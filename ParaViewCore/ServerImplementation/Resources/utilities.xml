@@ -1561,14 +1561,18 @@
 
   </ProxyGroup>
 
-  <ProxyGroup name="connection_cleaners">
-    <ConnectionCleanerProxy name="AnimationPlayer" class="vtkSMServerSideAnimationPlayer">
-
-      <ProxyProperty name="Writer"
-        command="SetWriter">
-      </ProxyProperty>
-    <!-- End of AnimationPlayer -->
-    </ConnectionCleanerProxy>
+  <ProxyGroup name="remote_player">
+    <!-- Proxy used to save animation remotely when the client disconnect -->
+    <Proxy name="AnimationPlayer" class="vtkPVServerSideAnimationPlayer">
+        <ProxyProperty name="Writer" command="SetWriter">
+        </ProxyProperty>
+        <StringVectorProperty name="XMLState" command="SetSessionProxyManagerState"
+                              number_of_elements="1" default_values="">
+          <Documentation>
+            Set the XML content of the vtkSMSessionProxyManager state.
+          </Documentation>
+        </StringVectorProperty>
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="extended_sources">
@@ -2306,6 +2310,19 @@
         </Documentation>
       </IntVectorProperty>
       <!-- End of TimerLog -->
+    </Proxy>
+
+    <ViewLayoutProxy name="ViewLayout" processes="client">
+      <Documentation>
+        Proxy used to manage layout for mutliple views.
+      </Documentation>
+    </ViewLayoutProxy>
+
+    <Proxy name="InternalViewLayoutHelper"
+      class="vtkViewLayout" processes="renderserver">
+      <Documentation>
+        Proxy used to manage layout for mutliple views.
+      </Documentation>
     </Proxy>
 
     <!-- End of group "misc" -->

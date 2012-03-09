@@ -20,16 +20,16 @@
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
+#include <map>
+#include <vector>
 #include "vtkStdString.h"
 
 struct vtkSMPropertyInternals
 {
-  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMDomain> > DomainMap;
+  typedef std::map<vtkStdString, vtkSmartPointer<vtkSMDomain> > DomainMap;
   DomainMap Domains;
 
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;
+  typedef std::vector<vtkSmartPointer<vtkSMDomain> > DependentsVector;
   DependentsVector Dependents;
 };
 

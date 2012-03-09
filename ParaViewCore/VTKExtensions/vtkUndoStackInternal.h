@@ -15,15 +15,15 @@
 #include "vtkSmartPointer.h"
 #include "vtkUndoSet.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 class vtkUndoStackInternal
 {
 public:
   struct Element
     {
-    vtkstd::string Label;
+    std::string Label;
     vtkSmartPointer<vtkUndoSet> UndoSet;
     Element(const char* label, vtkUndoSet* set)
       {
@@ -35,7 +35,7 @@ public:
         }
       }
     };
-  typedef vtkstd::vector<Element> VectorOfElements;
+  typedef std::vector<Element> VectorOfElements;
   VectorOfElements UndoStack;
   VectorOfElements RedoStack;
 };

@@ -1,0 +1,3 @@
+EXECUTE_PROCESS(
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "@ParaViewSuperBuild_CMAKE_SOURCE_DIR@/mantaPatches/Image/CMakeLists.txt" "@Manta_source@/Image/CMakeLists.txt"
+  )

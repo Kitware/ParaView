@@ -29,8 +29,8 @@
 #include "vtkSMSession.h"
 #include "vtkSMSourceProxy.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/set>
+#include <vector>
+#include <set>
 #include <vtkNew.h>
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
   bool FollowinMaster;
   bool Initilized;
   bool DisableSessionStatePush;
-  vtkstd::map<int, vtkSMMessage> ClientsCachedState;
+  std::map<int, vtkSMMessage> ClientsCachedState;
 
   vtkInternal(vtkSMProxySelectionModel* owner)
     {

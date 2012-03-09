@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDoubleValidator>
 
-#include <vtkSMProxy.h>
-#include <vtkSMProperty.h>
+#include "vtkSMProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
@@ -137,15 +138,15 @@ void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
 {
   BEGIN_UNDO_SET("Edit Keyframes");
 
+  vtkSMProxy* cueProxy = this->Internal->Cue->getProxy();
   if(this->Internal->Ui.variableRadio->isChecked())
     {
     this->Internal->Editor->writeKeyFrameData();
+    vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(0);
     }
   else if(this->Internal->Ui.constantRadio->isChecked())
     {
-    vtkSMProperty* prop =
-      this->Internal->Cue->getProxy()->GetProperty("UseAnimationTime");
-    pqSMAdaptor::setElementProperty(prop, 0);
+    vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(0);
 
     int oldNumber = this->Internal->Cue->getNumberOfKeyFrames();
     int newNumber = 2;
@@ -183,11 +184,9 @@ void pqPipelineTimeKeyFrameEditor::writeKeyFrameData()
       {
       this->Internal->Cue->deleteKeyFrame(0);
       }
-
-    vtkSMProperty* prop =
-      this->Internal->Cue->getProxy()->GetProperty("UseAnimationTime");
-    pqSMAdaptor::setElementProperty(prop, 1);
+    vtkSMPropertyHelper(cueProxy, "UseAnimationTime").Set(1);
     }
+  cueProxy->UpdateVTKObjects();
 
   END_UNDO_SET();
 }

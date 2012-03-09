@@ -189,6 +189,10 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   w2i->Update();
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
+#elif defined(__APPLE__)
+  w2i->ReadFrontBufferOn();
+  w2i->ShouldRerenderOn();
+  w2i->Update();
 #else
   // Everywhere else use back buffer.
   w2i->ReadFrontBufferOff();

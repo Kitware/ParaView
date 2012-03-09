@@ -1258,7 +1258,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
 	default_values="15.0" >
        <DoubleRangeDomain name="range" min="0" max="180" />
        <Documentation>
-	 The value of thie property is used in determining where the data set may be split. If the angle between two adjacent triangles is greater than or equal to the FeatureAngle value, then their boundary is considered a feature edge where the dataset can be split.
+	 The value of this property is used in determining where the data set may be split. If the angle between two adjacent triangles is greater than or equal to the FeatureAngle value, then their boundary is considered a feature edge where the dataset can be split.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -2769,7 +2769,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
 	     </RequiredProperties>
 	   </ArrayListDomain>
 	   <Documentation>
-	     The value of thie property lists the name of the scalar array to use in computing the median.
+	     The value of this property lists the name of the scalar array to use in computing the median.
 	   </Documentation>
      </StringVectorProperty>
 
@@ -8785,21 +8785,6 @@ This filter extracts a list of datasets from hierarchical datasets.
 	 The input that provides the selection object.
        </Documentation>
      </InputProperty>
-
-     <IntVectorProperty
-	name="PreserveTopology"
-	command="SetPreserveTopology"
-	number_of_elements="1"
-	default_values="0" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-	 If this property is set to 1 the output preserves the topology of its
-	 input and adds an insidedness array to mark which cells are inside or
-	 out. If 0 then the output is an unstructured grid which contains only
-	 the subset of cells that are inside.
-       </Documentation>
-     </IntVectorProperty>
-
      <!-- End ExtractSelection -->
    </SourceProxy>
 
@@ -8957,7 +8942,7 @@ This property controls how the filter works to generate tensor cell data. You ca
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractSelection" class="vtkExtractSelection"
+   <SourceProxy name="ExtractSelection" class="vtkPVSingleOutputExtractSelection"
       label="Extract Selection">
      <Documentation
 	short_help="Extract different type of selections."
@@ -9448,7 +9433,25 @@ This property controls how the filter works to generate tensor cell data. You ca
 	    Z coordinate in the generated polydata dataset.
 	  </Documentation>
       </StringVectorProperty>
+      <IntVectorProperty name="Create2DPoints" command="SetCreate2DPoints"
+                         number_of_elements="1" default_values="0"
+                         label="2D Points">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Specify whether the points of the polydata are 3D or 2D. If this is set to
+           true then the Z Column will be ignored and the z value of each point on the
+           polydata will be set to 0. By default this will be off.
+         </Documentation>
+      </IntVectorProperty>
 
+      <IntVectorProperty name="KeepAllDataArrays" command="SetPreserveCoordinateColumnsAsDataArrays"
+                         number_of_elements="1" default_values="0">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Allow user to keep columns specified as X,Y,Z as Data arrays.
+           By default this will be off.
+         </Documentation>
+      </IntVectorProperty>
     </SourceProxy>
 
     <!-- ==================================================================== -->
@@ -11333,8 +11336,17 @@ This property controls how the filter works to generate tensor cell data. You ca
             <Group name="filters"/>
          </ProxyGroupDomain>
          <DataTypeDomain name="input_type">
-           <DataType value="vtkDataSet"/>
+	          <DataType value="vtkCompositeDataSet"/>
          </DataTypeDomain>
+         <InputArrayDomain name="input_array1"
+                           attribute_type="cell"
+                           number_of_components="1">
+         </InputArrayDomain>
+         <InputArrayDomain name="input_array3"
+                           attribute_type="cell"
+                           number_of_components="3"
+                           optional="1">
+         </InputArrayDomain>
       </InputProperty>
 
       <IntVectorProperty
@@ -11400,15 +11412,73 @@ This property controls how the filter works to generate tensor cell data. You ca
          <SimpleIntInformationHelper/>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="NumberOfMaterials"
-        command="SetNumberOfMaterials"
-        number_of_elements="1"
-        default_values="1" >
-         <IntRangeDomain name="range" min="1"/>
-      </IntVectorProperty>
+      <StringVectorProperty name="VolumeFractionArrays"
+        command="SetMaterialVolumeFractionArray"
+        set_number_command="SetNumberOfMaterials"
+        use_index="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Scalars"
+          input_domain_name="input_array1">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+      </StringVectorProperty>
 
+      <StringVectorProperty name="NormalArrays"
+        command="SetMaterialNormalArray"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Vectors"
+          input_domain_name="input_array3">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </StringVectorProperty>
 
+      <StringVectorProperty name="OrderingArrays"
+        command="SetMaterialOrderingArray"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1">
+        <ArrayListDomain name="array_list"
+          attribute_type="Scalars"
+          input_domain_name="input_array1">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+      </StringVectorProperty>
+
+      <Hints>
+        <!--
+          YoungsMaterialInterface uses a custom panel that creates custom
+          widgets for these two properties so we hide them from the
+          auto-generated part of the panel.
+        -->
+        <Property name="OrderingArrays" show="0" />
+        <Property name="NormalArrays" show="0" />
+      </Hints>
      <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
 

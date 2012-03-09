@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkVRQueue.h"
 #include <sstream>
 #include <algorithm>
@@ -175,7 +176,7 @@ bool vtkVRInteractorStyle::update()
 bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
 {
   vtkSMProxy *p =0;
-  p = vtkSMProxyManager::GetProxyManager()->GetProxy( name.c_str() );
+  p = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetProxy( name.c_str() );
   if( p )
     {
     *proxy = p;

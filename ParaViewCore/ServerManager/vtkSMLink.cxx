@@ -22,7 +22,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkPVSession.h"
 
-#include <vtkstd/list>
+#include <list>
 
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand

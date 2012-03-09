@@ -36,17 +36,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSortFilterProxyModel>
 #include <QtDebug>
+#include <QTextEdit>
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqServer.h"
 #include "vtkNew.h"
 #include "vtkPVSystemInformation.h"
 #include "vtkSMSession.h"
 
-#include <vtkstd/map>
-#include <vtkstd/algorithm>
+#include <map>
+#include <algorithm>
 
 namespace
 {
@@ -166,7 +168,7 @@ public:
   virtual int rowCount(const QModelIndex &idx=QModelIndex()) const
     {
     (void)idx;
-    return this->Information->GetSystemInformations().size();
+    return static_cast<int>(this->Information->GetSystemInformations().size());
     }
   virtual int columnCount(const QModelIndex& idx=QModelIndex()) const
     {
@@ -177,7 +179,7 @@ public:
   virtual QVariant data(const QModelIndex& idx, int role=Qt::DisplayRole) const
     {
     if (role != Qt::DisplayRole && role != Qt::ToolTipRole &&
-      role != Qt::UserRole)
+      role != Qt::UserRole && role != Qt::EditRole)
       {
       return QVariant();
       }
@@ -190,7 +192,6 @@ public:
       // show a summary.
       return tooltipTemplate().arg(
         processTypeToText(info.ProcessType)).arg(
-        this->data(this->index(row, PROCESS_NAME)).toString()).arg(
         info.ProcessId).arg(info.NumberOfProcesses).arg(
         info.Hostname.c_str()).arg(info.OSName.c_str()).arg(
         info.Is64Bits? "64":"32").arg(
@@ -248,6 +249,18 @@ public:
 
     return this->Superclass::headerData(section, orientation, role);
     }
+
+  /// Method needed for copy/past cell editor
+  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const
+ {
+    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  }
+
+  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
+  {
+    // Fake edition...
+    return true;
+  }
   };
 };
 // Columns:
@@ -271,12 +284,13 @@ pqMemoryInspector::pqMemoryInspector(QWidget* parentObject, Qt::WindowFlags f)
   this->Internals->setupUi(this);
 
   // save the rich-text formatted text for later use.
-  this->Internals->SummaryText = this->Internals->summary->text();
-  this->Internals->summary->setText("");
+  this->Internals->SummaryText = this->Internals->summary->document()->toHtml();
+  this->Internals->summary->document()->setHtml("");
 
   this->Internals->ProxyModel.setSourceModel(&this->Internals->Model);
   this->Internals->tableView->setModel(
     &this->Internals->ProxyModel);
+  this->Internals->tableView->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   QObject::connect(this->Internals->buttonBox,
     SIGNAL(accepted()), this, SLOT(refresh()));
   QObject::connect(this->Internals->physicalMemory,
@@ -357,24 +371,24 @@ namespace
 
   class GatherSummary
     {
-    vtkstd::map<int, SummaryInfo> &Map;
+    std::map<int, SummaryInfo> &Map;
   public:
-    GatherSummary(vtkstd::map<int, SummaryInfo>& map):
+    GatherSummary(std::map<int, SummaryInfo>& map):
       Map(map) { }
     void operator() (
       const vtkPVSystemInformation::SystemInformationType& data)
       {
       SummaryInfo& info = this->Map[data.ProcessType];
-      info.PhysicalMin = vtkstd::min(info.PhysicalMin,
+      info.PhysicalMin = std::min(info.PhysicalMin,
         data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
-      info.PhysicalMax = vtkstd::max(info.PhysicalMax,
+      info.PhysicalMax = std::max(info.PhysicalMax,
         data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
       info.PhysicalSum += 
         (data.TotalPhysicalMemory - data.AvailablePhysicalMemory);
 
-      info.VirtualMin = vtkstd::min(info.VirtualMin,
+      info.VirtualMin = std::min(info.VirtualMin,
         data.TotalVirtualMemory - data.AvailableVirtualMemory);
-      info.VirtualMax = vtkstd::max(info.VirtualMax,
+      info.VirtualMax = std::max(info.VirtualMax,
         data.TotalVirtualMemory - data.AvailableVirtualMemory);
       info.VirtualSum += 
         (data.TotalVirtualMemory - data.AvailableVirtualMemory);
@@ -387,14 +401,14 @@ namespace
 //-----------------------------------------------------------------------------
 void pqMemoryInspector::updateSummary()
 {
-  vtkstd::map<int, SummaryInfo> collector;
-  vtkstd::for_each(
+  std::map<int, SummaryInfo> collector;
+  std::for_each(
     this->Internals->Model.GetInformation()->GetSystemInformations().begin(),
     this->Internals->Model.GetInformation()->GetSystemInformations().end(),
     GatherSummary(collector));
   QString text;
 
-  for (vtkstd::map<int, SummaryInfo>::iterator iter = collector.begin();
+  for (std::map<int, SummaryInfo>::iterator iter = collector.begin();
   iter != collector.end(); ++iter)
     {
     text += this->Internals->SummaryText.arg(
@@ -406,7 +420,15 @@ void pqMemoryInspector::updateSummary()
       memorySizeToText(iter->second.VirtualMax).toString()).arg(
       memorySizeToText(iter->second.VirtualSum/iter->second.Count).toString());
     }
-  this->Internals->summary->setText(text);
+  this->Internals->summary->document()->setHtml(text);
+
+  // Try reduce height of the process summary
+  int height = this->Internals->summary->heightForWidth(this->Internals->summary->width());
+  if(height < 0)
+    {
+    height = this->Internals->summary->minimumSizeHint().height();
+    }
+  this->Internals->summary->setMaximumHeight(height + 10);
 }
 
 //-----------------------------------------------------------------------------

@@ -28,7 +28,7 @@
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
 
-#include "vtkstd/string"
+#include "string"
 #include "vtksys/ios/sstream"
 
 #include "vtkCommand.h"
@@ -126,8 +126,8 @@ void vtkPVXYChartView::SetTitle(const char* title)
 {
   if (this->Chart)
     {
-    vtkstd::string tmp(title);
-    if (tmp.find("${TIME}") != vtkstd::string::npos)
+    std::string tmp(title);
+    if (tmp.find("${TIME}") != std::string::npos)
       {
       this->SetInternalTitle(title);
       }
@@ -493,9 +493,9 @@ void vtkPVXYChartView::Render(bool interactive)
   if (this->InternalTitle)
     {
     vtksys_ios::ostringstream new_title;
-    vtkstd::string title(this->InternalTitle);
+    std::string title(this->InternalTitle);
     size_t pos = title.find("${TIME}");
-    if (pos != vtkstd::string::npos)
+    if (pos != std::string::npos)
       {
       // The string was found - replace it and set the chart title.
       new_title << title.substr(0, pos)

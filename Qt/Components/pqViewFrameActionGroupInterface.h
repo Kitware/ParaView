@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 class pqViewFrameActionGroup;
-class pqMultiViewFrame;
+class pqViewFrame;
 class pqView;
 
 /// interface class for plugins that create QActionGroups
@@ -48,8 +48,10 @@ public:
 
   /// Add/remove plugin's actions to/from the frame 
   /// depending on the view type. Returns true if it did.
-  virtual bool connect(pqMultiViewFrame*, pqView*) = 0;
-  virtual bool disconnect(pqMultiViewFrame*, pqView*) = 0;
+  /// Note that pqView* may be NULL, implying that the frame is not being
+  /// assigned to any view.
+  virtual bool connect(pqViewFrame*, pqView*) = 0;
+  virtual bool disconnect(pqViewFrame*, pqView*) = 0;
 
   /// the instance of the QActionGroup that defines the actions
   virtual pqViewFrameActionGroup* actionGroup() = 0;

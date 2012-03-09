@@ -42,7 +42,7 @@ QtTesting.playCommand(object8, 'activate', '')
 object15 = 'pqClientMainWindow/representationToolbar/displayRepresentation/comboBox'
 QtTesting.playCommand(object15, 'set_string', 'Surface With Edges')
 object16 = 'pqClientMainWindow/1QTabBar1'
-QtTesting.playCommand(object16, 'set_tab', '1')
+QtTesting.playCommand(object16, 'set_tab_with_text', 'Display')
 
 # Change subdivision and capture images.
 # object17 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_vcontainer/1QScrollBar0'
@@ -50,7 +50,7 @@ QtTesting.playCommand(object16, 'set_tab', '1')
 # QtTesting.playCommand(object17, 'mouseMove', '1,0,0,7,175')
 # QtTesting.playCommand(object17, 'mouseRelease', '1,0,0,7,175')
 subdivisionWidget = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/pqDisplayProxyEditor/StyleGroup/NonlinearSubdivisionLevel'
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 
 QtTesting.playCommand(subdivisionWidget, 'set_int', '0')
 QtTestingImage.compareImage(snapshotWidget, 'NonlinearSubdivision0Display.png', 300, 300);

@@ -51,9 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerConnectReaction.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
-#include "pqViewManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 
@@ -78,6 +78,8 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   
   // check for --server.
   const char* serverresource_name = options->GetServerResourceName();
+  // (server-url gets lower priority than --server).
+  const char* server_url = options->GetServerURL();
   if (serverresource_name)
     {
     if (!pqServerConnectReaction::connectToServerUsingConfigurationName(
@@ -86,6 +88,14 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
       qCritical() << "Could not connect to requested server \"" 
         << serverresource_name 
         << "\". Creating default builtin connection.";
+      }
+    }
+  else if (server_url)
+    {
+    if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
+      {
+      qCritical() << "Could not connect to requested server \"" 
+        << server_url << "\". Creating default builtin connection.";
       }
     }
 
@@ -237,12 +247,13 @@ void pqCommandLineOptionsBehavior::resetApplication()
     }
 
   // reset view layout.
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-  if (viewManager)
+  pqTabbedMultiViewWidget* viewWidget = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  if (viewWidget)
     {
-    viewManager->reset();
+    viewWidget->reset();
     }
+
   // create default render view.
   pqApplicationCore::instance()->getObjectBuilder()->createView(
     pqRenderView::renderViewType(),

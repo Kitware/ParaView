@@ -334,11 +334,11 @@ static float nifti_mat33_colnorm( mat33 A ) ;
 static float nifti_mat33_determ ( mat33 R ) ;
 static mat33 nifti_mat33_mul    ( mat33 A , mat33 B ) ;
 
-static void  nifti_swap_2bytes ( int n , void *ar ) ;
-static void  nifti_swap_4bytes ( int n , void *ar ) ;
-static void  nifti_swap_8bytes ( int n , void *ar ) ;
-static void  nifti_swap_16bytes( int n , void *ar ) ;
-static void  nifti_swap_Nbytes ( int n , int siz , void *ar ) ;
+static void  nifti_swap_2bytes ( size_t n , void *ar ) ;
+static void  nifti_swap_4bytes ( size_t n , void *ar ) ;
+static void  nifti_swap_8bytes ( size_t n , void *ar ) ;
+static void  nifti_swap_16bytes( size_t n , void *ar ) ;
+static void  nifti_swap_Nbytes ( size_t n , int siz , void *ar ) ;
 
 static int    nifti_datatype_is_valid   (int dtype, int for_nifti);
 static int    nifti_datatype_from_string(const char * name);
@@ -502,19 +502,24 @@ static int    valid_nifti_extensions(const nifti_image *nim);
 
 #define NIFTI_ECODE_DICOM            2  /* intended for raw DICOM attributes  */
 
-#define NIFTI_ECODE_AFNI             4  /* Robert W Cox: rwcox@nih.gov */
+#define NIFTI_ECODE_AFNI             4  /* Robert W Cox: rwcox@nih.gov        */
+                                        /* http://afni.nimh.nih.gov/afni      */
 
-#define NIFTI_ECODE_COMMENT          6  /* plain ASCII text only */
+#define NIFTI_ECODE_COMMENT          6  /* plain ASCII text only              */
 
-#define NIFTI_ECODE_XCEDE            8  /* David B Keator: dbkeator@uci.edu */
+#define NIFTI_ECODE_XCEDE            8  /* David B Keator: dbkeator@uci.edu   */
+                                        /* http://www.nbirn.net/Resources/Users/Applications//xcede/index.htm */
 
-#define NIFTI_ECODE_JIMDIMINFO      10  /* Mark A Horsfield: */
+#define NIFTI_ECODE_JIMDIMINFO      10  /* Mark A Horsfield: mah5@leicester.ac.uk */
+                                        /* http://someplace/something         */
 
-#define NIFTI_ECODE_WORKFLOW_FWDS   12  /* Kate Fissell: fissell@pitt.edu */
+#define NIFTI_ECODE_WORKFLOW_FWDS   12  /* Kate Fissell: fissell@pitt.edu     */
+                                        /* http://kraepelin.wpic.pitt.edu/~fissell/NIFTI_ECODE_WORKFLOW_FWDS/NIFTI_ECODE_WORKFLOW_FWDS.html */
 
 #define NIFTI_ECODE_FREESURFER      14  /* http://surfer.nmr.mgh.harvard.edu  */
 
-#define NIFTI_ECODE_PYPICKLE        16  /* embedded Python objects */
+#define NIFTI_ECODE_PYPICKLE        16  /* embedded Python objects*/
+                                        /* http://niftilib.sourceforge.net/pynifti */
 
         /* LONI MiND codes: http://www.loni.ucla.edu/twiki/bin/view/Main/MiND */
 #define NIFTI_ECODE_MIND_IDENT      18  /* Vishal Patel: vishal.patel@ucla.edu*/
@@ -523,7 +528,12 @@ static int    valid_nifti_extensions(const nifti_image *nim);
 #define NIFTI_ECODE_DT_COMPONENT    24
 #define NIFTI_ECODE_SHC_DEGREEORDER 26  /* end LONI MiND codes                */
 
-#define NIFTI_MAX_ECODE             26  /******* maximum extension code *******/
+#define NIFTI_ECODE_VOXBO           28  /* Dan Kimberg: www.voxbo.org         */
+
+#define NIFTI_ECODE_CARET           30  /* John Harwell: john@brainvis.wustl.edu */
+                                        /* http://brainvis.wustl.edu/wiki/index.php/Caret:Documentation:CaretNiftiExtension */
+
+#define NIFTI_MAX_ECODE             30  /******* maximum extension code *******/
 
 /* nifti_type file codes */
 #define NIFTI_FTYPE_ANALYZE   0

@@ -55,11 +55,11 @@
 // STL
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
-#include "vtkstd/vector"
-using vtkstd::vector;
-#include "vtkstd/string"
-using vtkstd::string;
-#include "vtkstd/algorithm"
+#include "vector"
+using std::vector;
+#include "string"
+using std::string;
+#include "algorithm"
 // ansi c
 #include <math.h>
 // other

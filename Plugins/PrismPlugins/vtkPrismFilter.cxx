@@ -44,7 +44,7 @@ public:
     vtkSmartPointer<vtkBox> Box;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
-    vtkstd::string AxisVarName[3];
+    std::string AxisVarName[3];
     MyInternal()
     {
         this->SimulationDataThreshold=false;
@@ -108,9 +108,9 @@ bool vtkPrismFilter::GetSimulationDataThreshold()
 //----------------------------------------------------------------------------
 unsigned long vtkPrismFilter::GetMTime()
 {
-    unsigned long time = this->Superclass::GetMTime();
-    unsigned long readertime = this->Internal->Reader->GetMTime();
-    return time > readertime ? time : readertime;
+  unsigned long time = this->Superclass::GetMTime();
+  unsigned long readertime = this->Internal->Reader->GetMTime();
+  return time > readertime ? time : readertime;
 }
 
 //----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ int vtkPrismFilter::RequestSESAMEData(
                                       vtkInformationVector **vtkNotUsed(inputVector),
                                       vtkInformationVector *outputVector)
 {
-    vtkstd::string filename=this->Internal->Reader->GetFileName();
+    std::string filename=this->Internal->Reader->GetFileName();
     if(filename.empty())
     {
         return 1;
@@ -416,7 +416,6 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
     return 0;
   }
 
-  const int tableId = this->GetTable();
   bool scalingEnabled[3] = {this->GetSESAMEXLogScaling(),
                             this->GetSESAMEYLogScaling(),
                             this->GetSESAMEZLogScaling()};
@@ -468,7 +467,7 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
       newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
       newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
-      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
+      vtkPrismCommon::logScale(newPt,scalingEnabled);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
 
 
@@ -519,9 +518,8 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
       newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
       newPt[1] = inputScalars[1]->GetTuple( cellId )[0];
       newPt[2] = inputScalars[2]->GetTuple( cellId )[0];
-      vtkPrismCommon::scalePoint(newPt,scalingEnabled,tableId);
+      vtkPrismCommon::logScale(newPt,scalingEnabled);
       newIDs[0] = newPoints->InsertNextPoint( newPt );
-
       polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
     }
 
@@ -552,60 +550,60 @@ int vtkPrismFilter::RequestGeometryData(
                                         vtkInformationVector *outputVector)
 {
 
-    if( strcmp(this->GetXAxisVarName(), "none") == 0)
+  if( strcmp(this->GetXAxisVarName(), "none") == 0)
     {
-        return 1;
+    return 1;
     }
 
-    vtkInformation *info = outputVector->GetInformationObject(3);
-    vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
-        info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkInformation *info = outputVector->GetInformationObject(3);
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
+    info->Get(vtkDataObject::DATA_OBJECT()));
 
-    if ( !output ) 
+  if ( !output ) 
     {
-        vtkDebugMacro( << "No output found." );
-        return 0;
+    vtkDebugMacro( << "No output found." );
+    return 0;
     }
 
-    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    vtkMultiBlockDataSet *inputMB = vtkMultiBlockDataSet::SafeDownCast(
-      inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if (inputMB )
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkMultiBlockDataSet *inputMB = vtkMultiBlockDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  if (inputMB )
     {
-      unsigned int j=0;
-      vtkCompositeDataIterator* iter= inputMB->NewIterator();
-      iter->SkipEmptyNodesOn();
-      iter->TraverseSubTreeOn();
-      iter->VisitOnlyLeavesOn();
-      iter->GoToFirstItem();
-      while(!iter->IsDoneWithTraversal())
+    unsigned int j=0;
+    vtkCompositeDataIterator* iter= inputMB->NewIterator();
+    iter->SkipEmptyNodesOn();
+    iter->TraverseSubTreeOn();
+    iter->VisitOnlyLeavesOn();
+    iter->GoToFirstItem();
+    while(!iter->IsDoneWithTraversal())
       {
-        vtkDataSet *inputData=NULL;
-        inputData=vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        iter->GoToNextItem();
-        if(inputData)
+      vtkDataSet *inputData=NULL;
+      inputData=vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      iter->GoToNextItem();
+      if(inputData)
         {
-          this->CreateGeometry(inputData,j,output);
-          j++;
+        this->CreateGeometry(inputData,j,output);
+        j++;
         }
       }
-      iter->Delete();
-      return 1;
+    iter->Delete();
+    return 1;
     }
 
-    vtkDataSet *inputDS = vtkDataSet::SafeDownCast(
-      inInfo->Get(vtkDataObject::DATA_OBJECT()));
-    if(inputDS)
+  vtkDataSet *inputDS = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  if(inputDS)
     {
-      this->CreateGeometry(inputDS,0,output);
-      return 1;
-    }
-    else
-    {
-        vtkDebugMacro( << "Incorrect input type." );
-        return 0;
-    }
+    this->CreateGeometry(inputDS,0,output);
     return 1;
+    }
+  else
+    {
+    vtkDebugMacro( << "Incorrect input type." );
+    return 0;
+    }
+  return 1;
 }
 
 

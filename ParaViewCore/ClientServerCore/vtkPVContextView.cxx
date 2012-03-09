@@ -66,7 +66,7 @@ vtkPVContextView::vtkPVContextView()
 //----------------------------------------------------------------------------
 vtkPVContextView::~vtkPVContextView()
 {
-  vtkTileDisplayHelper::GetInstance()->EraseTile(this);
+  vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier);
 
   this->RenderWindow->Delete();
   this->ContextView->Delete();
@@ -98,7 +98,7 @@ void vtkPVContextView::Update()
 
   if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    vtkstd::vector<int> need_delivery;
+    std::vector<int> need_delivery;
     int num_reprs = this->GetNumberOfRepresentations();
     for (int cc=0; cc < num_reprs; cc++)
       {
@@ -199,7 +199,7 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
     // from the client-side.
     this->ContextView->GetRenderer()->EraseOff();
     this->ReceiveImageToFromClient();
-    vtkTileDisplayHelper::GetInstance()->FlushTiles(this, 
+    vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
       this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
     this->GetRenderWindow()->Frame();
     }
@@ -338,7 +338,7 @@ void vtkPVContextView::ReceiveImageToFromClient()
     vtkUnsignedCharArray::SafeDownCast(image->GetPointData()->GetScalars()));
   tile.MarkValid();
 
-  vtkTileDisplayHelper::GetInstance()->SetTile(this,
+  vtkTileDisplayHelper::GetInstance()->SetTile(this->Identifier,
     physical_viewport,
     this->ContextView->GetRenderer(), tile);
   image->Delete();

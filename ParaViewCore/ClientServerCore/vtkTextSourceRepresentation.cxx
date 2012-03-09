@@ -197,7 +197,7 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
     // since there's no direct connection between the mapper and the collector,
     // we don't put an update-suppressor in the pipeline.
 
-    vtkstd::string text;
+    std::string text;
 
     vtkFieldData* fieldData =
       this->DataCollector->GetOutputDataObject(0)->GetFieldData();

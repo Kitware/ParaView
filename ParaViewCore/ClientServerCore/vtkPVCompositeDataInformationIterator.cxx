@@ -18,7 +18,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 class vtkPVCompositeDataInformationIterator::vtkInternal
 {
@@ -36,7 +36,7 @@ public:
       }
     };
 
-  vtkstd::vector<vtkItem> Stack;
+  std::vector<vtkItem> Stack;
 };
 
 vtkStandardNewMacro(vtkPVCompositeDataInformationIterator);

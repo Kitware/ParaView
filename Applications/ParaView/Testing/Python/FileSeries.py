@@ -12,7 +12,7 @@ QtTesting.playCommand(object12, 'set_int', '0')
 QtTesting.playCommand(object12, 'key', '16777220')
 object3 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
 QtTesting.playCommand(object3, 'activate', '')
-object4 = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object4, 'mousePress', '(0.539658,0.641618,1,1,0)')
 QtTesting.playCommand(object4, 'mouseMove', '(0.225505,0.603083,1,0,0)')
 QtTesting.playCommand(object4, 'mouseRelease', '(0.225505,0.603083,1,0,0)')
@@ -28,7 +28,7 @@ QtTesting.playCommand(object3, 'activate', '')
 #QtTesting.playCommand(object8, 'activate', 'actionToolsRecordTestScreenshot')
 #object9 = 'pqClientMainWindow/RecordTestScreenshotDialog'
 #QtTesting.playCommand(object9, 'filesSelected', '$PARAVIEW_DATA_ROOT/Baseline/FileSeries1.png')
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'FileSeries1.png', 300, 300);
 object10 = 'pqClientMainWindow/currentTimeToolbar/qt_toolbar_ext_button'
 QtTesting.playCommand(object10, 'activate', '')

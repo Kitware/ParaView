@@ -16,7 +16,7 @@
 #include "vtkMaterialInterfaceProcessLoading.h"
 using vtksys_ios::ostream;
 using vtksys_ios::endl;
-using vtkstd::vector;
+using std::vector;
 
 //
 ostream &operator<<(ostream &sout, vtkMaterialInterfaceProcessLoading &fp)

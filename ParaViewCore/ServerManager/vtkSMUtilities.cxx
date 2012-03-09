@@ -29,7 +29,7 @@
 #include "vtkTransform.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(vtkSMUtilities);
 
@@ -42,7 +42,7 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
     return vtkErrorCode::NoFileNameError;
     }
 
-  vtkstd::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
+  std::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
   ext = vtksys::SystemTools::LowerCase(ext);
 
   vtkImageWriter* writer = 0;

@@ -101,44 +101,44 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim)
 }
 
 //GetExtension from uiig library.
-static vtkstd::string
-GetExtension( const vtkstd::string& filename ) {
+static std::string
+GetExtension( const std::string& filename ) {
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const vtkstd::string::size_type it = filename.find_last_of( "." );
+  const std::string::size_type it = filename.find_last_of( "." );
 
   // This determines the file's type by creating a new string
   // who's value is the extension of the input filename
   // eg. "myimage.gif" has an extension of "gif"
-  vtkstd::string fileExt( filename, it+1, filename.length() );
+  std::string fileExt( filename, it+1, filename.length() );
 
   return( fileExt );
 }
 
 //GetRootName from uiig library.
-static vtkstd::string
-GetRootName( const vtkstd::string& filename )
+static std::string
+GetRootName( const std::string& filename )
 {
-  const vtkstd::string fileExt = GetExtension(filename);
+  const std::string fileExt = GetExtension(filename);
 
   // Create a base filename
   // i.e Image.hdr --> Image
   if( fileExt.length() > 0 )
     {
-    const vtkstd::string::size_type it = filename.find_last_of( fileExt );
-    vtkstd::string baseName( filename, 0, it-fileExt.length() );
+    const std::string::size_type it = filename.find_last_of( fileExt );
+    std::string baseName( filename, 0, it-fileExt.length() );
     return( baseName );
     }
   //Default to return same as input when the extension is nothing (Analyze)
   return( filename );
 }
 
-static vtkstd::string
-GetHeaderFileName( const vtkstd::string & filename )
+static std::string
+GetHeaderFileName( const std::string & filename )
 {
-  vtkstd::string ImageFileName = GetRootName(filename);
-  vtkstd::string fileExt = GetExtension(filename);
+  std::string ImageFileName = GetRootName(filename);
+  std::string fileExt = GetExtension(filename);
   //If file was named xxx.img.gz then remove both the gz and the img endings.
   if(!fileExt.compare("gz"))
     {
@@ -149,11 +149,11 @@ GetHeaderFileName( const vtkstd::string & filename )
 }
 
 //Returns the base image filename.
-static vtkstd::string GetImageFileName( const vtkstd::string& filename )
+static std::string GetImageFileName( const std::string& filename )
 {
   // Why do we add ".img" here?  Look in fileutils.h
-  vtkstd::string fileExt = GetExtension(filename);
-  vtkstd::string ImageFileName = GetRootName(filename);
+  std::string fileExt = GetExtension(filename);
+  std::string ImageFileName = GetRootName(filename);
   if(!fileExt.compare("gz"))
     {
     //First strip both extensions off
@@ -167,7 +167,7 @@ static vtkstd::string GetImageFileName( const vtkstd::string& filename )
   else
     {
     //uiig::Reporter* reporter = uiig::Reporter::getReporter();
-    //vtkstd::string temp="Error, Can not determine compressed file image name. ";
+    //std::string temp="Error, Can not determine compressed file image name. ";
     //temp+=filename;
     //reporter->setMessage( temp );
     return ("");
@@ -206,7 +206,7 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
   }
 
   char *iname = this->GetFileName();
-  vtkstd::string HeaderFileName = GetHeaderFileName( iname );
+  std::string HeaderFileName = GetHeaderFileName( iname );
 
    if( ! vtknifti1_io::nifti_validfilename(HeaderFileName.c_str())  ) vtkErrorMacro("bad fname input") ;
 
@@ -695,6 +695,10 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   int flipIndex[3];
   int InPlaceFilteredAxes[3];
   int count;
+  int inExtent[6];
+  int outExtent[6];
+  int inStride[3];
+  int outStride[3];
   long inOffset;
   long charInOffset;
 
@@ -754,15 +758,26 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   for (count=0;count<3;count++){
   inDim[count] = (extent[(count*2)+1] - extent[count*2]) + 1;
+  inExtent[count*2] = extent[count*2];
+  inExtent[(count*2)+1] = extent[(count*2)+1];
  }
+
+  inStride[0] =                       scalarSize;
+  inStride[1] =            inDim[0] * scalarSize;
+  inStride[2] = inDim[1] * inDim[0] * scalarSize;
 
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
+    outStride[count]       = inStride[InPlaceFilteredAxes[count]];
+  outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
+  outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
 
   unsigned char* tempUnsignedCharData = NULL;
+  unsigned char* tempOutUnsignedCharData = NULL;
 
   tempUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
+  tempOutUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
 
   double tempSizeDouble;
   int tempSizeInt = 0;
@@ -861,7 +876,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
         for (idSize = 0; idSize < scalarSize ; idSize++){ 
         charOutOffset = outOffset + idSize;
-      outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
+      tempOutUnsignedCharData[charOutOffset] = tempUnsignedCharData[count++];
         } 
       } 
     }
@@ -869,7 +884,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
  } else if(imageDataType==1){
   for (count = 0; count < tempSizeInt ; count++){ 
     //outUnsignedCharPtr[count] = zeroValue;
-    outUnsignedCharPtr[count] = tempUnsignedCharData[count];
+    tempOutUnsignedCharData[count] = tempUnsignedCharData[count];
   } 
  }
 
@@ -881,7 +896,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   int byteSize = 8;
 
   for (count = 0; count < ((int) imageSizeInBytes) ; count++){ 
-    tempByte = outUnsignedCharPtr[count];
+    tempByte = tempOutUnsignedCharData[count];
 
     //swap tempByte
     newByte = 0;
@@ -890,7 +905,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     newByte += tempBit << (7 - bitCount);
     }
 
-    outUnsignedCharPtr[count] = newByte;
+    tempOutUnsignedCharData[count] = newByte;
   } 
   }
 
@@ -911,7 +926,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   if (imageDataType!=VTK_BIT){
     for (count = 0 ; count < onDiskImageSizeInBytes ; count++){
-    tempUnsignedCharData[count] = outUnsignedCharPtr[count];
+    tempUnsignedCharData[count] = tempOutUnsignedCharData[count];
     }
   } else {
     // Loop through input voxels
@@ -924,19 +939,21 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     unsigned char tempByteValue = 0;
     unsigned char tempBitValue = 0;
     int outBitNumber = 0;
+    int outTotalBitNumber = 0;
 
     for ( idZ = 0 ; idZ < outDim[2] ; idZ++){
     for ( idY = 0; idY < outDim[1] ; idY++){
       for (idX = 0; idX < outDim[0] ; idX++){
       outSliceOffset = tempSliceSizeInt * idZ;
       outSliceBit =  (idY * outDim[0]) + idX;
+      outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
       outSliceByte = (int) (outSliceBit / 8);
       outOffsetByte = outSliceOffset + outSliceByte;
       outBitNumber = outSliceBit %8;
         byteBitCount = totalBitCount % 8;
         byteCount = (int) (totalBitCount / 8);
 
-      tempByteValue = outUnsignedCharPtr[byteCount];
+      tempByteValue = tempOutUnsignedCharData[byteCount];
       tempBitValue = (tempByteValue >> byteBitCount) & 0x01;
 
       if(outBitNumber==0){
@@ -951,11 +968,14 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   }
   char * outP = (char *) (tempUnsignedCharData);
 
+  delete tempOutUnsignedCharData;
+  tempOutUnsignedCharData = NULL;
+
    write_data = 1;
    leave_open = 0;
 
   char *iname = this->GetFileName();
-  vtkstd::string ImageFileName = GetImageFileName( iname );
+  std::string ImageFileName = GetImageFileName( iname );
 
   if( ! znz_isnull(imgfile) ){
      fp = imgfile;
@@ -974,6 +994,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   delete tempUnsignedCharData;
   tempUnsignedCharData = NULL;
+  outP = NULL;
 
 }
 

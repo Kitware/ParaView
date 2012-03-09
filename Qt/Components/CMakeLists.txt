@@ -121,8 +121,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspector.h
-  pqMultiView.h
-  pqMultiViewFrame.h
+  pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
   pqObjectInspectorWidget.h
@@ -186,6 +185,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqStandardColorButton.h
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.h
+  pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
   pqThresholdPanel.h
@@ -196,12 +196,14 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqVCRController.h
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
+  pqViewFrame.h
   pqViewFrameActionGroup.h
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.h
+  pqYoungsMaterialInterfacePanel.h
   pqComponentsTestUtility.h
   pqTransferFunctionChartViewWidget.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
@@ -253,7 +255,6 @@ SET(UI_FORMS
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
   Resources/UI/pqMemoryInspector.ui
-  Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
@@ -394,8 +395,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqClipPanel.h
   pqChartSummaryDisplayPanel.cxx
   pqChartSummaryDisplayPanel.h
-  pqCloseViewUndoElement.cxx
-  pqCloseViewUndoElement.h
   pqCollaborationPanel.cxx
   pqCollaborationPanel.h
   pqColorMapModel.cxx
@@ -503,10 +502,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqLockViewSizeCustomDialog.h
   pqMemoryInspector.cxx
   pqMemoryInspector.h
-  pqMultiView.cxx
-  pqMultiView.h
-  pqMultiViewFrame.cxx
-  pqMultiViewFrame.h
+  pqMultiViewWidget.cxx
+  pqMultiViewWidget.h
   pqNamedObjectPanel.cxx
   pqNamedObjectPanel.h
   pqNamedWidgets.cxx
@@ -626,8 +623,6 @@ VTK_ADD_LIBRARY(pqComponents
   pqSphereWidget.h
   pqSplineWidget.cxx
   pqSplineWidget.h
-  pqSplitViewUndoElement.cxx
-  pqSplitViewUndoElement.h
   pqSpreadSheetDisplayEditor.cxx
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx
@@ -638,6 +633,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
+  pqTabbedMultiViewWidget.cxx
+  pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.cxx
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.cxx
@@ -661,6 +658,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.cxx
   pqViewContextMenuManager.h
+  pqViewFrame.cxx
+  pqViewFrame.h
   pqViewManager.cxx
   pqViewManager.h
   pqWidgetRangeDomain.cxx
@@ -671,6 +670,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqXYChartDisplayPanel.h
   pqXYChartOptionsEditor.cxx
   pqXYChartOptionsEditor.h
+  pqYoungsMaterialInterfacePanel.cxx
+  pqYoungsMaterialInterfacePanel.h
   pqTransferFunctionChartViewWidget.cxx
   pqTransferFunctionChartViewWidget.h 
   ${EXTRA_PQ_COMPONENT_SOURCES}

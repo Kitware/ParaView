@@ -27,7 +27,7 @@
 
 #include <string.h>
 #include <algorithm>
-#include <vtkstd/vector>
+#include <vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
@@ -179,7 +179,7 @@ vtkPVDataSetAttributesInformation
 
   // sort the arrays alphabetically
   int   arrayIndx = 0;
-  vtkstd::vector < vtkPVDataSetAttributesInformationSortArray > sortArays;
+  std::vector < vtkPVDataSetAttributesInformationSortArray > sortArays;
   sortArays.clear();
 
   if ( num > 0 )
@@ -192,7 +192,7 @@ vtkPVDataSetAttributesInformation
         da->GetArrayName(i) : "";
       }
 
-    vtkstd::sort( sortArays.begin(), sortArays.end(),
+    std::sort( sortArays.begin(), sortArays.end(),
                   vtkPVDataSetAttributesInfromationAlphabeticSorting );
     }
 
@@ -551,7 +551,7 @@ vtkPVDataSetAttributesInformation
 
   // Each array's information.
   vtkClientServerStream acss;
-  vtkstd::vector<unsigned char> data;
+  std::vector<unsigned char> data;
   for(int i=0; i < numArrays; ++i)
     {
     vtkTypeUInt32 length;

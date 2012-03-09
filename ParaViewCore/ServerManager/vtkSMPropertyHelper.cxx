@@ -392,7 +392,14 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const int *values, unsigned in
 {
   if(this->Type == INT)
     {
-    this->IntVectorProperty->SetElements(values, count);
+    if (this->UseUnchecked)
+      {
+      this->IntVectorProperty->SetUncheckedElements(values, count);
+      }
+    else
+      {
+      this->IntVectorProperty->SetElements(values, count);
+      }
     }
   else
     {
@@ -406,7 +413,14 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const double *values, unsigned
 {
   if(this->Type == DOUBLE)
     {
-    this->DoubleVectorProperty->SetElements(values, count);
+    if (this->UseUnchecked)
+      {
+      this->DoubleVectorProperty->SetUncheckedElements(values, count);
+      }
+    else
+      {
+      this->DoubleVectorProperty->SetElements(values, count);
+      }
     }
   else
     {
@@ -421,7 +435,14 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsig
 {
   if(this->Type == IDTYPE)
     {
-    this->IdTypeVectorProperty->SetElements(values, count);
+    if (this->UseUnchecked)
+      {
+      this->IdTypeVectorProperty->SetUncheckedElements(values, count);
+      }
+    else
+      {
+      this->IdTypeVectorProperty->SetElements(values, count);
+      }
     }
   else
     {
@@ -523,11 +544,25 @@ void vtkSMPropertyHelper::SetNumberOfElements(unsigned int elems)
     case DOUBLE:
     case IDTYPE:
     case STRING:
-      this->VectorProperty->SetNumberOfElements(elems);
+      if (this->UseUnchecked)
+        {
+        this->VectorProperty->SetNumberOfUncheckedElements(elems);
+        }
+      else
+        {
+        this->VectorProperty->SetNumberOfElements(elems);
+        }
       break;
     case PROXY:
     case INPUT:
-      this->ProxyProperty->SetNumberOfProxies(elems);
+      if (this->UseUnchecked)
+        {
+        this->ProxyProperty->SetNumberOfUncheckedProxies(elems);
+        }
+      else
+        {
+        this->ProxyProperty->SetNumberOfProxies(elems);
+        }
       break;
     default:
       vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
@@ -543,9 +578,18 @@ unsigned int vtkSMPropertyHelper::GetNumberOfElements() const
     case DOUBLE:
     case IDTYPE:
     case STRING:
+      if (this->UseUnchecked)
+        {
+        return this->VectorProperty->GetNumberOfUncheckedElements();
+        }
       return this->VectorProperty->GetNumberOfElements();
+
     case PROXY:
     case INPUT:
+      if (this->UseUnchecked)
+        {
+        return this->ProxyProperty->GetNumberOfUncheckedProxies();
+        }
       return this->ProxyProperty->GetNumberOfProxies();
     default:
       vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
@@ -669,11 +713,25 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value,
 {
   if (this->Type == PROXY)
     {
-    this->ProxyProperty->SetProxy(index, value);
+    if (this->UseUnchecked)
+      {
+      this->ProxyProperty->SetUncheckedProxy(index, value);
+      }
+    else
+      {
+      this->ProxyProperty->SetProxy(index, value);
+      }
     }
   else if (this->Type == INPUT)
     {
-    this->InputProperty->SetInputConnection(index, value, outputport);
+    if (this->UseUnchecked)
+      {
+      this->InputProperty->SetUncheckedInputConnection(index, value, outputport);
+      }
+    else
+      {
+      this->InputProperty->SetInputConnection(index, value, outputport);
+      }
     }
   else
     {
@@ -685,6 +743,13 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value,
 void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count, 
   unsigned int *outputports/*=NULL*/)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return;
+    }
+
   if (this->Type == PROXY)
     {
     this->ProxyProperty->SetProxies(count, value);
@@ -702,6 +767,12 @@ void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count,
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return;
+    }
   if (this->Type == PROXY)
     {
     this->ProxyProperty->AddProxy(value);
@@ -719,6 +790,12 @@ void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Remove(vtkSMProxy* value)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return;
+    }
   if(this->Type == PROXY ||
      this->Type == INPUT)
     {
@@ -739,6 +816,13 @@ vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
 //----------------------------------------------------------------------------
 unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return 0;
+    }
+
   if (this->Type == INPUT)
     {
     return this->InputProperty->GetOutputPortForConnection(index);
@@ -751,92 +835,31 @@ unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::SetStatus(const char* key, int value)
 {
-  if (this->Type != vtkSMPropertyHelper::STRING)
-    {
-    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
-    return;
-    }
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->Property);
-  if (svp->GetNumberOfElementsPerCommand() != 2)
-    {
-    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
-    return;
-    }
-
-  if (!svp->GetRepeatCommand())
-    {
-    vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
-    return;
-    }
-
-
   vtksys_ios::ostringstream str;
   str << value;
-
-  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
-    {
-    if (strcmp(svp->GetElement(cc), key) == 0)
-      {
-      svp->SetElement(cc+1, str.str().c_str());
-      return;
-      }
-    }
-
-  vtkStringList* list = vtkStringList::New();
-  svp->GetElements(list);
-  list->AddString(key);
-  list->AddString(str.str().c_str());
-  svp->SetElements(list);
-  list->Delete();
+  this->SetStatus(key, str.str().c_str());
 }
 
 //----------------------------------------------------------------------------
 int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
 {
-  if (this->Type != vtkSMPropertyHelper::STRING)
-    {
-    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
-    return default_value;
-    }
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->Property);
-  while (svp)
-    {
-    if (svp->GetNumberOfElementsPerCommand() != 2)
-      {
-      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
-      return default_value;
-      }
-
-    if (!svp->GetRepeatCommand())
-      {
-      vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
-      return default_value;
-      }
-
-    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
-      {
-      if (strcmp(svp->GetElement(cc), key) == 0)
-        {
-        return atoi(svp->GetElement(cc+1));
-        }
-      }
-
-    // Now check if the information_property has the value.
-    svp = svp->GetInformationOnly() == 0? 
-      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty()) : 0;
-    }
-
-  return default_value;
+  vtksys_ios::ostringstream str;
+  str << default_value;
+  const char* value = vtkSMPropertyHelper::GetStatus(key, str.str().c_str());
+  return atoi(value);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
   int num_values)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return;
+    }
+
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
     vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
@@ -894,6 +917,13 @@ void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
 //----------------------------------------------------------------------------
 bool vtkSMPropertyHelper::GetStatus(const char* key, double *values, int num_values)
 {
+  if (this->UseUnchecked)
+    {
+    // FIXME
+    vtkSMPropertyHelperWarningMacro("Call not supported for unchecked values");
+    return false;
+    }
+
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
     vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
@@ -961,20 +991,48 @@ void vtkSMPropertyHelper::SetStatus(const char* key, const char* value)
     return;
     }
 
-  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+  if (this->UseUnchecked)
     {
-    if (strcmp(svp->GetElement(cc), key) == 0)
+    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfUncheckedElements(); cc+=2)
       {
-      svp->SetElement(cc+1, value);
-      return;
+      if (strcmp(svp->GetUncheckedElement(cc), key) == 0)
+        {
+        svp->SetUncheckedElement(cc+1, value);
+        return;
+        }
+      }
+    }
+  else
+    {
+    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+      {
+      if (strcmp(svp->GetElement(cc), key) == 0)
+        {
+        svp->SetElement(cc+1, value);
+        return;
+        }
       }
     }
 
   vtkStringList* list = vtkStringList::New();
-  svp->GetElements(list);
+  if (this->UseUnchecked)
+    {
+    svp->GetUncheckedElements(list);
+    }
+  else
+    {
+    svp->GetElements(list);
+    }
   list->AddString(key);
   list->AddString(value);
-  svp->SetElements(list);
+  if (this->UseUnchecked)
+    {
+    svp->SetUncheckedElements(list);
+    }
+  else
+    {
+    svp->SetElements(list);
+    }
   list->Delete();
 }
 
@@ -1003,11 +1061,24 @@ const char* vtkSMPropertyHelper::GetStatus(const char* key, const char* default_
       return default_value;
       }
 
-    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+    if (this->UseUnchecked)
       {
-      if (strcmp(svp->GetElement(cc), key) == 0)
+      for (unsigned int cc=0; (cc+1) < svp->GetNumberOfUncheckedElements(); cc+=2)
         {
-        return svp->GetElement(cc+1);
+        if (strcmp(svp->GetUncheckedElement(cc), key) == 0)
+          {
+          return svp->GetUncheckedElement(cc+1);
+          }
+        }
+      }
+    else
+      {
+      for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+        {
+        if (strcmp(svp->GetElement(cc), key) == 0)
+          {
+          return svp->GetElement(cc+1);
+          }
         }
       }
 

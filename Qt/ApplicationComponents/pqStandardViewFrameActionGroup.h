@@ -35,18 +35,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrameActionGroup.h"
 #include "pqApplicationComponentsExport.h"
 
+class QWidget;
+class pqViewFrame;
+
 class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardViewFrameActionGroup : public pqViewFrameActionGroup
 {
   Q_OBJECT
   typedef pqViewFrameActionGroup Superclass;
 public:
   pqStandardViewFrameActionGroup(QObject* parent=0);
+  virtual ~pqStandardViewFrameActionGroup();
 
-  // Description:
-  // Tries to add/remove this group's actions to/from the frame if the
-  // view type is supported. Returns whether or not they were.
-  virtual bool connect(pqMultiViewFrame *frame, pqView *view);
-  virtual bool disconnect(pqMultiViewFrame *frame, pqView *view);
+  /// Tries to add/remove this group's actions to/from the frame if the
+  /// view type is supported. Returns whether or not they were.
+  virtual bool connect(pqViewFrame *frame, pqView *view);
+  virtual bool disconnect(pqViewFrame *frame, pqView *view);
+
+protected slots:
+  /// Called before the "Convert To" menu is shown. We populate the menu with
+  /// actions for available view types.
+  void aboutToShowConvertMenu();
+
+  /// This slot is called either from an action in the "Convert To" menu, or from
+  /// the buttons on an empty frame.
+  void invoked();
+
+protected:
+  void setupEmptyFrame(QWidget* frame);
 
 private:
   Q_DISABLE_COPY(pqStandardViewFrameActionGroup)

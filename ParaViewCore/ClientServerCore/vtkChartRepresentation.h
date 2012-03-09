@@ -124,7 +124,7 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  vtkTable* GetLocalOutput();
+  virtual vtkTable* GetLocalOutput();
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;

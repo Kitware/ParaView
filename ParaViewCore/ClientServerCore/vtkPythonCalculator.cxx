@@ -29,9 +29,9 @@
 #include "vtkDataArray.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <algorithm>
+#include <map>
+#include <string>
 
 vtkStandardNewMacro(vtkPythonCalculator);
 
@@ -133,7 +133,7 @@ void vtkPythonCalculator::Exec(const char* expression,
     }
 
   // Replace tabs with two spaces
-  vtkstd::string orgscript;
+  std::string orgscript;
   size_t len = strlen(expression);
   for(size_t i=0; i< len; i++)
     {
@@ -150,7 +150,7 @@ void vtkPythonCalculator::Exec(const char* expression,
   //size_t pos = orgscript.rfind("\n");
     
   // Construct a script that defines a function
-  vtkstd::string fscript;
+  std::string fscript;
   fscript  = "def ";
   fscript += funcname;
 
@@ -223,7 +223,7 @@ void vtkPythonCalculator::Exec(const char* expression,
   
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
 
-  vtkstd::string runscript;
+  std::string runscript;
   runscript += "import paraview\n";
   runscript += "paraview.fromFilter = True\n";
   runscript += "from paraview import vtk\n";

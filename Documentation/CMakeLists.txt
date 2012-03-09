@@ -28,6 +28,8 @@ build_help_project(paraview
     "<toc>
        <section title=\"ParaView User Manual\" ref=\"index.html\">
          <section title=\"Introduction\" ref=\"Book/Book_Chapter1.html\"/>
+         <section title=\"Python Calculator\" ref=\"Book/Book_PythonCalculator.html\"/>
+         <section title=\"Query Data\" ref=\"Book/Book_Chapter6.html\"/>
          <section title=\"Plugins\" ref=\"Book/Book_Chapter16.html\"/>
          <section title=\"Appendices\" ref=\"Book/Book_Chapter17.html\"/>
          <section title=\"Sources\" ref=\"Sources.html\"/>

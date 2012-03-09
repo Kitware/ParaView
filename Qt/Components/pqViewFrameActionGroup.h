@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QActionGroup>
 #include "pqComponentsExport.h"
 
-class pqMultiViewFrame;
+class pqViewFrame;
 class pqView;
 
 /// Base class for custom action groups that can be added to a view 
@@ -51,8 +51,8 @@ public:
   // Description:
   // Tries to add/remove this group's actions to/from the frame if the
   // view type is supported. Returns whether or not they were.
-  virtual bool connect(pqMultiViewFrame *frame, pqView *view) = 0;
-  virtual bool disconnect(pqMultiViewFrame *frame, pqView *view) = 0;
+  virtual bool connect(pqViewFrame *frame, pqView *view) = 0;
+  virtual bool disconnect(pqViewFrame *frame, pqView *view) = 0;
 
 private:
   pqViewFrameActionGroup(const pqViewFrameActionGroup&); // Not implemented.

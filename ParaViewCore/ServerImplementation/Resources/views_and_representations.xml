@@ -48,6 +48,9 @@
         <Documentation>
           Set the position on this view in the multiview configuration.
         </Documentation>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </IntVectorProperty>
 
       <IntVectorProperty name="ViewSize"
@@ -56,6 +59,9 @@
         state_ignored="1"
         ignore_synchronization="1"
         default_values="400 400" >
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the size of this view in the multiview configuration.
         </Documentation>
@@ -595,8 +601,8 @@
          <Property name="CameraParallelScaleInfo" />
          <Property name="CameraParallelProjection" />
          <Property name="EyeAngle" />
-	 <Property name="HeadPose" />
-	 <Property name="WandPose" />
+         <Property name="HeadPose" />
+         <Property name="WandPose" />
        </ExposedProperties>
      </SubProxy>
     </RenderViewProxy>
@@ -1243,7 +1249,11 @@
           <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
           <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
           <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
-		  <Property name="DataBounds" />
+          <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
+          <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
+          <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
+          <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+          <Property name="DataBounds" />
           <Property name="CustomBounds"/>
           <Property name="CustomBoundsActive"/>
         </ExposedProperties>
@@ -1417,6 +1427,7 @@
           <Property name="ScalarOpacityFunction" />
           <Property name="VolumeRenderingMode" />
           <Property name="Shade"/>
+          <Property name="InterpolationType"/>
         </ExposedProperties>
       </SubProxy>
 
@@ -1571,6 +1582,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1585,14 +1599,16 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
 
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -1790,6 +1806,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -1805,7 +1824,8 @@
       </IntVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetColor">
+        command="SetColor"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="transfer_functions" />
         </ProxyGroupDomain>
@@ -1849,8 +1869,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="MapScalars"
+        command="SetIndependantComponents"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/Disable independant component usage such a unsigned char RGBA data array.
+        </Documentation>
+      </IntVectorProperty>
+
       <ProxyProperty name="ScalarOpacityFunction"
-        command="SetScalarOpacity">
+        command="SetScalarOpacity"
+        skip_dependency="1" >
         <ProxyGroupDomain name="groups">
           <Group name="piecewise_functions" />
         </ProxyGroupDomain>
@@ -2014,7 +2045,8 @@
       </DoubleVectorProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
@@ -2192,7 +2224,8 @@
         </Documentation>
       </IntVectorProperty>
 
-      <ProxyProperty name="LookupTable" command="SetLookupTable">
+      <ProxyProperty name="LookupTable" command="SetLookupTable"
+        skip_dependency="1">
         <Documentation>
           Set the lookup table to use for scalar mapping.
         </Documentation>
@@ -2244,6 +2277,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2484,6 +2520,9 @@
         command="SetPickable"
         number_of_elements="1"
         default_values="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <IntRangeDomain name="bool" />
       </IntVectorProperty>
 
@@ -2496,7 +2535,8 @@
       </ProxyProperty>
 
       <ProxyProperty name="LookupTable"
-        command="SetLookupTable">
+        command="SetLookupTable"
+        skip_dependency="1" >
         <Documentation>
           Set the lookup-table to use to map data array to colors. Lookuptable
           is only used with MapScalars to ON.
@@ -2805,13 +2845,13 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
-	  <DoubleVectorProperty
+      <DoubleVectorProperty
         name="DataBounds"
         command="GetDataBounds"
-		information_only="1"
+        information_only="1"
         number_of_elements="6"
         default_values="0 1 0 1 0 1">
-		<SimpleDoubleInformationHelper/>
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -2911,6 +2951,16 @@
         <BooleanDomain name="bool"/>
         <Documentation>
           Specify if X axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="EnableCustomAxisRange"
+        command="EnableCustomAxisRange"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Allow user to enable or disable custom range label
         </Documentation>
       </IntVectorProperty>
 
@@ -3037,6 +3087,31 @@
           Set the location of tick marks.
         </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="XAxisRange"
+        command="SetXAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="YAxisRange"
+        command="SetYAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="ZAxisRange"
+        command="SetZAxisRange"
+        number_of_elements="2"
+        default_values="0 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
 
@@ -4210,15 +4285,6 @@
         </Documentation>
       </InputProperty>
 
-      <InputProperty name="InternalInput2"
-        command="SetInputConnection"
-        port_index="2"
-        is_internal="1">
-        <Documentation>
-          Internal property. Please don't touch this.
-        </Documentation>
-      </InputProperty>
-
        <!-- end of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
 
@@ -4401,6 +4467,9 @@
         command="SetViewPosition"
         number_of_elements="2"
         default_values="0 0">
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the position on this view in the multiview configuration.
         </Documentation>
@@ -4412,6 +4481,9 @@
         state_ignored="1"
         ignore_synchronization="1"
         default_values="400 400" >
+        <Hints>
+          <NoDefault />
+        </Hints>
         <Documentation>
           Set the size of this view in the multiview configuration.
         </Documentation>

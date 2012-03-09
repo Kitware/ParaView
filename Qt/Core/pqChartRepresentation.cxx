@@ -101,8 +101,14 @@ void pqChartRepresentation::setDefaultPropertyValues()
 
   if (!x_array.isEmpty())
     {
-    vtkSMPropertyHelper(proxy, "XArrayName").Set(x_array.toAscii().data());
-    vtkSMPropertyHelper(proxy, "UseIndexForXAxis").Set(0);
+    if (proxy->GetProperty("XArrayName"))
+      {
+      vtkSMPropertyHelper(proxy, "XArrayName").Set(x_array.toAscii().data());
+      }
+    if (proxy->GetProperty("UseIndexForXAxis"))
+      {
+      vtkSMPropertyHelper(proxy, "UseIndexForXAxis").Set(0);
+      }
     }
 
   // * Turn off Y-series that don't make much sense to show by default

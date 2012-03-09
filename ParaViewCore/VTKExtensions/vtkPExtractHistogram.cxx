@@ -32,7 +32,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
@@ -80,7 +80,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
   // We need to obtain the data array ranges from all processes.
   double data[3] = {0.0, 0.0, 0.0}; // 0--valid, (1,2) -- range.
   double *gathered_data= new double[3*num_processes];
-  vtkstd::string array_name = "";
+  std::string array_name = "";
 
   //get local range and array name. if I don't have that array locally,
   //then my contribution will be marked as invalid and ignored
@@ -238,7 +238,7 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
         if (array && reg_ex.find(array->GetName()))
           {
           int numComps = array->GetNumberOfComponents();
-          vtkstd::string name = reg_ex.match(1) + "_total";
+          std::string name = reg_ex.match(1) + "_total";
           vtkDataArray* tarray = output->GetRowData()->GetArray(name.c_str());
           for (vtkIdType idx=0; idx<this->BinCount; idx++)
             {

@@ -71,7 +71,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
       {
       // MPICH changes the current working directory after MPI_Init. We fix that
       // by changing the CWD back to the original one after MPI_Init.
-      vtkstd::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
+      std::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
 
       // This is here to avoid false leak messages from vtkDebugLeaks when
       // using mpich. It appears that the root process which spawns all the
@@ -214,6 +214,17 @@ bool vtkProcessModule::Finalize()
 vtkProcessModule::ProcessTypes vtkProcessModule::GetProcessType()
 {
   return vtkProcessModule::ProcessType;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::UpdateProcessType(ProcessTypes newType, bool dontKnowWhatImDoing/*=true*/)
+{
+  if(dontKnowWhatImDoing)
+    {
+    vtkWarningMacro("UpdateProcessType from "
+                    << vtkProcessModule::ProcessType << " to " << newType);
+    }
+  vtkProcessModule::ProcessType = newType;
 }
 
 //----------------------------------------------------------------------------

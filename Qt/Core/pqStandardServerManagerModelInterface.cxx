@@ -90,6 +90,10 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
         }
       }
     }
+  else if (group == "layouts")
+    {
+    return new pqProxy(group, name, proxy, server, NULL);
+    }
   else if (group == "sources")
     {
     if (proxy->GetProperty("Input"))

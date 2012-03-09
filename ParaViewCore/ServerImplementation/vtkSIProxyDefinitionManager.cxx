@@ -28,20 +28,21 @@
 #include "vtkPVSession.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkProcessModule.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
+#include "vtkSmartPointer.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
-#include <vtkstd/map>
+#include <map>
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <set>
+#include <string>
+#include <vector>
 
 #include <assert.h>
 
@@ -52,16 +53,20 @@
 //                    Internal Classes and typedefs
 //****************************************************************************/
 typedef vtkSmartPointer<vtkPVXMLElement>        XMLElement;
-typedef vtkstd::map<vtkStdString, XMLElement>   StrToXmlMap;
-typedef vtkstd::map<vtkStdString, StrToXmlMap>  StrToStrToXmlMap;
+typedef std::map<vtkStdString, XMLElement>   StrToXmlMap;
+typedef std::map<vtkStdString, StrToXmlMap>  StrToStrToXmlMap;
 
 class vtkSIProxyDefinitionManager::vtkInternals
 {
 public:
+  // Keep State Flag of the ProcessType
+  bool EnableXMLProxyDefinitionUpdate;
   // Keep track of ServerManager definition
   StrToStrToXmlMap CoreDefinitions;
   // Keep track of custom definition
   StrToStrToXmlMap CustomsDefinitions;
+  //-------------------------------------------------------------------------
+  vtkInternals() : EnableXMLProxyDefinitionUpdate(true) {}
   //-------------------------------------------------------------------------
   void Clear()
     {
@@ -141,10 +146,10 @@ public:
   }
 
   static void ExtractMetaInformation(vtkPVXMLElement* proxy,
-                                     vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > &subProxyMap,
-                                     vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > &propertyMap)
+                                     std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > &subProxyMap,
+                                     std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > &propertyMap)
     {
-    vtkstd::set<vtkstd::string> propertyTypeName;
+    std::set<std::string> propertyTypeName;
     propertyTypeName.insert("DoubleVectorProperty");
     propertyTypeName.insert("IntVectorProperty");
     propertyTypeName.insert("ProxyProperty");
@@ -437,8 +442,8 @@ private:
   StrToXmlMap::iterator CustomProxyIteratorEnd;
   StrToStrToXmlMap* CoreDefinitionMap;
   StrToStrToXmlMap* CustomDefinitionMap;
-  vtkstd::set<vtkStdString> GroupNames;
-  vtkstd::set<vtkStdString>::iterator GroupNameIterator;
+  std::set<vtkStdString> GroupNames;
+  std::set<vtkStdString>::iterator GroupNameIterator;
   bool InvalidCoreIterator;
   bool InvalidCustomIterator;
 };
@@ -713,8 +718,8 @@ void vtkSIProxyDefinitionManager::LoadCustomProxyDefinitions(vtkPVXMLElement* ro
     if ( currentElement->GetName() &&
          strcmp(currentElement->GetName(), "CustomProxyDefinition") == 0 )
       {
-      vtkstd::string group = currentElement->GetAttributeOrEmpty("group");
-      vtkstd::string name = currentElement->GetAttributeOrEmpty("name");
+      std::string group = currentElement->GetAttributeOrEmpty("group");
+      std::string name = currentElement->GetAttributeOrEmpty("name");
       if (!name.empty() && !group.empty())
         {
         if (currentElement->GetNumberOfNestedElements() == 1)
@@ -817,8 +822,8 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
   for (unsigned int i=0; i < root->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* group = root->GetNestedElement(i);
-    vtkstd::string groupName = group->GetAttributeOrEmpty("name");
-    vtkstd::string proxyName;
+    std::string groupName = group->GetAttributeOrEmpty("name");
+    std::string proxyName;
 
     // Loop over the top-level elements.
     for(unsigned int cc=0; cc < group->GetNumberOfNestedElements(); ++cc)
@@ -936,14 +941,14 @@ vtkPVXMLElement* vtkSIProxyDefinitionManager::GetCollapsedProxyDefinition(
   if(originalDefinition)
     {
     vtkPVXMLElement* realDefinition = originalDefinition;
-    vtkstd::string base_group =
+    std::string base_group =
         originalDefinition->GetAttributeOrEmpty("base_proxygroup");
-    vtkstd::string base_name =
+    std::string base_name =
         originalDefinition->GetAttributeOrEmpty("base_proxyname");
 
     if( !base_group.empty() && !base_name.empty())
       {
-      vtkstd::vector<vtkPVXMLElement*> classHierarchy;
+      std::vector<vtkPVXMLElement*> classHierarchy;
       while(originalDefinition)
         {
         classHierarchy.push_back(originalDefinition);
@@ -992,25 +997,25 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
                                                        vtkPVXMLElement* elementToFill)
 {
   // Meta-data of elementToFill
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > subProxyToFill;
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > propertiesToFill;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > subProxyToFill;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > propertiesToFill;
   vtkInternals::ExtractMetaInformation( elementToFill,
                                         subProxyToFill,
                                         propertiesToFill);
 
   // Meta-data of element that should be merged into the other
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > subProxySrc;
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> > propertiesSrc;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > subProxySrc;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> > propertiesSrc;
   vtkInternals::ExtractMetaInformation( element,
                                         subProxySrc,
                                         propertiesSrc);
 
   // Look for conflicting sub-proxy name and remove their definition if override
-  vtkstd::map<vtkstd::string, vtkSmartPointer<vtkPVXMLElement> >::iterator mapIter;
+  std::map<std::string, vtkSmartPointer<vtkPVXMLElement> >::iterator mapIter;
   mapIter = subProxyToFill.begin();
   while( mapIter != subProxyToFill.end())
     {
-    vtkstd::string name = mapIter->first;
+    std::string name = mapIter->first;
     if( subProxySrc.find(name) != subProxySrc.end() )
       {
       if (!subProxySrc[name]->GetAttribute("override"))
@@ -1035,7 +1040,7 @@ void vtkSIProxyDefinitionManager::MergeProxyDefinition(vtkPVXMLElement* element,
   mapIter = propertiesToFill.begin();
   while( mapIter != propertiesToFill.end())
     {
-    vtkstd::string name = mapIter->first;
+    std::string name = mapIter->first;
     if( propertiesSrc.find(name) != propertiesSrc.end())
       {
       if (!propertiesSrc[name]->GetAttribute("override") &&
@@ -1096,7 +1101,7 @@ void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
-    vtkstd::ostringstream xmlContent;
+    std::ostringstream xmlContent;
     iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
 
     xmlDef = msg->AddExtension(ProxyDefinitionState::xml_definition_proxy);
@@ -1113,7 +1118,7 @@ void vtkSIProxyDefinitionManager::Pull(vtkSMMessage* msg)
   iter->GoToFirstItem();
   while( !iter->IsDoneWithTraversal() )
     {
-    vtkstd::ostringstream xmlContent;
+    std::ostringstream xmlContent;
     iter->GetProxyDefinition()->PrintXML(xmlContent, vtkIndent());
 
     xmlDef = msg->AddExtension(ProxyDefinitionState::xml_custom_definition_proxy);
@@ -1179,15 +1184,20 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
     dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
   if (smplugin)
     {
-    vtkstd::vector<vtkstd::string> xmls;
+    std::vector<std::string> xmls;
     smplugin->GetXMLs(xmls);
-    for (size_t cc=0; cc < xmls.size(); cc++)
-      {
-      this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
-      }
 
-    // Make sure we invalidate any cached flatten version of our proxy definition
-    this->InternalsFlatten->Clear();
+    // Make sure only the SERVER is processing the XML proxy definition
+    if(this->Internals->EnableXMLProxyDefinitionUpdate)
+      {
+      for (size_t cc=0; cc < xmls.size(); cc++)
+        {
+        this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
+        }
+
+      // Make sure we invalidate any cached flatten version of our proxy definition
+      this->InternalsFlatten->Clear();
+      }
     }
 }
 //---------------------------------------------------------------------------
@@ -1211,8 +1221,8 @@ void vtkSIProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
   for(unsigned int i=0; i < propElement->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* currentElement = propElement->GetNestedElement(i);
-    if ( vtkstd::string(currentElement->GetName()).find("Helper") !=
-         vtkstd::string::npos)
+    if ( std::string(currentElement->GetName()).find("Helper") !=
+         std::string::npos)
       {
       informationHelper = currentElement;
       break;
@@ -1269,4 +1279,9 @@ void vtkSIProxyDefinitionManager::PatchXMLProperty(vtkPVXMLElement* propElement)
 vtkTypeUInt32 vtkSIProxyDefinitionManager::GetReservedGlobalID()
 {
   return vtkReservedRemoteObjectIds::RESERVED_PROXY_DEFINITION_MANAGER_ID;
+}
+//----------------------------------------------------------------------------
+void vtkSIProxyDefinitionManager::EnableXMLProxyDefnitionUpdate(bool enable)
+{
+  this->Internals->EnableXMLProxyDefinitionUpdate = enable;
 }

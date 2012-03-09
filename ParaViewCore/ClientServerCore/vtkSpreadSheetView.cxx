@@ -36,7 +36,7 @@
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
-#include <vtkstd/map>
+#include <map>
 
 class vtkSpreadSheetView::vtkInternals
 {
@@ -48,7 +48,7 @@ public:
     vtkTimeStamp RecentUseTime;
     };
 
-  typedef vtkstd::map<vtkIdType, CacheInfo> CacheType;
+  typedef std::map<vtkIdType, CacheInfo> CacheType;
   CacheType CachedBlocks;
 
   vtkTable* GetDataObject(vtkIdType blockId)
@@ -320,10 +320,10 @@ int vtkSpreadSheetView::StreamToClient()
   // From the active representation obtain the data/selection producers that
   // need to be streamed to the client.
   vtkAlgorithmOutput* dataPort = vtkGetDataProducer(this, cur);
-  vtkAlgorithmOutput* selectionPort = vtkGetSelectionProducer(this, cur);
+//  vtkAlgorithmOutput* selectionPort = vtkGetSelectionProducer(this, cur);
 
   this->TableSelectionMarker->SetInputConnection(0, dataPort);
-  this->TableSelectionMarker->SetInputConnection(1, selectionPort);
+  this->TableSelectionMarker->SetInputConnection(1, cur->GetExtractedDataProducer());
   this->TableStreamer->SetInputConnection(
       this->TableSelectionMarker->GetOutputPort());
   if (dataPort)

@@ -26,8 +26,6 @@
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -37,25 +35,28 @@
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
+#include "vtkRenderer.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include <vtkstd/map>
+#include <map>
 
 namespace
 {
@@ -106,11 +107,19 @@ vtkStandardNewMacro(vtkSMRenderViewProxy);
 vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
   this->IsSelectionCached = false;
+  this->NewMasterObserverId = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 {
+  if( this->NewMasterObserverId != 0 &&
+      this->Session && this->Session->GetCollaborationManager())
+    {
+    this->Session->GetCollaborationManager()->RemoveObserver(
+          this->NewMasterObserverId);
+    this->NewMasterObserverId = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -138,6 +147,11 @@ bool vtkSMRenderViewProxy::IsSelectionAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 {
   vtkSMSession* session = this->GetSession();
+
+  if(session->IsMultiClients() && !session->GetCollaborationManager()->IsMaster())
+    {
+    return "Cannot support selection in collaboration mode when not MASTER";
+    }
 
   if (session->GetIsAutoMPI())
     {
@@ -328,6 +342,15 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->ExecuteStream(stream);
     }
   info->Delete();
+
+  // Attach to the collaborative session a callback to clear the selection cache
+  // on the server side when we became master
+  if(this->Session->IsMultiClients())
+    {
+    this->NewMasterObserverId =
+        this->Session->GetCollaborationManager()->AddObserver(
+          vtkSMCollaborationManager::UpdateMasterUser, this, &vtkSMRenderViewProxy::NewMasterCallback);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -517,16 +540,7 @@ void vtkSMRenderViewProxy::ResetCamera(double bounds[6])
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  if (this->IsSelectionCached)
-    {
-    this->IsSelectionCached = false;
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke
-            << VTKOBJECT(this)
-            << "InvalidateCachedSelection"
-            << vtkClientServerStream::End;
-    this->ExecuteStream(stream);
-    }
+  this->ClearSelectionCache();
 
   // skip modified properties on camera subproxy.
   if (modifiedProxy != this->GetSubProxy("ActiveCamera"))
@@ -612,7 +626,7 @@ namespace
   //-----------------------------------------------------------------------------
   static void vtkShrinkSelection(vtkSelection* sel)
     {
-    vtkstd::map<int, int> pixelCounts;
+    std::map<int, int> pixelCounts;
     unsigned int numNodes = sel->GetNumberOfNodes();
     int choosen = -1;
     int maxPixels = -1;
@@ -634,7 +648,7 @@ namespace
         }
       }
 
-    vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
+    std::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
     if (choosen != -1)
       {
       for (unsigned int cc=0; cc < numNodes; cc++)
@@ -909,4 +923,30 @@ double vtkSMRenderViewProxy::GetZBufferValue(int x, int y)
 void vtkSMRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::NewMasterCallback(vtkObject*, unsigned long, void*)
+{
+  if( this->Session && this->Session->IsMultiClients() &&
+      this->Session->GetCollaborationManager()->IsMaster())
+    {
+    // Make sure we clear the selection cache server side as well as previous
+    // master might already have set a selection that has been cached.
+    this->ClearSelectionCache(/*force=*/true);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::ClearSelectionCache(bool force/*=false*/)
+{
+  if(this->IsSelectionCached || force)
+    {
+    this->IsSelectionCached = false;
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << VTKOBJECT(this)
+            << "InvalidateCachedSelection"
+            << vtkClientServerStream::End;
+    this->ExecuteStream(stream);
+    }
 }

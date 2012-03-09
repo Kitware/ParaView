@@ -26,11 +26,13 @@
 #include "vtkSmartPointer.h"
 
 #include <vtksys/RegularExpression.hxx>
+#include <vtksys/SystemInformation.hxx>
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+
+#include <string>
 #include <vtksys/ios/sstream>
-#include <vtkstd/vector>
-#include <vtkstd/map>
+#include <vector>
+#include <map>
 
 // set this to 1 if you want to generate a log file with all the raw socket
 // communication.
@@ -41,10 +43,10 @@
 class vtkTCPNetworkAccessManager::vtkInternals
 {
 public:
-  typedef vtkstd::vector<vtkWeakPointer<vtkSocketController> >
+  typedef std::vector<vtkWeakPointer<vtkSocketController> >
     VectorOfControllers;
   VectorOfControllers Controllers;
-  typedef vtkstd::map<int, vtkSmartPointer<vtkServerSocket> >
+  typedef std::map<int, vtkSmartPointer<vtkServerSocket> >
     MapToServerSockets;
   MapToServerSockets ServerSockets;
 };
@@ -76,22 +78,22 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     re_connect("^tcp://([^:]+)?:([0-9]+)\\?\?((&?[a-zA-Z0-9%]+=[^&]+)*)");
   vtksys::RegularExpression key_val("([a-zA-Z0-9%]+)=([^&]+)");
 
-  vtkstd::map<vtkstd::string, vtkstd::string> parameters;
+  std::map<std::string, std::string> parameters;
   if (re_connect.find(url))
     {
-    vtkstd::string hostname = re_connect.match(1);
+    std::string hostname = re_connect.match(1);
     int port = atoi(re_connect.match(2).c_str());
 
     // there some issue with RegularExpression that I cannot extract parameters.
     // hence we do this:
-    vtkstd::vector<vtksys::String> param_vals =
+    std::vector<vtksys::String> param_vals =
       vtksys::SystemTools::SplitString(re_connect.match(3).c_str(), '&');
     for (size_t cc=0; cc < param_vals.size(); cc++)
       {
       if (key_val.find(param_vals[cc]))
         {
-        vtkstd::string key = key_val.match(1);
-        vtkstd::string value = key_val.match(2);
+        std::string key = key_val.match(1);
+        std::string value = key_val.match(2);
         parameters[key] = value;
         }
       }
@@ -120,7 +122,7 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::NewConnection(const char*
     }
   else
     {
-    vtkErrorMacro("Malformed URL: " << (url? url : ""));
+    vtkErrorMacro("Malformed URL: " << (url? url : "(empty)"));
     }
 
   return NULL;
@@ -345,6 +347,15 @@ vtkMultiProcessController* vtkTCPNetworkAccessManager::WaitForConnection(
     this->Internals->ServerSockets[port] = server_socket;
     server_socket->FastDelete();
     }
+
+  vtksys::SystemInformation sys_info;
+  sys_info.RunOSCheck();
+  const char* sys_hostname = sys_info.GetHostname()?
+    sys_info.GetHostname() : "localhost";
+
+  // print out a status message.
+  cout << "Accepting connection(s): " << sys_hostname << ":"
+      << server_socket->GetServerPort() << endl;
 
   this->AbortPendingConnectionFlag = false;
   vtkSocketController* controller = NULL;

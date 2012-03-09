@@ -52,9 +52,10 @@ class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
 public:
   /// Assigns the menu that will display the list of files
   pqRecentFilesMenu(QMenu& menu, QObject* p=0);
+  virtual ~pqRecentFilesMenu();
 
   /// Open a resource on the given server
-  bool open(
+  virtual bool open(
     pqServer* server, const pqServerResource& resource) const;
 
 private slots:
@@ -64,7 +65,6 @@ private slots:
   void onServerStarted(pqServer*);
 
 private:
-  ~pqRecentFilesMenu();
   pqRecentFilesMenu(const pqRecentFilesMenu&);
   pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
 

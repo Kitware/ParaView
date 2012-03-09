@@ -114,33 +114,33 @@ static int nifti_write_extensions(znzFile fp, nifti_image *nim)
 }
 
 //GetExtension from uiig library.
-static vtkstd::string
-GetExtension( const vtkstd::string& filename ) {
+static std::string
+GetExtension( const std::string& filename ) {
 
   // This assumes that the final '.' in a file name is the delimiter
   // for the file's extension type
-  const vtkstd::string::size_type it = filename.find_last_of( "." );
+  const std::string::size_type it = filename.find_last_of( "." );
 
   // This determines the file's type by creating a new string
   // who's value is the extension of the input filename
   // eg. "myimage.gif" has an extension of "gif"
-  vtkstd::string fileExt( filename, it+1, filename.length() );
+  std::string fileExt( filename, it+1, filename.length() );
 
   return( fileExt );
 }
 
 //GetRootName from uiig library.
-static vtkstd::string
-GetRootName( const vtkstd::string& filename )
+static std::string
+GetRootName( const std::string& filename )
 {
-  const vtkstd::string fileExt = GetExtension(filename);
+  const std::string fileExt = GetExtension(filename);
 
   // Create a base filename
   // i.e Image.hdr --> Image
   if( fileExt.length() > 0 )
     {
-    const vtkstd::string::size_type it = filename.find_last_of( fileExt );
-    vtkstd::string baseName( filename, 0, it-fileExt.length() );
+    const std::string::size_type it = filename.find_last_of( fileExt );
+    std::string baseName( filename, 0, it-fileExt.length() );
     return( baseName );
     }
   //Default to return same as input when the extension is nothing (Analyze)
@@ -148,11 +148,11 @@ GetRootName( const vtkstd::string& filename )
 }
 
 //Returns the base image filename.
-static vtkstd::string GetImageFileName( const vtkstd::string& filename )
+static std::string GetImageFileName( const std::string& filename )
 {
   // Why do we add ".nii" here?  Look in fileutils.h
-  vtkstd::string fileExt = GetExtension(filename);
-  vtkstd::string ImageFileName = GetRootName(filename);
+  std::string fileExt = GetExtension(filename);
+  std::string ImageFileName = GetRootName(filename);
   if(!fileExt.compare("gz"))
     {
     //First strip both extensions off
@@ -166,7 +166,7 @@ static vtkstd::string GetImageFileName( const vtkstd::string& filename )
   else
     {
     //uiig::Reporter* reporter = uiig::Reporter::getReporter();
-    //vtkstd::string temp="Error, Can not determine compressed file image name. ";
+    //std::string temp="Error, Can not determine compressed file image name. ";
     //temp+=filename;
     //reporter->setMessage( temp );
     return ("");
@@ -201,12 +201,15 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
   cache->GetSpacing(spacing);
   cache->GetOrigin(origin);
   
-  if( numComponents > 1 ){
-    vtkErrorMacro("cannot write data with more than 1 component yet.");
+  if( numComponents > 4 ){
+    vtkErrorMacro("cannot write data with more than 4 components yet.");
+  }
+  if( numComponents == 2 ){
+    vtkErrorMacro("cannot write data with 2 components yet.");
   }
 
   char *iname = this->GetFileName();
-  vtkstd::string ImageFileName = GetImageFileName( iname );
+  std::string ImageFileName = GetImageFileName( iname );
 
    if( ! vtknifti1_io::nifti_validfilename(ImageFileName.c_str())  ) vtkErrorMacro("bad fname input") ;
 
@@ -387,6 +390,7 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
   m_NiftiImage->nvox = numberOfVoxels;
 
+  if(numComponents==1){
       switch(imageDataType)
     {
     case VTK_BIT://DT_BINARY:
@@ -399,13 +403,28 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
     m_NiftiImage->nbyper = 1;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
+    case VTK_SIGNED_CHAR://DT_INT8:
+    m_NiftiImage->datatype = DT_INT8;
+    m_NiftiImage->nbyper = 1;
+    dataTypeSize = m_NiftiImage->nbyper;
+      break;
     case VTK_SHORT://DT_SIGNED_SHORT:
     m_NiftiImage->datatype = DT_SIGNED_SHORT;
     m_NiftiImage->nbyper = 2;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
+    case VTK_UNSIGNED_SHORT://DT_UINT16:
+    m_NiftiImage->datatype = DT_UINT16;
+    m_NiftiImage->nbyper = 2;
+    dataTypeSize = m_NiftiImage->nbyper;
+      break;
     case VTK_INT://DT_SIGNED_INT:
     m_NiftiImage->datatype = DT_SIGNED_INT;
+    m_NiftiImage->nbyper = 4;
+    dataTypeSize = m_NiftiImage->nbyper;
+      break;
+    case VTK_UNSIGNED_INT://DT_UINT32:
+    m_NiftiImage->datatype = DT_UINT32;
     m_NiftiImage->nbyper = 4;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
@@ -419,9 +438,31 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
     m_NiftiImage->nbyper = 8;
     dataTypeSize = m_NiftiImage->nbyper;
       break;
+    case VTK_LONG://DT_INT64:
+    m_NiftiImage->datatype = DT_INT64;
+    m_NiftiImage->nbyper = 8;
+    dataTypeSize = m_NiftiImage->nbyper;
+      break;
+    case VTK_UNSIGNED_LONG://DT_UINT64:
+    m_NiftiImage->datatype = DT_UINT64;
+    m_NiftiImage->nbyper = 8;
+    dataTypeSize = m_NiftiImage->nbyper;
+      break;
      default:
+        vtkErrorMacro("cannot handle this vtkType yet.");
       break;
     }
+  } else if ((numComponents==3)&&(imageDataType==VTK_UNSIGNED_CHAR)){
+    m_NiftiImage->datatype = DT_RGB;
+    m_NiftiImage->nbyper = 3;
+    dataTypeSize = m_NiftiImage->nbyper;
+  } else if  ((numComponents==4)&&(imageDataType==VTK_UNSIGNED_CHAR)){
+    m_NiftiImage->datatype = DT_RGBA32;
+    m_NiftiImage->nbyper = 4;
+    dataTypeSize = m_NiftiImage->nbyper;
+  } else {
+    vtkErrorMacro("cannot handle this vtkType yet for multiple component data.");
+  }
   
   imageSizeInBytes = (int) (numberOfVoxels * dataTypeSize);
 
@@ -534,6 +575,8 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
   int flipIndex[3];
   int InPlaceFilteredAxes[3];
   int count;
+  int inExtent[6];
+  int outExtent[6];
   int inStride[3];
   int outStride[3];
   long inOffset;
@@ -680,6 +723,8 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
 
   for (count=0;count<3;count++){
   inDim[count] = (extent[(count*2)+1] - extent[count*2]) + 1;
+  inExtent[count*2] = extent[count*2];
+  inExtent[(count*2)+1] = extent[(count*2)+1];
  }
 
   inStride[0] =                       scalarSize;
@@ -689,12 +734,18 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outStride[count]       = inStride[InPlaceFilteredAxes[count]];
+  outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
+  outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
 
   unsigned char* tempUnsignedCharData = NULL;
+  unsigned char* tempOutUnsignedCharData = NULL;
 
   tempUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
+  tempOutUnsignedCharData = new unsigned char[outDim[0]*outDim[1]*outDim[2]*scalarSize];
   
+  char *  out_p = (char *) tempOutUnsignedCharData;
+
   int idSize;
   int idZ, idY, idX;
   long outSliceSize = outDim[0]*outDim[1]*scalarSize;
@@ -746,7 +797,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
         for (idSize = 0; idSize < scalarSize ; idSize++){ 
         charOutOffset = outOffset + idSize;
-      outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
+      tempOutUnsignedCharData[charOutOffset] = tempUnsignedCharData[count++];
         } 
       } 
     }
@@ -762,7 +813,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
         inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
         for (idSize = 0; idSize < scalarSize ; idSize++){ 
         charInOffset = inOffset + idSize;
-      tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset]; 
+      tempUnsignedCharData[count++] = tempOutUnsignedCharData[charInOffset]; 
         } 
       } 
     }
@@ -779,7 +830,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
         for (idSize = 0; idSize < scalarSize ; idSize++){ 
         charOutOffset = outOffset + idSize;
-      outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
+      tempOutUnsignedCharData[charOutOffset] = tempUnsignedCharData[count++];
         } 
       } 
     }
@@ -792,7 +843,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
    leave_open = 0;
 
   char *iname = this->GetFileName();
-  vtkstd::string ImageFileName = GetImageFileName( iname );
+  std::string ImageFileName = GetImageFileName( iname );
 
   if( ! znz_isnull(imgfile) ){
      fp = imgfile;
@@ -806,10 +857,13 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
    vtkznzlib::znzrewind(fp);
    vtkznzlib::znzseek(fp, iname_offset, SEEK_SET);  // in any case, seek to offset 
    if( write_data ) {
-     vtknifti1_io::nifti_write_buffer(fp, p, numberOfBytes);
+     vtknifti1_io::nifti_write_buffer(fp, out_p, numberOfBytes);
    }
    if( ! leave_open ) vtkznzlib::znzclose(fp);
 
+  delete tempOutUnsignedCharData;
+  tempOutUnsignedCharData = NULL;
+  out_p = NULL;
 }
 
 //----------------------------------------------------------------------------

@@ -48,6 +48,6 @@ void vtkPVPlugin::SetFileName(const char* filename)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPlugin::GetBinaryResources(vtkstd::vector<vtkstd::string>&)
+void vtkPVPlugin::GetBinaryResources(std::vector<std::string>&)
 {
 }

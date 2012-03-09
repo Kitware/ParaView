@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqTestingReaction.h"
 
-#include "pqPVApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqFileDialog.h"
 #include "pqLockViewSizeCustomDialog.h"
+#include "pqPVApplicationCore.h"
+#include "pqTabbedMultiViewWidget.h"
 #include "pqTestUtility.h"
-#include "pqViewManager.h"
 
 //-----------------------------------------------------------------------------
 pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::ConnectionType type)
@@ -46,10 +46,10 @@ pqTestingReaction::pqTestingReaction(QAction* parentObject, Mode mode,Qt::Connec
   if (mode == LOCK_VIEW_SIZE)
     {
     parentObject->setCheckable(true);
-    pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-                   pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
-    QObject::connect(viewManager, SIGNAL(maxViewWindowSizeSet(bool)),
-                     parentObject, SLOT(setChecked(bool)));
+    pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+      pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+    QObject::connect(viewManager, SIGNAL(viewSizeLocked(bool)),
+      parentObject, SLOT(setChecked(bool)));
     }
 }
 
@@ -114,15 +114,15 @@ void pqTestingReaction::playTest(const QString& filename)
 //-----------------------------------------------------------------------------
 void pqTestingReaction::lockViewSize(bool lock)
 {
-  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
-    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (viewManager)
     {
-    viewManager->setMaxViewWindowSize(lock? QSize(300, 300) : QSize(-1, -1));
+    viewManager->lockViewSize(lock? QSize(300, 300) : QSize(-1, -1));
     }
   else
     {
-    qCritical("pqTestingReaction requires pqViewManager.");
+    qCritical("pqTestingReaction requires pqTabbedMultiViewWidget.");
     }
 }
  

@@ -73,6 +73,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
+  pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -138,22 +139,8 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   ${UI_FORMS}
 )
 
-SET(PV_TEST_SERVER_ROOT "localhost" CACHE STRING
-  "Node which serves as the root node for the cluster when testing in parallel")
-MARK_AS_ADVANCED(PV_TEST_SERVER_ROOT)
-
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqTestingServers.pvsc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqTestingServers.pvsc")
-
-GENERATE_QT_RESOURCE_FROM_FILES(
-  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqCoreTesting.qrc"
-  "/pqCoreTesting"
-  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqTestingServers.pvsc")
-
 SET(UI_RESOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqCore.qrc"
-  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqCoreTesting.qrc"
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
@@ -254,6 +241,8 @@ VTK_ADD_LIBRARY(pqCore
   pqLookupTableManager.h
   pqNameCount.cxx
   pqNameCount.h
+  pqNonEditableStyledItemDelegate.cxx
+  pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.cxx
   pqObjectBuilder.h
   pqOptions.cxx

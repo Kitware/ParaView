@@ -65,7 +65,10 @@ public:
   unsigned int recentlyUsedMenuSize() const
     { return this->RecentlyUsedMenuSize; }
 
-  /// returns the actions created by this menu manager.
+  /// returns the widget that hold actions created by this menu manager.
+  QWidget* widgetActionsHolder() const;
+
+  /// returns the actions holds by the widgetActionsHolder
   QList<QAction*> actions() const;
 
   /// Returns the prototype proxy for the action.
@@ -124,6 +127,7 @@ signals:
 protected slots:
   void triggered();
   void quickLaunch();
+  void switchActiveServer();
 
 protected:
   QString ResourceTagName;

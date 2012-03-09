@@ -27,10 +27,10 @@
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
-#include <vtkstd/map>
-#include <vtkstd/algorithm>
+#include <vector>
+#include <string>
+#include <map>
+#include <algorithm>
 
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
@@ -42,29 +42,29 @@ struct vtkXMLCollectionReaderEntry
   const char* name;
 };
 
-class vtkXMLCollectionReaderString: public vtkstd::string
+class vtkXMLCollectionReaderString: public std::string
 {
 public:
-  typedef vtkstd::string Superclass;
+  typedef std::string Superclass;
   vtkXMLCollectionReaderString(): Superclass() {}
   vtkXMLCollectionReaderString(const char* s): Superclass(s) {}
   vtkXMLCollectionReaderString(const Superclass& s): Superclass(s) {}
 };
-typedef vtkstd::vector<vtkXMLCollectionReaderString>
+typedef std::vector<vtkXMLCollectionReaderString>
         vtkXMLCollectionReaderAttributeNames;
-typedef vtkstd::vector<vtkstd::vector<vtkXMLCollectionReaderString> >
+typedef std::vector<std::vector<vtkXMLCollectionReaderString> >
         vtkXMLCollectionReaderAttributeValueSets;
-typedef vtkstd::map<vtkXMLCollectionReaderString, vtkXMLCollectionReaderString>
+typedef std::map<vtkXMLCollectionReaderString, vtkXMLCollectionReaderString>
         vtkXMLCollectionReaderRestrictions;
 class vtkXMLCollectionReaderInternals
 {
 public:
-  vtkstd::vector<vtkXMLDataElement*> DataSets;
-  vtkstd::vector<vtkXMLDataElement*> RestrictedDataSets;
+  std::vector<vtkXMLDataElement*> DataSets;
+  std::vector<vtkXMLDataElement*> RestrictedDataSets;
   vtkXMLCollectionReaderAttributeNames AttributeNames;
   vtkXMLCollectionReaderAttributeValueSets AttributeValueSets;
   vtkXMLCollectionReaderRestrictions Restrictions;
-  vtkstd::vector< vtkSmartPointer<vtkXMLReader> > Readers;
+  std::vector< vtkSmartPointer<vtkXMLReader> > Readers;
   static const vtkXMLCollectionReaderEntry ReaderList[];
 };
 
@@ -264,7 +264,7 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const char* filePath,
   vtkXMLDataElement* ds = this->Internal->RestrictedDataSets[index];
 
   // Construct the name of the internal file.
-  vtkstd::string fileName;
+  std::string fileName;
   const char* file = ds->GetAttribute("file");
   if(!(file[0] == '/' || file[1] == ':'))
     {
@@ -277,8 +277,8 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const char* filePath,
   fileName += file;
 
   // Get the file extension.
-  vtkstd::string ext;
-  vtkstd::string::size_type pos = fileName.rfind('.');
+  std::string ext;
+  std::string::size_type pos = fileName.rfind('.');
   if(pos != fileName.npos)
     {
     ext = fileName.substr(pos+1);
@@ -350,7 +350,7 @@ void vtkXMLCollectionReader::BuildRestrictedDataSets()
 {
   // Build list of data sets fitting the restrictions.
   this->Internal->RestrictedDataSets.clear();
-  vtkstd::vector<vtkXMLDataElement*>::iterator d;
+  std::vector<vtkXMLDataElement*>::iterator d;
   for(d=this->Internal->DataSets.begin();
       d != this->Internal->DataSets.end(); ++d)
     {
@@ -392,8 +392,8 @@ int vtkXMLCollectionReader::RequestDataObject(
 
   // Find the path to this file in case the internal files are
   // specified as relative paths.
-  vtkstd::string filePath = this->FileName;
-  vtkstd::string::size_type pos = filePath.find_last_of("/\\");
+  std::string filePath = this->FileName;
+  std::string::size_type pos = filePath.find_last_of("/\\");
   if(pos != filePath.npos)
     {
     filePath = filePath.substr(0, pos);
@@ -489,8 +489,8 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
 
   // Find the path to this file in case the internal files are
   // specified as relative paths.
-  vtkstd::string filePath = this->FileName;
-  vtkstd::string::size_type pos = filePath.find_last_of("/\\");
+  std::string filePath = this->FileName;
+  std::string::size_type pos = filePath.find_last_of("/\\");
   if(pos != filePath.npos)
     {
     filePath = filePath.substr(0, pos);
@@ -611,9 +611,9 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name,
 
   // Find an entry for this attribute.
   vtkXMLCollectionReaderAttributeNames::iterator n =
-    vtkstd::find(this->Internal->AttributeNames.begin(),
+    std::find(this->Internal->AttributeNames.begin(),
                  this->Internal->AttributeNames.end(), name);
-  vtkstd::vector<vtkXMLCollectionReaderString>* values = 0;
+  std::vector<vtkXMLCollectionReaderString>* values = 0;
   if(n == this->Internal->AttributeNames.end())
     {
     // Need to create an entry for this attribute.
@@ -631,8 +631,8 @@ void vtkXMLCollectionReader::AddAttributeNameValue(const char* name,
 
   // Find an entry within the attribute for this value.
   s = value;
-  vtkstd::vector<vtkXMLCollectionReaderString>::iterator i =
-    vtkstd::find(values->begin(), values->end(), s);
+  std::vector<vtkXMLCollectionReaderString>::iterator i =
+    std::find(values->begin(), values->end(), s);
 
   if(i == values->end())
     {

@@ -43,17 +43,17 @@
 #endif
 #if defined (__APPLE__)
 #include <ApplicationServices/ApplicationServices.h>
-#include <vtkstd/vector>
+#include <vector>
 #endif
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <set>
+#include <string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
 
-inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
+inline void vtkPVFileInformationAddTerminatingSlash(std::string& name)
 {
   if (name.size()>0)
     {
@@ -71,10 +71,10 @@ inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 
 #if defined(_WIN32)
 
-static vtkstd::string WindowsNetworkRoot = "Windows Network";
+static std::string WindowsNetworkRoot = "Windows Network";
 
 // assumes native back-slashes
-static bool IsUncPath(const vtkstd::string& path)
+static bool IsUncPath(const std::string& path)
 {
   if(path.size() >= 2 && path[0] == '\\' && path[1] == '\\')
     {
@@ -83,7 +83,7 @@ static bool IsUncPath(const vtkstd::string& path)
   return false;
 }
 
-static bool IsNetworkPath(const vtkstd::string& path)
+static bool IsNetworkPath(const std::string& path)
 {
   if(path.compare(0, WindowsNetworkRoot.size(), WindowsNetworkRoot) == 0)
     {
@@ -95,9 +95,9 @@ static bool IsNetworkPath(const vtkstd::string& path)
 // returns true if path is valid, false otherwise
 // returns subdirs, if any
 
-static bool getNetworkSubdirs(const vtkstd::string& name,
+static bool getNetworkSubdirs(const std::string& name,
                               DWORD DisplayType,
-                              vtkstd::vector<vtkstd::string>& subdirs)
+                              std::vector<std::string>& subdirs)
 {
   HANDLE han=0;
   NETRESOURCEA rc;
@@ -129,7 +129,7 @@ static bool getNetworkSubdirs(const vtkstd::string& name,
         {
         for(DWORD i=0; i<count; i++)
           {
-          vtkstd::string subdir = res[i].lpRemoteName;
+          std::string subdir = res[i].lpRemoteName;
           if(subdir.compare(0, name.size(), name) == 0)
             {
             subdir = subdir.c_str() + name.size() + 1;
@@ -143,8 +143,8 @@ static bool getNetworkSubdirs(const vtkstd::string& name,
 }
 
 
-static bool getNetworkSubdirs(const vtkstd::string& path,
-                              vtkstd::vector<vtkstd::string>& subdirs,
+static bool getNetworkSubdirs(const std::string& path,
+                              std::vector<std::string>& subdirs,
                               int& type)
 {
   if(!IsNetworkPath(path))
@@ -159,7 +159,7 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
 
   static const int MaxTokens = 4;
 
-  vtkstd::vector<vtksys::String> pathtokens;
+  std::vector<vtksys::String> pathtokens;
   pathtokens = vtksys::SystemTools::SplitString(path.c_str()+1, '\\');
 
   static DWORD DisplayType[MaxTokens] =
@@ -175,7 +175,7 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
   if(tokenIndex >= MaxTokens)
     return false;
 
-  vtkstd::string name = pathtokens[tokenIndex];
+  std::string name = pathtokens[tokenIndex];
 
   if(tokenIndex == 0)
     {
@@ -194,10 +194,10 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
   return getNetworkSubdirs(name, DisplayType[tokenIndex], subdirs);
 }
 
-static bool getUncSharesOnServer(const vtkstd::string& server,
-                          vtkstd::vector<vtkstd::string>& ret)
+static bool getUncSharesOnServer(const std::string& server,
+                          std::vector<std::string>& ret)
 {
-  return getNetworkSubdirs(vtkstd::string("\\\\") + server,
+  return getNetworkSubdirs(std::string("\\\\") + server,
                          RESOURCEDISPLAYTYPE_SERVER, ret);
 }
 
@@ -207,7 +207,7 @@ static int vtkPVFileInformationGetType(const char* path)
 {
   int type = vtkPVFileInformation::INVALID;
 
-  vtkstd::string realpath = path;
+  std::string realpath = path;
 
   if(vtksys::SystemTools::FileExists(realpath.c_str()))
     {
@@ -238,7 +238,7 @@ static int vtkPVFileInformationGetType(const char* path)
     // this code doesn't give out anything with
     // "Windows Network\..." unless its a directory.
     // that may change
-    vtkstd::vector<vtksys::String> pathtokens;
+    std::vector<vtksys::String> pathtokens;
     pathtokens = vtksys::SystemTools::SplitString(realpath.c_str(), '\\');
     if(pathtokens.size() == 1)
       {
@@ -261,7 +261,7 @@ static int vtkPVFileInformationGetType(const char* path)
   // is it the root of a shared folder?
   if(IsUncPath(realpath))
     {
-    vtkstd::vector<vtksys::String> parts =
+    std::vector<vtksys::String> parts =
       vtksys::SystemTools::SplitString(realpath.c_str()+2, '\\', true);
     if(parts.empty())
       {
@@ -270,7 +270,7 @@ static int vtkPVFileInformationGetType(const char* path)
       }
     else
       {
-      vtkstd::vector<vtkstd::string> shares;
+      std::vector<std::string> shares;
       bool ret = getUncSharesOnServer(parts[0], shares);
       if(parts.size() == 1 && ret)
         {
@@ -296,14 +296,14 @@ static int vtkPVFileInformationGetType(const char* path)
 }
 
 #if defined(_WIN32)
-static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fname,
+static std::string vtkPVFileInformationResolveLink(const std::string& fname,
                                                       WIN32_FIND_DATA& wfd)
 {
   IShellLink* shellLink;
   HRESULT hr;
   char Link[MAX_PATH];
   bool coInit = false;
-  vtkstd::string result;
+  std::string result;
 
   hr = ::CoCreateInstance(CLSID_ShellLink, NULL,
                           CLSCTX_INPROC_SERVER, IID_IShellLink,
@@ -322,7 +322,7 @@ static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fnam
     hr = shellLink->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
     if(SUCCEEDED(hr))
       {
-      vtkstd::wstring wfname(fname.begin(), fname.end());
+      std::wstring wfname(fname.begin(), fname.end());
       hr = ppf->Load((LPOLESTR)wfname.c_str(), STGM_READ);
       if(SUCCEEDED(hr))
         {
@@ -345,10 +345,10 @@ static vtkstd::string vtkPVFileInformationResolveLink(const vtkstd::string& fnam
 }
 #endif
 
-vtkstd::string MakeAbsolutePath(const vtkstd::string& path,
-                            const vtkstd::string& working_dir)
+std::string MakeAbsolutePath(const std::string& path,
+                            const std::string& working_dir)
 {
-  vtkstd::string ret = path;
+  std::string ret = path;
 #if defined(WIN32)
   if(!IsUncPath(path) && !IsNetworkPath(path))
 #endif
@@ -362,7 +362,7 @@ vtkstd::string MakeAbsolutePath(const vtkstd::string& path,
 
 //-----------------------------------------------------------------------------
 class vtkPVFileInformationSet :
-  public vtkstd::set<vtkSmartPointer<vtkPVFileInformation> >
+  public std::set<vtkSmartPointer<vtkPVFileInformation> >
 {
 };
 
@@ -418,22 +418,22 @@ void vtkPVFileInformation::CopyFromObject(vtkObject* object)
 
   this->FastFileTypeDetection = helper->GetFastFileTypeDetection();
 
-  vtkstd::string working_directory =
+  std::string working_directory =
     vtksys::SystemTools::GetCurrentWorkingDirectory().c_str();
   if (helper->GetWorkingDirectory() && helper->GetWorkingDirectory()[0])
     {
     working_directory = helper->GetWorkingDirectory();
     }
 
-  vtkstd::string path = MakeAbsolutePath(helper->GetPath(), working_directory);
+  std::string path = MakeAbsolutePath(helper->GetPath(), working_directory);
 
   this->SetName(helper->GetPath());
   bool isLink = false;
 
 #if defined(_WIN32)
-  vtkstd::string::size_type idx;
+  std::string::size_type idx;
   for(idx = path.find('/', 0);
-        idx != vtkstd::string::npos;
+        idx != std::string::npos;
         idx = path.find('/', idx))
     {
     path.replace(idx, 1, 1, '\\');
@@ -521,7 +521,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
     {
     if(n & (1<<i))
       {
-      vtkstd::string driveLetter;
+      std::string driveLetter;
       driveLetter += 'A' + i;
       driveLetter += ":\\";
       vtkSmartPointer<vtkPVFileInformation> info =
@@ -561,12 +561,12 @@ void vtkPVFileInformation::GetSpecialDirectories()
             hfsname.unicode, hfsname.length);
 
         CFIndex pathSize = CFStringGetLength(url)+1;
-        vtkstd::vector<char> pathChars(pathSize, 0);
+        std::vector<char> pathChars(pathSize, 0);
         OSStatus pathStatus = CFStringGetCString(url, &pathChars[0], pathSize,
             kCFStringEncodingASCII);
 
         pathSize = CFStringGetLength(cfname)+1;
-        vtkstd::vector<char> nameChars(pathSize, 0);
+        std::vector<char> nameChars(pathSize, 0);
         OSStatus nameStatus = CFStringGetCString(cfname, &nameChars[0], pathSize,
             kCFStringEncodingASCII);
 
@@ -636,12 +636,12 @@ void vtkPVFileInformation::GetSpecialDirectories()
 
             // now put the name and path into a FileInfo Object
             CFIndex pathSize = CFStringGetLength(url)+1;
-            vtkstd::vector<char> pathChars(pathSize, 0);
+            std::vector<char> pathChars(pathSize, 0);
             OSStatus pathStatus = CFStringGetCString(url, &pathChars[0],
                 pathSize, kCFStringEncodingASCII);
 
             pathSize = CFStringGetLength(name)+1;
-            vtkstd::vector<char> nameChars(pathSize, 0);
+            std::vector<char> nameChars(pathSize, 0);
             OSStatus nameStatus = CFStringGetCString(name, &nameChars[0],
                 pathSize, kCFStringEncodingASCII);
 
@@ -681,7 +681,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 
   if(IsNetworkPath(this->FullPath))
     {
-    vtkstd::vector<vtkstd::string> shares;
+    std::vector<std::string> shares;
     int type;
     if(getNetworkSubdirs(this->FullPath, shares, type))
       {
@@ -689,7 +689,7 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
         {
         vtkPVFileInformation* info = vtkPVFileInformation::New();
         info->SetName(shares[i].c_str());
-        vtkstd::string fullpath =
+        std::string fullpath =
           vtksys::SystemTools::CollapseFullPath(shares[i].c_str(), this->FullPath);
         info->SetFullPath(fullpath.c_str());
         info->Type = type;
@@ -711,20 +711,20 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
   if(IsUncPath(this->FullPath))
     {
     bool didListing = false;
-    vtkstd::vector<vtksys::String> parts =
+    std::vector<vtksys::String> parts =
       vtksys::SystemTools::SplitString(this->FullPath+2, '\\', true);
 
     if(parts.size() == 1)
       {
       // get list of all shares on server
-      vtkstd::vector<vtkstd::string> shares;
+      std::vector<std::string> shares;
       if(getUncSharesOnServer(parts[0], shares))
         {
         for(unsigned int i=0; i<shares.size(); i++)
           {
           vtkPVFileInformation* info = vtkPVFileInformation::New();
           info->SetName(shares[i].c_str());
-          vtkstd::string fullpath = "\\\\" + parts[0] + "\\" + shares[i];
+          std::string fullpath = "\\\\" + parts[0] + "\\" + shares[i];
           info->SetFullPath(fullpath.c_str());
           info->Type = NETWORK_SHARE;
           info->FastFileTypeDetection = this->FastFileTypeDetection;
@@ -751,9 +751,9 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
     }
 
   // Search for all files in the given directory.
-  vtkstd::string prefix = this->FullPath;
+  std::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
-  vtkstd::string pattern = prefix;
+  std::string pattern = prefix;
   pattern += "*";
   WIN32_FIND_DATA data;
   HANDLE handle = FindFirstFile(pattern.c_str(), &data);
@@ -772,10 +772,10 @@ void vtkPVFileInformation::GetWindowsDirectoryListing()
 
   do
     {
-    vtkstd::string filename = data.cFileName;
+    std::string filename = data.cFileName;
     if(filename == "." || filename == "..")
       continue;
-    vtkstd::string fullpath = prefix + filename;
+    std::string fullpath = prefix + filename;
     size_t len = filename.size();
     bool isLink = false;
 
@@ -862,7 +862,7 @@ void vtkPVFileInformation::GetDirectoryListing()
 #else
 
   vtkPVFileInformationSet info_set;
-  vtkstd::string prefix = this->FullPath;
+  std::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
   // Open the directory and make sure it exists.
@@ -999,7 +999,7 @@ bool vtkPVFileInformation::DetectType()
 
 struct vtkPVFileInformation::vtkInfo
 {
-  typedef vtkstd::map<int, vtkSmartPointer<vtkPVFileInformation> > ChildrenType;
+  typedef std::map<int, vtkSmartPointer<vtkPVFileInformation> > ChildrenType;
   vtkSmartPointer<vtkPVFileInformation> Group;
   ChildrenType Children;
 
@@ -1008,10 +1008,10 @@ struct vtkPVFileInformation::vtkInfo
 //-----------------------------------------------------------------------------
 void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 {
-  typedef vtkstd::map<vtkstd::string, vtkInfo> MapOfStringToInfo;
+  typedef std::map<std::string, vtkInfo> MapOfStringToInfo;
   MapOfStringToInfo fileGroups;
 
-  vtkstd::string prefix = this->FullPath;
+  std::string prefix = this->FullPath;
   vtkPVFileInformationAddTerminatingSlash(prefix);
 
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
@@ -1027,7 +1027,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 
       if (match)
         {
-        vtkstd::string groupName = this->SequenceParser->GetSequenceName();
+        std::string groupName = this->SequenceParser->GetSequenceName();
         int groupIndex = this->SequenceParser->GetSequenceIndex();
 
         MapOfStringToInfo::iterator iter2 = fileGroups.find(groupName);

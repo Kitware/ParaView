@@ -95,7 +95,7 @@ a:hover {
 	font: normal 14px Georgia, "Times New Roman", Times, serif;
 	font-style: italic;
 	color: #45302C;
-} 
+}
 
 #logo a {
 	border: none;
@@ -414,4 +414,8 @@ a:hover {
 
 #about a {
 	color: #1CB543;
+}
+
+.post .entry img {
+  max-width: 100%;
 }

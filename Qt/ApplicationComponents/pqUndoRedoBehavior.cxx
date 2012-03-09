@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 #include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
 
 #include <QDebug>
@@ -77,6 +78,10 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   QObject::connect(core->getServerManagerModel(),
     SIGNAL(finishedRemovingServer()),
     stack, SLOT(clear()));
+
+  // As the undo-stack is properly setup now, record the current ProxyManager state
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->GetActiveSessionProxyManager()->TriggerStateUpdate();
 
   // FIXME disable undo when VCR is used
 //  QObject::connect(

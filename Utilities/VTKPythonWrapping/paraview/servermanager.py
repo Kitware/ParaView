@@ -471,6 +471,49 @@ class ExodusIIReaderProxy(SourceProxy):
                 f = getattr(self, prop)
                 f.DeselectAll()
 
+class ViewLayoutProxy(Proxy):
+    """Special class to define convenience methods for View Layout"""
+
+    def SplitViewHorizontal(self, view, fraction=0.5):
+        """Split the cell containing the specified view horizontally.
+        If no fraction is specified, the frame is split into equal parts.
+        On success returns a positve number that identifying the new cell
+        location that can be used to assign view to, or split further.
+        Return -1 on failure."""
+        location = self.GetViewLocation(view)
+        if location == -1:
+            raise RuntimeError, "View is not present in this layout."
+        if fraction < 0.0 or fraction > 1.0:
+            raise RuntimeError, "'fraction' must be in the range [0.0, 1.0]"
+        return self.SMProxy.SplitHorizontal(location, fraction)
+
+    def SplitViewVertical(self, view=None, fraction=0.5):
+        """Split the cell containing the specified view horizontally.
+        If no view is specified, active view is used.
+        If no fraction is specified, the frame is split into equal parts.
+        On success returns a positve number that identifying the new cell
+        location that can be used to assign view to, or split further.
+        Return -1 on failure."""
+        location = self.GetViewLocation(view)
+        if location == -1:
+            raise RuntimeError, "View is not present in this layout."
+        if fraction < 0.0 or fraction > 1.0:
+            raise RuntimeError, "'fraction' must be in the range [0.0, 1.0]"
+        return self.SMProxy.SplitVertical(location, fraction)
+
+    def AssignView(self, location, view):
+        """Assign a view at a particular location. Note that the view's position may
+        be changed by subsequent Split() calls. Returns true on success."""
+        viewproxy = None
+        if isinstance(view, Proxy):
+            view = view.SMProxy
+        return self.SMProxy.AssignView(location, view)
+
+    def GetViewLocation(self, view):
+        if isinstance(view, Proxy):
+            view = view.SMProxy
+        return self.SMProxy.GetViewLocation(view)
+
 class Property(object):
     """Generic property object that provides access to one of the properties of
     a server object. This class does not allow setting/getting any values but
@@ -2137,8 +2180,6 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
 
     #create the pipeline that reduces and transmits the data
     if arg1 == None:
-        print "getting appended"
-
         cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
         if cdinfo.GetDataIsComposite():
             print "use composite data append"
@@ -2157,11 +2198,9 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
             reducer.PostGatherHelperName = "vtkAppendFilter"
 
     elif type(arg1) is types.IntType:
-        print "getting node %d" % arg1
         reducer.PassThrough = arg1
 
     else:
-        print "applying operation"
         reducer.PreGatherHelper = arg1
         reducer.PostGatherHelper = arg2
 
@@ -2524,6 +2563,8 @@ def createModule(groupName, mdl=None):
             superclasses = (ExodusIIReaderProxy,)
         elif proto.IsA("vtkSMSourceProxy"):
             superclasses = (SourceProxy,)
+        elif proto.IsA("vtkSMViewLayoutProxy"):
+            superclasses = (ViewLayoutProxy,)
         else:
             superclasses = (Proxy,)
 

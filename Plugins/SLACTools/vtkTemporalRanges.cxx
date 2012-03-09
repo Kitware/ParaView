@@ -39,8 +39,8 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkstd/algorithm>
-#include <vtkstd/vector>
+#include <algorithm>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include <math.h>
@@ -83,9 +83,9 @@ namespace vtkTemporalRangesNamespace{
     if (!isnan(value))
       {
       column->SetValue(AVERAGE_ROW, value + column->GetValue(AVERAGE_ROW));
-      column->SetValue(MINIMUM_ROW, vtkstd::min(column->GetValue(MINIMUM_ROW),
+      column->SetValue(MINIMUM_ROW, std::min(column->GetValue(MINIMUM_ROW),
                                                 value));
-      column->SetValue(MAXIMUM_ROW, vtkstd::max(column->GetValue(MAXIMUM_ROW),
+      column->SetValue(MAXIMUM_ROW, std::max(column->GetValue(MAXIMUM_ROW),
                                                 value));
       column->SetValue(COUNT_ROW, column->GetValue(COUNT_ROW) + 1);
       }
@@ -100,9 +100,9 @@ namespace vtkTemporalRangesNamespace{
     double targetTotal = targetCount*target->GetValue(AVERAGE_ROW);
     double sourceTotal = sourceCount*source->GetValue(AVERAGE_ROW);
     target->SetValue(AVERAGE_ROW, (targetTotal + sourceTotal)/totalCount);
-    target->SetValue(MINIMUM_ROW, vtkstd::min(source->GetValue(MINIMUM_ROW),
+    target->SetValue(MINIMUM_ROW, std::min(source->GetValue(MINIMUM_ROW),
                                               target->GetValue(MINIMUM_ROW)));
-    target->SetValue(MAXIMUM_ROW, vtkstd::max(source->GetValue(MAXIMUM_ROW),
+    target->SetValue(MAXIMUM_ROW, std::max(source->GetValue(MAXIMUM_ROW),
                                               target->GetValue(MAXIMUM_ROW)));
     target->SetValue(COUNT_ROW, totalCount);
   }
@@ -296,9 +296,9 @@ void vtkTemporalRanges::AccumulateArray(vtkDataArray *field, vtkTable *output)
   int numComponents = field->GetNumberOfComponents();
   vtkIdType numTuples = field->GetNumberOfTuples();
   vtkDoubleArray *magnitudeColumn = NULL;
-  vtkstd::vector<vtkDoubleArray *> componentColumns(numComponents);
+  std::vector<vtkDoubleArray *> componentColumns(numComponents);
   VTK_CREATE(vtkDoubleArray, magnitudeAccumulate);
-  vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > componentAccumulate(numComponents);
+  std::vector<vtkSmartPointer<vtkDoubleArray> > componentAccumulate(numComponents);
   if (numComponents > 1)
     {
     magnitudeColumn = this->GetColumn(output, field->GetName(), -1);
@@ -377,7 +377,7 @@ vtkDoubleArray *vtkTemporalRanges::GetColumn(vtkTable *table, const char *name,
     {
     fullname << component;
     }
-  vtkstd::string fullnamestring = fullname.str();
+  std::string fullnamestring = fullname.str();
   return this->GetColumn(table, fullnamestring.c_str());
 }
 

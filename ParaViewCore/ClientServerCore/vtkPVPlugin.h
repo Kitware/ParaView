@@ -27,8 +27,8 @@
 
 #include "vtkObject.h"
 #include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -75,7 +75,7 @@ public:
   // Provides access to binary resources compiled into the plugin.
   // This is primarily used to compile in icons and compressed help project
   // (qch) files into plugins.
-  virtual void GetBinaryResources(vtkstd::vector<vtkstd::string>& resources);
+  virtual void GetBinaryResources(std::vector<std::string>& resources);
 
   // Description:
   // Used when import plugins programmatically.

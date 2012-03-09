@@ -95,7 +95,7 @@ protected:
   vtkIdType BlockNextPoint;
   vtkIdType BlockNumGlyphedPts;
 
-  vtkstd::vector< vtkIdType > RandomPtsInDataset;
+  std::vector< vtkIdType > RandomPtsInDataset;
 
   int RandomMode;
 

@@ -68,6 +68,9 @@ void vtkSMProxyDefinitionManager::SetSession(vtkSMSession* session)
       vtkCommand::RegisterEvent, this->Forwarder);
     this->ProxyDefinitionManager->AddObserver(
       vtkCommand::UnRegisterEvent, this->Forwarder);
+    this->ProxyDefinitionManager->EnableXMLProxyDefnitionUpdate(
+          session->GetProcessRoles() & vtkPVSession::SERVERS);
+    this->SynchronizeDefinitions();
     }
 }
 

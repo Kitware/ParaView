@@ -62,7 +62,7 @@
 class ImproperUseException : public PipelineException
 {
   public:
-                          ImproperUseException(vtkstd::string = "");
+                          ImproperUseException(std::string = "");
     virtual              ~ImproperUseException() VISIT_THROW_NOTHING {;};
 };
 

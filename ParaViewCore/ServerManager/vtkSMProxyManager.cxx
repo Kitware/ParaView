@@ -32,7 +32,7 @@
 #include "vtkWeakPointer.h"
 
 #include <vtksys/DateStamp.h> // For date stamp
-#include <vtkstd/map>
+#include <map>
 
 #define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
 //***************************************************************************
@@ -58,10 +58,10 @@ public:
   vtkWeakPointer<vtkSMSession> ActiveSession;
 
   // Data structure for storing GlobalPropertiesManagers.
-  typedef vtkstd::map<vtkstd::string,
+  typedef std::map<std::string,
           vtkSmartPointer<vtkSMGlobalPropertiesManager> >
             GlobalPropertiesManagersType;
-  typedef vtkstd::map<vtkstd::string,
+  typedef std::map<std::string,
           unsigned long >
             GlobalPropertiesManagersCallBackIDType;
   GlobalPropertiesManagersType GlobalPropertiesManagers;
@@ -430,4 +430,33 @@ void vtkSMProxyManager::UnRegisterProxy(
     {
     vtkErrorMacro("No active session found.");
     }
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(const char* groupname, unsigned int idx)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->GetProxyName(groupname, idx);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(
+  const char* groupname, vtkSMProxy* pxy)
+{
+  if (vtkSMSessionProxyManager* pxm = this->GetActiveSessionProxyManager())
+    {
+    return pxm->GetProxyName(groupname, pxy);
+    }
+  else
+    {
+    vtkErrorMacro("No active session found.");
+    }
+  return NULL;
 }

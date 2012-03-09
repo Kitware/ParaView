@@ -109,11 +109,6 @@ pqServerConfigurationCollection::pqServerConfigurationCollection(QObject* parent
     this->load(systemServers(), false);
     this->load(userServers(), true);
     }
-  else if (options && options->GetDisableRegistry())
-    {
-    // load the testing servers resource.
-    this->load(":/pqCoreTesting/pqTestingServers.pvsc", false);
-    }
 }
 
 //-----------------------------------------------------------------------------

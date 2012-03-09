@@ -16,8 +16,8 @@
 #ifndef __vtkPVServerOptionsInternals_h
 #define __vtkPVServerOptionsInternals_h
 
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <vector>
+#include <string>
 
 class vtkPVServerOptionsInternals
 {
@@ -39,8 +39,8 @@ public:
         this->CaveBoundsSet = 0;
       }
 
-    vtkstd::string Name;  // what is the name of the machine
-    vtkstd::string Environment; // what environment variables should be set
+    std::string Name;  // what is the name of the machine
+    std::string Environment; // what environment variables should be set
     int CaveBoundsSet;  // have the cave bounds been set
     // store the cave bounds  all 0.0 if not set
     double LowerLeft[3];
@@ -49,6 +49,7 @@ public:
   };
   void PrintSelf(ostream& os, vtkIndent indent)
     {
+      os << indent << "Eye Separation: " << this->EyeSeparation << "\n";
       os << indent << "Machine Information :\n";
       vtkIndent ind = indent.GetNextIndent();
       for(unsigned int i =0; i < this->MachineInformationVector.size(); ++i)
@@ -84,7 +85,8 @@ public:
           }
         }
     }
-  vtkstd::vector<MachineInformation> MachineInformationVector; // store the vector of machines
+  std::vector<MachineInformation> MachineInformationVector; // store the vector of machines
+  double EyeSeparation;		// Store Eye Separation information required for VR module
 };
 
 #endif

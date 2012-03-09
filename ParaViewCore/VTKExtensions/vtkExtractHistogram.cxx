@@ -32,9 +32,9 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <vector>
+#include <map>
+#include <string>
 
 struct vtkEHInternals
 {
@@ -43,9 +43,9 @@ struct vtkEHInternals
     {
     // The total of the values per bin - the second vector
     // is for arrays with multiple components
-    vtkstd::vector<vtkstd::vector<double> > TotalValues;
+    std::vector<std::vector<double> > TotalValues;
     };
-  typedef vtkstd::map<vtkstd::string, ArrayValuesType> ArrayMapType;
+  typedef std::map<std::string, ArrayValuesType> ArrayMapType;
   ArrayMapType ArrayValues;
   int FieldAssociation;
 };
@@ -407,11 +407,11 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
       {
       vtkSmartPointer<vtkDoubleArray> da =
         vtkSmartPointer<vtkDoubleArray>::New();
-      vtkstd::string newname = iter->first + "_total";
+      std::string newname = iter->first + "_total";
       da->SetName(newname.c_str());
       vtkSmartPointer<vtkDoubleArray> aa =
         vtkSmartPointer<vtkDoubleArray>::New();
-      vtkstd::string newname2 = iter->first + "_average";
+      std::string newname2 = iter->first + "_average";
       aa->SetName(newname2.c_str());
       int numComps = iter->second.TotalValues[0].size();
       da->SetNumberOfComponents(numComps);

@@ -69,6 +69,9 @@ signals:
   /// fired everytime the user click on the ExtractSelectionOverTime button
   void extractSelectionOverTime();
 
+  /// Fired when the user clicks on the help button.
+  void helpRequested();
+
 protected slots:
   /// Must be triggered before server disconnect to release all SMProxy links
   void freeSMProxy();
@@ -88,9 +91,6 @@ protected slots:
 
   /// adds a new clause.
   void addClause();
-
-  /// remove a particular clause. The clause to be removed is the signal sender.
-  void removeClause();
 
   /// Called when user click the "Run Query" button.
   void runQuery();

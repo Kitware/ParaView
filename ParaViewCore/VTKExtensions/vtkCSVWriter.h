@@ -51,6 +51,18 @@ public:
   vtkSetMacro(UseStringDelimiter, bool);
   vtkGetMacro(UseStringDelimiter, bool);
 
+  // Description:
+  // Get/Set the precision to use for printing numeric values.
+  // Default is 5.
+  vtkSetClampMacro(Precision, int, 0, VTK_INT_MAX);
+  vtkGetMacro(Precision, int);
+
+  // Description:
+  // Get/Set whether scientific notation is used for numeric values.
+  vtkSetMacro(UseScientificNotation, bool);
+  vtkGetMacro(UseScientificNotation, bool);
+  vtkBooleanMacro(UseScientificNotation, bool);
+
 //BTX
   // Description:
   // Internal method: decortes the "string" with the "StringDelimiter" if 
@@ -73,6 +85,9 @@ protected:
   char* FieldDelimiter;
   char* StringDelimiter;
   bool UseStringDelimiter;
+  int Precision;
+  bool UseScientificNotation;
+
   ofstream* Stream;
 private:
   vtkCSVWriter(const vtkCSVWriter&); // Not implemented.

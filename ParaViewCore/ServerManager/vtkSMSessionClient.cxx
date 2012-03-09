@@ -39,12 +39,12 @@
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSocketCommunicator.h"
 
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
 #include <assert.h>
-#include <vtkstd/set>
+#include <set>
 
 #define UPDATE_VTK_OBJECTS(object)                               \
   if(vtkSMProxy::SafeDownCast(object))                           \
@@ -165,14 +165,14 @@ bool vtkSMSessionClient::Connect(const char* url)
   // Add connect-id if needed (or maybe we extract that from url as well
   // (just like vtkNetworkAccessManager).
 
-  vtkstd::string data_server_url;
-  vtkstd::string render_server_url;
+  std::string data_server_url;
+  std::string render_server_url;
 
   if (pvserver.find(url))
     {
-    vtkstd::string hostname = pvserver.match(1);
+    std::string hostname = pvserver.match(1);
     int port = atoi(pvserver.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port <= 0)? 11111: port;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << hostname << ":" << port << "?" << handshake.str();
@@ -180,8 +180,9 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
   else if (pvserver_reverse.find(url))
     {
+    // 0 ports are acceptable for reverse connections.
     int port = atoi(pvserver_reverse.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port < 0)? 11111: port;
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&nonblocking=true&" << handshake.str();
     data_server_url = stream.str();
@@ -189,13 +190,13 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
   else if (pvrenderserver.find(url))
     {
-    vtkstd::string dataserverhost = pvrenderserver.match(1);
+    std::string dataserverhost = pvrenderserver.match(1);
     int dsport = atoi(pvrenderserver.match(2).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport <= 0)? 11111 : dsport;
 
-    vtkstd::string renderserverhost = pvrenderserver.match(3);
+    std::string renderserverhost = pvrenderserver.match(3);
     int rsport = atoi(pvrenderserver.match(4).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport <= 0)? 22221 : rsport;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << dataserverhost << ":" << dsport
@@ -209,10 +210,11 @@ bool vtkSMSessionClient::Connect(const char* url)
     }
   else if (pvrenderserver_reverse.find(url))
     {
+    // 0 ports are acceptable for reverse connections.
     int dsport = atoi(pvrenderserver_reverse.match(4).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport < 0)? 11111 : dsport;
     int rsport = atoi(pvrenderserver_reverse.match(7).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport < 0)? 22221 : rsport;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << dsport
@@ -479,7 +481,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::PUSH);
     stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     for (int cc=0; cc < num_controllers; cc++)
       {
@@ -520,7 +522,7 @@ void vtkSMSessionClient::PushState(vtkSMMessage* message)
         vtkMultiProcessStream stream;
         stream << static_cast<int>(vtkPVSessionServer::PUSH);
         stream << msg.SerializeAsString();
-        vtkstd::vector<unsigned char> raw_message;
+        std::vector<unsigned char> raw_message;
         stream.GetRawData(raw_message);
         this->DataServerController->TriggerRMIOnAllChildren(
             &raw_message[0], static_cast<int>(raw_message.size()),
@@ -578,7 +580,7 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::PULL);
     stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     controller->TriggerRMIOnAllChildren(
       &raw_message[0], static_cast<int>(raw_message.size()),
@@ -587,7 +589,7 @@ void vtkSMSessionClient::PullState(vtkSMMessage* message)
     // Get the reply
     vtkMultiProcessStream replyStream;
     controller->Receive(replyStream, 1, vtkPVSessionServer::REPLY_PULL);
-    vtkstd::string string;
+    std::string string;
     replyStream >> string;
     message->ParseFromString(string);
     }
@@ -634,7 +636,7 @@ void vtkSMSessionClient::ExecuteStream(
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::EXECUTE_STREAM)
       << static_cast<int>(ignore_errors) << static_cast<int>(size);
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
 
     for (int cc=0; cc < num_controllers; cc++)
@@ -681,7 +683,7 @@ const vtkClientServerStream& vtkSMSessionClient::GetLastResult(vtkTypeUInt32 loc
 
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::LAST_RESULT);
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     controller->TriggerRMIOnAllChildren(
       &raw_message[0], static_cast<int>(raw_message.size()),
@@ -741,7 +743,7 @@ bool vtkSMSessionClient::GatherInformation(
     << information->GetClassName()
     << globalid;
   information->CopyParametersToStream(stream);
-  vtkstd::vector<unsigned char> raw_message;
+  std::vector<unsigned char> raw_message;
   stream.GetRawData(raw_message);
 
   vtkMultiProcessController* controller = NULL;
@@ -830,7 +832,7 @@ void vtkSMSessionClient::UnRegisterSIObject(vtkSMMessage* message)
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::UNREGISTER_SI);
     stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     for (int cc=0; cc < num_controllers; cc++)
       {
@@ -874,7 +876,7 @@ void vtkSMSessionClient::RegisterSIObject(vtkSMMessage* message)
     vtkMultiProcessStream stream;
     stream << static_cast<int>(vtkPVSessionServer::REGISTER_SI);
     stream << message->SerializeAsString();
-    vtkstd::vector<unsigned char> raw_message;
+    std::vector<unsigned char> raw_message;
     stream.GetRawData(raw_message);
     for (int cc=0; cc < num_controllers; cc++)
       {
@@ -922,7 +924,7 @@ vtkTypeUInt32 vtkSMSessionClient::GetNextChunkGlobalUniqueIdentifier(
 void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int message_length)
 {
   // Setup load state context
-  vtkstd::string data;
+  std::string data;
   data.append(reinterpret_cast<char*>(message), message_length);
 
   vtkSMMessage state;

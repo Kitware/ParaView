@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaction.h"
 
 class pqServerConfiguration;
+class pqServerResource;
 
 /// @ingroup Reactions
 /// Reaction for connecting to a server.
@@ -59,6 +60,10 @@ public:
   /// To connect to a server given a configuration, use this API.
   static bool connectToServerUsingConfiguration(
     const pqServerConfiguration& config);
+
+  /// Connect to server using the resource. This will create a temporary
+  /// configuration for the resource.
+  static bool connectToServer(const pqServerResource& resource);
 
 protected:
   /// Called when the action is triggered.

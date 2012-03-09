@@ -15,7 +15,7 @@
 #include "vtkMaterialInterfaceCommBuffer.h"
 #include "vtkMaterialInterfaceUtilities.hxx"
 
-using vtkstd::vector;
+using std::vector;
 
 //----------------------------------------------------------------------------
 vtkMaterialInterfaceCommBuffer::vtkMaterialInterfaceCommBuffer()

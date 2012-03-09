@@ -24,9 +24,9 @@
 #include "vtkStdString.h"
 #include "vtkInstantiator.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <vector>
+#include <map>
+#include <string>
 #include <vtkSmartPointer.h>
 
 
@@ -35,13 +35,13 @@
 //*****************************************************************************
 struct vtkSMDataTypeDomainInternals
 {
-  vtkstd::vector<vtkStdString> DataTypes;
+  std::vector<vtkStdString> DataTypes;
 };
 //*****************************************************************************
 namespace vtkSMDataTypeDomainCache
 {
   static int ReferenceCount = 0;
-  static vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
+  static std::map<std::string, vtkSmartPointer<vtkDataObject> > DataObjectMap;
   static void AddReference()
     {
     ReferenceCount++;
@@ -78,7 +78,7 @@ namespace vtkSMDataTypeDomainCache
       classname = "vtkHierarchicalDataSet";
       }
 
-    vtkstd::map<vtkstd::string, vtkSmartPointer<vtkDataObject> >::iterator it;
+    std::map<std::string, vtkSmartPointer<vtkDataObject> >::iterator it;
     it = DataObjectMap.find(classname);
     if (it != DataObjectMap.end())
       {

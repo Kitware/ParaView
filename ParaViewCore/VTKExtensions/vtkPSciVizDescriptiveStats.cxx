@@ -41,8 +41,7 @@ int vtkPSciVizDescriptiveStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, v
   vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    //stats->AddColumn( inData->GetColumnName( i ) );
-    stats->SetColumnStatus( inData->GetColumnName( i ), 1 );
+    stats->AddColumn( inData->GetColumnName( i ) );
     }
   //stats->SetSignedDeviations( this->SignedDeviations ); // Shouldn't matter for model fitting, only affects assessed values.
 
@@ -85,7 +84,6 @@ int vtkPSciVizDescriptiveStats::AssessData( vtkTable* observations, vtkDataObjec
   vtkIdType ncols = observations->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    //stats->SetColumnStatus( observations->GetColumnName( i ), 1 );
     stats->AddColumn( observations->GetColumnName( i ) );
     }
   stats->SetSignedDeviations( this->SignedDeviations );

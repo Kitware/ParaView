@@ -21,8 +21,8 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
-#include <vtkstd/map>
+#include <string>
+#include <map>
 
 #include <sys/stat.h>
 #include <assert.h>

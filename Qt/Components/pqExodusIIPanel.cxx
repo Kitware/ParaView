@@ -80,8 +80,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 #include "pqTreeWidgetSelectionHelper.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/algorithm>
+#include <vector>
+#include <algorithm>
 
 //-----------------------------------------------------------------------------
 class pqExodusIIPanel::pqUI : public QObject, public Ui::ExodusIIPanel 
@@ -634,10 +634,10 @@ void pqExodusIIPanel::setSelectedBlocksCheckState(bool check/*=true*/)
   vtkPVDataInformation* dataInfo = port->getDataInformation();
 
   vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
-  vtkstd::vector<vtkIdType> block_ids;
+  std::vector<vtkIdType> block_ids;
   block_ids.resize(blocksProp.GetNumberOfElements());
   blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
-  vtkstd::sort(block_ids.begin(), block_ids.end());
+  std::sort(block_ids.begin(), block_ids.end());
 
   // if check is true then we are checking only the selected blocks,
   // if check is false, then we are un-checking the selected blocks, leaving

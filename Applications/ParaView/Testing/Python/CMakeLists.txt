@@ -3,19 +3,14 @@ SET (TESTS_WITHOUT_BASELINES
   )
 
 SET (TESTS_WITH_BASELINES
-#  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/DisconnectAndSaveAnimation.py
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRBaseLine.py
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRContour.py
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRDualClip.py
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRClip.py
 #  ${CMAKE_CURRENT_SOURCE_DIR}/CTHAMRMaterialInterfaceFilter.py
   ${CMAKE_CURRENT_SOURCE_DIR}/FileSeries.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.py
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.py
-  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.py
   )
 
 IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
@@ -38,13 +33,8 @@ SET (DisconnectAndSaveAnimation_DISABLE_C TRUE)
 SET (DisconnectAndSaveAnimation_DISABLE_CRS TRUE)
 set (FileSeries_BREAK TRUE)
 set (DisconnectAndSaveAnimation_BREAK TRUE)
-set (LoadStateMultiView_BREAK TRUE)
 set (NonlinearSubdivisionDisplay_DISABLE_CRS TRUE)
-set (TestIsoVolume_BREAK TRUE)
-SET (SLACTools_DISABLE_CS TRUE)
-SET (SLACTools_DISABLE_CRS TRUE)
-SET (SLACTools_BREAK TRUE)
-set (RenderNan_BREAK TRUE)
+
 set (MantaServerSideTest_DISABLE_C TRUE)
 set (MantaServerSideTest_DISABLE_CRS TRUE)
 SET (MantaTest_BREAK TRUE)
@@ -66,10 +56,6 @@ SET (StreamingClientSideTest_THRESHOLD 1000)
 set (StreamingServerSideTest_DISABLE_C TRUE)
 set (StreamingServerSideTest_DISABLE_CRS TRUE)
 SET (StreamingServerSideTest_BREAK TRUE)
-
-# Set image threshold overrides for the tests.
-SET(SaveLargeScreenshot_THRESHOLD 10000)
-SET(SLACTools_THRESHOLD 20)
 
 add_client_tests("pypv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}

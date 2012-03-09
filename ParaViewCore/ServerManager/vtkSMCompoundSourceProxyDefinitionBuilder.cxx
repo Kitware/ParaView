@@ -19,36 +19,36 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/list>
+#include <map>
+#include <string>
+#include <list>
 
 class vtkSMCompoundSourceProxyDefinitionBuilder::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxy> >
+  typedef std::map<std::string, vtkSmartPointer<vtkSMProxy> >
     MapOfProxies;
   MapOfProxies Proxies;
 
   struct PropertyInfo
     {
-    vtkstd::string ProxyName;
-    vtkstd::string PropertyName;
+    std::string ProxyName;
+    std::string PropertyName;
     };
-  typedef vtkstd::map<vtkstd::string, PropertyInfo> MapOfProperties;
+  typedef std::map<std::string, PropertyInfo> MapOfProperties;
   MapOfProperties Properties;
 
  struct PortInfo
     {
-    vtkstd::string ProxyName;
-    vtkstd::string PortName;
+    std::string ProxyName;
+    std::string PortName;
     unsigned int PortIndex;
     PortInfo()
       {
       this->PortIndex = VTK_UNSIGNED_INT_MAX;
       }
     };
- typedef vtkstd::map<vtkstd::string, PortInfo> MapOfPorts;
+ typedef std::map<std::string, PortInfo> MapOfPorts;
  MapOfPorts Ports;
 };
 
@@ -306,7 +306,7 @@ int vtkSMCompoundSourceProxyDefinitionBuilder::ShouldWriteValue(
 void vtkSMCompoundSourceProxyDefinitionBuilder::StripValues(
   vtkPVXMLElement* propertyElem)
 {
-  typedef vtkstd::list<vtkSmartPointer<vtkPVXMLElement> > ElementsType;
+  typedef std::list<vtkSmartPointer<vtkPVXMLElement> > ElementsType;
   ElementsType elements;
 
   // Find all elements we want to keep

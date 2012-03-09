@@ -25,10 +25,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTable.h"
 #include "vtkVariant.h"
 
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <map>
+#include <set>
+#include <vector>
+#include <string>
 #include <iostream>
 #include <sstream>
 #include <fstream>

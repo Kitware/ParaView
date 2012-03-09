@@ -31,10 +31,10 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkExtractPolyDataGeometry.h"
 #include "vtkBox.h"
 #include "vtkCleanPolyData.h"
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <algorithm>
+#include <map>
+#include <vector>
+#include <string>
 #include "vtkMultiBlockDataSet.h"
 
 #include "vtkBoundingBox.h"
@@ -67,7 +67,7 @@ class vtkPrismSurfaceReader::MyInternal
         vtkSmartPointer<vtkBox> Box;
 
         vtkSmartPointer<vtkCleanPolyData> CleanPolyData;
-        vtkstd::string AxisVarName[3];
+        std::string AxisVarName[3];
         vtkSmartPointer<vtkStringArray> ArrayNames;
 
         bool ArrayLogScaling[3];
@@ -79,7 +79,7 @@ class vtkPrismSurfaceReader::MyInternal
         bool WarpSurface;
         bool DisplayContours;
         int NumberOfContours;
-        vtkstd::string  ContourVarName;
+        std::string  ContourVarName;
         vtkSmartPointer<vtkDoubleArray> XRangeArray;
         vtkSmartPointer<vtkDoubleArray> YRangeArray;
         vtkSmartPointer<vtkDoubleArray> ZRangeArray;
@@ -904,7 +904,6 @@ int vtkPrismSurfaceReader::RequestData(
   //We do this instead of passing the scaled bounds, as converting
   //back can cause a numeric inaccuracey
   vtkBoundingBox unScaledBoundingBox;
-  int tID=this->GetTable();
   bool scalingEnabled[3] = {this->GetXLogScaling(),
                               this->GetYLogScaling(),
                               this->GetZLogScaling()};
@@ -928,10 +927,11 @@ int vtkPrismSurfaceReader::RequestData(
 
     unScaledBoundingBox.AddPoint(coords);
 
-    vtkPrismCommon::scalePoint(coords,scalingEnabled,tID);
+    // if user asked to use log-scale, scale it, otherwise don't. This has
+    // nothing to do with the table id (as was the case in the past).
+    vtkPrismCommon::logScale(coords,scalingEnabled);
 
     newPts->InsertPoint(ptId,coords);
-
   }
 
   double viewUnscaledBounds[6];
@@ -951,9 +951,7 @@ int vtkPrismSurfaceReader::RequestData(
     bounds[5]=10;
   }
 
-
-  //scale the threshold numbers
-  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,tID,
+  vtkPrismCommon::scaleThresholdBounds(scalingEnabled,
     this->XThresholdBetween, this->YThresholdBetween,
     this->ActualThresholdBounds);
   this->ActualThresholdBounds[4]=bounds[4];
@@ -1069,16 +1067,16 @@ int vtkPrismSurfaceReader::RequestData(
     contourOutput->SetPoints(newContourPts);
   }
 
-  if(tID==301)
-  {
+  if(this->GetTable()==301)
+    {
 
     return this->RequestCurveData(curveOutput);
-  }
+    }
   else
-  {
+    {
     vtkSmartPointer<vtkPoints> newCurvePts = vtkSmartPointer<vtkPoints>::New();
     curveOutput->SetPoints(newCurvePts);
-  }
+    }
   return 1;
 }
 
@@ -1205,8 +1203,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
       //Next we match the correct 401 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,vtkstd::vector<int> > tableMap;
-      vtkstd::vector<int> indexes;
+      std::map<std::string,std::vector<int> > tableMap;
+      std::vector<int> indexes;
       indexes.resize(2);
       //Density
       indexes[0]=2;//Vapor Density on Coexistence Line
@@ -1235,12 +1233,12 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray[2];
       vtkSmartPointer<vtkFloatArray> zArray[2];
 
-      vtkstd::map<vtkstd::string,vtkstd::vector<int> >::iterator iter;
+      std::map<std::string,std::vector<int> >::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
         //First check for pressure.
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
           if(iter->second[0]!=-1)
@@ -1397,7 +1395,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->ColdConversionFilter->GetOutput();
 
       //Next we match the correct 306 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Pressure
@@ -1413,11 +1411,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));
@@ -1553,7 +1551,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->SolidMeltConversionFilter->GetOutput();
 
       //Next we match the correct 401 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Temperature
@@ -1571,11 +1569,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));
@@ -1697,7 +1695,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkPolyData> input = this->Internal->LiquidMeltConversionFilter->GetOutput();
 
       //Next we match the correct 412 array with the correct 301 axis variables.
-      vtkstd::map<vtkstd::string,int > tableMap;
+      std::map<std::string,int > tableMap;
       //Density
       tableMap[this->Internal->Reader->GetTableArrayName(0)]=0;
       //Temperature
@@ -1715,11 +1713,11 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       vtkSmartPointer<vtkFloatArray> yArray;
       vtkSmartPointer<vtkFloatArray> zArray;
 
-      vtkstd::map<vtkstd::string,int>::iterator iter;
+      std::map<std::string,int>::iterator iter;
 
       for(iter=tableMap.begin();iter!=tableMap.end();iter++)
       {
-        vtkstd::string name=iter->first;
+        std::string name=iter->first;
         if(name==this->GetXAxisVarName())
         {
             xArray=vtkFloatArray::SafeDownCast(input->GetPointData()->GetArray(iter->second));

@@ -939,6 +939,24 @@ def LoadDistributedPlugin(pluginname, remote=True, ns=None):
             return LoadPlugin(info.GetPluginFileName(cc), remote, ns)
     raise RuntimeError, "Plugin '%s' not found" % pluginname
 
+def GetLayouts():
+    """Returns the layout proxies on the active session.
+    Layout proxies are used to place views in a grid."""
+    return servermanager.ProxyManager().GetProxiesInGroup("layouts")
+
+def GetLayout(view=None):
+    """Return the layout containing the give view, if any.
+    If no view is specified, active view is used.
+    """
+    if not view:
+        view = GetActiveView()
+    if not view:
+        raise RuntimeError, "No active view was found."
+    layouts = GetLayouts()
+    for layout in layouts.values():
+        if layout.GetViewLocation(view) != -1:
+            return layout
+    return None
 
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active

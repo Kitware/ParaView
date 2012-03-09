@@ -64,15 +64,15 @@
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
-#include <vtkstd/vector>
-#include <vtkstd/set>
-#include <vtkstd/map>
+#include <vector>
+#include <set>
+#include <map>
 
 class vtkPVRenderView::vtkInternals
 {
 public:
-  vtkstd::map<void*, int> RepToIdMap;
-  vtkstd::map<int, vtkDataRepresentation*> IdToRepMap;
+  std::map<void*, int> RepToIdMap;
+  std::map<int, vtkDataRepresentation*> IdToRepMap;
   int UniqueId;
   vtkInternals()
     {
@@ -312,7 +312,8 @@ void vtkPVRenderView::Initialize(unsigned int id)
   this->SynchronizedWindows->AddRenderer(id, this->RenderView->GetRenderer());
   this->SynchronizedWindows->AddRenderer(id, this->GetNonCompositedRenderer());
 
-  this->SynchronizedRenderers->Initialize(this->SynchronizedWindows->GetSession());
+  this->SynchronizedRenderers->Initialize(
+    this->SynchronizedWindows->GetSession(), id);
   this->SynchronizedRenderers->SetRenderer(this->RenderView->GetRenderer());
 
   this->Superclass::Initialize(id);
@@ -461,6 +462,10 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->MakingSelection = true;
 
+  // since setting this->MakingSelection to true may change data-delivery needs,
+  // we change the update time.
+  this->UpdateTime.Modified();
+
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
@@ -499,6 +504,7 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     }
 
   this->MakingSelection = false;
+  this->UpdateTime.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -507,7 +513,7 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
   assert(sel != NULL);
   this->SynchronizedWindows->BroadcastToDataServer(sel);
 
-  // not sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
+  // now, sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
   // pointers, since representations have know knowledge for that the PROP_ID()s
   // are.
   for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
@@ -976,7 +982,7 @@ void vtkPVRenderView::DoDataDelivery(
     // Tell everyone the representations that this process thinks are need to
     // delivery data.
     int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
-    vtkstd::vector<int> need_delivery;
+    std::vector<int> need_delivery;
     for (int cc=0; cc < num_reprs; cc++)
       {
       vtkInformation* info =
@@ -1099,12 +1105,12 @@ void vtkPVRenderView::GatherRepresentationInformation()
   // REQUEST_UPDATE() pass may result in REDISTRIBUTABLE_DATA_PRODUCER() being
   // specified. If so, we update the OrderedCompositingBSPCutsSource to use
   // those producers as inputs, if ordered compositing maybe needed.
-  static vtkstd::set<void*> previous_producers;
+  static std::set<void*> previous_producers;
 
   this->LocalGeometrySize = 0;
 
   bool need_ordered_compositing = false;
-  vtkstd::set<void*> current_producers;
+  std::set<void*> current_producers;
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   for (int cc=0; cc < num_reprs; cc++)
     {
@@ -1134,7 +1140,7 @@ void vtkPVRenderView::GatherRepresentationInformation()
   if (current_producers != previous_producers)
     {
     this->OrderedCompositingBSPCutsSource->RemoveAllInputs();
-    vtkstd::set<void*>::iterator iter;
+    std::set<void*>::iterator iter;
     for (iter = current_producers.begin(); iter != current_producers.end();
       ++iter)
       {
@@ -1323,6 +1329,16 @@ void vtkPVRenderView::ConfigureCompressor(const char* configuration)
 void vtkPVRenderView::InvalidateCachedSelection()
 {
   this->Selector->InvalidateCachedSelection();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PrepareForScreenshot()
+{
+  if (this->Interactor && this->GetRenderWindow())
+    {
+    this->GetRenderWindow()->SetInteractor(this->Interactor);
+    }
+  this->Superclass::PrepareForScreenshot();
 }
 
 //*****************************************************************

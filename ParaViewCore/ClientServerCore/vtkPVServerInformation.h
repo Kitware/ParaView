@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVServerInformation - Gets features of the server.
 // .SECTION Description
-// This objects is used by the client to get the features 
+// This objects is used by the client to get the features
 // suported by the server.
 // At the moment, server information is only on the root.
 
@@ -37,7 +37,7 @@ public:
   // Description:
   // This flag indicates whether the server can render remotely.
   // If it is off, all rendering has to be on the client.
-  // This is only off when the user starts the server with 
+  // This is only off when the user starts the server with
   // the --disable-composite command line option.
   vtkSetMacro(RemoteRendering, int);
   vtkGetMacro(RemoteRendering, int);
@@ -93,6 +93,11 @@ public:
   // Get/Set the time after which the server timesout.
   vtkSetMacro(Timeout, int);
   vtkGetMacro(Timeout, int);
+
+  // Description:
+  // Set/Get the EyeSeparation on server
+  void SetEyeSeparation(double value);
+  double GetEyeSeparation() const;
 
   // Description:
   // Number of machines to use in data or render server

@@ -4,6 +4,14 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
 )
 
+SET (TESTS_WITH_INLINE_COMPARES
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestIsoVolume.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
+)
+
 SET (TESTS_WITH_BASELINES)
 IF(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
@@ -15,6 +23,7 @@ ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNas.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNek.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
@@ -58,7 +67,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
@@ -69,6 +77,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ObjectInspectorSphere.xml
@@ -79,6 +88,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyLink.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
@@ -94,6 +104,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Tessellate.xml
@@ -124,6 +135,13 @@ SET (TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
+# only enable find data tests if numpy is available
+include("TestNumPy")
+
+IF ("1" STREQUAL ${HAS_NUMPY})
+  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES} ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
+ENDIF ("1" STREQUAL ${HAS_NUMPY})
+
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
 
@@ -143,6 +161,8 @@ set(CTHAMRMaterialInterfaceFilter_BREAK TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CS TRUE)
 set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
+set (TestIsoVolume_BREAK TRUE)
+set (TabbedViews_BREAK TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
@@ -170,6 +190,7 @@ set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
 SET (PlotEdges2_BREAK TRUE)
 SET (PropertyConversion2_BREAK TRUE)
+SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 set (EyeDomeLighting_BREAK TRUE)
@@ -197,6 +218,11 @@ SET (XYHistogram_THRESHOLD 60)
 # The color and opacity are often different on different machines.
 SET (NewColorEditor1_THRESHOLD 60)
 SET (NewColorEditor3_THRESHOLD 60)
+
+SET (SLACTools_DISABLE_CS TRUE)
+SET (SLACTools_DISABLE_CRS TRUE)
+SET (SLACTools_BREAK TRUE)
+SET(SLACTools_THRESHOLD 20)
 
 # Histogram filter produces different results when running in parallel, so
 # disable it.
@@ -243,6 +269,9 @@ SET (SaveCSV_THRESHOLD 40)
 ## server processess is not same as the data server processes
 SET (FFTOverTime_DISABLE_CRS TRUE)
 
+set (LoadStateMultiView_BREAK TRUE)
+set (RenderNan_BREAK TRUE)
+
 # NewColorEditor3 does volume rendering of structrued data which required remote
 # rendering in client-serve mode.
 SET (NewColorEditor3_DISABLE_CS TRUE)
@@ -262,6 +291,7 @@ IF (NOT BUILD_SHARED_LIBS)
   SET (H5PartReaderPlugin_DISABLE_C TRUE)
   SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
+  SET (SLACTools_DISABLE_C TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
@@ -274,6 +304,9 @@ SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+
+# Set image threshold overrides for the tests.
+SET(SaveLargeScreenshot_THRESHOLD 10000)
 
 IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
   SET(EyeDomeLighting_DISABLE_C TRUE)
@@ -344,7 +377,6 @@ set (Flow_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Flow2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (Fractal2D_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (GridConnectivity_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (LoadState_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (NormalGlyphs_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ObjectInspectorSphere_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (OpenSaveData_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
@@ -354,7 +386,9 @@ set (PlotEdges2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (PropertyConversion2_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+# disabling since the state file doesn't have view layout and such old state
+# files are not currently supported in collaborative mode.
+#set (PropertyLink_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ReadXMLPolyDataFileSeries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (RepresentationSelector_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (SaveColorMap_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
@@ -385,16 +419,20 @@ set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 
+IF (PARAVIEW_DATA_ROOT)
+  set (TESTS_WITHOUT_BASELINES
+    ${TESTS_WITHOUT_BASELINES}
+    ${TESTS_WITH_INLINE_COMPARES})
+ENDIF (PARAVIEW_DATA_ROOT)
+
 add_client_tests("pv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
-  PARALLEL
   )
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pv"
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-    PARALLEL
   )
 
   add_client_server_tests("pvcs"
@@ -402,10 +440,18 @@ IF (PARAVIEW_DATA_ROOT)
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
   )
 
+  add_client_server_tests("pvcs"
+    TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
+  )
+
   IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     add_client_render_server_tests("pvcrs"
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    )
+
+    add_client_render_server_tests("pvcrs"
+      TEST_SCRIPTS ${TESTS_WITH_INLINE_COMPARES}
     )
   ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 

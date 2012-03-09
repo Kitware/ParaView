@@ -32,8 +32,8 @@
 #include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkVolumeProperty.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 
 vtkStandardNewMacro(vtkImageVolumeRepresentation);
@@ -336,4 +336,10 @@ void vtkImageVolumeRepresentation::SetSpecularPower(double val)
 void vtkImageVolumeRepresentation::SetShade(bool val)
 {
   this->Property->SetShade(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
+{
+  this->Property->SetIndependentComponents(val);
 }

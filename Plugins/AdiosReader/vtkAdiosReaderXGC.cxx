@@ -21,8 +21,8 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtksys/ios/sstream>
-#include <vtkstd/string>
-#include <vtkstd/map>
+#include <string>
+#include <map>
 
 #include <sys/stat.h>
 #include <assert.h>
@@ -131,14 +131,14 @@ public:
     // We are supposed to have load a data file or maybe just the mesh
     // - if data was loaded, then load the mesh
     // - if mesh was loaded, then do nothing
-    if(this->MeshFile->FileName.find("xgc.mesh.bp") == vtkstd::string::npos)
+    if(this->MeshFile->FileName.find("xgc.mesh.bp") == std::string::npos)
       {
       // we have the field file
-      vtkstd::string meshFileName = "";
-      vtkstd::string::size_type i0 = this->MeshFile->FileName.rfind("xgc.");
-      vtkstd::string::size_type i1 = this->MeshFile->FileName.rfind(".bp");
+      std::string meshFileName = "";
+      std::string::size_type i0 = this->MeshFile->FileName.rfind("xgc.");
+      std::string::size_type i1 = this->MeshFile->FileName.rfind(".bp");
 
-      if (i0 != vtkstd::string::npos && i1 != vtkstd::string::npos)
+      if (i0 != std::string::npos && i1 != std::string::npos)
         {
         meshFileName = this->MeshFile->FileName.substr(0,i0+4) + "mesh.bp";
         this->DataFile = this->MeshFile;

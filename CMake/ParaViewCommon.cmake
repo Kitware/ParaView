@@ -197,13 +197,17 @@ SET(VTK_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 # installations.
 SET (VTK_INSTALL_NO_PYTHON ON)
 SET (VTK_INSTALL_NO_VTKPYTHON ON)
-# Tell VTK to install python extension modules using CMake so they get installed
-# with the other python extension modules ParaView creates.
-IF(WIN32)
-  SET (VTK_INSTALL_PYTHON_USING_CMAKE ON)
-ELSE()
-  SET (VTK_INSTALL_PYTHON_USING_CMAKE OFF)
-ENDIF()
+# --- this code seems to be half-baked, so disabling that for now. Let's just do
+# traditional python module installation for this release ---
+## Tell VTK to install python extension modules using CMake so they get installed
+## with the other python extension modules ParaView creates.
+##IF(WIN32)
+##  SET (VTK_INSTALL_PYTHON_USING_CMAKE ON)
+##ELSE()
+##  SET (VTK_INSTALL_PYTHON_USING_CMAKE OFF)
+##ENDIF()
+SET (VTK_INSTALL_PYTHON_USING_CMAKE ON)
+
 SET (VTK_INSTALL_NO_QT_PLUGIN ON)
 SET (VTK_INSTALL_NO_LIBRARIES ${PV_INSTALL_NO_LIBRARIES})
 
@@ -339,9 +343,6 @@ OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
 
 # Set this to get VTKs FOR LOOP "fix" to apply too all of Paraviews Source.
 SET(VTK_USE_FOR_SCOPE_WORKAROUND TRUE)
-
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
-  ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 
 OPTION(PARAVIEW_DISABLE_VTK_TESTING "Disable VTK Testing" OFF)
 MARK_AS_ADVANCED(PARAVIEW_DISABLE_VTK_TESTING)

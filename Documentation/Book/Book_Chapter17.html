@@ -1,1002 +1,458 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-        <META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
-        <TITLE>ParaView User's Guide (v3.10)</TITLE>
-        <META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Unix)">
-        <META NAME="CREATED" CONTENT="0;0">
-        <META NAME="CHANGED" CONTENT="0;0">
-        <META NAME="Rights" CONTENT="GFDL">
-        <STYLE TYPE="text/css">
-        <!--
-                @page { margin: 0.79in }
-                P { margin-bottom: 0.08in }
-                EM.western { font-family: "DejaVu Serif", serif }
-                EM.cjk { font-style: normal }
-                EM.ctl { font-style: normal }
-                A:link { so-language: zxx }
-        -->
-        </STYLE>
-</HEAD>
-<BODY DIR="LTR">
-<DIV ID=" Command Line Arguments" DIR="LTR">
-        <P STYLE="margin-bottom: 0.15in; page-break-after: avoid"><FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=6>Command
-        Line Arguments</FONT></FONT></P>
-        <DIV ID="Command-Line Arguments and Environment Variables " DIR="LTR">
-                <P STYLE="margin-top: 0.3in; margin-bottom: 0.15in; page-break-after: avoid">
-                <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5 STYLE="font-size: 20pt">Command-Line
-                Arguments and Environment Variables </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The following is a
-                list of options available when running ParaView from the command
-                line. When two options are listed, separated by a comma, either of
-                them can be used to achieve the specified result. Unless otherwise
-                specified, all command-line options are used on the client program.
-                Following the list of command-line options is a set of environment
-                variables ParaView recognizes. </FONT></FONT>
-                </P>
-                <DIV ID="General Options " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>General Options </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--data : Load the
-                                specified data file into ParaView (--data=data_file). </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--disable-registry,
-                                -dr : Launch ParaView in its default state; do not load any
-                                preferences saved in ParaView’s registry file. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--help, /? :
-                                Display a list of the command-line arguments and their
-                                descriptions. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--version, -V :
-                                Display ParaView’s version number, and then exit. </FONT></FONT>
-                                </P>
-                        </UL>
-                </DIV>
-                <DIV ID="Client-Server Options " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Client-Server
-                        Options </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--server, -s : Tell
-                                the client process where to connect to the server. The default is
-                                &nbsp;&nbsp;server =localhost. This command-line option is used
-                                on the client. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--client-host, -ch
-                                : Tell the server process(es) where to connect to the client. The
-                                default is &nbsp;&nbsp;client-host=localhost. This command-line
-                                option is used on the server(s). </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--server-port, -sp
-                                : Specify the port to use in establishing a connection between
-                                the client and the server. The default is --server-port=11111. If
-                                used, this argument must be specified on both the client and the
-                                server command lines, and the port numbers must match. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--data-server-port,
-                                -dsp : Specify the port to use in establishing a connection
-                                between the client and the data server. The default is
-                                --data-server-port=11111. If used, this argument must be
-                                specified on both the client and the data server command lines,
-                                and the port numbers must match. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--render-server-port,
-                                -rsp : Specify the port to use in establishing a connection
-                                between the client and the render server. The default is
-                                --render-server-port=22221. If used, this argument must be
-                                specified on both the client and the render server command lines,
-                                and the port numbers must match. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--reverse-connection,
-                                -rc : Cause the data and render servers to connect to the client.
-                                When using this option, the client, data server, and render
-                                server (if used) must be started with this command-line argument,
-                                and you should start the client before starting either server. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--connect-id :
-                                Using a connect ID is a security feature in client-server mode.
-                                To use this feature, pass this command-line argument with the
-                                same ID number to the client and server(s). If you do not pass
-                                the same ID number, the server(s) will be shut down. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--machines, -m :
-                                Use this command-line argument to pass in the network
-                                configuration file for the render server. See section Error:
-                                Reference source not found for a description of this file. </FONT></FONT>
-                                </P>
-                        </UL>
-                </DIV>
-                <DIV ID="Rendering Options " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Rendering
-                        Options </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--stereo : Enable
-                                stereo rendering in ParaView. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT
-                          SIZE=3>--stereo-type: Set the stereo
-                          rendering type. Options are: Crystal Eyes,
-                          Red-Blue, Interlaced ( Default ), Dresden,
-                          Anaglyph, Checkerboard</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--tile-dimensions-x,
-                                -tdx : Specify the number of tiles in the horizontal direction of
-                                the tiled display (&nbsp;&nbsp;tile&nbsp;dimensions-x=number_of_tiles).
-                                This value defaults to 0. To use this option, you must be running
-                                in client/server or client/data server/render server mode, and
-                                this option must be specified on the client command line. Setting
-                                this option to a value greater than 0 will enable the tiled
-                                display. If this argument is set to a value greater than 0 and
-                                -tdy (see below) is not set, then -tdy will default to 1. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--tile-dimensions-y,
-                                -tdy : Specify the number of tiles in the vertical direction of
-                                the tiled display (&nbsp;&nbsp;tile&nbsp;dimensions-y=number_of_tiles).
-                                This value defaults to 0. To use this option, you must be running
-                                in client/server or client/data server/render server mode, and
-                                this option must be specified on the client command line. Setting
-                                this option to a value greater than 0 will enable the tiled
-                                display. If this argument is set to a value greater than 0 and
-                                -tdx (see above) is not set, then -tdx will default to 1. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--tile-mullion-x,
-                                -tmx : Specify the spacing (in pixels) between columns in tiled
-                                display images. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--tile-mullion-y,
-                                -tmy : Specify the spacing (in pixels) between rows in tiled
-                                display images. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--use-offscreen-rendering
-                                : Use offscreen rendering on the satellite processes. On unix
-                                platforms, software rendering or mangled Mesa must be used with
-                                this option. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>--disable-composite,
-                                -dc : Use this command-line option if the data server does not
-                                have rendering resources and you are not using a render server.
-                                All the rendering will then be done on the client. </FONT></FONT>
-                                </P>
-                        </UL>
-                </DIV>
-               <DIV ID="Executable help " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Executable help </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>paraview --help </FONT></FONT>
-                        </P>
-                        <P STYLE="margin-left: 0.25in; margin-right: 0.25in; margin-top: 0.25in; margin-bottom: 0.25in; background: #e6e6e6; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu mono, monospace"><FONT
-                  SIZE=2>
-                 <UL>
-                    <LI>--connect-id=opt
-                            Set the ID of the server and client to make sure they match.
-                    <LI>--cslog=opt           ClientServerStream log
-                    file.
-                    <LI>--data=opt
-                              Load the specified data. To specify file series replace the
-                        numeral with a '.' eg. my0.vtk, my1.vtk...myN.vtk becomes my..vtk
-                    <LI>--data-directory=opt  Set the data directory where test-case data
-                        are.
-                    <LI>--disable-light-kit   When present, disables light kit by
-                        default. Useful for dashboard tests.
-                    <LI>--disable-registry     -dr
-                                       Do not use registry when running ParaView (for
-                        testing).
-                    <LI>--exit                Exit application when testing is
-                        done. Use for testing.
-                    <LI>--help                 /?
-                         Displays available command line arguments.
-                    <LI>--machines=opt
-                        -m=opt                Specify the network configurations file for
-                        the render server.
-                    <LI>--script=opt          Set a python script to be
-                        evaluated on startup.
-                    <LI>--server=opt           -s=opt
-                        Set the name of the server resource to connect with when the
-                        client starts.
-                    <LI>--state=opt           Load the specified statefile
-                        (.pvsm).
-                    <LI>--stereo              Tell the application to enable
-                        stereo rendering (only when running on a single process).
+<html>
+    <head>
+        <meta name="keywords" content=""/>
+        <meta name="description" content=""/>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <title>ParaView Users Manual</title>
+        <link href="../style.css" rel="stylesheet" type="text/css" media="screen"/>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="header-wrapper">
+                <div id="header">
+                    <div id="logo">
+                        <h1>
+                            <a href="http://www.paraview.org">ParaView </a>
+                        </h1>
+                        <p>User's Manual (Abridged)</p>
+                    </div>
+                </div>
+            </div>
+            <div id="page">
+                <div id="content">
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Command-Line Arguments</a>
+                        </h2>
+                        <div class="entry">
+                            <p>The following is a list of options available when running ParaView from the command line. When two options are listed, separated by a comma, either of them can be used to achieve the specified result. Unless otherwise specified, all command-line options are used on the client program. Following the list of command-line options is a set of environment variables ParaView recognizes. </p>
+                            <ul>
+                                <li>
+                                    <p> --data : Load the specified data file into ParaView (--data=data_file). </p>
+                                </li>
+                                <li>
+                                    <p> --disable-registry, -dr : Launch ParaView in its default state; do not load any preferences saved in ParaView’s registry file. </p>
+                                </li>
+                                <li>
+                                    <p> --help, /? : Display a list of the command-line arguments and their descriptions. </p>
+                                </li>
+                                <li>
+                                    <p> --version, -V : Display ParaView’s version number, and then exit. </p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p> --server, -s : Tell the client process where to connect to the server. The default is ‑‑server =localhost. This command-line option is used on the client. </p>
+                                </li>
+                                <li>
+                                    <p> --client-host, -ch : Tell the server process(es) where to connect to the client. The default is ‑‑client-host=localhost. This command-line option is used on the server(s). </p>
+                                </li>
+                                <li>
+                                    <p> --server-port, -sp : Specify the port to use in establishing a connection between the client and the server. The default is --server-port=11111. If used, this argument must be specified on both the client and the server command lines, and the port numbers must match. </p>
+                                </li>
+                                <li>
+                                    <p> --data-server-port, -dsp : Specify the port to use in establishing a connection between the client and the data server. The default is --data-server-port=11111. If used, this argument must be specified on both the client and the data server command lines, and the port numbers must match. </p>
+                                </li>
+                                <li>
+                                    <p> --render-server-port, -rsp : Specify the port to use in establishing a connection between the client and the render server. The default is --render-server-port=22221. If used, this argument must be specified on both the client and the render server command lines, and the port numbers must match. </p>
+                                </li>
+                                <li>
+                                    <p> --reverse-connection, -rc : Cause the data and render servers to connect to the client. When using this option, the client, data server, and render server (if used) must be started with this command-line argument, and you should start the client before starting either server. </p>
+                                </li>
+                                <li>
+                                    <p> --connect-id : Using a connect ID is a security feature in client-server mode. To use this feature, pass this command-line argument with the same ID number to the client and server(s). If you do not pass the same ID number, the server(s) will be shut down. </p>
+                                </li>
+                                <li>
+                                    <p> --machines, -m : Use this command-line argument to pass in the network configuration file for the render server. See section Error: Reference source not found for a description of this file. </p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p> --stereo : Enable stereo rendering in ParaView. </p>
+                                </li>
+                                <li>
+                                    <p> --stereo-type: Set the stereo rendering type. Options are: </p>
+                                    <ul>
+                                        <li>
+                                            <p> Crystal Eyes </p>
+                                        </li>
+                                        <li>
+                                            <p> Red-Blue </p>
+                                        </li>
+                                        <li>
+                                            <p> Interlaced ( Default ) </p>
+                                        </li>
+                                        <li>
+                                            <p> Dresden </p>
+                                        </li>
+                                        <li>
+                                            <p> Anaglyph </p>
+                                        </li>
+                                        <li>
+                                            <p> Checkerboard </p>
+                                        </li>
+                                    </ul>
+                                    <p/>
+                                </li>
+                                <li>
+                                    <p> --tile-dimensions-x, -tdx : Specify the number of tiles in the horizontal direction of the tiled display (‑‑tile‑dimensions-x=number_of_tiles). This value defaults to 0. To use this option, you must be running in client/server or client/data server/render server mode, and this option must be specified on the client command line. Setting this option to a value greater than 0 will enable the tiled display. If this argument is set to a value greater than 0 and -tdy (see below) is not set, then -tdy will default to 1. </p>
+                                </li>
+                                <li>
+                                    <p> --tile-dimensions-y, -tdy : Specify the number of tiles in the vertical direction of the tiled display (‑‑tile‑dimensions-y=number_of_tiles). This value defaults to 0. To use this option, you must be running in client/server or client/data server/render server mode, and this option must be specified on the client command line. Setting this option to a value greater than 0 will enable the tiled display. If this argument is set to a value greater than 0 and -tdx (see above) is not set, then -tdx will default to 1. </p>
+                                </li>
+                                <li>
+                                    <p> --tile-mullion-x, -tmx : Specify the spacing (in pixels) between columns in tiled display images. </p>
+                                </li>
+                                <li>
+                                    <p> --tile-mullion-y, -tmy : Specify the spacing (in pixels) between rows in tiled display images. </p>
+                                </li>
+                                <li>
+                                    <p> --use-offscreen-rendering : Use offscreen rendering on the satellite processes. On unix platforms, software rendering or mangled Mesa must be used with this option. </p>
+                                </li>
+                                <li>
+                                    <p> --disable-composite, -dc : Use this command-line option if the data server does not have rendering resources and you are not using a render server. All the rendering will then be done on the client. </p>
+                                </li>
+                            </ul>
 
-                    <LI>--stereo-type=opt     Specify the stereo type. This valid only
-                        when --stereo is specified. Possible values are &quot;Crystal
-                        Eyes&quot;, &quot;Red-Blue&quot;, &quot;Interlaced&quot;,
-                        &quot;Dresden&quot;, &quot;Anaglyph&quot;, &quot;Checkerboard&quot;
-
-<LI>--test-baseline=opt   Add test baseline. Can be used multiple
-                        times to specify multiple baselines for multiple tests, in order.
-
-<LI>--test-directory=opt  Set the temporary directory where test-case
-                        output will be stored.
-<LI>--test-script=opt     Add test script. Can
-                        be used multiple times to specify multiple tests.
-
-<LI>--test-threshold=opt  Add test image threshold. Can be used
-                        multiple times to specify multiple image thresholds for multiple
-                        tests in order.
-<LI>--version              -V                    Give
-                        the version number and exit.
-</UL>
-
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>pvbatch --help </FONT></FONT>
-                        </P>
-                        <P STYLE="margin-left: 0.25in; margin-right: 0.25in; margin-top: 0.25in; margin-bottom: 0.25in; background: #e6e6e6; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu mono, monospace"><FONT
-                  SIZE=2>
-<UL>
-<LI>--cslog=opt
-                                 ClientServerStream log file.
-  <LI>--help
-                        /?                         Displays available command line
-                        arguments.
-  <LI>--machines=opt              -m=opt
-                        Specify the network configurations file for the render server.
-
-  <LI>--symmetric                 -sym                       When
-                        specified, the python script is processed symmetrically on all
-                        processes.
-  <LI>--use-offscreen-rendering  Render offscreen on the
-                        satellite processes. This option only works with software
-                        rendering or mangled mesa on Unix.
-  <LI>--version                   -V
-                                               Give the version number
-                        and exit.</FONT></FONT></P>
-  </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>pvdataserver --help </FONT></FONT>
-                        </P>
-                        <P STYLE="margin-left: 0.25in; margin-right: 0.25in; margin-top: 0.25in; margin-bottom: 0.25in; background: #e6e6e6; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu mono, monospace"><FONT
-                  SIZE=2>
-                       </P>
- <UL>
- <LI>--client-host=opt
-                               -ch=opt                 Tell the data|render server the
-                        host name of the client, use with -rc.
-  <LI>--connect-id=opt        Set
-                        the ID of the server and client to make sure they match.
-
-<LI>--cslog=opt             ClientServerStream log file.
-
-<LI>--data-server-port=opt   -dsp=opt                What port data
-                        server use to connect to the client. (default
-                        11111).
-<LI>--help
-                                    /?                      Displays available command
-                        line arguments.
-<LI>--machines=opt           -m=opt
-                        Specify the network configurations file for the render server.
-
-<LI>--reverse-connection     -rc                     Have the server
-                        connect to the client.
-<LI>--timeout=opt           Time (in minutes)
-                        since connecting with a client after which the server may timeout.
-                        The client typically shows warning messages before the server
-                        times out.
-<LI>--version                 -V                      Give
-                        the version number and exit.</FONT></FONT></P>
-</UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>pvpython --help </FONT></FONT>
-                        </P>
-                        <P STYLE="margin-left: 0.25in; margin-right: 0.25in; margin-top: 0.25in; margin-bottom: 0.25in; background: #e6e6e6; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu mono, monospace"><FONT
-                  SIZE=2>
-                       </P>
-<UL>
-<LI>--connect-id=opt
-                         Set the ID of the server and client to make sure they match.
-
-<LI>--cslog=opt        ClientServerStream log file.
-<LI>--data=opt
-                        Load the specified data. To specify file series replace the
-                        numeral with a '.' eg. my0.vtk, my1.vtk...myN.vtk becomes my..vtk
-
-<LI>--help              /?                 Displays available command
-                        line arguments.
-<LI>--machines=opt      -m=opt             Specify the
-                        network configurations file for the render
-                        server.
-<LI>--state=opt
-                           Load the specified statefile (.pvsm).
-<LI>--stereo           Tell
-                        the application to enable stereo rendering (only when running on a
-                        single process).
-<LI>--stereo-type=opt  Specify the stereo type. This
-                        valid only when --stereo is specified. Possible values are
-                        &quot;Crystal Eyes&quot;, &quot;Red-Blue&quot;, &quot;Interlaced&quot;,
-                        &quot;Dresden&quot;, &quot;Anaglyph&quot;, &quot;Checkerboard&quot;
-
-<LI>--version           -V                 Give the version number and
-                        exit.</FONT></FONT></P>
-</UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT
-                        SIZE=3>pvrenderserver --help
-                      </P>
-<UL>
-<LI>--client-host=opt
-                                  -ch=opt                    Tell the data|render server
-                        the host name of the client, use with -rc.
-<LI>--connect-id=opt
-                           Set the ID of the server and client to make sure they match.
-
-<LI>--cslog=opt                ClientServerStream log file.
-<LI>--help
-                                         /?                         Displays available
-                        command line arguments.
-<LI>--machines=opt              -m=opt
-                                    Specify the network configurations file for the render
-                        server.
-<LI>--render-server-port=opt    -rsp=opt
-                        What port should the render server use to connect to the client.
-                        (default 22221).
-<LI>--reverse-connection        -rc
-                             Have the server connect to the client.
-
-<LI>--tile-dimensions-x=opt     -tdx=opt                   Size of
-                        tile display in the number of displays in each row of the display.
-
-<LI>--tile-dimensions-y=opt     -tdy=opt                   Size of
-                        tile display in the number of displays in each column of the
-                        display.
-<LI>--tile-mullion-x=opt        -tmx=opt
-                        Size of the gap between columns in the tile display, in Pixels.
-
-<LI>--tile-mullion-y=opt        -tmy=opt                   Size of the
-                        gap between rows in the tile display, in Pixels.
-
-<LI>--use-offscreen-rendering  Render offscreen on the satellite
-                        processes. This option only works with software rendering or
-                        mangled mesa on Unix.
-<LI>--version                   -V
-                                  Give the version number and
-                        exit.</FONT></FONT></P>
-</UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT
-                        SIZE=3>pvserver --help
-                       <BR><BR>
-                        </P>
-<UL>
-<LI>--client-host=opt
-                                  -ch=opt                    Tell the data|render server
-                        the host name of the client, use with -rc.
-<LI>--connect-id=opt
-                           Set the ID of the server and client to make sure they match.
-
-<LI>--cslog=opt                ClientServerStream log file.
-
-<LI>--disable-composite         -dc                        Use this
-                        option when rendering resources are not available on the server.
-
-<LI>--help                      /?                         Displays
-                        available command line arguments.
-<LI>--machines=opt
-                        -m=opt                     Specify the network configurations file
-                        for the render server.
-<LI>--reverse-connection        -rc
-                                   Have the server connect to the client.
-
-<LI>--server-port=opt           -sp=opt                    What port
-                        should the combined server use to connect to the client. (default
-                        11111).
-<LI>--tile-dimensions-x=opt     -tdx=opt
-                        Size of tile display in the number of displays in each row of the
-                        display.
-<LI>--tile-dimensions-y=opt     -tdy=opt
-                        Size of tile display in the number of displays in each column of
-                        the display.
-<LI>--tile-mullion-x=opt        -tmx=opt
-                         Size of the gap between columns in the tile display, in Pixels.
-
-<LI>--tile-mullion-y=opt        -tmy=opt                   Size of the
-                        gap between rows in the tile display, in
-                        Pixels.
-<LI>--timeout=opt
-                                 Time (in minutes) since connecting with a client after
-                        which the server may timeout. The client typically shows warning
-                        messages before the server times out.
-<LI>--use-offscreen-rendering
-                        Render offscreen on the satellite processes. This option only
-                        works with software rendering or mangled mesa
-                        on Unix.
-<LI> --version     -V Give the version
-                        number and exit.</FONT></FONT></P>
-</UL>
-                </DIV>
-
-                <DIV ID="Environment Variables " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Environment
-                        Variables </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>In addition to the
-                        command-line options previously listed, ParaView also recognizes
-                        the following environment variables. </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>PV_DISABLE_COMPOSITE_INTERRUPTS
-                                If this variable is set to 1, it is not possible to interrupt the
-                                compositing of images in parallel rendering. Otherwise it is
-                                interruptible through mouse interaction. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>PV_ICET_WINDOW_BORDERS
-                                Setting this variable to 1 when running ParaView in tiled display
-                                mode using IceT causes the render window for each tile to be the
-                                same size as the display area in ParaView’s main application
-                                window. (Normally each render window fills the whole screen when
-                                tiled display mode is used.) This feature is sometimes useful
-                                when debugging ParaView. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>PV_PLUGIN_PATH If
-                                you have shared libraries containing plugins you wish to load in
-                                ParaView at startup, set this environment variable to the path
-                                for these libraries. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>PV_SOFTWARE_RENDERING
-                                This environment variable has the same effect as setting both the
-                                &nbsp;&nbsp;use&nbsp;software&nbsp;rendering and
-                                --use-satellite-software environment variables. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>VTK_CLIENT_SERVER_LOG
-                                If set to 1, a log file will be created for the ParaView client,
-                                server, and render server. The log files will contain any
-                                client-server streams sent to the corresponding client, server,
-                                or render server. </FONT></FONT>
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                </DIV>
-
-        </DIV>
-</DIV>
-
-
-<DIV ID=" Application Settings" DIR="LTR">
-        <P STYLE="margin-bottom: 0.15in; page-break-after: avoid"><FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=6>Application
-        Settings</FONT></FONT></P>
-        <DIV ID="Application Settings " DIR="LTR">
-                <P STYLE="margin-top: 0.3in; margin-bottom: 0.15in; page-break-after: avoid">
-                <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5 STYLE="font-size: 20pt">Application
-                Settings </FONT></FONT>
-                </P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Application wide
-                settings are saved in between sessions so that every time you start
-                ParaView on the same machine you get the same behaviors. The
-                settings are stored in an XML file that resides at
-                <FONT FACE="DejaVu Serif, serif"><B>%APPDATA%\ParaView\ParaViewVERSION.ini</B></FONT>
-                on Windows and <FONT FACE="DejaVu Serif, serif"><B>~/.config/ParaView/ParaViewVERSION.ini</B></FONT>
-                on all other platforms. If you need to restore ParaView's default
-                settings you can either move this file or run with the
-                <FONT FACE="DejaVu Serif, serif"><B>--disable-registry</B></FONT>
-                argument.</FONT></FONT></P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>These settings are
-                managed via the settings dialog. On Macintosh this is reached from
-                the <FONT FACE="DejaVu Serif, serif"><B>Preferences</B></FONT>
-                entry in the <FONT FACE="DejaVu Serif, serif"><B>ParaView</B></FONT>
-                menu. On Unix, Linux and Windows systems it is reached from the
-                <FONT FACE="DejaVu Serif, serif"><B>Settings</B></FONT> entry on
-                the <FONT FACE="DejaVu Serif, serif"><B>Edit</B></FONT> menu. These
-                settings are program wide and are not to be confused with the View
-                settings found under the <FONT FACE="DejaVu Serif, serif"><B>Edit</B></FONT>
-                menu. Those settings are specific to each View window and are
-                discussed in the <A HREF="http://paraview.org/Wiki/ParaView/Displaying_Data">Displaying
-                Data</A> chapter.</FONT></FONT></P>
-                <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The following figures
-                show the various pages within the settings dialog. Choose from
-                among them by clicking on the page list toward the left. Click on
-                the arrow to expose the three sub pages in the <FONT FACE="DejaVu Serif, serif"><B>Render
-                View</B></FONT> settings category. Some plugins add their own pages
-                to the dialog but we do not discuss them here and instead refer you
-                to any documentation that comes along with the plugin. Do note
-                though that most settings are documented within the application via
-                tool tips.</FONT></FONT></P>
-                <DIV ID="General " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>General </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_445f1e29.jpg" NAME="139" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.1. General Preferences</B></FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Default
-                                View</B></FONT> : Choose the View window type that ParaView
-                                initially shows when it starts up and connects to any server.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>On
-                                File Open</B></FONT> : Control the
-                          time step shown by default when
-                                ParaView opens a file with multiple time steps.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Rescale
-                                Data Range Mode</B></FONT> : Controls how color lookup tables are
-                                adjusted when data ranges change</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Heart-Beat
-                                Interval</B></FONT> : Sets the length
-                          of time between keep alive
-                                messages that the client sends to the remote server which
-                                prevents the TCP connection between the two machines from
-                                shutting down.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Auto
-                                Accept</B></FONT> : Makes every change take effect immediately
-                                rather than requiring you to click the <FONT FACE="DejaVu Serif, serif"><B>Apply</B></FONT>
-                                button.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Auto
-                                Convert Properties</B></FONT> : Tells ParaView to do some data
-                                conversions automatically so that more filters are immediately
-                                applicable to the data you have at hand.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Crash
-                                Recovery</B></FONT> : Tells ParaView to save a record of each
-                                action you take so that you can easily recover your work if
-                                ParaView crashes mid-session.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Use
-                                Multi-Core</B></FONT> : Tells ParaView to spawn an MPI parallel
-                                server on the same machine that is running the GUI so to
-                                better take advantage of multi-core machines on processing bound
-                                problems.</FONT></FONT></P>
-
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT
-                                SIZE=3><FONT FACE="DejaVu Serif,
-                                serif">
-<B>Use Strict Load Balancing
-</B></FONT>: Tells ParaView to not use its own extents translators.
-</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT
-                                SIZE=3><FONT FACE="DejaVu Serif,
-                                serif">
-<B>
-Specular Highlighting with Scalar Coloring
-</B></FONT>
-: Tells ParaView to enable specular highlighting even when coloring data by scalar values.
-</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT
-                                SIZE=3><FONT FACE="DejaVu Serif,
-                                serif">
-<B>
-Disable Splash Screen
-</B></FONT>
-: Tells ParaView to not show its splash screen when starting.
-</FONT></FONT></P>
-                       </UL>
-                </DIV>
-                <DIV ID="Colors " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Colors </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_m341a5d55.jpg" NAME="140" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.2. Color Preferences</B></FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>When setting up
-                        visualizations, most datasets in the visualization are typically
-                        colored using scalar colors. However, there may be items in the
-                        setup that are simply colored using a solid color including text
-                        and other annotations. Also by default ParaView uses a grey
-                        background, so the default colors chosen for objects tends to be
-                        setup so that it looks appropriate on the grey background.
-                        However, when saving a screenshot for
-                                printing, you may prefer
-                        to white background, for example. In that case, it can be tedious
-                        to go to every object and change its color to work with the new
-                        background color. </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>To make it easier to
-                        change colors on the fly, ParaView defines color categories. Users
-                        can choose to assign a color category to any object when
-                        specifying a color using the category menu on most color-chooser
-                        buttons, as shown below. </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_m6ca332ef.jpg" NAME="141" WIDTH=622 HEIGHT=397 BORDER=0></P>
-                     <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure 17.3. Color Category on the Display Tab</B></FONT></FONT></P>
-                       <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Following
-                        associations are setup by default: </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Foreground color:
-                                Outlines and wireframes </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Background color:
-                                Background color in render views </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Surface color:
-                                Solid color to surfaces </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Text color: Color
-                                to 2D text </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Selection color:
-                                Color used to show highlighted/selected elements in render view. </FONT></FONT>
-                                </P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Egde color: Used
-                                for edges in <FONT FACE="DejaVu Serif, serif"><B>Surface With
-                                Edges</B></FONT> mode.</FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                </DIV>
-                <DIV ID="Animation " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Animation </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_m5f5dae66.jpg" NAME="142" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.4. Animation Preferences</B></FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Cache
-                                Geometry</B></FONT> : When checked this allows ParaView to save
-                                and later reuse rather than regenerate visible geometry during
-                                animation playback to speed up replay.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Cache
-                                Limit</B></FONT> : This is the maximum size of the animation
-                                playback geometry cache (on each node when in parallel).</FONT></FONT></P>
-                        </UL>
-                </DIV>
-                <DIV ID="Charts " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Charts </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_4394a8d6.jpg" NAME="143" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.5. Chart Preferences</B></FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Hidden
-                                Series</B></FONT> : Allows you to specify a set of regular
-                                expressions that are compared against array names so that various
-                                bookkeeping arrays are not drawn in 2D charts and thus distract
-                                from the meaningful ones.</FONT></FONT></P>
-                        </UL>
-                </DIV>
-                <DIV ID="Render View General " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Render View
-                        General </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_m4edcea30.jpg" NAME="144" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.6. General Render View Preferences</B></FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Use
-                                Immediate Mode Rendering</B></FONT> : Controls whether OpenGL
-                                display lists are used or not. This is
-                                generally only faster only
-                                when rendering relatively small amounts of geometry.</FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>LOD
-                        Parameters</B></FONT> settings control if, when and to what extent
-                        ParaView will down sample the data it draws while you move the
-                        mouse so to maintain interactivity. The algorithm by which
-                        ParaView down samples the data is known as quadric clustering.</FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>LOD
-                                Threshold</B></FONT> : Rendered data that is smaller than the
-                                specified size is not down sampled.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>LOD
-                                Resolution</B></FONT> : When data is
-                                down sampled, this controls
-                                how coarsely.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Outline
-                                threshold</B></FONT> : Data that is larger than this threshold is
-                                drawn only as a bounding box while you move the camera.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Lock
-                                Interactive Render</B></FONT> : Controls how long ParaView waits
-                                after you have released the mouse and finished moving the camera
-                                before it returns to a full resolution render.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Allow
-                                Rendering Interrupts</B></FONT> : makes the drawing process
-                                interuptable so that you can move the camera immediately, without
-                                having to wait for a potentially slow full resolution render to
-                                complete.</FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>Depth
-                        Peeling</B></FONT> settings control the algorithm that ParaView
-                        uses (given a sufficiently capable GPU) to draw translucent
-                        geometry correctly.</FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Enable
-                                Depth Peeling</B></FONT> : Controls whether ParaView will try to
-                                use the (potentially slow) depth peeling algorithm at all.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Number
-                                of Peels</B></FONT> : Controls the number of passes in the
-                                rendering algorithm. A higher number
-                                of peels produces quality images but increases
-                                rendering time.</FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>Coincident
-                        Topology Resolution</B></FONT> settings control the method that
-                        ParaView uses to draw co-planar polygons in a non conflicting way
-                        (to avoid z-tearing in graphics terminology). Changes to these
-                        parameters do not take effect until ParaView is restarted.</FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The pull down menu
-                        allows you to choose between various algorithms that deal with
-                        z-tearing. </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                        </UL>
-                        <UL>
-                                <OL>
-                                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Do
-                                        Nothing</B></FONT> : does not attempt to resolve overlapping
-                                        geometry</FONT></FONT></P>
-                                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Use
-                                        Z-Buffer Shift</B></FONT> : adjusts OpenGL's Z direction scaling
-                                        to draw one object slightly in front of the other. The <FONT FACE="DejaVu Serif, serif"><B>Z
-                                        Shift</B></FONT> property controls the amount of offset.</FONT></FONT></P>
-                                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Use
-                                        Polygon Offset</B></FONT> : adjusts polygon locations (by
-                                        calling glPolygonOffset()) for the same purpose. For an
-                                        explanation of the <FONT FACE="DejaVu Serif, serif"><B>Factor</B></FONT>
-                                        and <FONT FACE="DejaVu Serif, serif"><B>Units</B></FONT>
-                                        parameters, see
-                                        <A HREF="http://www.opengl.org/resources/faq/technical/polygonoffset.htm.">http://www.opengl.org/resources/faq/technical/polygonoffset.htm.</A>
-                                        The <FONT FACE="DejaVu Serif, serif"><B>Offset Faces</B></FONT>
-                                        parameters controls whether filled polygons are moved rather
-                                        than the points and edges.</FONT></FONT></P>
-                                </OL>
-                        </UL>
-                        <UL>
-                                <P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Use
-                                Offscreen Rendering for Screenshots</B></FONT> : This checkbox is
-                                enabled only when offscreen rendering is available. It tells
-                                ParaView to generate images that are being captured as
-                                screenshots in offscreen contexts. On some platforms this is
-                                necessary to avoid accidentally capturing overlapping pixels
-                                (such as a mouse pointer) from the operating system.</FONT></FONT></P>
-                        </UL>
-                </DIV>
-                <DIV ID="Render View Camera " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Render View
-                        Camera </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_m37578574.jpg" NAME="145" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.7. Camera Preferences</B></FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>These settings allow
-                        you to assign particular key/mouse press combinations to various
-                        camera moving controls. There are two sets of settings. <FONT FACE="DejaVu Serif, serif"><B>Control
-                        for 3D Movements</B></FONT> pertain to the 3D View. <FONT FACE="DejaVu Serif, serif"><B>Control
-                        for 2D Movements</B></FONT> pertain to the 2D View.</FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>In the 3D View
-                        controls you can assign the following motions to any combination
-                        of left, middle or right mouse button press and no, shift or
-                        control key press. </FONT></FONT>
-                        </P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Pan</B></FONT></FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Roll</B></FONT></FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Rotate</B></FONT></FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Multi-Rotate</B></FONT></FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Zoom</B></FONT></FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <BR><BR>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Rotation is not
-                        possible in the 2D View, which lacks a down direction to move
-                        about. So in this area you can only choose from <FONT FACE="DejaVu Serif, serif"><B>Pan</B></FONT>
-                        and <FONT FACE="DejaVu Serif, serif"><B>Zoom</B></FONT>.</FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>Clicking <FONT FACE="DejaVu Serif, serif"><B>Reset
-                        Defaults</B></FONT> restores the button assignments to the factory
-                        settings.</FONT></FONT></P>
-                </DIV>
-                <DIV ID="Render View Server " DIR="LTR">
-                        <P STYLE="margin-top: 0.3in; margin-bottom: 0.08in; page-break-after: avoid">
-                        <FONT FACE="DejaVu Sans, sans-serif"><FONT SIZE=5>Render View
-                        Server </FONT></FONT>
-                        </P>
-                        <P ALIGN=CENTER STYLE="margin-bottom: 0in"><IMG SRC="Book_html_4fb223ff.jpg" NAME="146" WIDTH=622 HEIGHT=547 BORDER=0></P>
-                      <P ALIGN=CENTER STYLE="margin-bottom: 0in"><FONT FACE="DejaVu Serif, serif"><FONT FACE="DejaVu Serif, serif"><B>Figure
-                        17.8. Server Preferences</B></FONT></FONT></P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>These settings
-                        control how and where rendering happens when you are connected to
-                        a remote server. </FONT></FONT>
-                        </P>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>Remote
-                        Rendering Parameters</B></FONT> are controls that generally affect
-                        the break-up of rendering work between the remote server and the
-                        local client machine.</FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Remote
-                                Render Theshold</B></FONT> : Geometry that is smaller than the
-                                set value will be delivered to the client for local rendering.
-                                Data that is larger than the set value will be rendered remotely
-                                and pixels will be sent instead.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Client
-                                Outline Threshold</B></FONT> : While the camera is being
-                                manipulated and the geometry is being rendered locally, or in
-                                tiled display mode when it is being rendered both locally and
-                                remotely, data that is larger than this threshold will be
-                                rendered as a bounding box to maintain interactivity</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Suppress
-                                Ordered Compositing</B></FONT> : This setting turns of the
-                                relatively slow transfer of data that must happen in parallel in
-                                order to render translucent geometry (as in volume rendering for
-                                instance) correctly.</FONT></FONT></P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>Client/Server
-                        Parameters</B></FONT> section has controls that affect how pixels
-                        are transferred between the render server and the client while the
-                        data is being rendered remotely and images rather than geometry
-                        are being delivered to the client. The <FONT FACE="DejaVu Serif, serif"><B>Apply
-                        presets for ...</B></FONT> menu allows you to choose from a set of
-                        default settings which are generally well suited to particular
-                        network connection bandwidths.</FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Interactive
-                                Subsample Rate</B></FONT> : This setting controls how coarsely
-                                the image is down sampled to maintain interactivity while the
-                                camera is being manipulated.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Image
-                                Compression</B></FONT> : Enables compression of images during
-                                interaction. You can choose from either of the two image
-                                compression algorithms:</FONT></FONT></P>
-                        </UL>
-                        <UL>
-                                <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                        </UL>
-                        <UL>
-                                <OL>
-                                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Squirt</B></FONT>
-                                        : Chooses IceT's native squirt image compression algorithm. The
-                                        slider to the right controls the colorspace fidelity of the
-                                        compression and conversely the interactive responsiveness.</FONT></FONT></P>
-                                </OL>
-                        </UL>
-                        <UL>
-                                <P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                                <LI><P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                        </UL>
-                        <UL>
-                                <OL>
-                                        <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Zlib</B></FONT>
-                                        : Chooses the ZLib library's compression algorithm instead. The
-                                        spin box to the right specifies a compression level (1 through
-                                        9). The slider controls the colorspace fidelity. The <FONT FACE="DejaVu Serif, serif"><B>Strip
-                                        Alpha</B></FONT> checkbox removes the Opacity channel (if any)
-                                        from the shipped images.</FONT></FONT></P>
-                                </OL>
-                        </UL>
-                        <UL>
-                                <P STYLE="margin-top: 0.05in; margin-bottom: 0.04in; page-break-inside: avoid; widows: 3">
-                                </P>
-                        </UL>
-                        <P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                        <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3>The <FONT FACE="DejaVu Serif, serif"><B>Tile
-                        Display Parameters</B></FONT> section contains controls that take
-                        effect when doing tiled display wall rendering.</FONT></FONT></P>
-                        <UL>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Still
-                                Subsample Rate</B></FONT> : This puts a screen space coarseness
-                                limit on the normally full resolution rendering that happens once
-                                you release the mouse after moving the camera. Image compositing
-                                time can prevent interactivity when working with large displays.
-                                This limit allows you to preview your results quickly and then
-                                choose to render truly full resolution results only once when you
-                                are satisfied with the preview.</FONT></FONT></P>
-                                <LI><P LANG="en-US" ALIGN=LEFT STYLE="margin-top: 0.04in; margin-bottom: 0.05in; page-break-inside: avoid; widows: 3">
-                                <FONT FACE="DejaVu Serif, serif"><FONT SIZE=3><FONT FACE="DejaVu Serif, serif"><B>Compositing
-                                Threshold</B></FONT> : This threshold allows you to get faster
-                                rendering times in the circumstance that you are visualizing
-                                relatively small datasets on large tiled displays. When the
-                                geometry size is below the threshold, the geometry is broadcast
-                                to all nodes in the render server. After this broadcast the
-                                relatively slow tiled image compositing algorithm is entirely
-                                omitted.</FONT></FONT></P>
-                        </UL>
-                </DIV>
-        </DIV>
-</DIV>
-</BODY>
-</HTML>
+                            <p>In addition to the command-line options previously listed, ParaView also recognizes the following environment variables. </p>
+                            <ul>
+                                <li>
+                                    <p> PV_DISABLE_COMPOSITE_INTERRUPTS If this variable is set to 1, it is not possible to interrupt the compositing of images in parallel rendering. Otherwise it is interruptible through mouse interaction. </p>
+                                </li>
+                                <li>
+                                    <p> PV_ICET_WINDOW_BORDERS Setting this variable to 1 when running ParaView in tiled display mode using IceT causes the render window for each tile to be the same size as the display area in ParaView’s main application window. (Normally each render window fills the whole screen when tiled display mode is used.) This feature is sometimes useful when debugging ParaView. </p>
+                                </li>
+                                <li>
+                                    <p> PV_PLUGIN_PATH  If you have shared libraries containing plugins you wish to load in ParaView at startup, set this environment variable to the path for these libraries. </p>
+                                </li>
+                                <li>
+                                    <p> PV_SOFTWARE_RENDERING This environment variable has the same effect as setting both the ‑‑use‑software‑rendering and --use-satellite-software environment variables. </p>
+                                </li>
+                                <li>
+                                    <p> VTK_CLIENT_SERVER_LOG If set to 1, a log file will be created for the ParaView client, server, and render server. The log files will contain any client-server streams sent to the corresponding client, server, or render server.</p>
+                                </li>
+                            </ul>
+                            <p/>
+                        </div>
+                    </div>
+                </div>
+                <div style="clear: both;"/>
+            </div>
+            <div id="page">
+                <div id="content">
+                    <div class="post">
+                        <h2 class="title">
+                            <a href="#">Application Settings </a>
+                        </h2>
+                        <div class="entry">
+                            <p>Application wide settings are saved in-between sessions so that every time you start ParaView on the same machine you get the same behaviors. The settings are stored in an XML file that resides at %APPDATA%\ParaView\ParaViewVERSION.ini on Windows and ~/.config/ParaView/ParaViewVERSION.ini on all other platforms. If you need to restore ParaView's default settings you can either move this file or run with the --disable-registry argument. </p>
+                            <p>These settings are managed via the settings dialog. On Macintosh, this is reached from the Preferences entry in the ParaView menu. On Unix, Linux, and Windows systems it is reached from the Settings entry on the Edit menu. These settings are program wide and are not to be confused with the View settings found under the Edit menu. Those settings are specific to each View window and are discussed in the  Displaying Data chapter. </p>
+                            <p>The following figures show the various pages within the settings dialog. Choose from among them by clicking on the page list toward the left. Click on the arrow to expose the three sub pages in the Render View settings category. Some plugins add their own pages to the dialog but we do not discuss them here and instead refer you to any documentation that comes along with the plugin. Do note though that most settings are documented within the application via tool tips. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929907941380096.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.1</strong> General Preferences</p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Default View</strong>: Choose the View window type that ParaView initially shows when it starts up and connects to any server.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>On File Open</strong>: Control the time step shown by default when ParaView opens a file with multiple time steps.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Rescale Data Range Mode</strong>: Controls how color lookup tables are adjusted when data ranges change</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Heart-Beat Interval</strong>: Sets the length of time between keep alive messages that the client sends to the remote server which prevents the TCP connection between the two machines from shutting down.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Auto Accept</strong>: Makes every change take effect immediately rather than requiring you to click the Apply button.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Auto Convert Properties</strong>: Tells ParaView to do some data conversions automatically so that more filters are immediately applicable to the data you have at hand.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Crash Recovery</strong>: Tells ParaView to save a record of each action you take so that you can easily recover your work if ParaView crashes mid-session.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Use Multi-Core</strong>: Tells ParaView to spawn an MPI parallel server on the same machine that is running the GUI, so to better take advantage of multi-core machines on processing bound problems.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Use Strict Load Balancing</strong>: Tells ParaView to not use its own extents translators.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Specular Highlighting with Scalar Coloring</strong>: Tells ParaView to enable specular highlighting even when coloring data by scalar values.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Disable Splash Screen</strong>: Tells ParaView to not show its splash screen when starting.</p>
+                                </li>
+                            </ul>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929907980019712.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.2</strong> Color Preferences</p>
+                            <p>When setting up visualizations, most datasets in the visualization are typically colored using scalar colors. However, there may be items in the setup that are simply colored using a  solid color including text and other annotations. Also by default ParaView uses a grey background, so the default colors chosen for objects tends to be setup so that it looks appropriate on the grey background. However, when saving a screenshot for printing, you may prefer to white background, for example. In that case, it can be tedious to go to every object and change its color to work with the new background color. </p>
+                            <p>To make it easier to change colors on the fly, ParaView defines color categories. Users can choose to assign a color category to any object when specifying a color using the category menu on most color-chooser buttons, as shown below. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929907991840768.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.3</strong> Color Category Menu on the Display Tab</p>
+                            <p>Following associations are setup by default: </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Foreground color</strong>: Outlines and wireframes.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Background color</strong>: Background color in render views.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Surface color</strong>: Solid color to surfaces.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Text color</strong>: Color to 2D text.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Selection color</strong>: Color used to show highlighted/selected elements in render view.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Edge color</strong>: Used for edges in Surface With Edges mode.</p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929908019658752.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.4</strong> Animation Preferences</p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong> Cache Geometry</strong>: When checked, this allows ParaView to save and later reuse, rather than regenerate, visible geometry during animation playback to speed-up replay.</p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Cache Limit</strong>: This is the maximum size of the animation playback geometry cache (on each node when in parallel).</p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929908039569408.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.5</strong> Chart Preferences</p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Hidden Series</strong>: Allows you to specify a set of regular expressions that are compared against array names so that various bookkeeping arrays are not drawn in 2D charts and thus distract from the meaningful ones.</p>
+                                </li>
+                            </ul>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929908057110528.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.6</strong> General Render View Preferences</p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Use Immediate Mode Rendering</strong>: Controls whether OpenGL display lists are used or not. This is generally only faster only when rendering relatively small amounts of geometry.</p>
+                                </li>
+                            </ul>
+                            <p>The LOD Parameters settings control if, when, and to what extent ParaView will down sample the data it draws while you move the mouse to maintain interactivity. The algorithm by which ParaView down samples the data is known as quadric clustering. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>LOD Threshold</strong>: Rendered data that is smaller than the specified size is not down sampled.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>LOD Resolution</strong>: When data is down sampled, this controls how coarsely.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Outline threshold</strong>: Data that is larger than this threshold is drawn only as a bounding box while you move the camera.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Lock Interactive Render</strong>: Controls how long ParaView waits after you have released the mouse and finished moving the camera before it returns to a full resolution render.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Allow Rendering Interrupts</strong>: Makes the drawing process interuptable so that you can move the camera immediately, without having to wait for a potentially slow full resolution render to complete.</p>
+                                </li>
+                            </ul>
+                            <p>The Depth Peeling settings control the algorithm that ParaView uses (given a sufficiently capable GPU) to draw translucent geometry correctly. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Enable Depth Peeling</strong>: Controls whether ParaView will try to use the (potentially slow) depth peeling algorithm.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Number of Peels</strong>: Controls the number of passes in the rendering algorithm. A higher number of peels produces quality images, but increases rendering time.</p>
+                                </li>
+                            </ul>
+                            <p>The Coincident Topology Resolution settings control the method that ParaView uses to draw co-planar polygons in a non conflicting way (to avoid z-tearing in graphics terminology). Changes to these parameters do not take effect until ParaView is restarted. </p>
+                            <p>The pull-down menu allows you to choose between various algorithms that deal with z-tearing. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Do Nothing</strong>: Does not attempt to resolve overlapping geometry</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Use Z-Buffer Shift</strong>: Adjusts OpenGL's Z direction scaling to draw one object slightly in front of the other. The Z Shift property controls the amount of offset.</p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Use Polygon Offset</strong>: Adjusts polygon locations (by calling glPolygonOffset()) for the same purpose. For an explanation of the Factor and Units parameters, see http://www.opengl.org/resources/faq/technical/polygonoffset.htm. The Offset Faces parameters control whether filled polygons are moved rather than the points and edges.</p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Use Offscreen Rendering for Screenshots</strong>: This checkbox is enabled only when offscreen rendering is available. It tells ParaView to generate images that are being captured as screenshots in offscreen contexts. On some platforms this is necessary to avoid accidentally capturing overlapping pixels (such as a mouse pointer) from the operating system.</p>
+                                </li>
+                            </ul>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929908104318976.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.7</strong> Camera Preferences</p>
+                            <p>These settings allow you to assign particular key/mouse press combinations to various camera moving controls. There are two sets of settings. Control for 3D Movements pertain to the 3D View. Control for 2D Movements pertain to the 2D View. </p>
+                            <p>In the 3D View controls you can assign the following motions to any combination of left, middle, or right mouse button press and no, shift, or control key press. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Pan</strong>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Roll</strong>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Rotate</strong>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Multi-Rotate</strong>
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <strong>Zoom</strong>
+                                    </p>
+                                </li>
+                            </ul>
+                            <p/>
+                            <p>Rotation is not possible in the 2D View, which lacks a down direction to move about. So in this area you can only choose from Pan and Zoom. </p>
+                            <p>Clicking Reset Defaults restores the button assignments to the factory settings. </p>
+                            <p align="center">
+                                <p>
+                                    <img src="13294929908132620288.png" align="center"/>
+                                </p>
+                                <strong>Figure 17.8</strong> Server Preferences</p>
+                            <p>These settings control how and where rendering happens when you are connected to a remote server.  </p>
+                            <p>The Remote Rendering Parameters are controls that generally affect the break-up of rendering work between the remote server and the local client machine. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Remote Render Theshold</strong>: Geometry that is smaller than the set value will be delivered to the client for local rendering. Data that is larger than the set value will be rendered remotely and pixels will be sent instead.</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Client Outline Threshold</strong>: While the camera is being manipulated and the geometry is being rendered locally, or in tiled display mode when it is being rendered both locally and remotely, data that is larger than this threshold will be rendered as a bounding box to maintain interactivity</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Suppress Ordered Compositing</strong>: This setting turns of the relatively slow transfer of data that must happen in parallel in order to render translucent geometry (as in volume rendering for instance) correctly.</p>
+                                </li>
+                            </ul>
+                            <p>The Client/Server Parameters section has controls that affect how pixels are transferred between the render server and the client while the data is being rendered remotely and images rather than geometry are being delivered to the client. The Apply presets for ... menu allows you to choose from a set of default settings which are generally well-suited to particular network connection bandwidths. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Interactive Subsample Rate</strong>: This setting controls how coarsely the image is down sampled to maintain interactivity while the camera is being manipulated.</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Image Compression</strong>: Enables compression of images during interaction. You can choose from either of the two image compression algorithms:</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Squirt</strong>: Chooses IceT's native squirt image compression algorithm. The slider to the right controls the colorspace fidelity of the compression and conversely the interactive responsiveness.</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Zlib</strong>: Chooses the ZLib library's compression algorithm instead. The spin box to the right specifies a compression level (1 through 9). The slider controls the colorspace fidelity. The Strip Alpha checkbox removes the Opacity channel (if any) from the shipped images.</p>
+                                </li>
+                            </ul>
+                            <p>The Tile Display Parameters section contains controls that take effect when doing tiled display wall rendering. </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Still Subsample Rate</strong>: This puts a screen space coarseness limit on the normally full-resolution rendering that happens once you release the mouse after moving the camera. Image compositing time can prevent interactivity when working with large displays. This limit allows you to preview your results quickly and then choose to render truly full-resolution results only once when you are satisfied with the preview.</p>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <strong>Compositing Threshold</strong>: This threshold allows you to get faster rendering times in the circumstance that you are visualizing relatively small datasets on large tiled displays. When the geometry size is below the threshold, the geometry is broadcast to all nodes in the render server. After this broadcast, the relatively slow tiled image compositing algorithm is entirely omitted.</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="about">
+                        <p>
+          This is an abridged version of the ParaView User's Manual. For a
+          regularly updated version of the manual, refer to the
+          <a href="http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents">
+          ParaView Wiki (Manual)</a>
+                        </p>
+                    </div>
+                </div>
+                <div style="clear: both;"/>
+            </div>
+        </div>
+        <div id="footer">
+            <p>Design by <a href="http://www.freecsstemplates.org/"> CSS Templates</a>.</p>
+        </div>
+    </body>
+</html>

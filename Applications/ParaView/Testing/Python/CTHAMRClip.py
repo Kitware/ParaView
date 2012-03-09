@@ -24,5 +24,5 @@ QtTesting.playCommand(object4, 'activate', '')
 object9 = 'pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/show3DWidget'
 QtTesting.playCommand(object9, 'set_boolean', 'false')
 # DO_IMAGE_COMPARE
-snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport'
+snapshotWidget = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTestingImage.compareImage(snapshotWidget, 'CTHAMRClip.png', 300, 300)

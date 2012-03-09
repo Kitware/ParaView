@@ -14,9 +14,9 @@ Copyright 2008 SciberQuest Inc.
 #include "ui_pqSQProcessMonitorForm.h"
 using Ui::pqSQProcessMonitorForm;
 
-#include <vtkstd/map>
+#include <map>
 using std::map;
-#include <vtkstd/string>
+#include <string>
 using std::string;
 #include  <vtkstd/vector>
 using std::vector;

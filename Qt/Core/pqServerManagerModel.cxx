@@ -435,6 +435,7 @@ void pqServerManagerModel::onProxyUnRegistered(const QString& group,
 
   if (view)
     {
+    view->cancelPendingRenders();
     emit this->viewRemoved(view);
     }
   else if (source)

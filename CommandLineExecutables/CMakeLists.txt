@@ -44,6 +44,9 @@ FOREACH(pvexe ${PV_EXE_LIST})
 
 ENDFOREACH(pvexe)
 
+SET(PV_TEST_USE_RANDOM_PORTS ON CACHE BOOL
+  "Use random port numbers when testing client-server configurations.")
+
 SET(PV_TEST_INIT_COMMAND "" CACHE STRING
   "Command to run before a test begins. Multiple commands are separated by ';'.")
 MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)

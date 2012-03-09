@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
@@ -170,7 +171,8 @@ void pqAnimationScene::setupTimeTrack()
 void pqAnimationScene::updateTimeSteps()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
-  if (pqApplicationCore::instance()->isLoadingState())
+  if (pqApplicationCore::instance()->isLoadingState() ||
+    this->getServer()->session()->IsProcessingRemoteNotification())
     {
     // If we are currently loading state then we don't want to change
     // the currently set start/end times.

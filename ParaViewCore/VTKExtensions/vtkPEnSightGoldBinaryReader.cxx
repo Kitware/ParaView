@@ -16,7 +16,7 @@
 
 #include <sys/stat.h>
 #include <ctype.h>
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(vtkPEnSightGoldBinaryReader);
 
@@ -180,7 +180,7 @@ int vtkPEnSightGoldBinaryReader::InitializeFile(const char* fileName)
     vtkErrorMacro("A GeometryFileName must be specified in the case file.");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -278,7 +278,7 @@ int vtkPEnSightGoldBinaryReader::ReadGeometryFile(const char* fileName, int time
         {
         if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
           {
-          vtkstd::map<int, long> tsMap;
+          std::map<int, long> tsMap;
           this->FileOffsets[fileName] = tsMap;
           }
         this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -1145,7 +1145,7 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(const char* fileName,
     vtkErrorMacro("A MeasuredFileName must be specified in the case file.");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -1222,7 +1222,7 @@ int vtkPEnSightGoldBinaryReader::ReadMeasuredGeometryFile(const char* fileName,
       this->ReadLine(line); // END TIME STEP
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -1347,7 +1347,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(
     vtkErrorMacro("NULL ScalarPerNode variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -1428,7 +1428,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerNode(
         }
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -1573,7 +1573,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(
     vtkErrorMacro("NULL VectorPerNode variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -1654,7 +1654,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerNode(
         }
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -1789,7 +1789,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerNode(
     vtkErrorMacro("NULL TensorPerNode variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -1855,7 +1855,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerNode(
         }
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -1955,7 +1955,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(
     vtkErrorMacro("NULL ScalarPerElement variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -2057,7 +2057,7 @@ int vtkPEnSightGoldBinaryReader::ReadScalarsPerElement(
         } // end while
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -2212,7 +2212,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(
     vtkErrorMacro("NULL VectorPerElement variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -2311,7 +2311,7 @@ int vtkPEnSightGoldBinaryReader::ReadVectorsPerElement(
         }
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();
@@ -2464,7 +2464,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(
     vtkErrorMacro("NULL TensorPerElement variable file name");
     return 0;
     }
-  vtkstd::string sfilename;
+  std::string sfilename;
   if (this->FilePath)
     {
     sfilename = this->FilePath;
@@ -2564,7 +2564,7 @@ int vtkPEnSightGoldBinaryReader::ReadTensorsPerElement(
         }
       if (this->FileOffsets.find(fileName) == this->FileOffsets.end())
         {
-        vtkstd::map<int, long> tsMap;
+        std::map<int, long> tsMap;
         this->FileOffsets[fileName] = tsMap;
         }
       this->FileOffsets[fileName][j] = this->IFile->tellg();

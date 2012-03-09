@@ -26,7 +26,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include "vtkSMPropertyInternals.h"
@@ -388,15 +388,15 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       this->SetHints(domainEl);
       continue;
       }
-    else if ( vtkstd::string(domainEl->GetName()).find("InformationHelper") !=
-              vtkstd::string::npos)
+    else if ( std::string(domainEl->GetName()).find("InformationHelper") !=
+              std::string::npos)
       {
       // InformationHelper are used to extract information from VTK object
       // therefore they are not used on the proxy side (SM).
       continue;
       }
-    else if ( vtkstd::string(domainEl->GetName()).find("StringArrayHelper") !=
-              vtkstd::string::npos)
+    else if ( std::string(domainEl->GetName()).find("StringArrayHelper") !=
+              std::string::npos)
       {
       // InformationHelper are used to extract information from VTK object
       // therefore they are not used on the proxy side (SM).

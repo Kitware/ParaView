@@ -28,15 +28,15 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/algorithm>
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <algorithm>
+#include <map>
+#include <string>
 
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
 
-typedef vtkstd::map<vtkstd::string, vtkstd::string> ParametersT;
+typedef std::map<std::string, std::string> ParametersT;
 
 class vtkPythonProgrammableFilterImplementation
 {
@@ -215,8 +215,8 @@ int vtkPythonProgrammableFilter::RequestUpdateExtent(
 void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
                                                const char *raw_value)
 {
-  const vtkstd::string name = raw_name ? raw_name : "";
-  const vtkstd::string value = raw_value ? raw_value : "";
+  const std::string name = raw_name ? raw_name : "";
+  const std::string value = raw_value ? raw_value : "";
 
   if(name.empty())
     {
@@ -259,9 +259,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   // Prepend the paths defined in PythonPath to sys.path
   if (this->PythonPath)
     {
-    vtkstd::string pathscript;
+    std::string pathscript;
     pathscript += "import sys\n";
-    vtkstd::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(
+    std::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(
       this->PythonPath, ';');
     for (unsigned int cc=0; cc < static_cast<unsigned int>(paths.size()); cc++)
       {
@@ -279,7 +279,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
     }
 
   // Construct a script that defines a function
-  vtkstd::string fscript;
+  std::string fscript;
   fscript  = "def ";
   fscript += funcname;
 
@@ -297,7 +297,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   fscript += "  ";
 
   // Replace tabs with two spaces
-  vtkstd::string orgscript;
+  std::string orgscript;
   size_t len = strlen(script);
   for(size_t i=0; i< len; i++)
     {
@@ -312,9 +312,9 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
     }
   // Remove DOS line endings. They confuse the indentation code below.
   orgscript.erase(
-    vtkstd::remove(orgscript.begin(), orgscript.end(), '\r'), orgscript.end());
+    std::remove(orgscript.begin(), orgscript.end(), '\r'), orgscript.end());
 
-  vtkstd::string::iterator it = orgscript.begin();
+  std::string::iterator it = orgscript.begin();
   for(; it != orgscript.end(); it++)
     {
     fscript += *it;
@@ -327,7 +327,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   fscript += "\n";
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
 
-  vtkstd::string runscript;
+  std::string runscript;
 
   runscript += "import paraview\n";
   runscript += "paraview.fromFilter = True\n";

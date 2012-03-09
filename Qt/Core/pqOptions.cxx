@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptions.h"
 
 #include <vtkObjectFactory.h>
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(pqOptions);
 
@@ -76,6 +76,7 @@ pqOptions::pqOptions()
   this->ExitAppWhenTestsDone = 0;
   this->DisableRegistry = 0;
   this->ServerResourceName = 0;
+  this->ServerURL = 0;
   this->DisableLightKit = 0;
   this->CurrentImageThreshold = 12;
   this->PythonScript = 0;
@@ -89,6 +90,7 @@ pqOptions::~pqOptions()
   this->SetTestDirectory(0);
   this->SetDataDirectory(0);
   this->SetServerResourceName(0);
+  this->SetServerURL(0);
   this->SetPythonScript(0);
 }
 
@@ -114,6 +116,12 @@ void pqOptions::Initialize()
   this->AddArgument("--server", "-s",
     &this->ServerResourceName,
     "Set the name of the server resource to connect with when the client starts.");
+
+  this->AddArgument("--server-url", "-url",
+    &this->ServerURL,
+    "Set the server-url to connect with when the client starts. "
+    "--server (-s) option supersedes this option, hence one should only use "
+    "one of the two options.");
 
   this->AddBooleanArgument("--disable-light-kit", 0,
     &this->DisableLightKit,
@@ -210,7 +218,8 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ServerResourceName: " 
     << (this->ServerResourceName? this->ServerResourceName : "(none)") << endl;
-
+  os << indent << "ServerURL: "
+    << (this->ServerURL? this->ServerURL : "(none)") << endl;
   os << indent << "PythonScript: " << 
     (this->PythonScript? this->PythonScript : "(none)") << endl;
 }

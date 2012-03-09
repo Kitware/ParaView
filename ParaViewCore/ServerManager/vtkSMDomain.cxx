@@ -21,7 +21,7 @@
 #include "vtkWeakPointer.h"
 #include "vtkSMSession.h"
 
-#include <vtkstd/map>
+#include <map>
 #include "vtkStdString.h"
 #include <assert.h>
 
@@ -32,7 +32,7 @@ struct vtkSMDomainInternals
   // property since both the domain and the required property belong to the same
   // proxy, so they will be deleted only when the proxy disappears.
   typedef 
-  vtkstd::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
+  std::map<vtkStdString, vtkWeakPointer<vtkSMProperty> > PropertyMap;
   PropertyMap RequiredProperties;
 };
 

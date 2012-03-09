@@ -30,7 +30,7 @@
 #include "vtkTestingOptions.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+#include <string>
 
 
 //----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ int vtkTestingProcessModuleGUIHelper::Run(vtkSMSession* session)
   ifp.close();
 
   // Replace ${DataDir} with the actual data dir path.
-  vtkstd::string str_buffer (buffer);
+  std::string str_buffer (buffer);
   delete []buffer;
   buffer = 0;
   if (options->GetDataDir())

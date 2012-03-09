@@ -47,8 +47,8 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
   int caveBounds = 0;
   for (int i = 0; atts[i] && atts[i + 1]; i += 2)
     {
-    vtkstd::string key = atts[i];
-    vtkstd::string value = atts[i + 1];
+    std::string key = atts[i];
+    std::string value = atts[i + 1];
     if(key == "Name")
       {
       info.Name = value;
@@ -100,6 +100,24 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
   return 1;
 }
 
+// ----------------------------------------------------------------------------
+int vtkPVServerOptions::AddEyeSeparationInformation(const char** atts)
+{
+  std::string key = atts[0];
+    std::string value = atts[1];
+    if(key == "Value")
+      {
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      str >> this->Internals->EyeSeparation;
+      }
+    else
+      {
+        vtkErrorMacro("<EyeSeparation Value=\"...\"/> needs to be specified");
+        return 0;
+      }
+  return 1;
+}
+
 //----------------------------------------------------------------------------
 int vtkPVServerOptions::ParseExtraXMLTag(const char* name, const char** atts)
 {
@@ -108,7 +126,18 @@ int vtkPVServerOptions::ParseExtraXMLTag(const char* name, const char** atts)
     {
     return this->AddMachineInformation(atts);
     }
+  // Hande the EyeSeparation tag
+  if(strcmp(name, "EyeSeparation") == 0)
+    {
+    return this->AddEyeSeparationInformation(atts);
+    }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+double vtkPVServerOptions::GetEyeSeparation()
+{
+  return static_cast<double> ( this->Internals->EyeSeparation );
 }
 
 //----------------------------------------------------------------------------

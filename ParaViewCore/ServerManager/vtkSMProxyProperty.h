@@ -15,30 +15,35 @@
 // .NAME vtkSMProxyProperty - property representing pointer(s) to vtkObject(s)
 // .SECTION Description
 // vtkSMProxyProperty is a concrete sub-class of vtkSMProperty representing
-// pointer(s) to vtkObject(s) (through vtkSMProxy). If 
-// UpdateSelf is true, the proxy ids (as opposed to the server object ids)
-// are passed to the stream. 
-// Note: This property connects two proxies: proxy A (to which this property
-// belongs) and proxy B (or more) (which is to be proxy A by using this 
-// property).
-// The way this is set depends on the number of IDs of the two proxies.
-// If A and B have same number of IDs, the vtkObject represented by i'th ID on
-// B is set on the server object represented by i'th ID on A. If A has 1 ID and
-// B has more than one, than all IDs in B are set on A one after the other. 
-// If B has 1 ID and A has more than one, than vtkObject represented by B is 
-// set on all the server objects of A.
-// 
-// ProxyProperty supports attribute "remove_command". Note that if RemoveCommand 
-// is set,  the clean_command is ignored. When RemoveCommand is set, only the 
-// changes in the proxies (by AddProxy/RemoveProxy) are progaated to servers 
-// .ie. those proxies not 
-// present in the previous call to AppendCommandToStream are set on the 
-// servers using this->Command
-// and those missing during current call are removed from the servers using 
-// this->RemoveCommand. Note that a property with "RemoveCommand" set should 
-// not be shared among more than 1 proxies.
-// 
-//TODO: Update comment
+// pointer(s) to vtkObject(s) (through vtkSMProxy).
+//
+// Besides the standard set of attributes, the following XML attributes are
+// supported:
+// \li command : identifies the method to call on the VTK object e.g.
+// AddRepresentation.
+// \li clean_command : if present, called once before invoking the method
+// specified by \c command every time the property value is pushed e.g.
+// RemoveAllRepresentations. If property
+// can take multiple values then the \c command is called for for each of the
+// values after the clean command for every push.
+// \li remove_command : an alternative to clean_command where instead of
+// resetting and adding all the values for every push, this simply calls the
+// specified method to remove the vtk-objects no longer referred to e.g.
+// RemoveRepresentation.
+// \li argument_type : identifies the type for value passed to the method on the
+// VTK object. Accepted values are "VTK", "SMProxy" or "SIProxy". Default is
+// VTK.
+// \li null_on_empty : if set to 1, whenever the property's value changes to
+// empty i.e. it contains no proxies, the command is called on the VTK object
+// with NULL argument useful when there's no clean_command that can be called on
+// the VTK object to unset the property e.g. SetLookupTable(NULL).
+// li skip_dependency : if set to 1, this property does not result in adding a
+// dependency between the proxies set as values of this property and the proxy
+// to which the property belongs (which is the default behaviour). Use this with
+// care as it would mean that ParaView would no realize any updates are needed
+// to the pipeline if any proxy set on the property changes. This is necessary
+// in some cases, e.g. if LUT proxy on a representation changes, we don't want
+// to representation to treat it same as if the input pipeline changed!
 // .SECTION See Also
 // vtkSMProperty
 
@@ -68,7 +73,7 @@ public:
   static vtkSMProxyProperty* New();
   vtkTypeMacro(vtkSMProxyProperty, vtkSMProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Add a proxy to the list of proxies.
   virtual int AddProxy(vtkSMProxy* proxy);
@@ -103,7 +108,7 @@ public:
   // Returns the index of proxy removed. If the proxy was not found,
   // returns NumberOfProxies.
   virtual unsigned int RemoveProxy(vtkSMProxy* proxy, int modify);
-  
+
   // Description:
   // Add an unchecked proxy. Does not modify the property.
   // Unchecked proxies are used by domains when verifying whether
@@ -141,6 +146,11 @@ public:
   unsigned int GetNumberOfProxies();
 
   // Description:
+  // Sets the number of unchecked proxies. If the new number is greater than the current
+  // number of proxies, then NULL will be inserted.
+  virtual void SetNumberOfUncheckedProxies(unsigned int num);
+
+  // Description:
   // Returns the number of unchecked proxies.
   unsigned int GetNumberOfUncheckedProxies();
 
@@ -163,6 +173,10 @@ public:
   // used while copying over the values from the two proxy properties.
   virtual void DeepCopy(vtkSMProperty* src, const char* exceptionClass, 
     int proxyPropertyCopyFlag);
+
+  // Description:
+  // Returns whether the "skip_dependency" attribute is set.
+  vtkGetMacro(SkipDependency, bool);
 
 //BTX
 protected:
@@ -209,6 +223,8 @@ protected:
   // Static flag used to know if the locator should be used to create proxy
   // or if the session should be used to find only the existing ones
   static bool CreateProxyAllowed;
+
+  bool SkipDependency;
 
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented

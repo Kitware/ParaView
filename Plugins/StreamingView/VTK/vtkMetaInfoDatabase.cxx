@@ -16,9 +16,9 @@
 
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 
 #define DEBUGPRINT_METAINFORMATION(arg) ;
 
@@ -37,11 +37,11 @@ struct RangeRecord2
 class ArrayRecord {
 public:
   //all of the min and max values ever found for one array
-  vtkstd::vector<RangeRecord2 *> ranges;
+  std::vector<RangeRecord2 *> ranges;
 
   ~ArrayRecord()
   {
-    vtkstd::vector<RangeRecord2 *>::iterator rit;
+    std::vector<RangeRecord2 *>::iterator rit;
     for (rit = ranges.begin(); rit < ranges.end(); rit++)
       {
       delete *rit;
@@ -69,7 +69,7 @@ public:
     //go through the list and find pieces that entirely contain this piece
     //for all of those, update their information if necessary with the new
     //information from this new piece
-    vtkstd::vector<RangeRecord2 *>::iterator rit;
+    std::vector<RangeRecord2 *>::iterator rit;
     for (rit = this->ranges.begin();
          rit < this->ranges.end();
          rit++)
@@ -132,7 +132,7 @@ public:
     //go through list and use the ranges of all my ancestors
     //use the most refined of them as an estimate for my range
     RangeRecord2 *best = NULL;
-    vtkstd::vector<RangeRecord2 *>::iterator rit;
+    std::vector<RangeRecord2 *>::iterator rit;
     for (rit = this->ranges.begin();
          rit < this->ranges.end();
          rit++)
@@ -195,7 +195,7 @@ public:
 class vtkMetaInfoDatabase::ArrayRecords {
 public:
   //ranges known known for all arrays
-  vtkstd::map<vtkstd::string, ArrayRecord* > records;
+  std::map<std::string, ArrayRecord* > records;
 
   ArrayRecord *GetRecord(int field, const char *ArrayName, int component)
   {
@@ -216,7 +216,7 @@ public:
 
   ~ArrayRecords()
   {
-    vtkstd::map<vtkstd::string, ArrayRecord *>::iterator rit;
+    std::map<std::string, ArrayRecord *>::iterator rit;
     for (rit = records.begin(); rit != records.end(); ++rit)
       {
       delete rit->second;

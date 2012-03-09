@@ -121,7 +121,6 @@ SET (Kit_SRCS
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExponentialKeyFrame.cxx
   vtkPVExtentTranslator.cxx
-  vtkPVExtractSelection.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
   vtkPVGenericRenderWindowInteractor.cxx
@@ -203,6 +202,7 @@ SET (Kit_SRCS
   vtkUndoSet.cxx
   vtkUndoStack.cxx
   vtkUpdateSuppressorPipeline.cxx
+  vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx

@@ -109,6 +109,12 @@ signals:
   void representationChanged(pqDataRepresentation*);
   void representationChanged(pqRepresentation*);
   void selectionChanged(const pqProxySelection&);
+  /// These signals are fired when a UserEvent is invoked from one of the active
+  /// objects. The introduction of those signal was to allow Python trace to
+  /// Show/Hide widget for a given active source.
+  void sourceNotification(pqPipelineSource*,char*);
+  void viewNotification(pqView*,char*);
+  void serverNotification(pqServer*,char*);
 
 private slots:
   /// if a new server connection was established, and no active server is set,
@@ -128,6 +134,9 @@ private slots:
 
   void sourceSelectionChanged();
   void viewSelectionChanged();
+
+  /// VTK observer used to handle notification on active objects
+  void onNotification(vtkObject* src, unsigned long event, void* method, void* data);
  
 protected:
   pqActiveObjects();

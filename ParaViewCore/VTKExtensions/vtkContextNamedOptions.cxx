@@ -27,7 +27,7 @@
 #include "vtkWeakPointer.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkstd/map"
+#include "map"
 #include "vtksys/ios/sstream"
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ public:
 
 };
 
-typedef vtkstd::map<vtkstd::string, vtkContextNamedOptions::PlotInfo > PlotMapType;
+typedef std::map<std::string, vtkContextNamedOptions::PlotInfo > PlotMapType;
 typedef PlotMapType::iterator PlotMapIterator;
 
 //----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ public:
   }
 
   PlotMapType PlotMap;
-  vtkstd::string XSeriesName;
+  std::string XSeriesName;
   bool UseIndexForXAxis;
   int ChartType;
   bool TableVisibility;
@@ -192,7 +192,7 @@ void vtkContextNamedOptions::SetXSeriesName(const char* name)
     }
 
   // Now update any existing plots to use the X series specified
-  vtkstd::map<vtkstd::string, PlotInfo>::iterator it;
+  std::map<std::string, PlotInfo>::iterator it;
   for (it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {
@@ -215,7 +215,7 @@ void vtkContextNamedOptions::SetUseIndexForXAxis(bool useIndex)
 {
   this->Internals->UseIndexForXAxis = useIndex;
   // Now update the plots to use the X series specified
-  vtkstd::map<vtkstd::string, PlotInfo>::iterator it;
+  std::map<std::string, PlotInfo>::iterator it;
   for (it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {

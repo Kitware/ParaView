@@ -41,7 +41,7 @@
 
 #include <ImproperUseException.h>
 
-using vtkstd::string;
+using std::string;
 
 
 // ****************************************************************************
@@ -52,7 +52,7 @@ using vtkstd::string;
 //
 // ****************************************************************************
 
-ImproperUseException::ImproperUseException(vtkstd::string reason)
+ImproperUseException::ImproperUseException(std::string reason)
 {
     if (reason == "")
         msg = "The pipeline object is being used improperly.";

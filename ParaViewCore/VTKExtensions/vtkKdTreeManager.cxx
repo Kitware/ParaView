@@ -32,11 +32,11 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include <vtkstd/set>
-#include <vtkstd/vector>
+#include <set>
+#include <vector>
 
 class vtkKdTreeManager::vtkAlgorithmSet : 
-  public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
+  public std::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
@@ -124,8 +124,8 @@ void vtkKdTreeManager::SetKdTree(vtkPKdTree* tree)
 void vtkKdTreeManager::Update()
 {
   vtkAlgorithmSet::iterator iter;
-  vtkstd::vector<vtkDataObject*> outputs;
-  vtkstd::vector<vtkDataObject*>::iterator dsIter;
+  std::vector<vtkDataObject*> outputs;
+  std::vector<vtkDataObject*>::iterator dsIter;
   
   bool update_required =  (this->GetMTime() > this->UpdateTime);
 

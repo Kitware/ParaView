@@ -107,6 +107,14 @@ bool pqServerConnectReaction::connectToServerUsingConfigurationName(
 }
 
 //-----------------------------------------------------------------------------
+bool pqServerConnectReaction::connectToServer(const pqServerResource& resource)
+{
+  pqServerConfiguration config;
+  config.setResource(resource);
+  return pqServerConnectReaction::connectToServerUsingConfiguration(config);
+}
+
+//-----------------------------------------------------------------------------
 bool pqServerConnectReaction::connectToServerUsingConfiguration(
   const pqServerConfiguration& config)
 {

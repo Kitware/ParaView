@@ -55,6 +55,11 @@ protected:
   // These are to initialize the displays. (This is directly copied from
   // vtkCaveRenderManager).
   void SetNumberOfDisplays(int numberOfDisplays);
+
+  // Description:
+  // Set the eye separation for all the displays.
+  void SetEyeSeparation(double eyeSeparation);
+
   void DefineDisplay(int idx, double origin[3], double x[3], double y[3]);
 
 
@@ -62,7 +67,7 @@ protected:
   // Method to update the camera.
   void ComputeCamera(vtkCamera* cam);
 
-
+  double EyeSeparation;
   int    NumberOfDisplays;
   double **Displays;
   double DisplayOrigin[3];

@@ -113,11 +113,11 @@ int vtkSMProxyConfigurationWriter::WriteConfiguration(const char *cFilename)
   // present. To save with out th eextension, set it NULL.
   const char *cExt=this->GetFileExtension();
   cExt=(cExt==NULL?"":cExt);
-  vtkstd::string filename(cFilename);
-  vtkstd::string ext(cExt);
+  std::string filename(cFilename);
+  std::string ext(cExt);
   if (!ext.empty()
     && (filename.size()<=ext.size()
-    || filename.find(ext,filename.size()-ext.size())==vtkstd::string::npos))
+    || filename.find(ext,filename.size()-ext.size())==std::string::npos))
     {
     filename+=ext;
     }

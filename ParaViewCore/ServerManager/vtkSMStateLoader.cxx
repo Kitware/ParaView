@@ -30,9 +30,9 @@
 #include "vtkSMStateVersionController.h"
 #include "vtkSMSession.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <map>
+#include <string>
+#include <vector>
 #include <assert.h>
 
 vtkStandardNewMacro(vtkSMStateLoader);
@@ -40,14 +40,15 @@ vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
 {
-  vtkstd::string GroupName;
-  vtkstd::string ProxyName;
+  std::string GroupName;
+  std::string ProxyName;
 };
 
 struct vtkSMStateLoaderInternals
 {
-  typedef vtkstd::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
-  typedef vtkstd::map<int, VectorOfRegInfo> RegInfoMapType;
+  bool KeepOriginalId;
+  typedef std::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
+  typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
 };
 
@@ -133,6 +134,12 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
   // Ensure that the proxy is created before it is registered, unless we are
   // reviving the server-side server manager, which needs special handling.
+  if(this->Internal->KeepOriginalId)
+    {
+    proxy->SetGlobalID(id);
+    }
+
+
   proxy->UpdateVTKObjects();
   if (proxy->IsA("vtkSMSourceProxy"))
     {
@@ -144,7 +151,6 @@ void vtkSMStateLoader::CreatedNewProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::RegisterProxy(vtkTypeUInt32 id, vtkSMProxy* proxy)
 {
-
   vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
     = this->Internal->RegistrationInformation.find(id);
   if (iter == this->Internal->RegistrationInformation.end())
@@ -335,8 +341,8 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
       {
       continue;
       }
-    vtkstd::string group = currentElement->GetAttribute("group");
-    vtkstd::string type = currentElement->GetAttribute("type");
+    std::string group = currentElement->GetAttribute("group");
+    std::string type = currentElement->GetAttribute("type");
     vtkSMGlobalPropertiesManager* mgr =
       pxm->GetGlobalPropertiesManager(mgrname);
     if (mgr && (group != mgr->GetXMLGroup() || type != mgr->GetXMLName()))
@@ -433,8 +439,9 @@ bool vtkSMStateLoader::VerifyXMLVersion(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
+int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem, bool keepOriginalId)
 {
+  this->Internal->KeepOriginalId = keepOriginalId;
   if (!elem)
     {
     vtkErrorMacro("Cannot load state from (null) root element.");
@@ -473,8 +480,9 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
+int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
 {
+  vtkPVXMLElement* rootElement = parent;
   if (rootElement->GetName() && 
     strcmp(rootElement->GetName(),"ServerManagerState") != 0)
     {
@@ -488,7 +496,7 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
     }
   
   vtkSMStateVersionController* convertor = vtkSMStateVersionController::New();
-  if (!convertor->Process(rootElement))
+  if (!convertor->Process(parent))
     {
     vtkWarningMacro("State convertor was not able to convert the state to current "
       "version successfully");

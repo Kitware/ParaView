@@ -23,8 +23,8 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/set>
+#include <vector>
+#include <set>
 
 class vtkPVSelectionSource::vtkInternal
 {
@@ -137,13 +137,13 @@ public:
       }
     };
 
-  typedef vtkstd::set<vtkIdType> SetOfIDs;
-  typedef vtkstd::set<IDType> SetOfIDType;
-  typedef vtkstd::set<CompositeIDType> SetOfCompositeIDType;
-  typedef vtkstd::set<HierarchicalIDType> SetOfHierarchicalIDType;
-  typedef vtkstd::set<PedigreeIDType> SetOfPedigreeIDType;
-  typedef vtkstd::set<PedigreeStringIDType> SetOfPedigreeStringIDType;
-  typedef vtkstd::vector<double> VectorOfDoubles;
+  typedef std::set<vtkIdType> SetOfIDs;
+  typedef std::set<IDType> SetOfIDType;
+  typedef std::set<CompositeIDType> SetOfCompositeIDType;
+  typedef std::set<HierarchicalIDType> SetOfHierarchicalIDType;
+  typedef std::set<PedigreeIDType> SetOfPedigreeIDType;
+  typedef std::set<PedigreeStringIDType> SetOfPedigreeStringIDType;
+  typedef std::vector<double> VectorOfDoubles;
 
 
   SetOfIDs GlobalIDs;
@@ -645,6 +645,14 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       output->ShallowCopy(source->GetOutput());
       }
     break;
+
+  case QUERY:
+      {
+      source->SetContentType(vtkSelectionNode::QUERY);
+      source->SetQueryString(this->QueryString);
+      source->Update();
+      output->ShallowCopy(source->GetOutput());
+      }
 
   case ID:
   default:

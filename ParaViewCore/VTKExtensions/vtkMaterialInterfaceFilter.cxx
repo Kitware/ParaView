@@ -74,11 +74,11 @@
 using vtksys_ios::ofstream;
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
-#include "vtkstd/vector"
-using vtkstd::vector;
-#include "vtkstd/string"
-using vtkstd::string;
-#include "vtkstd/algorithm"
+#include "vector"
+using std::vector;
+#include "string"
+using std::string;
+#include "algorithm"
 // ansi c
 #include <math.h>
 #include <ctime>
@@ -625,7 +625,7 @@ private:
   int Level;
   // Store index to neiboring blocks.
   // There may be more than one neighbor because higher levels.
-  vtkstd::vector<vtkMaterialInterfaceFilterBlock*> Neighbors[6];
+  std::vector<vtkMaterialInterfaceFilterBlock*> Neighbors[6];
 };
 
 //----------------------------------------------------------------------------
@@ -2083,7 +2083,7 @@ void vtkMaterialInterfaceFilter::CheckLevelsForNeighbors(
 //     {
 //     cout << "Stop here" << endl;
 //     }
-  vtkstd::vector<vtkMaterialInterfaceFilterBlock*> neighbors;
+  std::vector<vtkMaterialInterfaceFilterBlock*> neighbors;
   vtkMaterialInterfaceFilterBlock* neighbor;
   int blockIndex[3];
 
@@ -2142,7 +2142,7 @@ int vtkMaterialInterfaceFilter::FindFaceNeighbors(
   int blockIndex[3],
   int faceAxis,
   int faceMaxFlag,
-  vtkstd::vector<vtkMaterialInterfaceFilterBlock*> *result)
+  std::vector<vtkMaterialInterfaceFilterBlock*> *result)
 {
   int retVal = 0;
   vtkMaterialInterfaceFilterBlock* neighbor;
@@ -2983,7 +2983,7 @@ int vtkMaterialInterfaceFilter::ComputeRequiredGhostExtent(
   int remoteBaseCellExt[6],
   int neededExt[6])
 {
-  vtkstd::vector<vtkMaterialInterfaceFilterBlock*> neighbors;
+  std::vector<vtkMaterialInterfaceFilterBlock*> neighbors;
   int remoteBlockIndex[3];
   int remoteLayerExt[6];
 
@@ -3344,7 +3344,7 @@ int vtkMaterialInterfaceFilter::RequestData(
        << " MTime: "
        << this->GetMTime()
        << endl;
-  vtkstd::clock_t startTime=vtkstd::clock();
+  std::clock_t startTime=std::clock();
   #ifdef USE_VOXEL_VOLUME
   cerr << "USE_VOXEL_VOLUME\n";
   #endif
@@ -3579,7 +3579,7 @@ int vtkMaterialInterfaceFilter::RequestData(
   this->ResolvedFragmentIds.clear();
   this->FragmentSplitMarker.clear();
   #ifdef vtkMaterialInterfaceFilterDEBUG
-  vtkstd::clock_t endTime=vtkstd::clock();
+  std::clock_t endTime=std::clock();
   cerr << "[" << __LINE__ << "] "
        << this->Controller->GetLocalProcessId()
        << " clock time ellapsed during request data "

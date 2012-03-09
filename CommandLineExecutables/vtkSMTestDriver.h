@@ -21,8 +21,8 @@
 #ifndef __vtkSMTestDriver_h
 #define __vtkSMTestDriver_h
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 #include <vtksys/Process.h>
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
@@ -43,7 +43,7 @@ protected:
     RENDER_SERVER
     };
   void SeparateArguments(const char* str, 
-                         vtkstd::vector<vtkstd::string>& flags);
+                         std::vector<std::string>& flags);
   
   void ReportCommand(const char* const* command, const char* name);
   int ReportStatus(vtksysProcess* process, const char* name);
@@ -58,72 +58,85 @@ protected:
                          char* argv[]=0);
   
   int StartProcessAndWait(vtksysProcess* server, const char* name,
-                  vtkstd::vector<char>& out, vtkstd::vector<char>& err,
-                  const char* string_to_wait_for);
+                  std::vector<char>& out, std::vector<char>& err,
+                  const char* string_to_wait_for,
+                  std::string& matched_line);
   int StartProcess(vtksysProcess* client, const char* name);
   void Stop(vtksysProcess* p, const char* name);
-  int OutputStringHasError(const char* pname, vtkstd::string& output);
+  int OutputStringHasError(const char* pname, std::string& output);
 
-  int WaitForLine(vtksysProcess* process, vtkstd::string& line, double timeout,
-                  vtkstd::vector<char>& out, vtkstd::vector<char>& err);
+  int WaitForLine(vtksysProcess* process, std::string& line, double timeout,
+                  std::vector<char>& out, std::vector<char>& err);
   void PrintLine(const char* pname, const char* line);
   int WaitForAndPrintLine(const char* pname, vtksysProcess* process,
-                          vtkstd::string& line, double timeout,
-                          vtkstd::vector<char>& out, vtkstd::vector<char>& err,
+                          std::string& line, double timeout,
+                          std::vector<char>& out, std::vector<char>& err,
                           const char* string_to_wait_for=NULL,
-                          int* foundWaiting=NULL);
+                          int* foundWaiting=NULL,
+                          std::string* matched_line=NULL);
 
-  vtkstd::string GetDirectory(vtkstd::string location);
+  std::string GetDirectory(std::string location);
 
 private:
   struct ClientExecutableInfo
     {
-    vtkstd::string ClientExecutable; //< fullpath to paraview executable
+    std::string ClientExecutable; //< fullpath to paraview executable
     int ArgStart;
     int ArgEnd;
     };
 
-  vtkstd::vector<ClientExecutableInfo> ClientExecutables;
-  vtkstd::string ServerExecutable;  // fullpath to paraview server executable
-  vtkstd::string RenderServerExecutable;  // fullpath to paraview renderserver executable
-  vtkstd::string DataServerExecutable;  // fullpath to paraview dataserver executable
-  vtkstd::string MPIRun;  // fullpath to mpirun executable
+  // Description:
+  // These method setup the \c process appropriately i.e. set the command,
+  // timeout etc.
+  bool SetupRenderServer(vtksysProcess* process);
+  bool SetupServer(vtksysProcess* process);
+  bool SetupClient(vtksysProcess* process, const ClientExecutableInfo& info,
+    char* argv[]);
+
+  std::vector<ClientExecutableInfo> ClientExecutables;
+  std::string ServerExecutable;  // fullpath to paraview server executable
+  std::string RenderServerExecutable;  // fullpath to paraview renderserver executable
+  std::string DataServerExecutable;  // fullpath to paraview dataserver executable
+  std::string MPIRun;  // fullpath to mpirun executable
 
 
   // This specify the preflags and post flags that can be set using:
   // VTK_MPI_PRENUMPROC_FLAGS VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
-  vtkstd::vector<vtkstd::string> MPIPreNumProcFlags;
-  vtkstd::vector<vtkstd::string> MPIPreFlags;
-  vtkstd::vector<vtkstd::string> MPIPostFlags;
+  std::vector<std::string> MPIPreNumProcFlags;
+  std::vector<std::string> MPIPreFlags;
+  std::vector<std::string> MPIPostFlags;
  
   // ClientPostFlags are additional arguments sent to client.
-  vtkstd::vector<vtkstd::string> ClientPostFlags;
+  std::vector<std::string> ClientPostFlags;
 
   // MPIServerFlags allows you to specify flags specific for 
   // the client or the server
-  vtkstd::vector<vtkstd::string> MPIServerPreFlags;
-  vtkstd::vector<vtkstd::string> MPIServerPostFlags;
+  std::vector<std::string> MPIServerPreFlags;
+  std::vector<std::string> MPIServerPostFlags;
 
   // TDClientFlags / TDServerFlags allows you to specify flags specific for 
   // the client or the server when running in tiled display mode
-  vtkstd::vector<vtkstd::string> TDClientPreFlags;
-  vtkstd::vector<vtkstd::string> TDServerPreFlags;
-  vtkstd::vector<vtkstd::string> TDClientPostFlags;
-  vtkstd::vector<vtkstd::string> TDServerPostFlags;
+  std::vector<std::string> TDClientPreFlags;
+  std::vector<std::string> TDServerPreFlags;
+  std::vector<std::string> TDClientPostFlags;
+  std::vector<std::string> TDServerPostFlags;
 
   // PVSSHFlags allows user to pass ssh command to access distant machine
   // to do remote testing
-  vtkstd::vector<vtkstd::string> PVSSHFlags;
-  vtkstd::string                 PVSetupScript;
+  std::vector<std::string> PVSSHFlags;
+  std::string                 PVSetupScript;
   
   // Specify the number of process flag, this can be set using: VTK_MPI_NUMPROC_FLAG. 
   // This is then split into : 
   // MPIServerNumProcessFlag & MPIRenderServerNumProcessFlag
-  vtkstd::string MPINumProcessFlag;
-  vtkstd::string MPIServerNumProcessFlag;
-  vtkstd::string MPIRenderServerNumProcessFlag;
+  std::string MPINumProcessFlag;
+  std::string MPIServerNumProcessFlag;
+  std::string MPIRenderServerNumProcessFlag;
 
-  vtkstd::string CurrentPrintLineName;
+  std::string CurrentPrintLineName;
+
+  // identifies how to connect to the server.
+  std::string ServerURL;
 
   int RenderServerNumProcesses;
   double TimeOut;

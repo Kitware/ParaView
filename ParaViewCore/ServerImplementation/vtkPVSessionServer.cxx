@@ -37,12 +37,12 @@
 #include "vtkSIProxyDefinitionManager.h"
 
 #include <assert.h>
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/string>
-#include <vtkstd/vector>
-#include <vtkstd/map>
+#include <string>
+#include <vector>
+#include <map>
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -131,7 +131,7 @@ public:
   //-----------------------------------------------------------------
   void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
     {
-    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
         1, (void*)data.c_str(), data.size(),
         vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, false);
@@ -139,7 +139,7 @@ public:
     //-----------------------------------------------------------------
   void NotifyAllClients(vtkSMMessage* msgToBroadcast)
     {
-    vtkstd::string data = msgToBroadcast->SerializeAsString();
+    std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
         1, (void*)data.c_str(), data.size(),
         vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, true);
@@ -175,7 +175,7 @@ public:
   // Return true if the message was updated by the ShareOnlyCache
   bool RetreiveShareOnly(vtkSMMessage* msg)
     {
-    vtkstd::map<vtkTypeUInt32, vtkSMMessage>::iterator iter =
+    std::map<vtkTypeUInt32, vtkSMMessage>::iterator iter =
         this->ShareOnlyCache.find(msg->global_id());
     if(iter != this->ShareOnlyCache.end())
       {
@@ -189,7 +189,7 @@ public:
     {
     int nbCtrls = this->CompositeMultiProcessController->GetNumberOfControllers();
 
-    vtkstd::vector<int> alivedClients(nbCtrls);
+    std::vector<int> alivedClients(nbCtrls);
     for(int i = 0; i < nbCtrls; i++)
       {
       alivedClients.push_back(this->CompositeMultiProcessController->GetControllerId(i));
@@ -212,14 +212,14 @@ public:
 private:
   vtkNew<vtkCompositeMultiProcessController> CompositeMultiProcessController;
   vtkWeakPointer<vtkPVSessionServer> Owner;
-  vtkstd::string ClientURL;
-  vtkstd::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
+  std::string ClientURL;
+  std::map<vtkTypeUInt32, vtkSMMessage> ShareOnlyCache;
   bool SatelliteServerSession;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPVSessionServer);
 //----------------------------------------------------------------------------
-vtkPVSessionServer::vtkPVSessionServer()
+vtkPVSessionServer::vtkPVSessionServer() : vtkPVSessionBase()
 {
   this->Internal = new vtkInternals(this);
 
@@ -321,11 +321,13 @@ bool vtkPVSessionServer::Connect(const char* url)
   // Add connect-id if needed (or maybe we extract that from url as well (just
   // like vtkNetworkAccessManager).
 
-  vtkstd::string client_url;
+  // for forward connections, port number 0 is acceptable, while for
+  // reverse-connections it's not.
+  std::string client_url;
   if (pvserver.find(url))
     {
     int port = atoi(pvserver.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port < 0)? 11111: port;
 
     vtksys_ios::ostringstream stream;
     stream << "tcp://localhost:" << port << "?listen=true&" << handshake.str();
@@ -334,9 +336,9 @@ bool vtkPVSessionServer::Connect(const char* url)
     }
   else if (pvserver_reverse.find(url))
     {
-    vtkstd::string hostname = pvserver_reverse.match(1);
+    std::string hostname = pvserver_reverse.match(1);
     int port = atoi(pvserver_reverse.match(3).c_str());
-    port = (port == 0)? 11111: port;
+    port = (port <= 0)? 11111: port;
     vtksys_ios::ostringstream stream;
     stream << "tcp://" << hostname.c_str() << ":" << port << "?" << handshake.str();
     client_url = stream.str();
@@ -344,10 +346,10 @@ bool vtkPVSessionServer::Connect(const char* url)
   else if (pvrenderserver.find(url))
     {
     int dsport = atoi(pvrenderserver.match(3).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport < 0)? 11111 : dsport;
 
     int rsport = atoi(pvrenderserver.match(6).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport < 0)? 22221 : rsport;
 
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)
@@ -367,13 +369,13 @@ bool vtkPVSessionServer::Connect(const char* url)
     }
   else if (pvrenderserver_reverse.find(url))
     {
-    vtkstd::string dataserverhost = pvrenderserver.match(1);
+    std::string dataserverhost = pvrenderserver.match(1);
     int dsport = atoi(pvrenderserver.match(3).c_str());
-    dsport = (dsport == 0)? 11111 : dsport;
+    dsport = (dsport <= 0)? 11111 : dsport;
 
-    vtkstd::string renderserverhost = pvrenderserver.match(4);
+    std::string renderserverhost = pvrenderserver.match(4);
     int rsport = atoi(pvrenderserver.match(6).c_str());
-    rsport = (rsport == 0)? 22221 : rsport;
+    rsport = (rsport <= 0)? 22221 : rsport;
 
     if (vtkProcessModule::GetProcessType() ==
       vtkProcessModule::PROCESS_RENDER_SERVER)
@@ -436,7 +438,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
     {
   case vtkPVSessionServer::PUSH:
       {
-      vtkstd::string string;
+      std::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
@@ -459,7 +461,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
   case vtkPVSessionServer::PULL:
       {
-      vtkstd::string string;
+      std::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
@@ -478,7 +480,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
     break;
   case vtkPVSessionServer::REGISTER_SI:
       {
-      vtkstd::string string;
+      std::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
@@ -487,7 +489,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
     break;
   case vtkPVSessionServer::UNREGISTER_SI:
       {
-      vtkstd::string string;
+      std::string string;
       stream >> string;
       vtkSMMessage msg;
       msg.ParseFromString(string);
@@ -518,7 +520,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
   case vtkPVSessionServer::GATHER_INFORMATION:
       {
-      vtkstd::string classname;
+      std::string classname;
       vtkTypeUInt32 location, globalid;
       stream >> location >> classname >> globalid;
       this->GatherInformationInternal(location, classname.c_str(), globalid,

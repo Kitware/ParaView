@@ -527,11 +527,19 @@ void pqApplicationCore::loadState(
   // We disable recording view deletion in Undo/Stack
   // In anycase, the stack will be cleared, why bother recording something...
   BEGIN_UNDO_EXCLUDE();
-  QList<pqView*> current_views =
-    this->ServerManagerModel->findItems<pqView*>(server);
-  foreach (pqView* view, current_views)
+  QList<pqProxy*> proxies =
+    this->ServerManagerModel->findItems<pqProxy*>(server);
+  foreach (pqProxy* proxy, proxies)
     {
-    this->ObjectBuilder->destroy(view);
+    pqView* view = qobject_cast<pqView*>(proxy);
+    if (view)
+      {
+      this->ObjectBuilder->destroy(view);
+      }
+    else if (proxy->getSMGroup()=="layouts")
+      {
+      this->ObjectBuilder->destroy(proxy);
+      }
     }
   END_UNDO_EXCLUDE();
 

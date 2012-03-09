@@ -22,7 +22,7 @@ ENDMACRO (process_args)
 SET (TEST_GROUP_SIZE 3)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "PARALLEL" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "" ${ARGN})
   while (ACT_TEST_SCRIPTS)
     set (counter 0)
     set (extra_args)
@@ -66,10 +66,6 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
-      if(${ACT_PARALLEL} STREQUAL "FALSE")
-        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
-      endif()
-      #if (ACT_PARALLEL
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -92,7 +88,6 @@ FUNCTION (add_client_server_tests prefix)
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
-       --server=testserver
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_server_tests)
@@ -105,13 +100,12 @@ FUNCTION (add_client_render_server_tests prefix)
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
-       --server=testserver-dsrs
        --test-directory=${PARAVIEW_TEST_DIR}
     ${ARGN})
 ENDFUNCTION (add_client_render_server_tests)
 
 FUNCTION(add_multi_client_tests prefix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "PARALLEL" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
 
   foreach (test_script ${ACT_TEST_SCRIPTS})
     get_filename_component(test_name ${test_script} NAME_WE)
@@ -126,7 +120,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         -dr
         --disable-light-kit
-        --server=testserver
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-script=${test_script}
         --test-master
@@ -135,7 +128,6 @@ FUNCTION(add_multi_client_tests prefix)
         --client ${CLIENT_EXECUTABLE}
         -dr
         --disable-light-kit
-        --server=testserver
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-slave
         ${extra_args}

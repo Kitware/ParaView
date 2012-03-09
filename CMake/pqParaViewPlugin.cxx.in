@@ -66,7 +66,7 @@ extern "C" void VTK_EXPORT @PLUGIN_NAME@_CombinedInitialize(
 
 //-----------------------------------------------------------------------------
 void @PLUGIN_NAME@_Plugin::GetBinaryResources(
-  vtkstd::vector<vtkstd::string>& resources)
+  std::vector<std::string>& resources)
 {
 @BINARY_RESOURCES_INIT@
   (void)resources;
@@ -90,7 +90,7 @@ vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 }
 
 //-----------------------------------------------------------------------------
-void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
+void @PLUGIN_NAME@_Plugin::GetXMLs(std::vector<std::string> &xmls)
 {
 @XML_INTERFACES_INIT@
   (void)xmls;
@@ -113,9 +113,9 @@ QObjectList @PLUGIN_NAME@_Plugin::interfaces()
 #ifdef plugin_type_python
 @WRAP_PYTHON_INCLUDES@
 
-void @PLUGIN_NAME@_Plugin::GetPythonSourceList(vtkstd::vector<vtkstd::string>& modules,
-  vtkstd::vector<vtkstd::string>& sources,
-  vtkstd::vector<int> &package_flags)
+void @PLUGIN_NAME@_Plugin::GetPythonSourceList(std::vector<std::string>& modules,
+  std::vector<std::string>& sources,
+  std::vector<int> &package_flags)
 {
   const char *moduleNames[] = {
     @PY_MODULE_LIST@

@@ -18,7 +18,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkCommand.h"
 #include "vtkMultiProcessStream.h"
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 
@@ -61,7 +61,7 @@ void vtkImageCompressor::SaveConfiguration(vtkMultiProcessStream *stream)
 //-----------------------------------------------------------------------------
 const char *vtkImageCompressor::SaveConfiguration()
 {
-  vtkstd::ostringstream oss;
+  std::ostringstream oss;
   oss 
     << this->GetClassName()
     << " "
@@ -76,7 +76,7 @@ const char *vtkImageCompressor::SaveConfiguration()
 //-----------------------------------------------------------------------------
 bool vtkImageCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
 {
-  vtkstd::string typeStr;
+  std::string typeStr;
   *stream >> typeStr;
   if (typeStr==this->GetClassName())
     {
@@ -91,8 +91,8 @@ bool vtkImageCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
 //-----------------------------------------------------------------------------
 const char *vtkImageCompressor::RestoreConfiguration(const char *stream)
 {
-  vtkstd::istringstream iss(stream);
-  vtkstd::string typeStr;
+  std::istringstream iss(stream);
+  std::string typeStr;
   iss >> typeStr;
   if (typeStr==this->GetClassName())
     {

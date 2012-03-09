@@ -26,10 +26,10 @@
 #include "vtkCommand.h"
 
 #include <assert.h>
-#include <vtkstd/map>
+#include <map>
 #include <vtkNew.h>
 #include <vtkWeakPointer.h>
-#include <vtkstd/string>
+#include <string>
 #include <vtksys/ios/sstream>
 
 //****************************************************************************
@@ -137,7 +137,7 @@ public:
   vtkWeakPointer<vtkPVSessionServer>   ServerSession;
   vtkNew<vtkPVMultiClientsInformation> ServerInformations;
   vtkSMMessage                         ServerState;
-  vtkstd::map<int, vtkstd::string>     UserNames;
+  std::map<int, std::string>     UserNames;
   bool                                 DisableBroadcast;
   vtkWeakPointer<vtkSICollaborationManager>            Owner;
   vtkWeakPointer<vtkCompositeMultiProcessController>   MultiProcessController;

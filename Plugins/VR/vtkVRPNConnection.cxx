@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRPNCallBackHandlers.h"
 #include <QDateTime>
 #include <QDebug>
-#include <vtkstd/vector>
+#include <vector>
 #include <iostream>
 #include <sstream>
 #include <algorithm>

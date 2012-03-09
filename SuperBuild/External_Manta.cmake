@@ -8,12 +8,19 @@ if(WIN32)
   set(Manta_build_shared OFF)
 endif()
 
+configure_file(${ParaViewSuperBuild_CMAKE_SOURCE_DIR}/manta_patch_step.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/manta_patch_step.cmake
+  @ONLY)
+
+set(manta_PATCH_COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/manta_patch_step.cmake)
+
 ExternalProject_Add(Manta
   DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${Manta_source}
   BINARY_DIR ${Manta_binary}
   URL ${MANTA_URL}/${MANTA_GZ}
   URL_MD5 ${MANTA_MD5}
+  PATCH_COMMAND ${manta_PATCH_COMMAND}
   CMAKE_CACHE_ARGS
     -DCMAKE_CXX_FLAGS:STRING=${pv_tpl_cxx_flags}
     -DCMAKE_C_FLAGS:STRING=${pv_tpl_c_flags}

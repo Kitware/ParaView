@@ -92,9 +92,9 @@ public:
     virtual bool operator == (const VolumeAttributes &obj) const;
     virtual bool operator != (const VolumeAttributes &obj) const;
 
-    virtual const vtkstd::string TypeName() const;
+    virtual const std::string TypeName() const;
     virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const vtkstd::string &) const;
+    virtual AttributeSubject *CreateCompatible(const std::string &) const;
     virtual AttributeSubject *NewInstance(bool) const;
 
     // Property selection methods
@@ -112,7 +112,7 @@ public:
     void SetFreeformFlag(bool freeformFlag_);
     void SetOpacityControlPoints(const GaussianControlPointList &opacityControlPoints_);
     void SetResampleTarget(int resampleTarget_);
-    void SetOpacityVariable(const vtkstd::string &opacityVariable_);
+    void SetOpacityVariable(const std::string &opacityVariable_);
     void SetFreeformOpacity(const unsigned char *freeformOpacity_);
     void SetUseColorVarMin(bool useColorVarMin_);
     void SetColorVarMin(float colorVarMin_);
@@ -141,8 +141,8 @@ public:
     const GaussianControlPointList &GetOpacityControlPoints() const;
           GaussianControlPointList &GetOpacityControlPoints();
     int                            GetResampleTarget() const;
-    const vtkstd::string              &GetOpacityVariable() const;
-          vtkstd::string              &GetOpacityVariable();
+    const std::string              &GetOpacityVariable() const;
+          std::string              &GetOpacityVariable();
     const unsigned char            *GetFreeformOpacity() const;
           unsigned char            *GetFreeformOpacity();
     bool                           GetUseColorVarMin() const;
@@ -167,31 +167,31 @@ public:
     virtual void SetFromNode(DataNode *node);
 
     // Enum conversion functions
-    static vtkstd::string Renderer_ToString(Renderer);
-    static bool Renderer_FromString(const vtkstd::string &, Renderer &);
+    static std::string Renderer_ToString(Renderer);
+    static bool Renderer_FromString(const std::string &, Renderer &);
 protected:
-    static vtkstd::string Renderer_ToString(int);
+    static std::string Renderer_ToString(int);
 public:
-    static vtkstd::string GradientType_ToString(GradientType);
-    static bool GradientType_FromString(const vtkstd::string &, GradientType &);
+    static std::string GradientType_ToString(GradientType);
+    static bool GradientType_FromString(const std::string &, GradientType &);
 protected:
-    static vtkstd::string GradientType_ToString(int);
+    static std::string GradientType_ToString(int);
 public:
-    static vtkstd::string Scaling_ToString(Scaling);
-    static bool Scaling_FromString(const vtkstd::string &, Scaling &);
+    static std::string Scaling_ToString(Scaling);
+    static bool Scaling_FromString(const std::string &, Scaling &);
 protected:
-    static vtkstd::string Scaling_ToString(int);
+    static std::string Scaling_ToString(int);
 public:
-    static vtkstd::string SamplingType_ToString(SamplingType);
-    static bool SamplingType_FromString(const vtkstd::string &, SamplingType &);
+    static std::string SamplingType_ToString(SamplingType);
+    static bool SamplingType_FromString(const std::string &, SamplingType &);
 protected:
-    static vtkstd::string SamplingType_ToString(int);
+    static std::string SamplingType_ToString(int);
 public:
 
     // Keyframing methods
-    virtual vtkstd::string               GetFieldName(int index) const;
+    virtual std::string               GetFieldName(int index) const;
     virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual vtkstd::string               GetFieldTypeName(int index) const;
+    virtual std::string               GetFieldTypeName(int index) const;
     virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
 
     // User-defined methods
@@ -213,7 +213,7 @@ private:
     bool                     freeformFlag;
     GaussianControlPointList opacityControlPoints;
     int                      resampleTarget;
-    vtkstd::string              opacityVariable;
+    std::string              opacityVariable;
     unsigned char            freeformOpacity[256];
     bool                     useColorVarMin;
     float                    colorVarMin;

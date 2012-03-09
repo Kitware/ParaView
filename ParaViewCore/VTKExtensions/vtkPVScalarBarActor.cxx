@@ -45,7 +45,7 @@
 
 #include <math.h>
 
-#include <vtkstd/algorithm>
+#include <algorithm>
 
 #define COLOR_TEXTURE_MAP_SIZE 256
 
@@ -303,12 +303,12 @@ int vtkPVScalarBarActor::CreateLabel(double value,
       //we want the reduced size used so that we can get better fitting
       // Extra filter: Used to remove unwanted 0 after e+ or e-
       // i.e.: 1.23e+009 => 1.23e+9
-      vtkstd::string strToFilter = string2;
-      vtkstd::string ePlus = "e+0";
-      vtkstd::string eMinus = "e-0";
+      std::string strToFilter = string2;
+      std::string ePlus = "e+0";
+      std::string eMinus = "e-0";
       size_t pos = 0;
-      while( (pos = strToFilter.find(ePlus)) != vtkstd::string::npos ||
-             (pos = strToFilter.find(eMinus)) != vtkstd::string::npos)
+      while( (pos = strToFilter.find(ePlus)) != std::string::npos ||
+             (pos = strToFilter.find(eMinus)) != std::string::npos)
         {
         strToFilter.erase(pos + 2, 1);
         }
@@ -364,12 +364,12 @@ int vtkPVScalarBarActor::CreateLabel(double value,
 }
 
 //-----------------------------------------------------------------------------
-vtkstd::vector<double> vtkPVScalarBarActor::LinearTickMarks(
+std::vector<double> vtkPVScalarBarActor::LinearTickMarks(
                                                           const double range[2],
                                                           int maxTicks,
                                                           bool intOnly /*=0*/)
 {
-  vtkstd::vector<double> ticks;
+  std::vector<double> ticks;
 
   // Compute the difference between min and max of scalar bar values.
   double delta = range[1] - range[0];
@@ -444,7 +444,7 @@ vtkstd::vector<double> vtkPVScalarBarActor::LinearTickMarks(
     // as many digits as possible, but perhaps in the future we want it.)
     double nsd1 = ceil(log10(MY_ABS(mintrunc)/mag));
     double nsd2 = ceil(log10(MY_ABS(maxtrunc)/mag));
-    int numSignificantDigits = vtkstd::max(nsd1, nsd2);
+    int numSignificantDigits = std::max(nsd1, nsd2);
 #endif
 
     // Compute the ticks.
@@ -470,10 +470,10 @@ vtkstd::vector<double> vtkPVScalarBarActor::LinearTickMarks(
 }
 
 //-----------------------------------------------------------------------------
-vtkstd::vector<double> vtkPVScalarBarActor::LogTickMarks(const double range[2],
+std::vector<double> vtkPVScalarBarActor::LogTickMarks(const double range[2],
                                                          int maxTicks)
 {
-  vtkstd::vector<double> ticks;
+  std::vector<double> ticks;
 
   if (range[0] * range[1] <= 0)
     {
@@ -496,7 +496,7 @@ vtkstd::vector<double> vtkPVScalarBarActor::LogTickMarks(const double range[2],
     double ticksZ = pow(10, ticks[1] - ticks[0]);
     double nsd1 = range[0]/ticksZ;
     double nsd2 = range[1]/ticksZ;
-    double numSignificantDigits = vtkstd::max(nsd1, nsd2);
+    double numSignificantDigits = std::max(nsd1, nsd2);
     }
 #endif
 
@@ -648,16 +648,16 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
       targetWidth = propSize[0]-this->BarWidth-this->LabelSpace;
 
       int maxHeight = (int)(this->BarHeight/this->NumberOfLabels);
-      targetHeight = vtkstd::min(targetHeight, maxHeight);
+      targetHeight = std::min(targetHeight, maxHeight);
       }
     else
       {
       targetWidth = (int)(propSize[0]*0.8/this->NumberOfLabels);
 
-//       targetHeight = vtkstd::min(targetHeight, propSize[1]-this->BarHeight);
+//       targetHeight = std::min(targetHeight, propSize[1]-this->BarHeight);
       }
 
-    vtkstd::vector<double> ticks;
+    std::vector<double> ticks;
     if (isLogTable)
       {
       ticks = this->LogTickMarks(range, this->NumberOfLabels);
@@ -714,8 +714,8 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
           textMapper->GetSize(viewport, textSize);
           y -= textSize[1]/2;   // Adjust to center text.
           // Do not intersect min/max
-          y = vtkstd::max(y, static_cast<double>(minmaxTextHeight));
-          y = vtkstd::min(y, static_cast<double>(  propSize[1] - titleSize[1]
+          y = std::max(y, static_cast<double>(minmaxTextHeight));
+          y = std::min(y, static_cast<double>(  propSize[1] - titleSize[1]
                                                  - this->TitleSpace
                                                  - minmaxTextHeight
                                                  - textSize[1]));

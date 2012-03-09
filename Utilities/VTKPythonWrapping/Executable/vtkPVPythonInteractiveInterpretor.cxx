@@ -17,7 +17,7 @@
 
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/string>
+#include <string>
 
 class vtkPVPythonInteractiveInterpretor::vtkInternal
 {
@@ -86,17 +86,17 @@ bool vtkPVPythonInteractiveInterpretor::Push(const char* const code)
 
     // The embedded python interpreter cannot handle DOS line-endings, see
     // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
-    vtkstd::string buffer = code ? code : "";
+    std::string buffer = code ? code : "";
     // replace "\r\n" with "\n"
-    vtkstd::string::size_type i = buffer.find("\r\n");
-    for(; i != vtkstd::string::npos; i = buffer.find("\r\n", i))
+    std::string::size_type i = buffer.find("\r\n");
+    for(; i != std::string::npos; i = buffer.find("\r\n", i))
       {
       buffer.replace(i, 2, "\n");
       i++;
       }
     // replace "\r" with "\n"  (sometimes seen on Mac)
     i = buffer.find("\r");
-    for(; i != vtkstd::string::npos; i = buffer.find("\r", i))
+    for(; i != std::string::npos; i = buffer.find("\r", i))
       {
       buffer.replace(i, 1, "\n");
       i++;

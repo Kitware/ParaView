@@ -1,0 +1,120 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+  <SourceProxy name="AnalyzeReader" class="vtkAnalyzeReader" label="Analyze reader">
+      <Documentation
+       short_help="Read Analyze data files."
+       long_help="Read Analyze image data files">
+       The Analyze reader reads Analyze data and header files containing image
+       data file. The expected file extensions are .img and .hdr.
+     </Documentation>
+
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Analyze reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="img hdr" file_description="Analyze Files" />
+      </Hints>
+      <!-- End AnalyzeReader -->
+   </SourceProxy>
+
+  <SourceProxy name="NIfTIReader"
+                   class="vtkNIfTIReader"
+                   label="NIfTI Volume reader">
+      <Documentation
+       short_help="Read NIfTI Volume data files."
+       long_help="Read NIfTI Volume NII image data files">
+       The NIfTI Volume reader reads NIfTI files containing image data. The expected file extensions are .nii.
+     </Documentation>
+     <StringVectorProperty
+         name="FileName"
+         animateable="0"
+         command="SetFileName"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the NIfTI Volume reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <Hints>
+        <ReaderFactory extensions="nii img hdr" file_description="NIfTI Files" />
+      </Hints>
+      <!-- End NIfTIReader -->
+   </SourceProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="writers">
+
+   <WriterProxy name="AnalyzeWriter" class="vtkAnalyzeWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write Analyze files">
+        Writer to write Analyze files.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <WriterFactory extensions="img" file_description="Analyze File Format"/>
+      </Hints>
+    </WriterProxy>
+
+   <WriterProxy name="NIfTIWriter" class="vtkNIfTIWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write NIfTI files">
+        Writer to write NIfTI files.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkImageData"/>
+        </DataTypeDomain>
+      </InputProperty>
+       <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+     <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+         <WriterFactory extensions="nii" file_description="NIfTI File Format"/>
+     </Hints>
+    </WriterProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

@@ -456,6 +456,12 @@ protected:
   virtual void AddRepresentationInternal(vtkDataRepresentation* rep);
   virtual void RemoveRepresentationInternal(vtkDataRepresentation* rep);
 
+  // Description:
+  // These methods are used to setup the view for capturing screen shots.
+  // In batch mode, since the server-side has just 1 render window, we need to
+  // make sure that the right interactor is activated, otherwise, we end up
+  // capturing images from the wrong view.
+  virtual void PrepareForScreenshot();
 
   // Description:
   // Actual render method.

@@ -34,9 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QFile>
 #include <QtDebug>
+#include <QWidget>
 
-#include "vtkPVXMLParser.h"
+#include "pqCoreTestUtility.h"
+#include "pqObjectNaming.h"
+#include "pqOptions.h"
+#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 
 ///////////////////////////////////////////////////////////////////////////
@@ -106,15 +111,94 @@ int pqXMLEventSource::getNextEvent(
     return DONE;
     }
 
-  vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(
-      this->Implementation->CurrentEvent);
-    
-  object = elem->GetAttribute("object");
-  command = elem->GetAttribute("command");
-  arguments = elem->GetAttribute("arguments");
-  
+  int index = this->Implementation->CurrentEvent;
   this->Implementation->CurrentEvent++;
 
-  return SUCCESS;
+  vtkPVXMLElement* elem = this->Implementation->XML->GetNestedElement(index);
+  if (elem->GetName() && strcmp(elem->GetName(), "pqevent") == 0)
+    {
+    object = elem->GetAttribute("object");
+    command = elem->GetAttribute("command");
+    arguments = elem->GetAttribute("arguments");
+    return SUCCESS;
+    }
+  else if (elem->GetName() && strcmp(elem->GetName(), "pqcompareview")==0 &&
+    elem->GetAttribute("object") && elem->GetAttribute("baseline"))
+    {
+    // add support for elements of the form:
+    // <pqcompareview object="../Viewport" 
+    //                baseline="ExtractBlock.png"
+    //                width="300" height="300" />
+    QString widgetName = elem->GetAttribute("object");
+    QString baseline = elem->GetAttribute("baseline");
+    baseline = baseline.replace("$PARAVIEW_TEST_ROOT",
+      pqCoreTestUtility::TestDirectory());
+    baseline = baseline.replace("$PARAVIEW_DATA_ROOT",
+      pqCoreTestUtility::DataRoot());
+
+    int width = 300, height = 300;
+    elem->GetScalarAttribute("width", &width);
+    elem->GetScalarAttribute("height", &height);
+
+    QWidget* widget =
+      qobject_cast<QWidget*>(pqObjectNaming::GetObject(widgetName));
+
+    if (!widget)
+      {
+      return FAILURE;
+      }
+    cout << width << ", " << height << endl;
+    QSize old_size = widget->maximumSize();
+    widget->setMaximumSize(width, height);
+    widget->resize(width, height);
+
+    pqOptions* const options = pqOptions::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetOptions());
+    bool retVal = pqCoreTestUtility::CompareImage(widget, baseline,
+      options->GetCurrentImageThreshold(), std::cerr,
+      pqCoreTestUtility::TestDirectory());
+    widget->setMaximumSize(old_size);
+    if (!retVal)
+      {
+      return FAILURE;
+      }
+
+    return this->getNextEvent(object, command, arguments);
+    }
+  else if (elem->GetName() && strcmp(elem->GetName(), "pqcompareimage")==0 &&
+    elem->GetAttribute("image") && elem->GetAttribute("baseline"))
+    {
+    // add support for elements of the form:
+    // This only support PNG files.
+    // <pqcompareimage image="GeneratedImage.png" 
+    //                baseline="ExtractBlock.png"
+    //                width="300" height="300" />
+    QString image = elem->GetAttribute("image");
+    image = image.replace("$PARAVIEW_TEST_ROOT",
+      pqCoreTestUtility::TestDirectory());
+    image = image.replace("$PARAVIEW_DATA_ROOT",
+      pqCoreTestUtility::DataRoot());
+
+    QString baseline = elem->GetAttribute("baseline");
+    baseline = baseline.replace("$PARAVIEW_TEST_ROOT",
+      pqCoreTestUtility::TestDirectory());
+    baseline = baseline.replace("$PARAVIEW_DATA_ROOT",
+      pqCoreTestUtility::DataRoot());
+
+    pqOptions* const options = pqOptions::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetOptions());
+
+    if (!pqCoreTestUtility::CompareImage(image, baseline,
+       options->GetCurrentImageThreshold(), std::cerr,
+       pqCoreTestUtility::TestDirectory()))
+      {
+      return FAILURE;
+      }
+    return this->getNextEvent(object, command, arguments);
+    }
+
+  qCritical() << "Invalid xml element: " << elem->GetName();
+
+  return FAILURE;
 }
 

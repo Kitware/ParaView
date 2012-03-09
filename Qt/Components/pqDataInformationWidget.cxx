@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqDataInformationModel.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSectionVisibilityContextMenu.h"
@@ -97,6 +98,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
 {
   this->Model = new pqDataInformationModel(this);
   this->View = new QTableView(this);
+  this->View->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   // We provide the sorting proxy model
   QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);

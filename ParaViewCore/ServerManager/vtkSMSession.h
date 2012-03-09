@@ -32,6 +32,7 @@ class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
 {
 public:
   static vtkSMSession* New();
+  static vtkSMSession* New(vtkPVSessionBase* otherSession);
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -186,7 +187,7 @@ protected:
   // Subclasses should set initialize_during_constructor to false so that
   // this->Initialize() is not called in constructor but only after the session
   // has been created/setup correctly.
-  vtkSMSession(bool initialize_during_constructor=true);
+  vtkSMSession(bool initialize_during_constructor=true, vtkPVSessionCore* preExistingSessionCore=NULL);
   ~vtkSMSession();
 
   // Used by the Auto-MPI to prevent remote rendering, otherwise we should

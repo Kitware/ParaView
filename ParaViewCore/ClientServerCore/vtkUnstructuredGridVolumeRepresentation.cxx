@@ -35,16 +35,16 @@
 #include "vtkVolumeProperty.h"
 #include "vtkVolumeRepresentationPreprocessor.h"
 
-#include <vtkstd/map>
-#include <vtkstd/string>
+#include <map>
+#include <string>
 
 class vtkUnstructuredGridVolumeRepresentation::vtkInternals
 {
 public:
-  typedef vtkstd::map<vtkstd::string,
+  typedef std::map<std::string,
           vtkSmartPointer<vtkUnstructuredGridVolumeMapper> > MapOfMappers;
   MapOfMappers Mappers;
-  vtkstd::string ActiveVolumeMapper;
+  std::string ActiveVolumeMapper;
 };
 
 

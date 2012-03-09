@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QHeaderView>
+#include <QLineEdit>
 #include <QStringList>
 #include <QTimer>
 
@@ -60,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView core includes
 #include "pqActiveObjects.h"
+#include "pqNonEditableStyledItemDelegate.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
@@ -227,6 +229,7 @@ void pqProxyInformationWidget::updateInformation()
   vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
     source->getProxy()->GetProperty("TimestepValues"));
   this->Ui->timeValues->clear();
+  this->Ui->timeValues->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
   //
   QAbstractItemModel *pModel = this->Ui->timeValues->model();
   pModel->blockSignals(true);
@@ -241,6 +244,7 @@ void pqProxyInformationWidget::updateInformation()
       item->setData(0, Qt::DisplayRole, i);
       item->setData(1, Qt::DisplayRole, tsv->GetElement(i));
       item->setData(1, Qt::ToolTipRole, tsv->GetElement(i));
+      item->setFlags( item->flags() | Qt::ItemIsEditable);
       }
     }
   this->Ui->timeValues->blockSignals(false);
@@ -310,7 +314,7 @@ void pqProxyInformationWidget::fillDataInformation(
     {
     this->Ui->dataTimeLabel->setVisible(true);
     this->Ui->dataTimeLabel->setText(
-      QString("Current data time: <b>%1</b>").arg(dataInformation->GetTime()));
+      QString("Current data time: %1").arg(dataInformation->GetTime()));
     }
 
   vtkPVDataSetAttributesInformation* info[6];
@@ -389,6 +393,7 @@ void pqProxyInformationWidget::fillDataInformation(
           }
         item->setData(2, Qt::DisplayRole, dataRange);
         item->setData(2, Qt::ToolTipRole, dataRange);
+        item->setFlags( item->flags() | Qt::ItemIsEditable );
         if (arrayInfo->GetIsPartial())
           {
           item->setForeground(0, QBrush(QColor("darkBlue")));
@@ -404,6 +409,7 @@ void pqProxyInformationWidget::fillDataInformation(
     }
   this->Ui->dataArrays->header()->resizeSections(
     QHeaderView::ResizeToContents);
+  this->Ui->dataArrays->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
 
   double bounds[6];
   dataInformation->GetBounds(bounds);
@@ -464,6 +470,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
   else
     {
     node = new QTreeWidgetItem(this->Ui->compositeTree, QStringList(label));
+    this->Ui->compositeTree->setItemDelegate(new pqNonEditableStyledItemDelegate(this));
     }
   if (!info)
     {
@@ -473,6 +480,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
   // we save a ptr to the data information to easily locate the data
   // information.
   node->setData(0, Qt::UserRole, QVariant::fromValue((void*)info));
+  node->setFlags( node->flags() | Qt::ItemIsEditable);
 
   vtkPVCompositeDataInformation* compositeInformation = 
     info->GetCompositeDataInformation();
@@ -493,6 +501,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
       compositeInformation->GetDataInformation(cc);
     QTreeWidgetItem* childItem = 
       this->fillCompositeInformation(childInfo, node);
+    childItem->setFlags( childItem->flags() | Qt::ItemIsEditable );
     const char* name = compositeInformation->GetName(cc);
     if (name && name[0])
       {

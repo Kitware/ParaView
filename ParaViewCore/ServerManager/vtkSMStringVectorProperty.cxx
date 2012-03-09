@@ -31,7 +31,7 @@ class vtkSMStringVectorProperty::vtkInternals :
   public vtkSMVectorPropertyTemplate<vtkStdString>
 {
 public:
-  vtkstd::vector<int> ElementTypes;
+  std::vector<int> ElementTypes;
 
   vtkInternals(vtkSMStringVectorProperty* ivp):
     vtkSMVectorPropertyTemplate<vtkStdString>(ivp)
@@ -154,6 +154,18 @@ void vtkSMStringVectorProperty::GetElements(vtkStringList* list)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::GetUncheckedElements(vtkStringList* list)
+{
+  list->RemoveAllItems();
+
+  unsigned int numElems = this->GetNumberOfUncheckedElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    list->AddString(this->GetUncheckedElement(cc));
+    }
+}
+
+//---------------------------------------------------------------------------
 const char* vtkSMStringVectorProperty::GetUncheckedElement(unsigned int idx)
 {
   return this->Internals->GetUncheckedElement(idx).c_str();
@@ -180,6 +192,20 @@ int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
     values[cc] = list->GetString(cc)? list->GetString(cc): "";
     }
   int ret_val = this->Internals->SetElements(values, count);
+  delete[] values;
+  return ret_val;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetUncheckedElements(vtkStringList* list)
+{
+  unsigned int count = static_cast<unsigned int>(list->GetLength());
+  vtkStdString* values = new vtkStdString[count+1];
+  for (unsigned int cc=0; cc < count; cc++)
+    {
+    values[cc] = list->GetString(cc)? list->GetString(cc): "";
+    }
+  int ret_val = this->Internals->SetUncheckedElements(values, count);
   delete[] values;
   return ret_val;
 }

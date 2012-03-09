@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkSystemIncludes.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
-#include <vtkstd/map>
+#include <string>
+#include <vector>
+#include <map>
 
 class vtkMultiProcessStream;
 class vtkSpyPlotReader;
@@ -33,8 +33,8 @@ class vtkSpyPlotUniReader;
 class VTK_EXPORT vtkSpyPlotReaderMap
 {
 public:
-  typedef vtkstd::map<vtkstd::string, vtkSpyPlotUniReader*> MapOfStringToSPCTH;
-  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
+  typedef std::map<std::string, vtkSpyPlotUniReader*> MapOfStringToSPCTH;
+  typedef std::vector<std::string> VectorOfStrings;
   MapOfStringToSPCTH Files;
 
   // Initialize the file-map. The filename can either be a case file or a spcth

@@ -44,7 +44,7 @@ class vtkSMSession;
 
 /// pqQVTKWidget extends QVTKWidget to add awareness for view proxies. The
 /// advantage of doing that is that pqQVTKWidget can automatically update the
-/// "ViewPosition" and "ViewSize" properties on the view proxy whenever the
+/// "ViewSize" propertu on the view proxy whenever the
 /// widget's size/position changes.
 ///
 /// This class also enables image-caching by default (image caching support is
@@ -53,11 +53,6 @@ class PQCORE_EXPORT pqQVTKWidget : public QVTKWidget
 {
   Q_OBJECT
   typedef QVTKWidget Superclass;
-
-  Q_PROPERTY(QWidget* positionReference
-    READ positionReference
-    WRITE setPositionReference)
-
 public:
   pqQVTKWidget(QWidget* parent = NULL, Qt::WFlags f = 0);
   virtual ~pqQVTKWidget();
@@ -68,13 +63,6 @@ public:
   /// Set the session.
   /// This is only used when ViewProxy is not set.
   void setSession(vtkSMSession*);
-
-  /// If none is specified, then the parentWidget() is used. Position reference
-  /// is a widget (typically an ancestor of this pqQVTKWidget) relative to which
-  /// the position for the pqQVTKWidget should be determined.
-  void setPositionReference(QWidget* widget);
-
-  QWidget* positionReference() const;
 
   /// Retrun the Proxy ID if any, otherwise return 0
   vtkTypeUInt32 getProxyId();
@@ -101,7 +89,6 @@ private:
   Q_DISABLE_COPY(pqQVTKWidget)
   vtkSmartPointer<vtkSMProxy> ViewProxy;
   vtkWeakPointer<vtkSMSession> Session;
-  QPointer<QWidget> PositionReference;
   QImage MousePointerToDraw;
 };
 

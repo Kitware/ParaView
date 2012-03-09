@@ -23,7 +23,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include <vtkstd/vector>
+#include <vector>
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
@@ -34,9 +34,9 @@ class vtkSICompoundSourceProxy::vtkInternals
 public:
   struct PortInfo
     {
-    vtkstd::string ProxyName;
-    vtkstd::string ExposedName;
-    vtkstd::string PortName;
+    std::string ProxyName;
+    std::string ExposedName;
+    std::string PortName;
     unsigned int PortIndex;
     PortInfo()
       {
@@ -79,9 +79,9 @@ public:
     return this->ExposedPorts.size();
     }
 
-  typedef vtkstd::vector<PortInfo> VectorOfPortInfo;
+  typedef std::vector<PortInfo> VectorOfPortInfo;
   VectorOfPortInfo ExposedPorts;
-  vtkstd::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
+  std::vector<vtkSmartPointer<vtkAlgorithmOutput> > OutputPorts;
   bool NeedOutputPortCreation;
 };
 //*****************************************************************************

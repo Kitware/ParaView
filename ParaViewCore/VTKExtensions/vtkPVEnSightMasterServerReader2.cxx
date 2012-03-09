@@ -37,8 +37,8 @@
 # include "vtkMPICommunicator.h"
 #endif
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <string>
+#include <vector>
 
 #include <ctype.h>
 
@@ -56,13 +56,13 @@ vtkMultiProcessController* vtkPVEnSightMasterServerReader2::GetController()
 class vtkPVEnSightMasterServerReader2Internal
 {
 public:
-  vtkstd::vector<vtkstd::string> PieceFileNames;
+  std::vector<std::string> PieceFileNames;
   int EnSightVersion;
   int NumberOfTimeSets;
   int NumberOfOutputs;
-  vtkstd::vector<int> CumulativeTimeSetSizes;
-  vtkstd::vector<float> TimeSetValues;
-  vtkstd::vector<vtkPGenericEnSightReader*> RealReaders;
+  std::vector<int> CumulativeTimeSetSizes;
+  std::vector<float> TimeSetValues;
+  std::vector<vtkPGenericEnSightReader*> RealReaders;
 };
 
 //----------------------------------------------------------------------------
@@ -462,7 +462,7 @@ static int vtkPVEnSightMasterServerReader2StartsWith(const char* str1,
 // need this very carefully written version of getline.  Returns true
 // if any data were read before the end-of-file was reached.
 static int vtkPVEnSightMasterServerReader2GetLineFromStream(istream& is,
-    vtkstd::string& line)
+    std::string& line)
 {
   const int bufferSize = 1024;
   char buffer[bufferSize];
@@ -516,7 +516,7 @@ int vtkPVEnSightMasterServerReader2::ParseMasterServerFile()
   // Clear old list of pieces.
   this->Internal->PieceFileNames.clear();
   // Construct the file name to open.
-  vtkstd::string sfilename;
+  std::string sfilename;
   if(!this->CaseFileName || this->CaseFileName[0] == 0)
     {
     vtkErrorMacro("A case file name must be specified.");
@@ -549,7 +549,7 @@ int vtkPVEnSightMasterServerReader2::ParseMasterServerFile()
   int readingServers = 0;
   int numServers = 0;
   // Read all data lines in the file.
-  vtkstd::string line;
+  std::string line;
   while(vtkPVEnSightMasterServerReader2GetLineFromStream(fin, line))
     {
     // This section determines the type of file: case of SOS.

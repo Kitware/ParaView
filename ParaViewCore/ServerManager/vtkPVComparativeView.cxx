@@ -31,10 +31,10 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
 
-#include <vtkstd/vector>
-#include <vtkstd/map>
-#include <vtkstd/set>
-#include <vtkstd/string>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
 #include <vtksys/ios/sstream>
 
 #include <assert.h>
@@ -45,7 +45,7 @@
 namespace
 {
   static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
-    vtkstd::set<vtkstd::string> *exceptions=0)
+    std::set<std::string> *exceptions=0)
     {
     vtkSmartPointer<vtkSMPropertyIterator> iterSource;
     vtkSmartPointer<vtkSMPropertyIterator> iterDest;
@@ -114,7 +114,7 @@ public:
 
   struct RepresentationData
     {
-    typedef vtkstd::vector<RepresentationCloneItem> VectorOfClones;
+    typedef std::vector<RepresentationCloneItem> VectorOfClones;
     VectorOfClones Clones;
     vtkSmartPointer<vtkSMProxyLink> Link;
 
@@ -152,13 +152,13 @@ public:
       }
     };
 
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
+  typedef std::vector<vtkSmartPointer<vtkSMViewProxy> > VectorOfViews;
   VectorOfViews Views;
 
-  typedef vtkstd::map<vtkSMProxy*, RepresentationData> MapOfReprClones;
+  typedef std::map<vtkSMProxy*, RepresentationData> MapOfReprClones;
   MapOfReprClones RepresentationClones;
 
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> >
+  typedef std::vector<vtkSmartPointer<vtkSMComparativeAnimationCueProxy> >
     VectorOfCues;
   VectorOfCues Cues;
 
@@ -214,7 +214,7 @@ public:
 
   unsigned int ActiveIndexX;
   unsigned int ActiveIndexY;
-  vtkstd::string SuggestedViewType;
+  std::string SuggestedViewType;
 };
 
 //----------------------------------------------------------------------------
@@ -480,7 +480,7 @@ void vtkPVComparativeView::AddNewView()
   newView->UpdateVTKObjects();
 
   // Copy current view properties over to this newly created view.
-  vtkstd::set<vtkstd::string> exceptions;
+  std::set<std::string> exceptions;
   exceptions.insert("Representations");
   exceptions.insert("ViewSize");
   exceptions.insert("UseCache");

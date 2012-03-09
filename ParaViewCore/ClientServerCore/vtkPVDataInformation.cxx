@@ -45,7 +45,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessStream.h"
 
-#include <vtkstd/vector>
+#include <vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
 
@@ -1169,7 +1169,7 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     }
 
   vtkTypeUInt32 length;
-  vtkstd::vector<unsigned char> data;
+  std::vector<unsigned char> data;
   vtkClientServerStream dcss;
 
   // Point array information.

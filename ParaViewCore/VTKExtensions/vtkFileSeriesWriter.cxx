@@ -28,7 +28,7 @@
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 
-#include <vtkstd/string>
+#include <string>
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
@@ -182,11 +182,11 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
   vtksys_ios::ostringstream fname;
   if (this->WriteAllTimeSteps && this->NumberOfTimeSteps > 1)
     {
-    vtkstd::string path = 
+    std::string path =
       vtksys::SystemTools::GetFilenamePath(this->FileName);
-    vtkstd::string fnamenoext =
+    std::string fnamenoext =
       vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
-    vtkstd::string ext =
+    std::string ext =
       vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
     fname << path << "/" << fnamenoext << "_" << this->CurrentTimeIndex << ext;
     }

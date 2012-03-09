@@ -31,7 +31,7 @@
 #include "vtkUndoStackInternal.h"
 
 #include <vtksys/RegularExpression.hxx>
-#include <vtkstd/map>
+#include <map>
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);

@@ -66,9 +66,9 @@ public:
     virtual bool operator == (const ColorControlPointList &obj) const;
     virtual bool operator != (const ColorControlPointList &obj) const;
 
-    virtual const vtkstd::string TypeName() const;
+    virtual const std::string TypeName() const;
     virtual bool CopyAttributes(const AttributeGroup *);
-    virtual AttributeSubject *CreateCompatible(const vtkstd::string &) const;
+    virtual AttributeSubject *CreateCompatible(const std::string &) const;
     virtual AttributeSubject *NewInstance(bool) const;
 
     // Property selection methods
@@ -107,9 +107,9 @@ public:
 
 
     // Keyframing methods
-    virtual vtkstd::string               GetFieldName(int index) const;
+    virtual std::string               GetFieldName(int index) const;
     virtual AttributeGroup::FieldType GetFieldType(int index) const;
-    virtual vtkstd::string               GetFieldTypeName(int index) const;
+    virtual std::string               GetFieldTypeName(int index) const;
     virtual bool                      FieldsEqual(int index, const AttributeGroup *rhs) const;
 
     // User-defined methods

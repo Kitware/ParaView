@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-#include <vtkstd/map>
+#include <map>
 
 #ifdef MYDEBUG
 # define vtkMyDebug(x)\

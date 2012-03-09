@@ -25,11 +25,11 @@
 #include "vtkSmartPointer.h"
 
 #include <string.h>
-#include <vtkstd/list>
+#include <list>
 
 //=============================================================================
 // The static structure holding all of the registered modules.
-typedef vtkstd::list<vtkSmartPointer<vtkPVPythonModule> > vtkPVPythonModuleContainerType;
+typedef std::list<vtkSmartPointer<vtkPVPythonModule> > vtkPVPythonModuleContainerType;
 static vtkPVPythonModuleContainerType vtkPVPythonModuleRegisteredModules;
 
 void vtkPVPythonModule::RegisterModule(vtkPVPythonModule *module)

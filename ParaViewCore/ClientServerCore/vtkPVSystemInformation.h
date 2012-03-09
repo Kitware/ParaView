@@ -26,7 +26,7 @@
 #include "vtkProcessModule.h" // needed for vtkProcessModule::ProcessTypes
 #include "vtkPVInformation.h"
 #include "vtkStdString.h" // needed for vtkStdString
-#include <vtkstd/vector> // needed for vtkstd::vector
+#include <vector> // needed for std::vector
 
 class VTK_EXPORT vtkPVSystemInformation : public vtkPVInformation
 {
@@ -71,7 +71,7 @@ public:
 
   //BTX
   //  Provides access to the vector of informations.
-  const vtkstd::vector<SystemInformationType>& GetSystemInformations()
+  const std::vector<SystemInformationType>& GetSystemInformations()
     { return this->SystemInformations; }
   //ETX
 
@@ -81,7 +81,7 @@ protected:
   vtkPVSystemInformation();
   ~vtkPVSystemInformation();
 
-  vtkstd::vector<SystemInformationType> SystemInformations;
+  std::vector<SystemInformationType> SystemInformations;
 private:
   vtkPVSystemInformation(const vtkPVSystemInformation&); // Not implemented
   void operator=(const vtkPVSystemInformation&); // Not implemented

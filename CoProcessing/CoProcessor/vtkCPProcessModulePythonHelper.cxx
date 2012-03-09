@@ -26,7 +26,7 @@
 #define EXCLUDE_LOAD_ALL_FUNCTION
 #include "cppythonmodules.h"
 
-#include <vtkstd/string>
+#include <string>
 using namespace vtkstd;
 
 vtkStandardNewMacro(vtkCPProcessModulePythonHelper);

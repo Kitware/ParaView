@@ -17,8 +17,9 @@
 #include "vtkSMTestDriver.h"
 #include "vtkSMTestDriverConfig.h"
 
-#include <vtksys/SystemTools.hxx>
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/String.hxx>
+#include <vtksys/SystemTools.hxx>
 
 #include <assert.h>
 
@@ -27,6 +28,21 @@
 # include <unistd.h>
 # include <sys/wait.h>
 #endif
+namespace
+{
+  bool GetHostAndPort(
+    const std::string &output, std::string &hostname, int &port)
+    {
+    vtksys::RegularExpression regEx("Accepting connection\\(s\\): ([^:]+):([0-9]+)");
+    if (regEx.find(output))
+      {
+      hostname = regEx.match(1);
+      port = atoi(regEx.match(2).c_str());
+      return true;
+      }
+    return false;
+    }
+}
 
 // The main function as this class should only be used by this program
 int main(int argc, char* argv[])
@@ -56,11 +72,11 @@ vtkSMTestDriver::~vtkSMTestDriver()
 // now implement the vtkSMTestDriver class
 
 void vtkSMTestDriver::SeparateArguments(const char* str,
-                                     vtkstd::vector<vtkstd::string>& flags)
+                                     std::vector<std::string>& flags)
 {
-  vtkstd::string arg = str;
-  vtkstd::string::size_type pos1 = 0;
-  vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
+  std::string arg = str;
+  std::string::size_type pos1 = 0;
+  std::string::size_type pos2 = arg.find_first_of(" ;");
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
@@ -151,13 +167,13 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 }
 
 /// This adds the debug/build configuration crap for the executable on windows.
-static vtkstd::string FixExecutablePath(const vtkstd::string& path)
+static std::string FixExecutablePath(const std::string& path)
 {
 #ifdef  CMAKE_INTDIR
-  vtkstd::string parent_dir =
+  std::string parent_dir =
     vtksys::SystemTools::GetFilenamePath(path.c_str());
 
-  vtkstd::string filename =
+  std::string filename =
     vtksys::SystemTools::GetFilenameName(path);
   parent_dir += "/" CMAKE_INTDIR "/";
   return parent_dir + filename;
@@ -271,7 +287,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
 
   return 1;
 }
-
+//-----------------------------------------------------------------------------
 void
 vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
                                 const char* paraView,
@@ -401,13 +417,33 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     commandLine.push_back("--multi-clients");
     }
 
+#ifdef PV_TEST_USE_RANDOM_PORTS
+  if (!this->ReverseConnection)
+    {
+    // tell the server to pick a random port number.
+    if (type == DATA_SERVER)
+      {
+      commandLine.push_back("-dsp=0");
+      }
+    else if (type ==SERVER)
+      {
+      commandLine.push_back("-sp=0");
+      }
+    else if (type == RENDER_SERVER)
+      {
+      commandLine.push_back("-rsp=0");
+      }
+    }
+#endif
+
   commandLine.push_back(0);
 }
 
 int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name,
-  vtkstd::vector<char>& out,
-  vtkstd::vector<char>& err,
-  const char* string_to_wait_for)
+  std::vector<char>& out,
+  std::vector<char>& err,
+  const char* string_to_wait_for,
+  std::string &matched_line)
 {
   if(!server)
     {
@@ -417,12 +453,12 @@ int vtkSMTestDriver::StartProcessAndWait(vtksysProcess* server, const char* name
   vtksysProcess_SetTimeout(server, this->TimeOut);
   vtksysProcess_Execute(server);
   int foundWaiting = 0;
-  vtkstd::string output;
+  std::string output;
   while(!foundWaiting)
     {
     int pipe = this->WaitForAndPrintLine(
       name, server, output, 100.0, out, err,
-      string_to_wait_for, &foundWaiting);
+      string_to_wait_for, &foundWaiting, &matched_line);
     if(pipe == vtksysProcess_Pipe_None ||
        pipe == vtksysProcess_Pipe_Timeout)
       {
@@ -474,7 +510,7 @@ void vtkSMTestDriver::Stop(vtksysProcess* p, const char* name)
     }
 }
 
-int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output)
+int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output)
 {
   const char* possibleMPIErrors[] = {
     "error",
@@ -507,8 +543,8 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, vtkstd::string& out
     return 0;
     }
 
-  vtkstd::vector<vtkstd::string> lines;
-  vtkstd::vector<vtkstd::string>::iterator it;
+  std::vector<std::string> lines;
+  std::vector<std::string>::iterator it;
   vtksys::SystemTools::Split(output.c_str(), lines);
 
   int i, j;
@@ -560,11 +596,11 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // For example: "killall -9 rsh paraview;"
   if(strlen(PV_TEST_INIT_COMMAND) > 0)
     {
-    vtkstd::vector<vtksys::String> commands = vtksys::SystemTools::SplitString(
+    std::vector<vtksys::String> commands = vtksys::SystemTools::SplitString(
       PV_TEST_INIT_COMMAND, ';');
     for (unsigned int cc=0; cc < commands.size(); cc++)
       {
-      vtkstd::string command = commands[cc];
+      std::string command = commands[cc];
       if (command.size() > 0)
         {
         system(command.c_str());
@@ -594,7 +630,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // Allocate process managers.
   vtksysProcess* renderServer = 0;
   vtksysProcess* server = 0;
-  vtkstd::vector<vtksysProcess*> clients;
+  std::vector<vtksysProcess*> clients;
   if(this->TestRenderServer)
     {
     renderServer = vtksysProcess_New();
@@ -611,7 +647,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     if(!server)
       {
       VTK_CLEAN_PROCESSES;
-      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the server.\n";
+      cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the server (or dataserver).\n";
       return 1;
       }
     }
@@ -628,84 +664,41 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     clients.push_back(client);
     }
 
-  vtkstd::vector<char> ClientStdOut;
-  vtkstd::vector<char> ClientStdErr;
-  vtkstd::vector<char> ServerStdOut;
-  vtkstd::vector<char> ServerStdErr;
-  vtkstd::vector<char> RenderServerStdOut;
-  vtkstd::vector<char> RenderServerStdErr;
+  std::vector<char> ClientStdOut;
+  std::vector<char> ClientStdErr;
+  std::vector<char> ServerStdOut;
+  std::vector<char> ServerStdErr;
+  std::vector<char> RenderServerStdOut;
+  std::vector<char> RenderServerStdErr;
 
-  // Construct the render server process command line
-  vtksys_stl::vector<const char*> renderServerCommand;
-  if(renderServer)
+  if (this->ReverseConnection)
     {
-    this->CreateCommandLine(renderServerCommand,
-                            this->RenderServerExecutable.c_str(),
-                            RENDER_SERVER,
-                            this->MPIRenderServerNumProcessFlag.c_str());
-    this->ReportCommand(&renderServerCommand[0], "renderserver");
-    vtksysProcess_SetCommand(renderServer, &renderServerCommand[0]);
-    vtksysProcess_SetWorkingDirectory(renderServer,
-      this->GetDirectory(this->RenderServerExecutable).c_str());
-    }
-
-  vtksys_stl::vector<const char*> serverCommand;
-  if(server)
-    {
-    const char* serverExe = this->ServerExecutable.c_str();
-    vtkSMTestDriver::ProcessType serverType = SERVER;
-    if(this->TestRenderServer)
-      {
-      serverExe = this->DataServerExecutable.c_str();
-      serverType = DATA_SERVER;
-      }
-
-
-    this->CreateCommandLine(serverCommand,
-                            serverExe,
-                            serverType,
-                            this->MPIServerNumProcessFlag.c_str());
-    this->ReportCommand(&serverCommand[0], "server");
-    vtksysProcess_SetCommand(server, &serverCommand[0]);
-    vtksysProcess_SetWorkingDirectory(server, this->GetDirectory(serverExe).c_str());
-    }
-
-  // Construct the client process command line.
-  for (size_t cc=0; cc < this->ClientExecutables.size(); cc++)
-    {
-    const ClientExecutableInfo &info = this->ClientExecutables[cc];
-
-    vtksys_stl::vector<const char*> clientCommand;
-    const char* pv = info.ClientExecutable.c_str();
-    this->CreateCommandLine(clientCommand,
-                            pv,
-                            CLIENT,
-                            "",
-                            info.ArgStart, info.ArgEnd, argv);
-    this->ReportCommand(&clientCommand[0], "client");
-    vtksysProcess_SetCommand(clients[cc], &clientCommand[0]);
-    vtksysProcess_SetWorkingDirectory(clients[cc], this->GetDirectory(pv).c_str());
-    }
-
-  // Kill the processes if they are taking too long.
-  if(this->ReverseConnection)
-    {
+    // FIXME: NEED TO FIX REVERSE CONNECTION TESTS
+    // reverse connection is not supported with multiple clients.
     assert(clients.size() == 1);
-    if(!this->StartProcessAndWait(clients[0], "client",
-                          ClientStdOut, ClientStdErr, "Waiting"))
+
+    std::string connection_info;
+    this->SetupClient(clients[0], this->ClientExecutables[0], argv);
+    if (!this->StartProcessAndWait(clients[0], "client",
+                          ClientStdOut, ClientStdErr, "Waiting",
+                          connection_info))
       {
       cerr << "vtkSMTestDriver: Reverse connection client never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
       }
+
     // Now run the server
+    this->SetupServer(server);
     if(!this->StartProcess(server, "server"))
       {
       this->Stop(clients[0], "client");
       VTK_CLEAN_PROCESSES;
       return -1;
       }
+
     // Now run the render server
+    this->SetupRenderServer(renderServer);
     if(!this->StartProcess(renderServer, "renderserver"))
       {
       this->Stop(clients[0], "client");
@@ -716,22 +709,52 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     }
   else
     {
-    // Start the render server if there is one
+    // Start the render server if there is one.
+    std::string rs_connection_info;
+    this->SetupRenderServer(renderServer);
     if(!this->StartProcessAndWait(renderServer, "renderserver",
-        RenderServerStdOut, RenderServerStdErr, "Waiting"))
+        RenderServerStdOut, RenderServerStdErr, "Accepting connection(s):",
+        rs_connection_info))
       {
       cerr << "vtkSMTestDriver: Render server never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
       }
-    // Start the data server if there is one
-    if(!this->StartProcessAndWait(server, "server",
-        ServerStdOut, ServerStdErr, "Waiting"))
+
+    // Start the data server if there is one.
+    std::string s_connection_info;
+    this->SetupServer(server);
+    if(!this->StartProcessAndWait(server, renderServer? "dataserver": "server",
+        ServerStdOut, ServerStdErr, "Accepting connection(s):",
+        s_connection_info))
       {
       this->Stop(renderServer, "renderserver");
       cerr << "vtkSMTestDriver: Server never started.\n";
       VTK_CLEAN_PROCESSES;
       return -1;
+      }
+
+    // before launching the clients, we need to identify the host and port for
+    // the server processes so we can tell the client.
+    if (renderServer && server)
+      {
+      std::string rs_host("localhost"), ds_host("localhost");
+      int rs_port(22221), ds_port(11111);
+      GetHostAndPort(rs_connection_info, rs_host, rs_port);
+      GetHostAndPort(s_connection_info, ds_host, ds_port);
+      vtksys_ios::ostringstream stream;
+      stream << "-url=cdsrs://" << ds_host.c_str() << ":" << ds_port
+        << "/" << rs_host.c_str() << ":" << rs_port;
+      this->ServerURL = stream.str();
+      }
+    else if (server)
+      {
+      std::string host("localhost");
+      int port(11111);
+      GetHostAndPort(s_connection_info, host, port);
+      vtksys_ios::ostringstream stream;
+      stream << "-url=cs://" << host.c_str() << ":" << port;
+      this->ServerURL = stream.str();
       }
 
     // Now run the client(s).
@@ -743,8 +766,11 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
         {
         client_name << cc;
         }
+
+      std::string output_to_ignore;
+      this->SetupClient(clients[cc], this->ClientExecutables[cc], argv);
       if (!this->StartProcessAndWait(clients[cc], client_name.str().c_str(),
-          ClientStdOut, ClientStdErr, "started"))
+          ClientStdOut, ClientStdErr, "started", output_to_ignore))
         {
         this->Stop(server, "server");
         this->Stop(renderServer, "renderserver");
@@ -756,9 +782,9 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
 
   // Report the output of the processes.
   int clientPipe = 1;
-  vtkstd::string output;
+  std::string output;
   int mpiError = 0;
-  vtkstd::vector<int> client_pipe_status;
+  std::vector<int> client_pipe_status;
   client_pipe_status.resize(clients.size(), 1);
   while(clientPipe)
     {
@@ -958,14 +984,14 @@ int vtkSMTestDriver::ReportStatus(vtksysProcess* process, const char* name)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMTestDriver::WaitForLine(vtksysProcess* process, vtkstd::string& line,
+int vtkSMTestDriver::WaitForLine(vtksysProcess* process, std::string& line,
                               double timeout,
-                              vtkstd::vector<char>& out,
-                              vtkstd::vector<char>& err)
+                              std::vector<char>& out,
+                              std::vector<char>& err)
 {
   line = "";
-  vtkstd::vector<char>::iterator outiter = out.begin();
-  vtkstd::vector<char>::iterator erriter = err.begin();
+  std::vector<char>::iterator outiter = out.begin();
+  std::vector<char>::iterator erriter = err.begin();
   while(1)
     {
     // Check for a newline in stdout.
@@ -1026,14 +1052,14 @@ int vtkSMTestDriver::WaitForLine(vtksysProcess* process, vtkstd::string& line,
     else if(pipe == vtksysProcess_Pipe_STDOUT)
       {
       // Append to the stdout buffer.
-      vtkstd::vector<char>::size_type size = out.size();
+      std::vector<char>::size_type size = out.size();
       out.insert(out.end(), data, data+length);
       outiter = out.begin()+size;
       }
     else if(pipe == vtksysProcess_Pipe_STDERR)
       {
       // Append to the stderr buffer.
-      vtkstd::vector<char>::size_type size = err.size();
+      std::vector<char>::size_type size = err.size();
       err.insert(err.end(), data, data+length);
       erriter = err.begin()+size;
       }
@@ -1077,11 +1103,12 @@ void vtkSMTestDriver::PrintLine(const char* pname, const char* line)
 
 //----------------------------------------------------------------------------
 int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* process,
-                                      vtkstd::string& line, double timeout,
-                                      vtkstd::vector<char>& out,
-                                      vtkstd::vector<char>& err,
+                                      std::string& line, double timeout,
+                                      std::vector<char>& out,
+                                      std::vector<char>& err,
                                       const char* string_to_wait_for,
-                                      int* foundWaiting)
+                                      int* foundWaiting,
+                                      std::string* matched_line/*=NULL*/)
 {
   int pipe = this->WaitForLine(process, line, timeout, out, err);
   if(pipe == vtksysProcess_Pipe_STDOUT || pipe == vtksysProcess_Pipe_STDERR)
@@ -1090,13 +1117,91 @@ int vtkSMTestDriver::WaitForAndPrintLine(const char* pname, vtksysProcess* proce
     if (foundWaiting && string_to_wait_for && (line.find(string_to_wait_for) != line.npos))
       {
       *foundWaiting = 1;
+      if (matched_line)
+        {
+        *matched_line = line;
+        }
       }
     }
   return pipe;
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string vtkSMTestDriver::GetDirectory(vtkstd::string location)
+bool vtkSMTestDriver::SetupRenderServer(vtksysProcess* renderServer)
+{
+  // Construct the render server process command line
+  if(renderServer)
+    {
+    vtksys_stl::vector<const char*> renderServerCommand;
+    this->CreateCommandLine(renderServerCommand,
+      this->RenderServerExecutable.c_str(),
+      RENDER_SERVER,
+      this->MPIRenderServerNumProcessFlag.c_str());
+    this->ReportCommand(&renderServerCommand[0], "renderserver");
+    vtksysProcess_SetCommand(renderServer, &renderServerCommand[0]);
+    vtksysProcess_SetWorkingDirectory(renderServer,
+      this->GetDirectory(this->RenderServerExecutable).c_str());
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTestDriver::SetupServer(vtksysProcess* server)
+{
+  if (server)
+    {
+    vtksys_stl::vector<const char*> serverCommand;
+    const char* serverExe = this->ServerExecutable.c_str();
+    vtkSMTestDriver::ProcessType serverType = SERVER;
+    if(this->TestRenderServer)
+      {
+      serverExe = this->DataServerExecutable.c_str();
+      serverType = DATA_SERVER;
+      }
+
+    this->CreateCommandLine(serverCommand,
+      serverExe,
+      serverType,
+      this->MPIServerNumProcessFlag.c_str());
+    this->ReportCommand(&serverCommand[0], "server");
+    vtksysProcess_SetCommand(server, &serverCommand[0]);
+    vtksysProcess_SetWorkingDirectory(server, this->GetDirectory(serverExe).c_str());
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMTestDriver::SetupClient(
+  vtksysProcess* process, const ClientExecutableInfo& info, char* argv[])
+{
+  if (process)
+    {
+    vtksys_stl::vector<const char*> clientCommand;
+    this->CreateCommandLine(clientCommand,
+      info.ClientExecutable.c_str(),
+      CLIENT,
+      "",
+      info.ArgStart, info.ArgEnd, argv);
+    if (!this->ReverseConnection && !this->ServerURL.empty())
+      {
+      // push-back server url, if present.
+      clientCommand.pop_back(); // since the list is NULL terminated.
+      clientCommand.push_back(this->ServerURL.c_str());
+      clientCommand.push_back(NULL);
+      }
+    this->ReportCommand(&clientCommand[0], "client");
+    vtksysProcess_SetCommand(process, &clientCommand[0]);
+    vtksysProcess_SetWorkingDirectory(process, this->GetDirectory(
+        info.ClientExecutable.c_str()).c_str());
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkSMTestDriver::GetDirectory(std::string location)
 {
   return vtksys::SystemTools::GetParentDirectory(location.c_str());
 }

@@ -28,10 +28,10 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMWriterProxy.h"
 
-#include <vtkstd/list>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include <vtkstd/vector>
+#include <list>
+#include <set>
+#include <string>
+#include <vector>
 #include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
@@ -41,10 +41,10 @@ class vtkSMWriterFactory::vtkInternals
 public:
   struct vtkValue
     {
-    vtkstd::string Group;
-    vtkstd::string Name;
-    vtkstd::set<vtkstd::string> Extensions;
-    vtkstd::string Description;
+    std::string Group;
+    std::string Name;
+    std::set<std::string> Extensions;
+    std::string Description;
 
     bool FillInformation(vtkSMSession* session)
       {
@@ -66,7 +66,7 @@ public:
       const char* exts = rfHint->GetAttribute("extensions");
       if (exts)
         {
-        vtkstd::vector<vtkstd::string> exts_v;
+        std::vector<std::string> exts_v;
         vtksys::SystemTools::Split(exts, exts_v,' ');
         this->Extensions.insert(exts_v.begin(), exts_v.end());
         }
@@ -142,9 +142,9 @@ public:
       }
     };
 
-  typedef vtkstd::list<vtkValue> PrototypesType;
+  typedef std::list<vtkValue> PrototypesType;
   PrototypesType Prototypes;
-  vtkstd::string SupportedFileTypes;
+  std::string SupportedFileTypes;
 };
 
 vtkStandardNewMacro(vtkSMWriterFactory);
@@ -223,7 +223,7 @@ void vtkSMWriterFactory::RegisterPrototype(
     }
   if (extensions)
     {
-    vtkstd::vector<vtkstd::string> exts_v;
+    std::vector<std::string> exts_v;
     vtksys::SystemTools::Split(extensions, exts_v , ' ');
     value.Extensions.clear();
     value.Extensions.insert(exts_v.begin(), exts_v.end());
@@ -328,13 +328,13 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
     return NULL;
     }
 
-  vtkstd::string extension =
+  std::string extension =
     vtksys::SystemTools::GetFilenameExtension(filename);
   if (extension.size() > 0)
     {
     // Find characters after last "."
-    vtkstd::string::size_type found = extension.find_last_of(".");
-    if (found != vtkstd::string::npos)
+    std::string::size_type found = extension.find_last_of(".");
+    if (found != std::string::npos)
       {
       extension = extension.substr(found+1);
       }
@@ -376,12 +376,12 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
 }
 
 //----------------------------------------------------------------------------
-static vtkstd::string vtkJoin(
-  const vtkstd::set<vtkstd::string> exts, const char* prefix,
+static std::string vtkJoin(
+  const std::set<std::string> exts, const char* prefix,
   const char* suffix)
 {
   vtksys_ios::ostringstream stream;
-  vtkstd::set<vtkstd::string>::const_iterator iter;
+  std::set<std::string>::const_iterator iter;
   for (iter = exts.begin(); iter != exts.end(); ++iter)
     {
     stream << prefix << *iter << suffix;
@@ -393,7 +393,7 @@ static vtkstd::string vtkJoin(
 const char* vtkSMWriterFactory::GetSupportedFileTypes(
   vtkSMSourceProxy* source, unsigned int outputport)
 {
-  vtkstd::set<vtkstd::string> sorted_types;
+  std::set<std::string> sorted_types;
 
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
@@ -405,7 +405,7 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
       iter->FillInformation(source->GetSession());
       if (iter->Extensions.size() > 0)
         {
-        vtkstd::string ext_join = ::vtkJoin(iter->Extensions, "*.", " ");
+        std::string ext_join = ::vtkJoin(iter->Extensions, "*.", " ");
         vtksys_ios::ostringstream stream;
         stream << iter->Description << "(" << ext_join << ")";
         sorted_types.insert(stream.str());
@@ -414,7 +414,7 @@ const char* vtkSMWriterFactory::GetSupportedFileTypes(
     }
   
   vtksys_ios::ostringstream all_types;
-  vtkstd::set<vtkstd::string>::iterator iter2;
+  std::set<std::string>::iterator iter2;
   for (iter2 = sorted_types.begin(); iter2 != sorted_types.end(); ++iter2)
     {
     if (iter2 != sorted_types.begin())

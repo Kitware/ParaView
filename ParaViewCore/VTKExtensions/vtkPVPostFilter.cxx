@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
 #include "vtkDataObjectTypes.h"
+#include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkInformationStringVectorKey.h"
@@ -33,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVPostFilterExecutive.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
+#include <string>
 #include <assert.h>
 #include <set>
 #include <sstream>
@@ -41,10 +42,10 @@ PURPOSE.  See the above copyright notice for more information.
 namespace
 {
   // Demangles a mangled string containing an array name and a component name.
-  void DeMangleArrayName(const vtkstd::string &mangledName,
+  void DeMangleArrayName(const std::string &mangledName,
                          vtkDataSet *dataSet,
-                         vtkstd::string &demangledName,
-                         vtkstd::string &demangledComponentName)
+                         std::string &demangledName,
+                         std::string &demangledComponentName)
     {
     std::vector<vtkDataSetAttributes *> attributesArray;
     attributesArray.push_back(dataSet->GetCellData());
@@ -69,16 +70,17 @@ namespace
             {
             // the mangled name is just the array name
             demangledName = mangledName;
-            demangledComponentName = vtkstd::string();
+            demangledComponentName = std::string();
             return;
             }
           else if(mangledName.size() > arrayNameLength + 1)
             {
             vtkAbstractArray *array = dataSetAttributes->GetAbstractArray(arrayIndex);
-            size_t componentCount = array->GetNumberOfComponents();
+            int componentCount = array->GetNumberOfComponents();
 
             // check the for a matching component name
-            for(size_t componentIndex = 0; componentIndex < componentCount; componentIndex++)
+            //has to be from -1 as -1 represents the Magnitude component
+            for(int componentIndex = -1; componentIndex < componentCount; componentIndex++)
               {
               vtkStdString componentNameString;
               const char *componentName = array->GetComponentName(componentIndex);
@@ -114,7 +116,7 @@ namespace
 
     // return original name
     demangledName = mangledName;
-    demangledComponentName = vtkstd::string();
+    demangledComponentName = std::string();
     }
 }
 
@@ -166,7 +168,7 @@ vtkStdString vtkPVPostFilter::DefaultComponentName(int componentNumber, int comp
     }
   else
     {
-    vtkstd::ostringstream buffer;
+    std::ostringstream buffer;
     buffer << componentNumber;
     return buffer.str();
     }
@@ -305,7 +307,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
       vtkDataSet* dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (dataset)
         {
-        vtkstd::string demangled_name, demagled_component_name;
+        std::string demangled_name, demagled_component_name;
         DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
 
         this->DoAnyNeededConversions(dataset, name, fieldAssociation,
@@ -320,7 +322,7 @@ int vtkPVPostFilter::DoAnyNeededConversions(vtkDataObject* output)
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
     if (dataset)
       {
-      vtkstd::string demangled_name, demagled_component_name;
+      std::string demangled_name, demagled_component_name;
       DeMangleArrayName(name, dataset, demangled_name, demagled_component_name);
 
       return this->DoAnyNeededConversions(dataset,
@@ -439,8 +441,8 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
 //----------------------------------------------------------------------------
 namespace
 {
-  template <class T>
-  void CopyComponent(T* outIter, T* inIter, int compNo)
+  template <class T, class U>
+  void CopyComponent(T* outIter, U* inIter, int compNo)
     {
     vtkDataArray* inDa = vtkDataArray::SafeDownCast(inIter->GetArray());
     vtkIdType numTuples = inIter->GetNumberOfTuples();
@@ -473,73 +475,109 @@ namespace
         }
       }
     }
+
+  template <>
+  void CopyComponent(vtkArrayIteratorTemplate<double>* /*outIter*/,
+                     vtkArrayIteratorTemplate<vtkStdString>* /*inIter*/,
+                     int /*compNo*/)
+    {
+    //Because the vtkTemplateMacro is coded to attempt to call
+    //the function with each use case, we have to handle the string to double
+    //conversion, which in reality should never happen. So for know we
+    //are leaving it empty
+    }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVPostFilter::ExtractComponent(vtkDataSetAttributes* dsa,
   const char* requested_name, const char* demangled_name,
-  const char* demagled_component_name)
+  const char* demangled_component_name)
 {
   vtkAbstractArray* array = dsa->GetAbstractArray(demangled_name);
-  assert(array != NULL && demangled_name && demagled_component_name);
+  assert(array != NULL && demangled_name && demangled_component_name);
 
   int cIndex = -1;
+  bool found = false;
   // demagled_component_name can be a real component name OR
   // X,Y,Z for the first 3 components OR
   // 0,...N i.e. an integer for the index OR
   // Magnitude to indicate vector magnitude.
   // Now to the trick is to decide what way this particular request has been
   // made.
-  for (int cc=0; cc < array->GetNumberOfComponents(); cc++)
+
+  //First pass is to match the demangled name to a component name
+  //Component names take highest priority so if somebody named component 4 to be "1"
+  //that should match before resorting to using atoi
+  for (int cc=0; cc < array->GetNumberOfComponents() && array->HasAComponentName(); cc++)
     {
     const char* comp_name = array->GetComponentName(cc);
-    if (comp_name && strcmp(comp_name, demagled_component_name) == 0)
+    if (comp_name && strcmp(comp_name, demangled_component_name) == 0)
       {
       cIndex = cc;
+      found = true;
       break;
       }
     }
-  if (cIndex == -1)
+
+  //if we still haven't found a match we will check the component agianst the
+  //the default names.
+  int numComps = array->GetNumberOfComponents();
+  //compare agianst cIndex to only run this if component names didn't match
+  for(int i=-1; i < numComps && cIndex == -1;i++)
     {
-    const char* default_names[3];
-    default_names[0] = "x";
-    default_names[1] = "y";
-    default_names[2] = "z";
-    for (int cc=0; cc < 3; cc++)
+    vtkStdString defaultName = vtkPVPostFilter::DefaultComponentName(i,numComps);
+    if(vtksys::SystemTools::Strucmp(
+         defaultName.c_str(),demangled_component_name) == 0)
       {
-      if (vtksys::SystemTools::Strucmp(demagled_component_name, default_names[cc]) == 0)
-        {
-        cIndex = cc;
-        break;
-        }
-      }
-    }
-  if (cIndex == -1)
-    {
-    if (vtksys::SystemTools::Strucmp(demagled_component_name, "Magnitude") == 0)
-      {
-      // -1 implies magnitude.
-      }
-    else
-      {
-      cIndex = atoi(demagled_component_name);
+      cIndex = i;
+      found = true;
+      break;
       }
     }
 
-  vtkAbstractArray* newArray = array->NewInstance();
+  //None of the component names or default names matched so we
+  //go onto doing a pure conversion of the string to integer and using that.
+  if(!found)
+    {
+    cIndex = atoi(demangled_component_name);
+    }
+
+  //when we compute the magnitude we must place
+  //the result in a double array, since we don't the size of the
+  //resulting data.
+  bool isMagnitude = (cIndex == -1);
+  vtkAbstractArray* newArray = isMagnitude ? vtkDoubleArray::New() :
+                                                array->NewInstance();
+
   newArray->SetNumberOfComponents(1);
   newArray->SetNumberOfTuples(array->GetNumberOfTuples());
   newArray->SetName(requested_name);
 
   vtkArrayIterator* inIter = array->NewIterator();
   vtkArrayIterator* outIter = newArray->NewIterator();
-  switch (array->GetDataType())
+
+
+  if(isMagnitude)
     {
-    vtkArrayIteratorTemplateMacro(
-      ::CopyComponent(static_cast<VTK_TT*>(outIter),
-        static_cast<VTK_TT*>(inIter), cIndex);
-    );
+    switch (array->GetDataType())
+      {
+      vtkArrayIteratorTemplateMacro(
+        ::CopyComponent(static_cast< vtkArrayIteratorTemplate<double>* >(outIter),
+          static_cast<VTK_TT*>(inIter), cIndex);
+      );
+      }
     }
+  else
+    {
+    switch (array->GetDataType())
+      {
+      vtkArrayIteratorTemplateMacro(
+        ::CopyComponent(static_cast<VTK_TT*>(outIter),
+          static_cast<VTK_TT*>(inIter), cIndex);
+      );
+      }
+    }
+
   inIter->Delete();
   outIter->Delete();
   dsa->AddArray(newArray);

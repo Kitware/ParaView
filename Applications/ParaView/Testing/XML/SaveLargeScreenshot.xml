@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ElevationFilter" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="PlotAttributes" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/SplitVertical" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/SplitVertical" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar" command="mousePress" arguments="1,1,0,148,7" />
+  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/TitleBar" command="mouseRelease" arguments="1,0,0,148,7" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveScreenshot" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/selectedViewOnly" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/width" command="set_string" arguments="900" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/height" command="set_string" arguments="900" />
+  <pqevent object="pqClientMainWindow/SaveSnapshotDialog/ok" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
+  <pqevent object="pqClientMainWindow/FileSaveScreenshotDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/SaveLargeScreenshot.png" />
+</pqevents>

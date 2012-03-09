@@ -160,6 +160,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # Make
   "warning: jobserver unavailable"
 
+  # libtool
+  libtool: install: warning:
+
   # MPL
   "WARNING: Could not find .freetype2. headers in any"
 
@@ -169,6 +172,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Modules.audioop.c.*warning C4018"
   "Modules._multiprocessing.*warning"
   # Python - Linux
+  "PyArg_ParseTuple. is an unrecognized format function type"
   "dist.py.*UserWarning.*licence.*distribution option is deprecated"
   "Objects.unicodeobject.c.*warning:.*differ in signedness"
   "[Ii]nclude.(string|unicodeobject).h.*note: expected ‘const char *’ but argument is of type ‘unsigned char *’"

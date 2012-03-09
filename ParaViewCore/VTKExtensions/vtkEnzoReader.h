@@ -46,7 +46,7 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
-#include <vtkstd/vector> // STL Header
+#include <vector> // STL Header
 
 class    vtkDataSet;
 class    vtkPolyData;
@@ -348,7 +348,7 @@ protected:
   char         * FileName;
   
 //BTX
-  vtkstd::vector<int> BlockMap;
+  std::vector<int> BlockMap;
 //ETX
   virtual void GenerateBlockMap();
                             

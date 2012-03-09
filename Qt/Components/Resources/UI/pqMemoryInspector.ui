@@ -73,7 +73,10 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="summary">
+    <widget class="QTextEdit" name="summary">
+     <property name="readOnly">
+       <bool>true</bool>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
