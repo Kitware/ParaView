@@ -50,7 +50,6 @@ public:
   virtual ~vtkVRInteractorStyle();
   virtual bool handleEvent(const vtkVREventData& data);
   virtual bool update();
-  virtual bool render();
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
 

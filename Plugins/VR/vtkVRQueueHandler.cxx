@@ -40,7 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRStyleGrabNUpdateMatrix.h"
 #include "vtkVRStyleGrabNRotateSliceNormal.h"
 #include "vtkVRStyleGrabNTranslateSliceOrigin.h"
+#include "vtkSMRenderViewProxy.h"
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
+#include "pqView.h"
 
 #include <QList>
 #include <QPointer>
@@ -138,18 +141,26 @@ void vtkVRQueueHandler::processEvents()
       }
     }
 
-  // Triggers render for each objects that need to render. Typically only one
-  // object handles render without passing it forward.
-  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
-    {
-    if (style && style->render())
-      {
-      break;
-      }
-    }
+  this->render();
 
   // since timer is single-shot we start it again.
   this->Internals->Timer.start();
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueueHandler::render()
+{
+  vtkSMRenderViewProxy *proxy =0;
+  pqView *view = 0;
+  view = pqActiveObjects::instance().activeView();
+  if ( view )
+    {
+    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( proxy )
+      {
+      proxy->StillRender();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -174,16 +174,6 @@ bool vtkVRInteractorStyle::update()
   return false;
 }
 
-// -----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::render()
-{
-  if(this->OutProxy)
-    {
-    ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
-    }
-  return false;
-}
-
 // ----------------------------------------------------------------------------
 bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
 {
