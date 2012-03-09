@@ -120,6 +120,8 @@ void vtkVRQueueHandler::processEvents()
   Q_ASSERT(this->Internals->Queue != NULL);
   QQueue<vtkVREventData> events;
   this->Internals->Queue->tryDequeue(events);
+
+  // Loop through the event queue and pass events to InteractorStyles
   while (!events.isEmpty())
     {
     vtkVREventData data = events.dequeue();
@@ -131,6 +133,7 @@ void vtkVRQueueHandler::processEvents()
         }
       }
     }
+
   // There should be an explicit update for each handler. Otherwise the server
   // side updates will not happen
   foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
