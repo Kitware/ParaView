@@ -75,8 +75,13 @@ protected:
   // Actual rendering implementation.
   virtual void Render(bool interactive);
 
-  void SendImageToRenderServers();
-  void ReceiveImageToFromClient();
+  // Description:
+  // Callbacks called when the primary "renderer" in the vtkContextView
+  // starts/ends rendering. Note that this is called on the renderer, hence
+  // before the rendering cleanup calls like SwapBuffers called by the
+  // render-window.
+  void OnStartRender();
+  void OnEndRender();
 
   vtkContextView* ContextView;
   vtkRenderWindow* RenderWindow;
