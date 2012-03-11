@@ -24,10 +24,11 @@
 #include "vtkPointData.h"
 #include "vtkPVPostFilter.h"
 
+#include <algorithm>
+#include <assert.h>
 #include <set>
 #include <string>
 #include <vtksys/ios/sstream>
-#include <assert.h>
 
 namespace
 {
