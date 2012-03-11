@@ -32,7 +32,7 @@
 class vtkAnnotationLink;
 class vtkBlockDeliveryPreprocessor;
 class vtkClientServerMoveData;
-class vtkContextNamedOptions;
+class vtkChartNamedOptions;
 class vtkPVCacheKeeper;
 class vtkPVContextView;
 class vtkReductionFilter;
@@ -49,7 +49,7 @@ public:
   // Description:
   // Set the options object. This must be done before any other state is
   // updated.
-  void SetOptions(vtkContextNamedOptions*);
+  virtual void SetOptions(vtkChartNamedOptions*);
 
   // Description:
   // Set visibility of the representation.
@@ -131,7 +131,7 @@ protected:
   vtkReductionFilter* ReductionFilter;
   vtkClientServerMoveData* DeliveryFilter;
   vtkWeakPointer<vtkPVContextView> ContextView;
-  vtkContextNamedOptions* Options;
+  vtkChartNamedOptions* Options;
 
   vtkSelectionDeliveryFilter* SelectionDeliveryFilter;
 

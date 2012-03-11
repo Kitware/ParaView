@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 #include "pqDataRepresentation.h"
-#include "pqParallelCoordinatesSettingsModel.h"
+#include "pqChartSeriesSettingsModel.h"
 
 #include <assert.h>
 
@@ -85,7 +85,7 @@ public:
     }
 
   vtkWeakPointer<vtkSMParallelCoordinatesRepresentationProxy> ChartRepresentation;
-  pqParallelCoordinatesSettingsModel* SettingsModel;
+  pqChartSeriesSettingsModel* SettingsModel;
   pqComboBoxDomain* XAxisArrayDomain;
   pqSignalAdaptorComboBox* XAxisArrayAdaptor;
   pqPropertyLinks Links;
@@ -102,7 +102,7 @@ pqParallelCoordinatesChartDisplayPanel::pqParallelCoordinatesChartDisplayPanel(
   this->Internal = new pqParallelCoordinatesChartDisplayPanel::pqInternal();
   this->Internal->setupUi(this);
 
-  this->Internal->SettingsModel = new pqParallelCoordinatesSettingsModel(this);
+  this->Internal->SettingsModel = new pqChartSeriesSettingsModel(this);
   this->Internal->SeriesList->setModel(this->Internal->SettingsModel);
 
   QObject::connect(

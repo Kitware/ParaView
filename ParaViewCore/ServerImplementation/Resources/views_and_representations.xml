@@ -3653,7 +3653,7 @@
       <SubProxy>
         <Proxy name="PlotOptions"
           proxygroup="options"
-          proxyname="PlotOptionsBase">
+          proxyname="XYPlotOptions">
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
@@ -3777,28 +3777,6 @@
           </RequiredProperties>
        </CompositeTreeDomain>
       </IntVectorProperty>
-
-      <StringVectorProperty name="SeriesVisibilityInfo"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of visibility for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesVisibility"
-        command="SetSeriesVisibility"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        repeat_command="1"
-        information_property="SeriesVisibilityInfo" >
-        <Documentation>
-          Set the series visibility.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="LineThicknessInfo"
         number_of_elements_per_command="1"
         information_only="1">
@@ -3838,28 +3816,6 @@
           Set the series line style.
         </Documentation>
       </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesLabelInfo"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of labels for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesLabel"
-        command="SetLabel"
-        number_of_elements_per_command="2"
-        element_types="2 2"
-        repeat_command="1"
-        information_property="LabelInfo">
-        <Documentation>
-          Set the series labels.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="ColorInfo"
         number_of_elements_per_command="3"
         information_only="1">
@@ -3906,6 +3862,19 @@
           Internal property. Please don't touch this.
         </Documentation>
       </InputProperty>
+
+      <SubProxy>
+        <Proxy name="PlotOptions"
+          proxygroup="options"
+          proxyname="PlotOptionsBase">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="Label" exposed_name="SeriesLabel" />
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
+        </ExposedProperties>
+      </SubProxy>
 
     </ParallelCoordinatesRepresentationProxy>
 
@@ -4001,49 +3970,6 @@
           </RequiredProperties>
        </CompositeTreeDomain>
       </IntVectorProperty>
-
-      <StringVectorProperty name="SeriesVisibilityInfo"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of visibility for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesVisibility"
-        command="SetSeriesVisibility"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        repeat_command="1"
-        information_property="SeriesVisibilityInfo" >
-        <Documentation>
-          Set the series visibility.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesLabelInfo"
-        number_of_elements_per_command="2"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of labels for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="SeriesLabel"
-        command="SetSeriesLabel"
-        number_of_elements_per_command="2"
-        element_types="2 2"
-        repeat_command="1"
-        information_property="LabelInfo">
-        <Documentation>
-          Set the series labels.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="SeriesNamesInfo"
         number_of_elements_per_command="1"
         element_types="2"
@@ -4136,15 +4062,9 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
-          <Property name="Color" exposed_name="SeriesColor" />
           <Property name="Label" exposed_name="SeriesLabel" />
-          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
-          <Property name="PlotCorner" exposed_name="SeriesPlotCorner" />
-
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
-          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
-          <Property name="PlotCornerInfo" exposed_name="SeriesPlotCornerInfo" />
+          <Property name="LabelInfo" exposed_name="SeriesLabelInfo" />
         </ExposedProperties>
       </SubProxy>
 

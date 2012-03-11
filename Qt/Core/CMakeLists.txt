@@ -46,6 +46,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqApplicationCore.h
   pqBrandPluginsLoader.h
   pqChartRepresentation.h
+  pqChartSeriesSettingsModel.h
   pqContextView.h
   pqCollaborationEventPlayer.h
   pqCollaborationManager.h
@@ -79,7 +80,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindowAdapter.h
   pqOutputPort.h
   pqParallelCoordinatesChartView.h
-  pqParallelCoordinatesSettingsModel.h
   pqPickHelper.h
   pqPipelineSource.h
   pqPipelineFilter.h
@@ -174,6 +174,8 @@ VTK_ADD_LIBRARY(pqCore
   pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
+  pqChartSeriesSettingsModel.cxx
+  pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.cxx
   pqCollaborationEventPlayer.h
   pqCollaborationManager.cxx
@@ -255,8 +257,6 @@ VTK_ADD_LIBRARY(pqCore
   pqOutputWindow.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
-  pqParallelCoordinatesSettingsModel.cxx
-  pqParallelCoordinatesSettingsModel.h
   pqPickHelper.cxx
   pqPickHelper.h
   pqPipelineFilter.cxx

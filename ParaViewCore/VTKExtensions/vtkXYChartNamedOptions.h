@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkContextNamedOptions.h
+  Module:    vtkXYChartNamedOptions.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,23 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkContextNamedOptions
+// .NAME vtkXYChartNamedOptions
 // .SECTION Description
 //
 
-#ifndef __vtkContextNamedOptions_h
-#define __vtkContextNamedOptions_h
+#ifndef __vtkXYChartNamedOptions_h
+#define __vtkXYChartNamedOptions_h
 
-#include "vtkObject.h"
+#include "vtkChartNamedOptions.h"
 
-class vtkChart;
-class vtkTable;
-
-class VTK_EXPORT vtkContextNamedOptions : public vtkObject
+class VTK_EXPORT vtkXYChartNamedOptions : public vtkChartNamedOptions
 {
 public:
-  static vtkContextNamedOptions* New();
-  vtkTypeMacro(vtkContextNamedOptions, vtkObject);
+  static vtkXYChartNamedOptions* New();
+  vtkTypeMacro(vtkXYChartNamedOptions, vtkChartNamedOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -74,50 +71,34 @@ public:
   // Uses the enum from vtkChart.
   int GetChartType();
 
-// This BTX is here because currently vtkCharts is not client-server wrapped.
-//BTX
-  // Description:
-  // Sets the internal chart object whose options will be manipulated.
-  void SetChart(vtkChart* chart);
-  vtkChart * GetChart();
-//ETX
-
-
-  // Description:
-  // Sets the internal table object that can be plotted.
-  void SetTable(vtkTable* table);
-  vtkTable* GetTable();
-
   void RemovePlotsFromChart();
 
 //BTX
   // Description:
-  // Class for storing individual series properties like color, label, line thickness...
+  // Class for storing individual series properties like color, label, line
+  // thickness...
   class PlotInfo;
-//ETX
 
-//BTX
 protected:
-  vtkContextNamedOptions();
-  ~vtkContextNamedOptions();
+  vtkXYChartNamedOptions();
+  ~vtkXYChartNamedOptions();
 
   // Description:
   // Initializes the plots map, and adds a default series to plot
   void RefreshPlots();
 
+private:
+  vtkXYChartNamedOptions(const vtkXYChartNamedOptions&); // Not implemented
+  void operator=(const vtkXYChartNamedOptions&); // Not implemented
+
   // Description:
   // If the plot exists this will set its visibility.  If the plot does not yet
   // exist and visible is true then the plot will be created.  The series name
   // is passed to this method so it can be used to initialize the vtkPlot if needed.
-  void SetPlotVisibilityInternal(PlotInfo& info, bool visible, const char* seriesName);
-
+  void SetPlotVisibilityInternal(PlotInfo& info, bool visible,
+                                 const char* seriesName);
   PlotInfo& GetPlotInfo(const char* seriesName);
 
-private:
-  vtkContextNamedOptions(const vtkContextNamedOptions&); // Not implemented
-  void operator=(const vtkContextNamedOptions&); // Not implemented
-
-  vtkTimeStamp RefreshTime;
   class vtkInternals;
   vtkInternals* Internals;
 //ETX

@@ -31,7 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqPlotMatrixDisplayPanel.h"
+#include "pqChartSeriesSettingsModel.h"
 #include "pqDataRepresentation.h"
+#include "pqSignalAdaptors.h"
 #include "vtkSMProxy.h"
 
 #include "ui_pqPlotMatrixDisplayPanel.h"
@@ -42,8 +44,9 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
   Ui::pqPlotMatrixDisplayPanel ui;
   ui.setupUi(this);
 
-  this->SettingsModel = new pqPlotSettingsModel(this);
-  this->SettingsModel->setRepresentation(qobject_cast<pqDataRepresentation*>(representation));
+  this->SettingsModel = new pqChartSeriesSettingsModel(this);
+  pqDataRepresentation* dispRep = qobject_cast<pqDataRepresentation*>(representation);
+  this->SettingsModel->setRepresentation(dispRep);
   ui.Series->setModel(this->SettingsModel);
   ui.Series->setAcceptDrops(true);
   ui.Series->setDragEnabled(true);
@@ -116,18 +119,14 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
                    SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                    this,
                    SLOT(dataChanged(QModelIndex, QModelIndex)));
+  QObject::connect(this->SettingsModel, SIGNAL(redrawChart()),
+    this, SLOT(updateAllViews()));
 
-  QObject::connect(ui.Series->header(),
-                   SIGNAL(checkStateChanged()),
-                   this,
-                   SLOT(headerCheckStateChanged()));
+  QObject::connect(dispRep, SIGNAL(dataUpdated()), this, SLOT(reloadSeries()));
+  this->reloadSeries();
 }
 
 pqPlotMatrixDisplayPanel::~pqPlotMatrixDisplayPanel()
-{
-}
-
-void pqPlotMatrixDisplayPanel::headerCheckStateChanged()
 {
 }
 
@@ -136,4 +135,10 @@ void pqPlotMatrixDisplayPanel::dataChanged(QModelIndex topLeft, QModelIndex bott
   Q_UNUSED(topLeft);
   Q_UNUSED(bottomRight);
   this->Representation->renderViewEventually();
+}
+//-----------------------------------------------------------------------------
+void pqPlotMatrixDisplayPanel::reloadSeries()
+{
+  this->updateAllViews();
+  this->SettingsModel->reload();
 }

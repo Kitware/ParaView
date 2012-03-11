@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkContextNamedOptions.cxx
+  Module:    vtkXYChartNamedOptions.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkContextNamedOptions.h"
+#include "vtkXYChartNamedOptions.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkStringList.h"
@@ -25,15 +25,15 @@
 #include "vtkColorSeries.h"
 #include "vtkStdString.h"
 #include "vtkWeakPointer.h"
-#include "vtkSmartPointer.h"
+#include "vtkNew.h"
 
-#include "map"
-#include "vtksys/ios/sstream"
+#include <map>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 // Class to store information about each plot.
 // A PlotInfo is created for each column in the vtkTable
-class vtkContextNamedOptions::PlotInfo
+class vtkXYChartNamedOptions::PlotInfo
 {
 public:
   vtkWeakPointer<vtkPlot> Plot;
@@ -73,114 +73,68 @@ public:
     this->Color[2] = p.Color[2];
     this->Plot = p.Plot;
     }
-
 };
 
-typedef std::map<std::string, vtkContextNamedOptions::PlotInfo > PlotMapType;
+typedef std::map<std::string, vtkXYChartNamedOptions::PlotInfo > PlotMapType;
 typedef PlotMapType::iterator PlotMapIterator;
 
 //----------------------------------------------------------------------------
-class vtkContextNamedOptions::vtkInternals
+class vtkXYChartNamedOptions::vtkInternals
 {
 public:
   vtkInternals()
   {
-    this->Colors = vtkSmartPointer<vtkColorSeries>::New();
     this->UseIndexForXAxis = true;
-    this->ChartType = vtkChart::LINE;
-    this->TableVisibility = false;
   }
 
   PlotMapType PlotMap;
   std::string XSeriesName;
   bool UseIndexForXAxis;
-  int ChartType;
-  bool TableVisibility;
 
   vtkWeakPointer<vtkChart> Chart;
   vtkWeakPointer<vtkTable> Table;
-  vtkSmartPointer<vtkColorSeries> Colors;
+  vtkNew<vtkColorSeries> Colors;
 };
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkContextNamedOptions);
+vtkStandardNewMacro(vtkXYChartNamedOptions);
 
 //----------------------------------------------------------------------------
-vtkContextNamedOptions::vtkContextNamedOptions()
+vtkXYChartNamedOptions::vtkXYChartNamedOptions()
 {
+  this->ChartType = vtkChart::LINE;
   this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
-vtkContextNamedOptions::~vtkContextNamedOptions()
+vtkXYChartNamedOptions::~vtkXYChartNamedOptions()
 {
   delete this->Internals;
   this->Internals = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetChartType(int type)
+void vtkXYChartNamedOptions::SetChartType(int type)
 {
-  this->Internals->ChartType = type;
+  this->ChartType = type;
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetChartType()
+int vtkXYChartNamedOptions::GetChartType()
 {
-  return this->Internals->ChartType;
+  return this->ChartType;
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetChart(vtkChart* chart)
-{
-  if (this->Internals->Chart == chart)
-    {
-    return;
-    }
-  this->Internals->Chart = chart;
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-vtkChart * vtkContextNamedOptions::GetChart()
-{
-  return this->Internals->Chart;
-}
-
-//----------------------------------------------------------------------------
-vtkTable* vtkContextNamedOptions::GetTable()
-{
-  return this->Internals->Table;
-}
-
-//----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetTable(vtkTable* table)
-{
-  if (this->Internals->Table == table)
-    {
-    if (table && table->GetMTime() < this->RefreshTime)
-      {
-      return;
-      }
-    }
-
-  this->Internals->Table = table;
-  this->RefreshPlots();
-  this->SetTableVisibility(this->Internals->TableVisibility);
-  this->RefreshTime.Modified();
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-const char* vtkContextNamedOptions::GetXSeriesName()
+const char* vtkXYChartNamedOptions::GetXSeriesName()
 {
   return this->Internals->UseIndexForXAxis? NULL :
     this->Internals->XSeriesName.c_str();
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetXSeriesName(const char* name)
+void vtkXYChartNamedOptions::SetXSeriesName(const char* name)
 {
   if (!name)
     {
@@ -204,14 +158,14 @@ void vtkContextNamedOptions::SetXSeriesName(const char* name)
     }
 
   // If the X series column is changed, the range will have changed
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
-    this->Internals->Chart->RecalculateBounds();
+    this->Chart->RecalculateBounds();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetUseIndexForXAxis(bool useIndex)
+void vtkXYChartNamedOptions::SetUseIndexForXAxis(bool useIndex)
 {
   this->Internals->UseIndexForXAxis = useIndex;
   // Now update the plots to use the X series specified
@@ -226,9 +180,9 @@ void vtkContextNamedOptions::SetUseIndexForXAxis(bool useIndex)
     }
 
   // If the X series column is changed, the range will have changed
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
-    this->Internals->Chart->RecalculateBounds();
+    this->Chart->RecalculateBounds();
     }
 }
 
@@ -236,7 +190,7 @@ void vtkContextNamedOptions::SetUseIndexForXAxis(bool useIndex)
 
 namespace {
 // Helper method to set color on PlotInfo
-void SetPlotInfoColor(vtkContextNamedOptions::PlotInfo& plotInfo, vtkColor3ub color)
+void SetPlotInfoColor(vtkXYChartNamedOptions::PlotInfo& plotInfo, vtkColor3ub color)
 {
   plotInfo.Color[0] = color.GetData()[0]/255.0;
   plotInfo.Color[1] = color.GetData()[1]/255.0;
@@ -247,9 +201,9 @@ void SetPlotInfoColor(vtkContextNamedOptions::PlotInfo& plotInfo, vtkColor3ub co
 
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::RefreshPlots()
+void vtkXYChartNamedOptions::RefreshPlots()
 {
-  if (!this->Internals->Table)
+  if (!this->Table)
     {
     return;
     }
@@ -263,11 +217,11 @@ void vtkContextNamedOptions::RefreshPlots()
     }
 
   // For each series (column in the table)
-  const vtkIdType numberOfColumns = this->Internals->Table->GetNumberOfColumns();
+  const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();
   for (vtkIdType i = 0; i < numberOfColumns; ++i)
     {
     // Get the series name
-    const char* seriesName = this->Internals->Table->GetColumnName(i);
+    const char* seriesName = this->Table->GetColumnName(i);
     if (!seriesName || !seriesName[0])
       {
       continue;
@@ -290,7 +244,7 @@ void vtkContextNamedOptions::RefreshPlots()
     }
 
   // Now we need to prune old series (table columns that were removed)
-  if (this->Internals->Chart)
+  if (this->Chart)
     {
     PlotMapIterator it = this->Internals->PlotMap.begin();
     for ( ; it != this->Internals->PlotMap.end(); ++it)
@@ -299,7 +253,7 @@ void vtkContextNamedOptions::RefreshPlots()
       // the vtkTable then lets remove it from the chart
       if (it->second.Plot && newMap.find(it->first) == newMap.end())
         {
-        this->Internals->Chart->RemovePlotInstance(it->second.Plot);
+        this->Chart->RemovePlotInstance(it->second.Plot);
         }
       }
     }
@@ -308,9 +262,9 @@ void vtkContextNamedOptions::RefreshPlots()
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::RemovePlotsFromChart()
+void vtkXYChartNamedOptions::RemovePlotsFromChart()
 {
-  if (!this->Internals->Chart)
+  if (!this->Chart)
     {
     return;
     }
@@ -323,13 +277,13 @@ void vtkContextNamedOptions::RemovePlotsFromChart()
       {
       vtkPlot* plot = plotInfo.Plot;
       plotInfo.Plot = 0; // clear the weak pointer before destroying the plot
-      this->Internals->Chart->RemovePlotInstance(plot);
+      this->Chart->RemovePlotInstance(plot);
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
+void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
                                                        bool visible,
                                                        const char* seriesName)
 {
@@ -337,10 +291,10 @@ void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
     {
     plotInfo.Plot->SetVisible(static_cast<bool>(visible));
     }
-  else if (this->Internals->Chart && this->Internals->Table && visible)
+  else if (this->Chart && this->Table && visible)
     {
     // Create a new vtkPlot and initialize it
-    vtkPlot *plot = this->Internals->Chart->AddPlot(this->Internals->ChartType);
+    vtkPlot *plot = this->Chart->AddPlot(this->ChartType);
     if (plot)
       {
       plotInfo.Plot = plot;
@@ -356,7 +310,7 @@ void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         line->SetMarkerStyle(plotInfo.MarkerStyle);
         }
       plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      plot->SetInput(this->Internals->Table,
+      plot->SetInput(this->Table,
                       this->Internals->XSeriesName.c_str(),
                       seriesName);
       }
@@ -364,8 +318,8 @@ void vtkContextNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
 }
 
 //----------------------------------------------------------------------------
-vtkContextNamedOptions::PlotInfo&
-vtkContextNamedOptions::GetPlotInfo(const char* seriesName)
+vtkXYChartNamedOptions::PlotInfo&
+vtkXYChartNamedOptions::GetPlotInfo(const char* seriesName)
 {
   PlotMapIterator it = this->Internals->PlotMap.find(seriesName);
   if (it != this->Internals->PlotMap.end())
@@ -381,9 +335,9 @@ vtkContextNamedOptions::GetPlotInfo(const char* seriesName)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetTableVisibility(bool visible)
+void vtkXYChartNamedOptions::SetTableVisibility(bool visible)
 {
-  this->Internals->TableVisibility = visible;
+  this->TableVisibility = visible;
 
   for (PlotMapIterator it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
@@ -395,7 +349,7 @@ void vtkContextNamedOptions::SetTableVisibility(bool visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetVisibility(const char* name, int visible)
+void vtkXYChartNamedOptions::SetVisibility(const char* name, int visible)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible;
@@ -404,7 +358,7 @@ void vtkContextNamedOptions::SetVisibility(const char* name, int visible)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetLineThickness(const char* name,
+void vtkXYChartNamedOptions::SetLineThickness(const char* name,
                                                      int value)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
@@ -416,7 +370,7 @@ void vtkContextNamedOptions::SetLineThickness(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetLineStyle(const char* name, int style)
+void vtkXYChartNamedOptions::SetLineStyle(const char* name, int style)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.LineStyle = style;
@@ -427,7 +381,7 @@ void vtkContextNamedOptions::SetLineStyle(const char* name, int style)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetColor(const char* name,
+void vtkXYChartNamedOptions::SetColor(const char* name,
                                              double r, double g, double b)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
@@ -442,13 +396,13 @@ void vtkContextNamedOptions::SetColor(const char* name,
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetAxisCorner(const char* name, int value)
+void vtkXYChartNamedOptions::SetAxisCorner(const char* name, int value)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Corner = value;
-  if (plotInfo.Plot && this->Internals->Chart)
+  if (plotInfo.Plot && this->Chart)
     {
-    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Internals->Chart);
+    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Chart);
     if (chart)
       {
       chart->SetPlotCorner(plotInfo.Plot, value);
@@ -457,7 +411,7 @@ void vtkContextNamedOptions::SetAxisCorner(const char* name, int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetMarkerStyle(const char* name, int style)
+void vtkXYChartNamedOptions::SetMarkerStyle(const char* name, int style)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.MarkerStyle = style;
@@ -471,7 +425,7 @@ void vtkContextNamedOptions::SetMarkerStyle(const char* name, int style)
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::SetLabel(const char* name,
+void vtkXYChartNamedOptions::SetLabel(const char* name,
                                              const char* label)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
@@ -483,49 +437,49 @@ void vtkContextNamedOptions::SetLabel(const char* name,
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetVisibility(const char* name)
+int vtkXYChartNamedOptions::GetVisibility(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.Visible? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkContextNamedOptions::GetLabel(const char* name)
+const char* vtkXYChartNamedOptions::GetLabel(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.Label.c_str();
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetLineThickness(const char* name)
+int vtkXYChartNamedOptions::GetLineThickness(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.LineThickness;
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetLineStyle(const char* name)
+int vtkXYChartNamedOptions::GetLineStyle(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.LineStyle;
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetMarkerStyle(const char* name)
+int vtkXYChartNamedOptions::GetMarkerStyle(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.MarkerStyle;
 }
 
 //----------------------------------------------------------------------------
-int vtkContextNamedOptions::GetAxisCorner(const char* name)
+int vtkXYChartNamedOptions::GetAxisCorner(const char* name)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   return plotInfo.Corner;
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::GetColor(const char* name, double rgb[3])
+void vtkXYChartNamedOptions::GetColor(const char* name, double rgb[3])
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   rgb[0] = plotInfo.Color[0];
@@ -534,7 +488,7 @@ void vtkContextNamedOptions::GetColor(const char* name, double rgb[3])
 }
 
 //----------------------------------------------------------------------------
-void vtkContextNamedOptions::PrintSelf(ostream& os, vtkIndent indent)
+void vtkXYChartNamedOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
