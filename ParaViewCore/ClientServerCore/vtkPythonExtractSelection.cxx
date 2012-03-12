@@ -105,7 +105,7 @@ int vtkPythonExtractSelection::RequestDataObject(
         {
         vtkDataObject* newOutput =
           vtkDataObjectTypes::NewDataObject(outputType);
-        newOutput->SetPipelineInformation(info);
+        info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
         newOutput->Delete();
         this->GetOutputPortInformation(0)->Set(
           vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
