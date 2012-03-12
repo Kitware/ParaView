@@ -141,6 +141,9 @@ public:
   // Should this run print the version numbers and exit.
   vtkGetMacro(TellVersion, int);
 
+  /// Provides access to server-url if specified on the command line.
+  vtkGetStringMacro(ServerURL);
+
 protected:
 //BTX
   // Description:
@@ -185,6 +188,10 @@ protected:
 
   vtkSetStringMacro(ServerHostName);
   char* ServerHostName;
+
+  //server URL information
+  vtkSetStringMacro(ServerURL);
+  char* ServerURL;
 
   // Port information
   int ServerPort;
