@@ -3,6 +3,10 @@ from paraview import servermanager
 
 import time
 
+# Make sure the test driver know that process has properly started
+print "Process started"
+errors = 0
+
 #-------------------- Helpers methods ----------------
 def getHost(url):
    return url.split(':')[1][2:]
@@ -40,6 +44,7 @@ print "====> Found plugin path: ", plugin_path
 
 # Test if the built-in connection is here
 if (len(servermanager.MultiServerConnections) != 1):
+  errors += 1
   print "Error pvpython should be connected to a built-in session. Currently connected to ", servermanager.MultiServerConnections
 
 url = available_server_urls[0]
@@ -48,6 +53,7 @@ server1_connection = Connect(getHost(url), getPort(url))
 
 # Test that we have one more connection
 if (len(servermanager.MultiServerConnections) != 2):
+  errors += 1
   print "Error pvpython should be connected to a built-in session + one remote one. Currently connected to ", servermanager.MultiServerConnections
 
 url = available_server_urls[1]
@@ -56,27 +62,32 @@ server2_connection = Connect(getHost(url), getPort(url))
 
 # Test that we have one more connection
 if (len(servermanager.MultiServerConnections) != 3):
+  errors += 1
   print "Error pvpython should be connected to a built-in session + two remote one. Currently connected to ", servermanager.MultiServerConnections
 
 print "Available connections: ", servermanager.MultiServerConnections
 
 # Test that last created connection is the active one
 if ( servermanager.ActiveConnection != server2_connection):
+  errors += 1
   print "Error Invalid active connection. Expected ", server2_connection, " and got ", servermanager.ActiveConnection
 
 # Test that switchActiveConnection is working as expected
 switchActiveConnection(server1_connection, globals())
 if ( servermanager.ActiveConnection != server1_connection):
+  errors += 1
   print "Error Invalid active connection. Expected ", server1_connection, " and got ", servermanager.ActiveConnection
 
 # Test that switchActiveConnection is working as expected
 switchActiveConnection(built_in_connection, globals())
 if ( servermanager.ActiveConnection != built_in_connection):
+  errors += 1
   print "Error Invalid active connection. Expected ", built_in_connection, " and got ", servermanager.ActiveConnection
 
 # Test that switchActiveConnection is working as expected
 switchActiveConnection(server2_connection, globals())
 if ( servermanager.ActiveConnection != server2_connection):
+  errors += 1
   print "Error Invalid active connection. Expected ", server2_connection, " and got ", servermanager.ActiveConnection
 
 
@@ -91,6 +102,7 @@ pacMan_s2 = PacMan()
 switchActiveConnection(server1_connection, globals())
 try:
   pacMan_s1 = PacMan()
+  errors += 1
   print "Error: PacMan should not be available on Server1"
 except NameError:
   print "OK: PacMan is not available on server1"
@@ -102,6 +114,7 @@ switchActiveConnection(server1_connection)
 # Create PacMan ==> This should fail
 try:
   pacMan_s1 = PacMan()
+  errors += 1
   print "Error: PacMan should not be available on Server1"
 except RuntimeError:
   print "OK: PacMan is not available on server1"
@@ -111,6 +124,7 @@ switchActiveConnection(server2_connection, globals())
 switchActiveConnection(built_in_connection, globals())
 try:
   pacMan_builtin = PacMan()
+  errors += 1
   print "Error: PacMan should not be available on built-in"
 except NameError:
   print "OK: PacMan is not available on built-in"
@@ -126,6 +140,7 @@ print "After loading the plugin locally in built-in, the PacMan definition is av
 switchActiveConnection(server1_connection, globals())
 try:
   pacMan_s1 = PacMan()
+  errors += 1
   print "Error: PacMan should not be available on Server1"
 except NameError:
   print "OK: PacMan is still not available on server1"
@@ -137,3 +152,6 @@ Disconnect()
 print "Available connections after disconnect: ", servermanager.MultiServerConnections
 Disconnect()
 print "Available connections after disconnect: ", servermanager.MultiServerConnections
+
+if errors > 0:
+  raise RuntimeError, "An error occured during the execution"
