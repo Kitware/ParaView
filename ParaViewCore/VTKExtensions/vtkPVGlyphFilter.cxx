@@ -416,7 +416,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 
       //Accumulate the results.
       tmpOut->ShallowCopy(output);
-      append->AddInputData(tmpOut);
+      append->AddInputData(tmpOut.GetPointer());
 
       // Call FastDelete() instead of Delete() to avoid garbage
       // collection checks. This improves the preformance significantly
