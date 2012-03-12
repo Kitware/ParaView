@@ -19,7 +19,7 @@ ENDMACRO (process_args)
 
 
 #Determine how many tests are to be grouped.
-SET (TEST_GROUP_SIZE 1)
+SET (TEST_GROUP_SIZE 3)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
   PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND" "" ${ARGN})
