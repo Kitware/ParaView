@@ -17,9 +17,9 @@
 #include "vtkAnnotationLink.h"
 #include "vtkBlockDeliveryPreprocessor.h"
 #include "vtkChart.h"
+#include "vtkChartNamedOptions.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCommand.h"
-#include "vtkChartNamedOptions.h"
 #include "vtkContextView.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -68,6 +68,8 @@ vtkChartRepresentation::vtkChartRepresentation()
   this->DeliveryFilter->SetOutputDataType(VTK_TABLE);
 
   this->SelectionDeliveryFilter = vtkSelectionDeliveryFilter::New();
+  
+  this->EnableServerSideRendering = false;
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +84,20 @@ vtkChartRepresentation::~vtkChartRepresentation()
   this->DeliveryFilter->Delete();
 
   this->SelectionDeliveryFilter->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkChartRepresentation::ProcessViewRequest(vtkInformationRequestKey* request,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (request == vtkPVView::REQUEST_UPDATE())
+    {
+    this->EnableServerSideRendering =
+      (inInfo->Has(vtkPVContextView::ENABLE_SERVER_SIDE_RENDERING()) &&
+      inInfo->Get(vtkPVContextView::ENABLE_SERVER_SIDE_RENDERING()) == 1);
+    }
+
+  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
 }
 
 //----------------------------------------------------------------------------
@@ -163,6 +179,11 @@ int vtkChartRepresentation::RequestUpdateExtent(vtkInformation* request,
 //----------------------------------------------------------------------------
 vtkTable* vtkChartRepresentation::GetLocalOutput()
 {
+  if (this->LocalOutput)
+    {
+    return this->LocalOutput;
+    }
+
   return vtkTable::SafeDownCast(this->DeliveryFilter->GetOutputDataObject(0));
 }
 
@@ -179,6 +200,12 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
   this->DeliveryFilter->Modified();
   this->SelectionDeliveryFilter->Modified();
 
+  // remove the "cached" delivered data.
+  if (this->LocalOutput)
+    {
+    this->LocalOutput->Initialize();
+    }
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -189,6 +216,32 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
       this->GetInternalOutputPort(0));
     this->Preprocessor->Update();
     this->DeliveryFilter->SetInputConnection(this->ReductionFilter->GetOutputPort());
+    this->ReductionFilter->Update();
+    if (this->EnableServerSideRendering)
+      {
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+      int myId = pm->GetPartitionId();
+      int numProcs = pm->GetNumberOfLocalPartitions();
+
+      // Due to the way vtkChartNamedOptions works with vtkPlot, we need to
+      // ensure that the vtkTable instance is "updated" and not replaced
+      // otherwise the new vtkTable is not propagated to the plot correctly.
+      if (this->LocalOutput == NULL)
+        {
+        this->LocalOutput = vtkSmartPointer<vtkTable>::New();
+        }
+      if (myId == 0)
+        {
+        // clone the output of reduction filter on all satellites.
+        this->LocalOutput->ShallowCopy(
+          this->ReductionFilter->GetOutputDataObject(0));
+        }
+      if (numProcs > 1)
+        {
+        pm->GetGlobalController()->Broadcast(this->LocalOutput, 0);
+        }
+      }
     }
   else
     {
@@ -208,6 +261,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
 
   this->DeliveryFilter->Update();
   this->SelectionDeliveryFilter->Update();
+
 
   if (this->Options)
     {

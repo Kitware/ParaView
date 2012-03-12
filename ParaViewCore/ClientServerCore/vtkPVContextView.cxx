@@ -18,15 +18,11 @@
 #include "vtkCommand.h"
 #include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
-#include "vtkExtractVOI.h"
-#include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVOptions.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -35,9 +31,8 @@
 #include "vtkTileDisplayHelper.h"
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkWindowToImageFilter.h"
 
+vtkInformationKeyMacro(vtkPVContextView, ENABLE_SERVER_SIDE_RENDERING, Integer);
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
 {
@@ -149,6 +144,12 @@ void vtkPVContextView::Update()
       }
     }
 
+  this->RequestInformation->Remove(ENABLE_SERVER_SIDE_RENDERING());
+  if (this->InTileDisplayMode())
+    {
+    this->RequestInformation->Set(ENABLE_SERVER_SIDE_RENDERING(), 1);
+    }
+
   int size;
   stream >> size;
   for (int cc=0; cc < size; cc++)
@@ -212,9 +213,6 @@ void vtkPVContextView::OnEndRender()
     }
 
   // this code needs to be called on only server-nodes in tile-display mode.
-
-  vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier);
-
   vtkSynchronizedRenderers::vtkRawImage image;
   image.Capture(this->ContextView->GetRenderer());
   //image.SaveAsPNG("/tmp/foo.png");

@@ -28,6 +28,7 @@
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
 class vtkAnnotationLink;
 class vtkBlockDeliveryPreprocessor;
@@ -75,6 +76,12 @@ public:
   // have any real-input on the client side which messes with the Update
   // requests.
   virtual void MarkModified();
+
+  // Description:
+  // Overridden to get the status for the ENABLE_SERVER_SIDE_RENDERING() flag
+  // during REQUEST_UPDATE() pass.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
 
   // *************************************************************************
   // Forwarded to vtkBlockDeliveryPreprocessor.
@@ -124,7 +131,7 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  virtual vtkTable* GetLocalOutput();
+  vtkTable* GetLocalOutput();
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
@@ -136,6 +143,10 @@ protected:
   vtkSelectionDeliveryFilter* SelectionDeliveryFilter;
 
   vtkAnnotationLink* AnnLink;
+
+  bool EnableServerSideRendering;
+  vtkSmartPointer<vtkTable> LocalOutput;
+
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented
   void operator=(const vtkChartRepresentation&); // Not implemented
