@@ -26,7 +26,7 @@ def findInSubdirectory(filename, subdirectory=''):
         path = os.getcwd()
     for root, dirs, names in os.walk(path):
         for name in names:
-           if name.find(filename) > -1:
+           if (name.find(filename) > -1) and ( (name.find('.dll') > -1) or (name.find('.so') > -1) or (name.find('.dylib') > -1)):
               return os.path.join(root, name)
     raise 'File not found'
 #--------------------
