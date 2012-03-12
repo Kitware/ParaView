@@ -596,7 +596,7 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
   for (size_t __kk=0; __kk < this->NumberOfServers; __kk++)\
     {\
     if(!renderServers.empty()) vtksysProcess_Delete(renderServers[__kk]); \
-    vtksysProcess_Delete(servers[__kk]); \
+    if(!servers.empty()) vtksysProcess_Delete(servers[__kk]); \
     }
 
 //----------------------------------------------------------------------------
