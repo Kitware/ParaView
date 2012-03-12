@@ -135,8 +135,8 @@ int vtkPVExtractSelection::RequestData(
     vtkSelection *localSel = sel->NewInstance();
     localSel->ShallowCopy(sel);
 
-    pythonExtractSelection->SetInputConnection(0, localInputDO->GetProducerPort());
-    pythonExtractSelection->SetSelectionConnection(localSel->GetProducerPort());
+    pythonExtractSelection->SetInputData(0, localInputDO);
+    pythonExtractSelection->SetInputData(1, localSel);
 
     pythonExtractSelection->Update();
 
