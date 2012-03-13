@@ -21,6 +21,7 @@
 #define __vtkPVXYChartView_h
 
 #include "vtkPVContextView.h"
+#include "vtkAxis.h" //for enums.
 
 class vtkChart;
 class vtkChartView;
@@ -144,18 +145,26 @@ public:
   void SetAxisLabelPrecision(int index, int precision);
 
   // Description:
-  // Sets the behavior for the given axis, 0 - best fit, 1 - fixed, 2 - custom.
-  // These methods should not be called directly. They are made public only so
-  // that the client-server-stream-interpreter can invoke them. Use the
-  // corresponding properties to change these values.
-  void SetAxisBehavior(int index, int behavior);
-
-  // Description:
-  // Sets the range for the given axis.
-  // These methods should not be called directly. They are made public only so
-  // that the client-server-stream-interpreter can invoke them. Use the
-  // corresponding properties to change these values.
-  void SetAxisRange(int index, double minimum, double maximum);
+  // For axis ranges, ParaView overrides the VTK charts behavior. Instead of
+  // letting the user choose the behavior, we only have 2 modes, if any range is
+  // set, then the range is always used. If no range is set, then alone we let
+  // the chart determine the range.
+  void SetLeftAxisRange(double minimum, double maximum)
+    { this->SetAxisRange(vtkAxis::LEFT, minimum, maximum); }
+  void SetRightAxisRange(double minimum, double maximum)
+    { this->SetAxisRange(vtkAxis::RIGHT, minimum, maximum); }
+  void SetTopAxisRange(double minimum, double maximum)
+    { this->SetAxisRange(vtkAxis::TOP, minimum, maximum); }
+  void SetBottomAxisRange(double minimum, double maximum)
+    { this->SetAxisRange(vtkAxis::BOTTOM, minimum, maximum); }
+  void UnsetLeftAxisRange()
+    { this->UnsetAxisRange(vtkAxis::LEFT); }
+  void UnsetRightAxisRange()
+    { this->UnsetAxisRange(vtkAxis::RIGHT); }
+  void UnsetTopAxisRange()
+    { this->UnsetAxisRange(vtkAxis::TOP); }
+  void UnsetBottomAxisRange()
+    { this->UnsetAxisRange(vtkAxis::BOTTOM); }
 
   // Description:
   // Sets whether or not the given axis uses a log10 scale.
@@ -241,6 +250,9 @@ public:
 protected:
   vtkPVXYChartView();
   ~vtkPVXYChartView();
+
+  void SetAxisRange(int index, double min, double max);
+  void UnsetAxisRange(int index);
 
   // Description:
   // Actual rendering implementation.

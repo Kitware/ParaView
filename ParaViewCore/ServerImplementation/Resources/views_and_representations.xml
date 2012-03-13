@@ -805,25 +805,52 @@
         <IntRangeDomain name="range" min="0" max="6" />
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="AxisBehavior"
-        command="SetAxisBehavior"
-        repeat_command="1"
-        use_index="1"
-        number_of_elements_per_command="1"
-        number_of_elements="4"
-        default_values="0 0 0 0">
-        <IntRangeDomain name="range" min="0" max="2" />
-      </IntVectorProperty>
+      <DoubleVectorProperty name="LeftAxisRange"
+        command="SetLeftAxisRange"
+        clean_command="UnsetLeftAxisRange"
+        ignore_synchronization="1"
+        number_of_elements="2"
+        default_values="none">
+        <Documentation>
+          Set the axis range for the Left axis. Set to empty to let the chart
+          determine the range automatically.
+        </Documentation>
+      </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="AxisRange"
-        command="SetAxisRange"
-        repeat_command="1"
-        use_index="1"
-        number_of_elements_per_command="2"
-        number_of_elements="8"
-        default_values="0 1 0 1 0 1 0 1">
+      <DoubleVectorProperty name="RightAxisRange"
+        command="SetRightAxisRange"
+        clean_command="UnsetRightAxisRange"
+        ignore_synchronization="1"
+        number_of_elements="2"
+        default_values="none">
+        <Documentation>
+          Set the axis range for the Right axis. Set to empty to let the chart
+          determine the range automatically.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TopAxisRange"
+        command="SetTopAxisRange"
+        clean_command="UnsetTopAxisRange"
+        ignore_synchronization="1"
+        number_of_elements="2"
+        default_values="none">
+        <Documentation>
+          Set the axis range for the Top axis. Set to empty to let the chart
+          determine the range automatically.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BottomAxisRange"
+        command="SetBottomAxisRange"
+        clean_command="UnsetBottomAxisRange"
+        ignore_synchronization="1"
+        number_of_elements="2"
+        default_values="none">
+        <Documentation>
+          Set the axis range for the Bottom axis. Set to empty to let the chart
+          determine the range automatically.
+        </Documentation>
       </DoubleVectorProperty>
 
       <StringVectorProperty
@@ -4541,27 +4568,29 @@
         <Proxy name="RootView" proxygroup="views" proxyname="XYChartView">
         </Proxy>
         <ExposedProperties>
-          <Property name="ChartTitle"/>
-          <Property name="ChartTitleFont" />
-          <Property name="ChartTitleColor" />
-          <Property name="ChartTitleAlignment" />
-          <Property name="ShowLegend" />
-          <Property name="LegendLocation" />
-          <Property name="ShowAxis" />
-          <Property name="AxisLogScale" />
-          <Property name="ShowAxisGrid" />
           <Property name="AxisColor" />
           <Property name="AxisGridColor" />
-          <Property name="ShowAxisLabels" />
-          <Property name="AxisLabelFont" />
           <Property name="AxisLabelColor" />
+          <Property name="AxisLabelFont" />
           <Property name="AxisLabelNotation" />
           <Property name="AxisLabelPrecision" />
-          <Property name="AxisBehavior" />
-          <Property name="AxisRange" />
+          <Property name="AxisLogScale" />
           <Property name="AxisTitle" />
-          <Property name="AxisTitleFont" />
           <Property name="AxisTitleColor" />
+          <Property name="AxisTitleFont" />
+          <Property name="BottomAxisRange" />
+          <Property name="ChartTitle"/>
+          <Property name="ChartTitleAlignment" />
+          <Property name="ChartTitleColor" />
+          <Property name="ChartTitleFont" />
+          <Property name="LeftAxisRange" />
+          <Property name="LegendLocation" />
+          <Property name="RightAxisRange" />
+          <Property name="ShowAxis" />
+          <Property name="ShowAxisGrid" />
+          <Property name="ShowAxisLabels" />
+          <Property name="ShowLegend" />
+          <Property name="TopAxisRange" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -4582,26 +4611,28 @@
         <Proxy name="RootView" proxygroup="views" proxyname="XYBarChartView">
         </Proxy>
         <ExposedProperties>
-          <Property name="ChartTitle"/>
-          <Property name="ChartTitleFont" />
-          <Property name="ChartTitleColor" />
-          <Property name="ChartTitleAlignment" />
-          <Property name="ShowLegend" />
-          <Property name="ShowAxis" />
-          <Property name="AxisLogScale" />
-          <Property name="ShowAxisGrid" />
           <Property name="AxisColor" />
           <Property name="AxisGridColor" />
-          <Property name="ShowAxisLabels" />
-          <Property name="AxisLabelFont" />
           <Property name="AxisLabelColor" />
+          <Property name="AxisLabelFont" />
           <Property name="AxisLabelNotation" />
           <Property name="AxisLabelPrecision" />
-          <Property name="AxisBehavior" />
-          <Property name="AxisRange" />
+          <Property name="AxisLogScale" />
           <Property name="AxisTitle" />
-          <Property name="AxisTitleFont" />
           <Property name="AxisTitleColor" />
+          <Property name="AxisTitleFont" />
+          <Property name="BottomAxisRange" />
+          <Property name="ChartTitle"/>
+          <Property name="ChartTitleAlignment" />
+          <Property name="ChartTitleColor" />
+          <Property name="ChartTitleFont" />
+          <Property name="LeftAxisRange" />
+          <Property name="RightAxisRange" />
+          <Property name="ShowAxis" />
+          <Property name="ShowAxisGrid" />
+          <Property name="ShowAxisLabels" />
+          <Property name="ShowLegend" />
+          <Property name="TopAxisRange" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>

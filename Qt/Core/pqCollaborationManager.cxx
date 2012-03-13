@@ -268,7 +268,8 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
                 viewId));
         if(view && (this->Internals->AciveSession == server->session())) // Make sure we share the same active server
           {
-          view->SetViewBounds(range);
+          // FIXME
+          // view->SetViewBounds(range);
           }
         break;
         }
@@ -473,13 +474,14 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::attachChartViewBoundsListener(pqView* view)
 {
-  pqContextView* chartView = qobject_cast<pqContextView*>(view);
-  if(chartView)
-    {
-    QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
-                     this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
-                     Qt::UniqueConnection);
-    }
+  // FIXME:UDA
+  //pqContextView* chartView = qobject_cast<pqContextView*>(view);
+  //if(chartView)
+  //  {
+  //  QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
+  //                   this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
+  //                   Qt::UniqueConnection);
+  //  }
 }
 
 //-----------------------------------------------------------------------------
@@ -500,26 +502,27 @@ void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::sendChartViewBoundsToOtherClients()
 {
-  if(this->Internals->ContextViewBoundsToShare.size() > 0)
-    {
-    std::map<vtkTypeUInt32, ChartBounds>::iterator iter;
-    iter = this->Internals->ContextViewBoundsToShare.begin();
-    while(iter != this->Internals->ContextViewBoundsToShare.end())
-      {
-      vtkSMMessage msg;
-      msg.SetExtension(QtEvent::type, QtEvent::CHART_BOUNDS);
-      msg.SetExtension(ChartViewBounds::view, iter->first);
-      for(int i=0;i<8;i++)
-        {
-        msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
-        }
+ // FIXME:UDA
+ // if(this->Internals->ContextViewBoundsToShare.size() > 0)
+ //   {
+ //   std::map<vtkTypeUInt32, ChartBounds>::iterator iter;
+ //   iter = this->Internals->ContextViewBoundsToShare.begin();
+ //   while(iter != this->Internals->ContextViewBoundsToShare.end())
+ //     {
+ //     vtkSMMessage msg;
+ //     msg.SetExtension(QtEvent::type, QtEvent::CHART_BOUNDS);
+ //     msg.SetExtension(ChartViewBounds::view, iter->first);
+ //     for(int i=0;i<8;i++)
+ //       {
+ //       msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
+ //       }
 
-      this->activeCollaborationManager()->SendToOtherClients(&msg);
+ //     this->activeCollaborationManager()->SendToOtherClients(&msg);
 
-      // Move forward
-      iter++;
-      }
-    // Clean up stack
-    this->Internals->ContextViewBoundsToShare.clear();
-    }
+ //     // Move forward
+ //     iter++;
+ //     }
+ //   // Clean up stack
+ //   this->Internals->ContextViewBoundsToShare.clear();
+ //   }
 }

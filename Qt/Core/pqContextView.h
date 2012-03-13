@@ -93,19 +93,11 @@ public:
   /// Returns true if data on the given output port can be displayed by this view.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
-signals:
-  void viewBoundsUpdated(vtkTypeUInt32, double*);
-
 protected slots:
   virtual void initializeAfterObjectsCreated();
 
   /// Sets up the interactors correctly.
   virtual void initializeInteractors();
-
-  /// Called when view bounds dynamically change
-  /// This will
-  /// emit viewBoundsUpdated(vtkTypeUInt32 proxyId, double bounds[8]) signal.
-  virtual void onViewBoundsChange(vtkObject*, unsigned long, void*, void*);
 
 protected:
   /// Constructor:
