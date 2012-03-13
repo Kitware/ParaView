@@ -412,17 +412,9 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       // We have set all of the parameters that will be used in 
       // our overloaded IsPointVisible. Now let vktGlyph3D take over.
       newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
-      retVal = this->Superclass::RequestData(request, inputVs, outputVector);
+      retVal = this->Superclass::RequestData(request, inputVs, outputV.GetPointer());
 
-      //Accumulate the results.
-      tmpOut->ShallowCopy(output);
-      append->AddInputData(tmpOut.GetPointer());
-
-      // Call FastDelete() instead of Delete() to avoid garbage
-      // collection checks. This improves the preformance significantly
-      tmpOut->FastDelete();
-
-      // Glypher failed, so we skip the rest and fail as well.
+      // vktGlyph3D failed, so we skip the rest and fail as well.
       if (!retVal)
         {
         vtkErrorMacro("vtkGlyph3D failed.");
