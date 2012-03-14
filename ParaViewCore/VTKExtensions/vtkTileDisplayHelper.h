@@ -52,6 +52,10 @@ public:
   void EraseTile(unsigned int key);
 
   // Description:
+  // Same as EraseTile() except erases the tile for only the specified eye.
+  void EraseTile(unsigned int key, int leftEye);
+
+  // Description:
   // Flush the tiles.
   void FlushTiles(unsigned int key, int leftEye);
 

@@ -201,6 +201,8 @@ void vtkPVContextView::Render(bool vtkNotUsed(interactive))
 //----------------------------------------------------------------------------
 void vtkPVContextView::OnStartRender()
 {
+  vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier,
+    this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
 }
 
 //----------------------------------------------------------------------------
@@ -213,9 +215,6 @@ void vtkPVContextView::OnEndRender()
     }
 
   // this code needs to be called on only server-nodes in tile-display mode.
-  vtkSynchronizedRenderers::vtkRawImage image;
-  image.Capture(this->ContextView->GetRenderer());
-  //image.SaveAsPNG("/tmp/foo.png");
 
   double viewport[4];
   this->ContextView->GetRenderer()->GetViewport(viewport);
@@ -235,6 +234,14 @@ void vtkPVContextView::OnEndRender()
       vtkMultiProcessController::GetGlobalController()->GetLocalProcessId(),
       physical_viewport))
     {
+    // When tiling, vtkContextActor renders the result at the
+    // "physical_viewport" location on the window. So we grab the image only
+    // from that section of the view.
+    vtkSynchronizedRenderers::vtkRawImage image;
+    this->ContextView->GetRenderer()->SetViewport(physical_viewport);
+    image.Capture(this->ContextView->GetRenderer());
+    this->ContextView->GetRenderer()->SetViewport(viewport);
+
     vtkTileDisplayHelper::GetInstance()->SetTile(
       this->Identifier,
       physical_viewport,
@@ -244,7 +251,6 @@ void vtkPVContextView::OnEndRender()
 
   vtkTileDisplayHelper::GetInstance()->FlushTiles(this->Identifier,
     this->ContextView->GetRenderer()->GetActiveCamera()->GetLeftEye());
-
 }
 
 //----------------------------------------------------------------------------

@@ -158,6 +158,19 @@ void vtkTileDisplayHelper::EraseTile(unsigned int key)
 }
 
 //----------------------------------------------------------------------------
+void vtkTileDisplayHelper::EraseTile(unsigned int key, int leftEye)
+{
+  if (leftEye)
+    {
+    this->Internals->LeftEyeTilesMap.erase(key);
+    }
+  else
+    {
+    this->Internals->RightEyeTilesMap.erase(key);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkTileDisplayHelper::FlushTiles(unsigned int key, int leftEye)
 {
   this->Internals->FlushTiles(key,leftEye);
