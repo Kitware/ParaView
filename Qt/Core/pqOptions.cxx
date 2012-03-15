@@ -82,6 +82,7 @@ pqOptions::pqOptions()
   this->PythonScript = 0;
   this->TestMaster = 0;
   this->TestSlave = 0;
+  this->TileImagePath = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +93,7 @@ pqOptions::~pqOptions()
   this->SetServerResourceName(0);
   this->SetServerURL(0);
   this->SetPythonScript(0);
+  this->SetTileImagePath(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -102,6 +104,10 @@ void pqOptions::Initialize()
   this->AddArgument("--test-directory", NULL,
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
+
+  this->AddArgument("--tile-image-prefix", NULL,
+    &this->TileImagePath,
+    "Set the temporary directory with file name prefix for tile display image dump.");
   
   this->AddArgument("--data-directory", NULL,
     &this->DataDirectory,
