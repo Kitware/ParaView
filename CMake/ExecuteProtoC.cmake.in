@@ -19,7 +19,7 @@ else(WIN32)
   set(ENV{LD_LIBRARY_PATH} ${ld_lib_path})
 endif(WIN32)
 
-if (OutDir)
+if (OutDir AND NOT OutDir STREQUAL ".")
   set (protoc_location "@PROTOC_LOCATION_WITH_CFG@")
 else ()
   set (protoc_location "@PROTOC_LOCATION@")
