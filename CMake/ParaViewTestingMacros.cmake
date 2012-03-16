@@ -136,3 +136,26 @@ FUNCTION(add_multi_client_tests prefix)
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
+
+FUNCTION(add_multi_server_tests prefix nbServers)
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
+
+  foreach (test_script ${ACT_TEST_SCRIPTS})
+    get_filename_component(test_name ${test_script} NAME_WE)
+      set (extra_args)
+      process_args(extra_args)
+      add_test("${prefix}.${test_name}"
+          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        --test-multi-servers ${nbServers}
+        --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+        --client ${CLIENT_EXECUTABLE}
+        -dr
+        --disable-light-kit
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --test-script=${test_script}
+        ${extra_args}
+        --exit
+        )
+  endforeach(test_script)
+ENDFUNCTION(add_multi_server_tests)

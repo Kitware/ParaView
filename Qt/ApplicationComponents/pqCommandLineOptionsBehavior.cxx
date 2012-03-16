@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QDebug>
 #include <QMainWindow>
+#include <QString>
 #include <QStringList>
 #include <QTimer>
 
@@ -92,7 +93,20 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     }
   else if (server_url)
     {
-    if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
+    if(strchr(server_url, '|') != NULL)
+      {
+      // We should connect multiple times
+      QStringList urls = QString(server_url).split(QRegExp("\\|"), QString::SkipEmptyParts);
+      foreach(QString url, urls)
+        {
+        if (!pqServerConnectReaction::connectToServer(pqServerResource(url)))
+              {
+              qCritical() << "Could not connect to requested server \""
+                << url << "\". Creating default builtin connection.";
+              }
+        }
+      }
+    else if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
       {
       qCritical() << "Could not connect to requested server \"" 
         << server_url << "\". Creating default builtin connection.";
