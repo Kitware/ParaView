@@ -40,7 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRStyleGrabNUpdateMatrix.h"
 #include "vtkVRStyleGrabNRotateSliceNormal.h"
 #include "vtkVRStyleGrabNTranslateSliceOrigin.h"
+#include "vtkSMRenderViewProxy.h"
 #include "pqApplicationCore.h"
+#include "pqActiveObjects.h"
+#include "pqView.h"
 
 #include <QList>
 #include <QPointer>
@@ -117,6 +120,8 @@ void vtkVRQueueHandler::processEvents()
   Q_ASSERT(this->Internals->Queue != NULL);
   QQueue<vtkVREventData> events;
   this->Internals->Queue->tryDequeue(events);
+
+  // Loop through the event queue and pass events to InteractorStyles
   while (!events.isEmpty())
     {
     vtkVREventData data = events.dequeue();
@@ -128,6 +133,7 @@ void vtkVRQueueHandler::processEvents()
         }
       }
     }
+
   // There should be an explicit update for each handler. Otherwise the server
   // side updates will not happen
   foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
@@ -137,8 +143,27 @@ void vtkVRQueueHandler::processEvents()
       break;
       }
     }
+
+  this->render();
+
   // since timer is single-shot we start it again.
   this->Internals->Timer.start();
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueueHandler::render()
+{
+  vtkSMRenderViewProxy *proxy =0;
+  pqView *view = 0;
+  view = pqActiveObjects::instance().activeView();
+  if ( view )
+    {
+    proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( proxy )
+      {
+      proxy->StillRender();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

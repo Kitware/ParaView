@@ -118,7 +118,6 @@ void vtkVRStyleTracking::SetProperty()
 // ----------------------------------------------------------------------------
 bool vtkVRStyleTracking::update()
 {
-  this->OutProxy->UpdateVTKObjects();
-  ( ( vtkSMRenderViewProxy* )  this->OutProxy )->StillRender();
+  Superclass::update();
   return false;
 }
