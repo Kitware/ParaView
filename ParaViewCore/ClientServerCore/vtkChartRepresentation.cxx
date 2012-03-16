@@ -19,7 +19,7 @@
 #include "vtkChart.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCommand.h"
-#include "vtkContextNamedOptions.h"
+#include "vtkChartNamedOptions.h"
 #include "vtkContextView.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -32,13 +32,14 @@
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTables.h"
 #include "vtkReductionFilter.h"
+#include "vtkScatterPlotMatrix.h"
 #include "vtkSelectionDeliveryFilter.h"
 #include "vtkSelection.h"
 #include "vtkTable.h"
 
 
 vtkStandardNewMacro(vtkChartRepresentation);
-vtkCxxSetObjectMacro(vtkChartRepresentation, Options, vtkContextNamedOptions);
+vtkCxxSetObjectMacro(vtkChartRepresentation, Options, vtkChartNamedOptions);
 //----------------------------------------------------------------------------
 vtkChartRepresentation::vtkChartRepresentation()
 {
@@ -101,7 +102,15 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
   this->ContextView = chartView;
   if (this->Options)
     {
-    this->Options->SetChart(vtkChart::SafeDownCast(chartView->GetContextItem()));
+    if(vtkChart* pChart = vtkChart::SafeDownCast(chartView->GetContextItem()))
+      {
+      this->Options->SetChart(pChart);
+      }
+    else if(vtkScatterPlotMatrix* plotMatrix =
+      vtkScatterPlotMatrix::SafeDownCast(chartView->GetContextItem()))
+      {
+      this->Options->SetPlotMatrix(plotMatrix);
+      }
     this->Options->SetTableVisibility(this->GetVisibility());
     }
   return true;
@@ -120,6 +129,7 @@ bool vtkChartRepresentation::RemoveFromView(vtkView* view)
     {
     this->Options->RemovePlotsFromChart();
     this->Options->SetChart(0);
+    this->Options->SetPlotMatrix(0);
     }
   this->ContextView = 0;
   return true;
@@ -260,10 +270,9 @@ int vtkChartRepresentation::GetNumberOfSeries()
 //----------------------------------------------------------------------------
 void vtkChartRepresentation::RescaleChart()
 {
-  vtkChart *chart = this->Options->GetChart();
-  if (chart)
+  if (this->Options && this->Options->GetChart())
     {
-    chart->RecalculateBounds();
+    this->Options->GetChart()->RecalculateBounds();
     }
 }
 

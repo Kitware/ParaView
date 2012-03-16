@@ -16,7 +16,7 @@
 
 #include "vtkChartXY.h"
 #include "vtkCommand.h"
-#include "vtkContextNamedOptions.h"
+#include "vtkXYChartNamedOptions.h"
 #include "vtkContextView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPlot.h"
@@ -25,7 +25,7 @@
 
 vtkStandardNewMacro(vtkXYChartRepresentation);
 //----------------------------------------------------------------------------
-vtkXYChartRepresentation::vtkXYChartRepresentation()
+vtkXYChartRepresentation::vtkXYChartRepresentation() : XYOptions(NULL)
 {
 }
 
@@ -38,6 +38,19 @@ vtkXYChartRepresentation::~vtkXYChartRepresentation()
 void vtkXYChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkXYChartRepresentation::SetOptions(vtkChartNamedOptions *options)
+{
+  vtkChartRepresentation::SetOptions(options);
+  this->XYOptions = vtkXYChartNamedOptions::SafeDownCast(options);
+  if (!this->XYOptions)
+    {
+    vtkErrorMacro(<<"Error, options is of wrong type: "
+                  << options->GetClassName()
+                  << " when it should be vtkXYChartNamedOptions.");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -56,19 +69,19 @@ vtkChartXY* vtkXYChartRepresentation::GetChart()
 //----------------------------------------------------------------------------
 const char* vtkXYChartRepresentation::GetXAxisSeriesName()
 {
-  return this->Options? this->Options->GetXSeriesName() : NULL;
+  return this->XYOptions ? this->XYOptions->GetXSeriesName() : NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetXAxisSeriesName(const char* name)
 {
-  this->Options->SetXSeriesName(name);
+  this->XYOptions->SetXSeriesName(name);
 }
 
 //----------------------------------------------------------------------------
 void vtkXYChartRepresentation::SetUseIndexForXAxis(bool useIndex)
 {
-  this->Options->SetUseIndexForXAxis(useIndex);
+  this->XYOptions->SetUseIndexForXAxis(useIndex);
 }
 
 //----------------------------------------------------------------------------
@@ -77,16 +90,16 @@ void vtkXYChartRepresentation::SetChartType(const char *type)
   // Match the string to the vtkChart enum, if no match then stick with default.
   if (strcmp(type, "Line") == 0)
     {
-    this->Options->SetChartType(vtkChart::LINE);
+    this->XYOptions->SetChartType(vtkChart::LINE);
     }
   else if (strcmp(type, "Bar") == 0)
     {
-    this->Options->SetChartType(vtkChart::BAR);
+    this->XYOptions->SetChartType(vtkChart::BAR);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkXYChartRepresentation::GetChartType()
 {
-  return this->Options->GetChartType();
+  return this->XYOptions->GetChartType();
 }
