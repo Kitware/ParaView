@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqComparativeCueWidget_h
 
 #include <QTableWidget>
-#include <QTimer>
 #include "pqComponentsExport.h"
+#include "pqTimer.h"
 #include "vtkSmartPointer.h"
 
 class vtkEventQtSlotConnect;
@@ -98,7 +98,7 @@ private:
   vtkEventQtSlotConnect* VTKConnect;
   bool InUpdateGUI;
   bool SelectionChanged;
-  QTimer IdleUpdateTimer;
+  pqTimer IdleUpdateTimer;
   QSize Size;
   vtkSmartPointer<vtkSMComparativeAnimationCueProxy> Cue;
 };

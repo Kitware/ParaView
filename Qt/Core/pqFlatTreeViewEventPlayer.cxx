@@ -117,7 +117,7 @@ bool pqFlatTreeViewEventPlayer::playEvent(QObject* Object, const QString& Comman
                    data[3],
                    !!data[4].toInt(),
                    data[5].toInt());
-      QCoreApplication::sendEvent(object, &ke);
+      qApp->notify(object, &ke);
       return true;
       }
     }
@@ -141,7 +141,7 @@ bool pqFlatTreeViewEventPlayer::playEvent(QObject* Object, const QString& Comman
       type = Command == "mouseRelease" ? QEvent::MouseButtonRelease : type;
       type = Command == "mouseDblClick" ? QEvent::MouseButtonDblClick : type;
       QMouseEvent e(type, pt, button, buttons, keym);
-      QCoreApplication::sendEvent(object->viewport(), &e);
+      qApp->notify(object->viewport(), &e);
       pqEventDispatcher::processEventsAndWait(1);
       return true;
       }

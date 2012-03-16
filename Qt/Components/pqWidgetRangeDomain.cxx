@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetRangeDomain.h"
 
 // Qt includes
-#include <QTimer>
 #include <QWidget>
 
 // VTK includes
@@ -51,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include <pqSMAdaptor.h>
+#include <pqTimer.h>
 
   
 class pqWidgetRangeDomain::pqInternal
@@ -148,7 +148,7 @@ void pqWidgetRangeDomain::domainChanged()
     }
 
   this->Internal->MarkedForUpdate = true;
-  QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
+  pqTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
 
 //-----------------------------------------------------------------------------

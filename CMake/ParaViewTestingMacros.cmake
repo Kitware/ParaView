@@ -27,6 +27,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     set (counter 0)
     set (extra_args)
     set (full_test_name)
+    set (force_serial FALSE)
+
     while (${counter} LESS ${TEST_GROUP_SIZE})
       list(LENGTH ACT_TEST_SCRIPTS num_tests)
       if (num_tests)
@@ -57,6 +59,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
       endif (DEFINED ${test_name}_BREAK)
+      if (${test_name}_FORCE_SERIAL)
+        set (force_serial TRUE)
+      endif (${test_name}_FORCE_SERIAL)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
@@ -66,6 +71,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
+      if (force_serial)
+        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
+      endif()
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -133,6 +142,10 @@ FUNCTION(add_multi_client_tests prefix)
         ${extra_args}
         --exit
         )
+      if (${test_name}_FORCE_SERIAL)
+        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+      endif (${test_name}_FORCE_SERIAL)
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)

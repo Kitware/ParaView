@@ -138,6 +138,9 @@ pqContextView::~pqContextView()
 QWidget* pqContextView::createWidget()
 {
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
+  // don't use caching for charts since the charts don't seem to render
+  // correctly when an overlapping window is present, unlike 3D views.
+  vtkwidget->setAutomaticImageCacheEnabled(false);
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setObjectName("Viewport");
   return vtkwidget;

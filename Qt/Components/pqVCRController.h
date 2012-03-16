@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QPointer>
 #include <QObject>
-#include <QTimer>
+
 class pqPipelineSource;
 class pqAnimationScene;
 

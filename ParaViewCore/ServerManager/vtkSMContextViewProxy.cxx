@@ -14,19 +14,20 @@
 =========================================================================*/
 #include "vtkSMContextViewProxy.h"
 
+#include "vtkAxis.h"
 #include "vtkChartXY.h"
+#include "vtkClientServerStream.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
+#include "vtkEventForwarderCommand.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVContextView.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMUtilities.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkAxis.h"
 #include "vtkWeakPointer.h"
-#include "vtkNew.h"
-#include "vtkEventForwarderCommand.h"
+#include "vtkWindowToImageFilter.h"
 
 //-----------------------------------------------------------------------------
 // Minimal storage class for STL containers etc.
@@ -175,36 +176,44 @@ void vtkSMContextViewProxy::ResetDisplay()
 //-----------------------------------------------------------------------------
 vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
 {
-  this->StillRender();
+  vtkRenderWindow* window = this->GetRenderWindow();
 
+  // Offscreen rendering is not functioning properly on the mac.
+  // Do not use it.
+#if !defined(__APPLE__)
+  int prevOffscreen = window->GetOffScreenRendering();
+  window->SetOffScreenRendering(1);
+#endif
+
+  window->SwapBuffersOff();
+
+  this->StillRender();
   this->GetContextView()->Render();
 
-  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(this->GetContextView()->GetRenderWindow());
+  vtkSmartPointer<vtkWindowToImageFilter> w2i =
+    vtkSmartPointer<vtkWindowToImageFilter>::New();
+  w2i->SetInput(window);
   w2i->SetMagnification(magnification);
-
-  // Use front buffer on Windows for now until we can figure out
-  // the bug with Charts when using the back buffer.
-#ifdef WIN32
-  w2i->Update();
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
-#elif defined(__APPLE__)
-  w2i->ReadFrontBufferOn();
-  w2i->ShouldRerenderOn();
-  w2i->Update();
-#else
-  // Everywhere else use back buffer.
-  w2i->ReadFrontBufferOff();
-  // ShouldRerender was turned off previously. Why? Since we told w2i to read
-  // backbuffer, shouldn't we re-render again?
-  w2i->ShouldRerenderOn();
-  w2i->Update();
+  w2i->FixBoundaryOff();
+
+  // BUG #8715: We go through this indirection since the active connection needs
+  // to be set during update since it may request re-renders if magnification >1.
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << w2i.GetPointer() << "Update"
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
+
+  window->SwapBuffersOn();
+#if !defined(__APPLE__)
+  window->SetOffScreenRendering(prevOffscreen);
 #endif
 
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
-  w2i->Delete();
+  window->Frame();
   return capture;
 }
 

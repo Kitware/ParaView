@@ -104,6 +104,10 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   pqTestUtility(p)
 {
+  // we don't want to the dispatcher to wait during event playback. We will
+  // explicitly register timers that need to be timed out.
+  pqEventDispatcher::setEventPlaybackDelay(0);
+
   // add an XML source
   this->addEventSource("xml", new pqXMLEventSource(this));
   this->addEventObserver("xml", new pqXMLEventObserver(this));
@@ -244,13 +248,19 @@ namespace pqCoreTestUtilityInternal{
   public:
     WidgetSizer(QWidget* widget, const QSize& size)
       {
-      this->OldSize = widget->size();
-      this->Widget = widget;
-      widget->resize(size);
+      if (size.isValid())
+        {
+        this->OldSize = widget->size();
+        this->Widget = widget;
+        widget->resize(size);
+        }
       }
     ~WidgetSizer()
       {
-      this->Widget->resize(this->OldSize); 
+      if (this->Widget && this->OldSize.isValid())
+        {
+        this->Widget->resize(this->OldSize);
+        }
       }
 
     };
@@ -308,9 +318,11 @@ bool pqCoreTestUtility::CompareView(
   pqView* curView,
   const QString& referenceImage,
   double threshold,
-  const QString& tempDirectory)
+  const QString& tempDirectory,
+  const QSize& size/*=QSize()*/)
 {
   Q_ASSERT(curView != NULL);
+  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->getWidget(), size);
 
   vtkImageData* test_image = curView->captureImage(1);
   if (!test_image)

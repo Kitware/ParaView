@@ -1363,6 +1363,7 @@ void pqSelectionInspectorPanel::onActiveViewChanged(pqView* view)
   this->Implementation->ActiveView = renView;
 
   // update the frustum widget.
+  // FIXME:TIMER
   QTimer::singleShot(10, this, SLOT(updateFrustum()));
 
   // Update the "Display Style" GUI since it shows the representation in the
