@@ -14,17 +14,30 @@
 =========================================================================*/
 #include "vtkPVArrayCalculator.h"
 
-#include "vtkGraph.h"
-#include "vtkDataSet.h"
 #include "vtkCellData.h"
-#include "vtkPointData.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkGraph.h"
 #include "vtkInformation.h"
-#include "vtkObjectFactory.h"
 #include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPVPostFilter.h"
 
+#include <string>
 #include <vtksys/ios/sstream>
 #include <assert.h>
+
+namespace
+{
+  template <class A, class B>
+    std::string vtkJoinToString(const A& a, const B& b)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << a << "_" << b;
+      return stream.str();
+      }
+}
 
 vtkStandardNewMacro( vtkPVArrayCalculator );
 // ----------------------------------------------------------------------------
@@ -78,17 +91,27 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
           var_name << array_name << stringSufix[i];
           this->AddScalarVariable(var_name.str().c_str(), array_name, i );
           }
-        vtksys_ios::ostringstream var_name2;
-        var_name2 << array_name << "_";
+
+        std::string var_name;
         if (array->GetComponentName(i))
           {
-          var_name2 << array->GetComponentName(i);
+          var_name = vtkJoinToString(array_name, array->GetComponentName(i));
           }
         else
           {
-          var_name2 << i;
+          var_name = vtkJoinToString(array_name,
+            vtkPVPostFilter::DefaultComponentName(i, numberComps));
           }
-        this->AddScalarVariable(var_name2.str().c_str(), array_name, i );
+        this->AddScalarVariable(var_name.c_str(), array_name, i );
+
+        // also put a <ArrayName>_<ComponetNumber> to handle past versions of
+        // vtkPVArrayCalculator when component names were not used and index was
+        // used e.g. state files prior to fixing of BUG #12951.
+        std::string default_name = vtkJoinToString(array_name, i);
+        if (var_name != default_name)
+          {
+          this->AddScalarVariable(default_name.c_str(), array_name, i );
+          }
         }
       
       if ( numberComps == 3 )
