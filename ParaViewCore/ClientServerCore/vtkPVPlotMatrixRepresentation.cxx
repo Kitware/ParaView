@@ -151,30 +151,13 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetVisibility(bool visible)
 {
+  this->Superclass::SetVisibility(visible);
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
     plotMatrix->SetVisible(visible);
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char *name, bool visible)
-{
-  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
-    {
-    plotMatrix->SetColumnVisibility(name, visible);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::SetSeriesLabel(
-  const char *vtkNotUsed(name), const char *vtkNotUsed(label))
-{
-  if(this->GetPlotMatrix())
-    {
-    // TODO
-    }
-}
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::MoveInputTableColumn(int fromCol, int toCol)
 {

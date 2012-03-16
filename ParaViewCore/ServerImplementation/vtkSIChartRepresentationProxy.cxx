@@ -15,7 +15,7 @@
 #include "vtkSIChartRepresentationProxy.h"
 
 #include "vtkChartRepresentation.h"
-#include "vtkContextNamedOptions.h"
+#include "vtkChartNamedOptions.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSIChartRepresentationProxy);
@@ -35,7 +35,7 @@ void vtkSIChartRepresentationProxy::OnCreateVTKObjects()
   vtkSIProxy* optionsProxy = this->GetSubSIProxy("PlotOptions");
   if (optionsProxy)
     {
-    vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(
+    vtkChartNamedOptions* options = vtkChartNamedOptions::SafeDownCast(
       optionsProxy->GetVTKObject());
     vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
       this->GetVTKObject());
