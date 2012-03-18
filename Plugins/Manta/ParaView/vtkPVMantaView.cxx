@@ -98,8 +98,13 @@ void vtkPVMantaView::Initialize(unsigned int id)
   this->Superclass::Initialize(id);
 
   //disable multipass rendering so mantarenderer will do old school
-  //rendering
-  this->RenderView->GetRenderer()->SetPass(NULL);
+  //rendering ( for OpenGL renderer )
+  vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast
+    (this->RenderView->GetRenderer());
+  if(glrenderer)
+    {
+    glrenderer->SetPass(NULL);
+    }
 }
 
 //----------------------------------------------------------------------------
