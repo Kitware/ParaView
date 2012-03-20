@@ -20,6 +20,8 @@ ExternalProject_Add(HDF5
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_CFG_INTDIR}
     ${pv_tpl_compiler_args}
     -DHDF5_ENABLE_Z_LIB_SUPPORT:BOOL=ON
+    -DHDF5_BUILD_HL_LIB:BOOL=ON
+    -DHDF5_BUILD_WITH_INSTALL_NAME:BOOL=ON
     -DZLIB_INCLUDE_DIR:STRING=${ZLIB_INCLUDE_DIR}
     -DZLIB_LIBRARY:STRING=${ZLIB_LIBRARY}
   CMAKE_ARGS
@@ -31,7 +33,9 @@ ExternalProject_Add(HDF5
 if(WIN32)
   set(HDF5_INCLUDE_DIR ${HDF5_install}/include)
   set(HDF5_LIBRARY ${HDF5_install}/lib/hdf5dll${_LINK_LIBRARY_SUFFIX})
+  set(HDF5_HL_LIBRARY ${HDF5_install}/lib/hdf5_hldll${_LINK_LIBRARY_SUFFIX})
 else()
   set(HDF5_INCLUDE_DIR ${HDF5_install}/include)
   set(HDF5_LIBRARY ${HDF5_install}/lib/libhdf5${_LINK_LIBRARY_SUFFIX})
+  set(HDF5_HL_LIBRARY ${HDF5_install}/lib/libhdf5_hl${_LINK_LIBRARY_SUFFIX})
 endif()
