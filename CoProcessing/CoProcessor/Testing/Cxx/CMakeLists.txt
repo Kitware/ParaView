@@ -10,14 +10,14 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
   TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
 
-  ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/PythonScriptTest.py)
+  ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/PythonScriptTest.py)
 
   IF (VTK_MPIRUN_EXE)
     ADD_TEST(PCoProcessingPythonScriptExample
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS}
       ${VTK_MPI_PREFLAGS}
       ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample
-      ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/PythonScriptTest2.py
+      ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/PythonScriptTest2.py
       ${VTK_MPI_POSTFLAGS}
       )
   ENDIF (VTK_MPIRUN_EXE)
@@ -94,7 +94,7 @@ if(NOT EXISTS \${fullexe})
   message(FATAL_ERROR \"'\${fullexe}' does not exist\")
 endif()
 
-set(ARGS \"${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/waveletdriver.py;${CMAKE_BINARY_DIR}/Testing/Temporary/cptest.py;1\")
+set(ARGS \"${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/waveletdriver.py;${CMAKE_BINARY_DIR}/Testing/Temporary/cptest.py;1\")
 execute_process(COMMAND \${fullexe} \${ARGS} RESULT_VARIABLE failed)
 if(failed)
   message(FATAL_ERROR \"pvpython return value was = '\${failed}' \")
@@ -128,7 +128,7 @@ if(NOT EXISTS \${fullexe})
   message(FATAL_ERROR \"'\${fullexe}' does not exist\")
 endif()
 
-set(ARGS \"${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Cxx/outputcheck.py;${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0.pvtp\")
+set(ARGS \"${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/outputcheck.py;${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0.pvtp\")
 execute_process(COMMAND \${fullexe} \${ARGS} RESULT_VARIABLE failed)
 if(failed)
   message(FATAL_ERROR \"vtkpython return value was = '\${failed}' \")
