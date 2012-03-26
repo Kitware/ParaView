@@ -215,7 +215,7 @@ void pqImageOutputInfo::setupScreenshotInfo()
   vtkSmartPointer<vtkImageData> image;
   image.TakeReference(this->View->captureImage(thumbnailSize));
   vtkNew<vtkPNGWriter> pngWriter;
-  pngWriter->SetInput(image);
+  pngWriter->SetInputData(image);
   pngWriter->WriteToMemoryOn();
   pngWriter->Update();
   pngWriter->Write();

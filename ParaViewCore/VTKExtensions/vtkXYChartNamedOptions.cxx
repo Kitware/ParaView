@@ -310,9 +310,9 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         line->SetMarkerStyle(plotInfo.MarkerStyle);
         }
       plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      plot->SetInput(this->Table,
-                      this->Internals->XSeriesName.c_str(),
-                      seriesName);
+      plot->SetInputData(this->Table,
+                         this->Internals->XSeriesName.c_str(),
+                         seriesName);
       }
     }
 }

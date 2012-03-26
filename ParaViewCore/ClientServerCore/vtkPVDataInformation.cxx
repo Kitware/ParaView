@@ -39,7 +39,6 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSelection.h"
-#include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
@@ -348,16 +347,10 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data)
+void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformation* pinfo)
 {
   // Gather some common stuff
-  vtkInformation *pinfo = data->GetPipelineInformation();
-  if (!pinfo)
-    {
-    return;
-    }
-
-  if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+  if (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
     {
     double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     this->TimeSpan[0] = times[0];
@@ -575,7 +568,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
 void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
-
+  vtkInformation* info = NULL;
   // Handle the case where the a vtkAlgorithmOutput is passed instead of
   // the data object. vtkSMPart uses vtkAlgorithmOutput.
   if (!dobj)
@@ -584,11 +577,17 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(object);
     if (algOutput && algOutput->GetProducer())
       {
+      if (strcmp(algOutput->GetProducer()->GetClassName(), "vtkPVNullSource") == 0)
+        {
+        // Don't gather any data information from the hypothetical null source.
+        return;
+        }
+          
       if (algOutput->GetProducer()->IsA("vtkPVPostFilter"))
         {
         algOutput = algOutput->GetProducer()->GetInputConnection(0, 0);
         }
-
+      info = algOutput->GetProducer()->GetOutputInformation(this->PortNumber);
       dobj = algOutput->GetProducer()->GetOutputDataObject(
         algOutput->GetIndex());
       }
@@ -597,8 +596,12 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       // We don't use vtkAlgorithm::GetOutputDataObject() since that call a
       // UpdateDataObject() pass, which may raise errors if the algo is not
       // fully setup yet.
-      vtkInformation* info = algo->GetExecutive()->GetOutputInformation(
-        this->PortNumber);
+      if (strcmp(algo->GetClassName(), "vtkPVNullSource") == 0)
+        {
+        // Don't gather any data information from the hypothetical null source.
+        return;
+        }
+      info = algo->GetExecutive()->GetOutputInformation(this->PortNumber);
       if (!info || vtkDataObject::GetData(info) == NULL)
         {
         return;
@@ -613,18 +616,12 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
                   << (object?object->GetClassName():"(null"));
     return;
     }
-
-  if (strcmp(dobj->GetProducerPort()->GetProducer()->GetClassName(), "vtkPVNullSource") == 0)
-    {
-    // Don't gather any data information from the hypothetical null source.
-    return;
-    }
-
+  
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)
     {
     this->CopyFromCompositeDataSet(cds);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -632,7 +629,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ds)
     {
     this->CopyFromDataSet(ds);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -640,7 +637,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ads)
     {
     this->CopyFromGenericDataSet(ads);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -648,7 +645,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if( graph)
     {
     this->CopyFromGraph(graph);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -656,7 +653,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (table)
     {
     this->CopyFromTable(table);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -664,7 +661,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (selection)
     {
     this->CopyFromSelection(selection);
-    this->CopyCommonMetaData(dobj);
+    this->CopyCommonMetaData(dobj, info);
     return;
     }
 
@@ -672,7 +669,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   // object types, this isn't an error condition - just
   // display the name of the data object and return quietly.
   this->SetDataClassName(dobj->GetClassName());
-  this->CopyCommonMetaData(dobj);
+  this->CopyCommonMetaData(dobj, info);
 }
 
 //----------------------------------------------------------------------------

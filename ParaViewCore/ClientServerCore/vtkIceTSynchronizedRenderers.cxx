@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDefaultPass.h"
 #include "vtkRenderer.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
@@ -340,7 +341,7 @@ void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
   this->Superclass::SetRenderer(ren);
   if (ren)
     {
-    ren->SetPass(this->CameraRenderPass);
+    this->Renderer->SetPass(this->CameraRenderPass);
     // icet cannot work correctly in tile-display mode is software culling is
     // applied in vtkRenderer inself. vtkPVIceTCompositePass will cull out-of-frustum
     // props using icet-model-view matrix later.

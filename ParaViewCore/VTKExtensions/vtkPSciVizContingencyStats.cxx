@@ -29,7 +29,7 @@ int vtkPSciVizContingencyStats::LearnAndDerive( vtkMultiBlockDataSet* modelDO, v
 {
   // Create the statistics filter and run it
   vtkPContingencyStatistics* stats = vtkPContingencyStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, inData );
   vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
@@ -70,8 +70,8 @@ int vtkPSciVizContingencyStats::AssessData( vtkTable* observations, vtkDataObjec
 
   // Create the statistics filter and run it
   vtkPContingencyStatistics* stats = vtkPContingencyStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, observations );
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, observations );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
   modelCopy->FastDelete();
   vtkIdType ncols = observations->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )

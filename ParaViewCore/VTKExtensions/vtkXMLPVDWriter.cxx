@@ -134,12 +134,9 @@ void vtkXMLPVDWriter::SetWriteCollectionFile(int flag)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVDWriter::AddInput(vtkDataObject *input)
+void vtkXMLPVDWriter::AddInputData(vtkDataObject *input)
 {
-  if(input)
-    {
-    this->AddInputConnection(0, input->GetProducerPort());
-    }
+  this->AddInputDataInternal(0, input);
 }
 
 //----------------------------------------------------------------------------
@@ -352,8 +349,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPPolyDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -365,8 +360,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPolyDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_STRUCTURED_POINTS:
@@ -381,8 +374,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPImageDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -394,8 +385,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLImageDataWriter::SafeDownCast(this->Internal->Writers[i].GetPointer())
-            ->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_UNSTRUCTURED_GRID:
@@ -409,8 +398,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPUnstructuredGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -422,8 +409,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLUnstructuredGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_STRUCTURED_GRID:
@@ -437,8 +422,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPStructuredGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -450,8 +433,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLStructuredGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         break;
       case VTK_RECTILINEAR_GRID:
@@ -465,8 +446,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLPRectilinearGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         else
           {
@@ -478,8 +457,6 @@ void vtkXMLPVDWriter::CreateWriters()
             this->Internal->Writers[i] = w;
             w->Delete();
             }
-          vtkXMLRectilinearGridWriter::SafeDownCast(
-            this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
           }
         break;
 
@@ -492,11 +469,11 @@ void vtkXMLPVDWriter::CreateWriters()
           this->Internal->Writers[i] = w;
           w->Delete();
           }
-        vtkXMLPMultiBlockDataWriter::SafeDownCast(
-          this->Internal->Writers[i].GetPointer())->SetInput(exec->GetInputData(0, i));
         break;
       }
-    
+
+    this->Internal->Writers[i]->SetInputConnection(this->GetInputConnection(0, i));
+
     // Copy settings to the writer.
     if(vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
       {

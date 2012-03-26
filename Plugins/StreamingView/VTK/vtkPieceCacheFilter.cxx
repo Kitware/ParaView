@@ -440,7 +440,7 @@ void vtkPieceCacheFilter::AppendPieces()
     vtkPolyData *content = vtkPolyData::SafeDownCast(pos->second.second);
     if (content)
       {
-      this->AppendFilter->SetInputByNumber(cnt++, content);
+      this->AppendFilter->SetInputDataByNumber(cnt++, content);
 
       //remember that this piece is in the appended result
       vtkInformation* dataInfo = content->GetInformation();

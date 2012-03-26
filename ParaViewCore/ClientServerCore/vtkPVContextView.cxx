@@ -302,7 +302,7 @@ void vtkPVContextView::ReceiveImageToFromClient()
   // Extract sub-section from that image based on what will be project on the
   // current tile.
   vtkExtractVOI* voi = vtkExtractVOI::New();
-  voi->SetInput(image);
+  voi->SetInputData(image);
   voi->SetVOI(
     vtkMinInt(1.0, (tile_viewport[0]-viewport[0]) / (viewport[2] -
         viewport[0]))*(image_dims[0]-1),

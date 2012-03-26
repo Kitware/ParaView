@@ -84,7 +84,7 @@ int vtkUnstructuredDataDeliveryFilter::RequestDataObject(
       {
       return 0;
       }
-    output->SetPipelineInformation(outputVector->GetInformationObject(0));
+    outputVector->GetInformationObject(0)->Set(vtkDataObject::DATA_OBJECT(), output);
     this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
       output->GetExtentType());
     output->FastDelete();
@@ -114,7 +114,7 @@ int vtkUnstructuredDataDeliveryFilter::RequestData(
     inputClone.TakeReference(input->NewInstance());
     inputClone->ShallowCopy(input);
     }
-  this->MoveData->SetInput(inputClone);
+  this->MoveData->SetInputData(inputClone);
   this->MoveData->Update();
   output->ShallowCopy(this->MoveData->GetOutputDataObject(0));
   return 1;

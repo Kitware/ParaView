@@ -206,6 +206,7 @@ SET (XYHistogram_BREAK TRUE)
 
 SET(ExtractLevel_BREAK TRUE)
 
+SET(Fractal2D_BREAK TRUE)
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.

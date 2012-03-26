@@ -129,7 +129,7 @@ int vtkPVClipDataSet::RequestData(vtkInformation* request,
 
           vtkDataObject* inputClone = inDataObj->NewInstance();
           inputClone->ShallowCopy(inDataObj);
-          amrDC->SetInput(0, inputClone);
+          amrDC->SetInputData(0, inputClone);
           inputClone->FastDelete();
 
           amrDC->SetInputArrayToProcess(0,
@@ -204,7 +204,7 @@ int vtkPVClipDataSet::ClipUsingThreshold(
 
   vtkDataObject* inputClone = inputDO->NewInstance();
   inputClone->ShallowCopy(inputDO);
-  threshold->SetInput(0, inputClone);
+  threshold->SetInputData(0, inputClone);
   inputClone->FastDelete();
   threshold->SetInputArrayToProcess(0, this->GetInputArrayInformation(0));
 
@@ -297,7 +297,7 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkMultiBlockDataSet::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->FastDelete();
@@ -310,7 +310,7 @@ int vtkPVClipDataSet::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkUnstructuredGrid::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->FastDelete();

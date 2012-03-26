@@ -144,7 +144,7 @@ int vtkImageSpriteSource::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkImageData *output = vtkImageData::SafeDownCast(outInfo->Get(
       vtkDataObject::DATA_OBJECT()));
-  vtkImageData *data = this->AllocateOutputData(output);
+  vtkImageData *data = this->AllocateOutputData(output, outInfo);
 
   if (data->GetScalarType() != VTK_UNSIGNED_CHAR)
     {

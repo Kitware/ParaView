@@ -159,7 +159,8 @@ void vtkPVTemporalDataInformation::CopyFromObject(vtkObject* object)
   // timesteps properly, for contiguous time-range, we simply use the first and
   // last time value as the 2 timesteps.
 
-  vtkInformation* pipelineInfo = dobj->GetPipelineInformation();
+  vtkInformation* pipelineInfo =
+    port->GetProducer()->GetOutputInformation(port->GetIndex());
   std::vector<double> timesteps;
   if (pipelineInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
     {

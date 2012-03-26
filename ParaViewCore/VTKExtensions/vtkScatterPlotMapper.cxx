@@ -51,6 +51,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
+#include "vtkTrivialProducer.h"
 #include "vtkgl.h"
 
 #include <vector>
@@ -481,7 +482,7 @@ void vtkScatterPlotMapper::ComputeBounds()
     return;
     }
 
-  input->Update();
+  this->Update();
 
   // We do have hierarchical data - so we need to loop over
   // it and get the total bounds.
@@ -766,7 +767,7 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
     if (ss == 0)
       {
       ss = vtkPolyData::New();
-      polyDataMapper->SetInput(ss);
+      polyDataMapper->SetInputData(ss);
       ss->Delete();
       ss->ShallowCopy(source);      
       }
@@ -808,8 +809,10 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultSource->SetPoints(defaultPoints);
 
   defaultSource->InsertNextCell(VTK_POLY_LINE, 4, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkSmartPointer<vtkTrivialProducer> triangleProducer =
+    vtkSmartPointer<vtkTrivialProducer>::New();
+  triangleProducer->SetOutput(defaultSource);
+  this->AddGlyphSourceConnection(triangleProducer->GetOutputPort());
   defaultSource->Delete();
   defaultPoints->Delete();
 
@@ -825,12 +828,14 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultPoints->InsertNextPoint(-0.1, -0.1, 0);
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, 5, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkSmartPointer<vtkTrivialProducer> squareProducer =
+    vtkSmartPointer<vtkTrivialProducer>::New();
+  squareProducer->SetOutput(defaultSource);
+  this->AddGlyphSourceConnection(squareProducer->GetOutputPort());
   defaultSource->Delete();
   defaultPoints->Delete();
 
-  // pentagone
+  // pentagon
   defaultSource = vtkPolyData::New();
   defaultPoints = vtkPoints::New();
   defaultSource->Allocate();
@@ -849,8 +854,10 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultPoints->InsertNextPoint(0.0, 0.1, 0);
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, 11, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkSmartPointer<vtkTrivialProducer> pentagonProducer =
+    vtkSmartPointer<vtkTrivialProducer>::New();
+  pentagonProducer->SetOutput(defaultSource);
+  this->AddGlyphSourceConnection(pentagonProducer->GetOutputPort());
   defaultSource->Delete();
   defaultPoints->Delete();
 
@@ -868,8 +875,10 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
     }
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, points + 1, defaultPointIds);
-  defaultSource->SetUpdateExtent(0, 1, 0);
-  this->AddGlyphSourceConnection(defaultSource->GetProducerPort());
+  vtkSmartPointer<vtkTrivialProducer> circleProducer =
+    vtkSmartPointer<vtkTrivialProducer>::New();
+  circleProducer->SetOutput(defaultSource);
+  this->AddGlyphSourceConnection(circleProducer->GetOutputPort());
   defaultSource->Delete();
   defaultPoints->Delete();
 

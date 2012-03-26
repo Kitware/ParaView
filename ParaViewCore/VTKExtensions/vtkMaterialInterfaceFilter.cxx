@@ -5762,7 +5762,7 @@ void vtkMaterialInterfaceFilter::SaveBlockSurfaces(const char* fileName)
   pd->GetCellData()->AddArray(idArray);
 
   vtkXMLPolyDataWriter* w = vtkXMLPolyDataWriter::New();
-  w->SetInput(pd);
+  w->SetInputData(pd);
   w->SetFileName(fileName);
   w->Write();
   w->Delete();
@@ -5888,7 +5888,7 @@ void vtkMaterialInterfaceFilter::SaveGhostSurfaces(const char* fileName)
   pd->GetCellData()->AddArray(idArray);
 
   vtkXMLPolyDataWriter* w = vtkXMLPolyDataWriter::New();
-  w->SetInput(pd);
+  w->SetInputData(pd);
   w->SetFileName(fileName);
   w->Write();
 
@@ -6326,10 +6326,11 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
       {
       // merge two local pieces
       vtkAppendPolyData *apf=vtkAppendPolyData::New();
-      apf->AddInput(destMesh);
-      apf->AddInput(srcMesh);
+      apf->AddInputData(destMesh);
+      apf->AddInputData(srcMesh);
+      apf->Update();
       vtkPolyData *mergedMesh=apf->GetOutput();
-      mergedMesh->Update();
+      
       //mergedMesh->Register(0); // Do I have to? no because multi piece does it
       resolvedFragments->SetPiece(globalId, mergedMesh);
       apf->Delete();
@@ -6430,9 +6431,10 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
     nInitial+=fragmentMesh->GetNumberOfPoints();
     #endif
     // clean duplicate points
-    cpd->SetInput(fragmentMesh);
+    cpd->SetInputData(fragmentMesh);
+    cpd->Update();
     vtkPolyData *cleanedFragmentMesh=cpd->GetOutput();
-    cleanedFragmentMesh->Update();
+    
     #ifdef vtkMaterialInterfaceFilterDEBUG
     nFinal+=cleanedFragmentMesh->GetNumberOfPoints();
     #endif

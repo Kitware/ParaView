@@ -202,7 +202,7 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
     // down the pipeline and therefore saves the time that would be otherwise taken
     if ( !this->Static )
       {
-      input->Update();
+      this->Update();
       }
     
     this->InvokeEvent( vtkCommand::EndEvent, NULL );
@@ -235,7 +235,7 @@ void vtkMantaPolyDataMapper::RenderPiece(vtkRenderer *ren, vtkActor *act)
       this->InternalColorTexture = vtkMantaTexture::New();
       this->InternalColorTexture->RepeatOff();
       }
-    this->InternalColorTexture->SetInput(this->ColorTextureMap);
+    this->InternalColorTexture->SetInputData(this->ColorTextureMap);
     }
   
   // if something has changed, regenerate Manta primitives if required

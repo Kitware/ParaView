@@ -25,8 +25,11 @@
 #include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVView.h"
+#include "vtkSmartPointer.h"
 
 #include <assert.h>
+#include <vtkstd/map>
+
 //----------------------------------------------------------------------------
 vtkPVDataRepresentation::vtkPVDataRepresentation()
 {
@@ -159,25 +162,34 @@ bool vtkPVDataRepresentation::GetUsingCacheForUpdate()
 vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
                                                                    int conn)
 {
-  vtkAlgorithmOutput* prevOutput = this->Superclass::GetInternalOutputPort(
-    port, conn);
-  if (prevOutput->GetProducer()->IsA("vtkPVTrivialProducer"))
+  vtkAlgorithmOutput* prevOutput =
+    this->Superclass::GetInternalOutputPort(port, conn);
+  if (!prevOutput)
+    {
+    return 0;
+    }
+
+  vtkTrivialProducer* prevProducer = static_cast<vtkTrivialProducer*>(
+    prevOutput->GetProducer());
+  if (prevProducer->IsA("vtkPVTrivialProducer"))
     {
     return prevOutput;
     }
 
-  vtkDataObject* dobj = prevOutput->GetProducer()->GetOutputDataObject(0);
+  vtkDataObject* dobj = prevProducer->GetOutputDataObject(0);
 
+  vtkstd::pair<int, int> p(port, conn);
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
   vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
   tprod->SetExecutive(exec);
+  tprod->SetOutput(dobj);
   vtkInformation* portInfo = tprod->GetOutputPortInformation(0);
   portInfo->Set(vtkDataObject::DATA_TYPE_NAME(), dobj->GetClassName());
-  exec->UnRegister(0);
-  tprod->SetOutput(dobj);
-  tprod->UnRegister(0);
+  this->SetInternalInput(port, conn, tprod);
+  tprod->Delete();
+  exec->Delete();
 
-  return dobj->GetProducerPort();
+  return tprod->GetOutputPort();
 }
 
 //----------------------------------------------------------------------------

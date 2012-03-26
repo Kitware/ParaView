@@ -43,7 +43,8 @@ void vtkBalancedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 
 
 //*****************************************************************
-void vtkBalancedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
+void vtkBalancedRedistributePolyData::MakeSchedule (vtkPolyData* input,
+                                                    vtkCommSched* localSched)
 
 {
 //*****************************************************************
@@ -65,7 +66,7 @@ void vtkBalancedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   this->Controller->GetLocalProcessId();
 
   this->SetWeights(0, numProcs-1, 1.);
-  this->vtkWeightedRedistributePolyData::MakeSchedule(localSched);
+  this->vtkWeightedRedistributePolyData::MakeSchedule(input, localSched);
 
 }
 //*****************************************************************

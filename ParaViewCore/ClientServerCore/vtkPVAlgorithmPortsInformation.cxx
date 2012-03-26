@@ -16,9 +16,8 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
-#include "vtkDemandDrivenPipeline.h"
+// #include "vtkDemandDrivenPipeline.h"
 #include "vtkObjectFactory.h"
-#include "vtkSource.h"
 #include "vtkInformation.h"
 
 vtkStandardNewMacro(vtkPVAlgorithmPortsInformation);
@@ -57,21 +56,7 @@ void vtkPVAlgorithmPortsInformation::CopyFromObject(vtkObject* obj)
     vtkErrorMacro("Could not downcast vtkAlgorithm.");
     return;
     }
-  vtkDemandDrivenPipeline* pipeline = 
-    vtkDemandDrivenPipeline::SafeDownCast(algorithm->GetExecutive());
-  if (pipeline)
-    {
-    //pipeline->UpdateDataObject();
-    }
-  vtkSource* source = vtkSource::SafeDownCast(obj);
-  if (source)
-    {
-    this->NumberOfOutputs = source->GetNumberOfOutputs();
-    }
-  else
-    {
-    this->NumberOfOutputs = algorithm->GetNumberOfOutputPorts();
-    }
+  this->NumberOfOutputs = algorithm->GetNumberOfOutputPorts();
 
   int numInputs = algorithm->GetNumberOfInputPorts();
   for (int cc=0; cc < numInputs; cc++)

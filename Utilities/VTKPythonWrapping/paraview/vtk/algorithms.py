@@ -57,7 +57,7 @@ def _cell_derivatives (narray, dataset, attribute_type, filter):
        else : ds2.GetCellData().SetVectors(varray)
 
        c2p = vtk.vtkCellDataToPointData()
-       c2p.SetInput(ds2)
+       c2p.SetInputData(ds2)
        c2p.Update()
 
        # Set the output to the ds dataset
@@ -66,7 +66,7 @@ def _cell_derivatives (narray, dataset, attribute_type, filter):
        else:
           ds.GetPointData().SetVectors(c2p.GetOutput().GetPointData().GetVectors())
 
-    filter.SetInput(ds)
+    filter.SetInputData(ds)
 
     if dataset_adapter.ArrayAssociation.POINT == narray.Association :
        # Since the data is associated with cell and the query is on points
@@ -91,7 +91,7 @@ def _cell_quality (dataset, quality) :
     ds.CopyStructure(dataset.VTKObject)
 
     filter = vtk.vtkCellQuality()
-    filter.SetInput(ds)
+    filter.SetInputData(ds)
 
     if   "area"         == quality : filter.SetQualityMeasureToArea()
     elif "aspect"       == quality : filter.SetQualityMeasureToAspectRatio()
@@ -165,7 +165,7 @@ def _matrix_math_filter (narray, operation) :
        ds.GetCellData().SetTensors(varray)
        # filter.SetQualityTypeToCellQuality()
 
-    filter.SetInput(ds)
+    filter.SetInputData(ds)
     filter.Update()
 
     if dataset_adapter.ArrayAssociation.POINT == narray.Association :
@@ -468,7 +468,7 @@ def surface_normal (dataset) :
     ds.CopyStructure(dataset.VTKObject)
 
     filter = vtk.vtkPolyDataNormals()
-    filter.SetInput(ds)
+    filter.SetInputData(ds)
     filter.ComputeCellNormalsOn()
     filter.ComputePointNormalsOff()
 
@@ -515,7 +515,7 @@ def vertex_normal (dataset) :
     ds.CopyStructure(dataset.VTKObject)
 
     filter = vtk.vtkPolyDataNormals()
-    filter.SetInput(ds)
+    filter.SetInputData(ds)
     filter.ComputeCellNormalsOff()
     filter.ComputePointNormalsOn()
 
