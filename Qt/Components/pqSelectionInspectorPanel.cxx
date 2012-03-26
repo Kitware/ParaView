@@ -643,13 +643,19 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     SIGNAL(currentTextChanged(const QString&)),
     selSource, selSource->GetProperty("FieldType"));
 
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("ContainingCells"));
+  if (selSource->GetProperty("ContainingCells"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
+      selSource, selSource->GetProperty("ContainingCells"));
+    }
 
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("InsideOut"));
+  if (selSource->GetProperty("InsideOut"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
+      selSource, selSource->GetProperty("InsideOut"));
+    }
 
   if (selSource->GetProperty("IDs"))
     {
