@@ -1788,6 +1788,13 @@ void pqColorScaleEditor::makeDefault()
       {
       lut_mgr->saveOpacityFunctionAsDefault(this->OpacityFunction);
       }
+    // BUG #13010: If scalar bar is visible, save the scalar bar's position as
+    // default as well.
+    if (this->Form->ShowColorLegend->isChecked() &&
+      this->Legend)
+      {
+      lut_mgr->saveScalarBarAsDefault(this->Legend);
+      }
     }
 }
 //-----------------------------------------------------------------------------
