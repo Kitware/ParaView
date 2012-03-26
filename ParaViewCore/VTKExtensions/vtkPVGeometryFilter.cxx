@@ -470,6 +470,10 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
       vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
       }
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
+
+    vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
+    vtkGarbageCollector::DeferredCollectionPop();
+    vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
     return 1;
     }
 

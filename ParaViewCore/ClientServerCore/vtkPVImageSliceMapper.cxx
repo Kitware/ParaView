@@ -143,24 +143,36 @@ vtkImageData* vtkPVImageSliceMapper::GetInput()
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::Update()
 {
-  if (this->Static)
+  // Set the whole extent on the painter because it needs it internally
+  // and it has no access to the pipeline information.
+  vtkTexturePainter* ptr = vtkTexturePainter::SafeDownCast(this->GetPainter());
+
+  if (!this->Static)
     {
-    return;
+    int currentPiece, nPieces = this->NumberOfPieces;
+    vtkImageData* input = this->GetInput();
+
+    // If the estimated pipeline memory usage is larger than
+    // the memory limit, break the current piece into sub-pieces.
+    if (input)
+      {
+      this->GetInputAlgorithm()->UpdateInformation();
+      currentPiece = this->NumberOfSubPieces * this->Piece;
+      vtkStreamingDemandDrivenPipeline::SetUpdateExtent(
+        this->GetInputInformation(),
+        currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
+      }
+
+    this->Superclass::Update();
     }
 
-  int currentPiece, nPieces = this->NumberOfPieces;
-  vtkImageData* input = this->GetInput();
-  
-  // If the estimated pipeline memory usage is larger than
-  // the memory limit, break the current piece into sub-pieces.
-  if (input) 
-    {
-    currentPiece = this->NumberOfSubPieces * this->Piece;
-    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(this->GetInputInformation(),
-      currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
-    }
 
-  this->Superclass::Update();
+  int *wext = this->GetInputInformation(0, 0)->Get(
+    vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
+  if (wext)
+    {
+    ptr->SetWholeExtent(wext);
+    }
 }
 
 

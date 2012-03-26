@@ -16,7 +16,7 @@
 // .SECTION Description
 // vtkSIChartRepresentationProxy is the server-side helper for
 // vtkSMChartRepresentationProxy. It initializes the vtkXYChartRepresentation
-// instance with the vtkContextNamedOptions instance sub-proxy, if any during
+// instance with the vtkChartNamedOptions instance sub-proxy, if any during
 // CreateVTKObjects().
 
 #ifndef __vtkSIChartRepresentationProxy_h

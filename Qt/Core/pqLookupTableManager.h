@@ -69,6 +69,10 @@ public:
   /// will have the same state as this one.
   virtual void saveLUTAsDefault(pqScalarsToColors*)=0;
   virtual void saveOpacityFunctionAsDefault(pqScalarOpacityFunction*)=0;
+
+  /// save the state of the scalar bar, so that the next time a new scalar bar
+  /// is created its properties are setup using the defaults specified.
+  virtual void saveScalarBarAsDefault(pqScalarBarRepresentation*)=0;
   
   /// Set the scalar bar's visibility for the given lookup table in the given
   /// view. This may result in creating of a new scalar bar.
@@ -112,6 +116,9 @@ protected:
   /// Called when a OpactiyFunction is removed.
   virtual void onRemoveOpacityFunction(pqScalarOpacityFunction*){}
 
+  /// called when a new scalar is created so that subclasses have a change to
+  /// change the default values as needed.
+  virtual void initialize(pqScalarBarRepresentation*) { }
 };
 
 

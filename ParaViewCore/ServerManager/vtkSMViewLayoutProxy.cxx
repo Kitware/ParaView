@@ -955,9 +955,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
 
   vtkImageData* image = vtkImageData::New();
   image->SetExtent(extent);
-  image->SetScalarTypeToUnsignedChar();
-  image->SetNumberOfScalarComponents(3);
-  image->AllocateScalars();
+  image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
   unsigned char* image_data = 
     reinterpret_cast<unsigned char*>(image->GetScalarPointer());

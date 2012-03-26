@@ -27,6 +27,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     set (counter 0)
     set (extra_args)
     set (full_test_name)
+    set (force_serial FALSE)
+
     while (${counter} LESS ${TEST_GROUP_SIZE})
       list(LENGTH ACT_TEST_SCRIPTS num_tests)
       if (num_tests)
@@ -57,6 +59,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
       endif (DEFINED ${test_name}_BREAK)
+      if (${test_name}_FORCE_SERIAL)
+        set (force_serial TRUE)
+      endif (${test_name}_FORCE_SERIAL)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
@@ -66,6 +71,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
+      if (force_serial)
+        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
+      endif()
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -133,6 +142,33 @@ FUNCTION(add_multi_client_tests prefix)
         ${extra_args}
         --exit
         )
+      if (${test_name}_FORCE_SERIAL)
+        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+      endif (${test_name}_FORCE_SERIAL)
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
+
+FUNCTION(add_multi_server_tests prefix nbServers)
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
+
+  foreach (test_script ${ACT_TEST_SCRIPTS})
+    get_filename_component(test_name ${test_script} NAME_WE)
+      set (extra_args)
+      process_args(extra_args)
+      add_test("${prefix}.${test_name}"
+          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        --test-multi-servers ${nbServers}
+        --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+        --client ${CLIENT_EXECUTABLE}
+        -dr
+        --disable-light-kit
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --test-script=${test_script}
+        ${extra_args}
+        --exit
+        )
+  endforeach(test_script)
+ENDFUNCTION(add_multi_server_tests)

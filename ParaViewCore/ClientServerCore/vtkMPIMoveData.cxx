@@ -29,12 +29,12 @@
 #include "vtkImageAppend.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkMergeGraphs.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
@@ -46,12 +46,13 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkTrivialProducer.h"
 #include "vtkToolkits.h"
+#include <vtkTrivialProducer.h>
 #include "vtkUndirectedGraph.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
+#include <vtkstd/vector>
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"

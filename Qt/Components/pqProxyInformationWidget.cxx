@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QLineEdit>
 #include <QStringList>
-#include <QTimer>
 
 // VTK includes
 #include "vtkCommand.h"

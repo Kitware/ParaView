@@ -31,16 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPQLookupTableManager.h"
 
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntRangeDomain.h"
+#include "vtkSMNamedPropertyIterator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkStringList.h"
 
 #include <QList>
 #include <QMap>
@@ -50,8 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPipelineRepresentation.h"
-#include "pqScalarsToColors.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarOpacityFunction.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -103,6 +107,8 @@ public:
   typedef QMap<Key, QPointer<pqScalarOpacityFunction> > MapOfOpactiyFunc;
   MapOfOpactiyFunc OpacityFuncs;
   vtkSmartPointer<vtkPVXMLElement> DefaultOpacityElement;
+  
+  vtkSmartPointer<vtkPVXMLElement> DefaultScalarBarElement;
 
   QString getRegistrationName(
     const QString& xmlname, const QString& arrayname,
@@ -136,24 +142,31 @@ pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
     {
     if(settings->contains(DEFAULT_LOOKUPTABLE_SETTING_KEY()))
       {
-      vtkPVXMLParser* parser = vtkPVXMLParser::New();
+      vtkNew<vtkPVXMLParser> parser;
       if (parser->Parse(
           settings->value(DEFAULT_LOOKUPTABLE_SETTING_KEY()).toString().toAscii().data()))
         {
         this->Internal->DefaultLUTElement = parser->GetRootElement();
         }
-      parser->Delete();
       }
     
     if(settings->contains(DEFAULT_OPACITYFUNCTION_SETTING_KEY()))
       {
-      vtkPVXMLParser* opacityParser = vtkPVXMLParser::New();
-      if (opacityParser->Parse(
+      vtkNew<vtkPVXMLParser> parser;
+      if (parser->Parse(
           settings->value(DEFAULT_OPACITYFUNCTION_SETTING_KEY()).toString().toAscii().data()))
         {
-        this->Internal->DefaultOpacityElement = opacityParser->GetRootElement();
+        this->Internal->DefaultOpacityElement = parser->GetRootElement();
         }
-      opacityParser->Delete();
+      }
+    if (settings->contains(DEFAULT_SCALARBAR_SETTING_KEY()))
+      {
+      vtkNew<vtkPVXMLParser> parser;
+      if (parser->Parse(
+          settings->value(DEFAULT_SCALARBAR_SETTING_KEY()).toString().toAscii().data()))
+        {
+        this->Internal->DefaultScalarBarElement = parser->GetRootElement();
+        }
       }
     }
 }
@@ -227,6 +240,74 @@ bool pqPQLookupTableManager::getLookupTableProperties(
     return true;
     }
   return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqPQLookupTableManager::saveScalarBarAsDefault(
+  pqScalarBarRepresentation* scalar_bar)
+{
+  if (!scalar_bar)
+    {
+    return;
+    }
+
+  vtkSMProxy* proxy = scalar_bar->getProxy();
+
+  const char* properties_to_save[] = {
+    "Position",
+    "Position2",
+    "Orientation",
+    "AutomaticLabelFormat",
+    "LabelFormat",
+    "NumberOfLabels",
+    "AspectRatio",
+    "LabelColor",
+    "LabelOpacity",
+    "LabelFontFamily",
+    "LabelBold",
+    "LabelItalic",
+    "LabelShadow",
+    "LabelFontSize",
+    "TitleColor",
+    "TitleOpacity",
+    "TitleFontFamily",
+    "TitleBold",
+    "TitleItalic",
+    "TitleShadow",
+    "TitleFontSize",
+    NULL};
+
+  vtkNew<vtkStringList> properties;
+  for (int cc=0; properties_to_save[cc] != NULL; cc++)
+    {
+    properties->AddString(properties_to_save[cc]);
+    }
+
+  vtkNew<vtkSMNamedPropertyIterator> iter;
+  iter->SetProxy(proxy);
+  iter->SetPropertyNames(properties.GetPointer());
+  this->Internal->DefaultScalarBarElement.TakeReference(
+    proxy->SaveXMLState(NULL, iter.GetPointer()));
+
+  vtksys_ios::ostringstream stream;
+  this->Internal->DefaultScalarBarElement->PrintXML(stream, vtkIndent());
+  
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  settings->setValue(
+    pqPQLookupTableManager::DEFAULT_SCALARBAR_SETTING_KEY(),
+    stream.str().c_str());
+}
+
+//-----------------------------------------------------------------------------
+void pqPQLookupTableManager::initialize(pqScalarBarRepresentation* scalar_bar)
+{
+  if (this->Internal->DefaultScalarBarElement && scalar_bar)
+    {
+    scalar_bar->getProxy()->LoadXMLState(
+      this->Internal->DefaultScalarBarElement, NULL);
+    scalar_bar->getProxy()->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------

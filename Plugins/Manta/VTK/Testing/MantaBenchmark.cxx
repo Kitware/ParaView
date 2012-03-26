@@ -275,8 +275,7 @@ void MyProcess::Execute()
 #endif
 
   //Compute local geometric bounds
-  vtkPolyData *pd = source->GetOutput();
-  pd->SetUpdateExtent(me, numProcs, 0);
+  source->SetUpdateExtent(me, numProcs, 0);
   source->Update();
   source->GetOutput()->GetBounds(bds);
   /*

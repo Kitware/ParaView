@@ -60,6 +60,12 @@ vtkTexturePainter::vtkTexturePainter()
   this->ScalarArrayIndex = 0;
   this->UseXYPlane = 0;
   this->ScalarMode = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+  this->WholeExtent[0] =  0;
+  this->WholeExtent[1] = -1;
+  this->WholeExtent[2] =  0;
+  this->WholeExtent[3] = -1;
+  this->WholeExtent[4] =  0;
+  this->WholeExtent[5] = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -220,7 +226,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
     // we deliberately use whole extent here. So on processes where the slice is
     // not available, the vtkExtractVOI filter will simply yield an empty
     // output.
-    this->GetInformation()->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), inextent);
+    memcpy(inextent, this->WholeExtent, 6*sizeof(int));
     memcpy(outextent, inextent, sizeof(int)*6);
     int numdims = ::vtkGetDataDimension(inextent);
     int dims[3];

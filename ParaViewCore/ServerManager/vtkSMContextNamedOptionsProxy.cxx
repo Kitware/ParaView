@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkSMContextNamedOptionsProxy.h"
 
-#include "vtkContextNamedOptions.h"
+#include "vtkXYChartNamedOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
@@ -40,7 +40,7 @@ vtkSMContextNamedOptionsProxy::~vtkSMContextNamedOptionsProxy()
 void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
   vtkSMProperty* prop)
 {
-  vtkContextNamedOptions* options = vtkContextNamedOptions::SafeDownCast(
+  vtkXYChartNamedOptions* options = vtkXYChartNamedOptions::SafeDownCast(
     this->GetClientSideObject());
 
   if (prop == NULL)

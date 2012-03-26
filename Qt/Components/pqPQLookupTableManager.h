@@ -65,6 +65,10 @@ public:
   virtual void saveLUTAsDefault(pqScalarsToColors*);
   virtual void saveOpacityFunctionAsDefault(pqScalarOpacityFunction*);
 
+  /// save the state of the scalar bar, so that the next time a new scalar bar
+  /// is created its properties are setup using the defaults specified.
+  virtual void saveScalarBarAsDefault(pqScalarBarRepresentation*);
+
   /// Used to get the array the \c lut is associated with.
   /// Return false if no such association exists.
   virtual bool getLookupTableProperties(pqScalarsToColors* lut,
@@ -80,6 +84,12 @@ public:
   static const char* DEFAULT_OPACITYFUNCTION_SETTING_KEY()
     {
     return "/lookupTable/DefaultOpacity";
+    }
+
+  // Setting key used to save the default scalar bar
+  static const char* DEFAULT_SCALARBAR_SETTING_KEY()
+    {
+    return "/lookupTable/DefaultScalarBar";
     }
 
 public slots:
@@ -117,6 +127,10 @@ protected:
   /// map scalars to opacity.
   pqScalarOpacityFunction* createOpacityFunction(pqServer* server,
     const QString& arrayname, int number_of_components, int component);
+
+  /// called when a new scalar is created so that subclasses have a change to
+  /// change the default values as needed.
+  virtual void initialize(pqScalarBarRepresentation*);
   
 private:
   pqPQLookupTableManager(const pqPQLookupTableManager&); // Not implemented.

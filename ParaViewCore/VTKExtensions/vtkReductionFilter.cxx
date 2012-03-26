@@ -26,6 +26,7 @@
 #include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
@@ -206,13 +207,12 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
     this->PreGatherHelper->RemoveAllInputs();
     vtkDataObject *incopy = input->NewInstance();
     incopy->ShallowCopy(input);
-    vtkTrivialProducer* incopyProducer = vtkTrivialProducer::New();
+    vtkNew<vtkTrivialProducer> incopyProducer;
     incopyProducer->SetOutput(incopy);
     this->PreGatherHelper->AddInputConnection(0, incopyProducer->GetOutputPort());
     this->PreGatherHelper->Update();
     result = this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
-    incopyProducer->Delete();
 
     // If a PostGatherHelper is present, we need to ensure that the result produced
     // by this pre-processing stage is acceptable to the PostGatherHelper.
@@ -258,14 +258,11 @@ void vtkReductionFilter::PostProcess(vtkDataObject* output,
     this->PostGatherHelper->RemoveAllInputs();
     //connect all (or just the selected) datasets to the reduction
     //algorithm
-    vtkSmartPointer<vtkTrivialProducer> inputProducers[num_inputs];
     for (unsigned int cc = 0; cc < num_inputs; ++cc)
       {
-      inputProducers[cc]->SetOutput(inputs[cc]);
-      }
-    for (unsigned int cc = 0; cc < num_inputs; ++cc)
-      {
-      this->PostGatherHelper->AddInputConnection(inputProducers[cc]->GetOutputPort());
+      vtkNew<vtkTrivialProducer> tp;
+      tp->SetOutput(inputs[cc]);
+      this->PostGatherHelper->AddInputConnection(tp->GetOutputPort());
       }
     this->PostGatherHelper->Update();
     this->PostGatherHelper->RemoveAllInputs();

@@ -76,7 +76,7 @@ namespace
 {
   /// pqWidget is used to make it easier to get and set values from different
   /// types of widgets.
-  class pqWidget
+  class pqWidget : public QObject
     {
     QString PropertyName;
   public:
@@ -95,6 +95,8 @@ namespace
       {
       this->Widget->setProperty(this->PropertyName.toAscii().data(), value);
       }
+  private:
+    Q_DISABLE_COPY(pqWidget);
     };
 
   class pqWidgetForComboBox : public pqWidget
@@ -114,6 +116,9 @@ namespace
       QComboBox* combobox = qobject_cast<QComboBox*>(this->Widget);
       combobox->setCurrentIndex(combobox->findData(value));
       }
+
+  private:
+    Q_DISABLE_COPY(pqWidgetForComboBox);
     };
 
   class pqWidgetForCheckbox : public pqWidget
@@ -135,6 +140,8 @@ namespace
       QCheckBox* checkbox= qobject_cast<QCheckBox*>(this->Widget);
       checkbox->setChecked(value.toString() == this->TrueValue);
       }
+  private:
+    Q_DISABLE_COPY(pqWidgetForCheckbox);
     };
 
   /// Returns pre-defined run-time environment. This includes the environement
@@ -171,7 +178,7 @@ namespace
   /// update the dialog with widgets of right type with correct default values.
   /// It uses application settings to obtain the default values, whenever
   /// possible.
-  bool createWidgets(QMap<QString, pqWidget>& widgets,
+  bool createWidgets(QMap<QString, pqWidget*>& widgets,
     QDialog& dialog, const pqServerConfiguration& configuration,
     QProcessEnvironment& options)
     {
@@ -275,7 +282,7 @@ namespace
               default_value = min.toDouble() + (max.toDouble() - min.toDouble()) * noise;
               }
             }
-          widgets[name] = pqWidget(widget, "value");
+          widgets[name] = new pqWidget(widget, "value");
           widget->setProperty("minimum", QVariant(min));
           widget->setProperty("maximum", QVariant(max));
           widget->setProperty("step", QVariant(step));
@@ -283,20 +290,20 @@ namespace
         else if (strcmp(typeNode->GetName(), "String") == 0)
           {
           QLineEdit* widget = new QLineEdit(QString(), &dialog);
-          widgets[name] = pqWidget(widget, "text");
+          widgets[name] = new pqWidget(widget, "text");
           }
         else if (strcmp(typeNode->GetName(), "File") == 0)
           {
           pqFileChooserWidget* widget = new pqFileChooserWidget(&dialog);
           widget->setForceSingleFile(true);
-          widgets[name] = pqWidget(widget, "singleFilename");
+          widgets[name] = new pqWidget(widget, "singleFilename");
           }
         else if (strcmp(typeNode->GetName(), "Boolean") == 0)
           {
           QCheckBox * checkbox = new QCheckBox(&dialog);
           const char* true_value = typeNode->GetAttributeOrDefault("true", "1");
           const char* false_value = typeNode->GetAttributeOrDefault("false", "0");
-          widgets[name] = pqWidgetForCheckbox(checkbox, true_value, false_value);
+          widgets[name] = new pqWidgetForCheckbox(checkbox, true_value, false_value);
           }
         else if (strcmp(typeNode->GetName(), "Enumeration") == 0)
           {
@@ -313,7 +320,7 @@ namespace
               widget->addItem(xml_label, xml_value);
               }
             }
-          widgets[name] = pqWidgetForComboBox(widget);
+          widgets[name] = new pqWidgetForComboBox(widget);
           }
         else
           {
@@ -321,12 +328,12 @@ namespace
             << "/>' discovered under <Option/> element.";
           continue;
           }
-
-        widgets[name].ToSave = save;
-        widgets[name].set(default_value);
-        widgets[name].Widget->setEnabled(!readonly);
-        widgets[name].Widget->setObjectName(name);
-        formLayout->addRow(label, widgets[name].Widget);
+        widgets[name]->setParent(&dialog);
+        widgets[name]->ToSave = save;
+        widgets[name]->set(default_value);
+        widgets[name]->Widget->setEnabled(!readonly);
+        widgets[name]->Widget->setObjectName(name);
+        formLayout->addRow(label, widgets[name]->Widget);
         }// end of <Option />
       else if (strcmp(node->GetName(), "Switch") == 0)
         {
@@ -351,19 +358,19 @@ namespace
   /// the widgets. This function may change the resource uri for the \c
   /// configuration itself if any of the GUI widgets changed the server-port
   /// numbers.
-  void updateEnvironment(const QMap<QString, pqWidget> &widgets,
+  void updateEnvironment(const QMap<QString, pqWidget*> &widgets,
     pqServerConfiguration& configuration,
     QProcessEnvironment& options)
     {
     pqSettings* settings = pqApplicationCore::instance()->settings();
     pqServerResource resource = configuration.resource();
-    foreach (const pqWidget& item, widgets)
+    foreach (const pqWidget* item, widgets)
       {
-      QString name = item.Widget->objectName();
-      QVariant chosen_value = item.get();
+      QString name = item->Widget->objectName();
+      QVariant chosen_value = item->get();
       cout << name.toAscii().data() << "=" << chosen_value.toString().toAscii().data() <<
         endl;
-      if (item.ToSave)
+      if (item->ToSave)
         {
         // save the chosen value in settings if requested.
         QString settingsKey = QString("SERVER_STARTUP/%1.%2").arg(
@@ -574,7 +581,9 @@ bool pqServerLauncher::promptOptions()
   QDialog dialog(pqCoreUtilities::mainWidget());
 
   // setup the dialog using the configuration's XML.
-  QMap<QString, pqWidget> widgets; // map to save the widgets.
+  QMap<QString, pqWidget*> widgets; // map to save the widgets.
+  // note: all pqWidget instances created are set with parent as the dialog, so
+  // we don't need to clean them up explicitly.
   createWidgets(widgets, dialog, this->Internals->Configuration, options);
   if (dialog.exec() != QDialog::Accepted)
     {

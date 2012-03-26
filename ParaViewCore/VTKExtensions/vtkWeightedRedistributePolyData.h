@@ -58,7 +58,7 @@ protected:
 //ETX
 
 
-  virtual void MakeSchedule (vtkCommSched*);
+  virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
   float* Weights;
 
 private:

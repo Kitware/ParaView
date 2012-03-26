@@ -31,10 +31,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <pqSettings.h>
 
-#include <QDialog>
-#include <QMainWindow>
 #include <QDesktopWidget>
+#include <QDialog>
 #include <QDockWidget>
+#include <QFile>
+#include <QMainWindow>
+
+namespace
+{
+  class pqSettingsCleaner : public QObject
+  {
+  QString Filename;
+public:
+  pqSettingsCleaner(const QString& filename, QObject* parentObject):
+    QObject(parentObject), Filename(filename)
+  {
+  }
+
+  virtual ~pqSettingsCleaner()
+    {
+    QFile::remove(this->Filename);
+    }
+  };
+}
 
 //-----------------------------------------------------------------------------
 pqSettings::pqSettings(
@@ -43,6 +62,16 @@ pqSettings::pqSettings(
     QObject* p) :
 QSettings(QSettings::IniFormat, QSettings::UserScope, organization, application, p)
 {
+}
+
+//-----------------------------------------------------------------------------
+pqSettings::pqSettings(const QString& filename, bool temporary, QObject* parentObject)
+: QSettings(filename, QSettings::IniFormat, parentObject)
+{
+  if (temporary)
+    {
+    new pqSettingsCleaner(filename, this);
+    }
 }
 
 void pqSettings::alertSettingsModified()

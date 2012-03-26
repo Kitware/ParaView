@@ -130,28 +130,6 @@ int vtkPVExtractSelection::RequestData(
   if (sel->GetNumberOfNodes() >= 1 && sel->GetNode(0)->GetContentType() == vtkSelectionNode::QUERY)
     {
 #ifdef PARAVIEW_ENABLE_PYTHON
-
-//    +    vtkExecutive* producer;
-//    +    int producerPort;
-//    +    vtkExecutive::PRODUCER()->Get(input->GetInformation(), producer, producerPort);
-//    +    vtkAlgorithm* alg = NULL;
-//    +    if(producer)
-//    +      {
-//    +      alg = producer->GetAlgorithm();
-//    +      }
-//    +    if(alg)
-//    +      {
-//    +      this->AddInputConnection(0, alg->GetOutputPort());
-//    +      }
-//    +    else
-//    +      {
-//    +      vtkErrorMacro(<<"Error in obtaining producerPort for input");
-//    +      }
-//    +    producer->Delete();
-//    +    alg->Delete();
-
-
-
     vtkPythonExtractSelection *pythonExtractSelection = vtkPythonExtractSelection::New();
 
     vtkDataObject *localInputDO = inputDO->NewInstance();
@@ -160,47 +138,8 @@ int vtkPVExtractSelection::RequestData(
     vtkSelection *localSel = sel->NewInstance();
     localSel->ShallowCopy(sel);
 
-    // Get localInputDO port
-    vtkExecutive* producer = NULL;
-    int producerPort       = -1;
-    vtkExecutive::PRODUCER()->Get(
-        localInputDO->GetInformation(),producer,producerPort );
-    vtkAlgorithm* alg = NULL;
-    if( producer != NULL )
-      {
-      alg = producer->GetAlgorithm();
-      }
-    if( alg != NULL )
-      {
-      pythonExtractSelection->SetInputConnection(
-          0, alg->GetOutputPort() );
-      }
-    else
-      {
-      vtkErrorMacro(<<"Error in obtaining producer port for input");
-      }
-    producer->Delete();
-    alg->Delete();
-
-    // Get selection port
-    producer     = NULL;
-    producerPort = -1;
-    alg          = NULL;
-    vtkExecutive::PRODUCER()->Get(
-        localSel->GetInformation(),producer,producerPort);
-    if( producer != NULL )
-      {
-      alg = producer->GetAlgorithm();
-      }
-    if( alg != NULL )
-      {
-      pythonExtractSelection->SetSelectionConnection(alg->GetOutputPort());
-      }
-    else
-      {
-      vtkErrorMacro(<<"Error in obtaining producer port for input");
-      }
-
+    pythonExtractSelection->SetInputData(0, localInputDO);
+    pythonExtractSelection->SetInputData(1, localSel);
 
     pythonExtractSelection->Update();
 

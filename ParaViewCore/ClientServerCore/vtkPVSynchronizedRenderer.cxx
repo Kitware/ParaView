@@ -27,6 +27,7 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkRenderer.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkSocketController.h"
 
 #ifdef PARAVIEW_USE_ICE_T
@@ -391,7 +392,17 @@ void vtkPVSynchronizedRenderer::SetRenderer(vtkRenderer* ren)
     {
     this->CSSynchronizer->SetRenderer(ren);
     }
-  vtkSetObjectBodyMacro(Renderer, vtkRenderer, ren);
+
+  // The renderer should be OpenGL ...
+  vtkOpenGLRenderer *glRenderer = vtkOpenGLRenderer::SafeDownCast(ren);
+
+  if(ren && !glRenderer)
+    {
+    vtkErrorMacro("Received non OpenGL renderer");
+    assert(false);
+    }
+
+  vtkSetObjectBodyMacro(Renderer, vtkOpenGLRenderer, glRenderer);
   this->SetupPasses();
 }
 
