@@ -85,8 +85,6 @@ public:
   vtkInternals()
   {
     this->UseIndexForXAxis = true;
-    this->ChartType = vtkChart::LINE;
-    this->TableVisibility = false;
   }
 
   PlotMapType PlotMap;
