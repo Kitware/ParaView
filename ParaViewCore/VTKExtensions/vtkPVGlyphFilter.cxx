@@ -413,6 +413,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       // our overloaded IsPointVisible. Now let vktGlyph3D take over.
       newInInfo->Set(vtkDataObject::DATA_OBJECT(), ds);
       retVal = this->Superclass::RequestData(request, inputVs, outputV.GetPointer());
+
       // vktGlyph3D failed, so we skip the rest and fail as well.
       if (!retVal)
         {
@@ -425,7 +426,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
 
       //Accumulate the results.
       tmpOut->ShallowCopy(newoutput.GetPointer());
-      append->AddInput(tmpOut.GetPointer());
+      append->AddInputData(tmpOut.GetPointer());
 
       numInputs++;
       }

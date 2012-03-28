@@ -416,14 +416,14 @@ int vtkXMLCollectionReader::RequestDataObject(
         << "Please make sure this file format is supported.");
       return 0;
       }
-    output->SetPipelineInformation(info);
+    info->Set(vtkDataObject::DATA_OBJECT(), output);
     output->Delete();
     this->InternalForceMultiBlock = false;
     }
   else
     {
     vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::New();
-    output->SetPipelineInformation(info);
+    info->Set(vtkDataObject::DATA_OBJECT(), output);
     output->Delete();
     this->InternalForceMultiBlock = true;
     }

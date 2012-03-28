@@ -643,13 +643,19 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     SIGNAL(currentTextChanged(const QString&)),
     selSource, selSource->GetProperty("FieldType"));
 
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("ContainingCells"));
+  if (selSource->GetProperty("ContainingCells"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->checkboxContainCell, "checked", SIGNAL(toggled(bool)),
+      selSource, selSource->GetProperty("ContainingCells"));
+    }
 
-  this->Implementation->SelectionLinks->addPropertyLink(
-    this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
-    selSource, selSource->GetProperty("InsideOut"));
+  if (selSource->GetProperty("InsideOut"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->checkboxInsideOut, "checked", SIGNAL(toggled(bool)),
+      selSource, selSource->GetProperty("InsideOut"));
+    }
 
   if (selSource->GetProperty("IDs"))
     {
@@ -1363,6 +1369,7 @@ void pqSelectionInspectorPanel::onActiveViewChanged(pqView* view)
   this->Implementation->ActiveView = renView;
 
   // update the frustum widget.
+  // FIXME:TIMER
   QTimer::singleShot(10, this, SLOT(updateFrustum()));
 
   // Update the "Display Style" GUI since it shows the representation in the

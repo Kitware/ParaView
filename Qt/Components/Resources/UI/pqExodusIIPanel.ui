@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>740</height>
+    <width>392</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,7 +27,7 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="pqTreeWidget" name="Variables">
+    <widget class="pqExodusIIVariableSelectionWidget" name="Variables">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -193,7 +193,7 @@
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0">
-        <widget class="pqTreeWidget" name="FaceBlockArrays">
+        <widget class="pqExodusIIVariableSelectionWidget" name="FaceBlockArrays">
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -212,7 +212,7 @@
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0">
-        <widget class="pqTreeWidget" name="EdgeBlockArrays">
+        <widget class="pqExodusIIVariableSelectionWidget" name="EdgeBlockArrays">
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -228,7 +228,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqTreeWidget" name="Sets">
+    <widget class="pqExodusIIVariableSelectionWidget" name="Sets">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -359,7 +359,7 @@
     </widget>
    </item>
    <item>
-    <widget class="pqTreeWidget" name="Maps">
+    <widget class="pqExodusIIVariableSelectionWidget" name="Maps">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -532,11 +532,6 @@
    <header>pqFileChooserWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>pqTreeWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>pqTreeWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
@@ -546,6 +541,11 @@
    <class>pqTreeView</class>
    <extends>QTreeView</extends>
    <header>pqTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqExodusIIVariableSelectionWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqExodusIIVariableSelectionWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -68,7 +68,7 @@ protected:
   ~vtkAnalyzeReader();
 
   virtual void ExecuteInformation();
-  virtual void ExecuteData(vtkDataObject *out);
+  virtual void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation* outInfo);
 private:
   vtkAnalyzeReader(const vtkAnalyzeReader&);  // Not implemented.
   void operator=(const vtkAnalyzeReader&);  // Not implemented.

@@ -78,6 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 #include "vtkTesting.h"
 #include "vtkTIFFWriter.h"
+#include "vtkTrivialProducer.h"
 #include "vtkWindowToImageFilter.h"
 
 #ifdef QT_TESTING_WITH_PYTHON
@@ -89,7 +90,7 @@ template<typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 {
   WriterT* const writer = WriterT::New();
-  writer->SetInput(Capture->GetOutput());
+  writer->SetInputConnection(Capture->GetOutputPort());
   writer->SetFileName(File.filePath().toAscii().data());
   writer->Write();
   const bool result = writer->GetErrorCode() == vtkErrorCode::NoError;
@@ -104,6 +105,10 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
 pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
   pqTestUtility(p)
 {
+  // we don't want to the dispatcher to wait during event playback. We will
+  // explicitly register timers that need to be timed out.
+  pqEventDispatcher::setEventPlaybackDelay(0);
+
   // add an XML source
   this->addEventSource("xml", new pqXMLEventSource(this));
   this->addEventObserver("xml", new pqXMLEventObserver(this));
@@ -229,7 +234,9 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
   testing->AddArgument(TempDirectory.toAscii().data());
   testing->AddArgument("-V");
   testing->AddArgument(ReferenceImage.toAscii().data());
-  if (testing->RegressionTest(testImage, Threshold) == vtkTesting::PASSED)
+  vtkSmartPointer<vtkTrivialProducer> tp = vtkSmartPointer<vtkTrivialProducer>::New();
+  tp->SetOutput(testImage);
+  if (testing->RegressionTest(tp, Threshold) == vtkTesting::PASSED)
     {
     return true;
     }
@@ -244,13 +251,19 @@ namespace pqCoreTestUtilityInternal{
   public:
     WidgetSizer(QWidget* widget, const QSize& size)
       {
-      this->OldSize = widget->size();
-      this->Widget = widget;
-      widget->resize(size);
+      if (size.isValid())
+        {
+        this->OldSize = widget->size();
+        this->Widget = widget;
+        widget->resize(size);
+        }
       }
     ~WidgetSizer()
       {
-      this->Widget->resize(this->OldSize); 
+      if (this->Widget && this->OldSize.isValid())
+        {
+        this->Widget->resize(this->OldSize);
+        }
       }
 
     };
@@ -308,9 +321,11 @@ bool pqCoreTestUtility::CompareView(
   pqView* curView,
   const QString& referenceImage,
   double threshold,
-  const QString& tempDirectory)
+  const QString& tempDirectory,
+  const QSize& size/*=QSize()*/)
 {
   Q_ASSERT(curView != NULL);
+  pqCoreTestUtilityInternal::WidgetSizer sizer(curView->getWidget(), size);
 
   vtkImageData* test_image = curView->captureImage(1);
   if (!test_image)

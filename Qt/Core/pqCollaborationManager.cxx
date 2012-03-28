@@ -32,25 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqContextView.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineSource.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
-#include "pqQVTKWidget.h"
-#include "pqContextView.h"
+#include "vtkChart.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMContextViewProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
-#include "vtkSMContextViewProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkChart.h"
-#include "vtkNew.h"
 
 #include <set>
 #include <map>
@@ -59,12 +59,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QEvent>
 #include <QMap>
+#include <QMouseEvent>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 #include <QVariant>
 #include <QWidget>
-#include <QMouseEvent>
-#include <QTimer>
 
 //***************************************************************************
 //                           Internal class

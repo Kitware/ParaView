@@ -4415,63 +4415,6 @@
    <!-- End gaussiancubereader -->
    </SourceProxy>
 
-   <SourceProxy name="popreader" class="vtkPOPReader" label="POP Reader">
-     <Documentation
-       short_help="Read POP data files."
-       long_help="Reads data files from the Parallel Ocean Program (POP).">
-       The POP reader reads data files from the Parallel Ocean Program (POP). The expected file extension is .pop. The output of this reader is a structured grid dataset.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the POP Ocean file reader.
-        </Documentation>
-     </StringVectorProperty>
-
-      <DoubleVectorProperty
-         name="Radius"
-         command="SetRadius"
-         number_of_elements="1"
-         default_values="60000" >
-        <DoubleRangeDomain name="range"/>
-        <Documentation>
-          This property specifies the radius of the dataset.
-        </Documentation>
-      </DoubleVectorProperty>
-
-     <IntVectorProperty
-        name="ClipExtent"
-        command="SetClipExtent"
-        number_of_elements="6"
-        default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" >
-       <IntRangeDomain name="range"/>
-       <Documentation>
-         This property indicates the minimum and maximum extent in each dimension of the dataset (X, Y, and Z) to read.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="NumberOfGhostLevels"
-        command="SetNumberOfGhostLevels"
-        number_of_elements="1"
-        default_values="1" >
-       <IntRangeDomain name="range"/>
-       <Documentation>
-         This property indicates the number of ghost levels to generate.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Hints>
-      <ReaderFactory extensions="pop"
-          file_description="POP Ocean Files"/>
-     </Hints>
-   <!-- End popreader -->
-   </SourceProxy>
-
    <SourceProxy name="ensightMS"
                 class="vtkPVEnSightMasterServerReader2"
                 label="EnSight Master Server Reader">

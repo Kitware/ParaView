@@ -55,7 +55,7 @@ public:
 
   // Description:
   // Specify the input data to map.
-  void SetInput(vtkImageData *in);
+  void SetInputData(vtkImageData *in);
   virtual vtkImageData *GetInput();
 
   // Description:

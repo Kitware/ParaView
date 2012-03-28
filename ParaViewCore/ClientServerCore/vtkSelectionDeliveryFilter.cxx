@@ -68,7 +68,7 @@ int vtkSelectionDeliveryFilter::RequestData(vtkInformation*,
     {
     vtkSelection* clone = vtkSelection::New();
     clone->ShallowCopy(input);
-    this->ReductionFilter->SetInput(clone);
+    this->ReductionFilter->SetInputData(clone);
     this->DeliveryFilter->SetInputConnection(this->ReductionFilter->GetOutputPort());
     clone->FastDelete();
     }

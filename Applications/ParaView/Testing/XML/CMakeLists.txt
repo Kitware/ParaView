@@ -142,6 +142,10 @@ IF ("1" STREQUAL ${HAS_NUMPY})
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES} ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
+# These tests cannot be run using ctest -j since they are affected by focus
+# changed events.
+set (AnimatePipelineTime_FORCE_SERIAL TRUE)
+
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
 
@@ -202,6 +206,7 @@ SET (XYHistogram_BREAK TRUE)
 
 SET(ExtractLevel_BREAK TRUE)
 
+SET(Fractal2D_BREAK TRUE)
 
 # Add image threshold overrides for tests.
 # Generally all tests with wireframes need higher thresholds.
@@ -418,6 +423,11 @@ set (XdmfGridAttributes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (XYChart_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 set (ZLibXDMF_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 
+
+set(TESTS_WITH_MULTI_SERVERS_3
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServer3.xml
+)
+
 IF (PARAVIEW_DATA_ROOT)
   set (TESTS_WITHOUT_BASELINES
     ${TESTS_WITHOUT_BASELINES}
@@ -460,4 +470,7 @@ IF (PARAVIEW_DATA_ROOT)
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
     TEST_SCRIPTS ${TESTS_WITH_BASELINES})
 
+  add_multi_server_tests("pvcs-multi-servers" 3
+     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+     TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 ENDIF (PARAVIEW_DATA_ROOT)

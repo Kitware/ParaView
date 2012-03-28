@@ -142,7 +142,7 @@ int vtkCellPointsFilter::ExecuteCompositeDataSet(vtkCompositeDataSet* input,
       {
       vtkPolyData* tmpOut = vtkPolyData::New();
       this->ExecuteSimple(ds, tmpOut);
-      append->AddInput(tmpOut);
+      append->AddInputData(tmpOut);
       // Call FastDelete() instead of Delete() to avoid garbage
       // collection checks. This improves the performance significantly
       tmpOut->FastDelete();

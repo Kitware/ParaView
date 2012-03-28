@@ -68,7 +68,7 @@ protected:
   ~vtkNIfTIReader();
 
   virtual void ExecuteInformation();
-  virtual void ExecuteData(vtkDataObject *out);
+  virtual void ExecuteDataWithInformation(vtkDataObject *output, vtkInformation* outInfo);
 private:
   vtkNIfTIReader(const vtkNIfTIReader&);  // Not implemented.
   void operator=(const vtkNIfTIReader&);  // Not implemented.

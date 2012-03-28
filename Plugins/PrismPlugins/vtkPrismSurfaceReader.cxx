@@ -141,24 +141,24 @@ class vtkPrismSurfaceReader::MyInternal
 
             this->Reader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->ConversionFilter =  vtkSmartPointer<vtkSESAMEConversionFilter>::New();
-            this->ConversionFilter->SetInput(this->Reader->GetOutput());
+            this->ConversionFilter->SetInputConnection(this->Reader->GetOutputPort());
 
             this->VaporizationReader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->VaporizationConversionFilter =  vtkSmartPointer<vtkSESAMEConversionFilter>::New();
-            this->VaporizationConversionFilter->SetInput(this->VaporizationReader->GetOutput());
+            this->VaporizationConversionFilter->SetInputConnection(this->VaporizationReader->GetOutputPort());
 
             this->ColdReader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->ColdConversionFilter =  vtkSmartPointer<vtkSESAMEConversionFilter>::New();
-            this->ColdConversionFilter->SetInput(this->ColdReader->GetOutput());
+            this->ColdConversionFilter->SetInputConnection(this->ColdReader->GetOutputPort());
 
 
             this->SolidMeltReader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->SolidMeltConversionFilter =  vtkSmartPointer<vtkSESAMEConversionFilter>::New();
-            this->SolidMeltConversionFilter->SetInput(this->SolidMeltReader->GetOutput());
+            this->SolidMeltConversionFilter->SetInputConnection(this->SolidMeltReader->GetOutputPort());
 
             this->LiquidMeltReader =  vtkSmartPointer<vtkPrismSESAMEReader>::New();
             this->LiquidMeltConversionFilter =  vtkSmartPointer<vtkSESAMEConversionFilter>::New();
-            this->LiquidMeltConversionFilter->SetInput(this->LiquidMeltReader->GetOutput());
+            this->LiquidMeltConversionFilter->SetInputConnection(this->LiquidMeltReader->GetOutputPort());
 
             this->ExtractGeometry=vtkSmartPointer<vtkExtractPolyDataGeometry >::New();
 
@@ -957,10 +957,10 @@ int vtkPrismSurfaceReader::RequestData(
   this->ActualThresholdBounds[4]=bounds[4];
   this->ActualThresholdBounds[5]=bounds[5];
 
-  this->Internal->ExtractGeometry->SetInput(localOutput);
+  this->Internal->ExtractGeometry->SetInputData(localOutput);
   this->Internal->Box->SetBounds(this->ActualThresholdBounds);
 
-  this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+  this->Internal->CleanPolyData->SetInputConnection( this->Internal->ExtractGeometry->GetOutputPort());
 
   this->Internal->CleanPolyData->Update();
 
@@ -1052,7 +1052,7 @@ int vtkPrismSurfaceReader::RequestData(
     if(cArray)
     {
 
-      this->Internal->ContourFilter->SetInput(this->Internal->CleanPolyData->GetOutput());
+      this->Internal->ContourFilter->SetInputConnection(this->Internal->CleanPolyData->GetOutputPort());
 
       this->Internal->ContourFilter->SetInputArrayToProcess(
         0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
@@ -1310,8 +1310,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         }
 
 
-        this->Internal->ExtractGeometry->SetInput(localOutput);
-        this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+        this->Internal->ExtractGeometry->SetInputData(localOutput);
+        this->Internal->CleanPolyData->SetInputConnection( this->Internal->ExtractGeometry->GetOutputPort());
         this->Internal->CleanPolyData->Update();
 
         vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
@@ -1468,8 +1468,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
 
 
 
-      this->Internal->ExtractGeometry->SetInput(localOutput);
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+      this->Internal->ExtractGeometry->SetInputData(localOutput);
+      this->Internal->CleanPolyData->SetInputConnection( this->Internal->ExtractGeometry->GetOutputPort());
       this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
@@ -1625,8 +1625,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
       }
 
 
-      this->Internal->ExtractGeometry->SetInput(localOutput);
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+      this->Internal->ExtractGeometry->SetInputData(localOutput);
+      this->Internal->CleanPolyData->SetInputConnection( this->Internal->ExtractGeometry->GetOutputPort());
       this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
@@ -1768,8 +1768,8 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
         newPts->InsertPoint(ptId,coords);
       }
 
-      this->Internal->ExtractGeometry->SetInput(localOutput);
-      this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
+      this->Internal->ExtractGeometry->SetInputData(localOutput);
+      this->Internal->CleanPolyData->SetInputConnection( this->Internal->ExtractGeometry->GetOutputPort());
       this->Internal->CleanPolyData->Update();
 
       vtkSmartPointer<vtkPolyData> output= vtkSmartPointer<vtkPolyData>::New();
@@ -1814,7 +1814,7 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
   {
     if(resultPd[v])
     {
-      appendPD->AddInput(resultPd[v]);
+      appendPD->AddInputData(resultPd[v]);
       cOutput=true;
     }
   }

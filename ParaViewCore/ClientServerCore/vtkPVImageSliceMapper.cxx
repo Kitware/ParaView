@@ -22,6 +22,7 @@
 #include "vtkScalarsToColorsPainter.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkExecutive.h"
 #include "vtkDataArray.h"
 //-----------------------------------------------------------------------------
@@ -120,16 +121,17 @@ void vtkPVImageSliceMapper::Render(vtkRenderer* ren, vtkActor* act)
   for (int cc=0; cc < this->NumberOfSubPieces; cc++)
     {
     int currentPiece = this->NumberOfSubPieces * this->Piece + cc;
-    input->SetUpdateExtent(currentPiece, nPieces, this->GhostLevel);
+    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(this->GetInputInformation(),
+      currentPiece, nPieces, this->GhostLevel);
     this->RenderPiece(ren, act);
     }
 
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSliceMapper::SetInput(vtkImageData* input)
+void vtkPVImageSliceMapper::SetInputData(vtkImageData* input)
 {
-  this->SetInputConnection(0, input? input->GetProducerPort(): NULL);
+  this->SetInputDataInternal(0, input);
 }
 
 //----------------------------------------------------------------------------
@@ -141,24 +143,36 @@ vtkImageData* vtkPVImageSliceMapper::GetInput()
 //----------------------------------------------------------------------------
 void vtkPVImageSliceMapper::Update()
 {
-  if (this->Static)
+  // Set the whole extent on the painter because it needs it internally
+  // and it has no access to the pipeline information.
+  vtkTexturePainter* ptr = vtkTexturePainter::SafeDownCast(this->GetPainter());
+
+  if (!this->Static)
     {
-    return;
+    int currentPiece, nPieces = this->NumberOfPieces;
+    vtkImageData* input = this->GetInput();
+
+    // If the estimated pipeline memory usage is larger than
+    // the memory limit, break the current piece into sub-pieces.
+    if (input)
+      {
+      this->GetInputAlgorithm()->UpdateInformation();
+      currentPiece = this->NumberOfSubPieces * this->Piece;
+      vtkStreamingDemandDrivenPipeline::SetUpdateExtent(
+        this->GetInputInformation(),
+        currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
+      }
+
+    this->Superclass::Update();
     }
 
-  int currentPiece, nPieces = this->NumberOfPieces;
-  vtkImageData* input = this->GetInput();
-  
-  // If the estimated pipeline memory usage is larger than
-  // the memory limit, break the current piece into sub-pieces.
-  if (input) 
-    {
-    currentPiece = this->NumberOfSubPieces * this->Piece;
-    input->SetUpdateExtent(currentPiece, this->NumberOfSubPieces*nPieces, 
-                           this->GhostLevel);
-    }
 
-  this->Superclass::Update();
+  int *wext = this->GetInputInformation(0, 0)->Get(
+    vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
+  if (wext)
+    {
+    ptr->SetWholeExtent(wext);
+    }
 }
 
 
@@ -225,7 +239,7 @@ void vtkPVImageSliceMapper::ShallowCopy(vtkAbstractMapper* mapper)
   vtkPVImageSliceMapper* idmapper = vtkPVImageSliceMapper::SafeDownCast(mapper);
   if (idmapper)
     {
-    this->SetInput(idmapper->GetInput());
+    this->SetInputData(idmapper->GetInput());
     this->SetGhostLevel(idmapper->GetGhostLevel());
     this->SetNumberOfPieces(idmapper->GetNumberOfPieces());
     this->SetNumberOfSubPieces(idmapper->GetNumberOfSubPieces());
@@ -312,7 +326,7 @@ void vtkPVImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
     this->InvokeEvent(vtkCommand::StartEvent,NULL);
     if (!this->Static)
       {
-      input->Update();
+      this->Update();
       }
     this->InvokeEvent(vtkCommand::EndEvent,NULL);
 

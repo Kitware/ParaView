@@ -264,7 +264,8 @@ int vtkImageNetCDFPOPReader::RequestInformation(
     //save split path in translator
     vtkImageData *outData = vtkImageData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
-    vtkExtentTranslator *et = outData->GetExtentTranslator();
+    vtkExtentTranslator *et = vtkExtentTranslator::SafeDownCast(
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::EXTENT_TRANSLATOR()));
     et->SetSplitPath(pathLen, splitPath);
 
     this->Internals->GridSampler->SetSpacing(sSpacing);
