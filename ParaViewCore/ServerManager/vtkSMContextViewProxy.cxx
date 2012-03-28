@@ -31,6 +31,7 @@
 #include "vtkSMUtilities.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkProcessModule.h"
 
 //****************************************************************************
 // vtkSMContextViewInteractorStyle makes it possible for us to call
