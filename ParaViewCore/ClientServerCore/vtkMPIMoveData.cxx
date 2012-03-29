@@ -138,12 +138,10 @@ namespace
       result->ShallowCopy(pieces[0]);
       return false;
       }
-    std::vector< vtkSmartPointer<vtkTrivialProducer> > pieceProducers(pieces.size());
-    std::vector< vtkSmartPointer<vtkTrivialProducer> >::iterator producerIter;
     std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
-    for (iter = pieces.begin(), producerIter = pieceProducers.begin();
-         iter != pieces.end(), producerIter != pieceProducers.end();
-        ++iter, ++producerIter)
+    for (iter = pieces.begin();
+         iter != pieces.end();
+        ++iter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
       
@@ -152,8 +150,9 @@ namespace
         // skip empty pieces.
         continue;
         }
-      producerIter->GetPointer()->SetOutput(iter->GetPointer());
-      appender->AddInputConnection(0, producerIter->GetPointer()->GetOutputPort());
+      vtkNew<vtkTrivialProducer> tp;
+      tp->SetOutput(iter->GetPointer());
+      appender->AddInputConnection(0, tp->GetOutputPort());
       }
     appender->Update();
     result->ShallowCopy(appender->GetOutputDataObject(0));
