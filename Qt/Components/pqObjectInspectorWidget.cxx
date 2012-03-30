@@ -345,8 +345,16 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   this->AutoAcceptTimer.setSingleShot(true);
   this->AutoAcceptTimer.setInterval(1000);  // 1 sec
-  QObject::connect(&this->AutoAcceptTimer, SIGNAL(timeout()),
-                   this, SLOT(accept()));
+  if (applyPropertiesManager)
+    {
+    QObject::connect(&this->AutoAcceptTimer, SIGNAL(timeout()),
+      applyPropertiesManager, SLOT(applyProperties()));
+    }
+  else
+    {
+    QObject::connect(&this->AutoAcceptTimer, SIGNAL(timeout()),
+      this, SLOT(accept()));
+    }
 
   this->connect(&pqActiveObjects::instance(),
                 SIGNAL(portChanged(pqOutputPort*)),
