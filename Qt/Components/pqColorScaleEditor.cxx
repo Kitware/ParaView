@@ -1626,7 +1626,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
       this->OpacityFunctionViewer->resetView();
       }
     }
-  vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
+  //vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
   //if(pwf)
   //  {
   //  pwf->SetAllowDuplicateScalars(min==max);
