@@ -52,9 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
-#ifdef FIXME
-#include "pqScatterPlotRepresentation.h"
-#endif
 #include "pqSettings.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -110,10 +107,8 @@ public:
   pqSignalAdaptorComboBox *LabelFontAdaptor;
   vtkEventQtSlotConnect *Listener;
   pqColorPresetManager *Presets;
-  QPointer<pqDataRepresentation> CurrentDisplay;
   bool InSetColors;
   bool IgnoreEditor;
-  bool IsDormant;
   bool MakingLegend;
   vtkSmartPointer<vtkEventQtSlotConnect> ColorFunctionConnect;
   vtkSmartPointer<vtkEventQtSlotConnect> OpacityFunctionConnect;
@@ -122,7 +117,7 @@ public:
 
 //----------------------------------------------------------------------------
 pqColorScaleEditorForm::pqColorScaleEditorForm()
-  : Ui::pqColorScaleDialog(), Links(), CurrentDisplay(0)
+  : Ui::pqColorScaleDialog(), Links()
 {
   this->TitleColorAdaptor = 0;
   this->LabelColorAdaptor = 0;
@@ -134,7 +129,6 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->Presets = 0;
   this->InSetColors = false;
   this->IgnoreEditor = false;
-  this->IsDormant = true;
   this->MakingLegend = false;
 }
 
@@ -304,12 +298,6 @@ pqColorScaleEditor::~pqColorScaleEditor()
 
 void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
 {
-  this->Form->CurrentDisplay = display;
-  if(this->Form->IsDormant)
-    {
-    return;
-    }
-
   if(this->Display == display)
     {
     return;
@@ -375,29 +363,6 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
     }
 }
 
-void pqColorScaleEditor::showEvent(QShowEvent *e)
-{
-  // Set up the display and view if the dialog has been dormant.
-  if(this->Form->IsDormant)
-    {
-    this->Form->IsDormant = false;
-    this->setRepresentation(this->Form->CurrentDisplay);
-    }
-
-  QDialog::showEvent(e);
-}
-
-void pqColorScaleEditor::hideEvent(QHideEvent *e)
-{
-  QDialog::hideEvent(e);
-
-  // Save the current display and view and go dormant.
-  pqDataRepresentation *display = this->Form->CurrentDisplay;
-  this->setRepresentation(0);
-  this->Form->IsDormant = true;
-  this->Form->CurrentDisplay = display;
-}
-
 void pqColorScaleEditor::pushColors()
 {
   if(!this->ColorMap || this->Form->InSetColors)
@@ -419,6 +384,12 @@ void pqColorScaleEditor::pushColors()
       {
       plot->GetControlPoint(i, scalar);
       tf->GetColor(scalar[0], rgb);
+      rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
+      }
+    // If there is only one control point in the transfer function originally,
+    // we need to add another control point.
+    if(total == 1)
+      {
       rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
       }
     }
@@ -799,7 +770,7 @@ void pqColorScaleEditor::setNanColor(const QColor &color)
 }
 void pqColorScaleEditor::setScalarColor(const QColor &color)
 {
-  if (this->ColorMap)
+  if (!this->Form->InSetColors && this->ColorMap)
     {
     this->Form->InSetColors = true;
     vtkColorTransferFunction* clientTF=vtkColorTransferFunction::SafeDownCast(
@@ -820,6 +791,14 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
       clientTF->SetNodeValue(i, nodeVal);
       rgbPoints << nodeVal[0] << nodeVal[1] << nodeVal[2] <<nodeVal[3];
       }
+    //// SHOULD NEVER GET HERE
+    // If there is only one control point in the transfer function originally,
+    // we need to add another control point.
+    if(total == 1)
+      {
+      rgbPoints << nodeVal[0] << nodeVal[1] << nodeVal[2] <<nodeVal[3];
+      }
+
     vtkSMProxy *lookupTable = this->ColorMap->getProxy();
     pqSMAdaptor::setMultipleElementProperty(
       lookupTable->GetProperty("RGBPoints"), rgbPoints);
@@ -1036,6 +1015,7 @@ void pqColorScaleEditor::rescaleToNewRange()
     this->Form->InSetColors = false;
     range = this->ColorMap->getScalarRange();
     this->updateScalarRange(range.first, range.second);
+    this->updateCurrentColorPoint();
     }
 }
 
@@ -1062,6 +1042,7 @@ void pqColorScaleEditor::rescaleToDataRangeOverTime()
         {
         QPair<double, double> range = this->ColorMap->getScalarRange();
         this->updateScalarRange(range.first, range.second);
+        this->updateCurrentColorPoint();
         }
       }
     }
@@ -1076,12 +1057,6 @@ void pqColorScaleEditor::rescaleToDataRange()
   this->unsetCurrentPoints();
   pqPipelineRepresentation *pipeline =
       qobject_cast<pqPipelineRepresentation *>(this->Display);
-  //pqBarChartRepresentation *histogram =
-  //    qobject_cast<pqBarChartRepresentation *>(this->Display);
-#ifdef FIXME
-  pqScatterPlotRepresentation* scatterPlot =
-    qobject_cast<pqScatterPlotRepresentation *>(this->Display);
-#endif
   if(pipeline)
     {
     pipeline->resetLookupTableScalarRange();
@@ -1090,20 +1065,9 @@ void pqColorScaleEditor::rescaleToDataRange()
       {
       QPair<double, double> range = this->ColorMap->getScalarRange();
       this->updateScalarRange(range.first, range.second);
+      this->updateCurrentColorPoint();
       }
     }
-  //else if(histogram)
-  //  {
-  //  histogram->resetLookupTableScalarRange();
-  //  histogram->renderViewEventually();
-  //  }
-#ifdef FIXME
-  else if(scatterPlot)
-    {
-    scatterPlot->resetLookupTableScalarRange();
-    scatterPlot->renderViewEventually();
-    }
-#endif
   this->Form->InSetColors = false;
 }
 
@@ -1411,8 +1375,14 @@ void pqColorScaleEditor::loadColorPoints()
     //// Add the new data to the editor.
     QList<QVariant> list;
     vtkSMProxy *lookupTable = this->ColorMap->getProxy();
-    list = pqSMAdaptor::getMultipleElementProperty(
-        lookupTable->GetProperty("RGBPoints"));
+    vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      lookupTable->GetProperty("RGBPoints"));
+    int numPerCmd = smProp->GetNumberOfElementsPerCommand();
+    if(numPerCmd != 4)
+      {
+      return;
+      }
+    list = pqSMAdaptor::getMultipleElementProperty(smProp);
     for(int i = 0; (i + 3) < list.size(); i += 4)
       {
       colors->AddRGBPoint(list[i].toDouble(), list[i + 1].toDouble(),
@@ -1438,8 +1408,12 @@ void pqColorScaleEditor::loadOpacityPoints()
   vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->OpacityFunction->getProxy()->GetProperty("Points"));
   int numPerCmd = smProp->GetNumberOfElementsPerCommand();
+  if(numPerCmd != 4)
+    {
+    return;
+    }
   list = pqSMAdaptor::getMultipleElementProperty(smProp);
-  for(int j = 0; (j + numPerCmd) < list.size(); j += numPerCmd)
+  for(int j = 0; (j + 3) < list.size(); j += 4)
     {
     opacities->AddPoint(list[j].toDouble(), list[j+1].toDouble(),
       list[j+2].toDouble(), list[j+3].toDouble());
@@ -1470,7 +1444,7 @@ void pqColorScaleEditor::initColorScale()
     this->Form->verticalSpacer->changeSize(20, 10,
       QSizePolicy::Expanding, QSizePolicy::Ignored);
 
-    this->addRepClientOpacityFunction();
+    this->updateOpacityFunctionVisibility();
 
     this->Form->Listener->Connect(
         this->OpacityFunction->getProxy()->GetProperty("Points"),
@@ -1492,7 +1466,7 @@ void pqColorScaleEditor::initColorScale()
 
   if(this->ColorMap)
     {
-    this->addRepClientColorFunction();
+    this->updateColorFunctionVisibility();
     QPair<double, double> range = this->ColorMap->getScalarRange();
     if(this->OpacityFunction)
       {
@@ -1605,8 +1579,12 @@ void pqColorScaleEditor::enablePointControls()
 
 void pqColorScaleEditor::updatePointValues()
 {
+  this->Form->InSetColors = true;
+  this->loadColorPoints();
+  this->loadOpacityPoints();
   this->updateCurrentColorPoint();
   this->updateCurrentOpacityPoint();
+  this->Form->InSetColors = false;
 }
 
 void pqColorScaleEditor::enableRescaleControls(bool enable)
@@ -1632,7 +1610,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   vtkColorTransferFunction* colors = this->currentColorFunction();
   if(colors)
     {
-    colors->SetAllowDuplicateScalars(min==max);
+    //colors->SetAllowDuplicateScalars(min==max);
     this->ColorMapViewer->chartBounds(chartBounds);
     chartBounds[2] = min;
     chartBounds[3] = max;
@@ -1648,10 +1626,18 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
       this->OpacityFunctionViewer->resetView();
       }
     }
-  vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
-  if(pwf)
+  //vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
+  //if(pwf)
+  //  {
+  //  pwf->SetAllowDuplicateScalars(min==max);
+  //  }
+  if(this->ColorMap)
     {
-    pwf->SetAllowDuplicateScalars(min==max);
+    this->updateColorFunctionVisibility();
+    }
+  if(this->OpacityFunction)
+    {
+    this->updateOpacityFunctionVisibility();
     }
 }
 
@@ -1847,6 +1833,9 @@ void pqColorScaleEditor::onOpacityPlotAdded(vtkPlot* plot)
 void pqColorScaleEditor::updateCurrentColorPoint()
 {
   this->enableColorPointControls();
+  double range[2]={0,1};
+  bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
+  vtkColorTransferFunction* tf = this->currentColorFunction();
   vtkControlPointsItem* currentItem=this->ColorMapViewer->
     currentControlPointsItem();
   if(!currentItem || currentItem->GetNumberOfPoints() ==0 ||
@@ -1856,8 +1845,6 @@ void pqColorScaleEditor::updateCurrentColorPoint()
     }
   else
     {
-    double range[2]={0,1};
-    bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
     // if there is a valid color point, we need to disable
     // current opacity point if there is
     vtkControlPointsItem* currentOpaItem=
@@ -1872,16 +1859,17 @@ void pqColorScaleEditor::updateCurrentColorPoint()
     currentItem->GetControlPoint(i, scalar);
     double value = scalar[0];
     this->Form->ScalarValue->setText(QString::number(value, 'g', 6));
-    // If there is only one scalar value, get the color
-    // and set it to the ScalarColor button
-    vtkColorTransferFunction* tf = this->currentColorFunction();
-    if(tf && singleScalar)
-      {
-      double rgb[3];
-      tf->GetColor(range[0], rgb);
-      this->Form->ScalarColor->setChosenColor(
-        QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
-      }
+    }
+  // If there is only one scalar value, get the color
+  // and set it to the ScalarColor button,
+  // and set the scalar value to the text box
+  if(tf && singleScalar)
+    {
+    double rgb[3];
+    tf->GetColor(range[0], rgb);
+    this->Form->ScalarColor->setChosenColor(
+      QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+    this->Form->ScalarValue->setText(QString::number(range[0], 'g', 6));
     }
 }
 
@@ -1889,6 +1877,8 @@ void pqColorScaleEditor::updateCurrentColorPoint()
 void pqColorScaleEditor::updateCurrentOpacityPoint()
 {
   this->enableOpacityPointControls();
+  double range[2]={0,1};
+  bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
 
   vtkControlPointsItem* currentItem=this->OpacityFunctionViewer->
     currentControlPointsItem();
@@ -1911,8 +1901,6 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
         }
       else
         {
-        double range[2]={0,1};
-        bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
         currentItem->GetControlPoint(i, scalar);
         double opacity = scalar[1];
         this->Form->Opacity->setText(QString::number(opacity, 'g', 6));
@@ -1933,6 +1921,19 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
       this->Form->opacityScalar->setText("");
       }
     }
+
+  // If there is only one scalar value, get the color
+  // and set it to the ScalarColor button
+  if(this->OpacityFunction && singleScalar)
+    {
+    vtkPiecewiseFunction* pwf=this->currentOpacityFunction();
+    if(pwf)
+      {
+      double opacity = pwf->GetValue(range[0]);
+      this->Form->Opacity->setText(QString::number(opacity, 'g', 6));
+      this->Form->opacityScalar->setText(QString::number(range[0], 'g', 6));
+      }
+    }    
 }
 
 // ----------------------------------------------------------------------------
@@ -1944,10 +1945,10 @@ void pqColorScaleEditor::enableColorPointControls()
   bool enable=false;
   if(this->internalScalarRange(range) && range[0]==range[1])
     {
-    if(currentItem && currentItem->GetNumberOfPoints()>0)
-      {
-      currentItem->SetCurrentPoint(0);
-      }
+    //if(currentItem && currentItem->GetNumberOfPoints()>0)
+    //  {
+    //  currentItem->SetCurrentPoint(0);
+    //  }
     }
   else
     {
@@ -1977,7 +1978,7 @@ void pqColorScaleEditor::enableOpacityPointControls()
     {
     if(currentItem && currentItem->GetNumberOfPoints()>0)
       {
-      currentItem->SetCurrentPoint(0);
+      //currentItem->SetCurrentPoint(0);
       enable = true;
       }
     this->Form->opacityScalar->setEnabled(false);
@@ -2026,24 +2027,20 @@ vtkPiecewiseFunction* pqColorScaleEditor::currentOpacityFunction()
 // ----------------------------------------------------------------------------
 bool pqColorScaleEditor::internalScalarRange(double* range)
 {
-  vtkColorTransferFunction* clientTF=vtkColorTransferFunction::SafeDownCast(
-    this->ColorMap->getProxy()->GetClientSideObject());
-  if(!clientTF)
+  if(!this->ColorMap)
     {
     return false;
     }
-  range[0] = VTK_DOUBLE_MAX;
-  range[1] = VTK_DOUBLE_MIN;
+  
+  QPair<double, double> curRange = this->ColorMap->getScalarRange();
+  range[0] = curRange.first;
+  range[1] = curRange.second;
 
-  double colorRange[2] = {0., 1.};
-  clientTF->GetRange(colorRange);
-  range[0] = qMin(range[0], colorRange[0]);
-  range[1] = qMax(range[1], colorRange[1]);
   return true;
 }
 
 // ----------------------------------------------------------------------------
-void pqColorScaleEditor::addRepClientColorFunction()
+void pqColorScaleEditor::updateColorFunctionVisibility()
 {
   double range[2]={0.0, 1.0};
   if(this->internalScalarRange(range))
@@ -2065,7 +2062,7 @@ void pqColorScaleEditor::addRepClientColorFunction()
 }
 
 // ----------------------------------------------------------------------------
-void pqColorScaleEditor::addRepClientOpacityFunction()
+void pqColorScaleEditor::updateOpacityFunctionVisibility()
 {
   double range[2]={0.0, 1.0};
   if(this->internalScalarRange(range))
