@@ -323,6 +323,11 @@ void vtkIceTSynchronizedRenderers::HandleEndRender()
         viewport, this->Renderer,
         lastRenderedImage);
       }
+    else
+      {
+      vtkTileDisplayHelper::GetInstance()->EraseTile(this->Identifier);
+      }
+
 
     // Write-back either the freshly rendered tile or what was most recently
     // rendered.

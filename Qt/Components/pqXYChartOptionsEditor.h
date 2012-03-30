@@ -95,8 +95,6 @@ protected slots:
   void setLabelNotation(int notation);
   void setLabelPrecision(int precision);
   void setUsingLogScale(bool usingLogScale);
-  void setAxisMinimum();
-  void setAxisMaximum();
   void pickAxisTitleFont();
   void setAxisTitleColor(const QColor& color);
   void setAxisTitle(const QString& title);

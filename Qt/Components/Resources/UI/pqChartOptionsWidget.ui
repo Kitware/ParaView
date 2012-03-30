@@ -716,7 +716,7 @@ p, li { white-space: pre-wrap; }
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="1" column="0" rowspan="5">
+       <item row="1" column="0" rowspan="4">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -732,7 +732,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QStackedWidget" name="AxisLayoutPages">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -741,7 +741,7 @@ p, li { white-space: pre-wrap; }
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="BlankPage">
           <property name="sizePolicy">
@@ -750,49 +750,6 @@ p, li { white-space: pre-wrap; }
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-         </widget>
-         <widget class="QWidget" name="RangePage">
-          <layout class="QGridLayout">
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <property name="spacing">
-            <number>6</number>
-           </property>
-           <item row="2" column="0" colspan="2">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="AxisMaximum"/>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="AxisMinimum"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Maximum</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_15">
-             <property name="text">
-              <string>Minimum</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
          </widget>
          <widget class="QWidget" name="ListPage">
           <layout class="QGridLayout">
@@ -853,33 +810,23 @@ p, li { white-space: pre-wrap; }
        <item row="2" column="1">
         <widget class="QRadioButton" name="UseChartSelect">
          <property name="whatsThis">
-          <string>Check this option to let the chart choose the best axis layout.</string>
+          <string>Check this option to let the chart choose the best axis labels.</string>
          </property>
          <property name="text">
-          <string>Let the Chart Determine the Axis Layout</string>
+          <string>Compute axis labels automatically</string>
          </property>
          <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QRadioButton" name="UseFixedInterval">
          <property name="whatsThis">
           <string>Check this option to specify each of the axis labels. This option gives you the most control.</string>
          </property>
          <property name="text">
-          <string>Specify Each of the Axis Labels.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QRadioButton" name="UseBestFit">
-         <property name="whatsThis">
-          <string>Check this option to specify the range and let the chart choose suitable intervals.</string>
-         </property>
-         <property name="text">
-          <string>Specify the Axis Range</string>
+          <string>Specify labels explicitly</string>
          </property>
         </widget>
        </item>
@@ -1134,10 +1081,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>LabelPrecision</tabstop>
   <tabstop>UseLogScale</tabstop>
   <tabstop>UseChartSelect</tabstop>
-  <tabstop>UseBestFit</tabstop>
   <tabstop>UseFixedInterval</tabstop>
-  <tabstop>AxisMinimum</tabstop>
-  <tabstop>AxisMaximum</tabstop>
   <tabstop>LabelList</tabstop>
   <tabstop>AddButton</tabstop>
   <tabstop>RemoveButton</tabstop>

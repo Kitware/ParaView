@@ -92,8 +92,6 @@ public:
   QFont LabelFont;
   QFont TitleFont;
   QString Title;
-  QString Minimum;
-  QString Maximum;
   QStringListModel Labels;
   int GridType;
   int Notation;
@@ -126,8 +124,7 @@ public:
 //----------------------------------------------------------------------------
 pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
   : AxisColor(Qt::black), GridColor(Qt::lightGray), LabelColor(Qt::black),
-    TitleColor(Qt::black), LabelFont(), TitleFont(), Title(), Minimum(),
-    Maximum(), Labels()
+    TitleColor(Qt::black), LabelFont(), TitleFont(), Title(), Labels()
 {
   this->GridType = 0;
   this->Notation = 0;
@@ -248,8 +245,6 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
                    this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->Form->UseChartSelect, SIGNAL(toggled(bool)),
                    this, SLOT(changeLayoutPage(bool)));
-  QObject::connect(this->Internal->Form->UseBestFit, SIGNAL(toggled(bool)),
-                   this, SLOT(changeLayoutPage(bool)));
   QObject::connect(this->Internal->Form->UseFixedInterval, SIGNAL(toggled(bool)),
                    this, SLOT(changeLayoutPage(bool)));
   QObject::connect(this->Internal->Form->ShowAxis, SIGNAL(toggled(bool)),
@@ -275,11 +270,6 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   QObject::connect(this->Internal->Form->LabelPrecision,
                    SIGNAL(valueChanged(int)),
                    this, SLOT(setLabelPrecision(int)));
-
-  QObject::connect(this->Internal->Form->AxisMinimum, SIGNAL(textEdited(QString)),
-                   this, SLOT(setAxisMinimum()));
-  QObject::connect(this->Internal->Form->AxisMaximum, SIGNAL(textEdited(QString)),
-                   this, SLOT(setAxisMaximum()));
 
   QObject::connect(this->Internal->Form->UseLogScale, SIGNAL(toggled(bool)),
                    this, SLOT(setUsingLogScale(bool)));
@@ -588,26 +578,6 @@ void pqXYChartOptionsEditor::setUsingLogScale(bool usingLogScale)
     {
     this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->UseLogScale
         = usingLogScale;
-    this->changesAvailable();
-    }
-}
-
-void pqXYChartOptionsEditor::setAxisMinimum()
-{
-  if(this->Internal->Form->AxisIndex != -1)
-    {
-    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Minimum
-        = this->Internal->Form->AxisMinimum->text();
-    this->changesAvailable();
-    }
-}
-
-void pqXYChartOptionsEditor::setAxisMaximum()
-{
-  if(this->Internal->Form->AxisIndex != -1)
-    {
-    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->Maximum
-        = this->Internal->Form->AxisMaximum->text();
     this->changesAvailable();
     }
 }
@@ -938,21 +908,6 @@ void pqXYChartOptionsEditor::updateOptions()
     }
 
   values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisBehavior"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->AxisData[i]->AxisLayout = values[i].toInt();
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("AxisRange"));
-  for(int i = 0; i < 4 && values.size() == 8; ++i)
-    {
-    this->Internal->Form->AxisData[i]->Minimum = values[2*i].toString();
-    this->Internal->Form->AxisData[i]->Maximum = values[2*i+1].toString();
-    }
-
-  values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("AxisTitle"));
   for(int i = 0; i < 4 && i < values.size(); ++i)
     {
@@ -1167,16 +1122,6 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   proxy->UpdateProperty("AxisLabelsRight", 1);
   proxy->UpdateProperty("AxisLabelsTop", 1);
 
-  // Axis range
-  values.clear();
-  for(int i = 0; i < 4; ++i)
-    {
-    values.append(this->Internal->Form->AxisData[i]->Minimum);
-    values.append(this->Internal->Form->AxisData[i]->Maximum);
-    }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisRange"), values);
-
   // Axis use log scale
   values.clear();
   for(int i = 0; i < 4; ++i)
@@ -1244,21 +1189,17 @@ void pqXYChartOptionsEditor::loadAxisLayoutPage()
   pqXYChartOptionsEditorAxis *axis =
           this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
   this->Internal->Form->UseLogScale->setChecked(axis->UseLogScale);
-  if(axis->AxisLayout == 0)
+  if (axis->AxisLayout == vtkAxis::AUTO)
     {
     this->Internal->Form->UseChartSelect->setChecked(true);
     }
-  else if(axis->AxisLayout == 1)
-    {
-    this->Internal->Form->UseBestFit->setChecked(true);
-    }
   else
     {
+    Q_ASSERT(axis->AxisLayout == vtkAxis::CUSTOM);
     this->Internal->Form->UseFixedInterval->setChecked(true);
     }
   this->changeLayoutPage(true);
-  this->Internal->Form->AxisMinimum->setText(axis->Minimum);
-  this->Internal->Form->AxisMaximum->setText(axis->Maximum);
+
   QItemSelectionModel *model =
           this->Internal->Form->LabelList->selectionModel();
   if(model)
@@ -1294,13 +1235,7 @@ void pqXYChartOptionsEditor::changeLayoutPage(bool checked)
     // Change the axis layout stack page when the user picks an option.
     pqXYChartOptionsEditorAxis *axis =
         this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
-    if(this->Internal->Form->UseBestFit->isChecked())
-      {
-      this->Internal->Form->AxisLayoutPages->setCurrentWidget(
-              this->Internal->Form->RangePage);
-      axis->AxisLayout = vtkAxis::FIXED;
-      }
-    else if(this->Internal->Form->UseFixedInterval->isChecked())
+    if(this->Internal->Form->UseFixedInterval->isChecked())
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->ListPage);

@@ -17,86 +17,65 @@
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkClientServerStream.h"
+#include "vtkCommand.h"
+#include "vtkContextInteractorStyle.h"
 #include "vtkContextView.h"
 #include "vtkErrorCode.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVContextView.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMUtilities.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkProcessModule.h"
 
-//-----------------------------------------------------------------------------
-// Minimal storage class for STL containers etc.
-class vtkSMContextViewProxy::Private
+//****************************************************************************
+// vtkSMContextViewInteractorStyle makes it possible for us to call
+// StillRender() as the user interacts with the chart views on the client side
+// instead of directly calling Render() on the render-window. This makes no
+// difference in general, except in tile-display mode, where the StillRender()
+// ensures that the server-side views are updated as well.
+class vtkSMContextViewInteractorStyle : public vtkContextInteractorStyle
 {
 public:
-  Private()
-    {
-    ViewBounds[0] = ViewBounds[2] = ViewBounds[4] = ViewBounds[6] = 0.0;
-    ViewBounds[1] = ViewBounds[3] = ViewBounds[5] = ViewBounds[7] = 1.0;
-    }
+  static vtkSMContextViewInteractorStyle*New();
+  vtkTypeMacro(vtkSMContextViewInteractorStyle, vtkContextInteractorStyle);
 
-  ~Private()
+  void SetView(vtkSMContextViewProxy* view)
+    { this->ViewProxy = view; }
+protected:
+  virtual void RenderNow()
     {
-    if (this->Proxy && this->Proxy->GetContextItem() &&
-        this->Forwarder.GetPointer() != NULL)
+    if (this->ViewProxy)
       {
-      this->Proxy->GetContextItem()->RemoveObserver(this->Forwarder.GetPointer());
+      this->ViewProxy->StillRender();
       }
     }
-
-  void AttachCallback(vtkSMContextViewProxy* proxy)
-    {
-    this->Forwarder->SetTarget(proxy);
-    this->Proxy = proxy;
-    if(this->Proxy && this->Proxy->GetContextItem())
-      {
-      this->Proxy->GetContextItem()->AddObserver(
-          vtkChart::UpdateRange, this->Forwarder.GetPointer());
-      }
-    }
-
-  void UpdateBounds()
-    {
-    if(this->Proxy && this->Proxy->GetContextItem())
-      {
-      for(int i=0; i < 4; i++)
-        {
-        // FIXME: Generalize to support charts with zero to many axes.
-        vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Proxy->GetContextItem());
-        if (chart)
-          {
-          chart->GetAxis(i)->GetRange(&this->ViewBounds[i*2]);
-          }
-        }
-      }
-    }
-
-public:
-  double ViewBounds[8];
-  vtkNew<vtkEventForwarderCommand> Forwarder;
 
 private:
-  vtkWeakPointer<vtkSMContextViewProxy> Proxy;
+  vtkSMContextViewInteractorStyle() {}
+  ~vtkSMContextViewInteractorStyle() {}
+  vtkWeakPointer<vtkSMContextViewProxy> ViewProxy;
 };
+
+vtkStandardNewMacro(vtkSMContextViewInteractorStyle);
+//****************************************************************************
+
 
 vtkStandardNewMacro(vtkSMContextViewProxy);
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::vtkSMContextViewProxy()
 {
   this->ChartView = NULL;
-  this->Storage = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkSMContextViewProxy::~vtkSMContextViewProxy()
 {
-  delete this->Storage;
-  this->Storage = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -121,12 +100,22 @@ void vtkSMContextViewProxy::CreateVTKObjects()
 
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
-
-  this->Storage = new Private;
   this->ChartView = pvview->GetContextView();
 
-  // Try to attach viewport listener on chart
-  this->Storage->AttachCallback(this);
+  // if user interacts with the chart, we need to ensure that we set the axis
+  // behaviors to "FIXED" so that the user chosen axis ranges are preserved in
+  // state files, etc.
+  this->GetContextItem()->AddObserver(
+    vtkCommand::InteractionEvent, this,
+    &vtkSMContextViewProxy::OnInteractionEvent);
+
+  // update the interactor style.
+  vtkSMContextViewInteractorStyle* style =
+    vtkSMContextViewInteractorStyle::New();
+  style->SetScene(this->ChartView->GetScene());
+  style->SetView(this);
+  this->ChartView->GetInteractor()->SetInteractorStyle(style);
+  style->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -147,30 +136,6 @@ vtkAbstractContextItem* vtkSMContextViewProxy::GetContextItem()
   vtkPVContextView* pvview = vtkPVContextView::SafeDownCast(
     this->GetClientSideObject());
   return pvview? pvview->GetContextItem() : NULL;
-}
-//-----------------------------------------------------------------------------
-void vtkSMContextViewProxy::ResetDisplay()
-{
-  // FIXME: We should generalize this to support all charts (zero to many axes).
-  vtkChartXY *chart = vtkChartXY::SafeDownCast(this->GetContextItem());
-  if (chart)
-    {
-    int previousBehaviour[4];
-    for (int i = 0; i < 4; ++i)
-      {
-      previousBehaviour[i] = chart->GetAxis(i)->GetBehavior();
-      chart->GetAxis(i)->SetBehavior(vtkAxis::AUTO);
-      }
-
-    chart->RecalculateBounds();
-    this->GetContextView()->Render();
-
-    // Revert behaviour as it use to be...
-    for (int i = 0; i < 4; ++i)
-      {
-      chart->GetAxis(i)->SetBehavior(previousBehaviour[i]);
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -217,47 +182,50 @@ vtkImageData* vtkSMContextViewProxy::CaptureWindowInternal(int magnification)
   return capture;
 }
 
+static void update_property(vtkAxis* axis, vtkSMProperty* prop)
+{
+  if (axis && prop)
+    {
+    double range[2];
+    axis->GetRange(range);
+    vtkSMPropertyHelper(prop).SetNumberOfElements(2);
+    vtkSMPropertyHelper(prop).Set(range, 2);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextViewProxy::OnInteractionEvent()
+{
+  vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
+  if (chartXY)
+    {
+    // FIXME: Generalize to support charts with zero to many axes.
+    update_property(
+      chartXY->GetAxis(vtkAxis::LEFT), this->GetProperty("LeftAxisRange"));
+    update_property(
+      chartXY->GetAxis(vtkAxis::RIGHT), this->GetProperty("RightAxisRange"));
+    update_property(
+      chartXY->GetAxis(vtkAxis::TOP), this->GetProperty("TopAxisRange"));
+    update_property(
+      chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRange"));
+    this->UpdateVTKObjects();
+    this->InvokeEvent(vtkCommand::InteractionEvent);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMContextViewProxy::ResetDisplay()
+{
+  vtkSMPropertyHelper(this, "LeftAxisRange", true).SetNumberOfElements(0);
+  vtkSMPropertyHelper(this, "RightAxisRange", true).SetNumberOfElements(0);
+  vtkSMPropertyHelper(this, "TopAxisRange", true).SetNumberOfElements(0);
+  vtkSMPropertyHelper(this, "BottomAxisRange", true).SetNumberOfElements(0);
+  this->UpdateVTKObjects();
+  this->StillRender();
+}
+
 //----------------------------------------------------------------------------
 void vtkSMContextViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-}
-
-//----------------------------------------------------------------------------
-double* vtkSMContextViewProxy::GetViewBounds()
-{
-  this->Storage->UpdateBounds();
-  return this->Storage->ViewBounds;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMContextViewProxy::SetViewBounds(double* bounds)
-{
-  if(this->GetContextItem())
-    {
-    // Disable notification...
-    this->Storage->Forwarder->SetTarget(NULL);
-    // FIXME: This also needs generalizing to support all chart types.
-    vtkChartXY *chart = vtkChartXY::SafeDownCast(this->GetContextItem());
-
-    if (chart)
-      {
-      for (int i = 0; i < 4; i++)
-        {
-        this->Storage->ViewBounds[i*2] = bounds[i*2];
-        this->Storage->ViewBounds[i*2+1] = bounds[i*2+1];
-
-        chart->GetAxis(i)->SetBehavior(vtkAxis::FIXED);
-        chart->GetAxis(i)->SetRange(bounds[i*2], bounds[i*2+1]);
-        chart->GetAxis(i)->RecalculateTickSpacing();
-        }
-      }
-
-    // Do the rendering with the new range
-    this->StillRender();
-    this->GetContextView()->Render();
-
-    // Bring the notification back
-    this->Storage->Forwarder->SetTarget(this);
-    }
 }

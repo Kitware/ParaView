@@ -122,9 +122,6 @@ pqContextView::pqContextView(
   this->Command = command::New(*this);
   vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-
-  this->Internal->VTKConnect->Connect( viewProxy, vtkChart::UpdateRange,
-                                       this, SLOT(onViewBoundsChange(vtkObject*,ulong,void*,void*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -482,16 +479,4 @@ void pqContextView::setSelection(vtkSelection* sel)
   selectionSource->Delete();
 
   emit this->selected(opPort);
-}
-//-----------------------------------------------------------------------------
-void pqContextView::onViewBoundsChange(vtkObject* src,
-                                       unsigned long vtkNotUsed(event),
-                                       void* vtkNotUsed(method),
-                                       void* vtkNotUsed(data))
-{
-  vtkSMContextViewProxy* proxy = vtkSMContextViewProxy::SafeDownCast(src);
-  if(proxy)
-    {
-    emit viewBoundsUpdated(proxy->GetGlobalID(), proxy->GetViewBounds());
-    }
 }

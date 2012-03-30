@@ -137,7 +137,7 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
         this->OrderedColumns->SetValue(i, plotInput->GetColumnName(i));
         }
       }
-    if(vtkAnnotationLink* annLink = plotMatrix->GetActiveAnnotationLink())
+    if(vtkAnnotationLink* annLink = plotMatrix->GetAnnotationLink())
       {
       vtkSelection* sel = vtkSelection::SafeDownCast(
         this->SelectionDeliveryFilter->GetOutputDataObject(0));
