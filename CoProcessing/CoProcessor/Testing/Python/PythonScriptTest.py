@@ -90,5 +90,3 @@ except: from paraview.simple import *
 trivialproducer = TrivialProducer()
 contour = Contour(Input=trivialproducer)
 obj = trivialproducer.GetClientSideObject()
-
-
