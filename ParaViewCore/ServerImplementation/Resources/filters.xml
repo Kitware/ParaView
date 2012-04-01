@@ -103,15 +103,15 @@
 
   <ProxyGroup name="filters">
 
-   <SourceProxy 
-      name="AMRToMultiBlock" 
-      class="vtkAMRToMultiBlockFilter" 
+   <SourceProxy
+      name="AMRToMultiBlock"
+      class="vtkAMRToMultiBlockFilter"
       label="Convert AMR dataset to Multi-block">
       <Documentation
           short_help="Convert AMR to Multiblock"
           long_help="Convert AMR to Multiblock">
       </Documentation>
-      
+
       <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -126,16 +126,16 @@
              This property specifies the input for this filter.
            </Documentation>
      </InputProperty>
-      
+
    </SourceProxy>
-   
+
    <SourceProxy name="AMRCutPlane" class="vtkAMRCutPlane" label="AMR CutPlane">
       <Documentation
           short_help="Planar Cut of an AMR grid dataset"
           long_help="Planar Cut of an AMR grid dataset">
-          This filter creates a cut-plane of the 
+          This filter creates a cut-plane of the
       </Documentation>
-      
+
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -150,7 +150,7 @@
              This property specifies the input for this filter.
            </Documentation>
      </InputProperty>
-     
+
      <IntVectorProperty
         name="UseNativeCutter"
         command="SetUseNativeCutter"
@@ -162,18 +162,18 @@
           cutter is used instead of the specialized AMR cutter.
         </Documentation>
      </IntVectorProperty>
-     
+
      <IntVectorProperty
         name="LevelOfResolution"
         command="SetLevelOfResolution"
         number_of_elements="1"
         default_values="0" >
-        <IntRangeDomain name="range" min="0" max="100" /> 
+        <IntRangeDomain name="range" min="0" max="100" />
         <Documentation>
           Set maximum slice resolution.
         </Documentation>
       </IntVectorProperty>
-      
+
       <DoubleVectorProperty
          name="Center"
          label="Center"
@@ -191,7 +191,7 @@
          animateable="1"
          default_values="0 0 1" >
       </DoubleVectorProperty>
-     
+
       <Hints>
         <PropertyGroup type="Plane" label="Slice Widget">
           <Property function="Origin" name="Center" />
@@ -202,7 +202,7 @@
 
       </Hints>
    </SourceProxy>
-   
+
    <SourceProxy name="UniformGridPartitioner" class="vtkUniformGridPartitioner"
                 label="Partition UniformGrid by RCB">
       <Documentation
@@ -211,7 +211,7 @@
           This filters partitions a uniform grid instance. The output is a
           multiblock of uniform grids.
       </Documentation>
-      
+
       <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -225,8 +225,8 @@
            <Documentation>
              This property specifies the input for this filter.
            </Documentation>
-     </InputProperty>   
-     
+     </InputProperty>
+
      <IntVectorProperty
         name="NumberOfSubdivisions"
         command="SetNumberOfSubdivisions"
@@ -238,18 +238,18 @@
           coordinate bisection.
         </Documentation>
      </IntVectorProperty>
-     
+
    </SourceProxy>
-   
+
    <SourceProxy name="AMRResampleFilter" class="vtkAMRResampleFilter"
                 label="Resample AMR" >
       <Documentaion
           short_help="Converts AMR data to a uniform grid"
           long_help="Converts AMR data to a uniform grid">
           This filter allows the user to specify a Region of Interest(ROI)
-          within the AMR data-set and extract it as a uniform grid.   
+          within the AMR data-set and extract it as a uniform grid.
      </Documentaion>
-     
+
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -264,7 +264,7 @@
              This property specifies the input for this filter.
            </Documentation>
      </InputProperty>
-     
+
      <IntVectorProperty
         name="Demand-Driven Mode"
         command="SetDemandDrivenMode"
@@ -276,7 +276,7 @@
           demand-driven mode or not.
         </Documentation>
      </IntVectorProperty>
-     
+
      <IntVectorProperty
         name="TransferToNodes"
         command="SetTransferToNodes"
@@ -288,7 +288,7 @@
           to the nodes of the extracted region or the cells.
         </Documentation>
      </IntVectorProperty>
-     
+
      <IntVectorProperty
         name="NumberOfPartitions"
         command="SetNumberOfPartitions"
@@ -300,20 +300,20 @@
           coordinate bisection.
         </Documentation>
      </IntVectorProperty>
-     <!-- 
+     <!--
      <IntVectorProperty
         name="LevelOfResolution"
         command="SetLevelOfResolution"
         number_of_elements="1"
         default_values="0" >
-        <IntRangeDomain name="range" min="0" max="100" /> 
+        <IntRangeDomain name="range" min="0" max="100" />
         <Documentation>
           Set maximum slice resolution.
         </Documentation>
       </IntVectorProperty>
-      
+
       -->
-      <IntVectorProperty 
+      <IntVectorProperty
         name="Number of Samples"
         command="SetNumberOfSamples"
         number_of_elements="3"
@@ -323,8 +323,8 @@
         <Documentation>
           Sets the number of samples in each dimension
         </Documentation>
-      </IntVectorProperty>  
-                
+      </IntVectorProperty>
+
       <DoubleVectorProperty name="Min"
                           command="SetMin"
                           number_of_elements="3"
@@ -333,10 +333,10 @@
        <DoubleRangeDomain name="range" />
        <Documentation>
          This property sets the minimum 3-D coordinate location
-         by which the particles will be filtered out. 
+         by which the particles will be filtered out.
        </Documentation>
      </DoubleVectorProperty>
-                                      
+
      <DoubleVectorProperty name="Max"
                           command="SetMax"
                           number_of_elements="3"
@@ -345,13 +345,13 @@
        <DoubleRangeDomain name="range" />
        <Documentation>
          This property sets the minimum 3-D coordinate location
-         by which the particles will be filtered out. 
+         by which the particles will be filtered out.
        </Documentation>
-       
+
     </DoubleVectorProperty>
-    
+
    </SourceProxy>
-   
+
    <!-- ==================================================================== -->
    <SourceProxy name="AMRSlice" class="vtkAMRSliceFilter"
                 label="Slice AMR data" >
@@ -383,7 +383,7 @@
         number_of_elements="2"
         default_values="0 0">
       </IntVectorPropery>
-      
+
       <IntVectorProperty
          name="ForwardUpstream"
          command="SetForwardUpstream"
@@ -395,7 +395,7 @@
            upstream.
          </Documentation>
       </IntVectorProperty>
-      
+
       <IntVectorProperty
           name="EnablePrefetching"
           command="SetEnablePrefetching"
@@ -403,17 +403,17 @@
           default_values="0">
           <BooleanDomain name="bool"/>
           <Documentation>
-            This property specifies whether or not requests pre-fetching of 
+            This property specifies whether or not requests pre-fetching of
             blocks of the next level will be enabled.
           </Documentation>
       </IntVectorProperty>
-      
+
       <IntVectorProperty
         name="Level"
         command="SetMaxResolution"
         number_of_elements="1"
         default_values="0" >
-        <IntRangeDomain name="range" min="0" max="100" /> 
+        <IntRangeDomain name="range" min="0" max="100" />
 <!--         <RequiredProperties>
          <Property name="LevelRange" function="LevelRange"/>
         </RequiredProperties>
@@ -422,7 +422,7 @@
           Set maximum slice resolution.
         </Documentation>
       </IntVectorProperty>
-      
+
       <DoubleVectorProperty
         name="OffSet"
         command="SetOffSetFromOrigin"
@@ -433,7 +433,7 @@
         Set's the offset from the origin of the data-set
        </Documentation>
      </DoubleVectorProperty>
-     
+
      <IntVectorProperty
         name="Normal"
         command="SetNormal"
@@ -450,7 +450,7 @@
      </IntVectorProperty>
 
    </SourceProxy>
-   
+
     <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkPExtractArraysOverTime"
       label="Plot Selection Over Time">
@@ -6276,7 +6276,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	  <DataTypeDomain name="input_type" composite_data_supported="1">
 	    <DataType value="vtkDataSet"/>
 	  </DataTypeDomain>
-	  <InputArrayDomain name="input_array" attribute_type="point"
+	  <InputArrayDomain name="input_array" attribute_type="any"
 			    number_of_components="3"/>
 	  <Documentation>
 	    This property specifies the input to the Stream Tracer filter.
@@ -8163,7 +8163,7 @@ Tessellate a higher-order dataset.
      </InputProperty>
    <!-- End GroupIdScalars -->
    </SourceProxy>
-   
+
    <!-- ==================================================================== -->
    <SourceProxy name="NonOverlappingLevelIdScalars" class="vtkNonOverlappingAMRLevelIdScalars"
       label="Level Scalars(Non-Overlapping AMR)">
