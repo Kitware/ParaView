@@ -34,6 +34,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkMultiProcessController.h"
 
 #include <assert.h>
 
@@ -523,7 +524,8 @@ int vtkHierarchicalFractal::RequestData(
     this->AddTestArray(output);
     this->AddBlockIdArray(output);
     vtkHierarchicalBoxDataSet *hset = vtkHierarchicalBoxDataSet::SafeDownCast(output);
-    vtkAMRUtilities::GenerateMetaData(hset ,NULL);
+    vtkAMRUtilities::GenerateMetaData(
+        hset,vtkMultiProcessController::GetGlobalController());
     this->AddDepthArray(hset);
     hset->GenerateVisibilityArrays();
     info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),hset);
