@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
+   under the terms of the ParaQ license version 1.2.
 
    See License_v1.2.txt for the full ParaQ license.
    A copy of this license can be obtained by contacting
@@ -18,7 +18,7 @@
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
 CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqLineSourceWidget.h"
 #include "pqNamedWidgets.h"
+#include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
@@ -74,10 +75,10 @@ public:
 
   /// Provides a container for Qt controls
   QWidget UIContainer;
-  
+
   /// Provides a UI for managing a vtkPointSource
   pqPointSourceWidget* PointSourceWidget;
-  /// Manages a 3D line widget, plus Qt controls  
+  /// Manages a 3D line widget, plus Qt controls
   pqLineSourceWidget* LineSourceWidget;
   /// Provides the remaining Qt controls for the panel
   Ui::pqStreamTracerPanel UI;
@@ -89,7 +90,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(&this->Implementation->UIContainer);
-  
+
   // Get the boundaries of the new proxy ...
   double proxy_center[3] = {0.0, 0.0, 0.0};
 
@@ -114,8 +115,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
   vtkSMProperty* const source_property =
     this->proxy()->GetProperty("Source");
-    
-  // Setup initial defaults for our seed sources ...  
+
+  // Setup initial defaults for our seed sources ...
   const QList<pqSMProxy> sources = pqSMAdaptor::getProxyPropertyDomain(source_property);
   for(int i = 0; i != sources.size(); ++i)
     {
@@ -142,7 +143,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
         }
       source->UpdateVTKObjects();
 
-      this->Implementation->PointSourceWidget = 
+      this->Implementation->PointSourceWidget =
         new pqPointSourceWidget(this->proxy(), source, NULL);
       this->Implementation->PointSourceWidget->hideWidget();
 
@@ -152,7 +153,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
           {
           if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
             {
-            if (QString("PropertyGroup") == elem->GetName() && 
+            if (QString("PropertyGroup") == elem->GetName() &&
               QString("PointSource") == elem->GetAttribute("type"))
               {
               this->Implementation->PointSourceWidget->setHints(elem);
@@ -175,7 +176,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
           {
           if(vtkPVXMLElement* const elem = hints->GetNestedElement(cc))
             {
-            if (QString("PropertyGroup") == elem->GetName() && 
+            if (QString("PropertyGroup") == elem->GetName() &&
               QString("LineSource") == elem->GetAttribute("type"))
               {
               this->Implementation->LineSourceWidget->setHints(elem);
@@ -187,7 +188,7 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 
       }
     }
-  
+
 
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->setMargin(0);
@@ -225,21 +226,21 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     this->Implementation->PointSourceWidget->setWidgetVisible(false);
     this->Implementation->LineSourceWidget->setWidgetVisible(true);
     }
-  
+
   this->Implementation->LineSourceWidget->resetBounds();
   this->Implementation->PointSourceWidget->resetBounds();
   this->Implementation->LineSourceWidget->reset();
   this->Implementation->PointSourceWidget->reset();
 
 
-  QObject::connect(this->Implementation->UI.IntegratorType, 
-    SIGNAL(currentIndexChanged(int)), 
-    this, 
+  QObject::connect(this->Implementation->UI.IntegratorType,
+    SIGNAL(currentIndexChanged(int)),
+    this,
     SLOT(onIntegratorTypeChanged(int)));
 
-  QObject::connect(this->Implementation->UI.seedType, 
-    SIGNAL(currentIndexChanged(int)), 
-    this, 
+  QObject::connect(this->Implementation->UI.seedType,
+    SIGNAL(currentIndexChanged(int)),
+    this,
     SLOT(onSeedTypeChanged(int)));
 
   QObject::connect(this, SIGNAL(viewChanged(pqView*)),
@@ -255,8 +256,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     this, SIGNAL(onreset()), this->Implementation->PointSourceWidget, SLOT(reset()));
   QObject::connect(
     this, SIGNAL(onreset()), this->Implementation->LineSourceWidget, SLOT(reset()));
-  
-  pqNamedWidgets::link(this, this->proxy(), 
+
+  pqNamedWidgets::link(this, this->proxy(),
     this->propertyManager());
 
   QObject::connect(
@@ -266,6 +267,10 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(
     this->Implementation->LineSourceWidget, SIGNAL(modified()),
     this, SLOT(setModified()));
+
+  QObject::connect(object_proxy, SIGNAL(producerChanged(const QString&)),
+    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  this->updateEnableState();
 
 }
 
@@ -348,7 +353,7 @@ void pqStreamTracerPanel::onUseLineSource()
       }
     }
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqStreamTracerPanel::accept()
 {
@@ -399,11 +404,11 @@ void pqStreamTracerPanel::onIntegratorTypeChanged(int index)
     {
     enabled = true;
     }
-  this->Implementation->UI.MinimumIntegrationStep->setEnabled(enabled); 
+  this->Implementation->UI.MinimumIntegrationStep->setEnabled(enabled);
   this->Implementation->UI.MaximumIntegrationStep->setEnabled(enabled);
   this->Implementation->UI.MaximumError->setEnabled(enabled);
 }
-  
+
 void pqStreamTracerPanel::select()
 {
   pqObjectPanel::select();
@@ -428,6 +433,26 @@ void pqStreamTracerPanel::deselect()
     {
     this->Implementation->LineSourceWidget->deselect();
     }
+}
+
+void pqStreamTracerPanel::updateEnableState()
+{
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(
+    this->referenceProxy());
+  pqOutputPort* cur_input = NULL;
+  if (filter)
+    {
+    QList<pqOutputPort*> ports = filter->getAllInputs();
+    cur_input = ports.size() > 0? ports[0] : NULL;
+    }
+
+  bool isAMR = false;
+  if (cur_input)
+    {
+    vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
+    isAMR = dataInfo->GetCompositeDataSetType() == VTK_NON_OVERLAPPING_AMR;
+    }
+  this->Implementation->UI.InterpolatorType->setEnabled(!isAMR);
 }
 
 
