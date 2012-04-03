@@ -63,9 +63,6 @@ public:
   /// to load.
   vtkGetStringMacro(ServerResourceName);
 
-  /// Provides access to server-url if specified on the command line.
-  vtkGetStringMacro(ServerURL);
-
   vtkSetStringMacro(TileImagePath);
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
@@ -117,7 +114,6 @@ protected:
   char* TestDirectory;
   char* DataDirectory;
   char* ServerResourceName;
-  char* ServerURL;
   char* TileImagePath;
 
   int ExitAppWhenTestsDone;
