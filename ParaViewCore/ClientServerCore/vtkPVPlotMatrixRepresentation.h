@@ -51,14 +51,6 @@ public:
   virtual void SetVisibility(bool visible);
 
   // Description:
-  // Sets the visibility for the series in the plot matrix.
-  void SetSeriesVisibility(const char *name, bool visible);
-
-  // Description:
-  // Sets the label for the series in the plot matrix.
-  void SetSeriesLabel(const char *name, const char *label);
-
-  // Description:
   // Get the name of the series with the given index.  Returns 0 if the index
   // is out of range.  The returned pointer is only valid until the next call
   // to GetSeriesName.

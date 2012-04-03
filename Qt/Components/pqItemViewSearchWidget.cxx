@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QShowEvent>
 #include <QStyle>
-#include <QTimer>
 
 #include "ui_pqItemViewSearchWidget.h"
 

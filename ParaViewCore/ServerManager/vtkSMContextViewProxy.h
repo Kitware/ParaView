@@ -34,15 +34,6 @@ public:
   vtkTypeMacro(vtkSMContextViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Return the bounds of the chart
-  double* GetViewBounds();
-
-  // Description:
-  // Change the bounds of the current chart and change its behavior to be FIXED
-  // FIXME: We shouldn't have to change the behavior.
-  void SetViewBounds(double*);
-
 //BTX
   // Description:
   // Provides access to the vtk chart view.
@@ -75,18 +66,17 @@ protected:
   virtual void CreateVTKObjects();
 
   // Description:
+  // Used to update the axis range properties on each interaction event.
+  // This also fires the vtkCommand::InteractionEvent.
+  void OnInteractionEvent();
+
+  // Description:
   // The context view that is used for all context derived charts.
   vtkContextView* ChartView;
 
 private:
   vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
   void operator=(const vtkSMContextViewProxy&); // Not implemented
-
-  // Description:
-  // Private storage object.
-  class Private;
-  Private *Storage;
-
 //ETX
 };
 

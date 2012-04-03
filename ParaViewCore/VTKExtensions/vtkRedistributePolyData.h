@@ -23,7 +23,7 @@
 #ifndef __vtkRedistributePolyData_h
 #define __vtkRedistributePolyData_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
 
 //*******************************************************************
 class vtkDataArray;
@@ -31,10 +31,10 @@ class vtkDataSetAttributes;
 class vtkMultiProcessController;
 class vtkSocketController;
 
-class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
+class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -105,7 +105,7 @@ protected:
 
 //ETX
 
-  virtual void MakeSchedule (vtkCommSched*);
+  virtual void MakeSchedule (vtkPolyData* input, vtkCommSched*);
   void OrderSchedule (vtkCommSched*);
 
   void SendCellSizes (vtkIdType*, vtkIdType*, vtkPolyData*, int, 
@@ -157,7 +157,9 @@ protected:
   void ReceiveArrays (vtkDataArray*, vtkIdType, int, 
                       vtkIdType*, int); 
 
-  void Execute();
+  int RequestData(vtkInformation* request,
+                  vtkInformationVector** inputVector,
+                  vtkInformationVector* outputVector);
 
   // Do this as a proprocessing step.
   void CompleteInputArrays(vtkPolyData* input);

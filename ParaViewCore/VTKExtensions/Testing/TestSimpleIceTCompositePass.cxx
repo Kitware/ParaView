@@ -16,6 +16,7 @@
 #include "vtkPSphereSource.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkRenderPassCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -115,7 +116,9 @@ int main(int argc, char**argv)
 
     // insert the iceT pass into the pipeline.
     cameraP->SetDelegatePass(iceTPass);
-    renderer->SetPass(cameraP);
+
+    vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
+    glrenderer->SetPass(cameraP);
 
     //---------------------------------------------------------------------------
     // In parallel configurations, typically one node acts as the driver i.e. the

@@ -108,7 +108,7 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
     {
     this->MovieWriter->SetFileName(this->FileName);
     vtkImageData* emptyImage = this->NewFrame();
-    this->MovieWriter->SetInput(emptyImage);
+    this->MovieWriter->SetInputData(emptyImage);
     emptyImage->Delete();
 
     this->MovieWriter->Start();
@@ -146,9 +146,7 @@ vtkImageData* vtkSMAnimationSceneImageWriter::NewFrame()
 {
   vtkImageData* image = vtkImageData::New();
   image->SetDimensions(this->ActualSize[0], this->ActualSize[1], 1);
-  image->SetScalarTypeToUnsignedChar();
-  image->SetNumberOfScalarComponents(3);
-  image->AllocateScalars();
+  image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
   unsigned char rgb[3];
   rgb[0] = 0x0ff & static_cast<int>(this->BackgroundColor[0]*0x0ff);
@@ -263,10 +261,10 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     sprintf(number, ".%04d", this->FileCount);
     std::string filename = this->Prefix;
     filename = filename + number + this->Suffix;
-    this->ImageWriter->SetInput(combinedImage);
+    this->ImageWriter->SetInputData(combinedImage);
     this->ImageWriter->SetFileName(filename.c_str());
     this->ImageWriter->Write();
-    this->ImageWriter->SetInput(0);
+    this->ImageWriter->SetInputData(0);
 
     errcode = this->ImageWriter->GetErrorCode();
     this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount;
@@ -274,9 +272,9 @@ bool vtkSMAnimationSceneImageWriter::SaveFrame(double vtkNotUsed(time))
     }
   else if (this->MovieWriter)
     {
-    this->MovieWriter->SetInput(combinedImage);
+    this->MovieWriter->SetInputData(combinedImage);
     this->MovieWriter->Write();
-    this->MovieWriter->SetInput(0);
+    this->MovieWriter->SetInputData(0);
 
     int alg_error = this->MovieWriter->GetErrorCode();
     int movie_error = this->MovieWriter->GetError();

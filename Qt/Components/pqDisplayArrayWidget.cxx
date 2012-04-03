@@ -38,15 +38,15 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QRegExp>
-#include <QTimer>
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
-#include "pqUndoStack.h"
 #include "pqSMAdaptor.h"
+#include "pqTimer.h"
+#include "pqUndoStack.h"
 
 class pqDisplayArrayWidget::pqInternal
 {
@@ -407,7 +407,7 @@ void pqDisplayArrayWidget::needReloadGUI()
     return;
     }
   this->Internal->Updating = true;
-  QTimer::singleShot(0, this, SLOT(reloadGUI()));
+  pqTimer::singleShot(0, this, SLOT(reloadGUI()));
 }
 
 //-----------------------------------------------------------------------------

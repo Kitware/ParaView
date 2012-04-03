@@ -60,7 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkScatterPlotMatrix.h"
 
 #include "vtkCommand.h"
 #include "vtkNew.h"
@@ -123,9 +122,6 @@ pqContextView::pqContextView(
   this->Command = command::New(*this);
   vtkObject::SafeDownCast(viewProxy->GetClientSideObject())->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-
-  this->Internal->VTKConnect->Connect( viewProxy, vtkChart::UpdateRange,
-                                       this, SLOT(onViewBoundsChange(vtkObject*,ulong,void*,void*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -139,6 +135,9 @@ pqContextView::~pqContextView()
 QWidget* pqContextView::createWidget()
 {
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
+  // don't use caching for charts since the charts don't seem to render
+  // correctly when an overlapping window is present, unlike 3D views.
+  vtkwidget->setAutomaticImageCacheEnabled(false);
   vtkwidget->setViewProxy(this->getProxy());
   vtkwidget->setObjectName("Viewport");
   return vtkwidget;
@@ -480,16 +479,4 @@ void pqContextView::setSelection(vtkSelection* sel)
   selectionSource->Delete();
 
   emit this->selected(opPort);
-}
-//-----------------------------------------------------------------------------
-void pqContextView::onViewBoundsChange(vtkObject* src,
-                                       unsigned long vtkNotUsed(event),
-                                       void* vtkNotUsed(method),
-                                       void* vtkNotUsed(data))
-{
-  vtkSMContextViewProxy* proxy = vtkSMContextViewProxy::SafeDownCast(src);
-  if(proxy)
-    {
-    emit viewBoundsUpdated(proxy->GetGlobalID(), proxy->GetViewBounds());
-    }
 }

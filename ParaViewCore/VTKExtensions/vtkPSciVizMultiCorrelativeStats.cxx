@@ -30,7 +30,7 @@ int vtkPSciVizMultiCorrelativeStats::LearnAndDerive( vtkMultiBlockDataSet* model
 {
   // Create the statistics filter and run it
   vtkPMultiCorrelativeStatistics* stats = vtkPMultiCorrelativeStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, inData );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, inData );
   vtkIdType ncols = inData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
@@ -70,8 +70,8 @@ int vtkPSciVizMultiCorrelativeStats::AssessData( vtkTable* observations, vtkData
 
   // Create the statistics filter and run it
   vtkPMultiCorrelativeStatistics* stats = vtkPMultiCorrelativeStatistics::New();
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, observations );
-  stats->SetInput( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_DATA, observations );
+  stats->SetInputData( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
   //stats->GetAssessNames()->SetValue( 0, "d2" );
   modelCopy->FastDelete();
   vtkIdType ncols = observations->GetNumberOfColumns();

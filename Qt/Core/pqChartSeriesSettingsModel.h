@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqParallelCoordinatesSettingsModel.h
+   Module:    pqChartSeriesSettingsModel.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqParallelCoordinatesSettingsModel_h
-#define __pqParallelCoordinatesSettingsModel_h
+#ifndef __pqChartSeriesSettingsModel_h
+#define __pqChartSeriesSettingsModel_h
 
 #include "pqCheckableHeaderModel.h"
 #include "pqCoreExport.h"
@@ -40,15 +40,15 @@ class vtkTable;
 class vtkChartXY;
 class pqDataRepresentation;
 
-class PQCORE_EXPORT pqParallelCoordinatesSettingsModel : public pqCheckableHeaderModel
+class PQCORE_EXPORT pqChartSeriesSettingsModel : public pqCheckableHeaderModel
 {
   typedef pqCheckableHeaderModel Superclass;
 
   Q_OBJECT
 
 public:
-  pqParallelCoordinatesSettingsModel(QObject* parent = 0);
-  ~pqParallelCoordinatesSettingsModel();
+  pqChartSeriesSettingsModel(QObject* parent = 0);
+  ~pqChartSeriesSettingsModel();
 
   void setRepresentation(pqDataRepresentation* rep);
   pqDataRepresentation* representation() const;
@@ -95,6 +95,10 @@ public:
   /// \return A model index for the parent of the given index.
   virtual QModelIndex parent(const QModelIndex &index) const;
 
+  /// \brief Extended drag-n-drop operations for this model
+  virtual Qt::DropActions supportedDropActions() const;
+  virtual bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+
 public slots:
   /// Reloads the model i.e. refreshes all data from the display and resets the
   /// model.
@@ -113,6 +117,13 @@ public slots:
 
 signals:
   void redrawChart();
+
+protected:
+  virtual QModelIndex rootIndex() const;
+
+protected slots:
+  /// emits data-changed event whenever the properties are modified.
+  void emitDataChanged();
 
 private:
   class pqImplementation;

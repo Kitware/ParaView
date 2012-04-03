@@ -236,7 +236,7 @@ int vtkPVPostFilter::RequestDataObject(
       if (!output || !output->IsA(input->GetClassName()))
         {
         vtkDataObject* newOutput = input->NewInstance();
-        newOutput->SetPipelineInformation(info);
+        info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
         newOutput->Delete();
         }
       }
@@ -415,7 +415,7 @@ void vtkPVPostFilter::CellDataToPointData(vtkDataSet* output)
   clone->ShallowCopy(output);
 
   vtkCellDataToPointData *converter = vtkCellDataToPointData::New();
-  converter->SetInput(clone);
+  converter->SetInputData(clone);
   converter->PassCellDataOn();
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));
@@ -430,7 +430,7 @@ void vtkPVPostFilter::PointDataToCellData(vtkDataSet* output)
   clone->ShallowCopy(output);
 
   vtkPointDataToCellData *converter = vtkPointDataToCellData::New();
-  converter->SetInput(clone);
+  converter->SetInputData(clone);
   converter->PassPointDataOn();
   converter->Update();
   output->ShallowCopy(converter->GetOutputDataObject(0));

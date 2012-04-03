@@ -24,9 +24,11 @@
 #include "vtkPointData.h"
 #include "vtkPVPostFilter.h"
 
+#include <algorithm>
+#include <assert.h>
+#include <set>
 #include <string>
 #include <vtksys/ios/sstream>
-#include <assert.h>
 
 namespace
 {
@@ -37,6 +39,21 @@ namespace
       stream << a << "_" << b;
       return stream.str();
       }
+
+  class add_scalar_variables
+    {
+    vtkPVArrayCalculator* Calc;
+    const char* ArrayName;
+    int Component;
+  public:
+    add_scalar_variables(vtkPVArrayCalculator* calc,
+      const char* array_name, int component_num) :
+      Calc(calc), ArrayName(array_name), Component(component_num) { }
+    void operator() (const std::string& name)
+      {
+      this->Calc->AddScalarVariable(name.c_str(), this->ArrayName, this->Component);
+      }
+    };
 }
 
 vtkStandardNewMacro( vtkPVArrayCalculator );
@@ -54,7 +71,6 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
 { 
-  static  char   stringSufix[3][3] = { "_X", "_Y", "_Z" };
   unsigned long mtime = this->GetMTime();
 
   // Look at the data-arrays available in the input and register them as
@@ -76,7 +92,7 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
     vtkAbstractArray* array = inDataAttrs->GetAbstractArray(j);
     const char* array_name = array->GetName();
     int numberComps = array->GetNumberOfComponents();
-   
+
     if ( numberComps == 1 )
       {
       this->AddScalarVariable( array_name, array_name, 0 );
@@ -85,35 +101,26 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
       {
       for (int i = 0; i < numberComps; i ++ )
         {
-        if (i < 3)
-          {
-          vtksys_ios::ostringstream var_name;
-          var_name << array_name << stringSufix[i];
-          this->AddScalarVariable(var_name.str().c_str(), array_name, i );
-          }
+        std::set<std::string> possible_names;
 
-        std::string var_name;
         if (array->GetComponentName(i))
           {
-          var_name = vtkJoinToString(array_name, array->GetComponentName(i));
+          possible_names.insert(
+            vtkJoinToString(array_name, array->GetComponentName(i)));
           }
-        else
-          {
-          var_name = vtkJoinToString(array_name,
-            vtkPVPostFilter::DefaultComponentName(i, numberComps));
-          }
-        this->AddScalarVariable(var_name.c_str(), array_name, i );
+        possible_names.insert(vtkJoinToString(array_name,
+            vtkPVPostFilter::DefaultComponentName(i, numberComps)));
 
         // also put a <ArrayName>_<ComponetNumber> to handle past versions of
         // vtkPVArrayCalculator when component names were not used and index was
         // used e.g. state files prior to fixing of BUG #12951.
         std::string default_name = vtkJoinToString(array_name, i);
-        if (var_name != default_name)
-          {
-          this->AddScalarVariable(default_name.c_str(), array_name, i );
-          }
+        possible_names.insert(default_name);
+
+        std::for_each(possible_names.begin(), possible_names.end(),
+          add_scalar_variables(this, array_name, i));
         }
-      
+
       if ( numberComps == 3 )
         {
         this->AddVectorArrayName(array_name, 0, 1, 2 );

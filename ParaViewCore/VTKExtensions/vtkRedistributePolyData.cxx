@@ -25,6 +25,8 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkIntArray.h"
 #include "vtkLongArray.h"
 #include "vtkMath.h"
@@ -65,7 +67,9 @@ vtkRedistributePolyData::~vtkRedistributePolyData()
   this->SetController(0);
 }
 
-void vtkRedistributePolyData::Execute()
+int vtkRedistributePolyData::RequestData(vtkInformation* request,
+                                         vtkInformationVector** inputVector,
+                                         vtkInformationVector* outputVector)
 {
 #ifdef VTK_REDIST_DO_TIMING  
   vtkTimerLog* timer8 = vtkTimerLog::New();
@@ -75,8 +79,8 @@ void vtkRedistributePolyData::Execute()
   timerInfo8.timer->StartTimer();
 #endif
 
-  vtkPolyData *tmp = this->GetInput();
-  vtkPolyData *output = this->GetOutput();
+  vtkPolyData* tmp = vtkPolyData::GetData(inputVector[0]);
+  vtkPolyData* output = vtkPolyData::GetData(outputVector);
   vtkPolyData* input = vtkPolyData::New();
   input->ShallowCopy(tmp);
   this->CompleteInputArrays(input);
@@ -89,7 +93,7 @@ void vtkRedistributePolyData::Execute()
     output->GetPointData()->ShallowCopy(tmp->GetPointData());
     output->GetCellData()->ShallowCopy(tmp->GetCellData());
     input->Delete();
-    return;
+    return 1;
     }
 
   int myId;
@@ -98,7 +102,7 @@ void vtkRedistributePolyData::Execute()
     {
     vtkErrorMacro("need controller to redistribute cells");
     input->Delete();
-    return;
+    return 0;
     }
   myId = this->Controller->GetLocalProcessId();
 
@@ -118,7 +122,7 @@ void vtkRedistributePolyData::Execute()
 #endif
 
   vtkCommSched localSched;
-  this->MakeSchedule ( &localSched ); 
+  this->MakeSchedule ( input, &localSched ); 
   this->OrderSchedule ( &localSched);  // order schedule to avoid 
   // blocking problems later
   vtkIdType ***sendCellList = localSched.SendCellList; 
@@ -570,6 +574,8 @@ void vtkRedistributePolyData::Execute()
     vtkDebugMacro("send/rec (at end) time = "<<timerInfo8.Time);
     }
 #endif
+
+  return 1;
 }
 
 //*****************************************************************
@@ -593,7 +599,8 @@ void vtkRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 
 
 //*****************************************************************
-void vtkRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
+void vtkRedistributePolyData::MakeSchedule (vtkPolyData* input,
+                                            vtkCommSched* localSched)
 
 {
 //*****************************************************************
@@ -603,8 +610,6 @@ void vtkRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
   // get total number of polys and figure out how many each 
   // processor should have
-
-  vtkPolyData *input = this->GetInput();
 
   vtkCellArray *cellArrays[NUM_CELL_TYPES];
   cellArrays[0] = input->GetVerts();

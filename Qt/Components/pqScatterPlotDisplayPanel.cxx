@@ -73,7 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QPixmap>
 #include <QPointer>
-#include <QTimer>
 
 #include <assert.h>
 

@@ -365,9 +365,10 @@ static int TableIndex(int tableId)
 }
 
 
-vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkPolyDataSource()
+vtkPrismSESAMEReader::vtkPrismSESAMEReader() : vtkPolyDataAlgorithm()
 {
   this->Internal = new MyInternal();
+  this->SetNumberOfInputPorts(0);
 }
 
 vtkPrismSESAMEReader::~vtkPrismSESAMEReader()
@@ -464,13 +465,13 @@ void vtkPrismSESAMEReader::CloseFile()
 
 int vtkPrismSESAMEReader::GetNumberOfTableIds()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   return static_cast<int>(this->Internal->TableIds.size());
 }
 
 int* vtkPrismSESAMEReader::GetTableIds()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   return &this->Internal->TableIds[0];
 }
 
@@ -478,7 +479,7 @@ vtkIntArray* vtkPrismSESAMEReader::GetTableIdsAsArray()
 {
   this->Internal->TableIdsArray->Initialize();
   this->Internal->TableIdsArray->SetNumberOfComponents(1);
-  this->ExecuteInformation();
+  this->UpdateInformation();
   int numTableIds = static_cast<int>(this->Internal->TableIds.size());
   for (int i=0; i < numTableIds; ++i)
     {
@@ -506,19 +507,19 @@ void vtkPrismSESAMEReader::SetTable(int tableId)
 
 int vtkPrismSESAMEReader::GetTable()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   return this->Internal->TableId;
 }
 
 int vtkPrismSESAMEReader::GetNumberOfTableArrayNames()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   return static_cast<int>(this->Internal->TableArrays.size());
 }
 
 const char* vtkPrismSESAMEReader::GetTableArrayName(int index)
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   int s = static_cast<int>(this->Internal->TableArrays.size());
   if(s > index)
     {
@@ -528,12 +529,12 @@ const char* vtkPrismSESAMEReader::GetTableArrayName(int index)
 }
 const char* vtkPrismSESAMEReader::GetTableXAxisName()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
     return this->Internal->TableXAxisName.c_str();
 }
 const char* vtkPrismSESAMEReader::GetTableYAxisName()
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
     return this->Internal->TableYAxisName.c_str();
 }
 
@@ -553,7 +554,7 @@ void vtkPrismSESAMEReader::SetTableArrayStatus(const char* name, int flag)
 
 int vtkPrismSESAMEReader::GetTableArrayStatus(const char* name)
 {
-  this->ExecuteInformation();
+  this->UpdateInformation();
   int i, numArrays;
   numArrays = static_cast<int>(this->Internal->TableArrays.size());
   for(i=0; i<numArrays; i++)
@@ -567,12 +568,15 @@ int vtkPrismSESAMEReader::GetTableArrayStatus(const char* name)
 }
 
 
-void vtkPrismSESAMEReader::ExecuteInformation()
+int vtkPrismSESAMEReader::RequestInformation(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector*)
 {
   // open the file
   if(!this->OpenFile())
     {
-    return;
+    return 1;
     }
 
   if(this->Internal->TableIds.empty())
@@ -606,7 +610,7 @@ void vtkPrismSESAMEReader::ExecuteInformation()
 
   if (!this->Internal->ReadTable)
     {
-    return;
+    return 1;
     }
   this->Internal->ReadTable = false;
 
@@ -895,6 +899,7 @@ else if((this->Internal->TableId == 306 ||
     }
   }
 
+  return 1;
 }
 
 int vtkPrismSESAMEReader::JumpToTable( int toTable )
@@ -912,7 +917,9 @@ int vtkPrismSESAMEReader::JumpToTable( int toTable )
   return 0;
 }
 
-void vtkPrismSESAMEReader::Execute()
+int vtkPrismSESAMEReader::RequestData(vtkInformation*,
+                                      vtkInformationVector** inputVector,
+                                      vtkInformationVector* outputVector)
 {
   // read the file
   JumpToTable(this->Internal->TableId);
@@ -929,7 +936,9 @@ void vtkPrismSESAMEReader::Execute()
   else
     {
     this->ReadTable();
-    }
+  }
+
+  return 1;
 }
 
 void vtkPrismSESAMEReader::ReadTable()
@@ -1109,7 +1118,7 @@ void vtkPrismSESAMEReader::ReadTable()
   rGrid->Squeeze();
 
 
-  this->Internal->RectGridGeometry->SetInput(rGrid);
+  this->Internal->RectGridGeometry->SetInputData(rGrid);
   this->Internal->RectGridGeometry->Update();
 
 

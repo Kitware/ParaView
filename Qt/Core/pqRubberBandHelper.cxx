@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqTimer.h"
 
 // Qt Includes.
 #include <QCursor>
 #include <QPointer>
-#include <QTimer>
 #include <QWidget>
 #include <QMouseEvent>
 
@@ -163,7 +163,7 @@ void pqRubberBandHelper::setView(pqView* view)
 
   this->Internal->RenderView = renView;
   this->Mode = INTERACT;
-  QTimer::singleShot(10, this, SLOT(emitEnabledSignals()));
+  pqTimer::singleShot(10, this, SLOT(emitEnabledSignals()));
 }
 
 //-----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ bool pqRubberBandHelper::eventFilter(QObject *watched, QEvent *_event)
       QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
       if (mouseEvent.button() == Qt::LeftButton)
         {
-        QTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
+        pqTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
         }
       }
     }

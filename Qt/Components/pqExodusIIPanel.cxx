@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMap>
 #include <QtDebug>
-#include <QTimer>
-#include <QTreeWidget>
 #include <QVariant>
 #include <QVector>
 
@@ -51,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes
 #include "vtkEventQtSlotConnect.h"
 #include "vtkGraph.h"
-#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVCompositeDataInformationIterator.h"
@@ -66,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqApplicationCore.h"
+#include "pqExodusIIVariableSelectionWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
@@ -242,88 +240,16 @@ void pqExodusIIPanel::updateSIL()
 }
 
 //-----------------------------------------------------------------------------
-void pqExodusIIPanel::addSelectionsToTreeWidget(const QString& prop, 
-                                      QTreeWidget* tree,
-                                      PixmapType pix)
-{
-  vtkSMProperty* SMProperty = this->proxy()->GetProperty(prop.toAscii().data());
-  QList<QVariant> SMPropertyDomain;
-  SMPropertyDomain = pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
-  int j;
-  for(j=0; j<SMPropertyDomain.size(); j++)
-    {
-    QString varName = SMPropertyDomain[j].toString();
-    this->addSelectionToTreeWidget(varName, varName, tree, pix, prop, j);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
-                                               const QString& realName,
-                                               QTreeWidget* tree,
-                                               PixmapType pix,
-                                               const QString& prop,
-                                               int propIdx)
-{
-  static QPixmap pixmaps[] =
-    {
-    QPixmap(":/pqWidgets/Icons/pqNodalData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqFaceCenterData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqEdgeCenterData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqNodeSetData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqEdgeSetData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqFaceSetData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqElemSetData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqNodeMapData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqEdgeMapData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqElemMapData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqGlobalData16.png")
-    };
-
-  vtkSMProperty* SMProperty = this->proxy()->GetProperty(prop.toAscii().data());
-
-  if(!SMProperty || !tree)
-    {
-    return;
-    }
-
-  QList<QString> strs;
-  strs.append(name);
-  pqTreeWidgetItemObject* item;
-  item = new pqTreeWidgetItemObject(tree, strs);
-  item->setData(0, Qt::ToolTipRole, name);
-  if(pix >= 0)
-    {
-    item->setData(0, Qt::DecorationRole, pixmaps[pix]);
-    }
-  item->setData(0, Qt::UserRole, QString("%1 %2").arg((int)pix).arg(realName));
-
-  // initialize check state to unchecked. this also ensures
-  // that the item has a checkbox displayed in the view
-  item->setData(0, Qt::CheckStateRole, false);
-
-  this->propertyManager()->registerLink(item, 
-                      "checked", 
-                      SIGNAL(checkedStateChanged(bool)),
-                      this->proxy(), SMProperty, propIdx);
-
-  this->UI->TreeItemToPropMap[item] = prop;
-}
-
-//-----------------------------------------------------------------------------
 void pqExodusIIPanel::linkServerManagerProperties()
 {
+  vtkSMProxy* readerProxy = this->proxy();
 
   QFilterTreeProxyModel * filter =
     qobject_cast<QFilterTreeProxyModel *>(this->UI->Blocks->model());
   this->propertyManager()->registerLink(
     filter->sourceModel(), "values", SIGNAL(valuesChanged()),
-    this->proxy(),
-    this->proxy()->GetProperty("ElementBlocks"));
+    readerProxy,
+    readerProxy->GetProperty("ElementBlocks"));
 
   // parent class hooks up some of our widgets in the ui
   this->Superclass::linkServerManagerProperties();
@@ -331,62 +257,44 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->DisplItem = 0;
 
   // we hook up the node/element variables
+  QStringList variablesProperties;
+  variablesProperties
+    << "GenerateObjectIdCellArray"
+    << "GenerateGlobalElementIdArray"
+    << "ElementVariables"
+    << "FaceVariables"
+    << "EdgeVariables"
 
-  // do block id, global element id
-  this->addSelectionToTreeWidget("Object Ids", "ObjectId", this->UI->Variables,
-                   PM_ELEM, "GenerateObjectIdCellArray");
-  
-  this->addSelectionToTreeWidget("Global Element Ids", "GlobalElementId", this->UI->Variables,
-                   PM_ELEMBLK, "GenerateGlobalElementIdArray");
+    // do the set results variables
+    << "SideSetResultArrayStatus"
+    << "NodeSetResultArrayStatus"
+    << "FaceSetResultArrayStatus"
+    << "EdgeSetResultArrayStatus"
+    << "ElementSetResultArrayStatus"
 
-  this->addSelectionToTreeWidget("Implicit Element Ids", "ImplicitElementId", this->UI->Variables,
-                   PM_ELEMBLK, "GenerateImplicitElementIdArray");
+    << "GenerateGlobalNodeIdArray"
 
-  // integer array indicating file id (number in file name or position in sequence)
-  this->addSelectionToTreeWidget("File Ids", "FileId", this->UI->Variables,
-                   PM_ELEMBLK, "GenerateFileIdArray");
-  
-  // do the cell variables
-  this->addSelectionsToTreeWidget("ElementVariables",
-                                  this->UI->Variables, PM_ELEMBLK);
-  
-  // do the face variables
-  this->addSelectionsToTreeWidget("FaceVariables",
-                                  this->UI->Variables, PM_FACEBLK);
-  
-  // do the edge variables
-  this->addSelectionsToTreeWidget("EdgeVariables",
-                                  this->UI->Variables, PM_EDGEBLK);
+    // do the node variables
+    << "PointVariables"
 
-  // do the set results variables
-  this->addSelectionsToTreeWidget("SideSetResultArrayStatus",
-                                  this->UI->Variables, PM_SIDESET);
-  this->addSelectionsToTreeWidget("NodeSetResultArrayStatus",
-                                  this->UI->Variables, PM_NODESET);
-  this->addSelectionsToTreeWidget("FaceSetResultArrayStatus",
-                                  this->UI->Variables, PM_FACESET);
-  this->addSelectionsToTreeWidget("EdgeSetResultArrayStatus",
-                                  this->UI->Variables, PM_EDGESET);
-  this->addSelectionsToTreeWidget("ElementSetResultArrayStatus",
-                                  this->UI->Variables, PM_ELEMSET);
-  
-    
-  this->addSelectionToTreeWidget("Global Node Ids", "GlobalNodeId", this->UI->Variables,
-                   PM_NODE, "GenerateGlobalNodeIdArray");
+    // do the global variables
+    << "GlobalVariables";
 
-  this->addSelectionToTreeWidget("Implicit Node Ids", "ImplicitNodeId", this->UI->Variables,
-                   PM_NODE, "GenerateImplicitNodeIdArray");
+  foreach (const QString& pname, variablesProperties)
+    {
+    this->propertyManager()->registerLink(
+      this->UI->Variables, pname.toAscii().data(), SIGNAL(widgetModified()),
+      readerProxy, readerProxy->GetProperty(pname.toAscii().data()));
+    }
 
-  int numBef = this->UI->Variables->topLevelItemCount();
-  
-  // do the node variables
-  this->addSelectionsToTreeWidget("PointVariables",
-                                  this->UI->Variables, PM_NODE);
-  
+  // Find if there's any variable named "DIS*" in the PointVariables.
+  // This chunk of code can be cleaned up too. But leaving it as it was for now.
+  // We will have to think how can we auto-generate this panel in its entirety
+  // to make things cleaner and easier.
   int numAft = this->UI->Variables->topLevelItemCount();
 
   // find displacement variable
-  for(int j=numBef; j<numAft; j++)
+  for(int j=0; j<numAft; j++)
     {
     QTreeWidgetItem* item = this->UI->Variables->topLevelItem(j);
     if(item->data(0, Qt::DisplayRole).toString().left(3).toUpper() == "DIS")
@@ -398,12 +306,12 @@ void pqExodusIIPanel::linkServerManagerProperties()
   if(this->DisplItem)
     {
     QObject::connect(this->DisplItem, SIGNAL(checkedStateChanged(bool)),
-                     this, SLOT(displChanged(bool)));
+      this, SLOT(displChanged(bool)));
 
     // connect the apply displacements check box with the "DIS*" node variable
     QCheckBox* ApplyDisp = this->UI->ApplyDisplacements;
     QObject::connect(ApplyDisp, SIGNAL(stateChanged(int)),
-                     this, SLOT(applyDisplacements(int)));
+      this, SLOT(applyDisplacements(int)));
     this->applyDisplacements(Qt::Checked);
     ApplyDisp->setEnabled(true);
     }
@@ -415,41 +323,46 @@ void pqExodusIIPanel::linkServerManagerProperties()
     ApplyDisp->setEnabled(false);
     }
 
-  // do the global variables
-  this->addSelectionsToTreeWidget("GlobalVariables",
-                                  this->UI->Variables, PM_GLOBAL);
-
   // we hook up the sideset/nodeset 
-  //QTreeWidget* SetsTree = this->UI->Sets;
 
-
-  // blocks
-  this->addSelectionsToTreeWidget("EdgeBlocks",
-                                  this->UI->EdgeBlockArrays, PM_EDGEBLK);
-  this->addSelectionsToTreeWidget("FaceBlocks",
-                                  this->UI->FaceBlockArrays, PM_FACEBLK);
+  // edge/face blocks (the other block selection is done using SIL).
+  this->propertyManager()->registerLink(
+    this->UI->EdgeBlockArrays, "EdgeBlocks", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("EdgeBlocks"));
+  this->propertyManager()->registerLink(
+    this->UI->FaceBlockArrays, "FaceBlocks", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("FaceBlocks"));
 
   // sets
-  this->addSelectionsToTreeWidget("SideSetArrayStatus",
-                                  this->UI->Sets, PM_SIDESET);
-  this->addSelectionsToTreeWidget("NodeSetArrayStatus",
-                                  this->UI->Sets, PM_NODESET);
-  this->addSelectionsToTreeWidget("FaceSetArrayStatus",
-                                  this->UI->Sets, PM_FACESET);
-  this->addSelectionsToTreeWidget("EdgeSetArrayStatus",
-                                  this->UI->Sets, PM_EDGESET);
-  this->addSelectionsToTreeWidget("ElementSetArrayStatus",
-                                  this->UI->Sets, PM_ELEMSET);
+  this->propertyManager()->registerLink(
+    this->UI->Sets, "SideSetArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("SideSetArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Sets, "NodeSetArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("NodeSetArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Sets, "FaceSetArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("FaceSetArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Sets, "EdgeSetArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("EdgeSetArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Sets, "ElementSetArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("ElementSetArrayStatus"));
 
   // maps
-  this->addSelectionsToTreeWidget("NodeMapArrayStatus",
-                                  this->UI->Maps, PM_NODEMAP);
-  this->addSelectionsToTreeWidget("EdgeMapArrayStatus",
-                                  this->UI->Maps, PM_EDGEMAP);
-  this->addSelectionsToTreeWidget("FaceMapArrayStatus",
-                                  this->UI->Maps, PM_FACEMAP);
-  this->addSelectionsToTreeWidget("ElementMapArrayStatus",
-                                  this->UI->Maps, PM_ELEMMAP);
+  this->propertyManager()->registerLink(
+    this->UI->Maps, "NodeMapArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("NodeMapArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Maps, "EdgeMapArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("EdgeMapArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Maps, "FaceMapArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("FaceMapArrayStatus"));
+  this->propertyManager()->registerLink(
+    this->UI->Maps, "ElementMapArrayStatus", SIGNAL(widgetModified()),
+    readerProxy, readerProxy->GetProperty("ElementMapArrayStatus"));
 
   // Get the timestep values.  Note that the TimestepValues property will change
   // if HasModeShapes is on.  However, we know that when this method is called
@@ -462,12 +375,12 @@ void pqExodusIIPanel::linkServerManagerProperties()
         this->UI->TimestepValues.begin());
 
   // connect the mode shapes
-  this->propertyManager()->registerLink(this->UI->HasModeShapes,
-                                        "checked",
-                                        SIGNAL(toggled(bool)),
-                                        this->proxy(),
-                                        this->proxy()->
-                                        GetProperty("HasModeShapes"));
+  //this->propertyManager()->registerLink(this->UI->HasModeShapes,
+  //                                      "checked",
+  //                                      SIGNAL(toggled(bool)),
+  //                                      this->proxy(),
+  //                                      this->proxy()->
+  //                                      GetProperty("HasModeShapes"));
   this->UI->ModeSelectSlider->setMinimum(1);
   this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size());
   this->UI->ModeSelectSpinBox->setMinimum(1);
@@ -528,48 +441,6 @@ void pqExodusIIPanel::displChanged(bool state)
     {
     ApplyDisp->setCheckState(Qt::Unchecked);
     }
-}
-
-//-----------------------------------------------------------------------------
-QString pqExodusIIPanel::formatDataFor(vtkPVArrayInformation* ai)
-{
-  QString info;
-  if(ai)
-    {
-    int numComponents = ai->GetNumberOfComponents();
-    int dataType = ai->GetDataType();
-    double range[2];
-    for(int i=0; i<numComponents; i++)
-      {
-      ai->GetComponentRange(i, range);
-      QString s;
-      if(dataType != VTK_VOID && dataType != VTK_FLOAT && 
-         dataType != VTK_DOUBLE)
-        {
-        // display as integers (capable of 64 bit ids)
-        qlonglong min = qRound64(range[0]);
-        qlonglong max = qRound64(range[1]);
-        s = QString("%1 - %2").arg(min).arg(max);
-        }
-      else
-        {
-        // display as reals
-        double min = range[0];
-        double max = range[1];
-        s = QString("%1 - %2").arg(min,0,'f',6).arg(max,0,'f',6);
-        }
-      if(i > 0)
-        {
-        info += ", ";
-        }
-      info += s;
-      }
-    }
-  else
-    {
-    info = "Unavailable";
-    }
-  return info;
 }
 
 //-----------------------------------------------------------------------------

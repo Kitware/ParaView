@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqParallelCoordinatesSettingsModel.cxx
+   Module:    pqChartSeriesSettingsModel.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqParallelCoordinatesSettingsModel.h"
+#include "pqChartSeriesSettingsModel.h"
 
 #include "pqDataRepresentation.h"
 #include "vtkChartRepresentation.h"
-#include "vtkSMParallelCoordinatesRepresentationProxy.h"
+#include "vtkPVPlotMatrixRepresentation.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkWeakPointer.h"
 
+#include <QMimeData>
 #include <QPointer>
 #include <QPixmap>
 
-class pqParallelCoordinatesSettingsModel::pqImplementation
+class pqChartSeriesSettingsModel::pqImplementation
 {
 public:
   pqImplementation()
   {
   }
 
-  vtkWeakPointer<vtkSMParallelCoordinatesRepresentationProxy> RepresentationProxy;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
   QPointer<pqDataRepresentation> Representation;
+  QModelIndex rootIndex;
 
   vtkChartRepresentation* GetVTKRepresentation()
     {
@@ -57,7 +60,7 @@ public:
     }
 };
 
-pqParallelCoordinatesSettingsModel::pqParallelCoordinatesSettingsModel(QObject* parentObject) :
+pqChartSeriesSettingsModel::pqChartSeriesSettingsModel(QObject* parentObject) :
   Superclass(parentObject), Implementation(new pqImplementation())
 {
   // Set up the column headers.
@@ -70,12 +73,12 @@ pqParallelCoordinatesSettingsModel::pqParallelCoordinatesSettingsModel(QObject* 
       this, SLOT(setIndexCheckState(Qt::Orientation, int, int)));
 }
 
-pqParallelCoordinatesSettingsModel::~pqParallelCoordinatesSettingsModel()
+pqChartSeriesSettingsModel::~pqChartSeriesSettingsModel()
 {
   delete this->Implementation;
 }
 
-void pqParallelCoordinatesSettingsModel::setRepresentation(pqDataRepresentation* rep)
+void pqChartSeriesSettingsModel::setRepresentation(pqDataRepresentation* rep)
 {
   if (!rep || rep == this->Implementation->Representation)
     {
@@ -88,27 +91,27 @@ void pqParallelCoordinatesSettingsModel::setRepresentation(pqDataRepresentation*
     }
 
   this->Implementation->RepresentationProxy =
-    vtkSMParallelCoordinatesRepresentationProxy::SafeDownCast(rep->getProxy());
+    vtkSMChartRepresentationProxy::SafeDownCast(rep->getProxy());
   this->Implementation->Representation = rep;
 }
 
-pqDataRepresentation* pqParallelCoordinatesSettingsModel::representation() const
+pqDataRepresentation* pqChartSeriesSettingsModel::representation() const
 {
   return this->Implementation->Representation;
 }
 
-int pqParallelCoordinatesSettingsModel::rowCount(const QModelIndex& /*parent*/) const
+int pqChartSeriesSettingsModel::rowCount(const QModelIndex& /*parent*/) const
 {
   return this->Implementation->GetVTKRepresentation()?
       this->Implementation->GetVTKRepresentation()->GetNumberOfSeries() : 0;
 }
 
-int pqParallelCoordinatesSettingsModel::columnCount(const QModelIndex& /*parent*/) const
+int pqChartSeriesSettingsModel::columnCount(const QModelIndex& /*parent*/) const
 {
   return 2;
 }
 
-QVariant pqParallelCoordinatesSettingsModel::data(const QModelIndex& idx, int role) const
+QVariant pqChartSeriesSettingsModel::data(const QModelIndex& idx, int role) const
 {
   if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::ToolTipRole)
     {
@@ -133,7 +136,7 @@ QVariant pqParallelCoordinatesSettingsModel::data(const QModelIndex& idx, int ro
   return QVariant();
 }
 
-QVariant pqParallelCoordinatesSettingsModel::headerData(int section,
+QVariant pqChartSeriesSettingsModel::headerData(int section,
                                          Qt::Orientation orientation,
                                          int role) const
 {
@@ -155,7 +158,7 @@ QVariant pqParallelCoordinatesSettingsModel::headerData(int section,
   return QVariant();
 }
 
-bool pqParallelCoordinatesSettingsModel::setData(const QModelIndex &idx, const QVariant &value,
+bool pqChartSeriesSettingsModel::setData(const QModelIndex &idx, const QVariant &value,
                                   int role)
 {
   bool result = false;
@@ -180,7 +183,7 @@ bool pqParallelCoordinatesSettingsModel::setData(const QModelIndex &idx, const Q
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqParallelCoordinatesSettingsModel::index(int row, int column,
+QModelIndex pqChartSeriesSettingsModel::index(int row, int column,
   const QModelIndex &parentIndex) const
 {
   if(!parentIndex.isValid() && column >= 0 && column < 2 &&
@@ -193,15 +196,22 @@ QModelIndex pqParallelCoordinatesSettingsModel::index(int row, int column,
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqParallelCoordinatesSettingsModel::parent(const QModelIndex &) const
+QModelIndex pqChartSeriesSettingsModel::parent(const QModelIndex &) const
 {
-  return QModelIndex();
+  return this->rootIndex();
 }
 
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqParallelCoordinatesSettingsModel::flags(const QModelIndex &idx) const
+QModelIndex pqChartSeriesSettingsModel::rootIndex() const
 {
-  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+  return this->Implementation->rootIndex;
+}
+
+//-----------------------------------------------------------------------------
+Qt::ItemFlags pqChartSeriesSettingsModel::flags(const QModelIndex &idx) const
+{
+  Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsSelectable
+    | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
   if(idx.isValid() && idx.model() == this)
     {
     if(idx.column() == 0)
@@ -218,20 +228,20 @@ Qt::ItemFlags pqParallelCoordinatesSettingsModel::flags(const QModelIndex &idx) 
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesSettingsModel::reload()
+void pqChartSeriesSettingsModel::reload()
 {
   this->reset();
   this->updateCheckState(0, Qt::Horizontal);
 }
 
 //-----------------------------------------------------------------------------
-const char* pqParallelCoordinatesSettingsModel::getSeriesName(int row) const
+const char* pqChartSeriesSettingsModel::getSeriesName(int row) const
 {
   return this->Implementation->GetVTKRepresentation()->GetSeriesName(row);
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesSettingsModel::setSeriesEnabled(int row, bool enabled)
+void pqChartSeriesSettingsModel::setSeriesEnabled(int row, bool enabled)
 {
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
@@ -248,7 +258,7 @@ void pqParallelCoordinatesSettingsModel::setSeriesEnabled(int row, bool enabled)
 }
 
 //-----------------------------------------------------------------------------
-bool pqParallelCoordinatesSettingsModel::getSeriesEnabled(int row) const
+bool pqChartSeriesSettingsModel::getSeriesEnabled(int row) const
 {
   return vtkSMPropertyHelper(
       this->Implementation->RepresentationProxy, "SeriesVisibility")
@@ -256,7 +266,7 @@ bool pqParallelCoordinatesSettingsModel::getSeriesEnabled(int row) const
 }
 
 //-----------------------------------------------------------------------------
-void pqParallelCoordinatesSettingsModel::setSeriesLabel(int row, const QString& label)
+void pqChartSeriesSettingsModel::setSeriesLabel(int row, const QString& label)
 {
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
@@ -269,10 +279,78 @@ void pqParallelCoordinatesSettingsModel::setSeriesLabel(int row, const QString& 
 }
 
 //-----------------------------------------------------------------------------
-QString pqParallelCoordinatesSettingsModel::getSeriesLabel(int row) const
+QString pqChartSeriesSettingsModel::getSeriesLabel(int row) const
 {
   QString name = this->getSeriesName(row);
   return vtkSMPropertyHelper(this->Implementation->RepresentationProxy,
     "SeriesLabel").GetStatus(name.toStdString().c_str(),
     name.toStdString().c_str()); // name by default.
+}
+
+//-----------------------------------------------------------------------------
+Qt::DropActions pqChartSeriesSettingsModel::supportedDropActions () const
+{
+  // returns what actions are supported when dropping
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
+//-----------------------------------------------------------------------------
+bool pqChartSeriesSettingsModel::dropMimeData(const QMimeData *mData, Qt::DropAction action,
+                                      int row, int column, const QModelIndex &onIndex)
+{
+  Q_UNUSED(row);
+  Q_UNUSED(column);
+  if (!mData || action != Qt::MoveAction)
+      return false;
+
+  QStringList types = mimeTypes();
+  if (types.isEmpty())
+      return false;
+  QString format = types.at(0);
+  if (!mData->hasFormat(format))
+      return false;
+  vtkPVPlotMatrixRepresentation* plotMatrixRep = vtkPVPlotMatrixRepresentation::SafeDownCast(
+    this->Implementation->GetVTKRepresentation());
+  if(!plotMatrixRep)
+    {
+    return false;
+    }
+  this->blockSignals(true);
+
+  QByteArray encoded = mData->data(format);
+  QDataStream stream(&encoded, QIODevice::ReadOnly);
+
+  QList<int> rows;
+  while (!stream.atEnd()) {
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+    if(!rows.contains(r))
+      {
+      rows.append(r);
+      }
+    }
+
+  if(rows.count() ==0)
+    {
+    return false;
+    }
+
+  // if the drop is on an item, insert the dropping items
+  // before the dropped-on item; else, we will just move
+  // them to the end.
+  int toRow = onIndex.isValid() ? onIndex.row() : rowCount();
+  plotMatrixRep->MoveInputTableColumn(rows.value(0), toRow);
+  this->blockSignals(false);
+  this->emitDataChanged();
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSeriesSettingsModel::emitDataChanged()
+{
+  emit this->dataChanged(
+    this->createIndex(0, 0),
+    this->createIndex(this->rowCount(QModelIndex())-1, 0));
+  this->updateCheckState(0, Qt::Horizontal);
 }

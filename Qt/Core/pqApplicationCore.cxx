@@ -616,10 +616,9 @@ pqSettings* pqApplicationCore::settings()
       vtkProcessModule::GetProcessModule()->GetOptions());
     if (options && options->GetDisableRegistry())
       {
-      this->Settings = new pqSettings(
-        QApplication::organizationName(),
-        QApplication::applicationName() + QApplication::applicationVersion()
-        + ".DisabledRegistry", this);
+      QTemporaryFile tFile;
+      tFile.open();
+      this->Settings = new pqSettings(tFile.fileName() + ".ini", true, this);
       this->Settings->clear();
       }
     else

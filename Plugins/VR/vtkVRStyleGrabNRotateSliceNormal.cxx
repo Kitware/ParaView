@@ -204,7 +204,6 @@ bool vtkVRStyleGrabNRotateSliceNormal::update()
       {
       this->Proxy->UpdateVTKObjects();
       proxy->UpdateVTKObjects();
-      proxy->StillRender();
       }
     }
   return false;

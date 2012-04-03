@@ -70,14 +70,14 @@ vtkTransferFunctionEditorRepresentationSimple1D::vtkTransferFunctionEditorRepres
   vtkTransform *xform = vtkTransform::New();
   xform->Scale(1.35, 1.35, 1.35);
   this->ActiveHandleFilter = vtkTransformPolyDataFilter::New();
-  this->ActiveHandleFilter->SetInput(
+  this->ActiveHandleFilter->SetInputData(
     this->HandleRepresentation->GetCursorShape());
   this->ActiveHandleFilter->SetTransform(xform);
   xform->Delete();
 
   this->Lines = vtkPolyData::New();
   this->LinesMapper = vtkPolyDataMapper::New();
-  this->LinesMapper->SetInput(this->Lines);
+  this->LinesMapper->SetInputData(this->Lines);
   this->LinesMapper->InterpolateScalarsBeforeMappingOn();
   this->LinesActor = vtkActor::New();
   this->LinesActor->SetMapper(this->LinesMapper);
@@ -238,7 +238,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::BuildRepresentation()
       minXPlane->SetNormal(1, 0, 0);
 
       vtkClipPolyData *minXClip = vtkClipPolyData::New();
-      minXClip->SetInput(this->Lines);
+      minXClip->SetInputData(this->Lines);
       minXClip->SetClipFunction(minXPlane);
     
       // X maximum
@@ -759,6 +759,7 @@ void vtkTransferFunctionEditorRepresentationSimple1D::HighlightActiveHandle()
       {
       if (i == this->ActiveHandle)
         {
+        this->ActiveHandleFilter->Update();
         rep->SetCursorShape(this->ActiveHandleFilter->GetOutput());
         rep->Highlight(1);
         }

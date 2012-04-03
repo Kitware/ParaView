@@ -40,7 +40,7 @@ public:
 protected:
   vtkBalancedRedistributePolyData();
   ~vtkBalancedRedistributePolyData();
-  void MakeSchedule (vtkCommSched*);
+  void MakeSchedule (vtkPolyData*, vtkCommSched*);
 
 private:
   vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&); // Not implemented

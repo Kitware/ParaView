@@ -34,8 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QPointer>
-#include <QTimer>
+
 #include "pqComponentsExport.h"
+#include "pqTimer.h"
 
 class pqServer;
 
@@ -70,7 +71,7 @@ private:
   Q_DISABLE_COPY(pqTriggerOnIdleHelper)
 
   QPointer<pqServer> Server;
-  QTimer Timer;
+  pqTimer Timer;
 };
 
 #endif

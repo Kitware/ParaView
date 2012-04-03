@@ -32,13 +32,13 @@ SET (Kit_SRCS
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCellIntegrator.cxx
+  vtkChartNamedOptions.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkCleanUnstructuredGridCells.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCompositeMultiProcessController.cxx
-  vtkContextNamedOptions.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
@@ -207,6 +207,7 @@ SET (Kit_SRCS
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
+  vtkXYChartNamedOptions.cxx
   vtkZlibImageCompressor.cxx
 )
 

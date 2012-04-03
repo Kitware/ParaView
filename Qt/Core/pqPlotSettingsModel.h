@@ -96,11 +96,6 @@ public:
   /// \param index The model index.
   /// \return A model index for the parent of the given index.
   virtual QModelIndex parent(const QModelIndex &index) const;
-  virtual QModelIndex rootIndex() const;
-
-  /// \brief Extended drag-n-drop operations for this model
-  virtual Qt::DropActions supportedDropActions() const;
-  virtual bool dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
 public slots:
   /// Reloads the model i.e. refreshes all data from the display and resets the

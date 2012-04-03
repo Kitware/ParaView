@@ -54,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPoint>
 #include <QPointer>
 #include <QtDebug>
-#include <QTimer>
 #include <QMainWindow>
 #include <QStatusBar>
 
@@ -69,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqTimer.h"
 
 class pqRenderViewBase::pqInternal
 {
@@ -140,7 +140,7 @@ pqRenderViewBase::pqRenderViewBase(
   Superclass(type, group, name, renViewProxy, server, _parent)
 {
   this->Internal = new pqRenderViewBase::pqInternal();
-  this->InteractiveDelayUpdateTimer = new QTimer(this);
+  this->InteractiveDelayUpdateTimer = new pqTimer(this);
   this->AllowCaching = true;
 }
 

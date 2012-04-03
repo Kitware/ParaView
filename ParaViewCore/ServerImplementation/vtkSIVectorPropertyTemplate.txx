@@ -289,11 +289,9 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(vtkSMMessage* message, i
 
   AppendValues(values, *variant, force_idtype());
 
-  if(values.size() > 0)
-    {
-    return this->Push(&values[0], static_cast<int>(values.size()));
-    }
-  return true;
+  return (values.size() > 0) ?
+    this->Push(&values[0], static_cast<int>(values.size())) :
+    this->Push(static_cast<T*>(NULL), static_cast<int>(values.size()));
 }
 
 //---------------------------------------------------------------------------
@@ -375,7 +373,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
          << vtkClientServerStream::End;
     }
 
-  if (!this->Repeatable)
+  if (!this->Repeatable && number_of_elements > 0)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
     if (this->ArgumentIsArray)
@@ -391,7 +389,7 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
       }
     stream << vtkClientServerStream::End;
     }
-  else
+  else if (this->Repeatable)
     {
     int numCommands = number_of_elements / this->NumberOfElementsPerCommand;
     for(int i=0; i<numCommands; i++)

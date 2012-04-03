@@ -93,7 +93,7 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
   vtkGraphWriter* writer = vtkGraphWriter::New();
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
-  writer->SetInput(clone);
+  writer->SetInputData(clone);
   writer->Write();
 
   *css << vtkClientServerStream::Reply

@@ -49,7 +49,7 @@ int main( int argc, char* argv[] )
   reader->Update();
 
   vtkPVAMRDualContourRefPtr contour = vtkPVAMRDualContourRefPtr::New();
-  contour->SetInput( reader->GetOutputDataObject(0) );
+  contour->SetInputData( reader->GetOutputDataObject(0) );
   contour->SetVolumeFractionSurfaceValue(0.1);
   contour->SetEnableMergePoints(1);
   contour->SetEnableDegenerateCells(1);

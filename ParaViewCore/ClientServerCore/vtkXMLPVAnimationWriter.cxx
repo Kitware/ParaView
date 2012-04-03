@@ -23,6 +23,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkXMLWriter.h"
 
 #include <map>
@@ -145,8 +146,7 @@ void vtkXMLPVAnimationWriter::AddRepresentation(vtkAlgorithm* repr,
   if (repr)
     {
     vtkCompleteArrays* complete_arrays = vtkCompleteArrays::New();
-    complete_arrays->SetInputConnection(
-      pvrepr->GetRenderedDataObject(0)->GetProducerPort());
+    complete_arrays->SetInputData(pvrepr->GetRenderedDataObject(0));
     this->AddInputConnection(complete_arrays->GetOutputPort());
     this->AddInputInternal(groupname);
     complete_arrays->Delete();
@@ -221,16 +221,19 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     {
     vtkDataObject* dataObject = exec->GetInputData(0, i);
     // Make sure the pipeline mtime is up to date.
-    exec->GetInputData(0, i)->UpdateInformation();
+    exec->UpdateInformation();
     
     // If the input has been modified since the last animation step,
     // increment its file number.
     int changed = 0;
-    if(exec->GetInputData(0, i)->GetPipelineMTime() > 
-       this->Internal->InputMTimes[i])
+     
+  if(vtkStreamingDemandDrivenPipeline::SafeDownCast(
+    this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime() >
+    this->Internal->InputMTimes[i])
       {
       this->Internal->InputMTimes[i] = 
-        exec->GetInputData(0, i)->GetPipelineMTime();
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(
+        this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime();
       changed = 1;
       }
 

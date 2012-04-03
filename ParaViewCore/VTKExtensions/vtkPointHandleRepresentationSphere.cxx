@@ -56,20 +56,21 @@ vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
   // By default a vtkSphereSource will be used to define the cursor shape
   vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->SetThetaResolution(12);
+  sphere->Update();
   this->CursorShape = sphere->GetOutput();
   this->CursorShape->Register(this);
   sphere->Delete();
 
   this->Glypher = vtkGlyph3D::New();
-  this->Glypher->SetInput(this->FocalData);
-  this->Glypher->SetSource(this->CursorShape);
+  this->Glypher->SetInputData(this->FocalData);
+  this->Glypher->SetSourceData(this->CursorShape);
   this->Glypher->SetVectorModeToVectorRotationOff();
   this->Glypher->ScalingOn();
   this->Glypher->SetScaleModeToDataScalingOff();
   this->Glypher->SetScaleFactor(10.0);
 
   this->Mapper = vtkPolyDataMapper::New();
-  this->Mapper->SetInput(this->Glypher->GetOutput());
+  this->Mapper->SetInputConnection(this->Glypher->GetOutputPort());
 
   // Set up the initial properties
   this->CreateDefaultProperties();
@@ -133,7 +134,7 @@ void vtkPointHandleRepresentationSphere::SetCursorShape(vtkPolyData *shape)
       {
       this->CursorShape->Register(this);
       }
-    this->Glypher->SetSource(this->CursorShape);
+    this->Glypher->SetSourceData(this->CursorShape);
     this->Modified();
     }
 }
@@ -447,15 +448,15 @@ void vtkPointHandleRepresentationSphere::CreateDefaultDiskSource()
   diskProperty->SetLineWidth(0.5);
 
   this->DiskGlypher = vtkGlyph3D::New();
-  this->DiskGlypher->SetInput(this->FocalData);
-  this->DiskGlypher->SetSource(disk->GetOutput());
+  this->DiskGlypher->SetInputData(this->FocalData);
+  this->DiskGlypher->SetSourceConnection(disk->GetOutputPort());
   this->DiskGlypher->SetVectorModeToVectorRotationOff();
   this->DiskGlypher->ScalingOn();
   this->DiskGlypher->SetScaleModeToDataScalingOff();
   this->DiskGlypher->SetScaleFactor(this->Glypher->GetScaleFactor());
 
   this->DiskMapper = vtkPolyDataMapper::New();
-  this->DiskMapper->SetInput(this->DiskGlypher->GetOutput());
+  this->DiskMapper->SetInputConnection(this->DiskGlypher->GetOutputPort());
 
   this->DiskActor = vtkActor::New();
   this->DiskActor->SetMapper(this->DiskMapper);

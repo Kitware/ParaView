@@ -119,6 +119,7 @@ protected:
   char* ServerResourceName;
   char* ServerURL;
   char* TileImagePath;
+
   int ExitAppWhenTestsDone;
   int DisableRegistry;
   int DisableLightKit;
@@ -129,7 +130,6 @@ protected:
 
   vtkSetStringMacro(PythonScript);
   vtkSetStringMacro(ServerResourceName);
-  vtkSetStringMacro(ServerURL);
 
   struct TestInfo
     {

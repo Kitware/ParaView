@@ -102,12 +102,12 @@ vtkSmartPointer<vtkDataArray> vtkTableFFT::DoFFT(vtkDataArray *input)
   // Build an image data containing the input data.
   VTK_CREATE(vtkImageData, imgInput);
   imgInput->SetDimensions(input->GetNumberOfTuples(), 1, 1);
-  imgInput->SetScalarType(input->GetDataType());
+  imgInput->SetScalarType(input->GetDataType(), input->GetInformation());
   imgInput->GetPointData()->SetScalars(input);
 
   // Compute the FFT
   VTK_CREATE(vtkImageFFT, fft);
-  fft->SetInput(imgInput);
+  fft->SetInputData(imgInput);
   fft->Update();
 
   // Return the result

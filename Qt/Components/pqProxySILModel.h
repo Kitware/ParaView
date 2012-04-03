@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractProxyModel>
 #include "pqComponentsExport.h"
+#include "pqTimer.h"
 
 #include <QPixmap>
-#include <QTimer>
 
 /// pqProxySILModel is a proxy model for pqSILModel. This makes it possible for
 /// tree views to show only a sub-tree in the SIL. This also provides API to
@@ -178,7 +178,7 @@ private:
   pqProxySILModel(const pqProxySILModel&); // Not implemented.
   void operator=(const pqProxySILModel&); // Not implemented.
 
-  QTimer DelayedValuesChangedSignalTimer;
+  pqTimer DelayedValuesChangedSignalTimer;
   QPixmap CheckboxPixmaps[3];
   QString HierarchyName;
   bool    noCheckBoxes;
