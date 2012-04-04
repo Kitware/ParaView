@@ -23,10 +23,12 @@
 #define __vtkAMRDualGridHelper_h
 
 #include "vtkObject.h"
-#include <vector>
+#include <vtkstd/vector>
+#include <vtkstd/map>
 
 class vtkDataArray;
 class vtkIntArray;
+class vtkIdTypeArray;
 class vtkHierarchicalBoxDataSet;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperLevel;
@@ -130,8 +132,12 @@ private:
   // Distributed execution
   void ShareMetaData();
   void ShareBlocks();
-  void MarshalBlocks(vtkIntArray *buffer);
-  void UnmarshalBlocks(vtkIntArray *buffer);
+  void ShareBlocksWithNeighbors(vtkIntArray *neighbors);
+  void ShareBlocksWithNeighborsAsynchronous(vtkIntArray *neighbors);
+  void ShareBlocksWithNeighborsSynchronous(vtkIntArray *neighbors);
+  int MarshalBlocks(void *buffer, int sizeLimit);
+  void UnmarshalBlocks(void *buffer);
+  void UnmarshalBlocksFromOne(void *buffer, int blockProc);
 
   vtkMultiProcessController *Controller;
   void ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* input);
@@ -167,22 +173,22 @@ private:
   double GlobalOrigin[3];
   
   // Each level will have a grid to help find neighbors.
-  std::vector<vtkAMRDualGridHelperLevel*> Levels;
+  vtkstd::vector<vtkAMRDualGridHelperLevel*> Levels;
 
   int EnableDegenerateCells;
 
   void ProcessRegionRemoteCopyQueueSynchronous(bool hackLevelFlag);
-  void SendDegenerateRegionsFromQueueSynchronous(int destProc);
-  void ReceiveDegenerateRegionsFromQueueSynchronous(int srcProc,
+  void SendDegenerateRegionsFromQueueSynchronous(int destProc, vtkIdType messageLength);
+  void ReceiveDegenerateRegionsFromQueueSynchronous(int srcProc, vtkIdType messageLength,
                                                     bool hackLevelFlag);
 
   // NOTE: These methods are NOT DEFINED if not compiled with MPI.
   void ProcessRegionRemoteCopyQueueMPIAsynchronous(bool hackLevelFlag);
   void SendDegenerateRegionsFromQueueMPIAsynchronous(
-                                 int recvProc,
+                                 int recvProc, vtkIdType messageLength,
                                  vtkAMRDualGridHelperCommRequestList &sendList);
   void ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
-                              int sendProc,
+                              int sendProc, vtkIdType messageLength,
                               vtkAMRDualGridHelperCommRequestList &receiveList);
   void FinishDegenerateRegionsCommMPIAsynchronous(
                               bool hackLevelFlag,
@@ -191,8 +197,8 @@ private:
 
   // Degenerate regions that span processes.  We keep them in a queue
   // to communicate and process all at once.
-  std::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
-  vtkIdType DegenerateRegionMessageSize(int srcProc, int destProc);
+  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion> DegenerateRegionQueue;
+  void DegenerateRegionMessageSize(vtkIdTypeArray* srcProcs, vtkIdTypeArray* destProc);
   void* CopyDegenerateRegionBlockToMessage(
     const vtkAMRDualGridHelperDegenerateRegion &region,
     void* messagePtr);
@@ -201,7 +207,7 @@ private:
     const void* messagePtr,
     bool hackLevelFlag);
   void MarshalDegenerateRegionMessage(void *messagePtr, int destProc);
-  void UnmarshalDegenerateRegionMessage(const void *messagePtr, int srcProc,
+  void UnmarshalDegenerateRegionMessage(const void *messagePtr, int messageLength, int srcProc,
                                         bool hackLevelFlag);
 
   int SkipGhostCopy;
@@ -325,7 +331,7 @@ public:
   int NormalAxis;
 
   // Sparse array of points for equivalence computation.
-  std::vector<vtkAMRDualGridHelperSeed> FragmentIds;
+  vtkstd::vector<vtkAMRDualGridHelperSeed> FragmentIds;
   void AddFragmentSeed(int level, int x, int y, int z, int fragmentId);
 
   // This is the number of blocks pointing to this face.
