@@ -497,7 +497,7 @@ void vtkAMRDualGridHelperAddBackGhostValues(vtkDataArray *inPtr, int inDim[3],
       indexX = indexY;
       for (xx = outExt[0]; xx <= outExt[1]; ++xx)
         {
-        outPtr->SetTuple1 (outIndex ++, inPtr->GetTuple1 (indexX));
+        outPtr->SetTuple (outIndex ++, inPtr->GetTuple (indexX));
         if (xx >= inExt[0] && xx < inExt[1])
           {
           ++indexX;
