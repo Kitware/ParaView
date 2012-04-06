@@ -89,3 +89,11 @@ add_test("py-multi-servers.TestMultiServersConfig"
     --client ${PARAVIEW_PYTHON_EXECUTABLE}
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersConfig.py
 )
+
+add_test("py-multi-servers.TestMultiServersRemoteProxy"
+    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+    --test-multi-servers 3
+    --server ${PARAVIEW_SERVER_EXECUTABLE}
+    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
+)
