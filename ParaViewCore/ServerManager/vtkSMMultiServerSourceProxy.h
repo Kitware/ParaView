@@ -37,15 +37,33 @@ public:
   // Bind proxy with a given external proxy
   virtual void SetExternalProxy(vtkSMSourceProxy* proxyFromAnotherServer, int port = 0);
 
+  // Description:
+  // Return the proxy that is currently binded if any otherwise return NULL;
+  virtual vtkSMSourceProxy* GetExternalProxy();
+
 //BTX
 
   // Description:
   // Marks the selection proxies dirty as well as chain to superclass.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // This method is used to initialise the object to the given state
+  // If the definitionOnly Flag is set to True the proxy won't load the
+  // properties values and just setup the new proxy hierarchy with all subproxy
+  // globalID set. This allow to split the load process in 2 step to prevent
+  // invalid state when property refere to a sub-proxy that does not exist yet.
+  virtual void LoadState( const vtkSMMessage* message, vtkSMProxyLocator* locator);
+
 protected:
   vtkSMMultiServerSourceProxy();
   ~vtkSMMultiServerSourceProxy();
+
+  virtual void UpdateState();
+
+  vtkIdType RemoteProxySessionID;
+  vtkIdType RemoteProxyID;
+  int PortToExport;
 
 private:
   vtkSMMultiServerSourceProxy(const vtkSMMultiServerSourceProxy&); // Not implemented

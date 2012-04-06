@@ -279,6 +279,12 @@ bool pqUndoStack::ignoreAllChanges() const
 //-----------------------------------------------------------------------------
 void pqUndoStack::setActiveServer(pqServer* server)
 {
+  // Make sure we don't break a current running undo action
+  if(this->ignoreAllChanges())
+    {
+    return; // No change
+    }
+
   // Clear stack
   this->Implementation->IgnoreAllChangesStack.clear();
 
