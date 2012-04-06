@@ -24,10 +24,11 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkProperty.h"
 #include "vtkPVRenderView.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkTextProperty.h"
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkCubeAxesRepresentation);
@@ -64,7 +65,31 @@ void vtkCubeAxesRepresentation::SetVisibility(bool val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetColor(double r, double g, double b)
 {
-  this->CubeAxesActor->GetProperty()->SetColor(r, g, b);
+  // Old way
+  //this->CubeAxesActor->GetProperty()->SetColor(r, g, b);
+
+  // New way
+  this->CubeAxesActor->GetXAxesLinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetYAxesLinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetZAxesLinesProperty()->SetColor(r, g, b);
+
+  this->CubeAxesActor->GetXAxesGridlinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetYAxesGridlinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetZAxesGridlinesProperty()->SetColor(r, g, b);
+
+  this->CubeAxesActor->GetXAxesInnerGridlinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetYAxesInnerGridlinesProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetZAxesInnerGridlinesProperty()->SetColor(r, g, b);
+
+  this->CubeAxesActor->GetXAxesGridpolysProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetYAxesGridpolysProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetZAxesGridpolysProperty()->SetColor(r, g, b);
+
+  for(int i=0; i < 3; i++)
+    {
+    this->CubeAxesActor->GetTitleTextProperty(i)->SetColor(r, g, b);
+    this->CubeAxesActor->GetLabelTextProperty(i)->SetColor(r, g, b);
+    }
 }
 
 //----------------------------------------------------------------------------
