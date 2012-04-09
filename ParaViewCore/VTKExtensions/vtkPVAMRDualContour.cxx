@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkPVAMRDualContour.h"
 
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
@@ -65,7 +65,7 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
                                   vtkInformationVector* outputVector)
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkHierarchicalBoxDataSet* hbdsInput=vtkHierarchicalBoxDataSet::SafeDownCast(
+  vtkNonOverlappingAMR* hbdsInput=vtkNonOverlappingAMR::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkInformation *outInfo;

@@ -32,7 +32,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiBlockDataSet.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkAMRBox.h"
@@ -1868,7 +1868,7 @@ void vtkMaterialInterfaceFilter::DeleteAllBlocks()
 //----------------------------------------------------------------------------
 // Initialize blocks from multi block input.
 int vtkMaterialInterfaceFilter::InitializeBlocks(
-        vtkHierarchicalBoxDataSet* input,
+        vtkNonOverlappingAMR* input,
         string &materialFractionArrayName,
         string &massArrayName,
         vector<string> &volumeWtdAvgArrayNames,
@@ -1942,8 +1942,9 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(
     int numBlocks = input->GetNumberOfDataSets(level);
     for (int levelBlockId = 0; levelBlockId < numBlocks; ++levelBlockId)
       {
-      vtkAMRBox box;
-      vtkImageData* image = input->GetDataSet(level,levelBlockId,box);
+//      vtkAMRBox box;
+//      vtkImageData* image = input->GetDataSet(level,levelBlockId,box);
+      vtkImageData* image = input->GetDataSet(level,levelBlockId);
       // TODO: We need to check the CELL_DATA and the correct volume fraction array.
 
       if (image)
@@ -2368,7 +2369,7 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
 //----------------------------------------------------------------------------
 // count the number of local(wrt this proc) blocks.
 int vtkMaterialInterfaceFilter::GetNumberOfLocalBlocks(
-                              vtkHierarchicalBoxDataSet *hbds)
+                              vtkNonOverlappingAMR *hbds)
 {
   vtkCompositeDataIterator *it=hbds->NewIterator();
   it->InitTraversal();
@@ -2395,7 +2396,7 @@ int vtkMaterialInterfaceFilter::GetNumberOfLocalBlocks(
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(
-  vtkHierarchicalBoxDataSet* input)
+  vtkNonOverlappingAMR* input)
 {
   // extract information which the reader has exported to
   // the root node of the box hierarchy. All procs in the filter have
@@ -2483,7 +2484,7 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(
 // base extents (without overlap/ghost buffer) lie on grid
 // (i.e.) the min base extent must be a multiple of the standardBlockDimesions.
 int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
-  vtkHierarchicalBoxDataSet* input)
+  vtkNonOverlappingAMR* input)
 {
   int numLevels = input->GetNumberOfLevels();
   int numBlocks;
@@ -2536,8 +2537,9 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
     numBlocks = input->GetNumberOfDataSets(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
-      vtkAMRBox box;
-      vtkImageData* image = input->GetDataSet(level,blockId,box);
+//      vtkAMRBox box;
+//      vtkImageData* image = input->GetDataSet(level,blockId,box);
+      vtkImageData* image = input->GetDataSet(level,blockId);
       if (image)
         {
         ++totalNumberOfBlocksInThisProcess;
@@ -3115,7 +3117,7 @@ vtkPolyData *vtkMaterialInterfaceFilter::NewFragmentMesh()
 // determined, here we build arrays to hold the results,
 // clear dirty accumulators, etc...
 void vtkMaterialInterfaceFilter::PrepareForPass(
-        vtkHierarchicalBoxDataSet *hbdsInput,
+        vtkNonOverlappingAMR *hbdsInput,
         vector<string> &volumeWtdAvgArrayNames,
         vector<string> &massWtdAvgArrayNames,
         vector<string> &summedArrayNames,
@@ -3169,7 +3171,10 @@ void vtkMaterialInterfaceFilter::PrepareForPass(
   vtkImageData *testImage=0;
   if ( !hbdsIt->IsDoneWithTraversal() )
     {
-    testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
+//    testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
+    testImage=
+        vtkUniformGrid::SafeDownCast(
+            hbdsInput->GetDataSet(hbdsIt) );
     }
   hbdsIt->Delete();
   // if we got a null pointer then this indicates that
@@ -3351,7 +3356,7 @@ int vtkMaterialInterfaceFilter::RequestData(
   #endif
   // get the data set which we are to process
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkHierarchicalBoxDataSet *hbdsInput=vtkHierarchicalBoxDataSet::SafeDownCast(
+  vtkNonOverlappingAMR *hbdsInput=vtkNonOverlappingAMR::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // Get the outputs
@@ -3491,7 +3496,7 @@ int vtkMaterialInterfaceFilter::RequestData(
           }
         }
       */
-      vtkErrorMacro("This filter requires a vtkHierarchicalBoxDataSet on its input.");
+      vtkErrorMacro("This filter requires a vtkNonOverlappingAMR on its input.");
       return 0;
       }
 

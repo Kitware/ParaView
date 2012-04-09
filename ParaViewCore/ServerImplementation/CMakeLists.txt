@@ -24,6 +24,7 @@ SET (Kit_SRCS
   vtkPVSessionCore.cxx
   vtkPVSessionCoreInterpreterHelper.cxx
   vtkPVSessionServer.cxx
+  vtkSIAMRVolumeRepresentationProxy.cxx
   vtkSIArraySelectionProperty.cxx
   vtkSIChartRepresentationProxy.cxx
   vtkSICollaborationManager.cxx

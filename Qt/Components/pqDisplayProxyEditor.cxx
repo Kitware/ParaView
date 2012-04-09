@@ -97,6 +97,7 @@ public:
     this->BackfaceRepresentationAdaptor = 0;
     this->SliceDomain = 0;
     this->SelectedMapperAdaptor = 0;
+    this->SelectedResamplerAdaptor = 0;
     this->CompositeTreeAdaptor = 0;
     }
 
@@ -120,6 +121,7 @@ public:
   pqSignalAdaptorColor*    AmbientColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
   pqSignalAdaptorComboBox* SelectedMapperAdaptor;
+  pqSignalAdaptorComboBox* SelectedResamplerAdaptor;
   pqSignalAdaptorComboBox* BackfaceRepresentationAdaptor;
   pqWidgetRangeDomain* SliceDomain;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
@@ -492,6 +494,20 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
         pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, false, true);
     }
 
+  if (reprProxy->GetProperty("ResamplingMethod"))
+    {
+    QList<QVariant> methodNames =
+      pqSMAdaptor::getEnumerationPropertyDomain(
+        reprProxy->GetProperty("ResamplingMethod"));
+    foreach(QVariant item, methodNames)
+      {
+      this->Internal->SelectResamplerMethod->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+      this->Internal->SelectedResamplerAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, reprProxy->GetProperty("ResamplingMethod"));
+    }
   if (reprProxy->GetProperty("SelectMapper"))
     {
     QList<QVariant> mapperNames =
@@ -519,6 +535,30 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       this->Internal->SelectedMapperAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       reprProxy, reprProxy->GetProperty("VolumeRenderingMode"));
+    }
+
+  // setup for number of samples
+  if (reprProxy->GetProperty("NumberOfSamples"))
+    {
+    this->Internal->Links->
+      addPropertyLink(this->Internal->ISamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 0);
+    QIntValidator* validator = new QIntValidator(this);
+    validator->setBottom(10);
+    this->Internal->ISamples->setValidator(validator);
+
+    this->Internal->Links->
+      addPropertyLink(this->Internal->JSamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 1);
+    this->Internal->JSamples->setValidator(validator);
+    
+    this->Internal->Links->
+      addPropertyLink(this->Internal->KSamples,
+                      "text", SIGNAL(editingFinished()),
+                      reprProxy, reprProxy->GetProperty("NumberOfSamples"), 2);
+    this->Internal->KSamples->setValidator(validator);
     }
 
   this->Internal->BackfaceStyleRepresentation->clear();
@@ -598,6 +638,18 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->Internal->Shading->setEnabled(false);
     }
 
+  if (reprProxy->GetProperty("FreezeFocalPoint"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->FreezeFocalPoint,
+      "checked", SIGNAL(toggled(bool)),
+      reprProxy, reprProxy->GetProperty("FreezeFocalPoint"));
+    this->Internal->Shading->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->FreezeFocalPoint->setEnabled(false);
+    }
+
   this->updateEnableState();
 
 }
@@ -670,6 +722,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectMapper);
+
+  this->Internal->SelectedResamplerAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->SelectResamplerMethod);
 
   this->Internal->BackfaceRepresentationAdaptor = new pqSignalAdaptorComboBox(
                                    this->Internal->BackfaceStyleRepresentation);
@@ -756,6 +811,12 @@ void pqDisplayProxyEditor::updateEnableState()
     && (this->Internal->Representation->getProxy()->GetProperty("SelectMapper") ||
         this->Internal->Representation->getProxy()->GetProperty("VolumeRenderingMode")));
 
+  bool hasNumberOfSamples = 
+    this->Internal->Representation->getProxy()->GetProperty("NumberOfSamples");
+  this->Internal->ISamples->setEnabled(hasNumberOfSamples);
+  this->Internal->JSamples->setEnabled(hasNumberOfSamples);
+  this->Internal->KSamples->setEnabled(hasNumberOfSamples);
+  
   vtkSMProperty *backfaceRepProperty = this->Internal->Representation
     ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
   if (   !backfaceRepProperty

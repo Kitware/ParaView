@@ -20,6 +20,7 @@ ENDIF(NOT WIN32)
 
 SET (Kit_SRCS
   vtk3DWidgetRepresentation.cxx
+  vtkAMRVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkClientServerMoveData.cxx

@@ -38,7 +38,7 @@
 #include "vtkUniformGrid.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiBlockDataSet.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkAMRBox.h"
@@ -612,7 +612,7 @@ int vtkAMRDualContour::RequestData(
 {
   // get the data set which we are to process
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-  vtkHierarchicalBoxDataSet *hbdsInput=vtkHierarchicalBoxDataSet::SafeDownCast(
+  vtkNonOverlappingAMR *hbdsInput=vtkNonOverlappingAMR::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // Get the outputs
@@ -631,7 +631,7 @@ int vtkAMRDualContour::RequestData(
   if ( hbdsInput==0 )
     {
     // Do not deal with rectilinear grid
-    vtkErrorMacro("This filter requires a vtkHierarchicalBoxDataSet on its input.");
+    vtkErrorMacro("This filter requires a vtkNonOverlappingAMR on its input.");
     return 0;
     }
 
@@ -672,7 +672,7 @@ int vtkAMRDualContour::RequestData(
 }
 
 vtkMultiBlockDataSet*
-vtkAMRDualContour::DoRequestData(vtkHierarchicalBoxDataSet* hbdsInput,
+vtkAMRDualContour::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
                               const char* arrayNameToProcess)
 {
   vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::New();
@@ -1580,7 +1580,7 @@ double vtkDualGridContourInterpolateAttribute(
 
 //----------------------------------------------------------------------------
 void vtkAMRDualContour::InitializeCopyAttributes(
-  vtkHierarchicalBoxDataSet *hbdsInput,
+  vtkNonOverlappingAMR *hbdsInput,
   vtkDataSet* mesh)
 {
   // Most of this is just getting a block with cell attributes so we can

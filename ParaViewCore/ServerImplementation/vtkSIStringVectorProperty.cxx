@@ -204,6 +204,12 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
   if (!this->Repeatable)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
+
+    if (this->InitialString)
+      {
+      stream << InitialString;
+      }
+      
     vtkVectorOfStrings::const_iterator iter;
     int i=0;
     for (iter = values.begin(); iter != values.end(); ++iter, ++i)

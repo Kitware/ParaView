@@ -2,6 +2,111 @@
   <ProxyGroup name="sources">
    
    <!-- ==================================================================== -->
+   <SourceProxy name="AMRGaussianPulseSource" class="vtkAMRGaussianPulseSource" 
+                label="AMR GaussianPulse Source">
+   <Documentation long_help="Create AMR dataset w/ Gaussian Pulse"
+                  short_help="Create AMR dataset w/ Gaussian Pulse">
+    AMR dataset source, used for generating sample Berger-Collela AMR dataset
+    with a Gaussian Pulse field at the center.
+   </Documentation>
+   
+    <!-- Add gui component for setting the dimension -->
+    <IntVectorProperty name="Dimension"
+                      command="SetDimension"
+                      number_of_elements="1"
+                      default_values="3">
+    <EnumerationDomain name="enum">
+      <Entry value="2" text="2D"/>
+      <Entry value="3" text="3D"/>
+    </EnumerationDomain>
+    <Documentation>
+      Sets the desired dimension for the AMR dataset to generate.
+    </Documentation>
+    </IntVectorProperty>
+    
+    <DoubleVectorProperty
+        name="Root Spacing"
+        command="SetRootSpacing"
+        number_of_elements="1"
+        default_values="0.5" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the spacing at level 0.
+       </Documentation>
+     </DoubleVectorProperty>
+     
+      <!-- Add gui component for setting the dimension -->
+    <IntVectorProperty name="RefinementRatio"
+                      command="SetRefinementRatio"
+                      number_of_elements="1"
+                      default_values="2">
+    <EnumerationDomain name="enum">
+      <Entry value="2" text="2"/>
+      <Entry value="3" text="3"/>
+      <Entry value="4" text="4"/>
+    </EnumerationDomain>
+    <Documentation>
+      Sets the desired dimension for the AMR dataset to generate.
+    </Documentation>
+    </IntVectorProperty>
+    
+    <!-- Add gui components for manipulating the origin of the gaussian pulse -->
+    <DoubleVectorProperty name="XPulseOrigin"
+                          command="SetXPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set x-coordinate for the pulse origin</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="YPulseOrigin"
+                          command="SetYPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set y-coordinate for the pulse origin</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="ZPulseOrigin"
+                          command="SetZPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set z-coordinate for the pulse origin</Documentation>  
+    </DoubleVectorProperty>
+    
+    <!--  Add gui components for manipulating the pulse width -->
+    <DoubleVectorProperty name="XPulseWidth"
+                          command="SetXPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set x-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="YPulseWidth"
+                          command="SetYPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set y-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="ZPulseWidth"
+                          command="SetZPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set z-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    
+    <!--  Add gui components for manipulating the pulse width -->
+    <DoubleVectorProperty name="PulseAmplitude"
+                          command="SetPulseAmplitude"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.0001" max="1.0"/>
+    <Documentation>Sets the amplitude of the pulse</Documentation>
+    </DoubleVectorProperty>
+   </SourceProxy>
+ 
+   <!-- ==================================================================== -->
    <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D" label="2D Glyph">
      <Documentation
         long_help="Create a 2D glyph (e.g., arrow, cross, dash, etc.)"

@@ -77,12 +77,11 @@ namespace
       {
       result->ShallowCopy(pieces[0]);
       vtkImageData* id = vtkImageData::SafeDownCast(pieces[0]);
-//       if (id)
-//         {
-//           FIXME: Check whether to pass-in pipeline info?
-//         result->SetWholeExtent(
-//           static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
-//         }
+      if (id)
+        {
+        vtkStreamingDemandDrivenPipeline::SetWholeExtent(result->GetInformation(),
+          static_cast<vtkImageData*>(pieces[0].GetPointer())->GetExtent());
+        }
       return true;
       }
 
@@ -142,10 +141,10 @@ namespace
     std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter;
     for (iter = pieces.begin();
          iter != pieces.end();
-         ++iter)
+        ++iter)
       {
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetPointer());
-
+      
       if (ds && ds->GetNumberOfPoints() == 0)
         {
         // skip empty pieces.

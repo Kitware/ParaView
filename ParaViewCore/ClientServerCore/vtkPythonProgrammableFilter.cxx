@@ -29,6 +29,7 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <algorithm>
+#include <sstream>
 #include <map>
 #include <string>
 
@@ -212,7 +213,7 @@ int vtkPythonProgrammableFilter::RequestUpdateExtent(
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+void vtkPythonProgrammableFilter::SetParameterInternal(const char *raw_name,
                                                const char *raw_value)
 {
   const std::string name = raw_name ? raw_name : "";
@@ -227,6 +228,42 @@ void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
   this->Implementation->Parameters[name] = value;
   this->Modified();
 }
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const int value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const double value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const char *value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(
+    const char *raw_name,
+    const double value1, 
+    const double value2,
+    const double value3)
+{
+  std::ostringstream buf;
+  buf << value1 << value2 << value3;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ClearParameters()

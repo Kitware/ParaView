@@ -403,6 +403,20 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     }
 
   prototype = pxm->GetPrototypeProxy("representations",
+    "AMRRepresentation");
+  pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool ag = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (ag)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "AMRRepresentation"));
+    }
+
+  prototype = pxm->GetPrototypeProxy("representations",
     "GeometryRepresentation");
   pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
