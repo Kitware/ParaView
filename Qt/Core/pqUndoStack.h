@@ -92,6 +92,9 @@ public:
   /// Get the UndoStackBuilder that is used with that UndoStack
   vtkSMUndoStackBuilder* GetUndoStackBuilder();
 
+  /// Make sure all proxy of all SessionProxyManager get updated
+  void updateAllModifiedProxies();
+
 public slots:
   void beginUndoSet(QString label);
   void endUndoSet();
@@ -133,9 +136,6 @@ signals:
   // Fired after redo.
   void redone();
  
-public slots: 
-  void setActiveServer(pqServer* server);  // TODO remove this
-
 private slots:
   void onStackChanged();
 

@@ -81,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqYoungsMaterialInterfacePanel.h"
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
 #include "vtkSMProxy.h"
+#include "vtkSMSession.h"
 
 bool pqObjectInspectorWidget::AutoAccept = false;
 
@@ -567,12 +568,16 @@ void pqObjectInspectorWidget::accept()
     if (source)
       {
       this->show(source);
-      pqProxyModifiedStateUndoElement* elem =
-        pqProxyModifiedStateUndoElement::New();
-      elem->SetSession(source->getServer()->session());
-      elem->MadeUnmodified(source);
-      ADD_UNDO_ELEM(elem);
-      elem->Delete();
+      if ( source->getServer() && source->getServer()->session() &&
+           !source->getServer()->session()->IsMultiClients())
+        {
+        pqProxyModifiedStateUndoElement* elem =
+            pqProxyModifiedStateUndoElement::New();
+        elem->SetSession(source->getServer()->session());
+        elem->MadeUnmodified(source);
+        ADD_UNDO_ELEM(elem);
+        elem->Delete();
+        }
       }
     }
 

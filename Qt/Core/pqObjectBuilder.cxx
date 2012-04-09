@@ -119,12 +119,16 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     source->setDefaultPropertyValues();
     source->setModifiedState(pqProxy::UNINITIALIZED);
 
-    pqProxyModifiedStateUndoElement* elem =
-      pqProxyModifiedStateUndoElement::New();
-    elem->SetSession(server->session());
-    elem->MadeUninitialized(source);
-    ADD_UNDO_ELEM(elem);
-    elem->Delete();
+    // Manage Modified state in Undo/Redo only if not a collaborative server
+    if(!server->session()->IsMultiClients())
+      {
+      pqProxyModifiedStateUndoElement* elem =
+          pqProxyModifiedStateUndoElement::New();
+      elem->SetSession(server->session());
+      elem->MadeUninitialized(source);
+      ADD_UNDO_ELEM(elem);
+      elem->Delete();
+      }
     emit this->sourceCreated(source);
     emit this->proxyCreated(source);
     return source;
@@ -191,12 +195,16 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   filter->setDefaultPropertyValues();
   filter->setModifiedState(pqProxy::UNINITIALIZED);
 
-  pqProxyModifiedStateUndoElement* elem =
-    pqProxyModifiedStateUndoElement::New();
-  elem->SetSession(server->session());
-  elem->MadeUninitialized(filter);
-  ADD_UNDO_ELEM(elem);
-  elem->Delete();
+  // Manage Modified state in Undo/Redo only if not a collaborative server
+  if(!server->session()->IsMultiClients())
+    {
+    pqProxyModifiedStateUndoElement* elem =
+        pqProxyModifiedStateUndoElement::New();
+    elem->SetSession(server->session());
+    elem->MadeUninitialized(filter);
+    ADD_UNDO_ELEM(elem);
+    elem->Delete();
+    }
 
   emit this->filterCreated(filter);
   emit this->proxyCreated(filter);
@@ -311,12 +319,16 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
-  pqProxyModifiedStateUndoElement* elem =
-    pqProxyModifiedStateUndoElement::New();
-  elem->SetSession(server->session());
-  elem->MadeUninitialized(reader);
-  ADD_UNDO_ELEM(elem);
-  elem->Delete();
+  // Manage Modified state in Undo/Redo only if not a collaborative server
+  if(!server->session()->IsMultiClients())
+    {
+    pqProxyModifiedStateUndoElement* elem =
+        pqProxyModifiedStateUndoElement::New();
+    elem->SetSession(server->session());
+    elem->MadeUninitialized(reader);
+    ADD_UNDO_ELEM(elem);
+    elem->Delete();
+    }
 
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);
@@ -638,22 +650,25 @@ pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
 {
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->GetProxy("animation", "AnimationScene");
-  if(proxy == NULL)
-    {
-    proxy = this->createProxyInternal("animation", "AnimationScene", server,
-                                      "animation", QString(), QMap<QString,QVariant>());
-    }
-  if (proxy)
-    {
-    proxy->UpdateVTKObjects();
-
-    pqAnimationScene* scene = pqApplicationCore::instance()->
+  pqAnimationScene* scene = pqApplicationCore::instance()->
       getServerManagerModel()->findItem<pqAnimationScene*>(proxy);
 
-    // initialize the scene.
-    scene->setDefaultPropertyValues();
-    emit this->proxyCreated(scene);
-    return scene;
+  if(scene != NULL)
+    {
+    if(proxy == NULL)
+      {
+      proxy = this->createProxyInternal("animation", "AnimationScene", server,
+                                        "animation", QString(), QMap<QString,QVariant>());
+      }
+    if(proxy)
+      {
+      proxy->UpdateVTKObjects();
+
+      // initialize the scene.
+      scene->setDefaultPropertyValues();
+      emit this->proxyCreated(scene);
+      return scene;
+      }
     }
 
   return 0;

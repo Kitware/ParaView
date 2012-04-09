@@ -38,17 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager.
 #include "vtkClientServerStream.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 // Qt
 #include <QList>
@@ -60,8 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
-#include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqServer.h"
 #include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
@@ -409,15 +410,19 @@ void pqPipelineSource::setDefaultPropertyValues()
 
   this->createAnimationHelpersIfNeeded();
 
-  // This is sort-of-a-hack to ensure that when this operation is redo, all the
-  // helper proxies are discovered correctly. This needs to happen only after
-  // all helper proxies have been created.
-  pqHelperProxyRegisterUndoElement* elem = 
-    pqHelperProxyRegisterUndoElement::New();
-  elem->SetOperationTypeToRedo(); // Redo creation
-  elem->RegisterHelperProxies(this);
-  ADD_UNDO_ELEM(elem);
-  elem->Delete();
+  if ( this->getServer() && this->getServer()->session() &&
+       !this->getServer()->session()->IsMultiClients())
+    {
+    // This is sort-of-a-hack to ensure that when this operation is redo, all the
+    // helper proxies are discovered correctly. This needs to happen only after
+    // all helper proxies have been created.
+    pqHelperProxyRegisterUndoElement* elem =
+        pqHelperProxyRegisterUndoElement::New();
+    elem->SetOperationTypeToRedo(); // Redo creation
+    elem->RegisterHelperProxies(this);
+    ADD_UNDO_ELEM(elem);
+    elem->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
