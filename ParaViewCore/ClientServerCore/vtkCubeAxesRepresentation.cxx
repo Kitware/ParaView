@@ -65,10 +65,8 @@ void vtkCubeAxesRepresentation::SetVisibility(bool val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetColor(double r, double g, double b)
 {
-  // Old way
-  //this->CubeAxesActor->GetProperty()->SetColor(r, g, b);
+  this->CubeAxesActor->GetProperty()->SetColor(r, g, b);
 
-  // New way
   this->CubeAxesActor->GetXAxesLinesProperty()->SetColor(r, g, b);
   this->CubeAxesActor->GetYAxesLinesProperty()->SetColor(r, g, b);
   this->CubeAxesActor->GetZAxesLinesProperty()->SetColor(r, g, b);
