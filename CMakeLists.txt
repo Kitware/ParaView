@@ -61,10 +61,10 @@ ENDIF("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
 #########################################################################
 SET (PARAVIEW_VERSION_MAJOR 3)
 SET (PARAVIEW_VERSION_MINOR 14)
-SET (PARAVIEW_VERSION_PATCH 0)
+SET (PARAVIEW_VERSION_PATCH 1)
 SET (PARAVIEW_VERSION_PATCH_EXTRA "enhanced")
 SET (PARAVIEW_VERSION "3.14")
-SET (PARAVIEW_VERSION_FULL "3.14.0-enhanced")
+SET (PARAVIEW_VERSION_FULL "3.14.1-enhanced")
 
 INCLUDE(ParaViewDetermineVersion)
 determine_version(
