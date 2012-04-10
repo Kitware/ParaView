@@ -650,25 +650,22 @@ pqAnimationScene* pqObjectBuilder::createAnimationScene(pqServer* server)
 {
   vtkSMSessionProxyManager* pxm = server->proxyManager();
   vtkSMProxy* proxy = pxm->GetProxy("animation", "AnimationScene");
+
+  if(proxy == NULL)
+    {
+    proxy = this->createProxyInternal("animation", "AnimationScene", server,
+                                      "animation", QString(), QMap<QString,QVariant>());
+    }
   pqAnimationScene* scene = pqApplicationCore::instance()->
       getServerManagerModel()->findItem<pqAnimationScene*>(proxy);
-
-  if(scene != NULL)
+  if(proxy && scene)
     {
-    if(proxy == NULL)
-      {
-      proxy = this->createProxyInternal("animation", "AnimationScene", server,
-                                        "animation", QString(), QMap<QString,QVariant>());
-      }
-    if(proxy)
-      {
-      proxy->UpdateVTKObjects();
+    proxy->UpdateVTKObjects();
 
-      // initialize the scene.
-      scene->setDefaultPropertyValues();
-      emit this->proxyCreated(scene);
-      return scene;
-      }
+    // initialize the scene.
+    scene->setDefaultPropertyValues();
+    emit this->proxyCreated(scene);
+    return scene;
     }
 
   return 0;
