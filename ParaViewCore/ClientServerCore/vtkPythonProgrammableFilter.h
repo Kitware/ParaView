@@ -73,7 +73,12 @@ public:
   // Description:
   // Set a name-value parameter that will be available to the script
   // when it is run
+  void SetParameterInternal(const char *name, const char *value);
   void SetParameter(const char *name, const char *value);
+  void SetParameter(const char *name, const int value);
+  void SetParameter(const char *name, const double value);
+  void SetParameter(const char *name, const double value1, 
+                    const double value2, const double value3);
 
   // Description:
   // Clear all name-value parameters

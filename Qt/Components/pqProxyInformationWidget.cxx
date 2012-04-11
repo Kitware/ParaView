@@ -490,8 +490,14 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
     return node;
     }
 
+  bool isNonOverlappingAMR =
+    (strcmp(info->GetCompositeDataClassName(),"vtkNonOverlappingAMR") ==0);
+  bool isOverlappingAMR =
+    (strcmp(info->GetCompositeDataClassName(),"vtkOverlappingAMR") ==0);
   bool isHB = 
     (strcmp(info->GetCompositeDataClassName(),"vtkHierarchicalBoxDataSet") ==0);
+
+  bool isAMR = isHB || isOverlappingAMR || isNonOverlappingAMR;
 
   unsigned int numChildren = compositeInformation->GetNumberOfChildren();
   for (unsigned int cc=0; cc < numChildren; cc++)
@@ -507,7 +513,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
       // use name given to the block.
       childItem->setText(0, name);
       }
-    else if (isHB)
+    else if (isAMR)
       {
       childItem->setText(0, QString("Level %1").arg(cc));
       }

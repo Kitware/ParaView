@@ -18,7 +18,7 @@
 #include "vtkDummyController.h"
 #include "vtkImageData.h"
 #include "vtkUniformGrid.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkAMRBox.h"
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
@@ -2101,7 +2101,7 @@ void vtkAMRDualGridHelper::FinishDegenerateRegionsCommMPIAsynchronous(
 // The array name is the cell array that is being processed by the filter.
 // Ghost values have to be modified at level changes.  It could be extended to
 // process multiple arrays.
-int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
+int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input,
                                      const char* arrayName)
 {
 //   vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Controller);
@@ -2129,8 +2129,9 @@ int vtkAMRDualGridHelper::Initialize(vtkHierarchicalBoxDataSet* input,
     numBlocks = input->GetNumberOfDataSets(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
-      vtkAMRBox box;
-      vtkImageData* image = input->GetDataSet(level,blockId,box);
+//      vtkAMRBox box;
+//      vtkImageData* image = input->GetDataSet(level,blockId,box);
+      vtkImageData* image = input->GetDataSet(level,blockId);
       if (image)
         {
         this->AddBlock(level, image);
@@ -2303,7 +2304,7 @@ class vtkReduceMeta : public vtkCommunicator::Operation
 
 };
 
-void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* input)
+void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkNonOverlappingAMR* input)
 {
   // This is a big pain.
   // We have to look through all blocks to get a minimum root origin.
@@ -2356,8 +2357,9 @@ void vtkAMRDualGridHelper::ComputeGlobalMetaData(vtkHierarchicalBoxDataSet* inpu
     numBlocks = input->GetNumberOfDataSets(level);
     for (blockId = 0; blockId < numBlocks; ++blockId)
       {
-      vtkAMRBox box;
-      vtkImageData* image = input->GetDataSet(level,blockId,box);
+//      vtkAMRBox box;
+//      vtkImageData* image = input->GetDataSet(level,blockId,box);
+      vtkImageData* image = input->GetDataSet(level,blockId);
       if (image)
         {
         ++this->NumberOfBlocksInThisProcess;

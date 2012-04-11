@@ -106,6 +106,10 @@ public:
   virtual void ClearUncheckedElements();
 
   char* SetNumberCommand;
+  
+  vtkSetStringMacro(InitialString);
+  vtkGetStringMacro(InitialString);
+
 
 protected:
   vtkSMVectorProperty();
@@ -124,6 +128,8 @@ protected:
   int UseIndex;
 
   char* CleanCommand;
+  
+  char* InitialString;
 
   // Description:
   // Set the appropriate ivars from the xml element.

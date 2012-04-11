@@ -38,7 +38,7 @@
 class vtkDataSet;
 class vtkImageData;
 class vtkPolyData;
-class vtkHierarchicalBoxDataSet;
+class vtkNonOverlappingAMR;
 class vtkPoints;
 class vtkDoubleArray;
 class vtkCellArray;
@@ -265,7 +265,7 @@ protected:
 
   // Set up the result arrays for the calculations we are about to
   // make.
-  void PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
+  void PrepareForPass(vtkNonOverlappingAMR *hbdsInput,
                       std::vector<std::string> &volumeWtdAvgArrayNames,
                       std::vector<std::string> &massWtdAvgArrayNames,
                       std::vector<std::string> &summedArrayNames,
@@ -309,12 +309,12 @@ protected:
         double pt[3]);
   // Finds a global origin for the data set, and level 0 dx
   int  ComputeOriginAndRootSpacingOld(
-        vtkHierarchicalBoxDataSet* input);
+        vtkNonOverlappingAMR* input);
   void  ComputeOriginAndRootSpacing(
-        vtkHierarchicalBoxDataSet* input);
+        vtkNonOverlappingAMR* input);
   // Returns the total number of local(wrt this proc) blocks.
   int GetNumberOfLocalBlocks(
-        vtkHierarchicalBoxDataSet* input);
+        vtkNonOverlappingAMR* input);
   // Complex ghost layer Handling.
   std::vector<vtkMaterialInterfaceFilterBlock*> GhostBlocks;
   void ShareGhostBlocks();
@@ -469,7 +469,7 @@ protected:
   int NumberOfInputBlocks;
   vtkMaterialInterfaceFilterBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks(vtkHierarchicalBoxDataSet* input,
+  int InitializeBlocks(vtkNonOverlappingAMR* input,
                        std::string &materialFractionArrayName,
                        std::string &massArrayName,
                        std::vector<std::string> &volumeWtdAvgArrayNames,

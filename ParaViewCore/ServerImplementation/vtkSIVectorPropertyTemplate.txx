@@ -376,6 +376,11 @@ bool vtkSIVectorPropertyTemplate<T, force_idtype>::Push(T* values, int number_of
   if (!this->Repeatable && number_of_elements > 0)
     {
     stream << vtkClientServerStream::Invoke << object << this->Command;
+
+    if (this->InitialString)
+      {
+      stream << this->InitialString;
+      }
     if (this->ArgumentIsArray)
       {
       stream << vtkClientServerStream::InsertArray(values, number_of_elements);

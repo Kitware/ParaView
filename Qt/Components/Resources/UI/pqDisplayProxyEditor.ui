@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
-    <height>1271</height>
+    <width>561</width>
+    <height>1356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -624,6 +624,32 @@
       <string>Volume</string>
      </property>
      <layout class="QGridLayout">
+     <item row="5" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Resampler Method</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" colspan="2">
+       <widget class="QComboBox" name="SelectResamplerMethod"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Number of Samples</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="ISamples"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="JSamples"/>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="KSamples"/>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_19">
         <property name="text">
@@ -638,7 +664,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="6" column="0">
        <widget class="QCheckBox" name="Shading">
         <property name="toolTip">
          <string>When checked, shading is enabled.</string>
@@ -666,6 +692,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="FreezeFocalPoint">
+        <property name="text">
+         <string>Freeze Focal Point</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

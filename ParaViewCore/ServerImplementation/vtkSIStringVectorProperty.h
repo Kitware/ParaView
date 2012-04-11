@@ -28,6 +28,7 @@ public:
   vtkTypeMacro(vtkSIStringVectorProperty, vtkSIVectorProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+
 //BTX
 protected:
   vtkSIStringVectorProperty();

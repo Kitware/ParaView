@@ -26,6 +26,7 @@ vtkSMVectorProperty::vtkSMVectorProperty()
   this->CleanCommand = 0;
   this->IsInternal = 0;
   this->SetNumberCommand = 0;
+  this->InitialString = 0;  // TODO(jpocom) check
 }
 
 //---------------------------------------------------------------------------
@@ -33,6 +34,7 @@ vtkSMVectorProperty::~vtkSMVectorProperty()
 {
   this->SetCleanCommand(0);
   this->SetSetNumberCommand(0);
+  this->SetInitialString(0);  // TODO(jpocom) check
 }
 
 //---------------------------------------------------------------------------
@@ -85,6 +87,13 @@ int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if (clean_command)
     {
     this->SetCleanCommand(clean_command);
+    }
+    
+  // TODO(jpocom) check 
+  const char* initial_string = element->GetAttribute("initial_string");
+  if (initial_string)
+    {
+    this->SetInitialString(initial_string);
     }
 
   return 1;

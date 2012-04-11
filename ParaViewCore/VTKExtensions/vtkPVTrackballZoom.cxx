@@ -91,7 +91,10 @@ void vtkPVTrackballZoom::OnMouseMove(int vtkNotUsed(x), int y,
     pos[2] += tmp;
     fp[2] += tmp;
   
-    camera->SetFocalPoint(fp);
+    if (!camera->GetFreezeFocalPoint())
+      {
+      camera->SetFocalPoint(fp);
+      }
     camera->SetPosition(pos);
     ren->ResetCameraClippingRange();
     }

@@ -19,7 +19,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkGenericClip.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"

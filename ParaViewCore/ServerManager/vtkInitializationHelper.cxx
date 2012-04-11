@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkVolumeRenderingInstantiator.h"
 #include "vtkHybridInstantiator.h"
 #include "vtkParallelInstantiator.h"
+#include "vtkAMRInstantiator.h"
 #include "vtkPVCommonInstantiator.h"
 #include "vtkPVVTKExtensionsInstantiator.h"
 #include "vtkPVClientServerCoreInstantiator.h"
@@ -73,6 +74,7 @@ extern "C" void vtkPVClientServerCoreCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerImplementationCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerManager_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+extern "C" void vtkAMRCS_Initialize(vtkClientServerInterpreter * );
 
 #ifdef PARAVIEW_USE_VISITBRIDGE
 extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
@@ -215,6 +217,7 @@ void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
   vtkPVServerImplementationCS_Initialize(interp);
   vtkPVServerManager_Initialize(interp);
   vtkXdmfCS_Initialize(interp);
+  vtkAMRCS_Initialize(interp);
 
 # ifdef PARAVIEW_USE_VISITBRIDGE
   vtkVisItAVTAlgorithmsCS_Initialize(interp);

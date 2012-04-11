@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDoubleArray.h"
 #include "vtkExtractCTHPart.h" // for the BOUNDS key
 #include "vtkFloatArray.h"
-#include "vtkHierarchicalBoxDataSet.h"
+//#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -156,7 +157,8 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *req,
   
   if (this->IsAMR)
     {
-    outData = vtkHierarchicalBoxDataSet::New();
+//    outData = vtkHierarchicalBoxDataSet::New();
+    outData = vtkNonOverlappingAMR::New();
     }
   else
     {
@@ -525,7 +527,7 @@ int vtkSpyPlotReader::AddActiveBlockArray(
   return 1;
 }
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::AddAttributes(vtkHierarchicalBoxDataSet *hbds)
+int vtkSpyPlotReader::AddAttributes(vtkNonOverlappingAMR *hbds)
 {
   // global bounds
   double b[6];
@@ -642,12 +644,12 @@ int vtkSpyPlotReader::RequestData(
   int rightHasBounds = 0;
   int leftHasBounds = 0;
 
-  vtkHierarchicalBoxDataSet *hbds 
-        = vtkHierarchicalBoxDataSet::SafeDownCast(cds);
+  vtkNonOverlappingAMR *hbds
+        = vtkNonOverlappingAMR::SafeDownCast(cds);
 
   // TODO The following three calls compute meta data
   // this could be done in a single pass, and the meta data
-  // should be vtkInformationKeys defined in vtkHierarchicalBoxDataSet
+  // should be vtkInformationKeys defined in vtkNonOverlappingAMR
   // rather than placed in the field data as it is here.
 
   // Note that in the process of getting the bounds 
@@ -662,9 +664,16 @@ int vtkSpyPlotReader::RequestData(
   this->SetGlobalMinLevelAndSpacing( blockIterator );
   // export global bounds, minimum level, spacing, and box size
   // in field data arrays for use by downstream filters
-  if ( hbds )
+  if ( hbds != NULL )
     {
     this->AddAttributes(hbds);
+    assert("FieldData should not be NULL!" && hbds->GetFieldData()!=NULL );
+
+    vtkFieldData *fd = hbds->GetFieldData();
+    assert("Must have a GlobalBounds array!" && fd->HasArray("GlobalBounds"));
+    assert("Must have a GlobalBoxSize array!" && fd->HasArray("GlobalBoxSize"));
+    assert("Must have a MinLevel array!" && fd->HasArray("MinLevel"));
+    assert("Must have a MinLevelSpacing!" && fd->HasArray("MinLevelSpacing"));
     }
 
   int needTracers = 1;
@@ -1230,7 +1239,7 @@ void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
   this->Modified();
 }
 //-----------------------------------------------------------------------------
-void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int
+void vtkSpyPlotReader::PrintBlockList(vtkNonOverlappingAMR *hbds, int
   vtkNotUsed(myProcId))
 {
   unsigned int numberOfLevels=hbds->GetNumberOfLevels();
@@ -1245,8 +1254,7 @@ void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int
     for (i = 0; i<totalNumberOfDataSets; i++)
       {
      // cout<<myProcId<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
-      vtkAMRBox box;
-       if(hbds->GetDataSet(level,i,box)==0)
+       if(hbds->GetDataSet(level,i)==0)
         {
        // cout<<" Void"<<endl;
         }
@@ -1667,7 +1675,7 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
  return;
 }
 
-int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
+int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR *hb,
                                      vtkSpyPlotBlock *block, 
                                      int *level,
                                      int extents[6],
@@ -1699,16 +1707,19 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
 //   cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
 //                            << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
 //   cerr << "}\n";
+//
 
-  vtkAMRBox box(realExtents);
+//  vtkAMRBox box(realExtents);
+//  hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
   vtkUniformGrid* ug = vtkUniformGrid::New();
-  hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
+
   ug->SetSpacing(spacing);
   ug->SetExtent(extents);
   ug->SetOrigin(origin);
   *cd = ug->GetCellData();
-  ug->Delete();
 
+  hb->SetDataSet( *level, hb->GetNumberOfDataSets(*level), ug );
+  ug->Delete();
   return needsFixing;
 }
 
@@ -2016,8 +2027,8 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
     parent= vtkCommunicator::GetParentProcessor(processNumber);
     }
 
-  vtkHierarchicalBoxDataSet* hbDS = 
-    vtkHierarchicalBoxDataSet::SafeDownCast(composite);
+  vtkNonOverlappingAMR* hbDS =
+    vtkNonOverlappingAMR::SafeDownCast(composite);
   vtkMultiBlockDataSet* mbDS =
     vtkMultiBlockDataSet::SafeDownCast(composite);
 
@@ -2029,7 +2040,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
   if (this->IsAMR)
     {
     // hbDS is non-null.
-    assert("check: ds is vtkHierarchicalBoxDataSet" && hbDS !=0);
+    assert("check: ds is vtkNonOverlappingAMR" && hbDS !=NULL);
     numberOfLevels = hbDS->GetNumberOfLevels();
     unsigned long ulintMsgValue;
     // Update it from the children
@@ -2194,10 +2205,11 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
           int kk;
           for (kk=0; kk < numberOfDataSets; kk++)
             {
-            vtkAMRBox box;
-            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk, box);
+//            vtkAMRBox box;
+//            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk, box);
+            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
             datasets.push_back(ug);
-            boxes.push_back(box);
+//            boxes.push_back(box);
             }
           hbDS->SetNumberOfDataSets(level, 0); // removes all current datasets.
           hbDS->SetNumberOfDataSets(level, totalNumberOfDataSets);
@@ -2206,7 +2218,8 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
           // All other indices are in their initialized state.
           for (kk=0; kk < numberOfDataSets; kk++)
             {
-            hbDS->SetDataSet(level, kk+globalIndex, boxes[kk], datasets[kk]);
+            hbDS->SetDataSet(level,kk+globalIndex,datasets[kk]);
+//            hbDS->SetDataSet(level, kk+globalIndex, boxes[kk], datasets[kk]);
             }
           }
         }
