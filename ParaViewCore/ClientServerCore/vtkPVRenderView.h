@@ -37,10 +37,12 @@
 
 #include "vtkPVView.h"
 
+class vtkAlgorithmOutput;
 class vtkBSPCutsGenerator;
 class vtkCamera;
 class vtkCameraManipulator;
 class vtkInformationDoubleKey;
+class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
@@ -48,11 +50,12 @@ class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
-class vtkPVHardwareSelector;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
+class vtkPVDataRepresentation;
 class vtkPVGenericRenderWindowInteractor;
+class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
 class vtkPVSynchronizedRenderWindows;
@@ -234,12 +237,23 @@ public:
   vtkGetMacro(UseLightKit, bool);
   vtkBooleanMacro(UseLightKit, bool);
 
+  static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
+  static vtkInformationObjectBaseKey* REPRESENTED_LOD_DATA_STORE();
+
   // Description:
   // vtkDataRepresentation can use this key to publish meta-data about geometry
-  // size in the VIEW_REQUEST_METADATA pass. If this meta-data is available,
+  // size in the vtkPVView::REQUEST_UPDATE() or vtkPVView::REQUEST_UPDATE_LOD()
+  // passes. If this meta-data is available,
   // then the view can make informed decisions about where to render/whether to
   // use LOD etc.
   static vtkInformationIntegerKey* GEOMETRY_SIZE();
+
+  // Description:
+  // vtkDataRepresentation can use this key to publish meta-data about geometry
+  // bounds in the vtkPVView::REQUEST_UPDATE() or vtkPVView::REQUEST_UPDATE_LOD()
+  // passes. If this meta-data is available, then the view can make informed
+  // decisions when resetting camera to the bounds of visible data.
+  static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
 
   // DATA_DISTRIBUTION_MODE indicates where the geometry/data is to be
   // delivered for the current render/update.
@@ -356,6 +370,17 @@ public:
   // Returns the z-buffer value at the given location.
   // @CallOnClientOnly
   double GetZbufferDataAtPoint(int x, int y);
+
+  // Description:
+  // Convenience methods used by representations to pass represented data.
+  static void SetPiece(vtkInformation* info,
+    vtkPVDataRepresentation* repr, vtkDataObject* data);
+  static vtkAlgorithmOutput* GetPieceProducer(vtkInformation* info,
+    vtkPVDataRepresentation* repr);
+  static void SetPieceLOD(vtkInformation* info,
+    vtkPVDataRepresentation* repr, vtkDataObject* data);
+  static vtkAlgorithmOutput* GetPieceProducerLOD(vtkInformation* info,
+    vtkPVDataRepresentation* repr);
 
 public:
   //*****************************************************************

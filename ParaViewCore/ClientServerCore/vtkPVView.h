@@ -118,6 +118,21 @@ public:
   static vtkInformationRequestKey* REQUEST_UPDATE();
 
   // Description:
+  // This is a Update-LOD-Data pass. All representations are expected to update
+  // their lod-data, if any. This is assured to be called only after
+  // REQUEST_UPDATE() pass.
+  static vtkInformationRequestKey* REQUEST_UPDATE_LOD();
+
+  // Description:
+  // This is a render pass. This happens only after
+  // REQUEST_PREPARE_FOR_RENDER() (and optionally REQUEST_DELIVERY()) has happened.
+  // This is called for every render.
+  static vtkInformationRequestKey* REQUEST_RENDER();
+
+  // FIXME:STREAMING: REQUEST_INFORMATION(), REQUEST_PREPARE_FOR_RENDER(),
+  //                  REQUEST_DELIVERY() need to be removed.
+
+  // Description:
   // This is a Request-MetaData pass. This happens only after REQUEST_UPDATE()
   // has happened. In this pass representations typically publish information
   // that may be useful for rendering optimizations such as geometry sizes, etc.
@@ -133,12 +148,6 @@ public:
   // after REQUEST_PREPARE_FOR_RENDER(). Called for every render only on those
   // representations that should deliver data.
   static vtkInformationRequestKey* REQUEST_DELIVERY();
-
-  // Description:
-  // This is a render pass. This happens only after
-  // REQUEST_PREPARE_FOR_RENDER() (and optionally REQUEST_DELIVERY()) has happened.
-  // This is called for every render.
-  static vtkInformationRequestKey* REQUEST_RENDER();
 
   // Description:
   // Overridden to not call Update() directly on the input representations,

@@ -105,6 +105,7 @@ SET (Kit_SRCS
   vtkPVXYChartView.cxx
   vtkProcessModule.cxx
   vtkProcessModuleAutoMPI.cxx
+  vtkRepresentedDataStorage.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSession.cxx
@@ -160,6 +161,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVPythonPluginInterface.cxx
+  vtkRepresentedDataStorage.cxx
 
   WRAP_EXCLUDE
   )

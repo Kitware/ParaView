@@ -23,9 +23,8 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkOrderedCompositeDistributor.h"
-#include "vtkPKdTree.h"
 #include "vtkProperty.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVGeometryFilter.h"
@@ -40,12 +39,15 @@
 #include "vtkSelectionNode.h"
 #include "vtkShadowMapBakerPass.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //*****************************************************************************
+// This is used to convert a vtkPolyData to a vtkMultiBlockDataSet. If input is
+// vtkMultiBlockDataSet, then this is simply a pass-through filter. This makes
+// it easier to unify the code to select and render data by simply dealing with
+// vtkMultiBlockDataSet always.
 class vtkGeometryRepresentationMultiBlockMaker : public vtkMultiBlockDataSetAlgorithm
 {
 public:
@@ -97,13 +99,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
-  this->DeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
-  this->LODDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
-  this->Distributor = vtkOrderedCompositeDistributor::New();
-  this->UpdateSuppressor = vtkPVUpdateSuppressor::New();
-  this->LODUpdateSuppressor = vtkPVUpdateSuppressor::New();
-  this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
-  this->LODDeliverySuppressor = vtkPVUpdateSuppressor::New();
+
   this->RequestGhostCellsIfNeeded = true;
 
   this->ColorArrayName = 0;
@@ -134,13 +130,6 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->LODMapper->Delete();
   this->Actor->Delete();
   this->Property->Delete();
-  this->DeliveryFilter->Delete();
-  this->LODDeliveryFilter->Delete();
-  this->Distributor->Delete();
-  this->UpdateSuppressor->Delete();
-  this->LODUpdateSuppressor->Delete();
-  this->DeliverySuppressor->Delete();
-  this->LODDeliverySuppressor->Delete();
   this->SetColorArrayName(0);
 }
 
@@ -151,33 +140,23 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->Decimator->SetCopyCellData(1);
   this->Decimator->SetUseInternalTriangles(0);
   this->Decimator->SetNumberOfDivisions(10, 10, 10);
-  this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
-                                             // connected to the LOD pipeline.
+  // FIXME:STREAMING
+  //this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
+  //                                           // connected to the LOD pipeline.
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(1);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughCellIds(1);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetPassThroughPointIds(1);
 
-  this->DeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-  this->LODDeliveryFilter->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-
-  this->DeliverySuppressor->SetInputConnection(this->DeliveryFilter->GetOutputPort());
-  this->LODDeliverySuppressor->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
-
-  this->Distributor->SetController(vtkMultiProcessController::GetGlobalController());
-  this->Distributor->SetInputConnection(0, this->DeliverySuppressor->GetOutputPort());
-  this->Distributor->SetPassThrough(1);
-
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
   this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
 
-  this->UpdateSuppressor->SetInputConnection(this->Distributor->GetOutputPort());
-  this->LODUpdateSuppressor->SetInputConnection(this->LODDeliverySuppressor->GetOutputPort());
-
-  this->Mapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
-  this->LODMapper->SetInputConnection(this->LODUpdateSuppressor->GetOutputPort());
+  // FIXME:STREAMING - Mapper's inputs are directly the data-objects provided by
+  // the view.
+  //this->Mapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
+  //this->LODMapper->SetInputConnection(this->LODUpdateSuppressor->GetOutputPort());
 
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -196,7 +175,12 @@ int vtkGeometryRepresentation::FillInputPortInformation(
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+
+  // Saying INPUT_IS_OPTIONAL() is essential, since representations don't have
+  // any inputs on client-side (in client-server, client-render-server mode) and
+  // render-server-side (in client-render-server mode).
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+
   return 1;
 }
 
@@ -205,25 +189,28 @@ int vtkGeometryRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
   vtkInformation* inInfo, vtkInformation* outInfo)
 {
-  if (!this->GetVisibility())
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    return false;
+    // i.e. this->GetVisibility() == false, hence nothing to do.
+    return 0;
     }
 
-  if (request_type == vtkPVView::REQUEST_INFORMATION())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    this->GenerateMetaData(inInfo, outInfo);
-    }
-  else if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
-    {
-    // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
-    // filters have their states updated as requested by the view.
+    // provide the "geometry" to the view so the view can delivery it to the
+    // rendering nodes as and when needed.
 
-    // this is where we will look to see on what nodes are we going to render and
-    // render set that up.
-    bool lod = this->SuppressLOD? false :
-      (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
-    if (lod)
+    // When this process doesn't have any valid input, the cache-keeper is setup
+    // to provide a place-holder dataset of the right type.
+    vtkPVRenderView::SetPiece(inInfo, this, 
+      this->CacheKeeper->GetOutputDataObject(0));
+    }
+  else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
+    {
+    // Called to generate and provide the LOD data to the view.
+    // If SuppressLOD is true, we tell the view we have no LOD data to provide,
+    // otherwise we provide the decimated data.
+    if (!this->SuppressLOD)
       {
       if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
         {
@@ -231,67 +218,28 @@ int vtkGeometryRepresentation::ProcessViewRequest(
           inInfo->Get(vtkPVRenderView::LOD_RESOLUTION())) + 10;
         this->Decimator->SetNumberOfDivisions(division, division, division);
         }
-      this->LODDeliveryFilter->ProcessViewRequest(inInfo);
-      if (this->LODDeliverySuppressor->GetForcedUpdateTimeStamp() <
-        this->LODDeliveryFilter->GetMTime())
-        {
-        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-        }
-      }
-    else
-      {
-      this->DeliveryFilter->ProcessViewRequest(inInfo);
-      if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
-        this->DeliveryFilter->GetMTime())
-        {
-        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-        }
-      }
-    this->Actor->SetEnableLOD(lod? 1 : 0);
-    }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
-    {
-    if (this->Actor->GetEnableLOD())
-      {
-      this->LODDeliveryFilter->Modified();
-      this->LODDeliverySuppressor->ForceUpdate();
-      }
-    else
-      {
-      this->DeliveryFilter->Modified();
-      this->DeliverySuppressor->ForceUpdate();
+
+      this->Decimator->Update();
+      vtkPVRenderView::SetPieceLOD(inInfo, this, 
+        this->Decimator->GetOutputDataObject(0));
       }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    // typically, representations don't do anything special in this pass.
-    // However, when we are doing ordered compositing, we need to ensure that
-    // the redistribution of data happens in this pass.
-    if (inInfo->Has(vtkPVRenderView::KD_TREE()))
-      {
-      vtkPKdTree* kdTree = vtkPKdTree::SafeDownCast(
-        inInfo->Get(vtkPVRenderView::KD_TREE()));
-      this->Distributor->SetPKdTree(kdTree);
-      this->Distributor->SetPassThrough(0);
-      }
-    else
-      {
-      this->Distributor->SetPKdTree(NULL);
-      this->Distributor->SetPassThrough(1);
-      }
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    vtkAlgorithmOutput* producerPortLOD = vtkPVRenderView::GetPieceProducerLOD(inInfo, this);
+    this->Mapper->SetInputConnection(0, producerPort);
+    this->LODMapper->SetInputConnection(0, producerPortLOD);
 
+    // This is called just before the vtk-level render. In this pass, we simply
+    // pick the correct rendering mode and rendering parameters.
+    bool lod = this->SuppressLOD? false :
+      (inInfo->Has(vtkPVRenderView::USE_LOD()) == 1);
+    this->Actor->SetEnableLOD(lod? 1 : 0);
     this->UpdateColoringParameters();
-    if (this->Actor->GetEnableLOD())
-      {
-      this->LODUpdateSuppressor->ForceUpdate();
-      }
-    else
-      {
-      this->UpdateSuppressor->ForceUpdate();
-      }
     }
 
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -357,12 +305,6 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
 {
   // cout << this << ":" << this->DebugString << ":RequestData" << endl;
 
-  // mark delivery filters modified.
-  this->DeliveryFilter->Modified();
-  this->LODDeliveryFilter->Modified();
-  this->Distributor->Modified();
-
-
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -385,18 +327,14 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
       }
     this->GeometryFilter->SetInputConnection(
       this->GetInternalOutputPort());
-    this->CacheKeeper->Update();
-    this->DeliveryFilter->SetInputConnection(
-      this->CacheKeeper->GetOutputPort());
-    this->LODDeliveryFilter->SetInputConnection(
-      this->Decimator->GetOutputPort());
     }
   else
     {
-    this->DeliveryFilter->RemoveAllInputs();
-    this->LODDeliveryFilter->RemoveAllInputs();
+    vtkNew<vtkMultiBlockDataSet> placeholder;
+    vtkPVGeometryFilter::SafeDownCast(
+      this->GeometryFilter)->SetInputData(0, placeholder.GetPointer());
     }
-
+  this->CacheKeeper->Update();
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
@@ -419,28 +357,6 @@ vtkDataObject* vtkGeometryRepresentation::GetRenderedDataObject(int port)
 }
 
 //----------------------------------------------------------------------------
-bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*,
-  vtkInformation* outInfo)
-{
-  if (this->GeometryFilter->GetNumberOfInputConnections(0) > 0)
-    {
-    vtkDataObject* geom = this->GeometryFilter->GetOutputDataObject(0);
-    if (geom)
-      {
-      outInfo->Set(vtkPVRenderView::GEOMETRY_SIZE(),geom->GetActualMemorySize());
-      }
-    }
-
-  outInfo->Set(vtkPVRenderView::REDISTRIBUTABLE_DATA_PRODUCER(),
-    this->DeliveryFilter);
-  if (this->Actor->GetProperty()->GetOpacity() < 1.0)
-    {
-    outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
 void vtkGeometryRepresentation::MarkModified()
 {
   //cout << this << ":" << this->DebugString << ":MarkModified" << endl;
@@ -455,7 +371,6 @@ void vtkGeometryRepresentation::MarkModified()
 //----------------------------------------------------------------------------
 bool vtkGeometryRepresentation::AddToView(vtkView* view)
 {
-  // FIXME: Need generic view API to add props.
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
     {
@@ -787,7 +702,10 @@ void vtkGeometryRepresentation::SetUseOutline(int val)
     {
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(val);
     }
-  this->Modified();
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
 }
 
 //----------------------------------------------------------------------------
@@ -797,7 +715,19 @@ void vtkGeometryRepresentation::SetNonlinearSubdivisionLevel(int val)
     {
     vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(val);
     }
-  this->Modified();
-  this->DeliveryFilter->Modified();
-  this->LODDeliveryFilter->Modified();
+
+  // since geometry filter needs to execute, we need to mark the representation
+  // modified.
+  this->MarkModified();
 }
+
+//----------------------------------------------------------------------------
+#if !defined(VTK_LEGACY_REMOVE)
+bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*,
+  vtkInformation*)
+{
+  vtkWarningMacro(
+    "REQUEST_INFORMATION pass has been deprecated and no longer used");
+  return false;
+}
+#endif

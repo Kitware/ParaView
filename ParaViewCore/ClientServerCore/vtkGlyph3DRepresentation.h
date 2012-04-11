@@ -24,7 +24,8 @@
 
 class vtkGlyph3DMapper;
 class vtkPVArrowSource;
-
+class vtkUnstructuredDataDeliveryFilter;
+class vtkPVUpdateSuppressor;
 class VTK_EXPORT vtkGlyph3DRepresentation : public vtkGeometryRepresentation
 {
 public:

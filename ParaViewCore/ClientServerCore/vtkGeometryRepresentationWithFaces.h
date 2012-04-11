@@ -38,6 +38,14 @@ public:
     };
 
   // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
+  // Description:
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
   virtual void SetVisibility(bool val);
@@ -76,10 +84,6 @@ protected:
   // vtkView::RemoveRepresentation().  Subclasses should override this method.
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
-
-  // Description:
-  // Produce meta-data about this representation that the view may find useful.
-  virtual bool GenerateMetaData(vtkInformation*, vtkInformation*);
 
   // Description:
   // Passes on parameters to vtkProperty and vtkMapper

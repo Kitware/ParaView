@@ -27,15 +27,12 @@
 
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
-class vtkOrderedCompositeDistributor;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
-class vtkPVUpdateSuppressor;
 class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
-class vtkUnstructuredDataDeliveryFilter;
 
 class VTK_EXPORT vtkGeometryRepresentation : public vtkPVDataRepresentation
 {
@@ -217,7 +214,7 @@ protected:
 
   // Description:
   // Produce meta-data about this representation that the view may find useful.
-  virtual bool GenerateMetaData(vtkInformation*, vtkInformation*);
+  VTK_LEGACY(virtual bool GenerateMetaData(vtkInformation*, vtkInformation*));
 
   // Description:
   // Adds the representation to the view.  This is called from
@@ -252,13 +249,6 @@ protected:
   vtkMapper* LODMapper;
   vtkPVLODActor* Actor;
   vtkProperty* Property;
-  vtkUnstructuredDataDeliveryFilter* DeliveryFilter;
-  vtkUnstructuredDataDeliveryFilter* LODDeliveryFilter;
-  vtkOrderedCompositeDistributor* Distributor;
-  vtkPVUpdateSuppressor* UpdateSuppressor;
-  vtkPVUpdateSuppressor* LODUpdateSuppressor;
-  vtkPVUpdateSuppressor* DeliverySuppressor;
-  vtkPVUpdateSuppressor* LODDeliverySuppressor;
 
   int ColorAttributeType;
   char* ColorArrayName;

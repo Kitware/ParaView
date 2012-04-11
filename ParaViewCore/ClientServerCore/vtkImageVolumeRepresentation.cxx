@@ -26,10 +26,8 @@
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVUpdateSuppressor.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkVolumeProperty.h"
 
 #include <map>
@@ -50,8 +48,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
   this->OutlineSource = vtkOutlineSource::New();
-  this->OutlineDeliveryFilter = vtkUnstructuredDataDeliveryFilter::New();
-  this->OutlineUpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->OutlineMapper = vtkPolyDataMapper::New();
 
   this->ColorArrayName = 0;
@@ -59,12 +55,6 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
   this->Cache = vtkImageData::New();
 
   this->CacheKeeper->SetInputData(this->Cache);
-  this->OutlineDeliveryFilter->SetInputConnection(
-    this->OutlineSource->GetOutputPort());
-  this->OutlineUpdateSuppressor->SetInputConnection(
-    this->OutlineDeliveryFilter->GetOutputPort());
-  this->OutlineMapper->SetInputConnection(
-    this->OutlineUpdateSuppressor->GetOutputPort());
   this->Actor->SetLODMapper(this->OutlineMapper);
 }
 
@@ -75,8 +65,6 @@ vtkImageVolumeRepresentation::~vtkImageVolumeRepresentation()
   this->Property->Delete();
   this->Actor->Delete();
   this->OutlineSource->Delete();
-  this->OutlineDeliveryFilter->Delete();
-  this->OutlineUpdateSuppressor->Delete();
   this->OutlineMapper->Delete();
   this->CacheKeeper->Delete();
 
@@ -99,51 +87,37 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
   vtkInformation* inInfo, vtkInformation* outInfo)
 {
-  if (request_type == vtkPVView::REQUEST_INFORMATION())
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    outInfo->Set(vtkPVRenderView::GEOMETRY_SIZE(),
-      this->Cache->GetActualMemorySize());
-    outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-    if (this->GetNumberOfInputConnections(0) == 1)
-      {
-      outInfo->Set(vtkPVRenderView::REDISTRIBUTABLE_DATA_PRODUCER(),
-        this->GetInputConnection(0, 0)->GetProducer());
-      }
+    return 0;
     }
-  else if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    // // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
-    // // filters have their states updated as requested by the view.
-
-    // // this is where we will look to see on what nodes are we going to render and
-    // // render set that up.
-    this->OutlineDeliveryFilter->ProcessViewRequest(inInfo);
-    if (this->OutlineDeliveryFilter->GetMTime() >
-      this->OutlineUpdateSuppressor->GetForcedUpdateTimeStamp())
-      {
-      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-      }
-    }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
-    {
-    this->OutlineDeliveryFilter->Modified();
-    this->OutlineUpdateSuppressor->ForceUpdate();
+    // FIXME:STREAMING :- how do we tell the view to use "cuts" from this
+    // representation for ordered compositing?
+    // At the same time, the image data is not the data being delivered
+    // anywhere, so we don't really report it to the view's storage.
+    // vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
+    vtkPVRenderView::SetPiece(inInfo, this,
+      this->OutlineSource->GetOutputDataObject(0));
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
     this->UpdateMapperParameters();
-    }
 
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    if (producerPort)
+      {
+      this->OutlineMapper->SetInputConnection(producerPort);
+      }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // mark delivery filters modified.
-  this->OutlineDeliveryFilter->Modified();
-
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());

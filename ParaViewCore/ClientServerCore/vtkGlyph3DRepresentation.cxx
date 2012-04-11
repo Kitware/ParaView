@@ -50,11 +50,6 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
 
   this->DummySource = vtkPVArrowSource::New();
 
-  this->GlyphMapper->SetInputConnection(0,
-    this->Mapper->GetInputConnection(0, 0));
-  this->LODGlyphMapper->SetInputConnection(0,
-    this->LODMapper->GetInputConnection(0, 0));
-
   this->GlyphUpdateSuppressor->SetInputConnection(
     this->DataCollector->GetOutputPort());
   this->GlyphMapper->SetInputConnection(
@@ -183,50 +178,63 @@ int vtkGlyph3DRepresentation::ProcessViewRequest(
 {
   if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    return false;
+    return 0;
     }
 
-  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
-    {
-    // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
-    // filters have their states updated as requested by the view.
+  // FIXME:STREAMING
+  //if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+  //  {
+  //  // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
+  //  // filters have their states updated as requested by the view.
 
-    // this is where we will look to see on what nodes are we going to render and
-    // render set that up.
-    if (this->Actor->GetEnableLOD())
+  //  // this is where we will look to see on what nodes are we going to render and
+  //  // render set that up.
+  //  if (this->Actor->GetEnableLOD())
+  //    {
+  //    this->LODDataCollector->ProcessViewRequest(inInfo);
+  //    if (this->LODGlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
+  //      this->LODDataCollector->GetMTime())
+  //      {
+  //      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+  //      }
+  //    }
+  //  else
+  //    {
+  //    this->DataCollector->ProcessViewRequest(inInfo);
+  //    if (this->GlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
+  //      this->DataCollector->GetMTime())
+  //      {
+  //      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+  //      }
+  //    }
+  //  }
+  //else if (request_type == vtkPVView::REQUEST_DELIVERY())
+  //  {
+  //  if (this->Actor->GetEnableLOD())
+  //    {
+  //    this->LODDataCollector->Modified();
+  //    this->LODGlyphUpdateSuppressor->ForceUpdate();
+  //    }
+  //  else
+  //    {
+  //    this->DataCollector->Modified();
+  //    this->GlyphUpdateSuppressor->ForceUpdate();
+  //    }
+  //  }
+
+  if (request_type == vtkPVView::REQUEST_RENDER())
+    {
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    if (inInfo->Has(vtkPVRenderView::USE_LOD()))
       {
-      this->LODDataCollector->ProcessViewRequest(inInfo);
-      if (this->LODGlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
-        this->LODDataCollector->GetMTime())
-        {
-        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-        }
+      this->LODGlyphMapper->SetInputConnection(0, producerPort);
       }
     else
       {
-      this->DataCollector->ProcessViewRequest(inInfo);
-      if (this->GlyphUpdateSuppressor->GetForcedUpdateTimeStamp() <
-        this->DataCollector->GetMTime())
-        {
-        outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-        }
+      this->GlyphMapper->SetInputConnection(0, producerPort);
       }
     }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
-    {
-    if (this->Actor->GetEnableLOD())
-      {
-      this->LODDataCollector->Modified();
-      this->LODGlyphUpdateSuppressor->ForceUpdate();
-      }
-    else
-      {
-      this->DataCollector->Modified();
-      this->GlyphUpdateSuppressor->ForceUpdate();
-      }
-    }
-
-  return true;
+  return 1;
 }
 
 //----------------------------------------------------------------------------
