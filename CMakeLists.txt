@@ -361,7 +361,7 @@ EXPORT(TARGETS ${VTK_TARGETS} ${PY_STATIC_MODULES_LIST} FILE ${PARAVIEW_TARGETS_
 
 #########################################################################
 # Configure the CoProcessing library
-OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." OFF)
+OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." ON)
 MARK_AS_ADVANCED(PARAVIEW_ENABLE_COPROCESSING)
 IF (PARAVIEW_ENABLE_COPROCESSING)
   ADD_SUBDIRECTORY (CoProcessing)
