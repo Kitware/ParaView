@@ -13,7 +13,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/PythonScriptTest.py)
 
   IF (VTK_MPIRUN_EXE)
-    ADD_TEST(PCoProcessingPythonScriptExample
+    ADD_TEST(PCoProcessingTestPythonScript
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS}
       ${VTK_MPI_PREFLAGS}
       ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample
@@ -59,6 +59,8 @@ IF (PARAVIEW_DATA_ROOT)
         ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPPressure0.png 20
         -V ${PARAVIEW_DATA_ROOT}/Baseline/CPPressure0.png
         -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
+      SET_TESTS_PROPERTIES(PCoProcessingTestPythonScript PCoProcessingPythonScriptGridPlot
+        PCoProcessingPythonScriptPressurePlot PROPERTIES RUN_SERIAL ON)
     ENDIF (VTK_MPIRUN_EXE)
 
     # here is the full workflow for coprocessing where we generate
@@ -137,6 +139,7 @@ endif()
 
       add_test(NAME CoProcessingFullWorkflow COMMAND ${CMAKE_COMMAND}
         -Dcfg=$<CONFIGURATION> -P "${CoProcessing_BINARY_DIR}/CoProcessingFullWorkflowTest.cmake")
+      SET_TESTS_PROPERTIES(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     ENDIF (PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator)
 
   ENDIF (PARAVIEW_ENABLE_PYTHON)

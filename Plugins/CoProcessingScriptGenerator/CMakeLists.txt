@@ -99,4 +99,5 @@ IF (BUILD_TESTING)
   # add it here as well. this test though is a subset of that test.
   add_client_tests("pv"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
+  SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
 ENDIF (BUILD_TESTING)
