@@ -94,6 +94,9 @@ Info(new MetaInfo)
 vtkSpyPlotHistoryReader::~vtkSpyPlotHistoryReader()
 {
   this->SetFileName(0);
+  this->SetCommentCharacter(0);
+  this->SetDelimeter(0);
+
   delete this->Info;
   if ( this->CachedOutput )
     {
