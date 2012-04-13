@@ -96,12 +96,8 @@ pqLineSourceWidget::~pqLineSourceWidget()
 void pqLineSourceWidget::setControlledProperties(vtkSMProperty* point1, 
   vtkSMProperty* point2, vtkSMProperty* resolution)
 {
-  Superclass::setControlledProperties(point1, point2);
-  
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.resolution, "value", 
-    SIGNAL(valueChanged(int)),
-    this->getControlledProxy(), resolution);
+  this->Superclass::setControlledProperties(point1, point2);
+  this->setControlledProperty("Resolution", resolution);
 }
 
 //-----------------------------------------------------------------------------
