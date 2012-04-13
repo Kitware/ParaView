@@ -187,6 +187,14 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="AllowDuplicateScalars"
+        command="SetAllowDuplicateScalars"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of PVLookupTable -->
     </Proxy>
   </ProxyGroup>
