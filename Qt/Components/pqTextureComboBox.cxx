@@ -313,10 +313,14 @@ void pqTextureComboBox::onActivated(int index)
     proxy = this->Internal->Representation->getProxy();
     textureProperty = proxy->GetProperty("Texture");
     }
-  else
+  else if (this->Internal->RenderView)
     {
     proxy = this->Internal->RenderView->getProxy();
     textureProperty = proxy->GetProperty("BackgroundTexture");
+    }
+  else
+    {
+    return;
     }
 
   if (!textureProperty)
