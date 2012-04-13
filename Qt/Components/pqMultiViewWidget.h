@@ -159,7 +159,8 @@ protected:
   virtual bool eventFilter(QObject* caller, QEvent* evt);
 
 private:
-  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
+  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg,
+    int& maxIndex);
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget);
