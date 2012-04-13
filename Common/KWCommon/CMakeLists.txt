@@ -225,7 +225,7 @@ SET(Temp_Using_Shared_Forwarding OFF)
 IF(KWCOMMON_BUILD_PROCESSXML)
   # For shared libraries on non-windows systems use the KWSys shared-forward
   # implementation to make sure shared libraries are found.
-  IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+  IF(BUILD_SHARED_LIBS )
     IF(NOT WIN32)
       SET(KWCommon_FORWARD_DIR_BUILD ${EXECUTABLE_OUTPUT_PATH})
       SET(KWCommon_FORWARD_BIN_TO_LIB "..${KWCommon_INSTALL_LIB_DIR}")
@@ -248,7 +248,7 @@ IF(KWCOMMON_BUILD_PROCESSXML)
           COMPONENT Development)
       ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
     ENDIF(NOT WIN32)
-  ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+  ENDIF(BUILD_SHARED_LIBS )
 
   ADD_EXECUTABLE(kwProcessXML${KWCommon_EXE_SUFFIX} ProcessXML.cxx)
   TARGET_LINK_LIBRARIES(kwProcessXML${KWCommon_EXE_SUFFIX} vtkCommon vtksys)
