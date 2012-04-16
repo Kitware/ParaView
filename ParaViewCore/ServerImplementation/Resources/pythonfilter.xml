@@ -87,6 +87,71 @@
     <!-- End PythonCalculator -->    
     </SourceProxy>
 
+    <SourceProxy name="PythonAnnotation"
+                 class="vtkPythonAnnotationFilter"
+                 label="Python Annotation">
+      <Documentation
+         long_help="This filter evaluates a Python expression for a text annotation"
+         short_help="Evaluates a Python expression for a text annotation">
+        This filter uses Python to calculate an expression.
+        It depends heavily on the numpy and paraview.vtk modules.
+        To use the parallel functions, mpi4py is also necessary. The expression
+        is evaluated and the resulting scalar value or numpy array is added
+        to the output as an array. See numpy and paraview.vtk documentation
+        for the list of available functions.
+
+        This filter tries to make it easy for the user to write expressions
+        by defining certain variables. The filter tries to assign each array
+        to a variable of the same name. If the name of the array is not a
+        valid Python variable, it has to be accessed through a dictionary called
+        arrays (i.e. arrays['array_name']). The points can be accessed using the
+        points variable.
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs"
+         multiple_input="1">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <Documentation>
+        Set the input of the filter.
+           </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+         name="Expression"
+         command="SetPythonExpression"
+         number_of_elements="1">
+        <Documentation>
+        The Python expression evaluated during execution. FieldData arrays are direclty available through their name.
+        Set of provided variables [input, t_value, t_steps, t_range, t_index, FieldData, PointData, CellData]
+        (i.e.: "Momentum: (%f, %f, %f)" % (XMOM[t_index,0], YMOM[t_index,0], ZMOM[t_index,0]) )
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+         name="AnnotationValue"
+         command="GetAnnotationValue"
+         information_only="1" >
+        <Documentation>
+        Text that is used as annotation
+        </Documentation>
+      </StringVectorProperty>
+
+     <Hints>
+       <Visibility replace_input="0" />
+       <OutputPort name="Output-0" index="0" type="text" />
+     </Hints>
+    <!-- End PythonAnnotation -->
+    </SourceProxy>
+
     <SourceProxy name="ProgrammableFilter" 
                  class="vtkPythonProgrammableFilter"
                  label="Programmable Filter">

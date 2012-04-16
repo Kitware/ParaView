@@ -102,6 +102,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     pvfilters
     pvvtkextensions
     extract_selection
+    annotation
     )
 
   # Now copy these files if necessary.

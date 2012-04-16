@@ -144,6 +144,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
     vtkPythonCalculator.cxx
     vtkPythonProgrammableFilter.cxx
     vtkPythonExtractSelection.cxx
+    vtkPythonAnnotationFilter.cxx
     )
   SET (KIT_LIBS ${KIT_LIBS} ${PYTHON_LIBRARIES} vtkPVPythonInterpretor)
   INCLUDE_DIRECTORIES(

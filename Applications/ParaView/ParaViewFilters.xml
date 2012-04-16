@@ -156,6 +156,7 @@
   <Proxy group="filters" name="ProgrammableFilter" />
   <Proxy group="filters" name="PVConnectivityFilter" />
   <Proxy group="filters" name="PythonCalculator" />
+  <Proxy group="filters" name="PythonAnnotation" />
   <Proxy group="filters" name="PythonExtractSelection" />
   <Proxy group="filters" name="QuadraturePointInterpolator" />
   <Proxy group="filters" name="QuadraturePointsGenerator" />

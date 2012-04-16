@@ -79,6 +79,13 @@ IF (PARAVIEW_DATA_ROOT)
 
 # TODO: remote rendering tests and reverse connect tests.
 
+  # Add pvpython tests
+  add_test("pvpython.TestPythonAnnotationFilter"
+      ${PARAVIEW_PYTHON_EXECUTABLE}
+      --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py
+  )
+
 ENDIF (PARAVIEW_DATA_ROOT)
 
 # Python Multi-servers test
