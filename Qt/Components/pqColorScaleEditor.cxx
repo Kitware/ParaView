@@ -151,6 +151,12 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Color transfer function widgets
   this->restoreOptionalUserSettings();
   this->Form->ScalarColor->setVisible(0);
+  this->Form->pushButtonScalarColor->setFixedHeight(40);
+  this->Form->pushButtonScalarColor->setText("");
+  this->Form->pushButtonScalarColor->setVisible(0);
+  this->connect(this->Form->pushButtonScalarColor,SIGNAL(clicked()),
+    this->Form->ScalarColor, SLOT(chooseColor()));
+
   this->connect(this->Form->ScalarColor,SIGNAL(chosenColorChanged(const QColor &)),
     this, SLOT(setScalarColor(const QColor &)));
   this->connect(this->Form->opacityScalar, SIGNAL(editingFinished()),
@@ -158,16 +164,13 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(this->Form->pushButtonApply, SIGNAL(clicked()),
     this, SLOT(updateDisplay()));
 
-  QVBoxLayout* tfLayout = new QVBoxLayout(this->Form->frameColorTF);
-  this->ColorMapViewer = new pqTransferFunctionChartViewWidget(
-    this);
+  QLayout* tfLayout = this->Form->frameColorTF->layout();
+  this->ColorMapViewer = new pqTransferFunctionChartViewWidget(this);
   this->ColorMapViewer->setFixedHeight(40);
-  this->OpacityFunctionViewer = new pqTransferFunctionChartViewWidget(
-    this);
+  this->OpacityFunctionViewer = new pqTransferFunctionChartViewWidget(this);
   this->OpacityFunctionViewer->setSizePolicy(
     QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->OpacityFunctionViewer->setMinimumHeight(60);
-  tfLayout->setMargin(0);
   tfLayout->addWidget(this->ColorMapViewer);
 
   QVBoxLayout* opacityLayout = new QVBoxLayout(this->Form->frameOpacity);
@@ -779,6 +782,8 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
       {
       return;
       }
+    this->setScalarButtonColor(color);
+
     int total = clientTF->GetSize();
     double nodeVal[6];
     QList<QVariant> rgbPoints;
@@ -809,6 +814,16 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
     this->Form->InSetColors = false;
     this->renderViewOptionally();
     }
+}
+
+void pqColorScaleEditor::setScalarButtonColor(const QColor &color)
+{
+  this->Form->pushButtonScalarColor->setAutoFillBackground(true);
+  QString stylesheet = "background-color: rgb(";
+  stylesheet.append(QString::number(color.red())).append(", ").
+    append(QString::number(color.green())).append(", ").
+    append(QString::number(color.blue())).append("); border: none");
+  this->Form->pushButtonScalarColor->setStyleSheet(stylesheet);
 }
 
 void pqColorScaleEditor::renderTransferFunctionViews()
@@ -1893,11 +1908,9 @@ void pqColorScaleEditor::updateCurrentColorPoint()
     double nodeVal[6];
     tf->GetNodeValue(0, nodeVal);
     double rgb[3]={nodeVal[1], nodeVal[2], nodeVal[3]};
-
-//    double rgb[3];
-//    tf->GetColor(range[0], rgb);
+    this->setScalarButtonColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
     this->Form->ScalarColor->setChosenColor(
-      QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+          QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
     this->Form->ScalarValue->setText(QString::number(range[0], 'g', 6));
     }
 }
@@ -1951,7 +1964,7 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
       }
     }
 
-  // If there is only one scalar value, get the color
+  // If there is only one scalar value, get the opacity
   // and set it to the ScalarColor button
   if(this->OpacityFunction && singleScalar)
     {
@@ -2076,13 +2089,15 @@ void pqColorScaleEditor::updateColorFunctionVisibility()
     {
     if(range[0]==range[1])
       {
-      this->Form->frameColorTF->setVisible(0);
-      this->Form->ScalarColor->setVisible(1);
+      this->ColorMapViewer->setVisible(0);
+      //this->Form->frameColorTF->blockSignals(false);
+      this->Form->pushButtonScalarColor->setVisible(1);
       }
     else
       {
-      this->Form->frameColorTF->setVisible(1);
-      this->Form->ScalarColor->setVisible(0);
+      this->ColorMapViewer->setVisible(1);
+      //this->Form->frameColorTF->blockSignals(true);
+      this->Form->pushButtonScalarColor->setVisible(0);
       }
     vtkColorTransferFunction* ctf = vtkColorTransferFunction::SafeDownCast(
       this->ColorMap->getProxy()->GetClientSideObject());
