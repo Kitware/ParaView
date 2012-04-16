@@ -64,18 +64,20 @@ IF (PARAVIEW_DATA_ROOT)
     ENDIF (VTK_MPIRUN_EXE)
 
     # here is the full workflow for coprocessing where we generate
-    # a script, run a simulation driver code, and then check the output
+    # a script, run simulation driver code, and then check the output
     IF (PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator)
       set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
+      set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
       if(Q_WS_MAC)
         set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME}.app/Contents/MacOS)
+        set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS)
       endif(Q_WS_MAC)
 
       file(WRITE
 "${CoProcessing_BINARY_DIR}/CoProcessingFullWorkflowTest.cmake"
-"set(fullexe \"${REAL_EXECUTABLE_PATH}/paraview\")
+"set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/paraview\")
 if(NOT EXISTS \${fullexe})
-  set(fullexe \"${REAL_EXECUTABLE_PATH}/\${cfg}/paraview.exe\")
+  set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/\${cfg}/paraview.exe\")
 endif()
 FILE(REMOVE \"${CMAKE_BINARY_DIR}/Testing/Temporary/cptest.py ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/image_0.png ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0.pvtp ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0_0.vtp\" )
 
