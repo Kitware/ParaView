@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionManage_Plugins" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="Moments" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/localPlugins" command="setCurrent" arguments="CoProcessingPlugin" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/localGroup/loadSelected_Local" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/PluginManagerDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,7,4,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,7,4,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="CoProcessingWritersMenu" />
+  <pqevent object="pqClientMainWindow/CoProcessingWritersMenu" command="activate" arguments="Parallel PolyData Writer" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="CoProcessing" />
+  <pqevent object="pqClientMainWindow/CoProcessing" command="activate" arguments="Export State" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mousePress" arguments="1,1,0,11,11,/0:0" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/allInputs" command="mouseRelease" arguments="1,0,0,11,11,/0:0" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage2/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/__qt__passive_wizardbutton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/1QFrame0/wizardPage_2/outputRendering" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/1QWidget0/finishButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ExportStateWizard/ExportCoprocessingStateFileDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/cptest.py" />
+</pqevents>

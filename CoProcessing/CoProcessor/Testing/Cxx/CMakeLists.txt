@@ -71,6 +71,7 @@ IF (PARAVIEW_DATA_ROOT)
       if(Q_WS_MAC)
         set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME}.app/Contents/MacOS)
         set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS)
+        set(MAC_TEST_NAME "-Mac")
       endif(Q_WS_MAC)
 
       file(WRITE
@@ -81,7 +82,7 @@ if(NOT EXISTS \${fullexe})
 endif()
 FILE(REMOVE \"${CMAKE_BINARY_DIR}/Testing/Temporary/cptest.py ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/image_0.png ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0.pvtp ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0_0.vtp\" )
 
-set(ARGS \"-dr;--test-directory=${CMAKE_BINARY_DIR}/Testing/Temporary;--test-script=${CMAKE_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml;--exit\")
+set(ARGS \"-dr;--test-directory=${CMAKE_BINARY_DIR}/Testing/Temporary;--test-script=${CMAKE_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI${MAC_TEST_NAME}.xml;--exit\")
 execute_process(COMMAND \${fullexe} \${ARGS} RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)
   message(FATAL_ERROR \"ParaView return value was \${rv}\")
