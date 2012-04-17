@@ -67,6 +67,16 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 target_link_libraries(vtkCoProcessor ${CoProcessor_LIBS})
 
 IF (PARAVIEW_ENABLE_PYTHON)
+  IF(NOT APPLE)
+    FIND_LIBRARY(PYTHON_UTIL_LIBRARY
+      NAMES util
+      DOC "Utility library needed for pvpython"
+      )
+    MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
+    IF(PYTHON_UTIL_LIBRARY)
+      SET(PYTHON_UTIL_LIBRARY_LIB ${PYTHON_UTIL_LIBRARY})
+    ENDIF(PYTHON_UTIL_LIBRARY)
+  ENDIF(NOT APPLE)
   # Create Python bindings for the co-processing library
   set(BUILD_SHARED_LIBS ON CACHE BOOL "Needed for python scripting.")
   INCLUDE(FindPythonLibs)
@@ -88,7 +98,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # want to link to the python libray to resolve its symbols
   # immediately.
   IF(WIN32 OR APPLE)
-    TARGET_LINK_LIBRARIES (vtkCoProcessorPythonD ${PYTHON_LIBRARIES})
+    TARGET_LINK_LIBRARIES (vtkCoProcessorPythonD ${VTK_PYTHON_LIBRARIES} ${PYTHON_UTIL_LIBRARY_LIB})
   ENDIF(WIN32 OR APPLE)
 
   # Create a python module that can be loaded dynamically.  It links to
@@ -104,7 +114,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ENDIF(WIN32 AND NOT CYGWIN)
 
   IF(WIN32 OR APPLE)
-    TARGET_LINK_LIBRARIES (vtkCoProcessorPython ${PYTHON_LIBRARIES})
+    TARGET_LINK_LIBRARIES (vtkCoProcessorPython ${VTK_PYTHON_LIBRARIES} ${PYTHON_UTIL_LIBRARY_LIB})
   ENDIF(WIN32 OR APPLE)
 
   SET(PYTHON_MODULE_PREFIX "")
