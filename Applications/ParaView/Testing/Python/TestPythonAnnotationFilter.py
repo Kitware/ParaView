@@ -39,11 +39,8 @@ reader.GlobalVariables = ['KE', 'XMOM', 'YMOM', 'ZMOM', 'NSTEPS', 'TMSTEP']
 reader.UpdatePipeline()
 
 # Time management
-#animationscene = GetAnimationScene()
-tk = servermanager.ProxyManager().GetProxy('timekeeper','TimeKeeper')
-#animationscene.PlayMode = 'Snap To TimeSteps'
-#animationscene.AnimationTime = tk.TimestepValues[5]
-tk.Time = tk.TimestepValues[5]
+timesteps = servermanager.ProxyManager().GetProxy('timekeeper','TimeKeeper').TimestepValues
+time = timesteps[5]
 
 # Merge blocks
 merge = MergeBlocks()
@@ -51,12 +48,10 @@ merge = MergeBlocks()
 # Annotation filter
 annotation = PythonAnnotation()
 annotation.Expression = '"%f %f %f" % (XMOM[t_index], YMOM[t_index], ZMOM[t_index])'
-annotation.UpdatePipeline()
-Show()
 
 # Update time and trigger pipeline execution
-tk.Time = tk.TimestepValues[5]
-Render()
+time = timesteps[5]
+annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
@@ -67,8 +62,8 @@ if not equal(value, expected):
   print "Error: Expected ", expected, " and got ", value
 
 # Update time and trigger pipeline execution
-tk.Time = tk.TimestepValues[7]
-Render()
+time = timesteps[7]
+annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
@@ -80,11 +75,10 @@ if not equal(value, expected):
 
 # Check time infos
 annotation.Expression = '"%i %f %s" % (t_index, t_value, str(t_range))'
-annotation.UpdatePipeline()
 
 # Update time and trigger pipeline execution
-tk.Time = tk.TimestepValues[7]
-Render()
+time = timesteps[7]
+annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
@@ -95,8 +89,8 @@ if not equal(value, expected):
   print "Error: Expected ", expected, " and got ", value
 
 # Update time and trigger pipeline execution
-tk.Time = tk.TimestepValues[27]
-Render()
+time = timesteps[27]
+annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
@@ -107,8 +101,8 @@ if not equal(value, expected):
   print "Error: Expected ", expected, " and got ", value
 
 # Update time and trigger pipeline execution
-tk.Time = tk.TimestepValues[len(tk.TimestepValues)-1]
-Render()
+time = timesteps[len(timesteps)-1]
+annotation.UpdatePipeline(time)
 
 annotation.SMProxy.UpdatePropertyInformation()
 value = annotation.SMProxy.GetProperty('AnnotationValue').GetElement(0)
