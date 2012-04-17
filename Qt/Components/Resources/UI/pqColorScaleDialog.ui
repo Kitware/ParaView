@@ -243,7 +243,7 @@
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::Box</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
@@ -264,7 +264,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>PushButton</string>
+             <string>Scalar Color Button</string>
             </property>
             <property name="flat">
              <bool>true</bool>
