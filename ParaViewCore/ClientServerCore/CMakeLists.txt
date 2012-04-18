@@ -35,6 +35,7 @@ SET (Kit_SRCS
   vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
+  vtkMoleculeRepresentation.cxx
   vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
@@ -283,6 +284,7 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkViewsContext2D
   vtkRenderingLabel
   vtkRenderingVolume
+  vtkDomainsChemistry
 )
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)

@@ -8035,5 +8035,26 @@
    <!-- End plot3d reader-->
  </SourceProxy>
 
+
+  <!-- CML Reader -->
+  <SourceProxy name="CMLMoleculeReader"
+               class="vtkCMLMoleculeReader"
+               label="CML Molecule Reader">
+    <StringVectorProperty name="FileName"
+                          command="SetFileName"
+                          animateable="0"
+                          number_of_elements="1"
+                          panel_visibility="never">
+      <FileListDomain name="files" />
+      <Documentation>
+        This property specifies the CML file name
+      </Documentation>
+    </StringVectorProperty>
+
+    <Hints>
+      <ReaderFactory extensions="cml" file_description="CML"/>
+    </Hints>
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

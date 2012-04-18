@@ -73,4 +73,5 @@
   <Proxy group="sources" name="MPASReader" />
   <Proxy group="sources" name="EnzoParticlesReader" />
   <Proxy group="sources" name="FlashParticlesReader" />
+  <Proxy group="sources" name="CMLMoleculeReader"/>
 </ParaViewReaders>
