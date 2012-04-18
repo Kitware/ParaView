@@ -474,16 +474,12 @@ IF (PARAVIEW_DATA_ROOT)
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${TESTS_WITH_MULTI_SERVERS_3})
 
-  add_tile_display_tests("pvcs-tile-display" 2 2
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS Clip.xml)
-
-  add_tile_display_tests("pvcs-tile-display" 1 2
-     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS Clip.xml)
-
   add_tile_display_tests("pvcs-tile-display" 2 1
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-     TEST_SCRIPTS Clip.xml)
+     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x1.xml)
+
+  add_tile_display_tests("pvcs-tile-display" 2 2
+     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplayScatterPlot-2x2.xml)
 
 ENDIF (PARAVIEW_DATA_ROOT)

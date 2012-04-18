@@ -143,6 +143,8 @@ private:
   int TestRenderServer;
   int TestServer;
   int TestTiledDisplay;
+  std::string TestTiledDisplayTDX;
+  std::string TestTiledDisplayTDY;
   int AllowErrorInOutput;
   int TestRemoteRendering;
   int TestMultiClient;

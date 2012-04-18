@@ -20,8 +20,11 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkPNGWriter.h"
 
 #include <vtksys/ios/sstream>
+#include <vtkNew.h>
 
 #include <map>
 #include <set>
@@ -32,6 +35,7 @@ class vtkTileDisplayHelper::vtkInternals
 public:
   std::string DumpImagePath;
   static vtkSmartPointer<vtkTileDisplayHelper> Instance;
+  vtkNew<vtkPNGWriter> PNGWriter;
 
   class vtkTile
     {
@@ -112,7 +116,30 @@ public:
           tile.Renderer->SetViewport(0, 0, 1, 1);
           rawImage.Capture(tile.Renderer);
           tile.Renderer->SetViewport(viewport);
-          rawImage.SaveAsPNG(vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.c_str());
+
+          // Save RGBA raw image into a RGB PNG file
+          if(rawImage.IsValid())
+            {
+            // Allocate RGB output
+            vtkNew<vtkImageData> imageBuffer;
+            imageBuffer->SetDimensions(rawImage.GetWidth(), rawImage.GetHeight(), 1);
+            imageBuffer->AllocateScalars(VTK_UNSIGNED_CHAR, 3); // RGB
+
+            // Copy RGBA image to a RBG one.
+            unsigned char* readRGBAPointer = (unsigned char*)rawImage.GetRawPtr()->GetVoidPointer(0);
+            unsigned char* writeRGBPointer = (unsigned char*)imageBuffer->GetScalarPointer();
+            vtkIdType nbTuples =  rawImage.GetWidth()* rawImage.GetHeight();
+            for(vtkIdType tupleIndex = 0; tupleIndex < nbTuples; ++tupleIndex)
+              {
+              memcpy(writeRGBPointer, readRGBAPointer, 3); // Copy RBG
+              writeRGBPointer += 3;                        // Skip RGB
+              readRGBAPointer += 4;                        // Skip RGBA
+              }
+
+            this->PNGWriter->SetFileName(vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.c_str());
+            this->PNGWriter->SetInputData(imageBuffer.GetPointer());
+            this->PNGWriter->Write();
+            }
           break;
           }
         }
