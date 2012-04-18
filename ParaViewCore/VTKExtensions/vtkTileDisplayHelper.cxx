@@ -15,17 +15,22 @@
 #include "vtkTileDisplayHelper.h"
 
 #include "vtkCamera.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkSmartPointer.h"
+
+#include <vtksys/ios/sstream>
 
 #include <map>
 #include <set>
+#include <string>
 
 class vtkTileDisplayHelper::vtkInternals
 {
 public:
+  std::string DumpImagePath;
   static vtkSmartPointer<vtkTileDisplayHelper> Instance;
 
   class vtkTile
@@ -91,23 +96,34 @@ public:
     // overlapping views. This ensures that active view is always rendered on
     // top.        
     this->FlushTile(TileMap->find(current),*TileMap, leftEye);
-    }
+
+    // Check if dumping the tile as an image is needed
+    if(!vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.empty())
+      {
+      for (TilesMapType::iterator iter = TileMap->begin();
+           iter !=TileMap->end(); ++iter)
+        {
+        vtkTile& tile = iter->second;
+        if (tile.Renderer)
+          {
+          vtkSynchronizedRenderers::vtkRawImage rawImage;
+          double viewport[4];
+          tile.Renderer->GetViewport(viewport);
+          tile.Renderer->SetViewport(0, 0, 1, 1);
+          rawImage.Capture(tile.Renderer);
+          tile.Renderer->SetViewport(viewport);
+          rawImage.SaveAsPNG(vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.c_str());
+          break;
+          }
+        }
+      }
+  }
 };
 
 vtkSmartPointer<vtkTileDisplayHelper>
 vtkTileDisplayHelper::vtkInternals::Instance;
 
-//----------------------------------------------------------------------------
-vtkTileDisplayHelper* vtkTileDisplayHelper::New()
-{
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkTileDisplayHelper");
-  if(ret)
-    {
-    return static_cast<vtkTileDisplayHelper*>(ret);
-    }
-  return new vtkTileDisplayHelper;
-}
-
+vtkStandardNewMacro(vtkTileDisplayHelper);
 //----------------------------------------------------------------------------
 vtkTileDisplayHelper::vtkTileDisplayHelper()
 {
@@ -192,4 +208,24 @@ void vtkTileDisplayHelper::EnableKey(unsigned int key)
 void vtkTileDisplayHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::SetDumpImagePath(const char* newPath)
+{
+  if(newPath == NULL)
+    {
+    vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = "";
+    }
+  else
+    {
+    int pid =
+        vtkMultiProcessController::GetGlobalController() ?
+          vtkMultiProcessController::GetGlobalController()->GetLocalProcessId():
+          1;
+
+    vtksys_ios::ostringstream fullPath;
+    fullPath << newPath << "_" << pid << ".png";
+    vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = fullPath.str();
+    }
 }

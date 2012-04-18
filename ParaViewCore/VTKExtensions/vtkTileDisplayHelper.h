@@ -34,6 +34,12 @@ class vtkRenderer;
 class VTK_EXPORT vtkTileDisplayHelper : public vtkObject
 {
 public:
+  // Description:
+  // Only one instance by process should be used, that's why everyone should
+  // use the instance returned by the GetInstance() methods. But to allow
+  // that class to be used by a proxy, we need to expose the new.
+  // Beaware that a subset of methods will be available to the proxy.
+  static vtkTileDisplayHelper* New();
   vtkTypeMacro(vtkTileDisplayHelper, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -64,11 +70,18 @@ public:
   void ResetEnabledKeys();
   void EnableKey(unsigned int);
 
+  // Description:
+  // - Method that can be used by the proxy.
+  // - The Path will be used to save the latest flush of the tiles.
+  // - Basically for a 2 processes tile display setting you will have two images
+  //   dumped following the given pattern: ${DumpImagePath}_${processId}.png
+  // - If the DumpImagePath is set to NULL, then no image dump will occurs.
+  void SetDumpImagePath(const char* newPath);
+
 //BTX
 protected:
   vtkTileDisplayHelper();
   ~vtkTileDisplayHelper();
-  static vtkTileDisplayHelper* New();
 
 private:
   vtkTileDisplayHelper(const vtkTileDisplayHelper&); // Not implemented
