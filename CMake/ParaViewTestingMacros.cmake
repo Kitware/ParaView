@@ -172,3 +172,33 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         )
   endforeach(test_script)
 ENDFUNCTION(add_multi_server_tests)
+
+FUNCTION (add_tile_display_tests prefix nbx nby )
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
+
+  MATH(EXPR REQUIRED_CPU '${nbx}*${nby}-1') # -1 is for LESS
+  if (${REQUIRED_CPU} LESS ${MPIEXEC_MAX_NUMPROCS})
+    foreach (test_script ${ACT_TEST_SCRIPTS})
+      get_filename_component(test_name ${test_script} NAME_WE)
+      set (extra_args)
+      process_args(extra_args)
+      add_test("${prefix}.${test_name}"
+          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+          --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+          --client ${CLIENT_EXECUTABLE}
+          -dr
+          --disable-light-kit
+          --test-directory=${PARAVIEW_TEST_DIR}
+          --test-script=${test_script}
+
+          ${extra_args}
+          --exit
+          )
+      if (${test_name}_FORCE_SERIAL)
+        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+      endif (${test_name}_FORCE_SERIAL)
+    endforeach(test_script)
+  endif(${REQUIRED_CPU} LESS ${MPIEXEC_MAX_NUMPROCS})
+ENDFUNCTION (add_tile_display_tests)
