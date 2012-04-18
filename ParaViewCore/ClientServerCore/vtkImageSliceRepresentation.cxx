@@ -39,7 +39,7 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
 
   this->SliceData = vtkImageData::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->CacheKeeper->SetInput(this->SliceData);
+  this->CacheKeeper->SetInputData(this->SliceData);
 
   this->DeliveryFilter = vtkImageSliceDataDeliveryFilter::New();
   this->SliceMapper = vtkPVImageSliceMapper::New();
@@ -53,7 +53,7 @@ vtkImageSliceRepresentation::~vtkImageSliceRepresentation()
   this->SliceData->Delete();
   this->CacheKeeper->Delete();
   this->DeliveryFilter->Delete();
-  this->SliceMapper->SetInput(0);
+  this->SliceMapper->SetInputData(0);
   this->SliceMapper->Delete();
   this->Actor->Delete();
 }
@@ -164,7 +164,7 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     // executive keeps on re-executing it every time.
     vtkImageData* clone = vtkImageData::New();
     clone->ShallowCopy(this->DeliveryFilter->GetOutputDataObject(0));
-    this->SliceMapper->SetInput(clone);
+    this->SliceMapper->SetInputData(clone);
     clone->Delete();
 
     this->DeliveryTimeStamp.Modified();
@@ -261,7 +261,7 @@ void vtkImageSliceRepresentation::UpdateSliceData(
 
   vtkExtractVOI* voi = vtkExtractVOI::New();
   voi->SetVOI(outExt);
-  voi->SetInput(clone);
+  voi->SetInputData(clone);
   voi->Update();
 
   this->SliceData->ShallowCopy(voi->GetOutput());

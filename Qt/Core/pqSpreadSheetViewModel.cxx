@@ -58,16 +58,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCellType.h"
 
 // Qt Includes.
-#include <QTimer>
 #include <QItemSelectionModel>
 #include <QtDebug>
 #include <QPointer>
 
 // ParaView Includes.
-#include "pqSMAdaptor.h"
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqSMAdaptor.h"
+#include "pqTimer.h"
 
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
@@ -203,8 +203,8 @@ public:
   }
 
   QItemSelectionModel SelectionModel;
-  QTimer Timer;
-  QTimer SelectionTimer;
+  pqTimer Timer;
+  pqTimer SelectionTimer;
   int DecimalPrecision;
   vtkIdType LastRowCount;
   vtkIdType LastColumnCount;

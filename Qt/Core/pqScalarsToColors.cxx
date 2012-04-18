@@ -197,7 +197,7 @@ void pqScalarsToColors::setScalarRange(double min, double max)
   dold = (dold > 0) ? dold : 1;
 
   double dnew = (max -min);
-  dnew = (dnew > 0) ? dnew : 1;
+  dnew = (dnew >= 0) ? dnew : 1;
 
   double scale = dnew/dold;
 

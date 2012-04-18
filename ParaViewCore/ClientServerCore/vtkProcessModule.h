@@ -219,7 +219,7 @@ protected:
   // Used to keep track of maximum session used. Only used to ensure that no
   // session id is ever repeated.
   vtkIdType MaxSessionId;
-public:
+
   class vtkInternals;
 protected:
   vtkInternals* Internals;

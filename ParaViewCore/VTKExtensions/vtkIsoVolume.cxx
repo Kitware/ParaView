@@ -19,7 +19,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkGenericClip.h"
-#include "vtkHierarchicalBoxDataSet.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationStringVectorKey.h"
@@ -132,7 +132,7 @@ vtkDataObject* vtkIsoVolume::Clip(vtkDataObject* input,
 
   // disable AMRDualClip since it does not generate scalars.
   clipper->UseAMRDualClipForAMROff();
-  clipper->SetInput(0, input);
+  clipper->SetInputData(0, input);
   clipper->SetInputArrayToProcess(0, 0, 0, fieldAssociation, array_name);
   clipper->SetValue(value);
   clipper->SetInsideOut(invert? 1: 0);
@@ -175,7 +175,7 @@ int vtkIsoVolume::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkMultiBlockDataSet::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->Delete();
@@ -188,7 +188,7 @@ int vtkIsoVolume::RequestDataObject(vtkInformation* vtkNotUsed(request),
     if (!output)
       {
       output = vtkUnstructuredGrid::New();
-      output->SetPipelineInformation(outInfo);
+      outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
       output->Delete();

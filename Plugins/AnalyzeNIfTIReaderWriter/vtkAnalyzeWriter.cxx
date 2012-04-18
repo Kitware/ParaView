@@ -175,7 +175,9 @@ static std::string GetImageFileName( const std::string& filename )
   return( ImageFileName );
 }
 
-void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData *cache)
+void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
+                                       vtkImageData *cache,
+                                       int wholeExtent[6])
 {
    
    struct nifti_1_header nhdr ;
@@ -194,12 +196,10 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file), vtkImageData
     // Get the information from the input
   double spacing[3];
   double origin[3];
-  int wholeExtent[6];
   int numComponents = cache->GetNumberOfScalarComponents();
   imageDataType = cache->GetScalarType();
   cache->GetSpacing(spacing);
   cache->GetOrigin(origin);
-  cache->GetWholeExtent(wholeExtent);
   
   if( numComponents > 1 ){
     vtkErrorMacro("cannot write data with more than 1 component yet.");

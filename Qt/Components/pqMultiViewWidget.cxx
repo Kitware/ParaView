@@ -669,6 +669,23 @@ void pqMultiViewWidget::standardButtonPressed(int button)
 }
 
 //-----------------------------------------------------------------------------
+void pqMultiViewWidget::destroyAllViews()
+{
+  BEGIN_UNDO_SET("Destroy all views");
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()->getObjectBuilder();
+  QList<vtkSMViewProxy*> views = this->viewProxies();
+  foreach (vtkSMViewProxy* view, views)
+    {
+    if (view)
+      {
+      builder->destroy(getPQView(view));
+      }
+    }
+  END_UNDO_SET();
+}
+
+//-----------------------------------------------------------------------------
 void pqMultiViewWidget::splitterMoved()
 {
   QSplitter* splitter = qobject_cast<QSplitter*>(this->sender());

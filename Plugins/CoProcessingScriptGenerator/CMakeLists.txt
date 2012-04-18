@@ -1,3 +1,6 @@
+project(CoProcessingScriptGeneratorPlugin)
+
+
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
@@ -89,3 +92,11 @@ ADD_PARAVIEW_PLUGIN(
     cp_export_py.cxx
 )
 
+IF (BUILD_TESTING)
+  include(ParaViewTestingMacros)
+  # this test is redundant with the CoProcessingFullWorkflow test
+  # in the coprocessing library but that may not be built so we
+  # add it here as well. this test though is a subset of that test.
+  add_client_tests("pv"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
+ENDIF (BUILD_TESTING)

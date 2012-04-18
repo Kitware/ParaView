@@ -272,6 +272,8 @@ void vtkSISourceProxy::InsertExtractPiecesIfNecessary(
       }
     }
   else if (outputDO->IsA("vtkHierarchicalBoxDataSet") ||
+           outputDO->IsA("vtkOverlappingAMR") ||
+           outputDO->IsA("vtkNonOverlappingAMR") ||
            outputDO->IsA("vtkMultiBlockDataSet"))
     {
     extractPiecesClass = "vtkExtractPiece";

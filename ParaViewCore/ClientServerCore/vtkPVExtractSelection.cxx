@@ -19,9 +19,12 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
+#include "vtkExecutive.h"
+//#include "vtkExecutivePortKey.h"
 #include "vtkHierarchicalBoxDataIterator.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -96,7 +99,7 @@ int vtkPVExtractSelection::RequestDataObject(
         vtkErrorMacro("Could not create vtkSelectionOutput");
         return 0;
         }
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       this->GetOutputPortInformation(i)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       newOutput->Delete();
@@ -135,8 +138,8 @@ int vtkPVExtractSelection::RequestData(
     vtkSelection *localSel = sel->NewInstance();
     localSel->ShallowCopy(sel);
 
-    pythonExtractSelection->SetInputConnection(0, localInputDO->GetProducerPort());
-    pythonExtractSelection->SetSelectionConnection(localSel->GetProducerPort());
+    pythonExtractSelection->SetInputData(0, localInputDO);
+    pythonExtractSelection->SetInputData(1, localSel);
 
     pythonExtractSelection->Update();
 

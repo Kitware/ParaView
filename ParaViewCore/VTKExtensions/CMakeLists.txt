@@ -32,17 +32,16 @@ SET (Kit_SRCS
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCellIntegrator.cxx
+  vtkChartNamedOptions.cxx
   vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkCleanUnstructuredGridCells.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCompositeMultiProcessController.cxx
-  vtkContextNamedOptions.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
-  vtkEnzoReader.cxx
   vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
@@ -51,7 +50,6 @@ SET (Kit_SRCS
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkFlashContour.cxx
-  vtkFlashReader.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
@@ -207,6 +205,7 @@ SET (Kit_SRCS
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
+  vtkXYChartNamedOptions.cxx
   vtkZlibImageCompressor.cxx
 )
 
@@ -401,6 +400,8 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkViewsCS
   vtkCharts
   vtkChartsCS
+  vtkAMR
+  vtkAMRCS
   KWCommon
   vtksys
   ${KIT_LIBS}

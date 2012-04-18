@@ -34,9 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include "pqDisplayPanel.h"
-#include "pqPlotSettingsModel.h"
 #include "pqPropertyLinks.h"
-#include "pqSignalAdaptors.h"
+
+#include <QModelIndex>
+
+class pqSignalAdaptorColor;
+class pqSignalAdaptorComboBox;
+class pqChartSeriesSettingsModel;
 
 class PQCOMPONENTS_EXPORT pqPlotMatrixDisplayPanel : public pqDisplayPanel
 {
@@ -47,11 +51,12 @@ public:
   ~pqPlotMatrixDisplayPanel();
 
 private slots:
-  void headerCheckStateChanged();
   void dataChanged(QModelIndex topLeft, QModelIndex bottomRight);
+  /// Reloads the series list from the display.
+  void reloadSeries();
 
 private:
-  pqPlotSettingsModel* SettingsModel;
+  pqChartSeriesSettingsModel* SettingsModel;
   pqPropertyLinks Links;
   pqSignalAdaptorColor *ActivePlotColorAdaptor;
   pqSignalAdaptorColor *ScatterPlotsColorAdaptor;

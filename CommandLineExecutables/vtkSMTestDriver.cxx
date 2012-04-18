@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
 vtkSMTestDriver::vtkSMTestDriver()
 {
   this->AllowErrorInOutput = 0;
-  this->RenderServerNumProcesses = 0;
   this->TimeOut = 300;
   this->ServerExitTimeOut = 60;
   this->TestRenderServer = 0;
@@ -63,6 +62,7 @@ vtkSMTestDriver::vtkSMTestDriver()
   this->ReverseConnection = 0;
   this->TestRemoteRendering = 0;
   this->TestMultiClient = 0;
+  this->NumberOfServers = 1;
 }
 
 vtkSMTestDriver::~vtkSMTestDriver()
@@ -235,7 +235,12 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
     if(strcmp(argv[i], "--test-multi-clients") == 0)
       {
       this->TestMultiClient = 1;
-      fprintf(stderr, "Test Tiled Display.\n");
+      fprintf(stderr, "Test collaboration.\n");
+      }
+    if(strcmp(argv[i], "--test-multi-servers") == 0)
+      {
+      this->NumberOfServers = atoi(argv[i+1]);
+      fprintf(stderr, "Test multi-servers with %d servers.\n", this->NumberOfServers);
       }
     if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
@@ -417,6 +422,11 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     commandLine.push_back("--multi-clients");
     }
 
+  if (type == CLIENT && this->NumberOfServers > 1)
+    {
+    commandLine.insert(++commandLine.begin(), "--multi-servers");
+    }
+
 #ifdef PV_TEST_USE_RANDOM_PORTS
   if (!this->ReverseConnection)
     {
@@ -583,8 +593,11 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
     {\
     vtksysProcess_Delete(clients[__kk]);\
     }\
-  vtksysProcess_Delete(renderServer); \
-  vtksysProcess_Delete(server); 
+  for (size_t __kk=0; __kk < this->NumberOfServers; __kk++)\
+    {\
+    if(!renderServers.empty()) vtksysProcess_Delete(renderServers[__kk]); \
+    if(!servers.empty()) vtksysProcess_Delete(servers[__kk]); \
+    }
 
 //----------------------------------------------------------------------------
 int vtkSMTestDriver::Main(int argc, char* argv[])
@@ -628,28 +641,30 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
 
   // mpi code
   // Allocate process managers.
-  vtksysProcess* renderServer = 0;
-  vtksysProcess* server = 0;
+  std::vector<vtksysProcess*> renderServers;
+  std::vector<vtksysProcess*> servers;
   std::vector<vtksysProcess*> clients;
-  if(this->TestRenderServer)
+  for (size_t i=0; this->TestRenderServer && i < this->NumberOfServers; i++)
     {
-    renderServer = vtksysProcess_New();
+    vtksysProcess* renderServer = vtksysProcess_New();
     if(!renderServer)
       {
       VTK_CLEAN_PROCESSES;
       cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the render server.\n";
       return 1;
       }
+    renderServers.push_back(renderServer);
     }
-  if(this->TestServer)
+  for (size_t i=0; this->TestServer && i < this->NumberOfServers; i++)
     {
-    server = vtksysProcess_New();
+    vtksysProcess* server = vtksysProcess_New();
     if(!server)
       {
       VTK_CLEAN_PROCESSES;
       cerr << "vtkSMTestDriver: Cannot allocate vtksysProcess to run the server (or dataserver).\n";
       return 1;
       }
+    servers.push_back(server);
     }
 
   for (size_t cc=0; cc < this->ClientExecutables.size(); cc++)
@@ -689,71 +704,125 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       }
 
     // Now run the server
-    this->SetupServer(server);
-    if(!this->StartProcess(server, "server"))
+    if(!servers.empty())
       {
-      this->Stop(clients[0], "client");
-      VTK_CLEAN_PROCESSES;
-      return -1;
+      this->SetupServer(servers[0]);
+      if(!this->StartProcess(servers[0], "server"))
+        {
+        this->Stop(clients[0], "client");
+        VTK_CLEAN_PROCESSES;
+        return -1;
+        }
       }
 
     // Now run the render server
-    this->SetupRenderServer(renderServer);
-    if(!this->StartProcess(renderServer, "renderserver"))
+    if(!renderServers.empty())
       {
-      this->Stop(clients[0], "client");
-      this->Stop(server, "server");
-      VTK_CLEAN_PROCESSES;
-      return -1;
+      this->SetupRenderServer(renderServers[0]);
+      if(!this->StartProcess(renderServers[0], "renderserver"))
+        {
+        this->Stop(clients[0], "client");
+        this->Stop(servers[0], "server");
+        VTK_CLEAN_PROCESSES;
+        return -1;
+        }
       }
     }
   else
     {
     // Start the render server if there is one.
-    std::string rs_connection_info;
-    this->SetupRenderServer(renderServer);
-    if(!this->StartProcessAndWait(renderServer, "renderserver",
-        RenderServerStdOut, RenderServerStdErr, "Accepting connection(s):",
-        rs_connection_info))
+    std::vector<std::string> rs_connection_infos;
+    for( std::vector<vtksysProcess*>::iterator iter = renderServers.begin();
+         iter != renderServers.end();
+         iter++ )
       {
-      cerr << "vtkSMTestDriver: Render server never started.\n";
-      VTK_CLEAN_PROCESSES;
-      return -1;
+      vtksysProcess* renderServer = *iter;
+      std::string rs_connection_info;
+      this->SetupRenderServer(renderServer);
+
+      vtksys_ios::ostringstream processName;
+      processName << "renderserver " << rs_connection_infos.size();
+
+      if(!this->StartProcessAndWait(renderServer, processName.str().c_str(),
+          RenderServerStdOut, RenderServerStdErr, "Accepting connection(s):",
+          rs_connection_info))
+        {
+        cerr << "vtkSMTestDriver: Render server never started.\n";
+        VTK_CLEAN_PROCESSES;
+        return -1;
+        }
+      rs_connection_infos.push_back(rs_connection_info);
       }
 
+
     // Start the data server if there is one.
-    std::string s_connection_info;
-    this->SetupServer(server);
-    if(!this->StartProcessAndWait(server, renderServer? "dataserver": "server",
-        ServerStdOut, ServerStdErr, "Accepting connection(s):",
-        s_connection_info))
+    std::vector<std::string> s_connection_infos;
+    for( std::vector<vtksysProcess*>::iterator iter = servers.begin();
+         iter != servers.end();
+         iter++ )
       {
-      this->Stop(renderServer, "renderserver");
-      cerr << "vtkSMTestDriver: Server never started.\n";
-      VTK_CLEAN_PROCESSES;
-      return -1;
+      vtksysProcess* server = *iter;
+      std::string s_connection_info;
+      this->SetupServer(server);
+
+      vtksys_ios::ostringstream processName;
+      processName << (renderServers.empty() ? "server " : "dataserver ")
+                  << s_connection_infos.size();
+
+      if(!this->StartProcessAndWait(server, processName.str().c_str(),
+                                    ServerStdOut, ServerStdErr, "Accepting connection(s):",
+                                    s_connection_info))
+        {
+        for( std::vector<vtksysProcess*>::iterator stopIter = renderServers.begin();
+             stopIter != renderServers.end();
+             stopIter++ )
+          {
+          this->Stop(*stopIter, "renderserver");
+          }
+
+        cerr << "vtkSMTestDriver: Server never started.\n";
+        VTK_CLEAN_PROCESSES;
+        return -1;
+        }
+      s_connection_infos.push_back(s_connection_info);
       }
 
     // before launching the clients, we need to identify the host and port for
     // the server processes so we can tell the client.
-    if (renderServer && server)
+    if ((!renderServers.empty()) && (!servers.empty()))
       {
       std::string rs_host("localhost"), ds_host("localhost");
       int rs_port(22221), ds_port(11111);
-      GetHostAndPort(rs_connection_info, rs_host, rs_port);
-      GetHostAndPort(s_connection_info, ds_host, ds_port);
       vtksys_ios::ostringstream stream;
-      stream << "-url=cdsrs://" << ds_host.c_str() << ":" << ds_port
-        << "/" << rs_host.c_str() << ":" << rs_port;
+      stream << "-url=";
+      for(int i=0; i < this->NumberOfServers; i++)
+        {
+        GetHostAndPort(rs_connection_infos[i], rs_host, rs_port);
+        GetHostAndPort(s_connection_infos[i], ds_host, ds_port);
+        stream << "cdsrs://" << ds_host.c_str() << ":" << ds_port
+               << "/" << rs_host.c_str() << ":" << rs_port;
+        if( (i+1) < this->NumberOfServers)
+          {
+          stream << "|";
+          }
+        }
       this->ServerURL = stream.str();
       }
-    else if (server)
+    else if (!servers.empty())
       {
       std::string host("localhost");
       int port(11111);
-      GetHostAndPort(s_connection_info, host, port);
       vtksys_ios::ostringstream stream;
-      stream << "-url=cs://" << host.c_str() << ":" << port;
+      stream << "-url=";
+      for(int i=0; i < this->NumberOfServers; i++)
+        {
+        GetHostAndPort(s_connection_infos[i], host, port);
+        stream << "cs://" << host.c_str() << ":" << port;
+        if( (i+1) < this->NumberOfServers)
+          {
+          stream << "|";
+          }
+        }
       this->ServerURL = stream.str();
       }
 
@@ -772,8 +841,18 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       if (!this->StartProcessAndWait(clients[cc], client_name.str().c_str(),
           ClientStdOut, ClientStdErr, "started", output_to_ignore))
         {
-        this->Stop(server, "server");
-        this->Stop(renderServer, "renderserver");
+        for( std::vector<vtksysProcess*>::iterator stopIter = servers.begin();
+             stopIter != servers.end();
+             stopIter++ )
+          {
+          this->Stop(*stopIter, "server");
+          }
+        for( std::vector<vtksysProcess*>::iterator stopIter = renderServers.begin();
+             stopIter != renderServers.end();
+             stopIter++ )
+          {
+          this->Stop(*stopIter, "renderserver");
+          }
         VTK_CLEAN_PROCESSES;
         return -1;
         }
@@ -807,19 +886,31 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     // If client has died, we wait for output from the server processess
     // for this->ServerExitTimeOut, then we'll kill the servers, if needed.
     double timeout = (clientPipe)? 0.1 : this->ServerExitTimeOut;
-    output = "";
-    this->WaitForAndPrintLine("server", server, output, timeout,
-                              ServerStdOut, ServerStdErr, 0);
-    if(!mpiError && this->OutputStringHasError("server", output))
+
+    for( std::vector<vtksysProcess*>::iterator waitIter = servers.begin();
+         waitIter != servers.end();
+         waitIter++ )
       {
-      mpiError = 1;
+      output = "";
+      this->WaitForAndPrintLine("server", *waitIter, output, timeout,
+                                ServerStdOut, ServerStdErr, 0);
+      if(!mpiError && this->OutputStringHasError("server", output))
+        {
+        mpiError = 1;
+        }
       }
-    output = "";
-    this->WaitForAndPrintLine("renderserver", renderServer, output, timeout,
-                              RenderServerStdOut, RenderServerStdErr, 0);
-    if(!mpiError && this->OutputStringHasError("renderserver", output))
+
+    for( std::vector<vtksysProcess*>::iterator waitIter = servers.begin();
+         waitIter != servers.end();
+         waitIter++ )
       {
-      mpiError = 1;
+      output = "";
+      this->WaitForAndPrintLine("renderserver", *waitIter, output, timeout,
+                                RenderServerStdOut, RenderServerStdErr, 0);
+      if(!mpiError && this->OutputStringHasError("renderserver", output))
+        {
+        mpiError = 1;
+        }
       }
     output = "";
     }
@@ -834,13 +925,17 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   // must finish quickly. If not, is usually is a sign that
   // the client crashed/exited before it attempted to connect to 
   // the server.
-  if(server)
+  for( std::vector<vtksysProcess*>::iterator exitIter = servers.begin();
+       exitIter != servers.end();
+       exitIter++ )
     {
-    vtksysProcess_WaitForExit(server, &this->ServerExitTimeOut);
+    vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
-  if(renderServer)
+  for( std::vector<vtksysProcess*>::iterator exitIter = renderServers.begin();
+       exitIter != renderServers.end();
+       exitIter++ )
     {
-    vtksysProcess_WaitForExit(renderServer, &this->ServerExitTimeOut);
+    vtksysProcess_WaitForExit(*exitIter, &this->ServerExitTimeOut);
     }
 #ifdef PV_TEST_CLEAN_COMMAND
   // If any executable did not exit properly, run a user-specified
@@ -865,16 +960,20 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
     clientResult |= cur_result;
     }
   int serverResult = 0;
-  if(server)
+  for( std::vector<vtksysProcess*>::iterator killIter = servers.begin();
+       killIter != servers.end();
+       killIter++ )
     {
-    this->ReportStatus(server, "server");
-    vtksysProcess_Kill(server);
+    serverResult += this->ReportStatus(*killIter, "server");
+    vtksysProcess_Kill(*killIter);
     }
   int renderServerResult = 0;
-  if(renderServer)
+  for( std::vector<vtksysProcess*>::iterator killIter = renderServers.begin();
+       killIter != renderServers.end();
+       killIter++ )
     {
-    renderServerResult = this->ReportStatus(renderServer, "renderserver");
-    vtksysProcess_Kill(renderServer);
+    renderServerResult += this->ReportStatus(*killIter, "renderserver");
+    vtksysProcess_Kill(*killIter);
     }
 
   // Free process managers.
@@ -1187,8 +1286,7 @@ bool vtkSMTestDriver::SetupClient(
     if (!this->ReverseConnection && !this->ServerURL.empty())
       {
       // push-back server url, if present.
-      clientCommand.pop_back(); // since the list is NULL terminated.
-      clientCommand.push_back(this->ServerURL.c_str());
+      clientCommand.insert(++clientCommand.begin(), this->ServerURL.c_str());
       clientCommand.push_back(NULL);
       }
     this->ReportCommand(&clientCommand[0], "client");

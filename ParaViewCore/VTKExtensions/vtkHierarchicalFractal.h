@@ -113,7 +113,7 @@ protected:
   int TimeStepRange[2];
 
   // Convenience method.
-  unsigned int AppedDataSetToLevel(vtkCompositeDataSet* composite,
+  unsigned int AppendDataSetToLevel(vtkCompositeDataSet* composite,
     unsigned int level, int extents[6], vtkDataSet* ds);
 
   // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on

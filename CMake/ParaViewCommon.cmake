@@ -400,7 +400,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
-SET(kits Common Charts Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering Widgets)
+SET(kits Common AMR Charts Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering Widgets)
 FOREACH(kit ${kits})
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
     ${ParaView_SOURCE_DIR}/VTK/${kit}

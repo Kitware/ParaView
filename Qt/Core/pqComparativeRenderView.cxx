@@ -299,9 +299,7 @@ vtkImageData* pqComparativeRenderView::captureImage(int magnification)
   // Allocate final image data
   vtkImageData * finalImage = vtkImageData::New();
   finalImage->SetDimensions(finalImageSize[0], finalImageSize[1], 1);
-  finalImage->SetScalarTypeToUnsignedChar();
-  finalImage->SetNumberOfScalarComponents(3);
-  finalImage->AllocateScalars();
+  finalImage->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
   // Append all images together
   foreach (vtkImageData * image, images)

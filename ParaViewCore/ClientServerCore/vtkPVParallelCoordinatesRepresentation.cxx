@@ -25,6 +25,7 @@
 vtkStandardNewMacro(vtkPVParallelCoordinatesRepresentation);
 //----------------------------------------------------------------------------
 vtkPVParallelCoordinatesRepresentation::vtkPVParallelCoordinatesRepresentation()
+  : NumberOfColumns(0)
 {
 }
 
@@ -40,6 +41,26 @@ void vtkPVParallelCoordinatesRepresentation::PrintSelf(ostream& os, vtkIndent in
 }
 
 //----------------------------------------------------------------------------
+bool vtkPVParallelCoordinatesRepresentation::NumberOfColumnsChanged()
+{
+  // I don't think this function should stay around long, column visibility
+  // should be set according to the properties ParaView stores and shows in the
+  // display panel.
+  if (this->GetLocalOutput())
+    {
+    vtkIdType n = this->GetLocalOutput()->GetNumberOfColumns();
+    bool changed = n != this->NumberOfColumns;
+    this->NumberOfColumns = n;
+    if (this->GetChart() && changed)
+      {
+      this->GetChart()->SetColumnVisibilityAll(true);
+      }
+    return changed;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 {
   if (!this->Superclass::AddToView(view))
@@ -47,15 +68,12 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
     return false;
     }
 
-  std::cout << "pc table: ";
-  this->GetLocalOutput()->Print(std::cout);
-  std::cout << "num cols: " << this->GetLocalOutput()->GetNumberOfColumns() << std::endl;
-
   if (this->GetChart())
     {
     // Set the table, in case it has changed.
-    this->GetChart()->GetPlot(0)->SetInput(this->GetLocalOutput());
+    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
     this->GetChart()->SetVisible(this->GetVisibility());
+    this->NumberOfColumnsChanged();
     }
 
   return true;
@@ -66,8 +84,9 @@ bool vtkPVParallelCoordinatesRepresentation::RemoveFromView(vtkView* view)
 {
   if (this->GetChart())
     {
-    this->GetChart()->GetPlot(0)->SetInput(0);
+    this->GetChart()->GetPlot(0)->SetInputData(0);
     this->GetChart()->SetVisible(false);
+    this->NumberOfColumns = 0;
     }
   return this->Superclass::RemoveFromView(view);
 }
@@ -92,23 +111,6 @@ void vtkPVParallelCoordinatesRepresentation::SetVisibility(bool visible)
     {
     this->GetChart()->SetVisible(visible);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetSeriesVisibility(
-    const char* name, int visible)
-{
-  if (this->GetChart())
-    {
-    this->GetChart()->SetColumnVisibility(name, visible != 0);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVParallelCoordinatesRepresentation::SetLabel(const char*,
-                                                           const char*)
-{
-
 }
 
 //----------------------------------------------------------------------------
@@ -159,13 +161,10 @@ int vtkPVParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
 
   if (this->GetChart())
     {
-    //vtkSelection *sel =
-    //  vtkSelection::SafeDownCast(this->SelectionRepresentation->GetOutput());
-    //this->AnnLink->SetCurrentSelection(sel);
-    //this->GetChart()->SetAnnotationLink(AnnLink);
-
     // Set the table, in case it has changed.
-    this->GetChart()->GetPlot(0)->SetInput(this->GetLocalOutput());
+    // FIXME: This causes us to do more work that we should here.
+    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
+    this->NumberOfColumnsChanged();
     }
 
   return 1;

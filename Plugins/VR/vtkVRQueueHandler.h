@@ -73,6 +73,7 @@ protected slots:
 
 private:
   Q_DISABLE_COPY(vtkVRQueueHandler);
+  void render();
   class pqInternals;
   pqInternals* Internals;
 };

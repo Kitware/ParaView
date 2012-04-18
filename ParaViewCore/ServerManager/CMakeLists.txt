@@ -36,6 +36,7 @@ SET (Kit_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxRepresentationProxy.cxx
+#  vtkSMCacheBasedProxyLocator.cxx
   vtkSMCameraConfigurationReader.cxx
   vtkSMCameraConfigurationWriter.cxx
   vtkSMCameraLink.cxx
@@ -292,6 +293,49 @@ ADD_CUSTOM_COMMAND(
   ARGS ${min_init_writer} ${PARAVIEW_MINIMAL_BUILD_CLASS_FILE} ${MIN_INIT_SRC}
   COMMENT "generating ${MIN_INIT_SRC}")
 ENDIF(PARAVIEW_MINIMAL_BUILD)
+
+SET(GUI_CONFIG_FILES
+  ParaViewSources
+  ParaViewFilters
+  ParaViewReaders
+  ParaViewWriters
+)
+
+#IF(NOT CMAKE_CROSSCOMPILING)
+#  add_executable_with_forwarding(PV_EXE_SUFFIX
+#    vtkSMExtractDocumentation vtkSMExtractDocumentation.cxx)
+#  TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager )
+#  EXPORT(TARGETS vtkSMExtractDocumentation${PV_EXE_SUFFIX} FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
+#ENDIF(NOT CMAKE_CROSSCOMPILING)
+
+# FIXME: DUDE! Dependency on Qt code in ServerManager!!!!
+
+#CONFIGURE_FILE(${ParaView_CMAKE_DIR}/ExecuteSMExtractDocumentation.cmake.in
+#  ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+#  @ONLY)
+
+FOREACH(gcf ${GUI_CONFIG_FILES})
+  SET(fullXMLFile ${ParaView_SOURCE_DIR}/Applications/ParaView/${gcf}.xml)
+  SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
+
+  # run the following cmake script so that we can set the runtime path for Qt when executing
+  # SMExtractDocumentation during the build.
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${fullHTMLFile}
+    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
+    COMMAND ${CMAKE_COMMAND}
+    ARGS -DfullXMLFile=${fullXMLFile} -DOutDir=${CMAKE_CFG_INTDIR} -P ${ParaView_BINARY_DIR}/CMake/ExecuteSMExtractDocumentation.cmake
+    COMMENT "Creating Documentation for ${gcf}"
+    )
+
+  SET(HTML_RESULTS ${HTML_RESULTS} ${fullHTMLFile})
+ENDFOREACH(gcf)
+
+ADD_CUSTOM_TARGET(HTMLDocumentation
+  DEPENDS ${HTML_RESULTS}
+)
+SET (HTMLDocumentation_FILES ${HTML_RESULTS} CACHE INTERNAL
+  "HTMLDocumentation files generated from ServerManager")
 
 # including MINI_INIT -nix
 # SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS

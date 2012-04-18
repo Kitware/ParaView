@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqSMProxy.h" //needed for pqSMProxy.
 
-class QTimer;
+class pqTimer;
 
 /// pqRenderViewBase is an abstract base class for all render-view based views.
 /// It encapuslates some of the commonly needed functionality for all such
@@ -197,7 +197,7 @@ private:
 
   class pqInternal;
   pqInternal* Internal;
-  QTimer* InteractiveDelayUpdateTimer;
+  pqTimer* InteractiveDelayUpdateTimer;
 };
 
 #endif

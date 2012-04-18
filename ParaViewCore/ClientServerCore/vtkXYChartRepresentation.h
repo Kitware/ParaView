@@ -22,6 +22,7 @@
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;
+class vtkXYChartNamedOptions;
 
 class VTK_EXPORT vtkXYChartRepresentation : public vtkChartRepresentation
 {
@@ -29,6 +30,11 @@ public:
   static vtkXYChartRepresentation* New();
   vtkTypeMacro(vtkXYChartRepresentation, vtkChartRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Set the options object. This must be done before any other state is
+  // updated.
+  void SetOptions(vtkChartNamedOptions *);
 
   // Description:
   // Provides access to the underlying VTK representation.
@@ -57,6 +63,7 @@ protected:
   vtkXYChartRepresentation();
   ~vtkXYChartRepresentation();
 
+  vtkXYChartNamedOptions *XYOptions;
   // vtkDataRepresentation* SelectionRepresentation;
 
 private:

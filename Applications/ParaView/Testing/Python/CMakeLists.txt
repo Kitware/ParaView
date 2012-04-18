@@ -80,3 +80,12 @@ IF (PARAVIEW_DATA_ROOT)
 # TODO: remote rendering tests and reverse connect tests.
 
 ENDIF (PARAVIEW_DATA_ROOT)
+
+# Python Multi-servers test
+add_test("py-multi-servers.TestMultiServersConfig"
+    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+    --test-multi-servers 2
+    --server ${PARAVIEW_SERVER_EXECUTABLE}
+    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersConfig.py
+)

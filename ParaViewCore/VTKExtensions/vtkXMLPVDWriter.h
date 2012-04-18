@@ -55,7 +55,7 @@ public:
   
   // Description:
   // Add an input of this algorithm.
-  void AddInput(vtkDataObject *);
+  void AddInputData(vtkDataObject *);
 
   // Description:
   // Get/Set whether this instance will write the main collection

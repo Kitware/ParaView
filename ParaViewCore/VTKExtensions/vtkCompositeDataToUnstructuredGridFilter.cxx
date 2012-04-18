@@ -120,7 +120,7 @@ void vtkCompositeDataToUnstructuredGridFilter::ExecuteSubTree(
       vtkDataSet::SafeDownCast(iter2->GetCurrentDataObject());
     if (curDS)
       {
-      appender->AddInput(curDS);
+      appender->AddInputData(curDS);
       }
     }
   iter2->Delete();
@@ -132,7 +132,7 @@ void vtkCompositeDataToUnstructuredGridFilter::AddDataSet(
 {
   vtkDataSet* clone = ds->NewInstance();
   clone->ShallowCopy(ds);
-  appender->AddInput(clone);
+  appender->AddInputData(clone);
   clone->Delete();
 }
 
@@ -153,7 +153,7 @@ void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
   vtkUnstructuredGrid* clone = vtkUnstructuredGrid::New();
   clone->ShallowCopy(data);
   vtkCleanArrays* cleaner = vtkCleanArrays::New();
-  cleaner->SetInput(clone);
+  cleaner->SetInputData(clone);
   cleaner->Update();
   data->ShallowCopy(cleaner->GetOutput());
   cleaner->Delete();

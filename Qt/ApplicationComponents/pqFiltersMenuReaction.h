@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqFiltersMenuReaction_h
 
 #include <QObject>
-#include <QTimer>
 
 #include "pqApplicationComponentsExport.h"
+#include "pqTimer.h"
 
 class pqPipelineSource;
 class pqProxyGroupMenuManager;
@@ -70,7 +70,7 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqFiltersMenuReaction)
 
-  QTimer Timer;
+  pqTimer Timer;
 };
 
 #endif

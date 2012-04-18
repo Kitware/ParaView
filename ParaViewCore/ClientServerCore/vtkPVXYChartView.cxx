@@ -316,22 +316,29 @@ void vtkPVXYChartView::SetAxisLabelPrecision(int index, int precision)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisBehavior(int index, int behavior)
+void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
 {
   if (this->Chart)
     {
-    this->Chart->GetAxis(index)->SetBehavior(behavior);
+    vtkAxis* axis = this->Chart->GetAxis(index);
+    axis->SetBehavior(vtkAxis::FIXED);
+    axis->SetMinimum(min);
+    axis->SetMaximum(max);
     this->Chart->RecalculateBounds();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
+void vtkPVXYChartView::UnsetAxisRange(int index)
 {
-  if (this->Chart && this->Chart->GetAxis(index)->GetBehavior() > 0)
+  if (this->Chart)
     {
-    this->Chart->GetAxis(index)->SetMinimum(min);
-    this->Chart->GetAxis(index)->SetMaximum(max);
+    vtkAxis* axis = this->Chart->GetAxis(index);
+    axis->SetBehavior(vtkAxis::AUTO);
+
+    // we set some random min and max so we can notice them when they get used.
+    axis->SetMinimum(0.0);
+    axis->SetMaximum(6.66);
     this->Chart->RecalculateBounds();
     }
 }

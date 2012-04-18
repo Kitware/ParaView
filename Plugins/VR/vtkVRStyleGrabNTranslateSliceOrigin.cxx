@@ -208,7 +208,6 @@ bool vtkVRStyleGrabNTranslateSliceOrigin::update()
       {
       this->Proxy->UpdateVTKObjects();
       proxy->UpdateVTKObjects();
-      proxy->StillRender();
       }
     }
   return false;

@@ -115,6 +115,11 @@ public slots:
   /// cleans up the layout.
   void reset();
 
+  /// destroys each of the views present in this layout.
+  /// Useful when user closes the frame expecting that all containing views are
+  /// destroyed.
+  void destroyAllViews();
+
 protected slots:
   /// Slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called

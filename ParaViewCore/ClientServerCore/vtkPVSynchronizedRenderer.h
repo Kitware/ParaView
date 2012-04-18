@@ -29,6 +29,7 @@ class vtkPVSession;
 class vtkRenderer;
 class vtkRenderPass;
 class vtkSynchronizedRenderers;
+class vtkOpenGLRenderer;
 
 class VTK_EXPORT vtkPVSynchronizedRenderer : public vtkObject
 {
@@ -135,7 +136,7 @@ protected:
   bool Enabled;
   bool DisableIceT;
   int ImageReductionFactor;
-  vtkRenderer* Renderer;
+  vtkOpenGLRenderer* Renderer;
 
   bool UseDepthBuffer;
 private:

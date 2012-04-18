@@ -66,8 +66,8 @@ public slots:
   void setRepresentation(pqDataRepresentation *display);
 
 protected:
-  virtual void showEvent(QShowEvent *e);
-  virtual void hideEvent(QHideEvent *e);
+//  virtual void showEvent(QShowEvent *e);
+//  virtual void hideEvent(QHideEvent *e);
 
 private slots:
   void updateColors();
@@ -157,8 +157,8 @@ private:
   void initTransferFunctionView();
   vtkColorTransferFunction* currentColorFunction();
   vtkPiecewiseFunction* currentOpacityFunction();
-  void addRepClientColorFunction();
-  void addRepClientOpacityFunction();
+  void updateColorFunctionVisibility();
+  void updateOpacityFunctionVisibility();
   bool internalScalarRange(double* range);
   void renderTransferFunctionViews();
   void unsetCurrentPoints();

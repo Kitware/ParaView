@@ -57,7 +57,8 @@ class vtkCellData;
 class vtkDataArray;
 class vtkDataArraySelection;
 class vtkDataSetAttributes;
-class vtkHierarchicalBoxDataSet;
+//class vtkHierarchicalBoxDataSet;
+class vtkNonOverlappingAMR;
 class vtkMultiBlockDataSet;
 class vtkMultiProcessController;
 class vtkRectilinearGrid;
@@ -72,7 +73,7 @@ public:
   static vtkSpyPlotReader* New();
   vtkTypeMacro(vtkSpyPlotReader,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  void PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myProcId);
+  void PrintBlockList(vtkNonOverlappingAMR *hbds, int myProcId);
 
   // Description:
   // Get and set the file name. It is either the name of the case file or the
@@ -210,7 +211,7 @@ protected:
   void SetGlobalMinLevelAndSpacing(vtkSpyPlotBlockIterator *biter);
 
   // Set things up to process an AMR Block
-  int PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
+  int PrepareAMRData(vtkNonOverlappingAMR *hb,
                      vtkSpyPlotBlock *block, 
                      int *level,
                      int extents[6],
@@ -246,7 +247,7 @@ protected:
   // The array selections.
   vtkDataArraySelection *CellDataArraySelection;
 
-  // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
+  // Create either vtkNonOverlappingAMR or vtkMultiBlockDataSet based on
   // whether the dataset is AMR.
   virtual int RequestDataObject(vtkInformation *req,
     vtkInformationVector **inV,
@@ -279,7 +280,7 @@ protected:
 
   void AddGhostLevelArray(int numLevels);
   int AddBlockIdArray(vtkCompositeDataSet *cds);
-  int AddAttributes(vtkHierarchicalBoxDataSet *hbds);
+  int AddAttributes(vtkNonOverlappingAMR *hbds);
   int AddActiveBlockArray(vtkCellData *cd,vtkIdType nCells,unsigned char status);
 
   // Have all the readers have the same global level structure

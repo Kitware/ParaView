@@ -79,6 +79,7 @@ vtkPVOptions::vtkPVOptions()
   this->DataServerPort = 11111;
   this->RenderServerPort = 22221;
   this->RenderNodePort = 0;  // this means pick a random port
+  this->ServerURL = 0;
 
   this->ReverseConnection = 0;
   this->UseSoftwareRendering = 0;
@@ -118,6 +119,7 @@ vtkPVOptions::~vtkPVOptions()
   this->SetLogFileName(0);
   this->SetStereoType(0);
   this->SetParaViewDataName(0);
+  this->SetServerURL(0);
 }
 
 //----------------------------------------------------------------------------
@@ -188,6 +190,13 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER
                     | vtkPVOptions::PVSERVER | vtkPVOptions::PARAVIEW);
   */
+
+  this->AddArgument("--server-url", "-url",
+                    &this->ServerURL,
+                    "Set the server-url to connect with when the client starts. "
+                    "--server (-s) option supersedes this option, hence one should only use "
+                    "one of the two options.",
+                    vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
 
   this->AddArgument("--connect-id", 0, &this->ConnectID,
                     "Set the ID of the server and client to make sure they match.",
@@ -501,4 +510,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LogFileName: "
     << (this->LogFileName? this->LogFileName : "(none)") << endl;
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
+  os << indent << "ServerURL: "
+     << (this->ServerURL? this->ServerURL : "(none)") << endl;
 }

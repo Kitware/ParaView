@@ -33,9 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqAlwaysConnectedBehavior_h
 
 #include <QObject>
-#include <QTimer>
+
 #include "pqApplicationComponentsExport.h"
 #include "pqServerResource.h"
+#include "pqTimer.h"
 
 /// @ingroup Behaviors
 /// pqAlwaysConnectedBehavior ensures that the client always remains connected
@@ -60,7 +61,7 @@ protected slots:
 
 protected:
   pqServerResource DefaultServer;
-  QTimer Timer;
+  pqTimer Timer;
 private:
   Q_DISABLE_COPY(pqAlwaysConnectedBehavior)
 };

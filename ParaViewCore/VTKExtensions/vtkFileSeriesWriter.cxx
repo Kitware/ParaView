@@ -212,10 +212,13 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
     trivialProducer->SetWholeExtent(extent);
     trivialProducer->GatherExtents();
 
-    clone->GetInformation()->Set(
-      vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
+//     clone->GetInformation()->Set(
+//       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
     }
-  this->Writer->SetInputConnection(clone->GetProducerPort());
+  vtkTrivialProducer* tp  = vtkTrivialProducer::New();
+  tp->SetOutput(clone);
+  this->Writer->SetInputConnection(tp->GetOutputPort());
+  tp->Delete();
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();
   this->Writer->SetInputConnection(0);
