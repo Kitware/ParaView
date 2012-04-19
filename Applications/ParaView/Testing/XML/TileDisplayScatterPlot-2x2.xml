@@ -10,9 +10,9 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,11,13,/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,11,13,/0:0/0:1" />
 
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2_0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2_0.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2_1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2_1.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2_2.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2_2.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2_3.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2_3.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2-tile_0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2-tile_0.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2-tile_1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2-tile_1.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2-tile_2.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2-tile_2.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplayScatterPlot-2x2-tile_3.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplayScatterPlot-2x2-tile_3.png" />
 
 </pqevents>

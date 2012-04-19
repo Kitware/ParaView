@@ -252,7 +252,7 @@ void vtkTileDisplayHelper::SetDumpImagePath(const char* newPath)
           1;
 
     vtksys_ios::ostringstream fullPath;
-    fullPath << newPath << "_" << pid << ".png";
+    fullPath << newPath << "-tile_" << pid << ".png";
     vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = fullPath.str();
     }
 }
