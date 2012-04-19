@@ -60,8 +60,8 @@ struct vtkVRConnectionManager::pqInternals
 #endif
 #ifdef PARAVIEW_USE_VRUI
   QList<QPointer<vtkVRUIConnection> > VRUIConnections;
-  QPointer<vtkVRQueue> Queue;
 #endif
+  QPointer<vtkVRQueue> Queue;
 };
 
 // -----------------------------------------------------------------------cnstr
