@@ -178,7 +178,7 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
 
 
   MATH(EXPR REQUIRED_CPU '${tdx}*${tdy}-1') # -1 is for LESS
-  if (${REQUIRED_CPU} LESS ${MPIEXEC_MAX_NUMPROCS} AND ${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+  if (${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
     foreach (test_script ${ACT_TEST_SCRIPTS})
 
       get_filename_component(test_name ${test_script} NAME_WE)
@@ -206,5 +206,5 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
         message(STATUS "Running in serial \"${prefix}.${test_name}\"")
       endif (${test_name}_FORCE_SERIAL)
     endforeach(test_script)
-  endif(${REQUIRED_CPU} LESS ${MPIEXEC_MAX_NUMPROCS} AND ${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+  endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
 ENDFUNCTION (add_tile_display_tests)
