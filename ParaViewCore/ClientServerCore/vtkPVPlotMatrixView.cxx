@@ -31,6 +31,9 @@ vtkPVPlotMatrixView::vtkPVPlotMatrixView()
   this->PlotMatrix->AddObserver(
     vtkCommand::SelectionChangedEvent, this,
     &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
+  this->PlotMatrix->AddObserver(
+    vtkCommand::AnnotationChangedEvent, this,
+    &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
 
   this->ContextView->GetScene()->AddItem(this->PlotMatrix);
 }
@@ -51,8 +54,35 @@ vtkAbstractContextItem* vtkPVPlotMatrixView::GetContextItem()
 void vtkPVPlotMatrixView::PlotMatrixSelectionCallback(vtkObject*,
   unsigned long event, void*)
 {
-  // forward the SelectionChangedEvent
+  // forward the SelectionChangedEvent and InteractionEvent
   this->InvokeEvent(event);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetActivePlot(int i, int j)
+{
+  if (this->PlotMatrix)
+    {
+    this->PlotMatrix->SetActivePlot(vtkVector2i(i, j));
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetActiveRow()
+{
+  if (this->PlotMatrix)
+    {
+    return this->PlotMatrix->GetActivePlot().X();
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVPlotMatrixView::GetActiveColumn()
+{
+  if (this->PlotMatrix)
+    {
+    return this->PlotMatrix->GetActivePlot().Y();
+    }
 }
 
 //----------------------------------------------------------------------------
