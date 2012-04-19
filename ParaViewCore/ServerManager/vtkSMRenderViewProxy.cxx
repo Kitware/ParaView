@@ -26,6 +26,8 @@
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -35,11 +37,13 @@
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPointData.h"
-#include "vtkProcessModule.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMDataDeliveryManagerProxy.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
@@ -49,9 +53,6 @@
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
 #include "vtkTransform.h"
 #include "vtkWeakPointer.h"
 #include "vtkWindowToImageFilter.h"
@@ -60,6 +61,7 @@
 
 namespace
 {
+
   bool vtkIsImageEmpty(vtkImageData* image)
     {
     vtkDataArray* scalars = image->GetPointData()->GetScalars();
@@ -108,6 +110,8 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
 {
   this->IsSelectionCached = false;
   this->NewMasterObserverId = 0;
+  this->DeliveryManager = NULL;
+  this->NeedsUpdateLOD = false;
 }
 
 //----------------------------------------------------------------------------
@@ -119,6 +123,12 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
     this->Session->GetCollaborationManager()->RemoveObserver(
           this->NewMasterObserverId);
     this->NewMasterObserverId = 0;
+    }
+
+  if (this->DeliveryManager)
+    {
+    this->DeliveryManager->Delete();
+    this->DeliveryManager = NULL;
     }
 }
 
@@ -193,6 +203,55 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 const char* vtkSMRenderViewProxy::IsSelectVisiblePointsAvailable()
 {
   return this->IsSelectVisibleCellsAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::Update()
+{
+  this->NeedsUpdateLOD = this->NeedsUpdate;
+  this->Superclass::Update();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::UpdateLOD()
+{
+  if (this->ObjectsCreated && this->NeedsUpdateLOD)
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this)
+           << "UpdateLOD"
+           << vtkClientServerStream::End;
+    this->GetSession()->PrepareProgress();
+    this->ExecuteStream(stream);
+    this->GetSession()->CleanupPendingProgress();
+   
+    this->NeedsUpdateLOD = false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
+{
+  this->Superclass::PreRender(interactive);
+
+  vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+    this->GetClientSideObject());
+  assert(rv != NULL);
+
+  if (interactive && rv->GetUseLODForInteractiveRender())
+    {
+    // for interactive renders, we need to determine if we are going to use LOD.
+    // If so, we may need to update the LOD geometries.
+    this->UpdateLOD();
+    }
+
+  // if async delivery is not enabled, then we deliver explicitly before every
+  // render.
+  this->DeliveryManager->Deliver(interactive);
+
+  return interactive? rv->GetInteractiveRenderProcesses():
+    rv->GetStillRenderProcesses();
 }
 
 //-----------------------------------------------------------------------------
@@ -350,6 +409,16 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     this->NewMasterObserverId =
         this->Session->GetCollaborationManager()->AddObserver(
           vtkSMCollaborationManager::UpdateMasterUser, this, &vtkSMRenderViewProxy::NewMasterCallback);
+    }
+
+  // Setup data-delivery manager.
+  this->DeliveryManager = vtkSMDataDeliveryManagerProxy::SafeDownCast(
+    this->GetSessionProxyManager()->NewProxy(
+      "misc", "RenderViewDataDeliveryManager"));
+  if (this->DeliveryManager)
+    {
+    this->DeliveryManager->UpdateVTKObjects();
+    this->DeliveryManager->SetViewProxy(this);
     }
 }
 

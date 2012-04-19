@@ -46,8 +46,10 @@ SET (Kit_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkInitializationHelper.cxx
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
+  vtkPVDataDeliveryManager.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
   vtkPVMultiServerDataSource.cxx
+  vtkPVRenderViewDataDeliveryManager.cxx
   vtkPVRepresentationAnimationHelper.cxx
   vtkPVServerSideAnimationPlayer.cxx
   vtkSMAnimationScene.cxx
@@ -78,6 +80,7 @@ SET (Kit_SRCS
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
+  vtkSMDataDeliveryManagerProxy.cxx
   vtkSMDataSourceProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
@@ -195,6 +198,7 @@ SET( ServerManager_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
+  vtkPVDataDeliveryManager.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMDeserializer.cxx
   vtkSMDomain.cxx

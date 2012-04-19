@@ -62,6 +62,7 @@ class vtkPVSynchronizedRenderWindows;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
+class vtkRepresentedDataStorage;
 class vtkTexture;
 
 class VTK_EXPORT vtkPVRenderView : public vtkPVView
@@ -238,7 +239,6 @@ public:
   vtkBooleanMacro(UseLightKit, bool);
 
   static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
-  static vtkInformationObjectBaseKey* REPRESENTED_LOD_DATA_STORE();
 
   // Description:
   // vtkDataRepresentation can use this key to publish meta-data about geometry
@@ -381,6 +381,10 @@ public:
     vtkPVDataRepresentation* repr, vtkDataObject* data);
   static vtkAlgorithmOutput* GetPieceProducerLOD(vtkInformation* info,
     vtkPVDataRepresentation* repr);
+  static void SetDeliverToAllProcesses(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
+  static void SetDeliverLODToAllProcesses(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
 
 public:
   //*****************************************************************
@@ -468,7 +472,53 @@ public:
   // here.
   virtual void Update();
 
+  // Description:
+  // Asks representations to update their LOD geometries.
+  virtual void UpdateLOD();
+
+  // Description:
+  // Returns whether the view will use LOD rendering for the next
+  // InteractiveRender() call based on the geometry sizes determined by the most
+  // recent call to Update().
+  vtkGetMacro(UseLODForInteractiveRender, bool);
+
+  // Description:
+  // Returns whether the view will use outline boxes for the next
+  // InteractiveRender() call based on the geometry sizes determined by the most
+  // recent call to Update().
+  vtkGetMacro(UseOutlineForInteractiveRender, bool);
+
+  // Description:
+  // Returns whether the view will use distributed rendering for the next
+  // StillRender() call based on the geometry sizes determined by the most
+  // recent call to Update().
+  vtkGetMacro(UseDistributedRenderingForStillRender, bool);
+
+  // Description:
+  // Returns whether the view will use distributed rendering for the next
+  // InteractiveRender() call based on the geometry sizes determined by the most
+  // recent calls to Update() and UpdateLOD().
+  vtkGetMacro(UseDistributedRenderingForInteractiveRender, bool);
+
+  // Description:
+  // Returns the processes (vtkPVSession::ServerFlags) that are to be involved
+  // in the next StillRender() call based on the decisions made during the most
+  // recent Update().
+  vtkGetMacro(StillRenderProcesses, vtkTypeUInt32);
+
+  // Description:
+  // Returns the processes (vtkPVSession::ServerFlags) that are to be involved
+  // in the next InteractiveRender() call based on the decisions made during the most
+  // recent Update() and UpdateLOD().
+  vtkGetMacro(InteractiveRenderProcesses, vtkTypeUInt32);
+
+  // Description:
+  // Returns the data distribution mode to use.
+  int GetDataDistributionMode(bool use_remote_rendering);
+
 //BTX
+  vtkRepresentedDataStorage* GetGeometryStore();
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -495,30 +545,18 @@ protected:
   virtual void Render(bool interactive, bool skip_rendering);
 
   // Description:
-  // Does data-delivery to the rendering nodes.
-  virtual void DoDataDelivery(bool using_lod_rendering, bool using_remote_rendering);
+  // Returns true if distributed rendering should be used based on the geometry
+  // size.
+  bool ShouldUseDistributedRendering(double geometry_size);
 
   // Description:
-  // Calls vtkView::REQUEST_INFORMATION() on all representations
-  virtual void GatherRepresentationInformation();
-
-  // Description:
-  // Sychronizes the geometry size information on all nodes.
-  // @CallOnAllProcessess
-  void GatherGeometrySizeInformation();
+  // Returns true if LOD rendering should be used based on the geometry size.
+  bool ShouldUseLODRendering(double geometry);
 
   // Description:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
   void GatherBoundsInformation(bool using_remote_rendering);
-
-  // Description:
-  // Returns true if distributed rendering should be used.
-  bool GetUseDistributedRendering();
-
-  // Description:
-  // Returns true if LOD rendering should be used.
-  bool GetUseLODRendering();
 
   // Description:
   // Returns true when ordered compositing is needed on the current group of
@@ -528,18 +566,6 @@ protected:
   // \li true on pvserver or renderserver if opacity < 1 or volume present, else
   //     false
   bool GetUseOrderedCompositing();
-
-  // Description:
-  // Returns true if outline should be delivered to client.
-  bool GetDeliverOutlineToClient();
-
-  // Description:
-  // Update the request to enable/disable distributed rendering.
-  void SetRequestDistributedRendering(bool);
-
-  // Description:
-  // Update the request to enable/disable low-res rendering.
-  void SetRequestLODRendering(bool);
 
   // Description:
   // Set the last selection object.
@@ -589,8 +615,6 @@ protected:
   bool CounterSynchronizedSuccessfully;
 
   // In mega-bytes.
-  double LocalGeometrySize;
-  double GeometrySize;
   double RemoteRenderingThreshold;
   double LODRenderingThreshold;
   double ClientOutlineThreshold;
@@ -603,6 +627,10 @@ protected:
   bool UseLightKit;
 
   bool UsedLODForLastRender;
+  bool UseLODForInteractiveRender;
+  bool UseOutlineForInteractiveRender;
+  bool UseDistributedRenderingForStillRender;
+  bool UseDistributedRenderingForInteractiveRender;
 
   static bool RemoteRenderingAllowed;
 
@@ -611,6 +639,9 @@ protected:
   vtkTimeStamp UpdateTime;
   vtkTimeStamp StillRenderTime;
   vtkTimeStamp InteractiveRenderTime;
+
+  vtkTypeUInt32 StillRenderProcesses;
+  vtkTypeUInt32 InteractiveRenderProcesses;
 
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented

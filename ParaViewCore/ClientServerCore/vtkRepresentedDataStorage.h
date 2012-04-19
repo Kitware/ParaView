@@ -45,11 +45,22 @@ public:
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
 
   // Description:
-  void SetPiece(vtkPVDataRepresentation*, vtkDataObject* data);
-  void RemovePiece(vtkPVDataRepresentation*);
-  vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*);
+  void SetPiece(vtkPVDataRepresentation*, vtkDataObject* data, bool low_res);
+  vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res);
+  void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res);
+
+  void SetPiece(int, vtkDataObject* data, bool low_res);
+  vtkAlgorithmOutput* GetProducer(int, bool low_res);
+
+  // Description:
+  // Returns the size for all visible geometry.
+  unsigned long GetVisibleDataSize(bool low_res);
 
 //BTX
+  class vtkInternals;
+  vtkInternals* GetInternals()
+    { return this->Internals; }
+
 protected:
   vtkRepresentedDataStorage();
   ~vtkRepresentedDataStorage();
@@ -58,7 +69,6 @@ private:
   vtkRepresentedDataStorage(const vtkRepresentedDataStorage&); // Not implemented
   void operator=(const vtkRepresentedDataStorage&); // Not implemented
 
-  class vtkInternals;
   vtkInternals* Internals;
 //ETX
 };

@@ -13,61 +13,10 @@
 
 =========================================================================*/
 #include "vtkRepresentedDataStorage.h"
+#include "vtkRepresentedDataStorageInternals.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVTrivialProducer.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkDataObject.h"
-#include "vtkPVDataRepresentation.h"
-#include "vtkCompositeRepresentation.h"
-#include "vtkSmartPointer.h"
-#include "vtkWeakPointer.h"
-
-#include <map>
-
-class vtkRepresentedDataStorage::vtkInternals
-{
-public:
-  class vtkItem
-    {
-  public:
-    vtkWeakPointer<vtkPVDataRepresentation> Representation;
-    vtkSmartPointer<vtkPVTrivialProducer> Producer;
-    vtkWeakPointer<vtkDataObject> DataObject;
-    };
-
-  vtkItem* GetItem(vtkPVDataRepresentation* repr)
-    {
-    RepresentationToIdMapType::iterator iter =
-      this->RepresentationToIdMap.find(repr);
-    if (iter != this->RepresentationToIdMap.end())
-      {
-      return &this->ItemsMap[iter->second];
-      }
-
-    ItemsMapType::iterator iter2;
-    for (iter2 = this->ItemsMap.begin();
-      iter2 != this->ItemsMap.end(); ++iter2)
-      {
-      vtkCompositeRepresentation* composite =
-        vtkCompositeRepresentation::SafeDownCast(
-          iter2->second.Representation.GetPointer());
-      if (composite && composite->GetActiveRepresentation() == repr)
-        {
-        return &iter2->second;
-        }
-      }
-    return NULL;
-    }
-
-  typedef std::map<vtkPVDataRepresentation*, int>
-    RepresentationToIdMapType;
-
-  typedef std::map<int, vtkItem> ItemsMapType;
-
-  RepresentationToIdMapType RepresentationToIdMap;
-  ItemsMapType ItemsMap;
-};
 
 vtkStandardNewMacro(vtkRepresentedDataStorage);
 //----------------------------------------------------------------------------
@@ -83,6 +32,11 @@ vtkRepresentedDataStorage::~vtkRepresentedDataStorage()
   this->Internals = 0;
 }
 
+//----------------------------------------------------------------------------
+unsigned long vtkRepresentedDataStorage::GetVisibleDataSize(bool low_res)
+{
+  return this->Internals->GetVisibleDataSize(low_res);
+}
 
 //----------------------------------------------------------------------------
 void vtkRepresentedDataStorage::RegisterRepresentation(
@@ -92,8 +46,11 @@ void vtkRepresentedDataStorage::RegisterRepresentation(
 
   vtkInternals::vtkItem item;
   item.Representation = repr;
-  item.Producer = vtkSmartPointer<vtkPVTrivialProducer>::New();
-  this->Internals->ItemsMap[id] = item;
+  this->Internals->ItemsMap[id].first = item;
+
+  vtkInternals::vtkItem item2;
+  item2.Representation = repr;
+  this->Internals->ItemsMap[id].second= item2;
 }
 
 //----------------------------------------------------------------------------
@@ -112,14 +69,29 @@ void vtkRepresentedDataStorage::UnRegisterRepresentation(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetPiece(
-  vtkPVDataRepresentation* repr, vtkDataObject* data)
+void vtkRepresentedDataStorage::SetDeliverToAllProcesses(
+  vtkPVDataRepresentation* repr, bool mode, bool low_res)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (item)
     {
-    item->DataObject = data;
-    item->Producer->SetOutput(data);
+    item->AlwaysClone = mode;
+    }
+  else
+    {
+    vtkErrorMacro("Invalid argument.");
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::SetPiece(
+  vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
+  if (item)
+    {
+    item->SetDataObject(data);
     }
   else
     {
@@ -128,31 +100,46 @@ void vtkRepresentedDataStorage::SetPiece(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::RemovePiece(vtkPVDataRepresentation* repr)
+vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
+  vtkPVDataRepresentation* repr, bool low_res)
 {
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr);
-  if (item)
-    {
-    item->DataObject = NULL;
-    item->Producer->SetOutput(NULL);
-    }
-  else
-    {
-    vtkErrorMacro("Invalid arguments.");
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(vtkPVDataRepresentation* repr)
-{
-  vtkInternals::vtkItem* item = this->Internals->GetItem(repr);
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (!item)
     {
     vtkErrorMacro("Invalid arguments.");
     return NULL;
     }
 
-  return item->Producer->GetOutputPort(0);
+  return item->GetProducer()->GetOutputPort(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::SetPiece(int id, vtkDataObject* data, bool
+  low_res)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
+  if (item)
+    {
+    item->SetDataObject(data);
+    }
+  else
+    {
+    vtkErrorMacro("Invalid argument.");
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
+  int id, bool low_res)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
+  if (!item)
+    {
+    vtkErrorMacro("Invalid arguments.");
+    return NULL;
+    }
+
+  return item->GetProducer()->GetOutputPort(0);
 }
 
 //----------------------------------------------------------------------------

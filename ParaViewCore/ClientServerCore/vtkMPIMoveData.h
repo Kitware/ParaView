@@ -66,6 +66,7 @@ public:
   void SetServerToDataServer(){this->Server=vtkMPIMoveData::DATA_SERVER;}
   void SetServerToRenderServer(){this->Server=vtkMPIMoveData::RENDER_SERVER;}
   vtkSetClampMacro(Server, int, vtkMPIMoveData::CLIENT, vtkMPIMoveData::RENDER_SERVER);
+  vtkGetMacro(Server, int);
 
   // Description:
   // Specify how the data is to be redistributed.

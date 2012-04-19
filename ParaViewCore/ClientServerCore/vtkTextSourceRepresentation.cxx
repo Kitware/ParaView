@@ -17,10 +17,10 @@
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAbstractArray.h"
 #include "vtkAbstractWidget.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointSource.h"
 #include "vtkPolyData.h"
@@ -28,7 +28,6 @@
 #include "vtkPVRenderView.h"
 #include "vtkTable.h"
 #include "vtkTextRepresentation.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkTextSourceRepresentation);
@@ -40,19 +39,10 @@ vtkTextSourceRepresentation::vtkTextSourceRepresentation()
   this->TextWidgetRepresentation = 0;
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->DataCollector = vtkUnstructuredDataDeliveryFilter::New();
-  this->DataCollector->SetOutputDataType(VTK_POLY_DATA);
-
-  vtkInformation* info = vtkInformation::New();
-  info->Set(vtkPVRenderView::DATA_DISTRIBUTION_MODE(),
-    vtkMPIMoveData::CLONE);
-  this->DataCollector->ProcessViewRequest(info);
-  info->Delete();
 
   vtkPointSource* source = vtkPointSource::New();
   source->SetNumberOfPoints(1);
   source->Update();
-
   this->DummyPolyData = vtkPolyData::New();
   this->DummyPolyData->ShallowCopy(source->GetOutputDataObject(0));
   source->Delete();
@@ -64,7 +54,6 @@ vtkTextSourceRepresentation::vtkTextSourceRepresentation()
 vtkTextSourceRepresentation::~vtkTextSourceRepresentation()
 {
   this->SetTextWidgetRepresentation(0);
-  this->DataCollector->Delete();
   this->DummyPolyData->Delete();
   this->CacheKeeper->Delete();
 }
@@ -140,8 +129,6 @@ int vtkTextSourceRepresentation::RequestData(
   vtkInformation* request, vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  this->DataCollector->Modified();
-
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -156,12 +143,9 @@ int vtkTextSourceRepresentation::RequestData(
         this->DummyPolyData->GetFieldData()->ShallowCopy(input->GetRowData());
         }
       }
-    this->DataCollector->SetInputConnection(this->CacheKeeper->GetOutputPort());
     }
-  else
-    {
-    this->DataCollector->RemoveAllInputs();
-    }
+
+  this->CacheKeeper->Update();
 
   // It is tempting to try to do the data delivery in RequestData() itself.
   // However, whenever a representation updates, ParaView GUI may have some
@@ -176,31 +160,30 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
   vtkInformation* inInfo, vtkInformation* outInfo)
 {
-  if (!this->GetVisibility())
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    return false;
+    // i.e. this->GetVisibility() == false, hence nothing to do.
+    return 0;
     }
 
-  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-
-    if (this->DeliveryTimeStamp < this->DataCollector->GetMTime())
-      {
-      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-      }
+    vtkPVRenderView::SetPiece(inInfo, this, 
+      this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
     }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+  else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    this->DataCollector->Modified();
-    this->DataCollector->Update();
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
 
     // since there's no direct connection between the mapper and the collector,
     // we don't put an update-suppressor in the pipeline.
 
     std::string text;
-
     vtkFieldData* fieldData =
-      this->DataCollector->GetOutputDataObject(0)->GetFieldData();
+      producerPort->GetProducer()->GetOutputDataObject(
+        producerPort->GetIndex())->GetFieldData();
+
     vtkAbstractArray* array = fieldData->GetAbstractArray(0);
     if (array && array->GetNumberOfTuples() > 0)
       {
@@ -214,10 +197,9 @@ int vtkTextSourceRepresentation::ProcessViewRequest(
       {
       repr->SetText(text.c_str());
       }
-    this->DeliveryTimeStamp.Modified();
     }
 
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  return 1;
 }
 
 

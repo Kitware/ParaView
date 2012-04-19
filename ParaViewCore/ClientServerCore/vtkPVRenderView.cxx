@@ -85,7 +85,6 @@ public:
     }
 
   vtkNew<vtkRepresentedDataStorage> GeometryStore;
-  vtkNew<vtkRepresentedDataStorage> LODGeometryStore;
 };
 
 
@@ -107,7 +106,6 @@ vtkInformationKeyMacro(vtkPVRenderView, REDISTRIBUTABLE_DATA_PRODUCER, ObjectBas
 vtkInformationKeyMacro(vtkPVRenderView, KD_TREE, ObjectBase);
 vtkInformationKeyMacro(vtkPVRenderView, NEEDS_DELIVERY, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REPRESENTED_DATA_STORE, ObjectBase);
-vtkInformationKeyMacro(vtkPVRenderView, REPRESENTED_LOD_DATA_STORE, ObjectBase);
 vtkInformationKeyRestrictedMacro(vtkPVRenderView, GEOMETRY_BOUNDS, DoubleVector, 6);
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
@@ -120,11 +118,16 @@ vtkPVRenderView::vtkPVRenderView()
 
   this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
 
+  this->StillRenderProcesses = vtkPVSession::NONE;
+  this->InteractiveRenderProcesses = vtkPVSession::NONE;
   this->UsedLODForLastRender = false;
+  this->UseLODForInteractiveRender = false;
+  this->UseOutlineForInteractiveRender = false;
+  this->UseDistributedRenderingForStillRender = false;
+  this->UseDistributedRenderingForInteractiveRender = false;
   this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
-  this->GeometrySize = 0;
   this->RemoteRenderingThreshold = 0;
   this->LODRenderingThreshold = 0;
   this->ClientOutlineThreshold = 5;
@@ -313,6 +316,12 @@ vtkPVRenderView::~vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
+vtkRepresentedDataStorage* vtkPVRenderView::GetGeometryStore()
+{
+  return this->Internals->GeometryStore.GetPointer();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseOffscreenRendering(bool use_offscreen)
 {
   if (this->UseOffscreenRendering == use_offscreen)
@@ -365,7 +374,6 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
     if (dataRep)
       {
       this->Internals->GeometryStore->RegisterRepresentation(id, dataRep);
-      this->Internals->LODGeometryStore->RegisterRepresentation(id, dataRep);
       }
     }
 
@@ -387,7 +395,6 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
     if (dataRep)
       {
       this->Internals->GeometryStore->UnRegisterRepresentation(dataRep);
-      this->Internals->LODGeometryStore->UnRegisterRepresentation(dataRep);
       }
 
     // We only increase that counter when widget are not involved as in
@@ -786,16 +793,37 @@ void vtkPVRenderView::Update()
 
   this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
     this->Internals->GeometryStore.GetPointer());
-  this->RequestInformation->Set(REPRESENTED_LOD_DATA_STORE(),
-    this->Internals->LODGeometryStore.GetPointer());
 
   this->Superclass::Update();
 
-  // Do the vtkView::REQUEST_INFORMATION() pass.
-  this->GatherRepresentationInformation();
-
   // Gather information about geometry sizes from all representations.
-  this->GatherGeometrySizeInformation();
+  double local_size = this->GetGeometryStore()->GetVisibleDataSize(false) / 1024.0;
+  this->SynchronizedWindows->SynchronizeSize(local_size);
+
+  // Update decisions about lod-rendering and remote-rendering.
+  this->UseLODForInteractiveRender = this->ShouldUseLODRendering(local_size);
+  this->UseDistributedRenderingForStillRender = this->ShouldUseDistributedRendering(local_size);
+  if (!this->UseLODForInteractiveRender)
+    {
+    this->UseDistributedRenderingForInteractiveRender =
+      this->UseDistributedRenderingForStillRender;
+    this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
+    }
+
+  this->StillRenderProcesses = this->InteractiveRenderProcesses =
+    vtkPVSession::CLIENT;
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForStillRender)
+    {
+    this->StillRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForInteractiveRender)
+    {
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
 
   // UpdateTime is used to determine if we need to redeliver the geometries.
   // Hence the more accurate we can be about when to update this time, the
@@ -803,6 +831,37 @@ void vtkPVRenderView::Update()
   // that Update is called only when some representation is modified.
   this->UpdateTime.Modified();
   vtkTimerLog::MarkEndEvent("RenderView::Update");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateLOD()
+{
+  vtkTimerLog::MarkStartEvent("RenderView::UpdateLOD");
+  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
+    this->Internals->GeometryStore.GetPointer());
+
+  // Update LOD geometry.
+  this->CallProcessViewRequest(
+    vtkPVView::REQUEST_UPDATE_LOD(),
+    this->RequestInformation, this->ReplyInformationVector);
+
+  double local_size = this->GetGeometryStore()->GetVisibleDataSize(true) / 1024.0;
+  this->SynchronizedWindows->SynchronizeSize(local_size);
+
+  this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
+  this->UseDistributedRenderingForInteractiveRender =
+    this->ShouldUseDistributedRendering(local_size);
+
+  this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForInteractiveRender)
+    {
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
+
+  vtkTimerLog::MarkEndEvent("RenderView::UpdateLOD");
 }
 
 //----------------------------------------------------------------------------
@@ -850,21 +909,24 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Use loss-less image compression for client-server for full-res renders.
   this->SynchronizedRenderers->SetLossLessCompression(!interactive);
 
-  bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
-  this->SetRequestLODRendering(use_lod_rendering);
+  bool use_lod_rendering = interactive? this->GetUseLODForInteractiveRender() : false;
+  if (use_lod_rendering)
+    {
+    this->RequestInformation->Set(USE_LOD(), 1);
+    }
 
   // cout << "Using remote rendering: " << use_distributed_rendering << endl;
 
   // Decide if we are doing remote rendering or local rendering.
-  bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();
+  bool use_distributed_rendering = interactive?
+    this->GetUseDistributedRenderingForInteractiveRender():
+    this->GetUseDistributedRenderingForStillRender();
 
   // Render each representation with available geometry.
   // This is the pass where representations get an opportunity to get the
   // currently "available" represented data and try to render it.
   this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
     this->Internals->GeometryStore.GetPointer());
-  this->RequestInformation->Set(REPRESENTED_LOD_DATA_STORE(),
-    this->Internals->LODGeometryStore.GetPointer());
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_RENDER(),
     this->RequestInformation, this->ReplyInformationVector);
@@ -881,8 +943,8 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
     // GatherBoundsInformation will not do communication unless using
     // distributed rendering.
-    this->GatherBoundsInformation(use_distributed_rendering);
-
+    this->GatherBoundsInformation(
+      in_cave_mode || use_distributed_rendering);
     this->UpdateCenterAxes(this->LastComputedBounds);
     }
 
@@ -937,7 +999,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   if (!this->MakingSelection)
     {
-
     // If we are making selection, then it's a multi-step render process and we
     // need to leave the SynchronizedWindows/SynchronizedRenderers enabled for
     // that entire process.
@@ -947,161 +1008,23 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::DoDataDelivery(
-  bool using_lod_rendering, 
-  bool vtkNotUsed(using_remote_rendering)
-  )
-{
-  if ((using_lod_rendering &&
-    this->InteractiveRenderTime > this->UpdateTime) ||
-    (!using_lod_rendering &&
-     this->StillRenderTime > this->UpdateTime))
-    {
-    // skipping delivery
-    return;
-    }
-
-  if (!this->CounterSynchronizedSuccessfully)
-    {
-    // Skip data-delivery for this render.
-    return;
-    }
-
-  vtkMultiProcessController* s_controller =
-    this->SynchronizedWindows->GetClientServerController();
-  vtkMultiProcessController* d_controller =
-    this->SynchronizedWindows->GetClientDataServerController();
-  vtkMultiProcessController* p_controller =
-    vtkMultiProcessController::GetGlobalController();
-
-  vtkMultiProcessStream stream;
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
-    // Tell everyone the representations that this process thinks are need to
-    // delivery data.
-    int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
-    std::vector<int> need_delivery;
-    for (int cc=0; cc < num_reprs; cc++)
-      {
-      vtkInformation* info =
-        this->ReplyInformationVector->GetInformationObject(cc);
-      if (info->Has(NEEDS_DELIVERY()) && info->Get(NEEDS_DELIVERY()) == 1)
-        {
-        assert(this->Internals->RepToIdMap.find(this->GetRepresentation(cc)) !=
-          this->Internals->RepToIdMap.end());
-        need_delivery.push_back(
-          this->Internals->RepToIdMap[this->GetRepresentation(cc)]);
-        }
-      }
-
-    stream << static_cast<int>(need_delivery.size());
-    for (size_t cc=0; cc < need_delivery.size(); cc++)
-      {
-      stream << need_delivery[cc];
-      }
-
-    if (s_controller)
-      {
-      s_controller->Send(stream, 1, 9998877);
-      }
-    if (d_controller)
-      {
-      d_controller->Send(stream, 1, 9998877);
-      }
-    if (p_controller)
-      {
-      p_controller->Broadcast(stream, 0);
-      }
-    }
-  else
-    {
-    if (s_controller)
-      {
-      s_controller->Receive(stream, 1, 9998877);
-      }
-    if (d_controller)
-      {
-      d_controller->Receive(stream, 1, 9998877);
-      }
-    if (p_controller)
-      {
-      p_controller->Broadcast(stream, 0);
-      }
-    }
-  int size;
-  stream >> size;
-  for (int cc=0; cc < size; cc++)
-    {
-    int index;
-    stream >> index;
-    vtkPVDataRepresentation* repr =
-      vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
-    if (repr)
-      {
-      // it is essential that the representation is made visible for this pass.
-      bool visible = repr->GetVisibility();
-      if (visible == false)
-        {
-        repr->SetVisibility(true);
-        }
-      repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
-      if (visible == false)
-        {
-        repr->SetVisibility(visible);
-        }
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetRequestDistributedRendering(bool enable)
+int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 {
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode)
     {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      vtkMPIMoveData::CLONE);
+    return vtkMPIMoveData::CLONE;
     }
-  else if (enable)
+
+  if (use_remote_rendering)
     {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      in_tile_display_mode?
+    return in_tile_display_mode?
       vtkMPIMoveData::COLLECT_AND_PASS_THROUGH:
-      vtkMPIMoveData::PASS_THROUGH);
+      vtkMPIMoveData::PASS_THROUGH;
     }
-  else
-    {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      in_tile_display_mode?
-      vtkMPIMoveData::CLONE:
-      vtkMPIMoveData::COLLECT);
-    }
-}
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetRequestLODRendering(bool enable)
-{
-  if (enable)
-    {
-    this->RequestInformation->Set(USE_LOD(), 1);
-    this->RequestInformation->Set(LOD_RESOLUTION(), this->LODResolution);
-    this->RequestInformation->Set(REPRESENTED_LOD_DATA_STORE(),
-      this->Internals->LODGeometryStore.GetPointer());
-
-    // Update LOD geometry.
-    this->CallProcessViewRequest(
-      vtkPVView::REQUEST_UPDATE_LOD(),
-      this->RequestInformation, this->ReplyInformationVector);
-
-    this->RequestInformation->Set(USE_LOD(), 1);
-    this->RequestInformation->Set(LOD_RESOLUTION(), this->LODResolution);
-    }
-  else
-    {
-    this->RequestInformation->Remove(USE_LOD());
-    this->RequestInformation->Remove(LOD_RESOLUTION());
-    }
+  return in_tile_display_mode? vtkMPIMoveData::CLONE: vtkMPIMoveData::COLLECT;
 }
 
 //----------------------------------------------------------------------------
@@ -1116,7 +1039,7 @@ void vtkPVRenderView::SetPiece(vtkInformation* info,
     vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
     return;
     }
-  storage->SetPiece(repr, data);
+  storage->SetPiece(repr, data, false);
 }
 
 //----------------------------------------------------------------------------
@@ -1131,7 +1054,7 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(vtkInformation* info,
     vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
     return NULL;
     }
-  return storage->GetProducer(repr);
+  return storage->GetProducer(repr, false);
 }
 
 //----------------------------------------------------------------------------
@@ -1140,79 +1063,63 @@ void vtkPVRenderView::SetPieceLOD(vtkInformation* info,
 {
   vtkRepresentedDataStorage* storage =
     vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_LOD_DATA_STORE()));
+      info->Get(REPRESENTED_DATA_STORE()));
   if (!storage)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_LOD_DATA_STORE().");
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
     return;
-    }
-  storage->SetPiece(repr, data);
+    } 
+  storage->SetPiece(repr, data, true);
 }
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(vtkInformation* info,
     vtkPVDataRepresentation* repr)
 {
-  vtkRepresentedDataStorage* storage = vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_LOD_DATA_STORE()));
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
   if (!storage)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_LOD_DATA_STORE().");
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
     return NULL;
     }
 
-  return storage->GetProducer(repr);
+  return storage->GetProducer(repr, true);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherRepresentationInformation()
+void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
+  vtkPVDataRepresentation* repr, bool clone)
 {
-  // This method is called after Update(). All representations have told the
-  // view the geometries they are rendering. We update our geometry
-  // datastructure and collect information about bounds, sizes etc.
-
-  this->LocalGeometrySize = 0;
-  int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
-  for (int cc=0; cc < num_reprs; cc++)
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
+  if (!storage)
     {
-    vtkPVDataRepresentation* representation =
-      vtkPVDataRepresentation::SafeDownCast(this->GetRepresentation(cc));
-    if (!representation)
-      {
-      continue;
-      }
-    assert(this->Internals->RepToIdMap.find(representation) !=
-      this->Internals->RepToIdMap.end());
-
-    vtkInformation* info =
-      this->ReplyInformationVector->GetInformationObject(cc);
-
-    // FIXME:STREAMING we need to use the size from actual data register with
-    // the "storage". That relieves the representations of having to provide
-    // additional information.
-    if (info->Has(GEOMETRY_SIZE()))
-      {
-      double geometry_size = (info->Get(GEOMETRY_SIZE())/1024.0);
-      this->LocalGeometrySize += geometry_size;
-      }
-
-    if (info->Has(GEOMETRY_BOUNDS()))
-      {
-      }
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    return;
     }
+  storage->SetDeliverToAllProcesses(repr, clone, false);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherGeometrySizeInformation()
+void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
+  vtkPVDataRepresentation* repr, bool clone)
 {
-  this->GeometrySize = this->LocalGeometrySize;
-  this->SynchronizedWindows->SynchronizeSize(this->GeometrySize);
-
-  // FIXME:STREAMING -- here we'll sync information about bounds as well.
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
+  if (!storage)
+    {
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    return;
+    }
+  storage->SetDeliverToAllProcesses(repr, clone, true);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::GetUseDistributedRendering()
+bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
 {
   if (this->GetRemoteRenderingAvailable() == false)
     {
@@ -1231,21 +1138,14 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  return this->RemoteRenderingThreshold <= this->GeometrySize;
+  return this->RemoteRenderingThreshold <= geometry_size;
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::GetUseLODRendering()
+bool vtkPVRenderView::ShouldUseLODRendering(double geometry_size)
 {
   // return false;
-  return this->LODRenderingThreshold <= this->GeometrySize;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVRenderView::GetDeliverOutlineToClient()
-{
-//  return false;
-  return this->ClientOutlineThreshold <= this->GeometrySize;
+  return this->LODRenderingThreshold <= geometry_size;
 }
 
 //----------------------------------------------------------------------------

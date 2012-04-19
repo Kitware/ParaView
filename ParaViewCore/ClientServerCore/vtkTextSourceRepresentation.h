@@ -27,7 +27,6 @@
 class vtk3DWidgetRepresentation;
 class vtkPolyData;
 class vtkPVCacheKeeper;
-class vtkUnstructuredDataDeliveryFilter;
 
 class VTK_EXPORT vtkTextSourceRepresentation : public vtkPVDataRepresentation
 {
@@ -92,11 +91,8 @@ protected:
   virtual bool IsCached(double cache_key);
 
   vtkPVCacheKeeper* CacheKeeper;
-  vtkUnstructuredDataDeliveryFilter* DataCollector;
   vtkPolyData* DummyPolyData;
   vtk3DWidgetRepresentation* TextWidgetRepresentation;
-
-  vtkTimeStamp DeliveryTimeStamp;
 
 private:
   vtkTextSourceRepresentation(const vtkTextSourceRepresentation&); // Not implemented

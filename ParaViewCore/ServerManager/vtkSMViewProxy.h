@@ -96,6 +96,8 @@ protected:
   virtual vtkImageData* CaptureWindowInternal(int vtkNotUsed(magnification))
     { return NULL; }
 
+  virtual vtkTypeUInt32 PreRender(bool vtkNotUsed(interactive))
+    { return this->GetLocation(); }
   virtual void PostRender(bool vtkNotUsed(interactive)) {}
 
   // Description:
