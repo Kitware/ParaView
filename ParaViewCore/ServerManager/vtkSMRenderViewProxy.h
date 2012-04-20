@@ -28,7 +28,7 @@ class vtkCollection;
 class vtkPVGenericRenderWindowInteractor;
 class vtkRenderer;
 class vtkRenderWindow;
-class vtkSMDataDeliveryManagerProxy;
+class vtkSMDataDeliveryManager;
 
 class VTK_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
 {
@@ -174,7 +174,7 @@ protected:
   unsigned long NewMasterObserverId;
   void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
 
-  vtkSMDataDeliveryManagerProxy* DeliveryManager;
+  vtkSMDataDeliveryManager* DeliveryManager;
   bool NeedsUpdateLOD;
 
 private:

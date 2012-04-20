@@ -43,7 +43,7 @@
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCollaborationManager.h"
-#include "vtkSMDataDeliveryManagerProxy.h"
+#include "vtkSMDataDeliveryManager.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProperty.h"
@@ -412,14 +412,8 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
     }
 
   // Setup data-delivery manager.
-  this->DeliveryManager = vtkSMDataDeliveryManagerProxy::SafeDownCast(
-    this->GetSessionProxyManager()->NewProxy(
-      "misc", "RenderViewDataDeliveryManager"));
-  if (this->DeliveryManager)
-    {
-    this->DeliveryManager->UpdateVTKObjects();
-    this->DeliveryManager->SetViewProxy(this);
-    }
+  this->DeliveryManager = vtkSMDataDeliveryManager::New();
+  this->DeliveryManager->SetViewProxy(this);
 }
 
 //----------------------------------------------------------------------------

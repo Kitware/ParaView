@@ -161,7 +161,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVPythonPluginInterface.cxx
-  vtkRepresentedDataStorage.cxx
 
   WRAP_EXCLUDE
   )

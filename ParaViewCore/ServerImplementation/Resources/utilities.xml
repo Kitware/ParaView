@@ -2333,12 +2333,6 @@
       </Documentation>
     </Proxy>
 
-    <DataDeliveryManagerProxy name="RenderViewDataDeliveryManager"
-      class="vtkPVRenderViewDataDeliveryManager"
-      processes="renderserver|dataserver|client">
-
-    </DataDeliveryManagerProxy>
-
     <!-- End of group "misc" -->
   </ProxyGroup>
 

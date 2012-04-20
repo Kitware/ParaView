@@ -516,9 +516,11 @@ public:
   // Returns the data distribution mode to use.
   int GetDataDistributionMode(bool use_remote_rendering);
 
-//BTX
+  // Description:
+  // Provides access to the geometry storage for this view.
   vtkRepresentedDataStorage* GetGeometryStore();
 
+//BTX
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();

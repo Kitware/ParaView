@@ -12,42 +12,47 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDataDeliveryManagerProxy
+// .NAME vtkSMDataDeliveryManager
 // .SECTION Description
 //
 
-#ifndef __vtkSMDataDeliveryManagerProxy_h
-#define __vtkSMDataDeliveryManagerProxy_h
+#ifndef __vtkSMDataDeliveryManager_h
+#define __vtkSMDataDeliveryManager_h
 
-#include "vtkSMProxy.h"
-
+#include "vtkSMObject.h"
+#include "vtkWeakPointer.h"
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMDataDeliveryManagerProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMDataDeliveryManager : public vtkSMObject
 {
 public:
-  static vtkSMDataDeliveryManagerProxy* New();
-  vtkTypeMacro(vtkSMDataDeliveryManagerProxy, vtkSMProxy);
+  static vtkSMDataDeliveryManager* New();
+  vtkTypeMacro(vtkSMDataDeliveryManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Get/Set the view proxy for whom we are delivering the data.
   void SetViewProxy(vtkSMViewProxy*);
-  vtkSMViewProxy* GetViewProxy();
 
   void Deliver(bool interactive);
+
 //BTX
 protected:
-  vtkSMDataDeliveryManagerProxy();
-  ~vtkSMDataDeliveryManagerProxy();
+  vtkSMDataDeliveryManager();
+  ~vtkSMDataDeliveryManager();
 
   void OnViewUpdated();
 
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
   unsigned long UpdateObserverTag;
+
+  vtkTimeStamp GeometryDeliveryStamp;
+  vtkTimeStamp LODGeometryDeliveryStamp;
+  vtkTimeStamp ViewUpdateStamp;
+
 private:
-  vtkSMDataDeliveryManagerProxy(const vtkSMDataDeliveryManagerProxy&); // Not implemented
-  void operator=(const vtkSMDataDeliveryManagerProxy&); // Not implemented
+  vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&); // Not implemented
+  void operator=(const vtkSMDataDeliveryManager&); // Not implemented
 //ETX
 };
 

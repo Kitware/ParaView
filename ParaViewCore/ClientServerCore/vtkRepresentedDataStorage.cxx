@@ -17,6 +17,9 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkPVRenderView.h"
+#include "vtkNew.h"
+#include "vtkMPIMoveData.h"
 
 vtkStandardNewMacro(vtkRepresentedDataStorage);
 //----------------------------------------------------------------------------
@@ -30,6 +33,12 @@ vtkRepresentedDataStorage::~vtkRepresentedDataStorage()
 {
   delete this->Internals;
   this->Internals = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::SetView(vtkPVRenderView* view)
+{
+  this->View = view;
 }
 
 //----------------------------------------------------------------------------
@@ -140,6 +149,51 @@ vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
     }
 
   return item->GetProducer()->GetOutputPort(0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkRepresentedDataStorage::NeedsDelivery(
+  unsigned long timestamp, 
+  std::vector<int> &keys_to_deliver, bool use_low)
+{
+  vtkInternals::ItemsMapType::iterator iter;
+  for (iter = this->Internals->ItemsMap.begin();
+    iter != this->Internals->ItemsMap.end(); ++iter)
+    {
+    vtkInternals::vtkItem& item = use_low? iter->second.second : iter->second.first;
+    if (item.Representation &&
+      item.Representation->GetVisibility() &&
+      item.GetTimeStamp() > timestamp)
+      {
+      keys_to_deliver.push_back(iter->first);
+      }
+    }
+  return keys_to_deliver.size() > 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *values)
+
+{
+  cout << "Delivering : " << size << endl;
+  for (unsigned int cc=0; cc < size; cc++)
+    {
+    vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
+
+    vtkDataObject* data = item->GetDataObject();
+
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(data->GetDataObjectType());
+    dataMover->SetMoveModeToCollect();
+    dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
+    dataMover->Update();
+
+    if (dataMover->GetServer() == 0)
+      {
+      item->SetDataObject(dataMover->GetOutputDataObject(0));
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

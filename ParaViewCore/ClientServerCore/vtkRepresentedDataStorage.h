@@ -24,10 +24,16 @@
 #define __vtkRepresentedDataStorage_h
 
 #include "vtkObject.h"
+#include "vtkWeakPointer.h"
 
-class vtkPVDataRepresentation;
-class vtkDataObject;
 class vtkAlgorithmOutput;
+class vtkDataObject;
+class vtkPVDataRepresentation;
+class vtkPVRenderView;
+
+//BTX
+#include <vector>
+//ETX
 
 class VTK_EXPORT vtkRepresentedDataStorage : public vtkObject
 {
@@ -56,19 +62,25 @@ public:
   // Returns the size for all visible geometry.
   unsigned long GetVisibleDataSize(bool low_res);
 
+  void Deliver(int use_low_res, unsigned int size, int *keys);
+
+  void SetView(vtkPVRenderView*);
+
 //BTX
-  class vtkInternals;
-  vtkInternals* GetInternals()
-    { return this->Internals; }
+  bool NeedsDelivery(unsigned long timestamp,
+    std::vector<int>& keys_to_deliver, bool use_low_res);
 
 protected:
   vtkRepresentedDataStorage();
   ~vtkRepresentedDataStorage();
 
+  vtkWeakPointer<vtkPVRenderView> View;
+
 private:
   vtkRepresentedDataStorage(const vtkRepresentedDataStorage&); // Not implemented
   void operator=(const vtkRepresentedDataStorage&); // Not implemented
 
+  class vtkInternals;
   vtkInternals* Internals;
 //ETX
 };
