@@ -900,8 +900,8 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
         }
       }
 
-    for( std::vector<vtksysProcess*>::iterator waitIter = servers.begin();
-         waitIter != servers.end();
+    for( std::vector<vtksysProcess*>::iterator waitIter = renderServers.begin();
+         waitIter != renderServers.end();
          waitIter++ )
       {
       output = "";
