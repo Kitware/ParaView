@@ -13,7 +13,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ADD_TEST(CoProcessingTestPythonScript ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/PythonScriptTest.py)
 
   IF (VTK_MPIRUN_EXE)
-    ADD_TEST(PCoProcessingPythonScriptExample
+    ADD_TEST(PCoProcessingTestPythonScript
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS}
       ${VTK_MPI_PREFLAGS}
       ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample
@@ -59,25 +59,30 @@ IF (PARAVIEW_DATA_ROOT)
         ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/PCPPressure0.png 20
         -V ${PARAVIEW_DATA_ROOT}/Baseline/CPPressure0.png
         -T ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx)
+      SET_TESTS_PROPERTIES(PCoProcessingTestPythonScript PCoProcessingPythonScriptGridPlot
+        PCoProcessingPythonScriptPressurePlot PROPERTIES RUN_SERIAL ON)
     ENDIF (VTK_MPIRUN_EXE)
 
     # here is the full workflow for coprocessing where we generate
-    # a script, run a simulation driver code, and then check the output
+    # a script, run simulation driver code, and then check the output
     IF (PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator)
       set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
+      set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
       if(Q_WS_MAC)
         set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME}.app/Contents/MacOS)
+        set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS)
+        set(MAC_TEST_NAME "-Mac")
       endif(Q_WS_MAC)
 
       file(WRITE
 "${CoProcessing_BINARY_DIR}/CoProcessingFullWorkflowTest.cmake"
-"set(fullexe \"${REAL_EXECUTABLE_PATH}/paraview\")
+"set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/paraview\")
 if(NOT EXISTS \${fullexe})
-  set(fullexe \"${REAL_EXECUTABLE_PATH}/\${cfg}/paraview.exe\")
+  set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/\${cfg}/paraview.exe\")
 endif()
 FILE(REMOVE \"${CMAKE_BINARY_DIR}/Testing/Temporary/cptest.py ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/image_0.png ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0.pvtp ${CoProcessing_BINARY_DIR}/CoProcessor/Testing/Cxx/filename_0_0.vtp\" )
 
-set(ARGS \"-dr;--test-directory=${CMAKE_BINARY_DIR}/Testing/Temporary;--test-script=${CMAKE_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml;--exit\")
+set(ARGS \"-dr;--test-directory=${CMAKE_BINARY_DIR}/Testing/Temporary;--test-script=${CMAKE_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI${MAC_TEST_NAME}.xml;--exit\")
 execute_process(COMMAND \${fullexe} \${ARGS} RESULT_VARIABLE rv)
 if(NOT rv EQUAL 0)
   message(FATAL_ERROR \"ParaView return value was \${rv}\")
@@ -137,6 +142,7 @@ endif()
 
       add_test(NAME CoProcessingFullWorkflow COMMAND ${CMAKE_COMMAND}
         -Dcfg=$<CONFIGURATION> -P "${CoProcessing_BINARY_DIR}/CoProcessingFullWorkflowTest.cmake")
+      SET_TESTS_PROPERTIES(CoProcessingFullWorkflow PROPERTIES RUN_SERIAL ON)
     ENDIF (PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator)
 
   ENDIF (PARAVIEW_ENABLE_PYTHON)

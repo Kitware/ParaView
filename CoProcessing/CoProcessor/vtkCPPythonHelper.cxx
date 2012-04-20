@@ -21,6 +21,7 @@
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkPython.h"  // needed before including cppythonmodules.h
 #include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
 #include "pvpython.h"
