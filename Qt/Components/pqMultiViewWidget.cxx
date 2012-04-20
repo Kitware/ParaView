@@ -430,7 +430,8 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::createWidget(
-  int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
+  int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg,
+  int& max_index)
 {
   if (this->Internals->Widgets.size() <= static_cast<int>(index))
     {
@@ -469,6 +470,7 @@ QWidget* pqMultiViewWidget::createWidget(
         {
         frame->centralWidget()->setMaximumSize(this->LockViewSize);
         }
+      if (max_index < index) { max_index = index; }
       return frame;
       }
 
@@ -493,9 +495,11 @@ QWidget* pqMultiViewWidget::createWidget(
         direction == vtkSMViewLayoutProxy::VERTICAL?
         Qt::Vertical : Qt::Horizontal);
       splitter->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter));
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter,
+          max_index));
       splitter->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter));
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter,
+          max_index));
 
       // set the sizes are percentage. QSplitter uses the initially specified
       // sizes as reference.
@@ -510,6 +514,7 @@ QWidget* pqMultiViewWidget::createWidget(
         this, SLOT(splitterMoved()));
       QObject::connect(splitter, SIGNAL(splitterMoved(int, int)),
         this, SLOT(splitterMoved()), Qt::QueuedConnection);
+      if (max_index < index) { max_index = index; }
       return splitter;
       }
     else
@@ -524,9 +529,12 @@ QWidget* pqMultiViewWidget::createWidget(
       container->setLayout(slayout);
       container->setObjectName(QString("Container.%1").arg(index));
       slayout->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, container));
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, container,
+          max_index));
       slayout->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, container));
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, container,
+          max_index));
+      if (max_index < index) { max_index = index; }
       return container;
       }
     break;
@@ -551,11 +559,16 @@ void pqMultiViewWidget::reload()
       widget->setParent(cleaner);
       }
     }
-  QWidget* child = this->createWidget(0, vlayout, this);
+  int max_index=0;
+  QWidget* child = this->createWidget(0, vlayout, this, max_index);
   delete cleaner;
   cleaner = NULL;
 
   delete this->layout();
+
+  // resize Widgets to remove any obsolete indices. These indices weren't
+  // touched at all during the last call to createWidget().
+  this->Internals->Widgets.resize(max_index+1);
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setContentsMargins(0, 0, 0, 0);
