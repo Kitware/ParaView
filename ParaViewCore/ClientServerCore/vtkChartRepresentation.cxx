@@ -301,6 +301,11 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
           }
         }
       }
+    else
+      {
+      sel = vtkSelection::SafeDownCast(
+        this->SelectionDeliveryFilter->GetOutputDataObject(0));
+      }
     }
   else
     {
