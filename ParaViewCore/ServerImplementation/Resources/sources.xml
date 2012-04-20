@@ -2058,6 +2058,14 @@ is refined.
      </IntVectorProperty>
 
    </SourceProxy>
+   <!-- ==================================================================== -->
+   <MultiServerSourceProxy name="MultiServerProxy" class="vtkPVMultiServerDataSource" label="Remote Source Proxy" processes="client">
+      <Documentation
+         short_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers"
+         long_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers">
+      </Documentation>
 
+      <Property name="DependencyLink"/>
+   </MultiServerSourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

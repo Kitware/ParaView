@@ -61,11 +61,6 @@ pqUndoRedoBehavior::pqUndoRedoBehavior(QObject* parentObject)
   builder->Delete();
   core->setUndoStack(stack);
 
-  QObject::connect(
-    &pqActiveObjects::instance(), SIGNAL(serverChanged(pqServer*)),
-    stack, SLOT(setActiveServer(pqServer*))); 
-  stack->setActiveServer(pqActiveObjects::instance().activeServer());
-
   // clear undo stack when state is loaded.
   QObject::connect(core,
     SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),

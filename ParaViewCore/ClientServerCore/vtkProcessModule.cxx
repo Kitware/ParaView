@@ -243,7 +243,7 @@ vtkProcessModule::vtkProcessModule()
 {
   this->NetworkAccessManager = vtkTCPNetworkAccessManager::New();
   this->Options = 0;
-  this->Internals = new vtkInternals();
+  this->Internals = new vtkProcessModuleInternals();
   this->MaxSessionId = 0;
   this->ReportInterpreterErrors = true;
   this->SymmetricMPIMode = false;
@@ -282,7 +282,7 @@ vtkIdType vtkProcessModule::RegisterSession(vtkSession* session)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
 {
-  vtkInternals::MapOfSessions::iterator iter =
+  vtkProcessModuleInternals::MapOfSessions::iterator iter =
     this->Internals->Sessions.find(sessionID);
   if (iter != this->Internals->Sessions.end())
     {
@@ -299,7 +299,7 @@ bool vtkProcessModule::UnRegisterSession(vtkIdType sessionID)
 //----------------------------------------------------------------------------
 bool vtkProcessModule::UnRegisterSession(vtkSession* session)
 {
-  vtkInternals::MapOfSessions::iterator iter;
+  vtkProcessModuleInternals::MapOfSessions::iterator iter;
   for (iter = this->Internals->Sessions.begin();
     iter != this->Internals->Sessions.end(); ++iter)
     {
@@ -319,7 +319,7 @@ bool vtkProcessModule::UnRegisterSession(vtkSession* session)
 //----------------------------------------------------------------------------
 vtkSession* vtkProcessModule::GetSession(vtkIdType sessionID)
 {
-  vtkInternals::MapOfSessions::iterator iter =
+  vtkProcessModuleInternals::MapOfSessions::iterator iter =
     this->Internals->Sessions.find(sessionID);
   if (iter != this->Internals->Sessions.end())
     {
@@ -332,7 +332,7 @@ vtkSession* vtkProcessModule::GetSession(vtkIdType sessionID)
 //----------------------------------------------------------------------------
 vtkIdType vtkProcessModule::GetSessionID(vtkSession* session)
 {
-  vtkInternals::MapOfSessions::iterator iter;
+  vtkProcessModuleInternals::MapOfSessions::iterator iter;
   for (iter = this->Internals->Sessions.begin();
     iter != this->Internals->Sessions.end(); ++iter)
     {
@@ -411,7 +411,7 @@ vtkSession* vtkProcessModule::GetSession()
     return activeSession;
     }
 
-  vtkInternals::MapOfSessions::iterator iter;
+  vtkProcessModuleInternals::MapOfSessions::iterator iter;
   iter = this->Internals->Sessions.begin();
   return (iter != this->Internals->Sessions.end()?
     iter->second.GetPointer() : NULL);

@@ -96,6 +96,17 @@ void pqUndoRedoReaction::redo()
     }
   stack->redo();
 }
+//-----------------------------------------------------------------------------
+void pqUndoRedoReaction::clear()
+{
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (!stack)
+    {
+    qCritical("No application wide undo stack.");
+    return;
+    }
+  stack->clear();
+}
 
 //-----------------------------------------------------------------------------
 void pqUndoRedoReaction::enable(bool can_undo)

@@ -34,13 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtPythonConfig.h"
 
+#include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
 #include "pqPythonShell.h"
+#include "pqUndoStack.h"
 #include "vtkCommand.h"
-#include "vtkProcessModule.h"
-#include "vtkPVOptions.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVOptions.h"
 #include "vtkPVPythonInteractiveInterpretor.h"
+#include "vtkProcessModule.h"
 #include "vtkStdString.h"
 
 #include <QCoreApplication>
@@ -241,6 +243,10 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
   QObject::connect(
     &this->Implementation->Console, SIGNAL(executeCommand(const QString&)), 
     this, SLOT(onExecuteCommand(const QString&)));
+
+  // Make sure we clear the UndoStack if any python execution occurs
+  QObject::connect( this, SIGNAL(executing(bool)),
+                    this, SLOT(clearUndoStack()));
 }
 
 pqPythonShell::~pqPythonShell()
@@ -467,4 +473,13 @@ void pqPythonShell::internalExecuteCommand(const QString& command)
   emit this->executing(true);  
   this->Implementation->executeCommand(command);
   emit this->executing(false);
+}
+
+void pqPythonShell::clearUndoStack()
+{
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    stack->clear();
+    }
 }

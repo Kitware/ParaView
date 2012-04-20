@@ -184,6 +184,14 @@ void pqAnimationManager::onProxyRemoved(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 void pqAnimationManager::onActiveServerChanged(pqServer* server)
 {
+  // In case of multi-server that method can be called when we disconnect
+  // from one or our connected server.
+  // Check if the server is going to be deleted and if so just skip creation
+  if(!server || !server->session() || server->session()->GetReferenceCount() == 1)
+    {
+    return;
+    }
+
   this->Internals->ActiveServer = server;
   if (server && !this->getActiveScene())
     {

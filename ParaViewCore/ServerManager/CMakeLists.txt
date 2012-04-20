@@ -23,6 +23,7 @@ SET (Kit_SRCS
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
+  vtkPVMultiServerDataSource.cxx
   vtkPVRepresentationAnimationHelper.cxx
   vtkPVServerSideAnimationPlayer.cxx
   vtkSMAnimationScene.cxx
@@ -82,6 +83,7 @@ SET (Kit_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
+  vtkSMMultiServerSourceProxy.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMNullProxy.cxx
