@@ -38,10 +38,6 @@ options = servermanager.vtkProcessModule.GetProcessModule().GetOptions()
 available_server_urls = options.GetServerURL().split('|')
 built_in_connection = servermanager.ActiveConnection
 
-# Search plugin path
-plugin_path = findInSubdirectory('PacMan', options.GetApplicationPath()[0:-12]);
-print "====> Found plugin path: ", plugin_path
-
 # Test if the built-in connection is here
 if (len(servermanager.MultiServerConnections) != 1):
   errors += 1
@@ -93,7 +89,7 @@ if ( servermanager.ActiveConnection != server2_connection):
 
 # Load plugin on server2
 switchActiveConnection(server2_connection, globals())
-LoadPlugin(plugin_path, True, globals())
+LoadDistributedPlugin("PacMan", True, globals())
 
 # Create PacMan on server2
 pacMan_s2 = PacMan()
@@ -132,7 +128,7 @@ except NameError:
 # Load plugin localy for built-in
 # Create PacMan ==> This should be OK on built-in
 switchActiveConnection(built_in_connection, globals())
-LoadPlugin(plugin_path, False, globals())
+LoadDistributedPlugin("PacMan", False, globals())
 pacMan_builtin = PacMan()
 print "After loading the plugin locally in built-in, the PacMan definition is available"
 
