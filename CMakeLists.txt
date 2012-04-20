@@ -395,48 +395,11 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
 
-  SET(cmakeDevFiles
-      ${ParaView_CMAKE_DIR}/branded_splash.png
-      ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewMacros.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewBranding.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewBrandingCPack.cmake
-      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
-      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.cxx.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_main.cxx.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.h.in
-      ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in
-      ${ParaView_CMAKE_DIR}/pv-forward.c.in
-      # originaly from Qt/Components
-      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.cxx.in
-      # originaly from Qt/Core
-      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.cxx.in)
+  # install all cmake files.
   INSTALL(
-      FILES ${cmakeDevFiles} 
+      # the extra "/" is essential to ensure we don't end up with an extra
+      # directory at the install location.
+      DIRECTORY "${ParaView_CMAKE_DIR}/"
       DESTINATION ${PV_INSTALL_CMAKE_DIR}
       COMPONENT Development)
       
