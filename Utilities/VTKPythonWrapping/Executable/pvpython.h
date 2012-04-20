@@ -74,6 +74,15 @@ namespace ParaViewPython {
       return 1;
       }
 
+    if (processType == vtkProcessModule::PROCESS_BATCH &&
+      options->GetPythonScriptName() == 0)
+      {
+      vtkGenericWarningMacro("No script specified. "
+        "Please specify a batch script or use 'pvpython'.");
+      vtkInitializationHelper::Finalize();
+      return 1;
+      }
+
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     int ret_val = 0;
