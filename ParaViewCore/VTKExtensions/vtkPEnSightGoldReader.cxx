@@ -3275,6 +3275,7 @@ int vtkPEnSightGoldReader::InjectCoordinatesAtEnd(vtkUnstructuredGrid* output, l
   vtkPointData* pointData = output->GetPointData();
   vtkDataArray* globalNodeIds = this->GetPointIds(partId)->GenerateGlobalIdsArray("GlobalNodeId");
   pointData->SetGlobalIds(globalNodeIds);
+  globalNodeIds->Delete();
 
   // We do not inject global Element Ids: It is not required for D3, for example,
   // and it consumes a lot of memory

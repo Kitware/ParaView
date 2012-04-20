@@ -46,6 +46,19 @@
 typedef std::vector< vtkPEnSightReader::vtkPEnSightReaderCellIds* > vtkPEnSightReaderCellIdsTypeBase;
 class vtkPEnSightReaderCellIdsType: public vtkPEnSightReaderCellIdsTypeBase {};
 
+namespace
+{
+  void cleanup(vtkPEnSightReaderCellIdsType* foo)
+    {
+    if (!foo) { return; }
+    for (vtkPEnSightReaderCellIdsType::iterator iter = foo->begin();
+      iter != foo->end(); ++iter)
+      {
+      delete *iter;
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 vtkPEnSightReader::vtkPEnSightReader()
 {
@@ -116,12 +129,14 @@ vtkPEnSightReader::~vtkPEnSightReader()
 
   if (this->CellIds)
     {
+    cleanup(this->CellIds);
     delete this->CellIds;
     this->CellIds = NULL;
     }
 
   if (this->PointIds)
     {
+    cleanup(this->PointIds);
     delete this->PointIds;
     this->PointIds = NULL;
     }
@@ -2418,7 +2433,7 @@ void vtkPEnSightReader::InsertNextCellAndId(vtkUnstructuredGrid* output, int vtk
     // go. Insert It with real points Ids
     vtkIdType cellId = output->InsertNextCell(vtkCellType, numPoints, newPoints);
     this->GetCellIds(partId, ensightCellType)->InsertNextId(cellId);
-    delete newPoints;
+    delete [] newPoints;
 
     this->CoordinatesAtEnd = true;
     this->InjectGlobalElementIds = true;

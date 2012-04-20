@@ -75,16 +75,32 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
     typedef std::map< int , int > IntIntMap;
     typedef std::vector< int > IntVector;
 
-    vtkPEnSightReaderCellIds()
+    vtkPEnSightReaderCellIds() :
+      cellMap(NULL),
+      cellNumberOfIds(-1),
+      cellLocalNumberOfIds(-1),
+      cellVector(NULL),
+      ImplicitDimensions(NULL),
+      ImplicitLocalDimensions(NULL),
+      ImplicitSplitDimension(-1),
+      ImplicitSplitDimensionBeginIndex(-1),
+      ImplicitSplitDimensionEndIndex(-1),
+      mode (NON_SPARSE_MODE)
       {
-      this->mode = NON_SPARSE_MODE;
-      this->cellMap = NULL;
-      this->cellVector = NULL;
       }
 
-    vtkPEnSightReaderCellIds(EnsightReaderCellIdMode amode)
+    vtkPEnSightReaderCellIds(EnsightReaderCellIdMode amode) :
+      cellMap(NULL),
+      cellNumberOfIds(-1),
+      cellLocalNumberOfIds(-1),
+      cellVector(NULL),
+      ImplicitDimensions(NULL),
+      ImplicitLocalDimensions(NULL),
+      ImplicitSplitDimension(-1),
+      ImplicitSplitDimensionBeginIndex(-1),
+      ImplicitSplitDimensionEndIndex(-1),
+      mode (amode)
       {
-      this->mode = amode;
       if( this->mode == SPARSE_MODE )
         {
         this->cellMap = new IntIntMap;
@@ -109,12 +125,9 @@ class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
 
     ~vtkPEnSightReaderCellIds()
       {
-      if( this->mode == SPARSE_MODE )
-        delete this->cellMap;
-      else if( this->mode == IMPLICIT_STRUCTURED_MODE )
-        delete this->ImplicitDimensions;
-      else
-        delete this->cellVector;
+      delete this->cellMap;
+      delete this->cellVector;
+      delete [] this->ImplicitDimensions;
       }
 
     void SetMode(EnsightReaderCellIdMode amode)

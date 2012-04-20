@@ -53,9 +53,9 @@ vtkPEnSightGoldBinaryReader::~vtkPEnSightGoldBinaryReader()
     delete this->IFile;
     this->IFile = NULL;
     }
-  delete this->FloatBuffer[2];
-  delete this->FloatBuffer[1];
-  delete this->FloatBuffer[0];
+  delete [] this->FloatBuffer[2];
+  delete [] this->FloatBuffer[1];
+  delete [] this->FloatBuffer[0];
   free( this->FloatBuffer );
 }
 
@@ -4513,6 +4513,7 @@ int vtkPEnSightGoldBinaryReader::InjectCoordinatesAtEnd(vtkUnstructuredGrid* out
   vtkPointData* pointData = output->GetPointData();
   vtkDataArray* globalNodeIds = this->GetPointIds(partId)->GenerateGlobalIdsArray("GlobalNodeId");
   pointData->SetGlobalIds(globalNodeIds);
+  globalNodeIds->Delete();
 
   // We do not inject global Element Ids: It is not required for D3, for example,
   // and it consumes a lot of memory
