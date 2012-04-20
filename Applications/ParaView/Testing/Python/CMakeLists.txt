@@ -79,12 +79,16 @@ IF (PARAVIEW_DATA_ROOT)
 
 # TODO: remote rendering tests and reverse connect tests.
 
+# only enable TestPythonAnnotationFilter test if numpy is available
+include("TestNumPy")
+
+IF ("1" STREQUAL ${HAS_NUMPY})
   # Add pvpython tests
   add_test("pvpython.TestPythonAnnotationFilter"
       ${PARAVIEW_PYTHON_EXECUTABLE}
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
-      ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py
-  )
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py)
+ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 ENDIF (PARAVIEW_DATA_ROOT)
 
