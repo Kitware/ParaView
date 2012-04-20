@@ -61,8 +61,8 @@ void pqPlotMatrixView::selectionChanged()
   if(vtkScatterPlotMatrix *chartMatrix = vtkScatterPlotMatrix::SafeDownCast(
     this->getContextViewProxy()->GetContextItem()))
     {
-    sel = chartMatrix->GetActiveAnnotationLink() ?
-      chartMatrix->GetActiveAnnotationLink()->GetCurrentSelection() : NULL;
+    sel = chartMatrix->GetAnnotationLink() ?
+      chartMatrix->GetAnnotationLink()->GetCurrentSelection() : NULL;
     }
 
   if(!sel)

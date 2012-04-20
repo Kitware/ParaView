@@ -148,6 +148,13 @@ public:
   virtual vtkAbstractContextItem* GetContextItem();
 //BTX
 protected:
+  virtual void CreateVTKObjects();
+  void ActivePlotChanged();
+
+  void PostRender(bool);
+
+  bool ActiveChanged;
+
   vtkSMPlotMatrixViewProxy();
   ~vtkSMPlotMatrixViewProxy();
   void SendDouble3Vector(const char *func, 

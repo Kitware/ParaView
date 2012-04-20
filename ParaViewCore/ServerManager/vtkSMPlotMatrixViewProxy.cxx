@@ -20,12 +20,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVPlotMatrixView.h"
 #include "vtkPVXMLElement.h"
+#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMPlotMatrixViewProxy);
 
 //---------------------------------------------------------------------------
 vtkSMPlotMatrixViewProxy::vtkSMPlotMatrixViewProxy()
 {
+  this->ActiveChanged = false;
 }
 
 //---------------------------------------------------------------------------
@@ -39,6 +41,51 @@ void vtkSMPlotMatrixViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    return;
+  this->Superclass::CreateVTKObjects();
+
+  vtkPVPlotMatrixView *matrix =
+      vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
+  if (matrix)
+    {
+    matrix->AddObserver(vtkCommand::AnnotationChangedEvent, this,
+                        &vtkSMPlotMatrixViewProxy::ActivePlotChanged);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::ActivePlotChanged()
+{
+  this->ActiveChanged = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPlotMatrixViewProxy::PostRender(bool interactive)
+{
+  this->Superclass::PostRender(interactive);
+
+  if (this->ActiveChanged)
+    {
+    vtkPVPlotMatrixView *matrix =
+        vtkPVPlotMatrixView::SafeDownCast(this->GetClientSideObject());
+    if (matrix)
+      {
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << VTKOBJECT(this) << "SetActivePlot"
+             << matrix->GetActiveRow() << matrix->GetActiveColumn()
+             << vtkClientServerStream::End;
+      this->ExecuteStream(stream);
+      this->ActiveChanged = false;
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkSMPlotMatrixViewProxy::SendDouble3Vector(const char *func, 
                                                      int plotType, 

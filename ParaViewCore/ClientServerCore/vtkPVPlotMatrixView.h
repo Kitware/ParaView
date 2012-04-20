@@ -30,6 +30,12 @@ public:
   vtkAbstractContextItem* GetContextItem();
 
   // Description:
+  // Get/set the active plot in the scatter plot matrix.
+  void SetActivePlot(int i, int j);
+  int GetActiveRow();
+  int GetActiveColumn();
+
+  // Description:
   // Set the title of the active plot.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
