@@ -203,14 +203,14 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
   //if(inInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT &&
   if(inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {
-    vtkPVTrivialProducer* trivialProducer =
-      vtkPVTrivialProducer::New();
-    trivialProducer->SetOutput(clone);
-    trivialProducer->FastDelete();
-    int extent[6];
-    inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
-    trivialProducer->SetWholeExtent(extent);
-    trivialProducer->GatherExtents();
+    // vtkPVTrivialProducer* trivialProducer =
+    //   vtkPVTrivialProducer::New();
+    // trivialProducer->SetOutput(clone);
+    // trivialProducer->FastDelete();
+    // int extent[6];
+    // inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
+    // trivialProducer->SetWholeExtent(extent);
+    // trivialProducer->GatherExtents();
 
 //     clone->GetInformation()->Set(
 //       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
