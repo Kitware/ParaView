@@ -20,6 +20,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkNew.h"
 #include "vtkMPIMoveData.h"
+#include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkRepresentedDataStorage);
 //----------------------------------------------------------------------------
@@ -175,7 +176,26 @@ bool vtkRepresentedDataStorage::NeedsDelivery(
 void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *values)
 
 {
-  cout << "Delivering : " << size << endl;
+  // This method gets called on all processes with the list of representations
+  // to "deliver". We check with the view what mode we're operating in and
+  // decide where the data needs to be delivered.
+  //
+  // Representations can provide overrides, e.g. though the view says data is
+  // merely "pass-through", some representation says we need to clone the data
+  // everywhere. That makes it critical that this method is called on all
+  // processes at the same time to avoid deadlocks and other complications.
+  //
+  // This method will be implemented in "view-specific" subclasses since how the
+  // data is delivered is very view specific.
+
+  vtkTimerLog::MarkStartEvent(use_lod?
+    "LowRes Data Migration" : "FullRes Data Migration");
+
+  bool using_remote_rendering =
+    use_lod? this->View->GetUseDistributedRenderingForInteractiveRender() :
+    this->View->GetUseDistributedRenderingForStillRender();
+  int mode = this->View->GetDataDistributionMode(using_remote_rendering);
+
   for (unsigned int cc=0; cc < size; cc++)
     {
     vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
@@ -185,15 +205,17 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *val
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
     dataMover->SetOutputDataType(data->GetDataObjectType());
-    dataMover->SetMoveModeToCollect();
+    dataMover->SetMoveMode(mode);
+    if (item->AlwaysClone)
+      {
+      dataMover->SetMoveModeToClone();
+      }
     dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
     dataMover->Update();
-
-    if (dataMover->GetServer() == 0)
-      {
-      item->SetDataObject(dataMover->GetOutputDataObject(0));
-      }
+    item->SetDataObject(dataMover->GetOutputDataObject(0));
     }
+  vtkTimerLog::MarkEndEvent(use_lod?
+    "LowRes Data Migration" : "FullRes Data Migration");
 }
 
 //----------------------------------------------------------------------------

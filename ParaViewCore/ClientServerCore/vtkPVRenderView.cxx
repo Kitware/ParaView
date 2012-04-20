@@ -112,6 +112,8 @@ vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 vtkPVRenderView::vtkPVRenderView()
 {
   this->Internals = new vtkInternals();
+  this->Internals->GeometryStore->SetView(this);
+
   this->CounterSynchronizedSuccessfully = true;
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
@@ -799,6 +801,7 @@ void vtkPVRenderView::Update()
   // Gather information about geometry sizes from all representations.
   double local_size = this->GetGeometryStore()->GetVisibleDataSize(false) / 1024.0;
   this->SynchronizedWindows->SynchronizeSize(local_size);
+  cout << "Full Geometry size: " << local_size << endl;
 
   // Update decisions about lod-rendering and remote-rendering.
   this->UseLODForInteractiveRender = this->ShouldUseLODRendering(local_size);
@@ -847,6 +850,7 @@ void vtkPVRenderView::UpdateLOD()
 
   double local_size = this->GetGeometryStore()->GetVisibleDataSize(true) / 1024.0;
   this->SynchronizedWindows->SynchronizeSize(local_size);
+  cout << "LOD Geometry size: " << local_size << endl;
 
   this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
   this->UseDistributedRenderingForInteractiveRender =
