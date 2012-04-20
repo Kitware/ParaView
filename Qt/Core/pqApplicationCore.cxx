@@ -529,16 +529,29 @@ void pqApplicationCore::loadState(
   BEGIN_UNDO_EXCLUDE();
   QList<pqProxy*> proxies =
     this->ServerManagerModel->findItems<pqProxy*>(server);
+  QList<QPointer<pqProxy> > to_destroy;
   foreach (pqProxy* proxy, proxies)
     {
     pqView* view = qobject_cast<pqView*>(proxy);
     if (view)
       {
-      this->ObjectBuilder->destroy(view);
+      to_destroy.push_back(view);
       }
     else if (proxy->getSMGroup()=="layouts")
       {
-      this->ObjectBuilder->destroy(proxy);
+      to_destroy.push_back(proxy);
+      }
+    }
+  foreach (pqProxy* cur, to_destroy)
+    {
+    pqView* view = qobject_cast<pqView*>(cur);
+    if (view)
+      {
+      this->ObjectBuilder->destroy(view);
+      }
+    else if (cur)
+      {
+      this->ObjectBuilder->destroy(cur);
       }
     }
   END_UNDO_EXCLUDE();
