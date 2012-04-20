@@ -230,6 +230,10 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
       {
       this->TestServer = 1;
       this->TestTiledDisplay = 1;
+      this->TestTiledDisplayTDX = "-tdx=";
+      this->TestTiledDisplayTDX += argv[i+1];
+      this->TestTiledDisplayTDY = "-tdy=";
+      this->TestTiledDisplayTDY += argv[i+2];
       fprintf(stderr, "Test Tiled Display.\n");
       }
     if(strcmp(argv[i], "--test-multi-clients") == 0)
@@ -396,9 +400,17 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       // If there is specific flags for the server to pass to mpirun, add them
       if( type == SERVER || type == DATA_SERVER )
         {
-        for(unsigned int i = 0; i < this->TDServerPostFlags.size(); ++i)
+        if(this->TDServerPreFlags.size() == 0)
           {
-          commandLine.push_back(this->TDServerPostFlags[i].c_str());
+          commandLine.push_back(this->TestTiledDisplayTDX.c_str());
+          commandLine.push_back(this->TestTiledDisplayTDY.c_str());
+          }
+        else
+          {
+          for(unsigned int i = 0; i < this->TDServerPostFlags.size(); ++i)
+            {
+            commandLine.push_back(this->TDServerPostFlags[i].c_str());
+            }
           }
         }
       }

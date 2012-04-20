@@ -15,18 +15,27 @@
 #include "vtkTileDisplayHelper.h"
 
 #include "vtkCamera.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+#include "vtkPNGWriter.h"
+
+#include <vtksys/ios/sstream>
+#include <vtkNew.h>
 
 #include <map>
 #include <set>
+#include <string>
 
 class vtkTileDisplayHelper::vtkInternals
 {
 public:
+  std::string DumpImagePath;
   static vtkSmartPointer<vtkTileDisplayHelper> Instance;
+  vtkNew<vtkPNGWriter> PNGWriter;
 
   class vtkTile
     {
@@ -91,23 +100,57 @@ public:
     // overlapping views. This ensures that active view is always rendered on
     // top.        
     this->FlushTile(TileMap->find(current),*TileMap, leftEye);
-    }
+
+    // Check if dumping the tile as an image is needed
+    if(!vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.empty())
+      {
+      for (TilesMapType::iterator iter = TileMap->begin();
+           iter !=TileMap->end(); ++iter)
+        {
+        vtkTile& tile = iter->second;
+        if (tile.Renderer)
+          {
+          vtkSynchronizedRenderers::vtkRawImage rawImage;
+          double viewport[4];
+          tile.Renderer->GetViewport(viewport);
+          tile.Renderer->SetViewport(0, 0, 1, 1);
+          rawImage.Capture(tile.Renderer);
+          tile.Renderer->SetViewport(viewport);
+
+          // Save RGBA raw image into a RGB PNG file
+          if(rawImage.IsValid())
+            {
+            // Allocate RGB output
+            vtkNew<vtkImageData> imageBuffer;
+            imageBuffer->SetDimensions(rawImage.GetWidth(), rawImage.GetHeight(), 1);
+            imageBuffer->AllocateScalars(VTK_UNSIGNED_CHAR, 3); // RGB
+
+            // Copy RGBA image to a RBG one.
+            unsigned char* readRGBAPointer = (unsigned char*)rawImage.GetRawPtr()->GetVoidPointer(0);
+            unsigned char* writeRGBPointer = (unsigned char*)imageBuffer->GetScalarPointer();
+            vtkIdType nbTuples =  rawImage.GetWidth()* rawImage.GetHeight();
+            for(vtkIdType tupleIndex = 0; tupleIndex < nbTuples; ++tupleIndex)
+              {
+              memcpy(writeRGBPointer, readRGBAPointer, 3); // Copy RBG
+              writeRGBPointer += 3;                        // Skip RGB
+              readRGBAPointer += 4;                        // Skip RGBA
+              }
+
+            this->PNGWriter->SetFileName(vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath.c_str());
+            this->PNGWriter->SetInputData(imageBuffer.GetPointer());
+            this->PNGWriter->Write();
+            }
+          break;
+          }
+        }
+      }
+  }
 };
 
 vtkSmartPointer<vtkTileDisplayHelper>
 vtkTileDisplayHelper::vtkInternals::Instance;
 
-//----------------------------------------------------------------------------
-vtkTileDisplayHelper* vtkTileDisplayHelper::New()
-{
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkTileDisplayHelper");
-  if(ret)
-    {
-    return static_cast<vtkTileDisplayHelper*>(ret);
-    }
-  return new vtkTileDisplayHelper;
-}
-
+vtkStandardNewMacro(vtkTileDisplayHelper);
 //----------------------------------------------------------------------------
 vtkTileDisplayHelper::vtkTileDisplayHelper()
 {
@@ -192,4 +235,24 @@ void vtkTileDisplayHelper::EnableKey(unsigned int key)
 void vtkTileDisplayHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkTileDisplayHelper::SetDumpImagePath(const char* newPath)
+{
+  if(newPath == NULL)
+    {
+    vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = "";
+    }
+  else
+    {
+    int pid =
+        vtkMultiProcessController::GetGlobalController() ?
+          vtkMultiProcessController::GetGlobalController()->GetLocalProcessId():
+          1;
+
+    vtksys_ios::ostringstream fullPath;
+    fullPath << newPath << "-tile_" << pid << ".png";
+    vtkTileDisplayHelper::GetInstance()->Internals->DumpImagePath = fullPath.str();
+    }
 }

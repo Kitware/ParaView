@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<pqevents>
+<pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
+<pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+<pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface" />
+<pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="RTData" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitHorizontal" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.2/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/RenderView" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+<pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,23,5,/0:0/0:0" />
+<pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,23,5,/0:0/0:0" />
+<pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+<pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="ProbeLine" />
+<pqevent object="outputDialog/clearButton" command="activate" arguments="" />
+<pqevent object="outputDialog/closeButton" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/SplitHorizontal" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/TitleBar" command="mousePress" arguments="1,1,0,224,10" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/Close" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo" command="mousePress" arguments="1,1,0,81,77" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo" command="mouseRelease" arguments="1,0,0,81,77" />
+<pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,8,10,/0:0/0:0/1:1" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Viewport" command="mousePress" arguments="(0.799283,0.0973783,1,1,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Viewport" command="mouseMove" arguments="(0.799283,0.0973783,1,0,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Frame.1/Viewport" command="mouseRelease" arguments="(0.799283,0.0973783,1,0,0)" />
+<pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Viewport" command="mousePress" arguments="(0.423077,0.241573,1,1,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Viewport" command="mouseMove" arguments="(0.423077,0.241573,1,0,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.5/Viewport" command="mouseRelease" arguments="(0.423077,0.241573,1,0,0)" />
+<pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/Viewport" command="mousePress" arguments="(0.541958,0.20412,1,1,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/Viewport" command="mouseMove" arguments="(0.541958,0.20412,1,0,0)" />
+<pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/Viewport" command="mouseRelease" arguments="(0.541958,0.20412,1,0,0)" />
+<pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-tile_0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-tile_0.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-tile_1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-tile_1.png" />
+</pqevents>

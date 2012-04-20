@@ -273,7 +273,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVKeyFrameAnimationCue.cxx
   vtkPVRenderViewProxy.cxx
   vtkSciVizStatistics.cxx
-  vtkTileDisplayHelper.cxx
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorWidget.cxx
