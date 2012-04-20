@@ -151,6 +151,12 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Color transfer function widgets
   this->restoreOptionalUserSettings();
   this->Form->ScalarColor->setVisible(0);
+  this->Form->pushButtonScalarColor->setFixedHeight(40);
+  this->Form->pushButtonScalarColor->setText("");
+  this->Form->pushButtonScalarColor->setVisible(0);
+  this->connect(this->Form->pushButtonScalarColor,SIGNAL(clicked()),
+    this->Form->ScalarColor, SLOT(chooseColor()));
+
   this->connect(this->Form->ScalarColor,SIGNAL(chosenColorChanged(const QColor &)),
     this, SLOT(setScalarColor(const QColor &)));
   this->connect(this->Form->opacityScalar, SIGNAL(editingFinished()),
@@ -158,16 +164,13 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(this->Form->pushButtonApply, SIGNAL(clicked()),
     this, SLOT(updateDisplay()));
 
-  QVBoxLayout* tfLayout = new QVBoxLayout(this->Form->frameColorTF);
-  this->ColorMapViewer = new pqTransferFunctionChartViewWidget(
-    this);
+  QLayout* tfLayout = this->Form->frameColorTF->layout();
+  this->ColorMapViewer = new pqTransferFunctionChartViewWidget(this);
   this->ColorMapViewer->setFixedHeight(40);
-  this->OpacityFunctionViewer = new pqTransferFunctionChartViewWidget(
-    this);
+  this->OpacityFunctionViewer = new pqTransferFunctionChartViewWidget(this);
   this->OpacityFunctionViewer->setSizePolicy(
     QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->OpacityFunctionViewer->setMinimumHeight(60);
-  tfLayout->setMargin(0);
   tfLayout->addWidget(this->ColorMapViewer);
 
   QVBoxLayout* opacityLayout = new QVBoxLayout(this->Form->frameOpacity);
@@ -779,23 +782,28 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
       {
       return;
       }
+    this->setScalarButtonColor(color);
+
     int total = clientTF->GetSize();
     double nodeVal[6];
     QList<QVariant> rgbPoints;
-    for(int i = 0; i < total; i++)
+    clientTF->GetNodeValue(total-1, nodeVal);
+    nodeVal[1]=color.redF();
+    nodeVal[2]=color.greenF();
+    nodeVal[3]=color.blueF();
+    clientTF->SetNodeValue(total-1, nodeVal);
+    rgbPoints << nodeVal[0] << nodeVal[1] << nodeVal[2] <<nodeVal[3];
+    for(int i = 0; i < total-1; i++)
       {
       clientTF->GetNodeValue(i, nodeVal);
-      nodeVal[1]=color.redF();
-      nodeVal[2]=color.greenF();
-      nodeVal[3]=color.blueF();
-      clientTF->SetNodeValue(i, nodeVal);
       rgbPoints << nodeVal[0] << nodeVal[1] << nodeVal[2] <<nodeVal[3];
       }
-    //// SHOULD NEVER GET HERE
+
     // If there is only one control point in the transfer function originally,
     // we need to add another control point.
     if(total == 1)
       {
+      //// SHOULD NEVER GET HERE
       rgbPoints << nodeVal[0] << nodeVal[1] << nodeVal[2] <<nodeVal[3];
       }
 
@@ -806,6 +814,16 @@ void pqColorScaleEditor::setScalarColor(const QColor &color)
     this->Form->InSetColors = false;
     this->renderViewOptionally();
     }
+}
+
+void pqColorScaleEditor::setScalarButtonColor(const QColor &color)
+{
+  this->Form->pushButtonScalarColor->setAutoFillBackground(true);
+  QString stylesheet = "background-color: rgb(";
+  stylesheet.append(QString::number(color.red())).append(", ").
+    append(QString::number(color.green())).append(", ").
+    append(QString::number(color.blue())).append("); border: none");
+  this->Form->pushButtonScalarColor->setStyleSheet(stylesheet);
 }
 
 void pqColorScaleEditor::renderTransferFunctionViews()
@@ -892,7 +910,6 @@ void pqColorScaleEditor::loadPreset()
       vtkPiecewiseFunction *opacities = NULL;
       vtkColorTransferFunction* colors = this->currentColorFunction();
       this->ColorMapViewer->currentControlPointsItem()->SetCurrentPoint(-1);
-      colors->RemoveAllPoints();
       if(this->OpacityFunction)
         {
         opacities = this->currentOpacityFunction();
@@ -904,18 +921,38 @@ void pqColorScaleEditor::loadPreset()
       // Update the displayed range.
       temp.getValueRange(value, opacity);
       this->updateScalarRange(value.getDoubleValue(), opacity.getDoubleValue());
-
-      for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
+      bool singleScalar = (value.getDoubleValue()==opacity.getDoubleValue());
+      int numPoints = colorMap->getNumberOfPoints();
+      if(colors && numPoints > 0)
         {
-        temp.getPointColor(i, color);
-        temp.getPointValue(i, value);
-        colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
-            color.greenF(), color.blueF());
-        if(this->OpacityFunction)
+        colors->RemoveAllPoints();
+        if(singleScalar)
           {
-          temp.getPointOpacity(i, opacity);
-          opacities->AddPoint(value.getDoubleValue(),
-              opacity.getDoubleValue());
+          if(numPoints>1)
+            {
+            temp.getPointColor(numPoints-1, color);
+            colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+              color.greenF(), color.blueF());
+            }
+          temp.getPointColor(0, color);
+          colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+            color.greenF(), color.blueF());
+          }
+        else
+          {
+          for(int i = 0; i < numPoints; i++)
+            {
+            temp.getPointColor(i, color);
+            temp.getPointValue(i, value);
+            colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+              color.greenF(), color.blueF());
+            if(this->OpacityFunction)
+              {
+              temp.getPointOpacity(i, opacity);
+              opacities->AddPoint(value.getDoubleValue(),
+                opacity.getDoubleValue());
+              }
+            }
           }
         }
 
@@ -965,7 +1002,19 @@ void pqColorScaleEditor::loadPreset()
 
       // Update the actual color map.
       this->Form->IgnoreEditor = false;
-      this->pushColors();
+
+      if(singleScalar)
+        {
+        // the color to set on the color button
+        this->Form->ScalarColor->blockSignals(true);
+        this->Form->ScalarColor->setChosenColor(color);
+        this->Form->ScalarColor->blockSignals(false);
+        this->setScalarColor(color);        
+        }
+      else
+        {
+        this->pushColors();
+        }
 
       this->updatePointValues();
       }
@@ -1610,7 +1659,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   vtkColorTransferFunction* colors = this->currentColorFunction();
   if(colors)
     {
-    //colors->SetAllowDuplicateScalars(min==max);
+    colors->SetAllowDuplicateScalars(min==max);
     this->ColorMapViewer->chartBounds(chartBounds);
     chartBounds[2] = min;
     chartBounds[3] = max;
@@ -1626,11 +1675,11 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
       this->OpacityFunctionViewer->resetView();
       }
     }
-  //vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
-  //if(pwf)
-  //  {
-  //  pwf->SetAllowDuplicateScalars(min==max);
-  //  }
+  vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
+  if(pwf)
+    {
+    pwf->SetAllowDuplicateScalars(min==max);
+    }
   if(this->ColorMap)
     {
     this->updateColorFunctionVisibility();
@@ -1872,10 +1921,12 @@ void pqColorScaleEditor::updateCurrentColorPoint()
   // and set the scalar value to the text box
   if(tf && singleScalar)
     {
-    double rgb[3];
-    tf->GetColor(range[0], rgb);
+    double nodeVal[6];
+    tf->GetNodeValue(0, nodeVal);
+    double rgb[3]={nodeVal[1], nodeVal[2], nodeVal[3]};
+    this->setScalarButtonColor(QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
     this->Form->ScalarColor->setChosenColor(
-      QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+          QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
     this->Form->ScalarValue->setText(QString::number(range[0], 'g', 6));
     }
 }
@@ -1929,7 +1980,7 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
       }
     }
 
-  // If there is only one scalar value, get the color
+  // If there is only one scalar value, get the opacity
   // and set it to the ScalarColor button
   if(this->OpacityFunction && singleScalar)
     {
@@ -2054,13 +2105,15 @@ void pqColorScaleEditor::updateColorFunctionVisibility()
     {
     if(range[0]==range[1])
       {
-      this->Form->frameColorTF->setVisible(0);
-      this->Form->ScalarColor->setVisible(1);
+      this->ColorMapViewer->setVisible(0);
+      this->Form->frameColorTF->setFrameShape(QFrame::Box);
+      this->Form->pushButtonScalarColor->setVisible(1);
       }
     else
       {
-      this->Form->frameColorTF->setVisible(1);
-      this->Form->ScalarColor->setVisible(0);
+      this->ColorMapViewer->setVisible(1);
+      this->Form->frameColorTF->setFrameShape(QFrame::StyledPanel);
+      this->Form->pushButtonScalarColor->setVisible(0);
       }
     vtkColorTransferFunction* ctf = vtkColorTransferFunction::SafeDownCast(
       this->ColorMap->getProxy()->GetClientSideObject());
