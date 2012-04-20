@@ -31,7 +31,14 @@ paraview_build_optional_plugin(Manta "Manta ray traced rendering" Manta OFF)
 paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields" Moments ON)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PacMan "Testing plugin" TestPlugin  ON)
-paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON)
+
+# The PointSprite plugin does not build in static mode therefore we make sure it is disable
+if(BUILD_SHARED_LIBS)
+  paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON)
+else(BUILD_SHARED_LIBS)
+  set(PARAVIEW_BUILD_PLUGIN_PointSprite OFF CACHE BOOL "Must be disable in static build" FORCE)
+endif(BUILD_SHARED_LIBS)
+
 IF(PARAVIEW_ENABLE_PYTHON)
   paraview_build_optional_plugin(pvblot "pvblot" pvblot ON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
