@@ -202,8 +202,13 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     // When this process doesn't have any valid input, the cache-keeper is setup
     // to provide a place-holder dataset of the right type.
-    vtkPVRenderView::SetPiece(inInfo, this, 
-      this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(
+      inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+    if (this->Actor->GetProperty()->GetOpacity() < 1.0)
+      {
+      outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+      }
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {

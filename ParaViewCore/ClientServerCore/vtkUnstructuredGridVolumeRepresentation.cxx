@@ -189,8 +189,11 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
+    outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+
     vtkPVRenderView::SetPiece(inInfo, this,
       this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::MarkAsRedistributable(inInfo, this);
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {

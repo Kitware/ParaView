@@ -25,11 +25,13 @@
 
 #include "vtkObject.h"
 #include "vtkWeakPointer.h"
+#include "vtkSmartPointer.h"
 
 class vtkAlgorithmOutput;
 class vtkDataObject;
 class vtkPVDataRepresentation;
 class vtkPVRenderView;
+class vtkPKdTree;
 
 //BTX
 #include <vector>
@@ -66,6 +68,13 @@ public:
 
   void SetView(vtkPVRenderView*);
 
+  // Description:
+  // Render-view specific API to mark a piece as "re-distributable" i.e. it
+  // needs to be "moved around" when ordered compositing is needed.
+  void MarkAsRedistributable(vtkPVDataRepresentation*);
+
+  vtkPKdTree* GetKdTree();
+
 //BTX
   bool NeedsDelivery(unsigned long timestamp,
     std::vector<int>& keys_to_deliver, bool use_low_res);
@@ -75,6 +84,7 @@ protected:
   ~vtkRepresentedDataStorage();
 
   vtkWeakPointer<vtkPVRenderView> View;
+  vtkSmartPointer<vtkPKdTree> KdTree;
 
 private:
   vtkRepresentedDataStorage(const vtkRepresentedDataStorage&); // Not implemented

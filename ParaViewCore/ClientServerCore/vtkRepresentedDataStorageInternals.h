@@ -40,12 +40,14 @@ public:
   public:
     vtkWeakPointer<vtkPVDataRepresentation> Representation;
     bool AlwaysClone;
+    bool Redistributable;
 
     vtkItem() :
       Producer(vtkSmartPointer<vtkPVTrivialProducer>::New()),
       TimeStamp(0),
       ActualMemorySize(0),
-      AlwaysClone(false)
+      AlwaysClone(false),
+      Redistributable(false)
     { }
 
     void SetDataObject(vtkDataObject* data)

@@ -17,7 +17,6 @@
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
-#include "vtkBSPCutsGenerator.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkDataRepresentation.h"
@@ -154,6 +153,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Selector = vtkPVHardwareSelector::New();
   this->SynchronizationCounter  = 0;
   this->PreviousParallelProjectionStatus = 0;
+  this->NeedsOrderedCompositing = false;
 
   this->LastComputedBounds[0] = this->LastComputedBounds[2] =
     this->LastComputedBounds[4] = -1.0;
@@ -207,8 +207,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->LightKit = vtkLightKit::New();
   this->GetRenderer()->AddLight(this->Light);
   this->GetRenderer()->SetAutomaticLightCreation(0);
-
-  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
 
   if (this->Interactor)
     {
@@ -309,9 +307,6 @@ vtkPVRenderView::~vtkPVRenderView()
     this->RubberBandZoom->Delete();
     this->RubberBandZoom = 0;
     }
-
-  this->OrderedCompositingBSPCutsSource->Delete();
-  this->OrderedCompositingBSPCutsSource = NULL;
 
   delete this->Internals;
   this->Internals = NULL;
@@ -798,6 +793,21 @@ void vtkPVRenderView::Update()
 
   this->Superclass::Update();
 
+  // check if any representation told us that it needed ordered compositing.
+  this->NeedsOrderedCompositing = false;
+  int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
+  for (int cc=0; cc < num_reprs; cc++)
+    {
+    vtkInformation* info =
+      this->ReplyInformationVector->GetInformationObject(cc);
+    if (info->Has(NEED_ORDERED_COMPOSITING()) &&
+      info->Get(NEED_ORDERED_COMPOSITING()) != 0)
+      {
+      this->NeedsOrderedCompositing= true;
+      break;
+      }
+    }
+
   // Gather information about geometry sizes from all representations.
   double local_size = this->GetGeometryStore()->GetVisibleDataSize(false) / 1024.0;
   this->SynchronizedWindows->SynchronizeSize(local_size);
@@ -980,6 +990,9 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
 
+  this->SynchronizedRenderers->SetKdTree(
+    this->Internals->GeometryStore->GetKdTree());
+
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
   // view is being rendered. We explicitly mark the view being rendered using
@@ -1093,6 +1106,21 @@ vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(vtkInformation* info,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::MarkAsRedistributable(
+  vtkInformation* info, vtkPVDataRepresentation* repr)
+{
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
+  if (!storage)
+    {
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    return;
+    }
+  storage->MarkAsRedistributable(repr);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
   vtkPVDataRepresentation* repr, bool clone)
 {
@@ -1156,6 +1184,11 @@ bool vtkPVRenderView::ShouldUseLODRendering(double geometry_size)
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
   if (this->SynchronizedWindows->GetIsInCave())
+    {
+    return false;
+    }
+
+  if (!this->NeedsOrderedCompositing)
     {
     return false;
     }

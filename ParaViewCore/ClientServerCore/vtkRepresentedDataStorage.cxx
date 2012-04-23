@@ -15,11 +15,16 @@
 #include "vtkRepresentedDataStorage.h"
 #include "vtkRepresentedDataStorageInternals.h"
 
-#include "vtkObjectFactory.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkPVRenderView.h"
-#include "vtkNew.h"
+#include "vtkBSPCutsGenerator.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
+#include "vtkOrderedCompositeDistributor.h"
+#include "vtkPKdTree.h"
+#include "vtkPVRenderView.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkRepresentedDataStorage);
@@ -93,6 +98,22 @@ void vtkRepresentedDataStorage::SetDeliverToAllProcesses(
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::MarkAsRedistributable(
+  vtkPVDataRepresentation* repr)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
+  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true);
+  if (item)
+    {
+    item->Redistributable = true;
+    low_item->Redistributable = true;
+    }
+  else
+    {
+    vtkErrorMacro("Invalid argument.");
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkRepresentedDataStorage::SetPiece(
@@ -196,6 +217,7 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *val
     this->View->GetUseDistributedRenderingForStillRender();
   int mode = this->View->GetDataDistributionMode(using_remote_rendering);
 
+
   for (unsigned int cc=0; cc < size; cc++)
     {
     vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
@@ -214,10 +236,82 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *val
     dataMover->Update();
     item->SetDataObject(dataMover->GetOutputDataObject(0));
     }
+
+  // There's a possibility that we'd need to do ordered compositing.
+  // Ask the view if we need to redistribute the data for ordered compositing.
+  bool use_ordered_compositing = using_remote_rendering &&
+    this->View->GetUseOrderedCompositing();
+
+  if (use_ordered_compositing && !use_lod)
+    {
+    vtkNew<vtkBSPCutsGenerator> cutsGenerator;
+    vtkInternals::ItemsMapType::iterator iter;
+    for (iter = this->Internals->ItemsMap.begin();
+      iter != this->Internals->ItemsMap.end(); ++iter)
+      {
+      vtkInternals::vtkItem& item =  iter->second.first;
+      if (item.Representation &&
+        item.Representation->GetVisibility() &&
+        item.Redistributable)
+        {
+        cutsGenerator->AddInputData(item.GetDataObject());
+        }
+      }
+
+    vtkMultiProcessController* controller =
+      vtkMultiProcessController::GetGlobalController();
+    vtkStreamingDemandDrivenPipeline *sddp = vtkStreamingDemandDrivenPipeline::
+      SafeDownCast(cutsGenerator->GetExecutive());
+    sddp->SetUpdateExtent
+      (0,controller->GetLocalProcessId(),controller->GetNumberOfProcesses(),0);
+    sddp->Update(0);
+
+    this->KdTree = cutsGenerator->GetPKdTree();
+    }
+  else if (!use_lod)
+    {
+    this->KdTree = NULL;
+    }
+  // FIXME:STREAMING
+  // 1. Fix code to avoid recomputing of KdTree unless really necessary.
+  // 2. If KdTree is recomputed and is indeed different, then we need to
+  //    redistribute all the visible "redistributable" datasets, not just the
+  //    ones being requested.
+
+  if (this->KdTree)
+    {
+    vtkTimerLog::MarkStartEvent("Redistributing Data for Ordered Compositing");
+    for (unsigned int cc=0; cc < size; cc++)
+      {
+      vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
+      if (!item->Redistributable)
+        {
+        continue;
+        }
+
+      vtkDataObject* data = item->GetDataObject();
+
+      vtkNew<vtkOrderedCompositeDistributor> redistributor;
+      redistributor->SetController(vtkMultiProcessController::GetGlobalController());
+      redistributor->SetInputData(data);
+      redistributor->SetPKdTree(this->KdTree);
+      redistributor->SetPassThrough(0);
+      redistributor->Update();
+      item->SetDataObject(redistributor->GetOutputDataObject(0));
+      }
+    vtkTimerLog::MarkEndEvent("Redistributing Data for Ordered Compositing");
+    }
+
+
   vtkTimerLog::MarkEndEvent(use_lod?
     "LowRes Data Migration" : "FullRes Data Migration");
 }
 
+//----------------------------------------------------------------------------
+vtkPKdTree* vtkRepresentedDataStorage::GetKdTree()
+{
+  return this->KdTree;
+}
 //----------------------------------------------------------------------------
 void vtkRepresentedDataStorage::PrintSelf(ostream& os, vtkIndent indent)
 {

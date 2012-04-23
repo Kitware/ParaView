@@ -38,7 +38,6 @@
 #include "vtkPVView.h"
 
 class vtkAlgorithmOutput;
-class vtkBSPCutsGenerator;
 class vtkCamera;
 class vtkCameraManipulator;
 class vtkInformationDoubleKey;
@@ -385,6 +384,8 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
   static void SetDeliverLODToAllProcesses(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
+  static void MarkAsRedistributable(
+    vtkInformation* info, vtkPVDataRepresentation* repr);
 
 public:
   //*****************************************************************
@@ -520,6 +521,16 @@ public:
   // Provides access to the geometry storage for this view.
   vtkRepresentedDataStorage* GetGeometryStore();
 
+  // Description:
+  // Returns true when ordered compositing is needed on the current group of
+  // processes. Note that unlike most other functions, this may return different
+  // values on different processes e.g.
+  // \li always false on client and dataserver
+  // \li true on pvserver or renderserver if opacity < 1 or volume present, else
+  //     false
+  bool GetUseOrderedCompositing();
+
+
 //BTX
 protected:
   vtkPVRenderView();
@@ -559,15 +570,6 @@ protected:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
   void GatherBoundsInformation(bool using_remote_rendering);
-
-  // Description:
-  // Returns true when ordered compositing is needed on the current group of
-  // processes. Note that unlike most other functions, this may return different
-  // values on different processes e.g.
-  // \li always false on client and dataserver
-  // \li true on pvserver or renderserver if opacity < 1 or volume present, else
-  //     false
-  bool GetUseOrderedCompositing();
 
   // Description:
   // Set the last selection object.
@@ -624,6 +626,7 @@ protected:
   bool UseOffscreenRendering;
   bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForSceenshots;
+  bool NeedsOrderedCompositing;
 
   double LODResolution;
   bool UseLightKit;
@@ -635,8 +638,6 @@ protected:
   bool UseDistributedRenderingForInteractiveRender;
 
   static bool RemoteRenderingAllowed;
-
-  vtkBSPCutsGenerator* OrderedCompositingBSPCutsSource;
 
   vtkTimeStamp UpdateTime;
   vtkTimeStamp StillRenderTime;

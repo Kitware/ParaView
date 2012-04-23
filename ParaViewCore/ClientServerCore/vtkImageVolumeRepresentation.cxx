@@ -100,6 +100,8 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     // vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
     vtkPVRenderView::SetPiece(inInfo, this,
       this->OutlineSource->GetOutputDataObject(0));
+    outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
