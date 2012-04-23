@@ -796,7 +796,9 @@ int vtkPVGeometryFilter::RequestAMRData(
 
       if( ug == NULL )
         {
-        mpds->SetPiece( dataIdx, NULL );
+        vtkPolyData *trivialInput = vtkPolyData::New();
+        mpds->SetPiece( dataIdx, trivialInput );
+        trivialInput->Delete();
         }
       else
         {
@@ -814,6 +816,12 @@ int vtkPVGeometryFilter::RequestAMRData(
           mpds->SetPiece( dataIdx, tmpOut );
           tmpOut->Delete();
           } // END if AMR data is visible
+        else
+          {
+          vtkPolyData *trivialInput = vtkPolyData::New();
+          mpds->SetPiece( dataIdx, trivialInput );
+          trivialInput->Delete();
+          }
         } // END else
 
       } // END for all data
@@ -871,7 +879,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkDataObject* block = iter->GetCurrentDataObject();
-    
+
     vtkPolyData* tmpOut = vtkPolyData::New();
     this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
     this->ExecuteCellNormals(tmpOut, 0);
