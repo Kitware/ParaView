@@ -178,33 +178,35 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
 
 
   MATH(EXPR REQUIRED_CPU '${tdx}*${tdy}-1') # -1 is for LESS
-  if (${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
-    foreach (test_script ${ACT_TEST_SCRIPTS})
+  if (${PARAVIEW_USE_MPI})
+    if (${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+      foreach (test_script ${ACT_TEST_SCRIPTS})
 
-      get_filename_component(test_name ${test_script} NAME_WE)
-      set (extra_args)
-      process_args(extra_args)
-      add_test("${prefix}-${tdx}x${tdy}.${test_name}"
-          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
-          --test-tiled ${tdx} ${tdy}
-          --server ${PARAVIEW_SERVER_EXECUTABLE}
+        get_filename_component(test_name ${test_script} NAME_WE)
+        set (extra_args)
+        process_args(extra_args)
+        add_test("${prefix}-${tdx}x${tdy}.${test_name}"
+            ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+            --test-tiled ${tdx} ${tdy}
+            --server ${PARAVIEW_SERVER_EXECUTABLE}
 
-          --client ${CLIENT_EXECUTABLE}
-          -dr
-          --disable-light-kit
-          --test-directory=${PARAVIEW_TEST_DIR}
-          --test-script=${test_script}
-          --tile-image-prefix=${PARAVIEW_TEST_DIR}/${test_name}
+            --client ${CLIENT_EXECUTABLE}
+            -dr
+            --disable-light-kit
+            --test-directory=${PARAVIEW_TEST_DIR}
+            --test-script=${test_script}
+            --tile-image-prefix=${PARAVIEW_TEST_DIR}/${test_name}
 
-          ${extra_args}
-          --exit
-          )
-      set_property(TEST "${prefix}-${tdx}x${tdy}.${test_name}"
-                   PROPERTY ENVIRONMENT "PV_ICET_WINDOW_BORDERS=1")
-      if (${test_name}_FORCE_SERIAL)
-        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
-        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
-      endif (${test_name}_FORCE_SERIAL)
-    endforeach(test_script)
-  endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+            ${extra_args}
+            --exit
+            )
+        set_property(TEST "${prefix}-${tdx}x${tdy}.${test_name}"
+                     PROPERTY ENVIRONMENT "PV_ICET_WINDOW_BORDERS=1")
+        if (${test_name}_FORCE_SERIAL)
+          set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+          message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+        endif (${test_name}_FORCE_SERIAL)
+      endforeach(test_script)
+    endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+  endif()
 ENDFUNCTION (add_tile_display_tests)
