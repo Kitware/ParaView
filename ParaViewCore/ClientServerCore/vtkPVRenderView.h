@@ -237,15 +237,11 @@ public:
   vtkGetMacro(UseLightKit, bool);
   vtkBooleanMacro(UseLightKit, bool);
 
-  static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
-
   // Description:
-  // vtkDataRepresentation can use this key to publish meta-data about geometry
-  // size in the vtkPVView::REQUEST_UPDATE() or vtkPVView::REQUEST_UPDATE_LOD()
-  // passes. If this meta-data is available,
-  // then the view can make informed decisions about where to render/whether to
-  // use LOD etc.
-  static vtkInformationIntegerKey* GEOMETRY_SIZE();
+  // Key used to pass the internal vtkRepresentedDataStorage instance to the
+  // representations to get/set datasets to be delivered to rendering
+  // processes.
+  static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
 
   // Description:
   // vtkDataRepresentation can use this key to publish meta-data about geometry
@@ -254,53 +250,18 @@ public:
   // decisions when resetting camera to the bounds of visible data.
   static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
 
-  // DATA_DISTRIBUTION_MODE indicates where the geometry/data is to be
-  // delivered for the current render/update.
-  static vtkInformationIntegerKey* DATA_DISTRIBUTION_MODE();
-
+  // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.
   static vtkInformationIntegerKey* USE_LOD();
 
-  // DELIVER_LOD_TO_CLIENT is not used currently. I am just defining it as a
-  // placeholder. Currently tile-displays don't have the mode in which only LOD
-  // is delivered to the client.
-  static vtkInformationIntegerKey* DELIVER_LOD_TO_CLIENT();
-
-  // DELIVER_OUTLINE_TO_CLIENT is used to tile-display mode which tells the
-  // delivery filters to always delivery outline to the client.
-  static vtkInformationIntegerKey* DELIVER_OUTLINE_TO_CLIENT();
-
-  // the difference between DELIVER_OUTLINE_TO_CLIENT_FOR_LOD and
-  // DELIVER_OUTLINE_TO_CLIENT is that DELIVER_OUTLINE_TO_CLIENT_FOR_LOD implies
-  // that only the LOD delivery filters should deliver outline, but use normal
-  // pipeline when delivering full res geometry.
-  static vtkInformationIntegerKey* DELIVER_OUTLINE_TO_CLIENT_FOR_LOD();
-  static vtkInformationDoubleKey* LOD_RESOLUTION();
-
   // Description:
-  // This view supports ordered compositing, if needed. When ordered compositing
-  // needs to be employed, this view requires that all representations
-  // redistribute the data using a KdTree. To tell the view of the vtkAlgorithm
-  // that is producing some redistributable data, representation can use this
-  // key in their REQUEST_INFORMATION() pass to put the producer in the
-  // outInfo.
-  static vtkInformationObjectBaseKey* REDISTRIBUTABLE_DATA_PRODUCER();
+  // Indicates the LOD resolution when USE_LOD() is set.
+  static vtkInformationDoubleKey* LOD_RESOLUTION();
 
   // Description:
   // Representation can publish this key in their REQUEST_INFORMATION() pass to
   // indicate that the representation needs ordered compositing.
   static vtkInformationIntegerKey* NEED_ORDERED_COMPOSITING();
-
-  // Description:
-  // This is used by the view in the REQUEST_RENDER() pass to tell the
-  // representations the KdTree, if any to use for distributing the data. If
-  // none is present, then representations should not redistribute the data.
-  static vtkInformationObjectBaseKey* KD_TREE();
-
-  // Description:
-  // Placed in REQUEST_PREPARE_FOR_RENDER() stage to indicate that the
-  // representation needs delivery.
-  static vtkInformationIntegerKey* NEEDS_DELIVERY();
 
   // Description:
   // Make a selection. This will result in setting up of this->LastSelection

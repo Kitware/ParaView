@@ -25,11 +25,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVUpdateSuppressor.h"
 #include "vtkRenderer.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 
 vtkStandardNewMacro(vtkDataLabelRepresentation);
 //----------------------------------------------------------------------------
@@ -40,8 +38,6 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
 
   this->MergeBlocks = vtkCompositeDataToUnstructuredGridFilter::New();
   this->CacheKeeper = vtkPVCacheKeeper::New();
-  this->DataCollector = vtkUnstructuredDataDeliveryFilter::New();
-  this->DeliverySuppressor = vtkPVUpdateSuppressor::New();
 
   this->PointLabelMapper = vtkLabeledDataMapper::New();
   this->PointLabelActor = vtkActor2D::New();
@@ -55,13 +51,10 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->CellLabelActor = vtkActor2D::New();
   this->CellLabelProperty = vtkTextProperty::New();
 
-  this->DataCollector->SetOutputDataType(VTK_UNSTRUCTURED_GRID);
-
   this->CacheKeeper->SetInputConnection(this->MergeBlocks->GetOutputPort());
 
-  this->DeliverySuppressor->SetInputConnection(this->DataCollector->GetOutputPort());
-  this->PointLabelMapper->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
-  this->CellCenters->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
+  //this->PointLabelMapper->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
+  //this->CellCenters->SetInputConnection(this->DeliverySuppressor->GetOutputPort());
   this->CellLabelMapper->SetInputConnection(this->CellCenters->GetOutputPort());
 
   this->PointLabelActor->SetMapper(this->PointLabelMapper);
@@ -77,15 +70,12 @@ vtkDataLabelRepresentation::vtkDataLabelRepresentation()
   this->CellLabelActor->SetVisibility(0);
 
   this->TransformHelperProp = vtkActor::New();
-  this->InitializeForCommunication();
 }
 
 //----------------------------------------------------------------------------
 vtkDataLabelRepresentation::~vtkDataLabelRepresentation()
 {
   this->MergeBlocks->Delete();
-  this->DataCollector->Delete();
-  this->DeliverySuppressor->Delete();
   this->PointLabelMapper->Delete();
   this->PointLabelActor->Delete();
   this->PointLabelProperty->Delete();
@@ -96,16 +86,6 @@ vtkDataLabelRepresentation::~vtkDataLabelRepresentation()
   this->Transform->Delete();
   this->TransformHelperProp->Delete();
   this->CacheKeeper->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkDataLabelRepresentation::InitializeForCommunication()
-{
-  vtkInformation* info = vtkInformation::New();
-  info->Set(vtkPVRenderView::DATA_DISTRIBUTION_MODE(),
-    vtkMPIMoveData::CLONE);
-  this->DataCollector->ProcessViewRequest(info);
-  info->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -339,8 +319,6 @@ bool vtkDataLabelRepresentation::RemoveFromView(vtkView* view)
 int vtkDataLabelRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->DataCollector->Modified();
-
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -349,13 +327,11 @@ int vtkDataLabelRepresentation::RequestData(vtkInformation* request,
     {
     this->MergeBlocks->SetInputConnection(
       this->GetInternalOutputPort());
-    this->MergeBlocks->Update();
-    this->DataCollector->SetInputConnection(this->CacheKeeper->GetOutputPort());
+    this->CacheKeeper->Update();
     }
   else
     {
     this->MergeBlocks->RemoveAllInputs();
-    this->DataCollector->RemoveAllInputs();
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -366,26 +342,26 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
   vtkInformation* inInfo, vtkInformation* outInfo)
 {
-  if (!this->GetVisibility())
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    return false;
+    // i.e. this->GetVisibility() == false, hence nothing to do.
+    return 0;
     }
 
-  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    if (this->DeliverySuppressor->GetForcedUpdateTimeStamp() <
-      this->DataCollector->GetMTime())
-      {
-      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-      }
+    vtkPVRenderView::SetPiece(inInfo, this, 
+      this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
     }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+  else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    this->DataCollector->Modified();
-    this->DeliverySuppressor->ForceUpdate();
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    this->PointLabelMapper->SetInputConnection(producerPort);
+    this->CellCenters->SetInputConnection(producerPort);
     }
 
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  return 1;
 }
 
 //----------------------------------------------------------------------------

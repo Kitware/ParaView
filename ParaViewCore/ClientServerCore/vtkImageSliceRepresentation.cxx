@@ -134,10 +134,6 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     // to provide a place-holder dataset of the right type.
     vtkPVRenderView::SetPiece(inInfo, this, 
       this->CacheKeeper->GetOutputDataObject(0));
-
-    // FIXME:STREAMING :- how do we tell the view this image data is not to
-    // "re-distributed" when ordered compositing is needed (actually, is that
-    // true?)
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

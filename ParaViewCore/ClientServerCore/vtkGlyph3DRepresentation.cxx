@@ -27,7 +27,6 @@
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkQuadricClustering.h"
 #include "vtkRenderer.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 
 vtkStandardNewMacro(vtkGlyph3DRepresentation);
 //----------------------------------------------------------------------------
@@ -39,38 +38,38 @@ vtkGlyph3DRepresentation::vtkGlyph3DRepresentation()
   this->LODGlyphMapper = vtkGlyph3DMapper::New();
   this->GlyphActor = vtkPVLODActor::New();
 
-  this->DataCollector = vtkUnstructuredDataDeliveryFilter::New();
-  this->DataCollector->SetOutputDataType(VTK_POLY_DATA);
+  //this->DataCollector = vtkUnstructuredDataDeliveryFilter::New();
+  //this->DataCollector->SetOutputDataType(VTK_POLY_DATA);
 
-  this->LODDataCollector = vtkUnstructuredDataDeliveryFilter::New();
-  this->LODDataCollector->SetOutputDataType(VTK_POLY_DATA);
+  //this->LODDataCollector = vtkUnstructuredDataDeliveryFilter::New();
+  //this->LODDataCollector->SetOutputDataType(VTK_POLY_DATA);
 
   this->GlyphUpdateSuppressor = vtkPVUpdateSuppressor::New();
   this->LODGlyphUpdateSuppressor = vtkPVUpdateSuppressor::New();
 
   this->DummySource = vtkPVArrowSource::New();
 
-  this->GlyphUpdateSuppressor->SetInputConnection(
-    this->DataCollector->GetOutputPort());
-  this->GlyphMapper->SetInputConnection(
-    1, this->GlyphUpdateSuppressor->GetOutputPort());
+  //this->GlyphUpdateSuppressor->SetInputConnection(
+  //  this->DataCollector->GetOutputPort());
+  //this->GlyphMapper->SetInputConnection(
+  //  1, this->GlyphUpdateSuppressor->GetOutputPort());
 
-  this->LODGlyphUpdateSuppressor->SetInputConnection(
-    this->LODDataCollector->GetOutputPort());
-  this->LODGlyphMapper->SetInputConnection(
-    1, this->LODGlyphUpdateSuppressor->GetOutputPort());
+  //this->LODGlyphUpdateSuppressor->SetInputConnection(
+  //  this->LODDataCollector->GetOutputPort());
+  //this->LODGlyphMapper->SetInputConnection(
+  //  1, this->LODGlyphUpdateSuppressor->GetOutputPort());
 
   this->GlyphActor->SetMapper(this->GlyphMapper);
   this->GlyphActor->SetLODMapper(this->LODGlyphMapper);
   this->GlyphActor->SetProperty(this->Property);
 
-  // The glyph geometry is always cloned.
-  vtkInformation* info = vtkInformation::New();
-  info->Set(vtkPVRenderView::DATA_DISTRIBUTION_MODE(),
-    vtkMPIMoveData::CLONE);
-  this->DataCollector->ProcessViewRequest(info);
-  this->LODDataCollector->ProcessViewRequest(info);
-  info->Delete();
+  //// The glyph geometry is always cloned.
+  //vtkInformation* info = vtkInformation::New();
+  //info->Set(vtkPVRenderView::DATA_DISTRIBUTION_MODE(),
+  //  vtkMPIMoveData::CLONE);
+  //this->DataCollector->ProcessViewRequest(info);
+  //this->LODDataCollector->ProcessViewRequest(info);
+  //info->Delete();
 
   this->MeshVisibility = true;
   this->SetMeshVisibility(false);
@@ -88,8 +87,8 @@ vtkGlyph3DRepresentation::~vtkGlyph3DRepresentation()
   this->GlyphUpdateSuppressor->Delete();
   this->LODGlyphUpdateSuppressor->Delete();
 
-  this->DataCollector->Delete();
-  this->LODDataCollector->Delete();
+  //this->DataCollector->Delete();
+  //this->LODDataCollector->Delete();
   this->DummySource->Delete();
 }
 
@@ -152,22 +151,22 @@ int vtkGlyph3DRepresentation::FillInputPortInformation(int port,
 int vtkGlyph3DRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->DataCollector->Modified();
-  this->LODDataCollector->Modified();
-
-  if (inputVector[1]->GetNumberOfInformationObjects()==1)
-    {
-    this->DataCollector->SetInputConnection(this->GetInternalOutputPort(1));
-    this->LODDataCollector->SetInputConnection(this->GetInternalOutputPort(1));
-    }
-  else
-    {
-    this->DataCollector->RemoveAllInputs();
-    this->LODDataCollector->RemoveAllInputs();
-    this->DataCollector->SetInputConnection(this->DummySource->GetOutputPort());
-    this->LODDataCollector->SetInputConnection(this->DummySource->GetOutputPort());
-    }
-
+//  this->DataCollector->Modified();
+//  this->LODDataCollector->Modified();
+//
+//  if (inputVector[1]->GetNumberOfInformationObjects()==1)
+//    {
+//    this->DataCollector->SetInputConnection(this->GetInternalOutputPort(1));
+//    this->LODDataCollector->SetInputConnection(this->GetInternalOutputPort(1));
+//    }
+//  else
+//    {
+//    this->DataCollector->RemoveAllInputs();
+//    this->LODDataCollector->RemoveAllInputs();
+//    this->DataCollector->SetInputConnection(this->DummySource->GetOutputPort());
+//    this->LODDataCollector->SetInputConnection(this->DummySource->GetOutputPort());
+//    }
+//
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 

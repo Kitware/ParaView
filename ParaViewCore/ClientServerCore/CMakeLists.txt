@@ -31,7 +31,6 @@ SET (Kit_SRCS
   vtkGeometryRepresentation.cxx
   vtkGeometryRepresentationWithFaces.cxx
   vtkGlyph3DRepresentation.cxx
-  vtkImageSliceDataDeliveryFilter.cxx
   vtkPVImageSliceMapper.cxx
   vtkImageSliceRepresentation.cxx
   vtkImageVolumeRepresentation.cxx
@@ -114,7 +113,6 @@ SET (Kit_SRCS
   vtkSpreadSheetView.cxx
   vtkTCPNetworkAccessManager.cxx
   vtkTextSourceRepresentation.cxx
-  vtkUnstructuredDataDeliveryFilter.cxx
   vtkUnstructuredGridVolumeRepresentation.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXYChartRepresentation.cxx

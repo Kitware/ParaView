@@ -36,8 +36,6 @@ class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
 class vtkPVRenderView;
-class vtkPVUpdateSuppressor;
-class vtkUnstructuredDataDeliveryFilter;
 class vtkVolumeProperty;
 
 class VTK_EXPORT vtkAMRVolumeRepresentation : public vtkPVDataRepresentation
@@ -182,8 +180,6 @@ protected:
   vtkPVRenderView *RenderView;
 
   vtkOutlineSource* OutlineSource;
-  vtkUnstructuredDataDeliveryFilter* OutlineDeliveryFilter;
-  vtkPVUpdateSuppressor* OutlineUpdateSuppressor;
   vtkPolyDataMapper* OutlineMapper;
 
   int ColorAttributeType;

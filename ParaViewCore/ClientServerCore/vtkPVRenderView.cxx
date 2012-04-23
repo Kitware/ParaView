@@ -93,17 +93,9 @@ public:
 bool vtkPVRenderView::RemoteRenderingAllowed = true;
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkInformationKeyMacro(vtkPVRenderView, GEOMETRY_SIZE, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DATA_DISTRIBUTION_MODE, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT_FOR_LOD, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_LOD_TO_CLIENT, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, REDISTRIBUTABLE_DATA_PRODUCER, ObjectBase);
-vtkInformationKeyMacro(vtkPVRenderView, KD_TREE, ObjectBase);
-vtkInformationKeyMacro(vtkPVRenderView, NEEDS_DELIVERY, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REPRESENTED_DATA_STORE, ObjectBase);
 vtkInformationKeyRestrictedMacro(vtkPVRenderView, GEOMETRY_BOUNDS, DoubleVector, 6);
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
