@@ -51,13 +51,16 @@ public:
 
     void SetDataObject(vtkDataObject* data)
       {
-      this->DataObject = data;
-      this->Producer->SetOutput(data);
-      // the vtkTrivialProducer's MTime is is changed whenever the data itself
-      // changes or the data's mtime changes and hence we get a good indication
-      // of when we have a new piece for real.
-      this->TimeStamp = this->Producer->GetMTime();
-      this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+      if (data && data->GetMTime() > this->TimeStamp)
+        {
+        this->DataObject = data;
+        this->Producer->SetOutput(data);
+        // the vtkTrivialProducer's MTime is is changed whenever the data itself
+        // changes or the data's mtime changes and hence we get a good indication
+        // of when we have a new piece for real.
+        this->TimeStamp = this->Producer->GetMTime();
+        this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+        }
       }
 
     vtkPVTrivialProducer* GetProducer() const
