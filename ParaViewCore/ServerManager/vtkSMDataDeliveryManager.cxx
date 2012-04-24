@@ -96,6 +96,9 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;
 
   std::vector<int> keys_to_deliver;
+  
+
+
   // FIXME:STREAMING this logic is not the best here. We end up re-delivering
   // geometry when the representation didn't really update at all.
   if (!view->GetGeometryStore()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
@@ -103,6 +106,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     return;
     }
 
+  cout << "Request Delivery: " <<  keys_to_deliver.size() << endl;
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this->ViewProxy)

@@ -18,7 +18,6 @@
 #ifndef __vtkRepresentedDataStorageInternals_h
 #define __vtkRepresentedDataStorageInternals_h
 
-#include "vtkCompositeRepresentation.h"
 #include "vtkDataObject.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVTrivialProducer.h"
@@ -100,24 +99,6 @@ public:
         &(this->ItemsMap[index].first);
       }
 
-    // We have to this wackiness for vtkCompositeRepresentation.
-    // vtkCompositeRepresentation doesn't add it's "active" representation to
-    // the view, but instead forwards call to it. That implies that the item
-    // registered with the vtkRepresentedDataStorage is not the same as the item
-    // used when passing data using SetPiece() and such calls. Hence we handle
-    // vtkCompositeRepresentation specially.
-    ItemsMapType::iterator iter2;
-    for (iter2 = this->ItemsMap.begin(); iter2 != this->ItemsMap.end(); ++iter2)
-      {
-      vtkItem& item = use_second? iter2->second.second : iter2->second.first;
-
-      vtkCompositeRepresentation* composite = vtkCompositeRepresentation::SafeDownCast(
-        item.Representation.GetPointer());
-      if (composite && composite->GetActiveRepresentation() == repr)
-        {
-        return &item;
-        }
-      }
     return NULL;
     }
 

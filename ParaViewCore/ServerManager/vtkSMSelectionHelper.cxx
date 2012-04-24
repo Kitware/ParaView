@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkCompositeRepresentation.h"
 #include "vtkDataRepresentation.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
@@ -39,10 +40,10 @@
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMSession.h"
-#include "vtkUnsignedIntArray.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
 #include <vector>
@@ -634,7 +635,15 @@ namespace
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
       {
       vtkSMProxy* reprProxy = helper.GetAsProxy(cc);
-      if (reprProxy && reprProxy->GetClientSideObject() == repr)
+      vtkPVDataRepresentation* cur_repr = vtkPVDataRepresentation::SafeDownCast(
+        reprProxy? reprProxy->GetClientSideObject() : NULL);
+      if (cur_repr == repr)
+        {
+        return reprProxy;
+        }
+      vtkCompositeRepresentation* compRepr =
+        vtkCompositeRepresentation::SafeDownCast(cur_repr);
+      if (compRepr && compRepr->GetActiveRepresentation() == repr)
         {
         return reprProxy;
         }

@@ -37,7 +37,6 @@ public:
 
   std::string ActiveRepresentationKey;
 
-  vtkWeakPointer<vtkView> View;
   vtkSmartPointer<vtkStringArray> RepresentationTypes;
 };
 
@@ -71,21 +70,6 @@ void vtkCompositeRepresentation::SetVisibility(bool visible)
     repr->SetVisibility(visible);
     }
 }
-
-//----------------------------------------------------------------------------
-int vtkCompositeRepresentation::ProcessViewRequest(
-  vtkInformationRequestKey* request_type, vtkInformation* inInfo,
-  vtkInformation* outInfo)
-{
-  int ret_val = this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
-  vtkPVDataRepresentation* repr = this->GetActiveRepresentation();
-  if (repr && ret_val)
-    {
-    ret_val = repr->ProcessViewRequest(request_type, inInfo, outInfo);
-    }
-  return ret_val;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkCompositeRepresentation::AddRepresentation(
@@ -259,83 +243,13 @@ void vtkCompositeRepresentation::MarkModified()
 //----------------------------------------------------------------------------
 void vtkCompositeRepresentation::Update()
 {
-  vtkPVDataRepresentation* curActive = this->GetActiveRepresentation();
-  if (curActive)
-    {
-    curActive->Update();
-    }
+  // FIXME:STREAMING -- do we call Update() on the active repr here?
+  //vtkPVDataRepresentation* curActive = this->GetActiveRepresentation();
+  //if (curActive)
+  //  {
+  //  curActive->Update();
+  //  }
   this->Superclass::Update();
-}
-
-//----------------------------------------------------------------------------
-void vtkCompositeRepresentation::SetUpdateTime(double time)
-{
-  vtkInternals::RepresentationMap::iterator iter;
-  for (iter = this->Internals->Representations.begin();
-    iter != this->Internals->Representations.end(); iter++)
-    {
-    iter->second.GetPointer()->SetUpdateTime(time);
-    }
-  this->Superclass::SetUpdateTime(time);
-}
-//----------------------------------------------------------------------------
-void vtkCompositeRepresentation::SetUseCache(bool val)
-{
-  vtkInternals::RepresentationMap::iterator iter;
-  for (iter = this->Internals->Representations.begin();
-    iter != this->Internals->Representations.end(); iter++)
-    {
-    iter->second.GetPointer()->SetUseCache(val);
-    }
-  this->Superclass::SetUseCache(val);
-}
-//----------------------------------------------------------------------------
-void vtkCompositeRepresentation::SetCacheKey(double val)
-{
-  vtkInternals::RepresentationMap::iterator iter;
-  for (iter = this->Internals->Representations.begin();
-    iter != this->Internals->Representations.end(); iter++)
-    {
-    iter->second.GetPointer()->SetCacheKey(val);
-    }
-  this->Superclass::SetCacheKey(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkCompositeRepresentation::SetForceUseCache(bool val)
-{
-  vtkInternals::RepresentationMap::iterator iter;
-  for (iter = this->Internals->Representations.begin();
-    iter != this->Internals->Representations.end(); iter++)
-    {
-    iter->second.GetPointer()->SetForceUseCache(val);
-    }
-  this->Superclass::SetForceUseCache(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkCompositeRepresentation::SetForcedCacheKey(double val)
-{
-  vtkInternals::RepresentationMap::iterator iter;
-  for (iter = this->Internals->Representations.begin();
-    iter != this->Internals->Representations.end(); iter++)
-    {
-    iter->second.GetPointer()->SetForcedCacheKey(val);
-    }
-  this->Superclass::SetForcedCacheKey(val);
-}
-
-//----------------------------------------------------------------------------
-vtkSelection* vtkCompositeRepresentation::ConvertSelection(
-  vtkView* view, vtkSelection* selection)
-{
-  vtkPVDataRepresentation* activeRepr = this->GetActiveRepresentation();
-  if (activeRepr)
-    {
-    return activeRepr->ConvertSelection(view, selection);
-    }
-
-  return this->Superclass::ConvertSelection(view, selection);
 }
 
 //----------------------------------------------------------------------------
@@ -353,24 +267,26 @@ vtkDataObject* vtkCompositeRepresentation::GetRenderedDataObject(int port)
 //----------------------------------------------------------------------------
 bool vtkCompositeRepresentation::AddToView(vtkView* view)
 {
-  this->Internals->View = view;
-  vtkPVDataRepresentation* activeRepr = this->GetActiveRepresentation();
-  if (activeRepr)
+  vtkInternals::RepresentationMap::iterator iter;
+  for (iter = this->Internals->Representations.begin();
+    iter != this->Internals->Representations.end(); iter++)
     {
-    activeRepr->AddToView(view);
+    view->AddRepresentation(iter->second.GetPointer());
     }
+
   return this->Superclass::AddToView(view);
 }
 
 //----------------------------------------------------------------------------
 bool vtkCompositeRepresentation::RemoveFromView(vtkView* view)
 {
-  vtkPVDataRepresentation* activeRepr = this->GetActiveRepresentation();
-  if (activeRepr)
+  vtkInternals::RepresentationMap::iterator iter;
+  for (iter = this->Internals->Representations.begin();
+    iter != this->Internals->Representations.end(); iter++)
     {
-    activeRepr->RemoveFromView(view);
+    view->RemoveRepresentation(iter->second.GetPointer());
     }
-  this->Internals->View = 0;
+
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -394,14 +310,9 @@ void vtkCompositeRepresentation::SetActiveRepresentation(const char* key)
   vtkPVDataRepresentation* newActive = this->GetActiveRepresentation();
   if (curActive != newActive)
     {
-    if (curActive && this->Internals->View)
+    if (curActive)
       {
-      curActive->RemoveFromView(this->Internals->View);
-      }
-
-    if (newActive && this->Internals->View)
-      {
-      newActive->AddToView(this->Internals->View);
+      curActive->SetVisibility(false);
       }
 
     if (newActive)
