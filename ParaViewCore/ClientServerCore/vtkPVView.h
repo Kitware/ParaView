@@ -129,26 +129,6 @@ public:
   // This is called for every render.
   static vtkInformationRequestKey* REQUEST_RENDER();
 
-  // FIXME:STREAMING: REQUEST_INFORMATION(), REQUEST_PREPARE_FOR_RENDER(),
-  //                  REQUEST_DELIVERY() need to be removed.
-
-  // Description:
-  // This is a Request-MetaData pass. This happens only after REQUEST_UPDATE()
-  // has happened. In this pass representations typically publish information
-  // that may be useful for rendering optimizations such as geometry sizes, etc.
-  static vtkInformationRequestKey* REQUEST_INFORMATION();
-
-  // Description:
-  // This is a Prepare-for-rendering pass. This happens only after
-  // REQUEST_UPDATE() has happened. This is called for every render.
-  static vtkInformationRequestKey* REQUEST_PREPARE_FOR_RENDER();
-
-  // Description:
-  // This is called to make representations deliver data to the rendering nodes
-  // after REQUEST_PREPARE_FOR_RENDER(). Called for every render only on those
-  // representations that should deliver data.
-  static vtkInformationRequestKey* REQUEST_DELIVERY();
-
   // Description:
   // Overridden to not call Update() directly on the input representations,
   // instead use ProcessViewRequest() for all vtkPVDataRepresentations.

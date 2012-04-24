@@ -59,11 +59,8 @@ vtkPVView::vtkInternals::MapOfSynchronizedWindows
 vtkPVView::vtkInternals::SynchronizedWindows;
 
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_INFORMATION, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_PREPARE_FOR_RENDER, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_DELIVERY, Request);
 
 //----------------------------------------------------------------------------
 vtkPVView::vtkPVView()
