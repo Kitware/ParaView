@@ -157,6 +157,8 @@ protected:
 
   vtkSMPlotMatrixViewProxy();
   ~vtkSMPlotMatrixViewProxy();
+  void SendAnimationPath();
+  void AnimationTickEvent();
   void SendDouble3Vector(const char *func, 
                         int plotType, double *data);
   void SendDouble4Vector(const char *func, 

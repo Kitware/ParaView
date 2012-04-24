@@ -19,6 +19,7 @@
 #include "vtkScatterPlotMatrix.h"
 #include "vtkContextView.h"
 #include "vtkContextScene.h"
+#include "vtkRenderWindow.h"
 #include "vtkTextProperty.h"
 #include "vtkCommand.h"
 
@@ -33,6 +34,12 @@ vtkPVPlotMatrixView::vtkPVPlotMatrixView()
     &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
   this->PlotMatrix->AddObserver(
     vtkCommand::AnnotationChangedEvent, this,
+    &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
+  this->PlotMatrix->AddObserver(
+    vtkCommand::CreateTimerEvent, this,
+    &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
+  this->PlotMatrix->AddObserver(
+    vtkCommand::AnimationCueTickEvent, this,
     &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
 
   this->ContextView->GetScene()->AddItem(this->PlotMatrix);
@@ -83,6 +90,30 @@ int vtkPVPlotMatrixView::GetActiveColumn()
     {
     return this->PlotMatrix->GetActivePlot().Y();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::ClearAnimationPath()
+{
+  this->PlotMatrix->ClearAnimationPath();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::AddAnimationPath(int i, int j)
+{
+  this->PlotMatrix->AddAnimationPath(vtkVector2i(i, j));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::StartAnimationPath()
+{
+  this->PlotMatrix->BeginAnimationPath(this->RenderWindow->GetInteractor());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::AdvanceAnimationPath()
+{
+  this->PlotMatrix->AdvanceAnimation();
 }
 
 //----------------------------------------------------------------------------

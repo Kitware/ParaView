@@ -36,6 +36,22 @@ public:
   int GetActiveColumn();
 
   // Description:
+  // Clear the animation path, ensuring it is empty.
+  void ClearAnimationPath();
+
+  // Description:
+  // Append to the animation path of the scatter plot matrix.
+  void AddAnimationPath(int i, int j);
+
+  // Description:
+  // Append to the animation path of the scatter plot matrix.
+  void StartAnimationPath();
+
+  // Description:
+  // Push the animation forward a frame.
+  void AdvanceAnimationPath();
+
+  // Description:
   // Set the title of the active plot.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
