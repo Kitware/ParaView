@@ -245,9 +245,13 @@ public:
 
   // Description:
   // vtkDataRepresentation can use this key to publish meta-data about geometry
-  // bounds in the vtkPVView::REQUEST_UPDATE() or vtkPVView::REQUEST_UPDATE_LOD()
-  // passes. If this meta-data is available, then the view can make informed
+  // bounds in the vtkPVView::REQUEST_UPDATE().
+  // If this meta-data is available, then the view can make informed
   // decisions when resetting camera to the bounds of visible data.
+  // If no bounds are specified by a representation then the data bounds are
+  // used, if possible.
+  // Note that all process don't have to report bounds. The view takes care of
+  // consolidating the bounds between all views.
   static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
 
   // Description:
@@ -491,6 +495,9 @@ public:
   //     false
   bool GetUseOrderedCompositing();
 
+  // Description:
+  // Synchronizes core ivars for multi-client setups.
+  bool SynchronizeForCollaboration();
 
 //BTX
 protected:
@@ -546,10 +553,6 @@ protected:
   // displaying an image in a viewport.
   bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
 
-  // Description:
-  // Synchronizes core ivars for multi-client setups.
-  virtual void SynchronizeForCollaboration();
-
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
@@ -577,7 +580,6 @@ protected:
   // Used in collaboration mode to ensure that views are in the same state
   // (as far as representations added/removed goes) before rendering.
   int SynchronizationCounter;
-  bool CounterSynchronizedSuccessfully;
 
   // In mega-bytes.
   double RemoteRenderingThreshold;
@@ -599,10 +601,6 @@ protected:
   bool UseDistributedRenderingForInteractiveRender;
 
   static bool RemoteRenderingAllowed;
-
-  vtkTimeStamp UpdateTime;
-  vtkTimeStamp StillRenderTime;
-  vtkTimeStamp InteractiveRenderTime;
 
   vtkTypeUInt32 StillRenderProcesses;
   vtkTypeUInt32 InteractiveRenderProcesses;

@@ -79,9 +79,9 @@ public:
       }
     };
 
-  typedef std::map<int, std::pair<vtkItem, vtkItem> > ItemsMapType;
+  typedef std::map<unsigned int, std::pair<vtkItem, vtkItem> > ItemsMapType;
 
-  vtkItem* GetItem(int index, bool use_second)
+  vtkItem* GetItem(unsigned int index, bool use_second)
     {
     if (this->ItemsMap.find(index) != this->ItemsMap.end())
       {
@@ -97,7 +97,7 @@ public:
       this->RepresentationToIdMap.find(repr);
     if (iter != this->RepresentationToIdMap.end())
       {
-      int index = iter->second;
+      unsigned int index = iter->second;
       return use_second? &(this->ItemsMap[index].second) :
         &(this->ItemsMap[index].first);
       }
@@ -123,7 +123,7 @@ public:
     return size;
     }
 
-  typedef std::map<vtkPVDataRepresentation*, int>
+  typedef std::map<vtkPVDataRepresentation*, unsigned int>
     RepresentationToIdMapType;
 
   RepresentationToIdMapType RepresentationToIdMap;

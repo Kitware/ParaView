@@ -23,7 +23,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPKdTree.h"
+#include "vtkProcessModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSession.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 
@@ -55,7 +57,7 @@ unsigned long vtkRepresentedDataStorage::GetVisibleDataSize(bool low_res)
 
 //----------------------------------------------------------------------------
 void vtkRepresentedDataStorage::RegisterRepresentation(
-  int id, vtkPVDataRepresentation* repr)
+  unsigned int id, vtkPVDataRepresentation* repr)
 {
   this->Internals->RepresentationToIdMap[repr] = id;
 
@@ -145,7 +147,7 @@ vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetPiece(int id, vtkDataObject* data, bool
+void vtkRepresentedDataStorage::SetPiece(unsigned int id, vtkDataObject* data, bool
   low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
@@ -161,7 +163,7 @@ void vtkRepresentedDataStorage::SetPiece(int id, vtkDataObject* data, bool
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
-  int id, bool low_res)
+  unsigned int id, bool low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
   if (!item)
@@ -176,7 +178,7 @@ vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
 //----------------------------------------------------------------------------
 bool vtkRepresentedDataStorage::NeedsDelivery(
   unsigned long timestamp, 
-  std::vector<int> &keys_to_deliver, bool use_low)
+  std::vector<unsigned int> &keys_to_deliver, bool use_low)
 {
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin();
@@ -194,9 +196,19 @@ bool vtkRepresentedDataStorage::NeedsDelivery(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, int *values)
+void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned int *values)
 
 {
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (activeSession && activeSession->IsMultiClients())
+    {
+    if (!this->View->SynchronizeForCollaboration())
+      {
+      return;
+      }
+    }
+
   // This method gets called on all processes with the list of representations
   // to "deliver". We check with the view what mode we're operating in and
   // decide where the data needs to be delivered.

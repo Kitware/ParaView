@@ -49,7 +49,7 @@ public:
   // makes it possible for representations to communicate with the storage
   // directly using a self pointer, while enables views on different processes
   // to communicate information about representations using their unique ids.
-  void RegisterRepresentation(int id, vtkPVDataRepresentation*);
+  void RegisterRepresentation(unsigned int id, vtkPVDataRepresentation*);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
 
   // Description:
@@ -57,14 +57,14 @@ public:
   vtkAlgorithmOutput* GetProducer(vtkPVDataRepresentation*, bool low_res);
   void SetDeliverToAllProcesses(vtkPVDataRepresentation*, bool flag, bool low_res);
 
-  void SetPiece(int, vtkDataObject* data, bool low_res);
-  vtkAlgorithmOutput* GetProducer(int, bool low_res);
+  void SetPiece(unsigned int, vtkDataObject* data, bool low_res);
+  vtkAlgorithmOutput* GetProducer(unsigned int, bool low_res);
 
   // Description:
   // Returns the size for all visible geometry.
   unsigned long GetVisibleDataSize(bool low_res);
 
-  void Deliver(int use_low_res, unsigned int size, int *keys);
+  void Deliver(int use_low_res, unsigned int size, unsigned int *keys);
 
   void SetView(vtkPVRenderView*);
 
@@ -77,7 +77,7 @@ public:
 
 //BTX
   bool NeedsDelivery(unsigned long timestamp,
-    std::vector<int>& keys_to_deliver, bool use_low_res);
+    std::vector<unsigned int>& keys_to_deliver, bool use_low_res);
 
 protected:
   vtkRepresentedDataStorage();

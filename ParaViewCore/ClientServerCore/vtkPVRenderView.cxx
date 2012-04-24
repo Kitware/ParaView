@@ -75,14 +75,7 @@
 class vtkPVRenderView::vtkInternals
 {
 public:
-  std::map<void*, int> RepToIdMap;
-  std::map<int, vtkDataRepresentation*> IdToRepMap;
-  int UniqueId;
-  vtkInternals()
-    {
-    this->UniqueId = 0;
-    }
-
+  unsigned int UniqueId;
   vtkNew<vtkRepresentedDataStorage> GeometryStore;
 };
 
@@ -104,8 +97,6 @@ vtkPVRenderView::vtkPVRenderView()
 {
   this->Internals = new vtkInternals();
   this->Internals->GeometryStore->SetView(this);
-
-  this->CounterSynchronizedSuccessfully = true;
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
@@ -257,7 +248,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->GetNonCompositedRenderer()->SetRenderWindow(0);
   this->GetRenderer()->SetRenderWindow(0);
 
-
   this->SetLastSelection(NULL);
   this->Selector->Delete();
   this->SynchronizedRenderers->Delete();
@@ -347,23 +337,14 @@ void vtkPVRenderView::Initialize(unsigned int id)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
 {
-  if (vtk3DWidgetRepresentation::SafeDownCast(rep) == NULL)
+  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
+  if (dataRep != NULL)
     {
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
     this->SynchronizationCounter++;
-
     unsigned int id = this->Internals->UniqueId++;
-
-    this->Internals->RepToIdMap[rep] = id;
-    this->Internals->IdToRepMap[id] = rep;
-
-    vtkPVDataRepresentation* dataRep =
-      vtkPVDataRepresentation::SafeDownCast(rep);
-    if (dataRep)
-      {
-      this->Internals->GeometryStore->RegisterRepresentation(id, dataRep);
-      }
+    this->Internals->GeometryStore->RegisterRepresentation(id, dataRep);
     }
 
   this->Superclass::AddRepresentationInternal(rep);
@@ -372,19 +353,10 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
 {
-  if (this->Internals->RepToIdMap.find(rep) !=
-    this->Internals->RepToIdMap.end())
+  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
+  if (dataRep != NULL)
     {
-    int id = this->Internals->RepToIdMap[rep];
-    this->Internals->IdToRepMap.erase(id);
-    this->Internals->RepToIdMap.erase(rep);
-
-    vtkPVDataRepresentation* dataRep =
-      vtkPVDataRepresentation::SafeDownCast(rep);
-    if (dataRep)
-      {
-      this->Internals->GeometryStore->UnRegisterRepresentation(dataRep);
-      }
+    this->Internals->GeometryStore->UnRegisterRepresentation(dataRep);
 
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
@@ -515,10 +487,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->MakingSelection = true;
 
-  // since setting this->MakingSelection to true may change data-delivery needs,
-  // we change the update time.
-  this->UpdateTime.Modified();
-
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
   // render (or a nonremote render) in which case we need to update the
@@ -557,7 +525,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     }
 
   this->MakingSelection = false;
-  this->UpdateTime.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -720,9 +687,9 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SynchronizeForCollaboration()
+bool vtkPVRenderView::SynchronizeForCollaboration()
 {
-  this->CounterSynchronizedSuccessfully = false;
+  bool counterSynchronizedSuccessfully = false;
 
   // Also, can we optimize this further? This happens on every render in
   // collaborative mode.
@@ -746,7 +713,7 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     r_controller->Send(stream, 1, 41000);
     int server_sync_counter;
     r_controller->Receive(&server_sync_counter, 1, 1, 41001);
-    this->CounterSynchronizedSuccessfully =
+    counterSynchronizedSuccessfully =
       (server_sync_counter == this->SynchronizationCounter);
     }
   else
@@ -758,21 +725,19 @@ void vtkPVRenderView::SynchronizeForCollaboration()
       int client_sync_counter;
       stream >> client_sync_counter >> this->RemoteRenderingThreshold;
       r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
-      this->CounterSynchronizedSuccessfully =
+      counterSynchronizedSuccessfully =
         (client_sync_counter == this->SynchronizationCounter);
       }
 
     if (p_controller)
       {
       p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
-      int temp = this->CounterSynchronizedSuccessfully? 1 : 0;
+      int temp = counterSynchronizedSuccessfully? 1 : 0;
       p_controller->Broadcast(&temp, 1, 0);
-      this->CounterSynchronizedSuccessfully = (temp == 1);
+      counterSynchronizedSuccessfully = (temp == 1);
       }
     }
-  // Force DoDataDelivery(). That should happen every time in collaborative
-  // mode.
-  this->UpdateTime.Modified();
+  return counterSynchronizedSuccessfully;
 }
 
 //----------------------------------------------------------------------------
@@ -785,7 +750,12 @@ void vtkPVRenderView::Update()
 
   this->Superclass::Update();
 
-  // check if any representation told us that it needed ordered compositing.
+  // After every update we can expect the representation geometries to change.
+  // Thus we need to determine whether we are doing to remote-rendering or not,
+  // use-lod or not, etc. All these decisions are made right here to avoid
+  // making them during each render-call.
+
+  // Check if any representation told us that it needed ordered compositing.
   this->NeedsOrderedCompositing = false;
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   for (int cc=0; cc < num_reprs; cc++)
@@ -830,11 +800,6 @@ void vtkPVRenderView::Update()
     this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
     }
 
-  // UpdateTime is used to determine if we need to redeliver the geometries.
-  // Hence the more accurate we can be about when to update this time, the
-  // better. Right now, we are relying on the client (vtkSMViewProxy) to ensure
-  // that Update is called only when some representation is modified.
-  this->UpdateTime.Modified();
   vtkTimerLog::MarkEndEvent("RenderView::Update");
 }
 
@@ -891,13 +856,6 @@ void vtkPVRenderView::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
-  if (activeSession && activeSession->IsMultiClients())
-    {
-    this->SynchronizeForCollaboration();
-    }
-
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode && !this->RemoteRenderingAvailable)
@@ -955,15 +913,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     }
 
   this->UsedLODForLastRender = use_lod_rendering;
-
-  if (interactive)
-    {
-    this->InteractiveRenderTime.Modified();
-    }
-  else
-    {
-    this->StillRenderTime.Modified();
-    }
 
   if (skip_rendering)
     {

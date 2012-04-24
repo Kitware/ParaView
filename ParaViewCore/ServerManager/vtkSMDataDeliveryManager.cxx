@@ -95,7 +95,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   vtkTimeStamp& timeStamp = use_lod?
     this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;
 
-  std::vector<int> keys_to_deliver;
+  std::vector<unsigned int> keys_to_deliver;
   
 
 
