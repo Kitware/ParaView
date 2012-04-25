@@ -390,22 +390,6 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVCommon
   vtkPVCommonCS
   vtkXdmfCS
-  vtkParallelCoreCS
-  vtkChartsCore
-  vtkChartsCoreCS
-  vtkAMRCore
-  vtkAMRCoreCS
-  vtkIOEnSight
-  vtkInteractionWidgets
-  vtkIOParallel
-  vtkIOImport
-  vtkFiltersHyperTree
-  vtkFiltersStatistics
-  vtkFiltersParallelStatistics
-  vtkFiltersGeneric
-  vtkRenderingParallel
-  vtkIOExodus
-  vtkImagingFourier
   KWCommon
   vtksys
   ${KIT_LIBS}
@@ -414,6 +398,13 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${OPENGL_gl_LIBRARY}
   ${PARAVIEW_ADDITIONAL_LIBRARIES}
 )
+
+foreach(_module ${VTK_MODULES_ENABLED})
+  if(NOT ${_module}_EXCLUDE_FROM_WRAPPING)
+    target_link_libraries(vtk${KIT} ${_module}CS)
+  endif() 
+endforeach()
+
 IF (VTK_USE_QVTK)
   TARGET_LINK_LIBRARIES(vtk${KIT} QVTK)
 ENDIF (VTK_USE_QVTK)
