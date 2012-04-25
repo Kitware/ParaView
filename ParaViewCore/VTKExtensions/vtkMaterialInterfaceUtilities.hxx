@@ -30,11 +30,11 @@ using vtksys_ios::ofstream;
 using vtksys_ios::ifstream;
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
-#include<vtkstd/vector>
+#include<vector>
 using std::vector;
-#include<vtkstd/string>
+#include<string>
 using std::string;
-#include<vtkstd/algorithm>
+#include<algorithm>
 // other
 #include<assert.h>
 

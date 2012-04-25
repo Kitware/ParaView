@@ -148,7 +148,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
       new_value.begin(), new_value.end(), 
       std::inserter(to_remove, to_remove.begin()));
 
-    for (vtkstd::set<vtkTypeUInt32>::iterator iter = to_remove.begin();
+    for (std::set<vtkTypeUInt32>::iterator iter = to_remove.begin();
       iter != to_remove.end(); ++iter)
       {
       vtkObjectBase* arg = this->GetObjectBase(*iter);
@@ -179,7 +179,7 @@ bool vtkSIProxyProperty::Push(vtkSMMessage* message, int offset)
     }
 
   // Deal with proxy to add
-  for (vtkstd::set<vtkTypeUInt32>::iterator iter = to_add.begin();
+  for (std::set<vtkTypeUInt32>::iterator iter = to_add.begin();
       iter != to_add.end(); ++iter)
     {
     vtkObjectBase* arg = this->GetObjectBase(*iter);

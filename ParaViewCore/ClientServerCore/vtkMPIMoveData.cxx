@@ -52,7 +52,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
-#include <vtkstd/vector>
+#include <vector>
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
