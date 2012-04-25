@@ -42,7 +42,7 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   vtk_module_load(${module})
   vtk_module_classes_load(${module})
   
-  foreach(class ${${module}_CLASSES}})
+  foreach(class ${${module}_CLASSES})
     find_file(${class}_full_name "${class}.h" PATHS ${${module}_INCLUDE_DIRS} )
     
     if(${class}_full_name)
