@@ -382,10 +382,7 @@ IF(VTK_FOUND)
   include(${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake)
 ENDIF()
 
-# load details of all enable modules
-foreach(_module ${VTK_MODULES_ENABLED})
-  vtk_module_load(${_module})
-endforeach() 
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${VTK_DEFINITIONS})
 
 include_directories(${VTK_INCLUDE_DIRS})
 set(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIRS})
