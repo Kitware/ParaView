@@ -144,8 +144,16 @@ ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
 # Force a bunch of modules one, eventually these will be triggered by ParaView modules
+
+# First turn of stand alone group 
+SET(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(VTK_Group_StandAlone)
+
 SET(Module_vtkIOExodus ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkIOExodus)
+
+SET(Module_vtkIOEnSight ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOEnSight)
 
 SET(Module_vtkIOParallelExodus ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkIOParallelExodus)
@@ -156,7 +164,29 @@ MARK_AS_ADVANCED(Module_vtkIOParallel)
 SET(Module_vtkRenderingParallel ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkRenderingParallel)
 
+SET(Module_vtkFiltersGeneric ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkFiltersGeneric)
+
+SET(Module_vtkFiltersStatistics ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkFiltersStatistics)
+
+SET(Module_vtkFiltersParallelStatistics ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkFiltersParallelStatistics)
+
+SET(Module_vtkFiltersHyperTree ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkFiltersHyperTree)
+
+SET(Module_vtkImagingFourier ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkImagingFourier)
+
+SET(Module_vtkImagingMorphological ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkImagingMorphological)
+
+SET(Module_vtkIOImport ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOImport)
+
 SET(VTK_MAKE_INSTANTIATORS ON CACHE BOOL "" FORCE)
+
 #########################################################################
 # Force Infovis support on
 SET(Module_vtkInfovisCore ON CACHE BOOL "Build VTK Infovis module" FORCE)
