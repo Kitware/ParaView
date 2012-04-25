@@ -18,8 +18,32 @@ IF(NOT WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
 
+
+# configure the vtkInitializationHelper with the enable VTK modules
+set(vtk-module-instantiator-headers)
+set(vtk-module-init-functions)
+set(vtk-module-init-calls)
+
+foreach(_module ${VTK_MODULES_ENABLED})
+  if(NOT ${_module}_EXCLUDE_FROM_WRAPPING) 
+    set(vtk-module-instantiator-headers
+      "${vtk-module-instantiator-headers}#include \"${_module}Instantiator.h\"\n")
+    set(vtk-module-init-functions
+      "${vtk-module-init-functions}extern \"C\" void ${_module}CS_Initialize(vtkClientServerInterpreter*);\n")
+    set(vtk-module-init-calls
+      "${vtk-module-init-calls}${_module}CS_Initialize(interp);\n")
+  endif()    
+endforeach()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkInitializationHelper.cxx.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkInitializationHelper.cxx @ONLY)
+
+# why do we need todo this?
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkInitializationHelper.h
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkInitializationHelper.h @COPYONLY)
+
 SET (Kit_SRCS
-  vtkInitializationHelper.cxx
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkInitializationHelper.cxx
   vtkPVComparativeAnimationCue.cxx
   vtkPVComparativeView.cxx
   vtkPVKeyFrameAnimationCueForProxies.cxx
