@@ -176,6 +176,9 @@ MARK_AS_ADVANCED(Module_vtkFiltersParallelStatistics)
 SET(Module_vtkFiltersHyperTree ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkFiltersHyperTree)
 
+SET(Module_vtkFiltersParallelTracers ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkFiltersParallelTracers)
+
 SET(Module_vtkImagingFourier ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkImagingFourier)
 
