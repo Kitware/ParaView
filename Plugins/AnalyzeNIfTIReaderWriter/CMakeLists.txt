@@ -37,6 +37,9 @@ IF(PARAVIEW_BUILD_QT_GUI)
                           ${pqComponents_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}
        )
+       
+       include(Qt4Macros)
+       
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
