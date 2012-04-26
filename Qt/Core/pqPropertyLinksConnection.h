@@ -65,6 +65,8 @@ public:
   vtkSMProxy* proxy() const
     { return this->ProxySM; }
 
+  void setUseUncheckedProperties(bool useUnchecked);
+
   /// Comparison operator
   bool operator==(const pqPropertyLinksConnection& other) const;
 

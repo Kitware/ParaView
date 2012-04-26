@@ -69,12 +69,15 @@ pqPropertyLinks::~pqPropertyLinks()
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::setUseUncheckedProperties(bool val)
 {
-  if (this->Internals->Connections.size() > 0 &&
-    this->UseUncheckedProperties != val)
+  if(val == this->UseUncheckedProperties)
     {
-    qCritical() << "pqPropertyLinks::setUseUncheckedProperties must only be called "
-      "before setting up any links.";
+    // nothing to change
     return;
+    }
+
+  foreach(pqPropertyLinksConnection *connection, this->Internals->Connections)
+    {
+    connection->setUseUncheckedProperties(val);
     }
 
   this->UseUncheckedProperties = val;
