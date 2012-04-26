@@ -42,6 +42,7 @@ SET (MOC_HEADERS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
+  pqCubeAxesPropertyWidget.h
   pqDataTimeStepBehavior.h
   pqDataQueryReaction.h
   pqDefaultMainWindow.h
@@ -171,6 +172,8 @@ SET (SOURCE_FILES
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
+  pqCubeAxesPropertyWidget.cxx
+  pqCubeAxesPropertyWidget.h
   pqDataTimeStepBehavior.cxx
   pqDataTimeStepBehavior.h
   pqDataQueryReaction.h
