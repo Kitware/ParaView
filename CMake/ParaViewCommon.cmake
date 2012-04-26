@@ -58,6 +58,9 @@ ENDMACRO(GLOB_RECURSIVE_INSTALL_DEVELOPMENT)
 # Common settings
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
 
+# Choose static or shared libraries.
+option(BUILD_SHARED_LIBS "Build VTK with shared libraries." ON)
+
 set(PV_INSTALL_EXPORT_NAME ParaViewTargets)
 set(VTK_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 set(HDF5_EXPORTED_TARGETS ${PV_INSTALL_EXPORT_NAME})
@@ -71,6 +74,20 @@ SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
+
+# Use the new version of the variable names for output of build process.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL
+  "Single output directory for building all libraries.")
+if(UNIX)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    CACHE INTERNAL "Library output directory")
+else()
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    CACHE INTERNAL "Library output directory")
+endif()
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  CACHE INTERNAL "Archive output directory")
+
 
 #########################################################################
 # Configure VTK
@@ -115,14 +132,6 @@ IF(PARAVIEW_NEED_X)
   INCLUDE(${VTK_CMAKE_DIR}/vtkUseX.cmake)
 ENDIF(PARAVIEW_NEED_X)
 SET(VTK_DONT_INCLUDE_USE_X 1)
-
-# Choose static or shared libraries.  This provides BUILD_SHARED_LIBS
-INCLUDE(${VTK_CMAKE_DIR}/vtkSelectSharedLibraries.cmake)
-
-# ParaView needs static Tcl/Tk if not using shared libraries.
-IF(NOT BUILD_SHARED_LIBS)
-  SET(VTK_TCL_TK_STATIC ON CACHE INTERNAL "" FORCE)
-ENDIF(NOT BUILD_SHARED_LIBS)
 
 # Setup install directories.
 IF(NOT PV_INSTALL_BIN_DIR)

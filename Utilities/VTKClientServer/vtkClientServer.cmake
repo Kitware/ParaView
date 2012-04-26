@@ -6,7 +6,6 @@ INCLUDE (${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cmake)
 MACRO(CS_INITIALIZE_WRAP)
   SET(LIBRARY_OUTPUT_PATH    ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
   SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
-  SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 ENDMACRO(CS_INITIALIZE_WRAP)
 
 include(vtkModuleAPI)
