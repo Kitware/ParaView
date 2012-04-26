@@ -148,6 +148,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineTimeKeyFrameEditor.h
   pqPluginDialog.h
   pqPointSourceWidget.h
+  pqPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
   pqProxySelectionWidget.h
@@ -558,6 +559,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqPluginTreeWidgetEventTranslator.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
+  pqPropertyWidget.cxx
+  pqPropertyWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
