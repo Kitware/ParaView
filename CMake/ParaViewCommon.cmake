@@ -404,37 +404,17 @@ IF(PARAVIEW_ENABLE_PYTHON)
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
-IF(VTK_USE_SYSTEM_ZLIB)
-  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
-  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
-  SET(VTKZLIB_INCLUDE_DIR ${ZLIB_INCLUDE_DIR})
-ELSE(VTK_USE_SYSTEM_ZLIB)
-  SET(VTK_ZLIB_LIBRARIES vtkzlib)
-  SET(VTK_ZLIB_INCLUDE_DIRS
-    ${ParaView_SOURCE_DIR}/VTK/Utilities
-    ${ParaView_BINARY_DIR}/VTK/Utilities
-    ${ParaView_SOURCE_DIR}/VTK
-    ${ParaView_BINARY_DIR}/VTK
-    )
-  SET(VTKZLIB_INCLUDE_DIR
-    ${ParaView_SOURCE_DIR}/VTK/Utilities
-    ${ParaView_BINARY_DIR}/VTK/Utilities
-    ${ParaView_SOURCE_DIR}/VTK
-    ${ParaView_BINARY_DIR}/VTK
-    )
-ENDIF(VTK_USE_SYSTEM_ZLIB)
+
+
+
+SET(VTK_ZLIB_LIBRARIES ${vtkzlib_LIBRARIES})
+SET(VTK_ZLIB_INCLUDE_DIRS ${vtkzlib_INCLUDE_DIRS})
+SET(VTKZLIB_INCLUDE_DIR ${vtkzlib_INCLUDE_DIRS})
 
 #########################################################################
 # Configure HDF5
 set(HDF5_INCLUDE_DIR ${vtkhdf5_INCLUDE_DIRS})
 set(PARAVIEW_HDF5_LIBRARIES ${vtkhdf5_LIBRARIES})
-
-IF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_SOURCE_DIR}/GUISupport/Qt)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_DIR}/GUISupport/Qt)
-ENDIF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
 
 # Override QtTesting install variables
 IF (PARAVIEW_BUILD_QT_GUI)
@@ -531,7 +511,7 @@ MARK_AS_ADVANCED(CLEAR
 
 #########################################################################
 # Configure chroma-subsampling of the Ogg/Theora writer
-IF(VTK_USE_OGGTHEORA_ENCODER)
+IF(Module_vtkoggtheora)
   SET(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING FALSE CACHE STRING
     "Use 4:2:0 chroma-subsampling when writing Ogg/Theora movies")
   MARK_AS_ADVANCED(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING)
@@ -539,7 +519,7 @@ IF(VTK_USE_OGGTHEORA_ENCODER)
     SET(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING TRUE CACHE STRING
       "Must use 4:2:0 subsampling with this version of system-Ogg/Theora." FORCE)
   ENDIF(VTK_USE_SYSTEM_OGGTHEORA AND OGGTHEORA_NO_444_SUBSAMPLING)
-ENDIF(VTK_USE_OGGTHEORA_ENCODER)
+ENDIF()
 
 #########################################################################
 # Configure IceT
@@ -549,7 +529,7 @@ SET(ICET_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(ICET_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(ICET_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 MARK_AS_ADVANCED(CLEAR VTK_USE_MPI)
-IF(VTK_USE_MPI)
+IF(Module_ParallelMPI)
   OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" ON)
   MARK_AS_ADVANCED(PARAVIEW_USE_ICE_T)
   IF (BUILD_TESTING)
@@ -581,7 +561,7 @@ IF(VTK_USE_MPI)
 
   # Needed for mpich 2
   ADD_DEFINITIONS("-DMPICH_IGNORE_CXX_SEEK")
-ENDIF(VTK_USE_MPI)
+ENDIF()
 
  #########################################################################
 # Configure VisItBridge
