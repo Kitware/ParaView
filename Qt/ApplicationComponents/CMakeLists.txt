@@ -92,6 +92,7 @@ SET (MOC_HEADERS
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardPropertyWidgetInterface.h
   pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
@@ -196,8 +197,8 @@ SET (SOURCE_FILES
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
   pqFixPathsInStateFilesBehavior.h
-  pqGenericSummaryDisplayPanel.h
   pqGenericSummaryDisplayPanel.cxx
+  pqGenericSummaryDisplayPanel.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -274,6 +275,8 @@ SET (SOURCE_FILES
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardPropertyWidgetInterface.cxx
+  pqStandardPropertyWidgetInterface.h
   pqStandardSummaryPanelImplementation.cxx
   pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.cxx
