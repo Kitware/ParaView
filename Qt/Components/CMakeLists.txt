@@ -110,6 +110,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
   pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
@@ -482,6 +483,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIntVectorPropertyWidget.cxx
+  pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
   pqIsoVolumePanel.cxx
   pqItemViewSearchWidget.cxx
