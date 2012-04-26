@@ -32,12 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
 
+#include "pqOptions.h"
 #include "pqActiveObjects.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqPropertiesPanel.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
 #include "vtkPVPlugin.h"
+#include "vtkProcessModule.h"
 
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
@@ -59,6 +62,7 @@ ParaViewMainWindow::ParaViewMainWindow()
 #endif
 
   // Setup default GUI layout.
+  this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
 
   // Set up the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
@@ -73,18 +77,42 @@ ParaViewMainWindow::ParaViewMainWindow()
   this->tabifyDockWidget(this->Internals->animationViewDock,
     this->Internals->statisticsDock);
 
-  this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
-  this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->displayDock);
-  this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->informationDock);
-  this->Internals->objectInspectorDock->raise();
+  pqOptions* options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
 
-  // Enable automatic creation of representation on accept.
-  this->Internals->objectInspector->setShowOnAccept(true);
+  if(options->GetUseNewPanels())
+    {
+    this->removeDockWidget(this->Internals->objectInspectorDock);
+    this->removeDockWidget(this->Internals->displayDock);
+    delete this->Internals->objectInspectorDock;
+    delete this->Internals->displayDock;
+    this->Internals->objectInspectorDock = 0;
+    this->Internals->displayDock = 0;
 
-  // Enable help for from the object inspector.
-  QObject::connect(this->Internals->objectInspector,
-    SIGNAL(helpRequested(const QString&, const QString&)),
-    this, SLOT(showHelpForProxy(const QString&, const QString&)));
+    this->tabifyDockWidget(this->Internals->propertiesDock, this->Internals->informationDock);
+    this->Internals->propertiesDock->show();
+    this->Internals->propertiesDock->raise();
+
+    // Enable help from the properties panel.
+    QObject::connect(this->Internals->propertiesPanel,
+                     SIGNAL(helpRequested(const QString&, const QString&)),
+                     this, SLOT(showHelpForProxy(const QString&, const QString&)));
+    }
+  else
+    {
+    this->removeDockWidget(this->Internals->propertiesDock);
+    delete this->Internals->propertiesDock;
+    this->Internals->propertiesDock = 0;
+
+    this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->displayDock);
+    this->tabifyDockWidget(this->Internals->objectInspectorDock, this->Internals->informationDock);
+    this->Internals->objectInspectorDock->raise();
+
+    // Enable help from the object inspector.
+    QObject::connect(this->Internals->objectInspector,
+      SIGNAL(helpRequested(const QString&, const QString&)),
+      this, SLOT(showHelpForProxy(const QString&, const QString&)));
+    }
 
   // Populate application menus with actions.
   pqParaViewMenuBuilders::buildFileMenu(*this->Internals->menu_File);

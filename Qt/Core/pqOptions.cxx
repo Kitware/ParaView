@@ -82,6 +82,7 @@ pqOptions::pqOptions()
   this->TestMaster = 0;
   this->TestSlave = 0;
   this->TileImagePath = 0;
+  this->UseNewPanels = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -149,6 +150,10 @@ void pqOptions::Initialize()
   this->AddBooleanArgument("--test-slave", 0,
     &this->TestSlave,
     "(For testing) When present, tests slave configuration.");
+
+  this->AddBooleanArgument("--use-new-panels", 0,
+    &this->UseNewPanels,
+    "Use the 'New Properties Panel' instead of the old Properties and Display panels.");
 }
 
 //-----------------------------------------------------------------------------
