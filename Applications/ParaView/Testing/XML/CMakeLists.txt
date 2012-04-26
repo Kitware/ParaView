@@ -142,6 +142,11 @@ IF ("1" STREQUAL ${HAS_NUMPY})
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES} ${CMAKE_CURRENT_SOURCE_DIR}/FindDataDialog.xml)
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
+# These tests run using the new properties panel
+set(AboutDialog_USE_NEW_PANELS TRUE)
+set(RenderNan_USE_NEW_PANELS TRUE)
+set(Slice_USE_NEW_PANELS TRUE)
+
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
