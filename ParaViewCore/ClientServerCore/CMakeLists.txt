@@ -248,7 +248,7 @@ PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET(KIT_PYTHON_LIBS
-    vtkViewsPythonD
+    vtkViewsCorePythonD
     vtkPVVTKExtensionsPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
