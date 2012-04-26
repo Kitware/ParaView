@@ -190,6 +190,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqStandardColorButton.h
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.h
+  pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
@@ -648,6 +649,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
+  pqStringVectorPropertyWidget.cxx
+  pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.cxx
