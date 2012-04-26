@@ -47,6 +47,8 @@ vtkSMProperty::vtkSMProperty()
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
   this->XMLLabel = 0;
+  this->PanelVisibility = 0;
+  this->PanelVisibilityDefaultForRepresentation = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -60,6 +62,9 @@ vtkSMProperty::vtkSMProperty()
   this->Hints = 0;
   this->BlockModifiedEvents = false;
   this->PendingModifiedEvents = false;
+
+  // by default, properties are set to show only in advanced mode
+  this->SetPanelVisibility("advanced");
 
   this->Proxy = 0;
 }
@@ -355,6 +360,20 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (element->GetScalarAttribute("is_internal", &is_internal))
     {
     this->SetIsInternal(is_internal);
+    }
+
+  const char *panel_visibility = element->GetAttribute("panel_visibility");
+  if(panel_visibility)
+    {
+    this->SetPanelVisibility(panel_visibility);
+    }
+
+  const char *panel_visibility_default_for_representation =
+    element->GetAttribute("panel_visibility_default_for_representation");
+  if(panel_visibility_default_for_representation)
+    {
+    this->SetPanelVisibilityDefaultForRepresentation(
+      panel_visibility_default_for_representation);
     }
 
   // Manage deprecated XML definition
