@@ -1056,7 +1056,8 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>
           Set the visibility for this representation.
@@ -1098,7 +1099,8 @@
       <IntVectorProperty name="SelectionVisibility"
         command="SetSelectionVisibility"
         number_of_elements="1"
-        default_values="1" >
+        default_values="1"
+        panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>
           Set the visibility for the selection, if any.
@@ -1108,11 +1110,15 @@
       <IntVectorProperty name="CubeAxesVisibility"
         command="SetCubeAxesVisibility"
         number_of_elements="1"
-        default_values="0" >
+        default_values="0"
+        panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>
           Set the visibility for the cube axes.
         </Documentation>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </IntVectorProperty>
 
       <RepresentationType
@@ -1144,7 +1150,8 @@
         name="Representation"
         command="SetActiveRepresentation"
         number_of_elements="1"
-        default_values="Surface">
+        default_values="Surface"
+        panel_visibility="default">
         <Documentation>
           Choose the type for the representation.
         </Documentation>
@@ -1153,12 +1160,16 @@
             <Property name="RepresentationTypesInfo" function="StringList" />
           </RequiredProperties>
         </StringListDomain>
+        <Hints>
+          <ShowInSummaryPanel/>
+        </Hints>
       </StringVectorProperty>
 
       <StringVectorProperty name="SelectionCellFieldDataArrayName"
         command="SetCellFieldDataArrayName"
         number_of_elements="1"
-        default_values="vtkOriginalCellIds" >
+        default_values="vtkOriginalCellIds"
+        panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_cell">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
@@ -1169,7 +1180,8 @@
       <StringVectorProperty name="SelectionPointFieldDataArrayName"
         command="SetPointFieldDataArrayName"
         number_of_elements="1"
-        default_values="vtkOriginalPointIds" >
+        default_values="vtkOriginalPointIds"
+        panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_point">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
@@ -1183,37 +1195,39 @@
           proxyname="SurfaceRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="AllowSpecularHighlightingWithScalarColoring" />
-          <Property name="Ambient" />
-          <Property name="AmbientColor" />
-          <Property name="BackfaceAmbientColor" />
-          <Property name="BackfaceDiffuseColor" />
-          <Property name="BackfaceOpacity" />
-          <Property name="BackfaceRepresentation" />
-          <Property name="ColorArrayName" />
-          <Property name="ColorAttributeType" />
-          <Property name="Diffuse" />
-          <Property name="DiffuseColor" />
-          <Property name="EdgeColor" />
-          <Property name="InterpolateScalarsBeforeMapping" />
-          <Property name="Interpolation" />
-          <Property name="LineWidth" />
-          <Property name="LookupTable" />
+          <PropertyGroup type="ColorEditor" panel_visibility="default">
+            <Property name="AllowSpecularHighlightingWithScalarColoring"/>
+            <Property name="Ambient" />
+            <Property name="AmbientColor" />
+            <Property name="BackfaceAmbientColor" />
+            <Property name="BackfaceDiffuseColor" />
+            <Property name="BackfaceOpacity" />
+            <Property name="BackfaceRepresentation" />
+            <Property name="ColorArrayName" />
+            <Property name="ColorAttributeType" />
+            <Property name="Diffuse" />
+            <Property name="DiffuseColor" />
+            <Property name="EdgeColor" />
+            <Property name="InterpolateScalarsBeforeMapping" />
+            <Property name="Interpolation" />
+            <Property name="LineWidth" />
+            <Property name="LookupTable" />
+            <Property name="NonlinearSubdivisionLevel" />
+            <Property name="Specular" />
+            <Property name="SpecularColor" />
+            <Property name="SpecularPower" />
+          </PropertyGroup>
           <Property name="MapScalars" />
-          <Property name="NonlinearSubdivisionLevel" />
-          <Property name="Opacity" />
-          <Property name="Orientation" />
-          <Property name="Origin" />
-          <Property name="Pickable" />
-          <Property name="PointSize" />
+          <Property name="Opacity" panel_visibility="default" />
           <Property name="Position" />
           <Property name="Scale" />
-          <Property name="Specular" />
-          <Property name="SpecularColor" />
-          <Property name="SpecularPower" />
-          <Property name="StaticMode" />
-          <Property name="SuppressLOD" />
-          <Property name="Texture" />
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" panel_visibility="never"/>
+          <Property name="PointSize" panel_visibility_default_for_representation="points"/>
+          <Property name="StaticMode" panel_visibility="never" />
+          <Property name="SuppressLOD" panel_visibility="never" />
+          <Property name="Texture" panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1232,16 +1246,16 @@
           proxygroup="representations" proxyname="Glyph3DRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="Masking" />
-          <Property name="MeshVisibility" />
-          <Property name="Orient" />
-          <Property name="OrientationMode" />
-          <Property name="ScaleFactor" />
-          <Property name="ScaleMode" />
-          <Property name="Scaling" />
-          <Property name="SelectMaskArray" />
-          <Property name="SelectOrientationVectors" />
-          <Property name="SelectScaleArray" />
+          <Property name="Masking" panel_visibility="never" />
+          <Property name="MeshVisibility" panel_visibility="never" />
+          <Property name="Orient" panel_visibility="never" />
+          <Property name="OrientationMode" panel_visibility="never" />
+          <Property name="ScaleFactor" panel_visibility="never" />
+          <Property name="ScaleMode" panel_visibility="never" />
+          <Property name="Scaling" panel_visibility="never" />
+          <Property name="SelectMaskArray" panel_visibility="never" />
+          <Property name="SelectOrientationVectors" panel_visibility="never" />
+          <Property name="SelectScaleArray" panel_visibility="never" />
           <Property name="Source" />
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -1256,33 +1270,35 @@
           proxyname="CubeAxesRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property exposed_name="CubeAxesColor" name="Color" />
-          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
-          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
-          <Property exposed_name="CubeAxesInertia" name="Inertia" />
-          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
-          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
-          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
-          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
-          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
-          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
-          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
-          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
-          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
-          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
-          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
-          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
-          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
-          <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
-          <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
-          <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
-          <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
-          <Property name="DataBounds" />
-          <Property name="CustomBounds"/>
-          <Property name="CustomBoundsActive"/>
+          <PropertyGroup name="CubeAxes" type="CubeAxes" label="Cube Axes" panel_visibility="default">
+            <Property exposed_name="CubeAxesColor" name="Color" />
+            <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+            <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+            <Property exposed_name="CubeAxesInertia" name="Inertia" />
+            <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+            <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+            <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+            <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+            <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+            <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+            <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+            <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+            <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+            <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+            <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+            <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+            <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+            <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+            <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+            <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+            <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
+            <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
+            <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
+            <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+            <Property name="DataBounds" />
+            <Property name="CustomBounds"/>
+            <Property name="CustomBoundsActive"/>
+          </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
@@ -1304,32 +1320,32 @@
           <Exception name="PointSize" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="CellLabelBold" exposed_name="SelectionCellLabelBold" />
-          <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" />
-          <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" />
-          <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
-          <Property name="CellLabelFormat" exposed_name="SelectionCellLabelFormat" />
-          <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" />
-          <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" />
-          <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" />
-          <Property name="CellLabelShadow" exposed_name="SelectionCellLabelShadow" />
-          <Property name="CellLabelVisibility" exposed_name="SelectionCellLabelVisibility" />
-          <Property name="Color" exposed_name="SelectionColor" />
-          <Property name="LineWidth" exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" exposed_name="SelectionOpacity" />
-          <Property name="PointLabelBold" exposed_name="SelectionPointLabelBold" />
-          <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" />
-          <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" />
-          <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" />
-          <Property name="PointLabelFormat" exposed_name="SelectionPointLabelFormat" />
-          <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" />
-          <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" />
-          <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" />
-          <Property name="PointLabelShadow" exposed_name="SelectionPointLabelShadow" />
-          <Property name="PointLabelVisibility" exposed_name="SelectionPointLabelVisibility" />
-          <Property name="PointSize" exposed_name="SelectionPointSize" />
-          <Property name="Representation" exposed_name="SelectionRepresentation" />
-          <Property name="UseOutline" exposed_name="SelectionUseOutline"/>
+          <Property name="CellLabelBold" exposed_name="SelectionCellLabelBold" panel_visibility="never" />
+          <Property name="CellLabelColor" exposed_name="SelectionCellLabelColor" panel_visibility="never" />
+          <Property name="CellLabelFontFamily" exposed_name="SelectionCellLabelFontFamily" panel_visibility="never" />
+          <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" panel_visibility="never" />
+          <Property name="CellLabelFormat" exposed_name="SelectionCellLabelFormat" panel_visibility="never" />
+          <Property name="CellLabelItalic" exposed_name="SelectionCellLabelItalic" panel_visibility="never" />
+          <Property name="CellLabelJustification" exposed_name="SelectionCellLabelJustification" panel_visibility="never" />
+          <Property name="CellLabelOpacity" exposed_name="SelectionCellLabelOpacity" panel_visibility="never" />
+          <Property name="CellLabelShadow" exposed_name="SelectionCellLabelShadow" panel_visibility="never" />
+          <Property name="CellLabelVisibility" exposed_name="SelectionCellLabelVisibility" panel_visibility="never" />
+          <Property name="Color" exposed_name="SelectionColor" panel_visibility="never" />
+          <Property name="LineWidth" exposed_name="SelectionLineWidth" panel_visibility="never" />
+          <Property name="Opacity" exposed_name="SelectionOpacity" panel_visibility="never" />
+          <Property name="PointLabelBold" exposed_name="SelectionPointLabelBold" panel_visibility="never" />
+          <Property name="PointLabelColor" exposed_name="SelectionPointLabelColor" panel_visibility="never" />
+          <Property name="PointLabelFontFamily" exposed_name="SelectionPointLabelFontFamily" panel_visibility="never" />
+          <Property name="PointLabelFontSize" exposed_name="SelectionPointLabelFontSize" panel_visibility="never" />
+          <Property name="PointLabelFormat" exposed_name="SelectionPointLabelFormat" panel_visibility="never" />
+          <Property name="PointLabelItalic" exposed_name="SelectionPointLabelItalic" panel_visibility="never" />
+          <Property name="PointLabelJustification" exposed_name="SelectionPointLabelJustification" panel_visibility="never" />
+          <Property name="PointLabelOpacity" exposed_name="SelectionPointLabelOpacity" panel_visibility="never" />
+          <Property name="PointLabelShadow" exposed_name="SelectionPointLabelShadow" panel_visibility="never" />
+          <Property name="PointLabelVisibility" exposed_name="SelectionPointLabelVisibility" panel_visibility="never" />
+          <Property name="PointSize" exposed_name="SelectionPointSize" panel_visibility="never" />
+          <Property name="Representation" exposed_name="SelectionRepresentation" panel_visibility="never" />
+          <Property name="UseOutline" exposed_name="SelectionUseOutline" panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
     </PVRepresentationProxy>
@@ -1402,9 +1418,9 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityFunction" />
-          <Property name="ScalarOpacityUnitDistance" />
-          <Property name="ExtractedBlockIndex" />
+          <Property name="ScalarOpacityFunction" panel_visibility="never" />
+          <Property name="ScalarOpacityUnitDistance" panel_visibility="never" />
+          <Property name="ExtractedBlockIndex" panel_visibility="never" />
           <Property name="SelectMapper" />
         </ExposedProperties>
       </SubProxy>
@@ -1450,11 +1466,11 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityUnitDistance" />
-          <Property name="ScalarOpacityFunction" />
-          <Property name="VolumeRenderingMode" />
-          <Property name="Shade"/>
-          <Property name="InterpolationType"/>
+          <Property name="ScalarOpacityUnitDistance" panel_visibility="never" />
+          <Property name="ScalarOpacityFunction" panel_visibility="never" />
+          <Property name="VolumeRenderingMode" panel_visibility="advanced" panel_visibility_default_for_representation="volume" />
+          <Property name="Shade" panel_visibility="never" />
+          <Property name="InterpolationType" panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
 
@@ -1467,8 +1483,8 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="Slice" />
-          <Property name="SliceMode" />
+          <Property name="Slice" panel_visibility="advanced" panel_visibility_default_for_representation="slice" />
+          <Property name="SliceMode" panel_visibility="advanced" panel_visibility_default_for_representation="slice" />
         </ExposedProperties>
       </SubProxy>
 
@@ -2524,7 +2540,8 @@
       <IntVectorProperty name="SliceMode"
         command="SetSliceMode"
         number_of_elements="1"
-        default_values="5">
+        default_values="5"
+        label="Slice Direction">
         <Documentation>
           Determines the direction of slicing to obtain a 2D slice from a 3D
           image.
@@ -2815,7 +2832,8 @@
       <DoubleVectorProperty name="Position"
         command="SetPosition"
         number_of_elements="3"
-        default_values="0 0 0">
+        default_values="0 0 0"
+        label="Translation">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
