@@ -76,17 +76,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(PV_PYTHON_FILES
     demos/demo1
     demos/show_grid_as_background
-    vtk/__init__
-    vtk/genericfiltering
-    vtk/geovis
-    vtk/hybrid
-    vtk/imaging
-    vtk/infovis
-    vtk/io
-    vtk/parallel
-    vtk/views
-    vtk/volumerendering
-    vtk/widgets
     vtk/algorithms
     vtk/dataset_adapter
     servermanager
@@ -121,6 +110,22 @@ IF (PARAVIEW_ENABLE_PYTHON)
     SET(src "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/${file}.py")
     SET(PV_PYTHON_SOURCE_FILES ${PV_PYTHON_SOURCE_FILES} ${src})
   ENDFOREACH(file)
+
+  # We need to copy over the VTK generate files for each module
+  file(GLOB vtk_python_files ${VTK_BINARY_DIR}/Wrapping/Python/vtk/*.py)
+  
+  foreach(file ${vtk_python_files})
+    
+    get_filename_component(name ${file} NAME)
+    set(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/vtk/${name}")
+    
+    add_custom_command(DEPENDS ${file}
+      COMMAND ${CMAKE_COMMAND}
+      ARGS -E copy ${file} ${tgt}
+      OUTPUT ${tgt}
+      COMMENT "source copy")
+    SET(PV_PYTHON_OUTPUT_FILES ${PV_PYTHON_OUTPUT_FILES} ${tgt})
+  endforeach()
 
   IF ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
     #MESSAGE("In source build -- no need to copy Python files.")
