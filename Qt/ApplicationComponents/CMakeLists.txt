@@ -35,6 +35,7 @@ SET (MOC_HEADERS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
+  pqColorEditorPropertyWidget.h
   pqColorToolbar.h
   pqCollaborationBehavior.h
   pqCommandLineOptionsBehavior.h
@@ -158,6 +159,8 @@ SET (SOURCE_FILES
   pqChartSelectionReaction.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
+  pqColorEditorPropertyWidget.cxx
+  pqColorEditorPropertyWidget.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
