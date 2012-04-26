@@ -99,6 +99,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
+  pqDoubleEdit.h
+  pqDoubleVectorPropertyWidget.h
   pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.h
@@ -460,6 +462,10 @@ VTK_ADD_LIBRARY(pqComponents
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
+  pqDoubleEdit.cxx
+  pqDoubleEdit.h
+  pqDoubleVectorPropertyWidget.cxx
+  pqDoubleVectorPropertyWidget.h
   pqDistanceWidget.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
