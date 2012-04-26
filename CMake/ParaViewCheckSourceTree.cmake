@@ -2,8 +2,7 @@
 
 function(CheckGitDirectory path submodule)
   # Emit a fatal error and inform the user to init their submodules.
-  # supports new git (1.7.7?) locations of submodule .git directories
-  if(NOT EXISTS "${path}/${submodule}/.git/config" AND NOT EXISTS ${ParaView_SOURCE_DIR}/.git/modules/${submodule}/config)
+  if(NOT EXISTS "${path}/${submodule}/.git")
     message(FATAL_ERROR "
  Please initialize the git submodules.
  ${path} is not a valid git submodule.
