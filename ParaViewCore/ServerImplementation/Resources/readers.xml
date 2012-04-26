@@ -4508,6 +4508,27 @@
        long_help="Reads files in the SPCTH Spy Plot file format.">
        The Spy Plot reader loads an ASCII meta-file called the "case" file (extension .spcth). The case file lists all the binary files containing the dataset. This reader produces hierarchical datasets.
      </Documentation>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays"
+        panel_visibility="default">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -4589,7 +4610,8 @@
         name="GenerateTracerArray"
         command="SetGenerateTracerArray"
         number_of_elements="1"
-        default_values="0" >
+        default_values="0"
+        panel_visibility="default" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a cell array will be generated that stores the coordinates of any tracers.
@@ -4611,7 +4633,8 @@
         name="MergeXYZComponents"
         command="SetMergeXYZComponents"
         number_of_elements="1"
-        default_values="1" >
+        default_values="1"
+        panel_visibility="default" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, cell arrays named (for example) X velocity, Y velocity and Z velocity will be combined into a single vector array named velocity.
@@ -4622,28 +4645,6 @@
         name="CellArrayInfo"
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-       <Hints>
-         <ShowInSummaryPanel/>
-       </Hints>
      </StringVectorProperty>
 
      <Hints>
