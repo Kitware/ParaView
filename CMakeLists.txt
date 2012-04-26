@@ -129,7 +129,9 @@ MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC
 #########################################################################
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
-SET(Module_vtkParallelMPI ${PARAVIEW_USE_MPI} CACHE BOOL "Build VTK MPI module" FORCE)
+set(Module_vtkParallelMPI ${PARAVIEW_USE_MPI} CACHE BOOL "Build VTK MPI module" FORCE)
+# For now also set VTK_USE_MPI as lots of code is using it
+set(VTK_USE_MPI ${PARAVIEW_USE_MPI})
 # define this variable so that VTK_DEPENDENT_OPTION in the VTK 
 # CMakeLists.txt does not turn VTK_USE_MPI back to a regular cache
 # variable
