@@ -154,6 +154,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
+  pqProxyPropertyWidget.h
   pqProxySelectionWidget.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
@@ -575,6 +576,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
   pqProxyPanel.h
+  pqProxyPropertyWidget.cxx
+  pqProxyPropertyWidget.h
   pqProxySelectionWidget.cxx
   pqProxySelectionWidget.h
   pqQueryClauseWidget.cxx
