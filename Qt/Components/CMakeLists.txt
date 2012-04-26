@@ -130,6 +130,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqNetCDFPanel.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
+  pqObjectPanelPropertyWidget.h
   pqOptionsContainer.h
   pqOptionsDialog.h
   pqOptionsPage.h
@@ -529,6 +530,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
+  pqObjectPanelPropertyWidget.cxx
+  pqObjectPanelPropertyWidget.h
   pqOptionsContainer.cxx
   pqOptionsContainer.h
   pqOptionsDialog.cxx
