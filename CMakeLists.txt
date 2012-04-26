@@ -94,20 +94,25 @@ IF (PARAVIEW_BUILD_QT_GUI)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
   SET(QT_MIN_VERSION "4.6.0")
-  SET(QT_OFFICIAL_VERSION "4.6")
+  SET(QT_OFFICIAL_VERSION "4.8")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
   IF(NOT QT4_FOUND)
     MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
   ELSE(NOT QT4_FOUND)
-    # don't go greater than supported version
-    STRING(REGEX MATCH "^4\\.[6-7]\\.[0-9]+" qt_version_match "${QTVERSION}")
+    # check is Qtversion  is 4.8.*. If so, we are good. Otherwise we will post a
+    # warning of versions (>= 4.6 && < 4.8). However we report errors for any
+    # version less than 4.6
+    STRING(REGEX MATCH "^4\\.[8]\\.[0-9]+" qt_version_match "${QTVERSION}")
     IF (NOT qt_version_match)
-      STRING(REGEX MATCH "^4\\.[0-4]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
+      STRING(REGEX MATCH "^4\\.[0-5]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
       IF (qt_version46_x_tmp)
-        MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache).")
+        MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported. "
+          "Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache)."
+          "Minium required version is ${QT_MIN_VERSION}.")
       ELSE (qt_version46_x_tmp)
-        MESSAGE(WARNING "Warning: You are using Qt ${QTVERSION}. Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
+        MESSAGE(WARNING "Warning: You are using Qt ${QTVERSION}. "
+          "Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
       ENDIF (qt_version46_x_tmp)
     ENDIF (NOT qt_version_match)
   ENDIF(NOT QT4_FOUND)
