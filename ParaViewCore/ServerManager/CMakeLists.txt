@@ -99,6 +99,7 @@ SET (Kit_SRCS
   vtkSMPluginManager.cxx
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
+  vtkSMPropertyGroup.cxx
   vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
