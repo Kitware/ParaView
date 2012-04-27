@@ -33,8 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "ui_pqPropertiesPanel.h"
 
-#include <dirent.h>
-
 #include <QDebug>
 #include <QLabel>
 #include <QStyleFactory>
