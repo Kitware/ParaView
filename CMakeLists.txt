@@ -93,7 +93,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
-  SET(QT_MIN_VERSION "4.6.0")
+  SET(QT_MIN_VERSION "4.7.0")
   SET(QT_OFFICIAL_VERSION "4.8")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
@@ -101,11 +101,11 @@ IF (PARAVIEW_BUILD_QT_GUI)
     MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
   ELSE(NOT QT4_FOUND)
     # check is Qtversion  is 4.8.*. If so, we are good. Otherwise we will post a
-    # warning of versions (>= 4.6 && < 4.8). However we report errors for any
-    # version less than 4.6
+    # warning of versions (>= 4.7 && < 4.8). However we report errors for any
+    # version less than 4.7
     STRING(REGEX MATCH "^4\\.[8]\\.[0-9]+" qt_version_match "${QTVERSION}")
     IF (NOT qt_version_match)
-      STRING(REGEX MATCH "^4\\.[0-5]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
+      STRING(REGEX MATCH "^4\\.[0-6]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
       IF (qt_version46_x_tmp)
         MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported. "
           "Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache)."
