@@ -35,7 +35,7 @@ TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRendering)
 #          -V ${PARAVIEW_DATA_ROOT}/Baseline/MultiLayerRendering.png )
 
 
-IF ( VTK_USE_MPI )
+IF ( PARAVIEW_USE_MPI )
 
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
   ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
@@ -44,4 +44,4 @@ IF ( VTK_USE_MPI )
     -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
     -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaBenchmark.png )
 
-ENDIF (VTK_USE_MPI)
+ENDIF (PARAVIEW_USE_MPI)

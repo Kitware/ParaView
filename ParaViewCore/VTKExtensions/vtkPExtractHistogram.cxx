@@ -26,9 +26,9 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
 
@@ -63,7 +63,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     return this->Superclass::InitializeBinExtents(inputVector, 
       bin_extents, min, max);
     }
-#ifndef VTK_USE_MPI
+#ifndef PARAVIEW_USE_MPI
   return this->Superclass::InitializeBinExtents( inputVector, bin_extents, min, max );
 
 #else

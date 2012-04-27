@@ -46,7 +46,7 @@
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #include <vtkTrivialProducer.h>
 #include "vtkUndirectedGraph.h"
 #include "vtkUnstructuredGrid.h"
@@ -54,7 +54,7 @@
 #include <vtksys/ios/sstream>
 #include <vector>
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkAllToNRedistributeCompositePolyData.h"
 #endif
@@ -645,7 +645,7 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input,
     }
 
   // Perform the M to N operation.
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
    vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
    vtkDataObject* inputCopy = input->NewInstance();
    inputCopy->ShallowCopy(input);
@@ -676,7 +676,7 @@ void vtkMPIMoveData::DataServerGatherAll(vtkDataObject* input,
     return;
     }
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   int idx;
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
                                          this->Controller->GetCommunicator());
@@ -742,7 +742,7 @@ void vtkMPIMoveData::DataServerGatherToZero(vtkDataObject* input,
 
     vtkTimerLog::MarkStartEvent("Dataserver gathering to 0");
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   int idx;
   int myId= this->Controller->GetLocalProcessId();
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
@@ -1018,7 +1018,7 @@ void vtkMPIMoveData::RenderServerZeroBroadcast(vtkDataObject* data)
     return;
     }
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   int myId= this->Controller->GetLocalProcessId();
 
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(

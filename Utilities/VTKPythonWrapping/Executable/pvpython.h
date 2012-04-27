@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPythonOptions.h"
 #include "vtkSMSession.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
 
 #include "vtkPVPythonInterpretor.h"
 #include <vector>

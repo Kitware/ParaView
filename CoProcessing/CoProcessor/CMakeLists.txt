@@ -17,9 +17,9 @@ ELSE (ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
 
-if(VTK_USE_MPI)
+if(PARAVIEW_USE_MPI)
   set(COPROCESSOR_USE_MPI 1)
-endif(VTK_USE_MPI)
+endif(PARAVIEW_USE_MPI)
 
 CONFIGURE_FILE("${CoProcessing_SOURCE_DIR}/CoProcessor/CPSystemInformation.h.in"
                "${CoProcessing_BINARY_DIR}/CoProcessor/CPSystemInformation.h"

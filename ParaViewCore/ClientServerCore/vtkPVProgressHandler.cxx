@@ -23,9 +23,9 @@
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkPVConfig.h" // For PARAVIEW_USE_MPI
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
 #endif
@@ -218,7 +218,7 @@ public:
   MapOfObjectToInt RegisteredObjects;
 
   vtkProgressStore ProgressStore;
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   vtkMPICommunicator::Request AsyncRequest;
 #endif
   bool AsyncRequestValid;
@@ -398,7 +398,7 @@ void vtkPVProgressHandler::CleanupPendingProgress()
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::CleanupSatellites()
 {
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   vtkMPIController* controller = vtkMPIController::SafeDownCast(
     vtkMultiProcessController::GetGlobalController());
   if (controller && controller->GetNumberOfProcesses() > 1)
@@ -615,7 +615,7 @@ void vtkPVProgressHandler::MarkAsyncRequestReceived()
 int vtkPVProgressHandler::ReceiveProgressFromSatellites()
 {
   int req_count = 0;
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (this->Internals->AsyncRequestValid &&
     (this->Internals->ForceAsyncRequestReceived || 
      this->Internals->AsyncRequest.Test()))
@@ -661,7 +661,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
 //----------------------------------------------------------------------------
 vtkMPICommunicatorOpaqueRequest* vtkPVProgressHandler::GetAsyncRequest()
 {
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (this->Internals->AsyncRequestValid &&
     !this->Internals->ForceAsyncRequestReceived)
     {
@@ -674,7 +674,7 @@ vtkMPICommunicatorOpaqueRequest* vtkPVProgressHandler::GetAsyncRequest()
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::SendProgressToRoot()
 {
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (this->Internals->AsyncRequestValid &&
     this->Internals->AsyncRequest.Test())
     {

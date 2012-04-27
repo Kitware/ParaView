@@ -102,11 +102,11 @@ void vtkSMTestDriver::CollectConfiguredOptions()
     }
 
   // now find all the mpi information if mpi run is set
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #ifdef VTK_MPIRUN_EXE
   this->MPIRun = VTK_MPIRUN_EXE;
 #else
-  cerr << "Error: VTK_MPIRUN_EXE must be set when VTK_USE_MPI is on.\n";
+  cerr << "Error: VTK_MPIRUN_EXE must be set when PARAVIEW_USE_MPI is on.\n";
   return;
 #endif
   int serverNumProc = 1;
@@ -141,7 +141,7 @@ void vtkSMTestDriver::CollectConfiguredOptions()
   sprintf(buf, "%d", renderNumProc);
   this->MPIRenderServerNumProcessFlag = buf;
 
-#endif // VTK_USE_MPI
+#endif // PARAVIEW_USE_MPI
 
 # ifdef VTK_MPI_SERVER_PREFLAGS
   this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);

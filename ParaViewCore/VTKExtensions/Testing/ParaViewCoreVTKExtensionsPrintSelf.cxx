@@ -201,7 +201,7 @@
 #include "vtkXMLPVDWriter.h"
 #include "vtkZlibImageCompressor.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # include "vtkAllToNRedistributeCompositePolyData.h"
 # include "vtkAllToNRedistributePolyData.h"
 # include "vtkBalancedRedistributePolyData.h"
@@ -405,7 +405,7 @@ int main(int , char *[])
   PRINT_SELF(vtkXMLCollectionReader);
   PRINT_SELF(vtkXMLPVDWriter);
   PRINT_SELF(vtkZlibImageCompressor);
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   PRINT_SELF(vtkAllToNRedistributeCompositePolyData);
   PRINT_SELF(vtkAllToNRedistributePolyData);
   PRINT_SELF(vtkBalancedRedistributePolyData);
