@@ -349,7 +349,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
     this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
 # else
     cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
-    return;
+    return 0;
 # endif
 #ifdef VTK_MPI_PRENUMPROC_FLAGS
     this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
