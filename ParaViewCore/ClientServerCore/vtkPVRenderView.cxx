@@ -641,12 +641,6 @@ void vtkPVRenderView::ResetCamera()
   // future.
   this->Update();
 
-  // Do all passes needed for rendering so that the geometry in the renderer is
-  // updated. This is essential since the bounds are determined by using the
-  // geometry bounds know to the renders on all processes. If they are not
-  // updated, we will get wrong bounds.
-  this->Render(false, true);
-
   // Remember, vtkRenderer::ResetCamera() calls
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
   double bounds[6];
