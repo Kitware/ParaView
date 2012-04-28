@@ -144,8 +144,25 @@ ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 # These tests run using the new properties panel
 set(AboutDialog_USE_NEW_PANELS TRUE)
+set(ExodusXML_USE_NEW_PANELS TRUE)
+set(GridConnectivity_USE_NEW_PANELS TRUE)
 set(RenderNan_USE_NEW_PANELS TRUE)
 set(Slice_USE_NEW_PANELS TRUE)
+set(SpreadSheet1_USE_NEW_PANELS TRUE)
+set(SpreadSheet2_USE_NEW_PANELS TRUE)
+set(TestIsoVolume_USE_NEW_PANELS TRUE)
+set(UndoRedo1_USE_NEW_PANELS TRUE)
+set(UndoRedo5_USE_NEW_PANELS TRUE)
+set(UndoRedo6_USE_NEW_PANELS TRUE)
+set(UndoRedo7_USE_NEW_PANELS TRUE)
+set(VariableSelector_USE_NEW_PANELS TRUE)
+set(VariableSelector1_USE_NEW_PANELS TRUE)
+set(ViewSettingsDialog_USE_NEW_PANELS TRUE)
+set(XdmfRead_USE_NEW_PANELS TRUE)
+set(XdmfReadImageData_USE_NEW_PANELS TRUE)
+set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
+set(XdmfReadRectilinearGrid_USE_NEW_PANELS TRUE)
+set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
