@@ -67,6 +67,7 @@ public:
   void Deliver(int use_low_res, unsigned int size, unsigned int *keys);
 
   void SetView(vtkPVRenderView*);
+  vtkPVRenderView* GetView();
 
   // Description:
   // Render-view specific API to mark a piece as "re-distributable" i.e. it

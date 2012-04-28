@@ -32,6 +32,7 @@
 #include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
@@ -90,7 +91,6 @@ vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, REPRESENTED_DATA_STORE, ObjectBase);
-vtkInformationKeyRestrictedMacro(vtkPVRenderView, GEOMETRY_BOUNDS, DoubleVector, 6);
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -137,11 +137,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->SynchronizationCounter  = 0;
   this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
-
-  this->LastComputedBounds[0] = this->LastComputedBounds[2] =
-    this->LastComputedBounds[4] = -1.0;
-  this->LastComputedBounds[1] = this->LastComputedBounds[3] =
-    this->LastComputedBounds[5] = 1.0;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -584,58 +579,41 @@ void vtkPVRenderView::FinishSelection(vtkSelection* sel)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
-  //cout << "Clipping Bounds: "
-  //  << this->LastComputedBounds[0] << ", "
-  //  << this->LastComputedBounds[1] << ", "
-  //  << this->LastComputedBounds[2] << ", "
-  //  << this->LastComputedBounds[3] << ", "
-  //  << this->LastComputedBounds[4] << ", "
-  //  << this->LastComputedBounds[5] << endl;
-
-  this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
+  if (this->GeometryBounds.IsValid())
+    {
+    double bounds[6];
+    this->GeometryBounds.GetBounds(bounds);
+    this->GetRenderer()->ResetCameraClippingRange(bounds);
+    this->GetNonCompositedRenderer()->ResetCameraClippingRange(bounds);
+    }
 }
 
 #define PRINT_BOUNDS(bds)\
   bds[0] << "," << bds[1] << "," << bds[2] << "," << bds[3] << "," << bds[4] << "," << bds[5] << ","
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherBoundsInformation(
-  bool using_distributed_rendering)
+void vtkPVRenderView::SynchronizeGeometryBounds()
 {
-  vtkMath::UninitializeBounds(this->LastComputedBounds);
-
-  if (this->GetLocalProcessDoesRendering(using_distributed_rendering))
+  double bounds[6];
+  vtkMath::UninitializeBounds(bounds);
+  if (this->GeometryBounds.IsValid())
     {
-    this->CenterAxes->SetUseBounds(0);
-    // if ComputeVisiblePropBounds is called when there's no real window on the
-    // local process, all vtkWidgetRepresentations return wacky Z bounds which
-    // screws up the renderer and we don't see any images.
-    this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
-    this->CenterAxes->SetUseBounds(1);
+    this->GeometryBounds.GetBounds(bounds);
     }
 
-  if (using_distributed_rendering)
+  // sync up bounds across all processes when doing distributed rendering.
+  this->SynchronizedWindows->SynchronizeBounds(bounds);
+
+  if (!vtkMath::AreBoundsInitialized(bounds))
     {
-    // sync up bounds across all processes when doing distributed rendering.
-    this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+    this->GeometryBounds.SetBounds(-1, 1, -1, 1, -1, 1);
+    }
+  else
+    {
+    this->GeometryBounds.SetBounds(bounds);
     }
 
-  if (!vtkMath::AreBoundsInitialized(this->LastComputedBounds))
-    {
-    this->LastComputedBounds[0] = this->LastComputedBounds[2] =
-      this->LastComputedBounds[4] = -1.0;
-    this->LastComputedBounds[1] = this->LastComputedBounds[3] =
-      this->LastComputedBounds[5] = 1.0;
-    }
-  //cout << "Bounds: "
-  //  << this->LastComputedBounds[0] << ", "
-  //  << this->LastComputedBounds[1] << ", "
-  //  << this->LastComputedBounds[2] << ", "
-  //  << this->LastComputedBounds[3] << ", "
-  //  << this->LastComputedBounds[4] << ", "
-  //  << this->LastComputedBounds[5] << endl;
-
+  this->UpdateCenterAxes();
   this->ResetCameraClippingRange();
 }
 
@@ -671,7 +649,9 @@ void vtkPVRenderView::ResetCamera()
 
   // Remember, vtkRenderer::ResetCamera() calls
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
-  this->RenderView->GetRenderer()->ResetCamera(this->LastComputedBounds);
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
+  this->RenderView->GetRenderer()->ResetCamera(bounds);
 
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }
@@ -745,6 +725,10 @@ void vtkPVRenderView::Update()
 {
   vtkTimerLog::MarkStartEvent("RenderView::Update");
 
+  // reset the bounds, so that representations can provide us with bounds
+  // information during update.
+  this->GeometryBounds.Reset();
+
   this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
     this->Internals->GeometryStore.GetPointer());
 
@@ -799,6 +783,9 @@ void vtkPVRenderView::Update()
     {
     this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
     }
+
+  // Synchronize data bounds.
+  this->SynchronizeGeometryBounds();
 
   vtkTimerLog::MarkEndEvent("RenderView::Update");
 }
@@ -900,17 +887,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     (interactive?
      this->InteractiveRenderImageReductionFactor :
      this->StillRenderImageReductionFactor));
-
-  if (!interactive)
-    {
-    // Keep bounds information up-to-date.
-
-    // GatherBoundsInformation will not do communication unless using
-    // distributed rendering.
-    this->GatherBoundsInformation(
-      in_cave_mode || use_distributed_rendering);
-    this->UpdateCenterAxes(this->LastComputedBounds);
-    }
 
   this->UsedLODForLastRender = use_lod_rendering;
 
@@ -1092,6 +1068,45 @@ void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetGeometryBounds(vtkInformation* info,
+  double bounds[6], vtkMatrix4x4* matrix /*=NULL*/)
+{
+  // FIXME: I need a cleaner way for accessing the render view.
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
+  if (!storage)
+    {
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    return;
+    }
+
+  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(storage->GetView());
+  if (self)
+    {
+    if (matrix && vtkMath::AreBoundsInitialized(bounds))
+      {
+      double min_point[4] = {bounds[0], bounds[2], bounds[4], 1};
+      double max_point[4] = {bounds[1], bounds[3], bounds[5], 1};
+      matrix->MultiplyPoint(min_point, min_point);
+      matrix->MultiplyPoint(max_point, max_point);
+      double transformed_bounds[6];
+      transformed_bounds[0] = min_point[0] / min_point[3];
+      transformed_bounds[2] = min_point[1] / min_point[3];
+      transformed_bounds[4] = min_point[2] / min_point[3];
+      transformed_bounds[1] = max_point[0] / max_point[3];
+      transformed_bounds[3] = max_point[1] / max_point[3];
+      transformed_bounds[5] = max_point[2] / max_point[3];
+      self->GeometryBounds.AddBounds(transformed_bounds);
+      }
+    else
+      {
+      self->GeometryBounds.AddBounds(bounds);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
 {
   if (this->GetRemoteRenderingAvailable() == false)
@@ -1203,9 +1218,10 @@ void vtkPVRenderView::RemovePropFromRenderer(vtkProp* prop)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::UpdateCenterAxes(double bounds[6])
+void vtkPVRenderView::UpdateCenterAxes()
 {
-  vtkBoundingBox bbox(bounds);
+  vtkBoundingBox bbox(this->GeometryBounds);
+
   // include the center of rotation in the axes size determination.
   bbox.AddPoint(this->CenterAxes->GetPosition());
 

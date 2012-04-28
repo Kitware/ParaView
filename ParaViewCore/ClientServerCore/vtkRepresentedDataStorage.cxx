@@ -50,6 +50,12 @@ void vtkRepresentedDataStorage::SetView(vtkPVRenderView* view)
 }
 
 //----------------------------------------------------------------------------
+vtkPVRenderView* vtkRepresentedDataStorage::GetView()
+{
+  return this->View;
+}
+
+//----------------------------------------------------------------------------
 unsigned long vtkRepresentedDataStorage::GetVisibleDataSize(bool low_res)
 {
   return this->Internals->GetVisibleDataSize(low_res);

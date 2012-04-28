@@ -158,6 +158,7 @@ protected:
   int ColorAttributeType;
   char* ColorArrayName;
   int RequestedRenderMode;
+  double DataBounds[6];
 
 private:
   vtkImageVolumeRepresentation(const vtkImageVolumeRepresentation&); // Not implemented

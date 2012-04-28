@@ -259,6 +259,7 @@ protected:
   bool SuppressLOD;
   bool AllowSpecularHighlightingWithScalarColoring;
   bool RequestGhostCellsIfNeeded;
+  double DataBounds[6];
 
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented

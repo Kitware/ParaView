@@ -15,11 +15,14 @@
 #include "vtkGeometryRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkBoundingBox.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -115,6 +118,8 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
 
   this->AllowSpecularHighlightingWithScalarColoring = false;
 
+  vtkMath::UninitializeBounds(this->DataBounds);
+
   this->SetupDefaults();
 }
 
@@ -140,9 +145,6 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->Decimator->SetCopyCellData(1);
   this->Decimator->SetUseInternalTriangles(0);
   this->Decimator->SetNumberOfDivisions(10, 10, 10);
-  // FIXME:STREAMING
-  //this->LODDeliveryFilter->SetLODMode(true); // tell the filter that it is
-  //                                           // connected to the LOD pipeline.
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(1);
@@ -152,11 +154,6 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
   this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
-
-  // FIXME:STREAMING - Mapper's inputs are directly the data-objects provided by
-  // the view.
-  //this->Mapper->SetInputConnection(this->UpdateSuppressor->GetOutputPort());
-  //this->LODMapper->SetInputConnection(this->LODUpdateSuppressor->GetOutputPort());
 
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -209,6 +206,13 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       {
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
       }
+
+    // Set the data-bounds.
+    //double bounds[6];
+    vtkNew<vtkMatrix4x4> matrix;
+    this->Actor->GetMatrix(matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(
+      inInfo, this->DataBounds, matrix.GetPointer());
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {
@@ -310,6 +314,8 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
 {
   // cout << this << ":" << this->DebugString << ":RequestData" << endl;
 
+  vtkMath::UninitializeBounds(this->DataBounds);
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -340,6 +346,29 @@ int vtkGeometryRepresentation::RequestData(vtkInformation* request,
       this->GeometryFilter)->SetInputData(0, placeholder.GetPointer());
     }
   this->CacheKeeper->Update();
+
+  // Determine data bounds.
+  vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(
+    this->CacheKeeper->GetOutputDataObject(0));
+  if (cd)
+    {
+    vtkBoundingBox bbox;
+    vtkCompositeDataIterator* iter = cd->NewIterator();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (ds)
+        {
+        bbox.AddBounds(ds->GetBounds());
+        }
+      }
+    iter->Delete();
+    if (bbox.IsValid())
+      {
+      bbox.GetBounds(this->DataBounds);
+      }
+    }
+
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 

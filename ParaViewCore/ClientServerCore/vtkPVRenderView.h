@@ -36,6 +36,7 @@
 #define __vtkPVRenderView_h
 
 #include "vtkPVView.h"
+#include "vtkBoundingBox.h" // needed for iVar
 
 class vtkAlgorithmOutput;
 class vtkCamera;
@@ -49,6 +50,7 @@ class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
 class vtkLightKit;
+class vtkMatrix4x4;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
@@ -244,17 +246,6 @@ public:
   static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
 
   // Description:
-  // vtkDataRepresentation can use this key to publish meta-data about geometry
-  // bounds in the vtkPVView::REQUEST_UPDATE().
-  // If this meta-data is available, then the view can make informed
-  // decisions when resetting camera to the bounds of visible data.
-  // If no bounds are specified by a representation then the data bounds are
-  // used, if possible.
-  // Note that all process don't have to report bounds. The view takes care of
-  // consolidating the bounds between all views.
-  static vtkInformationDoubleVectorKey* GEOMETRY_BOUNDS();
-
-  // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.
   static vtkInformationIntegerKey* USE_LOD();
 
@@ -351,6 +342,8 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, bool clone);
   static void MarkAsRedistributable(
     vtkInformation* info, vtkPVDataRepresentation* repr);
+  static void SetGeometryBounds(vtkInformation* info,
+    double bounds[6], vtkMatrix4x4* transform = NULL);
 
 public:
   //*****************************************************************
@@ -537,7 +530,7 @@ protected:
   // Description:
   // Synchronizes bounds information on all nodes.
   // @CallOnAllProcessess
-  void GatherBoundsInformation(bool using_remote_rendering);
+  void SynchronizeGeometryBounds();
 
   // Description:
   // Set the last selection object.
@@ -546,7 +539,7 @@ protected:
   // Description:
   // UpdateCenterAxes().
   // Updates CenterAxes's scale and position.
-  void UpdateCenterAxes(double bounds[6]);
+  void UpdateCenterAxes();
 
   // Description
   // Returns true if the local process is doing to do actual render or
@@ -585,7 +578,8 @@ protected:
   double RemoteRenderingThreshold;
   double LODRenderingThreshold;
   double ClientOutlineThreshold;
-  double LastComputedBounds[6];
+  vtkBoundingBox GeometryBounds;
+
   bool UseOffscreenRendering;
   bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForSceenshots;

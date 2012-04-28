@@ -134,6 +134,13 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     // to provide a place-holder dataset of the right type.
     vtkPVRenderView::SetPiece(inInfo, this, 
       this->CacheKeeper->GetOutputDataObject(0));
+
+    vtkImageData* img = vtkImageData::SafeDownCast(
+      this->CacheKeeper->GetOutputDataObject(0));
+    if (img)
+      {
+      vtkPVRenderView::SetGeometryBounds(inInfo, img->GetBounds());
+      }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

@@ -15,14 +15,17 @@
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 
 #include "vtkCommand.h"
+#include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProjectedTetrahedraMapper.h"
-#include "vtkPVGeometryFilter.h"
 #include "vtkPVCacheKeeper.h"
+#include "vtkPVGeometryFilter.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVUpdateSuppressor.h"
@@ -194,6 +197,17 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
     vtkPVRenderView::SetPiece(inInfo, this,
       this->CacheKeeper->GetOutputDataObject(0));
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+
+    vtkDataSet* dataset = vtkDataSet::SafeDownCast(
+      this->CacheKeeper->GetOutputDataObject(0));
+    if (dataset)
+      {
+      vtkNew<vtkMatrix4x4> matrix;
+      this->Actor->GetMatrix(matrix.GetPointer());
+      vtkPVRenderView::SetGeometryBounds(inInfo, dataset->GetBounds(),
+        matrix.GetPointer());
+      }
+
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {

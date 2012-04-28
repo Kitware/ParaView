@@ -16,10 +16,10 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
-#include "vtkSmartVolumeMapper.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPolyDataMapper.h"
@@ -28,6 +28,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartVolumeMapper.h"
 #include "vtkVolumeProperty.h"
 
 #include <map>
@@ -56,6 +57,8 @@ vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 
   this->CacheKeeper->SetInputData(this->Cache);
   this->Actor->SetLODMapper(this->OutlineMapper);
+
+  vtkMath::UninitializeBounds(this->DataBounds);
 }
 
 //----------------------------------------------------------------------------
@@ -102,6 +105,7 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
       this->OutlineSource->GetOutputDataObject(0));
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -120,6 +124,8 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
 int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  vtkMath::UninitializeBounds(this->DataBounds);
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -139,6 +145,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
 
     this->OutlineSource->SetBounds(vtkImageData::SafeDownCast(
         this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
+    this->OutlineSource->GetBounds(this->DataBounds);
     }
   else
     {
