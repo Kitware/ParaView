@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqProxy.h"
+#include "pqObjectPanelPropertyWidget.h"
 
 //-----------------------------------------------------------------------------
 pqObjectPanel::pqObjectPanel(pqProxy* object_proxy, QWidget* p) :
@@ -58,9 +59,15 @@ void pqObjectPanel::accept()
 {
   pqProxyPanel::accept();
 
-  if(this->ReferenceProxy)
+  // this is hacky, but if we are used within a property widget we let
+  // our parent handle the proxy modified state. this should be removed
+  // when we get rid of the old properties panel
+  if(!qobject_cast<pqObjectPanelPropertyWidget *>(this->parent()))
     {
-    this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+    if(this->ReferenceProxy)
+      {
+      this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+      }
     }
 }
 
@@ -68,9 +75,17 @@ void pqObjectPanel::accept()
 void pqObjectPanel::reset()
 {
   pqProxyPanel::reset();
-  if (this->ReferenceProxy && this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
+
+  // this is hacky, but if we are used within a property widget we let
+  // our parent handle the proxy modified state. this should be removed
+  // when we get rid of the old properties panel
+  if(!qobject_cast<pqObjectPanelPropertyWidget *>(this->parent()))
     {
-    this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+    if (this->ReferenceProxy &&
+        this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
+      {
+      this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+      }
     }
 }
 
