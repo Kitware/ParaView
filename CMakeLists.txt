@@ -192,6 +192,9 @@ MARK_AS_ADVANCED(Module_vtkViewsContext2D)
 SET(Module_vtkIOExport ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkIOExport)
 
+SET(Module_vtkIOInfovis ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOInfovis)
+
 if(BUILD_TESTING)
   SET(Module_vtkTestingRendering ON CACHE BOOL "" FORCE)
   MARK_AS_ADVANCED(Module_vtkTestingRendering)
