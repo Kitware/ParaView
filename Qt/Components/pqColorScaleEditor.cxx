@@ -1340,6 +1340,13 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   model->addBuiltinColorMap(colorMap, "Black-Body Radiation");
 
   colorMap.removeAllPoints();
+  colorMap.setColorSpace(pqColorMapModel::LabSpace);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
+  colorMap.setNanColor(QColor(255, 255, 0));
+  model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
+
+  colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::RgbSpace);
   colorMap.addPoint(pqChartValue((double)0.0),   QColor(  0,   0,   0), (double)0.0);
   colorMap.addPoint(pqChartValue((double)0.333), QColor(  0,   0, 128), (double)0.333);
