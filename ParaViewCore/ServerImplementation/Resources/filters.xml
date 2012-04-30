@@ -120,7 +120,7 @@
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkHierarchicalBoxDataSet"/>
+             <DataType value="vtkOverlappingAMR"/>
            </DataTypeDomain>
            <Documentation>
              This property specifies the input for this filter.
@@ -144,7 +144,7 @@
              <Group name="filters"/>
            </ProxyGroupDomain>
            <DataTypeDomain name="input_type">
-             <DataType value="vtkHierarchicalBoxDataSet"/>
+             <DataType value="vtkOverlappingAMR"/>
            </DataTypeDomain>
            <Documentation>
              This property specifies the input for this filter.
@@ -155,7 +155,7 @@
         name="UseNativeCutter"
         command="SetUseNativeCutter"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           This property specifies whether the ParaView's generic dataset
