@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineObject_h
 
 #include "pqServerManagerModelItem.h"
+#include <QPointer>
+
 class pqProxyInternal;
 class pqServer;
 class vtkPVXMLElement;
@@ -60,9 +62,8 @@ public:
   virtual ~pqProxy();
 
   /// Get the server on which this proxy exists.
-  pqServer *getServer() const
-    { return this->Server; }
-
+  pqServer *getServer() const;
+  
   /// This is a convenience method. It re-registers the underlying proxy
   /// with the requested new name under the same group. Then it unregisters
   /// the proxy from the group with the old name. This operation is
@@ -172,7 +173,7 @@ protected slots:
   void onProxyUnRegistered(const QString&, const QString&, vtkSMProxy*);
 
 private:
-  pqServer *Server;           ///< Stores the parent server.
+  QPointer<pqServer> Server;           ///< Stores the parent server.
   QString SMName;
   QString SMGroup;
   pqProxyInternal* Internal;

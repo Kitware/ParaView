@@ -102,6 +102,12 @@ pqProxy::~pqProxy()
 }
 
 //-----------------------------------------------------------------------------
+pqServer* pqProxy::getServer() const
+{
+  return this->Server;
+}
+
+//-----------------------------------------------------------------------------
 void pqProxy::addHelperProxy(const QString& key, vtkSMProxy* proxy)
 {
   bool already_added = false;
