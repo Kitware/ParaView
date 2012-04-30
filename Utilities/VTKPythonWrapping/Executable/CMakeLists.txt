@@ -135,7 +135,7 @@ TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} vtkPVPython)
 IF(BORLAND)
   SET(KITS Common PVServerCommon PVServerManager)
   FOREACH(KIT ${KITS})
-    WRITE_FILE(${LIBRARY_OUTPUT_PATH}/vtk${KIT}Python.def
+    WRITE_FILE(${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/vtk${KIT}Python.def
       "EXPORTS\ninitvtk${KIT}Python=_initvtk${KIT}Python\n")
   ENDFOREACH(KIT)
 ENDIF(BORLAND)

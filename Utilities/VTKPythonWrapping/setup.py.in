@@ -29,7 +29,7 @@ else:
 
 # VTK build configuration settings.
 pv_version = "@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@"
-pv_lib_dir = "@LIBRARY_OUTPUT_PATH@"
+pv_lib_dir = "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@"
 pv_bin_dir = "@EXECUTABLE_OUTPUT_PATH@"
 pv_has_configuration_types = @VTK_PYTHON_HAS_CONFIG_TYPES@
 vtk_modules = """@VTK_PYTHON_MODULES@""".split(';')

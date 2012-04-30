@@ -70,7 +70,7 @@ IF(PYTHON_ENABLE_MODULE_vtk${KIT}Python)
   IF(CYGWIN OR NOT WIN32)
     SET(suf ${CMAKE_SHARED_MODULE_SUFFIX})
     SET(src vtk${KIT}Python${suf})
-    SET(tgt ${LIBRARY_OUTPUT_PATH}/libvtk${KIT}Python${suf})
+    SET(tgt ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libvtk${KIT}Python${suf})
     ADD_CUSTOM_COMMAND(TARGET vtk${KIT}Python POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E create_symlink ${src} ${tgt})
   ENDIF(CYGWIN OR NOT WIN32)

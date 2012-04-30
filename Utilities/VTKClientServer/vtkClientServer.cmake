@@ -4,7 +4,7 @@
 INCLUDE (${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cmake)
 #------------------------------------------------------------------------------
 MACRO(CS_INITIALIZE_WRAP)
-  SET(LIBRARY_OUTPUT_PATH    ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY    ${VTKCS_BINARY_DIR}/bin)
   SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
 ENDMACRO(CS_INITIALIZE_WRAP)
 
