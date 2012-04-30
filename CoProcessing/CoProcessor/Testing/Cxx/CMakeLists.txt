@@ -16,7 +16,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     ADD_TEST(PCoProcessingTestPythonScript
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS}
       ${VTK_MPI_PREFLAGS}
-      ${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample
+      ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/CoProcessingPythonScriptExample
       ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/PythonScriptTest2.py
       ${VTK_MPI_POSTFLAGS}
       )
