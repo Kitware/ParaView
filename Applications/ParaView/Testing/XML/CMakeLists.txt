@@ -164,6 +164,9 @@ set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGrid_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
 
+# These tests should not be run along with those using the new panels
+set(Threshold_BREAK TRUE)
+
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
