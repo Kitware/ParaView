@@ -183,6 +183,28 @@ MARK_AS_ADVANCED(Module_vtkImagingMorphological)
 SET(Module_vtkIOImport ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkIOImport)
 
+SET(Module_vtklibxml2 ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtklibxml2)
+
+SET(Module_vtkViewsContext2D ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkViewsContext2D)
+
+SET(Module_vtkIOExport ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOExport)
+
+if(BUILD_TESTING)
+  SET(Module_vtkTestingRendering ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkTestingRendering)
+
+  SET(Module_vtkFiltersProgrammable ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkFiltersProgrammable)
+  
+  SET(Module_vtkInteractionImage ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkInteractionImage)
+endif()
+
+
+
 SET(VTK_MAKE_INSTANTIATORS ON CACHE BOOL "" FORCE)
 
 #########################################################################
