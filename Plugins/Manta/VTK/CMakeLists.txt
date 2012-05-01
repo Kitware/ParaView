@@ -27,10 +27,10 @@ SET ( EXES_LIBS_EXPORT_DIR ${VTK_DIR} )
 MARK_AS_ADVANCED ( EXES_LIBS_EXPORT_DIR )
 
 # Set specific VTK libraries to link against
-SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics vtkFiltering)
-IF ( VTK_USE_PARALLEL )
-  SET (VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkParallel )
-ENDIF( VTK_USE_PARALLEL )
+set( VTK_LINK_LIBRARIES vtkRenderingOpenGL vtkFiltersCore)
+if( Module_vtkParallelCore )
+  set(VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkParallelCore )
+endif()
 IF (BUILD_AGAINST_PARAVIEW)
   SET ( VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkPVVTKExtensions vtkPVClientServerCore)
   INCLUDE_DIRECTORIES(
