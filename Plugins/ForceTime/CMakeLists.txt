@@ -19,6 +19,9 @@ IF(PARAVIEW_BUILD_QT_GUI)
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
+# Override macros with ParaView versions
+include(Qt4Macros)
+
 SET(Plugin_SRCS
   vtkForceTime.cxx
 )
@@ -29,4 +32,4 @@ ADD_PARAVIEW_PLUGIN( ForceTime "1.0"
   GUI_RESOURCE_FILES ForceTimeClient.xml
 )
 
-TARGET_LINK_LIBRARIES(ForceTime vtkFiltering)
+TARGET_LINK_LIBRARIES(ForceTime vtkFiltersCore)
