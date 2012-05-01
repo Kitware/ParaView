@@ -150,14 +150,25 @@ MARK_AS_ADVANCED(Module_vtkIOExodus)
 SET(Module_vtkIOEnSight ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkIOEnSight)
 
-SET(Module_vtkIOParallelExodus ON CACHE BOOL "" FORCE)
-MARK_AS_ADVANCED(Module_vtkIOParallelExodus)
+if(PARAVIEW_USE_MPI)
+  SET(Module_vtkIOParallelExodus ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkIOParallelExodus)
 
-SET(Module_vtkIOParallel ON CACHE BOOL "" FORCE)
-MARK_AS_ADVANCED(Module_vtkIOParallel)
+  SET(Module_vtkIOParallel ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkIOParallel)
 
-SET(Module_vtkRenderingParallel ON CACHE BOOL "" FORCE)
-MARK_AS_ADVANCED(Module_vtkRenderingParallel)
+  SET(Module_vtkRenderingParallel ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkRenderingParallel)
+
+  SET(Module_vtkFiltersParallelStatistics ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkFiltersParallelStatistics)
+
+  SET(Module_vtkFiltersParallelTracers ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkFiltersParallelTracers)
+
+  SET(Module_vtkFiltersParallelImaging ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkFiltersParallelImaging)
+endif()
 
 SET(Module_vtkFiltersGeneric ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkFiltersGeneric)
@@ -165,14 +176,8 @@ MARK_AS_ADVANCED(Module_vtkFiltersGeneric)
 SET(Module_vtkFiltersStatistics ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkFiltersStatistics)
 
-SET(Module_vtkFiltersParallelStatistics ON CACHE BOOL "" FORCE)
-MARK_AS_ADVANCED(Module_vtkFiltersParallelStatistics)
-
 SET(Module_vtkFiltersHyperTree ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkFiltersHyperTree)
-
-SET(Module_vtkFiltersParallelTracers ON CACHE BOOL "" FORCE)
-MARK_AS_ADVANCED(Module_vtkFiltersParallelTracers)
 
 SET(Module_vtkImagingFourier ON CACHE BOOL "" FORCE)
 MARK_AS_ADVANCED(Module_vtkImagingFourier)
