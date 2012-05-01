@@ -109,7 +109,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   file(GLOB vtk_python_files ${VTK_BINARY_DIR}/Wrapping/Python/vtk/*.py)
   
   foreach(file ${vtk_python_files})
-    
     get_filename_component(name ${file} NAME)
     set(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/vtk/${name}")
     
@@ -196,13 +195,20 @@ IF (PARAVIEW_ENABLE_PYTHON)
   
   # Setup VTK_PYTHON_MODULES, used in setup.py.in
   set(VTK_PYTHON_MODULES)
+  set(PV_VTK_PYTHON_IMPORTS)
+  
   
   foreach(_vtk_module ${VTK_MODULES_ENABLED})
    if(NOT ${_vtk_module}_EXCLUDE_FROM_WRAPPING)
      list(APPEND VTK_PYTHON_MODULES ${_vtk_module})
+     set(PV_VTK_PYTHON_IMPORTS "${PV_VTK_PYTHON_IMPORTS}from ${_vtk_module} import *\n") 
    endif() 
   endforeach()  
   
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
                ${CMAKE_CURRENT_BINARY_DIR}/setup.py @ONLY IMMEDIATE)
+               
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/paraview/vtk/__init__.py.in
+    ${PV_PYTHON_MODULE_BINARY_DIR}/vtk/__init__.py)                
+               
 ENDIF (PARAVIEW_ENABLE_PYTHON)

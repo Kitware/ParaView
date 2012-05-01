@@ -13,8 +13,6 @@ INCLUDE_DIRECTORIES(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${ParaView_BINARY_DIR}/VTK"
-  "${ParaView_SOURCE_DIR}/VTK/Common"
-  "${ParaView_SOURCE_DIR}/VTK/Parallel"
   "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python"
   "${ParaView_BINARY_DIR}/VTK/Wrapping/Python"
   "${PVCommon_SOURCE_DIR}"
@@ -133,7 +131,7 @@ TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} vtkPVPython)
 TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} vtkPVPython)
 
 IF(BORLAND)
-  SET(KITS Common PVServerCommon PVServerManager)
+  SET(KITS CommonCore PVServerCommon PVServerManager)
   FOREACH(KIT ${KITS})
     WRITE_FILE(${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/vtk${KIT}Python.def
       "EXPORTS\ninitvtk${KIT}Python=_initvtk${KIT}Python\n")
