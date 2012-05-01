@@ -168,6 +168,9 @@ if(PARAVIEW_USE_MPI)
 
   SET(Module_vtkFiltersParallelImaging ON CACHE BOOL "" FORCE)
   MARK_AS_ADVANCED(Module_vtkFiltersParallelImaging)
+  
+  SET(Module_vtkIOParallelNetCDF ON CACHE BOOL "" FORCE)
+  MARK_AS_ADVANCED(Module_vtkIOParallelNetCDF)
 endif()
 
 SET(Module_vtkFiltersGeneric ON CACHE BOOL "" FORCE)
