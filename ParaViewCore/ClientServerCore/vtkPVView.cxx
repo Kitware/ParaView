@@ -100,8 +100,6 @@ vtkPVView::vtkPVView()
   this->CacheKey = 0.0;
   this->UseCache = false;
 
-  this->StreamingPass = -1;
-
   this->RequestInformation = vtkInformation::New();
   this->ReplyInformationVector = vtkInformationVector::New();
 
@@ -276,15 +274,6 @@ void vtkPVView::CallProcessViewRequest(
 
         pvrepr->SetUseCache(this->GetUseCache());
         pvrepr->SetCacheKey(this->GetCacheKey());
-
-        if (vtkPVView::GetEnableStreaming() && this->StreamingPass >= 0)
-          {
-          pvrepr->SetStreamingPass(this->StreamingPass);
-          }
-        else
-          {
-          pvrepr->SetStreamingPass(-1);
-          }
         }
       }
     }

@@ -83,7 +83,6 @@ SET (Kit_SRCS
   vtkPExtractHistogram.cxx
   vtkPGenericEnSightReader.cxx
   vtkPhastaReader.cxx
-  vtkPieceStreamingExtentTranslator.cxx
   vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
@@ -147,7 +146,6 @@ SET (Kit_SRCS
   vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
   vtkPVSinusoidKeyFrame.cxx
-  vtkPVStreamingSphereSource.cxx
   vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx
@@ -170,7 +168,6 @@ SET (Kit_SRCS
   vtkSelectionSerializer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSortedTableStreamer.cxx
-  vtkStreamingExtentTranslator.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotHistoryReader.cxx
@@ -275,7 +272,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVKeyFrameAnimationCue.cxx
   vtkPVRenderViewProxy.cxx
   vtkSciVizStatistics.cxx
-  vtkStreamingExtentTranslator.cxx
   vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
   vtkTransferFunctionEditorWidget.cxx

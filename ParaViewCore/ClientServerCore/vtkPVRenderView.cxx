@@ -843,7 +843,6 @@ void vtkPVRenderView::StreamingUpdate(int pass)
     {
     cout << "StreamingUpdate: " << pass << endl;
     vtkTimerLog::MarkStartEvent("Streaming Update");
-    this->SetStreamingPass(pass);
 
     // Update the representations.
     this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
@@ -851,7 +850,6 @@ void vtkPVRenderView::StreamingUpdate(int pass)
     this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
       this->RequestInformation, this->ReplyInformationVector);
 
-    this->SetStreamingPass(-1);
     vtkTimerLog::MarkEndEvent("Streaming Update");
     }
 }
