@@ -3196,6 +3196,33 @@
    <!-- End P3DReaderCore -->
    </SourceProxy>
 
+   <!-- Beginning of FLUENTReaderCore -->
+   <SourceProxy name="FLUENTReaderCore" class="vtkFLUENTReader">
+     <StringVectorProperty name="CellArrayInfo"
+                           information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+     <StringVectorProperty name="CellArrayStatus"
+                           command="SetCellArrayStatus"
+                           number_of_elements="0"
+                           repeat_command="1"
+                           number_of_elements_per_command="2"
+                           element_types="2 0"
+                           information_property="CellArrayInfo"
+                           label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="CellArrayInfo"
+                     function="ArrayList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         Select which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   </SourceProxy>
+   <!-- End of FLUENTReaderCore -->
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -6401,45 +6428,38 @@
 
    <!-- Beginning of FLUENT Reader -->
    <SourceProxy name="FLUENTReader"
-                class="vtkFLUENTReader">
-     <Documentation
+                label="Fluent Case Reader"
+                class="vtkFileSeriesReader"
+                si_class="vtkSIFileSeriesReaderProxy"
+                file_name_method="SetFileName" >
+      <Documentation
         short_help="Reads a dataset in Fluent file format."
         long_help="Reads a dataset in Fluent file format." >
         FLUENTReader creates an unstructured grid dataset. It reads .cas and
-        .dat files stored in FLUENT native format.
-     </Documentation>
-     <StringVectorProperty name="FileName"
-                           command="SetFileName"
-                           animateable="0"
-                           number_of_elements="1">
-       <FileListDomain name="files"/>
-       <Documentation>
-         Set the file  name for the FLUENT reader.
-       </Documentation>
-     </StringVectorProperty>
-     <StringVectorProperty name="CellArrayInfo"
-                           information_only="1">
-       <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-     <StringVectorProperty name="CellArrayStatus"
-                           command="SetCellArrayStatus"
-                           number_of_elements="0"
-                           repeat_command="1"
-                           number_of_elements_per_command="2"
-                           element_types="2 0"
-                           information_property="CellArrayInfo"
-                           label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-         <RequiredProperties>
-           <Property name="CellArrayInfo"
-                     function="ArrayList"/>
-         </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         Select which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
+        .dat files stored in FLUENT native format (or a file series of the same.
+      </Documentation>
 
+      <StringVectorProperty name="FileName"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            animateable="0"
+                            number_of_elements="1"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the files to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Reader"
+          proxygroup="internal_sources" proxyname="FLUENTReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+        </ExposedProperties>
+      </SubProxy>
      <Hints>
       <ReaderFactory extensions="cas"
           file_description="Fluent Case Files" />
