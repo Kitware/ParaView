@@ -41,9 +41,9 @@ public:
   // requests.
   static vtkInformationObjectBaseKey* STREAMING_EXTENT_TRANSLATOR();
 
-  int SetUpdateStreamingExtent(int port, int pass, int number_of_passes);
+  int SetUpdateStreamingExtent(int port, int pass);
   static int SetUpdateStreamingExtent(
-    vtkInformation* info, int pass, int number_of_passes);
+    vtkInformation* info, int pass);
 
   vtkStreamingExtentTranslator* GetStreamingExtentTranslator(int port);
   static vtkStreamingExtentTranslator* GetStreamingExtentTranslator(

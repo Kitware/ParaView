@@ -27,16 +27,22 @@ public:
   vtkTypeMacro(vtkPieceStreamingExtentTranslator, vtkStreamingExtentTranslator);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:;
+  // Set/Get in how many passes should the data be streamed.
+  vtkSetClampMacro(NumberOfPasses, int, 1, 20);
+  vtkGetMacro(NumberOfPasses, int);
+
   // Description:
   // This is the method that is responsible to convert the pass request to
   // appropriate pipeline request.
-  virtual int PassToRequest(
-    int pass, int numPasses, vtkInformation* info);
+  virtual int PassToRequest(int pass, vtkInformation* info);
 
 //BTX
 protected:
   vtkPieceStreamingExtentTranslator();
   ~vtkPieceStreamingExtentTranslator();
+
+  int NumberOfPasses;
 
 private:
   vtkPieceStreamingExtentTranslator(const vtkPieceStreamingExtentTranslator&); // Not implemented.

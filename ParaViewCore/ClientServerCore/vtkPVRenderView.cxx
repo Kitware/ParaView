@@ -837,14 +837,13 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StreamingUpdate(int pass, int num_passes)
+void vtkPVRenderView::StreamingUpdate(int pass) 
 {
   if (vtkPVView::GetEnableStreaming())
     {
-    cout << "StreamingUpdate: " << pass << "/" << num_passes << endl;
+    cout << "StreamingUpdate: " << pass << endl;
     vtkTimerLog::MarkStartEvent("Streaming Update");
     this->SetStreamingPass(pass);
-    this->SetNumberOfStreamingPasses(num_passes);
 
     // Update the representations.
     this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
@@ -853,7 +852,6 @@ void vtkPVRenderView::StreamingUpdate(int pass, int num_passes)
       this->RequestInformation, this->ReplyInformationVector);
 
     this->SetStreamingPass(-1);
-    this->SetNumberOfStreamingPasses(0);
     vtkTimerLog::MarkEndEvent("Streaming Update");
     }
 }

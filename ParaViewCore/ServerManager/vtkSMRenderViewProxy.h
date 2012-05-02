@@ -129,7 +129,7 @@ public:
 
   // Description:
   // Called to render a streaming pass.
-  void StreamingUpdate(int pass, int number_of_passes);
+  void StreamingUpdate(int pass);
 
 //BTX
 protected:

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkCommand.h"
 #include "pqActiveObjects.h"
+#include "vtkPVView.h"
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
   : Superclass(parentObject), Pass(0), NumberOfPasses(10)
@@ -71,8 +72,11 @@ void pqViewStreamingBehavior::onViewUpdated(
   vtkObject* caller, unsigned long, void*)
 {
   vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(caller);
-  this->Pass = 0;
-  this->Timer.start(3000);
+  if (vtkPVView::GetEnableStreaming())
+    {
+    this->Pass = 0;
+    this->Timer.start(3000);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -83,7 +87,7 @@ void pqViewStreamingBehavior::onTimeout()
     {
     vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(
       view->getProxy());
-    rvProxy->StreamingUpdate(this->Pass, this->NumberOfPasses);
+    rvProxy->StreamingUpdate(this->Pass);
     view->forceRender();
 
     this->Pass++;

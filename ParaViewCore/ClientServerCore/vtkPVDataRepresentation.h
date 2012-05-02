@@ -124,9 +124,7 @@ public:
 
   // Description:
   virtual void SetStreamingPass(int pass);
-  virtual void SetNumberOfStreamingPasses(int num_passes);
   vtkGetMacro(StreamingPass, int);
-  vtkGetMacro(NumberOfStreamingPasses, int);
 
   // Description:
   // Making these methods public. When constructing composite representations,
@@ -184,7 +182,6 @@ private:
   double ForcedCacheKey;
   bool NeedUpdate;
 
-  int NumberOfStreamingPasses;
   int StreamingPass;
 
   class Internals;

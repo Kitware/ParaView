@@ -44,6 +44,7 @@ int vtkPVStreamingSphereSource::RequestInformation(vtkInformation *req,
       outputVector->GetInformationObject(0)) == NULL)
     {
     vtkNew<vtkPieceStreamingExtentTranslator> translator;
+    translator->SetNumberOfPasses(5);
     vtkPVCompositeDataPipeline::SetStreamingExtentTranslator(
       outputVector->GetInformationObject(0),
       translator.GetPointer());

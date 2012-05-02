@@ -231,14 +231,13 @@ void vtkSMRenderViewProxy::UpdateLOD()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::StreamingUpdate(int pass, int number_of_passes)
+void vtkSMRenderViewProxy::StreamingUpdate(int pass)
 {
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this)
          << "StreamingUpdate"
          << pass
-         << number_of_passes
          << vtkClientServerStream::End;
   this->GetSession()->PrepareProgress();
   this->ExecuteStream(stream);

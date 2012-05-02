@@ -48,7 +48,6 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
   this->ForcedCacheKey = 0.0;
 
   this->StreamingPass = -1;
-  this->NumberOfStreamingPasses = 0;
 
   this->NeedUpdate = true;
 }
@@ -80,21 +79,6 @@ void vtkPVDataRepresentation::SetStreamingPass(int pass)
     this->StreamingPass = pass;
 
     this->MarkModified();
-    // we don't call this->MarkModified() since we don't want the
-    // representations to re-execute unless the streaming-request indeed causes
-    // the update-request to change.
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataRepresentation::SetNumberOfStreamingPasses(int num_passes)
-{
-  if (this->NumberOfStreamingPasses != num_passes)
-    {
-    this->NumberOfStreamingPasses = num_passes;
-
-    this->MarkModified();
-    //this->NeedUpdate = true;
     // we don't call this->MarkModified() since we don't want the
     // representations to re-execute unless the streaming-request indeed causes
     // the update-request to change.
@@ -174,8 +158,7 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
           this->UpdateTime);
         }
       vtkPVCompositeDataPipeline::SetUpdateStreamingExtent(
-        inputVector[cc]->GetInformationObject(kk),
-        this->StreamingPass, this->NumberOfStreamingPasses);
+        inputVector[cc]->GetInformationObject(kk), this->StreamingPass);
       }
     }
 

@@ -86,11 +86,11 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     this->ViewProxy->GetClientSideObject());
   bool use_lod = interactive && view->GetUseLODForInteractiveRender();
 
-  if ( (!use_lod && this->ViewUpdateStamp < this->GeometryDeliveryStamp) ||
-    (use_lod && this->ViewUpdateStamp < this->LODGeometryDeliveryStamp) )
-    {
-    return;
-    }
+  //if ( (!use_lod && this->ViewUpdateStamp < this->GeometryDeliveryStamp) ||
+  //  (use_lod && this->ViewUpdateStamp < this->LODGeometryDeliveryStamp) )
+  //  {
+  //  return;
+  //  }
 
   vtkTimeStamp& timeStamp = use_lod?
     this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;

@@ -170,15 +170,15 @@ int vtkPVCompositeDataPipeline::SetStreamingExtentTranslator(
 
 //----------------------------------------------------------------------------
 int vtkPVCompositeDataPipeline::SetUpdateStreamingExtent(
-  int port, int pass, int number_of_passes)
+  int port, int pass)
 {
   return this->SetUpdateStreamingExtent(
-    this->GetOutputInformation(port), pass, number_of_passes);
+    this->GetOutputInformation(port), pass);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVCompositeDataPipeline::SetUpdateStreamingExtent(
-  vtkInformation* info, int pass, int number_of_passes)
+  vtkInformation* info, int pass)
 {
   if (!info)
     {
@@ -197,7 +197,7 @@ int vtkPVCompositeDataPipeline::SetUpdateStreamingExtent(
     }
 
   // Use the translator provided by data-producer to make a relevant request.
-  return translator->PassToRequest(pass, number_of_passes, info);
+  return translator->PassToRequest(pass, info);
 }
 
 //----------------------------------------------------------------------------

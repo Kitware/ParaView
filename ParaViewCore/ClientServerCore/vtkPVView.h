@@ -110,7 +110,6 @@ public:
 
   // Description:
   vtkSetMacro(StreamingPass, int);
-  vtkSetMacro(NumberOfStreamingPasses, int);
 
   // Description:
   // These methods are used to setup the view for capturing screen shots.
@@ -190,7 +189,6 @@ protected:
   int Position[2];
 
   int StreamingPass;
-  int NumberOfStreamingPasses;
 
 private:
   vtkPVView(const vtkPVView&); // Not implemented

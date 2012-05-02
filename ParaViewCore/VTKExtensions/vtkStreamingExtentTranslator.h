@@ -31,8 +31,7 @@ public:
   // Description:
   // This is the method that is responsible to convert the pass request to
   // appropriate pipeline request.
-  virtual int PassToRequest(
-    int pass, int numPasses, vtkInformation* info)=0;
+  virtual int PassToRequest(int pass, vtkInformation* info)=0;
 
 //BTX
 protected:

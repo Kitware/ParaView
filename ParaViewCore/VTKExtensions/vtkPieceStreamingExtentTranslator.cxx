@@ -21,6 +21,7 @@ vtkStandardNewMacro(vtkPieceStreamingExtentTranslator);
 //----------------------------------------------------------------------------
 vtkPieceStreamingExtentTranslator::vtkPieceStreamingExtentTranslator()
 {
+  this->NumberOfPasses = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -30,22 +31,22 @@ vtkPieceStreamingExtentTranslator::~vtkPieceStreamingExtentTranslator()
 
 //----------------------------------------------------------------------------
 int vtkPieceStreamingExtentTranslator::PassToRequest(
-  int pass, int numPasses, vtkInformation* info)
+  int pass, vtkInformation* info)
 {
   // convert pass request to piece request. We respect existing piece request,
   // if any.
-  if (numPasses > 1 && pass >= 0)
+  if (this->NumberOfPasses > 1 && pass >= 0 && pass < this->NumberOfPasses)
     {
     int piece = vtkStreamingDemandDrivenPipeline::GetUpdatePiece(info);
     int num_pieces =
       vtkStreamingDemandDrivenPipeline::GetUpdateNumberOfPieces(info);
 
-    piece = piece * numPasses + pass;
-    num_pieces = num_pieces * numPasses;
+    piece = piece * this->NumberOfPasses + pass;
+    num_pieces = num_pieces * this->NumberOfPasses;
 
     vtkStreamingDemandDrivenPipeline::SetUpdatePiece(info, piece);
     vtkStreamingDemandDrivenPipeline::SetUpdateNumberOfPieces(info, num_pieces);
-    cout << "Requesting: " << piece << "/" << num_pieces << endl;
+    cout << "Requesting Piece: " << piece << "/" << num_pieces << endl;
     return 1;
     }
   return 0;
