@@ -343,6 +343,9 @@ IF (PARAVIEW_ENABLE_PYTHON)
     vtkFiltersHybridPythonD
     vtkInteractionWidgetsPythonD
     vtkParallelCorePythonD
+    vtkRenderingParallelPythonD
+    vtkFiltersProgrammablePythonD
+    vtkIOEnSightPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
