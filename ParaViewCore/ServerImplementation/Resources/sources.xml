@@ -1050,7 +1050,7 @@ The point source creates a specified number of points within a given radius abou
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="SphereSource" class="vtkSphereSource" label="Sphere">
+   <SourceProxy name="SphereSource" class="vtkPVStreamingSphereSource" label="Sphere">
       <Documentation
          long_help="Create a 3D sphere given a center and radius." 
          short_help="Create a 3D sphere">

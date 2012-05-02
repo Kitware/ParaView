@@ -123,6 +123,12 @@ public:
   vtkGetMacro(NeedUpdate,  bool);
 
   // Description:
+  virtual void SetStreamingPass(int pass);
+  virtual void SetNumberOfStreamingPasses(int num_passes);
+  vtkGetMacro(StreamingPass, int);
+  vtkGetMacro(NumberOfStreamingPasses, int);
+
+  // Description:
   // Making these methods public. When constructing composite representations,
   // we need to call these methods directly on internal representations.
   virtual bool AddToView(vtkView* view)
@@ -177,6 +183,9 @@ private:
   double CacheKey;
   double ForcedCacheKey;
   bool NeedUpdate;
+
+  int NumberOfStreamingPasses;
+  int StreamingPass;
 
   class Internals;
   Internals* Implementation;

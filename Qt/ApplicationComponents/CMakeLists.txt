@@ -108,6 +108,7 @@ SET (MOC_HEADERS
   pqViewMenuManager.h
   pqViewSettingsManager.h
   pqViewSettingsReaction.h
+  pqViewStreamingBehavior.h
 )
 
 # List UI files.
@@ -309,6 +310,8 @@ SET (SOURCE_FILES
   pqViewSettingsManager.h
   pqViewSettingsReaction.cxx
   pqViewSettingsReaction.h
+  pqViewStreamingBehavior.cxx
+  pqViewStreamingBehavior.h
 )
 #---------------------------------------------
 IF(PARAVIEW_ENABLE_PYTHON)

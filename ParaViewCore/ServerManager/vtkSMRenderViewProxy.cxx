@@ -231,6 +231,22 @@ void vtkSMRenderViewProxy::UpdateLOD()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderViewProxy::StreamingUpdate(int pass, int number_of_passes)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "StreamingUpdate"
+         << pass
+         << number_of_passes
+         << vtkClientServerStream::End;
+  this->GetSession()->PrepareProgress();
+  this->ExecuteStream(stream);
+  this->DeliveryManager->Deliver(false);
+  this->GetSession()->CleanupPendingProgress();
+}
+
+//-----------------------------------------------------------------------------
 vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
 {
   this->Superclass::PreRender(interactive);
@@ -246,9 +262,12 @@ vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
     this->UpdateLOD();
     }
 
-  // if async delivery is not enabled, then we deliver explicitly before every
-  // render.
-  this->DeliveryManager->Deliver(interactive);
+  if (vtkPVView::GetEnableStreaming() == false)
+    {
+    // if async delivery is not enabled, then we deliver explicitly before every
+    // render.
+    this->DeliveryManager->Deliver(interactive);
+    }
 
   return interactive? rv->GetInteractiveRenderProcesses():
     rv->GetStillRenderProcesses();

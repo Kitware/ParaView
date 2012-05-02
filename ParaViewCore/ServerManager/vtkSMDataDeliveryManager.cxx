@@ -97,8 +97,6 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 
   std::vector<unsigned int> keys_to_deliver;
   
-
-
   // FIXME:STREAMING this logic is not the best here. We end up re-delivering
   // geometry when the representation didn't really update at all.
   if (!view->GetGeometryStore()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))

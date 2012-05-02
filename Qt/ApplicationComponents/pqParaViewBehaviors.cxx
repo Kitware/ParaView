@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
 #include "pqStandardPropertyWidgetInterface.h"
+#include "pqViewStreamingBehavior.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -101,6 +102,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqObjectPickingBehavior(this);
   new pqCollaborationBehavior(this);
   new pqMultiServerBehavior(this);
+  new pqViewStreamingBehavior(this);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,

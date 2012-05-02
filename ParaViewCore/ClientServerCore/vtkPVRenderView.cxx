@@ -637,8 +637,10 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
-  // FIXME: Call update only when needed. That can be done at some point in the
-  // future.
+  // Since ResetCamera() is accessible via a property on the view proxy, this
+  // method gets called directly (and on on the vtkSMRenderViewProxy). Hence
+  // we need to ensure things are updated explicitly and cannot rely on the View
+  // proxy to take care of updating the view.
   this->Update();
 
   // Remember, vtkRenderer::ResetCamera() calls
@@ -832,6 +834,28 @@ void vtkPVRenderView::InteractiveRender()
   this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
   this->Render(true, false);
   vtkTimerLog::MarkEndEvent("Interactive Render");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StreamingUpdate(int pass, int num_passes)
+{
+  if (vtkPVView::GetEnableStreaming())
+    {
+    cout << "StreamingUpdate: " << pass << "/" << num_passes << endl;
+    vtkTimerLog::MarkStartEvent("Streaming Update");
+    this->SetStreamingPass(pass);
+    this->SetNumberOfStreamingPasses(num_passes);
+
+    // Update the representations.
+    this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
+      this->Internals->GeometryStore.GetPointer());
+    this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
+      this->RequestInformation, this->ReplyInformationVector);
+
+    this->SetStreamingPass(-1);
+    this->SetNumberOfStreamingPasses(0);
+    vtkTimerLog::MarkEndEvent("Streaming Update");
+    }
 }
  
 //----------------------------------------------------------------------------

@@ -27,20 +27,30 @@
 
 #include "vtkCompositeDataPipeline.h"
 
-class vtkCompositeDataSet;
-class vtkInformationDoubleKey;
-class vtkInformationIntegerVectorKey;
-class vtkInformationObjectBaseKey;
-class vtkInformationStringKey;
-class vtkInformationDataObjectKey;
-class vtkInformationIntegerKey;
-
+class vtkStreamingExtentTranslator;
 class VTK_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCompositeDataPipeline* New();
   vtkTypeMacro(vtkPVCompositeDataPipeline,vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Key to store a streaming-extent translator for the pipeline. A streaming
+  // extent translator is used to convert "streaming requests" to pipeline
+  // requests.
+  static vtkInformationObjectBaseKey* STREAMING_EXTENT_TRANSLATOR();
+
+  int SetUpdateStreamingExtent(int port, int pass, int number_of_passes);
+  static int SetUpdateStreamingExtent(
+    vtkInformation* info, int pass, int number_of_passes);
+
+  vtkStreamingExtentTranslator* GetStreamingExtentTranslator(int port);
+  static vtkStreamingExtentTranslator* GetStreamingExtentTranslator(
+    vtkInformation* info);
+  int SetStreamingExtentTranslator(int port, vtkStreamingExtentTranslator*);
+  static int SetStreamingExtentTranslator(
+    vtkInformation* info, vtkStreamingExtentTranslator*);
 
 protected:
   vtkPVCompositeDataPipeline();
@@ -51,6 +61,8 @@ protected:
                                       vtkInformationVector** inInfoVec,
                                       vtkInformationVector* outInfoVec);
 
+  // Remove update/whole extent when resetting pipeline information.
+  virtual void ResetPipelineInformation(int port, vtkInformation*);
 
 private:
   vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&);  // Not implemented.

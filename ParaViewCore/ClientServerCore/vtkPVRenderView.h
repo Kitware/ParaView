@@ -170,6 +170,8 @@ public:
   // @CallOnAllProcessess
   virtual void InteractiveRender();
 
+  void StreamingUpdate(int, int);
+
   // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
   // typically set to 1, but in some cases with terrible connectivity or really

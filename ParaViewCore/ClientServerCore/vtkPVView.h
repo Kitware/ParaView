@@ -36,6 +36,9 @@ public:
   vtkTypeMacro(vtkPVView, vtkView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  static void SetEnableStreaming(bool);
+  static bool GetEnableStreaming();
+
   enum
     {
     ViewTimeChangedEvent=9000
@@ -104,6 +107,10 @@ public:
   // @CallOnAllProcessess
   vtkSetMacro(UseCache, bool);
   vtkGetMacro(UseCache, bool);
+
+  // Description:
+  vtkSetMacro(StreamingPass, int);
+  vtkSetMacro(NumberOfStreamingPasses, int);
 
   // Description:
   // These methods are used to setup the view for capturing screen shots.
@@ -182,6 +189,9 @@ protected:
   int Size[2];
   int Position[2];
 
+  int StreamingPass;
+  int NumberOfStreamingPasses;
+
 private:
   vtkPVView(const vtkPVView&); // Not implemented
   void operator=(const vtkPVView&); // Not implemented
@@ -190,6 +200,8 @@ private:
 
   bool ViewTimeValid;
   bool LastRenderOneViewAtATime;
+
+  static bool EnableStreaming;
 //ETX
 };
 

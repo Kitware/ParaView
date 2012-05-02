@@ -127,6 +127,10 @@ public:
   // of NeedsUpdateLOD flag.
   virtual void Update();
 
+  // Description:
+  // Called to render a streaming pass.
+  void StreamingUpdate(int pass, int number_of_passes);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
