@@ -27,11 +27,11 @@ INCLUDE_DIRECTORIES(
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
 
-VTK_ADD_LIBRARY(vtkPVPythonInterpretor
+PVVTK_ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInterpretor.cxx
   vtkPVPythonInteractiveInterpretor.cxx)
 
-VTK_ADD_LIBRARY(vtkPVPython
+PVVTK_ADD_LIBRARY(vtkPVPython
   vtkPVPythonOptions.cxx)
 
 add_executable_with_forwarding(PV_EXE_SUFFIX

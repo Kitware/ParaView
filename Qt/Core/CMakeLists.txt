@@ -160,7 +160,7 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
-VTK_ADD_LIBRARY(pqCore
+PVVTK_ADD_LIBRARY(pqCore
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAnimationCue.cxx

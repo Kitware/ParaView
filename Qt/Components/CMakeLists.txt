@@ -333,7 +333,7 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
-VTK_ADD_LIBRARY(pqComponents
+PVVTK_ADD_LIBRARY(pqComponents
   pq3DWidget.cxx
   pq3DWidget.h
   pqAboutDialog.cxx

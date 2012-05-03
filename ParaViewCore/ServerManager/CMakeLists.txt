@@ -262,7 +262,7 @@ IF(PARAVIEW_MINIMAL_BUILD)
 ENDIF(PARAVIEW_MINIMAL_BUILD)
 
 # Create the library.
-VTK_ADD_LIBRARY(vtk${KIT}
+PVVTK_ADD_LIBRARY(vtk${KIT}
   ${ServerManager_SRCS}
   ${MIN_INIT_SRC}
   ${CMInstantiator_SRCS}

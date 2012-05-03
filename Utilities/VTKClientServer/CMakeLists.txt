@@ -68,7 +68,7 @@ ADD_SUBDIRECTORY(Wrapping)
 CS_INITIALIZE_WRAP()
 
 # Create vtkClientServer library.
-VTK_ADD_LIBRARY(vtkClientServer
+PVVTK_ADD_LIBRARY(vtkClientServer
   vtkClientServerID.cxx
   vtkClientServerID.h
   vtkClientServerInterpreter.cxx

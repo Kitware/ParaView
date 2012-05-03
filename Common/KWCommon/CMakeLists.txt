@@ -158,7 +158,7 @@ INCLUDE_DIRECTORIES(
 # --------------------------------------------------------------------------
 # Build the library
 
-VTK_ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
+PVVTK_ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
 
 TARGET_LINK_LIBRARIES(KWCommon
   vtkCommon
