@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAnnotationLink.h"
 #include "vtkSelectionDeliveryFilter.h"
 #include "vtkStringArray.h"
+#include "vtkChartNamedOptions.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixRepresentation);
 
@@ -137,6 +138,11 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
         this->OrderedColumns->SetValue(i, plotInput->GetColumnName(i));
         }
       }
+    if (this->Options)
+      {
+      this->Options->UpdatePlotOptions();
+      }
+
     if(vtkAnnotationLink* annLink = plotMatrix->GetAnnotationLink())
       {
       vtkSelection* sel = vtkSelection::SafeDownCast(
