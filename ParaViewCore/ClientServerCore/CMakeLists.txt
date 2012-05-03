@@ -278,6 +278,10 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVVTKExtensions
   vtkPVVTKExtensionsCS
   ${KIT_LIBS}
+  vtkViewsCore
+  vtkViewsContext2D
+  vtkRenderingLabel
+  vtkRenderingVolume
 )
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)

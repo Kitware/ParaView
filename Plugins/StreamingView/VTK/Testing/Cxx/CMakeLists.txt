@@ -26,4 +26,11 @@ foreach (test ${TestsToRun})
 endforeach()
 TARGET_LINK_LIBRARIES( StreamingCxxTests
   vtkStreaming
-  vtkIO vtkRendering vtkFiltering vtkGraphics vtkCommon vtkImaging)
+  vtkIOCore
+  vtkRenderingOpenGL
+  vtkImagingSources
+  vtkFiltersProgrammable
+  vtkInteractionStyle
+  vtkFiltersParallel
+  vtkTestingRendering
+  )

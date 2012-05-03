@@ -27,7 +27,10 @@ FOREACH(name ${ServersFilters_SRCS})
   ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
     -D ${VTK_DATA_ROOT}
     )
-  TARGET_LINK_LIBRARIES(${name} vtkPVVTKExtensions)
+  TARGET_LINK_LIBRARIES(${name} 
+    vtkPVVTKExtensions
+    vtkImagingMorphological
+    vtkInteractionImage)
 ENDFOREACH(name)
 
 IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
@@ -117,7 +120,7 @@ IF (VTK_USE_MPI)
     ENDIF (MPI_EXTRA_LIBRARY)
 
     ADD_EXECUTABLE(DistributedSubsetSortingTable DistributedSubsetSortingTable.cxx)
-    TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallel vtkPVVTKExtensions)
+    TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallelMPI vtkPVVTKExtensions)
 
     ADD_TEST(TestDistributedSubsetSortingTable
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}

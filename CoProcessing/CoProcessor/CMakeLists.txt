@@ -53,8 +53,8 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 add_library(vtkCoProcessor ${CoProcessor_SRCS})
 set(CoProcessor_LIBS
-  vtkCommon
-  vtkFiltering
+  vtkCommonCore
+  vtkFiltersCore
   vtkPVVTKExtensions
   vtkPVServerManager
   )

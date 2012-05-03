@@ -57,9 +57,9 @@ endforeach(file)
 # List the kits from VTK that are needed by this project
 # -----------------------------------------------------------------------------
 set(KIT_LIBS
-  vtkHybrid
-  vtkRendering
-  vtkImaging
+  vtkFiltersHybrid
+  vtkRenderingOpenGL
+  vtkImagingCore
   ${OPENGL_gl_LIBRARY}
   )
 

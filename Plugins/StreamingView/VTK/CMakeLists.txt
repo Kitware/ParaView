@@ -10,7 +10,7 @@ FIND_PACKAGE ( VTK REQUIRED )
 INCLUDE ( ${VTK_USE_FILE} )
 
 SET ( VTK_LINK_LIBRARIES
-  vtkRendering vtkGraphics vtkFiltering vtkCommon vtkIO vtkImaging vtkNetCDF)
+  vtkRenderingCore  vtkCommonCore vtkFiltersCore vtkIOCore vtkImagingCore vtkNetCDF)
 
 INCLUDE_DIRECTORIES(${VTKNETCDF_BINARY_DIR})
 

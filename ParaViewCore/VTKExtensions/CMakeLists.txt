@@ -279,7 +279,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkTransferFunctionEditorWidget.cxx
   vtkTransferFunctionEditorWidget1D.cxx
   vtkUndoElement.cxx
-
   ABSTRACT)
 
 # The set of source files to be encoded.
@@ -332,7 +331,7 @@ VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 # Wrap PVServerCommon
-SET(KIT_WRAP_DEPS PVCommon Parallel Hybrid Rendering VolumeRendering Widgets)
+SET(KIT_WRAP_DEPS PVCommon) #Parallel Hybrid Rendering VolumeRendering Widgets
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
@@ -393,16 +392,22 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVCommon
   vtkPVCommonCS
   vtkXdmfCS
-  vtkHybridCS
-  vtkParallelCS
-  vtkVolumeRenderingCS
-  vtkWidgetsCS
-  vtkViews
-  vtkViewsCS
-  vtkCharts
-  vtkChartsCS
-  vtkAMR
-  vtkAMRCS
+  vtkParallelCoreCS
+  vtkChartsCore
+  vtkChartsCoreCS
+  vtkAMRCore
+  vtkAMRCoreCS
+  vtkIOEnSight
+  vtkInteractionWidgets
+  vtkIOParallel
+  vtkIOImport
+  vtkFiltersHyperTree
+  vtkFiltersStatistics
+  vtkFiltersParallelStatistics
+  vtkFiltersGeneric
+  vtkRenderingParallel
+  vtkIOExodus
+  vtkImagingFourier
   KWCommon
   vtksys
   ${KIT_LIBS}

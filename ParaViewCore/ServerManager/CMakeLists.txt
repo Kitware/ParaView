@@ -272,6 +272,7 @@ PVVTK_ADD_LIBRARY(vtk${KIT}
 TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVServerImplementationCS
   vtkPVServerImplementation
+  vtkTestingRendering
   )
 
 IF(PARAVIEW_USE_VISITBRIDGE)

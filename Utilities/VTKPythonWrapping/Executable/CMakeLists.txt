@@ -106,18 +106,14 @@ IF(PY_STATIC_MODULES_LIST)
 ENDIF(PY_STATIC_MODULES_LIST)
 
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
-  vtkCommon
+  vtkCommonCore
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 
 # Link against all the kit wrappers.
 SET(_PVPYTHON_LINK_LIBS
   vtkPVServerManagerPythonD
-  vtkCommon
-  vtkFiltering
-  vtkIO
-  vtkGraphics
-  vtkImaging
+  ${VTK_LIBRARIES}
   vtkPVPythonInterpretor
 #  vtkPVServerManager   # dont add this one here, because then cmake doesn't add the automatic dependencies of this lib (if linked static)
   ${VTK_PYTHON_LIBRARIES}

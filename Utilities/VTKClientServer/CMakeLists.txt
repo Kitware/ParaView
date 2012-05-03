@@ -77,7 +77,7 @@ PVVTK_ADD_LIBRARY(vtkClientServer
   vtkClientServerStream.h)
 
 
-TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
+TARGET_LINK_LIBRARIES(vtkClientServer vtkCommonCore)
 
 IF(NOT PV_INSTALL_NO_DEVELOPMENT)
   # Headers etc...

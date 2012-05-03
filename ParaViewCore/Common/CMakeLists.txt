@@ -61,7 +61,7 @@ VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 # Wrap PVServerCommon
-SET(KIT_WRAP_DEPS IO)
+SET(KIT_WRAP_DEPS IOCore)
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
@@ -69,8 +69,8 @@ PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET(KIT_PYTHON_LIBS
-    vtkCommonPythonD
-    vtkIOPythonD
+    vtkCommonCorePythonD
+    vtkIOCorePythonD
     vtkPVCommon
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
@@ -95,8 +95,11 @@ PVVTK_ADD_LIBRARY(vtk${KIT}
   ${KitInstantiator_SRCS}
   )
 TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkIOCS vtksys
-  vtkClientServer)
+  vtkIOCoreCS 
+  vtksys 
+  vtkClientServer
+  vtkIOXML
+  )
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL

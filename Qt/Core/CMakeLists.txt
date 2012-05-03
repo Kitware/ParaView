@@ -392,8 +392,8 @@ PVVTK_ADD_LIBRARY(pqCore
 TARGET_LINK_LIBRARIES(pqCore
   QtTesting
   pqWidgets
-  QVTK
-  vtkCharts
+  vtkGUISupportQt
+  vtkChartsCore
   vtkPVServerManager
   protobuf
 )
