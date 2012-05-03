@@ -89,8 +89,8 @@ IF (PARAVIEW_BUILD_QT_GUI)
   # CMake traverses the Qt directory (VTK/GUISupport/Qt).
   
   # set vars to build the QVTK library
-  SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
-  SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
+  set(Module_vtkGUISupportQt ON CACHE BOOL "Build VTK Qt GUI Support module" FORCE)  
+  
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
   SET(QT_MIN_VERSION "4.6.0")
@@ -112,10 +112,10 @@ IF (PARAVIEW_BUILD_QT_GUI)
     ENDIF (NOT qt_version_match)
   ENDIF(NOT QT4_FOUND)
 ELSE (PARAVIEW_BUILD_QT_GUI)
-  SET(VTK_USE_QT OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
+  SET(Module_vtkGUISupportQt OFF CACHE BOOL "Build VTK Qt GUI Support module" FORCE)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 # Mark these Qt variables as advanced. Users don't really have to set them.
-MARK_AS_ADVANCED(VTK_USE_QT VTK_USE_QTCHARTS VTK_USE_GUISUPPORT)
+MARK_AS_ADVANCED(Module_vtkGUISupportQt)
 MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
 # these should be all marked as advanced automatically but FindQt4 in cmake ...
 MARK_AS_ADVANCED(QT_QTMOTIF_INCLUDE_DIR QT_QTMOTIF_LIBRARY_DEBUG QT_QTMOTIF_LIBRARY_RELEASE QT_HELP_GENERATOR)
@@ -129,7 +129,7 @@ MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC
 #########################################################################
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
-SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" FORCE)
+SET(Module_vtkParallelMPI ${PARAVIEW_USE_MPI} CACHE BOOL "Build VTK MPI module" FORCE)
 # define this variable so that VTK_DEPENDENT_OPTION in the VTK 
 # CMakeLists.txt does not turn VTK_USE_MPI back to a regular cache
 # variable
@@ -143,19 +143,33 @@ IF (PARAVIEW_USE_MPI)
 ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
+# Force a bunch of modules one, eventually these will be triggered by ParaView modules
+SET(Module_vtkIOExodus ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOExodus)
+
+SET(Module_vtkIOParallelExodus ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOParallelExodus)
+
+SET(Module_vtkIOParallel ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkIOParallel)
+
+SET(Module_vtkRenderingParallel ON CACHE BOOL "" FORCE)
+MARK_AS_ADVANCED(Module_vtkRenderingParallel)
+
+SET(VTK_MAKE_INSTANTIATORS ON CACHE BOOL "" FORCE)
+#########################################################################
 # Force Infovis support on
-SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_INFOVIS)
+SET(Module_vtkInfovisCore ON CACHE BOOL "Build VTK Infovis module" FORCE)
+MARK_AS_ADVANCED(Module_vtkInfovisCore)
 
 #########################################################################
 # Force Charts support on
-SET(VTK_USE_CHARTS ON CACHE BOOL "Build VTK with Charts Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_CHARTS)
+SET(Module_vtkChartsCore ON CACHE BOOL "Build VTK Charts module" FORCE)
+MARK_AS_ADVANCED(Module_vtkChartsCore)
 
 #########################################################################
 #
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
-MARK_AS_ADVANCED(VTK_USE_TEXT_ANALYSIS)
 
 #########################################################################
 # Configure Testing
