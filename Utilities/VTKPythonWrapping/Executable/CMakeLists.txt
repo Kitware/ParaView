@@ -21,6 +21,7 @@ INCLUDE_DIRECTORIES(
   "${PVClientServerCore_SOURCE_DIR}"
   "${PVServerImplementation_SOURCE_DIR}"
   "${PVServerManager_SOURCE_DIR}"
+  "${ParaView_BINARY_DIR}/VTK/Wrapping"
   )
 
 # create the VTK/Python  executable

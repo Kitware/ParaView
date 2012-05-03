@@ -382,7 +382,15 @@ IF(VTK_FOUND)
   include(${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake)
 ENDIF()
 
-SET(VTK_INCLUDE_DIR
+# load details of all enable modules
+foreach(_module ${VTK_MODULES_ENABLED})
+  vtk_module_load(${_module})
+endforeach() 
+
+include_directories(${VTK_INCLUDE_DIRS})
+set(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIRS})
+
+set(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
   ${ParaView_SOURCE_DIR}/VTK
   ${ParaView_BINARY_DIR}/VTK
   ${ParaView_SOURCE_DIR}/VTK/Utilities
@@ -395,30 +403,9 @@ IF(PARAVIEW_ENABLE_PYTHON)
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
     ${ParaView_SOURCE_DIR}/VTK/Wrapping/Python
     ${ParaView_BINARY_DIR}/VTK/Wrapping/Python
+    ${ParaView_SOURCE_DIR}/VTK/Wrapping/PythonCore
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
-
-SET(kits Common AMR Charts Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering Widgets)
-FOREACH(kit ${kits})
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${ParaView_SOURCE_DIR}/VTK/${kit}
-    ${ParaView_BINARY_DIR}/VTK/${kit}
-    )
-ENDFOREACH(kit)
-
-IF(VTK_USE_INFOVIS)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${ParaView_SOURCE_DIR}/VTK/Infovis
-    ${ParaView_BINARY_DIR}/VTK/Infovis
-    )
-ENDIF(VTK_USE_INFOVIS)
-
-IF(VTK_USE_VIEWS)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${ParaView_SOURCE_DIR}/VTK/Views
-    ${ParaView_BINARY_DIR}/VTK/Views
-  )
-ENDIF(VTK_USE_VIEWS)
 
 IF(VTK_USE_SYSTEM_ZLIB)
   SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
@@ -442,19 +429,8 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
 # Configure HDF5
-IF(VTK_USE_SYSTEM_HDF5)
-  SET(PARAVIEW_HDF5_LIBRARIES ${VTK_HDF5_LIBRARIES})
-  SET(HDF5_INCLUDE_DIR ${VTK_HDF5_INCLUDE_DIRS})
-ELSE()
-  # User HDF5's cmake config file.
-  SET(HDF5_CONFIG ${ParaView_BINARY_DIR}/VTK/Utilities/vtkhdf5/vtkHDF5Config.cmake)
-  INCLUDE("${HDF5_CONFIG}")
-
-  # Xdmf uses HDF5_INCLUDE_DIR (singular)
-  SET(HDF5_INCLUDE_DIR ${HDF5_INCLUDE_DIRS})
-  SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIB_NAME})
-ENDIF()
-
+set(HDF5_INCLUDE_DIR ${vtkhdf5_INCLUDE_DIRS})
+set(PARAVIEW_HDF5_LIBRARIES ${vtkhdf5_LIBRARIES})
 
 IF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
   SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
