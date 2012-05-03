@@ -14,7 +14,7 @@ ENDFOREACH()
 
 PROJECT(ParaView)
 SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR} ${ParaView_CMAKE_DIR}/VTKMono)
 
 INCLUDE(Utilities/Git/Git.cmake)
 
@@ -168,7 +168,6 @@ SET(Module_vtkChartsCore ON CACHE BOOL "Build VTK Charts module" FORCE)
 MARK_AS_ADVANCED(Module_vtkChartsCore)
 
 #########################################################################
-#
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
 
 #########################################################################
