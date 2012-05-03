@@ -170,7 +170,7 @@ public:
   // @CallOnAllProcessess
   virtual void InteractiveRender();
 
-  void StreamingUpdate(int pass);
+  bool StreamingUpdate();
 
   // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
@@ -493,6 +493,8 @@ public:
   // Description:
   // Synchronizes core ivars for multi-client setups.
   bool SynchronizeForCollaboration();
+
+  vtkGetMacro(SynchronizationCounter, int);
 
 //BTX
 protected:

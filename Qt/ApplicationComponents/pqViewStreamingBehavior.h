@@ -59,7 +59,6 @@ private:
   Q_DISABLE_COPY(pqViewStreamingBehavior)
   QTimer Timer;
   int Pass;
-  int NumberOfPasses;
 };
 
 #endif

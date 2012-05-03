@@ -81,16 +81,19 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 {
   assert(this->ViewProxy != NULL);
 
-  // FIXME:STREAMING this needs to be a little bit cleaner.
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(
     this->ViewProxy->GetClientSideObject());
   bool use_lod = interactive && view->GetUseLODForInteractiveRender();
 
-  //if ( (!use_lod && this->ViewUpdateStamp < this->GeometryDeliveryStamp) ||
-  //  (use_lod && this->ViewUpdateStamp < this->LODGeometryDeliveryStamp) )
-  //  {
-  //  return;
-  //  }
+  // Delivery the "base" geometries for all representations. This is true,
+  // irrespective of whether we are streaming datasets. When a representation is
+  // updated, it provides a base-geometry that gets delivered for rendering (if
+  // any). This code handles that.
+  if ( (!use_lod && this->ViewUpdateStamp < this->GeometryDeliveryStamp) ||
+    (use_lod && this->ViewUpdateStamp < this->LODGeometryDeliveryStamp) )
+    {
+    return;
+    }
 
   vtkTimeStamp& timeStamp = use_lod?
     this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;
@@ -121,6 +124,13 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   this->ViewProxy->GetSession()->ExecuteStream(
     this->ViewProxy->GetLocation(), stream, false);
   timeStamp.Modified();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMDataDeliveryManager::DeliverNextPiece()
+{
+  // This method gets called to deliver next piece in queue. 
+  return false;
 }
 
 //----------------------------------------------------------------------------

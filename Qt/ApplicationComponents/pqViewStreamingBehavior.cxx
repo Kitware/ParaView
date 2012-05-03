@@ -38,9 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "pqActiveObjects.h"
 #include "vtkPVView.h"
+#include "pqServer.h"
+#include "vtkSMSession.h"
+
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
-  : Superclass(parentObject), Pass(0), NumberOfPasses(10)
+  : Superclass(parentObject), Pass(0)
 {
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -87,13 +90,22 @@ void pqViewStreamingBehavior::onTimeout()
     {
     vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(
       view->getProxy());
-    rvProxy->StreamingUpdate(this->Pass);
-    view->forceRender();
 
-    this->Pass++;
-    if (this->Pass < this->NumberOfPasses)
+    if (rvProxy->GetSession()->GetPendingProgress() ||
+      view->getServer()->isProcessingPending())
       {
-      this->Timer.start(1000);
+      this->Timer.start();
+      }
+    else
+      {
+      cout << "Update Pass: " << this->Pass << endl;
+      bool to_continue = rvProxy->StreamingUpdate();
+      view->forceRender();
+      if (to_continue)
+        {
+        this->Pass++;
+        this->Timer.start(1000);
+        }
       }
     }
 }

@@ -16,10 +16,7 @@
 // datasets as a volume.
 // .SECTION Description
 // vtkAMRVolumeRepresentation is a representation for volume rendering
-// vtkAMRData. Unlike other data-representations used by ParaView, this
-// representation does not support delivery to client (or render server) nodes.
-// In those configurations, it merely delivers a outline for the image to the
-// client and render-server and those nodes simply render the outline.
+// vtkAMRData.
 
 #ifndef __vtkAMRVolumeRepresentation_h
 #define __vtkAMRVolumeRepresentation_h
@@ -30,7 +27,6 @@ class vtkAMRVolumeMapper;
 class vtkColorTransferFunction;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkOverlappingAMR;
-class vtkOutlineSource;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
@@ -178,9 +174,6 @@ protected:
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
   vtkPVRenderView *RenderView;
-
-  vtkOutlineSource* OutlineSource;
-  vtkPolyDataMapper* OutlineMapper;
 
   int ColorAttributeType;
   char* ColorArrayName;

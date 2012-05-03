@@ -242,17 +242,31 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned
 
     vtkDataObject* data = item->GetDataObject();
 
-    vtkNew<vtkMPIMoveData> dataMover;
-    dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(data->GetDataObjectType());
-    dataMover->SetMoveMode(mode);
-    if (item->AlwaysClone)
+    if (data->IsA("vtkUniformGridAMR"))
       {
-      dataMover->SetMoveModeToClone();
+      // we are dealing with AMR datasets.
+      // We assume for now we're not running in render-server mode. We can
+      // ensure that at some point in future. 
+      // So we are either in pass-through or collect mode. 
+      if ( (mode & vtkMPIMoveData::COLLECT) != 0)
+        {
+        // handle delivery of AMR datasets.
+        }
       }
-    dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
-    dataMover->Update();
-    item->SetDataObject(dataMover->GetOutputDataObject(0));
+    else
+      {
+      vtkNew<vtkMPIMoveData> dataMover;
+      dataMover->InitializeForCommunicationForParaView();
+      dataMover->SetOutputDataType(data->GetDataObjectType());
+      dataMover->SetMoveMode(mode);
+      if (item->AlwaysClone)
+        {
+        dataMover->SetMoveModeToClone();
+        }
+      dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
+      dataMover->Update();
+      item->SetDataObject(dataMover->GetOutputDataObject(0));
+      }
     }
 
   // There's a possibility that we'd need to do ordered compositing.

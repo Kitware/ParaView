@@ -21,8 +21,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkOutlineSource.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
@@ -50,15 +48,11 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
-  this->OutlineSource = vtkOutlineSource::New();
-  this->OutlineMapper = vtkPolyDataMapper::New();
-
   this->ColorArrayName = 0;
   this->ColorAttributeType = POINT_DATA;
   this->Cache = vtkOverlappingAMR::New();
 
   this->CacheKeeper->SetInputData(this->Cache);
-  this->Actor->SetLODMapper(this->OutlineMapper);
   this->FreezeFocalPoint = false;
 }
 
@@ -68,8 +62,6 @@ vtkAMRVolumeRepresentation::~vtkAMRVolumeRepresentation()
   this->VolumeMapper->Delete();
   this->Property->Delete();
   this->Actor->Delete();
-  this->OutlineSource->Delete();
-  this->OutlineMapper->Delete();
   this->CacheKeeper->Delete();
 
   this->SetColorArrayName(0);
@@ -93,9 +85,6 @@ vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
                                                 vtkInformationVector* outputVector)
 {
   this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
-  this->VolumeMapper->ProcessUpdateExtentRequest(this->RenderView->GetRenderer(),
-                                                  request, inputVector,
-                                                  outputVector);
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -105,11 +94,9 @@ vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
                                                vtkInformationVector* outputVector)
 {
   this->Superclass::RequestInformation(request, inputVector, outputVector);
-  this->VolumeMapper->ProcessInformationRequest(this->RenderView->GetRenderer(),
-                                                request, inputVector,
-                                                outputVector);
   return 1;
 }
+
 //----------------------------------------------------------------------------
 int vtkAMRVolumeRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
@@ -127,9 +114,8 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
     // anywhere, so we don't really report it to the view's storage.
     // vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
     vtkPVRenderView::SetPiece(inInfo, this,
-      this->OutlineSource->GetOutputDataObject(0));
+      this->CacheKeeper->GetOutputDataObject(0));
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -138,7 +124,7 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
     if (producerPort)
       {
-      this->OutlineMapper->SetInputConnection(producerPort);
+      this->VolumeMapper->SetInputConnection(producerPort);
       }
     }
   return 1;
@@ -162,21 +148,6 @@ int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
       this->Cache->ShallowCopy(input);
       }
     this->CacheKeeper->Update();
-
-    this->Actor->SetEnableLOD(0);
-    this->VolumeMapper->SetInputConnection(
-      this->CacheKeeper->GetOutputPort());
-
-    this->OutlineSource->SetBounds(vtkOverlappingAMR::SafeDownCast(
-        this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
-    }
-  else
-    {
-    // when no input is present, it implies that this processes is on a node
-    // without the data input i.e. either client or render-server, in which case
-    // we show only the outline.
-    this->VolumeMapper->RemoveAllInputs();
-    this->Actor->SetEnableLOD(1);
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);

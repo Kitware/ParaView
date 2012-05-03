@@ -35,6 +35,7 @@ public:
   void SetViewProxy(vtkSMViewProxy*);
 
   void Deliver(bool interactive);
+  bool DeliverNextPiece();
 
 //BTX
 protected:

@@ -231,18 +231,13 @@ void vtkSMRenderViewProxy::UpdateLOD()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderViewProxy::StreamingUpdate(int pass)
+bool vtkSMRenderViewProxy::StreamingUpdate()
 {
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
-         << "StreamingUpdate"
-         << pass
-         << vtkClientServerStream::End;
   this->GetSession()->PrepareProgress();
-  this->ExecuteStream(stream);
-  this->DeliveryManager->Deliver(false);
+  // Tell the delivery manager to fetch next piece in queue, if any. 
+  bool something_delivered = this->DeliveryManager->DeliverNextPiece();
   this->GetSession()->CleanupPendingProgress();
+  return something_delivered;
 }
 
 //-----------------------------------------------------------------------------
@@ -260,14 +255,7 @@ vtkTypeUInt32 vtkSMRenderViewProxy::PreRender(bool interactive)
     // If so, we may need to update the LOD geometries.
     this->UpdateLOD();
     }
-
-  if (vtkPVView::GetEnableStreaming() == false)
-    {
-    // if async delivery is not enabled, then we deliver explicitly before every
-    // render.
-    this->DeliveryManager->Deliver(interactive);
-    }
-
+  this->DeliveryManager->Deliver(interactive);
   return interactive? rv->GetInteractiveRenderProcesses():
     rv->GetStillRenderProcesses();
 }

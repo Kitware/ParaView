@@ -837,11 +837,11 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::StreamingUpdate(int pass) 
+bool vtkPVRenderView::StreamingUpdate()
 {
   if (vtkPVView::GetEnableStreaming())
     {
-    cout << "StreamingUpdate: " << pass << endl;
+    cout << "StreamingUpdate: " << endl;
     vtkTimerLog::MarkStartEvent("Streaming Update");
 
     // Update the representations.
