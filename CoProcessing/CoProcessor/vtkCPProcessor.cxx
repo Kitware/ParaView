@@ -16,7 +16,6 @@
 
 #include "vtkCPDataDescription.h"
 #include "vtkCPPipeline.h"
-#include "vtkCPPythonScriptPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
