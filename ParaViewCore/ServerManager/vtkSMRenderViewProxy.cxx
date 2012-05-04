@@ -231,11 +231,17 @@ void vtkSMRenderViewProxy::UpdateLOD()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMRenderViewProxy::StreamingUpdate()
+bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
 {
   this->GetSession()->PrepareProgress();
+
   // Tell the delivery manager to fetch next piece in queue, if any. 
   bool something_delivered = this->DeliveryManager->DeliverNextPiece();
+  if (render_if_needed && something_delivered)
+    {
+    this->StillRender();
+    }
+
   this->GetSession()->CleanupPendingProgress();
   return something_delivered;
 }

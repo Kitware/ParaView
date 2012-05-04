@@ -99,8 +99,7 @@ void pqViewStreamingBehavior::onTimeout()
     else
       {
       cout << "Update Pass: " << this->Pass << endl;
-      bool to_continue = rvProxy->StreamingUpdate();
-      view->forceRender();
+      bool to_continue = rvProxy->StreamingUpdate(true);
       if (to_continue)
         {
         this->Pass++;

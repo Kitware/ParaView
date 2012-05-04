@@ -128,8 +128,9 @@ public:
   virtual void Update();
 
   // Description:
-  // Called to render a streaming pass.
-  bool StreamingUpdate();
+  // Called to render a streaming pass. Returns true if the view "streamed" some
+  // geometry.
+  bool StreamingUpdate(bool render_if_needed);
 
 //BTX
 protected:

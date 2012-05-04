@@ -170,7 +170,8 @@ public:
   // @CallOnAllProcessess
   virtual void InteractiveRender();
 
-  bool StreamingUpdate();
+  // Description:
+  const char* DeliverNextPiece();
 
   // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
@@ -603,6 +604,14 @@ protected:
   vtkTypeUInt32 StillRenderProcesses;
   vtkTypeUInt32 InteractiveRenderProcesses;
 
+  // Description:
+  // Keeps track of the time when vtkPVRenderView::Update() was called.
+  vtkTimeStamp UpdateTimeStamp;
+
+  // Description:
+  // Keeps track of the time when the priority-queue for streaming was
+  // generated.
+  vtkTimeStamp PriorityQueueBuildTimeStamp;
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

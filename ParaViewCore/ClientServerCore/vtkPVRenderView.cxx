@@ -784,6 +784,8 @@ void vtkPVRenderView::Update()
   this->SynchronizeGeometryBounds();
 
   vtkTimerLog::MarkEndEvent("RenderView::Update");
+
+  this->UpdateTimeStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -837,21 +839,35 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::StreamingUpdate()
+const char* vtkPVRenderView::DeliverNextPiece()
 {
-  if (vtkPVView::GetEnableStreaming())
+  if (!vtkPVView::GetEnableStreaming())
     {
-    cout << "StreamingUpdate: " << endl;
-    vtkTimerLog::MarkStartEvent("Streaming Update");
-
-    // Update the representations.
-    this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
-      this->Internals->GeometryStore.GetPointer());
-    this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
-      this->RequestInformation, this->ReplyInformationVector);
-
-    vtkTimerLog::MarkEndEvent("Streaming Update");
+    return NULL;
     }
+
+  if (this->UpdateTimeStamp > this->PriorityQueueBuildTimeStamp ||
+    this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp)
+    {
+    // if data or camera changed, we need to rebuild the priority queues.
+
+    // TODO:
+
+    this->PriorityQueueBuildTimeStamp.Modified();
+    }
+
+
+  cout << "StreamingUpdate: " << endl;
+  vtkTimerLog::MarkStartEvent("Streaming Update");
+
+  // Update the representations.
+  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
+    this->Internals->GeometryStore.GetPointer());
+  this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
+    this->RequestInformation, this->ReplyInformationVector);
+
+  vtkTimerLog::MarkEndEvent("Streaming Update");
+  return "hehe";
 }
  
 //----------------------------------------------------------------------------

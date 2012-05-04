@@ -22,6 +22,7 @@
 #include "vtkRepresentedDataStorage.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
+#include "vtkTimerLog.h"
 
 #include <assert.h>
 
@@ -129,7 +130,31 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 //----------------------------------------------------------------------------
 bool vtkSMDataDeliveryManager::DeliverNextPiece()
 {
-  // This method gets called to deliver next piece in queue. 
+  // This method gets called to deliver next piece in queue during streaming.
+  // vtkSMDataDeliveryManager::Deliver() relies on the "client" to decide what
+  // representations are dirty and requests geometries for those. This makes it
+  // possible to work well in multi-clients mode without putting any additional
+  // burden on the server side.
+  //
+  // For streaming, however, we require that multi-clients mode is disabled and
+  // the server decides what pieces need to be delivered since the server has
+  // more information about the data to decide how it should be streamed.
+
+  vtkTimerLog::MarkStartEvent("DeliverNextPiece");
+  vtkSMSession* session = this->ViewProxy->GetSession();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this->ViewProxy)
+         << "DeliverNextPiece"
+         << vtkClientServerStream::End;
+  session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, false);
+
+  const vtkClientServerStream& result = session->GetLastResult(
+    vtkPVSession::DATA_SERVER_ROOT);
+  result.Print(cout);
+  // extract the "piece-key" from the result and then request it.
+
+  vtkTimerLog::MarkEndEvent("DeliverNextPiece");
   return false;
 }
 
