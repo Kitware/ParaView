@@ -87,6 +87,59 @@
     <!-- End PythonCalculator -->    
     </SourceProxy>
 
+    <SourceProxy name="AnnotateGlobalData"
+                 class="vtkAnnotateGlobalDataFilter"
+                 label="Annotate Global Data">
+     <InputProperty name="Input"
+                    command="AddInputConnection"
+                    clean_command="RemoveAllInputs"
+                    multiple_input="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+              number_of_components="1"
+              attribute_type="none"/>
+        <Documentation>
+          Set the input of the filter.
+        </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       command="SetFieldArrayName"
+       number_of_elements="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays that is going to be displayed
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+                    name="Prefix"
+                    command="SetPrefix"
+                    default_values="Value is: "
+                    number_of_elements="1" >
+         <Documentation>
+         Text that is used as a prefix to the field value
+         </Documentation>
+     </StringVectorProperty>
+
+     <Hints>
+       <Visibility replace_input="0" />
+       <OutputPort name="Output-0" index="0" type="text" />
+     </Hints>
+     <!-- End AnnotateGlobalData -->
+    </SourceProxy>
+
     <SourceProxy name="PythonAnnotation"
                  class="vtkPythonAnnotationFilter"
                  label="Python Annotation">
@@ -104,8 +157,7 @@
         by defining certain variables. The filter tries to assign each array
         to a variable of the same name. If the name of the array is not a
         valid Python variable, it has to be accessed through a dictionary called
-        arrays (i.e. arrays['array_name']). The points can be accessed using the
-        points variable.
+        arrays (i.e. arrays['array_name']).
       </Documentation>
 
       <InputProperty

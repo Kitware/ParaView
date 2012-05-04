@@ -44,6 +44,11 @@ def ComputeAnnotation(self, inputDS, expression, t_value = 0, t_steps = [0,1], t
        fieldName = input.GetFieldData().GetArray(index).GetName()
        exec("%s = input.FieldData['%s']" % (fieldName, fieldName))
 
+    # handle multi-block
+    inputMB = []
+    for block in input:
+       inputMB.append(block)
+
     # Add time informations in current namespace
     t_index = 0
     try:
