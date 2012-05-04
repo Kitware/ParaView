@@ -79,6 +79,10 @@ public:
 //ETX
 
   // Description:
+  // Update the plot options to ensure that the charts have are in sync.
+  void UpdatePlotOptions();
+
+  // Description:
   // Sets the internal table object that can be plotted.
   void SetTable(vtkTable* table);
   vtkTable* GetTable();

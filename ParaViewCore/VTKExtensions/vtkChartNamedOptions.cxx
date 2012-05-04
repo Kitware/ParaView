@@ -175,6 +175,18 @@ vtkScatterPlotMatrix * vtkChartNamedOptions::GetPlotMatrix()
 }
 
 //----------------------------------------------------------------------------
+void vtkChartNamedOptions::UpdatePlotOptions()
+{
+  for (PlotMapIterator it = this->Internals->PlotMap.begin();
+       it != this->Internals->PlotMap.end(); ++it)
+    {
+    PlotInfo& plotInfo = it->second;
+    this->SetPlotVisibilityInternal(plotInfo, plotInfo.Visible,
+                                    it->first.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkChartNamedOptions::SetTable(vtkTable* table)
 {
   if (this->Table == table)
