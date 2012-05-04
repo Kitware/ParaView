@@ -29,7 +29,9 @@
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
+#ifdef PARAVIEW_USE_MPI
 #include "vtkDistributedDataFilter.h"
+#endif
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -41,7 +43,7 @@
 #include "vtkUnstructuredGrid.h"
 
 //-----------------------------------------------------------------------------
-
+#ifdef PARAVIEW_USE_MPI
 static void D3UpdateProgress(vtkObject *_D3, unsigned long,
                              void *_distributor, void *)
 {
@@ -53,7 +55,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
   distributor->SetProgressText(D3->GetProgressText());
   distributor->UpdateProgress(D3->GetProgress() * 0.9);
 }
-
+#endif
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
@@ -61,8 +63,10 @@ vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, Controller,
                      vtkMultiProcessController);
+#ifdef PARAVIEW_USE_MPI
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, D3,
                      vtkDistributedDataFilter);
+#endif
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, ToPolyData,
                      vtkDataSetSurfaceFilter);
 
@@ -73,7 +77,9 @@ vtkOrderedCompositeDistributor::vtkOrderedCompositeDistributor()
   this->PKdTree = NULL;
   this->Controller = NULL;
 
+#ifdef PARAVIEW_USE_MPI
   this->D3 = NULL;
+#endif
   this->ToPolyData = NULL;
 
   this->PassThrough = 0;
@@ -90,7 +96,9 @@ vtkOrderedCompositeDistributor::~vtkOrderedCompositeDistributor()
   this->SetPKdTree(NULL);
   this->SetController(NULL);
 
+#ifdef PARAVIEW_USE_MPI
   this->SetD3(NULL);
+#endif
   this->SetToPolyData(NULL);
 
   this->SetOutputType(NULL);
@@ -108,7 +116,9 @@ void vtkOrderedCompositeDistributor::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "PassThrough: " << this->PassThrough << endl;
   os << indent << "OutputType: " << 
     (this->OutputType? this->OutputType : "(none)") << endl;
+#ifdef PARAVIEW_USE_MPI
   os << indent << "D3: " << this->D3 << endl;
+#endif
   os << indent << "ToPolyData" << this->ToPolyData << endl;
 }
 
@@ -118,8 +128,9 @@ void vtkOrderedCompositeDistributor::ReportReferences(
                                                  vtkGarbageCollector *collector)
 {
   this->Superclass::ReportReferences(collector);
-
+#ifdef PARAVIEW_USE_MPI
   vtkGarbageCollectorReport(collector, this->D3, "D3");
+#endif
   vtkGarbageCollectorReport(collector, this->ToPolyData, "ToPolyData");
   vtkGarbageCollectorReport(collector, this->PKdTree, "PKdTree");
   vtkGarbageCollectorReport(collector, this->Controller, "Controller");
@@ -203,13 +214,13 @@ int vtkOrderedCompositeDistributor::RequestData(
     return 1;
     }
 
-  if (this->PassThrough)
+  if (this->PassThrough || Controller->GetNumberOfProcesses() == 1)
     {
     // Don't do anything to the data.
     output->ShallowCopy(input);
     return 1;
     }
-
+#ifdef PARAVIEW_USE_MPI
   if (!this->PKdTree)
     {
     vtkWarningMacro("No PKdTree set. vtkOrderedCompositeDistributor requires that"
@@ -321,4 +332,5 @@ int vtkOrderedCompositeDistributor::RequestData(
   this->LastOutput->ShallowCopy(output);
 
   return 1;
+#endif
 }
