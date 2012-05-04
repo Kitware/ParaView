@@ -4588,7 +4588,8 @@ The Transform filter allows you to specify the position, size, and orientation o
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInputConnection">
+       command="SetInputConnection"
+       panel_visibility="default">
 	  <ProxyGroupDomain name="groups">
 	    <Group name="sources"/>
 	    <Group name="filters"/>
@@ -4603,7 +4604,7 @@ The Transform filter allows you to specify the position, size, and orientation o
 	  </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="Transform" command="SetTransform">
+     <ProxyProperty name="Transform" command="SetTransform" panel_visibility="default">
 	   <ProxyGroupDomain name="groups">
 	      <Group name="transforms"/>
 	   </ProxyGroupDomain>
@@ -8683,7 +8684,8 @@ This filter extracts a range of groups from a multiblock dataset
 	command="AddIndex"
 	clean_command="RemoveAllIndices"
 	repeat_command="1"
-	number_of_elements_per_command="1">
+	number_of_elements_per_command="1"
+  panel_visibility="default">
        <CompositeTreeDomain name="tree" mode="all">
 	  <RequiredProperties>
 	     <Property name="Input" function="Input"/>

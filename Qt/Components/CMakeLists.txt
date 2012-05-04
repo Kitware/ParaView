@@ -99,6 +99,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
+  pqDoubleEdit.h
+  pqDoubleVectorPropertyWidget.h
   pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.h
   pqExtractCTHPartsPanel.h
@@ -110,6 +112,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
   pqItemViewSearchWidget.h
   pqKeyFrameEditor.h
@@ -127,6 +130,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqNetCDFPanel.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
+  pqObjectPanelPropertyWidget.h
   pqOptionsContainer.h
   pqOptionsDialog.h
   pqOptionsPage.h
@@ -141,6 +145,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPluginTreeWidgetEventPlayer.h
   pqPluginTreeWidgetEventTranslator.h
   pqPQLookupTableManager.h
+  pqPropertiesPanel.h
+  pqPropertyWidget.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h
@@ -148,8 +154,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineTimeKeyFrameEditor.h
   pqPluginDialog.h
   pqPointSourceWidget.h
+  pqPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
+  pqProxyPropertyWidget.h
   pqProxySelectionWidget.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
@@ -176,6 +184,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorTreeWidget.h
   pqSILModel.h
   pqSILWidget.h
+  pqStringVectorPropertyWidget.h
   pqSummaryPanel.h
   pqProxySILModel.h
   pqSelectionInputWidget.h
@@ -186,6 +195,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqStandardColorButton.h
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.h
+  pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
@@ -265,6 +275,7 @@ SET(UI_FORMS
   Resources/UI/pqPlotMatrixOptionsWidget.ui
   Resources/UI/pqPluginDialog.ui
   Resources/UI/pqPointSourceControls.ui
+  Resources/UI/pqPropertiesPanel.ui
   Resources/UI/pqProxyInformationWidget.ui
   Resources/UI/pqPythonAnimationCue.ui
   Resources/UI/pqQueryClauseWidget.ui
@@ -458,7 +469,15 @@ VTK_ADD_LIBRARY(pqComponents
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
+  pqDoubleEdit.cxx
+  pqDoubleEdit.h
+  pqDoubleVectorPropertyWidget.cxx
+  pqDoubleVectorPropertyWidget.h
   pqDistanceWidget.h
+  pqDoubleEdit.h
+  pqDoubleEdit.cxx
+  pqDoubleVectorPropertyWidget.h
+  pqDoubleVectorPropertyWidget.cxx
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.cxx
@@ -481,6 +500,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIntVectorPropertyWidget.cxx
+  pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
   pqIsoVolumePanel.cxx
   pqItemViewSearchWidget.cxx
@@ -517,6 +538,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
+  pqObjectPanelPropertyWidget.cxx
+  pqObjectPanelPropertyWidget.h
   pqOptionsContainer.cxx
   pqOptionsContainer.h
   pqOptionsDialog.cxx
@@ -531,6 +554,12 @@ VTK_ADD_LIBRARY(pqComponents
   pqOutputPortComboBox.h
   pqPQLookupTableManager.cxx
   pqPQLookupTableManager.h
+  pqPropertyWidget.h
+  pqPropertyWidget.cxx
+  pqPropertyWidgetInterface.h
+  pqPropertyWidgetInterface.cxx
+  pqPropertiesPanel.h
+  pqPropertiesPanel.cxx
   pqParallelCoordinatesChartDisplayPanel.cxx
   pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.cxx
@@ -558,10 +587,14 @@ VTK_ADD_LIBRARY(pqComponents
   pqPluginTreeWidgetEventTranslator.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
+  pqPropertyWidget.cxx
+  pqPropertyWidget.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
   pqProxyPanel.h
+  pqProxyPropertyWidget.cxx
+  pqProxyPropertyWidget.h
   pqProxySelectionWidget.cxx
   pqProxySelectionWidget.h
   pqQueryClauseWidget.cxx
@@ -616,6 +649,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqSILModel.h
   pqSILWidget.cxx
   pqSILWidget.h
+  pqStringVectorPropertyWidget.cxx
+  pqStringVectorPropertyWidget.h
   pqSummaryPanelInterface.cxx
   pqSummaryPanelInterface.h
   pqSummaryPanel.cxx
@@ -636,6 +671,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
+  pqStringVectorPropertyWidget.cxx
+  pqStringVectorPropertyWidget.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.cxx

@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoRedoBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
+#include "pqStandardPropertyWidgetInterface.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -71,6 +72,8 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   pgm->addInterface(new pqStandardViewModules(pgm));
 
   pgm->addInterface(new pqStandardSummaryPanelImplementation(pgm));
+
+  pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();

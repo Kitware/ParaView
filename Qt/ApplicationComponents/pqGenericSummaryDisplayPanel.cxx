@@ -83,6 +83,8 @@ pqGenericSummaryDisplayPanel::pqGenericSummaryDisplayPanel(pqRepresentation *rep
 
   vtkSMProxy *proxy = representation->getProxy();
   QFormLayout *l = new QFormLayout;
+  l->setMargin(2);
+  l->setVerticalSpacing(4);
 
   // add color by combo box
   if(attributes.contains(ColorBy))
@@ -90,7 +92,7 @@ pqGenericSummaryDisplayPanel::pqGenericSummaryDisplayPanel(pqRepresentation *rep
     // color by combo box
     pqDisplayColorWidget *colorBy = new pqDisplayColorWidget(this);
     colorBy->setRepresentation(qobject_cast<pqDataRepresentation *>(representation));
-    l->addRow("Color By:", colorBy);
+    l->addRow(colorBy);
 
     // scalar bar buttons
     QHBoxLayout *buttonLayout = new QHBoxLayout;
@@ -114,11 +116,10 @@ pqGenericSummaryDisplayPanel::pqGenericSummaryDisplayPanel(pqRepresentation *rep
     QPushButton *resetRangeButton = new QPushButton(QIcon(QString(":/pqWidgets/Icons/pqResetRange24.png")), "Rescale", this);
     QAction *resetRangeAction = new QAction(this);
     connect(resetRangeButton, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
-    new pqResetScalarRangeReaction(resetRangeAction);
     buttonLayout->addWidget(resetRangeButton);
+    new pqResetScalarRangeReaction(resetRangeAction);
 
-
-    l->addRow("", buttonLayout);
+    l->addRow(buttonLayout);
     }
 
   // add line width spin box

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QWidget>
+#include "pqPropertyWidget.h"
 
 class pqDisplayRepresentationWidgetInternal;
 class pqDataRepresentation;
@@ -66,5 +67,18 @@ private slots:
 private:
   pqDisplayRepresentationWidgetInternal* Internal;
 };
+
+class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPropertyWidget
+{
+  Q_OBJECT
+
+public:
+  pqDisplayRepresentationPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  ~pqDisplayRepresentationPropertyWidget();
+
+private:
+  pqDisplayRepresentationWidget *Widget;
+};
+
 #endif
 

@@ -46,9 +46,28 @@ QObject* qobject, const char* qproperty, const char* qsignal,
   ObjectQt(qobject), PropertyQt(qproperty), SignalQt(qsignal),
   ProxySM(smproxy), PropertySM(smproperty), IndexSM(smindex)
 {
-  if (this->PropertySM)
+  setUseUncheckedProperties(use_unchecked_modified_event);
+
+  if (this->ObjectQt && !this->SignalQt.isEmpty())
     {
-    if (use_unchecked_modified_event)
+    QObject::connect(this->ObjectQt, this->SignalQt.toAscii().data(),
+      this, SIGNAL(qtpropertyModified()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqPropertyLinksConnection::~pqPropertyLinksConnection()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyLinksConnection::setUseUncheckedProperties(bool useUnchecked)
+{
+  this->VTKConnector->Disconnect();
+
+  if(this->PropertySM)
+    {
+    if (useUnchecked)
       {
       this->VTKConnector->Connect(
         this->PropertySM, vtkCommand::UncheckedPropertyModifiedEvent,
@@ -61,17 +80,6 @@ QObject* qobject, const char* qproperty, const char* qsignal,
         this, SIGNAL(smpropertyModified()));
       }
     }
-
-  if (this->ObjectQt && !this->SignalQt.isEmpty())
-    {
-    QObject::connect(this->ObjectQt, this->SignalQt.toAscii().data(),
-      this, SIGNAL(qtpropertyModified()));
-    }
-}
-
-//-----------------------------------------------------------------------------
-pqPropertyLinksConnection::~pqPropertyLinksConnection()
-{
 }
 
 //-----------------------------------------------------------------------------

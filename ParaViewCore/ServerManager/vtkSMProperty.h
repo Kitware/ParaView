@@ -182,6 +182,30 @@ public:
   vtkGetMacro(IsInternal, int);
 
   // Description:
+  // Sets the panel visibility for the property. The value can be
+  // one of:
+  //   * "default": Show the property by default.
+  //   * "advanced": Only show the property in the advanced view.
+  //   * "never": Never show the property on the panel.
+  //
+  // By default, all properties have "advanced" visibility.
+  vtkSetStringMacro(PanelVisibility)
+
+  // Description:
+  // Returns the panel visibility for the property.
+  vtkGetStringMacro(PanelVisibility)
+
+  // Description:
+  // Sets the panel visibility to default if the current
+  // representation type matches \p representation.
+  vtkSetStringMacro(PanelVisibilityDefaultForRepresentation)
+
+  // Description:
+  // Returns which representation type the property will be shown by
+  // default for.
+  vtkGetStringMacro(PanelVisibilityDefaultForRepresentation)
+
+  // Description:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
@@ -342,6 +366,9 @@ protected:
   char* XMLName;
   char* XMLLabel;
   vtkSetStringMacro(XMLLabel);
+
+  char* PanelVisibility;
+  char* PanelVisibilityDefaultForRepresentation;
 
   vtkSMDomainIterator* DomainIterator;
 
