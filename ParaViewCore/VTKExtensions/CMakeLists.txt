@@ -73,7 +73,6 @@ SET (Kit_SRCS
   vtkMergeArrays.cxx
   vtkMergeCompositeDataSet.cxx
   vtkMinMax.cxx
-  vtkMPICompositeManager.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkParallelSerialWriter.cxx
@@ -217,6 +216,7 @@ IF (PARAVIEW_USE_MPI)
     vtkBalancedRedistributePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
+    vtkMPICompositeManager.cxx # deprecate?
     )
   IF (PARAVIEW_USE_ICE_T)
     SET(Kit_SRCS

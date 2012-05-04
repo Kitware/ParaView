@@ -275,7 +275,6 @@ int main(int , char *[])
   PRINT_SELF(vtkMergeArrays);
   PRINT_SELF(vtkMergeCompositeDataSet);
   PRINT_SELF(vtkMinMax);
-  PRINT_SELF(vtkMPICompositeManager);
   PRINT_SELF(vtkMultiProcessControllerHelper);
   PRINT_SELF(vtkOrderedCompositeDistributor);
   PRINT_SELF(vtkParallelSerialWriter);
@@ -411,6 +410,7 @@ int main(int , char *[])
   PRINT_SELF(vtkBalancedRedistributePolyData);
   PRINT_SELF(vtkRedistributePolyData);
   PRINT_SELF(vtkWeightedRedistributePolyData);
+  PRINT_SELF(vtkMPICompositeManager);
 # ifdef PARAVIEW_USE_ICE_T
   PRINT_SELF(vtkIceTCompositePass);
   PRINT_SELF(vtkIceTContext);
