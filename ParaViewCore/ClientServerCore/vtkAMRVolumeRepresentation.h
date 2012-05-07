@@ -22,6 +22,7 @@
 #define __vtkAMRVolumeRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
+#include "vtkWeakPointer.h" // needed for iVars.
 
 class vtkAMRVolumeMapper;
 class vtkColorTransferFunction;
@@ -173,7 +174,7 @@ protected:
   vtkAMRVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
-  vtkPVRenderView *RenderView;
+  vtkWeakPointer<vtkPVRenderView> RenderView;
 
   int ColorAttributeType;
   char* ColorArrayName;

@@ -38,7 +38,6 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 {
   this->RequestedRenderMode = 0; // Use Smart Mode
   this->RequestedResamplingMode = 0; // Frustrum Mode
-  this->RenderView = NULL;
   this->VolumeMapper = vtkAMRVolumeMapper::New();
   this->VolumeMapper->SetUseDefaultThreading(true);
   this->Property = vtkVolumeProperty::New();
@@ -173,17 +172,10 @@ void vtkAMRVolumeRepresentation::MarkModified()
 //----------------------------------------------------------------------------
 bool vtkAMRVolumeRepresentation::AddToView(vtkView* view)
 {
-  // FIXME: Need generic view API to add props.
   vtkPVRenderView* rview = vtkPVRenderView::SafeDownCast(view);
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
-    if (this->RenderView)
-      {
-      this->RenderView->UnRegister(0);
-      }
-    this->RenderView = rview;
-    this->RenderView->Register(0);
     return true;
     }
   return false;
@@ -196,11 +188,7 @@ bool vtkAMRVolumeRepresentation::RemoveFromView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
-    if (this->RenderView)
-      {
-      this->RenderView->UnRegister(0);
-      this->RenderView = NULL;
-      }
+    this->RenderView = NULL;
     return true;
     }
   return false;
