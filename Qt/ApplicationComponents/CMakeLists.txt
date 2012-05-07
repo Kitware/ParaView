@@ -62,6 +62,7 @@ SET (MOC_HEADERS
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
+  pqMultiServerBehavior.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
@@ -210,6 +211,8 @@ SET (SOURCE_FILES
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqMasterOnlyReaction.cxx
+  pqMultiServerBehavior.h
+  pqMultiServerBehavior.cxx
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx

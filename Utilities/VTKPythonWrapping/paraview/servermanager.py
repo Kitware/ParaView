@@ -1917,9 +1917,6 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=22221):
       creates a new connection to the data server on ds_host:ds_port and to the
       render server on rs_host: rs_port.
     """
-    global fromGUI
-    if fromGUI:
-        raise RuntimeError, "Cannot create a session through python. Use the GUI to setup the connection."
     if ds_host == None:
         session = vtkSMSession()
     elif rs_host == None:
@@ -1943,9 +1940,6 @@ def ReverseConnect(port=11111):
     option).
     The optional port specified the port to listen to.
     """
-    global fromGUI
-    if fromGUI:
-        raise RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
     session = vtkSMSessionClient()
     session.Connect("csrc://hostname:" + port)
     id = vtkProcessModule.GetProcessModule().RegisterSession(session)
@@ -1959,7 +1953,9 @@ def Disconnect(session=None):
     global MultiServerConnections
     global fromGUI
     if fromGUI:
-        raise RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
+        # Let the UI know that we want to disconnect
+        ActiveConnection.Session.InvokeEvent('ExitEvent')
+        return
     if ActiveConnection and (not session or session == ActiveConnection.Session):
         session = ActiveConnection.Session
         if MultiServerConnections:
