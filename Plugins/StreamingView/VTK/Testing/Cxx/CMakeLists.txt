@@ -28,6 +28,7 @@ TARGET_LINK_LIBRARIES( StreamingCxxTests
   vtkStreaming
   vtkIOCore
   vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
   vtkImagingSources
   vtkFiltersProgrammable
   vtkInteractionStyle
