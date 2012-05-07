@@ -18,11 +18,6 @@ IF(NOT WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
 ENDIF(NOT WIN32)
 
-# vtkProcessModule.cxx and vtkPVDisplayInformation.cxx uses VTK_USE_X
-if(VTK_USE_X)
-  add_definitions(-DVTK_USE_X)
-endif()
-
 SET (Kit_SRCS
   vtk3DWidgetRepresentation.cxx
   vtkAMRVolumeRepresentation.cxx
