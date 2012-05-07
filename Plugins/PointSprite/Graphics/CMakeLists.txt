@@ -15,7 +15,7 @@ set(KIT_SRCS
 # List the kits from VTK that are needed by this project
 # -----------------------------------------------------------------------------
 set(KIT_LIBS
-  #vtkGraphics
+  vtkFiltersCore
   )
 
 # -----------------------------------------------------------------------------

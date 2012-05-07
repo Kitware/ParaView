@@ -60,6 +60,7 @@ set(KIT_LIBS
   vtkFiltersHybrid
   vtkRenderingOpenGL
   vtkImagingCore
+  vtkInteractionStyle
   ${OPENGL_gl_LIBRARY}
   )
 
