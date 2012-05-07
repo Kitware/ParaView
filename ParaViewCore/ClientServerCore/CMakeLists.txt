@@ -21,7 +21,6 @@ ENDIF(NOT WIN32)
 SET (Kit_SRCS
   vtk3DWidgetRepresentation.cxx
   vtkAMRVolumeRepresentation.cxx
-  vtkAnnotateGlobalDataFilter.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkClientServerMoveData.cxx
@@ -141,6 +140,7 @@ ENDIF (PARAVIEW_USE_ICE_T AND VTK_USE_MPI)
 
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(Kit_SRCS ${Kit_SRCS}
+    vtkAnnotateGlobalDataFilter.cxx
     vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
     vtkPythonProgrammableFilter.cxx
