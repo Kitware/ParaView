@@ -71,7 +71,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET(KIT_PYTHON_LIBS
     vtkCommonCorePythonD
-    vtkIOCorePythonD
+    vtkIOXMLPythonD
     vtkPVCommon
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
