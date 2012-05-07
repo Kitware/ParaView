@@ -53,7 +53,7 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   
   foreach(class ${${module}_CLASSES})
     find_file(${class}_full_name "${class}.h" PATHS ${${module}_INCLUDE_DIRS} )
-    
+    set_property(CACHE ${class}_full_name PROPERTY TYPE INTERNAL)
     if(${class}_full_name)
       if(NOT ${module}_CLASS_${class}_WRAP_EXCLUDE)
         if(${module}_CLASS_${class}_ABSTRACT)
