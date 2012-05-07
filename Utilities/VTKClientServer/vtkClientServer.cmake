@@ -16,7 +16,10 @@ macro(pv_wrap_vtk_mod_cs module)
 
   # satisfy the auto init calls, this should done in VTK eventually  
   if( ${module} STREQUAL "vtkRenderingCore" )
-    target_link_libraries(${module}CS vtkRenderingOpenGL vtkInteractionStyle)
+    target_link_libraries(${module}CS 
+      vtkRenderingOpenGL
+      vtkInteractionStyle
+      vtkRenderingFreeTypeOpenGL)
   endif() 
   if( ${module} STREQUAL "vtkRenderingVolume" )
     target_link_libraries(${module}CS vtkRenderingVolumeOpenGL)
@@ -24,7 +27,6 @@ macro(pv_wrap_vtk_mod_cs module)
   if( ${module} STREQUAL "vtkRenderingFreeType" )
     target_link_libraries(${module}CS vtkRenderingFreeTypeOpenGL)
   endif()
-  
   foreach(dep ${${module}_DEPENDS})
     if(NOT ${dep}_EXCLUDE_FROM_WRAPPING)
       target_link_libraries(${module}CS ${dep}CS)
