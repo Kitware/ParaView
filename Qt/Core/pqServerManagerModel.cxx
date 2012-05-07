@@ -463,7 +463,19 @@ void pqServerManagerModel::onConnectionCreated(vtkIdType id)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pqServer* server = new pqServer(id, pm->GetOptions(), this);
-  server->setResource(this->Internal->ActiveResource);
+
+  // Make sure the server resource is valid otherwise use session URL informations
+  // (this is used when we connect from Python in multi-server mode)
+  if(this->Internal->ActiveResource.scheme().isEmpty())
+    {
+    vtkSMSession* session = vtkSMSession::SafeDownCast(pm->GetSession(id));
+    server->setResource(pqServerResource(session->GetURI()));
+    }
+  else
+    {
+    server->setResource(this->Internal->ActiveResource);
+    }
+
   this->Internal->ActiveResource = pqServerResource();
 
   emit this->preItemAdded(server);
