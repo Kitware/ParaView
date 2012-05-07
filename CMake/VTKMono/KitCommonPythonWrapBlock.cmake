@@ -8,7 +8,6 @@ INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_PATH}")
 # can link to this but it is not directly loaded dynamically as a
 # module.
 PVVTK_ADD_LIBRARY(vtk${KIT}PythonD ${KitPython_SRCS} ${Kit_PYTHON_EXTRA_SRCS})
-message("KIT_PYTHON_LIBS: ${KIT_PYTHON_LIBS}")
 TARGET_LINK_LIBRARIES(
   vtk${KIT}PythonD vtk${KIT} vtkWrappingPythonCore ${KIT_PYTHON_LIBS})
 IF(NOT VTK_INSTALL_NO_LIBRARIES)
