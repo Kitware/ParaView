@@ -61,6 +61,7 @@ set(KIT_LIBS
   vtkRenderingOpenGL
   vtkImagingCore
   vtkInteractionStyle
+  vtkRenderingFreeTypeOpenGL
   ${OPENGL_gl_LIBRARY}
   )
 
