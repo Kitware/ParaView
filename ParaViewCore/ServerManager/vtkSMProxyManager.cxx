@@ -31,10 +31,9 @@
 #include "vtkSMWriterFactory.h"
 #include "vtkWeakPointer.h"
 
-#include <vtksys/DateStamp.h> // For date stamp
 #include <map>
 
-#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
+//#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
 //***************************************************************************
 class vtkSMProxyManager::vtkPXMInternal
 {
@@ -185,10 +184,10 @@ bool vtkSMProxyManager::IsInitialized()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkSMProxyManager::GetParaViewSourceVersion()
-{
-  return PARAVIEW_SOURCE_VERSION;
-}
+//const char* vtkSMProxyManager::GetParaViewSourceVersion()
+//{
+//  return PARAVIEW_SOURCE_VERSION;
+//}
 
 //----------------------------------------------------------------------------
 int vtkSMProxyManager::GetVersionMajor()
