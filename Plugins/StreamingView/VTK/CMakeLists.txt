@@ -11,6 +11,7 @@ INCLUDE ( ${VTK_USE_FILE} )
 
 SET ( VTK_LINK_LIBRARIES
   vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
   vtkInteractionStyle
   vtkFiltersCore
   vtkIOCore
