@@ -93,6 +93,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
+
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
@@ -164,6 +165,7 @@ set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGrid_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
+set(XYHistogram_USE_NEW_PANELS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(Threshold_BREAK TRUE)
