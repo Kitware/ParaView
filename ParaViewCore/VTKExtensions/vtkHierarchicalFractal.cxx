@@ -20,7 +20,6 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDoubleArray.h"
-#include "vtkExtractCTHPart.h" // for the BOUNDS key
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkImageMandelbrotSource.h"
 #include "vtkInformation.h"
@@ -516,7 +515,7 @@ int vtkHierarchicalFractal::RequestData(
     bounds[5]=oz+zSize;
     }
   
-  info->Set(vtkExtractCTHPart::BOUNDS(),bounds,6);
+  info->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(),bounds,6);
   
   if(!this->GenerateRectilinearGrids)
     {

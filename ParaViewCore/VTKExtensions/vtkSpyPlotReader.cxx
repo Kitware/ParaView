@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDoubleArray.h"
-#include "vtkExtractCTHPart.h" // for the BOUNDS key
 #include "vtkFloatArray.h"
 //#include "vtkHierarchicalBoxDataSet.h"
 #include "vtkNonOverlappingAMR.h"
@@ -685,7 +684,7 @@ int vtkSpyPlotReader::RequestData(
     // the hierarchical dataset?
     double b[6];
     this->Bounds->GetBounds(b);
-    info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
+    info->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(), b, 6);
 
     // Read the blocks/files that are assigned to this process
     int current_block_number;
