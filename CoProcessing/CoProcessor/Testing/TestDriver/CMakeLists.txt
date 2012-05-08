@@ -54,7 +54,7 @@ SET_SOURCE_FILES_PROPERTIES(
 ADD_LIBRARY(vtkCPTestDriver
   ${TestDriver_SRCS} 
 )
-TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessor vtkFiltering)
+TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessor vtkFiltersCore)
 
 IF (VTK_WRAP_PYTHON)
   # Create Python bindings for the co-processing library
@@ -64,7 +64,7 @@ IF (VTK_WRAP_PYTHON)
   # can link to this but it is not directly loaded dynamically as a
   # module.
   ADD_LIBRARY(vtkCPTestDriverPythonD ${TestDriverPython_SRCS})
-  TARGET_LINK_LIBRARIES(vtkCPTestDriverPythonD vtkCPTestDriver vtkIOPythonD)
+  TARGET_LINK_LIBRARIES(vtkCPTestDriverPythonD vtkCPTestDriver vtkIOCorePythonD)
 
   # On some UNIX platforms the python library is static and therefore
   # should not be linked into the shared library.  Instead the symbols

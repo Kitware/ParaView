@@ -79,7 +79,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # can link to this but it is not directly loaded dynamically as a
   # module.
   ADD_LIBRARY(vtkCoProcessorPythonD ${CPPython_SRCS})
-  TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOPythonD)
+  TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOCorePythonD)
 
   # On some UNIX platforms the python library is static and therefore
   # should not be linked into the shared library.  Instead the symbols
