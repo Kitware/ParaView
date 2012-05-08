@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqUndoStack.h"
 #include "pqOutputPort.h"
+#include "pqDisplayPanel.h"
 #include "pqActiveObjects.h"
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
@@ -70,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplyPropertiesManager.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
+#include "pqDisplayPanelPropertyWidget.h"
 #include "pqProxyModifiedStateUndoElement.h"
 
 // custom panels
@@ -83,15 +85,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIsoVolumePanel.h"
 #include "pqCalculatorPanel.h"
 #include "pqStreamTracerPanel.h"
+#include "pqTextRepresentation.h"
 #include "pqProxyPropertyWidget.h"
+#include "pqXYChartDisplayPanel.h"
 #include "pqExtractCTHPartsPanel.h"
+#include "pqDisplayPanelInterface.h"
+#include "pqPlotMatrixDisplayPanel.h"
+#include "pqSpreadSheetDisplayEditor.h"
+#include "pqTextDisplayPropertiesWidget.h"
 #include "pqYoungsMaterialInterfacePanel.h"
+#include "pqParallelCoordinatesChartDisplayPanel.h"
 
 #include "pqPropertyWidget.h"
 #include "pqIntVectorPropertyWidget.h"
 #include "pqDoubleVectorPropertyWidget.h"
 #include "pqStringVectorPropertyWidget.h"
 
+// === pqStandardCustomPanels ============================================== //
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -217,6 +227,86 @@ public:
       }
     return false;
   }
+};
+
+// === pqStandardDisplayPanels ============================================= //
+class pqStandardDisplayPanels : public QObject, public pqDisplayPanelInterface
+{
+public:
+  /// constructor
+  pqStandardDisplayPanels(){}
+  /// destructor
+  virtual ~pqStandardDisplayPanels(){}
+
+  /// Returns true if this panel can be created for the given the proxy.
+  virtual bool canCreatePanel(pqRepresentation* proxy) const
+    {
+    if(!proxy || !proxy->getProxy())
+      {
+      return false;
+      }
+
+    QString type = proxy->getProxy()->GetXMLName();
+
+    if (type == "XYPlotRepresentation" ||
+       type == "XYChartRepresentation" ||
+       type == "XYBarChartRepresentation" ||
+       type == "BarChartRepresentation" ||
+       type == "SpreadSheetRepresentation" ||
+       qobject_cast<pqTextRepresentation*>(proxy)||
+       type == "ScatterPlotRepresentation" ||
+       type == "ParallelCoordinatesRepresentation" ||
+       type == "PlotMatrixRepresentation")
+      {
+      return true;
+      }
+
+    return false;
+    }
+  /// Creates a panel for the given proxy
+  virtual pqDisplayPanel* createPanel(pqRepresentation* proxy, QWidget* p)
+    {
+    if(!proxy || !proxy->getProxy())
+      {
+      qDebug() << "Proxy is null" << proxy;
+      return NULL;
+      }
+
+    QString type = proxy->getProxy()->GetXMLName();
+    if (type == QString("XYChartRepresentation"))
+      {
+      return new pqXYChartDisplayPanel(proxy, p);
+      }
+    if (type == QString("XYBarChartRepresentation"))
+      {
+      return new pqXYChartDisplayPanel(proxy, p);
+      }
+    if (type == "SpreadSheetRepresentation")
+      {
+      return new pqSpreadSheetDisplayEditor(proxy, p);
+      }
+
+    if (qobject_cast<pqTextRepresentation*>(proxy))
+      {
+      return new pqTextDisplayPropertiesWidget(proxy, p);
+      }
+#ifdef FIXME
+    if (type == "ScatterPlotRepresentation")
+      {
+      return new pqScatterPlotDisplayPanel(proxy, p);
+      }
+#endif
+    if (type == QString("ParallelCoordinatesRepresentation"))
+      {
+      return new pqParallelCoordinatesChartDisplayPanel(proxy, p);
+      }
+    else if (type == "PlotMatrixRepresentation")
+      {
+      return new pqPlotMatrixDisplayPanel(proxy, p);
+      }
+
+    return NULL;
+    }
 };
 
 pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
@@ -505,8 +595,32 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     this->Ui->DisplayGroupBox->setTitle("Display");
     }
 
-  // create property widgets
-  QList<pqPropertiesPanelItem> widgets = this->createWidgetsForProxy(repr);
+  QList<pqPropertiesPanelItem> widgets;
+
+  pqDisplayPanel *customPanel = 0;
+  pqStandardDisplayPanels standardDisplayPanels;
+  if(standardDisplayPanels.canCreatePanel(repr))
+    {
+    customPanel = standardDisplayPanels.createPanel(repr, 0);
+    }
+
+  if(customPanel)
+    {
+    customPanel->dataUpdated();
+
+    pqPropertiesPanelItem item;
+    item.Name = repr->getProxy()->GetXMLName();
+    item.LabelWidget = 0;
+    item.PropertyWidget = new pqDisplayPanelPropertyWidget(customPanel);
+    item.IsAdvanced = false;
+    widgets.append(item);
+    }
+  else
+    {
+    // create property widgets
+    widgets = this->createWidgetsForProxy(repr);
+    }
+
   foreach(const pqPropertiesPanelItem &item, widgets)
     {
     this->RepresentationPropertyItems.append(item);
