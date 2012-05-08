@@ -78,6 +78,9 @@ class vtkPVRenderView::vtkInternals
 public:
   unsigned int UniqueId;
   vtkNew<vtkRepresentedDataStorage> GeometryStore;
+  vtkInternals() : UniqueId(1)
+  {
+  }
 };
 
 
@@ -839,37 +842,40 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVRenderView::DeliverNextPiece()
+unsigned int vtkPVRenderView::GetNextPieceToDeliver()
 {
   if (!vtkPVView::GetEnableStreaming())
     {
-    return NULL;
+    return 0;
     }
 
   if (this->UpdateTimeStamp > this->PriorityQueueBuildTimeStamp ||
     this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp)
     {
-    // if data or camera changed, we need to rebuild the priority queues.
-
-    // TODO:
-
+    // either the data or the camera has changed. Regenerate the priority queue.
+    // Priority queue contains a list of (representation-id, block-id) tuples
+    // indicating the blocks to request.
+    vtkTimerLog::MarkStartEvent("Build View Priority Queue");
+    this->GetGeometryStore()->BuildPriorityQueue();
+    vtkTimerLog::MarkEndEvent("Build View Priority Queue");
     this->PriorityQueueBuildTimeStamp.Modified();
     }
 
-
-  cout << "StreamingUpdate: " << endl;
+  return this->GetGeometryStore()->GetRepresentationIdFromQueue();
+}
+ 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StreamingUpdate()
+{
   vtkTimerLog::MarkStartEvent("Streaming Update");
-
   // Update the representations.
   this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
     this->Internals->GeometryStore.GetPointer());
   this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
     this->RequestInformation, this->ReplyInformationVector);
-
   vtkTimerLog::MarkEndEvent("Streaming Update");
-  return "hehe";
 }
- 
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
@@ -1066,6 +1072,22 @@ void vtkPVRenderView::MarkAsRedistributable(
     }
   storage->MarkAsRedistributable(repr);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetStreamable(
+  vtkInformation* info, vtkPVDataRepresentation* repr, bool val)
+{
+  vtkRepresentedDataStorage* storage =
+    vtkRepresentedDataStorage::SafeDownCast(
+      info->Get(REPRESENTED_DATA_STORE()));
+  if (!storage)
+    {
+    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    return;
+    }
+  storage->SetStreamable(repr, val);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,

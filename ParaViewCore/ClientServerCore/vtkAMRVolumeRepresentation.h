@@ -24,7 +24,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for iVars.
 
-class vtkAMRVolumeMapper;
+class vtkSmartVolumeMapper;
 class vtkColorTransferFunction;
 class vtkFixedPointVolumeRayCastMapper;
 class vtkOverlappingAMR;
@@ -117,25 +117,39 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
 
-  // Description:
-  // Gets the metadata from upstream module and determines which blocks
-  // should be loaded by this instance.
-  virtual int RequestInformation(
-                                 vtkInformation *rqst,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector );
-
-  // Description:
-  // Performs upstream requests to the reader
-  virtual int RequestUpdateExtent(
-                                  vtkInformation*, vtkInformationVector**, 
-                                  vtkInformationVector* );
   vtkSetMacro(FreezeFocalPoint,bool);
   vtkGetMacro(FreezeFocalPoint,bool);
+
+  // Description:
+  // When steaming, this is the block that's requested from the upstream.
+  void SetStreamingBlockId(unsigned int val)
+    {
+    if (this->StreamingCapableSource)
+      {
+      this->StreamingBlockId = val;
+      this->MarkModified();
+      }
+    }
+
+  void ResetStreamingBlockId()
+    { this->StreamingBlockId = 0; }
 //BTX
 protected:
   vtkAMRVolumeRepresentation();
   ~vtkAMRVolumeRepresentation();
+
+  // Description:
+  // Gets the metadata from upstream module and determines which blocks
+  // should be loaded by this instance.
+  virtual int RequestInformation(vtkInformation *rqst,
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector );
+
+  // Description:
+  // Performs upstream requests to the reader
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, 
+    vtkInformationVector* );
 
   // Description:
   // Fill input port information.
@@ -171,7 +185,7 @@ protected:
 
   vtkOverlappingAMR* Cache;
   vtkPVCacheKeeper* CacheKeeper;
-  vtkAMRVolumeMapper* VolumeMapper;
+  vtkSmartVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
   vtkWeakPointer<vtkPVRenderView> RenderView;
@@ -182,6 +196,11 @@ protected:
   int RequestedResamplingMode;
   int NumberOfSamples[3];
   bool FreezeFocalPoint;
+  bool StreamingCapableSource;
+
+  unsigned int StreamingBlockId;
+
+  double DataBounds[6];
 
 private:
   vtkAMRVolumeRepresentation(const vtkAMRVolumeRepresentation&); // Not implemented

@@ -15,19 +15,24 @@
 #include "vtkAMRVolumeRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAMRResampleFilter.h"
 #include "vtkCommand.h"
-#include "vtkAMRVolumeMapper.h"
-#include "vtkOverlappingAMR.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVLODVolume.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkSmartVolumeMapper.h"
 #include "vtkVolumeProperty.h"
-
+#include "vtkMultiBlockDataSet.h"
+#include "vtkImageData.h"
 #include <map>
 #include <string>
 
@@ -36,10 +41,10 @@ vtkStandardNewMacro(vtkAMRVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 {
-  this->RequestedRenderMode = 0; // Use Smart Mode
+  this->RequestedRenderMode = 0; //vtkAMRVolumeMapper::DefaultRenderMode; // Use Smart Mode
   this->RequestedResamplingMode = 0; // Frustrum Mode
-  this->VolumeMapper = vtkAMRVolumeMapper::New();
-  this->VolumeMapper->SetUseDefaultThreading(true);
+  this->VolumeMapper = vtkSmartVolumeMapper::New();
+  //this->VolumeMapper->SetUseDefaultThreading(true);
   this->Property = vtkVolumeProperty::New();
 
   this->Actor = vtkPVLODVolume::New();
@@ -53,6 +58,10 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 
   this->CacheKeeper->SetInputData(this->Cache);
   this->FreezeFocalPoint = false;
+  vtkMath::UninitializeBounds(this->DataBounds);
+
+  this->StreamingBlockId = 0;
+  this->StreamingCapableSource = false;
 }
 
 //----------------------------------------------------------------------------
@@ -84,15 +93,53 @@ vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
                                                 vtkInformationVector* outputVector)
 {
   this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
+
+  // If this->StreamingCapableSource is true, i.e. input is streaming capable
+  // and streaming is enabled, the update request is always "qualified". i.e. we
+  // only request a particular block from the input. The block is passed on by
+  // the view during streaming updates. Default behavior is to just request the
+  // 0th block.
+  if (this->StreamingCapableSource)
+    {
+    for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
+      {
+      for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
+        {
+        vtkInformation* info = inputVector[cc]->GetInformationObject(kk);
+        info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
+        int block = static_cast<int>(this->StreamingBlockId);
+        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
+          &block, 1);
+        cout << "vtkAMRVolumeRepresentation::RequestUpdateExtent " 
+          << block << endl;
+        }
+      }
+    }
   return 1;
 }
+
 //----------------------------------------------------------------------------
 int
 vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
                                                vtkInformationVector** inputVector,
                                                vtkInformationVector* outputVector)
 {
-  this->Superclass::RequestInformation(request, inputVector, outputVector);
+  if (!this->Superclass::RequestInformation(request, inputVector, outputVector))
+    {
+    return 0;
+    }
+
+  // Determine if the input is streaming capable.
+  this->StreamingCapableSource = false;
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
+    {
+    vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+    if (inInfo->Has(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()) &&
+      vtkPVView::GetEnableStreaming())
+      {
+      this->StreamingCapableSource = true;
+      }
+    }
   return 1;
 }
 
@@ -112,18 +159,53 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
     // At the same time, the image data is not the data being delivered
     // anywhere, so we don't really report it to the view's storage.
     // vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
+
     vtkPVRenderView::SetPiece(inInfo, this,
       this->CacheKeeper->GetOutputDataObject(0));
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
+    vtkPVRenderView::SetStreamable(inInfo, this, this->StreamingCapableSource);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
     this->UpdateMapperParameters();
-
     vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
     if (producerPort)
       {
-      this->VolumeMapper->SetInputConnection(producerPort);
+      vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
+        producerPort->GetProducer()->GetOutputDataObject(0));
+      if (amr)
+        {
+        cout << "AMR Being Rendering -----" << endl;
+        for (unsigned int cc=0; cc < amr->GetNumberOfLevels(); cc++)
+          {
+          for (unsigned int kk=0; kk < amr->GetNumberOfDataSets(cc); kk++)
+            {
+            cout << cc <<", " << kk << " = " << amr->GetDataSet(cc, kk) << endl;
+            }
+          }
+
+        double bounds[6];
+        amr->GetBounds(bounds);
+        vtkNew<vtkAMRResampleFilter> resampler;
+        resampler->SetNumberOfSamples(40, 40, 40);
+        resampler->SetDemandDrivenMode(0);
+        resampler->SetMin(bounds[0], bounds[2], bounds[4]);
+        resampler->SetMax(bounds[1], bounds[3], bounds[5]);
+        resampler->SetInputData(amr);
+        resampler->Update();
+        vtkMultiBlockDataSet* mbs = vtkMultiBlockDataSet::SafeDownCast(
+          resampler->GetOutputDataObject(0));
+        if (mbs && mbs->GetNumberOfBlocks() == 1)
+          {
+          this->VolumeMapper->SetInputData(
+            vtkImageData::SafeDownCast(mbs->GetBlock(0)));
+          }
+        }
+      else
+        {
+        this->VolumeMapper->SetInputConnection(producerPort);
+        }
       }
     }
   return 1;
@@ -133,11 +215,11 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
 int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
     vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-    cerr << "vtkAMRVolumeRepresentation::RequestData" << endl;
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
+  vtkMath::UninitializeBounds(this->DataBounds);
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
     vtkOverlappingAMR* input =
@@ -147,6 +229,12 @@ int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
       this->Cache->ShallowCopy(input);
       }
     this->CacheKeeper->Update();
+    vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
+      this->CacheKeeper->GetOutputDataObject(0));
+    if (amr)
+      {
+      amr->GetBounds(this->DataBounds);
+      }
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -199,20 +287,12 @@ void vtkAMRVolumeRepresentation::UpdateMapperParameters()
 {
   this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
   this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
-  this->VolumeMapper->SetNumberOfSamples(this->NumberOfSamples);
-  this->VolumeMapper->SetRequestedResamplingMode(this->RequestedResamplingMode);
-  this->VolumeMapper->SetFreezeFocalPoint(this->FreezeFocalPoint);
-  switch (this->ColorAttributeType)
-    {
-  case CELL_DATA:
-    this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
-    break;
 
-  case POINT_DATA:
-  default:
-    this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    break;
-    }
+  // we always say point-data, since the resampler samples to points.
+  this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+  //this->VolumeMapper->SetNumberOfSamples(this->NumberOfSamples);
+  //this->VolumeMapper->SetRequestedResamplingMode(this->RequestedResamplingMode);
+  //this->VolumeMapper->SetFreezeFocalPoint(this->FreezeFocalPoint);
   this->Actor->SetMapper(this->VolumeMapper);
 }
 

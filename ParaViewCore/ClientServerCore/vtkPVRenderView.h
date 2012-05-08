@@ -171,7 +171,11 @@ public:
   virtual void InteractiveRender();
 
   // Description:
-  const char* DeliverNextPiece();
+  // Returns the representation id which is going to deliver the next piece for
+  // streaming.
+  unsigned int GetNextPieceToDeliver();
+
+  void StreamingUpdate();
 
   // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
@@ -347,6 +351,8 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr);
   static void SetGeometryBounds(vtkInformation* info,
     double bounds[6], vtkMatrix4x4* transform = NULL);
+  static void SetStreamable(
+    vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
 
 public:
   //*****************************************************************

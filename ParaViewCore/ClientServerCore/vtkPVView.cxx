@@ -62,7 +62,7 @@ vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
 
-bool vtkPVView::EnableStreaming = true;
+bool vtkPVView::EnableStreaming = true; 
 //----------------------------------------------------------------------------
 void vtkPVView::SetEnableStreaming(bool val)
 {

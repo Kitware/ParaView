@@ -74,7 +74,19 @@ public:
   // needs to be "moved around" when ordered compositing is needed.
   void MarkAsRedistributable(vtkPVDataRepresentation*);
 
+  // Description:
+  // Mark a representation as streamable. Currently only
+  // vtkAMRVolumeRepresentation is supported.
+  void SetStreamable(vtkPVDataRepresentation*, bool);
+
   vtkPKdTree* GetKdTree();
+
+  // Description:
+  // Based on the current camera and currently available datasets, build a
+  // priority queue.
+  bool BuildPriorityQueue();
+  unsigned int GetRepresentationIdFromQueue();
+  void StreamingDeliver(unsigned int key);
 
 //BTX
   bool NeedsDelivery(unsigned long timestamp,

@@ -16,18 +16,27 @@
 #include "vtkRepresentedDataStorageInternals.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAMRVolumeRepresentation.h"
 #include "vtkBSPCutsGenerator.h"
+#include "vtkFieldData.h"
 #include "vtkMPIMoveData.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOrderedCompositeDistributor.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPKdTree.h"
 #include "vtkProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSession.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
+#include "vtkUniformGridAMRDataIterator.h"
+#include "vtkUniformGrid.h"
+#include "vtkUnsignedIntArray.h"
+
+#include <assert.h>
 
 vtkStandardNewMacro(vtkRepresentedDataStorage);
 //----------------------------------------------------------------------------
@@ -116,6 +125,30 @@ void vtkRepresentedDataStorage::MarkAsRedistributable(
     {
     item->Redistributable = true;
     low_item->Redistributable = true;
+    }
+  else
+    {
+    vtkErrorMacro("Invalid argument.");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::SetStreamable(
+  vtkPVDataRepresentation* repr, bool val)
+{
+  if (!repr->IsA("vtkAMRVolumeRepresentation") && val == true)
+    {
+    vtkWarningMacro(
+      "Only vtkAMRVolumeRepresentation streaming is currently supported.");
+    return;
+    }
+
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
+  vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true);
+  if (item)
+    {
+    item->Streamable = val;
+    low_item->Streamable = val;
     }
   else
     {
@@ -247,26 +280,22 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned
       // we are dealing with AMR datasets.
       // We assume for now we're not running in render-server mode. We can
       // ensure that at some point in future. 
-      // So we are either in pass-through or collect mode. 
-      if ( (mode & vtkMPIMoveData::COLLECT) != 0)
-        {
-        // handle delivery of AMR datasets.
-        }
+      // So we are either in pass-through or collect mode.
+
+      // FIXME: check that the mode flags are "suitable" for AMR.
       }
-    else
+
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(data->GetDataObjectType());
+    dataMover->SetMoveMode(mode);
+    if (item->AlwaysClone)
       {
-      vtkNew<vtkMPIMoveData> dataMover;
-      dataMover->InitializeForCommunicationForParaView();
-      dataMover->SetOutputDataType(data->GetDataObjectType());
-      dataMover->SetMoveMode(mode);
-      if (item->AlwaysClone)
-        {
-        dataMover->SetMoveModeToClone();
-        }
-      dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
-      dataMover->Update();
-      item->SetDataObject(dataMover->GetOutputDataObject(0));
+      dataMover->SetMoveModeToClone();
       }
+    dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
+    dataMover->Update();
+    item->SetDataObject(dataMover->GetOutputDataObject(0));
     }
 
   // There's a possibility that we'd need to do ordered compositing.
@@ -344,6 +373,130 @@ vtkPKdTree* vtkRepresentedDataStorage::GetKdTree()
 {
   return this->KdTree;
 }
+
+//----------------------------------------------------------------------------
+bool vtkRepresentedDataStorage::BuildPriorityQueue()
+{
+  // just find the first visible AMR dataset and build priority queue for that
+  // dataset alone. In future, we can fix it to use information provided by
+  // representation indicating if streaming is possible (since not every AMR
+  // source is streambale).
+
+  this->Internals->PriorityQueue = vtkInternals::PriorityQueueType();
+
+  vtkOverlappingAMR* oamr = NULL;
+
+  vtkInternals::ItemsMapType::iterator iter;
+  for (iter = this->Internals->ItemsMap.begin();
+    iter != this->Internals->ItemsMap.end(); ++iter)
+    {
+    vtkInternals::vtkItem& item = iter->second.first;
+    if (item.Representation &&
+      item.Representation->GetVisibility() &&
+      item.Streamable &&
+      item.GetDataObject() &&
+      item.GetDataObject()->IsA("vtkOverlappingAMR"))
+      {
+      oamr = vtkOverlappingAMR::SafeDownCast(item.GetDataObject());
+      break;
+      }
+    }
+  if (oamr == NULL)
+    {
+    return true;
+    }
+
+  // note: amr block ids currently don't match up with composite dataset ids :/.
+  unsigned int block_id = 0;
+  // now build a priority queue for absent blocks using the current camera.
+  for (unsigned int level=0; level < oamr->GetNumberOfLevels(); level++)
+    {
+    for (unsigned int index=0;
+      index < oamr->GetNumberOfDataSets(level); index++)
+      {
+      if (oamr->GetDataSet(level, index) == NULL)
+        {
+        vtkInternals::vtkPriorityQueueItem item;
+        item.RepresentationId = iter->first;
+        item.BlockId = block_id;
+        item.Priority = 1.0 / (1.0 + block_id);
+        this->Internals->PriorityQueue.push(item);
+        }
+      block_id++;
+      }
+    }
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(key, false);
+  vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
+  if (!oamr)
+    {
+    cout << "ERROR: StreamingDeliver can only deliver AMR datasets for now" << endl;
+    abort();
+    }
+
+  if (this->Internals->PriorityQueue.empty())
+    {
+    // client side.
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(VTK_OVERLAPPING_AMR);
+    dataMover->SetMoveModeToCollect();
+    dataMover->SetInputConnection(NULL);
+    dataMover->Update();
+
+    // now put the piece in right place.
+    vtkOverlappingAMR* ds = vtkOverlappingAMR::SafeDownCast(
+      dataMover->GetOutputDataObject(0));
+    vtkCompositeDataIterator* iter = ds->NewIterator();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+      iter->GoToNextItem())
+      {
+      oamr->SetDataSet(iter, iter->GetCurrentDataObject());
+      }
+    iter->Delete();
+    oamr->Modified();
+    }
+  else
+    {
+    vtkInternals::vtkPriorityQueueItem qitem =
+      this->Internals->PriorityQueue.top();
+    this->Internals->PriorityQueue.pop();
+    assert(qitem.RepresentationId == key);
+
+    vtkAMRVolumeRepresentation* repr = vtkAMRVolumeRepresentation::SafeDownCast(
+      item->Representation);
+    repr->SetStreamingBlockId(qitem.BlockId);
+    this->View->StreamingUpdate();
+    repr->ResetStreamingBlockId();
+
+    oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
+    // the one bad thing about this is that we are sending the full amr
+    // meta-data again. We can do better here and not send it again.
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(VTK_OVERLAPPING_AMR);
+    dataMover->SetMoveModeToCollect();
+    dataMover->SetInputData(oamr);
+    dataMover->Update();
+    }
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkRepresentedDataStorage::GetRepresentationIdFromQueue()
+{
+  if (!this->Internals->PriorityQueue.empty())
+    {
+    return this->Internals->PriorityQueue.top().RepresentationId;
+    }
+
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 void vtkRepresentedDataStorage::PrintSelf(ostream& os, vtkIndent indent)
 {

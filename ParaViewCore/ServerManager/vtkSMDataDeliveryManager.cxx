@@ -145,17 +145,35 @@ bool vtkSMDataDeliveryManager::DeliverNextPiece()
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this->ViewProxy)
-         << "DeliverNextPiece"
+         << "GetNextPieceToDeliver"
          << vtkClientServerStream::End;
   session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, false);
 
   const vtkClientServerStream& result = session->GetLastResult(
     vtkPVSession::DATA_SERVER_ROOT);
   result.Print(cout);
-  // extract the "piece-key" from the result and then request it.
 
+  // extract the "piece-key" from the result and then request it.
+  unsigned int representation_id = 0;
+  result.GetArgument(0, 0, &representation_id);
+  if (representation_id != 0)
+    {
+    // we have something to deliver.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << VTKOBJECT(this->ViewProxy)
+           << "GetGeometryStore"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << vtkClientServerStream::LastResult
+           << "StreamingDeliver"
+           << representation_id 
+           << vtkClientServerStream::End;
+    this->ViewProxy->GetSession()->ExecuteStream(
+      this->ViewProxy->GetLocation(), stream, false);
+    }
   vtkTimerLog::MarkEndEvent("DeliverNextPiece");
-  return false;
+  return representation_id != 0;
 }
 
 //----------------------------------------------------------------------------

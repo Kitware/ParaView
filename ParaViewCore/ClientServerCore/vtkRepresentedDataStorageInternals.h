@@ -25,11 +25,34 @@
 #include "vtkWeakPointer.h"
 
 #include <map>
+#include <queue>
 #include <utility>
 
 class vtkRepresentedDataStorage::vtkInternals
 {
 public:
+
+  class vtkPriorityQueueItem
+    {
+  public:
+    unsigned int RepresentationId;
+    unsigned int BlockId;
+    double Priority;
+
+    vtkPriorityQueueItem() :
+      RepresentationId(0), BlockId(0), Priority(0)
+    {
+    }
+
+    bool operator < (const vtkPriorityQueueItem& other) const
+      {
+      return this->Priority < other.Priority;
+      }
+    };
+
+  typedef std::priority_queue<vtkPriorityQueueItem> PriorityQueueType;
+  PriorityQueueType PriorityQueue;
+
   class vtkItem
     {
     vtkSmartPointer<vtkPVTrivialProducer> Producer;
@@ -40,13 +63,15 @@ public:
     vtkWeakPointer<vtkPVDataRepresentation> Representation;
     bool AlwaysClone;
     bool Redistributable;
+    bool Streamable;
 
     vtkItem() :
       Producer(vtkSmartPointer<vtkPVTrivialProducer>::New()),
       TimeStamp(0),
       ActualMemorySize(0),
       AlwaysClone(false),
-      Redistributable(false)
+      Redistributable(false),
+      Streamable(false)
     { }
 
     void SetDataObject(vtkDataObject* data)
