@@ -11,7 +11,7 @@ set(_vtk_mpi_modules
   vtkFiltersParallelImaging
   vtkIOParallelMPI
   vtkFiltersParallelMPI
-  vtkFiltersParallelTracers
+  #vtkFiltersParallelTracers
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
   #  vtkDistributedStreamTracer
@@ -210,7 +210,7 @@ set(_vtk_modules
   #  vtkTextureMapToPlane
   #  vtkTextureMapToSphere
 
-  vtkFiltersTracers
+  #vtkFiltersTracers
   # Needed for:
   #  vtkStreamTracer
   #  vtkStreamTracer
