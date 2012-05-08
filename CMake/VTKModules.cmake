@@ -59,6 +59,7 @@ set(_vtk_modules
   vtkAMRCore
   vtkChartsCore
   vtkIOEnSight
+  vtkTestingRendering
   
   # Modules that are required a runtime generated from:
   #
@@ -329,7 +330,6 @@ mark_as_advanced(Module_vtkGUISupportQt)
 # Note: Again there may be duplicated this intended to record the dependancy
 if(BUILD_TESTING)
   list(APPEND _vtk_modules 
-    vtkTestingRendering
     vtkFiltersProgrammable
     vtkInteractionImage)
 endif()
