@@ -15,12 +15,14 @@
 #include "vtkAMRVolumeRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAMRIncrementalResampleHelper.h"
 #include "vtkAMRResampleFilter.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
@@ -30,9 +32,9 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartVolumeMapper.h"
+#include "vtkUniformGrid.h"
 #include "vtkVolumeProperty.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkImageData.h"
+
 #include <map>
 #include <string>
 
@@ -187,6 +189,7 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
 
         double bounds[6];
         amr->GetBounds(bounds);
+#ifdef USE_RESAMPLER
         vtkNew<vtkAMRResampleFilter> resampler;
         resampler->SetNumberOfSamples(40, 40, 40);
         resampler->SetDemandDrivenMode(0);
@@ -201,6 +204,15 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
           this->VolumeMapper->SetInputData(
             vtkImageData::SafeDownCast(mbs->GetBlock(0)));
           }
+#else
+        vtkNew<vtkAMRIncrementalResampleHelper> helper;
+        helper->Initialize(amr);
+        helper->SetAMRData(amr);
+        int samples[3]= {40, 40, 40};
+        helper->UpdateROI(bounds, samples);
+        helper->Update();
+        this->VolumeMapper->SetInputData(helper->GetGrid());
+#endif
         }
       else
         {

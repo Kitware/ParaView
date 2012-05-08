@@ -13,21 +13,25 @@
 
  =========================================================================*/
 #include "vtkAMRIncrementalResampleHelper.h"
+
+#include "vtkBoundingBox.h"
+#include "vtkCellData.h"
+#include "vtkFieldData.h"
+#include "vtkIntArray.h"
+#include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOverlappingAMR.h"
-#include "vtkMultiProcessController.h"
+#include "vtkPointData.h"
+#include "vtkStructuredData.h"
 #include "vtkUniformGrid.h"
 #include "vtkUniformGridPartitioner.h"
-#include "vtkIntArray.h"
-#include "vtkFieldData.h"
-#include "vtkBoundingBox.h"
-#include "vtkStructuredData.h"
-#include "vtkCellData.h"
-#include "vtkPointData.h"
+#include "vtkXMLImageDataWriter.h"
 
 // C++ includes
 #include <set>
 #include <cassert>
+#include <sstream>
 
 #define IMIN(ext) ext[0]
 #define IMAX(ext) ext[1]
@@ -101,6 +105,7 @@ void vtkAMRIncrementalResampleHelper::UpdateROI(
     {
     this->Grid->Delete();
     }
+  this->Grid = vtkUniformGrid::New();
 
   // STEP 1: Clear all processed blocks
   this->ClearProcessedBlocks();
@@ -127,7 +132,7 @@ void vtkAMRIncrementalResampleHelper::UpdateROI(
     double origin[3];
     origin[0] = this->ROIBounds[0]; // xmin
     origin[1] = this->ROIBounds[2]; // ymin
-    origin[2] = this->ROIBounds[3]; // zmin
+    origin[2] = this->ROIBounds[4]; // zmin
     this->Grid->SetOrigin(origin);
     this->Grid->SetSpacing( this->h );
     this->Grid->SetDimensions(this->NumberOfSamples);
@@ -147,9 +152,17 @@ void vtkAMRIncrementalResampleHelper::InitializeGrid()
   // STEP 0: Initialize the grid fields
   vtkUniformGrid *refGrid = this->GetReferenceGrid();
   assert("pre: Grid should not be NULL" && (refGrid != NULL) );
-  this->InitializeGridFields(
-     this->Grid->GetPointData(),this->Grid->GetNumberOfPoints(),
-     refGrid->GetCellData());
+  this->Grid->GetPointData()->CopyAllOn();
+  this->Grid->GetPointData()->CopyAllocate(
+    refGrid->GetCellData(), this->Grid->GetNumberOfPoints());
+  for (int cc=0; cc < this->Grid->GetPointData()->GetNumberOfArrays(); cc++)
+    {
+    this->Grid->GetPointData()->GetArray(cc)->SetNumberOfTuples(
+      this->Grid->GetNumberOfPoints());
+    }
+  //this->InitializeGridFields(
+  //   this->Grid->GetPointData(),this->Grid->GetNumberOfPoints(),
+  //   refGrid->GetCellData());
 
 
   // STEP 1: Create donor level array that store for each grid point the level
@@ -303,7 +316,8 @@ void vtkAMRIncrementalResampleHelper::CopyData(
   assert( "pre: target field data is NULL" && (target != NULL) );
   assert( "pre: source field data is NULL" && (src != NULL) );
   assert( "pre: number of arrays does not match" &&
-           (target->GetNumberOfArrays() == src->GetNumberOfArrays() ) );
+           (target->GetNumberOfArrays() == (src->GetNumberOfArrays() + 1) ) );
+  // the extra array is the  "DonorLevel" array.
 
   int arrayIdx = 0;
   for( ; arrayIdx < src->GetNumberOfArrays(); ++arrayIdx )
@@ -368,6 +382,7 @@ void vtkAMRIncrementalResampleHelper::Update()
   // NOTE: Shouldn't the update start here with the last level, dataIdx that
   // was processed?
 
+  unsigned int compositeIdx = 0;
   unsigned int numLevels = this->AMRData->GetNumberOfLevels();
   for( unsigned int levelIdx=0; levelIdx < numLevels; ++levelIdx )
     {
@@ -375,14 +390,23 @@ void vtkAMRIncrementalResampleHelper::Update()
     for(unsigned int dataIdx=0; dataIdx < numDataSets; ++dataIdx )
       {
       vtkUniformGrid *donorGrid = this->AMRData->GetDataSet(levelIdx,dataIdx);
-      int compositeIdx = this->Metadata->GetCompositeIndex(levelIdx,dataIdx);
+      //int compositeIdx = this->Metadata->GetCompositeIndex(levelIdx,dataIdx);
       if( !this->HasBlockBeenProcessed( compositeIdx) && (donorGrid !=  NULL) )
         {
         this->TransferSolutionFromGrid( donorGrid, static_cast<int>(levelIdx));
         this->MarkBlockAsProcessed( compositeIdx );
         } // END if
+      compositeIdx++;
       } // END for all datasets within level
     } // END for all levels
+
+
+  vtkNew<vtkXMLImageDataWriter> imgWriter;
+  std::ostringstream oss;
+  oss << "/tmp/resampleddata." << imgWriter->GetDefaultFileExtension();
+  imgWriter->SetFileName( oss.str().c_str() );
+  imgWriter->SetInputData(this->Grid);
+  imgWriter->Write();
 }
 
 //------------------------------------------------------------------------------
