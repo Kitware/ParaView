@@ -56,7 +56,7 @@ set(_vtk_modules
   vtkViewsContext2D
   vtkIOExport
   vtkIOInfovis
-  vtkAMRCore
+  vtkFiltersAMR
   vtkChartsCore
   vtkIOEnSight
   vtkTestingRendering
