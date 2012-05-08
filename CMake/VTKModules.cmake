@@ -333,6 +333,11 @@ if(BUILD_TESTING)
     vtkFiltersProgrammable
     vtkInteractionImage)
 endif()
+
+if(BUILD_EXAMPLES)
+  list(APPEND _vtk_modules 
+    vtkTestingCore)
+endif()
   
 # Now enable the modules
 foreach(_mod ${_vtk_modules})
