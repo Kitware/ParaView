@@ -35,21 +35,25 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
+#include "vtkNonOverlappingAMR.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineFilter.h"
+#include "vtkOverlappingAMR.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVSession.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkPVConfig.h"
-#include <vtkTrivialProducer.h>
+#include "vtkToolkits.h"
+#include "vtkTrivialProducer.h"
 #include "vtkUndirectedGraph.h"
 #include "vtkUnstructuredGrid.h"
+
 #include "vtk_zlib.h"
 #include <vtksys/ios/sstream>
 #include <vector>
@@ -116,10 +120,7 @@ namespace
         mergegraphs->Update();
 
         vtkGraph* mergeResult = mergegraphs->GetOutput();
-        vtkGraph* clone = mergeResult->NewInstance();
-        clone->ShallowCopy(mergeResult);
-        mergegraphs->SetInputData(0, clone);
-        clone->FastDelete();
+        mergegraphs->SetInputData(0, mergeResult);
         }
       vtkDataObject* mergeResult = mergegraphs->GetInputDataObject(0, 0);
       result->ShallowCopy(mergeResult);
@@ -326,6 +327,22 @@ int vtkMPIMoveData::RequestDataObject(vtkInformation*,
       return 1;
       }
     outputCopy = vtkMultiBlockDataSet::New();
+    }
+  else if (this->OutputDataType == VTK_OVERLAPPING_AMR)
+    {
+    if (output && output->IsA("vtkOverlappingAMR"))
+      {
+      return 1;
+      }
+    outputCopy = vtkOverlappingAMR::New();
+    }
+  else if (this->OutputDataType == VTK_NON_OVERLAPPING_AMR)
+    {
+    if (output && output->IsA("vtkNonOverlappingAMR"))
+      {
+      return 1;
+      }
+    outputCopy = vtkNonOverlappingAMR::New();
     }
   else
     {
@@ -647,13 +664,10 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataObject* input,
   // Perform the M to N operation.
 #ifdef PARAVIEW_USE_MPI
    vtkAllToNRedistributeCompositePolyData* AllToN = NULL;
-   vtkDataObject* inputCopy = input->NewInstance();
-   inputCopy->ShallowCopy(input);
    AllToN = vtkAllToNRedistributeCompositePolyData::New();
    AllToN->SetController(controller);
    AllToN->SetNumberOfProcesses(n);
-   AllToN->SetInputData(inputCopy);
-   inputCopy->Delete();
+   AllToN->SetInputData(input);
    AllToN->Update();
    output->ShallowCopy(AllToN->GetOutputDataObject(0));
    AllToN->Delete();
@@ -947,15 +961,11 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
       // reduce data using outline filter.
       if (output->IsA("vtkPolyData") || output->IsA("vtkMultiBlockDataSet"))
         {
-        vtkDataObject* clone = output->NewInstance();
-        clone->ShallowCopy(output);
-
         vtkOutlineFilter* filter = vtkOutlineFilter::New();
-        filter->SetInputData(clone);
+        filter->SetInputData(output);
         filter->Update();
         tosend = filter->GetOutputDataObject(0);
         filter->Delete();
-        clone->Delete();
         }
       else
         {
@@ -1107,10 +1117,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
 
   // Copy input to isolate reader from the pipeline.
   vtkDataWriter* writer = vtkGenericDataObjectWriter::New();
-  vtkDataObject* d = data->NewInstance();
-  d->ShallowCopy(data);
-  writer->SetInputData(d);
-  d->Delete();
+  writer->SetInputData(data);
   if (imageData)
     {
     // We add the image extents to the header, since the writer doesn't preserve
@@ -1127,6 +1134,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
     stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
     writer->SetHeader(stream.str().c_str());
     }
+
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
   writer->Write();

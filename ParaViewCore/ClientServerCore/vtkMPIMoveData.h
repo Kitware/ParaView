@@ -17,6 +17,8 @@
 // This class combines all the duplicate and collection requirements
 // into one filter. It can move polydata and unstructured grid between
 // processes. It can redistributed polydata from M to N processors.
+// Update: This filter can now support delivering vtkUniformGridAMR datasets in
+// PASS_THROUGH and/or COLLECT modes.
 
 #ifndef __vtkMPIMoveData_h
 #define __vtkMPIMoveData_h
@@ -81,9 +83,7 @@ public:
   // communicating with other processes. Since communicating with other
   // processes in RequestDataObject is dangerous (can cause deadlock because
   // it may happen out-of-sync), the application has to set the output
-  // type. The default is VTK_POLY_DATA. Currently, only VTK_UNSTRUCTURED_GRID
-  // and VTK_POLY_DATA are supported. Make sure to call this before any
-  // pipeline updates occur.
+  // type. The default is VTK_POLY_DATA. 
   vtkSetMacro(OutputDataType, int);
   vtkGetMacro(OutputDataType, int);
 
