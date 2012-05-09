@@ -75,6 +75,11 @@ public:
   // Loops through the given AMR data and updates the resampled grid
   void Update();
 
+  // Description:
+  // For debugging, use this method to write out the sampled uniform grid at the
+  // given location.
+  bool WriteGrid(const char* filename);
+
 protected:
   vtkAMRIncrementalResampleHelper();
   virtual ~vtkAMRIncrementalResampleHelper();
@@ -92,7 +97,7 @@ protected:
   // Description:
   // Copies the data to the target from the given source.
   void CopyData( vtkFieldData *target, vtkIdType targetIdx,
-				 vtkCellData *src, vtkIdType srcIdx );
+    vtkCellData *src, vtkIdType srcIdx );
 
   // Description:
   // Transfer solution from a candidate donor grid at the given level.

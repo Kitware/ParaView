@@ -31,7 +31,6 @@
 // C++ includes
 #include <set>
 #include <cassert>
-#include <sstream>
 
 #define IMIN(ext) ext[0]
 #define IMAX(ext) ext[1]
@@ -62,8 +61,8 @@ vtkAMRIncrementalResampleHelper::vtkAMRIncrementalResampleHelper()
 {
   this->Controller          = vtkMultiProcessController::GetGlobalController();
   this->ProcessedBlocks     = new vtkAMRProcessedBlocksList;
-  this->Metadata		    = NULL;
-  this->AMRData				= NULL;
+  this->Metadata        = NULL;
+  this->AMRData        = NULL;
   this->Grid                = NULL;
 }
 
@@ -124,8 +123,8 @@ void vtkAMRIncrementalResampleHelper::UpdateROI(
   // STEP 3: Partition the grid to the number of processes.
   if( this->Controller->GetNumberOfProcesses( ) > 1 )
     {
-	// TODO: Call vtkUniformGridPartitioner to partition the output grid
-	// to the number of processes.
+  // TODO: Call vtkUniformGridPartitioner to partition the output grid
+  // to the number of processes.
     }
   else
     {
@@ -248,7 +247,7 @@ void vtkAMRIncrementalResampleHelper::TransferSolutionFromGrid(
   assert("pre: level >= 0" && (level >= 0) );
   assert("pre: Receiver grid is NULL!" && (this->Grid != NULL) );
   assert("pre: Receiver grid must have a DonorLevel array" &&
-         (this->Grid->GetPointData()->HasArray("DonorLevel") ) );
+    (this->Grid->GetPointData()->HasArray("DonorLevel") ) );
 
   // STEP 0: Construct the intersection box instance between the two grids,
   // initialized to the receiver grid.
@@ -261,51 +260,69 @@ void vtkAMRIncrementalResampleHelper::TransferSolutionFromGrid(
 
   // STEP 2: Get pointer to the donor level array
   vtkIntArray *donorLevel =
-	vtkIntArray::SafeDownCast(
-			this->Grid->GetPointData()->GetArray("DonorLevel") );
+    vtkIntArray::SafeDownCast(
+      this->Grid->GetPointData()->GetArray("DonorLevel") );
   assert("pre: donor level array is NULL" && (donorLevel != NULL) );
   assert("pre: donor level array is out-of-bounds" &&
-		 (donorLevel->GetNumberOfTuples()==this->Grid->GetNumberOfPoints()));
+    (donorLevel->GetNumberOfTuples()==this->Grid->GetNumberOfPoints()));
 
   // STEP 3: Check if the grids are intersecting
-  if( iBox.IntersectBox( donorBox ) )
+  if (!iBox.IntersectBox( donorBox ))
     {
-	// STEP 4: Declare/acquire some attributes computed in each loop
-	int ijk[3];
-	double pcoords[3];
-    vtkIdType pntIdx 	= 0;
-    int dataDescription =
-      vtkStructuredData::GetDataDescription(donorGrid->GetDimensions());
+    // nothing to do, boxes don't intersect.
+    return;
+    }
+  // STEP 4: Declare/acquire some attributes computed in each loop
+  int ijk[3];
+  double pcoords[3];
+  int dataDescription =
+    vtkStructuredData::GetDataDescription(donorGrid->GetDimensions());
 
-    // STEP 5: Loop through all the points and foreach point do:
-    // 1. Check if the value at the point is a lower resolution
-    // 2. If at a lower res, find the donorCell that contains the pnt
-    // 3. Override the data at the point with higher res values
-    // 4. Update the donorLevel array with the level of this donor grid
-    for( ; pntIdx < this->Grid->GetNumberOfPoints(); ++pntIdx )
+  bool data_changed = false;
+  // STEP 5: Loop through all the points and foreach point do:
+  // 1. Check if the value at the point is a lower resolution
+  // 2. If at a lower res, find the donorCell that contains the pnt
+  // 3. Override the data at the point with higher res values
+  // 4. Update the donorLevel array with the level of this donor grid
+  for (vtkIdType pntIdx=0; pntIdx < this->Grid->GetNumberOfPoints(); ++pntIdx )
+    {
+    if (donorLevel->GetValue( pntIdx ) < level)
       {
-      if( donorLevel->GetValue( pntIdx ) < level )
-       {
-       int status = donorGrid->ComputeStructuredCoordinates(
-    		   this->Grid->GetPoint(pntIdx), ijk, pcoords);
-       if( status == 1 )
-         {
-    	 // Compute the cell index
-    	 int cellIdx =
-    	  vtkStructuredData::ComputeCellId(
-    	     donorGrid->GetDimensions(),ijk,dataDescription);
+      int status = donorGrid->ComputeStructuredCoordinates(
+        this->Grid->GetPoint(pntIdx), ijk, pcoords);
+      if (status == 1)
+        {
+        // Compute the cell index
+        int cellIdx = vtkStructuredData::ComputeCellId(
+          donorGrid->GetDimensions(),ijk,dataDescription);
 
-    	 // Copy the data
-    	 this->CopyData(
-    		this->Grid->GetPointData(), pntIdx,
-    		donorGrid->GetCellData(), cellIdx );
+        // Copy the data
+        this->CopyData( this->Grid->GetPointData(), pntIdx,
+          donorGrid->GetCellData(), cellIdx );
 
-    	  // Upgrade donor level
-    	  donorLevel->SetValue(pntIdx, level);
-          } // END if point inside grid
-        } // END if the value at node is lower level
-      } // END for all grid points
-    } // END if the grids are intersecting
+        // Upgrade donor level
+        donorLevel->SetValue(pntIdx, level);
+
+        data_changed = true;
+        } // END if point inside grid
+      } // END if the value at node is lower level
+    } // END for all grid points
+
+  if (data_changed)
+    {
+    // Mark all scalar arrays modified. This required since otherwise the volume
+    // mappers may not realize that the scalars have changed, as well as the
+    // scalar range returned by the array may be outdated.
+    for (int cc=0; cc < this->Grid->GetPointData()->GetNumberOfArrays(); cc++)
+      {
+      vtkDataArray* array = this->Grid->GetPointData()->GetArray(cc);
+      if (array)
+        {
+        array->Modified();
+        }
+      }
+    this->Grid->Modified();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -319,8 +336,7 @@ void vtkAMRIncrementalResampleHelper::CopyData(
            (target->GetNumberOfArrays() == (src->GetNumberOfArrays() + 1) ) );
   // the extra array is the  "DonorLevel" array.
 
-  int arrayIdx = 0;
-  for( ; arrayIdx < src->GetNumberOfArrays(); ++arrayIdx )
+  for (int arrayIdx=0; arrayIdx < src->GetNumberOfArrays(); ++arrayIdx)
     {
     vtkDataArray *targetArray = target->GetArray( arrayIdx );
     vtkDataArray *srcArray    = src->GetArray( arrayIdx );
@@ -338,8 +354,7 @@ void vtkAMRIncrementalResampleHelper::CopyData(
             (targetIdx >= 0) &&
             (targetIdx < targetArray->GetNumberOfTuples() ) );
 
-    int c=0;
-    for( ; c < srcArray->GetNumberOfComponents(); ++c )
+    for (int c=0 ; c < srcArray->GetNumberOfComponents(); ++c )
       {
       double f = srcArray->GetComponent( srcIdx, c );
       targetArray->SetComponent( targetIdx, c, f );
@@ -401,12 +416,21 @@ void vtkAMRIncrementalResampleHelper::Update()
     } // END for all levels
 
 
-  vtkNew<vtkXMLImageDataWriter> imgWriter;
-  std::ostringstream oss;
-  oss << "/tmp/resampleddata." << imgWriter->GetDefaultFileExtension();
-  imgWriter->SetFileName( oss.str().c_str() );
-  imgWriter->SetInputData(this->Grid);
-  imgWriter->Write();
+
+}
+
+//------------------------------------------------------------------------------
+bool vtkAMRIncrementalResampleHelper::WriteGrid(const char* filename)
+{
+  if (this->Grid && filename && filename[0])
+    {
+    vtkNew<vtkXMLImageDataWriter> imgWriter;
+    imgWriter->SetFileName(filename);
+    imgWriter->SetInputData(this->Grid);
+    imgWriter->Write();
+    return true;
+    }
+  return false;
 }
 
 //------------------------------------------------------------------------------
