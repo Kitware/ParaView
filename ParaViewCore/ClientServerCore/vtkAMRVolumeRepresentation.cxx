@@ -52,6 +52,8 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
   this->Actor = vtkPVLODVolume::New();
   this->Actor->SetProperty(this->Property);
 
+  this->Resampler = vtkAMRIncrementalResampleHelper::New();
+
   this->CacheKeeper = vtkPVCacheKeeper::New();
 
   this->ColorArrayName = 0;
@@ -64,6 +66,8 @@ vtkAMRVolumeRepresentation::vtkAMRVolumeRepresentation()
 
   this->StreamingBlockId = 0;
   this->StreamingCapableSource = false;
+
+  this->InitializeResampler = true;
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +81,7 @@ vtkAMRVolumeRepresentation::~vtkAMRVolumeRepresentation()
   this->SetColorArrayName(0);
 
   this->Cache->Delete();
+  this->Resampler->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -89,12 +94,14 @@ int vtkAMRVolumeRepresentation::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-int
-vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
-                                                vtkInformationVector** inputVector,
-                                                vtkInformationVector* outputVector)
+int vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  this->Superclass::RequestUpdateExtent(request, inputVector, outputVector);
+  if (!this->Superclass::RequestUpdateExtent(
+      request, inputVector, outputVector))
+    {
+    return 0;
+    }
 
   // If this->StreamingCapableSource is true, i.e. input is streaming capable
   // and streaming is enabled, the update request is always "qualified". i.e. we
@@ -121,10 +128,8 @@ vtkAMRVolumeRepresentation::RequestUpdateExtent(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int
-vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
-                                               vtkInformationVector** inputVector,
-                                               vtkInformationVector* outputVector)
+int vtkAMRVolumeRepresentation::RequestInformation(vtkInformation* request,
+  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   if (!this->Superclass::RequestInformation(request, inputVector, outputVector))
     {
@@ -154,6 +159,7 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
     {
     return 0;
     }
+
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
     // FIXME:STREAMING :- how do we tell the view to use "cuts" from this
@@ -205,13 +211,18 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
             vtkImageData::SafeDownCast(mbs->GetBlock(0)));
           }
 #else
-        vtkNew<vtkAMRIncrementalResampleHelper> helper;
-        helper->Initialize(amr);
-        helper->SetAMRData(amr);
+        if (this->InitializeResampler)
+          {
+          cout << "init resampler" << endl;
+          this->Resampler->Initialize(amr);
+          this->Resampler->SetAMRData(amr);
+          this->InitializeResampler = false;
+          }
+
         int samples[3]= {40, 40, 40};
-        helper->UpdateROI(bounds, samples);
-        helper->Update();
-        this->VolumeMapper->SetInputData(helper->GetGrid());
+        this->Resampler->UpdateROI(bounds, samples);
+        this->Resampler->Update();
+        this->VolumeMapper->SetInputData(this->Resampler->GetGrid());
 #endif
         }
       else
@@ -247,6 +258,11 @@ int vtkAMRVolumeRepresentation::RequestData(vtkInformation* request,
       {
       amr->GetBounds(this->DataBounds);
       }
+    }
+
+  if (this->StreamingBlockId == 0 || !this->StreamingCapableSource)
+    {
+    this->InitializeResampler = true;
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -298,7 +314,9 @@ bool vtkAMRVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkAMRVolumeRepresentation::UpdateMapperParameters()
 {
   this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
-  this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
+  //this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
+  // FIXME: setting to RayCastRenderMode while we are debugging things
+  this->VolumeMapper->SetRequestedRenderMode(vtkSmartVolumeMapper::RayCastRenderMode);
 
   // we always say point-data, since the resampler samples to points.
   this->VolumeMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);

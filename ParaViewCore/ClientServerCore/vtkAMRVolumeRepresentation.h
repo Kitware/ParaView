@@ -24,15 +24,15 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for iVars.
 
-class vtkSmartVolumeMapper;
+class vtkAMRIncrementalResampleHelper;
 class vtkColorTransferFunction;
-class vtkFixedPointVolumeRayCastMapper;
 class vtkOverlappingAMR;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
 class vtkPVRenderView;
+class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
 class VTK_EXPORT vtkAMRVolumeRepresentation : public vtkPVDataRepresentation
@@ -188,6 +188,7 @@ protected:
   vtkSmartVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
+  vtkAMRIncrementalResampleHelper* Resampler;
   vtkWeakPointer<vtkPVRenderView> RenderView;
 
   int ColorAttributeType;
@@ -197,6 +198,7 @@ protected:
   int NumberOfSamples[3];
   bool FreezeFocalPoint;
   bool StreamingCapableSource;
+  bool InitializeResampler;
 
   unsigned int StreamingBlockId;
 
