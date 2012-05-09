@@ -325,6 +325,11 @@ set(_vtk_modules
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
   #  vtkPCosmoReader
+
+  vtkIOParallelLSDyna
+  # Note: Not in ParaViewXXX.xml but required by a test.
+  # Needed for:
+  #  vtkPLSDynaReader
   )
 
 # Are we building the GUI
