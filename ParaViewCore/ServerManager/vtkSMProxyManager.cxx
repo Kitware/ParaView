@@ -33,7 +33,7 @@
 
 #include <map>
 
-//#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
+#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL
 //***************************************************************************
 class vtkSMProxyManager::vtkPXMInternal
 {
@@ -184,10 +184,10 @@ bool vtkSMProxyManager::IsInitialized()
 }
 
 //----------------------------------------------------------------------------
-//const char* vtkSMProxyManager::GetParaViewSourceVersion()
-//{
-//  return PARAVIEW_SOURCE_VERSION;
-//}
+const char* vtkSMProxyManager::GetParaViewSourceVersion()
+{
+  return PARAVIEW_SOURCE_VERSION;
+}
 
 //----------------------------------------------------------------------------
 int vtkSMProxyManager::GetVersionMajor()

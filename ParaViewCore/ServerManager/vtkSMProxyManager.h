@@ -78,7 +78,7 @@ public:
 
   // Description:
   // Returns a string with the format "paraview version x.x.x, Date: YYYY-MM-DD"
-  //static const char* GetParaViewSourceVersion();
+  static const char* GetParaViewSourceVersion();
 
   // Description:
   // Returns the current active session. If no active session is set, and
