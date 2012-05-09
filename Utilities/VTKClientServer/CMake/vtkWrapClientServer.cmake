@@ -44,6 +44,17 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     SET(TMP_HINTS)
   ENDIF (VTK_WRAP_HINTS)
 
+  set(_include_dirs_file)
+  foreach(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
+    set(_include_dirs_file "${_include_dirs_file}${INCLUDE_DIR}\n")
+  endforeach()
+  
+  string(STRIP "${_include_dirs_file}" CMAKE_CONFIGURABLE_FILE_CONTENT)
+  set(_target_includes_file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.inc)
+  configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+                 ${_target_includes_file} @ONLY)    
+  set(_target_includes "--includes ${_target_includes_file}")
+
   # For each class
   FOREACH(FILE ${SOURCES})
 
@@ -88,13 +99,13 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
       ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         MAIN_DEPENDENCY ${TMP_INPUT}
-        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS}
+        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS
         ${TMP_CONCRETE}
         ${TMP_HINTS}
         ${TMP_DEFINITIONS}
-        ${TMP_INCLUDE}
+        ${_target_includes}
         ${TMP_INPUT}
         ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         )
