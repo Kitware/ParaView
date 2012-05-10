@@ -99,7 +99,7 @@ class MyProcess : public vtkProcess
   bool UseDepthPeeling;
 public:
   static MyProcess *New();
-  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  vtkTypeMacro(MyProcess, vtkProcess);
 
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
@@ -133,7 +133,6 @@ protected:
   bool ServerMode;
 };
 
-vtkCxxRevisionMacro(MyProcess, "$Revision$");
 vtkStandardNewMacro(MyProcess);
 
 //-----------------------------------------------------------------------------

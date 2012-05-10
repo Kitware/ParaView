@@ -96,7 +96,7 @@ class MyProcess : public vtkProcess
   bool DepthOnly;
 public:
   static MyProcess *New();
-  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  vtkTypeMacro(MyProcess, vtkProcess);
 
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
