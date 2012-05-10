@@ -59,7 +59,6 @@ Ph.D. thesis of Christian BOUCHENY.
 #include "vtkCamera.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkDepthImageProcessingPass, "$Revision: 1.1 $");
 vtkCxxSetObjectMacro(vtkDepthImageProcessingPass,DelegatePass,vtkRenderPass);
 
 // ----------------------------------------------------------------------------

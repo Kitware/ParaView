@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 2.6)
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
 FIND_PACKAGE(VTK REQUIRED)
-IF(NOT VTK_USE_RENDERING)
-  MESSAGE(FATAL_ERROR "Example ${PROJECT_NAME} requires VTK_USE_RENDERING.")
-ENDIF(NOT VTK_USE_RENDERING)
 INCLUDE(${VTK_USE_FILE})
+if(NOT Module_vtkRenderingOpenGL)
+  message(FATAL_ERROR "Example ${PROJECT_NAME} requires rendering.")
+endif()
 
 SET( SRC_FILES
    vtkDepthImageProcessingPass.cxx
@@ -44,7 +44,9 @@ foreach(file ${GLSL_SRCS})
 endforeach(file)
 
 add_library(OffscreenShading SHARED ${SRC_FILES} ${EXTRA_SRCS})
-target_link_libraries(OffscreenShading vtkRendering ${OPENGL_gl_LIBRARY})
+target_link_libraries(OffscreenShading
+  vtkRenderingOpenGL
+  ${OPENGL_gl_LIBRARY})
 
 install( TARGETS OffscreenShading
    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
@@ -52,7 +54,7 @@ install( TARGETS OffscreenShading
    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development
    )
 
-include(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
+include(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
 IF(NOT VTK_INSTALL_NO_DEVELOPMENT)
   STRING(REGEX REPLACE "^/" "" VTK_INSTALL_PACKAGE_DIR_CM24 "${VTK_INSTALL_PACKAGE_DIR}")
 ENDIF(NOT VTK_INSTALL_NO_DEVELOPMENT)
