@@ -46,6 +46,8 @@ endforeach(file)
 add_library(OffscreenShading SHARED ${SRC_FILES} ${EXTRA_SRCS})
 target_link_libraries(OffscreenShading
   vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
+  vtkInteractionStyle
   ${OPENGL_gl_LIBRARY})
 
 install( TARGETS OffscreenShading
