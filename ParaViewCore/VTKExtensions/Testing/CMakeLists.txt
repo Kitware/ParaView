@@ -33,7 +33,7 @@ FOREACH(name ${ServersFilters_SRCS})
     vtkInteractionImage)
 ENDFOREACH(name)
 
-IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND VTK_USE_DISPLAY AND
+IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
    PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
   TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVVTKExtensions)
@@ -96,7 +96,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND VTK_USE_DISPLAY AND
 ENDIF()
 
 
-IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
+if(Module_vtkRenderingOpenGL AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
 # Enable these after the transfer function can take the vtkTable histograms.
 #TestTransferFunctionEditor
@@ -112,7 +112,7 @@ TestPVAMRDualClip
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVVTKExtensions)
   ENDFOREACH(name)
-ENDIF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
+endif()
 
 IF (PARAVIEW_USE_MPI)
     IF (MPI_LIBRARY)

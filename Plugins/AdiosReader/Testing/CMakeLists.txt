@@ -2,7 +2,7 @@
 ### FIXME ###
 #############
 
-IF(VTK_USE_DISPLAY AND VTK_USE_RENDERING)
+if(Module_vtkRenderingOpenGL)
   IF(VTK_USE_ADIOS)
     SET(ConditionalTests
       ${ConditionalTests}
@@ -18,16 +18,16 @@ IF(VTK_USE_DISPLAY AND VTK_USE_RENDERING)
     TARGET_LINK_LIBRARIES(TestAdiosInternals vtkParallel vtkIO vtkGraphics vtkImaging vtkRendering ${ADIOS_READ_LIBRARY})
   ENDIF(VTK_USE_ADIOS)
 
-ENDIF(VTK_USE_DISPLAY AND VTK_USE_RENDERING)
+endif()
 
 
 IF (VTK_DATA_ROOT)
-  IF (VTK_USE_DISPLAY AND VTK_USE_RENDERING)
+  if(Module_vtkRenderingOpenGL)
     IF(VTK_USE_ADIOS)
       ADD_TEST(TestAdiosReader ${CXX_TEST_PATH}/${KIT}CxxTests
            TestAdiosReader -D ${VTK_DATA_ROOT}
            -T ${VTK_BINARY_DIR}/Testing/Temporary
            -V ${VTK_DATA_ROOT}/Baseline/${KIT}/TestAdiosReader.png)
     ENDIF(VTK_USE_ADIOS)
-  ENDIF (VTK_USE_DISPLAY AND VTK_USE_RENDERING)
+  endif()
 ENDIF (VTK_DATA_ROOT)
