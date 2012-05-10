@@ -390,19 +390,13 @@ PVVTK_ADD_LIBRARY(pqCore
 #)
 
 TARGET_LINK_LIBRARIES(pqCore
-  QtTesting
   pqWidgets
-  vtkGUISupportQt
-  vtkChartsCore
-  vtkPVServerManager
   protobuf
+  QtTesting
+  vtkChartsCore
+  vtkGUISupportQt
+  vtkPVServerManager
 )
-
-IF(VTK_USE_INFOVIS)
-  TARGET_LINK_LIBRARIES(pqCore
-    vtkInfovisCS
-  )
-ENDIF(VTK_USE_INFOVIS)
 
 IF(QT_TESTING_WITH_PYTHON)
   TARGET_LINK_LIBRARIES(pqCore

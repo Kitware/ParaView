@@ -39,7 +39,9 @@
 #include "vtkImageRenderManager.h"
 #include "vtkLightsPass.h"
 #include "vtkMPIController.h"
+#include "vtkObjectFactory.h"
 #include "vtkOpaquePass.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOverlayPass.h"
 #include "vtkPieceScalars.h"
@@ -49,7 +51,6 @@
 #include "vtkProperty.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
-#include "vtkOpenGLRenderer.h"
 #include "vtkRenderPassCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -135,7 +136,6 @@ protected:
   bool ServerMode;
 };
 
-vtkCxxRevisionMacro(MyProcess, "$Revision$");
 vtkStandardNewMacro(MyProcess);
 
 //-----------------------------------------------------------------------------

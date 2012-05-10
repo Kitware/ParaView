@@ -74,7 +74,7 @@ ENDIF (PVServerManagerTestData)
 
 ################################################################################
 # ParaView ServerManager Unit Tests
-if(${VTK_USE_QT})
+if (PARAVIEW_ENABLE_QT_SUPPORT)
   find_package(Qt4 COMPONENTS QtCore QtTest REQUIRED)
   set(QT_DONT_USE_QTGUI TRUE)
   set(QT_USE_QTTEST TRUE)

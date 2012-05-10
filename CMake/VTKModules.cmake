@@ -1,5 +1,6 @@
 #########################################################################
 # This file turns on the modules needed by ParaView
+include (vtkDependentOption)
 
 # First turn of stand alone group 
 set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
@@ -333,7 +334,17 @@ set(_vtk_modules
   )
 
 # Are we building the GUI
-set(Module_vtkGUISupportQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
+
+set (PARAVIEW_BUILD_QT_GUI_NOT TRUE)
+if (PARAVIEW_BUILD_QT_GUI)
+  set (PARAVIEW_BUILD_QT_GUI_NOT FALSE)
+endif()
+
+VTK_DEPENDENT_OPTION(PARAVIEW_ENABLE_QT_SUPPORT
+  "Build ParaView with Qt support (without GUI)" OFF
+  "PARAVIEW_BUILD_QT_GUI_NOT" ON)
+
+set(Module_vtkGUISupportQt ${PARAVIEW_ENABLE_QT_SUPPORT} CACHE BOOL "" FORCE)
 mark_as_advanced(Module_vtkGUISupportQt)
   
 # Modules needed if testing is on
