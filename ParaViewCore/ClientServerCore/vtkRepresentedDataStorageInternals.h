@@ -37,10 +37,13 @@ public:
   public:
     unsigned int RepresentationId;
     unsigned int BlockId;
+    unsigned int Level;
+    unsigned int Index;
     double Priority;
 
     vtkPriorityQueueItem() :
-      RepresentationId(0), BlockId(0), Priority(0)
+      RepresentationId(0), BlockId(0),
+      Level(0), Index(0), Priority(0)
     {
     }
 

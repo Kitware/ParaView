@@ -184,14 +184,14 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
         producerPort->GetProducer()->GetOutputDataObject(0));
       if (amr)
         {
-        cout << "AMR Being Rendering -----" << endl;
-        for (unsigned int cc=0; cc < amr->GetNumberOfLevels(); cc++)
-          {
-          for (unsigned int kk=0; kk < amr->GetNumberOfDataSets(cc); kk++)
-            {
-            cout << cc <<", " << kk << " = " << amr->GetDataSet(cc, kk) << endl;
-            }
-          }
+        //cout << "AMR Being Rendering -----" << endl;
+        //for (unsigned int cc=0; cc < amr->GetNumberOfLevels(); cc++)
+        //  {
+        //  for (unsigned int kk=0; kk < amr->GetNumberOfDataSets(cc); kk++)
+        //    {
+        //    cout << cc <<", " << kk << " = " << amr->GetDataSet(cc, kk) << endl;
+        //    }
+        //  }
 
         double bounds[6];
         amr->GetBounds(bounds);

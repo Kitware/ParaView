@@ -18,7 +18,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkAMRVolumeRepresentation.h"
 #include "vtkBSPCutsGenerator.h"
-#include "vtkFieldData.h"
+#include "vtkPointData.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -420,6 +420,8 @@ bool vtkRepresentedDataStorage::BuildPriorityQueue()
         item.RepresentationId = iter->first;
         item.BlockId = block_id;
         item.Priority = 1.0 / (1.0 + block_id);
+        item.Level = level;
+        item.Index = index;
         this->Internals->PriorityQueue.push(item);
         }
       block_id++;
@@ -444,22 +446,33 @@ void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
     // client side.
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(VTK_OVERLAPPING_AMR);
+    dataMover->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
     dataMover->SetMoveModeToCollect();
     dataMover->SetInputConnection(NULL);
     dataMover->Update();
 
     // now put the piece in right place.
-    vtkOverlappingAMR* ds = vtkOverlappingAMR::SafeDownCast(
+    vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(
       dataMover->GetOutputDataObject(0));
-    vtkCompositeDataIterator* iter = ds->NewIterator();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-      iter->GoToNextItem())
+
+    if (mb->GetNumberOfBlocks() == 1 && mb->GetBlock(0) != NULL)
       {
-      oamr->SetDataSet(iter, iter->GetCurrentDataObject());
+      vtkNew<vtkUniformGrid> ug;
+      ug->ShallowCopy(mb->GetBlock(0));
+
+      vtkUnsignedIntArray* array = vtkUnsignedIntArray::SafeDownCast(
+        ug->GetPointData()->GetArray("AMRIndex"));
+      unsigned int index, level;
+      level = array->GetValue(0);
+      index = array->GetValue(1);
+      ug->GetPointData()->RemoveArray("AMRIndex");
+      oamr->SetDataSet(level, index, ug.GetPointer());
+      oamr->Modified();
       }
-    iter->Delete();
-    oamr->Modified();
+    else
+      {
+      vtkWarningMacro("Empty data (or incorrect data) received");
+      }
     }
   else
     {
@@ -475,13 +488,40 @@ void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
     repr->ResetStreamingBlockId();
 
     oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
+
+    vtkNew<vtkMultiBlockDataSet> mb;
+
+    vtkUniformGrid* piece = oamr->GetDataSet(qitem.Level, qitem.Index);
+    if (piece == NULL)
+      {
+      vtkWarningMacro("Null piece delivered!");
+      }
+    else
+      {
+      vtkNew<vtkImageData> img;
+      img->ShallowCopy(piece);
+      mb->SetBlock(0, img.GetPointer());
+
+      vtkNew<vtkUnsignedIntArray> indexArray;
+      indexArray->SetName("AMRIndex");
+      indexArray->SetNumberOfComponents(2);
+      indexArray->SetNumberOfTuples(1);
+      indexArray->SetValue(0, qitem.Level);
+      indexArray->SetValue(1, qitem.Index);
+
+      // this should be added in field data, however
+      // vtkStructuredPointsReader/Writer get confused when field data is
+      // present. So adding this as point data for now.
+      img->GetPointData()->AddArray(indexArray.GetPointer());
+      }
+
     // the one bad thing about this is that we are sending the full amr
     // meta-data again. We can do better here and not send it again.
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(VTK_OVERLAPPING_AMR);
+    dataMover->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
     dataMover->SetMoveModeToCollect();
-    dataMover->SetInputData(oamr);
+    dataMover->SetInputData(mb.GetPointer());
     dataMover->Update();
     }
 }
