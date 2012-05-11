@@ -39,10 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContextView.h"
 #include "pqEditCameraReaction.h"
 #include "pqInterfaceTracker.h"
-#include "pqViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqRenderView.h"
+#include "pqToggleInteractionViewMode.h"
 #include "pqUndoStack.h"
+#include "pqViewFrame.h"
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
 
@@ -104,6 +105,10 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");
     cameraAction->setObjectName("CameraButton");
     new pqEditCameraReaction(cameraAction, view);
+
+    QAction* interactionModeAction = frame->addTitleBarAction("3D");
+    interactionModeAction->setObjectName("ToggleInteractionMode");
+    new pqToggleInteractionViewMode(interactionModeAction, view);
     }
 
   QAction* optionsAction = frame->addTitleBarAction(

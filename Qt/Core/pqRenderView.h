@@ -166,13 +166,16 @@ public:
   /// restore the default light parameters
   virtual void restoreDefaultLightSettings();
 public:
-  /// Returns a array of 9 ManipulatorType objects defining
-  /// default set of camera manipulators used by this type of view.
-  /// There are exactly 9 entires in the returned array. It's is deliberately
-  /// returned as non-constant. Developers can change the default by directly
-  /// updating the entries.
-  static ManipulatorType* getDefaultManipulatorTypes()
-    { return pqRenderView::DefaultManipulatorTypes; }
+  /// Return 9 default 3D manipulators (Used inside settings)
+  static ManipulatorType* getDefault3DManipulatorTypes()
+  { return & pqRenderView::DefaultManipulatorTypes[0]; }
+
+  /// Return 9 default 2D manipulators (Used inside settings)
+  static ManipulatorType* getDefault2DManipulatorTypes()
+  { return & pqRenderView::DefaultManipulatorTypes[9]; }
+
+  /// Return all possible manipulators
+  virtual ManipulatorType* getManipulatorTypes(int &numberOfManipulatorType);
 
   /// Creates a new surface selection given the rectangle in display
   /// coordinates.
@@ -243,6 +246,9 @@ public slots:
   void resetCenterOfRotationIfNeeded()
     { this->onResetCameraEvent(); }
 
+  /// Try to provide the best view orientation and interaction mode
+  void updateInteractionMode(pqOutputPort* opPort);
+
 private slots:
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.
@@ -291,14 +297,8 @@ protected:
     { return "renderModule"; }
 
   /// Returns the name of the group in which to save the interactor style
-  /// settings.
-  virtual const char* interactorStyleSettingsGroup() const
-    { return "renderModule/InteractorStyle"; }
-
-
-  /// Must be overridden to return the default manipulator types.
-  virtual const ManipulatorType* getDefaultManipulatorTypesInternal()
-    { return pqRenderView::getDefaultManipulatorTypes(); }
+  /// settings with the corresponding CameraManipulator name.
+  virtual QMap<QString, QString> interactorStyleSettingsGroupToCameraManipulatorName() const;
 
   /// Setups up RenderModule and QVTKWidget binding.
   /// This method is called for all pqRenderView objects irrespective
@@ -315,7 +315,7 @@ private:
     vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,
     bool expand, bool select_blocks);
 
-  static ManipulatorType DefaultManipulatorTypes[9];
+  static ManipulatorType DefaultManipulatorTypes[18];
 
   void InternalConstructor(vtkSMViewProxy *renModule);
 };
