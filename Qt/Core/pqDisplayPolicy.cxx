@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkStructuredData.h"
+#include "vtkSMPropertyHelper.h"
 
 #include <QtDebug>
 #include <QString>
@@ -187,6 +188,13 @@ pqView* pqDisplayPolicy::getPreferredView(
       currentView = builder->createView(pqRenderView::renderViewType(),
         opPort->getServer());
       }
+    }
+
+  // Try to provide the best interaction mode to it if possible
+  pqRenderView* view = qobject_cast<pqRenderView*>(currentView);
+  if(view && 0 == vtkSMPropertyHelper(view->getProxy(), "Representations").GetNumberOfElements())
+    {
+    view->updateInteractionMode(opPort);
     }
 
   // No hints. We don't know what type of view is suitable
