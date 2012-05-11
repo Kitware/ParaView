@@ -199,6 +199,9 @@ signals:
   void triggeredUserListChanged();
   void triggerFollowCamera(int);
 
+  /// Forward request for disconnection
+  void closeSessionRequest();
+
 public slots:
   /// Allow user to broadcast to other client a given message
   void sendToOtherClients(vtkSMMessage* msg);
