@@ -93,6 +93,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ReadXMLPolyDataFileSeries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RectilinearFractal.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/RepresentationSelector.xml
+
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
@@ -146,6 +147,7 @@ ENDIF ("1" STREQUAL ${HAS_NUMPY})
 set(AboutDialog_USE_NEW_PANELS TRUE)
 set(ExodusXML_USE_NEW_PANELS TRUE)
 set(GridConnectivity_USE_NEW_PANELS TRUE)
+set(PlotEdges2_USE_NEW_PANELS TRUE)
 set(RenderNan_USE_NEW_PANELS TRUE)
 set(Slice_USE_NEW_PANELS TRUE)
 set(SpreadSheet1_USE_NEW_PANELS TRUE)
@@ -164,6 +166,8 @@ set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGrid_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
+set(XYChart_USE_NEW_PANELS TRUE)
+set(XYHistogram_USE_NEW_PANELS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(Threshold_BREAK TRUE)

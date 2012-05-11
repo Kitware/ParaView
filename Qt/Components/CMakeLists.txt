@@ -95,6 +95,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayArrayWidget.h
   pqDisplayColorWidget.h
   pqDisplayPanel.h
+  pqDisplayPanelPropertyWidget.h
   pqDisplayProxyEditor.h
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
@@ -462,6 +463,8 @@ VTK_ADD_LIBRARY(pqComponents
   pqDisplayColorWidget.h
   pqDisplayPanel.cxx
   pqDisplayPanel.h
+  pqDisplayPanelPropertyWidget.cxx
+  pqDisplayPanelPropertyWidget.h
   pqDisplayProxyEditor.cxx
   pqDisplayProxyEditor.h
   pqDisplayProxyEditorWidget.h
