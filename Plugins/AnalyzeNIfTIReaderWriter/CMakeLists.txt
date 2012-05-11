@@ -38,7 +38,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
         ${CMAKE_CURRENT_SOURCE_DIR}
        )
       
-      if(${CMAKE_VERSION} LESS 2.8.7 AND NOT WIN32)
+      if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
         include(Qt4Macros-CMake2.8.7)
       endif()
    ENDIF(QT4_FOUND)

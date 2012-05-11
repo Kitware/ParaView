@@ -25,7 +25,7 @@ SET (QT_USE_QTNETWORK TRUE)
 # in any of the SUBDIRS in this directory.
 INCLUDE(${QT_USE_FILE})
 
-if(${CMAKE_VERSION} LESS 2.8.7 AND NOT WIN32)
+if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
   include(Qt4Macros-CMake2.8.7)
 endif()
 
