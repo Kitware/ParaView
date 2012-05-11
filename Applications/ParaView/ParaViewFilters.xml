@@ -87,6 +87,7 @@
   </Category>
   
   <Proxy group="filters" name="UniformGridPartitioner" />
+  <Proxy group="filters" name="AnnotateGlobalData" />
   <Proxy group="filters" name="Append" />
   <Proxy group="filters" name="AppendAttributes" />
   <Proxy group="filters" name="AppendPolyData" />
