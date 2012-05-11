@@ -193,7 +193,7 @@ INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 # Create ClientServer wrappers for ParaView classes.
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
 VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
@@ -226,7 +226,7 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 
 # Create the library.
-VTK_ADD_LIBRARY(vtk${KIT}
+PVVTK_ADD_LIBRARY(vtk${KIT}
   ${Kit_SRCS}
   ${KitInstantiator_SRCS}
   )

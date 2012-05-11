@@ -39,10 +39,11 @@
 #include "vtkImageRenderManager.h"
 #include "vtkLightsPass.h"
 #include "vtkMPIController.h"
+#include "vtkObjectFactory.h"
 #include "vtkOpaquePass.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOverlayPass.h"
-#include "vtkParallelFactory.h"
 #include "vtkPieceScalars.h"
 #include "vtkPKdTree.h"
 #include "vtkPlaneSource.h"
@@ -50,7 +51,6 @@
 #include "vtkProperty.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
-#include "vtkOpenGLRenderer.h"
 #include "vtkRenderPassCollection.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -96,7 +96,7 @@ class MyProcess : public vtkProcess
   bool DepthOnly;
 public:
   static MyProcess *New();
-  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  vtkTypeMacro(MyProcess, vtkProcess);
 
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
@@ -136,7 +136,6 @@ protected:
   bool ServerMode;
 };
 
-vtkCxxRevisionMacro(MyProcess, "$Revision$");
 vtkStandardNewMacro(MyProcess);
 
 //-----------------------------------------------------------------------------

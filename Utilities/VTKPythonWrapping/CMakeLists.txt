@@ -33,12 +33,6 @@ IF(VTK_USE_X)
     ${CMAKE_Xlib_INCLUDE_PATH} ${CMAKE_Xutil_INCLUDE_PATH})
 ENDIF(VTK_USE_X)
 
-IF(VTK_HAVE_VP1000)
-  # VolumePro VP 1000 include directory.
-  SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
-    ${VLI_INCLUDE_PATH_FOR_VP1000})
-ENDIF(VTK_HAVE_VP1000)
-
 IF(VTK_USE_MANGLED_MESA)
   # Mangled Mesa include directory.
   SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
@@ -76,17 +70,6 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(PV_PYTHON_FILES
     demos/demo1
     demos/show_grid_as_background
-    vtk/__init__
-    vtk/genericfiltering
-    vtk/geovis
-    vtk/hybrid
-    vtk/imaging
-    vtk/infovis
-    vtk/io
-    vtk/parallel
-    vtk/views
-    vtk/volumerendering
-    vtk/widgets
     vtk/algorithms
     vtk/dataset_adapter
     servermanager
@@ -122,6 +105,21 @@ IF (PARAVIEW_ENABLE_PYTHON)
     SET(src "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/${file}.py")
     SET(PV_PYTHON_SOURCE_FILES ${PV_PYTHON_SOURCE_FILES} ${src})
   ENDFOREACH(file)
+
+  # We need to copy over the VTK generate files for each module
+  file(GLOB vtk_python_files ${VTK_BINARY_DIR}/Wrapping/Python/vtk/*.py)
+  
+  foreach(file ${vtk_python_files})
+    get_filename_component(name ${file} NAME)
+    set(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/vtk/${name}")
+    
+    add_custom_command(DEPENDS ${file}
+      COMMAND ${CMAKE_COMMAND}
+      ARGS -E copy ${file} ${tgt}
+      OUTPUT ${tgt}
+      COMMENT "source copy")
+    SET(PV_PYTHON_OUTPUT_FILES ${PV_PYTHON_OUTPUT_FILES} ${tgt})
+  endforeach()
 
   IF ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
     #MESSAGE("In source build -- no need to copy Python files.")
@@ -189,57 +187,29 @@ IF (PARAVIEW_ENABLE_PYTHON)
     SET(VTK_PYTHON_HAS_CONFIG_TYPES 0)
     SET(VTK_PYTHON_BUILD_TYPE "[]")
   ENDIF(CMAKE_CONFIGURATION_TYPES)
-  IF(VTK_USE_RENDERING)
-    SET(VTK_PYTHON_USE_RENDERING 1)
-  ELSE(VTK_USE_RENDERING)
-    SET(VTK_PYTHON_USE_RENDERING 0)
-  ENDIF(VTK_USE_RENDERING)
-  IF(VTK_USE_PARALLEL)
-    SET(VTK_PYTHON_USE_PARALLEL 1)
-  ELSE(VTK_USE_PARALLEL)
-    SET(VTK_PYTHON_USE_PARALLEL 0)
-  ENDIF(VTK_USE_PARALLEL)
-  IF(VTK_USE_CHARTS)
-    SET(VTK_PYTHON_USE_CHARTS 1)
-  ELSE(VTK_USE_CHARTS)
-    SET(VTK_PYTHON_USE_CHARTS 0)
-  ENDIF(VTK_USE_CHARTS)
-  IF(VTK_USE_GEOVIS)
-    SET(VTK_PYTHON_USE_GEOVIS 1)
-  ELSE(VTK_USE_GEOVIS)
-    SET(VTK_PYTHON_USE_GEOVIS 0)
-  ENDIF(VTK_USE_GEOVIS)
-  IF(VTK_USE_INFOVIS)
-    SET(VTK_PYTHON_USE_INFOVIS 1)
-  ELSE(VTK_USE_INFOVIS)
-    SET(VTK_PYTHON_USE_INFOVIS 0)
-  ENDIF(VTK_USE_INFOVIS)
-  IF(VTK_USE_TEXT_ANALYSIS)
-    SET(VTK_PYTHON_USE_TEXT_ANALYSIS 1)
-  ELSE(VTK_USE_TEXT_ANALYSIS)
-    SET(VTK_PYTHON_USE_TEXT_ANALYSIS 0)
-  ENDIF(VTK_USE_TEXT_ANALYSIS)
-  IF(VTK_USE_VIEWS)
-    SET(VTK_PYTHON_USE_VIEWS 1)
-  ELSE(VTK_USE_VIEWS)
-    SET(VTK_PYTHON_USE_VIEWS 0)
-  ENDIF(VTK_USE_VIEWS)
-  IF(VTK_USE_MPI)
-    SET(VTK_PYTHON_USE_MPI 1)
-  ELSE(VTK_USE_MPI)
-    SET(VTK_PYTHON_USE_MPI 0)
-  ENDIF(VTK_USE_MPI)
-  IF(VTK_USE_QT AND VTK_WRAP_PYTHON_SIP)
-    SET(VTK_PYTHON_USE_QT 1)
-  ELSE(VTK_USE_QT AND VTK_WRAP_PYTHON_SIP)
-    SET(VTK_PYTHON_USE_QT 0)
-  ENDIF(VTK_USE_QT AND VTK_WRAP_PYTHON_SIP)
+
   IF(VTK_WRAP_PYTHON_SIP)
     SET(VTK_PYTHON_USE_SIP 1)
   ELSE(VTK_WRAP_PYTHON_SIP)
     SET(VTK_PYTHON_USE_SIP 0)
   ENDIF(VTK_WRAP_PYTHON_SIP)
   
+  # Setup VTK_PYTHON_MODULES, used in setup.py.in
+  set(VTK_PYTHON_MODULES)
+  set(PV_VTK_PYTHON_IMPORTS)
+  
+  
+  foreach(_vtk_module ${VTK_MODULES_ENABLED})
+   if(NOT ${_vtk_module}_EXCLUDE_FROM_WRAPPING)
+     list(APPEND VTK_PYTHON_MODULES ${_vtk_module})
+     set(PV_VTK_PYTHON_IMPORTS "${PV_VTK_PYTHON_IMPORTS}from ${_vtk_module} import *\n") 
+   endif() 
+  endforeach()  
+  
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
                ${CMAKE_CURRENT_BINARY_DIR}/setup.py @ONLY IMMEDIATE)
+               
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/paraview/vtk/__init__.py.in
+    ${PV_PYTHON_MODULE_BINARY_DIR}/vtk/__init__.py)                
+               
 ENDIF (PARAVIEW_ENABLE_PYTHON)

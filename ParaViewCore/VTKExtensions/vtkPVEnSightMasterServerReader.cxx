@@ -27,12 +27,12 @@
 #include "vtkPVEnSightMasterServerTranslator.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #include "vtkTransmitPolyDataPiece.h"
 #include "vtkTransmitUnstructuredGridPiece.h"
 #include "vtkUnstructuredGrid.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # include "vtkMPICommunicator.h"
 #endif
 
@@ -92,7 +92,7 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 template <class T>
 int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
                                        int numPieces,

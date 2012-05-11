@@ -27,10 +27,10 @@ SET ( EXES_LIBS_EXPORT_DIR ${VTK_DIR} )
 MARK_AS_ADVANCED ( EXES_LIBS_EXPORT_DIR )
 
 # Set specific VTK libraries to link against
-SET ( VTK_LINK_LIBRARIES vtkRendering vtkGraphics vtkFiltering)
-IF ( VTK_USE_PARALLEL )
-  SET (VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkParallel )
-ENDIF( VTK_USE_PARALLEL )
+set( VTK_LINK_LIBRARIES vtkRenderingOpenGL vtkFiltersCore)
+if( Module_vtkParallelCore )
+  set(VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkParallelCore )
+endif()
 IF (BUILD_AGAINST_PARAVIEW)
   SET ( VTK_LINK_LIBRARIES ${VTK_LINK_LIBRARIES} vtkPVVTKExtensions vtkPVClientServerCore)
   INCLUDE_DIRECTORIES(
@@ -108,13 +108,11 @@ INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
 
 # Setup the output directories.
 #TODO: What are these for, are they necessary?
-SET ( LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
-      "Single output directory for building all libraries."
-    )
+SET ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 SET ( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
       "Single output directory for building all executables."
     )
-MARK_AS_ADVANCED ( LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH )
+MARK_AS_ADVANCED ( CMAKE_LIBRARY_OUTPUT_DIRECTORY EXECUTABLE_OUTPUT_PATH )
 
 # Create the header to configure the classes.
 CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/vtkMantaConfigure.h.in
@@ -232,7 +230,7 @@ IF ( MANTA_WRAP_TCL )
   
   IF ( CMAKE_CONFIGURATION_TYPES )
     FOREACH ( config ${CMAKE_CONFIGURATION_TYPES} )
-      SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}/${config}" )
+      SET ( VTKManta_TCL_LIBRARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${config}" )
       CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in
         ${PROJECT_BINARY_DIR}/${config}/pkgIndex.tcl
         @ONLY
@@ -240,7 +238,7 @@ IF ( MANTA_WRAP_TCL )
         )
     ENDFOREACH ( config )
   ELSE ( CMAKE_CONFIGURATION_TYPES )
-    SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}" )
+    SET ( VTKManta_TCL_LIBRARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" )
     CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in  
       ${PROJECT_BINARY_DIR}/pkgIndex.tcl     
       @ONLY

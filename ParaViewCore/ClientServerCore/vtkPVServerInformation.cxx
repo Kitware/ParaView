@@ -21,7 +21,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVServerOptions.h"
 #include "vtkPVServerOptionsInternals.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #include "vtkPVSession.h"
 #include "vtkCompositeMultiProcessController.h"
 
@@ -41,7 +41,7 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->TileMullions[0] = this->TileMullions[1] = 0;
   this->UseOffscreenRendering = 0;
   this->Timeout = 0;
-#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+#if defined(PARAVIEW_USE_ICE_T) && defined(PARAVIEW_USE_MPI)
   this->UseIceT = 1;
 #else
   this->UseIceT = 0;

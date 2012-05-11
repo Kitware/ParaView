@@ -29,7 +29,11 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 # they are not done directly in the above python script due to the fact
 # that they would make the python script rather ugly
 ADD_EXECUTABLE(CoProcessingCompareImagesTester CompareImages.cxx)
-TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester vtkCommon vtkIO vtkRendering)
+TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
+  vtkTestingRendering
+  vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
+  vtkInteractionStyle)
 
 IF (PARAVIEW_DATA_ROOT)
   IF (PARAVIEW_ENABLE_PYTHON)

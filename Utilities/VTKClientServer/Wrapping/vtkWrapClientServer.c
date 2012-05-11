@@ -1094,6 +1094,9 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
 
   data = fileInfo->MainClass;
 
+  if(!data)
+    return;
+
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->Name);
   fprintf(fp,"#define VTK_WRAPPING_CXX\n");
   if(strcmp("vtkObjectBase", data->Name) != 0)

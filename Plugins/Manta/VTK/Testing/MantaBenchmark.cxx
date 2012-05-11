@@ -27,7 +27,7 @@
 #include "vtkMantaTestSource.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
-#include "vtkParallelFactory.h"
+#include "vtkObjectFactory.h"
 #include "vtkPlane.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProcess.h"

@@ -30,7 +30,6 @@
 #include "vtkStructuredPoints.h"
 #include "vtkUnstructuredGrid.h"
 
-#include "vtkDistributedDataFilter.h"
 #include "vtkPKdTree.h"
 #include "vtkPointSet.h"
 #include "vtkPoints.h"

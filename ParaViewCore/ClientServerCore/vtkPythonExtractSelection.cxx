@@ -300,7 +300,7 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
 
       vtkIdType outPointId = -1;
 
-      vtkstd::map<vtkIdType, vtkIdType>::iterator iter =
+      std::map<vtkIdType, vtkIdType>::iterator iter =
         outPointIdMap.find(inPointId);
       if (iter == outPointIdMap.end())
         {

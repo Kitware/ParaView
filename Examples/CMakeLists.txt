@@ -82,7 +82,7 @@ ELSE(NOT ParaView_BINARY_DIR)
                          -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                          ${extra_params}
                          -DEXECUTABLE_OUTPUT_PATH:PATH=${EXECUTABLE_OUTPUT_PATH}
-                         -DLIBRARY_OUTPUT_PATH:PATH=${LIBRARY_OUTPUT_PATH}
+                         -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
          )
   ADD_CUSTOM_TARGET(ParaViewExamplesTarget ALL DEPENDS
                     ${ParaView_BINARY_DIR}/ParaViewExamples)

@@ -44,7 +44,7 @@
 #ifndef __vtkH5PartReader_h
 #define __vtkH5PartReader_h
 
-#include "vtkToolkits.h"     // For VTK_USE_MPI 
+#include "vtkPVConfig.h"     // For PARAVIEW_USE_MPI 
 #include "vtkPolyDataAlgorithm.h"
 #include <string>
 #include <vector>
@@ -152,7 +152,7 @@ public:
   void        SetCoordinateArrayStatus(const char* name, int status);
 
 //BTX
-  #ifdef VTK_USE_MPI
+  #ifdef PARAVIEW_USE_MPI
 //ETX
 //BTX
     // Description:
@@ -219,7 +219,7 @@ protected:
   vtkDataArraySelection* CoordinateSelection;
 
   //BTX
-    #ifdef VTK_USE_MPI
+    #ifdef PARAVIEW_USE_MPI
   //ETX
       vtkMultiProcessController* Controller;
   //BTX

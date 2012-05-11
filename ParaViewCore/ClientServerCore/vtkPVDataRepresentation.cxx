@@ -28,7 +28,7 @@
 #include "vtkSmartPointer.h"
 
 #include <assert.h>
-#include <vtkstd/map>
+#include <map>
 
 //----------------------------------------------------------------------------
 vtkPVDataRepresentation::vtkPVDataRepresentation()
@@ -178,7 +178,7 @@ vtkAlgorithmOutput* vtkPVDataRepresentation::GetInternalOutputPort(int port,
 
   vtkDataObject* dobj = prevProducer->GetOutputDataObject(0);
 
-  vtkstd::pair<int, int> p(port, conn);
+  std::pair<int, int> p(port, conn);
   vtkPVTrivialProducer* tprod = vtkPVTrivialProducer::New();
   vtkCompositeDataPipeline* exec = vtkCompositeDataPipeline::New();
   tprod->SetExecutive(exec);

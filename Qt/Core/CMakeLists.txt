@@ -160,7 +160,7 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
-VTK_ADD_LIBRARY(pqCore
+PVVTK_ADD_LIBRARY(pqCore
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAnimationCue.cxx
@@ -390,19 +390,13 @@ VTK_ADD_LIBRARY(pqCore
 #)
 
 TARGET_LINK_LIBRARIES(pqCore
-  QtTesting
   pqWidgets
-  QVTK
-  vtkCharts
-  vtkPVServerManager
   protobuf
+  QtTesting
+  vtkChartsCore
+  vtkGUISupportQt
+  vtkPVServerManager
 )
-
-IF(VTK_USE_INFOVIS)
-  TARGET_LINK_LIBRARIES(pqCore
-    vtkInfovisCS
-  )
-ENDIF(VTK_USE_INFOVIS)
 
 IF(QT_TESTING_WITH_PYTHON)
   TARGET_LINK_LIBRARIES(pqCore

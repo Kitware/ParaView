@@ -14,7 +14,8 @@ ENDFOREACH()
 
 PROJECT(ParaView)
 SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR}
+  ${ParaView_SOURCE_DIR}/VTK/CMake ${ParaView_CMAKE_DIR}/VTKMono )
 
 INCLUDE(Utilities/Git/Git.cmake)
 
@@ -86,11 +87,6 @@ ENDIF()
 OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
 IF (PARAVIEW_BUILD_QT_GUI)
   # need to set up Qt stuff here because there are Qt dependencies before
-  # CMake traverses the Qt directory (VTK/GUISupport/Qt).
-  
-  # set vars to build the QVTK library
-  SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
-  SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
   SET(QT_MIN_VERSION "4.7.0")
@@ -116,11 +112,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
       ENDIF (qt_version46_x_tmp)
     ENDIF (NOT qt_version_match)
   ENDIF(NOT QT4_FOUND)
-ELSE (PARAVIEW_BUILD_QT_GUI)
-  SET(VTK_USE_QT OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
-# Mark these Qt variables as advanced. Users don't really have to set them.
-MARK_AS_ADVANCED(VTK_USE_QT VTK_USE_QTCHARTS VTK_USE_GUISUPPORT)
 MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
 # these should be all marked as advanced automatically but FindQt4 in cmake ...
 MARK_AS_ADVANCED(QT_QTMOTIF_INCLUDE_DIR QT_QTMOTIF_LIBRARY_DEBUG QT_QTMOTIF_LIBRARY_RELEASE QT_HELP_GENERATOR)
@@ -134,12 +126,6 @@ MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC
 #########################################################################
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
-SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" FORCE)
-# define this variable so that VTK_DEPENDENT_OPTION in the VTK 
-# CMakeLists.txt does not turn VTK_USE_MPI back to a regular cache
-# variable
-# set it to PARAVIEW_USE_MPI so that VTK_USE_MPI is slaved to it.
-SET(VTK_USE_MPI_ISSET ${PARAVIEW_USE_MPI})
 IF (PARAVIEW_USE_MPI)
   FIND_PACKAGE(MPI)
   SET(PARAVIEW_USE_MPI_SSEND OFF CACHE BOOL
@@ -148,19 +134,15 @@ IF (PARAVIEW_USE_MPI)
 ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
-# Force Infovis support on
-SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_INFOVIS)
-
-#########################################################################
-# Force Charts support on
-SET(VTK_USE_CHARTS ON CACHE BOOL "Build VTK with Charts Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_CHARTS)
+# Enable VTK modules
+include(VTKModules)
 
 #########################################################################
 #
+SET(VTK_MAKE_INSTANTIATORS ON CACHE BOOL "" FORCE)
+
+#########################################################################
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
-MARK_AS_ADVANCED(VTK_USE_TEXT_ANALYSIS)
 
 #########################################################################
 # Configure Testing
@@ -296,7 +278,7 @@ ELSE("${CMAKE_CFG_INTDIR}" STREQUAL ".")
 ENDIF("${CMAKE_CFG_INTDIR}" STREQUAL ".")
 
 SET(PARAVIEW_LIBRARY_DIRS 
-  ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt

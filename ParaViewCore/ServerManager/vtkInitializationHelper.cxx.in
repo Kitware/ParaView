@@ -21,17 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
  * collect.
  */
 
-#include "vtkCommonInstantiator.h"
-#include "vtkFilteringInstantiator.h" // MANDATORY gives runtime problems otherwise
-#include "vtkGenericFilteringInstantiator.h"
-#include "vtkIOInstantiator.h"
-#include "vtkImagingInstantiator.h"
-#include "vtkGraphicsInstantiator.h"
-#include "vtkRenderingInstantiator.h"
-#include "vtkVolumeRenderingInstantiator.h"
-#include "vtkHybridInstantiator.h"
-#include "vtkParallelInstantiator.h"
-#include "vtkAMRInstantiator.h"
+@vtk-module-instantiator-headers@
 #include "vtkPVCommonInstantiator.h"
 #include "vtkPVVTKExtensionsInstantiator.h"
 #include "vtkPVClientServerCoreInstantiator.h"
@@ -56,25 +46,13 @@ static void vtkInitializationHelperInit(vtkClientServerInterpreter*);
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
 extern "C" void vtkParaviewMinInit_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkInfovisCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
+@vtk-module-init-functions@
 extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVVTKExtensionsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVClientServerCoreCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerImplementationCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVServerManager_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
-extern "C" void vtkAMRCS_Initialize(vtkClientServerInterpreter * );
 
 #ifdef PARAVIEW_USE_VISITBRIDGE
 extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
@@ -199,25 +177,13 @@ void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
   vtkParaviewMinInit_Initialize(interp);
 #else
   // Initialize built-in wrapper modules.
-  vtkCommonCS_Initialize(interp);
-  vtkFilteringCS_Initialize(interp);
-  vtkGenericFilteringCS_Initialize(interp);
-  vtkImagingCS_Initialize(interp);
-  vtkInfovisCS_Initialize(interp);
-  vtkGraphicsCS_Initialize(interp);
-  vtkIOCS_Initialize(interp);
-  vtkRenderingCS_Initialize(interp);
-  vtkVolumeRenderingCS_Initialize(interp);
-  vtkHybridCS_Initialize(interp);
-  vtkWidgetsCS_Initialize(interp);
-  vtkParallelCS_Initialize(interp);
+  @vtk-module-init-calls@
   vtkPVCommonCS_Initialize(interp);
   vtkPVVTKExtensionsCS_Initialize(interp);
   vtkPVClientServerCoreCS_Initialize(interp);
   vtkPVServerImplementationCS_Initialize(interp);
   vtkPVServerManager_Initialize(interp);
   vtkXdmfCS_Initialize(interp);
-  vtkAMRCS_Initialize(interp);
 
 # ifdef PARAVIEW_USE_VISITBRIDGE
   vtkVisItAVTAlgorithmsCS_Initialize(interp);

@@ -13,25 +13,24 @@ INCLUDE_DIRECTORIES(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${ParaView_BINARY_DIR}/VTK"
-  "${ParaView_SOURCE_DIR}/VTK/Common"
-  "${ParaView_SOURCE_DIR}/VTK/Parallel"
   "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python"
   "${ParaView_BINARY_DIR}/VTK/Wrapping/Python"
   "${PVCommon_SOURCE_DIR}"
   "${PVClientServerCore_SOURCE_DIR}"
   "${PVServerImplementation_SOURCE_DIR}"
   "${PVServerManager_SOURCE_DIR}"
+  "${ParaView_BINARY_DIR}/VTK/Wrapping"
   )
 
 # create the VTK/Python  executable
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h)
 
-VTK_ADD_LIBRARY(vtkPVPythonInterpretor
+PVVTK_ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInterpretor.cxx
   vtkPVPythonInteractiveInterpretor.cxx)
 
-VTK_ADD_LIBRARY(vtkPVPython
+PVVTK_ADD_LIBRARY(vtkPVPython
   vtkPVPythonOptions.cxx)
 
 add_executable_with_forwarding(PV_EXE_SUFFIX
@@ -106,18 +105,15 @@ IF(PY_STATIC_MODULES_LIST)
 ENDIF(PY_STATIC_MODULES_LIST)
 
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
-  vtkCommon
+  vtkCommonCore
+  vtksys
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 
 # Link against all the kit wrappers.
 SET(_PVPYTHON_LINK_LIBS
   vtkPVServerManagerPythonD
-  vtkCommon
-  vtkFiltering
-  vtkIO
-  vtkGraphics
-  vtkImaging
+  ${VTK_LIBRARIES}
   vtkPVPythonInterpretor
 #  vtkPVServerManager   # dont add this one here, because then cmake doesn't add the automatic dependencies of this lib (if linked static)
   ${VTK_PYTHON_LIBRARIES}
@@ -136,9 +132,9 @@ TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} vtkPVPython)
 TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} vtkPVPython)
 
 IF(BORLAND)
-  SET(KITS Common PVServerCommon PVServerManager)
+  SET(KITS CommonCore PVServerCommon PVServerManager)
   FOREACH(KIT ${KITS})
-    WRITE_FILE(${LIBRARY_OUTPUT_PATH}/vtk${KIT}Python.def
+    WRITE_FILE(${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/vtk${KIT}Python.def
       "EXPORTS\ninitvtk${KIT}Python=_initvtk${KIT}Python\n")
   ENDFOREACH(KIT)
 ENDIF(BORLAND)

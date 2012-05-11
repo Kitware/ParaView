@@ -17,7 +17,7 @@
 
 #include "vtkSystemIncludes.h"
 
-#include<vtkstd/vector>
+#include<vector>
 #include<vtkType.h>
 
 class vtkDoubleArray;

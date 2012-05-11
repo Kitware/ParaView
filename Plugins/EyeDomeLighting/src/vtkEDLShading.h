@@ -76,7 +76,7 @@ class VTK_EXPORT vtkEDLShading : public vtkDepthImageProcessingPass
 {
 public:
   static vtkEDLShading *New();
-  vtkTypeRevisionMacro(vtkEDLShading,vtkDepthImageProcessingPass);
+  vtkTypeMacro(vtkEDLShading,vtkDepthImageProcessingPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //BTX

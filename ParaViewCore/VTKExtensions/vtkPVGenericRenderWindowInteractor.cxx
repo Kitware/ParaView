@@ -24,14 +24,14 @@
 #include "vtkRenderWindow.h"
 #include "vtkPVConfig.h"
 
-#ifdef VTK_USE_QVTK
+#ifdef PARAVIEW_ENABLE_QT_SUPPORT
 #include "QVTKInteractor.h"
 #endif
 
 // this class wraps QVTKInteractor to provide an easy API to support
 // delayed-switch-out-of-ineractive-render mode. Look at BUG #10232 for details.
 class vtkPVGenericRenderWindowInteractorTimer : public
-#ifdef VTK_USE_QVTK
+#ifdef PARAVIEW_ENABLE_QT_SUPPORT
                                                      QVTKInteractor
 #else
                                                      vtkRenderWindowInteractor
@@ -41,7 +41,7 @@ class vtkPVGenericRenderWindowInteractorTimer : public
 
 public:
   static vtkPVGenericRenderWindowInteractorTimer* New();
-#ifdef VTK_USE_QVTK
+#ifdef PARAVIEW_ENABLE_QT_SUPPORT
   vtkTypeMacro(vtkPVGenericRenderWindowInteractorTimer, QVTKInteractor);
 #else
   vtkTypeMacro(vtkPVGenericRenderWindowInteractorTimer,
@@ -79,7 +79,7 @@ public:
   void SetTarget(vtkPVGenericRenderWindowInteractor* target)
     { this->Target = target; }
 
-#ifdef VTK_USE_QVTK
+#ifdef PARAVIEW_ENABLE_QT_SUPPORT
   virtual void TimerEvent(int timerId)
     {
     if(timerId == this->TimerId && this->Target)

@@ -29,11 +29,11 @@
 #include "vtkPVOptions.h"
 #include "vtkSessionIterator.h"
 #include "vtkTCPNetworkAccessManager.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 
 #include <vtksys/SystemTools.hxx>
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # include "vtkMPIController.h"
 # include "vtkPVMPICommunicator.h"
 # include <mpi.h>
@@ -60,7 +60,7 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   vtkProcessModule::GlobalController = vtkSmartPointer<vtkDummyController>::New();
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   bool use_mpi = (type != PROCESS_CLIENT);
   // initialize MPI only on non-client processes.
   if (use_mpi)
@@ -101,11 +101,11 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 #else
   static_cast<void>(argc); // unused warning when MPI is off
   static_cast<void>(argv); // unused warning when MPI is off
-#endif // VTK_USE_MPI
+#endif // PARAVIEW_USE_MPI
   vtkMultiProcessController::SetGlobalController(
     vtkProcessModule::GlobalController);
 
-#ifdef VTK_USE_X
+#ifdef PARAVIEW_USE_X
   // Hack to support -display parameter.  vtkPVOptions requires parameters to be
   // specified as -option=value, but it is generally expected that X window
   // programs allow you to set the display as -display host:port (i.e. without
@@ -199,7 +199,7 @@ bool vtkProcessModule::Finalize()
   vtkProcessModule::GlobalController->Finalize(/*finalizedExternally*/1);
   vtkProcessModule::GlobalController = NULL;
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (vtkProcessModule::FinalizeMPI)
     {
     MPI_Barrier(MPI_COMM_WORLD);

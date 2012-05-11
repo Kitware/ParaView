@@ -17,9 +17,9 @@ ELSE (ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
 
-if(VTK_USE_MPI)
+if(PARAVIEW_USE_MPI)
   set(COPROCESSOR_USE_MPI 1)
-endif(VTK_USE_MPI)
+endif(PARAVIEW_USE_MPI)
 
 CONFIGURE_FILE("${CoProcessing_SOURCE_DIR}/CoProcessor/CPSystemInformation.h.in"
                "${CoProcessing_BINARY_DIR}/CoProcessor/CPSystemInformation.h"
@@ -53,8 +53,8 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 add_library(vtkCoProcessor ${CoProcessor_SRCS})
 set(CoProcessor_LIBS
-  vtkCommon
-  vtkFiltering
+  vtkCommonCore
+  vtkFiltersCore
   vtkPVVTKExtensions
   vtkPVServerManager
   )
@@ -89,7 +89,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # can link to this but it is not directly loaded dynamically as a
   # module.
   ADD_LIBRARY(vtkCoProcessorPythonD ${CPPython_SRCS})
-  TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOPythonD)
+  TARGET_LINK_LIBRARIES(vtkCoProcessorPythonD vtkCoProcessor vtkIOCorePythonD)
 
   # On some UNIX platforms the python library is static and therefore
   # should not be linked into the shared library.  Instead the symbols

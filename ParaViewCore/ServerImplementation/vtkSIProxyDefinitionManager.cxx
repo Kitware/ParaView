@@ -36,7 +36,6 @@
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
-#include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <map>
 #include <vtksys/RegularExpression.hxx>

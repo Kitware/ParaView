@@ -353,7 +353,7 @@ SOURCE_GROUP("Generated" FILES
   ${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h
 )
 
-VTK_ADD_LIBRARY(pqApplicationComponents
+PVVTK_ADD_LIBRARY(pqApplicationComponents
   ${SOURCE_FILES}
   ${UI_BUILT_SOURCES}
   ${MOC_BUILT_SOURCES}

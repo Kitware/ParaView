@@ -54,7 +54,6 @@
 #include <map>
 #include <set>
 #include <vector>
-#include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 #include <assert.h>

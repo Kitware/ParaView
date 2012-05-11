@@ -27,10 +27,13 @@ FOREACH(name ${ServersFilters_SRCS})
   ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
     -D ${VTK_DATA_ROOT}
     )
-  TARGET_LINK_LIBRARIES(${name} vtkPVVTKExtensions)
+  TARGET_LINK_LIBRARIES(${name} 
+    vtkPVVTKExtensions
+    vtkImagingMorphological
+    vtkInteractionImage)
 ENDFOREACH(name)
 
-IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
+IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
    PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
   TARGET_LINK_LIBRARIES(TestIceTCompositePass vtkPVVTKExtensions)
@@ -68,6 +71,7 @@ IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
 
   ADD_EXECUTABLE(TestSimpleIceTCompositePass TestSimpleIceTCompositePass.cxx)
   TARGET_LINK_LIBRARIES(TestSimpleIceTCompositePass vtkPVVTKExtensions)
+
   ADD_TEST(TestSimpleIceTCompositePass
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
             ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestSimpleIceTCompositePass
@@ -90,7 +94,7 @@ IF(PARAVIEW_USE_ICE_T AND VTK_USE_MPI AND VTK_USE_DISPLAY AND
 ENDIF()
 
 
-IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
+if(Module_vtkRenderingOpenGL AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
 # Enable these after the transfer function can take the vtkTable histograms.
 #TestTransferFunctionEditor
@@ -106,9 +110,9 @@ TestPVAMRDualClip
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVVTKExtensions)
   ENDFOREACH(name)
-ENDIF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
+endif()
 
-IF (VTK_USE_MPI)
+IF (PARAVIEW_USE_MPI)
     IF (MPI_LIBRARY)
       SET(MPI_LIBRARIES ${MPI_LIBRARY})
     ENDIF (MPI_LIBRARY)
@@ -117,7 +121,7 @@ IF (VTK_USE_MPI)
     ENDIF (MPI_EXTRA_LIBRARY)
 
     ADD_EXECUTABLE(DistributedSubsetSortingTable DistributedSubsetSortingTable.cxx)
-    TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallel vtkPVVTKExtensions)
+    TARGET_LINK_LIBRARIES(DistributedSubsetSortingTable vtkParallelMPI vtkPVVTKExtensions)
 
     ADD_TEST(TestDistributedSubsetSortingTable
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
@@ -126,4 +130,4 @@ IF (VTK_USE_MPI)
             -T ${VTK_BINARY_DIR}/Testing/Temporary
             ${VTK_MPI_POSTFLAGS})
 
-ENDIF (VTK_USE_MPI)
+ENDIF (PARAVIEW_USE_MPI)

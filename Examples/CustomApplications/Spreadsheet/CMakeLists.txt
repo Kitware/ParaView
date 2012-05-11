@@ -67,6 +67,6 @@ build_paraview_client_cpack_config_init(
     DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.txt
 )
 
-TARGET_LINK_LIBRARIES(spreadsheet ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommon vtkPVCommon pqCore pqComponents)
+TARGET_LINK_LIBRARIES(spreadsheet ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommonCore vtkPVCommon pqCore pqComponents)
 
 build_paraview_client_cpack_config()

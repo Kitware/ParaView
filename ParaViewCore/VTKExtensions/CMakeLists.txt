@@ -73,7 +73,6 @@ SET (Kit_SRCS
   vtkMergeArrays.cxx
   vtkMergeCompositeDataSet.cxx
   vtkMinMax.cxx
-  vtkMPICompositeManager.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkParallelSerialWriter.cxx
@@ -209,7 +208,7 @@ SET (Kit_SRCS
   vtkZlibImageCompressor.cxx
 )
 
-IF (VTK_USE_MPI)
+IF (PARAVIEW_USE_MPI)
   SET (Kit_SRCS
     ${Kit_SRCS}
     vtkAllToNRedistributeCompositePolyData.cxx
@@ -217,6 +216,7 @@ IF (VTK_USE_MPI)
     vtkBalancedRedistributePolyData.cxx
     vtkRedistributePolyData.cxx
     vtkWeightedRedistributePolyData.cxx
+    vtkMPICompositeManager.cxx # deprecate?
     )
   IF (PARAVIEW_USE_ICE_T)
     SET(Kit_SRCS
@@ -227,14 +227,12 @@ IF (VTK_USE_MPI)
     SET(KIT_LIBS ${KIT_LIBS} IceTCore IceTMPI IceTGL)
   ENDIF (PARAVIEW_USE_ICE_T)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-ENDIF (VTK_USE_MPI)
+ENDIF (PARAVIEW_USE_MPI)
 
-IF (VTK_USE_QVTK)
+IF (PARAVIEW_ENABLE_QT_SUPPORT)
   INCLUDE_DIRECTORIES(
-    ${QT_INCLUDE_DIR}
-    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-    ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt)
-ENDIF (VTK_USE_QVTK)
+    ${QT_INCLUDE_DIR})
+ENDIF (PARAVIEW_ENABLE_QT_SUPPORT)
 
 IF(VTK_USE_SYSTEM_ZLIB)
   INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
@@ -278,7 +276,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkTransferFunctionEditorWidget.cxx
   vtkTransferFunctionEditorWidget1D.cxx
   vtkUndoElement.cxx
-
   ABSTRACT)
 
 # The set of source files to be encoded.
@@ -326,12 +323,12 @@ INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 # Create ClientServer wrappers for ParaView classes.
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
+INCLUDE(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
 VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 # Wrap PVServerCommon
-SET(KIT_WRAP_DEPS PVCommon Parallel Hybrid Rendering VolumeRendering Widgets)
+SET(KIT_WRAP_DEPS PVCommon ) #Parallel Hybrid Rendering VolumeRendering Widgets
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
@@ -340,9 +337,12 @@ IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
   SET(KIT_PYTHON_LIBS
     vtkPVCommonPythonD
-    vtkHybridPythonD
-    vtkWidgetsPythonD
-    vtkParallelPythonD
+    vtkFiltersHybridPythonD
+    vtkInteractionWidgetsPythonD
+    vtkParallelCorePythonD
+    vtkRenderingParallelPythonD
+    vtkFiltersProgrammablePythonD
+    vtkIOEnSightPythonD
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
@@ -361,30 +361,28 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 
-IF(VTK_USE_RENDERING)
-  # Create custom commands to encode each assembly file into a C string
-  # literal in a header file.
+# Create custom commands to encode each assembly file into a C string
+# literal in a header file.
 
-  SET(glsl_h_files)
-  FOREACH(file ${glsl_files})
-    SET(src ${CMAKE_CURRENT_SOURCE_DIR}/${file}.glsl)
-    SET(res ${CMAKE_CURRENT_BINARY_DIR}/${file}.cxx)
-    SET(resh ${CMAKE_CURRENT_BINARY_DIR}/${file}.h)
-    SET(glsl_h_files ${glsl_h_files} "${resh}")
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${res} ${resh}
-      DEPENDS ${src} vtkEncodeString
-      COMMAND ${VTK_ENCODESTRING_EXE}
-      ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
-      )
-    SET(Kit_SRCS ${Kit_SRCS} ${res})
-    SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)
-  ENDFOREACH(file)
-ENDIF(VTK_USE_RENDERING)
+SET(glsl_h_files)
+FOREACH(file ${glsl_files})
+  SET(src ${CMAKE_CURRENT_SOURCE_DIR}/${file}.glsl)
+  SET(res ${CMAKE_CURRENT_BINARY_DIR}/${file}.cxx)
+  SET(resh ${CMAKE_CURRENT_BINARY_DIR}/${file}.h)
+  SET(glsl_h_files ${glsl_h_files} "${resh}")
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${res} ${resh}
+    DEPENDS ${src} vtkEncodeString
+    COMMAND ${VTK_ENCODESTRING_EXE}
+    ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
+    )
+  SET(Kit_SRCS ${Kit_SRCS} ${res})
+  SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)
+ENDFOREACH(file)
 
 
 # Create the library.
-VTK_ADD_LIBRARY(vtk${KIT}
+PVVTK_ADD_LIBRARY(vtk${KIT}
   ${Kit_SRCS}
   ${KitInstantiator_SRCS}
   )
@@ -392,16 +390,6 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkPVCommon
   vtkPVCommonCS
   vtkXdmfCS
-  vtkHybridCS
-  vtkParallelCS
-  vtkVolumeRenderingCS
-  vtkWidgetsCS
-  vtkViews
-  vtkViewsCS
-  vtkCharts
-  vtkChartsCS
-  vtkAMR
-  vtkAMRCS
   KWCommon
   vtksys
   ${KIT_LIBS}
@@ -410,9 +398,16 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   ${OPENGL_gl_LIBRARY}
   ${PARAVIEW_ADDITIONAL_LIBRARIES}
 )
-IF (VTK_USE_QVTK)
-  TARGET_LINK_LIBRARIES(vtk${KIT} QVTK)
-ENDIF (VTK_USE_QVTK)
+
+foreach(_module ${VTK_MODULES_ENABLED})
+  if(NOT ${_module}_EXCLUDE_FROM_WRAPPING)
+    target_link_libraries(vtk${KIT} ${_module}CS)
+  endif() 
+endforeach()
+
+IF (PARAVIEW_ENABLE_QT_SUPPORT)
+  TARGET_LINK_LIBRARIES(vtk${KIT} vtkGUISupportQt)
+ENDIF ()
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET(temp_TO_INSTALL

@@ -16,7 +16,7 @@
 #include "vtkPVOptions.h"
 #include "vtkMultiThreader.h"
 #include "vtkSocket.h"
-#include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 #include "vtkPVConfig.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -172,7 +172,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
    this->Internals->TotalMulticoreProcessors =
      vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
    if( this->Internals->TotalMulticoreProcessors >1
        && vtkProcessModuleAutoMPI::UseMulticoreProcessors
      && this->Internals->CollectConfiguredOptions())
@@ -185,7 +185,7 @@ int vtkProcessModuleAutoMPI::IsPossible()
     }
 #else
   return 0;
-#endif //VTK_USE_MPI
+#endif //PARAVIEW_USE_MPI
 }
 
 //-----------------------------------------------------------------------public
@@ -329,7 +329,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
   this->ParaViewServer += "/" PARAVIEW_SERVER;
 
   // now find all the mpi information if mpi run is set
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #ifdef VTK_MPIRUN_EXE
   if(!this->SetMPIRun(VTK_MPIRUN_EXE))
     {
@@ -337,7 +337,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
     }
 #else
     cerr << "AutoMPI Error: "
-         << "VTK_MPIRUN_EXE must be set when VTK_USE_MPI is on."
+         << "VTK_MPIRUN_EXE must be set when PARAVIEW_USE_MPI is on."
          << endl;
     return 0;
 #endif
@@ -349,7 +349,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
     this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
 # else
     cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
-    return;
+    return 0;
 # endif
 #ifdef VTK_MPI_PRENUMPROC_FLAGS
     this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
@@ -364,7 +364,7 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
     sprintf(buf, "%d", serverNumProc);
     this->MPIServerNumProcessFlag = buf;
     }
-#endif // VTK_USE_MPI
+#endif // PARAVIEW_USE_MPI
 
 # ifdef VTK_MPI_SERVER_PREFLAGS
   this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);

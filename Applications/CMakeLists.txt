@@ -11,6 +11,10 @@ IF(QT4_FOUND)
 # in any of the SUBDIRS in this directory.
 INCLUDE(${QT_USE_FILE})
 
+if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
+  include(Qt4Macros-CMake2.8.7)
+endif()
+
 #########################################################################
 # Everything under Application uses VTK/ParaView ServerManager.
 INCLUDE_DIRECTORIES(

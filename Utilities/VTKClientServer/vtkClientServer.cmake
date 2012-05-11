@@ -2,16 +2,78 @@
 #
 #
 INCLUDE (${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cmake)
-
 #------------------------------------------------------------------------------
 MACRO(CS_INITIALIZE_WRAP)
-  SET(LIBRARY_OUTPUT_PATH    ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
   SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
-  SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 ENDMACRO(CS_INITIALIZE_WRAP)
+
+include(vtkModuleAPI)
+
+macro(pv_wrap_vtk_mod_cs module)
+  pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
+  PVVTK_ADD_LIBRARY(${module}CS ${${module}CS_SRCS})
+  target_link_libraries(${module}CS vtkClientServer ${module})
+
+  # satisfy the auto init calls, this should done in VTK eventually  
+  if( ${module} STREQUAL "vtkRenderingCore" )
+    target_link_libraries(${module}CS 
+      vtkRenderingOpenGL
+      vtkInteractionStyle
+      vtkRenderingFreeTypeOpenGL)
+  endif() 
+  if( ${module} STREQUAL "vtkRenderingVolume" )
+    target_link_libraries(${module}CS vtkRenderingVolumeOpenGL)
+  endif()
+  if( ${module} STREQUAL "vtkRenderingFreeType" )
+    target_link_libraries(${module}CS vtkRenderingFreeTypeOpenGL)
+  endif()
+  foreach(dep ${${module}_DEPENDS})
+    if(NOT ${dep}_EXCLUDE_FROM_WRAPPING)
+      target_link_libraries(${module}CS ${dep}CS)
+    endif()
+  endforeach()
+  if(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
+    if(BUILD_SHARED_LIBS)
+      if(NOT PV_INSTALL_NO_LIBRARIES)
+        install(TARGETS ${module}CS
+          EXPORT ${PV_INSTALL_EXPORT_NAME}
+          RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+          LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+          ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+      endif()
+    endif()
+  endif()
+endmacro()
+
+
+#------------------------------------------------------------------------------
+macro(pv_pre_wrap_vtk_mod_cs libname module)
+  set(vtk${kit}CS_HEADERS)
+  
+  vtk_module_load(${module})
+  vtk_module_classes_load(${module})
+  
+  foreach(class ${${module}_CLASSES})
+    find_file(${class}_full_name "${class}.h" PATHS ${${module}_INCLUDE_DIRS} )
+    set_property(CACHE ${class}_full_name PROPERTY TYPE INTERNAL)
+    if(${class}_full_name)
+      if(NOT ${module}_CLASS_${class}_WRAP_EXCLUDE)
+        if(${module}_CLASS_${class}_ABSTRACT)
+          set_source_files_properties(${${class}_full_name} PROPERTIES ABSTRACT 1)
+        endif()
+        list(APPEND ${module}CS_HEADERS ${${class}_full_name})
+      endif()
+    elseif()
+      message(WARNING "Unable to find: ${class}")
+    endif()  
+  endforeach()
+  
+  VTK_WRAP_ClientServer("${libname}" "${module}CS_SRCS" "${${module}CS_HEADERS}")
+endmacro()
 
 #------------------------------------------------------------------------------
 MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
+
   SET(vtk${kit}CS_HEADERS)
   INCLUDE("${VTK_KITS_DIR}/vtk${kit}Kit.cmake")
   FOREACH(class ${VTK_${ukit}_CLASSES})
@@ -35,7 +97,7 @@ ENDMACRO(PV_PRE_WRAP_VTK_CS kit ukit deps)
 MACRO(PV_WRAP_VTK_CS kit ukit deps)
   SET(KIT_CS_DEPS)
   PV_PRE_WRAP_VTK_CS("vtk${kit}CS" "${kit}" "${ukit}" "${deps}")
-  VTK_ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
+  PVVTK_ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
   TARGET_LINK_LIBRARIES(vtk${kit}CS vtkClientServer vtk${kit})
   FOREACH(dep ${deps})
     #MESSAGE("Link vtk${kit}CS to vtk${dep}CS")

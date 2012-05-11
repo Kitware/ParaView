@@ -57,9 +57,11 @@ endforeach(file)
 # List the kits from VTK that are needed by this project
 # -----------------------------------------------------------------------------
 set(KIT_LIBS
-  vtkHybrid
-  vtkRendering
-  vtkImaging
+  vtkFiltersHybrid
+  vtkRenderingOpenGL
+  vtkImagingCore
+  vtkInteractionStyle
+  vtkRenderingFreeTypeOpenGL
   ${OPENGL_gl_LIBRARY}
   )
 
@@ -92,7 +94,7 @@ endif (PV_INSTALL_BIN_DIR)
 # kit.
 # -----------------------------------------------------------------------------
 # needed by vtkExportKit.cmake
-include(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
+include(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
 IF(NOT VTK_INSTALL_NO_DEVELOPMENT)
   STRING(REGEX REPLACE "^/" "" VTK_INSTALL_PACKAGE_DIR_CM24 "${VTK_INSTALL_PACKAGE_DIR}")
 ENDIF(NOT VTK_INSTALL_NO_DEVELOPMENT)

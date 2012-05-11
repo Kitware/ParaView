@@ -94,7 +94,7 @@
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXYChartRepresentation.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # ifdef PARAVIEW_USE_ICE_T
 #  include "vtkIceTSynchronizedRenderers.h"
 # endif
@@ -208,7 +208,7 @@ int main(int, char**)
   PRINT_SELF(vtkXMLPVAnimationWriter);
   PRINT_SELF(vtkXYChartRepresentation);
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # ifdef PARAVIEW_USE_ICE_T
   PRINT_SELF(vtkIceTSynchronizedRenderers);
 # endif
