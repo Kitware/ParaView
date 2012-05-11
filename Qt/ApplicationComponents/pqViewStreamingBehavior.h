@@ -59,6 +59,10 @@ private:
   Q_DISABLE_COPY(pqViewStreamingBehavior)
   QTimer Timer;
   int Pass;
+  bool DelayUpdate;
+
+  void onStartInteractionEvent();
+  void onEndInteractionEvent();
 };
 
 #endif

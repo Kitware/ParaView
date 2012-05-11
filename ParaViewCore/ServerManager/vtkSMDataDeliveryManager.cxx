@@ -151,7 +151,7 @@ bool vtkSMDataDeliveryManager::DeliverNextPiece()
 
   const vtkClientServerStream& result = session->GetLastResult(
     vtkPVSession::DATA_SERVER_ROOT);
-  result.Print(cout);
+  //result.Print(cout);
 
   // extract the "piece-key" from the result and then request it.
   unsigned int representation_id = 0;

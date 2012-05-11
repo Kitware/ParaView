@@ -32,6 +32,7 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartVolumeMapper.h"
+#include "vtkTimerLog.h"
 #include "vtkUniformGrid.h"
 #include "vtkVolumeProperty.h"
 
@@ -219,9 +220,11 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
           this->InitializeResampler = false;
           }
 
+        vtkTimerLog::MarkStartEvent("Resample Volume");
         int samples[3]= {40, 40, 40};
         this->Resampler->UpdateROI(bounds, samples);
         this->Resampler->Update();
+        vtkTimerLog::MarkEndEvent("Resample Volume");
         this->VolumeMapper->SetInputData(this->Resampler->GetGrid());
 #endif
         }

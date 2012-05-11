@@ -40,10 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVView.h"
 #include "pqServer.h"
 #include "vtkSMSession.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
-  : Superclass(parentObject), Pass(0)
+  : Superclass(parentObject), Pass(0), DelayUpdate(false)
 {
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
@@ -79,7 +80,25 @@ void pqViewStreamingBehavior::onViewUpdated(
     {
     this->Pass = 0;
     this->Timer.start(3000);
+    rvProxy->GetInteractor()->AddObserver(
+      vtkCommand::StartInteractionEvent,
+      this, &pqViewStreamingBehavior::onStartInteractionEvent);
+    rvProxy->GetInteractor()->AddObserver(
+      vtkCommand::EndInteractionEvent,
+      this, &pqViewStreamingBehavior::onEndInteractionEvent);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewStreamingBehavior::onStartInteractionEvent()
+{
+  this->DelayUpdate = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewStreamingBehavior::onEndInteractionEvent()
+{
+  this->DelayUpdate = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -92,9 +111,9 @@ void pqViewStreamingBehavior::onTimeout()
       view->getProxy());
 
     if (rvProxy->GetSession()->GetPendingProgress() ||
-      view->getServer()->isProcessingPending())
+      view->getServer()->isProcessingPending() || this->DelayUpdate)
       {
-      this->Timer.start();
+      this->Timer.start(1000);
       }
     else
       {
@@ -103,7 +122,7 @@ void pqViewStreamingBehavior::onTimeout()
       if (to_continue)
         {
         this->Pass++;
-        this->Timer.start(1000);
+        this->Timer.start(100);
         }
       }
     }

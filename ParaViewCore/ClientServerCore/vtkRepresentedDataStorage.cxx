@@ -407,7 +407,6 @@ bool vtkRepresentedDataStorage::BuildPriorityQueue()
     }
 
   // note: amr block ids currently don't match up with composite dataset ids :/.
-  unsigned int block_id = 0;
   // now build a priority queue for absent blocks using the current camera.
   for (unsigned int level=0; level < oamr->GetNumberOfLevels(); level++)
     {
@@ -418,13 +417,12 @@ bool vtkRepresentedDataStorage::BuildPriorityQueue()
         {
         vtkInternals::vtkPriorityQueueItem item;
         item.RepresentationId = iter->first;
-        item.BlockId = block_id;
-        item.Priority = 1.0 / (1.0 + block_id);
+        item.BlockId = oamr->GetCompositeIndex(level, index);
+        item.Priority = 1.0 / (1.0 + item.BlockId);
         item.Level = level;
         item.Index = index;
         this->Internals->PriorityQueue.push(item);
         }
-      block_id++;
       }
     }
   return true;
