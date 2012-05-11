@@ -84,7 +84,7 @@ public:
   // Description:
   // Based on the current camera and currently available datasets, build a
   // priority queue.
-  bool BuildPriorityQueue();
+  bool BuildPriorityQueue(double planes[24]);
   unsigned int GetRepresentationIdFromQueue();
   void StreamingDeliver(unsigned int key);
 

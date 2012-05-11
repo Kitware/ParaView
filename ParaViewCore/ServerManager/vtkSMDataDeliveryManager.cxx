@@ -14,11 +14,13 @@
 =========================================================================*/
 #include "vtkSMDataDeliveryManager.h"
 
+#include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
+#include "vtkRenderer.h"
 #include "vtkRepresentedDataStorage.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
@@ -142,10 +144,20 @@ bool vtkSMDataDeliveryManager::DeliverNextPiece()
 
   vtkTimerLog::MarkStartEvent("DeliverNextPiece");
   vtkSMSession* session = this->ViewProxy->GetSession();
+
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(
+    this->ViewProxy->GetClientSideObject());
+
+  double planes[24];
+  vtkRenderer* ren = view->GetRenderer();
+  ren->GetActiveCamera()->GetFrustumPlanes(
+    ren->GetTiledAspectRatio(), planes);
+
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this->ViewProxy)
          << "GetNextPieceToDeliver"
+         << vtkClientServerStream::InsertArray(planes, 24)
          << vtkClientServerStream::End;
   session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, false);
 

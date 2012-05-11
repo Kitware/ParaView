@@ -173,7 +173,7 @@ public:
   // Description:
   // Returns the representation id which is going to deliver the next piece for
   // streaming.
-  unsigned int GetNextPieceToDeliver();
+  unsigned int GetNextPieceToDeliver(double planes[24]);
 
   void StreamingUpdate();
 

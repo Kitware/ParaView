@@ -842,21 +842,31 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVRenderView::GetNextPieceToDeliver()
+unsigned int vtkPVRenderView::GetNextPieceToDeliver(double planes[24])
 {
   if (!vtkPVView::GetEnableStreaming())
     {
     return 0;
     }
 
+  bool force_modified = false;
+  static double prev_planes[24];
+  for (int cc=0; cc < 24 && !force_modified;cc++)
+    {
+    force_modified = prev_planes[cc] != planes[cc];
+    }
+  memcpy(prev_planes, planes, 24*sizeof(double));
+
+
   if (this->UpdateTimeStamp > this->PriorityQueueBuildTimeStamp ||
-    this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp)
+    this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp ||
+    force_modified)
     {
     // either the data or the camera has changed. Regenerate the priority queue.
     // Priority queue contains a list of (representation-id, block-id) tuples
     // indicating the blocks to request.
     vtkTimerLog::MarkStartEvent("Build View Priority Queue");
-    this->GetGeometryStore()->BuildPriorityQueue();
+    this->GetGeometryStore()->BuildPriorityQueue(planes);
     vtkTimerLog::MarkEndEvent("Build View Priority Queue");
     this->PriorityQueueBuildTimeStamp.Modified();
     }
