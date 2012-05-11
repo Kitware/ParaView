@@ -17,6 +17,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkAMRIncrementalResampleHelper.h"
 #include "vtkAMRResampleFilter.h"
+#include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
@@ -220,11 +221,27 @@ int vtkAMRVolumeRepresentation::ProcessViewRequest(
           this->InitializeResampler = false;
           }
 
+        //double position[3], focalpoint[3];
+        //this->RenderView->GetActiveCamera()->GetPosition(position);
+        //this->RenderView->GetActiveCamera()->GetFocalPoint(focalpoint);
+
+        //double radius = sqrt(vtkMath::Distance2BetweenPoints(
+        //  position, focalpoint));
+
+        //vtkBoundingBox bbox(focalpoint[0], focalpoint[0],
+        //  focalpoint[1], focalpoint[1],
+        //  focalpoint[2], focalpoint[2]);
+        //bbox.AddPoint(focalpoint[0] - radius, focalpoint[1] - radius, focalpoint[2] - radius);
+        //bbox.AddPoint(focalpoint[0] + radius, focalpoint[1] + radius, focalpoint[2] + radius);
+        //bbox.GetBounds(bounds);
+
         vtkTimerLog::MarkStartEvent("Resample Volume");
         int samples[3]= {40, 40, 40};
+
         this->Resampler->UpdateROI(bounds, samples);
         this->Resampler->Update();
         vtkTimerLog::MarkEndEvent("Resample Volume");
+
         this->VolumeMapper->SetInputData(this->Resampler->GetGrid());
 #endif
         }
@@ -295,6 +312,7 @@ bool vtkAMRVolumeRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
+    this->RenderView = view;
     return true;
     }
   return false;
