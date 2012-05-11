@@ -29,6 +29,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
+#include "vtkIdList.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
 //----------------------------------------------------------------------------
@@ -95,12 +96,49 @@ int vtkAttributeDataToTableFilter::RequestData(
           vtkIdType numcells = ds->GetNumberOfCells();
           celltypes->SetNumberOfTuples(numcells);
           char* ptr = celltypes->GetPointer(0);
+          vtkIdList* points = vtkIdList::New();
+          vtkIdType maxpoints = 0;
           for (vtkIdType cc=0; cc < numcells; cc++)
             {
             ptr[cc] = static_cast<char>(ds->GetCellType(cc));
+            ds->GetCellPoints(cc, points);
+            maxpoints = maxpoints > points->GetNumberOfIds() ?
+              maxpoints : points->GetNumberOfIds();
             }
           output->GetRowData()->AddArray(celltypes);
           celltypes->Delete();
+
+          vtkIdTypeArray** indices = new vtkIdTypeArray*[maxpoints];
+          char arrayname[128];
+          for(vtkIdType i = 0; i < maxpoints; i++)
+          {
+            indices[i] = vtkIdTypeArray::New();
+            sprintf(arrayname, "Point Index %ld", (long int)i);
+            indices[i]->SetName(arrayname);
+            indices[i]->SetNumberOfTuples(numcells);
+          }
+          for(vtkIdType cc = 0; cc < numcells; cc++)
+            {
+            ds->GetCellPoints(cc, points);
+            for(vtkIdType pt = 0; pt < maxpoints; pt++)
+              {
+              if(pt < points->GetNumberOfIds())
+                {
+                indices[pt]->SetValue(cc, points->GetId(pt));
+                }
+              else
+                {
+                indices[pt]->SetValue(cc, -1);
+                }              
+              }
+            }
+          for(int i = 0; i < maxpoints; i++)
+            {
+            output->GetRowData()->AddArray(indices[i]);
+            indices[i]->Delete();
+            }
+          delete [] indices;
+          points->Delete();
           }
         }
       }
