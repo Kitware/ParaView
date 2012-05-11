@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqTwoDRenderView.h"
 #include "pqViewModuleInterface.h"
 
 typedef pqRenderView::ManipulatorType Manip;

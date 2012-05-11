@@ -122,12 +122,6 @@ public:
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
       }
-#ifdef FIXME
-    if (type == "ScatterPlotRepresentation")
-      {
-      return new pqScatterPlotDisplayPanel(proxy, p);
-      }
-#endif
     if (type == QString("ParallelCoordinatesRepresentation"))
       {
       return new pqParallelCoordinatesChartDisplayPanel(proxy, p);

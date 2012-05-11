@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqActivePlotMatrixViewOptions.h"
 #include "pqActiveRenderViewOptions.h"
-#include "pqActiveTwoDRenderViewOptions.h"
 #include "pqActiveXYChartOptions.h"
 #include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
@@ -42,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeXYChartView.h"
 #include "pqInterfaceTracker.h"
 #include "pqPlotMatrixView.h"
-#include "pqTwoDRenderView.h"
 #include "pqViewOptionsInterface.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
@@ -65,10 +63,6 @@ pqViewSettingsManager::pqViewSettingsManager(QObject* parentObject)
   // register for comparative views.
   this->registerOptions(pqComparativeXYChartView::chartViewType(), xyChartOptions);
   this->registerOptions(pqComparativeXYBarChartView::chartViewType(), xyBarChartOptions);
-
-  pqActiveTwoDRenderViewOptions* twoDOptions =
-    new pqActiveTwoDRenderViewOptions(this);
-  this->registerOptions(pqTwoDRenderView::twoDRenderViewType(), twoDOptions);
 
   // register for plot matrix views.
   pqActivePlotMatrixViewOptions *plotMatrixOptions = new pqActivePlotMatrixViewOptions(this);
