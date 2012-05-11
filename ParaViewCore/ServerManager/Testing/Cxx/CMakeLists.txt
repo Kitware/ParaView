@@ -80,6 +80,9 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   set(QT_USE_QTTEST TRUE)
 
   include(${QT_USE_FILE})
+  if(${CMAKE_VERSION} LESS 2.8.7 AND NOT WIN32)
+    include(Qt4Macros-CMake2.8.7)
+  endif()
 
   set(UNITTESTS
     vtkSMProxyTest

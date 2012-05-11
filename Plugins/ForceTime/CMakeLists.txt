@@ -19,8 +19,9 @@ IF(PARAVIEW_BUILD_QT_GUI)
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
-# Override macros with ParaView versions
-include(Qt4Macros)
+if(${CMAKE_VERSION} LESS 2.8.7 AND NOT WIN32)
+  include(Qt4Macros-CMake2.8.7)
+endif()
 
 SET(Plugin_SRCS
   vtkForceTime.cxx
