@@ -30,7 +30,7 @@ foreach(_mod ${_vtk_mpi_modules})
 endforeach()
 
 # Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
-set(VTK_COSMOS_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
+set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_COSMOS_USE_MPI)
 set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_VPIC_USE_MPI)
