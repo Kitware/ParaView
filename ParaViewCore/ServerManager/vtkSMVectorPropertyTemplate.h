@@ -28,6 +28,7 @@
 #include <vtkPVXMLElement.h>
 #include "vtkSMProperty.h"
 #include <typeinfo>
+#include <limits>
 
 class vtkSMProperty;
 
@@ -305,6 +306,10 @@ public:
     for (unsigned int i=0; i<size; i++)
       {
       vtksys_ios::ostringstream valueAsString;
+
+      // set the stream precision to the maximum precision for the data type
+      valueAsString.precision(std::numeric_limits<T>::digits10);
+
       valueAsString << this->GetElement(i);
 
       vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
