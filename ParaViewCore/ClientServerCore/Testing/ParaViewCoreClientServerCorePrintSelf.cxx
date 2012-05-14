@@ -21,7 +21,6 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNetworkImageSource.h"
 #include "vtkOutlineRepresentation.h"
-#include "vtkPV2DRenderView.h"
 #include "vtkPVAlgorithmPortsInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVBarChartView.h"
@@ -135,7 +134,6 @@ int main(int, char**)
   PRINT_SELF(vtkNetworkAccessManager);
   PRINT_SELF(vtkNetworkImageSource);
   PRINT_SELF(vtkOutlineRepresentation);
-  //PRINT_SELF(vtkPV2DRenderView);
   PRINT_SELF(vtkPVAlgorithmPortsInformation);
   PRINT_SELF(vtkPVArrayInformation);
   //PRINT_SELF(vtkPVBarChartView);

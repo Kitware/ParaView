@@ -41,7 +41,6 @@ SET (Kit_SRCS
   vtkNetworkAccessManager.cxx
   vtkNetworkImageSource.cxx
   vtkOutlineRepresentation.cxx
-  vtkPV2DRenderView.cxx
   vtkPVAlgorithmPortsInformation.cxx
   vtkPVArrayInformation.cxx
   vtkPVBarChartView.cxx

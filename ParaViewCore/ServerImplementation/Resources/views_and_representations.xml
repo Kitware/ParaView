@@ -622,26 +622,25 @@
     </RenderViewProxy>
 
     <!-- ================================================================== -->
-    <TwoDRenderViewProxy name="2DRenderView"
-                         class="vtkPV2DRenderView"
-                         processes="client|renderserver|dataserver"
-                         base_proxygroup="views"
-                         base_proxyname="RenderView" >
+    <RenderViewProxy name="2DRenderView" class="vtkPVRenderView"
+           base_proxygroup="views" base_proxyname="RenderView" >
       <Documentation>
         2D render view. Currently this view can only show image slices.
       </Documentation>
-
-      <IntVectorProperty name="AxesVisibility"
-        command="SetAxisVisibility"
+      <!-- This property is provided for Python scripting backward
+           compatibility as it will override by default the interaction mode -->
+      <IntVectorProperty name="InteractionMode"
+        command="SetInteractionMode"
         number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Set the visibility of the 2D overlay axes.
-        </Documentation>
+        override="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="3D" value="0" />
+          <Entry text="2D" value="1" />
+          <Entry text="Selection" value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
-
-    </TwoDRenderViewProxy>
+    </RenderViewProxy>
 
     <!-- ================================================================== -->
     <ContextViewProxy name="XYChartViewBase"
