@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqRenderView.h"
 #include "pqDataRepresentation.h"
-#include "pqPickHelper.h"
+#include "pqRubberBandHelper.h"
 
 
 class pqAxesToolbar::pqInternals : public Ui::pqAxesToolbar
@@ -48,13 +48,13 @@ void pqAxesToolbar::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 
-  this->PickHelper = new pqPickHelper(this);
-  QObject::connect(this->PickHelper, SIGNAL(enabled(bool)),
+  this->PickHelper = new pqRubberBandHelper(this);
+  QObject::connect(this->PickHelper, SIGNAL(enablePick(bool)),
     this->Internals->actionPickCenter, SLOT(setEnabled(bool)));
-  QObject::connect(this->PickHelper, SIGNAL(picking(bool)),
+  QObject::connect(this->PickHelper, SIGNAL(selecting(bool)),
     this->Internals->actionPickCenter, SLOT(setChecked(bool)));
   QObject::connect(this->PickHelper,
-    SIGNAL(pickFinished(double, double, double)),
+    SIGNAL(intersectionFinished(double, double, double)),
     this, SLOT(pickCenterOfRotationFinished(double, double, double)));
 
   QObject::connect(&pqActiveObjects::instance(),
@@ -172,11 +172,11 @@ void pqAxesToolbar::pickCenterOfRotation(bool begin)
 {
   if (begin)
     {
-    this->PickHelper->beginPick();
+    this->PickHelper->beginFastIntersect();
     }
   else
     {
-    this->PickHelper->endPick();
+    this->PickHelper->endSelection();
     }
 }
 
