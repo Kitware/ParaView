@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDataDeliveryManager
+// .NAME vtkSMDataDeliveryManager - server-manager class for
+// vtkPVDataDeliveryManager.
 // .SECTION Description
-//
+// vtkSMDataDeliveryManager is the server-manager wrapper for
+// vtkPVDataDeliveryManager. It manages calling on methods on instances of
+// vtkPVDataDeliveryManager.
 
 #ifndef __vtkSMDataDeliveryManager_h
 #define __vtkSMDataDeliveryManager_h
@@ -34,7 +37,12 @@ public:
   // Get/Set the view proxy for whom we are delivering the data.
   void SetViewProxy(vtkSMViewProxy*);
 
+  // Description:
+  // Called to request delivery of the geometry.
   void Deliver(bool interactive);
+
+  // Description:
+  // EXPERIMEMTAL: Delivery when streaming is enabled.
   bool DeliverNextPiece();
 
 //BTX
@@ -42,14 +50,10 @@ protected:
   vtkSMDataDeliveryManager();
   ~vtkSMDataDeliveryManager();
 
-  void OnViewUpdated();
-
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
-  unsigned long UpdateObserverTag;
 
   vtkTimeStamp GeometryDeliveryStamp;
   vtkTimeStamp LODGeometryDeliveryStamp;
-  vtkTimeStamp ViewUpdateStamp;
 
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&); // Not implemented

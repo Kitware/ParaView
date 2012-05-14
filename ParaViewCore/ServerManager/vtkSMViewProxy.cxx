@@ -220,6 +220,7 @@ void vtkSMViewProxy::Update()
       }
 
     this->PostUpdateData();
+    this->UpdateTimeStamp.Modified();
     }
 }
 

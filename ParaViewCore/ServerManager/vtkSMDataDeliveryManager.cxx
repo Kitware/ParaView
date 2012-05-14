@@ -16,12 +16,10 @@
 
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
-#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkObjectFactory.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
-#include "vtkRepresentedDataStorage.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
 #include "vtkTimerLog.h"
@@ -30,53 +28,23 @@
 
 vtkStandardNewMacro(vtkSMDataDeliveryManager);
 //----------------------------------------------------------------------------
-vtkSMDataDeliveryManager::vtkSMDataDeliveryManager():
-  UpdateObserverTag(0)
+vtkSMDataDeliveryManager::vtkSMDataDeliveryManager()
 {
 }
 
 //----------------------------------------------------------------------------
 vtkSMDataDeliveryManager::~vtkSMDataDeliveryManager()
 {
-  if (this->ViewProxy && this->UpdateObserverTag)
-    {
-    this->ViewProxy->RemoveObserver(this->UpdateObserverTag);
-    this->UpdateObserverTag = 0;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkSMDataDeliveryManager::SetViewProxy(vtkSMViewProxy* viewproxy)
 {
-  if (viewproxy == this->ViewProxy)
+  if (viewproxy != this->ViewProxy)
     {
-    return;
+    this->ViewProxy = viewproxy;
+    this->Modified();
     }
-
-  if (this->ViewProxy && this->UpdateObserverTag)
-    {
-    this->ViewProxy->RemoveObserver(this->UpdateObserverTag);
-    this->UpdateObserverTag = 0;
-    }
-  this->ViewProxy = viewproxy;
-  if (this->ViewProxy)
-    {
-    this->UpdateObserverTag = this->ViewProxy->AddObserver(
-      vtkCommand::UpdateDataEvent,
-      this, &vtkSMDataDeliveryManager::OnViewUpdated);
-    }
-
-  this->Modified();
-  this->ViewUpdateStamp.Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMDataDeliveryManager::OnViewUpdated()
-{
-  // Update the timestamp so we realize that view was updated. Hence, we can
-  // expect new geometry needs to be delivered. Otherwise that code is
-  // short-circuited for better rendering performance.
-  this->ViewUpdateStamp.Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -88,12 +56,14 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     this->ViewProxy->GetClientSideObject());
   bool use_lod = interactive && view->GetUseLODForInteractiveRender();
 
+  unsigned long update_ts = this->ViewProxy->GetUpdateTimeStamp();
+
   // Delivery the "base" geometries for all representations. This is true,
   // irrespective of whether we are streaming datasets. When a representation is
   // updated, it provides a base-geometry that gets delivered for rendering (if
   // any). This code handles that.
-  if ( (!use_lod && this->ViewUpdateStamp < this->GeometryDeliveryStamp) ||
-    (use_lod && this->ViewUpdateStamp < this->LODGeometryDeliveryStamp) )
+  if ( (!use_lod && update_ts < this->GeometryDeliveryStamp) ||
+    (use_lod && update_ts < this->LODGeometryDeliveryStamp) )
     {
     return;
     }
@@ -102,19 +72,17 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;
 
   std::vector<unsigned int> keys_to_deliver;
-  
-  // FIXME:STREAMING this logic is not the best here. We end up re-delivering
-  // geometry when the representation didn't really update at all.
-  if (!view->GetGeometryStore()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
+  if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
     {
     return;
     }
 
   cout << "Request Delivery: " <<  keys_to_deliver.size() << endl;
+  vtkTimerLog::MarkStartEvent("vtkSMDataDeliveryManager: Deliver Geometry");
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this->ViewProxy)
-         << "GetGeometryStore"
+         << "GetDeliveryManager"
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
          << vtkClientServerStream::LastResult
@@ -127,6 +95,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   this->ViewProxy->GetSession()->ExecuteStream(
     this->ViewProxy->GetLocation(), stream, false);
   timeStamp.Modified();
+  vtkTimerLog::MarkEndEvent("vtkSMDataDeliveryManager: Deliver Geometry");
 }
 
 //----------------------------------------------------------------------------
@@ -174,7 +143,7 @@ bool vtkSMDataDeliveryManager::DeliverNextPiece()
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
            << VTKOBJECT(this->ViewProxy)
-           << "GetGeometryStore"
+           << "GetDeliveryManager"
            << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
            << vtkClientServerStream::LastResult

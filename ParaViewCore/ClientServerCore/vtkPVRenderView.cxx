@@ -58,7 +58,7 @@
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkRepresentedDataStorage.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -77,7 +77,7 @@ class vtkPVRenderView::vtkInternals
 {
 public:
   unsigned int UniqueId;
-  vtkNew<vtkRepresentedDataStorage> GeometryStore;
+  vtkNew<vtkPVDataDeliveryManager> DeliveryManager;
   vtkInternals() : UniqueId(1)
   {
   }
@@ -93,13 +93,13 @@ vtkStandardNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, REPRESENTED_DATA_STORE, ObjectBase);
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
   this->Internals = new vtkInternals();
-  this->Internals->GeometryStore->SetView(this);
+  // non-reference counted, so no worries about reference loops.
+  this->Internals->DeliveryManager->SetRenderView(this);
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
@@ -293,9 +293,9 @@ vtkPVRenderView::~vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
-vtkRepresentedDataStorage* vtkPVRenderView::GetGeometryStore()
+vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
 {
-  return this->Internals->GeometryStore.GetPointer();
+  return this->Internals->DeliveryManager.GetPointer();
 }
 
 //----------------------------------------------------------------------------
@@ -342,7 +342,7 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
     // collaboration mode only the master has the widget in its representation
     this->SynchronizationCounter++;
     unsigned int id = this->Internals->UniqueId++;
-    this->Internals->GeometryStore->RegisterRepresentation(id, dataRep);
+    this->Internals->DeliveryManager->RegisterRepresentation(id, dataRep);
     }
 
   this->Superclass::AddRepresentationInternal(rep);
@@ -354,7 +354,7 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
   vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
   if (dataRep != NULL)
     {
-    this->Internals->GeometryStore->UnRegisterRepresentation(dataRep);
+    this->Internals->DeliveryManager->UnRegisterRepresentation(dataRep);
 
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
@@ -591,9 +591,6 @@ void vtkPVRenderView::ResetCameraClippingRange()
     }
 }
 
-#define PRINT_BOUNDS(bds)\
-  bds[0] << "," << bds[1] << "," << bds[2] << "," << bds[3] << "," << bds[4] << "," << bds[5] << ","
-
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeGeometryBounds()
 {
@@ -728,9 +725,6 @@ void vtkPVRenderView::Update()
   // information during update.
   this->GeometryBounds.Reset();
 
-  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
-    this->Internals->GeometryStore.GetPointer());
-
   this->Superclass::Update();
 
   // After every update we can expect the representation geometries to change.
@@ -754,7 +748,7 @@ void vtkPVRenderView::Update()
     }
 
   // Gather information about geometry sizes from all representations.
-  double local_size = this->GetGeometryStore()->GetVisibleDataSize(false) / 1024.0;
+  double local_size = this->GetDeliveryManager()->GetVisibleDataSize(false) / 1024.0;
   this->SynchronizedWindows->SynchronizeSize(local_size);
   // cout << "Full Geometry size: " << local_size << endl;
 
@@ -795,15 +789,13 @@ void vtkPVRenderView::Update()
 void vtkPVRenderView::UpdateLOD()
 {
   vtkTimerLog::MarkStartEvent("RenderView::UpdateLOD");
-  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
-    this->Internals->GeometryStore.GetPointer());
 
   // Update LOD geometry.
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE_LOD(),
     this->RequestInformation, this->ReplyInformationVector);
 
-  double local_size = this->GetGeometryStore()->GetVisibleDataSize(true) / 1024.0;
+  double local_size = this->GetDeliveryManager()->GetVisibleDataSize(true) / 1024.0;
   this->SynchronizedWindows->SynchronizeSize(local_size);
   // cout << "LOD Geometry size: " << local_size << endl;
 
@@ -866,12 +858,12 @@ unsigned int vtkPVRenderView::GetNextPieceToDeliver(double planes[24])
     // Priority queue contains a list of (representation-id, block-id) tuples
     // indicating the blocks to request.
     vtkTimerLog::MarkStartEvent("Build View Priority Queue");
-    this->GetGeometryStore()->BuildPriorityQueue(planes);
+    this->GetDeliveryManager()->BuildPriorityQueue(planes);
     vtkTimerLog::MarkEndEvent("Build View Priority Queue");
     this->PriorityQueueBuildTimeStamp.Modified();
     }
 
-  return this->GetGeometryStore()->GetRepresentationIdFromQueue();
+  return this->GetDeliveryManager()->GetRepresentationIdFromQueue();
 }
  
 //----------------------------------------------------------------------------
@@ -879,8 +871,6 @@ void vtkPVRenderView::StreamingUpdate()
 {
   vtkTimerLog::MarkStartEvent("Streaming Update");
   // Update the representations.
-  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
-    this->Internals->GeometryStore.GetPointer());
   this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
     this->RequestInformation, this->ReplyInformationVector);
   vtkTimerLog::MarkEndEvent("Streaming Update");
@@ -922,10 +912,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   // Render each representation with available geometry.
   // This is the pass where representations get an opportunity to get the
   // currently "available" represented data and try to render it.
-  this->RequestInformation->Set(REPRESENTED_DATA_STORE(),
-    this->Internals->GeometryStore.GetPointer());
-  this->CallProcessViewRequest(
-    vtkPVView::REQUEST_RENDER(),
+  this->CallProcessViewRequest(vtkPVView::REQUEST_RENDER(),
     this->RequestInformation, this->ReplyInformationVector);
 
   // set the image reduction factor.
@@ -954,7 +941,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     (!use_distributed_rendering && in_tile_display_mode));
 
   this->SynchronizedRenderers->SetKdTree(
-    this->Internals->GeometryStore->GetKdTree());
+    this->Internals->DeliveryManager->GetKdTree());
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -1011,91 +998,84 @@ int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 void vtkPVRenderView::SetPiece(vtkInformation* info,
   vtkPVDataRepresentation* repr, vtkDataObject* data)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-  storage->SetPiece(repr, data, false);
+
+  view->GetDeliveryManager()->SetPiece(repr, data, false);
 }
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(vtkInformation* info,
     vtkPVDataRepresentation* repr)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return NULL;
     }
-  return storage->GetProducer(repr, false);
+
+  return view->GetDeliveryManager()->GetProducer(repr, false);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetPieceLOD(vtkInformation* info,
   vtkPVDataRepresentation* repr, vtkDataObject* data)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
-    } 
-  storage->SetPiece(repr, data, true);
+    }
+
+  view->GetDeliveryManager()->SetPiece(repr, data, true);
 }
 
 //----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(vtkInformation* info,
     vtkPVDataRepresentation* repr)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return NULL;
     }
 
-  return storage->GetProducer(repr, true);
+  return view->GetDeliveryManager()->GetProducer(repr, true);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::MarkAsRedistributable(
   vtkInformation* info, vtkPVDataRepresentation* repr)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-  storage->MarkAsRedistributable(repr);
+
+  view->GetDeliveryManager()->MarkAsRedistributable(repr);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetStreamable(
   vtkInformation* info, vtkPVDataRepresentation* repr, bool val)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-  storage->SetStreamable(repr, val);
+
+  view->GetDeliveryManager()->SetStreamable(repr, val);
 }
 
 
@@ -1103,47 +1083,41 @@ void vtkPVRenderView::SetStreamable(
 void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
   vtkPVDataRepresentation* repr, bool clone)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-  storage->SetDeliverToAllProcesses(repr, clone, false);
+
+  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, false);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
   vtkPVDataRepresentation* repr, bool clone)
 {
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-  storage->SetDeliverToAllProcesses(repr, clone, true);
+
+  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, true);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetGeometryBounds(vtkInformation* info,
   double bounds[6], vtkMatrix4x4* matrix /*=NULL*/)
 {
-  // FIXME: I need a cleaner way for accessing the render view.
-  vtkRepresentedDataStorage* storage =
-    vtkRepresentedDataStorage::SafeDownCast(
-      info->Get(REPRESENTED_DATA_STORE()));
-  if (!storage)
+  vtkPVRenderView* self= vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
     {
-    vtkGenericWarningMacro("Missing REPRESENTED_DATA_STORE().");
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
 
-  vtkPVRenderView* self = vtkPVRenderView::SafeDownCast(storage->GetView());
   if (self)
     {
     if (matrix && vtkMath::AreBoundsInitialized(bounds))

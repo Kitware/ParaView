@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkRepresentedDataStorage.h"
-#include "vtkRepresentedDataStorageInternals.h"
+#include "vtkPVDataDeliveryManager.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAMRBox.h"
 #include "vtkAMRVolumeRepresentation.h"
 #include "vtkBSPCutsGenerator.h"
 #include "vtkCamera.h"
+#include "vtkDataObject.h"
+#include "vtkMath.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
@@ -29,19 +31,156 @@
 #include "vtkPKdTree.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataRepresentation.h"
+#include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSession.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkRenderer.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkUniformGridAMRDataIterator.h"
 #include "vtkUniformGrid.h"
 #include "vtkUnsignedIntArray.h"
-#include "vtkAMRBox.h"
-#include "vtkMath.h"
+#include "vtkWeakPointer.h"
 
 #include <assert.h>
+#include <map>
+#include <queue>
+#include <utility>
 
+//*****************************************************************************
+class vtkPVDataDeliveryManager::vtkInternals
+{
+public:
+
+  class vtkPriorityQueueItem
+    {
+  public:
+    unsigned int RepresentationId;
+    unsigned int BlockId;
+    unsigned int Level;
+    unsigned int Index;
+    double Priority;
+
+    vtkPriorityQueueItem() :
+      RepresentationId(0), BlockId(0),
+      Level(0), Index(0), Priority(0)
+    {
+    }
+
+    bool operator < (const vtkPriorityQueueItem& other) const
+      {
+      return this->Priority < other.Priority;
+      }
+    };
+
+  typedef std::priority_queue<vtkPriorityQueueItem> PriorityQueueType;
+  PriorityQueueType PriorityQueue;
+
+  class vtkItem
+    {
+    vtkSmartPointer<vtkPVTrivialProducer> Producer;
+    vtkWeakPointer<vtkDataObject> DataObject;
+    unsigned long TimeStamp;
+    unsigned long ActualMemorySize;
+  public:
+    vtkWeakPointer<vtkPVDataRepresentation> Representation;
+    bool AlwaysClone;
+    bool Redistributable;
+    bool Streamable;
+
+    vtkItem() :
+      Producer(vtkSmartPointer<vtkPVTrivialProducer>::New()),
+      TimeStamp(0),
+      ActualMemorySize(0),
+      AlwaysClone(false),
+      Redistributable(false),
+      Streamable(false)
+    { }
+
+    void SetDataObject(vtkDataObject* data)
+      {
+      this->DataObject = data;
+      this->Producer->SetOutput(data);
+
+      // the vtkTrivialProducer's MTime is is changed whenever the data itself
+      // changes or the data's mtime changes and hence we get a good indication
+      // of when we have a new piece for real.
+      this->TimeStamp = this->Producer->GetMTime();
+      this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+      }
+
+    vtkPVTrivialProducer* GetProducer() const
+      { return this->Producer.GetPointer(); }
+    vtkDataObject* GetDataObject() const
+      { return this->DataObject.GetPointer(); }
+    unsigned long GetTimeStamp() const
+      { return this->TimeStamp; }
+    void SetTimeStamp(unsigned long ts)
+      { this->TimeStamp = ts; }
+    unsigned long GetVisibleDataSize()
+      {
+      if (this->Representation && this->Representation->GetVisibility())
+        {
+        return this->ActualMemorySize;
+        }
+      return 0;
+      }
+    };
+
+  typedef std::map<unsigned int, std::pair<vtkItem, vtkItem> > ItemsMapType;
+
+  vtkItem* GetItem(unsigned int index, bool use_second)
+    {
+    if (this->ItemsMap.find(index) != this->ItemsMap.end())
+      {
+      return use_second? &(this->ItemsMap[index].second) :
+        &(this->ItemsMap[index].first);
+      }
+    return NULL;
+    }
+
+  vtkItem* GetItem(vtkPVDataRepresentation* repr, bool use_second)
+    {
+    RepresentationToIdMapType::iterator iter =
+      this->RepresentationToIdMap.find(repr);
+    if (iter != this->RepresentationToIdMap.end())
+      {
+      unsigned int index = iter->second;
+      return use_second? &(this->ItemsMap[index].second) :
+        &(this->ItemsMap[index].first);
+      }
+
+    return NULL;
+    }
+
+  unsigned long GetVisibleDataSize(bool use_second_if_available)
+    {
+    unsigned long size = 0;
+    ItemsMapType::iterator iter;
+    for (iter = this->ItemsMap.begin(); iter != this->ItemsMap.end(); ++iter)
+      {
+      if (use_second_if_available && iter->second.second.GetDataObject())
+        {
+        size += iter->second.second.GetVisibleDataSize();
+        }
+      else
+        {
+        size += iter->second.first.GetVisibleDataSize();
+        }
+      }
+    return size;
+    }
+
+  typedef std::map<vtkPVDataRepresentation*, unsigned int>
+    RepresentationToIdMapType;
+
+  RepresentationToIdMapType RepresentationToIdMap;
+  ItemsMapType ItemsMap;
+};
+//*****************************************************************************
 namespace
 {
   // this code is stolen from vtkFrustumCoverageCuller.
@@ -137,40 +276,42 @@ namespace
     }
 };
 
-vtkStandardNewMacro(vtkRepresentedDataStorage);
+//*****************************************************************************
+
+vtkStandardNewMacro(vtkPVDataDeliveryManager);
 //----------------------------------------------------------------------------
-vtkRepresentedDataStorage::vtkRepresentedDataStorage()
+vtkPVDataDeliveryManager::vtkPVDataDeliveryManager()
   : Internals(new vtkInternals())
 {
 }
 
 //----------------------------------------------------------------------------
-vtkRepresentedDataStorage::~vtkRepresentedDataStorage()
+vtkPVDataDeliveryManager::~vtkPVDataDeliveryManager()
 {
   delete this->Internals;
   this->Internals = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetView(vtkPVRenderView* view)
+void vtkPVDataDeliveryManager::SetRenderView(vtkPVRenderView* view)
 {
-  this->View = view;
+  this->RenderView = view;
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderView* vtkRepresentedDataStorage::GetView()
+vtkPVRenderView* vtkPVDataDeliveryManager::GetRenderView()
 {
-  return this->View;
+  return this->RenderView;
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkRepresentedDataStorage::GetVisibleDataSize(bool low_res)
+unsigned long vtkPVDataDeliveryManager::GetVisibleDataSize(bool low_res)
 {
   return this->Internals->GetVisibleDataSize(low_res);
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::RegisterRepresentation(
+void vtkPVDataDeliveryManager::RegisterRepresentation(
   unsigned int id, vtkPVDataRepresentation* repr)
 {
   this->Internals->RepresentationToIdMap[repr] = id;
@@ -185,7 +326,7 @@ void vtkRepresentedDataStorage::RegisterRepresentation(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::UnRegisterRepresentation(
+void vtkPVDataDeliveryManager::UnRegisterRepresentation(
   vtkPVDataRepresentation* repr)
 {
   vtkInternals::RepresentationToIdMapType::iterator iter =
@@ -200,7 +341,7 @@ void vtkRepresentedDataStorage::UnRegisterRepresentation(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetDeliverToAllProcesses(
+void vtkPVDataDeliveryManager::SetDeliverToAllProcesses(
   vtkPVDataRepresentation* repr, bool mode, bool low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
@@ -215,7 +356,7 @@ void vtkRepresentedDataStorage::SetDeliverToAllProcesses(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::MarkAsRedistributable(
+void vtkPVDataDeliveryManager::MarkAsRedistributable(
   vtkPVDataRepresentation* repr)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
@@ -232,7 +373,7 @@ void vtkRepresentedDataStorage::MarkAsRedistributable(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetStreamable(
+void vtkPVDataDeliveryManager::SetStreamable(
   vtkPVDataRepresentation* repr, bool val)
 {
   if (!repr->IsA("vtkAMRVolumeRepresentation") && val == true)
@@ -256,13 +397,18 @@ void vtkRepresentedDataStorage::SetStreamable(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetPiece(
+void vtkPVDataDeliveryManager::SetPiece(
   vtkPVDataRepresentation* repr, vtkDataObject* data, bool low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (item)
     {
-    item->SetDataObject(data);
+    vtkPVDataRepresentationPipeline* executive =
+      vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
+    if (executive && executive->GetDataTime() > item->GetTimeStamp())
+      {
+      item->SetDataObject(data);
+      }
     }
   else
     {
@@ -271,7 +417,7 @@ void vtkRepresentedDataStorage::SetPiece(
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
+vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
   vtkPVDataRepresentation* repr, bool low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
@@ -285,7 +431,7 @@ vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::SetPiece(unsigned int id, vtkDataObject* data, bool
+void vtkPVDataDeliveryManager::SetPiece(unsigned int id, vtkDataObject* data, bool
   low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
@@ -300,7 +446,7 @@ void vtkRepresentedDataStorage::SetPiece(unsigned int id, vtkDataObject* data, b
 }
 
 //----------------------------------------------------------------------------
-vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
+vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
   unsigned int id, bool low_res)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(id, low_res);
@@ -314,7 +460,7 @@ vtkAlgorithmOutput* vtkRepresentedDataStorage::GetProducer(
 }
 
 //----------------------------------------------------------------------------
-bool vtkRepresentedDataStorage::NeedsDelivery(
+bool vtkPVDataDeliveryManager::NeedsDelivery(
   unsigned long timestamp, 
   std::vector<unsigned int> &keys_to_deliver, bool use_low)
 {
@@ -334,14 +480,14 @@ bool vtkRepresentedDataStorage::NeedsDelivery(
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned int *values)
+void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned int *values)
 
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
   if (activeSession && activeSession->IsMultiClients())
     {
-    if (!this->View->SynchronizeForCollaboration())
+    if (!this->RenderView->SynchronizeForCollaboration())
       {
       return;
       }
@@ -363,9 +509,9 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned
     "LowRes Data Migration" : "FullRes Data Migration");
 
   bool using_remote_rendering =
-    use_lod? this->View->GetUseDistributedRenderingForInteractiveRender() :
-    this->View->GetUseDistributedRenderingForStillRender();
-  int mode = this->View->GetDataDistributionMode(using_remote_rendering);
+    use_lod? this->RenderView->GetUseDistributedRenderingForInteractiveRender() :
+    this->RenderView->GetUseDistributedRenderingForStillRender();
+  int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
 
   for (unsigned int cc=0; cc < size; cc++)
@@ -400,7 +546,7 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned
   // There's a possibility that we'd need to do ordered compositing.
   // Ask the view if we need to redistribute the data for ordered compositing.
   bool use_ordered_compositing = using_remote_rendering &&
-    this->View->GetUseOrderedCompositing();
+    this->RenderView->GetUseOrderedCompositing();
 
   if (use_ordered_compositing && !use_lod)
     {
@@ -468,13 +614,13 @@ void vtkRepresentedDataStorage::Deliver(int use_lod, unsigned int size, unsigned
 }
 
 //----------------------------------------------------------------------------
-vtkPKdTree* vtkRepresentedDataStorage::GetKdTree()
+vtkPKdTree* vtkPVDataDeliveryManager::GetKdTree()
 {
   return this->KdTree;
 }
 
 //----------------------------------------------------------------------------
-bool vtkRepresentedDataStorage::BuildPriorityQueue(double planes[24])
+bool vtkPVDataDeliveryManager::BuildPriorityQueue(double planes[24])
 {
   cout << "BuildPriorityQueue" << endl;
   // just find the first visible AMR dataset and build priority queue for that
@@ -511,7 +657,7 @@ bool vtkRepresentedDataStorage::BuildPriorityQueue(double planes[24])
   // now build a priority queue for absent blocks using the current camera.
 
   //double planes[24];
-  //vtkRenderer* ren = this->View->GetRenderer();
+  //vtkRenderer* ren = this->RenderView->GetRenderer();
   //ren->GetActiveCamera()->GetFrustumPlanes(
   //  ren->GetTiledAspectRatio(), planes);
 
@@ -556,7 +702,7 @@ bool vtkRepresentedDataStorage::BuildPriorityQueue(double planes[24])
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
+void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(key, false);
   vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
@@ -609,7 +755,7 @@ void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
     vtkAMRVolumeRepresentation* repr = vtkAMRVolumeRepresentation::SafeDownCast(
       item->Representation);
     repr->SetStreamingBlockId(qitem.BlockId);
-    this->View->StreamingUpdate();
+    this->RenderView->StreamingUpdate();
     repr->ResetStreamingBlockId();
 
     oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
@@ -652,7 +798,7 @@ void vtkRepresentedDataStorage::StreamingDeliver(unsigned int key)
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkRepresentedDataStorage::GetRepresentationIdFromQueue()
+unsigned int vtkPVDataDeliveryManager::GetRepresentationIdFromQueue()
 {
   if (!this->Internals->PriorityQueue.empty())
     {
@@ -663,7 +809,7 @@ unsigned int vtkRepresentedDataStorage::GetRepresentationIdFromQueue()
 }
 
 //----------------------------------------------------------------------------
-void vtkRepresentedDataStorage::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVDataDeliveryManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

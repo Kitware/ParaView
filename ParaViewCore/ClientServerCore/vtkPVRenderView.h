@@ -12,26 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVRenderView
+// .NAME vtkPVRenderView - Render View for ParaView.
 // .SECTION Description
-// vtkRenderViewBase equivalent that is specialized for ParaView. Eventually
-// vtkRenderViewBase should have a abstract base-class that this will derive from
-// instead of vtkRenderViewBase since we do not use the labelling/icon stuff from
-// vtkRenderViewBase.
-
-// FIXME: Following is temporary -- until I decide if that's necessary at all.
-// vtkPVRenderView has two types of public methods:
-// 1. @CallOnAllProcessess -- must be called on all processes with exactly the
-//                            same values.
-// 2. @CallOnClientOnly    -- can be called only on the "client" process. These
-//                            typically encapsulate client-side logic such as
-//                            deciding if we are doing remote rendering or local
-//                            rendering etc.
-
-// Utkarsh: Try to use methods that will be called on all processes for most
-// decision making similar to what ResetCamera() does. This will avoid the need
-// to have special code in vtkSMRenderViewProxy and will simplify life when
-// creating new views. "Move logic to VTK" -- that's the Mantra.
+// vtkRenderView equivalent that is specialized for ParaView. vtkRenderView
+// handles polygonal rendering for ParaView in all the different modes of
+// operation. vtkPVRenderView instance must be created on all involved
+// processes. vtkPVRenderView uses the information about what process it has
+// been created on to decide what part of the "rendering" happens on the
+// process.
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
 
@@ -44,8 +32,6 @@ class vtkCameraManipulator;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
-class vtkInformationObjectBaseKey;
-class vtkInformationRequestKey;
 class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
 class vtkLight;
@@ -59,11 +45,10 @@ class vtkPVGenericRenderWindowInteractor;
 class vtkPVHardwareSelector;
 class vtkPVInteractorStyle;
 class vtkPVSynchronizedRenderer;
-class vtkPVSynchronizedRenderWindows;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
-class vtkRepresentedDataStorage;
+class vtkPVDataDeliveryManager;
 class vtkTexture;
 
 class VTK_EXPORT vtkPVRenderView : public vtkPVView
@@ -171,13 +156,6 @@ public:
   virtual void InteractiveRender();
 
   // Description:
-  // Returns the representation id which is going to deliver the next piece for
-  // streaming.
-  unsigned int GetNextPieceToDeliver(double planes[24]);
-
-  void StreamingUpdate();
-
-  // Description:
   // Get/Set the reduction-factor to use when for StillRender(). This is
   // typically set to 1, but in some cases with terrible connectivity or really
   // large displays, one may want to use a sub-sampled image even for
@@ -247,10 +225,10 @@ public:
   vtkBooleanMacro(UseLightKit, bool);
 
   // Description:
-  // Key used to pass the internal vtkRepresentedDataStorage instance to the
-  // representations to get/set datasets to be delivered to rendering
-  // processes.
-  static vtkInformationObjectBaseKey* REPRESENTED_DATA_STORE();
+  // EXPERIMENTAL: Components of the streaming API for the render view. This is
+  // still under development.
+  unsigned int GetNextPieceToDeliver(double planes[24]);
+  void StreamingUpdate();
 
   // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.
@@ -353,10 +331,6 @@ public:
     double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
-
-public:
-  //*****************************************************************
-  // Methods merely exposing methods for internal objects.
 
   // Description:
   // Turn on/off the default light in the 3D renderer.
@@ -486,7 +460,7 @@ public:
 
   // Description:
   // Provides access to the geometry storage for this view.
-  vtkRepresentedDataStorage* GetGeometryStore();
+  vtkPVDataDeliveryManager* GetDeliveryManager();
 
   // Description:
   // Returns true when ordered compositing is needed on the current group of
@@ -501,6 +475,9 @@ public:
   // Synchronizes core ivars for multi-client setups.
   bool SynchronizeForCollaboration();
 
+  // Description:
+  // SynchronizationCounter is used in multi-clients mode to ensure that the
+  // views on two different clients are in the same state as the server side.
   vtkGetMacro(SynchronizationCounter, int);
 
 //BTX

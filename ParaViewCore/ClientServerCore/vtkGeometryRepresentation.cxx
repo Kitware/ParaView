@@ -196,23 +196,36 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     {
     // provide the "geometry" to the view so the view can delivery it to the
     // rendering nodes as and when needed.
-
     // When this process doesn't have any valid input, the cache-keeper is setup
-    // to provide a place-holder dataset of the right type.
-    vtkPVRenderView::SetPiece(
-      inInfo, this, this->CacheKeeper->GetOutputDataObject(0));
+    // to provide a place-holder dataset of the right type. This is essential
+    // since the vtkPVRenderView uses the type specified to decide on the
+    // delivery mechanism, among other things.
+    vtkPVRenderView::SetPiece(inInfo, this,
+      this->CacheKeeper->GetOutputDataObject(0));
+
+    // Since we are rendering polydata, it can be redistributed when ordered
+    // compositing is needed. So let the view know that it can feel free to
+    // redistribute data as and when needed.
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
+
+    // Tell the view if this representation needs ordered compositing. We need
+    // ordered compositing when rendering translucent geometry. 
     if (this->Actor->GetProperty()->GetOpacity() < 1.0)
       {
+      // We need to extend this condition to consider translucent LUTs once we
+      // start supporting them,
+
       outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
       }
 
-    // Set the data-bounds.
-    //double bounds[6];
+    // Finally, let the view know about the geometry bounds. The view uses this
+    // information for resetting camera and clip planes. Since this
+    // representation allows users to transform the geometry, we need to ensure
+    // that the bounds we report include the transformation as well.
     vtkNew<vtkMatrix4x4> matrix;
     this->Actor->GetMatrix(matrix.GetPointer());
-    vtkPVRenderView::SetGeometryBounds(
-      inInfo, this->DataBounds, matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds,
+      matrix.GetPointer());
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {
@@ -229,6 +242,9 @@ int vtkGeometryRepresentation::ProcessViewRequest(
         }
 
       this->Decimator->Update();
+
+      // Pass along the LOD geometry to the view so that it can deliver it to
+      // the rendering node as and when needed.
       vtkPVRenderView::SetPieceLOD(inInfo, this, 
         this->Decimator->GetOutputDataObject(0));
       }

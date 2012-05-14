@@ -86,6 +86,11 @@ public:
   // know if the internal geometry has changed.
   virtual bool HasDirtyRepresentation();
 
+  // Description:
+  // Returns the time when the most recent Update() caused the view to update.
+  unsigned long GetUpdateTimeStamp()
+    { return this->UpdateTimeStamp; }
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -112,6 +117,8 @@ protected:
   char* DefaultRepresentationName;
 
   bool Enable;
+
+  vtkTimeStamp UpdateTimeStamp;
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented

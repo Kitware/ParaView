@@ -58,6 +58,9 @@ SET (Kit_SRCS
   vtkPVDataInformation.cxx
   vtkPVDataRepresentation.cxx
   vtkPVDataRepresentationPipeline.cxx
+  vtkProcessModuleAutoMPI.cxx
+  vtkProcessModule.cxx
+  vtkPVDataDeliveryManager.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
   vtkPVDisplayInformation.cxx
@@ -77,24 +80,24 @@ SET (Kit_SRCS
   vtkPVOptionsXMLParser.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
-  vtkPVPlotMatrixView.cxx
   vtkPVPlotMatrixRepresentation.cxx
+  vtkPVPlotMatrixView.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
-  vtkPVPluginTracker.cxx
   vtkPVPluginsInformation.cxx
+  vtkPVPluginTracker.cxx
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
-  vtkPVSILInformation.cxx
-  vtkPVSingleOutputExtractSelection.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVServerOptions.cxx
   vtkPVSession.cxx
+  vtkPVSILInformation.cxx
+  vtkPVSingleOutputExtractSelection.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVSystemInformation.cxx
@@ -102,9 +105,6 @@ SET (Kit_SRCS
   vtkPVTimerInformation.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
-  vtkProcessModule.cxx
-  vtkProcessModuleAutoMPI.cxx
-  vtkRepresentedDataStorage.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
   vtkSession.cxx

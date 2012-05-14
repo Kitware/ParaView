@@ -26,6 +26,7 @@
 #include "vtkView.h"
 
 class vtkInformation;
+class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
 class vtkPVSynchronizedRenderWindows;
@@ -114,6 +115,12 @@ public:
   virtual void CleanupAfterScreenshot();
 
   // Description:
+  // Key used to pass the vtkPVView pointer to the representation during any of
+  // the view passes such as REQUEST_UPDATE(), REQUEST_UPDATE_LOD(),
+  // REQUEST_RENDER(), etc.
+  static vtkInformationObjectBaseKey* VIEW();
+
+  // Description:
   // This is a Update-Data pass. All representations are expected to update
   // their inputs and prepare geometries for rendering. All heavy work that has
   // to happen only when input-data changes can be done in this pass.
@@ -127,9 +134,9 @@ public:
   static vtkInformationRequestKey* REQUEST_UPDATE_LOD();
 
   // Description:
-  // This is a render pass. This happens only after
-  // REQUEST_PREPARE_FOR_RENDER() (and optionally REQUEST_DELIVERY()) has happened.
-  // This is called for every render.
+  // This is a render pass. This is called for every render, hence
+  // representations should not do any work that doesn't depend on things that
+  // could change every render.
   static vtkInformationRequestKey* REQUEST_RENDER();
 
   // Description:
