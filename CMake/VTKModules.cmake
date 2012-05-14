@@ -5,6 +5,8 @@ include (vtkDependentOption)
 # First turn of stand alone group 
 set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_Group_StandAlone)
+set(VTK_Group_Rendering OFF CACHE BOOL "" FORCE)
+mark_as_advanced(VTK_Group_Rendering)
 
 # The VTK modules needed when MPI is turned on
 set(_vtk_mpi_modules
@@ -37,9 +39,20 @@ mark_as_advanced(VTK_VPIC_USE_MPI)
 
 
 set(_vtk_modules
-# VTK modules which ParaView has a explicity compile
-# time dependency on
+  # VTK modules which ParaView has a explicity compile
+  # time dependency on
+  vtkRenderingVolume
+  vtkRenderingLabel
+  vtkRenderingFreeType
+  vtkRenderingFreeTypeOpenGL
+  vtkRenderingVolumeOpenGL
   vtkRenderingOpenGL
+  vtkRenderingLOD
+  vtkRenderingHybridOpenGL
+  vtkRenderingContext2D
+  vtkRenderingAnnotation
+  vtkInteractionStyle
+  vtkInteractionWidgets
   vtkRenderingParallel
   vtkFiltersParallel
   vtkIOParallelExodus
