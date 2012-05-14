@@ -1019,25 +1019,10 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           }
         domainIter->Delete();
 
-        //          pqProxySelectionWidget *widget = 0;
         if(vtkSMProxyListDomain::SafeDownCast(domain))
           {
-          //              widget = new pqProxySelectionWidget(proxy,
-          //                                                  proxy->GetPropertyName(property),
-          //                                                  pp->GetXMLLabel(),
-          //                                                 this);
-          //              widget->select();
-          //              this->addPropertyLink(widget,
-          //                                    proxy->GetPropertyName(property),
-          //                                    SIGNAL(proxyChanged(pqSMProxy)),
-          //                                    property);
-          //              this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
-
-          //              propertyWidget = new pqObjectPanelPropertyWidget()
-
-          //              layout->addWidget(widget);
+          propertyWidget = new pqProxyPropertyWidget(pp, smProxy);
           }
-        propertyWidget = new pqProxyPropertyWidget(pp, smProxy);
         }
       }
 
