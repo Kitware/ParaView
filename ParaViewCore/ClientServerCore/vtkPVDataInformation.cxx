@@ -358,10 +358,9 @@ void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformatio
     }
 
   vtkInformation *dinfo = data->GetInformation();
-  if (dinfo->Has(vtkDataObject::DATA_TIME_STEPS()) &&
-    dinfo->Length(vtkDataObject::DATA_TIME_STEPS()) == 1)
+  if (dinfo->Has(vtkDataObject::DATA_TIME_STEP()))
     {
-    double time = dinfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+    double time = dinfo->Get(vtkDataObject::DATA_TIME_STEP());
     this->Time = time;
     this->HasTime = 1;
     }
@@ -582,7 +581,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
         // Don't gather any data information from the hypothetical null source.
         return;
         }
-          
+
       if (algOutput->GetProducer()->IsA("vtkPVPostFilter"))
         {
         algOutput = algOutput->GetProducer()->GetInputConnection(0, 0);
@@ -616,7 +615,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
                   << (object?object->GetClassName():"(null"));
     return;
     }
-  
+
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)
     {
@@ -1021,7 +1020,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << this->NumberOfRows
        << this->MemorySize
        << this->PolygonCount
-       << this->Time 
+       << this->Time
        << this->HasTime
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);

@@ -137,9 +137,9 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
         vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
       if (this->UpdateTimeValid)
         {
-        sddp->SetUpdateTimeSteps(
+        sddp->SetUpdateTimeStep(
           inputVector[cc]->GetInformationObject(kk),
-          &this->UpdateTime, 1);
+          this->UpdateTime);
         }
       }
     }

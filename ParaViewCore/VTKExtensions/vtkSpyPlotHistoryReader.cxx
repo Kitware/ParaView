@@ -215,7 +215,7 @@ int vtkSpyPlotHistoryReader::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkTable *output = vtkTable::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -240,16 +240,16 @@ int vtkSpyPlotHistoryReader::RequestData(
   int TimeIndex = 0;
   // Check if a particular time was requested by the pipeline.
   // This overrides the ivar.
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) && tsLength>0)
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) && tsLength>0)
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
-    double *requestedTimeSteps =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double requestedTimeStep =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
     // find the first time value larger than requested time value
     // this logic could be improved
-    while (TimeIndex < tsLength-1 && steps[TimeIndex] < requestedTimeSteps[0])
+    while (TimeIndex < tsLength-1 && steps[TimeIndex] < requestedTimeStep)
       {
       TimeIndex++;
       }
@@ -271,7 +271,7 @@ void vtkSpyPlotHistoryReader::FillCache()
     getline(file_stream,line);
 
     //construct the table
-    vtkTable *output = vtkTable::New();    
+    vtkTable *output = vtkTable::New();
     this->ConstructTableColumns(output);
 
     //split the line into the items we want to add into the table
@@ -323,7 +323,7 @@ void vtkSpyPlotHistoryReader::FillCache()
       }
     this->CachedOutput->Tables.push_back(output);
     }
-  file_stream.close();  
+  file_stream.close();
 }
 
 //-----------------------------------------------------------------------------

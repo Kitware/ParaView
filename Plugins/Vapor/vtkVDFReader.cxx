@@ -228,11 +228,11 @@ int vtkVDFReader::RequestData(vtkInformation *request,
   image->AllocateScalars();
 
   // get the correct timestep
-  if (info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if (info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
-    double *TimeStepsReq =
-      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    TimeStep = (int)floor(TimeStepsReq[0]);
+    double TimeStepsReq =
+      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    TimeStep = (int)floor(TimeStepsReq);
     SetExtents(info);
     //printf("Recieved updated timestep: %d\n", TimeStep);
     }

@@ -75,29 +75,29 @@ void vtkPVDReader::ReadXMLData()
   double* steps = 0;
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
     {
-    tsLength = 
+    tsLength =
       outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    steps = 
+    steps =
       outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     }
 
   // Check if a particular time was requested.
   if(steps &&
-     outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+     outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
-    double *requestedTimeSteps = 
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    int numReqTimeSteps = 
-      outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double requestedTimeStep =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    int numReqTimeSteps =
+      outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
     if (numReqTimeSteps > 0)
       {
       // find the first time value larger than requested time value
       // this logic could be improved
       int cnt = 0;
-      while (cnt < tsLength-1 && steps[cnt] < requestedTimeSteps[0])
+      while (cnt < tsLength-1 && steps[cnt] < requestedTimeStep)
         {
         cnt++;
         }
@@ -113,22 +113,22 @@ void vtkPVDReader::ReadXMLData()
           {
           found = true;
           }
-        else 
+        else
           {
           cnt2++;
           }
         }
-      if (!found) 
+      if (!found)
         {
         cnt2 = 0;
-        }        
-      this->SetRestrictionImpl("timestep", 
+        }
+      this->SetRestrictionImpl("timestep",
                                this->GetAttributeValue("timestep", cnt2),
                                false);
       // This is what we will read.
       vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
-      output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
-                                    steps+cnt,1);
+      output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
+                                    steps[cnt]);
       }
     }
 
@@ -137,8 +137,8 @@ void vtkPVDReader::ReadXMLData()
 
 //----------------------------------------------------------------------------
 int vtkPVDReader::RequestDataObject(
-  vtkInformation* request, 
-  vtkInformationVector** inputVector, 
+  vtkInformation* request,
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   // need to Parse the file first
@@ -159,14 +159,14 @@ int vtkPVDReader::RequestDataObject(
       int numTimeSteps = this->GetNumberOfAttributeValues(index);
       if (numTimeSteps > 0)
         {
-        this->SetRestrictionImpl("timestep", 
+        this->SetRestrictionImpl("timestep",
                                  this->GetAttributeValue("timestep", 0),
                                  false);
         }
       }
     }
 
-  return 
+  return
     this->Superclass::RequestDataObject(request, inputVector, outputVector);
 }
 
@@ -203,14 +203,14 @@ void vtkPVDReader::SetupOutputInformation(vtkInformation *outInfo)
   std::sort(timeSteps.begin(), timeSteps.end());
   if (!timeSteps.empty())
     {
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
                  &timeSteps[0],
                  numTimeSteps);
     double timeRange[2];
     timeRange[0] = timeSteps[0];
     timeRange[1] = timeSteps[numTimeSteps-1];
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
-                 timeRange, 2);               
+                 timeRange, 2);
     }
 }
 
