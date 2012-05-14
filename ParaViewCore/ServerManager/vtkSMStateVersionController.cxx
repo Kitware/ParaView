@@ -1187,6 +1187,7 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
          }
        }
      }
+   return true;
  }
 
 //----------------------------------------------------------------------------
