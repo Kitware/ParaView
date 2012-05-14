@@ -62,7 +62,8 @@
      <InputProperty
 	name="Source"
 	command="SetInputConnection"
-	label="Probe Type">
+       label="Probe Type"
+       panel_visibility="default">
 	   <ProxyGroupDomain name="groups">
 	     <Group name="sources"/>
 	   </ProxyGroupDomain>
