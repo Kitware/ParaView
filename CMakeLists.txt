@@ -1,4 +1,13 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.5 FATAL_ERROR)
+
+# On Macs earlier than Lion we set LINK_INTERFACE_LIBRARIES however, there is a
+# bug in 2.8.7 (http://public.kitware.com/Bug/view.php?id=12647) that cause problems
+# so require 2.8.8 in this case
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND
+   CMAKE_SYSTEM_VERSION VERSION_LESS 11.0 AND
+   CMAKE_VERSION VERSION_EQUAL 2.8.7)
+ cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+endif()
 
 FOREACH(policy CMP0012 CMP0013 CMP0014)
   IF(POLICY ${policy})
