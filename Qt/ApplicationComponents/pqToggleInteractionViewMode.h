@@ -50,6 +50,9 @@ protected:
   /// Called when the action is triggered.
   virtual void onTriggered();
 
+public slots:
+  void updateInteractionLabel(int interactionMode);
+
 private:
   Q_DISABLE_COPY(pqToggleInteractionViewMode)
   QPointer<pqView> View;

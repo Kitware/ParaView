@@ -116,10 +116,12 @@ public:
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
+  int CurrentInteractionMode;
 
   bool InitializedWidgets;
   pqInternal()
     {
+    this->CurrentInteractionMode = -1;
     this->InitializedWidgets = false;
     this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
@@ -156,6 +158,12 @@ void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
   this->getConnector()->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
+
+  // Monitor any interaction mode change
+  this->getConnector()->Connect(
+        this->getProxy()->GetProperty("InteractionMode"),
+        vtkCommand::ModifiedEvent,
+        this, SLOT(onInteractionModeChange()));
 }
 
 //-----------------------------------------------------------------------------
@@ -935,5 +943,16 @@ void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
     // Update the interaction
     vtkSMPropertyHelper(this->getProxy(), "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_3D);
     this->getProxy()->UpdateProperty("InteractionMode",1);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqRenderView::onInteractionModeChange()
+{
+  int mode = -1;
+  vtkSMPropertyHelper(this->getProxy(), "InteractionMode").Get(&mode);
+  if(mode != this->Internal->CurrentInteractionMode)
+    {
+    this->Internal->CurrentInteractionMode = mode;
+    emit updateInteractionMode(this->Internal->CurrentInteractionMode);
     }
 }

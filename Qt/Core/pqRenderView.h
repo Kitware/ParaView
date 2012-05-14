@@ -196,6 +196,10 @@ public:
   /// block selection is selection of a block in a composite dataset.
   void selectBlock(int rectangle[4], bool expand=false);
 
+signals:
+  // Triggered when interaction mode change underneath
+  void updateInteractionMode(int mode);
+
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
@@ -261,6 +265,9 @@ private slots:
   /// When the default text annotation color changes, we need to update the
   /// orientation text actor.
   void textAnnotationColorChanged();
+
+  /// Called when VTK event get trigger to notify that the interaction mode has changed
+  void onInteractionModeChange();
 
 protected:
   /// Restores the visibility etc. for the annotations added by this view such

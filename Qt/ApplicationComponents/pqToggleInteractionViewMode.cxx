@@ -41,6 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqToggleInteractionViewMode::pqToggleInteractionViewMode(QAction* parentObject, pqView* view)
   : Superclass(parentObject), View(view)
 {
+  pqRenderView* renderView = qobject_cast<pqRenderView*>(this->View);
+  if(renderView)
+    {
+    QObject::connect(view, SIGNAL(updateInteractionMode(int)), this, SLOT(updateInteractionLabel(int)));
+
+    // Update label based on the current state (Needed when we load a state)
+    int mode = -1;
+    vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Get(&mode);
+    this->updateInteractionLabel(mode);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -52,12 +62,10 @@ void pqToggleInteractionViewMode::onTriggered()
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Get(&currentMode);
   if(currentMode == vtkPVRenderView::INTERACTION_MODE_3D)
     {
-    this->parentAction()->setText("2D");
     interactionMode = vtkPVRenderView::INTERACTION_MODE_2D;
     }
   else
     {
-    this->parentAction()->setText("3D");
     interactionMode = vtkPVRenderView::INTERACTION_MODE_3D;
     }
 
@@ -65,5 +73,19 @@ void pqToggleInteractionViewMode::onTriggered()
   vtkSMPropertyHelper(view->getProxy(), "InteractionMode").Set(interactionMode);
   view->getProxy()->UpdateProperty("InteractionMode",1);
 }
-
-
+//-----------------------------------------------------------------------------
+void pqToggleInteractionViewMode::updateInteractionLabel(int mode)
+{
+  switch(mode)
+    {
+  case vtkPVRenderView::INTERACTION_MODE_2D:
+    this->parentAction()->setText("2D");
+    break;
+  case vtkPVRenderView::INTERACTION_MODE_3D:
+    this->parentAction()->setText("3D");
+    break;
+  default:
+    this->parentAction()->setText("-");
+    break;
+    }
+}
