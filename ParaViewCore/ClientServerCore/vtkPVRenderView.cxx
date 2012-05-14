@@ -400,6 +400,11 @@ void vtkPVRenderView::SetInteractionMode(int mode)
 {
   if (this->InteractionMode != mode)
     {
+    if(this->InteractionMode == INTERACTION_MODE_3D)
+      {
+      this->PreviousParallelProjectionStatus = this->GetActiveCamera()->GetParallelProjection();
+      }
+
     this->InteractionMode = mode;
     this->Modified();
 
@@ -413,12 +418,12 @@ void vtkPVRenderView::SetInteractionMode(int mode)
     case INTERACTION_MODE_3D:
       this->Interactor->SetInteractorStyle(
             this->InteractorStyle = this->ThreeDInteractorStyle);
+      // Get back to the previous state
       this->GetActiveCamera()->SetParallelProjection(this->PreviousParallelProjectionStatus);
       break;
     case INTERACTION_MODE_2D:
       this->Interactor->SetInteractorStyle(
             this->InteractorStyle = this->TwoDInteractorStyle);
-      this->PreviousParallelProjectionStatus = this->GetActiveCamera()->GetParallelProjection();
       this->GetActiveCamera()->SetParallelProjection(1);
       break;
 
