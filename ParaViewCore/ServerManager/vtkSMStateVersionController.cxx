@@ -143,6 +143,11 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     this->UpdateVersion( version, updated_version );
     }
 
+  if (this->GetMajor(version)==3 && this->GetMinor(version) <= 14)
+    {
+    status = status && this->Process_3_14_to_next(root);
+    }
+
   return status;
 }
 
@@ -1148,6 +1153,41 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
     }
   return false;
 }
+
+//----------------------------------------------------------------------------
+ bool vtkSMStateVersionController::Process_3_14_to_next(vtkPVXMLElement* root)
+ {
+   // For 2D views we simply remove the InteractionMode property element to rely
+   // on the default value of the proxy definition itself
+   if (root)
+     {
+     const char* twoDRenderType = "2DRenderView";
+     const char* interactionModeName = "InteractionMode";
+     const char* currentType;
+     const char* currentName;
+     unsigned int nbElements = root->GetNumberOfNestedElements();
+     for(unsigned int elemIndex = 0; elemIndex < nbElements; elemIndex++)
+       {
+       vtkPVXMLElement* proxy = root->GetNestedElement(elemIndex);
+       if( (currentType = proxy->GetAttribute("type")) &&
+           !strcmp(twoDRenderType, currentType))
+         {
+         for( unsigned int propIndex = 0;
+              propIndex < proxy->GetNumberOfNestedElements();
+              propIndex++)
+           {
+           vtkPVXMLElement* property = proxy->GetNestedElement(propIndex);
+           if( (currentName = property->GetAttribute("name")) &&
+               !strcmp(interactionModeName, currentName))
+             {
+             proxy->RemoveNestedElement(property);
+             break;
+             }
+           }
+         }
+       }
+     }
+ }
 
 //----------------------------------------------------------------------------
 void vtkSMStateVersionController::PrintSelf(ostream& os, vtkIndent indent)
