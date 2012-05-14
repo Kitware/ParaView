@@ -2707,6 +2707,71 @@
    </SourceProxy>
    <!-- End NetCDFPOPReaderCore -->
 
+   <SourceProxy name="UnstructuredPOPReaderCore"
+                class="vtkUnstructuredPOPReader"
+                label="Unstructured NetCDF POP reader">
+     <Documentation
+        short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data."
+        long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data.">
+       The reader reads regular rectilinear grid (image/volume) data from a NetCDF file and turns it into an unstructured spherical grid.
+     </Documentation>
+
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         This property specifies the file name to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Stride"
+        command="SetStride"
+        number_of_elements="3"
+        default_values="1 1 1"
+        animateable="0">
+       <IntRangeDomain name="range" min="1 1 1" />
+       <Documentation>
+         This property indicate the number of indices per dimension (i,j,k) to skip between each point included
+         in this output.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="VOI"
+                        command="SetVOI"
+                        label="VOI"
+                        number_of_elements="6"
+                        default_values="0 -1 0 -1 0 -1">
+       <Documentation>
+         The data volume of interest (VOI). The VOI is a sub-extent of the
+         data that you want loaded. Setting a VOI is useful when reading
+         from a large data set and you are only interested in a small
+         portion of the data. If left containing all 0's, then the reader
+         will load in the entire data set.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="VerticalVelocity"
+                        command="SetVerticalVelocity"
+                        label="VerticalVelocity"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         If there is a velocity vector with only 2 components, specify
+         that the reader should compute the third component.
+       </Documentation>
+     </IntVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="pop.ncdf pop.nc" file_description="POP Ocean NetCDF (Unstructured)" />
+     </Hints>
+   </SourceProxy>
+   <!-- End UnstructuredPOPReaderCore -->
+
    <SourceProxy name="PNetCDFPOPReaderCore"
                 class="vtkPNetCDFPOPReader"
                 label="Parallel NetCDF POP reader">
@@ -7518,6 +7583,63 @@
      </Hints>
    </SourceProxy>
    <!-- End NetCDFPOPReader -->
+
+   <SourceProxy name="UnstructuredPOPReader"
+                class="vtkFileSeriesReader"
+                si_class="vtkSIFileSeriesReaderProxy"
+                file_name_method="SetFileName"
+                label="Unstructured NetCDF POP reader">
+     <Documentation
+        short_help="Read rectlinear grid data from a NetCDF file in the POP format and converts it into unstructured data."
+        long_help="Reads rectilinear grid data from a NetCDF POP file and converts it into unstructured data.">
+       The reader reads regular rectilinear grid (image/volume) data from a NetCDF file and turns it into an unstructured spherical grid.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="UnstructuredPOPReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="Stride" />
+         <Property name="VOI" />
+         <Property name="VerticalVelocity" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+                           command="GetCurrentFileName"
+                           information_only="1" >
+       <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="1"
+                           repeat_command="1"
+                           information_property="FileNameInfo" >
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="pop.ncdf pop.nc" file_description="POP Ocean NetCDF (Unstructured)" />
+     </Hints>
+   </SourceProxy>
+   <!-- End UnstructuredPOPReader -->
 
 #ifdef PARAVIEW_USE_MPI
    <SourceProxy name="PNetCDFPOPReader"
