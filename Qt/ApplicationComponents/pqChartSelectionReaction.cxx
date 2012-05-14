@@ -35,14 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqContextView.h"
 #include "vtkChart.h"
+#include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkScatterPlotMatrix.h"
 #include "vtkSMContextViewProxy.h"
 
 //-----------------------------------------------------------------------------
 pqChartSelectionReaction::pqChartSelectionReaction(
-  QAction* parentObject, pqContextView* view, int selectionMode)
-  : Superclass(parentObject), View(view), SelectionMode(selectionMode)
+  QAction* parentObject, pqContextView* view,
+  int selectionMode, int selectAction)
+  : Superclass(parentObject), View(view),
+    SelectionMode(selectionMode), SelectionAction(selectAction)
 {
   if (!view)
     {
@@ -74,7 +77,7 @@ void pqChartSelectionReaction::updateEnableState()
 
 //-----------------------------------------------------------------------------
 void pqChartSelectionReaction::startSelection(
-  pqContextView* view, int selMode)
+  pqContextView* view, int selMode, int selAction)
 {
   if(view && view->supportsSelection() && view->getContextViewProxy())
     {
@@ -90,6 +93,31 @@ void pqChartSelectionReaction::startSelection(
     else if(chartMatrix)
       {
       chartMatrix->SetSelectionMode(selMode);
+      chart = chartMatrix->GetMainChart();
+      }
+    // Handle selection actions
+    if(!chart)
+      {
+      return;
+      }
+    view->setSelectionAction(selAction);
+    if(selAction == pqContextView::SELECT_ACTION_DEFAULT &&
+      selMode == vtkContextScene::SELECTION_NONE)
+      {
+      chart->SetActionToButton(vtkChart::PAN,
+        vtkContextMouseEvent::LEFT_BUTTON);
+      chart->SetActionToButton(vtkChart::SELECT,
+        vtkContextMouseEvent::RIGHT_BUTTON);
+      }
+    else if(selAction == pqContextView::SELECTION_ACTION_RECTANGLE)
+      {
+      chart->SetActionToButton(vtkChart::SELECT_RECTANGLE,
+        vtkContextMouseEvent::RIGHT_BUTTON);
+      }
+    else if(selAction == pqContextView::SELECTION_ACTION_POLYGON)
+      {
+      chart->SetActionToButton(vtkChart::SELECT_POLYGON,
+        vtkContextMouseEvent::RIGHT_BUTTON);
       }
     }
 }
@@ -113,17 +141,38 @@ void pqChartSelectionReaction::onTriggered()
       {
       selMode = chartMatrix->GetSelectionMode();
       }
-    if(selMode == this->SelectionMode)
+    int selAction = this->View->selectionAction();
+
+    // for selection action change
+    if(this->SelectionAction != pqContextView::SELECT_ACTION_DEFAULT)
+      {
+      if(selAction != this->SelectionAction)
+        {
+        pqChartSelectionReaction::startSelection(this->View,
+          selMode, this->SelectionAction);    
+        }
+      else
+        {
+        this->parentAction()->blockSignals(true);
+        this->parentAction()->setChecked(false);
+        this->parentAction()->blockSignals(false);
+        pqChartSelectionReaction::startSelection(this->View,
+          selMode, pqContextView::SELECT_ACTION_DEFAULT);
+        }
+      }
+    // for selection mode change
+    else if(selMode != this->SelectionMode)
+      {
+      pqChartSelectionReaction::startSelection(this->View,
+        this->SelectionMode, selAction);
+      }
+    else
       {
       this->parentAction()->blockSignals(true);
       this->parentAction()->setChecked(false);
       this->parentAction()->blockSignals(false);
       pqChartSelectionReaction::startSelection(this->View,
-        vtkContextScene::SELECTION_NONE);
-      }
-    else if(selMode>=0)
-      {
-      pqChartSelectionReaction::startSelection(this->View, this->SelectionMode);
+        vtkContextScene::SELECTION_DEFAULT, selAction);    
       }
     }
 }

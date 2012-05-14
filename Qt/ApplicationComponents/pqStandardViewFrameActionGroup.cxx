@@ -53,17 +53,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 
 //-----------------------------------------------------------------------------
-inline void createChartSelectionAction(
+inline QAction* createChartSelectionAction(
   const QString &filename, const QString &actText,
   const QString &objName, QObject* actParent,
-  int selType, pqViewFrame* actFrame, pqContextView* chart_view)
+  int selType, pqViewFrame* actFrame, pqContextView* chart_view,
+  int enumSelAction=0)
 {
   QAction* selAction = new QAction(
     QIcon(filename), actText, actParent);
   selAction->setObjectName(objName);
   selAction->setCheckable(true);
   actFrame->addTitleBarAction(selAction);
-  new pqChartSelectionReaction(selAction, chart_view,selType);
+  new pqChartSelectionReaction(selAction, chart_view,selType, enumSelAction);
+  return selAction;
 }
 
 //-----------------------------------------------------------------------------
@@ -131,6 +133,7 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
   pqContextView* const chart_view = qobject_cast<pqContextView*>(view);
   if (chart_view && chart_view->supportsSelection())
     {
+    // selection mode
     createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartToggle16.png",
       "Toggle Selection", "ChartSelectToggleButton",
@@ -139,14 +142,26 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
       ":/pqWidgets/Icons/pqSelectChartMinus16.png",
       "Subtract Selection", "ChartSelectMinusButton",
       this, vtkContextScene::SELECTION_SUBTRACTION, frame, chart_view);
-    createChartSelectionAction(
+    QAction* plusAction = createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartPlus16.png",
       "Add Selection", "ChartSelectPlusButton",
       this, vtkContextScene::SELECTION_ADDITION, frame, chart_view);
-    createChartSelectionAction(
+
+    // selection action
+    QAction* rectSelAction = createChartSelectionAction(
+      ":/pqWidgets/Icons/pqSelectChartPolygon16.png",
+      "Polygon Selection", "ChartSelectPolygonButton",
+      this, vtkContextScene::SELECTION_NONE, frame, chart_view,
+      pqContextView::SELECTION_ACTION_POLYGON);
+    QAction* polySelAction = createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChart16.png",
-      "Start Selection", "ChartSelectButton",
-      this, vtkContextScene::SELECTION_DEFAULT, frame, chart_view);
+      "Rectangle Selection", "ChartSelectButton",
+      this, vtkContextScene::SELECTION_NONE, frame, chart_view,
+      pqContextView::SELECTION_ACTION_RECTANGLE);
+    QActionGroup *selActionGroup = new QActionGroup(this);
+    selActionGroup->addAction(rectSelAction);
+    selActionGroup->addAction(polySelAction);
+    frame->contextMenu()->insertSeparator(plusAction);
     }
   return true;
 }

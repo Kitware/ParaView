@@ -95,10 +95,12 @@ class pqContextView::pqInternal
 public:
   QPointer<QWidget> Viewport;
   bool InitializedAfterObjectsCreated;
+  int SelectionAction;
 
   pqInternal()
     {
     this->InitializedAfterObjectsCreated=false;
+    this->SelectionAction = pqContextView::SELECT_ACTION_DEFAULT;
     }
   ~pqInternal()
     {
@@ -479,4 +481,20 @@ void pqContextView::setSelection(vtkSelection* sel)
   selectionSource->Delete();
 
   emit this->selected(opPort);
+}
+
+void pqContextView::setSelectionAction(int selAction)
+{
+  if (this->Internal->SelectionAction == selAction ||
+    selAction < pqContextView::SELECT_ACTION_DEFAULT ||
+    selAction > pqContextView::SELECTION_ACTION_POLYGON)
+    {
+    return;
+    }
+  this->Internal->SelectionAction = selAction;
+}
+
+int pqContextView::selectionAction()
+{
+  return this->Internal->SelectionAction;
 }

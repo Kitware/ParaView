@@ -87,6 +87,19 @@ public:
   /// Returns true if selection can be done.
   virtual bool supportsSelection() const;
 
+  // Description:
+  // Enum of valid selection actions for charts in the context view
+  enum SelectionActionType{
+    SELECT_ACTION_DEFAULT = 0,
+    SELECTION_ACTION_RECTANGLE,
+    SELECTION_ACTION_POLYGON
+    };
+
+  /// set/get the selection action in the context view, defined
+  /// by above enumeration.
+  virtual void setSelectionAction(int selAction);
+  virtual int selectionAction();
+
   /// Resets the zoom level to 100%.
   virtual void resetDisplay();
 
