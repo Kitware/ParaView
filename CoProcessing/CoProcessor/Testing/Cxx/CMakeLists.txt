@@ -16,6 +16,17 @@ TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
   vtkRenderingFreeTypeOpenGL
   vtkInteractionStyle)
 
+# specify the real executable path since this gets
+# put in different places on different architectures.
+set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
+set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
+if(Q_WS_MAC)
+  set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME}.app/Contents/MacOS)
+  set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS)
+  set(MAC_TEST_NAME "-Mac")
+endif(Q_WS_MAC)
+
+
 # Create a macro to make the cmake files for running coprocessing test
 # MPIPREDEFS and MPIPOSTDEFS are optional and only used
 # when running the test in parallel.
@@ -24,10 +35,14 @@ MACRO(CreateCoProcessingScriptTest TESTNAME PYTHONSCRIPT
     MPIPREDEFS MPIPOSTDEFS)
   file(WRITE
     "${CoProcessing_BINARY_DIR}/${TESTNAME}.cmake"
-"set(fullexe \"${EXECUTABLE_OUTPUT_PATH}/CoProcessingPythonScriptExample\")
+"set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/CoProcessingPythonScriptExample\")
 if(NOT EXISTS \${fullexe})
-  set(fullexe \"PARAVIEW_EXECUTABLE_PATH}/\${cfg}/CoProcessingPythonScriptExample.exe\")
+  set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/\${cfg}/CoProcessingPythonScriptExample.exe\")
 endif()
+if(NOT EXISTS \${fullexe})
+  message(FATAL_ERROR \"'\${fullexe}' does not exist\")
+endif()
+
 FILE(REMOVE \"${CMAKE_BINARY_DIR}/Testing/Temporary/${GRIDOUTPUT} ${CMAKE_BINARY_DIR}/Testing/Temporary/${PRESSUREOUTPUT}\" )
 
 execute_process(COMMAND \${fullexe} ${CoProcessing_SOURCE_DIR}/CoProcessor/Testing/Python/${PYTHONSCRIPT} RESULT_VARIABLE rv)
@@ -92,14 +107,6 @@ ENDIF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_DATA_ROOT)
 # here is the full workflow for coprocessing where we generate
 # a script, run simulation driver code, and then check the output
 IF (PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_PLUGIN_CoProcessingScriptGenerator)
-  set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
-  set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH})
-  if(Q_WS_MAC)
-    set(REAL_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_NAME}.app/Contents/MacOS)
-    set(PARAVIEW_EXECUTABLE_PATH ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS)
-    set(MAC_TEST_NAME "-Mac")
-  endif(Q_WS_MAC)
-
   file(WRITE
 "${CoProcessing_BINARY_DIR}/CoProcessingFullWorkflowTest.cmake"
 "set(fullexe \"${PARAVIEW_EXECUTABLE_PATH}/paraview\")
