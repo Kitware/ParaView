@@ -12,17 +12,11 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-/*
-  Ghost cells
-  Read in field data from multiple files
-  Adjust vector quantities to this coordinate system
-*/
-
-
 #include "vtkUnstructuredPOPReader.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
 #include "vtkCellTypes.h"
+#include "vtkCleanUnstructuredGrid.h"
 #include "vtkDataArraySelection.h"
 #include "vtkExtentTranslator.h"
 #include "vtkFloatArray.h"
@@ -30,28 +24,35 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkIdList.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
+#include "vtkPVConfig.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
+// PARAVIEW_USE_MPI defined in vtkPVConfig.h
+#ifdef PARAVIEW_USE_MPI
+#include "vtkMPIController.h"
+#else
+#include "vtkMultiProcessController.h"
+#endif
+
+
+#include "vtksys/SystemTools.hxx"
 #include "vtk_netcdf.h"
 #include "vtk_netcdfcpp.h"
 
-#include "vtkMath.h"
 #include <set>
 #include <string>
 #include <vector>
 
-#include "vtkCleanUnstructuredGrid.h"
 
-#include "vtkIntArray.h"
-#include "vtksys/SystemTools.hxx"
-#include "vtkMPIController.h"
 
 namespace
 {
@@ -1324,6 +1325,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
   vtkUnstructuredGrid* grid, int* wholeExtent,
   int* subExtent, int numberOfGhostLevels, VTKPointIterator& pointIterator, double* w)
 {
+#ifdef PARAVIEW_USE_MPI
   if(wholeExtent[4] == subExtent[4] && wholeExtent[5] == subExtent[5])
     {
     // no communication necessary since this process has all the points
@@ -1428,6 +1430,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
       it->Wait();
       }
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1442,8 +1445,6 @@ int vtkUnstructuredPOPReader::GetPointOwnerPiece(
     vtkWarningMacro("Bad indices");
     return -1;
     }
-  // there should be a better way to do this but at least this will work
-  // but may be dreadfully slow.  ACBAUER -- fix this!!!!
   int subExtent[6];
   for(int piece=0;piece<numberOfPieces;piece++)
     {
