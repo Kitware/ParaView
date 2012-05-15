@@ -747,25 +747,25 @@ void vtkPVRenderView::SynchronizeForCollaboration()
   else
     {
     vtkMultiProcessStream stream;
-    if (r_controller && r_controller->Receive(stream, 1, 42000))
+    if (r_controller)
       {
-      if (p_controller)
-        {
-        p_controller->Broadcast(stream, 0);
-        }
-
-      int arg1, arg2, arg3, arg4;
-      stream >> arg1
-             >> arg2
-             >> arg3
-             >> arg4
-             >> this->StillRenderProcesses
-             >> this->InteractiveRenderProcesses;
-      this->UseLODForInteractiveRender = (arg1 == 1);
-      this->UseDistributedRenderingForStillRender = (arg2 == 1);
-      this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
-      this->UseOutlineForInteractiveRender = (arg4 == 1);
+      r_controller->Receive(stream, 1, 42000);
       }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    int arg1, arg2, arg3, arg4;
+    stream >> arg1
+           >> arg2
+           >> arg3
+           >> arg4
+           >> this->StillRenderProcesses
+           >> this->InteractiveRenderProcesses;
+    this->UseLODForInteractiveRender = (arg1 == 1);
+    this->UseDistributedRenderingForStillRender = (arg2 == 1);
+    this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
+    this->UseOutlineForInteractiveRender = (arg4 == 1);
     }
 }
 
