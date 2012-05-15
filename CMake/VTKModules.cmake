@@ -10,7 +10,7 @@ mark_as_advanced(VTK_Group_StandAlone)
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
-  vtkIOParallelMPI
+  vtkIOMPIImage
   vtkFiltersParallelMPI
   #vtkFiltersParallelTracers
   # Note: Not in ParaViewXXX.xml but required by a test.
@@ -264,6 +264,7 @@ set(_vtk_modules
   #  vtkMetaImageReader
   #  vtkMetaImageWriter
   #  vtkPNGWriter
+  #  vtkNrrdReader
 
   vtkIONetCDF
   # Needed for:
