@@ -111,7 +111,7 @@ vtkSMRenderViewProxy::vtkSMRenderViewProxy()
   this->IsSelectionCached = false;
   this->NewMasterObserverId = 0;
   this->DeliveryManager = NULL;
-  this->NeedsUpdateLOD = false;
+  this->NeedsUpdateLOD = true;
 }
 
 //----------------------------------------------------------------------------
@@ -208,7 +208,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisiblePointsAvailable()
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::Update()
 {
-  this->NeedsUpdateLOD = this->NeedsUpdate;
+  this->NeedsUpdateLOD |= this->NeedsUpdate;
   this->Superclass::Update();
 }
 
