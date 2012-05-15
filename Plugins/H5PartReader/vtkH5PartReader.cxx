@@ -680,9 +680,9 @@ int vtkH5PartReader::RequestData(
   //
   this->TimeOutOfRange = 0;
   this->ActualTimeStep = this->TimeStep;
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
-    double requestedTimeValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
+    double requestedTimeValue = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     this->ActualTimeStep = std::find_if(
       this->TimeStepValues.begin(), this->TimeStepValues.end(),
       std::bind2nd( H5PartToleranceCheck( this->TimeStepTolerance ), requestedTimeValue ))
@@ -692,7 +692,7 @@ int vtkH5PartReader::RequestData(
       {
       this->TimeOutOfRange = 1;
       }
-    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(), &requestedTimeValue, 1);
+    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), requestedTimeValue);
     }
   else
     {
@@ -706,7 +706,7 @@ int vtkH5PartReader::RequestData(
       {
       timevalue[0] = this->TimeStepValues[0];
       }
-    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(), &timevalue[0], 1);
+    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(), timevalue[0]);
     }
 
   if (this->TimeOutOfRange && this->MaskOutOfTimeRangeOutput)

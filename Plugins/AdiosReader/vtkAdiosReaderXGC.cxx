@@ -166,8 +166,8 @@ public:
       rectilinearGrid = this->MeshFile->GetPixieRectilinearGrid(realTimeStep);
       if(rectilinearGrid)
         {
-        rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                                &this->TimeStep, 1);
+        rectilinearGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEP(),
+                                                this->TimeStep);
         pixieOutput->SetBlock(0, rectilinearGrid);
         rectilinearGrid->FastDelete();
         }
@@ -175,13 +175,13 @@ public:
       structuredGrid = this->MeshFile->GetPixieStructuredGrid(realTimeStep);
       if(structuredGrid)
         {
-        structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                               &this->TimeStep, 1);
+        structuredGrid->GetInformation()->Set( vtkDataObject::DATA_TIME_STEP(),
+                                               this->TimeStep);
         pixieOutput->SetBlock(1, structuredGrid);
         structuredGrid->FastDelete();
         }
-      pixieOutput->GetInformation()->Set( vtkDataObject::DATA_TIME_STEPS(),
-                                          &this->TimeStep, 1);
+      pixieOutput->GetInformation()->Set( vtkDataObject::DATA_TIME_STEP(),
+                                          this->TimeStep);
       }
     else // We suppose that only XGC file format is the other
       {
@@ -422,10 +422,10 @@ int vtkAdiosReader::RequestUpdateExtent(vtkInformation*,
                         vtkInformationVector* outputVector)
 {
   vtkInformation *info = outputVector->GetInformationObject(0);
-  if(info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if(info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     this->Internal->SetActiveTimeStep(
-        info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0]);
+        info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()));
     }
   return 1;
 }

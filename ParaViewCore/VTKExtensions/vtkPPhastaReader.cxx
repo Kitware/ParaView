@@ -97,7 +97,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
                                   vtkInformationVector* outputVector)
 {
   // get the data object
-  vtkInformation *outInfo = 
+  vtkInformation *outInfo =
     outputVector->GetInformationObject(0);
 
   this->ActualTimeStep = this->TimeStepIndex;
@@ -106,15 +106,15 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   double* steps =
     outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    
+
   // Check if a particular time was requested.
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
-    double *requestedTimeSteps = 
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    double timeValue = requestedTimeSteps[0];
+    double requestedTimeStep =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    double timeValue = requestedTimeStep;
 
     // find the first time value larger than requested time value
     // this logic could be improved
@@ -133,10 +133,10 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     }
 
   // get the current piece being requested
-  int piece = 
+  int piece =
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
 
-  int numProcPieces = 
+  int numProcPieces =
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
   if (!this->Parser)
@@ -146,7 +146,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     }
 
   vtkPVXMLElement* rootElement = this->Parser->GetRootElement();
-  
+
   int numPieces;
   if (!rootElement->GetScalarAttribute("number_of_pieces", &numPieces))
     {
@@ -220,9 +220,9 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     {
     if (geomHasTime && geomHasPiece)
       {
-      sprintf(geom_name, 
-              geometryPattern, 
-              this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, 
+      sprintf(geom_name,
+              geometryPattern,
+              this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex,
               loadingPiece+1);
       }
     else if (geomHasPiece)
@@ -231,19 +231,19 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
     else if (geomHasTime)
       {
-      sprintf(geom_name, 
-              geometryPattern, 
+      sprintf(geom_name,
+              geometryPattern,
               this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
       }
     else
       {
       strcpy(geom_name, geometryPattern);
       }
-    
+
     if (fieldHasTime && fieldHasPiece)
       {
-      sprintf(field_name, 
-              fieldPattern, 
+      sprintf(field_name,
+              fieldPattern,
               this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex,
               loadingPiece+1);
       }
@@ -253,15 +253,15 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
     else if (fieldHasTime)
       {
-      sprintf(field_name, 
-              fieldPattern, 
+      sprintf(field_name,
+              fieldPattern,
               this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
       }
     else
       {
       strcpy(geom_name, fieldPattern);
       }
-    
+
     vtksys_ios::ostringstream geomFName;
     std::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
     if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
@@ -288,7 +288,7 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     fieldFName << field_name << ends;
     this->Reader->SetFieldFileName(fieldFName.str().c_str());
 
-    vtkPPhastaReaderInternal::CachedGridsMapType::iterator CachedCopy = 
+    vtkPPhastaReaderInternal::CachedGridsMapType::iterator CachedCopy =
       this->Internal->CachedGrids.find(loadingPiece);
 
     // if there is a cached copy, use that
@@ -298,10 +298,10 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       }
 
     this->Reader->Update();
-    
+
     if(CachedCopy == this->Internal->CachedGrids.end())
       {
-      vtkSmartPointer<vtkUnstructuredGrid> cached = 
+      vtkSmartPointer<vtkUnstructuredGrid> cached =
         vtkSmartPointer<vtkUnstructuredGrid>::New();
       cached->ShallowCopy(this->Reader->GetOutput());
       cached->GetPointData()->Initialize();
@@ -309,33 +309,33 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
       cached->GetFieldData()->Initialize();
       this->Internal->CachedGrids[loadingPiece] = cached;
       }
-    vtkSmartPointer<vtkUnstructuredGrid> copy = 
+    vtkSmartPointer<vtkUnstructuredGrid> copy =
       vtkSmartPointer<vtkUnstructuredGrid>::New();
     copy->ShallowCopy(this->Reader->GetOutput());
     MultiPieceDataSet->SetPiece(loadingPiece, copy);
     }
-  
+
   delete [] geom_name;
   delete [] field_name;
-  
+
   if (steps)
     {
-    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
-                                  steps+this->ActualTimeStep, 1);
+    output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
+                                  steps[this->ActualTimeStep]);
     }
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPPhastaReader::RequestInformation(vtkInformation*, 
-                                       vtkInformationVector**, 
+int vtkPPhastaReader::RequestInformation(vtkInformation*,
+                                       vtkInformationVector**,
                                        vtkInformationVector* outputVector)
-{ 
+{
   this->Internal->TimeStepInfoMap.clear();
   this->Reader->ClearFieldInfo();
-  
-  vtkInformation *outInfo = 
+
+  vtkInformation *outInfo =
     outputVector->GetInformationObject(0);
 
   if (!this->FileName)
@@ -349,8 +349,8 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
     this->Parser->Delete();
     this->Parser = 0;
     }
-  
-  vtkSmartPointer<vtkPVXMLParser> parser = 
+
+  vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
 
   parser->SetFileName(this->FileName);
@@ -417,7 +417,7 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
         {
         for (int j=0; j<numTimeSteps; j++)
           {
-          vtkPPhastaReaderInternal::TimeStepInfo& info = 
+          vtkPPhastaReaderInternal::TimeStepInfo& info =
             this->Internal->TimeStepInfoMap[j];
           info.GeomIndex = startIndex;
           info.FieldIndex = startIndex;
@@ -443,19 +443,19 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
             vtkPPhastaReaderInternal::TimeStepInfo& info =
               this->Internal->TimeStepInfoMap[index];
             int gIdx;
-            if (nested2->GetScalarAttribute("geometry_index", 
+            if (nested2->GetScalarAttribute("geometry_index",
                                              &gIdx))
               {
               info.GeomIndex = gIdx;
               }
             int fIdx;
-            if (nested2->GetScalarAttribute("field_index", 
+            if (nested2->GetScalarAttribute("field_index",
                                              &fIdx))
               {
               info.FieldIndex = fIdx;
               }
             double val;
-            if (nested2->GetScalarAttribute("value", 
+            if (nested2->GetScalarAttribute("value",
                                             &val))
               {
               info.TimeValue = val;
@@ -499,7 +499,7 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
             }
           const char* phastaFieldTag = 0;
           phastaFieldTag = nested2->GetAttribute("phasta_field_tag");
-          if (!phastaFieldTag) 
+          if (!phastaFieldTag)
             {
             vtkErrorMacro("No phasta field tag was specified");
             return 0;
@@ -568,13 +568,13 @@ int vtkPPhastaReader::RequestInformation(vtkInformation*,
       {
       timeSteps[tidx] = this->Internal->TimeStepInfoMap[tidx].TimeValue;
       }
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-                 timeSteps, 
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+                 timeSteps,
                  numTimeSteps);
     double timeRange[2];
     timeRange[0] = timeSteps[0];
     timeRange[1] = timeSteps[numTimeSteps-1];
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
                      timeRange, 2);
     delete[] timeSteps;
     }
@@ -614,11 +614,11 @@ void vtkPPhastaReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "FileName: " 
+  os << indent << "FileName: "
      << (this->FileName?this->FileName:"(none)")
      << endl;
   os << indent << "TimeStepIndex: " << this->TimeStepIndex << endl;
-  os << indent << "TimeStepRange: " 
+  os << indent << "TimeStepRange: "
      << this->TimeStepRange[0] << " " << this->TimeStepRange[1]
      << endl;
 }

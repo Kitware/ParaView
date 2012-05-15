@@ -85,7 +85,7 @@ int vtkFileSeriesWriter::ProcessRequest(vtkInformation* request,
   vtkInformationVector* outputVector)
 {
 
-  if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()) || 
+  if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()) ||
     request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
     {
     // Let the internal writer handle the request. Then the request will be
@@ -110,7 +110,7 @@ int vtkFileSeriesWriter::RequestInformation(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   if ( inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) )
     {
-    this->NumberOfTimeSteps = 
+    this->NumberOfTimeSteps =
       inInfo->Length( vtkStreamingDemandDrivenPipeline::TIME_STEPS() );
     }
   else
@@ -135,12 +135,12 @@ int vtkFileSeriesWriter::RequestUpdateExtent(
   if (inTimes && this->WriteAllTimeSteps)
     {
     double timeReq = inTimes[this->CurrentTimeIndex];
-    inputVector[0]->GetInformationObject(0)->Set( 
-        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(), 
-        &timeReq, 1);
+    inputVector[0]->GetInformationObject(0)->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
+        timeReq);
     }
 
-  return 1;  
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ int vtkFileSeriesWriter::RequestData(
       this->CurrentTimeIndex = 0;
       }
     }
-  
+
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -225,7 +225,7 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
 }
 
 //----------------------------------------------------------------------------
-// Overload standard modified time function. If the internal reader is 
+// Overload standard modified time function. If the internal reader is
 // modified, then this object is modified as well.
 unsigned long vtkFileSeriesWriter::GetMTime()
 {

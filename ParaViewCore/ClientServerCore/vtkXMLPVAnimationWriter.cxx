@@ -41,25 +41,25 @@ public:
   // The name of the group to which each input belongs.
   typedef std::vector<std::string> InputGroupNamesType;
   InputGroupNamesType InputGroupNames;
-  
+
   // The part number each input has been assigned in its group.
   typedef std::vector<int> InputPartNumbersType;
   InputPartNumbersType InputPartNumbers;
-  
+
   // The modified time when each input was last written in a previous
   // animation step.
   typedef std::vector<unsigned long> InputMTimesType;
   InputMTimesType InputMTimes;
-  
+
   // The number of times each input has changed during this animation
   // sequence.
   typedef std::vector<int> InputChangeCountsType;
   InputChangeCountsType InputChangeCounts;
-  
+
   // Count the number of parts in each group.
   typedef std::map<std::string, int> GroupMapType;
   GroupMapType GroupMap;
-  
+
   // Create the file name for the given input during this animation
   // step.
   std::string CreateFileName(int index, const char* prefix,
@@ -127,13 +127,13 @@ void vtkXMLPVAnimationWriter::AddInputInternal(const char* group)
     this->Internal->GroupMap.insert(v);
     }
   this->Internal->InputPartNumbers.push_back(partNum);
-  
+
   // Add the group name for this input.
   this->Internal->InputGroupNames.push_back(group);
-  
+
   // Allocate the mtime table entry for this input.
   this->Internal->InputMTimes.push_back(0);
-  
+
   // Allocate the change count entry for this input.
   this->Internal->InputChangeCounts.push_back(0);
 }
@@ -168,14 +168,14 @@ void vtkXMLPVAnimationWriter::Start()
     vtkErrorMacro("Cannot call Start() twice before calling Finish().");
     return;
     }
-  
+
   // Make sure we have a file name.
   if(!this->FileName || !this->FileName[0])
     {
     vtkErrorMacro("No FileName has been set.");
     return;
     }
-  
+
   // Initialize input change tables.
   int i;
   for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
@@ -183,24 +183,24 @@ void vtkXMLPVAnimationWriter::Start()
     this->Internal->InputMTimes[i] = 0;
     this->Internal->InputChangeCounts[i] = 0;
     }
-  
+
   // Clear the animation entries from any previous run.
   this->DeleteAllEntries();
-  
+
   // Clear the file names from any previous run.
   this->DeleteFileNames();
-  
+
   // Split the file name into a directory and file prefix.
   this->SplitFileName();
-  
+
   // Create a writer for each input.
   this->CreateWriters();
-  
+
   // Create the subdirectory for the internal files.
   std::string subdir = this->GetFilePath();
   subdir += this->GetFilePrefix();
   this->MakeDirectory(subdir.c_str());
-  
+
   this->StartCalled = 1;
 }
 
@@ -212,32 +212,32 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
     vtkErrorMacro("Must call Start() before WriteTime().");
     return;
     }
-  
+
   // Consider every input.
   int i;
   vtkExecutive *exec = this->GetExecutive();
-  
+
   for(i=0; i < this->GetNumberOfInputConnections(0); ++i)
     {
     vtkDataObject* dataObject = exec->GetInputData(0, i);
     // Make sure the pipeline mtime is up to date.
     exec->UpdateInformation();
-    
+
     // If the input has been modified since the last animation step,
     // increment its file number.
     int changed = 0;
-     
+
   if(vtkStreamingDemandDrivenPipeline::SafeDownCast(
     this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime() >
     this->Internal->InputMTimes[i])
       {
-      this->Internal->InputMTimes[i] = 
+      this->Internal->InputMTimes[i] =
       vtkStreamingDemandDrivenPipeline::SafeDownCast(
         this->GetInputAlgorithm(0, i)->GetExecutive())->GetPipelineMTime();
       changed = 1;
       }
 
-    if (dataObject->GetInformation()->Has(vtkDataObject::DATA_TIME_STEPS()))
+    if (dataObject->GetInformation()->Has(vtkDataObject::DATA_TIME_STEP()))
       {
       changed = 1;
       }
@@ -246,7 +246,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
       {
       this->Internal->InputChangeCounts[i] += 1;
       }
-    
+
     // Create this animation entry.
     vtkXMLWriter* writer = this->GetWriter(i);
     std::string fname =
@@ -260,7 +260,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
       << "\" file=\"" << fname.c_str()
       << "\"/>" << ends;
     this->AppendEntry(entry_with_warning_C4701.str().c_str());
-    
+
     // Write this step's file if its input has changed.
     if(changed)
       {
@@ -276,7 +276,7 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
         }
       }
     }
-  
+
   if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
     {
     this->DeleteFiles();
@@ -291,10 +291,10 @@ void vtkXMLPVAnimationWriter::Finish()
     vtkErrorMacro("Must call Start() before Finish().");
     return;
     }
-  
+
   this->StartCalled = 0;
   this->FinishCalled = 1;
-  
+
   // Just write the output file with the current set of entries.
   this->WriteInternal();
 
@@ -312,9 +312,9 @@ int vtkXMLPVAnimationWriter::WriteInternal()
     vtkErrorMacro("Do not call Write() directly.  Call Finish() instead.");
     return 0;
     }
-  
+
   this->FinishCalled = 0;
-  
+
   // Write the animation file.
   return this->WriteCollectionFileIfRequested();
 }
@@ -324,17 +324,17 @@ std::string
 vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
                                                  const char* prefix,
                                                  const char* ext)
-{ 
+{
   // Start with the directory and file name prefix.
   vtksys_ios::ostringstream fn_with_warning_C4701;
   fn_with_warning_C4701 << prefix << "/" << prefix << "_";
-  
+
   // Add the group name.
   fn_with_warning_C4701 << this->InputGroupNames[index].c_str();
-  
+
   // Construct the part/time portion.  Add a part number if there is
   // more than one part in this group.
-  char pt[100];  
+  char pt[100];
   if(this->GroupMap[this->InputGroupNames[index]] > 1)
     {
     sprintf(pt, "P%02dT%04d",
@@ -346,10 +346,10 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
     sprintf(pt, "T%04d", this->InputChangeCounts[index]-1);
     }
   fn_with_warning_C4701 << pt;
-  
+
   // Add the file extension.
   fn_with_warning_C4701 << "." << ext << ends;
-  
+
   // Return the result.
   std::string fname = fn_with_warning_C4701.str();
   return fname;
@@ -359,7 +359,7 @@ void vtkXMLPVAnimationWriter::AddFileName(const char *fileName)
 {
   int size = this->NumberOfFileNamesCreated;
   char **newFileNameList = new char *[size];
-  
+
   int i;
   for (i = 0; i < size; i++)
     {
@@ -368,9 +368,9 @@ void vtkXMLPVAnimationWriter::AddFileName(const char *fileName)
     delete [] this->FileNamesCreated[i];
     }
   delete [] this->FileNamesCreated;
-  
+
   this->FileNamesCreated = new char *[size+1];
-  
+
   for (i = 0; i < size; i++)
     {
     this->FileNamesCreated[i] = new char[strlen(newFileNameList[i]) + 1];
@@ -378,7 +378,7 @@ void vtkXMLPVAnimationWriter::AddFileName(const char *fileName)
     delete [] newFileNameList[i];
     }
   delete [] newFileNameList;
-  
+
   this->FileNamesCreated[size] = new char[strlen(fileName) + 1];
   strcpy(this->FileNamesCreated[size], fileName);
   this->NumberOfFileNamesCreated++;

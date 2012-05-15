@@ -669,13 +669,13 @@ int vtkNektarReader::RequestData(
   vtkDebugMacro(<<"RequestData: tsLength= "<< tsLength);
 
   // Check if a particular time was requested.
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
   {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
-    double *requestedTimeSteps =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    this->TimeValue = requestedTimeSteps[0];
+    double requestedTimeStep =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    this->TimeValue = requestedTimeStep;
 
     vtkDebugMacro(<<"RequestData: this->TimeValue= "<< this->TimeValue);
 
@@ -715,8 +715,8 @@ int vtkNektarReader::RequestData(
   // Save the time value in the output (ugrid) data information.
   if (steps)
   {
-    ugrid->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
-          steps+this->ActualTimeStep, 1);
+    ugrid->GetInformation()->Set(vtkDataObject::DATA_TIME_STEP(),
+          steps[this->ActualTimeStep]);
   }
 
 //  int new_rst_val = this->p_rst_start + (this->p_rst_inc* this->ActualTimeStep);

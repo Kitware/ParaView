@@ -244,17 +244,17 @@ std::set<int> vtkFileSeriesReaderTimeRanges::ChooseInputs(
                                                         vtkInformation *outInfo)
 {
   std::set<int> indices;
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
     // get the update times
-    int numUpTimes = 
-      outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    double *upTimes =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    int numUpTimes =
+      outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    double upTime =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
     for (int i = 0; i < numUpTimes; i++)
       {
-      indices.insert(this->GetIndexForTime(upTimes[i]));
+      indices.insert(this->GetIndexForTime(upTime));
       }
     }
   else
@@ -307,20 +307,20 @@ std::vector<double> vtkFileSeriesReaderTimeRanges::GetTimesForInput(
   std::vector<double> times;
 
   // Get the update times
-  int numUpTimes = 
-    outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-  double *upTimes =
-    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+  int numUpTimes =
+    outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  double upTime =
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
   for (int i = 0; i < numUpTimes; i++)
     {
-    if ((upTimes[i]>=allowedTimeRange[0]) && (upTimes[i]<allowedTimeRange[1]))
+    if ((upTime>=allowedTimeRange[0]) && (upTime<allowedTimeRange[1]))
       {
       // Add the time.  Clamp it to the input's supported time range in
       // case that input is clipping based on the time.
       times.push_back(std::max(supportedTimeRange[0],
                                   std::min(supportedTimeRange[1],
-                                              upTimes[i])));
+                                              upTime)));
       }
     }
 
@@ -423,7 +423,7 @@ vtkFileSeriesReader::~vtkFileSeriesReader()
 }
 
 //----------------------------------------------------------------------------
-// Overload standard modified time function. If the internal reader is 
+// Overload standard modified time function. If the internal reader is
 // modified, then this object is modified as well.
 unsigned long vtkFileSeriesReader::GetMTime()
 {
@@ -583,7 +583,7 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
       return this->RequestData(request, inputVector, outputVector);
       }
     // Let the reader process anything we did not handle ourselves.
-    int retVal = this->Reader->ProcessRequest(request, 
+    int retVal = this->Reader->ProcessRequest(request,
                                               inputVector,
                                               outputVector);
     // Additional processing requried by us.
@@ -833,7 +833,7 @@ void vtkFileSeriesReader::SetCurrentFileName(const char *fname)
 }
 
 //-----------------------------------------------------------------------------
-int vtkFileSeriesReader::FillOutputPortInformation(int port, 
+int vtkFileSeriesReader::FillOutputPortInformation(int port,
                                                    vtkInformation* info)
 {
   if (this->Reader)
