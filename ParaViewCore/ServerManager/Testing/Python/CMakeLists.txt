@@ -96,6 +96,7 @@ SET(PY_TESTS_NO_BASELINE
   SMPropertyAdaptor
   VRMLSource
   MultiServer
+  ValidateSources
 )
 
 if(PARAVIEW_BUILD_PLUGIN_SurfaceLIC AND PARAVIEW_BUILD_PLUGIN_SLACTools)
