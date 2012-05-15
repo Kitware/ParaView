@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewSettingsReaction.h"
 
 #include "vtkContextScene.h"
+#include "vtkChart.h"
 
 #include <QMenu>
 #include <QPushButton>
@@ -136,31 +137,35 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     // selection mode
     createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartToggle16.png",
-      "Toggle Selection", "ChartSelectToggleButton",
+      "Toggle Selection (Ctrl+Shift Keys)", "ChartSelectToggleButton",
       this, vtkContextScene::SELECTION_TOGGLE, frame, chart_view);
     createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartMinus16.png",
-      "Subtract Selection", "ChartSelectMinusButton",
+      "Subtract Selection (Ctrl Key)", "ChartSelectMinusButton",
       this, vtkContextScene::SELECTION_SUBTRACTION, frame, chart_view);
     QAction* plusAction = createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartPlus16.png",
-      "Add Selection", "ChartSelectPlusButton",
+      "Add Selection (Shift Key)", "ChartSelectPlusButton",
       this, vtkContextScene::SELECTION_ADDITION, frame, chart_view);
 
     // selection action
-    QAction* rectSelAction = createChartSelectionAction(
+    QAction* polySelAction = createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChartPolygon16.png",
       "Polygon Selection", "ChartSelectPolygonButton",
       this, vtkContextScene::SELECTION_NONE, frame, chart_view,
-      pqContextView::SELECTION_ACTION_POLYGON);
-    QAction* polySelAction = createChartSelectionAction(
+      vtkChart::SELECT_POLYGON);
+    QAction* rectSelAction = createChartSelectionAction(
       ":/pqWidgets/Icons/pqSelectChart16.png",
       "Rectangle Selection", "ChartSelectButton",
       this, vtkContextScene::SELECTION_NONE, frame, chart_view,
-      pqContextView::SELECTION_ACTION_RECTANGLE);
+      vtkChart::SELECT_RECTANGLE);
     QActionGroup *selActionGroup = new QActionGroup(this);
-    selActionGroup->addAction(rectSelAction);
+    selActionGroup->setExclusive(true);
     selActionGroup->addAction(polySelAction);
+    selActionGroup->addAction(rectSelAction);
+    // by default, the rectangle selection is checked
+    rectSelAction->setChecked(true);
+    // The separator does not seems to show ??
     frame->contextMenu()->insertSeparator(plusAction);
     }
   return true;

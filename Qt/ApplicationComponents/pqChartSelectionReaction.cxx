@@ -101,24 +101,14 @@ void pqChartSelectionReaction::startSelection(
       return;
       }
     view->setSelectionAction(selAction);
-    if(selAction == pqContextView::SELECT_ACTION_DEFAULT &&
-      selMode == vtkContextScene::SELECTION_NONE)
-      {
-      chart->SetActionToButton(vtkChart::PAN,
-        vtkContextMouseEvent::LEFT_BUTTON);
-      chart->SetActionToButton(vtkChart::SELECT,
-        vtkContextMouseEvent::RIGHT_BUTTON);
-      }
-    else if(selAction == pqContextView::SELECTION_ACTION_RECTANGLE)
-      {
-      chart->SetActionToButton(vtkChart::SELECT_RECTANGLE,
-        vtkContextMouseEvent::RIGHT_BUTTON);
-      }
-    else if(selAction == pqContextView::SELECTION_ACTION_POLYGON)
-      {
-      chart->SetActionToButton(vtkChart::SELECT_POLYGON,
-        vtkContextMouseEvent::RIGHT_BUTTON);
-      }
+    // if none of the ADD/Subtract/Toggle button is picked
+    // go back to default right-button selection;
+    // if any of these selection mode button is triggered
+    // make the selection to use left-button
+    chart->SetActionToButton(selAction,
+      selMode == vtkContextScene::SELECTION_NONE ?
+      vtkContextMouseEvent::RIGHT_BUTTON :
+      vtkContextMouseEvent::LEFT_BUTTON);
     }
 }
 
@@ -141,38 +131,35 @@ void pqChartSelectionReaction::onTriggered()
       {
       selMode = chartMatrix->GetSelectionMode();
       }
+    // we have to have a valid mode to continue
+    if(selMode < 0)
+      {
+      return;
+      }
     int selAction = this->View->selectionAction();
-
-    // for selection action change
-    if(this->SelectionAction != pqContextView::SELECT_ACTION_DEFAULT)
+    // if selection action buttons are invoked
+    if(this->SelectionAction != 0)
       {
       if(selAction != this->SelectionAction)
         {
         pqChartSelectionReaction::startSelection(this->View,
           selMode, this->SelectionAction);    
         }
-      else
-        {
-        this->parentAction()->blockSignals(true);
-        this->parentAction()->setChecked(false);
-        this->parentAction()->blockSignals(false);
-        pqChartSelectionReaction::startSelection(this->View,
-          selMode, pqContextView::SELECT_ACTION_DEFAULT);
-        }
       }
-    // for selection mode change
+    // if a different selection mode button
     else if(selMode != this->SelectionMode)
       {
       pqChartSelectionReaction::startSelection(this->View,
         this->SelectionMode, selAction);
       }
+    // if the same selection mode button
     else
       {
       this->parentAction()->blockSignals(true);
       this->parentAction()->setChecked(false);
       this->parentAction()->blockSignals(false);
       pqChartSelectionReaction::startSelection(this->View,
-        vtkContextScene::SELECTION_DEFAULT, selAction);    
+        vtkContextScene::SELECTION_NONE, selAction);    
       }
     }
 }

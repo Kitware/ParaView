@@ -87,16 +87,9 @@ public:
   /// Returns true if selection can be done.
   virtual bool supportsSelection() const;
 
-  // Description:
-  // Enum of valid selection actions for charts in the context view
-  enum SelectionActionType{
-    SELECT_ACTION_DEFAULT = 0,
-    SELECTION_ACTION_RECTANGLE,
-    SELECTION_ACTION_POLYGON
-    };
-
   /// set/get the selection action in the context view, defined
-  /// by above enumeration.
+  /// by vtkChart enumeration from SELECT to SELECT_POLYGON.
+  // Default is vtkChart::SELECT_RECTANGLE
   virtual void setSelectionAction(int selAction);
   virtual int selectionAction();
 

@@ -100,7 +100,7 @@ public:
   pqInternal()
     {
     this->InitializedAfterObjectsCreated=false;
-    this->SelectionAction = pqContextView::SELECT_ACTION_DEFAULT;
+    this->SelectionAction = vtkChart::SELECT_RECTANGLE;
     }
   ~pqInternal()
     {
@@ -486,8 +486,8 @@ void pqContextView::setSelection(vtkSelection* sel)
 void pqContextView::setSelectionAction(int selAction)
 {
   if (this->Internal->SelectionAction == selAction ||
-    selAction < pqContextView::SELECT_ACTION_DEFAULT ||
-    selAction > pqContextView::SELECTION_ACTION_POLYGON)
+    selAction < vtkChart::SELECT ||
+    selAction > vtkChart::SELECT_POLYGON)
     {
     return;
     }
