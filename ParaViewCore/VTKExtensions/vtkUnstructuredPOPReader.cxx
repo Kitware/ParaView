@@ -387,7 +387,8 @@ bool vtkUnstructuredPOPReader::ReadMetaData(int wholeExtent[6])
         }
       }
     }
-  if(wholeExtent[4] != 0 || wholeExtent[5] != dimensions[0] - 1 || this->Stride[2] != 1)
+  if(wholeExtent[4] != 0 || wholeExtent[5] != static_cast<int>(dimensions[0] - 1)
+     || this->Stride[2] != 1)
     {
     this->ReducedHeightResolution = true;
     }
@@ -875,8 +876,6 @@ bool vtkUnstructuredPOPReader::Transform(
           vals[1] = values[0] * (endPos[1] - startPos[1]) / norm;
           vals[2] = values[0] * (endPos[2] - startPos[2]) / norm;
 
-
-
           startIndex = latlonIndex;
           endIndex = latlonIndex+dimensions[1];
           if(start[1]+j*rStride[0] >= dimensions[0]-2)
@@ -884,8 +883,6 @@ bool vtkUnstructuredPOPReader::Transform(
             startIndex = latlonIndex-dimensions[1];
             endIndex = latlonIndex;
             }
-          vals[3];
-
           startLon = vtkMath::RadiansFromDegrees(realLongitude[startIndex]);
           startLat = vtkMath::RadiansFromDegrees(realLatitude[startIndex]);
 
@@ -1353,7 +1350,6 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
           iIndex, jIndex, kIndex, controller->GetNumberOfProcesses(),
           numberOfGhostLevels, wholeExtent);
         sendingProcesses[sendingProc]++;
-        int indices[3] = {iIndex, jIndex, kIndex};
         }
       }
     // now receive and process the data
@@ -1406,7 +1402,6 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
              kIndex < pointIterator.GetColumnOceanBottomExtentIndex() &&
              this->GetPointOwnerPiece(iIndex, jIndex, kIndex, controller->GetNumberOfProcesses(), numberOfGhostLevels, wholeExtent) == controller->GetLocalProcessId())
             {
-            vtkIdType pid = pieceIds->GetId(i);
             int indices[3] = {iIndex, jIndex, kIndex};
             std::copy(indices, indices+3, std::back_inserter(sendIndexInfo[pieceIds->GetId(i)]) );
             sendValueInfo[pieceIds->GetId(i)].push_back(w[pointId]);
