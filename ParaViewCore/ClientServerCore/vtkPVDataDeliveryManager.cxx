@@ -30,11 +30,9 @@
 #include "vtkOverlappingAMR.h"
 #include "vtkPKdTree.h"
 #include "vtkPointData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVSession.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
@@ -483,16 +481,6 @@ bool vtkPVDataDeliveryManager::NeedsDelivery(
 void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned int *values)
 
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
-  if (activeSession && activeSession->IsMultiClients())
-    {
-    if (!this->RenderView->SynchronizeForCollaboration())
-      {
-      return;
-      }
-    }
-
   // This method gets called on all processes with the list of representations
   // to "deliver". We check with the view what mode we're operating in and
   // decide where the data needs to be delivered.

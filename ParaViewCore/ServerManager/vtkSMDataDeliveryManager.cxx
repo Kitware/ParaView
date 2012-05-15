@@ -82,10 +82,6 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this->ViewProxy)
-         << "GetDeliveryManager"
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << vtkClientServerStream::LastResult
          << "Deliver"
          << static_cast<int>(use_lod)
          << static_cast<unsigned int>(keys_to_deliver.size())

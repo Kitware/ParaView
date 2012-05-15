@@ -463,6 +463,13 @@ public:
   vtkPVDataDeliveryManager* GetDeliveryManager();
 
   // Description:
+  // Called on all processes to request data-delivery for the list of
+  // representations. Note this method has to be called on all processes or it
+  // may lead to deadlock.
+  void Deliver(int use_lod,
+    unsigned int size, unsigned int *representation_ids);
+
+  // Description:
   // Returns true when ordered compositing is needed on the current group of
   // processes. Note that unlike most other functions, this may return different
   // values on different processes e.g.
@@ -470,15 +477,6 @@ public:
   // \li true on pvserver or renderserver if opacity < 1 or volume present, else
   //     false
   bool GetUseOrderedCompositing();
-
-  // Description:
-  // Synchronizes core ivars for multi-client setups.
-  bool SynchronizeForCollaboration();
-
-  // Description:
-  // SynchronizationCounter is used in multi-clients mode to ensure that the
-  // views on two different clients are in the same state as the server side.
-  vtkGetMacro(SynchronizationCounter, int);
 
 //BTX
 protected:
@@ -534,6 +532,21 @@ protected:
   // displaying an image in a viewport.
   bool GetLocalProcessDoesRendering(bool using_distributed_rendering);
 
+  // Description:
+  // In multi-clients mode, ensures that all processes are in the same "state"
+  // as far as the view is concerned. Returns false if that's not the case.
+  bool TestCollaborationCounter();
+
+  // Description:
+  // Synchronizes remote-rendering related parameters for collaborative
+  // rendering in multi-clients mode.
+  void SynchronizeForCollaboration();
+
+  // Description:
+  // SynchronizationCounter is used in multi-clients mode to ensure that the
+  // views on two different clients are in the same state as the server side.
+  vtkGetMacro(SynchronizationCounter, unsigned int);
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
@@ -560,7 +573,7 @@ protected:
 
   // Used in collaboration mode to ensure that views are in the same state
   // (as far as representations added/removed goes) before rendering.
-  int SynchronizationCounter;
+  unsigned int SynchronizationCounter;
 
   // In mega-bytes.
   double RemoteRenderingThreshold;

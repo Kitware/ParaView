@@ -17,7 +17,13 @@
 // .SECTION Description
 // vtkSMDataDeliveryManager is the server-manager wrapper for
 // vtkPVDataDeliveryManager. It manages calling on methods on instances of
-// vtkPVDataDeliveryManager.
+// vtkPVDataDeliveryManager. Before every render call, vtkSMRenderViewProxy
+// calls vtkSMDataDeliveryManager::Deliver() to ensure that any geometries that
+// need to be delivered are explicitly delivered. This separating into
+// Update-Deliver-Render calls ensures makes it possible to extend the framework
+// for streaming, in future.
+//
+// The streaming components of this class are experimental and will be changed.
 
 #ifndef __vtkSMDataDeliveryManager_h
 #define __vtkSMDataDeliveryManager_h
@@ -38,7 +44,9 @@ public:
   void SetViewProxy(vtkSMViewProxy*);
 
   // Description:
-  // Called to request delivery of the geometry.
+  // Called to request delivery of the geometry. This checks the client-side
+  // vtkPVDataDeliveryManager instance to see if any geometries need to be
+  // delivered and then requests delivery for those.
   void Deliver(bool interactive);
 
   // Description:

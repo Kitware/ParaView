@@ -663,12 +663,15 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::SynchronizeForCollaboration()
+bool vtkPVRenderView::TestCollaborationCounter()
 {
-  bool counterSynchronizedSuccessfully = false;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (!activeSession || !activeSession->IsMultiClients())
+    {
+    return true;
+    }
 
-  // Also, can we optimize this further? This happens on every render in
-  // collaborative mode.
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
   vtkMultiProcessController* d_controller = 
@@ -678,28 +681,25 @@ bool vtkPVRenderView::SynchronizeForCollaboration()
   if (d_controller != NULL)
     {
     vtkErrorMacro("RenderServer-DataServer configuration is not supported in "
-      "collabortion mode.");
+      "multi-clients mode. Please restart ParaView in the right mode. "
+      "Aborting since this could cause deadlocks and other issues.");
     abort();
     }
 
   if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
     {
-    vtkMultiProcessStream stream;
-    stream << this->SynchronizationCounter << this->RemoteRenderingThreshold;
-    r_controller->Send(stream, 1, 41000);
-    int server_sync_counter;
+    r_controller->Send(&this->SynchronizationCounter, 1, 1, 41000);
+    unsigned int server_sync_counter;
     r_controller->Receive(&server_sync_counter, 1, 1, 41001);
-    counterSynchronizedSuccessfully =
-      (server_sync_counter == this->SynchronizationCounter);
+    return (server_sync_counter == this->SynchronizationCounter);
     }
   else
     {
+    bool counterSynchronizedSuccessfully = false;
     if (r_controller)
       {
-      vtkMultiProcessStream stream;
-      r_controller->Receive(stream, 1, 41000);
-      int client_sync_counter;
-      stream >> client_sync_counter >> this->RemoteRenderingThreshold;
+      unsigned int client_sync_counter;
+      r_controller->Receive(&client_sync_counter, 1, 1, 41000);
       r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
       counterSynchronizedSuccessfully =
         (client_sync_counter == this->SynchronizationCounter);
@@ -712,8 +712,61 @@ bool vtkPVRenderView::SynchronizeForCollaboration()
       p_controller->Broadcast(&temp, 1, 0);
       counterSynchronizedSuccessfully = (temp == 1);
       }
+    return counterSynchronizedSuccessfully;
     }
-  return counterSynchronizedSuccessfully;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SynchronizeForCollaboration()
+{
+ vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (!activeSession || !activeSession->IsMultiClients())
+    {
+    return;
+    }
+
+  // Update decisions about lod-rendering and remote-rendering.
+  
+  vtkMultiProcessController* p_controller =
+    this->SynchronizedWindows->GetParallelController();
+  vtkMultiProcessController* r_controller =
+    this->SynchronizedWindows->GetClientServerController();
+
+  if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
+    {
+    vtkMultiProcessStream stream;
+    stream << (this->UseLODForInteractiveRender? 1 : 0)
+           << (this->UseDistributedRenderingForStillRender? 1 : 0)
+           << (this->UseDistributedRenderingForInteractiveRender? 1 :0)
+           << (this->UseOutlineForInteractiveRender? 1 : 0)
+           << this->StillRenderProcesses
+           << this->InteractiveRenderProcesses;
+    r_controller->Send(stream, 1, 42000);
+    }
+  else
+    {
+    vtkMultiProcessStream stream;
+    if (r_controller && r_controller->Receive(stream, 1, 42000))
+      {
+      if (p_controller)
+        {
+        p_controller->Broadcast(stream, 0);
+        }
+
+      int arg1, arg2, arg3, arg4;
+      stream >> arg1
+             >> arg2
+             >> arg3
+             >> arg4
+             >> this->StillRenderProcesses
+             >> this->InteractiveRenderProcesses;
+      this->UseLODForInteractiveRender = (arg1 == 1);
+      this->UseDistributedRenderingForStillRender = (arg2 == 1);
+      this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
+      this->UseOutlineForInteractiveRender = (arg4 == 1);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -879,6 +932,19 @@ void vtkPVRenderView::StreamingUpdate()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
+  if (this->SynchronizedWindows->GetMode() !=
+    vtkPVSynchronizedRenderWindows::CLIENT ||
+    (!interactive && this->UseDistributedRenderingForStillRender) ||
+    (interactive && this->UseDistributedRenderingForInteractiveRender))
+    {
+    // in multi-client modes, Render() will be called on client always. Now the
+    // client need to coordinate with server only when we are remote rendering.
+    // if Render() is called on server side, then we are indeed remote
+    // rendering, irrespective of what the local flags tell us and we need to
+    // coordinate with the client to update the local flags correctly.
+    this->SynchronizeForCollaboration();
+    }
+
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode && !this->RemoteRenderingAvailable)
@@ -972,6 +1038,25 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->SynchronizedWindows->SetEnabled(false);
     this->SynchronizedRenderers->SetEnabled(false);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Deliver(int use_lod,
+    unsigned int size, unsigned int *representation_ids)
+{
+  // if in multi-clients mode, ensure that processes are in the same "state"
+  // before doing the data delivery or we may end up with dead-locks due to
+  // mismatched representations.
+  if (!this->TestCollaborationCounter())
+    {
+    return;
+    }
+
+  // in multi-clients mode, for every Deliver() and Render() call, we obtain the
+  // remote-rendering related ivars from the client.
+  this->SynchronizeForCollaboration();
+
+  this->GetDeliveryManager()->Deliver(use_lod, size, representation_ids);
 }
 
 //----------------------------------------------------------------------------
