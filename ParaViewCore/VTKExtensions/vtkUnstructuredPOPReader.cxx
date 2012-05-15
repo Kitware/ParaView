@@ -819,7 +819,7 @@ bool vtkUnstructuredPOPReader::Transform(
           }
         size_t latlonIndex = GetPOPIndexFromGridIndices(
           2, dimensions, start+1, rStride, i, j, k);
-        if(latlonIndex < 0 || latlonIndex >= dimensions[0]*dimensions[1])
+        if(latlonIndex >= dimensions[0]*dimensions[1])
           {
           vtkErrorMacro("Bad lat-lon index.");
           }
