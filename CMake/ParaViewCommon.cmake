@@ -250,9 +250,8 @@ INCLUDE_DIRECTORIES(
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
 
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkSelectStreamsLibrary.cmake)
-VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB
-                           ${ParaView_SOURCE_DIR}/VTK)
+# always require standards-compliant C++ environment
+set(PARAVIEW_USE_ANSI_STDLIB TRUE)
 
 # Fix cxx flags
 IF(CMAKE_COMPILER_IS_GNUCXX)
