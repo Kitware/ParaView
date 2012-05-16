@@ -23,8 +23,10 @@
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInstantiator.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
@@ -34,6 +36,7 @@
 #include "vtkStructuredGrid.h"
 #include "vtkTable.h"
 #include "vtkToolkits.h"
+#include "vtkTrivialProducer.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 
@@ -120,7 +123,7 @@ int vtkReductionFilter::RequestDataObject(
         return 0;
         }
       vtkDataObject* newOutput = vtkDataObject::SafeDownCast(anObj);
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       newOutput->Delete();
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -143,7 +146,7 @@ int vtkReductionFilter::RequestDataObject(
         if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
-          newOutput->SetPipelineInformation(info);
+          info->Set(vtkDataObject::DATA_OBJECT(),newOutput);
           newOutput->Delete();
           this->GetOutputPortInformation(0)->Set(
             vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -204,7 +207,9 @@ vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
     this->PreGatherHelper->RemoveAllInputs();
     vtkDataObject *incopy = input->NewInstance();
     incopy->ShallowCopy(input);
-    this->PreGatherHelper->AddInputConnection(0, incopy->GetProducerPort());
+    vtkNew<vtkTrivialProducer> incopyProducer;
+    incopyProducer->SetOutput(incopy);
+    this->PreGatherHelper->AddInputConnection(0, incopyProducer->GetOutputPort());
     this->PreGatherHelper->Update();
     result = this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
@@ -255,8 +260,9 @@ void vtkReductionFilter::PostProcess(vtkDataObject* output,
     //algorithm
     for (unsigned int cc = 0; cc < num_inputs; ++cc)
       {
-      this->PostGatherHelper->AddInputConnection(
-        inputs[cc]->GetProducerPort());
+      vtkNew<vtkTrivialProducer> tp;
+      tp->SetOutput(inputs[cc]);
+      this->PostGatherHelper->AddInputConnection(tp->GetOutputPort());
       }
     this->PostGatherHelper->Update();
     this->PostGatherHelper->RemoveAllInputs();

@@ -57,8 +57,6 @@ Ph.D. thesis of Christian BOUCHENY.
 #include "vtkPropCollection.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkEDLShading, "$Revision: 1.1 $")
-;
 vtkStandardNewMacro(vtkEDLShading)
 ;
 

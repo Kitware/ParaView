@@ -19,6 +19,10 @@ IF(PARAVIEW_BUILD_QT_GUI)
    ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
+if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
+  include(Qt4Macros-CMake2.8.7)
+endif()
+
 SET(Plugin_SRCS
   vtkForceTime.cxx
 )
@@ -29,4 +33,4 @@ ADD_PARAVIEW_PLUGIN( ForceTime "1.0"
   GUI_RESOURCE_FILES ForceTimeClient.xml
 )
 
-TARGET_LINK_LIBRARIES(ForceTime vtkFiltering)
+TARGET_LINK_LIBRARIES(ForceTime vtkFiltersCore)

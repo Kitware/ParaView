@@ -63,7 +63,7 @@ public:
   // milliseconds==0, then the application switches to non-interactive mode
   // immediately.
   // Note, currently delayed render is only supported when compiled with
-  // VTK_USE_QVTK set to ON.
+  // PARAVIEW_ENABLE_QT_SUPPORT set to ON.
   vtkSetMacro(NonInteractiveRenderDelay, unsigned long);
   vtkGetMacro(NonInteractiveRenderDelay, unsigned long);
 

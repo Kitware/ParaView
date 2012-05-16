@@ -22,6 +22,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyLink.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMPropertyGroup.h"
 
 #include <map>
 #include <vector>
@@ -56,6 +57,8 @@ struct vtkSMProxyInternals
   // This vector keeps track of the order in which properties
   // were added for the Property iterator
   std::vector<vtkStdString> PropertyNamesInOrder;
+
+  std::vector<vtkSmartPointer<vtkSMPropertyGroup> > PropertyGroups;
 
   std::vector<int> ServerIDs;
 

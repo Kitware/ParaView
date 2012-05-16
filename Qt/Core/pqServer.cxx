@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
@@ -43,9 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkProcessModule.h"
 #include "vtkSMCollaborationManager.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
@@ -54,8 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkToolkits.h"
@@ -235,6 +236,10 @@ void pqServer::initialize()
     {
     vtkSMProxyManager::GetProxyManager()->SetActiveSession(this->Session);
     }
+
+  // Allow Python shell to trigger a disconnect request. Make sure that request
+  // get forwarded to pqServerDisconnectReaction
+  pqCoreUtilities::connect(this->session(), vtkCommand::ExitEvent, this, SIGNAL(closeSessionRequest()));
 }
 
 //-----------------------------------------------------------------------------

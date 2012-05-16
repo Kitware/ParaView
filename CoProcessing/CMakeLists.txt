@@ -9,10 +9,9 @@ IF (NOT EXECUTABLE_OUTPUT_PATH)
     "Output directory for coprocessing executables.")
 ENDIF (NOT EXECUTABLE_OUTPUT_PATH)
 
-IF (NOT LIBRARY_OUTPUT_PATH)
-  SET(LIBRARY_OUTPUT_PATH ${CoProcessing_BINARY_DIR}/bin CACHE INTERNAL 
-    "Output directory for coprocessing libraries.")
-ENDIF (NOT LIBRARY_OUTPUT_PATH)
+IF (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CoProcessing_BINARY_DIR}/bin)
+ENDIF (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 
 SET (CoProcessing_TEST_DIR "${CoProcessing_BINARY_DIR}/Testing/Temporary")
 
@@ -42,7 +41,7 @@ SET(CoProcessing_USE_FILE
   "${CoProcessing_SOURCE_DIR}/CoProcessingUse.cmake")
 
 SET(CoProcessing_LIBRARY_DIRS
-  ${LIBRARY_OUTPUT_PATH}
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
   )
 
 SET(CoProcessing_INCLUDE_DIRS

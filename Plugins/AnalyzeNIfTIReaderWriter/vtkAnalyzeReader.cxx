@@ -653,11 +653,11 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
 //----------------------------------------------------------------------------
 // This function reads a data from a file.  The datas extent/axes
 // are assumed to be the same as the file extent/order.
-void vtkAnalyzeReader::ExecuteData(vtkDataObject *output)
+void vtkAnalyzeReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInformation* outInfo)
 {
-  vtkImageData *data = this->AllocateOutputData(output);
+  vtkImageData *data = this->AllocateOutputData(output, outInfo);
 
-  if (this->UpdateExtentIsEmpty(output))
+  if (this->UpdateExtentIsEmpty(outInfo, output))
     {
     return;
     }

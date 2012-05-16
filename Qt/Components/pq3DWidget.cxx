@@ -460,16 +460,12 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
     }
 
   vtkSMProxy* pxy = this->proxy();
-  unsigned int max = hints->GetNumberOfNestedElements();
-  for (unsigned int cc=0; cc < max; cc++)
+  unsigned int max_props = hints->GetNumberOfNestedElements();
+  for (unsigned int i=0; i < max_props; i++)
     {
-    unsigned int max_props = hints->GetNumberOfNestedElements();
-    for (unsigned int i=0; i < max_props; i++)
-      {
-      vtkPVXMLElement* propElem = hints->GetNestedElement(i);
-      this->setControlledProperty(propElem->GetAttribute("function"),
-        pxy->GetProperty(propElem->GetAttribute("name")));
-      }
+    vtkPVXMLElement* propElem = hints->GetNestedElement(i);
+    this->setControlledProperty(propElem->GetAttribute("function"),
+      pxy->GetProperty(propElem->GetAttribute("name")));
     }
 }
 

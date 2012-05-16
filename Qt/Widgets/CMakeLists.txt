@@ -8,6 +8,8 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QT_QTDESIGNER_INCLUDE_DIR}
+  ${QtTesting_SOURCE_DIR}
+  ${QtTesting_BINARY_DIR}
 )
 
 ## Add the source (*.cxx,*.h) files here.
@@ -173,12 +175,13 @@ SET(QT_WIDGETS_ALL_SRCS ${QtWidgets_SRCS} ${QtWidgets_MOC_SOURCES}
   ${RCS_SOURCES} ${QtWidgets_UI_BUILT_SOURCES})
 
 ##########################################################################
-VTK_ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
+PVVTK_ADD_LIBRARY(pqWidgets ${QT_WIDGETS_ALL_SRCS})
 
 
 ## Widgets does not depend on VTK/ParaView. Only Qt.
 TARGET_LINK_LIBRARIES(pqWidgets
-  ${QT_LIBRARIES}  
+  ${QT_LIBRARIES}
+  QtTesting
 )
 
 if(APPLE)

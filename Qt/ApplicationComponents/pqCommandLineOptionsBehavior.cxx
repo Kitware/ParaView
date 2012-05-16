@@ -56,10 +56,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 #include <QApplication>
 #include <QDebug>
 #include <QMainWindow>
+#include <QString>
 #include <QStringList>
 #include <QTimer>
 
@@ -92,7 +96,20 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     }
   else if (server_url)
     {
-    if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
+    if(strchr(server_url, '|') != NULL)
+      {
+      // We should connect multiple times
+      QStringList urls = QString(server_url).split(QRegExp("\\|"), QString::SkipEmptyParts);
+      foreach(QString url, urls)
+        {
+        if (!pqServerConnectReaction::connectToServer(pqServerResource(url)))
+              {
+              qCritical() << "Could not connect to requested server \""
+                << url << "\". Creating default builtin connection.";
+              }
+        }
+      }
+    else if (!pqServerConnectReaction::connectToServer(pqServerResource(server_url)))
       {
       qCritical() << "Could not connect to requested server \"" 
         << server_url << "\". Creating default builtin connection.";
@@ -103,6 +120,18 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
   // (either the one requested by the user on the command line or simply the
   // default one).
   Q_ASSERT(pqActiveObjects::instance().activeServer() != 0);
+
+  // For tile display testing lets enable the dump of images
+  if(options->GetTileImagePath())
+    {
+    vtkSMProxy* proxy =
+        vtkSMProxyManager::GetProxyManager()->NewProxy("tile_helper","TileDisplayHelper");
+    vtkSMStringVectorProperty* property =
+        vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("DumpImagePath"));
+    property->SetElement(0, options->GetTileImagePath());
+    proxy->UpdateVTKObjects();
+    proxy->Delete();
+    }
 
   // check for --data option.
   if (options->GetParaViewDataName())

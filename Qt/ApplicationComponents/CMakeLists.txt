@@ -35,12 +35,14 @@ SET (MOC_HEADERS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
+  pqColorEditorPropertyWidget.h
   pqColorToolbar.h
   pqCollaborationBehavior.h
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
+  pqCubeAxesPropertyWidget.h
   pqDataTimeStepBehavior.h
   pqDataQueryReaction.h
   pqDefaultMainWindow.h
@@ -62,6 +64,7 @@ SET (MOC_HEADERS
   pqManageLinksReaction.h
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
+  pqMultiServerBehavior.h
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.h
   pqPersistentMainWindowStateBehavior.h
@@ -90,6 +93,7 @@ SET (MOC_HEADERS
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardPropertyWidgetInterface.h
   pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
@@ -158,6 +162,8 @@ SET (SOURCE_FILES
   pqChartSelectionReaction.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
+  pqColorEditorPropertyWidget.cxx
+  pqColorEditorPropertyWidget.h
   pqColorToolbar.cxx
   pqColorToolbar.h
   pqCommandLineOptionsBehavior.cxx
@@ -168,6 +174,8 @@ SET (SOURCE_FILES
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
+  pqCubeAxesPropertyWidget.cxx
+  pqCubeAxesPropertyWidget.h
   pqDataTimeStepBehavior.cxx
   pqDataTimeStepBehavior.h
   pqDataQueryReaction.h
@@ -190,8 +198,8 @@ SET (SOURCE_FILES
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
   pqFixPathsInStateFilesBehavior.h
-  pqGenericSummaryDisplayPanel.h
   pqGenericSummaryDisplayPanel.cxx
+  pqGenericSummaryDisplayPanel.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -210,6 +218,8 @@ SET (SOURCE_FILES
   pqManagePluginsReaction.h
   pqMasterOnlyReaction.h
   pqMasterOnlyReaction.cxx
+  pqMultiServerBehavior.h
+  pqMultiServerBehavior.cxx
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx
@@ -268,6 +278,8 @@ SET (SOURCE_FILES
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.cxx
   pqSpreadSheetVisibilityBehavior.h
+  pqStandardPropertyWidgetInterface.cxx
+  pqStandardPropertyWidgetInterface.h
   pqStandardSummaryPanelImplementation.cxx
   pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.cxx
@@ -341,7 +353,7 @@ SOURCE_GROUP("Generated" FILES
   ${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h
 )
 
-VTK_ADD_LIBRARY(pqApplicationComponents
+PVVTK_ADD_LIBRARY(pqApplicationComponents
   ${SOURCE_FILES}
   ${UI_BUILT_SOURCES}
   ${MOC_BUILT_SOURCES}

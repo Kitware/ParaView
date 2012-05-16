@@ -53,6 +53,9 @@ public:
   /// redo.
   static void redo();
 
+  /// Clear stack
+  static void clear();
+
 protected slots:
   void enable(bool);
   void setLabel(const QString& label);

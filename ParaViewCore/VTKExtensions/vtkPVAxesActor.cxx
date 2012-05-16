@@ -135,9 +135,9 @@ vtkPVAxesActor::vtkPVAxesActor()
   vtkPolyDataMapper *ymapper = vtkPolyDataMapper::New();
   vtkPolyDataMapper *zmapper = vtkPolyDataMapper::New();
 
-  xmapper->SetInput( this->XAxisVectorText->GetOutput() );
-  ymapper->SetInput( this->YAxisVectorText->GetOutput() );
-  zmapper->SetInput( this->ZAxisVectorText->GetOutput() );
+  xmapper->SetInputConnection( this->XAxisVectorText->GetOutputPort() );
+  ymapper->SetInputConnection( this->YAxisVectorText->GetOutputPort() );
+  zmapper->SetInputConnection( this->ZAxisVectorText->GetOutputPort() );
 
   this->XAxisLabel->SetMapper( xmapper );
   this->YAxisLabel->SetMapper( ymapper );
@@ -542,36 +542,36 @@ void vtkPVAxesActor::UpdateProps()
     {
     case vtkPVAxesActor::CYLINDER_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->CylinderSource->GetOutput() );
+        SetInputConnection( this->CylinderSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::LINE_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->LineSource->GetOutput() );
+        SetInputConnection( this->LineSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::USER_DEFINED_SHAFT:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-        SetInput( this->UserDefinedShaft );
+        SetInputData( this->UserDefinedShaft );
     }
 
   switch ( this->TipType )
     {
     case vtkPVAxesActor::CONE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->ConeSource->GetOutput() );
+        SetInputConnection( this->ConeSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::SPHERE_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->SphereSource->GetOutput() );
+        SetInputConnection( this->SphereSource->GetOutputPort() );
       break;
     case vtkPVAxesActor::USER_DEFINED_TIP:
       (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-        SetInput( this->UserDefinedTip );
+        SetInputData( this->UserDefinedTip );
     }
 
   (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-    GetInput()->Update();
+    GetInputAlgorithm()->Update();
   (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-    GetInput()->Update();
+    GetInputAlgorithm()->Update();
 
 
 

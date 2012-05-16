@@ -27,9 +27,10 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVSession.h"
 #include "vtkRenderer.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkSocketController.h"
 
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
 # include "vtkIceTSynchronizedRenderers.h"
 #endif
 #include "vtkCompositedSynchronizedRenderers.h"
@@ -184,7 +185,7 @@ void vtkPVSynchronizedRenderer::Initialize(
       {
       //ICET now handles stereo properly, so use it no matter the number
       //of partitions
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
       if (this->DisableIceT)
         {
         this->ParallelSynchronizer = vtkCompositedSynchronizedRenderers::New();
@@ -311,7 +312,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
     return;
     }
   
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   if (this->ParallelSynchronizer->IsA("vtkIceTSynchronizedRenderers") == 1)
     {
     vtkIceTSynchronizedRenderers *aux =
@@ -326,7 +327,7 @@ void vtkPVSynchronizedRenderer::SetUseDepthBuffer(bool useDB)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetupPasses()
 {
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   vtkIceTSynchronizedRenderers* iceTRen =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (iceTRen)
@@ -391,7 +392,17 @@ void vtkPVSynchronizedRenderer::SetRenderer(vtkRenderer* ren)
     {
     this->CSSynchronizer->SetRenderer(ren);
     }
-  vtkSetObjectBodyMacro(Renderer, vtkRenderer, ren);
+
+  // The renderer should be OpenGL ...
+  vtkOpenGLRenderer *glRenderer = vtkOpenGLRenderer::SafeDownCast(ren);
+
+  if(ren && !glRenderer)
+    {
+    vtkErrorMacro("Received non OpenGL renderer");
+    assert(false);
+    }
+
+  vtkSetObjectBodyMacro(Renderer, vtkOpenGLRenderer, glRenderer);
   this->SetupPasses();
 }
 
@@ -427,7 +438,7 @@ void vtkPVSynchronizedRenderer::SetImageReductionFactor(int factor)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 {
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)
@@ -441,7 +452,7 @@ void vtkPVSynchronizedRenderer::SetDataReplicatedOnAllProcesses(bool replicated)
 //----------------------------------------------------------------------------
 void vtkPVSynchronizedRenderer::SetKdTree(vtkPKdTree* tree)
 {
-#ifdef PARAVIEW_USE_ICE_T
+#if defined PARAVIEW_USE_ICE_T && defined PARAVIEW_USE_MPI
   vtkIceTSynchronizedRenderers* sync =
     vtkIceTSynchronizedRenderers::SafeDownCast(this->ParallelSynchronizer);
   if (sync)

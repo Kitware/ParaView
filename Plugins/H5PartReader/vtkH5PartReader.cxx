@@ -73,7 +73,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkSmartPointer.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 #include "vtkMultiProcessController.h"
 vtkCxxSetObjectMacro(vtkH5PartReader, Controller, vtkMultiProcessController);
 #endif
@@ -167,7 +167,7 @@ vtkH5PartReader::vtkH5PartReader()
   this->SetXarray("Coords_0");
   this->SetYarray("Coords_1");
   this->SetZarray("Coords_2");
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   this->Controller = NULL;
   this->SetController(vtkMultiProcessController::GetGlobalController());
 #endif
@@ -191,7 +191,7 @@ vtkH5PartReader::~vtkH5PartReader()
   this->PointDataArraySelection->Delete();
   this->PointDataArraySelection = 0;
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   this->SetController(NULL);
 #endif
 }
@@ -307,7 +307,7 @@ int vtkH5PartReader::RequestInformation(
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (this->Controller)
     {
     this->UpdatePiece = this->Controller->GetLocalProcessId();
@@ -572,7 +572,7 @@ int vtkH5PartReader::RequestData(
   // get the ouptut
   vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   //
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   if (this->Controller &&
       (this->UpdatePiece != this->Controller->GetLocalProcessId() ||
        this->UpdateNumPieces != this->Controller->GetNumberOfProcesses()))

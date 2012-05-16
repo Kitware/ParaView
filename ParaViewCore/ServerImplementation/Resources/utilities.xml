@@ -187,6 +187,14 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="AllowDuplicateScalars"
+        command="SetAllowDuplicateScalars"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of PVLookupTable -->
     </Proxy>
   </ProxyGroup>
@@ -2312,12 +2320,18 @@
       <!-- End of TimerLog -->
     </Proxy>
 
-    <ViewLayoutProxy name="ViewLayout" class="vtkViewLayout"
-      processes="renderserver">
+    <ViewLayoutProxy name="ViewLayout" processes="client">
       <Documentation>
         Proxy used to manage layout for mutliple views.
       </Documentation>
     </ViewLayoutProxy>
+
+    <Proxy name="InternalViewLayoutHelper"
+      class="vtkViewLayout" processes="renderserver">
+      <Documentation>
+        Proxy used to manage layout for mutliple views.
+      </Documentation>
+    </Proxy>
 
     <!-- End of group "misc" -->
   </ProxyGroup>
@@ -2581,6 +2595,182 @@
     <Proxy name="PolygonalSurfaceContourLineInterpolator" class="vtkPolygonalSurfaceContourLineInterpolator"
       base_proxygroup="contour_line_interpolators" base_proxyname="ContourLineInterpolatorBase">
     </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="tile_helper">
+    <Proxy name="TileDisplayHelper" class="vtkTileDisplayHelper" processes="renderserver">
+      <Documentation>
+        Helper proxy used to enable/disable server side tile image dump.
+      </Documentation>
+      <StringVectorProperty name="DumpImagePath" command="SetDumpImagePath"
+        number_of_elements="1" default_values="">
+        <Documentation>
+          Full Path + prefix file name.
+          The image full path will be: ${DumpImagePath}_${processId}.png
+        </Documentation>
+      </StringVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="options">
+  <!-- =================================================================== -->
+    <ContextNamedOptionsProxy name="PlotOptionsBase" class="vtkChartNamedOptions"
+      processes="client|dataserver|renderserver" >
+
+      <StringVectorProperty name="VisibilityInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of visibility for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LabelInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of labels for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="VisibilityInfo" >
+        <Documentation>
+          Set the series visibility.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Label"
+        command="SetLabel"
+        number_of_elements_per_command="2"
+        element_types="2 2"
+        repeat_command="1"
+        information_property="LabelInfo">
+        <Documentation>
+          Set the series labels.
+        </Documentation>
+      </StringVectorProperty>
+
+    <!-- End of PlotOptionsBase -->
+  </ContextNamedOptionsProxy>
+
+    <ContextNamedOptionsProxy name="XYPlotOptions" class="vtkXYChartNamedOptions"
+      base_proxygroup="options" base_proxyname="PlotOptionsBase"
+      processes="client|dataserver|renderserver" >
+
+      <StringVectorProperty name="LineThicknessInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line thickness for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThickness"
+        command="SetLineThickness"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="LineThicknessInfo" >
+        <Documentation>
+          Set the series line thickness.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyleInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyle"
+        command="SetLineStyle"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="LineStyleInfo">
+        <Documentation>
+          Set the series line style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ColorInfo"
+        number_of_elements_per_command="4"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements_per_command="4"
+        element_types="2 1 1 1"
+        repeat_command="1"
+        information_property="ColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="MarkerStyleInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="MarkerStyle"
+        command="SetMarkerStyle"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="MarkerStyleInfo">
+        <Documentation>
+          Set the series marker style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCornerInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PlotCorner"
+        command="SetAxisCorner"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="PlotCornerInfo">
+        <Documentation>
+          Set the series axis corner.
+        </Documentation>
+      </StringVectorProperty>
+      <!-- End of PlotOptionsBase -->
+    </ContextNamedOptionsProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

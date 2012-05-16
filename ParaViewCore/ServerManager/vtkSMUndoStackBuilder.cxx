@@ -130,7 +130,8 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
                                            const vtkSMMessage *previousState,
                                            const vtkSMMessage *newState)
 {
-  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack)
+  if (this->IgnoreAllChanges || !this->HandleChangeEvents() || !this->UndoStack
+      || session->IsMultiClients()) // No undo for collaboration
     {
     return;
     }
@@ -145,9 +146,10 @@ void vtkSMUndoStackBuilder::OnStateChange( vtkSMSession *session,
 
 //-----------------------------------------------------------------------------
 void vtkSMUndoStackBuilder::OnCreateObject(
-  vtkSMSession* vtkNotUsed(session), vtkSMMessage* newState)
+  vtkSMSession* session, vtkSMMessage* newState)
 {
-  if (this->UndoStack)
+  // Valid undo stack but No collaborative session
+  if (this->UndoStack && !session->IsMultiClients())
     {
     this->UndoStack->InvokeEvent(
       vtkSMUndoStack::ObjectCreationEvent, newState);

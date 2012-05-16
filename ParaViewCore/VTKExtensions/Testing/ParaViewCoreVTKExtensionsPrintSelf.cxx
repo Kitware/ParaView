@@ -33,11 +33,11 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkCompositeAnimationPlayer.h"
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
-#include "vtkContextNamedOptions.h"
+#include "vtkChartNamedOptions.h"
 #include "vtkCSVExporter.h"
 #include "vtkCSVWriter.h"
 #include "vtkDataSetToRectilinearGrid.h"
-#include "vtkEnzoReader.h"
+//#include "vtkEnzoReader.h"
 #include "vtkEquivalenceSet.h"
 #include "vtkExodusFileSeriesReader.h"
 #include "vtkExtractHistogram.h"
@@ -46,7 +46,7 @@
 #include "vtkFileSeriesReader.h"
 #include "vtkFileSeriesWriter.h"
 #include "vtkFlashContour.h"
-#include "vtkFlashReader.h"
+//#include "vtkFlashReader.h"
 #include "vtkGridConnectivity.h"
 #include "vtkHierarchicalFractal.h"
 #include "vtkImageCompressor.h"
@@ -201,7 +201,7 @@
 #include "vtkXMLPVDWriter.h"
 #include "vtkZlibImageCompressor.h"
 
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
 # include "vtkAllToNRedistributeCompositePolyData.h"
 # include "vtkAllToNRedistributePolyData.h"
 # include "vtkBalancedRedistributePolyData.h"
@@ -238,11 +238,11 @@ int main(int , char *[])
   PRINT_SELF(vtkCleanUnstructuredGrid);
   PRINT_SELF(vtkCompositeAnimationPlayer);
   PRINT_SELF(vtkCompositeDataToUnstructuredGridFilter);
-  PRINT_SELF(vtkContextNamedOptions);
+  PRINT_SELF(vtkChartNamedOptions);
   PRINT_SELF(vtkCSVExporter);
   PRINT_SELF(vtkCSVWriter);
   PRINT_SELF(vtkDataSetToRectilinearGrid);
-  PRINT_SELF(vtkEnzoReader);
+  //PRINT_SELF(vtkEnzoReader);
   PRINT_SELF(vtkEquivalenceSet);
   PRINT_SELF(vtkExodusFileSeriesReader);
   PRINT_SELF(vtkExtractHistogram);
@@ -251,7 +251,7 @@ int main(int , char *[])
   PRINT_SELF(vtkFileSeriesReader);
   PRINT_SELF(vtkFileSeriesWriter);
   PRINT_SELF(vtkFlashContour);
-  PRINT_SELF(vtkFlashReader);
+  //PRINT_SELF(vtkFlashReader);
   PRINT_SELF(vtkGridConnectivity);
   PRINT_SELF(vtkHierarchicalFractal);
   PRINT_SELF(vtkImageCompressor);
@@ -275,7 +275,6 @@ int main(int , char *[])
   PRINT_SELF(vtkMergeArrays);
   PRINT_SELF(vtkMergeCompositeDataSet);
   PRINT_SELF(vtkMinMax);
-  PRINT_SELF(vtkMPICompositeManager);
   PRINT_SELF(vtkMultiProcessControllerHelper);
   PRINT_SELF(vtkOrderedCompositeDistributor);
   PRINT_SELF(vtkParallelSerialWriter);
@@ -405,12 +404,13 @@ int main(int , char *[])
   PRINT_SELF(vtkXMLCollectionReader);
   PRINT_SELF(vtkXMLPVDWriter);
   PRINT_SELF(vtkZlibImageCompressor);
-#ifdef VTK_USE_MPI
+#ifdef PARAVIEW_USE_MPI
   PRINT_SELF(vtkAllToNRedistributeCompositePolyData);
   PRINT_SELF(vtkAllToNRedistributePolyData);
   PRINT_SELF(vtkBalancedRedistributePolyData);
   PRINT_SELF(vtkRedistributePolyData);
   PRINT_SELF(vtkWeightedRedistributePolyData);
+  PRINT_SELF(vtkMPICompositeManager);
 # ifdef PARAVIEW_USE_ICE_T
   PRINT_SELF(vtkIceTCompositePass);
   PRINT_SELF(vtkIceTContext);

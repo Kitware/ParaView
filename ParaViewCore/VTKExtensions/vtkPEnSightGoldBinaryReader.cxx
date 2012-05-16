@@ -53,9 +53,9 @@ vtkPEnSightGoldBinaryReader::~vtkPEnSightGoldBinaryReader()
     delete this->IFile;
     this->IFile = NULL;
     }
-  delete this->FloatBuffer[2];
-  delete this->FloatBuffer[1];
-  delete this->FloatBuffer[0];
+  delete [] this->FloatBuffer[2];
+  delete [] this->FloatBuffer[1];
+  delete [] this->FloatBuffer[0];
   free( this->FloatBuffer );
 }
 
@@ -3842,8 +3842,8 @@ int vtkPEnSightGoldBinaryReader::CreateStructuredGridOutput(
     }
 
   output->SetDimensions(newDimensions);
-  output->SetWholeExtent(
-                         0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
+//   output->SetWholeExtent(
+//                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
   points->Allocate(this->GetPointIds(partId)->GetLocalNumberOfIds());
 
   long currentPositionInFile = this->IFile->tellg();
@@ -4004,8 +4004,8 @@ int vtkPEnSightGoldBinaryReader::CreateRectilinearGridOutput(
     }
 
   output->SetDimensions(newDimensions);
-  output->SetWholeExtent(
-                         0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
+//   output->SetWholeExtent(
+//                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
   xCoords->Allocate(newDimensions[0]);
   yCoords->Allocate(newDimensions[1]);
   zCoords->Allocate(newDimensions[2]);
@@ -4127,8 +4127,8 @@ int vtkPEnSightGoldBinaryReader::CreateImageDataOutput(
     }
 
   output->SetDimensions(newDimensions);
-  output->SetWholeExtent(
-                         0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
+//   output->SetWholeExtent(
+//                          0, newDimensions[0]-1, 0, newDimensions[1]-1, 0, newDimensions[2]-1);
 
   this->ReadFloatArray(origin, 3);
   this->ReadFloatArray(delta, 3);
@@ -4513,6 +4513,7 @@ int vtkPEnSightGoldBinaryReader::InjectCoordinatesAtEnd(vtkUnstructuredGrid* out
   vtkPointData* pointData = output->GetPointData();
   vtkDataArray* globalNodeIds = this->GetPointIds(partId)->GenerateGlobalIdsArray("GlobalNodeId");
   pointData->SetGlobalIds(globalNodeIds);
+  globalNodeIds->Delete();
 
   // We do not inject global Element Ids: It is not required for D3, for example,
   // and it consumes a lot of memory

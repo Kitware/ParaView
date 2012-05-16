@@ -161,6 +161,11 @@ void pqFiltersMenuReaction::updateEnableState()
   bool enabled = (server != NULL);
   enabled = enabled ? server->isMaster() : enabled;
 
+  // Make sure we already have a selection model
+  vtkSMProxySelectionModel* selModel =
+    pqActiveObjects::instance().activeSourcesSelectionModel();
+  enabled = enabled && (selModel != NULL);
+
   // selected ports.
   QList<pqOutputPort*> outputPorts;
 
@@ -169,8 +174,7 @@ void pqFiltersMenuReaction::updateEnableState()
     {
     pqApplicationCore* core = pqApplicationCore::instance();
     pqServerManagerModel* smmodel = core->getServerManagerModel();
-    vtkSMProxySelectionModel* selModel =
-      pqActiveObjects::instance().activeSourcesSelectionModel();
+
     for (unsigned int cc=0; cc < selModel->GetNumberOfSelectedProxies(); cc++)
       {
       pqServerManagerModelItem* item =

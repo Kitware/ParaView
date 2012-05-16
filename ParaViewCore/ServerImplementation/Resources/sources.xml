@@ -2,6 +2,111 @@
   <ProxyGroup name="sources">
    
    <!-- ==================================================================== -->
+   <SourceProxy name="AMRGaussianPulseSource" class="vtkAMRGaussianPulseSource" 
+                label="AMR GaussianPulse Source">
+   <Documentation long_help="Create AMR dataset w/ Gaussian Pulse"
+                  short_help="Create AMR dataset w/ Gaussian Pulse">
+    AMR dataset source, used for generating sample Berger-Collela AMR dataset
+    with a Gaussian Pulse field at the center.
+   </Documentation>
+   
+    <!-- Add gui component for setting the dimension -->
+    <IntVectorProperty name="Dimension"
+                      command="SetDimension"
+                      number_of_elements="1"
+                      default_values="3">
+    <EnumerationDomain name="enum">
+      <Entry value="2" text="2D"/>
+      <Entry value="3" text="3D"/>
+    </EnumerationDomain>
+    <Documentation>
+      Sets the desired dimension for the AMR dataset to generate.
+    </Documentation>
+    </IntVectorProperty>
+    
+    <DoubleVectorProperty
+        name="Root Spacing"
+        command="SetRootSpacing"
+        number_of_elements="1"
+        default_values="0.5" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         Set the spacing at level 0.
+       </Documentation>
+     </DoubleVectorProperty>
+     
+      <!-- Add gui component for setting the dimension -->
+    <IntVectorProperty name="RefinementRatio"
+                      command="SetRefinementRatio"
+                      number_of_elements="1"
+                      default_values="2">
+    <EnumerationDomain name="enum">
+      <Entry value="2" text="2"/>
+      <Entry value="3" text="3"/>
+      <Entry value="4" text="4"/>
+    </EnumerationDomain>
+    <Documentation>
+      Sets the desired dimension for the AMR dataset to generate.
+    </Documentation>
+    </IntVectorProperty>
+    
+    <!-- Add gui components for manipulating the origin of the gaussian pulse -->
+    <DoubleVectorProperty name="XPulseOrigin"
+                          command="SetXPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set x-coordinate for the pulse origin</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="YPulseOrigin"
+                          command="SetYPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set y-coordinate for the pulse origin</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="ZPulseOrigin"
+                          command="SetZPulseOrigin"
+                          number_of_elements="1"
+                          default_values="0.0">
+    <DoubleRangeDomain name="range" min="-1.0" max="1.0"/>
+    <Documentation>Set z-coordinate for the pulse origin</Documentation>  
+    </DoubleVectorProperty>
+    
+    <!--  Add gui components for manipulating the pulse width -->
+    <DoubleVectorProperty name="XPulseWidth"
+                          command="SetXPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set x-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="YPulseWidth"
+                          command="SetYPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set y-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    <DoubleVectorProperty name="ZPulseWidth"
+                          command="SetZPulseWidth"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.5" max="10.0"/>
+    <Documentation>Set z-coordinate for the pulse Width</Documentation>
+    </DoubleVectorProperty>
+    
+    <!--  Add gui components for manipulating the pulse width -->
+    <DoubleVectorProperty name="PulseAmplitude"
+                          command="SetPulseAmplitude"
+                          number_of_elements="1"
+                          default_values="0.5">
+    <DoubleRangeDomain name="range" min="0.0001" max="1.0"/>
+    <Documentation>Sets the amplitude of the pulse</Documentation>
+    </DoubleVectorProperty>
+   </SourceProxy>
+ 
+   <!-- ==================================================================== -->
    <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D" label="2D Glyph">
      <Documentation
         long_help="Create a 2D glyph (e.g., arrow, cross, dash, etc.)"
@@ -86,7 +191,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="TipResolution"
          command="SetTipResolution"
          number_of_elements="1"
-         default_values="6" >
+         default_values="6"
+         panel_visibility="default" >
         <IntRangeDomain name="range" min="1" max="128" />
         <Documentation>
           This property specifies the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother.
@@ -98,7 +204,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="TipRadius"
          command="SetTipRadius"
          number_of_elements="1"
-         default_values="0.1" >
+         default_values="0.1"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0" max="10" />
         <Documentation>
           This property specifies the radius of the widest part of the tip of the arrow (the cone).
@@ -109,7 +216,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="TipLength"
          command="SetTipLength"
          number_of_elements="1"
-         default_values="0.35" >
+         default_values="0.35"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0" max="1" />
         <Documentation>
           This property specifies the length of the tip.
@@ -120,7 +228,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="ShaftResolution"
          command="SetShaftResolution"
          number_of_elements="1"
-         default_values="6" >
+         default_values="6"
+         panel_visibility="default" >
         <IntRangeDomain name="range" min="0" max="128" />
         <Documentation>
           This property specifies the number of faces of the shaft of the arrow (the cylinder). As the resolution increases, the cylinder will become smoother.
@@ -131,7 +240,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="ShaftRadius"
          command="SetShaftRadius"
          number_of_elements="1"
-         default_values="0.03" >
+         default_values="0.03"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0" max="5" />
         <Documentation>
           This property specifies the radius of the shaft of the arrow (the cylinder).
@@ -142,7 +252,8 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
          name="Invert"
          command="SetInvert"
          number_of_elements="1"
-         default_values="0">
+         default_values="0"
+         panel_visibility="default" >
          <BooleanDomain name="bool" />
          <Documentation>
            Inverts the arrow direction.
@@ -225,14 +336,12 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
          command="SetXLength"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the length of the box in the X direction.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -240,14 +349,12 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
          command="SetYLength"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the length of the box in the Y direction.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -255,14 +362,12 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
          command="SetZLength"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the length of the box in the Z direction.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -270,14 +375,12 @@ The Box source can be used to add a box to the 3D scene. The output of the Box s
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the center of the box.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
    <!-- End Box -->
    </SourceProxy>
@@ -306,14 +409,12 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          command="SetRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="0.5" >
+         default_values="0.5"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           This property specifies the radius of the base of the cone.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -321,14 +422,12 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          command="SetHeight"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the height of the cone.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -336,14 +435,12 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" />
          <Documentation>
            This property specifies the center of the cone.
          </Documentation>
-         <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -351,14 +448,12 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          command="SetDirection"
          number_of_elements="3"
          animateable="1"
-         default_values="1.0 0.0 0.0" >
+         default_values="1.0 0.0 0.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range"/>
         <Documentation>
           Set the orientation vector of the cone.  The vector does not have to be normalized.  The cone will point in the direction specified.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -508,7 +603,8 @@ The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The
          command="SetHeight"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the height of the cylinder (along the y axis).
@@ -519,7 +615,8 @@ The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The
          name="Radius"
          command="SetRadius"
          number_of_elements="1"
-         default_values="0.5" >
+         default_values="0.5"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the radius of the cylinder.
@@ -531,7 +628,8 @@ The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the coordinate value at the center of the cylinder.
@@ -563,7 +661,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          command="SetPoint1"
          number_of_elements="3"
          animateable="1"
-         default_values="-0.5 0.0 0.0" >
+         default_values="-0.5 0.0 0.0"
+         panel_visibility="default" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the first endpoint of the line.
@@ -575,7 +674,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          command="SetPoint2"
          number_of_elements="3"
          animateable="1"
-         default_values="0.5 0.0 0.0" >
+         default_values="0.5 0.0 0.0"
+         panel_visibility="default" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the second endpoint of the line.
@@ -586,7 +686,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          name="Resolution"
          command="SetResolution"
          number_of_elements="1"
-         default_values="6" >
+         default_values="6"
+         panel_visibility="default" >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           This property specifies the number of pieces into which to divide the line.
@@ -616,7 +717,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
       <DoubleVectorProperty
          name="Point1"
          number_of_elements="3"
-         default_values="-0.5 0.0 0.0" >
+         default_values="-0.5 0.0 0.0"
+         panel_visibility="default" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the first endpoint of the line.
@@ -626,7 +728,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
       <DoubleVectorProperty
          name="Point2"
          number_of_elements="3"
-         default_values="0.5 0.0 0.0" >
+         default_values="0.5 0.0 0.0"
+         panel_visibility="default" >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the second endpoint of the line.
@@ -833,7 +936,8 @@ The Plane source can be used to add a polygonal parallelogram to the 3D scene. U
          command="SetOrigin"
          number_of_elements="3"
          animateable="1"
-         default_values="-0.5 -0.5 0.0" >
+         default_values="-0.5 -0.5 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate of the origin (one corner) of the plane.
@@ -845,7 +949,8 @@ The Plane source can be used to add a polygonal parallelogram to the 3D scene. U
          command="SetPoint1"
          number_of_elements="3"
          animateable="1"
-         default_values="0.5 -0.5 0.0" >
+         default_values="0.5 -0.5 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate a second corner of the parallelogram. The line connecting this point and that specified by the Origin property define one edge of the parallelogram (its X axis).
@@ -857,7 +962,8 @@ The Plane source can be used to add a polygonal parallelogram to the 3D scene. U
          command="SetPoint2"
          number_of_elements="3"
          animateable="1"
-         default_values="-0.5 0.5 0.0" >
+         default_values="-0.5 0.5 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate a third corner of the parallelogram. The line connecting this point and that specified by the Origin property define a second edge of the parallelogram (its Y axis).
@@ -899,7 +1005,8 @@ The point source creates a specified number of points within a given radius abou
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinates of the center of the point cloud.
@@ -911,7 +1018,8 @@ The point source creates a specified number of points within a given radius abou
          command="SetNumberOfPoints"
          number_of_elements="1"
          animateable="1"
-         default_values="1" >
+         default_values="1"
+         panel_visibility="default" >
          <IntRangeDomain name="range" min="1"/>
          <Documentation>
            This property specifies the number of points in the point cloud.
@@ -923,7 +1031,8 @@ The point source creates a specified number of points within a given radius abou
          command="SetRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="0.0" >
+         default_values="0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           This property specifies the radius of the point cloud, measured from the value of the Center property.
@@ -953,14 +1062,12 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinates for the center of the sphere.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -968,14 +1075,12 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
          command="SetRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="0.5" >
+         default_values="0.5"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           This property specifies the radius of the sphere.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -1065,14 +1170,12 @@ The Disk source can be used to add a polygonal disk to the 3D scene. The output 
          command="SetInnerRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="0.5" >
+         default_values="0.5"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           Specify inner radius of hole in disc.
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -1080,14 +1183,12 @@ The Disk source can be used to add a polygonal disk to the 3D scene. The output 
          command="SetOuterRadius"
          number_of_elements="1"
          animateable="1"
-         default_values="1.0" >
+         default_values="1.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           Specify outer radius of disc. 
         </Documentation>
-        <Hints>
-          <ShowInSummaryPanel/>
-        </Hints>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -1242,9 +1343,11 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
       </Documentation>
       <IntVectorProperty
          name="WholeExtent"
+         label="Whole Extent"
          command="SetWholeExtent"
          number_of_elements="6"
-         default_values="-10 10 -10 10 -10 10" >
+         default_values="-10 10 -10 10 -10 10"
+         panel_visibility="default">
         <IntRangeDomain name="range"/>
         <Documentation>
           The six values in this property indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices.
@@ -1256,7 +1359,8 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default">
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinates of the center of the dataset.
@@ -1394,7 +1498,8 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
        name="Text"
        command="SetText"
        number_of_elements="1"
-       default_values="Text">
+       default_values="Text"
+       panel_visibility="default">
              <Hints>
               <Widget type="multi_line"/>
             </Hints>
@@ -1431,7 +1536,8 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
       <StringVectorProperty name="QueryString"
         command="SetQueryString"
         number_of_elements="1"
-        default_values="">
+        default_values=""
+        panel_visibility="default">
       </StringVectorProperty>
 
       <IntVectorProperty name="CompositeIndex"
@@ -1953,6 +2059,14 @@ is refined.
      </IntVectorProperty>
 
    </SourceProxy>
+   <!-- ==================================================================== -->
+   <MultiServerSourceProxy name="MultiServerProxy" class="vtkPVMultiServerDataSource" label="Remote Source Proxy" processes="client">
+      <Documentation
+         short_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers"
+         long_help="This proxy allow the user to automatically embed inside a built-in session data objects that belong to other servers">
+      </Documentation>
 
+      <Property name="DependencyLink"/>
+   </MultiServerSourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

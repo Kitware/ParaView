@@ -38,27 +38,27 @@ int main(int argc, char* argv[])
   delete [] fname;
 
   vtkImageContinuousDilate3D *dilate = vtkImageContinuousDilate3D::New();
-  dilate->SetInput(reader->GetOutput());
+  dilate->SetInputConnection(reader->GetOutputPort());
   dilate->SetKernelSize( 11, 11, 1);
 
   vtkImageContinuousErode3D *erode = vtkImageContinuousErode3D::New();
-  erode->SetInput (dilate->GetOutput());
+  erode->SetInputConnection (dilate->GetOutputPort());
   erode->SetKernelSize(11,11,1);
   
   vtkImageMedian3D *median = vtkImageMedian3D::New();
-  median->SetInput( erode->GetOutput() );
+  median->SetInputConnection( erode->GetOutputPort() );
   
   vtkImageGradient *gradient = vtkImageGradient::New();
-  gradient->SetInput( median->GetOutput() );
+  gradient->SetInputConnection( median->GetOutputPort() );
   gradient->SetDimensionality (3);
   gradient->Update(); //discard gradient
 
   vtkImageGradientMagnitude *magnitude = vtkImageGradientMagnitude::New();
-  magnitude->SetInput( erode->GetOutput() );
+  magnitude->SetInputConnection( erode->GetOutputPort() );
   magnitude->SetDimensionality (3);
 
   vtkImageViewer *viewer = vtkImageViewer::New();
-  viewer->SetInput ( magnitude->GetOutput() );
+  viewer->SetInputConnection ( magnitude->GetOutputPort() );
   viewer->SetColorWindow(2000);
   viewer->SetColorLevel(1000);
   viewer->Render();

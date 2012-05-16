@@ -23,7 +23,7 @@
 class vtkSessionIterator::vtkInternals
 {
 public:
-  vtkProcessModule::vtkInternals::MapOfSessions::iterator Iter;
+  vtkProcessModuleInternals::MapOfSessions::iterator Iter;
 };
 
 
@@ -51,7 +51,7 @@ void vtkSessionIterator::InitTraversal()
     return;
     }
 
-  vtkProcessModule::vtkInternals* internals = pm->Internals;
+  vtkProcessModuleInternals* internals = pm->Internals;
   this->Internals->Iter = internals->Sessions.begin();
 }
 
@@ -64,7 +64,7 @@ bool vtkSessionIterator::IsDoneWithTraversal()
     vtkErrorMacro("No ProcessModule found.");
     return true;
     }
-  vtkProcessModule::vtkInternals* internals = pm->Internals;
+  vtkProcessModuleInternals* internals = pm->Internals;
   return (this->Internals->Iter == internals->Sessions.end());
 }
 

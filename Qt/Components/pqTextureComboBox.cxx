@@ -51,18 +51,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QPointer>
 #include <QtDebug>
-#include <QTimer>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqFileDialog.h"
 #include "pqRenderView.h"
+#include "pqServer.h"
 #include "pqServerManagerObserver.h"
 #include "pqSMAdaptor.h"
+#include "pqTimer.h"
 #include "pqTriggerOnIdleHelper.h"
 #include "pqUndoStack.h"
-#include "pqServer.h"
 
 
 class pqTextureComboBox::pqInternal
@@ -148,7 +148,7 @@ void pqTextureComboBox::proxyUnRegistered(const QString& group, const QString&,
   if (group == TEXTURESGROUP)
     {
     this->Internal->TextureIcons.remove(proxy);
-    QTimer::singleShot(0, this, SLOT(updateTextures()));
+    pqTimer::singleShot(0, this, SLOT(updateTextures()));
     }
 }
 
@@ -313,10 +313,14 @@ void pqTextureComboBox::onActivated(int index)
     proxy = this->Internal->Representation->getProxy();
     textureProperty = proxy->GetProperty("Texture");
     }
-  else
+  else if (this->Internal->RenderView)
     {
     proxy = this->Internal->RenderView->getProxy();
     textureProperty = proxy->GetProperty("BackgroundTexture");
+    }
+  else
+    {
+    return;
     }
 
   if (!textureProperty)

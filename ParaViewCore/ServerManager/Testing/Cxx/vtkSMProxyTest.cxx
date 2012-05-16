@@ -1,0 +1,117 @@
+/*=========================================================================
+
+Program:   ParaView
+Module:    vtkSMProxyTest.cxx
+
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "vtkSMProxyTest.h"
+
+#include "vtkInitializationHelper.h"
+#include "vtkPVServerOptions.h"
+#include "vtkSMProxyManager.h"
+#include "vtkProcessModule.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMDoubleVectorProperty.h"
+
+void vtkSMProxyTest::SetAnnotation()
+{
+  vtkSMProxy *proxy = vtkSMProxy::New();
+
+  // set annotations
+  proxy->SetAnnotation("Color", "#FFAA00");
+  proxy->SetAnnotation("Tooltip", "Just a sphere");
+  proxy->SetAnnotation("Owner", "Seb");
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 3);
+  QVERIFY(proxy->HasAnnotation("Color"));
+  QVERIFY(proxy->HasAnnotation("Tooltip"));
+  QVERIFY(proxy->HasAnnotation("Owner"));
+
+  // remove owner annotation
+  proxy->SetAnnotation("Owner", NULL);
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 2);
+  QVERIFY(proxy->HasAnnotation("Color"));
+  QVERIFY(proxy->HasAnnotation("Tooltip"));
+
+  // remove tooltip annotation
+  proxy->RemoveAnnotation("Tooltip");
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 1);
+  QVERIFY(proxy->HasAnnotation("Color"));
+
+  // remove all annotations
+  proxy->RemoveAllAnnotations();
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 0);
+
+  // add annotations
+  proxy->SetAnnotation("Color", "#FFAA00");
+  proxy->SetAnnotation("Tooltip", "Just a sphere");
+  proxy->SetAnnotation("Owner", "Seb");
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 3);
+  QVERIFY(proxy->HasAnnotation("Color"));
+  QVERIFY(proxy->HasAnnotation("Tooltip"));
+  QVERIFY(proxy->HasAnnotation("Owner"));
+
+  // remove all annotations
+  proxy->RemoveAllAnnotations();
+  QCOMPARE(proxy->GetNumberOfAnnotations(), 0);
+
+  proxy->Delete();
+}
+
+void vtkSMProxyTest::GetProperty()
+{
+  vtkSMSession *session = vtkSMSession::New();
+  vtkSMSessionProxyManager *pxm = session->GetSessionProxyManager();
+  vtkSMProxy *proxy = pxm->NewProxy("sources", "SphereSource");
+  QVERIFY(proxy != NULL);
+
+  // get 'Center' property
+  vtkSMProperty *property = proxy->GetProperty("Center");
+  QVERIFY(property != NULL);
+  QCOMPARE(proxy->GetPropertyName(property), "Center");
+
+  // try to get an invalid property
+  property = proxy->GetProperty("NonexistantSphereProperty");
+  QVERIFY(property == NULL);
+  QVERIFY(proxy->GetPropertyName(property) == NULL);
+
+  proxy->Delete();
+  session->Delete();
+}
+
+void vtkSMProxyTest::GetVTKClassName()
+{
+  vtkSMProxy *proxy = vtkSMProxy::New();
+  QVERIFY(proxy->GetVTKClassName() == NULL);
+
+  proxy->SetVTKClassName("vtkSphereSource");
+  QCOMPARE(proxy->GetVTKClassName(), "vtkSphereSource");
+
+  proxy->Delete();
+}
+
+int main(int argc, char *argv[])
+{
+  vtkPVServerOptions* options = vtkPVServerOptions::New();
+  vtkInitializationHelper::Initialize(argc, argv,
+                                      vtkProcessModule::PROCESS_CLIENT,
+                                      options);
+
+  vtkSMProxyTest test;
+  int ret = QTest::qExec(&test, argc, argv);
+
+  vtkInitializationHelper::Finalize();
+  options->Delete();
+
+  return ret;
+}

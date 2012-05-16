@@ -27,7 +27,7 @@
 #include "vtkMantaTestSource.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
-#include "vtkParallelFactory.h"
+#include "vtkObjectFactory.h"
 #include "vtkPlane.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProcess.h"
@@ -275,8 +275,7 @@ void MyProcess::Execute()
 #endif
 
   //Compute local geometric bounds
-  vtkPolyData *pd = source->GetOutput();
-  pd->SetUpdateExtent(me, numProcs, 0);
+  source->SetUpdateExtent(me, numProcs, 0);
   source->Update();
   source->GetOutput()->GetBounds(bds);
   /*

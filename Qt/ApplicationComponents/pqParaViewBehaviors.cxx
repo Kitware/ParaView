@@ -42,19 +42,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDeleteBehavior.h"
 #include "pqFixPathsInStateFilesBehavior.h"
 #include "pqInterfaceTracker.h"
+#include "pqMultiServerBehavior.h"
 #include "pqObjectPickingBehavior.h"
+#include "pqPVNewSourceBehavior.h"
 #include "pqPersistentMainWindowStateBehavior.h"
 #include "pqPipelineContextMenuBehavior.h"
 #include "pqPluginActionGroupBehavior.h"
 #include "pqPluginDockWidgetsBehavior.h"
-#include "pqPVNewSourceBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
-#include "pqStandardViewModules.h"
 #include "pqStandardSummaryPanelImplementation.h"
+#include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
+#include "pqStandardPropertyWidgetInterface.h"
 
 #include <QShortcut>
 #include <QMainWindow>
@@ -71,6 +73,8 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   pgm->addInterface(new pqStandardViewModules(pgm));
 
   pgm->addInterface(new pqStandardSummaryPanelImplementation(pgm));
+
+  pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 
   // Load plugins distributed with application.
   pqApplicationCore::instance()->loadDistributedPlugins();
@@ -96,6 +100,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqObjectPickingBehavior(this);
   new pqCollaborationBehavior(this);
+  new pqMultiServerBehavior(this);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,

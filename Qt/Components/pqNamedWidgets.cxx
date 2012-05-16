@@ -1062,7 +1062,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bo
         h->setData(0, Qt::DisplayRole, header);
         tw->setHeaderItem(h);
         tw->setObjectName(name);
-        pqTreeWidgetSelectionHelper* helper = 
+        pqTreeWidgetSelectionHelper* helper =
           new pqTreeWidgetSelectionHelper(tw);
         helper->setObjectName(QString("%1Helper").arg(propertyName));
         panelLayout->addWidget(tw, rowCount, 0, 1, 2);

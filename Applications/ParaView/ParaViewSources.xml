@@ -24,4 +24,5 @@
   <Proxy group="sources" name="TimeSource" />
   <Proxy group="sources" name="Ruler" />
   <Proxy group="sources" name="RTAnalyticSource" />
+  <Proxy group="sources" name="AMRGaussianPulseSource" />
 </ParaViewSources>

@@ -32,25 +32,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCollaborationManager.h"
 
 #include "pqApplicationCore.h"
+#include "pqContextView.h"
 #include "pqCoreUtilities.h"
 #include "pqPipelineSource.h"
+#include "pqQVTKWidget.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
-#include "pqQVTKWidget.h"
-#include "pqContextView.h"
+#include "vtkChart.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkNew.h"
 #include "vtkPVMultiClientsInformation.h"
 #include "vtkSMCollaborationManager.h"
+#include "vtkSMContextViewProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSession.h"
 #include "vtkWeakPointer.h"
-#include "vtkSMContextViewProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkChart.h"
-#include "vtkNew.h"
 
 #include <set>
 #include <map>
@@ -59,12 +59,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QEvent>
 #include <QMap>
+#include <QMouseEvent>
 #include <QPointer>
 #include <QtDebug>
+#include <QTimer>
 #include <QVariant>
 #include <QWidget>
-#include <QMouseEvent>
-#include <QTimer>
 
 //***************************************************************************
 //                           Internal class
@@ -268,7 +268,8 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
                 viewId));
         if(view && (this->Internals->AciveSession == server->session())) // Make sure we share the same active server
           {
-          view->SetViewBounds(range);
+          // FIXME
+          // view->SetViewBounds(range);
           }
         break;
         }
@@ -473,13 +474,14 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::attachChartViewBoundsListener(pqView* view)
 {
-  pqContextView* chartView = qobject_cast<pqContextView*>(view);
-  if(chartView)
-    {
-    QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
-                     this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
-                     Qt::UniqueConnection);
-    }
+  // FIXME:UDA
+  //pqContextView* chartView = qobject_cast<pqContextView*>(view);
+  //if(chartView)
+  //  {
+  //  QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
+  //                   this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
+  //                   Qt::UniqueConnection);
+  //  }
 }
 
 //-----------------------------------------------------------------------------
@@ -500,26 +502,27 @@ void pqCollaborationManager::onChartViewChange(vtkTypeUInt32 gid, double* bounds
 //-----------------------------------------------------------------------------
 void pqCollaborationManager::sendChartViewBoundsToOtherClients()
 {
-  if(this->Internals->ContextViewBoundsToShare.size() > 0)
-    {
-    std::map<vtkTypeUInt32, ChartBounds>::iterator iter;
-    iter = this->Internals->ContextViewBoundsToShare.begin();
-    while(iter != this->Internals->ContextViewBoundsToShare.end())
-      {
-      vtkSMMessage msg;
-      msg.SetExtension(QtEvent::type, QtEvent::CHART_BOUNDS);
-      msg.SetExtension(ChartViewBounds::view, iter->first);
-      for(int i=0;i<8;i++)
-        {
-        msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
-        }
+ // FIXME:UDA
+ // if(this->Internals->ContextViewBoundsToShare.size() > 0)
+ //   {
+ //   std::map<vtkTypeUInt32, ChartBounds>::iterator iter;
+ //   iter = this->Internals->ContextViewBoundsToShare.begin();
+ //   while(iter != this->Internals->ContextViewBoundsToShare.end())
+ //     {
+ //     vtkSMMessage msg;
+ //     msg.SetExtension(QtEvent::type, QtEvent::CHART_BOUNDS);
+ //     msg.SetExtension(ChartViewBounds::view, iter->first);
+ //     for(int i=0;i<8;i++)
+ //       {
+ //       msg.AddExtension(ChartViewBounds::range, iter->second.Range[i]);
+ //       }
 
-      this->activeCollaborationManager()->SendToOtherClients(&msg);
+ //     this->activeCollaborationManager()->SendToOtherClients(&msg);
 
-      // Move forward
-      iter++;
-      }
-    // Clean up stack
-    this->Internals->ContextViewBoundsToShare.clear();
-    }
+ //     // Move forward
+ //     iter++;
+ //     }
+ //   // Clean up stack
+ //   this->Internals->ContextViewBoundsToShare.clear();
+ //   }
 }

@@ -32,19 +32,19 @@ vtkCxxSetObjectMacro(vtkTransferFunctionEditorRepresentation,
 vtkTransferFunctionEditorRepresentation::vtkTransferFunctionEditorRepresentation()
 {
   this->HistogramImage = vtkImageData::New();
-  this->HistogramImage->SetScalarTypeToUnsignedChar();
+  this->HistogramImage->SetScalarType(VTK_UNSIGNED_CHAR, this->HistogramImage->GetInformation());
   this->HistogramTexture = vtkTexture::New();
-  this->HistogramTexture->SetInput(this->HistogramImage);
+  this->HistogramTexture->SetInputData(this->HistogramImage);
   this->HistogramGeometry = vtkPolyData::New();
   this->HistogramMapper = vtkPolyDataMapper::New();
-  this->HistogramMapper->SetInput(this->HistogramGeometry);
+  this->HistogramMapper->SetInputData(this->HistogramGeometry);
   this->HistogramActor = vtkActor::New();
   this->HistogramActor->SetTexture(this->HistogramTexture);
   this->HistogramActor->SetMapper(this->HistogramMapper);
 
   this->BackgroundImage = vtkPolyData::New();
   this->BackgroundMapper = vtkPolyDataMapper::New();
-  this->BackgroundMapper->SetInput(this->BackgroundImage);
+  this->BackgroundMapper->SetInputData(this->BackgroundImage);
   this->BackgroundMapper->InterpolateScalarsBeforeMappingOn();
   this->BackgroundActor = vtkActor::New();
   this->BackgroundActor->SetMapper(this->BackgroundMapper);
@@ -209,8 +209,7 @@ void vtkTransferFunctionEditorRepresentation::InitializeImage(
     image->SetDimensions(
       this->DisplaySize[0] - 2*this->BorderWidth,
       this->DisplaySize[1] - 2*this->BorderWidth, 1);
-    image->SetNumberOfScalarComponents(4);
-    image->AllocateScalars();
+    image->AllocateScalars(image->GetScalarType(), 4);
     vtkUnsignedCharArray *array = vtkUnsignedCharArray::SafeDownCast(
       image->GetPointData()->GetScalars());
     if (array)

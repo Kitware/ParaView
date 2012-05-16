@@ -239,6 +239,15 @@
    </attribute>
    <widget class="pqMemoryInspector" name="dockWidgetContents"/>
   </widget>
+  <widget class="QDockWidget" name="propertiesDock">
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqPropertiesPanel" name="propertiesPanel"/>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -310,6 +319,12 @@
    <class>pqMemoryInspector</class>
    <extends>QWidget</extends>
    <header>pqMemoryInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqPropertiesPanel</class>
+   <extends>QWidget</extends>
+   <header>pqPropertiesPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -22,7 +22,7 @@
 #include <map>
 #include <vector>
 
-class vtkProcessModule::vtkInternals
+class vtkProcessModuleInternals
 {
 public:
   typedef std::map<vtkIdType, vtkSmartPointer<vtkSession> > MapOfSessions;

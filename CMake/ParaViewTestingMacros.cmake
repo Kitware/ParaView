@@ -27,6 +27,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     set (counter 0)
     set (extra_args)
     set (full_test_name)
+    set (force_serial FALSE)
+
     while (${counter} LESS ${TEST_GROUP_SIZE})
       list(LENGTH ACT_TEST_SCRIPTS num_tests)
       if (num_tests)
@@ -50,6 +52,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
             set (full_test_name "${full_test_name}.${test_name}")
             set (extra_args ${extra_args} "--test-script=${test}")
             process_args(extra_args)
+            if (DEFINED ${test_name}_USE_NEW_PANELS)
+              set (extra_args ${extra_args} "--use-new-panels")
+            endif ()
           endif (NOT ${test_name}${skip_test_flag_suffix})
         endif (${counter} LESS 100000)
       endif (num_tests)
@@ -57,6 +62,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       if (DEFINED ${test_name}_BREAK)
         set (counter 100000) # stop the group.
       endif (DEFINED ${test_name}_BREAK)
+      if (${test_name}_FORCE_SERIAL)
+        set (force_serial TRUE)
+      endif (${test_name}_FORCE_SERIAL)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
@@ -66,6 +74,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         ${extra_args}
         --exit
         )
+      if (force_serial)
+        set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
+      endif()
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -133,6 +145,71 @@ FUNCTION(add_multi_client_tests prefix)
         ${extra_args}
         --exit
         )
+      if (${test_name}_FORCE_SERIAL)
+        set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+        message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+      endif (${test_name}_FORCE_SERIAL)
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
+
+FUNCTION(add_multi_server_tests prefix nbServers)
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
+
+  foreach (test_script ${ACT_TEST_SCRIPTS})
+    get_filename_component(test_name ${test_script} NAME_WE)
+      set (extra_args)
+      process_args(extra_args)
+      add_test("${prefix}.${test_name}"
+          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        --test-multi-servers ${nbServers}
+        --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+        --client ${CLIENT_EXECUTABLE}
+        -dr
+        --disable-light-kit
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --test-script=${test_script}
+        ${extra_args}
+        --exit
+        )
+  endforeach(test_script)
+ENDFUNCTION(add_multi_server_tests)
+
+FUNCTION (add_tile_display_tests prefix tdx tdy )
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR" "" ${ARGN})
+
+
+  MATH(EXPR REQUIRED_CPU '${tdx}*${tdy}-1') # -1 is for LESS
+  if (${PARAVIEW_USE_MPI})
+    if (${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+      foreach (test_script ${ACT_TEST_SCRIPTS})
+
+        get_filename_component(test_name ${test_script} NAME_WE)
+        set (extra_args)
+        process_args(extra_args)
+        add_test("${prefix}-${tdx}x${tdy}.${test_name}"
+            ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+            --test-tiled ${tdx} ${tdy}
+            --server ${PARAVIEW_SERVER_EXECUTABLE}
+
+            --client ${CLIENT_EXECUTABLE}
+            -dr
+            --disable-light-kit
+            --test-directory=${PARAVIEW_TEST_DIR}
+            --test-script=${test_script}
+            --tile-image-prefix=${PARAVIEW_TEST_DIR}/${test_name}
+
+            ${extra_args}
+            --exit
+            )
+        set_property(TEST "${prefix}-${tdx}x${tdy}.${test_name}"
+                     PROPERTY ENVIRONMENT "PV_ICET_WINDOW_BORDERS=1")
+        if (${test_name}_FORCE_SERIAL)
+          set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
+          message(STATUS "Running in serial \"${prefix}.${test_name}\"")
+        endif (${test_name}_FORCE_SERIAL)
+      endforeach(test_script)
+    endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
+  endif()
+ENDFUNCTION (add_tile_display_tests)

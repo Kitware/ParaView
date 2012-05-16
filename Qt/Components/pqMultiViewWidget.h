@@ -79,6 +79,9 @@ public:
   /// Returns list of views assigned to frames in this widget.
   QList<vtkSMViewProxy*> viewProxies() const;
 
+  /// Returns true if the view has been assigned to this layout.
+  bool isViewAssigned(pqView*) const;
+
 signals:
   /// fired when a frame in this widget becomes active.
   void frameActivated();
@@ -112,6 +115,11 @@ public slots:
   /// cleans up the layout.
   void reset();
 
+  /// destroys each of the views present in this layout.
+  /// Useful when user closes the frame expecting that all containing views are
+  /// destroyed.
+  void destroyAllViews();
+
 protected slots:
   /// Slots called on different signals fired by the nested frames or splitters.
   /// Note that these slots use this->sender(), hence these should not be called
@@ -135,6 +143,10 @@ protected slots:
   /// empty.
   void proxyRemoved(pqProxy*);
 
+  /// called when a new view is added. we update the layout if the view added
+  /// belongs to this layout.
+  void viewAdded(pqView*);
+
 protected:
   /// Called whenever a new frame needs to be created for a view. Note that view
   /// may be null, in which case a place-holder frame is expected. The caller
@@ -145,9 +157,10 @@ protected:
   /// Event filter callback to detect when a sub-frame becomes active, so that
   /// we can mark it as such.
   virtual bool eventFilter(QObject* caller, QEvent* evt);
-  
+
 private:
-  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg);
+  QWidget* createWidget(int, vtkSMViewLayoutProxy* layout, QWidget* parentWdg,
+    int& maxIndex);
 
 private:
   Q_DISABLE_COPY(pqMultiViewWidget);

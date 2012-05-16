@@ -107,7 +107,7 @@ include(BundleUtilities)
  
 # Additional libs may be found in:
 #
-set(libs_path "@LIBRARY_OUTPUT_PATH@")
+set(libs_path "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
  
 set(FFMPEG_avcodec_LIBRARY "@FFMPEG_avcodec_LIBRARY@")
 if(FFMPEG_avcodec_LIBRARY)

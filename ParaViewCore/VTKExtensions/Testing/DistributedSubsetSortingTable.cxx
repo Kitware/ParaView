@@ -17,7 +17,6 @@
 // This test requires 4 MPI processes.
 
 #include "vtkTestUtilities.h"
-#include "vtkParallelFactory.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkImageData.h"
 #include "vtkRTAnalyticSource.h"
@@ -29,6 +28,7 @@
 #include "vtkTable.h"
 #include "vtkFloatArray.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkObjectFactory.h"
 /*
 ** This test only builds if MPI is in use
 */

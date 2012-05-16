@@ -131,6 +131,13 @@ bool vtkTilesHelper::GetTileViewport(const double* viewport, int rank,
     out_tile_viewport[3] = static_cast<int>(
       normalized_tile_viewport[3] * this->TileWindowSize[1] *
       this->TileDimensions[1] + 0.5) -1;
+    // due to rounding, we although normalized ranges maybe valid, we may end
+    // up with invalid integral ranges. So test again.
+    if (out_tile_viewport[2] <= out_tile_viewport[0] ||
+      out_tile_viewport[3] <= out_tile_viewport[1])
+      {
+      return false;
+      }
     return true;
     }
   return false;

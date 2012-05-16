@@ -29,21 +29,32 @@
 #include "vtkClearZPass.h"
 #include "vtkClientServerCompositePass.h"
 #include "vtkCompositeRenderManager.h"
+#include "vtkCompositeZPass.h"
+#include "vtkConeSource.h"
+#include "vtkCubeSource.h"
 #include "vtkDataSetReader.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDepthPeelingPass.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkIceTCompositePass.h"
 #include "vtkImageRenderManager.h"
+#include "vtkInformation.h"
+#include "vtkLightActor.h"
+#include "vtkLightCollection.h"
+#include "vtkLight.h"
 #include "vtkLightsPass.h"
 #include "vtkMPIController.h"
+#include "vtkObjectFactory.h"
 #include "vtkOpaquePass.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOverlayPass.h"
-#include "vtkParallelFactory.h"
 #include "vtkPieceScalars.h"
 #include "vtkPKdTree.h"
+#include "vtkPlaneSource.h"
+#include "vtkPointData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPolyDataNormals.h"
 #include "vtkProperty.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkRenderer.h"
@@ -51,6 +62,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSequencePass.h"
+#include "vtkShadowMapBakerPass.h"
+#include "vtkShadowMapPass.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkSphereSource.h"
@@ -60,19 +73,7 @@
 #include "vtkTranslucentPass.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVolumetricPass.h"
-#include "vtkPlaneSource.h"
-#include "vtkCubeSource.h"
-#include "vtkConeSource.h"
-#include "vtkLight.h"
-#include "vtkLightCollection.h"
-#include "vtkLightActor.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkPointData.h"
-#include "vtkCompositeZPass.h"
 
-#include "vtkInformation.h"
-#include "vtkShadowMapBakerPass.h"
-#include "vtkShadowMapPass.h"
 #include <cassert>
 
 /*
@@ -98,7 +99,7 @@ class MyProcess : public vtkProcess
   bool UseDepthPeeling;
 public:
   static MyProcess *New();
-  vtkTypeRevisionMacro(MyProcess, vtkProcess);
+  vtkTypeMacro(MyProcess, vtkProcess);
 
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
@@ -132,7 +133,6 @@ protected:
   bool ServerMode;
 };
 
-vtkCxxRevisionMacro(MyProcess, "$Revision$");
 vtkStandardNewMacro(MyProcess);
 
 //-----------------------------------------------------------------------------
@@ -397,7 +397,8 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
   cameraP->SetAspectRatioOverride(
     (double)this->TileDimensions[0] / this->TileDimensions[1]);
 
-  renderer->SetPass(cameraP);
+  vtkOpenGLRenderer *glrenderer = vtkOpenGLRenderer::SafeDownCast(renderer);
+  glrenderer->SetPass(cameraP);
 
   // setting viewport doesn't work in tile-display mode correctly yet.
   //renderer->SetViewport(0, 0, 0.75, 1);

@@ -133,6 +133,8 @@ public:
 
   virtual void ReleaseGraphicsResources (vtkWindow *);
 
+  vtkSetVector6Macro(WholeExtent, int);
+
 //BTX
 protected:
   vtkTexturePainter();
@@ -165,6 +167,7 @@ protected:
   int ScalarMode;
   int ScalarArrayIndex;
   int UseXYPlane;
+  int WholeExtent[6];
   char* ScalarArrayName;
   vtkScalarsToColors* LookupTable;
 

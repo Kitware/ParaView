@@ -27,6 +27,7 @@ class vtkNetworkAccessManager;
 class vtkPVOptions;
 class vtkSession;
 class vtkSessionIterator;
+class vtkProcessModuleInternals;
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
@@ -219,10 +220,9 @@ protected:
   // Used to keep track of maximum session used. Only used to ensure that no
   // session id is ever repeated.
   vtkIdType MaxSessionId;
-public:
-  class vtkInternals;
+
 protected:
-  vtkInternals* Internals;
+  vtkProcessModuleInternals* Internals;
 
   // vtkSessionIterator needs access to vtkInternals to be able to iterate over
   // the sessions efficiently.

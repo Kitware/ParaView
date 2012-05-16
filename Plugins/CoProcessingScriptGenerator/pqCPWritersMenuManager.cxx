@@ -179,8 +179,7 @@ void pqCPWritersMenuManager::createMenu()
     {
     if(vtkPVXMLElement* hints = iter->GetProxyHints())
       {
-      if(vtkPVXMLElement* coprocessingHint =
-         hints->FindNestedElementByName("CoProcessing"))
+      if(hints->FindNestedElementByName("CoProcessing"))
         {
         const char* proxyName = iter->GetProxyName();
         vtkSMProxy* prototype = pxm->GetPrototypeProxy(proxyGroup, proxyName);
@@ -220,7 +219,7 @@ void pqCPWritersMenuManager::updateEnableState()
   vtkSMProxySelectionModel* selection = pxm->GetSelectionModel("ActiveSources");
 
   QList<pqOutputPort*> outputPorts;
-  for(int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
+  for(unsigned int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
     vtkSMProxy* smProxy = selection->GetSelectedProxy(index);
     pqPipelineSource* source = pqModel->findItem<pqPipelineSource*>(smProxy);
@@ -337,16 +336,16 @@ void pqCPWritersMenuManager::createWriter(const QString& xmlgroup,
   pqServerManagerModel* pqModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqOutputPort*> selectedOutputPorts;
   QMap<QString, QList<pqOutputPort*> > namedInputs;
-  pqPipelineSource* source;
-  pqOutputPort* opPort;
   // Determine the list of selected output ports.
   for (unsigned int index = 0; index < selection->GetNumberOfSelectedProxies(); ++index)
     {
-    if (opPort = pqModel->findItem<pqOutputPort*>(selection->GetSelectedProxy(index)))
+    if (pqOutputPort* opPort =
+        pqModel->findItem<pqOutputPort*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(opPort);
       }
-    else if (source = pqModel->findItem<pqPipelineSource*>(selection->GetSelectedProxy(index)))
+    else if (pqPipelineSource* source =
+             pqModel->findItem<pqPipelineSource*>(selection->GetSelectedProxy(index)))
       {
       selectedOutputPorts.push_back(source->getOutputPort(0));
       }

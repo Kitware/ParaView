@@ -940,6 +940,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
   if (cellinfo)// && representation != vtkSMPVRepresentationProxy::VOLUME)
     {
     int dataSetType = -1;
+    int compositeDataType = -1;
     vtkPVDataInformation* dataInfo = NULL;
     if(this->getInput())
       {
@@ -948,12 +949,15 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     if(dataInfo)
       {
       dataSetType = dataInfo->GetDataSetType();// get data set type
+      compositeDataType = dataInfo->GetCompositeDataSetType();
       }
 
-    if (representation.compare("Volume", Qt::CaseInsensitive) != 0 || (
-        dataSetType != VTK_UNIFORM_GRID &&
-        dataSetType != VTK_STRUCTURED_POINTS &&
-        dataSetType != VTK_IMAGE_DATA ))
+    if ((compositeDataType == VTK_OVERLAPPING_AMR) ||
+        (compositeDataType == VTK_HIERARCHICAL_BOX_DATA_SET) ||
+        (representation.compare("Volume", Qt::CaseInsensitive) != 0) ||
+        (dataSetType != VTK_UNIFORM_GRID &&
+         dataSetType != VTK_STRUCTURED_POINTS &&
+         dataSetType != VTK_IMAGE_DATA ))
       {
       for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
         {

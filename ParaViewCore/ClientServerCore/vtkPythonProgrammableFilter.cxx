@@ -29,6 +29,7 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <algorithm>
+#include <sstream>
 #include <map>
 #include <string>
 
@@ -128,7 +129,7 @@ int vtkPythonProgrammableFilter::RequestDataObject(
         if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
-          newOutput->SetPipelineInformation(info);
+          info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
           newOutput->Delete();
           this->GetOutputPortInformation(0)->Set(
             vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
@@ -157,7 +158,7 @@ int vtkPythonProgrammableFilter::RequestDataObject(
                       << outTypeStr);
         return 0;
         }
-      newOutput->SetPipelineInformation(info);
+      info->Set(vtkDataObject::DATA_OBJECT(), newOutput);
       this->GetOutputPortInformation(0)->Set(
         vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
       newOutput->Delete();
@@ -212,7 +213,7 @@ int vtkPythonProgrammableFilter::RequestUpdateExtent(
 }
 
 //----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+void vtkPythonProgrammableFilter::SetParameterInternal(const char *raw_name,
                                                const char *raw_value)
 {
   const std::string name = raw_name ? raw_name : "";
@@ -227,6 +228,42 @@ void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
   this->Implementation->Parameters[name] = value;
   this->Modified();
 }
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const int value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const double value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(const char *raw_name,
+                                               const char *value)
+{
+  std::ostringstream buf;
+  buf << value;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
+void vtkPythonProgrammableFilter::SetParameter(
+    const char *raw_name,
+    const double value1, 
+    const double value2,
+    const double value3)
+{
+  std::ostringstream buf;
+  buf << value1 << value2 << value3;
+  this->SetParameterInternal(raw_name, buf.str().c_str() );
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::ClearParameters()

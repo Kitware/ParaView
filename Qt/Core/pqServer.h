@@ -48,11 +48,12 @@ class vtkSMSessionProxyManager;
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
+#include "pqTimer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessageMinimal.h"
 #include "vtkWeakPointer.h"
+
 #include <QPointer>
-#include <QTimer>
 
 /// pqServer (should be renamed to pqSession) is a pqServerManagerModelItem
 /// subclass that represents a vtkSMSession. Besides providing API to access
@@ -198,6 +199,9 @@ signals:
   void triggeredUserListChanged();
   void triggerFollowCamera(int);
 
+  /// Forward request for disconnection
+  void closeSessionRequest();
+
 public slots:
   /// Allow user to broadcast to other client a given message
   void sendToOtherClients(vtkSMMessage* msg);
@@ -232,7 +236,7 @@ private:
   // For now, this is same as the vtkProcessModule::Options.
   vtkSmartPointer<vtkPVOptions> Options;
 
-  QTimer IdleCollaborationTimer;
+  pqTimer IdleCollaborationTimer;
 
   class pqInternals;
   pqInternals* Internals;

@@ -101,7 +101,8 @@ public:
                            const QSize& size = QSize(300, 300));
 
   static bool CompareView(pqView* curView,
-    const QString& referenceImage, double threshold, const QString& tempDirectory);
+    const QString& referenceImage, double threshold, const QString& tempDirectory,
+    const QSize& size=QSize());
 
 private:
   QStringList TestFilenames;

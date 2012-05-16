@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPythonOptions.h"
 #include "vtkSMSession.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
 
 #include "vtkPVPythonInterpretor.h"
 #include <vector>
@@ -70,6 +69,15 @@ namespace ParaViewPython {
     vtkInitializationHelper::Initialize( argc, argv, processType, options );
     if (options->GetTellVersion() || options->GetHelpSelected())
       {
+      vtkInitializationHelper::Finalize();
+      return 1;
+      }
+
+    if (processType == vtkProcessModule::PROCESS_BATCH &&
+      options->GetPythonScriptName() == 0)
+      {
+      vtkGenericWarningMacro("No script specified. "
+        "Please specify a batch script or use 'pvpython'.");
       vtkInitializationHelper::Finalize();
       return 1;
       }

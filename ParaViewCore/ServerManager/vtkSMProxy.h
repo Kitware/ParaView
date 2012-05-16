@@ -132,6 +132,7 @@ class vtkSMLoadStateContext;
 class vtkPVXMLElement;
 class vtkSMDocumentation;
 class vtkSMProperty;
+class vtkSMPropertyGroup;
 class vtkSMPropertyIterator;
 class vtkSMProxyLocator;
 class vtkSMProxyManager;
@@ -454,6 +455,14 @@ public:
   // invalid state when property refere to a sub-proxy that does not exist yet.
   virtual void LoadState( const vtkSMMessage* msg, vtkSMProxyLocator* locator);
 
+  // Description:
+  // Returns the property group at \p index for the proxy.
+  vtkSMPropertyGroup* GetPropertyGroup(size_t index) const;
+
+  // Description:
+  // Returns the number of property groups that the proxy contains.
+  size_t GetNumberOfPropertyGroups() const;
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -509,6 +518,7 @@ protected:
   friend class vtkSMUndoRedoStateLoader;
   friend class vtkSMDeserializerProtobuf;
   friend class vtkSMStateLocator;
+  friend class vtkSMMultiServerSourceProxy;
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML

@@ -143,6 +143,10 @@ pqTabbedMultiViewWidget::pqTabbedMultiViewWidget(QWidget* parentObject)
   QObject::connect(
     core, SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
     this, SLOT(onStateLoaded()));
+
+  QObject::connect(
+    core->getObjectBuilder(), SIGNAL(aboutToCreateView(pqServer*)),
+    this, SLOT(aboutToCreateView(pqServer*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -192,16 +196,30 @@ void pqTabbedMultiViewWidget::proxyAdded(pqProxy* proxy)
     }
   else if (qobject_cast<pqView*>(proxy))
     {
-    if (pqApplicationCore::instance()->isLoadingState())
+    pqView* view = qobject_cast<pqView*>(proxy);
+    if (pqApplicationCore::instance()->isLoadingState() || view == NULL)
       {
       return;
+      }
+
+    // check if this proxy has been assigned a frame already. This typically can
+    // happen when loading states (for collaboration or otherwise).
+    QList<QPointer<pqMultiViewWidget> > widgets =
+      this->Internals->TabWidgets.values();
+
+    foreach (pqMultiViewWidget* widget, widgets)
+      {
+      if (widget && widget->isViewAssigned(view))
+        {
+        return;
+        }
       }
 
     // FIXME: we may want to give server-manager the opportunity to place the
     // view after creation, if it wants. The GUI should try to find a place for
     // it, only if the server-manager (through undo-redo, or loading state or
     // Python or collaborative-client).
-    this->assignToFrame(qobject_cast<pqView*>(proxy), true);
+    this->assignToFrame(view, true);
     }
 }
 
@@ -265,6 +283,15 @@ void pqTabbedMultiViewWidget::assignToFrame(pqView* view, bool warnIfTabCreated)
 }
 
 //-----------------------------------------------------------------------------
+void pqTabbedMultiViewWidget::aboutToCreateView(pqServer* server)
+{
+  if (!this->Internals->TabWidgets.contains(server))
+    {
+    this->createTab(server);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqTabbedMultiViewWidget::serverRemoved(pqServer* server)
 {
   // remove all tabs corresponding to the closed session.
@@ -315,6 +342,9 @@ void pqTabbedMultiViewWidget::closeTab(int index)
       pqApplicationCore::instance()->getObjectBuilder();
 
     BEGIN_UNDO_SET("Remove View Tab");
+    // first remove each of the views in the tab layout.
+    widget->destroyAllViews();
+
     builder->destroy(smmodel->findItem<pqProxy*>(vlayout));
     END_UNDO_SET();
     }

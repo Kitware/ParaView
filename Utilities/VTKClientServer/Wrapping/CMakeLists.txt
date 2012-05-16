@@ -7,6 +7,11 @@ IF(NOT CMAKE_CROSSCOMPILING)
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParse.tab.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParsePreprocess.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParseMain.c)
+
+  set_property(SOURCE ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParseMain.c PROPERTY COMPILE_DEFINITIONS
+    VTK_PARSE_VERSION="${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
+
+
   EXPORT(TARGETS vtkWrapClientServer FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
   IF(COMPILE_TOOLS_TARGET)
     ADD_DEPENDENCIES(${COMPILE_TOOLS_TARGET} vtkWrapClientServer)

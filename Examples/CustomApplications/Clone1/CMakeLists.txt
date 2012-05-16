@@ -51,4 +51,4 @@ build_paraview_client(paraview_revised
   SOURCES ${ParaView_SOURCE_FILES}
 )
 
-TARGET_LINK_LIBRARIES(paraview_revised ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}  vtkCommon vtkPVCommon pqCore pqComponents)
+TARGET_LINK_LIBRARIES(paraview_revised ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}  vtkCommonCore vtkPVCommon pqCore pqComponents)

@@ -88,39 +88,6 @@ protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
 
-  static QString formatDataFor(vtkPVArrayInformation* ai);
-
-  enum PixmapType 
-    {
-    PM_NONE = -1,
-    PM_NODE,
-    PM_ELEM,
-    PM_ELEMBLK,
-    PM_FACEBLK,
-    PM_EDGEBLK,
-    PM_NODESET,
-    PM_EDGESET,
-    PM_FACESET,
-    PM_SIDESET,
-    PM_ELEMSET,
-    PM_NODEMAP,
-    PM_EDGEMAP,
-    PM_FACEMAP,
-    PM_ELEMMAP,
-    PM_GLOBAL
-    };
-
-  void addSelectionsToTreeWidget(const QString& property, 
-                                 QTreeWidget* tree,
-                                 PixmapType pix);
-
-  void addSelectionToTreeWidget(const QString& name,
-                                const QString& realName,
-                                QTreeWidget* tree,
-                                PixmapType pix,
-                                const QString& prop,
-                                int propIdx = -1);
-
   pqTreeWidgetItemObject* DisplItem;
 
   class pqUI;

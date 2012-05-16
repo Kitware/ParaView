@@ -1,4 +1,4 @@
-r"""simple is a module for using paraview server manager in Python. It 
+r"""simple is a module for using paraview server manager in Python. It
 provides a simple convenience layer to functionality provided by the
 C++ classes wrapped to Python as well as the servermanager module.
 
@@ -50,16 +50,18 @@ def switchActiveConnection(newActiveConnection=None, ns=None):
 
 def Disconnect(ns=None, force=True):
     if servermanager.ActiveConnection and (force or servermanager.MultiServerConnections == None):
-        if ns:
-           _remove_functions(ns)
-        _remove_functions(globals())
-        servermanager.ProxyManager().DisableStateUpdateNotification()
-        servermanager.ProxyManager().UnRegisterProxies()
-        active_objects.view = None
-        active_objects.source = None
-        import gc
-        servermanager.Disconnect()
-        gc.collect()
+       if ns:
+          _remove_functions(ns)
+       _remove_functions(globals())
+       if not servermanager.fromGUI:
+          servermanager.ProxyManager().DisableStateUpdateNotification()
+          servermanager.ProxyManager().UnRegisterProxies()
+       active_objects.view = None
+       active_objects.source = None
+       servermanager.Disconnect()
+       if not servermanager.fromGUI:
+          import gc
+          gc.collect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """Creates a connection to a server. Example usage:

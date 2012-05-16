@@ -46,7 +46,8 @@ void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 
 
 //*****************************************************************
-void vtkAllToNRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
+void vtkAllToNRedistributePolyData::MakeSchedule (vtkPolyData* input,
+                                                  vtkCommSched* localSched)
 
 {
 //*****************************************************************
@@ -77,7 +78,7 @@ void vtkAllToNRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     this->SetWeights(numberOfValidProcesses, numProcs-1, 0.);
     }
 
-  this->Superclass::MakeSchedule(localSched);
+  this->Superclass::MakeSchedule(input, localSched);
 
 }
 //*****************************************************************

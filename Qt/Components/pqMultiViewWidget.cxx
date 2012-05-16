@@ -181,11 +181,12 @@ pqMultiViewWidget::pqMultiViewWidget(QWidget * parentObject, Qt::WindowFlags f)
   QObject::connect(&pqActiveObjects::instance(),
     SIGNAL(viewChanged(pqView*)), this, SLOT(markActive(pqView*)));
 
-
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(proxyRemoved(pqProxy*)),
     this, SLOT(proxyRemoved(pqProxy*)));
+  QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
+    this, SLOT(viewAdded(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -193,6 +194,37 @@ pqMultiViewWidget::~pqMultiViewWidget()
 {
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+bool pqMultiViewWidget::isViewAssigned(pqView* view) const
+{
+  return (view && this->Internals->LayoutManager &&
+    this->Internals->LayoutManager->GetViewLocation(
+      view->getViewProxy()) != -1);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::viewAdded(pqView* view)
+{
+  if (view && this->Internals->LayoutManager &&
+    this->Internals->LayoutManager->GetViewLocation(
+      view->getViewProxy()) != -1)
+    {
+    // a pqview was created for a view that this layout knows about. we have to
+    // reload the layout to ensure that the view gets placed correctly.
+    pqViewFrame* frame = this->Internals->ViewFrames[view->getViewProxy()];
+    if (frame)
+      {
+      QWidget* viewWidget = view->getWidget();
+      frame->setCentralWidget(viewWidget);
+      viewWidget->setParent(frame);
+      }
+    else
+      {
+      this->reload();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -373,10 +405,11 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   pqView* pqview = smmodel->findItem<pqView*>(view);
-  if (view)
+  // it's possible that pqview is NULL, if the view proxy hasnt been registered
+  // yet. This happens often when initialization state is being loaded in
+  // collaborative sessions.
+  if (view && pqview)
     {
-    Q_ASSERT(pqview != NULL);
-
     QWidget* viewWidget = pqview->getWidget();
     frame->setCentralWidget(viewWidget);
     viewWidget->setParent(frame);
@@ -397,7 +430,8 @@ pqViewFrame* pqMultiViewWidget::newFrame(vtkSMProxy* view)
 
 //-----------------------------------------------------------------------------
 QWidget* pqMultiViewWidget::createWidget(
-  int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg)
+  int index, vtkSMViewLayoutProxy* vlayout, QWidget* parentWdg,
+  int& max_index)
 {
   if (this->Internals->Widgets.size() <= static_cast<int>(index))
     {
@@ -436,6 +470,7 @@ QWidget* pqMultiViewWidget::createWidget(
         {
         frame->centralWidget()->setMaximumSize(this->LockViewSize);
         }
+      if (max_index < index) { max_index = index; }
       return frame;
       }
 
@@ -460,9 +495,11 @@ QWidget* pqMultiViewWidget::createWidget(
         direction == vtkSMViewLayoutProxy::VERTICAL?
         Qt::Vertical : Qt::Horizontal);
       splitter->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter));
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, splitter,
+          max_index));
       splitter->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter));
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, splitter,
+          max_index));
 
       // set the sizes are percentage. QSplitter uses the initially specified
       // sizes as reference.
@@ -477,6 +514,7 @@ QWidget* pqMultiViewWidget::createWidget(
         this, SLOT(splitterMoved()));
       QObject::connect(splitter, SIGNAL(splitterMoved(int, int)),
         this, SLOT(splitterMoved()), Qt::QueuedConnection);
+      if (max_index < index) { max_index = index; }
       return splitter;
       }
     else
@@ -491,9 +529,12 @@ QWidget* pqMultiViewWidget::createWidget(
       container->setLayout(slayout);
       container->setObjectName(QString("Container.%1").arg(index));
       slayout->addWidget(
-        this->createWidget(vlayout->GetFirstChild(index), vlayout, container));
+        this->createWidget(vlayout->GetFirstChild(index), vlayout, container,
+          max_index));
       slayout->addWidget(
-        this->createWidget(vlayout->GetSecondChild(index), vlayout, container));
+        this->createWidget(vlayout->GetSecondChild(index), vlayout, container,
+          max_index));
+      if (max_index < index) { max_index = index; }
       return container;
       }
     break;
@@ -518,11 +559,16 @@ void pqMultiViewWidget::reload()
       widget->setParent(cleaner);
       }
     }
-  QWidget* child = this->createWidget(0, vlayout, this);
+  int max_index=0;
+  QWidget* child = this->createWidget(0, vlayout, this, max_index);
   delete cleaner;
   cleaner = NULL;
 
   delete this->layout();
+
+  // resize Widgets to remove any obsolete indices. These indices weren't
+  // touched at all during the last call to createWidget().
+  this->Internals->Widgets.resize(max_index+1);
 
   QVBoxLayout* vbox = new QVBoxLayout(this);
   vbox->setContentsMargins(0, 0, 0, 0);
@@ -633,6 +679,23 @@ void pqMultiViewWidget::standardButtonPressed(int button)
       }
     break;
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiViewWidget::destroyAllViews()
+{
+  BEGIN_UNDO_SET("Destroy all views");
+  pqObjectBuilder* builder =
+    pqApplicationCore::instance()->getObjectBuilder();
+  QList<vtkSMViewProxy*> views = this->viewProxies();
+  foreach (vtkSMViewProxy* view, views)
+    {
+    if (view)
+      {
+      builder->destroy(getPQView(view));
+      }
+    }
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

@@ -79,4 +79,32 @@ IF (PARAVIEW_DATA_ROOT)
 
 # TODO: remote rendering tests and reverse connect tests.
 
+# only enable TestPythonAnnotationFilter test if numpy is available
+include("TestNumPy")
+
+IF ("1" STREQUAL ${HAS_NUMPY})
+  # Add pvpython tests
+  add_test("pvpython.TestPythonAnnotationFilter"
+      ${PARAVIEW_PYTHON_EXECUTABLE}
+      --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py)
+ENDIF ("1" STREQUAL ${HAS_NUMPY})
+
 ENDIF (PARAVIEW_DATA_ROOT)
+
+# Python Multi-servers test
+add_test("py-multi-servers.TestMultiServersConfig"
+    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+    --test-multi-servers 2
+    --server ${PARAVIEW_SERVER_EXECUTABLE}
+    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersConfig.py
+)
+
+add_test("py-multi-servers.TestMultiServersRemoteProxy"
+    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+    --test-multi-servers 3
+    --server ${PARAVIEW_SERVER_EXECUTABLE}
+    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
+)

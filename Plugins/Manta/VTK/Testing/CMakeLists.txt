@@ -17,7 +17,7 @@ foreach (test ${TestsToRun})
     -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaTest${TName}.png
     )
 endforeach()
-TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRendering)
+TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRenderingOpenGL)
 
 #disabling this until I sort out the shutdown segfault
 #ADD_EXECUTABLE( TriangleStrips TriangleStrips.cxx )
@@ -35,13 +35,13 @@ TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRendering)
 #          -V ${PARAVIEW_DATA_ROOT}/Baseline/MultiLayerRendering.png )
 
 
-IF ( VTK_USE_MPI )
+IF ( PARAVIEW_USE_MPI )
 
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
   ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
-  TARGET_LINK_LIBRARIES( MantaBenchmark vtkManta vtkHybrid vtkRendering vtkParallel )
+  TARGET_LINK_LIBRARIES( MantaBenchmark vtkManta vtkFiltersHybrid vtkRenderingOpenGL vtkParallelMPI )
   ADD_TEST( Manta-TestBenchmark ${EXECUTABLE_OUTPUT_PATH}/MantaBenchmark
     -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
     -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaBenchmark.png )
 
-ENDIF (VTK_USE_MPI)
+ENDIF (PARAVIEW_USE_MPI)

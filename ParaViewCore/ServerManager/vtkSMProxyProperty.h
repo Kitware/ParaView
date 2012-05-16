@@ -146,6 +146,11 @@ public:
   unsigned int GetNumberOfProxies();
 
   // Description:
+  // Sets the number of unchecked proxies. If the new number is greater than the current
+  // number of proxies, then NULL will be inserted.
+  virtual void SetNumberOfUncheckedProxies(unsigned int num);
+
+  // Description:
   // Returns the number of unchecked proxies.
   unsigned int GetNumberOfUncheckedProxies();
 

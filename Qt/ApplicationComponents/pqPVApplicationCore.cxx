@@ -110,7 +110,17 @@ void pqPVApplicationCore::quickLaunch()
         {
         // don't use QMenu::actions() since that includes only the top-level
         // actions.
-        dialog.addActions(menu->findChildren<QAction*>());
+        // --> BUT pqProxyGroupMenuManager in order to handle multi-server
+        //         setting properly add actions into an internal widget so
+        //         actions() should be used instead of findChildren()
+        if(menu->findChildren<QAction*>().size() == 0)
+          {
+          dialog.addActions(menu->actions());
+          }
+        else
+          {
+          dialog.addActions(menu->findChildren<QAction*>());
+          }
         }
       }
     dialog.exec();

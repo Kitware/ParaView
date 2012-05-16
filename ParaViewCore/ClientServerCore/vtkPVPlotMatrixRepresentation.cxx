@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAnnotationLink.h"
 #include "vtkSelectionDeliveryFilter.h"
 #include "vtkStringArray.h"
+#include "vtkChartNamedOptions.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixRepresentation);
 
@@ -137,7 +138,12 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
         this->OrderedColumns->SetValue(i, plotInput->GetColumnName(i));
         }
       }
-    if(vtkAnnotationLink* annLink = plotMatrix->GetActiveAnnotationLink())
+    if (this->Options)
+      {
+      this->Options->UpdatePlotOptions();
+      }
+
+    if(vtkAnnotationLink* annLink = plotMatrix->GetAnnotationLink())
       {
       vtkSelection* sel = vtkSelection::SafeDownCast(
         this->SelectionDeliveryFilter->GetOutputDataObject(0));
@@ -151,30 +157,13 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::SetVisibility(bool visible)
 {
+  this->Superclass::SetVisibility(visible);
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
     plotMatrix->SetVisible(visible);
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::SetSeriesVisibility(const char *name, bool visible)
-{
-  if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
-    {
-    plotMatrix->SetColumnVisibility(name, visible);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPlotMatrixRepresentation::SetSeriesLabel(
-  const char *vtkNotUsed(name), const char *vtkNotUsed(label))
-{
-  if(this->GetPlotMatrix())
-    {
-    // TODO
-    }
-}
 //----------------------------------------------------------------------------
 void vtkPVPlotMatrixRepresentation::MoveInputTableColumn(int fromCol, int toCol)
 {

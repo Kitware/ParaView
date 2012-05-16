@@ -50,10 +50,11 @@ class PQCORE_EXPORT pqSettings :
   Q_OBJECT
 
 public:
-  pqSettings(
-    const QString& organization,
-    const QString& application,
-    QObject* p);
+  pqSettings(const QString& organization, const QString& application, QObject* p);
+
+  /// use this constructor to use a file. If temporary is true, then the file
+  /// will be deleted when the pqSettings object is destroyed.
+  pqSettings(const QString& filename, bool temporary, QObject* parent);
 
   void saveState(const QMainWindow& window, const QString& key);
   void saveState(const QDialog& dialog, const QString& key);

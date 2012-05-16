@@ -213,6 +213,21 @@ void vtkSMInputProperty::SetNumberOfProxies(unsigned int num)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMInputProperty::SetNumberOfUncheckedProxies(unsigned int num)
+{
+  if (num != 0)
+    {
+    this->IPInternals->UncheckedOutputPorts.resize(num);
+    }
+  else
+    {
+    this->IPInternals->UncheckedOutputPorts.clear();
+    }
+
+  this->Superclass::SetNumberOfUncheckedProxies(num);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMInputProperty::SetProxies(unsigned int numProxies,
   vtkSMProxy* proxies[], unsigned int outputports[])
 {

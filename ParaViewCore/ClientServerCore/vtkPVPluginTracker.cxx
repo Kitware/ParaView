@@ -82,6 +82,7 @@ namespace
 
     std::vector<std::string> paths_to_search;
     paths_to_search.push_back(app_dir);
+    paths_to_search.push_back(app_dir + "/../lib/");
     paths_to_search.push_back(app_dir + "/plugins/" + plugin);
 #if defined(__APPLE__)
     paths_to_search.push_back(app_dir + "/../Plugins");

@@ -29,6 +29,7 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
+#include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
@@ -1494,52 +1495,126 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
   for ( i = 0; i < element->GetNumberOfNestedElements(); i++)
     {
     vtkPVXMLElement* exposedElement = element->GetNestedElement(i);
-    if (strcmp(exposedElement->GetName(), "ExposedProperties")!=0)
+    if (!(strcmp(exposedElement->GetName(), "ExposedProperties") == 0 ||
+          strcmp(exposedElement->GetName(), "PropertyGroup") == 0))
       {
       continue;
       }
     for ( j = 0; j < exposedElement->GetNumberOfNestedElements(); j++)
       {
       vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
-      if (strcmp(propertyElement->GetName(), "Property") != 0)
+      if (strcmp(propertyElement->GetName(), "Property") == 0)
         {
-        vtkErrorMacro("<ExposedProperties> can contain <Property> elements alone.");
-        continue;
-        }
-      const char* name = propertyElement->GetAttribute("name");
-      if (!name || !name[0])
-        {
-        vtkErrorMacro("Attribute name is required!");
-        continue;
-        }
-      const char* exposed_name = propertyElement->GetAttribute("exposed_name");
-      if (!exposed_name)
-        {
-        // use the property name as the exposed name.
-        exposed_name = name;
-        }
-      int override = 0;
-      if (!propertyElement->GetScalarAttribute("override", &override))
-        {
-        override = 0;
-        }
+        const char* name = propertyElement->GetAttribute("name");
+        if (!name || !name[0])
+          {
+          vtkErrorMacro("Attribute name is required!");
+          continue;
+          }
+        const char* exposed_name = propertyElement->GetAttribute("exposed_name");
+        if (!exposed_name)
+          {
+          // use the property name as the exposed name.
+          exposed_name = name;
+          }
+        int override = 0;
+        if (!propertyElement->GetScalarAttribute("override", &override))
+          {
+          override = 0;
+          }
 
-      if (propertyElement->GetAttribute("default_values"))
-        {
-        vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
-        vtkSMProperty* prop = subproxy->GetProperty(name);
-        if (!prop)
+        if (propertyElement->GetAttribute("default_values"))
           {
-          vtkWarningMacro("Failed to locate property '" << name
-                          << "' on subproxy '" << subproxy_name << "'");
-          return;
+          vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
+          vtkSMProperty* prop = subproxy->GetProperty(name);
+          if (!prop)
+            {
+            vtkWarningMacro("Failed to locate property '" << name
+                            << "' on subproxy '" << subproxy_name << "'");
+            return;
+            }
+          if (!prop->ReadXMLAttributes(subproxy, propertyElement))
+            {
+            return;
+            }
           }
-        if (!prop->ReadXMLAttributes(subproxy, propertyElement))
+        this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
+
+        vtkSMProxy *subproxy = this->GetSubProxy(subproxy_name);
+        vtkSMProperty *prop = subproxy->GetProperty(name);
+
+        // override panel_visibility with that of the exposed property
+        const char *panel_visibility = propertyElement->GetAttribute("panel_visibility");
+        if(panel_visibility)
           {
-          return;
+          prop->SetPanelVisibility(panel_visibility);
+          }
+
+        // override panel_visibility_default_for_representation with that of the exposed property
+        const char *panel_visibility_default_for_representation =
+          propertyElement->GetAttribute("panel_visibility_default_for_representation");
+        if(panel_visibility_default_for_representation)
+          {
+          prop->SetPanelVisibilityDefaultForRepresentation(
+            panel_visibility_default_for_representation);
+          }
+
+        // override label with that of the exposed property
+        const char *label = propertyElement->GetAttribute("label");
+        if(label)
+          {
+          prop->SetXMLLabel(label);
           }
         }
-      this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
+      else if(strcmp(propertyElement->GetName(), "PropertyGroup") == 0)
+        {
+        vtkSMPropertyGroup *group = vtkSMPropertyGroup::New();
+
+        const char *groupName = propertyElement->GetAttribute("name");
+        if(groupName)
+          {
+          group->SetName(groupName);
+          }
+
+        const char *groupType = propertyElement->GetAttribute("type");
+        if(groupType)
+          {
+          group->SetType(groupType);
+          }
+
+        const char *panelVisibility = propertyElement->GetAttribute("panel_visibility");
+        if(panelVisibility)
+          {
+          group->SetPanelVisibility(panelVisibility);
+          }
+
+        size_t propertyCountBefore = this->Internals->PropertyNamesInOrder.size();
+
+        // setup property group elements
+        this->SetupExposedProperties(subproxy_name, exposedElement);
+
+        // add each newly created property to the group
+        for(size_t index = propertyCountBefore;
+            index < this->Internals->PropertyNamesInOrder.size();
+            index++)
+          {
+          std::string name = this->Internals->PropertyNamesInOrder[index];
+          vtkSMProxy *subproxy =
+            this->GetSubProxy(this->Internals->ExposedProperties[name].SubProxyName);
+          vtkSMProperty *property =
+            subproxy->GetProperty(this->Internals->ExposedProperties[name].PropertyName);
+
+          group->AddProperty(property);
+          }
+
+        this->Internals->PropertyGroups.push_back(group);
+        group->Delete();
+        }
+      else
+        {
+        vtkErrorMacro("<ExposedProperties> can contain <Property> or <PropertyGroup> elements.");
+        continue;
+        }
       }
     }
 }
@@ -2010,6 +2085,21 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
     this->Internals->EnableAnnotationPush = previousAnnotationPush;
     }
 }
+
+//---------------------------------------------------------------------------
+vtkSMPropertyGroup* vtkSMProxy::GetPropertyGroup(size_t index) const
+{
+  assert(index < this->Internals->PropertyGroups.size());
+
+  return this->Internals->PropertyGroups[index];
+}
+
+//---------------------------------------------------------------------------
+size_t vtkSMProxy::GetNumberOfPropertyGroups() const
+{
+  return this->Internals->PropertyGroups.size();
+}
+
 //---------------------------------------------------------------------------
 void vtkSMProxy::PrototypeOn()
 {

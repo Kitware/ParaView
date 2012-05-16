@@ -103,6 +103,354 @@
 
   <ProxyGroup name="filters">
 
+   <SourceProxy
+      name="AMRToMultiBlock"
+      class="vtkAMRToMultiBlockFilter"
+      label="Convert AMR dataset to Multi-block">
+      <Documentation
+          short_help="Convert AMR to Multiblock"
+          long_help="Convert AMR to Multiblock">
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkOverlappingAMR"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+
+   </SourceProxy>
+
+   <SourceProxy name="AMRCutPlane" class="vtkAMRCutPlane" label="AMR CutPlane">
+      <Documentation
+          short_help="Planar Cut of an AMR grid dataset"
+          long_help="Planar Cut of an AMR grid dataset">
+          This filter creates a cut-plane of the
+      </Documentation>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkOverlappingAMR"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty
+        name="UseNativeCutter"
+        command="SetUseNativeCutter"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the ParaView's generic dataset
+          cutter is used instead of the specialized AMR cutter.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="LevelOfResolution"
+        command="SetLevelOfResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Center"
+         label="Center"
+         command="SetCenter"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.5 0.5 0.5" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Normal"
+         label="Normal"
+         command="SetNormal"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0 0 1" >
+      </DoubleVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="Plane" label="Slice Widget">
+          <Property function="Origin" name="Center" />
+          <Property function="Normal" name="Normal" />
+        </PropertyGroup>
+        <PropertyGroup type="Handle" label="Slice Widget">
+        </PropertyGroup>
+
+      </Hints>
+   </SourceProxy>
+
+   <SourceProxy name="UniformGridPartitioner" class="vtkUniformGridPartitioner"
+                label="Partition UniformGrid by RCB">
+      <Documentation
+          short_help="Partitions a Uniform grid by RCB"
+          long_help="Partitions a uniform grid by RCB">
+          This filters partitions a uniform grid instance. The output is a
+          multiblock of uniform grids.
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkImageData"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty
+        name="NumberOfSubdivisions"
+        command="SetNumberOfSubdivisions"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Set the number of subdivisions for recursive
+          coordinate bisection.
+        </Documentation>
+     </IntVectorProperty>
+
+   </SourceProxy>
+
+   <SourceProxy name="AMRResampleFilter" class="vtkAMRResampleFilter"
+                label="Resample AMR" >
+      <Documentaion
+          short_help="Converts AMR data to a uniform grid"
+          long_help="Converts AMR data to a uniform grid">
+          This filter allows the user to specify a Region of Interest(ROI)
+          within the AMR data-set and extract it as a uniform grid.
+     </Documentaion>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkOverlappingAMR"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty
+        name="Demand-Driven Mode"
+        command="SetDemandDrivenMode"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the resampling filter will operate in
+          demand-driven mode or not.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TransferToNodes"
+        command="SetTransferToNodes"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property specifies whether the solution will be transfered
+          to the nodes of the extracted region or the cells.
+        </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="NumberOfPartitions"
+        command="SetNumberOfPartitions"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Set the number of subdivisions for recursive
+          coordinate bisection.
+        </Documentation>
+     </IntVectorProperty>
+     <!--
+     <IntVectorProperty
+        name="LevelOfResolution"
+        command="SetLevelOfResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" />
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      -->
+      <IntVectorProperty
+        name="Number of Samples"
+        command="SetNumberOfSamples"
+        number_of_elements="3"
+        animateable="1"
+        default_values = "10 10 10">
+        <IntRangeDomain name="range" />
+        <Documentation>
+          Sets the number of samples in each dimension
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Min"
+                          command="SetMin"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="Max"
+                          command="SetMax"
+                          number_of_elements="3"
+                          animateable="1"
+                          default_values="0.0 0.0 0.0" >
+       <DoubleRangeDomain name="range" />
+       <Documentation>
+         This property sets the minimum 3-D coordinate location
+         by which the particles will be filtered out.
+       </Documentation>
+
+    </DoubleVectorProperty>
+
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="AMRSlice" class="vtkAMRSliceFilter"
+                label="Slice AMR data" >
+      <Documentation
+        short_help="Slices AMR Data"
+        long_help="Slices AMR Data">
+        This filter slices AMR data.
+      </Documentation>
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkOverlappingAMR"/>
+           </DataTypeDomain>
+           <Documentation>
+             This property specifies the input for this filter.
+           </Documentation>
+      </InputProperty>
+
+      <IntVectorPropery
+        name="LevelRange"
+        command="GetLevelRange"
+        information_only="1"
+        number_of_elements="2"
+        default_values="0 0">
+      </IntVectorPropery>
+
+      <IntVectorProperty
+         name="ForwardUpstream"
+         command="SetForwardUpstream"
+         number_of_elements="1"
+         default_values="0">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           This property specifies whether or not requests will be propagated
+           upstream.
+         </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="EnablePrefetching"
+          command="SetEnablePrefetching"
+          number_of_elements="1"
+          default_values="0">
+          <BooleanDomain name="bool"/>
+          <Documentation>
+            This property specifies whether or not requests pre-fetching of
+            blocks of the next level will be enabled.
+          </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Level"
+        command="SetMaxResolution"
+        number_of_elements="1"
+        default_values="0" >
+        <IntRangeDomain name="range" min="0" max="100" />
+<!--         <RequiredProperties>
+         <Property name="LevelRange" function="LevelRange"/>
+        </RequiredProperties>
+-->
+        <Documentation>
+          Set maximum slice resolution.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="OffSet"
+        command="SetOffSetFromOrigin"
+        number_of_elements="1"
+        default_values="1.0" >
+       <DoubleRangeDomain name="range" min="0"/>
+       <Documentation>
+        Set's the offset from the origin of the data-set
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="Normal"
+        command="SetNormal"
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="X-Normal"/>
+         <Entry value="2" text="Y-Normal"/>
+         <Entry value="3" text="Z-Normal"/>
+       </EnumerationDomain>
+       <Documentation>
+	  This property sets the normal of the slice.
+       </Documentation>
+     </IntVectorProperty>
+
+   </SourceProxy>
+
     <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkPExtractArraysOverTime"
       label="Plot Selection Over Time">
@@ -4240,7 +4588,8 @@ The Transform filter allows you to specify the position, size, and orientation o
     </Documentation>
     <InputProperty
        name="Input"
-       command="SetInputConnection">
+       command="SetInputConnection"
+       panel_visibility="default">
 	  <ProxyGroupDomain name="groups">
 	    <Group name="sources"/>
 	    <Group name="filters"/>
@@ -4255,7 +4604,7 @@ The Transform filter allows you to specify the position, size, and orientation o
 	  </Documentation>
      </InputProperty>
 
-     <ProxyProperty name="Transform" command="SetTransform">
+     <ProxyProperty name="Transform" command="SetTransform" panel_visibility="default">
 	   <ProxyGroupDomain name="groups">
 	      <Group name="transforms"/>
 	   </ProxyGroupDomain>
@@ -5928,7 +6277,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	  <DataTypeDomain name="input_type" composite_data_supported="1">
 	    <DataType value="vtkDataSet"/>
 	  </DataTypeDomain>
-	  <InputArrayDomain name="input_array" attribute_type="point"
+	  <InputArrayDomain name="input_array" attribute_type="any"
 			    number_of_components="3"/>
 	  <Documentation>
 	    This property specifies the input to the Stream Tracer filter.
@@ -7792,8 +8141,33 @@ Tessellate a higher-order dataset.
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="LevelIdScalars" class="vtkLevelIdScalars"
-      label="Level Scalars">
+   <SourceProxy name="OverlappingLevelIdScalars" class="vtkOverlappingAMRLevelIdScalars"
+      label="Level Scalars(Overlapping AMR)">
+     <Documentation
+    long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
+    short_help="Generate point scalars from level.">
+    The Level Scalars filter uses colors to show levels of a hierarchical dataset.
+     </Documentation>
+     <InputProperty
+    name="Input"
+    command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkOverlappingAMR"/>
+       </DataTypeDomain>
+       <Documentation>
+         This property specifies the input to the Level Scalars filter.
+       </Documentation>
+     </InputProperty>
+   <!-- End GroupIdScalars -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="NonOverlappingLevelIdScalars" class="vtkNonOverlappingAMRLevelIdScalars"
+      label="Level Scalars(Non-Overlapping AMR)">
      <Documentation
 	long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
 	short_help="Generate point scalars from level.">
@@ -7807,7 +8181,7 @@ Tessellate a higher-order dataset.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkNonOverlappingAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Level Scalars filter.
@@ -8247,7 +8621,7 @@ Tessellate a higher-order dataset.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkUniformGridAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Extract Group filter.
@@ -8310,7 +8684,8 @@ This filter extracts a range of groups from a multiblock dataset
 	command="AddIndex"
 	clean_command="RemoveAllIndices"
 	repeat_command="1"
-	number_of_elements_per_command="1">
+	number_of_elements_per_command="1"
+  panel_visibility="default">
        <CompositeTreeDomain name="tree" mode="all">
 	  <RequiredProperties>
 	     <Property name="Input" function="Input"/>
@@ -8366,7 +8741,7 @@ This filter extracts a list of datasets from hierarchical datasets.
 	     <Group name="filters"/>
 	   </ProxyGroupDomain>
 	   <DataTypeDomain name="input_type">
-	     <DataType value="vtkHierarchicalBoxDataSet"/>
+	     <DataType value="vtkUniformGridAMR"/>
 	   </DataTypeDomain>
 	   <Documentation>
 	     This property specifies the input to the Extract Datasets filter.
@@ -10773,7 +11148,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 	 <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type">
-	 <DataType value="vtkHierarchicalBoxDataSet"/>
+	 <DataType value="vtkNonOverlappingAMR"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array" attribute_type="cell" />
        <Documentation>
@@ -11428,7 +11803,8 @@ This property controls how the filter works to generate tensor cell data. You ca
 
       <StringVectorProperty name="NormalArrays"
         command="SetMaterialNormalArray"
-        use_index="1"
+        number_of_elements_per_command="2"
+        element_types="2 2"
         repeat_command="1">
         <ArrayListDomain name="array_list"
           attribute_type="Vectors"
@@ -11437,11 +11813,20 @@ This property controls how the filter works to generate tensor cell data. You ca
 		        <Property name="Input" function="Input"/>
 	        </RequiredProperties>
 	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
       <StringVectorProperty name="OrderingArrays"
         command="SetMaterialOrderingArray"
-        use_index="1"
+        number_of_elements_per_command="2"
+        element_types="2 2"
         repeat_command="1">
         <ArrayListDomain name="array_list"
           attribute_type="Scalars"
@@ -11450,8 +11835,25 @@ This property controls how the filter works to generate tensor cell data. You ca
 		        <Property name="Input" function="Input"/>
 	        </RequiredProperties>
 	      </ArrayListDomain>
+	      <FieldDataDomain name="field_list">
+	        <RequiredProperties>
+		        <Property name="Input" function="Input"/>
+	        </RequiredProperties>
+        </FieldDataDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
+      <Hints>
+        <!--
+          YoungsMaterialInterface uses a custom panel that creates custom
+          widgets for these two properties so we hide them from the
+          auto-generated part of the panel.
+        -->
+        <Property name="OrderingArrays" show="0" />
+        <Property name="NormalArrays" show="0" />
+      </Hints>
      <!-- End of YoungsMaterialInterface -->
     </SourceProxy>
 

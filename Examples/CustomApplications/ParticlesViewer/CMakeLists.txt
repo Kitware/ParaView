@@ -54,4 +54,4 @@ build_paraview_client(particles_viewer
       ${CMAKE_CURRENT_SOURCE_DIR}/SupportedReader.xml
 )
 
-TARGET_LINK_LIBRARIES(particles_viewer ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommon vtkPVCommon pqCore pqComponents)
+TARGET_LINK_LIBRARIES(particles_viewer ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommonCore vtkPVCommon pqCore pqComponents)

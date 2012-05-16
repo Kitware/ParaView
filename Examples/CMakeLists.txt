@@ -76,13 +76,13 @@ ELSE(NOT ParaView_BINARY_DIR)
          --build-makeprogram ${CMAKE_MAKE_PROGRAM}
          --build-options -DParaView_DIR:PATH=${ParaView_BINARY_DIR}
                          -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-                         -DCMAKE_C_COMPILER:STRING=${CMAKE_C_COMPILER}
+                         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
                          -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
-                         -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
+                         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
                          -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                          ${extra_params}
                          -DEXECUTABLE_OUTPUT_PATH:PATH=${EXECUTABLE_OUTPUT_PATH}
-                         -DLIBRARY_OUTPUT_PATH:PATH=${LIBRARY_OUTPUT_PATH}
+                         -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
          )
   ADD_CUSTOM_TARGET(ParaViewExamplesTarget ALL DEPENDS
                     ${ParaView_BINARY_DIR}/ParaViewExamples)

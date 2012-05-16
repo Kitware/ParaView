@@ -14,7 +14,8 @@ ENDFOREACH()
 
 PROJECT(ParaView)
 SET(ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
-SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR}
+  ${ParaView_SOURCE_DIR}/VTK/CMake ${ParaView_CMAKE_DIR}/VTKMono )
 
 INCLUDE(Utilities/Git/Git.cmake)
 
@@ -62,9 +63,9 @@ ENDIF("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
 SET (PARAVIEW_VERSION_MAJOR 3)
 SET (PARAVIEW_VERSION_MINOR 14)
 SET (PARAVIEW_VERSION_PATCH 1)
-SET (PARAVIEW_VERSION_PATCH_EXTRA)
+SET (PARAVIEW_VERSION_PATCH_EXTRA "enhanced")
 SET (PARAVIEW_VERSION "3.14")
-SET (PARAVIEW_VERSION_FULL "3.14.1")
+SET (PARAVIEW_VERSION_FULL "3.14.1-enhanced")
 
 INCLUDE(ParaViewDetermineVersion)
 determine_version(
@@ -86,36 +87,32 @@ ENDIF()
 OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
 IF (PARAVIEW_BUILD_QT_GUI)
   # need to set up Qt stuff here because there are Qt dependencies before
-  # CMake traverses the Qt directory (VTK/GUISupport/Qt).
-  
-  # set vars to build the QVTK library
-  SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
-  SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
-  SET(QT_MIN_VERSION "4.6.0")
-  SET(QT_OFFICIAL_VERSION "4.6")
+  SET(QT_MIN_VERSION "4.7.0")
+  SET(QT_OFFICIAL_VERSION "4.8")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
   IF(NOT QT4_FOUND)
     MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
   ELSE(NOT QT4_FOUND)
-    # don't go greater than supported version
-    STRING(REGEX MATCH "^4\\.[6-7]\\.[0-9]+" qt_version_match "${QTVERSION}")
+    # check is Qtversion  is 4.8.*. If so, we are good. Otherwise we will post a
+    # warning of versions (>= 4.7 && < 4.8). However we report errors for any
+    # version less than 4.7
+    STRING(REGEX MATCH "^4\\.[8]\\.[0-9]+" qt_version_match "${QTVERSION}")
     IF (NOT qt_version_match)
-      STRING(REGEX MATCH "^4\\.[0-4]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
+      STRING(REGEX MATCH "^4\\.[0-6]+\\.[0-9]+" qt_version46_x_tmp "${QTVERSION}")
       IF (qt_version46_x_tmp)
-        MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache).")
+        MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported. "
+          "Please use ${QT_OFFICIAL_VERSION} (you may need to clean your dirtied cache)."
+          "Minium required version is ${QT_MIN_VERSION}.")
       ELSE (qt_version46_x_tmp)
-        MESSAGE(WARNING "Warning: You are using Qt ${QTVERSION}. Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
+        MESSAGE(WARNING "Warning: You are using Qt ${QTVERSION}. "
+          "Officially supported version is Qt ${QT_OFFICIAL_VERSION}")
       ENDIF (qt_version46_x_tmp)
     ENDIF (NOT qt_version_match)
   ENDIF(NOT QT4_FOUND)
-ELSE (PARAVIEW_BUILD_QT_GUI)
-  SET(VTK_USE_QT OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
-# Mark these Qt variables as advanced. Users don't really have to set them.
-MARK_AS_ADVANCED(VTK_USE_QT VTK_USE_QTCHARTS VTK_USE_GUISUPPORT)
 MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
 # these should be all marked as advanced automatically but FindQt4 in cmake ...
 MARK_AS_ADVANCED(QT_QTMOTIF_INCLUDE_DIR QT_QTMOTIF_LIBRARY_DEBUG QT_QTMOTIF_LIBRARY_RELEASE QT_HELP_GENERATOR)
@@ -129,12 +126,6 @@ MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC
 #########################################################################
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
-SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" FORCE)
-# define this variable so that VTK_DEPENDENT_OPTION in the VTK 
-# CMakeLists.txt does not turn VTK_USE_MPI back to a regular cache
-# variable
-# set it to PARAVIEW_USE_MPI so that VTK_USE_MPI is slaved to it.
-SET(VTK_USE_MPI_ISSET ${PARAVIEW_USE_MPI})
 IF (PARAVIEW_USE_MPI)
   FIND_PACKAGE(MPI)
   SET(PARAVIEW_USE_MPI_SSEND OFF CACHE BOOL
@@ -143,19 +134,15 @@ IF (PARAVIEW_USE_MPI)
 ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
-# Force Infovis support on
-SET(VTK_USE_INFOVIS ON CACHE BOOL "Build VTK with Infovis Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_INFOVIS)
-
-#########################################################################
-# Force Charts support on
-SET(VTK_USE_CHARTS ON CACHE BOOL "Build VTK with Charts Support" FORCE)
-MARK_AS_ADVANCED(VTK_USE_CHARTS)
+# Enable VTK modules
+include(VTKModules)
 
 #########################################################################
 #
+SET(VTK_MAKE_INSTANTIATORS ON CACHE BOOL "" FORCE)
+
+#########################################################################
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
-MARK_AS_ADVANCED(VTK_USE_TEXT_ANALYSIS)
 
 #########################################################################
 # Configure Testing
@@ -291,7 +278,7 @@ ELSE("${CMAKE_CFG_INTDIR}" STREQUAL ".")
 ENDIF("${CMAKE_CFG_INTDIR}" STREQUAL ".")
 
 SET(PARAVIEW_LIBRARY_DIRS 
-  ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
@@ -361,7 +348,7 @@ EXPORT(TARGETS ${VTK_TARGETS} ${PY_STATIC_MODULES_LIST} FILE ${PARAVIEW_TARGETS_
 
 #########################################################################
 # Configure the CoProcessing library
-OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." OFF)
+OPTION(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." ON)
 MARK_AS_ADVANCED(PARAVIEW_ENABLE_COPROCESSING)
 IF (PARAVIEW_ENABLE_COPROCESSING)
   ADD_SUBDIRECTORY (CoProcessing)
@@ -395,48 +382,11 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
 
-  SET(cmakeDevFiles
-      ${ParaView_CMAKE_DIR}/branded_splash.png
-      ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewMacros.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewBranding.cmake
-      ${ParaView_CMAKE_DIR}/ParaViewBrandingCPack.cmake
-      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
-      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.cxx.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_main.cxx.in
-      ${ParaView_CMAKE_DIR}/branded_paraview_initializer.h.in
-      ${ParaView_CMAKE_DIR}/ParaViewCPackOptions.cmake.in
-      ${ParaView_CMAKE_DIR}/pv-forward.c.in
-      # originaly from Qt/Components
-      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqActionGroupImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDockWindowImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.cxx.in
-      # originaly from Qt/Core
-      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqAutoStartImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.cxx.in
-      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.h.in
-      ${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.cxx.in)
+  # install all cmake files.
   INSTALL(
-      FILES ${cmakeDevFiles} 
+      # the extra "/" is essential to ensure we don't end up with an extra
+      # directory at the install location.
+      DIRECTORY "${ParaView_CMAKE_DIR}/"
       DESTINATION ${PV_INSTALL_CMAKE_DIR}
       COMPONENT Development)
       

@@ -20,14 +20,12 @@
 #include "vtkProcessModule.h"
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
+#include "vtkPython.h"  // needed before including cppythonmodules.h
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 
 #define EXCLUDE_LOAD_ALL_FUNCTION
 #include "cppythonmodules.h"
-
-#include <string>
-using namespace vtkstd;
 
 vtkStandardNewMacro(vtkCPProcessModulePythonHelper);
 

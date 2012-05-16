@@ -43,8 +43,8 @@
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
 
-#include "Testing/Cxx/vtkTestUtilities.h"
-#include "Testing/Cxx/vtkRegressionTestImage.h"
+#include "vtkTestUtilities.h"
+#include "vtkRegressionTestImage.h"
 
 int main(int argc, char *argv[])
 {

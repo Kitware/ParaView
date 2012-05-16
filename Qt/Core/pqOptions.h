@@ -49,6 +49,7 @@ public:
   vtkTypeMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  vtkGetStringMacro(TileImagePath);
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
 
@@ -62,9 +63,7 @@ public:
   /// to load.
   vtkGetStringMacro(ServerResourceName);
 
-  /// Provides access to server-url if specified on the command line.
-  vtkGetStringMacro(ServerURL);
-
+  vtkSetStringMacro(TileImagePath);
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(DataDirectory);
 
@@ -100,6 +99,10 @@ public:
   // support.
   vtkGetStringMacro(PythonScript);
 
+  // Description:
+  // Returns true if the new panels are enabled.
+  vtkGetMacro(UseNewPanels, int);
+
   // DO NOT CALL. Public for internal callbacks.
   int AddTestScript(const char*);
   int SetLastTestBaseline(const char*);
@@ -115,18 +118,19 @@ protected:
   char* TestDirectory;
   char* DataDirectory;
   char* ServerResourceName;
-  char* ServerURL;
+  char* TileImagePath;
+
   int ExitAppWhenTestsDone;
   int DisableRegistry;
   int DisableLightKit;
   int CurrentImageThreshold;
   int TestMaster;
   int TestSlave;
+  int UseNewPanels;
   char* PythonScript;
 
   vtkSetStringMacro(PythonScript);
   vtkSetStringMacro(ServerResourceName);
-  vtkSetStringMacro(ServerURL);
 
   struct TestInfo
     {

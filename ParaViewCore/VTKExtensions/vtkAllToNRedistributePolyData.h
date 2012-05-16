@@ -44,7 +44,7 @@ protected:
   vtkAllToNRedistributePolyData();
   ~vtkAllToNRedistributePolyData();
 
-  void MakeSchedule (vtkCommSched*);
+  void MakeSchedule (vtkPolyData*, vtkCommSched*);
 
   int NumberOfProcesses;
 

@@ -93,6 +93,8 @@ private slots:
 
   void onExecuteCommand(const QString&);
 
+  void clearUndoStack();
+
 private:
   pqPythonShell(const pqPythonShell&);
   pqPythonShell& operator=(const pqPythonShell&);

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMoveEvent>
 #include <QResizeEvent>
-#include <QTimer>
 #include <QPixmap>
 #include <QImage>
 #include <QPainter>

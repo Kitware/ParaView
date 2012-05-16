@@ -89,6 +89,7 @@ private slots:
 
   void setNanColor(const QColor &color);
   void setScalarColor(const QColor &color);
+  void setScalarButtonColor(const QColor &color);
 
   void savePreset();
   void loadPreset();

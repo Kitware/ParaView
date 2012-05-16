@@ -19,6 +19,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOpaquePass.h"
+#include "vtkOpenGLRenderer.h"
 #include "vtkOutlineSource.h"
 #include "vtkPNGWriter.h"
 #include "vtkProperty.h"
@@ -175,7 +176,17 @@ void vtkParticlePipeline::SetupPipeline ()
 
   VTK_CREATE (vtkCameraPass, cameraP);
   cameraP->SetDelegatePass (iceTPass);
-  renderer->SetPass (cameraP);
+  vtkOpenGLRenderer *glRenderer =
+      vtkOpenGLRenderer::SafeDownCast( this->renderer );
+  if( glRenderer != NULL )
+    {
+    glRenderer->SetPass(cameraP);
+    }
+  else
+    {
+    vtkErrorMacro("Cannot cast renderer to vtkOpenGLRenderer!");
+    return;
+    }
 
   this->syncWin->SetRenderWindow (window);
   this->syncWin->SetParallelController (ctrl);

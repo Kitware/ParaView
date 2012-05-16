@@ -27,6 +27,7 @@
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -853,9 +854,13 @@ void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
 {
   this->CreateVTKObjects();
 
+  vtkSMProxy* proxy = this->GetSessionProxyManager()->NewProxy(
+    "misc", "InternalViewLayoutHelper");
+  proxy->UpdateVTKObjects();
+
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this)
+         << VTKOBJECT(proxy)
          << "ResetTileDisplay"
          << vtkClientServerStream::End;
   for (vtkInternals::KDTreeType::iterator iter =
@@ -866,14 +871,15 @@ void vtkSMViewLayoutProxy::ShowViewsOnTileDisplay()
     if (iter->ViewProxy.GetPointer() != NULL)
       {
       stream << vtkClientServerStream::Invoke
-        << VTKOBJECT(this)
+        << VTKOBJECT(proxy)
         << "ShowOnTileDisplay"
         << static_cast<unsigned int>(iter->ViewProxy->GetGlobalID())
         << vtkClientServerStream::End;
       }
     }
-
-  this->ExecuteStream(stream);
+  this->GetSession()->ExecuteStream(
+    proxy->GetLocation(), stream, false);
+  proxy->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -949,9 +955,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
 
   vtkImageData* image = vtkImageData::New();
   image->SetExtent(extent);
-  image->SetScalarTypeToUnsignedChar();
-  image->SetNumberOfScalarComponents(3);
-  image->AllocateScalars();
+  image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
   unsigned char* image_data = 
     reinterpret_cast<unsigned char*>(image->GetScalarPointer());
