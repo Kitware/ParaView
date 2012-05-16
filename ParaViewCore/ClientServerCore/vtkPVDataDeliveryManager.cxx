@@ -110,6 +110,17 @@ public:
       this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
       }
 
+    void SetDeliveredDataObject(vtkDataObject* data)
+      {
+      this->Producer->SetOutput(data);
+      this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+      }
+
+    vtkDataObject* GetDeliveredDataObject()
+      {
+      return this->Producer->GetOutputDataObject(0);
+      }
+
     vtkPVTrivialProducer* GetProducer() const
       { return this->Producer.GetPointer(); }
     vtkDataObject* GetDataObject() const
@@ -526,9 +537,10 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       {
       dataMover->SetMoveModeToClone();
       }
-    dataMover->SetInputConnection(item->GetProducer()->GetOutputPort());
+    dataMover->SetInputData(data);
     dataMover->Update();
-    item->SetDataObject(dataMover->GetOutputDataObject(0));
+
+    item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
     }
 
   // There's a possibility that we'd need to do ordered compositing.
@@ -548,7 +560,7 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
         item.Representation->GetVisibility() &&
         item.Redistributable)
         {
-        cutsGenerator->AddInputData(item.GetDataObject());
+        cutsGenerator->AddInputData(item.GetDeliveredDataObject());
         }
       }
 
@@ -583,11 +595,9 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
         continue;
         }
 
-      vtkDataObject* data = item->GetDataObject();
-
       vtkNew<vtkOrderedCompositeDistributor> redistributor;
       redistributor->SetController(vtkMultiProcessController::GetGlobalController());
-      redistributor->SetInputData(data);
+      redistributor->SetInputData(item->GetDeliveredDataObject());
       redistributor->SetPKdTree(this->KdTree);
       redistributor->SetPassThrough(0);
       redistributor->Update();
