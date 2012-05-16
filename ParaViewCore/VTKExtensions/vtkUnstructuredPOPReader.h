@@ -34,6 +34,8 @@
 
 #include "vtkUnstructuredGridAlgorithm.h"
 
+#include <cstddef> // for ptrdiff_t
+
 class vtkCallbackCommand;
 class vtkDataArraySelection;
 class vtkIdList;
