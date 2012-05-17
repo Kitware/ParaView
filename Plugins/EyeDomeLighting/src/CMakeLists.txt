@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
 
-FIND_PACKAGE(VTK REQUIRED)
+FIND_PACKAGE(VTK REQUIRED COMPONENTS vtkRenderingOpenGL)
 INCLUDE(${VTK_USE_FILE})
 if(NOT Module_vtkRenderingOpenGL)
   message(FATAL_ERROR "Example ${PROJECT_NAME} requires rendering.")
@@ -46,8 +46,6 @@ endforeach(file)
 add_library(OffscreenShading SHARED ${SRC_FILES} ${EXTRA_SRCS})
 target_link_libraries(OffscreenShading
   vtkRenderingOpenGL
-  vtkRenderingFreeTypeOpenGL
-  vtkInteractionStyle
   ${OPENGL_gl_LIBRARY})
 
 install( TARGETS OffscreenShading
