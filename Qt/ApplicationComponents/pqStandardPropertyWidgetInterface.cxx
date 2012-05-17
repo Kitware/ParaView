@@ -32,17 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStandardPropertyWidgetInterface.h"
 
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyGroup.h"
-
-#include "pqProxy.h"
 #include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqCubeAxesPropertyWidget.h"
-#include "pqPipelineRepresentation.h"
+#include "pqArrayStatusPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
+#include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqPipelineRepresentation.h"
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
+#include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
   : QObject(p)
@@ -63,6 +63,7 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *proxy,
     {
     return new pqDisplayRepresentationPropertyWidget(proxy);
     }
+
 //  if(propert = "textture")
 //    {
 //    pqTextureComboBox;
@@ -82,6 +83,10 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
   else if(QString(group->GetType()) == "CubeAxes")
     {
     return new pqCubeAxesPropertyWidget(proxy);
+    }
+  else if (QString(group->GetType()) == "ArrayStatus")
+    {
+    return new pqArrayStatusPropertyWidget(proxy, group);
     }
 
   return 0;

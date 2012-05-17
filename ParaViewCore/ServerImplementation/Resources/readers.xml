@@ -5562,7 +5562,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the XDMF reader.
@@ -5588,7 +5589,7 @@
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="PointArrayInfo"
-        animateable="0"
+        panel_visibility="default"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -5614,7 +5615,7 @@
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="CellArrayInfo"
-        animateable="0"
+        panel_visibility="default"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -5769,24 +5770,23 @@
 
          <PropertyGroup name="Sets" label="Sets"
              panel_visibility="advanced"
-             type="ExodusIIVariableSelection">
-           <Property name="NodeSetInfo" />
+             type="ArrayStatus">
            <Property name="NodeSetArrayStatus" />
-           <Property name="SideSetInfo" />
            <Property name="SideSetArrayStatus" />
-           <Property name="FaceSetInfo" />
            <Property name="FaceSetArrayStatus" />
-           <Property name="EdgeSetInfo" />
            <Property name="EdgeSetArrayStatus" />
-           <Property name="ElementSetInfo" />
            <Property name="ElementSetArrayStatus" />
          </PropertyGroup>
 
-         <PropertyGroup name="ModeShapes" label="Mode Shapes" panel_visibility="default">
-           <Property name="HasModeShapes" />
-           <Property name="ModeShape" />
-           <Property name="AnimateVibrations" />
-         </PropertyGroup>
+         <Property name="NodeSetInfo" />
+         <Property name="SideSetInfo" />
+         <Property name="FaceSetInfo" />
+         <Property name="EdgeSetInfo" />
+         <Property name="ElementSetInfo" />
+
+         <Property name="HasModeShapes" />
+         <Property name="ModeShape" />
+         <Property name="AnimateVibrations" />
 
          <Property name="FilePrefix" />
          <Property name="FilePrefixInfo" />
