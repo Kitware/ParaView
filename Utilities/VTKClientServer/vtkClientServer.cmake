@@ -13,22 +13,10 @@ macro(pv_wrap_vtk_mod_cs module)
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
   PVVTK_ADD_LIBRARY(${module}CS ${${module}CS_SRCS})
   target_link_libraries(${module}CS vtkClientServer ${module})
-
-  # satisfy the auto init calls, this should done in VTK eventually  
-  if( ${module} STREQUAL "vtkRenderingCore" )
-    target_link_libraries(${module}CS 
-      vtkRenderingOpenGL
-      vtkInteractionStyle
-      vtkRenderingFreeTypeOpenGL)
-  endif() 
-  if( ${module} STREQUAL "vtkRenderingVolume" )
-    target_link_libraries(${module}CS vtkRenderingVolumeOpenGL)
-  endif()
-  if( ${module} STREQUAL "vtkRenderingFreeType" )
-    target_link_libraries(${module}CS vtkRenderingFreeTypeOpenGL)
-  endif()
-  if( ${module} STREQUAL "vtkIOImage" AND PARAVIEW_USE_MPI)
-    target_link_libraries(${module}CS vtkIOMPIImage)
+  # add compile definition for auto init for modules that provide implementation
+  if(${module}_IMPLEMENTS)
+    set_property(TARGET ${module}CS PROPERTY COMPILE_DEFINITIONS
+      "${module}_AUTOINIT=1(${module})")
   endif()
   foreach(dep ${${module}_DEPENDS})
     if(NOT ${dep}_EXCLUDE_FROM_WRAPPING)
