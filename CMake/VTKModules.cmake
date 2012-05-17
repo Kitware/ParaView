@@ -12,10 +12,10 @@ set(_vtk_mpi_modules
   vtkFiltersParallelImaging
   vtkIOMPIImage
   vtkFiltersParallelMPI
-  #vtkFiltersParallelTracers
+  vtkFiltersParallelTracers
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
-  #  vtkDistributedStreamTracer
+  #  vtkPStreamTracer
   
   vtkIOParallelNetCDF
   # Needed for:
