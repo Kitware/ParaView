@@ -17,7 +17,22 @@ ENDIF( COMMAND CMAKE_POLICY )
 
 # Find VTK and take settings we need from it #################################
 INCLUDE ( ${CMAKE_ROOT}/Modules/FindVTK.cmake )
-FIND_PACKAGE ( VTK REQUIRED )  
+
+set(_vtk_modules
+  vtkRenderingOpenGL
+  vtkFiltersCore
+  vtkParallelCore
+  vtkFiltersHybrid
+  )
+
+if(PARAVIEW_USE_MPI)
+  list(APPEND _vtk_modules vtkParallelMPI)
+endif()
+
+FIND_PACKAGE ( VTK REQUIRED
+  COMPONENTS "${_vtk_modules}"
+  ) 
+ 
 INCLUDE ( ${VTK_USE_FILE} )
 
 #TODO: What is this? Is it necessary?
