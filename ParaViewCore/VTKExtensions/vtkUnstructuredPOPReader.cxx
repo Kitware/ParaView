@@ -51,6 +51,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include <set>
 #include <string>
 #include <vector>
+#include <iterator>
 
 
 
