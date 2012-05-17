@@ -1630,99 +1630,6 @@
         </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty
-        name="FilePrefixInfo"
-        command="GetFilePrefix"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePrefix"
-        command="SetFilePrefix"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePrefixInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePrefixInfo" function="Prefix"/>
-          </RequiredProperties>
-       </FileListDomain>
-        <Documentation>
-          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePatternInfo"
-        command="GetFilePattern"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePattern"
-        command="SetFilePattern"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePatternInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePatternInfo" function="Pattern"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-        name="FileRangeInfo"
-        command="GetFileRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="FileRange"
-        command="SetFileRange"
-        number_of_elements="2"
-        default_values="-1 -1"
-        animateable="0"
-        information_property="FileRangeInfo" >
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="FileRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         This property controls the indices of the first and last files to be read.
-       </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty
-        name="XMLFileNameInfo"
-        command="GetXMLFileName"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="XMLFileName"
-        command="SetXMLFileName"
-        number_of_elements="1"
-        animateable="0"
-        label="XML File Name">
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="XMLFileNameInfo" function="XMLFileName"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
-       </Documentation>
-     </StringVectorProperty>
-
      <IntVectorProperty name="HasModeShapes"
                         command="SetHasModeShapes"
                         number_of_elements="1"
@@ -2503,9 +2410,100 @@
        </Documentation>
      </IntVectorProperty>
 
-     <Hints>
-       <Property name="Refresh" show="0"/>
-     </Hints>
+
+    <StringVectorProperty name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePrefixInfo" >
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="FilePrefixInfo" function="Prefix"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property specifies the file root used with the file pattern to
+        format a file name. (See the File Pattern property).
+      </Documentation>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePatternInfo" >
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="FilePatternInfo" function="Pattern"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property contains a text string specifying the pattern used to load
+        files. There are two parts to it: the prefix (%s) and the file number
+        (%i). The format used is the same as that used for printf.
+       </Documentation>
+    </StringVectorProperty>
+
+    <IntVectorProperty name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+
+    <IntVectorProperty name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2"
+        default_values="-1 -1"
+        animateable="0"
+        information_property="FileRangeInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+          <Property name="FileRangeInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        This property controls the indices of the first and last files to be read.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="XMLFileName"
+        command="SetXMLFileName"
+        number_of_elements="1"
+        animateable="0"
+        label="XML File Name">
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="XMLFileNameInfo"
+              function="XMLFileName"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
+      </Documentation>
+    </StringVectorProperty>
+
+    <Hints>
+      <Property name="Refresh" show="0"/>
+    </Hints>
 
    <!-- End ExodusIIReaderCore -->
    </SourceProxy>
@@ -5726,17 +5724,6 @@
        <Proxy name="Reader"
               proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
        <ExposedProperties>
-         <Property name="FilePrefix" />
-         <Property name="FilePrefixInfo" />
-         <Property name="FilePattern" />
-         <Property name="FilePatternInfo" />
-         <Property name="FileRange" />
-         <Property name="FileRangeInfo" />
-         <Property name="XMLFileName" />
-         <Property name="XMLFileNameInfo" />
-         <Property name="HasModeShapes" />
-         <Property name="ModeShape" />
-         <Property name="AnimateVibrations" />
          <Property name="Refresh" />
          <Property name="SILUpdateStamp" />
          <Property name="EdgeBlocks" />
@@ -5762,16 +5749,7 @@
          <Property name="FaceMapArrayStatus" />
          <Property name="ElementMapInfo" />
          <Property name="ElementMapArrayStatus" />
-         <Property name="NodeSetInfo" />
-         <Property name="NodeSetArrayStatus" />
-         <Property name="SideSetInfo" />
-         <Property name="SideSetArrayStatus" />
-         <Property name="FaceSetInfo" />
-         <Property name="FaceSetArrayStatus" />
-         <Property name="EdgeSetInfo" />
-         <Property name="EdgeSetArrayStatus" />
-         <Property name="ElementSetInfo" />
-         <Property name="ElementSetArrayStatus" />
+
          <Property name="ElementSetResultArrayInfo" />
          <Property name="ElementSetResultArrayStatus" />
          <Property name="SideSetResultArrayInfo" />
@@ -5788,6 +5766,36 @@
          <Property name="GenerateGlobalNodeIdArray" />
          <Property name="GenerateGlobalElementIdArray" />
          <Property name="ExodusModelMetadata" />
+
+         <PropertyGroup name="Sets" label="Sets"
+             panel_visibility="advanced"
+             type="ExodusIIVariableSelection">
+           <Property name="NodeSetInfo" />
+           <Property name="NodeSetArrayStatus" />
+           <Property name="SideSetInfo" />
+           <Property name="SideSetArrayStatus" />
+           <Property name="FaceSetInfo" />
+           <Property name="FaceSetArrayStatus" />
+           <Property name="EdgeSetInfo" />
+           <Property name="EdgeSetArrayStatus" />
+           <Property name="ElementSetInfo" />
+           <Property name="ElementSetArrayStatus" />
+         </PropertyGroup>
+
+         <PropertyGroup name="ModeShapes" label="Mode Shapes" panel_visibility="default">
+           <Property name="HasModeShapes" />
+           <Property name="ModeShape" />
+           <Property name="AnimateVibrations" />
+         </PropertyGroup>
+
+         <Property name="FilePrefix" />
+         <Property name="FilePrefixInfo" />
+         <Property name="FilePattern" />
+         <Property name="FilePatternInfo" />
+         <Property name="FileRange" />
+         <Property name="FileRangeInfo" />
+         <Property name="XMLFileName" />
+         <Property name="XMLFileNameInfo" />
        </ExposedProperties>
      </SubProxy>
 
