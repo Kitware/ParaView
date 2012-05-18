@@ -354,6 +354,9 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   // Get ProxyManager
   vtkSMSessionProxyManager* pxm = source->GetSession()->GetSessionProxyManager();
 
+  // Make sure the source is in an expected state (BUG #13172)
+  source->UpdatePipeline();
+
   vtkInternals::PrototypesType::iterator iter;
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)

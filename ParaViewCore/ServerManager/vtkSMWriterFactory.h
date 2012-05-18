@@ -84,6 +84,10 @@ public:
   // Description:
   // Create a new writer proxy to write the data from the specified output port
   // to the file specified, if possible.
+  // As internally UpdatePipeline() will be called on the source proxy,
+  // in order to prevent a double pipeline execution when you want to write a
+  // given timestep, you should call updatePipeline( time ) before the
+  // CreateWriter call.
   vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy*,
     unsigned int outputport);
   vtkSMProxy* CreateWriter(const char* filename, vtkSMSourceProxy* pxy)
