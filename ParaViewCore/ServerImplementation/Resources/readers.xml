@@ -5725,48 +5725,30 @@
        <Proxy name="Reader"
               proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
        <ExposedProperties>
-         <Property name="Refresh" />
-         <Property name="SILUpdateStamp" />
-         <Property name="EdgeBlocks" />
-         <Property name="EdgeBlocksInfo" />
-         <Property name="FaceBlocks" />
-         <Property name="FaceBlocksInfo" />
-         <Property name="ElementBlocks" />
-         <Property name="GlobalVariables" />
-         <Property name="GlobalVariablesInfo" />
-         <Property name="PointVariables" />
-         <Property name="PointVariablesInfo" />
-         <Property name="EdgeVariables" />
-         <Property name="EdgeVariablesInfo" />
-         <Property name="FaceVariables" />
-         <Property name="FaceVariablesInfo" />
-         <Property name="ElementVariables" />
-         <Property name="ElementVariablesInfo" />
-         <Property name="NodeMapInfo" />
-         <Property name="NodeMapArrayStatus" />
-         <Property name="EdgeMapInfo" />
-         <Property name="EdgeMapArrayStatus" />
-         <Property name="FaceMapInfo" />
-         <Property name="FaceMapArrayStatus" />
-         <Property name="ElementMapInfo" />
-         <Property name="ElementMapArrayStatus" />
+         <PropertyGroup name="Variables" label="Variables"
+              panel_visibility="default"
+              type="ArrayStatus">
+           <Property name="GenerateObjectIdCellArray" />
+           <Property name="GenerateGlobalElementIdArray" />
+           <Property name="ElementVariables" />
+           <Property name="FaceVariables" />
+           <Property name="EdgeVariables" />
+           <Property name="SideSetResultArrayStatus" />
+           <Property name="NodeSetResultArrayStatus" />
+           <Property name="FaceSetResultArrayStatus" />
+           <Property name="EdgeSetResultArrayStatus" />
+           <Property name="GenerateGlobalNodeIdArray" />
+           <Property name="ElementSetResultArrayStatus" />
+           <Property name="PointVariables" />
+           <Property name="GlobalVariables" />
+         </PropertyGroup>
 
-         <Property name="ElementSetResultArrayInfo" />
-         <Property name="ElementSetResultArrayStatus" />
-         <Property name="SideSetResultArrayInfo" />
-         <Property name="SideSetResultArrayStatus" />
-         <Property name="FaceSetResultArrayInfo" />
-         <Property name="FaceSetResultArrayStatus" />
-         <Property name="EdgeSetResultArrayInfo" />
-         <Property name="EdgeSetResultArrayStatus" />
-         <Property name="NodeSetResultArrayInfo" />
-         <Property name="NodeSetResultArrayStatus" />
+         <!-- fixme - need to group these two properties -->
          <Property name="ApplyDisplacements" />
          <Property name="DisplacementMagnitude" />
-         <Property name="GenerateObjectIdCellArray" />
-         <Property name="GenerateGlobalNodeIdArray" />
-         <Property name="GenerateGlobalElementIdArray" />
-         <Property name="ExodusModelMetadata" />
+
+         <Property name="EdgeBlocks" />
+         <Property name="EdgeBlocksInfo" />
 
          <PropertyGroup name="Sets" label="Sets"
              panel_visibility="advanced"
@@ -5778,11 +5760,39 @@
            <Property name="ElementSetArrayStatus" />
          </PropertyGroup>
 
-         <Property name="NodeSetInfo" />
-         <Property name="SideSetInfo" />
-         <Property name="FaceSetInfo" />
+         <PropertyGroup name="Maps" label="Maps"
+            panel_visibility="advanced"
+            type="ArrayStatus">
+           <Property name="NodeMapArrayStatus" />
+           <Property name="EdgeMapArrayStatus" />
+           <Property name="FaceMapArrayStatus" />
+           <Property name="ElementMapArrayStatus" />
+         </PropertyGroup>
+
+         <Property name="EdgeMapInfo" />
          <Property name="EdgeSetInfo" />
+         <Property name="EdgeSetResultArrayInfo" />
+         <Property name="EdgeVariablesInfo" />
+         <Property name="ElementBlocks" />
+         <Property name="ElementMapInfo" />
          <Property name="ElementSetInfo" />
+         <Property name="ElementSetResultArrayInfo" />
+         <Property name="ElementVariablesInfo" />
+         <Property name="ExodusModelMetadata" />
+         <Property name="FaceBlocks" />
+         <Property name="FaceBlocksInfo" />
+         <Property name="FaceMapInfo" />
+         <Property name="FaceSetInfo" />
+         <Property name="FaceSetResultArrayInfo" />
+         <Property name="FaceVariablesInfo" />
+         <Property name="GlobalVariablesInfo" />
+         <Property name="NodeMapInfo" />
+         <Property name="NodeSetInfo" />
+         <Property name="NodeSetResultArrayInfo" />
+         <Property name="PointVariablesInfo" />
+         <Property name="SideSetInfo" />
+         <Property name="SideSetResultArrayInfo" />
+         <Property name="SILUpdateStamp" />
 
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
@@ -5796,6 +5806,8 @@
          <Property name="FileRangeInfo" />
          <Property name="XMLFileName" />
          <Property name="XMLFileNameInfo" />
+
+         <Property name="Refresh" />
        </ExposedProperties>
      </SubProxy>
 

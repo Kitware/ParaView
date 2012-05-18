@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqExodusIIVariableSelectionWidget.h"
 #include "vtkSMPropertyGroup.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 
 #include <QHBoxLayout>
@@ -54,9 +55,13 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 
  for (unsigned int cc=0; cc < group->GetNumberOfProperties(); cc++)
    {
-   const char* property_name = proxy->GetPropertyName(group->GetProperty(cc));
-   this->addPropertyLink(selectorWidget, property_name,
-     SIGNAL(widgetModified()), group->GetProperty(cc));
+   if (group->GetProperty(cc) &&
+     group->GetProperty(cc)->GetInformationOnly() == 0)
+     {
+     const char* property_name = proxy->GetPropertyName(group->GetProperty(cc));
+     this->addPropertyLink(selectorWidget, property_name,
+       SIGNAL(widgetModified()), group->GetProperty(cc));
+     }
    }
 }
 
