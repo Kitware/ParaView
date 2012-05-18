@@ -389,7 +389,11 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       DIRECTORY "${ParaView_CMAKE_DIR}/"
       DESTINATION ${PV_INSTALL_CMAKE_DIR}
       COMPONENT Development)
-      
+
+  INSTALL( FILES ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
+    DESTINATION ${PV_INSTALL_CMAKE_DIR}
+    COMPONENT Development)
+
   # Re-configure for the install.
   SET(SOURCE_TREE                                  ${ParaView_SOURCE_DIR})
   SET(BUILD_TREE                                   ${ParaView_BINARY_DIR}) 
