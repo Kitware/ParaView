@@ -107,7 +107,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   ENDFOREACH(file)
 
   # We need to copy over the VTK generate files for each module
-  file(GLOB vtk_python_files ${VTK_BINARY_DIR}/Wrapping/Python/vtk/*.py)
+  file(GLOB vtk_python_files ${VTK_BINARY_DIR}/Wrapping/Python/vtk/vtk*.py)
   
   foreach(file ${vtk_python_files})
     get_filename_component(name ${file} NAME)
