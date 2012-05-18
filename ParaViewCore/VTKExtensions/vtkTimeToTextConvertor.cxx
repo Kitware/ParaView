@@ -85,19 +85,19 @@ int vtkTimeToTextConvertor::RequestData(
   vtkInformation* inputInfo = input? input->GetInformation() : 0;
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
-  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()) 
+  if (inputInfo && inputInfo->Has(vtkDataObject::DATA_TIME_STEP())
     && this->Format)
     {
-    double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+    double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
     }
-  else if(outputInfo && 
-    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())
+  else if(outputInfo &&
+    outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP())
     && this->Format)
     {
     double time = outputInfo->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
+      vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
     }
@@ -117,7 +117,7 @@ int vtkTimeToTextConvertor::RequestData(
 void vtkTimeToTextConvertor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Format: " 
+  os << indent << "Format: "
     << (this->Format? this->Format : "(none)") << endl;
 }
 

@@ -6,7 +6,15 @@ IF( COMMAND CMAKE_POLICY )
 ENDIF( COMMAND CMAKE_POLICY )
 
 INCLUDE ( ${CMAKE_ROOT}/Modules/FindVTK.cmake )
-FIND_PACKAGE ( VTK REQUIRED )
+FIND_PACKAGE ( VTK REQUIRED COMPONENTS
+  vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
+  vtkInteractionStyle
+  vtkFiltersCore
+  vtkIOCore
+  vtkImagingSources
+  )
+
 INCLUDE ( ${VTK_USE_FILE} )
 
 SET ( VTK_LINK_LIBRARIES

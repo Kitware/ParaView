@@ -131,28 +131,17 @@ int vtkForceTime::RequestUpdateExtent (
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
 
   // override the time request if IgnorePipelineTime is on.
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
-    double *upTimes =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    int numTimes =
-      outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    double *inTimes = new double [numTimes];
+    double inTime =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
 
-    for (int i=0; i<numTimes; ++i)
+    if(this->IgnorePipelineTime)
       {
-      if(this->IgnorePipelineTime)
-        {
-        inTimes[i] = this->ForcedTime;
-        }
-      else
-        {
-        inTimes[i] = upTimes[i];
-        }
+      inTime = this->ForcedTime;
       }
-    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
-                inTimes,numTimes);
-    delete [] inTimes;
+
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), inTime);
     }
 
   return 1;

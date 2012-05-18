@@ -33,6 +33,7 @@
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkStdString.h"
+#include "vtkDebugLeaks.h"
 
 #include <map>
 #include <set>

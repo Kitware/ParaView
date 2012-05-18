@@ -410,15 +410,15 @@ int vtkPVEnSightMasterServerReader2::RequestData(vtkInformation * vtkNotUsed(req
     steps = outInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     }
 
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP())
       && steps != 0 && tsLength > 0)
     {
-    double *requestedTimeSteps = outInfo->Get(
-        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double requestedTimeStep = outInfo->Get(
+        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     // find the first time value larger than requested time value
     // this logic could be improved
     int cnt = 0;
-    while(cnt < tsLength - 1 && steps[cnt] < requestedTimeSteps[0])
+    while(cnt < tsLength - 1 && steps[cnt] < requestedTimeStep)
       {
       cnt++;
       }
@@ -582,7 +582,7 @@ int vtkPVEnSightMasterServerReader2::ParseMasterServerFile()
         // Handle the case file line an sos file with one server.
         numServers = 1;
         this->Internal->PieceFileNames.push_back(this->CaseFileName);
-        // We could exit the state machine here 
+        // We could exit the state machine here
         // because we have nothing else to do from this state.
         // We assume the line "SERVERS" will not appear in any case file.
         }

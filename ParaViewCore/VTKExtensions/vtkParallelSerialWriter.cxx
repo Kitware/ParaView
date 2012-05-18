@@ -100,7 +100,7 @@ int vtkParallelSerialWriter::RequestInformation(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   if ( inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) )
     {
-    this->NumberOfTimeSteps = 
+    this->NumberOfTimeSteps =
       inInfo->Length( vtkStreamingDemandDrivenPipeline::TIME_STEPS() );
     }
   else
@@ -119,12 +119,12 @@ int vtkParallelSerialWriter::RequestUpdateExtent(
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   inInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(), 
+    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
     this->NumberOfPieces);
   inInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(), this->Piece);
   inInfo->Set(
-    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 
+    vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
 
   double *inTimes = inputVector[0]->GetInformationObject(0)->Get(
@@ -132,11 +132,11 @@ int vtkParallelSerialWriter::RequestUpdateExtent(
   if (inTimes && this->WriteAllTimeSteps)
     {
     double timeReq = inTimes[this->CurrentTimeIndex];
-    inputVector[0]->GetInformationObject(0)->Set( 
-        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(), 
-        &timeReq, 1);
+    inputVector[0]->GetInformationObject(0)->Set(
+        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
+        timeReq);
     }
-  return 1;  
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ int vtkParallelSerialWriter::RequestData(
     request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
     this->CurrentTimeIndex = 0;
     }
-  
+
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   this->WriteATimestep(input);
@@ -181,22 +181,22 @@ int vtkParallelSerialWriter::RequestData(
       this->CurrentTimeIndex = 0;
       }
     }
-  
+
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
 {
-  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input); 
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input);
   if (cds)
     {
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cds->NewIterator());
     iter->SetSkipEmptyNodes(0);
     int idx;
-    for(idx=0, iter->InitTraversal(); 
-        !iter->IsDoneWithTraversal(); 
+    for(idx=0, iter->InitTraversal();
+        !iter->IsDoneWithTraversal();
         iter->GoToNextItem(), idx++)
       {
       vtkDataObject* curObj = iter->GetCurrentDataObject();
@@ -218,7 +218,7 @@ void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
     inputCopy->ShallowCopy(input);
     this->WriteAFile(this->FileName, inputCopy);
     }
-  
+
 }
 
 //----------------------------------------------------------------------------
@@ -226,7 +226,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
 {
   vtkMultiProcessController* controller =
     vtkMultiProcessController::GetGlobalController();
-  
+
   vtkSmartPointer<vtkReductionFilter> md = vtkSmartPointer<vtkReductionFilter>::New();
   md->SetController(controller);
   md->SetPreGatherHelper(this->PreGatherHelper);
@@ -254,7 +254,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
   if (controller->GetLocalProcessId() == 0)
     {
     vtkDataObject* output = md->GetOutputDataObject(0);
-    if (vtkDataSet::SafeDownCast(output) == 0 || 
+    if (vtkDataSet::SafeDownCast(output) == 0 ||
       vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
       {
       vtkSmartPointer<vtkDataObject> outputCopy;
@@ -288,7 +288,7 @@ void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* in
 }
 
 //----------------------------------------------------------------------------
-// Overload standard modified time function. If the internal reader is 
+// Overload standard modified time function. If the internal reader is
 // modified, then this object is modified as well.
 unsigned long vtkParallelSerialWriter::GetMTime()
 {

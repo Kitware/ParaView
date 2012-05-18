@@ -66,9 +66,9 @@ int vtkPythonAnnotationFilter::RequestData(
     {
     timeInfo << ",";
     // Time
-    if(inputInfo->Has(vtkDataObject::DATA_TIME_STEPS()))
+    if(inputInfo->Has(vtkDataObject::DATA_TIME_STEP()))
       {
-      double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+      double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEP());
       timeInfo << time << ", ";
       }
     else
@@ -144,9 +144,9 @@ void vtkPythonAnnotationFilter::EvaluateExpression()
 {
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
+  sprintf(addrofthis, "%p", this);
+  char *aplus = addrofthis;
+  if ((addrofthis[0] == '0') &&
       ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
     {
     aplus += 2; //skip over "0x"

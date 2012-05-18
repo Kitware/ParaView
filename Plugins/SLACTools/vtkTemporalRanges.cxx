@@ -172,8 +172,8 @@ int vtkTemporalRanges::RequestUpdateExtent(
   double *inTimes = inInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   if (inTimes)
     {
-    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
-                &inTimes[this->CurrentTimeIndex], 1);
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(),
+                inTimes[this->CurrentTimeIndex]);
     }
 
   return 1;

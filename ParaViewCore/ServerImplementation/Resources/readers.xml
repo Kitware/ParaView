@@ -5421,7 +5421,7 @@
    </SourceProxy>
 
    <SourceProxy name="NrrdReader"
-                class="vtkPNrrdReader"
+                class="vtkNrrdReader"
                 label="Nrrd Reader">
      <Documentation short_help="Read raw image files with Nrrd meta data."
                     long_help="Reads raw image files with Nrrd meta data.">
