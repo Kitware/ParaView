@@ -70,7 +70,6 @@
 #include "vtkMergeArrays.h"
 #include "vtkMergeCompositeDataSet.h"
 #include "vtkMinMax.h"
-#include "vtkMPICompositeManager.h"
 #include "vtkMultiProcessControllerHelper.h"
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkParallelSerialWriter.h"
@@ -207,6 +206,7 @@
 # include "vtkBalancedRedistributePolyData.h"
 # include "vtkRedistributePolyData.h"
 # include "vtkWeightedRedistributePolyData.h"
+# include "vtkMPICompositeManager.h"
 # ifdef PARAVIEW_USE_ICE_T
 #  include "vtkIceTCompositePass.h"
 #  include "vtkIceTContext.h"
