@@ -198,6 +198,7 @@ SET (Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
+  vtkUnstructuredPOPReader.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkViewLayout.cxx
   vtkVolumeRepresentationPreprocessor.cxx
