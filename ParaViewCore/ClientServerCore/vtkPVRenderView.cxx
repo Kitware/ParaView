@@ -594,8 +594,15 @@ void vtkPVRenderView::ResetCameraClippingRange()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeGeometryBounds()
 {
-  double bounds[6];
-  vtkMath::UninitializeBounds(bounds);
+  double bounds[6] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
+    VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
+    VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+
+  // Don't use vtkMath::UninitializeBounds() since it sets it to {1,-1,..} which
+  // can cause incorrect parellel reduction for bounds when calling
+  // vtkPVSynchronizedRenderWindows::SynchronizeBounds();
+  // vtkMath::UninitializeBounds(bounds);
+
   if (this->GeometryBounds.IsValid())
     {
     this->GeometryBounds.GetBounds(bounds);
