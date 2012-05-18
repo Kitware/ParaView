@@ -44,10 +44,12 @@ class PQAPPLICATIONCOMPONENTS_EXPORT pqChartSelectionReaction : public pqReactio
   Q_OBJECT
   typedef pqReaction Superclass;
 public:
-  pqChartSelectionReaction(QAction* parent, pqContextView* view, int selectionMode=0);
+  pqChartSelectionReaction(QAction* parent, pqContextView* view,
+    int selectionMode, int selectAction=0);
 
   /// start selection on the view.
-  static void startSelection(pqContextView* view, int selectionMode=0);
+  static void startSelection(pqContextView* view, int selectionMode,
+    int selectionAction);
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call
@@ -62,6 +64,7 @@ private:
   Q_DISABLE_COPY(pqChartSelectionReaction)
   QPointer<pqContextView> View;
   int SelectionMode;
+  int SelectionAction;
 };
 
 #endif

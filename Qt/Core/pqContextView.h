@@ -87,6 +87,12 @@ public:
   /// Returns true if selection can be done.
   virtual bool supportsSelection() const;
 
+  /// set/get the selection action in the context view, defined
+  /// by vtkChart enumeration from SELECT to SELECT_POLYGON.
+  // Default is vtkChart::SELECT_RECTANGLE
+  virtual void setSelectionAction(int selAction);
+  virtual int selectionAction();
+
   /// Resets the zoom level to 100%.
   virtual void resetDisplay();
 
