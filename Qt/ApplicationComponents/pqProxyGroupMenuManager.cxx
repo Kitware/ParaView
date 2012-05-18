@@ -649,7 +649,11 @@ QList<QAction*> pqProxyGroupMenuManager::actions(const QString& category)
 void pqProxyGroupMenuManager::setEnabled(bool enable)
 {
   this->Enabled = enable;
+#ifndef Q_OS_MAC
+  // on Mac, with Qt 4.8.1, the enabling/disabling of the menu itself causes
+  // issues; the menu never re-enables itself after being disabled (BUG #13184).
   this->menu()->setEnabled(enable);
+#endif
 }
 //-----------------------------------------------------------------------------
 void pqProxyGroupMenuManager::addProxyDefinitionUpdateListener(const QString& proxyGroupName)
