@@ -64,7 +64,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqFileDialogModelFileInfo
 {
 public:
-  pqFileDialogModelFileInfo()
+  pqFileDialogModelFileInfo():
+    Type(vtkPVFileInformation::INVALID),
+    Hidden(false)
   {
   }
 
@@ -432,32 +434,16 @@ public:
     return results;
     }
 
-  bool isHidden(const QModelIndex& Index)
+  bool isHidden(const QModelIndex& idx)
     {
-    const int size = this->FileList.size();
-    if(Index.row() >= size)
-      return false;
-
-    QModelIndex p = Index.parent();
-    if ( p.isValid() && p.row() < size)
-      {
-      pqFileDialogModelFileInfo& file = this->FileList[p.row()];
-      const QList<pqFileDialogModelFileInfo>& grp = file.group();
-      if(Index.row() < grp.size())
-        {
-        return grp[Index.row()].isHidden();
-        }
-      }
-    return this->FileList[Index.row()].isHidden();
+    const pqFileDialogModelFileInfo* info = this->infoForIndex(idx);
+    return info? info->isHidden() : false;
     }
 
-  bool isDir(const QModelIndex& Index)
+  bool isDir(const QModelIndex& idx)
     {
-    if(Index.row() >= this->FileList.size())
-      return false;
-
-    pqFileDialogModelFileInfo& file = this->FileList[Index.row()];
-    return vtkPVFileInformation::IsDirectory(file.type());
+    const pqFileDialogModelFileInfo* info = this->infoForIndex(idx);
+    return info? vtkPVFileInformation::IsDirectory(info->type()) : false;
     }
 
   bool isRemote()
@@ -567,7 +553,6 @@ bool pqFileDialogModel::isHidden( const QModelIndex&  Index)
     return this->Implementation->isHidden(Index);
 
   return false;
-
 }
 
 bool pqFileDialogModel::isDir(const QModelIndex& Index)

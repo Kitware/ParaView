@@ -144,12 +144,23 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
 
   if(this->Model->isDir(idx))
     {
+    QString str = this->sourceModel()->data(idx).toString();
     return true;
     }
 
-  QString str = this->sourceModel()->data(idx).toString();
-  bool pass = this->Wildcards.exactMatch(str);
-  return pass;
+  if (source_parent.isValid())
+    {
+    // if source_parent is valid, then the item is an element in a file-group.
+    // For file-groups, we use pass any file in a group, if the group's label
+    // passes the test (BUG #13179).
+    QString str = this->sourceModel()->data(source_parent).toString();
+    return this->Wildcards.exactMatch(str);
+    }
+  else
+    {
+    QString str = this->sourceModel()->data(idx).toString();
+    return this->Wildcards.exactMatch(str);
+    }
 }
 
 
