@@ -6260,7 +6260,7 @@ Probe is a filter that computes point attributes at specified point positions. T
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer"
+   <SourceProxy name="StreamTracer" class="vtkStreamTracer"
     label="Stream Tracer">
     <Documentation
        long_help="Integrate streamlines in a vector field."
@@ -6494,7 +6494,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ArbitrarySourceStreamTracer" class="vtkDistributedStreamTracer"
+   <SourceProxy name="ArbitrarySourceStreamTracer" class="vtkStreamTracer"
     label="Stream Tracer With Custom Source">
     <Documentation
        long_help="Integrate streamlines in a vector field."
