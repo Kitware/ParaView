@@ -35,17 +35,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVTrackballRoll.h"
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkProcessModule.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMInteractionUndoStackBuilder.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -53,9 +54,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
+#include "vtkStructuredData.h"
 #include "vtkTrackballPan.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMGlobalPropertiesManager.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -82,31 +85,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 
-pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] = 
+pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
 {
-    { 1, 0, 0, "Rotate"},
-    { 2, 0, 0, "Pan"},
-    { 3, 0, 0, "Zoom"},
-    { 1, 1, 0, "Roll"},
-    { 2, 1, 0, "Rotate"},
-    { 3, 1, 0, "Pan"},
-    { 1, 0, 1, "Zoom"},
-    { 2, 0, 1, "Rotate"},
-    { 3, 0, 1, "Zoom"},
+  { 1, 0, 0, "Rotate", "Camera3DManipulators"},
+  { 2, 0, 0, "Pan",    "Camera3DManipulators"},
+  { 3, 0, 0, "Zoom",   "Camera3DManipulators"},
+  { 1, 1, 0, "Roll",   "Camera3DManipulators"},
+  { 2, 1, 0, "Rotate", "Camera3DManipulators"},
+  { 3, 1, 0, "Pan",    "Camera3DManipulators"},
+  { 1, 0, 1, "Zoom",   "Camera3DManipulators"},
+  { 2, 0, 1, "Rotate", "Camera3DManipulators"},
+  { 3, 0, 1, "Zoom",   "Camera3DManipulators"},
+  // ------------- 3D / 2D -------------
+  { 1, 0, 0, "Pan",  "Camera2DManipulators"},
+  { 2, 0, 0, "Pan",  "Camera2DManipulators"},
+  { 3, 0, 0, "Zoom", "Camera2DManipulators"},
+  { 1, 1, 0, "Zoom", "Camera2DManipulators"},
+  { 2, 1, 0, "Zoom", "Camera2DManipulators"},
+  { 3, 1, 0, "Zoom", "Camera2DManipulators"},
+  { 1, 0, 1, "Zoom", "Camera2DManipulators"},
+  { 2, 0, 1, "Zoom", "Camera2DManipulators"},
+  { 3, 0, 1, "Pan" , "Camera2DManipulators"},
 };
 
 class pqRenderView::pqInternal
 {
 public:
-
+  QMap<QString, QString> SettingsGroupToManipulatorName;
   vtkSmartPointer<vtkSMUndoStack> InteractionUndoStack;
   vtkSmartPointer<vtkSMInteractionUndoStackBuilder> UndoStackBuilder;
   QList<pqRenderView* > LinkedUndoStacks;
   bool UpdatingStack;
+  int CurrentInteractionMode;
 
   bool InitializedWidgets;
   pqInternal()
     {
+    this->CurrentInteractionMode = -1;
     this->InitializedWidgets = false;
     this->UpdatingStack = false;
     this->InteractionUndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
@@ -115,6 +130,12 @@ public:
       vtkSmartPointer<vtkSMInteractionUndoStackBuilder>::New();
     this->UndoStackBuilder->SetUndoStack(
       this->InteractionUndoStack);
+
+    // Fill the mapping table
+    this->SettingsGroupToManipulatorName["renderModule/InteractorStyle"] =
+        "Camera3DManipulators";
+    this->SettingsGroupToManipulatorName["renderModule2D/InteractorStyle"] =
+        "Camera2DManipulators";
     }
 
   ~pqInternal()
@@ -137,6 +158,12 @@ void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
   this->getConnector()->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
+
+  // Monitor any interaction mode change
+  this->getConnector()->Connect(
+        this->getProxy()->GetProperty("InteractionMode"),
+        vtkCommand::ModifiedEvent,
+        this, SLOT(onInteractionModeChange()));
 }
 
 //-----------------------------------------------------------------------------
@@ -858,4 +885,74 @@ void pqRenderView::textAnnotationColorChanged()
   vtkSMPropertyHelper(this->getProxy(), "OrientationAxesLabelColor", true).Set(
     value, 3);
   this->getProxy()->UpdateProperty("OrientationAxesLabelColor");
+}
+//-----------------------------------------------------------------------------
+pqRenderViewBase::ManipulatorType* pqRenderView::getManipulatorTypes(int &numberOfManipulatorType)
+{
+  numberOfManipulatorType = 18; // 9 + 9
+  return pqRenderView::DefaultManipulatorTypes;
+}
+//-----------------------------------------------------------------------------
+QMap<QString, QString> pqRenderView::interactorStyleSettingsGroupToCameraManipulatorName() const
+{
+  return this->Internal->SettingsGroupToManipulatorName;
+}
+//-----------------------------------------------------------------------------
+void pqRenderView::updateInteractionMode(pqOutputPort* opPort)
+{
+  vtkPVDataInformation* datainfo = opPort->getDataInformation();
+  QString className = datainfo ?  datainfo->GetDataClassName() : QString();
+
+  // Regardless the type of data, see if it is flat
+  double bounds[6];
+  datainfo->GetBounds(bounds);
+
+  double focal[3] = {(bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2,(bounds[4]+bounds[5])/2};
+  double position[3] = {0,0,0};
+  double viewUp[3] = {0,0,0};
+  bool is2DDataSet = false;
+
+  // Update camera infos
+  for(int i=0; i<3; i++)
+    {
+    if(bounds[i*2+1]-bounds[i*2] == 0)
+      {
+      position[i] = focal[i] + 10000;
+      viewUp[(i+2)%3] = 1;
+      is2DDataSet = true;
+      }
+    else
+      {
+      position[i] = focal[i];
+      }
+    }
+
+  if(is2DDataSet)
+    {
+    // Update camera position
+    vtkSMPropertyHelper(this->getProxy(), "CameraFocalPoint").Set(focal, 3);
+    vtkSMPropertyHelper(this->getProxy(), "CameraPosition").Set(position, 3);
+    vtkSMPropertyHelper(this->getProxy(), "CameraViewUp").Set(viewUp, 3);
+
+    // Update the interaction
+    vtkSMPropertyHelper(this->getProxy(), "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_2D);
+    this->getProxy()->UpdateVTKObjects();
+    }
+  else
+    {
+    // Update the interaction
+    vtkSMPropertyHelper(this->getProxy(), "InteractionMode").Set(vtkPVRenderView::INTERACTION_MODE_3D);
+    this->getProxy()->UpdateProperty("InteractionMode",1);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqRenderView::onInteractionModeChange()
+{
+  int mode = -1;
+  vtkSMPropertyHelper(this->getProxy(), "InteractionMode").Get(&mode);
+  if(mode != this->Internal->CurrentInteractionMode)
+    {
+    this->Internal->CurrentInteractionMode = mode;
+    emit updateInteractionMode(this->Internal->CurrentInteractionMode);
+    }
 }

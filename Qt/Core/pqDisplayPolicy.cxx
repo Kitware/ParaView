@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkStructuredData.h"
+#include "vtkSMPropertyHelper.h"
 
 #include <QtDebug>
 #include <QString>
@@ -52,7 +53,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
-#include "pqTwoDRenderView.h"
 #include "pqXYBarChartView.h"
 #include "pqXYChartView.h"
 
@@ -137,21 +137,6 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   vtkPVDataInformation* datainfo = opPort->getDataInformation();
   QString className = datainfo?  datainfo->GetDataClassName() : QString();
 
-  // * Check if we should create the 2D view.
-  if ((className == "vtkImageData" || className == "vtkUniformGrid") &&
-    datainfo->GetCompositeDataClassName()==0)
-    {
-    int extent[6];
-    datainfo->GetExtent(extent);
-    int temp[6]={0, 0, 0, 0, 0, 0};
-    int dimensionality = vtkStructuredData::GetDataDimension(
-      vtkStructuredData::SetExtent(extent, temp));
-    if (dimensionality == 2)
-      {
-      return pqTwoDRenderView::twoDRenderViewType();
-      }
-    }
-
   // Show table in spreadsheet view by default (unless the table is to be
   // treated as a "string" source).
   if (className == "vtkTable" && !is_text)
@@ -203,6 +188,13 @@ pqView* pqDisplayPolicy::getPreferredView(
       currentView = builder->createView(pqRenderView::renderViewType(),
         opPort->getServer());
       }
+    }
+
+  // Try to provide the best interaction mode to it if possible
+  pqRenderView* view = qobject_cast<pqRenderView*>(currentView);
+  if(view && 0 == vtkSMPropertyHelper(view->getProxy(), "Representations").GetNumberOfElements())
+    {
+    view->updateInteractionMode(opPort);
     }
 
   // No hints. We don't know what type of view is suitable

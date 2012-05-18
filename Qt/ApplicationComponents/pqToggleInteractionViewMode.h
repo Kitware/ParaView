@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActiveTwoDRenderViewOptions.h
+   Module:    pqToggleInteractionViewMode.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,49 +28,36 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqToggleInteractionViewMode_h
+#define __pqToggleInteractionViewMode_h
 
-/// \file pqActiveTwoDRenderViewOptions.h
-/// \date 7/31/2007
+#include "pqReaction.h"
+#include <QPointer>
 
-#ifndef _pqActiveTwoDRenderViewOptions_h
-#define _pqActiveTwoDRenderViewOptions_h
+class pqView;
 
-
-#include "pqComponentsExport.h"
-#include "pqActiveViewOptions.h"
-
-
-/// \class pqActiveTwoDRenderViewOptions
-/// \brief
-///   The pqActiveTwoDRenderViewOptions class is used to dislpay an
-///   options dialog for the render view.
-class PQCOMPONENTS_EXPORT pqActiveTwoDRenderViewOptions :
-    public pqActiveViewOptions
+/// @ingroup Reactions
+/// pqToggleInteractionViewMode is a reaction that toggle 2D/3D interaction mode
+class PQAPPLICATIONCOMPONENTS_EXPORT pqToggleInteractionViewMode : public pqReaction
 {
   Q_OBJECT
-
+  typedef pqReaction Superclass;
 public:
-  /// \brief
-  ///   Creates a render view options instance.
-  /// \param parent The parent object.
-  pqActiveTwoDRenderViewOptions(QObject *parent=0);
-  virtual ~pqActiveTwoDRenderViewOptions();
+  pqToggleInteractionViewMode(QAction* parent, pqView* view=0);
 
-  /// \name pqActiveViewOptions Methods
-  //@{
-  virtual void showOptions(pqView *view, const QString &page,
-      QWidget *parent=0);
-  virtual void changeView(pqView *view);
-  virtual void closeOptions();
-  //@}
+protected:
+  /// Called when the action is triggered.
+  virtual void onTriggered();
 
-protected slots:
-  void finishDialog();
+public slots:
+  void updateInteractionLabel(int interactionMode);
 
 private:
-  class pqInternal;
-  pqInternal* Internal;
+  Q_DISABLE_COPY(pqToggleInteractionViewMode)
+  QPointer<pqView> View;
 };
 
 #endif
+
+

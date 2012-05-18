@@ -172,7 +172,6 @@ SET (Kit_SRCS
   vtkSMTextWidgetRepresentationProxy.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
-  vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoStack.cxx
   vtkSMUndoStackBuilder.cxx

@@ -99,6 +99,7 @@ SET (MOC_HEADERS
   pqStatusBar.h
   pqTestingReaction.h
   pqTimerLogReaction.h
+  pqToggleInteractionViewMode.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h
@@ -290,6 +291,8 @@ SET (SOURCE_FILES
   pqTestingReaction.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
+  pqToggleInteractionViewMode.h
+  pqToggleInteractionViewMode.cxx
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx

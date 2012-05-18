@@ -98,9 +98,10 @@ public:
   /// and the view are the same.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
-  /// Get/set the camera manipulators
-  QList<vtkSMProxy*> getCameraManipulators() const;
-  virtual bool setCameraManipulators(const QList<pqSMProxy> &manipulators);
+  /// Get/set the camera manipulators: ["Camera2DManipulator", "Camera3DManipulator"]
+  QList<vtkSMProxy*> getCameraManipulators(const QString &cameraManipulatorName) const;
+  virtual bool setCameraManipulators(const QString &cameraManipulatorName,
+                                     const QList<pqSMProxy> &manipulators);
 
   /// restore the default light parameters
   virtual void restoreDefaultLightSettings();
@@ -117,18 +118,20 @@ public:
   static void setStereo(int mode);
 
 public:
-  /// Subclasses will generally define a static method
-  ///   static const ManipulatorType* getDefaultManipulatorTypes()
-  /// Which returns the set of default manipulator types.
-  /// Returns a array of 9 ManipulatorType objects defining
-  /// default set of camera manipulators used by this type of view.
+
   struct ManipulatorType
     {
     int Mouse;
     int Shift;
     int Control;
     QByteArray Name;
+    QByteArray CameraManipulatorName;
     };
+
+  /// Subclass must fill some static structure and provide an implementation
+  /// of that method which should returns a set of camera manipulators used
+  /// by this type of view.
+  virtual ManipulatorType* getManipulatorTypes(int &numberOfManipulatorType) = 0;
 
 protected slots:
   virtual void initializeAfterObjectsCreated();
@@ -163,9 +166,6 @@ protected:
   virtual vtkSMProxy* createCameraManipulator(
     int mouse, int shift, int control, QString name);
   
-  /// Must be overridden to return the default manipulator types.
-  virtual const ManipulatorType* getDefaultManipulatorTypesInternal() = 0;
-
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
@@ -184,8 +184,8 @@ protected:
   virtual const char* viewSettingsGroup() const=0;
 
   /// Returns the name of the group in which to save the interactor style
-  /// settings.
-  virtual const char* interactorStyleSettingsGroup() const=0;
+  /// settings that map to a given CameraManipulator name.
+  virtual QMap<QString, QString> interactorStyleSettingsGroupToCameraManipulatorName() const=0;
 
   /// On Mac, we usually try to cache the front buffer to avoid unecessary
   //  updates.

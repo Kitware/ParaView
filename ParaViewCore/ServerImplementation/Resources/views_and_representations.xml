@@ -291,9 +291,23 @@
         </Documentation>
       </IntVectorProperty>
 
-      <ProxyProperty name="CameraManipulators"
-        command="AddManipulator"
-        clean_command="RemoveAllManipulators"
+      <ProxyProperty name="Camera2DManipulators"
+        command="Add2DManipulator"
+        clean_command="RemoveAll2DManipulators"
+        is_internal="1"
+        repeatable="1">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files.
+        Eventually, we need to take out all the interaction related code from
+        the server manager -->
+        <ProxyGroupDomain name="groups">
+          <Group name="cameramanipulators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <ProxyProperty name="Camera3DManipulators"
+        command="Add3DManipulator"
+        clean_command="RemoveAll3DManipulators"
         is_internal="1"
         repeatable="1">
         <!-- For now, we are marking this property is_internal so that it won't
@@ -608,26 +622,25 @@
     </RenderViewProxy>
 
     <!-- ================================================================== -->
-    <TwoDRenderViewProxy name="2DRenderView"
-                         class="vtkPV2DRenderView"
-                         processes="client|renderserver|dataserver"
-                         base_proxygroup="views"
-                         base_proxyname="RenderView" >
+    <RenderViewProxy name="2DRenderView" class="vtkPVRenderView"
+           base_proxygroup="views" base_proxyname="RenderView" >
       <Documentation>
         2D render view. Currently this view can only show image slices.
       </Documentation>
-
-      <IntVectorProperty name="AxesVisibility"
-        command="SetAxisVisibility"
+      <!-- This property is provided for Python scripting backward
+           compatibility as it will override by default the interaction mode -->
+      <IntVectorProperty name="InteractionMode"
+        command="SetInteractionMode"
         number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Set the visibility of the 2D overlay axes.
-        </Documentation>
+        override="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="3D" value="0" />
+          <Entry text="2D" value="1" />
+          <Entry text="Selection" value="2" />
+        </EnumerationDomain>
       </IntVectorProperty>
-
-    </TwoDRenderViewProxy>
+    </RenderViewProxy>
 
     <!-- ================================================================== -->
     <ContextViewProxy name="XYChartViewBase"
@@ -4846,7 +4859,9 @@
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
-          <Property name="CameraManipulators" />
+          <Property name="InteractionMode" />
+          <Property name="Camera3DManipulators" />
+          <Property name="Camera2DManipulators" />
           <Property name="CenterOfRotation" />
           <!-- Annotations -->
           <Property name="CenterAxesVisibility" />

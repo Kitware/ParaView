@@ -66,6 +66,7 @@ public:
   QPointer<pqRenderView> RenderView;
   vtkSmartPointer<vtkCommand> Observer;
   int StartPosition[2];
+  int PreviousInteractionMode;
 
   QCursor ZoomCursor;
 
@@ -187,6 +188,11 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     return 0;
     }
 
+  // Store the previous interaction mode so we get back to that exact same
+  // interaction mode once we are done.
+  vtkSMPropertyHelper(rmp, "InteractionMode").Get(
+        &this->Internal->PreviousInteractionMode);
+
   if (selectionMode == ZOOM)
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
@@ -236,7 +242,7 @@ int pqRubberBandHelper::setRubberBandOff()
     }
 
   vtkSMPropertyHelper(rmp, "InteractionMode").Set(
-    vtkPVRenderView::INTERACTION_MODE_3D);
+    this->Internal->PreviousInteractionMode);
   rmp->UpdateVTKObjects();
   rmp->RemoveObserver(this->Internal->Observer);
 

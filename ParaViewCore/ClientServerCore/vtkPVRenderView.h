@@ -430,8 +430,10 @@ public:
 
   //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
-  void AddManipulator(vtkCameraManipulator* val);
-  void RemoveAllManipulators();
+  void Add2DManipulator(vtkCameraManipulator* val);
+  void RemoveAll2DManipulators();
+  void Add3DManipulator(vtkCameraManipulator* val);
+  void RemoveAll3DManipulators();
 
   // Description:
   // Overridden to synchronize information among processes whenever data
@@ -538,7 +540,6 @@ protected:
   vtkRenderer* NonCompositedRenderer;
   vtkPVSynchronizedRenderer* SynchronizedRenderers;
   vtkPVGenericRenderWindowInteractor* Interactor;
-  vtkPVInteractorStyle* InteractorStyle;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
   vtkInteractorStyleRubberBandZoom* RubberBandZoom;
   vtkPVCenterAxesActor* CenterAxes;
@@ -549,6 +550,13 @@ protected:
   int StillRenderImageReductionFactor;
   int InteractiveRenderImageReductionFactor;
   int InteractionMode;
+
+  // 2D and 3D interactor style
+  vtkPVInteractorStyle* TwoDInteractorStyle;
+  vtkPVInteractorStyle* ThreeDInteractorStyle;
+
+  // Active interactor style either [TwoDInteractorStyle, ThreeDInteractorStyle]
+  vtkPVInteractorStyle* InteractorStyle;
 
   // Used in collaboration mode to ensure that views are in the same state
   // (as far as representations added/removed goes) before rendering.
@@ -590,6 +598,8 @@ private:
   // This flag is set to false when not all processes cannot render e.g. cannot
   // open the DISPLAY etc.
   bool RemoteRenderingAvailable;
+
+  int PreviousParallelProjectionStatus;
 
   class vtkInternals;
   vtkInternals* Internals;

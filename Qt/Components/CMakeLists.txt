@@ -49,7 +49,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqActivePlotMatrixViewOptions.h
   pqActiveRenderViewOptions.h
   pqActiveServer.h
-  pqActiveTwoDRenderViewOptions.h
   pqActiveView.h
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.h
@@ -170,7 +169,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSampleScalarWidget.h
   pqSaveSnapshotDialog.h
   pqScalarSetModel.h
-#  pqScatterPlotDisplayPanel.h
   pqSelectionInspectorPanel.h
   pqSelectReaderDialog.h
   pqSelectThroughPanel.h
@@ -204,7 +202,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
   pqTriggerOnIdleHelper.h
-  pqTwoDRenderViewOptions.h
   pqVCRController.h
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
@@ -287,7 +284,6 @@ SET(UI_FORMS
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqSaveSnapshotDialog.ui
-#  Resources/UI/pqScatterPlotDisplayPanel.ui
   Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
@@ -301,7 +297,6 @@ SET(UI_FORMS
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqThresholdPanel.ui
   Resources/UI/pqTimerLogDisplay.ui
-  Resources/UI/pqTwoDRenderViewOptions.ui
   Resources/UI/pqWriterDialog.ui
   Resources/UI/pqXYChartDisplayPanel.ui
 )
@@ -360,8 +355,6 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
-  pqActiveTwoDRenderViewOptions.cxx
-  pqActiveTwoDRenderViewOptions.h
   pqActiveView.cxx
   pqActiveView.h
   pqActiveViewOptions.cxx
@@ -620,8 +613,6 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqSaveSnapshotDialog.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
-#  pqScatterPlotDisplayPanel.cxx
-#  pqScatterPlotDisplayPanel.h
   pqSelectionInspectorPanel.cxx
   pqSelectionInspectorPanel.h
   pqSelectReaderDialog.cxx
@@ -690,8 +681,6 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqToolTipTrapper.h
   pqTriggerOnIdleHelper.cxx
   pqTriggerOnIdleHelper.h
-  pqTwoDRenderViewOptions.cxx
-  pqTwoDRenderViewOptions.h
   pqUndoStackBuilder.cxx
   pqUndoStackBuilder.h
   pqVariableType.h

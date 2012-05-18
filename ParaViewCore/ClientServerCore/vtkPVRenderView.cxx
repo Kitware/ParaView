@@ -122,6 +122,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseLightKit = false;
   this->Interactor = 0;
   this->InteractorStyle = 0;
+  this->TwoDInteractorStyle = 0;
+  this->ThreeDInteractorStyle = 0;
   this->RubberBandStyle = 0;
   this->RubberBandZoom = 0;
   this->CenterAxes = vtkPVCenterAxesActor::New();
@@ -136,6 +138,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->Selector = vtkPVHardwareSelector::New();
   this->SynchronizationCounter  = 0;
+  this->PreviousParallelProjectionStatus = 0;
 
   this->LastComputedBounds[0] = this->LastComputedBounds[2] =
     this->LastComputedBounds[4] = -1.0;
@@ -194,26 +197,29 @@ vtkPVRenderView::vtkPVRenderView()
 
   if (this->Interactor)
     {
-    this->InteractorStyle = vtkPVInteractorStyle::New();
+    this->InteractorStyle = // Default one will be the 3D
+        this->ThreeDInteractorStyle = vtkPVInteractorStyle::New();
+    this->TwoDInteractorStyle = vtkPVInteractorStyle::New();
+
     this->Interactor->SetRenderer(this->GetRenderer());
     this->Interactor->SetRenderWindow(this->GetRenderWindow());
-    this->Interactor->SetInteractorStyle(this->InteractorStyle);
+    this->Interactor->SetInteractorStyle(this->ThreeDInteractorStyle);
 
     // Add some default manipulators. Applications can override them without
     // much ado.
     vtkPVTrackballRotate* manip = vtkPVTrackballRotate::New();
     manip->SetButton(1);
-    this->InteractorStyle->AddManipulator(manip);
+    this->ThreeDInteractorStyle->AddManipulator(manip);
     manip->Delete();
 
     vtkPVTrackballZoom* manip2 = vtkPVTrackballZoom::New();
     manip2->SetButton(3);
-    this->InteractorStyle->AddManipulator(manip2);
+    this->ThreeDInteractorStyle->AddManipulator(manip2);
     manip2->Delete();
 
     vtkTrackballPan* manip3 = vtkTrackballPan::New();
     manip3->SetButton(2);
-    this->InteractorStyle->AddManipulator(manip3);
+    this->ThreeDInteractorStyle->AddManipulator(manip3);
     manip3->Delete();
 
     this->RubberBandStyle = vtkInteractorStyleRubberBand3D::New();
@@ -264,8 +270,19 @@ vtkPVRenderView::~vtkPVRenderView()
     }
   if (this->InteractorStyle)
     {
-    this->InteractorStyle->Delete();
+    // Don't want to delete it as it is only pointing to either
+    // [TwoDInteractorStyle, ThreeDInteractorStyle]
     this->InteractorStyle = 0;
+    }
+  if (this->TwoDInteractorStyle)
+    {
+    this->TwoDInteractorStyle->Delete();
+    this->TwoDInteractorStyle = 0;
+    }
+  if (this->ThreeDInteractorStyle)
+    {
+    this->ThreeDInteractorStyle->Delete();
+    this->ThreeDInteractorStyle = 0;
     }
   if (this->RubberBandStyle)
     {
@@ -383,6 +400,11 @@ void vtkPVRenderView::SetInteractionMode(int mode)
 {
   if (this->InteractionMode != mode)
     {
+    if(this->InteractionMode == INTERACTION_MODE_3D)
+      {
+      this->PreviousParallelProjectionStatus = this->GetActiveCamera()->GetParallelProjection();
+      }
+
     this->InteractionMode = mode;
     this->Modified();
 
@@ -394,8 +416,15 @@ void vtkPVRenderView::SetInteractionMode(int mode)
     switch (this->InteractionMode)
       {
     case INTERACTION_MODE_3D:
+      this->Interactor->SetInteractorStyle(
+            this->InteractorStyle = this->ThreeDInteractorStyle);
+      // Get back to the previous state
+      this->GetActiveCamera()->SetParallelProjection(this->PreviousParallelProjectionStatus);
+      break;
     case INTERACTION_MODE_2D:
-      this->Interactor->SetInteractorStyle(this->InteractorStyle);
+      this->Interactor->SetInteractorStyle(
+            this->InteractorStyle = this->TwoDInteractorStyle);
+      this->GetActiveCamera()->SetParallelProjection(1);
       break;
 
     case INTERACTION_MODE_SELECTION:
@@ -1609,20 +1638,37 @@ void vtkPVRenderView::SetStencilCapable(int val)
 //*****************************************************************
 // Forwarded to vtkPVInteractorStyle if present on local processes.
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddManipulator(vtkCameraManipulator* val)
+void vtkPVRenderView::Add2DManipulator(vtkCameraManipulator* val)
 {
-  if (this->InteractorStyle)
+  if (this->TwoDInteractorStyle)
     {
-    this->InteractorStyle->AddManipulator(val);
+    this->TwoDInteractorStyle->AddManipulator(val);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveAllManipulators()
+void vtkPVRenderView::RemoveAll2DManipulators()
 {
-  if (this->InteractorStyle)
+  if (this->TwoDInteractorStyle)
     {
-    this->InteractorStyle->RemoveAllManipulators();
+    this->TwoDInteractorStyle->RemoveAllManipulators();
+    }
+}
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Add3DManipulator(vtkCameraManipulator* val)
+{
+  if (this->ThreeDInteractorStyle)
+    {
+    this->ThreeDInteractorStyle->AddManipulator(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemoveAll3DManipulators()
+{
+  if (this->ThreeDInteractorStyle)
+    {
+    this->ThreeDInteractorStyle->RemoveAllManipulators();
     }
 }
 //----------------------------------------------------------------------------

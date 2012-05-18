@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
-#include "pqTwoDRenderView.h"
 #include "pqViewModuleInterface.h"
 
 typedef pqRenderView::ManipulatorType Manip;
@@ -521,7 +520,7 @@ void pqGlobalRenderViewOptions::applyChanges()
   
   // save out camera manipulators
   Manip manips[9];
-  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
+  const Manip* default3DManips = pqRenderView::getDefault3DManipulatorTypes();
   for(int i=0; i<9; i++)
     {
     manips[i] = default3DManips[i];
@@ -545,7 +544,7 @@ void pqGlobalRenderViewOptions::applyChanges()
 
   // Now save out 2D camera manipulators (these are saved in a different group).
   settings->beginGroup("renderModule2D");
-  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  const Manip* default2DManips = pqRenderView::getDefault2DManipulatorTypes();
   for(int i=0; i<9; i++)
     {
     manips[i] = default2DManips[i];
@@ -745,7 +744,7 @@ void pqGlobalRenderViewOptions::resetChanges()
   val = settings->value("InteractorStyle/CameraManipulators");
 
   Manip manips[9];
-  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
+  const Manip* default3DManips = pqRenderView::getDefault3DManipulatorTypes();
   for(int k = 0; k < 9; k++)
     {
     manips[k] = default3DManips[k];
@@ -789,7 +788,7 @@ void pqGlobalRenderViewOptions::resetChanges()
   settings->beginGroup("renderModule2D");
   val = settings->value("InteractorStyle/CameraManipulators");
 
-  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  const Manip* default2DManips = pqRenderView::getDefault2DManipulatorTypes();
   for(int k = 0; k < 9; k++)
     {
     manips[k] = default2DManips[k];
@@ -1001,7 +1000,7 @@ void pqGlobalRenderViewOptions::clientCollectSliderChanged(int value)
 //-----------------------------------------------------------------------------
 void pqGlobalRenderViewOptions::resetDefaultCameraManipulators()
 {
-  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
+  const Manip* default3DManips = pqRenderView::getDefault3DManipulatorTypes();
   for(int i=0; i<9; i++)
     {
     int idx = this->Internal->CameraControl3DComboItemList.indexOf(
@@ -1009,7 +1008,7 @@ void pqGlobalRenderViewOptions::resetDefaultCameraManipulators()
     this->Internal->CameraControl3DComboBoxList[i]->setCurrentIndex(idx);
     }
 
-  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  const Manip* default2DManips = pqRenderView::getDefault2DManipulatorTypes();
   for(int i=0; i<9; i++)
     {
     int idx = this->Internal->CameraControl2DComboItemList.indexOf(

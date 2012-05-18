@@ -118,8 +118,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqStandardViewModules.h
   pqTextRepresentation.h
   pqTimeKeeper.h
-  pqTwoDRenderView.h
-#  pqScatterPlotView.h
   pqUndoStack.h
   pqView.h
   pqViewExporterManager.h
@@ -350,8 +348,6 @@ PVVTK_ADD_LIBRARY(pqCore
   pqTimeKeeper.h
   pqTreeLayoutStrategyInterface.cxx
   pqTreeLayoutStrategyInterface.h
-  pqTwoDRenderView.cxx
-  pqTwoDRenderView.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqView.cxx
