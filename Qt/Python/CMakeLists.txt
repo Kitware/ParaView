@@ -60,6 +60,7 @@ TARGET_LINK_LIBRARIES(QtPython
   ${QT_LIBRARIES}
   ${PYTHON_LIBRARIES}
   vtkPVPythonInterpretor
+  vtkPVClientServerCore
 )
 
 CONFIGURE_FILE(

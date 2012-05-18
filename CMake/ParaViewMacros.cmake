@@ -483,3 +483,12 @@ function(build_help_project name)
     WORKING_DIRECTORY "${arg_DESTINATION_DIRECTORY}"
   )
 endfunction(build_help_project)
+
+macro(pv_set_link_interface_libs target)
+  # if not lion then we need to set LINK_INTERFACE_LIBRARIES to reduce the number
+  # of libraries we link against there is a limit of 253.
+  if(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_VERSION VERSION_LESS 11.0) 
+    set_property(TARGET ${target}
+      PROPERTY LINK_INTERFACE_LIBRARIES "${ARGN}")
+  endif()
+endmacro()

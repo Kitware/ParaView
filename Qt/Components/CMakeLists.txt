@@ -711,12 +711,18 @@ PVVTK_ADD_LIBRARY(pqComponents
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
 )
-
 TARGET_LINK_LIBRARIES(pqComponents
   pqCore
   ${PYTHON_LINK_LIBRARIES}
   ${QT_QTNETWORK_LIBRARY}
 )
+
+set(_link_interface "pqCore")
+if(PARAVIEW_ENABLE_PYTHON)
+  list(APPEND _link_interface QtPython)
+endif()
+
+pv_set_link_interface_libs(pqComponents ${_link_interface})
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqComponentsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/pqComponentsExport.h")

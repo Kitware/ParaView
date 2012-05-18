@@ -110,6 +110,8 @@ TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 
+pv_set_link_interface_libs(vtkPVPythonInterpretor "")
+
 # Link against all the kit wrappers.
 SET(_PVPYTHON_LINK_LIBS
   vtkPVServerManagerPythonD

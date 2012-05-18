@@ -27,7 +27,11 @@ IF(QT_TESTING_WITH_PYTHON)
   ADD_EXECUTABLE(pqFileDialogTest
                  pqFileDialogTest.cxx pqFileDialogTest.h 
                  ${MOC_SRCS})
-  TARGET_LINK_LIBRARIES(pqFileDialogTest pqCore QtTesting ${QT_LIBRARIES} )
+  TARGET_LINK_LIBRARIES(pqFileDialogTest
+    pqCore
+    QtTesting
+    vtkPVClientServerCore
+    ${QT_LIBRARIES} )
   ADD_TEST(pqFileDialogTest "${EXECUTABLE_OUTPUT_PATH}/pqFileDialogTest" -dr
            "--test-directory=${PARAVIEW_TEST_DIR}"
            "--test-script=${CMAKE_CURRENT_SOURCE_DIR}/pqFileDialogTest.py"

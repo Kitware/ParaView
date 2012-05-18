@@ -394,6 +394,10 @@ TARGET_LINK_LIBRARIES(pqCore
   vtkPVServerManager
 )
 
+pv_set_link_interface_libs(pqCore
+  pqWidgets
+  vtkPVServerManager)
+
 IF(QT_TESTING_WITH_PYTHON)
   TARGET_LINK_LIBRARIES(pqCore
     ${PYTHON_LIBRARIES}
