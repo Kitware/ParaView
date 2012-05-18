@@ -269,7 +269,7 @@ QToolButton* pqViewFrame::createButton(QAction* action)
   toolButton->setIcon(action->icon());
 
   QObject::connect(toolButton, SIGNAL(triggered(QAction*)),
-    this, SLOT(buttonClicked()));
+    this, SLOT(buttonClicked()), Qt::QueuedConnection);
   return toolButton;
 }
 
