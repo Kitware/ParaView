@@ -53,9 +53,7 @@ public:
   virtual void apply();
   virtual void reset();
 
-  void setProxy(vtkSMProxy *proxy);
   vtkSMProxy* proxy() const;
-  void setProperty(vtkSMProperty *property);
   vtkSMProperty* property() const;
 
   virtual bool showLabel() const;
