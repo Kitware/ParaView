@@ -424,6 +424,9 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
 
+  // clear any search string
+  this->Ui->SearchLineEdit->clear();
+
   // remove old property widgets
   foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
     {
