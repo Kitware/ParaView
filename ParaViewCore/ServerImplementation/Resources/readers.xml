@@ -18,7 +18,8 @@
        <StringVectorProperty name="FileName"
                            command="SetFileName"
                            animateable="0"
-                           number_of_elements="1">
+                           number_of_elements="1"
+                           panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           This property specifies the Enzo file name
@@ -127,7 +128,8 @@
      <StringVectorProperty name="FileName"
                            command="SetFileName"
                            animateable="0"
-                           number_of_elements="1">
+                           number_of_elements="1"
+                           panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           This property specifies the Enzo file name
@@ -251,7 +253,8 @@
           name="FileName"
           command="SetFileName"
           animateable="0" 
-          number_of_elements="1">
+          number_of_elements="1"
+          panel_visibility="never">
           
           <FileListDomain name="files" />
           <Documentation>
@@ -376,7 +379,8 @@
           name="FileName"
           command="SetFileName"
           animateable="0" 
-          number_of_elements="1">
+          number_of_elements="1"
+          panel_visibility="never">
           
           <FileListDomain name="files" />
           <Documentation>
@@ -513,7 +517,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the AVS UCD reader.
@@ -584,7 +589,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Meta Image reader.
@@ -609,7 +615,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Legacy VTK reader.
@@ -630,7 +637,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML polygonal dataset reader.
@@ -711,7 +719,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML unstructured grid reader.
@@ -792,7 +801,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
@@ -874,7 +884,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML structured grid reader.
@@ -955,7 +966,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
@@ -1036,7 +1048,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML polygonal dataset reader.
@@ -1108,7 +1121,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML unstructured grid reader.
@@ -1179,7 +1193,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML uniform rectilinear grid (image/volume) reader.
@@ -1250,7 +1265,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML structured grid reader.
@@ -1321,7 +1337,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML non-uniform rectilinear grid reader.
@@ -1390,7 +1407,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the STL reader.
@@ -1423,7 +1441,8 @@
       <StringVectorProperty name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the CSV (Command Separated Values) reader.
@@ -1499,7 +1518,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK multi-block reader.
@@ -1516,7 +1536,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK hierarchical box data reader.
@@ -1535,7 +1556,8 @@
       <StringVectorProperty name="FileName"
                             command="SetFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -1553,7 +1575,8 @@
 
       <StringVectorProperty name="FileName"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -1632,7 +1655,8 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1"
-        animateable="0">
+        animateable="0"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Exodus reader.
@@ -2529,7 +2553,8 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The name of the file to load
@@ -2576,7 +2601,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name to read.
@@ -2657,7 +2683,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name to read.
@@ -2720,7 +2747,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the file name to read.
@@ -2783,7 +2811,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the file name to read.
@@ -2856,7 +2885,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the COSMO reader.
@@ -2913,7 +2943,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the PNG reader.
@@ -2939,7 +2970,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the PNG reader.
@@ -2966,7 +2998,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the TIFF reader.
@@ -2986,7 +3019,8 @@
       <StringVectorProperty name="FileName"
                             command="SetFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -3134,7 +3168,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the .xyz (geometry) file name for the PLOT3D reader.
@@ -3334,7 +3369,8 @@
             command="AddFileName"
             animateable="0"
             number_of_elements="0"
-            repeat_command="1">
+            repeat_command="1"
+            panel_visibility="never">
           <FileListDomain name="files" />
           <Documentation>
           The list of files to be read by the reader.
@@ -3402,7 +3438,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3468,7 +3505,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3536,7 +3574,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3653,7 +3692,8 @@
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="1"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3714,7 +3754,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3774,7 +3815,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3836,7 +3878,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML polygonal dataset format. The standard extension is .vtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -3893,7 +3936,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML unstructured grid data format. The standard extension is .vtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -3951,7 +3995,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4009,7 +4054,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4066,7 +4112,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4122,7 +4169,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4180,7 +4228,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4237,7 +4286,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4295,7 +4345,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4353,7 +4404,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4457,7 +4509,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -5032,7 +5085,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -5486,7 +5540,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5538,7 +5593,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5589,7 +5645,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5877,7 +5934,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files" />
        <Documentation>
          This property specifies the file name for the Exodus reader.
@@ -6069,7 +6127,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is
@@ -6510,7 +6569,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the files to load.
@@ -6845,7 +6905,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the files to load.
@@ -7025,7 +7086,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           A list of files to be read in a time series.
@@ -7069,7 +7131,8 @@
                             animateable="0"
                             number_of_elements="1"
                             repeat_command="1"
-                            information_property="FileNameInfo">
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader. Each file is expected to be
@@ -7141,7 +7204,8 @@
                             animateable="0"
                             number_of_elements="1"
                             repeat_command="1"
-                            information_property="FileNameInfo">
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader.
@@ -7203,7 +7267,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
            The list of files to be read by the reader.
@@ -7502,7 +7567,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7562,7 +7628,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7619,7 +7686,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7681,7 +7749,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7741,7 +7810,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
