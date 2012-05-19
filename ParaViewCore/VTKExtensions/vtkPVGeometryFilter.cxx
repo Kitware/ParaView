@@ -15,6 +15,7 @@
 #include "vtkPVGeometryFilter.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAMRBox.h"
 #include "vtkAppendPolyData.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
@@ -39,8 +40,11 @@
 #include "vtkInformation.h"
 #include "vtkInformationIntegerVectorKey.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPointData.h"
@@ -54,16 +58,13 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
-#include "vtkUniformGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkTimerLog.h"
+#include "vtkUniformGrid.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGridGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkMultiPieceDataSet.h"
-#include "vtkAMRBox.h"
-#include "vtkMath.h"
 
 #include <map>
 #include <vector>
@@ -156,7 +157,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
-
+  this->GenerateProcessIds = (this->Controller &&
+    this->Controller->GetNumberOfProcesses() > 1);
+  
   this->OutlineSource = vtkOutlineSource::New();
 
   this->PassThroughCellIds = 1;
@@ -497,11 +500,36 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     numProcs,
     0,
     wholeExtent);
-  this->ExecuteCellNormals(output, 1);
-  this->RemoveGhostCells(output);
+  this->CleanupOutputData(output, 1);
   return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::CleanupOutputData(
+  vtkPolyData* output, int doCommunicate)
+{
+  this->ExecuteCellNormals(output, doCommunicate);
+  this->RemoveGhostCells(output);
+  if (this->GenerateProcessIds && output && output->GetNumberOfPoints() > 0)
+    {
+    // add process ids array.
+    int numProcs = this->Controller?
+      this->Controller->GetNumberOfProcesses() : 1;
+    int procId  = this->Controller? this->Controller->GetLocalProcessId() : 0;
+    vtkIdType numPoints = output->GetNumberOfPoints();
+    vtkNew<vtkUnsignedIntArray> array;
+    array->SetNumberOfTuples(output->GetNumberOfPoints());
+    unsigned int* ptr = array->GetPointer(0);
+    for (vtkIdType cc=0; cc < output->GetNumberOfPoints(); cc++)
+      {
+      ptr[cc] = static_cast<unsigned int>(procId);
+      }
+    array->SetName("vtkProcessId");
+    output->GetPointData()->AddArray(array.GetPointer());
+    }
+}
+
+//----------------------------------------------------------------------------
 namespace
 {
   static void vtkPVGeometryFilterMergePieces(vtkMultiPieceDataSet* mp)
@@ -809,8 +837,7 @@ int vtkPVGeometryFilter::RequestAMRData(
           {
           vtkPolyData* tmpOut = vtkPolyData::New();
           this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0, wholeExtent, extractface);
-          this->ExecuteCellNormals(tmpOut, 0);
-          this->RemoveGhostCells(tmpOut);
+          this->CleanupOutputData(tmpOut, 0);
           this->AddCompositeIndex(
            tmpOut,input->GetFlatIndex(level,dataIdx));
           mpds->SetPiece( dataIdx, tmpOut );
@@ -882,8 +909,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
     vtkPolyData* tmpOut = vtkPolyData::New();
     this->ExecuteBlock(block, tmpOut, 0, 0, 1, 0, wholeExtent);
-    this->ExecuteCellNormals(tmpOut, 0);
-    this->RemoveGhostCells(tmpOut);
+    this->CleanupOutputData(tmpOut, 0);
     //skip empty nodes.
     if (tmpOut->GetNumberOfPoints() > 0)
       {
