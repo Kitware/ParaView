@@ -1576,6 +1576,12 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
           group->SetName(groupName);
           }
 
+        const char *groupLabel = propertyElement->GetAttribute("label");
+        if(groupLabel)
+          {
+          group->SetXMLLabel(groupLabel);
+          }
+
         const char *groupType = propertyElement->GetAttribute("type");
         if(groupType)
           {
