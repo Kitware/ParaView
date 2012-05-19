@@ -31,6 +31,7 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
   : Internals(new vtkSMPropertyGroupInternals)
 {
   this->Name = 0;
+  this->XMLLabel = 0;
   this->Type = 0;
   this->PanelVisibility = 0;
 
@@ -41,6 +42,7 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
 //---------------------------------------------------------------------------
 vtkSMPropertyGroup::~vtkSMPropertyGroup()
 {
+  this->SetXMLLabel(0);
   delete this->Internals;
 }
 

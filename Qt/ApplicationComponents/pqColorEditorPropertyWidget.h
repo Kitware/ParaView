@@ -44,8 +44,6 @@ class pqColorEditorPropertyWidget : public pqPropertyWidget
 public:
   pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
   ~pqColorEditorPropertyWidget();
-
-  bool showLabel() const;
 };
 
 #endif // _pqColorEditorPropertyWidget_h

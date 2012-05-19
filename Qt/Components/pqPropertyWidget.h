@@ -56,7 +56,7 @@ public:
   vtkSMProxy* proxy() const;
   vtkSMProperty* property() const;
 
-  virtual bool showLabel() const;
+  bool showLabel() const;
 
 signals:
   /// This signal is emitted when the widget's value is changed by the user.
@@ -68,6 +68,7 @@ protected:
                        const char *qsignal,
                        vtkSMProperty *smproperty,
                        int smindex = -1);
+  void setShowLabel(bool show);
 
 private slots:
   void setModified(bool modified = true);
@@ -84,6 +85,7 @@ private:
   vtkSMProperty *Property;
   pqPropertyLinks Links;
   bool Modified;
+  bool ShowLabel;
 };
 
 #endif // _pqPropertyWidget_h

@@ -40,6 +40,7 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
     Property(0)
 {
   this->Modified = false;
+  this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()), this, SIGNAL(modified()));
@@ -72,9 +73,14 @@ void pqPropertyWidget::reset()
   this->setModified(false);
 }
 
+void pqPropertyWidget::setShowLabel(bool show)
+{
+  this->ShowLabel = show;
+}
+
 bool pqPropertyWidget::showLabel() const
 {
-  return true;
+  return this->ShowLabel;
 }
 
 void pqPropertyWidget::addPropertyLink(QObject *qobject,
