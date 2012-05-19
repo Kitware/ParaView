@@ -1202,7 +1202,7 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(
       pointId = pointIterator.GetPointId(k);
       if(pointId < 0 || pointId >= grid->GetNumberOfPoints())
         {
-        vtkErrorMacro("SCREWED this up!!!");  
+        vtkErrorMacro("Bad point id.");
         continue;
         }
       double gradient[3][3];
@@ -1286,8 +1286,8 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(
     }
   if(vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() > 1)
     {
-    this->CommunicateParallelVerticalVelocity(grid, wholeExtent, subExtent,
-                                              numberOfGhostLevels, pointIterator, &w[0]);
+    this->CommunicateParallelVerticalVelocity(
+      wholeExtent, subExtent, numberOfGhostLevels, pointIterator, &w[0]);
     }
 
   // now w[] should have the proper values and we need to add them back in
@@ -1305,7 +1305,7 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(
         k>=pointIterator.GetColumnTopPointExtentIndex(true);k--)
       {
       double velocity[3];
-      vtkIdType pointId = pointIterator.GetPointId(k);
+      pointId = pointIterator.GetPointId(k);
       velocityArray->GetTuple(pointId, velocity);
       for(int i=0;i<3;i++)
         {
@@ -1317,12 +1317,12 @@ void vtkUnstructuredPOPReader::ComputeVerticalVelocity(
   grid->GetPointData()->RemoveArray("Gradients");
 }
 
+#ifdef PARAVIEW_USE_MPI
 //-----------------------------------------------------------------------------
 void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
-  vtkUnstructuredGrid* grid, int* wholeExtent,
-  int* subExtent, int numberOfGhostLevels, VTKPointIterator& pointIterator, double* w)
+  int* wholeExtent, int* subExtent,
+  int numberOfGhostLevels, VTKPointIterator& pointIterator, double* w)
 {
-#ifdef PARAVIEW_USE_MPI
   if(wholeExtent[4] == subExtent[4] && wholeExtent[5] == subExtent[5])
     {
     // no communication necessary since this process has all the points
@@ -1425,8 +1425,16 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
       it->Wait();
       }
     }
-#endif
 }
+#else // #ifdef PARAVIEW_USE_MPI
+//-----------------------------------------------------------------------------
+void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
+  int* vtkNotUsed(wholeExtent), int* vtkNotUsed(subExtent),
+  int vtkNotUsed(numberOfGhostLevels),
+  VTKPointIterator& vtkNotUsed(pointIterator), double* vtkNotUsed(w) )
+{
+}
+#endif
 
 //-----------------------------------------------------------------------------
 int vtkUnstructuredPOPReader::GetPointOwnerPiece(
