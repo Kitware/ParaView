@@ -465,6 +465,10 @@ public:
   //     false
   bool GetUseOrderedCompositing();
 
+  // Description:
+  // Provides access to the time when Update() was last called.
+  unsigned long GetUpdateTimeStamp()
+    { return this->UpdateTimeStamp; }
 //BTX
 protected:
   vtkPVRenderView();

@@ -55,21 +55,31 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(
     this->ViewProxy->GetClientSideObject());
   bool use_lod = interactive && view->GetUseLODForInteractiveRender();
+  bool use_distributed_rendering =
+    interactive? view->GetUseDistributedRenderingForInteractiveRender():
+    view->GetUseDistributedRenderingForStillRender();
 
-  unsigned long update_ts = this->ViewProxy->GetUpdateTimeStamp();
-
-  // Delivery the "base" geometries for all representations. This is true,
-  // irrespective of whether we are streaming datasets. When a representation is
-  // updated, it provides a base-geometry that gets delivered for rendering (if
-  // any). This code handles that.
-  if ( (!use_lod && update_ts < this->GeometryDeliveryStamp) ||
-    (use_lod && update_ts < this->LODGeometryDeliveryStamp) )
+  unsigned long update_ts = view->GetUpdateTimeStamp();
+  int delivery_type = LOCAL_RENDERING_AND_FULL_RES;
+  if (!use_lod && use_distributed_rendering)
     {
-    return;
+    delivery_type = REMOTE_RENDERING_AND_FULL_RES;
+    }
+  else if (use_lod && !use_distributed_rendering)
+    {
+    delivery_type = LOCAL_RENDERING_AND_LOW_RES;
+    }
+  else if (use_lod && use_distributed_rendering)
+    {
+    delivery_type = REMOTE_RENDERING_AND_LOW_RES;
     }
 
-  vtkTimeStamp& timeStamp = use_lod?
-    this->LODGeometryDeliveryStamp : this->GeometryDeliveryStamp;
+  vtkTimeStamp& timeStamp = this->DeliveryTimestamps[delivery_type];
+  if (timeStamp > update_ts)
+    {
+    // we delivered the data since the update. Nothing delivery to be done.
+    return;
+    }
 
   std::vector<unsigned int> keys_to_deliver;
   if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))

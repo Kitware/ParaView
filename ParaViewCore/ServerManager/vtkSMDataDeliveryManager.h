@@ -60,8 +60,14 @@ protected:
 
   vtkWeakPointer<vtkSMViewProxy> ViewProxy;
 
-  vtkTimeStamp GeometryDeliveryStamp;
-  vtkTimeStamp LODGeometryDeliveryStamp;
+  enum
+    {
+    LOCAL_RENDERING_AND_FULL_RES=0,
+    LOCAL_RENDERING_AND_LOW_RES=1,
+    REMOTE_RENDERING_AND_FULL_RES=2,
+    REMOTE_RENDERING_AND_LOW_RES=3,
+    };
+  vtkTimeStamp DeliveryTimestamps[4];
 
 private:
   vtkSMDataDeliveryManager(const vtkSMDataDeliveryManager&); // Not implemented
