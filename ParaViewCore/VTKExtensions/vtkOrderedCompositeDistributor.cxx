@@ -29,9 +29,6 @@
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
-#ifdef PARAVIEW_USE_MPI
-#include "vtkDistributedDataFilter.h"
-#endif
 #include "vtkGarbageCollector.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -40,7 +37,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkPolyData.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI 
 #include "vtkUnstructuredGrid.h"
+
+#ifdef PARAVIEW_USE_MPI
+# include "vtkDistributedDataFilter.h"
+#endif
 
 //-----------------------------------------------------------------------------
 #ifdef PARAVIEW_USE_MPI

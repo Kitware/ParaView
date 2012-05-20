@@ -40,6 +40,7 @@
 #define __vtkOrderedCompositeDistributor_h
 
 #include "vtkPointSetAlgorithm.h"
+#include "vtkPVConfig.h"
 
 class vtkBSPCuts;
 class vtkDataSet;
