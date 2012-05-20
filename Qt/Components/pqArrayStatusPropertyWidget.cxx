@@ -43,8 +43,8 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentObject)
   : Superclass(proxy, parentObject)
 {
-  pqExodusIIVariableSelectionWidget* selectorWidget = new
-    pqExodusIIVariableSelectionWidget(this);
+  pqExodusIIVariableSelectionWidget* selectorWidget =
+    new pqExodusIIVariableSelectionWidget(this);
   selectorWidget->setRootIsDecorated(false);
   //selectorWidget->setText(group->GetName());
 
@@ -53,16 +53,16 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   hbox->setMargin(0);
   hbox->setSpacing(4);
 
- for (unsigned int cc=0; cc < group->GetNumberOfProperties(); cc++)
-   {
-   if (group->GetProperty(cc) &&
-     group->GetProperty(cc)->GetInformationOnly() == 0)
-     {
-     const char* property_name = proxy->GetPropertyName(group->GetProperty(cc));
-     this->addPropertyLink(selectorWidget, property_name,
-       SIGNAL(widgetModified()), group->GetProperty(cc));
-     }
-   }
+  for (unsigned int cc=0; cc < group->GetNumberOfProperties(); cc++)
+    {
+    if (group->GetProperty(cc) &&
+        group->GetProperty(cc)->GetInformationOnly() == 0)
+      {
+      const char* property_name = proxy->GetPropertyName(group->GetProperty(cc));
+      this->addPropertyLink(selectorWidget, property_name,
+                            SIGNAL(widgetModified()), group->GetProperty(cc));
+      }
+    }
 
   // dont show label
   this->setShowLabel(false);
@@ -72,8 +72,8 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
     vtkSMProperty* property, QWidget *parentObject)
 : Superclass(proxy, parentObject)
 {
-  pqExodusIIVariableSelectionWidget* selectorWidget = new
-    pqExodusIIVariableSelectionWidget(this);
+  pqExodusIIVariableSelectionWidget* selectorWidget =
+    new pqExodusIIVariableSelectionWidget(this);
 
   selectorWidget->setRootIsDecorated(false);
   //selectorWidget->setText(property->GetXMLLabel());
@@ -85,7 +85,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
 
   const char* property_name = proxy->GetPropertyName(property);
   this->addPropertyLink(selectorWidget, property_name,
-    SIGNAL(widgetModified()), property);
+                        SIGNAL(widgetModified()), property);
 
   // dont show label
   this->setShowLabel(false);
