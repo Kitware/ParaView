@@ -311,6 +311,12 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
 
   // Description:
+  // Hack to pass along image data producer to use to generate the KdTree cuts
+  // when volume rendering image data. This code needs refactoring.
+  static void SetImageDataProducer(
+    vtkInformation* info, vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
+
+  // Description:
   // Representations that support hardware (render-buffer based) selection,
   // should register the prop that they use for selection rendering. They can do
   // that in the vtkPVDataRepresentation::AddToView() implementation.

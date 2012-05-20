@@ -80,10 +80,23 @@ public:
   class vtkItem
     {
     vtkSmartPointer<vtkPVTrivialProducer> Producer;
+
+    // Data object produced by the representation.
     vtkWeakPointer<vtkDataObject> DataObject;
+
+    // Data object available after delivery to the "rendering" node.
+    vtkSmartPointer<vtkDataObject> DeliveredDataObject;
+
+    // Data object after re-distributing when using ordered compositing, for
+    // example.
+    vtkSmartPointer<vtkDataObject> RedistributedDataObject;
+
     unsigned long TimeStamp;
     unsigned long ActualMemorySize;
   public:
+    vtkWeakPointer<vtkAlgorithmOutput> ImageDataProducer;
+      // <-- HACK for image data volume rendering.
+
     vtkWeakPointer<vtkPVDataRepresentation> Representation;
     bool AlwaysClone;
     bool Redistributable;
@@ -100,35 +113,54 @@ public:
 
     void SetDataObject(vtkDataObject* data)
       {
+      if (data != this->DataObject ||
+        (data && data->GetMTime() > this->TimeStamp))
+        {
+        vtkTimeStamp ts; ts.Modified();
+        this->TimeStamp = ts;
+        }
       this->DataObject = data;
-      this->Producer->SetOutput(data);
-
-      // the vtkTrivialProducer's MTime is is changed whenever the data itself
-      // changes or the data's mtime changes and hence we get a good indication
-      // of when we have a new piece for real.
-      this->TimeStamp = this->Producer->GetMTime();
       this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
       }
 
     void SetDeliveredDataObject(vtkDataObject* data)
       {
-      this->Producer->SetOutput(data);
-      this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+      this->DeliveredDataObject = data;
+      }
+
+    void SetRedistributedDataObject(vtkDataObject* data)
+      {
+      this->RedistributedDataObject = data;
       }
 
     vtkDataObject* GetDeliveredDataObject()
       {
-      return this->Producer->GetOutputDataObject(0);
+      return this->DeliveredDataObject.GetPointer();
       }
 
-    vtkPVTrivialProducer* GetProducer() const
-      { return this->Producer.GetPointer(); }
+    vtkDataObject* GetRedistributedDataObject()
+      {
+      return this->RedistributedDataObject.GetPointer();
+      }
+
+    vtkPVTrivialProducer* GetProducer(bool use_redistributed_data)
+      { 
+      if (use_redistributed_data && this->Redistributable)
+        {
+        this->Producer->SetOutput(this->RedistributedDataObject);
+        }
+      else
+        {
+        this->Producer->SetOutput(this->DeliveredDataObject);
+        }
+      return this->Producer.GetPointer();
+      }
+
     vtkDataObject* GetDataObject() const
       { return this->DataObject.GetPointer(); }
     unsigned long GetTimeStamp() const
       { return this->TimeStamp; }
-    void SetTimeStamp(unsigned long ts)
-      { this->TimeStamp = ts; }
+
     unsigned long GetVisibleDataSize()
       {
       if (this->Representation && this->Representation->GetVisibility())
@@ -458,7 +490,8 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
     return NULL;
     }
 
-  return item->GetProducer()->GetOutputPort(0);
+  return item->GetProducer(
+    this->RenderView->GetUseOrderedCompositing())->GetOutputPort(0);
 }
 
 //----------------------------------------------------------------------------
@@ -477,6 +510,21 @@ void vtkPVDataDeliveryManager::SetPiece(unsigned int id, vtkDataObject* data, bo
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::SetImageDataProducer(
+  vtkPVDataRepresentation* repr, vtkAlgorithmOutput *producer)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
+  if (item)
+    {
+    item->ImageDataProducer = producer;
+    }
+  else
+    {
+    vtkErrorMacro("Invalid argument.");
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
   unsigned int id, bool low_res)
 {
@@ -487,7 +535,8 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
     return NULL;
     }
 
-  return item->GetProducer()->GetOutputPort(0);
+  return item->GetProducer(
+    this->RenderView->GetUseOrderedCompositing())->GetOutputPort(0);
 }
 
 //----------------------------------------------------------------------------
@@ -534,7 +583,6 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     this->RenderView->GetUseDistributedRenderingForStillRender();
   int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
 
-
   for (unsigned int cc=0; cc < size; cc++)
     {
     vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
@@ -551,6 +599,9 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       // FIXME: check that the mode flags are "suitable" for AMR.
       }
 
+    // release old memory (not necessarily, but try).
+    item->SetDeliveredDataObject(NULL);
+
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
     dataMover->SetOutputDataType(data->GetDataObjectType());
@@ -565,13 +616,20 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
     }
 
-  // There's a possibility that we'd need to do ordered compositing.
-  // Ask the view if we need to redistribute the data for ordered compositing.
-  bool use_ordered_compositing = using_remote_rendering &&
-    this->RenderView->GetUseOrderedCompositing();
+  vtkTimerLog::MarkEndEvent(use_lod?
+    "LowRes Data Migration" : "FullRes Data Migration");
+}
 
-  if (use_ordered_compositing && !use_lod)
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(
+  bool use_lod)
+{
+  if (this->RenderView->GetUpdateTimeStamp() > this->RedistributionTimeStamp)
     {
+    vtkTimerLog::MarkStartEvent("Regenerate Kd-Tree");
+    // need to re-generate the kd-tree.
+    this->RedistributionTimeStamp.Modified();
+
     vtkNew<vtkBSPCutsGenerator> cutsGenerator;
     vtkInternals::ItemsMapType::iterator iter;
     for (iter = this->Internals->ItemsMap.begin();
@@ -579,10 +637,16 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       {
       vtkInternals::vtkItem& item =  iter->second.first;
       if (item.Representation &&
-        item.Representation->GetVisibility() &&
-        item.Redistributable)
+        item.Representation->GetVisibility())
         {
-        cutsGenerator->AddInputData(item.GetDeliveredDataObject());
+        if (item.Redistributable)
+          {
+          cutsGenerator->AddInputData(item.GetDeliveredDataObject());
+          }
+        else if (item.ImageDataProducer)
+          {
+          cutsGenerator->AddInputConnection(item.ImageDataProducer);
+          }
         }
       }
 
@@ -595,42 +659,58 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
     sddp->Update(0);
 
     this->KdTree = cutsGenerator->GetPKdTree();
+    vtkTimerLog::MarkEndEvent("Regenerate Kd-Tree");
     }
-  else if (!use_lod)
-    {
-    this->KdTree = NULL;
-    }
-  // FIXME:STREAMING
-  // 1. Fix code to avoid recomputing of KdTree unless really necessary.
-  // 2. If KdTree is recomputed and is indeed different, then we need to
-  //    redistribute all the visible "redistributable" datasets, not just the
-  //    ones being requested.
 
-  if (this->KdTree)
+  if (this->KdTree == NULL)
     {
-    vtkTimerLog::MarkStartEvent("Redistributing Data for Ordered Compositing");
-    for (unsigned int cc=0; cc < size; cc++)
+    return;
+    }
+
+  vtkTimerLog::MarkStartEvent("Redistributing Data for Ordered Compositing");
+  vtkInternals::ItemsMapType::iterator iter;
+  for (iter = this->Internals->ItemsMap.begin();
+    iter != this->Internals->ItemsMap.end(); ++iter)
+    {
+    vtkInternals::vtkItem& item = use_lod? iter->second.second : iter->second.first;
+
+    if (!item.Redistributable ||
+      item.Representation == NULL ||
+      item.Representation->GetVisibility() == false ||
+
+      // delivered object can be null in case we're updating lod and the
+      // representation doeesn't have any LOD data.
+      item.GetDeliveredDataObject() == NULL) 
       {
-      vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], use_lod !=0);
-      if (!item->Redistributable)
-        {
-        continue;
-        }
-
-      vtkNew<vtkOrderedCompositeDistributor> redistributor;
-      redistributor->SetController(vtkMultiProcessController::GetGlobalController());
-      redistributor->SetInputData(item->GetDeliveredDataObject());
-      redistributor->SetPKdTree(this->KdTree);
-      redistributor->SetPassThrough(0);
-      redistributor->Update();
-      item->SetDataObject(redistributor->GetOutputDataObject(0));
+      continue;
       }
-    vtkTimerLog::MarkEndEvent("Redistributing Data for Ordered Compositing");
+
+    if (item.GetRedistributedDataObject() &&
+
+      // input-data didn't change
+      (item.GetDeliveredDataObject()->GetMTime() <
+       item.GetRedistributedDataObject()->GetMTime()) &&
+
+      // kd-tree didn't change
+      (item.GetRedistributedDataObject()->GetMTime() >
+       this->KdTree->GetMTime()))
+      {
+      // skip redistribution.
+      continue;
+      }
+
+    // release old memory (not necessarily, but try).
+    item.SetRedistributedDataObject(NULL);
+
+    vtkNew<vtkOrderedCompositeDistributor> redistributor;
+    redistributor->SetController(vtkMultiProcessController::GetGlobalController());
+    redistributor->SetInputData(item.GetDeliveredDataObject());
+    redistributor->SetPKdTree(this->KdTree);
+    redistributor->SetPassThrough(0);
+    redistributor->Update();
+    item.SetRedistributedDataObject(redistributor->GetOutputDataObject(0));
     }
-
-
-  vtkTimerLog::MarkEndEvent(use_lod?
-    "LowRes Data Migration" : "FullRes Data Migration");
+  vtkTimerLog::MarkEndEvent("Redistributing Data for Ordered Compositing");
 }
 
 //----------------------------------------------------------------------------

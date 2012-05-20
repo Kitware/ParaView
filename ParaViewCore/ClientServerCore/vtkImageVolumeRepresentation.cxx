@@ -96,16 +96,20 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     }
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    // FIXME:STREAMING :- how do we tell the view to use "cuts" from this
-    // representation for ordered compositing?
-    // At the same time, the image data is not the data being delivered
-    // anywhere, so we don't really report it to the view's storage.
-    // vtkPVRenderView::SetPiece(inInfo, this, this->Cache);
     vtkPVRenderView::SetPiece(inInfo, this,
       this->OutlineSource->GetOutputDataObject(0));
     outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
 
     vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
+
+    // The KdTree generation code that uses the image cuts needs to be updated
+    // bigtime. But due to time shortage, I'm leaving the old code as is. We
+    // will get back to it later.
+    if (this->GetNumberOfInputConnections(0) == 1)
+      {
+      vtkPVRenderView::SetImageDataProducer(inInfo, this,
+        this->GetInputConnection(0, 0));
+      }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {

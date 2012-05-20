@@ -976,6 +976,18 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->GetUseDistributedRenderingForInteractiveRender():
     this->GetUseDistributedRenderingForStillRender();
 
+  if (this->GetUseOrderedCompositing())
+    {
+    this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(
+      use_lod_rendering);
+    this->SynchronizedRenderers->SetKdTree(
+      this->Internals->DeliveryManager->GetKdTree());
+    }
+  else
+    {
+    this->SynchronizedRenderers->SetKdTree(NULL);
+    }
+
   // Render each representation with available geometry.
   // This is the pass where representations get an opportunity to get the
   // currently "available" represented data and try to render it.
@@ -1007,8 +1019,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
 
-  this->SynchronizedRenderers->SetKdTree(
-    this->Internals->DeliveryManager->GetKdTree());
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -1164,6 +1174,20 @@ void vtkPVRenderView::SetStreamable(
   view->GetDeliveryManager()->SetStreamable(repr, val);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetImageDataProducer(
+  vtkInformation* info, vtkPVDataRepresentation* repr,
+  vtkAlgorithmOutput* producer)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetImageDataProducer(repr, producer);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
@@ -1260,7 +1284,7 @@ bool vtkPVRenderView::GetUseOrderedCompositing()
     return false;
     }
 
-  if (!this->NeedsOrderedCompositing)
+  if (!this->NeedsOrderedCompositing || this->MakingSelection)
     {
     return false;
     }

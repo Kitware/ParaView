@@ -106,6 +106,11 @@ public:
   void SetRenderView(vtkPVRenderView*);
   vtkPVRenderView* GetRenderView();
 
+  // Description:
+  // Called by the view on ever render when ordered compositing is to be used to
+  // ensure that the geometries are redistributed, as needed.
+  void RedistributeDataForOrderedCompositing(bool use_lod);
+
 //BTX
   // Description:
   // Internal method used to determine the list of representations that need
@@ -137,6 +142,11 @@ public:
   void StreamingDeliver(unsigned int key);
   // *******************************************************************
 
+
+  // *******************************************************************
+  // HACK for dealing with volume rendering for image data
+  void SetImageDataProducer(vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
+
 //BTX
 protected:
   vtkPVDataDeliveryManager();
@@ -145,6 +155,7 @@ protected:
   vtkWeakPointer<vtkPVRenderView> RenderView;
   vtkSmartPointer<vtkPKdTree> KdTree;
 
+  vtkTimeStamp RedistributionTimeStamp;
 private:
   vtkPVDataDeliveryManager(const vtkPVDataDeliveryManager&); // Not implemented
   void operator=(const vtkPVDataDeliveryManager&); // Not implemented
