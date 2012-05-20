@@ -32,22 +32,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStringVectorPropertyWidget.h"
 
-#include "vtkSMProxy.h"
-#include "vtkSMDomain.h"
-#include "vtkSMProperty.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMEnumerationDomain.h"
-#include "vtkSMStringListDomain.h"
-#include "vtkSMArraySelectionDomain.h"
-#include "vtkSMFileListDomain.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMArraySelectionDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMEnumerationDomain.h"
+#include "vtkSMFileListDomain.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSILDomain.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkSMStringVectorProperty.h"
 
-#include "pqTreeWidget.h"
 #include "pqApplicationCore.h"
+#include "pqExodusIIVariableSelectionWidget.h"
 #include "pqFileChooserWidget.h"
+#include "pqProxySILModel.h"
 #include "pqServerManagerModel.h"
+#include "pqSILModel.h"
+#include "pqSILWidget.h"
+#include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
 
 #include <QComboBox>
@@ -151,19 +156,38 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
 
     layout->addWidget(comboBox);
     }
+  else if (vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(domain))
+    {
+    pqSILWidget* tree = new pqSILWidget(silDomain->GetSubTree(), this);
+    tree->setObjectName("BlockSelectionWidget");
+
+    pqSILModel* silModel = new pqSILModel(tree);
+
+    // FIXME: This needs to be automated, we want the model to automatically
+    // fetch the SIL when the domain is updated.
+    silModel->update(silDomain->GetSIL());
+    tree->setModel(silModel);
+
+    this->addPropertyLink(tree->activeModel(), "values",
+      SIGNAL(valuesChanged()), property);
+
+    // FIXME: HIDE WIDGET LABEL
+    layout->addWidget(tree);
+    }
   else if(vtkSMArraySelectionDomain *asd = vtkSMArraySelectionDomain::SafeDownCast(domain))
     {
-    pqTreeWidget *treeWidget = new pqTreeWidget(this);
-    treeWidget->setObjectName("TreeWidget");
-    treeWidget->setColumnCount(1);
-    treeWidget->setRootIsDecorated(false);
-    QTreeWidgetItem *header = new QTreeWidgetItem();
-//    header->setData(0, Qt::DisplayRole, header);
-    treeWidget->setHeaderItem(header);
-    pqTreeWidgetSelectionHelper* helper =
-      new pqTreeWidgetSelectionHelper(treeWidget);
-    helper->setObjectName("TreeWidgetHelper");
-    }
+    pqExodusIIVariableSelectionWidget* selectorWidget =
+      new pqExodusIIVariableSelectionWidget(this);
+    selectorWidget->setObjectName("ArraySelectionWidget");
+    selectorWidget->setRootIsDecorated(false);
+    selectorWidget->setHeaderLabel(property->GetXMLLabel());
+    this->addPropertyLink(
+      selectorWidget, proxy->GetPropertyName(property),
+      SIGNAL(widgetModified()), property);
 
+    // FIXME: HIDE WIDGET LABEL
+
+    layout->addWidget(selectorWidget);
+   }
   this->setLayout(layout);
 }

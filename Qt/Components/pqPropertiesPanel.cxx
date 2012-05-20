@@ -102,6 +102,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStringVectorPropertyWidget.h"
 
 // === pqStandardCustomPanels ============================================== //
+
+namespace
+{
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -171,14 +174,6 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("ExodusIIReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExodusIIPanel(proxy, p);
-        }
-      if(QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExodusIIPanel(proxy, p);
-        }
       if(QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqNetCDFPanel(proxy, p);
@@ -217,10 +212,7 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
-        QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
-        QString("netCDFReader") == proxy->getProxy()->GetXMLName()
-         )
+      if (QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }
@@ -228,6 +220,7 @@ public:
     return false;
   }
 };
+}
 
 // === pqStandardDisplayPanels ============================================= //
 class pqStandardDisplayPanels : public QObject, public pqDisplayPanelInterface
