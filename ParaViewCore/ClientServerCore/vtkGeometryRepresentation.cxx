@@ -43,6 +43,7 @@
 #include "vtkShadowMapBakerPass.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkHardwareSelectionPolyDataPainter.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -98,7 +99,18 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->MultiBlockMaker = vtkGeometryRepresentationMultiBlockMaker::New();
   this->Decimator = vtkQuadricClustering::New();
-  this->Mapper = vtkCompositePolyDataMapper2::New();
+
+  // setup the selection mapper so that we don't need to make any selection
+  // conversions after rendering.
+  vtkCompositePolyDataMapper2* mapper = vtkCompositePolyDataMapper2::New();
+  vtkHardwareSelectionPolyDataPainter* selPainter =
+    vtkHardwareSelectionPolyDataPainter::SafeDownCast(
+      mapper->GetSelectionPainter()->GetDelegatePainter());
+  selPainter->SetPointIdArrayName("vtkOriginalPointIds");
+  selPainter->SetCellIdArrayName("vtkOriginalCellIds");
+  selPainter->SetProcessIdArrayName("vtkProcessId");
+
+  this->Mapper = mapper;
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
@@ -425,6 +437,10 @@ bool vtkGeometryRepresentation::AddToView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->AddActor(this->Actor);
+
+    // Indicate that this is prop that we are rendering when hardware selection
+    // is enabled.
+    rview->RegisterPropForHardwareSelection(this, this->GetRenderedProp());
     return true;
     }
   return false;
@@ -437,6 +453,7 @@ bool vtkGeometryRepresentation::RemoveFromView(vtkView* view)
   if (rview)
     {
     rview->GetRenderer()->RemoveActor(this->Actor);
+    rview->UnRegisterPropForHardwareSelection(this, this->GetRenderedProp());
     return true;
     }
   return false;
@@ -553,52 +570,6 @@ void vtkGeometryRepresentation::UpdateColoringParameters()
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkGeometryRepresentation::ConvertSelection(
-  vtkView* _view, vtkSelection* selection)
-{
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(_view);
-  // if this->GeometryFilter has 0 inputs, it means we don't have any valid
-  // input data on this process, so we can't convert the selection.
-  if (!view ||
-    this->GeometryFilter->GetNumberOfInputConnections(0) == 0)
-    {
-    return this->Superclass::ConvertSelection(_view, selection);
-    }
-
-  vtkSelection* newInput = vtkSelection::New();
-
-  // locate any selection nodes which belong to this representation.
-  for (unsigned int cc=0; cc < selection->GetNumberOfNodes(); cc++)
-    {
-    vtkSelectionNode* node = selection->GetNode(cc);
-    vtkProp* prop = NULL;
-    if (node->GetProperties()->Has(vtkSelectionNode::PROP()))
-      {
-      prop = vtkProp::SafeDownCast(node->GetProperties()->Get(vtkSelectionNode::PROP()));
-      }
-
-    if (prop == this->GetRenderedProp())
-      {
-      newInput->AddNode(node);
-      node->GetProperties()->Set(vtkSelectionNode::SOURCE(),
-        this->GeometryFilter);
-      }
-    }
-
-  if (newInput->GetNumberOfNodes() == 0)
-    {
-    newInput->Delete();
-    return selection;
-    }
-
-  vtkSelection* output = vtkSelection::New();
-  vtkSelectionConverter* convertor = vtkSelectionConverter::New();
-  convertor->Convert(newInput, output, 0);
-  convertor->Delete();
-  newInput->Delete();
-  return output;
-}
-
 void vtkGeometryRepresentation::SetAllowSpecularHighlightingWithScalarColoring(int allow)
 {
   this->AllowSpecularHighlightingWithScalarColoring = allow > 0 ? true : false;

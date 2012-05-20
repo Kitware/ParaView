@@ -52,6 +52,8 @@ public:
   // to communicate information about representations using their unique ids.
   void RegisterRepresentation(unsigned int id, vtkPVDataRepresentation*);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
+  unsigned int GetRepresentationId(vtkPVDataRepresentation*);
+  vtkPVDataRepresentation* GetRepresentation(unsigned int);
 
   // Description:
   // Representations (indirectly via vtkPVRenderView::SetPiece()) call this

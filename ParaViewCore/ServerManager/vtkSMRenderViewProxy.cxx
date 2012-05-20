@@ -715,37 +715,37 @@ namespace
   //-----------------------------------------------------------------------------
   static void vtkShrinkSelection(vtkSelection* sel)
     {
-    std::map<int, int> pixelCounts;
+    std::map<void*, int> pixelCounts;
     unsigned int numNodes = sel->GetNumberOfNodes();
-    int choosen = -1;
+    void* choosen = NULL;
     int maxPixels = -1;
     for (unsigned int cc=0; cc < numNodes; cc++)
       {
       vtkSelectionNode* node = sel->GetNode(cc);
       vtkInformation* properties = node->GetProperties();
       if (properties->Has(vtkSelectionNode::PIXEL_COUNT()) &&
-        properties->Has(vtkSelectionNode::SOURCE_ID()))
+        properties->Has(vtkSelectionNode::SOURCE()))
         {
         int numPixels = properties->Get(vtkSelectionNode::PIXEL_COUNT());
-        int source_id = properties->Get(vtkSelectionNode::SOURCE_ID());
-        pixelCounts[source_id] += numPixels;
-        if (pixelCounts[source_id] > maxPixels)
+        void* source = properties->Get(vtkSelectionNode::SOURCE());
+        pixelCounts[source] += numPixels;
+        if (pixelCounts[source] > maxPixels)
           {
           maxPixels = numPixels;
-          choosen = source_id;
+          choosen = source;
           }
         }
       }
 
     std::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
-    if (choosen != -1)
+    if (choosen != NULL)
       {
       for (unsigned int cc=0; cc < numNodes; cc++)
         {
         vtkSelectionNode* node = sel->GetNode(cc);
         vtkInformation* properties = node->GetProperties();
-        if (properties->Has(vtkSelectionNode::SOURCE_ID()) &&
-          properties->Get(vtkSelectionNode::SOURCE_ID()) == choosen)
+        if (properties->Has(vtkSelectionNode::SOURCE()) &&
+          properties->Get(vtkSelectionNode::SOURCE()) == choosen)
           {
           choosenNodes.push_back(node);
           }
@@ -766,13 +766,9 @@ bool vtkSMRenderViewProxy::FetchLastSelection(
 {
   if (selectionSources && selectedRepresentations)
     {
-    vtkSmartPointer<vtkPVLastSelectionInformation> info =
-      vtkSmartPointer<vtkPVLastSelectionInformation>::New();
-
-    this->GetSession()->GatherInformation(
-      vtkPVSession::DATA_SERVER, info, this->GetGlobalID());
-
-    vtkSelection* selection = info->GetSelection();
+    vtkPVRenderView* rv = vtkPVRenderView::SafeDownCast(
+      this->GetClientSideObject());
+    vtkSelection* selection = rv->GetLastSelection();
     if (!multiple_selections)
       {
       // only pass through selection over a single representation.

@@ -47,15 +47,34 @@ public:
   // Called to invalidate the cache.
   void InvalidateCachedSelection()
     { this->Modified(); }
+
+  int AssignUniqueId(vtkProp*);
+
 //BTX
 protected:
   vtkPVHardwareSelector();
   ~vtkPVHardwareSelector();
 
+   // Description:
+  // Return a unique ID for the prop.
+  virtual int GetPropID(int idx, vtkProp* prop);
+
+  // Description:
+  // Returns is the pass indicated is needed.
+  // Overridden to report that we always need the process-id pass. In future, we
+  // can be smart about it by only requiring it for sessions with more than 1
+  // data-server.
+  virtual bool PassRequired(int pass);
+
   vtkTimeStamp CaptureTime;
+  int UniqueId;
+
 private:
   vtkPVHardwareSelector(const vtkPVHardwareSelector&); // Not implemented
   void operator=(const vtkPVHardwareSelector&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

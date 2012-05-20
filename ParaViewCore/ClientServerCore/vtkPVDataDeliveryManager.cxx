@@ -350,6 +350,28 @@ void vtkPVDataDeliveryManager::UnRegisterRepresentation(
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkPVDataDeliveryManager::GetRepresentationId(
+  vtkPVDataRepresentation* repr)
+{
+  vtkInternals::RepresentationToIdMapType::iterator iter =
+    this->Internals->RepresentationToIdMap.find(repr);
+  if (iter == this->Internals->RepresentationToIdMap.end())
+    {
+    vtkErrorMacro("Invalid argument.");
+    return 0;
+    }
+  return iter->second;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataRepresentation* vtkPVDataDeliveryManager::GetRepresentation(
+  unsigned int index)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(index, false);
+  return item? item->Representation : NULL;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::SetDeliverToAllProcesses(
   vtkPVDataRepresentation* repr, bool mode, bool low_res)
 {

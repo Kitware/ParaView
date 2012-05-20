@@ -109,28 +109,6 @@ public:
   vtkRenderWindow* GetRenderWindow();
 
   // Description:
-  // It's possible to directly add vtkProps to a view. This API provides access
-  // to add props to the 3D/composited renderer. Note that if you add props in
-  // this way, they will not be included in the computations for geometry-size
-  // which is used to make decisions whether to use LOD or remote rendering etc.
-  // Nor can such props participate in data-redistribution when volume rendering
-  // or translucent rendering. As a rule of thumb only add props not directly
-  // connected to input data using this API such as scalar bars, cube axes etc.
-  void AddPropToRenderer(vtkProp*);
-  void RemovePropFromRenderer(vtkProp*);
-
-  // Description:
-  // It's possible to directly add vtkProps to a view. This API provides access
-  // to add props to the non-composited renderer. Note that if you add props in
-  // this way, they will not be included in the computations for geometry-size
-  // which is used to make decisions whether to use LOD or remote rendering etc.
-  // Nor can such props participate in data-redistribution when volume rendering
-  // or translucent rendering. As a rule of thumb only add props not directly
-  // connected to input data using this API such as scalar bars, cube axes etc.
-  void AddPropToNonCompositedRenderer(vtkProp*);
-  void RemovePropFromNonCompositedRenderer(vtkProp*);
-
-  // Description:
   // Returns the interactor. .
   vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
 
@@ -331,6 +309,15 @@ public:
     double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
+
+  // Description:
+  // Representations that support hardware (render-buffer based) selection,
+  // should register the prop that they use for selection rendering. They can do
+  // that in the vtkPVDataRepresentation::AddToView() implementation.
+  void RegisterPropForHardwareSelection(
+    vtkPVDataRepresentation* repr, vtkProp* prop);
+  void UnRegisterPropForHardwareSelection(
+    vtkPVDataRepresentation* repr, vtkProp* prop);
 
   // Description:
   // Turn on/off the default light in the 3D renderer.

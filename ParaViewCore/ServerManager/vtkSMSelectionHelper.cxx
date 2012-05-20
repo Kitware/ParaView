@@ -597,22 +597,22 @@ bool vtkSMSelectionHelper::MergeSelection(
 namespace
 {
   // Splits \c selection into a collection of selections based on the
-  // SOURCE_ID().
+  // SOURCE().
   void vtkSplitSelection(vtkSelection* selection,
-    std::map<int, vtkSmartPointer<vtkSelection> >& map_of_selections)
+    std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >& map_of_selections)
     {
     for (unsigned int cc=0; cc < selection->GetNumberOfNodes(); cc++)
       {
       vtkSelectionNode* node = selection->GetNode(cc);
-      if (node && node->GetProperties()->Has(vtkSelectionNode::SOURCE_ID()))
+      if (node && node->GetProperties()->Has(vtkSelectionNode::SOURCE()))
         {
-        int source_id =
-          node->GetProperties()->Get(vtkSelectionNode::SOURCE_ID());
-        vtkSelection* sel = map_of_selections[source_id];
+        vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
+          node->GetProperties()->Get(vtkSelectionNode::SOURCE()));
+        vtkSelection* sel = map_of_selections[repr];
         if (!sel)
           {
           sel = vtkSelection::New();
-          map_of_selections[source_id] = sel;
+          map_of_selections[repr] = sel;
           sel->FastDelete();
           }
         sel->AddNode(node);
@@ -620,7 +620,8 @@ namespace
       }
     }
 
-  vtkSMProxy* vtkLocateRepresentation(vtkSMProxy* viewProxy, int id)
+  vtkSMProxy* vtkLocateRepresentation(vtkSMProxy* viewProxy,
+    vtkPVDataRepresentation* repr)
     {
     vtkView* view = vtkView::SafeDownCast(viewProxy->GetClientSideObject());
     if (!view)
@@ -629,7 +630,6 @@ namespace
       return NULL;
       }
 
-    vtkDataRepresentation* repr = view->GetRepresentation(id);
     // now locate the proxy for this repr.
     vtkSMPropertyHelper helper(viewProxy, "Representations");
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
@@ -661,13 +661,13 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
   // representation that was selected. We now need to create selection source
   // proxies for each representation that was selected separately.
 
-  // This relies on SOURCE_ID() defined on the selection nodes to locate the
+  // This relies on SOURCE() defined on the selection nodes to locate the
   // representation proxy for the representation that was selected.
 
-  std::map<int, vtkSmartPointer<vtkSelection> > selections;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> > selections;
   vtkSplitSelection(selection, selections);
 
-  std::map<int, vtkSmartPointer<vtkSelection> >::iterator iter;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >::iterator iter;
   for (iter = selections.begin(); iter != selections.end(); ++iter)
     {
     vtkSMProxy* reprProxy = vtkLocateRepresentation(view, iter->first);

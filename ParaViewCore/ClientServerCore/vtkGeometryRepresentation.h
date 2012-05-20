@@ -168,15 +168,6 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
 
-  // Description:
-  // Convert the selection to a type appropriate for sharing with other
-  // representations through vtkAnnotationLink, possibly using the view.
-  // For the superclass, we just return the same selection.
-  // Subclasses may do something more fancy, like convert the selection
-  // from a frustrum to a list of pedigree ids.  If the selection cannot
-  // be applied to this representation, return NULL.
-  virtual vtkSelection* ConvertSelection(vtkView* view, vtkSelection* selection);
-
   virtual void SetAllowSpecularHighlightingWithScalarColoring(int allow);
 
 //BTX

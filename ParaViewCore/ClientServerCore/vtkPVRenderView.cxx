@@ -75,12 +75,32 @@
 
 class vtkPVRenderView::vtkInternals
 {
+  std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
+
 public:
   unsigned int UniqueId;
   vtkNew<vtkPVDataDeliveryManager> DeliveryManager;
+
   vtkInternals() : UniqueId(1)
   {
   }
+  void RegisterSelectionProp(
+    int id, vtkProp*, vtkPVDataRepresentation* rep)
+    {
+    this->PropMap[id] = rep;
+    }
+  void UnRegisterSelectionProp(vtkProp* prop, vtkPVDataRepresentation* rep)
+    {
+    (void)prop;
+    (void)rep;
+    }
+
+  vtkPVDataRepresentation* GetRepresentationForPropId(int id)
+    {
+    std::map<int, vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter =
+      this->PropMap.find(id);
+    return (iter != this->PropMap.end()? iter->second : NULL);
+    }
 };
 
 
@@ -365,6 +385,21 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::RegisterPropForHardwareSelection(
+  vtkPVDataRepresentation* repr, vtkProp* prop)
+{
+  int id = this->Selector->AssignUniqueId(prop);
+  this->Internals->RegisterSelectionProp(id, prop, repr);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UnRegisterPropForHardwareSelection(
+  vtkPVDataRepresentation* repr, vtkProp* prop)
+{
+  this->Internals->UnRegisterSelectionProp(prop, repr);
+}
+
+//----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer()
 {
   return this->RenderView->GetRenderer();
@@ -477,12 +512,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     return;
     }
 
-  if (!this->GetRemoteRenderingAvailable())
-    {
-    vtkErrorMacro("Cannot make selections since remote rendering is not available.");
-    return;
-    }
-
   this->MakingSelection = true;
 
   // Make sure that the representations are up-to-date. This is required since
@@ -495,32 +524,25 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
-  // for now, we always do the process pass. In future, we can be smart about
-  // disabling process pass when not needed.
-  this->Selector->SetProcessID(
-    vtkMultiProcessController::GetGlobalController()?
-    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
 
-  vtkSelection* sel = this->Selector->Select(region);
+
+  vtkSmartPointer<vtkSelection> sel;
+  if (this->SynchronizedWindows->GetEnabled() ||
+    this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    sel.TakeReference(this->Selector->Select(region));
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+      {
+      // valid selection is only generated on the driver process. Other's are
+      // merely rendering the passes so that the result is composited correctly.
+      this->FinishSelection(sel);
+      }
+    }
 
   // look at ::Render(..,..). We need to disable these once we are done with
   // rendering.
   this->SynchronizedWindows->SetEnabled(false);
   this->SynchronizedRenderers->SetEnabled(false);
-
-  if (sel)
-    {
-    // A valid sel is only generated on the "driver" node. The driver node may not have
-    // the actual data (except in built-in mode). So representations on this
-    // process may not be able to handle ConvertSelection() if call it right here.
-    // Hence we broadcast the selection to all data-server nodes.
-    this->FinishSelection(sel);
-    sel->Delete();
-    }
-  else
-    {
-    vtkErrorMacro("Failed to capture selection.");
-    }
 
   this->MakingSelection = false;
 }
@@ -529,54 +551,26 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 void vtkPVRenderView::FinishSelection(vtkSelection* sel)
 {
   assert(sel != NULL);
-  this->SynchronizedWindows->BroadcastToDataServer(sel);
 
-  // now, sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
-  // pointers, since representations have know knowledge for that the PROP_ID()s
-  // are.
+  // first, convert local-prop ids to ids that the data-server can understand if
+  // the selection was done without compositing, i.e. rendering happened on the
+  // client side.
   for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
     {
     vtkSelectionNode* node = sel->GetNode(cc);
     if (node->GetProperties()->Has(vtkSelectionNode::PROP_ID()))
       {
       int propid = node->GetProperties()->Get(vtkSelectionNode::PROP_ID());
-      vtkProp* prop = this->Selector->GetPropFromID(propid);
-      node->GetProperties()->Set(vtkSelectionNode::PROP(), prop);
+      vtkPVDataRepresentation* repr =
+        this->Internals->GetRepresentationForPropId(propid);
+      if (repr)
+        {
+        node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
+        }
       }
     }
 
-  // Now all processes have the full selection. We can tell the representations
-  // to convert the selections.
-
-  vtkSelection* converted = vtkSelection::New();
-
-  // Now, vtkPVRenderView is in no position to tell how many representations got
-  // selected, and what nodes in the vtkSelection correspond to which
-  // representations. So it simply passes the full vtkSelection to all
-  // representations and asks them to "convert" it. A representation will return
-  // the original selection if it was not selected at all or returns the
-  // converted selection for the part that it can handle, ignoring the rest.
-  for (int i = 0; i < this->GetNumberOfRepresentations(); ++i)
-    {
-    vtkDataRepresentation* repr = this->GetRepresentation(i);
-    vtkSelection* convertedSelection = repr->ConvertSelection(this, sel);
-    if (convertedSelection == NULL|| convertedSelection == sel)
-      {
-      continue;
-      }
-    for (unsigned int cc=0; cc < convertedSelection->GetNumberOfNodes(); cc++)
-      {
-      vtkSelectionNode* node = convertedSelection->GetNode(cc);
-      // update the SOURCE() for the node to be the selected representation.
-      node->GetProperties()->Set(vtkSelectionNode::SOURCE_ID(), i);
-      converted->AddNode(convertedSelection->GetNode(cc));
-      }
-    convertedSelection->Delete();
-    }
-
-  this->SetLastSelection(converted);
-  converted->FastDelete();
-
+  this->SetLastSelection(sel);
 }
 
 //----------------------------------------------------------------------------
@@ -1242,12 +1236,6 @@ bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
     return false;
     }
 
-  if (this->MakingSelection)
-    {
-    // force remote rendering when doing a surface selection.
-    return true;
-    }
-
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH)
     {
     // currently, we only support parallel rendering in batch mode.
@@ -1319,30 +1307,6 @@ void vtkPVRenderView::SetLightSwitch(bool enable)
 bool vtkPVRenderView::GetLightSwitch()
 {
   return this->Light->GetSwitch() != 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddPropToNonCompositedRenderer(vtkProp* prop)
-{
-  this->GetNonCompositedRenderer()->AddActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::RemovePropFromNonCompositedRenderer(vtkProp* prop)
-{
-  this->GetNonCompositedRenderer()->RemoveActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddPropToRenderer(vtkProp* prop)
-{
-  this->GetRenderer()->AddActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::RemovePropFromRenderer(vtkProp* prop)
-{
-  this->GetRenderer()->RemoveActor(prop);
 }
 
 //----------------------------------------------------------------------------
