@@ -63,6 +63,9 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
        SIGNAL(widgetModified()), group->GetProperty(cc));
      }
    }
+
+  // dont show label
+  this->setShowLabel(false);
 }
 
 pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
@@ -83,6 +86,9 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
   const char* property_name = proxy->GetPropertyName(property);
   this->addPropertyLink(selectorWidget, property_name,
     SIGNAL(widgetModified()), property);
+
+  // dont show label
+  this->setShowLabel(false);
 }
 
 //-----------------------------------------------------------------------------
