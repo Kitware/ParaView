@@ -588,21 +588,31 @@ void vtkPVRenderView::ResetCameraClippingRange()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SynchronizeGeometryBounds()
 {
-  double bounds[6] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-    VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
-    VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+  vtkBoundingBox bbox;
+  bbox.AddBox(this->GeometryBounds);
 
-  // Don't use vtkMath::UninitializeBounds() since it sets it to {1,-1,..} which
-  // can cause incorrect parellel reduction for bounds when calling
-  // vtkPVSynchronizedRenderWindows::SynchronizeBounds();
-  // vtkMath::UninitializeBounds(bounds);
 
-  if (this->GeometryBounds.IsValid())
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    this->GeometryBounds.GetBounds(bounds);
+    // get local bounds to consider 3D widgets correctly.
+    // if ComputeVisiblePropBounds is called when there's no real window on the
+    // local process, all vtkWidgetRepresentations return wacky Z bounds which
+    // screws up the renderer and we don't see any images. Hence we only do this
+    // on the driver nodes. There will always be a render window on the driver
+    // nodes.
+
+    this->CenterAxes->SetUseBounds(0);
+    double prop_bounds[6];
+    this->GetRenderer()->ComputeVisiblePropBounds(prop_bounds);
+    this->CenterAxes->SetUseBounds(1);
+
+
+    bbox.AddBounds(prop_bounds);
     }
 
   // sync up bounds across all processes when doing distributed rendering.
+  double bounds[6];
+  bbox.GetBounds(bounds);
   this->SynchronizedWindows->SynchronizeBounds(bounds);
 
   if (!vtkMath::AreBoundsInitialized(bounds))
