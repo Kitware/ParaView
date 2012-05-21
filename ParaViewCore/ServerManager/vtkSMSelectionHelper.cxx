@@ -27,6 +27,7 @@
 #include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -37,7 +38,6 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSession.h"
@@ -63,7 +63,8 @@ void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
   vtkSMSession* session,
   vtkSelectionNode* selection,
-  vtkSMProxy* selSource /*=NULL*/)
+  vtkSMProxy* selSource,
+  bool ignore_composite_keys)
 {
   assert("Session need to be provided and need to be valid" && session);
 
@@ -97,12 +98,13 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     // we need to choose between IDSelectionSource,
     // CompositeDataIDSelectionSource and HierarchicalDataIDSelectionSource.
     proxyname = "IDSelectionSource";
-    if (selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
+    if (!ignore_composite_keys && selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
       {
       proxyname = "CompositeDataIDSelectionSource";
       use_composite = true;
       }
-    else if (selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) && 
+    else if (!ignore_composite_keys &&
+      selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) && 
        selProperties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()))
       {
       proxyname = "HierarchicalDataIDSelectionSource";
@@ -282,7 +284,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-  vtkSMSession* session, vtkSelection* selection)
+  vtkSMSession* session, vtkSelection* selection, bool ignore_composite_keys)
 {
   vtkSMProxy* selSource= 0;
   unsigned int numNodes = selection->GetNumberOfNodes(); 
@@ -290,7 +292,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
     {
     vtkSelectionNode* node = selection->GetNode(cc);
     selSource = vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-      session, node, selSource);
+      session, node, selSource, ignore_composite_keys);
     }
   if (selSource)
     {
@@ -650,6 +652,20 @@ namespace
       }
     return NULL;
     }
+
+  bool vtkInputIsComposite(vtkSMProxy* proxy)
+    {
+    vtkSMPropertyHelper helper(proxy, "Input", true);
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+      helper.GetAsProxy(0));
+    if (input)
+      {
+      vtkPVDataInformation* info = input->GetDataInformation(
+        helper.GetOutputPort(0));
+      return (info->GetCompositeDataSetType() != -1);
+      }
+    return false;
+    }
 };
 
 //----------------------------------------------------------------------------
@@ -676,9 +692,14 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
       continue;
       }
 
+    // determine if input dataset to this representation is a composite dataset,
+    // if not, we ignore the composite-ids that may be present in the selection.
+    bool input_is_composite_dataset = vtkInputIsComposite(reprProxy);
+
     vtkSMProxy* selSource =
       vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-        view->GetSession(), iter->second.GetPointer());
+        view->GetSession(), iter->second.GetPointer(),
+        input_is_composite_dataset == false);
     if (!selSource)
       {
       continue;

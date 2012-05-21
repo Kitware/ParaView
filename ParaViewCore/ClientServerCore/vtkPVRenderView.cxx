@@ -525,7 +525,6 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
 
-
   vtkSmartPointer<vtkSelection> sel;
   if (this->SynchronizedWindows->GetEnabled() ||
     this->SynchronizedWindows->GetLocalProcessIsDriver())

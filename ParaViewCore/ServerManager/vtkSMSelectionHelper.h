@@ -46,7 +46,8 @@ public:
   // handle all other types of selection but that's not required currently and
   // hence we not adding that code.
   static vtkSMProxy* NewSelectionSourceFromSelection(
-    vtkSMSession* session, vtkSelection* selection);
+    vtkSMSession* session, vtkSelection* selection,
+    bool ignore_composite_keys=false);
 
   static void NewSelectionSourcesFromSelection(
     vtkSelection* selection, vtkSMProxy* view,
@@ -82,7 +83,8 @@ private:
   void operator=(const vtkSMSelectionHelper&); // Not implemented.
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
-    vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource=0);
+    vtkSMSession*, vtkSelectionNode* selection, vtkSMProxy* selSource,
+    bool ignore_composite_keys);
 
   static vtkSMProxy* ConvertInternal(
     vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
