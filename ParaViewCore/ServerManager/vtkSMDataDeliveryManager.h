@@ -29,7 +29,7 @@
 #define __vtkSMDataDeliveryManager_h
 
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"
+#include "vtkWeakPointer.h" // needed for iVars
 class vtkSMViewProxy;
 
 class VTK_EXPORT vtkSMDataDeliveryManager : public vtkSMObject
