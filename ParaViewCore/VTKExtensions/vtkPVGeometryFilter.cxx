@@ -362,6 +362,8 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
   int updatePiece, int updateNumPieces, int updateGhosts,
   int *wholeExtent, bool extractface[6] )
 {
+  (void)updateNumPieces;
+  (void)updateGhosts;
 
 //  if (this->UseOutline /*&& this->MakeOutlineOfInput*/ )
 //  {
@@ -513,14 +515,12 @@ void vtkPVGeometryFilter::CleanupOutputData(
   if (this->GenerateProcessIds && output && output->GetNumberOfPoints() > 0)
     {
     // add process ids array.
-    int numProcs = this->Controller?
-      this->Controller->GetNumberOfProcesses() : 1;
     int procId  = this->Controller? this->Controller->GetLocalProcessId() : 0;
     vtkIdType numPoints = output->GetNumberOfPoints();
     vtkNew<vtkUnsignedIntArray> array;
-    array->SetNumberOfTuples(output->GetNumberOfPoints());
+    array->SetNumberOfTuples(numPoints);
     unsigned int* ptr = array->GetPointer(0);
-    for (vtkIdType cc=0; cc < output->GetNumberOfPoints(); cc++)
+    for (vtkIdType cc=0; cc < numPoints; cc++)
       {
       ptr[cc] = static_cast<unsigned int>(procId);
       }
