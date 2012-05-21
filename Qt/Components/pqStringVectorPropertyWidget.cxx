@@ -171,7 +171,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
     this->addPropertyLink(tree->activeModel(), "values",
       SIGNAL(valuesChanged()), property);
 
-    // FIXME: HIDE WIDGET LABEL
+    // hide widget label
+    setShowLabel(false);
+
     layout->addWidget(tree);
     }
   else if(vtkSMArraySelectionDomain *asd = vtkSMArraySelectionDomain::SafeDownCast(domain))
@@ -185,7 +187,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
       selectorWidget, proxy->GetPropertyName(property),
       SIGNAL(widgetModified()), property);
 
-    // FIXME: HIDE WIDGET LABEL
+    // hide widget label
+    setShowLabel(false);
 
     layout->addWidget(selectorWidget);
    }
