@@ -16,6 +16,8 @@
 // .SECTION Description
 // vtkGlyph3DRepresentation is a representation that uses the vtkGlyph3DMapper
 // for rendering glyphs.
+// Note that vtkGlyph3DRepresentation requires that the "glyph" source data is
+// available on all rendering processes.
 
 #ifndef __vtkGlyph3DRepresentation_h
 #define __vtkGlyph3DRepresentation_h
@@ -24,8 +26,7 @@
 
 class vtkGlyph3DMapper;
 class vtkPVArrowSource;
-class vtkUnstructuredDataDeliveryFilter;
-class vtkPVUpdateSuppressor;
+
 class VTK_EXPORT vtkGlyph3DRepresentation : public vtkGeometryRepresentation
 {
 public:
@@ -107,13 +108,8 @@ protected:
 
   vtkGlyph3DMapper* GlyphMapper;
   vtkGlyph3DMapper* LODGlyphMapper;
-  vtkPVUpdateSuppressor* GlyphUpdateSuppressor;
-  vtkPVUpdateSuppressor* LODGlyphUpdateSuppressor;
 
   vtkPVLODActor* GlyphActor;
-  vtkQuadricClustering* GlyphDecimator;
-  vtkUnstructuredDataDeliveryFilter* DataCollector;
-  vtkUnstructuredDataDeliveryFilter* LODDataCollector;
   vtkPVArrowSource* DummySource;
 
   bool MeshVisibility;
