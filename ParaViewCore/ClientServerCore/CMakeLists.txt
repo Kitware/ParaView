@@ -88,6 +88,7 @@ SET (Kit_SRCS
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
+  vtkPVRayCastPickingHelper.cxx
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSILInformation.cxx

@@ -46,32 +46,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 // ParaView includes.
-#include "vtkInteractorStyleRubberBandZoom.h"
-#include "vtkMemberFunctionCommand.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMOutputPort.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMProxySelectionModel.h"
-#include "vtkSMRenderViewProxy.h"
-
-// TMP --- begin
 #include "pqPipelineSource.h"
 #include "vtkCamera.h"
 #include "vtkCell.h"
 #include "vtkCollection.h"
+#include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkMath.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkNew.h"
-#include "vtkPVExtractSelection.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSelection.h"
-#include "vtkSelectionNode.h"
-#include "vtkUnstructuredGrid.h"
-// TMP --- end
+#include "vtkSmartPointer.h"
 
 #include "zoom.xpm"
 
@@ -473,88 +468,48 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
       {
       vtkSMRenderViewProxy* renderViewProxy =
           this->Internal->RenderView->getRenderViewProxy();
+      vtkSMSessionProxyManager* spxm = renderViewProxy->GetSessionProxyManager();
 
-      pqDataRepresentation* picked = this->Internal->RenderView->pick(region);
-      if (picked)
+      vtkNew<vtkCollection> representations;
+      vtkNew<vtkCollection> sources;
+      renderViewProxy->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+
+      if(representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
         {
-        vtkSMSessionProxyManager* spxm =
-            this->Internal->RenderView->getServer()->proxyManager();
+        vtkSMPVRepresentationProxy* rep =
+            vtkSMPVRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
+        vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
+        vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
 
-        vtkNew<vtkCollection> representations;
-        vtkNew<vtkCollection> sources;
-        renderViewProxy->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+        // Picking info
+        double display[3] = { region[0], region[1], 0.5 };
+        double linePoint1[3], linePoint2[3];
+        double* world;
 
-        if(representations->GetNumberOfItems() == 1 && sources->GetNumberOfItems() == 1)
+        vtkRenderer* renderer = renderViewProxy->GetRenderer();
+        renderer->SetDisplayPoint(display);
+        renderer->DisplayToWorld();
+        world = renderer->GetWorldPoint();
+        for (int i=0; i < 3; i++)
           {
-          vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
-
-          // Create selection extract filter
-          vtkSMSourceProxy* filter =
-              vtkSMSourceProxy::SafeDownCast(
-                spxm->NewProxy("filters","PVExtractSelection"));
-          vtkSMPropertyHelper(filter, "Input").Set( picked->getInput()->getProxy() );
-          vtkSMPropertyHelper(filter, "Selection").Set( source );
-
-          filter->UpdateVTKObjects();
-          filter->UpdatePipeline();
-
-          vtkPVExtractSelection* f = vtkPVExtractSelection::SafeDownCast(filter->GetClientSideObject());
-          vtkUnstructuredGrid* grid = vtkUnstructuredGrid::SafeDownCast(f->GetOutput());
-          if(grid->GetNumberOfCells() == 1 && grid->GetCell(0)->GetCellDimension() == 2 && grid->GetNumberOfPoints() > 2)
-            {
-            // Plane info
-            double a[3], b[3], c[3], normal[3], d;
-            grid->GetPoint(0,a);
-            grid->GetPoint(1,b);
-            grid->GetPoint(2,c);
-            double v1[3] = {c[0]- a[0], c[1]- a[1], c[2]- a[2]};
-            double v2[3] = {c[0]- b[0], c[1]- b[1], c[2]- b[2]};
-            vtkMath::Cross(v1, v2, normal);
-            d = (a[0]*normal[0] + a[1]* normal[1] + a[2]*normal[2]);
-
-            // Picking info
-            double display[3] = {region[0], region[1], renderViewProxy->GetZBufferValue(region[0], region[1])};
-            double center[3];
-            double tmp[3];
-            double* world;
-            double lookVector[3];
-            vtkRenderer* renderer = renderViewProxy->GetRenderer();
-            renderer->SetDisplayPoint(display);
-            renderer->DisplayToWorld();
-            world = renderer->GetWorldPoint();
-            for (int i=0; i < 3; i++)
-              {
-              center[i] = world[i] / world[3];
-              }
-            renderer->GetActiveCamera()->GetFocalPoint(lookVector);
-            renderer->GetActiveCamera()->GetPosition(tmp);
-            lookVector[0] -= tmp[0];
-            lookVector[1] -= tmp[1];
-            lookVector[2] -= tmp[2];
-
-            // Start computing intersection
-            double right = d;
-            double left = 0;
-            for(int i=0;i<3;i++)
-              {
-              right -= normal[i]*center[i];
-              left += lookVector[i]*normal[i];
-              }
-            double t = right / left;
-
-             // Find intersection
-            emit intersectionFinished(
-                  lookVector[0]*t + center[0],
-                  lookVector[1]*t + center[1],
-                  lookVector[2]*t + center[2]);
-            }
-          else
-            {
-            cout << "Invalid cell dimension !!!" << endl;
-            }
-
-          filter->Delete();
+          linePoint1[i] = world[i] / world[3];
           }
+        renderer->GetActiveCamera()->GetPosition(linePoint2);
+
+        // Compute the  intersection...
+        double intersection[3] = {0,0,0};
+        vtkSMProxy* pickingHelper = spxm->NewProxy("misc","PickingHelper");
+        vtkSMPropertyHelper(pickingHelper, "Input").Set( input );
+        vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
+        vtkSMPropertyHelper(pickingHelper, "PointA").Set(linePoint1, 3);
+        vtkSMPropertyHelper(pickingHelper, "PointB").Set(linePoint2, 3);
+        pickingHelper->UpdateVTKObjects();
+        pickingHelper->UpdateProperty("Update",1);
+        vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
+        vtkSMPropertyHelper(pickingHelper, "Intersection").Get(intersection, 3);
+        pickingHelper->Delete();
+
+        emit intersectionFinished(intersection[0], intersection[1], intersection[2]);
         }
       else
         {
