@@ -46,8 +46,11 @@ def ComputeAnnotation(self, inputDS, expression, t_value = 0, t_steps = [0,1], t
 
     # handle multi-block
     inputMB = []
-    for block in input:
-       inputMB.append(block)
+    try:
+        for block in input:
+            inputMB.append(block)
+    except:
+        pass
 
     # Add time informations in current namespace
     t_index = 0
