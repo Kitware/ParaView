@@ -87,7 +87,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
     return;
     }
 
-  cout << "Request Delivery: " <<  keys_to_deliver.size() << endl;
+  //cout << "Request Delivery: " <<  keys_to_deliver.size() << endl;
   vtkTimerLog::MarkStartEvent("vtkSMDataDeliveryManager: Deliver Geometry");
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
