@@ -112,15 +112,12 @@ public:
     { }
 
     void SetDataObject(vtkDataObject* data)
-      {
-      if (data != this->DataObject ||
-        (data && data->GetMTime() > this->TimeStamp))
-        {
-        vtkTimeStamp ts; ts.Modified();
-        this->TimeStamp = ts;
-        }
+      { 
       this->DataObject = data;
       this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
+
+      vtkTimeStamp ts; ts.Modified();
+      this->TimeStamp = ts;
       }
 
     void SetDeliveredDataObject(vtkDataObject* data)

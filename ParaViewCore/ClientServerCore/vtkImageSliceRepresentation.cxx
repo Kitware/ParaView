@@ -165,7 +165,7 @@ int vtkImageSliceRepresentation::RequestData(vtkInformation* request,
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
-    this->UpdateSliceData(inputVector);
+    this->UpdateSliceData(inputVector); 
     this->CacheKeeper->Update();
     }
 
@@ -239,6 +239,7 @@ void vtkImageSliceRepresentation::UpdateSliceData(
   // vtkExtractVOI is not passing correct origin. Until that's fixed, I
   // will just use the input origin/spacing to compute the bounds.
   this->SliceData->SetOrigin(input->GetOrigin());
+
   voi->Delete();
   clone->Delete();
 }
