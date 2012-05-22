@@ -39,13 +39,28 @@ vtkPrismRepresentation::~vtkPrismRepresentation()
 
 }
 
-//----------------------------------------------------------------------------
-bool vtkPrismRepresentation::GenerateMetaData(vtkInformation *inInfo, vtkInformation* outInfo)
-{
-  bool ret_val = this->Superclass::GenerateMetaData(inInfo, outInfo);
 
-  if (!ret_val ||
-    this->GeometryFilter->GetTotalNumberOfInputConnections() == 0)
+//----------------------------------------------------------------------------
+int vtkPrismRepresentation::ProcessViewRequest(vtkInformationRequestKey* request,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (!this->Superclass::ProcessViewRequest(request, inInfo, outInfo))
+    {
+    return 0;
+    }
+
+  if (request == vtkPVView::REQUEST_UPDATE())
+    {
+    this->GetPrismMetaData(outInfo);
+    }
+  return 1;
+}
+
+
+//----------------------------------------------------------------------------
+bool vtkPrismRepresentation::GetPrismMetaData(vtkInformation* outInfo)
+{
+  if (this->GeometryFilter->GetTotalNumberOfInputConnections() == 0)
     {
     return false;
     }

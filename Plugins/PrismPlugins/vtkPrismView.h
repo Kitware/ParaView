@@ -76,8 +76,9 @@ public:
   static vtkInformationIntegerKey* PRISM_TABLE_ID();
 
   // Description:
-  // Calls vtkView::REQUEST_INFORMATION() on all representations
-  void GatherRepresentationInformation();
+  // Overridden to use the meta-data obtained from vtkPrismRepresentation as
+  // appropriate.
+  virtual void Update();
 
   // Description:
   // Set / Get the world scale mode for each axis.
