@@ -211,27 +211,13 @@ void vtkPVStreamingView::ResetCameraClippingRange()
 {
   //extend the bounds we use whenever we find a piece that is outside of what
   //we've used before.
-  int i;
-  for (i = 0; i < 6; i+=2)
-    {
-    if (this->LastComputedBounds[i] < this->RunningBounds[i])
-      {
-      this->RunningBounds[i] = this->LastComputedBounds[i];
-      }
-    }
-  for (i = 1; i < 6; i+=2)
-    {
-    if (this->LastComputedBounds[i] > this->RunningBounds[i])
-      {
-      this->RunningBounds[i] = this->LastComputedBounds[i];
-      }
-    }
-  for (i = 0; i<6; i++)
-    {
-    this->LastComputedBounds[i] = this->RunningBounds[i];
-    }
+  vtkBoundingBox runningBox(this->RunningBounds);
+  runningBox.AddBox(this->GeometryBounds);
 
-  this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange
-    (this->LastComputedBounds);
+  runningBox.GetBounds(this->RunningBounds);
+  this->GeometryBounds.SetBounds(this->RunningBounds);
+
+  this->GetRenderer()->ResetCameraClippingRange(this->RunningBounds);
+  this->GetNonCompositedRenderer()->ResetCameraClippingRange(
+    this->RunningBounds);
 }
