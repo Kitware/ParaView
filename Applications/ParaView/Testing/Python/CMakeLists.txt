@@ -88,6 +88,10 @@ IF ("1" STREQUAL ${HAS_NUMPY})
       ${PARAVIEW_PYTHON_EXECUTABLE}
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
       ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py)
+  add_test("pvpython.TestPythonAnnotationFilterNoMerge"
+      ${PARAVIEW_PYTHON_EXECUTABLE}
+      --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
+      ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilterNoMerge.py)
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 ENDIF (PARAVIEW_DATA_ROOT)
