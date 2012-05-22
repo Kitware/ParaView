@@ -124,10 +124,8 @@ protected:
 
   vtkCellPointsFilter* PointsFilter;
   vtk1DTransferFunctionFilter* ArrayToRadiusFilter;
-  vtk1DTransferFunctionFilter* LODArrayToRadiusFilter;
 
   vtk1DTransferFunctionFilter* ArrayToOpacityFilter;
-  vtk1DTransferFunctionFilter* LODArrayToOpacityFilter;
 
   vtkPointSpriteProperty* PSProperty;
 

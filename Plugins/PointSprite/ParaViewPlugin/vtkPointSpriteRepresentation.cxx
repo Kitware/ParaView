@@ -29,6 +29,7 @@
 #include "vtkPVLODActor.h"
 #include "vtkTexture.h"
 #include "vtkTwoScalarsToColorsPainter.h"
+#include "vtkPVCacheKeeper.h"
 
 vtkStandardNewMacro(vtkPointSpriteRepresentation);
 vtkCxxSetObjectMacro(vtkPointSpriteRepresentation, TextureInternal, vtkTexture);
@@ -42,9 +43,7 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   cpf->SetVertexCells(1);
 
   this->ArrayToRadiusFilter = vtk1DTransferFunctionFilter::New();
-  this->LODArrayToRadiusFilter = vtk1DTransferFunctionFilter::New();
   this->ArrayToOpacityFilter = vtk1DTransferFunctionFilter::New();
-  this->LODArrayToOpacityFilter = vtk1DTransferFunctionFilter::New();
   this->PSProperty = vtkPointSpriteProperty::New();
 
   // replace the superclass's property.
@@ -84,14 +83,6 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
   this->RadiusTransferFunctionChooser->SetLookupTableTransferFunction(
     this->RadiusTableTransferFunction);
 
-  this->LODArrayToRadiusFilter->SetEnabled(0);
-  this->LODArrayToRadiusFilter->SetConcatenateOutputNameWithInput(0);
-  this->LODArrayToRadiusFilter->SetOutputArrayName("ArrayMappedToRadius");
-  this->LODArrayToRadiusFilter->SetForceSameTypeAsInputArray(0);
-  this->LODArrayToRadiusFilter->SetOutputArrayType(VTK_FLOAT);
-  this->LODArrayToRadiusFilter->SetTransferFunction(
-    this->RadiusTransferFunctionChooser);
-
   this->ArrayToOpacityFilter->SetEnabled(0);
   this->ArrayToOpacityFilter->SetConcatenateOutputNameWithInput(0);
   this->ArrayToOpacityFilter->SetOutputArrayName("ArrayMappedToOpacity");
@@ -103,14 +94,6 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
     this->OpacityGaussianTransferFunction);
   this->OpacityTransferFunctionChooser->SetLookupTableTransferFunction(
     this->OpacityTableTransferFunction);
-
-  this->LODArrayToOpacityFilter->SetEnabled(0);
-  this->LODArrayToOpacityFilter->SetConcatenateOutputNameWithInput(0);
-  this->LODArrayToOpacityFilter->SetOutputArrayName("ArrayMappedToOpacity");
-  this->LODArrayToOpacityFilter->SetForceSameTypeAsInputArray(0);
-  this->LODArrayToOpacityFilter->SetOutputArrayType(VTK_FLOAT);
-  this->LODArrayToOpacityFilter->SetTransferFunction(
-    this->OpacityTransferFunctionChooser);
 
   this->PSProperty->SetRadiusArrayName("ArrayMappedToRadius");
   this->ScalarsToColorsPainter->SetOpacityArrayName("ArrayMappedToOpacity");
@@ -143,17 +126,10 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
 
   // change the pipeline setup by the superclass to insert our filters in it.
   this->ArrayToRadiusFilter->SetInputConnection(
-    this->Mapper->GetInputConnection(0, 0));
+    this->CacheKeeper->GetInputConnection(0, 0));
   this->ArrayToOpacityFilter->SetInputConnection(
     this->ArrayToRadiusFilter->GetOutputPort());
-  this->Mapper->SetInputConnection(this->ArrayToOpacityFilter->GetOutputPort());
-
-  this->LODArrayToRadiusFilter->SetInputConnection(
-    this->LODMapper->GetInputConnection(0, 0));
-  this->LODArrayToOpacityFilter->SetInputConnection(
-    this->LODArrayToRadiusFilter->GetOutputPort());
-  this->LODMapper->SetInputConnection(
-    this->LODArrayToOpacityFilter->GetOutputPort());
+  this->CacheKeeper->SetInputConnection(this->ArrayToOpacityFilter->GetOutputPort());
 
   // Setup default textures.
   this->SphereTexture = vtkTexture::New();
@@ -182,9 +158,7 @@ vtkPointSpriteRepresentation::vtkPointSpriteRepresentation()
 vtkPointSpriteRepresentation::~vtkPointSpriteRepresentation()
 {
   this->ArrayToRadiusFilter->Delete();
-  this->LODArrayToRadiusFilter->Delete();
   this->ArrayToOpacityFilter->Delete();
-  this->LODArrayToOpacityFilter->Delete();
   this->PointSpriteDefaultPainter->Delete();
   this->LODPointSpriteDefaultPainter->Delete();
   this->DepthSortPainter->Delete();
@@ -224,33 +198,33 @@ void vtkPointSpriteRepresentation::SetTexture(vtkTexture* texture)
 }
 
 //***************************************************************************
-// Forwarded to ArrayToRadiusFilter and LODArrayToRadiusFilter
+// Forwarded to ArrayToRadiusFilter
 void vtkPointSpriteRepresentation::SetRadiusTransferFunctionEnabled(int val)
 {
   this->ArrayToRadiusFilter->SetEnabled(val);
-  this->LODArrayToRadiusFilter->SetEnabled(val);
+  this->MarkModified();
 }
 
 void vtkPointSpriteRepresentation::SetRadiusArrayToProcess(
   int a, int b, int c, int d, const char* e)
 {
   this->ArrayToRadiusFilter->SetInputArrayToProcess(a, b, c, d, e);
-  this->LODArrayToRadiusFilter->SetInputArrayToProcess(a, b, c, d, e);
+  this->MarkModified();
 }
 
 //***************************************************************************
-// Forwarded to ArrayToOpacityFilter and LODArrayToOpacityFilter
+// Forwarded to ArrayToOpacityFilter
 void vtkPointSpriteRepresentation::SetOpacityTransferFunctionEnabled(int val)
 {
   this->ArrayToOpacityFilter->SetEnabled(val);
-  this->LODArrayToOpacityFilter->SetEnabled(val);
+  this->MarkModified();
 }
 
 void vtkPointSpriteRepresentation::SetOpacityArrayToProcess(
   int a, int b, int c, int d, const char* e)
 {
   this->ArrayToOpacityFilter->SetInputArrayToProcess(a, b, c, d, e);
-  this->LODArrayToOpacityFilter->SetInputArrayToProcess(a, b, c, d, e);
+  this->MarkModified();
 }
 
 //***************************************************************************
