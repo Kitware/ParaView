@@ -18,16 +18,20 @@
 // and integration filter but I also want a dual grid iso surface filter
 // so I mad it a separate class.  The API needs to be improved to make
 // it more generally useful.
+// This class will take advantage of some meta information, if available
+// from a coprocessing adaptor.  If not available, it will compute the 
+// information.
 
 #ifndef __vtkAMRDualGridHelper_h
 #define __vtkAMRDualGridHelper_h
 
 #include "vtkObject.h"
-#include <std/vector>
-#include <std/map>
+#include <vector>
+#include <map>
 
 class vtkDataArray;
 class vtkIntArray;
+class vtkIdTypeArray;
 class vtkNonOverlappingAMR;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperLevel;

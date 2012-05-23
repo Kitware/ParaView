@@ -35,8 +35,8 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include "std/list"
-#include "std/vector"
+#include <list>
+#include <vector>
 
 #include "vtksys/SystemTools.hxx"
 
@@ -2280,6 +2280,9 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
     this->Levels.push_back(tmp);
     }
 
+  // These arrays are meta information passed from the coprocessing
+  // adaptor when connected to the simulation.  These are not 
+  // available when post-processing a file.
   vtkFieldData *inputFd = input->GetFieldData();
   vtkDoubleArray *globalBoundsDa
     = vtkDoubleArray::SafeDownCast (inputFd->GetArray("GlobalBounds"));
@@ -2292,6 +2295,7 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
   vtkIntArray *neighbors
     = vtkIntArray::SafeDownCast (inputFd->GetArray("Neighbors"));
 
+  // Take advantage of passed in global information if available
   if (globalBoundsDa && standardBoxSizeIa && minLevelIa && minLevelSpacingDa) 
     {
     this->GlobalOrigin[0] = globalBoundsDa->GetValue (0);
@@ -2313,6 +2317,7 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
     }
   else
     {
+    // Otherwise compute the global info by communication with all processes
     this->ComputeGlobalMetaData(input);
     }
 
@@ -2334,11 +2339,14 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
 
   if (neighbors) 
     {
+    // if we have passed neighbor information, use this to send blocks only to those
+    // All processes will only have blocks from neigbhoring processes
     vtkSortDataArray::Sort (neighbors);
     this->ShareBlocksWithNeighbors (neighbors);
     }
   else
     {
+    // otherwise share block information with all processes
     // All processes will have all blocks (but not image data).
     this->ShareBlocks();
     }
