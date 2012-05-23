@@ -35,8 +35,8 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-#include "vtkstd/list"
-#include "vtkstd/vector"
+#include "std/list"
+#include "std/vector"
 
 #include "vtksys/SystemTools.hxx"
 
@@ -126,7 +126,7 @@ public:
   int Level;
 
   void CreateBlockFaces(vtkAMRDualGridHelperBlock* block, int x, int y, int z);
-  vtkstd::vector<vtkAMRDualGridHelperBlock*> Blocks;
+  std::vector<vtkAMRDualGridHelperBlock*> Blocks;
 
   // I need my own container because the 2D
   // grid can expand in all directions.
@@ -179,7 +179,7 @@ struct vtkAMRDualGridHelperCommRequest
 // This class is a STL list of vtkAMRDualGridHelperCommRequest structs with some
 // helper methods added.
 class vtkAMRDualGridHelperCommRequestList
-  : public vtkstd::list<vtkAMRDualGridHelperCommRequest>
+  : public std::list<vtkAMRDualGridHelperCommRequest>
 {
 public:
   // Description:
@@ -1394,7 +1394,7 @@ void vtkAMRDualGridHelper::DegenerateRegionMessageSize(vtkIdTypeArray* srcProcs,
   // that the queue will be the same on all processes.  Message/region lengths
   // are computed implicitely.
 
-  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
+  std::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
   for (region = this->DegenerateRegionQueue.begin();
        region != this->DegenerateRegionQueue.end(); region++)
     {
@@ -1848,7 +1848,7 @@ void vtkAMRDualGridHelper::MarshalDegenerateRegionMessage(void *messagePtr,
 {
   int myProcId = this->Controller->GetLocalProcessId();
 
-  vtkstd::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
+  std::vector<vtkAMRDualGridHelperDegenerateRegion>::iterator region;
   for (region = this->DegenerateRegionQueue.begin();
        region != this->DegenerateRegionQueue.end(); region++)
     {
