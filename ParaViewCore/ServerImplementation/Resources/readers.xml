@@ -3847,10 +3847,15 @@
               proxygroup="internal_sources" proxyname="XMLPolyDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -3905,10 +3910,15 @@
               proxyname="XMLUnstructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -3964,10 +3974,15 @@
               proxyname="XMLImageDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4023,10 +4038,15 @@
               proxyname="XMLStructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4081,10 +4101,15 @@
               proxyname="XMLRectilinearGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4138,10 +4163,15 @@
               proxygroup="internal_sources" proxyname="XMLPPolyDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4197,10 +4227,15 @@
               proxyname="XMLPUnstructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4255,10 +4290,15 @@
               proxyname="XMLPImageDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4314,10 +4354,15 @@
               proxyname="XMLPStructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4373,10 +4418,15 @@
               proxyname="XMLPRectilinearGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -6116,10 +6166,15 @@
          proxygroup="internal_sources" proxyname="AVSucdReader">
        </Proxy>
        <ExposedProperties>
-          <Property name="CellArrayInfo" />
-          <Property name="CellArrayStatus" />
-          <Property name="PointArrayInfo" />
-          <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -6592,8 +6647,8 @@
           proxygroup="internal_sources" proxyname="FLUENTReaderCore">
         </Proxy>
         <ExposedProperties>
-          <Property name="CellArrayInfo" />
-          <Property name="CellArrayStatus" />
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
         </ExposedProperties>
       </SubProxy>
      <Hints>
