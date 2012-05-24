@@ -30,6 +30,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <assert.h>
 
@@ -85,9 +86,18 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
   int subId;
   double pcoord[3];
 
+  // Manage multi-process distribution
+  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
+  int pid = controller->GetLocalProcessId();
+  int numberOfProcesses = controller->GetNumberOfProcesses();
+
   vtkNew<vtkPVExtractSelection> extractSelectionFilter;
   extractSelectionFilter->SetInputConnection(0,this->Input->GetOutputPort(0));
   extractSelectionFilter->SetInputConnection(1,this->Selection->GetOutputPort(0));
+  vtkStreamingDemandDrivenPipeline* executive =
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(
+        extractSelectionFilter->GetExecutive());
+  executive->SetUpdateExtent(0, pid, numberOfProcesses, 0);
   extractSelectionFilter->Update();
   vtkDataSet* ds = vtkDataSet::SafeDownCast(extractSelectionFilter->GetOutput());
   vtkCompositeDataSet* cds =
@@ -124,10 +134,14 @@ void vtkPVRayCastPickingHelper::ComputeIntersection()
       }
     }
 
-  // Now do the global reduction so every node will get the right localtion
-  vtkMultiProcessController* controller = vtkMultiProcessController::GetGlobalController();
-  if(controller->GetNumberOfProcesses() > 1)
+  // If distributed do a global reduction and make sure the root node get the
+  // right value. We don't care about the other nodes...
+  if(numberOfProcesses > 1)
     {
-    controller->AllReduce(this->Intersection, this->Intersection, 3, vtkCommunicator::SUM_OP);
+    double result[3];
+    controller->Reduce(this->Intersection, result, 3, vtkCommunicator::SUM_OP, 0);
+    this->Intersection[0] = result[0];
+    this->Intersection[1] = result[1];
+    this->Intersection[2] = result[2];
     }
 }
