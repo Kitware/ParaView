@@ -114,6 +114,12 @@ public:
   vtkBooleanMacro(PassThroughPointIds,int);
 
   // Description:
+  // If on, point arrays named vtkProcessId is added.
+  vtkSetMacro(GenerateProcessIds, bool);
+  vtkGetMacro(GenerateProcessIds, bool);
+  vtkBooleanMacro(GenerateProcessIds, bool);
+
+  // Description:
   // If off, which is the default, extracts the surface of the data fed
   // into the geometry filter. If on, it produces a bounding box for the
   // input to the filter that is producing that data instead.
@@ -224,6 +230,11 @@ protected:
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
 
+  // Description:
+  // Cleans up the output polydata. If doCommunicate is true the method is free
+  // to communicate with other processes as needed.
+  void CleanupOutputData(vtkPolyData* output, int doCommunicate);
+
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 
   void ChangeUseStripsInternal(int val, int force);
@@ -268,6 +279,7 @@ protected:
   // Convenience method to purge ghost cells.
   void RemoveGhostCells(vtkPolyData*);
 
+  bool GenerateProcessIds;
   int PassThroughCellIds;
   int PassThroughPointIds;
   int ForceUseStrips;

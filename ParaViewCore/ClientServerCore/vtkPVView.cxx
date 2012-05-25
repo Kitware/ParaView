@@ -16,6 +16,7 @@
 
 #include "vtkCacheSizeKeeper.h"
 #include "vtkInformation.h"
+#include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -58,11 +59,24 @@ public:
 vtkPVView::vtkInternals::MapOfSynchronizedWindows
 vtkPVView::vtkInternals::SynchronizedWindows;
 
-vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_INFORMATION, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_PREPARE_FOR_RENDER, Request);
 vtkInformationKeyMacro(vtkPVView, REQUEST_RENDER, Request);
-vtkInformationKeyMacro(vtkPVView, REQUEST_DELIVERY, Request);
+vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE_LOD, Request);
+vtkInformationKeyMacro(vtkPVView, REQUEST_UPDATE, Request);
+vtkInformationKeyRestrictedMacro(vtkPVView, VIEW, ObjectBase, "vtkPVView");
+
+bool vtkPVView::EnableStreaming = false; 
+//----------------------------------------------------------------------------
+void vtkPVView::SetEnableStreaming(bool val)
+{
+  vtkPVView::EnableStreaming = val;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVView::GetEnableStreaming()
+{
+  return vtkPVView::EnableStreaming;
+}
+
 //----------------------------------------------------------------------------
 vtkPVView::vtkPVView()
 {
@@ -265,6 +279,11 @@ void vtkPVView::CallProcessViewRequest(
         }
       }
     }
+
+  // NOTE: This will create a reference loop (depending on what inInfo is). If
+  // it's this->RequestInformation, then we have a loop and hence it's
+  // essential to call vtkInformation::Clear() before this method returns.
+  inInfo->Set(VIEW(), this);
 
   for (int cc=0; cc < num_reprs; cc++)
     {

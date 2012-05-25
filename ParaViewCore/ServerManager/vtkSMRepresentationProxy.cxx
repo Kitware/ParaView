@@ -162,7 +162,10 @@ void vtkSMRepresentationProxy::UpdatePipelineInternal(
 //----------------------------------------------------------------------------
 void vtkSMRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  if ((modifiedProxy != this) && this->ObjectsCreated)
+  if ((modifiedProxy != this) && this->ObjectsCreated &&
+    // this check ensures that for composite representations, we don't end up
+    // marking all representations dirty when a sub-representation is modified.
+    (this->GetSubProxyName(modifiedProxy) == NULL))
     {
     if (!this->MarkedModified)
       {

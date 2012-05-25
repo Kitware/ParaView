@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
+#include "vtkCompositeRepresentation.h"
 #include "vtkDataRepresentation.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdTypeArray.h"
@@ -26,6 +27,7 @@
 #include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
@@ -37,12 +39,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMSession.h"
-#include "vtkUnsignedIntArray.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkView.h"
 
 #include <vector>
@@ -62,7 +63,8 @@ void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
   vtkSMSession* session,
   vtkSelectionNode* selection,
-  vtkSMProxy* selSource /*=NULL*/)
+  vtkSMProxy* selSource,
+  bool ignore_composite_keys)
 {
   assert("Session need to be provided and need to be valid" && session);
 
@@ -96,12 +98,13 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     // we need to choose between IDSelectionSource,
     // CompositeDataIDSelectionSource and HierarchicalDataIDSelectionSource.
     proxyname = "IDSelectionSource";
-    if (selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
+    if (!ignore_composite_keys && selProperties->Has(vtkSelectionNode::COMPOSITE_INDEX()))
       {
       proxyname = "CompositeDataIDSelectionSource";
       use_composite = true;
       }
-    else if (selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) && 
+    else if (!ignore_composite_keys &&
+      selProperties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) && 
        selProperties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()))
       {
       proxyname = "HierarchicalDataIDSelectionSource";
@@ -281,7 +284,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-  vtkSMSession* session, vtkSelection* selection)
+  vtkSMSession* session, vtkSelection* selection, bool ignore_composite_keys)
 {
   vtkSMProxy* selSource= 0;
   unsigned int numNodes = selection->GetNumberOfNodes(); 
@@ -289,7 +292,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelection(
     {
     vtkSelectionNode* node = selection->GetNode(cc);
     selSource = vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
-      session, node, selSource);
+      session, node, selSource, ignore_composite_keys);
     }
   if (selSource)
     {
@@ -596,22 +599,22 @@ bool vtkSMSelectionHelper::MergeSelection(
 namespace
 {
   // Splits \c selection into a collection of selections based on the
-  // SOURCE_ID().
+  // SOURCE().
   void vtkSplitSelection(vtkSelection* selection,
-    std::map<int, vtkSmartPointer<vtkSelection> >& map_of_selections)
+    std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >& map_of_selections)
     {
     for (unsigned int cc=0; cc < selection->GetNumberOfNodes(); cc++)
       {
       vtkSelectionNode* node = selection->GetNode(cc);
-      if (node && node->GetProperties()->Has(vtkSelectionNode::SOURCE_ID()))
+      if (node && node->GetProperties()->Has(vtkSelectionNode::SOURCE()))
         {
-        int source_id =
-          node->GetProperties()->Get(vtkSelectionNode::SOURCE_ID());
-        vtkSelection* sel = map_of_selections[source_id];
+        vtkPVDataRepresentation* repr = vtkPVDataRepresentation::SafeDownCast(
+          node->GetProperties()->Get(vtkSelectionNode::SOURCE()));
+        vtkSelection* sel = map_of_selections[repr];
         if (!sel)
           {
           sel = vtkSelection::New();
-          map_of_selections[source_id] = sel;
+          map_of_selections[repr] = sel;
           sel->FastDelete();
           }
         sel->AddNode(node);
@@ -619,7 +622,8 @@ namespace
       }
     }
 
-  vtkSMProxy* vtkLocateRepresentation(vtkSMProxy* viewProxy, int id)
+  vtkSMProxy* vtkLocateRepresentation(vtkSMProxy* viewProxy,
+    vtkPVDataRepresentation* repr)
     {
     vtkView* view = vtkView::SafeDownCast(viewProxy->GetClientSideObject());
     if (!view)
@@ -628,18 +632,39 @@ namespace
       return NULL;
       }
 
-    vtkDataRepresentation* repr = view->GetRepresentation(id);
     // now locate the proxy for this repr.
     vtkSMPropertyHelper helper(viewProxy, "Representations");
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
       {
       vtkSMProxy* reprProxy = helper.GetAsProxy(cc);
-      if (reprProxy && reprProxy->GetClientSideObject() == repr)
+      vtkPVDataRepresentation* cur_repr = vtkPVDataRepresentation::SafeDownCast(
+        reprProxy? reprProxy->GetClientSideObject() : NULL);
+      if (cur_repr == repr)
+        {
+        return reprProxy;
+        }
+      vtkCompositeRepresentation* compRepr =
+        vtkCompositeRepresentation::SafeDownCast(cur_repr);
+      if (compRepr && compRepr->GetActiveRepresentation() == repr)
         {
         return reprProxy;
         }
       }
     return NULL;
+    }
+
+  bool vtkInputIsComposite(vtkSMProxy* proxy)
+    {
+    vtkSMPropertyHelper helper(proxy, "Input", true);
+    vtkSMSourceProxy* input = vtkSMSourceProxy::SafeDownCast(
+      helper.GetAsProxy(0));
+    if (input)
+      {
+      vtkPVDataInformation* info = input->GetDataInformation(
+        helper.GetOutputPort(0));
+      return (info->GetCompositeDataSetType() != -1);
+      }
+    return false;
     }
 };
 
@@ -652,13 +677,13 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
   // representation that was selected. We now need to create selection source
   // proxies for each representation that was selected separately.
 
-  // This relies on SOURCE_ID() defined on the selection nodes to locate the
+  // This relies on SOURCE() defined on the selection nodes to locate the
   // representation proxy for the representation that was selected.
 
-  std::map<int, vtkSmartPointer<vtkSelection> > selections;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> > selections;
   vtkSplitSelection(selection, selections);
 
-  std::map<int, vtkSmartPointer<vtkSelection> >::iterator iter;
+  std::map<vtkPVDataRepresentation*, vtkSmartPointer<vtkSelection> >::iterator iter;
   for (iter = selections.begin(); iter != selections.end(); ++iter)
     {
     vtkSMProxy* reprProxy = vtkLocateRepresentation(view, iter->first);
@@ -667,9 +692,14 @@ void vtkSMSelectionHelper::NewSelectionSourcesFromSelection(
       continue;
       }
 
+    // determine if input dataset to this representation is a composite dataset,
+    // if not, we ignore the composite-ids that may be present in the selection.
+    bool input_is_composite_dataset = vtkInputIsComposite(reprProxy);
+
     vtkSMProxy* selSource =
       vtkSMSelectionHelper::NewSelectionSourceFromSelection(
-        view->GetSession(), iter->second.GetPointer());
+        view->GetSession(), iter->second.GetPointer(),
+        input_is_composite_dataset == false);
     if (!selSource)
       {
       continue;

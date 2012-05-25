@@ -15,12 +15,13 @@
 #include "vtkPVRenderView.h"
 
 #include "vtk3DWidgetRepresentation.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
-#include "vtkBSPCutsGenerator.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkDataRepresentation.h"
 #include "vtkInformationDoubleKey.h"
+#include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
@@ -31,10 +32,12 @@
 #include "vtkLight.h"
 #include "vtkLightKit.h"
 #include "vtkMath.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkProcessModule.h"
@@ -55,12 +58,14 @@
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
+#include "vtkTrivialProducer.h"
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
@@ -70,13 +75,31 @@
 
 class vtkPVRenderView::vtkInternals
 {
+  std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
+
 public:
-  std::map<void*, int> RepToIdMap;
-  std::map<int, vtkDataRepresentation*> IdToRepMap;
-  int UniqueId;
-  vtkInternals()
+  unsigned int UniqueId;
+  vtkNew<vtkPVDataDeliveryManager> DeliveryManager;
+
+  vtkInternals() : UniqueId(1)
+  {
+  }
+  void RegisterSelectionProp(
+    int id, vtkProp*, vtkPVDataRepresentation* rep)
     {
-    this->UniqueId = 0;
+    this->PropMap[id] = rep;
+    }
+  void UnRegisterSelectionProp(vtkProp* prop, vtkPVDataRepresentation* rep)
+    {
+    (void)prop;
+    (void)rep;
+    }
+
+  vtkPVDataRepresentation* GetRepresentationForPropId(int id)
+    {
+    std::map<int, vtkWeakPointer<vtkPVDataRepresentation> >::iterator iter =
+      this->PropMap.find(id);
+    return (iter != this->PropMap.end()? iter->second : NULL);
     }
 };
 
@@ -87,34 +110,31 @@ public:
 bool vtkPVRenderView::RemoteRenderingAllowed = true;
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkInformationKeyMacro(vtkPVRenderView, GEOMETRY_SIZE, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DATA_DISTRIBUTION_MODE, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_OUTLINE_TO_CLIENT_FOR_LOD, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, DELIVER_LOD_TO_CLIENT, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
-vtkInformationKeyMacro(vtkPVRenderView, REDISTRIBUTABLE_DATA_PRODUCER, ObjectBase);
-vtkInformationKeyMacro(vtkPVRenderView, KD_TREE, ObjectBase);
-vtkInformationKeyMacro(vtkPVRenderView, NEEDS_DELIVERY, Integer);
-
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
   this->Internals = new vtkInternals();
-  this->CounterSynchronizedSuccessfully = true;
+  // non-reference counted, so no worries about reference loops.
+  this->Internals->DeliveryManager->SetRenderView(this);
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
   this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
 
+  this->StillRenderProcesses = vtkPVSession::NONE;
+  this->InteractiveRenderProcesses = vtkPVSession::NONE;
   this->UsedLODForLastRender = false;
+  this->UseLODForInteractiveRender = false;
+  this->UseOutlineForInteractiveRender = false;
+  this->UseDistributedRenderingForStillRender = false;
+  this->UseDistributedRenderingForInteractiveRender = false;
   this->MakingSelection = false;
   this->StillRenderImageReductionFactor = 1;
   this->InteractiveRenderImageReductionFactor = 2;
-  this->GeometrySize = 0;
   this->RemoteRenderingThreshold = 0;
   this->LODRenderingThreshold = 0;
   this->ClientOutlineThreshold = 5;
@@ -139,11 +159,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Selector = vtkPVHardwareSelector::New();
   this->SynchronizationCounter  = 0;
   this->PreviousParallelProjectionStatus = 0;
-
-  this->LastComputedBounds[0] = this->LastComputedBounds[2] =
-    this->LastComputedBounds[4] = -1.0;
-  this->LastComputedBounds[1] = this->LastComputedBounds[3] =
-    this->LastComputedBounds[5] = 1.0;
+  this->NeedsOrderedCompositing = false;
 
   this->SynchronizedRenderers = vtkPVSynchronizedRenderer::New();
 
@@ -192,8 +208,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->LightKit = vtkLightKit::New();
   this->GetRenderer()->AddLight(this->Light);
   this->GetRenderer()->SetAutomaticLightCreation(0);
-
-  this->OrderedCompositingBSPCutsSource = vtkBSPCutsGenerator::New();
 
   if (this->Interactor)
     {
@@ -252,7 +266,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->GetNonCompositedRenderer()->SetRenderWindow(0);
   this->GetRenderer()->SetRenderWindow(0);
 
-
   this->SetLastSelection(NULL);
   this->Selector->Delete();
   this->SynchronizedRenderers->Delete();
@@ -295,11 +308,14 @@ vtkPVRenderView::~vtkPVRenderView()
     this->RubberBandZoom = 0;
     }
 
-  this->OrderedCompositingBSPCutsSource->Delete();
-  this->OrderedCompositingBSPCutsSource = NULL;
-
   delete this->Internals;
   this->Internals = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataDeliveryManager* vtkPVRenderView::GetDeliveryManager()
+{
+  return this->Internals->DeliveryManager.GetPointer();
 }
 
 //----------------------------------------------------------------------------
@@ -339,28 +355,26 @@ void vtkPVRenderView::Initialize(unsigned int id)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
 {
-  if (vtk3DWidgetRepresentation::SafeDownCast(rep) == NULL)
+  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
+  if (dataRep != NULL)
     {
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
     this->SynchronizationCounter++;
-
     unsigned int id = this->Internals->UniqueId++;
-    this->Internals->RepToIdMap[rep] = id;
-    this->Internals->IdToRepMap[id] = rep;
+    this->Internals->DeliveryManager->RegisterRepresentation(id, dataRep);
     }
+
   this->Superclass::AddRepresentationInternal(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
 {
-  if (this->Internals->RepToIdMap.find(rep) !=
-    this->Internals->RepToIdMap.end())
+  vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
+  if (dataRep != NULL)
     {
-    this->Internals->IdToRepMap.erase(
-      this->Internals->RepToIdMap[rep]);
-    this->Internals->RepToIdMap.erase(rep);
+    this->Internals->DeliveryManager->UnRegisterRepresentation(dataRep);
 
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
@@ -368,6 +382,21 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
     }
 
   this->Superclass::RemoveRepresentationInternal(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RegisterPropForHardwareSelection(
+  vtkPVDataRepresentation* repr, vtkProp* prop)
+{
+  int id = this->Selector->AssignUniqueId(prop);
+  this->Internals->RegisterSelectionProp(id, prop, repr);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UnRegisterPropForHardwareSelection(
+  vtkPVDataRepresentation* repr, vtkProp* prop)
+{
+  this->Internals->UnRegisterSelectionProp(prop, repr);
 }
 
 //----------------------------------------------------------------------------
@@ -483,17 +512,7 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
     return;
     }
 
-  if (!this->GetRemoteRenderingAvailable())
-    {
-    vtkErrorMacro("Cannot make selections since remote rendering is not available.");
-    return;
-    }
-
   this->MakingSelection = true;
-
-  // since setting this->MakingSelection to true may change data-delivery needs,
-  // we change the update time.
-  this->UpdateTime.Modified();
 
   // Make sure that the representations are up-to-date. This is required since
   // due to delayed-swicth-back-from-lod, the most recent render maybe a LOD
@@ -505,146 +524,106 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
-  // for now, we always do the process pass. In future, we can be smart about
-  // disabling process pass when not needed.
-  this->Selector->SetProcessID(
-    vtkMultiProcessController::GetGlobalController()?
-    vtkMultiProcessController::GetGlobalController()->GetLocalProcessId() : 0);
 
-  vtkSelection* sel = this->Selector->Select(region);
+  vtkSmartPointer<vtkSelection> sel;
+  if (this->SynchronizedWindows->GetEnabled() ||
+    this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    sel.TakeReference(this->Selector->Select(region));
+    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
+      {
+      // valid selection is only generated on the driver process. Other's are
+      // merely rendering the passes so that the result is composited correctly.
+      this->FinishSelection(sel);
+      }
+    }
 
   // look at ::Render(..,..). We need to disable these once we are done with
   // rendering.
   this->SynchronizedWindows->SetEnabled(false);
   this->SynchronizedRenderers->SetEnabled(false);
 
-  if (sel)
-    {
-    // A valid sel is only generated on the "driver" node. The driver node may not have
-    // the actual data (except in built-in mode). So representations on this
-    // process may not be able to handle ConvertSelection() if call it right here.
-    // Hence we broadcast the selection to all data-server nodes.
-    this->FinishSelection(sel);
-    sel->Delete();
-    }
-  else
-    {
-    vtkErrorMacro("Failed to capture selection.");
-    }
-
   this->MakingSelection = false;
-  this->UpdateTime.Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::FinishSelection(vtkSelection* sel)
 {
   assert(sel != NULL);
-  this->SynchronizedWindows->BroadcastToDataServer(sel);
 
-  // now, sel has PROP_ID() set and not PROP() pointers. We setup the PROP()
-  // pointers, since representations have know knowledge for that the PROP_ID()s
-  // are.
+  // first, convert local-prop ids to ids that the data-server can understand if
+  // the selection was done without compositing, i.e. rendering happened on the
+  // client side.
   for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
     {
     vtkSelectionNode* node = sel->GetNode(cc);
     if (node->GetProperties()->Has(vtkSelectionNode::PROP_ID()))
       {
       int propid = node->GetProperties()->Get(vtkSelectionNode::PROP_ID());
-      vtkProp* prop = this->Selector->GetPropFromID(propid);
-      node->GetProperties()->Set(vtkSelectionNode::PROP(), prop);
+      vtkPVDataRepresentation* repr =
+        this->Internals->GetRepresentationForPropId(propid);
+      if (repr)
+        {
+        node->GetProperties()->Set(vtkSelectionNode::SOURCE(), repr);
+        }
       }
     }
 
-  // Now all processes have the full selection. We can tell the representations
-  // to convert the selections.
-
-  vtkSelection* converted = vtkSelection::New();
-
-  // Now, vtkPVRenderView is in no position to tell how many representations got
-  // selected, and what nodes in the vtkSelection correspond to which
-  // representations. So it simply passes the full vtkSelection to all
-  // representations and asks them to "convert" it. A representation will return
-  // the original selection if it was not selected at all or returns the
-  // converted selection for the part that it can handle, ignoring the rest.
-  for (int i = 0; i < this->GetNumberOfRepresentations(); ++i)
-    {
-    vtkDataRepresentation* repr = this->GetRepresentation(i);
-    vtkSelection* convertedSelection = repr->ConvertSelection(this, sel);
-    if (convertedSelection == NULL|| convertedSelection == sel)
-      {
-      continue;
-      }
-    for (unsigned int cc=0; cc < convertedSelection->GetNumberOfNodes(); cc++)
-      {
-      vtkSelectionNode* node = convertedSelection->GetNode(cc);
-      // update the SOURCE() for the node to be the selected representation.
-      node->GetProperties()->Set(vtkSelectionNode::SOURCE_ID(), i);
-      converted->AddNode(convertedSelection->GetNode(cc));
-      }
-    convertedSelection->Delete();
-    }
-
-  this->SetLastSelection(converted);
-  converted->FastDelete();
-
+  this->SetLastSelection(sel);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
-  //cout << "Clipping Bounds: "
-  //  << this->LastComputedBounds[0] << ", "
-  //  << this->LastComputedBounds[1] << ", "
-  //  << this->LastComputedBounds[2] << ", "
-  //  << this->LastComputedBounds[3] << ", "
-  //  << this->LastComputedBounds[4] << ", "
-  //  << this->LastComputedBounds[5] << endl;
-
-  this->GetRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
-  this->GetNonCompositedRenderer()->ResetCameraClippingRange(this->LastComputedBounds);
+  if (this->GeometryBounds.IsValid())
+    {
+    double bounds[6];
+    this->GeometryBounds.GetBounds(bounds);
+    this->GetRenderer()->ResetCameraClippingRange(bounds);
+    this->GetNonCompositedRenderer()->ResetCameraClippingRange(bounds);
+    }
 }
 
-#define PRINT_BOUNDS(bds)\
-  bds[0] << "," << bds[1] << "," << bds[2] << "," << bds[3] << "," << bds[4] << "," << bds[5] << ","
-
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherBoundsInformation(
-  bool using_distributed_rendering)
+void vtkPVRenderView::SynchronizeGeometryBounds()
 {
-  vtkMath::UninitializeBounds(this->LastComputedBounds);
+  vtkBoundingBox bbox;
+  bbox.AddBox(this->GeometryBounds);
 
-  if (this->GetLocalProcessDoesRendering(using_distributed_rendering))
+
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
-    this->CenterAxes->SetUseBounds(0);
+    // get local bounds to consider 3D widgets correctly.
     // if ComputeVisiblePropBounds is called when there's no real window on the
     // local process, all vtkWidgetRepresentations return wacky Z bounds which
-    // screws up the renderer and we don't see any images.
-    this->GetRenderer()->ComputeVisiblePropBounds(this->LastComputedBounds);
+    // screws up the renderer and we don't see any images. Hence we only do this
+    // on the driver nodes. There will always be a render window on the driver
+    // nodes.
+
+    this->CenterAxes->SetUseBounds(0);
+    double prop_bounds[6];
+    this->GetRenderer()->ComputeVisiblePropBounds(prop_bounds);
     this->CenterAxes->SetUseBounds(1);
+
+
+    bbox.AddBounds(prop_bounds);
     }
 
-  if (using_distributed_rendering)
+  // sync up bounds across all processes when doing distributed rendering.
+  double bounds[6];
+  bbox.GetBounds(bounds);
+  this->SynchronizedWindows->SynchronizeBounds(bounds);
+
+  if (!vtkMath::AreBoundsInitialized(bounds))
     {
-    // sync up bounds across all processes when doing distributed rendering.
-    this->SynchronizedWindows->SynchronizeBounds(this->LastComputedBounds);
+    this->GeometryBounds.SetBounds(-1, 1, -1, 1, -1, 1);
     }
-
-  if (!vtkMath::AreBoundsInitialized(this->LastComputedBounds))
+  else
     {
-    this->LastComputedBounds[0] = this->LastComputedBounds[2] =
-      this->LastComputedBounds[4] = -1.0;
-    this->LastComputedBounds[1] = this->LastComputedBounds[3] =
-      this->LastComputedBounds[5] = 1.0;
+    this->GeometryBounds.SetBounds(bounds);
     }
-  //cout << "Bounds: "
-  //  << this->LastComputedBounds[0] << ", "
-  //  << this->LastComputedBounds[1] << ", "
-  //  << this->LastComputedBounds[2] << ", "
-  //  << this->LastComputedBounds[3] << ", "
-  //  << this->LastComputedBounds[4] << ", "
-  //  << this->LastComputedBounds[5] << endl;
 
+  this->UpdateCenterAxes();
   this->ResetCameraClippingRange();
 }
 
@@ -668,19 +647,17 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
 // Note this is called on all processes.
 void vtkPVRenderView::ResetCamera()
 {
-  // FIXME: Call update only when needed. That can be done at some point in the
-  // future.
+  // Since ResetCamera() is accessible via a property on the view proxy, this
+  // method gets called directly (and on on the vtkSMRenderViewProxy). Hence
+  // we need to ensure things are updated explicitly and cannot rely on the View
+  // proxy to take care of updating the view.
   this->Update();
-
-  // Do all passes needed for rendering so that the geometry in the renderer is
-  // updated. This is essential since the bounds are determined by using the
-  // geometry bounds know to the renders on all processes. If they are not
-  // updated, we will get wrong bounds.
-  this->Render(false, true);
 
   // Remember, vtkRenderer::ResetCamera() calls
   // vtkRenderer::ResetCameraClippingPlanes() with the given bounds.
-  this->RenderView->GetRenderer()->ResetCamera(this->LastComputedBounds);
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
+  this->RenderView->GetRenderer()->ResetCamera(bounds);
 
   this->InvokeEvent(vtkCommand::ResetCameraEvent);
 }
@@ -696,12 +673,15 @@ void vtkPVRenderView::ResetCamera(double bounds[6])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SynchronizeForCollaboration()
+bool vtkPVRenderView::TestCollaborationCounter()
 {
-  this->CounterSynchronizedSuccessfully = false;
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (!activeSession || !activeSession->IsMultiClients())
+    {
+    return true;
+    }
 
-  // Also, can we optimize this further? This happens on every render in
-  // collaborative mode.
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
   vtkMultiProcessController* d_controller = 
@@ -711,64 +691,191 @@ void vtkPVRenderView::SynchronizeForCollaboration()
   if (d_controller != NULL)
     {
     vtkErrorMacro("RenderServer-DataServer configuration is not supported in "
-      "collabortion mode.");
+      "multi-clients mode. Please restart ParaView in the right mode. "
+      "Aborting since this could cause deadlocks and other issues.");
     abort();
     }
 
   if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
     {
-    vtkMultiProcessStream stream;
-    stream << this->SynchronizationCounter << this->RemoteRenderingThreshold;
-    r_controller->Send(stream, 1, 41000);
-    int server_sync_counter;
+    r_controller->Send(&this->SynchronizationCounter, 1, 1, 41000);
+    unsigned int server_sync_counter;
     r_controller->Receive(&server_sync_counter, 1, 1, 41001);
-    this->CounterSynchronizedSuccessfully =
-      (server_sync_counter == this->SynchronizationCounter);
+    return (server_sync_counter == this->SynchronizationCounter);
     }
   else
     {
+    bool counterSynchronizedSuccessfully = false;
     if (r_controller)
       {
-      vtkMultiProcessStream stream;
-      r_controller->Receive(stream, 1, 41000);
-      int client_sync_counter;
-      stream >> client_sync_counter >> this->RemoteRenderingThreshold;
+      unsigned int client_sync_counter;
+      r_controller->Receive(&client_sync_counter, 1, 1, 41000);
       r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
-      this->CounterSynchronizedSuccessfully =
+      counterSynchronizedSuccessfully =
         (client_sync_counter == this->SynchronizationCounter);
       }
 
     if (p_controller)
       {
       p_controller->Broadcast(&this->RemoteRenderingThreshold, 1, 0);
-      int temp = this->CounterSynchronizedSuccessfully? 1 : 0;
+      int temp = counterSynchronizedSuccessfully? 1 : 0;
       p_controller->Broadcast(&temp, 1, 0);
-      this->CounterSynchronizedSuccessfully = (temp == 1);
+      counterSynchronizedSuccessfully = (temp == 1);
       }
+    return counterSynchronizedSuccessfully;
     }
-  // Force DoDataDelivery(). That should happen every time in collaborative
-  // mode.
-  this->UpdateTime.Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SynchronizeForCollaboration()
+{
+ vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
+  if (!activeSession || !activeSession->IsMultiClients())
+    {
+    return;
+    }
+
+  // Update decisions about lod-rendering and remote-rendering.
+  
+  vtkMultiProcessController* p_controller =
+    this->SynchronizedWindows->GetParallelController();
+  vtkMultiProcessController* r_controller =
+    this->SynchronizedWindows->GetClientServerController();
+
+  if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
+    {
+    vtkMultiProcessStream stream;
+    stream << (this->UseLODForInteractiveRender? 1 : 0)
+           << (this->UseDistributedRenderingForStillRender? 1 : 0)
+           << (this->UseDistributedRenderingForInteractiveRender? 1 :0)
+           << (this->UseOutlineForInteractiveRender? 1 : 0)
+           << this->StillRenderProcesses
+           << this->InteractiveRenderProcesses;
+    r_controller->Send(stream, 1, 42000);
+    }
+  else
+    {
+    vtkMultiProcessStream stream;
+    if (r_controller)
+      {
+      r_controller->Receive(stream, 1, 42000);
+      }
+    if (p_controller)
+      {
+      p_controller->Broadcast(stream, 0);
+      }
+    int arg1, arg2, arg3, arg4;
+    stream >> arg1
+           >> arg2
+           >> arg3
+           >> arg4
+           >> this->StillRenderProcesses
+           >> this->InteractiveRenderProcesses;
+    this->UseLODForInteractiveRender = (arg1 == 1);
+    this->UseDistributedRenderingForStillRender = (arg2 == 1);
+    this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
+    this->UseOutlineForInteractiveRender = (arg4 == 1);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Update()
 {
   vtkTimerLog::MarkStartEvent("RenderView::Update");
+
+  // reset the bounds, so that representations can provide us with bounds
+  // information during update.
+  this->GeometryBounds.Reset();
+
   this->Superclass::Update();
 
-  // Do the vtkView::REQUEST_INFORMATION() pass.
-  this->GatherRepresentationInformation();
+  // After every update we can expect the representation geometries to change.
+  // Thus we need to determine whether we are doing to remote-rendering or not,
+  // use-lod or not, etc. All these decisions are made right here to avoid
+  // making them during each render-call.
+
+  // Check if any representation told us that it needed ordered compositing.
+  this->NeedsOrderedCompositing = false;
+  int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
+  for (int cc=0; cc < num_reprs; cc++)
+    {
+    vtkInformation* info =
+      this->ReplyInformationVector->GetInformationObject(cc);
+    if (info->Has(NEED_ORDERED_COMPOSITING()) &&
+      info->Get(NEED_ORDERED_COMPOSITING()) != 0)
+      {
+      this->NeedsOrderedCompositing= true;
+      break;
+      }
+    }
 
   // Gather information about geometry sizes from all representations.
-  this->GatherGeometrySizeInformation();
+  double local_size = this->GetDeliveryManager()->GetVisibleDataSize(false) / 1024.0;
+  this->SynchronizedWindows->SynchronizeSize(local_size);
+  // cout << "Full Geometry size: " << local_size << endl;
 
-  // UpdateTime is used to determine if we need to redeliver the geometries.
-  // Hence the more accurate we can be about when to update this time, the
-  // better. Right now, we are relying on the client (vtkSMViewProxy) to ensure
-  // that Update is called only when some representation is modified.
-  this->UpdateTime.Modified();
+  // Update decisions about lod-rendering and remote-rendering.
+  this->UseLODForInteractiveRender = this->ShouldUseLODRendering(local_size);
+  this->UseDistributedRenderingForStillRender = this->ShouldUseDistributedRendering(local_size);
+  if (!this->UseLODForInteractiveRender)
+    {
+    this->UseDistributedRenderingForInteractiveRender =
+      this->UseDistributedRenderingForStillRender;
+    this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
+    }
+
+  this->StillRenderProcesses = this->InteractiveRenderProcesses =
+    vtkPVSession::CLIENT;
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForStillRender)
+    {
+    this->StillRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForInteractiveRender)
+    {
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
+
+  // Synchronize data bounds.
+  this->SynchronizeGeometryBounds();
+
   vtkTimerLog::MarkEndEvent("RenderView::Update");
+
+  this->UpdateTimeStamp.Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateLOD()
+{
+  vtkTimerLog::MarkStartEvent("RenderView::UpdateLOD");
+
+  // Update LOD geometry.
+  this->CallProcessViewRequest(
+    vtkPVView::REQUEST_UPDATE_LOD(),
+    this->RequestInformation, this->ReplyInformationVector);
+
+  double local_size = this->GetDeliveryManager()->GetVisibleDataSize(true) / 1024.0;
+  this->SynchronizedWindows->SynchronizeSize(local_size);
+  // cout << "LOD Geometry size: " << local_size << endl;
+
+  this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
+  this->UseDistributedRenderingForInteractiveRender =
+    this->ShouldUseDistributedRendering(local_size);
+
+  this->InteractiveRenderProcesses = vtkPVSession::CLIENT;
+  bool in_tile_display_mode = this->InTileDisplayMode();
+  bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
+  if (in_tile_display_mode || in_cave_mode ||
+    this->UseDistributedRenderingForInteractiveRender)
+    {
+    this->InteractiveRenderProcesses = vtkPVSession::CLIENT_AND_SERVERS;
+    }
+
+  vtkTimerLog::MarkEndEvent("RenderView::UpdateLOD");
 }
 
 //----------------------------------------------------------------------------
@@ -790,22 +897,64 @@ void vtkPVRenderView::InteractiveRender()
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkPVRenderView::GetNextPieceToDeliver(double planes[24])
+{
+  if (!vtkPVView::GetEnableStreaming())
+    {
+    return 0;
+    }
+
+  bool force_modified = false;
+  static double prev_planes[24];
+  for (int cc=0; cc < 24 && !force_modified;cc++)
+    {
+    force_modified = prev_planes[cc] != planes[cc];
+    }
+  memcpy(prev_planes, planes, 24*sizeof(double));
+
+
+  if (this->UpdateTimeStamp > this->PriorityQueueBuildTimeStamp ||
+    this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp ||
+    force_modified)
+    {
+    // either the data or the camera has changed. Regenerate the priority queue.
+    // Priority queue contains a list of (representation-id, block-id) tuples
+    // indicating the blocks to request.
+    vtkTimerLog::MarkStartEvent("Build View Priority Queue");
+    this->GetDeliveryManager()->BuildPriorityQueue(planes);
+    vtkTimerLog::MarkEndEvent("Build View Priority Queue");
+    this->PriorityQueueBuildTimeStamp.Modified();
+    }
+
+  return this->GetDeliveryManager()->GetRepresentationIdFromQueue();
+}
+ 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StreamingUpdate()
+{
+  vtkTimerLog::MarkStartEvent("Streaming Update");
+  // Update the representations.
+  this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
+    this->RequestInformation, this->ReplyInformationVector);
+  vtkTimerLog::MarkEndEvent("Streaming Update");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkPVSession* activeSession = vtkPVSession::SafeDownCast(pm->GetActiveSession());
-  if (activeSession && activeSession->IsMultiClients())
+  if (this->SynchronizedWindows->GetMode() !=
+    vtkPVSynchronizedRenderWindows::CLIENT ||
+    (!interactive && this->UseDistributedRenderingForStillRender) ||
+    (interactive && this->UseDistributedRenderingForInteractiveRender))
     {
+    // in multi-client modes, Render() will be called on client always. Now the
+    // client need to coordinate with server only when we are remote rendering.
+    // if Render() is called on server side, then we are indeed remote
+    // rendering, irrespective of what the local flags tell us and we need to
+    // coordinate with the client to update the local flags correctly.
     this->SynchronizeForCollaboration();
     }
 
-  // Use loss-less image compression for client-server for full-res renders.
-  this->SynchronizedRenderers->SetLossLessCompression(!interactive);
-
-  bool use_lod_rendering = interactive? this->GetUseLODRendering() : false;
-  this->SetRequestLODRendering(use_lod_rendering);
-
-  // cout << "Using remote rendering: " << use_distributed_rendering << endl;
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode && !this->RemoteRenderingAvailable)
@@ -816,88 +965,42 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
       vtkErrorMacro(
         "In Cave mode and Display cannot be opened on server-side! "
         "Ensure the environment is set correctly in the pvx file.");
-      in_cave_mode = true;
+      in_cave_mode = false;
       }
     }
+
+  // Use loss-less image compression for client-server for full-res renders.
+  this->SynchronizedRenderers->SetLossLessCompression(!interactive);
+
+  bool use_lod_rendering = interactive? this->GetUseLODForInteractiveRender() : false;
+  if (use_lod_rendering)
+    {
+    this->RequestInformation->Set(USE_LOD(), 1);
+    }
+
+  // cout << "Using remote rendering: " << use_distributed_rendering << endl;
 
   // Decide if we are doing remote rendering or local rendering.
-  bool use_distributed_rendering = in_cave_mode || this->GetUseDistributedRendering();
+  bool use_distributed_rendering = interactive?
+    this->GetUseDistributedRenderingForInteractiveRender():
+    this->GetUseDistributedRenderingForStillRender();
 
-  // Build the request for REQUEST_PREPARE_FOR_RENDER().
-  this->SetRequestDistributedRendering(use_distributed_rendering);
-
-  if (in_tile_display_mode && this->GetDeliverOutlineToClient())
+  if (this->GetUseOrderedCompositing())
     {
-    this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-    this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT(), 1);
-    }
-  else if (!in_tile_display_mode && this->GetDeliverOutlineToClient())
-    {
-    this->RequestInformation->Set(DELIVER_OUTLINE_TO_CLIENT_FOR_LOD(), 1);
-    if (interactive && !use_distributed_rendering)
-      {
-      // also force LOD mode. Otherwise the outline is delivered only when LOD
-      // mode is kicked in, even when the user requested that the LOD be
-      // delivered to client for a lower threshold that the LOD threshold.
-      use_lod_rendering = true;
-      this->SetRequestLODRendering(use_lod_rendering);
-      }
-    }
-  else
-    {
-    this->RequestInformation->Remove(DELIVER_OUTLINE_TO_CLIENT());
-    this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
-    }
-
-  if (in_cave_mode)
-    {
-    // FIXME: This isn't supported currently.
-    this->RequestInformation->Set(DELIVER_LOD_TO_CLIENT(), 1);
-    }
-  else
-    {
-    this->RequestInformation->Remove(DELIVER_LOD_TO_CLIENT());
-    }
-
-  // In REQUEST_PREPARE_FOR_RENDER, this view expects all representations to
-  // know the data-delivery mode. No representation should do any delivery here.
-  // Only inform the view whether they will do delivery. Then the "driver" will
-  // dictate what representations need to do delivery.
-  this->CallProcessViewRequest(
-    vtkPVView::REQUEST_PREPARE_FOR_RENDER(),
-    this->RequestInformation, this->ReplyInformationVector);
-
-  this->DoDataDelivery(use_lod_rendering, use_distributed_rendering);
-
-  if (use_distributed_rendering &&
-    this->OrderedCompositingBSPCutsSource->GetNumberOfInputConnections(0) > 0)
-    {
-    vtkMultiProcessController* controller =
-      vtkMultiProcessController::GetGlobalController();
-    if (controller && controller->GetNumberOfProcesses() > 1)
-      {
-      vtkStreamingDemandDrivenPipeline *sddp = vtkStreamingDemandDrivenPipeline::
-        SafeDownCast(this->OrderedCompositingBSPCutsSource->GetExecutive());
-      sddp->SetUpdateExtent
-        (0,controller->GetLocalProcessId(),controller->GetNumberOfProcesses(),0);
-      sddp->Update(0);
-      }
-    else
-      {
-      this->OrderedCompositingBSPCutsSource->Update();
-      }
+    this->Internals->DeliveryManager->RedistributeDataForOrderedCompositing(
+      use_lod_rendering);
     this->SynchronizedRenderers->SetKdTree(
-      this->OrderedCompositingBSPCutsSource->GetPKdTree());
-    this->RequestInformation->Set(KD_TREE(),
-      this->OrderedCompositingBSPCutsSource->GetPKdTree());
+      this->Internals->DeliveryManager->GetKdTree());
     }
   else
     {
     this->SynchronizedRenderers->SetKdTree(NULL);
     }
 
-  this->CallProcessViewRequest(
-    vtkPVView::REQUEST_RENDER(),
+  // Render each representation with available geometry.
+  // This is the pass where representations get an opportunity to get the
+  // currently "available" represented data and try to render it.
+  this->CallProcessViewRequest(vtkPVView::REQUEST_RENDER(),
     this->RequestInformation, this->ReplyInformationVector);
 
   // set the image reduction factor.
@@ -906,27 +1009,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
      this->InteractiveRenderImageReductionFactor :
      this->StillRenderImageReductionFactor));
 
-  if (!interactive)
-    {
-    // Keep bounds information up-to-date.
-
-    // GatherBoundsInformation will not do communication unless using
-    // distributed rendering.
-    this->GatherBoundsInformation(use_distributed_rendering);
-
-    this->UpdateCenterAxes(this->LastComputedBounds);
-    }
-
   this->UsedLODForLastRender = use_lod_rendering;
-
-  if (interactive)
-    {
-    this->InteractiveRenderTime.Modified();
-    }
-  else
-    {
-    this->StillRenderTime.Modified();
-    }
 
   if (skip_rendering)
     {
@@ -944,6 +1027,7 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
   this->SynchronizedRenderers->SetDataReplicatedOnAllProcesses(
     in_cave_mode ||
     (!use_distributed_rendering && in_tile_display_mode));
+
 
   // When in batch mode, we are using the same render window for all views. That
   // makes it impossible for vtkPVSynchronizedRenderWindows to identify which
@@ -968,7 +1052,6 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 
   if (!this->MakingSelection)
     {
-
     // If we are making selection, then it's a multi-step render process and we
     // need to leave the SynchronizedWindows/SynchronizedRenderers enabled for
     // that entire process.
@@ -978,228 +1061,212 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::DoDataDelivery(
-  bool using_lod_rendering, 
-  bool vtkNotUsed(using_remote_rendering)
-  )
+void vtkPVRenderView::Deliver(int use_lod,
+    unsigned int size, unsigned int *representation_ids)
 {
-  if ((using_lod_rendering &&
-    this->InteractiveRenderTime > this->UpdateTime) ||
-    (!using_lod_rendering &&
-     this->StillRenderTime > this->UpdateTime))
+  // if in multi-clients mode, ensure that processes are in the same "state"
+  // before doing the data delivery or we may end up with dead-locks due to
+  // mismatched representations.
+  if (!this->TestCollaborationCounter())
     {
-    // skipping delivery
     return;
     }
 
-  if (!this->CounterSynchronizedSuccessfully)
-    {
-    // Skip data-delivery for this render.
-    return;
-    }
+  // in multi-clients mode, for every Deliver() and Render() call, we obtain the
+  // remote-rendering related ivars from the client.
+  this->SynchronizeForCollaboration();
 
-  vtkMultiProcessController* s_controller =
-    this->SynchronizedWindows->GetClientServerController();
-  vtkMultiProcessController* d_controller =
-    this->SynchronizedWindows->GetClientDataServerController();
-  vtkMultiProcessController* p_controller =
-    vtkMultiProcessController::GetGlobalController();
-
-  vtkMultiProcessStream stream;
-  if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-    {
-    // Tell everyone the representations that this process thinks are need to
-    // delivery data.
-    int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
-    std::vector<int> need_delivery;
-    for (int cc=0; cc < num_reprs; cc++)
-      {
-      vtkInformation* info =
-        this->ReplyInformationVector->GetInformationObject(cc);
-      if (info->Has(NEEDS_DELIVERY()) && info->Get(NEEDS_DELIVERY()) == 1)
-        {
-        assert(this->Internals->RepToIdMap.find(this->GetRepresentation(cc)) !=
-          this->Internals->RepToIdMap.end());
-        need_delivery.push_back(
-          this->Internals->RepToIdMap[this->GetRepresentation(cc)]);
-        }
-      }
-
-    stream << static_cast<int>(need_delivery.size());
-    for (size_t cc=0; cc < need_delivery.size(); cc++)
-      {
-      stream << need_delivery[cc];
-      }
-
-    if (s_controller)
-      {
-      s_controller->Send(stream, 1, 9998877);
-      }
-    if (d_controller)
-      {
-      d_controller->Send(stream, 1, 9998877);
-      }
-    if (p_controller)
-      {
-      p_controller->Broadcast(stream, 0);
-      }
-    }
-  else
-    {
-    if (s_controller)
-      {
-      s_controller->Receive(stream, 1, 9998877);
-      }
-    if (d_controller)
-      {
-      d_controller->Receive(stream, 1, 9998877);
-      }
-    if (p_controller)
-      {
-      p_controller->Broadcast(stream, 0);
-      }
-    }
-  int size;
-  stream >> size;
-  for (int cc=0; cc < size; cc++)
-    {
-    int index;
-    stream >> index;
-    vtkPVDataRepresentation* repr =
-      vtkPVDataRepresentation::SafeDownCast(this->Internals->IdToRepMap[index]);
-    if (repr)
-      {
-      // it is essential that the representation is made visible for this pass.
-      bool visible = repr->GetVisibility();
-      if (visible == false)
-        {
-        repr->SetVisibility(true);
-        }
-      repr->ProcessViewRequest(REQUEST_DELIVERY(), NULL, NULL);
-      if (visible == false)
-        {
-        repr->SetVisibility(visible);
-        }
-      }
-    }
+  this->GetDeliveryManager()->Deliver(use_lod, size, representation_ids);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetRequestDistributedRendering(bool enable)
+int vtkPVRenderView::GetDataDistributionMode(bool use_remote_rendering)
 {
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode)
     {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      vtkMPIMoveData::CLONE);
+    return vtkMPIMoveData::CLONE;
     }
-  else if (enable)
+
+  if (use_remote_rendering)
     {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      in_tile_display_mode?
+    return in_tile_display_mode?
       vtkMPIMoveData::COLLECT_AND_PASS_THROUGH:
-      vtkMPIMoveData::PASS_THROUGH);
+      vtkMPIMoveData::PASS_THROUGH;
     }
-  else
-    {
-    this->RequestInformation->Set(DATA_DISTRIBUTION_MODE(),
-      in_tile_display_mode?
-      vtkMPIMoveData::CLONE:
-      vtkMPIMoveData::COLLECT);
-    }
+
+  return in_tile_display_mode? vtkMPIMoveData::CLONE: vtkMPIMoveData::COLLECT;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetRequestLODRendering(bool enable)
+void vtkPVRenderView::SetPiece(vtkInformation* info,
+  vtkPVDataRepresentation* repr, vtkDataObject* data)
 {
-  if (enable)
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    this->RequestInformation->Set(USE_LOD(), 1);
-    this->RequestInformation->Set(LOD_RESOLUTION(), this->LODResolution);
-    }
-  else
-    {
-    this->RequestInformation->Remove(USE_LOD());
-    this->RequestInformation->Remove(LOD_RESOLUTION());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::GatherRepresentationInformation()
-{
-  this->CallProcessViewRequest(vtkPVView::REQUEST_INFORMATION(),
-    this->RequestInformation, this->ReplyInformationVector);
-
-  // REQUEST_UPDATE() pass may result in REDISTRIBUTABLE_DATA_PRODUCER() being
-  // specified. If so, we update the OrderedCompositingBSPCutsSource to use
-  // those producers as inputs, if ordered compositing maybe needed.
-  static std::set<void*> previous_producers;
-
-  this->LocalGeometrySize = 0;
-
-  bool need_ordered_compositing = false;
-  std::set<void*> current_producers;
-  int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
-  for (int cc=0; cc < num_reprs; cc++)
-    {
-    vtkInformation* info =
-      this->ReplyInformationVector->GetInformationObject(cc);
-    if (info->Has(REDISTRIBUTABLE_DATA_PRODUCER()))
-      {
-      current_producers.insert(info->Get(REDISTRIBUTABLE_DATA_PRODUCER()));
-      }
-    if (info->Has(NEED_ORDERED_COMPOSITING()))
-      {
-      need_ordered_compositing = true;
-      }
-    if (info->Has(GEOMETRY_SIZE()))
-      {
-      this->LocalGeometrySize += (info->Get(GEOMETRY_SIZE())/1024.0);
-      }
-    }
-
-  if (!this->GetUseOrderedCompositing() || !need_ordered_compositing)
-    {
-    this->OrderedCompositingBSPCutsSource->RemoveAllInputs();
-    previous_producers.clear();
+    vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
 
-  if (current_producers != previous_producers)
+  view->GetDeliveryManager()->SetPiece(repr, data, false);
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducer(vtkInformation* info,
+    vtkPVDataRepresentation* repr)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
     {
-    this->OrderedCompositingBSPCutsSource->RemoveAllInputs();
-    std::set<void*>::iterator iter;
-    for (iter = current_producers.begin(); iter != current_producers.end();
-      ++iter)
-      {
-      this->OrderedCompositingBSPCutsSource->AddInputConnection(0,
-        reinterpret_cast<vtkAlgorithm*>(*iter)->GetOutputPort(0));
-      }
-    previous_producers = current_producers;
+    vtkGenericWarningMacro("Missing VIEW().");
+    return NULL;
     }
 
+  return view->GetDeliveryManager()->GetProducer(repr, false);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::GatherGeometrySizeInformation()
+void vtkPVRenderView::SetPieceLOD(vtkInformation* info,
+  vtkPVDataRepresentation* repr, vtkDataObject* data)
 {
-  this->GeometrySize = this->LocalGeometrySize;
-  this->SynchronizedWindows->SynchronizeSize(this->GeometrySize);
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetPiece(repr, data, true);
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::GetUseDistributedRendering()
+vtkAlgorithmOutput* vtkPVRenderView::GetPieceProducerLOD(vtkInformation* info,
+    vtkPVDataRepresentation* repr)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return NULL;
+    }
+
+  return view->GetDeliveryManager()->GetProducer(repr, true);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::MarkAsRedistributable(
+  vtkInformation* info, vtkPVDataRepresentation* repr)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->MarkAsRedistributable(repr);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetStreamable(
+  vtkInformation* info, vtkPVDataRepresentation* repr, bool val)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetStreamable(repr, val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetImageDataProducer(
+  vtkInformation* info, vtkPVDataRepresentation* repr,
+  vtkAlgorithmOutput* producer)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetImageDataProducer(repr, producer);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDeliverToAllProcesses(vtkInformation* info,
+  vtkPVDataRepresentation* repr, bool clone)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, false);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetDeliverLODToAllProcesses(vtkInformation* info,
+  vtkPVDataRepresentation* repr, bool clone)
+{
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!view)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  view->GetDeliveryManager()->SetDeliverToAllProcesses(repr, clone, true);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetGeometryBounds(vtkInformation* info,
+  double bounds[6], vtkMatrix4x4* matrix /*=NULL*/)
+{
+  vtkPVRenderView* self= vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+
+  if (self)
+    {
+    if (matrix && vtkMath::AreBoundsInitialized(bounds))
+      {
+      double min_point[4] = {bounds[0], bounds[2], bounds[4], 1};
+      double max_point[4] = {bounds[1], bounds[3], bounds[5], 1};
+      matrix->MultiplyPoint(min_point, min_point);
+      matrix->MultiplyPoint(max_point, max_point);
+      double transformed_bounds[6];
+      transformed_bounds[0] = min_point[0] / min_point[3];
+      transformed_bounds[2] = min_point[1] / min_point[3];
+      transformed_bounds[4] = min_point[2] / min_point[3];
+      transformed_bounds[1] = max_point[0] / max_point[3];
+      transformed_bounds[3] = max_point[1] / max_point[3];
+      transformed_bounds[5] = max_point[2] / max_point[3];
+      self->GeometryBounds.AddBounds(transformed_bounds);
+      }
+    else
+      {
+      self->GeometryBounds.AddBounds(bounds);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
 {
   if (this->GetRemoteRenderingAvailable() == false)
     {
     return false;
-    }
-
-  if (this->MakingSelection)
-    {
-    // force remote rendering when doing a surface selection.
-    return true;
     }
 
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_BATCH)
@@ -1208,27 +1275,25 @@ bool vtkPVRenderView::GetUseDistributedRendering()
     return true;
     }
 
-  return this->RemoteRenderingThreshold <= this->GeometrySize;
+  return this->RemoteRenderingThreshold <= geometry_size;
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::GetUseLODRendering()
+bool vtkPVRenderView::ShouldUseLODRendering(double geometry_size)
 {
   // return false;
-  return this->LODRenderingThreshold <= this->GeometrySize;
-}
-
-//----------------------------------------------------------------------------
-bool vtkPVRenderView::GetDeliverOutlineToClient()
-{
-//  return false;
-  return this->ClientOutlineThreshold <= this->GeometrySize;
+  return this->LODRenderingThreshold <= geometry_size;
 }
 
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetUseOrderedCompositing()
 {
   if (this->SynchronizedWindows->GetIsInCave())
+    {
+    return false;
+    }
+
+  if (!this->NeedsOrderedCompositing || this->MakingSelection)
     {
     return false;
     }
@@ -1278,33 +1343,10 @@ bool vtkPVRenderView::GetLightSwitch()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddPropToNonCompositedRenderer(vtkProp* prop)
+void vtkPVRenderView::UpdateCenterAxes()
 {
-  this->GetNonCompositedRenderer()->AddActor(prop);
-}
+  vtkBoundingBox bbox(this->GeometryBounds);
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::RemovePropFromNonCompositedRenderer(vtkProp* prop)
-{
-  this->GetNonCompositedRenderer()->RemoveActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddPropToRenderer(vtkProp* prop)
-{
-  this->GetRenderer()->AddActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::RemovePropFromRenderer(vtkProp* prop)
-{
-  this->GetRenderer()->RemoveActor(prop);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::UpdateCenterAxes(double bounds[6])
-{
-  vtkBoundingBox bbox(bounds);
   // include the center of rotation in the axes size determination.
   bbox.AddPoint(this->CenterAxes->GetPosition());
 

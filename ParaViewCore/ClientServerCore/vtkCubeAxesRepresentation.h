@@ -25,6 +25,7 @@
 
 class vtkCubeAxesActor;
 class vtkPVRenderView;
+class vtkOutlineSource;
 
 class VTK_EXPORT vtkCubeAxesRepresentation : public vtkPVDataRepresentation
 {
@@ -142,8 +143,8 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
+  vtkOutlineSource* OutlineSource;
   vtkWeakPointer<vtkPVRenderView> View;
-  vtkTimeStamp BoundsUpdateTime;
   vtkCubeAxesActor* CubeAxesActor;
   double Position[3];
   double Scale[3];

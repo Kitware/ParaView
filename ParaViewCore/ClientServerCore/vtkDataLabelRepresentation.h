@@ -33,10 +33,8 @@ class vtkCompositeDataToUnstructuredGridFilter;
 class vtkLabeledDataMapper;
 class vtkProp3D;
 class vtkPVCacheKeeper;
-class vtkPVUpdateSuppressor;
 class vtkTextProperty;
 class vtkTransform;
-class vtkUnstructuredDataDeliveryFilter;
 
 class VTK_EXPORT vtkDataLabelRepresentation : public vtkPVDataRepresentation
 {
@@ -119,10 +117,6 @@ protected:
   virtual bool RemoveFromView(vtkView* view);
 
   // Description:
-  // Intialize the vtkUnstructuredDataDeliveryFilter.
-  void InitializeForCommunication();
-
-  // Description:
   // Fill input port information
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
@@ -146,8 +140,6 @@ protected:
 
   vtkCompositeDataToUnstructuredGridFilter* MergeBlocks;
   vtkPVCacheKeeper* CacheKeeper;
-  vtkUnstructuredDataDeliveryFilter* DataCollector;
-  vtkPVUpdateSuppressor* DeliverySuppressor;
 
   vtkLabeledDataMapper* PointLabelMapper;
   vtkTextProperty* PointLabelProperty;

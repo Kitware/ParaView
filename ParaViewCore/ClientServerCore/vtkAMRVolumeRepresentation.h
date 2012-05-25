@@ -16,28 +16,23 @@
 // datasets as a volume.
 // .SECTION Description
 // vtkAMRVolumeRepresentation is a representation for volume rendering
-// vtkAMRData. Unlike other data-representations used by ParaView, this
-// representation does not support delivery to client (or render server) nodes.
-// In those configurations, it merely delivers a outline for the image to the
-// client and render-server and those nodes simply render the outline.
+// vtkAMRData.
 
 #ifndef __vtkAMRVolumeRepresentation_h
 #define __vtkAMRVolumeRepresentation_h
 
 #include "vtkPVDataRepresentation.h"
+#include "vtkWeakPointer.h" // needed for iVars.
 
-class vtkAMRVolumeMapper;
+class vtkAMRIncrementalResampleHelper;
 class vtkColorTransferFunction;
-class vtkFixedPointVolumeRayCastMapper;
 class vtkOverlappingAMR;
-class vtkOutlineSource;
 class vtkPiecewiseFunction;
 class vtkPolyDataMapper;
 class vtkPVCacheKeeper;
 class vtkPVLODVolume;
 class vtkPVRenderView;
-class vtkPVUpdateSuppressor;
-class vtkUnstructuredDataDeliveryFilter;
+class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
 class VTK_EXPORT vtkAMRVolumeRepresentation : public vtkPVDataRepresentation
@@ -122,25 +117,39 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
 
-  // Description:
-  // Gets the metadata from upstream module and determines which blocks
-  // should be loaded by this instance.
-  virtual int RequestInformation(
-                                 vtkInformation *rqst,
-                                 vtkInformationVector **inputVector,
-                                 vtkInformationVector *outputVector );
-
-  // Description:
-  // Performs upstream requests to the reader
-  virtual int RequestUpdateExtent(
-                                  vtkInformation*, vtkInformationVector**, 
-                                  vtkInformationVector* );
   vtkSetMacro(FreezeFocalPoint,bool);
   vtkGetMacro(FreezeFocalPoint,bool);
+
+  // Description:
+  // When steaming, this is the block that's requested from the upstream.
+  void SetStreamingBlockId(unsigned int val)
+    {
+    if (this->StreamingCapableSource)
+      {
+      this->StreamingBlockId = val;
+      this->MarkModified();
+      }
+    }
+
+  void ResetStreamingBlockId()
+    { this->StreamingBlockId = 0; }
 //BTX
 protected:
   vtkAMRVolumeRepresentation();
   ~vtkAMRVolumeRepresentation();
+
+  // Description:
+  // Gets the metadata from upstream module and determines which blocks
+  // should be loaded by this instance.
+  virtual int RequestInformation(vtkInformation *rqst,
+    vtkInformationVector **inputVector,
+    vtkInformationVector *outputVector );
+
+  // Description:
+  // Performs upstream requests to the reader
+  virtual int RequestUpdateExtent(
+    vtkInformation*, vtkInformationVector**, 
+    vtkInformationVector* );
 
   // Description:
   // Fill input port information.
@@ -176,15 +185,11 @@ protected:
 
   vtkOverlappingAMR* Cache;
   vtkPVCacheKeeper* CacheKeeper;
-  vtkAMRVolumeMapper* VolumeMapper;
+  vtkSmartVolumeMapper* VolumeMapper;
   vtkVolumeProperty* Property;
   vtkPVLODVolume* Actor;
-  vtkPVRenderView *RenderView;
-
-  vtkOutlineSource* OutlineSource;
-  vtkUnstructuredDataDeliveryFilter* OutlineDeliveryFilter;
-  vtkPVUpdateSuppressor* OutlineUpdateSuppressor;
-  vtkPolyDataMapper* OutlineMapper;
+  vtkAMRIncrementalResampleHelper* Resampler;
+  vtkWeakPointer<vtkPVRenderView> RenderView;
 
   int ColorAttributeType;
   char* ColorArrayName;
@@ -192,6 +197,12 @@ protected:
   int RequestedResamplingMode;
   int NumberOfSamples[3];
   bool FreezeFocalPoint;
+  bool StreamingCapableSource;
+  bool InitializeResampler;
+
+  unsigned int StreamingBlockId;
+
+  double DataBounds[6];
 
 private:
   vtkAMRVolumeRepresentation(const vtkAMRVolumeRepresentation&); // Not implemented

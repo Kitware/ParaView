@@ -78,6 +78,7 @@ SET (Kit_SRCS
   vtkSMContextNamedOptionsProxy.cxx
   vtkSMContextViewProxy.cxx
   vtkSMCSVExporterProxy.cxx
+  vtkSMDataDeliveryManager.cxx
   vtkSMDataSourceProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
@@ -195,6 +196,7 @@ SET( ServerManager_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkInitializationHelper.cxx
+  vtkPVDataDeliveryManager.cxx
   vtkSMAnimationSceneWriter.cxx
   vtkSMDeserializer.cxx
   vtkSMDomain.cxx

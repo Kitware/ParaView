@@ -88,11 +88,11 @@ int vtkBSPCutsGenerator::RequestData(vtkInformation *,
       //clone->ShallowCopy(input);
       if (input->GetExtentType() == VTK_3D_EXTENT)
         {
-        mgr->SetStructuredProducer(this->GetInputAlgorithm());
+        mgr->SetStructuredProducer(this->GetInputAlgorithm(0, cc));
         }
       else
         {
-        mgr->AddProducer(this->GetInputAlgorithm());
+        mgr->AddProducer(this->GetInputAlgorithm(0, cc));
         }
       //clone->FastDelete();
       }

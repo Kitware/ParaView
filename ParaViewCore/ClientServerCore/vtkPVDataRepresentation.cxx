@@ -16,12 +16,12 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataPipeline.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataPipeline.h"
 #include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkPVView.h"

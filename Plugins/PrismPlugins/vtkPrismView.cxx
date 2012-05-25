@@ -17,21 +17,23 @@
 #include "vtk3DWidgetRepresentation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCubeAxesRepresentation.h"
+#include "vtkInformationDoubleKey.h"
+#include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
-#include "vtkInformationDoubleKey.h"
-#include "vtkInformationVector.h"
-#include "vtkInformationDoubleVectorKey.h"
 #include "vtkInformationIntegerVectorKey.h"
+#include "vtkInformationRequestKey.h"
+#include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPrismPrivate.h"
 #include "vtkPrismRepresentation.h"
 #include "vtkPVCompositeRepresentation.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkSelectionRepresentation.h"
+#include "vtkTimerLog.h"
 #include "vtkTransform.h"
 
-#include "vtkPrismPrivate.h"
 
 vtkStandardNewMacro(vtkPrismView);
 vtkInformationKeyRestrictedMacro(vtkPrismView, PRISM_GEOMETRY_BOUNDS, DoubleVector,6);
@@ -144,9 +146,10 @@ bool vtkPrismView::UpdateWorldScale()
   return false;
 }
 //----------------------------------------------------------------------------
-void vtkPrismView::GatherRepresentationInformation()
+void vtkPrismView::Update()
 {
-  this->Superclass::GatherRepresentationInformation();
+  vtkTimerLog::MarkStartEvent("PrismView::Update");
+  this->Superclass::Update();
 
   int num_reprs = this->ReplyInformationVector->GetNumberOfInformationObjects();
   vtkBoundingBox worldBounds, thresholdBounds;
@@ -245,6 +248,7 @@ void vtkPrismView::GatherRepresentationInformation()
       widget->SetCustomWidgetTransform(this->Transform);
       }
     }
+  vtkTimerLog::MarkEndEvent("PrismView::Update");
 }
 
 

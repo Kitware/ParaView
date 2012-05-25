@@ -21,24 +21,22 @@
 // Provide the ability to automatically use a vector component as a scalar
 // input property.
 //
-//  Interpolate cell centered data to point data, and the inverse if needed
+// Interpolate cell centered data to point data, and the inverse if needed
 // by the filter.
-// .SECTION See also
-//  vtkCompositeDataPipeline
 
 #ifndef __vtkPVPostFilterExecutive_h
 #define __vtkPVPostFilterExecutive_h
 
-#include "vtkCompositeDataPipeline.h"
+#include "vtkPVCompositeDataPipeline.h"
 
 class vtkInformationInformationVectorKey;
 class vtkInformationStringVectorKey;
 
-class VTK_EXPORT vtkPVPostFilterExecutive : public vtkCompositeDataPipeline
+class VTK_EXPORT vtkPVPostFilterExecutive : public vtkPVCompositeDataPipeline
 {
 public:
   static vtkPVPostFilterExecutive* New();
-  vtkTypeMacro(vtkPVPostFilterExecutive,vtkCompositeDataPipeline);
+  vtkTypeMacro(vtkPVPostFilterExecutive,vtkPVCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkInformationInformationVectorKey* POST_ARRAYS_TO_PROCESS();

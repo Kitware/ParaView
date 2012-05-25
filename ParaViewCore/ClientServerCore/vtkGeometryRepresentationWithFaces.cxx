@@ -53,11 +53,32 @@ void vtkGeometryRepresentationWithFaces::SetupDefaults()
   this->BackfaceActor->SetProperty(this->BackfaceProperty);
   this->BackfaceActor->SetMapper(this->BackfaceMapper);
   this->BackfaceActor->SetLODMapper(this->LODBackfaceMapper);
+}
 
-  this->BackfaceMapper->SetInputConnection(
-    this->Mapper->GetInputConnection(0, 0));
-  this->LODBackfaceMapper->SetInputConnection(
-    this->LODMapper->GetInputConnection(0, 0));
+//----------------------------------------------------------------------------
+int vtkGeometryRepresentationWithFaces::ProcessViewRequest(
+  vtkInformationRequestKey* request_type,
+  vtkInformation* inInfo, vtkInformation* outInfo)
+{
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
+    {
+    return 0;
+    }
+
+  if (request_type == vtkPVView::REQUEST_RENDER())
+    {
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    if (inInfo->Has(vtkPVRenderView::USE_LOD()))
+      {
+      this->LODBackfaceMapper->SetInputConnection(0, producerPort);
+      }
+    else
+      {
+      this->BackfaceMapper->SetInputConnection(0, producerPort);
+      }
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -91,18 +112,6 @@ bool vtkGeometryRepresentationWithFaces::RemoveFromView(vtkView* view)
     rview->GetRenderer()->RemoveActor(this->BackfaceActor);
     }
   return this->Superclass::RemoveFromView(view);
-}
-
-//----------------------------------------------------------------------------
-bool vtkGeometryRepresentationWithFaces::GenerateMetaData(
-  vtkInformation* inInfo, vtkInformation* outInfo)
-{
-  this->Superclass::GenerateMetaData(inInfo, outInfo);
-  if (this->BackfaceActor->GetProperty()->GetOpacity() < 1.0)
-    {
-    outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-    }
-  return true;
 }
 
 //----------------------------------------------------------------------------

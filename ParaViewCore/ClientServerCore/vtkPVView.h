@@ -26,6 +26,7 @@
 #include "vtkView.h"
 
 class vtkInformation;
+class vtkInformationObjectBaseKey;
 class vtkInformationRequestKey;
 class vtkInformationVector;
 class vtkPVSynchronizedRenderWindows;
@@ -35,6 +36,9 @@ class VTK_EXPORT vtkPVView : public vtkView
 public:
   vtkTypeMacro(vtkPVView, vtkView);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  static void SetEnableStreaming(bool);
+  static bool GetEnableStreaming();
 
   enum
     {
@@ -111,6 +115,12 @@ public:
   virtual void CleanupAfterScreenshot();
 
   // Description:
+  // Key used to pass the vtkPVView pointer to the representation during any of
+  // the view passes such as REQUEST_UPDATE(), REQUEST_UPDATE_LOD(),
+  // REQUEST_RENDER(), etc.
+  static vtkInformationObjectBaseKey* VIEW();
+
+  // Description:
   // This is a Update-Data pass. All representations are expected to update
   // their inputs and prepare geometries for rendering. All heavy work that has
   // to happen only when input-data changes can be done in this pass.
@@ -118,26 +128,15 @@ public:
   static vtkInformationRequestKey* REQUEST_UPDATE();
 
   // Description:
-  // This is a Request-MetaData pass. This happens only after REQUEST_UPDATE()
-  // has happened. In this pass representations typically publish information
-  // that may be useful for rendering optimizations such as geometry sizes, etc.
-  static vtkInformationRequestKey* REQUEST_INFORMATION();
+  // This is a Update-LOD-Data pass. All representations are expected to update
+  // their lod-data, if any. This is assured to be called only after
+  // REQUEST_UPDATE() pass.
+  static vtkInformationRequestKey* REQUEST_UPDATE_LOD();
 
   // Description:
-  // This is a Prepare-for-rendering pass. This happens only after
-  // REQUEST_UPDATE() has happened. This is called for every render.
-  static vtkInformationRequestKey* REQUEST_PREPARE_FOR_RENDER();
-
-  // Description:
-  // This is called to make representations deliver data to the rendering nodes
-  // after REQUEST_PREPARE_FOR_RENDER(). Called for every render only on those
-  // representations that should deliver data.
-  static vtkInformationRequestKey* REQUEST_DELIVERY();
-
-  // Description:
-  // This is a render pass. This happens only after
-  // REQUEST_PREPARE_FOR_RENDER() (and optionally REQUEST_DELIVERY()) has happened.
-  // This is called for every render.
+  // This is a render pass. This is called for every render, hence
+  // representations should not do any work that doesn't depend on things that
+  // could change every render.
   static vtkInformationRequestKey* REQUEST_RENDER();
 
   // Description:
@@ -201,6 +200,8 @@ private:
 
   bool ViewTimeValid;
   bool LastRenderOneViewAtATime;
+
+  static bool EnableStreaming;
 //ETX
 };
 

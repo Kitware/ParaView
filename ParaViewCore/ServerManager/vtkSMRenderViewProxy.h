@@ -28,6 +28,7 @@ class vtkCollection;
 class vtkPVGenericRenderWindowInteractor;
 class vtkRenderer;
 class vtkRenderWindow;
+class vtkSMDataDeliveryManager;
 
 class VTK_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
 {
@@ -121,10 +122,24 @@ public:
   // Returns the Z-buffer value at the given location in this view.
   double GetZBufferValue(int x, int y);
 
+  // Description:
+  // Called vtkPVView::Update on the server-side. Overridden to update the state
+  // of NeedsUpdateLOD flag.
+  virtual void Update();
+
+  // Description:
+  // Called to render a streaming pass. Returns true if the view "streamed" some
+  // geometry.
+  bool StreamingUpdate(bool render_if_needed);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
   ~vtkSMRenderViewProxy();
+
+  // Description:
+  // Calls UpdateLOD() on the vtkPVRenderView.
+  void UpdateLOD();
 
   // Description:
   // Overridden to ensure that we clean up the selection cache on the server
@@ -142,6 +157,7 @@ protected:
     bool multiple_selections,
     int fieldAssociation);
 
+  virtual vtkTypeUInt32 PreRender(bool interactive);
   virtual void PostRender(bool interactive);
 
   // Description:
@@ -162,6 +178,9 @@ protected:
   // the cache of selection when the current user became master
   unsigned long NewMasterObserverId;
   void NewMasterCallback(vtkObject* src, unsigned long event, void* data);
+
+  vtkSMDataDeliveryManager* DeliveryManager;
+  bool NeedsUpdateLOD;
 
 private:
   vtkSMRenderViewProxy(const vtkSMRenderViewProxy&); // Not implemented

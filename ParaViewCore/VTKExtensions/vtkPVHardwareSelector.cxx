@@ -14,19 +14,40 @@
 =========================================================================*/
 #include "vtkPVHardwareSelector.h"
 
+#include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
+
+#include <map>
+
+class vtkPVHardwareSelector::vtkInternals
+{
+public:
+  typedef std::map<void*, int> PropMapType;
+  PropMapType PropMap;
+};
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {
+  this->SetUseProcessIdFromData(true);
+  this->ProcessID = 0;
+  this->UniqueId = 0;
+  this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::~vtkPVHardwareSelector()
 {
+  delete this->Internals;
+  this->Internals = 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVHardwareSelector::PassRequired(int pass)
+{
+  return (pass == PROCESS_PASS?  true : this->Superclass::PassRequired(pass));
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +77,23 @@ bool vtkPVHardwareSelector::NeedToRenderForSelection()
   // vtkPVHardwareSelector is explicitly modified when some action happens that
   // would result in invalidation of captured buffers.
   return this->CaptureTime < this->GetMTime();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVHardwareSelector::AssignUniqueId(vtkProp* prop)
+{
+  int id = this->UniqueId;
+  this->UniqueId++;
+  this->Internals->PropMap[prop] = id;
+  return id;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVHardwareSelector::GetPropID(int vtkNotUsed(idx), vtkProp* prop)
+{
+  vtkInternals::PropMapType::iterator iter = this->Internals->PropMap.find(prop);
+  return (iter != this->Internals->PropMap.end() ?
+    iter->second : -1);
 }
 
 //----------------------------------------------------------------------------

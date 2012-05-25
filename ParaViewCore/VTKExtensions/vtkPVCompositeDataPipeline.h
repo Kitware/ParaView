@@ -12,41 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeDataPipeline - Executive supporting composite datasets.
+// .NAME vtkPVCompositeDataPipeline - executive to add support for
+// vtkPVPostFilter in ParaView data pipelines.
 // .SECTION Description
-// vtkPVCompositeDataPipeline is an executive that supports the processing of
-// composite dataset. It supports algorithms that are aware of composite
-// dataset as well as those that are not. Type checking is performed at run
-// time. Algorithms that are not composite dataset-aware have to support
-// all dataset types contained in the composite dataset. The pipeline
-// execution can be summarized as follows:
-//
-// * REQUEST_INFORMATION: The producers have to provide information about
-// the contents of the composite dataset in this pass.
-// Sources that can produce more than one piece (note that a piece is
-// different than a block; each piece consistes of 0 or more blocks) should
-// set MAXIMUM_NUMBER_OF_PIECES to -1.
-//
-// * REQUEST_DATA: This is where the algorithms execute. If the
-// vtkPVCompositeDataPipeline is assigned to a simple filter,
-// it will invoke the  vtkStreamingDemandDrivenPipeline passes in a loop,
-// passing a different block each time and will collect the results in a
-// composite dataset.
-// .SECTION See also
-//  vtkCompositeDataSet
+// vtkPVCompositeDataPipeline extends vtkCompositeDataPipeline to add ParaView
+// specific extensions to the pipeline.
+// \li Post Filter :- it adds support to ensure that array requests made on
+//     algorithms are passed along to the input vtkPVPostFilter, if one exists.
+//     vtkPVPostFilter is used to automatically extract components or generated
+//     derived arrays such as magnitude array for vectors.
 
 #ifndef __vtkPVCompositeDataPipeline_h
 #define __vtkPVCompositeDataPipeline_h
 
 #include "vtkCompositeDataPipeline.h"
-
-class vtkCompositeDataSet;
-class vtkInformationDoubleKey;
-class vtkInformationIntegerVectorKey;
-class vtkInformationObjectBaseKey;
-class vtkInformationStringKey;
-class vtkInformationDataObjectKey;
-class vtkInformationIntegerKey;
 
 class VTK_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
 {
@@ -64,6 +43,8 @@ protected:
                                       vtkInformationVector** inInfoVec,
                                       vtkInformationVector* outInfoVec);
 
+  // Remove update/whole extent when resetting pipeline information.
+  virtual void ResetPipelineInformation(int port, vtkInformation*);
 
 private:
   vtkPVCompositeDataPipeline(const vtkPVCompositeDataPipeline&);  // Not implemented.

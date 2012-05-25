@@ -11,7 +11,6 @@
 #include "vtkGeometryRepresentation.h"
 #include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkGlyph3DRepresentation.h"
-#include "vtkImageSliceDataDeliveryFilter.h"
 #include "vtkImageSliceMapper.h"
 #include "vtkImageSliceRepresentation.h"
 #include "vtkImageVolumeRepresentation.h"
@@ -88,7 +87,6 @@
 #include "vtkSpreadSheetView.h"
 #include "vtkTCPNetworkAccessManager.h"
 #include "vtkTextSourceRepresentation.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXYChartRepresentation.h"
@@ -124,7 +122,6 @@ int main(int, char**)
   PRINT_SELF(vtkGeometryRepresentation);
   PRINT_SELF(vtkGeometryRepresentationWithFaces);
   PRINT_SELF(vtkGlyph3DRepresentation);
-  PRINT_SELF(vtkImageSliceDataDeliveryFilter);
   PRINT_SELF(vtkImageSliceMapper);
   PRINT_SELF(vtkImageSliceRepresentation);
   PRINT_SELF(vtkImageVolumeRepresentation);
@@ -201,7 +198,6 @@ int main(int, char**)
   //PRINT_SELF(vtkSpreadSheetView);
   PRINT_SELF(vtkTCPNetworkAccessManager);
   PRINT_SELF(vtkTextSourceRepresentation);
-  PRINT_SELF(vtkUnstructuredDataDeliveryFilter);
   PRINT_SELF(vtkUnstructuredGridVolumeRepresentation);
   PRINT_SELF(vtkXMLPVAnimationWriter);
   PRINT_SELF(vtkXYChartRepresentation);
