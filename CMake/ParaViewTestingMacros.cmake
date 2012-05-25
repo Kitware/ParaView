@@ -123,7 +123,12 @@ FUNCTION(add_multi_client_tests prefix)
     get_filename_component(test_name ${test_script} NAME_WE)
     if (${test_name}_ENABLE_COLLAB)
       set (extra_args)
+      set (use_new_panels)
       process_args(extra_args)
+      if (DEFINED ${test_name}_USE_NEW_PANELS)
+        set (use_new_panels "--use-new-panels")
+      endif ()
+
       add_test("${prefix}.${test_name}"
           ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
         --test-multi-clients
@@ -135,6 +140,7 @@ FUNCTION(add_multi_client_tests prefix)
         --test-directory=${PARAVIEW_TEST_DIR}
         --test-script=${test_script}
         --test-master
+        ${use_new_panels}
         --exit
 
         --client ${CLIENT_EXECUTABLE}
