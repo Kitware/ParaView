@@ -374,6 +374,7 @@ int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
       }
     }
 
+
   numRead = element->GetVectorAttribute("resolution",
                                         MAX_NUM,
                                         values);
@@ -391,6 +392,13 @@ int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
 //---------------------------------------------------------------------------
 void vtkSMIntRangeDomain::Update(vtkSMProperty* prop)
 {
+  if (prop == NULL)
+    {
+    // if prop is null, check if we have a "RequiredProperties" specified and
+    // use that.
+    prop = this->GetRequiredProperty("Range");
+    }
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
   if (ivp && ivp->GetInformationOnly())
     {

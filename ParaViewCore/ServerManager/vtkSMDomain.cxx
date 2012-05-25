@@ -121,6 +121,12 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
                 {
                 this->AddRequiredProperty(req, function);
                 }
+              else
+                {
+                vtkWarningMacro(
+                  "You have added a domain dependency to a property named '"
+                  << name << "' which does not exist.");
+                }
               }
             }
           }

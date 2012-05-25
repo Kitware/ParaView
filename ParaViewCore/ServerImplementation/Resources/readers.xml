@@ -1695,16 +1695,17 @@
          information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
-     <DoubleVectorProperty name="TimeRange" information_only="1">
-       <TimeRangeInformationHelper/>
-     </DoubleVectorProperty>
+
+     <IntVectorProperty name="TimeStepRangeInfo"
+         command="GetTimeStepRange"
+         information_only="1">
+     </IntVectorProperty>
 
      <IntVectorProperty name="ModeShape"
                         command="SetModeShape"
                         number_of_elements="1"
-                        default_values="1"
-                        information_property="TimestepValues">
-       <IntRangeDomain name="range">
+                        default_values="1">
+       <IntRangeDomain name="range" foo="1">
          <RequiredProperties>
            <Property name="TimeStepRangeInfo" function="Range"/>
          </RequiredProperties>
@@ -5965,6 +5966,7 @@
          <Property name="SideSetResultArrayInfo" />
          <Property name="SILUpdateStamp" />
 
+         <Property name="TimeStepRangeInfo" />
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
          <Property name="AnimateVibrations" />
@@ -6046,6 +6048,7 @@
        <ExposedProperties>
          <Property name="XMLFileNameInfo" />
          <Property name="XMLFileName" />
+         <Property name="TimeStepRangeInfo" />
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
          <Property name="AnimateVibrations" />
