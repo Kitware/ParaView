@@ -10,7 +10,3 @@ for source in sources:
     s.UpdateVTKObjects()
   except Exception, e:
     print "Error creating:", str(s)
-  else:
-    pass
-  finally:
-    pass
