@@ -22,6 +22,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
+#include "vtkMoleculeMapper.h"
 #include "vtkInformationVector.h"
 
 vtkStandardNewMacro(vtkMoleculeRepresentation)
