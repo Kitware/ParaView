@@ -198,8 +198,8 @@ protected:
   // communication to finish the vertical velocity integration
   // on each process.
   void CommunicateParallelVerticalVelocity(
-    vtkUnstructuredGrid* grid, int* wholeExtent, int* subExtent,
-    int numberOfGhostLevels, VTKPointIterator& pointIterator, double* w);
+    int* wholeExtent, int* subExtent, int numberOfGhostLevels,
+    VTKPointIterator& pointIterator, double* w);
 
   // Description:
   // Given ijk indices with respect to WholeExtent, return the
