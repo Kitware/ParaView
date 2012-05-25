@@ -345,6 +345,10 @@ set(_vtk_modules
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
   #  vtkPLSDynaReader
+
+  vtkDomainsChemistry
+  # Needed for:
+  #  vtkMoleculeRepresentation
   )
 
 # Are we building the GUI

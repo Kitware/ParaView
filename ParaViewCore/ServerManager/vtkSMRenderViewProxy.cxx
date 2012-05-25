@@ -417,6 +417,20 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     }
 
   prototype = pxm->GetPrototypeProxy("representations",
+    "MoleculeRepresentation");
+  pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool mg = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (mg)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "MoleculeRepresentation"));
+    }
+
+  prototype = pxm->GetPrototypeProxy("representations",
     "GeometryRepresentation");
   pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
