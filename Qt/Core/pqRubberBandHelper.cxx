@@ -46,15 +46,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 
 // ParaView includes.
+#include "pqPipelineSource.h"
+#include "vtkCamera.h"
+#include "vtkCell.h"
+#include "vtkCollection.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
+#include "vtkMath.h"
 #include "vtkMemberFunctionCommand.h"
+#include "vtkNew.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
-#include "vtkSmartPointer.h"
+#include "vtkPVRenderView.h"
+#include "vtkRenderer.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxySelectionModel.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 
 #include "zoom.xpm"
 
@@ -209,7 +221,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     // event filter to listen to mouse click events.
     this->Internal->RenderView->getWidget()->installEventFilter(this);
     }
-  else
+  else // FAST_INTERSECT, SELECT, SELECT_POINTS, FRUSTUM, FRUSTUM_POINTS, BLOCKS, PICK
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
       vtkPVRenderView::INTERACTION_MODE_SELECTION);
@@ -221,6 +233,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
   this->Mode = selectionMode;
   emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(false);
+  emit this->selecting(true);
   emit this->startSelection();
   return 1;
 }
@@ -253,6 +266,7 @@ int pqRubberBandHelper::setRubberBandOff()
   this->Mode = INTERACT;
   emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(true);
+  emit this->selecting(false);
   emit this->stopSelection();
   return 1;
 }
@@ -362,6 +376,12 @@ void pqRubberBandHelper::beginPickOnClick()
 }
 
 //-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginFastIntersect()
+{
+  this->setRubberBandOn(FAST_INTERSECT);
+}
+
+//-----------------------------------------------------------------------------
 void pqRubberBandHelper::endSelection()
 {
   this->setRubberBandOff();
@@ -449,10 +469,115 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         }
       }
     break;
+  case FAST_INTERSECT:
+    if (region[0] == region[2] && region[1] == region[3])
+      {
+      vtkSMRenderViewProxy* renderViewProxy =
+          this->Internal->RenderView->getRenderViewProxy();
+      vtkSMSessionProxyManager* spxm = renderViewProxy->GetSessionProxyManager();
+
+      vtkNew<vtkCollection> representations;
+      vtkNew<vtkCollection> sources;
+      renderViewProxy->SelectSurfaceCells(region, representations.GetPointer(), sources.GetPointer(), false);
+
+      if(representations->GetNumberOfItems() > 0 && sources->GetNumberOfItems() > 0)
+        {
+        vtkSMPVRepresentationProxy* rep =
+            vtkSMPVRepresentationProxy::SafeDownCast(representations->GetItemAsObject(0));
+        vtkSMProxy* input = vtkSMPropertyHelper(rep, "Input").GetAsProxy(0);
+        vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
+
+        // Picking info
+        double display[3] = { region[0], region[1], 0.5 };
+        double linePoint1[3], linePoint2[3];
+        double* world;
+
+        vtkRenderer* renderer = renderViewProxy->GetRenderer();
+        renderer->SetDisplayPoint(display);
+        renderer->DisplayToWorld();
+        world = renderer->GetWorldPoint();
+        for (int i=0; i < 3; i++)
+          {
+          linePoint1[i] = world[i] / world[3];
+          }
+        renderer->GetActiveCamera()->GetPosition(linePoint2);
+
+        // Compute the  intersection...
+        double intersection[3] = {0,0,0};
+        vtkSMProxy* pickingHelper = spxm->NewProxy("misc","PickingHelper");
+        vtkSMPropertyHelper(pickingHelper, "Input").Set( input );
+        vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
+        vtkSMPropertyHelper(pickingHelper, "PointA").Set(linePoint1, 3);
+        vtkSMPropertyHelper(pickingHelper, "PointB").Set(linePoint2, 3);
+        pickingHelper->UpdateVTKObjects();
+        pickingHelper->UpdateProperty("Update",1);
+        vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
+        vtkSMPropertyHelper(pickingHelper, "Intersection").Get(intersection, 3);
+        pickingHelper->Delete();
+
+        emit intersectionFinished(intersection[0], intersection[1], intersection[2]);
+        }
+      else
+        {
+        // Use camera focal point to get some Zbuffer
+        double cameraFP[4];
+        vtkRenderer* renderer = renderViewProxy->GetRenderer();
+        vtkCamera* camera = renderer->GetActiveCamera();
+        camera->GetFocalPoint(cameraFP); cameraFP[3] = 1.0;
+        renderer->SetWorldPoint(cameraFP);
+        renderer->WorldToDisplay();
+        double *displayCoord = renderer->GetDisplayPoint();
+
+        // Handle display to world conversion
+        double display[3] = {region[0], region[1], displayCoord[2]};
+        double center[3];
+        renderer->SetDisplayPoint(display);
+        renderer->DisplayToWorld();
+        double* world = renderer->GetWorldPoint();
+        for (int i=0; i < 3; i++)
+          {
+          center[i] = world[i] / world[3];
+          }
+        emit intersectionFinished(center[0], center[1], center[2]);
+        }
+      }
+    break;
     }
   if (region)
     {
     emit this->selectionFinished(region[0], region[1], region[2], region[3]);
     }
 }
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::triggerFastIntersect()
+{
+  if (!this->Internal->RenderView)
+    {
+    //qDebug("Pick is unavailable without visible data.");
+    return;
+    }
 
+  vtkSMRenderViewProxy* rmp =
+    this->Internal->RenderView->getRenderViewProxy();
+  if (!rmp)
+    {
+    qDebug("No render module proxy specified. Cannot switch to selection");
+    return;
+    }
+
+  vtkRenderWindowInteractor* rwi = rmp->GetInteractor();
+  if (!rwi)
+    {
+    qDebug("No interactor specified. Cannot switch to selection");
+    return;
+    }
+
+  // Get region
+  int* eventpos = rwi->GetEventPosition();
+  int region[4] = { eventpos[0], eventpos[1], eventpos[0], eventpos[1] };
+
+  // Trigger fast intersection
+  this->beginFastIntersect();
+  this->onSelectionChanged(NULL, 0, region);
+  this->endSelection();
+}

@@ -85,6 +85,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion2.xml
