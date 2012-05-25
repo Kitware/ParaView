@@ -2606,7 +2606,7 @@
         number_of_elements="1" default_values="">
         <Documentation>
           Full Path + prefix file name.
-          The image full path will be: ${DumpImagePath}_${processId}.png
+          The image full path will be: ${DumpImagePath}-Tile${processId}.png
         </Documentation>
       </StringVectorProperty>
     </Proxy>

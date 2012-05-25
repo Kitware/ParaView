@@ -36,6 +36,6 @@
 <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Splitter.0/Splitter.2/Frame.6/Viewport" command="mouseRelease" arguments="(0.541958,0.20412,1,0,0)" />
 <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-tile_0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-tile_0.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-tile_1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-tile_1.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-Tile0.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/TileDisplay3DTesting-1x2-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/TileDisplay3DTesting-1x2-Tile1.png" />
 </pqevents>
