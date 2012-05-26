@@ -7220,7 +7220,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
        <IntRangeDomain name="range">
 	 <RequiredProperties>
-	   <Property name="TimeStepRangeInfo" function="Range"/>
+	   <Property name="TimestepValues" function="Range"/>
 	 </RequiredProperties>
        </IntRangeDomain>
        <Documentation>

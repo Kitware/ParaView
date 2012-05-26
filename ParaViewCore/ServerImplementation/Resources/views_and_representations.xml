@@ -1759,7 +1759,6 @@
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
 
@@ -1769,7 +1768,6 @@
           proxyname="UnstructuredGridVolumeZSweepMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -1779,7 +1777,6 @@
           proxyname="ProjectedTetrahedraMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -1789,7 +1786,6 @@
           proxyname="HAVSVolumeMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -3100,13 +3096,13 @@
         <ArrayRangeDomain name="scalar_range">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
-             <Property name="SelectInputScalars" function="ArraySelection"/>
+             <Property name="SelectScaleArray" function="ArraySelection"/>
           </RequiredProperties>
         </ArrayRangeDomain>
         <ArrayRangeDomain name="vector_range">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
-             <Property name="SelectInputVectors" function="ArraySelection"/>
+             <Property name="SelectOrientationVectors" function="ArraySelection"/>
           </RequiredProperties>
         </ArrayRangeDomain>
         <Documentation>

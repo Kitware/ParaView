@@ -172,89 +172,14 @@
     <Proxy name="ProjectedTetrahedraMapper"
       class="vtkProjectedTetrahedraMapper"
       processes="client|renderserver|dataserver">
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
     </Proxy>
 
     <Proxy name="HAVSVolumeMapper"
       class="vtkHAVSVolumeMapper"
       processes="client|renderserver|dataserver">
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
     </Proxy>
 
     <Proxy name="DummyVolumeMapper">
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
       <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
         <ProxyGroupDomain name="groups">
           <Group name="ugrid_raycast_functions"/>
@@ -265,33 +190,6 @@
     <Proxy name="UnstructuredGridVolumeRayCastMapper"
       class="vtkUnstructuredGridVolumeRayCastMapper"
       processes="client|renderserver|dataserver">
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
-
       <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
         <ProxyGroupDomain name="groups">
           <Group name="ugrid_raycast_functions"/>
@@ -302,31 +200,6 @@
     <Proxy name="UnstructuredGridVolumeZSweepMapper"
       class="vtkUnstructuredGridVolumeZSweepMapper"
       processes="client|renderserver|dataserver">
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
     </Proxy>
 
     <Proxy name="GPUVolumeRayCastMapper"
@@ -335,31 +208,6 @@
       <Documentation>
         This is the proxy for GPU based volume rendering.
       </Documentation>
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
       <IntVectorProperty
         name="BlendMode"
         command="SetBlendMode"
@@ -409,31 +257,6 @@
     <Proxy name="FixedPointVolumeRayCastMapper"
       class="vtkFixedPointVolumeRayCastMapper"
       processes="client|renderserver|dataserver">
-      <StringVectorProperty
-        name="SelectScalarArray"
-        command="SelectScalarArray"
-        number_of_elements="1"
-        animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-      </StringVectorProperty>
-      <IntVectorProperty
-        name="ScalarMode"
-        command="SetScalarMode"
-        default_values="3"
-        number_of_elements="1"
-        animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Default"/>
-          <Entry value="1" text="PointData"/>
-          <Entry value="2" text="CellData"/>
-          <Entry value="3" text="PointFieldData"/>
-          <Entry value="4" text="CellFieldData"/>
-        </EnumerationDomain>
-      </IntVectorProperty>
       <IntVectorProperty
         name="BlendMode"
         command="SetBlendMode"
