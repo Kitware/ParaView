@@ -87,7 +87,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   if (
     text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive) ||
-    text.contains("looking for 'HistogramView") || 
+    text.contains("looking for 'HistogramView") ||
     text.contains("(looking for 'XYPlot") ||
     text.contains("Unrecognised OpenGL version")
     )
@@ -127,8 +127,11 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
   if (
-    text.contains("Unrecognised OpenGL version")
-  )
+    text.contains("Unrecognised OpenGL version") ||
+/* Skip DBusMenuExporterPrivate errors. These, I suspect, are due to
+     * repeated menu actions in the menus. */
+    text.contains("DBusMenuExporterPrivate") ||
+    text.contains("DBusMenuExporterDBus")  )
     {
     return;
     }
