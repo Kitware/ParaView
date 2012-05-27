@@ -45,6 +45,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
 {
   pqExodusIIVariableSelectionWidget* selectorWidget =
     new pqExodusIIVariableSelectionWidget(this);
+  selectorWidget->setObjectName("SelectionWidget");
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(group->GetXMLLabel());
 
@@ -74,6 +75,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
 {
   pqExodusIIVariableSelectionWidget* selectorWidget =
     new pqExodusIIVariableSelectionWidget(this);
+  selectorWidget->setObjectName("SelectionWidget");
 
   selectorWidget->setRootIsDecorated(false);
   selectorWidget->setHeaderLabel(property->GetXMLLabel());
