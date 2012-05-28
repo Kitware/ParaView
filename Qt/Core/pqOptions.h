@@ -101,7 +101,7 @@ public:
 
   // Description:
   // Returns true if the new panels are enabled.
-  vtkGetMacro(UseNewPanels, int);
+  vtkGetMacro(UseOldPanels, int);
 
   // DO NOT CALL. Public for internal callbacks.
   int AddTestScript(const char*);
@@ -126,7 +126,7 @@ protected:
   int CurrentImageThreshold;
   int TestMaster;
   int TestSlave;
-  int UseNewPanels;
+  int UseOldPanels;
   char* PythonScript;
 
   vtkSetStringMacro(PythonScript);
