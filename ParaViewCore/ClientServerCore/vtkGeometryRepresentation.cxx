@@ -253,6 +253,10 @@ int vtkGeometryRepresentation::ProcessViewRequest(
       {
       if (inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()))
         {
+        // HACK to ensure that when Decimator is next employed, it delivers a
+        // new geometry.
+        this->Decimator->Modified();
+
         this->LODOutlineFilter->Update();
         // Pass along the LOD geometry to the view so that it can deliver it to
         // the rendering node as and when needed.
@@ -261,6 +265,10 @@ int vtkGeometryRepresentation::ProcessViewRequest(
         }
       else
         {
+        // HACK to ensure that when Decimator is next employed, it delivers a
+        // new geometry.
+        this->LODOutlineFilter->Modified();
+
         if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
           {
           int division = static_cast<int>(150 *

@@ -465,7 +465,19 @@ void vtkPVDataDeliveryManager::SetPiece(
     {
     vtkPVDataRepresentationPipeline* executive =
       vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
-    if (executive && executive->GetDataTime() > item->GetTimeStamp())
+
+    // SetPiece() is called in every REQUEST_UPDATE() or REQUEST_UPDATE_LOD()
+    // pass irrespective of whether the data has actually changed. 
+    // (I think that's a mistake, but the fact that representations can be
+    // updated without view makes it tricky since we cannot set the data to
+    // deliver in vtkPVDataRepresentation::RequestData() easily). Hence we need
+    // to ensure that the data we are getting is newer than what we have.
+    unsigned long data_time = executive? executive->GetDataTime() : 0;
+    if (data && (data->GetMTime() > data_time))
+      {
+      data_time = data->GetMTime();
+      }
+    if (data_time > item->GetTimeStamp())
       {
       item->SetDataObject(data);
       }
