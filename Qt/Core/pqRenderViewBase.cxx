@@ -448,7 +448,6 @@ static const char* pqRenderViewModuleLightSettings [] = {
   };
 
 static const char* pqGlobalRenderViewModuleMiscSettings [] = {
-  "CollectGeometryThreshold",
   "CompressionEnabled",
   "CompressorConfig",
   "DepthPeeling",
@@ -463,6 +462,7 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "StillRenderImageReductionFactor",
   "TileDisplayCompositeThreshold",
   "UseOffscreenRenderingForScreenshots",
+  "UseOutlineForLODRendering",
   NULL
   };
 

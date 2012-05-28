@@ -99,6 +99,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->MultiBlockMaker = vtkGeometryRepresentationMultiBlockMaker::New();
   this->Decimator = vtkQuadricClustering::New();
+  this->LODOutlineFilter = vtkPVGeometryFilter::New();
 
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
@@ -143,6 +144,7 @@ vtkGeometryRepresentation::~vtkGeometryRepresentation()
   this->GeometryFilter->Delete();
   this->MultiBlockMaker->Delete();
   this->Decimator->Delete();
+  this->LODOutlineFilter->Delete();
   this->Mapper->Delete();
   this->LODMapper->Delete();
   this->Actor->Delete();
@@ -157,6 +159,8 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->Decimator->SetCopyCellData(1);
   this->Decimator->SetUseInternalTriangles(0);
   this->Decimator->SetNumberOfDivisions(10, 10, 10);
+  
+  this->LODOutlineFilter->SetUseOutline(1);
 
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetUseOutline(0);
   vtkPVGeometryFilter::SafeDownCast(this->GeometryFilter)->SetNonlinearSubdivisionLevel(1);
@@ -166,6 +170,7 @@ void vtkGeometryRepresentation::SetupDefaults()
   this->MultiBlockMaker->SetInputConnection(this->GeometryFilter->GetOutputPort());
   this->CacheKeeper->SetInputConnection(this->MultiBlockMaker->GetOutputPort());
   this->Decimator->SetInputConnection(this->CacheKeeper->GetOutputPort());
+  this->LODOutlineFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
 
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
@@ -246,19 +251,30 @@ int vtkGeometryRepresentation::ProcessViewRequest(
     // otherwise we provide the decimated data.
     if (!this->SuppressLOD)
       {
-      if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
+      if (inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD()))
         {
-        int division = static_cast<int>(150 *
-          inInfo->Get(vtkPVRenderView::LOD_RESOLUTION())) + 10;
-        this->Decimator->SetNumberOfDivisions(division, division, division);
+        this->LODOutlineFilter->Update();
+        // Pass along the LOD geometry to the view so that it can deliver it to
+        // the rendering node as and when needed.
+        vtkPVRenderView::SetPieceLOD(inInfo, this, 
+          this->LODOutlineFilter->GetOutputDataObject(0));
         }
+      else
+        {
+        if (inInfo->Has(vtkPVRenderView::LOD_RESOLUTION()))
+          {
+          int division = static_cast<int>(150 *
+            inInfo->Get(vtkPVRenderView::LOD_RESOLUTION())) + 10;
+          this->Decimator->SetNumberOfDivisions(division, division, division);
+          }
 
-      this->Decimator->Update();
+        this->Decimator->Update();
 
-      // Pass along the LOD geometry to the view so that it can deliver it to
-      // the rendering node as and when needed.
-      vtkPVRenderView::SetPieceLOD(inInfo, this, 
-        this->Decimator->GetOutputDataObject(0));
+        // Pass along the LOD geometry to the view so that it can deliver it to
+        // the rendering node as and when needed.
+        vtkPVRenderView::SetPieceLOD(inInfo, this, 
+          this->Decimator->GetOutputDataObject(0));
+        }
       }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())

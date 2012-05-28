@@ -130,12 +130,6 @@ public:
         QString("%1 Pixels").arg(value));
       }
     }
-
-  void updateClientCollectLabel(double value_in_mb)
-    {
-    this->clientCollectLabel->setText(
-      QString("%1 MBytes").arg(value_in_mb));
-    }
 };
 
 
@@ -205,6 +199,10 @@ void pqGlobalRenderViewOptions::init()
   QObject::connect(this->Internal->lodResolution,
     SIGNAL(valueChanged(int)), this, SLOT(lodResolutionSliderChanged(int)));
 
+  QObject::connect(this->Internal->useOutlineForLOD,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
   QObject::connect(this->Internal->outlineThreshold,
     SIGNAL(valueChanged(int)), this, SLOT(outlineThresholdSliderChanged(int)));
 
@@ -229,10 +227,6 @@ void pqGlobalRenderViewOptions::init()
   QObject::connect(this->Internal->stillRenderSubsampleRate, 
     SIGNAL(valueChanged(int)), 
     this, SLOT(stillRenderSubsampleRateSliderChanged(int)));
-
-  QObject::connect(this->Internal->clientCollect,
-    SIGNAL(valueChanged(int)),
-    this, SLOT(clientCollectSliderChanged(int)));
 
   // enable the apply button when things are changed
   QObject::connect(this->Internal->enableLOD,
@@ -293,10 +287,6 @@ void pqGlobalRenderViewOptions::init()
                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->enableStillRenderSubsampleRate,
-                  SIGNAL(toggled(bool)),
-                  this, SIGNAL(changesAvailable()));
-
-  QObject::connect(this->Internal->enableClientCollect,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
@@ -415,6 +405,8 @@ void pqGlobalRenderViewOptions::applyChanges()
     {
     settings->setValue("LODThreshold", VTK_DOUBLE_MAX);
     }
+  settings->setValue("UseOutlineForLODRendering",
+    this->Internal->useOutlineForLOD->isChecked());
   
   settings->setValue("DepthPeeling",
     this->Internal->depthPeeling->isChecked());
@@ -508,16 +500,6 @@ void pqGlobalRenderViewOptions::applyChanges()
     settings->setValue("StillRenderImageReductionFactor", 1);
     }
 
-  if (this->Internal->enableClientCollect->checkState() == Qt::Checked)
-    {
-    settings->setValue("CollectGeometryThreshold",
-      this->Internal->clientCollect->value());
-    }
-  else
-    {
-    settings->setValue("CollectGeometryThreshold", VTK_DOUBLE_MAX);
-    }
-  
   // save out camera manipulators
   Manip manips[9];
   const Manip* default3DManips = pqRenderView::getDefault3DManipulatorTypes();
@@ -617,6 +599,9 @@ void pqGlobalRenderViewOptions::resetChanges()
   val = settings->value("LODResolution", 50);
   this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));
   this->Internal->updateLODResolutionLabel(this->Internal->lodResolution->value());
+
+  val = settings->value("UseOutlineForLODRendering", false);
+  this->Internal->useOutlineForLOD->setChecked(val.toBool());
 
   val = settings->value("DepthPeeling", true);
   this->Internal->depthPeeling->setChecked(val.toBool());
@@ -728,19 +713,6 @@ void pqGlobalRenderViewOptions::resetChanges()
       this->Internal->stillRenderSubsampleRate->value());
     }
   
-  val = settings->value("CollectGeometryThreshold", 100);
-  if (val.toDouble() >= VTK_LARGE_FLOAT)
-    {
-    this->Internal->enableClientCollect->setCheckState(Qt::Unchecked);
-    this->Internal->updateClientCollectLabel(this->Internal->clientCollect->value());
-    }
-  else
-    {
-    this->Internal->enableClientCollect->setCheckState(Qt::Checked);
-    this->Internal->clientCollect->setValue(val.toInt());
-    this->Internal->updateClientCollectLabel(this->Internal->clientCollect->value());
-    }
-
   val = settings->value("InteractorStyle/CameraManipulators");
 
   Manip manips[9];
@@ -987,13 +959,6 @@ void pqGlobalRenderViewOptions::applyCompressorDefaults()
 void pqGlobalRenderViewOptions::stillRenderSubsampleRateSliderChanged(int value)
 {
   this->Internal->updateStillSubsampleRateLabel(value);
-  emit this->changesAvailable();
-}
-
-//-----------------------------------------------------------------------------
-void pqGlobalRenderViewOptions::clientCollectSliderChanged(int value)
-{
-  this->Internal->updateClientCollectLabel(static_cast<double>(value));
   emit this->changesAvailable();
 }
 

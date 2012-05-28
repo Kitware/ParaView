@@ -111,6 +111,7 @@ bool vtkPVRenderView::RemoteRenderingAllowed = true;
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
+vtkInformationKeyMacro(vtkPVRenderView, USE_OUTLINE_FOR_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
@@ -129,7 +130,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractiveRenderProcesses = vtkPVSession::NONE;
   this->UsedLODForLastRender = false;
   this->UseLODForInteractiveRender = false;
-  this->UseOutlineForInteractiveRender = false;
   this->UseDistributedRenderingForStillRender = false;
   this->UseDistributedRenderingForInteractiveRender = false;
   this->MakingSelection = false;
@@ -137,8 +137,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractiveRenderImageReductionFactor = 2;
   this->RemoteRenderingThreshold = 0;
   this->LODRenderingThreshold = 0;
-  this->ClientOutlineThreshold = 5;
   this->LODResolution = 0.5;
+  this->UseOutlineForLODRendering = false;
   this->UseLightKit = false;
   this->Interactor = 0;
   this->InteractorStyle = 0;
@@ -749,7 +749,6 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     stream << (this->UseLODForInteractiveRender? 1 : 0)
            << (this->UseDistributedRenderingForStillRender? 1 : 0)
            << (this->UseDistributedRenderingForInteractiveRender? 1 :0)
-           << (this->UseOutlineForInteractiveRender? 1 : 0)
            << this->StillRenderProcesses
            << this->InteractiveRenderProcesses;
     r_controller->Send(stream, 1, 42000);
@@ -765,17 +764,15 @@ void vtkPVRenderView::SynchronizeForCollaboration()
       {
       p_controller->Broadcast(stream, 0);
       }
-    int arg1, arg2, arg3, arg4;
+    int arg1, arg2, arg3;
     stream >> arg1
            >> arg2
            >> arg3
-           >> arg4
            >> this->StillRenderProcesses
            >> this->InteractiveRenderProcesses;
     this->UseLODForInteractiveRender = (arg1 == 1);
     this->UseDistributedRenderingForStillRender = (arg2 == 1);
     this->UseDistributedRenderingForInteractiveRender = (arg3 == 1);
-    this->UseOutlineForInteractiveRender = (arg4 == 1);
     }
 }
 
@@ -822,7 +819,6 @@ void vtkPVRenderView::Update()
     {
     this->UseDistributedRenderingForInteractiveRender =
       this->UseDistributedRenderingForStillRender;
-    this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
     }
 
   this->StillRenderProcesses = this->InteractiveRenderProcesses =
@@ -854,6 +850,13 @@ void vtkPVRenderView::UpdateLOD()
   vtkTimerLog::MarkStartEvent("RenderView::UpdateLOD");
 
   // Update LOD geometry.
+
+  this->RequestInformation->Set(LOD_RESOLUTION(), this->LODResolution);
+  if (this->UseOutlineForLODRendering)
+    {
+    this->RequestInformation->Set(USE_OUTLINE_FOR_LOD(), 1);
+    }
+
   this->CallProcessViewRequest(
     vtkPVView::REQUEST_UPDATE_LOD(),
     this->RequestInformation, this->ReplyInformationVector);
@@ -862,7 +865,6 @@ void vtkPVRenderView::UpdateLOD()
   this->SynchronizedWindows->SynchronizeSize(local_size);
   // cout << "LOD Geometry size: " << local_size << endl;
 
-  this->UseOutlineForInteractiveRender = (this->ClientOutlineThreshold <= local_size);
   this->UseDistributedRenderingForInteractiveRender =
     this->ShouldUseDistributedRendering(local_size);
 

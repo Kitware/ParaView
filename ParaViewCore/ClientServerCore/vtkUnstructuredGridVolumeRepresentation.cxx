@@ -213,6 +213,9 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
     {
     if (this->GetNumberOfInputConnections(0) > 0)
       {
+      this->LODGeometryFilter->SetUseOutline(
+        inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD())? 1 : 0);
+      this->LODGeometryFilter->SetUseOutline(0);
       this->LODGeometryFilter->Update();
       }
     vtkPVRenderView::SetPieceLOD(inInfo, this,

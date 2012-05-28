@@ -71,7 +71,6 @@ private slots:
   void squirtColorspaceSliderChanged(int value);
   void zlibColorspaceSliderChanged(int value);
   void stillRenderSubsampleRateSliderChanged(int);
-  void clientCollectSliderChanged(int);
   void resetDefaultCameraManipulators();
   void applyCompressorDefaults();
 
