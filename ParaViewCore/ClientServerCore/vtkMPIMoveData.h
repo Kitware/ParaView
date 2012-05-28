@@ -88,14 +88,6 @@ public:
   vtkGetMacro(OutputDataType, int);
 
   // Description:
-  // Sometimes, the data may be too huge to deliver to the client. In that case,
-  // the client can request that only the outline for the data may be delivered
-  // to the client. This is supported only for vtkPolyData.
-  // Off by default.
-  vtkSetMacro(DeliverOutlineToClient, int);
-  vtkGetMacro(DeliverOutlineToClient, int);
-
-  // Description:
   // When set to true, zlib compression is used. False by default.
   // This value has any effect only on the data-sender processes. The receiver
   // always checks the received data to see if zlib decompression is required.
@@ -162,7 +154,6 @@ protected:
 //ETX
 
   int OutputDataType;
-  int DeliverOutlineToClient;
 
 private:
   int UpdateNumberOfPieces;

@@ -195,8 +195,6 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   this->UpdateNumberOfPieces = 0;
   this->UpdatePiece = 0;
-
-  this->DeliverOutlineToClient = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -954,27 +952,8 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
   if (myId == 0)
     {
     vtkTimerLog::MarkStartEvent("Dataserver sending to client");
-
-    vtkSmartPointer<vtkDataObject> tosend = output;
-    if (this->DeliverOutlineToClient)
-      {
-      // reduce data using outline filter.
-      if (output->IsA("vtkPolyData") || output->IsA("vtkMultiBlockDataSet"))
-        {
-        vtkOutlineFilter* filter = vtkOutlineFilter::New();
-        filter->SetInputData(output);
-        filter->Update();
-        tosend = filter->GetOutputDataObject(0);
-        filter->Delete();
-        }
-      else
-        {
-        vtkErrorMacro("DeliverOutlineToClient can only be used for vtkPolyData.");
-        }
-      }
-
     this->ClearBuffer();
-    this->MarshalDataToBuffer(tosend);
+    this->MarshalDataToBuffer(output);
     this->ClientDataServerSocketController->Send(
                                      &(this->NumberOfBuffers), 1, 1, 23490);
     this->ClientDataServerSocketController->Send(this->BufferLengths,
@@ -1279,8 +1258,6 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
-  os << indent << "DeliverOutlineToClient : "
-    << this->DeliverOutlineToClient << endl;
   os << indent << "OutputDataType: ";
   if (this->OutputDataType == VTK_POLY_DATA)
     {
