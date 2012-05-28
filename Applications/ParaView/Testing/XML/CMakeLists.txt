@@ -145,6 +145,8 @@ ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 # These tests run using the new properties panel
 set(AboutDialog_USE_NEW_PANELS TRUE)
+set(AnimatePipelineTime_USE_NEW_PANELS TRUE)
+set(CTHDerivedDensity2DClyinder_USE_NEW_PANELS TRUE)
 set(ExodusXML_USE_NEW_PANELS TRUE)
 set(GridConnectivity_USE_NEW_PANELS TRUE)
 set(PlotEdges2_USE_NEW_PANELS TRUE)
@@ -170,6 +172,7 @@ set(XYChart_USE_NEW_PANELS TRUE)
 set(XYHistogram_USE_NEW_PANELS TRUE)
 
 # These tests should not be run along with those using the new panels
+set(3DWidgetInCustomFilter_BREAK TRUE)
 set(Threshold_BREAK TRUE)
 set(ExodusIIPanel_BREAK TRUE)
 set(ExodusModeShapes_BREAK TRUE)
