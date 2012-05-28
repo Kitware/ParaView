@@ -137,6 +137,9 @@ SET (TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
+# Probe picking does not work in render server mode
+set(ProbePicking_DISABLE_CRS TRUE)
+
 # only enable find data tests if numpy is available
 include("TestNumPy")
 

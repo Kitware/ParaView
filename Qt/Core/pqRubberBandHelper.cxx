@@ -513,6 +513,14 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         }
       else
         {
+        // Need to warn user when used in RenderServer mode
+        if(!renderViewProxy->IsSelectionAvailable())
+          {
+          qWarning("Snapping to the surface is not available therefore "
+                   "the camera focal point will be used to determine "
+                   "the depth of the picking.");
+          }
+
         // Use camera focal point to get some Zbuffer
         double cameraFP[4];
         vtkRenderer* renderer = renderViewProxy->GetRenderer();
