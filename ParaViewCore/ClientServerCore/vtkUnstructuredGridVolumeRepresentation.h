@@ -162,6 +162,8 @@ protected:
   int ColorAttributeType;
   char* ColorArrayName;
 
+  double DataBounds[6];
+
 private:
   vtkUnstructuredGridVolumeRepresentation(const vtkUnstructuredGridVolumeRepresentation&); // Not implemented
   void operator=(const vtkUnstructuredGridVolumeRepresentation&); // Not implemented

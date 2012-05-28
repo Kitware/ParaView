@@ -18,6 +18,7 @@
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -32,6 +33,7 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkVolumeProperty.h"
 #include "vtkVolumeRepresentationPreprocessor.h"
 
@@ -77,6 +79,8 @@ vtkUnstructuredGridVolumeRepresentation::vtkUnstructuredGridVolumeRepresentation
 
   this->ColorArrayName = 0;
   this->ColorAttributeType = POINT_DATA;
+
+  vtkMath::UninitializeBounds(this->DataBounds);
 }
 
 //----------------------------------------------------------------------------
@@ -154,6 +158,8 @@ int vtkUnstructuredGridVolumeRepresentation::FillInputPortInformation(
 int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
+  vtkMath::UninitializeBounds(this->DataBounds);
+
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
@@ -165,10 +171,20 @@ int vtkUnstructuredGridVolumeRepresentation::RequestData(vtkInformation* request
 
     this->Preprocessor->Update();
     this->CacheKeeper->Update();
+
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(
+      this->CacheKeeper->GetOutputDataObject(0));
+    if (ds)
+      {
+      ds->GetBounds(this->DataBounds);
+      }
     }
   else
     {
     this->Preprocessor->RemoveAllInputs();
+    vtkNew<vtkUnstructuredGrid> placeholder;
+    this->Preprocessor->SetInputData(0, placeholder.GetPointer());
+    this->CacheKeeper->Update();
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -198,25 +214,16 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
       this->CacheKeeper->GetOutputDataObject(0));
     vtkPVRenderView::MarkAsRedistributable(inInfo, this);
 
-    vtkDataSet* dataset = vtkDataSet::SafeDownCast(
-      this->CacheKeeper->GetOutputDataObject(0));
-    if (dataset)
-      {
-      vtkNew<vtkMatrix4x4> matrix;
-      this->Actor->GetMatrix(matrix.GetPointer());
-      vtkPVRenderView::SetGeometryBounds(inInfo, dataset->GetBounds(),
-        matrix.GetPointer());
-      }
-
+    vtkNew<vtkMatrix4x4> matrix;
+    this->Actor->GetMatrix(matrix.GetPointer());
+    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds,
+      matrix.GetPointer());
     }
   else if (request_type == vtkPVView::REQUEST_UPDATE_LOD())
     {
-    if (this->GetNumberOfInputConnections(0) > 0)
-      {
-      this->LODGeometryFilter->SetUseOutline(
-        inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD())? 1 : 0);
-      this->LODGeometryFilter->Update();
-      }
+    this->LODGeometryFilter->SetUseOutline(
+      inInfo->Has(vtkPVRenderView::USE_OUTLINE_FOR_LOD())? 1 : 0);
+    this->LODGeometryFilter->Update();
     vtkPVRenderView::SetPieceLOD(inInfo, this,
       this->LODGeometryFilter->GetOutputDataObject(0));
     }
