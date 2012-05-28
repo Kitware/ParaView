@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlaneWidget.h"
 #include "pqInterfaceTracker.h"
 #include "pqLineSourceWidget.h"
-#include "pqPickHelper.h"
+#include "pqRubberBandHelper.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
@@ -170,7 +170,7 @@ public:
   /// Stores the selected/not selected state of the 3D widget (controlled by the owning panel)
   bool Selected;
 
-  pqPickHelper PickHelper;
+  pqRubberBandHelper PickHelper;
   QKeySequence PickSequence;
   QPointer<QShortcut> PickShortcut;
   bool IsMaster;
@@ -193,7 +193,7 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   this->setControlledProxy(pxy);
 
   QObject::connect(&this->Internal->PickHelper,
-    SIGNAL(pickFinished(double, double, double)),
+    SIGNAL(intersectionFinished(double, double, double)),
     this, SLOT(pick(double, double, double)));
 
   QObject::connect( pqApplicationCore::instance(),
@@ -317,7 +317,7 @@ void pq3DWidget::setView(pqView* pqview)
     this->Internal->PickShortcut = new QShortcut(
       this->Internal->PickSequence, pqview->getWidget());
     QObject::connect(this->Internal->PickShortcut, SIGNAL(activated()),
-      &this->Internal->PickHelper, SLOT(pick()));
+      &this->Internal->PickHelper, SLOT(triggerFastIntersect()));
     }
 
   if (rview && widget)

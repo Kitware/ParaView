@@ -2333,6 +2333,40 @@
       </Documentation>
     </Proxy>
 
+    <Proxy name="PickingHelper"
+      class="vtkPVRayCastPickingHelper" processes="dataserver">
+      <Documentation>
+        Proxy used to pick a point of a surface mesh.
+      </Documentation>
+      <DoubleVectorProperty name="PointA"
+        command="SetPointA"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="PointB"
+        command="SetPointB"
+        number_of_elements="3"
+        default_values="0.0 0.0 1.0">
+      </DoubleVectorProperty>
+      <DoubleVectorProperty name="Intersection"
+        command="GetIntersection" information_only="1" number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+      <Property name="Update" command="ComputeIntersection"></Property>
+      <ProxyProperty name="Input"
+        command="SetInput">
+        <Documentation>
+          The input from which the selection is extracted.
+        </Documentation>
+      </ProxyProperty>
+      <ProxyProperty name="Selection"
+        command="SetSelection">
+        <Documentation>
+          The selection that is used to reduced the input.
+        </Documentation>
+      </ProxyProperty>
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 
@@ -2606,7 +2640,7 @@
         number_of_elements="1" default_values="">
         <Documentation>
           Full Path + prefix file name.
-          The image full path will be: ${DumpImagePath}_${processId}.png
+          The image full path will be: ${DumpImagePath}-Tile${processId}.png
         </Documentation>
       </StringVectorProperty>
     </Proxy>

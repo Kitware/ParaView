@@ -26,7 +26,6 @@
 #include "vtkStructuredData.h" // for VTK_*_PLANE
 
 class vtkImageData;
-class vtkImageSliceDataDeliveryFilter;
 class vtkPVCacheKeeper;
 class vtkPVImageSliceMapper;
 class vtkPVLODActor;
@@ -158,11 +157,9 @@ protected:
   int SliceMode;
   unsigned int Slice;
 
-  vtkTimeStamp DeliveryTimeStamp;
-
   int WholeExtent[6];
   vtkPVCacheKeeper* CacheKeeper;
-  vtkImageSliceDataDeliveryFilter* DeliveryFilter;
+
   vtkPVImageSliceMapper* SliceMapper;
   vtkPVLODActor* Actor;
   vtkImageData* SliceData;

@@ -23,6 +23,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkPriorityHelper.h
       vtkProcessModuleConnectionManagerInternals.h
       vtkProcessModuleInternals.h
+      vtkPVDataDeliveryManager.h
       vtkPVPlugin.h
       vtkPVPluginTracker.h
       vtkPVPythonPluginInterface.h

@@ -32,6 +32,13 @@ public:
   vtkTypeMacro(vtkPVDataRepresentationPipeline, vtkCompositeDataPipeline);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Exposes the internal time-step updated when the RequestData() method on the
+  // representation is called. This makes it easier for us to determine when the
+  // representation executed.
+  unsigned long GetDataTime() const
+    { return this->DataTime; }
+
 //BTX
 protected:
   vtkPVDataRepresentationPipeline();

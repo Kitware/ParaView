@@ -141,7 +141,7 @@ vtkImageData* vtkPVImageSliceMapper::GetInput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSliceMapper::Update()
+void vtkPVImageSliceMapper::Update(int port)
 {
   // Set the whole extent on the painter because it needs it internally
   // and it has no access to the pipeline information.
@@ -163,7 +163,7 @@ void vtkPVImageSliceMapper::Update()
         currentPiece, this->NumberOfSubPieces*nPieces, this->GhostLevel);
       }
 
-    this->Superclass::Update();
+    this->Superclass::Update(port);
     }
 
 

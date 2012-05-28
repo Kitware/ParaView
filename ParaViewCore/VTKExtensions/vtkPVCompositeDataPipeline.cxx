@@ -16,18 +16,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
-#include "vtkCompositeDataIterator.h"
 #include "vtkDataObject.h"
-#include "vtkInformationDoubleKey.h"
-#include "vtkInformationExecutivePortKey.h"
-#include "vtkInformationExecutivePortVectorKey.h"
 #include "vtkInformation.h"
-#include "vtkInformationIdTypeKey.h"
-#include "vtkInformationIntegerKey.h"
 #include "vtkInformationIntegerVectorKey.h"
 #include "vtkInformationKey.h"
 #include "vtkInformationObjectBaseKey.h"
-#include "vtkInformationStringKey.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPostFilterExecutive.h"
@@ -35,7 +28,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 
 vtkStandardNewMacro(vtkPVCompositeDataPipeline);
-
 //----------------------------------------------------------------------------
 vtkPVCompositeDataPipeline::vtkPVCompositeDataPipeline()
 {
@@ -96,6 +88,13 @@ void vtkPVCompositeDataPipeline::CopyDefaultInformation(
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeDataPipeline::ResetPipelineInformation(
+  int port, vtkInformation* info)
+{
+  this->Superclass::ResetPipelineInformation(port, info);
 }
 
 //----------------------------------------------------------------------------

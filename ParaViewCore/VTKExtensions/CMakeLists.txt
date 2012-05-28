@@ -20,6 +20,7 @@ SET (Kit_SRCS
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
+  vtkAMRIncrementalResampleHelper.cxx
   vtkAnimationPlayer.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx

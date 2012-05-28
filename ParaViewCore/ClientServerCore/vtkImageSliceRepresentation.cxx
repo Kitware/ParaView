@@ -17,7 +17,6 @@
 #include "vtkCommand.h"
 #include "vtkExtractVOI.h"
 #include "vtkImageData.h"
-#include "vtkImageSliceDataDeliveryFilter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
@@ -41,7 +40,6 @@ vtkImageSliceRepresentation::vtkImageSliceRepresentation()
   this->CacheKeeper = vtkPVCacheKeeper::New();
   this->CacheKeeper->SetInputData(this->SliceData);
 
-  this->DeliveryFilter = vtkImageSliceDataDeliveryFilter::New();
   this->SliceMapper = vtkPVImageSliceMapper::New();
   this->Actor = vtkPVLODActor::New();
   this->Actor->SetMapper(this->SliceMapper);
@@ -52,7 +50,6 @@ vtkImageSliceRepresentation::~vtkImageSliceRepresentation()
 {
   this->SliceData->Delete();
   this->CacheKeeper->Delete();
-  this->DeliveryFilter->Delete();
   this->SliceMapper->SetInputData(0);
   this->SliceMapper->Delete();
   this->Actor->Delete();
@@ -123,79 +120,53 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request_type,
   vtkInformation* inInfo, vtkInformation* outInfo)
 {
-  if (request_type == vtkPVView::REQUEST_INFORMATION())
+  if (!this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo))
     {
-    // Here we need to tell the view about the geometry size and if we need
-    // ordered compositing.
-    vtkDataObject* slice = this->SliceData;
-    if (slice)
-      {
-      outInfo->Set(vtkPVRenderView::GEOMETRY_SIZE(), slice->GetActualMemorySize());
-      }
-    if (this->Actor->GetProperty()->GetOpacity() < 1.0)
-      {
-      outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-      }
+    return 0;
     }
-  else if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
-    {
-    // In REQUEST_PREPARE_FOR_RENDER, we need to ensure all our data-deliver
-    // filters have their states updated as requested by the view.
-    this->DeliveryFilter->ProcessViewRequest(inInfo);
 
-    // we have to use DeliveryTimeStamp since when image-data has invalid
-    // extents the executive goes berserk and always keeps on re-executing the
-    // pipeline which breaks when running in parallel.
-    if (this->DeliveryTimeStamp < this->DeliveryFilter->GetMTime())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
+    {
+    // provide the "geometry" to the view so the view can delivery it to the
+    // rendering nodes as and when needed.
+
+    // When this process doesn't have any valid input, the cache-keeper is setup
+    // to provide a place-holder dataset of the right type.
+    vtkPVRenderView::SetPiece(inInfo, this, 
+      this->CacheKeeper->GetOutputDataObject(0));
+
+    vtkImageData* img = vtkImageData::SafeDownCast(
+      this->CacheKeeper->GetOutputDataObject(0));
+    if (img)
       {
-      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
+      vtkPVRenderView::SetGeometryBounds(inInfo, img->GetBounds());
       }
-    }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
-    {
-    this->DeliveryFilter->Modified();
-    this->DeliveryFilter->Update();
-
-    // since there's no direct connection between the mapper and the collector,
-    // we don't put an update-suppressor in the pipeline.
-
-    // essential to break the pipeline link between the mapper and the delivery
-    // filter since when the delivery filter produces an empty image, the
-    // executive keeps on re-executing it every time.
-    vtkImageData* clone = vtkImageData::New();
-    clone->ShallowCopy(this->DeliveryFilter->GetOutputDataObject(0));
-    this->SliceMapper->SetInputData(clone);
-    clone->Delete();
-
-    this->DeliveryTimeStamp.Modified();
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    // this->SliceMapper->Update();
+    // since there's no direct connection between the mapper and the collector,
+    // we don't put an update-suppressor in the pipeline.
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    if (producerPort)
+      {
+      this->SliceMapper->SetInputConnection(producerPort);
+      }
     }
-
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkImageSliceRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  // Mark delivery filter modified.
-  this->DeliveryFilter->Modified();
-
   // Pass caching information to the cache keeper.
   this->CacheKeeper->SetCachingEnabled(this->GetUseCache());
   this->CacheKeeper->SetCacheTime(this->GetCacheKey());
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
-    this->UpdateSliceData(inputVector);
-    this->DeliveryFilter->SetInputConnection(this->CacheKeeper->GetOutputPort());
-    }
-  else
-    {
-    this->DeliveryFilter->RemoveAllInputs();
+    this->UpdateSliceData(inputVector); 
+    this->CacheKeeper->Update();
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -268,6 +239,7 @@ void vtkImageSliceRepresentation::UpdateSliceData(
   // vtkExtractVOI is not passing correct origin. Until that's fixed, I
   // will just use the input origin/spacing to compute the bounds.
   this->SliceData->SetOrigin(input->GetOrigin());
+
   voi->Delete();
   clone->Delete();
 }

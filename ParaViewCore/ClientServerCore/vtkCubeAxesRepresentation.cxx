@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkCubeAxesRepresentation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataIterator.h"
@@ -24,8 +25,11 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderView.h"
+#include "vtkOutlineSource.h"
+#include "vtkPolyData.h"
 #include "vtkProperty.h"
+#include "vtkProperty.h"
+#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkTextProperty.h"
@@ -35,6 +39,9 @@ vtkStandardNewMacro(vtkCubeAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
 {
+  this->OutlineSource = vtkOutlineSource::New();
+  this->OutlineSource->SetBoxTypeToAxisAligned();
+
   this->CubeAxesActor = vtkCubeAxesActor::New();
   this->CubeAxesActor->SetPickable(0);
 
@@ -53,6 +60,7 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
 vtkCubeAxesRepresentation::~vtkCubeAxesRepresentation()
 {
   this->CubeAxesActor->Delete();
+  this->OutlineSource->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -139,23 +147,26 @@ int vtkCubeAxesRepresentation::ProcessViewRequest(
     return 0;
     }
 
-  if (request_type == vtkPVView::REQUEST_PREPARE_FOR_RENDER())
+  if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    if (this->BoundsUpdateTime < this->GetMTime())
-      {
-      outInfo->Set(vtkPVRenderView::NEEDS_DELIVERY(), 1);
-      }
+    // we don't call Update() on the outline source, hence on processes without
+    // any input data, the dataset will be uninitialized.
+    vtkPVRenderView::SetPiece(inInfo, this, 
+      this->OutlineSource->GetOutputDataObject(0));
     }
-  else if (request_type == vtkPVView::REQUEST_DELIVERY())
+  else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    if (this->View)
+    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+    if (producerPort)
       {
-      // This is a complex code that ensures that all processes end up with the
-      // max bounds. This includes the client, data-server, render-server nodes.
-      this->View->SynchronizeBounds(this->DataBounds);
+      vtkAlgorithm* producer = producerPort->GetProducer();
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(producer->GetOutputDataObject(
+          producerPort->GetIndex()));
+      if (ds)
+        {
+        ds->GetBounds(this->DataBounds);
+        }
       }
-    this->BoundsUpdateTime.Modified();
-
     this->UpdateBounds();
     }
 
@@ -197,7 +208,10 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
       iter->Delete();
       bbox.GetBounds(this->DataBounds);
       }
+    this->OutlineSource->SetBounds(this->DataBounds);
+    this->OutlineSource->Update();
     }
+
 
   // We fire UpdateDataEvent to notify the representation proxy that the
   // representation was updated. The representation proxty will then call

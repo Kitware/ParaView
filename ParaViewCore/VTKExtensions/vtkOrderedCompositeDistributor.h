@@ -40,6 +40,7 @@
 #define __vtkOrderedCompositeDistributor_h
 
 #include "vtkPointSetAlgorithm.h"
+#include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI
 
 class vtkBSPCuts;
 class vtkDataSet;

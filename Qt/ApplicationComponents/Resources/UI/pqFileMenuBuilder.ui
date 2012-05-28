@@ -116,7 +116,7 @@
   </action>
   <action name="actionExport" >
    <property name="text" >
-    <string>Export</string>
+    <string>Export Scene</string>
    </property>
   </action>
 

@@ -80,7 +80,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindowAdapter.h
   pqOutputPort.h
   pqParallelCoordinatesChartView.h
-  pqPickHelper.h
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
@@ -256,8 +255,6 @@ PVVTK_ADD_LIBRARY(pqCore
   pqOutputWindow.h
   pqParallelCoordinatesChartView.cxx
   pqParallelCoordinatesChartView.h
-  pqPickHelper.cxx
-  pqPickHelper.h
   pqPipelineFilter.cxx
   pqPipelineFilter.h
   pqPipelineRepresentation.cxx

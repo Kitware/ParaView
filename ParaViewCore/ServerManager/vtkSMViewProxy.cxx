@@ -26,8 +26,8 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSession.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMUtilities.h"
 
@@ -130,6 +130,8 @@ void vtkSMViewProxy::StillRender()
   // side then we get deadlocks.
   this->Update();
 
+  vtkTypeUInt32 render_location = this->PreRender(interactive==1);
+
   if (this->ObjectsCreated)
     {
     vtkClientServerStream stream;
@@ -137,7 +139,7 @@ void vtkSMViewProxy::StillRender()
            << VTKOBJECT(this)
            << "StillRender"
            << vtkClientServerStream::End;
-    this->ExecuteStream(stream);
+    this->ExecuteStream(stream, false, render_location);
     }
 
   this->PostRender(interactive==1);
@@ -156,6 +158,8 @@ void vtkSMViewProxy::InteractiveRender()
   // working over a slow client-server connection.
   // this->Update();
 
+  vtkTypeUInt32 render_location = this->PreRender(interactive==1);
+
   if (this->ObjectsCreated)
     {
     vtkClientServerStream stream;
@@ -163,7 +167,7 @@ void vtkSMViewProxy::InteractiveRender()
            << VTKOBJECT(this)
            << "InteractiveRender"
            << vtkClientServerStream::End;
-    this->ExecuteStream(stream);
+    this->ExecuteStream(stream, false, render_location);
     }
 
   this->PostRender(interactive==1);

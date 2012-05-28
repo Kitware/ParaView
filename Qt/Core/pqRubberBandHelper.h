@@ -69,7 +69,8 @@ public:
     BLOCKS,
     ZOOM,
     PICK,
-    PICK_ON_CLICK
+    PICK_ON_CLICK,
+    FAST_INTERSECT
   };
   // PICK_ON_CLICK mode is same as pick, except that the helper does not change
   // the interactor or draw any rubber bands, now change the cursor. It just
@@ -95,6 +96,11 @@ public slots:
   void beginZoom();
   void beginPick();
   void beginPickOnClick();
+  void beginFastIntersect();
+
+  /// Instantly trigger a FastIntersect processing which will fire
+  /// intersectionFinished(xyz) based on the curent mouse location.
+  void triggerFastIntersect();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.
@@ -132,9 +138,13 @@ signals:
   /// This is inverse of selectionModeChanged signal, provided for convenience.
   void interactionModeChanged(bool notselectable);
 
-  /// Fired to mark the start and ends of election.
+  /// Fired to mark the start and ends of selection.
   void startSelection();
   void stopSelection();
+  void selecting(bool);
+
+  /// Fired in FAST_INTERSECT_MODE
+  void intersectionFinished(double x, double y, double z);
 
 protected slots:
   void emitEnabledSignals();

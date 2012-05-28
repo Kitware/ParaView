@@ -90,7 +90,9 @@ public:
   
   // Description:
   // Update that sets the update piece first.
-  virtual void Update();
+  virtual void Update(int port);
+  virtual void Update()
+    { this->Superclass::Update(); }
 
   // Description:
   // If you want only a part of the data, specify by setting the piece.

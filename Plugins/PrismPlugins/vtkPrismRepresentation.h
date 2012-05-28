@@ -29,12 +29,20 @@ public:
   vtkTypeMacro(vtkPrismRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes.
+  // Overridden to generate prism-specific meta-data during
+  // vtkPVView::REQUEST_UPDATE() pass.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
 //BTX
 protected:
   vtkPrismRepresentation();
   ~vtkPrismRepresentation();
 
-  virtual bool GenerateMetaData(vtkInformation*, vtkInformation* outInfo);
+  virtual bool GetPrismMetaData(vtkInformation* outInfo);
+
 private:
   vtkPrismRepresentation(const vtkPrismRepresentation&); // Not implemented
   void operator=(const vtkPrismRepresentation&); // Not implemented

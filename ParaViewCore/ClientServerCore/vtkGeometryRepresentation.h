@@ -27,15 +27,12 @@
 
 class vtkCompositePolyDataMapper2;
 class vtkMapper;
-class vtkOrderedCompositeDistributor;
 class vtkPVCacheKeeper;
 class vtkPVGeometryFilter;
 class vtkPVLODActor;
-class vtkPVUpdateSuppressor;
 class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
-class vtkUnstructuredDataDeliveryFilter;
 
 class VTK_EXPORT vtkGeometryRepresentation : public vtkPVDataRepresentation
 {
@@ -171,15 +168,6 @@ public:
   virtual void SetMapScalars(int val);
   virtual void SetStatic(int val);
 
-  // Description:
-  // Convert the selection to a type appropriate for sharing with other
-  // representations through vtkAnnotationLink, possibly using the view.
-  // For the superclass, we just return the same selection.
-  // Subclasses may do something more fancy, like convert the selection
-  // from a frustrum to a list of pedigree ids.  If the selection cannot
-  // be applied to this representation, return NULL.
-  virtual vtkSelection* ConvertSelection(vtkView* view, vtkSelection* selection);
-
   virtual void SetAllowSpecularHighlightingWithScalarColoring(int allow);
 
 //BTX
@@ -217,7 +205,7 @@ protected:
 
   // Description:
   // Produce meta-data about this representation that the view may find useful.
-  virtual bool GenerateMetaData(vtkInformation*, vtkInformation*);
+  VTK_LEGACY(virtual bool GenerateMetaData(vtkInformation*, vtkInformation*));
 
   // Description:
   // Adds the representation to the view.  This is called from
@@ -252,13 +240,6 @@ protected:
   vtkMapper* LODMapper;
   vtkPVLODActor* Actor;
   vtkProperty* Property;
-  vtkUnstructuredDataDeliveryFilter* DeliveryFilter;
-  vtkUnstructuredDataDeliveryFilter* LODDeliveryFilter;
-  vtkOrderedCompositeDistributor* Distributor;
-  vtkPVUpdateSuppressor* UpdateSuppressor;
-  vtkPVUpdateSuppressor* LODUpdateSuppressor;
-  vtkPVUpdateSuppressor* DeliverySuppressor;
-  vtkPVUpdateSuppressor* LODDeliverySuppressor;
 
   int ColorAttributeType;
   char* ColorArrayName;
@@ -269,6 +250,7 @@ protected:
   bool SuppressLOD;
   bool AllowSpecularHighlightingWithScalarColoring;
   bool RequestGhostCellsIfNeeded;
+  double DataBounds[6];
 
 private:
   vtkGeometryRepresentation(const vtkGeometryRepresentation&); // Not implemented
