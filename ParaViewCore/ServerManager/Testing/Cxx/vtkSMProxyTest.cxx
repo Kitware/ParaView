@@ -75,15 +75,15 @@ void vtkSMProxyTest::GetProperty()
   vtkSMProxy *proxy = pxm->NewProxy("sources", "SphereSource");
   QVERIFY(proxy != NULL);
 
-  // get 'Center' property
-  vtkSMProperty *property = proxy->GetProperty("Center");
-  QVERIFY(property != NULL);
-  QCOMPARE(proxy->GetPropertyName(property), "Center");
+  // get 'Center' smproperty
+  vtkSMProperty *smproperty = proxy->GetProperty("Center");
+  QVERIFY(smproperty != NULL);
+  QCOMPARE(proxy->GetPropertyName(smproperty), "Center");
 
-  // try to get an invalid property
-  property = proxy->GetProperty("NonexistantSphereProperty");
-  QVERIFY(property == NULL);
-  QVERIFY(proxy->GetPropertyName(property) == NULL);
+  // try to get an invalid smproperty
+  smproperty = proxy->GetProperty("NonexistantSphereProperty");
+  QVERIFY(smproperty == NULL);
+  QVERIFY(proxy->GetPropertyName(smproperty) == NULL);
 
   proxy->Delete();
   session->Delete();

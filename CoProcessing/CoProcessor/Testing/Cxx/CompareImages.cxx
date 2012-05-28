@@ -27,7 +27,7 @@ int IsFileValid(const char* fileName)
     vtkGenericWarningMacro("Could not find file " << fileName);
     return 0;
     }
-  if(vtksys::SystemTools::GetFilenameLastExtension(fileName) == ".png" == 0)
+  if(vtksys::SystemTools::GetFilenameLastExtension(fileName) == ".png")
     {
     vtkGenericWarningMacro("Wrong file type " << fileName);
     return 0;

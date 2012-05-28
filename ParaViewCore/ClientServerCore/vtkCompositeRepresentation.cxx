@@ -229,6 +229,19 @@ void vtkCompositeRepresentation::RemoveInputConnection(
 }
 
 //----------------------------------------------------------------------------
+void vtkCompositeRepresentation::RemoveInputConnection(
+  int port, int idx)
+{
+  vtkInternals::RepresentationMap::iterator iter;
+  for (iter = this->Internals->Representations.begin();
+    iter != this->Internals->Representations.end(); iter++)
+    {
+    iter->second.GetPointer()->RemoveInputConnection(port, idx);
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkCompositeRepresentation::MarkModified()
 {
   vtkInternals::RepresentationMap::iterator iter;
@@ -241,7 +254,7 @@ void vtkCompositeRepresentation::MarkModified()
 }
 
 //----------------------------------------------------------------------------
-void vtkCompositeRepresentation::Update()
+void vtkCompositeRepresentation::Update(int port)
 {
   // FIXME:STREAMING -- do we call Update() on the active repr here?
   //vtkPVDataRepresentation* curActive = this->GetActiveRepresentation();
@@ -249,7 +262,7 @@ void vtkCompositeRepresentation::Update()
   //  {
   //  curActive->Update();
   //  }
-  this->Superclass::Update();
+  this->Superclass::Update(port);
 }
 
 //----------------------------------------------------------------------------

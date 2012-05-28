@@ -51,6 +51,7 @@ public:
   virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void AddInputConnection(vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
+  virtual void RemoveInputConnection(int port, int index);
 
   // Description:
   // Propagate the modification to all internal representations.

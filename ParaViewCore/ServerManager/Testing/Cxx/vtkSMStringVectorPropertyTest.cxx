@@ -23,42 +23,42 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMStringVectorPropertyTest::SetNumberOfElements()
 {
-  vtkSMStringVectorProperty *property = vtkSMStringVectorProperty::New();
-  QCOMPARE(property->GetNumberOfElements(), 0U);
+  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
+  QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
-  property->SetNumberOfElements(5);
-  QCOMPARE(property->GetNumberOfElements(), 5U);
+  smproperty->SetNumberOfElements(5);
+  QCOMPARE(smproperty->GetNumberOfElements(), 5U);
 
-  property->SetNumberOfElements(2);
-  QCOMPARE(property->GetNumberOfElements(), 2U);
+  smproperty->SetNumberOfElements(2);
+  QCOMPARE(smproperty->GetNumberOfElements(), 2U);
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMStringVectorPropertyTest::SetElement()
 {
-  vtkSMStringVectorProperty *property = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
 
-  property->SetElement(2, "Hello");
-  QCOMPARE(property->GetNumberOfElements(), 3U);
-  QCOMPARE(property->GetElement(0), "");
-  QCOMPARE(property->GetElement(1), "");
-  QCOMPARE(property->GetElement(2), "Hello");
+  smproperty->SetElement(2, "Hello");
+  QCOMPARE(smproperty->GetNumberOfElements(), 3U);
+  QCOMPARE(smproperty->GetElement(0), "");
+  QCOMPARE(smproperty->GetElement(1), "");
+  QCOMPARE(smproperty->GetElement(2), "Hello");
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMStringVectorPropertyTest::SetElements()
 {
-  vtkSMStringVectorProperty *property = vtkSMStringVectorProperty::New();
+  vtkSMStringVectorProperty *smproperty = vtkSMStringVectorProperty::New();
 
   const char *values[] = {"Para", "View"};
-  property->SetElements(values, 2);
-  QCOMPARE(property->GetNumberOfElements(), 2U);
-  QCOMPARE(property->GetElement(0), "Para");
-  QCOMPARE(property->GetElement(1), "View");
+  smproperty->SetElements(values, 2);
+  QCOMPARE(smproperty->GetNumberOfElements(), 2U);
+  QCOMPARE(smproperty->GetElement(0), "Para");
+  QCOMPARE(smproperty->GetElement(1), "View");
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMStringVectorPropertyTest::Copy()

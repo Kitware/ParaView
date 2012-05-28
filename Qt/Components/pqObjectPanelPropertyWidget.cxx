@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(pqObjectPanel *objectPanel,
-                                                         QWidget *parent)
-  : pqPropertyWidget(objectPanel->proxy(), parent)
+                                                         QWidget *parentObject)
+  : pqPropertyWidget(objectPanel->proxy(), parentObject)
 {
   this->ObjectPanel = objectPanel;
   this->connect(this->ObjectPanel, SIGNAL(modified()), this, SIGNAL(modified()));

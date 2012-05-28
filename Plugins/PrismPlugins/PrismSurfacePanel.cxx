@@ -518,9 +518,9 @@ bool PrismSurfacePanel::pqUI::LoadConversions(const QString &fileName)
        {
            SESAMEConversionsForTable tableData;
 
-           std::string data= tableElement->GetAttribute("Id");
+           std::string data_str= tableElement->GetAttribute("Id");
            int intValue;
-           sscanf(data.c_str(),"%d",&intValue);
+           sscanf(data_str.c_str(),"%d",&intValue);
            tableData.TableId=intValue;
 
            for(int v=0;v<tableElement->GetNumberOfNestedElements();v++)
@@ -532,26 +532,26 @@ bool PrismSurfacePanel::pqUI::LoadConversions(const QString &fileName)
                    SESAMEConversionVariable variableData;
                    double value;
 
-                    data=variableElement->GetAttribute("Name");
-                    variableData.Name=data.c_str();
+                    data_str=variableElement->GetAttribute("Name");
+                    variableData.Name=data_str.c_str();
 
-                    data=variableElement->GetAttribute("SESAME_Units");
-                    variableData.SESAMEUnits=data.c_str();
+                    data_str=variableElement->GetAttribute("SESAME_Units");
+                    variableData.SESAMEUnits=data_str.c_str();
 
 
-                    data= variableElement->GetAttribute("SESAME_SI");
-                    sscanf(data.c_str(),"%lf",&value);
+                    data_str= variableElement->GetAttribute("SESAME_SI");
+                    sscanf(data_str.c_str(),"%lf",&value);
                     variableData.SIConversion=value;
 
-                    data=variableElement->GetAttribute("SESAME_SI_Units");
-                    variableData.SIUnits=data.c_str();
+                    data_str=variableElement->GetAttribute("SESAME_SI_Units");
+                    variableData.SIUnits=data_str.c_str();
 
-                    data= variableElement->GetAttribute("SESAME_cgs");
-                    sscanf(data.c_str(),"%lf",&value);
+                    data_str= variableElement->GetAttribute("SESAME_cgs");
+                    sscanf(data_str.c_str(),"%lf",&value);
                     variableData.cgsConversion=value;
 
-                    data=variableElement->GetAttribute("SESAME_cgs_Units");
-                    variableData.cgsUnits=data.c_str();
+                    data_str=variableElement->GetAttribute("SESAME_cgs_Units");
+                    variableData.cgsUnits=data_str.c_str();
 
                     tableData.VariableConversions.insert(variableData.Name,variableData);
                }

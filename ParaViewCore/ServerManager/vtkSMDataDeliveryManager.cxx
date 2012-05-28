@@ -146,18 +146,18 @@ bool vtkSMDataDeliveryManager::DeliverNextPiece()
   if (representation_id != 0)
     {
     // we have something to deliver.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
+    vtkClientServerStream stream2;
+    stream2 << vtkClientServerStream::Invoke
            << VTKOBJECT(this->ViewProxy)
            << "GetDeliveryManager"
            << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
+    stream2 << vtkClientServerStream::Invoke
            << vtkClientServerStream::LastResult
            << "StreamingDeliver"
-           << representation_id 
+           << representation_id
            << vtkClientServerStream::End;
     this->ViewProxy->GetSession()->ExecuteStream(
-      this->ViewProxy->GetLocation(), stream, false);
+      this->ViewProxy->GetLocation(), stream2, false);
     }
   vtkTimerLog::MarkEndEvent("DeliverNextPiece");
   return representation_id != 0;

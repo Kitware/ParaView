@@ -67,7 +67,7 @@ vtkRedistributePolyData::~vtkRedistributePolyData()
   this->SetController(0);
 }
 
-int vtkRedistributePolyData::RequestData(vtkInformation* request,
+int vtkRedistributePolyData::RequestData(vtkInformation* vtkNotUsed(request),
                                          vtkInformationVector** inputVector,
                                          vtkInformationVector* outputVector)
 {

@@ -918,8 +918,8 @@ int vtkPrismSESAMEReader::JumpToTable( int toTable )
 }
 
 int vtkPrismSESAMEReader::RequestData(vtkInformation*,
-                                      vtkInformationVector** inputVector,
-                                      vtkInformationVector* outputVector)
+                                      vtkInformationVector**,
+                                      vtkInformationVector*)
 {
   // read the file
   JumpToTable(this->Internal->TableId);

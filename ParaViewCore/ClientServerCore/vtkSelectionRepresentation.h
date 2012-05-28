@@ -47,6 +47,7 @@ public:
   virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void AddInputConnection(vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
+  virtual void RemoveInputConnection(int port, int idx);
 
   // Description:
   // This needs to be called on all instances of vtkSelectionRepresentation when

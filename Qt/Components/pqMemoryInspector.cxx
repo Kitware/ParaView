@@ -251,13 +251,14 @@ public:
     }
 
   /// Method needed for copy/past cell editor
-  virtual Qt::ItemFlags flags ( const QModelIndex & index ) const
+  virtual Qt::ItemFlags flags ( const QModelIndex & idx) const
  {
-    return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+    return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
   }
 
-  virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
+  virtual bool setData ( const QModelIndex &, const QVariant &, int role = Qt::EditRole )
   {
+  (void) role;
     // Fake edition...
     return true;
   }
@@ -423,12 +424,12 @@ void pqMemoryInspector::updateSummary()
   this->Internals->summary->document()->setHtml(text);
 
   // Try reduce height of the process summary
-  int height = this->Internals->summary->heightForWidth(this->Internals->summary->width());
-  if(height < 0)
+  int height1 = this->Internals->summary->heightForWidth(this->Internals->summary->width());
+  if(height1 < 0)
     {
-    height = this->Internals->summary->minimumSizeHint().height();
+    height1 = this->Internals->summary->minimumSizeHint().height();
     }
-  this->Internals->summary->setMaximumHeight(height + 10);
+  this->Internals->summary->setMaximumHeight(height1 + 10);
 }
 
 //-----------------------------------------------------------------------------

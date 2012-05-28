@@ -81,6 +81,7 @@ int vtkPVPlotMatrixView::GetActiveRow()
     {
     return this->PlotMatrix->GetActivePlot().X();
     }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -90,6 +91,7 @@ int vtkPVPlotMatrixView::GetActiveColumn()
     {
     return this->PlotMatrix->GetActivePlot().Y();
     }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
