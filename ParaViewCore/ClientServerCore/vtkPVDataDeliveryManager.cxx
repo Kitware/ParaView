@@ -595,10 +595,7 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
       // FIXME: check that the mode flags are "suitable" for AMR.
       }
-
-    // release old memory (not necessarily, but try).
-    item->SetDeliveredDataObject(NULL);
-
+ 
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
     dataMover->SetOutputDataType(data->GetDataObjectType());
@@ -608,9 +605,17 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       dataMover->SetMoveModeToClone();
       }
     dataMover->SetInputData(data);
-    dataMover->Update();
 
-    item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
+    if (dataMover->GetOutputGeneratedOnProcess())
+      {
+      // release old memory (not necessarily, but try).
+      item->SetDeliveredDataObject(NULL);
+      }
+    dataMover->Update();
+    if (dataMover->GetOutputGeneratedOnProcess())
+      {
+      item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
+      }
     }
 
   vtkTimerLog::MarkEndEvent(use_lod?

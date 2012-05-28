@@ -376,6 +376,46 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
 }
 
 //-----------------------------------------------------------------------------
+bool vtkMPIMoveData::GetOutputGeneratedOnProcess()
+{
+  switch (this->Server)
+    {
+  case vtkMPIMoveData::RENDER_SERVER:
+    // if this->Server is RENDER_SERVER, then we are in a true client-ds-rs
+    // configuration. In that case, the data is valid only when movemode is
+    // clone or pass-thru.
+    return (this->MoveMode == PASS_THROUGH ||
+      this->MoveMode == CLONE ||
+      this->MoveMode == COLLECT_AND_PASS_THROUGH);
+
+  case vtkMPIMoveData::DATA_SERVER:
+    // if this->Server is DATA_SERVER, we may be in cs or cdsrs modes.
+    if (this->MPIMToNSocketConnection)
+      {
+      // definitely in render-server mode. This process never generates data.
+      return false;
+      }
+    return (this->MoveMode == PASS_THROUGH ||
+      this->MoveMode == CLONE ||
+      this->MoveMode == COLLECT_AND_PASS_THROUGH);
+
+  case vtkMPIMoveData::CLIENT:
+      if (this->ClientDataServerSocketController)
+        {
+        // client.
+        return (this->MoveMode == COLLECT ||
+          this->MoveMode == CLONE ||
+          this->MoveMode == COLLECT_AND_PASS_THROUGH);
+        }
+      // built-in mode; ofcourse we have data.
+      return true;
+    }
+
+  vtkErrorMacro("Invalid setup. Is vtkMPIMoveData initialized yet?");
+  return false;
+}
+
+//-----------------------------------------------------------------------------
 // This filter  is going to replace the many variations of collection fitlers.
 // It handles collection and duplication.
 // It handles poly data and unstructured grid.

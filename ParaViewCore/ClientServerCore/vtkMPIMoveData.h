@@ -94,6 +94,13 @@ public:
   static void SetUseZLibCompression(bool b);
   static bool GetUseZLibCompression();
 
+  // Description:
+  // vtkMPIMoveData doesn't necessarily generate a valid output data on all the
+  // involved processes (depending on the MoveMode and Server ivars). This
+  // returns true if valid data is available on the current processes after
+  // successful Update() given the current ivars).
+  bool GetOutputGeneratedOnProcess();
+
 //BTX
   enum MoveModes {
     PASS_THROUGH=0,
