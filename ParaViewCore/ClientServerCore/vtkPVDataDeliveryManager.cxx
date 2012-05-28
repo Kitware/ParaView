@@ -624,7 +624,7 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       item->SetDeliveredDataObject(NULL);
       }
     dataMover->Update();
-    if (dataMover->GetOutputGeneratedOnProcess())
+    if (item->GetDeliveredDataObject() == NULL)
       {
       item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
       }
