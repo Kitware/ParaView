@@ -116,8 +116,13 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
     }
   else if(vtkSMIntRangeDomain *range = vtkSMIntRangeDomain::SafeDownCast(domain))
     {
-    if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
+    int elementCount = ivp->GetNumberOfElements();
+
+    if(elementCount == 1 &&
+       range->GetMinimumExists(0) &&
+       range->GetMaximumExists(0))
       {
+      // slider + spin box
       pqIntRangeWidget *widget = new pqIntRangeWidget(this);
       widget->setObjectName("IntRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
@@ -127,8 +132,6 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
       }
     else
       {
-      int elementCount = ivp->GetNumberOfElements();
-
       if(elementCount == 6)
         {
         QGridLayout *gridLayout = new QGridLayout;
@@ -138,16 +141,16 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
         for(int i = 0; i < 3; i++)
           {
           QLineEdit *lineEdit = new QLineEdit(this);
-          lineEdit->setObjectName("LineEdit" + QString::number(i));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i)));
+          lineEdit->setObjectName("LineEdit" + QString::number(i*2+0));
+          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i*2+0)));
           gridLayout->addWidget(lineEdit, i, 0);
-          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
+          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+0);
 
           lineEdit = new QLineEdit(this);
-          lineEdit->setObjectName("LineEdit" + QString::number(i + 3));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i + 3)));
+          lineEdit->setObjectName("LineEdit" + QString::number(i*2+1));
+          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i*2+1)));
           gridLayout->addWidget(lineEdit, i, 1);
-          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i + 3);
+          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+1);
           }
 
         layout->addLayout(gridLayout);
