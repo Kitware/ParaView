@@ -33,6 +33,15 @@ FOREACH(name ${ServersFilters_SRCS})
     vtkInteractionImage)
 ENDFOREACH(name)
 
+set (_MPI_TEST_PATH ${CXX_TEST_PATH})
+# CMAKE_CONFIGURATION_TYPES is set for generators that support multiple
+# configurations e.g. Visual Studio. In that case we update the _MPI_TEST_PATH to
+# include the configuration type (CTEST_CONFIGURATION_TYPE)
+  if (CMAKE_CONFIGURATION_TYPES)
+set (_MPI_TEST_PATH ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE})
+endif (CMAKE_CONFIGURATION_TYPES)
+
+
 IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
    PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(TestIceTCompositePass TestIceTCompositePass.cxx)
@@ -40,7 +49,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
 
   ADD_TEST(TestIceTCompositePassWithBlurAndOrderedCompositing
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            ${_MPI_TEST_PATH}/TestIceTCompositePass
             --tdx 2
             --blur
             --use-ordered-compositing
@@ -52,7 +61,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
 
   ADD_TEST(TestIceTCompositePassWithSobel
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            ${_MPI_TEST_PATH}/TestIceTCompositePass
             --sobel
             -D ${PARAVIEW_DATA_ROOT}
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -61,7 +70,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
 
   ADD_TEST(TestIceTCompositePassDepthOnly
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTCompositePass
+            ${_MPI_TEST_PATH}/TestIceTCompositePass
             --tdx 2
             --depth-only
             -D ${PARAVIEW_DATA_ROOT}
@@ -74,7 +83,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
 
   ADD_TEST(TestSimpleIceTCompositePass
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestSimpleIceTCompositePass
+            ${_MPI_TEST_PATH}/TestSimpleIceTCompositePass
             -D ${PARAVIEW_DATA_ROOT}
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
             -V Baseline/TestSimpleIceTCompositePass.png
@@ -85,7 +94,7 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
 
   ADD_TEST(TestIceTShadowMapPass-image
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/TestIceTShadowMapPass
+            ${_MPI_TEST_PATH}/TestIceTShadowMapPass
             --tdx 2
             -D ${PARAVIEW_DATA_ROOT}
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -125,7 +134,7 @@ IF (PARAVIEW_USE_MPI)
 
     ADD_TEST(TestDistributedSubsetSortingTable
             ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
-            ${CXX_TEST_PATH}/\${CTEST_CONFIGURATION_TYPE}/DistributedSubsetSortingTable
+            ${_MPI_TEST_PATH}/DistributedSubsetSortingTable
             -D ${VTK_DATA_ROOT}
             -T ${VTK_BINARY_DIR}/Testing/Temporary
             ${VTK_MPI_POSTFLAGS})
