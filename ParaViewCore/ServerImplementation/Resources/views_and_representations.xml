@@ -1184,9 +1184,6 @@
         default_values="vtkOriginalCellIds"
         panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_cell">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
@@ -1196,9 +1193,6 @@
         default_values="vtkOriginalPointIds"
         panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_point">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
@@ -2714,9 +2708,6 @@
         </Documentation>
         <ArrayListDomain name="array_list" attribute_type="Scalars"
           input_domain_name="input_array_any">
-          <RequiredProperties>
-            <Property name="Input" function="Input" />
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
