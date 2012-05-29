@@ -4928,7 +4928,8 @@ The Warp (vector) filter translates the points of the input dataset using a spec
 	 command="SetInputArrayToProcess"
 	 number_of_elements="5"
 	 element_types="0 0 0 0 2"
-	 label="Vectors">
+	 label="Vectors"
+   panel_visibility="default" >
 	    <ArrayListDomain name="array_list" attribute_type="Vectors">
 	      <RequiredProperties>
 		 <Property name="Input" function="Input"/>
@@ -4946,7 +4947,8 @@ The Warp (vector) filter translates the points of the input dataset using a spec
 	 name="ScaleFactor"
 	 command="SetScaleFactor"
 	 number_of_elements="1"
-	 default_values="1.0" >
+	 default_values="1.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  Each component of the selected vector array will be multiplied by the value of this property before being used to compute new point coordinates.
