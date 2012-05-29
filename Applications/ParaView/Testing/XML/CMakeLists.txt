@@ -58,7 +58,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ExodusIIPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusModeShapes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExodusXML.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExportX3dPOVVRML.xml
@@ -229,7 +228,6 @@ set(ZLibXDMF_USE_NEW_PANELS TRUE)
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)
 set(Threshold_BREAK TRUE)
-set(ExodusIIPanel_BREAK TRUE)
 set(ExodusModeShapes_BREAK TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
@@ -458,7 +456,6 @@ set (CreateDelete_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (D3SmallCells_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (DualSphereAnimation_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (EnSight_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-#set (ExodusIIPanel_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (ExodusModeShapes_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (ExodusXML_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (ExTimeseries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
