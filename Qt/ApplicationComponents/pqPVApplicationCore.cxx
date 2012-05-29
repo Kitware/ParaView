@@ -197,11 +197,11 @@ pqTestUtility* pqPVApplicationCore::testUtility()
 }
 
 //-----------------------------------------------------------------------------
-bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event )
+bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event_ )
 {
-  if (event->type() == QEvent::FileOpen)
+  if (event_->type() == QEvent::FileOpen)
     {
-    QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
+    QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event_);
     if (!fileEvent->file().isEmpty())
       {
       QList<QString> files;
@@ -221,6 +221,6 @@ bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event )
   else
     {
     // standard event processing
-    return QObject::eventFilter(obj, event);
+    return QObject::eventFilter(obj, event_);
     }
 }
