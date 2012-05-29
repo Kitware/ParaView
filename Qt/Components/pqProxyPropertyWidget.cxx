@@ -71,12 +71,10 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *property,
     this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
 
     layout->addWidget(widget);
+
+    // don't show label for the proxy selection widget
+    this->setShowLabel(false);
     }
 
   this->setLayout(layout);
-}
-
-bool pqProxyPropertyWidget::showLabel() const
-{
-  return false;
 }
