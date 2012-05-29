@@ -1009,6 +1009,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
         }
       else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
         {
+        bool selection_input = (pp->GetHints() &&
+          pp->GetHints()->FindNestedElementByName("SelectionInput"));
+
         // find the domain
         vtkSMDomain *domain = 0;
         vtkSMDomainIterator *domainIter = pp->NewDomainIterator();
@@ -1018,7 +1021,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           }
         domainIter->Delete();
 
-        if(vtkSMProxyListDomain::SafeDownCast(domain))
+        if (selection_input || vtkSMProxyListDomain::SafeDownCast(domain))
           {
           propertyWidget = new pqProxyPropertyWidget(pp, smProxy, this);
           }

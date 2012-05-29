@@ -469,7 +469,8 @@
      </Documentation>
 
      <InputProperty name="Input"
-	 command="SetInputConnection">
+        command="SetInputConnection"
+        panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>
@@ -485,7 +486,8 @@
      </InputProperty>
 
      <InputProperty name="Selection"
-	 command="SetSelectionConnection">
+	 command="SetSelectionConnection"
+   panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>
@@ -9345,7 +9347,8 @@ This property controls how the filter works to generate tensor cell data. You ca
      </InputProperty>
 
      <InputProperty name="Selection"
-	 command="SetSelectionConnection">
+	 command="SetSelectionConnection"
+   panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>

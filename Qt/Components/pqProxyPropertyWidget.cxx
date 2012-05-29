@@ -34,48 +34,83 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 
-#include "vtkSMProperty.h"
+#include "pqProxySelectionWidget.h"
+#include "pqSelectionInputWidget.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMProperty.h"
 #include "vtkSMProxyListDomain.h"
 
-#include "pqProxySelectionWidget.h"
-
-pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *property,
+pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smproperty,
                                              vtkSMProxy *proxy,
                                              QWidget *parent)
   : pqPropertyWidget(proxy, parent)
 {
-  QVBoxLayout *layout = new QVBoxLayout;
+  QVBoxLayout *vbox = new QVBoxLayout;
 
-  // find the domain
-  vtkSMDomain *domain = 0;
-  vtkSMDomainIterator *domainIter = property->NewDomainIterator();
-  for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
+  bool selection_input = (smproperty->GetHints() &&
+    smproperty->GetHints()->FindNestedElementByName("SelectionInput"));
+  if (selection_input)
     {
-    domain = domainIter->GetDomain();
-    }
-  domainIter->Delete();
+    pqSelectionInputWidget* siw = new pqSelectionInputWidget(this);
+    siw->setObjectName(proxy->GetPropertyName(smproperty));
+    vbox->addWidget(siw);
 
-  if(vtkSMProxyListDomain::SafeDownCast(domain))
-    {
-    pqProxySelectionWidget *widget =
-      new pqProxySelectionWidget(proxy,
-                                 proxy->GetPropertyName(property),
-                                 property->GetXMLLabel(),
-                                 this);
-    widget->setView(this->view());
-    widget->select();
-    this->addPropertyLink(widget,
-                          proxy->GetPropertyName(property),
-                          SIGNAL(proxyChanged(pqSMProxy)),
-                          property);
-    this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
+    this->SelectionInputWidget = siw;
 
-    layout->addWidget(widget);
+    this->addPropertyLink(siw, "selection",
+      SIGNAL(selectionChanged(pqSMProxy)), smproperty);
+    
+    this->connect(siw, SIGNAL(selectionChanged(pqSMProxy)),
+      this, SIGNAL(modified()));
 
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
     }
+  else
+    {
+    // find the domain
+    vtkSMProxyListDomain *domain = 0;
+    vtkSMDomainIterator *domainIter = smproperty->NewDomainIterator();
+    for (domainIter->Begin(); !domainIter->IsAtEnd() && domain == NULL; domainIter->Next())
+      {
+      domain = vtkSMProxyListDomain::SafeDownCast(domainIter->GetDomain());
+      }
+    domainIter->Delete();
 
-  this->setLayout(layout);
+    if (domain)
+      {
+      pqProxySelectionWidget *widget = new pqProxySelectionWidget(proxy,
+        proxy->GetPropertyName(smproperty),
+        smproperty->GetXMLLabel(),
+        this);
+      widget->setView(this->view());
+      widget->select();
+      this->addPropertyLink(widget,
+        proxy->GetPropertyName(smproperty),
+        SIGNAL(proxyChanged(pqSMProxy)),
+        smproperty);
+      this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
+
+      vbox->addWidget(widget);
+
+      // don't show label for the proxy selection widget
+      this->setShowLabel(false);
+      }
+    }
+
+  this->setLayout(vbox);
+}
+
+void pqProxyPropertyWidget::apply()
+{
+  if (this->SelectionInputWidget)
+    {
+    this->SelectionInputWidget->preAccept();
+    }
+  this->Superclass::apply();
+  if (this->SelectionInputWidget)
+    {
+    this->SelectionInputWidget->postAccept();
+    }
 }
