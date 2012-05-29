@@ -9776,7 +9776,8 @@ This property controls how the filter works to generate tensor cell data. You ca
 
       <StringVectorProperty name="XColumn"
 	command="SetXColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list">
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>
@@ -9789,7 +9790,8 @@ This property controls how the filter works to generate tensor cell data. You ca
       </StringVectorProperty>
       <StringVectorProperty name="YColumn"
 	command="SetYColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list" >
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>
@@ -9802,7 +9804,8 @@ This property controls how the filter works to generate tensor cell data. You ca
       </StringVectorProperty>
       <StringVectorProperty name="ZColumn"
 	command="SetZColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list" >
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>
