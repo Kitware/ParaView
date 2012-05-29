@@ -63,6 +63,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *property,
                                  proxy->GetPropertyName(property),
                                  property->GetXMLLabel(),
                                  this);
+    widget->setView(this->view());
     widget->select();
     this->addPropertyLink(widget,
                           proxy->GetPropertyName(property),

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 #include "pqProxy.h"
+#include "pqPropertiesPanel.h"
 
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
   : QWidget(parent),
@@ -49,6 +50,14 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
 
 pqPropertyWidget::~pqPropertyWidget()
 {
+}
+
+pqView* pqPropertyWidget::view() const
+{
+  pqPropertiesPanel *panel =
+    qobject_cast<pqPropertiesPanel *>(this->parentWidget());
+
+  return panel ? panel->view() : 0;
 }
 
 vtkSMProxy* pqPropertyWidget::proxy() const

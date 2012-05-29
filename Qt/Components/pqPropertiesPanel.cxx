@@ -941,6 +941,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       item.IsAdvanced = QString(group->GetPanelVisibility()) == "advanced";
       item.Modified = true;
 
+      this->connect(this, SIGNAL(viewChanged(pqView*)),
+                    propertyWidget, SIGNAL(viewChanged(pqView*)));
+
       widgets.append(item);
       }
     }
@@ -994,15 +997,15 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       {
       if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy);
+        propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy, this);
         }
       else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy);
+        propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy, this);
         }
       else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy);
+        propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy, this);
         }
       else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
         {
@@ -1017,7 +1020,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
         if(vtkSMProxyListDomain::SafeDownCast(domain))
           {
-          propertyWidget = new pqProxyPropertyWidget(pp, smProxy);
+          propertyWidget = new pqProxyPropertyWidget(pp, smProxy, this);
           }
         }
       }
@@ -1055,6 +1058,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
         }
 
       item.Modified = true;
+
+      this->connect(this, SIGNAL(viewChanged(pqView*)),
+                    propertyWidget, SIGNAL(viewChanged(pqView*)));
 
       widgets.append(item);
       }
