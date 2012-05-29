@@ -52,12 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QHBoxLayout>
 
-pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
+pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                                                      vtkSMProxy *proxy,
                                                      QWidget *parent)
   : pqPropertyWidget(proxy, parent)
 {
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property);
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty);
   if(!ivp)
     {
     return;
@@ -97,7 +97,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
     this->addPropertyLink(adaptor,
                           "currentText",
                           SIGNAL(currentTextChanged(QString)),
-                          property);
+                          smproperty);
 
     layout->addWidget(comboBox);
     }
@@ -106,6 +106,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
     pqTreeWidget *treeWidget = new pqTreeWidget(this);
 
     treeWidget->setObjectName("TreeWidget");
+    treeWidget->setHeaderLabel(smproperty->GetXMLLabel());
 
     pqSignalAdaptorCompositeTreeWidget *adaptor =
       new pqSignalAdaptorCompositeTreeWidget(treeWidget, ivp);
@@ -113,6 +114,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
     this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), ivp);
 
     layout->addWidget(treeWidget);
+    this->setShowLabel(false);
     }
   else if(vtkSMIntRangeDomain *range = vtkSMIntRangeDomain::SafeDownCast(domain))
     {
@@ -142,13 +144,13 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
           {
           QLineEdit *lineEdit = new QLineEdit(this);
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+0));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i*2+0)));
+          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+0)));
           gridLayout->addWidget(lineEdit, i, 0);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+0);
 
           lineEdit = new QLineEdit(this);
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+1));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i*2+1)));
+          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+1)));
           gridLayout->addWidget(lineEdit, i, 1);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+1);
           }
@@ -161,7 +163,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *property,
           {
           QLineEdit *lineEdit = new QLineEdit;
           lineEdit->setObjectName("LineEdit" + QString::number(i));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(property).GetAsInt(i)));
+          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
           layout->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
           }
