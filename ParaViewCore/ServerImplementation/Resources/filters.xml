@@ -8644,7 +8644,8 @@ Tessellate a higher-order dataset.
 	command="AddLevel"
 	clean_command="RemoveAllLevels"
 	repeat_command="1"
-	number_of_elements_per_command="1">
+	number_of_elements_per_command="1"
+  panel_visibility="default" >
 	<Hints>
 	  <!-- Tells the widget not to use flat-indicies for this property.
 		Only needed when number_of_elements_per_command==1
