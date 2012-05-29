@@ -56,19 +56,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 
 #include <QComboBox>
+#include <QLabel>
 #include <QLineEdit>
-#include <QHBoxLayout>
+#include <QTextEdit>
 #include <QTreeWidget>
+#include <QVBoxLayout>
 
-pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *property,
+pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smproperty,
                                                            vtkSMProxy *proxy,
                                                            QWidget *parent)
   : pqPropertyWidget(proxy, parent)
 {
-  vtkSMStringVectorProperty *ivp = vtkSMStringVectorProperty::SafeDownCast(property);
+  vtkSMStringVectorProperty *ivp = vtkSMStringVectorProperty::SafeDownCast(smproperty);
   if(!ivp)
     {
     return;
+    }
+
+  bool multiline_text = false;
+  if (ivp->GetHints())
+    {
+    vtkPVXMLElement* widgetHint = ivp->GetHints()->FindNestedElementByName("Widget");
+    if (widgetHint && widgetHint->GetAttribute("type") &&
+      strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
+      {
+      multiline_text = true;
+      }
     }
   
   // find the domain
@@ -80,9 +93,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
     }
   domainIter->Delete();
 
-  QHBoxLayout *layout = new QHBoxLayout;
-  layout->setMargin(0);
-  layout->setSpacing(0);
+  QVBoxLayout *vbox = new QVBoxLayout;
+  vbox->setMargin(0);
+  vbox->setSpacing(0);
 
   if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
     {
@@ -94,12 +107,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
       comboBox->addItem(ed->GetEntryText(i));
       }
 
-    layout->addWidget(comboBox);
+    vbox->addWidget(comboBox);
     }
-  else if(vtkSMFileListDomain *fld = vtkSMFileListDomain::SafeDownCast(domain))
+  else if (vtkSMFileListDomain::SafeDownCast(domain))
     {
     // dont show properties with filename
-//    if(property->GetXMLLabel() == "FileName")
+//    if(smproperty->GetXMLLabel() == "FileName")
 //      {
 //      }
 
@@ -107,7 +120,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
     chooser->setObjectName("FileChooser");
 
     // decide whether to allow multiple files
-    if(property->GetRepeatable())
+    if(smproperty->GetRepeatable())
       {
       // multiple file names allowed
       chooser->setForceSingleFile(false);
@@ -115,7 +128,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
       this->addPropertyLink(chooser,
                             "filenames",
                             SIGNAL(filenamesChanged(QStringList)),
-                            property);
+                            smproperty);
       }
     else
       {
@@ -124,14 +137,14 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
       this->addPropertyLink(chooser,
                             "singleFilename",
                             SIGNAL(filenameChanged(QString)),
-                            property);
+                            smproperty);
       }
 
-    // If there's a hint on the property indicating that this property expects a
+    // If there's a hint on the smproperty indicating that this smproperty expects a
     // directory name, then, we will use the directory mode.
-    if (property->IsA("vtkSMStringVectorProperty") &&
-        property->GetHints() &&
-        property->GetHints()->FindNestedElementByName("UseDirectoryName"))
+    if (smproperty->IsA("vtkSMStringVectorProperty") &&
+        smproperty->GetHints() &&
+        smproperty->GetHints()->FindNestedElementByName("UseDirectoryName"))
       {
       chooser->setUseDirectoryMode(true);
       }
@@ -140,7 +153,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
       pqApplicationCore::instance()->getServerManagerModel();
     chooser->setServer(smm->findServer(proxy->GetSession()));
 
-    layout->addWidget(chooser);
+    vbox->addWidget(chooser);
     }
   else if(vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(domain))
     {
@@ -154,7 +167,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
 
     this->addPropertyLink(comboBox, "currentText", SIGNAL(currentIndexChanged(QString)), ivp);
 
-    layout->addWidget(comboBox);
+    vbox->addWidget(comboBox);
     }
   else if (vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(domain))
     {
@@ -169,28 +182,58 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *proper
     tree->setModel(silModel);
 
     this->addPropertyLink(tree->activeModel(), "values",
-      SIGNAL(valuesChanged()), property);
+      SIGNAL(valuesChanged()), smproperty);
 
     // hide widget label
     setShowLabel(false);
 
-    layout->addWidget(tree);
+    vbox->addWidget(tree);
     }
-  else if(vtkSMArraySelectionDomain *asd = vtkSMArraySelectionDomain::SafeDownCast(domain))
+  else if (vtkSMArraySelectionDomain::SafeDownCast(domain))
     {
     pqExodusIIVariableSelectionWidget* selectorWidget =
       new pqExodusIIVariableSelectionWidget(this);
     selectorWidget->setObjectName("ArraySelectionWidget");
     selectorWidget->setRootIsDecorated(false);
-    selectorWidget->setHeaderLabel(property->GetXMLLabel());
+    selectorWidget->setHeaderLabel(smproperty->GetXMLLabel());
     this->addPropertyLink(
-      selectorWidget, proxy->GetPropertyName(property),
-      SIGNAL(widgetModified()), property);
+      selectorWidget, proxy->GetPropertyName(smproperty),
+      SIGNAL(widgetModified()), smproperty);
 
     // hide widget label
     setShowLabel(false);
 
-    layout->addWidget(selectorWidget);
+    vbox->addWidget(selectorWidget);
    }
-  this->setLayout(layout);
+  else if (multiline_text)
+    {
+    QLabel* label = new QLabel(smproperty->GetXMLLabel(), this);
+    vbox->addWidget(label);
+
+    // add a multiline text widget
+    QTextEdit *textEdit = new QTextEdit(this);
+    QFont textFont("Courier");
+    textEdit->setFont(textFont);
+    textEdit->setObjectName(proxy->GetPropertyName(smproperty));
+    textEdit->setAcceptRichText(false);
+    textEdit->setTabStopWidth(2);
+    textEdit->setLineWrapMode(QTextEdit::NoWrap);
+
+    this->addPropertyLink(textEdit, "plainText",
+      SIGNAL(textChanged()), smproperty);
+    
+    vbox->addWidget(textEdit);
+    this->setShowLabel(false);
+    }
+  else
+    {
+    // add a single line edit.
+    QLineEdit* lineEdit = new QLineEdit(this);
+    lineEdit->setObjectName(proxy->GetPropertyName(smproperty));
+    this->addPropertyLink(lineEdit, "text",
+      SIGNAL(textChanged(const QString&)), smproperty);
+
+    vbox->addWidget(lineEdit);
+    }
+  this->setLayout(vbox);
 }

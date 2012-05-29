@@ -9197,7 +9197,8 @@ This filter extracts a list of datasets from hierarchical datasets.
        name="Format"
        command="SetFormat"
        number_of_elements="1"
-       default_values="Time: %f">
+       default_values="Time: %f"
+       panel_visibility="default" >
        <Documentation>
 	 The value of this property is a format string used to display the input time. The format string is specified using printf style.
        </Documentation>

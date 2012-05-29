@@ -1888,7 +1888,8 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
        name="Format"
        command="SetFormat"
        number_of_elements="1"
-       default_values="Time: %f">
+       default_values="Time: %f"
+       panel_visibility="default" >
        <Documentation>
          This property specifies the format used to display the input time (using printf style).
        </Documentation>
