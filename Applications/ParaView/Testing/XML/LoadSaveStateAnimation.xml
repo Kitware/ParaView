@@ -25,7 +25,7 @@
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileSaveServerState" />
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temp.pvsm" />
   
-  <pqevent object="pqClientMainWindow/objectInspectorDock/objectInspector/Delete" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Delete" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileLoadServerState" />
   <pqevent object="pqClientMainWindow/FileLoadServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/temp.pvsm" />
   <pqevent object="pqClientMainWindow/FixStateFilenamesDialog/1pqCollapsedGroup0/FileName/FileButton" command="activate" arguments="" />
