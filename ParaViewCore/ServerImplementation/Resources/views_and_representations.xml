@@ -183,7 +183,7 @@
       <DoubleVectorProperty name="LODThreshold"
         command="SetLODRenderingThreshold"
         number_of_elements="1"
-        default_values="0">
+        default_values="5">
         <Documentation>
           Set the memory size threshold above which LOD will be used while
           rendering interactively. The value is rendering-geometry size in MBs.

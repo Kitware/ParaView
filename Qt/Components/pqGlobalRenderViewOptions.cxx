@@ -88,12 +88,6 @@ public:
       QVariant(value/10.0).toString() + " MBytes");
     }
 
-  void updateTileDisplayCompositeThresholdLabel(int value)
-    {
-    this->tileDisplayCompositeThresholdLabel->setText(
-      QVariant(value/10.0).toString() + " MBytes");
-    }
-
   void updateSubsamplingRateLabel(int value)
     {
     this->subsamplingRateLabel->setText(QVariant(value).toString() 
@@ -209,9 +203,6 @@ void pqGlobalRenderViewOptions::init()
   QObject::connect(this->Internal->compositeThreshold,
     SIGNAL(valueChanged(int)), this, SLOT(compositeThresholdSliderChanged(int)));
 
-  QObject::connect(this->Internal->tileDisplayCompositeThreshold,
-    SIGNAL(valueChanged(int)), this, SLOT(tileDisplayCompositeThresholdSliderChanged(int)));
-
   QObject::connect(this->Internal->subsamplingRate,
     SIGNAL(valueChanged(int)), this, SLOT(subsamplingRateSliderChanged(int)));
 
@@ -287,10 +278,6 @@ void pqGlobalRenderViewOptions::init()
                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->enableStillRenderSubsampleRate,
-                  SIGNAL(toggled(bool)),
-                  this, SIGNAL(changesAvailable()));
-
-  QObject::connect(this->Internal->enableTileDisplayCompositing,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
@@ -429,16 +416,6 @@ void pqGlobalRenderViewOptions::applyChanges()
   else
     {
     settings->setValue("RemoteRenderThreshold", VTK_DOUBLE_MAX);
-    }
-
-  if (this->Internal->enableTileDisplayCompositing->isChecked())
-    {
-    settings->setValue("TileDisplayCompositeThreshold", 
-      this->Internal->tileDisplayCompositeThreshold->value() / 10.0);
-    }
-  else
-    {
-    settings->setValue("TileDisplayCompositeThreshold", VTK_DOUBLE_MAX);
     }
 
   settings->setValue("DisableOrderedCompositing",
@@ -636,22 +613,6 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->updateCompositeThresholdLabel(this->Internal->compositeThreshold->value());
     }
 
-  val = settings->value("TileDisplayCompositeThreshold", 3);
-  if (val.toDouble() >= VTK_LARGE_FLOAT)
-    {
-    this->Internal->enableTileDisplayCompositing->setCheckState(Qt::Unchecked);
-    this->Internal->updateTileDisplayCompositeThresholdLabel(
-      this->Internal->tileDisplayCompositeThreshold->value());
-    }
-  else
-    {
-    this->Internal->enableTileDisplayCompositing->setCheckState(Qt::Checked);
-    this->Internal->tileDisplayCompositeThreshold->setValue(static_cast<int>(val.toDouble()*10));
-    this->Internal->updateTileDisplayCompositeThresholdLabel(
-      this->Internal->tileDisplayCompositeThreshold->value());
-    }
-  
-  
   val = settings->value("DisableOrderedCompositing", false);
   this->Internal->orderedCompositing->setChecked(val.toBool());
 
@@ -836,13 +797,6 @@ void pqGlobalRenderViewOptions::outlineThresholdSliderChanged(int value)
 void pqGlobalRenderViewOptions::compositeThresholdSliderChanged(int value)
 {
   this->Internal->updateCompositeThresholdLabel(value);
-  emit this->changesAvailable();
-}
-
-//-----------------------------------------------------------------------------
-void pqGlobalRenderViewOptions::tileDisplayCompositeThresholdSliderChanged(int value)
-{
-  this->Internal->updateTileDisplayCompositeThresholdLabel(value);
   emit this->changesAvailable();
 }
 
