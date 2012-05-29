@@ -3169,7 +3169,8 @@
         name="QFileName"
         command="SetQFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="default">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the .q (solution) file name for the PLOT3D reader.
@@ -3261,7 +3262,8 @@
         command="AddFunction"
         clean_command="RemoveAllFunctions"
         repeat_command="1"
-        number_of_elements_per_command="1">
+        number_of_elements_per_command="1"
+        panel_visibility="default">
        <EnumerationDomain name="array_list">
          <!-- <Entry value="100" text="Scalar - Density"/> -->
          <Entry value="110" text="Scalar - Pressure"/>
