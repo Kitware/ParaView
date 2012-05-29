@@ -4838,7 +4838,8 @@ The Warp (scalar) filter translates the points of the input data set along a vec
 	command="SetInputArrayToProcess"
 	number_of_elements="5"
 	element_types="0 0 0 0 2"
-	label="Scalars">
+	label="Scalars"
+  panel_visibility="default" >
 	   <ArrayListDomain name="array_list" attribute_type="Scalars">
 	     <RequiredProperties>
 		<Property name="Input" function="Input"/>
@@ -4854,7 +4855,8 @@ The Warp (scalar) filter translates the points of the input data set along a vec
 	command="SetScaleFactor"
 	number_of_elements="1"
 	animateable="1"
-	default_values="1.0" >
+	default_values="1.0"
+  panel_visibility="default" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
 	 The scalar value at a given point is multiplied by the value of this property to determine the magnitude of the change vector for that point.
