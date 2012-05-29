@@ -68,7 +68,7 @@
     <string>Select Cells On</string>
    </property>
    <property name="toolTip">
-    <string>Select Cells On</string>
+    <string>Select Cells On (s)</string>
    </property>
    <property name="statusTip">
     <string>Select Cells On</string>
@@ -95,10 +95,13 @@
     <string>Select Cells Through</string>
    </property>
    <property name="toolTip">
-    <string>Select Cells Through</string>
+    <string>Select Cells Through (f)</string>
    </property>
    <property name="statusTip">
     <string>Select Cells Through</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
    </property>
   </action>
   <action name="actionSelectSurfacePoints">
@@ -119,10 +122,13 @@
     <string>Select Points On</string>
    </property>
    <property name="toolTip">
-    <string>Select Points On</string>
+    <string>Select Points On (d)</string>
    </property>
    <property name="statusTip">
     <string>Select Points On</string>
+   </property>
+   <property name="shortcut">
+    <string>D</string>
    </property>
   </action>
   <action name="actionSelectFrustumPoints">
@@ -143,10 +149,13 @@
     <string>Select Points Through</string>
    </property>
    <property name="toolTip">
-    <string>Select Points Through</string>
+    <string>Select Points Through (g)</string>
    </property>
    <property name="statusTip">
     <string>Select Points Through</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
    </property>
   </action>
   <action name="actionSelect_Block">
@@ -162,6 +171,9 @@
    </property>
    <property name="text">
     <string>Select Block</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Block (b)</string>
    </property>
    <property name="shortcut">
     <string>B</string>
@@ -180,6 +192,12 @@
    </property>
    <property name="text">
     <string>Pick Object</string>
+   </property>
+   <property name="toolTip">
+    <string>Pick Object (n)</string>
+   </property>
+   <property name="shortcut">
+    <string>N</string>
    </property>
   </action>
 
