@@ -6076,7 +6076,8 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
 	name="VOI"
 	command="SetVOI"
 	number_of_elements="6"
-	default_values="0 0 0 0 0 0">
+	default_values="0 0 0 0 0 0"
+  panel_visibility="default" >
        <ExtentDomain name="extent">
 	 <RequiredProperties>
 	    <Property name="Input" function="Input"/>
