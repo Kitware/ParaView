@@ -6862,7 +6862,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="PreShift"
 	 command="SetPreShift"
 	 number_of_elements="1"
-	 default_values="0.0" >
+	 default_values="0.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  Apply a translation to the data before scaling.
@@ -6875,7 +6876,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="PostShift"
 	 command="SetPostShift"
 	 number_of_elements="1"
-	 default_values="0.0" >
+	 default_values="0.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  The amount of time the input is shifted.
@@ -6886,7 +6888,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="Scale"
 	 command="SetScale"
 	 number_of_elements="1"
-	 default_values="1.0" >
+	 default_values="1.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  The factor by which the input time is scaled.
