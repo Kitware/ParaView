@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+	<key>CFBundleGetInfoString</key>
+	<string>${MACOSX_BUNDLE_INFO_STRING}</string>
+	<key>CFBundleIconFile</key>
+	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${MACOSX_BUNDLE_GUI_IDENTIFIER}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
+	<key>CFBundleName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${MACOSX_BUNDLE_SHORT_VERSION_STRING}</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_VERSION}</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>LSRequiresCarbon</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
+
+<!-- File type associations -->
+<key>CFBundleDocumentTypes</key>
+<array>
+<!-- ExodusIII -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>ExodusIII data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>g</string>
+<string>e</string>
+<string>ex2</string>
+<string>ex2v2</string>
+<string>exo</string>
+<string>gen</string>
+<string>exoII</string>
+<string>0</string>
+<string>00</string>
+<string>000</string>
+<string>0000</string>
+<string>exii</string>
+<string>ex-timeseries</string>
+</array>
+</dict>
+<!-- LSDyna -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>LSDyna data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>d3plot</string>
+<string>k</string>
+<string>lsdyna</string>
+</array>
+</dict>
+<!-- ParaView -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>ParaView data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>pvd</string>
+</array>
+</dict>
+<!-- VTK -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>VTK data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>vtk</string>
+<string>pvtk</string>
+<string>vtp</string>
+<string>vtu</string>
+<string>vti</string>
+<string>vts</string>
+<string>vtr</string>
+<string>pvtp</string>
+<string>pvtu</string>
+<string>pvti</string>
+<string>pvts</string>
+<string>pvtr</string>
+<string>vtmb</string>
+<string>vtm</string>
+<string>vthb</string>
+</array>
+<key>CFBundleTypeIconFile</key>
+<string>vtk.icns</string>
+</dict>
+<!-- EnSight -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>EnSight data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>case</string>
+<string>Case</string>
+<string>CASE</string>
+<string>sos</string>
+<string>SOS</string>
+</array>
+</dict>
+<!-- BYU -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>BYU data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>g</string>
+</array>
+</dict>
+<!-- Xdmf -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Xdmf data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>xmf</string>
+<string>xdmf</string>
+</array>
+</dict>
+<!-- Protein Data Bank -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Protein Data Bank data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>pdb</string>
+</array>
+</dict>
+<!-- XMol -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>XMole Molecule data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>xyz</string>
+</array>
+</dict>
+<!-- PLOT3D -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>PLOT3D data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>xyz</string>
+</array>
+</dict>
+<!-- SpyPlot -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>SpyPlot CTH data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>spcth</string>
+<string>0</string>
+<string>spcth-timeseries</string>
+</array>
+</dict>
+<!-- Digital Elevation Map -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Digital Elevation Map data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>dem</string>
+</array>
+</dict>
+<!-- VRML 2 -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>VRML 2 data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>wrl</string>
+</array>
+</dict>
+<!-- PLY Polygonal -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>PLY Polygonal data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>ply</string>
+</array>
+</dict>
+<!-- Stereo Lithography -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Stereo Lithography data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>stl</string>
+</array>
+</dict>
+<!-- Gaussian Cube -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Gaussian Cube data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>cube</string>
+</array>
+</dict>
+<!-- Raw -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Raw (binary) data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>raw</string>
+</array>
+</dict>
+<!-- POP Ocean -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>POP Ocean data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>pop</string>
+</array>
+</dict>
+<!-- AVS UCD -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>AVS UCD data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>inp</string>
+</array>
+</dict>
+<!-- Meta Image Data -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Meta Image data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>mhd</string>
+<string>mha</string>
+</array>
+</dict>
+<!-- Faced Polygonal -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Faced Polygonal data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>facet</string>
+</array>
+</dict>
+<!-- PNG Image -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>PNG Image</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>png</string>
+</array>
+</dict>
+<!-- Phasta -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Phasta data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>pht</string>
+</array>
+</dict>
+<!-- SESAME -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>SESAME data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>sesame</string>
+</array>
+</dict>
+<!-- Comma-separated-values -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Comma-separated-values data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>csv</string>
+</array>
+</dict>
+<!-- MFIX Unstructured Grid -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>MFIX Unstructured Grid data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>RES</string>
+</array>
+</dict>
+<!-- Fluent Case Files -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>Fluent Case data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>cas</string>
+</array>
+</dict>
+<!-- OpenFOAM -->
+<dict>
+<key>CFBundleTypeName</key>
+<string>OpenFOAM data</string>
+<key>CFBundleTypeRole</key>
+<string>Viewer</string>
+<key>LSIsAppleDefaultForType</key>
+<true/>
+<key>CFBundleTypeExtensions</key>
+<array>
+<string>foam</string>
+<string>OpenFOAM</string>
+</array>
+<key>CFBundleTypeIconFile</key>
+<string>OpenFOAM.icns</string>
+</dict>
+</array>
+<!-- File type associations -->
+
+</dict>
+</plist>

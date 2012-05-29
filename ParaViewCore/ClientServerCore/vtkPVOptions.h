@@ -144,6 +144,10 @@ public:
   /// Provides access to server-url if specified on the command line.
   vtkGetStringMacro(ServerURL);
 
+  // Description:
+  // This is used when user want to open a file at startup
+  vtkSetStringMacro(ParaViewDataName);
+
 protected:
 //BTX
   // Description:
@@ -174,7 +178,6 @@ protected:
 
   // Description:
   // Subclasses may need to access these
-  vtkSetStringMacro(ParaViewDataName);
   char* ParaViewDataName;
 
   vtkSetStringMacro(RenderServerHostName);

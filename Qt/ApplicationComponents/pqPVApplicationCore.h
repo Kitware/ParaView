@@ -95,6 +95,9 @@ public slots:
   void startSearch();
 
 protected:
+  /// Override event filter in order to catch file association mechanism
+  virtual bool eventFilter ( QObject * obj, QEvent * event );
+
   QPointer<pqSelectionManager> SelectionManager;
   QPointer<pqAnimationManager> AnimationManager;
   QPointer<pqApplyPropertiesManager> ApplyPropertiesManger;
