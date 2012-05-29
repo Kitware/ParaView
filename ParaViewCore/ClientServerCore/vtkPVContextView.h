@@ -67,13 +67,6 @@ public:
   // representations are "dirty" on all processes to avoid race conditions.
   virtual void Update();
 
-  // Description:
-  // ENABLE_SERVER_SIDE_RENDERING() key in placed in the REQUEST_UPDATE() pass
-  // to indicate to the representations that server-side rendering of charts
-  // would be needed. This is the case when tile-display mode is enabled and
-  // charts are to be rendered on the tiles on the server-side.
-  static vtkInformationIntegerKey* ENABLE_SERVER_SIDE_RENDERING();
-
 //BTX
 protected:
   vtkPVContextView();

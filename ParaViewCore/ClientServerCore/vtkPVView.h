@@ -144,16 +144,16 @@ public:
   // instead use ProcessViewRequest() for all vtkPVDataRepresentations.
   virtual void Update();
 
+  // Description:
+  // Returns true if the application is currently in tile display mode.
+  bool InTileDisplayMode();
+
 //BTX
   vtkGetMacro(Identifier, unsigned int);
 
 protected:
   vtkPVView();
   ~vtkPVView();
-
-  // Description:
-  // Returns true if the application is currently in tile display mode.
-  bool InTileDisplayMode();
 
   // vtkPVSynchronizedRenderWindows is used to ensure that this view participates
   // in tile-display configurations. Even if your view subclass a simple
