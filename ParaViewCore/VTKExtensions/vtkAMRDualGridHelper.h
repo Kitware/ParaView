@@ -176,7 +176,7 @@ private:
   double GlobalOrigin[3];
   
   // Each level will have a grid to help find neighbors.
-  vtkstd::vector<vtkAMRDualGridHelperLevel*> Levels;
+  std::vector<vtkAMRDualGridHelperLevel*> Levels;
 
   int EnableDegenerateCells;
 
@@ -334,7 +334,7 @@ public:
   int NormalAxis;
 
   // Sparse array of points for equivalence computation.
-  vtkstd::vector<vtkAMRDualGridHelperSeed> FragmentIds;
+  std::vector<vtkAMRDualGridHelperSeed> FragmentIds;
   void AddFragmentSeed(int level, int x, int y, int z, int fragmentId);
 
   // This is the number of blocks pointing to this face.
