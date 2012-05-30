@@ -94,6 +94,7 @@ ADD_PARAVIEW_PLUGIN(
 
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
+  set(CoProcessingGUI_USE_NEW_PANELS TRUE)
   # this test is redundant with the CoProcessingFullWorkflow test
   # in the coprocessing library but that may not be built so we
   # add it here as well. this test though is a subset of that test.
