@@ -75,11 +75,7 @@ protected:
                        int smindex = -1);
   void setShowLabel(bool show);
 
-private slots:
-  void setModified(bool modified = true);
-
 private:
-  bool isModified() const;
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
 
@@ -89,7 +85,6 @@ private:
   vtkSMProxy *Proxy;
   vtkSMProperty *Property;
   pqPropertyLinks Links;
-  bool Modified;
   bool ShowLabel;
 };
 

@@ -499,7 +499,6 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     item.Name = proxy->getProxy()->GetXMLName();
     item.LabelWidget = 0;
     item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
-    item.PropertyWidget->setModified(false);
     item.IsAdvanced = false;
     widgets.append(item);
     }

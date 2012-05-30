@@ -40,12 +40,10 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
     Proxy(proxy),
     Property(0)
 {
-  this->Modified = false;
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()), this, SIGNAL(modified()));
-  this->connect(this, SIGNAL(modified()), this, SLOT(setModified()));
 }
 
 pqPropertyWidget::~pqPropertyWidget()
@@ -73,13 +71,11 @@ vtkSMProperty* pqPropertyWidget::property() const
 void pqPropertyWidget::apply()
 {
   this->Links.accept();
-  this->setModified(false);
 }
 
 void pqPropertyWidget::reset()
 {
   this->Links.reset();
-  this->setModified(false);
 }
 
 void pqPropertyWidget::setShowLabel(bool show)
@@ -104,16 +100,6 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
                               this->Proxy,
                               smproperty,
                               smindex);
-}
-
-void pqPropertyWidget::setModified(bool modified)
-{
-  this->Modified = modified;
-}
-
-bool pqPropertyWidget::isModified() const
-{
-  return this->Modified;
 }
 
 void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)
