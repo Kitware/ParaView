@@ -926,6 +926,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       if(propertyWidget->showLabel())
         {
         item.LabelWidget = new QLabel(group->GetType());
+        item.LabelWidget->setWordWrap(true);
         }
       else
         {
@@ -1041,6 +1042,8 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           {
           label = new QLabel(name);
           }
+
+        label->setWordWrap(true);
         }
 
       QString objectName = propertyIter->GetKey();
