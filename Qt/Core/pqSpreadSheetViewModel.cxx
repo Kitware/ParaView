@@ -214,6 +214,7 @@ public:
   QPointer<pqDataRepresentation> ActiveRepresentation;
   vtkWeakPointer<vtkSMProxy> ActiveRepresentationProxy;
   vtkSpreadSheetView *VTKView;
+  QList<bool> ColumnVisibility;
   bool Dirty;
 };
 
@@ -774,5 +775,26 @@ Qt::ItemFlags pqSpreadSheetViewModel::flags ( const QModelIndex & index ) const
 bool pqSpreadSheetViewModel::setData ( const QModelIndex & index, const QVariant & value, int role )
 {
   // Do nothing, we are not supposed to change our data...
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::setVisible ( int section, bool visibility )
+{
+  while(this->Internal->ColumnVisibility.size() <= section)
+    {
+    this->Internal->ColumnVisibility.append(true);
+    }
+  this->Internal->ColumnVisibility[section] = visibility;
+  emit this->headerDataChanged(Qt::Horizontal, section-1, section);
+}
+
+//-----------------------------------------------------------------------------
+bool pqSpreadSheetViewModel::isVisible ( int section )
+{
+  if(this->Internal->ColumnVisibility.size() > section)
+    {
+    return this->Internal->ColumnVisibility.at(section);
+    }
   return true;
 }

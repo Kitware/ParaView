@@ -36,10 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 // Qt Includes.
+#include <QAction>
+#include <QComboBox>
+#include <QDebug>
+#include <QPointer>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QComboBox>
-#include <QPointer>
+#include <QMenu>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
@@ -58,6 +62,8 @@ public:
   QPointer<pqSignalAdaptorComboBox> AttributeAdaptor;
   QPointer<pqComboBoxDomain> AttributeDomain;
   QPointer<pqSignalAdaptorSpinBox> DecimalPrecisionAdaptor;
+  QMenu ColumnToggleMenu;
+
   pqInternal()
     {
     }
@@ -97,6 +103,9 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
 
   QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
     this->Spreadsheet, SLOT(render()));
+
+  QObject::connect(this->Internal->ToggleColumnVisibility, SIGNAL(clicked()),
+    this, SLOT(showToggleColumnPopupMenu()));
 
   QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)),
     this, SLOT(currentIndexChanged(pqOutputPort*)));
@@ -177,4 +186,56 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
 void pqSpreadSheetViewDecorator::displayPrecisionChanged(int precision)
 {
   this->Spreadsheet->getViewModel()->setDecimalPrecision(precision);
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::showToggleColumnPopupMenu()
+{
+  // Update toggle list
+  QMap<QString,bool> userRole;
+  this->Internal->ColumnToggleMenu.clear();
+  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+    {
+    QString name =
+        this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString();
+    userRole[name] = this->Spreadsheet->getViewModel()->isVisible(i);
+    if(!name.startsWith("__"))
+      {
+      this->Internal->ColumnToggleMenu.addAction(name);
+      }
+    }
+
+  foreach(QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+    {
+    a->setCheckable(true);
+    a->setChecked(userRole[a->text()]);
+    QObject::connect(a, SIGNAL(changed()), this, SLOT(updateColumnVisibility()));
+    }
+
+  if(userRole.size() > 0)
+    {
+    this->Internal->ColumnToggleMenu.popup(
+          this->Internal->ToggleColumnVisibility->mapToGlobal(
+            QPoint(0, this->Internal->ToggleColumnVisibility->height())));
+    }
+  }
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::updateColumnVisibility()
+{
+  QList<QString> headers;
+  for(int i=0; i < this->Spreadsheet->getViewModel()->columnCount(); i++)
+    {
+    headers.append(
+        this->Spreadsheet->getViewModel()->headerData(i, Qt::Horizontal).toString());
+    }
+
+  foreach(QAction* a, this->Internal->ColumnToggleMenu.findChildren<QAction*>())
+    {
+    int index = headers.indexOf(a->text());
+    if(index >= 0)
+      {
+      this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
+      }
+    }
 }

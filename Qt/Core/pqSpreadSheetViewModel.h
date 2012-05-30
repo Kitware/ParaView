@@ -106,6 +106,12 @@ public:
   /// Return true only if the given column is sortable.
   bool isSortable(int section);
 
+  /// Return true only if the given column is visible
+  bool isVisible(int section);
+
+  /// Set the visibility of a given column
+  void setVisible(int section, bool visible);
+
   /// Returns the field type for the data currently shown by this model.
   int getFieldType() const;
 

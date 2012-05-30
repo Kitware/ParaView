@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
     <height>26</height>
+    <width>526</width>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -131,6 +131,26 @@
      </property>
      <property name="toolButtonStyle" >
       <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="ToggleColumnVisibility">
+     <property name="toolTip">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="statusTip">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="whatsThis">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="text">
+      <string>Toggle column visibility</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</normaloff>:/pqWidgets/Icons/pqRectilinearGrid16.png</iconset>
      </property>
     </widget>
    </item>
