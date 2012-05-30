@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 class pqSelectionInputWidget;
+class pqProxySelectionWidget;
 
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
@@ -50,11 +51,12 @@ public:
 
   bool showLabel() const;
 
-
   /// Overridden for pqSelectionInputWidget.
   virtual void apply();
+
 private:
   QPointer<pqSelectionInputWidget> SelectionInputWidget;
+  QPointer<pqProxySelectionWidget> ProxySelectionWidget;
 };
 
 #endif // _pqProxyPropertyWidget_h

@@ -94,6 +94,10 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smproperty,
 
       vbox->addWidget(widget);
 
+      // store the proxy selection widget so that we can call
+      // its accept() method when our apply() is called
+      this->ProxySelectionWidget = widget;
+
       // don't show label for the proxy selection widget
       this->setShowLabel(false);
       }
@@ -109,6 +113,13 @@ void pqProxyPropertyWidget::apply()
     this->SelectionInputWidget->preAccept();
     }
   this->Superclass::apply();
+
+  // apply properties for the proxy selection widget
+  if(this->ProxySelectionWidget)
+    {
+    this->ProxySelectionWidget->accept();
+    }
+
   if (this->SelectionInputWidget)
     {
     this->SelectionInputWidget->postAccept();
