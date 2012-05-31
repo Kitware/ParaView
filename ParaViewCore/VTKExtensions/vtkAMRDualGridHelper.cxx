@@ -1872,8 +1872,6 @@ void vtkAMRDualGridHelper::UnmarshalDegenerateRegionMessage(
                                                          int srcProc,
                                                          bool hackLevelFlag)
 {
-  int myProc = this->Controller->GetLocalProcessId();
-
   while (1) 
     {
     const int *gridPtr = static_cast<const int *>(messagePtr);
@@ -2020,7 +2018,6 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueSynchronous(
     }
 */
 
-  int myProc = this->Controller->GetLocalProcessId();
   // std::cerr << "ProcessDegenerates: Proc " << myProc << " sending " << messageLength << " to " << destProc << std::endl;
   // Send the message
   this->Controller->Send(&messageLength, 1, destProc, DEGENERATE_REGION_TAG);
@@ -2262,8 +2259,6 @@ int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input,
 {
 vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Controller);
 
-  int myProc = this->Controller->GetLocalProcessId();
-
   int blockId, numBlocks;
   int numLevels = input->GetNumberOfLevels();
 
@@ -2401,7 +2396,6 @@ void vtkAMRDualGridHelper::ShareBlocksWithNeighbors (vtkIntArray *neighbors)
     }
 #endif //VTK_AMR_DUAL_GRID_USE_MPI_ASYNCHRONOUS
 
-  int myProc = this->Controller->GetLocalProcessId();
   this->ShareBlocksWithNeighborsSynchronous (neighbors);
   this->ShareBlocksWithNeighborsSynchronous (neighbors);
    
@@ -2511,7 +2505,7 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsSync", this->Contro
     this->UnmarshalBlocksFromOne (recvBuffer->GetPointer (0), neighborProc);
     }
 }
-int vtkAMRDualGridHelper::MarshalBlocks(void *inBuffer, int sizeLimit)
+int vtkAMRDualGridHelper::MarshalBlocks(void *inBuffer, unsigned int sizeLimit)
 {
   int *buffer = static_cast<int *>(inBuffer);
   // Marshal the procs.
@@ -2603,9 +2597,6 @@ void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(void *inBuffer, int blockProc)
   //
   // The messages from all processes are mashed together in buffer in order
   // by process id.
-
-  int myProc = this->Controller->GetLocalProcessId();
-  int numProc = this->Controller->GetNumberOfProcesses();
 
   int numLevels = *buffer++;
   for (int levelIdx = 0; levelIdx < numLevels; levelIdx++)

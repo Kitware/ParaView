@@ -138,7 +138,7 @@ private:
   void ShareBlocksWithNeighbors(vtkIntArray *neighbors);
   void ShareBlocksWithNeighborsAsynchronous(vtkIntArray *neighbors);
   void ShareBlocksWithNeighborsSynchronous(vtkIntArray *neighbors);
-  int MarshalBlocks(void *buffer, int sizeLimit);
+  int MarshalBlocks(void *buffer, unsigned int sizeLimit);
   void UnmarshalBlocks(void *buffer);
   void UnmarshalBlocksFromOne(void *buffer, int blockProc);
 
