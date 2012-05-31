@@ -1669,7 +1669,6 @@ void* vtkAMRDualGridHelper::CopyDegenerateRegionBlockToMessage(
   ext[5] = ((ext[5]+highResBlock->OriginIndex[2]) >> levelDiff) - lowResBlock->OriginIndex[2];
 
   int *gridPtr = static_cast<int *>(messagePtr);
-  int myProc = this->Controller->GetLocalProcessId();
 
   *gridPtr++ = regionX;
   *gridPtr++ = regionY;
