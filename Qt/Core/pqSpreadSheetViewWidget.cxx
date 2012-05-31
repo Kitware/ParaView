@@ -77,53 +77,40 @@ public:
       this->Top : index;
     const_cast<pqDelegate*>(this)->Bottom = (this->Bottom.isValid() && index < this->Bottom)?
       this->Bottom : index;
-
-    this->Superclass::paint(painter, option, index);
-    }
-
-  // special text painter that does tab stops to line up multi-component data
-  // at this point, multi-component data is already in string format and 
-  // has '\t' characters separating each component
-  // taken from QItemDelegate::drawDisplay and tweaked
-  void drawDisplay(QPainter* painter, const QStyleOptionViewItem& option,
-    const QRect & r, const QString & text ) const
-    {
+    QString text = index.data().toString();
     if (text.isEmpty())
       return;
 
-    QPen pen = painter->pen();
-    QPalette::ColorGroup cg = option.state & QStyle::State_Enabled
-      ? QPalette::Normal : QPalette::Disabled;
+    // Make sure the text color is appropriate when selection
+    QPalette::ColorGroup cg =
+        (option.state & QStyle::State_Enabled) ?
+          QPalette::Normal : QPalette::Disabled;
     if (cg == QPalette::Normal && !(option.state & QStyle::State_Active))
+      {
       cg = QPalette::Inactive;
-    if (option.state & QStyle::State_Selected) {
-      painter->fillRect(r, option.palette.brush(cg, QPalette::Highlight));
+      }
+    if (option.state & QStyle::State_Selected)
+      {
       painter->setPen(option.palette.color(cg, QPalette::HighlightedText));
-    } else {
+      }
+    else
+      {
       painter->setPen(option.palette.color(cg, QPalette::Text));
-    }
+      }
 
-    if (option.state & QStyle::State_Editing) {
-      painter->save();
-      painter->setPen(option.palette.color(cg, QPalette::Text));
-      painter->drawRect(r.adjusted(0, 0, -1, -1));
-      painter->restore();
-    }
-
-    const int textMargin = QApplication::style()->pixelMetric(
-      QStyle::PM_FocusFrameHMargin) + 1;
-    QRect textRect = r.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
+    const int textMargin =
+        QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+    QRect textRect = option.rect.adjusted(textMargin, 0, -textMargin, 0);
     this->TextOption.setWrapMode(QTextOption::ManualWrap);
     this->TextOption.setTextDirection(option.direction);
     this->TextOption.setAlignment(
       QStyle::visualAlignment(option.direction, option.displayAlignment));
-    // assume this is representative of the largest number we'll show
     
-    int len = option.fontMetrics.width("-8.88888e-8888 ");
-    this->TextOption.setTabStop(len);
+    int split = text.split("\t").length();
+    this->TextOption.setTabStop(option.rect.width()/split);
     this->TextLayout.setTextOption(this->TextOption);
     this->TextLayout.setFont(option.font);
-    this->TextLayout.setText(this->replaceNewLine(text));
+    this->TextLayout.setText(text);
 
     QSizeF textLayoutSize = this->doTextLayout(textRect.width());
 
@@ -170,15 +157,6 @@ public:
     }
     this->TextLayout.endLayout();
     return QSizeF(widthUsed, height);
-    }
-
-  static QString replaceNewLine(QString text)
-    {
-    const QChar nl = QLatin1Char('\n');
-    for (int i = 0; i < text.count(); ++i)
-      if (text.at(i) == nl)
-        text[i] = QChar::LineSeparator;
-    return text;
     }
 
   QModelIndex Top;
