@@ -465,7 +465,19 @@ void vtkPVDataDeliveryManager::SetPiece(
     {
     vtkPVDataRepresentationPipeline* executive =
       vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
-    if (executive && executive->GetDataTime() > item->GetTimeStamp())
+
+    // SetPiece() is called in every REQUEST_UPDATE() or REQUEST_UPDATE_LOD()
+    // pass irrespective of whether the data has actually changed. 
+    // (I think that's a mistake, but the fact that representations can be
+    // updated without view makes it tricky since we cannot set the data to
+    // deliver in vtkPVDataRepresentation::RequestData() easily). Hence we need
+    // to ensure that the data we are getting is newer than what we have.
+    unsigned long data_time = executive? executive->GetDataTime() : 0;
+    if (data && (data->GetMTime() > data_time))
+      {
+      data_time = data->GetMTime();
+      }
+    if (data_time > item->GetTimeStamp())
       {
       item->SetDataObject(data);
       }
@@ -595,10 +607,7 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
 
       // FIXME: check that the mode flags are "suitable" for AMR.
       }
-
-    // release old memory (not necessarily, but try).
-    item->SetDeliveredDataObject(NULL);
-
+ 
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
     dataMover->SetOutputDataType(data->GetDataObjectType());
@@ -608,9 +617,17 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       dataMover->SetMoveModeToClone();
       }
     dataMover->SetInputData(data);
-    dataMover->Update();
 
-    item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
+    if (dataMover->GetOutputGeneratedOnProcess())
+      {
+      // release old memory (not necessarily, but try).
+      item->SetDeliveredDataObject(NULL);
+      }
+    dataMover->Update();
+    if (item->GetDeliveredDataObject() == NULL)
+      {
+      item->SetDeliveredDataObject(dataMover->GetOutputDataObject(0));
+      }
     }
 
   vtkTimerLog::MarkEndEvent(use_lod?

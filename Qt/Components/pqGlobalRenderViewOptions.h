@@ -66,12 +66,10 @@ private slots:
   void lodResolutionSliderChanged(int);
   void outlineThresholdSliderChanged(int);
   void compositeThresholdSliderChanged(int);
-  void tileDisplayCompositeThresholdSliderChanged(int value);
   void subsamplingRateSliderChanged(int);
   void squirtColorspaceSliderChanged(int value);
   void zlibColorspaceSliderChanged(int value);
   void stillRenderSubsampleRateSliderChanged(int);
-  void clientCollectSliderChanged(int);
   void resetDefaultCameraManipulators();
   void applyCompressorDefaults();
 

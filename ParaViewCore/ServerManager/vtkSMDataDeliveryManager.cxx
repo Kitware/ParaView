@@ -84,6 +84,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
   std::vector<unsigned int> keys_to_deliver;
   if (!view->GetDeliveryManager()->NeedsDelivery(timeStamp, keys_to_deliver, use_lod))
     {
+    timeStamp.Modified();
     return;
     }
 

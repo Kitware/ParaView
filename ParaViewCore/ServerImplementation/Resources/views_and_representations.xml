@@ -146,15 +146,13 @@
       </IntVectorProperty>
 
       <DoubleVectorProperty name="CollectGeometryThreshold"
-        command="SetClientOutlineThreshold"
         number_of_elements="1"
         default_values="100.0">
         <Documentation>
-          Select the threshold under which any geometry is collected on the
-          client.  When the data size exceeds the threshold, the client shows
-          outlines instead of actual data. Size is in kilobytes.
+          DEPRECATED: Simply set UseOutlineForLODRendering flag to true, and
+          whenever LOD rendering is employed, we rendering outlines, is
+          possible.
         </Documentation>
-        <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -185,7 +183,7 @@
       <DoubleVectorProperty name="LODThreshold"
         command="SetLODRenderingThreshold"
         number_of_elements="1"
-        default_values="0">
+        default_values="5">
         <Documentation>
           Set the memory size threshold above which LOD will be used while
           rendering interactively. The value is rendering-geometry size in MBs.
@@ -203,6 +201,18 @@
           implies maximum level of detail.
         </Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseOutlineForLODRendering"
+        command="SetUseOutlineForLODRendering"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, this overrides the LODResolution. In that case, when
+          using LOD for rendering, if possible, the data is rendered as
+          outlines.
+        </Documentation>
+      </IntVectorProperty>
 
       <StringVectorProperty
         name="CompressorConfig"

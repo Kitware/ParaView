@@ -195,8 +195,6 @@ vtkMPIMoveData::vtkMPIMoveData()
 
   this->UpdateNumberOfPieces = 0;
   this->UpdatePiece = 0;
-
-  this->DeliverOutlineToClient = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -375,6 +373,46 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
     vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkMPIMoveData::GetOutputGeneratedOnProcess()
+{
+  switch (this->Server)
+    {
+  case vtkMPIMoveData::RENDER_SERVER:
+    // if this->Server is RENDER_SERVER, then we are in a true client-ds-rs
+    // configuration. In that case, the data is valid only when movemode is
+    // clone or pass-thru.
+    return (this->MoveMode == PASS_THROUGH ||
+      this->MoveMode == CLONE ||
+      this->MoveMode == COLLECT_AND_PASS_THROUGH);
+
+  case vtkMPIMoveData::DATA_SERVER:
+    // if this->Server is DATA_SERVER, we may be in cs or cdsrs modes.
+    if (this->MPIMToNSocketConnection)
+      {
+      // definitely in render-server mode. This process never generates data.
+      return false;
+      }
+    return (this->MoveMode == PASS_THROUGH ||
+      this->MoveMode == CLONE ||
+      this->MoveMode == COLLECT_AND_PASS_THROUGH);
+
+  case vtkMPIMoveData::CLIENT:
+      if (this->ClientDataServerSocketController)
+        {
+        // client.
+        return (this->MoveMode == COLLECT ||
+          this->MoveMode == CLONE ||
+          this->MoveMode == COLLECT_AND_PASS_THROUGH);
+        }
+      // built-in mode; ofcourse we have data.
+      return true;
+    }
+
+  vtkErrorMacro("Invalid setup. Is vtkMPIMoveData initialized yet?");
+  return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -954,27 +992,8 @@ void vtkMPIMoveData::DataServerSendToClient(vtkDataObject* output)
   if (myId == 0)
     {
     vtkTimerLog::MarkStartEvent("Dataserver sending to client");
-
-    vtkSmartPointer<vtkDataObject> tosend = output;
-    if (this->DeliverOutlineToClient)
-      {
-      // reduce data using outline filter.
-      if (output->IsA("vtkPolyData") || output->IsA("vtkMultiBlockDataSet"))
-        {
-        vtkOutlineFilter* filter = vtkOutlineFilter::New();
-        filter->SetInputData(output);
-        filter->Update();
-        tosend = filter->GetOutputDataObject(0);
-        filter->Delete();
-        }
-      else
-        {
-        vtkErrorMacro("DeliverOutlineToClient can only be used for vtkPolyData.");
-        }
-      }
-
     this->ClearBuffer();
-    this->MarshalDataToBuffer(tosend);
+    this->MarshalDataToBuffer(output);
     this->ClientDataServerSocketController->Send(
                                      &(this->NumberOfBuffers), 1, 1, 23490);
     this->ClientDataServerSocketController->Send(this->BufferLengths,
@@ -1279,8 +1298,6 @@ void vtkMPIMoveData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfBuffers: " << this->NumberOfBuffers << endl;
   os << indent << "Server: " << this->Server << endl;
   os << indent << "MoveMode: " << this->MoveMode << endl;
-  os << indent << "DeliverOutlineToClient : "
-    << this->DeliverOutlineToClient << endl;
   os << indent << "OutputDataType: ";
   if (this->OutputDataType == VTK_POLY_DATA)
     {

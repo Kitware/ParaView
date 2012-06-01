@@ -174,12 +174,12 @@ public:
   vtkGetMacro(LODResolution, double);
 
   // Description:
-  // This threshold is only applicable when in client-server mode. It is the size
-  // of geometry in megabytes beyond which the view should not deliver geometry
-  // to the client, but only outlines.
-  // @CallOnAllProcessess
-  vtkSetMacro(ClientOutlineThreshold, double);
-  vtkGetMacro(ClientOutlineThreshold, double);
+  // When set to true, instead of using simplified geometry for LOD rendering,
+  // uses outline, if possible. Note that not all representations support this
+  // mode and hence one may still see non-outline data being rendering when this
+  // flag is ON and LOD is being used.
+  vtkSetMacro(UseOutlineForLODRendering, bool);
+  vtkGetMacro(UseOutlineForLODRendering, bool);
 
   // Description:
   // Passes the compressor configuration to the client-server synchronizer, if
@@ -213,8 +213,13 @@ public:
   static vtkInformationIntegerKey* USE_LOD();
 
   // Description:
-  // Indicates the LOD resolution when USE_LOD() is set.
+  // Indicates the LOD resolution in REQUEST_UPDATE_LOD() pass.
   static vtkInformationDoubleKey* LOD_RESOLUTION();
+
+  // Description:
+  // Indicates the LOD must use outline if possible in REQUEST_UPDATE_LOD()
+  // pass.
+  static vtkInformationIntegerKey* USE_OUTLINE_FOR_LOD();
 
   // Description:
   // Representation can publish this key in their REQUEST_INFORMATION() pass to
@@ -418,12 +423,6 @@ public:
   vtkGetMacro(UseLODForInteractiveRender, bool);
 
   // Description:
-  // Returns whether the view will use outline boxes for the next
-  // InteractiveRender() call based on the geometry sizes determined by the most
-  // recent call to Update().
-  vtkGetMacro(UseOutlineForInteractiveRender, bool);
-
-  // Description:
   // Returns whether the view will use distributed rendering for the next
   // StillRender() call based on the geometry sizes determined by the most
   // recent call to Update().
@@ -575,7 +574,6 @@ protected:
   // In mega-bytes.
   double RemoteRenderingThreshold;
   double LODRenderingThreshold;
-  double ClientOutlineThreshold;
   vtkBoundingBox GeometryBounds;
 
   bool UseOffscreenRendering;
@@ -588,7 +586,7 @@ protected:
 
   bool UsedLODForLastRender;
   bool UseLODForInteractiveRender;
-  bool UseOutlineForInteractiveRender;
+  bool UseOutlineForLODRendering;
   bool UseDistributedRenderingForStillRender;
   bool UseDistributedRenderingForInteractiveRender;
 

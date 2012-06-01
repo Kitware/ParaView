@@ -236,6 +236,8 @@ protected:
   vtkAlgorithm* MultiBlockMaker;
   vtkPVCacheKeeper* CacheKeeper;
   vtkQuadricClustering* Decimator;
+  vtkPVGeometryFilter* LODOutlineFilter;
+
   vtkMapper* Mapper;
   vtkMapper* LODMapper;
   vtkPVLODActor* Actor;

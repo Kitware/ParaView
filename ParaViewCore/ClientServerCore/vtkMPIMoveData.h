@@ -88,19 +88,18 @@ public:
   vtkGetMacro(OutputDataType, int);
 
   // Description:
-  // Sometimes, the data may be too huge to deliver to the client. In that case,
-  // the client can request that only the outline for the data may be delivered
-  // to the client. This is supported only for vtkPolyData.
-  // Off by default.
-  vtkSetMacro(DeliverOutlineToClient, int);
-  vtkGetMacro(DeliverOutlineToClient, int);
-
-  // Description:
   // When set to true, zlib compression is used. False by default.
   // This value has any effect only on the data-sender processes. The receiver
   // always checks the received data to see if zlib decompression is required.
   static void SetUseZLibCompression(bool b);
   static bool GetUseZLibCompression();
+
+  // Description:
+  // vtkMPIMoveData doesn't necessarily generate a valid output data on all the
+  // involved processes (depending on the MoveMode and Server ivars). This
+  // returns true if valid data is available on the current processes after
+  // successful Update() given the current ivars).
+  bool GetOutputGeneratedOnProcess();
 
 //BTX
   enum MoveModes {
@@ -162,7 +161,6 @@ protected:
 //ETX
 
   int OutputDataType;
-  int DeliverOutlineToClient;
 
 private:
   int UpdateNumberOfPieces;

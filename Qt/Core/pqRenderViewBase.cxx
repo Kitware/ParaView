@@ -272,10 +272,6 @@ void pqRenderViewBase::initializeAfterObjectsCreated()
 void pqRenderViewBase::setDefaultPropertyValues()
 {
   vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("TileDisplayCompositeThreshold"), 3);
 
   // Compressor setting to pull from application wide settings cache.
   pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressorConfig"),"NULL");
@@ -448,7 +444,6 @@ static const char* pqRenderViewModuleLightSettings [] = {
   };
 
 static const char* pqGlobalRenderViewModuleMiscSettings [] = {
-  "CollectGeometryThreshold",
   "CompressionEnabled",
   "CompressorConfig",
   "DepthPeeling",
@@ -461,8 +456,8 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "RemoteRenderThreshold",
   "RenderInterruptsEnabled",
   "StillRenderImageReductionFactor",
-  "TileDisplayCompositeThreshold",
   "UseOffscreenRenderingForScreenshots",
+  "UseOutlineForLODRendering",
   NULL
   };
 
