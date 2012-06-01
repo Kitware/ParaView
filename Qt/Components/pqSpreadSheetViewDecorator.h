@@ -55,6 +55,8 @@ protected slots:
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
   void displayPrecisionChanged(int);
+  void showToggleColumnPopupMenu();
+  void updateColumnVisibility();
   
 protected:
   pqSpreadSheetView* Spreadsheet;

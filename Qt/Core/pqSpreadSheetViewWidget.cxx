@@ -217,11 +217,13 @@ void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* model)
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewWidget::onHeaderDataChanged()
 {
-  for (int cc=0; cc < this->model()->columnCount(); cc++)
+  pqSpreadSheetViewModel* shModel =
+      qobject_cast<pqSpreadSheetViewModel*>(this->model());
+  for (int cc=0; cc < shModel->columnCount(); cc++)
     {
     QString headerTitle =
       this->model()->headerData(cc, Qt::Horizontal).toString();
-    this->setColumnHidden(cc, pqIsColumnInternal(headerTitle));
+    this->setColumnHidden(cc, !shModel->isVisible(cc) || pqIsColumnInternal(headerTitle));
     }
 }
 
