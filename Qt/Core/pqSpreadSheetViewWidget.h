@@ -73,6 +73,10 @@ protected slots:
   /// hidden.
   void onHeaderDataChanged();
 
+  /// Call that method when you want to use a present of column order
+  /// [ PointID/CellID, BlockNumber, Structured Coordinates/Points, etc...]
+  void sortColumns();
+
 protected:
   /// Overridden to tell the pqSpreadSheetViewModel about the active viewport.
   virtual void paintEvent(QPaintEvent* event);
