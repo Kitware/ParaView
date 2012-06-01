@@ -2719,23 +2719,23 @@ attributes of the fragments.
       </InputProperty>
 
       <StringVectorProperty
-	name="SelectMaterialArrays"
-	command="AddInputCellArrayToProcess"
-	clean_command="ClearInputCellArrayToProcess"
-	number_of_elements="1"
-	repeat_command="1">
-	<ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR">
-	  <RequiredProperties>
-	    <Property name="Input" function="Input"/>
-	  </RequiredProperties>
-	</ArrayListDomain>
-	<Hints>
-	  <NoDefault />
-	</Hints>
-	<Documentation>
-	  This property specifies the cell arrays from which the contour filter will
-	  compute contour cells.
-	</Documentation>
+        name="SelectMaterialArrays"
+        command="AddInputCellArrayToProcess"
+        clean_command="ClearInputCellArrayToProcess"
+        number_of_elements="1"
+        repeat_command="1">
+        <ArrayListDomain name="array_list" attribute_type="Scalars" data_type="VTK_UNSIGNED_CHAR VTK_INT">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>
+          This property specifies the cell arrays from which the contour filter will
+          compute contour cells.
+        </Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty
