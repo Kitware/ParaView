@@ -37,7 +37,6 @@ void vtkSMDataSourceProxy::CopyData(vtkSMSourceProxy *sourceProxy)
     {
     return;
     }
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << VTKOBJECT(sourceProxy) << "GetOutput"

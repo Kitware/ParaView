@@ -1457,6 +1457,7 @@ unsigned int vtkHierarchicalFractal::AppendDataSetToLevel(
   int extents[6],
   vtkDataSet* dataset)
 {
+  (void)extents;
   unsigned int index = 0;
   vtkMultiBlockDataSet* mbDS = vtkMultiBlockDataSet::SafeDownCast(composite);
   vtkHierarchicalBoxDataSet* hbDS = 

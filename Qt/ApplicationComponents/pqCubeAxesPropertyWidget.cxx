@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqCubeAxesEditorDialog.h"
 
-pqCubeAxesPropertyWidget::pqCubeAxesPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+pqCubeAxesPropertyWidget::pqCubeAxesPropertyWidget(vtkSMProxy *proxy, QWidget
+  *parentObject)
+  : pqPropertyWidget(proxy, parentObject)
 {
   QHBoxLayout *layout = new QHBoxLayout;
   layout->setMargin(0);

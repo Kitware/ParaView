@@ -70,6 +70,7 @@ public:
   virtual void AddInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void AddInputConnection(vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
+  virtual void RemoveInputConnection(int port, int idx);
 
   // Description:
   // Propagate the modification to all internal representations.
@@ -81,7 +82,8 @@ public:
 
   // Description:
   // Bring this algorithm's outputs up-to-date.
-  virtual void Update();
+  virtual void Update() { this->Superclass::Update(); }
+  virtual void Update(int port);
 
   // Description:
   // Returns the list of available representation types as a string array.

@@ -889,8 +889,6 @@ void vtkPVFileInformation::GetDirectoryListing()
 
     // fix to bug #09452 such that directories with trailing names can be
     // shown in the file dialog
-    struct stat status;
-
 #if defined (__SVR4) && defined (__sun)
   struct stat status;
   int res = stat( info->FullPath, &status );

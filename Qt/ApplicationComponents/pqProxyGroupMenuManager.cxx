@@ -804,8 +804,8 @@ void pqProxyGroupMenuManager::switchActiveServer()
     this->Internal->LocalActiveSession = newActiveSession;
 
     // Clear the QuickSearch QAction pool...
-    QList<QAction*> actions = this->Internal->Widget.actions();
-    foreach(QAction* action, actions)
+    QList<QAction*> action_list = this->Internal->Widget.actions();
+    foreach(QAction* action, action_list)
       {
       this->Internal->Widget.removeAction(action);
       }

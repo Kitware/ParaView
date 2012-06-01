@@ -45,8 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqGenericSummaryDisplayPanel.h"
 
-pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy,
+  QWidget *parentObject)
+  : pqPropertyWidget(proxy, parentObject)
 {
   QVBoxLayout *layout = new QVBoxLayout;
   layout->setMargin(2);

@@ -605,7 +605,7 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
     {\
     vtksysProcess_Delete(clients[__kk]);\
     }\
-  for (size_t __kk=0; __kk < this->NumberOfServers; __kk++)\
+  for (int __kk=0; __kk < this->NumberOfServers; __kk++)\
     {\
     if(!renderServers.empty()) vtksysProcess_Delete(renderServers[__kk]); \
     if(!servers.empty()) vtksysProcess_Delete(servers[__kk]); \
@@ -656,7 +656,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
   std::vector<vtksysProcess*> renderServers;
   std::vector<vtksysProcess*> servers;
   std::vector<vtksysProcess*> clients;
-  for (size_t i=0; this->TestRenderServer && i < this->NumberOfServers; i++)
+  for (int i=0; this->TestRenderServer && i < this->NumberOfServers; i++)
     {
     vtksysProcess* renderServer = vtksysProcess_New();
     if(!renderServer)
@@ -667,7 +667,7 @@ int vtkSMTestDriver::Main(int argc, char* argv[])
       }
     renderServers.push_back(renderServer);
     }
-  for (size_t i=0; this->TestServer && i < this->NumberOfServers; i++)
+  for (int i=0; this->TestServer && i < this->NumberOfServers; i++)
     {
     vtksysProcess* server = vtksysProcess_New();
     if(!server)

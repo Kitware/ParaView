@@ -346,8 +346,8 @@ int vtkRawStridedReader2::RequestInformation
 
   outInfo->Set(vtkDataObject::SPACING(), this->Spacing, 3);
 
-  vtkImageData *outData = vtkImageData::SafeDownCast
-    (outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  //vtkImageData *outData = vtkImageData::SafeDownCast
+  //  (outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   this->sWholeExtent[0] = this->WholeExtent[0];
   this->sWholeExtent[1] = this->WholeExtent[1];

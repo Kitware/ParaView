@@ -128,6 +128,20 @@ void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmO
 }
 
 //----------------------------------------------------------------------------
+void vtkPVCompositeRepresentation::RemoveInputConnection(int port, int index)
+{
+  if (port == 0)
+    {
+    this->CubeAxesRepresentation->RemoveInputConnection(0, index);
+    this->Superclass::RemoveInputConnection(0, index);
+    }
+  else if (port == 1)
+    {
+    this->SelectionRepresentation->RemoveInputConnection(0, index);
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVCompositeRepresentation::AddToView(vtkView* view)
 {
   view->AddRepresentation(this->CubeAxesRepresentation);

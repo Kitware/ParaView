@@ -639,12 +639,12 @@ void pqDataInformationModel::refreshGeometrySizes()
     this->index(this->rowCount()-1, pqDataInformationModel::GeometrySize));
 }
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqDataInformationModel::flags ( const QModelIndex & index ) const
+Qt::ItemFlags pqDataInformationModel::flags ( const QModelIndex & idx) const
 {
-  return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
 }
 //-----------------------------------------------------------------------------
-bool pqDataInformationModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+bool pqDataInformationModel::setData (const QModelIndex &, const QVariant&, int)
 {
   // Do nothing, we are not supposed to change our data...
   return true;

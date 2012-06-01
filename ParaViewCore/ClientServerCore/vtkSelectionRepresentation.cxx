@@ -92,6 +92,15 @@ void vtkSelectionRepresentation::RemoveInputConnection(
 }
 
 //----------------------------------------------------------------------------
+void vtkSelectionRepresentation::RemoveInputConnection(
+  int port, int idx)
+{
+  this->GeometryRepresentation->RemoveInputConnection(port, idx);
+  this->LabelRepresentation->RemoveInputConnection(port, idx);
+}
+
+
+//----------------------------------------------------------------------------
 int vtkSelectionRepresentation::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {

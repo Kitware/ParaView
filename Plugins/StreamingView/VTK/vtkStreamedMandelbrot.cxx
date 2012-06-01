@@ -119,8 +119,8 @@ int vtkStreamedMandelbrot::RequestInformation (
     cerr << endl;
     );
     //save split path in translator
-    vtkImageData *outData = vtkImageData::SafeDownCast(
-      outInfo->Get(vtkDataObject::DATA_OBJECT()));
+    //vtkImageData *outData = vtkImageData::SafeDownCast(
+    //  outInfo->Get(vtkDataObject::DATA_OBJECT()));
     vtkExtentTranslator *et = vtkExtentTranslator::SafeDownCast(
       outInfo->Get(vtkStreamingDemandDrivenPipeline::EXTENT_TRANSLATOR()));
     et->SetSplitPath(pathLen, splitPath);

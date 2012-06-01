@@ -118,8 +118,8 @@ void pqPropertyLinksConnection::copyValuesFromServerManagerToQt(bool use_uncheck
   case pqSMAdaptor::PROXY:
   case pqSMAdaptor::PROXYSELECTION:
       {
-      pqSMProxy proxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
-      currentSMValue.setValue(proxy);
+      pqSMProxy smproxy = pqSMAdaptor::getProxyProperty(this->PropertySM, value_type);
+      currentSMValue.setValue(smproxy);
       if (currentSMValue != currentQtValue)
         {
         this->ObjectQt->setProperty(this->PropertyQt.toAscii().data(), currentSMValue);

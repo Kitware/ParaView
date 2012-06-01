@@ -767,12 +767,12 @@ int pqSpreadSheetViewModel::getDecimalPrecision()
   return this->Internal->DecimalPrecision;
 }
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqSpreadSheetViewModel::flags ( const QModelIndex & index ) const
+Qt::ItemFlags pqSpreadSheetViewModel::flags ( const QModelIndex & idx ) const
 {
-  return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+  return QAbstractTableModel::flags(idx) | Qt::ItemIsEditable;
 }
 //-----------------------------------------------------------------------------
-bool pqSpreadSheetViewModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+bool pqSpreadSheetViewModel::setData ( const QModelIndex&, const QVariant&, int)
 {
   // Do nothing, we are not supposed to change our data...
   return true;

@@ -23,58 +23,58 @@ PURPOSE.  See the above copyright notice for more information.
 
 void vtkSMIntVectorPropertyTest::SetNumberOfElements()
 {
-  vtkSMIntVectorProperty *property = vtkSMIntVectorProperty::New();
-  QCOMPARE(property->GetNumberOfElements(), 0U);
+  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
+  QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
-  property->SetNumberOfElements(4);
-  QCOMPARE(property->GetNumberOfElements(), 4U);
+  smproperty->SetNumberOfElements(4);
+  QCOMPARE(smproperty->GetNumberOfElements(), 4U);
 
-  property->SetNumberOfElements(14);
-  QCOMPARE(property->GetNumberOfElements(), 14U);
+  smproperty->SetNumberOfElements(14);
+  QCOMPARE(smproperty->GetNumberOfElements(), 14U);
 
-  property->SetNumberOfElements(6);
-  QCOMPARE(property->GetNumberOfElements(), 6U);
+  smproperty->SetNumberOfElements(6);
+  QCOMPARE(smproperty->GetNumberOfElements(), 6U);
 
-  property->SetNumberOfElements(0);
-  QCOMPARE(property->GetNumberOfElements(), 0U);
+  smproperty->SetNumberOfElements(0);
+  QCOMPARE(smproperty->GetNumberOfElements(), 0U);
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMIntVectorPropertyTest::SetElement()
 {
-  vtkSMIntVectorProperty *property = vtkSMIntVectorProperty::New();
-  property->SetNumberOfElements(2);
-  QCOMPARE(property->GetNumberOfElements(), 2U);
-  QCOMPARE(property->GetElement(0), 0);
-  QCOMPARE(property->GetElement(1), 0);
+  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
+  smproperty->SetNumberOfElements(2);
+  QCOMPARE(smproperty->GetNumberOfElements(), 2U);
+  QCOMPARE(smproperty->GetElement(0), 0);
+  QCOMPARE(smproperty->GetElement(1), 0);
 
-  property->SetElement(0, 2);
-  property->SetElement(1, 4);
-  QCOMPARE(property->GetElement(0), 2);
-  QCOMPARE(property->GetElement(1), 4);
+  smproperty->SetElement(0, 2);
+  smproperty->SetElement(1, 4);
+  QCOMPARE(smproperty->GetElement(0), 2);
+  QCOMPARE(smproperty->GetElement(1), 4);
 
-  property->SetElement(2, 8);
-  QCOMPARE(property->GetNumberOfElements(), 3U);
-  QCOMPARE(property->GetElement(0), 2);
-  QCOMPARE(property->GetElement(1), 4);
-  QCOMPARE(property->GetElement(2), 8);
+  smproperty->SetElement(2, 8);
+  QCOMPARE(smproperty->GetNumberOfElements(), 3U);
+  QCOMPARE(smproperty->GetElement(0), 2);
+  QCOMPARE(smproperty->GetElement(1), 4);
+  QCOMPARE(smproperty->GetElement(2), 8);
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMIntVectorPropertyTest::SetElements()
 {
-  vtkSMIntVectorProperty *property = vtkSMIntVectorProperty::New();
+  vtkSMIntVectorProperty *smproperty = vtkSMIntVectorProperty::New();
 
   int values[] = {9, 18, 27};
-  property->SetElements(values, 3);
-  QCOMPARE(property->GetNumberOfElements(), 3U);
-  QCOMPARE(property->GetElement(0), 9);
-  QCOMPARE(property->GetElement(1), 18);
-  QCOMPARE(property->GetElement(2), 27);
+  smproperty->SetElements(values, 3);
+  QCOMPARE(smproperty->GetNumberOfElements(), 3U);
+  QCOMPARE(smproperty->GetElement(0), 9);
+  QCOMPARE(smproperty->GetElement(1), 18);
+  QCOMPARE(smproperty->GetElement(2), 27);
 
-  property->Delete();
+  smproperty->Delete();
 }
 
 void vtkSMIntVectorPropertyTest::Copy()
