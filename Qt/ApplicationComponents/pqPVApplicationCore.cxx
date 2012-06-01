@@ -33,26 +33,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
-#include "pqApplyPropertiesManager.h"
 #include "pqAnimationManager.h"
+#include "pqApplyPropertiesManager.h"
 #include "pqComponentsInit.h"
 #include "pqComponentsTestUtility.h"
 #include "pqCoreUtilities.h"
 #include "pqItemViewSearchWidget.h"
+#include "pqOptions.h"
 #include "pqPQLookupTableManager.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqSelectionManager.h"
 #include "pqSetName.h"
 #include "pqSpreadSheetViewModel.h"
+#include "vtkProcessModule.h"
 
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include "pqPythonManager.h"
 #endif
 
-#include <QAction>
-#include <QShortcut>
-#include <QApplication>
 #include <QAbstractItemView>
+#include <QAction>
+#include <QApplication>
+#include <QDebug>
+#include <QFileOpenEvent>
+#include <QList>
+#include <QShortcut>
+
+#include "pqLoadDataReaction.h"
 
 //-----------------------------------------------------------------------------
 pqPVApplicationCore::pqPVApplicationCore(
@@ -187,4 +194,33 @@ pqTestUtility* pqPVApplicationCore::testUtility()
     this->TestUtility = new pqComponentsTestUtility(this);
     }
   return this->TestUtility;
+}
+
+//-----------------------------------------------------------------------------
+bool pqPVApplicationCore::eventFilter ( QObject * obj, QEvent * event_ )
+{
+  if (event_->type() == QEvent::FileOpen)
+    {
+    QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event_);
+    if (!fileEvent->file().isEmpty())
+      {
+      QList<QString> files;
+      files.append(fileEvent->file());
+
+      // By default we always update the options
+      this->Options->SetParaViewDataName(files[0].toAscii().data());
+
+      // If the application is already started just load the data
+      if(vtkProcessModule::GetProcessModule()->GetSession())
+        {
+        pqLoadDataReaction::loadData(files);
+        }
+      }
+    return false;
+    }
+  else
+    {
+    // standard event processing
+    return QObject::eventFilter(obj, event_);
+    }
 }
