@@ -90,20 +90,6 @@ vtkChartRepresentation::~vtkChartRepresentation()
 }
 
 //----------------------------------------------------------------------------
-int vtkChartRepresentation::ProcessViewRequest(vtkInformationRequestKey* request,
-  vtkInformation* inInfo, vtkInformation* outInfo)
-{
-  if (request == vtkPVView::REQUEST_UPDATE())
-    {
-    this->EnableServerSideRendering =
-      (inInfo->Has(vtkPVContextView::ENABLE_SERVER_SIDE_RENDERING()) &&
-      inInfo->Get(vtkPVContextView::ENABLE_SERVER_SIDE_RENDERING()) == 1);
-    }
-
-  return this->Superclass::ProcessViewRequest(request, inInfo, outInfo);
-}
-
-//----------------------------------------------------------------------------
 void vtkChartRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -119,6 +105,9 @@ bool vtkChartRepresentation::AddToView(vtkView* view)
     }
 
   this->ContextView = chartView;
+  this->EnableServerSideRendering = (chartView &&
+    chartView->InTileDisplayMode());
+
   if (this->Options)
     {
     if(vtkChart* pChart = vtkChart::SafeDownCast(chartView->GetContextItem()))

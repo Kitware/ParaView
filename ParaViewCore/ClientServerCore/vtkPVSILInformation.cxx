@@ -62,7 +62,14 @@ void vtkPVSILInformation::CopyFromObject(vtkObject* obj)
     }
 
   vtkAlgorithm* reader = algOutput->GetProducer();
-  reader->UpdateInformation();
+  // Since vtkPVSILInformation is RootOnly information object, calling
+  // vtkAlgorithm::UpdateInformation() is scary since if the algorithm does
+  // indeed update the information, it will only happen on the root node and
+  // cause deadlocks (e.g. pvcs.GridConnectivity). Since information objects are
+  // only expected to gather information currently available, we shouldn't be
+  // calling this UpdateInformation() in the first place.
+  // 
+  // reader->UpdateInformation();
 
   vtkInformation* info = reader->GetExecutive()->GetOutputInformation(
     algOutput->GetIndex());

@@ -102,6 +102,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStringVectorPropertyWidget.h"
 
 // === pqStandardCustomPanels ============================================== //
+
+namespace
+{
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -171,14 +174,6 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("ExodusIIReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExodusIIPanel(proxy, p);
-        }
-      if(QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExodusIIPanel(proxy, p);
-        }
       if(QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqNetCDFPanel(proxy, p);
@@ -217,10 +212,7 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
-        QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
-        QString("netCDFReader") == proxy->getProxy()->GetXMLName()
-         )
+      if (QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }
@@ -228,6 +220,7 @@ public:
     return false;
   }
 };
+}
 
 // === pqStandardDisplayPanels ============================================= //
 class pqStandardDisplayPanels : public QObject, public pqDisplayPanelInterface
@@ -424,6 +417,9 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
 
+  // clear any search string
+  this->Ui->SearchLineEdit->clear();
+
   // remove old property widgets
   foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
     {
@@ -503,7 +499,6 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     item.Name = proxy->getProxy()->GetXMLName();
     item.LabelWidget = 0;
     item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
-    item.PropertyWidget->setModified(false);
     item.IsAdvanced = false;
     widgets.append(item);
     }
@@ -930,6 +925,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       if(propertyWidget->showLabel())
         {
         item.LabelWidget = new QLabel(group->GetType());
+        item.LabelWidget->setWordWrap(true);
         }
       else
         {
@@ -944,6 +940,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       item.PropertyWidget = propertyWidget;
       item.IsAdvanced = QString(group->GetPanelVisibility()) == "advanced";
       item.Modified = true;
+
+      this->connect(this, SIGNAL(viewChanged(pqView*)),
+                    propertyWidget, SIGNAL(viewChanged(pqView*)));
 
       widgets.append(item);
       }
@@ -998,18 +997,21 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       {
       if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy);
+        propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy, this);
         }
       else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy);
+        propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy, this);
         }
       else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(property))
         {
-        propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy);
+        propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy, this);
         }
       else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
         {
+        bool selection_input = (pp->GetHints() &&
+          pp->GetHints()->FindNestedElementByName("SelectionInput"));
+
         // find the domain
         vtkSMDomain *domain = 0;
         vtkSMDomainIterator *domainIter = pp->NewDomainIterator();
@@ -1019,9 +1021,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           }
         domainIter->Delete();
 
-        if(vtkSMProxyListDomain::SafeDownCast(domain))
+        if (selection_input || vtkSMProxyListDomain::SafeDownCast(domain))
           {
-          propertyWidget = new pqProxyPropertyWidget(pp, smProxy);
+          propertyWidget = new pqProxyPropertyWidget(pp, smProxy, this);
           }
         }
       }
@@ -1039,6 +1041,8 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           {
           label = new QLabel(name);
           }
+
+        label->setWordWrap(true);
         }
 
       QString objectName = propertyIter->GetKey();
@@ -1059,6 +1063,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
         }
 
       item.Modified = true;
+
+      this->connect(this, SIGNAL(viewChanged(pqView*)),
+                    propertyWidget, SIGNAL(viewChanged(pqView*)));
 
       widgets.append(item);
       }

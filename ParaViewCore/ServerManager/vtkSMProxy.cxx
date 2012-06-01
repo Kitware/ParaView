@@ -1483,6 +1483,74 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
 }
 
 //---------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement,
+                                                const char* subproxy_name)
+{
+  const char* name = propertyElement->GetAttribute("name");
+  if (!name || !name[0])
+    {
+    vtkErrorMacro("Attribute name is required!");
+    return 0;
+    }
+  const char* exposed_name = propertyElement->GetAttribute("exposed_name");
+  if (!exposed_name)
+    {
+    // use the property name as the exposed name.
+    exposed_name = name;
+    }
+  int override = 0;
+  if (!propertyElement->GetScalarAttribute("override", &override))
+    {
+    override = 0;
+    }
+
+  if (propertyElement->GetAttribute("default_values"))
+    {
+    vtkSMProxy *subproxy = this->GetSubProxy(subproxy_name);
+    vtkSMProperty* prop = subproxy->GetProperty(name);
+    if (!prop)
+      {
+      vtkWarningMacro("Failed to locate property '" << name
+                      << "' on subproxy '" << subproxy_name << "'");
+      return 0;
+      }
+    if (!prop->ReadXMLAttributes(subproxy, propertyElement))
+      {
+      return 0;
+      }
+    }
+  this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
+
+  vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
+  vtkSMProperty *prop = subproxy->GetProperty(name);
+
+  // override panel_visibility with that of the exposed property
+  const char *panel_visibility = propertyElement->GetAttribute("panel_visibility");
+  if(panel_visibility)
+    {
+    prop->SetPanelVisibility(panel_visibility);
+    }
+
+  // override panel_visibility_default_for_representation with that of the exposed property
+  const char *panel_visibility_default_for_representation =
+    propertyElement->GetAttribute("panel_visibility_default_for_representation");
+  if(panel_visibility_default_for_representation)
+    {
+    prop->SetPanelVisibilityDefaultForRepresentation(
+      panel_visibility_default_for_representation);
+    }
+
+  // override label with that of the exposed property
+  const char *label = propertyElement->GetAttribute("label");
+  if(label)
+    {
+    prop->SetXMLLabel(label);
+    }
+
+  return prop;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
   vtkPVXMLElement *element)
 {
@@ -1505,66 +1573,7 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
       vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
       if (strcmp(propertyElement->GetName(), "Property") == 0)
         {
-        const char* name = propertyElement->GetAttribute("name");
-        if (!name || !name[0])
-          {
-          vtkErrorMacro("Attribute name is required!");
-          continue;
-          }
-        const char* exposed_name = propertyElement->GetAttribute("exposed_name");
-        if (!exposed_name)
-          {
-          // use the property name as the exposed name.
-          exposed_name = name;
-          }
-        int override = 0;
-        if (!propertyElement->GetScalarAttribute("override", &override))
-          {
-          override = 0;
-          }
-
-        if (propertyElement->GetAttribute("default_values"))
-          {
-          vtkSMProxy* subproxy = this->GetSubProxy(subproxy_name);
-          vtkSMProperty* prop = subproxy->GetProperty(name);
-          if (!prop)
-            {
-            vtkWarningMacro("Failed to locate property '" << name
-                            << "' on subproxy '" << subproxy_name << "'");
-            return;
-            }
-          if (!prop->ReadXMLAttributes(subproxy, propertyElement))
-            {
-            return;
-            }
-          }
-        this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
-
-        vtkSMProxy *subproxy = this->GetSubProxy(subproxy_name);
-        vtkSMProperty *prop = subproxy->GetProperty(name);
-
-        // override panel_visibility with that of the exposed property
-        const char *panel_visibility = propertyElement->GetAttribute("panel_visibility");
-        if(panel_visibility)
-          {
-          prop->SetPanelVisibility(panel_visibility);
-          }
-
-        // override panel_visibility_default_for_representation with that of the exposed property
-        const char *panel_visibility_default_for_representation =
-          propertyElement->GetAttribute("panel_visibility_default_for_representation");
-        if(panel_visibility_default_for_representation)
-          {
-          prop->SetPanelVisibilityDefaultForRepresentation(
-            panel_visibility_default_for_representation);
-          }
-
-        // override label with that of the exposed property
-        const char *label = propertyElement->GetAttribute("label");
-        if(label)
-          {
-          prop->SetXMLLabel(label);
-          }
+        this->SetupExposedProperty(propertyElement, subproxy_name);
         }
       else if(strcmp(propertyElement->GetName(), "PropertyGroup") == 0)
         {
@@ -1574,6 +1583,12 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
         if(groupName)
           {
           group->SetName(groupName);
+          }
+
+        const char *groupLabel = propertyElement->GetAttribute("label");
+        if(groupLabel)
+          {
+          group->SetXMLLabel(groupLabel);
           }
 
         const char *groupType = propertyElement->GetAttribute("type");
@@ -1588,21 +1603,13 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
           group->SetPanelVisibility(panelVisibility);
           }
 
-        size_t propertyCountBefore = this->Internals->PropertyNamesInOrder.size();
-
-        // setup property group elements
-        this->SetupExposedProperties(subproxy_name, exposedElement);
-
-        // add each newly created property to the group
-        for(size_t index = propertyCountBefore;
-            index < this->Internals->PropertyNamesInOrder.size();
-            index++)
+        vtkPVXMLElement *groupElement = propertyElement;
+        for(unsigned int k = 0; k < groupElement->GetNumberOfNestedElements(); k++)
           {
-          std::string name = this->Internals->PropertyNamesInOrder[index];
-          vtkSMProxy *subproxy =
-            this->GetSubProxy(this->Internals->ExposedProperties[name].SubProxyName);
+          propertyElement = groupElement->GetNestedElement(k);
+
           vtkSMProperty *property =
-            subproxy->GetProperty(this->Internals->ExposedProperties[name].PropertyName);
+            this->SetupExposedProperty(propertyElement, subproxy_name);
 
           group->AddProperty(property);
           }

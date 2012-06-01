@@ -98,6 +98,13 @@ namespace
         QPixmap(":/pqWidgets/Icons/pqFaceMapData16.png"));
       this->insert("ElementMapArrayStatus",
         QPixmap(":/pqWidgets/Icons/pqElemMapData16.png"));
+
+      this->insert("PointArrayStatus",
+        QPixmap(":/pqWidgets/Icons/pqNodalData16.png"));
+      this->insert("CellArrayStatus",
+        QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
+      this->insert("SetStatus",
+        QPixmap(":/pqWidgets/Icons/pqSideSetData16.png"));
       }
     };
 }

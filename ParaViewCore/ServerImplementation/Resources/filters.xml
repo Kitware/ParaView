@@ -469,7 +469,8 @@
      </Documentation>
 
      <InputProperty name="Input"
-	 command="SetInputConnection">
+        command="SetInputConnection"
+        panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>
@@ -485,7 +486,8 @@
      </InputProperty>
 
      <InputProperty name="Selection"
-	 command="SetSelectionConnection">
+	 command="SetSelectionConnection"
+   panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>
@@ -4836,7 +4838,8 @@ The Warp (scalar) filter translates the points of the input data set along a vec
 	command="SetInputArrayToProcess"
 	number_of_elements="5"
 	element_types="0 0 0 0 2"
-	label="Scalars">
+	label="Scalars"
+  panel_visibility="default" >
 	   <ArrayListDomain name="array_list" attribute_type="Scalars">
 	     <RequiredProperties>
 		<Property name="Input" function="Input"/>
@@ -4852,7 +4855,8 @@ The Warp (scalar) filter translates the points of the input data set along a vec
 	command="SetScaleFactor"
 	number_of_elements="1"
 	animateable="1"
-	default_values="1.0" >
+	default_values="1.0"
+  panel_visibility="default" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
 	 The scalar value at a given point is multiplied by the value of this property to determine the magnitude of the change vector for that point.
@@ -4926,7 +4930,8 @@ The Warp (vector) filter translates the points of the input dataset using a spec
 	 command="SetInputArrayToProcess"
 	 number_of_elements="5"
 	 element_types="0 0 0 0 2"
-	 label="Vectors">
+	 label="Vectors"
+   panel_visibility="default" >
 	    <ArrayListDomain name="array_list" attribute_type="Vectors">
 	      <RequiredProperties>
 		 <Property name="Input" function="Input"/>
@@ -4944,7 +4949,8 @@ The Warp (vector) filter translates the points of the input dataset using a spec
 	 name="ScaleFactor"
 	 command="SetScaleFactor"
 	 number_of_elements="1"
-	 default_values="1.0" >
+	 default_values="1.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  Each component of the selected vector array will be multiplied by the value of this property before being used to compute new point coordinates.
@@ -6074,7 +6080,8 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
 	name="VOI"
 	command="SetVOI"
 	number_of_elements="6"
-	default_values="0 0 0 0 0 0">
+	default_values="0 0 0 0 0 0"
+  panel_visibility="default" >
        <ExtentDomain name="extent">
 	 <RequiredProperties>
 	    <Property name="Input" function="Input"/>
@@ -6855,7 +6862,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="PreShift"
 	 command="SetPreShift"
 	 number_of_elements="1"
-	 default_values="0.0" >
+	 default_values="0.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  Apply a translation to the data before scaling.
@@ -6868,7 +6876,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="PostShift"
 	 command="SetPostShift"
 	 number_of_elements="1"
-	 default_values="0.0" >
+	 default_values="0.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  The amount of time the input is shifted.
@@ -6879,7 +6888,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 	 name="Scale"
 	 command="SetScale"
 	 number_of_elements="1"
-	 default_values="1.0" >
+	 default_values="1.0"
+   panel_visibility="default" >
 	<DoubleRangeDomain name="range"/>
 	<Documentation>
 	  The factor by which the input time is scaled.
@@ -7220,7 +7230,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
        <IntRangeDomain name="range">
 	 <RequiredProperties>
-	   <Property name="TimeStepRangeInfo" function="Range"/>
+	   <Property name="TimestepValues" function="Range"/>
 	 </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
@@ -8634,7 +8644,8 @@ Tessellate a higher-order dataset.
 	command="AddLevel"
 	clean_command="RemoveAllLevels"
 	repeat_command="1"
-	number_of_elements_per_command="1">
+	number_of_elements_per_command="1"
+  panel_visibility="default" >
 	<Hints>
 	  <!-- Tells the widget not to use flat-indicies for this property.
 		Only needed when number_of_elements_per_command==1
@@ -9187,7 +9198,8 @@ This filter extracts a list of datasets from hierarchical datasets.
        name="Format"
        command="SetFormat"
        number_of_elements="1"
-       default_values="Time: %f">
+       default_values="Time: %f"
+       panel_visibility="default" >
        <Documentation>
 	 The value of this property is a format string used to display the input time. The format string is specified using printf style.
        </Documentation>
@@ -9345,7 +9357,8 @@ This property controls how the filter works to generate tensor cell data. You ca
      </InputProperty>
 
      <InputProperty name="Selection"
-	 command="SetSelectionConnection">
+	 command="SetSelectionConnection"
+   panel_visibility="default" >
        <ProxyGroupDomain name="groups">
 	 <Group name="sources"/>
 	 <Group name="filters"/>
@@ -9772,7 +9785,8 @@ This property controls how the filter works to generate tensor cell data. You ca
 
       <StringVectorProperty name="XColumn"
 	command="SetXColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list">
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>
@@ -9785,7 +9799,8 @@ This property controls how the filter works to generate tensor cell data. You ca
       </StringVectorProperty>
       <StringVectorProperty name="YColumn"
 	command="SetYColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list" >
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>
@@ -9798,7 +9813,8 @@ This property controls how the filter works to generate tensor cell data. You ca
       </StringVectorProperty>
       <StringVectorProperty name="ZColumn"
 	command="SetZColumn"
-	number_of_elements="1">
+	number_of_elements="1"
+  panel_visibility="default" >
 	  <ArrayListDomain name="array_list" >
 	    <RequiredProperties>
 	      <Property name="Input" function="Input"/>

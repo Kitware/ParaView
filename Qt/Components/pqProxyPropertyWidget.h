@@ -34,17 +34,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqProxyPropertyWidget_h
 
 #include "pqPropertyWidget.h"
+#include <QPointer>
+
+class pqSelectionInputWidget;
+class pqProxySelectionWidget;
 
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
+  typedef pqPropertyWidget Superclass;
 public:
   pqProxyPropertyWidget(vtkSMProperty *property,
                         vtkSMProxy *proxy,
                         QWidget *parent = 0);
 
   bool showLabel() const;
+
+  /// Overridden for pqSelectionInputWidget.
+  virtual void apply();
+
+private:
+  QPointer<pqSelectionInputWidget> SelectionInputWidget;
+  QPointer<pqProxySelectionWidget> ProxySelectionWidget;
 };
 
 #endif // _pqProxyPropertyWidget_h

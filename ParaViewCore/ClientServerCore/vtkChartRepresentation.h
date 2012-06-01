@@ -77,12 +77,6 @@ public:
   // requests.
   virtual void MarkModified();
 
-  // Description:
-  // Overridden to get the status for the ENABLE_SERVER_SIDE_RENDERING() flag
-  // during REQUEST_UPDATE() pass.
-  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
-    vtkInformation* inInfo, vtkInformation* outInfo);
-
   // *************************************************************************
   // Forwarded to vtkBlockDeliveryPreprocessor.
   void SetFieldAssociation(int);

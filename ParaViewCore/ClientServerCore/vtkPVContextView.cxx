@@ -32,7 +32,6 @@
 #include "vtkTilesHelper.h"
 #include "vtkTimerLog.h"
 
-vtkInformationKeyMacro(vtkPVContextView, ENABLE_SERVER_SIDE_RENDERING, Integer);
 //----------------------------------------------------------------------------
 vtkPVContextView::vtkPVContextView()
 {
@@ -142,12 +141,6 @@ void vtkPVContextView::Update()
       {
       p_controller->Broadcast(stream, 0);
       }
-    }
-
-  this->RequestInformation->Remove(ENABLE_SERVER_SIDE_RENDERING());
-  if (this->InTileDisplayMode())
-    {
-    this->RequestInformation->Set(ENABLE_SERVER_SIDE_RENDERING(), 1);
     }
 
   int size;

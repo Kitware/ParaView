@@ -33,36 +33,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyWidget.h"
 
 #include "pqProxy.h"
+#include "pqPropertiesPanel.h"
 
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
   : QWidget(parent),
     Proxy(proxy),
     Property(0)
 {
-  this->Modified = false;
+  this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);
   this->connect(&this->Links, SIGNAL(qtWidgetChanged()), this, SIGNAL(modified()));
-  this->connect(this, SIGNAL(modified()), this, SLOT(setModified()));
 }
 
 pqPropertyWidget::~pqPropertyWidget()
 {
 }
 
-void pqPropertyWidget::setProxy(vtkSMProxy *proxy)
+pqView* pqPropertyWidget::view() const
 {
-  this->Proxy = proxy;
+  pqPropertiesPanel *panel =
+    qobject_cast<pqPropertiesPanel *>(this->parentWidget());
+
+  return panel ? panel->view() : 0;
 }
 
 vtkSMProxy* pqPropertyWidget::proxy() const
 {
   return this->Proxy;
-}
-
-void pqPropertyWidget::setProperty(vtkSMProperty *property)
-{
-  this->Property = property;
 }
 
 vtkSMProperty* pqPropertyWidget::property() const
@@ -73,18 +71,21 @@ vtkSMProperty* pqPropertyWidget::property() const
 void pqPropertyWidget::apply()
 {
   this->Links.accept();
-  this->setModified(false);
 }
 
 void pqPropertyWidget::reset()
 {
   this->Links.reset();
-  this->setModified(false);
+}
+
+void pqPropertyWidget::setShowLabel(bool show)
+{
+  this->ShowLabel = show;
 }
 
 bool pqPropertyWidget::showLabel() const
 {
-  return true;
+  return this->ShowLabel;
 }
 
 void pqPropertyWidget::addPropertyLink(QObject *qobject,
@@ -99,16 +100,6 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
                               this->Proxy,
                               smproperty,
                               smindex);
-}
-
-void pqPropertyWidget::setModified(bool modified)
-{
-  this->Modified = modified;
-}
-
-bool pqPropertyWidget::isModified() const
-{
-  return this->Modified;
 }
 
 void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)

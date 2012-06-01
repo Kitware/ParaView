@@ -37,6 +37,14 @@ public:
   vtkGetStringMacro(Name)
 
   // Description:
+  // Sets the name of the property group to \p name.
+  vtkSetStringMacro(XMLLabel)
+
+  // Description:
+  // Returns the name of the property group.
+  vtkGetStringMacro(XMLLabel)
+
+  // Description:
   // Sets the type of the property group to \p type.
   vtkSetStringMacro(Type)
 
@@ -79,6 +87,7 @@ private:
   void operator=(const vtkSMPropertyGroup&); // Not implemented
 
   char *Name;
+  char *XMLLabel;
   char *Type;
   char *PanelVisibility;
 

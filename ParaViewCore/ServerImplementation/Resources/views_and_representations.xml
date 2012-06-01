@@ -1194,9 +1194,6 @@
         default_values="vtkOriginalCellIds"
         panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_cell">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
@@ -1206,9 +1203,6 @@
         default_values="vtkOriginalPointIds"
         panel_visibility="never">
         <ArrayListDomain name="array_list" input_domain_name="input_array_point">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
@@ -1769,7 +1763,6 @@
           proxyname="UnstructuredGridVolumeRayCastMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
 
@@ -1779,7 +1772,6 @@
           proxyname="UnstructuredGridVolumeZSweepMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -1789,7 +1781,6 @@
           proxyname="ProjectedTetrahedraMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -1799,7 +1790,6 @@
           proxyname="HAVSVolumeMapper">
         </Proxy>
         <ShareProperties subproxy="VolumeDummyMapper">
-          <Exception name="Input"/>
         </ShareProperties>
       </SubProxy>
 
@@ -2728,9 +2718,6 @@
         </Documentation>
         <ArrayListDomain name="array_list" attribute_type="Scalars"
           input_domain_name="input_array_any">
-          <RequiredProperties>
-            <Property name="Input" function="Input" />
-          </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
 
@@ -3110,13 +3097,13 @@
         <ArrayRangeDomain name="scalar_range">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
-             <Property name="SelectInputScalars" function="ArraySelection"/>
+             <Property name="SelectScaleArray" function="ArraySelection"/>
           </RequiredProperties>
         </ArrayRangeDomain>
         <ArrayRangeDomain name="vector_range">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
-             <Property name="SelectInputVectors" function="ArraySelection"/>
+             <Property name="SelectOrientationVectors" function="ArraySelection"/>
           </RequiredProperties>
         </ArrayRangeDomain>
         <Documentation>

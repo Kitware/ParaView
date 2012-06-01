@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyLinks.h"
 
+class pqView;
 class vtkSMProxy;
 class vtkSMProperty;
 
@@ -53,16 +54,18 @@ public:
   virtual void apply();
   virtual void reset();
 
-  void setProxy(vtkSMProxy *proxy);
+  pqView* view() const;
   vtkSMProxy* proxy() const;
-  void setProperty(vtkSMProperty *property);
   vtkSMProperty* property() const;
 
-  virtual bool showLabel() const;
+  bool showLabel() const;
 
 signals:
   /// This signal is emitted when the widget's value is changed by the user.
   void modified();
+
+  /// This signal is emitted when the current view changes.
+  void viewChanged(pqView *view);
 
 protected:
   void addPropertyLink(QObject *qobject,
@@ -70,12 +73,9 @@ protected:
                        const char *qsignal,
                        vtkSMProperty *smproperty,
                        int smindex = -1);
-
-private slots:
-  void setModified(bool modified = true);
+  void setShowLabel(bool show);
 
 private:
-  bool isModified() const;
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
 
@@ -85,7 +85,7 @@ private:
   vtkSMProxy *Proxy;
   vtkSMProperty *Property;
   pqPropertyLinks Links;
-  bool Modified;
+  bool ShowLabel;
 };
 
 #endif // _pqPropertyWidget_h

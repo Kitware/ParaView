@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqColorEditorPropertyWidget.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2012 Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,22 +28,30 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-
-#ifndef _pqColorEditorPropertyWidget_h
-#define _pqColorEditorPropertyWidget_h
-
-#include "pqComponentsExport.h"
+========================================================================*/
+#ifndef __pqArrayStatusPropertyWidget_h
+#define __pqArrayStatusPropertyWidget_h
 
 #include "pqPropertyWidget.h"
 
-class pqColorEditorPropertyWidget : public pqPropertyWidget
+class vtkSMPropertyGroup;
+
+class PQCOMPONENTS_EXPORT pqArrayStatusPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-
+  typedef pqPropertyWidget Superclass;
 public:
-  pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
-  ~pqColorEditorPropertyWidget();
+  pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
+    vtkSMPropertyGroup* group, QWidget *parent = 0);
+  pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
+    vtkSMProperty* property, QWidget *parent = 0);
+  virtual ~pqArrayStatusPropertyWidget();
+
+  virtual bool showLabel() const
+    { return false; }
+
+private:
+  Q_DISABLE_COPY(pqArrayStatusPropertyWidget)
 };
 
-#endif // _pqColorEditorPropertyWidget_h
+#endif

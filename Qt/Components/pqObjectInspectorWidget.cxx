@@ -85,6 +85,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool pqObjectInspectorWidget::AutoAccept = false;
 
+namespace
+{
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -211,6 +213,7 @@ public:
     return false;
     }
 };
+}
 
 //-----------------------------------------------------------------------------
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)

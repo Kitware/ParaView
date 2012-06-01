@@ -80,7 +80,7 @@ ParaViewMainWindow::ParaViewMainWindow()
   pqOptions* options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
 
-  if(options->GetUseNewPanels())
+  if(!options->GetUseOldPanels())
     {
     this->removeDockWidget(this->Internals->objectInspectorDock);
     this->removeDockWidget(this->Internals->displayDock);

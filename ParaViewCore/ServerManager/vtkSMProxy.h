@@ -743,6 +743,10 @@ protected:
   vtkSMProxyObserver* SubProxyObserver;
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
+
+private:
+  vtkSMProperty* SetupExposedProperty(vtkPVXMLElement* propertyElement,
+                                      const char* subproxy_name);
 //ETX
 };
 

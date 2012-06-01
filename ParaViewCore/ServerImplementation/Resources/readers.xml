@@ -1,93 +1,85 @@
 <ServerManagerConfiguration>
-
   <ProxyGroup name="internal_sources">
-  
-   <!--  FLASH AMR Particles Reader -->
-   <SourceProxy name="FlashParticlesReaderCore"
-               class="vtkAMRFlashParticlesReader"
-               label="FLASH Particles AMR Reader" >
-      
+    <!--  FLASH AMR Particles Reader -->
+    <SourceProxy name="FlashParticlesReaderCore"
+        class="vtkAMRFlashParticlesReader"
+        label="FLASH Particles AMR Reader">
       <Documentation short_help="Reads AMR particles from FLASH dataset"
-                     long_help="Reads AMR particles from FLASH dataset" >
-          The Flash particles reader loads particle simulation data stored
-          in Flash format. The output of this reader is a MultiBlock dataset
-          where each block is vtkPolyData that holds the particles and
-          corresponding particle data.
+          long_help="Reads AMR particles from FLASH dataset" >
+        The Flash particles reader loads particle simulation data stored
+        in Flash format. The output of this reader is a MultiBlock dataset
+        where each block is vtkPolyData that holds the particles and
+        corresponding particle data.
       </Documentation>
-      
        <StringVectorProperty name="FileName"
                            command="SetFileName"
                            animateable="0"
-                           number_of_elements="1">
+                           number_of_elements="1"
+                           panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           This property specifies the Enzo file name
-        </Documentation>         
+        </Documentation>
       </StringVectorProperty>
-    
+
      <!-- Display the number of Particles -->
-    <IntVectorProperty
-        name="NumParticles"
+    <IntVectorProperty name="NumParticles"
         command="GetTotalNumberOfParticles"
         information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-     
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+
     <IntVectorProperty name="Frequency"
-                       command="SetFrequency"
-                       number_of_elements="1"
-                       default_values="1" >
-       <IntRangeDomain name="range" />
-       <Documentation>
-         This property sets the frequency interval for loading particles.
-       </Documentation>
+        command="SetFrequency"
+        number_of_elements="1"
+        default_values="1" >
+      <IntRangeDomain name="range" />
+      <Documentation>
+        This property sets the frequency interval for loading particles.
+      </Documentation>
     </IntVectorProperty>
-    
+
     <IntVectorProperty name="FilterLocation"
-                       command="SetFilterLocation"
-                       number_of_elements="1"
-                       default_values="0">
-       <BooleanDomain name="bool" />
-       <Documentation>
-          Turns on filtering of particles by location
-       </Documentation>
+        command="SetFilterLocation"
+        number_of_elements="1"
+        default_values="0">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        Turns on filtering of particles by location
+      </Documentation>
     </IntVectorProperty>
-    
+
     <DoubleVectorProperty name="MinLocation"
-                          command="SetMinLocation"
-                          number_of_elements="3"
-                          animateable="1"
-                          default_values="0.0 0.0 0.0" >
-       <DoubleRangeDomain name="range" />
-       <Documentation>
-         This property sets the minimum 3-D coordinate location
-         by which the particles will be filtered out. 
-       </Documentation>
+        command="SetMinLocation"
+        number_of_elements="3"
+        animateable="1"
+        default_values="0.0 0.0 0.0" >
+      <DoubleRangeDomain name="range" />
+      <Documentation>
+        This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.
+      </Documentation>
     </DoubleVectorProperty>
-                                          
-     <DoubleVectorProperty name="MaxLocation"
-                          command="SetMaxLocation"
-                          number_of_elements="3"
-                          animateable="1"
-                          default_values="0.0 0.0 0.0" >
-       <DoubleRangeDomain name="range" />
-       <Documentation>
-         This property sets the minimum 3-D coordinate location
-         by which the particles will be filtered out. 
-       </Documentation>
+
+    <DoubleVectorProperty name="MaxLocation"
+        command="SetMaxLocation"
+        number_of_elements="3"
+        animateable="1"
+        default_values="0.0 0.0 0.0" >
+      <DoubleRangeDomain name="range" />
+      <Documentation>
+        This property sets the minimum 3-D coordinate location
+        by which the particles will be filtered out.
+      </Documentation>
     </DoubleVectorProperty>
-    
-    
-    <!--  Array Selection GUI Component -->     
-     <StringVectorProperty
-        name="ParticleArrayInfo"
+
+    <!--  Array Selection GUI Component -->
+    <StringVectorProperty name="ParticleArrayInfo"
         information_only="1">
-        <ArraySelectionInformationHelper 
-         attribute_name="Particle"/>
-     </StringVectorProperty>
-     
-     <StringVectorProperty
-        name="ParticleArrayStatus"
+      <ArraySelectionInformationHelper attribute_name="Particle"/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="ParticleArrayStatus"
         command="SetParticleArrayStatus"
         number_of_elements="0"
         repeat_command="1"
@@ -95,23 +87,22 @@
         element_types="2 0"
         information_property="ParticleArrayInfo"
         label="Particle Arrays">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property name="ParticleArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-        </ArraySelectionDomain>
-        <Documentation>
-          This property lists which particle arrays to read.
-        </Documentation>
-     </StringVectorProperty>
-    
-     <Hints>
-       <ReaderFactory 
-            extensions="Flash flash"
-            file_description="AMR flash particles dataset" />
-     </Hints>
+      <ArraySelectionDomain name="array_list">
+        <RequiredProperties>
+          <Property name="ParticleArrayInfo" function="ArrayList"/>
+        </RequiredProperties>
+      </ArraySelectionDomain>
+      <Documentation>
+        This property lists which particle arrays to read.
+      </Documentation>
+    </StringVectorProperty>
+
+    <Hints>
+      <ReaderFactory extensions="Flash flash"
+          file_description="AMR flash particles dataset" />
+    </Hints>
    </SourceProxy>
-   
+
    <!--  ENZO AMR Particles Reader -->
    <SourceProxy name="EnzoParticlesReaderCore"
                 class="vtkAMREnzoParticlesReader"
@@ -127,7 +118,8 @@
      <StringVectorProperty name="FileName"
                            command="SetFileName"
                            animateable="0"
-                           number_of_elements="1">
+                           number_of_elements="1"
+                           panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           This property specifies the Enzo file name
@@ -251,7 +243,8 @@
           name="FileName"
           command="SetFileName"
           animateable="0" 
-          number_of_elements="1">
+          number_of_elements="1"
+          panel_visibility="never">
           
           <FileListDomain name="files" />
           <Documentation>
@@ -376,7 +369,8 @@
           name="FileName"
           command="SetFileName"
           animateable="0" 
-          number_of_elements="1">
+          number_of_elements="1"
+          panel_visibility="never">
           
           <FileListDomain name="files" />
           <Documentation>
@@ -513,7 +507,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the AVS UCD reader.
@@ -584,7 +579,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Meta Image reader.
@@ -609,7 +605,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Legacy VTK reader.
@@ -630,7 +627,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML polygonal dataset reader.
@@ -711,7 +709,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML unstructured grid reader.
@@ -792,7 +791,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
@@ -874,7 +874,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML structured grid reader.
@@ -955,7 +956,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
@@ -1036,7 +1038,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML polygonal dataset reader.
@@ -1108,7 +1111,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML unstructured grid reader.
@@ -1179,7 +1183,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML uniform rectilinear grid (image/volume) reader.
@@ -1250,7 +1255,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML structured grid reader.
@@ -1321,7 +1327,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the partitioned VTK XML non-uniform rectilinear grid reader.
@@ -1390,7 +1397,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the STL reader.
@@ -1423,7 +1431,8 @@
       <StringVectorProperty name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the CSV (Command Separated Values) reader.
@@ -1499,7 +1508,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK multi-block reader.
@@ -1516,7 +1526,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the VTK hierarchical box data reader.
@@ -1535,7 +1546,8 @@
       <StringVectorProperty name="FileName"
                             command="SetFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -1553,7 +1565,8 @@
 
       <StringVectorProperty name="FileName"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -1632,104 +1645,12 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1"
-        animateable="0">
+        animateable="0"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the Exodus reader.
         </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePrefixInfo"
-        command="GetFilePrefix"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePrefix"
-        command="SetFilePrefix"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePrefixInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePrefixInfo" function="Prefix"/>
-          </RequiredProperties>
-       </FileListDomain>
-        <Documentation>
-          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePatternInfo"
-        command="GetFilePattern"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePattern"
-        command="SetFilePattern"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePatternInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePatternInfo" function="Pattern"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty
-        name="FileRangeInfo"
-        command="GetFileRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="FileRange"
-        command="SetFileRange"
-        number_of_elements="2"
-        default_values="-1 -1"
-        animateable="0"
-        information_property="FileRangeInfo" >
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="FileRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         This property controls the indices of the first and last files to be read.
-       </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty
-        name="XMLFileNameInfo"
-        command="GetXMLFileName"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="XMLFileName"
-        command="SetXMLFileName"
-        number_of_elements="1"
-        animateable="0"
-        label="XML File Name">
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="XMLFileNameInfo" function="XMLFileName"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
-       </Documentation>
      </StringVectorProperty>
 
      <IntVectorProperty name="HasModeShapes"
@@ -1774,16 +1695,17 @@
          information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
-     <DoubleVectorProperty name="TimeRange" information_only="1">
-       <TimeRangeInformationHelper/>
-     </DoubleVectorProperty>
+
+     <IntVectorProperty name="TimeStepRangeInfo"
+         command="GetTimeStepRange"
+         information_only="1">
+     </IntVectorProperty>
 
      <IntVectorProperty name="ModeShape"
                         command="SetModeShape"
                         number_of_elements="1"
-                        default_values="1"
-                        information_property="TimestepValues">
-       <IntRangeDomain name="range">
+                        default_values="1">
+       <IntRangeDomain name="range" foo="1">
          <RequiredProperties>
            <Property name="TimeStepRangeInfo" function="Range"/>
          </RequiredProperties>
@@ -2512,9 +2434,100 @@
        </Documentation>
      </IntVectorProperty>
 
-     <Hints>
-       <Property name="Refresh" show="0"/>
-     </Hints>
+
+    <StringVectorProperty name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePrefixInfo" >
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="FilePrefixInfo" function="Prefix"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property specifies the file root used with the file pattern to
+        format a file name. (See the File Pattern property).
+      </Documentation>
+    </StringVectorProperty>
+
+    <StringVectorProperty
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePatternInfo" >
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="FilePatternInfo" function="Pattern"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property contains a text string specifying the pattern used to load
+        files. There are two parts to it: the prefix (%s) and the file number
+        (%i). The format used is the same as that used for printf.
+       </Documentation>
+    </StringVectorProperty>
+
+    <IntVectorProperty name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+      <SimpleIntInformationHelper/>
+    </IntVectorProperty>
+
+    <IntVectorProperty name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2"
+        default_values="-1 -1"
+        animateable="0"
+        information_property="FileRangeInfo" >
+      <IntRangeDomain name="range">
+        <RequiredProperties>
+          <Property name="FileRangeInfo" function="Range"/>
+        </RequiredProperties>
+      </IntRangeDomain>
+      <Documentation>
+        This property controls the indices of the first and last files to be read.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1">
+      <SimpleStringInformationHelper/>
+    </StringVectorProperty>
+
+    <StringVectorProperty name="XMLFileName"
+        command="SetXMLFileName"
+        number_of_elements="1"
+        animateable="0"
+        label="XML File Name">
+      <FileListDomain name="default_value" optional="1">
+        <RequiredProperties>
+          <Property name="XMLFileNameInfo"
+              function="XMLFileName"/>
+        </RequiredProperties>
+      </FileListDomain>
+      <Documentation>
+        This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
+      </Documentation>
+    </StringVectorProperty>
+
+    <Hints>
+      <Property name="Refresh" show="0"/>
+    </Hints>
 
    <!-- End ExodusIIReaderCore -->
    </SourceProxy>
@@ -2529,7 +2542,8 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The name of the file to load
@@ -2576,7 +2590,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name to read.
@@ -2657,7 +2672,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name to read.
@@ -2720,7 +2736,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the file name to read.
@@ -2783,7 +2800,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the file name to read.
@@ -2856,7 +2874,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the COSMO reader.
@@ -2913,7 +2932,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the PNG reader.
@@ -2939,7 +2959,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the PNG reader.
@@ -2966,7 +2987,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the TIFF reader.
@@ -2986,7 +3008,8 @@
       <StringVectorProperty name="FileName"
                             command="SetFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the file to load.
@@ -3134,7 +3157,8 @@
         name="FileName"
         animateable="0"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the .xyz (geometry) file name for the PLOT3D reader.
@@ -3145,7 +3169,8 @@
         name="QFileName"
         command="SetQFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="default">
        <FileListDomain name="files"/>
        <Documentation>
          This property specifies the .q (solution) file name for the PLOT3D reader.
@@ -3237,7 +3262,8 @@
         command="AddFunction"
         clean_command="RemoveAllFunctions"
         repeat_command="1"
-        number_of_elements_per_command="1">
+        number_of_elements_per_command="1"
+        panel_visibility="default">
        <EnumerationDomain name="array_list">
          <!-- <Entry value="100" text="Scalar - Density"/> -->
          <Entry value="110" text="Scalar - Pressure"/>
@@ -3334,7 +3360,8 @@
             command="AddFileName"
             animateable="0"
             number_of_elements="0"
-            repeat_command="1">
+            repeat_command="1"
+            panel_visibility="never">
           <FileListDomain name="files" />
           <Documentation>
           The list of files to be read by the reader.
@@ -3402,7 +3429,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3468,7 +3496,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3536,7 +3565,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The list of files to be read by the reader.
@@ -3653,7 +3683,8 @@
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="1"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3714,7 +3745,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3774,7 +3806,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be
@@ -3817,10 +3850,15 @@
               proxygroup="internal_sources" proxyname="XMLPolyDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -3836,7 +3874,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML polygonal dataset format. The standard extension is .vtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -3874,10 +3913,15 @@
               proxyname="XMLUnstructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -3893,7 +3937,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML unstructured grid data format. The standard extension is .vtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -3932,10 +3977,15 @@
               proxyname="XMLImageDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -3951,7 +4001,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -3990,10 +4041,15 @@
               proxyname="XMLStructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4009,7 +4065,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4047,10 +4104,15 @@
               proxyname="XMLRectilinearGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4066,7 +4128,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4103,10 +4166,15 @@
               proxygroup="internal_sources" proxyname="XMLPPolyDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4122,7 +4190,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4161,10 +4230,15 @@
               proxyname="XMLPUnstructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4180,7 +4254,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4218,10 +4293,15 @@
               proxyname="XMLPImageDataReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4237,7 +4317,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4276,10 +4357,15 @@
               proxyname="XMLPStructuredGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4295,7 +4381,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4334,10 +4421,15 @@
               proxyname="XMLPRectilinearGridReaderCore">
        </Proxy>
        <ExposedProperties>
-         <Property name="CellArrayInfo" />
-         <Property name="CellArrayStatus" />
-         <Property name="PointArrayInfo" />
-         <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -4353,7 +4445,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo">
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -4457,7 +4550,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -5032,7 +5126,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide one file per time step.
@@ -5486,7 +5581,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5538,7 +5634,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5589,7 +5686,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is specified,
@@ -5638,7 +5736,8 @@
         name="FileName"
         command="SetFileName"
         animateable="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name for the XDMF reader.
@@ -5664,7 +5763,7 @@
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="PointArrayInfo"
-        animateable="0"
+        panel_visibility="default"
         label="Point Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -5690,7 +5789,7 @@
         number_of_elements_per_command="2"
         element_types="2 0"
         information_property="CellArrayInfo"
-        animateable="0"
+        panel_visibility="default"
         label="Cell Arrays">
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
@@ -5800,6 +5899,80 @@
        <Proxy name="Reader"
               proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
        <ExposedProperties>
+         <PropertyGroup name="Variables" label="Variables"
+              panel_visibility="default"
+              type="ArrayStatus">
+           <Property name="GenerateObjectIdCellArray" />
+           <Property name="GenerateGlobalElementIdArray" />
+           <Property name="ElementVariables" />
+           <Property name="FaceVariables" />
+           <Property name="EdgeVariables" />
+           <Property name="SideSetResultArrayStatus" />
+           <Property name="NodeSetResultArrayStatus" />
+           <Property name="FaceSetResultArrayStatus" />
+           <Property name="EdgeSetResultArrayStatus" />
+           <Property name="GenerateGlobalNodeIdArray" />
+           <Property name="ElementSetResultArrayStatus" />
+           <Property name="PointVariables" />
+           <Property name="GlobalVariables" />
+         </PropertyGroup>
+
+         <!-- fixme - need to group these two properties -->
+         <Property name="ApplyDisplacements" />
+         <Property name="DisplacementMagnitude" />
+
+         <Property name="EdgeBlocks" />
+         <Property name="EdgeBlocksInfo" />
+
+         <PropertyGroup name="Sets" label="Sets"
+             panel_visibility="advanced"
+             type="ArrayStatus">
+           <Property name="NodeSetArrayStatus" />
+           <Property name="SideSetArrayStatus" />
+           <Property name="FaceSetArrayStatus" />
+           <Property name="EdgeSetArrayStatus" />
+           <Property name="ElementSetArrayStatus" />
+         </PropertyGroup>
+
+         <PropertyGroup name="Maps" label="Maps"
+            panel_visibility="advanced"
+            type="ArrayStatus">
+           <Property name="NodeMapArrayStatus" />
+           <Property name="EdgeMapArrayStatus" />
+           <Property name="FaceMapArrayStatus" />
+           <Property name="ElementMapArrayStatus" />
+         </PropertyGroup>
+
+         <Property name="EdgeMapInfo" />
+         <Property name="EdgeSetInfo" />
+         <Property name="EdgeSetResultArrayInfo" />
+         <Property name="EdgeVariablesInfo" />
+         <Property name="ElementBlocks" />
+         <Property name="ElementMapInfo" />
+         <Property name="ElementSetInfo" />
+         <Property name="ElementSetResultArrayInfo" />
+         <Property name="ElementVariablesInfo" />
+         <Property name="ExodusModelMetadata" />
+         <Property name="FaceBlocks" />
+         <Property name="FaceBlocksInfo" />
+         <Property name="FaceMapInfo" />
+         <Property name="FaceSetInfo" />
+         <Property name="FaceSetResultArrayInfo" />
+         <Property name="FaceVariablesInfo" />
+         <Property name="GlobalVariablesInfo" />
+         <Property name="NodeMapInfo" />
+         <Property name="NodeSetInfo" />
+         <Property name="NodeSetResultArrayInfo" />
+         <Property name="PointVariablesInfo" />
+         <Property name="SideSetInfo" />
+         <Property name="SideSetResultArrayInfo" />
+         <Property name="SILUpdateStamp" />
+
+         <Property name="TimeStepRangeInfo" />
+         <Property name="HasModeShapes" />
+         <Property name="ModeShape" />
+         <Property name="AnimateVibrations" />
+
          <Property name="FilePrefix" />
          <Property name="FilePrefixInfo" />
          <Property name="FilePattern" />
@@ -5808,60 +5981,8 @@
          <Property name="FileRangeInfo" />
          <Property name="XMLFileName" />
          <Property name="XMLFileNameInfo" />
-         <Property name="HasModeShapes" />
-         <Property name="ModeShape" />
-         <Property name="AnimateVibrations" />
+
          <Property name="Refresh" />
-         <Property name="SILUpdateStamp" />
-         <Property name="EdgeBlocks" />
-         <Property name="EdgeBlocksInfo" />
-         <Property name="FaceBlocks" />
-         <Property name="FaceBlocksInfo" />
-         <Property name="ElementBlocks" />
-         <Property name="GlobalVariables" />
-         <Property name="GlobalVariablesInfo" />
-         <Property name="PointVariables" />
-         <Property name="PointVariablesInfo" />
-         <Property name="EdgeVariables" />
-         <Property name="EdgeVariablesInfo" />
-         <Property name="FaceVariables" />
-         <Property name="FaceVariablesInfo" />
-         <Property name="ElementVariables" />
-         <Property name="ElementVariablesInfo" />
-         <Property name="NodeMapInfo" />
-         <Property name="NodeMapArrayStatus" />
-         <Property name="EdgeMapInfo" />
-         <Property name="EdgeMapArrayStatus" />
-         <Property name="FaceMapInfo" />
-         <Property name="FaceMapArrayStatus" />
-         <Property name="ElementMapInfo" />
-         <Property name="ElementMapArrayStatus" />
-         <Property name="NodeSetInfo" />
-         <Property name="NodeSetArrayStatus" />
-         <Property name="SideSetInfo" />
-         <Property name="SideSetArrayStatus" />
-         <Property name="FaceSetInfo" />
-         <Property name="FaceSetArrayStatus" />
-         <Property name="EdgeSetInfo" />
-         <Property name="EdgeSetArrayStatus" />
-         <Property name="ElementSetInfo" />
-         <Property name="ElementSetArrayStatus" />
-         <Property name="ElementSetResultArrayInfo" />
-         <Property name="ElementSetResultArrayStatus" />
-         <Property name="SideSetResultArrayInfo" />
-         <Property name="SideSetResultArrayStatus" />
-         <Property name="FaceSetResultArrayInfo" />
-         <Property name="FaceSetResultArrayStatus" />
-         <Property name="EdgeSetResultArrayInfo" />
-         <Property name="EdgeSetResultArrayStatus" />
-         <Property name="NodeSetResultArrayInfo" />
-         <Property name="NodeSetResultArrayStatus" />
-         <Property name="ApplyDisplacements" />
-         <Property name="DisplacementMagnitude" />
-         <Property name="GenerateObjectIdCellArray" />
-         <Property name="GenerateGlobalNodeIdArray" />
-         <Property name="GenerateGlobalElementIdArray" />
-         <Property name="ExodusModelMetadata" />
        </ExposedProperties>
      </SubProxy>
 
@@ -5877,7 +5998,8 @@
                            animateable="0"
                            number_of_elements="1"
                            information_property="FileNameInfo"
-                           repeat_command="1">
+                           repeat_command="1"
+                           panel_visibility="never">
        <FileListDomain name="files" />
        <Documentation>
          This property specifies the file name for the Exodus reader.
@@ -5926,62 +6048,90 @@
        <Proxy name="Reader"
               proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
        <ExposedProperties>
-         <Property name="XMLFileNameInfo" />
-         <Property name="XMLFileName" />
+         <PropertyGroup name="Variables" label="Variables"
+              panel_visibility="default"
+              type="ArrayStatus">
+           <Property name="GenerateObjectIdCellArray" />
+           <Property name="GenerateGlobalElementIdArray" />
+           <Property name="ElementVariables" />
+           <Property name="FaceVariables" />
+           <Property name="EdgeVariables" />
+           <Property name="SideSetResultArrayStatus" />
+           <Property name="NodeSetResultArrayStatus" />
+           <Property name="FaceSetResultArrayStatus" />
+           <Property name="EdgeSetResultArrayStatus" />
+           <Property name="GenerateGlobalNodeIdArray" />
+           <Property name="ElementSetResultArrayStatus" />
+           <Property name="PointVariables" />
+           <Property name="GlobalVariables" />
+         </PropertyGroup>
+
+         <!-- fixme - need to group these two properties -->
+         <Property name="ApplyDisplacements" />
+         <Property name="DisplacementMagnitude" />
+
+         <Property name="EdgeBlocks" />
+         <Property name="EdgeBlocksInfo" />
+
+         <PropertyGroup name="Sets" label="Sets"
+             panel_visibility="advanced"
+             type="ArrayStatus">
+           <Property name="NodeSetArrayStatus" />
+           <Property name="SideSetArrayStatus" />
+           <Property name="FaceSetArrayStatus" />
+           <Property name="EdgeSetArrayStatus" />
+           <Property name="ElementSetArrayStatus" />
+         </PropertyGroup>
+
+         <PropertyGroup name="Maps" label="Maps"
+            panel_visibility="advanced"
+            type="ArrayStatus">
+           <Property name="NodeMapArrayStatus" />
+           <Property name="EdgeMapArrayStatus" />
+           <Property name="FaceMapArrayStatus" />
+           <Property name="ElementMapArrayStatus" />
+         </PropertyGroup>
+
+         <Property name="EdgeMapInfo" />
+         <Property name="EdgeSetInfo" />
+         <Property name="EdgeSetResultArrayInfo" />
+         <Property name="EdgeVariablesInfo" />
+         <Property name="ElementBlocks" />
+         <Property name="ElementMapInfo" />
+         <Property name="ElementSetInfo" />
+         <Property name="ElementSetResultArrayInfo" />
+         <Property name="ElementVariablesInfo" />
+         <Property name="ExodusModelMetadata" />
+         <Property name="FaceBlocks" />
+         <Property name="FaceBlocksInfo" />
+         <Property name="FaceMapInfo" />
+         <Property name="FaceSetInfo" />
+         <Property name="FaceSetResultArrayInfo" />
+         <Property name="FaceVariablesInfo" />
+         <Property name="GlobalVariablesInfo" />
+         <Property name="NodeMapInfo" />
+         <Property name="NodeSetInfo" />
+         <Property name="NodeSetResultArrayInfo" />
+         <Property name="PointVariablesInfo" />
+         <Property name="SideSetInfo" />
+         <Property name="SideSetResultArrayInfo" />
+         <Property name="SILUpdateStamp" />
+
+         <Property name="TimeStepRangeInfo" />
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
          <Property name="AnimateVibrations" />
+
+         <Property name="FilePrefix" />
+         <Property name="FilePrefixInfo" />
+         <Property name="FilePattern" />
+         <Property name="FilePatternInfo" />
+         <Property name="FileRange" />
+         <Property name="FileRangeInfo" />
+         <Property name="XMLFileName" />
+         <Property name="XMLFileNameInfo" />
+
          <Property name="Refresh" />
-         <Property name="SILUpdateStamp" />
-         <Property name="EdgeBlocks" />
-         <Property name="EdgeBlocksInfo" />
-         <Property name="FaceBlocks" />
-         <Property name="FaceBlocksInfo" />
-         <Property name="ElementBlocks" />
-         <Property name="GlobalVariables" />
-         <Property name="GlobalVariablesInfo" />
-         <Property name="PointVariables" />
-         <Property name="PointVariablesInfo" />
-         <Property name="EdgeVariables" />
-         <Property name="EdgeVariablesInfo" />
-         <Property name="FaceVariables" />
-         <Property name="FaceVariablesInfo" />
-         <Property name="ElementVariables" />
-         <Property name="ElementVariablesInfo" />
-         <Property name="NodeMapInfo" />
-         <Property name="NodeMapArrayStatus" />
-         <Property name="EdgeMapInfo" />
-         <Property name="EdgeMapArrayStatus" />
-         <Property name="FaceMapInfo" />
-         <Property name="FaceMapArrayStatus" />
-         <Property name="ElementMapInfo" />
-         <Property name="ElementMapArrayStatus" />
-         <Property name="NodeSetInfo" />
-         <Property name="NodeSetArrayStatus" />
-         <Property name="SideSetInfo" />
-         <Property name="SideSetArrayStatus" />
-         <Property name="FaceSetInfo" />
-         <Property name="FaceSetArrayStatus" />
-         <Property name="EdgeSetInfo" />
-         <Property name="EdgeSetArrayStatus" />
-         <Property name="ElementSetInfo" />
-         <Property name="ElementSetArrayStatus" />
-         <Property name="ElementSetResultArrayInfo" />
-         <Property name="ElementSetResultArrayStatus" />
-         <Property name="SideSetResultArrayInfo" />
-         <Property name="SideSetResultArrayStatus" />
-         <Property name="FaceSetResultArrayInfo" />
-         <Property name="FaceSetResultArrayStatus" />
-         <Property name="EdgeSetResultArrayInfo" />
-         <Property name="EdgeSetResultArrayStatus" />
-         <Property name="NodeSetResultArrayInfo" />
-         <Property name="NodeSetResultArrayStatus" />
-         <Property name="ApplyDisplacements" />
-         <Property name="DisplacementMagnitude" />
-         <Property name="GenerateObjectIdCellArray" />
-         <Property name="GenerateGlobalNodeIdArray" />
-         <Property name="GenerateGlobalElementIdArray" />
-         <Property name="ExodusModelMetadata" />
        </ExposedProperties>
      </SubProxy>
 
@@ -6048,10 +6198,15 @@
          proxygroup="internal_sources" proxyname="AVSucdReader">
        </Proxy>
        <ExposedProperties>
-          <Property name="CellArrayInfo" />
-          <Property name="CellArrayStatus" />
-          <Property name="PointArrayInfo" />
-          <Property name="PointArrayStatus" />
+         <PropertyGroup name="CellPointArrayStatus"
+                        label="Cell/Point Array Status"
+                        panel_visibility="default"
+                        type="ArrayStatus">
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
+           <Property name="PointArrayInfo" />
+           <Property name="PointArrayStatus" />
+         </PropertyGroup>
        </ExposedProperties>
      </SubProxy>
 
@@ -6069,7 +6224,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than one file is
@@ -6510,7 +6666,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the files to load.
@@ -6522,8 +6679,8 @@
           proxygroup="internal_sources" proxyname="FLUENTReaderCore">
         </Proxy>
         <ExposedProperties>
-          <Property name="CellArrayInfo" />
-          <Property name="CellArrayStatus" />
+           <Property name="CellArrayInfo" />
+           <Property name="CellArrayStatus" />
         </ExposedProperties>
       </SubProxy>
      <Hints>
@@ -6845,7 +7002,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           The name of the files to load.
@@ -7025,7 +7183,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="1"
-                            repeat_command="1">
+                            repeat_command="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>
           A list of files to be read in a time series.
@@ -7069,7 +7228,8 @@
                             animateable="0"
                             number_of_elements="1"
                             repeat_command="1"
-                            information_property="FileNameInfo">
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader. Each file is expected to be
@@ -7141,7 +7301,8 @@
                             animateable="0"
                             number_of_elements="1"
                             repeat_command="1"
-                            information_property="FileNameInfo">
+                            information_property="FileNameInfo"
+                            panel_visibility="never">
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader.
@@ -7203,7 +7364,8 @@
         animateable="0"
         number_of_elements="1"
         repeat_command="1"
-        information_property="FileNameInfo" >
+        information_property="FileNameInfo"
+        panel_visibility="never">
         <FileListDomain name="files"/>
        <Documentation>
            The list of files to be read by the reader.
@@ -7502,7 +7664,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7562,7 +7725,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7619,7 +7783,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7681,7 +7846,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.
@@ -7741,7 +7907,8 @@
                            animateable="0"
                            number_of_elements="1"
                            repeat_command="1"
-                           information_property="FileNameInfo" >
+                           information_property="FileNameInfo"
+                           panel_visibility="never">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader.

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedWidgets.h"
 #include "pqCollapsedGroup.h"
 #include "pqNamedWidgets.h"
+#include "pqPropertyWidget.h"
 
 //-----------------------------------------------------------------------------
 class pqProxySelectionWidget::pqInternal
@@ -167,14 +168,28 @@ void pqProxySelectionWidget::handleProxyChanged()
 //-----------------------------------------------------------------------------
 void pqProxySelectionWidget::initialize3DWidget()
 {
+  // proxy panel is the parent widget with the old panels
   pqProxyPanel* panel = qobject_cast<pqProxyPanel*>(this->parentWidget());
+
+  // property widget is the parent widget with the new properties panel
+  pqPropertyWidget *propertyWidget =
+    qobject_cast<pqPropertyWidget*>(this->parentWidget());
 
   if (this->Internal->Widget)
     {
     this->Internal->Widget->deselect();
     this->Internal->Widget->setView(0);
     this->Internal->Widget->hide();
-    QObject::disconnect(panel, 0, this->Internal->Widget, 0);
+
+    if(panel)
+      {
+      QObject::disconnect(panel, 0, this->Internal->Widget, 0);
+      }
+    else if(propertyWidget)
+      {
+      QObject::disconnect(propertyWidget, 0, this->Internal->Widget, 0);
+      }
+
     this->Internal->Widget = NULL;
     }
 
@@ -260,19 +275,29 @@ void pqProxySelectionWidget::initialize3DWidget()
   // Save the panel for later.
   this->Internal->Panels[smProxy] = this->Internal->Widget;
   
-  QObject::connect(panel, SIGNAL(onselect()),
-                   this->Internal->Widget, SLOT(select()));
-  QObject::connect(panel, SIGNAL(ondeselect()),
-                   this->Internal->Widget, SLOT(deselect()));
-  QObject::connect(panel, SIGNAL(onaccept()),
-                   this->Internal->Widget, SLOT(accept()));
-  QObject::connect(panel, SIGNAL(onreset()),
-                   this->Internal->Widget, SLOT(reset()));
-  QObject::connect(this->Internal->Widget, SIGNAL(modified()), 
-                   panel, SLOT(setModified()));
-  QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
-                   this->Internal->Widget, SLOT(setView(pqView*)));
-  
+  if(panel)
+    {
+    QObject::connect(panel, SIGNAL(onselect()),
+                     this->Internal->Widget, SLOT(select()));
+    QObject::connect(panel, SIGNAL(ondeselect()),
+                     this->Internal->Widget, SLOT(deselect()));
+    QObject::connect(panel, SIGNAL(onaccept()),
+                     this->Internal->Widget, SLOT(accept()));
+    QObject::connect(panel, SIGNAL(onreset()),
+                     this->Internal->Widget, SLOT(reset()));
+    QObject::connect(this->Internal->Widget, SIGNAL(modified()),
+                     panel, SLOT(setModified()));
+    QObject::connect(panel, SIGNAL(viewChanged(pqView*)),
+                     this->Internal->Widget, SLOT(setView(pqView*)));
+    }
+  else if(propertyWidget)
+    {
+    QObject::connect(this->Internal->Widget, SIGNAL(modified()),
+                     this, SIGNAL(modified()));
+    QObject::connect(propertyWidget, SIGNAL(viewChanged(pqView*)),
+                     this->Internal->Widget, SLOT(setView(pqView*)));
+    }
+
   this->Internal->Widget->setView(this->Internal->View);
   if (this->Internal->Selected)
     {

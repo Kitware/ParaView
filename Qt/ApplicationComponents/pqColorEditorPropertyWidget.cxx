@@ -118,13 +118,10 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy,
 
   layout->addWidget(groupBox);
   setLayout(layout);
+
+  setShowLabel(false);
 }
 
 pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
 {
-}
-
-bool pqColorEditorPropertyWidget::showLabel() const
-{
-  return false;
 }
