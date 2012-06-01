@@ -17,6 +17,7 @@
 #include "vtkCellData.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
+#include "vtkFunctionParser.h"
 #include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -72,6 +73,9 @@ void vtkPVArrayCalculator::UpdateArrayAndVariableNames
    ( vtkDataObject * vtkNotUsed(theInputObj), vtkDataSetAttributes * inDataAttrs )
 { 
   unsigned long mtime = this->GetMTime();
+
+  // Make sure we reparse the function based on the current array order
+  this->FunctionParser->InvalidateFunction();
 
   // Look at the data-arrays available in the input and register them as
   // variables with the superclass.
