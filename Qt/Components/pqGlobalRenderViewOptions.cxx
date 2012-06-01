@@ -656,7 +656,7 @@ void pqGlobalRenderViewOptions::resetChanges()
   val = settings->value("CompressionEnabled",1);
   this->Internal->CompressorGroup->setChecked(val.toInt());
 
-  val = settings->value("NonInteractiveRenderDelay", 2);
+  val = settings->value("NonInteractiveRenderDelay", 0);
   this->Internal->stillRenderDelay->setValue(val.toInt());
 
   val = settings->value("StillRenderImageReductionFactor", 1);
