@@ -34,6 +34,7 @@
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDepthPeelingPass.h"
 #include "vtkDistributedDataFilter.h"
+#include "vtkFrameBufferObject.h"
 #include "vtkGaussianBlurPass.h"
 #include "vtkIceTCompositePass.h"
 #include "vtkImageRenderManager.h"
@@ -345,6 +346,18 @@ void MyProcess::SetupRenderPasses(vtkRenderer* renderer)
 //-----------------------------------------------------------------------------
 void MyProcess::Execute()
 {
+  // test required extensions by creating a dummy rendering context.
+  vtkSmartPointer<vtkRenderWindow> temp =
+    vtkSmartPointer<vtkRenderWindow>::New();
+  if (!vtkFrameBufferObject::IsSupported(temp))
+    {
+    vtkWarningMacro("Rendering context doesn't support required extensions.\n"
+      "Skipping test.");
+    this->ReturnValue =vtkTesting::PASSED;
+    return;
+    }
+  temp = NULL;
+
   int myId = this->Controller->GetLocalProcessId();
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
