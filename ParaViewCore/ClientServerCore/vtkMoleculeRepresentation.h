@@ -18,7 +18,8 @@
 
 #include "vtkPVDataRepresentation.h"
 
-#include "vtkMoleculeMapper.h"
+class vtkActor;
+class vtkMoleculeMapper;
 
 class VTK_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
 {
