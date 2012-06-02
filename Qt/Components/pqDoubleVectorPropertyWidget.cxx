@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeWidget.h"
 
 #include <QHBoxLayout>
+#include <QDoubleSpinBox>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *property,
                                                            vtkSMProxy *proxy,
@@ -73,6 +74,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
     {
     if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
       {
+      // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
@@ -83,8 +85,31 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
       layout->setSpacing(4);
       layout->addWidget(widget);
       }
+    else if(range->GetMinimumExists(0) || range->GetMaximumExists(0))
+      {
+      // half-bounded ranges are represented with a spin box
+      QDoubleSpinBox *widget = new QDoubleSpinBox(this);
+      widget->setObjectName("DoubleSpinBox");
+      if(range->GetMinimumExists(0))
+        {
+        widget->setMinimum(range->GetMinimum(0));
+        }
+      else
+        {
+        widget->setMaximum(range->GetMaximum(0));
+        }
+
+      this->addPropertyLink(widget,
+                            "value",
+                            SIGNAL(valueChanged(double)),
+                            property);
+
+      layout->setSpacing(4);
+      layout->addWidget(widget);
+      }
     else
       {
+      // unbounded ranges are represented with a line edit
       int elementCount = dvp->GetNumberOfElements();
 
       if(elementCount == 6)

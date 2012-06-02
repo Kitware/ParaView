@@ -1226,7 +1226,6 @@
             <Property name="EdgeColor" />
             <Property name="InterpolateScalarsBeforeMapping" />
             <Property name="Interpolation" />
-            <Property name="LineWidth" />
             <Property name="LookupTable" />
             <Property name="NonlinearSubdivisionLevel" />
             <Property name="Specular" />
@@ -1235,6 +1234,7 @@
           </PropertyGroup>
           <Property name="MapScalars" />
           <Property name="Opacity" panel_visibility="default" />
+          <Property name="LineWidth" />
           <Property name="BackfaceRepresentation" />
           <Property name="Position" />
           <Property name="Scale" />
