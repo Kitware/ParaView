@@ -1219,7 +1219,6 @@
             <Property name="BackfaceAmbientColor" />
             <Property name="BackfaceDiffuseColor" />
             <Property name="BackfaceOpacity" />
-            <Property name="BackfaceRepresentation" />
             <Property name="ColorArrayName" />
             <Property name="ColorAttributeType" />
             <Property name="Diffuse" />
@@ -1236,6 +1235,7 @@
           </PropertyGroup>
           <Property name="MapScalars" />
           <Property name="Opacity" panel_visibility="default" />
+          <Property name="BackfaceRepresentation" />
           <Property name="Position" />
           <Property name="Scale" />
           <Property name="Orientation" />
