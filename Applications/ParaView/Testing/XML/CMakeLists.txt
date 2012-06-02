@@ -146,6 +146,7 @@ IF ("1" STREQUAL ${HAS_NUMPY})
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 # These tests run using the new properties panel
+set(3DWidgetInCustomFilter_USE_NEW_PANELS TRUE)
 set(AboutDialog_USE_NEW_PANELS TRUE)
 set(AnimatePipelineTime_USE_NEW_PANELS TRUE)
 set(CalcParens_USE_NEW_PANELS TRUE)
