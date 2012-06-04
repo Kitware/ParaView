@@ -81,6 +81,16 @@ vtkPVPythonInterpretor* vtkPythonProgrammableFilter::GetGlobalPipelineInterpreto
 }
 
 //----------------------------------------------------------------------------
+void vtkPythonProgrammableFilter::DeleteGlobalPythonInterpretor()
+{
+  if(GlobalPipelineInterpretor)
+    {
+    GlobalPipelineInterpretor->Delete();
+    GlobalPipelineInterpretor = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
   Implementation(new vtkPythonProgrammableFilterImplementation())
 {

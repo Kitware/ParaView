@@ -40,7 +40,7 @@ A simple example:
 #     PURPOSE.  See the above copyright notice for more information.
 #
 #==============================================================================
-import paraview, re, os, os.path, new, sys, vtk
+import paraview, re, os, os.path, new, sys, atexit, vtk
 
 if not paraview.compatibility.minor:
     paraview.compatibility.major = 3
@@ -3023,3 +3023,5 @@ def GetConnectionAt(index):
 
 def GetNumberOfConnections():
    return len(MultiServerConnections)
+
+atexit.register(vtkPythonProgrammableFilter.DeleteGlobalPythonInterpretor)
