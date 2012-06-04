@@ -85,28 +85,6 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
       layout->setSpacing(4);
       layout->addWidget(widget);
       }
-    else if(range->GetMinimumExists(0) || range->GetMaximumExists(0))
-      {
-      // half-bounded ranges are represented with a spin box
-      QDoubleSpinBox *widget = new QDoubleSpinBox(this);
-      widget->setObjectName("DoubleSpinBox");
-      if(range->GetMinimumExists(0))
-        {
-        widget->setMinimum(range->GetMinimum(0));
-        }
-      else
-        {
-        widget->setMaximum(range->GetMaximum(0));
-        }
-
-      this->addPropertyLink(widget,
-                            "value",
-                            SIGNAL(valueChanged(double)),
-                            property);
-
-      layout->setSpacing(4);
-      layout->addWidget(widget);
-      }
     else
       {
       // unbounded ranges are represented with a line edit
