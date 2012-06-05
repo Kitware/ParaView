@@ -20,6 +20,7 @@ SET (Kit_SRCS
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
+  vtkAMRFileSeriesReader.cxx
   vtkAMRIncrementalResampleHelper.cxx
   vtkAnimationPlayer.cxx
   vtkAppendArcLength.cxx
@@ -404,7 +405,7 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
 foreach(_module ${VTK_MODULES_ENABLED})
   if(NOT ${_module}_EXCLUDE_FROM_WRAPPING)
     target_link_libraries(vtk${KIT} ${_module}CS)
-  endif() 
+  endif()
 endforeach()
 
 IF (PARAVIEW_ENABLE_QT_SUPPORT)

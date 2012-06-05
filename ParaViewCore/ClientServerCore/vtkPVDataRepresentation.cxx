@@ -113,6 +113,27 @@ int vtkPVDataRepresentation::RequestData(vtkInformation*,
   return 1;
 }
 
+int vtkPVDataRepresentation::RequestUpdateTime(vtkInformation* request,
+  vtkInformationVector** inputVector,
+  vtkInformationVector* outputVector)
+{
+  for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
+    {
+    for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
+      {
+      vtkStreamingDemandDrivenPipeline* sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+      if (this->UpdateTimeValid)
+        {
+        sddp->SetUpdateTimeStep(
+          inputVector[cc]->GetInformationObject(kk),
+          this->UpdateTime);
+        }
+      }
+    }
+
+  return 1;
+}
 //----------------------------------------------------------------------------
 int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
   vtkInformationVector** inputVector,
