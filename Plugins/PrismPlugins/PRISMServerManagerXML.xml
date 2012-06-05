@@ -797,7 +797,7 @@
         default_values="Density">
         <StringListDomain name="XArray_list">
           <RequiredProperties>
-             <Property name="AxisVarNameInfo" function="ArrayList"/>
+             <Property name="SESAMEAxisVarNameInfo" function="ArrayList"/>
           </RequiredProperties>
         </StringListDomain>
      </StringVectorProperty>
@@ -1377,7 +1377,7 @@
         default_values="Density">
         <StringListDomain name="XArray_list">
           <RequiredProperties>
-             <Property name="AxisVarNameInfo" function="ArrayList"/>
+             <Property name="SESAMEAxisVarNameInfo" function="ArrayList"/>
           </RequiredProperties>
         </StringListDomain>
      </StringVectorProperty>
