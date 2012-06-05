@@ -165,6 +165,10 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
+  virtual int RequestUpdateTime (vtkInformation*,
+                                  vtkInformationVector**,
+                                 vtkInformationVector*);
+
   double UpdateTime;
   bool UpdateTimeValid;
 private:
