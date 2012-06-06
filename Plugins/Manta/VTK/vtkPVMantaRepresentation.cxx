@@ -58,18 +58,15 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkPVMantaRepresentation.h"
 
+#include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkMantaCompositeMapper.h"
 #include "vtkMantaLODActor.h"
 #include "vtkMantaPolyDataMapper.h"
 #include "vtkMantaProperty.h"
 #include "vtkObjectFactory.h"
-#include "vtkCompositePolyDataMapper2.h"
-#include "vtkOrderedCompositeDistributor.h"
-#include "vtkUnstructuredDataDeliveryFilter.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMantaRepresentation);
@@ -87,8 +84,6 @@ vtkPVMantaRepresentation::vtkPVMantaRepresentation()
   this->Property->Delete();
   this->Property = vtkMantaProperty::New();
 
-  this->Mapper->SetInputConnection(this->Distributor->GetOutputPort());
-  this->LODMapper->SetInputConnection(this->LODDeliveryFilter->GetOutputPort());
   this->Actor->SetMapper(this->Mapper);
   this->Actor->SetLODMapper(this->LODMapper);
   this->Actor->SetProperty(this->Property);
