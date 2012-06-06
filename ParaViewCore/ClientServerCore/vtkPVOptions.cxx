@@ -14,9 +14,10 @@
 #include "vtkPVOptions.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkProcessModule.h"
+#include "vtkPVView.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemInformation.hxx>
@@ -59,6 +60,8 @@ vtkPVOptions::vtkPVOptions()
   this->SymmetricMPIMode = 0;
 
   this->TellVersion = 0;
+
+  this->AMRStreaming = 0;
 
   // initialize host names
   vtksys::SystemInformation sys_info;
@@ -292,6 +295,12 @@ void vtkPVOptions::Initialize()
     &this->SymmetricMPIMode,
     "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
+
+  this->AddBooleanArgument("--amr-streaming", "-amr",
+    &this->AMRStreaming,
+    "EXPERIMENTAL: When specified, AMR streaming for volume rendering is "
+    "enabled",
+    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +371,15 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     return 0;
     }
 #endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
+
+  if (this->AMRStreaming)
+    {
+    vtkPVView::SetEnableStreaming(true);
+    }
+  else
+    {
+    vtkPVView::SetEnableStreaming(false);
+    }
 
   return 1;
 }
@@ -512,4 +530,5 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
   os << indent << "ServerURL: "
      << (this->ServerURL? this->ServerURL : "(none)") << endl;
+  os << indent << "AMRStreaming:" << this->AMRStreaming << endl;
 }
