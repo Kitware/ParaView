@@ -2761,7 +2761,9 @@
                         command="SetVOI"
                         label="VOI"
                         number_of_elements="6"
-                        default_values="0 -1 0 -1 0 -1">
+                        default_values="0 -1 0 -1 0 -1"
+                        panel_visibility="default">
+       <IntRangeDomain name="range" />
        <Documentation>
          The data volume of interest (VOI). The VOI is a sub-extent of the
          data that you want loaded. Setting a VOI is useful when reading
