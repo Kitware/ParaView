@@ -637,8 +637,12 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
       // automatically update vtk objects and re-render view on change
       item.PropertyWidget->setAutoUpdateVTKObjects(true);
       item.PropertyWidget->setUseUncheckedProperties(false);
-      this->connect(item.PropertyWidget, SIGNAL(modified()),
-                    this->View, SLOT(render()));
+
+      if(this->View)
+        {
+        this->connect(item.PropertyWidget, SIGNAL(modified()),
+                      this->View, SLOT(render()));
+        }
       }
     }
 
