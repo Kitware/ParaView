@@ -3025,7 +3025,8 @@
       <StringVectorProperty name="Dimensions"
                             command="SetDimensions"
                             number_of_elements="1"
-                            animatelable="0">
+                            animatelable="0"
+                            panel_visibility="default">
         <StringListDomain name="array_list">
           <RequiredProperties>
             <Property name="DimensionInfo" function="ArrayList" />
@@ -3053,7 +3054,8 @@
                          command="SetSphericalCoordinates"
                          animateable="0"
                          number_of_elements="1"
-                         default_values="1">
+                         default_values="1"
+                         panel_visibility="default">
         <BooleanDomain name="bool" />
         <Documentation>
           If on, then data with latitude/longitude dimensions will be
@@ -3066,7 +3068,9 @@
       <DoubleVectorProperty name="VerticalScale"
                             command="SetVerticalScale"
                             number_of_elements="1"
-                            default_values="1">
+                            default_values="1"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range"/>
         <Documentation>
           The scale of the vertical component of spherical coordinates. It
           is common to write the vertical component with respect to
@@ -3083,7 +3087,9 @@
       <DoubleVectorProperty name="VerticalBias"
                             command="SetVerticalBias"
                             number_of_elements="1"
-                            default_values="0">
+                            default_values="0"
+                            panel_visibility="default">
+        <DoubleRangeDomain name="range"/>
         <Documentation>
           The bias of the vertical component of spherical coordinates. It
           is common to write the vertical component with respect to
@@ -3100,7 +3106,8 @@
       <IntVectorProperty name="ReplaceFillValueWithNan"
                          command="SetReplaceFillValueWithNan"
                          number_of_elements="1"
-                         default_values="0">
+                         default_values="0"
+                         panel_visibility="default">
         <BooleanDomain name="bool" />
         <Documentation>
           If on, any float or double variable read that has a _FillValue
@@ -3118,7 +3125,8 @@
                          command="SetOutputType"
                          number_of_elements="1"
                          animateable="0"
-                         default_values="-1">
+                         default_values="-1"
+                         panel_visibility="default">
         <EnumerationDomain name="enum">
           <Entry value="-1" text="Automatic" />
           <Entry value="6" text="Image" />

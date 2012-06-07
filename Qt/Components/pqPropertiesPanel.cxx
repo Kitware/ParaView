@@ -172,13 +172,6 @@ public:
         return new pqYoungsMaterialInterfacePanel(proxy, p);
         }
       }
-    if(QString("sources") == proxy->getProxy()->GetXMLGroup())
-      {
-      if(QString("netCDFReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqNetCDFPanel(proxy, p);
-        }
-      }
     return 0;
   }
 
@@ -206,13 +199,6 @@ public:
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
          QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName() ||
          QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
-        {
-        return true;
-        }
-      }
-    if(QString("sources") == proxy->getProxy()->GetXMLGroup())
-      {
-      if (QString("netCDFReader") == proxy->getProxy()->GetXMLName())
         {
         return true;
         }
