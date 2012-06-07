@@ -3489,8 +3489,13 @@
           <Property name="NumBlocks" />
           <Property name="EnableCaching" />
           <Property name="Level" />
-          <Property name="PointArrayStatus" />
-          <Property name="CellArrayStatus" />
+          <PropertyGroup name="CellPointArrayStatus"
+                         label="Cell/Point Array Status"
+                         panel_visibility="default"
+                         type="ArrayStatus">
+           <Property name="PointArrayStatus" />
+           <Property name="CellArrayStatus" />
+         </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
         
