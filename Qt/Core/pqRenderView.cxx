@@ -98,14 +98,14 @@ pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
   { 3, 0, 1, "Zoom",   "Camera3DManipulators"},
   // ------------- 3D / 2D -------------
   { 1, 0, 0, "Pan",  "Camera2DManipulators"},
-  { 2, 0, 0, "Pan",  "Camera2DManipulators"},
+  { 2, 0, 0, "Roll",  "Camera2DManipulators"},
   { 3, 0, 0, "Zoom", "Camera2DManipulators"},
   { 1, 1, 0, "Zoom", "Camera2DManipulators"},
   { 2, 1, 0, "Zoom", "Camera2DManipulators"},
   { 3, 1, 0, "Zoom", "Camera2DManipulators"},
-  { 1, 0, 1, "Zoom", "Camera2DManipulators"},
-  { 2, 0, 1, "Zoom", "Camera2DManipulators"},
-  { 3, 0, 1, "Pan" , "Camera2DManipulators"},
+  { 1, 0, 1, "Roll", "Camera2DManipulators"},
+  { 2, 0, 1, "Pan", "Camera2DManipulators"},
+  { 3, 0, 1, "Rotate" , "Camera2DManipulators"},
 };
 
 class pqRenderView::pqInternal
