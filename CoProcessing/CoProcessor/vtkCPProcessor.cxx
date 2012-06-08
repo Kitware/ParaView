@@ -19,6 +19,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
+#include "CPSystemInformation.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "vtkCPPythonHelper.h"
+#else
+#include "vtkCPCxxHelper.h"
+#endif
+
 #include <list>
 
 struct vtkCPProcessorInternals
@@ -27,6 +34,8 @@ struct vtkCPProcessorInternals
   typedef PipelineList::iterator PipelineListIterator;
   PipelineList Pipelines;
 };
+
+vtkObject* vtkCPProcessor::InitializationHelper = NULL;
 
 vtkStandardNewMacro(vtkCPProcessor);
 
@@ -43,6 +52,15 @@ vtkCPProcessor::~vtkCPProcessor()
     {
     delete this->Internal;
     this->Internal = NULL;
+    }
+  if(this->InitializationHelper)
+    {
+    bool nullify = this->InitializationHelper->GetReferenceCount() == 1;
+    this->InitializationHelper->Delete();
+    if(nullify)
+      {
+      this->InitializationHelper = NULL;
+      }
     }
 }
 
@@ -101,6 +119,18 @@ void vtkCPProcessor::RemoveAllPipelines()
 //----------------------------------------------------------------------------
 int vtkCPProcessor::Initialize()
 {
+  if(this->InitializationHelper == NULL)
+    {
+#ifdef PARAVIEW_ENABLE_PYTHON
+    this->InitializationHelper = vtkCPPythonHelper::New();
+#else
+    this->InitializationHelper = vtkCPCxxHelper::New();
+#endif
+    }
+  else
+    {
+    this->InitializationHelper->Register(this);
+    }
   return 1;
 }
 

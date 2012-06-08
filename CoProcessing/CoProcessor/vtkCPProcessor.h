@@ -105,6 +105,9 @@ private:
   void operator=(const vtkCPProcessor&); // Not implemented
 
   vtkCPProcessorInternals* Internal;
+
+  /// Storage for the PV options.
+  static vtkObject* InitializationHelper;
 };
 
 #endif

@@ -134,7 +134,7 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
 //----------------------------------------------------------------------------
 vtkPVPythonInterpretor* vtkCPPythonHelper::GetPythonInterpretor()
 {
-  return this->PythonInterpretor;
+  return Instance->PythonInterpretor;
 }
 
 

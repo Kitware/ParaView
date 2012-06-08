@@ -67,9 +67,6 @@ private:
   vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&); // Not implemented
   void operator=(const vtkCPPythonScriptPipeline&); // Not implemented
 
-  /// The object that runs the python scripts.
-  static vtkCPPythonHelper* PythonHelper;
-
   /// The name of the python script (without the path or extension)
   /// that is used as the namespace of the functions of the script.
   char* PythonScriptName;

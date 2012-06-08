@@ -26,6 +26,7 @@
 
 #include <string>
 
+#include "CPSystemInformation.h"
 #ifdef COPROCESSOR_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
@@ -35,11 +36,13 @@ vtkStandardNewMacro(vtkPVCustomTestDriver);
 //----------------------------------------------------------------------------
 vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 {
-  int myid = 0;
-#ifdef COPROCESSOR_USE_MPI
-  myid = vtkMPICommunicator::GetWorldCommunicator()->GetLocalProcessId();
-#endif
   this->Processor = vtkCPProcessor::New();
+  this->Processor->Initialize();
+
+  vtkCPProcessor* ppp = vtkCPProcessor::New();
+  ppp->Initialize();
+  ppp->Delete();
+
   // Specify how the field varies over space and time.
   vtkCPLinearScalarFieldFunction* fieldFunction = 
     vtkCPLinearScalarFieldFunction::New();
@@ -54,6 +57,11 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
   fieldBuilder->SetArrayName("Pressure");
   fieldBuilder->SetTensorFieldFunction(fieldFunction);
   fieldFunction->Delete();
+
+  int myid = 0;
+#ifdef COPROCESSOR_USE_MPI
+  myid = vtkMPICommunicator::GetWorldCommunicator()->GetLocalProcessId();
+#endif
 
   // Set the type of grid we are building.
   vtkCPUniformGridBuilder* gridBuilder = vtkCPUniformGridBuilder::New();
@@ -153,7 +161,6 @@ int vtkPVCustomTestDriver::Initialize(const char* fileName)
     success = 0;
     }
 
-  this->Processor->Initialize();
   return success;
 }
 
