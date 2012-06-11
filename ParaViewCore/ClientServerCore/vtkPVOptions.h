@@ -148,6 +148,9 @@ public:
   // This is used when user want to open a file at startup
   vtkSetStringMacro(ParaViewDataName);
 
+  // Description:
+  // EXPERIMENTAL: When set, AMR streaming is enabled.
+  vtkGetMacro(AMRStreaming, int);
 protected:
 //BTX
   // Description:
@@ -249,6 +252,7 @@ private:
   vtkSetStringMacro(StereoType);
   char* StereoType;
 
+  int AMRStreaming;
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

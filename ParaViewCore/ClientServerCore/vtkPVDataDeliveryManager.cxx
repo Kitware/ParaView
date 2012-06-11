@@ -819,8 +819,7 @@ bool vtkPVDataDeliveryManager::BuildPriorityQueue(double planes[24])
 void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(key, false);
-  vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
-  if (!oamr)
+  if (vtkOverlappingAMR::SafeDownCast(item->GetDataObject()) == NULL)
     {
     cout << "ERROR: StreamingDeliver can only deliver AMR datasets for now" << endl;
     abort();
@@ -828,6 +827,9 @@ void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
 
   if (this->Internals->PriorityQueue.empty())
     {
+    vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(
+      item->GetDeliveredDataObject());
+
     // client side.
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
@@ -856,7 +858,7 @@ void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
       }
     else
       {
-      vtkWarningMacro("Empty data (or incorrect data) received");
+      // vtkWarningMacro("Empty data (or incorrect data) received");
       }
     }
   else
@@ -872,14 +874,15 @@ void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
     this->RenderView->StreamingUpdate();
     repr->ResetStreamingBlockId();
 
-    oamr = vtkOverlappingAMR::SafeDownCast(item->GetDataObject());
+    vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(
+      item->GetDataObject());
 
     vtkNew<vtkMultiBlockDataSet> mb;
 
     vtkUniformGrid* piece = oamr->GetDataSet(qitem.Level, qitem.Index);
     if (piece == NULL)
       {
-      vtkWarningMacro("Null piece delivered!");
+      // vtkWarningMacro("Null piece delivered!");
       }
     else
       {
