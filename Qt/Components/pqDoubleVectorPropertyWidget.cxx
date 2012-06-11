@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeWidget.h"
 
 #include <QHBoxLayout>
+#include <QDoubleSpinBox>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *property,
                                                            vtkSMProxy *proxy,
@@ -73,6 +74,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
     {
     if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
       {
+      // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);
       widget->setObjectName("DoubleRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
@@ -85,6 +87,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
       }
     else
       {
+      // unbounded ranges are represented with a line edit
       int elementCount = dvp->GetNumberOfElements();
 
       if(elementCount == 6)
