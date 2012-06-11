@@ -107,6 +107,7 @@ public:
 //BTX
   static vtkPVPythonInterpretor* GetGlobalPipelineInterpretor();
 //ETX
+  static void DeleteGlobalPythonInterpretor();
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
