@@ -24,22 +24,14 @@
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 
-#include <string>
-
-#ifdef COPROCESSOR_USE_MPI
-#include "vtkMPICommunicator.h"
-#endif
-
 vtkStandardNewMacro(vtkPVCustomTestDriver);
 
 //----------------------------------------------------------------------------
 vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 {
-  int myid = 0;
-#ifdef COPROCESSOR_USE_MPI
-  myid = vtkMPICommunicator::GetWorldCommunicator()->GetLocalProcessId();
-#endif
   this->Processor = vtkCPProcessor::New();
+  this->Processor->Initialize();
+
   // Specify how the field varies over space and time.
   vtkCPLinearScalarFieldFunction* fieldFunction = 
     vtkCPLinearScalarFieldFunction::New();
@@ -57,15 +49,15 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 
   // Set the type of grid we are building.
   vtkCPUniformGridBuilder* gridBuilder = vtkCPUniformGridBuilder::New();
-  int Dimensions[3] = {50, 50, 50};
-  gridBuilder->SetDimensions(Dimensions);
+  int dimensions[3] = {50, 50, 50};
+  gridBuilder->SetDimensions(dimensions);
   double spacing[3] = {.2, .2, .3};
   gridBuilder->SetSpacing(spacing);
-  double origin[3] = {myid*49*.2,20,300};
+  double origin[3] = {0,20,300};
   gridBuilder->SetOrigin(origin);
   gridBuilder->SetFieldBuilder(fieldBuilder);
   fieldBuilder->Delete();
-  
+
   this->SetGridBuilder(gridBuilder);
   gridBuilder->Delete();
 }
@@ -153,7 +145,6 @@ int vtkPVCustomTestDriver::Initialize(const char* fileName)
     success = 0;
     }
 
-  this->Processor->Initialize();
   return success;
 }
 

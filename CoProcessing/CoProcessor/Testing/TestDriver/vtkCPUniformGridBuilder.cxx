@@ -15,6 +15,7 @@
 #include "vtkCPUniformGridBuilder.h"
 
 #include "vtkCPBaseFieldBuilder.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
@@ -107,7 +108,17 @@ bool vtkCPUniformGridBuilder::CreateUniformGrid()
     vtkUniformGrid* newGrid = vtkUniformGrid::New();
     newGrid->SetSpacing(this->Spacing);
     newGrid->SetOrigin(this->Origin);
-    newGrid->SetDimensions(this->Dimensions);
+
+    vtkMultiProcessController* controller =
+      vtkMultiProcessController::GetGlobalController();
+    int numberOfProcesses = controller->GetNumberOfProcesses();
+    int processId = controller->GetLocalProcessId();
+    // partition in the x-direction
+    int extents[6] = {this->Dimensions[0]*processId/numberOfProcesses,
+                      this->Dimensions[0]*(processId+1)/numberOfProcesses,
+                      0, this->Dimensions[1], 0, this->Dimensions[2]};
+    newGrid->SetExtent(extents);
+
     this->SetUniformGrid(newGrid);
     newGrid->Delete();
     }

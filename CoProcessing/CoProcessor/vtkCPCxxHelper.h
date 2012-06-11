@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkCPPythonHelper.h
+  Module:    vtkCPCxxHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,42 +12,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef vtkCPPythonHelper_h
-#define vtkCPPythonHelper_h
+#ifndef vtkCPCxxHelper_h
+#define vtkCPCxxHelper_h
 
 #include "vtkCPPipeline.h"
 #include "CPWin32Header.h" // For windows import/export of shared libraries
 
-class vtkPVPythonOptions;
-class vtkPVPythonInterpretor;
+class vtkPVOptions;
 
 /// @ingroup CoProcessing
-/// Singleton class for python interpretor.
-class COPROCESSING_EXPORT vtkCPPythonHelper : public vtkObject
+/// Singleton class for initializing without python.
+class COPROCESSING_EXPORT vtkCPCxxHelper : public vtkObject
 {
 public:
-  static vtkCPPythonHelper* New();
-  vtkTypeMacro(vtkCPPythonHelper,vtkObject);
+  static vtkCPCxxHelper* New();
+  vtkTypeMacro(vtkCPCxxHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /// Get the interpretor that has been setup.
-  static vtkPVPythonInterpretor* GetPythonInterpretor();
-
 protected:
-  vtkCPPythonHelper();
-  virtual ~vtkCPPythonHelper();
+  vtkCPCxxHelper();
+  virtual ~vtkCPCxxHelper();
 
 private:
-  vtkCPPythonHelper(const vtkCPPythonHelper&); // Not implemented
-  void operator=(const vtkCPPythonHelper&); // Not implemented
+  vtkCPCxxHelper(const vtkCPCxxHelper&); // Not implemented
+  void operator=(const vtkCPCxxHelper&); // Not implemented
 
-  vtkPVPythonOptions* PythonOptions;
-  vtkPVPythonInterpretor* PythonInterpretor;
+  vtkPVOptions* Options;
 
   /// The singleton instance of the class.
-  static vtkCPPythonHelper* Instance;
+  static vtkCPCxxHelper* Instance;
 };
-
-
 
 #endif
