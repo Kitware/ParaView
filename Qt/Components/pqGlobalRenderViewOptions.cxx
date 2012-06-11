@@ -168,7 +168,7 @@ void pqGlobalRenderViewOptions::init()
       << this->Internal->comboBoxCamera2D_8 << this->Internal->comboBoxCamera2D_9;
 
   this->Internal->CameraControl2DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
-     << "Pan" << "Zoom";
+     << "Pan" << "Zoom" << "Roll" << "Rotate";
 
   for ( int cc = 0; cc < this->Internal->CameraControl2DComboBoxList.size(); cc++ )
     {
