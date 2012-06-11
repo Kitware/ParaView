@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkVRQueue.h"
+#include "vtkPVXMLElement.h"
 
 // ----------------------------------------------------------------------------
 vtkVRActiveObjectManipulationStyle::vtkVRActiveObjectManipulationStyle(QObject* parentObject) :
@@ -236,3 +237,50 @@ bool vtkVRActiveObjectManipulationStyle::update()
     }
   return false;
 }
+
+// ----------------------------------------------------------------------------
+bool vtkVRActiveObjectManipulationStyle::configure(vtkPVXMLElement* child,
+                                                   vtkSMProxyLocator* locator)
+{
+  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 && 
+      strcmp(this->metaObject()->className(),
+             child->GetAttributeOrEmpty("class")) == 0)
+    {
+    if ( child->GetNumberOfNestedElements() !=1 )
+      {
+      std::cerr << "vtkVRActiveObjectManipulationStyle::configure(): "
+                << "There has to be only 1 element present " << std::endl
+                << "<Analog name=\"analogEventName\"/>" << std::endl;
+      return false;
+      }
+    vtkPVXMLElement* analog = child->GetNestedElement(0);
+    if (analog && analog->GetName() && strcmp(analog->GetName(), "Analog") == 0)
+      {
+      this->Analog = analog->GetAttributeOrEmpty("name");
+      }
+    else
+      {
+      std::cerr << "vtkVRActiveObjectManipulationStyle::configure(): "
+                << "Analog event has to be specified" << std::endl
+                << "<Analog name=\"analogEventName\"/>"
+                << std::endl;
+      return false;
+      }
+    }
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+vtkPVXMLElement* vtkVRActiveObjectManipulationStyle::saveConfiguration() const
+{
+  vtkPVXMLElement* child = Superclass::saveConfiguration();
+
+  vtkPVXMLElement* analog = vtkPVXMLElement::New();
+  analog->SetName("Analog");
+  analog->AddAttribute("name", this->Analog.c_str() );
+  child->AddNestedElement(analog);
+  analog->FastDelete();
+
+  return child;
+}
+

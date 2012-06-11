@@ -45,13 +45,15 @@ class vtkVRActiveObjectManipulationStyle : public vtkVRInteractorStyle
 public:
   vtkVRActiveObjectManipulationStyle(QObject* parent);
   ~vtkVRActiveObjectManipulationStyle();
+  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* saveConfiguration() const;
   virtual bool handleEvent(const vtkVREventData& data);
   virtual bool update();
 
 protected:
   void HandleAnalog ( const vtkVREventData& data );
   void HandleSpaceNavigatorAnalog( const vtkVREventData& data );
-
+  std::string Analog;
 protected:
 };
 
