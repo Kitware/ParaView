@@ -372,7 +372,7 @@ std::string vtkVRPNConnection::GetName( int eventType, int id )
     {
     case ANALOG_EVENT:
       e << "analog." << id;
-      if( this->AnalogMapping.find( e.str())!= this->ButtonMapping.end())
+      if( this->AnalogMapping.find( e.str())!= this->AnalogMapping.end())
         returnStr << this->AnalogMapping[e.str()];
       else
         returnStr << e.str();
