@@ -14,7 +14,9 @@ INCLUDE_DIRECTORIES(
   "${CMAKE_CURRENT_BINARY_DIR}"
   "${ParaView_BINARY_DIR}/VTK"
   "${ParaView_SOURCE_DIR}/VTK/Wrapping/Python"
+  "${ParaView_SOURCE_DIR}/VTK/Wrapping/PythonCore"
   "${ParaView_BINARY_DIR}/VTK/Wrapping/Python"
+  "${ParaView_BINARY_DIR}/VTK/Wrapping/PythonCore"
   "${PVCommon_SOURCE_DIR}"
   "${PVClientServerCore_SOURCE_DIR}"
   "${PVServerImplementation_SOURCE_DIR}"
@@ -107,6 +109,7 @@ ENDIF(PY_STATIC_MODULES_LIST)
 TARGET_LINK_LIBRARIES(vtkPVPythonInterpretor
   vtkCommonCore
   vtksys
+  vtkPythonCore
   ${VTK_PYTHON_LIBRARIES}
   ${PYTHON_UTIL_LIBRARY_LIB})
 
