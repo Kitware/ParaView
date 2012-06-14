@@ -18,6 +18,7 @@
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkAMRFileSeriesReader);
 
