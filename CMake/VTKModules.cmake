@@ -225,9 +225,8 @@ set(_vtk_modules
   #  vtkTextureMapToPlane
   #  vtkTextureMapToSphere
 
-  #vtkFiltersTracers
+  #vtkFiltersFlowPaths
   # Needed for:
-  #  vtkStreamTracer
   #  vtkStreamTracer
 
   vtkFiltersVerdict
@@ -349,7 +348,7 @@ set(_vtk_modules
 
 if(PARAVIEW_USE_VISITBRIDGE)
   # Needed by VisItBridge
-  list(APPEND _vtk_modules vtkFiltersTracers )
+  list(APPEND _vtk_modules vtkFiltersFlowPaths)
 endif()
 
 # Are we building the GUI
