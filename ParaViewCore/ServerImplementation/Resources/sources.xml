@@ -172,7 +172,8 @@ The 3D Text source displays a text string as polygonal data.
         name="Text"
         command="SetText"
         number_of_elements="1"
-        default_values="3D Text">
+        default_values="3D Text"
+        panel_visibility="default" >
         <Documentation>
           This property contains the text string to be displayed. The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string.
         </Documentation>
@@ -285,7 +286,8 @@ The Axes source can be used to add a representation of the coordinate system axe
          name="Origin"
          command="SetOrigin"
          number_of_elements="3"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           The values of this property set the X, Y, and Z coordinates of the origin of the axes.
@@ -316,7 +318,9 @@ The Axes source can be used to add a representation of the coordinate system axe
          name="Bounds"
          command="SetBounds"
          number_of_elements="6"
-         default_values="0 1 0 1 0 1" >
+         default_values="0 1 0 1 0 1"
+         panel_visibility="default" >
+         <DoubleRangeDomain name="range" />
          <Documentation>
            The values of this property specify the minimum and maximum X, Y, and Z coordinates (X min, X max, Y min, Y max, Z min, Z max) for drawing the outline.
          </Documentation>
@@ -757,7 +761,8 @@ The Mandelbrot source can be used to add a uniform rectilinear grid with scalar 
          name="WholeExtent"
          command="SetWholeExtent"
          number_of_elements="6"
-         default_values="0 250 0 250 0 0" >
+         default_values="0 250 0 250 0 0"
+         panel_visibility="default" >
         <IntRangeDomain name="range"/>
         <Documentation>
           The six values in the property indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
@@ -803,7 +808,8 @@ The Mandelbrot source can be used to add a uniform rectilinear grid with scalar 
          label="Maximum Number of Iterations"
          number_of_elements="1"
          animateable="1"
-         default_values="100" >
+         default_values="100"
+         panel_visibility="default" >
         <IntRangeDomain name="range" min="1" max="5000" />
         <Documentation>
           The value of this property specifies the limit on computational iterations (i.e., the maximum number of iterations to perform to determine if the value will go above 2). Values less than 2.0 after the specified number of iterations are considered in the fractal set.
@@ -1232,7 +1238,8 @@ The Superquadric source can be used to add a polygonal superquadric to the 3D sc
          command="SetCenter"
          number_of_elements="3"
          animateable="1"
-         default_values="0.0 0.0 0.0" >
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinates of the center of the superquadric.
@@ -1288,7 +1295,8 @@ The Superquadric source can be used to add a polygonal superquadric to the 3D sc
          command="SetThetaRoundness"
          number_of_elements="1"
          animateable="1"
-         default_values="1" >
+         default_values="1"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0.01" />
         <Documentation>
           This property defines the roundness of the superquadric in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes.
@@ -1300,7 +1308,8 @@ The Superquadric source can be used to add a polygonal superquadric to the 3D sc
          command="SetPhiRoundness"
          number_of_elements="1"
          animateable="1"
-         default_values="1" >
+         default_values="1"
+         panel_visibility="default" >
         <DoubleRangeDomain name="range" min="0.01" />
         <Documentation>
           This property defines the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes.
@@ -1323,7 +1332,8 @@ The Superquadric source can be used to add a polygonal superquadric to the 3D sc
         command="SetToroidal" 
         number_of_elements="1"
         animateable="1"
-        default_values="1" > 
+        default_values="1"
+        panel_visibility="default" >
        <BooleanDomain name="bool"/>
        <Documentation>
          If the value of this property is 0, the generated superquadric will not contain a hole (i.e., the superquadric will be ellipsoidal). Otherwise, a toroidal object is generated.
@@ -1927,6 +1937,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         command="SetXAmplitude"
         number_of_elements="1"
         default_values="0.0">
+        <DoubleRangeDomain name="range" />
         <Documentation>
         Controls how far the data set moves along X over time.
         </Documentation>
@@ -1937,6 +1948,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         command="SetYAmplitude"
         number_of_elements="1"
         default_values="0.0">
+        <DoubleRangeDomain name="range" />
         <Documentation>
         Controls how far the data set moves along Y over time.
         </Documentation>
