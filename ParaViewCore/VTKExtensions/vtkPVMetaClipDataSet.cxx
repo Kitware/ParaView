@@ -83,7 +83,7 @@ void vtkPVMetaClipDataSet::SetValue( double value)
 //----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::SetUseValueAsOffset(int value)
 {
-  this->Internal->Clip->SetUseValueAsOffset(value);
+  this->Internal->Clip->SetUseValueAsOffset(value != 0);
   this->Modified();
 }
 //----------------------------------------------------------------------------

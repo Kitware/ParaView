@@ -135,7 +135,7 @@ void vtkPVDataSetAlgorithmSelectorFilter::PrintSelf(ostream& os, vtkIndent inden
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::RegisterFilter(vtkAlgorithm *filter)
 {
-  int size = this->Internal->RegisteredFilters.size();
+  int size = static_cast<int>(this->Internal->RegisteredFilters.size());
   this->Internal->RegisteredFilters.push_back(filter);
   this->Modified();
   return size;
