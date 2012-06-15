@@ -50,13 +50,12 @@ vtkPVDataSetAlgorithmSelectorFilter::vtkPVDataSetAlgorithmSelectorFilter()
   this->Internal = new vtkInternals();
   this->SetNumberOfOutputPorts(1);
   this->SetNumberOfInputPorts(1);
-  this->OutputType = NULL;
+  this->OutputType = VTK_DATA_SET;
 }
 //----------------------------------------------------------------------------
 vtkPVDataSetAlgorithmSelectorFilter::~vtkPVDataSetAlgorithmSelectorFilter()
 {
   delete this->Internal; this->Internal = NULL;
-  this->SetOutputType(NULL);
 }
 //----------------------------------------------------------------------------
 int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
@@ -149,8 +148,7 @@ void vtkPVDataSetAlgorithmSelectorFilter::UnRegisterFilter(int index)
     {
     std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator iter =
         this->Internal->RegisteredFilters.begin();
-    iter      += index;
-
+    iter += index;
     this->Internal->RegisteredFilters.erase(iter);
 
     this->Modified();
@@ -251,7 +249,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(vtkInformation *, vtk
         {
         vtkPolyData* output = vtkPolyData::New();
         this->GetExecutive()->SetOutputData(0, output);
-        output->Delete();
+        output->FastDelete();
         this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
                                                output->GetExtentType());
         }
@@ -266,7 +264,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::RequestDataObject(vtkInformation *, vtk
         {
         vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
         this->GetExecutive()->SetOutputData(0, output);
-        output->Delete();
+        output->FastDelete();
         this->GetOutputPortInformation(0)->Set(vtkDataObject::DATA_EXTENT_TYPE(),
                                                output->GetExtentType());
         }

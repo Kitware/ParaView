@@ -57,6 +57,7 @@ vtkPVMetaClipDataSet::vtkPVMetaClipDataSet()
 //----------------------------------------------------------------------------
 vtkPVMetaClipDataSet::~vtkPVMetaClipDataSet()
 {
+  delete this->Internal; this->Internal = NULL;
 }
 
 //----------------------------------------------------------------------------

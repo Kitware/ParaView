@@ -4971,14 +4971,14 @@ This filter extracts the portion of the input dataset that lies along the specif
     </Documentation>
 
      <IntVectorProperty
-         label="Preserve Input Cells"
+         label="Crinkle slice"
          name="PreserveInputCells"
          command="PreserveInputCells"
          number_of_elements="1"
          default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         This parameter controls whether to extract entire cells or just the surface that match the region.
+         This parameter controls whether to extract the entire cells that are sliced by the region or just extract a triangulated surface of that region.
        </Documentation>
      </IntVectorProperty>
 
@@ -5143,14 +5143,14 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
     </Documentation>
 
      <IntVectorProperty
-         label="Preserve Input Cells"
+         label="Crinkle clip"
          name="PreserveInputCells"
          command="PreserveInputCells"
          number_of_elements="1"
          default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         This parameter controls whether to extract entire cells or just the surface that match the region.
+         This parameter controls whether to extract entire cells in the given region or clip those cells so all of the output one stay only inside that region.
        </Documentation>
      </IntVectorProperty>
 
