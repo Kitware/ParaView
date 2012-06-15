@@ -4963,12 +4963,25 @@ The Warp (vector) filter translates the points of the input dataset using a spec
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="Cut" class="vtkCutter" label="Slice">
+   <SourceProxy name="Cut" class="vtkPVMetaSliceDataSet" label="Slice">
     <Documentation
        long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
        short_help="Slice datasets with planes.">
 This filter extracts the portion of the input dataset that lies along the specified plane. The Slice filter takes any type of dataset as input. The output of this filter is polygonal data.
     </Documentation>
+
+     <IntVectorProperty
+         label="Preserve Input Cells"
+         name="PreserveInputCells"
+         command="PreserveInputCells"
+         number_of_elements="1"
+         default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This parameter controls whether to extract entire cells or just the surface that match the region.
+       </Documentation>
+     </IntVectorProperty>
+
     <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -5122,12 +5135,25 @@ This parameter controls whether to extract cells that are on the boundary of the
 
 
    <!-- ==================================================================== -->
-   <SourceProxy name="Clip" class="vtkPVClipDataSet">
+   <SourceProxy name="Clip" class="vtkPVMetaClipDataSet">
     <Documentation
        long_help="Clip with an implicit plane. Clipping does not reduce the dimensionality of the data set. The output data type of this filter is always an unstructured grid."
        short_help="Clip with an implicit plane.">
 The Clip filter cuts away a portion of the input data set using an implicit plane. This filter operates on all types of data sets, and it returns unstructured grid data on output.
     </Documentation>
+
+     <IntVectorProperty
+         label="Preserve Input Cells"
+         name="PreserveInputCells"
+         command="PreserveInputCells"
+         number_of_elements="1"
+         default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This parameter controls whether to extract entire cells or just the surface that match the region.
+       </Documentation>
+     </IntVectorProperty>
+
     <InputProperty
        name="Input"
        command="SetInputConnection">

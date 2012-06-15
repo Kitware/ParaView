@@ -136,6 +136,8 @@ SET (Kit_SRCS
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVMergeTables.cxx
+  vtkPVMetaClipDataSet.cxx
+  vtkPVMetaSliceDataSet.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
   vtkPVPlotTime.cxx
@@ -158,6 +160,7 @@ SET (Kit_SRCS
   vtkPVTrivialExtentTranslator.cxx
   vtkPVTrivialProducer.cxx
   vtkPVUpdateSuppressor.cxx
+  vtkPVDataSetAlgorithmSelectorFilter.cxx
   vtkQuerySelectionSource.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkRectilinearGridConnectivity.cxx

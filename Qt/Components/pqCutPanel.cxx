@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 
 #include <QVBoxLayout>
+#include <QCheckBox>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqCutPanel::pqImplementation
@@ -52,15 +53,17 @@ public:
   
   /// Controls the number and position of "slices"
   pqSampleScalarWidget SampleScalarWidget;
+  pqCollapsedGroup* SampleScalarWidgetContainer;
 };
 
 pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   Superclass(object_proxy, p),
   Implementation(new pqImplementation())
 {
-  pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
-  group2->setTitle(tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
-  QVBoxLayout* l = new QVBoxLayout(group2);
+  this->Implementation->SampleScalarWidgetContainer = new pqCollapsedGroup(this);
+  this->Implementation->SampleScalarWidgetContainer->setTitle(
+        tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
+  QVBoxLayout* l = new QVBoxLayout(this->Implementation->SampleScalarWidgetContainer);
   this->Implementation->SampleScalarWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->SampleScalarWidget);
  
@@ -72,7 +75,8 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   delete this->findChild<QWidget*>("_labelForContourValues");
   qDeleteAll(this->findChildren<QWidget*>(QRegExp("ContourValues_\\d+")));
 
-  panel_layout->addWidget(group2, rowCount, 0, 1, panel_layout->columnCount());
+  panel_layout->addWidget(this->Implementation->SampleScalarWidgetContainer,
+                          rowCount, 0, 1, panel_layout->columnCount());
   //panel_layout->setRowStretch(panel_layout->rowCount(), 1);
   
   // Link SampleScalarWidget's qProperty to vtkSMProperty
@@ -91,6 +95,12 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
   this->Implementation->SampleScalarWidget.setDataSources(
     this->proxy(),
     vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->GetProperty("ContourValues")));
+
+  // In case of Extract Cells By Region we don't want to see the contours panel
+  // Let's bind that checkbox property to that panel visibility
+  QObject::connect( this->findChild<QCheckBox*>("PreserveInputCells"),
+                    SIGNAL(toggled(bool)),
+                    this, SLOT(setContoursValuesVisibility(bool)));
 }
 
 pqCutPanel::~pqCutPanel()
@@ -108,3 +118,14 @@ void pqCutPanel::onRejected()
   this->Implementation->SampleScalarWidget.reset();
 }
 
+void pqCutPanel::setContoursValuesVisibility(bool hide)
+{
+  if(hide)
+    {
+    this->Implementation->SampleScalarWidgetContainer->hide();
+    }
+  else
+    {
+    this->Implementation->SampleScalarWidgetContainer->show();
+    }
+}

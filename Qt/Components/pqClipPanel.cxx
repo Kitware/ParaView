@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxySelectionWidget.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -64,15 +65,21 @@ void pqClipPanel::setScalarWidgetsVisibility(pqSMProxy aproxy)
   QComboBox* arraySel = this->findChild<QComboBox*>("SelectInputScalars");
   QLabel* label2 = this->findChild<QLabel*>("_labelForValue");
   QLineEdit* value = this->findChild<QLineEdit*>("Value");
+  QCheckBox* preserveCells = this->findChild<QCheckBox*>("PreserveInputCells");
   if (strcmp(aproxy->GetXMLName(), "Scalar") == 0)
     {
     label->show();
     arraySel->show();
     label2->show();
     value->show();
+    preserveCells->setEnabled(false);
+    preserveCells->setCheckable(false);
+    preserveCells->setChecked(false);
     }
   else
     {
+    preserveCells->setEnabled(true);
+    preserveCells->setCheckable(true);
     label->hide();
     arraySel->hide();
     label2->hide();
