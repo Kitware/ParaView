@@ -67,7 +67,7 @@ int vtkPVDataSetAlgorithmSelectorFilter::ProcessRequest(
   if(request->Has(vtkStreamingDemandDrivenPipeline::
      REQUEST_DATA_OBJECT()))
     {
-    this->RequestDataObject(NULL, NULL, outputVector);
+    return this->RequestDataObject(NULL, NULL, outputVector);
     }
   else
     {
@@ -144,7 +144,8 @@ int vtkPVDataSetAlgorithmSelectorFilter::RegisterFilter(vtkAlgorithm *filter)
 //----------------------------------------------------------------------------
 void vtkPVDataSetAlgorithmSelectorFilter::UnRegisterFilter(int index)
 {
-  if(this->Internal->RegisteredFilters.size() > index && index >= 0)
+  int size = static_cast<int>(this->Internal->RegisteredFilters.size());
+  if( index >= 0 && index < size )
     {
     std::vector<vtkSmartPointer<vtkAlgorithm> >::iterator iter =
         this->Internal->RegisteredFilters.begin();
@@ -170,7 +171,8 @@ int vtkPVDataSetAlgorithmSelectorFilter::GetNumberOfFilters()
 //----------------------------------------------------------------------------
 vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::GetFilter(int index)
 {
-  if(this->Internal->RegisteredFilters.size() > index && index >= 0)
+  int size = static_cast<int>(this->Internal->RegisteredFilters.size());
+  if( index >= 0 && index < size )
     {
     return this->Internal->RegisteredFilters.at(index);
     }
@@ -186,7 +188,8 @@ vtkAlgorithm* vtkPVDataSetAlgorithmSelectorFilter::GetActiveFilter()
 //----------------------------------------------------------------------------
 vtkAlgorithm *vtkPVDataSetAlgorithmSelectorFilter::SetActiveFilter(int index)
 {
-  if(this->Internal->RegisteredFilters.size() > index && index >= 0)
+  int size = static_cast<int>(this->Internal->RegisteredFilters.size());
+  if( index >= 0 && index < size )
     {
     this->Internal->ActiveFilter = index;
     this->Modified();

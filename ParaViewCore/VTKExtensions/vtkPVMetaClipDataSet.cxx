@@ -108,13 +108,23 @@ void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, int port, int connect
   this->Internal->Clip->SetInputArrayToProcess(idx, port, connection, fieldAssociation, fieldAttributeType);
   this->Modified();
 }
-//----------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------
 void vtkPVMetaClipDataSet::SetInputArrayToProcess(int idx, vtkInformation *info)
 {
   this->Internal->Clip->SetInputArrayToProcess(idx, info);
   this->Modified();
-}//----------------------------------------------------------------------------
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMetaClipDataSet::SetInputArrayToProcess(
+    int idx, int port, int connection, const char* fieldName, const char* fieldType)
+{
+  this->Internal->Clip->SetInputArrayToProcess(idx, port, connection, fieldName, fieldType);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 
 void vtkPVMetaClipDataSet::SetInsideOut(int insideOut)
 {

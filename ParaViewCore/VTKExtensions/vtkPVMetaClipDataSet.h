@@ -58,6 +58,8 @@ public:
                               int fieldAttributeType);
   virtual void SetInputArrayToProcess(int idx, vtkInformation *info);
 
+  virtual void SetInputArrayToProcess(int idx, int port, int connection, const char* fieldName, const char* fieldType);
+
   // Description:
   // Expose method from vtkClip
   void SetUseValueAsOffset(int);
