@@ -159,7 +159,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
         }
       else
         {
-        for(int i = 0; i < ivp->GetNumberOfElements(); i++)
+        for(unsigned int i = 0; i < ivp->GetNumberOfElements(); i++)
           {
           QLineEdit *lineEdit = new QLineEdit;
           lineEdit->setObjectName("LineEdit" + QString::number(i));
