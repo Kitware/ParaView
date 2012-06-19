@@ -46,20 +46,20 @@ public:
     std::set<std::string> Extensions;
     std::string Description;
 
-    bool FillInformation(vtkSMSession* session)
+    void FillInformation(vtkSMSession* session)
       {
       vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
       vtkSMProxy* prototype = pxm->GetPrototypeProxy( this->Group.c_str(),
                                                       this->Name.c_str());
       if (!prototype || !prototype->GetHints())
         {
-        return false;
+        return;
         }
       vtkPVXMLElement* rfHint =
         prototype->GetHints()->FindNestedElementByName("WriterFactory");
       if (!rfHint)
         {
-        return false;
+        return;
         }
 
       this->Extensions.clear();
@@ -71,7 +71,6 @@ public:
         this->Extensions.insert(exts_v.begin(), exts_v.end());
         }
       this->Description = rfHint->GetAttribute("file_description");
-      return true;
       }
 
     // Returns true is a prototype proxy can be created on the given connection.
@@ -361,9 +360,10 @@ vtkSMProxy* vtkSMWriterFactory::CreateWriter(
   for (iter = this->Internals->Prototypes.begin();
     iter != this->Internals->Prototypes.end(); ++iter)
     {
-    if (iter->CanCreatePrototype(source) && iter->FillInformation(source->GetSession()) &&
-      iter->ExtensionTest(extension.c_str()) &&
-      iter->CanWrite(source, outputport))
+    iter->FillInformation(source->GetSession());
+    if (iter->CanCreatePrototype(source) &&
+        iter->ExtensionTest(extension.c_str()) &&
+        iter->CanWrite(source, outputport))
       {
       vtkSMProxy* proxy = pxm->NewProxy(
         iter->Group.c_str(),
