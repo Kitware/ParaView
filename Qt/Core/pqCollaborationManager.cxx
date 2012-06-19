@@ -453,19 +453,6 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
 }
 
 //-----------------------------------------------------------------------------
-void pqCollaborationManager::attachChartViewBoundsListener(pqView* view)
-{
-  // FIXME:UDA
-  //pqContextView* chartView = qobject_cast<pqContextView*>(view);
-  //if(chartView)
-  //  {
-  //  QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
-  //                   this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
-  //                   Qt::UniqueConnection);
-  //  }
-}
-
-//-----------------------------------------------------------------------------
 void pqCollaborationManager::enableMousePointerSharing(bool enable)
 {
   this->Internals->BroadcastMouseLocation = enable;
