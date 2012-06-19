@@ -48,8 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
-                                                           QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+                                                           QWidget *parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
   if(!dvp)

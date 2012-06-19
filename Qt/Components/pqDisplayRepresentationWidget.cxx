@@ -185,8 +185,8 @@ void pqDisplayRepresentationWidget::onCurrentTextChanged(const QString&)
 
 //-----------------------------------------------------------------------------
 pqDisplayRepresentationPropertyWidget::pqDisplayRepresentationPropertyWidget(
-  vtkSMProxy *smProxy, QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+  vtkSMProxy *smProxy, QWidget *parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout *layoutLocal = new QVBoxLayout;
   layoutLocal->setMargin(0);

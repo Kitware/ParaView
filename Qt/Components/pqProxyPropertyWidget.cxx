@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
                                              vtkSMProxy *smProxy,
-                                             QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+                                             QWidget *parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout *vbox = new QVBoxLayout;
 

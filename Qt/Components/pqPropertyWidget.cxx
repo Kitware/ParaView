@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqPropertiesPanel.h"
 
-pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentWidget)
-  : QWidget(parentWidget),
+pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
+  : QWidget(parentObject),
     Proxy(smProxy),
     Property(0)
 {
@@ -78,9 +78,9 @@ void pqPropertyWidget::reset()
   this->Links.reset();
 }
 
-void pqPropertyWidget::setShowLabel(bool showLabel)
+void pqPropertyWidget::setShowLabel(bool isLabelVisible)
 {
-  this->ShowLabel = showLabel;
+  this->ShowLabel = isLabelVisible;
 }
 
 bool pqPropertyWidget::showLabel() const

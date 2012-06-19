@@ -54,8 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                                                      vtkSMProxy *smProxy,
-                                                     QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+                                                     QWidget *parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty);
   if(!ivp)

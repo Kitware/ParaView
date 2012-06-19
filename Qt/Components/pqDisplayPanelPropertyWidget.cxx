@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(pqDisplayPanel *panel,
-                                                           QWidget *parentWidget)
-  : pqPropertyWidget(panel->getRepresentation()->getProxy(), parentWidget)
+                                                           QWidget *parentObject)
+  : pqPropertyWidget(panel->getRepresentation()->getProxy(), parentObject)
 {
   this->DisplayPanel = panel;
 
