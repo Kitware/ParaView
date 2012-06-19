@@ -89,7 +89,6 @@ int vtkMarkSelectedRows::RequestData(vtkInformation*,
 
   if(!selectedIdsArray)
     {
-    cout << "no selected ids array" << std::endl;
     return 1;
     }
 
