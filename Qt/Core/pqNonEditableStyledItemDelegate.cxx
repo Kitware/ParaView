@@ -46,6 +46,9 @@ pqNonEditableStyledItemDelegate::pqNonEditableStyledItemDelegate( QObject * p)
 QWidget* pqNonEditableStyledItemDelegate::createEditor (
     QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
+  Q_UNUSED(option);
+  Q_UNUSED(index);
+
   QLineEdit* lineEdit = new QLineEdit(parent);
   lineEdit->setReadOnly(true);
 

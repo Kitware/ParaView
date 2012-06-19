@@ -850,10 +850,10 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
   searchTextChanged(this->Ui->SearchLineEdit->text());
 }
 
-void pqPropertiesPanel::representationPropertyChanged(vtkObject *object, unsigned long event, void *data)
+void pqPropertiesPanel::representationPropertyChanged(vtkObject *object, unsigned long event_, void *data_)
 {
-  Q_UNUSED(event);
-  Q_UNUSED(data);
+  Q_UNUSED(event_);
+  Q_UNUSED(data_);
 
   if(!object)
     {

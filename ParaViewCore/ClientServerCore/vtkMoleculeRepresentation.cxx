@@ -78,7 +78,7 @@ void vtkMoleculeRepresentation::SetVisibility(bool value)
   this->Actor->SetVisibility(value);
 }
 
-int vtkMoleculeRepresentation::FillInputPortInformation(int port,
+int vtkMoleculeRepresentation::FillInputPortInformation(int vtkNotUsed(port),
                                                         vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMolecule");

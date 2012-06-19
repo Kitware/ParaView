@@ -1868,8 +1868,8 @@ void vtkAMRDualGridHelper::MarshalDegenerateRegionMessage(void *messagePtr,
 // the information to the local block data structures.
 void vtkAMRDualGridHelper::UnmarshalDegenerateRegionMessage(
                                                          const void *messagePtr,
-                                                         int messageLength,
-                                                         int srcProc,
+                                                         int vtkNotUsed(messageLength),
+                                                         int vtkNotUsed(srcProc),
                                                          bool hackLevelFlag)
 {
   while (1) 
@@ -2587,7 +2587,7 @@ void vtkAMRDualGridHelper::UnmarshalBlocks(void *inBuffer)
       }
     }
 }
-void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(void *inBuffer, int blockProc)
+void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(void *inBuffer, int vtkNotUsed(blockProc))
 {
   int *buffer = static_cast<int *>(inBuffer);
   // Unmarshal the procs.
