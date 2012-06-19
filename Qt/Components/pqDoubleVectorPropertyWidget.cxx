@@ -115,7 +115,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
         }
       else
         {
-        for(int i = 0; i < dvp->GetNumberOfElements(); i++)
+        for(unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
           {
           pqDoubleEdit *lineEdit = new pqDoubleEdit(this);
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
