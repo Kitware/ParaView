@@ -41,22 +41,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqCubeAxesEditorDialog.h"
 
-pqCubeAxesPropertyWidget::pqCubeAxesPropertyWidget(vtkSMProxy *proxy, QWidget
+pqCubeAxesPropertyWidget::pqCubeAxesPropertyWidget(vtkSMProxy *smProxy, QWidget
   *parentObject)
-  : pqPropertyWidget(proxy, parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
-  QHBoxLayout *layout = new QHBoxLayout;
-  layout->setMargin(0);
-  layout->setSpacing(4);
+  QHBoxLayout *layoutLocal = new QHBoxLayout;
+  layoutLocal->setMargin(0);
+  layoutLocal->setSpacing(4);
   QCheckBox *checkBox = new QCheckBox("Visible");
   checkBox->setObjectName("VisibilityCheckBox");
-  this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), proxy->GetProperty("CubeAxesVisibility"));
-  layout->addWidget(checkBox);
+  this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), smProxy->GetProperty("CubeAxesVisibility"));
+  layoutLocal->addWidget(checkBox);
   QPushButton *button = new QPushButton("Edit");
   button->setObjectName("EditButton");
   connect(button, SIGNAL(clicked()), SLOT(showEditorDialog()));
-  layout->addWidget(button);
-  setLayout(layout);
+  layoutLocal->addWidget(button);
+  setLayout(layoutLocal);
 }
 
 void pqCubeAxesPropertyWidget::showEditorDialog()

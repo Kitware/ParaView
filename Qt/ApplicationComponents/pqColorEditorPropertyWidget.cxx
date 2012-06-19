@@ -45,28 +45,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqGenericSummaryDisplayPanel.h"
 
-pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy,
+pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
   QWidget *parentObject)
-  : pqPropertyWidget(proxy, parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(2);
+  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  layoutLocal->setMargin(2);
   QGroupBox *groupBox = new QGroupBox("Color");
   QVBoxLayout *groupBoxLayout = new QVBoxLayout;
   groupBoxLayout->setMargin(0);
 
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqProxy *pqproxy = smm->findItem<pqProxy *>(proxy);
+  pqProxy *pqproxy = smm->findItem<pqProxy *>(smProxy);
 
   pqRepresentation *representation = qobject_cast<pqRepresentation *>(pqproxy);
 
   QWidget *colorWidget = 0;
 
-  if(proxy->GetProperty("Representation") != NULL)
+  if(smProxy->GetProperty("Representation") != NULL)
     {
     QList<pqGenericSummaryDisplayPanel::DisplayAttributes> attributes;
 
-    const char *representationName = vtkSMPropertyHelper(proxy, "Representation").GetAsString(0);
+    const char *representationName = vtkSMPropertyHelper(smProxy, "Representation").GetAsString(0);
 
     if(strcmp(representationName, "Surface") == 0)
       {
@@ -101,7 +101,7 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy,
 
     colorWidget = new pqGenericSummaryDisplayPanel(representation, attributes);
     }
-  else if(strcmp(proxy->GetXMLName(), "ImageSliceRepresentation") == 0)
+  else if(strcmp(smProxy->GetXMLName(), "ImageSliceRepresentation") == 0)
     {
     QList<pqGenericSummaryDisplayPanel::DisplayAttributes> attributes;
     attributes.append(pqGenericSummaryDisplayPanel::SliceDirection);
@@ -116,8 +116,8 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *proxy,
 
   groupBox->setLayout(groupBoxLayout);
 
-  layout->addWidget(groupBox);
-  setLayout(layout);
+  layoutLocal->addWidget(groupBox);
+  setLayout(layoutLocal);
 
   setShowLabel(false);
 }

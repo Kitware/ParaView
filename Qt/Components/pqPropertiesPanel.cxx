@@ -325,11 +325,11 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   QString styleName = this->Ui->ApplyButton->style()->metaObject()->className();
   if(styleName == "QWindowsXPStyle")
      {
-     QStyle *style = QStyleFactory::create("cleanlooks");
-     style->setParent(this);
-     this->Ui->ApplyButton->setStyle(style);
-     this->Ui->ResetButton->setStyle(style);
-     this->Ui->DeleteButton->setStyle(style);
+     QStyle *styleLocal = QStyleFactory::create("cleanlooks");
+     styleLocal->setParent(this);
+     this->Ui->ApplyButton->setStyle(styleLocal);
+     this->Ui->ResetButton->setStyle(styleLocal);
+     this->Ui->DeleteButton->setStyle(styleLocal);
      QPalette buttonPalette = this->Ui->ApplyButton->palette();
      buttonPalette.setColor(QPalette::Button, QColor(244,246,244));
      this->Ui->ApplyButton->setPalette(buttonPalette);
@@ -387,11 +387,11 @@ pqPropertiesPanel::~pqPropertiesPanel()
   delete this->Ui;
 }
 
-void pqPropertiesPanel::setView(pqView *view)
+void pqPropertiesPanel::setView(pqView *activeView)
 {
-  this->View = view;
+  this->View = activeView;
 
-  emit this->viewChanged(view);
+  emit this->viewChanged(activeView);
 }
 
 pqView* pqPropertiesPanel::view() const
@@ -922,11 +922,10 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
         item.LabelWidget = 0;
         }
 
-      QString objectName = group->GetType();
-      objectName.replace(" ", "");
-      propertyWidget->setObjectName(objectName);
+      QString groupTypeName = group->GetType();
+      groupTypeName.replace(" ", "");
+      propertyWidget->setObjectName(groupTypeName);
 
-      propertyWidget->setObjectName(objectName);
       item.PropertyWidget = propertyWidget;
       item.IsAdvanced = QString(group->GetPanelVisibility()) == "advanced";
       item.Modified = true;
@@ -945,25 +944,25 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
   for(propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
     {
     const char *name = propertyIter->GetKey();
-    vtkSMProperty *property = propertyIter->GetProperty();
+    vtkSMProperty *smProperty = propertyIter->GetProperty();
 
-    if(property->GetInformationOnly())
+    if(smProperty->GetInformationOnly())
       {
       // skip information only properties
       continue;
       }
-    else if(property->GetIsInternal())
+    else if(smProperty->GetIsInternal())
       {
       // skip internal properties
       continue;
       }
-    else if(QString(property->GetPanelVisibility()) == "never")
+    else if(QString(smProperty->GetPanelVisibility()) == "never")
       {
       // skip properties marked as never show
       continue;
       }
 
-    if(groupProperties.find(property) != groupProperties.end())
+    if(groupProperties.find(smProperty) != groupProperties.end())
       {
       // skip group properties
       continue;
@@ -974,7 +973,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
     pqInterfaceTracker *interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
     foreach(pqPropertyWidgetInterface *interface, interfaceTracker->interfaces<pqPropertyWidgetInterface *>())
       {
-      propertyWidget = interface->createWidgetForProperty(smProxy, property);
+      propertyWidget = interface->createWidgetForProperty(smProxy, smProperty);
 
       if(propertyWidget)
         {
@@ -985,19 +984,19 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
     if(!propertyWidget)
       {
-      if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
+      if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty))
         {
         propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy, this);
         }
-      else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property))
+      else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smProperty))
         {
         propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy, this);
         }
-      else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(property))
+      else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smProperty))
         {
         propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy, this);
         }
-      else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
+      else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(smProperty))
         {
         bool selection_input = (pp->GetHints() &&
           pp->GetHints()->FindNestedElementByName("SelectionInput"));
@@ -1023,7 +1022,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       QLabel *label = 0;
       if(propertyWidget->showLabel())
         {
-        if(const char *xmlLabel = property->GetXMLLabel())
+        if(const char *xmlLabel = smProperty->GetXMLLabel())
           {
           label = new QLabel(xmlLabel);
           }
@@ -1035,21 +1034,21 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
         label->setWordWrap(true);
         }
 
-      QString objectName = propertyIter->GetKey();
-      objectName.replace(" ", "");
-      propertyWidget->setObjectName(objectName);
+      QString propertyKeyName = propertyIter->GetKey();
+      propertyKeyName.replace(" ", "");
+      propertyWidget->setObjectName(propertyKeyName);
 
       // save record of the property widget and containing widget
       pqPropertiesPanelItem item;
       item.Name = name;
       item.LabelWidget = label;
       item.PropertyWidget = propertyWidget;
-      item.IsAdvanced = QString(property->GetPanelVisibility()) == "advanced";
+      item.IsAdvanced = QString(smProperty->GetPanelVisibility()) == "advanced";
 
-      if(property->GetPanelVisibilityDefaultForRepresentation())
+      if(smProperty->GetPanelVisibilityDefaultForRepresentation())
         {
         item.DefaultVisibilityForRepresentations.append(
-          property->GetPanelVisibilityDefaultForRepresentation());
+          smProperty->GetPanelVisibilityDefaultForRepresentation());
         }
 
       item.Modified = true;

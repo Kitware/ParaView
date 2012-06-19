@@ -41,10 +41,10 @@ pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(pqObjectPanel *objectPa
   this->ObjectPanel = objectPanel;
   this->connect(this->ObjectPanel, SIGNAL(modified()), this, SIGNAL(modified()));
 
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(0);
-  layout->addWidget(objectPanel);
-  setLayout(layout);
+  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  layoutLocal->setMargin(0);
+  layoutLocal->addWidget(objectPanel);
+  setLayout(layoutLocal);
 }
 
 pqObjectPanelPropertyWidget::~pqObjectPanelPropertyWidget()

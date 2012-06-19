@@ -54,14 +54,14 @@ pqStandardPropertyWidgetInterface::~pqStandardPropertyWidgetInterface()
 }
 
 pqPropertyWidget*
-pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *proxy,
-                                                           vtkSMProperty *property)
+pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
+                                                           vtkSMProperty *smProperty)
 {
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation *>(proxy);
-  if(repr && std::string(proxy->GetPropertyName(property)) == "Representation")
+  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
+  if(repr && std::string(smProxy->GetPropertyName(smProperty)) == "Representation")
     {
-    return new pqDisplayRepresentationPropertyWidget(proxy);
+    return new pqDisplayRepresentationPropertyWidget(smProxy);
     }
 
 //  if(propert = "textture")

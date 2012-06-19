@@ -46,12 +46,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QDoubleSpinBox>
 
-pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *property,
-                                                           vtkSMProxy *proxy,
-                                                           QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
+                                                           vtkSMProxy *smProxy,
+                                                           QWidget *parentWidget)
+  : pqPropertyWidget(smProxy, parentWidget)
 {
-  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property);
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty);
   if(!dvp)
     {
     return;
@@ -66,9 +66,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
     }
   domainIter->Delete();
 
-  QHBoxLayout *layout = new QHBoxLayout;
-  layout->setMargin(0);
-  layout->setSpacing(0);
+  QHBoxLayout *layoutLocal = new QHBoxLayout;
+  layoutLocal->setMargin(0);
+  layoutLocal->setSpacing(0);
 
   if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
     {
@@ -80,10 +80,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
 
-      this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), property);
+      this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
 
-      layout->setSpacing(4);
-      layout->addWidget(widget);
+      layoutLocal->setSpacing(4);
+      layoutLocal->addWidget(widget);
       }
     else
       {
@@ -100,18 +100,18 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
           {
           pqDoubleEdit *lineEdit = new pqDoubleEdit(this);
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
-          lineEdit->setValue(vtkSMPropertyHelper(property).GetAsDouble(i));
+          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
           gridLayout->addWidget(lineEdit, 0, i);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
 
           lineEdit = new pqDoubleEdit(this);
           lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
-          lineEdit->setValue(vtkSMPropertyHelper(property).GetAsDouble(i + 3));
+          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3));
           gridLayout->addWidget(lineEdit, 1, i);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i + 3);
           }
 
-        layout->addLayout(gridLayout);
+        layoutLocal->addLayout(gridLayout);
         }
       else
         {
@@ -119,13 +119,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *proper
           {
           pqDoubleEdit *lineEdit = new pqDoubleEdit(this);
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
-          lineEdit->setValue(vtkSMPropertyHelper(property).GetAsDouble(i));
-          layout->addWidget(lineEdit);
+          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
+          layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
           }
         }
       }
     }
 
-  this->setLayout(layout);
+  this->setLayout(layoutLocal);
 }

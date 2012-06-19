@@ -544,21 +544,21 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       addPropertyLink(this->Internal->ISamples,
                       "text", SIGNAL(editingFinished()),
                       reprProxy, reprProxy->GetProperty("NumberOfSamples"), 0);
-    QIntValidator* validator = new QIntValidator(this);
-    validator->setBottom(10);
-    this->Internal->ISamples->setValidator(validator);
+    QIntValidator* intValidator = new QIntValidator(this);
+    intValidator->setBottom(10);
+    this->Internal->ISamples->setValidator(intValidator);
 
     this->Internal->Links->
       addPropertyLink(this->Internal->JSamples,
                       "text", SIGNAL(editingFinished()),
                       reprProxy, reprProxy->GetProperty("NumberOfSamples"), 1);
-    this->Internal->JSamples->setValidator(validator);
+    this->Internal->JSamples->setValidator(intValidator);
     
     this->Internal->Links->
       addPropertyLink(this->Internal->KSamples,
                       "text", SIGNAL(editingFinished()),
                       reprProxy, reprProxy->GetProperty("NumberOfSamples"), 2);
-    this->Internal->KSamples->setValidator(validator);
+    this->Internal->KSamples->setValidator(intValidator);
     }
 
   this->Internal->BackfaceStyleRepresentation->clear();

@@ -185,17 +185,17 @@ void pqDisplayRepresentationWidget::onCurrentTextChanged(const QString&)
 
 //-----------------------------------------------------------------------------
 pqDisplayRepresentationPropertyWidget::pqDisplayRepresentationPropertyWidget(
-  vtkSMProxy *proxy, QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+  vtkSMProxy *smProxy, QWidget *parentWidget)
+  : pqPropertyWidget(smProxy, parentWidget)
 {
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(0);
+  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  layoutLocal->setMargin(0);
   this->Widget = new pqDisplayRepresentationWidget;
-  layout->addWidget(this->Widget);
-  setLayout(layout);
+  layoutLocal->addWidget(this->Widget);
+  setLayout(layoutLocal);
 
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(proxy);
+  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
   if(repr)
     {
     this->Widget->setRepresentation(repr);
