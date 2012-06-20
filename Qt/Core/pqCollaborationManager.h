@@ -124,9 +124,6 @@ public slots:
   /// information with other clients
   void attachMouseListenerTo3DViews();
 
-  /// Attach bounds listener if the given view is a pqContextView
-  void attachChartViewBoundsListener(pqView*);
-
   /// Enable/disable local mouse pointer location
   void enableMousePointerSharing(bool);
 

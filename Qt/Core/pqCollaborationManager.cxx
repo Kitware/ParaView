@@ -254,25 +254,6 @@ void pqCollaborationManager::onClientMessage(pqServer* server, vtkSMMessage* msg
         chatMsg =  msg->GetExtension(ChatMessage::txt).c_str();
         emit triggerChatMessage(server, userId, chatMsg);
         break;
-      case QtEvent::CHART_BOUNDS:
-        {
-        vtkTypeUInt32 viewId = msg->GetExtension(ChartViewBounds::view);
-        double range[8];
-        for(int i=0;i<8;i++)
-          {
-          range[i] = msg->GetExtension(ChartViewBounds::range, i);
-          }
-        vtkSMContextViewProxy* view =
-            vtkSMContextViewProxy::SafeDownCast(
-              server->session()->GetRemoteObject(
-                viewId));
-        if(view && (this->Internals->AciveSession == server->session())) // Make sure we share the same active server
-          {
-          // FIXME
-          // view->SetViewBounds(range);
-          }
-        break;
-        }
       case QtEvent::OTHER:
         // Custom handling
         break;
@@ -469,19 +450,6 @@ void pqCollaborationManager::attachMouseListenerTo3DViews()
                      this, SLOT(updateMousePointerLocation(QMouseEvent*)),
                      Qt::UniqueConnection);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqCollaborationManager::attachChartViewBoundsListener(pqView* view)
-{
-  // FIXME:UDA
-  //pqContextView* chartView = qobject_cast<pqContextView*>(view);
-  //if(chartView)
-  //  {
-  //  QObject::connect(chartView, SIGNAL(viewBoundsUpdated(vtkTypeUInt32,double*)),
-  //                   this, SLOT(onChartViewChange(vtkTypeUInt32,double*)),
-  //                   Qt::UniqueConnection);
-  //  }
 }
 
 //-----------------------------------------------------------------------------

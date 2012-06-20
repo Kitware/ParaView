@@ -35,15 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 pqDisplayPanelPropertyWidget::pqDisplayPanelPropertyWidget(pqDisplayPanel *panel,
-                                                           QWidget *parent)
-  : pqPropertyWidget(panel->getRepresentation()->getProxy(), parent)
+                                                           QWidget *parentObject)
+  : pqPropertyWidget(panel->getRepresentation()->getProxy(), parentObject)
 {
   this->DisplayPanel = panel;
 
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->setMargin(0);
-  layout->addWidget(panel);
-  setLayout(layout);
+  QVBoxLayout *layoutLocal = new QVBoxLayout;
+  layoutLocal->setMargin(0);
+  layoutLocal->addWidget(panel);
+  setLayout(layoutLocal);
 }
 
 pqDisplayPanelPropertyWidget::~pqDisplayPanelPropertyWidget()

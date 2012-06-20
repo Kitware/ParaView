@@ -66,9 +66,4 @@ pqCollaborationBehavior::pqCollaborationBehavior(QObject* parentObject)
                     SIGNAL(viewChanged(pqView*)),
                     this->CollaborationManager, SLOT(attachMouseListenerTo3DViews()),
                     Qt::UniqueConnection);
-
-  QObject::connect( core->getServerManagerModel(),
-                    SIGNAL(viewAdded(pqView*)),
-                    this->CollaborationManager, SLOT(attachChartViewBoundsListener(pqView*)),
-                    Qt::UniqueConnection);
 }

@@ -447,10 +447,10 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
     return false;
     }
 
-  QString data (file.readAll());
+  QString fileContent (file.readAll());
   file.close();
 
-  if (data.indexOf("<PRISM_Conversions>") == -1)
+  if (fileContent.indexOf("<PRISM_Conversions>") == -1)
     {
     //This is an incorrect file format.
     QString message;
@@ -461,7 +461,7 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
     }
 
   vtkXMLDataElement* rootElement = vtkXMLUtilities::ReadElementFromString(
-    data.toAscii().constData());
+    fileContent.toAscii().constData());
   if (!rootElement)
     {
     return false;
@@ -488,9 +488,9 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
        {
            SESAMEConversionsForTable tableData;
 
-           std::string data= tableElement->GetAttribute("Id");
+           std::string elemId = tableElement->GetAttribute("Id");
            int intValue;
-           sscanf(data.c_str(),"%d",&intValue);
+           sscanf(elemId.c_str(),"%d",&intValue);
            tableData.TableId=intValue;
 
            for(int v=0;v<tableElement->GetNumberOfNestedElements();v++)
@@ -502,26 +502,26 @@ bool PrismPanel::pqUI::LoadConversions(const QString &fileName)
                    SESAMEConversionVariable variableData;
                    double value;
 
-                    data=variableElement->GetAttribute("Name");
-                    variableData.Name=data.c_str();
+                    elemId=variableElement->GetAttribute("Name");
+                    variableData.Name=elemId.c_str();
 
-                    data=variableElement->GetAttribute("SESAME_Units");
-                    variableData.SESAMEUnits=data.c_str();
+                    elemId=variableElement->GetAttribute("SESAME_Units");
+                    variableData.SESAMEUnits=elemId.c_str();
 
 
-                    data= variableElement->GetAttribute("SESAME_SI");
-                    sscanf(data.c_str(),"%lf",&value);
+                    elemId= variableElement->GetAttribute("SESAME_SI");
+                    sscanf(elemId.c_str(),"%lf",&value);
                     variableData.SIConversion=value;
 
-                    data=variableElement->GetAttribute("SESAME_SI_Units");
-                    variableData.SIUnits=data.c_str();
+                    elemId=variableElement->GetAttribute("SESAME_SI_Units");
+                    variableData.SIUnits=elemId.c_str();
 
-                    data= variableElement->GetAttribute("SESAME_cgs");
-                    sscanf(data.c_str(),"%lf",&value);
+                    elemId= variableElement->GetAttribute("SESAME_cgs");
+                    sscanf(elemId.c_str(),"%lf",&value);
                     variableData.cgsConversion=value;
 
-                    data=variableElement->GetAttribute("SESAME_cgs_Units");
-                    variableData.cgsUnits=data.c_str();
+                    elemId=variableElement->GetAttribute("SESAME_cgs_Units");
+                    variableData.cgsUnits=elemId.c_str();
 
                     tableData.VariableConversions.insert(variableData.Name,variableData);
                }

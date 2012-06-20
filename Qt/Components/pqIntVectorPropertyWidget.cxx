@@ -53,9 +53,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
-                                                     vtkSMProxy *proxy,
-                                                     QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+                                                     vtkSMProxy *smProxy,
+                                                     QWidget *parentObject)
+  : pqPropertyWidget(smProxy, parentObject)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty);
   if(!ivp)
@@ -72,15 +72,15 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
   domainIter->Delete();
 
-  QHBoxLayout *layout = new QHBoxLayout;
-  layout->setMargin(0);
+  QHBoxLayout *layoutLocal = new QHBoxLayout;
+  layoutLocal->setMargin(0);
 
   if(vtkSMBooleanDomain::SafeDownCast(domain))
     {
     QCheckBox *checkBox = new QCheckBox(QString(), this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
-    layout->addWidget(checkBox);
+    layoutLocal->addWidget(checkBox);
     }
   else if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
     {
@@ -99,7 +99,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                           SIGNAL(currentTextChanged(QString)),
                           smproperty);
 
-    layout->addWidget(comboBox);
+    layoutLocal->addWidget(comboBox);
     }
   else if(vtkSMCompositeTreeDomain::SafeDownCast(domain))
     {
@@ -113,7 +113,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), ivp);
 
-    layout->addWidget(treeWidget);
+    layoutLocal->addWidget(treeWidget);
     this->setShowLabel(false);
     }
   else if(vtkSMIntRangeDomain *range = vtkSMIntRangeDomain::SafeDownCast(domain))
@@ -130,7 +130,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(int)), ivp);
-      layout->addWidget(widget);
+      layoutLocal->addWidget(widget);
       }
     else
       {
@@ -155,21 +155,21 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+1);
           }
 
-        layout->addLayout(gridLayout);
+        layoutLocal->addLayout(gridLayout);
         }
       else
         {
-        for(int i = 0; i < ivp->GetNumberOfElements(); i++)
+        for(unsigned int i = 0; i < ivp->GetNumberOfElements(); i++)
           {
           QLineEdit *lineEdit = new QLineEdit;
           lineEdit->setObjectName("LineEdit" + QString::number(i));
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
-          layout->addWidget(lineEdit);
+          layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
           }
         }
       }
     }
 
-  this->setLayout(layout);
+  this->setLayout(layoutLocal);
 }

@@ -247,7 +247,6 @@ message ChatMessage {
 message QtEvent {
   enum QtEventType {
     CHAT                = 1;
-    CHART_BOUNDS        = 2;
     OTHER               = 3;
   }
 
