@@ -20,7 +20,9 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPProcessor.h"
+#ifdef PARAVIEW_ENABLE_PYTHON
 #include "vtkCPPythonScriptPipeline.h"
+#endif
 #include "vtkDataSet.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPointData.h"
@@ -73,6 +75,7 @@ namespace ParaViewCoProcessing
   }
 } // end namespace
 
+#ifdef PARAVIEW_ENABLE_PYTHON
 void coprocessorinitialize(char* pythonFileName, int* pythonFileNameLength )
 {
   if(!ParaViewCoProcessing::coProcessor)
@@ -95,6 +98,24 @@ void coprocessorinitialize(char* pythonFileName, int* pythonFileNameLength )
     ParaViewCoProcessing::coProcessorData->AddInput("input");
     }
 }
+#else
+void coprocessorinitialize()
+{
+  if(!ParaViewCoProcessing::coProcessor)
+    {
+    ParaViewCoProcessing::coProcessor = vtkCPProcessor::New();
+    ParaViewCoProcessing::coProcessor->Initialize();
+
+    // no pipelines in this configuration
+
+    }
+  if(!ParaViewCoProcessing::coProcessorData)
+    {
+    ParaViewCoProcessing::coProcessorData = vtkCPDataDescription::New();
+    ParaViewCoProcessing::coProcessorData->AddInput("input");
+    }
+}
+#endif
 
 void coprocessorfinalize()
 {

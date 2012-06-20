@@ -19,7 +19,7 @@ ENDIF (ParaView_SOURCE_DIR)
 # Attempt to detect if we have a Fortran Compiler available.
 include(${ParaView_SOURCE_DIR}/SuperBuild/CheckFortran.cmake)
 
-include_directories(${FortranAdaptor_BINARY_DIR})
+include_directories(${FortranAdaptor_BINARY_DIR} ${CoProcessor_BINARY_DIR})
 
 if(CMAKE_Fortran_COMPILER)
   ENABLE_LANGUAGE(Fortran)
