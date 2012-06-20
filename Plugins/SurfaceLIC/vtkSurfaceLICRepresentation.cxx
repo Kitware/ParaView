@@ -109,3 +109,12 @@ void vtkSurfaceLICRepresentation::SelectInputVectors(int, int, int,
   this->Painter->SetInputArrayToProcess(attributeMode, name);
   this->LODPainter->SetInputArrayToProcess(attributeMode, name);
 }
+
+//----------------------------------------------------------------------------
+void vtkSurfaceLICRepresentation::UpdateColoringParameters()
+{
+  Superclass::UpdateColoringParameters();
+
+  // never interpolate scalars for surface LIC
+  Superclass::SetInterpolateScalarsBeforeMapping(0);
+}
