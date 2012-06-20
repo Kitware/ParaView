@@ -15,7 +15,7 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect24.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Connect</string>
+    <string>&amp;Connect...</string>
    </property>
    <property name="statusTip" >
     <string>Connect</string>
@@ -37,7 +37,7 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
    </property>
    <property name="text" >
-    <string>Save Screenshot</string>
+    <string>Save Screenshot...</string>
    </property>
   </action>
   <action name="actionFileSaveAnimation" >
@@ -45,7 +45,7 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSaveAnimation24.png</iconset>
    </property>
    <property name="text" >
-    <string>Save &amp;Animation</string>
+    <string>Save &amp;Animation...</string>
    </property>
    <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
     <bool>true</bool>
@@ -56,7 +56,7 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSave24.png</iconset>
    </property>
    <property name="text" >
-    <string>Save Data</string>
+    <string>Save Data...</string>
    </property>
    <property name="shortcut" >
     <string>Ctrl+S</string>
@@ -67,7 +67,7 @@
   </action>
   <action name="actionFileLoadServerState" >
    <property name="text" >
-    <string>&amp;Load State</string>
+    <string>&amp;Load State...</string>
    </property>
    <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
     <bool>true</bool>
@@ -75,12 +75,12 @@
   </action>
   <action name="actionFileSaveServerState" >
    <property name="text" >
-    <string>&amp;Save State</string>
+    <string>&amp;Save State...</string>
    </property>
   </action>
   <action name="actionFileSaveGeometry" >
    <property name="text" >
-    <string>Save &amp;Geometry</string>
+    <string>Save &amp;Geometry...</string>
    </property>
    <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
     <bool>true</bool>
@@ -91,7 +91,7 @@
     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
    </property>
    <property name="text" >
-    <string>&amp;Open</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="statusTip" >
     <string>Open</string>
@@ -116,7 +116,7 @@
   </action>
   <action name="actionExport" >
    <property name="text" >
-    <string>Export Scene</string>
+    <string>Export Scene...</string>
    </property>
   </action>
 
