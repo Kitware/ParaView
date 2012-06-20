@@ -55,6 +55,8 @@ private slots:
   /// Called if the user rejects pending modifications
   void onRejected();
 
+  /// Called when the preserve input cell get changed
+  void setContoursValuesVisibility(bool hide);
 
 private:
   class pqImplementation;
