@@ -2,7 +2,7 @@
 # This file turns on the modules needed by ParaView
 include (vtkDependentOption)
 
-# First turn of stand alone group 
+# First turn of stand alone group
 set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_Group_StandAlone)
 set(VTK_Group_Rendering OFF CACHE BOOL "" FORCE)
@@ -18,13 +18,13 @@ set(_vtk_mpi_modules
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
   #  vtkPStreamTracer
-  
+
   vtkIOParallelNetCDF
   # Needed for:
   #  vtkPNetCDFPOPReader
   )
 
-# Turn on based on the value of PARAVIEW_USE_MPI  
+# Turn on based on the value of PARAVIEW_USE_MPI
 foreach(_mod ${_vtk_mpi_modules})
   set(_full_name Module_${_mod})
   set(${_full_name} ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
@@ -76,17 +76,13 @@ set(_vtk_modules
   vtkTestingRendering
   # Needed to for tests that are built even with BUILD_TESTING off!
   vtkInteractionImage
-  if(PARAVIEW_USE_VISITBRIDGE)
-    # Needed by VisItBridge
-    vtkFiltersTracers
-  endif() 
   # Modules that are required a runtime generated from:
   #
   # ParaViewFilters.xml
   # ParaViewReaders.xml
   # ParaViewSources.xml
   # ParaViewWriters.xml
-  # 
+  #
   # Note: Some are duplicates of the above, but they are listed to record the
   # implicit dependancy
   vtkAMRCore
@@ -229,9 +225,8 @@ set(_vtk_modules
   #  vtkTextureMapToPlane
   #  vtkTextureMapToSphere
 
-  #vtkFiltersTracers
+  #vtkFiltersFlowPaths
   # Needed for:
-  #  vtkStreamTracer
   #  vtkStreamTracer
 
   vtkFiltersVerdict
@@ -335,7 +330,7 @@ set(_vtk_modules
   vtkRenderingFreeType
   # Needed for:
   #  vtkVectorText
-  
+
   vtkFiltersCosmo
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
@@ -351,6 +346,11 @@ set(_vtk_modules
   #  vtkMoleculeRepresentation
   )
 
+if(PARAVIEW_USE_VISITBRIDGE)
+  # Needed by VisItBridge
+  list(APPEND _vtk_modules vtkFiltersFlowPaths)
+endif()
+
 # Are we building the GUI
 
 set (PARAVIEW_BUILD_QT_GUI_NOT TRUE)
@@ -364,19 +364,19 @@ VTK_DEPENDENT_OPTION(PARAVIEW_ENABLE_QT_SUPPORT
 
 set(Module_vtkGUISupportQt ${PARAVIEW_ENABLE_QT_SUPPORT} CACHE BOOL "" FORCE)
 mark_as_advanced(Module_vtkGUISupportQt)
-  
+
 # Modules needed if testing is on
 # Note: Again there may be duplicated this intended to record the dependancy
 if(BUILD_TESTING)
-  list(APPEND _vtk_modules 
+  list(APPEND _vtk_modules
     vtkFiltersProgrammable)
 endif()
 
 if(BUILD_EXAMPLES)
-  list(APPEND _vtk_modules 
+  list(APPEND _vtk_modules
     vtkTestingCore)
 endif()
-  
+
 # Now enable the modules
 foreach(_mod ${_vtk_modules})
   set(_full_name Module_${_mod})

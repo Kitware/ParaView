@@ -49,7 +49,8 @@
 
   <Category name="Temporal" menu_label="&amp;Temporal">
     <Proxy group="filters" name="ParticleTracer" />
-    <Proxy group="filters" name="ParticlePathLines" />
+    <Proxy group="filters" name="ParticlePath" />
+    <Proxy group="filters" name="StreakLine" />
     <Proxy group="filters" name="TemporalCache" />
     <Proxy group="filters" name="TemporalInterpolator" />
     <Proxy group="filters" name="TemporalSnapToTimeStep" />
@@ -74,7 +75,7 @@
     <Proxy group="filters" name="ExtractHierarchicalLevel" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
-  
+
   <Category name="AMR" menu_label="&amp;AMR">
     <Proxy group="filters" name="AMRDualMeshExtractor" />
     <Proxy group="filters" name="AMRResampleFilter" />
@@ -85,7 +86,7 @@
     <Proxy group="filters" name="ExtractHierarchicalLevel" />
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
-  
+
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="AnnotateGlobalData" />
   <Proxy group="filters" name="Append" />

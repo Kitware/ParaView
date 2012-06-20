@@ -64,7 +64,7 @@ public:
   int GetAggregateTimeInfo(vtkInformation *outInfo);
   int GetInputTimeInfo(int index, vtkInformation *outInfo);
   int GetIndexForTime(double time);
-  std::set<int> ChooseInputs(vtkInformation *outInfo);
+  int ChooseInput(vtkInformation *outInfo);
   std::vector<double> GetTimesForInput(int inputId, vtkInformation *outInfo);
 private:
   static vtkInformationIntegerKey *INDEX();
@@ -240,29 +240,20 @@ int vtkFileSeriesReaderTimeRanges::GetIndexForTime(double time)
 }
 
 //-----------------------------------------------------------------------------
-std::set<int> vtkFileSeriesReaderTimeRanges::ChooseInputs(
-                                                        vtkInformation *outInfo)
+int vtkFileSeriesReaderTimeRanges::ChooseInput(vtkInformation *outInfo)
 {
-  std::set<int> indices;
+  int index=-1;
   if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
-    // get the update times
-    int numUpTimes =
-      outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    double upTime =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-
-    for (int i = 0; i < numUpTimes; i++)
-      {
-      indices.insert(this->GetIndexForTime(upTime));
-      }
+    double upTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    index = this->GetIndexForTime(upTime);
     }
   else
     {
-    indices.insert(0);
+    index = 0;
     }
 
-  return indices;
+  return index;
 }
 
 //-----------------------------------------------------------------------------
@@ -582,15 +573,28 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
       {
       return this->RequestData(request, inputVector, outputVector);
       }
-    // Let the reader process anything we did not handle ourselves.
-    int retVal = this->Reader->ProcessRequest(request,
-                                              inputVector,
-                                              outputVector);
+
     // Additional processing requried by us.
     if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
       {
       this->RequestUpdateExtent(request, inputVector, outputVector);
       }
+
+    if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_TIME()))
+      {
+      this->RequestUpdateTime(request, inputVector, outputVector);
+      }
+
+    if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_TIME_DEPENDENT_INFORMATION()))
+      {
+      this->RequestUpdateTimeDependentInformation(request, inputVector, outputVector);
+      }
+
+// Let the reader process anything we did not handle ourselves.
+    int retVal = this->Reader->ProcessRequest(request,
+                                              inputVector,
+                                              outputVector);
+
 
     return retVal;
     }
@@ -671,28 +675,18 @@ int vtkFileSeriesReader::RequestUpdateExtent(
                                  vtkInformationVector* outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  std::set<int> inputs = this->Internal->TimeRanges->ChooseInputs(outInfo);
-  if (inputs.size() > 1)
-    {
-    vtkErrorMacro("vtkTemporalDataSet not fully supported.");
-    // To support readers that give vtkTemporalDataSet, we would have to iterate
-    // over all of the readers in RequestData and then combine the outputs into
-    // some saved data set.
-    return 0;
-    }
-  if (inputs.size() == 0)
-    {
-    vtkErrorMacro("Inputs are not set.");
-    return 0;
-    }
-
-  int index = *(inputs.begin());
+  int index = this->ChooseInput(outInfo);
   if (index >= static_cast<int>(this->GetNumberOfFileNames()))
     {
     // this happens when there are no files set. That's an acceptable condition
     // when the file-series is not an essential filename eg. the Q file for
     // Plot3D reader.
     index = -1;
+    }
+  if (index<0)
+    {
+    vtkErrorMacro("Inputs are not set.");
+    return 0;
     }
 
   // Make sure that the reader file name is set correctly and that
@@ -929,4 +923,9 @@ void vtkFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
      << (this->MetaFileName?this->MetaFileName:"(none)") << endl;
   os << indent << "UseMetaFile: " << this->UseMetaFile << endl;
   os << indent << "IgnoreReaderTime: " << this->IgnoreReaderTime << endl;
+}
+
+int vtkFileSeriesReader::ChooseInput(vtkInformation* outInfo)
+{
+  return this->Internal->TimeRanges->ChooseInput(outInfo);
 }

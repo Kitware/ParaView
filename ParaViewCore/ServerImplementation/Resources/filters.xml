@@ -1,3 +1,4 @@
+
 <ServerManagerConfiguration>
   <ProxyGroup name="internal_filters">
    <!-- ==================================================================== -->
@@ -6554,6 +6555,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
      <InputProperty
 	name="Source"
+	label="Seed Source"
 	command="SetSourceConnection" >
 	   <ProxyGroupDomain name="groups">
 	     <Group name="sources"/>
@@ -7060,138 +7062,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        <!-- End TemporalStatistics -->
      </SourceProxy>
 
-   <!-- ==================================================================== -->
-
-    <SourceProxy name="ParticlePathLines"
-	      class="vtkTemporalPathLineFilter"
-	      label="Particle Pathlines">
-      <Documentation
-	 long_help="Creates polylines representing pathlines of animating particles"
-	 short_help="Particle Pathlines">
-	Particle Pathlines takes any dataset as input, it extracts the
-	point locations of all cells over time to build up a polyline
-	trail.  The point number (index) is used as the 'key' if the points
-	are randomly changing their respective order in the points list,
-	then you should specify a scalar that represents the unique
-	ID. This is intended to handle the output of a filter such as the
-	TemporalStreamTracer.
-      </Documentation>
-
-      <OutputPort name="Pathlines" index="0" />
-      <OutputPort name="Particles" index="1" />
-
-      <InputProperty
-	 name="Input"
-	 command="SetInputConnection">
-	<ProxyGroupDomain name="groups">
-	  <Group name="sources"/>
-	  <Group name="filters"/>
-	</ProxyGroupDomain>
-	<DataTypeDomain name="input_type">
-	  <DataType value="vtkPointSet"/>
-	</DataTypeDomain>
-	<InputArrayDomain name="input_array" attribute_type="point"
-			  optional="1"/>
-	<Documentation>
-	  The input cells to create pathlines for.
-	</Documentation>
-      </InputProperty>
-
-      <InputProperty
-	 name="Selection"
-	 command="SetSelectionConnection">
-	<ProxyGroupDomain name="groups">
-	  <Group name="sources"/>
-	  <Group name="filters"/>
-	</ProxyGroupDomain>
-	<DataTypeDomain name="input_type">
-	  <DataType value="vtkDataSet"/>
-	</DataTypeDomain>
-	<Hints>
-	  <Optional />
-	</Hints>
-	<Documentation>
-	  Set a second input, which is a selection. Particles with the same
-	  Id in the selection as the primary input will be chosen for
-	  pathlines Note that you must have the same IdChannelArray in the
-	  selection as the input
-	</Documentation>
-      </InputProperty>
-
-      <IntVectorProperty
-	  name="MaskPoints"
-	  command="SetMaskPoints"
-	  number_of_elements="1"
-	  default_values="100" >
-	<Documentation>
-	  Set the number of particles to track as a ratio of the input.
-	  Example: setting MaskPoints to 10 will track every 10th point.
-	</Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-	  name="MaxTrackLength"
-	  command="SetMaxTrackLength"
-	  number_of_elements="1"
-	  default_values="25" >
-	<Documentation>
-	  If the Particles being traced animate for a long time, the trails
-	  or traces will become long and stringy. Setting the
-	  MaxTraceTimeLength will limit how much of the trace is
-	  displayed. Tracks longer then the Max will disappear and the
-	  trace will apppear like a snake of fixed length which progresses
-	  as the particle moves.  This length is given with respect to
-	  timesteps.
-	</Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-	 name="MaxStepDistance"
-	 command="SetMaxStepDistance"
-	 number_of_elements="3"
-	 animateable="1"
-	 default_values="1.0 1.0 1.0" >
-	<DoubleRangeDomain name="range"/>
-	<Documentation>
-	  If a particle disappears from one end of a simulation and
-	  reappears on the other side, the track left will be
-	  unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
-	  threshold above which if a step occurs larger than the value (for
-	  the dimension), the track will be dropped and restarted after the
-	  step. (ie the part before the wrap around will be dropped and the
-	  newer part kept).
-	</Documentation>
-      </DoubleVectorProperty>
-
-      <StringVectorProperty
-	  name="IdChannelArray"
-	  command="SetIdChannelArray"
-	  number_of_elements="1"
-	  default_values="Global or Local IDs"
-	  animateable="0">
-	  <ArrayListDomain
-	    name="array_list" attribute_type="Scalars"
-	    none_string="Global or Local IDs">
-	    <RequiredProperties>
-	      <Property name="Input" function="Input"/>
-	    </RequiredProperties>
-	  </ArrayListDomain>
-	<Documentation>
-	  Specify the name of a scalar array which will be used to fetch
-	  the index of each point. This is necessary only if the particles
-	  change position (Id order) on each time step. The Id can be used
-	  to identify particles at each step and hence track them properly.
-	  If this array is set to "Global or Local IDs", the global point
-	  ids are used if they exist or the point index is otherwise.
-	</Documentation>
-      </StringVectorProperty>
-
-   </SourceProxy>
-
-   <!-- End TemporalPathLineFilter -->
 
    <!-- ==================================================================== -->
-    <SourceProxy name="ParticleTracer" class="vtkTemporalStreamTracer">
+    <SourceProxy name="ParticleTracer" class="vtkParticleTracer">
     <Documentation
        long_help="Trace Particles through time in a vector field."
        short_help="Trace Particles through time in a vector field.">
@@ -7220,6 +7093,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
       <InputProperty
 	 name="Source"
+	 label="Seed Source"
 	 command="AddSourceConnection"
 	 clean_command="RemoveAllSources"
 	 multiple_input="1">
@@ -7246,53 +7120,282 @@ This filter operates on any type of data set, provided it has point-centered vec
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 -->
-     <IntVectorProperty
-       name="TimeStep"
-       command="SetTimeStep"
-       number_of_elements="1"
-       animateable="1"
-       default_values="0"
-       information_property="TimestepValues">
-
-       <IntRangeDomain name="range">
-	 <RequiredProperties>
-	   <Property name="TimestepValues" function="Range"/>
-	 </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-	 Set/Get the TimeStep. This is the primary means of advancing
-	 the particles. The TimeStep should be animated and this will drive
-	 the pipeline forcing timesteps to be fetched from upstream.
-       </Documentation>
-     </IntVectorProperty>
-
      <DoubleVectorProperty
 	name="TimestepValues"
 	information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
 
-     <IntVectorProperty
-	name="StaticSeeds"
-	command="SetStaticSeeds"
-	number_of_elements="1"
-	default_values="1" >
-       <BooleanDomain name="bool"/>
-       <Documentation>
-	 Force the use of static seed optimizations
-      </Documentation>
-     </IntVectorProperty>
+     <!-- <IntVectorProperty -->
+     <!-- 	name="StaticSeeds" -->
+     <!-- 	command="SetStaticSeeds" -->
+     <!-- 	number_of_elements="1" -->
+     <!-- 	default_values="1" > -->
+     <!--   <BooleanDomain name="bool"/> -->
+     <!--   <Documentation> -->
+     <!-- 	 Force the use of static seed optimizations -->
+     <!--  </Documentation> -->
+     <!-- </IntVectorProperty> -->
+
+     <!-- <IntVectorProperty -->
+     <!-- 	name="StaticMesh" -->
+     <!-- 	command="SetStaticMesh" -->
+     <!-- 	number_of_elements="1" -->
+     <!-- 	default_values="0" > -->
+     <!--   <BooleanDomain name="bool"/> -->
+     <!--   <Documentation> -->
+     <!-- 	 Force the use of static mesh optimizations -->
+     <!--   </Documentation> -->
+     <!-- </IntVectorProperty> -->
+
+      <!-- <DoubleVectorProperty -->
+      <!-- 	name="InitialIntegrationStep" -->
+      <!-- 	command="SetInitialIntegrationStep" -->
+      <!-- 	number_of_elements="1" -->
+      <!-- 	default_values="0.25" > -->
+      <!-- 	<DoubleRangeDomain name="range"/> -->
+      <!-- 	<Documentation> -->
+      <!-- 	  Specify the Initial step size used for line integration, expressed in: -->
+      <!-- 	  LENGTH_UNIT      = 1 -->
+      <!-- 	  CELL_LENGTH_UNIT = 2 -->
+      <!-- 	  (either the starting size for an adaptive integrator, e.g., RK45, -->
+      <!-- 	  or the constant / fixed size for non-adaptive ones, i.e., RK2 and RK4) -->
+      <!-- 	</Documentation> -->
+      <!-- </DoubleVectorProperty> -->
 
      <IntVectorProperty
-	name="StaticMesh"
-	command="SetStaticMesh"
+	name="ForceReinjectionEveryNSteps"
+	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="0" >
-       <BooleanDomain name="bool"/>
+       <IntRangeDomain name="range" min ="0"/>
        <Documentation>
-	 Force the use of static mesh optimizations
+	 When animating particles, it is nice to inject new ones every Nth step
+	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
+	 non zero value will cause the particle source to reinject particles
+	 every Nth step even if it is otherwise unchanged.
+	 Note that if the particle source is also animated, this flag will be
+	 redundant as the particles will be reinjected whenever the source changes
+	 anyway
        </Documentation>
      </IntVectorProperty>
+
+     <StringVectorProperty
+	name="SelectInputVectors"
+	command="SetInputArrayToProcess"
+	number_of_elements="5"
+	element_types="0 0 0 0 2"
+	panel_visibility="default"
+	animateable="0">
+	   <ArrayListDomain name="array_list" attribute_type="Vectors">
+	     <RequiredProperties>
+		<Property name="Input" function="Input"/>
+	     </RequiredProperties>
+	   </ArrayListDomain>
+	   <Documentation>
+	       Specify which vector array should be used for the integration
+	       through that filter.
+	   </Documentation>
+     </StringVectorProperty>
+
+      <IntVectorProperty
+	 name="ComputeVorticity"
+	 command="SetComputeVorticity"
+	 number_of_elements="1"
+	 default_values="1" >
+	<BooleanDomain name="bool"/>
+	<Documentation>
+	  Compute vorticity and angular rotation of particles as they progress
+	</Documentation>
+      </IntVectorProperty>
+      <!-- End ParticleTracer -->
+   </SourceProxy>
+
+    <SourceProxy name="ParticlePath" class="vtkParticlePathFilter">
+    <Documentation
+       long_help="Trace Particle Paths through time in a vector field."
+       short_help="Trace Particle Paths through time in a vector field.">
+The Particle Trace filter generates pathlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
+    </Documentation>
+
+     <InputProperty
+	name="Input"
+	command="AddInputConnection"
+	clean_command="RemoveAllInputs"
+	multiple_input="1">
+       <ProxyGroupDomain name="groups">
+	 <Group name="sources"/>
+	 <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+	 <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array" attribute_type="point"
+			 number_of_components="3"/>
+       <Documentation>
+	   Specify which is the Input of the StreamTracer filter.
+       </Documentation>
+     </InputProperty>
+
+      <InputProperty
+	 name="Source"
+	 label="Seed Source"
+	 command="AddSourceConnection"
+	 clean_command="RemoveAllSources"
+	 multiple_input="1">
+	<ProxyGroupDomain name="groups">
+	  <Group name="sources"/>
+	  <Group name="filters"/>
+	</ProxyGroupDomain>
+	<DataTypeDomain name="input_type">
+	  <DataType value="vtkDataSet"/>
+	</DataTypeDomain>
+	<Documentation>
+	    Specify the seed dataset. Typically fron where the vector field
+	    integration should begin. Usually a point/radius or a line with a
+	    given resolution.
+	</Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty
+	 name="TerminationTime"
+	 command="SetTerminationTime"
+	 number_of_elements="1"
+	 default_values="0.0"
+	 panel_visibility="default"
+	 >
+	<DoubleRangeDomain name="range"/>
+	<Documentation>
+	  Setting TerminationTime to a positive value will cause particles
+	  to terminate when the time is reached. The units of time should be consistent with the
+	  primary time variable.
+	</Documentation>
+      </DoubleVectorProperty>
+
+    <DoubleVectorProperty
+	name="TimestepValues"
+	information_only="1">
+      <TimeStepsInformationHelper/>
+    </DoubleVectorProperty>
+
+    <IntVectorProperty
+	name="ForceReinjectionEveryNSteps"
+	command="SetForceReinjectionEveryNSteps"
+	number_of_elements="1"
+	default_values="0" >
+       <IntRangeDomain name="range" min ="0"/>
+      <Documentation>
+	 When animating particles, it is nice to inject new ones every Nth step
+	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
+	 non zero value will cause the particle source to reinject particles
+	 every Nth step even if it is otherwise unchanged.
+	 Note that if the particle source is also animated, this flag will be
+	 redundant as the particles will be reinjected whenever the source changes
+	 anyway
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty
+	name="SelectInputVectors"
+	command="SetInputArrayToProcess"
+	number_of_elements="5"
+	element_types="0 0 0 0 2"
+	animateable="0"
+       panel_visibility="default">
+	   <ArrayListDomain name="array_list" attribute_type="Vectors">
+	     <RequiredProperties>
+		<Property name="Input" function="Input"/>
+	     </RequiredProperties>
+	   </ArrayListDomain>
+	   <Documentation>
+	       Specify which vector array should be used for the integration
+	       through that filter.
+	   </Documentation>
+    </StringVectorProperty>
+
+     <IntVectorProperty
+	 name="ComputeVorticity"
+	 command="SetComputeVorticity"
+	 number_of_elements="1"
+	 default_values="1" >
+	<BooleanDomain name="bool"/>
+	<Documentation>
+	  Compute vorticity and angular rotation of particles as they progress
+	</Documentation>
+     </IntVectorProperty>
+  </SourceProxy>
+
+
+   <!-- ==================================================================== -->
+
+    <SourceProxy name="StreakLine" class="vtkStreaklineFilter">
+    <Documentation
+       long_help="Trace Streak lines through time in a vector field."
+       short_help="Trace Streak lines through time in a vector field.">
+The Particle Trace filter generates pathlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
+    </Documentation>
+
+     <InputProperty
+	name="Input"
+	command="AddInputConnection"
+	clean_command="RemoveAllInputs"
+	multiple_input="1">
+       <ProxyGroupDomain name="groups">
+	 <Group name="sources"/>
+	 <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+	 <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array" attribute_type="point"
+			 number_of_components="3"/>
+       <Documentation>
+	   Specify which is the Input of the StreamTracer filter.
+       </Documentation>
+     </InputProperty>
+
+      <InputProperty
+	 name="Source"
+	 label="Seed Source"
+	 command="AddSourceConnection"
+	 clean_command="RemoveAllSources"
+	 multiple_input="1">
+	<ProxyGroupDomain name="groups">
+	  <Group name="sources"/>
+	  <Group name="filters"/>
+	</ProxyGroupDomain>
+	<DataTypeDomain name="input_type">
+	  <DataType value="vtkDataSet"/>
+	</DataTypeDomain>
+	<Documentation>
+	    Specify the seed dataset. Typically fron where the vector field
+	    integration should begin. Usually a point/radius or a line with a
+	    given resolution.
+	</Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty
+	 name="TerminationTime"
+	 command="SetTerminationTime"
+	 number_of_elements="1"
+	 default_values="0.0"
+	 panel_visibility="default"
+	 >
+	<DoubleRangeDomain name="range"/>
+	<Documentation>
+	  Setting TerminationTime to a positive value will cause particles
+	  to terminate when the time is reached. The units of time should be consistent with the
+	  primary time variable.
+	</Documentation>
+      </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+	name="TimestepValues"
+	information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
 
      <IntVectorProperty
 	name="ForceReinjectionEveryNSteps"
@@ -7315,7 +7418,8 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetInputArrayToProcess"
 	number_of_elements="5"
 	element_types="0 0 0 0 2"
-	animateable="0">
+	animateable="0"
+       panel_visibility="default">
 	   <ArrayListDomain name="array_list" attribute_type="Vectors">
 	     <RequiredProperties>
 		<Property name="Input" function="Input"/>
@@ -7327,21 +7431,6 @@ This filter operates on any type of data set, provided it has point-centered vec
 	   </Documentation>
      </StringVectorProperty>
 
-      <DoubleVectorProperty
-	name="InitialIntegrationStep"
-	command="SetInitialIntegrationStep"
-	number_of_elements="1"
-	default_values="0.25" >
-	<DoubleRangeDomain name="range"/>
-	<Documentation>
-	  Specify the Initial step size used for line integration, expressed in:
-	  LENGTH_UNIT      = 1
-	  CELL_LENGTH_UNIT = 2
-	  (either the starting size for an adaptive integrator, e.g., RK45,
-	  or the constant / fixed size for non-adaptive ones, i.e., RK2 and RK4)
-	</Documentation>
-      </DoubleVectorProperty>
-
       <IntVectorProperty
 	 name="ComputeVorticity"
 	 command="SetComputeVorticity"
@@ -7352,149 +7441,6 @@ This filter operates on any type of data set, provided it has point-centered vec
 	  Compute vorticity and angular rotation of particles as they progress
 	</Documentation>
       </IntVectorProperty>
-
-<!--
-      <IntVectorProperty
-	name="InitialIntegrationStepUnit"
-	command="SetInitialIntegrationStepUnit"
-	number_of_elements="1"
-	default_values="2" >
-       <EnumerationDomain name="enum">
-	 <Entry value="0" text="Time"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-	name="IntegratorType"
-	command="SetIntegratorType"
-	number_of_elements="1"
-	default_values="0" >
-       <EnumerationDomain name="enum">
-	 <Entry value="0" text="Runge-Kutta 2"/>
-	 <Entry value="1" text="Runge-Kutta 4"/>
-	 <Entry value="2" text="Runge-Kutta 4-5"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-	name="MaximumError"
-	command="SetMaximumError"
-	number_of_elements="1"
-	default_values="0.000001" >
-       <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty
-	name="MinimumIntegrationStepUnit"
-	command="SetMinimumIntegrationStepUnit"
-	number_of_elements="1"
-	default_values="2" >
-       <EnumerationDomain name="enum">
-	 <Entry value="0" text="Time"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-	name="MinimumIntegrationStep"
-	command="SetMinimumIntegrationStep"
-	number_of_elements="1"
-	default_values="0.01" >
-       <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty
-	name="MaximumIntegrationStepUnit"
-	command="SetMaximumIntegrationStepUnit"
-	number_of_elements="1"
-	default_values="2" >
-       <EnumerationDomain name="enum">
-	 <Entry value="0" text="Time"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-	name="MaximumIntegrationStep"
-	command="SetMaximumIntegrationStep"
-	number_of_elements="1"
-	default_values="0.01" >
-       <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
--->
-
-      <DoubleVectorProperty
-	 name="TerminationTime"
-	 command="SetTerminationTime"
-	 number_of_elements="1"
-	 default_values="0.0" >
-	<DoubleRangeDomain name="range"/>
-	<Documentation>
-	  Setting TerminationTime to a positive value will cause particles
-	  to terminate when the time is reached. Use a vlue of zero to
-	  diable termination. The units of time should be consistent with the
-	  primary time variable.
-	</Documentation>
-      </DoubleVectorProperty>
-
-     <IntVectorProperty
-	name="TerminationTimeUnit"
-	label="Termination Time Unit"
-	command="SetTerminationTimeUnit"
-	number_of_elements="1"
-	default_values="1" >
-       <EnumerationDomain name="enum">
-	 <Entry value="0" text="Simulation Time"/>
-	 <Entry value="1" text="TimeSteps"/>
-       </EnumerationDomain>
-       <Documentation>
-	 The termination time may be specified as TimeSteps or Simulation  time
-       </Documentation>
-     </IntVectorProperty>
-
-      <DoubleVectorProperty
-	 name="TerminalSpeed"
-	 label="Term. Speed"
-	 command="SetTerminalSpeed"
-	 number_of_elements="1"
-	 default_values="0.000000000001" >
-	<DoubleRangeDomain name="range"/>
-	<Documentation>
-	  If at any point the speed is below the value of this property, the integration is terminated.
-	</Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-	 name="IgnorePipelineTime"
-	 command="SetIgnorePipelineTime"
-	 number_of_elements="1"
-	 default_values="0" >
-	<BooleanDomain name="bool"/>
-	<Documentation>
-	  Ignore the TIME_ requests made by the pipeline and only use the TimeStep set manually
-	</Documentation>
-      </IntVectorProperty>
-
-      <StringVectorProperty
-	 name="ParticleFileName"
-	 command="SetParticleFileName"
-	 number_of_elements="1"
-	 default_values="/project/csvis/biddisco/ptracer/run-1">
-	<Documentation>
-	  Provide a name for the particle file generated if writing is enabled
-	</Documentation>
-      </StringVectorProperty>
-
-      <IntVectorProperty
-	 name="EnableParticleWriting"
-	 command="SetEnableParticleWriting"
-	 number_of_elements="1"
-	 default_values="0" >
-	<BooleanDomain name="bool"/>
-	<Documentation>
-	  Turn On/Off particle writing
-	</Documentation>
-      </IntVectorProperty>
-
-      <!-- End ParticleTracer -->
    </SourceProxy>
 
    <!-- ==================================================================== -->

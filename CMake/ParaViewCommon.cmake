@@ -387,6 +387,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
     ${ParaView_SOURCE_DIR}/VTK/Wrapping/Python
     ${ParaView_BINARY_DIR}/VTK/Wrapping/Python
     ${ParaView_SOURCE_DIR}/VTK/Wrapping/PythonCore
+    ${ParaView_BINARY_DIR}/VTK/Wrapping/PythonCore
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 

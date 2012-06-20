@@ -125,7 +125,7 @@ public:
   vtkGetStringMacro(FileNameMethod);
 
   // Description:
-  // If true, then treat file series like it does not contain any time step 
+  // If true, then treat file series like it does not contain any time step
   // values. False by default.
   vtkGetMacro(IgnoreReaderTime, int);
   vtkSetMacro(IgnoreReaderTime, int);
@@ -141,6 +141,13 @@ protected:
   virtual int RequestUpdateExtent(vtkInformation*,
                                   vtkInformationVector**,
                                   vtkInformationVector*);
+
+  virtual int RequestUpdateTime (vtkInformation*,
+                                  vtkInformationVector**,
+                                 vtkInformationVector*) {return 1;};
+  virtual int RequestUpdateTimeDependentInformation (vtkInformation*,
+                                                     vtkInformationVector**,
+                                                     vtkInformationVector*) {return 1;};
   virtual int RequestData(vtkInformation *request,
                           vtkInformationVector **inputVector,
                           vtkInformationVector *outputVector);
@@ -190,6 +197,7 @@ protected:
 
   int IgnoreReaderTime;
 
+  int ChooseInput(vtkInformation*);
 private:
   vtkFileSeriesReader(const vtkFileSeriesReader&); // Not implemented.
   void operator=(const vtkFileSeriesReader&); // Not implemented.
