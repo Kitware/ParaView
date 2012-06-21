@@ -67,7 +67,7 @@ paraview_build_optional_plugin(
       SciberQuestToolkit
       "SciberQuestToolkit - Domain specific visualization tools for magnetospheric sciences."
       SciberQuestToolkit
-      OFF)
+      ON)
 if(PARAVIEW_USE_MPI AND NOT WIN32)
   paraview_build_optional_plugin(Nektar "Nektar Reader Plugin" Nektar OFF)
 endif()
