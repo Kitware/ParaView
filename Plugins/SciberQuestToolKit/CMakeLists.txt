@@ -19,10 +19,52 @@ if("${PROJECT_SOURCE_DIR}"  STREQUAL "${PROJECT_BINARY_DIR}")
   message(FATAL_ERROR "SciberQuestToolKit requires an out of source Build.")
 endif()
 
-include(ParaViewConfig.cmake)
+#--------------------------------------------------
+# Find and Use ParaView
+#--------------------------------------------------
+IF (ParaView_SOURCE_DIR)
+  INCLUDE_DIRECTORIES(
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${PARAVIEW_GUI_INCLUDE_DIRS}
+    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
+    ${VTK_INCLUDE_DIR}
+    ${MPI_INCLUDE_PATH}
+    ${OPENGL_INCLUDE_DIR}
+  )
+ELSE (ParaView_SOURCE_DIR)
+  FIND_PACKAGE(ParaView REQUIRED)
+  INCLUDE(${PARAVIEW_USE_FILE})
+ENDIF (ParaView_SOURCE_DIR)
+
+#--------------------------------------------------
+# Use ParaView configuration for MPI
+#--------------------------------------------------
+if(${PARAVIEW_USE_MPI})
+  set(SQTK_WITHOUT_MPI OFF)
+  add_definitions("-DMPICH_IGNORE_CXX_SEEK")
+else()
+  set(SQTK_WITHOUT_MPI ON)
+  add_definitions(-DSQTK_WITHOUT_MPI)
+endif()
+
+#--------------------------------------------------
+# Configuration options
+#--------------------------------------------------
+
+set(SQTK_CUDA            OFF CACHE BOOL "Enable CUDA optimizations.")
+set(SQTK_PROCESS_MONITOR ON  CACHE BOOL "Build the process monitor.")
+
+set(SQTK_PYTHON_BINDINGS OFF CACHE BOOL "Enable Python bindings.")
+set(SQTK_TESTING         ${BUILD_TESTING})
+
+#--------------------------------------------------
+
 include(EigenConfig.cmake)
-include(MPICHConfig.cmake)
-include(CUDAConfig.cmake)
+
+if (SQTK_CUDA)
+  include(CUDAConfig.cmake)
+endif (SQTK_CUDA)
+
 include(GeneratePythonBindings.cmake)
 include(GetDate.cmake)
 
@@ -72,7 +114,6 @@ set(SM_CXX_SOURCES
   vtkSQVortexDetect.cxx
   )
 
-set(SQTK_PROCESS_MONITOR ON CACHE BOOL "Build the process monitor.")
 if (APPLE)
   set(SQTK_PROCESS_MONITOR OFF)
 endif()
@@ -167,7 +208,6 @@ if (SQTK_PROCESS_MONITOR)
   endif()
 endif()
 
-set(SQTK_CUDA OFF CACHE BOOL "Enable CUDA optimizations.")
 if (CUDA_FOUND AND SQTK_CUDA)
   message(STATUS "Including CUDA accelerated filters.")
   message(STATUS "Cuda ${CUDA_VERSION_STRING} found.")
@@ -348,7 +388,6 @@ endif()
 
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
 
-set(SQTK_PYTHON_BINDINGS OFF CACHE BOOL "Generate vtk python bindings")
 if (SQTK_PYTHON_BINDINGS)
   message(STATUS "generating vtk python bindings.")
   generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
@@ -357,7 +396,6 @@ if (SQTK_PYTHON_BINDINGS)
 endif()
 
 # testing
-set(SQTK_TESTING OFF CACHE BOOL "Build project tests.")
 if (SQTK_TESTING)
   if (NOT SQTK_WITHOUT_MPI AND MPI_FOUND)
     add_definitions("-DMPICH_IGNORE_CXX_SEEK")
