@@ -181,6 +181,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
         Set the number of IO nodes. Set to 0 to use the implementation default.
       </Documentation>
@@ -477,6 +478,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
         Number of ghost cells to read.
       </Documentation>
@@ -489,6 +491,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         default_values="1 1 1"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
       Set the number of blocks to be used in an out of core read. The resulting block size
       must be less than 2 GB per block for a scalar and less than 6 GB per block for a vector.
@@ -501,6 +504,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
         Memory used by the largest block in the domain decomposition. Must be less than 2 GB per block
         for a scalar and less than 6 GB per block for a vector.
@@ -514,6 +518,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="10"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
       Set the number of blocks to cache during out of core operation. Increasing the number of
       blocks cached improves the IO perforomance while increasing the memory footprint.
@@ -526,6 +531,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
         Wrost case bound on memory used by the block cache.
       </Documentation>
@@ -569,6 +575,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">
+        <IntRangeDomain name="range" />
       <Documentation>
         Set the number of IO nodes. Set to 0 to use the implementation default.
       </Documentation>
