@@ -347,6 +347,11 @@ set(_vtk_modules
   #  vtkMoleculeRepresentation
   )
 
+if(PARAVIEW_USE_PYTHON)
+  # Needed for python wrapping
+  list(APPEND _vtk_modules vtkWrappingPython)
+endif()
+
 # Are we building the GUI
 
 set (PARAVIEW_BUILD_QT_GUI_NOT TRUE)

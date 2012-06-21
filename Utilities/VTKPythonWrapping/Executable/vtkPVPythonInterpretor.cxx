@@ -19,7 +19,7 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPythonAppInitConfigure.h"
+#include "vtkPVPythonAppInitConfigure.h"
 #include "vtkStdString.h"
 #include "vtkWindows.h"
 #include "pvpythonmodules.h"
