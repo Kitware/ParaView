@@ -225,9 +225,10 @@ set(_vtk_modules
   #  vtkTextureMapToPlane
   #  vtkTextureMapToSphere
 
-  #vtkFiltersFlowPaths
+  vtkFiltersFlowPaths
   # Needed for:
   #  vtkStreamTracer
+  #  Plugins/SciberQuestToolKit/vtkSQFieldTracer
 
   vtkFiltersVerdict
   # Needed for:
@@ -345,11 +346,6 @@ set(_vtk_modules
   # Needed for:
   #  vtkMoleculeRepresentation
   )
-
-if(PARAVIEW_USE_VISITBRIDGE)
-  # Needed by VisItBridge
-  list(APPEND _vtk_modules vtkFiltersFlowPaths)
-endif()
 
 # Are we building the GUI
 
