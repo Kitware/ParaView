@@ -488,7 +488,9 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         vtkSMSourceProxy* selection = vtkSMSourceProxy::SafeDownCast(sources->GetItemAsObject(0));
 
         // Picking info
-        double display[3] = { region[0], region[1], 0.5 };
+        // {r0, r1, 1} => We want to make sure the ray that start from the camera reach
+        // the end of the scene so it could cross any cell of the scene
+        double display[3] = { region[0], region[1], 1 };
         double linePoint1[3], linePoint2[3];
         double* world;
 
