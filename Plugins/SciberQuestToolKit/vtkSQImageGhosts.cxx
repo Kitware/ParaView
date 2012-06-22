@@ -87,6 +87,9 @@ int vtkSQImageGhosts::Initialize(vtkPVXMLElement *root)
     << "# ::vtkSQImageGhosts" << "\n"
     << "\n";
   #endif
+
+  (void)root;
+
   return 0;
 }
 
@@ -95,7 +98,9 @@ void vtkSQImageGhosts::SetCommunicator(MPI_Comm comm)
 {
   if (this->Comm==comm) return;
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)comm;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (mpiOk)

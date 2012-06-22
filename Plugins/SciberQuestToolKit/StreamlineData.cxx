@@ -52,6 +52,8 @@ void StreamlineData::ClearOut()
 //-----------------------------------------------------------------------------
 void StreamlineData::SetSource(vtkSQCellGenerator *sourceGen)
 {
+  (void)sourceGen;
+
   sqErrorMacro(pCerr(),"Cell generator source is not supported.");
 }
 

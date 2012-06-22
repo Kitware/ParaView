@@ -151,7 +151,9 @@ void BOVReader::SetCommunicator(MPI_Comm comm)
 //-----------------------------------------------------------------------------
 void BOVReader::SetHints(MPI_Info hints)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)hints;
+  #else
   if (this->Hints==hints) return;
 
   int mpiOk=0;
@@ -216,7 +218,9 @@ int BOVReader::Open(const char *fileName)
 
   int ok=0;
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)fileName;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)

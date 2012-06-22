@@ -39,7 +39,7 @@ void ToLower(string &in)
   size_t n=in.size();
   for (size_t i=0; i<n; ++i)
     {
-    in[i]=tolower(in[i]);
+    in[i]=(char)tolower(in[i]);
     }
 }
 
@@ -53,6 +53,8 @@ int FileExists(const char *path)
     {
     return 1;
     }
+  #else
+  (void)path;
   #endif
   return 0;
 }
@@ -89,7 +91,7 @@ int Represented(const char *path, const char *prefix)
   if (ds)
     {
     struct dirent *de;
-    while ((de=readdir(ds)))
+    while ((de=readdir(ds))!=0)
       {
       char *fname=de->d_name;
       if (strncmp(fname,prefix,prefixLen)==0)
@@ -228,7 +230,7 @@ int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids)
   if (ds)
     {
     struct dirent *de;
-    while ((de=readdir(ds)))
+    while ((de=readdir(ds))!=0)
       {
       char *fname=de->d_name;
       if (strncmp(fname,prefix,prefixLen)==0)
@@ -302,10 +304,10 @@ string StripPathFromFileName(const string fileName)
 
 
 //*****************************************************************************
-int LoadLines(const char *fileName, vector<string> &lines)
+size_t LoadLines(const char *fileName, vector<string> &lines)
 {
   // Load each line in the given file into a the vector.
-  int nRead=0;
+  size_t nRead=0;
   const int bufSize=1024;
   char buf[bufSize]={'\0'};
   ifstream file(fileName);
@@ -328,7 +330,7 @@ int LoadLines(const char *fileName, vector<string> &lines)
 }
 
 //*****************************************************************************
-int LoadText(const string &fileName, string &text)
+size_t LoadText(const string &fileName, string &text)
 {
   ifstream file(fileName.c_str());
   if (!file.is_open())
@@ -338,7 +340,7 @@ int LoadText(const string &fileName, string &text)
     }
   // Determine the length of the file ...
   file.seekg (0,ios::end);
-  size_t nBytes=file.tellg();
+  size_t nBytes=(size_t)file.tellg();
   file.seekg (0, ios::beg);
   // and allocate a buffer to hold its contents.
   char *buf=new char [nBytes];

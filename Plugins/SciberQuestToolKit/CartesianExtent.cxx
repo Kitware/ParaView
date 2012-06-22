@@ -60,12 +60,7 @@ int CartesianExtent::GetDimensionMode(
     return DIM_MODE_2D_XY;
     }
   // It's 3D
-  else
-    {
-    return DIM_MODE_3D;
-    }
-
-  return DIM_MODE_INVALID;
+  return DIM_MODE_3D;
 }
 
 //-----------------------------------------------------------------------------

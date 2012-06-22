@@ -49,7 +49,7 @@ public:
   /**
   Execute the given command in a new process.
   */
-  virtual int Exec(string &cmd){ return -1; }
+  virtual int Exec(string &){ return -1; }
 
   /**
   If set will print a stack trace for segfault, gp fault, floating point

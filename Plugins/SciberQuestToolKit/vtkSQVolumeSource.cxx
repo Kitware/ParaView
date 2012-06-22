@@ -146,13 +146,16 @@ int vtkSQVolumeSource::Initialize(vtkPVXMLElement *root)
 
 //----------------------------------------------------------------------------
 int vtkSQVolumeSource::RequestInformation(
-    vtkInformation * /*req*/,
-    vtkInformationVector ** /*inInfos*/,
+    vtkInformation *req,
+    vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
   #ifdef vtkSQVolumeSourceDEBUG
   cerr << "===============================vtkSQVolumeSource::RequestInformation" << endl;
   #endif
+
+  (void)req;
+  (void)inInfos;
 
   // tell the excutive that we are handling our own paralelization.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
@@ -172,6 +175,9 @@ int vtkSQVolumeSource::RequestData(
   #ifdef vtkSQVolumeSourceDEBUG
   cerr << "===============================vtkSQVolumeSource::RequestData" << endl;
   #endif
+
+  (void)req;
+  (void)inInfos;
 
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
 

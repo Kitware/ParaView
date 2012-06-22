@@ -1,8 +1,8 @@
 /*
-   ____    _ __ 	  ____		     __    ____
+   ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/	\___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -19,11 +19,11 @@ class WindowsSystemInterface::Implementation
 {
 public:
   Implementation()
-	:
+        :
     Pid(-1),
     HProc(0),
     HostName("localhost"),
-    MemoryTotal(-1)
+    MemoryTotal(0)
       {}
 
   int Pid;
@@ -42,7 +42,7 @@ WindowsSystemInterface::WindowsSystemInterface()
   MEMORYSTATUSEX statex;
   statex.dwLength=sizeof(statex);
   GlobalMemoryStatusEx(&statex);
-  this->impl->MemoryTotal=statex.ullTotalPhys/1024;
+  this->impl->MemoryTotal=(unsigned long)statex.ullTotalPhys/1024;
 
   this->impl->HProc=OpenProcess(
       PROCESS_QUERY_INFORMATION|PROCESS_VM_READ,
@@ -90,7 +90,7 @@ unsigned long WindowsSystemInterface::GetMemoryUsed()
   if (!ok)
     {
     cerr << "Failed to obtain memory information." << endl;
-    return -1;
+    return 0;
     }
   return pmc.WorkingSetSize/1024;
 }

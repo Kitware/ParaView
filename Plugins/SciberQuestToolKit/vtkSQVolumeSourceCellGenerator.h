@@ -33,13 +33,13 @@ public:
   /**
   Return the cell type of the cell at id. 
   */
-  virtual int GetCellType(vtkIdType id){ return VTK_HEXAHEDRON; }
+  virtual int GetCellType(vtkIdType){ return VTK_HEXAHEDRON; }
 
   /**
   Return the number of points required for the named
   cell. For homogeneous datasets its always the same.
   */
-  virtual int GetNumberOfCellPoints(vtkIdType id){ return 8;}
+  virtual int GetNumberOfCellPoints(vtkIdType){ return 8;}
 
   /**
   Copy the points from a cell into the provided buffer,

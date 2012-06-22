@@ -94,7 +94,9 @@ const BOVWriter &BOVWriter::operator=(const BOVWriter &other)
 //-----------------------------------------------------------------------------
 void BOVWriter::SetCommunicator(MPI_Comm comm)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)comm;
+  #else
   int mpiOk;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -130,7 +132,9 @@ void BOVWriter::SetCommunicator(MPI_Comm comm)
 //-----------------------------------------------------------------------------
 void BOVWriter::SetHints(MPI_Info hints)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)hints;
+  #else
   int mpiOk;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)

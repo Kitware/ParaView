@@ -16,6 +16,7 @@ using std::endl;
 //-----------------------------------------------------------------------------
 FlatIndex::FlatIndex(int ni, int nj, int nk, int mode)
 {
+  (void)nk;
   switch(mode)
     {
     case CartesianExtent::DIM_MODE_2D_XZ:

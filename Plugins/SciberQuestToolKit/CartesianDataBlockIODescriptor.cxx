@@ -22,6 +22,10 @@ CartesianDataBlockIODescriptor::CartesianDataBlockIODescriptor(
       int nGhosts)
 {
   #ifdef SQTK_WITHOUT_MPI
+  (void)blockExt;
+  (void)fileExt;
+  (void)periodic;
+  (void)nGhosts;
   sqErrorMacro(
     cerr,
     << "This class requires MPI but it was built without MPI.");

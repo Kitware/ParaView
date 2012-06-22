@@ -124,6 +124,15 @@ int GhostTransaction::Execute(
   int iErr=0;
 
   #ifdef SQTK_WITHOUT_MPI
+  (void)comm;
+  (void)rank;
+  (void)nComps;
+  (void)srcData;
+  (void)destData;
+  (void)pointData;
+  (void)dimMode;
+  (void)req;
+  (void)tag;
   sqErrorMacro(cerr,"Attempting to execute MPI code in a serial build.");
   #else
   ostringstream oss;

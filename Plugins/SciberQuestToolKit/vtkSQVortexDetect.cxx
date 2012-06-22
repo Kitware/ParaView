@@ -426,6 +426,8 @@ int vtkSQVortexDetect::Initialize(vtkPVXMLElement *root)
   pCerr() << "=====vtkSQVortexDetect::Initialize" << endl;
   #endif
 
+  (void)root;
+
   return 0;
 }
 

@@ -34,6 +34,10 @@ BOVTimeStepImage::BOVTimeStepImage(
   sqErrorMacro(
     cerr,
     << "This class requires MPI but it was built without MPI.");
+  (void)comm;
+  (void)hints;
+  (void)stepIdx;
+  (void)metaData;
   #else
   int mpiMode=0;
   if (metaData->ReadMode())

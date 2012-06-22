@@ -176,7 +176,11 @@ void CreateCartesianView(
       const CartesianExtent &decomp,
       MPI_Datatype &view)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)domain;
+  (void)decomp;
+  (void)view;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -244,7 +248,12 @@ void CreateCartesianView(
       int nComps,
       MPI_Datatype &view)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)domain;
+  (void)decomp;
+  (void)nComps;
+  (void)view;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -324,7 +333,14 @@ MPI_Status WriteDataArray(
         T *data)                       // pointer to a buffer to write to disk.
 {
   MPI_Status ok=0;
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)fileName;
+  (void)comm;
+  (void)hints;
+  (void)domain;
+  (void)decomp;
+  (void)data;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -446,7 +462,16 @@ int ReadDataArray(
         int compNoMem,                  // start offset in mem array
         T *data)                        // pointer to a buffer to read into.
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)fileName;
+  (void)comm;
+  (void)hints;
+  (void)domain;
+  (void)decomp;
+  (void)nCompsMem;
+  (void)compNoMem;
+  (void)data;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -579,7 +604,15 @@ int WriteDataArray(
         int compNoMem,                 // start offset in mem array
         T *data)                       // pointer to a buffer to write from.
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)file;
+  (void)hints;
+  (void)domain;
+  (void)decomp;
+  (void)nCompsMem;
+  (void)compNoMem;
+  (void)data;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -688,7 +721,15 @@ int ReadDataArray(
         int compNoMem,                 // start offset in mem array
         T *data)                       // pointer to a buffer to read into.
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)file;
+  (void)hints;
+  (void)domain;
+  (void)decomp;
+  (void)nCompsMem;
+  (void)compNoMem;
+  (void)data;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
@@ -798,7 +839,13 @@ int ReadDataArray(
         MPI_Datatype fileView,         // file layout
         T *data)                       // pointer to a buffer to read into.
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)file;
+  (void)hints;
+  (void)memView;
+  (void)fileView;
+  (void)data;
+  #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
   if (!mpiOk)

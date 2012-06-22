@@ -209,7 +209,9 @@ void CartesianDecomp::SetExtent(const CartesianExtent &ext)
 //-----------------------------------------------------------------------------
 int CartesianDecomp::SetDecompDims(int nBlocks)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)nBlocks;
+  #else
   if (nBlocks==0)
     {
     sqErrorMacro(cerr,"0 is an invald number of blocks.");

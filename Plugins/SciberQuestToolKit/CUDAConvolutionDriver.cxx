@@ -84,6 +84,8 @@ int CUDAConvolutionDriver::SetDeviceId(int deviceId)
   this->BlockGridMax[2]=props.maxGridSize[2];
   this->WarpSize=props.warpSize;
   this->MaxWarpsPerBlock=props.maxThreadsPerBlock/props.warpSize;
+  #else
+  (void)deviceId;
   #endif
 
   return 0;
@@ -383,6 +385,15 @@ int CUDAConvolutionDriver::Convolution(
 
   delete devK;
   // TODO if kernel is in texture mem, unbind
+  #else
+  (void)extV;
+  (void)extW;
+  (void)extK;
+  (void)nGhost;
+  (void)mode;
+  (void)V;
+  (void)W;
+  (void)K;
   #endif
 
   return 0;

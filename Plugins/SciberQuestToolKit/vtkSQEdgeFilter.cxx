@@ -164,6 +164,8 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
   pCerr() << "===============================vtkSQEdgeFilter::RequestUpdateExtent" << endl;
   #endif
 
+  (void)req;
+
   typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
   vtkInformation* outInfo=outInfos->GetInformationObject(0);

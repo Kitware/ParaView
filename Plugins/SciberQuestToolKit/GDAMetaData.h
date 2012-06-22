@@ -1,7 +1,8 @@
-/*   ____    _ __           ____               __    ____
+/*
+   ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -14,7 +15,6 @@ Copyright 2012 SciberQuest Inc.
 #include <iostream>
 using std::ostream;
 
-
 /// Parser for SciberQuest GDA dataset format.
 /**
 Parser for SciberQuest's GDA dataset metadata format.
@@ -24,7 +24,7 @@ class SQ_EXPORT GDAMetaData : public BOVMetaData
 public:
   /// Constructors.
   GDAMetaData();
-  GDAMetaData(const GDAMetaData &other)
+  GDAMetaData(const GDAMetaData &other) : BOVMetaData(other)
     {
     *this=other;
     }

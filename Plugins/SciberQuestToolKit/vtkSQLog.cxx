@@ -177,10 +177,14 @@ public:
   /// collect buffer to a root process
   void Gather(int worldRank, int worldSize, int rootRank)
   {
+    #ifdef SQTK_WITHOUT_MPI
+    (void)worldRank;
+    (void)worldSize;
+    (void)rootRank;
+    #else
     // in serial this is a no-op
     if (worldSize>1)
       {
-      #ifndef SQTK_WITHOUT_MPI
       int *bufferSizes=0;
       int *disp=0;
       if (worldRank==rootRank)
@@ -234,8 +238,8 @@ public:
         {
         this->Clear();
         }
-      #endif
       }
+    #endif
   }
 
 protected:
@@ -441,7 +445,9 @@ void vtkSQLog::EndEvent(const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::EndEventSynch(int rank, const char *event)
 {
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)rank;
+  #else
   MPI_Barrier(MPI_COMM_WORLD);
   if (this->WorldRank!=rank) return;
   #endif

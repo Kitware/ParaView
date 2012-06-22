@@ -239,5 +239,6 @@ int vtkSQVolumeSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
 //-----------------------------------------------------------------------------
 void vtkSQVolumeSourceCellGenerator::PrintSelf(ostream& os, vtkIndent indent)
 {
-
+ (void)os;
+ (void)indent;
 }

@@ -714,6 +714,8 @@ int vtkSQMedianFilter::RequestUpdateExtent(
   pCerr() << "===============================vtkSQMedianFilter::RequestUpdateExtent" << endl;
   #endif
 
+  (void)req;
+
   typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
   vtkInformation* outInfo=outInfos->GetInformationObject(0);

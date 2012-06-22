@@ -283,8 +283,8 @@ public:
   it needs into the pipeline information.
   */
   virtual void PushPipelineInformation(
-        vtkInformation *req,
-        vtkInformation *info)
+        vtkInformation *,
+        vtkInformation *)
   {}
 
   /**

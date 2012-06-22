@@ -331,7 +331,9 @@ int vtkSQBOVReader::CanReadFile(const char *file)
 
   int status=0;
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)file;
+  #else
   // only rank 0 opens the file, this results in metadata
   // being parsed. If the parsing of md is successful then
   // the file is ours.
@@ -356,6 +358,7 @@ void vtkSQBOVReader::SetFileName(const char* _arg)
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
+  (void)_arg;
   //vtkErrorMacro(
   //    << "This class requires MPI however it was built without MPI.");
   #else

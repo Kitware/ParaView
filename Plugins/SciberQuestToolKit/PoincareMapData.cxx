@@ -53,7 +53,8 @@ void PoincareMapData::ClearOut()
 //-----------------------------------------------------------------------------
 void PoincareMapData::SetSource(vtkSQCellGenerator *sourceGen)
 {
-  sqErrorMacro(pCerr(),"Cell generator source is not supported."); 
+  (void)sourceGen;
+  sqErrorMacro(pCerr(),"Cell generator source is not supported.");
 }
 
 //-----------------------------------------------------------------------------

@@ -81,6 +81,7 @@ int vtkSQImageSource::Initialize(vtkPVXMLElement *root)
     << "# ::vtkSQImageSource" << "\n"
     << "\n";
   #endif
+  (void)root;
   vtkErrorMacro("Initialize not yet implemented!!!");
   return 0;
 }
@@ -108,14 +109,16 @@ void vtkSQImageSource::SetKExtent(int klo, int khi)
 
 //-----------------------------------------------------------------------------
 int vtkSQImageSource::RequestInformation(
-      vtkInformation * /*req*/,
+      vtkInformation *req,
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQImageSourceDEBUG
   pCerr() << "=====vtkSQImageSource::RequestInformation" << endl;
   #endif
-  //this->Superclass::RequestInformation(req,inInfos,outInfos);
+
+  (void)req;
+  (void)inInfos;
 
   vtkInformation* outInfo=outInfos->GetInformationObject(0);
 
@@ -129,7 +132,7 @@ int vtkSQImageSource::RequestInformation(
 
 //-----------------------------------------------------------------------------
 int vtkSQImageSource::RequestData(
-    vtkInformation * /*req*/,
+    vtkInformation *req,
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
@@ -140,6 +143,9 @@ int vtkSQImageSource::RequestData(
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   log->StartEvent("vtkSQImageSource::RequestData");
   #endif
+
+  (void)req;
+  (void)inInfoVec;
 
   vtkInformation *outInfo=outInfoVec->GetInformationObject(0);
   vtkDataSet *outData

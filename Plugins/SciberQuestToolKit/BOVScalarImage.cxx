@@ -14,13 +14,17 @@ Copyright 2012 SciberQuest Inc.
 MPI_File Open(MPI_Comm comm, MPI_Info hints, const char *fileName, int mode)
 {
   #ifdef SQTK_WITHOUT_MPI
+  (void)comm;
+  (void)hints;
+  (void)fileName;
+  (void)mode;
   return 0;
   #else
   // added this to deal with vpic data arrays which use spaces.
   string cleanFileName=fileName;
   size_t fileNameLen=cleanFileName.size();
   for (size_t i=0; i<fileNameLen; ++i)
-    { 
+    {
     if (cleanFileName[i]==' ') cleanFileName[i]='-';
     }
 

@@ -209,13 +209,15 @@ void vtkSQVortexFilter::ClearArraysToCopy()
 
 //-----------------------------------------------------------------------------
 int vtkSQVortexFilter::RequestDataObject(
-    vtkInformation* /* request */,
+    vtkInformation* request,
     vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec)
 {
   #ifdef vtkSQVortexFilterDEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestDataObject" << endl;
   #endif
+
+  (void)request;
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -237,14 +239,15 @@ int vtkSQVortexFilter::RequestDataObject(
 
 //-----------------------------------------------------------------------------
 int vtkSQVortexFilter::RequestInformation(
-      vtkInformation * /*req*/,
+      vtkInformation *req,
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQVortexFilterDEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestInformation" << endl;
   #endif
-  //this->Superclass::RequestInformation(req,inInfos,outInfos);
+
+  (void)req;
 
   // We will work in a restricted problem domain so that we have
   // always a single layer of ghost cells available. To make it so
@@ -309,6 +312,8 @@ int vtkSQVortexFilter::RequestUpdateExtent(
   pCerr() << "=====vtkSQVortexFilter::RequestUpdateExtent" << endl;
   #endif
 
+  (void)req;
+
   typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
   vtkInformation* outInfo=outInfos->GetInformationObject(0);
@@ -366,7 +371,7 @@ int vtkSQVortexFilter::RequestUpdateExtent(
 
 //-----------------------------------------------------------------------------
 int vtkSQVortexFilter::RequestData(
-    vtkInformation * /*req*/,
+    vtkInformation *req,
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
@@ -378,6 +383,8 @@ int vtkSQVortexFilter::RequestData(
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   log->StartEvent("vtkSQVortexFilter::RequestData");
   #endif
+
+  (void)req;
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());

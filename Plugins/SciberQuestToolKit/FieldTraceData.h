@@ -101,7 +101,7 @@ public:
   or all posibilities may be included. The latter is better for temporal
   animations.
   */
-  virtual void PrintLegend(int reduce){}
+  virtual void PrintLegend(int){}
 
 protected:
   vector<FieldLine *> Lines;

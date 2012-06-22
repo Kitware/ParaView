@@ -49,6 +49,7 @@ const IntersectData &IntersectData::operator=(const IntersectData &other)
 int IntersectData::CommitType(MPI_Datatype *classType)
 {
   #ifdef SQTK_WITHOUT_MPI
+  (void)classType;
   return 0;
   #else
   const int nBlocks=2;

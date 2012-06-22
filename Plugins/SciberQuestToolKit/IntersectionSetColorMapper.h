@@ -2,10 +2,9 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
-
 */
 #ifndef IntersectionSetColorMapper_h
 #define IntersectionSetColorMapper_h
@@ -131,10 +130,12 @@ public:
     }
   /// reduce the number of colors to those which are used.
   void SqueezeColorMap(vtkIntArray *scalar){
-    #ifndef SQTK_WITHOUT_MPI
+    #ifdef SQTK_WITHOUT_MPI
+    (void)scalar;
+    #else
     int procId=0;
     MPI_Comm_rank(MPI_COMM_WORLD,&procId);
-    // Walk the color map, for any used color replace it with 
+    // Walk the color map, for any used color replace it with
     // the number of colors used thus far. This will reduce
     // the color map to only the used colors.
     vtkIdType nCells=scalar->GetNumberOfTuples();

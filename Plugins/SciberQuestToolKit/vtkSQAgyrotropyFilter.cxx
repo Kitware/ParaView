@@ -37,9 +37,13 @@ Copyright 2012 SciberQuest Inc.
 #include <algorithm>
 using std::min;
 using std::max;
+#include <typeinfo>
+
 #include <string>
 using std::string;
 #include <cmath>
+
+
 
 #define vtkSQAgyrotropyFilterDEBUG 0
 #define vtkSQAgyrotropyFilterTIME 0
@@ -48,11 +52,9 @@ using std::string;
   #include "vtkSQLog.h"
 #endif
 
-
-
 // ****************************************************************************
 template<typename T>
-void agyrotropy(T *pT, T *pV, T *pA, size_t n)
+void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
 {
   for (size_t i=0; i<n; ++i)
     {
@@ -87,28 +89,86 @@ void agyrotropy(T *pT, T *pV, T *pA, size_t n)
     T a = nxx+nyy+nzz;
     T b = -(nxy*nxy + nxz*nxz + nyz*nyz - nxx*nyy - nxx*nzz - nyy*nzz);
 
-    T d = a*a-4.0*b;
-    if ((d<0.0) && (d<-1.0e-6))
+    T d = a*a-T(4.0)*b;
+    if ((d<=T(0.0)) && (d>=T(noiseThreshold)))
       {
-      d=0.0;
+      d=T(0.0);
       }
     else
-    if (d<0.0)
+    if (d<=T(0.0))
       {
-      cerr
-        << "point " << i << " has negative descriminant." << endl
+      vtkGenericWarningMacro(
+        << "point " << i << " has negative descriminant. "
+           "In PIC data this may be due to noise and maybe "
+           "corrected by increasing the noiseThreshold." << endl
         << "a=" << a << endl
         << "b=" << b << endl
-        << "d=" << d << endl;
-      d*=-1.0;
+        << "d=" << d << endl);
+      d*=T(-1.0);
       }
 
-    pA[i] = 2*::sqrt(d)/a;
+    pA[i]=T(2.0)*::sqrt(d)/a;
 
     pV+=3;
     pT+=9;
     }
 }
+
+/**
+Helper for vtkTemplateMacro unsupported type have
+no specialization and result in error message.
+*/
+template<typename T>
+class AgyrotropyFunctor
+{
+public:
+  void operator()(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
+  {
+    (void)pT;
+    (void)pV;
+    (void)pA;
+    (void)n;
+    (void)noiseThreshold;
+    vtkGenericWarningMacro(
+      "Can not compute on arrays of type " << typeid(T).name());
+    for (size_t i=0; i<n; ++i)
+      {
+      pA[i] = T(0);
+      }
+  }
+};
+
+// float specialization
+template<>
+class AgyrotropyFunctor<float>
+{
+public:
+  void operator()(
+        float *pT,
+        float *pV,
+        float *pA,
+        size_t n,
+        float noiseThreshold)
+  {
+    Agyrotropy(pT,pV,pA,n,noiseThreshold);
+  }
+};
+
+// double specialization
+template<>
+class AgyrotropyFunctor<double>
+{
+public:
+  void operator()(
+        double *pT,
+        double *pV,
+        double *pA,
+        size_t n,
+        double noiseThreshold)
+  {
+    Agyrotropy(pT,pV,pA,n,noiseThreshold);
+  }
+};
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQAgyrotropyFilter);
@@ -119,6 +179,8 @@ vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
   #if vtkSQAgyrotropyFilterDEBUG>1
   pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << endl;
   #endif
+
+  this->NoiseThreshold=1.0e-6;
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
@@ -145,12 +207,6 @@ int vtkSQAgyrotropyFilter::Initialize(vtkPVXMLElement *root)
     {
     return -1;
     }
-
-  /*
-  int mode=MODE_STREAM;
-  GetOptionalAttribute<int,1>(elem,"mode",&mode);
-  this->SetMode(mode);
-  */
 
   #if defined vtkSQAgyrotropyFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -198,16 +254,8 @@ int vtkSQAgyrotropyFilter::RequestData(
     return 1;
     }
 
-  /// construct the outpu from a shallow copy
+  /// construct the output from a shallow copy
   out->ShallowCopy(in);
-  /*
-  int nArrays;
-  nArrays = in->GetPointData()->GetNumberOfArrays();
-  for (int i=0; i<nArrays; ++i)
-    {
-    out->GetPointData()->AddArray(in->GetPointData()->GetArray(i));
-    }
-  */
 
   /// get electron pressure tensor and magnetic field
   vtkDataArray *T=this->GetInputArrayToProcess(0,inputVector);
@@ -241,13 +289,14 @@ int vtkSQAgyrotropyFilter::RequestData(
   switch(A->GetDataType())
     {
     vtkTemplateMacro(
-      agyrotropy<VTK_TT>(
+      AgyrotropyFunctor<VTK_TT> agyrotropy;
+      agyrotropy(
           (VTK_TT*)T->GetVoidPointer(0),
           (VTK_TT*)V->GetVoidPointer(0),
           (VTK_TT*)A->GetVoidPointer(0),
-          nTups));
+          nTups,
+          (VTK_TT)this->NoiseThreshold));
     }
-
 
   #if defined vtkSQAgyrotropyFilterTIME
   log->EndEvent("vtkSQAgyrotropyFilter::RequestData");

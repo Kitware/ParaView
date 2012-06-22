@@ -8,7 +8,12 @@ Copyright 2012 SciberQuest Inc.
 */
 // .NAME vtkSQAgyrotropyFilter -
 // .SECTION Description
+// Compute agyrotropy as described in:
 //
+// JOURNAL OF GEOPHYSICAL RESEARCH, VOL. 113, A06222, 2008,
+// "Illuminating electron diffusion regions of collisionless
+// magnetic reconnection using electron agyrotropy",
+// Jack Scudder and William Daughton
 
 #ifndef __vtkSQAgyrotropyFilter_h
 #define __vtkSQAgyrotropyFilter_h
@@ -29,6 +34,11 @@ public:
   // Initialize the object from an xml document.
   int Initialize(vtkPVXMLElement *root);
 
+  // Description:
+  // Set/Get the noise threshold, above which negative discriminant
+  // is corrected for. eg: if (nt < val < 0) then val=0
+  vtkSetMacro(NoiseThreshold,double);
+  vtkGetMacro(NoiseThreshold,double);
 
 protected:
   vtkSQAgyrotropyFilter();
@@ -42,6 +52,8 @@ private:
   void operator=(const vtkSQAgyrotropyFilter&);  // Not implemented.
 
 private:
+  double NoiseThreshold;
+
 };
 
 #endif

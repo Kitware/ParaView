@@ -759,6 +759,9 @@ void ScalarConvolution2D(
       T * __restrict__ W,
       float * __restrict__ K)
 {
+  (void)knij;
+  (void)nGhost;
+
   // get a tuple from the current flat index in the output
   // index space
   for (unsigned long wi=0; wi<wnij; ++wi)
@@ -800,6 +803,9 @@ void ScalarConvolution3D(
       T * __restrict__ W,
       float * __restrict__ K)
 {
+  (void)knijk;
+  (void)nGhost;
+
   // visit each output element
   for (unsigned long wi=0; wi<wnijk; ++wi)
     {
@@ -1008,6 +1014,8 @@ void ScalarMedianFilter2D(
       T * __restrict__ V,
       T * __restrict__ W)
 {
+  (void)nGhost;
+
   unsigned long *ids=0;
   posix_memalign((void**)ids,16,knij*sizeof(unsigned long));
 
@@ -1062,6 +1070,9 @@ void ScalarMedianFilter3D(
       T * __restrict__ V,
       T * __restrict__ W)
 {
+  (void)knij;
+  (void)nGhost;
+
   unsigned long *ids=0;
   posix_memalign((void**)ids,16,knijk*sizeof(unsigned long));
 
@@ -2848,7 +2859,7 @@ void VectorMatrixMul(
         const int  pi= 3*idx.Index( i, j, k);
 
         W[_pi  ] = V[pi  ]*Mxx[_pi] + V[pi+1]*Myx[_pi] + V[pi+2]*Mzx[_pi];
-        W[_pi+1] = V[pi+1]*Mxy[_pi] + V[pi+1]*Myy[_pi] + V[pi+2]*Myz[_pi];
+        W[_pi+1] = V[pi+1]*Mxy[_pi] + V[pi+1]*Myy[_pi] + V[pi+2]*Mzy[_pi];
         W[_pi+2] = V[pi+2]*Mxz[_pi] + V[pi+1]*Myz[_pi] + V[pi+2]*Mzz[_pi];
         }
       }

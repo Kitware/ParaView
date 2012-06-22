@@ -626,7 +626,10 @@ int vtkSQFieldTracer::RequestData(
   log->StartEvent("vtkSQFieldTracer::RequestData");
   #endif
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)inputVector;
+  (void)outputVector;
+  #else
   vtkInformation *info;
 
   /// Reader
@@ -928,7 +931,15 @@ int vtkSQFieldTracer::IntegrateDynamic(
   log->StartEvent("vtkSQFieldTracer::IntegrateDynamic");
   #endif
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)procId;
+  (void)nProcs;
+  (void)nCells;
+  (void)fieldName;
+  (void)oocr;
+  (void)oocrCache;
+  (void)traceData;
+  #else
   const int masterProcId=(nProcs>1?1:0); // NOTE: proc 0 is busy with PV overhead.
   const int BLOCK_REQ=2222;
   // Master process distributes the work and integrates
@@ -1508,7 +1519,9 @@ unsigned long vtkSQFieldTracer::GetGlobalCellId(vtkDataSet *data)
 {
   unsigned long gid=0;
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)data;
+  #else
   unsigned long nLocal=data->GetNumberOfCells();
 
   unsigned long *nGlobal

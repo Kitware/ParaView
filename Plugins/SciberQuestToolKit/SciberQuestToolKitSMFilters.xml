@@ -68,13 +68,9 @@ Copyright 2012 SciberQuest Inc.
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
+        <!-- none selected by default -->
         <Hints>
-           <!--
-           This overrides the GUI's default mechanism to
-           not set the default value for this property
-           using the domain when the proxy is created
-           -->
-           <NoDefault />
+          <NoDefault />
         </Hints>
       </StringVectorProperty>
 
@@ -251,7 +247,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         This property specifies the scale factor to scale every glyph by.
       </Documentation>
@@ -276,7 +271,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="10"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         If scaling by eigenvalues should be limited, this value sets an upper limit for scale factor times
         eigenvalue.
@@ -709,7 +703,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0.0"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         Lower bound on the segments in the resulting streamline
       </Documentation>
@@ -993,7 +986,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0.0"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         Lower bound on the segments in the resulting streamline
       </Documentation>
@@ -1807,7 +1799,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="100000000"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         Maximum time interval beyond which line integration is terminated.
       </Documentation>
@@ -2383,7 +2374,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1.0"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
       <Documentation>
         Maximum time interval beyond which line integration is terminated.
       </Documentation>
@@ -3106,6 +3096,18 @@ Copyright 2012 SciberQuest Inc.
             </Documentation>
       </StringVectorProperty>
 
+      <DoubleVectorProperty
+         name="NoiseThreshold"
+         command="SetNoiseThreshold"
+         number_of_elements="1"
+         default_values="-1.0e-4"
+         panel_visibility="default">
+        <Documentation>
+         This controls the correction of negative descriminant in the computation.
+         eg: if (NoiseThreshold less than value less than 0) then value=0.
+        </Documentation>
+      </DoubleVectorProperty>
+
     <Hints>
       <View type="RenderView"/>
     </Hints>
@@ -3196,7 +3198,6 @@ Copyright 2012 SciberQuest Inc.
   <!-- End vtkSQMedianFilter -->
   </SourceProxy>
 
-
   <!-- ==================================================================== -->
   <SourceProxy
     name="vtkSQKernelConvolution"
@@ -3209,39 +3210,37 @@ Copyright 2012 SciberQuest Inc.
     </Documentation>
 
      <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="point"/>
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array" attribute_type="point"/>
       </InputProperty>
 
       <StringVectorProperty
-        name="Arrays to filter"
-        command="AddInputArray"
-        clean_command="ClearInputArrays"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        label="Arrays"
-        panel_visibility="default">
+          name="ArraysToFilter"
+          command="AddInputArray"
+          clean_command="ClearInputArrays"
+          repeat_command="1"
+          number_of_elements_per_command="1"
+          label="Arrays"
+          panel_visibility="default">
         <Documentation>
-            This property specifies the name(s) array(s) to filter.
+          This property specifies the name(s) array(s) to filter.
         </Documentation>
         <ArrayListDomain name="array_list">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
+        <!-- none selected by default -->
         <Hints>
-        <!-- This overrides the GUI's default mechanism to
-            not set the default value for this property
-            using the domain when the proxy is created -->
-            <NoDefault />
+          <NoDefault />
         </Hints>
       </StringVectorProperty>
 
@@ -3317,7 +3316,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="-1"
         panel_visibility="default">
-        <IntRangeDomain name="range" />
        <Documentation>
          When set larger than 0, ranks are assigned to use GPUs.
        </Documentation>
@@ -3354,7 +3352,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="8"
         panel_visibility="default">
-        <IntRangeDomain name="range" />
        <Documentation>
          Control over domain decomposition. More warps per block means larger blocks.
        </Documentation>
@@ -3636,7 +3633,6 @@ Copyright 2012 SciberQuest Inc.
       default_values="-1.0 1.0"
       information_property="IBoundsInfo"
       panel_visibility="default">
-      <DoubleRangeDomain name="range" />
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3655,7 +3651,6 @@ Copyright 2012 SciberQuest Inc.
       default_values="-1.0 1.0"
       information_property="JBoundsInfo"
       panel_visibility="default">
-      <DoubleRangeDomain name="range" />
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3674,7 +3669,6 @@ Copyright 2012 SciberQuest Inc.
       default_values="-1.0 1.0"
       information_property="KBoundsInfo"
       panel_visibility="default">
-      <DoubleRangeDomain name="range" />
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3688,7 +3682,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         default_values="1 1 1"
         panel_visibility="default">
-        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <!-- Transforms -->
@@ -3699,7 +3692,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         default_values="0.0 0.0 0.0"
         panel_visibility="default">
-        <DoubleRangeDomain name="range" />
         <Documentation>
           Controls how non-linear the generated points are. 0 is linear.
         </Documentation>
@@ -3743,7 +3735,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         panel_visibility="default">
-        <IntRangeDomain name="range" min="1"/>
       <Documentation>
          Set the number of randomly selected cells to pass through to the output.
        </Documentation>
@@ -3756,7 +3747,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">
-        <IntRangeDomain name="range" min="0"/>
       <Documentation>
         Set the seed to the random number generator. -1 means to use system time.
       </Documentation>
@@ -3799,7 +3789,6 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="10"
         panel_visibility="default">
-        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
     <Hints>

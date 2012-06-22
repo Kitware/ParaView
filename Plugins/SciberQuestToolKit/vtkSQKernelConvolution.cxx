@@ -819,6 +819,8 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
   pCerr() << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
   #endif
 
+  (void)req;
+
   typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
   vtkInformation* outInfo=outInfos->GetInformationObject(0);

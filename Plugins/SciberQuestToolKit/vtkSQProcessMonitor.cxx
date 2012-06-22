@@ -369,4 +369,6 @@ void vtkSQProcessMonitor::PrintMemoryUseStream(ostream &os)
 //----------------------------------------------------------------------------
 void vtkSQProcessMonitor::PrintSelf(ostream& os, vtkIndent indent)
 {
+  (void)os;
+  (void)indent;
 }

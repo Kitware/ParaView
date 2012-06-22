@@ -250,7 +250,9 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
   log->StartEvent("vtkSQBOVWriter::SetFileName");
   #endif
 
-  #ifndef SQTK_WITHOUT_MPI
+  #ifdef SQTK_WITHOUT_MPI
+  (void)_arg;
+  #else
   vtkDebugMacro(<< this->GetClassName() << ": setting FileName to " << (_arg?_arg:"(null)"));
   if (this->FileName == NULL && _arg == NULL) { return;}
   if (this->FileName && _arg && (!strcmp(this->FileName,_arg))) { return;}
@@ -531,6 +533,9 @@ int vtkSQBOVWriter::RequestUpdateExtent(
   pCerr() << "=====vtkSQBOVWriter::RequestUpdateExtent" << endl;
   #endif
 
+  (void)req;
+  (void)outInfos;
+
   vtkInformation *inInfo=inInfos[0]->GetInformationObject(0);
 
   // if we are writing all times we need to set the speciic
@@ -583,13 +588,17 @@ int vtkSQBOVWriter::RequestUpdateExtent(
 
 //----------------------------------------------------------------------------
 int vtkSQBOVWriter::RequestDataObject(
-      vtkInformation* /*req*/,
-      vtkInformationVector** /*inInfos*/,
-      vtkInformationVector* outInfos)
+      vtkInformation *req,
+      vtkInformationVector **inInfos,
+      vtkInformationVector *outInfos)
 {
   #if defined vtkSQBOVWriterDEBUG
   pCerr() << "=====vtkSQBOVWriter::RequestDataObject" << endl;
   #endif
+
+  (void)req;
+  (void)inInfos;
+  (void)outInfos;
 
   return 1;
 }
