@@ -1,62 +1,34 @@
-PROJECT(VTKCS)
-
-SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-
-INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServer.cmake)
-
-IF(NOT PARAVIEW_BINARY_DIR)
-  SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/VTK/Utilities")
-ENDIF(NOT PARAVIEW_BINARY_DIR)
-
-# Configure the vtkClientServer library.
-SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerConfigure.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkClientServerConfigure.h
-  @ONLY IMMEDIATE
-  )
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${VTK_INCLUDE_DIR}
-  )
-
-
-# OpenGL include directories.
-IF(APPLE)
-  IF(VTK_USE_X)
-    SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
-      ${OPENGL_INCLUDE_DIR})
-  ENDIF(VTK_USE_X)
-ELSE(APPLE)
-  SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
-    ${OPENGL_INCLUDE_DIR})
-ENDIF(APPLE)
-
-IF(VTK_USE_X)
-  # X include directories.
-  SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
-    ${CMAKE_Xlib_INCLUDE_PATH} ${CMAKE_Xutil_INCLUDE_PATH})
-ENDIF(VTK_USE_X)
-
-# Off-Screen Mesa include directory.
-IF(VTK_OPENGL_HAS_OSMESA)
-  IF(OSMESA_INCLUDE_DIR)
-    SET(PVWRAP_OPEN_GL_DIRS ${PVWRAP_OPEN_GL_DIRS}
-      ${OSMESA_INCLUDE_DIR})
-  ENDIF(OSMESA_INCLUDE_DIR)
-ENDIF(VTK_OPENGL_HAS_OSMESA)
-
-INCLUDE_DIRECTORIES(${PVWRAP_OPEN_GL_DIRS})
-
-# Build the vtkClientServer wrapping utility first.
-ADD_SUBDIRECTORY(Wrapping)
-
-CS_INITIALIZE_WRAP()
-
-# Create vtkClientServer library.
-PVVTK_ADD_LIBRARY(vtkClientServer
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set(Module_SRCS
   vtkClientServerID.cxx
   vtkClientServerID.h
   vtkClientServerInterpreter.cxx
@@ -64,55 +36,4 @@ PVVTK_ADD_LIBRARY(vtkClientServer
   vtkClientServerStream.cxx
   vtkClientServerStream.h)
 
-
-TARGET_LINK_LIBRARIES(vtkClientServer vtkCommonCore)
-
-IF(NOT PV_INSTALL_NO_DEVELOPMENT)
-  # Headers etc...
-  SET(sourceFiles
-     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerID.h"
-     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerInterpreter.h"
-     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerStream.h"
-     "${CMAKE_CURRENT_BINARY_DIR}/vtkClientServerConfigure.h")
-   
-  INSTALL(
-      FILES ${sourceFiles}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-      COMPONENT Development)
-  # CMake files
-  SET(configFiles
-      "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServer.cmake"
-      "${CMAKE_CURRENT_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake"
-      "${CMAKE_CURRENT_SOURCE_DIR}/CMake/vtkWrapClientServer.cxx.in")
-  INSTALL(
-      FILES ${configFiles}
-      DESTINATION ${PV_INSTALL_CMAKE_DIR}
-      COMPONENT Development)
-ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
-
-# Build vtkClientServer wrappers for Xdmf if it is available.
-IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-  ADD_SUBDIRECTORY(Xdmf2)
-ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-
-foreach(_vtk_module ${VTK_MODULES_ENABLED})
-  if(NOT ${_vtk_module}_EXCLUDE_FROM_WRAPPING) 
-    pv_wrap_vtk_mod_cs(${_vtk_module})
-  endif()
-endforeach()
-
-IF(PARAVIEW_USE_VISITBRIDGE)
-  ADD_SUBDIRECTORY(VisItBridge)
-ENDIF(PARAVIEW_USE_VISITBRIDGE)
-
-IF(NOT PV_INSTALL_NO_LIBRARIES)
-  INSTALL(TARGETS vtkClientServer
-    EXPORT ${PV_INSTALL_EXPORT_NAME}
-    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
-
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Testing)
-ENDIF(BUILD_TESTING)
+vtk_module_library(vtkClientServer ${Module_SRCS})

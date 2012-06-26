@@ -1,0 +1,10 @@
+vtk_module(vtkPVCommon
+  GROUPS
+    ParaView
+  DEPENDS
+    vtkCommonCore
+    vtkIOXML
+    vtkClientServer
+  TEST_DEPENDS
+    vtkTestingCore
+)

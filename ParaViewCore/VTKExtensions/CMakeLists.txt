@@ -1,22 +1,34 @@
-# PVVTKExtensions should contain classes that extend VTK. This can only depend
-# on VTK and PVCommon.
-
-PROJECT(PVVTKExtensions)
-
-INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
-
-# needed by vtkExportKit.cmake
-SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
-SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
-
-SET(KIT PVVTKExtensions)
-SET(KIT_UPCASE "PVVTKEXTENSIONS")
-IF(NOT WIN32)
-  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-ENDIF(NOT WIN32)
-
-SET (Kit_SRCS
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set(Module_SRCS
   vtkAMRDualClip.cxx
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
@@ -214,9 +226,8 @@ SET (Kit_SRCS
   vtkZlibImageCompressor.cxx
 )
 
-IF (PARAVIEW_USE_MPI)
-  SET (Kit_SRCS
-    ${Kit_SRCS}
+if (PARAVIEW_USE_MPI)
+  list(APPEND Module_SRCS
     vtkAllToNRedistributeCompositePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
     vtkBalancedRedistributePolyData.cxx
@@ -224,27 +235,16 @@ IF (PARAVIEW_USE_MPI)
     vtkWeightedRedistributePolyData.cxx
     vtkMPICompositeManager.cxx # deprecate?
     )
-  IF (PARAVIEW_USE_ICE_T)
-    SET(Kit_SRCS
-      ${Kit_SRCS}
+
+  if (PARAVIEW_USE_ICE_T)
+    list(APPEND Module_SRCS
       vtkIceTCompositePass.cxx
       vtkIceTContext.cxx)
-    INCLUDE_DIRECTORIES(${ICET_INCLUDE_DIR})
-    SET(KIT_LIBS ${KIT_LIBS} IceTCore IceTMPI IceTGL)
-  ENDIF (PARAVIEW_USE_ICE_T)
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-ENDIF (PARAVIEW_USE_MPI)
+  endif()
+endif()
 
-IF (PARAVIEW_ENABLE_QT_SUPPORT)
-  INCLUDE_DIRECTORIES(
-    ${QT_INCLUDE_DIR})
-ENDIF (PARAVIEW_ENABLE_QT_SUPPORT)
 
-IF(VTK_USE_SYSTEM_ZLIB)
-  INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
-ENDIF(VTK_USE_SYSTEM_ZLIB)
-
-SET_SOURCE_FILES_PROPERTIES(
+set_source_files_properties(
   vtkAMRDualGridHelper.cxx
   vtkCacheSizeKeeper.cxx
   vtkMaterialInterfaceCommBuffer.cxx
@@ -261,10 +261,10 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSpyPlotIStream.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
-  WRAP_EXCLUDE
-  )
+  WRAP_EXCLUDE)
 
-SET_SOURCE_FILES_PROPERTIES(
+
+set_source_files_properties(
   vtkAnimationPlayer.cxx
   vtkCacheSizeKeeper.cxx
   vtkCameraManipulatorGUIHelper.cxx
@@ -284,156 +284,4 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkUndoElement.cxx
   ABSTRACT)
 
-# The set of source files to be encoded.
-SET(glsl_files
-  vtkIceTCompositeZPassShader_fs
-  )
-
-INCLUDE_DIRECTORIES(
-  ${PVCommon_SOURCE_DIR}
-  ${PVCommon_BINARY_DIR}
-  ${PVVTKExtensions_SOURCE_DIR}
-  ${PVVTKExtensions_BINARY_DIR}
-  ${VTK_INCLUDE_DIR}
-  ${HDF5_INCLUDE_DIR}
-  ${SPCTH_INCLUDE_DIR}
-  ${XDMF_INCLUDE_DIRS}
-  )
-
-# The following was copy/paste from vtkIncludeDirectories.cmake
-# OpenGL include directories.
-IF(APPLE)
-  IF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
-    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-  ENDIF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
-ELSE(APPLE)
-  INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-ENDIF(APPLE)
-
-
-SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
-
-# Setup vtkInstantiator registration for this library's classes.
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator KitInstantiator_SRCS
-  "${Kit_SRCS}"
-  VTK_EXPORT
-  "${CMAKE_CURRENT_BINARY_DIR}" "")
-
-# load the ClientServer command
-INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
-CS_INITIALIZE_WRAP()
-INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
-
-# Wrap PVServer
-# Create ClientServer wrappers for ParaView classes.
-SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
-SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
-VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
-SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
-
-# Wrap PVServerCommon
-SET(KIT_WRAP_DEPS PVCommon ) #Parallel Hybrid Rendering VolumeRendering Widgets
-SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
-PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
-
-# Wrap for python
-IF (PARAVIEW_ENABLE_PYTHON)
-  SET(Kit_PYTHON_EXTRA_SRCS)
-  SET(KIT_PYTHON_LIBS
-    vtkPVCommonPythonD
-    vtkFiltersHybridPythonD
-    vtkInteractionWidgetsPythonD
-    vtkParallelCorePythonD
-    vtkRenderingParallelPythonD
-    vtkFiltersProgrammablePythonD
-    vtkIOEnSightPythonD
-    )
-  # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
-  SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
-  SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
-  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
-  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
-  SET(KIT_PYTHON_DEPS)
-
-  SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
-  SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-  SET(VTK_INSTALL_LIB_DIR_CM24 "${VTKPythonWrapping_INSTALL_LIB_DIR}")
-  SET(VTK_INSTALL_BIN_DIR_CM24 "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-
-  # include python wrapping from VTK
-  INCLUDE(KitCommonPythonWrapBlock)
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-
-
-# Create custom commands to encode each assembly file into a C string
-# literal in a header file.
-
-SET(glsl_h_files)
-FOREACH(file ${glsl_files})
-  SET(src ${CMAKE_CURRENT_SOURCE_DIR}/${file}.glsl)
-  SET(res ${CMAKE_CURRENT_BINARY_DIR}/${file}.cxx)
-  SET(resh ${CMAKE_CURRENT_BINARY_DIR}/${file}.h)
-  SET(glsl_h_files ${glsl_h_files} "${resh}")
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${res} ${resh}
-    DEPENDS ${src} vtkEncodeString
-    COMMAND ${VTK_ENCODESTRING_EXE}
-    ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
-    )
-  SET(Kit_SRCS ${Kit_SRCS} ${res})
-  SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)
-ENDFOREACH(file)
-
-
-# Create the library.
-PVVTK_ADD_LIBRARY(vtk${KIT}
-  ${Kit_SRCS}
-  ${KitInstantiator_SRCS}
-  )
-TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkPVCommon
-  vtkPVCommonCS
-  vtkXdmfCS
-  KWCommon
-  vtksys
-  ${KIT_LIBS}
-  ${PARAVIEW_HDF5_LIBRARIES}
-  ${SPCTH_LIBRARIES}
-  ${OPENGL_gl_LIBRARY}
-  ${PARAVIEW_ADDITIONAL_LIBRARIES}
-)
-
-foreach(_module ${VTK_MODULES_ENABLED})
-  if(NOT ${_module}_EXCLUDE_FROM_WRAPPING)
-    target_link_libraries(vtk${KIT} ${_module}CS)
-  endif()
-endforeach()
-
-IF (PARAVIEW_ENABLE_QT_SUPPORT)
-  TARGET_LINK_LIBRARIES(vtk${KIT} vtkGUISupportQt)
-ENDIF ()
-
-IF(NOT PV_INSTALL_NO_LIBRARIES)
-  SET(temp_TO_INSTALL
-    vtk${KIT})
-
-  INSTALL(TARGETS ${temp_TO_INSTALL}
-    EXPORT ${PV_INSTALL_EXPORT_NAME}
-    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
-
-# Development files install
-IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  GLOB_INSTALL_DEVELOPMENT(
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR}
-      "*.h;*.hxx;*.txx")
-ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
-
-IF (BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF (BUILD_TESTING)
+vtk_module_library(vtkPVVTKExtensions ${Module_SRCS})

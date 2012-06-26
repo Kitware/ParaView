@@ -57,7 +57,7 @@ struct vtkClientServerInterpreterErrorCallbackInfo
   int message;
 };
 
-class VTK_CLIENT_SERVER_EXPORT vtkClientServerInterpreter : public vtkObject
+class VTKCLIENTSERVER_EXPORT vtkClientServerInterpreter : public vtkObject
 {
 public:
   static vtkClientServerInterpreter* New();

@@ -22,11 +22,11 @@
 #ifndef __vtkClientServerID_h
 #define __vtkClientServerID_h
 
-#include "vtkClientServerConfigure.h" // Top-level vtkClientServer header.
+#include "vtkClientServerModule.h" // Top-level vtkClientServer header.
 #include "vtkSystemIncludes.h" // vtkTypeUInt32
 #include "vtkIOStream.h" // Needed for operator <<
 
-struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
+struct VTKCLIENTSERVER_EXPORT vtkClientServerID
 {
   vtkClientServerID() : ID(0) {}
   explicit vtkClientServerID(vtkTypeUInt32 id) : ID(id) {}
@@ -51,9 +51,9 @@ struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
   vtkTypeUInt32 ID;
 };
 
-VTK_CLIENT_SERVER_EXPORT ostream& operator<<(
+VTKCLIENTSERVER_EXPORT ostream& operator<<(
   ostream& os, const vtkClientServerID& id);
-VTK_CLIENT_SERVER_EXPORT vtkOStreamWrapper& operator<<(
+VTKCLIENTSERVER_EXPORT vtkOStreamWrapper& operator<<(
   vtkOStreamWrapper& os, const vtkClientServerID& id);
                       
 #endif

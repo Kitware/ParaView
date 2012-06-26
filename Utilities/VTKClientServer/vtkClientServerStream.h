@@ -28,7 +28,7 @@
 
 class vtkClientServerStreamInternals;
 
-class VTK_CLIENT_SERVER_EXPORT vtkClientServerStream
+class VTKCLIENTSERVER_EXPORT vtkClientServerStream
 {
 public:
   // Description:
