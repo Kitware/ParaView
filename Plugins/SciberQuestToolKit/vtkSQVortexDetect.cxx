@@ -141,6 +141,7 @@ void ComputeVorticity(
     }
 }
 
+/*
 // ****************************************************************************
 void ComputeHelicity(
       vtkAlgorithm *alg,
@@ -183,7 +184,6 @@ void ComputeHelicity(
     }
 }
 
-/*
 // *****************************************************************************
 void ComputeLambda2(
       vtkAlgorithm *alg,

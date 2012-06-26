@@ -175,6 +175,7 @@ void BinaryStream::Grow(int nBytes)
 template <typename T>
 void BinaryStream::Pack(T *val)
 {
+  (void)val;
   cerr << "Error: Packing a pointer." << endl;
 }
 

@@ -320,11 +320,9 @@ void CreateCartesianView(
   #endif
 }
 
-
-
 //*****************************************************************************
 template<typename T>
-MPI_Status WriteDataArray(
+int WriteDataArray(
         const char *fileName,          // File name to write.
         MPI_Comm comm,                 // MPI communicator handle
         MPI_Info hints,                // MPI file hints
@@ -332,7 +330,6 @@ MPI_Status WriteDataArray(
         const CartesianExtent &decomp, // region to be wrote, block extents
         T *data)                       // pointer to a buffer to write to disk.
 {
-  MPI_Status ok=0;
   #ifdef SQTK_WITHOUT_MPI
   (void)fileName;
   (void)comm;
@@ -427,7 +424,8 @@ MPI_Status WriteDataArray(
     }
 
   // Write
-  iErr=MPI_File_write_all(file,data,1,memView,&ok);
+  MPI_Status status;
+  iErr=MPI_File_write_all(file,data,1,memView,&status);
   MPI_File_close(&file);
   MPI_Type_free(&fileView);
   MPI_Type_free(&memView);
@@ -440,9 +438,8 @@ MPI_Status WriteDataArray(
     return 0;
     }
   #endif
-  return ok;
+  return 1;
 }
-
 
 /**
 NOTE: The file is a scalar, but the memory can be vector

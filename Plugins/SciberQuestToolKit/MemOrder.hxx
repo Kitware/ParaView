@@ -112,7 +112,7 @@ void SubsetReorder(
         {
         unsigned long vi=nComp*(vj+vi0+i);
         unsigned long wi=wj+i;
-        for (long c=0; c<nComp; ++c)
+        for (unsigned long c=0; c<nComp; ++c)
           {
           if (split)
             {

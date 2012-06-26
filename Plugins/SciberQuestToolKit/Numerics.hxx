@@ -376,6 +376,8 @@ bool Find(int *I, T *V, T *val)
 template<typename T, int nComp>
 bool HasNans(int *I, T *V, T *val)
 {
+  (void)val;
+
   bool has=false;
 
   int ni=I[0];
