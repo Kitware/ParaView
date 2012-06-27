@@ -136,7 +136,7 @@ int CPUConvolutionDriver::Convolution(
           float *hV=(float*)V->GetVoidPointer(0);
           Split<float>(vnijk,hV,sV);
 
-          // apply convolution 
+          // apply convolution
           for (unsigned long q=0; q<nComp; ++q)
             {
             if ((mode==CartesianExtent::DIM_MODE_2D_XY)
@@ -185,7 +185,7 @@ int CPUConvolutionDriver::Convolution(
           }
           break;
         default:
-          // TODO 
+          // TODO
           sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
           return -1;
         }

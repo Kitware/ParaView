@@ -36,7 +36,7 @@ class BOVSymetricTensorImageIterator;
 
 /// Collection of file handles for a single timestep.
 /**
-A collection of file handles to the scalar, vector, and tensor 
+A collection of file handles to the scalar, vector, and tensor
 data that together comprise this time step.
 */
 class BOVTimeStepImage
@@ -49,7 +49,7 @@ public:
       BOVMetaData *metaData);
   ~BOVTimeStepImage();
 
-  int GetNumberOfImages() const 
+  int GetNumberOfImages() const
     {
     return
       this->Scalars.size()+

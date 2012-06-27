@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -22,7 +22,7 @@ using std::endl;
 //-----------------------------------------------------------------------------
 SystemInterface *SystemInterfaceFactory::NewSystemInterface()
 {
-  // This typdef is declared in SystemType.h according to the 
+  // This typdef is declared in SystemType.h according to the
   // current system type
   return new CurrentSystemInterface;
 }

@@ -23,7 +23,7 @@ using std::endl;
 #include <complex>
 using std::complex;
 
-#include<Eigen/Eigenvalues> 
+#include<Eigen/Eigenvalues>
 using namespace Eigen;
 
 #include "Tuple.hxx"
@@ -2691,7 +2691,7 @@ void Gradient(
 // output -> patch outpu array is defined on
 // dX     -> grid spacing triple
 // V      -> vector field
-// Q      -> 
+// Q      ->
 //*****************************************************************************
 template <typename T>
 void QCriteria(

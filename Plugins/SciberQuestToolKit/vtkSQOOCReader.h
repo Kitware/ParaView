@@ -41,7 +41,7 @@ public:
   This key is used to pass the actual reader from the meta reader
   to downstream filters. The meta reader at the head of the pipeline
   initializes and sets the reader into the pipeline information
-  then down strem filters may read data as needed. The object set 
+  then down strem filters may read data as needed. The object set
   must implement the vtkSQOOCReader interface and be reader to read
   once set into the pipeline.
   */

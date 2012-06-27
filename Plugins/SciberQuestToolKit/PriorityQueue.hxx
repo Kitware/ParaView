@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -15,7 +15,7 @@ Copyright 2012 SciberQuest Inc.
 /**
 This is an index heap, indexes are ordered from comparisions
 of keys stored internally. Keys are initialized during Push()
-and can be later modified with Update. Key's must support 
+and can be later modified with Update. Key's must support
 operator< and operator=.
 */
 template <typename T>
@@ -223,7 +223,7 @@ void PriorityQueue<T>::HeapifyTopDown(unsigned int node)
     {
     unsigned int child=2*node;
 
-    // get the smaller of the two children, 
+    // get the smaller of the two children,
     // without going off the end of the heap
     if ( ((child+1)<this->NIds)
       && (this->Keys[this->Ids[child+1]]<this->Keys[this->Ids[child]]) )

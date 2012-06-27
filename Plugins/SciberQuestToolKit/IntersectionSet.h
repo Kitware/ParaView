@@ -147,7 +147,7 @@ public:
     return x+(nSurfaces+1)*y;
     }
 
-  /// Synchronize intersection sets across all processes, such that 
+  /// Synchronize intersection sets across all processes, such that
   /// all reflect the intersection set closest to this seed point.
   int AllReduce();
 

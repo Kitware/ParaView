@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -105,7 +105,7 @@ public:
   //ETX
 
   // Description:
-  // Specify a uniform integration step unit for MinimumIntegrationStep, 
+  // Specify a uniform integration step unit for MinimumIntegrationStep,
   // InitialIntegrationStep, and MaximumIntegrationStep. NOTE: The valid
   // units are LENGTH_UNIT (1) and CELL_LENGTH_UNIT (2).
   void SetStepUnit(int unit);
@@ -207,7 +207,7 @@ private:
 
   // Description:
   // Distribute the work load according to a master-slave self scheduling scheme. All
-  // seed cells must be present on all process, work is dished out by process 0 in 
+  // seed cells must be present on all process, work is dished out by process 0 in
   // contiguous blocks of cell ids.
   int IntegrateDynamic(
       int procId,
@@ -230,7 +230,7 @@ private:
 
   // Description:
   // Trace one field line from the given seed point, using the given out-of-core
-  // reader. As segments are generated they are tested using the stermination 
+  // reader. As segments are generated they are tested using the stermination
   // condition and terminated imediately. The last neighborhood read is stored
   // in the nhood parameter. It is up to the caller to delete this.
   void IntegrateOne(

@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 
@@ -53,7 +53,7 @@ public:
   virtual vtkDataArray *GetOutput();
 
   /**
-  Copy the range from the input array to the end of then 
+  Copy the range from the input array to the end of then
   output array.
   */
   virtual void Copy(IdBlock &ids);
@@ -107,7 +107,7 @@ void DataArrayCopierImpl<T>::SetInput(vtkDataArray *in)
     return;
     }
 
-  if (this->Input) 
+  if (this->Input)
     {
     this->Input->Delete();
     }

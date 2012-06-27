@@ -58,7 +58,7 @@ int SshStream::Connect(string user, string host)
     case SSH_SERVER_ERROR:
     case SSH_SERVER_FILE_NOT_FOUND:
     default:
-      cerr 
+      cerr
         << "Error:" << endl
         << ssh_get_error(this->Session) << endl
         << endl;
@@ -75,7 +75,7 @@ int SshStream::Authenticate(string user, string passwd)
   int stat=ssh_userauth_password(this->Session,user.c_str(),passwd.c_str());
   if (stat!=SSH_OK)
     {
-    cerr 
+    cerr
       << "Error:" << endl
       << "Failed to authenticate using password." << endl
       << endl;
@@ -123,7 +123,7 @@ int SshStream::CloseChannel(size_t cid)
 {
   if (cid>=this->Channel.size())
     {
-    cerr 
+    cerr
       << "Error: CloseChannel failed, no channel " << cid << "." << endl;
     return -1;
     }
@@ -132,7 +132,7 @@ int SshStream::CloseChannel(size_t cid)
     {
     channel_send_eof(this->Channel[cid]);
     channel_close(this->Channel[cid]);
-    channel_free(this->Channel[cid]);  
+    channel_free(this->Channel[cid]);
     this->Channel[cid]=0;
     }
 

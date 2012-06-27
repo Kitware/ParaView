@@ -142,7 +142,7 @@ BOVTimeStepImage::BOVTimeStepImage(
     else
     if (metaData->IsArraySymetricTensor(arrayName))
       {
-      // deduce the file name from the following convention: 
+      // deduce the file name from the following convention:
       // arrayname{xx,xy, ... ,zz}_step.ext
       ostringstream
             xxFileName,xyFileName,xzFileName,

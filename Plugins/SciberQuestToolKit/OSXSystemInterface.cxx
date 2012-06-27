@@ -42,7 +42,7 @@ Copyright 2012 SciberQuest Inc.
 //     thread_basic_info_data_t thi_data;
 //     unsigned table_size;
 //     struct task_basic_info ti;
-// 
+//
 //     error = task_for_pid(mach_task_self(), pid, &task);
 //     if (error != KERN_SUCCESS) {
 //         /* fprintf(stderr, "++ Probably you have to set suid or become root.\n"); */
@@ -71,7 +71,7 @@ Copyright 2012 SciberQuest Inc.
 //         rpd->rss = ti.resident_size;
 //         rpd->vsize = ti.virtual_size;
 //     }
-// 
+//
 //     mach_port_deallocate(mach_task_self(), task);
 //     return 0;
 // }

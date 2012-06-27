@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 
@@ -38,7 +38,7 @@ Copyright 2012 SciberQuest Inc.
 
 vtkStandardNewMacro(vtkSQTubeFilter);
 
-// Construct object with radius 0.5, radius variation turned off, the number 
+// Construct object with radius 0.5, radius variation turned off, the number
 // of sides set to 3, and radius factor of 10.
 //----------------------------------------------------------------------------
 vtkSQTubeFilter::vtkSQTubeFilter()
@@ -196,7 +196,7 @@ int vtkSQTubeFilter::RequestData(
       // This allows each different polylines to share vertices, but have
       // their normals (and hence their tubes) calculated independently
       generateNormals = 1;
-      }      
+      }
     }
 
   // If varying width, get appropriate info.
@@ -239,7 +239,7 @@ int vtkSQTubeFilter::RequestData(
   //
   this->Theta = 2.0*vtkMath::Pi() / this->NumberOfSides;
   vtkPolyLine *lineNormalGenerator = vtkPolyLine::New();
-  for (inCellId=0, inLines->InitTraversal(); 
+  for (inCellId=0, inLines->InitTraversal();
        inLines->GetNextCell(npts,pts) && !abort; inCellId++)
     {
     this->UpdateProgress((double)inCellId/numLines);
@@ -253,7 +253,7 @@ int vtkSQTubeFilter::RequestData(
 
     // If necessary calculate normals, each polyline calculates its
     // normals independently, avoiding conflicts at shared vertices.
-    if (generateNormals) 
+    if (generateNormals)
       {
       singlePolyline->Reset(); //avoid instantiation
       singlePolyline->InsertNextCell(npts,pts);
@@ -276,7 +276,7 @@ int vtkSQTubeFilter::RequestData(
       vtkWarningMacro(<< "Could not generate points!");
       continue; //skip tubing this polyline
       }
-      
+
     // Generate the strips for this polyline (including caps)
     //
     this->GenerateStrips(offset,npts,pts,inCellId,cd,outCD,newStrips);
@@ -294,7 +294,7 @@ int vtkSQTubeFilter::RequestData(
     }//for all polylines
 
   singlePolyline->Delete();
-  
+
   // reset the radius to ite orginal value if necessary
   if (this->VaryRadius == VTK_VARY_RADIUS_BY_ABSOLUTE_SCALAR)
     {
@@ -330,9 +330,9 @@ int vtkSQTubeFilter::RequestData(
 }
 
 //----------------------------------------------------------------------------
-int vtkSQTubeFilter::GeneratePoints(vtkIdType offset, 
+int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
                                   vtkIdType npts, vtkIdType *pts,
-                                  vtkPoints *inPts, vtkPoints *newPts, 
+                                  vtkPoints *inPts, vtkPoints *newPts,
                                   vtkPointData *pd, vtkPointData *outPD,
                                   vtkFloatArray *newNormals,
                                   vtkDataArray *inScalars, double range[2],
@@ -355,7 +355,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
   double normal[3];
   vtkIdType ptId=offset;
 
-  // Use "averaged" segment to create beveled effect. 
+  // Use "averaged" segment to create beveled effect.
   // Watch out for first and last points.
   //
   for (j=0; j < npts; j++)
@@ -364,7 +364,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
       {
       inPts->GetPoint(pts[0],p);
       inPts->GetPoint(pts[1],pNext);
-      for (i=0; i<3; i++) 
+      for (i=0; i<3; i++)
         {
         sNext[i] = pNext[i] - p[i];
         sPrev[i] = sNext[i];
@@ -438,7 +438,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
     vtkMath::Cross(s,n,w);
     if ( vtkMath::Normalize(w) == 0.0)
       {
-      vtkWarningMacro(<<"Bad normal s = " <<s[0]<<" "<<s[1]<<" "<< s[2] 
+      vtkWarningMacro(<<"Bad normal s = " <<s[0]<<" "<<s[1]<<" "<< s[2]
                       << " n = " << n[0] << " " << n[1] << " " << n[2]);
       return 0;
       }
@@ -449,24 +449,24 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
     // Compute a scale factor based on scalars or vectors
     if ( inScalars && this->VaryRadius == VTK_VARY_RADIUS_BY_SCALAR )
       {
-      sFactor = 1.0 + ((this->RadiusFactor - 1.0) * 
-                (inScalars->GetComponent(pts[j],0) - range[0]) 
+      sFactor = 1.0 + ((this->RadiusFactor - 1.0) *
+                (inScalars->GetComponent(pts[j],0) - range[0])
                        / (range[1]-range[0]));
       }
     else if ( inVectors && this->VaryRadius == VTK_VARY_RADIUS_BY_VECTOR )
       {
-      sFactor = 
+      sFactor =
         sqrt((double)maxSpeed/vtkMath::Norm(inVectors->GetTuple(pts[j])));
       if ( sFactor > this->RadiusFactor )
         {
         sFactor = this->RadiusFactor;
         }
       }
-    else if ( inScalars && 
+    else if ( inScalars &&
               this->VaryRadius == VTK_VARY_RADIUS_BY_ABSOLUTE_SCALAR )
       {
       sFactor = inScalars->GetComponent(pts[j],0);
-      if (sFactor < 0.0) 
+      if (sFactor < 0.0)
         {
         vtkWarningMacro(<<"Scalar value less than zero, skipping line");
         return 0;
@@ -478,9 +478,9 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
       {
       for (k=0; k < this->NumberOfSides; k++)
         {
-        for (i=0; i<3; i++) 
+        for (i=0; i<3; i++)
           {
-          normal[i] = w[i]*cos((double)k*this->Theta) + 
+          normal[i] = w[i]*cos((double)k*this->Theta) +
             nP[i]*sin((double)k*this->Theta);
           s[i] = p[i] + this->Radius * sFactor * normal[i];
           }
@@ -489,7 +489,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
         outPD->CopyData(pd,pts[j],ptId);
         ptId++;
         }//for each side
-      } 
+      }
     else
       {
       double n_left[3], n_right[3];
@@ -503,11 +503,11 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
           // polygonal appearance, as if by flat-shading around the tube,
           // while still allowing smooth (gouraud) shading along the
           // tube as it bends.
-          normal[i]  = w[i]*cos((double)(k+0.0)*this->Theta) + 
+          normal[i]  = w[i]*cos((double)(k+0.0)*this->Theta) +
             nP[i]*sin((double)(k+0.0)*this->Theta);
-          n_right[i] = w[i]*cos((double)(k-0.5)*this->Theta) + 
+          n_right[i] = w[i]*cos((double)(k-0.5)*this->Theta) +
             nP[i]*sin((double)(k-0.5)*this->Theta);
-          n_left[i]  = w[i]*cos((double)(k+0.5)*this->Theta) + 
+          n_left[i]  = w[i]*cos((double)(k+0.5)*this->Theta) +
             nP[i]*sin((double)(k+0.5)*this->Theta);
           s[i] = p[i] + this->Radius * sFactor * normal[i];
           }
@@ -521,7 +521,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
         }//for each side
       }//else separate vertices
     }//for all points in polyline
-  
+
   //Produce end points for cap. They are placed at tail end of points.
   if (this->Capping)
     {
@@ -546,7 +546,7 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
     int endOffset = offset + (npts-1)*this->NumberOfSides;
     if ( ! this->SidesShareVertices )
       {
-      endOffset = offset + 2*(npts-1)*this->NumberOfSides;      
+      endOffset = offset + 2*(npts-1)*this->NumberOfSides;
       }
     for (k=0; k < numCapSides; k+=capIncr)
       {
@@ -557,13 +557,13 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
       ptId++;
       }
     }//if capping
-  
+
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts, 
-                                   vtkIdType* vtkNotUsed(pts), 
+void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
+                                   vtkIdType* vtkNotUsed(pts),
                                    vtkIdType inCellId,
                                    vtkCellData *cd, vtkCellData *outCD,
                                    vtkCellArray *newStrips)
@@ -574,14 +574,14 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
 
   if (this->SidesShareVertices)
     {
-    for (k=this->Offset; k<(this->NumberOfSides+this->Offset); 
+    for (k=this->Offset; k<(this->NumberOfSides+this->Offset);
          k+=this->OnRatio)
       {
       i1 = k % this->NumberOfSides;
       i2 = (k+1) % this->NumberOfSides;
       outCellId = newStrips->InsertNextCell(npts*2);
       outCD->CopyData(cd,inCellId,outCellId);
-      for (i=0; i < npts; i++) 
+      for (i=0; i < npts; i++)
         {
         i3 = i*this->NumberOfSides;
         newStrips->InsertCellPoint(offset+i2+i3);
@@ -591,14 +591,14 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
     }
   else
     {
-    for (k=this->Offset; k<(this->NumberOfSides+this->Offset); 
+    for (k=this->Offset; k<(this->NumberOfSides+this->Offset);
          k+=this->OnRatio)
       {
       i1 = 2*(k % this->NumberOfSides) + 1;
       i2 = 2*((k+1) % this->NumberOfSides);
       outCellId = newStrips->InsertNextCell(npts*2);
       outCD->CopyData(cd,inCellId,outCellId);
-      for (i=0; i < npts; i++) 
+      for (i=0; i < npts; i++)
         {
         i3 = i*2*this->NumberOfSides;
         newStrips->InsertCellPoint(offset+i2+i3);
@@ -613,7 +613,7 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
     {
     vtkIdType startIdx = offset + npts*this->NumberOfSides;
     vtkIdType idx;
-    
+
     if ( ! this->SidesShareVertices )
       {
       startIdx = offset + 2*npts*this->NumberOfSides;
@@ -639,7 +639,7 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
         i1--;
         }
       }
-    
+
     //The end cap - reversed order to be consistent with normal
     startIdx += this->NumberOfSides;
     outCellId = newStrips->InsertNextCell(this->NumberOfSides);
@@ -666,8 +666,8 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
 
 //----------------------------------------------------------------------------
 void vtkSQTubeFilter::GenerateTextureCoords(vtkIdType offset,
-                                          vtkIdType npts, vtkIdType *pts, 
-                                          vtkPoints *inPts, 
+                                          vtkIdType npts, vtkIdType *pts,
+                                          vtkPoints *inPts,
                                           vtkDataArray *inScalars,
                                           vtkFloatArray *newTCoords)
 {
@@ -740,7 +740,7 @@ void vtkSQTubeFilter::GenerateTextureCoords(vtkIdType offset,
       xPrev[0]=x[0]; xPrev[1]=x[1]; xPrev[2]=x[2];
       }
     }
-  
+
   // Capping, set the endpoints as appropriate
   if ( this->Capping )
     {
@@ -773,7 +773,7 @@ vtkIdType vtkSQTubeFilter::ComputeOffset(vtkIdType offset, vtkIdType npts)
     {
     offset += 2 * this->NumberOfSides * npts; //points are duplicated
     }
-    
+
   if ( this->Capping )
     {
     offset += 2*this->NumberOfSides; //cap points are duplicated
@@ -791,7 +791,7 @@ const char *vtkSQTubeFilter::GetVaryRadiusAsString(void)
     {
     return "VaryRadiusOff";
     }
-  else if ( this->VaryRadius == VTK_VARY_RADIUS_BY_SCALAR ) 
+  else if ( this->VaryRadius == VTK_VARY_RADIUS_BY_SCALAR )
     {
     return "VaryRadiusByScalar";
     }
@@ -799,7 +799,7 @@ const char *vtkSQTubeFilter::GetVaryRadiusAsString(void)
     {
     return "VaryRadiusByAbsoluteScalar";
     }
-  else 
+  else
     {
     return "VaryRadiusByVector";
     }
@@ -814,15 +814,15 @@ const char *vtkSQTubeFilter::GetGenerateTCoordsAsString(void)
     {
     return "GenerateTCoordsOff";
     }
-  else if ( this->GenerateTCoords == VTK_TCOORDS_FROM_SCALARS ) 
+  else if ( this->GenerateTCoords == VTK_TCOORDS_FROM_SCALARS )
     {
     return "GenerateTCoordsFromScalar";
     }
-  else if ( this->GenerateTCoords == VTK_TCOORDS_FROM_LENGTH ) 
+  else if ( this->GenerateTCoords == VTK_TCOORDS_FROM_LENGTH )
     {
     return "GenerateTCoordsFromLength";
     }
-  else 
+  else
     {
     return "GenerateTCoordsFromNormalizedLength";
     }
@@ -840,15 +840,15 @@ void vtkSQTubeFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "On Ratio: " << this->OnRatio << "\n";
   os << indent << "Offset: " << this->Offset << "\n";
 
-  os << indent << "Use Default Normal: " 
+  os << indent << "Use Default Normal: "
      << (this->UseDefaultNormal ? "On\n" : "Off\n");
-  os << indent << "Sides Share Vertices: " 
+  os << indent << "Sides Share Vertices: "
      << (this->SidesShareVertices ? "On\n" : "Off\n");
   os << indent << "Default Normal: " << "( " << this->DefaultNormal[0] <<
      ", " << this->DefaultNormal[1] << ", " << this->DefaultNormal[2] <<
      " )\n";
   os << indent << "Capping: " << (this->Capping ? "On\n" : "Off\n");
-  os << indent << "Generate TCoords: " 
+  os << indent << "Generate TCoords: "
      << this->GetGenerateTCoordsAsString() << endl;
   os << indent << "Texture Length: " << this->TextureLength << endl;
 }

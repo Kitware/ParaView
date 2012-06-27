@@ -82,11 +82,11 @@ vtkSQSurfaceVectors::~vtkSQSurfaceVectors()
 //   // get the info objects
 //   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 //   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-// 
+//
 //   inInfo->Set(
 //     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
 //     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS())+1);
-// 
+//
 //   return 1;
 // }
 
@@ -108,7 +108,7 @@ int vtkSQSurfaceVectors::RequestData(
     return 1;
     }
 
-  vtkDataSet *output 
+  vtkDataSet *output
     = dynamic_cast<vtkDataSet*>(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   // sanity -- empty output
   if (output==0)
@@ -209,7 +209,7 @@ int vtkSQSurfaceVectors::RequestData(
           default:
             vtkErrorMacro(
               << "Unsuported cell type "
-              << input->GetCellType(cid) 
+              << input->GetCellType(cid)
               << ".");
             return 1;
             break;

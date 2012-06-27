@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -220,10 +220,10 @@ int vtkSQHemisphereSource::RequestInformation(
 //     if (inInfo->Has(GDAMetaDataKeys::CELL_SIZE_RE()))
 //       {
 //       double cellSizeRe;
-// 
+//
 //       inInfo->Get(GDAMetaDataKeys::CELL_SIZE_RE(),cellSizeRe);
 //       this->Radius=2.5/cellSizeRe; // sphere will have 2.5 re.
-// 
+//
 //       cerr << "Found CELL_SIZE_RE." << endl;
 //       }
 

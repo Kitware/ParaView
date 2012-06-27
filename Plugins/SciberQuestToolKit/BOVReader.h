@@ -92,7 +92,7 @@ public:
   int Close();
 
   /**
-  Set number of ghost cells to use with each sub-domain default 
+  Set number of ghost cells to use with each sub-domain default
   is 1.
   */
   int GetNumberOfGhostCells(){ return this->NGhost; }
@@ -101,7 +101,7 @@ public:
 
   /**
   Open a specific time step. This is done indepedently of the
-  read so that if running out of core only a single open is 
+  read so that if running out of core only a single open is
   requried.
   */
   BOVTimeStepImage *OpenTimeStep(int stepNo);
@@ -126,7 +126,7 @@ public:
 
 
   /**
-  Get an instance of the appropriate dataset type needed to hold the 
+  Get an instance of the appropriate dataset type needed to hold the
   data. May be one of vtkImageData, vtkRectilinearGrid, or vtkStructuredGrid.
   */
   vtkDataSet *GetDataSet();

@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -21,7 +21,7 @@ Copyright 2012 SciberQuest Inc.
 
 =========================================================================*/
 #include "vtkSQSeedPointLatice.h"
- 
+
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkMultiProcessController.h"
@@ -239,7 +239,7 @@ int vtkSQSeedPointLatice::FillInputPortInformation(
   #endif
 
 
-  // The input is optional,if present it will be used 
+  // The input is optional,if present it will be used
   // for bounds.
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),"vtkDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(),1);

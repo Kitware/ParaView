@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 
@@ -23,13 +23,13 @@ Copyright 2012 SciberQuest Inc.
 =========================================================================*/
 // .NAME vtkSQTubeFilter - filter that generates tubes around lines
 // .SECTION Description
-// vtkSQTubeFilter is a filter that generates a tube around each input line. 
+// vtkSQTubeFilter is a filter that generates a tube around each input line.
 // The tubes are made up of triangle strips and rotate around the tube with
 // the rotation of the line normals. (If no normals are present, they are
-// computed automatically.) The radius of the tube can be set to vary with 
+// computed automatically.) The radius of the tube can be set to vary with
 // scalar or vector value. If the radius varies with scalar value the radius
 // is linearly adjusted. If the radius varies with vector value, a mass
-// flux preserving variation is used. The number of sides for the tube also 
+// flux preserving variation is used. The number of sides for the tube also
 // can be specified. You can also specify which of the sides are visible. This
 // is useful for generating interesting striping effects. Other options
 // include the ability to cap the tube and generate texture coordinates.
@@ -180,7 +180,7 @@ public:
 
   // Description:
   // Control the conversion of units during the texture coordinates
-  // calculation. The TextureLength indicates what length (whether 
+  // calculation. The TextureLength indicates what length (whether
   // calculated from scalars or length) is mapped to the [0,1)
   // texture space.
   vtkSetClampMacro(TextureLength,double,0.000001,VTK_LARGE_INTEGER);
@@ -206,22 +206,22 @@ protected:
   int Offset;  //control the generation of the sides
   int GenerateTCoords; //control texture coordinate generation
   double TextureLength; //this length is mapped to [0,1) texture space
-  
+
   // Helper methods
   int GeneratePoints(vtkIdType offset, vtkIdType npts, vtkIdType *pts,
-                     vtkPoints *inPts, vtkPoints *newPts, 
+                     vtkPoints *inPts, vtkPoints *newPts,
                      vtkPointData *pd, vtkPointData *outPD,
                      vtkFloatArray *newNormals, vtkDataArray *inScalars,
-                     double range[2], vtkDataArray *inVectors, double maxNorm, 
+                     double range[2], vtkDataArray *inVectors, double maxNorm,
                      vtkDataArray *inNormals);
-  void GenerateStrips(vtkIdType offset, vtkIdType npts, vtkIdType *pts, 
+  void GenerateStrips(vtkIdType offset, vtkIdType npts, vtkIdType *pts,
                       vtkIdType inCellId, vtkCellData *cd, vtkCellData *outCD,
                       vtkCellArray *newStrips);
-  void GenerateTextureCoords(vtkIdType offset, vtkIdType npts, vtkIdType *pts, 
+  void GenerateTextureCoords(vtkIdType offset, vtkIdType npts, vtkIdType *pts,
                              vtkPoints *inPts, vtkDataArray *inScalars,
                             vtkFloatArray *newTCoords);
   vtkIdType ComputeOffset(vtkIdType offset,vtkIdType npts);
-  
+
   // Helper data members
   double Theta;
 

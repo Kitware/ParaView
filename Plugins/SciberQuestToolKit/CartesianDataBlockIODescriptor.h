@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -24,10 +24,10 @@ using std::ostream;
 
 /// Container for the MPI file and memory views
 /**
-Container for the MPI file and memory views required to 
+Container for the MPI file and memory views required to
 read in a cartesian block of data with ghost cells. Here
 the ghost cells are filled directly from disk as
-no other blocks are assumed to be in memory. The views 
+no other blocks are assumed to be in memory. The views
 are accessed via CartesianDataBlockIODescriptorIterator.
 */
 class CartesianDataBlockIODescriptor

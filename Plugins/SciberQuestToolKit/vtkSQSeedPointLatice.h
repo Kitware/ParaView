@@ -2,14 +2,14 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
 // .NAME vtkSQSeedPointLatice - create a set of points on a cartesian latice
 // .SECTION Description
 // Create a set of points on a cartesian latice, Latice spacing can be linear
-// or non-linear. The nonlinearity has the affect of making the seed points 
+// or non-linear. The nonlinearity has the affect of making the seed points
 // more dense in the center of the dataset.
 
 
@@ -50,7 +50,7 @@ public:
   // Description:
   // Set the power to use in the non-linear transform.
   // Value of 0 means no transform is applied, and grid is
-  // regular cartesian. When a power is set, the grid is 
+  // regular cartesian. When a power is set, the grid is
   // a streatched cartesian grid with higher density at the
   // center of the bounds.
   void SetTransformPower(double *tp);

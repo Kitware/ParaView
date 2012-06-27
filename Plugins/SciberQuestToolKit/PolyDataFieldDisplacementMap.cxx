@@ -234,7 +234,7 @@ int PolyDataFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 
     ++polyId;
     }
-  // correct the length of the point array, above we assumed 
+  // correct the length of the point array, above we assumed
   // that all points from each cell needed to be inserted
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);

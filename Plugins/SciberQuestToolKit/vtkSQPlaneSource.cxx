@@ -263,7 +263,7 @@ int vtkSQPlaneSource::RequestData(
 
   int ptId=0;
   map<vtkIdType,vtkIdType> idMap;
-  pair<map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert; 
+  pair<map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert;
 
   for (int cid=startId; cid<endId; ++cid)
     {
@@ -294,7 +294,7 @@ int vtkSQPlaneSource::RequestData(
         ++ptId;
         }
 
-      // convert the index to a local pt id, and add to the cell. 
+      // convert the index to a local pt id, and add to the cell.
       pIa[0]=idMapInsert.first->second;
       ++pIa;
       }
@@ -320,11 +320,11 @@ int vtkSQPlaneSource::RequestData(
   // int i, j, ii;
   // int numPts;
   // int numPolys;
-  // vtkPoints *newPoints; 
+  // vtkPoints *newPoints;
   // vtkFloatArray *newNormals;
   // vtkFloatArray *newTCoords;
   // vtkCellArray *newPolys;
-  // 
+  //
   // // Check input
   // for ( i=0; i < 3; i++ )
   //   {
@@ -335,12 +335,12 @@ int vtkSQPlaneSource::RequestData(
   //   {
   //   return 0;
   //   }
-  // 
+  //
   // // Set things up; allocate memory
   // //
   // numPts = (this->XResolution+1) * (this->YResolution+1);
   // numPolys = this->XResolution * this->YResolution;
-  // 
+  //
   // newPoints = vtkPoints::New();
   // newPoints->Allocate(numPts);
   // newNormals = vtkFloatArray::New();
@@ -349,10 +349,10 @@ int vtkSQPlaneSource::RequestData(
   // newTCoords = vtkFloatArray::New();
   // newTCoords->SetNumberOfComponents(2);
   // newTCoords->Allocate(2*numPts);
-  // 
+  //
   // newPolys = vtkCellArray::New();
   // newPolys->Allocate(newPolys->EstimateSize(numPolys,4));
-  // 
+  //
   // // Generate points and point data
   // //
   // for (numPts=0, i=0; i<(this->YResolution+1); i++)
@@ -361,18 +361,18 @@ int vtkSQPlaneSource::RequestData(
   //   for (j=0; j<(this->XResolution+1); j++)
   //     {
   //     tc[0] = static_cast<double>(j) / this->XResolution;
-  // 
+  //
   //     for ( ii=0; ii < 3; ii++)
   //       {
   //       x[ii] = this->Origin[ii] + tc[0]*v1[ii] + tc[1]*v2[ii];
   //       }
-  // 
+  //
   //     newPoints->InsertPoint(numPts,x);
   //     newTCoords->InsertTuple(numPts,tc);
   //     newNormals->InsertTuple(numPts++,this->Normal);
   //     }
   //   }
-  // 
+  //
   // // Generate polygon connectivity
   // //
   // for (i=0; i<this->YResolution; i++)
@@ -386,19 +386,19 @@ int vtkSQPlaneSource::RequestData(
   //     newPolys->InsertNextCell(4,pts);
   //     }
   //   }
-  // 
+  //
   // // Update ourselves and release memory
   // output->SetPoints(newPoints);
   // newPoints->Delete();
-  // 
+  //
   // newNormals->SetName("Normals");
   // output->GetPointData()->SetNormals(newNormals);
   // newNormals->Delete();
-  // 
+  //
   // newTCoords->SetName("TextureCoordinates");
   // output->GetPointData()->SetTCoords(newTCoords);
   // newTCoords->Delete();
-  // 
+  //
   // output->SetPolys(newPolys);
   // newPolys->Delete();
 

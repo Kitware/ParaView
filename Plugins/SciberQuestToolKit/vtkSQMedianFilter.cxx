@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -649,7 +649,7 @@ int vtkSQMedianFilter::RequestInformation(
 
   // We will work in a restricted problem domain so that we have
   // always a single layer of ghost cells available. To make it so
-  // we'll take the upstream's domain and shrink it by half the 
+  // we'll take the upstream's domain and shrink it by half the
   // kernel width.
   int nGhosts = this->KernelWidth/2;
 
@@ -1018,7 +1018,7 @@ int vtkSQMedianFilter::RequestData(
         }
         break;
       default:
-        // TODO 
+        // TODO
         sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
         return -1;
       }

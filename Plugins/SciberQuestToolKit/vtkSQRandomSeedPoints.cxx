@@ -53,7 +53,7 @@ int vtkSQRandomSeedPoints::FillInputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  // The input is optional,if present it will be used 
+  // The input is optional,if present it will be used
   // for bounds.
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),"vtkDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(),1);

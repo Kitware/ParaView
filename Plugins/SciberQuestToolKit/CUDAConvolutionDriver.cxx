@@ -378,7 +378,7 @@ int CUDAConvolutionDriver::Convolution(
       }
       break;
     default:
-      // TODO 
+      // TODO
       sqErrorMacro(cerr,"Not currently using vtkTemplateMacro");
       return -1;
     }

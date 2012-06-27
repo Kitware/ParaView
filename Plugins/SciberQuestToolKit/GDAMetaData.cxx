@@ -230,7 +230,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
   // if ( ParseValue(metaData,0,"R_MP=",r_mp)==string::npos
   //   || ParseValue(metaData,0,"R_obstacle_to_MP=",r_obs_to_mp)==string::npos)
   //   {
-  //   cerr << __LINE__ << " Warning: Parsing " << fileName 
+  //   cerr << __LINE__ << " Warning: Parsing " << fileName
   //         << " magnetopause dimension not found." << endl;
   //   this->CellSizeRe=-1.0;
   //   }

@@ -105,7 +105,7 @@ pqSQPlaneSource::pqSQPlaneSource(
   this->Form->constraintNone->click();
 
   //   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
-  //   
+  //
   //   // Connect to server side pipeline's UpdateInformation events.
   //   this->VTKConnect=vtkEventQtSlotConnect::New();
   //   this->VTKConnect->Connect(
@@ -190,7 +190,7 @@ pqSQPlaneSource::pqSQPlaneSource(
       SIGNAL(toggled(bool)),
       this, SLOT(SpacingModified()));
 
-  // These connection let PV know that we have changed, and makes the apply 
+  // These connection let PV know that we have changed, and makes the apply
   // button activated.
   QObject::connect(
       this->Form->name,

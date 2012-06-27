@@ -38,7 +38,7 @@ Copyright 2012 SciberQuest Inc.
 
 vtkStandardNewMacro(vtkSQTensorGlyph);
 
-// Construct object with scaling on and scale factor 1.0. Eigenvalues are 
+// Construct object with scaling on and scale factor 1.0. Eigenvalues are
 // extracted, glyphs are colored with input scalar data, and logarithmic
 // scaling is turned off.
 vtkSQTensorGlyph::vtkSQTensorGlyph()
@@ -128,7 +128,7 @@ int vtkSQTensorGlyph::RequestData(
   int j;
   vtkPoints *sourcePts;
   vtkDataArray *sourceNormals;
-  vtkCellArray *sourceCells, *cells;  
+  vtkCellArray *sourceCells, *cells;
   vtkPoints *newPts;
   vtkFloatArray *newScalars=NULL;
   vtkFloatArray *newNormals=NULL;
@@ -156,8 +156,8 @@ int vtkSQTensorGlyph::RequestData(
   matrix = vtkMatrix4x4::New();
 
   // set up working matrices
-  m[0] = m0; m[1] = m1; m[2] = m2; 
-  v[0] = v0; v[1] = v1; v[2] = v2; 
+  m[0] = m0; m[1] = m1; m[2] = m2;
+  v[0] = v0; v[1] = v1; v[2] = v2;
 
   vtkDebugMacro(<<"Generating tensor glyphs");
 
@@ -215,8 +215,8 @@ int vtkSQTensorGlyph::RequestData(
   // only copy scalar data through
   pd = this->GetSource()->GetPointData();
   // generate scalars if eigenvalues are chosen or if scalars exist.
-  if (this->ColorGlyphs && 
-      ((this->ColorMode == COLOR_BY_EIGENVALUES) || 
+  if (this->ColorGlyphs &&
+      ((this->ColorMode == COLOR_BY_EIGENVALUES) ||
        (inScalars && (this->ColorMode == COLOR_BY_SCALARS)) ) )
     {
     newScalars = vtkFloatArray::New();
@@ -256,7 +256,7 @@ int vtkSQTensorGlyph::RequestData(
       npts = cellPts->GetNumberOfIds();
       for (dir=0; dir < numDirs; dir++)
         {
-        // This variable may be removed, but that 
+        // This variable may be removed, but that
         // will not improve readability
         subIncr = ptIncr + dir*numSourcePts;
         for (i=0; i < npts; i++)
@@ -302,7 +302,7 @@ int vtkSQTensorGlyph::RequestData(
       for (i=0; i<3; i++)
         {
         xv[i] = tensor[i];
-        yv[i] = tensor[i+3]; 
+        yv[i] = tensor[i+3];
         zv[i] = tensor[i+6];
         }
       w[0] = vtkMath::Normalize(xv);
@@ -363,7 +363,7 @@ int vtkSQTensorGlyph::RequestData(
 
     // Now do the real work for each "direction"
 
-    for (dir=0; dir < numDirs; dir++) 
+    for (dir=0; dir < numDirs; dir++)
       {
       // cerr << "dir=" << dir << endl;
 
@@ -391,8 +391,8 @@ int vtkSQTensorGlyph::RequestData(
       matrix->Element[2][1] = yv[2];
       matrix->Element[2][2] = zv[2];
       trans->Concatenate(matrix);
-        
-      if (eigen_dir == 1) 
+
+      if (eigen_dir == 1)
         {
         trans->RotateZ(90.0);
         }
@@ -402,7 +402,7 @@ int vtkSQTensorGlyph::RequestData(
         trans->RotateY(-90.0);
         }
 
-      if (this->ThreeGlyphs) 
+      if (this->ThreeGlyphs)
         {
         trans->Scale(w[eigen_dir], this->ScaleFactor, this->ScaleFactor);
         }
@@ -418,19 +418,19 @@ int vtkSQTensorGlyph::RequestData(
         }
 
       // if the eigenvalue is negative, shift to reverse direction.
-      // The && is there to ensure that we do not change the 
-      // old behaviour of vtkSQTensorGlyphs (which only used one dir), 
+      // The && is there to ensure that we do not change the
+      // old behaviour of vtkSQTensorGlyphs (which only used one dir),
       // in case there is an oriented glyph, e.g. an arrow.
-      if (w[eigen_dir] < 0 && numDirs > 1) 
+      if (w[eigen_dir] < 0 && numDirs > 1)
         {
         trans->Translate(-this->Length, 0., 0.);
         }
 
       // multiply points (and normals if available) by resulting
       // matrix
-      trans->TransformPoints(sourcePts,newPts); 
+      trans->TransformPoints(sourcePts,newPts);
 
-      // Apply the transformation to a series of points, 
+      // Apply the transformation to a series of points,
       // and append the results to outPts.
       if ( newNormals )
         {
@@ -441,34 +441,34 @@ int vtkSQTensorGlyph::RequestData(
           {
           trans->Scale(-1.,-1.,-1.);
           }
-  
+
         trans->TransformNormals(sourceNormals,newNormals);
         }
 
         // Copy point data from source
-      if ( this->ColorGlyphs && inScalars && 
+      if ( this->ColorGlyphs && inScalars &&
            (this->ColorMode == COLOR_BY_SCALARS) )
         {
         s = inScalars->GetComponent(inPtId, 0);
-        for (i=0; i < numSourcePts; i++) 
+        for (i=0; i < numSourcePts; i++)
           {
           newScalars->InsertTuple(ptIncr+i, &s);
           }
         }
-      else if (this->ColorGlyphs && 
+      else if (this->ColorGlyphs &&
                (this->ColorMode == COLOR_BY_EIGENVALUES) )
         {
-        // If ThreeGlyphs is false we use the first (largest) 
+        // If ThreeGlyphs is false we use the first (largest)
         // eigenvalue as scalar.
         s = w[eigen_dir];
-        for (i=0; i < numSourcePts; i++) 
+        for (i=0; i < numSourcePts; i++)
           {
           newScalars->InsertTuple(ptIncr+i, &s);
           }
         }
       else
         {
-        for (i=0; i < numSourcePts; i++) 
+        for (i=0; i < numSourcePts; i++)
           {
           outPD->CopyData(pd,i,ptIncr+i);
           }

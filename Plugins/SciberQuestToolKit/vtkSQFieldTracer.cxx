@@ -854,7 +854,7 @@ int vtkSQFieldTracer::RequestData(
     #if vtkSQFieldTracerDEBUG>1
     pCerr() << "Static distribution assumed." << endl;
     #endif
-    // This assumes that seed source is distrubuted such that each 
+    // This assumes that seed source is distrubuted such that each
     // process has a unique portion of the work.
     this->IntegrateStatic(
           source->GetNumberOfCells(),
@@ -1023,7 +1023,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
         }
       }
     }
-  // Work processes receive chunks of seed cell ids and 
+  // Work processes receive chunks of seed cell ids and
   // integrate.
   else
     {
@@ -1303,7 +1303,7 @@ void vtkSQFieldTracer::IntegrateOne(
           error);
       interp->SetNormalizeVector(false);
 
-      // integrator errors, 1=out of bounds, 2=uninitialized, 
+      // integrator errors, 1=out of bounds, 2=uninitialized,
       // 3=unexepcted val. Have to handle out of bounds because
       // in some cases p1 is not updated which leads to incorrect
       // classification as a field null.

@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -101,7 +101,7 @@ pqSQHemisphereSource::pqSQHemisphereSource(
   QObject::connect(this->Form->save,SIGNAL(clicked()),this,SLOT(saveConfiguration()));
   QObject::connect(this->Form->restore,SIGNAL(clicked()),this,SLOT(loadConfiguration()));
 
-  // These connection let PV know that we have changed, and makes the apply 
+  // These connection let PV know that we have changed, and makes the apply
   // button activated.
   QObject::connect(
       this->Form->c_x,
@@ -470,11 +470,11 @@ void pqSQHemisphereSource::reset()
 //       vtkCommand::UpdateInformationEvent,
 //       this, SLOT(UpdateInformationEvent()));
 //   // Get our initial state from the server side. In server side RequestInformation
-//   // the database view is encoded in vtkInformationObject. We are relying on the 
+//   // the database view is encoded in vtkInformationObject. We are relying on the
 //   // fact that there is a pending event waiting for us.
 //   this->UpdateInformationEvent();
 
-// 
+//
 //   // These connection let PV know that we have changed, and makes the apply button
 //   // is activated.
 //   QObject::connect(

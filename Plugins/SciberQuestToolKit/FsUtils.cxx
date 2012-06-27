@@ -257,7 +257,7 @@ int GetSeriesIds(const char *path, const char *prefix, vector<int> &ids)
 
 
 // Returns the path not including the file name and not
-// including the final PATH_SEP. If PATH_SEP isn't found 
+// including the final PATH_SEP. If PATH_SEP isn't found
 // then ".PATH_SEP" is returned.
 //*****************************************************************************
 string StripFileNameFromPath(const string fileName)

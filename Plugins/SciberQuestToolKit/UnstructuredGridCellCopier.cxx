@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 
@@ -220,7 +220,7 @@ int UnstructuredGridCellCopier::Copy(IdBlock &SourceIds)
       }
     }
 
-  // correct the length of the point array, above we assumed 
+  // correct the length of the point array, above we assumed
   // that all points from each cell needed to be inserted
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);

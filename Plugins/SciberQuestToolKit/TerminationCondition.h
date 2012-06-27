@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -29,7 +29,7 @@ public:
 
   /**
   Determine if the segment p0->p1 intersects a periodic boundary.
-  If so the bc is applied and the face id (1-6) is returned. 
+  If so the bc is applied and the face id (1-6) is returned.
   Otherwise return 0.
   */
   int ApplyPeriodicBC(double p0[3], double p1[3]);
@@ -118,8 +118,8 @@ public:
   Return the indentifier for the special termination cases.
   */
   int GetProblemDomainSurfaceId(){ return 0; }
-  int GetFieldNullId(){ return this->TerminationSurfaces.size()+1; }
-  int GetShortIntegrationId(){ return this->TerminationSurfaces.size()+2; }
+  int GetFieldNullId(){ return (int)this->TerminationSurfaces.size()+1; }
+  int GetShortIntegrationId(){ return (int)this->TerminationSurfaces.size()+2; }
 
   /**
   Eliminate unused colors from the the lookup table and send
@@ -176,7 +176,7 @@ int TerminationCondition::OutsideProblemDomain(const double p0[3], double p1[3])
   // be inside. The caller will have previously applied point test.
   if (this->ProblemDomain.Outside(p1))
     {
-    // clip segment p0->p1 at one of the six faces of 
+    // clip segment p0->p1 at one of the six faces of
     // the domain bounds.
     double v[3]={
         p1[0]-p0[0],

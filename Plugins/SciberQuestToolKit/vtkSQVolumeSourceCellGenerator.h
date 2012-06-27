@@ -2,7 +2,7 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
@@ -31,7 +31,7 @@ public:
     }
 
   /**
-  Return the cell type of the cell at id. 
+  Return the cell type of the cell at id.
   */
   virtual int GetCellType(vtkIdType){ return VTK_HEXAHEDRON; }
 
@@ -50,7 +50,7 @@ public:
 
   /**
   Copy the point's indexes into the provided bufffer,
-  buffer is expected to be large enough. Return the 
+  buffer is expected to be large enough. Return the
   number of points coppied. The index is unique across
   all processes but is not the same as the point id
   in a VTK dataset.

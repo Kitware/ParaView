@@ -2,14 +2,14 @@
    ____    _ __           ____               __    ____
   / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
  _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
-/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_) 
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
 */
 // .NAME vtkSQRandomSeedPoints - create a random cloud of points
 // .SECTION Description
-// vtkSQRandomSeedPoints is a source object that creates a user-specified number 
-// of points within a specified radius about a specified center point. 
+// vtkSQRandomSeedPoints is a source object that creates a user-specified number
+// of points within a specified radius about a specified center point.
 // By default location of the points is random within the sphere. It is
 // also possible to generate random points only on the surface of the
 // sphere.
