@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStringVectorPropertyWidget.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -154,6 +155,46 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     chooser->setServer(smm->findServer(smProxy->GetSession()));
 
     vbox->addWidget(chooser);
+    }
+  else if(vtkSMArrayListDomain *ald = vtkSMArrayListDomain::SafeDownCast(domain))
+    {
+    if(smProperty->GetRepeatable())
+      {
+      // repeatable array list domains get a tree widget
+      // listing each array name with a check box
+      pqExodusIIVariableSelectionWidget* selectorWidget =
+        new pqExodusIIVariableSelectionWidget(this);
+      selectorWidget->setObjectName("ArraySelectionWidget");
+      selectorWidget->setRootIsDecorated(false);
+      selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+      this->addPropertyLink(
+        selectorWidget, smProxy->GetPropertyName(smProperty),
+        SIGNAL(widgetModified()), smProperty);
+
+      // hide widget label
+      this->setShowLabel(false);
+
+      vbox->addWidget(selectorWidget);
+      }
+    else
+      {
+      // non-repeatable array list domains get a combo box
+      // listing each array name
+      QComboBox *comboBox = new QComboBox(this);
+      comboBox->setObjectName("ComboBox");
+
+      for(unsigned int i = 0; i < ald->GetNumberOfStrings(); i++)
+        {
+        comboBox->addItem(ald->GetString(i));
+        }
+
+      this->addPropertyLink(comboBox,
+                            "currentText",
+                            SIGNAL(currentIndexChanged(QString)),
+                            ivp);
+
+      vbox->addWidget(comboBox);
+      }
     }
   else if(vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(domain))
     {
