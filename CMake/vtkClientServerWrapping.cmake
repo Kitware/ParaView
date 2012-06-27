@@ -1,12 +1,8 @@
 #
 #
 #
-INCLUDE (${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cmake)
+include (vtkWrapClientServer)
 #------------------------------------------------------------------------------
-MACRO(CS_INITIALIZE_WRAP)
-  SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
-ENDMACRO(CS_INITIALIZE_WRAP)
-
 include(vtkModuleAPI)
 
 macro(pv_wrap_vtk_mod_cs module)
