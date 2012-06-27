@@ -263,6 +263,7 @@ else()
     ParaViewCore/Common
     ParaViewCore/VTKExtensions
     ParaViewCore/ClientServerCore
+    ParaViewCore/ServerImplementation
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs

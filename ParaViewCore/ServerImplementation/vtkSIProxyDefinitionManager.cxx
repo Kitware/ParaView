@@ -46,7 +46,7 @@
 #include <assert.h>
 
 // this file must be included after vtkPVConfig etc. are included.
-#include "vtkSMGeneratedModules.h"
+// #include "vtkSMGeneratedModules.h"
 
 //****************************************************************************/
 //                    Internal Classes and typedefs
@@ -457,7 +457,7 @@ vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
   this->InternalsFlatten = new vtkInternals;
 
   // Load the generated modules
-# include "vtkParaViewIncludeModulesToSMApplication.h"
+// # include "vtkParaViewIncludeModulesToSMApplication.h"
 
   // Now register with the plugin tracker, so that when new plugins are loaded,
   // we parse the XML if provided and automatically add it to the proxy
