@@ -561,7 +561,7 @@ int BOVSpaceTimeInterpolator::Interpolate(
 
         switch(inArray->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             {
             VTK_TT *V0=(VTK_TT*)daV0->GetVoidPointer(0);
             VTK_TT *V1=(VTK_TT*)daV1->GetVoidPointer(0);
@@ -594,6 +594,9 @@ int BOVSpaceTimeInterpolator::Interpolate(
               }
             }
             );
+
+          default:
+            sqErrorMacro(cerr,"Unsupprted numeric type " << inArray->GetClassName()):
           }
         }
       }
@@ -624,7 +627,7 @@ int BOVSpaceTimeInterpolator::Interpolate(
 
         switch(inArray->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             {
             VTK_TT *V0=(VTK_TT*)daV0->GetVoidPointer(0);
             VTK_TT *V1=(VTK_TT*)daV1->GetVoidPointer(0);
@@ -672,6 +675,9 @@ int BOVSpaceTimeInterpolator::Interpolate(
               }
             }
             );
+
+          default:
+            sqErrorMacro(cerr,"Unsupprted numeric type " << inArray->GetClassName()):
           }
         }
       }

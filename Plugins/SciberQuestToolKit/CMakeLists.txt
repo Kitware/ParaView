@@ -111,7 +111,6 @@ set(SM_CXX_SOURCES
   vtkSQTubeFilter.cxx
   vtkSQVolumeSource.cxx
   vtkSQVortexFilter.cxx
-  vtkSQVortexDetect.cxx
   )
 
 if (APPLE)

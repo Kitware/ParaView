@@ -628,7 +628,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Helicity<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -636,6 +636,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)H->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute helicity on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::Helicity");
@@ -659,7 +663,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           NormalizedHelicity<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -667,6 +671,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)HN->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute normalized helicity on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
@@ -690,7 +698,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           QCriteria<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -698,6 +706,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)Q->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute Q on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::Q");
@@ -721,7 +733,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Lambda<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -729,6 +741,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)L->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute lambda-1,2,3 on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::Lambda123");
@@ -752,7 +768,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Lambda2<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -760,6 +776,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)L2->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute lambda-2 on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::Lambda2");
@@ -783,7 +803,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Divergence<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -791,6 +811,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)D->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute divergence on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::Divergence");
@@ -879,7 +903,7 @@ int vtkSQVortexFilter::RequestData(
 
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Gradient<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -896,6 +920,10 @@ int vtkSQVortexFilter::RequestData(
               (VTK_TT*)Gzy->GetVoidPointer(0),
               (VTK_TT*)Gzz->GetVoidPointer(0));
           );
+        default:
+          vtkErrorMacro(
+            << "Cannot compute gradient on type "
+            << V->GetClassName());
         }
 
       if (this->SplitComponents)
@@ -969,7 +997,7 @@ int vtkSQVortexFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           EigenvalueDiagnostic<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -977,6 +1005,10 @@ int vtkSQVortexFilter::RequestData(
               dX,
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)D->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute eigenvalue diagnostic on type "
+            << V->GetClassName());
         }
       #if defined vtkSQVortexFilterTIME
       log->EndEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
@@ -1082,7 +1114,7 @@ int vtkSQVortexFilter::RequestData(
 
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
 
           Gradient<VTK_TT>(
               inputExt.GetData(),
@@ -1128,6 +1160,10 @@ int vtkSQVortexFilter::RequestData(
               (VTK_TT*)V->GetVoidPointer(0),
               (VTK_TT*)S->GetVoidPointer(0));
           );
+        default:
+          vtkErrorMacro(
+            << "Cannot compute gradient diagnostic on type "
+            << V->GetClassName());
         }
       W->Delete();
       Gxx->Delete();
@@ -1168,12 +1204,16 @@ int vtkSQVortexFilter::RequestData(
         mda->Delete();
         switch(V->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             Magnitude<VTK_TT>(
                 daNt,
                 daNc,
                 (VTK_TT*)da->GetVoidPointer(0),
                 (VTK_TT*)mda->GetVoidPointer(0)));
+        default:
+          vtkErrorMacro(
+            << "Cannot compute magnitude on type "
+            << V->GetClassName());
           }
         }
       #if defined vtkSQVortexFilterTIME
@@ -1187,11 +1227,6 @@ int vtkSQVortexFilter::RequestData(
     {
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
-
-
-
-
-
 
   #if defined vtkSQVortexFilterTIME
   log->EndEvent("vtkSQVortexFilter::RequestData");

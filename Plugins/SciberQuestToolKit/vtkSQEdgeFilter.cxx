@@ -475,7 +475,5 @@ void vtkSQEdgeFilter::PrintSelf(ostream& os, vtkIndent indent)
   #endif
 
   this->Superclass::PrintSelf(os,indent);
-
   // TODO
-
 }

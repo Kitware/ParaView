@@ -2595,7 +2595,7 @@ Copyright 2012 SciberQuest Inc.
   <!-- End vtkSQEdgeFilter -->
   </SourceProxy>
 
-  <!-- ==================================================================== -->
+  <!-- ====================================================================
   <SourceProxy
     name="vtkSQVortexDetect"
     class="vtkSQVortexDetect"
@@ -2800,9 +2800,8 @@ Copyright 2012 SciberQuest Inc.
       <View type="RenderView"/>
     </Hints>
 
-  <!-- End vtkSQVortexDetect -->
   </SourceProxy>
-
+  End vtkSQVortexDetect -->
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -3100,11 +3099,11 @@ Copyright 2012 SciberQuest Inc.
          name="NoiseThreshold"
          command="SetNoiseThreshold"
          number_of_elements="1"
-         default_values="-1.0e-4"
+         default_values="1.0e-4"
          panel_visibility="default">
         <Documentation>
          This controls the correction of negative descriminant in the computation.
-         eg: if (NoiseThreshold less than value less than 0) then value=0.
+         eg: if (-NoiseThreshold less than value less than 0) then value=0.
         </Documentation>
       </DoubleVectorProperty>
 

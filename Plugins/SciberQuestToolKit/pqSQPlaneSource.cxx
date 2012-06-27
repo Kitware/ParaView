@@ -782,7 +782,7 @@ int pqSQPlaneSource::CalculateNormal(double *n)
   v2[2]=p2[2]-o[2];
 
   vtkMath::Cross(v1,v2,n);
-  int ok=vtkMath::Normalize(n);
+  int ok=(int)vtkMath::Normalize(n);
   if (!ok)
     {
     this->Form->coordStatus->setText("Error");
