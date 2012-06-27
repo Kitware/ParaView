@@ -13,3 +13,6 @@
 [submodule "Utilities/VisItBridge"]
 	path = Utilities/VisItBridge
 	url = git://paraview.org/VisItBridge.git
+[submodule "ThirdParty/IceT/vtkicet"]
+	path = ThirdParty/IceT/vtkicet
+	url = git://paraview.org/IceT.git
