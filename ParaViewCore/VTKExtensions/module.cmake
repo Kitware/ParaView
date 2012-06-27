@@ -3,13 +3,15 @@ if (PARAVIEW_USE_MPI)
   list(APPEND _dependencies
     vtkFiltersParallelImaging
     vtkFiltersParallelMPI
-    vtkFiltersParallelTracers
+#    vtkFiltersParallelTracers
     vtkIOMPIImage
     vtkIOParallelNetCDF
     vtkParallelMPI
     )
 
   if (PARAVIEW_USE_ICE_T)
+    list(APPEND _dependencies
+      vtkicet)
   endif()
 endif()
 
@@ -33,4 +35,7 @@ vtk_module(vtkPVVTKExtensions
     vtkRenderingParallel
     vtkViewsContext2D
     ${_dependencies}
+
+  COMPILE_DEPENDS
+    vtkUtilitiesEncodeString
 )

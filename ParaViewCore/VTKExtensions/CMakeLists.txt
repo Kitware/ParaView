@@ -243,45 +243,65 @@ if (PARAVIEW_USE_MPI)
   endif()
 endif()
 
+set_source_files_properties(
+  vtkAMRDualGridHelper
+  vtkCacheSizeKeeper
+  vtkMaterialInterfaceCommBuffer
+  vtkMaterialInterfaceIdList
+  vtkMaterialInterfacePieceLoading
+  vtkMaterialInterfacePieceTransaction
+  vtkMaterialInterfacePieceTransactionMatrix
+  vtkMaterialInterfaceProcessLoading
+  vtkMaterialInterfaceProcessRing
+  vtkMaterialInterfaceToProcMap
+  vtkPVPlotTime
+  vtkSpyPlotBlock
+  vtkSpyPlotBlockIterator
+  vtkSpyPlotIStream
+  vtkSpyPlotReaderMap
+  vtkSpyPlotUniReader
+  WRAP_EXCLUDE
+  )
 
 set_source_files_properties(
-  vtkAMRDualGridHelper.cxx
-  vtkCacheSizeKeeper.cxx
-  vtkMaterialInterfaceCommBuffer.cxx
-  vtkMaterialInterfaceIdList.cxx
-  vtkMaterialInterfacePieceLoading.cxx
-  vtkMaterialInterfacePieceTransaction.cxx
-  vtkMaterialInterfacePieceTransactionMatrix.cxx
-  vtkMaterialInterfaceProcessLoading.cxx
-  vtkMaterialInterfaceProcessRing.cxx
-  vtkMaterialInterfaceToProcMap.cxx
-  vtkPVPlotTime.cxx
-  vtkSpyPlotBlock.cxx
-  vtkSpyPlotBlockIterator.cxx
-  vtkSpyPlotIStream.cxx
-  vtkSpyPlotReaderMap.cxx
-  vtkSpyPlotUniReader.cxx
-  WRAP_EXCLUDE)
-
-
-set_source_files_properties(
-  vtkAnimationPlayer.cxx
-  vtkCacheSizeKeeper.cxx
-  vtkCameraManipulatorGUIHelper.cxx
-  vtkCellIntegrator.cxx
-  vtkImageCompressor.cxx
-  vtkPEnSightReader.cxx
-  vtkPVAnimationCue.cxx
-  vtkPVCueManipulator.cxx
-  vtkPVJoystickFly.cxx
-  vtkPVKeyFrameAnimationCue.cxx
-  vtkPVRenderViewProxy.cxx
-  vtkSciVizStatistics.cxx
-  vtkTransferFunctionEditorRepresentation.cxx
-  vtkTransferFunctionEditorRepresentation1D.cxx
-  vtkTransferFunctionEditorWidget.cxx
-  vtkTransferFunctionEditorWidget1D.cxx
-  vtkUndoElement.cxx
+  vtkAnimationPlayer
+  vtkCacheSizeKeeper
+  vtkCameraManipulatorGUIHelper
+  vtkCellIntegrator
+  vtkImageCompressor
+  vtkPEnSightReader
+  vtkPVAnimationCue
+  vtkPVCueManipulator
+  vtkPVJoystickFly
+  vtkPVKeyFrameAnimationCue
+  vtkPVRenderViewProxy
+  vtkSciVizStatistics
+  vtkTransferFunctionEditorRepresentation
+  vtkTransferFunctionEditorRepresentation1D
+  vtkTransferFunctionEditorWidget
+  vtkTransferFunctionEditorWidget1D
+  vtkUndoElement
   ABSTRACT)
+
+
+#---------------------------------------------------------
+# Encode glsl files.
+foreach (file vtkIceTCompositeZPassShader_fs.glsl)
+  get_filename_component(file_we ${file} NAME_WE)
+  set(src  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+  set(res  ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.cxx)
+  set(resh ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.h)
+  list(APPEND shader_h_files ${resh})
+  add_custom_command(
+    OUTPUT ${res} ${resh}
+    DEPENDS ${src} vtkEncodeString
+    COMMAND vtkEncodeString
+    ARGS ${res} ${src} ${file_we} --build-header
+      VTKPVVTKEXTENSIONS_EXPORT vtkPVVTKExtensionsModule.h
+    )
+  list(APPEND Module_SRCS ${res})
+  set_source_files_properties(${file_we} WRAP_EXCLUDE)
+endforeach()
+#---------------------------------------------------------
 
 vtk_module_library(vtkPVVTKExtensions ${Module_SRCS})

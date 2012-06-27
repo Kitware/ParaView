@@ -38,8 +38,7 @@
 
 #include <assert.h>
 #include "vtkgl.h"
-#include <IceT.h>
-#include <IceTGL.h>
+#include "vtk_icet.h"
 
 extern const char *vtkIceTCompositeZPassShader_fs;
 

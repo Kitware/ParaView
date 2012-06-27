@@ -114,6 +114,9 @@ option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
   "Use MPI synchronous-send commands for communication" OFF
   "PARAVIEW_USE_MPI" OFF)
+cmake_dependent_option(PARAVIEW_USE_ICE_T
+  "Enable IceT (needed for parallel rendering)" ON
+  "PARAVIEW_USE_MPI" OFF)
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
 # Set the export name.
@@ -246,22 +249,30 @@ else()
   # need a better mechanism.
   set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Disbale Python Threads support" FORCE)
 
-  # FIXME: I'm not convinced we need to merge the VTK/ParaView targets.
-  #set(VTK_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+  set(VTK_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 
   # turn some module ON to avoid warnings from VTK.
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaView ON CACHE INTERNAL "" FORCE)
+  set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE INTERNAL "" FORCE)
 
-  vtk_add_to_module_search_path(
-    "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer"
-    "${ParaView_BINARY_DIR}/Utilities/VTKClientServer")
-  vtk_add_to_module_search_path(
-    "${ParaView_SOURCE_DIR}/ParaViewCore/Common"
-    "${ParaView_BINARY_DIR}/ParaViewCore/Common")
-  vtk_add_to_module_search_path(
-    "${ParaView_SOURCE_DIR}/ParaViewCore/VTKExtensions"
-    "${ParaView_BINARY_DIR}/ParaViewCore/VTKExtensions")
+  set (ParaViewModulesDirs
+    Utilities/VTKClientServer
+    ParaViewCore/PythonSupport
+    ParaViewCore/Common
+    ParaViewCore/VTKExtensions
+    ParaViewCore/ClientServerCore
+  )
+  if (PARAVIEW_USE_ICE_T)
+    list(APPEND ParaViewModulesDirs
+      ThirdParty/IceT)
+  endif()
+
+  foreach(dir ${ParaViewModulesDirs})
+    vtk_add_to_module_search_path(
+    "${ParaView_SOURCE_DIR}/${dir}"
+    "${ParaView_BINARY_DIR}/${dir}")
+  endforeach()
 
   # include VTK
   add_subdirectory(VTK)

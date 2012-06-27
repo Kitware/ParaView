@@ -30,7 +30,6 @@
 #==========================================================================
 set(Module_SRCS
   vtkClientServerInterpreterInitializer.cxx
-  vtkClientServerInterpreterInitializer.h
   vtkCommandOptions.cxx
   vtkCommandOptions.h
   vtkCommandOptionsXMLParser.cxx
@@ -46,8 +45,11 @@ set(Module_SRCS
 )
 
 set_source_files_properties(
-  vtkClientServerInterpreterInitializer.cxx
-  WRAP_EXCLUDE
-  )
+  vtkClientServerInterpreterInitializer
+  WRAP_EXCLUDE)
+
+set_source_files_properties(
+  vtkClientServerInterpreterInitializer
+  ABSTRACT)
 
 vtk_module_library(vtkPVCommon ${Module_SRCS})

@@ -1,24 +1,34 @@
-# PVClientServerCore contains classes essential for client-server mechanisms in
-# ParaView.
-# This also includes additional extensions to VTK that depend on ProcessModule
-# or sessions.
-
-PROJECT(PVClientServerCore)
-
-INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
-
-# needed by vtkExportKit.cmake
-SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
-SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
-
-SET(KIT PVClientServerCore)
-SET(KIT_UPCASE "PVCLIENTSERVERCORE")
-IF(NOT WIN32)
-  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-ENDIF(NOT WIN32)
-
-SET (Kit_SRCS
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set (Module_SRCS
   vtk3DWidgetRepresentation.cxx
   vtkAMRVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
@@ -120,26 +130,8 @@ SET (Kit_SRCS
   vtkXYChartRepresentation.cxx
 )
 
-IF (PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI)
-  SET (Kit_SRCS
-    ${Kit_SRCS}
-    vtkIceTSynchronizedRenderers.cxx)
-  INCLUDE_DIRECTORIES(${ICET_INCLUDE_DIR})
-  SET(KIT_LIBS ${KIT_LIBS} IceTCore IceTMPI IceTGL)
-
-  # The following was copy/paste from vtkIncludeDirectories.cmake
-  # OpenGL include directories.
-  IF(APPLE)
-    IF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
-      INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-    ENDIF(VTK_USE_X OR VTK_OPENGL_HAS_OSMESA)
-  ELSE(APPLE)
-    INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
-  ENDIF(APPLE)
-ENDIF (PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI)
-
-IF(PARAVIEW_ENABLE_PYTHON)
-  SET(Kit_SRCS ${Kit_SRCS}
+if (PARAVIEW_ENABLE_PYTHON)
+  list(APPEND Module_SRCS
     vtkAnnotateGlobalDataFilter.cxx
     vtkPythonAnimationCue.cxx
     vtkPythonCalculator.cxx
@@ -147,165 +139,47 @@ IF(PARAVIEW_ENABLE_PYTHON)
     vtkPythonExtractSelection.cxx
     vtkPythonAnnotationFilter.cxx
     )
-  SET (KIT_LIBS ${KIT_LIBS} ${PYTHON_LIBRARIES} vtkPVPythonInterpretor)
-  INCLUDE_DIRECTORIES(
-    ${PYTHON_INCLUDE_PATH}
-    ${VTKPythonWrapping_SOURCE_DIR}/Executable)
-ENDIF(PARAVIEW_ENABLE_PYTHON)
+endif()
 
+if (PARAVIEW_USE_ICE_T)
+  list(APPEND Module_SRCS
+    vtkIceTSynchronizedRenderers.cxx)
+endif()
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkProcessModuleAutoMPI.cxx
-  vtkPVOptionsXMLParser.cxx
-  vtkPVPlugin.cxx
-  vtkPVServerOptions.cxx
-  vtkPVServerManagerPluginInterface.cxx
-  vtkPVPythonPluginInterface.cxx
+if (PARAVIEW_USE_MPI)
+  list(APPEND Module_SRCS
+    vtkPVMPICommunicator.cxx)
+  set_source_files_properties(
+    vtkPVMPICommunicator
+    WRAP_EXCLUDE)
+
+endif()
+
+set_source_files_properties(
+  vtkProcessModuleAutoMPI
+  vtkPVOptionsXMLParser
+  vtkPVPlugin
+  vtkPVPythonPluginInterface
+  vtkPVServerManagerPluginInterface
+  vtkPVServerOptions
 
   WRAP_EXCLUDE
   )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkNetworkAccessManager.cxx
-  vtkPVContextView.cxx
-  vtkPVDataRepresentation.cxx
-  vtkPVInformation.cxx
-  vtkPVPlugin.cxx
-  vtkPVPluginTracker.cxx
-  vtkPVPythonPluginInterface.cxx
-  vtkPVServerManagerPluginInterface.cxx
-  vtkPVSession.cxx
-  vtkPVSynchronizedRenderWindows.cxx
-  vtkPVView.cxx
-  vtkSession.cxx
-  vtkTileDisplayHelper.cxx
+set_source_files_properties(
+  vtkNetworkAccessManager
+  vtkPVContextView
+  vtkPVDataRepresentation
+  vtkPVInformation
+  vtkPVPlugin
+  vtkPVPluginTracker
+  vtkPVPythonPluginInterface
+  vtkPVServerManagerPluginInterface
+  vtkPVSession
+  vtkPVSynchronizedRenderWindows
+  vtkPVView
+  vtkSession
+  vtkTileDisplayHelper
   ABSTRACT)
 
-INCLUDE_DIRECTORIES(
-  ${PVCommon_SOURCE_DIR}
-  ${PVCommon_BINARY_DIR}
-  ${PVVTKExtensions_SOURCE_DIR}
-  ${PVVTKExtensions_BINARY_DIR}
-  ${PVClientServerCore_SOURCE_DIR}
-  ${PVClientServerCore_BINARY_DIR}
-  ${VTK_INCLUDE_DIR}
-  ${VTK_ZLIB_INCLUDE_DIRS}
-  )
-
-IF (PARAVIEW_USE_MPI)
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-  SET (Kit_SRCS ${Kit_SRCS} vtkPVMPICommunicator.cxx)
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkPVMPICommunicator.cxx
-    WRAP_EXCLUDE)
-  IF (MPI_LIBRARY)
-    SET(KIT_LIBS ${KIT_LIBS} "${MPI_LIBRARY}")
-  ELSE (MPI_LIBRARY)
-    MESSAGE("Could not find the required MPI libraries")
-  ENDIF (MPI_LIBRARY)
-  IF (MPI_EXTRA_LIBRARY)
-    SET(KIT_LIBS ${KIT_LIBS} "${MPI_EXTRA_LIBRARY}")
-  ENDIF (MPI_EXTRA_LIBRARY)
-ENDIF (PARAVIEW_USE_MPI)
-
-# for vtkPVFileInformation
-IF(WIN32)
-  SET(KIT_LIBS ${KIT_LIBS} mpr)
-ENDIF(WIN32)
-IF(MINGW)
-  SET(KIT_LIBS ${KIT_LIBS} uuid ole32)
-ENDIF(MINGW)
-IF(APPLE)
-  SET(KIT_LIBS ${KIT_LIBS} "-framework CoreServices")
-ENDIF(APPLE)
-
-SET(VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
-
-# Setup vtkInstantiator registration for this library's classes.
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator KitInstantiator_SRCS
-  "${Kit_SRCS}"
-  VTK_EXPORT
-  "${CMAKE_CURRENT_BINARY_DIR}" "")
-
-# load the ClientServer command
-INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
-CS_INITIALIZE_WRAP()
-INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
-
-# Wrap PVServer
-# Create ClientServer wrappers for ParaView classes.
-SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
-SET(VTK_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-INCLUDE(${ParaView_CMAKE_DIR}/VTKMono/vtkExportKit.cmake)
-VTK_EXPORT_KIT("${KIT}" "${KIT_UPCASE}" "${Kit_SRCS}")
-SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
-
-# Wrap PVServerCommon
-SET(KIT_WRAP_DEPS PVVTKExtensions)
-SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
-PV_WRAP_VTK_CS("${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
-
-# Wrap for python
-IF (PARAVIEW_ENABLE_PYTHON)
-  SET(Kit_PYTHON_EXTRA_SRCS)
-  SET(KIT_PYTHON_LIBS
-    vtkViewsCorePythonD
-    vtkPVVTKExtensionsPythonD
-    )
-  # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
-  SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
-  SET(VTK_WRAP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
-  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
-  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
-  SET(KIT_PYTHON_DEPS)
-
-  SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
-  SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-  SET(VTK_INSTALL_LIB_DIR_CM24 "${VTKPythonWrapping_INSTALL_LIB_DIR}")
-  SET(VTK_INSTALL_BIN_DIR_CM24 "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-
-  # include python wrapping from VTK
-  INCLUDE(KitCommonPythonWrapBlock)
-ENDIF (PARAVIEW_ENABLE_PYTHON)
-
-
-
-# Create the library.
-PVVTK_ADD_LIBRARY(vtk${KIT}
-  ${Kit_SRCS}
-  ${KitInstantiator_SRCS}
-  )
-TARGET_LINK_LIBRARIES(vtk${KIT}
-  vtkPVVTKExtensions
-  vtkPVVTKExtensionsCS
-  ${KIT_LIBS}
-  vtkViewsCore
-  vtkViewsContext2D
-  vtkRenderingLabel
-  vtkRenderingVolume
-  vtkDomainsChemistry
-)
-
-IF(NOT PV_INSTALL_NO_LIBRARIES)
-  SET(temp_TO_INSTALL
-    vtk${KIT})
-
-  INSTALL(TARGETS ${temp_TO_INSTALL}
-    EXPORT ${PV_INSTALL_EXPORT_NAME}
-    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
-
-# Development files install
-IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  GLOB_INSTALL_DEVELOPMENT(
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR}
-      "*.h;*.hxx;*.txx")
-ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
-
-IF (BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF (BUILD_TESTING)
+vtk_module_library(vtkPVClientServerCore ${Module_SRCS})
