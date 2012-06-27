@@ -27,10 +27,11 @@
 #define __vtkPVPythonInterpretor_h
 
 #include "vtkObject.h"
+#include "vtkPVPythonSupportModule.h"
 
 class vtkStdString;
 class vtkPVPythonInterpretorInternal;
-class VTK_EXPORT vtkPVPythonInterpretor : public vtkObject
+class VTKPVPYTHONSUPPORT_EXPORT vtkPVPythonInterpretor : public vtkObject
 {
 public:
   static vtkPVPythonInterpretor* New();

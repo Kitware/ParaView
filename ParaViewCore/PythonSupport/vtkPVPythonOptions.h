@@ -23,8 +23,9 @@
 #define __vtkPVPythonOptions_h
 
 #include "vtkPVOptions.h"
+#include "vtkPVPythonSupportModule.h"
 
-class VTK_EXPORT vtkPVPythonOptions : public vtkPVOptions
+class VTKPVPYTHONSUPPORT_EXPORT vtkPVPythonOptions : public vtkPVOptions
 {
 public:
   static vtkPVPythonOptions* New();
