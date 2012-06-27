@@ -257,6 +257,7 @@ else()
   set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE INTERNAL "" FORCE)
 
   set (ParaViewModulesDirs
+    ThirdParty/protobuf
     Utilities/VTKClientServer
     ParaViewCore/PythonSupport
     ParaViewCore/Common
