@@ -1,6 +1,3 @@
-[submodule "IceT"]
-	path = Utilities/IceT
-	url = git://paraview.org/IceT.git
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
