@@ -284,6 +284,8 @@ else()
 
   # turn some module ON to avoid warnings from VTK.
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
+  set (VTK_Group_ParaViewCore ON CACHE INTERNAL "" FORCE)
+  set (VTK_Group_ParaViewRendering ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaView ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE INTERNAL "" FORCE)
 
@@ -292,9 +294,12 @@ else()
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common
-    ParaViewCore/VTKExtensions
-    ParaViewCore/ClientServerCore
-    ParaViewCore/ServerImplementation
+    ParaViewCore/VTKExtensions/Core
+    ParaViewCore/VTKExtensions/Rendering
+    ParaViewCore/VTKExtensions/Default
+    #ParaViewCore/VTKExtensions
+    #ParaViewCore/ClientServerCore
+    #ParaViewCore/ServerImplementation
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs

@@ -34,25 +34,13 @@ set(Module_SRCS
   vtkAMRDualGridHelper.cxx
   vtkAMRFileSeriesReader.cxx
   vtkAMRIncrementalResampleHelper.cxx
-  vtkAnimationPlayer.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
-  vtkAttributeDataToTableFilter.cxx
-  vtkBlockDeliveryPreprocessor.cxx
-  vtkBSPCutsGenerator.cxx
-  vtkCacheSizeKeeper.cxx
-  vtkCameraInterpolator2.cxx
-  vtkCameraManipulator.cxx
-  vtkCameraManipulatorGUIHelper.cxx
   vtkCellIntegrator.cxx
-  vtkChartNamedOptions.cxx
-  vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkCleanUnstructuredGridCells.cxx
-  vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
-  vtkCompositeMultiProcessController.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
@@ -66,15 +54,11 @@ set(Module_SRCS
   vtkFlashContour.cxx
   vtkGridConnectivity.cxx
   vtkHierarchicalFractal.cxx
-  vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
-  vtkInteractorStyleTransferFunctionEditor.cxx
+#  vtkInteractorStyleTransferFunctionEditor.cxx
   vtkIntersectFragments.cxx
   vtkIsoVolume.cxx
-  vtkKdTreeGenerator.cxx
-  vtkKdTreeManager.cxx
-  vtkMarkSelectedRows.cxx
   vtkMaterialInterfaceCommBuffer.cxx
   vtkMaterialInterfaceFilter.cxx
   vtkMaterialInterfaceIdList.cxx
@@ -87,8 +71,6 @@ set(Module_SRCS
   vtkMergeArrays.cxx
   vtkMergeCompositeDataSet.cxx
   vtkMinMax.cxx
-  vtkMultiProcessControllerHelper.cxx
-  vtkOrderedCompositeDistributor.cxx
   vtkParallelSerialWriter.cxx
   vtkPConvertSelection.cxx
   vtkPEnSightGoldBinaryReader.cxx
@@ -101,7 +83,6 @@ set(Module_SRCS
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
   vtkPPhastaReader.cxx
-  vtkPriorityHelper.cxx
   vtkPSciVizContingencyStats.cxx
   vtkPSciVizDescriptiveStats.cxx
   vtkPSciVizKMeans.cxx
@@ -109,82 +90,35 @@ set(Module_SRCS
   vtkPSciVizPCAStats.cxx
   vtkPVAMRDualClip.cxx
   vtkPVAMRDualContour.cxx
-  vtkPVAnimationCue.cxx
-  vtkPVAnimationScene.cxx
   vtkPVArrayCalculator.cxx
   vtkPVArrowSource.cxx
-  vtkPVAxesActor.cxx
-  vtkPVAxesWidget.cxx
-  vtkPVBooleanKeyFrame.cxx
   vtkPVBox.cxx
-  vtkPVCenterAxesActor.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
-  vtkPVCompositeDataPipeline.cxx
-  vtkPVCompositeKeyFrame.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
-  vtkPVCueManipulator.cxx
-  vtkPVDefaultPass.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerReader2.cxx
   vtkPVEnSightMasterServerTranslator.cxx
-  vtkPVExponentialKeyFrame.cxx
-  vtkPVExtentTranslator.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVGeometryFilter.cxx
   vtkPVGlyphFilter.cxx
-  vtkPVHardwareSelector.cxx
-  vtkPVInteractorStyle.cxx
-  vtkPVJoystickFly.cxx
-  vtkPVJoystickFlyIn.cxx
-  vtkPVJoystickFlyOut.cxx
-  vtkPVKeyFrame.cxx
-  vtkPVKeyFrameAnimationCue.cxx
-  vtkPVKeyFrameCueManipulator.cxx
   vtkPVLinearExtrusionFilter.cxx
-  vtkPVLODActor.cxx
-  vtkPVLODVolume.cxx
-  vtkPVMergeTables.cxx
   vtkPVMetaClipDataSet.cxx
   vtkPVMetaSliceDataSet.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
   vtkPVPlotTime.cxx
-  vtkPVPostFilter.cxx
-  vtkPVPostFilterExecutive.cxx
-  vtkPVRampKeyFrame.cxx
-  vtkPVRecoverGeometryWireframe.cxx
-  vtkPVRenderViewProxy.cxx
-  vtkPVScalarBarActor.cxx
   vtkPVSelectionSource.cxx
-  vtkPVSinusoidKeyFrame.cxx
   vtkPVTextSource.cxx
-  vtkPVTrackballMoveActor.cxx
-  vtkPVTrackballMultiRotate.cxx
-  vtkPVTrackballPan.cxx
-  vtkPVTrackballRoll.cxx
-  vtkPVTrackballRotate.cxx
-  vtkPVTrackballZoom.cxx
   vtkPVTransform.cxx
-  vtkPVTrivialExtentTranslator.cxx
-  vtkPVTrivialProducer.cxx
-  vtkPVUpdateSuppressor.cxx
   vtkPVDataSetAlgorithmSelectorFilter.cxx
   vtkQuerySelectionSource.cxx
-  vtkRealtimeAnimationPlayer.cxx
   vtkRectilinearGridConnectivity.cxx
-  vtkReductionFilter.cxx
   vtkScatterPlotMapper.cxx
   vtkScatterPlotPainter.cxx
   vtkSciVizStatistics.cxx
-  vtkSelectionConverter.cxx
-  vtkSelectionSerializer.cxx
-  vtkSequenceAnimationPlayer.cxx
-  vtkSortedTableStreamer.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotHistoryReader.cxx
@@ -192,60 +126,28 @@ set(Module_SRCS
   vtkSpyPlotReader.cxx
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
-  vtkSquirtCompressor.cxx
   vtkSurfaceVectors.cxx
   vtkTableFFT.cxx
-  vtkTexturePainter.cxx
-  vtkTilesHelper.cxx
-  vtkTileDisplayHelper.cxx
-  vtkTimestepsAnimationPlayer.cxx
   vtkTimeToTextConvertor.cxx
-  vtkTrackballPan.cxx
-  vtkTransferFunctionEditorRepresentation.cxx
-  vtkTransferFunctionEditorRepresentation1D.cxx
-  vtkTransferFunctionEditorRepresentationShapes1D.cxx
-  vtkTransferFunctionEditorRepresentationShapes2D.cxx
-  vtkTransferFunctionEditorRepresentationSimple1D.cxx
-  vtkTransferFunctionEditorWidget.cxx
-  vtkTransferFunctionEditorWidget1D.cxx
-  vtkTransferFunctionEditorWidgetShapes1D.cxx
-  vtkTransferFunctionEditorWidgetShapes2D.cxx
-  vtkTransferFunctionEditorWidgetSimple1D.cxx
-  vtkTransferFunctionViewer.cxx
-  vtkUndoElement.cxx
-  vtkUndoSet.cxx
-  vtkUndoStack.cxx
+# vtkTransferFunctionEditorRepresentation.cxx
+# vtkTransferFunctionEditorRepresentation1D.cxx
+# vtkTransferFunctionEditorRepresentationShapes1D.cxx
+# vtkTransferFunctionEditorRepresentationShapes2D.cxx
+# vtkTransferFunctionEditorRepresentationSimple1D.cxx
+# vtkTransferFunctionEditorWidget.cxx
+# vtkTransferFunctionEditorWidget1D.cxx
+# vtkTransferFunctionEditorWidgetShapes1D.cxx
+# vtkTransferFunctionEditorWidgetShapes2D.cxx
+# vtkTransferFunctionEditorWidgetSimple1D.cxx
+# vtkTransferFunctionViewer.cxx
   vtkUnstructuredPOPReader.cxx
-  vtkUpdateSuppressorPipeline.cxx
-  vtkViewLayout.cxx
-  vtkVolumeRepresentationPreprocessor.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVDWriter.cxx
-  vtkXYChartNamedOptions.cxx
-  vtkZlibImageCompressor.cxx
 )
-
-if (PARAVIEW_USE_MPI)
-  list(APPEND Module_SRCS
-    vtkAllToNRedistributeCompositePolyData.cxx
-    vtkAllToNRedistributePolyData.cxx
-    vtkBalancedRedistributePolyData.cxx
-    vtkRedistributePolyData.cxx
-    vtkWeightedRedistributePolyData.cxx
-    vtkMPICompositeManager.cxx # deprecate?
-    )
-
-  if (PARAVIEW_USE_ICE_T)
-    list(APPEND Module_SRCS
-      vtkIceTCompositePass.cxx
-      vtkIceTContext.cxx)
-  endif()
-endif()
 
 set_source_files_properties(
   vtkAMRDualGridHelper
-  vtkCacheSizeKeeper
   vtkMaterialInterfaceCommBuffer
   vtkMaterialInterfaceIdList
   vtkMaterialInterfacePieceLoading
@@ -264,44 +166,13 @@ set_source_files_properties(
   )
 
 set_source_files_properties(
-  vtkAnimationPlayer
-  vtkCacheSizeKeeper
-  vtkCameraManipulatorGUIHelper
   vtkCellIntegrator
-  vtkImageCompressor
   vtkPEnSightReader
-  vtkPVAnimationCue
-  vtkPVCueManipulator
-  vtkPVJoystickFly
-  vtkPVKeyFrameAnimationCue
-  vtkPVRenderViewProxy
   vtkSciVizStatistics
   vtkTransferFunctionEditorRepresentation
   vtkTransferFunctionEditorRepresentation1D
   vtkTransferFunctionEditorWidget
   vtkTransferFunctionEditorWidget1D
-  vtkUndoElement
   ABSTRACT)
 
-
-#---------------------------------------------------------
-# Encode glsl files.
-foreach (file vtkIceTCompositeZPassShader_fs.glsl)
-  get_filename_component(file_we ${file} NAME_WE)
-  set(src  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
-  set(res  ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.cxx)
-  set(resh ${CMAKE_CURRENT_BINARY_DIR}/${file_we}.h)
-  list(APPEND shader_h_files ${resh})
-  add_custom_command(
-    OUTPUT ${res} ${resh}
-    DEPENDS ${src} vtkEncodeString
-    COMMAND vtkEncodeString
-    ARGS ${res} ${src} ${file_we} --build-header
-      VTKPVVTKEXTENSIONS_EXPORT vtkPVVTKExtensionsModule.h
-    )
-  list(APPEND Module_SRCS ${res})
-  set_source_files_properties(${file_we} WRAP_EXCLUDE)
-endforeach()
-#---------------------------------------------------------
-
-vtk_module_library(vtkPVVTKExtensions ${Module_SRCS})
+vtk_module_library(vtkPVVTKExtensionsDefault ${Module_SRCS})
