@@ -1,2 +1,0 @@
-SET(KIT_WRAP_DEPS Rendering)
-PV_WRAP_VTK_CS(Parallel PARALLEL "${KIT_WRAP_DEPS}")

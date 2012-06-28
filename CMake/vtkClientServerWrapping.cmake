@@ -7,8 +7,14 @@ include(vtkModuleAPI)
 
 macro(pv_wrap_vtk_mod_cs module)
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
-  PVVTK_ADD_LIBRARY(${module}CS ${${module}CS_SRCS})
+
+  # save current include-dirs
+  get_directory_property(__tmp_include_dirs INCLUDE_DIRECTORIES)
+  include_directories(${${module}_DEPENDS_INCLUDE_DIRS}
+                      ${${module}_INCLUDE_DIRS})
+  vtk_add_library(${module}CS ${${module}CS_SRCS})
   target_link_libraries(${module}CS vtkClientServer ${module})
+
   # add compile definition for auto init for modules that provide implementation
   if(${module}_IMPLEMENTS)
     set_property(TARGET ${module}CS PROPERTY COMPILE_DEFINITIONS
@@ -19,17 +25,10 @@ macro(pv_wrap_vtk_mod_cs module)
       target_link_libraries(${module}CS ${dep}CS)
     endif()
   endforeach()
-  if(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
-    if(BUILD_SHARED_LIBS)
-      if(NOT PV_INSTALL_NO_LIBRARIES)
-        install(TARGETS ${module}CS
-          EXPORT ${PV_INSTALL_EXPORT_NAME}
-          RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-          LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-          ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-      endif()
-    endif()
-  endif()
+
+  # restore include-dirs
+  set_directory_properties(PROPERTIES
+    INCLUDE_DIRECTORIES "${__tmp_include_dirs}")
 endmacro()
 
 #------------------------------------------------------------------------------
@@ -106,9 +105,9 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
       IF(NOT PV_INSTALL_NO_LIBRARIES)
         INSTALL(TARGETS vtk${kit}CS
           EXPORT ${PV_INSTALL_EXPORT_NAME}
-          RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-          LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-          ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+          RUNTIME DESTINATION ${VTK_INSTALL_RUNTIME_DIR} COMPONENT Runtime
+          LIBRARY DESTINATION ${VTK_INSTALL_LIBRARY_DIR} COMPONENT Runtime
+          ARCHIVE DESTINATION ${VTK_INSTALL_ARCHIVE_DIR} COMPONENT Development)
       ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
     ENDIF(BUILD_SHARED_LIBS)
   ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)

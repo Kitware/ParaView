@@ -100,8 +100,39 @@ add_custom_target(pvHostTools)
 set (COMPILE_TOOLS_TARGET pvHostTools)
 get_property(PV_TARGET_SUPPORTS_SHARED_LIBS
   GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
-#------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+# Setup install directories.
+IF(NOT PV_INSTALL_BIN_DIR)
+  SET(PV_INSTALL_BIN_DIR bin)
+ENDIF(NOT PV_INSTALL_BIN_DIR)
+IF(NOT PV_INSTALL_INCLUDE_DIR)
+  SET(PV_INSTALL_INCLUDE_DIR include/paraview-${PARAVIEW_VERSION})
+ENDIF(NOT PV_INSTALL_INCLUDE_DIR)
+IF(NOT PV_INSTALL_LIB_DIR)
+  SET(PV_INSTALL_LIB_DIR lib/paraview-${PARAVIEW_VERSION})
+ENDIF(NOT PV_INSTALL_LIB_DIR)
+IF(NOT PV_INSTALL_PLUGIN_DIR)
+  IF(WIN32)
+    SET(PV_INSTALL_PLUGIN_DIR ${PV_INSTALL_BIN_DIR})
+  ELSE(WIN32)
+    SET(PV_INSTALL_PLUGIN_DIR ${PV_INSTALL_LIB_DIR})
+  ENDIF(WIN32)
+ENDIF(NOT PV_INSTALL_PLUGIN_DIR)
+IF(NOT PV_INSTALL_DATA_DIR)
+  SET(PV_INSTALL_DATA_DIR share/paraview-${PARAVIEW_VERSION})
+ENDIF(NOT PV_INSTALL_DATA_DIR)
+IF(NOT PV_INSTALL_CMAKE_DIR)
+  SET(PV_INSTALL_CMAKE_DIR ${PV_INSTALL_LIB_DIR}/CMake)
+ENDIF(NOT PV_INSTALL_CMAKE_DIR)
+IF(NOT PV_INSTALL_DOC_DIR)
+  SET(PV_INSTALL_DOC_DIR share/doc/paraview-${PARAVIEW_VERSION})
+ENDIF(NOT PV_INSTALL_DOC_DIR)
+set (VTK_INSTALL_RUNTIME_DIR ${PV_INSTALL_BIN_DIR})
+set (VTK_INSTALL_ARCHIVE_DIR ${PV_INSTALL_LIB_DIR})
+set (VTK_INSTALL_LIBRARY_DIR ${PV_INSTALL_LIB_DIR})
+
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # Define ParaView specific options.
@@ -283,6 +314,7 @@ else()
   set (BUILD_TESTING ${__pv_build_testing})
   set (BUILD_EXAMPLES ${__pv_build_examples})
 
+  include(${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake)
 endif()
 
 #------------------------------------------------------------------------------
@@ -290,3 +322,9 @@ configure_file(
   ${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h
   @ONLY)
+
+#------------------------------------------------------------------------------
+# Client-Server Wrapping for all Modules.
+#------------------------------------------------------------------------------
+add_subdirectory(Utilities/VTKClientServer/Wrapping)
+#------------------------------------------------------------------------------

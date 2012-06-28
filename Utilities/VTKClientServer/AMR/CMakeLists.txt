@@ -1,2 +1,0 @@
-SET(KIT_WRAP_DEPS Common Parallel Filtering)
-PV_WRAP_VTK_CS( AMR AMR "${KIT_WRAP_DEPS}")
