@@ -17,7 +17,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkPVView.h"
+// #include "vtkPVView.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemInformation.hxx>
@@ -374,11 +374,12 @@ int vtkPVOptions::PostProcess(int, const char* const*)
 
   if (this->AMRStreaming)
     {
-    vtkPVView::SetEnableStreaming(true);
+    vtkErrorMacro("FIXME");
+//  vtkPVView::SetEnableStreaming(true);
     }
   else
     {
-    vtkPVView::SetEnableStreaming(false);
+//  vtkPVView::SetEnableStreaming(false);
     }
 
   return 1;

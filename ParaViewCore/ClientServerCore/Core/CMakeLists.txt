@@ -29,70 +29,26 @@
 #
 #==========================================================================
 set (Module_SRCS
-  vtk3DWidgetRepresentation.cxx
-  vtkAMRVolumeRepresentation.cxx
-  vtkCaveSynchronizedRenderers.cxx
-  vtkChartRepresentation.cxx
-  vtkClientServerMoveData.cxx
   vtkCompleteArrays.cxx
-  vtkCompositeRepresentation.cxx
-  vtkCubeAxesRepresentation.cxx
-  vtkDataLabelRepresentation.cxx
-  vtkGeometryRepresentation.cxx
-  vtkGeometryRepresentationWithFaces.cxx
-  vtkGlyph3DRepresentation.cxx
-  vtkPVImageSliceMapper.cxx
-  vtkImageSliceRepresentation.cxx
-  vtkImageVolumeRepresentation.cxx
-  vtkMoleculeRepresentation.cxx
-  vtkMPIMoveData.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkNetworkAccessManager.cxx
-  vtkNetworkImageSource.cxx
-  vtkOutlineRepresentation.cxx
-  vtkPVAlgorithmPortsInformation.cxx
-  vtkPVArrayInformation.cxx
-  vtkPVBarChartView.cxx
-  vtkPVCacheKeeper.cxx
-  vtkPVCacheKeeperPipeline.cxx
-  vtkPVCacheSizeInformation.cxx
-  vtkPVCameraAnimationCue.cxx
-  vtkPVCameraCueManipulator.cxx
-  vtkPVCameraKeyFrame.cxx
-  vtkPVClassNameInformation.cxx
-  vtkPVClientServerSynchronizedRenderers.cxx
-  vtkPVCompositeDataInformation.cxx
-  vtkPVCompositeDataInformationIterator.cxx
-  vtkPVCompositeRepresentation.cxx
-  vtkPVContextView.cxx
-  vtkPVDataInformation.cxx
-  vtkPVDataRepresentation.cxx
-  vtkPVDataRepresentationPipeline.cxx
   vtkProcessModuleAutoMPI.cxx
   vtkProcessModule.cxx
-  vtkPVDataDeliveryManager.cxx
+  vtkPVAlgorithmPortsInformation.cxx
+  vtkPVArrayInformation.cxx
+  vtkPVClassNameInformation.cxx
+  vtkPVCompositeDataInformation.cxx
+  vtkPVCompositeDataInformationIterator.cxx
+  vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
-  vtkPVDisplayInformation.cxx
-  vtkPVEnvironmentInformation.cxx
-  vtkPVEnvironmentInformationHelper.cxx
   vtkPVExtractSelection.cxx
-  vtkPVFileInformation.cxx
-  vtkPVFileInformationHelper.cxx
   vtkPVGenericAttributeInformation.cxx
-  vtkPVImplicitPlaneRepresentation.cxx
   vtkPVInformation.cxx
-  vtkPVLastSelectionInformation.cxx
-  vtkPVLineChartView.cxx
   vtkPVMultiClientsInformation.cxx
-  vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
-  vtkPVParallelCoordinatesChartView.cxx
-  vtkPVParallelCoordinatesRepresentation.cxx
-  vtkPVPlotMatrixRepresentation.cxx
-  vtkPVPlotMatrixView.cxx
   vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVPluginsInformation.cxx
@@ -100,50 +56,26 @@ set (Module_SRCS
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
   vtkPVPythonPluginInterface.cxx
-  vtkPVRayCastPickingHelper.cxx
-  vtkPVRenderView.cxx
-  vtkPVRepresentedDataInformation.cxx
-  vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerManagerPluginInterface.cxx
   vtkPVServerOptions.cxx
   vtkPVSession.cxx
   vtkPVSILInformation.cxx
-  vtkPVSingleOutputExtractSelection.cxx
-  vtkPVSynchronizedRenderer.cxx
-  vtkPVSynchronizedRenderWindows.cxx
   vtkPVSystemInformation.cxx
   vtkPVTemporalDataInformation.cxx
   vtkPVTimerInformation.cxx
-  vtkPVView.cxx
-  vtkPVXYChartView.cxx
-  vtkSelectionDeliveryFilter.cxx
-  vtkSelectionRepresentation.cxx
   vtkSession.cxx
   vtkSessionIterator.cxx
-  vtkSpreadSheetRepresentation.cxx
-  vtkSpreadSheetView.cxx
   vtkTCPNetworkAccessManager.cxx
-  vtkTextSourceRepresentation.cxx
-  vtkUnstructuredGridVolumeRepresentation.cxx
-  vtkXMLPVAnimationWriter.cxx
-  vtkXYChartRepresentation.cxx
 )
+
 
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
-    vtkAnnotateGlobalDataFilter.cxx
     vtkPythonAnimationCue.cxx
-    vtkPythonCalculator.cxx
-    vtkPythonProgrammableFilter.cxx
     vtkPythonExtractSelection.cxx
-    vtkPythonAnnotationFilter.cxx
+    vtkPythonProgrammableFilter.cxx
     )
-endif()
-
-if (PARAVIEW_USE_ICE_T)
-  list(APPEND Module_SRCS
-    vtkIceTSynchronizedRenderers.cxx)
 endif()
 
 if (PARAVIEW_USE_MPI)
@@ -152,7 +84,6 @@ if (PARAVIEW_USE_MPI)
   set_source_files_properties(
     vtkPVMPICommunicator
     WRAP_EXCLUDE)
-
 endif()
 
 set_source_files_properties(
@@ -168,18 +99,13 @@ set_source_files_properties(
 
 set_source_files_properties(
   vtkNetworkAccessManager
-  vtkPVContextView
-  vtkPVDataRepresentation
   vtkPVInformation
   vtkPVPlugin
   vtkPVPluginTracker
   vtkPVPythonPluginInterface
   vtkPVServerManagerPluginInterface
   vtkPVSession
-  vtkPVSynchronizedRenderWindows
-  vtkPVView
   vtkSession
-  vtkTileDisplayHelper
   ABSTRACT)
 
-vtk_module_library(vtkPVClientServerCore ${Module_SRCS})
+vtk_module_library(vtkPVClientServerCoreCore ${Module_SRCS})

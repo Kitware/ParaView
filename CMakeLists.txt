@@ -297,6 +297,9 @@ else()
     ParaViewCore/VTKExtensions/Core
     ParaViewCore/VTKExtensions/Rendering
     ParaViewCore/VTKExtensions/Default
+    ParaViewCore/ClientServerCore/Core
+    ParaViewCore/ClientServerCore/Rendering
+    ParaViewCore/ClientServerCore/Default
     #ParaViewCore/VTKExtensions
     #ParaViewCore/ClientServerCore
     #ParaViewCore/ServerImplementation

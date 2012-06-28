@@ -33,15 +33,12 @@ set(Module_SRCS
   vtkAMRDualContour.cxx
   vtkAMRDualGridHelper.cxx
   vtkAMRFileSeriesReader.cxx
-  vtkAMRIncrementalResampleHelper.cxx
   vtkAppendArcLength.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkCellIntegrator.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkCleanUnstructuredGridCells.cxx
-  vtkCompositeDataToUnstructuredGridFilter.cxx
-  vtkCSVExporter.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
   vtkEquivalenceSet.cxx
@@ -91,7 +88,6 @@ set(Module_SRCS
   vtkPVAMRDualClip.cxx
   vtkPVAMRDualContour.cxx
   vtkPVArrayCalculator.cxx
-  vtkPVArrowSource.cxx
   vtkPVBox.cxx
   vtkPVClipClosedSurface.cxx
   vtkPVClipDataSet.cxx
@@ -109,7 +105,6 @@ set(Module_SRCS
   vtkPVMetaSliceDataSet.cxx
   vtkPVNullSource.cxx
   vtkPVPlane.cxx
-  vtkPVPlotTime.cxx
   vtkPVSelectionSource.cxx
   vtkPVTextSource.cxx
   vtkPVTransform.cxx

@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set(Module_SRCS
+  vtkAMRIncrementalResampleHelper.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
   vtkBSPCutsGenerator.cxx
@@ -37,12 +38,15 @@ set(Module_SRCS
   vtkCameraManipulatorGUIHelper.cxx
   vtkChartNamedOptions.cxx
   vtkCleanArrays.cxx
+  vtkCompositeDataToUnstructuredGridFilter.cxx
+  vtkCSVExporter.cxx
   vtkImageCompressor.cxx
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
   vtkMarkSelectedRows.cxx
   vtkMultiProcessControllerHelper.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVCenterAxesActor.cxx
@@ -57,6 +61,7 @@ set(Module_SRCS
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVMergeTables.cxx
+  vtkPVPlotTime.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVScalarBarActor.cxx
