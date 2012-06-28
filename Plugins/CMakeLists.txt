@@ -31,6 +31,11 @@ paraview_build_optional_plugin(Manta "Manta ray traced rendering" Manta OFF)
 paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields" Moments ON)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PacMan "Testing plugin" TestPlugin  ON)
+if(PARAVIEW_USE_PISTON)
+  paraview_build_optional_plugin(Piston "LANL Piston GPU accelerated filters" Piston  ON)
+else()
+  set(PARAVIEW_BUILD_PLUGIN_Piston OFF CACHE BOOL "Can't use this plugin without piston" FORCE)
+endif()
 
 # The PointSprite plugin does not build in static mode therefore we make sure it is disable
 if(BUILD_SHARED_LIBS)
