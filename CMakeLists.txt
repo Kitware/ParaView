@@ -289,7 +289,7 @@ else()
 
   set (ParaViewModulesDirs
     ThirdParty/protobuf
-    Utilities/VTKClientServer
+    ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common
     ParaViewCore/VTKExtensions
@@ -326,5 +326,5 @@ configure_file(
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
-add_subdirectory(Utilities/VTKClientServer/Wrapping)
+add_subdirectory(Wrapping/ClientServer)
 #------------------------------------------------------------------------------

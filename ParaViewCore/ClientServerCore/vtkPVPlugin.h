@@ -85,8 +85,10 @@ public:
   static void ImportPlugin(vtkPVPlugin* plugin);
 };
 
+#ifndef __WRAP__
 typedef const char* (C_DECL *pv_plugin_query_verification_data_fptr)();
 typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
+#endif
 
 /// TODO: add compiler version.
 #define __PV_PLUGIN_VERIFICATION_STRING__ "paraviewplugin|" CMAKE_CXX_COMPILER_ID "|" PARAVIEW_VERSION

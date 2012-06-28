@@ -112,11 +112,13 @@ protected:
   int Dimensions[3];
   struct BlockStatusType
   {
+#ifndef __WRAP__
     unsigned Active: 1;
     unsigned Allocated: 1;
     unsigned AMR: 1;
     unsigned Fixed :1;
     unsigned Debug :1;
+#endif
   };
   BlockStatusType Status;
   int Level;

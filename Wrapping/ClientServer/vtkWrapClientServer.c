@@ -1243,4 +1243,3 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
   output_InitFunction(fp,classData);
   free(classData);
 }
-

@@ -173,7 +173,3 @@ int main()
 //   vtkClientServerInterpreter
     
 //     add RMI
-    
-    
-
-

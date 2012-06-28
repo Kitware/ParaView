@@ -1,7 +1,9 @@
 set (__dependencies)
 
 if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND __dependencies vtkPVPythonSupport)
+  list(APPEND __dependencies
+      vtkPVPythonSupport
+      vtkFiltersProgrammable)
 endif (PARAVIEW_ENABLE_PYTHON)
 
 if (PARAVIEW_USE_ICE_T)
