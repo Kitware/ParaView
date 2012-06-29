@@ -21,14 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
  * collect.
  */
 
-@vtk-module-instantiator-headers@
-#include "vtkPVCommonInstantiator.h"
-#include "vtkPVVTKExtensionsInstantiator.h"
-#include "vtkPVClientServerCoreInstantiator.h"
-#include "vtkPVServerImplementationInstantiator.h"
-#include "vtkPVServerManagerInstantiator.h"
 #include "vtkClientServerInterpreter.h"
-
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
@@ -42,22 +35,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtksys/ios/sstream>
 
 static void vtkInitializationHelperInit(vtkClientServerInterpreter*);
-
-//----------------------------------------------------------------------------
-// ClientServer wrapper initialization functions.
-extern "C" void vtkParaviewMinInit_Initialize(vtkClientServerInterpreter*);
-@vtk-module-init-functions@
-extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkPVVTKExtensionsCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkPVClientServerCoreCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkPVServerImplementationCS_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkPVServerManager_Initialize(vtkClientServerInterpreter*);
-extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
-
-#ifdef PARAVIEW_USE_VISITBRIDGE
-extern "C" void vtkVisItAVTAlgorithmsCS_Initialize(vtkClientServerInterpreter *);
-extern "C" void vtkVisItDatabasesCS_Initialize(vtkClientServerInterpreter *);
-#endif
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
@@ -173,22 +150,22 @@ void vtkInitializationHelper::Finalize()
 void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
 {
 
-#ifdef PARAVIEW_MINIMAL_BUILD
-  vtkParaviewMinInit_Initialize(interp);
-#else
-  // Initialize built-in wrapper modules.
-  @vtk-module-init-calls@
-  vtkPVCommonCS_Initialize(interp);
-  vtkPVVTKExtensionsCS_Initialize(interp);
-  vtkPVClientServerCoreCS_Initialize(interp);
-  vtkPVServerImplementationCS_Initialize(interp);
-  vtkPVServerManager_Initialize(interp);
-  vtkXdmfCS_Initialize(interp);
-
-# ifdef PARAVIEW_USE_VISITBRIDGE
-  vtkVisItAVTAlgorithmsCS_Initialize(interp);
-  vtkVisItDatabasesCS_Initialize(interp);
-# endif
-#endif
+//#ifdef PARAVIEW_MINIMAL_BUILD
+//  vtkParaviewMinInit_Initialize(interp);
+//#else
+//  // Initialize built-in wrapper modules.
+//  @vtk-module-init-calls@
+//  vtkPVCommonCS_Initialize(interp);
+//  vtkPVVTKExtensionsCS_Initialize(interp);
+//  vtkPVClientServerCoreCS_Initialize(interp);
+//  vtkPVServerImplementationCS_Initialize(interp);
+//  vtkPVServerManager_Initialize(interp);
+//  vtkXdmfCS_Initialize(interp);
+//
+//# ifdef PARAVIEW_USE_VISITBRIDGE
+//  vtkVisItAVTAlgorithmsCS_Initialize(interp);
+//  vtkVisItDatabasesCS_Initialize(interp);
+//# endif
+//#endif
 
 }

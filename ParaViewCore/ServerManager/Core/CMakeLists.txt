@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkInitializationHelper.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx
@@ -117,6 +118,7 @@ set (Module_SRCS
 )
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkInitializationHelper
   vtkSMDeserializer
   vtkSMDomain.
   vtkSMLink

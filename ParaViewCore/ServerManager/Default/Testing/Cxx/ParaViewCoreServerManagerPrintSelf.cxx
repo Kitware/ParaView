@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkPVConfig.h"
 
-#include "vtkInitializationHelper.h"
+//#include "vtkInitializationHelper.h"
 #include "vtkPVComparativeAnimationCue.h"
 #include "vtkPVComparativeView.h"
 #include "vtkPVKeyFrameAnimationCueForProxies.h"
@@ -145,7 +145,7 @@ int main(int , char *[])
 {
   vtkObject *c;
 
-  PRINT_SELF(vtkInitializationHelper);
+//  PRINT_SELF(vtkInitializationHelper);
   PRINT_SELF(vtkPVComparativeAnimationCue);
   PRINT_SELF(vtkPVComparativeView);
   PRINT_SELF(vtkPVKeyFrameAnimationCueForProxies);

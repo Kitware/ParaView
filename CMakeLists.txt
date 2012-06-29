@@ -148,6 +148,10 @@ cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
 cmake_dependent_option(PARAVIEW_USE_ICE_T
   "Enable IceT (needed for parallel rendering)" ON
   "PARAVIEW_USE_MPI" OFF)
+cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
+  "Build ParaView with Qt support (without GUI)" OFF
+  "NOT PARAVIEW_BUILD_QT_GUI" ON)
+
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
 # Set the export name.
@@ -306,9 +310,6 @@ else()
     ParaViewCore/ServerManager/Core
     ParaViewCore/ServerManager/Rendering
     ParaViewCore/ServerManager/Default
-    #ParaViewCore/VTKExtensions
-    #ParaViewCore/ClientServerCore
-    #ParaViewCore/ServerImplementation
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs
@@ -340,5 +341,5 @@ configure_file(
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
-#add_subdirectory(Wrapping/ClientServer)
+add_subdirectory(Wrapping/ClientServer)
 #------------------------------------------------------------------------------
