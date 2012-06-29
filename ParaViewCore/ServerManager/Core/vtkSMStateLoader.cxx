@@ -17,7 +17,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCameraLink.h"
+// FIXME:MODULARIZATION
+//#include "vtkSMCameraLink.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
@@ -407,9 +408,12 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         link = pxm->GetRegisteredLink(linkname);
         if (!link)
           {
-          link = vtkSMCameraLink::New();
-          pxm->RegisterLink(linkname, link);
-          link->Delete();
+
+          // FIXME:MODULARIZATION
+          vtkErrorMacro("Need to fix camera link states");
+          // link = vtkSMCameraLink::New();
+          // pxm->RegisterLink(linkname, link);
+          // link->Delete();
           }       
         }
       if (link)

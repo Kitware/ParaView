@@ -20,7 +20,6 @@
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyHelper.h"
@@ -28,6 +27,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkWeakPointer.h"
 
@@ -965,7 +965,7 @@ vtkImageData* vtkSMViewLayoutProxy::CaptureWindow(int magnification)
   
   for (size_t cc=0; cc < images.size(); cc++)
     {
-    vtkSMAnimationSceneImageWriter::Merge(image, images[cc]);
+    vtkSMUtilities::Merge(image, images[cc]);
     }
   return image;
 }

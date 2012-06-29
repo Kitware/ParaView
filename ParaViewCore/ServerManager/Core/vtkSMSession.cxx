@@ -17,7 +17,8 @@
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderView.h"
+// FIXME:MODULARIZATION
+// #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
@@ -218,7 +219,8 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
-  vtkPVRenderView::AllowRemoteRendering(true);
+// FIXME:MODULARIZATION
+//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
 
@@ -251,7 +253,8 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
                                         bool allowRemoteRendering)
 {
-  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
+// FIXME:MODULARIZATION
+//  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
@@ -269,7 +272,8 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   const char* rshost, int rsport)
 {
-  vtkPVRenderView::AllowRemoteRendering(true);
+// FIXME:MODULARIZATION
+//  vtkPVRenderView::AllowRemoteRendering(true);
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
@@ -321,7 +325,8 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 vtkIdType vtkSMSession::ReverseConnectToRemote(
   int dsport, int rsport, bool (*callback)())
 {
-  vtkPVRenderView::AllowRemoteRendering(true);
+// FIXME:MODULARIZATION
+//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkTemp temp;
   temp.Callback = callback;
 

@@ -1,0 +1,9 @@
+vtk_module(vtkPVServerManagerDefault
+  GROUPS
+    ParaView
+  DEPENDS
+    vtkPVServerManagerRendering
+    vtkPVServerImplementationDefault
+    vtkTestingRendering
+    vtkIOExport
+)

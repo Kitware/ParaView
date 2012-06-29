@@ -303,6 +303,9 @@ else()
     ParaViewCore/ServerImplementation/Core
     ParaViewCore/ServerImplementation/Rendering
     ParaViewCore/ServerImplementation/Default
+    ParaViewCore/ServerManager/Core
+    ParaViewCore/ServerManager/Rendering
+    ParaViewCore/ServerManager/Default
     #ParaViewCore/VTKExtensions
     #ParaViewCore/ClientServerCore
     #ParaViewCore/ServerImplementation
@@ -337,5 +340,5 @@ configure_file(
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
-add_subdirectory(Wrapping/ClientServer)
+#add_subdirectory(Wrapping/ClientServer)
 #------------------------------------------------------------------------------

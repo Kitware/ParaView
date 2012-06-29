@@ -66,6 +66,11 @@ public:
   static vtkPoints* CreateOrbit(const double center[3], const double normal[3],
                                 double radius, int resolution);
 
+  // Description:
+  // Convenience method used to merge a smaller image (\c src) into a 
+  // larger one (\c dest). The location of the smaller image in the larger image
+  // are determined by their extents.
+  static void Merge(vtkImageData* dest, vtkImageData* src);
 //BTX
 protected:
   vtkSMUtilities() {}

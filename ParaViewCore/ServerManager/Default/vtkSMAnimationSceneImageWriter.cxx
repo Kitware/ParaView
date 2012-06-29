@@ -31,6 +31,7 @@
 #include "vtkSMViewProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
+#include "vtkSMUtilities.h"
 
 #ifdef VTK_USE_MPEG2_ENCODER
 # include "vtkMPEG2Writer.h"
@@ -183,43 +184,7 @@ vtkImageData* vtkSMAnimationSceneImageWriter::CaptureViewImage(
 //-----------------------------------------------------------------------------
 void vtkSMAnimationSceneImageWriter::Merge(vtkImageData* dest, vtkImageData* src)
 {
-  if (!src || !dest)
-    {
-    return;
-    }
-
-  vtkImageIterator<unsigned char> inIt(src, src->GetExtent());
-  int outextent[6];
-  src->GetExtent(outextent);
-
-  // we need to flip Y.
-  outextent[2] = dest->GetExtent()[3] - outextent[2];
-  outextent[3] = dest->GetExtent()[3] - outextent[3];
-  int temp = outextent[2];
-  outextent[2] = outextent[3];
-  outextent[3] = temp;
-  // snap extents to what is available.
-  outextent[0] = std::max(outextent[0], dest->GetExtent()[0]);
-  outextent[1] = std::min(outextent[1], dest->GetExtent()[1]);
-  outextent[2] = std::max(outextent[2], dest->GetExtent()[2]);
-  outextent[3] = std::min(outextent[3], dest->GetExtent()[3]);
-  vtkImageIterator<unsigned char> outIt(dest, outextent);
-
-  while (!outIt.IsAtEnd() && !inIt.IsAtEnd())
-    {
-    unsigned char* spanOut = outIt.BeginSpan();
-    unsigned char* spanIn = inIt.BeginSpan();
-    unsigned char* outSpanEnd = outIt.EndSpan();
-    unsigned char* inSpanEnd = inIt.EndSpan();
-    if (outSpanEnd != spanOut && inSpanEnd != spanIn)
-      {
-      size_t minO = outSpanEnd - spanOut;
-      size_t minI = inSpanEnd - spanIn;
-      memcpy(spanOut, spanIn, (minO < minI)? minO : minI);
-      }
-    inIt.NextSpan();
-    outIt.NextSpan();
-    }
+  vtkSMUtilities::Merge(dest, src);
 }
 
 //-----------------------------------------------------------------------------
