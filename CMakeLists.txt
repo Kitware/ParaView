@@ -300,6 +300,9 @@ else()
     ParaViewCore/ClientServerCore/Core
     ParaViewCore/ClientServerCore/Rendering
     ParaViewCore/ClientServerCore/Default
+    ParaViewCore/ServerImplementation/Core
+    ParaViewCore/ServerImplementation/Rendering
+    ParaViewCore/ServerImplementation/Default
     #ParaViewCore/VTKExtensions
     #ParaViewCore/ClientServerCore
     #ParaViewCore/ServerImplementation

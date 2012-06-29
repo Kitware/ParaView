@@ -19,7 +19,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
-#include "vtkGeometryRepresentation.h"
+//#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
@@ -29,10 +29,11 @@
 #include "vtkPVExtentTranslator.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSIPVRepresentationProxy.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkCompositeDataSet.h"
 
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -337,6 +338,37 @@ bool vtkSISourceProxy::ReadXMLAttributes(vtkPVXMLElement* element)
 }
 
 //----------------------------------------------------------------------------
+// FIXME: avoid code-duplication with vtkGeometryRepresentation. However I
+// cannot add dependecy on vtkGeometryRepresentation here. Fix it!!!
+namespace
+{
+  bool vtkGeometryRepresentationDoRequestGhostCells(vtkInformation* info)
+    {
+    vtkMultiProcessController* controller =
+      vtkMultiProcessController::GetGlobalController();
+    if (controller == NULL || controller->GetNumberOfProcesses() <= 1)
+      {
+      return false;
+      }
+
+    if (vtkUnstructuredGrid::GetData(info) != NULL ||
+      vtkCompositeDataSet::GetData(info) != NULL)
+      {
+      // ensure that there's no WholeExtent to ensure
+      // that this UG was never born out of a structured dataset.
+      bool has_whole_extent = (info->Has(
+          vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()) != 0);
+      if (!has_whole_extent)
+        {
+        //cout << "Need ghosts" << endl;
+        return true;
+        }
+      }
+    return false;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
 {
   int processid =
@@ -367,7 +399,7 @@ void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
   // ghost-cells if available (11811), but not asking for ghost-cells earlier than the
   // representation results in multiple executes (12546). Hence, we request
   // ghost-cells in UpdatePipeline().
-  bool req_ghost_cells = vtkGeometryRepresentation::DoRequestGhostCells(
+  bool req_ghost_cells = vtkGeometryRepresentationDoRequestGhostCells(
     sddp->GetOutputInformation(real_port));
 
   sddp->SetUpdateExtent(real_port, processid, numprocs, /*ghost level*/

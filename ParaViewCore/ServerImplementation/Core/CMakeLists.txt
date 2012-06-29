@@ -34,17 +34,13 @@ set (Module_SRCS
   vtkPVSessionCore.cxx
   vtkPVSessionCoreInterpreterHelper.cxx
   vtkPVSessionServer.cxx
-  vtkSIAMRVolumeRepresentationProxy.cxx
   vtkSIArraySelectionProperty.cxx
-  vtkSIChartRepresentationProxy.cxx
   vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
-  vtkSIContextArraysProperty.cxx
   vtkSIDataArrayProperty.cxx
   vtkSIDoubleVectorProperty.cxx
   vtkSIFileSeriesReaderProxy.cxx
   vtkSIIdTypeVectorProperty.cxx
-  vtkSIImageTextureProxy.cxx
   vtkSIInputProperty.cxx
   vtkSIIntVectorProperty.cxx
   vtkSIObject.cxx
@@ -52,20 +48,13 @@ set (Module_SRCS
   vtkSIProxy.cxx
   vtkSIProxyDefinitionManager.cxx
   vtkSIProxyProperty.cxx
-  vtkSIPVRepresentationProxy.cxx
-  vtkSIScalarBarActorProxy.cxx
-  vtkSISelectionRepresentationProxy.cxx
   vtkSISILProperty.cxx
   vtkSISourceProxy.cxx
   vtkSIStringVectorProperty.cxx
-  vtkSITextSourceRepresentationProxy.cxx
   vtkSITimeRangeProperty.cxx
   vtkSITimeStepsProperty.cxx
-  vtkSIUniformGridVolumeRepresentationProxy.cxx
-  vtkSIUnstructuredGridVolumeRepresentationProxy.cxx
   vtkSIVectorProperty.cxx
   vtkSIWriterProxy.cxx
-  vtkSIXMLAnimationWriterRepresentationProperty.cxx
   vtkSMMessage.cxx
 )
 
@@ -75,8 +64,8 @@ set_source_files_properties(
 
 set_source_files_properties(
   vtkPVProxyDefinitionIterator.cxx
-  vtkSIVectorProperty.cxx
   vtkPVSessionBase.cxx
+  vtkSIVectorProperty.cxx
   vtkSMMessage.cxx
   ABSTRACT)
 
@@ -90,9 +79,9 @@ add_custom_command(
     
     COMMAND protoc_compiler
            "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
-           --proto_path "@CMAKE_CURRENT_SOURCE_DIR@/Resources"
-           "${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto"
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/vtkPVMessage.proto protoc_compiler
+           --proto_path "@CMAKE_CURRENT_SOURCE_DIR@"
+           "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto"
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto protoc_compiler
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -102,40 +91,10 @@ add_custom_target(
     ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
     ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
 )
-#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# Generate header from the xml files.
-#------------------------------------------------------------------------------
-set (resourceFiles
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
-  )
-
-cmake_dependent_option(PARAVIEW_ENABLE_PYTHON_FILTERS
-  "Enable Python calculator and programmable filters." ON
-  "PARAVIEW_ENABLE_PYTHON" OFF)
-
-if (PARAVIEW_ENABLE_PYTHON_FILTERS)
-  list(APPEND resourceFiles
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml)
-endif()
-
-set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
-  CACHE INTERNAL "Server Manager XMLs")
-
-#------------------------------------------------------------------------------
-
-
-vtk_module_library(vtkPVServerImplementation
+vtk_module_library(vtkPVServerImplementationCore
   ${Module_SRCS})
 
-add_dependencies(vtkPVServerImplementation
+add_dependencies(vtkPVServerImplementationCore
   protobuf_code_generation)
