@@ -58,7 +58,8 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     if proxy.GetXMLGroup() == 'views' and export_rendering:
         proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
         ctorArgs = [ ctorMethod, "\"%s\"" % screenshot_info[proxyName][0], screenshot_info[proxyName][1], \
-                     screenshot_info[proxyName][2], screenshot_info[proxyName][3], "cp_views" ]
+                     screenshot_info[proxyName][2], screenshot_info[proxyName][3], \
+                         screenshot_info[proxyName][4], screenshot_info[proxyName][5], "cp_views" ]
         view_proxies.append(proxy)
         return ("CreateView", ctorArgs, extraCtorCommands)
 
@@ -281,13 +282,14 @@ def CreateWriter(proxy_ctor, filename, freq, cp_writers):
     cp_writers.append(writer)
     return writer
 
-def CreateView(proxy_ctor, filename, freq, fittoscreen, magnification, cp_views):
+def CreateView(proxy_ctor, filename, freq, fittoscreen, magnification, width, height, cp_views):
     view = proxy_ctor()
     view.add_attribute("cpFileName", filename)
     view.add_attribute("cpFrequency", freq)
     view.add_attribute("cpFileName", filename)
     view.add_attribute("cpFitToScreen", fittoscreen)
     view.add_attribute("cpMagnification", magnification)
+    view.ViewSize = [ width, height ]
     cp_views.append(view)
     return view
 
