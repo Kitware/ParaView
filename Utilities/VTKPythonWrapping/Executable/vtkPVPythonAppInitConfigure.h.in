@@ -1,0 +1,12 @@
+#ifndef __vtkPVPythonAppInitConfigure_h
+#define __vtkPVPythonAppInitConfigure_h
+
+#include "vtkPythonAppInitConfigure.h"
+
+#define VTK_PYTHON_PACKAGE_DIR "@VTK_BINARY_DIR@/Wrapping/Python"
+#define VTK_PYTHON_LIBRARY_DIR_BUILD "@CMAKE_LIBRARY_OUTPUT_DIRECTORY@"
+#define PV_PYTHON_PACKAGE_DIR "@PV_PYTHON_MODULE_DIR@"
+
+#define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
+
+#endif
