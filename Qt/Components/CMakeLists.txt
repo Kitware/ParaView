@@ -125,7 +125,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
-  pqMemoryInspector.h
+  pqMemoryInspectorPanel.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
@@ -163,6 +163,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
+  pqRemoteCommandDialog.h
+  pqRemoteCommandTemplateDialog.h
   pqRenderViewOptions.h
   pqRescaleRange.h
   pqSMSignalAdaptors.h
@@ -264,7 +266,7 @@ SET(UI_FORMS
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
-  Resources/UI/pqMemoryInspector.ui
+  Resources/UI/pqMemoryInspectorPanelForm.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
@@ -280,6 +282,8 @@ SET(UI_FORMS
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqQueryDialog.ui
+  Resources/UI/pqRemoteCommandDialogForm.ui
+  Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqRenderViewOptions.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui
@@ -523,8 +527,8 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.cxx
   pqLockViewSizeCustomDialog.h
-  pqMemoryInspector.cxx
-  pqMemoryInspector.h
+  pqMemoryInspectorPanel.cxx
+  pqMemoryInspectorPanel.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqNamedObjectPanel.cxx
@@ -602,6 +606,10 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqQueryDialog.h
   pqRecentFilesMenu.cxx
   pqRecentFilesMenu.h
+  pqRemoteCommandDialog.cxx
+  pqRemoteCommandDialog.h
+  pqRemoteCommandTemplateDialog.cxx
+  pqRemoteCommandTemplateDialog.h
   pqRescaleRange.cxx
   pqRescaleRange.h
   pqRenderViewOptions.cxx
