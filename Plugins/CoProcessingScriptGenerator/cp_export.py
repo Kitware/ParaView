@@ -196,6 +196,11 @@ def DoCoProcessing(datadescription):
                         else:
                             print 'something strange with color attribute type', rep.ColorAttributeType
 
+                        if datainformation.GetArray(rep.ColorArrayName) == None:
+                            # there is no array on this process. it's possible
+                            # that this process has no points or cells
+                            continue
+
                         if lut.VectorMode != 'Magnitude' or \
                            datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents() == 1:
                             datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(lut.VectorComponent)
