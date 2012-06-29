@@ -78,6 +78,7 @@ protected:
 private:
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
+  void setProperty(vtkSMProperty *property);
 
   friend class pqPropertiesPanel;
 

@@ -52,6 +52,7 @@ class pqPipelineSource;
 class pqPropertyWidget;
 class pqRepresentation;
 struct pqPropertiesPanelItem;
+class vtkSMProperty;
 
 /// \class pqPropertiesPanel
 /// \brief The pqPropertiesPanel class is used to display the properties of
@@ -69,6 +70,9 @@ public:
 
   /// Returns the current render view.
   pqView* view() const;
+
+  /// Returns the widget corresponding to the property.
+  pqPropertyWidget* getWidgetForProperty(vtkSMProperty *property) const;
 
 public slots:
   /// Sets the current render view to \p view.
