@@ -1224,7 +1224,6 @@
             <Property name="Diffuse" />
             <Property name="DiffuseColor" />
             <Property name="EdgeColor" />
-            <Property name="InterpolateScalarsBeforeMapping" />
             <Property name="Interpolation" />
             <Property name="LookupTable" />
             <Property name="NonlinearSubdivisionLevel" />
@@ -1232,16 +1231,17 @@
             <Property name="SpecularColor" />
             <Property name="SpecularPower" />
           </PropertyGroup>
-          <Property name="MapScalars" />
+          <Property name="MapScalars" panel_visibility="advanced"/>
+          <Property name="InterpolateScalarsBeforeMapping" panel_visibility="advanced"/>
           <Property name="Opacity" panel_visibility="default" />
-          <Property name="LineWidth" />
-          <Property name="BackfaceRepresentation" />
-          <Property name="Position" />
-          <Property name="Scale" />
-          <Property name="Orientation" />
-          <Property name="Origin" />
+          <Property name="LineWidth" panel_visibility="advanced"/>
+          <Property name="BackfaceRepresentation" panel_visibility="advanced"/>
+          <Property name="Position" panel_visibility="advanced" />
+          <Property name="Scale" panel_visibility="advanced" />
+          <Property name="Orientation" panel_visibility="advanced" />
+          <Property name="Origin" panel_visibility="advanced" />
           <Property name="Pickable" panel_visibility="never"/>
-          <Property name="PointSize" panel_visibility_default_for_representation="points"/>
+          <Property name="PointSize" panel_visibility="advanced" panel_visibility_default_for_representation="points"/>
           <Property name="StaticMode" panel_visibility="never" />
           <Property name="SuppressLOD" panel_visibility="never" />
           <Property name="Texture" panel_visibility="never" />
@@ -3015,7 +3015,8 @@
 
       <InputProperty name="Source" command="SetInputConnection"
         port_index="1"
-        label="Glyph Type">
+        label="Glyph Type"
+        panel_visibility="advanced">
         <Documentation>
           Specify the source objects.
         </Documentation>

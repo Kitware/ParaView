@@ -35,8 +35,8 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
   this->Type = 0;
   this->PanelVisibility = 0;
 
-  // by default, properties are set to show only in advanced mode
-  SetPanelVisibility("advanced");
+  // by default, properties are set to always shown
+  this->SetPanelVisibility("default");
 }
 
 //---------------------------------------------------------------------------
