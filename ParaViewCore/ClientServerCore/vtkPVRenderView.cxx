@@ -107,9 +107,9 @@ public:
     return (iter != this->PropMap.end()? iter->second : NULL);
     }
 
+#ifdef PARAVIEW_USE_PISTON
   void PreRender(vtkRenderViewBase *renderView)
     {
-#ifdef PARAVIEW_USE_PISTON
     if(vtkPVOptions *options = vtkProcessModule::GetProcessModule()->GetOptions())
       {
       if(!vtkPistonMapper::IsEnabledCudaGL() && options->GetUseCudaInterop())
@@ -117,8 +117,13 @@ public:
         vtkPistonMapper::InitCudaGL(renderView->GetRenderWindow());
         }
       }
-#endif // PARAVIEW_USE_PISTON
     }
+#else
+  void PreRender(vtkRenderViewBase *vtkNotUsed(renderView))
+    {
+    }
+#endif // PARAVIEW_USE_PISTON
+
 };
 
 
