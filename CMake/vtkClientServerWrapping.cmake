@@ -10,8 +10,11 @@ macro(pv_wrap_vtk_mod_cs module)
 
   # save current include-dirs
   get_directory_property(__tmp_include_dirs INCLUDE_DIRECTORIES)
+  vtk_module_dep_includes(${module})
   include_directories(${${module}_DEPENDS_INCLUDE_DIRS}
-                      ${${module}_INCLUDE_DIRS})
+                      ${${module}_INCLUDE_DIRS}
+                      ${vtkClientServer_INCLUDE_DIRS}
+                      )
   vtk_add_library(${module}CS ${${module}CS_SRCS})
   target_link_libraries(${module}CS vtkClientServer ${module})
 
@@ -46,7 +49,7 @@ endmacro()
 #------------------------------------------------------------------------------
 macro(pv_pre_wrap_vtk_mod_cs libname module)
   set(vtk${kit}CS_HEADERS)
-  
+ 
   vtk_module_load(${module})
   vtk_module_classes_load(${module})
   
