@@ -1372,7 +1372,7 @@ vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper
 (const char *classname)
 {
   std::map<std::string, std::string>::iterator iter =
-    helpers.find(classname);
+    helpers.find(classname ? classname : std::string());
   if (iter != helpers.end())
     {
     std::string helperclassname = iter->second;
