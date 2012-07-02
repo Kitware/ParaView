@@ -28,8 +28,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <string>
 #include <vtksys/ios/sstream>
 
-static void vtkInitializationHelperInit(vtkClientServerInterpreter*);
-
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
 {
@@ -79,8 +77,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  vtkClientServerInterpreterInitializer::GetInitializer()->
-    RegisterCallback(&::vtkInitializationHelperInit);
+  PARAVIEW_INITIALIZE();
 
   vtkProcessModule::Initialize(
     static_cast<vtkProcessModule::ProcessTypes>(type), argc, argv);
@@ -131,37 +128,4 @@ void vtkInitializationHelper::Finalize()
 
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
-}
-
-//-----------------------------------------------------------------------------
-/*
- * PARAVIEW_MINIMIUM if enabled, initializes only required set of classes.
- * The mechanism is specified in the Servers/ServerManager/CMakeList.txt
- * Otherwise the entire vtk+paraview class list will be included.
- *
- * @param pm IN used to pass the interpreter for every *_Initialize function.
- */
-void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
-{
-  // defined in vtkPVInitializer.h
-  PARAVIEW_CSSTREAMS_INITIALIZE(interp);
-
-//#ifdef PARAVIEW_MINIMAL_BUILD
-//  vtkParaviewMinInit_Initialize(interp);
-//#else
-//  // Initialize built-in wrapper modules.
-//  @vtk-module-init-calls@
-//  vtkPVCommonCS_Initialize(interp);
-//  vtkPVVTKExtensionsCS_Initialize(interp);
-//  vtkPVClientServerCoreCS_Initialize(interp);
-//  vtkPVServerImplementationCS_Initialize(interp);
-//  vtkPVServerManager_Initialize(interp);
-//  vtkXdmfCS_Initialize(interp);
-//
-//# ifdef PARAVIEW_USE_VISITBRIDGE
-//  vtkVisItAVTAlgorithmsCS_Initialize(interp);
-//  vtkVisItDatabasesCS_Initialize(interp);
-//# endif
-//#endif
-
 }

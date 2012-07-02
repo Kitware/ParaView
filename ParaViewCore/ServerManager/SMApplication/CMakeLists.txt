@@ -50,7 +50,7 @@ foreach (_module ${VTK_MODULES_ENABLED})
       NOT VTK_MODULE_${_module}_IS_TEST AND
       NOT VTK_MODULE_${_module}_THIRD_PARTY AND
         (NOT _module STREQUAL "vtkPVServerManagerApplication") )
-    message("${_module} == Adding")
+    #message("${_module} == Adding")
     set(vtk-module-init-functions
       "${vtk-module-init-functions}extern \"C\" void ${_module}CS_Initialize(vtkClientServerInterpreter*);\n")
     set(vtk-module-init-calls
@@ -58,13 +58,57 @@ foreach (_module ${VTK_MODULES_ENABLED})
 
     list(APPEND _dependencies ${_module}CS)
   endif()
-
-  # TODO: We will do something similar for the XMLs too.
-
 endforeach()
 
 # Add link-dependencies on all wrapping classes.
 target_link_libraries(vtkPVServerManagerApplication ${_dependencies})
+
+#------------------------------------------------------------------------------
+# Setup SM xmls. 
+#------------------------------------------------------------------------------
+SET(resourceFiles
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
+  )
+
+if (PARAVIEW_ENABLE_PYTHON)
+  list(APPEND resourceFiles
+      ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
+  )
+endif(PARAVIEW_ENABLE_PYTHON)
+set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
+    CACHE INTERNAL "Server Manager XMLs")
+
+get_target_property(kwprocessXML_location kwProcessXML LOCATION)
+add_custom_target(vtkPVServerManagerApplicationXMLs
+  DEPENDS ${resourceFiles} kwProcessXML
+    #"${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
+  COMMAND ${kwprocessXML_location}
+       ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+       vtkSMDefaultModules Interface GetInterfaces
+       ${resourceFiles}
+  COMMENT "generating modules")
+add_dependencies(vtkPVServerManagerApplication
+  vtkPVServerManagerApplicationXMLs)
+
+set (xml_init_code "")
+foreach(rf ${resourceFiles})
+  string(REGEX REPLACE "^.*/(.*).(xml|pvsm)$" "\\1" moduleName "${rf}")
+  set (oneModule
+"  init_string =  vtkSMDefaultModules${moduleName}GetInterfaces();
+  xmls.push_back(init_string);
+  delete[] init_string; init_string = NULL;")
+  set(xml_init_code
+    "${xml_init_code}\n${oneModule}")
+endforeach()
+
 #------------------------------------------------------------------------------
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVInitializer.h.in
