@@ -310,6 +310,7 @@ else()
     ParaViewCore/ServerManager/Core
     ParaViewCore/ServerManager/Rendering
     ParaViewCore/ServerManager/Default
+    ParaViewCore/ServerManager/SMApplication
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs

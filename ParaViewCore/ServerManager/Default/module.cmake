@@ -6,4 +6,6 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerImplementationDefault
     vtkTestingRendering
     vtkIOExport
+  TEST_DEPENDS
+    vtkPVServerManagerApplication
 )

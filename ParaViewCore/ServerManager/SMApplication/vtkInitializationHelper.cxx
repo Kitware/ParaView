@@ -14,13 +14,7 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkInitializationHelper.h"
 #include "vtkPVConfig.h"
-/*
- * Make sure all the kits register their classes with vtkInstantiator.
- * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
- * anyway.  The instantiators will add no more code for the linker to
- * collect.
- */
-
+#include "vtkPVInitializer.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkOutputWindow.h"
@@ -149,6 +143,8 @@ void vtkInitializationHelper::Finalize()
  */
 void vtkInitializationHelperInit(vtkClientServerInterpreter* interp)
 {
+  // defined in vtkPVInitializer.h
+  PARAVIEW_CSSTREAMS_INITIALIZE(interp);
 
 //#ifdef PARAVIEW_MINIMAL_BUILD
 //  vtkParaviewMinInit_Initialize(interp);

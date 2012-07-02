@@ -1,0 +1,28 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVInitializer.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// THIS IS A GENERATED FILE -- DO NOT EDIT ---
+#ifndef __vtkPVInitializer_h
+#define __vtkPVInitializer_h
+
+class vtkClientServerInterpreter;
+
+@vtk-module-init-functions@
+void PARAVIEW_CSSTREAMS_INITIALIZE(vtkClientServerInterpreter* interp)
+{
+@vtk-module-init-calls@
+}
+
+#endif
+// THIS IS A GENERATED FILE -- DO NOT EDIT ---
