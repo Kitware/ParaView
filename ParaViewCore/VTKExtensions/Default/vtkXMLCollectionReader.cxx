@@ -18,7 +18,7 @@
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
@@ -302,7 +302,7 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const char* filePath,
          strcmp(this->Internal->Readers[index]->GetClassName(), rname) == 0))
       {
       // Use the instantiator to create the reader.
-      vtkObject* o = vtkInstantiator::CreateInstance(rname);
+      vtkObject* o = vtkPVInstantiator::CreateInstance(rname);
       vtkXMLReader* reader = vtkXMLReader::SafeDownCast(o);
       this->Internal->Readers[index] = reader;
       if(reader)
@@ -313,7 +313,7 @@ vtkDataObject* vtkXMLCollectionReader::SetupOutput(const char* filePath,
         {
         // The class was not registered with the instantiator.
         vtkErrorMacro("Error creating \"" << rname
-                      << "\" using vtkInstantiator.");
+                      << "\" using vtkPVInstantiator.");
         if(o)
           {
           o->Delete();

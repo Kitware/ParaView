@@ -23,7 +23,7 @@
 #include "vtkInformationStringKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationKey.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkObjectFactory.h"
@@ -370,7 +370,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
         {
         vtkAbstractArray* arr =
           vtkAbstractArray::SafeDownCast(
-            vtkInstantiator::CreateInstance(elem->GetAttribute("classname")));
+            vtkPVInstantiator::CreateInstance(elem->GetAttribute("classname")));
         vtkDataArray* dataArray =
           vtkDataArray::SafeDownCast(arr);
         if (dataArray)

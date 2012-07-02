@@ -16,25 +16,25 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
-#include "vtkInstantiator.h"
 #include "vtkCompositeMultiProcessController.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
-#include "vtkNew.h"
 #include "vtkNetworkAccessManager.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIProxy.h"
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSessionCore.h"
-#include "vtkProcessModule.h"
-#include "vtkSMMessage.h"
-#include "vtkSmartPointer.h"
-#include "vtkSocketCommunicator.h"
 #include "vtkReservedRemoteObjectIds.h"
-#include "vtkSocketController.h"
 #include "vtkSIProxyDefinitionManager.h"
+#include "vtkSIProxy.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMMessage.h"
+#include "vtkSocketCommunicator.h"
+#include "vtkSocketController.h"
 
 #include <assert.h>
 #include <string>
@@ -555,7 +555,7 @@ void vtkPVSessionServer::GatherInformationInternal(
   vtkMultiProcessStream& stream)
 {
   vtkSmartPointer<vtkObject> o;
-  o.TakeReference(vtkInstantiator::CreateInstance(classname));
+  o.TakeReference(vtkPVInstantiator::CreateInstance(classname));
 
   vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
   if (info)

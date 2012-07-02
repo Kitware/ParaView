@@ -18,7 +18,6 @@
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkImageIterator.h"
-#include "vtkInstantiator.h"
 #include "vtkJPEGWriter.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
@@ -26,6 +25,7 @@
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPoints.h"
+#include "vtkPVInstantiator.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTransform.h"
 
@@ -95,7 +95,7 @@ SaveImage(vtkImageData* image, const char* filename, const char* writerName)
     return vtkErrorCode::UnknownError;
     }
 
-  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
+  vtkObject* object = vtkPVInstantiator::CreateInstance(writerName);
   if (!object)
     {
     vtkGenericWarningMacro("Failed to create Writer " << writerName);

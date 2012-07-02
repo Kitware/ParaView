@@ -42,6 +42,8 @@ set(Module_SRCS
   vtkPVXMLParser.h
   vtkStringList.cxx
   vtkStringList.h
+  vtkPVInstantiator.cxx
+  vtkPVInstantiator.h
 )
 
 set_source_files_properties(

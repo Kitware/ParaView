@@ -15,8 +15,8 @@
 #include "vtkSMProperty.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
@@ -426,7 +426,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     vtkObject* object = 0;
     vtksys_ios::ostringstream name;
     name << "vtkSM" << domainEl->GetName() << ends;
-    object = vtkInstantiator::CreateInstance(name.str().c_str());
+    object = vtkPVInstantiator::CreateInstance(name.str().c_str());
     if (object)
       {
       vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);

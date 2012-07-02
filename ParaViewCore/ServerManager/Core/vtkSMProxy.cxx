@@ -19,23 +19,23 @@
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkGarbageCollector.h"
-#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIProxy.h"
 #include "vtkProcessModule.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSIProxyDefinitionManager.h"
+#include "vtkSIProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
 
 #include <algorithm>
@@ -1274,7 +1274,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;
   cname << "vtkSM" << propElement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(cname.str().c_str());
+  object = vtkPVInstantiator::CreateInstance(cname.str().c_str());
 
   property = vtkSMProperty::SafeDownCast(object);
   if (property)

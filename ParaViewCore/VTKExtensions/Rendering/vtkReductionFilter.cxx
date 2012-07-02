@@ -25,7 +25,7 @@
 #include "vtkInformation.h"
 #include "vtkInformationExecutivePortKey.h"
 #include "vtkInformationVector.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -78,7 +78,7 @@ int vtkReductionFilter::FillInputPortInformation(int idx, vtkInformation *info)
 void vtkReductionFilter::SetPreGatherHelperName(const char* name)
 {
   vtkSmartPointer<vtkObject> foo;
-  foo.TakeReference(vtkInstantiator::CreateInstance(name));
+  foo.TakeReference(vtkPVInstantiator::CreateInstance(name));
   this->SetPreGatherHelper(vtkAlgorithm::SafeDownCast(foo));
 }
 
@@ -86,7 +86,7 @@ void vtkReductionFilter::SetPreGatherHelperName(const char* name)
 void vtkReductionFilter::SetPostGatherHelperName(const char* name)
 {
   vtkSmartPointer<vtkObject> foo;
-  foo.TakeReference(vtkInstantiator::CreateInstance(name));
+  foo.TakeReference(vtkPVInstantiator::CreateInstance(name));
   this->SetPostGatherHelper(vtkAlgorithm::SafeDownCast(foo));
 }
 

@@ -19,21 +19,21 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 //#include "vtkGeometryRepresentation.h"
 #include "vtkInformation.h"
-#include "vtkInstantiator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPriorityHelper.h"
 #include "vtkProcessModule.h"
 #include "vtkPVExtentTranslator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVPostFilter.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMMessage.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkCompositeDataSet.h"
 
 #include <vector>
 #include <vtksys/ios/sstream>
@@ -104,7 +104,7 @@ bool vtkSISourceProxy::CreateVTKObjects(vtkSMMessage* message)
     !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
     {
     vtkExecutive* executive = vtkExecutive::SafeDownCast(
-      vtkInstantiator::CreateInstance(this->ExecutiveName));
+      vtkPVInstantiator::CreateInstance(this->ExecutiveName));
     if (executive)
       {
       algorithm->SetExecutive(executive);

@@ -17,17 +17,18 @@
 #include "vtkCollection.h"
 #include "vtkDebugLeaks.h"
 #include "vtkEventForwarderCommand.h"
-#include "vtkInstantiator.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_*
+#include "vtkPVInstantiator.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkReservedRemoteObjectIds.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCollaborationManager.h"
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMGlobalPropertiesLinkUndoElement.h"
@@ -40,6 +41,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxySelectionModel.h"
+#include "vtkSMSessionClient.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMStateLocator.h"
 #include "vtkSMUndoStackBuilder.h"
@@ -47,9 +49,6 @@
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkVersion.h"
-
-#include "vtkSMSessionClient.h"
-#include "vtkSMCollaborationManager.h"
 
 #include <map>
 #include <set>
@@ -283,7 +282,7 @@ vtkSMProxy* vtkSMSessionProxyManager::NewProxy(vtkPVXMLElement* pelement,
   vtkObject* object = 0;
   vtksys_ios::ostringstream cname;
   cname << "vtkSM" << pelement->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(cname.str().c_str());
+  object = vtkPVInstantiator::CreateInstance(cname.str().c_str());
 
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(object);
   if (proxy)
@@ -1625,7 +1624,7 @@ void vtkSMSessionProxyManager::LoadState(const vtkSMMessage* msg, vtkSMProxyLoca
       // Create the concreate class
       vtkObject* object;
       const char* className = msgTmp.GetExtension(DefinitionHeader::client_class).c_str();
-      object = vtkInstantiator::CreateInstance(className);
+      object = vtkPVInstantiator::CreateInstance(className);
       if (!object)
         {
         vtkErrorMacro("Did not create Link concreate class of " << className);

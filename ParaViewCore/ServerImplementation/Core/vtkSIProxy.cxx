@@ -18,14 +18,14 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
-#include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIProperty.h"
+#include "vtkPVInstantiator.h"
+#include "vtkPVSessionCore.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSIProperty.h"
+#include "vtkSIProxyDefinitionManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
-#include "vtkSIProxyDefinitionManager.h"
-#include "vtkPVSessionCore.h"
 
 #include <map>
 #include <set>
@@ -468,7 +468,7 @@ bool vtkSIProxy::ReadXMLProperty(vtkPVXMLElement* propElement)
     classname = cname.str();
     }
 
-  object.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
+  object.TakeReference(vtkPVInstantiator::CreateInstance(classname.c_str()));
   if (!object)
     {
     vtkErrorMacro("Failed to create helper for property: " << classname);

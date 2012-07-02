@@ -18,16 +18,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
-#include "vtkInstantiator.h"
 
 #include <vector>
 #include <map>
 #include <string>
-#include <vtkSmartPointer.h>
 
 
 //*****************************************************************************
@@ -85,7 +85,7 @@ namespace vtkSMDataTypeDomainCache
       return it->second.GetPointer();
       }
 
-    vtkObject* object = vtkInstantiator::CreateInstance(classname);
+    vtkObject* object = vtkPVInstantiator::CreateInstance(classname);
     vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
     if (!dobj)
       {

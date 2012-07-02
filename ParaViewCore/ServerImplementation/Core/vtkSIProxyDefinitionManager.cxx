@@ -17,7 +17,6 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
-#include "vtkInstantiator.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"

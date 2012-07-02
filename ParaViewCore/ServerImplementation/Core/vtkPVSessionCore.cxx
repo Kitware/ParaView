@@ -19,7 +19,7 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
@@ -427,7 +427,7 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
     // Create the corresponding SI object.
     std::string classname = message->GetExtension(DefinitionHeader::server_class);
     vtkObject* object;
-    object = vtkInstantiator::CreateInstance(classname.c_str());
+    object = vtkPVInstantiator::CreateInstance(classname.c_str());
     if (!object)
       {
       vtkErrorMacro("Failed to instantiate " << classname.c_str());
@@ -875,7 +875,7 @@ void vtkPVSessionCore::GatherInformationStatelliteCallback()
   stream >> classname >> globalid;
 
   vtkSmartPointer<vtkObject> o;
-  o.TakeReference(vtkInstantiator::CreateInstance(classname.c_str()));
+  o.TakeReference(vtkPVInstantiator::CreateInstance(classname.c_str()));
   vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
   if (info)
     {

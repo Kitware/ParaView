@@ -11,7 +11,6 @@
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
-#include "vtkInstantiator.h"
 #include "vtkMath.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPointData.h"
