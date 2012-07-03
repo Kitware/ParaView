@@ -8,6 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQEdgeFilter.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "CartesianExtent.h"
 #include "postream.h"
 

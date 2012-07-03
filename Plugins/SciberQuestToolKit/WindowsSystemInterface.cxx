@@ -92,7 +92,7 @@ unsigned long WindowsSystemInterface::GetMemoryUsed()
     cerr << "Failed to obtain memory information." << endl;
     return 0;
     }
-  return pmc.WorkingSetSize/1024;
+  return (unsigned long)(pmc.WorkingSetSize/1024);
 }
 
 //-----------------------------------------------------------------------------

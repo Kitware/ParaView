@@ -15,6 +15,8 @@ Copyright 2012 SciberQuest Inc.
   #include "vtkSQLog.h"
 #endif
 
+#include "SQPosixOnWindows.h"
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "Numerics.hxx"
 #include "MemOrder.hxx"
 #include "Tuple.hxx"

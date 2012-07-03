@@ -55,11 +55,11 @@ void RectilinearDecomp::SetCoordinate(int q, SharedArray<float> *coord)
 //-----------------------------------------------------------------------------
 float *RectilinearDecomp::SubsetCoordinate(int q, const CartesianExtent &ext) const
 {
-  int N[3];
-  ext.Size(N);
+  int n[3];
+  ext.Size(n);
 
   const float *coord=this->Coordinates[q]->GetPointer();
-  float *scoord=(float *)malloc(N[q]*sizeof(float));
+  float *scoord=(float *)malloc(n[q]*sizeof(float));
 
   for (int i=0,s=ext[2*q],e=ext[2*q+1]; s<=e; ++i,++s)
     {

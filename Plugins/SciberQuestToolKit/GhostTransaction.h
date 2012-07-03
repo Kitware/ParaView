@@ -17,6 +17,7 @@ Copyright 2012 SciberQuest Inc.
 typedef void * MPI_Request;
 typedef void * MPI_Comm;
 #else
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

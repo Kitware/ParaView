@@ -8,11 +8,13 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "CPUConvolutionDriver.h"
 
+#include "SQPosixOnWindows.h"
 #include "CartesianExtent.h"
 #include "MemOrder.hxx"
 #include "Numerics.hxx"
 #include "SQMacros.h"
 #include "postream.h"
+#include "SQVTKTemplateMacroWarningSupression.h"
 
 #include "vtkDataArray.h"
 

@@ -11,6 +11,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "CUDAConvolutionDriver.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "CartesianExtent.h"
 #include "MemOrder.hxx"
 #include "SQMacros.h"

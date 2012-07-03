@@ -26,6 +26,7 @@ typedef void * MPI_Comm;
 typedef void * MPI_Info;
 typedef void * MPI_File;
 #else
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

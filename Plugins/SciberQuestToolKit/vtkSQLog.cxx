@@ -47,6 +47,7 @@ using std::ofstream;
 using std::ios_base;
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

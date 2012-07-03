@@ -34,6 +34,7 @@ using std::string;
 #include <algorithm>
 using std::max;
 
+#include "SQEigenWarningSupression.h"
 #include<Eigen/Eigenvalues>
 using namespace Eigen;
 

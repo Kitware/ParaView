@@ -37,6 +37,7 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include "postream.h"
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 
@@ -650,7 +651,7 @@ int vtkSQBOVWriter::RequestInformation(
 
   for (int i=0; i<nSteps; ++i)
     {
-    md->AddTimeStep(times[i]);
+    md->AddTimeStep((int)times[i]);
     }
 
   return 1;

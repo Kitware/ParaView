@@ -23,6 +23,7 @@ Copyright 2012 SciberQuest Inc.
 #include "MPIRawArrayIO.hxx"
 #include "SQMacros.h"
 #include "PrintUtils.h"
+#include "SQVTKTemplateMacroWarningSupression.h"
 
 #include <sstream>
 using std::ostringstream;
@@ -61,7 +62,7 @@ BOVWriter::BOVWriter()
 }
 
 //-----------------------------------------------------------------------------
-BOVWriter::BOVWriter(const BOVWriter &other)
+BOVWriter::BOVWriter(const BOVWriter &other) : RefCountedPointer()
 {
   *this=other;
 }

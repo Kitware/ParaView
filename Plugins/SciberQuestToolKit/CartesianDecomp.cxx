@@ -14,6 +14,7 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

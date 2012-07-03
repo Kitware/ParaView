@@ -9,6 +9,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQImageGhosts.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "CartesianExtent.h"
 #include "postream.h"
 #include "Numerics.hxx"

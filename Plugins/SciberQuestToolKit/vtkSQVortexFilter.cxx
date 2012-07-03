@@ -8,6 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQVortexFilter.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "CartesianExtent.h"
 #include "XMLUtils.h"
 #include "postream.h"

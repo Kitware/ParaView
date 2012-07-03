@@ -210,9 +210,9 @@ void pqSQBOVMetaReader::UpdateDecompDims()
       }
     else
       {
-      int p=log10((float)nCells[q]);
-      int b=pow(10.0,p-2);
-      int m=nCells[q]/((int)pow(10.0,p));
+      int p=(int)log10((float)nCells[q]);
+      int b=(int)pow(10.0,p-2);
+      int m=(int)(nCells[q]/((int)pow(10.0,p)));
       int dim=m*b;
       nBlocks*=dim;
       this->DecompDims[q]->setText(QString("%1").arg(dim));

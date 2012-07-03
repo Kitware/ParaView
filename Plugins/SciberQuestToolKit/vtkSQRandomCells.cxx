@@ -45,6 +45,7 @@ typedef pair<set<unsigned long long>::iterator,bool> SetInsert;
 #include <ctime>
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 
@@ -322,7 +323,9 @@ int vtkSQRandomCells::RequestData(
       {
       // sample size is large enough that random selection of n unique cells
       // is impractical.
-      unsigned long long reducedSampleSize=max(1.0,0.75*nCellsTotal);
+      unsigned long long reducedSampleSize
+        = (unsigned long long)max(1.0,0.75*nCellsTotal);
+
       vtkWarningMacro(
         << "Reducing sample size from "
         << this->SampleSize
