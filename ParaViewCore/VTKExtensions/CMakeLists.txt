@@ -380,7 +380,7 @@ FOREACH(file ${glsl_files})
     OUTPUT ${res} ${resh}
     DEPENDS ${src} vtkEncodeString
     COMMAND ${VTK_ENCODESTRING_EXE}
-    ARGS ${res} ${src} ${file} --build-header VTK_EXPORT vtkSystemIncludes.h
+    ARGS ${res} ${src} ${file}
     )
   SET(Kit_SRCS ${Kit_SRCS} ${res})
   SET_SOURCE_FILES_PROPERTIES( ${res} WRAP_EXCLUDE)

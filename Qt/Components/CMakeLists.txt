@@ -17,6 +17,18 @@ IF(PARAVIEW_ENABLE_PYTHON)
     ${VTKPythonWrapping_SOURCE_DIR}/Executable)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+# setup the default color maps
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.cxx
+         ${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.h
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ColorMaps.xml vtkEncodeString
+  COMMAND ${VTK_ENCODESTRING_EXE}
+  ARGS ${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.cxx
+       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ColorMaps.xml
+       pqBuiltinColorMapsXML --build-header PQCOMPONENTS_EXPORT pqComponentsExport.h
+)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.cxx WRAP_EXCLUDE)
+
 INCLUDE(${QT_USE_FILE})
 
 INCLUDE_DIRECTORIES(
@@ -386,6 +398,8 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqArrayStatusPropertyWidget.h
   pqBoxWidget.cxx
   pqBoxWidget.h
+  pqBuiltinColorMaps.cxx
+  pqBuiltinColorMaps.h
   pqCalculatorPanel.cxx
   pqCalculatorPanel.h
   pqCalculatorSummaryPanel.cxx
