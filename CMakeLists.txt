@@ -215,6 +215,10 @@ if (BUILD_TESTING)
 
   # Enable Python testing, is Python was enabled.
   set (QT_TESTING_WITH_PYTHON ${PARAVIEW_ENABLE_PYTHON})
+
+  # Since Qt/Testing hasn't been converted to vtk-modules, we simply import it
+  # here.
+  add_subdirectory(Qt/Testing)
 endif()
 
 #------------------------------------------------------------------------------
@@ -315,6 +319,12 @@ else()
     ParaViewCore/ServerManager/Rendering
     ParaViewCore/ServerManager/Default
     ParaViewCore/ServerManager/SMApplication
+
+    Qt/Widgets
+    Qt/Core
+    Qt/Components
+    Qt/Python
+    Qt/ApplicationComponents
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs
