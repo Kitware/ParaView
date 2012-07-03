@@ -140,6 +140,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqParallelCoordinatesChartDisplayPanel.h
+  pqPassArraysPanel.h
   pqPlotMatrixDisplayPanel.h
   pqPlotMatrixOptionsEditor.h
   pqPluginTreeWidget.h
@@ -563,6 +564,8 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.cxx
 #  pqParticleTracerPanel.h
+  pqPassArraysPanel.cxx
+  pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.cxx
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.cxx

@@ -84,6 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 #include "pqIsoVolumePanel.h"
 #include "pqCalculatorPanel.h"
+#include "pqPassArraysPanel.h"
 #include "pqStreamTracerPanel.h"
 #include "pqTextRepresentation.h"
 #include "pqProxyPropertyWidget.h"
@@ -130,6 +131,10 @@ public:
       if(QString("Calculator") == proxy->getProxy()->GetXMLName())
         {
         return new pqCalculatorPanel(proxy, p);
+        }
+      if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqPassArraysPanel(proxy, p);
         }
       if (QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
         QString("Glyph") == proxy->getProxy()->GetXMLName())
@@ -198,7 +203,8 @@ public:
          QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
          QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName() ||
-         QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
+         QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
+         QString("PassArrays") == proxy->getProxy()->GetXMLName() )
         {
         return true;
         }
@@ -399,7 +405,7 @@ pqView* pqPropertiesPanel::view() const
   return this->View;
 }
 
-pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *property) const
+pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *prop) const
 {
   foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
     {
@@ -409,7 +415,7 @@ pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *propert
       continue;
       }
 
-    if(widget->property() == property)
+    if(widget->property() == prop)
       {
       return widget;
       }
