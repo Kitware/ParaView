@@ -1,9 +1,6 @@
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
-[submodule "Qt/Testing"]
-	path = Qt/Testing
-	url = git://paraview.org/QtTesting.git
 [submodule "Utilities/VisItBridge"]
 	path = Utilities/VisItBridge
 	url = git://paraview.org/VisItBridge.git
@@ -16,3 +13,6 @@
 [submodule "ThirdParty/Xdmf2/vtkxdmf2"]
 	path = ThirdParty/Xdmf2/vtkxdmf2
 	url = git://paraview.org/Xdmf.git
+[submodule "ThirdParty/QtTesting/vtkqttesting"]
+	path = ThirdParty/QtTesting/vtkqttesting
+	url = git://paraview.org/QtTesting.git
