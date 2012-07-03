@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqChartPrintSave_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 
 class QMenu;
 class QWidget;
 
 
-class QTWIDGETS_EXPORT pqChartPrintSave : public QObject
+class PQWIDGETS_EXPORT pqChartPrintSave : public QObject
 {
   Q_OBJECT
 

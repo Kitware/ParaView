@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqTreeView_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QTreeView>
 
 
-class QTWIDGETS_EXPORT pqTreeView : public QTreeView
+class PQWIDGETS_EXPORT pqTreeView : public QTreeView
 {
   Q_OBJECT
 

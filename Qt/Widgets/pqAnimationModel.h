@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimationModel_h
 #define pqAnimationModel_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QObject>
 #include <QGraphicsScene>
@@ -46,7 +46,7 @@ class QGraphicsView;
 class pqCheckBoxPixMaps;
 
 // a model that represents a collection of animation tracks
-class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
+class PQWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
 {
   Q_OBJECT
   Q_ENUMS(ModeType)

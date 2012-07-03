@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqIntRangeWidget_h
 
 #include <QWidget>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
   
 class QSlider;
 class QLineEdit;
 
 /// a widget with a tied slider and line edit for editing a int property
-class QTWIDGETS_EXPORT pqIntRangeWidget : public QWidget
+class PQWIDGETS_EXPORT pqIntRangeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(int value READ value WRITE setValue USER true)

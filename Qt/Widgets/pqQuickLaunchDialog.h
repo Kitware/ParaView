@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqQuickLaunchDialog_h
 
 #include <QDialog>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 /// A borderless pop-up dialog used to show actions that the user can launch.
 /// Provides search capabilities.
-class QTWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
+class PQWIDGETS_EXPORT pqQuickLaunchDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;

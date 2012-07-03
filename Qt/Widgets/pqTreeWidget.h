@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqTreeWidget_h
 #define _pqTreeWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QTreeWidget>
 
 /**
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   4.  Signal emitted when user navigates beyond end of the table giving an 
       opportunity to the lister to grow the table.
 */
-class QTWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
+class PQWIDGETS_EXPORT pqTreeWidget : public QTreeWidget
 {
   typedef QTreeWidget Superclass;
   Q_OBJECT

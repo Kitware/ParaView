@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTreeWidgetCheckHelper_h
 #define __pqTreeWidgetCheckHelper_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 
 class QTreeWidget;
@@ -46,7 +46,7 @@ class QTreeWidgetItem;
 /// purpose, we use pqTreeWidgetCheckHelper. Simply create
 /// and instance of pqTreeWidgetCheckHelper, and 
 /// set a tree to use.
-class QTWIDGETS_EXPORT pqTreeWidgetCheckHelper : public QObject
+class PQWIDGETS_EXPORT pqTreeWidgetCheckHelper : public QObject
 {
   Q_OBJECT
 public:

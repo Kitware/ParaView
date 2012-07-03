@@ -37,13 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCheckableHeaderView_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QHeaderView>
 
 class pqCheckableHeaderViewInternal;
 
 
-class QTWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
+class PQWIDGETS_EXPORT pqCheckableHeaderView : public QHeaderView
 {
   Q_OBJECT
 

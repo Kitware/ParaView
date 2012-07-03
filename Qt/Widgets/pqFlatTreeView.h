@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFlatTreeView_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QAbstractScrollArea>
 #include <QModelIndex>          // Needed for return type
 #include <QStyleOptionViewItem> // Needed for return type
@@ -69,7 +69,7 @@ class QRect;
 /// those items are indented from the parent. Normal tree view
 /// branches are drawn between the parent and child items to show
 /// the relationship.
-class QTWIDGETS_EXPORT pqFlatTreeView : public QAbstractScrollArea
+class PQWIDGETS_EXPORT pqFlatTreeView : public QAbstractScrollArea
 {
   Q_OBJECT
 

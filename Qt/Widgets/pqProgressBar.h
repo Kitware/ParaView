@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqProgressBar_h
 #define __pqProgressBar_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QWidget>
 
 class pqProgressBarHelper;
@@ -42,7 +42,7 @@ class QLabel;
 //lightweight widget that has a progress bar and label.
 //this gives us a consitent progress bar no matter the OS
 //mainly because everyone wants to see what is "working" on OSX
-class QTWIDGETS_EXPORT pqProgressBar : public QWidget
+class PQWIDGETS_EXPORT pqProgressBar : public QWidget
 {
   Q_OBJECT
 public:

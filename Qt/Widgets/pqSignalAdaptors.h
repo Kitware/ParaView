@@ -41,12 +41,12 @@ class QSlider;
 class QTextEdit;
 class QSpinBox;
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 
 /// signal adaptor to allow getting/setting/observing of a pseudo 'currentText' property of a combo box 
 /// the QComboBox currentIndexChanged signal is forwarded to this currentTextChanged signal
-class QTWIDGETS_EXPORT pqSignalAdaptorComboBox : public QObject
+class PQWIDGETS_EXPORT pqSignalAdaptorComboBox : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QString currentText READ currentText WRITE setCurrentText)
@@ -82,7 +82,7 @@ protected:
 };
 
 /// signal adaptor to allow getting/setting/observing of an rgba (0.0 - 1.0 range)
-class QTWIDGETS_EXPORT pqSignalAdaptorColor : public QObject
+class PQWIDGETS_EXPORT pqSignalAdaptorColor : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QVariant color READ color WRITE setColor)
@@ -108,7 +108,7 @@ protected:
 
 
 /// signal adaptor to adjust the range of a int slider to (0.0-1.0)
-class QTWIDGETS_EXPORT pqSignalAdaptorSliderRange : public QObject
+class PQWIDGETS_EXPORT pqSignalAdaptorSliderRange : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(double value READ value WRITE setValue)
@@ -128,7 +128,7 @@ protected slots:
 };
 
 /// signal adaptor that lets us get the text inside a QTextEdit
-class QTWIDGETS_EXPORT pqSignalAdaptorTextEdit : public QObject
+class PQWIDGETS_EXPORT pqSignalAdaptorTextEdit : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QString text READ text WRITE setText)
@@ -148,7 +148,7 @@ protected:
 
 
 /// signal adaptor that lets us set/get the integer value inside a QSpinBox
-class QTWIDGETS_EXPORT pqSignalAdaptorSpinBox : public QObject
+class PQWIDGETS_EXPORT pqSignalAdaptorSpinBox : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(int value READ value WRITE setValue)

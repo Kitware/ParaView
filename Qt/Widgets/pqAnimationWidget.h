@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimationWidget_h
 #define pqAnimationWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QAbstractScrollArea>
 #include <QStandardItemModel>
@@ -43,7 +43,7 @@ class QHeaderView;
 class pqAnimationModel;
 class pqAnimationTrack;
 
-class QTWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
+class PQWIDGETS_EXPORT pqAnimationWidget : public QAbstractScrollArea
 {
   Q_OBJECT
 public:

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqConsoleWidget_h
 #define _pqConsoleWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QWidget>
 #include <QTextCharFormat>
@@ -48,7 +48,7 @@ class pqConsoleWidgetCompleter;
   
   \sa pqPythonShell, pqOutputWindow
 */
-class QTWIDGETS_EXPORT pqConsoleWidget :
+class PQWIDGETS_EXPORT pqConsoleWidget :
   public QWidget
 {
   Q_OBJECT
@@ -105,7 +105,7 @@ private:
 };
 
 
-class QTWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
+class PQWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
 {
 public:
 

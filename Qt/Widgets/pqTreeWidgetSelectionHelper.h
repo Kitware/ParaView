@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqTreeWidgetSelectionHelper_h
 
 #include <QObject>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QItemSelection>
 
 class QTreeWidget;
@@ -46,7 +46,7 @@ class QTreeWidgetItem;
 /// tree widget.
 /// CAVEATS: This helper currently assumes that the 0-th column is checkable (if
 /// at all). This can be fixed if needed.
-class QTWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
+class PQWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

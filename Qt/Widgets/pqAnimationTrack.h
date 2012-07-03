@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimationTrack_h
 #define pqAnimationTrack_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QObject>
 #include <QGraphicsItem>
@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationKeyFrame;
 
 // represents a track
-class QTWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
+class PQWIDGETS_EXPORT pqAnimationTrack : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   /// Declare the interfaces implemented - fails with Qt 4.5, warns on 4.6

@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqColorTableModel_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QAbstractListModel>
 
 class pqColorTableModelInternal;
 class QColor;
 
 
-class QTWIDGETS_EXPORT pqColorTableModel : public QAbstractListModel
+class PQWIDGETS_EXPORT pqColorTableModel : public QAbstractListModel
 {
   Q_OBJECT
 

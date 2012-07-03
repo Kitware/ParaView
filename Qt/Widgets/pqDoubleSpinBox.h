@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDoubleSpinBox_h
 
 #include <QDoubleSpinBox>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 /// QDoubleSpinBox which fires editingFinished() signal when the value is changed
 /// by steps (increments).
-class QTWIDGETS_EXPORT pqDoubleSpinBox : public QDoubleSpinBox
+class PQWIDGETS_EXPORT pqDoubleSpinBox : public QDoubleSpinBox
 {
   Q_OBJECT
   typedef QDoubleSpinBox Superclass;

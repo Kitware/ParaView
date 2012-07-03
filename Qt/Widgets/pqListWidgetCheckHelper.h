@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqListWidgetCheckHelper_h
 #define __pqListWidgetCheckHelper_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 
 class QListWidget;
@@ -46,7 +46,7 @@ class QListWidgetItem;
 /// purpose, we use pqListWidgetCheckHelper. Simply create
 /// and instance of pqListWidgetCheckHelper, and 
 /// set a List to use.
-class QTWIDGETS_EXPORT pqListWidgetCheckHelper : public QObject
+class PQWIDGETS_EXPORT pqListWidgetCheckHelper : public QObject
 {
   Q_OBJECT
 public:

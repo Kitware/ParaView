@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMainWindow>
 #include <QPointer>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 class QHelpEngine;
 class QHelpEngineCore;
@@ -43,7 +43,7 @@ class QWebView;
 
 /// pqHelpWindow provides a assistant-like window  for showing help provided by
 /// a QHelpEngine.
-class QTWIDGETS_EXPORT pqHelpWindow : public QMainWindow
+class PQWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
   typedef QMainWindow Superclass;
@@ -85,7 +85,7 @@ private:
 #include <QBuffer>
 /// Internal class used to add support to QWebView to load files from
 /// QHelpEngine.
-class QTWIDGETS_EXPORT pqHelpWindowNetworkReply : public QNetworkReply
+class PQWIDGETS_EXPORT pqHelpWindowNetworkReply : public QNetworkReply
 {
   Q_OBJECT;
   typedef QNetworkReply Superclass;

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqWaitCursor_h
 #define _pqWaitCursor_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 /**
   RAII component that displays a wait cursor during a long operation.
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   /endcode
 */
 
-class QTWIDGETS_EXPORT pqWaitCursor
+class PQWIDGETS_EXPORT pqWaitCursor
 {
 public:
   pqWaitCursor();

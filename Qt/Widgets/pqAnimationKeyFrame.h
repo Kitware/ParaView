@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqAnimationKeyFrame_h
 #define pqAnimationKeyFrame_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QObject>
 #include <QGraphicsItem>
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationTrack;
 
 // represents a key frame
-class QTWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
+class PQWIDGETS_EXPORT pqAnimationKeyFrame : public QObject, public QGraphicsItem
 {
   Q_OBJECT
   /// the time as a fraction of scene time that this keyframe starts at

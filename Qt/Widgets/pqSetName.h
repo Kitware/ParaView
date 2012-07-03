@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSetName_h
 #define _pqSetName_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QString>
 
 /**
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   \sa pqSetData, pqConnect
 */
   
-struct QTWIDGETS_EXPORT pqSetName
+struct PQWIDGETS_EXPORT pqSetName
 {
   pqSetName(const QString& Name);
   const QString Name;

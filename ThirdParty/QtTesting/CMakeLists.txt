@@ -1,0 +1,48 @@
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set (QT_TESTING_WITH_PYTHON ${PARAVIEW_ENABLE_PYTHON})
+set (QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+set (QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+set (QtTesting_INSTALL_LIBRARY_DIR ${PV_INSTALL_LIB_DIR})
+set (QT_TESTING_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+
+##########################################################################
+# import Qt4 build settings
+find_package(Qt4 REQUIRED QUIET)
+include(${QT_USE_FILE})
+
+vtk_target_export(QtTesting)
+vtk_module_third_party(qttesting
+  INCLUDE_DIRS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/vtkqttesting
+    ${CMAKE_CURRENT_BINARY_DIR}/vtkqttesting
+  LIBRARIES QtTesting
+)

@@ -212,13 +212,6 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
-
-  # Enable Python testing, is Python was enabled.
-  set (QT_TESTING_WITH_PYTHON ${PARAVIEW_ENABLE_PYTHON})
-
-  # Since Qt/Testing hasn't been converted to vtk-modules, we simply import it
-  # here.
-  add_subdirectory(Qt/Testing)
 endif()
 
 #------------------------------------------------------------------------------
@@ -295,11 +288,13 @@ else()
   set (VTK_Group_ParaViewCore ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaViewRendering ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaView ON CACHE INTERNAL "" FORCE)
+  set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE INTERNAL "" FORCE)
 
   set (ParaViewModulesDirs
     Utilities/ProcessXML
     ThirdParty/protobuf
+    ThirdParty/QtTesting
     CommandLineExecutables
 #    Need to fix Xdmf2 rules.
 #    ThirdParty/Xdmf2

@@ -39,12 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // that can be used for the same.
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QMenu>
 #include <QPointer>
 #include <QHeaderView>
 
-class QTWIDGETS_EXPORT pqSectionVisibilityContextMenu : public QMenu
+class PQWIDGETS_EXPORT pqSectionVisibilityContextMenu : public QMenu
 {
   Q_OBJECT
 public:
