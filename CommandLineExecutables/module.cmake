@@ -1,0 +1,9 @@
+vtk_module(pvCommandLineExecutables
+  GROUPS
+    ParaView
+  DEPENDS
+    vtkPVServerManagerApplication
+  TEST_DEPENDS
+    vtksys
+  EXCLUDE_FROM_WRAPPING
+)

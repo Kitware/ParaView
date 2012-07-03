@@ -296,6 +296,9 @@ else()
   set (ParaViewModulesDirs
     Utilities/ProcessXML
     ThirdParty/protobuf
+    CommandLineExecutables
+#    Need to fix Xdmf2 rules.
+#    ThirdParty/Xdmf2
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common

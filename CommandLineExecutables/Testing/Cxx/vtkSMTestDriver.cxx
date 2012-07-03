@@ -95,7 +95,7 @@ void vtkSMTestDriver::SeparateArguments(const char* str,
 void vtkSMTestDriver::CollectConfiguredOptions()
 {
   // try to make sure that this timesout before dart so it can kill all the processes
-  this->TimeOut = DART_TESTING_TIMEOUT - 10.0;
+  this->TimeOut = 0; 
   if(this->TimeOut < 0)
     {
     this->TimeOut = 1500;
