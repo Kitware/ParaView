@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqStandardServerManagerModelInterface_h 
 #define __pqStandardServerManagerModelInterface_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqServerManagerModelInterface.h"
 #include <QObject>
 

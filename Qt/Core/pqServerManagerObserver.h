@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerManagerObserver_h
 #define _pqServerManagerObserver_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 #include "vtkType.h" // needed for vtkIdType
 

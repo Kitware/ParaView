@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqImageUtil_h
 
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 class QImage;
 class vtkImageData;
 class QString;

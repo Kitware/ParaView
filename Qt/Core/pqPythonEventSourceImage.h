@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPythonEventSourceImage_h
 
 #include "pqPythonEventSource.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /** Python event source with Image comparison capabilities 
 

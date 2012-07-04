@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialogModel_h
 #define _pqFileDialogModel_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 #include <QAbstractItemModel>
 #include <QFileIconProvider>

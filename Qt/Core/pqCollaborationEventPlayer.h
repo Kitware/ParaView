@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqCollaborationEventPlayer_h 
 #define __pqCollaborationEventPlayer_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqWidgetEventPlayer.h"
 
 /// pqCollaborationEventPlayer is used to playback events that make

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqOutputWindowAdapter_h
 #define _pqOutputWindowAdapter_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 #include <vtkOutputWindow.h>
 #include <QObject>

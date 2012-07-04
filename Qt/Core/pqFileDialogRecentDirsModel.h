@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractListModel>
 #include <QStringList>
 #include <QPointer>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqServer;
 class pqFileDialogModel;

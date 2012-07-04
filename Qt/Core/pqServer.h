@@ -45,7 +45,7 @@ class vtkSMRenderViewProxy;
 class vtkSMSession;
 class vtkSMSessionProxyManager;
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqServerManagerModelItem.h"
 #include "pqServerResource.h"
 #include "pqTimer.h"

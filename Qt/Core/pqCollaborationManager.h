@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCollaborationManager_h
 #define _pqCollaborationManager_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "vtkSMMessageMinimal.h"
 #include <QObject>
 

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqServerManagerModelInterface_h
 
 #include <QtPlugin>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class vtkSMProxy;
 class pqServer;

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSettings_h
 #define _pqSettings_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QSettings>
 
 class QDialog;

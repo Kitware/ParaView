@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqLinkViewWidget_h
 
 #include <QWidget>
-#include <pqCoreExport.h>
+#include <pqCoreModule.h>
 class pqRenderView;
 class QLineEdit;
 

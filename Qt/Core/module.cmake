@@ -1,0 +1,9 @@
+vtk_module(pqCore
+  GROUPS
+    ParaViewQt
+  DEPENDS
+    pqWidgets
+    vtkGUISupportQt
+    vtkPVServerManagerApplication
+  EXCLUDE_FROM_WRAPPING
+)

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFormBuilder_h
 #define _pqFormBuilder_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 #ifdef Q_WS_MAC
 #include <QUiLoader>  // build fine with Qt install from dmg

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QList>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqQVTKWidget_h
 
 #include "QVTKWidget.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 

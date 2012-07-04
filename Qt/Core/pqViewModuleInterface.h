@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqViewModuleInterface_h
 #define _pqViewModuleInterface_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 #include <QtPlugin>
 #include <QStringList>

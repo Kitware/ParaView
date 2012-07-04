@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqCoreInit_h
 #define __pqCoreInit_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /// pqCoreInit() is for initializing static data when pqCore is built 
 /// as a static library.  Otherwise, linkers may drop out entire object

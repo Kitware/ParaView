@@ -196,6 +196,11 @@ set(QT_USE_QTWEBKIT 1)
 find_package(Qt4 REQUIRED QUIET)
 include(${QT_USE_FILE})
 
+# Setting this variable ensures that any module depending on pqWidgets
+# automatically inherits the Qt include dirs.
+set (${vtk-module}_INCLUDE_DIRS
+  ${QT_INCLUDES})
+
 set(${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${QT_WIDGETS_ALL_SRCS})

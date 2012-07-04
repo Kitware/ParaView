@@ -37,7 +37,7 @@ class vtkSMProperty;
 class vtkSMProxy;
 class vtkObject;
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QVariant>
 #include <QList>
 #include <QPair>

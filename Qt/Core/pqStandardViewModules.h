@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqStandardViewModules_h
 #define _pqStandardViewModules_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqViewModuleInterface.h"
 #include <QObject>
 

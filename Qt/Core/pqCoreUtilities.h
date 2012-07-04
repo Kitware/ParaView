@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqCoreUtilities_h 
 #define __pqCoreUtilities_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqEventDispatcher.h"
 
 #include <QEventLoop>

@@ -17,7 +17,7 @@
 #define __vtkPVGUIPluginInterface_h
 
 #include <QObjectList>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /// vtkPVGUIPluginInterface defines the interface required by GUI plugins. This
 /// simply provides access to the GUI-component interfaces defined in this

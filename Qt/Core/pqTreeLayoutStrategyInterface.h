@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 #include <QStringList>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class vtkAreaLayoutStrategy;
 

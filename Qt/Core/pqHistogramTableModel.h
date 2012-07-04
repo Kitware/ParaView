@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqHistogramTableModel_h
 #define __pqHistogramTableModel_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QAbstractTableModel>
 
 class vtkDoubleArray;

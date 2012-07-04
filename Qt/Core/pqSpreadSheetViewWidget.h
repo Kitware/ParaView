@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSpreadSheetViewWidget_h
 
 #include <QTableView>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqSpreadSheetViewModel;
 

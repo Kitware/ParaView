@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqOptions_h
 #define __pqOptions_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <vtkPVOptions.h>
 #include <QStringList>
 

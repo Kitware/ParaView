@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqQVTKWidgetEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /**
 Translates low-level Qt events into high-level ParaView events that can be recorded as test cases.

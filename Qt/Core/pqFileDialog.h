@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialog_h
 #define _pqFileDialog_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QStringList>
 #include <QDialog>
 
