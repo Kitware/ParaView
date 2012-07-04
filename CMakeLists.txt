@@ -73,6 +73,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
 include(CMakeDependentOption)
+include(ParaViewMacros)
 #------------------------------------------------------------------------------
 
 
@@ -156,6 +157,13 @@ option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
 # Set the export name.
 set(PV_INSTALL_EXPORT_NAME ParaViewTargets)
+
+# Is this a 32 bit or 64bit build. Display this in about dialog.
+if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+  set(PARAVIEW_BUILD_ARCHITECTURE "64")
+else()
+  set(PARAVIEW_BUILD_ARCHITECTURE "32")
+endif()
 
 FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   ${ParaView_SOURCE_DIR}/../ParaViewData

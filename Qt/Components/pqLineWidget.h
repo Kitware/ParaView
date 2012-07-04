@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLineWidget_h
 
 #include "pq3DWidget.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QColor>
 
 class pqServer;

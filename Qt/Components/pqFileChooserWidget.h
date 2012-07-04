@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileChooserWidget_h
 #define _pqFileChooserWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QWidget>
 #include <QString>
 #include <QStringList>

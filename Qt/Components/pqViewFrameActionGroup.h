@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqViewFrameActionGroup_h
 
 #include <QActionGroup>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqViewFrame;
 class pqView;

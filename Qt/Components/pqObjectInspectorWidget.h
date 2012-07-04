@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectInspectorWidget_h
 #define _pqObjectInspectorWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QWidget>
 #include <QMap>
 #include <QPointer>

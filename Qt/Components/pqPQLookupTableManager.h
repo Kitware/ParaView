@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPQLookupTableManager_h
 
 #include "pqLookupTableManager.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class vtkSMProxy;
 

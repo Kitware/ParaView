@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqTimer.h"
 
 class pqServer;

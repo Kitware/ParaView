@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqItemViewSearchWidget_h
 #define __pqItemViewSearchWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QDialog>
 #include <QModelIndex>
 

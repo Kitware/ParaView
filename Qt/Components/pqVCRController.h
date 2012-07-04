@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqVCRController_h
 #define _pqVCRController_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QPointer>
 #include <QObject>
 

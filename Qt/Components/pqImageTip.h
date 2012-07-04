@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImageTip_h
 #define _pqImageTip_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QLabel>
 
 class QBasicTimer;

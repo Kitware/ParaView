@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPointer>
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqObjectPanel.h"
 #include "pqOutputPort.h"

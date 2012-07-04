@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqApplicationOptions_h
 #define _pqApplicationOptions_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqOptionsContainer.h"
 
 /// options container for pages of render view options

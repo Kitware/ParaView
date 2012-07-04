@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqExodusIIVariableSelectionWidget_h
 
 #include "pqTreeWidget.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// pqExodusIIVariableSelectionWidget is used by pqExodusIIPanel to show the
 /// a variable selection widget. Unlike typical variable selection widgets used

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqKeyFrameTimeValidator_h
 
 #include <QDoubleValidator>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqAnimationScene;
 class vtkSMDomain;

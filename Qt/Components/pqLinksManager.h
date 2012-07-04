@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqLinksManager_h
 
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "ui_pqLinksManager.h"
 
 /// dialog for viewing, creating, editing, removing proxy/property/camera links

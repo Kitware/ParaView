@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QList>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqServerConfiguration.h"
 
 class QAuthenticator;

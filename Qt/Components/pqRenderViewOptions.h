@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqRenderViewOptions_h
 #define _pqRenderViewOptions_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqOptionsContainer.h"
 
 class pqView;

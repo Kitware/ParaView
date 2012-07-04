@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPlotMatrixDisplayPanel_h
 #define _pqPlotMatrixDisplayPanel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqDisplayPanel.h"
 #include "pqPropertyLinks.h"
 

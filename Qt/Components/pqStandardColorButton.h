@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqStandardColorButton_h
 
 #include "pqColorChooserButton.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class vtkEventQtSlotConnect;
 

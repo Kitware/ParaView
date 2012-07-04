@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayPanelInterface_h
 
 #include <QtPlugin>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 class pqDisplayPanel;
 class pqRepresentation;
 class QWidget;

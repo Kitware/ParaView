@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqComparativeCueWidget_h
 
 #include <QTableWidget>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqTimer.h"
 #include "vtkSmartPointer.h"
 

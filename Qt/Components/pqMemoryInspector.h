@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqMemoryInspector_h
 
 #include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class PQCOMPONENTS_EXPORT pqMemoryInspector : public QWidget
 {

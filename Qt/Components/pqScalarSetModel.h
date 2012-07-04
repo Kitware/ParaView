@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqScalarSetModel_h
 #define _pqScalarSetModel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QAbstractListModel>
 

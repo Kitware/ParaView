@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectPanel_h
 #define _pqObjectPanel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqProxyPanel.h"
 
 #include <QPointer>

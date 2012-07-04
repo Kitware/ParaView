@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectPanelPropertyWidget_h
 #define _pqObjectPanelPropertyWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include "pqObjectPanel.h"
 #include "pqPropertyWidget.h"

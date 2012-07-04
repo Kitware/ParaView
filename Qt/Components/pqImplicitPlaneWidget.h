@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImplicitPlaneWidget_h
 #define _pqImplicitPlaneWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include "pqProxy.h"
 

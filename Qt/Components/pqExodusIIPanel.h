@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqExodusIIPanel_h
 
 #include "pqNamedObjectPanel.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqOutputPort;
 class pqTreeWidgetItemObject;

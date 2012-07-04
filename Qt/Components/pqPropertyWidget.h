@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPropertyWidget_h
 #define _pqPropertyWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QWidget>
 

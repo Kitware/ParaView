@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqComparativeVisPanel_h
 
 #include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqView;
 class vtkSMProxy;

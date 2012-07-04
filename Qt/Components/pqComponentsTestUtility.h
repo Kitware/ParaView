@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqComponentsTestUtility_h
 
 #include "pqCoreTestUtility.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// pqComponentsTestUtility simply adds a pqComponents specific testing
 /// capabilities to pqCoreTestUtility.

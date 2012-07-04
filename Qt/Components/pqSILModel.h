@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 
 #include "vtkObject.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "vtkSmartPointer.h"
 
 class vtkGraph;

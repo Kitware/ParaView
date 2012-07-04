@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqProxyPanel_h
 #define _pqProxyPanel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QWidget>
 #include <QPointer>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 class pqProxy;
 class pqView;
 class pqPropertyManager;

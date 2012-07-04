@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDisplayPanelDecoratorInterface_h
 
 #include <QtPlugin>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 class pqDisplayPanel;
 
 /// pqDisplayPanelDecoratorInterface is used to add decorators to display panels

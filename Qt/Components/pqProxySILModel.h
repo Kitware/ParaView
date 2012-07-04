@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqProxySILModel_h
 
 #include <QAbstractProxyModel>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqTimer.h"
 
 #include <QPixmap>

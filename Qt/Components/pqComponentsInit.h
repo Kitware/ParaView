@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqComponentsInit_h
 #define __pqComponentsInit_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// pqComponentsInit() is for initializing static data when pqComponents 
 /// is built as a static library.  Otherwise, linkers may drop out entire 

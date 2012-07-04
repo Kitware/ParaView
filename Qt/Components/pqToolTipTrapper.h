@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqToolTipTrapper_h
 #define _pqToolTipTrapper_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QObject>
 

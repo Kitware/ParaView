@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqAnimationManager_h
 #define __pqAnimationManager_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QObject>
 
 class QSize;

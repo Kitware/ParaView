@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineModel_h
 
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QAbstractItemModel>
 #include <QPointer>
 #include "pqView.h"

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QPointer>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// needed for inline get-methods.
 #include "pqDataRepresentation.h"

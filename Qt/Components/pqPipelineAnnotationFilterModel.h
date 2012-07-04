@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineAnnotationFilterModel_h
 
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QSortFilterProxyModel>
 
 class vtkSession;

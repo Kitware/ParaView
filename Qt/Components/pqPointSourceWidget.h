@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 #include "pqHandleWidget.h" 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqPropertyManager;
 
