@@ -1292,10 +1292,13 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 {
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
+  // get builtin color maps xml
+  const char *xml = pqComponentsGetColorMapsXML();
+
   // create xml parser
   vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
   xmlParser->InitializeParser();
-  xmlParser->ParseChunk(pqBuiltinColorMapsXML, strlen(pqBuiltinColorMapsXML));
+  xmlParser->ParseChunk(xml, strlen(xml));
   xmlParser->CleanupParser();
 
   // parse each color map element
