@@ -182,7 +182,7 @@ endif (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 set (PARAVIEW_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
 # Setup Qt state
-if (PARAVIEW_BUILD_QT_GUI)
+if (PARAVIEW_ENABLE_QT_SUPPORT)
   # need to set up Qt stuff here because there are Qt dependencies before
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
@@ -360,4 +360,7 @@ configure_file(
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
 add_subdirectory(Wrapping/ClientServer)
+
 #------------------------------------------------------------------------------
+add_subdirectory(Documentation)
+add_subdirectory(Applications)
