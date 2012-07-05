@@ -28,7 +28,17 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+vtk_module_third_party(xdmf2
+ INCLUDE_DIRS 
+   ${CMAKE_CURRENT_SOURCE_DIR}/vtkxdmf2/libsrc
+   ${CMAKE_CURRENT_BINARY_DIR}/vtkxdmf2/libsrc
+  LIBRARIES Xdmf
+  NO_ADD_SUBDIRECTORY
+)
 
+if(VTK_USE_SYSTEM_XDMF2)
+  return()
+endif()
 
 #########################################################################
 # Set Xdmf environment
@@ -38,6 +48,7 @@ SET(XDMF_INSTALL_INCLUDE_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
 SET(XDMF_INSTALL_INCLUDE_VTK_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
 SET(XDMF_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
 SET(XDMF_WRAP_PYTHON_INSTALL_DIR ${PV_INSTALL_LIB_DIR}/site-packages/Xdmf)
+SET(XDMF_USE_ANSI_STDLIB 1)
 
 SET(XDMF_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(XDMF_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
@@ -51,15 +62,25 @@ MARK_AS_ADVANCED(XDMF_REGENERATE_WRAPPERS XDMF_REGENERATE_YACCLEX)
 
 SET(XDMF_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/vtkxdmf2/vtk/Utilities")
+
+SET (XDMF_BUILD_MPI ${PARAVIEW_USE_MPI})
+if (XDMF_BUILD_MPI)
+  
+endif()
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkxdmf2/libsrc
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkxdmf2/libsrc
+  ${vtkhdf5_INCLUDE_DIRS}
+  ${vtklibxml2_INCLUDE_DIRS})
+
+set (HDF5_LIBRARY "${vtkhdf5_LIBRARIES}")
+set (LIBXML2_LIBRARY "${vtklibxml2_LIBRARIES}")
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vtkxdmf2/libsrc)
 #SET(XDMF_INCLUDE_DIRS
 #  "${ParaView_SOURCE_DIR}/Utilities/Xdmf2/vtk"
 #  "${ParaView_BINARY_DIR}/Utilities/Xdmf2/vtk")
 SET(PARAVIEW_LINK_XDMF ON)
 set (VTK_FOUND 1)
-vtk_target_export(Xdmf)
-vtk_module_third_party(Xdmf2
-  INCLUDE_DIRS 
-    ${CMAKE_CURRENT_SOURCE_DIR}/vtkxdmf2/vtk
-    ${CMAKE_CURRENT_BINARY_DIR}/vtkxdmf2/vtk
-  LIBRARIES Xdmf
-)
+#vtk_target_export(Xdmf)
