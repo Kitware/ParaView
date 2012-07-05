@@ -33,5 +33,6 @@ if (NOT CMAKE_CROSSCOMPILING)
   vtk_add_executable(kwProcessXML ProcessXML.cxx)
   vtk_module_export("")
   target_link_libraries(kwProcessXML
-    vtkCommonCore)
+    vtkCommonCore
+    vtksys)
 endif()
