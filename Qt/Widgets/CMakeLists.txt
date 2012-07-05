@@ -107,7 +107,6 @@ set(Module_SRCS
   pqTreeWidgetSelectionHelper.h
   pqWaitCursor.cxx
   pqWaitCursor.h
-  QtWidgetsExport.h
 #  QtWidgetsPlugin.cxx
 #  QtWidgetsPlugin.h
 )
