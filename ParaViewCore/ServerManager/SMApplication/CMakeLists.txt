@@ -87,16 +87,18 @@ set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
     CACHE INTERNAL "Server Manager XMLs")
 
 get_target_property(kwprocessXML_location kwProcessXML LOCATION)
-add_custom_target(vtkPVServerManagerApplicationXMLs
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   DEPENDS ${resourceFiles} kwProcessXML
-    #"${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
   COMMAND ${kwprocessXML_location}
        ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
        vtkSMDefaultModules Interface GetInterfaces
        ${resourceFiles}
-  COMMENT "generating modules")
-add_dependencies(vtkPVServerManagerApplication
-  vtkPVServerManagerApplicationXMLs)
+  COMMENT "Generating headers for ServerManager XMLs")
+set_source_files_properties(vtkInitializationHelper.cxx
+  PROPERTIES OBJECT_DEPENDS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
 
 set (xml_init_code "")
 foreach(rf ${resourceFiles})
