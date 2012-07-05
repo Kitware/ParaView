@@ -21,19 +21,23 @@
 #include "vtkCompositeDataSet.h"
 #include "vtkCubeAxesActor.h"
 #include "vtkDataSet.h"
+#include "vtkFieldData.h"
+#include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkProperty.h"
-#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
+#include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform.h"
+#include "vtkAxisActor.h"
 
 vtkStandardNewMacro(vtkCubeAxesRepresentation);
 //----------------------------------------------------------------------------
@@ -181,6 +185,74 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
+
+    // Update axes title informations
+    vtkFieldData* fieldData = input->GetFieldData();
+    vtkStringArray* titleX =
+        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForX"));
+    vtkStringArray* titleY =
+        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
+    vtkStringArray* titleZ =
+        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
+    if(titleX && titleX->GetNumberOfValues() > 0)
+      {
+      this->CubeAxesActor->SetXTitle(titleX->GetValue(0).c_str());
+      }
+    if(titleY && titleY->GetNumberOfValues() > 0)
+      {
+      this->CubeAxesActor->SetYTitle(titleY->GetValue(0).c_str());
+      }
+    if(titleZ && titleZ->GetNumberOfValues() > 0)
+      {
+      this->CubeAxesActor->SetZTitle(titleZ->GetValue(0).c_str());
+      }
+
+    // Update Axis orientation
+    vtkFloatArray* uBase =
+        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForX"));
+    if(uBase && uBase->GetNumberOfTuples() > 0)
+      {
+      this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple3(0));
+      }
+    else
+      {
+      this->CubeAxesActor->SetAxisBaseForX(1,0,0);
+      }
+    vtkFloatArray* vBase =
+        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForY"));
+    if(vBase && vBase->GetNumberOfTuples() > 0)
+      {
+      this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple3(0));
+      }
+    else
+      {
+      this->CubeAxesActor->SetAxisBaseForY(0,1,0);
+      }
+    vtkFloatArray* wBase =
+        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForZ"));
+    if(wBase && wBase->GetNumberOfTuples() > 0)
+      {
+      this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple3(0));
+      }
+    else
+      {
+      this->CubeAxesActor->SetAxisBaseForZ(0,0,1);
+      }
+
+    // Make sure we enable oriented bounding box if any
+    vtkFloatArray* orientedboundingBox =
+        vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
+    if(orientedboundingBox)
+      {
+      this->CubeAxesActor->SetUseOrientedBounds(1);
+      this->CubeAxesActor->SetOrientedBounds(orientedboundingBox->GetTuple(0));
+      }
+    else
+      {
+      this->CubeAxesActor->SetUseOrientedBounds(0);
+      }
+
+
     vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
     vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(input);
     if (ds)
