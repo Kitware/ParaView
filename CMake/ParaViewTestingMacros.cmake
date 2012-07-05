@@ -68,8 +68,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
-      ADD_TEST("${prefix}${full_test_name}"
-        ${PARAVIEW_SMTESTDRIVER_EXECUTABLE} 
+      ADD_TEST(NAME "${prefix}${full_test_name}"
+        COMMAND smTestDriver
         ${ACT_COMMAND}
         ${extra_args}
         --exit
@@ -129,8 +129,8 @@ FUNCTION(add_multi_client_tests prefix)
         set (use_old_panels "--use-old-panels")
       endif ()
 
-      add_test("${prefix}.${test_name}"
-          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+      add_test(NAME "${prefix}.${test_name}"
+        COMMAND smTestDriver
         --test-multi-clients
         --server ${PARAVIEW_SERVER_EXECUTABLE}
 
@@ -166,8 +166,8 @@ FUNCTION(add_multi_server_tests prefix nbServers)
     get_filename_component(test_name ${test_script} NAME_WE)
       set (extra_args)
       process_args(extra_args)
-      add_test("${prefix}.${test_name}"
-          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+      add_test(NAME "${prefix}.${test_name}"
+        COMMAND smTestDriver
         --test-multi-servers ${nbServers}
         --server ${PARAVIEW_SERVER_EXECUTABLE}
 
@@ -194,8 +194,8 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
         get_filename_component(test_name ${test_script} NAME_WE)
         set (extra_args)
         process_args(extra_args)
-        add_test("${prefix}-${tdx}x${tdy}.${test_name}"
-            ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        add_test(NAME "${prefix}-${tdx}x${tdy}.${test_name}"
+            COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
             --server ${PARAVIEW_SERVER_EXECUTABLE}
 
