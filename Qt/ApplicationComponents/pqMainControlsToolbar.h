@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqMainControlsToolbar_h
 
 #include <QToolBar>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqMainControlsToolbar is the toolbar with actions (and reactions) for the
 /// "Main Controls" toolbar in ParaView. It includes buttons like "Open Data",

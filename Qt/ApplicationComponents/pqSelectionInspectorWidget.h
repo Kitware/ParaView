@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSelectionInspectorWidget_h
 
 #include "pqSelectionInspectorPanel.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqSelectionInspectorWidget simply extends pqSelectionInspectorPanel to use
 /// the selection manager provided by pqPVApplicationCore as the selection manager

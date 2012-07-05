@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCommandLineOptionsBehavior_h
 
 #include <QObject>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// @ingroup Behaviors
 /// pqCommandLineOptionsBehavior processes command-line options on startup and

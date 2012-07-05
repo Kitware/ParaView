@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRepresentationToolbar_h
 
 #include <QToolBar>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqRepresentationToolbar is the toolbar which allows the user to choose the
 /// representation type for the active representation.

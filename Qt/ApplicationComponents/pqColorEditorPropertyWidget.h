@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqColorEditorPropertyWidget_h
 #define _pqColorEditorPropertyWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 #include "pqPropertyWidget.h"
 
-class pqColorEditorPropertyWidget : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 

@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCubeAxesPropertyWidget_h
 #define _pqCubeAxesPropertyWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 #include "pqPropertyLinks.h"
 #include "pqPropertyWidget.h"
 
-class pqCubeAxesPropertyWidget : public pqPropertyWidget
+class PQAPPLICATIONCOMPONENTS_EXPORT pqCubeAxesPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 

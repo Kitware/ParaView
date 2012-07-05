@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqUndoRedoBehavior_h
 
 #include <QObject>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// @ingroup Behaviors
 /// pqUndoRedoBehavior enables application wide undo-redo.

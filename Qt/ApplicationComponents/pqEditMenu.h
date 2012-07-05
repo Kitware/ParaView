@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqEditMenu_h
 
 #include <QMenu>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class PQAPPLICATIONCOMPONENTS_EXPORT pqEditMenu : public QMenu
 {

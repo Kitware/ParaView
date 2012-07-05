@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqAnimationTimeToolbar_h
 
 #include "pqCurrentTimeToolbar.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqAnimationTimeToolbar is subclass of pqCurrentTimeToolbar that connects to
 /// the pqPVApplicationCore::animationManager() to keep track of the active scene.

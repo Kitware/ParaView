@@ -1,139 +1,34 @@
-PROJECT(pqApplicationComponents)
-
-INCLUDE_DIRECTORIES(
-  ${pqApplicationComponents_SOURCE_DIR}
-  ${pqApplicationComponents_BINARY_DIR}
-  ${pqComponents_BINARY_DIR}
-  ${pqComponents_SOURCE_DIR}
-  ${pqComponents_BINARY_DIR}/Resources/UI
-  ${pqCore_BINARY_DIR}
-  ${pqCore_SOURCE_DIR}
-  ${VTK_INCLUDE_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
-  ${QtTesting_SOURCE_DIR}
-  ${QtTesting_BINARY_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
-  ${QtPython_BINARY_DIR}
-  ${QtPython_SOURCE_DIR})
-
-# List headers to be processed by moc
-SET (MOC_HEADERS
-  pqAboutDialogReaction.h
-  pqAlwaysConnectedBehavior.h
-  pqAnimationTimeToolbar.h
-  pqApplicationSettingsReaction.h
-  pqAutoApplyReaction.h
-  pqAutoLoadPluginXMLBehavior.h
-  pqAxesToolbar.h
-  pqCameraLinkReaction.h
-  pqCameraReaction.h
-  pqCameraToolbar.h
-  pqCameraUndoRedoReaction.h
-  pqCategoryToolbarsBehavior.h
-  pqChangePipelineInputReaction.h
-  pqChartSelectionReaction.h
-  pqColorEditorPropertyWidget.h
-  pqColorToolbar.h
-  pqCollaborationBehavior.h
-  pqCommandLineOptionsBehavior.h
-  pqCopyReaction.h
-  pqCrashRecoveryBehavior.h
-  pqCreateCustomFilterReaction.h
-  pqCubeAxesPropertyWidget.h
-  pqDataTimeStepBehavior.h
-  pqDataQueryReaction.h
-  pqDefaultMainWindow.h
-  pqDefaultViewBehavior.h
-  pqDeleteBehavior.h
-  pqDeleteReaction.h
-  pqEditCameraReaction.h
-  pqEditColorMapReaction.h
-  pqExportReaction.h
-  pqFiltersMenuReaction.h
-  pqFixPathsInStateFilesBehavior.h
-  pqGenericSummaryDisplayPanel.h
-  pqHelpReaction.h
-  pqIgnoreSourceTimeReaction.h
-  pqLoadDataReaction.h
-  pqLoadStateReaction.h
-  pqMainControlsToolbar.h
-  pqManageCustomFiltersReaction.h
-  pqManageLinksReaction.h
-  pqManagePluginsReaction.h
-  pqMasterOnlyReaction.h
-  pqMultiServerBehavior.h
-  pqObjectPickingBehavior.h
-  pqParaViewBehaviors.h
-  pqPersistentMainWindowStateBehavior.h
-  pqPipelineContextMenuBehavior.h
-  pqPluginActionGroupBehavior.h
-  pqPluginDockWidgetsBehavior.h
-  pqPluginDocumentationBehavior.h
-  pqProxyGroupMenuManager.h
-  pqPVAnimationWidget.h
-  pqPVApplicationCore.h
-  pqPVNewSourceBehavior.h
-  pqPythonShellReaction.h
-  pqQtMessageHandlerBehavior.h
-  pqReaction.h
-  pqRepresentationToolbar.h
-  pqResetScalarRangeReaction.h
-  pqSaveAnimationGeometryReaction.h
-  pqSaveAnimationReaction.h
-  pqSaveDataReaction.h
-  pqSaveScreenshotReaction.h
-  pqSaveStateReaction.h
-  pqScalarBarVisibilityReaction.h
-  pqSelectionInspectorWidget.h
-  pqSelectionToolbar.h
-  pqServerConnectReaction.h
-  pqServerDisconnectReaction.h
-  pqSourcesMenuReaction.h
-  pqSpreadSheetVisibilityBehavior.h
-  pqStandardPropertyWidgetInterface.h
-  pqStandardSummaryPanelImplementation.h
-  pqStandardViewFrameActionGroup.h
-  pqStatusBar.h
-  pqTestingReaction.h
-  pqTimerLogReaction.h
-  pqToggleInteractionViewMode.h
-  pqUndoRedoBehavior.h
-  pqUndoRedoReaction.h
-  pqVCRToolbar.h
-  pqVerifyRequiredPluginBehavior.h
-  pqViewFrameActionsBehavior.h
-  pqViewMenuManager.h
-  pqViewSettingsManager.h
-  pqViewSettingsReaction.h
-  pqViewStreamingBehavior.h
-)
-
-# List UI files.
-SET (UI_FILES
-  Resources/UI/pqAxesToolbar.ui
-  Resources/UI/pqCameraToolbar.ui
-  Resources/UI/pqColorToolbar.ui
-  Resources/UI/pqDefaultMainWindow.ui
-  Resources/UI/pqEditMenuBuilder.ui
-  Resources/UI/pqFileMenuBuilder.ui
-  Resources/UI/pqMainControlsToolbar.ui
-  Resources/UI/pqPipelineBrowserContextMenu.ui
-  Resources/UI/pqSelectionToolbar.ui
-  Resources/UI/pqVCRToolbar.ui
-)
-
-# List qrc files
-# DP - the resource file is empty at the moment
-# comment this back in when we have some resources
-#SET (UI_RESOURCES
-#  Resources/pqApplicationComponents.qrc
-#)
-
-# List all source files.
-SET (SOURCE_FILES
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set (Module_SRCS
   pqAboutDialogReaction.cxx
   pqAboutDialogReaction.h
   pqAlwaysConnectedBehavior.cxx
@@ -178,10 +73,10 @@ SET (SOURCE_FILES
   pqCreateCustomFilterReaction.h
   pqCubeAxesPropertyWidget.cxx
   pqCubeAxesPropertyWidget.h
+  pqDataQueryReaction.cxx
+  pqDataQueryReaction.h
   pqDataTimeStepBehavior.cxx
   pqDataTimeStepBehavior.h
-  pqDataQueryReaction.h
-  pqDataQueryReaction.cxx
   pqDefaultMainWindow.cxx
   pqDefaultMainWindow.h
   pqDefaultViewBehavior.cxx
@@ -218,10 +113,10 @@ SET (SOURCE_FILES
   pqManageLinksReaction.h
   pqManagePluginsReaction.cxx
   pqManagePluginsReaction.h
-  pqMasterOnlyReaction.h
   pqMasterOnlyReaction.cxx
-  pqMultiServerBehavior.h
+  pqMasterOnlyReaction.h
   pqMultiServerBehavior.cxx
+  pqMultiServerBehavior.h
   pqObjectPickingBehavior.cxx
   pqObjectPickingBehavior.h
   pqParaViewBehaviors.cxx
@@ -292,8 +187,8 @@ SET (SOURCE_FILES
   pqTestingReaction.h
   pqTimerLogReaction.cxx
   pqTimerLogReaction.h
-  pqToggleInteractionViewMode.h
   pqToggleInteractionViewMode.cxx
+  pqToggleInteractionViewMode.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
@@ -313,81 +208,164 @@ SET (SOURCE_FILES
   pqViewStreamingBehavior.cxx
   pqViewStreamingBehavior.h
 )
-#---------------------------------------------
-IF(PARAVIEW_ENABLE_PYTHON)
-  SET (MOC_HEADERS
-    ${MOC_HEADERS}
+
+set (Module_MOC_HDRS
+  pqAboutDialogReaction.h
+  pqAlwaysConnectedBehavior.h
+  pqAnimationTimeToolbar.h
+  pqApplicationSettingsReaction.h
+  pqAutoApplyReaction.h
+  pqAutoLoadPluginXMLBehavior.h
+  pqAxesToolbar.h
+  pqCameraLinkReaction.h
+  pqCameraReaction.h
+  pqCameraToolbar.h
+  pqCameraUndoRedoReaction.h
+  pqCategoryToolbarsBehavior.h
+  pqChangePipelineInputReaction.h
+  pqChartSelectionReaction.h
+  pqCollaborationBehavior.h
+  pqColorEditorPropertyWidget.h
+  pqColorToolbar.h
+  pqCommandLineOptionsBehavior.h
+  pqCopyReaction.h
+  pqCrashRecoveryBehavior.h
+  pqCreateCustomFilterReaction.h
+  pqCubeAxesPropertyWidget.h
+  pqDataQueryReaction.h
+  pqDataTimeStepBehavior.h
+  pqDefaultMainWindow.h
+  pqDefaultViewBehavior.h
+  pqDeleteBehavior.h
+  pqDeleteReaction.h
+  pqEditCameraReaction.h
+  pqEditColorMapReaction.h
+  pqExportReaction.h
+  pqFiltersMenuReaction.h
+  pqFixPathsInStateFilesBehavior.h
+  pqGenericSummaryDisplayPanel.h
+  pqHelpReaction.h
+  pqIgnoreSourceTimeReaction.h
+  pqLoadDataReaction.h
+  pqLoadStateReaction.h
+  pqMainControlsToolbar.h
+  pqManageCustomFiltersReaction.h
+  pqManageLinksReaction.h
+  pqManagePluginsReaction.h
+  pqMasterOnlyReaction.h
+  pqMultiServerBehavior.h
+  pqObjectPickingBehavior.h
+  pqParaViewBehaviors.h
+  pqPersistentMainWindowStateBehavior.h
+  pqPipelineContextMenuBehavior.h
+  pqPluginActionGroupBehavior.h
+  pqPluginDockWidgetsBehavior.h
+  pqPluginDocumentationBehavior.h
+  pqProxyGroupMenuManager.h
+  pqPVAnimationWidget.h
+  pqPVApplicationCore.h
+  pqPVNewSourceBehavior.h
+  pqPythonShellReaction.h
+  pqQtMessageHandlerBehavior.h
+  pqReaction.h
+  pqRepresentationToolbar.h
+  pqResetScalarRangeReaction.h
+  pqSaveAnimationGeometryReaction.h
+  pqSaveAnimationReaction.h
+  pqSaveDataReaction.h
+  pqSaveScreenshotReaction.h
+  pqSaveStateReaction.h
+  pqScalarBarVisibilityReaction.h
+  pqSelectionInspectorWidget.h
+  pqSelectionToolbar.h
+  pqServerConnectReaction.h
+  pqServerDisconnectReaction.h
+  pqSourcesMenuReaction.h
+  pqSpreadSheetVisibilityBehavior.h
+  pqStandardPropertyWidgetInterface.h
+  pqStandardSummaryPanelImplementation.h
+  pqStandardViewFrameActionGroup.h
+  pqStatusBar.h
+  pqTestingReaction.h
+  pqTimerLogReaction.h
+  pqToggleInteractionViewMode.h
+  pqUndoRedoBehavior.h
+  pqUndoRedoReaction.h
+  pqVCRToolbar.h
+  pqVerifyRequiredPluginBehavior.h
+  pqViewFrameActionsBehavior.h
+  pqViewMenuManager.h
+  pqViewSettingsManager.h
+  pqViewSettingsReaction.h
+  pqViewStreamingBehavior.h
+)
+
+if (PARAVIEW_ENABLE_PYTHON)
+  list (APPEND Module_MOC_HDRS
     pqMacroReaction.h
     pqTraceReaction.h
-    )
-  SET (SOURCE_FILES
-    ${SOURCE_FILES}
+  )
+
+  list (APPEND Module_SRCS
     pqMacroReaction.cxx
     pqMacroReaction.h
     pqTraceReaction.cxx
     pqTraceReaction.h
-    )
-ENDIF(PARAVIEW_ENABLE_PYTHON)
-#---------------------------------------------
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqApplicationComponentsExport.h.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")
+  )
+endif()
 
-SET(dynamicHeaders 
-    "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")
-
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  ${MOC_HEADERS}
+set (Module_UI_FILES
+  Resources/UI/pqAxesToolbar.ui
+  Resources/UI/pqCameraToolbar.ui
+  Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqDefaultMainWindow.ui
+  Resources/UI/pqEditMenuBuilder.ui
+  Resources/UI/pqFileMenuBuilder.ui
+  Resources/UI/pqMainControlsToolbar.ui
+  Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqSelectionToolbar.ui
+  Resources/UI/pqVCRToolbar.ui
 )
 
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  ${UI_FILES}
+set (Module_RESOURCE_FILES
 )
 
-QT4_ADD_RESOURCES(RCS_SOURCES
-  ${UI_RESOURCES}
-)
+qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS}
+
+# not sure this is the best way, but "moc" is complaining about
+# interfaces defined under Components and this seems like the only way to fix
+# that issue.
+  OPTIONS -I ${CMAKE_CURRENT_SOURCE_DIR}/../Components)
+
+qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
+qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 
 SOURCE_GROUP("Resources" FILES
-  ${UI_RESOURCES}
-  ${UI_FILES}
+  ${Module_UI_FILES}
+  ${Module_RESOURCE_FILES}
 )
 
 SOURCE_GROUP("Generated" FILES
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  ${UI_BUILT_SOURCES}
-  ${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h
+  ${__Module_RESOURCE_SRCS}
+  ${__Module_MOC_SRCS}
+  ${__Module_UI_SRCS}
 )
 
-PVVTK_ADD_LIBRARY(pqApplicationComponents
-  ${SOURCE_FILES}
-  ${UI_BUILT_SOURCES}
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  )
+set(${vtk-module}_NO_HeaderTest 1)
+vtk_module_library(pqApplicationComponents
+  ${Module_SRCS}
+  ${__Module_RESOURCE_SRCS}
+  ${__Module_MOC_SRCS}
+  ${__Module_UI_SRCS})
 
-TARGET_LINK_LIBRARIES(pqApplicationComponents
-  pqComponents
-  )
-
-IF(NOT PV_INSTALL_NO_LIBRARIES)
-  INSTALL(TARGETS pqApplicationComponents
-    EXPORT ${PV_INSTALL_EXPORT_NAME}
-    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
-ENDIF()
-  
-IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  # Headers
-  GLOB_INSTALL_DEVELOPMENT(
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR} 
-      "*.h;*.hxx;*.txx")
-  INSTALL(
-      FILES ${dynamicHeaders}
-      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
-      COMPONENT Development)
-ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
-
-
+#IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+#  # Headers
+#  GLOB_INSTALL_DEVELOPMENT(
+#      ${CMAKE_CURRENT_SOURCE_DIR}
+#      ${PV_INSTALL_INCLUDE_DIR} 
+#      "*.h;*.hxx;*.txx")
+#  INSTALL(
+#      FILES ${dynamicHeaders}
+#      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+#      COMPONENT Development)
+#ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 #include "pqTimer.h"
 
 class pqPipelineSource;

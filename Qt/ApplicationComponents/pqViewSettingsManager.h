@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqViewSettingsManager_h
 
 #include "pqActiveViewOptionsManager.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqViewSettingsManager is a temporary class used by
 /// pqActiveViewSettingsReaction to manage the view options using

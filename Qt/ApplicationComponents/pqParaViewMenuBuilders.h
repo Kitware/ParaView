@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqParaViewMenuBuilders_h 
 #define __pqParaViewMenuBuilders_h
 
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class QMenu;
 class QWidget;
