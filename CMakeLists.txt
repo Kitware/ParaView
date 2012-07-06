@@ -133,6 +133,13 @@ set (VTK_INSTALL_RUNTIME_DIR ${PV_INSTALL_BIN_DIR})
 set (VTK_INSTALL_ARCHIVE_DIR ${PV_INSTALL_LIB_DIR})
 set (VTK_INSTALL_LIBRARY_DIR ${PV_INSTALL_LIB_DIR})
 
+# Setting this ensures that "make install" will leave rpaths to external
+# libraries (not part of the build-tree e.g. Qt, ffmpeg, etc.) intact on
+# "make install". This ensures that one can install a version of ParaView on the
+# build machine without any issues. If this not desired, simply comment the
+# following line and "make install" will strip all rpaths, which is default
+# behavior.
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -303,9 +310,10 @@ else()
     Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
+    ThirdParty/Xdmf2
+
     CommandLineExecutables
-#    Need to fix Xdmf2 rules.
-#    ThirdParty/Xdmf2
+
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common
@@ -363,4 +371,5 @@ add_subdirectory(Wrapping/ClientServer)
 
 #------------------------------------------------------------------------------
 add_subdirectory(Documentation)
+#add_subdirectory(Plugins)
 add_subdirectory(Applications)
