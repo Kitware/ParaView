@@ -246,12 +246,6 @@ function(generate_header name)
     ${ARGN}
     )
 
-  if (NOT PARAVIEW_PROCESS_XML_EXECUTABLE)
-    MESSAGE (FATAL_ERROR
-      "No PARAVIEW_PROCESS_XML_EXECUTABLE specified
-      Could not locate kwProcessXML executable")
-  endif ()
-
   set (function_names)
   set (input_files)
   set (have_xmls)
@@ -271,7 +265,7 @@ function(generate_header name)
   if (have_xmls)
     add_custom_command(
       OUTPUT "${name}"
-      COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
+      COMMAND kwProcessXML
               ${base_64}
               ${name}
               \"${arg_PREFIX}\" 
@@ -279,7 +273,7 @@ function(generate_header name)
               \"${arg_SUFFIX}\"
               ${input_files}
       DEPENDS ${arg_FILES}
-              ${PARAVIEW_PROCESS_XML_EXECUTABLE}
+              kwProcessXML 
      ) 
   endif ()
 
