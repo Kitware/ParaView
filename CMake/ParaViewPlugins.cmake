@@ -1,7 +1,5 @@
 # Requires ParaView_QT_DIR and ParaView_BINARY_DIR to be set.
 
-INCLUDE("${VTK_MAKE_INSTANTIATOR}/vtkMakeInstantiator.cmake")
-
 # Macro to install a plugin that's included in the ParaView source directory.
 # This is a macro internal to ParaView and should not be directly used by
 # external applications. This may change in future without notice.
@@ -109,8 +107,6 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
   endif()
   
   SET(HDRS)
-  SET(REALSRCS)
-  SET(INST_SRCS)
 
   FOREACH(SRC ${ARGN})
     GET_FILENAME_COMPONENT(src_name "${SRC}" NAME_WE)
@@ -123,9 +119,6 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
       SET(HDR "${CMAKE_CURRENT_BINARY_DIR}/${src_name}.h")
     ENDIF()
     LIST(APPEND HDRS ${HDR})
-    IF(NOT HDR MATCHES ${SRC})
-      SET(REALSRCS ${REALSRCS} ${SRC})
-    ENDIF(NOT HDR MATCHES ${SRC})
   ENDFOREACH(SRC ${ARGN})
   
   SET(CS_SRCS)
@@ -133,18 +126,12 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
     VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
     # only generate the instantiator code for cxx classes that'll be included in
     # the plugin
-    IF(REALSRCS)
-      VTK_MAKE_INSTANTIATOR3(vtkSM${Name}Instantiator INST_SRCS "${REALSRCS}"
-        VTK_EXPORT "${CMAKE_CURRENT_BINARY_DIR}" "")
-      SET (SM_PLUGIN_INCLUDES
-        "${SM_PLUGIN_INCLUDES}#include \"vtkSM${Name}Instantiator.h\"\n")
-    ENDIF(REALSRCS)
     SET(INITIALIZE_WRAPPING 1)
   ELSE(HDRS)
     SET(INITIALIZE_WRAPPING 0)
   ENDIF(HDRS)
 
-  SET(${OUTSRCS} ${CS_SRCS} ${INST_SRCS} ${XML_HEADER})
+  SET(${OUTSRCS} ${CS_SRCS} ${XML_HEADER})
   
 ENDMACRO(ADD_SERVER_MANAGER_EXTENSION)
 
