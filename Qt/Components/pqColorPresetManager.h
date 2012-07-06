@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QDialog>
 
+#include "pqColorMapModel.h" // for pqColorMapModel
+
 class pqColorPresetManagerForm;
 class pqColorPresetModel;
 class QItemSelectionModel;
@@ -67,6 +69,8 @@ public:
   void restoreSettings();
 
   virtual bool eventFilter(QObject *object, QEvent *e);
+
+  static pqColorMapModel createColorMapFromXML(vtkPVXMLElement *element);
 
 public slots:
   void importColorMap(const QStringList &files);

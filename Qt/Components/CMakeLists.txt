@@ -17,6 +17,27 @@ IF(PARAVIEW_ENABLE_PYTHON)
     ${VTKPythonWrapping_SOURCE_DIR}/Executable)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+# setup the default color maps
+SET(CMD_DEP kwProcessXML)
+IF(CMAKE_CROSSCOMPILING)
+  SET(CMD kwProcessXML)
+ELSE(CMAKE_CROSSCOMPILING)
+  GET_TARGET_PROPERTY(CMD kwProcessXML LOCATION)
+ENDIF(CMAKE_CROSSCOMPILING)
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.h
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ColorMaps.xml
+          ${CMD_DEP}
+  COMMAND ${CMD}
+  ARGS ${CMAKE_CURRENT_BINARY_DIR}/pqBuiltinColorMaps.h
+       pqComponentsGet
+       XML
+       XML
+       ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ColorMaps.xml
+  COMMENT "generating built-in color map xml"
+)
+
 INCLUDE(${QT_USE_FILE})
 
 INCLUDE_DIRECTORIES(
@@ -386,6 +407,7 @@ PVVTK_ADD_LIBRARY(pqComponents
   pqArrayStatusPropertyWidget.h
   pqBoxWidget.cxx
   pqBoxWidget.h
+  pqBuiltinColorMaps.h
   pqCalculatorPanel.cxx
   pqCalculatorPanel.h
   pqCalculatorSummaryPanel.cxx

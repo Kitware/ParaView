@@ -505,10 +505,9 @@ void pqColorPresetManager::selectNewItem(const QModelIndex &, int first,
     }
 }
 
-void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
+pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *element)
 {
   pqColorMapModel colorMap;
-  QString name = element->GetAttribute("name");
   QString space = element->GetAttribute("space");
   if(space == "RGB")
     {
@@ -617,6 +616,14 @@ void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
       // Unrecognized tag.  Ignore.
       }
     }
+
+  return colorMap;
+}
+
+void pqColorPresetManager::importColorMap(vtkPVXMLElement *element)
+{
+  pqColorMapModel colorMap = createColorMapFromXML(element);
+  QString name = element->GetAttribute("name");
 
   if(colorMap.getNumberOfPoints() > 1)
     {
