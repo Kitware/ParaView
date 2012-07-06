@@ -13,17 +13,14 @@ Copyright 2012 SciberQuest Inc.
 using std::cerr;
 using std::endl;
 
-// disable gcc shadow variable warnings for eigen
-#if !defined(__INTEL_COMPILER) && defined(__GNUG__)
-#pragma GCC diagnostic ignored "-Wshadow"
-#endif
-
 #include <cstdlib>
 #include <cmath>
 #include <complex>
 using std::complex;
 
-#include<Eigen/Eigenvalues>
+#include "SQPosixOnWindows.h"
+#include "SQEigenWarningSupression.h"
+#include <Eigen/Eigenvalues>
 using namespace Eigen;
 
 #include "Tuple.hxx"
@@ -713,7 +710,7 @@ void Convolution(
         // intialize the output
         for (int c=0; c<nComp; ++c)
           {
-          W[_pi+c] = 0.0;
+          W[_pi+c] = T(0);
           }
 
         for (int h=kernel[4]; h<=kernel[5]; ++h)
@@ -733,7 +730,7 @@ void Convolution(
 
               for (int c=0; c<nComp; ++c)
                 {
-                W[_pi+c] += V[vi+c]*K[kii];
+                W[_pi+c] += T(V[vi+c]*K[kii]);
                 }
               }
             }
@@ -1214,9 +1211,9 @@ void Rotation(
 
         //      __   ->
         //  w = \/ x V
-        Wx[_pi]=0.0;
-        Wy[_pi]=0.0;
-        Wz[_pi]=0.0;
+        Wx[_pi]=T(0);
+        Wy[_pi]=T(0);
+        Wz[_pi]=T(0);
         if (iok)
           {
           int vilo_y=3*idx.Index(i-1,j,k)+1;
@@ -1225,8 +1222,8 @@ void Rotation(
           int vihi_y=3*idx.Index(i+1,j,k)+1;
           int vihi_z=vihi_y+1;
 
-          Wy[_pi] -= (V[vihi_z]-V[vilo_z])/dx[0];
-          Wz[_pi] += (V[vihi_y]-V[vilo_y])/dx[0];
+          Wy[_pi] -= T((V[vihi_z]-V[vilo_z])/dx[0]);
+          Wz[_pi] += T((V[vihi_y]-V[vilo_y])/dx[0]);
           }
 
         if (jok)
@@ -1237,8 +1234,8 @@ void Rotation(
           int vjhi_x=3*idx.Index(i,j+1,k);
           int vjhi_z=vjhi_x+2;
 
-          Wx[_pi] += (V[vjhi_z]-V[vjlo_z])/dx[1];
-          Wz[_pi] -= (V[vjhi_x]-V[vjlo_x])/dx[1];
+          Wx[_pi] += T((V[vjhi_z]-V[vjlo_z])/dx[1]);
+          Wz[_pi] -= T((V[vjhi_x]-V[vjlo_x])/dx[1]);
           }
 
         if (kok)
@@ -1249,8 +1246,8 @@ void Rotation(
           int vkhi_x=3*idx.Index(i,j,k+1);
           int vkhi_y=vkhi_x+1;
 
-          Wx[_pi] -= (V[vkhi_y]-V[vklo_y])/dx[2];
-          Wy[_pi] += (V[vkhi_x]-V[vklo_x])/dx[2];
+          Wx[_pi] -= T((V[vkhi_y]-V[vklo_y])/dx[2]);
+          Wy[_pi] += T((V[vkhi_x]-V[vklo_x])/dx[2]);
           }
         }
       }
@@ -1317,9 +1314,9 @@ void Rotation(
 
         //      __   ->
         //  w = \/ x V
-        Wx[pi]=(V[vjhi+2]-V[vjlo+2])/dx[1]-(V[vkhi+1]-V[vklo+1])/dx[2];
-        Wy[pi]=(V[vkhi  ]-V[vklo  ])/dx[2]-(V[vihi+2]-V[vilo+2])/dx[0];
-        Wz[pi]=(V[vihi+1]-V[vilo+1])/dx[0]-(V[vjhi  ]-V[vjlo  ])/dx[1];
+        Wx[pi]=T((V[vjhi+2]-V[vjlo+2])/dx[1]-(V[vkhi+1]-V[vklo+1])/dx[2]);
+        Wy[pi]=T((V[vkhi  ]-V[vklo  ])/dx[2]-(V[vihi+2]-V[vilo+2])/dx[0]);
+        Wz[pi]=T((V[vihi+1]-V[vilo+1])/dx[0]-(V[vjhi  ]-V[vjlo  ])/dx[1]);
         }
       }
     }
@@ -2317,26 +2314,26 @@ void Laplacian(
 
         //      __2
         //  L = \/ S
-        L[_pi]=0.0;
+        L[_pi]=T(0);
         if (iok)
           {
           const int ilo=idx.Index(i-1,j,k);
           const int ihi=idx.Index(i+1,j,k);
-          L[_pi] += (S[ihi] + S[ilo] - 2.0*S[pi])/dx2[0];
+          L[_pi] += T((S[ihi] + S[ilo] - 2.0*S[pi])/dx2[0]);
           }
 
         if (jok)
           {
           const int jlo=idx.Index(i,j-1,k);
           const int jhi=idx.Index(i,j+1,k);
-          L[_pi] += (S[jhi] + S[jlo] - 2.0*S[pi])/dx2[1];
+          L[_pi] += T((S[jhi] + S[jlo] - 2.0*S[pi])/dx2[1]);
           }
 
         if (kok)
           {
           const int klo=idx.Index(i,j,k-1);
           const int khi=idx.Index(i,j,k+1);
-          L[_pi] += (S[khi] + S[klo] - 2.0*S[pi])/dx2[2];
+          L[_pi] += T((S[khi] + S[klo] - 2.0*S[pi])/dx2[2]);
           }
         }
       }
@@ -2472,28 +2469,28 @@ void Gradient(
 
         //      __
         //  G = \/ S
-        Gx[_pi]=0.0;
-        Gy[_pi]=0.0;
-        Gz[_pi]=0.0;
+        Gx[_pi]=T(0);
+        Gy[_pi]=T(0);
+        Gz[_pi]=T(0);
         if (iok)
           {
           int ilo=idx.Index(i-1,j,k);
           int ihi=idx.Index(i+1,j,k);
-          Gx[_pi] = (S[ihi]-S[ilo])/dx[0];
+          Gx[_pi] = T((S[ihi]-S[ilo])/dx[0]);
           }
 
         if (jok)
           {
           int jlo=idx.Index(i,j-1,k);
           int jhi=idx.Index(i,j+1,k);
-          Gy[_pi] = (S[jhi]-S[jlo])/dx[1];
+          Gy[_pi] = T((S[jhi]-S[jlo])/dx[1]);
           }
 
         if (kok)
           {
           int klo=idx.Index(i,j,k-1);
           int khi=idx.Index(i,j,k+1);
-          Gz[_pi] = (S[khi]-S[klo])/dx[2];
+          Gz[_pi] = T((S[khi]-S[klo])/dx[2]);
           }
         }
       }

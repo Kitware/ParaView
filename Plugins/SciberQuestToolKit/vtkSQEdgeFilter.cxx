@@ -8,6 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQEdgeFilter.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
 #include "CartesianExtent.h"
 #include "postream.h"
 
@@ -475,7 +476,5 @@ void vtkSQEdgeFilter::PrintSelf(ostream& os, vtkIndent indent)
   #endif
 
   this->Superclass::PrintSelf(os,indent);
-
   // TODO
-
 }

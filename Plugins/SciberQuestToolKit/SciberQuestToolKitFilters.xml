@@ -19,6 +19,7 @@ Copyright 2012 SciberQuest Inc.
     <Proxy group="filters" name="vtkSQFieldTracer"/>
     <Proxy group="filters" name="vtkSQFieldTracerRK45"/>
     <Proxy group="filters" name="vtkSQFieldTopologyMapper"/>
+    <Proxy group="filters" name="vtkSQFTLE"/>
     <Proxy group="filters" name="vtkSQHemisphereSource"/>
     <Proxy group="filters" name="vtkSQImageGhosts"/>
     <Proxy group="filters" name="vtkSQKernelConvolution"/>

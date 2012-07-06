@@ -50,15 +50,17 @@ endif()
 #--------------------------------------------------
 # Configuration options
 #--------------------------------------------------
-
 set(SQTK_CUDA            OFF CACHE BOOL "Enable CUDA optimizations.")
 set(SQTK_PROCESS_MONITOR ON  CACHE BOOL "Build the process monitor.")
-
 set(SQTK_PYTHON_BINDINGS OFF CACHE BOOL "Enable Python bindings.")
-set(SQTK_TESTING         ${BUILD_TESTING})
+mark_as_advanced(SQTK_CUDA SQTK_PROCESS_MONITOR SQTK_PYTHON_BINDINGS)
+
+if (BUILD_TESTING)
+  #message(STATUS "Building regression tests.")
+  #subdirs(Testing)
+endif()
 
 #--------------------------------------------------
-
 include(EigenConfig.cmake)
 
 if (SQTK_CUDA)
@@ -91,6 +93,7 @@ set(SM_CXX_SOURCES
   vtkSQFieldTopologySelect.cxx
   vtkSQFieldTopologySplit.cxx
   vtkSQFieldTracer.cxx
+  vtkSQFTLE.cxx
   vtkSQHemisphereSource.cxx
   vtkSQImageGhosts.cxx
   vtkSQImageSource.cxx
@@ -111,7 +114,6 @@ set(SM_CXX_SOURCES
   vtkSQTubeFilter.cxx
   vtkSQVolumeSource.cxx
   vtkSQVortexFilter.cxx
-  vtkSQVortexDetect.cxx
   )
 
 if (APPLE)
@@ -394,15 +396,3 @@ if (SQTK_PYTHON_BINDINGS)
   install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
   install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})
 endif()
-
-# testing
-if (SQTK_TESTING)
-  if (NOT SQTK_WITHOUT_MPI AND MPI_FOUND)
-    add_definitions("-DMPICH_IGNORE_CXX_SEEK")
-    include_directories(${MPI_INCLUDE_PATH})
-    # Need to be fixed to support VTK 6
-    # add_executable(TestFieldTopologyMapper Testing/TestFieldTopologyMapper.cpp)
-    # target_link_libraries(TestFieldTopologyMapper SciberQuestToolKit ${MPI_LIBRARIES})
-    # install(TARGETS TestFieldTopologyMapper DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-  endif ()
-endif ()

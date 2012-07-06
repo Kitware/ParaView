@@ -36,7 +36,7 @@ public:
 
   // Description:
   // Set/Get the noise threshold, above which negative discriminant
-  // is corrected for. eg: if (nt < val < 0) then val=0
+  // is corrected for. eg: if (-nt < val < 0) then val=0
   vtkSetMacro(NoiseThreshold,double);
   vtkGetMacro(NoiseThreshold,double);
 

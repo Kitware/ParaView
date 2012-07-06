@@ -60,6 +60,7 @@ using std::max;
 
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

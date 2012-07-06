@@ -2597,6 +2597,72 @@ Copyright 2012 SciberQuest Inc.
 
   <!-- ==================================================================== -->
   <SourceProxy
+    name="vtkSQFTLE"
+    class="vtkSQFTLE"
+    label="SQ Vortex Detect">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Given a displacement map compute FTLE. For an explanation of
+      this terminology see http://amath.colorado.edu/cmsms/index.php?page=ftle-of-the-standard-map
+    </Documentation>
+
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="point"
+                             number_of_components="3"/>
+           <Documentation>
+             This property specifies the dataset to process..
+           </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+         name="SelectInputVectors"
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2"
+         label="Displacement Map"
+         panel_visibility="default">
+            <ArrayListDomain name="array_list" attribute_type="Vectors">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+            <Documentation>
+              Identifies the displacement map to use to compute the FTLE.
+            </Documentation>
+      </StringVectorProperty>
+
+     <IntVectorProperty
+        name="PassInput"
+        label="Copy input"
+        command="SetPassInput"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Deep copy the input array to the output
+        </Documentation>
+     </IntVectorProperty>
+
+    <Hints>
+      <View type="RenderView"/>
+    </Hints>
+
+  </SourceProxy>
+  <!-- End vtkSQFTLE -->
+
+  <!-- ====================================================================
+  <SourceProxy
     name="vtkSQVortexDetect"
     class="vtkSQVortexDetect"
     label="SQ Vortex Detect">
@@ -2800,9 +2866,8 @@ Copyright 2012 SciberQuest Inc.
       <View type="RenderView"/>
     </Hints>
 
-  <!-- End vtkSQVortexDetect -->
   </SourceProxy>
-
+  End vtkSQVortexDetect -->
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -3100,11 +3165,11 @@ Copyright 2012 SciberQuest Inc.
          name="NoiseThreshold"
          command="SetNoiseThreshold"
          number_of_elements="1"
-         default_values="-1.0e-4"
+         default_values="1.0e-4"
          panel_visibility="default">
         <Documentation>
          This controls the correction of negative descriminant in the computation.
-         eg: if (NoiseThreshold less than value less than 0) then value=0.
+         eg: if (-NoiseThreshold less than value less than 0) then value=0.
         </Documentation>
       </DoubleVectorProperty>
 

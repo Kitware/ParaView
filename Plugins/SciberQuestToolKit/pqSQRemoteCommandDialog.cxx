@@ -390,15 +390,15 @@ void pqSQRemoteCommandDialog::UpdateCommandPreview()
 //------------------------------------------------------------------------------
 void pqSQRemoteCommandDialog::FindSshExecutable()
 {
-  string exec=this->LocateFile();
-  this->Ui->sshExec->setText(exec.c_str());
+  string exe=this->LocateFile();
+  this->Ui->sshExec->setText(exe.c_str());
 }
 
 //------------------------------------------------------------------------------
 void pqSQRemoteCommandDialog::FindXTermExecutable()
 {
-  string exec=this->LocateFile();
-  this->Ui->xtExec->setText(exec.c_str());
+  string exe=this->LocateFile();
+  this->Ui->xtExec->setText(exe.c_str());
 }
 
 //------------------------------------------------------------------------------

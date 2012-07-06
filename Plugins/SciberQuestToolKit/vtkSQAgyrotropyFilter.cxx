@@ -43,8 +43,6 @@ using std::max;
 using std::string;
 #include <cmath>
 
-
-
 #define vtkSQAgyrotropyFilterDEBUG 0
 #define vtkSQAgyrotropyFilterTIME 0
 
@@ -56,6 +54,8 @@ using std::string;
 template<typename T>
 void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
 {
+  noiseThreshold=-fabs(noiseThreshold);
+
   for (size_t i=0; i<n; ++i)
     {
     T bx=pV[0];
@@ -89,13 +89,13 @@ void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
     T a = nxx+nyy+nzz;
     T b = -(nxy*nxy + nxz*nxz + nyz*nyz - nxx*nyy - nxx*nzz - nyy*nzz);
 
-    T d = a*a-T(4.0)*b;
-    if ((d<=T(0.0)) && (d>=T(noiseThreshold)))
+    T d = a*a-T(4)*b;
+    if ((d<=T(0)) && (d>=noiseThreshold))
       {
-      d=T(0.0);
+      d=T(0);
       }
     else
-    if (d<=T(0.0))
+    if (d<=T(0))
       {
       vtkGenericWarningMacro(
         << "point " << i << " has negative descriminant. "
@@ -104,71 +104,15 @@ void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
         << "a=" << a << endl
         << "b=" << b << endl
         << "d=" << d << endl);
-      d*=T(-1.0);
+      d*=T(-1);
       }
 
-    pA[i]=T(2.0)*::sqrt(d)/a;
+    pA[i]=T(2)*::sqrt(d)/a;
 
     pV+=3;
     pT+=9;
     }
 }
-
-/**
-Helper for vtkTemplateMacro unsupported type have
-no specialization and result in error message.
-*/
-template<typename T>
-class AgyrotropyFunctor
-{
-public:
-  void operator()(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
-  {
-    (void)pT;
-    (void)pV;
-    (void)pA;
-    (void)n;
-    (void)noiseThreshold;
-    vtkGenericWarningMacro(
-      "Can not compute on arrays of type " << typeid(T).name());
-    for (size_t i=0; i<n; ++i)
-      {
-      pA[i] = T(0);
-      }
-  }
-};
-
-// float specialization
-template<>
-class AgyrotropyFunctor<float>
-{
-public:
-  void operator()(
-        float *pT,
-        float *pV,
-        float *pA,
-        size_t n,
-        float noiseThreshold)
-  {
-    Agyrotropy(pT,pV,pA,n,noiseThreshold);
-  }
-};
-
-// double specialization
-template<>
-class AgyrotropyFunctor<double>
-{
-public:
-  void operator()(
-        double *pT,
-        double *pV,
-        double *pA,
-        size_t n,
-        double noiseThreshold)
-  {
-    Agyrotropy(pT,pV,pA,n,noiseThreshold);
-  }
-};
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQAgyrotropyFilter);
@@ -180,7 +124,7 @@ vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
   pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << endl;
   #endif
 
-  this->NoiseThreshold=1.0e-6;
+  this->NoiseThreshold=1.0e-4;
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
@@ -288,14 +232,17 @@ int vtkSQAgyrotropyFilter::RequestData(
   // compute the agyrotropy
   switch(A->GetDataType())
     {
-    vtkTemplateMacro(
-      AgyrotropyFunctor<VTK_TT> agyrotropy;
-      agyrotropy(
+    vtkFloatTemplateMacro(
+      Agyrotropy(
           (VTK_TT*)T->GetVoidPointer(0),
           (VTK_TT*)V->GetVoidPointer(0),
           (VTK_TT*)A->GetVoidPointer(0),
           nTups,
           (VTK_TT)this->NoiseThreshold));
+      default:
+        vtkErrorMacro(
+          << "Cannot compute agyrotropy on type "
+          << V->GetClassName());
     }
 
   #if defined vtkSQAgyrotropyFilterTIME

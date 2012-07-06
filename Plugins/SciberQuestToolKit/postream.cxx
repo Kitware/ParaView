@@ -15,6 +15,7 @@ Copyright 2012 SciberQuest Inc.
 #endif
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

@@ -67,6 +67,7 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 
@@ -1529,7 +1530,7 @@ unsigned long vtkSQFieldTracer::GetGlobalCellId(vtkDataSet *data)
 
   MPI_Allgather(
         &nLocal,1,MPI_UNSIGNED_LONG,
-        &nGlobal,1,MPI_UNSIGNED_LONG,
+        nGlobal,1,MPI_UNSIGNED_LONG,
         MPI_COMM_WORLD);
 
   for (int i=0; i<this->WorldRank; ++i)

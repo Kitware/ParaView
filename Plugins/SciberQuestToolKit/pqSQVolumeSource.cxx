@@ -565,7 +565,7 @@ int pqSQVolumeSource::ValidateCoordinates()
     double n[3];
     vtkMath::Cross(a1,a2,n);
 
-    int ok=vtkMath::Normalize(n);
+    int ok=(int)vtkMath::Normalize(n);
     if (!ok)
       {
       ostringstream os;
@@ -666,9 +666,9 @@ void pqSQVolumeSource::SpacingModified()
 
     // update the grid resolution to match the requested grid spacing
     // as closely as possible.
-    this->Nx[0]=ceil(this->Dims[0]/this->Dx[0]);
-    this->Nx[1]=ceil(this->Dims[1]/this->Dx[1]);
-    this->Nx[2]=ceil(this->Dims[2]/this->Dx[2]);
+    this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
+    this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
+    this->Nx[2]=(int)ceil(this->Dims[2]/this->Dx[2]);
     this->SetResolution(this->Nx);
     }
   else
@@ -679,8 +679,8 @@ void pqSQVolumeSource::SpacingModified()
 
     if (this->Form->aspectLock->isChecked())
       {
-      this->Nx[1]=ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
-      this->Nx[2]=ceil(this->Nx[0]*this->Dims[2]/this->Dims[0]);
+      this->Nx[1]=(int)ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
+      this->Nx[2]=(int)ceil(this->Nx[0]*this->Dims[2]/this->Dims[0]);
       }
 
     this->SetResolution(this->Nx);
@@ -710,9 +710,9 @@ void pqSQVolumeSource::ResolutionModified()
   // enforce a uniform pixel aspect ratio
   if (this->Form->aspectLock->isChecked())
     {
-    this->Nx[1]=(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[1]/this->Dims[0]:1);
+    this->Nx[1]=(int)(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[1]/this->Dims[0]:1.0);
     this->Nx[1]=(this->Nx[1]<1?1:this->Nx[1]);
-    this->Nx[2]=(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[2]/this->Dims[0]:1);
+    this->Nx[2]=(int)(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[2]/this->Dims[0]:1.0);
     this->Nx[2]=(this->Nx[2]<1?1:this->Nx[2]);
     this->SetResolution(this->Nx);
     }

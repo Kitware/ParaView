@@ -782,7 +782,7 @@ int pqSQPlaneSource::CalculateNormal(double *n)
   v2[2]=p2[2]-o[2];
 
   vtkMath::Cross(v1,v2,n);
-  int ok=vtkMath::Normalize(n);
+  int ok=(int)vtkMath::Normalize(n);
   if (!ok)
     {
     this->Form->coordStatus->setText("Error");
@@ -995,8 +995,8 @@ void pqSQPlaneSource::SpacingModified()
 
     // update the grid resolution to match the requested grid spacing
     // as closely as possible.
-    this->Nx[0]=ceil(this->Dims[0]/this->Dx[0]);
-    this->Nx[1]=ceil(this->Dims[1]/this->Dx[1]);
+    this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
+    this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
     this->SetResolution(this->Nx);
     }
   else
@@ -1007,7 +1007,7 @@ void pqSQPlaneSource::SpacingModified()
 
     if (this->Form->aspectLock->isChecked())
       {
-      this->Nx[1]=ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
+      this->Nx[1]=(int)ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
       }
 
     this->SetResolution(this->Nx);
@@ -1036,7 +1036,7 @@ void pqSQPlaneSource::ResolutionModified()
   // enforce a uniform pixel aspect ratio
   if (this->Form->aspectLock->isChecked())
     {
-    this->Nx[1]=(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[1]/this->Dims[0]:1);
+    this->Nx[1]=(int)(this->Dims[0]>1E-6?this->Nx[0]*this->Dims[1]/this->Dims[0]:1.0);
     this->Nx[1]=(this->Nx[1]<1?1:this->Nx[1]);
     this->SetResolution(this->Nx);
     }

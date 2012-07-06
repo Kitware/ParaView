@@ -8,8 +8,8 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "pqSQTensorGlyph.h"
 
-pqSQTensorGlyph::pqSQTensorGlyph(pqProxy *proxy, QWidget *p)
-  : Superclass(proxy, p)
+pqSQTensorGlyph::pqSQTensorGlyph(pqProxy *prox, QWidget *p)
+  : Superclass(prox, p)
 {
   // // List of all children
   // QObjectList list(this->children());

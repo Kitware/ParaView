@@ -39,6 +39,7 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 
 #ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

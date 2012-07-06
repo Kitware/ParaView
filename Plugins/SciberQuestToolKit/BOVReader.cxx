@@ -79,7 +79,7 @@ BOVReader::BOVReader()
 }
 
 //-----------------------------------------------------------------------------
-BOVReader::BOVReader(const BOVReader &other)
+BOVReader::BOVReader(const BOVReader &other) : RefCountedPointer()
 {
   *this=other;
 }

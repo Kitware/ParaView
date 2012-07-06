@@ -13,6 +13,7 @@ Copyright 2012 SciberQuest Inc.
 typedef void * MPI_Comm;
 typedef void * MPI_Info;
 #else
+#include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 

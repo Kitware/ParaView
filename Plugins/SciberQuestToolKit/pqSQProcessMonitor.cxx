@@ -230,7 +230,7 @@ void RankData::UpdateLoadWidget()
   float used = this->GetLoad();
   float fracUsed = this->GetLoadFraction();
   float percUsed = fracUsed*100.0;
-  int progVal = fracUsed*SQPM_PROGBAR_MAX;
+  int progVal = (int)(fracUsed*SQPM_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
   this->LoadWidget->setFormat(
@@ -433,7 +433,7 @@ void HostData::UpdateLoadWidget()
   float used = this->GetLoad();
   float fracUsed = this->GetLoadFraction();
   float percUsed = fracUsed*100.0;
-  int progVal = fracUsed*SQPM_PROGBAR_MAX;
+  int progVal = (int)(fracUsed*SQPM_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
   this->LoadWidget->setFormat(
@@ -942,7 +942,7 @@ void pqSQProcessMonitor::OverrideCapacity()
     // capacity and usage are reported in kiB, but UI request
     // in GiB.
     unsigned long long capacity
-      = this->Ui->overrideCapacity->text().toDouble()*pow(2.0,20);
+      = (unsigned long long)(this->Ui->overrideCapacity->text().toDouble()*pow(2.0,20));
 
     if (capacity<=0)
       {

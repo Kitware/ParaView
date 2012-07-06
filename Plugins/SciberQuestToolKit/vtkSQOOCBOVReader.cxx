@@ -29,7 +29,7 @@ Copyright 2012 SciberQuest Inc.
 #include <sstream>
 using std::ostringstream;
 
-#define vtkSQOOCBOVReaderDEBUG 1
+//#define vtkSQOOCBOVReaderDEBUG 1
 
 #ifndef vtkSQOOCBOVReaderDEBUG
   // 0 -- no output
@@ -100,10 +100,10 @@ void vtkSQOOCBOVReader::ClearBlockCache()
     block->SetData(0);
     }
 
-  #if vtkSQOOCBOVReaderDEBUG>0
-  int nBlocks=this->BlockUse.size();
+  //#if vtkSQOOCBOVReaderDEBUG>0
+  size_t nBlocks=this->BlockUse.size();
   this->BlockUse.assign(nBlocks,0);
-  #endif
+  //#endif
 }
 
 
@@ -134,9 +134,9 @@ void vtkSQOOCBOVReader::Close()
   #if vtkSQOOCBOVReaderDEBUG>0
   if (this->CacheMissCount>0)
     {
-    int nBlocks=this->BlockUse.size();
-    int nUsed=0;
-    for (int i=0; i<nBlocks; ++i)
+    size_t nBlocks=this->BlockUse.size();
+    size_t nUsed=0;
+    for (size_t i=0; i<nBlocks; ++i)
       {
       nUsed+=this->BlockUse[i];
       }
@@ -353,8 +353,8 @@ void vtkSQOOCBOVReader::DeActivateArray(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQOOCBOVReader::DeActivateAllArrays()
 {
-  int nArray=this->Reader->GetMetaData()->GetNumberOfArrays();
-  for (int i=0; i<nArray; ++i)
+  size_t nArray=this->Reader->GetMetaData()->GetNumberOfArrays();
+  for (size_t i=0; i<nArray; ++i)
     {
     const char *name=this->Reader->GetMetaData()->GetArrayName(i);
     this->Reader->GetMetaData()->DeactivateArray(name);
