@@ -29,10 +29,10 @@
 #
 #==========================================================================
 set (QT_TESTING_WITH_PYTHON ${PARAVIEW_ENABLE_PYTHON})
-set (QtTesting_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-set (QtTesting_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-set (QtTesting_INSTALL_LIBRARY_DIR ${PV_INSTALL_LIB_DIR})
-set (QT_TESTING_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
+set (QtTesting_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
+set (QtTesting_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
+set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
+set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 
 ##########################################################################
 # import Qt4 build settings

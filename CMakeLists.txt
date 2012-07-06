@@ -103,35 +103,54 @@ get_property(PV_TARGET_SUPPORTS_SHARED_LIBS
   GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
 
 #------------------------------------------------------------------------------
-# Setup install directories.
-IF(NOT PV_INSTALL_BIN_DIR)
-  SET(PV_INSTALL_BIN_DIR bin)
-ENDIF(NOT PV_INSTALL_BIN_DIR)
-IF(NOT PV_INSTALL_INCLUDE_DIR)
-  SET(PV_INSTALL_INCLUDE_DIR include/paraview-${PARAVIEW_VERSION})
-ENDIF(NOT PV_INSTALL_INCLUDE_DIR)
-IF(NOT PV_INSTALL_LIB_DIR)
-  SET(PV_INSTALL_LIB_DIR lib/paraview-${PARAVIEW_VERSION})
-ENDIF(NOT PV_INSTALL_LIB_DIR)
-IF(NOT PV_INSTALL_PLUGIN_DIR)
-  IF(WIN32)
-    SET(PV_INSTALL_PLUGIN_DIR ${PV_INSTALL_BIN_DIR})
-  ELSE(WIN32)
-    SET(PV_INSTALL_PLUGIN_DIR ${PV_INSTALL_LIB_DIR})
-  ENDIF(WIN32)
-ENDIF(NOT PV_INSTALL_PLUGIN_DIR)
-IF(NOT PV_INSTALL_DATA_DIR)
-  SET(PV_INSTALL_DATA_DIR share/paraview-${PARAVIEW_VERSION})
-ENDIF(NOT PV_INSTALL_DATA_DIR)
-IF(NOT PV_INSTALL_CMAKE_DIR)
-  SET(PV_INSTALL_CMAKE_DIR ${PV_INSTALL_LIB_DIR}/CMake)
-ENDIF(NOT PV_INSTALL_CMAKE_DIR)
-IF(NOT PV_INSTALL_DOC_DIR)
-  SET(PV_INSTALL_DOC_DIR share/doc/paraview-${PARAVIEW_VERSION})
-ENDIF(NOT PV_INSTALL_DOC_DIR)
-set (VTK_INSTALL_RUNTIME_DIR ${PV_INSTALL_BIN_DIR})
-set (VTK_INSTALL_ARCHIVE_DIR ${PV_INSTALL_LIB_DIR})
-set (VTK_INSTALL_LIBRARY_DIR ${PV_INSTALL_LIB_DIR})
+# Setup install directories (we use names with VTK_ prefix, since ParaView now
+# is built as a custom "VTK" library.
+if(NOT VTK_INSTALL_RUNTIME_DIR)
+  set(VTK_INSTALL_RUNTIME_DIR bin)
+endif()
+if(NOT VTK_INSTALL_LIBRARY_DIR)
+  set(VTK_INSTALL_LIBRARY_DIR lib/paraview-${PARAVIEW_VERSION})
+endif()
+if(NOT VTK_INSTALL_ARCHIVE_DIR)
+  set(VTK_INSTALL_ARCHIVE_DIR lib/paraview-${PARAVIEW_VERSION})
+endif()
+if(NOT VTK_INSTALL_INCLUDE_DIR)
+  set(VTK_INSTALL_INCLUDE_DIR include/paraview-${PARAVIEW_VERSION})
+endif()
+if(NOT VTK_INSTALL_DATA_DIR)
+  set(VTK_INSTALL_DATA_DIR share/paraview-${PARAVIEW_VERSION})
+endif()
+if(NOT VTK_INSTALL_DOC_DIR)
+  set(VTK_INSTALL_DOC_DIR share/doc/paraview-${PARAVIEW_VERSION})
+endif()
+if(NOT VTK_INSTALL_PACKAGE_DIR)
+  set(VTK_INSTALL_PACKAGE_DIR "lib/cmake/paraview-${PARAVIEW_VERSION}")
+endif()
+if(NOT VTK_INSTALL_DOXYGEN_DIR)
+  set(VTK_INSTALL_DOXYGEN_DIR ${VTK_INSTALL_DOC_DIR}/doxygen)
+endif()
+if(NOT VTK_INSTALL_EXPORT_NAME)
+  set(VTK_INSTALL_EXPORT_NAME ParaViewTargets)
+endif()
+if(NOT VTK_MODULES_DIR)
+  set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
+endif()
+
+if(NOT PV_INSTALL_PLUGIN_DIR)
+  if (WIN32)
+    set (PV_INSTALL_PLUGIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
+  else ()
+    set (PV_INSTALL_PLUGIN_DIR ${VTK_INSTALL_LIBRARY_DIR})
+  endif()
+endif()
+
+# for temporary backwards compatibility.
+set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
+set (PV_INSTALL_LIB_DIR ${VTK_INSTALL_ARCHIVE_DIR})
+
+#set (VTK_INSTALL_NO_LIBRARIES TRUE)
+set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+set (PV_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 
 # Setting this ensures that "make install" will leave rpaths to external
 # libraries (not part of the build-tree e.g. Qt, ffmpeg, etc.) intact on
@@ -373,3 +392,16 @@ add_subdirectory(Wrapping/ClientServer)
 add_subdirectory(Documentation)
 #add_subdirectory(Plugins)
 add_subdirectory(Applications)
+
+
+#------------------------------------------------------------------------------
+# Lastly generate the ParaViewConfig.cmake so that other projects can depend on
+# ParaView.
+# We create two versions of ParaViewConfig.cmake for the build tree and the
+# install tree.
+
+# For build tree.
+set (PARAVIEW_CONFIG_CODE "
+set (VTK_CONFIG_FILE \"${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake\") ")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfig.cmake @ONLY)
