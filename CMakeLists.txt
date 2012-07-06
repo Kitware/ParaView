@@ -130,7 +130,7 @@ if(NOT VTK_INSTALL_DOXYGEN_DIR)
   set(VTK_INSTALL_DOXYGEN_DIR ${VTK_INSTALL_DOC_DIR}/doxygen)
 endif()
 if(NOT VTK_INSTALL_EXPORT_NAME)
-  set(VTK_INSTALL_EXPORT_NAME ParaViewTargets)
+  set(VTK_INSTALL_EXPORT_NAME VTKTargets)
 endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
@@ -144,12 +144,13 @@ if(NOT PV_INSTALL_PLUGIN_DIR)
   endif()
 endif()
 
+#set (VTK_INSTALL_NO_LIBRARIES TRUE)
+#set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (PV_INSTALL_LIB_DIR ${VTK_INSTALL_ARCHIVE_DIR})
-
-#set (VTK_INSTALL_NO_LIBRARIES TRUE)
-set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+set (PV_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 set (PV_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 
 # Setting this ensures that "make install" will leave rpaths to external
@@ -180,9 +181,6 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
-
-# Set the export name.
-set(PV_INSTALL_EXPORT_NAME ParaViewTargets)
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
@@ -315,8 +313,6 @@ else()
   # need a better mechanism.
   set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Disbale Python Threads support" FORCE)
 
-  set(VTK_INSTALL_EXPORT_NAME ${PV_INSTALL_EXPORT_NAME})
-
   # turn some module ON to avoid warnings from VTK.
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
   set (VTK_Group_ParaViewCore ON CACHE INTERNAL "" FORCE)
@@ -329,7 +325,7 @@ else()
     Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
-    ThirdParty/Xdmf2
+#    ThirdParty/Xdmf2
 
     CommandLineExecutables
 
@@ -401,7 +397,18 @@ add_subdirectory(Applications)
 # install tree.
 
 # For build tree.
-set (PARAVIEW_CONFIG_CODE "
-set (VTK_CONFIG_FILE \"${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake\") ")
+set (PARAVIEW_CONFIG_INSTALLED FALSE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfig.cmake @ONLY)
+
+set (PARAVIEW_CONFIG_INSTALLED TRUE)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake @ONLY)
+configure_file(ParaViewConfigVersion.cmake.in ParaViewConfigVersion.cmake @ONLY)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfigVersion.cmake
+        ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseParaView.cmake
+  DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
+)
