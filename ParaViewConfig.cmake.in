@@ -5,20 +5,29 @@
 # This file is configured by ParaView and used by the UseParaView.cmake module
 # to load ParaView's settings for an external project.
 
-
-@PARAVIEW_CONFIG_CODE@
+if (@PARAVIEW_CONFIG_INSTALLED@)
+  get_filename_component(location "${CMAKE_CURRENT_LIST_FILE}" PATH)
+  set (VTK_CONFIG_FILE "${location}/VTKConfig.cmake")
+  set (ParaView_CMAKE_DIR "${location}")
+else()
+  # The ParaView is in the build-location.
+  set (VTK_CONFIG_FILE "@ParaView_BINARY_DIR@/VTK/VTKConfig.cmake")
+  set (ParaView_CMAKE_DIR "@ParaView_CMAKE_DIR@")
+endif()
 
 #------------------------------------------------------------------------------
 # Version information for ParaView
 SET(PARAVIEW_VERSION_MAJOR "@PARAVIEW_VERSION_MAJOR@")
 SET(PARAVIEW_VERSION_MINOR "@PARAVIEW_VERSION_MINOR@")
 SET(PARAVIEW_VERSION_PATCH "@PARAVIEW_VERSION_PATCH@")
-SET(PARAVIEW_VERSION_FULL    "@PARAVIEW_VERSION_FULL@")
+SET(PARAVIEW_VERSION_FULL  "@PARAVIEW_VERSION_FULL@")
 
 # The location of the UseParaView.cmake file
 # FIXME: I don't like this mixing of case, we need to fix that to be consistent.
-set (ParaView_CMAKE_DIR "@ParaView_CMAKE_DIR@")
 set (ParaView_USE_FILE "${ParaView_CMAKE_DIR}/UseParaView.cmake")
+
+set (PARAVIEW_USE_FILE ${ParaView_USE_FILE})
+set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
 
 # load VTK config. This will bring in information about all modules (including
 # ParaView's modules).

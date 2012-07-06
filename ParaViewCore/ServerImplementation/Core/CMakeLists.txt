@@ -69,6 +69,12 @@ set_source_files_properties(
   vtkSMMessage.cxx
   ABSTRACT)
 
+# Add header-only files so they get installed correctly.
+set (${vtk-module}_HDRS
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkSMMessageMinimal.h
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.h
+  )
+
 #------------------------------------------------------------------------------
 # Generate the protbuf message file.
 #------------------------------------------------------------------------------
