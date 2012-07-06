@@ -71,6 +71,26 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
 endmacro()
 
 #------------------------------------------------------------------------------
+# use this to wrap an arbitrary list of source files. It detects the headers and
+# CS wraps those. the result is a variable named ${libname}CS_SRCS with all the
+# generated files
+macro(pv_pre_wrap_sources_cs libname)
+  set (__tmp_headers)
+  foreach (src ${ARGN})
+    get_filename_component(src_name "${src}" NAME_WE)
+    get_filename_component(src_path "${src}" ABSOLUTE)
+    get_filename_component(src_path "${src_path}" PATH)
+
+    if (EXISTS "${src_path}/${src_name}.h")
+      list (APPEND __tmp_headers "${src_path}/${src_name}.h")
+    elseif (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${src_name}.h")
+      list (APPEND __tmp_headers "${CMAKE_CURRENT_BINARY_DIR}/${src_name}.h")
+    endif()
+  endforeach()
+  VTK_WRAP_ClientServer("${libname}" "${libname}CS_SRCS" "${__tmp_headers}")
+endmacro()
+
+#------------------------------------------------------------------------------
 MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
 
   SET(vtk${kit}CS_HEADERS)
