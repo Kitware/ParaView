@@ -379,6 +379,12 @@ configure_file(
   ${ParaView_BINARY_DIR}/vtkPVConfig.h
   @ONLY)
 
+if (NOT VTK_INSTALL_NO_DEVELOPMENT)
+  install(FILES ${ParaView_BINARY_DIR}/vtkPVConfig.h
+    DESTINATION ${VTK_INSTALL_INCLUDE_DIR}
+    COMPONENT Development)
+endif()
+
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
@@ -388,7 +394,6 @@ add_subdirectory(Wrapping/ClientServer)
 add_subdirectory(Documentation)
 #add_subdirectory(Plugins)
 add_subdirectory(Applications)
-
 
 #------------------------------------------------------------------------------
 # Lastly generate the ParaViewConfig.cmake so that other projects can depend on
