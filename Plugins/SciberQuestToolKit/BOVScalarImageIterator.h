@@ -31,7 +31,7 @@ public:
   /**
   Advance the iterator.
   */
-  virtual int Next()
+  virtual size_t Next()
     {
     if (this->Idx<this->End)
       {
@@ -66,8 +66,8 @@ private:
 
 private:
   const BOVTimeStepImage *Step;
-  int Idx;
-  int End;
+  size_t Idx;
+  size_t End;
 };
 
 #endif

@@ -223,8 +223,8 @@ const char *BOVMetaData::GetArrayName(size_t i) const
 //-----------------------------------------------------------------------------
 void BOVMetaData::DeactivateAllArrays()
 {
-  int nArrays=this->GetNumberOfArrays();
-  for (int i=0; i<nArrays; ++i)
+  size_t nArrays=this->GetNumberOfArrays();
+  for (size_t i=0; i<nArrays; ++i)
     {
     const char *arrayName=this->GetArrayName(i);
     this->DeactivateArray(arrayName);
@@ -234,8 +234,8 @@ void BOVMetaData::DeactivateAllArrays()
 //-----------------------------------------------------------------------------
 void BOVMetaData::ActivateAllArrays()
 {
-  int nArrays=this->GetNumberOfArrays();
-  for (int i=0; i<nArrays; ++i)
+  size_t nArrays=this->GetNumberOfArrays();
+  for (size_t i=0; i<nArrays; ++i)
     {
     const char *arrayName=this->GetArrayName(i);
     this->ActivateArray(arrayName);

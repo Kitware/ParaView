@@ -36,12 +36,12 @@ public:
   /**
   Alolocate nBytes for the stream.
   */
-  void Resize(int nBytes);
+  void Resize(size_t nBytes);
 
   /**
   Add nBytes to the stream.
   */
-  void Grow(int nBytes);
+  void Grow(size_t nBytes);
 
   /**
   Get apointer to the stream internal representation.
@@ -67,8 +67,8 @@ public:
   template <typename T> void Pack(T *val);
   template <typename T> void Pack(T val);
   template <typename T> void UnPack(T &val);
-  template <typename T> void Pack(const T *val, int n);
-  template <typename T> void UnPack(T *val, int n);
+  template <typename T> void Pack(const T *val, size_t n);
+  template <typename T> void UnPack(T *val, size_t n);
 
   // specializations
   void Pack(const string &str);
@@ -150,7 +150,7 @@ void BinaryStream::Clear()
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::Resize(int nBytes)
+void BinaryStream::Resize(size_t nBytes)
 {
   char *origData=this->Data;
   this->Data=(char *)realloc(this->Data,nBytes);
@@ -166,7 +166,7 @@ void BinaryStream::Resize(int nBytes)
 
 //-----------------------------------------------------------------------------
 inline
-void BinaryStream::Grow(int nBytes)
+void BinaryStream::Grow(size_t nBytes)
 {
   this->Resize(this->Size+nBytes);
 }
@@ -201,13 +201,13 @@ void BinaryStream::UnPack(T &val)
 
 //-----------------------------------------------------------------------------
 template <typename T>
-void BinaryStream::Pack(const T *val, int n)
+void BinaryStream::Pack(const T *val, size_t n)
 {
-  const int nBytes=n*sizeof(T);
+  size_t nBytes=n*sizeof(T);
 
   this->Grow(nBytes);
 
-  for (int i=0; i<n; ++i,this->DataP+=sizeof(T))
+  for (size_t i=0; i<n; ++i,this->DataP+=sizeof(T))
     {
     *((T *)this->DataP)=val[i];
     }
@@ -215,9 +215,9 @@ void BinaryStream::Pack(const T *val, int n)
 
 //-----------------------------------------------------------------------------
 template <typename T>
-void BinaryStream::UnPack(T *val, int n)
+void BinaryStream::UnPack(T *val, size_t n)
 {
-  for (int i=0; i<n; ++i, this->DataP+=sizeof(T))
+  for (size_t i=0; i<n; ++i, this->DataP+=sizeof(T))
     {
     val[i]=*((T *)this->DataP);
     }
@@ -227,7 +227,7 @@ void BinaryStream::UnPack(T *val, int n)
 inline
 void BinaryStream::Pack(const string &str)
 {
-  int strLen=str.size();
+  size_t strLen=str.size();
   this->Pack(strLen);
   this->Pack(str.c_str(),strLen);
 }
@@ -236,7 +236,7 @@ void BinaryStream::Pack(const string &str)
 inline
 void BinaryStream::UnPack(string &str)
 {
-  int strLen=0;
+  size_t strLen=0;
   this->UnPack(strLen);
 
   str.resize(strLen);
@@ -249,7 +249,7 @@ void BinaryStream::UnPack(string &str)
 template<typename T>
 void BinaryStream::Pack(vector<T> &v)
 {
-  const int vLen=v.size();
+  const size_t vLen=v.size();
   this->Pack(vLen);
   this->Pack(&v[0],vLen);
 }
@@ -258,7 +258,7 @@ void BinaryStream::Pack(vector<T> &v)
 template<typename T>
 void BinaryStream::UnPack(vector<T> &v)
 {
-  int vLen;
+  size_t vLen;
   this->UnPack(vLen);
   v.resize(vLen);
   this->UnPack(&v[0],vLen);
@@ -268,7 +268,7 @@ void BinaryStream::UnPack(vector<T> &v)
 template<typename T>
 void BinaryStream::Pack(SharedArray<T> &v)
 {
-  const int vLen=v.Size();
+  const size_t vLen=v.Size();
   this->Pack(vLen);
   this->Pack(v.GetPointer(),vLen);
 }
@@ -277,7 +277,7 @@ void BinaryStream::Pack(SharedArray<T> &v)
 template<typename T>
 void BinaryStream::UnPack(SharedArray<T> &v)
 {
-  int vLen;
+  size_t vLen;
   this->UnPack(vLen);
   v.Resize(vLen);
   this->UnPack(v.GetPointer(),vLen);
@@ -287,7 +287,7 @@ void BinaryStream::UnPack(SharedArray<T> &v)
 inline
 void BinaryStream::Pack(map<string,int> &m)
 {
-  const int mLen=m.size();
+  size_t mLen=m.size();
   this->Pack(mLen);
 
   map<string,int>::iterator it=m.begin();
@@ -303,10 +303,10 @@ void BinaryStream::Pack(map<string,int> &m)
 inline
 void BinaryStream::UnPack(map<string,int> &m)
 {
-  int mLen=0;
+  size_t mLen=0;
   this->UnPack(mLen);
 
-  for (int i=0; i<mLen; ++i)
+  for (size_t i=0; i<mLen; ++i)
     {
     string key;
     this->UnPack(key);

@@ -58,7 +58,7 @@ public:
   compute seed points (centred on cells of input). Copy the cells
   on which we operate into the output.
   */
-  virtual int InsertCells(IdBlock *SourceIds)=0;
+  virtual vtkIdType InsertCells(IdBlock *SourceIds)=0;
 
   /**
   Get a specific field line.

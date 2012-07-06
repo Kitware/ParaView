@@ -415,7 +415,7 @@ int BOVWriter::WriteTimeStep(
       vtkDataSet *grid,
       vtkAlgorithm *alg)
 {
-  double progInc=0.70/step->GetNumberOfImages();
+  double progInc=0.70/(double)step->GetNumberOfImages();
   double prog=0.25;
   if(alg)alg->UpdateProgress(prog);
 

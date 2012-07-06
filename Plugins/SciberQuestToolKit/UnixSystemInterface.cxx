@@ -70,11 +70,11 @@ int UnixSystemInterface::Exec(string &cmd)
   if (childPid==0)
     {
 
-    int nArgStrs=argStrs.size();
+    size_t nArgStrs=argStrs.size();
     char **args=(char **)malloc((nArgStrs+1)*sizeof(char *));
-    for (int i=0; i<nArgStrs; ++i)
+    for (size_t i=0; i<nArgStrs; ++i)
       {
-      int argLen=argStrs[i].size();
+      size_t argLen=argStrs[i].size();
       args[i]=(char *)malloc((argLen+1)*sizeof(char));
       strncpy(args[i],argStrs[i].c_str(),argLen+1);
       #if defined pqSQProcessMonitorDEBUG

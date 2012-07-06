@@ -344,7 +344,7 @@ int vtkSQEdgeFilter::RequestData(
       W->SetName(V->GetName());
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Copy<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -387,7 +387,7 @@ int vtkSQEdgeFilter::RequestData(
 
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Gradient<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -419,7 +419,7 @@ int vtkSQEdgeFilter::RequestData(
 
         switch(V->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             Interleave<VTK_TT>(
                 outputTups,
                 (VTK_TT*)Gx->GetVoidPointer(0),
@@ -447,7 +447,7 @@ int vtkSQEdgeFilter::RequestData(
       //
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Laplacian<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),

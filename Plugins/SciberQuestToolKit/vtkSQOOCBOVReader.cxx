@@ -77,7 +77,7 @@ void vtkSQOOCBOVReader::InitializeBlockCache()
 {
   this->ClearBlockCache();
 
-  int nBlocks=this->DomainDecomp->GetNumberOfBlocks();
+  int nBlocks=(int)this->DomainDecomp->GetNumberOfBlocks();
 
   this->LRUQueue->Initialize(this->BlockCacheSize,nBlocks);
 

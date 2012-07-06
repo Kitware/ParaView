@@ -55,7 +55,7 @@ public:
   Copy a contiguous block of cells and their associated point
   and cell data from iniput to output.
   */
-  virtual int Copy(IdBlock &block);
+  virtual vtkIdType Copy(IdBlock &block);
   using CellCopier::Copy;
 
 

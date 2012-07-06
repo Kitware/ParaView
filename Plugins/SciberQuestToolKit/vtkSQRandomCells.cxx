@@ -280,7 +280,7 @@ int vtkSQRandomCells::RequestData(
     vector<unsigned long long> *assignments=new vector<unsigned long long>[worldSize];
 
     // seed the number generator.
-    int seed=(this->Seed<0?time(0):this->Seed);
+    int seed=(this->Seed<0?((int)time(0)):this->Seed);
     srand(seed);
 
     set<unsigned long long> usedCellIds;
@@ -324,7 +324,7 @@ int vtkSQRandomCells::RequestData(
       // sample size is large enough that random selection of n unique cells
       // is impractical.
       unsigned long long reducedSampleSize
-        = (unsigned long long)max(1.0,0.75*nCellsTotal);
+        = (unsigned long long)max(1.0,0.75*(double)nCellsTotal);
 
       vtkWarningMacro(
         << "Reducing sample size from "
@@ -407,7 +407,7 @@ int vtkSQRandomCells::RequestData(
             MPI_COMM_WORLD);
         MPI_Send(
             &((assignments[i])[0]),
-            nAssigned[i],
+            (int)nAssigned[i], // TODO -- this is a problem with MPI api.
             MPI_UNSIGNED_LONG_LONG,
             i,
             1,
@@ -448,7 +448,7 @@ int vtkSQRandomCells::RequestData(
       cellsToPass.resize(nCellsToPass);
       MPI_Recv(
           &cellsToPass[0],
-          nCellsToPass,
+          (int)nCellsToPass, // TODO -- this is a problem with MPI api.
           MPI_UNSIGNED_LONG_LONG,
           masterRank,
           1,

@@ -56,12 +56,12 @@ int IntersectData::CommitType(MPI_Datatype *classType)
   int blockLen[nBlocks]={3, 2};
   MPI_Datatype blockType[nBlocks]={MPI_INT, MPI_DOUBLE};
   MPI_Aint blockDispl[nBlocks];
-  MPI_Address(&this->seedPointId, &blockDispl[0]);
-  MPI_Address(&this->fwdIntersectTime, &blockDispl[1]);
+  MPI_Get_address(&this->seedPointId, &blockDispl[0]);
+  MPI_Get_address(&this->fwdIntersectTime, &blockDispl[1]);
   blockDispl[1]-=blockDispl[0];
   blockDispl[0]=0;
 
-  MPI_Type_struct(nBlocks,blockLen,blockDispl,blockType,classType);
+  MPI_Type_create_struct(nBlocks,blockLen,blockDispl,blockType,classType);
 
   return MPI_Type_commit(classType)==MPI_SUCCESS;
   #endif

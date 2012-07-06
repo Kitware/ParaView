@@ -159,7 +159,7 @@ public:
   /**
   Get the number of blocks.
   */
-  int GetNumberOfBlocks() const { return this->Decomp.size(); }
+  size_t GetNumberOfBlocks() const { return this->Decomp.size(); }
 
   /**
   Convert an id tuple into an index.

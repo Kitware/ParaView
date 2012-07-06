@@ -112,9 +112,18 @@ int vtkSQLineSource::RequestData(
     }
 
   // line equation paramteric in point id
-  int t1=this->Resolution;
-  float r0[3]={this->Point1[0], this->Point1[1], this->Point1[2]};
-  float r1[3]={this->Point2[0], this->Point2[1], this->Point2[2]};
+  float t1=(float)this->Resolution;
+
+  float r0[3]={
+      (float)this->Point1[0],
+      (float)this->Point1[1],
+      (float)this->Point1[2]};
+
+  float r1[3]={
+      (float)this->Point2[0],
+      (float)this->Point2[1],
+      (float)this->Point2[2]};
+
   float v[3]={(r1[0]-r0[0])/t1, (r1[1]-r0[1])/t1, (r1[2]-r0[2])/t1};
 
   int nPtsLocal=nLocal+1;
@@ -128,14 +137,14 @@ int vtkSQLineSource::RequestData(
   pa->SetNumberOfTuples(nPtsLocal);
   float *ppa=pa->GetPointer(0);
 
-  ppa[0]=r0[0]+startId*v[0];
-  ppa[1]=r0[1]+startId*v[1];
-  ppa[2]=r0[2]+startId*v[2];
+  ppa[0]=r0[0]+((float)startId)*v[0];
+  ppa[1]=r0[1]+((float)startId)*v[1];
+  ppa[2]=r0[2]+((float)startId)*v[2];
   ppa+=3;
 
   for (int i=0,id=startId; id<endId; ++i,++id)
     {
-    int segEnd=id+1;
+    float segEnd=(float)(id+1);
     ppa[0]=r0[0]+segEnd*v[0];
     ppa[1]=r0[1]+segEnd*v[1];
     ppa[2]=r0[2]+segEnd*v[2];

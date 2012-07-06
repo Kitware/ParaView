@@ -840,7 +840,9 @@ int vtkSQFieldTracer::RequestData(
     #endif
     // This requires all process to have all the seed source data
     // present.
-    int nSourceCells=sourceGen!=0?sourceGen->GetNumberOfCells():source->GetNumberOfCells();
+    vtkIdType nSourceCells
+      = (sourceGen!=0?sourceGen->GetNumberOfCells():source->GetNumberOfCells());
+
     this->IntegrateDynamic(
           this->WorldRank,
           this->WorldSize,
@@ -887,7 +889,7 @@ int vtkSQFieldTracer::RequestData(
 //-----------------------------------------------------------------------------
 inline
 int vtkSQFieldTracer::IntegrateStatic(
-      int nCells,
+      vtkIdType nCells,
       const char *fieldName,
       vtkSQOOCReader *oocr,
       vtkDataSet *&oocrCache,
@@ -901,7 +903,7 @@ int vtkSQFieldTracer::IntegrateStatic(
   // do all local ids in a single pass.
   IdBlock sourceIds;
   sourceIds.first()=0;
-  sourceIds.size()=nCells;
+  sourceIds.size()=(int)nCells;
 
   int ok=this->IntegrateBlock(
             &sourceIds,
@@ -921,7 +923,7 @@ int vtkSQFieldTracer::IntegrateStatic(
 int vtkSQFieldTracer::IntegrateDynamic(
       int procId,
       int nProcs,
-      int nCells,
+      vtkIdType nCells,
       const char *fieldName,
       vtkSQOOCReader *oocr,
       vtkDataSet *&oocrCache,
@@ -950,9 +952,9 @@ int vtkSQFieldTracer::IntegrateDynamic(
   // leaving workers idle.
   if (procId==masterProcId)
     {
-    int workerBlockSize=min(this->WorkerBlockSize,max(nCells/nProcs,1));
+    int workerBlockSize=min(this->WorkerBlockSize,max((int)nCells/nProcs,1));
     int masterBlockSize=min(workerBlockSize,this->MasterBlockSize);
-    WorkQueue Q(nCells);
+    WorkQueue Q((int)nCells);
     int nActiveWorkers=nProcs-1;
     int moreWork=1;
     while (nActiveWorkers || moreWork)
@@ -981,7 +983,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
           // this closes all workers.
           MPI_Send(
               sourceIds.data(),
-              sourceIds.dataSize(),
+              (int)sourceIds.dataSize(),
               MPI_UNSIGNED_LONG_LONG,
               otherProc,
               BLOCK_REQ,
@@ -1044,7 +1046,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
       IdBlock sourceIds;
       MPI_Recv(
           sourceIds.data(),
-          sourceIds.dataSize(),
+          (int)sourceIds.dataSize(),
           MPI_UNSIGNED_LONG_LONG,
           masterProcId,
           BLOCK_REQ,

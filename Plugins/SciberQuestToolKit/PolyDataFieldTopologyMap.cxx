@@ -147,7 +147,7 @@ void PolyDataFieldTopologyMap::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldTopologyMap::InsertCells(IdBlock *SourceIds)
+vtkIdType PolyDataFieldTopologyMap::InsertCells(IdBlock *SourceIds)
 {
   if (this->SourceGen)
     {
@@ -157,7 +157,7 @@ int PolyDataFieldTopologyMap::InsertCells(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
+vtkIdType PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -171,7 +171,7 @@ int PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
   vtkIdType nOutPts=this->OutPts->GetNumberOfTuples();
   vtkIdType polyId=startCellId;
 
-  int lId=this->Lines.size();
+  size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
   vector<vtkIdType> sourcePtIds;
@@ -201,7 +201,7 @@ int PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
     // but this is wrong as there will be many duplicates. ignored.
     float *pOutPts=this->OutPts->WritePointer(3*nOutPts,3*nSourcePtIds);
     // the seed point is the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     // transfer from input to output (only what we own)
     for (vtkIdType j=0; j<nSourcePtIds; ++j,++pOutCells)
       {
@@ -234,9 +234,9 @@ int PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
       seed[2]+=sourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nSourcePtIds;
-    seed[1]/=nSourcePtIds;
-    seed[2]/=nSourcePtIds;
+    seed[0]/=((float)nSourcePtIds);
+    seed[1]/=((float)nSourcePtIds);
+    seed[2]/=((float)nSourcePtIds);
 
     this->Lines[lId]=new FieldLine(seed,polyId);
     this->Lines[lId]->AllocateTrace();
@@ -252,7 +252,7 @@ int PolyDataFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
+vtkIdType PolyDataFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -278,7 +278,7 @@ int PolyDataFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
   vtkIdType nOutPts=this->OutPts->GetNumberOfTuples();
   vtkIdType polyId=startCellId;
 
-  int lId=this->Lines.size();
+  size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
   // For each cell asigned to us we'll get its center (this is the seed point)
@@ -303,7 +303,7 @@ int PolyDataFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
     // but this is wrong as there will be many duplicates. ignored.
     float *pOutPts=this->OutPts->WritePointer(3*nOutPts,3*nPtIds);
     // the  point we will use the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     // transfer from input to output (only what we own)
     for (vtkIdType j=0; j<nPtIds; ++j,++pOutCells)
       {
@@ -336,9 +336,9 @@ int PolyDataFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
       seed[2]+=pSourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nPtIds;
-    seed[1]/=nPtIds;
-    seed[2]/=nPtIds;
+    seed[0]/=((float)nPtIds);
+    seed[1]/=((float)nPtIds);
+    seed[2]/=((float)nPtIds);
 
     this->Lines[lId]=new FieldLine(seed,polyId);
     this->Lines[lId]->AllocateTrace();

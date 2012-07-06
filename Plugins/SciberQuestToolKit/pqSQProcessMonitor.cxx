@@ -227,9 +227,9 @@ RankData::RankData(
 //-----------------------------------------------------------------------------
 void RankData::UpdateLoadWidget()
 {
-  float used = this->GetLoad();
+  float used = (float)this->GetLoad();
   float fracUsed = this->GetLoadFraction();
-  float percUsed = fracUsed*100.0;
+  float percUsed = fracUsed*100.0f;
   int progVal = (int)(fracUsed*SQPM_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
@@ -430,9 +430,9 @@ void HostData::InitializeLoadWidget()
 //-----------------------------------------------------------------------------
 void HostData::UpdateLoadWidget()
 {
-  float used = this->GetLoad();
+  float used = (float)this->GetLoad();
   float fracUsed = this->GetLoadFraction();
-  float percUsed = fracUsed*100.0;
+  float percUsed = fracUsed*100.0f;
   int progVal = (int)(fracUsed*SQPM_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
@@ -1094,8 +1094,8 @@ void pqSQProcessMonitor::ShowOnlyNodes()
   vector<QTreeWidgetItem*> items;
   flattenTree(this->Ui->configView,items);
 
-  int nItems=items.size();
-  for (int i=0; i<nItems; ++i)
+  size_t nItems=items.size();
+  for (size_t i=0; i<nItems; ++i)
     {
     QTreeWidgetItem *item=items[i];
 

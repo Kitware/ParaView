@@ -120,7 +120,7 @@ void UnstructuredFieldTopologyMap::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldTopologyMap::InsertCells(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldTopologyMap::InsertCells(IdBlock *SourceIds)
 {
   if (this->SourceGen)
     {
@@ -130,10 +130,10 @@ int UnstructuredFieldTopologyMap::InsertCells(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
-  vtkIdType nCellsLocal=SourceIds->size();
+  vtkIdType nCellsLocal=(vtkIdType)SourceIds->size();
 
 //   // input points
 //   float *pSourcePts=this->SourcePts->GetPointer(0);
@@ -157,7 +157,7 @@ int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
   vtkIdType *pOutLocs=this->OutLocs->WritePointer(endOfLocs,nCellsLocal);
 
   // field lines
-  int lId=this->Lines.size();
+  size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
   vector<float> sourcePts;
@@ -184,7 +184,7 @@ int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
     ++pOutLocs;
 
     // copy its type.
-    *pOutTypes=this->SourceGen->GetCellType(sourceCellId);
+    *pOutTypes=(unsigned char)this->SourceGen->GetCellType(sourceCellId);
     ++pOutTypes;
 
     // Get location to write new cell.
@@ -201,7 +201,7 @@ int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
     // but this is wrong as there will be many duplicates. ignored.
     float *pOutPts=this->OutPts->WritePointer(3*nOutPts,3*nPtIds);
     // the  point we will use the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     // transfer from input to output (only what we own)
     for (vtkIdType j=0; j<nPtIds; ++j)
       {
@@ -230,9 +230,9 @@ int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
       seed[2]+=sourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nPtIds;
-    seed[1]/=nPtIds;
-    seed[2]/=nPtIds;
+    seed[0]/=((float)nPtIds);
+    seed[1]/=((float)nPtIds);
+    seed[2]/=((float)nPtIds);
 
     this->Lines[lId]=new FieldLine(seed,sourceCellId);
     this->Lines[lId]->AllocateTrace();
@@ -249,10 +249,10 @@ int UnstructuredFieldTopologyMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
-  vtkIdType nCellsLocal=SourceIds->size();
+  vtkIdType nCellsLocal=(vtkIdType)SourceIds->size();
 
   // Cells are sequentially acccessed so explicitly skip all cells
   // we aren't interested in.
@@ -286,7 +286,7 @@ int UnstructuredFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
   vtkIdType *pOutLocs=this->OutLocs->WritePointer(endOfLocs,nCellsLocal);
 
   // field lines
-  int lId=this->Lines.size();
+  size_t lId=this->Lines.size();
   this->Lines.resize(lId+nCellsLocal,0);
 
   vtkIdType sourceCellId=startCellId;
@@ -324,7 +324,7 @@ int UnstructuredFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
     // but this is wrong as there will be many duplicates. ignored.
     float *pOutPts=this->OutPts->WritePointer(3*nOutPts,3*nPtIds);
     // the  point we will use the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     // transfer from input to output (only what we own)
     for (vtkIdType j=0; j<nPtIds; ++j)
       {
@@ -359,9 +359,9 @@ int UnstructuredFieldTopologyMap::InsertCellsFromDataset(IdBlock *SourceIds)
       seed[2]+=pSourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nPtIds;
-    seed[1]/=nPtIds;
-    seed[2]/=nPtIds;
+    seed[0]/=((float)nPtIds);
+    seed[1]/=((float)nPtIds);
+    seed[2]/=((float)nPtIds);
 
     this->Lines[lId]=new FieldLine(seed,sourceCellId);
     this->Lines[lId]->AllocateTrace();

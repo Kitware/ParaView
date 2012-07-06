@@ -100,7 +100,7 @@ vtkSQProcessMonitor::vtkSQProcessMonitor()
   char *hostnames=0;
   if (this->WorldRank==0)
     {
-    int n=0;
+    vtkIdType n=0;
     for (int i=0; i<this->WorldSize; ++i)
       {
       hnDispls[i]=n;

@@ -29,14 +29,14 @@ using namespace Eigen;
 
 //*****************************************************************************
 template<typename T>
-bool IsReal(complex<T> &c, T eps=1.0e-6)
+bool IsReal(complex<T> &c, T eps=T(1.0e-6))
 {
   return (fabs(imag(c)) < eps);
 }
 
 //*****************************************************************************
 template<typename T>
-bool IsComplex(complex<T> &c, T eps=1.0e-6)
+bool IsComplex(complex<T> &c, T eps=T(1.0e-6))
 {
   return (fabs(imag(c)) >= eps);
 }
@@ -74,7 +74,7 @@ T Gaussian(T X[3], T a, T B[3], T c)
 
   T r2 = x*x+y*y+z*z;
 
-  return a*exp(-r2/(2.0*c*c));
+  return a*((T)exp(-r2/(((T)2)*c*c)));
 }
 
 //*****************************************************************************
@@ -105,15 +105,15 @@ void linspace(T lo, T hi, int n, T *data)
 
   if (n==1)
     {
-    data[0]=(hi+lo)/2.0;
+    data[0]=(hi+lo)/((T)2);
     return;
     }
 
-  T delta=(hi-lo)/(n-1);
+  T delta=(hi-lo)/((T)(n-1));
 
   for (int i=0; i<n; ++i)
     {
-    data[i]=lo+i*delta;
+    data[i]=lo+((T)i)*delta;
     }
 }
 
@@ -125,23 +125,22 @@ void linspace(Ti X0[3], Ti X1[3], int n, To *X)
 
   if (n==1)
     {
-    X[0]=(X1[0]+X0[0])/2.0;
-    X[1]=(X1[1]+X0[1])/2.0;
-    X[2]=(X1[2]+X0[2])/2.0;
+    X[0]=(To)((X1[0]+X0[0])/Ti(2));
+    X[1]=(To)((X1[1]+X0[1])/Ti(2));
+    X[2]=(To)((X1[2]+X0[2])/Ti(2));
     return;
     }
 
   Ti dX[3]={
-    (X1[0]-X0[0])/(n-1),
-    (X1[1]-X0[1])/(n-1),
-    (X1[2]-X0[2])/(n-1)
-    };
+    (X1[0]-X0[0])/((Ti)(n-1)),
+    (X1[1]-X0[1])/((Ti)(n-1)),
+    (X1[2]-X0[2])/((Ti)(n-1))};
 
   for (int i=0; i<n; ++i)
     {
-    X[0]=X0[0]+i*dX[0];
-    X[1]=X0[1]+i*dX[1];
-    X[2]=X0[2]+i*dX[2];
+    X[0]=(To)(X0[0]+((Ti)i)*dX[0]);
+    X[1]=(To)(X0[1]+((Ti)i)*dX[1]);
+    X[2]=(To)(X0[2]+((Ti)i)*dX[2]);
     X+=3;
     }
 }
@@ -159,19 +158,19 @@ void logspace(T lo, T hi, int n, T p, T *data)
   int nhi=n-mid;
   T s=hi-lo;
 
-  T rhi=pow(10.0,p);
+  T rhi=(T)pow(((T)10),p);
 
-  linspace<T>(1.0,0.99*rhi,nlo,data);
-  linspace<T>(1.0,rhi,nhi,data+nlo);
+  linspace<T>(((T)1),T(0.99)*rhi,nlo,data);
+  linspace<T>(((T)1),rhi,nhi,data+nlo);
 
   int i=0;
   for (; i<nlo; ++i)
     {
-    data[i]=lo+s*(0.5*log10(data[i])/p);
+    data[i]=lo+s*(T(0.5)*((T)log10(data[i]))/p);
     }
   for (; i<n; ++i)
     {
-    data[i]=lo+s*(1.0-log10(data[i])/(2.0*p));
+    data[i]=lo+s*(((T)1)-((T)log10(data[i]))/(((T)2)*p));
     }
 }
 
@@ -179,7 +178,7 @@ void logspace(T lo, T hi, int n, T p, T *data)
 template <typename T>
 T Interpolate(double t, T v0, T v1)
 {
-  T w=(1.0-t)*v0 + t*v1;
+  T w=(((T)1)-T(t))*v0 + T(t)*v1;
   return w;
 }
 
@@ -291,7 +290,7 @@ void slowSort(T *a, int l, int r)
       {
       if (a[j]>a[j-1])
         {
-        double tmp=a[j-1];
+        T tmp=a[j-1];
         a[j-1]=a[j];
         a[j]=tmp;
         }
@@ -422,7 +421,7 @@ void Magnitude(int *I, T *  V, T *  mV)
         const int vi = 3*p;
         const int vj = vi + 1;
         const int vk = vi + 2;
-        mV[p]=::sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]);
+        mV[p]=sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]);
         }
       }
     }
@@ -439,7 +438,7 @@ void Magnitude(
   for (size_t q=0; q<n; ++q)
     {
     size_t qq=3*q;
-    mV[q] = ::sqrt(V[qq]*V[qq]+V[qq+1]+V[qq+1]+V[qq+2]*V[qq+2]);
+    mV[q] = ((T)sqrt(V[qq]*V[qq]+V[qq+1]+V[qq+1]+V[qq+2]*V[qq+2]));
     }
 }
 
@@ -455,13 +454,13 @@ void Magnitude(
   for (size_t q=0; q<nt; ++q)
     {
     size_t qq=nc*q;
-    T vv=0.0f;
+    T vv=((T)0);
     for (size_t c=0; c<nc; ++c)
       {
       size_t r=qq+c;
       vv+=V[r]*V[r];
       }
-    mV[q] = ::sqrt(vv);
+    mV[q] = ((T)sqrt(vv));
     }
 }
 
@@ -710,7 +709,7 @@ void Convolution(
         // intialize the output
         for (int c=0; c<nComp; ++c)
           {
-          W[_pi+c] = T(0);
+          W[_pi+c] = ((T)0);
           }
 
         for (int h=kernel[4]; h<=kernel[5]; ++h)
@@ -730,7 +729,7 @@ void Convolution(
 
               for (int c=0; c<nComp; ++c)
                 {
-                W[_pi+c] += T(V[vi+c]*K[kii]);
+                W[_pi+c] += V[vi+c]*((T)K[kii]);
                 }
               }
             }
@@ -770,7 +769,7 @@ void ScalarConvolution2D(
     i=wi-j*wni;
 
     // compute using the aligned buffers
-    float w=0.0f;
+    T w=(0);
     for (unsigned long g=0; g<kni; ++g)
       {
       unsigned long b=kni*g;
@@ -779,7 +778,7 @@ void ScalarConvolution2D(
         {
         unsigned long vi=q+f;
         unsigned long ki=b+f;
-        w+=V[vi]*K[ki];
+        w+=V[vi]*((T)K[ki]);
         }
       }
     W[wi]=w;
@@ -814,7 +813,7 @@ void ScalarConvolution3D(
     i=wi-k*wnij-j*wni;
 
     // compute convolution
-    float w=0.0f;
+    T w=((T)0);
     for (unsigned long h=0; h<kni; ++h)
       {
       unsigned long c=knij*h;
@@ -828,7 +827,7 @@ void ScalarConvolution3D(
           unsigned long ki=b+f;
           unsigned long vi=q+f;
 
-          w+=V[vi]*K[ki];
+          w+=V[vi]*((T)K[ki]);
           }
         }
       }
@@ -891,7 +890,7 @@ void ScalarConvolution2D(
       }
 
     // compute using the aligned buffers
-    float w=0.0f;
+    float w=((T)0);
     for (unsigned long ki=0; ki<knij4; ++ki)
       {
       w=w+aV[ki]*aK[ki];
@@ -962,7 +961,7 @@ void ScalarConvolution3D(
       }
 
     // compute convolution
-    float w=0.0f;
+    float w=((T)0);
     for (unsigned long ki=0; ki<knijk4; ++ki)
       {
       w=w+aV[ki]*aK[ki];
@@ -1144,8 +1143,8 @@ void DivergenceFace(int *I, double *dX, T *V, T *mV, T *div)
         //cerr << "(" << vilo << ", " << vihi << ", " << vjlo << ", " << vjhi << ", " << vklo << ", " << vkhi << ")" << endl;
 
         // const double modV=mV[cId];
-        // (::sqrt(V[vilo]*V[vilo] + V[vjlo]*V[vjlo] + V[vklo]*V[vklo])
-        // + ::sqrt(V[vihi]*V[vihi] + V[vjhi]*V[vjhi] + V[vkhi]*V[vkhi]))/2.0;
+        // (sqrt(V[vilo]*V[vilo] + V[vjlo]*V[vjlo] + V[vklo]*V[vklo])
+        // + sqrt(V[vihi]*V[vihi] + V[vjhi]*V[vjhi] + V[vkhi]*V[vkhi]))/((T)2);
 
         div[c] =(V[vihi]-V[vilo])/dX[0]/mV[p];
         div[c]+=(V[vjhi]-V[vjlo])/dX[1]/mV[p];
@@ -1189,7 +1188,10 @@ void Rotation(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -1211,9 +1213,9 @@ void Rotation(
 
         //      __   ->
         //  w = \/ x V
-        Wx[_pi]=T(0);
-        Wy[_pi]=T(0);
-        Wz[_pi]=T(0);
+        Wx[_pi]=((T)0);
+        Wy[_pi]=((T)0);
+        Wz[_pi]=((T)0);
         if (iok)
           {
           int vilo_y=3*idx.Index(i-1,j,k)+1;
@@ -1222,8 +1224,8 @@ void Rotation(
           int vihi_y=3*idx.Index(i+1,j,k)+1;
           int vihi_z=vihi_y+1;
 
-          Wy[_pi] -= T((V[vihi_z]-V[vilo_z])/dx[0]);
-          Wz[_pi] += T((V[vihi_y]-V[vilo_y])/dx[0]);
+          Wy[_pi] -= (V[vihi_z]-V[vilo_z])/dx[0];
+          Wz[_pi] += (V[vihi_y]-V[vilo_y])/dx[0];
           }
 
         if (jok)
@@ -1234,8 +1236,8 @@ void Rotation(
           int vjhi_x=3*idx.Index(i,j+1,k);
           int vjhi_z=vjhi_x+2;
 
-          Wx[_pi] += T((V[vjhi_z]-V[vjlo_z])/dx[1]);
-          Wz[_pi] -= T((V[vjhi_x]-V[vjlo_x])/dx[1]);
+          Wx[_pi] += (V[vjhi_z]-V[vjlo_z])/dx[1];
+          Wz[_pi] -= (V[vjhi_x]-V[vjlo_x])/dx[1];
           }
 
         if (kok)
@@ -1246,8 +1248,8 @@ void Rotation(
           int vkhi_x=3*idx.Index(i,j,k+1);
           int vkhi_y=vkhi_x+1;
 
-          Wx[_pi] -= T((V[vkhi_y]-V[vklo_y])/dx[2]);
-          Wy[_pi] += T((V[vkhi_x]-V[vklo_x])/dx[2]);
+          Wx[_pi] -= (V[vkhi_y]-V[vklo_y])/dx[2];
+          Wy[_pi] += (V[vkhi_x]-V[vklo_x])/dx[2];
           }
         }
       }
@@ -1354,7 +1356,10 @@ void Helicity(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -1372,9 +1377,9 @@ void Helicity(
 
         //      __   ->
         //  w = \/ x V
-        double wx=0.0;
-        double wy=0.0;
-        double wz=0.0;
+        T wx=((T)0);
+        T wy=((T)0);
+        T wz=((T)0);
         if (iok)
           {
           int vilo_y=3*idx.Index(i-1,j,k)+1;
@@ -1452,8 +1457,10 @@ void Helicity(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *H)
       for (int p=output[0]; p<=output[1]; ++p)
         {
         // stencil deltas
-        const TP dx[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        const TD dx[3] = {
+            (TD)(x[p+1]-x[p-1]),
+            (TD)(y[q+1]-y[q-1]),
+            (TD)(z[r+1]-z[r-1])};
 
         // output array indices
         const int _i=p-output[0];
@@ -1479,7 +1486,7 @@ void Helicity(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *H)
 
         //      __   ->
         //  w = \/ x V
-        const double w[3]={
+        const TD w[3]={
               (V[vjhi+2]-V[vjlo+2])/dx[1]-(V[vkhi+1]-V[vklo+1])/dx[2],
               (V[vkhi  ]-V[vklo  ])/dx[2]-(V[vihi+2]-V[vilo+2])/dx[0],
               (V[vihi+1]-V[vilo+1])/dx[0]-(V[vjhi  ]-V[vjlo  ])/dx[1]
@@ -1524,7 +1531,10 @@ void NormalizedHelicity(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -1542,9 +1552,9 @@ void NormalizedHelicity(
 
         //      __   ->
         //  w = \/ x V
-        double wx=0.0;
-        double wy=0.0;
-        double wz=0.0;
+        T wx=((T)0);
+        T wy=((T)0);
+        T wz=((T)0);
         if (iok)
           {
           int vilo_y=3*idx.Index(i-1,j,k)+1;
@@ -1583,7 +1593,7 @@ void NormalizedHelicity(
 
         //  ->
         // |w|
-        const double modW=::sqrt(wx*wx+wy*wy+wz*wz);
+        const T modW=((T)sqrt(wx*wx+wy*wy+wz*wz));
 
         const int vi=3*idx.Index(i,j,k);
         const int vj=vi+1;
@@ -1591,8 +1601,8 @@ void NormalizedHelicity(
 
         //  ->
         // |V|
-        const double modV
-          = ::sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]);
+        const T modV
+          = ((T)sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]));
 
         const int pi=_idx.Index(_i,_j,_k);
 
@@ -1640,8 +1650,10 @@ void NormalizedHelicity(
       for (int p=output[0]; p<=output[1]; ++p)
         {
         // stencil deltas
-        const TP dx[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        const TD dx[3] = {
+            ((TD)(x[p+1]-x[p-1]))
+            ((TD)(y[q+1]-y[q-1]))
+            ((TD)(z[r+1]-z[r-1]))};
 
         // output array indices
         const int _i=p-output[0];
@@ -1669,17 +1681,17 @@ void NormalizedHelicity(
 
         //  ->
         // |V|
-        const double modV
-          = ::sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]);
+        const TD modV
+          = sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]);
 
         //      __   ->
         //  w = \/ x V
-        const double w[3]={
+        const TD w[3]={
               (V[vjhi+2]-V[vjlo+2])/dx[1]-(V[vkhi+1]-V[vklo+1])/dx[2],
               (V[vkhi  ]-V[vklo  ])/dx[2]-(V[vihi+2]-V[vilo+2])/dx[0],
               (V[vihi+1]-V[vilo+1])/dx[0]-(V[vjhi  ]-V[vjlo  ])/dx[1]};
 
-        const double modW=::sqrt(w[0]*w[0]+w[1]*w[1]+w[2]*w[2]);
+        const TD modW=sqrt(w[0]*w[0]+w[1]*w[1]+w[2]*w[2]);
 
         //         ->  ->     -> ->
         // H_n = ( V . w ) / |V||w|
@@ -1731,7 +1743,10 @@ void Lambda(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -1748,7 +1763,7 @@ void Lambda(
         const int  i=p-input[0];
 
         // J: gradient velocity tensor, (jacobian)
-        double j11=0.0, j12=0.0, j13=0.0;
+        T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -1764,7 +1779,7 @@ void Lambda(
           j13=(V[vihi_z]-V[vilo_z])/dx[0];
           }
 
-        double j21=0.0, j22=0.0, j23=0.0;
+        T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
           int vjlo_x=3*idx.Index(i,j-1,k);
@@ -1780,7 +1795,7 @@ void Lambda(
           j23=(V[vjhi_z]-V[vjlo_z])/dx[1];
           }
 
-        double j31=0.0, j32=0.0, j33=0.0;
+        T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
           int vklo_x=3*idx.Index(i,j,k-1);
@@ -1796,20 +1811,20 @@ void Lambda(
           j33=(V[vkhi_z]-V[vklo_z])/dx[2];
           }
 
-        Matrix<double,3,3> J;
+        Matrix<T,3,3> J;
         J <<
           j11, j12, j13,
           j21, j22, j23,
           j31, j32, j33;
 
         // construct pressure corrected hessian
-        Matrix<double,3,3> S=0.5*(J+J.transpose());
-        Matrix<double,3,3> W=0.5*(J-J.transpose());
-        Matrix<double,3,3> HP=S*S+W*W;
+        Matrix<T,3,3> S=0.5*(J+J.transpose());
+        Matrix<T,3,3> W=0.5*(J-J.transpose());
+        Matrix<T,3,3> HP=S*S+W*W;
 
         // compute eigen values, lambda
-        Matrix<double,3,1> e;
-        SelfAdjointEigenSolver<Matrix<double,3,3> >solver(HP,false);
+        Matrix<T,3,1> e;
+        SelfAdjointEigenSolver<Matrix<T,3,3> >solver(HP,false);
         e=solver.eigenvalues();
 
         const int pi=_idx.Index(_i,_j,_k);
@@ -1854,8 +1869,10 @@ void Lambda(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *L)
       for (int p=output[0]; p<=output[1]; ++p)
         {
         // stencil deltas
-        const TP dx[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        const TD dx[3] = {
+            ((TD)(x[p+1]-x[p-1])),
+            ((TD)(y[q+1]-y[q-1])),
+            ((TD)(z[r+1]-z[r-1]))};
 
         // output array indices
         const int _i=p-output[0];
@@ -1880,29 +1897,29 @@ void Lambda(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *L)
         const int vkhi=3*((k+1)*ninj+j*ni+i);
 
         // J: gradient velocity tensor, (jacobian)
-        Matrix<double,3,3> J;
+        Matrix<TD,3,3> J;
         J <<
           (V[vihi]-V[vilo])/dx[0], (V[vihi+1]-V[vilo+1])/dx[0], V[vihi+2]-V[vilo+2]/dx[0],
           (V[vjhi]-V[vjlo])/dx[1], (V[vjhi+1]-V[vjlo+1])/dx[1], V[vjhi+2]-V[vjlo+2]/dx[1],
           (V[vkhi]-V[vklo])/dx[2], (V[vkhi+1]-V[vklo+1])/dx[2], V[vkhi+2]-V[vklo+2]/dx[2];
 
         // construct pressure corrected hessian
-        Matrix<double,3,3> S=0.5*(J+J.transpose());
-        Matrix<double,3,3> W=0.5*(J-J.transpose());
-        Matrix<double,3,3> HP=S*S+W*W;
+        Matrix<TD,3,3> S=((TD)0.5)*(J+J.transpose());
+        Matrix<TD,3,3> W=((TD)0.5)*(J-J.transpose());
+        Matrix<TD,3,3> HP=S*S+W*W;
 
         // compute eigen values, lambda
-        Matrix<double,3,1> e;
-        SelfAdjointEigenSolver<Matrix<double,3,3> >solver(HP,false);
+        Matrix<TD,3,1> e;
+        SelfAdjointEigenSolver<Matrix<TD,3,3> >solver(HP,false);
         e=solver.eigenvalues();
 
         L[vi]=e(0,0);
         L[vj]=e(1,0);
         L[vk]=e(2,0);
 
-        L[vi]=(L[vi]>=-1E-5&&L[vi]<=1E-5?0.0:L[vi]);
-        L[vj]=(L[vj]>=-1E-5&&L[vj]<=1E-5?0.0:L[vj]);
-        L[vk]=(L[vk]>=-1E-5&&L[vk]<=1E-5?0.0:L[vk]);
+        L[vi]=(((L[vi]>=((TD)-1E-5))&&(L[vi]<=((TD)1E-5)))?TD(0):L[vi]);
+        L[vj]=(((L[vj]>=((TD)-1E-5))&&(L[vj]<=((TD)1E-5)))?TD(0):L[vj]);
+        L[vk]=(((L[vk]>=((TD)-1E-5))&&(L[vk]<=((TD)1E-5)))?TD(0):L[vk]);
 
         slowSort(&L[vi],0,3);
         // cerr << L[vi] << ", "  << L[vj] << ", " << L[vk] << endl;
@@ -1943,7 +1960,10 @@ void Lambda2(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -1960,7 +1980,7 @@ void Lambda2(
         const int  i=p-input[0];
 
         // J: gradient velocity tensor, (jacobian)
-        double j11=0.0, j12=0.0, j13=0.0;
+        T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -1976,7 +1996,7 @@ void Lambda2(
           j13=(V[vihi_z]-V[vilo_z])/dx[0];
           }
 
-        double j21=0.0, j22=0.0, j23=0.0;
+        T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
           int vjlo_x=3*idx.Index(i,j-1,k);
@@ -1992,7 +2012,7 @@ void Lambda2(
           j23=(V[vjhi_z]-V[vjlo_z])/dx[1];
           }
 
-        double j31=0.0, j32=0.0, j33=0.0;
+        T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
           int vklo_x=3*idx.Index(i,j,k-1);
@@ -2008,20 +2028,20 @@ void Lambda2(
           j33=(V[vkhi_z]-V[vklo_z])/dx[2];
           }
 
-        Matrix<double,3,3> J;
+        Matrix<T,3,3> J;
         J <<
           j11, j12, j13,
           j21, j22, j23,
           j31, j32, j33;
 
         // construct pressure corrected hessian
-        Matrix<double,3,3> S=0.5*(J+J.transpose());
-        Matrix<double,3,3> W=0.5*(J-J.transpose());
-        Matrix<double,3,3> HP=S*S+W*W;
+        Matrix<T,3,3> S=0.5*(J+J.transpose());
+        Matrix<T,3,3> W=0.5*(J-J.transpose());
+        Matrix<T,3,3> HP=S*S+W*W;
 
         // compute eigen values, lambda
-        Matrix<double,3,1> e;
-        SelfAdjointEigenSolver<Matrix<double,3,3> >solver(HP,false);
+        Matrix<T,3,1> e;
+        SelfAdjointEigenSolver<Matrix<T,3,3> >solver(HP,false);
         e=solver.eigenvalues();  // input array bounds.
 
         const int pi=_idx.Index(_i,_j,_k);
@@ -2065,8 +2085,10 @@ void Lambda2(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *L2)
       {
       for (int p=output[0]; p<=output[1]; ++p)
         {
-        const TP dx[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        const TD dx[3] = {
+            ((TD)(x[p+1]-x[p-1])),
+            ((TD)(y[q+1]-y[q-1])),
+            ((TD)(z[r+1]-z[r-1]))};
 
         // output array indices
         const int _i=p-output[0];
@@ -2088,26 +2110,28 @@ void Lambda2(int *input, int *output, TP *x, TP *y, TP *z, TD *V, TD *L2)
         const int vkhi=3*((k+1)*ninj+j*ni+i);
 
         // J: gradient velocity tensor, (jacobian)
-        Matrix<double,3,3> J;
+        Matrix<TD,3,3> J;
         J <<
           (V[vihi]-V[vilo])/dx[0], (V[vihi+1]-V[vilo+1])/dx[0], V[vihi+2]-V[vilo+2]/dx[0],
           (V[vjhi]-V[vjlo])/dx[1], (V[vjhi+1]-V[vjlo+1])/dx[1], V[vjhi+2]-V[vjlo+2]/dx[1],
           (V[vkhi]-V[vklo])/dx[2], (V[vkhi+1]-V[vklo+1])/dx[2], V[vkhi+2]-V[vklo+2]/dx[2];
 
         // construct pressure corrected hessian
-        Matrix<double,3,3> S=0.5*(J+J.transpose());
-        Matrix<double,3,3> W=0.5*(J-J.transpose());
-        Matrix<double,3,3> HP=S*S+W*W;
+        Matrix<TD,3,3> S=((TD)0.5)*(J+J.transpose());
+        Matrix<TD,3,3> W=((TD)0.5)*(J-J.transpose());
+        Matrix<TD,3,3> HP=S*S+W*W;
 
         // compute eigen values, lambda
-        Matrix<double,3,1> e;
-        SelfAdjointEigenSolver<Matrix<double,3,3> >solver(HP,false);
+        Matrix<TD,3,1> e;
+        SelfAdjointEigenSolver<Matrix<TD,3,3> >solver(HP,false);
         e=solver.eigenvalues();
 
         // extract lambda-2
         slowSort(e.data(),0,3);
         L2[pi]=e(1,0);
-        L2[pi]=(L2[pi]>=-1E-5&&L2[pi]<=1E-5?0.0:L2[pi]);
+        L2[pi]=(((L2[pi]>=((TD)-1E-5))&&(L2[pi]<=((TD)1E-5)))?TD(0):L2[pi]);
+        // TODO -- this is probably needed because of discrete particle
+        // noise, as such it should not be used unless it's needed.
         }
       }
     }
@@ -2145,7 +2169,10 @@ void Divergence(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2166,7 +2193,7 @@ void Divergence(
 
         //      __   ->
         //  D = \/ . V
-        D[_pi]=0.0;
+        D[_pi]=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -2226,8 +2253,10 @@ void Divergence(
       for (int p=output[0]; p<=output[1]; ++p)
         {
         // stencil deltas
-        const TP dx[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        const TD dx[3] = {
+            ((TD)(x[p+1]-x[p-1])),
+            ((TD)(y[q+1]-y[q-1])),
+            ((TD)(z[r+1]-z[r-1]))};
 
         // output array indices
         const int _i=p-output[0];
@@ -2291,7 +2320,10 @@ void Laplacian(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx2[3]={dX[0]*dX[0],dX[1]*dX[1],dX[2]*dX[2]};
+  const T dx2[3]={
+      ((T)dX[0])*((T)dX[0]),
+      ((T)dX[1])*((T)dX[1]),
+      ((T)dX[2])*((T)dX[2])};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2314,26 +2346,26 @@ void Laplacian(
 
         //      __2
         //  L = \/ S
-        L[_pi]=T(0);
+        L[_pi]=((T)0);
         if (iok)
           {
           const int ilo=idx.Index(i-1,j,k);
           const int ihi=idx.Index(i+1,j,k);
-          L[_pi] += T((S[ihi] + S[ilo] - 2.0*S[pi])/dx2[0]);
+          L[_pi] += (S[ihi] + S[ilo] - ((T)2)*S[pi])/dx2[0];
           }
 
         if (jok)
           {
           const int jlo=idx.Index(i,j-1,k);
           const int jhi=idx.Index(i,j+1,k);
-          L[_pi] += T((S[jhi] + S[jlo] - 2.0*S[pi])/dx2[1]);
+          L[_pi] += (S[jhi] + S[jlo] - ((T)2)*S[pi])/dx2[1];
           }
 
         if (kok)
           {
           const int klo=idx.Index(i,j,k-1);
           const int khi=idx.Index(i,j,k+1);
-          L[_pi] += T((S[khi] + S[klo] - 2.0*S[pi])/dx2[2]);
+          L[_pi] += (S[khi] + S[klo] - ((T)2)*S[pi])/dx2[2];
           }
         }
       }
@@ -2374,12 +2406,14 @@ void Laplacian(
       for (int p=output[0]; p<=output[1]; ++p)
         {
         // stencil deltas
-        TP dx2[3]
-          = {x[p+1]-x[p-1],y[q+1]-y[q-1],z[r+1]-z[r-1]};
+        TD dx2[3] = {
+            ((TD)(x[p+1]-x[p-1])),
+            ((TD)(y[q+1]-y[q-1])),
+            ((TD)(z[r+1]-z[r-1]))};
+
         dx2[0]*=dx2[0];
         dx2[1]*=dx2[1];
         dx2[2]*=dx2[2];
-
 
         // output array indices
         const int _i=p-output[0];
@@ -2406,9 +2440,9 @@ void Laplacian(
         //      __2
         //  L = \/ S
         L[_pi]
-           = (S[ihi] + S[ilo] - 2.0*S[pi])/dx2[0]
-           + (S[jhi] + S[jlo] - 2.0*S[pi])/dx2[1]
-           + (S[khi] + S[klo] - 2.0*S[pi])/dx2[2];
+           = (S[ihi] + S[ilo] - TD(2)*S[pi])/dx2[0]
+           + (S[jhi] + S[jlo] - TD(2)*S[pi])/dx2[1]
+           + (S[khi] + S[klo] - TD(2)*S[pi])/dx2[2];
         }
       }
     }
@@ -2448,7 +2482,10 @@ void Gradient(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2469,9 +2506,9 @@ void Gradient(
 
         //      __
         //  G = \/ S
-        Gx[_pi]=T(0);
-        Gy[_pi]=T(0);
-        Gz[_pi]=T(0);
+        Gx[_pi]=((T)0);
+        Gy[_pi]=((T)0);
+        Gz[_pi]=((T)0);
         if (iok)
           {
           int ilo=idx.Index(i-1,j,k);
@@ -2605,7 +2642,10 @@ void Gradient(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2626,9 +2666,9 @@ void Gradient(
         const int _pi=_idx.Index(_i,_j,_k);
 
         // J: gradient tensor, (jacobian)
-        Jxx[_pi]=0.0;
-        Jxy[_pi]=0.0;
-        Jxz[_pi]=0.0;
+        Jxx[_pi]=((T)0);
+        Jxy[_pi]=((T)0);
+        Jxz[_pi]=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -2644,9 +2684,9 @@ void Gradient(
           Jxz[_pi] = (V[vihi_z]-V[vilo_z])/dx[0];;
           }
 
-        Jyx[_pi]=0.0;
-        Jyy[_pi]=0.0;
-        Jyz[_pi]=0.0;
+        Jyx[_pi]=((T)0);
+        Jyy[_pi]=((T)0);
+        Jyz[_pi]=((T)0);
         if (jok)
           {
           int vjlo_x=3*idx.Index(i,j-1,k);
@@ -2662,9 +2702,9 @@ void Gradient(
           Jyz[_pi] = (V[vjhi_z]-V[vjlo_z])/dx[1];;
           }
 
-        Jzx[_pi]=0.0;
-        Jzy[_pi]=0.0;
-        Jzz[_pi]=0.0;
+        Jzx[_pi]=((T)0);
+        Jzy[_pi]=((T)0);
+        Jzz[_pi]=((T)0);
         if (kok)
           {
           int vklo_x=3*idx.Index(i,j,k-1);
@@ -2716,7 +2756,10 @@ void QCriteria(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2737,9 +2780,9 @@ void QCriteria(
         const int _pi=_idx.Index(_i,_j,_k);
 
         // J: gradient tensor, (jacobian)
-        T Jxx=0.0;
-        T Jxy=0.0;
-        T Jxz=0.0;
+        T Jxx=((T)0);
+        T Jxy=((T)0);
+        T Jxz=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -2755,9 +2798,9 @@ void QCriteria(
           Jxz = (V[vihi_z]-V[vilo_z])/dx[0];;
           }
 
-        T Jyx=0.0;
-        T Jyy=0.0;
-        T Jyz=0.0;
+        T Jyx=((T)0);
+        T Jyy=((T)0);
+        T Jyz=((T)0);
         if (jok)
           {
           int vjlo_x=3*idx.Index(i,j-1,k);
@@ -2773,9 +2816,9 @@ void QCriteria(
           Jyz = (V[vjhi_z]-V[vjlo_z])/dx[1];;
           }
 
-        T Jzx=0.0;
-        T Jzy=0.0;
-        T Jzz=0.0;
+        T Jzx=((T)0);
+        T Jzy=((T)0);
+        T Jzz=((T)0);
         if (kok)
           {
           int vklo_x=3*idx.Index(i,j,k-1);
@@ -2795,7 +2838,7 @@ void QCriteria(
         Q[_pi]
           = (divV*divV - (Jxx*Jxx + Jxy*Jyx + Jxz*Jzx
                            + Jyx*Jxy + Jyy*Jyy + Jyz*Jzy
-                             + Jzx*Jxz + Jzy*Jyz + Jzz*Jzz))/2.0f;
+                             + Jzx*Jxz + Jzy*Jyz + Jzz*Jzz))/((T)2);
         }
       }
     }
@@ -2909,7 +2952,7 @@ void Normalize(
         const int _pi=_idx.Index(_i,_j,_k);
         const int  pi= 3*idx.Index( i, j, k);
 
-        T mv = ::sqrt(V[pi]*V[pi]+V[pi+1]*V[pi+1]+V[pi+2]*V[pi+2]);
+        T mv = ((T)sqrt(V[pi]*V[pi]+V[pi+1]*V[pi+1]+V[pi+2]*V[pi+2]));
 
         W[_pi  ] /= mv;
         W[_pi+1] /= mv;
@@ -2946,7 +2989,10 @@ void EigenvalueDiagnostic(
   FlatIndex _idx(_ni,_nj,_nk,mode);
 
   // stencil deltas
-  const double dx[3]={dX[0]*2.0,dX[1]*2.0,dX[2]*2.0};
+  const T dx[3]={
+      ((T)dX[0])*((T)2),
+      ((T)dX[1])*((T)2),
+      ((T)dX[2])*((T)2)};
 
   // loop over output in patch coordinates (both patches are in the same space)
   for (int r=output[4]; r<=output[5]; ++r)
@@ -2963,7 +3009,7 @@ void EigenvalueDiagnostic(
         const int  i=p-input[0];
 
         // J: gradient velocity tensor, (jacobian)
-        double j11=0.0, j12=0.0, j13=0.0;
+        T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
           int vilo_x=3*idx.Index(i-1,j,k);
@@ -2979,7 +3025,7 @@ void EigenvalueDiagnostic(
           j13=(V[vihi_z]-V[vilo_z])/dx[0];
           }
 
-        double j21=0.0, j22=0.0, j23=0.0;
+        T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
           int vjlo_x=3*idx.Index(i,j-1,k);
@@ -2995,7 +3041,7 @@ void EigenvalueDiagnostic(
           j23=(V[vjhi_z]-V[vjlo_z])/dx[1];
           }
 
-        double j31=0.0, j32=0.0, j33=0.0;
+        T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
           int vklo_x=3*idx.Index(i,j,k-1);
@@ -3011,20 +3057,20 @@ void EigenvalueDiagnostic(
           j33=(V[vkhi_z]-V[vklo_z])/dx[2];
           }
 
-        Matrix<double,3,3> J;
+        Matrix<T,3,3> J;
         J <<
           j11, j12, j13,
           j21, j22, j23,
           j31, j32, j33;
 
         // compute eigen values, lambda
-        Matrix<complex<double>,3,1> e;
-        EigenSolver<Matrix<double,3,3> >solver(J,false);
+        Matrix<complex<T>,3,1> e;
+        EigenSolver<Matrix<T,3,3> >solver(J,false);
         e=solver.eigenvalues();
 
-        complex<double> &e1 = e(0);
-        complex<double> &e2 = e(1);
-        complex<double> &e3 = e(2);
+        complex<T> &e1 = e(0);
+        complex<T> &e2 = e(1);
+        complex<T> &e3 = e(2);
 
         // see Haimes, and Kenwright VGT and Feature Extraction fig 2
         // 0 - repelling node
@@ -3071,8 +3117,8 @@ void EigenvalueDiagnostic(
             return;
             }
 
-          bool attracting=(real(e(realIdx))<0.0);
-          bool type1=(imag(e(imagIdx1))<0.0);
+          bool attracting=(real(e(realIdx))<((T)0));
+          bool type1=(imag(e(imagIdx1))<((T)0));
 
           if (type1 && attracting)
             {
@@ -3100,9 +3146,9 @@ void EigenvalueDiagnostic(
           int nAttracting=0;
           for (int i=0; i<3; ++i)
             {
-            if (real(e(i))<0.0) ++nAttracting;
+            if (real(e(i))<((T)0)) ++nAttracting;
             }
-          L[pi]=nAttracting;
+          L[pi]=((T)nAttracting);
           }
         }
       }

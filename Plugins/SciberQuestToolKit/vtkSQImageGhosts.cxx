@@ -533,8 +533,8 @@ void vtkSQImageGhosts::ExecuteTransactions(
       {
       static int tag=0;
       vector<MPI_Request> req;
-      int nTransactions = transactions.size();
-      for (int j=0; j<nTransactions; ++j, ++tag)
+      size_t nTransactions = transactions.size();
+      for (size_t j=0; j<nTransactions; ++j, ++tag)
         {
         GhostTransaction &trans = transactions[j];
 
@@ -553,7 +553,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
                 tag));
           }
         }
-      MPI_Waitall(req.size(), &req[0], MPI_STATUSES_IGNORE);
+      MPI_Waitall((int)req.size(), &req[0], MPI_STATUSES_IGNORE);
       }
     #endif
     }

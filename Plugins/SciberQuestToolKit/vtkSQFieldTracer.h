@@ -199,7 +199,7 @@ private:
   // Integrate over all local cells. This assumes that each process has a unique
   // subset of the work (i.e. seed source cells are statically distributed),
   int IntegrateStatic(
-      int nCells,
+      vtkIdType nCells,
       const char *fieldName,
       vtkSQOOCReader *oocr,
       vtkDataSet *&oocrCache,
@@ -212,7 +212,7 @@ private:
   int IntegrateDynamic(
       int procId,
       int nProcs,
-      int nCells,
+      vtkIdType nCells,
       const char *fieldName,
       vtkSQOOCReader *oocr,
       vtkDataSet *&oocrCache,

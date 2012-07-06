@@ -193,7 +193,7 @@ public:
         bufferSizes=(int *)malloc(worldSize*sizeof(int));
         disp=(int *)malloc(worldSize*sizeof(int));
         }
-      int bufferSize=this->GetSize();
+      int bufferSize=(int)this->GetSize();
       MPI_Gather(
           &bufferSize,
           1,
@@ -333,12 +333,12 @@ vtkSQLog::~vtkSQLog()
   #if defined(vtkSQLogDEBUG)
   if (this->EventId.size()>0)
     {
-    int nIds=this->EventId.size();
+    size_t nIds=this->EventId.size();
     sqErrorMacro(
       pCerr(),
       << "Event id stack has "
       << nIds << " remaining.");
-    for (int i=0; i<nIds; ++i)
+    for (size_t i=0; i<nIds; ++i)
       {
       pCerr() << "EventId[" << i << "]=" << this->EventId[i] << endl;
       }

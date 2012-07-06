@@ -166,8 +166,8 @@ int TerminationCondition::IntersectsTerminationSurface(
       double p1[3],
       double *pi)
 {
-  size_t nSurfaces=this->TerminationSurfaces.size();
-  for (size_t i=0; i<nSurfaces; ++i)
+  int nSurfaces=(int)this->TerminationSurfaces.size();
+  for (int i=0; i<nSurfaces; ++i)
     {
     double p[3]={0.0};
     double t=0.0;
@@ -297,6 +297,6 @@ void TerminationCondition::InitializeColorMapper()
   names.push_back("feild null");
   names.push_back("short integration");
 
-  size_t nSurf=this->TerminationSurfaces.size()+2; // only 2 bc problem domain is automatically included.
+  int nSurf=((int)this->TerminationSurfaces.size())+2; // only 2 bc problem domain is automatically included.
   this->CMap.BuildColorMap(nSurf,names);
 }

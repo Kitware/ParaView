@@ -60,16 +60,16 @@ CellCopier::~CellCopier()
 //-----------------------------------------------------------------------------
 void CellCopier::ClearDataCopier()
 {
-  int n;
+  size_t n;
   n=this->PointDataCopier.size();
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     delete this->PointDataCopier[i];
     }
   this->PointDataCopier.clear();
 
   n=this->CellDataCopier.size();
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     delete this->CellDataCopier[i];
     }
@@ -82,13 +82,13 @@ void CellCopier::Initialize(vtkDataSet *in, vtkDataSet *out)
   this->ClearDataCopier();
   this->ClearPointIdMap();
 
-  int n;
+  size_t n;
   vtkPointData *pdIn=in->GetPointData();
   vtkPointData *pdOut=out->GetPointData();
   n=pdIn->GetNumberOfArrays();
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
-    vtkDataArray *da=pdIn->GetArray(i);
+    vtkDataArray *da=pdIn->GetArray((int)i);
     DataArrayCopier *dac=NewDataArrayCopier(da);
     dac->Initialize(da);
     this->PointDataCopier.push_back(dac);
@@ -98,9 +98,9 @@ void CellCopier::Initialize(vtkDataSet *in, vtkDataSet *out)
   vtkCellData *cdIn=in->GetCellData();
   vtkCellData *cdOut=out->GetCellData();
   n=cdIn->GetNumberOfArrays();
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
-    vtkDataArray *da=cdIn->GetArray(i);
+    vtkDataArray *da=cdIn->GetArray((int)i);
     DataArrayCopier *dac=NewDataArrayCopier(da);
     dac->Initialize(da);
     this->CellDataCopier.push_back(dac);
@@ -111,8 +111,8 @@ void CellCopier::Initialize(vtkDataSet *in, vtkDataSet *out)
 //-----------------------------------------------------------------------------
 int CellCopier::CopyPointData(IdBlock &block)
 {
-  int n=this->PointDataCopier.size();
-  for (int i=0; i<n; ++i)
+  size_t n=this->PointDataCopier.size();
+  for (size_t i=0; i<n; ++i)
     {
     this->PointDataCopier[i]->Copy(block);
     }
@@ -122,8 +122,8 @@ int CellCopier::CopyPointData(IdBlock &block)
 //-----------------------------------------------------------------------------
 int CellCopier::CopyCellData(IdBlock &block)
 {
-  int n=this->CellDataCopier.size();
-  for (int i=0; i<n; ++i)
+  size_t n=this->CellDataCopier.size();
+  for (size_t i=0; i<n; ++i)
     {
     this->CellDataCopier[i]->Copy(block);
     }
@@ -133,8 +133,8 @@ int CellCopier::CopyCellData(IdBlock &block)
 //-----------------------------------------------------------------------------
 int CellCopier::CopyPointData(vtkIdType id)
 {
-  int n=this->PointDataCopier.size();
-  for (int i=0; i<n; ++i)
+  size_t n=this->PointDataCopier.size();
+  for (size_t i=0; i<n; ++i)
     {
     this->PointDataCopier[i]->Copy(id);
     }
@@ -144,8 +144,8 @@ int CellCopier::CopyPointData(vtkIdType id)
 //-----------------------------------------------------------------------------
 int CellCopier::CopyCellData(vtkIdType id)
 {
-  int n=this->CellDataCopier.size();
-  for (int i=0; i<n; ++i)
+  size_t n=this->CellDataCopier.size();
+  for (size_t i=0; i<n; ++i)
     {
     this->CellDataCopier[i]->Copy(id);
     }

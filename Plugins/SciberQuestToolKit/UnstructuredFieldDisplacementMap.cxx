@@ -120,7 +120,7 @@ void UnstructuredFieldDisplacementMap::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
 {
   if (this->SourceGen)
     {
@@ -130,7 +130,7 @@ int UnstructuredFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -180,7 +180,7 @@ int UnstructuredFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceId
     ++pOutLocs;
 
     // copy its type.
-    *pOutTypes=this->SourceGen->GetCellType(sourceCellId);
+    *pOutTypes=(unsigned char)this->SourceGen->GetCellType(sourceCellId);
     ++pOutTypes;
 
     // Get location to write new cell.
@@ -233,11 +233,11 @@ int UnstructuredFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceId
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);
 
-  return this->Lines.size();
+  return (vtkIdType)this->Lines.size();
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
+vtkIdType UnstructuredFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -351,5 +351,5 @@ int UnstructuredFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);
 
-  return this->Lines.size();
+  return (vtkIdType)this->Lines.size();
 }

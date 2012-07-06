@@ -212,7 +212,7 @@ void CreateCartesianView(
   // use a contiguous type when possible.
   if (domain==decomp)
     {
-    iErr=MPI_Type_contiguous(nCells,nativeType,&view);
+    iErr=MPI_Type_contiguous((int)nCells,nativeType,&view);
     if (iErr)
       {
       sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -290,7 +290,7 @@ void CreateCartesianView(
   // use a contiguous type when possible.
   if (domain==decomp)
     {
-    iErr=MPI_Type_contiguous(nCells,nativeType,&view);
+    iErr=MPI_Type_contiguous((int)nCells,nativeType,&view);
     if (iErr)
       {
       sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -413,7 +413,7 @@ int WriteDataArray(
     }
   // memory view
   MPI_Datatype memView;
-  iErr=MPI_Type_contiguous(nCells,nativeType,&memView);
+  iErr=MPI_Type_contiguous((int)nCells,nativeType,&memView);
   if (iErr)
     {
     sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -547,7 +547,7 @@ int ReadDataArray(
   MPI_Datatype memView;
   if (nCompsMem==1)
     {
-    iErr=MPI_Type_contiguous(nCells,nativeType,&memView);
+    iErr=MPI_Type_contiguous((int)nCells,nativeType,&memView);
     if (iErr)
       {
       sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -555,7 +555,7 @@ int ReadDataArray(
     }
   else
     {
-    iErr=MPI_Type_vector(nCells,1,nCompsMem,nativeType,&memView);
+    iErr=MPI_Type_vector((int)nCells,1,nCompsMem,nativeType,&memView);
     if (iErr)
       {
       sqErrorMacro(pCerr(),"MPI_Type_vector failed.");
@@ -671,7 +671,7 @@ int WriteDataArray(
   MPI_Datatype memView;
   if (nCompsMem==1)
     {
-    iErr=MPI_Type_contiguous(nCells,nativeType,&memView);
+    iErr=MPI_Type_contiguous((int)nCells,nativeType,&memView);
   if (iErr)
     {
     sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -679,7 +679,7 @@ int WriteDataArray(
     }
   else
     {
-    iErr=MPI_Type_vector(nCells,1,nCompsMem,nativeType,&memView);
+    iErr=MPI_Type_vector((int)nCells,1,nCompsMem,nativeType,&memView);
   if (iErr)
     {
     sqErrorMacro(pCerr(),"MPI_Type_vector failed.");
@@ -788,7 +788,7 @@ int ReadDataArray(
   MPI_Datatype memView;
   if (nCompsMem==1)
     {
-    iErr=MPI_Type_contiguous(nCells,nativeType,&memView);
+    iErr=MPI_Type_contiguous((int)nCells,nativeType,&memView);
   if (iErr)
     {
     sqErrorMacro(pCerr(),"MPI_Type_contiguous failed.");
@@ -796,7 +796,7 @@ int ReadDataArray(
     }
   else
     {
-    iErr=MPI_Type_vector(nCells,1,nCompsMem,nativeType,&memView);
+    iErr=MPI_Type_vector((int)nCells,1,nCompsMem,nativeType,&memView);
   if (iErr)
     {
     sqErrorMacro(pCerr(),"MPI_Type_vector failed.");

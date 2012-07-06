@@ -167,7 +167,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
 
       for (size_t i=0; i<nc; ++i)
         {
-        pCoord[i]=(pCoord[i]+pCoord[i+1])/2.0;
+        pCoord[i]=(pCoord[i]+pCoord[i+1])/2.0f;
         }
 
       coord->Resize(nc);
@@ -450,8 +450,8 @@ int GDAMetaData::Write()
     os << endl;
     }
 
-  int nArrays=this->GetNumberOfArrays();
-  for (int i=0; i<nArrays; ++i)
+  size_t nArrays=this->GetNumberOfArrays();
+  for (size_t i=0; i<nArrays; ++i)
     {
     const char *arrayName=this->GetArrayName(i);
 

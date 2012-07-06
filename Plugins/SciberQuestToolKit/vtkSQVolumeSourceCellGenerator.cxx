@@ -184,7 +184,13 @@ void vtkSQVolumeSourceCellGenerator::ComputeDeltas()
 int vtkSQVolumeSourceCellGenerator::GetCellPointIndexes(vtkIdType cid, vtkIdType *idx)
 {
   int i,j,k;
-  indexToIJK(cid,this->Resolution[0],this->Resolution[3],i,j,k);
+  indexToIJK(
+      ((int)cid),
+      this->Resolution[0],
+      this->Resolution[3],
+      i,
+      j,
+      k);
 
   // point indices in VTK order.
   int I[24]={
@@ -211,7 +217,13 @@ int vtkSQVolumeSourceCellGenerator::GetCellPointIndexes(vtkIdType cid, vtkIdType
 int vtkSQVolumeSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
 {
   int i,j,k;
-  indexToIJK(cid,this->Resolution[0],this->Resolution[3],i,j,k);
+  indexToIJK(
+      ((int)cid),
+      this->Resolution[0],
+      this->Resolution[3],
+      i,
+      j,
+      k);
 
   // point indices in VTK order.
   int I[24]={
@@ -225,12 +237,32 @@ int vtkSQVolumeSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
       i  ,j+1,k+1
       };
 
+  float dx[3]={
+      ((float)this->Dx[0]),
+      ((float)this->Dx[1]),
+      ((float)this->Dx[2])};
+
+  float dy[3]={
+      ((float)this->Dy[0]),
+      ((float)this->Dy[1]),
+      ((float)this->Dy[2])};
+
+  float dz[3]={
+      ((float)this->Dz[0]),
+      ((float)this->Dz[1]),
+      ((float)this->Dz[2])};
+
+  float O[3]={
+      ((float)this->Origin[0]),
+      ((float)this->Origin[1]),
+      ((float)this->Origin[2])};
+
   for (int q=0; q<8; ++q)
     {
     int qq=q*3;
-    pts[qq  ]=this->Origin[0]+I[qq]*this->Dx[0]+I[qq+1]*this->Dy[0]+I[qq+2]*this->Dz[0];
-    pts[qq+1]=this->Origin[1]+I[qq]*this->Dx[1]+I[qq+1]*this->Dy[1]+I[qq+2]*this->Dz[1];
-    pts[qq+2]=this->Origin[2]+I[qq]*this->Dx[2]+I[qq+1]*this->Dy[2]+I[qq+2]*this->Dz[2];
+    pts[qq  ]=O[0]+((float)I[qq])*dx[0]+((float)I[qq+1])*dy[0]+((float)I[qq+2])*dz[0];
+    pts[qq+1]=O[1]+((float)I[qq])*dx[1]+((float)I[qq+1])*dy[1]+((float)I[qq+2])*dz[1];
+    pts[qq+2]=O[2]+((float)I[qq])*dx[2]+((float)I[qq+1])*dy[2]+((float)I[qq+2])*dz[2];
     }
 
   return 8;

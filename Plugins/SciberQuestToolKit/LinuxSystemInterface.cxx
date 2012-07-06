@@ -34,7 +34,7 @@ LinuxSystemInterface::LinuxSystemInterface()
   // get the total system memory
   int ok;
   vector<string> meminfo;
-  ok=LoadLines("/proc/meminfo",meminfo);
+  ok=(int)LoadLines("/proc/meminfo",meminfo);
   if (!ok)
     {
     sqErrorMacro(cerr,"Failed to open /proc/meminfo.");
@@ -121,7 +121,7 @@ long LinuxSystemInterface::GetStatusField(const char *name)
   // value pairs there in
   int ok;
   vector<string> status;
-  ok=LoadLines("/proc/self/status",status);
+  ok=(int)LoadLines("/proc/self/status",status);
   if (!ok)
     {
     sqErrorMacro(cerr,"Failed to open /proc/self/status.");

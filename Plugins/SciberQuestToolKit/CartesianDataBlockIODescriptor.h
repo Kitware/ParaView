@@ -49,7 +49,7 @@ public:
   /**
   Get the number of views.
   */
-  int Size() const { return this->MemViews.size(); }
+  size_t Size() const { return this->MemViews.size(); }
 
   /**
   Access to a specific view.

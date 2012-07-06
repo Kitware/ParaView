@@ -122,14 +122,14 @@ void UnstructuredGridCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int UnstructuredGridCellCopier::Copy(IdBlock &SourceIds)
+vtkIdType UnstructuredGridCellCopier::Copy(IdBlock &SourceIds)
 {
   // copy cell data
   this->CopyCellData(SourceIds);
 
   // copy cell geometry and point data
   vtkIdType startCellId=SourceIds.first();
-  vtkIdType nCellsLocal=SourceIds.size();
+  vtkIdType nCellsLocal=(vtkIdType)SourceIds.size();
 
   // Cells are sequentially acccessed so explicitly skip all cells
   // we aren't interested in.

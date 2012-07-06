@@ -368,8 +368,8 @@ string pqSQRemoteCommandDialog::GetCommand()
   string command
     = (const char*)this->Ui->commandTemplates->currentText().toAscii();
 
-  int nTokens = this->TokenValues.size();
-  for (int i=0; i<nTokens; ++i)
+  size_t nTokens = this->TokenValues.size();
+  for (size_t i=0; i<nTokens; ++i)
     {
     SearchAndReplace(
           this->Tokens[i],

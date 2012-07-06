@@ -41,6 +41,7 @@ vtkStandardNewMacro(vtkSQSeedPointLatice);
 
 
 //*****************************************************************************
+static
 inline
 void indexToIJK(int idx, int nx, int nxy, int &i, int &j, int &k)
 {
@@ -52,24 +53,26 @@ void indexToIJK(int idx, int nx, int nxy, int &i, int &j, int &k)
 
 //*****************************************************************************
 template <typename T>
+static
 void linspace(T lo, T hi, int n, T *data)
 {
   if (n==1)
     {
-    data[0]=(hi+lo)/2.0;
+    data[0]=(hi+lo)/((T)2);
     return;
     }
 
-  T delta=(hi-lo)/(n-1);
+  T delta=(hi-lo)/((T)(n-1));
 
   for (int i=0; i<n; ++i)
     {
-    data[i]=lo+i*delta;
+    data[i]=lo+((T)i)*delta;
     }
 }
 
 //*****************************************************************************
 template <typename T>
+static
 void logspace(T lo, T hi, int n, T p, T *data)
 {
   int mid=n/2;
@@ -77,19 +80,19 @@ void logspace(T lo, T hi, int n, T p, T *data)
   int nhi=n-mid;
   T s=hi-lo;
 
-  T rhi=pow((T)10.0,p);
+  T rhi=((T)pow(((T)10),p));
 
-  linspace<T>(1.0,0.99*rhi,nlo,data);
+  linspace<T>(((T)1),((T)0.99)*rhi,nlo,data);
   linspace<T>(1.0,rhi,nhi,data+nlo);
 
   int i=0;
   for (; i<nlo; ++i)
     {
-    data[i]=lo+s*(0.5*log10(data[i])/p);
+    data[i]=lo+s*(((T)0.5)*((T)log10(data[i]))/p);
     }
   for (; i<n; ++i)
     {
-    data[i]=lo+s*(1.0-log10(data[i])/(2.0*p));
+    data[i]=lo+s*(((T)1)-((T)log10(data[i]))/(((T)2)*p));
     }
 }
 
@@ -327,10 +330,10 @@ int vtkSQSeedPointLatice::RequestData(
       double bounds[6];
       inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),bounds);
 
-      float dX[3];
-      dX[0]=(this->Bounds[1]-this->Bounds[0])/this->NX[0];
-      dX[1]=(this->Bounds[3]-this->Bounds[2])/this->NX[1];
-      dX[2]=(this->Bounds[5]-this->Bounds[4])/this->NX[2];
+      double dX[3];
+      dX[0]=(this->Bounds[1]-this->Bounds[0])/((double)this->NX[0]);
+      dX[1]=(this->Bounds[3]-this->Bounds[2])/((double)this->NX[1]);
+      dX[2]=(this->Bounds[5]-this->Bounds[4])/((double)this->NX[2]);
 
       bounds[0]+=dX[0]/2.0;
       bounds[1]-=dX[0]/2.0;
@@ -353,11 +356,20 @@ int vtkSQSeedPointLatice::RequestData(
     switch (this->Transform[q])
       {
       case TRANSFORM_NONE:
-        linspace<float>(this->Bounds[2*q],this->Bounds[2*q+1],this->NX[q],axes[q]);
+        linspace<float>(
+            ((float)this->Bounds[2*q]),
+            ((float)this->Bounds[2*q+1]),
+            this->NX[q],
+            axes[q]);
         break;
 
       case TRANSFORM_LOG:
-        logspace<float>(this->Bounds[2*q],this->Bounds[2*q+1],this->NX[q],this->Power[q],axes[q]);
+        logspace<float>(
+            ((float)this->Bounds[2*q]),
+            ((float)this->Bounds[2*q+1]),
+            this->NX[q],
+            ((float)this->Power[q]),
+            axes[q]);
         break;
 
       default:

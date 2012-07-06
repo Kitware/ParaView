@@ -321,15 +321,15 @@ int vtkSQBOVWriter::WriteMetaData()
 //-----------------------------------------------------------------------------
 int vtkSQBOVWriter::GetNumberOfTimeSteps()
 {
-  return this->Writer->GetMetaData()->GetNumberOfTimeSteps();
+  return (int)this->Writer->GetMetaData()->GetNumberOfTimeSteps();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSQBOVWriter::GetTimeSteps(double *times)
 {
-  int n=this->Writer->GetMetaData()->GetNumberOfTimeSteps();
+  size_t n=this->Writer->GetMetaData()->GetNumberOfTimeSteps();
 
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     times[i]=this->Writer->GetMetaData()->GetTimeStep(i);
     }
@@ -374,7 +374,7 @@ int vtkSQBOVWriter::GetNumberOfPointArrays()
   #if defined vtkSQBOVWriterDEBUG
   pCerr() << "=====vtkSQBOVWriter::GetNumberOfPointArrays" << endl;
   #endif
-  return this->Writer->GetMetaData()->GetNumberOfArrays();
+  return (int)this->Writer->GetMetaData()->GetNumberOfArrays();
 }
 
 //-----------------------------------------------------------------------------

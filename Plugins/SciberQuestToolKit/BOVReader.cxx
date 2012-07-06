@@ -252,7 +252,7 @@ int BOVReader::Open(const char *fileName)
       {
       BinaryStream str;
       this->MetaData->Pack(str);
-      int nBytes=str.GetSize();
+      int nBytes=(int)str.GetSize();
       MPI_Bcast(&nBytes,1,MPI_INT,0,this->Comm);
       MPI_Bcast(str.GetData(),nBytes,MPI_CHAR,0,this->Comm);
       }
@@ -758,7 +758,7 @@ int BOVReader::ReadTimeStep(
   log->StartEvent("BOVReader::ReadTimeStep");
   #endif
 
-  double progInc=0.70/step->GetNumberOfImages();
+  double progInc=0.70/(double)step->GetNumberOfImages();
   double prog=0.25;
   if(alg)alg->UpdateProgress(prog);
 
@@ -832,7 +832,7 @@ int BOVReader::ReadTimeStep(
   log->StartEvent("BOVReader::ReadTimeStep");
   #endif
 
-  double progInc=0.70/step->GetNumberOfImages();
+  double progInc=0.70/(double)step->GetNumberOfImages();
   double prog=0.25;
   if(alg)alg->UpdateProgress(prog);
 
@@ -921,7 +921,7 @@ int BOVReader::ReadMetaTimeStep(int stepIdx, vtkDataSet *grid, vtkAlgorithm *alg
   // for each in the output. Downstream array can then be selected.
   const size_t nPoints=grid->GetNumberOfPoints();
   const size_t nArrays=this->MetaData->GetNumberOfArrays();
-  double progInc=0.75/nArrays;
+  double progInc=0.75/(double)nArrays;
   double prog=0.25;
   if(alg)alg->UpdateProgress(prog);
   for (size_t i=0; i<nArrays; ++i)
