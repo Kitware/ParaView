@@ -99,7 +99,7 @@ public:
 
   QString CurrentPage;
   vtkVector2f Gutter;
-  
+
   //Title properties
   QFont TitleFont;
   int TitleAlignment;
@@ -107,7 +107,7 @@ public:
   QColor TitleColor;
   QColor SelectedActiveScatterChartBGColor;
   QColor SelectedRowColumnScatterChartBGColor;
-  
+
   QMap<int, pqPlotMatrixOptionsChartSetting*> PlotData;
   int CurrentPlot;
   int Borders[4];
@@ -117,14 +117,13 @@ public:
 pqPlotMatrixOptionsChartSetting::pqPlotMatrixOptionsChartSetting()
   : BackGroundColor(Qt::white),AxisColor(Qt::black), GridColor(Qt::lightGray),
     LabelColor(Qt::black), LabelFont("Arial", 12)
-{ 
+{
   this->Notation = 0;
   this->Precision = 2;
   this->ToolTipNotation = 0;
   this->ToolTipPrecision = 2;
   this->ShowGrid = true;
   this->ShowLabels = true;
-  
 }
 
 //----------------------------------------------------------------------------
@@ -137,7 +136,7 @@ pqPlotMatrixOptionsEditorForm::pqPlotMatrixOptionsEditorForm()
   this->PlotData[vtkScatterPlotMatrix::ACTIVEPLOT] = new pqPlotMatrixOptionsChartSetting();
   this->PlotData[vtkScatterPlotMatrix::SCATTERPLOT] = new pqPlotMatrixOptionsChartSetting();
   this->PlotData[vtkScatterPlotMatrix::HISTOGRAM] = new pqPlotMatrixOptionsChartSetting();
-  
+
   this->PlotData[vtkScatterPlotMatrix::ACTIVEPLOT]->BackGroundColor.fromRgbF(1.0, 1.0, 1.0, 0.0);
   this->PlotData[vtkScatterPlotMatrix::SCATTERPLOT]->BackGroundColor.fromRgbF(1.0, 1.0, 1.0, 0.0);
   this->PlotData[vtkScatterPlotMatrix::HISTOGRAM]->BackGroundColor.fromRgbF(0.5, 0.5, 0.5, 0.4);
@@ -184,7 +183,7 @@ pqPlotMatrixOptionsEditor::pqPlotMatrixOptionsEditor(QWidget *widgetParent)
 
   QObject::connect(this->Internal->Form->ShowAxisGrid, SIGNAL(toggled(bool)),
                    this, SLOT(setGridVisibility(bool)));
-                   
+
   QObject::connect(this->Internal->Form->BackgroundColor,
                   SIGNAL(chosenColorChanged(QColor)),
                   this, SLOT(setChartBackgroundColor(QColor)));
@@ -230,13 +229,15 @@ pqPlotMatrixOptionsEditor::pqPlotMatrixOptionsEditor(QWidget *widgetParent)
     this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->Form->GutterY, SIGNAL(valueChanged(double)),
     this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->Form->selRowColBackgroundColor, 
+  QObject::connect(this->Internal->Form->selRowColBackgroundColor,
     SIGNAL(chosenColorChanged(QColor)),
     this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->Form->selActiveBackgroundColor,
     SIGNAL(chosenColorChanged(QColor)),
     this, SIGNAL(changesAvailable()));
-
+  QObject::connect(this->Internal->Form->NumberOfFrames,
+                   SIGNAL(valueChanged(int)),
+                   this, SIGNAL(changesAvailable()));
 }
 
 pqPlotMatrixOptionsEditor::~pqPlotMatrixOptionsEditor()
@@ -286,7 +287,7 @@ void pqPlotMatrixOptionsEditor::setPage(const QString &page)
   else
     {
     widget = this->Internal->Form->ActivePlot;
-    
+
     if(path[0] == "Active Plot")
       {
       this->Internal->Form->CurrentPlot = vtkScatterPlotMatrix::ACTIVEPLOT;
@@ -475,14 +476,14 @@ void pqPlotMatrixOptionsEditor::updateOptions()
   if(!proxy)
     {
     return;
-    } 
+    }
   // TODO: Update GUI from proxy
   this->blockSignals(true);
 
   // Use the server properties to update the options on the charts
   this->Internal->Form->Title = proxy->GetTitle();
   vtkTextProperty *prop = proxy->GetTitleProperties();
-  this->Internal->Form->TitleFont = 
+  this->Internal->Form->TitleFont =
     QFont(prop->GetFontFamilyAsString(),
           prop->GetFontSize(),
           prop->GetBold() ? QFont::Bold : -1,
@@ -495,7 +496,7 @@ void pqPlotMatrixOptionsEditor::updateOptions()
   this->Internal->Form->TitleColor = QColor::fromRgbF(rgba[0], rgba[1],
                                                      rgba[2], rgba[2]);
   this->Internal->Form->TitleAlignment = prop->GetJustification();
- 
+
   vtkColor4ub color;
   color = proxy->GetScatterPlotSelectedRowColumnColor();
   this->Internal->Form->SelectedRowColumnScatterChartBGColor =
@@ -503,17 +504,17 @@ void pqPlotMatrixOptionsEditor::updateOptions()
   color = proxy->GetScatterPlotSelectedActiveColor();
   this->Internal->Form->SelectedActiveScatterChartBGColor =
     QColor::fromRgb(color[0], color[1], color[2], color[3]);
-  
+
   vtkVector2f gutter;
   gutter = proxy->GetGutter();
   this->Internal->Form->Gutter.Set(gutter[0], gutter[1]);
-  
+
   int borders[4];
   proxy->GetBorders(borders);
   memcpy(this->Internal->Form->Borders, borders, sizeof(int));
 
   for(QMap<int, pqPlotMatrixOptionsChartSetting*>::iterator dataIt=
-    this->Internal->Form->PlotData.begin(); 
+    this->Internal->Form->PlotData.begin();
     dataIt!=this->Internal->Form->PlotData.end(); ++dataIt)
     {
     int plotType = dataIt.key();
@@ -561,12 +562,12 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
   if(!proxy)
     {
     return;
-    } 
+    }
 
   // title
   this->Internal->Form->Title = this->Internal->Form->ChartTitle->text();
   proxy->SetTitle(this->Internal->Form->Title.toAscii().constData());
-  this->Internal->Form->TitleAlignment = 
+  this->Internal->Form->TitleAlignment =
     this->Internal->Form->ChartTitleAlignment->currentIndex();
   vtkTextProperty *prop = proxy->GetTitleProperties();
   prop->SetJustification(this->Internal->Form->TitleAlignment);
@@ -585,22 +586,23 @@ void pqPlotMatrixOptionsEditor::applyChartOptions()
                  static_cast<double>(color.blueF()));
 
   // Gutter size
-  this->Internal->Form->Gutter.Set(
-    this->Internal->Form->GutterX->value(),
-    this->Internal->Form->GutterY->value());
+  this->Internal->Form->Gutter.Set(this->Internal->Form->GutterX->value(),
+                                   this->Internal->Form->GutterY->value());
   proxy->SetGutter(this->Internal->Form->Gutter);
+
+  // Set the number of frames - zero gives no transition effect.
+  proxy->SetNumberOfFrames(this->Internal->Form->NumberOfFrames->value());
 
   // Margin size
   this->Internal->Form->Borders[0]= this->Internal->Form->LeftMargin->value();
-  this->Internal->Form->Borders[1]=  this->Internal->Form->BottomMargin->value();
-  this->Internal->Form->Borders[2]=  this->Internal->Form->RightMargin->value();
-  this->Internal->Form->Borders[3]=  this->Internal->Form->TopMargin->value();
-  proxy->SetBorders(
-    this->Internal->Form->Borders[0],
-    this->Internal->Form->Borders[1],
-    this->Internal->Form->Borders[2],
-    this->Internal->Form->Borders[3]);
-  
+  this->Internal->Form->Borders[1]= this->Internal->Form->BottomMargin->value();
+  this->Internal->Form->Borders[2]= this->Internal->Form->RightMargin->value();
+  this->Internal->Form->Borders[3]= this->Internal->Form->TopMargin->value();
+  proxy->SetBorders(this->Internal->Form->Borders[0],
+                    this->Internal->Form->Borders[1],
+                    this->Internal->Form->Borders[2],
+                    this->Internal->Form->Borders[3]);
+
   // Scatter plot selection background color
   color = this->Internal->Form->selRowColBackgroundColor->chosenColor();
   this->Internal->Form->SelectedRowColumnScatterChartBGColor = color;
