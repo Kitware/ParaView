@@ -120,7 +120,11 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
                    this,
                    SLOT(dataChanged(QModelIndex, QModelIndex)));
   QObject::connect(this->SettingsModel, SIGNAL(redrawChart()),
-    this, SLOT(updateAllViews()));
+                   this, SLOT(updateAllViews()));
+  QObject::connect(ui.Series->header(), SIGNAL(checkStateChanged()),
+                   this, SLOT(headerCheckStateChanged()));
+
+  this->Series = ui.Series;
 
   QObject::connect(dispRep, SIGNAL(dataUpdated()), this, SLOT(reloadSeries()));
   this->reloadSeries();
@@ -141,4 +145,27 @@ void pqPlotMatrixDisplayPanel::reloadSeries()
 {
   this->updateAllViews();
   this->SettingsModel->reload();
+}
+
+//-----------------------------------------------------------------------------
+void pqPlotMatrixDisplayPanel::headerCheckStateChanged()
+{
+  // get current check state/
+  QHeaderView* header = this->Series->header();
+  QAbstractItemModel* headerModel = header->model();
+  bool checkable = false;
+  int cs = headerModel->headerData(0, header->orientation(),
+                                   Qt::CheckStateRole).toInt(&checkable);
+  if (checkable)
+    {
+    if (cs ==  Qt::Checked)
+      {
+      cs = Qt::Unchecked;
+      }
+    else
+      {
+      cs = Qt::Checked;
+      }
+    headerModel->setHeaderData(0, header->orientation(), cs, Qt::CheckStateRole);
+    }
 }
