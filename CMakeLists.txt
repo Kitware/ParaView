@@ -391,6 +391,11 @@ endif()
 add_subdirectory(Wrapping/ClientServer)
 
 #------------------------------------------------------------------------------
+# Package the paraview *.py files.
+#------------------------------------------------------------------------------
+add_subdirectory(Wrapping/Python)
+
+#------------------------------------------------------------------------------
 add_subdirectory(Documentation)
 #add_subdirectory(Plugins)
 add_subdirectory(Applications)
