@@ -12,17 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #include "vtkPython.h"
 #include "vtkPVPythonInterpretor.h"
 
-
+#include "pvpythonmodules.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVConfig.h"
 #include "vtkPythonAppInitConfigure.h"
 #include "vtkStdString.h"
 #include "vtkWindows.h"
-#include "pvpythonmodules.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <algorithm>
@@ -31,11 +30,6 @@
 #include <signal.h>  // for signal
 
 //-----------------------------------------------------------------------------
-#if defined(CMAKE_INTDIR)
-# define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD "/" CMAKE_INTDIR
-#else
-# define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD
-#endif
 
 /* The maximum length of a file name.  */
 #if defined(PATH_MAX)
@@ -146,8 +140,8 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 
     // These two directories should be all that is necessary when running the
     // python interpreter in a build tree.
-    vtkPythonAppInitPrependPythonPath(PV_PYTHON_PACKAGE_DIR "/site-packages");
-    vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR_BUILD);
+    //vtkPythonAppInitPrependPythonPath(PV_PYTHON_PACKAGE_DIR "/site-packages");
+    vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR);
 
 #if defined(__APPLE__)
     // On OS X distributions, the libraries are in a different directory

@@ -3,5 +3,6 @@ vtk_module(vtkPVPythonSupport
     ParaViewPython
   DEPENDS
     vtkCommonCore
+    vtksys
   EXCLUDE_FROM_WRAPPING
 )

@@ -40,6 +40,20 @@ foreach (name pvserver pvdataserver pvrenderserver)
     vtkPVServerManagerApplication)
 endforeach()
 
+if (PARAVIEW_ENABLE_PYTHON)
+  foreach (name pvbatch pvpython)
+    vtk_add_executable(${name}
+      ${name}.cxx
+      vtkPVPythonOptions.cxx)
+    #vtk_target_name(${name})
+    #vtk_target_label(${name})
+    #vtk_target_install(${name})
+    target_link_libraries(${name}
+      vtkPVServerManagerApplication
+      vtkPVPythonSupport)
+  endforeach()
+endif()
+
 #FIXME:MODULARIZATION -- link line for plugins when doing static builds.
 
 

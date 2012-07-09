@@ -68,5 +68,3 @@ private:
 };
 
 #endif // #ifndef __vtkPVPythonOptions_h
-
-

@@ -36,20 +36,19 @@ set (Module_SRCS
   vtkPVPythonInterpretorWrapper.h
 )
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkPythonAppInitConfigure.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkPythonAppInitConfigure.h
-  @ONLY)
-
 include_directories(
   "${VTK_SOURCE_DIR}/Wrapping/Python"
   "${VTK_BINARY_DIR}/Wrapping/Python"
   "${PYTHON_INCLUDE_PATH}"
   )
 
+set(VTK_WRAP_PYTHON_FIND_LIBS ON)
+include (vtkWrapPython)
+include_directories("${PYTHON_INCLUDE_PATH}")
+
 vtk_module_library(vtkPVPythonSupport ${Module_SRCS})
 target_link_libraries(vtkPVPythonSupport
-  vtkPythonCore)
+  ${VTK_PYTHON_LIBRARIES})
 
 # When paraview is linked statically (for example during
 # cross-compiling) the python wrapper module "init" functions must be
