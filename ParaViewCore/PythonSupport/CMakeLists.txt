@@ -42,8 +42,8 @@ configure_file(
   @ONLY)
 
 include_directories(
-  "${VTK_SOURCE_DIR}/Wrapping/PythonCore"
-  "${VTK_BINARY_DIR}/Wrapping/PythonCore"
+  "${VTK_SOURCE_DIR}/Wrapping/Python"
+  "${VTK_BINARY_DIR}/Wrapping/Python"
   "${PYTHON_INCLUDE_PATH}"
   )
 
