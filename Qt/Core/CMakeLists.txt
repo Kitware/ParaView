@@ -342,7 +342,11 @@ if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND Module_MOC_HDRS
     pqPythonEventSourceImage.h)
 
- include_directories(${PYTHON_INCLUDE_PATH})
+  include_directories(
+    "${VTK_SOURCE_DIR}/Wrapping/Python"
+    "${VTK_BINARY_DIR}/Wrapping/Python"
+    "${PYTHON_INCLUDE_PATH}"
+    )
 endif()
 
 

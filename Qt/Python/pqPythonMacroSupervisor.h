@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonMacroSupervisor_h
 #define _pqPythonMacroSupervisor_h
 
-#include "QtPythonExport.h"
+#include "pqPythonModule.h"
 #include <QObject>
 #include <QMap>
 #include <QPointer>
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QAction;
 
-class QTPYTHON_EXPORT pqPythonMacroSupervisor : public QObject
+class PQPYTHON_EXPORT pqPythonMacroSupervisor : public QObject
 {
   Q_OBJECT
 public:

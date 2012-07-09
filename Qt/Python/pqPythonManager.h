@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqPythonManager_h
 #define __pqPythonManager_h
 
-#include "QtPythonExport.h"
+#include "pqPythonModule.h"
 #include <QObject>
 
 class QWidget;
@@ -52,7 +52,7 @@ class pqPythonDialog;
 /// Note: because the interpreter is initialized lazily, a number of the member
 /// functions on this class have the side effect of initializing the python
 /// interpreter first.
-class QTPYTHON_EXPORT pqPythonManager : public QObject
+class PQPYTHON_EXPORT pqPythonManager : public QObject
 {
   Q_OBJECT
 

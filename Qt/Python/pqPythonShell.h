@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonShell_h
 #define _pqPythonShell_h
 
-#include "QtPythonExport.h"
+#include "pqPythonModule.h"
 #include <QWidget>
 /**
   Qt widget that provides an interactive "shell" interface to an embedded Python interpreter.
@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */  
   
 class vtkObject;
-class QTPYTHON_EXPORT pqPythonShell :
+class PQPYTHON_EXPORT pqPythonShell :
   public QWidget
 {
   Q_OBJECT

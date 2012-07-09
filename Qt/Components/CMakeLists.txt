@@ -654,20 +654,6 @@ set (Module_RESOURCE_FILES
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
 )
 
-# FIXME:MODULARIZATION
-#IF(PARAVIEW_ENABLE_PYTHON)
-#  FIND_PACKAGE(PythonLibs)
-#
-#  SET(PYTHON_LINK_LIBRARIES
-#    vtkPVPythonInterpretor
-#    QtPython
-#    vtkPVServerManagerPythonD
-#    ${PYTHON_LIBRARIES})
-#
-#  INCLUDE_DIRECTORIES(
-#    ${VTKPythonWrapping_SOURCE_DIR}/Executable)
-#ENDIF(PARAVIEW_ENABLE_PYTHON)
-
 qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
 qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})

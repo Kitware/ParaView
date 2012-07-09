@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonDialog_h
 #define _pqPythonDialog_h
 
-#include "QtPythonExport.h"
+#include "pqPythonModule.h"
 #include <QDialog>
 
 /**
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPythonShell;
 class QCloseEvent;
 class QSplitter;
-class QTPYTHON_EXPORT pqPythonDialog : public QDialog
+class PQPYTHON_EXPORT pqPythonDialog : public QDialog
 {
   Q_OBJECT
 
