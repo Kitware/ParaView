@@ -196,8 +196,9 @@ public:
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
-
+#ifndef __WRAP__
   static vtkSMProxyManager* New();
+#endif
 
   friend class vtkSMSessionProxyManager;
 

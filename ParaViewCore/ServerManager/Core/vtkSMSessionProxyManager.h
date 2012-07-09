@@ -518,8 +518,10 @@ private:
   vtkSMSessionProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;
 
+#ifndef __WRAP__
   static vtkSMSessionProxyManager* New()
     { return NULL; }
+#endif
 
 private:
   vtkSMSessionProxyManager(const vtkSMSessionProxyManager&); // Not implemented
