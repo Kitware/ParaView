@@ -36,8 +36,7 @@ if (NOT PARAVIEW_ENABLE_PYTHON)
 endif()
 
 set(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
-set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/site-packages/paraview")
-set(PV_PYTHON_MODULE_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE INTERNAL "Path to paraview module.")
+set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview")
 
 # Handle out-of-source builds correctly.
 #
@@ -49,7 +48,7 @@ set(PV_PYTHON_MODULE_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE INTERNAL "Path to p
 # *** Step 1 has to be done carefully to avoid missing out files ***
 
 file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/paraview
-      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/site-packages
+      DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages
       USE_SOURCE_PERMISSIONS
       FILES_MATCHING
       PATTERN *.py)
@@ -57,7 +56,7 @@ file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/paraview
 # Add a couple of vtk python files to "paraview" module.
 file (COPY "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/numpy_support.py"
            "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/vtkConstants.py"
-      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/site-packages/paraview
+      DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview
       USE_SOURCE_PERMISSIONS)
 
 # Byte compile the Python files.

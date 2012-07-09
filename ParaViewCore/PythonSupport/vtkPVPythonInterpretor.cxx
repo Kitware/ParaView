@@ -100,6 +100,10 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
   pkg_prefix += "/..";
 #endif
   vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/mpi4py");
+  vtkPythonAppInitPrependPath2(pkg_prefix, "/site-packages");
+  vtkPythonAppInitPrependPath2(pkg_prefix, "/lib/site-packages");
+  vtkPythonAppInitPrependPath2(pkg_prefix, "/../lib/site-packages");
+
   if (vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/VTKPythonWrapping/site-packages"))
     {
     // This executable is running from the build tree.  Prepend the
