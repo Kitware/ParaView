@@ -411,23 +411,7 @@ vtkAMRDualGridHelperBlock::vtkAMRDualGridHelperBlock()
   this->Image = 0;
   this->CopyFlag = 0;
 
-  for (int x = 0; x < 3; ++x)
-    {
-    for (int y = 0; y < 3; ++y)
-      {
-      for (int z = 0; z < 3; ++z)
-        {
-        // Default to own.
-        this->RegionBits[x][y][z] = vtkAMRRegionBitOwner;
-        }
-      }
-    }
-  // It does not matter what the center is because we do not reference it.
-  // I cannot hurt to set it consistently though.
-  this->RegionBits[1][1][1] = vtkAMRRegionBitOwner;
-
-  // Default to boundary.
-  this->BoundaryBits = 63;
+  this->ResetRegionBits ();
 }
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelperBlock::~vtkAMRDualGridHelperBlock()
@@ -463,6 +447,29 @@ vtkAMRDualGridHelperBlock::~vtkAMRDualGridHelperBlock()
     this->Image = 0;
     }
 }
+//----------------------------------------------------------------------------
+void vtkAMRDualGridHelperBlock::ResetRegionBits ()
+{
+
+  for (int x = 0; x < 3; ++x)
+    {
+    for (int y = 0; y < 3; ++y)
+      {
+      for (int z = 0; z < 3; ++z)
+        {
+        // Default to own.
+        this->RegionBits[x][y][z] = vtkAMRRegionBitOwner;
+        }
+      }
+    }
+  // It does not matter what the center is because we do not reference it.
+  // I cannot hurt to set it consistently though.
+  this->RegionBits[1][1][1] = vtkAMRRegionBitOwner;
+
+  // Default to boundary.
+  this->BoundaryBits = 63;
+}
+
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelperAddBackGhostValues(vtkDataArray *inPtr, int inDim[3],
                                             vtkDataArray *outPtr, int outDim[3],
@@ -842,21 +849,6 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)
 {
-  // For sending degenerate array values we need to know the type.
-  // This assumes all images are the same type (of course).
-  if( !volume->GetCellData()->HasArray(this->ArrayName) )
-    return;
-
-  vtkDataArray* da = volume->GetCellData()->GetArray(this->ArrayName);
-  if (da)
-    {
-    this->DataTypeSize = da->GetDataTypeSize();
-    }
-  else
-    {
-    vtkErrorMacro("Could not find the data type size.");
-    }
-
   // First compute the grid location of this block.
   double blockSize[3];
   blockSize[0] = (this->RootSpacing[0]*this->StandardBlockDimensions[0]) / (1 << level);
@@ -908,6 +900,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::AddGridBlock(
   int x, int y, int z,
   vtkImageData* volume)
 {
+  // std::cerr << "Adding a grid block to level " << this->Level << " at " << x << " " << y << " " << z << std::endl;
   // Expand the grid array if necessary.
   if (this->Grid == 0 || x < this->GridExtent[0] || x > this->GridExtent[1] ||
       y < this->GridExtent[2] || y > this->GridExtent[3] ||
@@ -1333,6 +1326,7 @@ int vtkAMRDualGridHelper::ClaimBlockSharedRegion(
         copy->DeepCopy(block->Image);
         block->Image = copy;
         block->CopyFlag = 1;
+        // std::cerr << "Claim block shared region results in a copy flag " << block->Image << " " << bestBlock->Image  << "\n";
         }
       vtkDataArray *blockDataArray = block->Image->GetCellData()->GetArray(this->ArrayName);
       vtkDataArray *bestBlockDataArray = bestBlock->Image->GetCellData()->GetArray(this->ArrayName);
@@ -1910,6 +1904,7 @@ void vtkAMRDualGridHelper::UnmarshalDegenerateRegionMessage(
       copy->DeepCopy(region.ReceivingBlock->Image);
       region.ReceivingBlock->Image = copy;
       region.ReceivingBlock->CopyFlag = 1;
+      // std::cerr << "Unmarshal degenerate region results in a copy\n";
       }
     region.ReceivingArray = region.ReceivingBlock->Image->GetCellData()->GetArray(this->ArrayName);
 
@@ -2001,7 +1996,6 @@ vtkTimerLogSmartMarkEvent markevent("ProcessRegionRemoteCopyQueueSynchronous", t
         }
       }
     }
-  // std::cerr << "ProcessDegenerates: Proc " << myProc << " DONE!!!!!!" << std::endl;
 }
 
 
@@ -2044,7 +2038,6 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueueSynchronous(
 */
 
   int myProc = this->Controller->GetLocalProcessId();
-  // std::cerr << "ProcessDegenerates: Proc " << myProc << " recieving " << messageLength << " from " << srcProc << std::endl;
   // Receive the message.
   vtkIdType originalLength = messageLength;
   this->Controller->Receive(&messageLength, 1, srcProc, DEGENERATE_REGION_TAG);
@@ -2153,7 +2146,6 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
   if (messageLength == 0) return;
 */
 
-  // std::cerr << "ProcessDegenerates: Proc " << myProc << " recieving " << messageLength << " from " << sendProc << std::endl;
   vtkAMRDualGridHelperCommRequest request;
   request.SendProcess = sendProc;
   request.ReceiveProcess = myProc;
@@ -2193,7 +2185,6 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueMPIAsynchronous(
   if (messageLength == 0) return;
 */
 
-  // std::cerr << "ProcessDegenerates: Proc " << myProc << " sending " << messageLength << " to " << recvProc << std::endl;
   vtkAMRDualGridHelperCommRequest request;
   request.SendProcess = myProc;
   request.ReceiveProcess = recvProc;
@@ -2254,16 +2245,12 @@ void vtkAMRDualGridHelper::FinishDegenerateRegionsCommMPIAsynchronous(
 // The array name is the cell array that is being processed by the filter.
 // Ghost values have to be modified at level changes.  It could be extended to
 // process multiple arrays.
-int vtkAMRDualGridHelper::Initialize(vtkNonOverlappingAMR* input,
-                                     const char* arrayName)
+int vtkAMRDualGridHelper::Initialize (vtkNonOverlappingAMR* input)
 {
 vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Controller);
 
   int blockId, numBlocks;
   int numLevels = input->GetNumberOfLevels();
-
-  vtkDualGridHelperCheckAssumption = 1;
-  this->SetArrayName(arrayName);
 
   // Create the level objects.
   this->Levels.reserve(numLevels);
@@ -2344,11 +2331,58 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
     // All processes will have all blocks (but not image data).
     this->ShareBlocks();
     }
+}
+
+int vtkAMRDualGridHelper::SetupData(vtkNonOverlappingAMR* input,
+                                     const char* arrayName)
+{
+vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::SetupData", this->Controller);
+
+  int blockId, numBlocks;
+  int numLevels = input->GetNumberOfLevels();
+
+  vtkDualGridHelperCheckAssumption = 1;
+  this->SetArrayName(arrayName);
+
+  // For sending degenerate array values we need to know the type.
+  // This assumes all images are the same type (of course).
+  // Find the first that has data.
+  for (int level = 0; level < numLevels; ++level)
+    {
+    numBlocks = input->GetNumberOfDataSets(level);
+    for (blockId = 0; blockId < numBlocks; ++blockId)
+      {
+      vtkImageData* image = input->GetDataSet(level,blockId);
+      if (image)
+        {
+        vtkDataArray* da = image->GetCellData()->GetArray(this->ArrayName);
+        if (da)
+          {
+          this->DataTypeSize = da->GetDataTypeSize();
+          break;
+          }
+        else
+          {
+          vtkErrorMacro("Could not find the data type size.");
+          }
+        }
+      }
+    }
+ 
+  // Reset all the region bits
+  for (int level = 0; level < numLevels; ++level)
+    {
+    numBlocks = this->GetNumberOfBlocksInLevel(level);
+    for (blockId = 0; blockId < numBlocks; ++blockId)
+      {
+      vtkAMRDualGridHelperBlock* block = this->GetBlock (level, blockId);
+      block->ResetRegionBits ();
+      }
+    }
 
   // Plan for meshing between blocks.
   this->AssignSharedRegions();
 
-  //
   // Copy regions on level boundaries between processes.
   this->ProcessRegionRemoteCopyQueue(false);
 

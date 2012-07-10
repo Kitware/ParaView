@@ -79,7 +79,8 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   virtual void SetController(vtkMultiProcessController *);
 
-  int                       Initialize(vtkNonOverlappingAMR* input,
+  int                       Initialize(vtkNonOverlappingAMR* input);
+  int                       SetupData(vtkNonOverlappingAMR* input,
                                        const char* arrayName);
   const double*             GetGlobalOrigin() { return this->GlobalOrigin;}
   const double*             GetRootSpacing() { return this->RootSpacing;}
@@ -240,6 +241,7 @@ public:
   vtkAMRDualGridHelperBlock();
   ~vtkAMRDualGridHelperBlock();
 
+  void ResetRegionBits ();
   // We assume that all blocks have ghost levels and are the same
   // dimension.  The vtk spy reader strips the ghost cells on
   // boundary blocks (on the outer surface of the data set).

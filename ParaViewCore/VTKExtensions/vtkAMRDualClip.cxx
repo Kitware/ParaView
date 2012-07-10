@@ -1513,7 +1513,8 @@ vtkAMRDualClip::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
     }
 
   // @TODO: Check if this is the right thing to do.
-  this->Helper->Initialize(hbdsInput, arrayNameToProcess);
+  this->Helper->Initialize(hbdsInput);
+  this->Helper->SetupData(hbdsInput, arrayNameToProcess);
 
   if (this->Controller && this->Controller->GetNumberOfProcesses() > 1 &&
       this->EnableDegenerateCells)
