@@ -22,8 +22,6 @@
 
 #include "vtkPVInformation.h"
 
-#include "vtkStdString.h"
-
 #include <string> // for string
 using std::string;
 #include <vector> // for vector
@@ -53,18 +51,18 @@ public:
 
   // Description:
   // Access managed information
-  int GetSize(){ return this->Configs.size(); }
+  size_t GetSize(){ return this->Configs.size(); }
 
-  const char * GetOSDescriptor(int i){ return this->Configs[i].OSDescriptor.c_str(); }
-  const char * GetCPUDescriptor(int i){ return this->Configs[i].CPUDescriptor.c_str(); }
-  const char * GetMemoryDescriptor(int i){ return this->Configs[i].MemDescriptor.c_str(); }
-  const char *GetHostName(int i){ return this->Configs[i].HostName.c_str(); }
-  const char *GetFullyQualifiedDomainName(int i){ return this->Configs[i].FullyQualifiedDomainName.c_str(); }
-  int GetProcessType(int i){ return this->Configs[i].ProcessType; }
-  int GetSystemType(int i){ return this->Configs[i].SystemType; }
-  int GetRank(int i){ return this->Configs[i].Rank; }
-  unsigned long long GetPid(int i){ return this->Configs[i].Pid; }
-  unsigned long long GetCapacity(int i){ return this->Configs[i].Capacity; }
+  const char *GetOSDescriptor(size_t i){ return this->Configs[i].OSDescriptor.c_str(); }
+  const char *GetCPUDescriptor(size_t i){ return this->Configs[i].CPUDescriptor.c_str(); }
+  const char *GetMemoryDescriptor(size_t i){ return this->Configs[i].MemDescriptor.c_str(); }
+  const char *GetHostName(size_t i){ return this->Configs[i].HostName.c_str(); }
+  const char *GetFullyQualifiedDomainName(size_t i){ return this->Configs[i].FullyQualifiedDomainName.c_str(); }
+  int GetProcessType(size_t i){ return this->Configs[i].ProcessType; }
+  int GetSystemType(size_t i){ return this->Configs[i].SystemType; }
+  int GetRank(size_t i){ return this->Configs[i].Rank; }
+  unsigned long long GetPid(size_t i){ return this->Configs[i].Pid; }
+  unsigned long long GetCapacity(size_t i){ return this->Configs[i].Capacity; }
 
 protected:
   vtkPVSystemConfigInformation();

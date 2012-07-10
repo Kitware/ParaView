@@ -84,11 +84,11 @@ void vtkPVMemoryUseInformation::CopyToStream(vtkClientServerStream *css)
 {
   css->Reset();
 
-  unsigned int count = this->MemInfos.size();
+  size_t count = this->MemInfos.size();
 
   *css << vtkClientServerStream::Reply << count;
 
-  for (unsigned int i=0; i<count; ++i)
+  for (size_t i=0; i<count; ++i)
     {
     *css
       << this->MemInfos[i].ProcessType
@@ -105,7 +105,7 @@ void vtkPVMemoryUseInformation::CopyFromStream(
         const vtkClientServerStream* css)
 {
   int offset=0;
-  unsigned int count=0;
+  size_t count=0;
 
   vtkVerifyParseMacro(
       css->GetArgument(0,offset,&count),
@@ -114,7 +114,7 @@ void vtkPVMemoryUseInformation::CopyFromStream(
 
   this->MemInfos.resize(count);
 
-  for (unsigned int i=0; i<count; ++i)
+  for (size_t i=0; i<count; ++i)
     {
     vtkVerifyParseMacro(
         css->GetArgument(0,offset,&MemInfos[i].ProcessType),

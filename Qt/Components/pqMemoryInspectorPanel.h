@@ -18,6 +18,7 @@
 #include "pqComponentsExport.h"
 #include <QWidget>
 #include <QProcess>
+#include <QMenu>
 
 #include <map>
 using std::map;
@@ -29,6 +30,8 @@ using std::vector;
 class pqMemoryInspectorPanelUI;
 class HostData;
 class RankData;
+class QTreeWidgetItem;
+class vtkPVSystemConfigInformation;
 
 class PQCOMPONENTS_EXPORT pqMemoryInspectorPanel : public QWidget
 {
@@ -48,7 +51,10 @@ protected slots:
 
   // Description:
   // enable/disable stack trace.
-  void EnableStackTraceSignalHandler(int enable);
+  void EnableStackTraceOnClient(bool enable);
+  void EnableStackTraceOnServer(bool enable);
+  void EnableStackTraceOnDataServer(bool enable);
+  void EnableStackTraceOnRenderServer(bool enable);
 
   // Description:
   // run remote command on one of the client or server ranks.
@@ -58,10 +64,6 @@ protected slots:
   // Description:
   // Display host properties
   void ShowHostPropertiesDialog();
-
-  // Description:
-  // Enable/disable buttons based on current selction.
-  void UpdateConfigViewButtons();
 
   // Description:
   // Use when an artificial limit on per-process memory
@@ -85,11 +87,23 @@ private:
       map<string,HostData *> &hosts,
       vector<RankData *> &ranks);
 
-  void OverrideCapacity(map<string,HostData*> &hosts);
-
   void RefreshRanks();
   void RefreshHosts();
   void RefreshHosts(map<string,HostData*> &hosts);
+
+  void InitializeServerGroup(
+      unsigned long long clientPid,
+      vtkPVSystemConfigInformation *configs,
+      int validProcessType,
+      QTreeWidgetItem *group,
+      map<string,HostData*> &hosts,
+      vector<RankData*> &ranks,
+      int &systemType);
+
+  void EnableStackTrace(bool enable,int group);
+  void AddEnableStackTraceMenuAction(int serverType, QMenu &context);
+
+  void OverrideCapacity(map<string,HostData*> &hosts);
 
 private:
   pqMemoryInspectorPanelUI *Ui;
@@ -98,15 +112,22 @@ private:
   HostData *ClientHost;
   RankData *ClientRank;
   int ClientSystemType;
+  bool StackTraceOnClient;
 
   map<string,HostData *> ServerHosts;
   vector<RankData *> ServerRanks;
+  int ServerSystemType;
+  bool StackTraceOnServer;
 
   map<string,HostData *> DataServerHosts;
   vector<RankData *> DataServerRanks;
+  int DataServerSystemType;
+  bool StackTraceOnDataServer;
 
   map<string,HostData *> RenderServerHosts;
   vector<RankData *> RenderServerRanks;
+  int RenderServerSystemType;
+  bool StackTraceOnRenderServer;
 };
 
 #endif

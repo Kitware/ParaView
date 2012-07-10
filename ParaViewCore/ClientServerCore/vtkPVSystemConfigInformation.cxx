@@ -128,13 +128,14 @@ void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream *css)
   #ifdef vtkPVSystemConfigInformationDEBUG
   cerr << "=====vtkPVSystemConfigInformation::CopyToStream" << endl;
   #endif
+
   css->Reset();
 
-  unsigned int numberOfConfigs = this->Configs.size();
+  size_t numberOfConfigs = this->Configs.size();
 
   *css << vtkClientServerStream::Reply << numberOfConfigs;
 
-  for (unsigned int i=0; i<numberOfConfigs; ++i)
+  for (size_t i=0; i<numberOfConfigs; ++i)
     {
     *css
       << this->Configs[i].OSDescriptor.c_str()
@@ -161,7 +162,7 @@ void vtkPVSystemConfigInformation::CopyFromStream(
   #endif
 
   int offset=0;
-  unsigned int numberOfConfigs=0;
+  size_t numberOfConfigs=0;
 
   vtkVerifyParseMacro(
       css->GetArgument(0,offset,&numberOfConfigs),
@@ -170,7 +171,7 @@ void vtkPVSystemConfigInformation::CopyFromStream(
 
   this->Configs.resize(numberOfConfigs);
 
-  for (unsigned int i=0; i<numberOfConfigs; ++i)
+  for (size_t i=0; i<numberOfConfigs; ++i)
     {
     char *osDescr;
     vtkVerifyParseMacro(

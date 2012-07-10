@@ -19,6 +19,9 @@ using Ui::pqMemoryInspectorPanelForm;
 
 // #define pqMemoryInspectorPanelDEBUG
 
+// print a process table to stderr during initialization
+// #define MIP_PROCESS_TABLE
+
 #include "pqComponentsExport.h"
 #include "pqActiveObjects.h"
 
@@ -28,6 +31,7 @@ using Ui::pqMemoryInspectorPanelForm;
 #include "vtkPVEnableStackTraceSignalHandler.h"
 #include "vtkPVDisableStackTraceSignalHandler.h"
 #include "vtkSMSession.h"
+#include "vtkSMSessionClient.h"
 #include "vtkPVInformation.h"
 #include "vtkClientServerStream.h"
 
@@ -59,6 +63,11 @@ using std::istringstream;
 #include <iostream>
 using std::cerr;
 using std::endl;
+using std::left;
+using std::right;
+#include <iomanip>
+using std::setw;
+using std::setfill;
 
 #define pqErrorMacro(estr)\
   qDebug()\
@@ -73,30 +82,35 @@ class pqMemoryInspectorPanelUI
   public Ui::pqMemoryInspectorPanelForm
     {};
 
-
 // QProgress bar makes use of integer type. Each power of 10
 // greater than 100 result in a decimal place of precision in
 // the UI.
-#define SQPM_PROGBAR_MAX 1000
+#define MIP_PROGBAR_MAX 1000
 
+// keys for tree items
 enum {
-  PROCESS_TYPE=Qt::UserRole,
-  PROCESS_TYPE_INVALID,
-  PROCESS_TYPE_CLIENT_GROUP,
-  PROCESS_TYPE_CLIENT_HOST,
-  PROCESS_TYPE_CLIENT_RANK,
-  PROCESS_TYPE_SERVER_GROUP,
-  PROCESS_TYPE_SERVER_HOST,
-  PROCESS_TYPE_SERVER_RANK,
-  PROCESS_ID,                 // unsigned long long
-  PROCESS_HOST_NAME,          // string, hostname
-  PROCESS_RANK_INVALID,       //
-  PROCESS_RANK,               // int
-  PROCESS_HOST_OS,            // descriptive string
-  PROCESS_HOST_CPU,           // descriptive string
-  PROCESS_HOST_MEM,           // descriptive string
-  PROCESS_FQDN,          // string, network address
-  PROCESS_SYSTEM_TYPE         // int (0 unix like, 1 win)
+  ITEM_KEY_PROCESS_TYPE=Qt::UserRole,
+  ITEM_KEY_PVSERVER_TYPE,      // vtkProcessModule::ProcessTypes
+  ITEM_KEY_PID,                // unsigned long long
+  ITEM_KEY_HOST_NAME,          // string, hostname
+  ITEM_KEY_MPI_RANK,           // int
+  ITEM_KEY_HOST_OS,            // descriptive string
+  ITEM_KEY_HOST_CPU,           // descriptive string
+  ITEM_KEY_HOST_MEM,           // descriptive string
+  ITEM_KEY_FQDN,               // string, network address
+  ITEM_KEY_SYSTEM_TYPE         // int (0 unix like, 1 win)
+};
+
+// data for tree items
+enum {
+  ITEM_DATA_CLIENT_GROUP,
+  ITEM_DATA_CLIENT_HOST,
+  ITEM_DATA_CLIENT_RANK,
+  ITEM_DATA_SERVER_GROUP,
+  ITEM_DATA_SERVER_HOST,
+  ITEM_DATA_SERVER_RANK,
+  ITEM_DATA_UNIX_SYSTEM=0,
+  ITEM_DATA_WIN_SYSTEM=1
 };
 
 namespace
@@ -166,11 +180,11 @@ void ClearVectorOfPointers(vector<T *> data)
     if (data[i])
       {
       delete data[i];
+      data[i]=NULL;
       }
     }
   data.clear();
 }
-
 
 //*****************************************************************************
 void unescapeWhitespace(string &s, char escChar)
@@ -194,7 +208,7 @@ class RankData
 public:
   RankData(
       int rank,
-      int pid,
+      unsigned long long pid,
       unsigned long long load,
       unsigned long long capacity);
 
@@ -203,8 +217,8 @@ public:
   void SetRank(int rank){ this->Rank=rank; }
   int GetRank(){ return this->Rank; }
 
-  void SetPid(int pid){ this->Pid=pid; }
-  int GetPid(){ return this->Pid; }
+  void SetPid(unsigned long long pid){ this->Pid=pid; }
+  unsigned long long GetPid(){ return this->Pid; }
 
   void OverrideCapacity(unsigned long long capacity);
   void SetCapacity(unsigned long long capacity){ this->Capacity=capacity; }
@@ -219,9 +233,11 @@ public:
   void UpdateLoadWidget();
   void InitializeLoadWidget();
 
+  void Print(ostream &os);
+
 private:
   int Rank;
-  int Pid;
+  unsigned long long Pid;
   unsigned long long Load;
   unsigned long long Capacity;
   QProgressBar *LoadWidget;
@@ -231,7 +247,7 @@ private:
 //-----------------------------------------------------------------------------
 RankData::RankData(
       int rank,
-      int pid,
+      unsigned long long pid,
       unsigned long long load,
       unsigned long long capacity)
         :
@@ -252,10 +268,10 @@ RankData::~RankData()
 //-----------------------------------------------------------------------------
 void RankData::UpdateLoadWidget()
 {
-  float used = this->GetLoad();
+  float used = (float)this->GetLoad();
   float fracUsed = this->GetLoadFraction();
-  float percUsed = fracUsed*100.0;
-  int progVal = fracUsed*SQPM_PROGBAR_MAX;
+  float percUsed = fracUsed*100.0f;
+  int progVal = (int)(fracUsed*MIP_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
   this->LoadWidget->setFormat(
@@ -282,7 +298,7 @@ void RankData::InitializeLoadWidget()
   this->LoadWidget->setStyle(::getLoadWidgetStyle());
   this->LoadWidget->setMaximumHeight(15);
   this->LoadWidget->setMinimum(0);
-  this->LoadWidget->setMaximum(SQPM_PROGBAR_MAX);
+  this->LoadWidget->setMaximum(MIP_PROGBAR_MAX);
   QFont font(this->LoadWidget->font());
   font.setPointSize(8);
   this->LoadWidget->setFont(font);
@@ -297,6 +313,18 @@ void RankData::OverrideCapacity(unsigned long long capacity)
   this->UpdateLoadWidget();
 }
 
+//-----------------------------------------------------------------------------
+void RankData::Print(ostream &os)
+{
+  os
+    << "RankData(" << this << ")"
+    << " Rank=" << this->Rank
+    << " Pid=" << this->Pid
+    << " Load=" << this->Load
+    << " Capacity=" << this->Capacity
+    << " LoadWidget=" << this->LoadWidget
+    << endl;
+}
 
 /// data associated with the host
 //=============================================================================
@@ -338,12 +366,14 @@ public:
   void InitializeLoadWidget();
   void UpdateLoadWidget();
 
-  RankData *AddRankData(int rank, int pid);
+  RankData *AddRankData(int rank, unsigned long long pid);
   RankData *GetRankData(int i){ return this->Ranks[i]; }
   void ClearRankData();
 
   unsigned long long GetLoad();
   float GetLoadFraction(){ return (float)this->GetLoad()/(float)this->Capacity; }
+
+  void Print(ostream &os);
 
 private:
   string HostName;
@@ -395,7 +425,7 @@ void HostData::ClearRankData()
 }
 
 //-----------------------------------------------------------------------------
-RankData *HostData::AddRankData(int rank, int pid)
+RankData *HostData::AddRankData(int rank, unsigned long long pid)
 {
   RankData *newRank=new RankData(rank,pid,0,this->Capacity);
   this->Ranks.push_back(newRank);
@@ -450,7 +480,7 @@ void HostData::InitializeLoadWidget()
   this->LoadWidget->setStyle(::getLoadWidgetStyle());
   this->LoadWidget->setMaximumHeight(15);
   this->LoadWidget->setMinimum(0);
-  this->LoadWidget->setMaximum(SQPM_PROGBAR_MAX);
+  this->LoadWidget->setMaximum(MIP_PROGBAR_MAX);
   QFont font(this->LoadWidget->font());
   font.setPointSize(8);
   this->LoadWidget->setFont(font);
@@ -461,10 +491,10 @@ void HostData::InitializeLoadWidget()
 //-----------------------------------------------------------------------------
 void HostData::UpdateLoadWidget()
 {
-  float used = this->GetLoad();
+  float used = (float)this->GetLoad();
   float fracUsed = this->GetLoadFraction();
-  float percUsed = fracUsed*100.0;
-  int progVal = fracUsed*SQPM_PROGBAR_MAX;
+  float percUsed = fracUsed*100.0f;
+  int progVal = (int)(fracUsed*MIP_PROGBAR_MAX);
 
   this->LoadWidget->setValue(progVal);
   this->LoadWidget->setFormat(
@@ -484,7 +514,24 @@ void HostData::UpdateLoadWidget()
   this->LoadWidget->setPalette(palette);
 }
 
-
+//-----------------------------------------------------------------------------
+void HostData::Print(ostream &os)
+{
+  os
+    << "HostData(" << this << ")"
+    << " HostName=" << this->HostName
+    << " Capacity=" << this->Capacity
+    << " RealCapacity=" << this->RealCapacity
+    << " LoadWidget=" << this->LoadWidget
+    << " TreeItem=" << this->TreeItem
+    << " Ranks=" << endl;
+  size_t nRanks=this->Ranks.size();
+  for (size_t i=0; i<nRanks; ++i)
+    {
+    this->Ranks[i]->Print(os);
+    }
+  os << endl;
+}
 
 //-----------------------------------------------------------------------------
 pqMemoryInspectorPanel::pqMemoryInspectorPanel(
@@ -522,32 +569,6 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(
         this,
         SLOT(OverrideCapacity()));
 
-  // execute remote command
-  QObject::connect(
-        this->Ui->configView,
-        SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
-        this,
-        SLOT(UpdateConfigViewButtons()));
-
-  QObject::connect(
-        this->Ui->openCommandDialog,
-        SIGNAL(clicked()),
-        this,
-        SLOT(ExecuteRemoteCommand()));
-
-  // host props
-  QObject::connect(
-        this->Ui->configView,
-        SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
-        this,
-        SLOT(UpdateConfigViewButtons()));
-
-  QObject::connect(
-        this->Ui->openPropertiesDialog,
-        SIGNAL(clicked()),
-        this,
-        SLOT(ShowHostPropertiesDialog()));
-
   // intialize new remote server
   QObject::connect(
         &pqActiveObjects::instance(),
@@ -568,15 +589,7 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(
         SIGNAL(customContextMenuRequested(const QPoint &)),
         this,
         SLOT(ConfigViewContextMenu(const QPoint &)));
-
   this->Ui->configView->setContextMenuPolicy(Qt::CustomContextMenu);
-
-  // stack trace signal handler
-  QObject::connect(
-        this->Ui->btSignalHandler,
-        SIGNAL(stateChanged(int)),
-        this,
-        SLOT(EnableStackTraceSignalHandler(int)));
 
   this->Ui->configView->expandAll();
 }
@@ -616,6 +629,7 @@ void pqMemoryInspectorPanel::ClearServer(
     if ((*it).second)
       {
       delete (*it).second;
+      (*it).second=NULL;
       }
     ++it;
     }
@@ -632,18 +646,132 @@ void pqMemoryInspectorPanel::ClearServers()
 }
 
 //-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::InitializeServerGroup(
+    unsigned long long clientPid,
+    vtkPVSystemConfigInformation *configs,
+    int validProcessType,
+    QTreeWidgetItem *group,
+    map<string,HostData*> &hosts,
+    vector<RankData*> &ranks,
+    int &systemType)
+{
+  size_t nConfigs=configs->GetSize();
+  for (size_t i=0; i<nConfigs; ++i)
+    {
+    // assume that we get what we ask for and nothing more
+    // but verify that it's not the builtin
+    unsigned long long pid=configs->GetPid(i);
+    if (pid==clientPid)
+      {
+      // must be the builtin, do not duplicate.
+      continue;
+      }
+    int processType=configs->GetProcessType(i);
+    if (processType!=validProcessType)
+      {
+      // it's not the correct type.
+      continue;
+      }
+    string os=configs->GetOSDescriptor(i);
+    string cpu=configs->GetCPUDescriptor(i);
+    string mem=configs->GetMemoryDescriptor(i);
+    string hostName=configs->GetHostName(i);
+    string fqdn=configs->GetFullyQualifiedDomainName(i);
+    systemType=configs->GetSystemType(i);
+    int rank=configs->GetRank(i);
+    unsigned long long capacity=configs->GetCapacity(i);
+
+    // it's useful to have hostname's rank's and pid's in
+    // the terminal. if the client hangs you can attach
+    // gdb and see where it's stuck without a lot of effort
+
+    #ifdef MIP_PROCESS_TABLE
+    cerr
+      << setw(32) << fqdn
+      << setw(16) << pid
+      << setw(8)  << rank << endl
+      << setw(1);
+    #endif
+
+    // host
+    HostData *serverHost=NULL;
+
+    pair<string,HostData*> ins(hostName,NULL);
+    pair<map<string,HostData*>::iterator,bool> ret;
+    ret=hosts.insert(ins);
+    if (ret.second)
+      {
+      // new host
+      serverHost=new HostData(hostName,capacity);
+      ret.first->second=serverHost;
+
+      QTreeWidgetItem *serverHostItem=new QTreeWidgetItem(group);
+      serverHostItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+      serverHostItem->setExpanded(true);
+      serverHostItem->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_HOST));
+      serverHostItem->setData(0,ITEM_KEY_PVSERVER_TYPE,QVariant(processType));
+      serverHostItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(systemType));
+      serverHostItem->setData(0,ITEM_KEY_HOST_OS,QString(os.c_str()));
+      serverHostItem->setData(0,ITEM_KEY_HOST_CPU,QString(cpu.c_str()));
+      serverHostItem->setData(0,ITEM_KEY_HOST_MEM,QString(mem.c_str()));
+      serverHostItem->setData(0,ITEM_KEY_FQDN,QString(fqdn.c_str()));
+      serverHostItem->setText(0,hostName.c_str());
+      this->Ui->configView->setItemWidget(serverHostItem,1,serverHost->GetLoadWidget());
+
+      serverHost->SetTreeItem(serverHostItem);
+      }
+    else
+      {
+      serverHost=ret.first->second;
+      }
+    // rank
+    RankData *serverRank=serverHost->AddRankData(rank,pid);
+    ranks.push_back(serverRank);
+
+    QTreeWidgetItem *serverRankItem=new QTreeWidgetItem(serverHost->GetTreeItem());
+    serverRankItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    serverRankItem->setExpanded(false);
+    serverRankItem->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_RANK));
+    serverRankItem->setData(0,ITEM_KEY_PVSERVER_TYPE,QVariant(processType));
+    serverRankItem->setData(0,ITEM_KEY_HOST_NAME,QVariant(hostName.c_str()));
+    serverRankItem->setData(0,ITEM_KEY_PID,QVariant(pid));
+    serverRankItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(systemType));
+    serverRankItem->setData(0,ITEM_KEY_FQDN,QString(fqdn.c_str()));
+    serverRankItem->setText(0,QString("%1:%2").arg(rank).arg(pid));
+    this->Ui->configView->setItemWidget(serverRankItem,1,serverRank->GetLoadWidget());
+    }
+
+  // prune off the group if there were none added.
+  if (group->childCount()==0)
+    {
+    int idx=this->Ui->configView->indexOfTopLevelItem(group);
+    if (idx>=0)
+      {
+      this->Ui->configView->takeTopLevelItem(idx);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::Initialize()
 {
   #if defined pqMemoryInspectorPanelDEBUG
   cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
   #endif
 
-  vtkPVSystemConfigInformation *configs;
-
   this->ClearClient();
   this->ClearServers();
 
-  // remove all branches from process tree
+  this->ClientSystemType=0;
+  this->ServerSystemType=0;
+  this->DataServerSystemType=0;
+  this->RenderServerSystemType=0;
+
+  this->StackTraceOnClient=0;
+  this->StackTraceOnServer=0;
+  this->StackTraceOnDataServer=0;
+  this->StackTraceOnRenderServer=0;
+
   this->Ui->configView->clear();
 
   pqServer* server = pqActiveObjects::instance().activeServer();
@@ -654,21 +782,25 @@ void pqMemoryInspectorPanel::Initialize()
     return;
     }
 
-  // add branches in the view for various pv types
-  // clients
+
+  // client
   QTreeWidgetItem *clientGroup
     = new QTreeWidgetItem(this->Ui->configView,QStringList("paraview"));
   clientGroup->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
   clientGroup->setExpanded(true);
-  clientGroup->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_CLIENT_GROUP));
+  clientGroup->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_CLIENT_GROUP));
+
+  vtkSMSession *session=NULL;
+  vtkPVSystemConfigInformation *configs=NULL;
 
   configs=vtkPVSystemConfigInformation::New();
-  server->session()->GatherInformation(vtkSMSession::CLIENT,configs,0);
+  session=server->session();
+  session->GatherInformation(vtkSMSession::CLIENT,configs,0);
 
-  int nConfigs=configs->GetSize();
-  if (nConfigs<1)
+  size_t nConfigs=configs->GetSize();
+  if (nConfigs!=1)
     {
-    pqErrorMacro("There should always be a client.");
+    pqErrorMacro("There should always be one client.");
     return;
     }
 
@@ -685,212 +817,151 @@ void pqMemoryInspectorPanel::Initialize()
   QTreeWidgetItem *clientHostItem=new QTreeWidgetItem(clientGroup);
   clientHostItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
   clientHostItem->setExpanded(true);
-  clientHostItem->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_CLIENT_HOST));
-  clientHostItem->setData(0,PROCESS_HOST_OS,QString(configs->GetOSDescriptor(0)));
-  clientHostItem->setData(0,PROCESS_HOST_CPU,QString(configs->GetCPUDescriptor(0)));
-  clientHostItem->setData(0,PROCESS_HOST_MEM,QString(configs->GetMemoryDescriptor(0)));
-  clientHostItem->setData(0,PROCESS_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
+  clientHostItem->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_CLIENT_HOST));
+  clientHostItem->setData(0,ITEM_KEY_PVSERVER_TYPE,QVariant(configs->GetProcessType(0)));
+  clientHostItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(configs->GetSystemType(0)));
+  clientHostItem->setData(0,ITEM_KEY_HOST_OS,QString(configs->GetOSDescriptor(0)));
+  clientHostItem->setData(0,ITEM_KEY_HOST_CPU,QString(configs->GetCPUDescriptor(0)));
+  clientHostItem->setData(0,ITEM_KEY_HOST_MEM,QString(configs->GetMemoryDescriptor(0)));
+  clientHostItem->setData(0,ITEM_KEY_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
   clientHostItem->setText(0,configs->GetHostName(0));
 
   QTreeWidgetItem *clientRankItem=new QTreeWidgetItem(clientHostItem);
   clientRankItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
   clientRankItem->setExpanded(true);
-  clientRankItem->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_CLIENT_RANK));
-  clientRankItem->setData(0,PROCESS_HOST_NAME,QVariant(configs->GetHostName(0)));
-  clientRankItem->setData(0,PROCESS_ID,QVariant(configs->GetPid(0)));
-  clientRankItem->setData(0,PROCESS_SYSTEM_TYPE,QVariant(configs->GetSystemType(0)));
-  clientHostItem->setData(0,PROCESS_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
+  clientRankItem->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_CLIENT_RANK));
+  clientRankItem->setData(0,ITEM_KEY_HOST_NAME,QVariant(configs->GetHostName(0)));
+  clientRankItem->setData(0,ITEM_KEY_PID,QVariant(configs->GetPid(0)));
+  clientRankItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(configs->GetSystemType(0)));
+  clientHostItem->setData(0,ITEM_KEY_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
   clientRankItem->setText(0,QString("0:%1").arg(configs->GetPid(0)));
   this->Ui->configView->setItemWidget(clientRankItem,1,this->ClientRank->GetLoadWidget());
 
   configs->Delete();
 
-  // servers
-  QTreeWidgetItem *serverGroup
-    = new QTreeWidgetItem(this->Ui->configView,QStringList("pvserver"));
-  serverGroup->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-  serverGroup->setExpanded(true);
-  serverGroup->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_SERVER_GROUP));
-  int serverGroupSize=0;
+  #ifdef MIP_PROCESS_TABLE
+  // print a process table to the terminal.
+  cerr
+    << endl
+    << setw(32) << "Host"
+    << setw(16) << "Pid"
+    << setw(8)  << "Rank"
+    << endl
+    << left << setw(56) << setfill('=') << "client" << endl
+    << right<< setw(1)  << setfill(' ')
+    << setw(32) << configs->GetFullyQualifiedDomainName(0)
+    << setw(16) << configs->GetPid(0)
+    << setw(8)  << "x" << endl
+    << setfill(' ') << setw(1);
+  #endif
 
-  QTreeWidgetItem *dataServerGroup
-    = new QTreeWidgetItem(this->Ui->configView,QStringList("pvdataserver"));
-  dataServerGroup->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-  dataServerGroup->setExpanded(true);
-  dataServerGroup->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_SERVER_GROUP));
-  int dataServerGroupSize=0;
-
-  QTreeWidgetItem *renderServerGroup
-    = new QTreeWidgetItem(this->Ui->configView,QStringList("pvrenderserver"));
-  renderServerGroup->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-  renderServerGroup->setExpanded(true);
-  renderServerGroup->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_SERVER_GROUP));
-  int renderServerGroupSize=0;
+  // collect info from the server(s)
 
   configs=vtkPVSystemConfigInformation::New();
-  server->session()->GatherInformation(vtkSMSession::SERVERS,configs,0);
+
+  vtkPVSystemConfigInformation *dsconfigs=vtkPVSystemConfigInformation::New();
+  session->GatherInformation(vtkPVSession::DATA_SERVER,dsconfigs,0);
+  configs->AddInformation(dsconfigs);
+
+  // don't attempt to communicate with a render server if it's
+  // not connected which results in a duplicated gather as in that
+  // case comm is routed to the data server.
+  if (session->GetRenderClientMode()==vtkSMSession::RENDERING_SPLIT)
+    {
+    vtkPVSystemConfigInformation *rsconfigs=vtkPVSystemConfigInformation::New();
+    session->GatherInformation(vtkPVSession::RENDER_SERVER,rsconfigs,0);
+    configs->AddInformation(rsconfigs);
+    }
 
   nConfigs=configs->GetSize();
-  this->ServerRanks.resize(nConfigs);
-  this->DataServerRanks.resize(nConfigs);
-  this->RenderServerRanks.resize(nConfigs);
-  for (int i=0; i<nConfigs; ++i)
+  if (nConfigs>0)
     {
-    // select a group on the tree
-    QTreeWidgetItem *group=0;
-    int *groupSize=0;
-    map<string,HostData *> *hosts=0;
-    vector<RankData *> *ranks=0;
-    switch (configs->GetProcessType(i))
-      {
-      case vtkProcessModule::PROCESS_SERVER:
-        group=serverGroup;
-        groupSize=&serverGroupSize;
-        hosts=&this->ServerHosts;
-        ranks=&this->ServerRanks;
-        break;
 
-      case vtkProcessModule::PROCESS_DATA_SERVER:
-        group=dataServerGroup;
-        groupSize=&dataServerGroupSize;
-        hosts=&this->DataServerHosts;
-        ranks=&this->DataServerRanks;
-        break;
+    // servers
+    #ifdef MIP_PROCESS_TABLE
+    cerr
+      << left << setw(56) << setfill('=') << "server" << endl
+      << right << setw(1)  << setfill(' ');
+    #endif
+    QTreeWidgetItem *group=NULL;
+    group = new QTreeWidgetItem(QStringList("pvserver"));
+    group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    group->setExpanded(true);
+    group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+    this->Ui->configView->addTopLevelItem(group);
 
-      case vtkProcessModule::PROCESS_RENDER_SERVER:
-        group=renderServerGroup;
-        groupSize=&renderServerGroupSize;
-        hosts=&this->RenderServerHosts;
-        ranks=&this->RenderServerRanks;
-        break;
+    this->InitializeServerGroup(
+        clientPid,
+        configs,
+        vtkProcessModule::PROCESS_SERVER,
+        group,
+        this->ServerHosts,
+        this->ServerRanks,
+        this->ServerSystemType);
 
-      case vtkProcessModule::PROCESS_INVALID:
-      case vtkProcessModule::PROCESS_CLIENT:
-      default:
-        continue;
-      }
-    // add this entry
-    string os=configs->GetOSDescriptor(i);
-    string cpu=configs->GetCPUDescriptor(i);
-    string mem=configs->GetMemoryDescriptor(i);
-    string hostName=configs->GetHostName(i);
-    string fqdn=configs->GetFullyQualifiedDomainName(i);
-    int systemType=configs->GetSystemType(i);
-    int rank=configs->GetRank(i);
-    unsigned long long pid=configs->GetPid(i);
-    unsigned long long capacity=configs->GetCapacity(i);
+    // dataservers
+    #ifdef MIP_PROCESS_TABLE
+    cerr
+      << left << setw(56) << setfill('=') << "data server" << endl
+      << right << setw(1)  << setfill(' ');
+    #endif
+    group = new QTreeWidgetItem(QStringList("pvdataserver"));
+    group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    group->setExpanded(true);
+    group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+    this->Ui->configView->addTopLevelItem(group);
 
-    // this is useful when debugging. the client hangs and you
-    // can then get server pids from the terminal output.
-    cerr << rank << " " << fqdn << " " << pid << endl;
+    this->InitializeServerGroup(
+        clientPid,
+        configs,
+        vtkProcessModule::PROCESS_DATA_SERVER,
+        group,
+        this->DataServerHosts,
+        this->DataServerRanks,
+        this->DataServerSystemType);
 
-    if (pid==clientPid)
-      {
-      // don't create entries of server with same pid as
-      // the cleint
-      continue;
-      }
-    *groupSize+=1;
+    // renderservers
+    #ifdef MIP_PROCESS_TABLE
+    cerr
+      << left << setw(56) << setfill('=') << "render server" << endl
+      << right << setw(1)  << setfill(' ');
+    #endif
+    group = new QTreeWidgetItem(QStringList("pvrenderserver"));
+    group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
+    group->setExpanded(true);
+    group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+    this->Ui->configView->addTopLevelItem(group);
 
-    // host
-    HostData *serverHost;
+    this->InitializeServerGroup(
+        clientPid,
+        configs,
+        vtkProcessModule::PROCESS_RENDER_SERVER,
+        group,
+        this->RenderServerHosts,
+        this->RenderServerRanks,
+        this->RenderServerSystemType);
 
-    pair<string,HostData*> ins(hostName,(HostData*)0);
-    pair<map<string,HostData*>::iterator,bool> ret;
-    ret=hosts->insert(ins);
-    if (ret.second)
-      {
-      // new host
-      serverHost=new HostData(hostName,capacity);
-      ret.first->second=serverHost;
-
-      QTreeWidgetItem *serverHostItem=new QTreeWidgetItem(group);
-      serverHostItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-      serverHostItem->setExpanded(true);
-      serverHostItem->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_SERVER_HOST));
-      serverHostItem->setData(0,PROCESS_HOST_OS,QString(os.c_str()));
-      serverHostItem->setData(0,PROCESS_HOST_CPU,QString(cpu.c_str()));
-      serverHostItem->setData(0,PROCESS_HOST_MEM,QString(mem.c_str()));
-      serverHostItem->setData(0,PROCESS_FQDN,QString(fqdn.c_str()));
-      serverHostItem->setText(0,hostName.c_str());
-      this->Ui->configView->setItemWidget(serverHostItem,1,serverHost->GetLoadWidget());
-
-      serverHost->SetTreeItem(serverHostItem);
-      }
-    else
-      {
-      serverHost=ret.first->second;
-      }
-
-    // rank
-    RankData *serverRank=serverHost->AddRankData(rank,pid);
-    (*ranks)[rank]=serverRank;
-
-    QTreeWidgetItem *serverRankItem=new QTreeWidgetItem(serverHost->GetTreeItem());
-    serverRankItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-    serverRankItem->setExpanded(false);
-    serverRankItem->setData(0,PROCESS_TYPE,QVariant(PROCESS_TYPE_SERVER_RANK));
-    serverRankItem->setData(0,PROCESS_HOST_NAME,QVariant(hostName.c_str()));
-    serverRankItem->setData(0,PROCESS_ID,QVariant(pid));
-    serverRankItem->setData(0,PROCESS_SYSTEM_TYPE,QVariant(systemType));
-    serverRankItem->setData(0,PROCESS_FQDN,QString(fqdn.c_str()));
-    serverRankItem->setText(0,QString("%1:%2").arg(i).arg(pid));
-    this->Ui->configView->setItemWidget(serverRankItem,1,serverRank->GetLoadWidget());
+    #ifdef MIP_PROCESS_TABLE
+    cerr << setw(56) << setfill('=') << "=" << endl << setw(1) << setfill(' ');
+    #endif
     }
   configs->Delete();
 
-  // fix vector sizes
-  this->ServerRanks.resize(serverGroupSize);
-  this->DataServerRanks.resize(dataServerGroupSize);
-  this->RenderServerRanks.resize(renderServerGroupSize);
-
-  // remove empty server groups
-  int serverGroupIdx=this->Ui->configView->topLevelItemCount();
-  serverGroupIdx-=1;
-  if (renderServerGroupSize==0)
-    {
-    delete this->Ui->configView->takeTopLevelItem(serverGroupIdx);
-    serverGroupIdx-=1;
-    }
-
-  if (dataServerGroupSize==0)
-    {
-    delete this->Ui->configView->takeTopLevelItem(serverGroupIdx);
-    serverGroupIdx-=1;
-    }
-
-  if (serverGroupSize==0)
-    {
-    delete this->Ui->configView->takeTopLevelItem(serverGroupIdx);
-    serverGroupIdx-=1;
-    }
-
   //
   this->ClientOnly=0;
-  if ( (serverGroupSize==0)
-    && (dataServerGroupSize==0)
-    && (renderServerGroupSize==0) )
+  if ( (this->RenderServerHosts.size()==0)
+    && (this->DataServerHosts.size()==0)
+    && (this->ServerHosts.size()==0))
     {
     this->ClientOnly=1;
-    }
-
-  if (this->ClientOnly)
-    {
     this->Ui->enableOverrideCapacity->setEnabled(false);
     this->Ui->overrideCapacity->setEnabled(false);
-    #if defined(WIN32)
-    this->Ui->btSignalHandler->setEnabled(false);
-    #endif
     }
   else
     {
     this->Ui->enableOverrideCapacity->setEnabled(true);
     this->Ui->overrideCapacity->setEnabled(
-        this->Ui->enableOverrideCapacity->isChecked());
-
-    #if defined(WIN32)
-    this->Ui->btSignalHandler->setEnabled(true);
-    #endif
+         this->Ui->enableOverrideCapacity->isChecked());
 
     // update host load to reflect all of its ranks.
     map<string,HostData*>::iterator it;
@@ -920,8 +991,7 @@ void pqMemoryInspectorPanel::Initialize()
   this->Refresh();
 
   //
-  this->Ui->openCommandDialog->setEnabled(false);
-  this->Ui->openPropertiesDialog->setEnabled(false);
+  this->ShowAllRanks();
 }
 
 //-----------------------------------------------------------------------------
@@ -946,12 +1016,14 @@ void pqMemoryInspectorPanel::RefreshRanks()
     }
 
   // fectch latest numbers
-  vtkPVMemoryUseInformation *infos=0;
-  int nInfos=0;
+  vtkSMSession *session=NULL;
+  vtkPVMemoryUseInformation *infos=NULL;
+  size_t nInfos=0;
 
   // client
   infos=vtkPVMemoryUseInformation::New();
-  server->session()->GatherInformation(vtkSMSession::CLIENT,infos,0);
+  session=server->session();
+  session->GatherInformation(vtkSMSession::CLIENT,infos,0);
 
   nInfos=infos->GetSize();
   if (nInfos==0)
@@ -972,41 +1044,58 @@ void pqMemoryInspectorPanel::RefreshRanks()
 
   // servers
   infos=vtkPVMemoryUseInformation::New();
-  server->session()->GatherInformation(vtkSMSession::SERVERS,infos,0);
+
+  vtkPVMemoryUseInformation *dsinfos=vtkPVMemoryUseInformation::New();
+  session->GatherInformation(vtkPVSession::DATA_SERVER,dsinfos,0);
+  infos->AddInformation(dsinfos);
+
+  // don't attempt to communicate with a render server if it's
+  // not connected which results in a duplicated gather as in that
+  // case comm is routed to the data server.
+  if (session->GetRenderClientMode()==vtkSMSession::RENDERING_SPLIT)
+    {
+    vtkPVMemoryUseInformation *rsinfos=vtkPVMemoryUseInformation::New();
+    session->GatherInformation(vtkPVSession::RENDER_SERVER,rsinfos,0);
+    infos->AddInformation(rsinfos);
+    }
+
 
   nInfos=infos->GetSize();
-  for (int i=0; i<nInfos; ++i)
+  for (size_t i=0; i<nInfos; ++i)
     {
-    // select a group on the tree
-    vector<RankData *> *ranks=0;
-    switch (infos->GetProcessType(i))
+    int rank=infos->GetRank((int)i);
+    unsigned long long use=infos->GetMemoryUse((int)i);
+
+    switch (infos->GetProcessType((int)i))
       {
       case vtkProcessModule::PROCESS_SERVER:
-        ranks=&this->ServerRanks;
+        if (this->ServerRanks.size())
+          {
+          this->ServerRanks[rank]->SetLoad(use);
+          this->ServerRanks[rank]->UpdateLoadWidget();
+          }
         break;
 
       case vtkProcessModule::PROCESS_DATA_SERVER:
-        ranks=&this->DataServerRanks;
+        if (this->DataServerRanks.size())
+          {
+          this->DataServerRanks[rank]->SetLoad(use);
+          this->DataServerRanks[rank]->UpdateLoadWidget();
+          }
         break;
 
       case vtkProcessModule::PROCESS_RENDER_SERVER:
-        ranks=&this->RenderServerRanks;
+        if (this->RenderServerRanks.size())
+          {
+          this->RenderServerRanks[rank]->SetLoad(use);
+          this->RenderServerRanks[rank]->UpdateLoadWidget();
+          }
         break;
 
       case vtkProcessModule::PROCESS_INVALID:
       case vtkProcessModule::PROCESS_CLIENT:
       default:
         continue;
-      }
-
-    // update this rank's entry
-    if (ranks->size())
-      {
-      int rank=infos->GetRank(i);
-      unsigned long long use=infos->GetMemoryUse(i);
-
-      (*ranks)[rank]->SetLoad(use);
-      (*ranks)[rank]->UpdateLoadWidget();
       }
     }
   infos->Delete();
@@ -1058,7 +1147,7 @@ void pqMemoryInspectorPanel::OverrideCapacity(map<string,HostData*> &hosts)
     // capacity and usage are reported in kiB, but UI request
     // in GiB.
     unsigned long long capacity
-      = this->Ui->overrideCapacity->text().toDouble()*pow(2.0,20);
+      = (unsigned long long)(this->Ui->overrideCapacity->text().toDouble()*pow(2.0,20));
 
     if (capacity<=0)
       {
@@ -1084,7 +1173,35 @@ void pqMemoryInspectorPanel::OverrideCapacity(map<string,HostData*> &hosts)
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::EnableStackTraceSignalHandler(int enable)
+void pqMemoryInspectorPanel::EnableStackTraceOnClient(bool enable)
+{
+  this->EnableStackTrace(enable,vtkPVSession::CLIENT);
+  this->StackTraceOnClient=enable;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::EnableStackTraceOnServer(bool enable)
+{
+  this->EnableStackTrace(enable,vtkPVSession::DATA_SERVER);
+  this->StackTraceOnServer=enable;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::EnableStackTraceOnDataServer(bool enable)
+{
+  this->EnableStackTrace(enable,vtkPVSession::DATA_SERVER);
+  this->StackTraceOnDataServer=enable;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::EnableStackTraceOnRenderServer(bool enable)
+{
+  this->EnableStackTrace(enable,vtkPVSession::RENDER_SERVER);
+  this->StackTraceOnRenderServer=enable;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::EnableStackTrace(bool enable, int group)
 {
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (!server)
@@ -1098,47 +1215,14 @@ void pqMemoryInspectorPanel::EnableStackTraceSignalHandler(int enable)
     vtkPVEnableStackTraceSignalHandler *esh
       = vtkPVEnableStackTraceSignalHandler::New();
 
-    server->session()->GatherInformation(
-        vtkSMSession::CLIENT_AND_SERVERS,esh,0);
+    server->session()->GatherInformation(group,esh,0);
     }
   else
     {
     vtkPVDisableStackTraceSignalHandler *dsh
       = vtkPVDisableStackTraceSignalHandler::New();
 
-    server->session()->GatherInformation(
-        vtkSMSession::CLIENT_AND_SERVERS,dsh,0);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::UpdateConfigViewButtons()
-{
-  #if defined pqMemoryInspectorPanelDEBUG
-  cerr << ":::::pqMemoryInspectorPanel::SetExecuteButtonState" << endl;
-  #endif
-
-  this->Ui->openCommandDialog->setEnabled(false);
-  this->Ui->openPropertiesDialog->setEnabled(false);
-
-  QTreeWidgetItem *item=this->Ui->configView->currentItem();
-  if (item)
-    {
-    bool ok;
-    int type=item->data(0,PROCESS_TYPE).toInt(&ok);
-    if (!ok) return;
-    switch (type)
-      {
-      case PROCESS_TYPE_CLIENT_HOST:
-      case PROCESS_TYPE_SERVER_HOST:
-        this->Ui->openPropertiesDialog->setEnabled(true);
-        break;
-
-      case PROCESS_TYPE_CLIENT_RANK:
-      case PROCESS_TYPE_SERVER_RANK:
-        this->Ui->openCommandDialog->setEnabled(true);
-        break;
-      }
+    server->session()->GatherInformation(group,dsh,0);
     }
 }
 
@@ -1154,18 +1238,18 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
   if (item)
     {
     bool ok;
-    int type=item->data(0,PROCESS_TYPE).toInt(&ok);
+    int type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt(&ok);
     if (!ok) return;
     switch (type)
       {
-      case PROCESS_TYPE_CLIENT_RANK:
-      case PROCESS_TYPE_SERVER_RANK:
+      case ITEM_DATA_CLIENT_RANK:
+      case ITEM_DATA_SERVER_RANK:
         {
-        string host((const char *)item->data(0,PROCESS_HOST_NAME).toString().toAscii());
-        string fqdn((const char *)item->data(0,PROCESS_FQDN).toString().toAscii());
-        string pid((const char *)item->data(0,PROCESS_ID).toString().toAscii());
+        string host((const char *)item->data(0,ITEM_KEY_HOST_NAME).toString().toAscii());
+        string fqdn((const char *)item->data(0,ITEM_KEY_FQDN).toString().toAscii());
+        string pid((const char *)item->data(0,ITEM_KEY_PID).toString().toAscii());
 
-        int serverSystemType=item->data(0,PROCESS_SYSTEM_TYPE).toInt();
+        int serverSystemType=item->data(0,ITEM_KEY_SYSTEM_TYPE).toInt();
 
         bool localServer=(this->ClientHost->GetHostName()==host);
         if (localServer)
@@ -1268,22 +1352,22 @@ void pqMemoryInspectorPanel::ShowOnlyNodes()
   while ((item=*it)!=(QTreeWidgetItem*)0)
     {
     bool ok;
-    int type=item->data(0,PROCESS_TYPE).toInt(&ok);
+    int type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt(&ok);
     if (!ok) return;
     switch (type)
       {
-      case PROCESS_TYPE_CLIENT_GROUP:
-      case PROCESS_TYPE_SERVER_GROUP:
-      case PROCESS_TYPE_CLIENT_HOST:
+      case ITEM_DATA_CLIENT_GROUP:
+      case ITEM_DATA_SERVER_GROUP:
+      case ITEM_DATA_CLIENT_HOST:
         item->setExpanded(true);
         break;
 
-      case PROCESS_TYPE_SERVER_HOST:
+      case ITEM_DATA_SERVER_HOST:
         item->setExpanded(false);
         break;
 
-      case PROCESS_TYPE_CLIENT_RANK:
-      case PROCESS_TYPE_SERVER_RANK:
+      case ITEM_DATA_CLIENT_RANK:
+      case ITEM_DATA_SERVER_RANK:
         break;
       }
     ++it;
@@ -1313,20 +1397,20 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
     return;
     }
 
-  int type=item->data(0,PROCESS_TYPE).toInt();
-  if ( (type==PROCESS_TYPE_CLIENT_HOST)
-    || (type==PROCESS_TYPE_SERVER_HOST) )
+  int type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt();
+  if ( (type==ITEM_DATA_CLIENT_HOST)
+    || (type==ITEM_DATA_SERVER_HOST) )
     {
     QString host=item->text(0);
 
-    QString os=item->data(0,PROCESS_HOST_OS).toString();
-    QString cpu=item->data(0,PROCESS_HOST_CPU).toString();
-    QString mem=item->data(0,PROCESS_HOST_MEM).toString();
-    QString fqdn=item->data(0,PROCESS_FQDN).toString();
+    QString os=item->data(0,ITEM_KEY_HOST_OS).toString();
+    QString cpu=item->data(0,ITEM_KEY_HOST_CPU).toString();
+    QString mem=item->data(0,ITEM_KEY_HOST_MEM).toString();
+    QString fqdn=item->data(0,ITEM_KEY_FQDN).toString();
 
     QString descr;
     descr+="<h2>";
-    descr+=(type==PROCESS_TYPE_CLIENT_HOST?"Client":"Server");
+    descr+=(type==ITEM_DATA_CLIENT_HOST?"Client":"Server");
     descr+=" System Properties</h2><hr><table>";
     descr+="<tr><td><b>Host:</b></td><td>";
     descr+=fqdn;
@@ -1347,39 +1431,119 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint &pos)
+void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint &position)
 {
   #if defined pqMemoryInspectorPanelDEBUG
   cerr << ":::::pqMemoryInspectorPanel::ConfigContextMenu" << endl;
   #endif
 
   QMenu context;
-  context.addAction("show only nodes",this,SLOT(ShowOnlyNodes()));
-  context.addAction("show all ranks",this,SLOT(ShowAllRanks()));
 
-  QTreeWidgetItem * item=this->Ui->configView->itemAt(pos);
+  QTreeWidgetItem * item=this->Ui->configView->itemAt(position);
   if (item)
     {
     bool ok;
-    int type=item->data(0,PROCESS_TYPE).toInt(&ok);
-    if (!ok) return;
-    switch (type)
+    int procType=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt(&ok);
+    if (!ok) { return; }
+    switch(procType)
       {
-      case PROCESS_TYPE_CLIENT_GROUP:
-      case PROCESS_TYPE_SERVER_GROUP:
+      case ITEM_DATA_CLIENT_GROUP:
+        {
+        QTreeWidgetItem *child=item->child(0);
+        if (child==NULL) return;
+        int sysType=child->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
+        if (!ok) return;
+        int serverType=child->data(0,ITEM_KEY_PVSERVER_TYPE).toInt(&ok);
+        if (!ok) return;
+        if (sysType==ITEM_DATA_UNIX_SYSTEM)
+          {
+          this->AddEnableStackTraceMenuAction(serverType,context);
+          }
+        }
         break;
 
-      case PROCESS_TYPE_CLIENT_HOST:
-      case PROCESS_TYPE_SERVER_HOST:
+      case ITEM_DATA_SERVER_GROUP:
+        {
+        context.addAction("show only nodes",this,SLOT(ShowOnlyNodes()));
+        context.addAction("show all ranks",this,SLOT(ShowAllRanks()));
+
+        QTreeWidgetItem *child=item->child(0);
+        if (child==NULL) return;
+        int sysType=child->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
+        if (!ok) return;
+        int serverType=child->data(0,ITEM_KEY_PVSERVER_TYPE).toInt(&ok);
+        if (!ok) return;
+        if (sysType==ITEM_DATA_UNIX_SYSTEM)
+          {
+          this->AddEnableStackTraceMenuAction(serverType,context);
+          }
+        }
+        break;
+
+      case ITEM_DATA_CLIENT_HOST:
+      case ITEM_DATA_SERVER_HOST:
+        {
         context.addAction("properties...",this,SLOT(ShowHostPropertiesDialog()));
+        }
         break;
 
-      case PROCESS_TYPE_CLIENT_RANK:
-      case PROCESS_TYPE_SERVER_RANK:
-        context.addAction("remote command...",this,SLOT(ExecuteRemoteCommand()));
+      case ITEM_DATA_CLIENT_RANK:
+      case ITEM_DATA_SERVER_RANK:
+        {
+        int sysType=item->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
+        if (!ok) return;
+        if (sysType==ITEM_DATA_UNIX_SYSTEM)
+          {
+          context.addAction("remote command...",this,SLOT(ExecuteRemoteCommand()));
+          }
+        }
         break;
       }
     }
 
-  context.exec(this->Ui->configView->mapToGlobal(pos));
+  context.exec(this->Ui->configView->mapToGlobal(position));
+}
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::AddEnableStackTraceMenuAction(
+      int serverType,
+      QMenu &context)
+{
+  QAction *action=new QAction(this);
+  action->setText("stack trace signal handler");
+  action->setCheckable(true);
+  switch (serverType)
+    {
+    case vtkProcessModule::PROCESS_CLIENT:
+      action->setChecked(this->StackTraceOnClient);
+      connect(action,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(EnableStackTraceOnClient(bool)));
+      break;
+
+    case vtkProcessModule::PROCESS_SERVER:
+      action->setChecked(this->StackTraceOnServer);
+      connect(action,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(EnableStackTraceOnServer(bool)));
+      break;
+
+    case vtkProcessModule::PROCESS_DATA_SERVER:
+      action->setChecked(this->StackTraceOnDataServer);
+      connect(action,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(EnableStackTraceOnDataServer(bool)));
+      break;
+
+    case vtkProcessModule::PROCESS_RENDER_SERVER:
+      action->setChecked(this->StackTraceOnRenderServer);
+      connect(action,
+            SIGNAL(toggled(bool)),
+            this,
+            SLOT(EnableStackTraceOnRenderServer(bool)));
+      break;
+    }
+  context.addAction(action);
 }

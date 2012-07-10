@@ -49,7 +49,7 @@ public:
 
   // Description:
   // access the managed information.
-  int GetSize(){ return this->MemInfos.size(); }
+  size_t GetSize(){ return this->MemInfos.size(); }
   int GetProcessType(int i){ return this->MemInfos[i].ProcessType; }
   int GetRank(int i){ return this->MemInfos[i].Rank; }
   unsigned long long GetMemoryUse(int i){ return this->MemInfos[i].MemUse; }

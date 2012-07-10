@@ -527,8 +527,8 @@ string pqRemoteCommandDialog::GetCommand()
     = (const char*)this->Ui->commandTemplates->itemData(
         this->Ui->commandTemplates->currentIndex()).toString().toAscii();
 
-  int nTokens = this->TokenValues.size();
-  for (int i=0; i<nTokens; ++i)
+  size_t nTokens = this->TokenValues.size();
+  for (size_t i=0; i<nTokens; ++i)
     {
     ::searchAndReplace(
           this->Tokens[i],
@@ -549,15 +549,15 @@ void pqRemoteCommandDialog::UpdateCommandPreview()
 //------------------------------------------------------------------------------
 void pqRemoteCommandDialog::FindSshExecutable()
 {
-  string exec=this->LocateFile();
-  this->Ui->sshExec->setText(exec.c_str());
+  string exe=this->LocateFile();
+  this->Ui->sshExec->setText(exe.c_str());
 }
 
 //------------------------------------------------------------------------------
 void pqRemoteCommandDialog::FindXTermExecutable()
 {
-  string exec=this->LocateFile();
-  this->Ui->xtExec->setText(exec.c_str());
+  string exe=this->LocateFile();
+  this->Ui->xtExec->setText(exe.c_str());
 }
 
 //------------------------------------------------------------------------------
