@@ -185,22 +185,22 @@ void pqParaViewMenuBuilders::buildFiltersMenu(QMenu& menu,
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
 {
-  new pqCreateCustomFilterReaction(menu.addAction("Create Custom Filter") <<
+  new pqCreateCustomFilterReaction(menu.addAction("Create Custom Filter...") <<
     pqSetName("actionToolsCreateCustomFilter"));
-  new pqCameraLinkReaction(menu.addAction("Add Camera Link") <<
+  new pqCameraLinkReaction(menu.addAction("Add Camera Link...") <<
     pqSetName("actionToolsAddCameraLink"));
   menu.addSeparator();
-  new pqManageCustomFiltersReaction(menu.addAction("Manage Custom Filters")
+  new pqManageCustomFiltersReaction(menu.addAction("Manage Custom Filters...")
     << pqSetName("actionToolsManageCustomFilters"));
-  new pqManageLinksReaction(menu.addAction("Manage Links") <<
+  new pqManageLinksReaction(menu.addAction("Manage Links...") <<
     pqSetName("actionToolsManageLinks"));
   //<addaction name="actionToolsAddCameraLink" />
 #ifdef BUILD_SHARED_LIBS
   // Add support for importing plugins only if ParaView was built shared.
-  new pqManagePluginsReaction(menu.addAction("Manage Plugins") <<
+  new pqManagePluginsReaction(menu.addAction("Manage Plugins...") <<
     pqSetName("actionManage_Plugins"));
 #else
-  QAction* action2 = menu.addAction("Manage Plugins");
+  QAction* action2 = menu.addAction("Manage Plugins...");
   action2->setEnabled(false);
   action2->setToolTip(
     "Use BUILD_SHARED:ON while compiling to enable plugin support.");
@@ -211,10 +211,10 @@ void pqParaViewMenuBuilders::buildToolsMenu(QMenu& menu)
   menu.addSeparator(); // --------------------------------------------------
 
   //<addaction name="actionToolsDumpWidgetNames" />
-  new pqTestingReaction(menu.addAction("Record Test")
+  new pqTestingReaction(menu.addAction("Record Test...")
     << pqSetName("actionToolsRecordTest"),
     pqTestingReaction::RECORD);
-  new pqTestingReaction(menu.addAction("Play Test")
+  new pqTestingReaction(menu.addAction("Play Test...")
     << pqSetName("actionToolsPlayTest"),
     pqTestingReaction::PLAYBACK,Qt::QueuedConnection);
   new pqTestingReaction(menu.addAction("Lock View Size")
@@ -296,7 +296,7 @@ void pqParaViewMenuBuilders::buildMacrosMenu
   pqPythonManager* manager = pqPVApplicationCore::instance()->pythonManager();
   if (manager)
     {
-    new pqMacroReaction(menu.addAction("Add new macro")
+    new pqMacroReaction(menu.addAction("Add new macro...")
                         << pqSetName("actionMacroCreate"));
     QMenu *editMenu = menu.addMenu("Edit...");
     QMenu *deleteMenu = menu.addMenu("Delete...");
@@ -317,7 +317,7 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
   new pqHelpReaction(help);
 
   new pqAboutDialogReaction(
-    menu.addAction("About")
+    menu.addAction("About...")
     << pqSetName("actionAbout"));
 }
 

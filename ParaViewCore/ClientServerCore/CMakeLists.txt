@@ -62,6 +62,7 @@ SET (Kit_SRCS
   vtkProcessModuleAutoMPI.cxx
   vtkProcessModule.cxx
   vtkPVDataDeliveryManager.cxx
+  vtkPVDataInformationHelper.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
   vtkPVDisplayInformation.cxx
@@ -168,6 +169,7 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkNetworkAccessManager.cxx
   vtkPVContextView.cxx
+  vtkPVDataInformationHelper.cxx
   vtkPVDataRepresentation.cxx
   vtkPVInformation.cxx
   vtkPVPlugin.cxx

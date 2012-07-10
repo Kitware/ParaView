@@ -79,7 +79,8 @@
       <IntVectorProperty name="PassPartialArrays"
 	command="SetPassPartialArrays"
 	number_of_elements="1"
-	default_values="1">
+	default_values="1"
+  panel_visibility="advanced">
 	<Documentation>
 	  When dealing with composite datasets, partial arrays are common i.e.
 	  data-arrays that are not available in all of the blocks. By default,

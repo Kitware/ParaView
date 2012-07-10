@@ -31,10 +31,12 @@
 #include <signal.h>  // for signal
 
 //-----------------------------------------------------------------------------
-#if defined(CMAKE_INTDIR)
-# define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD "/" CMAKE_INTDIR
-#else
-# define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD
+#if !defined(VTK_PYTHON_LIBRARY_DIR)
+# if defined(CMAKE_INTDIR)
+#  define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD "/" CMAKE_INTDIR
+# else
+#  define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD
+# endif
 #endif
 
 /* The maximum length of a file name.  */

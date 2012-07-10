@@ -105,6 +105,10 @@ pqParallelCoordinatesChartDisplayPanel::pqParallelCoordinatesChartDisplayPanel(
   this->Internal->SettingsModel = new pqChartSeriesSettingsModel(this);
   this->Internal->SeriesList->setModel(this->Internal->SettingsModel);
 
+  QObject::connect(this->Internal->SeriesList->header(),
+                   SIGNAL(checkStateChanged()),
+                   this, SLOT(headerCheckStateChanged()));
+
   QObject::connect(
     this->Internal->SeriesList, SIGNAL(activated(const QModelIndex &)),
     this, SLOT(activateItem(const QModelIndex &)));
@@ -283,4 +287,27 @@ Qt::CheckState pqParallelCoordinatesChartDisplayPanel::getEnabledState() const
   Qt::CheckState enabledState = Qt::Unchecked;
 
   return enabledState;
+}
+
+//-----------------------------------------------------------------------------
+void pqParallelCoordinatesChartDisplayPanel::headerCheckStateChanged()
+{
+  // get current check state/
+  QHeaderView* header = this->Internal->SeriesList->header();
+  QAbstractItemModel* headerModel = header->model();
+  bool checkable = false;
+  int cs = headerModel->headerData(0, header->orientation(),
+                                   Qt::CheckStateRole).toInt(&checkable);
+  if (checkable)
+    {
+    if (cs ==  Qt::Checked)
+      {
+      cs = Qt::Unchecked;
+      }
+    else
+      {
+      cs = Qt::Checked;
+      }
+    headerModel->setHeaderData(0, header->orientation(), cs, Qt::CheckStateRole);
+    }
 }
