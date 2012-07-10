@@ -32,23 +32,28 @@ vtk_module_impl()
 vtk_module_export("")
 
 foreach (name pvserver pvdataserver pvrenderserver)
-  vtk_add_executable(${name} ${name}.cxx)
+  add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
   #vtk_target_name(${name})
   #vtk_target_label(${name})
   #vtk_target_install(${name})
-  target_link_libraries(${name}
+  if (NOT VTK_INSTALL_NO_RUNTIME)
+    pv_executable_install(${name} "${exe_suffix}")
+  endif()
+  target_link_libraries(${name}${exe_suffix}
     vtkPVServerManagerApplication)
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
   foreach (name pvbatch pvpython)
-    vtk_add_executable(${name}
-      ${name}.cxx
+    add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx
       vtkPVPythonOptions.cxx)
     #vtk_target_name(${name})
     #vtk_target_label(${name})
     #vtk_target_install(${name})
-    target_link_libraries(${name}
+    if (NOT VTK_INSTALL_NO_RUNTIME)
+      pv_executable_install(${name} "${exe_suffix}")
+    endif()
+    target_link_libraries(${name}${exe_suffix}
       vtkPVServerManagerApplication
       vtkPVPythonSupport)
   endforeach()

@@ -50,13 +50,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
 
 vtk_module_impl()
-vtk_add_executable(smTestDriver
-  vtkSMTestDriver.cxx
-  vtkSMTestDriver.h)
-vtk_module_export(
+vtk_module_export("")
+
+add_executable_with_forwarding(exe_suffix
+  smTestDriver
   vtkSMTestDriver.cxx
   vtkSMTestDriver.h)
 
-target_link_libraries(smTestDriver
+target_link_libraries(smTestDriver${exe_suffix}
   vtksys
   vtkCommonCore)
+if (NOT VTK_INSTALL_NO_DEVELOPMENT)
+  pv_executable_install(smTestDriver "${exe_suffix}")
+endif()

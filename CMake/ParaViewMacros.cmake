@@ -488,13 +488,9 @@ macro(pv_set_link_interface_libs target)
 endmacro()
 
 #------------------------------------------------------------------------------
-# Function used to add install rules for executables (non-test and
-# non-development tools).
+# Function used to add install rules for executables.
 #------------------------------------------------------------------------------
 function (pv_executable_install name exe_suffix)
-  if (VTK_INSTALL_NO_RUNTIME)
-    return()
-  endif()
   install(TARGETS ${name}
           DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
           COMPONENT Runtime)
