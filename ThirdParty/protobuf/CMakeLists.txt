@@ -42,3 +42,4 @@ vtk_module_third_party(protobuf
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/src
   LIBRARIES protobuf
 )
+mark_as_advanced(protobuf_ENABLE_TESTING)

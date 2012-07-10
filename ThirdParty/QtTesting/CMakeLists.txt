@@ -41,8 +41,10 @@ include(${QT_USE_FILE})
 
 vtk_target_export(QtTesting)
 vtk_module_third_party(qttesting
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkqttesting
     ${CMAKE_CURRENT_BINARY_DIR}/vtkqttesting
   LIBRARIES QtTesting
 )
+
+mark_as_advanced(QT_TESTING_INSTALL_DEVELOPMENT)

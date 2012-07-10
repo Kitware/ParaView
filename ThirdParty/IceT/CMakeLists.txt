@@ -60,8 +60,13 @@ vtk_target_export(IceTMPI)
 vtk_target_export(IceTGL)
 
 vtk_module_third_party(icet
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkicet/src/include
     ${CMAKE_CURRENT_BINARY_DIR}/vtkicet/src/include
   LIBRARIES IceTCore IceTMPI IceTGL
 )
+
+# keep IceT variables from polluting the space.
+mark_as_advanced(
+  ICET_MAGIC_K ICET_MAX_IMAGE_SPLIT ICET_USE_MPI ICET_USE_OPENGL
+  GLUT_cocoa_LIBRARY)

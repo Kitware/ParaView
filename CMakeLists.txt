@@ -182,6 +182,9 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
+mark_as_advanced(PARAVIEW_USE_ICE_T
+  PARAVIEW_USE_MPI_SSEND)
+
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
   set(PARAVIEW_BUILD_ARCHITECTURE "64")
@@ -365,6 +368,22 @@ else()
 
   # include VTK
   add_subdirectory(VTK)
+
+  # keep VTK cmake variables from polluting the non-advanced space.
+  mark_as_advanced(
+    VTK_EXTRA_COMPILER_WARNINGS
+    VTK_Group_Imaging
+    VTK_Group_MPI
+    VTK_Group_ParaView
+    VTK_Group_ParaViewCore
+    VTK_Group_ParaViewPython
+    VTK_Group_ParaViewQt
+    VTK_Group_ParaViewRendering
+    VTK_Group_Qt
+    VTK_Group_Views
+    VTK_USE_TK
+    VTK_WRAP_JAVA
+    VTK_WRAP_TCL)
 
   # restore state
   set (BUILD_TESTING ${__pv_build_testing})
