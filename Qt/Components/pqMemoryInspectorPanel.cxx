@@ -696,7 +696,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
     // host
     HostData *serverHost=NULL;
 
-    pair<string,HostData*> ins(hostName,NULL);
+    pair<string,HostData*> ins(hostName,(HostData*)0);
     pair<map<string,HostData*>::iterator,bool> ret;
     ret=hosts.insert(ins);
     if (ret.second)
