@@ -93,6 +93,33 @@ public:
   // Allow user to specify custom XYZAxisRanges based on arbitrary number
   virtual void EnableCustomAxisRange(bool useCustomRange);
 
+  // Description:
+  // Enable/Disable the usage of the FieldData to override the XTitle value.
+  vtkSetMacro(UseDefaultXTitle,int);
+  vtkGetMacro(UseDefaultXTitle,int);
+
+  // Description:
+  // Enable/Disable the usage of the FieldData to override the YTitle value.
+  vtkSetMacro(UseDefaultYTitle,int);
+  vtkGetMacro(UseDefaultYTitle,int);
+
+  // Description:
+  // Enable/Disable the usage of the FieldData to override the ZTitle value.
+  vtkSetMacro(UseDefaultZTitle,int);
+  vtkGetMacro(UseDefaultZTitle,int);
+
+  // Description:
+  // Set the user defined title that could be use it UseDefaultXTitle=0
+  virtual void SetXTitle(const char* val);
+
+  // Description:
+  // Set the user defined title that could be use it UseDefaultYTitle=0
+  virtual void SetYTitle(const char* val);
+
+  // Description:
+  // Set the user defined title that could be use it UseDefaultZTitle=0
+  virtual void SetZTitle(const char* val);
+
   //***************************************************************************
   // Forwarded to internal vtkCubeAxesActor
   virtual void SetFlyMode(int val);
@@ -100,7 +127,6 @@ public:
   virtual void SetCornerOffset(double val);
   virtual void SetTickLocation(int val);
 
-  virtual void SetXTitle(const char* val);
   virtual void SetXAxisVisibility(int val);
   virtual void SetXAxisTickVisibility(int val);
   virtual void SetXAxisMinorTickVisibility(int val);
@@ -108,18 +134,18 @@ public:
   virtual void SetXAxisRange(double min, double max);
 
   virtual void SetYAxisVisibility(int val);
-  virtual void SetYTitle(const char* val);
   virtual void SetYAxisTickVisibility(int val);
   virtual void SetYAxisMinorTickVisibility(int val);
   virtual void SetDrawYGridlines(int val);
   virtual void SetYAxisRange(double min, double max);
 
   virtual void SetZAxisVisibility(int val);
-  virtual void SetZTitle(const char* val);
   virtual void SetZAxisTickVisibility(int val);
   virtual void SetZAxisMinorTickVisibility(int val);
   virtual void SetDrawZGridlines(int val);
   virtual void SetZAxisRange(double min, double max);
+
+  virtual void SetGridLineLocation(int val);
 //BTX
 protected:
   vtkCubeAxesRepresentation();
@@ -153,6 +179,17 @@ protected:
   int CustomBoundsActive[3];
   double DataBounds[6];
   bool UseBoundsRangeAsLabel;
+  bool UseOrientedBounds;
+  int UseDefaultXTitle;
+  int UseDefaultYTitle;
+  int UseDefaultZTitle;
+  char* UserXTitle;
+  char* UserYTitle;
+  char* UserZTitle;
+
+  vtkSetStringMacro(UserXTitle);
+  vtkSetStringMacro(UserYTitle);
+  vtkSetStringMacro(UserZTitle);
 private:
   vtkCubeAxesRepresentation(const vtkCubeAxesRepresentation&); // Not implemented
   void operator=(const vtkCubeAxesRepresentation&); // Not implemented

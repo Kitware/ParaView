@@ -58,6 +58,10 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
   this->CustomBoundsActive[1] = 0;
   this->CustomBoundsActive[2] = 0;
   this->UseBoundsRangeAsLabel = true;
+  this->UseOrientedBounds = false;
+
+  this->UserXTitle = this->UserYTitle = this->UserZTitle = NULL;
+  this->UseDefaultXTitle = this->UseDefaultYTitle = this->UseDefaultZTitle = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +69,9 @@ vtkCubeAxesRepresentation::~vtkCubeAxesRepresentation()
 {
   this->CubeAxesActor->Delete();
   this->OutlineSource->Delete();
+  this->SetUserXTitle(NULL);
+  this->SetUserYTitle(NULL);
+  this->SetUserZTitle(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -194,17 +201,29 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
         vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
     vtkStringArray* titleZ =
         vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
-    if(titleX && titleX->GetNumberOfValues() > 0)
+    if(titleX && titleX->GetNumberOfValues() > 0 && this->UseDefaultXTitle == 1)
       {
       this->CubeAxesActor->SetXTitle(titleX->GetValue(0).c_str());
       }
-    if(titleY && titleY->GetNumberOfValues() > 0)
+    else if(this->UserXTitle)
+      {
+      this->CubeAxesActor->SetXTitle(this->UserXTitle);
+      }
+    if(titleY && titleY->GetNumberOfValues() > 0 && this->UseDefaultYTitle == 1)
       {
       this->CubeAxesActor->SetYTitle(titleY->GetValue(0).c_str());
       }
-    if(titleZ && titleZ->GetNumberOfValues() > 0)
+    else if(this->UserYTitle)
+      {
+      this->CubeAxesActor->SetYTitle(this->UserYTitle);
+      }
+    if(titleZ && titleZ->GetNumberOfValues() > 0 && this->UseDefaultZTitle == 1)
       {
       this->CubeAxesActor->SetZTitle(titleZ->GetValue(0).c_str());
+      }
+    else if(this->UserZTitle)
+      {
+      this->CubeAxesActor->SetZTitle(this->UserZTitle);
       }
 
     // Update Axis orientation
@@ -212,7 +231,7 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
         vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForX"));
     if(uBase && uBase->GetNumberOfTuples() > 0)
       {
-      this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple3(0));
+      this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple(0));
       }
     else
       {
@@ -222,7 +241,7 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
         vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForY"));
     if(vBase && vBase->GetNumberOfTuples() > 0)
       {
-      this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple3(0));
+      this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple(0));
       }
     else
       {
@@ -232,7 +251,7 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
         vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForZ"));
     if(wBase && wBase->GetNumberOfTuples() > 0)
       {
-      this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple3(0));
+      this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple(0));
       }
     else
       {
@@ -244,12 +263,27 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
         vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
     if(orientedboundingBox)
       {
+      this->UseOrientedBounds = true;
       this->CubeAxesActor->SetUseOrientedBounds(1);
       this->CubeAxesActor->SetOrientedBounds(orientedboundingBox->GetTuple(0));
       }
     else
       {
+      this->UseOrientedBounds = false;
       this->CubeAxesActor->SetUseOrientedBounds(0);
+      }
+
+    // Make sure we enable the custom origin if any
+    vtkFloatArray* customOrigin =
+        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisOrigin"));
+    if(customOrigin)
+      {
+      this->CubeAxesActor->SetUseAxisOrigin(1);
+      this->CubeAxesActor->SetAxisOrigin(customOrigin->GetTuple(0));
+      }
+    else
+      {
+      this->CubeAxesActor->SetUseAxisOrigin(0);
       }
 
 
@@ -348,7 +382,7 @@ void vtkCubeAxesRepresentation::UpdateBounds()
       }
     }
   this->CubeAxesActor->SetBounds(bds);
-  if(UseBoundsRangeAsLabel)
+  if(this->UseBoundsRangeAsLabel && !this->UseOrientedBounds)
     {
     this->CubeAxesActor->SetXAxisRange(&bds[0]);
     this->CubeAxesActor->SetYAxisRange(&bds[2]);
@@ -390,7 +424,7 @@ void vtkCubeAxesRepresentation::SetTickLocation(int val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetXTitle(const char* val)
 {
-  this->CubeAxesActor->SetXTitle(val);
+  this->SetUserXTitle(val);
 }
 
 //----------------------------------------------------------------------------
@@ -420,7 +454,7 @@ void vtkCubeAxesRepresentation::SetDrawXGridlines(int val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetYTitle(const char* val)
 {
-  this->CubeAxesActor->SetYTitle(val);
+  this->SetUserYTitle(val);
 }
 
 //----------------------------------------------------------------------------
@@ -450,7 +484,7 @@ void vtkCubeAxesRepresentation::SetDrawYGridlines(int val)
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetZTitle(const char* val)
 {
-  this->CubeAxesActor->SetZTitle(val);
+  this->SetUserZTitle(val);
 }
 
 //----------------------------------------------------------------------------
@@ -476,6 +510,13 @@ void vtkCubeAxesRepresentation::SetDrawZGridlines(int val)
 {
   this->CubeAxesActor->SetDrawZGridlines(val);
 }
+
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetGridLineLocation(int val)
+{
+  this->CubeAxesActor->SetGridLineLocation(val);
+}
+
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::SetXAxisRange(double min, double max)
 {
