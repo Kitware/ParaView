@@ -2331,6 +2331,7 @@ vtkTimerLogSmartMarkEvent markevent("vtkAMRDualGridHelper::Initialize", this->Co
     // All processes will have all blocks (but not image data).
     this->ShareBlocks();
     }
+  return VTK_OK;
 }
 
 int vtkAMRDualGridHelper::SetupData(vtkNonOverlappingAMR* input,
