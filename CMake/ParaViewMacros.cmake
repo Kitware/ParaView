@@ -486,3 +486,21 @@ macro(pv_set_link_interface_libs target)
       PROPERTY LINK_INTERFACE_LIBRARIES "${ARGN}")
   endif()
 endmacro()
+
+#------------------------------------------------------------------------------
+# Function used to add install rules for executables (non-test and
+# non-development tools).
+#------------------------------------------------------------------------------
+function (pv_executable_install name exe_suffix)
+  if (VTK_INSTALL_NO_RUNTIME)
+    return()
+  endif()
+  install(TARGETS ${name}
+          DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
+          COMPONENT Runtime)
+  if (exe_suffix)
+    install(TARGETS ${name}${exe_suffix}
+            DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
+            COMPONENT Runtime)
+  endif()
+endfunction()

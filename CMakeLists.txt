@@ -359,6 +359,10 @@ else()
     list(APPEND ParaViewModulesDirs
       ThirdParty/IceT)
   endif()
+  if (BUILD_TESTING)
+    list (APPEND  ParaViewModulesDirs
+    Utilities/TestDriver)
+  endif()
 
   foreach(dir ${ParaViewModulesDirs})
     vtk_add_to_module_search_path(

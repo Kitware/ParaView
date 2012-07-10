@@ -49,5 +49,14 @@ MARK_AS_ADVANCED(PV_TEST_CLIENT)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-vtk_module_test_executable(smTestDriver vtkSMTestDriver)
+vtk_module_impl()
+vtk_add_executable(smTestDriver
+  vtkSMTestDriver.cxx
+  vtkSMTestDriver.h)
+vtk_module_export(
+  vtkSMTestDriver.cxx
+  vtkSMTestDriver.h)
+
+target_link_libraries(smTestDriver
+  vtksys
+  vtkCommonCore)
