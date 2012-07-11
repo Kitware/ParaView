@@ -177,6 +177,12 @@ set(CXX_SOURCES
   XMLUtils.cxx
   )
 
+if (WIN32)
+  set(CXX_SOURCES
+    ${CXX_SOURCES}
+    win_windirent.cxx)
+endif()
+
 if (CUDA_FOUND AND SQTK_CUDA)
   message(STATUS "SQTK Including CUDA accelerated filters.")
   message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
