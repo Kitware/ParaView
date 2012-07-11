@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkStringList.h"
+#include "vtkSMPropertyHelper.h"
 
 #include <QList>
 #include <QMap>
@@ -431,7 +432,6 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
     this->createOpacityFunction(server, arrayname, number_of_components, component);
   vtkSMPropertyHelper(lutProxy, "ScalarOpacityFunction").Set(sof->getProxy());
   lutProxy->UpdateVTKObjects();
-
   
   return this->Internal->LookupTables[key];
 }
