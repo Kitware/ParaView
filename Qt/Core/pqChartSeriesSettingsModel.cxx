@@ -159,7 +159,7 @@ QVariant pqChartSeriesSettingsModel::headerData(int section,
 }
 
 bool pqChartSeriesSettingsModel::setData(const QModelIndex &idx, const QVariant &value,
-                                  int role)
+                                         int role)
 {
   bool result = false;
   if (idx.isValid() && idx.model() == this)

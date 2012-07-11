@@ -25,7 +25,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Open</string>
+    <string>Open...</string>
    </property>
    <property name="statusTip">
     <string>Open</string>
@@ -37,7 +37,7 @@
      <normaloff>:/pqWidgets/Icons/pqSave24.png</normaloff>:/pqWidgets/Icons/pqSave24.png</iconset>
    </property>
    <property name="text">
-    <string>Save Data</string>
+    <string>Save Data...</string>
    </property>
    <property name="PV_MUST_BE_MASTER_TO_SHOW" stdset="0">
     <bool>true</bool>
@@ -49,7 +49,7 @@
      <normaloff>:/pqWidgets/Icons/pqConnect24.png</normaloff>:/pqWidgets/Icons/pqConnect24.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Connect</string>
+    <string>&amp;Connect...</string>
    </property>
    <property name="statusTip">
     <string>Connect</string>

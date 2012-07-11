@@ -71,8 +71,9 @@ public:
     }
   void updateLODResolutionLabel(int value)
     {
-    QVariant val(160-value + 10);
-
+    // value goes from 0 - 150, we map that to (160-10)
+    int display_value = (150-value) + 10;
+    QVariant val(display_value);
     this->lodResolutionLabel->setText(
       val.toString() + "x" + val.toString() + "x" + val.toString());
     }
@@ -386,7 +387,8 @@ void pqGlobalRenderViewOptions::applyChanges()
   if (this->Internal->enableLOD->isChecked())
     {
     settings->setValue("LODThreshold", this->Internal->lodThreshold->value() / 10.0);
-    settings->setValue("LODResolution", 160-this->Internal->lodResolution->value() + 10);
+    settings->setValue("LODResolution",
+      1.0 - this->Internal->lodResolution->value()/ 150.0);
     }
   else
     {
@@ -573,8 +575,16 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->updateLODThresholdLabel(this->Internal->lodThreshold->value());
     }
 
-  val = settings->value("LODResolution", 50);
-  this->Internal->lodResolution->setValue(static_cast<int>(160-val.toDouble() + 10));
+  double lod_resolution = settings->value("LODResolution", 0.5).toDouble();
+  if (lod_resolution > 1.0 || lod_resolution < 0)
+    {
+    // this happens when using old-settings (when we saved a value in the range
+    // 10-160 for lod resolution.
+    lod_resolution = (lod_resolution - 10)/150.0;
+    }
+  lod_resolution = (lod_resolution > 1.0)? 1.0 : lod_resolution;
+  this->Internal->lodResolution->setValue(static_cast<int>(
+      (1.0 - lod_resolution) * 150));
   this->Internal->updateLODResolutionLabel(this->Internal->lodResolution->value());
 
   val = settings->value("UseOutlineForLODRendering", false);

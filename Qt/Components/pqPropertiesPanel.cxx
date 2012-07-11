@@ -399,6 +399,25 @@ pqView* pqPropertiesPanel::view() const
   return this->View;
 }
 
+pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *property) const
+{
+  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
+    {
+    pqPropertyWidget *widget = item.PropertyWidget;
+    if(!widget || !widget->property())
+      {
+      continue;
+      }
+
+    if(widget->property() == property)
+      {
+      return widget;
+      }
+    }
+
+  return 0;
+}
+
 void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
@@ -1037,6 +1056,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       QString propertyKeyName = propertyIter->GetKey();
       propertyKeyName.replace(" ", "");
       propertyWidget->setObjectName(propertyKeyName);
+
+      // store the property associated with the widget
+      propertyWidget->setProperty(smProperty);
 
       // save record of the property widget and containing widget
       pqPropertiesPanelItem item;

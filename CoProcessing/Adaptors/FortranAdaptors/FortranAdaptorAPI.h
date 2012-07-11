@@ -21,6 +21,9 @@
 #include "FortranAdaptorAPIMangling.h"
 #endif
 
+#include "CPSystemInformation.h" // for PARAVIEW_ENABLE_PYTHON definition
+
+
 #ifdef __cplusplus
 class vtkCPDataDescription;
 class vtkDataSet;
@@ -63,9 +66,12 @@ extern "C" {
 #endif
 
 // for now assume that the coprocessor is run through a python script
+#ifdef PARAVIEW_ENABLE_PYTHON
 void coprocessorinitialize(char* pythonFileName,
                            int* pythonFileNameLength);
-
+#else
+  void coprocessorinitialize();
+#endif
 // call at the end of the simulation
 void coprocessorfinalize();
 

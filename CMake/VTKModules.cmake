@@ -352,6 +352,10 @@ if(PARAVIEW_USE_PYTHON)
   list(APPEND _vtk_modules vtkWrappingPython)
 endif()
 
+if(PARAVIEW_USE_PISTON)
+  list(APPEND _vtk_modules vtkAcceleratorsPiston)
+endif() 
+
 # Are we building the GUI
 
 set (PARAVIEW_BUILD_QT_GUI_NOT TRUE)

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqBuiltinColorMaps.h"
 #include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include "pqColorPresetManager.h"
@@ -66,6 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
@@ -1287,129 +1290,38 @@ void pqColorScaleEditor::cleanupLegend()
 
 void pqColorScaleEditor::loadBuiltinColorPresets()
 {
-  pqColorMapModel colorMap;
   pqColorPresetModel *model = this->Form->Presets->getModel();
-  colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 59, 76, 192), 0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(180,  4,  38), 1.0);
-  colorMap.setNanColor(QColor(63, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Cool to Warm");
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0, 0, 255), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0,   0), (double)0.0);
-  colorMap.setNanColor(QColor(127, 127, 127));
-  model->addBuiltinColorMap(colorMap, "Blue to Red Rainbow");
+  // get builtin color maps xml
+  const char *xml = pqComponentsGetColorMapsXML();
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(  0, 0, 255), (double)1.0);
-  colorMap.setNanColor(QColor(127, 127, 127));
-  model->addBuiltinColorMap(colorMap, "Red to Blue Rainbow");
+  // create xml parser
+  vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+  xmlParser->InitializeParser();
+  xmlParser->ParseChunk(xml, strlen(xml));
+  xmlParser->CleanupParser();
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0,   0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Grayscale");
+  // parse each color map element
+  vtkPVXMLElement *root = xmlParser->GetRootElement();
+  for(unsigned int i = 0; i < root->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement *colorMapElement = root->GetNestedElement(i);
+    if(std::string("ColorMap") != colorMapElement->GetName())
+      {
+      continue;
+      }
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(  0,   0,    0), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "X Ray");
+    // load color map from its XML
+    pqColorMapModel colorMap =
+      pqColorPresetManager::createColorMapFromXML(colorMapElement);
+    QString name = colorMapElement->GetAttribute("name");
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 10,  10, 242), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(242, 242,  10), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Blue to Yellow");
+    // add color map to the model
+    model->addBuiltinColorMap(colorMap, name);
+    }
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0,   0, 0  ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.4), QColor(230,   0, 0  ), (double)0.4);
-  colorMap.addPoint(pqChartValue((double)0.8), QColor(230, 230, 0  ), (double)0.8);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(0, 127, 255));
-  model->addBuiltinColorMap(colorMap, "Black-Body Radiation");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor(  0,   0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.333), QColor(  0,   0, 128), (double)0.333);
-  colorMap.addPoint(pqChartValue((double)0.666), QColor(  0, 128, 255), (double)0.666);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Black, Blue and White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor(  0,   0, 0  ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.333), QColor(128,   0, 0  ), (double)0.333);
-  colorMap.addPoint(pqChartValue((double)0.666), QColor(255, 128, 0  ), (double)0.666);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Black, Orange and White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor(  0, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.45), QColor(  0,   0, 255 ), (double)0.45);
-  colorMap.addPoint(pqChartValue((double)0.5),  QColor(  0,   0, 128 ), (double)0.5);
-  colorMap.addPoint(pqChartValue((double)0.55), QColor(255,   0,   0 ), (double)0.55);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(255, 255,   0 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Cold and Hot");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor( 71,  71, 219 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.143), QColor(  0,   0,  92 ), (double)0.143);
-  colorMap.addPoint(pqChartValue((double)0.285), QColor(  0, 255, 255 ), (double)0.285);
-  colorMap.addPoint(pqChartValue((double)0.429), QColor(  0, 128,   0 ), (double)0.429);
-  colorMap.addPoint(pqChartValue((double)0.571), QColor(255, 255,   0 ), (double)0.571);
-  colorMap.addPoint(pqChartValue((double)0.714), QColor(255,  97,   0 ), (double)0.714);
-  colorMap.addPoint(pqChartValue((double)0.857), QColor(107,   0,   0 ), (double)0.857);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(224,  77,  77 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Desaturated");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor(255, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.17), QColor(  0,   0, 255 ), (double)0.17);
-  colorMap.addPoint(pqChartValue((double)0.34), QColor(  0, 255, 255 ), (double)0.34);
-  colorMap.addPoint(pqChartValue((double)0.50), QColor(  0, 255,   0 ), (double)0.50);
-  colorMap.addPoint(pqChartValue((double)0.67), QColor(255, 255,   0 ), (double)0.67);
-  colorMap.addPoint(pqChartValue((double)0.84), QColor(255,   0,   0 ), (double)0.84);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(224,   0, 255 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Blended White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor( 81,  87, 110 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.17), QColor(  0,   0, 255 ), (double)0.17);
-  colorMap.addPoint(pqChartValue((double)0.34), QColor(  0, 255, 255 ), (double)0.34);
-  colorMap.addPoint(pqChartValue((double)0.50), QColor(  0, 255,   0 ), (double)0.50);
-  colorMap.addPoint(pqChartValue((double)0.67), QColor(255, 255,   0 ), (double)0.67);
-  colorMap.addPoint(pqChartValue((double)0.84), QColor(255,   0,   0 ), (double)0.84);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(224,   0, 255 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Blended Grey");
+  // cleanup parser
+  xmlParser->Delete();
 }
 
 void pqColorScaleEditor::loadColorPoints()

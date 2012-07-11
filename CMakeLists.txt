@@ -144,6 +144,10 @@ IF (PARAVIEW_USE_MPI)
 ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
+SET(PARAVIEW_USE_PISTON OFF CACHE BOOL
+  "Build ParaView with Piston GPGPU filters")
+
+#########################################################################
 # Enable VTK modules
 include(VTKModules)
 

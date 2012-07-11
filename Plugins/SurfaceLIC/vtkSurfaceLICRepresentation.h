@@ -49,6 +49,10 @@ protected:
   vtkSurfaceLICRepresentation();
   ~vtkSurfaceLICRepresentation();
 
+  // Description:
+  // Overridden method to set parameters on vtkProperty and vtkMapper.
+  void UpdateColoringParameters();
+
   vtkSurfaceLICPainter* Painter;
   vtkSurfaceLICPainter* LODPainter;
 

@@ -30,11 +30,13 @@
 #include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInstantiator.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformationHelper.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkRectilinearGrid.h"
@@ -46,8 +48,12 @@
 #include "vtkMultiProcessStream.h"
 
 #include <vector>
+#include <map>
+#include <string>
 
 vtkStandardNewMacro(vtkPVDataInformation);
+
+std::map<std::string, std::string> helpers;
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -664,6 +670,17 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
+  const char *cname = dobj->GetClassName();
+  vtkPVDataInformationHelper *dhelper = vtkPVDataInformation::FindHelper
+    (cname);
+  if (dhelper)
+    {
+    dhelper->CopyFromDataObject(this, dobj);
+    this->CopyCommonMetaData(dobj, info);
+    dhelper->Delete();
+    return;
+    }
+
   // Because custom applications may implement their own data
   // object types, this isn't an error condition - just
   // display the name of the data object and return quietly.
@@ -913,6 +930,15 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
       return "Multi-piece Dataset";
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
+    default:
+      vtkPVDataInformationHelper *dhelper = vtkPVDataInformation::FindHelper
+        (this->DataClassName);
+      if (dhelper)
+        {
+        const char *namestr = dhelper->GetPrettyDataTypeString();
+        dhelper->Delete();
+        return namestr;
+        }
     }
 
   return "UnknownType";
@@ -1332,4 +1358,32 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     }
 
   CSS_ARGUMENT_END();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::RegisterHelper(const char *classname,
+                                          const char *helper)
+{
+  helpers[classname] = helper;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper
+(const char *classname)
+{
+  std::map<std::string, std::string>::iterator iter =
+    helpers.find(classname ? classname : std::string());
+  if (iter != helpers.end())
+    {
+    std::string helperclassname = iter->second;
+    vtkObject* obj = vtkInstantiator::CreateInstance(helperclassname.c_str());
+    vtkPVDataInformationHelper* helper =
+      vtkPVDataInformationHelper::SafeDownCast(obj);
+    if(!helper)
+      {
+      obj->Delete();
+      }
+    return helper;
+    }
+  return NULL;
 }
