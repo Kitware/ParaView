@@ -22,17 +22,8 @@
 #define __vtkSMMessageMinimal_h
 
 #include "vtkSystemIncludes.h"
+#include "vtkPVServerImplementationCoreModule.h"
 
-// Define the export Macro
-#if defined(VTK_BUILD_SHARED_LIBS)
-  #if defined(vtkPVServerImplementation_EXPORTS)
-    #define VTK_PROTOBUF_EXPORT VTK_ABI_EXPORT
-  #else
-    #define VTK_PROTOBUF_EXPORT VTK_ABI_IMPORT
-  #endif
-#else
-  #define VTK_PROTOBUF_EXPORT VTK_EXPORT
-#endif
 namespace paraview_protobuf
 {
   class Message;

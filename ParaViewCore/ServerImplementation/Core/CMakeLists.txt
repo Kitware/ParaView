@@ -84,7 +84,7 @@ add_custom_command(
            ${CMAKE_CURRENT_BINARY_DIR}/vtkPVMessage.pb.cc
     
     COMMAND protoc_compiler
-           "--cpp_out=dllexport_decl=VTK_PROTOBUF_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
+           "--cpp_out=dllexport_decl=VTKPVSERVERIMPLEMENTATIONCORE_EXPORT:${CMAKE_CURRENT_BINARY_DIR}"
            --proto_path "@CMAKE_CURRENT_SOURCE_DIR@"
            "${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto"
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVMessage.proto protoc_compiler
@@ -99,6 +99,10 @@ add_custom_target(
 )
 
 #------------------------------------------------------------------------------
+if (WIN32 AND BUILD_SHARED_LIBS)
+  add_definitions(-DPROTOBUF_USE_DLLS)
+endif()
+
 vtk_module_library(vtkPVServerImplementationCore
   ${Module_SRCS})
 
