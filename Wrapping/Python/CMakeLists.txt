@@ -47,6 +47,15 @@ set(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages
 #
 # *** Step 1 has to be done carefully to avoid missing out files ***
 
+# Copy generated module files from VTK.
+# To this first so we can replace some of the VTK files by ParaView
+# customizations.
+file (COPY "${VTK_BINARY_DIR}/Wrapping/Python/vtk"
+      DESTINATION "${PV_PYTHON_MODULE_BINARY_DIR}"
+      USE_SOURCE_PERMISSIONS)
+
+# This will replace the "vtk/__init__.py" file as well as add a few extra files
+# to the "vtk" module.
 file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/paraview
       DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages
       USE_SOURCE_PERMISSIONS
@@ -58,6 +67,7 @@ file (COPY "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/numpy_support.py"
            "${VTK_SOURCE_DIR}/Wrapping/Python/vtk/util/vtkConstants.py"
       DESTINATION ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/site-packages/paraview
       USE_SOURCE_PERMISSIONS)
+
 
 # Byte compile the Python files.
 CONFIGURE_FILE(${PV_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv.py.in
