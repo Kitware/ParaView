@@ -862,6 +862,7 @@ void pqMemoryInspectorPanel::Initialize()
   vtkPVSystemConfigInformation *dsconfigs=vtkPVSystemConfigInformation::New();
   session->GatherInformation(vtkPVSession::DATA_SERVER,dsconfigs,0);
   configs->AddInformation(dsconfigs);
+  dsconfigs->Delete();
 
   // don't attempt to communicate with a render server if it's
   // not connected which results in a duplicated gather as in that
@@ -871,6 +872,7 @@ void pqMemoryInspectorPanel::Initialize()
     vtkPVSystemConfigInformation *rsconfigs=vtkPVSystemConfigInformation::New();
     session->GatherInformation(vtkPVSession::RENDER_SERVER,rsconfigs,0);
     configs->AddInformation(rsconfigs);
+    rsconfigs->Delete();
     }
 
   nConfigs=configs->GetSize();
@@ -1048,6 +1050,7 @@ void pqMemoryInspectorPanel::RefreshRanks()
   vtkPVMemoryUseInformation *dsinfos=vtkPVMemoryUseInformation::New();
   session->GatherInformation(vtkPVSession::DATA_SERVER,dsinfos,0);
   infos->AddInformation(dsinfos);
+  dsinfos->Delete();
 
   // don't attempt to communicate with a render server if it's
   // not connected which results in a duplicated gather as in that
@@ -1057,6 +1060,7 @@ void pqMemoryInspectorPanel::RefreshRanks()
     vtkPVMemoryUseInformation *rsinfos=vtkPVMemoryUseInformation::New();
     session->GatherInformation(vtkPVSession::RENDER_SERVER,rsinfos,0);
     infos->AddInformation(rsinfos);
+    rsinfos->Delete();
     }
 
 
