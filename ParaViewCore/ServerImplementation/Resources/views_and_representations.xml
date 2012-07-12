@@ -1319,6 +1319,8 @@
             <Property name="DataBounds" />
             <Property name="CustomBounds"/>
             <Property name="CustomBoundsActive"/>
+            <Property name="CustomRange"/>
+            <Property name="CustomRangeActive"/>
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3217,9 +3219,23 @@
         default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="CustomRange"
+        command="SetCustomRange"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="CustomBoundsActive"
         command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CustomRangeActive"
+        command="SetCustomRangeActive"
         number_of_elements="3"
         default_values="0 0 0">
       </IntVectorProperty>

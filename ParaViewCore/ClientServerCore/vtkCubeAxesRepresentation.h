@@ -66,6 +66,18 @@ public:
   vtkGetVector3Macro(CustomBoundsActive, int);
 
   // Description:
+  // Get/Set whether to use custom range for a particular dimension.
+  vtkSetVector3Macro(CustomRangeActive, int);
+  vtkGetVector3Macro(CustomRangeActive, int);
+
+  // Description:
+  // Get/Set custom range to use. When corresponding CustomRangeActive is
+  // true, the data bounds will be ignored for that direction and CustomBounds
+  // will be used instead.
+  vtkSetVector6Macro(CustomRange, double);
+  vtkGetVector6Macro(CustomRange, double);
+
+  // Description:
   // Set the actor color.
   virtual void SetColor(double r, double g, double b);
   virtual void SetColor(double rgb[3])
@@ -177,6 +189,8 @@ protected:
   double Orientation[3];
   double CustomBounds[6];
   int CustomBoundsActive[3];
+  double CustomRange[6];
+  int CustomRangeActive[3];
   double DataBounds[6];
   bool UseBoundsRangeAsLabel;
   bool UseOrientedBounds;

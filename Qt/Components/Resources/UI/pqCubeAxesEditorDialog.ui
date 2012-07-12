@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>499</height>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -223,6 +223,27 @@
          </layout>
         </widget>
        </item>
+       <item row="6" column="0">
+        <widget class="QGroupBox" name="CubeAxesXCustomRange">
+         <property name="title">
+          <string>Custom Range</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QLineEdit" name="CubeAxesXCustomRangeMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesXCustomRangeMax"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="ytab">
@@ -337,6 +358,27 @@
          </layout>
         </widget>
        </item>
+       <item row="6" column="0">
+        <widget class="QGroupBox" name="CubeAxesYCustomRange">
+         <property name="title">
+          <string>Custom Range</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLineEdit" name="CubeAxesYCustomRangeMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesYCustomRangeMax"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="ztab">
@@ -447,6 +489,27 @@
              </size>
             </property>
            </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QGroupBox" name="CubeAxesZCustomRange">
+         <property name="title">
+          <string>Custom Range</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLineEdit" name="CubeAxesZCustomRangeMin"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="CubeAxesZCustomRangeMax"/>
           </item>
          </layout>
         </widget>
