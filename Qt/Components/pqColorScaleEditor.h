@@ -74,6 +74,7 @@ private slots:
   void updateOpacity();
 
   void handleOpacityPointsChanged();
+  void handleEnableOpacityMappingChanged();
   void handleColorPointsChanged();
 
   void setScalarFromText();
@@ -81,6 +82,7 @@ private slots:
   void setSingleOpacityFromText();
   void setOpacityScalarFromText();
   void setOpacityControlsVisibility(bool visible);
+  void setEnableOpacityMapping(int enable);
   void updateDisplay();
 
   void setColorSpace(int index);
