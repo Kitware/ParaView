@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMPropertyHelper.h"
@@ -427,6 +428,7 @@ pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *prop) c
 void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
+  this->updateInformationAndDomains();
 
   // clear any search string
   this->Ui->SearchLineEdit->clear();
@@ -712,6 +714,8 @@ void pqPropertiesPanel::apply()
     proxy->setModifiedState(pqProxy::UNMODIFIED);
     }
 
+  this->updateInformationAndDomains();
+
   this->updateButtonState();
 
   emit this->applied();
@@ -731,6 +735,8 @@ void pqPropertiesPanel::reset()
 
     this->Proxy->setModifiedState(pqProxy::UNMODIFIED);
     }
+
+  this->updateInformationAndDomains();
 
   this->updateButtonState();
 }
@@ -1119,5 +1125,30 @@ bool pqPropertiesPanel::isPanelItemVisible(const pqPropertiesPanelItem &item) co
   else
     {
     return true;
+    }
+}
+
+void pqPropertiesPanel::updateInformationAndDomains()
+{
+  if(!this->Proxy)
+    {
+    return;
+    }
+
+  vtkSMProxy *proxy = this->Proxy->getProxy();
+
+  if(vtkSMSourceProxy *sourceProxy = vtkSMSourceProxy::SafeDownCast(proxy))
+    {
+    sourceProxy->UpdatePipelineInformation();
+    }
+  else
+    {
+    proxy->UpdatePropertyInformation();
+    }
+
+  vtkSMProperty *inputProperty = proxy->GetProperty("Input");
+  if(inputProperty)
+    {
+    inputProperty->UpdateDependentDomains();
     }
 }
