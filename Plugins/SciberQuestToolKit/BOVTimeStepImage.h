@@ -50,7 +50,7 @@ public:
       BOVMetaData *metaData);
   ~BOVTimeStepImage();
 
-  int GetNumberOfImages() const
+  size_t GetNumberOfImages() const
     {
     return
       this->Scalars.size()+

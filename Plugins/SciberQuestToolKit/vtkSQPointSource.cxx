@@ -83,8 +83,8 @@ int vtkSQPointSource::RequestData(
   int nLocal=1;
   if (this->NumberOfPoints>nPieces)
     {
-    int pieceSize=this->NumberOfPoints/nPieces;
-    int nLarge=this->NumberOfPoints%nPieces;
+    int pieceSize=((int)this->NumberOfPoints)/nPieces;
+    int nLarge=((int)this->NumberOfPoints)%nPieces;
     nLocal=pieceSize+(pieceNo<nLarge?1:0);
     }
 
@@ -97,20 +97,20 @@ int vtkSQPointSource::RequestData(
   ca->SetNumberOfTuples(2*nLocal);
   vtkIdType *pca=ca->GetPointer(0);
 
-  srand(pieceNo+time(0));
+  srand((unsigned int)pieceNo+(unsigned int)time(0));
 
   for (int i=0; i<nLocal; ++i)
     {
-    double pi=3.14159265358979;
-    double rho=this->Radius*((double)rand())/((double)RAND_MAX);
-    double theta=2.0*pi*((double)rand())/((double)RAND_MAX);
-    double phi=pi*((double)rand())/((double)RAND_MAX);
-    double sin_theta=sin(theta);
-    double cos_theta=cos(theta);
-    double rho_sin_phi=rho*sin(phi);
-    ppa[0]=this->Center[0]+rho_sin_phi*cos_theta;
-    ppa[1]=this->Center[1]+rho_sin_phi*sin_theta;
-    ppa[2]=this->Center[2]+rho*cos(phi);
+    float pi=3.14159265358979f;
+    float rho=((float)this->Radius)*((float)rand())/((float)RAND_MAX);
+    float theta=2.0f*pi*((float)rand())/((float)RAND_MAX);
+    float phi=pi*((float)rand())/((float)RAND_MAX);
+    float sin_theta=(float)sin(theta);
+    float cos_theta=(float)cos(theta);
+    float rho_sin_phi=rho*(float)sin(phi);
+    ppa[0]=((float)this->Center[0])+rho_sin_phi*cos_theta;
+    ppa[1]=((float)this->Center[1])+rho_sin_phi*sin_theta;
+    ppa[2]=((float)this->Center[2])+rho*(float)cos(phi);
     ppa+=3;
 
     pca[0]=1;

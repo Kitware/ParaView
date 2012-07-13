@@ -58,7 +58,7 @@ int CPUConvolutionDriver::Convolution(
   int nW[3];
   extW.Size(nW);
   unsigned long wnijk=extW.Size();
-  unsigned long nComp=W->GetNumberOfComponents();
+  int nComp=W->GetNumberOfComponents();
 
   int nK[3];
   extK.Size(nK);
@@ -105,7 +105,7 @@ int CPUConvolutionDriver::Convolution(
     case OPT_NONE:
       switch (V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           ::Convolution<VTK_TT>(
               extV.GetData(),
               extW.GetData(),
@@ -126,9 +126,9 @@ int CPUConvolutionDriver::Convolution(
         // TODO -- replace with vtkTemplateMacro
         case VTK_FLOAT:
           {
-          vector<float*> sV(nComp,0);
-          vector<float*> sW(nComp,0);
-          for (unsigned long q=0; q<nComp; ++q)
+          vector<float*> sV((size_t)nComp,NULL);
+          vector<float*> sW((size_t)nComp,NULL);
+          for (int q=0; q<nComp; ++q)
             {
             posix_memalign((void**)&sV[q],16,vnijk*sizeof(float));
             posix_memalign((void**)&sW[q],16,wnijk*sizeof(float));
@@ -139,7 +139,7 @@ int CPUConvolutionDriver::Convolution(
           Split<float>(vnijk,hV,sV);
 
           // apply convolution
-          for (unsigned long q=0; q<nComp; ++q)
+          for (int q=0; q<nComp; ++q)
             {
             if ((mode==CartesianExtent::DIM_MODE_2D_XY)
               ||(mode==CartesianExtent::DIM_MODE_2D_XZ)
@@ -179,7 +179,7 @@ int CPUConvolutionDriver::Convolution(
           Interleave(wnijk,sW,hW);
 
           // clean up
-          for (unsigned long q=0; q<nComp; ++q)
+          for (int q=0; q<nComp; ++q)
             {
             free(sW[q]);
             free(sV[q]);

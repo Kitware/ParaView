@@ -181,26 +181,26 @@ BOVTimeStepImage::BOVTimeStepImage(
 //-----------------------------------------------------------------------------
 BOVTimeStepImage::~BOVTimeStepImage()
 {
-  int nScalars=this->Scalars.size();
-  for (int i=0; i<nScalars; ++i)
+  size_t nScalars=this->Scalars.size();
+  for (size_t i=0; i<nScalars; ++i)
     {
     delete this->Scalars[i];
     }
 
-  int nVectors=this->Vectors.size();
-  for (int i=0; i<nVectors; ++i)
+  size_t nVectors=this->Vectors.size();
+  for (size_t i=0; i<nVectors; ++i)
     {
     delete this->Vectors[i];
     }
 
-  int nTensors=this->Tensors.size();
-  for (int i=0; i<nTensors; ++i)
+  size_t nTensors=this->Tensors.size();
+  for (size_t i=0; i<nTensors; ++i)
     {
     delete this->Tensors[i];
     }
 
-  int nSymetricTensors=this->SymetricTensors.size();
-  for (int i=0; i<nSymetricTensors; ++i)
+  size_t nSymetricTensors=this->SymetricTensors.size();
+  for (size_t i=0; i<nSymetricTensors; ++i)
     {
     delete this->SymetricTensors[i];
     }
@@ -210,29 +210,29 @@ BOVTimeStepImage::~BOVTimeStepImage()
 ostream &operator<<(ostream &os, const BOVTimeStepImage &si)
 {
   os << "Scalars:" << endl;
-  int nScalars=si.Scalars.size();
-  for (int i=0; i<nScalars; ++i)
+  size_t nScalars=si.Scalars.size();
+  for (size_t i=0; i<nScalars; ++i)
     {
     os << *si.Scalars[i] << endl;
     }
 
   os << "Vectors:" << endl;
-  int nVectors=si.Vectors.size();
-  for (int i=0; i<nVectors; ++i)
+  size_t nVectors=si.Vectors.size();
+  for (size_t i=0; i<nVectors; ++i)
     {
     os << *si.Vectors[i] << endl;
     }
 
   os << "Tensors:" << endl;
-  int nTensors=si.Tensors.size();
-  for (int i=0; i<nTensors; ++i)
+  size_t nTensors=si.Tensors.size();
+  for (size_t i=0; i<nTensors; ++i)
     {
     os << *si.Tensors[i] << endl;
     }
 
   os << "SymetricTensors:" << endl;
-  int nSymetricTensors=si.SymetricTensors.size();
-  for (int i=0; i<nSymetricTensors; ++i)
+  size_t nSymetricTensors=si.SymetricTensors.size();
+  for (size_t i=0; i<nSymetricTensors; ++i)
     {
     os << *si.SymetricTensors[i] << endl;
     }

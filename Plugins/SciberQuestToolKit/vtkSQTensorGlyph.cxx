@@ -253,7 +253,7 @@ int vtkSQTensorGlyph::RequestData(
       {
       cell = this->GetSource()->GetCell(cellId);
       cellPts = cell->GetPointIds();
-      npts = cellPts->GetNumberOfIds();
+      npts = (int)cellPts->GetNumberOfIds();
       for (dir=0; dir < numDirs; dir++)
         {
         // This variable may be removed, but that

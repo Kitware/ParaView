@@ -26,8 +26,8 @@ public:
   /**
   Direct accesss to the array
   */
-  T &operator[](int i){ return this->Data[i]; }
-  const T &operator[](int i) const { return this->Data[i]; }
+  T &operator[](size_t i){ return this->Data[i]; }
+  const T &operator[](size_t i) const { return this->Data[i]; }
 
   /**
   Direct accesss to the array

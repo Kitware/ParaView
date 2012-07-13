@@ -54,8 +54,8 @@ private:
 
 private:
   const CartesianDataBlockIODescriptor *Descriptor;
-  int At;
-  int Of;
+  size_t At;
+  size_t Of;
 };
 
 ostream &operator<<(ostream &os, const CartesianDataBlockIODescriptorIterator &it);

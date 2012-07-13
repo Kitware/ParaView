@@ -563,7 +563,7 @@ int vtkSQVortexFilter::RequestData(
 
       switch(V->GetDataType())
         {
-        vtkTemplateMacro(
+        vtkFloatTemplateMacro(
           Rotation<VTK_TT>(
               inputExt.GetData(),
               outputExt.GetData(),
@@ -595,7 +595,7 @@ int vtkSQVortexFilter::RequestData(
 
         switch(V->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             Interleave<VTK_TT>(
                 outputTups,
                 (VTK_TT*)Rx->GetVoidPointer(0),
@@ -952,7 +952,7 @@ int vtkSQVortexFilter::RequestData(
 
         switch(V->GetDataType())
           {
-          vtkTemplateMacro(
+          vtkFloatTemplateMacro(
             Interleave<VTK_TT>(
                 outputTups,
                 (VTK_TT*)Gxx->GetVoidPointer(0),

@@ -141,15 +141,15 @@ int vtkSQSurfaceVectors::RequestData(
     }
 
   double prog=0.0;
-  double progInc=1.0/nPoints;
+  double progInc=1.0/((double)nPoints);
   double progRep=0.1;
 
   vtkIdList* cIds = vtkIdList::New();
   vtkIdList* ptIds = vtkIdList::New();
 
   // for each vector on the input project onto the surface
-  int nVectors=vectors.size();
-  for (int i=0; i<nVectors; ++i)
+  size_t nVectors=vectors.size();
+  for (size_t i=0; i<nVectors; ++i)
     {
     // progress
     prog+=progInc;
@@ -181,11 +181,11 @@ int vtkSQSurfaceVectors::RequestData(
     for (vtkIdType pid=0; pid<nPoints; ++pid)
       {
       input->GetPointCells(pid,cIds);
-      int nCIds=cIds->GetNumberOfIds();
+      vtkIdType nCIds=cIds->GetNumberOfIds();
 
       // Compute the point normal.
       double n[3]={0.0};
-      for (int j=0; j<nCIds; ++j)
+      for (vtkIdType j=0; j<nCIds; ++j)
         {
         vtkIdType cid=cIds->GetId(j);
         switch (input->GetCellType(cid))

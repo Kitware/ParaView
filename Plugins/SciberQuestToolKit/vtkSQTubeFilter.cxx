@@ -159,7 +159,7 @@ int vtkSQTubeFilter::RequestData(
   newNormals->SetNumberOfComponents(3);
   newNormals->Allocate(3*numNewPts);
   newStrips = vtkCellArray::New();
-  newStrips->Allocate(newStrips->EstimateSize(1,numNewPts));
+  newStrips->Allocate(newStrips->EstimateSize(1,(int)numNewPts));
   vtkCellArray *singlePolyline = vtkCellArray::New();
 
   // Point data: copy scalars, vectors, tcoords. Normals may be computed here.
@@ -242,7 +242,7 @@ int vtkSQTubeFilter::RequestData(
   for (inCellId=0, inLines->InitTraversal();
        inLines->GetNextCell(npts,pts) && !abort; inCellId++)
     {
-    this->UpdateProgress((double)inCellId/numLines);
+    this->UpdateProgress(((double)inCellId)/((double)numLines));
     abort = this->GetAbortExecute();
 
     if (npts < 2)
@@ -543,10 +543,10 @@ int vtkSQTubeFilter::GeneratePoints(vtkIdType offset,
       ptId++;
       }
     //the end cap
-    int endOffset = offset + (npts-1)*this->NumberOfSides;
+    int endOffset = (int)(offset + (npts-1)*this->NumberOfSides);
     if ( ! this->SidesShareVertices )
       {
-      endOffset = offset + 2*(npts-1)*this->NumberOfSides;
+      endOffset = (int)(offset + 2*(npts-1)*this->NumberOfSides);
       }
     for (k=0; k < numCapSides; k+=capIncr)
       {
@@ -579,11 +579,11 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
       {
       i1 = k % this->NumberOfSides;
       i2 = (k+1) % this->NumberOfSides;
-      outCellId = newStrips->InsertNextCell(npts*2);
+      outCellId = newStrips->InsertNextCell(((int)npts*2));
       outCD->CopyData(cd,inCellId,outCellId);
       for (i=0; i < npts; i++)
         {
-        i3 = i*this->NumberOfSides;
+        i3 = (int)(i*this->NumberOfSides);
         newStrips->InsertCellPoint(offset+i2+i3);
         newStrips->InsertCellPoint(offset+i1+i3);
         }
@@ -596,11 +596,11 @@ void vtkSQTubeFilter::GenerateStrips(vtkIdType offset, vtkIdType npts,
       {
       i1 = 2*(k % this->NumberOfSides) + 1;
       i2 = 2*((k+1) % this->NumberOfSides);
-      outCellId = newStrips->InsertNextCell(npts*2);
+      outCellId = newStrips->InsertNextCell((int)(npts*2));
       outCD->CopyData(cd,inCellId,outCellId);
       for (i=0; i < npts; i++)
         {
-        i3 = i*2*this->NumberOfSides;
+        i3 = ((int)i)*2*this->NumberOfSides;
         newStrips->InsertCellPoint(offset+i2+i3);
         newStrips->InsertCellPoint(offset+i1+i3);
         }

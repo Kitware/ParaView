@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 
 #include "vtkFloatArray.h"
 
-
 // Data type to collect streamline points during a trace. The
 // streamline is expected mapped in two steps, a backward and
 // forward trace.
@@ -40,12 +39,13 @@ public:
   // Set seed point for coming trace and clear out internal data
   // structures.
   void Initialize(double p[3], unsigned long long seedId);
+  void Initialize(float p[3], unsigned long long seedId);
   // Description:
   // Get seed point and it's id.
   unsigned long long GetSeedId() const { return this->SeedId; }
-  double *GetSeedPoint() { return this->Seed; }
-  // const double *GetSeedPoint() const{ return this->Seed; }
+  float *GetSeedPoint() { return this->Seed; }
   void GetSeedPoint(double p[3]) const;
+  void GetSeedPoint(float p[3]) const;
 
   // Description:
   // Add a point to the trace in the given direction.
@@ -92,7 +92,7 @@ public:
 private:
   vtkFloatArray *FwdTrace;    // streamline trace along V
   vtkFloatArray *BwdTrace;    // streamline trace along -V
-  double Seed[3];             // seed point TODO - should be a float.
+  float Seed[3];              // seed point
   unsigned long long SeedId;  // cell id in origniating dataset
   int FwdTerminator;          // code indicating how fwd trace ended
   int BwdTerminator;          // code indicating how bwd trace ended
@@ -108,24 +108,9 @@ FieldLine::FieldLine()
   FwdTerminator(0),
   BwdTerminator(0)
 {
-  this->Seed[0]=0.0;
-  this->Seed[1]=0.0;
-  this->Seed[2]=0.0;
-}
-
-//-----------------------------------------------------------------------------
-inline
-FieldLine::FieldLine(double p[3], unsigned long long seedId)
-    :
-  FwdTrace(0),
-  BwdTrace(0),
-  SeedId(seedId),
-  FwdTerminator(0),
-  BwdTerminator(0)
-{
-  this->Seed[0]=p[0];
-  this->Seed[1]=p[1];
-  this->Seed[2]=p[2];
+  this->Seed[0]=0.0f;
+  this->Seed[1]=0.0f;
+  this->Seed[2]=0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -143,6 +128,20 @@ FieldLine::FieldLine(float p[3], unsigned long long seedId)
   this->Seed[2]=p[2];
 }
 
+//-----------------------------------------------------------------------------
+inline
+FieldLine::FieldLine(double p[3], unsigned long long seedId)
+    :
+  FwdTrace(0),
+  BwdTrace(0),
+  SeedId(seedId),
+  FwdTerminator(0),
+  BwdTerminator(0)
+{
+  this->Seed[0]=(float)p[0];
+  this->Seed[1]=(float)p[1];
+  this->Seed[2]=(float)p[2];
+}
 
 //-----------------------------------------------------------------------------
 inline
@@ -170,6 +169,19 @@ void FieldLine::DeleteTrace()
 inline
 void FieldLine::Initialize(double p[3], unsigned long long seedId)
 {
+  this->Seed[0]=(float)p[0];
+  this->Seed[1]=(float)p[1];
+  this->Seed[2]=(float)p[2];
+  this->SeedId=seedId;
+  if (this->FwdTrace) this->FwdTrace->SetNumberOfTuples(0);
+  if (this->BwdTrace) this->BwdTrace->SetNumberOfTuples(0);
+  this->BwdTerminator=this->FwdTerminator=0;
+}
+
+//-----------------------------------------------------------------------------
+inline
+void FieldLine::Initialize(float p[3], unsigned long long seedId)
+{
   this->Seed[0]=p[0];
   this->Seed[1]=p[1];
   this->Seed[2]=p[2];
@@ -179,14 +191,14 @@ void FieldLine::Initialize(double p[3], unsigned long long seedId)
   this->BwdTerminator=this->FwdTerminator=0;
 }
 
-// //-----------------------------------------------------------------------------
-// inline
-// void FieldLine::GetSeedPoint(float p[3]) const
-// {
-//   p[0]=this->Seed[0];
-//   p[1]=this->Seed[1];
-//   p[2]=this->Seed[2];
-// }
+//-----------------------------------------------------------------------------
+inline
+void FieldLine::GetSeedPoint(float p[3]) const
+{
+  p[0]=this->Seed[0];
+  p[1]=this->Seed[1];
+  p[2]=this->Seed[2];
+}
 
 //-----------------------------------------------------------------------------
 inline

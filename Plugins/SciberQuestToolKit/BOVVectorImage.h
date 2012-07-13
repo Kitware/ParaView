@@ -52,7 +52,7 @@ public:
     }
 
   void SetNumberOfComponents(int nComps);
-  int GetNumberOfComponents() const { return this->ComponentFiles.size(); }
+  int GetNumberOfComponents() const { return (int)this->ComponentFiles.size(); }
 
   void SetName(const char *name){ this->Name=name; }
   const char *GetName() const { return this->Name.c_str(); }

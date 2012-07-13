@@ -643,7 +643,7 @@ int vtkSQKernelConvolution::UpdateKernel()
     }
   this->KernelExt=ext;
 
-  int size = ext.Size();
+  size_t size = ext.Size();
 
   this->Kernel=new float [size];
   float kernelNorm=0.0;
@@ -651,11 +651,11 @@ int vtkSQKernelConvolution::UpdateKernel()
   if (this->KernelType==KERNEL_TYPE_GAUSIAN)
     {
     float *X=new float[this->KernelWidth];
-    linspace<float>(-1.0,1.0, this->KernelWidth, X);
+    linspace<float>(-1.0f,1.0f, this->KernelWidth, X);
 
-    float B[3]={0.0,0.0,0.0};
-    float a=1.0;
-    float c=0.55;
+    float B[3]={0.0f,0.0f,0.0f};
+    float a=1.0f;
+    float c=0.55f;
 
     int H=(this->Mode==CartesianExtent::DIM_MODE_3D?this->KernelWidth:1);
 
@@ -665,7 +665,8 @@ int vtkSQKernelConvolution::UpdateKernel()
         {
         for (int i=0; i<this->KernelWidth; ++i)
           {
-          float x[3]={X[i],X[j],this->Mode==CartesianExtent::DIM_MODE_3D?X[k]:0.0};
+          float x[3]
+            = {X[i],X[j],(this->Mode==CartesianExtent::DIM_MODE_3D)?X[k]:0.0f};
 
           int q = this->KernelWidth*this->KernelWidth*k+this->KernelWidth*j+i;
 
@@ -679,10 +680,10 @@ int vtkSQKernelConvolution::UpdateKernel()
   else
   if (this->KernelType==KERNEL_TYPE_CONSTANT)
     {
-    kernelNorm=size;
-    for (int i=0; i<size; ++i)
+    kernelNorm=((float)size);
+    for (size_t i=0; i<size; ++i)
       {
-      this->Kernel[i]=1.0;
+      this->Kernel[i]=1.0f;
       }
     }
   else
@@ -694,7 +695,7 @@ int vtkSQKernelConvolution::UpdateKernel()
     }
 
   // normalize
-  for (int i=0; i<size; ++i)
+  for (size_t i=0; i<size; ++i)
     {
     this->Kernel[i]/=kernelNorm;
     }

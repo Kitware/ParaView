@@ -27,6 +27,10 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
 #include "vtkPolyDataWriter.h"
+#include "vtkTesting.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkPNGWriter.h"
+#include "TestUtils.h"
 
 #include <iostream>
 using std::cerr;
@@ -34,23 +38,8 @@ using std::cerr;
 #include <string>
 using std::string;
 
-#include <mpi.h>
-
-/**
-TestFieldTopologyMapper
-
-Input:
-  /path/to/SmallVector.bovm
-  Seed source type, 1=plane, 2=volume
-
-Output:
-  Left: process id scalars showing the domain decomposition of the topograph.
-  Right: topograph.
-
-*/
 int main(int argc, char **argv)
 {
-  ///MPI_Init(&argc,&argv);
   vtkMPIController* controller=vtkMPIController::New();
   controller->Initialize(&argc,&argv,0);
   int worldRank=controller->GetLocalProcessId();
@@ -58,34 +47,46 @@ int main(int argc, char **argv)
 
   vtkMultiProcessController::SetGlobalController(controller);
 
-  // vtkStreamingDemandDrivenPipeline* exec = vtkStreamingDemandDrivenPipeline::New();
-  // vtkAlgorithm::SetDefaultExecutivePrototype(exec);
-  // exec->Delete();
-
-  if (argc<2)
+  vtkTesting *testHelper = NULL;
+  string dataRoot;
+  string tempDir;
+  string inputFileName;
+  string tempFile;
+  string tempBaseline;
+  string tempDecomp;
+  if (worldRank==0)
     {
-    cerr << "Error: Provide the path to SmallVector.bovm in $1." << endl;
-    return 1;
-    }
-  string testData(argv[1]);
-  testData+="/SmallVector.bovm";
+    testHelper = vtkTesting::New();
+    testHelper->AddArguments(argc,const_cast<const char **>(argv));
+    if (!testHelper->IsFlagSpecified("-D"))
+      {
+      cerr << "Error: -D /path/to/data was not specified.";
+      return 1;
+      }
+    dataRoot=testHelper->GetDataRoot();
+    inputFileName=dataRoot+"/Data/SciberQuestToolKit/SmallVector/SmallVector.bovm";
 
-  if (argc<3)
-    {
-    cerr << "Error: Make a seed selection (1=plane,2=volume) at $2." << endl;
-    return 1;
+    tempDir=testHelper->GetTempDirectory();
+    tempBaseline=tempDir+"/SciberQuestToolKit-TestFieldTopologyMapper.png";
+    tempDecomp=tempDir+"/SciberQuestToolKit-TestFieldTopologyMapperDecomp.png";
     }
-  int seedSelection=atoi(argv[2]);
+  Broadcast(controller,dataRoot);
+  Broadcast(controller,tempDir);
+  Broadcast(controller,inputFileName);
+  Broadcast(controller,tempBaseline);
+  Broadcast(controller,tempDecomp);
+
+  // TODO -- make this a command line option
   enum {
     PLANE=1,
     VOLUME=2
     };
+  int seedSelection=PLANE;
 
   // ooc reader
   vtkSQBOVReader *r=vtkSQBOVReader::New();
-  //r->SetExtent
   r->SetMetaRead(1);
-  r->SetFileName(testData.c_str());
+  r->SetFileName(inputFileName.c_str());
   r->SetPointArrayStatus("vi",1);
 
   // terminator
@@ -161,7 +162,7 @@ int main(int argc, char **argv)
   ftm->SetForwardOnly(0);
   ftm->SetUseDynamicScheduler(1);
   ftm->SetMasterBlockSize(16);
-  ftm->SetWorkerBlockSize(512);
+  ftm->SetWorkerBlockSize(128);
   ftm->AddInputConnection(0,r->GetOutputPort(0));
   ftm->AddInputConnection(1,sp->GetOutputPort(0));
   ftm->AddInputConnection(2,s1->GetOutputPort(0));
@@ -200,17 +201,19 @@ int main(int argc, char **argv)
 
   // Serial rendering. rank 0 gathers and renders the data in a new
   // pipeline. Other ranks send the output of their pipelines.
+  int testStatus = 0;
   const int renderRank=0;
   const int tag=101;
-  if (worldRank!=renderRank)
+  if (worldRank!=0)
     {
     controller->Send(surf->GetOutput(),renderRank,tag);
+    testStatus = 0;
     }
   else
     {
     // gather.
     vtkAppendPolyData *apd=vtkAppendPolyData::New();
-    apd->AddInput(surf->GetOutput());
+    apd->AddInputData(surf->GetOutput());
     for (int i=0; i<worldSize; ++i)
       {
       if (i==renderRank)
@@ -219,25 +222,27 @@ int main(int argc, char **argv)
         }
       vtkPolyData* pd = vtkPolyData::New();
       controller->Receive(pd,vtkMultiProcessController::ANY_SOURCE,tag);
-      apd->AddInput(pd);
+      apd->AddInputData(pd);
       pd->Delete();
       }
 
-    apd->GetOutput()->Update();
+    apd->Update();
+    /*
+    vtkPolyDataWriter *w=vtkPolyDataWriter::New();
+    w->SetInputConnection(apd->GetOutputPort(0));
+    w->SetFileName("TestFieldTopologyMapper.vtk");
+    w->Write();
+    w->Delete();
+    */
 
+    // render the result
     vtkPolyData *map=vtkPolyData::New();
     map->ShallowCopy(apd->GetOutput());
     map->GetCellData()->SetActiveScalars("IntersectColor");
 
-    vtkPolyDataWriter *w=vtkPolyDataWriter::New();
-    w->SetInput(apd->GetOutput());
-    w->SetFileName("TestFieldTopologyMapper.vtk");
-    w->Write();
-    w->Delete();
-
     vtkPolyDataMapper *pdm;
     pdm=vtkPolyDataMapper::New();
-    pdm->SetInput(map);
+    pdm->SetInputData(map);
     pdm->SetColorModeToMapScalars();
     pdm->SetScalarModeToUseCellData();
     pdm->SetScalarRange(map->GetCellData()->GetArray("IntersectColor")->GetRange());
@@ -246,58 +251,74 @@ int main(int argc, char **argv)
     vtkActor *act;
     act=vtkActor::New();
     act->SetMapper(pdm);
-    act->AddPosition(-3.5,0.0,0.0);
     pdm->Delete();
 
-    vtkPolyData *decomp=vtkPolyData::New();
-    decomp->ShallowCopy(apd->GetOutput());
-    decomp->GetPointData()->SetActiveScalars("ProcessId");
-    apd->Delete();
-
-    vtkRenderer *ren=vtkRenderer::New();
-    ren->AddActor(act);
-    act->Delete();
-
-    pdm=vtkPolyDataMapper::New();
-    pdm->SetInput(decomp);
-    pdm->SetColorModeToMapScalars();
-    pdm->SetScalarModeToUsePointData();
-    pdm->SetScalarRange(decomp->GetPointData()->GetArray("ProcessId")->GetRange());
-    decomp->Delete();
-
-    act=vtkActor::New();
-    act->SetMapper(pdm);
-    act->AddPosition(3.5,0.0,0.0);
-    pdm->Delete();
-
+    vtkRenderer *ren;
+    ren=vtkRenderer::New();
     ren->AddActor(act);
     act->Delete();
 
     vtkCamera *cam=ren->GetActiveCamera();
-    cam->SetFocalPoint(3.5,3.5,3.5);
-    cam->SetPosition(3.5,15.0,3.5);
+    cam->SetFocalPoint(0.0,3.5,3.5);
+    cam->SetPosition(0.0,15.0,3.5);
     cam->ComputeViewPlaneNormal();
     cam->SetViewUp(0.0,0.0,1.0);
     cam->OrthogonalizeViewUp();
     ren->ResetCamera();
 
-    vtkRenderWindow *rwin=vtkRenderWindow::New();
+    vtkRenderWindow *rwin;
+    rwin=vtkRenderWindow::New();
     rwin->AddRenderer(ren);
     ren->Delete();
 
-    vtkRenderWindowInteractor *rwi=vtkRenderWindowInteractor::New();
-    rwi->SetRenderWindow(rwin);
+    // Perform the regression test.
+    int failFlag=vtkTesting::Test(argc, argv, rwin, 5.0);
+    if (failFlag==vtkTesting::DO_INTERACTOR)
+      {
+      // Not testing, interact with scene.
+      vtkRenderWindowInteractor *rwi=vtkRenderWindowInteractor::New();
+      rwi->SetRenderWindow(rwin);
+      rwin->Render();
+      rwi->Start();
+      rwi->Delete();
+      }
+    else
+      {
+      // Save a baseline
+      vtkWindowToImageFilter *baselineImage = vtkWindowToImageFilter::New();
+      baselineImage->SetInput(rwin);
+      vtkPNGWriter *baselineWriter = vtkPNGWriter::New();
+      baselineWriter->SetFileName(tempBaseline.c_str());
+      baselineWriter->SetInputConnection(baselineImage->GetOutputPort());
+      baselineWriter->Write();
+      baselineWriter->Delete();
+      baselineImage->Delete();
+
+      // save the decomposition, for manula inspection. It can't be
+      // part of the baseline since a race condition makes it non
+      // deterministic.
+      map->GetPointData()->SetActiveScalars("ProcessId");
+      pdm->SetScalarModeToUsePointData();
+      pdm->SetScalarRange(map->GetPointData()->GetArray("ProcessId")->GetRange());
+      pdm->Update();
+      rwin->Render();
+      vtkWindowToImageFilter *decompImage = vtkWindowToImageFilter::New();
+      decompImage->SetInput(rwin);
+      vtkPNGWriter *decompWriter = vtkPNGWriter::New();
+      decompWriter->SetFileName(tempDecomp.c_str());
+      decompWriter->SetInputConnection(decompImage->GetOutputPort());
+      decompWriter->Write();
+      decompWriter->Delete();
+      decompImage->Delete();
+      }
+    testStatus=failFlag==vtkTesting::PASSED?0:1;
     rwin->Delete();
-    rwin->Render();
-    rwi->Start();
-    rwi->Delete();
     }
   surf->Delete();
 
-  ///MPI_Finalize();
   controller->Finalize();
   controller->Delete();
   //vtkAlgorithm::SetDefaultExecutivePrototype(0);
 
-  return 0;
+  return testStatus;
 }

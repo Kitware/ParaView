@@ -45,7 +45,7 @@ public:
   Copy a single cell and its associated point and cell data
   from iniput to output.
   */
-  virtual int Copy(vtkIdType cellId)
+  virtual vtkIdType Copy(vtkIdType cellId)
     {
     IdBlock id(cellId);
     return this->Copy(id);
@@ -56,7 +56,7 @@ public:
   and cell data from iniput to output. Derived classes must make
   sure this method gets called if they override it.
   */
-  virtual int Copy(IdBlock &block)=0;
+  virtual vtkIdType Copy(IdBlock &block)=0;
 
   /**
   Free resources used by the object. Dervied classes must makes

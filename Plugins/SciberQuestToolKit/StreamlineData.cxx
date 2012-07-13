@@ -157,7 +157,7 @@ void StreamlineData::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int StreamlineData::InsertCells(IdBlock *SourceIds)
+vtkIdType StreamlineData::InsertCells(IdBlock *SourceIds)
 {
   vtkIdType startId=SourceIds->first();
   vtkIdType endId=SourceIds->last();
@@ -173,8 +173,8 @@ int StreamlineData::InsertCells(IdBlock *SourceIds)
     }
 
   // for the cells assigned to us, generate seed points.
-  vtkIdType lId=this->Lines.size();
-  vtkIdType nSeeds=SourceIds->size();
+  vtkIdType lId=(vtkIdType)this->Lines.size();
+  vtkIdType nSeeds=(vtkIdType)SourceIds->size();
   this->Lines.resize(lId+nSeeds,0);
 
   float *pSourcePts=this->SourcePts->GetPointer(0);
@@ -188,7 +188,7 @@ int StreamlineData::InsertCells(IdBlock *SourceIds)
     SourceCells->GetNextCell(nPtIds,ptIds);
 
     // the seed point we will use the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     for (vtkIdType pId=0; pId<nPtIds; ++pId)
       {
       vtkIdType idx=3*ptIds[pId];
@@ -198,9 +198,9 @@ int StreamlineData::InsertCells(IdBlock *SourceIds)
       seed[2]+=pSourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nPtIds;
-    seed[1]/=nPtIds;
-    seed[2]/=nPtIds;
+    seed[0]/=((float)nPtIds);
+    seed[1]/=((float)nPtIds);
+    seed[2]/=((float)nPtIds);
 
     this->Lines[lId]=new FieldLine(seed,cId);
     this->Lines[lId]->AllocateTrace();
@@ -246,7 +246,7 @@ int StreamlineData::SyncGeometry()
     vtkIdType nNewPts=this->Lines[i]->CopyPoints(pLinePts);
 
     // compute the arc-length
-    *pLength=0.0;
+    *pLength=0.0f;
     for (int q=1; q<nNewPts; ++q)
       {
       int q0=3*(q-1);
@@ -254,7 +254,7 @@ int StreamlineData::SyncGeometry()
       float x=pLinePts[q1  ]-pLinePts[q0  ];
       float y=pLinePts[q1+1]-pLinePts[q0+1];
       float z=pLinePts[q1+2]-pLinePts[q0+2];
-      *pLength+=sqrt(x*x+y*y+z*z);
+      *pLength+=((float)sqrt(x*x+y*y+z*z));
       }
     ++pLength;
 

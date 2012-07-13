@@ -12,7 +12,7 @@ set(Eigen_DIR
 
 if (NOT EXISTS ${Eigen_DIR})
   message(FATAL_ERROR
-  "Set Eigen_DIR to the path to your Eigen install." )
+    "SQTK Set Eigen_DIR to the path to your Eigen install." )
 endif ()
 
 include_directories(${Eigen_DIR})
@@ -21,7 +21,7 @@ include_directories(${Eigen_DIR})
 # we don't add an include for the intel intrinsics.
 if (CMAKE_C_COMPILER_ID STREQUAL "Intel")
 
-  message(STATUS "Intel compiler detected.")
+  message(STATUS "SQTK Intel compiler detected.")
 
   set(EXTRA_INTEL_INCLUDES
     /path/to/intel/include/intel64
@@ -30,7 +30,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Intel")
 
   if (NOT EXISTS ${EXTRA_INTEL_INCLUDES})
     message(FATAL_ERROR
-      "Set EXTRA_INTEL_INCLUDES to the path to the intel compiler.")
+      "SQTK Set EXTRA_INTEL_INCLUDES to the path to the intel compiler.")
   endif ()
 
   include_directories(${EXTRA_INTEL_INCLUDES})

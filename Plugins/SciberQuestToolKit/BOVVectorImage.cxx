@@ -17,7 +17,7 @@ BOVVectorImage::~BOVVectorImage()
 //-----------------------------------------------------------------------------
 void BOVVectorImage::Clear()
 {
-  int nComps=this->ComponentFiles.size();
+  int nComps=(int)this->ComponentFiles.size();
   for (int i=0; i<nComps; ++i)
     {
     BOVScalarImage *comp=this->ComponentFiles[i];

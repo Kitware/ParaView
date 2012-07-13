@@ -142,7 +142,7 @@ int vtkSQPlaneSourceCellGenerator::GetCellPointIndexes(
       vtkIdType *idx)
 {
   int i,j;
-  indexToIJ(cid,this->Resolution[0],i,j);
+  indexToIJ((int)cid,this->Resolution[0],i,j);
 
   // vertex indices
   int I[12]={
@@ -166,7 +166,7 @@ int vtkSQPlaneSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
 {
   // cell index (also lower left pt index)
   int i,j;
-  indexToIJ(cid,this->Resolution[0],i,j);
+  indexToIJ((int)cid,this->Resolution[0],i,j);
 
   // vertex indices
   int I[12]={
@@ -176,12 +176,27 @@ int vtkSQPlaneSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
       i  ,j+1,0
       };
 
+  float dx[3]={
+      ((float)this->Dx[0]),
+      ((float)this->Dx[1]),
+      ((float)this->Dx[2])};
+
+  float dy[3]={
+      ((float)this->Dy[0]),
+      ((float)this->Dy[1]),
+      ((float)this->Dy[2])};
+
+  float O[3]={
+      ((float)this->Origin[0]),
+      ((float)this->Origin[1]),
+      ((float)this->Origin[2])};
+
   for (int q=0; q<4; ++q)
     {
     int qq=q*3;
-    pts[qq  ]=this->Origin[0]+I[qq]*this->Dx[0]+I[qq+1]*this->Dy[0];
-    pts[qq+1]=this->Origin[1]+I[qq]*this->Dx[1]+I[qq+1]*this->Dy[1];
-    pts[qq+2]=this->Origin[2]+I[qq]*this->Dx[2]+I[qq+1]*this->Dy[2];
+    pts[qq  ]=O[0]+((float)I[qq])*dx[0]+((float)I[qq+1])*dy[0];
+    pts[qq+1]=O[1]+((float)I[qq])*dx[1]+((float)I[qq+1])*dy[1];
+    pts[qq+2]=O[2]+((float)I[qq])*dx[2]+((float)I[qq+1])*dy[2];
     }
 
   return 4;

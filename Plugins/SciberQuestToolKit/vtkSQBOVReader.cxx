@@ -282,7 +282,7 @@ int vtkSQBOVReader::Initialize(
 
   // return selected arrays
   // when none are selected we return all available
-  int nArrays=0;
+  size_t nArrays=0;
   elem=GetOptionalElement(elem,"arrays");
   if (elem)
     {
@@ -297,9 +297,9 @@ int vtkSQBOVReader::Initialize(
   else
     {
     nArrays=this->GetNumberOfPointArrays();
-    for (int i=0; i<nArrays; ++i)
+    for (size_t i=0; i<nArrays; ++i)
       {
-      const char * arrayName=this->GetPointArrayName(i);
+      const char *arrayName=this->GetPointArrayName((int)i);
       arrays.push_back(arrayName);
       }
     }
@@ -312,7 +312,7 @@ int vtkSQBOVReader::Initialize(
     << "#   cb_buffer_size=" << cb_buffer_size << "\n"
     << "#   wholeExtent=" << Tuple<int>(wholeExtent,6) << "\n"
     << "#   subsetExtent=" << Tuple<int>(subset,6) << "\n";
-  for (int i=0; i<nArrays; ++i)
+  for (size_t i=0; i<nArrays; ++i)
     {
     *log << "#   arrayName_" << i << "=" << arrays[i] << "\n";
     }
@@ -516,15 +516,15 @@ int vtkSQBOVReader::GetVectorProjection()
 //-----------------------------------------------------------------------------
 int vtkSQBOVReader::GetNumberOfTimeSteps()
 {
-  return this->Reader->GetMetaData()->GetNumberOfTimeSteps();
+  return (int)this->Reader->GetMetaData()->GetNumberOfTimeSteps();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSQBOVReader::GetTimeSteps(double *times)
 {
-  int n=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
+  size_t n=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
 
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     times[i]=this->Reader->GetMetaData()->GetTimeStep(i);
     }
@@ -619,7 +619,7 @@ int vtkSQBOVReader::GetNumberOfPointArrays()
   #if defined vtkSQBOVReaderDEBUG
   pCerr() << "===============================GetNumberOfPointArrays" << endl;
   #endif
-  return this->Reader->GetMetaData()->GetNumberOfArrays();
+  return (int)this->Reader->GetMetaData()->GetNumberOfArrays();
 }
 
 //-----------------------------------------------------------------------------
@@ -791,10 +791,10 @@ int vtkSQBOVReader::RequestInformation(
     }
 
   // Determine which time steps are available.
-  int nSteps=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
+  size_t nSteps=this->Reader->GetMetaData()->GetNumberOfTimeSteps();
   const int *steps=this->Reader->GetMetaData()->GetTimeSteps();
   vector<double> times(nSteps,0.0);
-  for (int i=0; i<nSteps; ++i)
+  for (size_t i=0; i<nSteps; ++i)
     {
     times[i]=(double)steps[i]; // use the index rather than the actual.
     }
@@ -808,7 +808,7 @@ int vtkSQBOVReader::RequestInformation(
   info->Set(
     vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
     &times[0],
-    times.size());
+    (int)times.size());
 
   double timeRange[2]={times[0],times[times.size()-1]};
   info->Set(
@@ -1147,16 +1147,16 @@ int vtkSQBOVReader::RequestData(
       fa=vtkFloatArray::New();
       fa->SetNumberOfTuples(2);
       pFa=fa->GetPointer(0);
-      pFa[0]=subsetBounds[2];
-      pFa[1]=subsetBounds[3];
+      pFa[0]=((float)subsetBounds[2]);
+      pFa[1]=((float)subsetBounds[3]);
       rgds->SetYCoordinates(fa);
       fa->Delete();
 
       fa=vtkFloatArray::New();
       fa->SetNumberOfTuples(2);
       pFa=fa->GetPointer(0);
-      pFa[0]=subsetBounds[4];
-      pFa[1]=subsetBounds[5];
+      pFa[0]=((float)subsetBounds[4]);
+      pFa[1]=((float)subsetBounds[5]);
       rgds->SetZCoordinates(fa);
       fa->Delete();
 

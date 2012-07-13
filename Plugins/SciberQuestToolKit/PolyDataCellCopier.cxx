@@ -162,13 +162,13 @@ void PolyDataCellCopier::Initialize(vtkDataSet *s, vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataCellCopier::Copy(IdBlock &SourceIds)
+vtkIdType PolyDataCellCopier::Copy(IdBlock &SourceIds)
 {
   // copy cell data
   this->CopyCellData(SourceIds);
 
   vtkIdType startCellId=SourceIds.first();
-  vtkIdType nCellsLocal=SourceIds.size();
+  vtkIdType nCellsLocal=(vtkIdType)SourceIds.size();
 
   // Cells are sequentially acccessed (not random) so explicitly skip all cells
   // we aren't interested in.

@@ -147,7 +147,7 @@ void PolyDataFieldDisplacementMap::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
+vtkIdType PolyDataFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
 {
   if (this->SourceGen)
     {
@@ -157,7 +157,7 @@ int PolyDataFieldDisplacementMap::InsertCells(IdBlock *SourceIds)
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
+vtkIdType PolyDataFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -239,11 +239,11 @@ int PolyDataFieldDisplacementMap::InsertCellsFromGenerator(IdBlock *SourceIds)
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);
 
-  return this->Lines.size();
+  return (vtkIdType)this->Lines.size();
 }
 
 //-----------------------------------------------------------------------------
-int PolyDataFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
+vtkIdType PolyDataFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
 {
   vtkIdType startCellId=SourceIds->first();
   vtkIdType nCellsLocal=SourceIds->size();
@@ -329,5 +329,5 @@ int PolyDataFieldDisplacementMap::InsertCellsFromDataset(IdBlock *SourceIds)
   // and allocated that much space.
   this->OutPts->Resize(nOutPts);
 
-  return this->Lines.size();
+  return (vtkIdType)this->Lines.size();
 }

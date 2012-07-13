@@ -162,23 +162,23 @@ int vtkSQRandomSeedPoints::RequestData(
   verts->Delete();
 
   float dX[3];
-  dX[0]=this->Bounds[1]-this->Bounds[0];
-  dX[1]=this->Bounds[3]-this->Bounds[2];
-  dX[2]=this->Bounds[5]-this->Bounds[4];
+  dX[0]=(float)(this->Bounds[1]-this->Bounds[0]);
+  dX[1]=(float)(this->Bounds[3]-this->Bounds[2]);
+  dX[2]=(float)(this->Bounds[5]-this->Bounds[4]);
 
   float eps[3];
-  eps[0]=dX[0]/100.0;
-  eps[1]=dX[1]/100.0;
-  eps[2]=dX[2]/100.0;
+  eps[0]=dX[0]/100.0f;
+  eps[1]=dX[1]/100.0f;
+  eps[2]=dX[2]/100.0f;
 
-  dX[0]-=2.0*eps[0];
-  dX[1]-=2.0*eps[1];
-  dX[2]-=2.0*eps[2];
+  dX[0]-=2.0f*eps[0];
+  dX[1]-=2.0f*eps[1];
+  dX[2]-=2.0f*eps[2];
 
   float X0[3];
-  X0[0]=this->Bounds[0]+eps[0];
-  X0[1]=this->Bounds[2]+eps[1];
-  X0[2]=this->Bounds[4]+eps[2];
+  X0[0]=((float)this->Bounds[0])+eps[0];
+  X0[1]=((float)this->Bounds[2])+eps[1];
+  X0[2]=((float)this->Bounds[4])+eps[2];
 
   double prog=0.0;
   double progUnit=1.0/nLocal;
@@ -186,7 +186,7 @@ int vtkSQRandomSeedPoints::RequestData(
   double progRepLevel=0.1;
 
   // generate the point set
-  srand(rank+time(0));
+  srand((unsigned int)rank+(unsigned int)time(0));
   for (int q=0; q<nLocal; ++q, prog+=progUnit)
     {
     // update PV progress
@@ -197,10 +197,10 @@ int vtkSQRandomSeedPoints::RequestData(
       }
 
     // new random point
-    const float rmax=RAND_MAX;
-    pX[0]=X0[0]+dX[0]*rand()/rmax;
-    pX[1]=X0[1]+dX[1]*rand()/rmax;
-    pX[2]=X0[2]+dX[2]*rand()/rmax;
+    const float rmax=(float)RAND_MAX;
+    pX[0]=X0[0]+dX[0]*((float)rand())/rmax;
+    pX[1]=X0[1]+dX[1]*((float)rand())/rmax;
+    pX[2]=X0[2]+dX[2]*((float)rand())/rmax;
 
     pX+=3;
 

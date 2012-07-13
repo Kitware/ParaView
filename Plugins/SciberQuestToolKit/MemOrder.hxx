@@ -181,7 +181,7 @@ void Split(
 {
   // reorder a vtk vector array into contiguous
   // scalar components
-  int nComp=W.size();
+  int nComp=(int)W.size();
   for (size_t i=0; i<n; ++i)
     {
     size_t ii=nComp*i;
@@ -200,7 +200,7 @@ void Interleave(
       T * __restrict__  V)
 {
   // interleave array in contiguous component order
-  int nComp=W.size();
+  int nComp=(int)W.size();
   for (size_t i=0; i<n; ++i)
     {
     size_t ii=nComp*i;

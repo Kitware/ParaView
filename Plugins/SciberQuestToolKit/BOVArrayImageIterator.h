@@ -21,7 +21,7 @@ step.
 class BOVArrayImageIterator
 {
 public:
-  BOVArrayImageIterator(const BOVTimeStepImage *step, int size)
+  BOVArrayImageIterator(const BOVTimeStepImage *step, size_t size)
        :
     Step(step),
     Idx(0),
@@ -36,7 +36,7 @@ public:
   /**
   Advance the iterator.
   */
-  virtual int Next()
+  virtual size_t Next()
     {
     if (this->Idx<this->End)
       {
@@ -66,8 +66,8 @@ private:
 
 protected:
   const BOVTimeStepImage *Step;
-  int Idx;
-  int End;
+  size_t Idx;
+  size_t End;
 };
 
 // Define some specific classes of the iterator

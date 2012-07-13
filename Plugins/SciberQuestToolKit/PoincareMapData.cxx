@@ -154,7 +154,7 @@ void PoincareMapData::SetOutput(vtkDataSet *o)
 }
 
 //-----------------------------------------------------------------------------
-int PoincareMapData::InsertCells(IdBlock *SourceIds)
+vtkIdType PoincareMapData::InsertCells(IdBlock *SourceIds)
 {
   vtkIdType startId=SourceIds->first();
   vtkIdType endId=SourceIds->last();
@@ -185,7 +185,7 @@ int PoincareMapData::InsertCells(IdBlock *SourceIds)
     SourceCells->GetNextCell(nPtIds,ptIds);
 
     // the seed point we will use the center of the cell
-    double seed[3]={0.0};
+    float seed[3]={0.0f,0.0f,0.0f};
     for (vtkIdType pId=0; pId<nPtIds; ++pId)
       {
       vtkIdType idx=3*ptIds[pId];
@@ -195,9 +195,9 @@ int PoincareMapData::InsertCells(IdBlock *SourceIds)
       seed[2]+=pSourcePts[idx+2];
       }
     // finsih the seed point computation (at cell center).
-    seed[0]/=nPtIds;
-    seed[1]/=nPtIds;
-    seed[2]/=nPtIds;
+    seed[0]/=((float)nPtIds);
+    seed[1]/=((float)nPtIds);
+    seed[2]/=((float)nPtIds);
 
     this->Lines[lId]=new FieldLine(seed,this->SourceCellGid+cId);
     this->Lines[lId]->AllocateTrace();
@@ -258,7 +258,7 @@ int PoincareMapData::SyncGeometry()
     pMapPts+=3*nPts;
 
     // update the scalars
-    *pId=this->Lines[i]->GetSeedId();
+    *pId=(int)this->Lines[i]->GetSeedId();
     ++pId;
 
     // build the poly verts

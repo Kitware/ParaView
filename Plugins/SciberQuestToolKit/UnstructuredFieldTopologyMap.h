@@ -70,13 +70,13 @@ public:
   // Description:
   // Convert a list of seed cells (sourceIds) to FieldLine
   // structures and build the output (if any).
-  virtual int InsertCells(IdBlock *SourceIds);
+  virtual vtkIdType InsertCells(IdBlock *SourceIds);
 
 private:
   void ClearSource();
   void ClearOut();
-  int InsertCellsFromGenerator(IdBlock *SourceIds);
-  int InsertCellsFromDataset(IdBlock *SourceIds);
+  vtkIdType InsertCellsFromGenerator(IdBlock *SourceIds);
+  vtkIdType InsertCellsFromDataset(IdBlock *SourceIds);
 
 private:
   typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;

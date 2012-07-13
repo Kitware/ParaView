@@ -71,7 +71,7 @@ public:
   Convert a list of seed cells (sourceIds) to FieldLine
   structures and build the output (if any).
   */
-  virtual int InsertCells(IdBlock *SourceIds);
+  virtual vtkIdType InsertCells(IdBlock *SourceIds);
 
   /**
   Set the global id of cell 0 in this processes source cells.

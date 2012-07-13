@@ -54,7 +54,7 @@ using std::string;
 template<typename T>
 void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
 {
-  noiseThreshold=-fabs(noiseThreshold);
+  noiseThreshold=-T(fabs(noiseThreshold));
 
   for (size_t i=0; i<n; ++i)
     {
@@ -107,7 +107,7 @@ void Agyrotropy(T *pT, T *pV, T *pA, size_t n, T noiseThreshold)
       d*=T(-1);
       }
 
-    pA[i]=T(2)*::sqrt(d)/a;
+    pA[i]=T(2)*T(sqrt(d))/a;
 
     pV+=3;
     pT+=9;

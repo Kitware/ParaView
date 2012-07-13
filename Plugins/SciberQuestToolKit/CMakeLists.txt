@@ -50,13 +50,14 @@ endif()
 #--------------------------------------------------
 # Configuration options
 #--------------------------------------------------
-set(SQTK_CUDA            OFF CACHE BOOL "Enable CUDA optimizations.")
-set(SQTK_PROCESS_MONITOR ON  CACHE BOOL "Build the process monitor.")
+set(SQTK_CUDA OFF CACHE BOOL "Enable CUDA optimizations.")
+mark_as_advanced(SQTK_CUDA)
+
 set(SQTK_PYTHON_BINDINGS OFF CACHE BOOL "Enable Python bindings.")
-mark_as_advanced(SQTK_CUDA SQTK_PROCESS_MONITOR SQTK_PYTHON_BINDINGS)
+mark_as_advanced(SQTK_PYTHON_BINDINGS)
 
 if (BUILD_TESTING)
-  #message(STATUS "Building regression tests.")
+  #message(STATUS "SQTK Building regression tests.")
   #subdirs(Testing)
 endif()
 
@@ -115,14 +116,6 @@ set(SM_CXX_SOURCES
   vtkSQVolumeSource.cxx
   vtkSQVortexFilter.cxx
   )
-
-if (APPLE)
-  set(SQTK_PROCESS_MONITOR OFF)
-endif()
-if (SQTK_PROCESS_MONITOR)
-  message(STATUS "Building process monitor.")
-  set(SM_CXX_SOURCES ${SM_CXX_SOURCES} vtkSQProcessMonitor.cxx)
-endif()
 
 set_source_files_properties(
   vtkSQOOCReader.cxx
@@ -184,41 +177,21 @@ set(CXX_SOURCES
   XMLUtils.cxx
   )
 
-if (SQTK_PROCESS_MONITOR)
+if (WIN32)
   set(CXX_SOURCES
     ${CXX_SOURCES}
-    SystemInterfaceFactory.cxx
-    )
-  if (WIN32)
-    set(CXX_SOURCES
-      ${CXX_SOURCES}
-      WindowsSystemInterface.cxx
-      win_windirent.cxx
-      )
-  elseif (APPLE)
-    set(CXX_SOURCES
-      ${CXX_SOURCES}
-      UnixSystemInterface.cxx
-      OSXSystemInterface.cxx
-      )
-  else()
-    set(CXX_SOURCES
-      ${CXX_SOURCES}
-      UnixSystemInterface.cxx
-      LinuxSystemInterface.cxx
-      )
-  endif()
+    win_windirent.cxx)
 endif()
 
 if (CUDA_FOUND AND SQTK_CUDA)
-  message(STATUS "Including CUDA accelerated filters.")
-  message(STATUS "Cuda ${CUDA_VERSION_STRING} found.")
+  message(STATUS "SQTK Including CUDA accelerated filters.")
+  message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
   set(CUDA_NVCC_FLAGS "-arch=sm_20;--compiler-options;-fPIC" CACHE STRING "nvcc flags")
   set(CUDA_NVCC_DEBUG_FLAGS "-g;-G;" CACHE STRING "nvcc debug flags")
   set(CUDA_NVCC_RELEASE_FLAGS "-O3" CACHE STRING "nvcc release flags")
-  message(STATUS "CUDA_NVCC_FLAGS=${CUDA_NVCC_FLAGS}")
-  message(STATUS "CUDA_NVCC_DEBUG_FLAGS=${CUDA_NVCC_DEBUG_FLAGS}")
-  message(STATUS "CUDA_NVCC_RELEASE_FLAGS=${CUDA_NVCC_FLAGS}")
+  message(STATUS "SQTK CUDA_NVCC_FLAGS=${CUDA_NVCC_FLAGS}")
+  message(STATUS "SQTK CUDA_NVCC_DEBUG_FLAGS=${CUDA_NVCC_DEBUG_FLAGS}")
+  message(STATUS "SQTK CUDA_NVCC_RELEASE_FLAGS=${CUDA_NVCC_FLAGS}")
   set(CU_SOURCES CUDAConvolutionDriver.cu)
   set_property(
     SOURCE ${CU_SOURCES}
@@ -235,7 +208,7 @@ else()
 endif()
 
 if(PARAVIEW_BUILD_QT_GUI)
-  message(STATUS "Including custom panels.")
+  message(STATUS "SQTK Including custom panels.")
   set(_IFACES)
   set(_IFACE_SRCS)
   # Qt custom panels
@@ -307,23 +280,6 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACES ${_IFACES} ${IFACES})
   set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
 
-  if (SQTK_PROCESS_MONITOR)
-    message(STATUS "Building process monitor ui.")
-    QT4_WRAP_CPP(MOC_SRCS pqSQProcessMonitor.h)
-    QT4_WRAP_CPP(MOC_SRCS pqSQRemoteCommandDialog.h)
-    QT4_WRAP_CPP(MOC_SRCS pqSQRemoteSignalDialog.h)
-    QT4_WRAP_UI(UI_SRCS pqSQProcessMonitorForm.ui)
-    QT4_WRAP_UI(UI_SRCS pqSQRemoteCommandDialogForm.ui)
-    QT4_WRAP_UI(UI_SRCS pqSQRemoteSignalDialogForm.ui)
-    ADD_PARAVIEW_OBJECT_PANEL(
-      IFACES IFACE_SRCS
-      CLASS_NAME pqSQProcessMonitor
-      XML_NAME vtkSQProcessMonitor
-      XML_GROUP sources)
-    set(_IFACES ${_IFACES} ${IFACES})
-    set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
-  endif()
-
   set (CXX_SOURCES
     ${CXX_SOURCES}
     ${MOC_SRCS}
@@ -339,14 +295,6 @@ if(PARAVIEW_BUILD_QT_GUI)
     pqSQVolumeSource.cxx
     )
 
-  if (SQTK_PROCESS_MONITOR)
-    set (CXX_SOURCES
-      ${CXX_SOURCES}
-      pqSQProcessMonitor.cxx
-      pqSQRemoteCommandDialog.cxx
-      pqSQRemoteSignalDialog.cxx)
-  endif()
-
 endif (PARAVIEW_BUILD_QT_GUI)
 
 set (SQTK_XML
@@ -361,16 +309,6 @@ set (SQTK_SM_XML
   SciberQuestToolKitSMSources.xml
   SciberQuestToolKitSMFilters.xml)
 
-if (SQTK_PROCESS_MONITOR)
-  set (SQTK_XML
-    ${SQTK_XML}
-    SciberQuestToolKitProcessMonitor.xml)
-
-  set (SQTK_SM_XML
-    ${SQTK_SM_XML}
-    SciberQuestToolKitSMProcessMonitor.xml)
-endif()
-
 # Generate the plugin, servermanager and wrapped language bindings.
 add_paraview_plugin(
   SciberQuestToolKit "${SQTK_VERSION}"
@@ -384,14 +322,10 @@ if (SQTK_CUDA AND CUDA_FOUND)
   target_link_libraries(SciberQuestToolKit CUDAConvolutionDriver)
 endif()
 
-if (WIN32 AND SQTK_PROCESS_MONITOR)
-  target_link_libraries(SciberQuestToolKit Psapi)
-endif()
-
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
 
 if (SQTK_PYTHON_BINDINGS)
-  message(STATUS "generating vtk python bindings.")
+  message(STATUS "SQTK generating vtk python bindings.")
   generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
   install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
   install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})

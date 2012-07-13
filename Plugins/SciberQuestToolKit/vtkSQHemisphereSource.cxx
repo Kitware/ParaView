@@ -48,20 +48,25 @@ void LocateHemisphere(float *pX, size_t nx,double *C, double *N)
   // allign the hemisphere with an aribtrary north and place it
   // an arbitrary center.
 
-  float magN=sqrt(N[0]*N[0]+N[1]*N[1]+N[2]*N[2]);
-  if (magN<1.0e-3)
+  float magN=(float)sqrt(N[0]*N[0]+N[1]*N[1]+N[2]*N[2]);
+  if (magN<1.0e-3f)
     {
     sqErrorMacro(cerr,"Vector magniude must be non-zero.");
     return;
     }
 
   float v[3];
-  v[0]=N[0]/magN;
-  v[1]=N[1]/magN;
-  v[2]=N[2]/magN;
+  v[0]=((float)N[0])/magN;
+  v[1]=((float)N[1])/magN;
+  v[2]=((float)N[2])/magN;
 
-  float p=sqrt(v[0]*v[0]+v[1]*v[1]);
-  if (p<1e-03)
+  float c[3];
+  c[0]=(float)C[0];
+  c[1]=(float)C[1];
+  c[2]=(float)C[2];
+
+  float p=(float)sqrt(v[0]*v[0]+v[1]*v[1]);
+  if (p<1e-03f)
     {
     // North is coincident with z-axis nothing to do.
     return;
@@ -72,15 +77,15 @@ void LocateHemisphere(float *pX, size_t nx,double *C, double *N)
 
   for (size_t i=0; i<nx; ++i)
     {
-    int ii=3*i;
+    size_t ii=3*i;
     float x=pX[ii  ];
     float y=pX[ii+1];
     float z=pX[ii+2];
 
     // rotate twice and translate (see fig 3-7 rogers & adams)
-    pX[ii  ] =  x*q*m - y*l + z*p*m + C[0];
-    pX[ii+1] =  x*q*l + y*m + z*p*l + C[1];
-    pX[ii+2] = -x*p         + z*q   + C[2];
+    pX[ii  ] =  x*q*m - y*l + z*p*m + c[0];
+    pX[ii+1] =  x*q*l + y*m + z*p*l + c[1];
+    pX[ii+2] = -x*p         + z*q   + c[2];
 
     // cerr
     //   << Tuple<float>(x,y,z)
@@ -280,7 +285,7 @@ int vtkSQHemisphereSource::RequestData(
   int nx;
   X=dynamic_cast<vtkFloatArray*>(northPd->GetPoints()->GetData());
   pX=X->GetPointer(0);
-  nx=X->GetNumberOfTuples();
+  nx=(int)X->GetNumberOfTuples();
   LocateHemisphere(pX,nx,this->Center,this->North);
 
 
@@ -301,7 +306,7 @@ int vtkSQHemisphereSource::RequestData(
   // orient it
   X=dynamic_cast<vtkFloatArray*>(southPd->GetPoints()->GetData());
   pX=X->GetPointer(0);
-  nx=X->GetNumberOfTuples();
+  nx=(int)X->GetNumberOfTuples();
   LocateHemisphere(pX,nx,this->Center,this->North);
 
   ss->Delete();

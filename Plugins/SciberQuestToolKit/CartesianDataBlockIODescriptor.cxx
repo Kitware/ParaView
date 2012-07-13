@@ -138,8 +138,8 @@ void CartesianDataBlockIODescriptor::Clear()
 //-----------------------------------------------------------------------------
 ostream &operator<<(ostream &os,const CartesianDataBlockIODescriptor &descr)
 {
-  int n=descr.MemViews.size();
-  for (int i=0; i<n; ++i)
+  size_t n=descr.MemViews.size();
+  for (size_t i=0; i<n; ++i)
     {
     os << "    " << descr.FileViews[i] << " -> " << descr.MemViews[i] << endl;
     }

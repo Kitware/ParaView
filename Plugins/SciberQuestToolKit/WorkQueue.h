@@ -32,8 +32,7 @@ public:
       b.first()=b.size()=0;
       return 0;
       }
-    int
-    next_at=min(m_at+size,m_end);
+    int next_at=min(m_at+size,m_end);
     size=next_at-m_at;
     b.first()=m_at;
     b.size()=size;

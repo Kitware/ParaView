@@ -71,8 +71,8 @@ vtkPVXMLElement *GetOptionalElement(
 //*****************************************************************************
 istream &Delim(istream &s,char c)
 {
-    char w=s.peek();
-    while (s && (w=s.peek()) && (s.peek()==c))
+    char w=(char)s.peek();
+    while (s && (w=((char)s.peek())) && (((char)s.peek())==c))
     {
         s.get();
     }

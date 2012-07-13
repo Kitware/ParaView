@@ -72,8 +72,7 @@ void FieldLine::GetDisplacement(float *d)
   float s[3]={
       this->Seed[0],
       this->Seed[1],
-      this->Seed[2]
-      };
+      this->Seed[2]};
 
   vtkIdType np;
   float *p0=s;
