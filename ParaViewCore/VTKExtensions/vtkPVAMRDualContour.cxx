@@ -79,6 +79,7 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
   this->IsoValue = (this->VolumeFractionSurfaceValue *
                     PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR);
 
+  this->InitializeRequest (hbdsInput);
   size_t noOfArrays = this->Implementation->CellArrays.size();
   for(size_t i = 0; i < noOfArrays; i++)
     {
@@ -92,6 +93,7 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
       out->Delete();
       }
     }
+  this->FinalizeRequest ();
 
   return 1;
 }

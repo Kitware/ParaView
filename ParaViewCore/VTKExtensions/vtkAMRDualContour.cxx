@@ -655,8 +655,10 @@ int vtkAMRDualContour::RequestData(
     }
   const char *arrayNameToProcess = inArrayInfo->Get(vtkDataObject::FIELD_NAME());
 
+  this->InitializeRequest (hbdsInput);
   vtkMultiBlockDataSet* out =
     this->DoRequestData(hbdsInput, arrayNameToProcess);
+  this->FinalizeRequest ();
 
   if(out)
     {
@@ -671,17 +673,8 @@ int vtkAMRDualContour::RequestData(
   return 1;
 }
 
-vtkMultiBlockDataSet*
-vtkAMRDualContour::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
-                              const char* arrayNameToProcess)
+void vtkAMRDualContour::InitializeRequest (vtkNonOverlappingAMR* hbdsInput) 
 {
-  vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::New();
-  mbdsOutput0->SetNumberOfBlocks(1);
-  vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
-  mbdsOutput0->SetBlock(0,mpds);
-
-  mpds->SetNumberOfPieces(0);
-
   if(this->Helper)
     {
     this->Helper->Delete();
@@ -698,9 +691,27 @@ vtkAMRDualContour::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
     {
     this->Helper->SetController(NULL);
     }
+  this->Helper->Initialize(hbdsInput);
+}
 
-  // @TODO: Check if this is the right thing to do.
-  this->Helper->Initialize(hbdsInput, arrayNameToProcess);
+void vtkAMRDualContour::FinalizeRequest ()
+{
+  this->Helper->Delete();
+  this->Helper = 0;
+}
+
+vtkMultiBlockDataSet*
+vtkAMRDualContour::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
+                              const char* arrayNameToProcess)
+{
+  this->Helper->SetupData(hbdsInput, arrayNameToProcess);
+
+  vtkMultiBlockDataSet* mbdsOutput0 = vtkMultiBlockDataSet::New();
+  mbdsOutput0->SetNumberOfBlocks(1);
+  vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
+  mbdsOutput0->SetBlock(0,mpds);
+
+  mpds->SetNumberOfPieces(0);
 
   this->Mesh = vtkPolyData::New();
   this->Points = vtkPoints::New();
@@ -742,8 +753,6 @@ vtkAMRDualContour::DoRequestData(vtkNonOverlappingAMR* hbdsInput,
   this->Faces = 0;
 
   mpds->Delete();
-  this->Helper->Delete();
-  this->Helper = 0;
 
   return mbdsOutput0;
 }
