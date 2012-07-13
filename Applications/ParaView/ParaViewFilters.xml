@@ -146,6 +146,7 @@
   <Proxy group="filters" name="OutlineFilter" />
   <Proxy group="filters" name="ParticlePathLines" />
   <Proxy group="filters" name="ParticleTracer" />
+  <Proxy group="filters" name="PassArrays" />
   <Proxy group="filters" name="PlotAttributes" />
   <Proxy group="filters" name="PlotOnIntersectionCurves" />
   <Proxy group="filters" name="PlotOnSortedLines" />
