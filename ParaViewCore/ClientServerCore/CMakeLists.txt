@@ -65,7 +65,9 @@ SET (Kit_SRCS
   vtkPVDataInformationHelper.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
+  vtkPVDisableStackTraceSignalHandler.cxx
   vtkPVDisplayInformation.cxx
+  vtkPVEnableStackTraceSignalHandler.cxx
   vtkPVEnvironmentInformation.cxx
   vtkPVEnvironmentInformationHelper.cxx
   vtkPVExtractSelection.cxx
@@ -76,6 +78,7 @@ SET (Kit_SRCS
   vtkPVInformation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMemoryUseInformation.cxx
   vtkPVMultiClientsInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVOptions.cxx
@@ -103,6 +106,7 @@ SET (Kit_SRCS
   vtkPVSingleOutputExtractSelection.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
+  vtkPVSystemConfigInformation.cxx
   vtkPVSystemInformation.cxx
   vtkPVTemporalDataInformation.cxx
   vtkPVTimerInformation.cxx
