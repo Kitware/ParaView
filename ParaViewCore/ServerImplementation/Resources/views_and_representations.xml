@@ -1298,23 +1298,29 @@
             <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
             <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
             <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+            <Property exposed_name="CubeAxesUseDefaultXTitle" name="UseDefaultXTitle" />
             <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
             <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
             <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
             <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
             <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+            <Property exposed_name="CubeAxesUseDefaultYTitle" name="UseDefaultYTitle" />
             <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
             <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
             <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
             <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
             <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+            <Property exposed_name="CubeAxesUseDefaultZTitle" name="UseDefaultZTitle" />
             <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
             <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
             <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
             <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+            <Property exposed_name="CubeAxesGridLineLocation" name="GridLineLocation" />
             <Property name="DataBounds" />
             <Property name="CustomBounds"/>
             <Property name="CustomBoundsActive"/>
+            <Property name="CustomRange"/>
+            <Property name="CustomRangeActive"/>
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3214,9 +3220,23 @@
         default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="CustomRange"
+        command="SetCustomRange"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="CustomBoundsActive"
         command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CustomRangeActive"
+        command="SetCustomRangeActive"
         number_of_elements="3"
         default_values="0 0 0">
       </IntVectorProperty>
@@ -3242,6 +3262,22 @@
         <Documentation>
           Specify a mode to control how the axes are drawn: either static,
           closest triad, furthest triad or outer edges in relation to the
+          camera position.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GridLineLocation"
+        command="SetGridLineLocation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="All Faces" value="0" />
+          <Entry text="Closest Faces" value="1" />
+          <Entry text="Furthest Faces" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify a mode to control how the grid lines of the axes are drawn: either on the
+          closest faces, furthest faces or on all the faces in relation to the
           camera position.
         </Documentation>
       </IntVectorProperty>
@@ -3296,6 +3332,36 @@
           Set the title for the Z axis.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty  name="UseDefaultXTitle"
+        command="SetUseDefaultXTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if X axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="UseDefaultYTitle"
+        command="SetUseDefaultYTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Y axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="UseDefaultZTitle"
+        command="SetUseDefaultZTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Z axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
 
       <IntVectorProperty  name="XAxisVisibility"
         command="SetXAxisVisibility"
