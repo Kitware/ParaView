@@ -121,6 +121,12 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
   this->onCuesChanged();
   this->onAnimationTimePropertyChanged();
 
+  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
+  connector->Connect(
+        timekeeper->getProxy()->GetProperty("TimeLabel"),
+        vtkCommand::ModifiedEvent,
+        this, SIGNAL(timeLabelChanged()));
+
   // Initialize the time keeper.
   this->setupTimeTrack();
 }

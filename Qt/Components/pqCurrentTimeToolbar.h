@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QLineEdit;
 class QSpinBox;
+class QLabel;
 class pqAnimationScene;
 
 /// pqCurrentTimeToolbar is a toolbar that shows the current animation time.
@@ -74,6 +75,9 @@ protected slots:
 
   /// Update range for the spin box.
   void onTimeStepsChanged();
+
+  /// Update the label text
+  void onTimeLabelChanged();
   
 signals:
   /// emitted to request the scene to change it's animation time.
@@ -82,6 +86,7 @@ signals:
 protected:
   QLineEdit* TimeLineEdit;
   QSpinBox* TimeSpinBox;
+  QLabel* TimeLabel;
 
 private:
   pqCurrentTimeToolbar(const pqCurrentTimeToolbar&); // Not implemented.

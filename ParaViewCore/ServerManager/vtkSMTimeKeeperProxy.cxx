@@ -44,6 +44,7 @@ void vtkSMTimeKeeperProxy::CreateVTKObjects()
       {
       tk->SetTimestepValuesProperty(this->GetProperty("TimestepValues"));
       tk->SetTimeRangeProperty(this->GetProperty("TimeRange"));
+      tk->SetTimeLabelProperty(this->GetProperty("TimeLabel"));
       }
     }
 }

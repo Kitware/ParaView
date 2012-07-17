@@ -312,8 +312,10 @@ void pqProxyInformationWidget::fillDataInformation(
   if (dataInformation->GetHasTime())
     {
     this->Ui->dataTimeLabel->setVisible(true);
+    const char* timeLabel = dataInformation->GetTimeLabel();
     this->Ui->dataTimeLabel->setText(
-      QString("Current data time: %1").arg(dataInformation->GetTime()));
+          QString("Current data %2: %1")
+          .arg(dataInformation->GetTime()).arg(timeLabel ? timeLabel : "time"));
     }
 
   vtkPVDataSetAttributesInformation* info[6];

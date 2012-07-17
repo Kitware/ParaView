@@ -85,6 +85,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
   this->Time = 0.0;
+  this->TimeLabel = NULL;
 
   this->PortNumber = -1;
 }
@@ -110,6 +111,7 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->PointArrayInformation = NULL;
   this->SetDataClassName(0);
   this->SetCompositeDataClassName(0);
+  this->SetTimeLabel(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -176,6 +178,11 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeSpan: "
      << this->TimeSpan[0] << ", " << this->TimeSpan[1]
      << endl;
+
+  if(this->TimeLabel)
+    {
+    os << indent << "TimeLabel: " << this->TimeLabel << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -235,6 +242,7 @@ void vtkPVDataInformation::Initialize()
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
   this->HasTime = 0;
   this->Time = 0.0;
+  this->SetTimeLabel(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -288,6 +296,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo,
   timespan = dataInfo->GetTimeSpan();
   this->TimeSpan[0] = timespan[0];
   this->TimeSpan[1] = timespan[1];
+  this->SetTimeLabel(dataInfo->GetTimeLabel());
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +371,11 @@ void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data, vtkInformatio
     this->TimeSpan[0] = times[0];
     this->TimeSpan[1] = times[1];
     }
+
+  this->SetTimeLabel(
+        (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION()))
+        ? pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION())
+        : NULL);
 
   vtkInformation *dinfo = data->GetInformation();
   if (dinfo->Has(vtkDataObject::DATA_TIME_STEP()))
@@ -859,6 +873,8 @@ void vtkPVDataInformation::AddInformation(
     this->Time = info->GetTime();
     this->HasTime = 1;
     }
+
+  this->SetTimeLabel(info->GetTimeLabel());
 }
 
 //----------------------------------------------------------------------------
@@ -1048,6 +1064,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << this->PolygonCount
        << this->Time
        << this->HasTime
+       << this->TimeLabel
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
 
@@ -1186,6 +1203,13 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing has-time.");
     return;
     }
+  const char* timeLabel = 0;
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &timeLabel))
+    {
+    vtkErrorMacro("Error parsing time label.");
+    return;
+    }
+  this->SetTimeLabel(timeLabel);
   if(!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Bounds, 6))
     {
     vtkErrorMacro("Error parsing bounds.");

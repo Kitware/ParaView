@@ -56,6 +56,7 @@
 
       <DoubleVectorProperty
          name="OrientedBoundingBox"
+         label="Oriented bounds"
          command="SetOrientedBoundingBox"
          number_of_elements="6"
          default_values="-0.5 0.5 -0.5 0.5 -0.5 0.5"
@@ -104,6 +105,7 @@
 
      <IntVectorProperty
         name="EnableCustomBase"
+        label="Use Base"
         command="SetEnableCustomBase"
         number_of_elements="1"
         default_values="0"
@@ -113,6 +115,7 @@
 
      <IntVectorProperty
         name="EnableCustomBounds"
+        label="Use Bounds"
         command="SetEnableCustomBounds"
         number_of_elements="1"
         default_values="0"
@@ -122,6 +125,7 @@
 
      <IntVectorProperty
         name="EnableCustomTitle"
+        label="Use Titles"
         command="SetEnableCustomTitle"
         number_of_elements="1"
         default_values="0"
@@ -131,6 +135,7 @@
 
      <IntVectorProperty
         name="EnableCustomOrigin"
+        label="Axes Origin"
         command="SetEnableCustomOrigin"
         number_of_elements="1"
         default_values="0"
@@ -138,6 +143,43 @@
         <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
+     <IntVectorProperty
+        name="EnableTimeLabel"
+        label="Use Time label"
+        command="SetEnableTimeLabel"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+    <!-- Needed to provide time annotation -->
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty
+       name="TimeLabel"
+       command="SetTimeLabel"
+       number_of_elements="1"
+       default_values="Time"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the text to use for time label.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="TimeLabelAnnotation"
+       information_only="1" si_class="vtkSITimeLabelProperty">
+     </StringVectorProperty>
 
    <!-- End Sphere -->
    </SourceProxy>

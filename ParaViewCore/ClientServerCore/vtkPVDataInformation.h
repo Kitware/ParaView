@@ -172,6 +172,10 @@ public:
   vtkGetMacro(Time, double);
 
   // Description:
+  // Returns the label that should be used instead of "time"
+  vtkGetStringMacro(TimeLabel);
+
+  // Description:
   // Returns if the data type is structured.
   int IsDataStructured();
 
@@ -214,6 +218,9 @@ protected:
 
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
+
+  char*          TimeLabel;
+  vtkSetStringMacro(TimeLabel);
 
   char*          CompositeDataClassName;
   vtkSetStringMacro(CompositeDataClassName);

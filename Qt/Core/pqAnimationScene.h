@@ -146,6 +146,9 @@ signals:
   /// Emitted when the number of timesteps changes
   void timeStepsChanged();
 
+  /// Emitted when a source is changing the label that should be use for time
+  void timeLabelChanged();
+
 public slots:
   /// Play animation.
   void play();

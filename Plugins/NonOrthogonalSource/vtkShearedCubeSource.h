@@ -85,12 +85,27 @@ public:
   vtkGetMacro(EnableCustomOrigin, int);
 
 
+  // Description:
+  // Enable/Disable field generation for label that will be used for "Time:"
+  vtkSetMacro(EnableTimeLabel, int);
+  vtkGetMacro(EnableTimeLabel, int);
+
+  // Description:
+  // Specify custom Time label
+  vtkSetStringMacro(TimeLabel);
+  vtkGetStringMacro(TimeLabel);
+
 protected:
   vtkShearedCubeSource();
   ~vtkShearedCubeSource();
 
   void UpdateMetaData(vtkDataSet* ds);
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+
+  // Needed for time label annotation
+  virtual int RequestInformation(vtkInformation *info,
+                                 vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector);
 
   double BaseU[3];
   double BaseV[3];
@@ -100,11 +115,13 @@ protected:
   char* AxisUTitle;
   char* AxisVTitle;
   char* AxisWTitle;
+  char* TimeLabel;
 
   int EnableCustomBase;
   int EnableCustomBounds;
   int EnableCustomTitle;
   int EnableCustomOrigin;
+  int EnableTimeLabel;
 
 private:
   vtkShearedCubeSource(const vtkShearedCubeSource&);  // Not implemented.
