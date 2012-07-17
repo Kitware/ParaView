@@ -182,7 +182,6 @@ SET (Kit_SRCS
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkSurfaceVectors.cxx
-  vtkTableFFT.cxx
   vtkTexturePainter.cxx
   vtkTilesHelper.cxx
   vtkTileDisplayHelper.cxx
