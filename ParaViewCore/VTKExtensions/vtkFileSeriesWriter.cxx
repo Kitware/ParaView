@@ -200,25 +200,18 @@ void vtkFileSeriesWriter::WriteATimestep(vtkDataObject* input,
   vtkSmartPointer<vtkDataObject> clone;
   clone.TakeReference(input->NewInstance());
   clone->ShallowCopy(input);
-  //if(inInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT &&
+
+  vtkPVTrivialProducer* tp  = vtkPVTrivialProducer::New();
+  tp->SetOutput(clone);
   if(inInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()))
     {
-    // vtkPVTrivialProducer* trivialProducer =
-    //   vtkPVTrivialProducer::New();
-    // trivialProducer->SetOutput(clone);
-    // trivialProducer->FastDelete();
-    // int extent[6];
-    // inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
-    // trivialProducer->SetWholeExtent(extent);
-    // trivialProducer->GatherExtents();
-
-//     clone->GetInformation()->Set(
-//       vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
+    int wholeExtent[6];
+    inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), wholeExtent);
+    tp->SetWholeExtent(wholeExtent);
+    tp->GatherExtents();
     }
-  vtkTrivialProducer* tp  = vtkTrivialProducer::New();
-  tp->SetOutput(clone);
   this->Writer->SetInputConnection(tp->GetOutputPort());
-  tp->Delete();
+  tp->FastDelete();
   this->SetWriterFileName(fname.str().c_str());
   this->WriteInternal();
   this->Writer->SetInputConnection(0);
