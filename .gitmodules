@@ -10,9 +10,6 @@
 [submodule "ThirdParty/protobuf/vtkprotobuf"]
 	path = ThirdParty/protobuf/vtkprotobuf
 	url = git://public.kitware.com/protobuf.git
-[submodule "ThirdParty/Xdmf2/vtkxdmf2"]
-	path = ThirdParty/Xdmf2/vtkxdmf2
-	url = git://paraview.org/Xdmf.git
 [submodule "ThirdParty/QtTesting/vtkqttesting"]
 	path = ThirdParty/QtTesting/vtkqttesting
 	url = git://paraview.org/QtTesting.git

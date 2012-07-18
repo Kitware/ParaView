@@ -344,7 +344,6 @@ else()
     Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
-#    ThirdParty/Xdmf2
 
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
