@@ -134,6 +134,7 @@ ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
 SET (PVBATCH_TESTS
   Simple
+  ParallelImageWriter
   ParallelSerialWriter
 )
 
