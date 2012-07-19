@@ -368,15 +368,20 @@ void pqPythonMacroSupervisor::onMacroTriggered()
 void pqPythonMacroSupervisor::onDeleteMacroTriggered()
 {
   QObject* action = this->sender();
+  QList<QString> listOfMacroToDelete;
   QMap<QString, QPointer<QAction> >::const_iterator itr = this->Internal->DeleteActionMap.constBegin();
   for ( ; itr != this->Internal->DeleteActionMap.constEnd(); ++itr)
     {
     if (itr.value() == action)
       {
       QString filename = itr.key();
-      pqPythonMacroSupervisor::removeStoredMacro(filename);
-      pqPythonMacroSupervisor::removeMacro(filename);
+      listOfMacroToDelete.append(filename);
       }
+    }
+  foreach(QString fileName, listOfMacroToDelete)
+    {
+    pqPythonMacroSupervisor::removeStoredMacro(fileName);
+    pqPythonMacroSupervisor::removeMacro(fileName);
     }
 }
 //----------------------------------------------------------------------------
