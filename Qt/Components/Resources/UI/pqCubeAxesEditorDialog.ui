@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>578</height>
+    <height>601</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -144,7 +144,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QGroupBox" name="CubeAxesXCustomBounds">
          <property name="title">
           <string>Custom Bounds</string>
@@ -223,7 +223,7 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QGroupBox" name="CubeAxesXCustomRange">
          <property name="title">
           <string>Custom Range</string>
@@ -242,6 +242,13 @@
            <widget class="QLineEdit" name="CubeAxesXCustomRangeMax"/>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="UseOriginalBoundsRangeForX">
+         <property name="text">
+          <string>Original Bounds as Range</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -279,7 +286,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QGroupBox" name="CubeAxesYCustomBounds">
          <property name="title">
           <string>Custom Bounds</string>
@@ -358,7 +365,7 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QGroupBox" name="CubeAxesYCustomRange">
          <property name="title">
           <string>Custom Range</string>
@@ -377,6 +384,13 @@
            <widget class="QLineEdit" name="CubeAxesYCustomRangeMax"/>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="UseOriginalBoundsRangeForY">
+         <property name="text">
+          <string>Original Bounds as Range</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -414,7 +428,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QGroupBox" name="CubeAxesZCustomBounds">
          <property name="title">
           <string>Custom Bounds</string>
@@ -493,7 +507,7 @@
          </layout>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QGroupBox" name="CubeAxesZCustomRange">
          <property name="title">
           <string>Custom Range</string>
@@ -512,6 +526,13 @@
            <widget class="QLineEdit" name="CubeAxesZCustomRangeMax"/>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="UseOriginalBoundsRangeForZ">
+         <property name="text">
+          <string>Original Bounds as Range</string>
+         </property>
         </widget>
        </item>
       </layout>

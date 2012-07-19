@@ -71,6 +71,11 @@ public:
   vtkGetVector3Macro(CustomRangeActive, int);
 
   // Description:
+  // Get/Set whether to use original data bounds as range for a particular dimension.
+  vtkSetVector3Macro(OriginalBoundsRangeActive, int);
+  vtkGetVector3Macro(OriginalBoundsRangeActive, int);
+
+  // Description:
   // Get/Set custom range to use. When corresponding CustomRangeActive is
   // true, the data bounds will be ignored for that direction and CustomBounds
   // will be used instead.
@@ -189,6 +194,7 @@ protected:
   double Orientation[3];
   double CustomBounds[6];
   int CustomBoundsActive[3];
+  int OriginalBoundsRangeActive[3];
   double CustomRange[6];
   int CustomRangeActive[3];
   double DataBounds[6];

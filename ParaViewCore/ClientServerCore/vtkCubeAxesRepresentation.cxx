@@ -67,6 +67,9 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
 
   this->UserXTitle = this->UserYTitle = this->UserZTitle = NULL;
   this->UseDefaultXTitle = this->UseDefaultYTitle = this->UseDefaultZTitle = 1;
+  this->OriginalBoundsRangeActive[0] = 0;
+  this->OriginalBoundsRangeActive[1] = 0;
+  this->OriginalBoundsRangeActive[2] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -392,17 +395,29 @@ void vtkCubeAxesRepresentation::UpdateBounds()
   for ( int i=0; i < 3; ++i)
     {
     int pos = i * 2;
+    double* bp = NULL;
     if ( this->CustomRangeActive[i] )
       {
-      if(i == 0) this->CubeAxesActor->SetXAxisRange(&this->CustomRange[pos]);
-      if(i == 1) this->CubeAxesActor->SetYAxisRange(&this->CustomRange[pos]);
-      if(i == 2) this->CubeAxesActor->SetZAxisRange(&this->CustomRange[pos]);
+      bp = &this->CustomRange[pos];
       }
     else if (this->UseBoundsRangeAsLabel && !this->UseOrientedBounds)
       {
-      if(i == 0) this->CubeAxesActor->SetXAxisRange(&bds[pos]);
-      if(i == 1) this->CubeAxesActor->SetYAxisRange(&bds[pos]);
-      if(i == 2) this->CubeAxesActor->SetZAxisRange(&bds[pos]);
+      if(this->OriginalBoundsRangeActive[i] == 0)
+        {
+        bp = &bds[pos];
+        }
+      else
+        {
+        bp = &this->DataBounds[pos];
+        }
+      }
+
+    // Use the proper SetRange method
+    switch(i)
+      {
+    case 0: this->CubeAxesActor->SetXAxisRange(bp); break;
+    case 1: this->CubeAxesActor->SetYAxisRange(bp); break;
+    case 2: this->CubeAxesActor->SetZAxisRange(bp); break;
       }
     }
 }

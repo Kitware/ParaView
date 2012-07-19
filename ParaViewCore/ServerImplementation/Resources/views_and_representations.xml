@@ -1319,6 +1319,7 @@
             <Property name="DataBounds" />
             <Property name="CustomBounds"/>
             <Property name="CustomBoundsActive"/>
+            <Property name="OriginalBoundsRangeActive"/>
             <Property name="CustomRange"/>
             <Property name="CustomRangeActive"/>
           </PropertyGroup>
@@ -3230,6 +3231,13 @@
       <IntVectorProperty
         name="CustomBoundsActive"
         command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="OriginalBoundsRangeActive"
+        command="SetOriginalBoundsRangeActive"
         number_of_elements="3"
         default_values="0 0 0">
       </IntVectorProperty>
