@@ -87,7 +87,7 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
       widget->setView(this->view());
       widget->select();
       this->addPropertyLink(widget,
-        smProxy->GetPropertyName(smProperty),
+        "proxy",
         SIGNAL(proxyChanged(pqSMProxy)),
         smProperty);
       this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
