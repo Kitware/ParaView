@@ -28,6 +28,7 @@ ENDMACRO(paraview_build_optional_plugin)
 
 paraview_build_optional_plugin(EyeDomeLighting "EyeDomeLighting" EyeDomeLighting OFF)
 paraview_build_optional_plugin(Manta "Manta ray traced rendering" Manta OFF)
+paraview_build_optional_plugin(MultiSliceView "Multi-Slice 3D view rendering" MultiSliceView ON)
 paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields" Moments ON)
 paraview_build_optional_plugin(NonOrthogonalSource "Non Orthogonal Source code sample" NonOrthogonalSource ON)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)

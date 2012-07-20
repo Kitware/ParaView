@@ -1,0 +1,95 @@
+<ServerManagerConfiguration>
+   <ProxyGroup name="views">
+      <RenderViewProxy name="MultiSlice" class="vtkPVRenderView"
+         processes="client|renderserver|dataserver"
+         base_proxygroup="views" base_proxyname="RenderView"
+         representation_name="vtkMultiSliceRepresentation">
+      </RenderViewProxy>
+   </ProxyGroup>
+
+   <!-- ================================================================== -->
+
+   <ProxyGroup name="representations">
+      <RepresentationProxy name="MultiSliceRepresentation"
+                           class="vtkMultiSliceRepresentation"
+                           processes="client|renderserver|dataserver"
+                           base_proxygroup="representations"
+                           base_proxyname="SurfaceRepresentation">
+
+
+         <DoubleVectorProperty name="XSlicesValues"
+                               command="SetSliceX"
+                               repeat_command="1"
+                               set_number_command="SetNumberOfSliceX"
+                               number_of_elements_per_command="1"
+                               use_index="1"/>
+
+         <DoubleVectorProperty name="YSlicesValues"
+                               command="SetSliceY"
+                               repeat_command="1"
+                               set_number_command="SetNumberOfSliceY"
+                               number_of_elements_per_command="1"
+                               use_index="1"/>
+
+         <DoubleVectorProperty name="ZSlicesValues"
+                               command="SetSliceZ"
+                               repeat_command="1"
+                               set_number_command="SetNumberOfSliceZ"
+                               number_of_elements_per_command="1"
+                               use_index="1"/>
+      </RepresentationProxy>
+
+      <!-- ================================================================== -->
+
+      <Extension name="GeometryRepresentation">
+        <RepresentationType subproxy="MultiSliceRepresentation" text="Multi Slices" subtype="Surface" />
+        <SubProxy>
+          <Proxy name="MultiSliceRepresentation"
+            proxygroup="representations" proxyname="MultiSliceRepresentation" />
+            <ShareProperties subproxy="SurfaceRepresentation">
+              <Exception name="Visibility" />
+              <Exception name="Representation" />
+            </ShareProperties>
+            <ExposedProperties>
+              <Property name="XSlicesValues"/>
+              <Property name="YSlicesValues"/>
+              <Property name="ZSlicesValues"/>
+            </ExposedProperties>
+        </SubProxy>
+      </Extension>
+
+      <Extension name="UnstructuredGridRepresentation">
+        <RepresentationType subproxy="MultiSliceRepresentation" text="Multi Slices" subtype="Surface" />
+        <SubProxy>
+          <Proxy name="MultiSliceRepresentation"
+            proxygroup="representations" proxyname="MultiSliceRepresentation" />
+            <ShareProperties subproxy="SurfaceRepresentation">
+              <Exception name="Visibility" />
+              <Exception name="Representation" />
+            </ShareProperties>
+            <ExposedProperties>
+              <Property name="XSlicesValues"/>
+              <Property name="YSlicesValues"/>
+              <Property name="ZSlicesValues"/>
+            </ExposedProperties>
+        </SubProxy>
+      </Extension>
+
+      <Extension name="UniformGridRepresentation">
+        <RepresentationType subproxy="MultiSliceRepresentation" text="Multi Slices" subtype="Surface" />
+        <SubProxy>
+          <Proxy name="MultiSliceRepresentation"
+            proxygroup="representations" proxyname="MultiSliceRepresentation" />
+            <ShareProperties subproxy="SurfaceRepresentation">
+              <Exception name="Visibility" />
+              <Exception name="Representation" />
+            </ShareProperties>
+            <ExposedProperties>
+              <Property name="XSlicesValues"/>
+              <Property name="YSlicesValues"/>
+              <Property name="ZSlicesValues"/>
+            </ExposedProperties>
+        </SubProxy>
+      </Extension>
+   </ProxyGroup>
+</ServerManagerConfiguration>
