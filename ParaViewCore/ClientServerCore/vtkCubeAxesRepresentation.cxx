@@ -400,16 +400,14 @@ void vtkCubeAxesRepresentation::UpdateBounds()
       {
       bp = &this->CustomRange[pos];
       }
-    else if (this->UseBoundsRangeAsLabel && !this->UseOrientedBounds)
+    else if ( this->UseBoundsRangeAsLabel && !this->UseOrientedBounds &&
+              this->OriginalBoundsRangeActive[i] != 0)
       {
-      if(this->OriginalBoundsRangeActive[i] == 0)
-        {
-        bp = &bds[pos];
-        }
-      else
-        {
-        bp = &this->DataBounds[pos];
-        }
+      bp = &this->DataBounds[pos];
+      }
+    else // Default setup
+      {
+      bp = &bds[pos];
       }
 
     // Use the proper SetRange method
