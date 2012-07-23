@@ -107,10 +107,6 @@ public:
   virtual void SetVisibility(bool visible);
 
   // Description:
-  // Allow user to specify custom XYZAxisRanges based on arbitrary number
-  virtual void EnableCustomAxisRange(bool useCustomRange);
-
-  // Description:
   // Enable/Disable the usage of the FieldData to override the XTitle value.
   vtkSetMacro(UseDefaultXTitle,int);
   vtkGetMacro(UseDefaultXTitle,int);
@@ -148,19 +144,16 @@ public:
   virtual void SetXAxisTickVisibility(int val);
   virtual void SetXAxisMinorTickVisibility(int val);
   virtual void SetDrawXGridlines(int val);
-  virtual void SetXAxisRange(double min, double max);
 
   virtual void SetYAxisVisibility(int val);
   virtual void SetYAxisTickVisibility(int val);
   virtual void SetYAxisMinorTickVisibility(int val);
   virtual void SetDrawYGridlines(int val);
-  virtual void SetYAxisRange(double min, double max);
 
   virtual void SetZAxisVisibility(int val);
   virtual void SetZAxisTickVisibility(int val);
   virtual void SetZAxisMinorTickVisibility(int val);
   virtual void SetDrawZGridlines(int val);
-  virtual void SetZAxisRange(double min, double max);
 
   virtual void SetGridLineLocation(int val);
 //BTX
@@ -198,7 +191,6 @@ protected:
   double CustomRange[6];
   int CustomRangeActive[3];
   double DataBounds[6];
-  bool UseBoundsRangeAsLabel;
   bool UseOrientedBounds;
   int UseDefaultXTitle;
   int UseDefaultYTitle;
