@@ -120,6 +120,7 @@
 
       <IntVectorProperty name="InteractionMode"
         command="SetInteractionMode"
+        state_ignored="1"
         number_of_elements="1"
         default_values="0">
         <EnumerationDomain name="enum">
@@ -641,6 +642,7 @@
            compatibility as it will override by default the interaction mode -->
       <IntVectorProperty name="InteractionMode"
         command="SetInteractionMode"
+        state_ignored="1"
         number_of_elements="1"
         override="1"
         default_values="1">
