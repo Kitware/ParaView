@@ -227,7 +227,7 @@ int vtkGeometryRepresentation::ProcessViewRequest(
 
     // Tell the view if this representation needs ordered compositing. We need
     // ordered compositing when rendering translucent geometry. 
-    if (this->Actor->GetProperty()->GetOpacity() < 1.0)
+    if (this->Actor->HasTranslucentPolygonalGeometry())
       {
       // We need to extend this condition to consider translucent LUTs once we
       // start supporting them,

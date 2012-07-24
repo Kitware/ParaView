@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
+#include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -389,9 +390,6 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
           this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"),
           vtkCommand::ModifiedEvent, this, SLOT(handleEnableOpacityMappingChanged()));
       }
-
-    // update opacity mapping gui elements
-    this->handleEnableOpacityMappingChanged();
     }
 
   // Disable the gui elements if the color map is null.
@@ -404,6 +402,9 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
     this->Form->ShowColorLegend->setEnabled(renderModule != 0);
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
     }
+
+  // update opacity mapping gui elements
+  this->handleEnableOpacityMappingChanged();
 }
 
 void pqColorScaleEditor::pushColors()
@@ -513,6 +514,8 @@ void pqColorScaleEditor::handleEnableOpacityMappingChanged()
 
     this->Form->EnableOpacityFunction->setCheckState(
       enabled ? Qt::Checked : Qt::Unchecked);
+
+    this->Form->frameOpacity->setVisible(enabled);
 }
 
 void pqColorScaleEditor::handleOpacityPointsChanged()
@@ -1483,6 +1486,28 @@ void pqColorScaleEditor::initColorScale()
   if(this->Display)
     {
     this->OpacityFunction = this->Display->getScalarOpacityFunction();
+
+    if(this->OpacityFunction)
+      {
+      // the representation has a built-in opacity function which
+      // cannot be disabled, so don't show the check box
+      this->Form->EnableOpacityFunction->setVisible(false);
+      }
+    else
+      {
+      pqScalarsToColors *colorMap = this->Display->getLookupTable();
+      pqServerManagerModel* smmodel =
+          pqApplicationCore::instance()->getServerManagerModel();
+      pqSMProxy opacityFunctionProxy =
+        pqSMAdaptor::getProxyProperty(
+          colorMap->getProxy()->GetProperty("ScalarOpacityFunction"));
+      if(opacityFunctionProxy.GetPointer())
+        {
+        this->OpacityFunction =
+          smmodel->findItem<pqScalarOpacityFunction*>(opacityFunctionProxy);
+        this->Form->EnableOpacityFunction->setVisible(true);
+        }
+      }
     }
 
   bool usingOpacity = this->OpacityFunction != 0;
@@ -1499,10 +1524,13 @@ void pqColorScaleEditor::initColorScale()
     this->Form->Listener->Connect(
         this->OpacityFunction->getProxy()->GetProperty("Points"),
         vtkCommand::ModifiedEvent, this, SLOT(handleOpacityPointsChanged()));
-    this->Form->ReprLinks.addPropertyLink(
-      this->Form->ScalarOpacityUnitDistance, "text", SIGNAL(editingFinished()),
-      this->Display->getProxy(),
-      this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"));
+    if(this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"))
+      {
+      this->Form->ReprLinks.addPropertyLink(
+        this->Form->ScalarOpacityUnitDistance, "text", SIGNAL(editingFinished()),
+        this->Display->getProxy(),
+        this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"));
+      }
     }
   else
     {
@@ -2221,6 +2249,7 @@ void pqColorScaleEditor::setEnableOpacityMapping(int enable)
     bool enabled = enable == Qt::Checked;
     pqSMAdaptor::setElementProperty(
       this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"), enabled);
+    this->Form->frameOpacity->setVisible(enabled);
 }
 
 // ----------------------------------------------------------------------------
