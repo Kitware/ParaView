@@ -49,6 +49,7 @@ SET (Kit_SRCS
   vtkSISourceProxy.cxx
   vtkSIStringVectorProperty.cxx
   vtkSITextSourceRepresentationProxy.cxx
+  vtkSITimeLabelProperty.cxx
   vtkSITimeRangeProperty.cxx
   vtkSITimeStepsProperty.cxx
   vtkSIUniformGridVolumeRepresentationProxy.cxx

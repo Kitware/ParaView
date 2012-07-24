@@ -18,10 +18,11 @@
 #include "vtkCommand.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 
 #include <set>
 #include <map>
@@ -66,6 +67,7 @@ public:
 vtkStandardNewMacro(vtkSMTimeKeeper);
 vtkCxxSetObjectMacro(vtkSMTimeKeeper, TimestepValuesProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMTimeKeeper, TimeRangeProperty, vtkSMProperty);
+vtkCxxSetObjectMacro(vtkSMTimeKeeper, TimeLabelProperty, vtkSMProperty);
 //----------------------------------------------------------------------------
 vtkSMTimeKeeper::vtkSMTimeKeeper()
 {
@@ -73,6 +75,7 @@ vtkSMTimeKeeper::vtkSMTimeKeeper()
   this->Internal = new vtkInternal();
   this->TimestepValuesProperty = 0;
   this->TimeRangeProperty = 0;
+  this->TimeLabelProperty = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +85,7 @@ vtkSMTimeKeeper::~vtkSMTimeKeeper()
 
   this->SetTimestepValuesProperty(0);
   this->SetTimeRangeProperty(0);
+  this->SetTimeLabelProperty(0);
 }
 
 //----------------------------------------------------------------------------
@@ -122,7 +126,8 @@ void vtkSMTimeKeeper::RemoveAllViews()
 //----------------------------------------------------------------------------
 void vtkSMTimeKeeper::AddTimeSource(vtkSMSourceProxy* src)
 {
-  if (!src->GetProperty("TimestepValues") && !src->GetProperty("TimeRange"))
+  if (!src->GetProperty("TimestepValues") && !src->GetProperty("TimeRange") &&
+      !src->GetProperty("TimeLabelAnnotation"))
     {
     return;
     }
@@ -182,6 +187,8 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
 {
   std::set<double> timesteps;
   double timerange[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+  const char* label = NULL;
+  int nbDiffCustomLabel = 0;
 
   vtkInternal::SourcesType::iterator iter;
   for (iter = this->Internal->Sources.begin();
@@ -213,6 +220,17 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
       timerange[0] = timerange[0] > cur_elem? cur_elem : timerange[0];
       timerange[1] = timerange[1] < cur_elem? cur_elem : timerange[1];
       }
+
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+          iter->GetPointer()->GetProperty("TimeLabelAnnotation"));
+    if (svp && svp->GetNumberOfElements() > 0)
+      {
+      if(label && strcmp(label, svp->GetElement(0)))
+        {
+        nbDiffCustomLabel++;
+        }
+      label = svp->GetElement(0);
+      }
     }
 
   if (timerange[0] == VTK_DOUBLE_MAX && timerange[1] == VTK_DOUBLE_MIN)
@@ -239,6 +257,12 @@ void vtkSMTimeKeeper::UpdateTimeSteps()
     vtkSMDoubleVectorProperty::SafeDownCast(
       this->TimestepValuesProperty)->SetNumberOfElements(0);
     }
+
+  // Make sure the label is valid and if several source try to override that
+  // label in a different manner, we simply rollback to the default "Time :" value
+  vtkSMStringVectorProperty::SafeDownCast(
+        this->TimeLabelProperty)->SetElement(
+        0, (nbDiffCustomLabel > 0 || label == NULL) ? "Time" : label);
 }
 
 //----------------------------------------------------------------------------

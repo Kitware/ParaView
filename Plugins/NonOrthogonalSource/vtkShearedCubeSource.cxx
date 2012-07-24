@@ -27,6 +27,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkMath.h"
+#include "vtkDemandDrivenPipeline.h"
 
 #include <vtkNew.h>
 
@@ -39,6 +40,7 @@ vtkShearedCubeSource::vtkShearedCubeSource()
   this->EnableCustomBounds = 0;
   this->EnableCustomTitle = 0;
   this->EnableCustomOrigin = 0;
+  this->EnableTimeLabel = 0;
 
   for(int i=0; i < 3; i++)
     {
@@ -48,6 +50,7 @@ vtkShearedCubeSource::vtkShearedCubeSource()
     }
   this->BaseU[0] = this->BaseV[1] = this->BaseW[2] = 1.0;
   this->AxisUTitle = this->AxisVTitle = this->AxisWTitle = NULL;
+  this->TimeLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +59,7 @@ vtkShearedCubeSource::~vtkShearedCubeSource()
   this->SetAxisUTitle(NULL);
   this->SetAxisVTitle(NULL);
   this->SetAxisWTitle(NULL);
+  this->SetTimeLabel(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -267,4 +271,32 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
       fieldData->AddArray(wAxisTitle.GetPointer());
       }
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkShearedCubeSource::RequestInformation(
+    vtkInformation * info, vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector)
+{
+  // Add new time label information
+   vtkInformation *infoOutput = outputVector->GetInformationObject(0);
+  if(this->EnableTimeLabel != 0 && this->TimeLabel)
+    {
+    // Get information object to fill
+    infoOutput->Set(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION(), this->TimeLabel);
+
+    // Also pretend that we have some time dependant data
+    double timeRange[2] = {0,1};
+    double timesteps[5] = {0, 0.25, 0.5, 0.75, 1};
+    infoOutput->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timesteps, 5);
+    infoOutput->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+    }
+  else
+    {
+    infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_LABEL_ANNOTATION());
+    infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    infoOutput->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    }
+
+  return this->Superclass::RequestInformation(info, inputVector, outputVector);;
 }

@@ -2007,6 +2007,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <StringVectorProperty
+        name="TimeLabel"
+        number_of_elements="1"
+        default_values="Time"
+        information_only="1" >
+        <Documentation>
+          This is the string that is used as label to eventually replace "time"
+          by something else such as "frequency" or any user specific label that
+          the user want to set to use a 4th dimension that is not time.
+        </Documentation>
+      </StringVectorProperty>
+
       <ProxyProperty
         name="Views"
         command="AddView"
