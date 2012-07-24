@@ -100,6 +100,7 @@ private slots:
   void rescaleToNewRange();
   void rescaleToDataRange();
   void rescaleToDataRangeOverTime();
+  void rescaleToSimpleRange();
 
   void setUseDiscreteColors(bool on);
   void setSizeFromText();
@@ -141,6 +142,8 @@ private slots:
   void saveOptionalUserSettings();
   void restoreOptionalUserSettings();
 
+  // Advanced/Simple management
+  void enableAvancedPanel(bool);
 private:
   void loadBuiltinColorPresets();
   void loadColorPoints();
