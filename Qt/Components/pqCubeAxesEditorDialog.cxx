@@ -158,6 +158,11 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       PV_GROUPBOX_REGISTER(CubeAxesYCustomRange, "CustomRangeActive", 1);
       PV_GROUPBOX_REGISTER(CubeAxesZCustomRange, "CustomRangeActive", 2);
 
+      //link the activation of the group boxes to vtkSMCubeAxesRepresentationProxy
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForX, "OriginalBoundsRangeActive", 0);
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForY, "OriginalBoundsRangeActive", 1);
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForZ, "OriginalBoundsRangeActive", 2);
+
       //now they are linked, set them to objects bounds.
       vtkSMPropertyHelper(repr,"DataBounds").UpdateValueFromServer();
       vtkSMPropertyHelper(repr,"DataBounds").Get(pvBounds,6);

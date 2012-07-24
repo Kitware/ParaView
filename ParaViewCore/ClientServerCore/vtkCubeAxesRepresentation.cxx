@@ -62,11 +62,13 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
   this->CustomRangeActive[0] = 0;
   this->CustomRangeActive[1] = 0;
   this->CustomRangeActive[2] = 0;
-  this->UseBoundsRangeAsLabel = true;
   this->UseOrientedBounds = false;
 
   this->UserXTitle = this->UserYTitle = this->UserZTitle = NULL;
   this->UseDefaultXTitle = this->UseDefaultYTitle = this->UseDefaultZTitle = 1;
+  this->OriginalBoundsRangeActive[0] = 0;
+  this->OriginalBoundsRangeActive[1] = 0;
+  this->OriginalBoundsRangeActive[2] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -392,17 +394,26 @@ void vtkCubeAxesRepresentation::UpdateBounds()
   for ( int i=0; i < 3; ++i)
     {
     int pos = i * 2;
+    double* bp = NULL;
     if ( this->CustomRangeActive[i] )
       {
-      if(i == 0) this->CubeAxesActor->SetXAxisRange(&this->CustomRange[pos]);
-      if(i == 1) this->CubeAxesActor->SetYAxisRange(&this->CustomRange[pos]);
-      if(i == 2) this->CubeAxesActor->SetZAxisRange(&this->CustomRange[pos]);
+      bp = &this->CustomRange[pos];
       }
-    else if (this->UseBoundsRangeAsLabel && !this->UseOrientedBounds)
+    else if ( !this->UseOrientedBounds && this->OriginalBoundsRangeActive[i] != 0)
       {
-      if(i == 0) this->CubeAxesActor->SetXAxisRange(&bds[pos]);
-      if(i == 1) this->CubeAxesActor->SetYAxisRange(&bds[pos]);
-      if(i == 2) this->CubeAxesActor->SetZAxisRange(&bds[pos]);
+      bp = &this->DataBounds[pos];
+      }
+    else // Default setup
+      {
+      bp = &bds[pos];
+      }
+
+    // Use the proper SetRange method
+    switch(i)
+      {
+    case 0: this->CubeAxesActor->SetXAxisRange(bp); break;
+    case 1: this->CubeAxesActor->SetYAxisRange(bp); break;
+    case 2: this->CubeAxesActor->SetZAxisRange(bp); break;
       }
     }
 }
@@ -532,42 +543,4 @@ void vtkCubeAxesRepresentation::SetDrawZGridlines(int val)
 void vtkCubeAxesRepresentation::SetGridLineLocation(int val)
 {
   this->CubeAxesActor->SetGridLineLocation(val);
-}
-
-//----------------------------------------------------------------------------
-void vtkCubeAxesRepresentation::SetXAxisRange(double min, double max)
-{
-  if(!UseBoundsRangeAsLabel)
-    {
-    this->CubeAxesActor->SetXAxisRange(min, max);
-    }
-}
-//----------------------------------------------------------------------------
-void vtkCubeAxesRepresentation::SetYAxisRange(double min, double max)
-{
-  if(!UseBoundsRangeAsLabel)
-    {
-    this->CubeAxesActor->SetYAxisRange(min, max);
-    }
-}
-//----------------------------------------------------------------------------
-void vtkCubeAxesRepresentation::SetZAxisRange(double min, double max)
-{
-  if(!UseBoundsRangeAsLabel)
-    {
-    this->CubeAxesActor->SetZAxisRange(min, max);
-    }
-}
-//----------------------------------------------------------------------------
-void vtkCubeAxesRepresentation::EnableCustomAxisRange(bool useCustomRange)
-{
-  this->UseBoundsRangeAsLabel = !useCustomRange;
-  if(UseBoundsRangeAsLabel)
-    {
-    double bounds[6];
-    this->CubeAxesActor->GetBounds(bounds);
-    this->CubeAxesActor->SetXAxisRange(&bounds[0]);
-    this->CubeAxesActor->SetYAxisRange(&bounds[2]);
-    this->CubeAxesActor->SetZAxisRange(&bounds[4]);
-    }
 }

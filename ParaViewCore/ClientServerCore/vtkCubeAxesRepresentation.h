@@ -71,6 +71,11 @@ public:
   vtkGetVector3Macro(CustomRangeActive, int);
 
   // Description:
+  // Get/Set whether to use original data bounds as range for a particular dimension.
+  vtkSetVector3Macro(OriginalBoundsRangeActive, int);
+  vtkGetVector3Macro(OriginalBoundsRangeActive, int);
+
+  // Description:
   // Get/Set custom range to use. When corresponding CustomRangeActive is
   // true, the data bounds will be ignored for that direction and CustomBounds
   // will be used instead.
@@ -100,10 +105,6 @@ public:
   // Description:
   // Set visibility of the representation.
   virtual void SetVisibility(bool visible);
-
-  // Description:
-  // Allow user to specify custom XYZAxisRanges based on arbitrary number
-  virtual void EnableCustomAxisRange(bool useCustomRange);
 
   // Description:
   // Enable/Disable the usage of the FieldData to override the XTitle value.
@@ -143,19 +144,16 @@ public:
   virtual void SetXAxisTickVisibility(int val);
   virtual void SetXAxisMinorTickVisibility(int val);
   virtual void SetDrawXGridlines(int val);
-  virtual void SetXAxisRange(double min, double max);
 
   virtual void SetYAxisVisibility(int val);
   virtual void SetYAxisTickVisibility(int val);
   virtual void SetYAxisMinorTickVisibility(int val);
   virtual void SetDrawYGridlines(int val);
-  virtual void SetYAxisRange(double min, double max);
 
   virtual void SetZAxisVisibility(int val);
   virtual void SetZAxisTickVisibility(int val);
   virtual void SetZAxisMinorTickVisibility(int val);
   virtual void SetDrawZGridlines(int val);
-  virtual void SetZAxisRange(double min, double max);
 
   virtual void SetGridLineLocation(int val);
 //BTX
@@ -189,10 +187,10 @@ protected:
   double Orientation[3];
   double CustomBounds[6];
   int CustomBoundsActive[3];
+  int OriginalBoundsRangeActive[3];
   double CustomRange[6];
   int CustomRangeActive[3];
   double DataBounds[6];
-  bool UseBoundsRangeAsLabel;
   bool UseOrientedBounds;
   int UseDefaultXTitle;
   int UseDefaultYTitle;
