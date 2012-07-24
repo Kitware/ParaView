@@ -58,7 +58,8 @@ def cp_hook(info, ctorMethod, ctorArgs, extraCtorCommands):
     if proxy.GetXMLGroup() == 'views' and export_rendering:
         proxyName = servermanager.ProxyManager().GetProxyName("views", proxy)
         ctorArgs = [ ctorMethod, "\"%s\"" % screenshot_info[proxyName][0], screenshot_info[proxyName][1], \
-                     screenshot_info[proxyName][2], screenshot_info[proxyName][3], "cp_views" ]
+                     screenshot_info[proxyName][2], screenshot_info[proxyName][3], \
+                         screenshot_info[proxyName][4], screenshot_info[proxyName][5], "cp_views" ]
         view_proxies.append(proxy)
         return ("CreateView", ctorArgs, extraCtorCommands)
 
@@ -196,6 +197,11 @@ def DoCoProcessing(datadescription):
                         else:
                             print 'something strange with color attribute type', rep.ColorAttributeType
 
+                        if datainformation.GetArray(rep.ColorArrayName) == None:
+                            # there is no array on this process. it's possible
+                            # that this process has no points or cells
+                            continue
+
                         if lut.VectorMode != 'Magnitude' or \
                            datainformation.GetArray(rep.ColorArrayName).GetNumberOfComponents() == 1:
                             datarange = datainformation.GetArray(rep.ColorArrayName).GetRange(lut.VectorComponent)
@@ -276,13 +282,14 @@ def CreateWriter(proxy_ctor, filename, freq, cp_writers):
     cp_writers.append(writer)
     return writer
 
-def CreateView(proxy_ctor, filename, freq, fittoscreen, magnification, cp_views):
+def CreateView(proxy_ctor, filename, freq, fittoscreen, magnification, width, height, cp_views):
     view = proxy_ctor()
     view.add_attribute("cpFileName", filename)
     view.add_attribute("cpFrequency", freq)
     view.add_attribute("cpFileName", filename)
     view.add_attribute("cpFitToScreen", fittoscreen)
     view.add_attribute("cpMagnification", magnification)
+    view.ViewSize = [ width, height ]
     cp_views.append(view)
     return view
 
