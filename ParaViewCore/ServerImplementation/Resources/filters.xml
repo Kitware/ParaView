@@ -7169,7 +7169,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="0" >
-       <IntRangeDomain name="range" min ="0"/>
+       <IntRangeDomain name="range"/>
        <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
@@ -7285,7 +7285,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="0" >
-       <IntRangeDomain name="range" min ="0"/>
+       <IntRangeDomain name="range"/>
       <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
@@ -7403,6 +7403,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="1" >
+       <IntRangeDomain name="range"/>
        <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
