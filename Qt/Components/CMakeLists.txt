@@ -65,6 +65,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidget.h
+  pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.h
@@ -370,6 +371,8 @@ SOURCE_GROUP("Generated" FILES
 PVVTK_ADD_LIBRARY(pqComponents
   pq3DWidget.cxx
   pq3DWidget.h
+  pq3DWidgetPropertyWidget.cxx
+  pq3DWidgetPropertyWidget.h
   pqAboutDialog.cxx
   pqAboutDialog.h
   pqActionGroupInterface.cxx

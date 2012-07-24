@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqView.h"
 #include "pqProxy.h"
+#include "pq3DWidget.h"
 #include "pqUndoStack.h"
 #include "pqOutputPort.h"
 #include "pqDisplayPanel.h"
@@ -69,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanelItem.h"
 #include "pqObjectPanelInterface.h"
 #include "pqProxySelectionWidget.h"
+#include "pq3DWidgetPropertyWidget.h"
 #include "pqApplyPropertiesManager.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
@@ -518,6 +520,32 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
   else
     {
     widgets = this->createWidgetsForProxy(proxy);
+    }
+
+  // add 3D widgets
+  vtkSMProxy *smProxy = proxy->getProxy();
+  vtkPVXMLElement *hints = smProxy->GetHints();
+  if(hints)
+    {
+    QList<pq3DWidget*> widgets3d = pq3DWidget::createWidgets(smProxy, smProxy);
+
+    foreach (pq3DWidget *widget, widgets3d)
+      {
+      connect(this, SIGNAL(viewChanged(pqView*)),
+              widget, SLOT(setView(pqView*)));
+      widget->setView(this->view());
+      widget->resetBounds();
+      widget->reset();
+
+      // must call select
+      widget->select();
+
+      pqPropertiesPanelItem item;
+      item.LabelWidget = 0;
+      item.PropertyWidget = new pq3DWidgetPropertyWidget(widget);
+      item.IsAdvanced = false;
+      widgets.append(item);
+      }
     }
 
   // add widgets to the panel
