@@ -8,8 +8,6 @@ INCLUDE_DIRECTORIES(
     ${VTK_INCLUDE_DIR}
   )
 
-INCLUDE(${QT_USE_FILE})
-
 ADD_PARAVIEW_PLUGIN(NonOrthogonalSource "1.0"
      SERVER_MANAGER_XML vtkNonOrthogonalSource.xml
      SERVER_MANAGER_SOURCES vtkShearedCubeSource.cxx
