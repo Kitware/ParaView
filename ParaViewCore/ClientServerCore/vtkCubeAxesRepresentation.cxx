@@ -271,8 +271,12 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
     if(orientedboundingBox)
       {
       this->UseOrientedBounds = true;
+      double* orientedBounds = orientedboundingBox->GetTuple(0);
       this->CubeAxesActor->SetUseOrientedBounds(1);
-      this->CubeAxesActor->SetOrientedBounds(orientedboundingBox->GetTuple(0));
+      this->CubeAxesActor->SetOrientedBounds(orientedBounds);
+      this->CubeAxesActor->SetXAxisRange(&orientedBounds[0]);
+      this->CubeAxesActor->SetYAxisRange(&orientedBounds[2]);
+      this->CubeAxesActor->SetZAxisRange(&orientedBounds[4]);
       }
     else
       {
