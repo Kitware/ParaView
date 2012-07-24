@@ -79,7 +79,7 @@ public:
   // Description:
   // Saves a screenshot of the view to disk. The writerName argument specifies
   // the vtkImageWriter subclass to use.
-  int WriteImage(const char* filename, const char* writerName, int magnification);
+  int WriteImage(const char* filename, const char* writerName, int magnification=1);
 
   // Description:
   // Return true any internal representation is dirty. This can be usefull to
