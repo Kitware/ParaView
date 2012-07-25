@@ -16,9 +16,10 @@
 #ifndef __vtkSMUncheckedPropertyHelper_h
 #define __vtkSMUncheckedPropertyHelper_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMPropertyHelper.h"
 
-class VTK_EXPORT vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
 {
 public:
   vtkSMUncheckedPropertyHelper(vtkSMProxy *proxy, const char *name, bool quiet = false)
@@ -39,3 +40,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMUncheckedPropertyHelper.h

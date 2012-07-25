@@ -20,9 +20,10 @@
 #ifndef __vtkPVCacheSizeInformation_h
 #define __vtkPVCacheSizeInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVCacheSizeInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheSizeInformation : public vtkPVInformation
 {
 public:
   static vtkPVCacheSizeInformation* New();

@@ -18,9 +18,10 @@
 #ifndef __vtkPVEnSightMasterServerTranslator_h
 #define __vtkPVEnSightMasterServerTranslator_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtentTranslator.h"
 
-class VTK_EXPORT vtkPVEnSightMasterServerTranslator : public vtkExtentTranslator
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVEnSightMasterServerTranslator : public vtkExtentTranslator
 {
 public:
   static vtkPVEnSightMasterServerTranslator* New();

@@ -32,7 +32,7 @@
 class vtkInformationInformationVectorKey;
 class vtkInformationStringVectorKey;
 
-class VTK_EXPORT vtkPVPostFilterExecutive : public vtkPVCompositeDataPipeline
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVPostFilterExecutive : public vtkPVCompositeDataPipeline
 {
 public:
   static vtkPVPostFilterExecutive* New();

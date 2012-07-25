@@ -24,6 +24,7 @@
 #ifndef __vtkImageVolumeRepresentation_h
 #define __vtkImageVolumeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkColorTransferFunction;
@@ -37,7 +38,7 @@ class vtkPVLODVolume;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
-class VTK_EXPORT vtkImageVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageVolumeRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkImageVolumeRepresentation* New();

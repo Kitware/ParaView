@@ -65,9 +65,10 @@
 #ifndef __vtkPSciVizMultiCorrelativeStats_h
 #define __vtkPSciVizMultiCorrelativeStats_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
 
-class VTK_EXPORT vtkPSciVizMultiCorrelativeStats : public vtkSciVizStatistics
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizMultiCorrelativeStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizMultiCorrelativeStats* New();

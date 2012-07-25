@@ -36,13 +36,14 @@
 #ifndef __vtkPVProgressHandler_h
 #define __vtkPVProgressHandler_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkMPICommunicatorOpaqueRequest;
 class vtkMultiProcessController;
 class vtkPVSession;
 
-class VTK_EXPORT vtkPVProgressHandler : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVProgressHandler : public vtkObject
 {
 public:
   static vtkPVProgressHandler* New();

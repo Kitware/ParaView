@@ -23,12 +23,13 @@
 #ifndef __vtkPVAMRDualClip_h
 #define __vtkPVAMRDualClip_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAMRDualClip.h"
 
 // Forware declaration.
 class vtkPVAMRDualClipInternal;
 
-class VTK_EXPORT vtkPVAMRDualClip : public vtkAMRDualClip
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVAMRDualClip : public vtkAMRDualClip
 {
 public:
   static vtkPVAMRDualClip* New();

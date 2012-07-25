@@ -23,12 +23,13 @@
 #ifndef __vtkPVSystemInformation_h
 #define __vtkPVSystemInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkProcessModule.h" // needed for vtkProcessModule::ProcessTypes
 #include "vtkPVInformation.h"
 #include "vtkStdString.h" // needed for vtkStdString
 #include <vector> // needed for std::vector
 
-class VTK_EXPORT vtkPVSystemInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSystemInformation : public vtkPVInformation
 {
 public:
   static vtkPVSystemInformation* New();

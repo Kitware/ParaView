@@ -22,12 +22,13 @@
 #ifndef __vtkSMTesting_h
 #define __vtkSMTesting_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkTesting;
 class vtkSMRenderViewProxy;
 
-class VTK_EXPORT vtkSMTesting : public vtkSMObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTesting : public vtkSMObject
 {
 public:
   static vtkSMTesting* New();

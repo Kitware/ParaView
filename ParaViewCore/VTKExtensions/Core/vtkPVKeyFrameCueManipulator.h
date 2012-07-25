@@ -40,7 +40,7 @@ class vtkPVKeyFrameCueManipulatorInternals;
 class vtkPVKeyFrameCueManipulatorObserver;
 class vtkPVKeyFrame;
 
-class VTK_EXPORT vtkPVKeyFrameCueManipulator :
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVKeyFrameCueManipulator :
   public vtkPVCueManipulator
 {
 public:

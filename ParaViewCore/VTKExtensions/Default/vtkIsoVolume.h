@@ -23,12 +23,13 @@
 #ifndef __vtkIsoVolume_h
 #define __vtkIsoVolume_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 // Forware declarations.
 class vtkPVClipDataSet;
 
-class VTK_EXPORT vtkIsoVolume : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIsoVolume : public vtkDataObjectAlgorithm
 {
 public:
   static vtkIsoVolume* New();

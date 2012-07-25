@@ -32,6 +32,7 @@
 #ifndef __vtkUnstructuredPOPReader_h
 #define __vtkUnstructuredPOPReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 #include <cstddef> // for ptrdiff_t
@@ -42,7 +43,7 @@ class vtkIdList;
 class vtkUnstructuredPOPReaderInternal;
 class VTKPointIterator;
 
-class VTK_EXPORT vtkUnstructuredPOPReader : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkUnstructuredPOPReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   vtkTypeMacro(vtkUnstructuredPOPReader,vtkUnstructuredGridAlgorithm);

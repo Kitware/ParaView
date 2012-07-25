@@ -21,9 +21,10 @@
 #ifndef __vtkSIContextArraysProperty_h
 #define __vtkSIContextArraysProperty_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSIContextArraysProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIContextArraysProperty : public vtkSIProperty
 {
 public:
   static vtkSIContextArraysProperty* New();

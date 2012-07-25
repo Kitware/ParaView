@@ -26,12 +26,13 @@
 #ifndef __vtkSMDimensionsDomain_h
 #define __vtkSMDimensionsDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMIntRangeDomain.h"
 
 class vtkSMIntVectorProperty;
 class vtkSMProxyProperty;
 
-class VTK_EXPORT vtkSMDimensionsDomain : public vtkSMIntRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDimensionsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMDimensionsDomain* New();

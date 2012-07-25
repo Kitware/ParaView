@@ -21,9 +21,10 @@
 #ifndef __vtkPVPlane_h
 #define __vtkPVPlane_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPlane.h"
 
-class VTK_EXPORT vtkPVPlane : public vtkPlane
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVPlane : public vtkPlane
 {
 public:
   static vtkPVPlane* New();

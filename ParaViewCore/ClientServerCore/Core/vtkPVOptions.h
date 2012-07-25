@@ -22,11 +22,12 @@
 #ifndef __vtkPVOptions_h
 #define __vtkPVOptions_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptions.h"
 
 class vtkPVOptionsInternal;
 
-class VTK_EXPORT vtkPVOptions : public vtkCommandOptions
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptions : public vtkCommandOptions
 {
 protected:
 //BTX

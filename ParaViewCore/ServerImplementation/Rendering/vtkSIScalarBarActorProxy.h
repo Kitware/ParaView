@@ -20,9 +20,10 @@
 #ifndef __vtkSIScalarBarActorProxy_h
 #define __vtkSIScalarBarActorProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTK_EXPORT vtkSIScalarBarActorProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIScalarBarActorProxy : public vtkSIProxy
 {
 public:
   static vtkSIScalarBarActorProxy* New();

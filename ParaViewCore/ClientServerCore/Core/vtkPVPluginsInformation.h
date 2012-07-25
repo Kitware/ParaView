@@ -21,9 +21,10 @@
 #ifndef __vtkPVPluginsInformation_h
 #define __vtkPVPluginsInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVPluginsInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginsInformation : public vtkPVInformation
 {
 public:
   static vtkPVPluginsInformation* New();

@@ -32,13 +32,14 @@
 #ifndef __vtkPEnSightGoldBinaryReader_h
 #define __vtkPEnSightGoldBinaryReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"
 
 class vtkMultiBlockDataSet;
 class vtkUnstructuredGrid;
 class vtkPoints;
 
-class VTK_EXPORT vtkPEnSightGoldBinaryReader : public vtkPEnSightReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldBinaryReader : public vtkPEnSightReader
 {
  public:
   static vtkPEnSightGoldBinaryReader *New();

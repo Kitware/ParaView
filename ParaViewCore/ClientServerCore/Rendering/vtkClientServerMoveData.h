@@ -23,12 +23,13 @@
 // .SECTION Warning
 // This filter may change the output in RequestData().
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkMultiProcessController;
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkClientServerMoveData : public vtkDataObjectAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkClientServerMoveData : public vtkDataObjectAlgorithm
 {
 public:
   static vtkClientServerMoveData* New();

@@ -20,9 +20,10 @@
 #ifndef __vtkTransferFunctionEditorWidgetShapes2D_h
 #define __vtkTransferFunctionEditorWidgetShapes2D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorWidget.h"
 
-class VTK_EXPORT vtkTransferFunctionEditorWidgetShapes2D : public vtkTransferFunctionEditorWidget
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorWidgetShapes2D : public vtkTransferFunctionEditorWidget
 {
 public:
   static vtkTransferFunctionEditorWidgetShapes2D* New();

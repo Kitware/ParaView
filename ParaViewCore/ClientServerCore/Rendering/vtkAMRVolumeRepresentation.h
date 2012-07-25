@@ -21,6 +21,7 @@
 #ifndef __vtkAMRVolumeRepresentation_h
 #define __vtkAMRVolumeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for iVars.
 
@@ -35,7 +36,7 @@ class vtkPVRenderView;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
 
-class VTK_EXPORT vtkAMRVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRVolumeRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkAMRVolumeRepresentation* New();

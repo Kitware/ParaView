@@ -22,11 +22,12 @@
 #ifndef __vtkNetworkAccessManager_h
 #define __vtkNetworkAccessManager_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkNetworkAccessManager : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkNetworkAccessManager : public vtkObject
 {
 public:
   vtkTypeMacro(vtkNetworkAccessManager, vtkObject);

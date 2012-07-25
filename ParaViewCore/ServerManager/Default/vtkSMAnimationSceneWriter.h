@@ -21,12 +21,13 @@
 #ifndef __vtkSMAnimationSceneWriter_h
 #define __vtkSMAnimationSceneWriter_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 
 class vtkSMAnimationScene;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMAnimationSceneWriter : public vtkSMSessionObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMAnimationSceneWriter : public vtkSMSessionObject
 {
 public:
   vtkTypeMacro(vtkSMAnimationSceneWriter, vtkSMSessionObject);

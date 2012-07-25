@@ -20,6 +20,7 @@
 #ifndef __vtkSIObject_h
 #define __vtkSIObject_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
@@ -27,7 +28,7 @@
 class vtkClientServerInterpreter;
 class vtkPVSessionCore;
 
-class VTK_EXPORT vtkSIObject : public vtkObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIObject : public vtkObject
 {
 public:
   static vtkSIObject* New();

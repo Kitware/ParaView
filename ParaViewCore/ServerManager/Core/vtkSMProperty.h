@@ -62,6 +62,7 @@
 #ifndef __vtkSMProperty_h
 #define __vtkSMProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkweakPointer
@@ -78,7 +79,7 @@ class vtkSMProxyLocator;
 struct vtkSMPropertyInternals;
 //ETX
 
-class VTK_EXPORT vtkSMProperty : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProperty : public vtkSMObject
 {
 public:
   static vtkSMProperty* New();

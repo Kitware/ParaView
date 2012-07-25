@@ -116,6 +116,7 @@
 #ifndef __vtkPPhastaReader_h
 #define __vtkPPhastaReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkPVXMLParser;
@@ -125,7 +126,7 @@ class vtkPhastaReader;
 struct vtkPPhastaReaderInternal;
 //ETX
 
-class VTK_EXPORT vtkPPhastaReader : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPPhastaReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPPhastaReader* New();

@@ -19,10 +19,11 @@
 #ifndef __vtkSICollaborationManager_h
 #define __vtkSICollaborationManager_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
-class VTK_EXPORT vtkSICollaborationManager : public vtkSIObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSICollaborationManager : public vtkSIObject
 {
 public:
   static vtkSICollaborationManager* New();

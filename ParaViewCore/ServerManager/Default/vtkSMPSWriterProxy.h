@@ -21,9 +21,10 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSMPSWriterProxy_h
 #define __vtkSMPSWriterProxy_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMPWriterProxy.h"
 
-class VTK_EXPORT vtkSMPSWriterProxy : public vtkSMPWriterProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPSWriterProxy : public vtkSMPWriterProxy
 {
 public:
   static vtkSMPSWriterProxy* New();

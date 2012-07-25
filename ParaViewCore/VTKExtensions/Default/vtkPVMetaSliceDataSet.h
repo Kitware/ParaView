@@ -19,11 +19,12 @@
 #ifndef __vtkPVMetaSliceDataSet_h
 #define __vtkPVMetaSliceDataSet_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 
 class vtkImplicitFunction;
 
-class VTK_EXPORT vtkPVMetaSliceDataSet : public vtkPVDataSetAlgorithmSelectorFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaSliceDataSet : public vtkPVDataSetAlgorithmSelectorFilter
 {
 public:
   vtkTypeMacro(vtkPVMetaSliceDataSet,vtkPVDataSetAlgorithmSelectorFilter);

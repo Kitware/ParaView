@@ -16,6 +16,7 @@
 #ifndef __vtkExtractScatterPlot_h
 #define __vtkExtractScatterPlot_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
 // .NAME vtkExtractScatterPlot - Extract a scatter plot (two-dimensional histogram) from any dataset
@@ -29,7 +30,7 @@
 // vtkUnsignedLongArray named "bin_values" which contains the value for
 // each bin.
 
-class VTK_EXPORT vtkExtractScatterPlot :
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractScatterPlot :
   public vtkPolyDataAlgorithm
 {
 public:

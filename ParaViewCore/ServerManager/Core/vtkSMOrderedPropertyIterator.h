@@ -25,12 +25,13 @@
 #ifndef __vtkSMOrderedPropertyIterator_h
 #define __vtkSMOrderedPropertyIterator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMProperty;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMOrderedPropertyIterator : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMOrderedPropertyIterator : public vtkSMObject
 {
 public:
   static vtkSMOrderedPropertyIterator* New();

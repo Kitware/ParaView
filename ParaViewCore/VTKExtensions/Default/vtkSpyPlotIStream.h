@@ -22,10 +22,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 #ifndef __vtkSpyPlotIStream_h
 #define __vtkSpyPlotIStream_h
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkType.h"
 #include "vtkSystemIncludes.h"
 
-class VTK_EXPORT vtkSpyPlotIStream {
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotIStream {
 public:
   vtkSpyPlotIStream();
   virtual ~vtkSpyPlotIStream();
@@ -50,3 +51,6 @@ inline istream*vtkSpyPlotIStream::GetStream()
 }
 
 #endif
+
+
+// VTK-HeaderTest-Exclude: vtkSpyPlotIStream.h

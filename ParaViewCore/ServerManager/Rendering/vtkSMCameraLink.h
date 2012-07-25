@@ -23,9 +23,10 @@
 #ifndef __vtkSMCameraLink_h
 #define __vtkSMCameraLink_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxyLink.h"
 
-class VTK_EXPORT vtkSMCameraLink : public vtkSMProxyLink
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMCameraLink : public vtkSMProxyLink
 {
 public:
   static vtkSMCameraLink* New();

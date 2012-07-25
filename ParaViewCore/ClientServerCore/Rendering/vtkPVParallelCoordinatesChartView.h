@@ -20,9 +20,10 @@
 #ifndef __vtkPVParallelCoordinatesChartView_h
 #define __vtkPVParallelCoordinatesChartView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVXYChartView.h"
 
-class VTK_EXPORT vtkPVParallelCoordinatesChartView : public vtkPVXYChartView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesChartView : public vtkPVXYChartView
 {
 public:
   static vtkPVParallelCoordinatesChartView* New();

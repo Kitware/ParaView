@@ -21,6 +21,7 @@
 #ifndef __vtkSMRemoteObject_h
 #define __vtkSMRemoteObject_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
@@ -30,7 +31,7 @@ class vtkSMSession;
 class vtkSMProxyLocator;
 class vtkSMLoadStateContext;
 
-class VTK_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRemoteObject : public vtkSMSessionObject
 {
 // My friends are...
   friend class vtkSMStateHelper;    // To pull state
@@ -176,16 +177,16 @@ private:
 // </code>
 // Will result in calling the vtkSIProxy::MethodName() when the stream in
 // interpreted.
-class VTK_EXPORT SIOBJECT
+class VTKPVSERVERMANAGERCORE_EXPORT SIOBJECT
 {
   vtkSMRemoteObject* Reference;
-  friend VTK_EXPORT vtkClientServerStream& operator<<(
+  friend VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const SIOBJECT& manipulator);
 public:
   SIOBJECT(vtkSMRemoteObject* rmobject) : Reference(rmobject) {}
 };
 
-VTK_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
+VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<< (vtkClientServerStream& stream,
   const SIOBJECT& manipulator);
 
 #endif // #ifndef __vtkSMRemoteObject_h

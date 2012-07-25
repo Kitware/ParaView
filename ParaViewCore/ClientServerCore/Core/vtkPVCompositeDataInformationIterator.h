@@ -21,11 +21,12 @@
 #ifndef __vtkPVCompositeDataInformationIterator_h
 #define __vtkPVCompositeDataInformationIterator_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkPVDataInformation;
 
-class VTK_EXPORT vtkPVCompositeDataInformationIterator : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVCompositeDataInformationIterator : public vtkObject
 {
 public:
   static vtkPVCompositeDataInformationIterator* New();

@@ -24,10 +24,11 @@
 #define __vtkAttributeDataToTableFilter_h
 
 #include "vtkTableAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkFieldData;
 
-class VTK_EXPORT vtkAttributeDataToTableFilter : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAttributeDataToTableFilter : public vtkTableAlgorithm
 {
 public:
   static vtkAttributeDataToTableFilter* New();

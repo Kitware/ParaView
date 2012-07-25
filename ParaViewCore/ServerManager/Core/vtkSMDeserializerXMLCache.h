@@ -20,6 +20,7 @@
 #ifndef __vtkSMDeserializerXMLCache_h
 #define __vtkSMDeserializerXMLCache_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
@@ -27,7 +28,7 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMDeserializerXMLCache : public vtkSMDeserializerXML
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializerXMLCache : public vtkSMDeserializerXML
 {
 public:
   static vtkSMDeserializerXMLCache* New();

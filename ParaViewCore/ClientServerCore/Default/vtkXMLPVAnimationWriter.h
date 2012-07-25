@@ -20,11 +20,12 @@
 #ifndef __vtkXMLPVAnimationWriter_h
 #define __vtkXMLPVAnimationWriter_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkXMLPVDWriter.h"
 
 class vtkXMLPVAnimationWriterInternals;
 
-class VTK_EXPORT vtkXMLPVAnimationWriter: public vtkXMLPVDWriter
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkXMLPVAnimationWriter: public vtkXMLPVDWriter
 {
 public:
   static vtkXMLPVAnimationWriter* New();

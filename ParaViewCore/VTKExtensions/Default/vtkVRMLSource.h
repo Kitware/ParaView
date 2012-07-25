@@ -20,12 +20,13 @@
 #ifndef __vtkVRMLSource_h
 #define __vtkVRMLSource_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkMultiBlockDataSet;
 class vtkVRMLImporter;
 
-class VTK_EXPORT vtkVRMLSource : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkVRMLSource : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkVRMLSource,vtkMultiBlockDataSetAlgorithm);

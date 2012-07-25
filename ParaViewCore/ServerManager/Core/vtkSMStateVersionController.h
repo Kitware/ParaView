@@ -20,9 +20,10 @@
 #ifndef __vtkSMStateVersionController_h
 #define __vtkSMStateVersionController_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStateVersionControllerBase.h"
 
-class VTK_EXPORT vtkSMStateVersionController : public vtkSMStateVersionControllerBase
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionController : public vtkSMStateVersionControllerBase
 {
 public:
   static vtkSMStateVersionController* New();

@@ -23,11 +23,12 @@
 #ifndef __vtkSMPropertyModificationUndoElement_h
 #define __vtkSMPropertyModificationUndoElement_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMUndoElement.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMPropertyModificationUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMPropertyModificationUndoElement* New();

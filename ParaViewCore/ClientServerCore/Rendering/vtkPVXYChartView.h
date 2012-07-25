@@ -20,6 +20,7 @@
 #ifndef __vtkPVXYChartView_h
 #define __vtkPVXYChartView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVContextView.h"
 #include "vtkAxis.h" //for enums.
 
@@ -27,7 +28,7 @@ class vtkChart;
 class vtkChartView;
 class vtkPVPlotTime;
 
-class VTK_EXPORT vtkPVXYChartView : public vtkPVContextView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVXYChartView : public vtkPVContextView
 {
 public:
   static vtkPVXYChartView* New();

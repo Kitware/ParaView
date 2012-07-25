@@ -19,11 +19,12 @@
 #ifndef __vtkPConvertSelection_h
 #define __vtkPConvertSelection_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkConvertSelection.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkPConvertSelection : public vtkConvertSelection
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPConvertSelection : public vtkConvertSelection
 {
 public:
   static vtkPConvertSelection* New();

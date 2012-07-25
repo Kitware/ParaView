@@ -40,4 +40,4 @@ public:
   VectorOfElements RedoStack;
 };
 //****************************************************************************
-
+// VTK-HeaderTest-Exclude: vtkUndoStackInternal.h

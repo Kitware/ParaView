@@ -16,6 +16,7 @@
 #ifndef __vtkExtractHistogram_h
 #define __vtkExtractHistogram_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
 //BTX
@@ -34,7 +35,7 @@ struct vtkEHInternals;
 // the boundaries between each histogram bin, and a vtkUnsignedLongArray
 // named "bin_values" which will contain the value for each bin.
 
-class VTK_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
 {
 public:
   static vtkExtractHistogram* New();

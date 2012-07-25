@@ -23,6 +23,7 @@
 #ifndef __vtkPVComparativeAnimationCue_h
 #define __vtkPVComparativeAnimationCue_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSMDomain;
@@ -30,7 +31,7 @@ class vtkSMProperty;
 class vtkSMProxy;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkPVComparativeAnimationCue : public vtkObject
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkPVComparativeAnimationCue : public vtkObject
 {
 public:
   static vtkPVComparativeAnimationCue* New();

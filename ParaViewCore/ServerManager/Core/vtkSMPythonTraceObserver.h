@@ -21,12 +21,13 @@
 #ifndef __vtkSMPythonTraceObserver_h
 #define __vtkSMPythonTraceObserver_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMPythonTraceObserverCommandHelper;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMPythonTraceObserver : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPythonTraceObserver : public vtkSMObject
 {
 public:
   static vtkSMPythonTraceObserver* New();

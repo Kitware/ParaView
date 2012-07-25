@@ -24,12 +24,13 @@
 #ifndef __vtkPVCompositeRepresentation_h
 #define __vtkPVCompositeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeRepresentation.h"
 
 class vtkSelectionRepresentation;
 class vtkCubeAxesRepresentation;
 
-class VTK_EXPORT vtkPVCompositeRepresentation : public vtkCompositeRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCompositeRepresentation : public vtkCompositeRepresentation
 {
 public:
   static vtkPVCompositeRepresentation* New();

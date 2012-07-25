@@ -22,8 +22,9 @@
 #define __vtkPVTrackballZoom_h
 
 #include "vtkCameraManipulator.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVTrackballZoom : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballZoom : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballZoom *New();

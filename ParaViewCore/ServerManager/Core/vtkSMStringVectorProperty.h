@@ -26,12 +26,13 @@
 #ifndef __vtkSMStringVectorProperty_h
 #define __vtkSMStringVectorProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
 class vtkStringList;
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
 {
 public:
   static vtkSMStringVectorProperty* New();

@@ -57,3 +57,4 @@ VTKCLIENTSERVER_EXPORT vtkOStreamWrapper& operator<<(
   vtkOStreamWrapper& os, const vtkClientServerID& id);
                       
 #endif
+// VTK-HeaderTest-Exclude: vtkClientServerID.h

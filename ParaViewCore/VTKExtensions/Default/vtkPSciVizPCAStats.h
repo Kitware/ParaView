@@ -43,9 +43,10 @@
 #ifndef __vtkPSciVizPCAStats_h
 #define __vtkPSciVizPCAStats_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
 
-class VTK_EXPORT vtkPSciVizPCAStats : public vtkSciVizStatistics
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizPCAStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizPCAStats* New();

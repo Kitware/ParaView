@@ -22,6 +22,7 @@
 #ifndef __vtkSMInteractionUndoStackBuilder_h
 #define __vtkSMInteractionUndoStackBuilder_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMInteractionUndoStackBuilderObserver;
@@ -29,7 +30,7 @@ class vtkSMRenderViewProxy;
 class vtkSMUndoStack;
 class vtkUndoSet;
 
-class VTK_EXPORT vtkSMInteractionUndoStackBuilder : public vtkSMObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMInteractionUndoStackBuilder : public vtkSMObject
 {
 public:
   static vtkSMInteractionUndoStackBuilder* New();

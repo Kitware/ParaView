@@ -21,9 +21,10 @@
 #ifndef __vtkSIUnstructuredGridVolumeRepresentationProxy_h
 #define __vtkSIUnstructuredGridVolumeRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTK_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIUnstructuredGridVolumeRepresentationProxy : public vtkSIProxy
 {
 public:
   static vtkSIUnstructuredGridVolumeRepresentationProxy* New();

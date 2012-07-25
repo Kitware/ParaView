@@ -18,8 +18,9 @@
 #ifndef __vtkPVDisplayInformation_h
 #define __vtkPVDisplayInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
-class VTK_EXPORT vtkPVDisplayInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDisplayInformation : public vtkPVInformation
 {
 public:
   static vtkPVDisplayInformation* New();

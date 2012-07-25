@@ -20,9 +20,10 @@
 #ifndef __vtkPVRepresentedDataInformation_h
 #define __vtkPVRepresentedDataInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataInformation.h"
 
-class VTK_EXPORT vtkPVRepresentedDataInformation : public vtkPVDataInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRepresentedDataInformation : public vtkPVDataInformation
 {
 public:
   static vtkPVRepresentedDataInformation* New();

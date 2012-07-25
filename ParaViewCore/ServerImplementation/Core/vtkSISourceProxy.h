@@ -23,12 +23,13 @@
 #ifndef __vtkSISourceProxy_h
 #define __vtkSISourceProxy_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
 class vtkAlgorithm;
 class vtkAlgorithmOutput;
 
-class VTK_EXPORT vtkSISourceProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISourceProxy : public vtkSIProxy
 {
 public:
   static vtkSISourceProxy* New();

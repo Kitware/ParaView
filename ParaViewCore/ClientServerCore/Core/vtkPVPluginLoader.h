@@ -24,6 +24,7 @@
 #ifndef __vtkPVPluginLoader_h
 #define __vtkPVPluginLoader_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkIntArray;
@@ -31,7 +32,7 @@ class vtkPVPlugin;
 class vtkStringArray;
 class vtkPVPlugin;
 
-class VTK_EXPORT vtkPVPluginLoader : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPluginLoader : public vtkObject
 {
 public:
   static vtkPVPluginLoader* New();

@@ -22,6 +22,7 @@
 #ifndef __vtkImageSliceRepresentation_h
 #define __vtkImageSliceRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkStructuredData.h" // for VTK_*_PLANE
 
@@ -31,7 +32,7 @@ class vtkPVImageSliceMapper;
 class vtkPVLODActor;
 class vtkScalarsToColors;
 
-class VTK_EXPORT vtkImageSliceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkImageSliceRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkImageSliceRepresentation* New();

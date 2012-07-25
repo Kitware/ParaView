@@ -23,11 +23,12 @@
 #define __vtkSortedTableStreamer_h
 
 #include "vtkTableAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 class vtkTable;
 class vtkDataArray;
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkSortedTableStreamer : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSortedTableStreamer : public vtkTableAlgorithm
 {
 private:
   class InternalsBase;

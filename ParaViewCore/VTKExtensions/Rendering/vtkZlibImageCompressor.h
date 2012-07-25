@@ -27,11 +27,12 @@
 #define __vtkZlibImageCompressor_h
 
 #include "vtkImageCompressor.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkZlibCompressorImageConditioner;
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkZlibImageCompressor : public vtkImageCompressor
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkZlibImageCompressor : public vtkImageCompressor
 {
 public:
   static vtkZlibImageCompressor* New();

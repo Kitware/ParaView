@@ -18,11 +18,12 @@
 #ifndef __vtkSMTextWidgetRepresentationProxy_h
 #define __vtkSMTextWidgetRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"
 
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMTextWidgetRepresentationProxy : public vtkSMNewWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMTextWidgetRepresentationProxy : public vtkSMNewWidgetRepresentationProxy
 {
 public:
   static vtkSMTextWidgetRepresentationProxy* New();

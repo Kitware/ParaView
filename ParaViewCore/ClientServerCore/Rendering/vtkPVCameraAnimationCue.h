@@ -20,13 +20,14 @@
 #ifndef __vtkPVCameraAnimationCue_h
 #define __vtkPVCameraAnimationCue_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVKeyFrameAnimationCue.h"
 
 class vtkCamera;
 class vtkPVCameraCueManipulator;
 class vtkPVRenderView;
 
-class VTK_EXPORT vtkPVCameraAnimationCue : public vtkPVKeyFrameAnimationCue
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCameraAnimationCue : public vtkPVKeyFrameAnimationCue
 {
 public:
   static vtkPVCameraAnimationCue* New();

@@ -30,12 +30,13 @@
 #ifndef __vtkPVArrayCalculator_h
 #define __vtkPVArrayCalculator_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkArrayCalculator.h"
 
 class vtkDataObject;
 class vtkDataSetAttributes;
 
-class VTK_EXPORT vtkPVArrayCalculator : public vtkArrayCalculator
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVArrayCalculator : public vtkArrayCalculator
 {
 public:
   vtkTypeMacro( vtkPVArrayCalculator,vtkArrayCalculator );

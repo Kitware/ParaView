@@ -21,9 +21,10 @@
 #ifndef __vtkPythonAnnotationFilter_h
 #define __vtkPythonAnnotationFilter_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
-class VTK_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPythonAnnotationFilter : public vtkTableAlgorithm
 {
 public:
   static vtkPythonAnnotationFilter* New();

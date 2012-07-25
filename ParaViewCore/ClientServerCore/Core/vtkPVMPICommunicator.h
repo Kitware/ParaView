@@ -21,9 +21,10 @@
 #ifndef __vtkPVMPICommunicator_h
 #define __vtkPVMPICommunicator_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkMPICommunicator.h"
 
-class VTK_EXPORT vtkPVMPICommunicator : public vtkMPICommunicator
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVMPICommunicator : public vtkMPICommunicator
 {
 public:
   static vtkPVMPICommunicator* New();

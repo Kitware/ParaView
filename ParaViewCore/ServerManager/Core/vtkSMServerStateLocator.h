@@ -20,13 +20,14 @@
 #ifndef __vtkSMServerStateLocator_h
 #define __vtkSMServerStateLocator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStateLocator.h"
 #include "vtkWeakPointer.h" // needed for the session ref
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMServerStateLocator : public vtkSMStateLocator
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMServerStateLocator : public vtkSMStateLocator
 {
 public:
   static vtkSMServerStateLocator* New();

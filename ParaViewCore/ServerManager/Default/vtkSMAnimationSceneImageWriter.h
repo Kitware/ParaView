@@ -28,6 +28,7 @@
 #ifndef __vtkSMAnimationSceneImageWriter_h
 #define __vtkSMAnimationSceneImageWriter_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMAnimationSceneWriter.h"
 
 class vtkGenericMovieWriter;
@@ -35,7 +36,7 @@ class vtkImageData;
 class vtkImageWriter;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMAnimationSceneImageWriter : public vtkSMAnimationSceneWriter
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMAnimationSceneImageWriter : public vtkSMAnimationSceneWriter
 {
 public:
   static vtkSMAnimationSceneImageWriter* New();

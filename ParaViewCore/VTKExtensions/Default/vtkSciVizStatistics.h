@@ -34,6 +34,7 @@
 #ifndef __vtkSciVizStatistics_h
 #define __vtkSciVizStatistics_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
 class vtkCompositeDataSet;
@@ -44,7 +45,7 @@ class vtkMultiBlockDataSet;
 class vtkSciVizStatisticsP;
 class vtkStatisticsAlgorithm;
 
-class VTK_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
 {
 public:
   vtkTypeMacro(vtkSciVizStatistics,vtkTableAlgorithm);

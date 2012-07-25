@@ -21,6 +21,7 @@
 #ifndef __vtkFlashContour_h
 #define __vtkFlashContour_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkImageData;
@@ -31,7 +32,7 @@ class vtkPolyData;
 class vtkDoubleArray;
 class vtkIntArray;
 
-class VTK_EXPORT vtkFlashContour : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFlashContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkFlashContour *New();

@@ -21,6 +21,7 @@
 
 #include "vtkObject.h"
 #include "vtkStdString.h" // needed for vtkStdString.
+#include "vtkPVCommonModule.h" // needed for export macro
 
 class vtkCollection;
 class vtkPVXMLParser;
@@ -29,7 +30,7 @@ class vtkPVXMLParser;
 struct vtkPVXMLElementInternals;
 //ETX
 
-class VTK_EXPORT vtkPVXMLElement : public vtkObject
+class VTKPVCOMMON_EXPORT vtkPVXMLElement : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVXMLElement,vtkObject);

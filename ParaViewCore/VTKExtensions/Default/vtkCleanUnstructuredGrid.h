@@ -27,11 +27,12 @@
 #ifndef __vtkCleanUnstructuredGrid_h
 #define __vtkCleanUnstructuredGrid_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkPointLocator;
 
-class VTK_EXPORT vtkCleanUnstructuredGrid: public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGrid: public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCleanUnstructuredGrid *New();

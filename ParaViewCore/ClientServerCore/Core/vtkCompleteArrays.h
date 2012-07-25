@@ -22,6 +22,7 @@
 #ifndef __vtkCompleteArrays_h
 #define __vtkCompleteArrays_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
 
 class vtkMultiProcessController;
@@ -30,7 +31,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkDataSetAttributes;
 
 
-class VTK_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm 
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkCompleteArrays : public vtkDataSetAlgorithm 
 {
 public:
   vtkTypeMacro(vtkCompleteArrays,vtkDataSetAlgorithm);

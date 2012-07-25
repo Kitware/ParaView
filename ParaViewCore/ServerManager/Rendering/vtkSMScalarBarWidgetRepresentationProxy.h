@@ -23,11 +23,12 @@
 #ifndef __vtkSMScalarBarWidgetRepresentationProxy_h
 #define __vtkSMScalarBarWidgetRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMNewWidgetRepresentationProxy.h"
 
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMScalarBarWidgetRepresentationProxy : 
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMScalarBarWidgetRepresentationProxy : 
   public vtkSMNewWidgetRepresentationProxy
 {
 public:

@@ -22,13 +22,14 @@
 #ifndef __vtkPVSelectionInformation_h
 #define __vtkPVSelectionInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSelection;
 
-class VTK_EXPORT vtkPVSelectionInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVSelectionInformation : public vtkPVInformation
 {
 public:
   static vtkPVSelectionInformation* New();

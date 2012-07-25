@@ -19,9 +19,10 @@
 #ifndef __vtkSIArraySelectionProperty_h
 #define __vtkSIArraySelectionProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSIArraySelectionProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIArraySelectionProperty : public vtkSIProperty
 {
 public:
   static vtkSIArraySelectionProperty* New();

@@ -21,9 +21,10 @@
 #define __vtkCSVExporter_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 class vtkFieldData;
 
-class VTK_EXPORT vtkCSVExporter : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCSVExporter : public vtkObject
 {
 public:
   static vtkCSVExporter* New();

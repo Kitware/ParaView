@@ -29,11 +29,12 @@
 #ifndef __vtkCompositeRepresentation_h
 #define __vtkCompositeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkStringArray;
 
-class VTK_EXPORT vtkCompositeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCompositeRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkCompositeRepresentation* New();

@@ -21,6 +21,7 @@
 #ifndef __vtk3DWidgetRepresentation_h
 #define __vtk3DWidgetRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -29,7 +30,7 @@ class vtkPVRenderView;
 class vtkWidgetRepresentation;
 class vtkTransform;
 
-class VTK_EXPORT vtk3DWidgetRepresentation : public vtkDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtk3DWidgetRepresentation : public vtkDataRepresentation
 {
 public:
   static vtk3DWidgetRepresentation* New();

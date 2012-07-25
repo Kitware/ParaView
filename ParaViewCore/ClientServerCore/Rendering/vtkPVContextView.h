@@ -20,6 +20,7 @@
 #ifndef __vtkPVContextView_h
 #define __vtkPVContextView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 
 class vtkAbstractContextItem;
@@ -28,7 +29,7 @@ class vtkContextView;
 class vtkInformationIntegerKey;
 class vtkRenderWindow;
 
-class VTK_EXPORT vtkPVContextView : public vtkPVView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextView : public vtkPVView
 {
 public:
   vtkTypeMacro(vtkPVContextView, vtkPVView);

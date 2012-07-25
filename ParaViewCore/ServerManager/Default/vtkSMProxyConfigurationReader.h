@@ -34,12 +34,13 @@
 #ifndef __vtkSMProxyConfigurationReader_h
 #define __vtkSMProxyConfigurationReader_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMProxyConfigurationReader : public vtkSMObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationReader : public vtkSMObject
 {
 public:
   static vtkSMProxyConfigurationReader *New();

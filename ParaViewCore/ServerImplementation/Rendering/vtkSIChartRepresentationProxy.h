@@ -22,9 +22,10 @@
 #ifndef __vtkSIChartRepresentationProxy_h
 #define __vtkSIChartRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
-class VTK_EXPORT vtkSIChartRepresentationProxy : public vtkSISourceProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIChartRepresentationProxy : public vtkSISourceProxy
 {
 public:
   static vtkSIChartRepresentationProxy* New();

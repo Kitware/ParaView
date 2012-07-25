@@ -22,10 +22,11 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotHistoryReader_h
 #define __vtkSpyPlotHistoryReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 class vtkTable;
 
-class VTK_EXPORT vtkSpyPlotHistoryReader : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotHistoryReader : public vtkTableAlgorithm
 {
 public:
   static vtkSpyPlotHistoryReader* New();

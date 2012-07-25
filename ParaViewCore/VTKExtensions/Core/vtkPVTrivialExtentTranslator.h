@@ -24,11 +24,12 @@
 #define __vtkPVTrivialExtentTranslator_h
 
 #include "vtkExtentTranslator.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkDataSet;
 class vtkPVTrivialExtentTranslatorInternals;
 
-class VTK_EXPORT vtkPVTrivialExtentTranslator : public vtkExtentTranslator
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTrivialExtentTranslator : public vtkExtentTranslator
 {
 public:
   static vtkPVTrivialExtentTranslator* New();

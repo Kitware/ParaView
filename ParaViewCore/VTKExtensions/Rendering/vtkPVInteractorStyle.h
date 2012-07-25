@@ -25,11 +25,12 @@
 #define __vtkPVInteractorStyle_h
 
 #include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkCameraManipulator;
 class vtkCollection;
 
-class VTK_EXPORT vtkPVInteractorStyle : public vtkInteractorStyleTrackballCamera
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
 public:
   static vtkPVInteractorStyle *New();

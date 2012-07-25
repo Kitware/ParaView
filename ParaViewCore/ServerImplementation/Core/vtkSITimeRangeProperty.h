@@ -19,9 +19,10 @@
 #ifndef __vtkSITimeRangeProperty_h
 #define __vtkSITimeRangeProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSITimeRangeProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeRangeProperty : public vtkSIProperty
 {
 public:
   static vtkSITimeRangeProperty* New();

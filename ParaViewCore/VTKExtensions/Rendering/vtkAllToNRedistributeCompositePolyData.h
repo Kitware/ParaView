@@ -20,10 +20,11 @@
 #define __vtkAllToNRedistributeCompositePolyData_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkAllToNRedistributeCompositePolyData : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAllToNRedistributeCompositePolyData : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAllToNRedistributeCompositePolyData* New();

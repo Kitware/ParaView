@@ -22,6 +22,7 @@
 #ifndef __vtkSpreadSheetView_h
 #define __vtkSpreadSheetView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 
 class vtkClientServerMoveData;
@@ -32,7 +33,7 @@ class vtkSortedTableStreamer;
 class vtkTable;
 class vtkVariant;
 
-class VTK_EXPORT vtkSpreadSheetView : public vtkPVView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetView : public vtkPVView
 {
 public:
   static vtkSpreadSheetView* New();

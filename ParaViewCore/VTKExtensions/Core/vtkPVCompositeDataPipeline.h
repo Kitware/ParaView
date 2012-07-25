@@ -26,8 +26,9 @@
 #define __vtkPVCompositeDataPipeline_h
 
 #include "vtkCompositeDataPipeline.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVCompositeDataPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCompositeDataPipeline* New();

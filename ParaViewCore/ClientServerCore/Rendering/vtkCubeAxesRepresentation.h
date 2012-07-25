@@ -20,6 +20,7 @@
 #ifndef __vtkCubeAxesRepresentation_h
 #define __vtkCubeAxesRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -27,7 +28,7 @@ class vtkCubeAxesActor;
 class vtkPVRenderView;
 class vtkOutlineSource;
 
-class VTK_EXPORT vtkCubeAxesRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCubeAxesRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkCubeAxesRepresentation* New();

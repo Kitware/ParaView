@@ -1,6 +1,7 @@
 #ifndef __vtkSpyPlotBlockIterator_h
 #define __vtkSpyPlotBlockIterator_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSpyPlotUniReader.h"
 #include "vtkSpyPlotReaderMap.h"
 #include "assert.h"
@@ -10,7 +11,7 @@ class vtkSpyPlotReaderMap;
 class vtkSpyPlotReader;
 
 //-----------------------------------------------------------------------------
-class VTK_EXPORT vtkSpyPlotBlockIterator
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockIterator
 {
 public:
   // Description:
@@ -96,7 +97,7 @@ protected:
 
 
 
-class VTK_EXPORT vtkSpyPlotBlockDistributionBlockIterator
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlockDistributionBlockIterator
   : public vtkSpyPlotBlockIterator
 {
 public:
@@ -109,7 +110,7 @@ protected:
 };
 
 
-class VTK_EXPORT vtkSpyPlotFileDistributionBlockIterator
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotFileDistributionBlockIterator
   : public vtkSpyPlotBlockIterator
 {
 public:
@@ -184,3 +185,5 @@ inline int vtkSpyPlotBlockIterator::GetNumberOfFields() const
 }
   
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSpyPlotBlockIterator.h

@@ -21,12 +21,13 @@
 #ifndef __vtkSelectionRepresentation_h
 #define __vtkSelectionRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkGeometryRepresentation;
 class vtkDataLabelRepresentation;
 
-class VTK_EXPORT vtkSelectionRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkSelectionRepresentation* New();

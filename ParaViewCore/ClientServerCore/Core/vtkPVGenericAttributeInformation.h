@@ -22,11 +22,12 @@
 #ifndef __vtkPVGenericAttributeInformation_h
 #define __vtkPVGenericAttributeInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVArrayInformation.h"
 
 class vtkClientServerStream;
 
-class VTK_EXPORT vtkPVGenericAttributeInformation : public vtkPVArrayInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVGenericAttributeInformation : public vtkPVArrayInformation
 {
 public:
   static vtkPVGenericAttributeInformation* New();

@@ -27,10 +27,11 @@
 #ifndef __vtkSpreadSheetRepresentation_h
 #define __vtkSpreadSheetRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkBlockDeliveryPreprocessor;
-class VTK_EXPORT vtkSpreadSheetRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSpreadSheetRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkSpreadSheetRepresentation* New();

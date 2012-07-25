@@ -21,12 +21,13 @@
 #ifndef __vtkMPIMToNSocketConnectionPortInformation_h
 #define __vtkMPIMToNSocketConnectionPortInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkMPIMToNSocketConnectionPortInformationInternals;
 
 
-class VTK_EXPORT vtkMPIMToNSocketConnectionPortInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnectionPortInformation : public vtkPVInformation
 {
 public:
   static vtkMPIMToNSocketConnectionPortInformation* New();

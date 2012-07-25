@@ -23,6 +23,7 @@
 #ifndef __vtkSMAnimationScene_h
 #define __vtkSMAnimationScene_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkPVAnimationScene.h"
 
 class vtkCompositeAnimationPlayer;
@@ -30,7 +31,7 @@ class vtkEventForwarderCommand;
 class vtkSMProxy;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMAnimationScene : public vtkPVAnimationScene
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMAnimationScene : public vtkPVAnimationScene
 {
 public:
   static vtkSMAnimationScene* New();

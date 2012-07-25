@@ -22,6 +22,7 @@
 #ifndef __vtkGeometryRepresentation_h
 #define __vtkGeometryRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkProperty.h" // needed for VTK_POINTS etc.
 
@@ -34,7 +35,7 @@ class vtkQuadricClustering;
 class vtkScalarsToColors;
 class vtkTexture;
 
-class VTK_EXPORT vtkGeometryRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGeometryRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkGeometryRepresentation* New();

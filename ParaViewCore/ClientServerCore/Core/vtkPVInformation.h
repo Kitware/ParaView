@@ -19,12 +19,13 @@
 #ifndef __vtkPVInformation_h
 #define __vtkPVInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkClientServerStream;
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkPVInformation : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVInformation : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVInformation, vtkObject);

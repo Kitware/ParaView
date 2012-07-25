@@ -23,10 +23,11 @@
 #ifndef __vtkPVRepresentationAnimationHelper_h
 #define __vtkPVRepresentationAnimationHelper_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
-class VTK_EXPORT vtkPVRepresentationAnimationHelper : public vtkSMProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVRepresentationAnimationHelper : public vtkSMProxy
 {
 public:
   static vtkPVRepresentationAnimationHelper* New();

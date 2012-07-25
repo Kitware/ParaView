@@ -20,9 +20,10 @@
 #define __vtkBSPCutsGenerator_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 class vtkPKdTree;
 
-class VTK_EXPORT vtkBSPCutsGenerator : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBSPCutsGenerator : public vtkDataObjectAlgorithm
 {
 public:
   static vtkBSPCutsGenerator* New();

@@ -50,6 +50,7 @@
 #ifndef __vtkSMProxyProperty_h
 #define __vtkSMProxyProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProperty.h"
 
 class vtkSMProxy;
@@ -58,7 +59,7 @@ class vtkSMStateLocator;
 struct vtkSMProxyPropertyInternals;
 //ETX
 
-class VTK_EXPORT vtkSMProxyProperty : public vtkSMProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyProperty : public vtkSMProperty
 {
 public:
   // Description:

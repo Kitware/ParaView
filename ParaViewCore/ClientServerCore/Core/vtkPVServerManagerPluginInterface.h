@@ -21,11 +21,12 @@
 #ifndef __vtkPVServerManagerPluginInterface_h
 #define __vtkPVServerManagerPluginInterface_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkClientServerInterpreterInitializer.h"
 #include <vector> // STL Header
 #include <string> // STL Header
 
-class VTK_EXPORT vtkPVServerManagerPluginInterface
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerManagerPluginInterface
 {
 public:
   virtual ~vtkPVServerManagerPluginInterface();
@@ -44,3 +45,4 @@ public:
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkPVServerManagerPluginInterface.h

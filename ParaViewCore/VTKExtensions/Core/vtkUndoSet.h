@@ -30,12 +30,13 @@
 #define __vtkUndoSet_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkCollection;
 class vtkPVXMLElement;
 class vtkUndoElement;
 
-class VTK_EXPORT vtkUndoSet : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoSet : public vtkObject
 {
 public:
   static vtkUndoSet* New();

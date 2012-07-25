@@ -21,9 +21,10 @@
 #ifndef __vtkPVLinearExtrusionFilter_h
 #define __vtkPVLinearExtrusionFilter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPLinearExtrusionFilter.h"
 
-class VTK_EXPORT vtkPVLinearExtrusionFilter : public vtkPLinearExtrusionFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVLinearExtrusionFilter : public vtkPLinearExtrusionFilter
 {
 public:
   static vtkPVLinearExtrusionFilter *New();

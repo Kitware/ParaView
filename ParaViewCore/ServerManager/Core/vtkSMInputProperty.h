@@ -31,11 +31,12 @@
 struct vtkSMInputPropertyInternals;
 //ETX
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxyProperty.h"
 
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMInputProperty : public vtkSMProxyProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputProperty : public vtkSMProxyProperty
 {
 public:
   static vtkSMInputProperty* New();

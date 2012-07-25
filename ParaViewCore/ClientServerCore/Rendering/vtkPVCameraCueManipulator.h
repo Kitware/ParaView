@@ -25,11 +25,12 @@
 #ifndef __vtkPVCameraCueManipulator_h
 #define __vtkPVCameraCueManipulator_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVKeyFrameCueManipulator.h"
 
 class vtkCameraInterpolator;
 
-class VTK_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCameraCueManipulator : public vtkPVKeyFrameCueManipulator
 {
 public:
   static vtkPVCameraCueManipulator* New();

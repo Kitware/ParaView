@@ -19,6 +19,7 @@
 #ifndef __vtkProcessModule_h
 #define __vtkProcessModule_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
@@ -29,7 +30,7 @@ class vtkSession;
 class vtkSessionIterator;
 class vtkProcessModuleInternals;
 
-class VTK_EXPORT vtkProcessModule : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModule : public vtkObject
 {
 public:
   static vtkProcessModule* New();

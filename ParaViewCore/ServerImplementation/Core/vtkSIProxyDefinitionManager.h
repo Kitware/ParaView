@@ -39,13 +39,14 @@
 #ifndef __vtkSIProxyDefinitionManager_h
 #define __vtkSIProxyDefinitionManager_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"
 
 class vtkPVPlugin;
 class vtkPVProxyDefinitionIterator;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSIProxyDefinitionManager : public vtkSIObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProxyDefinitionManager : public vtkSIObject
 {
 public:
   static vtkSIProxyDefinitionManager* New();

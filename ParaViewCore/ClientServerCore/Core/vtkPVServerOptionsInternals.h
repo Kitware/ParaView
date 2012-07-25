@@ -90,3 +90,5 @@ public:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVServerOptionsInternals.h

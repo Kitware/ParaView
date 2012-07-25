@@ -25,11 +25,12 @@
 #ifndef __vtkSMFixedTypeDomain_h
 #define __vtkSMFixedTypeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMFixedTypeDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFixedTypeDomain : public vtkSMDomain
 {
 public:
   static vtkSMFixedTypeDomain* New();

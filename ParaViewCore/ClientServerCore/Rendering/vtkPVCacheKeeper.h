@@ -26,11 +26,12 @@
 #ifndef __vtkPVCacheKeeper_h
 #define __vtkPVCacheKeeper_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkCacheSizeKeeper;
 
-class VTK_EXPORT vtkPVCacheKeeper : public vtkDataObjectAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeper : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPVCacheKeeper* New();

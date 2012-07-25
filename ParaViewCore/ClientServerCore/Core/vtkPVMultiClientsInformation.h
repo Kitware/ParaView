@@ -21,11 +21,12 @@
 #ifndef __vtkPVMultiClientsInformation_h
 #define __vtkPVMultiClientsInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkClientServerStream;
 
-class VTK_EXPORT vtkPVMultiClientsInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVMultiClientsInformation : public vtkPVInformation
 {
 public:
   static vtkPVMultiClientsInformation* New();

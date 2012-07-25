@@ -100,3 +100,6 @@ private:
   int Data[SIZE];
 };
 #endif
+
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfaceIdListItem.h

@@ -38,6 +38,7 @@
 #ifndef __vtkSMWriterFactory_h
 #define __vtkSMWriterFactory_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkPVXMLElement;
@@ -46,7 +47,7 @@ class vtkSMSession;
 class vtkSMSessionProxyManager;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMWriterFactory : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMWriterFactory : public vtkSMObject
 {
 public:
   static vtkSMWriterFactory* New();

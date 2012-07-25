@@ -36,12 +36,13 @@
 #ifndef __vtkSMCollaborationManager_h
 #define __vtkSMCollaborationManager_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
 class vtkSMProxyLocator;
 
-class VTK_EXPORT vtkSMCollaborationManager : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCollaborationManager : public vtkSMRemoteObject
 {
 public:
   // Description:

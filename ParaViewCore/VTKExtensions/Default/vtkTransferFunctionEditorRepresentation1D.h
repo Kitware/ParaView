@@ -27,9 +27,10 @@
 #ifndef __vtkTransferFunctionEditorRepresentation1D_h
 #define __vtkTransferFunctionEditorRepresentation1D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorRepresentation.h"
 
-class VTK_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorRepresentation1D : public vtkTransferFunctionEditorRepresentation
 {
 public:
   vtkTypeMacro(vtkTransferFunctionEditorRepresentation1D, vtkTransferFunctionEditorRepresentation);

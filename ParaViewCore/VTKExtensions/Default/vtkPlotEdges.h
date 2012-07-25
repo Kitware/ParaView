@@ -19,6 +19,7 @@
 #ifndef __vtkPlotEdges_h
 #define __vtkPlotEdges_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 //BTX
@@ -29,7 +30,7 @@ class vtkCollection;
 class vtkMultiBlockDataSet;
 //ETX
 
-class VTK_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkPlotEdges, vtkMultiBlockDataSetAlgorithm);

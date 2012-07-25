@@ -22,6 +22,7 @@
 #ifndef __vtkUnstructuredGridVolumeRepresentation_h
 #define __vtkUnstructuredGridVolumeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkColorTransferFunction;
@@ -38,7 +39,7 @@ class vtkUnstructuredGridVolumeMapper;
 class vtkVolumeProperty;
 class vtkVolumeRepresentationPreprocessor;
 
-class VTK_EXPORT vtkUnstructuredGridVolumeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkUnstructuredGridVolumeRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkUnstructuredGridVolumeRepresentation* New();

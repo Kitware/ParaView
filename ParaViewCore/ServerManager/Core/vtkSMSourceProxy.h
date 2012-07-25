@@ -30,6 +30,7 @@
 #ifndef __vtkSMSourceProxy_h
 #define __vtkSMSourceProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
 class vtkPVArrayInformation;
@@ -42,7 +43,7 @@ class vtkSMOutputPort;
 class vtkSMProperty;
 class vtkSMSessionProxyManager;
 
-class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSourceProxy : public vtkSMProxy
 {
 public:
   static vtkSMSourceProxy* New();

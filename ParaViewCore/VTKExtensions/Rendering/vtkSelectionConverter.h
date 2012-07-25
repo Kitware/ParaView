@@ -31,13 +31,14 @@
 #define __vtkSelectionConverter_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkSelection;
 class vtkSelectionNode;
 class vtkCompositeDataIterator;
 class vtkDataSet;
 
-class VTK_EXPORT vtkSelectionConverter : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSelectionConverter : public vtkObject
 {
 public:
   static vtkSelectionConverter* New();

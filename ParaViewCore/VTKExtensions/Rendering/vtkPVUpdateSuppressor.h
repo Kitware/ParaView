@@ -24,8 +24,9 @@
 #define __vtkPVUpdateSuppressor_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
 public:
   vtkTypeMacro(vtkPVUpdateSuppressor,vtkDataObjectAlgorithm);

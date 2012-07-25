@@ -90,3 +90,6 @@ class vtkMaterialInterfaceProcessLoading
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkMaterialInterfaceProcessLoading &fp);
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, std::vector<vtkMaterialInterfaceProcessLoading> &vfp);
 #endif
+
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfaceProcessLoading.h

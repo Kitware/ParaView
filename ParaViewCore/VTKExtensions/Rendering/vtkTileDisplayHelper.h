@@ -28,10 +28,11 @@
 
 #include "vtkObject.h"
 #include "vtkSynchronizedRenderers.h" // needed for vtkRawImage.
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkRenderer;
 
-class VTK_EXPORT vtkTileDisplayHelper : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkTileDisplayHelper : public vtkObject
 {
 public:
   // Description:

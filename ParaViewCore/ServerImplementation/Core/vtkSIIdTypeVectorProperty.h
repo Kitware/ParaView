@@ -19,11 +19,12 @@
 #ifndef __vtkSIIdTypeVectorProperty_h
 #define __vtkSIIdTypeVectorProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"
 #include "vtkSIVectorPropertyTemplate.h" // real superclass
 
 #define vtkSIVectorProperty vtkSIVectorPropertyTemplate<vtkIdType, bool>
-class VTK_EXPORT vtkSIIdTypeVectorProperty : public vtkSIVectorProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIIdTypeVectorProperty : public vtkSIVectorProperty
 #undef vtkSIVectorProperty
 {
 public:

@@ -31,10 +31,11 @@
 #define __vtkPVTrivialProducer_h
 
 #include "vtkTrivialProducer.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkPVTrivialExtentTranslator;
 
-class VTK_EXPORT vtkPVTrivialProducer : public vtkTrivialProducer
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTrivialProducer : public vtkTrivialProducer
 {
 public:
   static vtkPVTrivialProducer* New();

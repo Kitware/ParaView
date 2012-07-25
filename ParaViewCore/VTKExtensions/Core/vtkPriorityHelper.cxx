@@ -92,3 +92,9 @@ void vtkPriorityHelper::Update()
     this->Input->Update();
     }
 }
+  
+//-----------------------------------------------------------------------------
+void vtkPriorityHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

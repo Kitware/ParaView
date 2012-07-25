@@ -30,8 +30,9 @@
 #define __vtkPVMergeTables_h
 
 #include "vtkTableAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVMergeTables : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVMergeTables : public vtkTableAlgorithm
 {
 public:
   static vtkPVMergeTables* New();

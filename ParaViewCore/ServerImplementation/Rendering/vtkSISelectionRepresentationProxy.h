@@ -20,11 +20,12 @@
 #ifndef __vtkSISelectionRepresentationProxy_h
 #define __vtkSISelectionRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
 class vtkSMDataLabelRepresentationProxy;
 
-class VTK_EXPORT vtkSISelectionRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSISelectionRepresentationProxy : public vtkSIProxy
 {
 public:
   static vtkSISelectionRepresentationProxy* New();

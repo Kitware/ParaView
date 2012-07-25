@@ -35,6 +35,7 @@
 #ifndef __vtkSMPropertyAdaptor_h
 #define __vtkSMPropertyAdaptor_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMDomain;
@@ -54,7 +55,7 @@ class vtkSMIdTypeVectorProperty;
 class vtkSMIntVectorProperty;
 class vtkSMStringVectorProperty;
 
-class VTK_EXPORT vtkSMPropertyAdaptor : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyAdaptor : public vtkSMObject
 {
 public:
   static vtkSMPropertyAdaptor* New();

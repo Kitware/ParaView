@@ -24,10 +24,12 @@
 
 #include "vtkXMLParser.h"
 #include "vtkCommandOptions.h" // for enum
+#include "vtkPVCommonModule.h" // needed for export macro
+
 class vtkCommandOptionsXMLParserInternal;
 class vtkCommandOptions;
 
-class VTK_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
+class VTKPVCOMMON_EXPORT vtkCommandOptionsXMLParser : public vtkXMLParser
 {
 public:
   static vtkCommandOptionsXMLParser* New();

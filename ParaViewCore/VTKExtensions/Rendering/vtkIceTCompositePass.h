@@ -33,6 +33,7 @@
 
 #include "vtkRenderPass.h"
 #include "vtkSynchronizedRenderers.h" //  needed for vtkRawImage.
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessController;
 class vtkPKdTree;
@@ -44,7 +45,7 @@ class vtkOpenGLRenderWindow;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 
-class VTK_EXPORT vtkIceTCompositePass : public vtkRenderPass
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTCompositePass : public vtkRenderPass
 {
 public:
   static vtkIceTCompositePass* New();

@@ -21,6 +21,7 @@
 #ifndef __vtkSMSessionClient_h
 #define __vtkSMSessionClient_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSession.h"
 
 class vtkMultiProcessController;
@@ -29,7 +30,7 @@ class vtkSMCollaborationManager;
 class vtkSMProxyLocator;
 class vtkSMProxyManager;
 
-class VTK_EXPORT vtkSMSessionClient : public vtkSMSession
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSessionClient : public vtkSMSession
 {
 public:
   static vtkSMSessionClient* New();

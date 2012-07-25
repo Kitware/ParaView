@@ -22,11 +22,12 @@
 #ifndef __vtkSITextSourceRepresentationProxy_h
 #define __vtkSITextSourceRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSITextSourceRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSITextSourceRepresentationProxy : public vtkSIProxy
 {
 public:
   static vtkSITextSourceRepresentationProxy* New();

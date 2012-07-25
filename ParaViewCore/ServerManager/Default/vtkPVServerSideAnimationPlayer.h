@@ -19,12 +19,13 @@
 #ifndef __vtkPVServerSideAnimationPlayer_h
 #define __vtkPVServerSideAnimationPlayer_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSMAnimationSceneImageWriter;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkPVServerSideAnimationPlayer : public vtkObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVServerSideAnimationPlayer : public vtkObject
 {
 public:
   static vtkPVServerSideAnimationPlayer* New();

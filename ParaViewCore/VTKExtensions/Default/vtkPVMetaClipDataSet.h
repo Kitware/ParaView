@@ -19,11 +19,12 @@
 #ifndef __vtkPVMetaClipDataSet_h
 #define __vtkPVMetaClipDataSet_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPVDataSetAlgorithmSelectorFilter.h"
 
 class vtkImplicitFunction;
 
-class VTK_EXPORT vtkPVMetaClipDataSet : public vtkPVDataSetAlgorithmSelectorFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVMetaClipDataSet : public vtkPVDataSetAlgorithmSelectorFilter
 {
 public:
   vtkTypeMacro(vtkPVMetaClipDataSet,vtkPVDataSetAlgorithmSelectorFilter);

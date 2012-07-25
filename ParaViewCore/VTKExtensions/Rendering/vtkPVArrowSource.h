@@ -27,8 +27,9 @@
 #define __vtkPVArrowSource_h
 
 #include "vtkArrowSource.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVArrowSource : public vtkArrowSource
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVArrowSource : public vtkArrowSource
 {
 public:
   // Description

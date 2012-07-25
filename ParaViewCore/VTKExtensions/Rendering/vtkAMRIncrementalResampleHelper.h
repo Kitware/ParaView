@@ -27,6 +27,7 @@
 #define VTKAMRINCREMENTALRESAMPLEHELPER_H_
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 // Forward declarations
 class vtkAMRDomainParameters;
@@ -37,7 +38,7 @@ class vtkMultiProcessController;
 class vtkFieldData;
 class vtkCellData;
 
-class VTK_EXPORT vtkAMRIncrementalResampleHelper : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkAMRIncrementalResampleHelper : public vtkObject
 {
 public:
   static vtkAMRIncrementalResampleHelper *New();

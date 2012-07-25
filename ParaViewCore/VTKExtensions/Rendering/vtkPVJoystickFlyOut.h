@@ -21,8 +21,9 @@
 #define __vtkPVJoystickFlyOut_h
 
 #include "vtkPVJoystickFly.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVJoystickFlyOut : public vtkPVJoystickFly
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVJoystickFlyOut : public vtkPVJoystickFly
 {
 public:
   static vtkPVJoystickFlyOut *New();

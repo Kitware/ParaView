@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotReader_h
 #define __vtkSpyPlotReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"
 
 class vtkBoundingBox;
@@ -67,7 +68,7 @@ class vtkSpyPlotBlockIterator;
 class vtkSpyPlotReaderMap;
 class vtkSpyPlotUniReader;
 
-class VTK_EXPORT vtkSpyPlotReader : public vtkCompositeDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotReader : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkSpyPlotReader* New();

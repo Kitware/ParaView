@@ -25,7 +25,7 @@
 #ifndef __vtkReservedRemoteObjectIds_h
 #define __vtkReservedRemoteObjectIds_h
 
-struct VTK_EXPORT vtkReservedRemoteObjectIds
+struct VTKPVCLIENTSERVERCORECORE_EXPORT vtkReservedRemoteObjectIds
 {
   // This Enum allow the user to list a set of the reserved GlobalIds
   enum ReservedGlobalIds
@@ -37,3 +37,5 @@ struct VTK_EXPORT vtkReservedRemoteObjectIds
     };
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkReservedRemoteObjectIds.h

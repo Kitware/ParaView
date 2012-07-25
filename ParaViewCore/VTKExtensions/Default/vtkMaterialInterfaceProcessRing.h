@@ -86,3 +86,5 @@ private:
   std::vector<int> Buffer;
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfaceProcessRing.h

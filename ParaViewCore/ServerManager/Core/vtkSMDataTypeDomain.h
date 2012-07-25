@@ -29,6 +29,7 @@
 #ifndef __vtkSMDataTypeDomain_h
 #define __vtkSMDataTypeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 class vtkSMSourceProxy;
@@ -36,7 +37,7 @@ class vtkSMSourceProxy;
 struct vtkSMDataTypeDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDataTypeDomain : public vtkSMDomain
 {
 public:
   static vtkSMDataTypeDomain* New();

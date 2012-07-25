@@ -21,9 +21,10 @@
 #ifndef __vtkPVEnvironmentInformationHelper_h
 #define __vtkPVEnvironmentInformationHelper_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkPVEnvironmentInformationHelper : public vtkObject
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVEnvironmentInformationHelper : public vtkObject
 {
 public:
   static vtkPVEnvironmentInformationHelper* New();

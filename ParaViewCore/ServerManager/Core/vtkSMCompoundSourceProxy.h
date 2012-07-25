@@ -32,13 +32,14 @@
 #ifndef __vtkSMCompoundSourceProxy_h
 #define __vtkSMCompoundSourceProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"
 
 class vtkSMProxyLocator;
 class vtkPVXMLElement;
 class vtkSMProxyManager;
 
-class VTK_EXPORT vtkSMCompoundSourceProxy : public vtkSMSourceProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundSourceProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMCompoundSourceProxy* New();

@@ -20,9 +20,10 @@
 #ifndef __vtkPVDReader_h
 #define __vtkPVDReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkXMLCollectionReader.h"
 
-class VTK_EXPORT vtkPVDReader : public vtkXMLCollectionReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVDReader : public vtkXMLCollectionReader
 {
 public:
   static vtkPVDReader* New();

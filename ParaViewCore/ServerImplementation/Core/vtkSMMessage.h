@@ -75,3 +75,5 @@ inline vtkClientServerStream& operator << (vtkClientServerStream& stream,
 
 using namespace paraview_protobuf;
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMMessage.h

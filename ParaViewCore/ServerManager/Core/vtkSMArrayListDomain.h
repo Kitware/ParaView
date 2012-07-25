@@ -59,6 +59,7 @@
 #ifndef __vtkSMArrayListDomain_h
 #define __vtkSMArrayListDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"
 #include "vtkStdString.h" // needed for vtkStdString.
 
@@ -72,7 +73,7 @@ class vtkPVArrayInformation;
 struct vtkSMArrayListDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMArrayListDomain* New();

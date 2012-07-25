@@ -20,11 +20,12 @@
 #ifndef __vtkSessionIterator_h
 #define __vtkSessionIterator_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSession;
 
-class VTK_EXPORT vtkSessionIterator : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkSessionIterator : public vtkObject
 {
 public:
   static vtkSessionIterator* New();

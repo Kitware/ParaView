@@ -21,9 +21,10 @@
 #ifndef __vtkSMSpreadSheetRepresentationProxy_h
 #define __vtkSMSpreadSheetRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMSpreadSheetRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSpreadSheetRepresentationProxy : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMSpreadSheetRepresentationProxy* New();

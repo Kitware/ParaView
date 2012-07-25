@@ -20,9 +20,10 @@
 #ifndef __vtkOutlineRepresentation_h
 #define __vtkOutlineRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"
 
-class VTK_EXPORT vtkOutlineRepresentation : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation : public vtkGeometryRepresentation
 {
 public:
   static vtkOutlineRepresentation* New();

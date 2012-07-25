@@ -26,6 +26,7 @@
 #ifndef __vtkSMUndoStackBuilder_h
 #define __vtkSMUndoStackBuilder_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
@@ -35,7 +36,7 @@ class vtkUndoElement;
 class vtkUndoSet;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
 {
 public:
   static vtkSMUndoStackBuilder* New();

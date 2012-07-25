@@ -20,6 +20,7 @@
 #ifndef __vtkTransferFunctionEditorWidgetSimple1D_h
 #define __vtkTransferFunctionEditorWidgetSimple1D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorWidget1D.h"
 
 class vtkAbstractWidget;
@@ -27,7 +28,7 @@ class vtkHandleWidget;
 class vtkNodeList;
 class vtkTransferFunctionEditorRepresentationSimple1D;
 
-class VTK_EXPORT vtkTransferFunctionEditorWidgetSimple1D : public vtkTransferFunctionEditorWidget1D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorWidgetSimple1D : public vtkTransferFunctionEditorWidget1D
 {
 public:
   static vtkTransferFunctionEditorWidgetSimple1D* New();

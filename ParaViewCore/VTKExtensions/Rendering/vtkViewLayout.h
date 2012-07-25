@@ -21,8 +21,9 @@
 #define __vtkViewLayout_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkViewLayout : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkViewLayout : public vtkObject
 {
 public:
   static vtkViewLayout* New();

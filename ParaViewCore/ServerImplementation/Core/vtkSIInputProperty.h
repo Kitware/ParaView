@@ -21,9 +21,10 @@
 #ifndef __vtkSIInputProperty_h
 #define __vtkSIInputProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProxyProperty.h"
 
-class VTK_EXPORT vtkSIInputProperty : public vtkSIProxyProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIInputProperty : public vtkSIProxyProperty
 {
 public:
   static vtkSIInputProperty* New();

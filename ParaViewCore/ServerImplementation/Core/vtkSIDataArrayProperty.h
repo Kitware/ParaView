@@ -19,9 +19,10 @@
 #ifndef __vtkSIDataArrayProperty_h
 #define __vtkSIDataArrayProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSIDataArrayProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIDataArrayProperty : public vtkSIProperty
 {
 public:
   static vtkSIDataArrayProperty* New();

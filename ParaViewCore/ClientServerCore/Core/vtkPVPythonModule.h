@@ -30,9 +30,10 @@
 #ifndef __vtkPVPythonModule_h
 #define __vtkPVPythonModule_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkPVPythonModule : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonModule : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVPythonModule, vtkObject);

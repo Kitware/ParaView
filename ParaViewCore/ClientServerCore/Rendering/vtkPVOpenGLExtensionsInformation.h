@@ -21,11 +21,12 @@
 #ifndef __vtkPVOpenGLExtensionsInformation_h
 #define __vtkPVOpenGLExtensionsInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkPVOpenGLExtensionsInformationInternal;
 
-class VTK_EXPORT vtkPVOpenGLExtensionsInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVOpenGLExtensionsInformation : public vtkPVInformation
 {
 public:
   static vtkPVOpenGLExtensionsInformation* New();

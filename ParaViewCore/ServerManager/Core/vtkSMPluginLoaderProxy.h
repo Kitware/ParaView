@@ -21,9 +21,10 @@
 #ifndef __vtkSMPluginLoaderProxy_h
 #define __vtkSMPluginLoaderProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-class VTK_EXPORT vtkSMPluginLoaderProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPluginLoaderProxy : public vtkSMProxy
 {
 public:
   static vtkSMPluginLoaderProxy* New();

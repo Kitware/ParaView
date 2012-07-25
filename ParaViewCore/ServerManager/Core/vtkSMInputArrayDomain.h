@@ -34,6 +34,7 @@
 #ifndef __vtkSMInputArrayDomain_h
 #define __vtkSMInputArrayDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 // Needed to get around some header defining ANY as a macro
@@ -45,7 +46,7 @@ class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMInputArrayDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMInputArrayDomain : public vtkSMDomain
 {
 public:
   static vtkSMInputArrayDomain* New();

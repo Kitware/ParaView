@@ -23,11 +23,12 @@
 #ifndef __vtkPVTemporalDataInformation_h
 #define __vtkPVTemporalDataInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkPVDataSetAttributesInformation;
 
-class VTK_EXPORT vtkPVTemporalDataInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVTemporalDataInformation : public vtkPVInformation
 {
 public:
   static vtkPVTemporalDataInformation* New();

@@ -19,6 +19,7 @@
 #ifndef __vtkSMDomainIterator_h
 #define __vtkSMDomainIterator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMProperty;
@@ -28,7 +29,7 @@ class vtkSMDomain;
 struct vtkSMDomainIteratorInternals;
 //ETX
 
-class VTK_EXPORT vtkSMDomainIterator : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDomainIterator : public vtkSMObject
 {
 public:
   static vtkSMDomainIterator* New();

@@ -21,6 +21,7 @@
 #ifndef __vtkSMPropertyLink_h
 #define __vtkSMPropertyLink_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"
 
 //BTX
@@ -29,7 +30,7 @@ struct vtkSMPropertyLinkInternals;
 class vtkSMPropertyLinkObserver;
 //ETX
 
-class VTK_EXPORT vtkSMPropertyLink : public vtkSMLink
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyLink : public vtkSMLink
 {
 public:
   static vtkSMPropertyLink* New();

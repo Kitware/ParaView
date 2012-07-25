@@ -25,12 +25,13 @@
 #ifndef __vtkSMNumberOfComponentsDomain_h
 #define __vtkSMNumberOfComponentsDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMIntRangeDomain.h"
 
 class vtkSMSourceProxy;
 class vtkSMInputArrayDomain;
 
-class VTK_EXPORT vtkSMNumberOfComponentsDomain : public vtkSMIntRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNumberOfComponentsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMNumberOfComponentsDomain* New();

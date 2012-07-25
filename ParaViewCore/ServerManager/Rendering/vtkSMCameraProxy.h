@@ -20,9 +20,10 @@
 #ifndef __vtkSMCameraProxy_h
 #define __vtkSMCameraProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-class VTK_EXPORT vtkSMCameraProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMCameraProxy : public vtkSMProxy
 {
 public:
   static vtkSMCameraProxy* New();

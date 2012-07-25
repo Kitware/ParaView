@@ -20,9 +20,10 @@
 #ifndef __vtkPVBarChartView_h
 #define __vtkPVBarChartView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVXYChartView.h"
 
-class VTK_EXPORT vtkPVBarChartView : public vtkPVXYChartView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVBarChartView : public vtkPVXYChartView
 {
 public:
   static vtkPVBarChartView* New();

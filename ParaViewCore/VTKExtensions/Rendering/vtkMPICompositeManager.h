@@ -20,8 +20,9 @@
 #define __vtkMPICompositeManager_h
 
 #include "vtkCompositeRenderManager.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkMPICompositeManager : public vtkCompositeRenderManager
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMPICompositeManager : public vtkCompositeRenderManager
 {
 public:
   static vtkMPICompositeManager* New();

@@ -36,4 +36,5 @@ set(Module_SRCS
   vtkClientServerStream.cxx
   vtkClientServerStream.h)
 
+# disable header testing
 vtk_module_library(vtkClientServer ${Module_SRCS})

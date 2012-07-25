@@ -24,6 +24,7 @@
 #define __vtkTexturePainter_h
 
 #include "vtkPainter.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkImageData;
 class vtkInformationIntegerKey;
@@ -32,7 +33,7 @@ class vtkInformationStringKey;
 class vtkScalarsToColors;
 class vtkTexture;
 
-class VTK_EXPORT vtkTexturePainter : public vtkPainter
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkTexturePainter : public vtkPainter
 {
 public:
   static vtkTexturePainter* New();

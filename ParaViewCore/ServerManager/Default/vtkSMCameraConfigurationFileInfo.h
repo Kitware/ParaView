@@ -53,3 +53,4 @@ public:
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkSMCameraConfigurationFileInfo.h

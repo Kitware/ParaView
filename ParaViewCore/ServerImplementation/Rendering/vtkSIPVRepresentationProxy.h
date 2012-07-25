@@ -19,9 +19,10 @@
 #ifndef __vtkSIPVRepresentationProxy_h
 #define __vtkSIPVRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTK_EXPORT vtkSIPVRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIPVRepresentationProxy : public vtkSIProxy
 {
 public:
   static vtkSIPVRepresentationProxy* New();

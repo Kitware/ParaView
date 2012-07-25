@@ -20,6 +20,7 @@
 #ifndef __vtkPVSessionCoreInterpreterHelper_h
 #define __vtkPVSessionCoreInterpreterHelper_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -30,7 +31,7 @@ class vtkProcessModule;
 class vtkPVSessionCore;
 class vtkMPIMToNSocketConnection;
 
-class VTK_EXPORT vtkPVSessionCoreInterpreterHelper : public vtkObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionCoreInterpreterHelper : public vtkObject
 {
 public:
   static vtkPVSessionCoreInterpreterHelper* New();

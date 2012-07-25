@@ -25,8 +25,9 @@
 #define __vtkCompositeMultiProcessController_h
 
 #include "vtkMultiProcessController.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
-class VTK_EXPORT vtkCompositeMultiProcessController : public vtkMultiProcessController
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCompositeMultiProcessController : public vtkMultiProcessController
 {
 public:
   static vtkCompositeMultiProcessController* New();

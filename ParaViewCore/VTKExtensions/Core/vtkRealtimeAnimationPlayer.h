@@ -20,9 +20,10 @@
 #define __vtkRealtimeAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkTimerLog;
-class VTK_EXPORT vtkRealtimeAnimationPlayer : public vtkAnimationPlayer
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkRealtimeAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkRealtimeAnimationPlayer* New();

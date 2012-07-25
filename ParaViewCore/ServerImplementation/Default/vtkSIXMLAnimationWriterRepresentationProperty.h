@@ -21,9 +21,10 @@
 #ifndef __vtkSIXMLAnimationWriterRepresentationProperty_h
 #define __vtkSIXMLAnimationWriterRepresentationProperty_h
 
+#include "vtkPVServerImplementationDefaultModule.h" //needed for exports
 #include "vtkSIInputProperty.h"
 
-class VTK_EXPORT vtkSIXMLAnimationWriterRepresentationProperty : public vtkSIInputProperty
+class VTKPVSERVERIMPLEMENTATIONDEFAULT_EXPORT vtkSIXMLAnimationWriterRepresentationProperty : public vtkSIInputProperty
 {
 public:
   static vtkSIXMLAnimationWriterRepresentationProperty* New();

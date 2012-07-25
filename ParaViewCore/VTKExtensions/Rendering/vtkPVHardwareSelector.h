@@ -26,8 +26,9 @@
 #define __vtkPVHardwareSelector_h
 
 #include "vtkHardwareSelector.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVHardwareSelector : public vtkHardwareSelector
 {
 public:
   static vtkPVHardwareSelector* New();

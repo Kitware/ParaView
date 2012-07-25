@@ -40,12 +40,13 @@
 #define _vtkIceTContext_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessController;
 
 class vtkIceTContextOpaqueHandle;
 
-class VTK_EXPORT vtkIceTContext : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTContext : public vtkObject
 {
 public:
   vtkTypeMacro(vtkIceTContext, vtkObject);

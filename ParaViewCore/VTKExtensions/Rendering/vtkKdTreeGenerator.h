@@ -42,6 +42,7 @@
 #define __vtkKdTreeGenerator_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkDataObject;
 class vtkExtentTranslator;
@@ -50,7 +51,7 @@ class vtkKdNode;
 class vtkKdTreeGeneratorVector;
 class vtkPKdTree;
 
-class VTK_EXPORT vtkKdTreeGenerator : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkKdTreeGenerator : public vtkObject
 {
 public:
   static vtkKdTreeGenerator* New();

@@ -16,11 +16,12 @@
 #ifndef __vtkPVPlotMatrixView_h
 #define __vtkPVPlotMatrixView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVContextView.h"
 
 class vtkScatterPlotMatrix;
 
-class VTK_EXPORT vtkPVPlotMatrixView : public vtkPVContextView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVPlotMatrixView : public vtkPVContextView
 {
 public:
   static vtkPVPlotMatrixView* New();

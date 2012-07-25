@@ -22,6 +22,7 @@
 #ifndef __vtkPhastaReader_h
 #define __vtkPhastaReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkUnstructuredGrid;
@@ -33,7 +34,7 @@ class vtkInformationVector;
 struct vtkPhastaReaderInternal;
 //ETX
 
-class VTK_EXPORT vtkPhastaReader : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPhastaReader : public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkPhastaReader *New();

@@ -20,9 +20,10 @@
 #ifndef __vtkSMImplicitPlaneRepresentationProxy_h
 #define __vtkSMImplicitPlaneRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMWidgetRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMWidgetRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMWidgetRepresentationProxy
 {
 public:
   static vtkSMImplicitPlaneRepresentationProxy* New();

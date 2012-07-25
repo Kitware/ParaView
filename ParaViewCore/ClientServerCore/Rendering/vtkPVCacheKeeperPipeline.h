@@ -19,10 +19,11 @@
 #ifndef __vtkPVCacheKeeperPipeline_h
 #define __vtkPVCacheKeeperPipeline_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeDataPipeline.h"
 
 class vtkPVCacheKeeper;
-class VTK_EXPORT vtkPVCacheKeeperPipeline : public vtkCompositeDataPipeline
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVCacheKeeperPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVCacheKeeperPipeline* New();

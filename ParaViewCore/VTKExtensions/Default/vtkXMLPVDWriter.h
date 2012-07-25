@@ -20,12 +20,13 @@
 #ifndef __vtkXMLPVDWriter_h
 #define __vtkXMLPVDWriter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkXMLWriter.h"
 
 class vtkCallbackCommand;
 class vtkXMLPVDWriterInternals;
 
-class VTK_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLPVDWriter : public vtkXMLWriter
 {
 public:
   static vtkXMLPVDWriter* New();

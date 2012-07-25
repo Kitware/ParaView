@@ -26,6 +26,7 @@
 #ifndef __vtkSMDomain_h
 #define __vtkSMDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 #include "vtkClientServerID.h" // needed for saving animation in batch script
 
@@ -36,7 +37,7 @@ class vtkPVXMLElement;
 struct vtkSMDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMDomain : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDomain : public vtkSMSessionObject
 {
 public:
   vtkTypeMacro(vtkSMDomain, vtkSMSessionObject);

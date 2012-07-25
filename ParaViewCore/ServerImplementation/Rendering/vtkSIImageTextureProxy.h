@@ -21,11 +21,12 @@
 #ifndef __vtkSIImageTextureProxy_h
 #define __vtkSIImageTextureProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
 class vtkImageData;
 
-class VTK_EXPORT vtkSIImageTextureProxy : public vtkSISourceProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIImageTextureProxy : public vtkSISourceProxy
 {
 public:
   static vtkSIImageTextureProxy* New();

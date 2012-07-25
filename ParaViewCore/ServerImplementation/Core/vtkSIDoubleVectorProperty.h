@@ -20,11 +20,12 @@
 #ifndef __vtkSIDoubleVectorProperty_h
 #define __vtkSIDoubleVectorProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"
 #include "vtkSIVectorPropertyTemplate.h" // real superclass
 
 #define vtkSIVectorProperty vtkSIVectorPropertyTemplate<double>
-class VTK_EXPORT vtkSIDoubleVectorProperty : public vtkSIVectorProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIDoubleVectorProperty : public vtkSIVectorProperty
 #undef vtkSIVectorProperty
 {
 public:

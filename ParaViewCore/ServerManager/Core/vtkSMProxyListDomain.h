@@ -25,13 +25,14 @@
 #ifndef __vtkSMProxyListDomain_h
 #define __vtkSMProxyListDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyListDomainInternals;
 
-class VTK_EXPORT vtkSMProxyListDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyListDomain : public vtkSMDomain
 {
 public:
   static vtkSMProxyListDomain* New();

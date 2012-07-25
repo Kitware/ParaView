@@ -21,12 +21,13 @@
 #ifndef __vtkSurfaceVectors_h
 #define __vtkSurfaceVectors_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
 
 class vtkFloatArray;
 class vtkIdList;
 
-class VTK_EXPORT vtkSurfaceVectors : public vtkDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSurfaceVectors : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSurfaceVectors,vtkDataSetAlgorithm);

@@ -32,9 +32,10 @@
 
 #include "vtkDataObjectAlgorithm.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkReductionFilter* New();

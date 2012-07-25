@@ -24,12 +24,13 @@
 #ifndef __vtkPVArrayInformation_h
 #define __vtkPVArrayInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 class vtkClientServerStream;
 class vtkStdString;
 class vtkStringArray;
 
-class VTK_EXPORT vtkPVArrayInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVArrayInformation : public vtkPVInformation
 {
 public:
   static vtkPVArrayInformation* New();

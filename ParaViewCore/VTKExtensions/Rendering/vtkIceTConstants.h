@@ -16,7 +16,6 @@
  Copyright (c) Sandia Corporation
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
-
 // .NAME vtkIceTConstants - Keeper of constants for IceT classes.
 //
 // .SECTION Description
@@ -39,8 +38,9 @@
 
 #ifndef __vtkIceTConstants_h
 #define __vtkIceTConstants_h
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkIceTConstants
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkIceTConstants
 {
 public:
   enum StrategyType {
@@ -59,3 +59,5 @@ public:
 };
 
 #endif //__vtkIceTConstants_h
+
+// VTK-HeaderTest-Exclude: vtkIceTConstants.h

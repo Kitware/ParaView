@@ -30,9 +30,10 @@
 #ifndef __vtkPSciVizKMeans_h
 #define __vtkPSciVizKMeans_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
 
-class VTK_EXPORT vtkPSciVizKMeans : public vtkSciVizStatistics
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizKMeans : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizKMeans* New();

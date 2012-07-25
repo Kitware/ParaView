@@ -26,13 +26,14 @@
 #ifndef __vtkSMStringListDomain_h
 #define __vtkSMStringListDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 //BTX
 struct vtkSMStringListDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStringListDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStringListDomain : public vtkSMDomain
 {
 public:
   static vtkSMStringListDomain* New();

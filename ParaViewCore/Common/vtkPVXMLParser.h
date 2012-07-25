@@ -20,10 +20,11 @@
 #define __vtkPVXMLParser_h
 
 #include "vtkXMLParser.h"
+#include "vtkPVCommonModule.h" // needed for export macro
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkPVXMLParser : public vtkXMLParser
+class VTKPVCOMMON_EXPORT vtkPVXMLParser : public vtkXMLParser
 {
 public:
   vtkTypeMacro(vtkPVXMLParser,vtkXMLParser);

@@ -22,10 +22,11 @@
 #ifndef __vtkPVOptionsXMLParser_h
 #define __vtkPVOptionsXMLParser_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkCommandOptionsXMLParser.h"
 class vtkCommandOptions;
 
-class VTK_EXPORT vtkPVOptionsXMLParser : public vtkCommandOptionsXMLParser
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptionsXMLParser : public vtkCommandOptionsXMLParser
 {
 public:
   static vtkPVOptionsXMLParser* New();

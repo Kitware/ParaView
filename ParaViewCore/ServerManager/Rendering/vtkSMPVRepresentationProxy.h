@@ -25,9 +25,10 @@
 #ifndef __vtkSMPVRepresentationProxy_h
 #define __vtkSMPVRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPVRepresentationProxy : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMPVRepresentationProxy* New();

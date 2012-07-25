@@ -19,11 +19,12 @@
 #ifndef __vtkSMUtilities_h
 #define __vtkSMUtilities_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkImageData;
 class vtkPoints;
-class VTK_EXPORT vtkSMUtilities : public vtkSMObject
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMUtilities : public vtkSMObject
 {
 public:
   static vtkSMUtilities* New();

@@ -19,9 +19,10 @@
 #ifndef __vtkSITimeStepsProperty_h
 #define __vtkSITimeStepsProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSITimeStepsProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeStepsProperty : public vtkSIProperty
 {
 public:
   static vtkSITimeStepsProperty* New();

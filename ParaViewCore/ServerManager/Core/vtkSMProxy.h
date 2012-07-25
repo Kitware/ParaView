@@ -120,6 +120,7 @@
 #ifndef __vtkSMProxy_h
 #define __vtkSMProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
@@ -139,7 +140,7 @@ class vtkSMProxyManager;
 class vtkSMSessionProxyManager;
 class vtkSMProxyObserver;
 
-class VTK_EXPORT vtkSMProxy : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxy : public vtkSMRemoteObject
 {
 public:
   // ----------- DEPRECATED API --------------
@@ -765,7 +766,7 @@ private:
 // </code>
 // Will result in calling the vtkSIProxy::MethodName() when the stream in
 // interpreted.
-class VTK_EXPORT SIPROXY : public SIOBJECT
+class VTKPVSERVERMANAGERCORE_EXPORT SIPROXY : public SIOBJECT
 {
 public:
   SIPROXY(vtkSMProxy* proxy) : SIOBJECT (proxy) { }
@@ -785,15 +786,15 @@ public:
 // Will result in calling the vtkClassName::MethodName() when the stream in
 // interpreted where vtkClassName is the type for the VTKObject which the proxyA
 // represents.
-class VTK_EXPORT VTKOBJECT
+class VTKPVSERVERMANAGERCORE_EXPORT VTKOBJECT
 {
   vtkSMProxy* Reference;
-  friend VTK_EXPORT vtkClientServerStream& operator<<(
+  friend VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
     vtkClientServerStream& stream, const VTKOBJECT& manipulator);
 public:
   VTKOBJECT(vtkSMProxy* proxy) : Reference(proxy) {}
 };
-VTK_EXPORT vtkClientServerStream& operator<<(
+VTKPVSERVERMANAGERCORE_EXPORT vtkClientServerStream& operator<<(
   vtkClientServerStream& stream, const VTKOBJECT& manipulator);
 
 //ETX

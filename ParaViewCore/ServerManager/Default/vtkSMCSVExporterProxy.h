@@ -20,9 +20,10 @@
 #ifndef __vtkSMCSVExporterProxy_h
 #define __vtkSMCSVExporterProxy_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMExporterProxy.h"
 
-class VTK_EXPORT vtkSMCSVExporterProxy : public vtkSMExporterProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCSVExporterProxy : public vtkSMExporterProxy
 {
 public:
   static vtkSMCSVExporterProxy* New();

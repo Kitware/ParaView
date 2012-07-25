@@ -20,6 +20,7 @@
 #ifndef __vtkSIProxy_h
 #define __vtkSIProxy_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIObject.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
@@ -28,7 +29,7 @@ class vtkSIProperty;
 class vtkPVXMLElement;
 class vtkSIProxyDefinitionManager;
 
-class VTK_EXPORT vtkSIProxy : public vtkSIObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProxy : public vtkSIObject
 {
 public:
   static vtkSIProxy* New();

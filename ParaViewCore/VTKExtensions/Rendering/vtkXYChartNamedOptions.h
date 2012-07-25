@@ -20,8 +20,9 @@
 #define __vtkXYChartNamedOptions_h
 
 #include "vtkChartNamedOptions.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkXYChartNamedOptions : public vtkChartNamedOptions
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkXYChartNamedOptions : public vtkChartNamedOptions
 {
 public:
   static vtkXYChartNamedOptions* New();

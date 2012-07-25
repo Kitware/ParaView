@@ -19,11 +19,12 @@
 #ifndef __vtkSISILProperty_h
 #define __vtkSISILProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
 class vtkGraph;
 
-class VTK_EXPORT vtkSISILProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSISILProperty : public vtkSIProperty
 {
 public:
   static vtkSISILProperty* New();

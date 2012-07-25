@@ -20,13 +20,14 @@
 #define __vtkKdTreeManager_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkPKdTree;
 class vtkAlgorithm;
 class vtkDataSet;
 class vtkDataObject;
 
-class VTK_EXPORT vtkKdTreeManager : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkKdTreeManager : public vtkObject
 {
 public:
   static vtkKdTreeManager* New();

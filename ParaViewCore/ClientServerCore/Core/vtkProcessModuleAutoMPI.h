@@ -16,11 +16,12 @@
 # define   	__vtkProcessModuleAutoMPI_h
 
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
 
 class vtkProcessModuleAutoMPIInternals;
-class VTK_EXPORT vtkProcessModuleAutoMPI: public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkProcessModuleAutoMPI: public vtkObject
 {
 public:
   static vtkProcessModuleAutoMPI* New();

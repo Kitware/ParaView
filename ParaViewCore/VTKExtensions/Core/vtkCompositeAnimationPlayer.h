@@ -22,12 +22,13 @@
 #define __vtkCompositeAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkSequenceAnimationPlayer;
 class vtkRealtimeAnimationPlayer;
 class vtkTimestepsAnimationPlayer;
 
-class VTK_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPlayer
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCompositeAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkCompositeAnimationPlayer* New();

@@ -25,6 +25,7 @@
 #ifndef __vtkDataLabelRepresentation_h
 #define __vtkDataLabelRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkActor2D;
@@ -36,7 +37,7 @@ class vtkPVCacheKeeper;
 class vtkTextProperty;
 class vtkTransform;
 
-class VTK_EXPORT vtkDataLabelRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkDataLabelRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkDataLabelRepresentation* New();

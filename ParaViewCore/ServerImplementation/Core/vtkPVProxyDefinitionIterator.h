@@ -27,11 +27,12 @@
 #ifndef __vtkPVProxyDefinitionIterator_h
 #define __vtkPVProxyDefinitionIterator_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkPVProxyDefinitionIterator : public vtkObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVProxyDefinitionIterator : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVProxyDefinitionIterator, vtkObject);

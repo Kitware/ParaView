@@ -24,6 +24,7 @@
 #ifndef __vtkPVExtractVOI_h
 #define __vtkPVExtractVOI_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
 
 class vtkDataObject;
@@ -32,7 +33,7 @@ class vtkExtractGrid;
 class vtkExtractRectilinearGrid;
 class vtkExtractVOI;
 
-class VTK_EXPORT vtkPVExtractVOI : public vtkDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVExtractVOI : public vtkDataSetAlgorithm
 {
 
 public:

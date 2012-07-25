@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotUniReader_h
 #define __vtkSpyPlotUniReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 class vtkSpyPlotBlock;
 class vtkDataArraySelection;
@@ -40,7 +41,7 @@ class vtkUnsignedCharArray;
 class vtkSpyPlotIStream;
 
 
-class VTK_EXPORT vtkSpyPlotUniReader : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotUniReader : public vtkObject
 {
 public:
   vtkTypeMacro(vtkSpyPlotUniReader, vtkObject);
@@ -278,3 +279,5 @@ inline int vtkSpyPlotUniReader::IsAMR()
 
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSpyPlotUniReader.h

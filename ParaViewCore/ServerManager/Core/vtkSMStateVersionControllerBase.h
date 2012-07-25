@@ -23,11 +23,12 @@
 #ifndef __vtkSMStateVersionControllerBase_h
 #define __vtkSMStateVersionControllerBase_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMStateVersionControllerBase : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateVersionControllerBase : public vtkSMObject
 {
 public:
   vtkTypeMacro(vtkSMStateVersionControllerBase, vtkSMObject);

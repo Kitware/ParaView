@@ -90,6 +90,7 @@
 #ifndef __vtkSMSessionProxyManager_h
 #define __vtkSMSessionProxyManager_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 
@@ -119,7 +120,7 @@ struct vtkSMSessionProxyManagerInternals;
 struct vtkClientServerID;
 //ETX
 
-class VTK_EXPORT vtkSMSessionProxyManager : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSessionProxyManager : public vtkSMSessionObject
 {
 public:
   // Description:
@@ -530,3 +531,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMSessionProxyManager.h

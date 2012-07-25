@@ -22,8 +22,9 @@
 #define __vtkCacheSizeKeeper_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
-class VTK_EXPORT vtkCacheSizeKeeper : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkCacheSizeKeeper : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCacheSizeKeeper, vtkObject);

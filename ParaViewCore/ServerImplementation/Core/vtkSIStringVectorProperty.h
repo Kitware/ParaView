@@ -19,9 +19,10 @@
 #ifndef __vtkSIStringVectorProperty_h
 #define __vtkSIStringVectorProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"
 
-class VTK_EXPORT vtkSIStringVectorProperty : public vtkSIVectorProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIStringVectorProperty : public vtkSIVectorProperty
 {
 public:
   static vtkSIStringVectorProperty* New();

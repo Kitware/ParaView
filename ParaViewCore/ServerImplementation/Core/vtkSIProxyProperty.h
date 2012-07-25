@@ -23,9 +23,10 @@
 #ifndef __vtkSIProxyProperty_h
 #define __vtkSIProxyProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSIProxyProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProxyProperty : public vtkSIProperty
 {
 public:
   static vtkSIProxyProperty* New();

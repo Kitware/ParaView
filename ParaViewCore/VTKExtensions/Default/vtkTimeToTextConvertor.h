@@ -23,9 +23,10 @@
 #ifndef __vtkTimeToTextConvertor_h
 #define __vtkTimeToTextConvertor_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
-class VTK_EXPORT vtkTimeToTextConvertor : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTimeToTextConvertor : public vtkTableAlgorithm
 {
 public:
   static vtkTimeToTextConvertor* New();

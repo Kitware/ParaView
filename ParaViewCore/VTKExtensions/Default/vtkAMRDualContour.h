@@ -26,6 +26,7 @@
 #ifndef __vtkAMRDualContour_h
 #define __vtkAMRDualContour_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include <vector>
 #include <string>
@@ -50,7 +51,7 @@ class vtkAMRDualGridHelperFace;
 class vtkAMRDualContourEdgeLocator;
 
 
-class VTK_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkAMRDualContour *New();
@@ -198,3 +199,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkAMRDualContour.h

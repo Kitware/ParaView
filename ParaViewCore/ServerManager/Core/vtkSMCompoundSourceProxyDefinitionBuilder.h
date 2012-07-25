@@ -25,12 +25,13 @@
 #ifndef __vtkSMCompoundSourceProxyDefinitionBuilder_h
 #define __vtkSMCompoundSourceProxyDefinitionBuilder_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMProxy;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMCompoundSourceProxyDefinitionBuilder : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundSourceProxyDefinitionBuilder : public vtkSMObject
 {
 public:
   static vtkSMCompoundSourceProxyDefinitionBuilder* New();

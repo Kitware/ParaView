@@ -23,6 +23,7 @@
 #ifndef __vtkSMPipelineState_h
 #define __vtkSMPipelineState_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
@@ -30,7 +31,7 @@
 class vtkSMSession;
 class vtkSMProxyLocator;
 
-class VTK_EXPORT vtkSMPipelineState : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPipelineState : public vtkSMRemoteObject
 {
   // My friends are...
   friend class vtkSMSessionProxyManager;

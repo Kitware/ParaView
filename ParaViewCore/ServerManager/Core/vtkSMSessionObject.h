@@ -20,13 +20,14 @@
 #ifndef __vtkSMSessionObject_h
 #define __vtkSMSessionObject_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include <vtkWeakPointer.h> // Needed to keep track of the session
 
 class vtkSMSession;
 class vtkSMSessionProxyManager;
 
-class VTK_EXPORT vtkSMSessionObject : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSessionObject : public vtkSMObject
 {
 public:
   static vtkSMSessionObject* New();

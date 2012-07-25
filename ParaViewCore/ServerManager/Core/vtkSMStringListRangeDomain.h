@@ -29,13 +29,14 @@
 #ifndef __vtkSMStringListRangeDomain_h
 #define __vtkSMStringListRangeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 class vtkSMIntRangeDomain;
 class vtkSMBooleanDomain;
 class vtkSMStringListDomain;
 
-class VTK_EXPORT vtkSMStringListRangeDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStringListRangeDomain : public vtkSMDomain
 {
 public:
   static vtkSMStringListRangeDomain* New();

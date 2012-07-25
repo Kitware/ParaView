@@ -22,13 +22,14 @@
 #ifndef __vtkSMUndoElement_h
 #define __vtkSMUndoElement_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkUndoElement.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkSMSession;
 class vtkSMSessionProxyManager;
 
-class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
 public:
   vtkTypeMacro(vtkSMUndoElement, vtkUndoElement);

@@ -26,13 +26,14 @@
 // information. The output of this filter will always be a single vtkPolyData 
 // that contains exactly one point and one cell (a VTK_VERTEX).
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkFieldData;
 class vtkAbstractArray;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkMinMax : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMinMax : public vtkPolyDataAlgorithm
 {
 public:
   static vtkMinMax* New();

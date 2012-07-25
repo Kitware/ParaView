@@ -20,9 +20,10 @@
 #ifndef __vtkPVSingleOutputExtractSelection_h
 #define __vtkPVSingleOutputExtractSelection_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVExtractSelection.h"
 
-class VTK_EXPORT vtkPVSingleOutputExtractSelection : public vtkPVExtractSelection
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVSingleOutputExtractSelection : public vtkPVExtractSelection
 {
 public:
   static vtkPVSingleOutputExtractSelection* New();

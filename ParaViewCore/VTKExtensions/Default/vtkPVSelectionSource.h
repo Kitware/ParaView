@@ -22,9 +22,10 @@
 #ifndef __vtkPVSelectionSource_h
 #define __vtkPVSelectionSource_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"
 
-class VTK_EXPORT vtkPVSelectionSource : public vtkSelectionAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVSelectionSource : public vtkSelectionAlgorithm
 {
 public:
   static vtkPVSelectionSource* New();

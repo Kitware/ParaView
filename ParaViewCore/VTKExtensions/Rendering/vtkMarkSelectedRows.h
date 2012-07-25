@@ -25,8 +25,9 @@
 #define __vtkMarkSelectedRows_h
 
 #include "vtkTableAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkMarkSelectedRows : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMarkSelectedRows : public vtkTableAlgorithm
 {
 public:
   static vtkMarkSelectedRows* New();

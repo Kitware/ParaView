@@ -24,6 +24,7 @@
 #ifndef __vtkSMArrayRangeDomain_h
 #define __vtkSMArrayRangeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDoubleRangeDomain.h"
 
 class vtkSMProxyProperty;
@@ -31,7 +32,7 @@ class vtkSMSourceProxy;
 class vtkSMInputArrayDomain;
 class vtkPVDataSetAttributesInformation;
 
-class VTK_EXPORT vtkSMArrayRangeDomain : public vtkSMDoubleRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArrayRangeDomain : public vtkSMDoubleRangeDomain
 {
 public:
   static vtkSMArrayRangeDomain* New();

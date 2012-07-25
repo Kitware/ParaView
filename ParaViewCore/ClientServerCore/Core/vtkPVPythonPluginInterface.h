@@ -20,11 +20,12 @@
 #ifndef __vtkPVPythonPluginInterface_h
 #define __vtkPVPythonPluginInterface_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include <vector> // STL Header
 #include <string> // STL Header
 
-class VTK_EXPORT vtkPVPythonPluginInterface
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPythonPluginInterface
 {
 public:
   virtual ~vtkPVPythonPluginInterface();
@@ -36,3 +37,4 @@ public:
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkPVPythonPluginInterface.h

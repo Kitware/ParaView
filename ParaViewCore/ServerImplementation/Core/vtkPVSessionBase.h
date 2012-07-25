@@ -22,6 +22,7 @@
 #ifndef __vtkPVSessionBase_h
 #define __vtkPVSessionBase_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkPVSession.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 
@@ -33,7 +34,7 @@ class vtkPVServerInformation;
 class vtkSIProxyDefinitionManager;
 class vtkPVSessionCore;
 
-class VTK_EXPORT vtkPVSessionBase : public vtkPVSession
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionBase : public vtkPVSession
 {
 public:
   vtkTypeMacro(vtkPVSessionBase, vtkPVSession);

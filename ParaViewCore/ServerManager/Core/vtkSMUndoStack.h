@@ -35,6 +35,7 @@
 #ifndef __vtkSMUndoStack_h
 #define __vtkSMUndoStack_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkUndoStack.h"
 
 class vtkSMUndoRedoStateLoader;
@@ -42,7 +43,7 @@ class vtkSMUndoStackObserver;
 class vtkUndoSet;
 class vtkCollection;
 
-class VTK_EXPORT vtkSMUndoStack : public vtkUndoStack
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUndoStack : public vtkUndoStack
 {
 public:
   static vtkSMUndoStack* New();

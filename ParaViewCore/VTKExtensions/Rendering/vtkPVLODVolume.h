@@ -25,11 +25,12 @@
 #define __vtkPVLODVolume_h
 
 #include "vtkVolume.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkLODProp3D;
 class vtkMapper;
 
-class VTK_EXPORT vtkPVLODVolume : public vtkVolume
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODVolume : public vtkVolume
 {
 public:
   vtkTypeMacro(vtkPVLODVolume,vtkVolume);

@@ -20,9 +20,10 @@
 #ifndef __vtkPVLineChartView_h
 #define __vtkPVLineChartView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVXYChartView.h"
 
-class VTK_EXPORT vtkPVLineChartView : public vtkPVXYChartView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLineChartView : public vtkPVXYChartView
 {
 public:
   static vtkPVLineChartView* New();

@@ -34,11 +34,12 @@
 #ifndef __vtkPVExtractSelection_h
 #define __vtkPVExtractSelection_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkExtractSelection.h"
 
 class vtkSelectionNode;
 
-class VTK_EXPORT vtkPVExtractSelection : public vtkExtractSelection
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVExtractSelection : public vtkExtractSelection
 {
 public:
   vtkTypeMacro(vtkPVExtractSelection,vtkExtractSelection);

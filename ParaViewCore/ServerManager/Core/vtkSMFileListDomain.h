@@ -26,9 +26,10 @@
 #ifndef __vtkSMFileListDomain_h
 #define __vtkSMFileListDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListDomain.h"
 
-class VTK_EXPORT vtkSMFileListDomain : public vtkSMStringListDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFileListDomain : public vtkSMStringListDomain
 {
 public:
   static vtkSMFileListDomain* New();

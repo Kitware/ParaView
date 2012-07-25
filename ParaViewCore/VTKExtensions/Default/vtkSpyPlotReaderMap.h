@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotReaderMap_h
 #define __vtkSpyPlotReaderMap_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
 #include <string>
@@ -30,7 +31,7 @@ class vtkMultiProcessStream;
 class vtkSpyPlotReader;
 class vtkSpyPlotUniReader;
 
-class VTK_EXPORT vtkSpyPlotReaderMap
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotReaderMap
 {
 public:
   typedef std::map<std::string, vtkSpyPlotUniReader*> MapOfStringToSPCTH;
@@ -67,3 +68,5 @@ private:
 
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSpyPlotReaderMap.h

@@ -33,6 +33,7 @@
 #ifndef __vtkPEnSightReader_h
 #define __vtkPEnSightReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPGenericEnSightReader.h"
 
 #include "vtkIdTypeArray.h" // For ivars
@@ -55,7 +56,7 @@ class vtkPEnSightReaderCellIdsType;
 
 #define NEXTMODULO3( x ) (x==0) ? 1 : ((x==1) ? 2 : 0 )
 
-class VTK_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnSightReader
 {
  public:
   vtkTypeMacro(vtkPEnSightReader, vtkPGenericEnSightReader);

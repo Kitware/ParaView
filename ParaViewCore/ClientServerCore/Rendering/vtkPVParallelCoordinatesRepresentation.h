@@ -19,11 +19,12 @@
 #ifndef __vtkPVParallelCoordinatesRepresentation_h
 #define __vtkPVParallelCoordinatesRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
 
 class vtkChartParallelCoordinates;
 
-class VTK_EXPORT vtkPVParallelCoordinatesRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVParallelCoordinatesRepresentation : public vtkChartRepresentation
 {
 public:
   static vtkPVParallelCoordinatesRepresentation* New();

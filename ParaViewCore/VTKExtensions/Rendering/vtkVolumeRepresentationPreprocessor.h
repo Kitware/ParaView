@@ -30,13 +30,14 @@
 #define __vtkVolumeRepresentationPreprocessor_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiBlockDataSet;
 class vtkDataSetTriangleFilter;
 class vtkExtractBlock;
 
 
-class VTK_EXPORT vtkVolumeRepresentationPreprocessor :
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkVolumeRepresentationPreprocessor :
   public vtkUnstructuredGridAlgorithm
 {
 public:

@@ -23,6 +23,7 @@
 #ifndef __vtkPVSessionCore_h
 #define __vtkPVSessionCore_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 #include "vtkWeakPointer.h" // needed for vtkMultiProcessController
@@ -36,7 +37,7 @@ class vtkPVInformation;
 class vtkSIObject;
 class vtkSIProxyDefinitionManager;
 
-class VTK_EXPORT vtkPVSessionCore : public vtkObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionCore : public vtkObject
 {
 public:
   static vtkPVSessionCore* New();

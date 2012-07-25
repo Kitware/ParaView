@@ -25,9 +25,10 @@
 #ifndef __vtkDataSetToRectilinearGrid_h
 #define __vtkDataSetToRectilinearGrid_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkRectilinearGridAlgorithm.h"
 
-class VTK_EXPORT vtkDataSetToRectilinearGrid : public vtkRectilinearGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkDataSetToRectilinearGrid : public vtkRectilinearGridAlgorithm
 {
 public:
   static vtkDataSetToRectilinearGrid* New();

@@ -19,10 +19,11 @@
 #ifndef __vtkPVRayCastPickingHelper_h
 #define __vtkPVRayCastPickingHelper_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 class vtkAlgorithm;
 
-class VTK_EXPORT vtkPVRayCastPickingHelper : public vtkObject
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRayCastPickingHelper : public vtkObject
 {
 public:
   static vtkPVRayCastPickingHelper *New();

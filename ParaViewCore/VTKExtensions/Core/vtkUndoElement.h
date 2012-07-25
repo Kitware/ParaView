@@ -28,9 +28,10 @@
 #define __vtkUndoElement_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 class vtkCollection;
 
-class VTK_EXPORT vtkUndoElement : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoElement : public vtkObject
 {
 public:
   vtkTypeMacro(vtkUndoElement, vtkObject);

@@ -24,13 +24,14 @@
 #ifndef __vtkPVPluginTracker_h
 #define __vtkPVPluginTracker_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // needed  for vtkSmartPointer;
 
 class vtkPVPlugin;
 class vtkPVXMLElement;
 
-class VTK_EXPORT  vtkPVPluginTracker : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT  vtkPVPluginTracker : public vtkObject
 {
 public:
   static vtkPVPluginTracker* New();
@@ -111,3 +112,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVPluginTracker.h

@@ -24,9 +24,10 @@
 #ifndef __vtkSMBooleanDomain_h
 #define __vtkSMBooleanDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
-class VTK_EXPORT vtkSMBooleanDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBooleanDomain : public vtkSMDomain
 {
 public:
   static vtkSMBooleanDomain* New();

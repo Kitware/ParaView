@@ -22,12 +22,13 @@
 #ifndef __vtkIntegrateFlowThroughSurface_h
 #define __vtkIntegrateFlowThroughSurface_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkIdList;
 class vtkDataSetAttributes;
 
-class VTK_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
 {
 public:
   vtkTypeMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);

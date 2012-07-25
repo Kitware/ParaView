@@ -27,6 +27,7 @@
 #ifndef __vtkSMCompositeTreeDomain_h
 #define __vtkSMCompositeTreeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -35,7 +36,7 @@ class vtkSMInputProperty;
 class vtkSMSourceProxy;
 
 // TODO: CHANGE NAME OF THIS CLASS
-class VTK_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
 {
 public:
   static vtkSMCompositeTreeDomain* New();

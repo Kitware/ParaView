@@ -28,13 +28,14 @@
 #ifndef __vtkSMNamedPropertyIterator_h
 #define __vtkSMNamedPropertyIterator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMPropertyIterator.h"
 
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkStringList;
 
-class VTK_EXPORT vtkSMNamedPropertyIterator : public vtkSMPropertyIterator
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNamedPropertyIterator : public vtkSMPropertyIterator
 {
 public:
   static vtkSMNamedPropertyIterator* New();

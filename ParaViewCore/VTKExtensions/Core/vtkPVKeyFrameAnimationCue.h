@@ -25,7 +25,7 @@
 class vtkPVKeyFrame;
 class vtkPVKeyFrameCueManipulator;
 
-class VTK_EXPORT vtkPVKeyFrameAnimationCue : public vtkPVAnimationCue
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVKeyFrameAnimationCue : public vtkPVAnimationCue
 {
 public:
   vtkTypeMacro(vtkPVKeyFrameAnimationCue, vtkPVAnimationCue);

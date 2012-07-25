@@ -21,9 +21,10 @@
 #ifndef __vtkPVClassNameInformation_h
 #define __vtkPVClassNameInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVClassNameInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVClassNameInformation : public vtkPVInformation
 {
 public:
   static vtkPVClassNameInformation* New();

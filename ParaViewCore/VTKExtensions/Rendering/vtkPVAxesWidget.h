@@ -22,6 +22,7 @@
 #define __vtkPVAxesWidget_h
 
 #include "vtkInteractorObserver.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkActor2D;
 class vtkKWApplication;
@@ -30,7 +31,7 @@ class vtkPVAxesActor;
 class vtkPVAxesWidgetObserver;
 class vtkRenderer;
 
-class VTK_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
 {
 public:
   static vtkPVAxesWidget* New();

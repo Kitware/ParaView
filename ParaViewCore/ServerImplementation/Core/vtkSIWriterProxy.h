@@ -19,9 +19,10 @@
 #ifndef __vtkSIWriterProxy_h
 #define __vtkSIWriterProxy_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
-class VTK_EXPORT vtkSIWriterProxy : public vtkSISourceProxy
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIWriterProxy : public vtkSISourceProxy
 {
 public:
   static vtkSIWriterProxy* New();

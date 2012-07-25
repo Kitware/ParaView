@@ -20,11 +20,12 @@
 #ifndef __vtkEquivalenceSet_h
 #define __vtkEquivalenceSet_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 class vtkIntArray;
 
 
-class VTK_EXPORT vtkEquivalenceSet : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkEquivalenceSet : public vtkObject
 {
 public:
   vtkTypeMacro(vtkEquivalenceSet,vtkObject);

@@ -19,6 +19,7 @@
 #ifndef __vtkPythonExtractSelection_h
 #define __vtkPythonExtractSelection_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkProgrammableFilter.h"
 
 class vtkCharArray;
@@ -27,7 +28,7 @@ class vtkTable;
 class vtkSelection;
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkPythonExtractSelection : public vtkProgrammableFilter
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonExtractSelection : public vtkProgrammableFilter
 {
 public:
   static vtkPythonExtractSelection* New();

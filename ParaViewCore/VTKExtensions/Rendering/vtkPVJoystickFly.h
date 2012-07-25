@@ -21,10 +21,11 @@
 #define __vtkPVJoystickFly_h
 
 #include "vtkCameraManipulator.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkRenderer;
 
-class VTK_EXPORT vtkPVJoystickFly : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVJoystickFly : public vtkCameraManipulator
 {
 public:
   vtkTypeMacro(vtkPVJoystickFly, vtkCameraManipulator);

@@ -66,9 +66,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkCallbackCommand
 
 #include "vtkCommand.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 template<class ClassT>
-class VTK_EXPORT vtkMemberFunctionCommand :
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkMemberFunctionCommand :
   public vtkCommand
 {
   typedef vtkMemberFunctionCommand<ClassT> ThisT;
@@ -179,3 +180,5 @@ vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
   result->SetCallback(object, method);
   return result;
 }
+//-----------------------------------------------------------------------------
+// VTK-HeaderTest-Exclude: vtkMemberFunctionCommand.h

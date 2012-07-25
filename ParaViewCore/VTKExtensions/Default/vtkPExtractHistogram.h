@@ -20,11 +20,12 @@
 #ifndef __vtkPExtractHistogram_h
 #define __vtkPExtractHistogram_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkExtractHistogram.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkPExtractHistogram : public vtkExtractHistogram
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPExtractHistogram : public vtkExtractHistogram
 {
 public:
   static vtkPExtractHistogram* New();

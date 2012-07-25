@@ -24,13 +24,14 @@
 #ifndef __vtkPVFileInformation_h
 #define __vtkPVFileInformation_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkCollection;
 class vtkPVFileInformationSet;
 class vtkFileSequenceParser;
 
-class VTK_EXPORT vtkPVFileInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkPVFileInformation : public vtkPVInformation
 {
 public:
   static vtkPVFileInformation* New();

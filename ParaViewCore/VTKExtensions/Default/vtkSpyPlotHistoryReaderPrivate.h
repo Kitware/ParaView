@@ -242,3 +242,4 @@ void getTimeStepInfo(const std::string &s, const char &delim,
 }
 
 #endif
+// VTK-HeaderTest-Exclude: vtkSpyPlotHistoryReaderPrivate.h

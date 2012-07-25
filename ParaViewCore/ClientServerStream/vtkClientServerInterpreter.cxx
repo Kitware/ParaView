@@ -940,3 +940,9 @@ vtkObjectBase* vtkClientServerInterpreter::NewInstance(const char* classname)
     }
   return NULL;
 }
+
+//----------------------------------------------------------------------------
+void vtkClientServerInterpreter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

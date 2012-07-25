@@ -20,6 +20,7 @@
 #ifndef __vtkSMSelectionHelper_h
 #define __vtkSMSelectionHelper_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkCollection;
@@ -29,7 +30,7 @@ class vtkSMProxy;
 class vtkSMSession;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMSelectionHelper : public vtkSMObject
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMSelectionHelper : public vtkSMObject
 {
 public:
   static vtkSMSelectionHelper* New();

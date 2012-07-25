@@ -21,6 +21,7 @@
 #ifndef __vtkSIProperty_h
 #define __vtkSIProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
@@ -30,7 +31,7 @@ class vtkSIObject;
 class vtkSIProxy;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSIProperty : public vtkObject
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIProperty : public vtkObject
 {
 public:
   static vtkSIProperty* New();

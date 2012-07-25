@@ -21,6 +21,7 @@
 #ifndef __vtkSMLink_h
 #define __vtkSMLink_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // Needed
 //BTX
@@ -30,7 +31,7 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 //ETX
 
-class VTK_EXPORT vtkSMLink : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMLink : public vtkSMRemoteObject
 {
 public:
   vtkTypeMacro(vtkSMLink, vtkSMRemoteObject);

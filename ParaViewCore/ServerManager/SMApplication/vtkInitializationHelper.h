@@ -23,13 +23,14 @@
 #define __vtkInitializationHelper_h
 
 #include "vtkObject.h"
-
+#include "vtkPVServerManagerApplicationModule.h" // needed for exports
 class vtkPVOptions;
 
-class VTK_EXPORT vtkInitializationHelper : public vtkObject
+class VTKPVSERVERMANAGERAPPLICATION_EXPORT vtkInitializationHelper : public vtkObject
 {
 public:
   vtkTypeMacro(vtkInitializationHelper,vtkObject);
+  void PrintSelf(ostream&, vtkIndent);
 
   // Description:
   // Initializes the server manager. Do not use the server manager

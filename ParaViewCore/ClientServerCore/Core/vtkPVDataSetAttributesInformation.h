@@ -23,6 +23,7 @@
 #ifndef __vtkPVDataSetAttributesInformation_h
 #define __vtkPVDataSetAttributesInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 #include "vtkDataSetAttributes.h" // needed for NUM_ATTRIBUTES
 
@@ -32,7 +33,7 @@ class vtkFieldData;
 class vtkPVArrayInformation;
 class vtkGenericAttributeCollection;
 
-class VTK_EXPORT vtkPVDataSetAttributesInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVDataSetAttributesInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataSetAttributesInformation* New();

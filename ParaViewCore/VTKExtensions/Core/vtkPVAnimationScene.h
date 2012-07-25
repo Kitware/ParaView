@@ -29,13 +29,14 @@
 #define __vtkPVAnimationScene_h
 
 #include "vtkAnimationCue.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkAnimationCue;
 class vtkCollection;
 class vtkCollectionIterator;
 class vtkTimerLog;
 
-class VTK_EXPORT vtkPVAnimationScene: public vtkAnimationCue
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVAnimationScene: public vtkAnimationCue
 {
 public:
   vtkTypeMacro(vtkPVAnimationScene, vtkAnimationCue);

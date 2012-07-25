@@ -20,10 +20,11 @@
 #ifndef __vtkPVImplicitPlaneRepresentation_h
 #define __vtkPVImplicitPlaneRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkImplicitPlaneRepresentation.h"
 
 class vtkTransform;
-class VTK_EXPORT vtkPVImplicitPlaneRepresentation : public vtkImplicitPlaneRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVImplicitPlaneRepresentation : public vtkImplicitPlaneRepresentation
 {
 public:
   static vtkPVImplicitPlaneRepresentation* New();

@@ -22,6 +22,7 @@
 #ifndef __vtkSMProxyDefinitionManager_h
 #define __vtkSMProxyDefinitionManager_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSIProxyDefinitionManager.h" // needed for enums
 #include "vtkWeakPointer.h" // needed for weak pointer.
@@ -30,7 +31,7 @@
 class vtkSMProxyLocator;
 class vtkEventForwarderCommand;
 
-class VTK_EXPORT vtkSMProxyDefinitionManager : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyDefinitionManager : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxyDefinitionManager* New();

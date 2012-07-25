@@ -24,6 +24,7 @@
 #define __vtkPVAxesActor_h
 
 #include "vtkProp3D.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkRenderer;
 class vtkPropCollection;
@@ -38,7 +39,7 @@ class vtkSphereSource;
 class vtkPolyData;
 class vtkVectorText;
 
-class VTK_EXPORT vtkPVAxesActor : public vtkProp3D
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVAxesActor : public vtkProp3D
 {
 public:
   static vtkPVAxesActor *New();

@@ -23,12 +23,13 @@
 #define __vtkBalancedRedistributePolyData_h
 
 #include "vtkWeightedRedistributePolyData.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 class vtkMultiProcessController;
 
 
 //*******************************************************************
 
-class VTK_EXPORT vtkBalancedRedistributePolyData : public vtkWeightedRedistributePolyData
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBalancedRedistributePolyData : public vtkWeightedRedistributePolyData
 {
 public:
   vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);

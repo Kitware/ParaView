@@ -21,11 +21,12 @@
 #ifndef __vtkTCPNetworkAccessManager_h
 #define __vtkTCPNetworkAccessManager_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkNetworkAccessManager.h"
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkTCPNetworkAccessManager : public vtkNetworkAccessManager
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkTCPNetworkAccessManager : public vtkNetworkAccessManager
 {
 public:
   static vtkTCPNetworkAccessManager* New();

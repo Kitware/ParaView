@@ -23,12 +23,13 @@
 #ifndef __vtkPVSessionServer_h
 #define __vtkPVSessionServer_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkPVSessionBase.h"
 
 class vtkMultiProcessController;
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkPVSessionServer : public vtkPVSessionBase
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkPVSessionServer : public vtkPVSessionBase
 {
 public:
   static vtkPVSessionServer* New();

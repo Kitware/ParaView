@@ -23,11 +23,12 @@
 #ifndef __vtkSMComparativeAnimationCueProxy_h
 #define __vtkSMComparativeAnimationCueProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
 class vtkPVComparativeAnimationCue;
 
-class VTK_EXPORT vtkSMComparativeAnimationCueProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMComparativeAnimationCueProxy : public vtkSMProxy
 {
 public:
   static vtkSMComparativeAnimationCueProxy* New();

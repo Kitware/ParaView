@@ -22,11 +22,12 @@
 #ifndef __vtkSMIntVectorProperty_h
 #define __vtkSMIntVectorProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMIntVectorProperty : public vtkSMVectorProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMIntVectorProperty : public vtkSMVectorProperty
 {
 public:
   static vtkSMIntVectorProperty* New();

@@ -28,6 +28,7 @@
 #ifndef __vtkTransferFunctionEditorRepresentation_h
 #define __vtkTransferFunctionEditorRepresentation_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkWidgetRepresentation.h"
 
 class vtkActor;
@@ -38,7 +39,7 @@ class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkTexture;
 
-class VTK_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorRepresentation : public vtkWidgetRepresentation
 {
 public:
   vtkTypeMacro(vtkTransferFunctionEditorRepresentation, vtkWidgetRepresentation);

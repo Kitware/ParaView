@@ -21,13 +21,14 @@
 #ifndef __vtkSMDeserializerXML_h
 #define __vtkSMDeserializerXML_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializer.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
 
-class VTK_EXPORT vtkSMDeserializerXML : public vtkSMDeserializer
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializerXML : public vtkSMDeserializer
 {
 public:
   static vtkSMDeserializerXML* New();

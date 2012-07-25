@@ -37,12 +37,13 @@
 #ifndef __vtkSMViewLayoutProxy_h
 #define __vtkSMViewLayoutProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
 class vtkSMViewProxy;
 class vtkImageData;
 
-class VTK_EXPORT vtkSMViewLayoutProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewLayoutProxy : public vtkSMProxy
 {
 public:
   static vtkSMViewLayoutProxy* New();

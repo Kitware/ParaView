@@ -21,10 +21,11 @@
 #ifndef __vtkFileSeriesWriter_h
 #define __vtkFileSeriesWriter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 class vtkClientServerInterpreter;
 
-class VTK_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkFileSeriesWriter* New();

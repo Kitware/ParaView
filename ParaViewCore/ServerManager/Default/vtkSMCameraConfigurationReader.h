@@ -26,12 +26,13 @@
 #ifndef __vtkSMCameraConfigurationReader_h
 #define __vtkSMCameraConfigurationReader_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxyConfigurationReader.h"
 
 class vtkSMProxy;
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMCameraConfigurationReader : public vtkSMProxyConfigurationReader
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationReader : public vtkSMProxyConfigurationReader
 {
 public:
   vtkTypeMacro(vtkSMCameraConfigurationReader,vtkSMProxyConfigurationReader);

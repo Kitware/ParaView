@@ -21,9 +21,10 @@
 #ifndef __vtkSMAnimationSceneProxy_h
 #define __vtkSMAnimationSceneProxy_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMAnimationSceneProxy : public vtkSMProxy
 {
 public:
   static vtkSMAnimationSceneProxy* New();

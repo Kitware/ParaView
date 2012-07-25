@@ -21,13 +21,14 @@
 #ifndef __vtkSMRemoteObjectUpdateUndoElement_h
 #define __vtkSMRemoteObjectUpdateUndoElement_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMUndoElement.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage
 #include "vtkWeakPointer.h" //  needed for vtkWeakPointer.
 
 class vtkSMProxyLocator;
 
-class VTK_EXPORT vtkSMRemoteObjectUpdateUndoElement : public vtkSMUndoElement
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMRemoteObjectUpdateUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMRemoteObjectUpdateUndoElement* New();

@@ -27,12 +27,13 @@
 #ifndef __vtkSMSILDomain_h
 #define __vtkSMSILDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMArraySelectionDomain.h"
 
 class vtkGraph;
 class vtkPVSILInformation;
 
-class VTK_EXPORT vtkSMSILDomain : public vtkSMArraySelectionDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSILDomain : public vtkSMArraySelectionDomain
 {
 public:
   static vtkSMSILDomain* New();

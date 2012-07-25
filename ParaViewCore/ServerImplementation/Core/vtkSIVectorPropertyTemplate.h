@@ -19,10 +19,11 @@
 #ifndef __vtkSIVectorPropertyTemplate_h
 #define __vtkSIVectorPropertyTemplate_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIVectorProperty.h"
 
 template <class T, class force_idtype=int>
-class VTK_EXPORT vtkSIVectorPropertyTemplate : public vtkSIVectorProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIVectorPropertyTemplate : public vtkSIVectorProperty
 {
 public:
   typedef vtkSIVectorProperty Superclass;
@@ -71,3 +72,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSIVectorPropertyTemplate.h

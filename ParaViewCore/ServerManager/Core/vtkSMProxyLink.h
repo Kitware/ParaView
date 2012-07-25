@@ -23,13 +23,14 @@
 #ifndef __vtkSMProxyLink_h
 #define __vtkSMProxyLink_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMLink.h"
 
 //BTX
 struct vtkSMProxyLinkInternals;
 //ETX
 
-class VTK_EXPORT vtkSMProxyLink : public vtkSMLink
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyLink : public vtkSMLink
 {
 public:
   static vtkSMProxyLink* New();

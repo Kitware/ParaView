@@ -22,12 +22,13 @@
 #ifndef __vtkGlyph3DRepresentation_h
 #define __vtkGlyph3DRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentation.h"
 
 class vtkGlyph3DMapper;
 class vtkPVArrowSource;
 
-class VTK_EXPORT vtkGlyph3DRepresentation : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkGlyph3DRepresentation : public vtkGeometryRepresentation
 {
 public:
   static vtkGlyph3DRepresentation* New();

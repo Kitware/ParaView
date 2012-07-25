@@ -20,11 +20,12 @@
 #ifndef __vtkPVSILInformation_h
 #define __vtkPVSILInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkGraph;
 
-class VTK_EXPORT vtkPVSILInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSILInformation : public vtkPVInformation
 {
 public:
   static vtkPVSILInformation* New();

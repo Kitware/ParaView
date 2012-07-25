@@ -19,11 +19,12 @@
 #ifndef __vtkSMChartRepresentationProxy_h
 #define __vtkSMChartRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRepresentationProxy.h"
 
 class vtkChartRepresentation;
 
-class VTK_EXPORT vtkSMChartRepresentationProxy : public vtkSMRepresentationProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMChartRepresentationProxy : public vtkSMRepresentationProxy
 {
 public:
   static vtkSMChartRepresentationProxy* New();

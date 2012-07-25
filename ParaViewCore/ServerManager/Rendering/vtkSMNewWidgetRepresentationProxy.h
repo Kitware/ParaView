@@ -23,6 +23,7 @@
 #ifndef __vtkSMNewWidgetRepresentationProxy_h
 #define __vtkSMNewWidgetRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 class vtkSMViewProxy;
 class vtkSMNewWidgetRepresentationObserver;
@@ -31,7 +32,7 @@ class vtkAbstractWidget;
 struct vtkSMNewWidgetRepresentationInternals;
 //ETX
 
-class VTK_EXPORT vtkSMNewWidgetRepresentationProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMNewWidgetRepresentationProxy : public vtkSMProxy
 {
 public:
   static vtkSMNewWidgetRepresentationProxy* New();

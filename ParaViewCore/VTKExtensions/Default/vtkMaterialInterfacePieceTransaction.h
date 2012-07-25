@@ -82,3 +82,6 @@ private:
 };
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, const vtkMaterialInterfacePieceTransaction &ta);
 #endif
+
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransaction.h

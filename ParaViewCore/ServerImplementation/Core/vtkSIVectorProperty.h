@@ -20,9 +20,10 @@
 #ifndef __vtkSIVectorProperty_h
 #define __vtkSIVectorProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSIVectorProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIVectorProperty : public vtkSIProperty
 {
 public:
   vtkTypeMacro(vtkSIVectorProperty, vtkSIProperty);

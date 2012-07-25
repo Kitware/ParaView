@@ -20,11 +20,12 @@
 #ifndef __vtkPVGlyphFilter_h
 #define __vtkPVGlyphFilter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGlyph3D.h"
 
 class vtkMaskPoints;
 
-class VTK_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVGlyphFilter : public vtkGlyph3D
 {
 public:
   vtkTypeMacro(vtkPVGlyphFilter,vtkGlyph3D);

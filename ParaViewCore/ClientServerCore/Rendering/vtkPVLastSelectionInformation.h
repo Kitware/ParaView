@@ -20,9 +20,10 @@
 #ifndef __vtkPVLastSelectionInformation_h
 #define __vtkPVLastSelectionInformation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVSelectionInformation.h"
 
-class VTK_EXPORT vtkPVLastSelectionInformation : public vtkPVSelectionInformation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVLastSelectionInformation : public vtkPVSelectionInformation
 {
 public:
   static vtkPVLastSelectionInformation* New();

@@ -463,3 +463,5 @@ private:
 #endif
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkClientServerStream.h

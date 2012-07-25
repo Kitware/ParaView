@@ -27,7 +27,7 @@
 #define __vtkPVPythonInterpretor_h
 
 #include "vtkObject.h"
-#include "vtkPVPythonSupportModule.h"
+#include "vtkPVPythonSupportModule.h" // needed for export macro
 
 class vtkStdString;
 class vtkPVPythonInterpretorInternal;

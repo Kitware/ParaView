@@ -23,8 +23,9 @@
 #define __vtkBlockDeliveryPreprocessor_h
 
 #include "vtkDataObjectAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkBlockDeliveryPreprocessor : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkBlockDeliveryPreprocessor : public vtkDataObjectAlgorithm
 {
 public:
   static vtkBlockDeliveryPreprocessor* New();

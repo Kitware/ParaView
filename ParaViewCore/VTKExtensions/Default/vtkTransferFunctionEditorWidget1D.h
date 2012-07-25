@@ -24,9 +24,10 @@
 #ifndef __vtkTransferFunctionEditorWidget1D_h
 #define __vtkTransferFunctionEditorWidget1D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorWidget.h"
 
-class VTK_EXPORT vtkTransferFunctionEditorWidget1D : public vtkTransferFunctionEditorWidget
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorWidget1D : public vtkTransferFunctionEditorWidget
 {
 public:
   vtkTypeMacro(vtkTransferFunctionEditorWidget1D, vtkTransferFunctionEditorWidget);

@@ -26,11 +26,12 @@
 #ifndef __vtkSMCameraConfigurationWriter_h
 #define __vtkSMCameraConfigurationWriter_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxyConfigurationWriter.h"
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMCameraConfigurationWriter : public vtkSMProxyConfigurationWriter
 {
 public:
   vtkTypeMacro(vtkSMCameraConfigurationWriter,vtkSMProxyConfigurationWriter);

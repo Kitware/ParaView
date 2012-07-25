@@ -21,6 +21,7 @@
 #ifndef __vtkSMDeserializerProtobuf_h
 #define __vtkSMDeserializerProtobuf_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializer.h"
 
 class vtkPVXMLElement;
@@ -28,7 +29,7 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMDeserializerProtobuf : public vtkSMDeserializer
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializerProtobuf : public vtkSMDeserializer
 {
 public:
   static vtkSMDeserializerProtobuf* New();

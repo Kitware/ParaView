@@ -20,13 +20,14 @@
 #ifndef __vtkPVKeyFrameAnimationCueForProxies_h
 #define __vtkPVKeyFrameAnimationCueForProxies_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkPVKeyFrameAnimationCue.h"
 
 class vtkSMProxy;
 class vtkSMProperty;
 class vtkSMDomain;
 
-class VTK_EXPORT vtkPVKeyFrameAnimationCueForProxies : public vtkPVKeyFrameAnimationCue
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVKeyFrameAnimationCueForProxies : public vtkPVKeyFrameAnimationCue
 {
 public:
   static vtkPVKeyFrameAnimationCueForProxies* New();

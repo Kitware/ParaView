@@ -23,6 +23,7 @@
 #ifndef __vtkMPIMoveData_h
 #define __vtkMPIMoveData_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"
 
 class vtkMultiProcessController;
@@ -31,7 +32,7 @@ class vtkMPIMToNSocketConnection;
 class vtkDataSet;
 class vtkIndent;
 
-class VTK_EXPORT vtkMPIMoveData : public vtkPassInputTypeAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMPIMoveData : public vtkPassInputTypeAlgorithm
 {
 public:
   static vtkMPIMoveData *New();

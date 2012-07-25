@@ -28,11 +28,12 @@
 #ifndef __vtkSMDataDeliveryManager_h
 #define __vtkSMDataDeliveryManager_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkWeakPointer.h" // needed for iVars
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkSMDataDeliveryManager : public vtkSMObject
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMDataDeliveryManager : public vtkSMObject
 {
 public:
   static vtkSMDataDeliveryManager* New();

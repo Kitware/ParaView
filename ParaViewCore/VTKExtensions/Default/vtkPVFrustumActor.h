@@ -20,12 +20,13 @@
 #ifndef __vtkPVFrustumActor_h
 #define __vtkPVFrustumActor_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkOpenGLActor.h"
 
 class vtkOutlineSource;
 class vtkPolyDataMapper;
 
-class VTK_EXPORT vtkPVFrustumActor : public vtkOpenGLActor
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVFrustumActor : public vtkOpenGLActor
 {
 public:
   static vtkPVFrustumActor* New();

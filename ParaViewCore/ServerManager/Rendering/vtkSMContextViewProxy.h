@@ -20,6 +20,7 @@
 #ifndef __vtkSMContextViewProxy_h
 #define __vtkSMContextViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
 
 class vtkAbstractContextItem;
@@ -27,7 +28,7 @@ class vtkContextView;
 class vtkImageData;
 class vtkRenderWindow;
 
-class VTK_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMContextViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMContextViewProxy* New();

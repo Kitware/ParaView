@@ -40,6 +40,7 @@
 #define __vtkOrderedCompositeDistributor_h
 
 #include "vtkPointSetAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkPVConfig.h" // needed for PARAVIEW_USE_MPI
 
 class vtkBSPCuts;
@@ -49,7 +50,7 @@ class vtkDistributedDataFilter;
 class vtkMultiProcessController;
 class vtkPKdTree;
 
-class VTK_EXPORT vtkOrderedCompositeDistributor : public vtkPointSetAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkOrderedCompositeDistributor : public vtkPointSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkOrderedCompositeDistributor, vtkPointSetAlgorithm);

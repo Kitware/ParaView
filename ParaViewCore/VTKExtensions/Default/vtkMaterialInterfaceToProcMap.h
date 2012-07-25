@@ -60,3 +60,5 @@ private:
   int BitsPerInt; // number of bits in an integer
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfaceToProcMap.h

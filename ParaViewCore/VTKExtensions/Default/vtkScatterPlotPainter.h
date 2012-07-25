@@ -26,6 +26,7 @@
 #ifndef __vtkScatterPlotPainter_h
 #define __vtkScatterPlotPainter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPainter.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -37,7 +38,7 @@ class vtkScalarsToColors;
 class vtkScalarsToColorsPainter;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkScatterPlotPainter: public vtkPainter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkScatterPlotPainter: public vtkPainter
 {
 public:
   static vtkScatterPlotPainter* New();

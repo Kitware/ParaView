@@ -23,6 +23,7 @@
 #ifndef __vtkAMRDualClip_h
 #define __vtkAMRDualClip_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkDataSet;
@@ -45,7 +46,7 @@ class vtkAMRDualGridHelperFace;
 class vtkAMRDualClipLocator;
 
 
-class VTK_EXPORT vtkAMRDualClip : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualClip : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkAMRDualClip *New();

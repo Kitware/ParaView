@@ -24,6 +24,7 @@
 #define __vtkRedistributePolyData_h
 
 #include "vtkPolyDataAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 //*******************************************************************
 class vtkDataArray;
@@ -31,7 +32,7 @@ class vtkDataSetAttributes;
 class vtkMultiProcessController;
 class vtkSocketController;
 
-class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkRedistributePolyData : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataAlgorithm);
@@ -81,7 +82,7 @@ protected:
     POINTS_TAG         = 180
   };
 
-  class VTK_EXPORT vtkCommSched
+  class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCommSched
   {
   public:
     vtkCommSched();

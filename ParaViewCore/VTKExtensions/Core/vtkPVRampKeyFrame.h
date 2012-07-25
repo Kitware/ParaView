@@ -21,7 +21,7 @@
 
 #include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkPVRampKeyFrame : public vtkPVKeyFrame
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVRampKeyFrame : public vtkPVKeyFrame
 {
 public:
   static vtkPVRampKeyFrame* New();

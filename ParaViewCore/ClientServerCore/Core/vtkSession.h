@@ -21,9 +21,10 @@
 #ifndef __vtkSession_h
 #define __vtkSession_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
-class VTK_EXPORT vtkSession : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkSession : public vtkObject
 {
 public:
   vtkTypeMacro(vtkSession, vtkObject);

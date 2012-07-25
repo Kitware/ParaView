@@ -22,16 +22,18 @@
 #define __vtkPriorityHelper_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkAlgorithmOutput;
 class vtkAlgorithm;
 class vtkDataObject;
 
-class VTK_EXPORT vtkPriorityHelper : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPriorityHelper : public vtkObject
 {
 public:
   static vtkPriorityHelper* New();
   vtkTypeMacro(vtkPriorityHelper, vtkObject);
+  void PrintSelf(ostream&, vtkIndent);
 
   // Descrition:
   // Tell it what filter you want to control.

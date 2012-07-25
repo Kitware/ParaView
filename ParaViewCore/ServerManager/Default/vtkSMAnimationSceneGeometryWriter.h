@@ -22,11 +22,12 @@
 #ifndef __vtkSMAnimationSceneGeometryWriter_h
 #define __vtkSMAnimationSceneGeometryWriter_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMAnimationSceneWriter.h"
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnimationSceneWriter
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMAnimationSceneGeometryWriter : public vtkSMAnimationSceneWriter
 {
 public:
   static vtkSMAnimationSceneGeometryWriter* New();

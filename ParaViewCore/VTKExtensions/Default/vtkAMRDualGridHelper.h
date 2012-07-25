@@ -25,6 +25,7 @@
 #ifndef __vtkAMRDualGridHelper_h
 #define __vtkAMRDualGridHelper_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 #include <vector>
 #include <map>
@@ -42,7 +43,7 @@ class vtkAMRDualGridHelperFace;
 class vtkAMRDualGridHelperCommRequestList;
 
 //----------------------------------------------------------------------------
-class VTK_EXPORT vtkAMRDualGridHelper : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRDualGridHelper : public vtkObject
 {
 public:
   static vtkAMRDualGridHelper *New();
@@ -348,3 +349,5 @@ private:
 //ETX
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkAMRDualGridHelper.h

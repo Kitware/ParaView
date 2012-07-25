@@ -36,11 +36,12 @@
 #ifndef __vtkTableFFT_h
 #define __vtkTableFFT_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
 #include "vtkSmartPointer.h"    // For internal method.
 
-class VTK_EXPORT vtkTableFFT : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTableFFT : public vtkTableAlgorithm
 {
 public:
   vtkTypeMacro(vtkTableFFT, vtkTableAlgorithm);

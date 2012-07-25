@@ -19,9 +19,10 @@
 #ifndef __vtkSMDirectoryProxy_h
 #define __vtkSMDirectoryProxy_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-class VTK_EXPORT vtkSMDirectoryProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMDirectoryProxy : public vtkSMProxy
 {
 public:
   static vtkSMDirectoryProxy* New();

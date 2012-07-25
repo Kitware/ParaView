@@ -34,3 +34,5 @@ typedef paraview_protobuf::Message vtkSMMessage;
 typedef paraview_protobuf::MessageCollection vtkSMMessageCollection;
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMMessageMinimal.h

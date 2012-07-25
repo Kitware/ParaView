@@ -24,12 +24,13 @@
 #define __vtkCameraManipulator_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkCameraManipulatorGUIHelper;
 class vtkRenderer;
 class vtkRenderWindowInteractor;
 
-class VTK_EXPORT vtkCameraManipulator : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraManipulator : public vtkObject
 {
 public:
   static vtkCameraManipulator *New();

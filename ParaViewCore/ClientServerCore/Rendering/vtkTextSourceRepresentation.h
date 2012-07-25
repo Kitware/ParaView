@@ -22,13 +22,14 @@
 #ifndef __vtkTextSourceRepresentation_h
 #define __vtkTextSourceRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtk3DWidgetRepresentation;
 class vtkPolyData;
 class vtkPVCacheKeeper;
 
-class VTK_EXPORT vtkTextSourceRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkTextSourceRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkTextSourceRepresentation* New();

@@ -19,9 +19,10 @@
 #ifndef __vtkSMParallelCoordinatesRepresentationProxy_h
 #define __vtkSMParallelCoordinatesRepresentationProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMChartRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMParallelCoordinatesRepresentationProxy :
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMParallelCoordinatesRepresentationProxy :
     public vtkSMChartRepresentationProxy
 {
 public:

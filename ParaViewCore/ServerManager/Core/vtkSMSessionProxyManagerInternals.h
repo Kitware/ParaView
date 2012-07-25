@@ -509,3 +509,5 @@ struct vtkSMSessionProxyManagerInternals
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMSessionProxyManagerInternals.h

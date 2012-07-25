@@ -32,3 +32,6 @@ public:
 
 
 #endif // __vtkSciVizStatisticsPrivate_h
+
+
+// VTK-HeaderTest-Exclude: vtkSciVizStatisticsPrivate.h

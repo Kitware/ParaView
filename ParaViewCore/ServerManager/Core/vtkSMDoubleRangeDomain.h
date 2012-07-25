@@ -39,13 +39,14 @@
 #ifndef __vtkSMDoubleRangeDomain_h
 #define __vtkSMDoubleRangeDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 //BTX
 struct vtkSMDoubleRangeDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMDoubleRangeDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleRangeDomain : public vtkSMDomain
 {
 public:
   static vtkSMDoubleRangeDomain* New();

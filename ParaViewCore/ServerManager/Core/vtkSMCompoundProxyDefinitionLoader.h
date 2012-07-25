@@ -24,11 +24,12 @@
 #ifndef __vtkSMCompoundProxyDefinitionLoader_h
 #define __vtkSMCompoundProxyDefinitionLoader_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializerXML
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializerXML
 {
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();

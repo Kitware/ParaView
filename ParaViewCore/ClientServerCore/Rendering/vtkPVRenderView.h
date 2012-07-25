@@ -23,6 +23,7 @@
 #ifndef __vtkPVRenderView_h
 #define __vtkPVRenderView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVView.h"
 #include "vtkBoundingBox.h" // needed for iVar
 
@@ -51,7 +52,7 @@ class vtkRenderWindow;
 class vtkPVDataDeliveryManager;
 class vtkTexture;
 
-class VTK_EXPORT vtkPVRenderView : public vtkPVView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
 {
   //*****************************************************************
 public:

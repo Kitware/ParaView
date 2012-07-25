@@ -22,6 +22,7 @@
 #ifndef __vtkSMPropertyIterator_h
 #define __vtkSMPropertyIterator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 //BTX
@@ -31,7 +32,7 @@ struct vtkSMPropertyIteratorInternals;
 class vtkSMProperty;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMPropertyIterator : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyIterator : public vtkSMObject
 {
 public:
   static vtkSMPropertyIterator* New();

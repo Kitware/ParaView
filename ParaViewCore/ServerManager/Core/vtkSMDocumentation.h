@@ -22,11 +22,12 @@
 #ifndef __vtkSMDocumentation_h
 #define __vtkSMDocumentation_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkPVXMLElement;
 
-class VTK_EXPORT vtkSMDocumentation : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDocumentation : public vtkSMObject
 {
 public:
   static vtkSMDocumentation* New();

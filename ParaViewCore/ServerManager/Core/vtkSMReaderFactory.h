@@ -35,6 +35,7 @@
 #ifndef __vtkSMReaderFactory_h
 #define __vtkSMReaderFactory_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkStringList;
@@ -42,7 +43,7 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
 public:
   static vtkSMReaderFactory* New();

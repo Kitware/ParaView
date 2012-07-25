@@ -21,10 +21,11 @@
 #define __vtkCleanArrays_h
 
 #include "vtkDataSetAlgorithm.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessController;
 
-class VTK_EXPORT vtkCleanArrays : public vtkDataSetAlgorithm
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCleanArrays : public vtkDataSetAlgorithm
 {
 public:
   static vtkCleanArrays* New();

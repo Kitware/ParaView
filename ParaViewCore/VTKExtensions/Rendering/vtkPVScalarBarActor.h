@@ -34,11 +34,12 @@
 #define __vtkPVScalarBarActor_h
 
 #include "vtkScalarBarActor.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 #include "vtkSmartPointer.h" // For ivars
 #include <vector>     // For ivars
 
-class VTK_EXPORT vtkPVScalarBarActor : public vtkScalarBarActor
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVScalarBarActor : public vtkScalarBarActor
 {
 public:
   vtkTypeMacro(vtkPVScalarBarActor, vtkScalarBarActor);

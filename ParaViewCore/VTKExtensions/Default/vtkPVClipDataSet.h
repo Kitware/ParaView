@@ -21,9 +21,10 @@
 #ifndef __vtkPVClipDataSet_h
 #define __vtkPVClipDataSet_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableBasedClipDataSet.h"
 
-class VTK_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipDataSet : public vtkTableBasedClipDataSet
 {
 public:
   vtkTypeMacro(vtkPVClipDataSet,vtkTableBasedClipDataSet);

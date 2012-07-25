@@ -21,9 +21,10 @@
 #ifndef __vtkPVAlgorithmPortsInformation_h
 #define __vtkPVAlgorithmPortsInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVAlgorithmPortsInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVAlgorithmPortsInformation : public vtkPVInformation
 {
 public:
   static vtkPVAlgorithmPortsInformation* New();

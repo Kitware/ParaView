@@ -21,6 +21,7 @@
 #ifndef __vtkTransferFunctionEditorRepresentationSimple1D_h
 #define __vtkTransferFunctionEditorRepresentationSimple1D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
 class vtkActor;
@@ -32,7 +33,7 @@ class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkTransformPolyDataFilter;
 
-class VTK_EXPORT vtkTransferFunctionEditorRepresentationSimple1D : public vtkTransferFunctionEditorRepresentation1D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorRepresentationSimple1D : public vtkTransferFunctionEditorRepresentation1D
 {
 public:
   static vtkTransferFunctionEditorRepresentationSimple1D* New();

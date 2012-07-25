@@ -25,10 +25,11 @@
 #define __vtkPVRenderViewProxy_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkRenderWindow;
 
-class VTK_EXPORT vtkPVRenderViewProxy : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVRenderViewProxy : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVRenderViewProxy, vtkObject);

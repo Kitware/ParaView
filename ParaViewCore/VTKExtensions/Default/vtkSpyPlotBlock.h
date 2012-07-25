@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSpyPlotBlock_h
 #define __vtkSpyPlotBlock_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSystemIncludes.h"
 
 class vtkCellData;
@@ -35,7 +36,7 @@ class vtkSpyPlotIStream;
 class vtkBoundingBox;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkSpyPlotBlock
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkSpyPlotBlock
 {
 public:
   
@@ -211,3 +212,5 @@ inline int vtkSpyPlotBlock::GetTotalSize() const
 }
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSpyPlotBlock.h

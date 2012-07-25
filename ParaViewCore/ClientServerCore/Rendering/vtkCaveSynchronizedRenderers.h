@@ -24,12 +24,13 @@
 #ifndef __vtkCaveSynchronizedRenderers_h
 #define __vtkCaveSynchronizedRenderers_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
 
 class vtkCamera;
 class vtkMatrix4x4;
 
-class VTK_EXPORT vtkCaveSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCaveSynchronizedRenderers : public vtkSynchronizedRenderers
 {
 public:
   static vtkCaveSynchronizedRenderers* New();

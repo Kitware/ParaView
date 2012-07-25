@@ -26,9 +26,10 @@
 #ifndef __vtkPVContourFilter_h
 #define __vtkPVContourFilter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkContourFilter.h"
 
-class VTK_EXPORT vtkPVContourFilter : public vtkContourFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVContourFilter : public vtkContourFilter
 {
 public:
   vtkTypeMacro(vtkPVContourFilter, vtkContourFilter);

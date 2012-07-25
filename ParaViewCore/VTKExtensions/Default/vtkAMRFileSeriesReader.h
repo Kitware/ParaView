@@ -16,9 +16,10 @@
 #ifndef __vtkAMRFileSeriesReader_h
 #define __vtkAMRFileSeriesReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkFileSeriesReader.h"
 
-class VTK_EXPORT vtkAMRFileSeriesReader : public vtkFileSeriesReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAMRFileSeriesReader : public vtkFileSeriesReader
 {
 public:
   static vtkAMRFileSeriesReader* New();

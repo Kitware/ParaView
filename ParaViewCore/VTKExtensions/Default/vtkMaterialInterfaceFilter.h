@@ -28,6 +28,7 @@
 #ifndef __vtkMaterialInterfaceFilter_h
 #define __vtkMaterialInterfaceFilter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vector" // needed for vector
 #include "string" // needed for string
@@ -59,7 +60,7 @@ class vtkMaterialInterfacePieceLoading;
 class vtkMaterialInterfaceCommBuffer;
 
 
-class VTK_EXPORT vtkMaterialInterfaceFilter : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMaterialInterfaceFilter : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkMaterialInterfaceFilter *New();

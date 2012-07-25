@@ -81,3 +81,6 @@ private:
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkMaterialInterfacePieceLoading &fp);
 void PrintPieceLoadingHistogram(std::vector<std::vector<vtkIdType> > &pla);
 #endif
+
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceLoading.h

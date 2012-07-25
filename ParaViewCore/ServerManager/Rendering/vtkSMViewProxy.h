@@ -29,13 +29,14 @@
 #ifndef __vtkSMViewProxy_h
 #define __vtkSMViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
 class vtkImageData;
 class vtkSMRepresentationProxy;
 class vtkView;
 
-class VTK_EXPORT vtkSMViewProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMViewProxy : public vtkSMProxy
 {
 public:
   static vtkSMViewProxy* New();

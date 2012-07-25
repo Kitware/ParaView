@@ -24,6 +24,7 @@
 #ifndef __vtkPVDataDeliveryManager_h
 #define __vtkPVDataDeliveryManager_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkSmartPointer.h" // needed for iVar.
 #include "vtkWeakPointer.h" // needed for iVar.
@@ -38,7 +39,7 @@ class vtkPKdTree;
 #include <vector>
 //ETX
 
-class VTK_EXPORT vtkPVDataDeliveryManager : public vtkObject
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataDeliveryManager : public vtkObject
 {
 public:
   static vtkPVDataDeliveryManager* New();
@@ -166,3 +167,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVDataDeliveryManager.h

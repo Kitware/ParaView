@@ -17,12 +17,13 @@
 #ifndef __vtkCSVWriter_h
 #define __vtkCSVWriter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkWriter.h"
 
 class vtkStdString;
 class vtkTable;
 
-class VTK_EXPORT vtkCSVWriter : public vtkWriter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCSVWriter : public vtkWriter
 {
 public:
   static vtkCSVWriter* New();

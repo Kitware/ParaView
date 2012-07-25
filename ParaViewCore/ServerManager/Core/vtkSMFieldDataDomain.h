@@ -39,6 +39,7 @@
 #ifndef __vtkSMFieldDataDomain_h
 #define __vtkSMFieldDataDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMEnumerationDomain.h"
 
 class vtkPVDataSetAttributesInformation;
@@ -46,7 +47,7 @@ class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMFieldDataDomain : public vtkSMEnumerationDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMFieldDataDomain : public vtkSMEnumerationDomain
 {
 public:
   static vtkSMFieldDataDomain* New();

@@ -23,6 +23,7 @@
 #ifndef __vtkSMProxySelectionModel_h
 #define __vtkSMProxySelectionModel_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMRemoteObject.h"
 #include "vtkSMMessageMinimal.h" // Needed for vtkSMMessage*
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
@@ -35,7 +36,7 @@ class vtkSMProxy;
 #include <set> // needed for vtkset::set.
 //ETX
 
-class VTK_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxySelectionModel : public vtkSMRemoteObject
 {
 public:
   static vtkSMProxySelectionModel*  New();

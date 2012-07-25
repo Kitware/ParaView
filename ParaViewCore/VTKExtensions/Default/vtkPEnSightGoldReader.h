@@ -32,6 +32,7 @@
 #ifndef __vtkPEnSightGoldReader_h
 #define __vtkPEnSightGoldReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPEnSightReader.h"
 
 //BTX
@@ -41,7 +42,7 @@ class UndefPartialInternal;
 class vtkMultiBlockDataSet;
 class vtkPoints;
 
-class VTK_EXPORT vtkPEnSightGoldReader : public vtkPEnSightReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightGoldReader : public vtkPEnSightReader
 {
  public:
   static vtkPEnSightGoldReader *New();

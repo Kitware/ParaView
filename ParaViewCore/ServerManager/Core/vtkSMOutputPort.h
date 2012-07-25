@@ -27,6 +27,7 @@
 #ifndef __vtkSMOutputPort_h
 #define __vtkSMOutputPort_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkWeakPointer.h" // needed by SourceProxy pointer
 
@@ -37,7 +38,7 @@ class vtkPVTemporalDataInformation;
 class vtkSMCompoundSourceProxy;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMOutputPort : public vtkSMProxy
 {
 public:
   static vtkSMOutputPort* New();

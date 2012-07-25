@@ -24,9 +24,10 @@
 #ifndef __vtkSMDataSourceProxy_h
 #define __vtkSMDataSourceProxy_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"
 
-class VTK_EXPORT vtkSMDataSourceProxy : public vtkSMSourceProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDataSourceProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMDataSourceProxy* New();

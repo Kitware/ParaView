@@ -27,11 +27,12 @@
 #define __vtkImageCompressor_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkUnsignedCharArray;
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkImageCompressor : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkImageCompressor : public vtkObject
 {
 public:
   vtkTypeMacro(vtkImageCompressor, vtkObject);

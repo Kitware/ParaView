@@ -21,7 +21,7 @@
 
 #include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkPVExponentialKeyFrame : public vtkPVKeyFrame
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVExponentialKeyFrame : public vtkPVKeyFrame
 {
 public:
   vtkTypeMacro(vtkPVExponentialKeyFrame, vtkPVKeyFrame);

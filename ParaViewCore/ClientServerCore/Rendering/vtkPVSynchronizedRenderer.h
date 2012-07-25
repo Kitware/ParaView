@@ -20,6 +20,7 @@
 #ifndef __vtkPVSynchronizedRenderer_h
 #define __vtkPVSynchronizedRenderer_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkIceTSynchronizedRenderers;
@@ -31,7 +32,7 @@ class vtkRenderPass;
 class vtkSynchronizedRenderers;
 class vtkOpenGLRenderer;
 
-class VTK_EXPORT vtkPVSynchronizedRenderer : public vtkObject
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVSynchronizedRenderer : public vtkObject
 {
 public:
   static vtkPVSynchronizedRenderer* New();

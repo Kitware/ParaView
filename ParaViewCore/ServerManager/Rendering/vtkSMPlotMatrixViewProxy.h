@@ -17,12 +17,13 @@ PURPOSE.  See the above copyright notice for more information.
 #ifndef __vtkSMPlotMatrixViewProxy_h
 #define __vtkSMPlotMatrixViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMContextViewProxy.h"
 #include "vtkClientServerStream.h" // For CS stream methods.
 
 class vtkAbstractContextItem;
 
-class VTK_EXPORT vtkSMPlotMatrixViewProxy : public vtkSMContextViewProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMPlotMatrixViewProxy : public vtkSMContextViewProxy
 {
 public:
   static vtkSMPlotMatrixViewProxy* New();

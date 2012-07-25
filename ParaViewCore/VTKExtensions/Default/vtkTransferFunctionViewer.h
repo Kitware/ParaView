@@ -38,6 +38,7 @@
 #ifndef __vtkTransferFunctionViewer_h
 #define __vtkTransferFunctionViewer_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkColorTransferFunction;
@@ -51,7 +52,7 @@ class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkTransferFunctionEditorWidget;
 
-class VTK_EXPORT vtkTransferFunctionViewer : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionViewer : public vtkObject
 {
 public:
   static vtkTransferFunctionViewer* New();

@@ -36,11 +36,12 @@
 #define __vtkUndoStack_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkUndoStackInternal;
 class vtkUndoSet;
 
-class VTK_EXPORT vtkUndoStack : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkUndoStack : public vtkObject
 {
 public:
 

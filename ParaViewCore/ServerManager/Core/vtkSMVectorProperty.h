@@ -23,9 +23,10 @@
 #ifndef __vtkSMVectorProperty_h
 #define __vtkSMVectorProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProperty.h"
 
-class VTK_EXPORT vtkSMVectorProperty : public vtkSMProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMVectorProperty : public vtkSMProperty
 {
 public:
   vtkTypeMacro(vtkSMVectorProperty, vtkSMProperty);

@@ -105,3 +105,4 @@ struct vtkSMProxyInternals
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkSMProxyInternals.h

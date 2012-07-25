@@ -21,12 +21,13 @@
 #ifndef __vtkPVClientServerSynchronizedRenderers_h
 #define __vtkPVClientServerSynchronizedRenderers_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
 
 class vtkImageCompressor;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkPVClientServerSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVClientServerSynchronizedRenderers : public vtkSynchronizedRenderers
 {
 public:
   static vtkPVClientServerSynchronizedRenderers* New();

@@ -24,6 +24,7 @@
 #ifndef __vtkFileSequenceParser_h
 #define __vtkFileSequenceParser_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 
 namespace vtksys {
@@ -31,7 +32,7 @@ namespace vtksys {
 }
 
 
-class VTK_EXPORT vtkFileSequenceParser : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSequenceParser : public vtkObject
 {
 public:
   static vtkFileSequenceParser* New();

@@ -19,6 +19,7 @@
 #ifndef __vtkIntersectFragments_h
 #define __vtkIntersectFragments_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vector"//
 #include "string"//
@@ -33,7 +34,7 @@ class vtkMultiProcessController;
 class vtkMaterialInterfaceCommBuffer;
 class vtkCutter;
 
-class VTK_EXPORT vtkIntersectFragments : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkIntersectFragments : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkIntersectFragments *New();

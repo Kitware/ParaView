@@ -23,11 +23,12 @@
 #ifndef __vtkSIFileSeriesReaderProxy_h
 #define __vtkSIFileSeriesReaderProxy_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSISourceProxy.h"
 
 class vtkAlgorithm;
 
-class VTK_EXPORT vtkSIFileSeriesReaderProxy : public vtkSISourceProxy
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSIFileSeriesReaderProxy : public vtkSISourceProxy
 {
 public:
   static vtkSIFileSeriesReaderProxy* New();

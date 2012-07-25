@@ -21,9 +21,10 @@
 #ifndef __vtkAnnotateGlobalDataFilter_h
 #define __vtkAnnotateGlobalDataFilter_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkPythonAnnotationFilter.h"
 
-class VTK_EXPORT vtkAnnotateGlobalDataFilter : public vtkPythonAnnotationFilter
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkAnnotateGlobalDataFilter : public vtkPythonAnnotationFilter
 {
 public:
   static vtkAnnotateGlobalDataFilter* New();

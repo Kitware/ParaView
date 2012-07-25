@@ -22,11 +22,12 @@
 #ifndef __vtkPVServerOptions_h
 #define __vtkPVServerOptions_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVOptions.h"
 
 class vtkPVServerOptionsInternals;
 
-class VTK_EXPORT vtkPVServerOptions : public vtkPVOptions
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerOptions : public vtkPVOptions
 {
 public:
   static vtkPVServerOptions* New();

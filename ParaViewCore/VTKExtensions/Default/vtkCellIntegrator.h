@@ -23,12 +23,13 @@
 #ifndef __vtkCellIntegrator_h
 #define __vtkCellIntegrator_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkDataSet;
 class vtkIdList;
 
-class VTK_EXPORT vtkCellIntegrator : public vtkObject
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCellIntegrator : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCellIntegrator,vtkObject);

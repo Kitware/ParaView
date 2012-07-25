@@ -22,10 +22,11 @@
 #define __vtkTimestepsAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkTimestepsAnimationPlayerSetOfDouble;
 
-class VTK_EXPORT vtkTimestepsAnimationPlayer : public vtkAnimationPlayer
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkTimestepsAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkTimestepsAnimationPlayer* New();

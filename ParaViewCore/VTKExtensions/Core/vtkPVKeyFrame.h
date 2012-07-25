@@ -25,12 +25,13 @@
 #define __vtkPVKeyFrame_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkPVKeyFrameInternals;
 class vtkPVAnimationCue;
 struct vtkClientServerID;
 
-class VTK_EXPORT vtkPVKeyFrame : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVKeyFrame : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVKeyFrame, vtkObject);

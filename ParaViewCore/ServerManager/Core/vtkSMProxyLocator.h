@@ -21,6 +21,7 @@
 #ifndef __vtkSMProxyLocator_h
 #define __vtkSMProxyLocator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkWeakPointer.h" // needed to keep the session around
 
@@ -29,7 +30,7 @@ class vtkSMDeserializer;
 class vtkSMProxy;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMProxyLocator : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyLocator : public vtkSMObject
 {
 public:
   static vtkSMProxyLocator* New();

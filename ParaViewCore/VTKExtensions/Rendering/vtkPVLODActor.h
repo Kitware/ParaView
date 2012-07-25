@@ -26,10 +26,11 @@
 #define __vtkPVLODActor_h
 
 #include "vtkActor.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMapper;
 
-class VTK_EXPORT vtkPVLODActor : public vtkActor
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVLODActor : public vtkActor
 {
 public:
   vtkTypeMacro(vtkPVLODActor,vtkActor);

@@ -27,6 +27,7 @@
 #ifndef __vtkTransferFunctionEditorWidget_h
 #define __vtkTransferFunctionEditorWidget_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkAbstractWidget.h"
 
 class vtkColorTransferFunction;
@@ -34,7 +35,7 @@ class vtkDataSet;
 class vtkPiecewiseFunction;
 class vtkRectilinearGrid;
 
-class VTK_EXPORT vtkTransferFunctionEditorWidget : public vtkAbstractWidget
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorWidget : public vtkAbstractWidget
 {
 public:
   vtkTypeMacro(vtkTransferFunctionEditorWidget, vtkAbstractWidget);

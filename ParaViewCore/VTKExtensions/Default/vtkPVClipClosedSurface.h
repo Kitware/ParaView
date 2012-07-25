@@ -20,11 +20,12 @@
 #ifndef __vtkPVClipClosedSurface_h
 #define __vtkPVClipClosedSurface_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkClipClosedSurface.h"
 
 class vtkPlane;
 
-class VTK_EXPORT vtkPVClipClosedSurface : public vtkClipClosedSurface
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVClipClosedSurface : public vtkClipClosedSurface
 {
 public:
   vtkTypeMacro( vtkPVClipClosedSurface, vtkClipClosedSurface );

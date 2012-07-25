@@ -22,11 +22,12 @@
 #ifndef __vtkPVDataRepresentation_h
 #define __vtkPVDataRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkDataRepresentation.h"
 
 class vtkInformationRequestKey;
 
-class VTK_EXPORT vtkPVDataRepresentation : public vtkDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentation : public vtkDataRepresentation
 {
 public:
   vtkTypeMacro(vtkPVDataRepresentation, vtkDataRepresentation);

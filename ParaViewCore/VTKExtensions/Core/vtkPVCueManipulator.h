@@ -35,9 +35,11 @@
 #define __vtkPVCueManipulator_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
+
 class vtkPVAnimationCue;
 
-class VTK_EXPORT vtkPVCueManipulator : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVCueManipulator : public vtkObject
 {
 public:
   vtkTypeMacro(vtkPVCueManipulator, vtkObject);

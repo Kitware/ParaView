@@ -19,6 +19,7 @@
 #ifndef __vtkSMSession_h
 #define __vtkSMSession_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkPVSessionBase.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 
@@ -28,7 +29,7 @@ class vtkSMProxyLocator;
 class vtkSMSessionProxyManager;
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMSession : public vtkPVSessionBase
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSession : public vtkPVSessionBase
 {
 public:
   static vtkSMSession* New();

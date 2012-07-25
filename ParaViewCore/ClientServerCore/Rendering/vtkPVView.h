@@ -23,6 +23,7 @@
 #ifndef __vtkPVView_h
 #define __vtkPVView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkView.h"
 
 class vtkInformation;
@@ -31,7 +32,7 @@ class vtkInformationRequestKey;
 class vtkInformationVector;
 class vtkPVSynchronizedRenderWindows;
 
-class VTK_EXPORT vtkPVView : public vtkView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVView : public vtkView
 {
 public:
   vtkTypeMacro(vtkPVView, vtkView);

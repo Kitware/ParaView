@@ -329,3 +329,5 @@ public:
     }
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkSMVectorPropertyTemplate.h

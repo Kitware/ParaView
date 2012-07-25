@@ -24,8 +24,9 @@
 #define __vtkPVTrackballMoveActor_h
 
 #include "vtkCameraManipulator.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVTrackballMoveActor : public vtkCameraManipulator
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVTrackballMoveActor : public vtkCameraManipulator
 {
 public:
   static vtkPVTrackballMoveActor *New();

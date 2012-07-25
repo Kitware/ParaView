@@ -24,12 +24,13 @@
 #ifndef __vtkSMBoundsDomain_h
 #define __vtkSMBoundsDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDoubleRangeDomain.h"
 
 class vtkPVDataInformation;
 class vtkSMProxyProperty;
 
-class VTK_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMBoundsDomain : public vtkSMDoubleRangeDomain
 {
 public:
   static vtkSMBoundsDomain* New();

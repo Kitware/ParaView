@@ -27,6 +27,7 @@
 #ifndef __vtkPVDataInformation_h
 #define __vtkPVDataInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkCollection;
@@ -42,7 +43,7 @@ class vtkPVDataSetAttributesInformation;
 class vtkSelection;
 class vtkTable;
 
-class VTK_EXPORT vtkPVDataInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVDataInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataInformation* New();

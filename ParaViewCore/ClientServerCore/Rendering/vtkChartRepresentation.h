@@ -26,6 +26,7 @@
 #ifndef __vtkChartRepresentation_h
 #define __vtkChartRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
@@ -40,7 +41,7 @@ class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
 
-class VTK_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkChartRepresentation* New();

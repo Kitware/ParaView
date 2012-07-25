@@ -21,6 +21,7 @@
 #ifndef __vtkSMDeserializer_h
 #define __vtkSMDeserializer_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 
 class vtkPVXMLElement;
@@ -28,7 +29,7 @@ class vtkSMProxy;
 class vtkSMProxyLocator;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMDeserializer : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDeserializer : public vtkSMSessionObject
 {
 public:
   vtkTypeMacro(vtkSMDeserializer, vtkSMSessionObject);

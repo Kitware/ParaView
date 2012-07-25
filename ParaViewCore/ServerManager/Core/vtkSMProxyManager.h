@@ -23,6 +23,7 @@
 #ifndef __vtkSMProxyManager_h
 #define __vtkSMProxyManager_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkSmartPointer.h" // Needed for the singleton
 
@@ -39,7 +40,7 @@ class vtkSMStateLoader;
 class vtkSMUndoStackBuilder;
 class vtkSMWriterFactory;
 
-class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyManager : public vtkSMObject
 {
 public:
   vtkTypeMacro(vtkSMProxyManager, vtkSMObject);

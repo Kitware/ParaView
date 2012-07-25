@@ -57,6 +57,7 @@
 #ifndef __vtkSMPropertyHelper_h
 #define __vtkSMPropertyHelper_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkVariant.h"
 
@@ -82,7 +83,7 @@ class vtkSMStringVectorProperty;
 class vtkSMProxyProperty;
 class vtkSMInputProperty;
 
-class VTK_EXPORT vtkSMPropertyHelper 
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyHelper 
 {
 public:
   // Description:
@@ -242,3 +243,4 @@ private:
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkSMPropertyHelper.h

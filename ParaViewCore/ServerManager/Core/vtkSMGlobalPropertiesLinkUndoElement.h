@@ -22,11 +22,12 @@
 #ifndef __vtkSMGlobalPropertiesLinkUndoElement_h
 #define __vtkSMGlobalPropertiesLinkUndoElement_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMUndoElement.h"
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMGlobalPropertiesLinkUndoElement : public vtkSMUndoElement
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMGlobalPropertiesLinkUndoElement : public vtkSMUndoElement
 {
 public:
   static vtkSMGlobalPropertiesLinkUndoElement* New();

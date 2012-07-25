@@ -74,6 +74,7 @@
 #ifndef __vtkRectilinearGridConnectivity_h
 #define __vtkRectilinearGridConnectivity_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkPolyData;
@@ -88,7 +89,7 @@ class vtkRectilinearGridConnectivityFaceHash;
 class vtkRectilinearGridConnectivityInternal;
 
 
-class VTK_EXPORT vtkRectilinearGridConnectivity : 
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkRectilinearGridConnectivity : 
           public vtkMultiBlockDataSetAlgorithm
 {
 public:

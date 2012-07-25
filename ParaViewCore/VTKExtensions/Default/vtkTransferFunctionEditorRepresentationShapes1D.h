@@ -21,9 +21,10 @@
 #ifndef __vtkTransferFunctionEditorRepresentationShapes1D_h
 #define __vtkTransferFunctionEditorRepresentationShapes1D_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTransferFunctionEditorRepresentation1D.h"
 
-class VTK_EXPORT vtkTransferFunctionEditorRepresentationShapes1D : public vtkTransferFunctionEditorRepresentation1D
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkTransferFunctionEditorRepresentationShapes1D : public vtkTransferFunctionEditorRepresentation1D
 {
 public:
   static vtkTransferFunctionEditorRepresentationShapes1D* New();

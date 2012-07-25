@@ -19,11 +19,12 @@
 #ifndef __vtkPythonAnimationCue_h
 #define __vtkPythonAnimationCue_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkAnimationCue.h"
 
 class vtkPVPythonInterpretor;
 
-class VTK_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPythonAnimationCue : public vtkAnimationCue
 {
 public:
   static vtkPythonAnimationCue* New();

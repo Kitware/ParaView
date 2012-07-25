@@ -19,13 +19,14 @@
 #define __vtkPVGenericRenderWindowInteractor_h
 
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkPVRenderViewProxy;
 class vtkRenderer;
 class vtkPVGenericRenderWindowInteractorObserver;
 class vtkPVGenericRenderWindowInteractorTimer;
 
-class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGenericRenderWindowInteractor : public vtkRenderWindowInteractor
 {
 public:
   static vtkPVGenericRenderWindowInteractor *New();

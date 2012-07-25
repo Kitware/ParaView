@@ -26,6 +26,7 @@
 #ifndef __vtkScatterPlotMapper_h
 #define __vtkScatterPlotMapper_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
@@ -34,7 +35,7 @@ class vtkPolyData;
 class vtkScalarsToColorsPainter;
 class vtkScatterPlotPainter;
 
-class VTK_EXPORT vtkScatterPlotMapper : public vtkCompositePolyDataMapper2
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkScatterPlotMapper : public vtkCompositePolyDataMapper2
 {
 public:
   static vtkScatterPlotMapper* New();

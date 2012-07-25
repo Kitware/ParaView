@@ -46,10 +46,11 @@
 #define __vtkSquirtCompressor_h
 
 #include "vtkImageCompressor.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkMultiProcessStream;
 
-class VTK_EXPORT vtkSquirtCompressor : public vtkImageCompressor
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkSquirtCompressor : public vtkImageCompressor
 {
 public:
   static vtkSquirtCompressor* New();

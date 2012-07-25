@@ -131,3 +131,5 @@ vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransactions(
   return nTransactions;
 }
 #endif
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfacePieceTransactionMatrix.h

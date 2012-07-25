@@ -23,6 +23,7 @@
 #ifndef __vtkPVCompositeDataInformation_h
 #define __vtkPVCompositeDataInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkPVDataInformation;
@@ -30,7 +31,7 @@ class vtkPVDataInformation;
 struct vtkPVCompositeDataInformationInternals;
 //ETX
 
-class VTK_EXPORT vtkPVCompositeDataInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVCompositeDataInformation : public vtkPVInformation
 {
 public:
   static vtkPVCompositeDataInformation* New();

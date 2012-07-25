@@ -24,11 +24,12 @@
 #ifndef __vtkSMComparativeViewProxy_h
 #define __vtkSMComparativeViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
 
 class vtkCollection;
 
-class VTK_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMComparativeViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMComparativeViewProxy* New();

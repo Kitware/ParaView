@@ -28,9 +28,10 @@
 #ifndef __vtkPSciVizDescriptiveStats_h
 #define __vtkPSciVizDescriptiveStats_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
 
-class VTK_EXPORT vtkPSciVizDescriptiveStats : public vtkSciVizStatistics
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizDescriptiveStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizDescriptiveStats* New();

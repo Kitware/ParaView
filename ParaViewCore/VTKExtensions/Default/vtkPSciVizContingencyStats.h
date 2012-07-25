@@ -35,9 +35,10 @@
 #ifndef __vtkPSciVizContingencyStats_h
 #define __vtkPSciVizContingencyStats_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSciVizStatistics.h"
 
-class VTK_EXPORT vtkPSciVizContingencyStats : public vtkSciVizStatistics
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPSciVizContingencyStats : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizContingencyStats* New();

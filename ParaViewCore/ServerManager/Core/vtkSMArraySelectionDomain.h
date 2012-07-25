@@ -26,9 +26,10 @@
 #ifndef __vtkSMArraySelectionDomain_h
 #define __vtkSMArraySelectionDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMStringListRangeDomain.h"
 
-class VTK_EXPORT vtkSMArraySelectionDomain : public vtkSMStringListRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMArraySelectionDomain : public vtkSMStringListRangeDomain
 {
 public:
   static vtkSMArraySelectionDomain* New();

@@ -22,11 +22,12 @@
 #ifndef __vtkSMDoubleVectorProperty_h
 #define __vtkSMDoubleVectorProperty_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMVectorProperty.h"
 
 class vtkSMStateLocator;
 
-class VTK_EXPORT vtkSMDoubleVectorProperty : public vtkSMVectorProperty
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMDoubleVectorProperty : public vtkSMVectorProperty
 {
 public:
   static vtkSMDoubleVectorProperty* New();

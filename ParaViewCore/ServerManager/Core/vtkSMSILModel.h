@@ -33,6 +33,7 @@
 #ifndef __vtkSMSILModel_h 
 #define __vtkSMSILModel_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include <set> // required for vtkset
 
@@ -40,7 +41,7 @@ class vtkGraph;
 class vtkSMStringVectorProperty;
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMSILModel : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSILModel : public vtkSMObject
 {
 public:
   static vtkSMSILModel* New();

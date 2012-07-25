@@ -26,9 +26,10 @@
 #ifndef __vtkAppendArcLength_h
 #define __vtkAppendArcLength_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
-class VTK_EXPORT vtkAppendArcLength : public vtkPolyDataAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkAppendArcLength : public vtkPolyDataAlgorithm
 {
 public:
   static vtkAppendArcLength* New();

@@ -21,8 +21,9 @@
 #define __vtkUpdateSuppressorPipeline_h
 
 #include "vtkCompositeDataPipeline.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkUpdateSuppressorPipeline* New();

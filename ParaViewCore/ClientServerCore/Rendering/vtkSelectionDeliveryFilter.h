@@ -22,12 +22,13 @@
 #ifndef __vtkSelectionDeliveryFilter_h
 #define __vtkSelectionDeliveryFilter_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"
 
 class vtkClientServerMoveData;
 class vtkReductionFilter;
 
-class VTK_EXPORT vtkSelectionDeliveryFilter : public vtkSelectionAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSelectionDeliveryFilter : public vtkSelectionAlgorithm
 {
 public:
   static vtkSelectionDeliveryFilter* New();

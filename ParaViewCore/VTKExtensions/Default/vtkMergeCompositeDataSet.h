@@ -29,9 +29,10 @@
 #ifndef __vtkMergeCompositeDataSet_h
 #define __vtkMergeCompositeDataSet_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkVertexGlyphFilter.h"
 
-class VTK_EXPORT vtkMergeCompositeDataSet : public vtkVertexGlyphFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMergeCompositeDataSet : public vtkVertexGlyphFilter
 {
 public:
   vtkTypeMacro(vtkMergeCompositeDataSet, vtkVertexGlyphFilter);

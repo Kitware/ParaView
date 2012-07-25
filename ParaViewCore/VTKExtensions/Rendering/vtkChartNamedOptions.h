@@ -21,12 +21,13 @@
 
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // For ivars
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkChart;
 class vtkTable;
 class vtkScatterPlotMatrix;
 
-class VTK_EXPORT vtkChartNamedOptions : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkChartNamedOptions : public vtkObject
 {
 public:
   static vtkChartNamedOptions* New();

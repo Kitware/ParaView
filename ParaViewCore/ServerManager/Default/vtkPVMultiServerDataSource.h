@@ -19,13 +19,14 @@
 #ifndef __vtkMultiServerDataSource_h
 #define __vtkMultiServerDataSource_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkSMSourceProxy;
 class vtkInformation;
 class vtkInformationVector;
 
-class VTK_EXPORT vtkPVMultiServerDataSource : public vtkDataObjectAlgorithm
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkPVMultiServerDataSource : public vtkDataObjectAlgorithm
 {
 public:
   static vtkPVMultiServerDataSource *New();

@@ -27,13 +27,14 @@
 #ifndef __vtkSMEnumerationDomain_h
 #define __vtkSMEnumerationDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 //BTX
 struct vtkSMEnumerationDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMEnumerationDomain : public vtkSMDomain
 {
 public:
   static vtkSMEnumerationDomain* New();

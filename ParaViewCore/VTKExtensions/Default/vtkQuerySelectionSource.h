@@ -25,11 +25,12 @@
 #ifndef __vtkQuerySelectionSource_h
 #define __vtkQuerySelectionSource_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkSelectionAlgorithm.h"
 
 class vtkAbstractArray;
 
-class VTK_EXPORT vtkQuerySelectionSource : public vtkSelectionAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkQuerySelectionSource : public vtkSelectionAlgorithm
 {
 public:
   static vtkQuerySelectionSource* New();

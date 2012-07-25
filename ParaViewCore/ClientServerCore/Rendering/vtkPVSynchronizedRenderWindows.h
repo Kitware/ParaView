@@ -29,6 +29,7 @@
 #ifndef __vtkPVSynchronizedRenderWindows_h
 #define __vtkPVSynchronizedRenderWindows_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h" // for vtkRMIFunctionType
 #include "vtkWeakPointer.h" // for vtkWeakPointer.
@@ -41,7 +42,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkSelection;
 
-class VTK_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVSynchronizedRenderWindows : public vtkObject
 {
 public:
   // Description:
@@ -273,3 +274,5 @@ private:
 };
 
 #endif
+
+// VTK-HeaderTest-Exclude: vtkPVSynchronizedRenderWindows.h

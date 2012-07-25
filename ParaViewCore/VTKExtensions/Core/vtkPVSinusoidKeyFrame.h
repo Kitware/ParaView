@@ -26,7 +26,7 @@
 
 #include "vtkPVKeyFrame.h"
 
-class VTK_EXPORT vtkPVSinusoidKeyFrame : public vtkPVKeyFrame
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVSinusoidKeyFrame : public vtkPVKeyFrame
 {
 public:
   static vtkPVSinusoidKeyFrame* New();

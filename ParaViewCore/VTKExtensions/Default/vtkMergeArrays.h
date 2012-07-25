@@ -23,11 +23,12 @@
 #ifndef __vtkMergeArrays_h
 #define __vtkMergeArrays_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataSetAlgorithm.h"
 
 class vtkDataSet;
 
-class VTK_EXPORT vtkMergeArrays : public vtkDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkMergeArrays : public vtkDataSetAlgorithm
 {
 public:
   static vtkMergeArrays *New();

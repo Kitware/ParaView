@@ -27,6 +27,7 @@
 #ifndef __vtkIceTSynchronizedRenderers_h
 #define __vtkIceTSynchronizedRenderers_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkSynchronizedRenderers.h"
 #include "vtkIceTCompositePass.h" // needed for inline methods.
 
@@ -34,7 +35,7 @@ class vtkCameraPass;
 class vtkImageProcessingPass;
 class vtkMyImagePasterPass;
 
-class VTK_EXPORT vtkIceTSynchronizedRenderers : public vtkSynchronizedRenderers
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkIceTSynchronizedRenderers : public vtkSynchronizedRenderers
 {
 public:
   static vtkIceTSynchronizedRenderers* New();

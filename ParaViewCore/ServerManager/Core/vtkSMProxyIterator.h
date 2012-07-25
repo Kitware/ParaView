@@ -22,6 +22,7 @@
 #ifndef __vtkSMProxyIterator_h
 #define __vtkSMProxyIterator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMSessionObject.h"
 
 //BTX
@@ -30,7 +31,7 @@ struct vtkSMProxyIteratorInternals;
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMProxyIterator : public vtkSMSessionObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyIterator : public vtkSMSessionObject
 {
 public:
   static vtkSMProxyIterator* New();

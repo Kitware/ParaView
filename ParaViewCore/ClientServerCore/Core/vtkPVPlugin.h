@@ -25,6 +25,7 @@
 #ifndef __vtkPVPlugin_h
 #define __vtkPVPlugin_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 #include "vtkPVConfig.h" // needed for PARAVIEW_VERSION and CMAKE_CXX_COMPILER_ID
 #include <vector>
@@ -39,7 +40,7 @@
 # define C_EXPORT extern "C"
 #endif
 
-class VTK_EXPORT vtkPVPlugin
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVPlugin
 {
   char* FileName;
   void SetFileName(const char* filename);
@@ -137,4 +138,5 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
   vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
 
 #endif // __vtkPVPlugin_h
+// VTK-HeaderTest-Exclude: vtkPVPlugin.h
 

@@ -21,9 +21,10 @@
 #ifndef __vtkSIAMRVolumeRepresentationProxy_h
 #define __vtkSIAMRVolumeRepresentationProxy_h
 
+#include "vtkPVServerImplementationRenderingModule.h" //needed for exports
 #include "vtkSIProxy.h"
 
-class VTK_EXPORT vtkSIAMRVolumeRepresentationProxy : public vtkSIProxy
+class VTKPVSERVERIMPLEMENTATIONRENDERING_EXPORT vtkSIAMRVolumeRepresentationProxy : public vtkSIProxy
 {
 public:
   static vtkSIAMRVolumeRepresentationProxy* New();

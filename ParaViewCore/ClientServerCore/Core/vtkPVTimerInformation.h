@@ -20,10 +20,11 @@
 #define __vtkPVTimerInformation_h
 
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 
-class VTK_EXPORT vtkPVTimerInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVTimerInformation : public vtkPVInformation
 {
 public:
   static vtkPVTimerInformation* New();

@@ -22,11 +22,12 @@
 #ifndef __vtkSMMultiServerSourceProxy_h
 #define __vtkSMMultiServerSourceProxy_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"
 
 class vtkSMProxy;
 
-class VTK_EXPORT vtkSMMultiServerSourceProxy : public vtkSMSourceProxy
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMMultiServerSourceProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMMultiServerSourceProxy* New();

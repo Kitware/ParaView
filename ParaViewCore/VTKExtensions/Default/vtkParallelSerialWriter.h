@@ -24,11 +24,12 @@
 #ifndef __vtkParallelSerialWriter_h
 #define __vtkParallelSerialWriter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkClientServerInterpreter;
 
-class VTK_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkParallelSerialWriter* New();

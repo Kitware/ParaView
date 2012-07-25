@@ -30,6 +30,7 @@
 #ifndef __vtkMPIMToNSocketConnection_h
 #define __vtkMPIMToNSocketConnection_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 class vtkMultiProcessController;
 class vtkServerSocket;
@@ -37,7 +38,7 @@ class vtkSocketCommunicator;
 class vtkMPIMToNSocketConnectionPortInformation;
 class vtkMPIMToNSocketConnectionInternals;
 
-class VTK_EXPORT vtkMPIMToNSocketConnection : public vtkObject
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkMPIMToNSocketConnection : public vtkObject
 {
 public:
   static vtkMPIMToNSocketConnection* New();

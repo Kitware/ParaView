@@ -19,12 +19,13 @@
 #ifndef __vtkXYChartRepresentation_h
 #define __vtkXYChartRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkChartRepresentation.h"
 
 class vtkChartXY;
 class vtkXYChartNamedOptions;
 
-class VTK_EXPORT vtkXYChartRepresentation : public vtkChartRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkXYChartRepresentation : public vtkChartRepresentation
 {
 public:
   static vtkXYChartRepresentation* New();

@@ -26,6 +26,7 @@
 #ifndef __vtkSMProxyGroupDomain_h
 #define __vtkSMProxyGroupDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDomain.h"
 
 class vtkSMProperty;
@@ -34,7 +35,7 @@ class vtkSMProxy;
 struct vtkSMProxyGroupDomainInternals;
 //ETX
 
-class VTK_EXPORT vtkSMProxyGroupDomain : public vtkSMDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMProxyGroupDomain : public vtkSMDomain
 {
 public:
   static vtkSMProxyGroupDomain* New();

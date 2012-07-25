@@ -16,12 +16,13 @@
 #ifndef _vtkMoleculeRepresentation_h
 #define _vtkMoleculeRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 
 class vtkActor;
 class vtkMoleculeMapper;
 
-class VTK_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkMoleculeRepresentation : public vtkPVDataRepresentation
 {
 public:
   static vtkMoleculeRepresentation* New();

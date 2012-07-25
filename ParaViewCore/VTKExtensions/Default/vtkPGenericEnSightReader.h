@@ -20,6 +20,7 @@
 #ifndef __vtkPGenericEnSightReader_h
 #define __vtkPGenericEnSightReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkGenericEnSightReader.h"
 
 class vtkCallbackCommand;
@@ -27,7 +28,7 @@ class vtkDataArrayCollection;
 class vtkDataArraySelection;
 class vtkIdListCollection;
 
-class VTK_EXPORT vtkPGenericEnSightReader : public vtkGenericEnSightReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPGenericEnSightReader : public vtkGenericEnSightReader
 {
 public:
   static vtkPGenericEnSightReader *New();

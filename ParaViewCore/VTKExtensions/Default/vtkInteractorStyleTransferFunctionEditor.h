@@ -23,11 +23,12 @@
 #ifndef __vtkInteractorStyleTransferFunctionEditor_h
 #define __vtkInteractorStyleTransferFunctionEditor_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkInteractorStyle.h"
 
 class vtkTransferFunctionEditorWidget;
 
-class VTK_EXPORT vtkInteractorStyleTransferFunctionEditor : public vtkInteractorStyle
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkInteractorStyleTransferFunctionEditor : public vtkInteractorStyle
 {
 public:
   static vtkInteractorStyleTransferFunctionEditor* New();

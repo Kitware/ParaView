@@ -26,12 +26,13 @@
 #ifndef __vtkSMNumberOfGroupsDomain_h
 #define __vtkSMNumberOfGroupsDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMIntRangeDomain.h"
 
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMNumberOfGroupsDomain : public vtkSMIntRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNumberOfGroupsDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMNumberOfGroupsDomain* New();

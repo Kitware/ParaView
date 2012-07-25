@@ -31,7 +31,7 @@ class vtkPVSinusoidKeyFrame;
 class vtkPVExponentialKeyFrame;
 class vtkPVRampKeyFrame;
 
-class VTK_EXPORT vtkPVCompositeKeyFrame : public vtkPVKeyFrame
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVCompositeKeyFrame : public vtkPVKeyFrame
 {
 public:
   static vtkPVCompositeKeyFrame* New();

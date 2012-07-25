@@ -25,6 +25,7 @@
 #ifndef __vtkGridConnectivity_h
 #define __vtkGridConnectivity_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkSmartPointer.h" // For ivars
 #include <vector>     // For ivars
@@ -41,7 +42,7 @@ class vtkEquivalenceSet;
 class vtkUnstructuredGrid;
 class vtkPolyData;
 
-class VTK_EXPORT vtkGridConnectivity : public vtkMultiBlockDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkGridConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkGridConnectivity,vtkMultiBlockDataSetAlgorithm);

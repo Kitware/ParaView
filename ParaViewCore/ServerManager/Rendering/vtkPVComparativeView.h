@@ -21,6 +21,7 @@
 #ifndef __vtkPVComparativeView_h
 #define __vtkPVComparativeView_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkCollection;
@@ -28,7 +29,7 @@ class vtkSMComparativeAnimationCueProxy;
 class vtkSMProxy;
 class vtkSMViewProxy;
 
-class VTK_EXPORT vtkPVComparativeView : public vtkObject
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkPVComparativeView : public vtkObject
 {
 public:
   static vtkPVComparativeView* New();

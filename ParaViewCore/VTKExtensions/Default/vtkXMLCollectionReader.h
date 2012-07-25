@@ -26,11 +26,12 @@
 #ifndef __vtkXMLCollectionReader_h
 #define __vtkXMLCollectionReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkXMLReader.h"
 
 class vtkXMLCollectionReaderInternals;
 
-class VTK_EXPORT vtkXMLCollectionReader : public vtkXMLReader
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkXMLCollectionReader : public vtkXMLReader
 {
 public:
   static vtkXMLCollectionReader* New();

@@ -24,7 +24,7 @@
 #define __vtkPVPythonInteractiveInterpretor_h
 
 #include "vtkPVPythonInterpretor.h"
-#include "vtkPVPythonSupportModule.h"
+#include "vtkPVPythonSupportModule.h" // needed for exports
 
 class VTKPVPYTHONSUPPORT_EXPORT vtkPVPythonInteractiveInterpretor : public vtkPVPythonInterpretor
 {

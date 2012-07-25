@@ -22,6 +22,7 @@
 #ifndef __vtkSMStateLoader_h
 #define __vtkSMStateLoader_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"
 
 class vtkPVXMLElement;
@@ -32,7 +33,7 @@ class vtkSMProxyLocator;
 struct vtkSMStateLoaderInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializerXML
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateLoader : public vtkSMDeserializerXML
 {
 public:
   static vtkSMStateLoader* New();

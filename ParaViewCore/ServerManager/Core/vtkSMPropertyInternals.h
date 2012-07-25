@@ -35,3 +35,4 @@ struct vtkSMPropertyInternals
 
 #endif
 
+// VTK-HeaderTest-Exclude: vtkSMPropertyInternals.h

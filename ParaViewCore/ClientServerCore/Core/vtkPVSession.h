@@ -21,6 +21,7 @@
 #ifndef __vtkPVSession_h
 #define __vtkPVSession_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkSession.h"
 
 class vtkMPIMToNSocketConnection;
@@ -28,7 +29,7 @@ class vtkMultiProcessController;
 class vtkPVProgressHandler;
 class vtkPVServerInformation;
 
-class VTK_EXPORT vtkPVSession : public vtkSession
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSession : public vtkSession
 {
 public:
   vtkTypeMacro(vtkPVSession, vtkSession);

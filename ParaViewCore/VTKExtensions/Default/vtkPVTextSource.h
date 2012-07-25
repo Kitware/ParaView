@@ -20,9 +20,10 @@
 #ifndef __vtkPVTextSource_h
 #define __vtkPVTextSource_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkTableAlgorithm.h"
 
-class VTK_EXPORT vtkPVTextSource : public vtkTableAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVTextSource : public vtkTableAlgorithm
 {
 public:
   static vtkPVTextSource* New();

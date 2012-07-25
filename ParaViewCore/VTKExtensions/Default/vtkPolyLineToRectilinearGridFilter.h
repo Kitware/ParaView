@@ -25,9 +25,10 @@
 #define __vtkPolyLineToRectilinearGridFilter_h
 
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkRectilinearGridAlgorithm.h"
 
-class VTK_EXPORT vtkPolyLineToRectilinearGridFilter : 
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPolyLineToRectilinearGridFilter : 
   public vtkRectilinearGridAlgorithm
 {
 public:

@@ -30,9 +30,10 @@
 #ifndef __vtkCleanUnstructuredGridCells_h
 #define __vtkCleanUnstructuredGridCells_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkUnstructuredGridAlgorithm.h"
 
-class VTK_EXPORT vtkCleanUnstructuredGridCells: public vtkUnstructuredGridAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkCleanUnstructuredGridCells: public vtkUnstructuredGridAlgorithm
 {
 public:
   static vtkCleanUnstructuredGridCells *New();

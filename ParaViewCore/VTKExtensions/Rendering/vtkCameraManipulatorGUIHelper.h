@@ -27,8 +27,9 @@
 #define __vtkCameraManipulatorGUIHelper_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkCameraManipulatorGUIHelper : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraManipulatorGUIHelper : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCameraManipulatorGUIHelper, vtkObject);

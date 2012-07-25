@@ -28,10 +28,11 @@
 #define __vtkPVExtentTranslator_h
 
 #include "vtkExtentTranslator.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkAlgorithm;
 
-class VTK_EXPORT vtkPVExtentTranslator : public vtkExtentTranslator
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVExtentTranslator : public vtkExtentTranslator
 {
 public:
   static vtkPVExtentTranslator *New();

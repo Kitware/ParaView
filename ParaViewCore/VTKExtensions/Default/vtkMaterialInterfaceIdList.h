@@ -68,3 +68,5 @@ private:
   std::vector<vtkMaterialInterfaceIdListItem> IdList;
 };
 #endif
+
+// VTK-HeaderTest-Exclude: vtkMaterialInterfaceIdList.h

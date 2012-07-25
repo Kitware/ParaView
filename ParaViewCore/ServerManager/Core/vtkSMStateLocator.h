@@ -20,6 +20,7 @@
 #ifndef __vtkSMStateLocator_h
 #define __vtkSMStateLocator_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 #include "vtkSMMessageMinimal.h" // needed for vtkSMMessage.
 #include "vtkWeakPointer.h" // need for observer
@@ -28,7 +29,7 @@ class vtkSMProxy;
 class vtkSMSession;
 class vtkUndoStack;
 
-class VTK_EXPORT vtkSMStateLocator : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMStateLocator : public vtkSMObject
 {
 public:
   static vtkSMStateLocator* New();

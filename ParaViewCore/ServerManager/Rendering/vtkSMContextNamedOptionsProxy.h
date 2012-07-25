@@ -19,12 +19,13 @@
 #ifndef __vtkSMContextNamedOptionsProxy_h
 #define __vtkSMContextNamedOptionsProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
 class vtkChart;
 class vtkTable;
 
-class VTK_EXPORT vtkSMContextNamedOptionsProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMContextNamedOptionsProxy : public vtkSMProxy
 {
 public:
   static vtkSMContextNamedOptionsProxy* New();

@@ -25,6 +25,7 @@
 #ifndef __vtkHierarchicalFractal_h
 #define __vtkHierarchicalFractal_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkCompositeDataSetAlgorithm.h"
 
 class vtkIntArray;
@@ -38,7 +39,7 @@ class vtkHierarchicalBoxDataSet;
 
 
 
-class VTK_EXPORT vtkHierarchicalFractal : public vtkCompositeDataSetAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkHierarchicalFractal : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkHierarchicalFractal *New();

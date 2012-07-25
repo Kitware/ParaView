@@ -22,12 +22,13 @@
 #ifndef __vtkNetworkImageSource_h
 #define __vtkNetworkImageSource_h
 
+#include "vtkPVClientServerCoreDefaultModule.h" //needed for exports
 #include "vtkImageAlgorithm.h"
 
 class vtkImageData;
 class vtkClientServerStream;
 
-class VTK_EXPORT vtkNetworkImageSource : public vtkImageAlgorithm
+class VTKPVCLIENTSERVERCOREDEFAULT_EXPORT vtkNetworkImageSource : public vtkImageAlgorithm
 {
 public:
   static vtkNetworkImageSource* New();

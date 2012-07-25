@@ -21,9 +21,10 @@
 
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkPVAnimationScene;
-class VTK_EXPORT vtkAnimationPlayer : public vtkObject
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkAnimationPlayer : public vtkObject
 {
 public:
   vtkTypeMacro(vtkAnimationPlayer, vtkObject);

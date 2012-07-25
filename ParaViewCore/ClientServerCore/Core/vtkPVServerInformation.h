@@ -22,12 +22,13 @@
 #ifndef __vtkPVServerInformation_h
 #define __vtkPVServerInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
 class vtkClientServerStream;
 class vtkPVServerOptionsInternals;
 
-class VTK_EXPORT vtkPVServerInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVServerInformation : public vtkPVInformation
 {
 public:
   static vtkPVServerInformation* New();

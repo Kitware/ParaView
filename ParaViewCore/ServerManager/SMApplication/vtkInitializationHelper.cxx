@@ -129,3 +129,9 @@ void vtkInitializationHelper::Finalize()
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
 }
+  
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

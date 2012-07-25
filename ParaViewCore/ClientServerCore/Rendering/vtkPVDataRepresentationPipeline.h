@@ -23,9 +23,10 @@
 #ifndef __vtkPVDataRepresentationPipeline_h
 #define __vtkPVDataRepresentationPipeline_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkCompositeDataPipeline.h"
 
-class VTK_EXPORT vtkPVDataRepresentationPipeline : public vtkCompositeDataPipeline
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVDataRepresentationPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkPVDataRepresentationPipeline* New();

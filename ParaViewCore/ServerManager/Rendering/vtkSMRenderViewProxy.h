@@ -21,6 +21,7 @@
 #ifndef __vtkSMRenderViewProxy_h
 #define __vtkSMRenderViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMViewProxy.h"
 
 class vtkCamera;
@@ -30,7 +31,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkSMDataDeliveryManager;
 
-class VTK_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRenderViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMRenderViewProxy* New();

@@ -34,13 +34,14 @@
 #ifndef __vtkSMProxyConfigurationWriter_h
 #define __vtkSMProxyConfigurationWriter_h
 
+#include "vtkPVServerManagerDefaultModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMPropertyIterator;
 class vtkSMProxy;
 class vtkStringList;
 
-class VTK_EXPORT vtkSMProxyConfigurationWriter : public vtkSMObject
+class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMProxyConfigurationWriter : public vtkSMObject
 {
 public:
   static vtkSMProxyConfigurationWriter* New();

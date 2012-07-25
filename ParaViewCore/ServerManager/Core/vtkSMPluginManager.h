@@ -23,12 +23,13 @@
 #ifndef __vtkSMPluginManager_h
 #define __vtkSMPluginManager_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkPVPluginsInformation;
 class vtkSMSession;
 
-class VTK_EXPORT vtkSMPluginManager : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPluginManager : public vtkSMObject
 {
 public:
   static vtkSMPluginManager* New();

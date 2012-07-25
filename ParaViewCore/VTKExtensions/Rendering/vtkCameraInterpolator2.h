@@ -20,12 +20,13 @@
 #define __vtkCameraInterpolator2_h
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
 class vtkPoints;
 class vtkParametricSpline;
 class vtkCamera;
 
-class VTK_EXPORT vtkCameraInterpolator2 : public vtkObject
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkCameraInterpolator2 : public vtkObject
 {
 public:
   static vtkCameraInterpolator2* New();

@@ -20,8 +20,9 @@
 #define __vtkSequenceAnimationPlayer_h
 
 #include "vtkAnimationPlayer.h"
+#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
-class VTK_EXPORT vtkSequenceAnimationPlayer : public vtkAnimationPlayer
+class VTKPVVTKEXTENSIONSCORE_EXPORT vtkSequenceAnimationPlayer : public vtkAnimationPlayer
 {
 public:
   static vtkSequenceAnimationPlayer* New();

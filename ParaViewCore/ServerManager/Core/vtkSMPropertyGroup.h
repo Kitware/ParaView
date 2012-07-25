@@ -16,12 +16,13 @@
 #ifndef __vtkSMPropertyGroup_h
 #define __vtkSMPropertyGroup_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMObject.h"
 
 class vtkSMProperty;
 class vtkSMPropertyGroupInternals;
 
-class VTK_EXPORT vtkSMPropertyGroup : public vtkSMObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMPropertyGroup : public vtkSMObject
 {
 public:
   static vtkSMPropertyGroup* New();

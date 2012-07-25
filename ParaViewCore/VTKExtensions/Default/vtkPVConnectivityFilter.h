@@ -22,9 +22,10 @@
 #ifndef __vtkPVConnectivityFilter_h
 #define __vtkPVConnectivityFilter_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkConnectivityFilter.h"
 
-class VTK_EXPORT vtkPVConnectivityFilter : public vtkConnectivityFilter
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPVConnectivityFilter : public vtkConnectivityFilter
 {
 public:
   vtkTypeMacro(vtkPVConnectivityFilter, vtkConnectivityFilter);

@@ -25,6 +25,7 @@
 #ifndef __vtkPointHandleRepresentationSphere_h
 #define __vtkPointHandleRepresentationSphere_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkHandleRepresentation.h"
 
 class vtkActor;
@@ -35,7 +36,7 @@ class vtkPolyDataAlgorithm;
 class vtkPolyDataMapper;
 class vtkProperty;
 
-class VTK_EXPORT vtkPointHandleRepresentationSphere : public vtkHandleRepresentation
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPointHandleRepresentationSphere : public vtkHandleRepresentation
 {
 public:
   // Description:

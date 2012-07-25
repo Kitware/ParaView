@@ -21,8 +21,9 @@
 #define __vtkPVPlotTime_h
 
 #include "vtkPlot.h"
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 
-class VTK_EXPORT vtkPVPlotTime : public vtkPlot
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVPlotTime : public vtkPlot
 {
 public:
   static vtkPVPlotTime* New();

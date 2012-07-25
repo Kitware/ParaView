@@ -47,6 +47,7 @@
 #ifndef __vtkFileSeriesReader_h
 #define __vtkFileSeriesReader_h
 
+#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
 #include "vtkDataObjectAlgorithm.h"
 
 class vtkStringArray;
@@ -55,7 +56,7 @@ class vtkStringArray;
 struct vtkFileSeriesReaderInternals;
 //ETX
 
-class VTK_EXPORT vtkFileSeriesReader : public vtkDataObjectAlgorithm
+class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkFileSeriesReader : public vtkDataObjectAlgorithm
 {
 public:
   static vtkFileSeriesReader* New();

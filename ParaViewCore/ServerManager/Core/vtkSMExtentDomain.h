@@ -24,11 +24,12 @@
 #ifndef __vtkSMExtentDomain_h
 #define __vtkSMExtentDomain_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMIntRangeDomain.h"
 
 class vtkSMProxyProperty;
 
-class VTK_EXPORT vtkSMExtentDomain : public vtkSMIntRangeDomain
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMExtentDomain : public vtkSMIntRangeDomain
 {
 public:
   static vtkSMExtentDomain* New();

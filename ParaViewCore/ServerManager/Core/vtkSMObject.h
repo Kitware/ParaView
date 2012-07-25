@@ -20,11 +20,12 @@
 #ifndef __vtkSMObject_h
 #define __vtkSMObject_h
 
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSMApplication;
 
-class VTK_EXPORT vtkSMObject : public vtkObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMObject : public vtkObject
 {
 public:
   static vtkSMObject* New();

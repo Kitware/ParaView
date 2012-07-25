@@ -23,9 +23,10 @@
 #ifndef __vtkPVDataSizeInformation_h
 #define __vtkPVDataSizeInformation_h
 
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
 
-class VTK_EXPORT vtkPVDataSizeInformation : public vtkPVInformation
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVDataSizeInformation : public vtkPVInformation
 {
 public:
   static vtkPVDataSizeInformation* New();
