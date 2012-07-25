@@ -167,6 +167,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
     this, SLOT(setOpacityScalarFromText()));
   this->connect(this->Form->pushButtonApply, SIGNAL(clicked()),
     this, SLOT(updateDisplay()));
+
+  this->UseEnableOpacityCheckBox = false;
   this->connect(this->Form->EnableOpacityFunction, SIGNAL(stateChanged(int)),
     this, SLOT(setEnableOpacityMapping(int)));
 
@@ -509,6 +511,8 @@ void pqColorScaleEditor::handleColorPointsChanged()
 
 void pqColorScaleEditor::handleEnableOpacityMappingChanged()
 {
+  if(this->UseEnableOpacityCheckBox)
+    {
     bool enabled = pqSMAdaptor::getElementProperty(
       this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping")).toBool();
 
@@ -516,6 +520,7 @@ void pqColorScaleEditor::handleEnableOpacityMappingChanged()
       enabled ? Qt::Checked : Qt::Unchecked);
 
     this->Form->frameOpacity->setVisible(enabled);
+    }
 }
 
 void pqColorScaleEditor::handleOpacityPointsChanged()
@@ -1492,6 +1497,7 @@ void pqColorScaleEditor::initColorScale()
       // the representation has a built-in opacity function which
       // cannot be disabled, so don't show the check box
       this->Form->EnableOpacityFunction->setVisible(false);
+      this->UseEnableOpacityCheckBox = false;
       }
     else
       {
@@ -1506,6 +1512,7 @@ void pqColorScaleEditor::initColorScale()
         this->OpacityFunction =
           smmodel->findItem<pqScalarOpacityFunction*>(opacityFunctionProxy);
         this->Form->EnableOpacityFunction->setVisible(true);
+        this->UseEnableOpacityCheckBox = true;
         }
       }
     }
@@ -2246,10 +2253,13 @@ void pqColorScaleEditor::setOpacityControlsVisibility(bool visible)
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::setEnableOpacityMapping(int enable)
 {
+  if(this->UseEnableOpacityCheckBox)
+    {
     bool enabled = enable == Qt::Checked;
     pqSMAdaptor::setElementProperty(
       this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"), enabled);
     this->Form->frameOpacity->setVisible(enabled);
+    }
 }
 
 // ----------------------------------------------------------------------------

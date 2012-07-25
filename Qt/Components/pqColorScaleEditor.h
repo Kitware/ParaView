@@ -179,6 +179,7 @@ private:
   pqScalarsToColors *ColorMap;
   pqScalarOpacityFunction *OpacityFunction;
   pqScalarBarRepresentation *Legend;
+  bool UseEnableOpacityCheckBox;
 };
 
 #endif
