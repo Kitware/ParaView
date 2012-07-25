@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSignalAdaptorColor;
 class pqSignalAdaptorComboBox;
 class pqChartSeriesSettingsModel;
+class pqTreeView;
 
 class PQCOMPONENTS_EXPORT pqPlotMatrixDisplayPanel : public pqDisplayPanel
 {
@@ -49,6 +50,9 @@ class PQCOMPONENTS_EXPORT pqPlotMatrixDisplayPanel : public pqDisplayPanel
 public:
   pqPlotMatrixDisplayPanel(pqRepresentation *representation, QWidget *parent = NULL);
   ~pqPlotMatrixDisplayPanel();
+
+protected slots:
+  void headerCheckStateChanged();
 
 private slots:
   void dataChanged(QModelIndex topLeft, QModelIndex bottomRight);
@@ -63,6 +67,7 @@ private:
   pqSignalAdaptorColor *HistogramColorAdaptor;
   pqSignalAdaptorComboBox *ActivePlotMarkerStyleAdaptor;
   pqSignalAdaptorComboBox *ScatterPlotsMarkerStyleAdaptor;
+  pqTreeView *Series;
 };
 
 #endif

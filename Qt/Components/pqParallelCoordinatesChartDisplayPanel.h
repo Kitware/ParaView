@@ -64,6 +64,8 @@ protected slots:
 
   void setSeriesStyle(int listIndex);
 
+  void headerCheckStateChanged();
+
 private:
   pqParallelCoordinatesChartDisplayPanel(const pqParallelCoordinatesChartDisplayPanel&); // Not implemented.
   void operator=(const pqParallelCoordinatesChartDisplayPanel&); // Not implemented.

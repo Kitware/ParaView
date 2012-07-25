@@ -145,6 +145,24 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       PV_GROUPBOX_REGISTER(CubeAxesYCustomBounds, "CustomBoundsActive", 1);
       PV_GROUPBOX_REGISTER(CubeAxesZCustomBounds, "CustomBoundsActive", 2);
 
+      //link the ui elements to the vtkSMCubeAxesRepresentationProxy
+      PV_LINEEDIT_REGISTER(CubeAxesXCustomRangeMin, "CustomRange", 0);
+      PV_LINEEDIT_REGISTER(CubeAxesXCustomRangeMax, "CustomRange", 1);
+      PV_LINEEDIT_REGISTER(CubeAxesYCustomRangeMin, "CustomRange", 2);
+      PV_LINEEDIT_REGISTER(CubeAxesYCustomRangeMax, "CustomRange", 3);
+      PV_LINEEDIT_REGISTER(CubeAxesZCustomRangeMin, "CustomRange", 4);
+      PV_LINEEDIT_REGISTER(CubeAxesZCustomRangeMax, "CustomRange", 5);
+
+      //link the activation of the group boxes to vtkSMCubeAxesRepresentationProxy
+      PV_GROUPBOX_REGISTER(CubeAxesXCustomRange, "CustomRangeActive", 0);
+      PV_GROUPBOX_REGISTER(CubeAxesYCustomRange, "CustomRangeActive", 1);
+      PV_GROUPBOX_REGISTER(CubeAxesZCustomRange, "CustomRangeActive", 2);
+
+      //link the activation of the group boxes to vtkSMCubeAxesRepresentationProxy
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForX, "OriginalBoundsRangeActive", 0);
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForY, "OriginalBoundsRangeActive", 1);
+      PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForZ, "OriginalBoundsRangeActive", 2);
+
       //now they are linked, set them to objects bounds.
       vtkSMPropertyHelper(repr,"DataBounds").UpdateValueFromServer();
       vtkSMPropertyHelper(repr,"DataBounds").Get(pvBounds,6);
@@ -162,6 +180,21 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
         !this->Internal->CubeAxesZCustomBounds->isChecked(),
         this->Internal->CubeAxesZCustomBoundsMin,
         this->Internal->CubeAxesZCustomBoundsMax);
+
+      this->setupCustomAxes( pvBounds[0],pvBounds[1],
+        !this->Internal->CubeAxesXCustomRange->isChecked(),
+        this->Internal->CubeAxesXCustomRangeMin,
+        this->Internal->CubeAxesXCustomRangeMax);
+
+      this->setupCustomAxes( pvBounds[2], pvBounds[3],
+        !this->Internal->CubeAxesYCustomRange->isChecked(),
+        this->Internal->CubeAxesYCustomRangeMin,
+        this->Internal->CubeAxesYCustomRangeMax);
+
+      this->setupCustomAxes( pvBounds[4], pvBounds[5],
+        !this->Internal->CubeAxesZCustomRange->isChecked(),
+        this->Internal->CubeAxesZCustomRangeMin,
+        this->Internal->CubeAxesZCustomRangeMax);
 
       }
     }

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStringVectorPropertyWidget.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -46,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 
 #include "pqApplicationCore.h"
+#include "pqComboBoxDomain.h"
 #include "pqExodusIIVariableSelectionWidget.h"
 #include "pqFileChooserWidget.h"
 #include "pqProxySILModel.h"
@@ -62,21 +64,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <QDebug>
+
 pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
                                                            QWidget *parentWidget)
   : pqPropertyWidget(smProxy, parentWidget)
 {
-  vtkSMStringVectorProperty *ivp = vtkSMStringVectorProperty::SafeDownCast(smProperty);
-  if(!ivp)
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smProperty);
+  if(!svp)
     {
     return;
     }
 
   bool multiline_text = false;
-  if (ivp->GetHints())
+  if (svp->GetHints())
     {
-    vtkPVXMLElement* widgetHint = ivp->GetHints()->FindNestedElementByName("Widget");
+    vtkPVXMLElement* widgetHint = svp->GetHints()->FindNestedElementByName("Widget");
     if (widgetHint && widgetHint->GetAttribute("type") &&
       strcmp(widgetHint->GetAttribute("type"), "multi_line") == 0)
       {
@@ -84,12 +88,43 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       }
     }
   
-  // find the domain
-  vtkSMDomain *domain = 0;
-  vtkSMDomainIterator *domainIter = ivp->NewDomainIterator();
+  // find the domain(s)
+  vtkSMEnumerationDomain *enumerationDomain = 0;
+  vtkSMFileListDomain *fileListDomain = 0;
+  vtkSMArrayListDomain *arrayListDomain = 0;
+  vtkSMStringListDomain *stringListDomain = 0;
+  vtkSMSILDomain *silDomain = 0;
+  vtkSMArraySelectionDomain *arraySelectionDomain = 0;
+
+  vtkSMDomainIterator *domainIter = svp->NewDomainIterator();
   for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
     {
-    domain = domainIter->GetDomain();
+    vtkSMDomain *domain = domainIter->GetDomain();
+
+    if(!enumerationDomain)
+      {
+      enumerationDomain = vtkSMEnumerationDomain::SafeDownCast(domain);
+      }
+    if(!fileListDomain)
+      {
+      fileListDomain = vtkSMFileListDomain::SafeDownCast(domain);
+      }
+    if(!arrayListDomain)
+      {
+      arrayListDomain = vtkSMArrayListDomain::SafeDownCast(domain);
+      }
+    if(!stringListDomain)
+      {
+      stringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
+      }
+    if(!silDomain)
+      {
+      silDomain = vtkSMSILDomain::SafeDownCast(domain);
+      }
+    if(!arraySelectionDomain)
+      {
+      arraySelectionDomain = vtkSMArraySelectionDomain::SafeDownCast(domain);
+      }
     }
   domainIter->Delete();
 
@@ -97,19 +132,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
   vbox->setMargin(0);
   vbox->setSpacing(0);
 
-  if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
-    {
-    QComboBox *comboBox = new QComboBox(this);
-    comboBox->setObjectName("ComboBox");
-
-    for(unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
-      {
-      comboBox->addItem(ed->GetEntryText(i));
-      }
-
-    vbox->addWidget(comboBox);
-    }
-  else if (vtkSMFileListDomain::SafeDownCast(domain))
+  if (fileListDomain)
     {
     // dont show properties with filename
 //    if(smproperty->GetXMLLabel() == "FileName")
@@ -155,21 +178,58 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     vbox->addWidget(chooser);
     }
-  else if(vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(domain))
+  else if(arrayListDomain)
+    {
+    if(smProperty->GetRepeatable())
+      {
+      // repeatable array list domains get a tree widget
+      // listing each array name with a check box
+      pqExodusIIVariableSelectionWidget* selectorWidget =
+        new pqExodusIIVariableSelectionWidget(this);
+      selectorWidget->setObjectName("ArraySelectionWidget");
+      selectorWidget->setRootIsDecorated(false);
+      selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
+      this->addPropertyLink(
+        selectorWidget, smProxy->GetPropertyName(smProperty),
+        SIGNAL(widgetModified()), smProperty);
+
+      // hide widget label
+      this->setShowLabel(false);
+
+      vbox->addWidget(selectorWidget);
+      }
+    else
+      {
+      // non-repeatable array list domains get a combo box
+      // listing each array name
+      QComboBox *comboBox = new QComboBox(this);
+      comboBox->setObjectName("ComboBox");
+
+      new pqComboBoxDomain(comboBox, smProperty, "array_list");
+
+      this->addPropertyLink(comboBox,
+                            "currentText",
+                            SIGNAL(currentIndexChanged(QString)),
+                            svp);
+
+      vbox->addWidget(comboBox);
+      }
+    }
+  else if(stringListDomain)
     {
     QComboBox *comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
 
-    for(unsigned int i = 0; i < sld->GetNumberOfStrings(); i++)
+    for(unsigned int i = 0; i < stringListDomain->GetNumberOfStrings(); i++)
       {
-      comboBox->addItem(sld->GetString(i));
+      comboBox->addItem(stringListDomain->GetString(i));
       }
 
-    this->addPropertyLink(comboBox, "currentText", SIGNAL(currentIndexChanged(QString)), ivp);
+    this->addPropertyLink(comboBox, "currentText", SIGNAL(currentIndexChanged(QString)), svp);
 
     vbox->addWidget(comboBox);
     }
-  else if (vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(domain))
+  else if (silDomain)
     {
     pqSILWidget* tree = new pqSILWidget(silDomain->GetSubTree(), this);
     tree->setObjectName("BlockSelectionWidget");
@@ -189,7 +249,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     vbox->addWidget(tree);
     }
-  else if (vtkSMArraySelectionDomain::SafeDownCast(domain))
+  else if (arraySelectionDomain)
     {
     pqExodusIIVariableSelectionWidget* selectorWidget =
       new pqExodusIIVariableSelectionWidget(this);
@@ -224,6 +284,18 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     
     vbox->addWidget(textEdit);
     this->setShowLabel(false);
+    }
+  else if(enumerationDomain)
+    {
+    QComboBox *comboBox = new QComboBox(this);
+    comboBox->setObjectName("ComboBox");
+
+    for(unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
+      {
+      comboBox->addItem(enumerationDomain->GetEntryText(i));
+      }
+
+    vbox->addWidget(comboBox);
     }
   else
     {

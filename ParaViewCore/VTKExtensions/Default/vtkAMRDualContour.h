@@ -119,6 +119,14 @@ protected:
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // Description:
+  // This should be called before any number of calls to DoRequestData 
+  void InitializeRequest (vtkNonOverlappingAMR* input);
+
+  // Description:
+  // This should be called after any number of calls to DoRequestData
+  void FinalizeRequest ();
+
+  // Description:
   // Not a pipeline function. This is a helper function that
   // allows creating a new data set given a input and a cell array name.
   vtkMultiBlockDataSet* DoRequestData(vtkNonOverlappingAMR* input,

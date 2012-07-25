@@ -1,0 +1,187 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+  <SourceProxy name="ShearedCube" class="vtkShearedCubeSource" label="ShearedCube">
+      <Documentation
+         long_help="Create a shearded 3D cube."
+         short_help="Create a 3D cube">
+      </Documentation>
+
+      <DoubleVectorProperty
+         name="U"
+         command="SetBaseU"
+         number_of_elements="3"
+         default_values="1.0 0.0 0.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding X axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="V"
+         command="SetBaseV"
+         number_of_elements="3"
+         default_values="0.0 1.0 0.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Y axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="W"
+         command="SetBaseW"
+         number_of_elements="3"
+         default_values="0.0 0.0 1.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Z axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="AxisOrigin"
+         command="SetAxisOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding X axis direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="OrientedBoundingBox"
+         label="Oriented bounds"
+         command="SetOrientedBoundingBox"
+         number_of_elements="6"
+         default_values="-0.5 0.5 -0.5 0.5 -0.5 0.5"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The oriented bounding box
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <StringVectorProperty
+       name="XTitle"
+       label="X Title"
+       command="SetAxisUTitle"
+       number_of_elements="1"
+       default_values="Base U"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the X axis.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="YTitle"
+       label="Y Title"
+       command="SetAxisVTitle"
+       number_of_elements="1"
+       default_values="Base V"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the Y axis.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="ZTitle"
+       label="Z Title"
+       command="SetAxisWTitle"
+       number_of_elements="1"
+       default_values="Base W"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the text to display for the Z axis.
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="EnableCustomBase"
+        label="Use Base"
+        command="SetEnableCustomBase"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="EnableCustomBounds"
+        label="Use Bounds"
+        command="SetEnableCustomBounds"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="EnableCustomTitle"
+        label="Use Titles"
+        command="SetEnableCustomTitle"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="EnableCustomOrigin"
+        label="Axes Origin"
+        command="SetEnableCustomOrigin"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="EnableTimeLabel"
+        label="Use Time label"
+        command="SetEnableTimeLabel"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="default">
+        <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+    <!-- Needed to provide time annotation -->
+
+     <DoubleVectorProperty
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty
+       name="TimeLabel"
+       command="SetTimeLabel"
+       number_of_elements="1"
+       default_values="Time"
+       panel_visibility="default">
+        <Documentation>
+          This property specifies the text to use for time label.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="TimeLabelAnnotation"
+       information_only="1" si_class="vtkSITimeLabelProperty">
+     </StringVectorProperty>
+
+   <!-- End Sphere -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

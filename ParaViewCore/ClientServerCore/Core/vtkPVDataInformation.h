@@ -40,6 +40,7 @@ class vtkInformation;
 class vtkPVArrayInformation;
 class vtkPVCompositeDataInformation;
 class vtkPVDataSetAttributesInformation;
+class vtkPVDataInformationHelper;
 class vtkSelection;
 class vtkTable;
 
@@ -173,7 +174,16 @@ public:
 
   // Description:
   // Returns if the data type is structured.
+  vtkGetStringMacro(TimeLabel);
+
+  // Description:
+  // Returns if the data type is structured.
   int IsDataStructured();
+
+  // Description:
+  // Allows run time addition of information getters for new classes
+  static void RegisterHelper(const char *classname,
+                             const char *helperclassname);
 
 protected:
   vtkPVDataInformation();
@@ -189,6 +199,8 @@ protected:
   void CopyFromTable(vtkTable* table);
   void CopyFromSelection(vtkSelection* selection);
   void CopyCommonMetaData(vtkDataObject*, vtkInformation*);
+
+  static vtkPVDataInformationHelper *FindHelper(const char *classname);
 
   // Data information collected from remote processes.
   int            DataSetType;
@@ -208,6 +220,9 @@ protected:
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
 
+  char*          TimeLabel;
+  vtkSetStringMacro(TimeLabel);
+
   char*          CompositeDataClassName;
   vtkSetStringMacro(CompositeDataClassName);
 
@@ -222,6 +237,7 @@ protected:
 
   vtkPVArrayInformation* PointArrayInformation;
 
+  friend class vtkPVDataInformationHelper;
 private:
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented

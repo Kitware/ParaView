@@ -26,7 +26,7 @@ vtkStandardNewMacro(vtkPrismCubeAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkPrismCubeAxesRepresentation::vtkPrismCubeAxesRepresentation()
 {
-  this->EnableCustomAxisRange(true);
+  this->SetCustomRangeActive(1,1,1);
 }
 
 //----------------------------------------------------------------------------
@@ -46,23 +46,22 @@ int vtkPrismCubeAxesRepresentation::RequestData(vtkInformation* info,
         fieldData->HasArray("YRange") &&
         fieldData->HasArray("ZRange"))
       {
-      double bounds[2];
+      double bounds[6];
       //set the custom range to the actor
       vtkDataArray *range;
       range = fieldData->GetArray("XRange");
       bounds[0] = range->GetTuple1(0);
       bounds[1] = range->GetTuple1(1);
-      this->SetXAxisRange(bounds[0], bounds[1]);
 
       range = fieldData->GetArray("YRange");
-      bounds[0] = range->GetTuple1(0);
-      bounds[1] = range->GetTuple1(1);
-      this->SetYAxisRange(bounds[0], bounds[1]);
+      bounds[2] = range->GetTuple1(0);
+      bounds[3] = range->GetTuple1(1);
 
       range = fieldData->GetArray("ZRange");
-      bounds[0] = range->GetTuple1(0);
-      bounds[1] = range->GetTuple1(1);
-      this->SetZAxisRange(bounds[0], bounds[1]);
+      bounds[4] = range->GetTuple1(0);
+      bounds[5] = range->GetTuple1(1);
+
+      this->SetCustomRange(bounds);
       }
     if (fieldData->HasArray("XTitle") &&
         fieldData->HasArray("YTitle") &&

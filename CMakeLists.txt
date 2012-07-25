@@ -170,6 +170,8 @@ option(BUILD_EXAMPLES "Build ParaView examples" OFF)
 option(BUILD_SHARED_LIBS "Build ParaView using shared libraries" ON)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
+option(PARAVIEW_USE_PISTON OFF "Build ParaView with Piston GPGPU filters")
+
 cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
   "Use MPI synchronous-send commands for communication" OFF
   "PARAVIEW_USE_MPI" OFF)
@@ -239,7 +241,6 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   endif (NOT QT4_FOUND)
 endif()
 SET(PARAVIEW_QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE})
-
 
 # Setup testing.
 if (BUILD_TESTING)

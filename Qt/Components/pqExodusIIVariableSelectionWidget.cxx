@@ -194,12 +194,6 @@ bool pqExodusIIVariableSelectionWidget::eventFilter(
 //-----------------------------------------------------------------------------
 void pqExodusIIVariableSelectionWidget::propertyChanged(const QString& pname)
 {
-  if (!this->Internals->Pixmaps.contains(pname))
-    {
-    qDebug() << "Unexpected property: " << pname;
-    return;
-    }
-
   QVariant properyValue = this->property(pname.toAscii().data());
   if (pname == "GenerateObjectIdCellArray")
     {
@@ -215,8 +209,8 @@ void pqExodusIIVariableSelectionWidget::propertyChanged(const QString& pname)
     }
   else
     {
-    QList<QList<QVariant> > status_values = properyValue.value<QList<QList<QVariant> > >();
-    QMap<QString, bool> statuses;
+    QList<QList<QVariant> > status_values =
+      properyValue.value<QList<QList<QVariant> > >();
     foreach (const QList<QVariant>& tuple, status_values)
       {
       if (tuple.size() == 2)

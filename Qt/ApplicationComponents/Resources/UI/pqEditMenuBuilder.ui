@@ -155,7 +155,7 @@
   </action>
   <action name="actionQuery">
    <property name="text">
-    <string>Find Data</string>
+    <string>Find Data...</string>
    </property>
    <property name="iconText">
     <string>Find Data</string>

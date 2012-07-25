@@ -63,6 +63,8 @@ vtkPVOptions::vtkPVOptions()
 
   this->AMRStreaming = 0;
 
+  this->UseCudaInterop = 0;
+
   // initialize host names
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
@@ -301,6 +303,11 @@ void vtkPVOptions::Initialize()
     "EXPERIMENTAL: When specified, AMR streaming for volume rendering is "
     "enabled",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--use-cuda-interop", "-cudaiop",
+    &this->UseCudaInterop,
+    "When specified, piston classes will use cuda interop for direct rendering",
+    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -532,4 +539,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ServerURL: "
      << (this->ServerURL? this->ServerURL : "(none)") << endl;
   os << indent << "AMRStreaming:" << this->AMRStreaming << endl;
+
+  os << indent << "UseCudaInterop" << this->UseCudaInterop << std::endl;
 }

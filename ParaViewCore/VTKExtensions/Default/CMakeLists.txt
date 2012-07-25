@@ -122,7 +122,6 @@ set(Module_SRCS
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSurfaceVectors.cxx
-  vtkTableFFT.cxx
   vtkTimeToTextConvertor.cxx
 # vtkTransferFunctionEditorRepresentation.cxx
 # vtkTransferFunctionEditorRepresentation1D.cxx

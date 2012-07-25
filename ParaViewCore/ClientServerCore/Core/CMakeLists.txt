@@ -41,11 +41,13 @@ set (Module_SRCS
   vtkPVCompositeDataInformation.cxx
   vtkPVCompositeDataInformationIterator.cxx
   vtkPVDataInformation.cxx
+  vtkPVDataInformationHelper.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
   vtkPVExtractSelection.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
+  vtkPVMemoryUseInformation.cxx
   vtkPVMultiClientsInformation.cxx
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
@@ -99,6 +101,7 @@ set_source_files_properties(
 
 set_source_files_properties(
   vtkNetworkAccessManager
+  vtkPVDataInformationHelper
   vtkPVInformation
   vtkPVPlugin
   vtkPVPluginTracker

@@ -78,9 +78,11 @@ protected:
   friend class vtkSMTimeKeeperProxy;
   void SetTimestepValuesProperty(vtkSMProperty*);
   void SetTimeRangeProperty(vtkSMProperty*);
+  void SetTimeLabelProperty(vtkSMProperty*);
 
   void UpdateTimeSteps();
 
+  vtkSMProperty* TimeLabelProperty;
   vtkSMProperty* TimeRangeProperty;
   vtkSMProperty* TimestepValuesProperty;
   double Time;

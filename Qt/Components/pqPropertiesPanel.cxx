@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMPropertyHelper.h"
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqView.h"
 #include "pqProxy.h"
+#include "pq3DWidget.h"
 #include "pqUndoStack.h"
 #include "pqOutputPort.h"
 #include "pqDisplayPanel.h"
@@ -68,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanelItem.h"
 #include "pqObjectPanelInterface.h"
 #include "pqProxySelectionWidget.h"
+#include "pq3DWidgetPropertyWidget.h"
 #include "pqApplyPropertiesManager.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
@@ -84,6 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 #include "pqIsoVolumePanel.h"
 #include "pqCalculatorPanel.h"
+#include "pqPassArraysPanel.h"
 #include "pqStreamTracerPanel.h"
 #include "pqTextRepresentation.h"
 #include "pqProxyPropertyWidget.h"
@@ -130,6 +134,10 @@ public:
       if(QString("Calculator") == proxy->getProxy()->GetXMLName())
         {
         return new pqCalculatorPanel(proxy, p);
+        }
+      if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqPassArraysPanel(proxy, p);
         }
       if (QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
         QString("Glyph") == proxy->getProxy()->GetXMLName())
@@ -198,7 +206,8 @@ public:
          QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
          QString("CTHPart") == proxy->getProxy()->GetXMLName() ||
          QString("RectilinearGridConnectivity") == proxy->getProxy()->GetXMLName() ||
-         QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
+         QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
+         QString("PassArrays") == proxy->getProxy()->GetXMLName() )
         {
         return true;
         }
@@ -399,9 +408,29 @@ pqView* pqPropertiesPanel::view() const
   return this->View;
 }
 
+pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *prop) const
+{
+  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
+    {
+    pqPropertyWidget *widget = item.PropertyWidget;
+    if(!widget || !widget->property())
+      {
+      continue;
+      }
+
+    if(widget->property() == prop)
+      {
+      return widget;
+      }
+    }
+
+  return 0;
+}
+
 void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
+  this->updateInformationAndDomains();
 
   // clear any search string
   this->Ui->SearchLineEdit->clear();
@@ -491,6 +520,32 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
   else
     {
     widgets = this->createWidgetsForProxy(proxy);
+    }
+
+  // add 3D widgets
+  vtkSMProxy *smProxy = proxy->getProxy();
+  vtkPVXMLElement *hints = smProxy->GetHints();
+  if(hints)
+    {
+    QList<pq3DWidget*> widgets3d = pq3DWidget::createWidgets(smProxy, smProxy);
+
+    foreach (pq3DWidget *widget, widgets3d)
+      {
+      connect(this, SIGNAL(viewChanged(pqView*)),
+              widget, SLOT(setView(pqView*)));
+      widget->setView(this->view());
+      widget->resetBounds();
+      widget->reset();
+
+      // must call select
+      widget->select();
+
+      pqPropertiesPanelItem item;
+      item.LabelWidget = 0;
+      item.PropertyWidget = new pq3DWidgetPropertyWidget(widget);
+      item.IsAdvanced = false;
+      widgets.append(item);
+      }
     }
 
   // add widgets to the panel
@@ -687,6 +742,8 @@ void pqPropertiesPanel::apply()
     proxy->setModifiedState(pqProxy::UNMODIFIED);
     }
 
+  this->updateInformationAndDomains();
+
   this->updateButtonState();
 
   emit this->applied();
@@ -706,6 +763,8 @@ void pqPropertiesPanel::reset()
 
     this->Proxy->setModifiedState(pqProxy::UNMODIFIED);
     }
+
+  this->updateInformationAndDomains();
 
   this->updateButtonState();
 }
@@ -1038,6 +1097,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       propertyKeyName.replace(" ", "");
       propertyWidget->setObjectName(propertyKeyName);
 
+      // store the property associated with the widget
+      propertyWidget->setProperty(smProperty);
+
       // save record of the property widget and containing widget
       pqPropertiesPanelItem item;
       item.Name = name;
@@ -1091,5 +1153,30 @@ bool pqPropertiesPanel::isPanelItemVisible(const pqPropertiesPanelItem &item) co
   else
     {
     return true;
+    }
+}
+
+void pqPropertiesPanel::updateInformationAndDomains()
+{
+  if(!this->Proxy)
+    {
+    return;
+    }
+
+  vtkSMProxy *proxy = this->Proxy->getProxy();
+
+  if(vtkSMSourceProxy *sourceProxy = vtkSMSourceProxy::SafeDownCast(proxy))
+    {
+    sourceProxy->UpdatePipelineInformation();
+    }
+  else
+    {
+    proxy->UpdatePropertyInformation();
+    }
+
+  vtkSMProperty *inputProperty = proxy->GetProperty("Input");
+  if(inputProperty)
+    {
+    inputProperty->UpdateDependentDomains();
     }
 }

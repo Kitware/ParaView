@@ -152,6 +152,11 @@ public:
   // Description:
   // EXPERIMENTAL: When set, AMR streaming is enabled.
   vtkGetMacro(AMRStreaming, int);
+
+  // Description:
+  // When set, use cuda interop feature
+  vtkGetMacro(UseCudaInterop, int);
+
 protected:
 //BTX
   // Description:
@@ -254,6 +259,9 @@ private:
   char* StereoType;
 
   int AMRStreaming;
+
+  int UseCudaInterop;
+
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

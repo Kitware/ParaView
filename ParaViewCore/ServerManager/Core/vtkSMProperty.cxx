@@ -64,7 +64,7 @@ vtkSMProperty::vtkSMProperty()
   this->PendingModifiedEvents = false;
 
   // by default, properties are set to show only in advanced mode
-  this->SetPanelVisibility("advanced");
+  this->SetPanelVisibility("default");
 
   this->Proxy = 0;
 }

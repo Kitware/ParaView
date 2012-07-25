@@ -38,12 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIntValidator>
 
 // ParaView Includes.
+#include "pqApplicationCore.h"
+#include "pqSettings.h"
 #include "vtkPVProxyDefinitionIterator.h"
 #include "vtkRenderWindow.h" // for VTK_STEREO_*
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+
+#define SETTINGS_KEY "pqSaveSnapshotDialog/SaveOnlySelectedView"
 
 class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
@@ -59,6 +63,7 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 {
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
+
   this->Internal->AspectRatio = 1.0;
   this->Internal->quality->setMinimum(0);
   this->Internal->quality->setMaximum(100);
@@ -71,6 +76,13 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   validator = new QIntValidator(this);
   validator->setBottom(50);
   this->Internal->height->setValidator(validator);
+
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if (settings && settings->contains(SETTINGS_KEY))
+    {
+    this->Internal->selectedViewOnly->setChecked(
+      settings->value(SETTINGS_KEY).toBool());
+    }
 
   QObject::connect(this->Internal->ok, SIGNAL(pressed()),
     this, SLOT(accept()), Qt::QueuedConnection);
@@ -109,6 +121,13 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
 //-----------------------------------------------------------------------------
 pqSaveSnapshotDialog::~pqSaveSnapshotDialog()
 {
+  pqSettings* settings = pqApplicationCore::instance()?
+    pqApplicationCore::instance()->settings(): NULL;
+  if (settings)
+    {
+    settings->setValue(SETTINGS_KEY, !this->saveAllViews());
+    }
+
   delete this->Internal;
 }
 

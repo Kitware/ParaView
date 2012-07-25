@@ -43,6 +43,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
+#include "vtkPVConfig.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -67,6 +68,10 @@
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
 #include "vtkWeakPointer.h"
+
+#ifdef PARAVIEW_USE_PISTON
+#include "vtkPistonMapper.h"
+#endif
 
 #include <assert.h>
 #include <vector>
@@ -101,6 +106,24 @@ public:
       this->PropMap.find(id);
     return (iter != this->PropMap.end()? iter->second : NULL);
     }
+
+#ifdef PARAVIEW_USE_PISTON
+  void PreRender(vtkRenderViewBase *renderView)
+    {
+    if(vtkPVOptions *options = vtkProcessModule::GetProcessModule()->GetOptions())
+      {
+      if(!vtkPistonMapper::IsEnabledCudaGL() && options->GetUseCudaInterop())
+        {
+        vtkPistonMapper::InitCudaGL(renderView->GetRenderWindow());
+        }
+      }
+    }
+#else
+  void PreRender(vtkRenderViewBase *vtkNotUsed(renderView))
+    {
+    }
+#endif // PARAVIEW_USE_PISTON
+
 };
 
 
@@ -684,7 +707,7 @@ bool vtkPVRenderView::TestCollaborationCounter()
 
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
-  vtkMultiProcessController* d_controller = 
+  vtkMultiProcessController* d_controller =
     this->SynchronizedWindows->GetClientDataServerController();
   vtkMultiProcessController* r_controller =
     this->SynchronizedWindows->GetClientServerController();
@@ -737,7 +760,7 @@ void vtkPVRenderView::SynchronizeForCollaboration()
     }
 
   // Update decisions about lod-rendering and remote-rendering.
-  
+
   vtkMultiProcessController* p_controller =
     this->SynchronizedWindows->GetParallelController();
   vtkMultiProcessController* r_controller =
@@ -885,7 +908,11 @@ void vtkPVRenderView::StillRender()
 {
   vtkTimerLog::MarkStartEvent("Still Render");
   this->GetRenderWindow()->SetDesiredUpdateRate(0.002);
+
+  this->Internals->PreRender(this->RenderView);
+
   this->Render(false, false);
+
   vtkTimerLog::MarkEndEvent("Still Render");
 }
 
@@ -894,7 +921,11 @@ void vtkPVRenderView::InteractiveRender()
 {
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->GetRenderWindow()->SetDesiredUpdateRate(5.0);
+
+  this->Internals->PreRender(this->RenderView);
+
   this->Render(true, false);
+
   vtkTimerLog::MarkEndEvent("Interactive Render");
 }
 
@@ -930,7 +961,7 @@ unsigned int vtkPVRenderView::GetNextPieceToDeliver(double planes[24])
 
   return this->GetDeliveryManager()->GetRepresentationIdFromQueue();
 }
- 
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StreamingUpdate()
 {

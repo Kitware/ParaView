@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqBuiltinColorMaps.h"
 #include "pqChartValue.h"
 #include "pqColorMapModel.h"
 #include "pqColorPresetManager.h"
@@ -66,6 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
@@ -284,6 +287,33 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   //Hook up the MakeDefaultButton
   this->connect(this->Form->MakeDefaultButton, SIGNAL(clicked()),
       this, SLOT(makeDefault()));
+
+  // =========================
+  // Simple UI add-on
+  // =========================
+  this->connect( this->Form->SwitchToAdvanced, SIGNAL(toggled(bool)),
+                 this, SLOT(enableAvancedPanel(bool)));
+  this->enableAvancedPanel(this->Form->SwitchToAdvanced->isChecked());
+
+  this->connect( this->Form->UseLogScaleSimple, SIGNAL(toggled(bool)),
+                 this, SLOT(setLogScale(bool)));
+
+  this->connect( this->Form->PresetButtonSimple, SIGNAL(clicked()),
+                 this, SLOT(loadPreset()));
+
+  this->connect( this->Form->UseAutoRescaleSimple, SIGNAL(toggled(bool)),
+                 this, SLOT(setAutoRescale(bool)));
+
+  this->connect( this->Form->SimpleMin, SIGNAL(editingFinished()),
+                 this, SLOT(rescaleToSimpleRange()));
+
+  this->connect( this->Form->SimpleMax, SIGNAL(editingFinished()),
+                 this, SLOT(rescaleToSimpleRange()));
+
+  // Make sure the line edits only allow number inputs.
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Form->SimpleMin->setValidator(validator);
+  this->Form->SimpleMax->setValidator(validator);
 }
 
 pqColorScaleEditor::~pqColorScaleEditor()
@@ -1023,6 +1053,11 @@ void pqColorScaleEditor::loadPreset()
 
 void pqColorScaleEditor::setLogScale(bool on)
 {
+  // Make sure both UI widget are in sync
+  this->Form->UseLogScale->setChecked(on);
+  this->Form->UseLogScaleSimple->setChecked(on);
+
+  // Do the real job
   this->renderTransferFunctionViews();
 
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
@@ -1039,6 +1074,13 @@ void pqColorScaleEditor::setLogScale(bool on)
 
 void pqColorScaleEditor::setAutoRescale(bool on)
 {
+  // Make sure both UI widget are in sync
+  this->Form->UseAutoRescale->setChecked(on);
+  this->Form->UseAutoRescaleSimple->setChecked(on);
+  this->Form->SimpleMin->setEnabled(!on);
+  this->Form->SimpleMax->setEnabled(!on);
+
+  // Do the real job
   this->enableRescaleControls(!on);
   this->ColorMap->setScalarRangeLock(!on);
   this->enablePointControls();
@@ -1049,6 +1091,29 @@ void pqColorScaleEditor::setAutoRescale(bool on)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqColorScaleEditor::rescaleToSimpleRange()
+{
+  if(!this->Form->UseAutoRescaleSimple->isChecked() && !this->Form->SwitchToAdvanced->isChecked())
+    {
+    bool okMin = true, okMax = true;
+    double min = this->Form->SimpleMin->text().toDouble(&okMin);
+    double max = this->Form->SimpleMax->text().toDouble(&okMax);
+    if(okMin && okMax)
+      {
+      QPair<double, double> range;
+      this->Form->InSetColors = true;
+      this->unsetCurrentPoints();
+      this->setScalarRange(min, max);
+      this->Form->InSetColors = false;
+      range = this->ColorMap->getScalarRange();
+      this->updateScalarRange(range.first, range.second);
+      this->updateCurrentColorPoint();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqColorScaleEditor::rescaleToNewRange()
 {
   // Launch the rescale range dialog to get the new range.
@@ -1287,129 +1352,38 @@ void pqColorScaleEditor::cleanupLegend()
 
 void pqColorScaleEditor::loadBuiltinColorPresets()
 {
-  pqColorMapModel colorMap;
   pqColorPresetModel *model = this->Form->Presets->getModel();
-  colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 59, 76, 192), 0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(180,  4,  38), 1.0);
-  colorMap.setNanColor(QColor(63, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Cool to Warm");
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0, 0, 255), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 0,   0), (double)0.0);
-  colorMap.setNanColor(QColor(127, 127, 127));
-  model->addBuiltinColorMap(colorMap, "Blue to Red Rainbow");
+  // get builtin color maps xml
+  const char *xml = pqComponentsGetColorMapsXML();
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::HsvSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(  0, 0, 255), (double)1.0);
-  colorMap.setNanColor(QColor(127, 127, 127));
-  model->addBuiltinColorMap(colorMap, "Red to Blue Rainbow");
+  // create xml parser
+  vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+  xmlParser->InitializeParser();
+  xmlParser->ParseChunk(xml, strlen(xml));
+  xmlParser->CleanupParser();
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0,   0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Grayscale");
+  // parse each color map element
+  vtkPVXMLElement *root = xmlParser->GetRootElement();
+  for(unsigned int i = 0; i < root->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement *colorMapElement = root->GetNestedElement(i);
+    if(std::string("ColorMap") != colorMapElement->GetName())
+      {
+      continue;
+      }
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(255, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(  0,   0,    0), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "X Ray");
+    // load color map from its XML
+    pqColorMapModel colorMap =
+      pqColorPresetManager::createColorMapFromXML(colorMapElement);
+    QString name = colorMapElement->GetAttribute("name");
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 10,  10, 242), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(242, 242,  10), (double)1.0);
-  colorMap.setNanColor(QColor(255, 0, 0));
-  model->addBuiltinColorMap(colorMap, "Blue to Yellow");
+    // add color map to the model
+    model->addBuiltinColorMap(colorMap, name);
+    }
 
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(  0,   0, 0  ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.4), QColor(230,   0, 0  ), (double)0.4);
-  colorMap.addPoint(pqChartValue((double)0.8), QColor(230, 230, 0  ), (double)0.8);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(0, 127, 255));
-  model->addBuiltinColorMap(colorMap, "Black-Body Radiation");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::LabSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor(0, 153, 191), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(196, 119, 87),(double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "CIELab Blue to Red");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor(  0,   0,   0), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.333), QColor(  0,   0, 128), (double)0.333);
-  colorMap.addPoint(pqChartValue((double)0.666), QColor(  0, 128, 255), (double)0.666);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Black, Blue and White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor(  0,   0, 0  ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.333), QColor(128,   0, 0  ), (double)0.333);
-  colorMap.addPoint(pqChartValue((double)0.666), QColor(255, 128, 0  ), (double)0.666);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(255, 255, 255), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Black, Orange and White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor(  0, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.45), QColor(  0,   0, 255 ), (double)0.45);
-  colorMap.addPoint(pqChartValue((double)0.5),  QColor(  0,   0, 128 ), (double)0.5);
-  colorMap.addPoint(pqChartValue((double)0.55), QColor(255,   0,   0 ), (double)0.55);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(255, 255,   0 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Cold and Hot");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),   QColor( 71,  71, 219 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.143), QColor(  0,   0,  92 ), (double)0.143);
-  colorMap.addPoint(pqChartValue((double)0.285), QColor(  0, 255, 255 ), (double)0.285);
-  colorMap.addPoint(pqChartValue((double)0.429), QColor(  0, 128,   0 ), (double)0.429);
-  colorMap.addPoint(pqChartValue((double)0.571), QColor(255, 255,   0 ), (double)0.571);
-  colorMap.addPoint(pqChartValue((double)0.714), QColor(255,  97,   0 ), (double)0.714);
-  colorMap.addPoint(pqChartValue((double)0.857), QColor(107,   0,   0 ), (double)0.857);
-  colorMap.addPoint(pqChartValue((double)1.0),   QColor(224,  77,  77 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Desaturated");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor(255, 255, 255 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.17), QColor(  0,   0, 255 ), (double)0.17);
-  colorMap.addPoint(pqChartValue((double)0.34), QColor(  0, 255, 255 ), (double)0.34);
-  colorMap.addPoint(pqChartValue((double)0.50), QColor(  0, 255,   0 ), (double)0.50);
-  colorMap.addPoint(pqChartValue((double)0.67), QColor(255, 255,   0 ), (double)0.67);
-  colorMap.addPoint(pqChartValue((double)0.84), QColor(255,   0,   0 ), (double)0.84);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(224,   0, 255 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Blended White");
-
-  colorMap.removeAllPoints();
-  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
-  colorMap.addPoint(pqChartValue((double)0.0),  QColor( 81,  87, 110 ), (double)0.0);
-  colorMap.addPoint(pqChartValue((double)0.17), QColor(  0,   0, 255 ), (double)0.17);
-  colorMap.addPoint(pqChartValue((double)0.34), QColor(  0, 255, 255 ), (double)0.34);
-  colorMap.addPoint(pqChartValue((double)0.50), QColor(  0, 255,   0 ), (double)0.50);
-  colorMap.addPoint(pqChartValue((double)0.67), QColor(255, 255,   0 ), (double)0.67);
-  colorMap.addPoint(pqChartValue((double)0.84), QColor(255,   0,   0 ), (double)0.84);
-  colorMap.addPoint(pqChartValue((double)1.0),  QColor(224,   0, 255 ), (double)1.0);
-  colorMap.setNanColor(QColor(255, 255, 0));
-  model->addBuiltinColorMap(colorMap, "Rainbow Blended Grey");
+  // cleanup parser
+  xmlParser->Delete();
 }
 
 void pqColorScaleEditor::loadColorPoints()
@@ -1537,6 +1511,14 @@ void pqColorScaleEditor::initColorScale()
     this->Form->UseAutoRescale->blockSignals(false);
     this->enableRescaleControls(!this->Form->UseAutoRescale->isChecked());
 
+    // Handle simple UI
+    this->Form->UseAutoRescaleSimple->blockSignals(true);
+    this->Form->UseAutoRescaleSimple->setChecked(
+        !this->ColorMap->getScalarRangeLock());
+    this->Form->UseAutoRescaleSimple->blockSignals(false);
+    this->Form->SimpleMin->setEnabled(!this->Form->UseAutoRescale->isChecked());
+    this->Form->SimpleMax->setEnabled(!this->Form->UseAutoRescale->isChecked());
+
     // Set up the color table size elements.
     vtkSMProxy *lookupTable = this->ColorMap->getProxy();
     int tableSize = pqSMAdaptor::getElementProperty(
@@ -1660,6 +1642,8 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   // Update the spin box ranges and set the values.
   this->Form->MinimumLabel->setText(QString::number(min, 'g', 6));
   this->Form->MaximumLabel->setText(QString::number(max, 'g', 6));
+  this->Form->SimpleMin->setText(QString::number(min, 'g', 6));
+  this->Form->SimpleMax->setText(QString::number(max, 'g', 6));
 
   double chartBounds[8];
   // Update the editor scalar range.
@@ -2172,7 +2156,8 @@ void pqColorScaleEditor::saveOptionalUserSettings()
   settings->remove("");
   settings->setValue("ImmediateRender", QVariant(
     this->Form->checkBoxImmediateRender->isChecked()));
-
+  settings->setValue("AdvancedPanel", QVariant(
+    this->Form->SwitchToAdvanced->isChecked()));
   settings->endGroup();
 }
 
@@ -2186,9 +2171,13 @@ void pqColorScaleEditor::restoreOptionalUserSettings()
     {
     if(*key == "ImmediateRender")
       {
-      int checked = settings->value(*key).toInt();
+      bool checked = settings->value(*key).toBool();
       this->Form->checkBoxImmediateRender->setChecked(checked);
-      break;
+      }
+    if(*key == "AdvancedPanel")
+      {
+      bool checked = settings->value(*key).toBool();
+      this->Form->SwitchToAdvanced->setChecked(checked);
       }
     }
 
@@ -2258,4 +2247,18 @@ void pqColorScaleEditor::updateOpacity()
 {
   this->updateCurrentOpacityPoint();
   this->pushOpacity();
+}
+// ----------------------------------------------------------------------------
+void pqColorScaleEditor::enableAvancedPanel(bool checked)
+{
+  // Collapse
+  this->Form->ColorTabs->setVisible(false);
+  this->Form->SimplePanel->setVisible(false);
+
+  // Expand eventually
+  this->Form->ColorTabs->setVisible(checked);
+  this->Form->SimplePanel->setVisible(!checked);
+
+  // Adjust size
+  this->adjustSize();
 }

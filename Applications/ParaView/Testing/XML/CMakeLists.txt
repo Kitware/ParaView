@@ -2,6 +2,7 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
 )
 
 SET (TESTS_WITH_INLINE_COMPARES
@@ -183,6 +184,7 @@ set(LoadPlugins_USE_NEW_PANELS TRUE)
 set(LoadSaveStateAnimation_USE_NEW_PANELS TRUE)
 set(LoadState_USE_NEW_PANELS TRUE)
 set(NiftiReaderWriterPlugin_USE_NEW_PANELS TRUE)
+set(MemoryInspectorPanel_USE_NEW_PANELS TRUE)
 set(NewColorEditor1_USE_NEW_PANELS TRUE)
 set(NewColorEditor3_USE_NEW_PANELS TRUE)
 set(NormalGlyphs_USE_NEW_PANELS TRUE)

@@ -506,12 +506,13 @@ bool pqCPExportStateWizard::validateCurrentPage()
       pqImageOutputInfo* viewInfo = dynamic_cast<pqImageOutputInfo*>(
         this->Internals->viewsContainer->widget(i));
       pqView* view = viewInfo->getView();
+      QSize viewSize = view->getSize();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5'],").
+      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5', '%6', '%7'],").
         arg(proxyManager->GetProxyName("views", viewProxy)).
         arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
         arg(static_cast<int>(viewInfo->fitToScreen())).
-        arg(viewInfo->getMagnification());
+        arg(viewInfo->getMagnification()).arg(viewSize.width()).arg(viewSize.height());
       rendering_info+= info;
       }
     // remove the last comma -- assume that there's at least one view

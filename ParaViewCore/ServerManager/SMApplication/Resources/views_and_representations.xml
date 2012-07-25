@@ -120,6 +120,7 @@
 
       <IntVectorProperty name="InteractionMode"
         command="SetInteractionMode"
+        state_ignored="1"
         number_of_elements="1"
         default_values="0">
         <EnumerationDomain name="enum">
@@ -641,6 +642,7 @@
            compatibility as it will override by default the interaction mode -->
       <IntVectorProperty name="InteractionMode"
         command="SetInteractionMode"
+        state_ignored="1"
         number_of_elements="1"
         override="1"
         default_values="1">
@@ -1224,7 +1226,6 @@
             <Property name="Diffuse" />
             <Property name="DiffuseColor" />
             <Property name="EdgeColor" />
-            <Property name="InterpolateScalarsBeforeMapping" />
             <Property name="Interpolation" />
             <Property name="LookupTable" />
             <Property name="NonlinearSubdivisionLevel" />
@@ -1232,16 +1233,17 @@
             <Property name="SpecularColor" />
             <Property name="SpecularPower" />
           </PropertyGroup>
-          <Property name="MapScalars" />
+          <Property name="MapScalars" panel_visibility="advanced"/>
+          <Property name="InterpolateScalarsBeforeMapping" panel_visibility="advanced"/>
           <Property name="Opacity" panel_visibility="default" />
-          <Property name="LineWidth" />
-          <Property name="BackfaceRepresentation" />
-          <Property name="Position" />
-          <Property name="Scale" />
-          <Property name="Orientation" />
-          <Property name="Origin" />
+          <Property name="LineWidth" panel_visibility="advanced"/>
+          <Property name="BackfaceRepresentation" panel_visibility="advanced"/>
+          <Property name="Position" panel_visibility="advanced" />
+          <Property name="Scale" panel_visibility="advanced" />
+          <Property name="Orientation" panel_visibility="advanced" />
+          <Property name="Origin" panel_visibility="advanced" />
           <Property name="Pickable" panel_visibility="never"/>
-          <Property name="PointSize" panel_visibility_default_for_representation="points"/>
+          <Property name="PointSize" panel_visibility="advanced" panel_visibility_default_for_representation="points"/>
           <Property name="StaticMode" panel_visibility="never" />
           <Property name="SuppressLOD" panel_visibility="never" />
           <Property name="Texture" panel_visibility="never" />
@@ -1298,23 +1300,26 @@
             <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
             <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
             <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+            <Property exposed_name="CubeAxesUseDefaultXTitle" name="UseDefaultXTitle" />
             <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
             <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
             <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
             <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
             <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+            <Property exposed_name="CubeAxesUseDefaultYTitle" name="UseDefaultYTitle" />
             <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
             <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
             <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
             <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
             <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
-            <Property exposed_name="CubeAxesEnableCustomAxisRange" name="EnableCustomAxisRange" />
-            <Property exposed_name="CubeAxesXAxisRange" name="XAxisRange" />
-            <Property exposed_name="CubeAxesYAxisRange" name="YAxisRange" />
-            <Property exposed_name="CubeAxesZAxisRange" name="ZAxisRange" />
+            <Property exposed_name="CubeAxesUseDefaultZTitle" name="UseDefaultZTitle" />
+            <Property exposed_name="CubeAxesGridLineLocation" name="GridLineLocation" />
             <Property name="DataBounds" />
             <Property name="CustomBounds"/>
             <Property name="CustomBoundsActive"/>
+            <Property name="OriginalBoundsRangeActive"/>
+            <Property name="CustomRange"/>
+            <Property name="CustomRangeActive"/>
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3015,7 +3020,8 @@
 
       <InputProperty name="Source" command="SetInputConnection"
         port_index="1"
-        label="Glyph Type">
+        label="Glyph Type"
+        panel_visibility="advanced">
         <Documentation>
           Specify the source objects.
         </Documentation>
@@ -3213,9 +3219,30 @@
         default_values="0 1 0 1 0 1">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="CustomRange"
+        command="SetCustomRange"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="CustomBoundsActive"
         command="SetCustomBoundsActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="OriginalBoundsRangeActive"
+        command="SetOriginalBoundsRangeActive"
+        number_of_elements="3"
+        default_values="0 0 0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="CustomRangeActive"
+        command="SetCustomRangeActive"
         number_of_elements="3"
         default_values="0 0 0">
       </IntVectorProperty>
@@ -3241,6 +3268,22 @@
         <Documentation>
           Specify a mode to control how the axes are drawn: either static,
           closest triad, furthest triad or outer edges in relation to the
+          camera position.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="GridLineLocation"
+        command="SetGridLineLocation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="All Faces" value="0" />
+          <Entry text="Closest Faces" value="1" />
+          <Entry text="Furthest Faces" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify a mode to control how the grid lines of the axes are drawn: either on the
+          closest faces, furthest faces or on all the faces in relation to the
           camera position.
         </Documentation>
       </IntVectorProperty>
@@ -3296,6 +3339,36 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty  name="UseDefaultXTitle"
+        command="SetUseDefaultXTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if X axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="UseDefaultYTitle"
+        command="SetUseDefaultYTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Y axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="UseDefaultZTitle"
+        command="SetUseDefaultZTitle"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Z axis title should use any provided title.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty  name="XAxisVisibility"
         command="SetXAxisVisibility"
         number_of_elements="1"
@@ -3303,16 +3376,6 @@
         <BooleanDomain name="bool"/>
         <Documentation>
           Specify if X axis is visible.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty  name="EnableCustomAxisRange"
-        command="EnableCustomAxisRange"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Allow user to enable or disable custom range label
         </Documentation>
       </IntVectorProperty>
 
@@ -3439,30 +3502,6 @@
           Set the location of tick marks.
         </Documentation>
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="XAxisRange"
-        command="SetXAxisRange"
-        number_of_elements="2"
-        default_values="0 1">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="YAxisRange"
-        command="SetYAxisRange"
-        number_of_elements="2"
-        default_values="0 1">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="ZAxisRange"
-        command="SetZAxisRange"
-        number_of_elements="2"
-        default_values="0 1">
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
 
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>

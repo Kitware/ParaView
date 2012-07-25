@@ -79,7 +79,8 @@
       <IntVectorProperty name="PassPartialArrays"
 	command="SetPassPartialArrays"
 	number_of_elements="1"
-	default_values="1">
+	default_values="1"
+  panel_visibility="advanced">
 	<Documentation>
 	  When dealing with composite datasets, partial arrays are common i.e.
 	  data-arrays that are not available in all of the blocks. By default,
@@ -7168,7 +7169,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="0" >
-       <IntRangeDomain name="range" min ="0"/>
+       <IntRangeDomain name="range"/>
        <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
@@ -7284,7 +7285,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="0" >
-       <IntRangeDomain name="range" min ="0"/>
+       <IntRangeDomain name="range"/>
       <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
@@ -7402,6 +7403,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 	command="SetForceReinjectionEveryNSteps"
 	number_of_elements="1"
 	default_values="1" >
+       <IntRangeDomain name="range"/>
        <Documentation>
 	 When animating particles, it is nice to inject new ones every Nth step
 	 to produce a continuous flow. Setting ForceReinjectionEveryNSteps to a
@@ -11844,6 +11846,123 @@ This property controls how the filter works to generate tensor cell data. You ca
         <Property name="NormalArrays" show="0" />
       </Hints>
      <!-- End of YoungsMaterialInterface -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="PassArrays" class="vtkPassArrays"
+                 label="Pass Arrays">
+      <Documentation
+         short_help="Pass specified point and cell data arrays."
+         long_help="Pass specified point and cell data arrays.">
+The Pass Arrays filter makes a shallow copy of the output data object from the input data object
+except for passing only the arrays specified to the output from the input.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+	  <Group name="sources"/>
+	  <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+	  <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+	<InputArrayDomain name="input_array"/>
+      </InputProperty>
+
+      <IntVectorProperty name="UseFieldTypes"
+                         command="SetUseFieldTypes"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This hidden property must always be set to 1 for this proxy to work.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AddPointArrayType"
+                         command="AddFieldType"
+                         number_of_elements="1"
+                         default_values="0"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This hidden property must always be set to 0 for this proxy to work.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AddCellArrayType"
+                         command="AddFieldType"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This hidden property must always be set to 1 for this proxy to work.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AddFieldArrayType"
+                         command="AddFieldType"
+                         number_of_elements="1"
+                         default_values="2"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This hidden property must always be set to 2 for this proxy to work.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+	 name="AddPointDataArray"
+	 command="AddPointDataArray"
+         clean_command="ClearPointDataArrays"
+         repeat_command="1"
+         number_of_elements_per_command="1"
+	 label="PointDataArrays"
+	 animateable="0"
+         immediate_update="0">
+	<Documentation>
+          Add a point array by name to be passed.
+	</Documentation>
+	<Hints>
+	  <ShowInSummaryPanel/>
+	</Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+	 name="AddCellDataArray"
+	 command="AddCellDataArray"
+         clean_command="ClearCellDataArrays"
+         repeat_command="1"
+         number_of_elements_per_command="1"
+	 label="CellDataArrays"
+	 animateable="0"
+         immediate_update="0">
+	<Documentation>
+          Add a cell array by name to be passed.
+	</Documentation>
+	<Hints>
+	  <ShowInSummaryPanel/>
+	</Hints>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+	 name="AddFieldDataArray"
+	 command="AddFieldDataArray"
+         clean_command="ClearFieldDataArrays"
+         repeat_command="1"
+         number_of_elements_per_command="1"
+	 label="FieldDataArrays"
+	 animateable="0"
+         immediate_update="0">
+	<Documentation>
+          Add a field array by name to be passed.
+	</Documentation>
+	<Hints>
+	  <ShowInSummaryPanel/>
+	</Hints>
+      </StringVectorProperty>
+      <!-- End PassArrays -->
     </SourceProxy>
 
   </ProxyGroup>

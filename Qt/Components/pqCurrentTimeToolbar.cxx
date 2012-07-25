@@ -65,6 +65,7 @@ void pqCurrentTimeToolbar::constructor()
 {
   QLabel* label = new QLabel(this);
   label->setText("Time: ");
+  this->TimeLabel = label;
 
   QLineEdit* timeedit = new QLineEdit(this);
   timeedit->setSizePolicy(
@@ -125,6 +126,8 @@ void pqCurrentTimeToolbar::setAnimationScene(pqAnimationScene* scene)
       this->Scene, SLOT(setAnimationTime(double)));
     QObject::connect(this->Scene, SIGNAL(timeStepsChanged()),
       this, SLOT(onTimeStepsChanged()));
+    QObject::connect(this->Scene, SIGNAL(timeLabelChanged()),
+      this, SLOT(onTimeLabelChanged()));
 
     this->sceneTimeChanged(this->Scene->getAnimationTime());
     }
@@ -145,6 +148,17 @@ void pqCurrentTimeToolbar::onTimeStepsChanged()
     this->TimeSpinBox->setMaximum(0);
     }
   this->TimeSpinBox->blockSignals(prev);
+}
+
+//-----------------------------------------------------------------------------
+void pqCurrentTimeToolbar::onTimeLabelChanged()
+{
+  pqTimeKeeper* timekeeper = this->Scene->getServer()->getTimeKeeper();
+  this->TimeLabel->setText(
+        pqSMAdaptor::getElementProperty(
+          timekeeper->getProxy()->GetProperty("TimeLabel")).toString());
+
+  this->TimeLabel->setText(this->TimeLabel->text() + ": ");
 }
 
 //-----------------------------------------------------------------------------
