@@ -49,17 +49,18 @@ MARK_AS_ADVANCED(PV_TEST_CLIENT)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
 
+include(vtkForwardingExecutable)
+
 vtk_module_impl()
 vtk_module_export("")
-
-add_executable_with_forwarding(exe_suffix
+vtk_add_executable_with_forwarding(out_exe_suffix
   smTestDriver
   vtkSMTestDriver.cxx
   vtkSMTestDriver.h)
 
-target_link_libraries(smTestDriver${exe_suffix}
+target_link_libraries(smTestDriver
   vtksys
   vtkCommonCore)
 if (NOT VTK_INSTALL_NO_DEVELOPMENT)
-  pv_executable_install(smTestDriver "${exe_suffix}")
+  pv_executable_install(smTestDriver "${out_exe_suffix}")
 endif()
