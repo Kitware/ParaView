@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
+    <width>700</width>
     <height>446</height>
    </rect>
   </property>
@@ -264,7 +264,7 @@ p, li { white-space: pre-wrap; }
  <customwidgets>
   <customwidget>
    <class>pqColorChooserButton</class>
-   <extends>QToolButton</extends>
+   <extends>QPushButton</extends>
    <header>pqColorChooserButton.h</header>
   </customwidget>
   <customwidget>
