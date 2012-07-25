@@ -400,6 +400,7 @@ set (Module_SRCS
 
 set (Module_MOC_HDRS
   pq3DWidget.h
+  pq3DWidgetPropertyWidget.h
   pqAboutDialog.h
   pqActiveObjects.h
   pqActivePlotMatrixViewOptions.h
@@ -482,7 +483,7 @@ set (Module_MOC_HDRS
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
-  pqMemoryInspector.h
+  pqMemoryInspectorPanel.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
@@ -497,6 +498,7 @@ set (Module_MOC_HDRS
   pqOutputPortComboBox.h
   pqParallelCoordinatesChartDisplayPanel.h
 #  pqParticleTracerPanel.h
+  pqPassArraysPanel.h
   pqPipelineAnnotationFilterModel.h
   pqPipelineBrowserWidget.h
   pqPipelineModel.h
@@ -520,6 +522,8 @@ set (Module_MOC_HDRS
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
+  pqRemoteCommandDialog.h
+  pqRemoteCommandTemplateDialog.h
   pqRenderViewOptions.h
   pqRescaleRange.h
   pqSampleScalarAddRangeDialog.h
@@ -614,7 +618,7 @@ set (Module_UI_FILES
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
   Resources/UI/pqLockViewSizeCustomDialog.ui
-  Resources/UI/pqMemoryInspector.ui
+  Resources/UI/pqMemoryInspectorPanelForm.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
   Resources/UI/pqParallelCoordinatesChartDisplayPanel.ui
@@ -630,6 +634,8 @@ set (Module_UI_FILES
   Resources/UI/pqQueryClauseWidget.ui
   Resources/UI/pqQueryCompositeTreeDialog.ui
   Resources/UI/pqQueryDialog.ui
+  Resources/UI/pqRemoteCommandDialogForm.ui
+  Resources/UI/pqRemoteCommandTemplateDialogForm.ui
   Resources/UI/pqRenderViewOptions.ui
   Resources/UI/pqRescaleRangeDialog.ui
   Resources/UI/pqSampleScalarAddRangeDialog.ui

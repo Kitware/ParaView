@@ -44,6 +44,8 @@ set (Module_SRCS
   vtkPVDataInformationHelper.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx
+  vtkPVDisableStackTraceSignalHandler.cxx
+  vtkPVEnableStackTraceSignalHandler.cxx
   vtkPVExtractSelection.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
@@ -63,6 +65,7 @@ set (Module_SRCS
   vtkPVServerOptions.cxx
   vtkPVSession.cxx
   vtkPVSILInformation.cxx
+  vtkPVSystemConfigInformation.cxx
   vtkPVSystemInformation.cxx
   vtkPVTemporalDataInformation.cxx
   vtkPVTimerInformation.cxx
