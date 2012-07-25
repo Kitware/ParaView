@@ -18,8 +18,7 @@ foreach (name ${test_srcs})
   vtk_module_test_executable(${name}
     ${name}.cxx)
   add_test(NAME ${name}
-      COMMAND ${CXX_TEST_PATH}/${name} ${name}
-              -D ${VTK_DATA_ROOT})
+      COMMAND ${name} ${name} -D ${VTK_DATA_ROOT})
 endforeach()
 
 #------------------------------------------------------------------------------
@@ -70,7 +69,8 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   foreach(name ${UNITTESTS})
     qt4_wrap_cpp(${name}_MOC_SOURCES ${name}.h)
     vtk_module_test_executable(${name} ${name}.cxx ${${name}_MOC_SOURCES})
-    add_test(pvunit.${name} ${CXX_TEST_PATH}/${name})
+    add_test(NAME pvunit.${name}
+             COMMAND ${name})
     target_link_libraries(${name} ${QT_LIBRARIES})
   endforeach()
 endif()
