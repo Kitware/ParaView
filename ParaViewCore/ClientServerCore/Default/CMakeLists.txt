@@ -51,3 +51,8 @@ set_source_files_properties(
   ABSTRACT)
 
 vtk_module_library(vtkPVClientServerCoreDefault ${Module_SRCS})
+
+# for vtkPVFileInformation
+if (WIN32)
+  target_link_libraries(vtkPVClientServerCoreDefault mpr)
+endif()
