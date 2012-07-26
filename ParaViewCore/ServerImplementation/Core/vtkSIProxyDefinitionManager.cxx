@@ -1190,7 +1190,10 @@ void vtkSIProxyDefinitionManager::HandlePlugin(vtkPVPlugin* plugin)
       {
       for (size_t cc=0; cc < xmls.size(); cc++)
         {
-        this->LoadConfigurationXMLFromString(xmls[cc].c_str(), true);
+        this->LoadConfigurationXMLFromString(xmls[cc].c_str(),
+          // if GetPluginName() == vtkPVInitializerPlugin, it implies that it's
+          // the ParaView core and should not be treated as plugin.
+          strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") != 0);
         }
 
       // Make sure we invalidate any cached flatten version of our proxy definition
