@@ -319,11 +319,11 @@ else()
 
   # turn some module ON to avoid warnings from VTK.
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaViewCore ON CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaViewRendering ON CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaView ON CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE INTERNAL "" FORCE)
+  set (VTK_Group_ParaViewCore ON CACHE BOOL "")
+  set (VTK_Group_ParaViewRendering ON CACHE BOOL "")
+  set (VTK_Group_ParaView ON CACHE BOOL "")
+  set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
+  set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
 
   set (ParaViewModulesDirs
     Utilities/ProcessXML
