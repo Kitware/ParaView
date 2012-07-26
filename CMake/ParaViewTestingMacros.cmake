@@ -96,7 +96,7 @@ ENDFUNCTION (add_client_tests)
 FUNCTION (add_client_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CS"
     COMMAND
-       --server ${PARAVIEW_SERVER_EXECUTABLE}
+       --server $<TARGET_FILE:pvserver>
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
@@ -107,8 +107,8 @@ ENDFUNCTION (add_client_server_tests)
 FUNCTION (add_client_render_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
-       --data-server ${PARAVIEW_DATA_SERVER_EXECUTABLE}
-       --render-server ${PARAVIEW_RENDER_SERVER_EXECUTABLE}
+       --data-server $<TARGET_FILE:pvdataserver>
+       --render-server $<TARGET_FILE:pvrenderserver>
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
@@ -132,7 +132,7 @@ FUNCTION(add_multi_client_tests prefix)
       add_test(NAME "${prefix}.${test_name}"
         COMMAND smTestDriver
         --test-multi-clients
-        --server ${PARAVIEW_SERVER_EXECUTABLE}
+        --server $<TARGET_FILE:pvserver>
 
         --client ${CLIENT_EXECUTABLE}
         -dr
@@ -169,7 +169,7 @@ FUNCTION(add_multi_server_tests prefix nbServers)
       add_test(NAME "${prefix}.${test_name}"
         COMMAND smTestDriver
         --test-multi-servers ${nbServers}
-        --server ${PARAVIEW_SERVER_EXECUTABLE}
+        --server $<TARGET_FILE:pvserver>
 
         --client ${CLIENT_EXECUTABLE}
         -dr
@@ -197,7 +197,7 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
         add_test(NAME "${prefix}-${tdx}x${tdy}.${test_name}"
             COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
-            --server ${PARAVIEW_SERVER_EXECUTABLE}
+            --server $<TARGET_FILE:pvserver>
 
             --client ${CLIENT_EXECUTABLE}
             -dr
