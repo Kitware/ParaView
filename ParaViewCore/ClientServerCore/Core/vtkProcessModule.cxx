@@ -36,7 +36,7 @@
 #ifdef PARAVIEW_USE_MPI
 # include "vtkMPIController.h"
 # include "vtkPVMPICommunicator.h"
-# include <mpi.h>
+# include "vtkMPI.h"
 #endif
 
 #include <assert.h>
