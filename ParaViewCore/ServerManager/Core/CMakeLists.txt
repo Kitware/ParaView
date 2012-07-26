@@ -118,7 +118,7 @@ set (Module_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMDeserializer
-  vtkSMDomain.
+  vtkSMDomain
   vtkSMLink
   vtkSMPropertyHelper
   vtkSMProxyManager  # since New() is protected.
