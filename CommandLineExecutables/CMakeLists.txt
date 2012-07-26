@@ -28,31 +28,33 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+include (vtkForwardingExecutable)
+
 vtk_module_impl()
 vtk_module_export("")
 
 foreach (name pvserver pvdataserver pvrenderserver)
-  add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
+  vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
   #vtk_target_name(${name})
   #vtk_target_label(${name})
   #vtk_target_install(${name})
   if (NOT VTK_INSTALL_NO_RUNTIME)
     pv_executable_install(${name} "${exe_suffix}")
   endif()
-  target_link_libraries(${name}${exe_suffix}
+  target_link_libraries(${name}
     vtkPVServerManagerApplication)
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
   foreach (name pvbatch pvpython)
-    add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
+    vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
     #vtk_target_name(${name})
     #vtk_target_label(${name})
     #vtk_target_install(${name})
     if (NOT VTK_INSTALL_NO_RUNTIME)
       pv_executable_install(${name} "${exe_suffix}")
     endif()
-    target_link_libraries(${name}${exe_suffix}
+    target_link_libraries(${name}
       vtkPVServerManagerApplication
       vtkPVPythonSupport)
   endforeach()

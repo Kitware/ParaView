@@ -263,6 +263,17 @@ if (BUILD_TESTING)
   include(CTest)
 endif()
 
+# Setup default state for ParaView module groups.
+set (VTK_Group_ParaViewCore ON CACHE BOOL "")
+set (VTK_Group_ParaViewRendering ON CACHE BOOL "")
+set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
+set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
+set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
+
+# enable ParaView command line executables module.
+set (Module_pvCommandLineExecutables ON CACHE BOOL 
+  "Enable commandline (pvserver, pvbatch, etc.) executables")
+
 #------------------------------------------------------------------------------
 
 include_directories(${ParaView_BINARY_DIR})
@@ -321,12 +332,6 @@ else()
 
   # turn some module ON to avoid warnings from VTK.
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
-  set (VTK_Group_ParaViewCore ON CACHE BOOL "")
-  set (VTK_Group_ParaViewRendering ON CACHE BOOL "")
-  set (VTK_Group_ParaView ON CACHE BOOL "")
-  set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
-  set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
-  set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
   set (ParaViewModulesDirs
     Utilities/ProcessXML

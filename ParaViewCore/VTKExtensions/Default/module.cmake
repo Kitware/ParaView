@@ -16,8 +16,6 @@
 #endif()
 
 vtk_module(vtkPVVTKExtensionsDefault
-  GROUPS
-    ParaView
   DEPENDS
     vtkFiltersAMR
     vtkFiltersParallelStatistics

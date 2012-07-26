@@ -3,8 +3,6 @@ if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND __depends vtkPVPythonSupport)
 endif()
 vtk_module(pvCommandLineExecutables
-  GROUPS
-    ParaView
   DEPENDS
     vtkPVServerManagerApplication
     ${__depends}

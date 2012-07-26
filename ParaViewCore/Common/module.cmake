@@ -1,6 +1,6 @@
 vtk_module(vtkPVCommon
   GROUPS
-    ParaView
+    ParaViewCore
   DEPENDS
     vtkCommonCore
     vtkIOXML
