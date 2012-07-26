@@ -24,7 +24,6 @@
 #include "vtkPython.h"  // needed before including cppythonmodules.h
 #include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
-#include "pvpython.h"
 #include "vtkSMProperty.h"
 
 #define EXCLUDE_LOAD_ALL_FUNCTION

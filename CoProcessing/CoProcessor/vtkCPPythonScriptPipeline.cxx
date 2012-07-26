@@ -18,7 +18,6 @@
 #include "vtkCPDataDescription.h"
 #include "vtkCPPythonHelper.h"
 #include "vtkDataObject.h"
-#include "vtkInitializationHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVPythonInterpretor.h"

@@ -59,6 +59,7 @@ set (Module_SRCS
   vtkPVPluginTracker.cxx
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
+  vtkPVPythonOptions.cxx
   vtkPVPythonPluginInterface.cxx
   vtkPVServerInformation.cxx
   vtkPVServerManagerPluginInterface.cxx

@@ -45,8 +45,7 @@ endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
   foreach (name pvbatch pvpython)
-    add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx
-      vtkPVPythonOptions.cxx)
+    add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
     #vtk_target_name(${name})
     #vtk_target_label(${name})
     #vtk_target_install(${name})

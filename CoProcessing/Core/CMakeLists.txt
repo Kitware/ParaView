@@ -29,44 +29,13 @@
 #
 #==========================================================================
 set (Modules_SRCS
-  vtkCPCxxHelper.cxx
-  vtkCPProcessor.cxx
-  CPSystemInformation.h
+  vtkCPDataDescription.cxx
+  vtkCPInputDataDescription.cxx
+  vtkCPPipeline.cxx
 )
 
-if (PARAVIEW_ENABLE_PYTHON)
-  list(APPEND Modules_SRCS
-    vtkCPPythonHelper.cxx
-    vtkCPPythonScriptPipeline.cxx)
+set_source_files_properties(
+  vtkCPPipeline
+  ABSTRACT)
 
-  include_directories(
-  "${VTK_SOURCE_DIR}/Wrapping/Python"
-  "${VTK_BINARY_DIR}/Wrapping/Python")
-  set(VTK_WRAP_PYTHON_FIND_LIBS ON)
-  include (vtkWrapPython)
-  include_directories("${PYTHON_INCLUDE_PATH}")
-endif (PARAVIEW_ENABLE_PYTHON)
-
-if(PARAVIEW_USE_MPI)
-  set(COPROCESSOR_USE_MPI 1)
-endif(PARAVIEW_USE_MPI)
-
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CPSystemInformation.h.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CPSystemInformation.h"
-    @ONLY IMMEDIATE)
-
-vtk_module_library(${vtk-module}
-  ${Modules_SRCS})
-
-if (PARAVIEW_ENABLE_PYTHON)
-  SET(PYTHON_MODULE_PREFIX "")
-  PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/cppythonmodules.h)
-  GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
-  IF(PY_STATIC_MODULES_LIST)
-    TARGET_LINK_LIBRARIES(${vtk-module} ${PY_STATIC_MODULES_LIST})
-  ENDIF(PY_STATIC_MODULES_LIST)
-endif()
-
-if (BUILD_TESTING)
-  add_subdirectory(Testing/TestDriver)
-endif ()
+vtk_module_library(${vtk-module} ${Modules_SRCS})

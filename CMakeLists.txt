@@ -355,6 +355,9 @@ else()
     Qt/Components
     Qt/Python
     Qt/ApplicationComponents
+
+    CoProcessing/Core
+    CoProcessing/CoProcessor
   )
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs

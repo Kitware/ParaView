@@ -1,3 +1,4 @@
+set (CoProcessing_BINARY_DIR ${ParaView_BINARY_DIR}/CoProcessing)
 include_directories(
   ${TestDriver_SOURCE_DIR}
   )
@@ -5,6 +6,8 @@ include_directories(
 IF (COPROCESSOR_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF (COPROCESSOR_USE_MPI)
+
+vtk_module_test()
 
 # below is for doing image comparisons
 # they are not done directly in the above python script due to the fact
