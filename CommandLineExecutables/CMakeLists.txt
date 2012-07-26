@@ -61,27 +61,3 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 #FIXME:MODULARIZATION -- link line for plugins when doing static builds.
-
-
-#------------------------------------------------------------------------
-## FIXME:MODULARIZATION -- NEED TO VERIFY THIS
-## We setup the CPack scripts for packaging the server.
-## This comes in handy when the Qt client is not built, or we want to package
-## the server executables alone (pvpython, pvbatch as well, if python was
-## enabled).
-#include(ParaViewBrandingCPack)
-## Install ParaView client
-#build_paraview_client_cpack_config_init(
-#    PACKAGE_NAME "ParaViewServers"
-#    ORGANIZATION "Kitware Inc."
-#    VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
-#    VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-#    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
-#    DESCRIPTION "ParaView is a scientific visualization tool"
-#    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-#    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-#)
-#
-#SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
-#  ${CPACK_INSTALL_CMAKE_PROJECTS})
-#build_paraview_client_cpack_config()
