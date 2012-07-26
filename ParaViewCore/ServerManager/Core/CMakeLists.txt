@@ -108,6 +108,7 @@ set (Module_SRCS
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
+  vtkSMUncheckedPropertyHelper.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoStackBuilder.cxx
   vtkSMUndoStack.cxx
@@ -126,6 +127,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMSession
   vtkSMSessionProxyManager # since New() is non-standard.
   vtkSMStateVersionControllerBase
+  vtkSMUncheckedPropertyHelper
   vtkSMUndoElement
   vtkSMVectorProperty
   ABSTRACT
@@ -133,6 +135,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMPropertyHelper
+  vtkSMUncheckedPropertyHelper
   WRAP_EXCLUDE)
 
 vtk_module_library(vtkPVServerManagerCore ${Module_SRCS})

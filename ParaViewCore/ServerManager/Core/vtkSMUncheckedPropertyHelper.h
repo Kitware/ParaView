@@ -22,17 +22,9 @@
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMUncheckedPropertyHelper : public vtkSMPropertyHelper
 {
 public:
-  vtkSMUncheckedPropertyHelper(vtkSMProxy *proxy, const char *name, bool quiet = false)
-    : vtkSMPropertyHelper(proxy, name, quiet)
-  {
-    setUseUnchecked(true);
-  }
-
-  vtkSMUncheckedPropertyHelper(vtkSMProperty *property, bool quiet = false)
-    : vtkSMPropertyHelper(property, quiet)
-  {
-    setUseUnchecked(true);
-  }
+  vtkSMUncheckedPropertyHelper(
+    vtkSMProxy *proxy, const char *name, bool quiet = false);
+  vtkSMUncheckedPropertyHelper(vtkSMProperty *property, bool quiet = false);
 
 private:
   vtkSMUncheckedPropertyHelper(const vtkSMUncheckedPropertyHelper&); // Not implemented
