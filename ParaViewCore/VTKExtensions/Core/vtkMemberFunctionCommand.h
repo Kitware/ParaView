@@ -66,11 +66,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkCallbackCommand
 
 #include "vtkCommand.h"
-#include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 template<class ClassT>
-class VTKPVVTKEXTENSIONSCORE_EXPORT vtkMemberFunctionCommand :
-  public vtkCommand
+class vtkMemberFunctionCommand : public vtkCommand
 {
   typedef vtkMemberFunctionCommand<ClassT> ThisT;
 
