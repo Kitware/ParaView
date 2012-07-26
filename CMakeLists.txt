@@ -315,17 +315,6 @@ else()
   set(VTK_WRAP_PYTHON ${PARAVIEW_ENABLE_PYTHON}
     CACHE INTERNAL "Should VTK Python wrapping be built?" FORCE)
 
-  # provide option to disable VTK testing
-  option(PARAVIEW_DISABLE_VTK_TESTING "Disable VTK Testing" OFF)
-  mark_as_advanced(PARAVIEW_DISABLE_VTK_TESTING)
-
-  set (__pv_build_testing ${BUILD_TESTING})
-  set (__pv_build_examples ${BUILD_EXAMPLES})
-  if (PARAVIEW_DISABLE_VTK_TESTING)
-    set (BUILD_TESTING OFF)
-    set (BUILD_EXAMPLES OFF)
-  endif()
-
   # FIXME: How do we handle this when using external VTK? We can't and hence we
   # need a better mechanism.
   set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Disbale Python Threads support" FORCE)
@@ -422,10 +411,6 @@ else()
     VTK_USE_TK
     VTK_WRAP_JAVA
     VTK_WRAP_TCL)
-
-  # restore state
-  set (BUILD_TESTING ${__pv_build_testing})
-  set (BUILD_EXAMPLES ${__pv_build_examples})
 
   include(${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake)
 endif()
