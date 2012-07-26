@@ -1,9 +1,17 @@
 vtk_module(vtkPVServerManagerDefault
   DEPENDS
-    vtkPVServerManagerRendering
-    vtkPVServerImplementationDefault
-    vtkTestingRendering
+    vtkFiltersCosmo
+    vtkFiltersFlowPaths
+    vtkFiltersTexture
     vtkIOExport
+    vtkIOImage
+    vtkIONetCDF
+    vtkIOParallelLSDyna
+    vtkIOVPIC
+    vtkPVServerImplementationDefault
+    vtkPVServerManagerRendering
+    vtkRenderingHybridOpenGL
+    vtkTestingRendering
   TEST_DEPENDS
     vtkPVServerManagerApplication
 )

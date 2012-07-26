@@ -444,7 +444,8 @@ add_subdirectory(Wrapping/Python)
 
 #------------------------------------------------------------------------------
 add_subdirectory(Documentation)
-#add_subdirectory(Plugins)
+set (PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins")
+add_subdirectory(Plugins)
 add_subdirectory(Applications)
 
 #------------------------------------------------------------------------------

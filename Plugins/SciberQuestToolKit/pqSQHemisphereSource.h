@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #define pqSQHemisphereSource_h
 
 #include "pqNamedObjectPanel.h"
-#include "pqComponentsExport.h"// no comment
 #include <vector>// no comment
 
 #include "ui_pqSQHemisphereSourceForm.h"//  no comment

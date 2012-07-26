@@ -70,7 +70,8 @@ ADD_PARAVIEW_AUTO_START(
 ADD_CUSTOM_COMMAND(
   OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/cp_export_py.cxx"
   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/cp_export.py"
-  COMMAND ${VTK_ENCODESTRING_EXE}
+          vtkEncodeString
+  COMMAND vtkEncodeString
   ARGS "${CMAKE_CURRENT_BINARY_DIR}/cp_export_py.cxx"
        "${CMAKE_CURRENT_SOURCE_DIR}/cp_export.py"
        cp_export_py)

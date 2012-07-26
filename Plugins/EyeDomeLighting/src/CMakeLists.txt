@@ -36,8 +36,8 @@ foreach(file ${GLSL_SRCS})
   set(res ${CMAKE_CURRENT_BINARY_DIR}/${file}.cxx)
   add_custom_command(
     OUTPUT ${res}
-    DEPENDS ${src}
-    COMMAND ${VTK_ENCODESTRING_EXE}
+    DEPENDS ${src} vtkEncodeString
+    COMMAND vtkEncodeString
     ARGS ${res} ${src} ${file}
     )
   set(EXTRA_SRCS ${EXTRA_SRCS} ${res})
