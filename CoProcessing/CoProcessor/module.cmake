@@ -5,7 +5,7 @@ endif()
 
 vtk_module(vtkCoProcessor
   GROUPS
-    ParaViewCoProcessor
+    CoProcessing
   DEPENDS
     vtkCoProcessorCore
     vtkPVServerManagerApplication

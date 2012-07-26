@@ -198,6 +198,19 @@ FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   ${ParaView_SOURCE_DIR}/../ParaViewData
   ${ParaView_BINARY_DIR}/../ParaViewData
   $ENV{PARAVIEW_DATA_ROOT})
+
+# CoProcessing related options.
+# I am keeping them as they were, we can propobably minimize these as well.
+option(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." ON)
+cmake_dependent_option(BUILD_FORTRAN_COPROCESSING_ADAPTORS
+  "Build a coprocessing adaptor that can be called from Fortran or C" OFF
+  "PARAVIEW_ENABLE_COPROCESSING" OFF)
+cmake_dependent_option(BUILD_PARTICLE_COPROCESSING_ADAPTORS
+  "Build a coprocessing adaptor that renders particle systems" OFF
+  "PARAVIEW_ENABLE_COPROCESSING" OFF)
+mark_as_advanced(BUILD_PARTICLE_COPROCESSING_ADAPTORS)
+mark_as_advanced(BUILD_FORTRAN_COPROCESSING_ADAPTORS)
+
 #------------------------------------------------------------------------------
 
 
@@ -324,6 +337,7 @@ else()
   set (VTK_Group_ParaView ON CACHE BOOL "")
   set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
   set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
+  set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
   set (ParaViewModulesDirs
     Utilities/ProcessXML
@@ -355,14 +369,29 @@ else()
     Qt/Components
     Qt/Python
     Qt/ApplicationComponents
-
-    CoProcessing/Core
-    CoProcessing/CoProcessor
   )
+
   if (PARAVIEW_USE_ICE_T)
     list(APPEND ParaViewModulesDirs
       ThirdParty/IceT)
   endif()
+
+  if (PARAVIEW_ENABLE_COPROCESSING)
+    list (APPEND ParaViewModulesDirs
+      CoProcessing/Core
+      CoProcessing/CoProcessor)
+  endif()
+
+  if (BUILD_FORTRAN_COPROCESSING_ADAPTORS)
+    list (APPEND ParaViewModulesDirs
+      CoProcessing/Adaptors/FortranAdaptors)
+  endif()
+
+  if (BUILD_PARTICLE_COPROCESSING_ADAPTORS)
+    list (APPEND ParaViewModulesDirs
+      CoProcessing/Adaptors/ParticleAdaptor)
+  endif()
+
   if (BUILD_TESTING)
     list (APPEND  ParaViewModulesDirs
     Utilities/TestDriver)
@@ -380,6 +409,7 @@ else()
   # keep VTK cmake variables from polluting the non-advanced space.
   mark_as_advanced(
     VTK_EXTRA_COMPILER_WARNINGS
+    VTK_Group_CoProcessing
     VTK_Group_Imaging
     VTK_Group_MPI
     VTK_Group_ParaView
