@@ -20,9 +20,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVSessionServer.h"
 #include "vtkPVConfig.h"
 
-#ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
-#endif
+//#ifndef BUILD_SHARED_LIBS
+//#include "pvStaticPluginsInit.h"
+//#endif
 
 static bool RealMain(int argc, char* argv[],
   vtkProcessModule::ProcessTypes type)
@@ -43,10 +43,10 @@ static bool RealMain(int argc, char* argv[],
     return 1;
     }
 
-  // load static plugins
-#ifndef BUILD_SHARED_LIBS
-  paraview_static_plugins_init();
-#endif
+//  // load static plugins
+//#ifndef BUILD_SHARED_LIBS
+//  paraview_static_plugins_init();
+//#endif
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkMultiProcessController* controller = pm->GetGlobalController();
