@@ -272,7 +272,7 @@ set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
 # enable ParaView command line executables module.
 set (Module_pvCommandLineExecutables ON CACHE BOOL 
-  "Enable commandline (pvserver, pvbatch, etc.) executables")
+  "Enable commandline (pvserver, pvbatch, etc.) executables" FORCE)
 
 #------------------------------------------------------------------------------
 
