@@ -9,4 +9,5 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkRenderingLabel
     vtkViewsContext2D
     vtkViewsCore
+    vtkRenderingVolumeOpenGL
 )

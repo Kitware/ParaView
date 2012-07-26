@@ -22,6 +22,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkInteractionStyle
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
+    vtkRenderingFreeTypeOpenGL
     vtkRenderingParallel
     ${__dependencies}
   COMPILE_DEPENDS
