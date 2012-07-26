@@ -20,12 +20,12 @@ class vtkDataSet;
 class vtkFieldData;
 
 #include "vtkObject.h"
-#include "CPWin32Header.h" // For windows import/export of shared libraries
+#include "vtkCoProcessorCoreModule.h" // For windows import/export of shared libraries
 
 /// @ingroup CoProcessing
 /// This class provides the data description for each input for the coprocessor
 /// pipelines.
-class COPROCESSING_EXPORT vtkCPInputDataDescription : public vtkObject
+class VTKCOPROCESSORCORE_EXPORT vtkCPInputDataDescription : public vtkObject
 {
 public:
   static vtkCPInputDataDescription* New();

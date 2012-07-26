@@ -16,7 +16,7 @@
 #define vtkCPDataDescription_h
 
 #include "vtkObject.h"
-#include "CPWin32Header.h" // For windows import/export of shared libraries
+#include "vtkCoProcessorCoreModule.h" // needed for exports
 
 class vtkFieldData;
 class vtkCPInputDataDescription;
@@ -24,7 +24,7 @@ class vtkCPInputDataDescription;
 /// @ingroup CoProcessing
 /// This class provides the description of the data for the coprocessor
 /// pipelines.
-class COPROCESSING_EXPORT vtkCPDataDescription : public vtkObject
+class VTKCOPROCESSORCORE_EXPORT vtkCPDataDescription : public vtkObject
 {
 public:
   static vtkCPDataDescription* New();
