@@ -17,7 +17,16 @@ TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
   vtkTestingRendering
   vtkRenderingOpenGL
   vtkRenderingFreeTypeOpenGL
-  vtkInteractionStyle)
+  vtkInteractionStyle
+  vtkIOImage
+  )
+
+if (PARAVIEW_USE_MPI)
+  # FIXME: not sure this is the right fix, w.o. this I am getting some missing
+  # ...AutoInit build errors.
+  TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
+    vtkIOMPIImage)
+endif()
 
 # specify the real executable path since this gets
 # put in different places on different architectures.

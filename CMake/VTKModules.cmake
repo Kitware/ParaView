@@ -1,20 +1,13 @@
 #########################################################################
-# This file turns on the modules needed by ParaView
-include (vtkDependentOption)
+# This file is included in ParaView/ParaViewCore/ServerManager/Default
+# to ensure all ParaView needed modules are turned on when building the complete
+# application.
 
-# First turn of stand alone group
-set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_Group_StandAlone)
-set(VTK_Group_Rendering OFF CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_Group_Rendering)
-
-# The VTK modules needed when MPI is turned on
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
   vtkIOMPIImage
   vtkFiltersParallelMPI
-  vtkFiltersParallelTracers
   # Note: Not in ParaViewXXX.xml but required by a test.
   # Needed for:
   #  vtkPStreamTracer
@@ -23,20 +16,6 @@ set(_vtk_mpi_modules
   # Needed for:
   #  vtkPNetCDFPOPReader
   )
-
-# Turn on based on the value of PARAVIEW_USE_MPI
-foreach(_mod ${_vtk_mpi_modules})
-  set(_full_name Module_${_mod})
-  set(${_full_name} ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
-  mark_as_advanced(${_full_name})
-endforeach()
-
-# Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
-set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_COSMOS_USE_MPI)
-set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_VPIC_USE_MPI)
-
 
 set(_vtk_modules
   # VTK modules which ParaView has a explicity compile
@@ -83,13 +62,6 @@ set(_vtk_modules
   # ParaViewSources.xml
   # ParaViewWriters.xml
   #
-  # Note: Some are duplicates of the above, but they are listed to record the
-  # implicit dependancy
-  vtkAMRCore
-  # Needed for:
-  #  vtkAMRResampleFilter
-  #  vtkAMRCutPlane
-  #  vtkAMRGaussianPulseSource
 
   vtkCommonExecutionModel
   # Needed for:
@@ -347,44 +319,10 @@ set(_vtk_modules
   #  vtkMoleculeRepresentation
   )
 
-if(PARAVIEW_USE_PYTHON)
-  # Needed for python wrapping
-  list(APPEND _vtk_modules vtkWrappingPython)
-endif()
-
 if(PARAVIEW_USE_PISTON)
   list(APPEND _vtk_modules vtkAcceleratorsPiston)
 endif() 
 
-# Are we building the GUI
-
-set (PARAVIEW_BUILD_QT_GUI_NOT TRUE)
-if (PARAVIEW_BUILD_QT_GUI)
-  set (PARAVIEW_BUILD_QT_GUI_NOT FALSE)
+if (PARAVIEW_USE_MPI)
+  list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()
-
-VTK_DEPENDENT_OPTION(PARAVIEW_ENABLE_QT_SUPPORT
-  "Build ParaView with Qt support (without GUI)" OFF
-  "PARAVIEW_BUILD_QT_GUI_NOT" ON)
-
-set(Module_vtkGUISupportQt ${PARAVIEW_ENABLE_QT_SUPPORT} CACHE BOOL "" FORCE)
-mark_as_advanced(Module_vtkGUISupportQt)
-
-# Modules needed if testing is on
-# Note: Again there may be duplicated this intended to record the dependancy
-if(BUILD_TESTING)
-  list(APPEND _vtk_modules
-    vtkFiltersProgrammable)
-endif()
-
-if(BUILD_EXAMPLES)
-  list(APPEND _vtk_modules
-    vtkTestingCore)
-endif()
-
-# Now enable the modules
-foreach(_mod ${_vtk_modules})
-  set(_full_name Module_${_mod})
-  set(${_full_name} ON CACHE BOOL "" FORCE)
-  mark_as_advanced(${_full_name})
-endforeach()

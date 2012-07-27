@@ -145,7 +145,7 @@ if(NOT PV_INSTALL_PLUGIN_DIR)
 endif()
 
 #set (VTK_INSTALL_NO_LIBRARIES TRUE)
-#set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
 
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
@@ -273,6 +273,12 @@ set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 # enable ParaView command line executables module.
 set (Module_pvCommandLineExecutables ON CACHE BOOL 
   "Enable commandline (pvserver, pvbatch, etc.) executables" FORCE)
+
+# Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
+set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
+mark_as_advanced(VTK_COSMOS_USE_MPI)
+set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
+mark_as_advanced(VTK_VPIC_USE_MPI)
 
 #------------------------------------------------------------------------------
 
