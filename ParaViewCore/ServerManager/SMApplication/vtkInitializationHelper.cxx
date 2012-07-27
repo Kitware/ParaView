@@ -77,8 +77,6 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  PARAVIEW_INITIALIZE();
-
   vtkProcessModule::Initialize(
     static_cast<vtkProcessModule::ProcessTypes>(type), argc, argv);
 
@@ -111,6 +109,10 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     }
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);
+
+  // this has to happen after process module is initialized and options have
+  // been set.
+  PARAVIEW_INITIALIZE();
 
   // Set multi-server flag to vtkProcessModule
   vtkProcessModule::GetProcessModule()->SetMultipleSessionsSupport(
