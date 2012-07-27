@@ -447,6 +447,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     this->Ui->PropertiesLayout->removeWidget(item.PropertyWidget);
     delete item.PropertyWidget;
     }
+
+  // remove spacer item
+  this->Ui->PropertiesLayout->removeItem(
+    this->Ui->PropertiesLayout->itemAtPosition(
+      this->Ui->PropertiesLayout->rowCount() - 1, 0));
+
   this->ProxyPropertyItems.clear();
 
   // update group box name
@@ -570,6 +576,14 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
                   this, SLOT(proxyPropertyChanged()));
     }
 
+  // add spacer item
+  this->Ui->PropertiesLayout->addItem(new QSpacerItem(0,
+                                                   0,
+                                                   QSizePolicy::Minimum,
+                                                   QSizePolicy::Expanding),
+                                   this->Ui->PropertiesLayout->rowCount(),
+                                   0);
+
   // update advanced state
   this->advancedButtonToggled(this->Ui->AdvancedButton->isChecked());
 
@@ -607,6 +621,11 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
   this->Representation = repr;
 
+  // remove spacer item
+  this->Ui->DisplayLayout->removeItem(
+    this->Ui->DisplayLayout->itemAtPosition(
+      this->Ui->DisplayLayout->rowCount() - 1, 0));
+
   // remove old property widgets
   foreach(const pqPropertiesPanelItem &item, this->RepresentationPropertyItems)
     {
@@ -619,6 +638,7 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     this->Ui->DisplayLayout->removeWidget(item.PropertyWidget);
     delete item.PropertyWidget;
     }
+
   this->RepresentationPropertyItems.clear();
 
   // update group box name
@@ -686,6 +706,14 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
         }
       }
     }
+
+  // add spacer item
+  this->Ui->DisplayLayout->addItem(new QSpacerItem(0,
+                                                   0,
+                                                   QSizePolicy::Minimum,
+                                                   QSizePolicy::Expanding),
+                                   this->Ui->DisplayLayout->rowCount(),
+                                   0);
 
   // connect to representation type changed signal
   this->RepresentationTypeSignal->Disconnect();
