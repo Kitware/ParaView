@@ -431,6 +431,13 @@
          </item>
         </layout>
        </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="EnableOpacityFunction">
+         <property name="text">
+          <string>Enable Opacity Function</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="LegendPage">

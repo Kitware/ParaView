@@ -1,82 +1,69 @@
 <ServerManagerConfiguration>
   <!-- We put all 3D widget definitions in this file -->
   <ProxyGroup name="representations">
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="HandleWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="HandleWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
       <SubProxy>
-
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="HandleRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="HandleRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
           <Property name="WorldPositionInfo" />
           <Property name="WorldPosition" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="HandleWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="HandleWidget"></Proxy>
       </SubProxy>
-
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="PointSourceWidgetRepresentation"
-      base_proxygroup="representations" base_proxyname="HandleWidgetRepresentation"
-      class="vtk3DWidgetRepresentation" >
+    <NewWidgetRepresentationProxy base_proxygroup="representations"
+                                  base_proxyname="HandleWidgetRepresentation"
+                                  class="vtk3DWidgetRepresentation"
+                                  name="PointSourceWidgetRepresentation">
       <!--
         This is same as handle widget except that it provides
         dummy properties for the radius/number of points in a point
         source.
       -->
-      <DoubleVectorProperty
-        name="Radius"
-        number_of_elements="1"
-        default_values="1.0">
-        <DoubleRangeDomain name="range" min="0" />
+      <DoubleVectorProperty default_values="1.0"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="NumberOfPoints"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+      <IntVectorProperty default_values="1"
+                         name="NumberOfPoints"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
       </IntVectorProperty>
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="LineWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="LineWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="LineRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="LineRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
           <Property name="Point1WorldPositionInfo" />
@@ -87,52 +74,45 @@
           <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="LineWidget2">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="LineWidget2"></Proxy>
         <ExposedProperties>
           <Property name="ProcessEvents" />
         </ExposedProperties>
       </SubProxy>
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="LineSourceWidgetRepresentation"
-      class="vtk3DWidgetRepresentation"
-      base_proxygroup="representations" base_proxyname="LineWidgetRepresentation">
+    <NewWidgetRepresentationProxy base_proxygroup="representations"
+                                  base_proxyname="LineWidgetRepresentation"
+                                  class="vtk3DWidgetRepresentation"
+                                  name="LineSourceWidgetRepresentation">
       <!--
         This is same as LineWidgetRepresentation except that it provides
         dummy property for the resolution for the line source.
       -->
-      <IntVectorProperty
-        name="Resolution"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="1" />
+      <IntVectorProperty default_values="1"
+                         name="Resolution"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
       </IntVectorProperty>
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="ImplicitPlaneWidgetRepresentation"
-      class="vtk3DWidgetRepresentation" >
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ImplicitPlaneWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations"
-          proxyname="ImplicitPlaneRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="ImplicitPlaneRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="DrawPlane" />
           <Property name="OriginInfo" />
@@ -145,39 +125,30 @@
           <Property name="Reset" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="ImplicitPlaneWidget2">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="ImplicitPlaneWidget2"></Proxy>
       </SubProxy>
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="DistanceWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="DistanceWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="UseNonCompositedRenderer"
-        command="SetUseNonCompositedRenderer"
-        number_of_elements="1"
-        default_values="1">
-      </IntVectorProperty>
-
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"></IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop2D"
-          proxygroup="3d_widget_representations"
-          proxyname="DistanceRepresentation2D">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="DistanceRepresentation2D"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
           <Property name="Point1WorldPositionInfo" />
@@ -187,39 +158,31 @@
           <Property name="PlaceWidget" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="DistanceWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="DistanceWidget"></Proxy>
         <ExposedProperties>
           <Property name="ProcessEvents" />
         </ExposedProperties>
       </SubProxy>
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="BoxWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-      <Documentation>
-        Representation proxy for the the box widget. This includes the
-        widget/representation proxies for the box 3D widget.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="BoxWidgetRepresentation">
+      <Documentation>Representation proxy for the the box widget. This includes
+      the widget/representation proxies for the box 3D widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="BoxRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="BoxRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="PlaceFactor" />
           <Property name="PlaceWidget" />
@@ -232,38 +195,30 @@
           <Property name="ScaleInfo" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="BoxWidget2">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="BoxWidget2"></Proxy>
       </SubProxy>
-
       <!-- End of BoxWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="SphereWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-      <Documentation>
-        Representation proxy for the the sphere widget. This includes the
-        widget/representation proxies for the sphere 3D widget.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="SphereWidgetRepresentation">
+      <Documentation>Representation proxy for the the sphere widget. This
+      includes the widget/representation proxies for the sphere 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="SphereRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="SphereRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
@@ -277,34 +232,27 @@
           <Property name="HandleDirection" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="SphereWidget2">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="SphereWidget2"></Proxy>
       </SubProxy>
-
       <!-- End of SphereWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="SliderWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="SliderWidgetRepresentation">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="SliderRepresentation3D">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="SliderRepresentation3D"></Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
           <Property name="ValueInfo" />
@@ -315,37 +263,30 @@
           <Property name="MaximumValue" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="SliderWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="SliderWidget"></Proxy>
       </SubProxy>
       <!--- End of SliderWidgetRepresentaion -->
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="SplineWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-      <Documentation>
-        Representation proxy for the the spline widget. This includes the
-        widget/representation proxies for the sphere 3D widget.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="SplineWidgetRepresentation">
+      <Documentation>Representation proxy for the the spline widget. This
+      includes the widget/representation proxies for the sphere 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations" proxyname="SplineRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="SplineRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
@@ -355,39 +296,30 @@
           <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="SplineWidget2">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="SplineWidget2"></Proxy>
       </SubProxy>
-
       <!-- End of SplineWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <NewWidgetRepresentationProxy name="ContourWidgetRepresentation"
-      class="vtk3DWidgetRepresentation">
-      <Documentation>
-        Representation proxy for the the Contour widget. This includes the
-        widget/representation proxies for the sphere 3D widget.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <NewWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                  name="ContourWidgetRepresentation">
+      <Documentation>Representation proxy for the the Contour widget. This
+      includes the widget/representation proxies for the sphere 3D
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="3d_widget_representations"
-          proxyname="OrientedGlyphContourRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="OrientedGlyphContourRepresentation"></Proxy>
         <ExposedProperties>
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
@@ -402,69 +334,56 @@
           <Property name="ClosedLoop" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="ContourWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="ContourWidget"></Proxy>
         <ExposedProperties>
           <Property name="CloseLoop" />
           <Property name="WidgetState" />
           <Property name="WidgetStateInfo" />
           <Property name="AllowNodePicking" />
           <Property name="Initialize" />
-          <Property name="ProcessEvents"/>
+          <Property name="ProcessEvents" />
         </ExposedProperties>
       </SubProxy>
-
       <!-- End of ContourWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation"
-        class="vtk3DWidgetRepresentation">
-      <Documentation>
-        ScalarBarWidgetRepresentation is a representation for a scalar bar
-        including a widget to control the position and orientation of the scalar
-        bar.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <ScalarBarWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                        name="ScalarBarWidgetRepresentation">
+      <Documentation>ScalarBarWidgetRepresentation is a representation for a
+      scalar bar including a widget to control the position and orientation of
+      the scalar bar.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="UseNonCompositedRenderer"
-        command="SetUseNonCompositedRenderer"
-        number_of_elements="1"
-        default_values="1">
-      </IntVectorProperty>
-
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"></IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop2D"
-          proxygroup="3d_widget_representations"
-          proxyname="ScalarBarRepresentation" >
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="ScalarBarRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Visibility"/>
-          <Property name="Position"/>
-          <Property name="Position2"/>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Position2" />
           <Property name="Orientation" />
-          <Property name="PositionInfo"/>
-          <Property name="Position2Info"/>
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
           <Property name="OrientationInfo" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Prop2DActor"
-               proxygroup="annotations" proxyname="ScalarBarActor">
-        </Proxy>
+               proxygroup="annotations"
+               proxyname="ScalarBarActor"></Proxy>
         <ExposedProperties>
           <Property name="LookupTable" />
           <Property name="Title" />
@@ -474,28 +393,27 @@
           <Property name="NumberOfLabels" />
           <Property name="AspectRatio" />
           <!-- properties for Label -->
-          <Property name="LabelColor"     />
-          <Property name="LabelOpacity"   />
-          <Property name="LabelFontFamily"/>
-          <Property name="LabelBold"      />
-          <Property name="LabelItalic"    />
-          <Property name="LabelShadow"    />
-          <Property name="LabelFontSize"  />
+          <Property name="LabelColor" />
+          <Property name="LabelOpacity" />
+          <Property name="LabelFontFamily" />
+          <Property name="LabelBold" />
+          <Property name="LabelItalic" />
+          <Property name="LabelShadow" />
+          <Property name="LabelFontSize" />
           <!-- properties for Title -->
-          <Property name="TitleColor"     />
-          <Property name="TitleOpacity"   />
-          <Property name="TitleFontFamily"/>
-          <Property name="TitleBold"      />
-          <Property name="TitleItalic"    />
-          <Property name="TitleShadow"    />
-          <Property name="TitleFontSize"  />
+          <Property name="TitleColor" />
+          <Property name="TitleOpacity" />
+          <Property name="TitleFontFamily" />
+          <Property name="TitleBold" />
+          <Property name="TitleItalic" />
+          <Property name="TitleShadow" />
+          <Property name="TitleFontSize" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-               proxygroup="3d_widgets" proxyname="ScalarBarWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="ScalarBarWidget"></Proxy>
         <ExposedProperties>
           <Property name="Selectable" />
           <Property name="Resizable" />
@@ -503,193 +421,159 @@
         </ExposedProperties>
       </SubProxy>
     </ScalarBarWidgetRepresentationProxy>
-
     <!-- ================================================================== -->
-    <TextWidgetRepresentationProxy name="TextWidgetRepresentation"
-      class="vtk3DWidgetRepresentation" >
-      <Documentation>
-        TextWidgetRepresentation is a representation for text widget as well as
-        the representation for the text shown in the widget.
-      </Documentation>
-
-      <IntVectorProperty name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable/Disable widget interaction.
-        </Documentation>
+    <TextWidgetRepresentationProxy class="vtk3DWidgetRepresentation"
+                                   name="TextWidgetRepresentation">
+      <Documentation>TextWidgetRepresentation is a representation for text
+      widget as well as the representation for the text shown in the
+      widget.</Documentation>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Enable/Disable widget interaction.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="UseNonCompositedRenderer"
-        command="SetUseNonCompositedRenderer"
-        number_of_elements="1"
-        default_values="1">
-      </IntVectorProperty>
-
+      <IntVectorProperty command="SetUseNonCompositedRenderer"
+                         default_values="1"
+                         name="UseNonCompositedRenderer"
+                         number_of_elements="1"></IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop2D"
-          proxygroup="3d_widget_representations" proxyname="TextRepresentation">
-        </Proxy>
+               proxygroup="3d_widget_representations"
+               proxyname="TextRepresentation"></Proxy>
         <ExposedProperties>
-          <Property name="Visibility"/>
-          <Property name="Text"/>
-          <Property name="Position"/>
-          <Property name="Position2"/>
-          <Property name="PositionInfo"/>
-          <Property name="Position2Info"/>
-          <Property name="WindowLocation"/>
-          <Property name="TextActor"/>
+          <Property name="Visibility" />
+          <Property name="Text" />
+          <Property name="Position" />
+          <Property name="Position2" />
+          <Property name="PositionInfo" />
+          <Property name="Position2Info" />
+          <Property name="WindowLocation" />
+          <Property name="TextActor" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Prop2DActor"
-          proxygroup="props" proxyname="TextActor">
-        </Proxy>
+               proxygroup="props"
+               proxyname="TextActor"></Proxy>
         <ExposedProperties>
-          <Property name="TextScaleMode"/>
-          <Property name="TextProperty"/>
+          <Property name="TextScaleMode" />
+          <Property name="TextProperty" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Prop2DProperty"
-          proxygroup="properties" proxyname="TextProperty">
-        </Proxy>
-
+               proxygroup="properties"
+               proxyname="TextProperty"></Proxy>
         <ExposedProperties>
-          <Property name="Justification"/>
-          <Property name="Orientation"/>
-          <Property name="Color"/>
-          <Property name="Opacity"/>
-          <Property name="FontFamily"/>
-          <Property name="Bold"/>
-          <Property name="Italic"/>
-          <Property name="Shadow"/>
-          <Property name="FontSize"/>
+          <Property name="Justification" />
+          <Property name="Orientation" />
+          <Property name="Color" />
+          <Property name="Opacity" />
+          <Property name="FontFamily" />
+          <Property name="Bold" />
+          <Property name="Italic" />
+          <Property name="Shadow" />
+          <Property name="FontSize" />
         </ExposedProperties>
-
       </SubProxy>
-
       <SubProxy>
         <Proxy name="Widget"
-          proxygroup="3d_widgets" proxyname="TextWidget">
-        </Proxy>
+               proxygroup="3d_widgets"
+               proxyname="TextWidget"></Proxy>
         <ExposedProperties>
-          <Property name="ProcessEvents"/>
-          <Property name="Selectable"/>
-          <Property name="Resizable"/>
+          <Property name="ProcessEvents" />
+          <Property name="Selectable" />
+          <Property name="Resizable" />
         </ExposedProperties>
       </SubProxy>
-
       <!-- End of TextWidgetRepresentation -->
     </TextWidgetRepresentationProxy>
   </ProxyGroup>
-
   <!-- ****************************************************************** -->
   <ProxyGroup name="3d_widget_representations">
-
     <!-- ================================================================== -->
-    <Proxy name="OrientedGlyphContourRepresentation"
-      class="vtkOrientedGlyphContourRepresentation">
-      <Documentation>
-        Proxy for vtkOrientedGlyphContourRepresentation. Don't use directly since it's not
-        coupled with the widget. Use "ContourWidgetRepresentation" instead which
-        include this representation as well as the widget to modify the
-        representation.
-      </Documentation>
-
-      <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkOrientedGlyphContourRepresentation"
+           name="OrientedGlyphContourRepresentation">
+      <Documentation>Proxy for vtkOrientedGlyphContourRepresentation. Don't use
+      directly since it's not coupled with the widget. Use
+      "ContourWidgetRepresentation" instead which include this representation
+      as well as the widget to modify the representation.</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="none">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PlaceFactor"
-        command="SetPlaceFactor"
-        number_of_elements="1"
-        default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.01" />
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="ClosedLoop"
-        command="SetClosedLoop"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetClosedLoop"
+                         default_values="0"
+                         name="ClosedLoop"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty
-         name="ClosedLoopInfo"
-         command="GetClosedLoop"
-         number_of_elements="1"
-         information_only="1"
-         default_values="0">
-        <SimpleIntInformationHelper/>
+      <IntVectorProperty command="GetClosedLoop"
+                         default_values="0"
+                         information_only="1"
+                         name="ClosedLoopInfo"
+                         number_of_elements="1">
+        <SimpleIntInformationHelper />
       </IntVectorProperty>
-
-      <ProxyProperty
-        name="PointPlacer"
-        command="SetPointPlacer">
+      <ProxyProperty command="SetPointPlacer"
+                     name="PointPlacer">
         <ProxyGroupDomain name="groups">
           <Group name="point_placers" />
         </ProxyGroupDomain>
       </ProxyProperty>
-
-      <ProxyProperty
-        name="LineInterpolator"
-        command="SetLineInterpolator">
+      <ProxyProperty command="SetLineInterpolator"
+                     name="LineInterpolator">
         <ProxyGroupDomain name="groups">
           <Group name="contour_line_interpolators" />
         </ProxyGroupDomain>
       </ProxyProperty>
-
-      <DoubleVectorProperty
-        name="NodePositions"
-        command="AddNodeAtWorldPosition"
-        repeat_command="1"
-        number_of_elements_per_command="3">
-      </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="SelectNodes"
-        command="SetNthNodeSelected"
-        repeat_command="1"
-        number_of_elements_per_command="1">
-      </IntVectorProperty>
-
-      <IntVectorProperty name="ShowSelectedNodes"
-        command="SetShowSelectedNodes"
-        number_of_elements="1"
-        default_values="1">
+      <DoubleVectorProperty command="AddNodeAtWorldPosition"
+                            name="NodePositions"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"></DoubleVectorProperty>
+      <IntVectorProperty command="SetNthNodeSelected"
+                         name="SelectNodes"
+                         number_of_elements_per_command="1"
+                         repeat_command="1"></IntVectorProperty>
+      <IntVectorProperty command="SetShowSelectedNodes"
+                         default_values="1"
+                         name="ShowSelectedNodes"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <Property name="ClearAllNodes" command="ClearAllNodes" />
-
-      <DoubleVectorProperty name="LineColor"
-        command="SetLineColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      <Property command="ClearAllNodes"
+                name="ClearAllNodes" />
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="1.0 1.0 1.0"
+                            name="LineColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="AlwaysOnTop"
-        command="SetAlwaysOnTop"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetAlwaysOnTop"
+                         default_values="0"
+                         name="AlwaysOnTop"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <Hints>
@@ -698,308 +582,255 @@
       </Hints>
       <!-- End of OrientedGlyphContourRepresentation -->
     </Proxy>
-
     <!-- ================================================================== -->
-    <Proxy name="SplineRepresentation" class="vtkSplineRepresentation">
-      <Documentation>
-        Proxy for vtkSplineRepresentation. Don't use directly since it's not
-        coupled with the widget. Use "SplineWidgetRepresentation" instead which
-        include this representation as well as the widget to modify the
-        representation.
-      </Documentation>
-
-      <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkSplineRepresentation"
+           name="SplineRepresentation">
+      <Documentation>Proxy for vtkSplineRepresentation. Don't use directly
+      since it's not coupled with the widget. Use "SplineWidgetRepresentation"
+      instead which include this representation as well as the widget to modify
+      the representation.</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="none">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PlaceFactor"
-        command="SetPlaceFactor"
-        number_of_elements="1"
-        default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.01" />
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="HandlePositions"
-        command="SetHandlePosition"
-        set_number_command="SetNumberOfHandles"
-        use_index="1"
-        repeat_command="1"
-        number_of_elements_per_command="3"
-        number_of_elements="6"
-        default_values="0 0 0 1 0 0"
-        information_property="HandlePositionsInfo" >
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="HandlePositionsInfo"
-        command="GetHandlePositions"
-        information_only="1">
+      <DoubleVectorProperty command="SetHandlePosition"
+                            default_values="0 0 0 1 0 0"
+                            information_property="HandlePositionsInfo"
+                            name="HandlePositions"
+                            number_of_elements="6"
+                            number_of_elements_per_command="3"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfHandles"
+                            use_index="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetHandlePositions"
+                            information_only="1"
+                            name="HandlePositionsInfo">
         <DoubleArrayInformationHelper />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="Closed"
-        command="SetClosed"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetClosed"
+                         default_values="0"
+                         name="Closed"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="LineColor"
-        command="SetLineColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 0.0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="1.0 1.0 0.0"
+                            name="LineColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
       </DoubleVectorProperty>
-
       <!-- End of SplineRepresentation -->
     </Proxy>
-
-
     <!-- ================================================================== -->
-    <Proxy name="SliderRepresentation3D" class="vtkSliderRepresentation3D">
-      <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkSliderRepresentation3D"
+           name="SliderRepresentation3D">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="Value"
-        command="SetValue"
-        number_of_elements="1"
-        information_property="ValueInfo"
-        default_values="0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="ValueInfo"
-        command="GetValue"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="Point1"
-        command="SetPoint1InWorldCoordinates"
-        number_of_elements="3"
-        default_values="-1.0 0.0 0.0">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty command="SetValue"
+                            default_values="0"
+                            information_property="ValueInfo"
+                            name="Value"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="Point2"
-        command="SetPoint2InWorldCoordinates"
-        number_of_elements="3"
-        default_values="1.0 0.0 0.0">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty command="GetValue"
+                            information_only="1"
+                            name="ValueInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="MinimumValue"
-        command="SetMinimumValue"
-        number_of_elements="1"
-        default_values="0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="MaximumValue"
-        command="SetMaximumValue"
-        number_of_elements="1"
-        default_values="1">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPoint1InWorldCoordinates"
+                            default_values="-1.0 0.0 0.0"
+                            name="Point1"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPoint2InWorldCoordinates"
+                            default_values="1.0 0.0 0.0"
+                            name="Point2"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMinimumValue"
+                            default_values="0"
+                            name="MinimumValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetMaximumValue"
+                            default_values="1"
+                            name="MaximumValue"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
     </Proxy>
     <!-- ================================================================== -->
-    <Proxy name="SphereRepresentation" class="vtkSphereRepresentation">
-      <Documentation>
-        Proxy for vtkSphereRepresentation. Don't confuse this with the
-        vtkSMRepresentation proxy for the sphere widget (which is the
-        SphereWidgetRepresentation).
-      </Documentation>
-
-      <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkSphereRepresentation"
+           name="SphereRepresentation">
+      <Documentation>Proxy for vtkSphereRepresentation. Don't confuse this with
+      the vtkSMRepresentation proxy for the sphere widget (which is the
+      SphereWidgetRepresentation).</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="none">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="PlaceFactor"
-        command="SetPlaceFactor"
-        number_of_elements="1"
-        default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.01" />
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="Representation"
-        command="SetRepresentation"
-        number_of_elements="1"
-        default_values="1">
-        <Documentation>
-           Set the representation (i.e., appearance) of the sphere. Different
-            representations are useful depending on the application.
-        </Documentation>
+      <IntVectorProperty command="SetRepresentation"
+                         default_values="1"
+                         name="Representation"
+                         number_of_elements="1">
+        <Documentation>Set the representation (i.e., appearance) of the sphere.
+        Different representations are useful depending on the
+        application.</Documentation>
         <EnumerationDomain name="enum">
-          <Entry text="Off" value="0" />
-          <Entry text="Wireframe" value="1" />
-          <Entry text="Surface" value="2" />
+          <Entry text="Off"
+                 value="0" />
+          <Entry text="Wireframe"
+                 value="1" />
+          <Entry text="Surface"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="Center"
-        command="SetCenter"
-        number_of_elements="3"
-        default_values="0.0 0.0 0.0"
-        information_property="CenterInfo">
+      <DoubleVectorProperty command="SetCenter"
+                            default_values="0.0 0.0 0.0"
+                            information_property="CenterInfo"
+                            name="Center"
+                            number_of_elements="3">
         <DoubleRangeDomain name="range" />
-        <Documentation>
-           The center position of the sphere. Note that this may
-           adjust the direction from the handle to the center, as well as
-           the radius of the sphere.
-        </Documentation>
+        <Documentation>The center position of the sphere. Note that this may
+        adjust the direction from the handle to the center, as well as the
+        radius of the sphere.</Documentation>
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="CenterInfo"
-        command="GetCenter"
-        information_only="1" >
+      <DoubleVectorProperty command="GetCenter"
+                            information_only="1"
+                            name="CenterInfo">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Radius"
-        command="SetRadius"
-        number_of_elements="1"
-        default_values="0.5"
-        information_property="RadiusInfo">
-        <DoubleRangeDomain name="range" min="0.0" />
-        <Documentation>
-          The radius of sphere. Default is 0.5. Note that this may
-          modify the position of the handle based on the handle direction.
-        </Documentation>
+      <DoubleVectorProperty command="SetRadius"
+                            default_values="0.5"
+                            information_property="RadiusInfo"
+                            name="Radius"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.0"
+                           name="range" />
+        <Documentation>The radius of sphere. Default is 0.5. Note that this may
+        modify the position of the handle based on the handle
+        direction.</Documentation>
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="RadiusInfo"
-        command="GetRadius"
-        information_only="1" >
+      <DoubleVectorProperty command="GetRadius"
+                            information_only="1"
+                            name="RadiusInfo">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="HandleVisibility"
-        command="SetHandleVisibility"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetHandleVisibility"
+                         default_values="0"
+                         name="HandleVisibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>
-          The handle sits on the surface of the sphere and may be moved around
-          the surface by picking (left mouse) and then moving. The position
-          of the handle can be retrieved, this is useful for positioning
-          cameras and lights. By default, the handle is turned off.
-        </Documentation>
+        <Documentation>The handle sits on the surface of the sphere and may be
+        moved around the surface by picking (left mouse) and then moving. The
+        position of the handle can be retrieved, this is useful for positioning
+        cameras and lights. By default, the handle is turned
+        off.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="HandleText"
-        command="SetHandleText"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetHandleText"
+                         default_values="0"
+                         name="HandleText"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>
-          Enable/disable a label that displays the location of the handle in
-          spherical coordinates (radius,theta,phi). The two angles, theta and
-          phi, are displayed in degrees. Note that phi is measured from the
-          north pole down towards the equator; and theta is the angle around
-          the north/south axis.
-        </Documentation>
+        <Documentation>Enable/disable a label that displays the location of the
+        handle in spherical coordinates (radius,theta,phi). The two angles,
+        theta and phi, are displayed in degrees. Note that phi is measured from
+        the north pole down towards the equator; and theta is the angle around
+        the north/south axis.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="RadialLine"
-        command="SetRadialLine"
-        number_of_elements="1"
-        default_values="0">
+      <IntVectorProperty command="SetRadialLine"
+                         default_values="0"
+                         name="RadialLine"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>
-          Enable/disable a radial line segment that joins the center of the
-          outer sphere and the handle.
-        </Documentation>
+        <Documentation>Enable/disable a radial line segment that joins the
+        center of the outer sphere and the handle.</Documentation>
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="HandleDirection"
-        number_of_elements="3"
-        default_values="0 0 1">
-        <Documentation>
-          Set/Get the direction vector of the handle relative to the center of
-          the sphere. This may affect the position of the handle and the radius
-          of the sphere.
-        </Documentation>
+      <DoubleVectorProperty default_values="0 0 1"
+                            name="HandleDirection"
+                            number_of_elements="3">
+        <Documentation>Set/Get the direction vector of the handle relative to
+        the center of the sphere. This may affect the position of the handle
+        and the radius of the sphere.</Documentation>
       </DoubleVectorProperty>
-
       <!-- End of SphereRepresentation -->
     </Proxy>
-
     <!-- ================================================================== -->
-    <BoxRepresentationProxy name="BoxRepresentation" class="vtkBoxRepresentation">
-      <Documentation>
-        Proxy for vtkBoxRepresentation. Don't confuse this with the
-        vtkSMRepresentation proxy for the box widget (which is the
-        BoxWidgetRepresentation).
-      </Documentation>
-
-      <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <BoxRepresentationProxy class="vtkBoxRepresentation"
+                            name="BoxRepresentation">
+      <Documentation>Proxy for vtkBoxRepresentation. Don't confuse this with
+      the vtkSMRepresentation proxy for the box widget (which is the
+      BoxWidgetRepresentation).</Documentation>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="none">
-        <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="none"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="PlaceFactor"
-        command="SetPlaceFactor"
-        number_of_elements="1"
-        default_values="1.0">
-        <DoubleRangeDomain name="range" min="0.01" />
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.0"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0.01"
+                           name="range" />
       </DoubleVectorProperty>
-
       <SubProxy>
         <Proxy name="Transform"
-          proxygroup="extended_sources" proxyname="Transform2">
-        </Proxy>
+               proxygroup="extended_sources"
+               proxyname="Transform2"></Proxy>
         <ExposedProperties>
           <Property name="Position" />
           <Property name="PositionInfo" />
@@ -1009,588 +840,527 @@
           <Property name="ScaleInfo" />
         </ExposedProperties>
       </SubProxy>
-
       <!-- End of BoxRepresentation -->
     </BoxRepresentationProxy>
-
     <!-- ================================================================== -->
-    <Proxy name="DistanceRepresentation2D"
-           class="vtkDistanceRepresentation2D"
+    <Proxy class="vtkDistanceRepresentation2D"
+           name="DistanceRepresentation2D"
            post_creation="InstantiateHandleRepresentation">
-
-     <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <DoubleVectorProperty name="Point1WorldPosition"
-        command="SetPoint1WorldPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point1WorldPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point1WorldPositionInfo"
-        command="GetPoint1WorldPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2WorldPosition"
-        command="SetPoint2WorldPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point2WorldPositionInfo"
-        default_values="1 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2WorldPositionInfo"
-        command="GetPoint2WorldPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="PlaceWidget"
-        is_internal="1"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="0 1 0 1 0 1">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <!-- End of DistanceRepresentation2D -->
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint1WorldPosition"
+                            default_values="0 0 0"
+                            information_property="Point1WorldPositionInfo"
+                            name="Point1WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint1WorldPosition"
+                            information_only="1"
+                            name="Point1WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint2WorldPosition"
+                            default_values="1 0 0"
+                            information_property="Point2WorldPositionInfo"
+                            name="Point2WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint2WorldPosition"
+                            information_only="1"
+                            name="Point2WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="0 1 0 1 0 1"
+                            is_internal="1"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <!-- End of DistanceRepresentation2D -->
     </Proxy>
-
     <!-- ================================================================== -->
-    <ImplicitPlaneRepresentationProxy name="ImplicitPlaneRepresentation"
-      class="vtkPVImplicitPlaneRepresentation">
-      <IntVectorProperty name="Visibility"
-         command="SetVisibility"
-         number_of_elements="1"
-         default_values="1"
-         animateable="1">
-         <BooleanDomain name="bool" />
+    <ImplicitPlaneRepresentationProxy class="vtkPVImplicitPlaneRepresentation"
+                                      name="ImplicitPlaneRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty name="DrawPlane"
-         command="SetDrawPlane"
-         number_of_elements="1"
-         default_values="1"
-         animateable="1">
-         <BooleanDomain name="bool" />
+      <IntVectorProperty animateable="1"
+                         command="SetDrawPlane"
+                         default_values="1"
+                         name="DrawPlane"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-    <Property
-      name="Reset"
-      command="Reset">
-    </Property>
-
-      <DoubleVectorProperty name="Origin"
-         command="SetTransformedOrigin"
-         number_of_elements="3"
-         information_property="OriginInfo"
-         default_values="0 0 0">
-         <DoubleRangeDomain name="range"/>
+      <Property command="Reset"
+                name="Reset"></Property>
+      <DoubleVectorProperty command="SetTransformedOrigin"
+                            default_values="0 0 0"
+                            information_property="OriginInfo"
+                            name="Origin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="OriginInfo"
-         command="GetTransformedOrigin"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetTransformedOrigin"
+                            information_only="1"
+                            name="OriginInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Normal"
-         command="SetTransformedNormal"
-         number_of_elements="3"
-         information_property="NormalInfo"
-         default_values="1 0 0">
-         <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty command="SetTransformedNormal"
+                            default_values="1 0 0"
+                            information_property="NormalInfo"
+                            name="Normal"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="NormalInfo"
-         command="GetTransformedNormal"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetTransformedNormal"
+                            information_only="1"
+                            name="NormalInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PlaceWidget"
-         is_internal="1"
-         command="PlaceTransformedWidget"
-         number_of_elements="6"
-         argument_is_array="1"
-         default_values="none">
-         <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceTransformedWidget"
+                            default_values="none"
+                            is_internal="1"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PlaceFactor"
-         command="SetPlaceFactor"
-         number_of_elements="1"
-         default_values="1.2">
-         <DoubleRangeDomain name="range"/>
+      <DoubleVectorProperty command="SetPlaceFactor"
+                            default_values="1.2"
+                            name="PlaceFactor"
+                            number_of_elements="1">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
     </ImplicitPlaneRepresentationProxy>
-
     <!-- ================================================================== -->
-    <Proxy name="LineRepresentation" class="vtkLineRepresentation">
-
-     <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkLineRepresentation"
+           name="LineRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <DoubleVectorProperty name="Point1WorldPosition"
-        command="SetPoint1WorldPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point1WorldPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point1WorldPositionInfo"
-        command="GetPoint1WorldPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2WorldPosition"
-        command="SetPoint2WorldPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point2WorldPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2WorldPositionInfo"
-        command="GetPoint2WorldPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point1DisplayPosition"
-        command="SetPoint1DisplayPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point1DisplayPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point1DisplayPositionInfo"
-        command="GetPoint1DisplayPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2DisplayPosition"
-        command="SetPoint2DisplayPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="Point2DisplayPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="Point2DisplayPositionInfo"
-        command="GetPoint2DisplayPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="PlaceWidget"
-        is_internal="1"
-        command="PlaceWidget"
-        number_of_elements="6"
-        argument_is_array="1"
-        default_values="0 1 0 1 0 1">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty name="LineColor"
-        command="SetLineColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-     </DoubleVectorProperty>
-    </Proxy>
-
-    <!-- ================================================================== -->
-    <Proxy name="HandleRepresentation" class="vtkPointHandleRepresentation3D">
-
-     <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="WorldPosition"
-        command="SetWorldPosition"
-        number_of_elements="3"
-        argument_is_array="1"
-        information_property="WorldPositionInfo"
-        default_values="0 0 0">
-        <DoubleRangeDomain name="range"/>
-     </DoubleVectorProperty>
-
-     <DoubleVectorProperty
-        name="WorldPositionInfo"
-        command="GetWorldPosition"
-        information_only="1">
-        <SimpleDoubleInformationHelper/>
-     </DoubleVectorProperty>
-    </Proxy>
-
-    <!-- ================================================================== -->
-    <Proxy name="ScalarBarRepresentation" class="vtkScalarBarRepresentation">
-
-      <IntVectorProperty name="Visibility"
-         command="SetVisibility"
-         number_of_elements="1"
-         default_values="1"
-         animateable="1">
-         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="Position"
-         command="SetPosition"
-         number_of_elements="2"
-         information_property="PositionInfo"
-         default_values="0.87 0.25">
-         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint1WorldPosition"
+                            default_values="0 0 0"
+                            information_property="Point1WorldPositionInfo"
+                            name="Point1WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PositionInfo"
-         command="GetPosition"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetPoint1WorldPosition"
+                            information_only="1"
+                            name="Point1WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Position2"
-         command="SetPosition2"
-         number_of_elements="2"
-         information_property="Position2Info"
-         default_values="0.13 0.5">
-         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint2WorldPosition"
+                            default_values="0 0 0"
+                            information_property="Point2WorldPositionInfo"
+                            name="Point2WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Position2Info"
-         command="GetPosition2"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetPoint2WorldPosition"
+                            information_only="1"
+                            name="Point2WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="Orientation"
-        command="SetOrientation"
-        number_of_elements="1"
-        information_property="OrientationInfo"
-        default_values="1">
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint1DisplayPosition"
+                            default_values="0 0 0"
+                            information_property="Point1DisplayPositionInfo"
+                            name="Point1DisplayPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint1DisplayPosition"
+                            information_only="1"
+                            name="Point1DisplayPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetPoint2DisplayPosition"
+                            default_values="0 0 0"
+                            information_property="Point2DisplayPositionInfo"
+                            name="Point2DisplayPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPoint2DisplayPosition"
+                            information_only="1"
+                            name="Point2DisplayPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="PlaceWidget"
+                            default_values="0 1 0 1 0 1"
+                            is_internal="1"
+                            name="PlaceWidget"
+                            number_of_elements="6">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetLineColor"
+                            default_values="1.0 1.0 1.0"
+                            name="LineColor"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkPointHandleRepresentation3D"
+           name="HandleRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetWorldPosition"
+                            default_values="0 0 0"
+                            information_property="WorldPositionInfo"
+                            name="WorldPosition"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetWorldPosition"
+                            information_only="1"
+                            name="WorldPositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+    </Proxy>
+    <!-- ================================================================== -->
+    <Proxy class="vtkScalarBarRepresentation"
+           name="ScalarBarRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.87 0.25"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.13 0.5"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetOrientation"
+                         default_values="1"
+                         information_property="OrientationInfo"
+                         name="Orientation"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Horizontal"/>
-          <Entry value="1" text="Vertical"/>
+          <Entry text="Horizontal"
+                 value="0" />
+          <Entry text="Vertical"
+                 value="1" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <IntVectorProperty name="OrientationInfo"
-        command="GetOrientation"
-        information_only="1" >
+      <IntVectorProperty command="GetOrientation"
+                         information_only="1"
+                         name="OrientationInfo">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
-
-      <ProxyProperty name="ScalarBarActor" command="SetScalarBarActor">
+      <ProxyProperty command="SetScalarBarActor"
+                     name="ScalarBarActor">
         <ProxyGroupDomain name="groups">
-          <Group name="annotations"/>
+          <Group name="annotations" />
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
-
     <!-- ================================================================== -->
-    <Proxy name="TextRepresentation" class="vtkTextRepresentation">
-
-      <IntVectorProperty name="Visibility"
-         command="SetVisibility"
-         number_of_elements="1"
-         default_values="1"
-         animateable="1">
-         <BooleanDomain name="bool" />
+    <Proxy class="vtkTextRepresentation"
+           name="TextRepresentation">
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="Position"
-         command="SetPosition"
-         number_of_elements="2"
-         information_property="PositionInfo"
-         default_values="0.05 0.05">
-         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0.05 0.05"
+                            information_property="PositionInfo"
+                            name="Position"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="PositionInfo"
-         command="GetPosition"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetPosition"
+                            information_only="1"
+                            name="PositionInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Position2"
-         command="SetPosition2"
-         number_of_elements="2"
-         information_property="Position2Info"
-         default_values="0.1 0.1">
-         <DoubleRangeDomain name="range" min="0 0" max="1 1"/>
+      <DoubleVectorProperty command="SetPosition2"
+                            default_values="0.1 0.1"
+                            information_property="Position2Info"
+                            name="Position2"
+                            number_of_elements="2">
+        <DoubleRangeDomain max="1 1"
+                           min="0 0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="Position2Info"
-         command="GetPosition2"
-         information_only="1">
-         <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="GetPosition2"
+                            information_only="1"
+                            name="Position2Info">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <StringVectorProperty name="Text"
-         command="SetText"
-         immediate_update="1"
-         default_values="Some Default">
-      </StringVectorProperty>
-
-      <IntVectorProperty name="WindowLocation"
-        command="SetWindowLocation"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
+      <StringVectorProperty command="SetText"
+                            default_values="Some Default"
+                            immediate_update="1"
+                            name="Text"></StringVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetWindowLocation"
+                         default_values="0"
+                         name="WindowLocation"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="AnyLocation"/>
-          <Entry value="1" text="LowerLeftCorner"/>
-          <Entry value="2" text="LowerRightCorner"/>
-          <Entry value="3" text="LowerCenter"/>
-          <Entry value="4" text="UpperLeftCorner"/>
-          <Entry value="5" text="UpperRightCorner"/>
-          <Entry value="6" text="UpperCenter"/>
+          <Entry text="AnyLocation"
+                 value="0" />
+          <Entry text="LowerLeftCorner"
+                 value="1" />
+          <Entry text="LowerRightCorner"
+                 value="2" />
+          <Entry text="LowerCenter"
+                 value="3" />
+          <Entry text="UpperLeftCorner"
+                 value="4" />
+          <Entry text="UpperRightCorner"
+                 value="5" />
+          <Entry text="UpperCenter"
+                 value="6" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <ProxyProperty name="TextActor" command="SetTextActor">
-        <ProxyGroupDomain name="groups">
-          <Group name="props"/>
-        </ProxyGroupDomain>
-      </ProxyProperty>
-    </Proxy>
-
-  </ProxyGroup>
-
-  <!-- ****************************************************************** -->
-  <ProxyGroup name="3d_widgets">
-    <Proxy name="WidgetBase">
-      <Documentation>
-        Base API definition for all 3D widgets.
-      </Documentation>
-
-      <ProxyProperty name="Representation"
-         command="SetRepresentation">
+      <ProxyProperty command="SetTextActor"
+                     name="TextActor">
         <ProxyGroupDomain name="groups">
           <Group name="props" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty name="Enabled"
-                         command="SetEnabled"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool"/>
+    </Proxy>
+  </ProxyGroup>
+  <!-- ****************************************************************** -->
+  <ProxyGroup name="3d_widgets">
+    <Proxy name="WidgetBase">
+      <Documentation>Base API definition for all 3D widgets.</Documentation>
+      <ProxyProperty command="SetRepresentation"
+                     name="Representation">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty command="SetEnabled"
+                         default_values="0"
+                         name="Enabled"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of WidgetBase -->
     </Proxy>
-
-    <Proxy name="SliderWidget" class="vtkSliderWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="HandleWidget" class="vtkHandleWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="LineWidget2" class="vtkLineWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <IntVectorProperty name="ProcessEvents"
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-    </Proxy>
-
-    <Proxy name="DistanceWidget" class="vtkDistanceWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase"
-      post_creation="SetWidgetStateToManipulate" >
-      <IntVectorProperty name="ProcessEvents"
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-    </Proxy>
-
-    <Proxy name="ImplicitPlaneWidget2" class="vtkImplicitPlaneWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="SplineWidget2" class="vtkSplineWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-    </Proxy>
-
-    <Proxy name="ContourWidget" class="vtkContourWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-
-      <Property name="CloseLoop" command="CloseLoop" />
-      <Property name="Initialize" command="Initialize" />
-
-      <IntVectorProperty name="WidgetState"
-        command="SetWidgetState"
-        number_of_elements="1"
-        information_property="WidgetStateInfo"
-        default_values="1">
-      </IntVectorProperty>
-
-      <IntVectorProperty name="WidgetStateInfo"
-        command="GetWidgetState"
-        information_only="1" >
-      </IntVectorProperty>
-
-      <IntVectorProperty name="AllowNodePicking"
-        command="SetAllowNodePicking"
-        number_of_elements="1"
-        default_values="1">
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkSliderWidget"
+           name="SliderWidget"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkHandleWidget"
+           name="HandleWidget"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkLineWidget2"
+           name="LineWidget2">
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty name="ProcessEvents"
-        command="SetProcessEvents"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
     </Proxy>
-
-    <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <IntVectorProperty name="Selectable"
-                         command="SetSelectable"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool"/>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkDistanceWidget"
+           name="DistanceWidget"
+           post_creation="SetWidgetStateToManipulate">
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty name="Resizable"
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkImplicitPlaneWidget2"
+           name="ImplicitPlaneWidget2"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkSplineWidget2"
+           name="SplineWidget2"></Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkContourWidget"
+           name="ContourWidget">
+      <Property command="CloseLoop"
+                name="CloseLoop" />
+      <Property command="Initialize"
+                name="Initialize" />
+      <IntVectorProperty command="SetWidgetState"
+                         default_values="1"
+                         information_property="WidgetStateInfo"
+                         name="WidgetState"
+                         number_of_elements="1"></IntVectorProperty>
+      <IntVectorProperty command="GetWidgetState"
+                         information_only="1"
+                         name="WidgetStateInfo"></IntVectorProperty>
+      <IntVectorProperty command="SetAllowNodePicking"
+                         default_values="1"
+                         name="AllowNodePicking"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+    </Proxy>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkScalarBarWidget"
+           name="ScalarBarWidget">
+      <IntVectorProperty command="SetSelectable"
+                         default_values="0"
+                         name="Selectable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty animateable="0"
                          command="SetResizable"
-                         number_of_elements="1"
                          default_values="1"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
+                         name="Resizable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty name="Repositionable"
+      <IntVectorProperty animateable="0"
                          command="SetRepositionable"
-                         number_of_elements="1"
                          default_values="1"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
+                         name="Repositionable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
       <!-- End of ScalarBarWidget -->
     </Proxy>
-
-    <Proxy name="TextWidget" class="vtkTextWidget"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-
-      <IntVectorProperty name="Selectable"
-                         command="SetSelectable"
-                         number_of_elements="1"
-                         default_values="0">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Resizable"
-                         command="SetResizable"
-                         number_of_elements="1"
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkTextWidget"
+           name="TextWidget">
+      <IntVectorProperty command="SetSelectable"
                          default_values="0"
-                         animateable="0">
-        <BooleanDomain name="bool"/>
+                         name="Selectable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty name="ProcessEvents"
-                         command="SetProcessEvents"
-                         number_of_elements="1"
-                         default_values="1">
-        <BooleanDomain name="bool"/>
+      <IntVectorProperty animateable="0"
+                         command="SetResizable"
+                         default_values="0"
+                         name="Resizable"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-
+      <IntVectorProperty command="SetProcessEvents"
+                         default_values="1"
+                         name="ProcessEvents"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of TextWidget -->
     </Proxy>
-
-    <Proxy name="BoxWidget2" class="vtkBoxWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <Documentation>
-        Proxy for vtkBoxWidget2.
-      </Documentation>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkBoxWidget2"
+           name="BoxWidget2">
+      <Documentation>Proxy for vtkBoxWidget2.</Documentation>
     </Proxy>
-
-    <Proxy name="SphereWidget2" class="vtkSphereWidget2"
-      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
-      <Documentation>
-        Proxy for vtkSphereWidget2.
-      </Documentation>
+    <Proxy base_proxygroup="3d_widgets"
+           base_proxyname="WidgetBase"
+           class="vtkSphereWidget2"
+           name="SphereWidget2">
+      <Documentation>Proxy for vtkSphereWidget2.</Documentation>
     </Proxy>
-
-
-    <Proxy name="AxesWidget" class="vtkPVAxesWidget"
+    <Proxy class="vtkPVAxesWidget"
+           name="AxesWidget"
            processes="client">
-      <Documentation>
-        Orientation widget used by Render View.
-      </Documentation>
-
-      <IntVectorProperty name="Interactivity"
-          command="SetInteractive"
-          number_of_elements="1"
-          default_values="0">
+      <Documentation>Orientation widget used by Render View.</Documentation>
+      <IntVectorProperty command="SetInteractive"
+                         default_values="0"
+                         name="Interactivity"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
-        <Documentation>
-          Set whether to allow this 3D widget to be interactively moved/scaled.
-        </Documentation>
+        <Documentation>Set whether to allow this 3D widget to be interactively
+        moved/scaled.</Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty name="Visibility"
-          command="SetEnabled"
-          number_of_elements="1"
-          default_values="1">
+      <IntVectorProperty command="SetEnabled"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="LabelColor"
-          command="SetAxisLabelColor"
-          number_of_elements="3"
-          default_values="1 1 1">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="OutlineColor"
-          command="SetOutlineColor"
-          number_of_elements="3"
-          default_values="1 1 1">
-      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetAxisLabelColor"
+                            default_values="1 1 1"
+                            name="LabelColor"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetOutlineColor"
+                            default_values="1 1 1"
+                            name="OutlineColor"
+                            number_of_elements="3"></DoubleVectorProperty>
       <!-- End of AxesWidget -->
     </Proxy>
-
     <!-- End of ProxyGroup 3d_widgets -->
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -168,6 +168,60 @@ void pqQueryClauseWidget::populateSelectionCriteria(
   this->Internals->criteria->clear();
   this->Internals->Arrays.clear();
 
+  if (type_flags & INDEX)
+    {
+    this->Internals->criteria->addItem("ID", INDEX);
+    }
+
+  vtkPVDataSetAttributesInformation* attrInfo = this->getChosenAttributeInfo();
+  if (type_flags & GLOBALID)
+    {
+    // Do we have global ids?
+    if (attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS))
+      {
+      this->Internals->criteria->addItem("Global ID", GLOBALID);
+      this->Internals->criteria->setCurrentIndex(
+            this->Internals->criteria->count()-1);
+      }
+    }
+
+  if (type_flags & THRESHOLD)
+    {
+    // Now add the attribute arrays.
+    for (int cc=0; cc < attrInfo->GetNumberOfArrays(); cc++)
+      {
+      vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(cc);
+      if (arrayInfo->GetNumberOfComponents() > 1)
+        {
+        this->Internals->criteria->addItem(
+              QString("%1 (Magnitude)").arg(arrayInfo->GetName()),
+              THRESHOLD);
+
+        int item_index = (this->Internals->criteria->count()-1);
+        this->Internals->Arrays.insert(item_index,
+                                       pqInternals::ArrayInfo(arrayInfo->GetName(), -1));
+
+        for (int kk=0; kk < arrayInfo->GetNumberOfComponents(); kk++)
+          {
+          this->Internals->criteria->addItem(
+                QString("%1 (%2)").arg(arrayInfo->GetName()).arg(kk),
+                THRESHOLD);
+          item_index = (this->Internals->criteria->count()-1);
+          this->Internals->Arrays.insert(item_index,
+                                         pqInternals::ArrayInfo(arrayInfo->GetName(), kk));
+          }
+        }
+      else
+        {
+        this->Internals->criteria->addItem(arrayInfo->GetName(),
+                                           THRESHOLD);
+        int item_index = (this->Internals->criteria->count()-1);
+        this->Internals->Arrays.insert(item_index,
+                                       pqInternals::ArrayInfo(arrayInfo->GetName(), 0));
+        }
+      }
+    }
+
   vtkPVDataInformation* dataInfo = this->producer()->getDataInformation();
 
   if(type_flags & QUERY)
@@ -220,7 +274,9 @@ void pqQueryClauseWidget::populateSelectionCondition()
   case QUERY:
     this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
     break;
-
+  case INDEX:
+  case GLOBALID:
+  case THRESHOLD:
   case PROCESSID:
     this->Internals->condition->addItem("is", pqQueryClauseWidget::SINGLE_VALUE);
     this->Internals->condition->addItem("is between",
@@ -333,13 +389,29 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
 
   if (multi_block)
     {
-    sub_widgets.push_back(BLOCK);
+    switch (criteria_type)
+      {
+    case INDEX:
+    case QUERY:
+    case THRESHOLD:
+      sub_widgets.push_back(BLOCK);
+      break;
+    case GLOBALID:
+    default:
+      break;
+      }
     }
 
   if (amr)
     {
     switch (criteria_type)
       {
+    case INDEX:
+    case THRESHOLD:
+      sub_widgets.push_back(AMR_LEVEL);
+      sub_widgets.push_back(AMR_BLOCK);
+      break;
+    case GLOBALID:
       // for now, when selecting Global ids, we don't allow the users to pick the
       // block to extract the array from. We can support this if needed in
       // future.
@@ -369,6 +441,15 @@ void pqQueryClauseWidget::updateDependentClauseWidgets()
     sub_widget->setAttributeType(this->attributeType());
     sub_widget->initialize(t_flag, true);
     vbox->addWidget(sub_widget);
+    }
+
+  if(criteria_type == QUERY)
+    {
+    this->Internals->value->setText(this->LastQuery);
+    }
+  else
+    {
+    this->Internals->value->setText("");
     }
 }
 
@@ -501,21 +582,58 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     return;
     }
 
+  // Variables used to build Query
+  QString query;
+  QString fieldName;
+
+  // Determine the name of the field
+  switch(criteria_type)
+    {
+  case INDEX:
+    fieldName = "id";
+    break;
+  case GLOBALID:
+    fieldName =
+        this->getChosenAttributeInfo()->GetAttributeInformation(
+          vtkDataSetAttributes::GLOBALIDS)->GetName();
+    break;
+  case THRESHOLD:
+    pqInternals::ArrayInfo info = this->Internals->Arrays[
+        this->Internals->criteria->currentIndex()];
+    if(info.ComponentNo == -1)
+      {
+      // Magnitude
+      fieldName.append("mag(").append(info.ArrayName).append(")");
+      }
+    else
+      {
+      fieldName.append(info.ArrayName)
+          .append("[:,").append(QString::number(info.ComponentNo)).append("]");
+      }
+    break;
+    }
+
   ConditionMode condition_type = this->currentConditionType();
   QList<QVariant> values;
   switch (condition_type)
     {
   case SINGLE_VALUE:
+    if(query.isEmpty()) query = "%1 == %2";
   case SINGLE_VALUE_LE:
+    if(query.isEmpty()) query = "%1 <= %2";
   case SINGLE_VALUE_GE:
+    if(query.isEmpty()) query = "%1 >= %2";
     if (!this->Internals->value->text().isEmpty())
       {
       values << this->Internals->value->text();
+      query = query.arg(fieldName, this->Internals->value->text());
       }
     break;
   case LIST_OF_VALUES:
+    if(query.isEmpty()) query = "contains(%1,[%2])";
     if (!this->Internals->value->text().isEmpty())
       {
+      query = query.arg(fieldName, this->Internals->value->text());
       QStringList parts = this->Internals->value->text().split(',',
         QString::SkipEmptyParts);
       foreach (QString part, parts)
@@ -526,15 +644,19 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
     break;
 
   case PAIR_OF_VALUES:
+    if(query.isEmpty()) query = "(%1 > %2) & (%1 < %3)";
     if (!this->Internals->value_min->text().isEmpty() &&
       !this->Internals->value_max->text().isEmpty())
       {
       values << this->Internals->value_min->text();
       values << this->Internals->value_max->text();
+      query = query.arg(fieldName, this->Internals->value_min->text(), this->Internals->value_max->text());
       }
     break;
 
   case TRIPLET_OF_VALUES:
+    // FIXME don't really work but we don't care as we removed that case in the possibility
+    if(query.isEmpty()) query = "[(tuple[0,0] & tuple[0,1] & tuple[0,2] ) for tuple in (abs(Points - [%1,%2,%3]) < 1e-6)]";
     if (!this->Internals->value_x->text().isEmpty() &&
       !this->Internals->value_y->text().isEmpty() &&
       !this->Internals->value_z->text().isEmpty())
@@ -542,6 +664,9 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       values << this->Internals->value_x->text();
       values << this->Internals->value_y->text();
       values << this->Internals->value_z->text();
+      query = query.arg( this->Internals->value_x->text(),
+                         this->Internals->value_y->text(),
+                         this->Internals->value_z->text());
       }
     break;
 
@@ -550,8 +675,10 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   case BLOCK_NAME_VALUE:
   case AMR_LEVEL_VALUE:
   case AMR_BLOCK_VALUE:
+    if(query.isEmpty()) query = "contains(%1,[%2])";
     if (!this->Internals->value_block->text().isEmpty())
       {
+      query = query.arg(fieldName, this->Internals->value_block->text());
       if (this->AsQualifier)
         {
         values << this->Internals->value_block->text();
@@ -591,6 +718,12 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
       }
     // break; -- don't break
 
+  case INDEX:
+  case GLOBALID:
+  case THRESHOLD:
+    this->LastQuery = query;
+    vtkSMPropertyHelper(selSource, "QueryString").Set(query.toAscii().constData());
+    break;
   case AMR_LEVEL:
       {
       vtkSMPropertyHelper(selSource,
