@@ -990,7 +990,8 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       TARGET_LINK_LIBRARIES(${NAME} pqComponents)
     ENDIF(plugin_type_gui OR GUI_SRCS)
     IF(SM_SRCS)
-      TARGET_LINK_LIBRARIES(${NAME} vtkPVServerManagerDefault)
+      TARGET_LINK_LIBRARIES(${NAME} vtkPVServerManagerDefault
+        vtkPVServerManagerDefaultCS)
     ENDIF(SM_SRCS)
 
     # Add install rules for the plugin. Currently only the plugins in ParaView
