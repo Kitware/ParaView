@@ -449,7 +449,10 @@ add_subdirectory(Wrapping/ClientServer)
 add_subdirectory(Wrapping/Python)
 
 #------------------------------------------------------------------------------
-add_subdirectory(Documentation)
+if (PARAVIEW_BUILD_QT_GUI)
+  # Don't build documentation is Qt GUI is not being built.
+  add_subdirectory(Documentation)
+endif()
 set (PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins")
 add_subdirectory(Plugins)
 add_subdirectory(Applications)
