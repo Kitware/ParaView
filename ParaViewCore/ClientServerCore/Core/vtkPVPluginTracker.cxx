@@ -87,6 +87,7 @@ namespace
 #if defined(__APPLE__)
     paths_to_search.push_back(app_dir + "/../Plugins");
     paths_to_search.push_back(app_dir + "/../../..");
+    paths_to_search.push_back(app_dir + "/../../../../lib");
 #endif
     // On windows configuration files are in the parent directory
     paths_to_search.push_back(app_dir + "/../");
