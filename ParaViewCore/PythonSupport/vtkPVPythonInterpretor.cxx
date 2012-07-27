@@ -145,6 +145,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // These two directories should be all that is necessary when running the
     // python interpreter in a build tree.
     //vtkPythonAppInitPrependPythonPath(PV_PYTHON_PACKAGE_DIR "/site-packages");
+    vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR "/site-packages");
     vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR);
 
 #if defined(__APPLE__)
