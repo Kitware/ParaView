@@ -1,541 +1,456 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="camera">
-    <CameraProxy name="Camera" class="vtkCamera"
-      processes="client" > <!-- |dataserver|renderserver -->
-      <DoubleVectorProperty
-        name="CameraPositionInfo"
-        command="GetPosition"
-        number_of_elements="3"
-        information_only="1"
-        default_values="0 0 1">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraPosition"
-        command="SetPosition"
-        number_of_elements="3"
-        information_property="CameraPositionInfo"
-        immediate_update="1"
-        ignore_synchronization="1"
-        default_values="0 0 1">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraFocalPointInfo"
-        command="GetFocalPoint"
-        number_of_elements="3"
-        information_only="1"
-        default_values="0 0 0">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraFocalPoint"
-        command="SetFocalPoint"
-        number_of_elements="3"
-        information_property="CameraFocalPointInfo"
-        immediate_update="1"
-        ignore_synchronization="1"
-        default_values="0 0 0">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraViewUpInfo"
-        command="GetViewUp"
-        number_of_elements="3"
-        information_only="1"
-        default_values="0 1 0">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraViewUp"
-        command="SetViewUp"
-        number_of_elements="3"
-        information_property="CameraViewUpInfo"
-        immediate_update="1"
-        ignore_synchronization="1"
-        default_values="0 1 0">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraViewAngleInfo"
-        command="GetViewAngle"
-        information_only="1">
+    <CameraProxy class="vtkCamera"
+                 name="Camera"
+                 processes="client">
+      <!-- |dataserver|renderserver -->
+      <DoubleVectorProperty command="GetPosition"
+                            default_values="0 0 1"
+                            information_only="1"
+                            name="CameraPositionInfo"
+                            number_of_elements="3">
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraViewAngle"
-        command="SetViewAngle"
-        information_property="CameraViewAngleInfo"
-        number_of_elements="1"
-        immediate_update="1"
-        ignore_synchronization="1"
-        default_values="30">
+      <DoubleVectorProperty command="SetPosition"
+                            default_values="0 0 1"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraPositionInfo"
+                            name="CameraPosition"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetFocalPoint"
+                            default_values="0 0 0"
+                            information_only="1"
+                            name="CameraFocalPointInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraClippingRangeInfo"
-        command="GetClippingRange"
-        number_of_elements="2"
-        information_only="1"
-        default_values="0.01 1000.01">
-        <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="SetFocalPoint"
+                            default_values="0 0 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraFocalPointInfo"
+                            name="CameraFocalPoint"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewUp"
+                            default_values="0 1 0"
+                            information_only="1"
+                            name="CameraViewUpInfo"
+                            number_of_elements="3">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraClippingRange"
-        command="SetClippingRange"
-        number_of_elements="2"
-        information_property="CameraClippingRangeInfo"
-        immediate_update="1"
-        ignore_synchronization="1"
-        default_values="0.01 1000.01">
+      <DoubleVectorProperty command="SetViewUp"
+                            default_values="0 1 0"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewUpInfo"
+                            name="CameraViewUp"
+                            number_of_elements="3"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetViewAngle"
+                            information_only="1"
+                            name="CameraViewAngleInfo">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraParallelScale"
-        command="SetParallelScale"
-        information_property="CameraParallelScaleInfo"
-        number_of_elements="1"
-        ignore_synchronization="1"
-        default_values="1.0">
+      <DoubleVectorProperty command="SetViewAngle"
+                            default_values="30"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraViewAngleInfo"
+                            name="CameraViewAngle"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetClippingRange"
+                            default_values="0.01 1000.01"
+                            information_only="1"
+                            name="CameraClippingRangeInfo"
+                            number_of_elements="2">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="CameraParallelScaleInfo"
-        command="GetParallelScale"
-        number_of_elements="1"
-        information_only="1"
-        default_values="1.0" >
-        <SimpleDoubleInformationHelper/>
+      <DoubleVectorProperty command="SetClippingRange"
+                            default_values="0.01 1000.01"
+                            ignore_synchronization="1"
+                            immediate_update="1"
+                            information_property="CameraClippingRangeInfo"
+                            name="CameraClippingRange"
+                            number_of_elements="2"></DoubleVectorProperty>
+      <DoubleVectorProperty command="SetParallelScale"
+                            default_values="1.0"
+                            ignore_synchronization="1"
+                            information_property="CameraParallelScaleInfo"
+                            name="CameraParallelScale"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty command="GetParallelScale"
+                            default_values="1.0"
+                            information_only="1"
+                            name="CameraParallelScaleInfo"
+                            number_of_elements="1">
+        <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="CameraParallelProjection"
-        command="SetParallelProjection"
-        number_of_elements="1"
-        ignore_synchronization="1"
-        default_values="0">
+      <IntVectorProperty command="SetParallelProjection"
+                         default_values="0"
+                         ignore_synchronization="1"
+                         name="CameraParallelProjection"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="EyeAngle"
-        command="SetEyeAngle"
-        number_of_elements="1"
-        ignore_synchronization="1"
-        default_values="2.0">
-        <DoubleRangeDomain name="range" min="0" />
+      <DoubleVectorProperty command="SetEyeAngle"
+                            default_values="2.0"
+                            ignore_synchronization="1"
+                            name="EyeAngle"
+                            number_of_elements="1">
+        <DoubleRangeDomain min="0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty
-	  name = "EnableTracking"
-	  command ="SetUseOffAxisProjection"
-	  number_of_elements="1"
-	  default_values="0">
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-         name="HeadPose"
-         command="SetEyeTransformMatrix"
-         is_internal="1"
-         immediate_update="1"
-         number_of_elements="16"
-         argument_is_array="1"
-         default_values="1.0 0.0 0.0 0.0
+      <IntVectorProperty command="SetUseOffAxisProjection"
+                         default_values="0"
+                         name="EnableTracking"
+                         number_of_elements="1"></IntVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetEyeTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
                          0.0 1.0 0.0 0.0
                          0.0 0.0 1.0 0.0
-                         0.0 0.0 0.0 1.0" >
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-         name="WandPose"
-         command="SetModelTransformMatrix"
-         is_internal="1"
-         immediate_update="1"
-         number_of_elements="16"
-         argument_is_array="1"
-         default_values="1.0 0.0 0.0 0.0
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="HeadPose"
+                            number_of_elements="16"></DoubleVectorProperty>
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetModelTransformMatrix"
+                            default_values="1.0 0.0 0.0 0.0
                          0.0 1.0 0.0 0.0
                          0.0 0.0 1.0 0.0
-                         0.0 0.0 0.0 1.0" >
-      </DoubleVectorProperty>
-
-    </CameraProxy> <!-- end of Camera Proxy -->
+                         0.0 0.0 0.0 1.0"
+                            immediate_update="1"
+                            is_internal="1"
+                            name="WandPose"
+                            number_of_elements="16"></DoubleVectorProperty>
+    </CameraProxy>
+    <!-- end of Camera Proxy -->
   </ProxyGroup>
-
   <ProxyGroup name="mappers">
-
-    <Proxy name="ProjectedTetrahedraMapper"
-      class="vtkProjectedTetrahedraMapper"
-      processes="client|renderserver|dataserver">
-    </Proxy>
-
-    <Proxy name="HAVSVolumeMapper"
-      class="vtkHAVSVolumeMapper"
-      processes="client|renderserver|dataserver">
-    </Proxy>
-
+    <Proxy class="vtkProjectedTetrahedraMapper"
+           name="ProjectedTetrahedraMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <Proxy class="vtkHAVSVolumeMapper"
+           name="HAVSVolumeMapper"
+           processes="client|renderserver|dataserver"></Proxy>
     <Proxy name="DummyVolumeMapper">
-      <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
         <ProxyGroupDomain name="groups">
-          <Group name="ugrid_raycast_functions"/>
+          <Group name="ugrid_raycast_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
-
-    <Proxy name="UnstructuredGridVolumeRayCastMapper"
-      class="vtkUnstructuredGridVolumeRayCastMapper"
-      processes="client|renderserver|dataserver">
-      <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
+    <Proxy class="vtkUnstructuredGridVolumeRayCastMapper"
+           name="UnstructuredGridVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <ProxyProperty command="SetRayCastFunction"
+                     name="RayCastFunction">
         <ProxyGroupDomain name="groups">
-          <Group name="ugrid_raycast_functions"/>
+          <Group name="ugrid_raycast_functions" />
         </ProxyGroupDomain>
       </ProxyProperty>
     </Proxy>
-
-    <Proxy name="UnstructuredGridVolumeZSweepMapper"
-      class="vtkUnstructuredGridVolumeZSweepMapper"
-      processes="client|renderserver|dataserver">
-    </Proxy>
-
-    <Proxy name="GPUVolumeRayCastMapper"
-      class="vtkGPUVolumeRayCastMapper"
-      processes="client|renderserver|dataserver">
-      <Documentation>
-        This is the proxy for GPU based volume rendering.
-      </Documentation>
-      <IntVectorProperty
-        name="BlendMode"
-        command="SetBlendMode"
-        default_values="0"
-        number_of_elements="1"
-        animateable="0">
-        <Documentation>
-          Set the current blend mode. Default is Composite. MaximumIntensity is
-          also known as MIP rendering.
-        </Documentation>
+    <Proxy class="vtkUnstructuredGridVolumeZSweepMapper"
+           name="UnstructuredGridVolumeZSweepMapper"
+           processes="client|renderserver|dataserver"></Proxy>
+    <Proxy class="vtkGPUVolumeRayCastMapper"
+           name="GPUVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <Documentation>This is the proxy for GPU based volume
+      rendering.</Documentation>
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Composite"/>
-          <Entry value="1" text="MaximumIntensity"/>
-          <Entry value="2" text="MinimumIntensity"/>
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="AutoAdjustSampleDistances"
-        command="SetAutoAdjustSampleDistances"
-        default_values="1"
-        number_of_elements="1"
-        animateable="0">
-        <Documentation>
-        If AutoAdjustSampleDistances is on, the the ImageSampleDistance
-        will be varied to achieve the allocated render time of this
-        prop (controlled by the desired update rate and any culling in
-        use).
-        </Documentation>
+      <IntVectorProperty animateable="0"
+                         command="SetAutoAdjustSampleDistances"
+                         default_values="1"
+                         name="AutoAdjustSampleDistances"
+                         number_of_elements="1">
+        <Documentation>If AutoAdjustSampleDistances is on, the the
+        ImageSampleDistance will be varied to achieve the allocated render time
+        of this prop (controlled by the desired update rate and any culling in
+        use).</Documentation>
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="SampleDistance"
-        command="SetSampleDistance"
-        default_values="1.0"
-        number_of_elements="1"
-        animateable="0">
-        <Documentation>
-        Set/Get the distance between samples used for rendering
-        when AutoAdjustSampleDistances is off, or when this mapper
-        has more than 1 second allocated to it for rendering.
-        </Documentation>
+      <DoubleVectorProperty animateable="0"
+                            command="SetSampleDistance"
+                            default_values="1.0"
+                            name="SampleDistance"
+                            number_of_elements="1">
+        <Documentation>Set/Get the distance between samples used for rendering
+        when AutoAdjustSampleDistances is off, or when this mapper has more
+        than 1 second allocated to it for rendering.</Documentation>
       </DoubleVectorProperty>
       <!-- End of GPUVolumeRayCastMapper -->
     </Proxy>
-
-    <Proxy name="FixedPointVolumeRayCastMapper"
-      class="vtkFixedPointVolumeRayCastMapper"
-      processes="client|renderserver|dataserver">
-      <IntVectorProperty
-        name="BlendMode"
-        command="SetBlendMode"
-        default_values="0"
-        number_of_elements="1"
-        animateable="0">
-        <Documentation>
-          Set the current blend mode. Default is Composite. MaximumIntensity is
-          also known as MIP rendering.
-        </Documentation>
+    <Proxy class="vtkFixedPointVolumeRayCastMapper"
+           name="FixedPointVolumeRayCastMapper"
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty animateable="0"
+                         command="SetBlendMode"
+                         default_values="0"
+                         name="BlendMode"
+                         number_of_elements="1">
+        <Documentation>Set the current blend mode. Default is Composite.
+        MaximumIntensity is also known as MIP rendering.</Documentation>
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Composite"/>
-          <Entry value="1" text="MaximumIntensity"/>
-          <Entry value="2" text="MinimumIntensity"/>
+          <Entry text="Composite"
+                 value="0" />
+          <Entry text="MaximumIntensity"
+                 value="1" />
+          <Entry text="MinimumIntensity"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="LockSampleDistanceToInputSpacing"
-        command="SetLockSampleDistanceToInputSpacing"
-        default_values="1"
-        number_of_elements="1"
-        animateable="0">
+      <IntVectorProperty animateable="0"
+                         command="SetLockSampleDistanceToInputSpacing"
+                         default_values="1"
+                         name="LockSampleDistanceToInputSpacing"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of FixedPointVolumeRayCastMapper -->
     </Proxy>
-
-  <!-- End of "mappers" -->
+    <!-- End of "mappers" -->
   </ProxyGroup>
-
   <ProxyGroup name="ugrid_raycast_functions">
-    <Proxy name="BunykRayCastFunction"
-           class="vtkUnstructuredGridBunykRayCastFunction">
-    </Proxy>
+    <Proxy class="vtkUnstructuredGridBunykRayCastFunction"
+           name="BunykRayCastFunction"></Proxy>
   </ProxyGroup>
-
   <ProxyGroup name="textures">
-    <SourceProxy name="Texture" class="vtkTexture">
-      <InputProperty name="Input" command="SetInputConnection">
+    <SourceProxy class="vtkTexture"
+                 name="Texture">
+      <InputProperty command="SetInputConnection"
+                     name="Input">
         <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
+          <Group name="sources" />
+          <Group name="filters" />
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkImageData"/>
+          <DataType value="vtkImageData" />
         </DataTypeDomain>
       </InputProperty>
     </SourceProxy>
-
-    <Proxy name="ImageTexture"
-           class="vtkTexture"
+    <Proxy class="vtkTexture"
+           name="ImageTexture"
            si_class="vtkSIImageTextureProxy">
-      <Documentation>
-        This is a proxy for a vtkTexture which also includes an image file
-        reader. This reader can read an image of client/data server or render
-        server and then transmit it to the client/render server where it will be
-        used for texturing.
-      </Documentation>
+      <Documentation>This is a proxy for a vtkTexture which also includes an
+      image file reader. This reader can read an image of client/data server or
+      render server and then transmit it to the client/render server where it
+      will be used for texturing.</Documentation>
       <SubProxy>
         <Proxy name="Source"
-          proxygroup="sources" proxyname="NetworkImageSource" />
+               proxygroup="sources"
+               proxyname="NetworkImageSource" />
         <ExposedProperties>
           <Property name="FileName" />
         </ExposedProperties>
       </SubProxy>
-      <IntVectorProperty
-        name="RestrictPowerOf2ImageSmaller"
-        command="SetRestrictPowerOf2ImageSmaller"
-        number_of_elements="1"
-        default_values="0"
-        animateable="1">
+      <IntVectorProperty animateable="1"
+                         command="SetRestrictPowerOf2ImageSmaller"
+                         default_values="0"
+                         name="RestrictPowerOf2ImageSmaller"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
     </Proxy>
   </ProxyGroup>
-
   <ProxyGroup name="props">
-    <Proxy name="TextActor" class="vtkTextActor">
-      <Documentation>
-        Proxy for a text actor. Not to be used directly.
-      </Documentation>
-
-      <StringVectorProperty
-        name="Text"
-        command="SetInput"
-        number_of_elements="1"
-        animateable="0">
-      </StringVectorProperty>
-
-      <IntVectorProperty
-        name="Visibility"
-        command="SetVisibility"
-        number_of_elements="1"
-        default_values="1"
-        animateable="1">
+    <Proxy class="vtkTextActor"
+           name="TextActor">
+      <Documentation>Proxy for a text actor. Not to be used
+      directly.</Documentation>
+      <StringVectorProperty animateable="0"
+                            command="SetInput"
+                            name="Text"
+                            number_of_elements="1"></StringVectorProperty>
+      <IntVectorProperty animateable="1"
+                         command="SetVisibility"
+                         default_values="1"
+                         name="Visibility"
+                         number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="Position"
-        command="SetPosition"
-        number_of_elements="2"
-        default_values="0 0"
-        animateable="0">
+      <DoubleVectorProperty animateable="0"
+                            command="SetPosition"
+                            default_values="0 0"
+                            name="Position"
+                            number_of_elements="2">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="TextScaleMode"
-        command="SetTextScaleMode"
-        number_of_elements="1"
-        default_values="2"
-        animateable="0">
+      <IntVectorProperty animateable="0"
+                         command="SetTextScaleMode"
+                         default_values="2"
+                         name="TextScaleMode"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="None" />
-          <Entry value="1" text="Prop" />
-          <Entry value="2" text="Viewport" />
+          <Entry text="None"
+                 value="0" />
+          <Entry text="Prop"
+                 value="1" />
+          <Entry text="Viewport"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <ProxyProperty name="TextProperty"
-        command="SetTextProperty">
+      <ProxyProperty command="SetTextProperty"
+                     name="TextProperty">
         <ProxyGroupDomain name="groups">
-          <Group name="properties"/>
+          <Group name="properties" />
         </ProxyGroupDomain>
       </ProxyProperty>
-
       <!-- End of TextActor -->
     </Proxy>
-
     <!-- End of group "props" -->
   </ProxyGroup>
-
   <ProxyGroup name="properties">
-    <Proxy name="TextProperty" class="vtkTextProperty">
-      <DoubleVectorProperty
-        name="Color"
-        command="SetColor"
-        number_of_elements="3"
-        argument_is_array="1"
-        default_values="1.0 1.0 1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+    <Proxy class="vtkTextProperty"
+           name="TextProperty">
+      <DoubleVectorProperty animateable="0"
+                            argument_is_array="1"
+                            command="SetColor"
+                            default_values="1.0 1.0 1.0"
+                            name="Color"
+                            number_of_elements="3">
+        <DoubleRangeDomain max="1 1 1"
+                           min="0 0 0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <DoubleVectorProperty
-        name="Opacity"
-        command="SetOpacity"
-        number_of_elements="1"
-        default_values="1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      <DoubleVectorProperty animateable="0"
+                            command="SetOpacity"
+                            default_values="1.0"
+                            name="Opacity"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="1.0"
+                           min="0.0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <IntVectorProperty
-        name="FontFamily"
-        command="SetFontFamily"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
+      <IntVectorProperty animateable="0"
+                         command="SetFontFamily"
+                         default_values="0"
+                         name="FontFamily"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Arial"/>
-          <Entry value="1" text="Courier"/>
-          <Entry value="2" text="Times"/>
+          <Entry text="Arial"
+                 value="0" />
+          <Entry text="Courier"
+                 value="1" />
+          <Entry text="Times"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Bold"
-        command="SetBold"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
-        <BooleanDomain name="bool"/>
+      <IntVectorProperty animateable="0"
+                         command="SetBold"
+                         default_values="0"
+                         name="Bold"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Italic"
-        command="SetItalic"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
-        <BooleanDomain name="bool"/>
+      <IntVectorProperty animateable="0"
+                         command="SetItalic"
+                         default_values="0"
+                         name="Italic"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="Shadow"
-        command="SetShadow"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
-        <BooleanDomain name="bool"/>
+      <IntVectorProperty animateable="0"
+                         command="SetShadow"
+                         default_values="0"
+                         name="Shadow"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
-
-      <IntVectorProperty
-        name="FontSize"
-        command="SetFontSize"
-        number_of_elements="1"
-        default_values="18"
-        animateable="0">
-        <IntRangeDomain name="range" min="0" />
+      <IntVectorProperty animateable="0"
+                         command="SetFontSize"
+                         default_values="18"
+                         name="FontSize"
+                         number_of_elements="1">
+        <IntRangeDomain min="0"
+                        name="range" />
       </IntVectorProperty>
-
-      <DoubleVectorProperty name="Orientation"
-        command="SetOrientation"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
-      </DoubleVectorProperty>
-
-      <DoubleVectorProperty name="LineOffset"
-        command="SetLineOffset"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="Justification"
-        command="SetJustification"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
+      <DoubleVectorProperty animateable="0"
+                            command="SetOrientation"
+                            default_values="0"
+                            name="Orientation"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <DoubleVectorProperty animateable="0"
+                            command="SetLineOffset"
+                            default_values="0"
+                            name="LineOffset"
+                            number_of_elements="1"></DoubleVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetJustification"
+                         default_values="0"
+                         name="Justification"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Left"/>
-          <Entry value="1" text="Center"/>
-          <Entry value="2" text="Right"/>
+          <Entry text="Left"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Right"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
-      <IntVectorProperty name="VerticalJustification"
-        command="SetVerticalJustification"
-        number_of_elements="1"
-        default_values="0"
-        animateable="0">
+      <IntVectorProperty animateable="0"
+                         command="SetVerticalJustification"
+                         default_values="0"
+                         name="VerticalJustification"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="0" text="Bottom"/>
-          <Entry value="1" text="Center"/>
-          <Entry value="2" text="Top"/>
+          <Entry text="Bottom"
+                 value="0" />
+          <Entry text="Center"
+                 value="1" />
+          <Entry text="Top"
+                 value="2" />
         </EnumerationDomain>
       </IntVectorProperty>
-
       <!-- End of TextProperty -->
     </Proxy>
-
   </ProxyGroup>
-
   <ProxyGroup name="interactors">
-    <Proxy name="GenericRenderWindowInteractor" class="vtkPVGenericRenderWindowInteractor">
-      <ProxyProperty
-        name="Renderer"
-        command="SetRenderer">
+    <Proxy class="vtkPVGenericRenderWindowInteractor"
+           name="GenericRenderWindowInteractor">
+      <ProxyProperty command="SetRenderer"
+                     name="Renderer">
         <ProxyGroupDomain name="groups">
-          <Group  name="renderers" />
+          <Group name="renderers" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <ProxyProperty
-        name="InteractorStyle"
-        command="SetInteractorStyle">
+      <ProxyProperty command="SetInteractorStyle"
+                     name="InteractorStyle">
         <ProxyGroupDomain name="groups">
-          <Group  name="interactorstyles" />
+          <Group name="interactorstyles" />
         </ProxyGroupDomain>
       </ProxyProperty>
-      <DoubleVectorProperty
-        name="CenterOfRotation"
-        command="SetCenterOfRotation"
-        number_of_elements="3"
-        default_values="0 0 0">
-      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetCenterOfRotation"
+                            default_values="0 0 0"
+                            name="CenterOfRotation"
+                            number_of_elements="3"></DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
-
   <ProxyGroup name="interactorstyles">
-    <Proxy name="InteractorStyle" class="vtkPVInteractorStyle">
-      <ProxyProperty
-        name="CameraManipulators"
-        command="AddManipulator"
-        clean_command="RemoveAllManipulators"
-        is_internal="1"
-        repeatable="1">
+    <Proxy class="vtkPVInteractorStyle"
+           name="InteractorStyle">
+      <ProxyProperty clean_command="RemoveAllManipulators"
+                     command="AddManipulator"
+                     is_internal="1"
+                     name="CameraManipulators"
+                     repeatable="1">
         <!-- For now, we are marking this property is_internal so that it won't
         get saved in state files.
         Eventually, we need to take out all the interaction related code from
@@ -546,126 +461,125 @@
       </ProxyProperty>
     </Proxy>
   </ProxyGroup>
-
   <ProxyGroup name="cameramanipulators">
-    <Proxy name="CameraManipulator" class="vtkCameraManipulator"
-      processes="client|renderserver|dataserver" >
-      <IntVectorProperty
-        name="Button"
-        command="SetButton"
-        number_of_elements="1"
-        default_values="1">
+    <Proxy class="vtkCameraManipulator"
+           name="CameraManipulator"
+           processes="client|renderserver|dataserver">
+      <IntVectorProperty command="SetButton"
+                         default_values="1"
+                         name="Button"
+                         number_of_elements="1">
         <EnumerationDomain name="enum">
-          <Entry value="1" text="Left Button"/>
-          <Entry value="2" text="Center Button"/>
-          <Entry value="3" text="Right Button"/>
+          <Entry text="Left Button"
+                 value="1" />
+          <Entry text="Center Button"
+                 value="2" />
+          <Entry text="Right Button"
+                 value="3" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty
-        name="Shift"
-        command="SetShift"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="IsShiftPressed"/>
+      <IntVectorProperty command="SetShift"
+                         default_values="0"
+                         name="Shift"
+                         number_of_elements="1">
+        <BooleanDomain name="IsShiftPressed" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="Control"
-        command="SetControl"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="IsControlPressed"/>
+      <IntVectorProperty command="SetControl"
+                         default_values="0"
+                         name="Control"
+                         number_of_elements="1">
+        <BooleanDomain name="IsControlPressed" />
       </IntVectorProperty>
-      <StringVectorProperty
-        name="ManipulatorName"
-        command="SetManipulatorName"
-        number_of_elements="1">
-      </StringVectorProperty>
+      <StringVectorProperty command="SetManipulatorName"
+                            name="ManipulatorName"
+                            number_of_elements="1"></StringVectorProperty>
     </Proxy>
-
-    <Proxy name="JoystickFlyIn" class="vtkPVJoystickFlyIn" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" >
-      <DoubleVectorProperty
-        name="FlySpeed"
-        command="SetFlySpeed"
-        number_of_elements="1"
-        default_values="15">
-        <DoubleRangeDomain name="range" min="1" max="30"/>
-      </DoubleVectorProperty>
-    </Proxy>
-
-    <Proxy name="JoystickFlyOut" class="vtkPVJoystickFlyOut" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" >
-      <DoubleVectorProperty
-        name="FlySpeed"
-        command="SetFlySpeed"
-        number_of_elements="1"
-        default_values="15">
-        <DoubleRangeDomain name="range" min="1" max="30"/>
-      </DoubleVectorProperty>
-    </Proxy>
-
-    <Proxy name="TrackballMoveActor" class="vtkPVTrackballMoveActor" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballPan1" class="vtkTrackballPan" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballPan2" class="vtkPVTrackballPan" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballRoll" class="vtkPVTrackballRoll" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballRotate" class="vtkPVTrackballRotate" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballZoom" class="vtkPVTrackballZoom" base_proxygroup="cameramanipulators"
-      base_proxyname="CameraManipulator"
-      processes="client|renderserver|dataserver" />
-
-    <Proxy name="TrackballMultiRotate" class="vtkPVTrackballMultiRotate"
-           base_proxygroup="cameramanipulators"
+    <Proxy base_proxygroup="cameramanipulators"
            base_proxyname="CameraManipulator"
+           class="vtkPVJoystickFlyIn"
+           name="JoystickFlyIn"
+           processes="client|renderserver|dataserver">
+      <DoubleVectorProperty command="SetFlySpeed"
+                            default_values="15"
+                            name="FlySpeed"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="30"
+                           min="1"
+                           name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVJoystickFlyOut"
+           name="JoystickFlyOut"
+           processes="client|renderserver|dataserver">
+      <DoubleVectorProperty command="SetFlySpeed"
+                            default_values="15"
+                            name="FlySpeed"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="30"
+                           min="1"
+                           name="range" />
+      </DoubleVectorProperty>
+    </Proxy>
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballMoveActor"
+           name="TrackballMoveActor"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkTrackballPan"
+           name="TrackballPan1"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballPan"
+           name="TrackballPan2"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballRoll"
+           name="TrackballRoll"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballRotate"
+           name="TrackballRotate"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballZoom"
+           name="TrackballZoom"
+           processes="client|renderserver|dataserver" />
+    <Proxy base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator"
+           class="vtkPVTrackballMultiRotate"
+           name="TrackballMultiRotate"
            processes="client|renderserver|dataserver" />
   </ProxyGroup>
-
   <ProxyGroup name="PropPickers">
-    <Proxy name="AreaPicker"
-           class="vtkRenderedAreaPicker">
-
-      <ProxyProperty
-        name="SetRenderer"
-        command="SetRenderer">
+    <Proxy class="vtkRenderedAreaPicker"
+           name="AreaPicker">
+      <ProxyProperty command="SetRenderer"
+                     name="SetRenderer">
         <ProxyGroupDomain name="groups">
-          <Group name="renderers"/>
+          <Group name="renderers" />
         </ProxyGroupDomain>
       </ProxyProperty>
-
-      <DoubleVectorProperty
-        name="SetPickCoords"
-        command="SetPickCoords"
-        number_of_elements="4"
-        default_values="0.0 0.0 0.0 0.0">
-        <DoubleRangeDomain name="range" min="0.0 0.0 0.0 0.0"/>
+      <DoubleVectorProperty command="SetPickCoords"
+                            default_values="0.0 0.0 0.0 0.0"
+                            name="SetPickCoords"
+                            number_of_elements="4">
+        <DoubleRangeDomain min="0.0 0.0 0.0 0.0"
+                           name="range" />
       </DoubleVectorProperty>
-
-      <Property
-        name="Pick"
-        command="Pick"
-        is_internal="1">
-      </Property>
+      <Property command="Pick"
+                is_internal="1"
+                name="Pick"></Property>
     </Proxy>
-
     <!-- End of PropPickers -->
   </ProxyGroup>
-
   <ProxyGroup name="views">
     <!--
     <CaveRenderViewProxy name="CaveRenderView"
@@ -684,5 +598,4 @@
     -->
     <!-- End of group "views" -->
   </ProxyGroup>
-
 </ServerManagerConfiguration>
