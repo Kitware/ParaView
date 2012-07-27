@@ -145,7 +145,7 @@ if(NOT PV_INSTALL_PLUGIN_DIR)
 endif()
 
 #set (VTK_INSTALL_NO_LIBRARIES TRUE)
-set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+#set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
 
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
@@ -218,9 +218,9 @@ mark_as_advanced(BUILD_FORTRAN_COPROCESSING_ADAPTORS)
 # Update state based on chosen/imported options.
 #------------------------------------------------------------------------------
 # Set shared libs related state
-if (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
-  set(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
-endif (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
+#if (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
+#  set(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
+#endif (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 set (PARAVIEW_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
 # Setup Qt state
