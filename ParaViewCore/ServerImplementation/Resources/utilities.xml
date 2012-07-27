@@ -195,6 +195,18 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <ProxyProperty name="ScalarOpacityFunction"
+        command="SetScalarOpacityFunction">
+      </ProxyProperty>
+
+      <IntVectorProperty name="EnableOpacityMapping"
+        command="SetEnableOpacityMapping"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+
       <!-- End of PVLookupTable -->
     </Proxy>
   </ProxyGroup>

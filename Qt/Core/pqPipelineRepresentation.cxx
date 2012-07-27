@@ -204,8 +204,8 @@ pqScalarOpacityFunction* pqPipelineRepresentation::getScalarOpacityFunction()
 {
   if (this->getRepresentationType().compare("Volume", Qt::CaseInsensitive) == 0)
     {
-    pqServerManagerModel* smmodel = 
-      pqApplicationCore::instance()->getServerManagerModel();
+    pqServerManagerModel* smmodel =
+        pqApplicationCore::instance()->getServerManagerModel();
     vtkSMProxy* opf = this->getScalarOpacityFunctionProxy();
 
     return (opf? smmodel->findItem<pqScalarOpacityFunction*>(opf): 0);
