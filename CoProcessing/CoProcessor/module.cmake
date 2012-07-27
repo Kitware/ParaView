@@ -3,11 +3,11 @@ if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND __depends vtkPVPythonSupport)
 endif()
 
-vtk_module(vtkCoProcessor
+vtk_module(vtkCoProcessorImplementation
   GROUPS
     CoProcessing
   DEPENDS
-    vtkCoProcessorCore
+    vtkCoProcessor
     vtkPVServerManagerApplication
     ${__depends}
   EXCLUDE_FROM_WRAPPING

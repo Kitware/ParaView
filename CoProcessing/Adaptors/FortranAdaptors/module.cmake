@@ -2,6 +2,6 @@ vtk_module(FortranAdaptor
   GROUPS
     CoProcessing
   DEPENDS
-    vtkCoProcessor
+    vtkCoProcessorImplementation
   EXCLUDE_FROM_WRAPPING
 )

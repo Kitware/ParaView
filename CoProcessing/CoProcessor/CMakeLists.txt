@@ -55,6 +55,9 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CPSystemInformation.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/CPSystemInformation.h"
     @ONLY IMMEDIATE)
 
+# disable header testing for this module.
+set (${vtk-module}_NO_HeaderTest TRUE)
+
 vtk_module_library(${vtk-module}
   ${Modules_SRCS})
 

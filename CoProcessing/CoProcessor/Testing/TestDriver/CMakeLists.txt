@@ -1,19 +1,4 @@
 PROJECT(TestDriver)
-cmake_minimum_required(VERSION 2.6)
-
-#--------------------------------------------------
-# Find and Use ParaView
-#--------------------------------------------------
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
 
 include_directories(
   ${TestDriver_SOURCE_DIR} 
@@ -54,7 +39,7 @@ SET_SOURCE_FILES_PROPERTIES(
 ADD_LIBRARY(vtkCPTestDriver
   ${TestDriver_SRCS} 
 )
-TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessor vtkFiltersCore)
+TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessorImplementation vtkFiltersCore)
 
 IF (VTK_WRAP_PYTHON)
   # Create Python bindings for the co-processing library

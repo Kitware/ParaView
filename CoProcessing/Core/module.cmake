@@ -1,4 +1,4 @@
-vtk_module(vtkCoProcessorCore
+vtk_module(vtkCoProcessor
   GROUPS
     CoProcessing
   DEPENDS

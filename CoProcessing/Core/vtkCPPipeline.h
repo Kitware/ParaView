@@ -16,7 +16,7 @@
 #define vtkCPPipeline_h
 
 #include "vtkObject.h"
-#include "vtkCoProcessorCoreModule.h" // For windows import/export of shared libraries
+#include "vtkCoProcessorModule.h" // For windows import/export of shared libraries
 
 class vtkCPDataDescription;
 
@@ -26,7 +26,7 @@ class vtkCPDataDescription;
 /// or they can use this to create a single pipeline and add it to
 /// vtkCPProcessor.  Each derived class should set itself up before
 /// adding itself to vtkCPProcessor.
-class VTKCOPROCESSORCORE_EXPORT vtkCPPipeline : public vtkObject
+class VTKCOPROCESSOR_EXPORT vtkCPPipeline : public vtkObject
 {
 public:
   vtkTypeMacro(vtkCPPipeline,vtkObject);

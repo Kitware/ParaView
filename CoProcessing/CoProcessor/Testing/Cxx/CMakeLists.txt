@@ -1,4 +1,6 @@
 set (CoProcessing_BINARY_DIR ${ParaView_BINARY_DIR}/CoProcessing)
+set (CoProcessing_SOURCE_DIR ${ParaView_SOURCE_DIR}/CoProcessing)
+
 include_directories(
   ${TestDriver_SOURCE_DIR}
   )
@@ -100,7 +102,7 @@ ENDMACRO(CreateCoProcessingScriptTest)
 
 IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
-  TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
+  TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessorImplementation vtkCPTestDriver)
 
   CreateCoProcessingScriptTest(CoProcessingTestPythonScript PythonScriptTest.py
     CPGrid0.png CPPressure0.png CPGrid0.png CPPressure0.png "" "")
