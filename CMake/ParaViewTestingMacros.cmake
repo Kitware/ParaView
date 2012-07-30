@@ -78,6 +78,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
       endif()
+ 
+      # add the "PARAVIEW" label to the test properties. this allows for the user
+      # to instruct cmake to run just the ParaView tests with the '-L' flag
+      set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW")
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -155,6 +159,8 @@ FUNCTION(add_multi_client_tests prefix)
         set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}.${test_name}\"")
       endif (${test_name}_FORCE_SERIAL)
+
+      set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
@@ -179,6 +185,7 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         ${extra_args}
         --exit
         )
+      set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
   endforeach(test_script)
 ENDFUNCTION(add_multi_server_tests)
 
@@ -215,6 +222,8 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
           set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
           message(STATUS "Running in serial \"${prefix}.${test_name}\"")
         endif (${test_name}_FORCE_SERIAL)
+
+        set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES LABELS "PARAVIEW")
       endforeach(test_script)
     endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
   endif()
