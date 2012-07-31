@@ -66,8 +66,36 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
       message(WARNING "Unable to find: ${class}")
     endif()  
   endforeach()
+
+  # build hints file for the module
+  if(VTK_WRAP_HINTS)
+    set(SAVED_VTK_WRAP_HINTS ${VTK_WRAP_HINTS})
+  endif()
+
+  # variable storing VTK's hints combined with the module's hints
+  set(COMBINED_HINTS "")
+
+  if(VTK_WRAP_HINTS)
+    file(READ ${VTK_WRAP_HINTS} COMBINED_HINTS)
+  endif()
+  foreach(_dir ${${module}_INCLUDE_DIRS})
+    if(EXISTS ${_dir}/hints)
+      file(READ "${_dir}/hints" MODULE_HINTS)
+      set(COMBINED_HINTS "${COMBINED_HINTS}\n${MODULE_HINTS}")
+    endif()
+  endforeach()
+
+  if(NOT ${COMBINED_HINTS} EQUAL "")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints ${COMBINED_HINTS})
+    set(VTK_WRAP_HINTS "${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints")
+  endif()
   
   VTK_WRAP_ClientServer("${libname}" "${module}CS_SRCS" "${${module}CS_HEADERS}")
+
+  # restore VTK_WRAP_HINTS
+  if(SAVED_VTK_WRAP_HINTS)
+    set(VTK_WRAP_HINTS ${SAVED_VTK_WRAP_HINTS})
+  endif()
 endmacro()
 
 #------------------------------------------------------------------------------
