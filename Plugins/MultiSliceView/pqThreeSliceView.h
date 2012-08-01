@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    pqMultiSliceView.h
+  Module:    pqThreeSliceView.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,56 +12,56 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME pqMultiSliceView - QT GUI that allow multi slice control
+// .NAME pqThreeSliceView - QT GUI that allow 3 slice control across 4 view embedded as 1
 
-#ifndef __pqMultiSliceView_h
-#define __pqMultiSliceView_h
+#ifndef __pqThreeSliceView_h
+#define __pqThreeSliceView_h
 
 #include "pqRenderView.h"
 
 #include <QtCore>
 #include <QtGui>
 
-class pqSliceAxisWidget;
+class QVTKWidget;
+class pqRenderView;
+class vtkSMPropertyLink;
+class vtkSMViewProxy;
+class vtkEventQtSlotConnect;
 
-class pqMultiSliceView : public pqRenderView
+class pqThreeSliceView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
 public:
-  static QString pqMultiSliceViewType() { return "MultiSliceView"; }
-  static QString pqMultiSliceViewTypeName() { return "Multi Slice 3D View"; }
+  static QString pqThreeSliceViewType() { return "ThreeSliceView"; }
+  static QString pqThreeSliceViewTypeName() { return "Three Slice View"; }
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView
-  pqMultiSliceView( const QString& viewtype,
+  pqThreeSliceView( const QString& viewtype,
                     const QString& group,
                     const QString& name,
                     vtkSMViewProxy* viewmodule,
                     pqServer* server,
                     QObject* p);
-  virtual ~pqMultiSliceView();
+  virtual ~pqThreeSliceView();
 
   /// Override to decorate the QVTKWidget
   virtual QWidget* createWidget();
 
+  /// Redirect reset camera to all views
+  virtual void resetCamera();
+
 public slots:
-  void updateAxisBounds();
-  void updateAxisBounds(double bounds[6]);
-  void updateSlices();
-
-protected:
-  /// Helper method to get the concreate 3D widget
-  QVTKWidget* getInternalWidget() { return this->InternalWidget; }
-
-  QVTKWidget* InternalWidget;
-  pqSliceAxisWidget* AxisX;
-  pqSliceAxisWidget* AxisY;
-  pqSliceAxisWidget* AxisZ;
+  /// Request a StillRender on idle. Multiple calls are collapsed into one.
+  virtual void render();
 
 private:
-  pqMultiSliceView(const pqMultiSliceView&); // Not implemented.
-  void operator=(const pqMultiSliceView&); // Not implemented.
+  pqThreeSliceView(const pqThreeSliceView&); // Not implemented.
+  void operator=(const pqThreeSliceView&); // Not implemented.
+
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

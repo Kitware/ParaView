@@ -24,14 +24,15 @@
 
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
+#include "vtkDataRepresentation.h"
 #include "vtkMath.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPlot.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkView.h"
-#include "vtkSMPropertyHelper.h"
 
 //-----------------------------------------------------------------------------
 pqMultiSliceView::pqMultiSliceView(
@@ -127,14 +128,7 @@ void pqMultiSliceView::updateAxisBounds(double bounds[6])
   this->AxisY->renderView();
   this->AxisZ->renderView();
 }
-#include "vtkCamera.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "vtkDataRepresentation.h"
-#include "vtkDataObject.h"
-#include "vtkPolyData.h"
 
-#include "vtkDataSet.h"
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::updateAxisBounds()
 {
