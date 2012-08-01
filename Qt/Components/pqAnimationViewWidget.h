@@ -103,6 +103,9 @@ protected slots:
   void setCurrentTime(double);
   void setKeyFrameTime(pqAnimationTrack*, pqAnimationKeyFrame*, int, double);
 
+  // update the time labels
+  void onTimeLabelChanged();
+
 private:
   pqAnimationViewWidget(const pqAnimationViewWidget&); // Not implemented.
   void operator=(const pqAnimationViewWidget&); // Not implemented.
