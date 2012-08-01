@@ -45,6 +45,10 @@ pqMultiSliceView::pqMultiSliceView(
                    this, SLOT(updateAxisBounds()));
   QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
                    this, SLOT(updateAxisBounds()));
+
+  // Make sure all the representations share the same slice values
+  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
+                   this, SLOT(updateSlices()));
 }
 
 //-----------------------------------------------------------------------------

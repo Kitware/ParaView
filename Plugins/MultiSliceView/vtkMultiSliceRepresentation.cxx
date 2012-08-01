@@ -118,7 +118,6 @@ void vtkMultiSliceRepresentation::SetNumberOfSlice(vtkCutter* slice, int size)
 {
   if(size != slice->GetNumberOfContours())
     {
-    cout  << "Update the number of slices to " << size << endl;
     slice->SetNumberOfContours(size);
     this->Modified();
     }
