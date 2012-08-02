@@ -24,36 +24,46 @@
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSessionProxyManager.h"
-#include "vtkView.h"
-#include "vtkNew.h"
 #include "vtkSmartPointer.h"
+#include "vtkView.h"
 
 #include <vector>
 
 //----------------------------------------------------------------------------
-struct pqThreeSliceView::pqInternal
+class pqThreeSliceView::pqInternal
 {
-  QPointer<QVTKWidget> InternalWidget;
-  QPointer<QVTKWidget> InternalWidgetX;
-  QPointer<QVTKWidget> InternalWidgetY;
-  QPointer<QVTKWidget> InternalWidgetZ;
+public:
+  QPointer<QVTKWidget> MainWidget;
+  QPointer<QVTKWidget> TopLeftWidget;
+  QPointer<QVTKWidget> TopRightWidget;
+  QPointer<QVTKWidget> BottomLeftWidget;
 
-  QPointer<pqRenderView> AxisX;
-  QPointer<pqRenderView> AxisY;
-  QPointer<pqRenderView> AxisZ;
+  QPointer<pqRenderView> TopLeftRenderer;
+  QPointer<pqRenderView> TopRightRenderer;
+  QPointer<pqRenderView> BottomLeftRenderer;
 
   vtkSmartPointer<vtkSMViewProxy> ViewProxy;
-  vtkSmartPointer<vtkSMRenderViewProxy> ViewProxyForX;
-  vtkSmartPointer<vtkSMRenderViewProxy> ViewProxyForY;
-  vtkSmartPointer<vtkSMRenderViewProxy> ViewProxyForZ;
+  vtkSmartPointer<vtkSMRenderViewProxy> TopLeftProxy;
+  vtkSmartPointer<vtkSMRenderViewProxy> TopRightProxy;
+  vtkSmartPointer<vtkSMRenderViewProxy> BottomLeftProxy;
 
   std::vector<vtkSmartPointer<vtkSMPropertyLink> > Links;
+
+  double TopLeftNormal[3];
+  double TopRightNormal[3];
+  double BottomLeftNormal[3];
+  double TopLeftViewUp[3];
+  double TopRightViewUp[3];
+  double BottomLeftViewUp[3];
+  double SlicesOrigin[3];
 
   // ------
 
@@ -61,12 +71,131 @@ struct pqThreeSliceView::pqInternal
   {
     vtkNew<vtkSMPropertyLink> link;
     link->AddLinkedProperty(this->ViewProxy, property, vtkSMLink::INPUT);
-    link->AddLinkedProperty(this->ViewProxyForX, property, vtkSMLink::OUTPUT);
-    link->AddLinkedProperty(this->ViewProxyForY, property, vtkSMLink::OUTPUT);
-    link->AddLinkedProperty(this->ViewProxyForZ, property, vtkSMLink::OUTPUT);
+    link->AddLinkedProperty(this->TopLeftProxy, property, vtkSMLink::OUTPUT);
+    link->AddLinkedProperty(this->TopRightProxy, property, vtkSMLink::OUTPUT);
+    link->AddLinkedProperty(this->BottomLeftProxy, property, vtkSMLink::OUTPUT);
 
     // Keep it with auto-delete
     this->Links.push_back(link.GetPointer());
+  }
+
+  // ------
+
+  void ResetToDefault()
+  {
+    // Reset to 0.0 everywhere
+    for(int i=0;i<3;i++)
+      {
+      this->SlicesOrigin[i]
+          = this->TopLeftNormal[i] = this->TopLeftViewUp[i]
+          = this->TopRightNormal[i] = this->TopRightViewUp[i]
+          = this->BottomLeftNormal[i] = this->BottomLeftViewUp[i] = 0.0;
+      }
+
+    // Set 1.0 only where it is necessery
+    this->TopLeftNormal[0] = this->TopLeftViewUp[1]
+        = this->TopRightNormal[1] = this->TopRightViewUp[2]
+        = this->BottomLeftNormal[2] = this->BottomLeftViewUp[1]
+        = 1.0;
+  }
+
+  // ------
+
+  void UpdateSlices()
+  {
+    // Init orientation
+    double cameraPosition[3] = {0,0,0};
+    const char* focalPoint = "CameraFocalPointInfo";
+    const char* position   = "CameraPosition";
+    const char* viewUp     = "CameraViewUp";
+
+    // Update X (Top-Left)
+    vtkSMPropertyHelper(this->TopLeftProxy, focalPoint).Get(cameraPosition, 3);
+    vtkMath::Add(cameraPosition, this->TopLeftNormal, cameraPosition);
+    vtkSMPropertyHelper(this->TopLeftProxy, position).Set(cameraPosition, 3);
+    vtkSMPropertyHelper(this->TopLeftProxy, viewUp).Set(this->TopLeftViewUp, 3);
+    this->TopLeftProxy->InvokeCommand("ResetCamera");
+
+    // Update Y (Top-Right)
+    vtkSMPropertyHelper(this->TopRightProxy, focalPoint).Get(cameraPosition, 3);
+    vtkMath::Add(cameraPosition, this->TopRightNormal, cameraPosition);
+    vtkSMPropertyHelper(this->TopRightProxy, position).Set(cameraPosition, 3);
+    vtkSMPropertyHelper(this->TopRightProxy, viewUp).Set(this->TopRightViewUp, 3);
+    this->TopRightProxy->InvokeCommand("ResetCamera");
+
+    // Update Z (Bottom-Left)
+    vtkSMPropertyHelper(this->BottomLeftProxy, focalPoint).Get(cameraPosition, 3);
+    vtkMath::Add(cameraPosition, this->BottomLeftNormal, cameraPosition);
+    vtkSMPropertyHelper(this->BottomLeftProxy, position).Set(cameraPosition, 3);
+    vtkSMPropertyHelper(this->BottomLeftProxy, viewUp).Set(this->BottomLeftViewUp, 3);
+    this->BottomLeftProxy->InvokeCommand("ResetCamera");
+  }
+
+  // ------
+
+  void Initialize(pqServer* server, const QString& viewType, const QString& group,
+                  const QString& name, vtkSMViewProxy* mainViewProxy, QObject* p)
+  {
+    vtkSMSessionProxyManager* spxm = server->proxyManager();
+    const char* g = "views";
+    const char* t = "2DRenderView";
+
+    this->ResetToDefault();
+
+    this->ViewProxy = mainViewProxy;
+
+    this->TopLeftProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
+    this->TopLeftProxy->FastDelete();
+
+    this->TopRightProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
+    this->TopRightProxy->FastDelete();
+
+    this->BottomLeftProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
+    this->BottomLeftProxy->FastDelete();
+
+    this->TopLeftRenderer = new pqRenderView(viewType, group, name, this->TopLeftProxy, server, p);
+    this->TopRightRenderer = new pqRenderView(viewType, group, name, this->TopRightProxy, server, p);
+    this->BottomLeftRenderer = new pqRenderView(viewType, group, name, this->BottomLeftProxy, server, p);
+  }
+
+  // ------
+
+  QWidget* CreateWidget(pqThreeSliceView* view)
+  {
+    // Get the internal widget that we want to decorate
+    this->MainWidget = qobject_cast<QVTKWidget*>(view->pqRenderView::createWidget());
+    this->TopLeftWidget = qobject_cast<QVTKWidget*>(this->TopLeftRenderer->getWidget());
+    this->TopRightWidget = qobject_cast<QVTKWidget*>(this->TopRightRenderer->getWidget());
+    this->BottomLeftWidget = qobject_cast<QVTKWidget*>(this->BottomLeftRenderer->getWidget());
+
+    // Build the widget hierarchy
+    QWidget* container = new QWidget();
+    container->setStyleSheet("background-color: white");
+    container->setAutoFillBackground(true);
+
+    QGridLayout* gridLayout = new QGridLayout(container);
+    this->MainWidget->setParent(container);
+
+    gridLayout->addWidget(this->TopLeftWidget,    0, 0); // TOP-LEFT
+    gridLayout->addWidget(this->TopRightWidget,   0, 1); // TOP-RIGHT
+    gridLayout->addWidget(this->BottomLeftWidget, 1, 0); // BOTTOM-LEFT
+    gridLayout->addWidget(this->MainWidget,       1, 1); // BOTTOM-RIGHT
+    gridLayout->setContentsMargins(0,0,0,0);
+    gridLayout->setSpacing(0);
+
+    // Properly do the binding between the proxy and the 3D widget
+    vtkSMRenderViewProxy* renModule = view->getRenderViewProxy();
+    if (this->MainWidget && renModule)
+      {
+      this->MainWidget->SetRenderWindow(renModule->GetRenderWindow());
+      }
+
+    // For axis
+    this->TopLeftWidget->SetRenderWindow(this->TopLeftProxy->GetRenderWindow());
+    this->TopRightWidget->SetRenderWindow(this->TopRightProxy->GetRenderWindow());
+    this->BottomLeftWidget->SetRenderWindow(this->BottomLeftProxy->GetRenderWindow());
+
+    return container;
   }
 };
 
@@ -77,27 +206,7 @@ pqThreeSliceView::pqThreeSliceView(
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
   this->Internal = new pqInternal();
-  this->Internal->ViewProxy = viewProxy;
-
-  this->Internal->ViewProxyForX =
-      vtkSMRenderViewProxy::SafeDownCast(
-        server->proxyManager()->NewProxy("views", "2DRenderView"));
-  this->Internal->ViewProxyForX->FastDelete();
-  this->Internal->ViewProxyForY =
-      vtkSMRenderViewProxy::SafeDownCast(
-        server->proxyManager()->NewProxy("views", "2DRenderView"));
-  this->Internal->ViewProxyForY->FastDelete();
-  this->Internal->ViewProxyForZ =
-      vtkSMRenderViewProxy::SafeDownCast(
-        server->proxyManager()->NewProxy("views", "2DRenderView"));
-  this->Internal->ViewProxyForZ->FastDelete();
-
-  this->Internal->AxisX =
-      new pqRenderView(viewType, group, name, this->Internal->ViewProxyForX, server, this);
-  this->Internal->AxisY =
-      new pqRenderView(viewType, group, name, this->Internal->ViewProxyForY, server, this);
-  this->Internal->AxisZ =
-      new pqRenderView(viewType, group, name, this->Internal->ViewProxyForZ, server, this);
+  this->Internal->Initialize(server, viewType, group, name, viewProxy, this);
 
   // Bind properties across views
   this->Internal->AddLink("UseLight");
@@ -145,66 +254,11 @@ pqThreeSliceView::~pqThreeSliceView()
 //-----------------------------------------------------------------------------
 QWidget* pqThreeSliceView::createWidget()
 {
-  // Get the internal widget that we want to decorate
-  this->Internal->InternalWidget = qobject_cast<QVTKWidget*>(this->pqRenderView::createWidget());
-  this->Internal->InternalWidgetX = qobject_cast<QVTKWidget*>(this->Internal->AxisX->getWidget());
-  this->Internal->InternalWidgetY = qobject_cast<QVTKWidget*>(this->Internal->AxisY->getWidget());
-  this->Internal->InternalWidgetZ = qobject_cast<QVTKWidget*>(this->Internal->AxisZ->getWidget());
+  // Create the widget with all the axes
+  QWidget* container = this->Internal->CreateWidget(this);
 
-  // Build the widget hierarchy
-  QWidget* container = new QWidget();
-  container->setStyleSheet("background-color: white");
-  container->setAutoFillBackground(true);
-
-  QGridLayout* gridLayout = new QGridLayout(container);
-  this->Internal->InternalWidget->setParent(container);
-
-  gridLayout->addWidget(this->Internal->InternalWidgetX, 0, 0); // TOP-LEFT
-  gridLayout->addWidget(this->Internal->InternalWidgetY, 0, 1); // TOP-RIGHT
-  gridLayout->addWidget(this->Internal->InternalWidgetZ, 1, 0); // BOTTOM-LEFT
-  gridLayout->addWidget(this->Internal->InternalWidget,  1, 1);    // BOTTOM-RIGHT
-  gridLayout->setContentsMargins(0,0,0,0);
-  gridLayout->setSpacing(0);
-
-  // Properly do the binding between the proxy and the 3D widget
-  vtkSMRenderViewProxy* renModule = this->getRenderViewProxy();
-  if (this->Internal->InternalWidget && renModule)
-    {
-    this->Internal->InternalWidget->SetRenderWindow(renModule->GetRenderWindow());
-    }
-
-  // For axis
-  this->Internal->InternalWidgetX->SetRenderWindow(this->Internal->ViewProxyForX->GetRenderWindow());
-  this->Internal->InternalWidgetY->SetRenderWindow(this->Internal->ViewProxyForY->GetRenderWindow());
-  this->Internal->InternalWidgetZ->SetRenderWindow(this->Internal->ViewProxyForZ->GetRenderWindow());
-
-  // Init orientation
-  double cameraPosition[3];
-  double viewUp[3] = {0,0,0};
-
-  // Update X
-  vtkSMPropertyHelper(this->Internal->ViewProxyForX, "CameraFocalPointInfo").Get(cameraPosition, 3);
-  cameraPosition[0] += 100;
-  viewUp[1] = 1;
-  vtkSMPropertyHelper(this->Internal->ViewProxyForX, "CameraPosition").Set(cameraPosition, 3);
-  vtkSMPropertyHelper(this->Internal->ViewProxyForX, "CameraViewUp").Set(viewUp, 3);
-  this->Internal->ViewProxyForX->InvokeCommand("ResetCamera");
-
-  // Update Z
-  vtkSMPropertyHelper(this->Internal->ViewProxyForZ, "CameraFocalPointInfo").Get(cameraPosition, 3);
-  cameraPosition[2] += 100;
-  vtkSMPropertyHelper(this->Internal->ViewProxyForZ, "CameraPosition").Set(cameraPosition, 3);
-  vtkSMPropertyHelper(this->Internal->ViewProxyForZ, "CameraViewUp").Set(viewUp, 3);
-  this->Internal->ViewProxyForZ->InvokeCommand("ResetCamera");
-
-  // Update Y
-  vtkSMPropertyHelper(this->Internal->ViewProxyForY, "CameraFocalPointInfo").Get(cameraPosition, 3);
-  cameraPosition[1] += 100;
-  viewUp[1] = 0;
-  viewUp[2] = 1;
-  vtkSMPropertyHelper(this->Internal->ViewProxyForY, "CameraPosition").Set(cameraPosition, 3);
-  vtkSMPropertyHelper(this->Internal->ViewProxyForY, "CameraViewUp").Set(viewUp, 3);
-  this->Internal->ViewProxyForY->InvokeCommand("ResetCamera");
+  // Make sure the view are normal to the slices
+  this->Internal->UpdateSlices();
 
   return container;
 }
@@ -213,16 +267,121 @@ void pqThreeSliceView::resetCamera()
 {
   this->pqRenderView::resetCamera();
 
-  this->Internal->ViewProxyForX->InvokeCommand("ResetCamera");
-  this->Internal->ViewProxyForY->InvokeCommand("ResetCamera");
-  this->Internal->ViewProxyForZ->InvokeCommand("ResetCamera");
+  this->Internal->TopLeftProxy->InvokeCommand("ResetCamera");
+  this->Internal->TopRightProxy->InvokeCommand("ResetCamera");
+  this->Internal->BottomLeftProxy->InvokeCommand("ResetCamera");
 }
 //-----------------------------------------------------------------------------
 void pqThreeSliceView::render()
 {
   this->pqRenderView::render();
 
-  this->Internal->AxisX->render();
-  this->Internal->AxisY->render();
-  this->Internal->AxisZ->render();
+  this->Internal->TopLeftRenderer->render();
+  this->Internal->TopRightRenderer->render();
+  this->Internal->BottomLeftRenderer->render();
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getTopLeftNormal() const
+{
+  return this->Internal->TopLeftNormal;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getTopRightNormal() const
+{
+  return this->Internal->TopRightNormal;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getBottomLeftNormal() const
+{
+  return this->Internal->BottomLeftNormal;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getTopLeftViewUp() const
+{
+  return this->Internal->TopLeftViewUp;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getTopRightViewUp() const
+{
+  return this->Internal->TopRightViewUp;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getBottomLeftViewUp() const
+{
+  return this->Internal->BottomLeftViewUp;
+}
+//-----------------------------------------------------------------------------
+const double* pqThreeSliceView::getSlicesOrigin() const
+{
+  return this->Internal->SlicesOrigin;
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setTopLeftNormal(double x, double y, double z)
+{
+  this->Internal->TopLeftNormal[0] = x;
+  this->Internal->TopLeftNormal[1] = y;
+  this->Internal->TopLeftNormal[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setTopRightNormal(double x, double y, double z)
+{
+  this->Internal->TopRightNormal[0] = x;
+  this->Internal->TopRightNormal[1] = y;
+  this->Internal->TopRightNormal[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setBottomLeftNormal(double x, double y, double z)
+{
+  this->Internal->BottomLeftNormal[0] = x;
+  this->Internal->BottomLeftNormal[1] = y;
+  this->Internal->BottomLeftNormal[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setTopLeftViewUp(double x, double y, double z)
+{
+  this->Internal->TopLeftViewUp[0] = x;
+  this->Internal->TopLeftViewUp[1] = y;
+  this->Internal->TopLeftViewUp[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setTopRightViewUp(double x, double y, double z)
+{
+  this->Internal->TopRightViewUp[0] = x;
+  this->Internal->TopRightViewUp[1] = y;
+  this->Internal->TopRightViewUp[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setBottomLeftViewUp(double x, double y, double z)
+{
+  this->Internal->BottomLeftViewUp[0] = x;
+  this->Internal->BottomLeftViewUp[1] = y;
+  this->Internal->BottomLeftViewUp[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::setSlicesOrigin(double x, double y, double z)
+{
+  this->Internal->SlicesOrigin[0] = x;
+  this->Internal->SlicesOrigin[1] = y;
+  this->Internal->SlicesOrigin[2] = z;
+
+  this->Internal->UpdateSlices();
+}
+
+//-----------------------------------------------------------------------------
+void pqThreeSliceView::resetDefaultSettings()
+{
+  this->Internal->ResetToDefault();
+  this->Internal->UpdateSlices();
 }

@@ -52,6 +52,43 @@ public:
   /// Redirect reset camera to all views
   virtual void resetCamera();
 
+  /// Access Normals for all slices
+  //@{
+  const double* getTopLeftNormal() const;
+  const double* getTopRightNormal() const;
+  const double* getBottomLeftNormal() const;
+  //@}
+
+  /// Access ViewUp for all slices
+  //@{
+  const double* getTopLeftViewUp() const;
+  const double* getTopRightViewUp() const;
+  const double* getBottomLeftViewUp() const;
+  //@}
+
+  /// Access Origin of all slices
+  const double* getSlicesOrigin() const;
+
+  /// Set Slices Normals
+  //@{
+  void setTopLeftNormal(double x, double y, double z);
+  void setTopRightNormal(double x, double y, double z);
+  void setBottomLeftNormal(double x, double y, double z);
+  //@}
+
+  /// Set Slices ViewUp
+  //@{
+  void setTopLeftViewUp(double x, double y, double z);
+  void setTopRightViewUp(double x, double y, double z);
+  void setBottomLeftViewUp(double x, double y, double z);
+  //@}
+
+  /// Set Slices Origin
+  void setSlicesOrigin(double x, double y, double z);
+
+  /// Reset Normal/ViewUp/Origin to their defaults
+  void resetDefaultSettings();
+
 public slots:
   /// Request a StillRender on idle. Multiple calls are collapsed into one.
   virtual void render();
