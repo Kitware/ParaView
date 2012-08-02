@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqSliceAxisWidget.cxx
+   Module:  pqMultiSliceAxisWidget.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqSliceAxisWidget.h"
+#include "pqMultiSliceAxisWidget.h"
 
 // PV includes
 #include "QVTKWidget.h"
-#include "vtkSMProperty.h"
-#include "vtkSMContextViewProxy.h"
-#include "pqSMAdaptor.h"
-#include "pqServer.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
+#include "pqSMAdaptor.h"
+#include "pqServer.h"
+#include "vtkSMContextViewProxy.h"
+#include "vtkSMProperty.h"
 
 // VTK includes
 #include "vtkAxis.h"
-#include "vtkChartXY.h"
-#include "vtkCompositeControlPointsItem.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkMultiSliceContextItem.h"
+#include "vtkNew.h"
 #include "vtkPen.h"
 #include "vtkPlot.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
-#include "vtkNew.h"
-#include "vtkSlicesItem.h"
 
 // Qt includes
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
 //----------------------------------------------------------------------------
-class pqSliceAxisWidget::pqInternal
+class pqMultiSliceAxisWidget::pqInternal
 {
 
 public:
   pqInternal(
-    pqSliceAxisWidget& object):Widget_ptr(&object)
+    pqMultiSliceAxisWidget& object):Widget_ptr(&object)
     {
     this->View = new QVTKWidget(Widget_ptr);
     this->Range[0] = -10.;
@@ -96,29 +94,30 @@ public:
     this->SliceItem->GetAxis()->Update();
     }
 
-  vtkNew<vtkContextView> ContextView;
-  vtkNew<vtkSlicesItem> SliceItem;
-  QPointer<QVTKWidget> View;
-  double Range[2];
-  pqSliceAxisWidget* Widget_ptr;
+  vtkNew<vtkContextView>           ContextView;
+  vtkNew<vtkMultiSliceContextItem> SliceItem;
+  QPointer<QVTKWidget>             View;
+  double                           Range[2];
+  pqMultiSliceAxisWidget*          Widget_ptr;
 };
 
 //-----------------------------------------------------------------------------
-pqSliceAxisWidget::pqSliceAxisWidget(
+pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(
                              QWidget* parentWidget/*=NULL*/):Superclass(parentWidget)
 {
-  this->Internal = new pqSliceAxisWidget::pqInternal(*this);
+  this->Internal = new pqMultiSliceAxisWidget::pqInternal(*this);
   this->Internal->init();
   QVBoxLayout* vLayout = new QVBoxLayout(this);
   vLayout->setMargin(0);
   vLayout->addWidget(this->Internal->View);
 
-  this->Internal->SliceItem->AddObserver(vtkCommand::ModifiedEvent, this,
-                                         &pqSliceAxisWidget::invalidateCallback);
+  this->Internal->SliceItem->AddObserver(
+        vtkCommand::ModifiedEvent, this,
+        &pqMultiSliceAxisWidget::invalidateCallback);
 }
 
 //-----------------------------------------------------------------------------
-pqSliceAxisWidget::~pqSliceAxisWidget()
+pqMultiSliceAxisWidget::~pqMultiSliceAxisWidget()
 {
   // Don't need to remove observer as we are looking at an internal field that
   // will be deleted in the same time as us.
@@ -129,55 +128,59 @@ pqSliceAxisWidget::~pqSliceAxisWidget()
     delete this->Internal;
     }
 }
+
 // ----------------------------------------------------------------------------
-QVTKWidget* pqSliceAxisWidget::getVTKWidget()
+QVTKWidget* pqMultiSliceAxisWidget::getVTKWidget()
 {
   return this->Internal->View;
 }
+
 // ----------------------------------------------------------------------------
-void pqSliceAxisWidget::setTitle(const QString& newTitle)
+void pqMultiSliceAxisWidget::setTitle(const QString& newTitle)
 {
   this->Internal->SliceItem->GetAxis()->SetTitle(newTitle.toLatin1().data());
 }
 
 // ----------------------------------------------------------------------------
-QString pqSliceAxisWidget::title()const
+QString pqMultiSliceAxisWidget::title()const
 {
   return QString(this->Internal->SliceItem->GetAxis()->GetTitle());
 }
+
 // ----------------------------------------------------------------------------
-vtkContextScene* pqSliceAxisWidget::scene()const
+vtkContextScene* pqMultiSliceAxisWidget::scene()const
 {
   return this->Internal->ContextView->GetScene();
 }
 
 // ----------------------------------------------------------------------------
-void pqSliceAxisWidget::renderView()
+void pqMultiSliceAxisWidget::renderView()
 {
   this->Internal->View->GetRenderWindow()->Render();
 }
 
 // ----------------------------------------------------------------------------
-void pqSliceAxisWidget::setAxisType(int type)
+void pqMultiSliceAxisWidget::setAxisType(int type)
 {
   this->Internal->SliceItem->GetAxis()->SetPosition(type);
   this->Internal->SliceItem->GetAxis()->Update();
 }
+
 // ----------------------------------------------------------------------------
-void pqSliceAxisWidget::setRange(double min, double max)
+void pqMultiSliceAxisWidget::setRange(double min, double max)
 {
   this->Internal->SliceItem->GetAxis()->SetRange(min, max);
   this->Internal->SliceItem->GetAxis()->Update();
 }
 
 // ----------------------------------------------------------------------------
-void pqSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long, void*)
+void pqMultiSliceAxisWidget::invalidateCallback(vtkObject*, unsigned long, void*)
 {
   emit this->modelUpdated();
 }
 
 // ----------------------------------------------------------------------------
-const double* pqSliceAxisWidget::getVisibleSlices(int &nbSlices) const
+const double* pqMultiSliceAxisWidget::getVisibleSlices(int &nbSlices) const
 {
   return this->Internal->SliceItem->GetVisibleSlices(nbSlices);
 }

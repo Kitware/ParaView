@@ -19,7 +19,7 @@
 
 #include "QVTKWidget.h"
 
-#include "pqSliceAxisWidget.h"
+#include "pqMultiSliceAxisWidget.h"
 #include "pqRepresentation.h"
 
 #include "vtkAxis.h"
@@ -71,21 +71,21 @@ QWidget* pqMultiSliceView::createWidget()
   this->InternalWidget->setParent(container);
 
   // Init top axis
-  this->AxisX = new pqSliceAxisWidget(container);
+  this->AxisX = new pqMultiSliceAxisWidget(container);
   this->AxisX->setAxisType(vtkAxis::LEFT);
   this->AxisX->setRange(-10,10);
   this->AxisX->setTitle("X");
   this->AxisX->setFixedWidth(80);
   this->AxisX->renderView();
 
-  this->AxisY = new pqSliceAxisWidget(container);
+  this->AxisY = new pqMultiSliceAxisWidget(container);
   this->AxisY->setAxisType(vtkAxis::TOP);
   this->AxisY->setRange(-10,10);
   this->AxisY->setTitle("Y");
   this->AxisY->setFixedHeight(60);
   this->AxisY->renderView();
 
-  this->AxisZ = new pqSliceAxisWidget(container);
+  this->AxisZ = new pqMultiSliceAxisWidget(container);
   this->AxisZ->setAxisType(vtkAxis::RIGHT);
   this->AxisZ->setRange(-10,10);
   this->AxisZ->setTitle("Z");

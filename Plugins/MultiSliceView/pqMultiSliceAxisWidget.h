@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqSliceAxisWidget.h
+   Module:  pqMultiSliceAxisWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,30 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSliceAxisWidget_h
-#define __pqSliceAxisWidget_h
+#ifndef __pqMultiSliceAxisWidget_h
+#define __pqMultiSliceAxisWidget_h
 
 #include <QWidget>
 #include <QPointer>
 
-class vtkChartXY;
 class vtkContextScene;
-class vtkPlot;
 class vtkObject;
-class vtkControlPointsItem;
 class QVTKWidget;
-class QMouseEvent;
 
-class pqSliceAxisWidget : public QWidget
+class pqMultiSliceAxisWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;
 
 public:
-  pqSliceAxisWidget(QWidget* parent=NULL);
+  pqMultiSliceAxisWidget(QWidget* parent=NULL);
+  virtual ~pqMultiSliceAxisWidget();
 
-  virtual ~pqSliceAxisWidget();
-
+  /// Set the range of the Axis (Bound)
   void setRange(double min, double max);
 
   /// Axis::LEFT=0, Axis::BOTTOM, Axis::RIGHT, Axis::TOP
@@ -62,24 +58,29 @@ public:
   QString title()const;
   void setTitle(const QString& title);
 
+  /// Return the Widget that contain the ContextView
   QVTKWidget* getVTKWidget();
 
-  /// Return the locations of the visible slices
+  /// Return the locations of the visible slices within the range as well as
+  /// the number of values that can be read from the pointer
   const double* getVisibleSlices(int &nbSlices) const;
 
 public slots:
   void renderView();
 
 signals:
+  /// Signal emitted when the model has changed internally
   void modelUpdated();
 
 protected:
   vtkContextScene* scene() const;
+
+  /// Internal VTK callback used to emit the modelUpdated() signal
   void invalidateCallback(vtkObject*, unsigned long, void*);
 
 private:
-  pqSliceAxisWidget(const pqSliceAxisWidget&); // Not implemented.
-  void operator=(const pqSliceAxisWidget&); // Not implemented.
+  pqMultiSliceAxisWidget(const pqMultiSliceAxisWidget&); // Not implemented.
+  void operator=(const pqMultiSliceAxisWidget&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;

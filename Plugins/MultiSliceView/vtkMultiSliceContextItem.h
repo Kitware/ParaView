@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkSlicesItem.h
+  Module:    vtkMultiSliceContextItem.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,23 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// .NAME vtkMultiSliceContextItem
 
-// .NAME vtkSlicesItem
+#ifndef __vtkMultiSliceContextItem_h
+#define __vtkMultiSliceContextItem_h
 
-#ifndef __vtkScalarsToColorsItem_h
-#define __vtkScalarsToColorsItem_h
-
-#include "vtkChartsCoreModule.h" // For export macro
 #include "vtkContextItem.h"
 #include "vtkRect.h"
 
 class vtkAxis;
 
-class vtkSlicesItem: public vtkContextItem
+class vtkMultiSliceContextItem: public vtkContextItem
 {
 public:
-  static vtkSlicesItem* New();
-  vtkTypeMacro(vtkSlicesItem, vtkContextItem);
+  static vtkMultiSliceContextItem* New();
+  vtkTypeMacro(vtkMultiSliceContextItem, vtkContextItem);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -68,7 +66,6 @@ public:
   // propagated to other items.
   virtual bool MouseMoveEvent(const vtkContextMouseEvent &mouse);
 
-
   // Description:
   // Get access to the data model. Return a pointer array to the differents
   // visible slices
@@ -79,15 +76,15 @@ protected:
   double ComputeEpsilon(int numberOfPixel = 5);
   void forceRender();
 
-  vtkSlicesItem();
-  virtual ~vtkSlicesItem();
+  vtkMultiSliceContextItem();
+  virtual ~vtkMultiSliceContextItem();
   vtkAxis* Axis;
   vtkRectf ActiveArea;
   int ActiveSliceIndex;
 
 private:
-  vtkSlicesItem(const vtkSlicesItem &); // Not implemented.
-  void operator=(const vtkSlicesItem &);   // Not implemented.
+  vtkMultiSliceContextItem(const vtkMultiSliceContextItem &); // Not implemented.
+  void operator=(const vtkMultiSliceContextItem &);   // Not implemented.
 
   struct vtkInternal;
   vtkInternal* Internal;

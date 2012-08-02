@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkSlicesItem.cxx
+  Module:    vtkMultiSliceContextItem.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,40 +13,35 @@
 
 =========================================================================*/
 
+#include "vtkMultiSliceContextItem.h"
+
 #include "vtkAxis.h"
-#include "vtkBrush.h"
 #include "vtkBrush.h"
 #include "vtkCommand.h"
 #include "vtkContext2D.h"
-#include "vtkContextDevice2D.h"
 #include "vtkContextMouseEvent.h"
 #include "vtkContextScene.h"
-#include "vtkFloatArray.h"
-#include "vtkImageData.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
-#include "vtkPoints2D.h"
-#include "vtkSlicesItem.h"
 #include "vtkSmartPointer.h"
-#include "vtkTransform2D.h"
 #include "vtkVector.h"
 
 #include <vector>
 
-#include <cassert>
-
 // ******************************* Internal class *****************************
-struct vtkSlicesItem::vtkInternal {
+struct vtkMultiSliceContextItem::vtkInternal {
   std::vector<double> Slices;
   std::vector<bool> SlicesVisibility;
   double LengthForRatio;
-  // We assume that we won't have more than 255 slices by axe
+  // We assume that we won't have more than 255 slices by axis
   double VisibleSliceValues[255];
 
+  // ----
+
   // Return -1 if not found
-  int findSliceIndex(double value, double epsilon)
+  int FindSliceIndex(double value, double epsilon)
   {
     double min = value - epsilon;
     double max = value + epsilon;
@@ -60,6 +55,8 @@ struct vtkSlicesItem::vtkInternal {
       }
     return -1;
   }
+
+  // ----
 
   double* UpdateVisibleValues(int &size)
   {
@@ -78,9 +75,9 @@ struct vtkSlicesItem::vtkInternal {
 };
 
 //-----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSlicesItem);
+vtkStandardNewMacro(vtkMultiSliceContextItem);
 //-----------------------------------------------------------------------------
-vtkSlicesItem::vtkSlicesItem()
+vtkMultiSliceContextItem::vtkMultiSliceContextItem()
 {
   this->Axis = vtkAxis::New();
   this->AddItem(this->Axis);
@@ -90,7 +87,7 @@ vtkSlicesItem::vtkSlicesItem()
 }
 
 //-----------------------------------------------------------------------------
-vtkSlicesItem::~vtkSlicesItem()
+vtkMultiSliceContextItem::~vtkMultiSliceContextItem()
 {
   this->Axis->Delete();
   this->Axis = NULL;
@@ -99,13 +96,13 @@ vtkSlicesItem::~vtkSlicesItem()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSlicesItem::PrintSelf(ostream &os, vtkIndent indent)
+void vtkMultiSliceContextItem::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::Paint(vtkContext2D* painter)
+bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
 {
   int width  = this->GetScene()->GetViewWidth();
   int height = this->GetScene()->GetViewHeight();
@@ -206,7 +203,7 @@ bool vtkSlicesItem::Paint(vtkContext2D* painter)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::Hit(const vtkContextMouseEvent &mouse)
+bool vtkMultiSliceContextItem::Hit(const vtkContextMouseEvent &mouse)
 {
   vtkVector2f position = mouse.GetPos();
   return
@@ -217,7 +214,7 @@ bool vtkSlicesItem::Hit(const vtkContextMouseEvent &mouse)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::MouseButtonPressEvent(const vtkContextMouseEvent &mouse)
+bool vtkMultiSliceContextItem::MouseButtonPressEvent(const vtkContextMouseEvent &mouse)
 {
   vtkVector2f position = mouse.GetPos();
   double value = 0;
@@ -232,13 +229,13 @@ bool vtkSlicesItem::MouseButtonPressEvent(const vtkContextMouseEvent &mouse)
     value = this->ScreenToRange(position.X() - 15);
     break;
     }
-  this->ActiveSliceIndex = this->Internal->findSliceIndex(value, this->ComputeEpsilon());// find corresponding slice index
+  this->ActiveSliceIndex = this->Internal->FindSliceIndex(value, this->ComputeEpsilon());// find corresponding slice index
 
   return true;
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::MouseButtonReleaseEvent(const vtkContextMouseEvent &mouse)
+bool vtkMultiSliceContextItem::MouseButtonReleaseEvent(const vtkContextMouseEvent &mouse)
 {
   // Toggle visibility
   if( this->ActiveSliceIndex != -1 &&
@@ -256,7 +253,7 @@ bool vtkSlicesItem::MouseButtonReleaseEvent(const vtkContextMouseEvent &mouse)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::MouseDoubleClickEvent(const vtkContextMouseEvent &mouse)
+bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent &mouse)
 {
   double value = 0;
   int index = -1;
@@ -272,7 +269,7 @@ bool vtkSlicesItem::MouseDoubleClickEvent(const vtkContextMouseEvent &mouse)
   break;
     }
 
-  if((index = this->Internal->findSliceIndex(value, this->ComputeEpsilon())) == -1)
+  if((index = this->Internal->FindSliceIndex(value, this->ComputeEpsilon())) == -1)
     {
     // Create
     this->Internal->Slices.push_back(value);
@@ -297,7 +294,7 @@ bool vtkSlicesItem::MouseDoubleClickEvent(const vtkContextMouseEvent &mouse)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSlicesItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
+bool vtkMultiSliceContextItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
 {
   if(this->ActiveSliceIndex > -1)
     {
@@ -322,7 +319,7 @@ bool vtkSlicesItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSlicesItem::ScreenToRange(float position)
+double vtkMultiSliceContextItem::ScreenToRange(float position)
 {
   double range[2];
   this->Axis->GetRange(range);
@@ -343,7 +340,7 @@ double vtkSlicesItem::ScreenToRange(float position)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSlicesItem::ComputeEpsilon(int numberOfPixel)
+double vtkMultiSliceContextItem::ComputeEpsilon(int numberOfPixel)
 {
   double range[2];
   this->Axis->GetRange(range);
@@ -352,14 +349,14 @@ double vtkSlicesItem::ComputeEpsilon(int numberOfPixel)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSlicesItem::forceRender()
+void vtkMultiSliceContextItem::forceRender()
 {
   // Mark the scene as dirty
   this->GetScene()->SetDirty(true);
 }
 
 //-----------------------------------------------------------------------------
-const double* vtkSlicesItem::GetVisibleSlices(int &nbSlices) const
+const double* vtkMultiSliceContextItem::GetVisibleSlices(int &nbSlices) const
 {
   return this->Internal->UpdateVisibleValues(nbSlices);
 }

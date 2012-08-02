@@ -22,7 +22,7 @@
 #include <QtCore>
 #include <QtGui>
 
-class pqSliceAxisWidget;
+class pqMultiSliceAxisWidget;
 
 class pqMultiSliceView : public pqRenderView
 {
@@ -55,9 +55,9 @@ protected:
   QVTKWidget* getInternalWidget() { return this->InternalWidget; }
 
   QVTKWidget* InternalWidget;
-  pqSliceAxisWidget* AxisX;
-  pqSliceAxisWidget* AxisY;
-  pqSliceAxisWidget* AxisZ;
+  QPointer<pqMultiSliceAxisWidget> AxisX;
+  QPointer<pqMultiSliceAxisWidget> AxisY;
+  QPointer<pqMultiSliceAxisWidget> AxisZ;
 
 private:
   pqMultiSliceView(const pqMultiSliceView&); // Not implemented.

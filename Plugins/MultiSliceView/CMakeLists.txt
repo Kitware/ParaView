@@ -16,12 +16,15 @@ IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE_DIRECTORIES(${PARAVIEW_GUI_INCLUDE_DIRS})
 
   QT4_WRAP_CPP(MOC_SRCS
-    vtkSlicesItem.h
-    pqSliceAxisWidget.h
+    pqActiveThreeSliceRenderViewOptions.h
+
+    pqMultiSliceAxisWidget.h
     pqMultiSliceView.h
+
     pqThreeSliceView.h
     pqThreeSliceViewOptions.h
-    pqActiveThreeSliceRenderViewOptions.h
+
+    vtkMultiSliceContextItem.h
   )
 
   QT4_WRAP_UI(UI_SRCS
@@ -54,7 +57,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     SERVER_MANAGER_SOURCES
       vtkMultiSliceRepresentation.cxx
     SERVER_MANAGER_XML
-      MultiSliceView.xml
+      SliceViews.xml
     GUI_INTERFACES
       ${VIEW1_IFACE}
       ${VIEW2_IFACE}
@@ -65,12 +68,15 @@ IF(PARAVIEW_BUILD_QT_GUI)
       ${VIEW1_IFACE_SRCS}
       ${VIEW2_IFACE_SRCS}
       ${VIEW2_OPTIONS_IFACE_SRCS}
-      vtkSlicesItem.cxx
-      pqSliceAxisWidget.cxx
+      pqActiveThreeSliceRenderViewOptions.cxx
+
+      pqMultiSliceAxisWidget.cxx
       pqMultiSliceView.cxx
+
       pqThreeSliceView.cxx
       pqThreeSliceViewOptions.cxx
-      pqActiveThreeSliceRenderViewOptions.cxx
+
+      vtkMultiSliceContextItem.cxx
   )
 
 ENDIF(PARAVIEW_BUILD_QT_GUI)
