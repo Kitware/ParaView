@@ -184,3 +184,15 @@ const double* pqMultiSliceAxisWidget::getVisibleSlices(int &nbSlices) const
 {
   return this->Internal->SliceItem->GetVisibleSlices(nbSlices);
 }
+
+// ----------------------------------------------------------------------------
+void pqMultiSliceAxisWidget::SetActiveSize(int size)
+{
+  this->Internal->SliceItem->SetActiveSize(size);
+}
+
+// ----------------------------------------------------------------------------
+void pqMultiSliceAxisWidget::SetEdgeMargin(int margin)
+{
+  this->Internal->SliceItem->SetEdgeMargin(margin);
+}

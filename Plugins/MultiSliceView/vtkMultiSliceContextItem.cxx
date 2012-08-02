@@ -25,6 +25,7 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
+#include "vtkRect.h"
 #include "vtkSmartPointer.h"
 #include "vtkVector.h"
 
@@ -32,6 +33,11 @@
 
 // ******************************* Internal class *****************************
 struct vtkMultiSliceContextItem::vtkInternal {
+  int ActiveSize;
+  int EdgeMargin;
+  vtkNew<vtkAxis> Axis;
+  vtkRectf ActiveArea;
+  int ActiveSliceIndex;
   std::vector<double> Slices;
   std::vector<bool> SlicesVisibility;
   double LengthForRatio;
@@ -39,6 +45,26 @@ struct vtkMultiSliceContextItem::vtkInternal {
   double VisibleSliceValues[255];
 
   // ----
+
+  vtkInternal(vtkMultiSliceContextItem* parent)
+  {
+    this->ActiveSize = 10;
+    this->EdgeMargin = 15;
+    this->ActiveArea.Set(0,0,0,0);
+    this->ActiveSliceIndex = -1; // Nothing is selected for now
+    parent->AddItem(this->Axis.GetPointer());
+  }
+
+  // ----
+
+  bool IsInActiveArea(float x, float y)
+  {
+    return
+        x >= this->ActiveArea.X() &&
+        y >= this->ActiveArea.Y() &&
+        x <= (this->ActiveArea.X() + this->ActiveArea.Width()) &&
+        y <= (this->ActiveArea.Y() + this->ActiveArea.Height());
+  }
 
   // Return -1 if not found
   int FindSliceIndex(double value, double epsilon)
@@ -79,18 +105,12 @@ vtkStandardNewMacro(vtkMultiSliceContextItem);
 //-----------------------------------------------------------------------------
 vtkMultiSliceContextItem::vtkMultiSliceContextItem()
 {
-  this->Axis = vtkAxis::New();
-  this->AddItem(this->Axis);
-  this->ActiveArea.Set(0,0,0,0);
-  this->ActiveSliceIndex = -1; // Nothing is selected for now
-  this->Internal = new vtkInternal();
+  this->Internal = new vtkInternal(this);
 }
 
 //-----------------------------------------------------------------------------
 vtkMultiSliceContextItem::~vtkMultiSliceContextItem()
 {
-  this->Axis->Delete();
-  this->Axis = NULL;
   delete this->Internal;
   this->Internal = NULL;
 }
@@ -104,44 +124,66 @@ void vtkMultiSliceContextItem::PrintSelf(ostream &os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
 {
+  // short var name for internal vars
+  vtkRectf* activeArea = &this->Internal->ActiveArea;
+  vtkAxis* axis = this->Internal->Axis.GetPointer();
+  int activeSize = this->Internal->ActiveSize;
+  int edgeMargin = this->Internal->EdgeMargin;
+  int sliceHandleMargin = 2;
+
+  // Local vars
   int width  = this->GetScene()->GetViewWidth();
   int height = this->GetScene()->GetViewHeight();
   int x1,y1,x2,y2;
   float slicerX1, slicerY1, slicerX2, slicerY2;
-  slicerX2 = slicerY2 = 5;
+  slicerX2 = slicerY2 = activeSize;
 
   // Reset active area
-  this->ActiveArea.Set(0, 0, width, height);
+  activeArea->Set(0, 0, width, height);
 
-  switch(this->Axis->GetPosition())
+  switch(axis->GetPosition())
     {
   case vtkAxis::LEFT:
-    this->ActiveArea.SetX(width/2);
-    slicerX2 = width - 5;
+    activeArea->SetX(width - activeSize);
+    slicerX2 = width - sliceHandleMargin;
+    slicerX1 = x1 = x2 = (width - activeSize);
+    y1 = edgeMargin;
+    y2 = height - edgeMargin;
+    activeArea->SetWidth(activeSize);
+    this->Internal->LengthForRatio = height - edgeMargin - edgeMargin;
+    break;
   case vtkAxis::RIGHT:
-    slicerX1 = x1 = x2 = width/2;
-    y1 = 15;
-    y2 = height - 15;
-    this->ActiveArea.SetWidth(width/2);
-    this->Internal->LengthForRatio = height - 30;
+    slicerX2 = sliceHandleMargin;
+    slicerX1 = x1 = x2 = activeSize;
+    y1 = edgeMargin;
+    y2 = height - edgeMargin;
+    activeArea->SetWidth(activeSize);
+    this->Internal->LengthForRatio = height - edgeMargin - edgeMargin;
     break;
   case vtkAxis::BOTTOM:
-    this->ActiveArea.SetY(height/2);
-    slicerY2 = height - 5;
+    activeArea->SetY(height - activeSize);
+    slicerY2 = height - sliceHandleMargin;
+    slicerY1 = y1 = y2 = (height - activeSize);
+    x1 = edgeMargin;
+    x2 = width - edgeMargin;
+    activeArea->SetHeight(activeSize);
+    this->Internal->LengthForRatio = width - edgeMargin - edgeMargin;
+    break;
   case vtkAxis::TOP:
-    slicerY1 = y1 = y2 = height/2;
-    x1 = 15;
-    x2 = width - 15;
-    this->ActiveArea.SetHeight(height/2);
-    this->Internal->LengthForRatio = width - 30;
-  break;
+    slicerY2 = sliceHandleMargin;
+    slicerY1 = y1 = y2 = activeSize;
+    x1 = edgeMargin;
+    x2 = width - edgeMargin;
+    activeArea->SetHeight(activeSize);
+    this->Internal->LengthForRatio = width - edgeMargin - edgeMargin;
+    break;
     }
 
   // Update the axis
-  this->Axis->SetPoint1(x1,y1);
-  this->Axis->SetPoint2(x2,y2);
-  this->Axis->GetBoundingRect(painter);
-  this->Axis->Update();
+  axis->SetPoint1(x1,y1);
+  axis->SetPoint2(x2,y2);
+  axis->GetBoundingRect(painter);
+  axis->Update();
 
   // Draw the slices positions
   if(this->Internal->Slices.size() > 0)
@@ -152,13 +194,13 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
     // Draw the triangles
     double range[2];
     float polyX[4], polyY[4];
-    this->Axis->GetRange(range);
+    axis->GetRange(range);
     double rangeLength = range[1]-range[0];
     std::vector<double>::iterator pos = this->Internal->Slices.begin();
     int index = 0;
     for(;pos != this->Internal->Slices.end(); pos++, index++)
       {
-      if(this->ActiveSliceIndex == index)
+      if(this->Internal->ActiveSliceIndex == index)
         {
         brush->SetColor(255,255,255);
         painter->ApplyBrush(brush.GetPointer());
@@ -173,8 +215,8 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
         brush->SetColor(200,200,200);
         painter->ApplyBrush(brush.GetPointer());
         }
-      float screen = 15 + (this->Internal->LengthForRatio * (*pos - range[0]) / rangeLength);
-      switch(this->Axis->GetPosition())
+      float screen = edgeMargin + (this->Internal->LengthForRatio * (*pos - range[0]) / rangeLength);
+      switch(axis->GetPosition())
         {
       case vtkAxis::LEFT:
       case vtkAxis::RIGHT:
@@ -206,11 +248,7 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
 bool vtkMultiSliceContextItem::Hit(const vtkContextMouseEvent &mouse)
 {
   vtkVector2f position = mouse.GetPos();
-  return
-      position.X() >= this->ActiveArea.X() &&
-      position.Y() >= this->ActiveArea.Y() &&
-      position.X() <= (this->ActiveArea.X() + this->ActiveArea.Width()) &&
-      position.Y() <= (this->ActiveArea.Y() + this->ActiveArea.Height());
+  return this->Internal->IsInActiveArea(position.X(),position.Y());
 }
 
 //-----------------------------------------------------------------------------
@@ -218,18 +256,20 @@ bool vtkMultiSliceContextItem::MouseButtonPressEvent(const vtkContextMouseEvent 
 {
   vtkVector2f position = mouse.GetPos();
   double value = 0;
-  switch(this->Axis->GetPosition())
+  switch(this->Internal->Axis->GetPosition())
     {
   case vtkAxis::LEFT:
   case vtkAxis::RIGHT:
-     value = this->ScreenToRange(position.Y() - 15);
+     value = this->ScreenToRange(position.Y() - this->Internal->EdgeMargin);
     break;
   case vtkAxis::BOTTOM:
   case vtkAxis::TOP:
-    value = this->ScreenToRange(position.X() - 15);
+    value = this->ScreenToRange(position.X() - this->Internal->EdgeMargin);
     break;
     }
-  this->ActiveSliceIndex = this->Internal->FindSliceIndex(value, this->ComputeEpsilon());// find corresponding slice index
+  // find corresponding slice index
+  this->Internal->ActiveSliceIndex =
+      this->Internal->FindSliceIndex(value, this->ComputeEpsilon());
 
   return true;
 }
@@ -238,16 +278,16 @@ bool vtkMultiSliceContextItem::MouseButtonPressEvent(const vtkContextMouseEvent 
 bool vtkMultiSliceContextItem::MouseButtonReleaseEvent(const vtkContextMouseEvent &mouse)
 {
   // Toggle visibility
-  if( this->ActiveSliceIndex != -1 &&
+  if( this->Internal->ActiveSliceIndex != -1 &&
       mouse.GetButton() == vtkContextMouseEvent::RIGHT_BUTTON)
     {
-    this->Internal->SlicesVisibility[this->ActiveSliceIndex] =
-        !this->Internal->SlicesVisibility[this->ActiveSliceIndex];
+    this->Internal->SlicesVisibility[Internal->ActiveSliceIndex] =
+        !this->Internal->SlicesVisibility[Internal->ActiveSliceIndex];
     this->InvokeEvent(vtkCommand::ModifiedEvent);
     }
 
   // Deselect active slice
-  this->ActiveSliceIndex = -1;
+  this->Internal->ActiveSliceIndex = -1;
   this->forceRender();
   return true;
 }
@@ -257,15 +297,15 @@ bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent 
 {
   double value = 0;
   int index = -1;
-  switch(this->Axis->GetPosition())
+  switch(this->Internal->Axis->GetPosition())
     {
   case vtkAxis::LEFT:
   case vtkAxis::RIGHT:
-    value = this->ScreenToRange(mouse.GetPos().Y()-15);
+    value = this->ScreenToRange(mouse.GetPos().Y() - this->Internal->EdgeMargin);
     break;
   case vtkAxis::BOTTOM:
   case vtkAxis::TOP:
-    value = this->ScreenToRange(mouse.GetPos().X()-15);
+    value = this->ScreenToRange(mouse.GetPos().X() - this->Internal->EdgeMargin);
   break;
     }
 
@@ -296,21 +336,21 @@ bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent 
 //-----------------------------------------------------------------------------
 bool vtkMultiSliceContextItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
 {
-  if(this->ActiveSliceIndex > -1)
+  if(Internal->ActiveSliceIndex > -1)
     {
     double value = 0;
-    switch(this->Axis->GetPosition())
+    switch(this->Internal->Axis->GetPosition())
       {
     case vtkAxis::LEFT:
     case vtkAxis::RIGHT:
-      value = this->ScreenToRange(mouse.GetPos().Y()-15);
+      value = this->ScreenToRange(mouse.GetPos().Y() - this->Internal->EdgeMargin);
       break;
     case vtkAxis::BOTTOM:
     case vtkAxis::TOP:
-      value = this->ScreenToRange(mouse.GetPos().X()-15);
+      value = this->ScreenToRange(mouse.GetPos().X() - this->Internal->EdgeMargin);
     break;
       }
-    this->Internal->Slices[this->ActiveSliceIndex] = value;
+    this->Internal->Slices[Internal->ActiveSliceIndex] = value;
     this->forceRender();
     this->InvokeEvent(vtkCommand::ModifiedEvent);
     }
@@ -322,7 +362,7 @@ bool vtkMultiSliceContextItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
 double vtkMultiSliceContextItem::ScreenToRange(float position)
 {
   double range[2];
-  this->Axis->GetRange(range);
+  this->Internal->Axis->GetRange(range);
   double rangeLength = range[1]-range[0];
   double value = range[0] + rangeLength*(position/this->Internal->LengthForRatio);
 
@@ -343,7 +383,7 @@ double vtkMultiSliceContextItem::ScreenToRange(float position)
 double vtkMultiSliceContextItem::ComputeEpsilon(int numberOfPixel)
 {
   double range[2];
-  this->Axis->GetRange(range);
+  this->Internal->Axis->GetRange(range);
   double rangeLength = range[1]-range[0];
   return rangeLength*(numberOfPixel/this->Internal->LengthForRatio);
 }
@@ -359,4 +399,22 @@ void vtkMultiSliceContextItem::forceRender()
 const double* vtkMultiSliceContextItem::GetVisibleSlices(int &nbSlices) const
 {
   return this->Internal->UpdateVisibleValues(nbSlices);
+}
+
+//-----------------------------------------------------------------------------
+vtkAxis* vtkMultiSliceContextItem::GetAxis()
+{
+  return this->Internal->Axis.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void vtkMultiSliceContextItem::SetActiveSize(int size)
+{
+  this->Internal->ActiveSize = size;
+}
+
+//-----------------------------------------------------------------------------
+void vtkMultiSliceContextItem::SetEdgeMargin(int size)
+{
+  this->Internal->EdgeMargin = size;
 }

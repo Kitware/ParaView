@@ -65,6 +65,13 @@ public:
   /// the number of values that can be read from the pointer
   const double* getVisibleSlices(int &nbSlices) const;
 
+  /// The active size define the number of pixel that are going to be used for
+  /// the slider handle.
+  void SetActiveSize(int size);
+
+  /// The margin used on the side of the Axis.
+  void SetEdgeMargin(int margin);
+
 public slots:
   void renderView();
 

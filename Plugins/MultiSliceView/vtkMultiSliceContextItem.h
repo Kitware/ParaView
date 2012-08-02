@@ -18,7 +18,6 @@
 #define __vtkMultiSliceContextItem_h
 
 #include "vtkContextItem.h"
-#include "vtkRect.h"
 
 class vtkAxis;
 
@@ -35,7 +34,20 @@ public:
   // draws the texture into the shape
   virtual bool Paint(vtkContext2D *painter);
 
-  vtkAxis* GetAxis() { return this->Axis; }
+  // Description:
+  // Return the Axis on which that ContextItem is based.
+  // In order to configure that item, just configure the Axis itself.
+  // (Range + Position)
+  vtkAxis* GetAxis();
+
+  // Description:
+  // The active size define the number of pixel that are going to be used for
+  // the slider handle.
+  void SetActiveSize(int size);
+
+  // Description:
+  // The margin used on the side of the Axis.
+  void SetEdgeMargin(int margin);
 
 //BTX
   // Description:
@@ -78,9 +90,6 @@ protected:
 
   vtkMultiSliceContextItem();
   virtual ~vtkMultiSliceContextItem();
-  vtkAxis* Axis;
-  vtkRectf ActiveArea;
-  int ActiveSliceIndex;
 
 private:
   vtkMultiSliceContextItem(const vtkMultiSliceContextItem &); // Not implemented.

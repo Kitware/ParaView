@@ -34,6 +34,10 @@
 #include "vtkSMRepresentationProxy.h"
 #include "vtkView.h"
 
+#define MULTI_SLICE_AXIS_THIKNESS 60
+#define MULTI_SLICE_AXIS_ACTIVE_SIZE 20
+#define MULTI_SLICE_AXIS_EDGE_MARGIN 10
+
 //-----------------------------------------------------------------------------
 pqMultiSliceView::pqMultiSliceView(
     const QString& viewType, const QString& group, const QString& name,
@@ -75,21 +79,27 @@ QWidget* pqMultiSliceView::createWidget()
   this->AxisX->setAxisType(vtkAxis::LEFT);
   this->AxisX->setRange(-10,10);
   this->AxisX->setTitle("X");
-  this->AxisX->setFixedWidth(80);
+  this->AxisX->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
+  this->AxisX->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
+  this->AxisX->setFixedWidth(MULTI_SLICE_AXIS_THIKNESS);
   this->AxisX->renderView();
 
   this->AxisY = new pqMultiSliceAxisWidget(container);
   this->AxisY->setAxisType(vtkAxis::TOP);
   this->AxisY->setRange(-10,10);
   this->AxisY->setTitle("Y");
-  this->AxisY->setFixedHeight(60);
+  this->AxisY->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
+  this->AxisY->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
+  this->AxisY->setFixedHeight(MULTI_SLICE_AXIS_THIKNESS - 4);
   this->AxisY->renderView();
 
   this->AxisZ = new pqMultiSliceAxisWidget(container);
   this->AxisZ->setAxisType(vtkAxis::RIGHT);
   this->AxisZ->setRange(-10,10);
   this->AxisZ->setTitle("Z");
-  this->AxisZ->setFixedWidth(80);
+  this->AxisZ->SetEdgeMargin(MULTI_SLICE_AXIS_EDGE_MARGIN);
+  this->AxisZ->SetActiveSize(MULTI_SLICE_AXIS_ACTIVE_SIZE);
+  this->AxisZ->setFixedWidth(MULTI_SLICE_AXIS_THIKNESS);
   this->AxisZ->renderView();
 
   gridLayout->addWidget(this->AxisY, 0, 1);  // TOP
