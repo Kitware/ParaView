@@ -31,7 +31,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   ADD_PARAVIEW_VIEW_MODULE(
     VIEW1_IFACE VIEW1_IFACE_SRCS
     VIEW_TYPE pqMultiSliceView
-    VIEW_NAME "MultiSlice"
+    VIEW_NAME "Orthogonal Slice View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME MultiSlice
   )
@@ -39,7 +39,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
   ADD_PARAVIEW_VIEW_MODULE(
     VIEW2_IFACE VIEW2_IFACE_SRCS
     VIEW_TYPE pqThreeSliceView
-    VIEW_NAME "ThreeSliceView"
+    VIEW_NAME "ThreeSlice View"
     VIEW_XML_GROUP views
     VIEW_XML_NAME ThreeSlice
   )
