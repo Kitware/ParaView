@@ -15,7 +15,6 @@
 #include "vtkPython.h"
 #include "vtkPVPythonInterpretor.h"
 
-#include "pvpythonmodules.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
@@ -468,9 +467,6 @@ int vtkPVPythonInterpretor::PyMain(int argc, char** argv)
   // Set the program name, so that we can ask python to provide us
   // full path.
   Py_SetProgramName(argv[0]);
-
-  // initialize the statically linked modules
-  CMakeLoadAllPythonModules();
 
   // Initialize interpreter.
   Py_Initialize();
