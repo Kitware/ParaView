@@ -135,10 +135,13 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
+  set (VTK_CUSTOM_LIBRARY_SUFFIX "-pv${PARAVIEW_VERSION}")
+endif()
 
 # Handle the target export file, this is used if building against a build tree.
 if(NOT VTK_EXPORTS_FILE)
-  set(VTK_EXPORTS_FILE "${VTK_BINARY_DIR}/${VTK_INSTALL_EXPORT_NAME}.cmake")
+  set(VTK_EXPORTS_FILE "${ParaView_BINARY_DIR}/VTK/${VTK_INSTALL_EXPORT_NAME}.cmake")
 endif()
 file(REMOVE "${VTK_EXPORTS_FILE}")
 
