@@ -34,12 +34,17 @@ set (QtTesting_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QtTesting_INSTALL_LIBRARY_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (QT_TESTING_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
 
+# NOTE TO DEVELOPER:
+# QtTesting doesn't export any build-dir targets i.e. it doesn't use EXPORT() at
+# all and hence provides no mechanism to add those to the VTKTargets.cmake file
+# ParaView uses for build-dir targets. It can become a problem when plugins want
+# to extend the testing mechanism.
+
 ##########################################################################
 # import Qt4 build settings
 find_package(Qt4 REQUIRED QUIET)
 include(${QT_USE_FILE})
 
-vtk_target_export(QtTesting)
 vtk_module_third_party(qttesting
   INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkqttesting
