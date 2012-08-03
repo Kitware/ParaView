@@ -136,6 +136,13 @@ if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
 
+# Handle the target export file, this is used if building against a build tree.
+if(NOT VTK_EXPORTS_FILE)
+  set(VTK_EXPORTS_FILE "${VTK_BINARY_DIR}/${VTK_INSTALL_EXPORT_NAME}.cmake")
+endif()
+file(REMOVE "${VTK_EXPORTS_FILE}")
+
+
 if(NOT PV_INSTALL_PLUGIN_DIR)
   if (WIN32)
     set (PV_INSTALL_PLUGIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
