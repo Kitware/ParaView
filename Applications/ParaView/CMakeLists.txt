@@ -25,6 +25,17 @@ set(ParaView_SOURCE_FILES
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
+set (python_dependencies)
+if (PARAVIEW_ENABLE_PYTHON)
+  include_directories("${PYTHON_INCLUDE_PATH}")
+
+  # when building static ParaView, generate a header file to initialize
+  # all the python wrapped modules statically.
+  vtk_write_python_modules_header_for_wrapped_modules(
+    "${CMAKE_CURRENT_BINARY_DIR}/paraviewpythonmodules.h"
+    python_dependencies)
+endif()
+
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
@@ -54,6 +65,10 @@ build_paraview_client(paraview
 if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(paraview ${PARAVIEW_PLUGINLIST})
 endif(NOT BUILD_SHARED_LIBS)
+
+# add dependecies to linked python modules These are non-empty only when
+# building statically.
+target_link_libraries(paraview ${python_dependencies})
 
 # This ensure that the paraview.qch file is generated.
 add_dependencies(paraview
