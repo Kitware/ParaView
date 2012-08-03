@@ -46,6 +46,16 @@ foreach (name pvserver pvdataserver pvrenderserver)
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
+  include_directories("${PYTHON_INCLUDE_PATH}")
+
+  set (dependencies)
+
+  # when building static ParaView, generate a header file to initialize
+  # all the python wrapped modules statically.
+  vtk_write_python_modules_header_for_wrapped_modules(
+    "${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h"
+    dependencies)
+
   foreach (name pvbatch pvpython)
     vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
     #vtk_target_name(${name})
@@ -56,7 +66,8 @@ if (PARAVIEW_ENABLE_PYTHON)
     endif()
     target_link_libraries(${name}
       vtkPVServerManagerApplication
-      vtkPVPythonSupport)
+      vtkPVPythonSupport
+      ${dependencies})
   endforeach()
 endif()
 

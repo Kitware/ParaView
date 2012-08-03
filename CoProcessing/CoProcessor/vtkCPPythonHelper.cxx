@@ -26,7 +26,6 @@
 #include "vtkSMObject.h"
 #include "vtkSMProperty.h"
 
-#define EXCLUDE_LOAD_ALL_FUNCTION
 #include "cppythonmodules.h"
 
 #include <string>
@@ -96,12 +95,13 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
         vtkCPPythonHelper::Instance->PythonOptions);
 
 
-    // Do static initialization of python libraries
-    cppythonmodules_h_LoadAllPythonModules();
-
     // Initialize the sub-interpreter because that is where RunSimpleString
     // works.
     vtkCPPythonHelper::Instance->PythonInterpretor = vtkPVPythonInterpretor::New();
+    // register callback to initialize modules statically. The callback is
+    // empty when BUILD_SHARED_LIBS is ON.
+    CMakeLoadAllPythonModules();
+
     //int interpOk =
     vtkCPPythonHelper::Instance->PythonInterpretor->InitializeSubInterpretor(1, argv);
 

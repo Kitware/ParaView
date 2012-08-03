@@ -49,23 +49,3 @@ include_directories("${PYTHON_INCLUDE_PATH}")
 vtk_module_library(vtkPVPythonSupport ${Module_SRCS})
 target_link_libraries(vtkPVPythonSupport
   ${VTK_PYTHON_LIBRARIES})
-
-# When paraview is linked statically (for example during
-# cross-compiling) the python wrapper module "init" functions must be
-# referenced and called at startup.  The necessary code is written
-# into pvpythonmodules.h and included in vtkPVPythonInterpretor.cxx
-# for compilation.  Then the vtkPVPythonInterpretor static library
-# "links" to all the module archives.  This creates a circular
-# dependency chain between the interpreter and the wrapper modules.
-#
-# In the future we should change this to have a library whose purpose
-# is to reference all the module init functions.  That library may
-# then depend on the modules and vtkPVPythonInterpretor without
-# creating a cycle.
-set(PYTHON_MODULE_PREFIX "")
-PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h)
-# The PYTHON_ADD_MODULE macro stores the list of static modules in a global property
-GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
-if(PY_STATIC_MODULES_LIST)
-  target_link_libraries(vtkPVPythonSupport ${PY_STATIC_MODULES_LIST})
-endif(PY_STATIC_MODULES_LIST)

@@ -63,15 +63,8 @@ IF (VTK_WRAP_PYTHON)
 
   # Create a python module that can be loaded dynamically.  It links to
   # the shared library containing the wrappers for this kit.
-  PYTHON_ADD_MODULE(vtkCPTestDriverPython vtkCPTestDriverPythonInit.cxx)
+  _vtk_add_python_module(vtkCPTestDriverPython vtkCPTestDriverPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkCPTestDriverPython vtkCPTestDriverPythonD)
-
-  # Python extension modules on Windows must have the extension ".pyd"
-  # instead of ".dll" as of Python 2.5.  Older python versions do support
-  # this suffix.
-  IF(WIN32 AND NOT CYGWIN)
-    SET_TARGET_PROPERTIES(vtkCPTestDriverPython PROPERTIES SUFFIX ".pyd")
-  ENDIF(WIN32 AND NOT CYGWIN)
 
   IF(WIN32 OR APPLE)
     TARGET_LINK_LIBRARIES (vtkCPTestDriverPython ${PYTHON_LIBRARIES})

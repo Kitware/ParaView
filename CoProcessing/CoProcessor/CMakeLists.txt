@@ -63,11 +63,10 @@ vtk_module_library(${vtk-module}
 
 if (PARAVIEW_ENABLE_PYTHON)
   SET(PYTHON_MODULE_PREFIX "")
-  PYTHON_WRITE_MODULES_HEADER(${CMAKE_CURRENT_BINARY_DIR}/cppythonmodules.h)
-  GET_PROPERTY(PY_STATIC_MODULES_LIST GLOBAL PROPERTY PY_STATIC_MODULES_LIST)
-  IF(PY_STATIC_MODULES_LIST)
-    TARGET_LINK_LIBRARIES(${vtk-module} ${PY_STATIC_MODULES_LIST})
-  ENDIF(PY_STATIC_MODULES_LIST)
+  vtk_write_python_modules_header_for_wrapped_modules(
+    ${CMAKE_CURRENT_BINARY_DIR}/cppythonmodules.h
+    static_python_modules_list)
+  target_link_libraries(${vtk-module} ${static_python_modules_list})
 endif()
 
 if (BUILD_TESTING)

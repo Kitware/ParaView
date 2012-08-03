@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVPythonInterpretor.h"
 #include <vector>
 
+// file containing static initialization functions for all modules built.
+#include "pvpythonmodules.h"
+
 namespace ParaViewPython {
 
   //---------------------------------------------------------------------------
@@ -105,6 +108,10 @@ namespace ParaViewPython {
 
       // Start interpretor
       vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
+      // register callback to initialize modules statically. The callback is
+      // empty when BUILD_SHARED_LIBS is ON.
+      CMakeLoadAllPythonModules();
+
       ret_val = interpretor->PyMain(pythonArgs.size(), &*pythonArgs.begin());
       interpretor->Delete();
 
