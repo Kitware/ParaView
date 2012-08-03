@@ -33,10 +33,7 @@
 set (PROTOBUF_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (PROTOBUF_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (PROTOBUF_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
-
-
-vtk_target_export(protobuf)
-vtk_target_export(protoc)
+set (PROTOBUF_EXPORTS_FILE ${VTK_EXPORTS_FILE})
 
 vtk_module_third_party(protobuf
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/src
