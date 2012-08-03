@@ -46,9 +46,9 @@ set(vtk-module-init-functions)
 set(vtk-module-init-calls)
 set(_dependencies)
 foreach (_module ${VTK_MODULES_ENABLED})
-  if (NOT VTK_MODULE_${_module}_EXCLUDE_FROM_WRAPPING AND
-      NOT VTK_MODULE_${_module}_IS_TEST AND
-      NOT VTK_MODULE_${_module}_THIRD_PARTY AND
+  if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
+      NOT ${_module}_IS_TEST AND
+      NOT ${_module}_THIRD_PARTY AND
         (NOT _module STREQUAL "vtkPVServerManagerApplication") )
     #message("${_module} == Adding")
     set(vtk-module-init-functions
