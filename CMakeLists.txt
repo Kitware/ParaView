@@ -188,14 +188,19 @@ cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
 cmake_dependent_option(PARAVIEW_USE_ICE_T
   "Enable IceT (needed for parallel rendering)" ON
   "PARAVIEW_USE_MPI" OFF)
+mark_as_advanced(PARAVIEW_USE_ICE_T
+  PARAVIEW_USE_MPI_SSEND)
+
 cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
   "Build ParaView with Qt support (without GUI)" OFF
   "NOT PARAVIEW_BUILD_QT_GUI" ON)
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
-mark_as_advanced(PARAVIEW_USE_ICE_T
-  PARAVIEW_USE_MPI_SSEND)
+# this new option will make it easier to disable all optional plugins. This can
+# come handy when building statically to avoid bringing in all plugins without
+# having to disable them manually.
+option(PARAVIEW_ENABLE_PLUGINS ON "Enable optional plugins for ParaView")
 
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
@@ -455,6 +460,8 @@ add_subdirectory(Wrapping/ClientServer)
 
 #------------------------------------------------------------------------------
 # Package the paraview *.py files.
+# This doesn't do the actual Python wrapping of modules. That's managed by VTK.
+# This merely builds/installs/packages the ParaView specific *.py files.
 #------------------------------------------------------------------------------
 add_subdirectory(Wrapping/Python)
 
@@ -463,8 +470,18 @@ if (PARAVIEW_BUILD_QT_GUI)
   # Don't build documentation is Qt GUI is not being built.
   add_subdirectory(Documentation)
 endif()
-set (PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins")
-add_subdirectory(Plugins)
+
+# ParaView uses GLOBAL property "PARAVIEW_PLUGINS" to keep track of all built
+# plugins.
+#add_subdirectory(Plugins)
+
+#------------------------------------------------------------------------------
+# Process ParaView Plugins. These are processed similar to VTK modules.
+include(ParaViewPluginsMacros)
+pv_process_plugins(
+  ${CMAKE_CURRENT_SOURCE_DIR}/Plugins
+  ${CMAKE_CURRENT_BINARY_DIR}/Plugins)
+
 add_subdirectory(Applications)
 
 #------------------------------------------------------------------------------

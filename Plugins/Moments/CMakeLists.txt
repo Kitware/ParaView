@@ -3,14 +3,10 @@
 # flows through the area of the cell.  Circulation fields are defined on 1D
 # cells and describes flows in the direction of the cell.
 
+include_directories(${VTK_INCLUDE_DIRS})
+
 SET(PLUGIN_NAME Moments)
 SET(PLUGIN_VERSION "0.0")
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${VTK_INCLUDE_DIR}
-  )
 
 SET(SM_XML
   Moments.xml
