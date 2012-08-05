@@ -197,11 +197,6 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
-# this new option will make it easier to disable all optional plugins. This can
-# come handy when building statically to avoid bringing in all plugins without
-# having to disable them manually.
-option(PARAVIEW_ENABLE_PLUGINS ON "Enable optional plugins for ParaView")
-
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
   set(PARAVIEW_BUILD_ARCHITECTURE "64")
@@ -285,10 +280,6 @@ set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
 set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
 set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
-# enable ParaView command line executables module.
-set (Module_pvCommandLineExecutables ON CACHE BOOL 
-  "Enable commandline (pvserver, pvbatch, etc.) executables" FORCE)
-
 # Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
 set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_COSMOS_USE_MPI)
@@ -359,8 +350,6 @@ else()
     ThirdParty/protobuf
     ThirdParty/QtTesting
 #    ThirdParty/Xdmf2
-
-    CommandLineExecutables
 
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
@@ -471,17 +460,17 @@ if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Documentation)
 endif()
 
-# ParaView uses GLOBAL property "PARAVIEW_PLUGINS" to keep track of all built
-# plugins.
-#add_subdirectory(Plugins)
-
 #------------------------------------------------------------------------------
 # Process ParaView Plugins. These are processed similar to VTK modules.
 include(ParaViewPluginsMacros)
+# This will set two variables:
+# PARAVIEW_PLUGINS_ALL -- all available plugins.
+# PARAVIEW_PLUGINLIST - list of library/target names for all enable plugins.
 pv_process_plugins(
   ${CMAKE_CURRENT_SOURCE_DIR}/Plugins
   ${CMAKE_CURRENT_BINARY_DIR}/Plugins)
-
+  
+add_subdirectory(CommandLineExecutables)
 add_subdirectory(Applications)
 
 #------------------------------------------------------------------------------

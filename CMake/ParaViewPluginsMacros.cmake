@@ -28,11 +28,24 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-
 # This file is similar to vtkModuleMacros.cmake in role. It adds the pv_plugin
 # macro used to add plugins (similar to modules for VTK) for ParaView. Plugins
 # are expected to include a plugin.cmake file (analogous to module.cmake) file
 # which includes the call to pv_plugin() macro.
+
+# Now, to build a plugin to be incorporated into ParaView one puts a
+# plugin.cmake file in that directory containing the CMakeLists.txt file to
+# create the plugin. At compile time, ParaView searches for plugin.cmake files
+# in the ParaView/Plugins root or under locations added explicitly using
+# pv_add_plugin_search_path(). The plugin.cmake file should have at most a single call
+# to pv_plugin() (the file can skip calling the pv_plugin() macro if decided so
+# based on certain cmake variables). This call provides information about the
+# plugin to paraview even before trying to process it.
+# Then the CMakeLists.txt file has the pertinant code to build the plugin. The
+# CMakeLists.txt file will be processed automaticall if the plugin is enabled.
+# pv_plugin() macro provides options that can be used to control if the plugin
+# is enabled by default, or autoloaded or is named differently (or comprises of multiple
+# plugins -- which is rare).
 
 get_filename_component(_ParaViewPluginsMacros_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include (ParaViewPlugins)
@@ -41,25 +54,44 @@ include (CMakeParseArguments)
 #------------------------------------------------------------------------------
 # USAGE:
 #   pv_plugin(<NAME>
+#             # provide a descrption for the plugin.
 #             [DESCRIPTION <text>]
+#
+#             # if provided, the plugin will be autoloaded on startup.
 #             [AUTOLOAD]
+#
+#             # if provided, the plugin will be auto-enabled for building.
+#             # otherwise user has to turn it ON an CMake configure time.
+#             [DEFAULT_ENABLED]
+#
+#             # <NAME> is generally used as the name of the plugin used for the
+#             # single call to add_paraview_plugin(). If a different name is
+#             # used, or more that 1 plugin is added in then all the plugin
+#             # names must be specified using this argument.
+#             [PLUGIN_NAMES <name1> <name2>]
 # )
 macro(pv_plugin _name)
   vtk_module_check_name(${_name})
   set(pv-plugin ${_name})
   set(${pv-plugin}_DESCRIPTION "(plugin)")
   set(${pv-plugin}_AUTOLOAD FALSE)
-  set(${pv_plugin}_DEFAULT_ENABLED FALSE)
+  set(${pv-plugin}_DEFAULT_ENABLED FALSE)
+  set(${pv-plugin}_PLUGIN_NAMES "${_name}")
 
   cmake_parse_arguments("${pv-plugin}"
       "AUTOLOAD;DEFAULT_ENABLED" # options
       "DESCRIPTION" # one_value_keywords
-      "" # multi_value_keywords
+      "PLUGIN_NAMES" # multi_value_keywords
       ${ARGN})
 
-  if (${pv-plugins}_UNPARSED_ARGUMENTS)
-    message(WARNING
-      "Unrecognized arguments: ${${pv-plugins}_UNPARSED_ARGUMENTS}")
+  # set default values.
+  if (NOT ${pv-plugin}_PLUGIN_NAMES)
+    set(${pv-plugin}_PLUGIN_NAMES "${_name}")
+  endif()
+
+  if (${pv-plugin}_UNPARSED_ARGUMENTS)
+    message(AUTHOR_WARNING
+      "Unrecognized arguments: ${${pv-plugin}_UNPARSED_ARGUMENTS}")
   endif()
 endmacro()
 
@@ -115,7 +147,8 @@ endmacro()
 # searching for the plugins available, providing options for enabling them and
 # then processing the cmake files for enabled plugins.
 macro(pv_process_plugins root_src root_build)
-  set (PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
+  set (PARAVIEW_PLUGINS_ALL)
+
   pv_plugin_search_under_root(${root_src} ${root_build})
 
   # search for available plugins and load information about them.
@@ -125,6 +158,7 @@ macro(pv_process_plugins root_src root_build)
   foreach (pv-plugin IN LISTS PARAVIEW_PLUGINS_ALL)
     set(PARAVIEW_BUILD_PLUGIN_${pv-plugin} ${${pv-plugin}_DEFAULT_ENABLED}
       CACHE BOOL "Build ${pv-plugin} Plugin")
+    mark_as_advanced(PARAVIEW_BUILD_PLUGIN_${pv-plugin})
   endforeach()
 
   # process all enabled plugins.
@@ -136,8 +170,55 @@ macro(pv_process_plugins root_src root_build)
       message(STATUS "Plugin: ${pv-plugin} - ${${pv-plugin}_DESCRIPTION} : Disabled")
     endif()
   endforeach()
-
+ 
   # write the .plugins file.
-  write_plugins_file()
+  set (PARAVIEW_PLUGINLIST)
+  set (plugin_ini "<?xml version=\"1.0\"?>\n<Plugins>\n")
+  foreach (pv-plugin IN LISTS PARAVIEW_PLUGINS_ALL)
+    if (PARAVIEW_BUILD_PLUGIN_${pv-plugin})
+      # fill up the PARAVIEW_PLUGINLIST with the names of the libraries for all
+      # the enabled plugins.
+      list(APPEND PARAVIEW_PLUGINLIST ${${pv-plugin}_PLUGIN_NAMES})
+      foreach (libname IN LISTS ${pv-plugin}_PLUGIN_NAMES)
+        if (${pv-plugin}_AUTOLOAD)
+          set(plugin_ini
+            "${plugin_ini}  <Plugin name=\"${libname}\" auto_load=\"1\"/>\n")
+        else ()
+          set(plugin_ini
+            "${plugin_ini}  <Plugin name=\"${libname}\" auto_load=\"0\"/>\n")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+  set (plugin_ini "${plugin_ini}</Plugins>\n")
+  file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins" "${plugin_ini}")
+
+  # write the static plugins init file.
+  _write_static_plugins_init_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.h
+    ${PARAVIEW_PLUGINLIST})
 
 endmacro()
+
+#------------------------------------------------------------------------------
+# Internal function used to generate a header file initializing all plugins that
+# can be used by executables to link against the plugins when building
+# statically.
+function(_write_static_plugins_init_file filename)
+  set(plugins_init_function "#include \"vtkPVPlugin.h\"\n\n")
+
+  # write PV_PLUGIN_IMPORT_INIT calls
+  foreach(plugin_name ${ARGN})
+    set(plugins_init_function "${plugins_init_function}PV_PLUGIN_IMPORT_INIT(${plugin_name});\n")
+  endforeach()
+  set(plugins_init_function "${plugins_init_function}\n")
+
+  # write PV_PLUGIN_IMPORT calls
+  set(plugins_init_function "${plugins_init_function}inline void paraview_static_plugins_init()\n{\n")
+  foreach(plugin_name ${ARGN})
+    set(plugins_init_function "${plugins_init_function}  PV_PLUGIN_IMPORT(${plugin_name});\n")
+  endforeach()
+  set(plugins_init_function "${plugins_init_function}}\n")
+
+  file(WRITE "${filename}" "${plugins_init_function}")
+endfunction()

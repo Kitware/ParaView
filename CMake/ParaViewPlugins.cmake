@@ -998,17 +998,9 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     # source are installed.
     internal_paraview_install_plugin(${NAME})
 
-    # this builds a list of actual plugin names added by plugins provided in the
-    # ParaView source directory itself.
-    # This is used to generate the ".plugins" configuration file, as well as
-    # when creating the mac bundle.
-    SET(PARAVIEW_PLUGINLIST ${PARAVIEW_PLUGINLIST} ${NAME} CACHE INTERNAL
-        "List of configured plugins")
-
-    SET(PARAVIEW_AUTOLOAD_PLUGINLIST)
     IF(ARG_AUTOLOAD)
-      SET(PARAVIEW_AUTOLOAD_PLUGINLIST ${PARAVIEW_AUTOLOAD_PLUGINLIST} ${NAME} CACHE INTERNAL
-        "List of plugins that will be automatically loaded by default")
+      message(WARNING "AUTOLOAD option is deprecated. Plugins built within"
+        " ParaView source should use pv_plugin(..) macro with AUTOLOAD argument.")
     ENDIF(ARG_AUTOLOAD)
   ENDIF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
   
@@ -1118,41 +1110,3 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
   ENDIF(PYTHON_ENABLE_MODULE_${NAME}Python)
 
 ENDMACRO(WRAP_PLUGIN_FOR_PYTHON)
-
-# Configure the ".plugins" configuration xml for making paraview aware of the
-# distributed plugins.
-FUNCTION(WRITE_PLUGINS_FILE)
-  SET (plugins_ini "<?xml version=\"1.0\"?>\n<Plugins>\n")
-  FOREACH(pluginname ${PARAVIEW_PLUGINLIST})
-    PV_PLUGIN_LIST_CONTAINS(autoload_plugin ${pluginname} ${PARAVIEW_AUTOLOAD_PLUGINLIST})
-    IF(autoload_plugin)
-      set (plugins_ini "${plugins_ini}  <Plugin name=\"${pluginname}\" auto_load=\"1\"/>\n")
-    ELSE(autoload_plugin)
-      set (plugins_ini "${plugins_ini}  <Plugin name=\"${pluginname}\" auto_load=\"0\"/>\n")
-    ENDIF(autoload_plugin)
-  ENDFOREACH(pluginname ${PARAVIEW_PLUGINLIST})
-  set (plugins_ini "${plugins_ini}</Plugins>\n")
-
-  FILE(WRITE "${EXECUTABLE_OUTPUT_PATH}/.plugins" "${plugins_ini}")
-ENDFUNCTION(WRITE_PLUGINS_FILE)
-
-# create a header file containing a paraview_init_static_plugins() method which
-# calls PV_PLUGIN_IMPORT for each plugin in the plugins list
-macro(write_static_plugins_init_file)
-  set(plugins_init_function "#include \"vtkPVPlugin.h\"\n\n")
-
-  # write PV_PLUGIN_IMPORT_INIT calls
-  foreach(plugin_name ${PARAVIEW_PLUGINLIST})
-    set(plugins_init_function "${plugins_init_function}PV_PLUGIN_IMPORT_INIT(${plugin_name});\n")
-  endforeach()
-  set(plugins_init_function "${plugins_init_function}\n")
-
-  # write PV_PLUGIN_IMPORT calls
-  set(plugins_init_function "${plugins_init_function}inline void paraview_static_plugins_init()\n{\n")
-  foreach(plugin_name ${PARAVIEW_PLUGINLIST})
-    set(plugins_init_function "${plugins_init_function}  PV_PLUGIN_IMPORT(${plugin_name});\n")
-  endforeach()
-  set(plugins_init_function "${plugins_init_function}}\n")
-
-  file(WRITE "${CMAKE_BINARY_DIR}/pvStaticPluginsInit.h" "${plugins_init_function}")
-endmacro()

@@ -28,10 +28,21 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+if (NOT TARGET vtkPVServerManagerApplication)
+  message(STATUS "vtkPVServerManagerApplication module is not enabled. "
+    "Command line executables will not be built.")
+  return()
+endif()
+
+vtk_module_dep_includes(vtkPVServerManagerApplication)
+include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
+                    ${vtkPVServerManagerApplication_INCLUDE_DIRS})
+
 include (vtkForwardingExecutable)
 
-vtk_module_impl()
-vtk_module_export("")
+# these will be removed once vtkForwardingExecutable is fixed.
+set(VTK_INSTALL_BIN_DIR_CM24 ${VTK_INSTALL_RUNTIME_DIR})
+set(VTK_INSTALL_LIB_DIR_CM24 ${VTK_INSTALL_LIBRARY_DIR})
 
 foreach (name pvserver pvdataserver pvrenderserver)
   vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
@@ -43,10 +54,16 @@ foreach (name pvserver pvdataserver pvrenderserver)
   endif()
   target_link_libraries(${name}
     vtkPVServerManagerApplication)
+  if (NOT BUILD_SHARED_LIBS)
+    target_link_libraries(${name} ${PARAVIEW_PLUGINLIST})
+  endif()
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
   include_directories("${PYTHON_INCLUDE_PATH}")
+  vtk_module_dep_includes(vtkPVPythonSupport)
+  include_directories(${vtkPVPythonSupport_DEPENDS_INCLUDE_DIRS}
+                      ${vtkPVPythonSupport_INCLUDE_DIRS})
 
   set (dependencies)
 
