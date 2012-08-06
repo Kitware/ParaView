@@ -31,6 +31,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchLineEdit" command="set_string" arguments="ren" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchLineEdit" command="set_string" arguments="rende" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/SearchLineEdit" command="set_string" arguments="render" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/RenderMode/ComboBox" command="set_string" arguments="Sphere (Texture)" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/RenderMode/ComboBox" command="set_string" arguments="Sphere (Texture)" />
   <pqevent object="pqSLACActionHolder/actionToggleBackgroundBW" command="activate" arguments="" />
 </pqevents>

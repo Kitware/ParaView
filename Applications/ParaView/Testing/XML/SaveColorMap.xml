@@ -4,7 +4,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="RTData" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/ColorEditor/1QGroupBox0/1pqGenericSummaryDisplayPanel0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ColorEditor/1QGroupBox0/1pqGenericSummaryDisplayPanel0/1QPushButton1" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/SwitchToAdvanced" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/PresetButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/Gradients" command="mousePress" arguments="1,1,0,125,7,/5:0" />
