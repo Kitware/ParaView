@@ -389,6 +389,12 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   // connect to advanced button
   this->connect(this->Ui->AdvancedButton, SIGNAL(toggled(bool)),
                 this, SLOT(advancedButtonToggled(bool)));
+
+  this->connect(this->Ui->PropertiesButton, SIGNAL(toggled(bool)),
+                this->Ui->PropertiesFrame, SLOT(setVisible(bool)));
+
+  this->connect(this->Ui->DisplayButton, SIGNAL(toggled(bool)),
+                this->Ui->DisplayFrame, SLOT(setVisible(bool)));
 }
 
 pqPropertiesPanel::~pqPropertiesPanel()
@@ -458,11 +464,11 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
   // update group box name
   if(proxy)
     {
-    this->Ui->PropertiesGroupBox->setTitle(QString("Properties (%1)").arg(proxy->getSMName()));
+    this->Ui->PropertiesButton->setText(QString("Properties (%1)").arg(proxy->getSMName()));
     }
   else
     {
-    this->Ui->PropertiesGroupBox->setTitle("Properties");
+    this->Ui->PropertiesButton->setText("Properties");
     }
 
   if(!proxy)
@@ -644,11 +650,11 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
   // update group box name
   if(repr)
     {
-    this->Ui->DisplayGroupBox->setTitle(QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
+    this->Ui->DisplayButton->setText(QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
     }
   else
     {
-    this->Ui->DisplayGroupBox->setTitle("Display");
+    this->Ui->DisplayButton->setText("Display");
     }
 
   QList<pqPropertiesPanelItem> widgets;

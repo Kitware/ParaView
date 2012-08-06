@@ -262,6 +262,7 @@ pqGenericSummaryDisplayPanel::pqGenericSummaryDisplayPanel(pqRepresentation *rep
     }
 
   this->setLayout(l);
+  this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
 //-----------------------------------------------------------------------------
