@@ -63,7 +63,8 @@ if (PARAVIEW_ENABLE_PYTHON)
   include_directories("${PYTHON_INCLUDE_PATH}")
   vtk_module_dep_includes(vtkPVPythonSupport)
   include_directories(${vtkPVPythonSupport_DEPENDS_INCLUDE_DIRS}
-                      ${vtkPVPythonSupport_INCLUDE_DIRS})
+                      ${vtkPVPythonSupport_INCLUDE_DIRS}
+                      ${CMAKE_CURRENT_BINARY_DIR})
 
   set (dependencies)
 
