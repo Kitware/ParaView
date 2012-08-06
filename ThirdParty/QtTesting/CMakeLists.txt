@@ -52,4 +52,5 @@ vtk_module_third_party(qttesting
   LIBRARIES QtTesting
 )
 
+vtk_target_export(QtTesting)
 mark_as_advanced(QT_TESTING_INSTALL_DEVELOPMENT)

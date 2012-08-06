@@ -54,7 +54,6 @@ set(ICET_INSTALL_INCLUDE_DIR ${VTK_INSTALL_INCLUDE_DIR})
 set(ICET_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 set(ICET_INSTALL_NO_LIBRARIES ${VTK_INSTALL_NO_LIBRARIES})
 set(ICET_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
-set(ICET_EXPORTS_FILE ${VTK_EXPORTS_FILE})
 
 vtk_module_third_party(icet
   INCLUDE_DIRS
@@ -62,6 +61,13 @@ vtk_module_third_party(icet
     ${CMAKE_CURRENT_BINARY_DIR}/vtkicet/src/include
   LIBRARIES IceTCore IceTMPI IceTGL
 )
+
+# icet exports its build dir targets to a custom IceTTargets.cmake file. We
+# don't care much about it. We just ensure that we export the targets we are
+# interested in here again.
+vtk_target_export(IceTCore)
+vtk_target_export(IceTMPI)
+vtk_target_export(IceTGL)
 
 # keep IceT variables from polluting the space.
 mark_as_advanced(

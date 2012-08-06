@@ -33,10 +33,20 @@
 set (PROTOBUF_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (PROTOBUF_INSTALL_LIB_DIR ${VTK_INSTALL_LIBRARY_DIR})
 set (PROTOBUF_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
-set (PROTOBUF_EXPORTS_FILE ${VTK_EXPORTS_FILE})
 
 vtk_module_third_party(protobuf
   INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/vtkprotobuf/src
   LIBRARIES protobuf
 )
+
+# protobuf exports it's build-dir targets to a custom file
+# (PROTOBUF_EXPORTS.cmake). We don't care much about that. We export
+# build-dir targets ourselves.
+vtk_target_export(protobuf)
+vtk_target_export(protobuf-lite)
+vtk_target_export(protoc)
+
+# FIXME: this is not supported yet, but we plan to support it soon.
+#vtk_build_tools_target_export(protoc_compiler)
+
 mark_as_advanced(protobuf_ENABLE_TESTING)
