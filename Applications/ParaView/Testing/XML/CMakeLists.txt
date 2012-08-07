@@ -32,15 +32,16 @@ ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
 
 if(Module_vtkIOVisItBridge)
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
+    )
 endif()
 
 SET (TESTS_WITH_BASELINES
