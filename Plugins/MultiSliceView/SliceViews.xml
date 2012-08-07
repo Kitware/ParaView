@@ -1,10 +1,10 @@
 <ServerManagerConfiguration>
    <ProxyGroup name="views">
-      <RenderViewProxy name="MultiSlice" class="vtkPVRenderView"
+      <MultiSliceViewProxy name="MultiSlice" class="vtkPVRenderView"
          processes="client|renderserver|dataserver"
          base_proxygroup="views" base_proxyname="RenderView"
          representation_name="vtkMultiSliceRepresentation">
-      </RenderViewProxy>
+      </MultiSliceViewProxy>
 
       <RenderViewProxy name="ThreeSlice" class="vtkPVRenderView"
          processes="client|renderserver|dataserver"
