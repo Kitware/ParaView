@@ -1,10 +1,7 @@
 # Set up some common testing environment.
-SET (CLIENT_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
-IF (Q_WS_MAC)
-  SET(CLIENT_EXECUTABLE
-    ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview)
-ENDIF (Q_WS_MAC)
-
+SET (CLIENT_EXECUTABLE  "\$<TARGET_FILE:paraview>")
+# FIXME: need to verify that the above points to the paraview executable within
+# the app bundle on Mac.
 
 MACRO (process_args out_extra_args)
   SET (temp_args)
