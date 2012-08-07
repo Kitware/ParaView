@@ -1,0 +1,12 @@
+#------------------------------------------------------------------------------
+# ParaViewCompileToolsConfig.cmake - ParaView compile tools configuration file
+# for cross compiling.
+#
+# This file simply imports the VTKCompileToolsConfig.cmake file. We provide this
+# wrapper so that ParaView project can indeed require users to point to a file
+# that is named ParaView....cmake rather than VTK....cmake
+
+# Remember cross compiling is not supported from "installed" version of the
+# host-tools, one has to point to the build-directory.
+
+include(@ParaView_BINARY_DIR@/VTK/VTKCompileToolsConfig.cmake)

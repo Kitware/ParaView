@@ -29,10 +29,15 @@
 #
 #==========================================================================
 vtk_module_impl()
+vtk_module_export("")
+
 if (NOT CMAKE_CROSSCOMPILING)
-  vtk_add_executable(kwProcessXML ProcessXML.cxx)
-  vtk_module_export("")
-  target_link_libraries(kwProcessXML
-    vtkCommonCore
-    vtksys)
+  if (UNIX AND VTK_BUILD_FORWARDING_EXECUTABLES)
+    include(vtkForwardingExecutable)
+    vtk_add_executable_with_forwarding(kwProcessXML ProcessXML.cxx)
+  else ()
+    add_executable(kwProcessXML ProcessXML.cxx)
+  endif()
+  target_link_libraries(kwProcessXML vtkCommonCore vtksys)
+  vtk_compile_tools_target(kwProcessXML)
 endif()

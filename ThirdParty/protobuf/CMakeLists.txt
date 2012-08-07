@@ -45,8 +45,10 @@ vtk_module_third_party(protobuf
 vtk_target_export(protobuf)
 vtk_target_export(protobuf-lite)
 vtk_target_export(protoc)
+vtk_compile_tools_target_export(protoc_compiler)
 
-# FIXME: this is not supported yet, but we plan to support it soon.
-#vtk_build_tools_target_export(protoc_compiler)
+# All these exports don't all any install rules. However we make protobuf itself
+# install components at the right location yb setting PROTOBUF_INSTALL_*
+# variables.
 
 mark_as_advanced(protobuf_ENABLE_TESTING)

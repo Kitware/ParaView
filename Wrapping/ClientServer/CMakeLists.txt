@@ -3,7 +3,7 @@ IF(NOT CMAKE_CROSSCOMPILING)
   # vtkParse.tab.c has #line markers that break #include with double quotes.
   INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/VTK/Wrapping)
 
-  vtk_add_executable(vtkWrapClientServer
+  add_executable(vtkWrapClientServer
                 vtkWrapClientServer.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParse.tab.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParsePreprocess.c
@@ -11,20 +11,7 @@ IF(NOT CMAKE_CROSSCOMPILING)
 
   set_property(SOURCE ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParseMain.c PROPERTY COMPILE_DEFINITIONS
     VTK_PARSE_VERSION="${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")
-
-
-  EXPORT(TARGETS vtkWrapClientServer FILE ${EXPORT_EXECUTABLES_FILE} NAMESPACE "${EXPORT_EXECUTABLES_NAMESPACE}" APPEND)
-  IF(COMPILE_TOOLS_TARGET)
-    ADD_DEPENDENCIES(${COMPILE_TOOLS_TARGET} vtkWrapClientServer)
-  ENDIF(COMPILE_TOOLS_TARGET)
-
-  IF(NOT PV_INSTALL_NO_DEVELOPMENT)
-    INSTALL(
-        TARGETS vtkWrapClientServer
-        DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
-        COMPONENT Development)
-  ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
-
+  vtk_compile_tools_target(vtkWrapClientServer)
 ENDIF(NOT CMAKE_CROSSCOMPILING)
 
 #==========================================================================
