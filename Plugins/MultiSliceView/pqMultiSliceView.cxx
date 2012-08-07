@@ -19,6 +19,7 @@
 
 #include "QVTKWidget.h"
 
+#include "pqDataRepresentation.h"
 #include "pqMultiSliceAxisWidget.h"
 #include "pqRepresentation.h"
 
@@ -44,11 +45,8 @@ pqMultiSliceView::pqMultiSliceView(
     vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
-  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
-                   this, SLOT(updateAxisBounds()));
-  QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
-                   this, SLOT(updateAxisBounds()));
-  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
+  // When data change make sure the bounds are updated
+  QObject::connect(this, SIGNAL(updateDataEvent()),
                    this, SLOT(updateAxisBounds()));
 
   // Make sure all the representations share the same slice values
@@ -145,22 +143,23 @@ void pqMultiSliceView::updateAxisBounds()
   double bounds[6] = { VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
                        VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
                        VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+  double repB[6];
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
-    if(!rep->isVisible() || rep->isWidgetType())
+    pqDataRepresentation* repData = qobject_cast<pqDataRepresentation*>(rep);
+    if(!rep->isVisible() || rep->isWidgetType() || repData == NULL)
       {
       continue;
       }
-    vtkSMRepresentationProxy* smRep =
-        vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
-    smRep->UpdatePipeline();
-    double* repBounds = smRep->GetRepresentedDataInformation()->GetBounds();
-    for(int i=0;i<3;i++)
+    if(repData->getDataBounds(repB))
       {
-      int index = 2*i;
-      bounds[index] = (bounds[index] < repBounds[index]) ? bounds[index] : repBounds[index];
-      index++;
-      bounds[index] = (bounds[index] > repBounds[index]) ? bounds[index] : repBounds[index];
+      for(int i=0;i<3;i++)
+        {
+        int index = 2*i;
+        bounds[index] = (bounds[index] < repB[index]) ? bounds[index] : repB[index];
+        index++;
+        bounds[index] = (bounds[index] > repB[index]) ? bounds[index] : repB[index];
+        }
       }
     }
 
