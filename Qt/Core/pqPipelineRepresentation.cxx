@@ -284,6 +284,25 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     return;
     }
 
+  // For some view all the default representation names may not exist
+  // therefore we need to filter them to match existing ones.
+  vtkSMPropertyHelper availableTypes(repr, "RepresentationTypesInfo");
+  const char* DEFAULT_OUTLINE = "Outline";
+  const char* DEFAULT_SURFACE = "Surface";
+  const char* DEFAULT_SLICE = "Slice";
+  if(availableTypes.GetNumberOfElements() == 1)
+    {
+    // All default value should be that UNIQUE possible choice
+    DEFAULT_OUTLINE = DEFAULT_SURFACE = DEFAULT_SLICE
+        = availableTypes.GetAsString(0);
+    }
+  else
+    {
+    // TODO if the issue arise
+    // We need to filter possible defaults with allowed value and if one of
+    // the default does not exist replace it with some allowed value
+    }
+
   pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
     "Wireframe");
   pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
@@ -333,7 +352,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
        dataSetType == VTK_GENERIC_DATA_SET)
       {
       pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        "Surface");
+        DEFAULT_SURFACE);
       }
     else if (dataSetType == VTK_UNSTRUCTURED_GRID)
       {
@@ -341,7 +360,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()*1000000.0)
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "Outline");
+          DEFAULT_OUTLINE);
         }
       }
     else if (dataSetType == VTK_IMAGE_DATA)
@@ -355,12 +374,12 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
         {
 
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "Slice");
+          DEFAULT_SLICE);
         }
       else
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "Outline");
+          DEFAULT_OUTLINE);
         }
       }
     else if(dataSetType == VTK_RECTILINEAR_GRID ||
@@ -370,18 +389,18 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "Surface");
+          DEFAULT_SURFACE);
         }
       else
         {
         pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-          "Outline");
+          DEFAULT_OUTLINE);
         }
       }
     else
       {
       pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
-        "Outline");
+        DEFAULT_OUTLINE);
       }
     }
   // Locate input display.

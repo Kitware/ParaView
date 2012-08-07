@@ -151,8 +151,10 @@ void pqMultiSliceView::updateAxisBounds()
       {
       continue;
       }
-    if(repData->getDataBounds(repB))
+    vtkPVDataInformation* info = repData->getInputDataInformation();
+    if(info)
       {
+      info->GetBounds(repB);
       for(int i=0;i<3;i++)
         {
         int index = 2*i;
@@ -180,7 +182,7 @@ void pqMultiSliceView::updateSlices()
 
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
-    if( !rep->isVisible() || rep->isWidgetType() ||
+    if( rep->isWidgetType() ||
         !rep->getProxy()->GetProperty("XSlicesValues"))
       {
       continue;

@@ -57,7 +57,7 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
 
   // Choose which type of representation proxy to create.
   vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations",
-    "MultiSliceRepresentation");
+    "CompositeMultiSliceRepresentation");
   vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
@@ -67,7 +67,7 @@ vtkSMRepresentationProxy* vtkSMMultiSliceViewProxy::CreateDefaultRepresentation(
   if (sg)
     {
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy("representations", "MultiSliceRepresentation"));
+      pxm->NewProxy("representations", "CompositeMultiSliceRepresentation"));
     return repr;
     }
 

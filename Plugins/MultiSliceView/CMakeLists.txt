@@ -55,6 +55,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   ADD_PARAVIEW_PLUGIN(MultiSliceView "1.0"
     SERVER_MANAGER_SOURCES
+      vtkCompositeMultiSliceRepresentation.cxx
       vtkMultiSliceRepresentation.cxx
       vtkOrthogonalSliceFilter.cxx
       vtkSMMultiSliceViewProxy.cxx
