@@ -5,7 +5,16 @@ include (vtkWrapClientServer)
 #------------------------------------------------------------------------------
 include(vtkModuleAPI)
 
-macro(pv_wrap_vtk_mod_cs module)
+# Adds client-server wrapping for a vtk-module. This uses vtkModuleAPI to load
+# information about the indicated VTK module and then warps the headers and
+# generates a library named ${module}CS.
+macro(vtk_add_cs_wrapping module)
+  if (NOT TARGET vtkWrapClientServer)
+    message(FATAL_ERROR
+      "Failed to locate vtkWrapClientServer target. ParaView targets "
+      "may not have been imported correctly.")
+  endif()
+
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
 
   # save current include-dirs
