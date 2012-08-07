@@ -152,6 +152,10 @@ endif()
 #set (VTK_INSTALL_NO_LIBRARIES TRUE)
 #set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
 
+# Disable installing of the Qt Designer plugin. There's no need for it in
+# ParaView install rules.
+set (VTK_INSTALL_NO_QT_PLUGIN TRUE)
+
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (PV_INSTALL_LIB_DIR ${VTK_INSTALL_ARCHIVE_DIR})
@@ -463,6 +467,17 @@ pv_process_plugins(
   
 add_subdirectory(CommandLineExecutables)
 add_subdirectory(Applications)
+
+#------------------------------------------------------------------------------
+# We add a mechanism to incorporate arbitrary install rules into the
+# build-process.
+foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
+  if (EXISTS "${rule_file}")
+    message (STATUS "***** Incorporating custom cmake file : ${rule_file} ****")
+    include("${rule_file}")
+    message (STATUS "*********************************************************")
+  endif (EXISTS "${rule_file}")
+endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
 
 #------------------------------------------------------------------------------
 # Lastly generate the ParaViewConfig.cmake so that other projects can depend on

@@ -58,8 +58,8 @@ build_paraview_client(paraview
       ${PARAVIEW_EXTRA_GUI_RESOURCES} # Add any compiled in GUI configuration xmls
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
-    INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
-    INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
+    INSTALL_BIN_DIR "${VTK_INSTALL_RUNTIME_DIR}"
+    INSTALL_LIB_DIR "${VTK_INSTALL_LIBRARY_DIR}")
 
 # link enabled plugins if not building in shared library mode
 if(NOT BUILD_SHARED_LIBS)
@@ -77,16 +77,3 @@ add_dependencies(paraview
 if (BUILD_TESTING)
   add_subdirectory(Testing)
 endif (BUILD_TESTING)
-
-
-foreach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
-  if (EXISTS "${rule_file}")
-    include("${rule_file}")
-  endif (EXISTS "${rule_file}")
-endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
-
-#------------------------------------------------------------------------
-# Install the .plugins configuration file.
-install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
-        DESTINATION ${PV_INSTALL_PLUGIN_DIR}
-        COMPONENT Runtime)

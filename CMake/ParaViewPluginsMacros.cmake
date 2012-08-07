@@ -193,6 +193,11 @@ macro(pv_process_plugins root_src root_build)
   set (plugin_ini "${plugin_ini}</Plugins>\n")
   file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins" "${plugin_ini}")
 
+  # Install the .plugins configuration file.
+  install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/.plugins"
+          DESTINATION "${PV_INSTALL_PLUGIN_DIR}"
+          COMPONENT Runtime)
+
   # write the static plugins init file.
   _write_static_plugins_init_file(
     ${CMAKE_CURRENT_BINARY_DIR}/pvStaticPluginsInit.h
