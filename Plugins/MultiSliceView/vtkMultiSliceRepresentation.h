@@ -22,8 +22,7 @@
 
 #include "vtkGeometryRepresentationWithFaces.h"
 
-class vtkCutter;
-class vtkAppendFilter;
+class vtkOrthogonalSliceFilter;
 
 class vtkMultiSliceRepresentation : public vtkGeometryRepresentationWithFaces
 {
@@ -54,15 +53,7 @@ protected:
   vtkMultiSliceRepresentation();
   ~vtkMultiSliceRepresentation();
 
-  vtkCutter* SliceAlongX;
-  vtkCutter* SliceAlongY;
-  vtkCutter* SliceAlongZ;
-
-  vtkAppendFilter* CombinedFilteredInput;
-
-  void SetSlice(vtkCutter* slice, int index, double value);
-  void SetNumberOfSlice(vtkCutter* slice, int size);
-
+  vtkOrthogonalSliceFilter* InternalSliceFilter;
 private:
   vtkMultiSliceRepresentation(const vtkMultiSliceRepresentation&); // Not implemented
   void operator=(const vtkMultiSliceRepresentation&); // Not implemented

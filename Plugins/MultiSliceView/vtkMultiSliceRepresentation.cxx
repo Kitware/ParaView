@@ -19,46 +19,20 @@
 #include "vtkPlane.h"
 #include "vtkNew.h"
 #include "vtkAppendFilter.h"
+#include "vtkOrthogonalSliceFilter.h"
 
 vtkStandardNewMacro(vtkMultiSliceRepresentation);
 //----------------------------------------------------------------------------
 vtkMultiSliceRepresentation::vtkMultiSliceRepresentation()
 {
-  this->SliceAlongX = vtkCutter::New();
-  this->SliceAlongY = vtkCutter::New();
-  this->SliceAlongZ = vtkCutter::New();
-
-  vtkNew<vtkPlane> planeX;
-  planeX->SetNormal(1,0,0);
-  planeX->SetOrigin(0,0,0);
-  this->SliceAlongX->SetCutFunction(planeX.GetPointer());
-
-  vtkNew<vtkPlane> planeY;
-  planeY->SetNormal(0,1,0);
-  planeY->SetOrigin(0,0,0);
-  this->SliceAlongY->SetCutFunction(planeY.GetPointer());
-
-  vtkNew<vtkPlane> planeZ;
-  planeZ->SetNormal(0,0,1);
-  planeZ->SetOrigin(0,0,0);
-  this->SliceAlongZ->SetCutFunction(planeZ.GetPointer());
-
-  this->CombinedFilteredInput = vtkAppendFilter::New();
-  this->CombinedFilteredInput->AddInputConnection(this->SliceAlongX->GetOutputPort());
-  this->CombinedFilteredInput->AddInputConnection(this->SliceAlongY->GetOutputPort());
-  this->CombinedFilteredInput->AddInputConnection(this->SliceAlongZ->GetOutputPort());
+  this->InternalSliceFilter = vtkOrthogonalSliceFilter::New();
 }
 
 //----------------------------------------------------------------------------
 vtkMultiSliceRepresentation::~vtkMultiSliceRepresentation()
 {
-  this->SliceAlongX->Delete();
-  this->SliceAlongY->Delete();
-  this->SliceAlongZ->Delete();
-  this->SliceAlongX = this->SliceAlongY = this->SliceAlongZ = NULL;
-
-  this->CombinedFilteredInput->Delete();
-  this->CombinedFilteredInput = NULL;
+  this->InternalSliceFilter->Delete();
+  this->InternalSliceFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -70,57 +44,37 @@ void vtkMultiSliceRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceX(int index, double value)
 {
-  this->SetSlice(this->SliceAlongX, index, value);
+  this->InternalSliceFilter->SetSliceX(index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceX(int size)
 {
-  this->SetNumberOfSlice(this->SliceAlongX, size);
+  this->InternalSliceFilter->SetNumberOfSliceX(size);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceY(int index, double value)
 {
-  this->SetSlice(this->SliceAlongY, index, value);
+  this->InternalSliceFilter->SetSliceY(index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceY(int size)
 {
-  this->SetNumberOfSlice(this->SliceAlongY, size);
+  this->InternalSliceFilter->SetNumberOfSliceY(size);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceZ(int index, double value)
 {
-  this->SetSlice(this->SliceAlongZ, index, value);
+  this->InternalSliceFilter->SetSliceZ(index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceZ(int size)
 {
-  this->SetNumberOfSlice(this->SliceAlongZ, size);
-}
-
-//----------------------------------------------------------------------------
-void vtkMultiSliceRepresentation::SetSlice(vtkCutter* slice, int index, double value)
-{
-  if(slice->GetValue(index) != value)
-    {
-    slice->SetValue(index, value);
-    this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkMultiSliceRepresentation::SetNumberOfSlice(vtkCutter* slice, int size)
-{
-  if(size != slice->GetNumberOfContours())
-    {
-    slice->SetNumberOfContours(size);
-    this->Modified();
-    }
+  this->InternalSliceFilter->SetNumberOfSliceZ(size);
 }
 
 //----------------------------------------------------------------------------
@@ -129,9 +83,7 @@ vtkAlgorithmOutput* vtkMultiSliceRepresentation::GetInternalOutputPort(int port,
   vtkAlgorithmOutput* inputAlgo =
       this->Superclass::GetInternalOutputPort(port, conn);
 
-  this->SliceAlongX->SetInputConnection(inputAlgo);
-  this->SliceAlongY->SetInputConnection(inputAlgo);
-  this->SliceAlongZ->SetInputConnection(inputAlgo);
+  this->InternalSliceFilter->SetInputConnection(inputAlgo);
 
-  return this->CombinedFilteredInput->GetOutputPort();
+  return this->InternalSliceFilter->GetOutputPort();
 }
