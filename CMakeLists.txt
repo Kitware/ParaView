@@ -496,10 +496,20 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake @ONLY)
 configure_file(ParaViewConfigVersion.cmake.in ParaViewConfigVersion.cmake @ONLY)
 
-# note: ParaViewCompileToolsConfig.cmake is never installed.
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfigVersion.cmake
-        ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseParaView.cmake
-  DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
-)
+if (NOT VTK_INSTALL_NO_DEVELOPMENT)
+  # note: ParaViewCompileToolsConfig.cmake is never installed.
+
+  install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake
+          ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfigVersion.cmake
+          ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseParaView.cmake
+    DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
+    COMPONENT Development
+  )
+
+  install(
+    DIRECTORY "${ParaView_SOURCE_DIR}/CMake/"
+    DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
+    COMPONENT Development
+  )
+endif()
