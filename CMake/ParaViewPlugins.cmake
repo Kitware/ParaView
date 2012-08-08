@@ -1114,3 +1114,54 @@ MACRO(WRAP_PLUGIN_FOR_PYTHON NAME WRAP_LIST WRAP_EXCLUDE_LIST)
   ENDIF(PYTHON_ENABLE_MODULE_${NAME}Python)
 
 ENDMACRO(WRAP_PLUGIN_FOR_PYTHON)
+
+#------------------------------------------------------------------------------
+# locates module.cmake files under the current source directory and registers
+# them as modules. All identified modules are treated as enabled and are built.
+macro(pv_process_modules)
+  unset (VTK_MODULES_ALL)
+  file(GLOB_RECURSE files RELATIVE
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/module.cmake")
+  foreach (module_cmake IN LISTS files)
+    get_filename_component(base "${module_cmake}" PATH)
+    vtk_add_module(
+      "${CMAKE_CURRENT_SOURCE_DIR}/${base}"
+      module.cmake
+      "${CMAKE_CURRENT_BINARY_DIR}/${base}")
+  endforeach()
+
+  set (current_module_set ${VTK_MODULES_ALL})
+
+  # sort the modules based on depedencies. This will endup bringing in
+  # VTK-modules too. We raise errors if required VTK modules are not already
+  # enabled.
+  include(TopologicalSort)
+  topological_sort(VTK_MODULES_ALL "" _DEPENDS)
+
+  set (current_module_set_sorted)
+  foreach(module IN LISTS VTK_MODULES_ALL)
+    list(FIND current_module_set ${module} _found)
+    if (_found EQUAL -1)
+      # this is a VTK module and must have already been enabled. Otherwise raise
+      # error.
+      list(FIND VTK_MODULES_ENABLED ${module} _found)
+      if (_found EQUAL -1)
+        message(FATAL_ERROR
+          "Requested modules not available: ${module}")
+      endif()
+    else ()
+      list(APPEND current_module_set_sorted ${module})
+    endif ()
+  endforeach()
+
+  foreach(_module IN LISTS current_module_set_sorted)
+    set(vtk-module ${_module})
+    add_subdirectory("${${_module}_SOURCE_DIR}" "${${_module}_BINARY_DIR}")
+    vtk_add_cs_wrapping(${_module})
+    unset(vtk-module)
+  endforeach()
+
+  unset (VTK_MODULES_ALL)
+  unset (current_module_set)
+  unset (current_module_set_sorted)
+endmacro()

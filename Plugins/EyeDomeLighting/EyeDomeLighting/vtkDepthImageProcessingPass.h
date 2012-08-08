@@ -50,6 +50,7 @@ Ph.D. thesis of Christian BOUCHENY.
 #define __vtkDepthImageProcessingPass_h
 
 #include "vtkImageProcessingPass.h"
+#include "vtkEyeDomeLightingModule.h" // needed for exports.
 
 class vtkOpenGLRenderWindow;
 class vtkDepthPeelingPassLayerList; // Pimpl
@@ -58,7 +59,7 @@ class vtkShader2;
 class vtkFrameBufferObject;
 class vtkTextureObject;
 
-class VTK_EXPORT vtkDepthImageProcessingPass : public vtkImageProcessingPass
+class VTKEYEDOMELIGHTING_EXPORT vtkDepthImageProcessingPass : public vtkImageProcessingPass
 {
 public:
   vtkTypeMacro(vtkDepthImageProcessingPass,vtkRenderPass);

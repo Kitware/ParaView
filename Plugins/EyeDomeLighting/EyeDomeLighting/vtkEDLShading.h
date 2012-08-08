@@ -64,6 +64,7 @@ Ph.D. thesis of Christian BOUCHENY.
 //#define VTK_EDL_SHADING_DEBUG
 
 #include "vtkDepthImageProcessingPass.h"
+#include "vtkEyeDomeLightingModule.h" // needed for exports.
 
 class vtkOpenGLRenderWindow;
 class vtkDepthPeelingPassLayerList; // Pimpl
@@ -72,7 +73,7 @@ class vtkShader2;
 class vtkFrameBufferObject;
 class vtkTextureObject;
 
-class VTK_EXPORT vtkEDLShading : public vtkDepthImageProcessingPass
+class VTKEYEDOMELIGHTING_EXPORT vtkEDLShading : public vtkDepthImageProcessingPass
 {
 public:
   static vtkEDLShading *New();
