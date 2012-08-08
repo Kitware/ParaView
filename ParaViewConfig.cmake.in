@@ -9,10 +9,12 @@ if (@PARAVIEW_CONFIG_INSTALLED@)
   get_filename_component(location "${CMAKE_CURRENT_LIST_FILE}" PATH)
   set (VTK_CONFIG_FILE "${location}/VTKConfig.cmake")
   set (ParaView_CMAKE_DIR "${location}")
+  set (PARAVIEW_CONFIG_TARGETS_FILE "${location}/ParaViewTargets.cmake")
 else()
   # The ParaView is in the build-location.
   set (VTK_CONFIG_FILE "@ParaView_BINARY_DIR@/VTK/VTKConfig.cmake")
   set (ParaView_CMAKE_DIR "@ParaView_CMAKE_DIR@")
+  set (PARAVIEW_CONFIG_TARGETS_FILE "@ParaView_BINARY_DIR@/ParaViewTargets.cmake")
 endif()
 
 #------------------------------------------------------------------------------
@@ -28,6 +30,11 @@ set (ParaView_USE_FILE "${ParaView_CMAKE_DIR}/UseParaView.cmake")
 
 set (PARAVIEW_USE_FILE ${ParaView_USE_FILE})
 set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
+
+# Import ParaView targets.
+if(NOT TARGET vtkPVCommon)
+  include("${PARAVIEW_CONFIG_TARGETS_FILE}")
+endif()
 
 # load VTK config. This will bring in information about all modules (including
 # ParaView's modules).

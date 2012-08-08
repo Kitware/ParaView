@@ -125,7 +125,7 @@ if(NOT VTK_INSTALL_DOXYGEN_DIR)
   set(VTK_INSTALL_DOXYGEN_DIR ${VTK_INSTALL_DOC_DIR}/doxygen)
 endif()
 if(NOT VTK_INSTALL_EXPORT_NAME)
-  set(VTK_INSTALL_EXPORT_NAME VTKTargets)
+  set(VTK_INSTALL_EXPORT_NAME ParaViewTargets)
 endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
@@ -516,8 +516,6 @@ endforeach(rule_file ${PARAVIEW_EXTRA_INSTALL_RULES_FILE})
 set (PARAVIEW_CONFIG_INSTALLED FALSE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfig.cmake @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewCompileToolsConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/ParaViewCompileToolsConfig.cmake @ONLY)
 
 set (PARAVIEW_CONFIG_INSTALLED TRUE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
@@ -525,12 +523,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ParaViewConfig.cmake.in
 configure_file(ParaViewConfigVersion.cmake.in ParaViewConfigVersion.cmake @ONLY)
 
 if (NOT VTK_INSTALL_NO_DEVELOPMENT)
-  # note: ParaViewCompileToolsConfig.cmake is never installed.
-
   install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/ParaViewConfig.cmake
           ${CMAKE_CURRENT_BINARY_DIR}/ParaViewConfigVersion.cmake
-          ${CMAKE_CURRENT_SOURCE_DIR}/CMake/UseParaView.cmake
     DESTINATION ${VTK_INSTALL_PACKAGE_DIR}
     COMPONENT Development
   )
@@ -550,14 +545,15 @@ get_property(_vtk_compiletools_targets GLOBAL PROPERTY VTK_COMPILETOOLS_TARGETS)
 set (_vtk_all_targets ${_vtk_targets} ${_vtk_compiletools_targets})
 if (_vtk_all_targets)
   list(REMOVE_DUPLICATES _vtk_all_targets)
-  export(TARGETS ${_vtk_all_targets} FILE ${ParaView_BINARY_DIR}/VTK/VTKTargets.cmake)
+  export(TARGETS ${_vtk_all_targets} FILE
+    ${ParaView_BINARY_DIR}/ParaViewTargets.cmake)
 endif()
 # Add a virtual target that can be used to build all compile tools.
 add_custom_target(pvCompileTools)
 if (_vtk_compiletools_targets)
   list(REMOVE_DUPLICATES _vtk_compiletools_targets)
   export(TARGETS ${_vtk_compiletools_targets}
-         FILE ${ParaView_BINARY_DIR}/VTK/VTKCompileToolsConfig.cmake)
+         FILE ${ParaView_BINARY_DIR}/ParaViewCompileToolsConfig.cmake)
   add_dependencies(pvCompileTools
       ${_vtk_compiletools_targets}
       vtkCompileTools)
