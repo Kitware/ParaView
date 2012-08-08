@@ -33,6 +33,10 @@ set (PARAVIEW_CMAKE_DIR ${ParaView_CMAKE_DIR})
 # ParaView's modules).
 include("${VTK_CONFIG_FILE}")
 
+if(@PARAVIEW_CONFIG_INSTALLED@)
+else()
+  list(APPEND VTK_INCLUDE_DIRS @ParaView_BINARY_DIR@)
+endif()
 #------------------------------------------------------------------------------
 # ParaView global configuration options.
 

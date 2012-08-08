@@ -1,6 +1,3 @@
-include (ParaViewPlugins)
-include (ParaViewMacros)
-
 include_directories(${VTK_INCLUDE_DIRS}
   ${EyeDomeLighting_SOURCE_DIR}/EyeDomeLighting
   ${EyeDomeLighting_BINARY_DIR}/EyeDomeLighting)

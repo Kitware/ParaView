@@ -49,8 +49,6 @@
 #include <setjmp.h>
 #endif
 
-#include <pqComponentsExport.h>
-
 #ifdef FAKE_EXCEPTIONS
 #define VISIT_THROW_NOTHING
 #else

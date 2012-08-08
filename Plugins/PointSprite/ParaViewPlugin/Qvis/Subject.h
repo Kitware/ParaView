@@ -37,7 +37,6 @@
 
 #ifndef SUBJECT_H
 #define SUBJECT_H
-#include <pqComponentsExport.h>
 #include <vector>
 
 // Forward declaration

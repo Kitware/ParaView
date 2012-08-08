@@ -37,7 +37,6 @@
 
 #ifndef QVIS_SPECTRUM_BAR_H
 #define QVIS_SPECTRUM_BAR_H
-#include "pqComponentsExport.h"
 #include <qwidget.h>
 
 // Forward declarations.

@@ -2,7 +2,10 @@
 if (BUILD_SHARED_LIBS)
   pv_plugin(PointSprite
     DESCRIPTION "Point Sprites"
-# disabled currently due to build issues.
-#    DEFAULT_ENABLED
-)
+    DEFAULT_ENABLED
+    PLUGIN_NAMES "PointSprite_Plugin"
+    )
+else()
+  message(STATUS
+    "PointSprite plugin is not available in static builds.")
 endif()

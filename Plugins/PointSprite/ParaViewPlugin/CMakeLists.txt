@@ -1,22 +1,9 @@
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
-    ${MPI_INCLUDE_PATH}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
+include_directories(${VTK_INCLUDE_DIRS}
+  ${PointSpritePlugin_SOURCE_DIR}/Graphics
+  ${PointSpritePlugin_BINARY_DIR}/Graphics
+  ${PointSpritePlugin_SOURCE_DIR}/Rendering
+  ${PointSpritePlugin_BINARY_DIR}/Rendering)
     
-include_directories(
-  ${PARAVIEW_GUI_INCLUDE_DIRS}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
-
 set(SM_SOURCES
   vtkSMCustomBoundsDomain.cxx
   vtkSMPointSpriteRepresentationProxy.cxx
@@ -34,19 +21,6 @@ set(SM_XMLS_Graphics
   )
 
 set(PLUGIN_NAME PointSprite_Plugin)
-
-set(CS_WRAP_Rendering)
-include(${PointSpritePlugin_BINARY_DIR}/Rendering/vtkPointSprite_RenderingKit.cmake)
-foreach(class ${VTK_POINTSPRITE_RENDERING_CLASSES})
-  set(CS_WRAP_Rendering ${CS_WRAP_Rendering} ${VTK_POINTSPRITE_RENDERING_HEADER_DIR}/${class}.h)
-endforeach(class)
-
-set(CS_WRAP_Graphics)
-include(${PointSpritePlugin_BINARY_DIR}/Graphics/vtkPointSprite_GraphicsKit.cmake)
-foreach(class ${VTK_POINTSPRITE_GRAPHICS_CLASSES})
-  set(CS_WRAP_Graphics ${CS_WRAP_Graphics} ${VTK_POINTSPRITE_GRAPHICS_HEADER_DIR}/${class}.h)
-endforeach(class)
-
 
 IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE(${QT_USE_FILE}) 
@@ -120,7 +94,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     
     add_paraview_plugin(${PLUGIN_NAME} "1.0"
       SERVER_MANAGER_SOURCES 
-        "${SM_SOURCES};${CS_WRAP_Rendering};${CS_WRAP_Graphics}"
+        ${SM_SOURCES}
       SERVER_MANAGER_XML 
         "${SM_XMLS_Rendering};${SM_XMLS_Graphics}"
       GUI_INTERFACES 
@@ -136,13 +110,13 @@ IF(PARAVIEW_BUILD_QT_GUI)
 ELSE(PARAVIEW_BUILD_QT_GUI)
     add_paraview_plugin(${PLUGIN_NAME} "1.0"
         SERVER_MANAGER_SOURCES 
-            "${SM_SOURCES};${CS_WRAP_Rendering};${CS_WRAP_Graphics}"
+            ${SM_SOURCES}
         SERVER_MANAGER_XML 
             "${SM_XMLS_Rendering};${SM_XMLS_Graphics}"
     )
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 target_link_libraries(${PLUGIN_NAME}
-  PointSprite_Rendering
-  PointSprite_Graphics
+  vtkPointSpriteGraphics
+  vtkPointSpriteRendering
 )

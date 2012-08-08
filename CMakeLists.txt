@@ -344,6 +344,7 @@ else()
   set (VTK_CMAKE_DIR ${ParaView_SOURCE_DIR}/VTK/CMake)
   set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VTK_CMAKE_DIR})
   include(vtkModuleAPI)
+  include(vtkModuleMacros)
 
   # Change VTK default, since VTK is set up to enable TK when python wrapping is
   # enabled.

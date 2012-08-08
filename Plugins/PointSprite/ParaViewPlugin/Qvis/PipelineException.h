@@ -41,7 +41,6 @@
 
 #ifndef PIPELINE_EXCEPTION_H
 #define PIPELINE_EXCEPTION_H
-#include <pqComponentsExport.h>
 
 
 #include <VisItException.h>

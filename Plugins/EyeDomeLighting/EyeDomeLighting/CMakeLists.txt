@@ -1,6 +1,3 @@
-
-include(vtkModuleMacros)
-
 SET( SRC_FILES
    vtkDepthImageProcessingPass.cxx
    vtkEDLShading.cxx

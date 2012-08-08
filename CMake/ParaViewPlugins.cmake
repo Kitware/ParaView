@@ -2,6 +2,8 @@
 # load the required *.in files for the generated code.
 set(_paraviewplugins_cmake_dir "${CMAKE_CURRENT_LIST_DIR}")
 
+include(ParaViewMacros)
+
 # Requires ParaView_QT_DIR and ParaView_BINARY_DIR to be set.
 
 # Macro to install a plugin that's included in the ParaView source directory.
@@ -1164,4 +1166,31 @@ macro(pv_process_modules)
   unset (VTK_MODULES_ALL)
   unset (current_module_set)
   unset (current_module_set_sorted)
+endmacro()
+
+# this macro is used to setup the environment for loading/building VTK modules
+# within ParaView plugins. This is only needed when building plugins outside of
+# ParaVIew's source tree.
+macro(pv_setup_module_environment _name)
+  # Setup enviroment to build VTK modules outside of VTK source tree.
+  set (VTK_INSTALL_EXPORT_NAME "${_name}Targets")
+  set (VTK_INSTALL_RUNTIME_DIR "bin")
+  set (VTK_INSTALL_LIBRARY_DIR "lib")
+  set (VTK_INSTALL_ARCHIVE_DIR "lib")
+  set (VTK_INSTALL_INCLUDE_DIR "include")
+  set (VTK_INSTALL_PACKAGE_DIR "lib/cmake/${_name}")
+  set (VTK_MODULES_DIR
+    "${CMAKE_CURRENT_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
+  set (VTK_EXPORTS_FILE
+    "${CMAKE_CURRENT_BINARY_DIR}/${_name}Targets.cmake")
+  set (BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
+
+  include(vtkModuleMacros)
+  include(vtkModuleAPI)
+  include(vtkClientServerWrapping)
+
+  # load information about existing modules.
+  foreach (mod IN LISTS VTK_MODULES_ENABLED)
+    vtk_module_load("${mod}")
+  endforeach()
 endmacro()
