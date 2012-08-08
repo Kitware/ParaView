@@ -83,3 +83,9 @@ IF(PARAVIEW_BUILD_QT_GUI)
   )
 
 ENDIF(PARAVIEW_BUILD_QT_GUI)
+
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif (BUILD_TESTING)

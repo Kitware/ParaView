@@ -14,18 +14,32 @@
 =========================================================================*/
 #include "vtkMultiSliceRepresentation.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkCutter.h"
-#include "vtkPlane.h"
-#include "vtkNew.h"
 #include "vtkAppendFilter.h"
+#include "vtkCompositePolyDataMapper2.h"
+#include "vtkCutter.h"
+#include "vtkHardwareSelectionPolyDataPainter.h"
+#include "vtkMapper.h"
+#include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkOrthogonalSliceFilter.h"
+#include "vtkPlane.h"
+#include "vtkSelection.h"
 
 vtkStandardNewMacro(vtkMultiSliceRepresentation);
 //----------------------------------------------------------------------------
 vtkMultiSliceRepresentation::vtkMultiSliceRepresentation()
 {
   this->InternalSliceFilter = vtkOrthogonalSliceFilter::New();
+
+  // setup the selection mapper so that we don't need to make any selection
+  // conversions after rendering.
+  vtkCompositePolyDataMapper2* mapper =
+      vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  vtkHardwareSelectionPolyDataPainter* selPainter =
+      vtkHardwareSelectionPolyDataPainter::SafeDownCast(
+        mapper->GetSelectionPainter()->GetDelegatePainter());
+  selPainter->SetPointIdArrayName("-");
+  selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
 }
 
 //----------------------------------------------------------------------------

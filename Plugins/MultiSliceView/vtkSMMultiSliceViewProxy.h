@@ -34,6 +34,10 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
 
+  // Description:
+  // Similar to IsSelectionAvailable(), however, on failure returns the
+  // error message otherwise 0.
+  virtual const char* IsSelectVisiblePointsAvailable();
 //BTX
 protected:
   vtkSMMultiSliceViewProxy();

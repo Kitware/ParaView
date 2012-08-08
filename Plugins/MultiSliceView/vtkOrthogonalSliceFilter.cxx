@@ -15,9 +15,11 @@
 #include "vtkOrthogonalSliceFilter.h"
 
 #include "vtkAppendPolyData.h"
+#include "vtkCellData.h"
 #include "vtkContourValues.h"
 #include "vtkCutter.h"
 #include "vtkDataSet.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
@@ -173,6 +175,20 @@ int vtkOrthogonalSliceFilter::RequestData( vtkInformation *,
       vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData *output =
       vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  // Add CellIds
+  vtkIdType nbCells = input->GetNumberOfCells();
+  vtkNew<vtkIdTypeArray> originalCellIds;
+  originalCellIds->SetName("vtkSliceOriginalCellIds");
+  originalCellIds->SetNumberOfComponents(1);
+  originalCellIds->SetNumberOfTuples(nbCells);
+  input->GetCellData()->AddArray(originalCellIds.GetPointer());
+
+  // Fill the array with proper id values
+  for(vtkIdType id = 0; id < nbCells; ++id)
+    {
+    originalCellIds->SetValue(id, id);
+    }
 
   this->SliceAlongX->SetInputData(input);
   this->SliceAlongY->SetInputData(input);

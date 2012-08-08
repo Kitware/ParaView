@@ -82,4 +82,9 @@ void vtkSMMultiSliceViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
-
+//----------------------------------------------------------------------------
+const char* vtkSMMultiSliceViewProxy::IsSelectVisiblePointsAvailable()
+{
+  // The original dataset and the slice don't share the same points
+  return "Multi-Slice View do not allow point selection";
+}
