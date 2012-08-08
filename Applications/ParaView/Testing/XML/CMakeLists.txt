@@ -14,12 +14,12 @@ SET (TESTS_WITH_INLINE_COMPARES
 )
 
 SET (TESTS_WITH_BASELINES)
-IF(NOT PARAVIEW_USE_VISITBRIDGE)
+if(NOT Module_vtkIOVisItBridge)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
-ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
+else()
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
@@ -28,7 +28,7 @@ ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
-ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
+endif()
 
 if(Module_vtkIOXdmf2)
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
@@ -229,6 +229,7 @@ set(UnstructuredOutline_USE_NEW_PANELS TRUE)
 set(VariableSelector1_USE_NEW_PANELS TRUE)
 set(VariableSelector_USE_NEW_PANELS TRUE)
 set(ViewSettingsDialog_USE_NEW_PANELS TRUE)
+set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
