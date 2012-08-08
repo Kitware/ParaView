@@ -21,7 +21,11 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   # if this is used from outside paraview (e.g. in a plugin, this
   # should come from the ParaViewConfig.cmake file
   IF(NOT VTK_WRAP_ClientServer_EXE)
-    SET(VTK_WRAP_ClientServer_EXE vtkWrapClientServer)
+    if (TARGET vtkWrapClientServer)
+      SET(VTK_WRAP_ClientServer_EXE vtkWrapClientServer)
+    else ()
+      message(FATAL_ERROR "VTK_WRAP_ClientServer_EXE must be set.")
+    endif()
   ENDIF(NOT VTK_WRAP_ClientServer_EXE)
 
   # all the compiler "-D" args

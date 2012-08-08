@@ -16,16 +16,14 @@ macro(vtk_add_cs_wrapping module)
   endif()
 
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
-
-  # save current include-dirs
-  get_directory_property(__tmp_include_dirs INCLUDE_DIRECTORIES)
   vtk_module_dep_includes(${module})
-  include_directories(${${module}_DEPENDS_INCLUDE_DIRS}
-                      ${${module}_INCLUDE_DIRS}
-                      ${vtkClientServer_INCLUDE_DIRS}
-                      )
   vtk_add_library(${module}CS ${${module}CS_SRCS})
   target_link_libraries(${module}CS vtkClientServer ${module})
+  set_property(TARGET ${module}CS APPEND  
+    PROPERTY INCLUDE_DIRECTORIES
+    ${${module}_DEPENDS_INCLUDE_DIRS}
+    ${${module}_INCLUDE_DIRS}
+    ${vtkClientServer_INCLUDE_DIRS})
 
   # add compile definition for auto init for modules that provide implementation
   if(${module}_IMPLEMENTS)
@@ -37,10 +35,6 @@ macro(vtk_add_cs_wrapping module)
       target_link_libraries(${module}CS ${dep}CS)
     endif()
   endforeach()
-
-  # restore include-dirs
-  set_directory_properties(PROPERTIES
-    INCLUDE_DIRECTORIES "${__tmp_include_dirs}")
 endmacro()
 
 #------------------------------------------------------------------------------
