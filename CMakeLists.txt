@@ -179,7 +179,10 @@ option(BUILD_EXAMPLES "Build ParaView examples" OFF)
 option(BUILD_SHARED_LIBS "Build ParaView using shared libraries" ON)
 option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
-option(PARAVIEW_USE_PISTON OFF "Build ParaView with Piston GPGPU filters")
+option(PARAVIEW_USE_PISTON "Build ParaView with Piston GPGPU filters" OFF)
+cmake_dependent_option(PARAVIEW_INSTALL_DEVELOPMENT_FILES
+  "When enabled, \"make install\" will install development files" OFF
+  "UNIX" OFF)
 
 cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
   "Use MPI synchronous-send commands for communication" OFF
@@ -227,6 +230,9 @@ mark_as_advanced(BUILD_FORTRAN_COPROCESSING_ADAPTORS)
 # Update state based on chosen/imported options.
 #------------------------------------------------------------------------------
 set (PARAVIEW_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+if (NOT PARAVIEW_INSTALL_DEVELOPMENT_FILES)
+  set (VTK_INSTALL_NO_DEVELOPMENT TRUE)
+endif()
 
 # Setup Qt state
 if (PARAVIEW_ENABLE_QT_SUPPORT)
@@ -534,3 +540,27 @@ if (NOT VTK_INSTALL_NO_DEVELOPMENT)
     COMPONENT Development
   )
 endif()
+
+#-----------------------------------------------------------------------------
+# Export all targets at once from the build tree in their final configuration.
+# We export these again so that we add ParaView's targets to the list.
+get_property(_vtk_targets GLOBAL PROPERTY VTK_TARGETS)
+get_property(_vtk_compiletools_targets GLOBAL PROPERTY VTK_COMPILETOOLS_TARGETS)
+set (_vtk_all_targets ${_vtk_targets} ${_vtk_compiletools_targets})
+if (_vtk_all_targets)
+  list(REMOVE_DUPLICATES _vtk_all_targets)
+  export(TARGETS ${_vtk_all_targets} FILE ${ParaView_BINARY_DIR}/VTK/VTKTargets.cmake)
+endif()
+# Add a virtual target that can be used to build all compile tools.
+add_custom_target(pvCompileTools)
+if (_vtk_compiletools_targets)
+  list(REMOVE_DUPLICATES _vtk_compiletools_targets)
+  export(TARGETS ${_vtk_compiletools_targets}
+         FILE ${ParaView_BINARY_DIR}/VTK/VTKCompileToolsConfig.cmake)
+  add_dependencies(pvCompileTools
+      ${_vtk_compiletools_targets}
+      vtkCompileTools)
+endif()
+unset(_vtk_targets)
+unset(_vtk_compiletools_targets)
+unset(_vtk_all_targets)
