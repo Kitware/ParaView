@@ -93,6 +93,23 @@ bool pqPropertyWidget::showLabel() const
   return this->ShowLabel;
 }
 
+void pqPropertyWidget::setReason(const QString &message)
+{
+  QByteArray ascii = message.toAscii();
+
+  this->Reason.str(ascii.constData());
+}
+
+std::stringstream& pqPropertyWidget::setReason()
+{
+  return this->Reason;
+}
+
+QString pqPropertyWidget::reason() const
+{
+  return QString::fromStdString(this->Reason.str());
+}
+
 void pqPropertyWidget::addPropertyLink(QObject *qobject,
                                        const char *qproperty,
                                        const char *qsignal,

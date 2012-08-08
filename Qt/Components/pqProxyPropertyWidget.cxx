@@ -66,6 +66,9 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
 
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
+
+    this->setReason() << "pqSelectionInputWidget for a ProxyProperty with a "
+                      << "SelectionInput hint";
     }
   else
     {
@@ -100,6 +103,9 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
 
       // don't show label for the proxy selection widget
       this->setShowLabel(false);
+
+      this->setReason() << "pqProxySelectionWidget for a "
+                        << "ProxyListDomain (" << domain->GetXMLName() << ")";
       }
     }
 

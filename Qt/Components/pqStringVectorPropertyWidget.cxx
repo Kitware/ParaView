@@ -134,11 +134,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
   if (fileListDomain)
     {
-    // dont show properties with filename
-//    if(smproperty->GetXMLLabel() == "FileName")
-//      {
-//      }
-
     pqFileChooserWidget *chooser = new pqFileChooserWidget(this);
     chooser->setObjectName("FileChooser");
 
@@ -177,6 +172,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     chooser->setServer(smm->findServer(smProxy->GetSession()));
 
     vbox->addWidget(chooser);
+
+    this->setReason() << "pqFileChooserWidget for a StringVectorProperty with "
+                      << "a FileListDomain";
     }
   else if(arrayListDomain)
     {
@@ -197,6 +195,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       this->setShowLabel(false);
 
       vbox->addWidget(selectorWidget);
+
+      this->setReason() << "pqExodusIIVariableSelectionWidget for a "
+                        << "StringVectorProperty with a repeatable "
+                        << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
       }
     else
       {
@@ -213,6 +215,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                             svp);
 
       vbox->addWidget(comboBox);
+
+      this->setReason() << "QComboBox for a StringVectorProperty with a "
+                           "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
       }
     }
   else if(stringListDomain)
@@ -228,6 +233,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     this->addPropertyLink(comboBox, "currentText", SIGNAL(currentIndexChanged(QString)), svp);
 
     vbox->addWidget(comboBox);
+
+    this->setReason() << "QComboBox for a StringVectorProperty with a "
+                      << "StringListDomain (" << stringListDomain->GetXMLName() << ")";
     }
   else if (silDomain)
     {
@@ -248,6 +256,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     setShowLabel(false);
 
     vbox->addWidget(tree);
+
+    this->setReason() << "pqSILWidget for a StringVectorProperty with a "
+                      << "SILDomain (" << silDomain->GetXMLName() << ")";
     }
   else if (arraySelectionDomain)
     {
@@ -264,6 +275,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     setShowLabel(false);
 
     vbox->addWidget(selectorWidget);
+
+    this->setReason() << "pqExodusIIVariableSelectionWidget for a StringVectorProperty "
+                      << "with a ArraySelectionDomain (" << arraySelectionDomain->GetXMLName() << ")";
    }
   else if (multiline_text)
     {
@@ -284,6 +298,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     
     vbox->addWidget(textEdit);
     this->setShowLabel(false);
+
+    this->setReason() << "QTextEdit for a StringVectorProperty with multi line text";
     }
   else if(enumerationDomain)
     {
@@ -296,6 +312,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       }
 
     vbox->addWidget(comboBox);
+
+    this->setReason() << "QComboBox for a StringVectorProperty with an "
+                      << "EnumerationDomain (" << enumerationDomain->GetXMLName() << ")";
     }
   else
     {
@@ -306,6 +325,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       SIGNAL(textChanged(const QString&)), smProperty);
 
     vbox->addWidget(lineEdit);
+
+    this->setReason() << "QLineEdit for a StringVectorProperty with no domain";
     }
   this->setLayout(vbox);
 }

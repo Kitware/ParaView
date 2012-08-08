@@ -84,6 +84,11 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
       layoutLocal->setSpacing(4);
       layoutLocal->addWidget(widget);
+
+      this->setReason() << "pqDoubleRangeWidget for an DoubleVectorProperty "
+                        << "with a single element and a "
+                        << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                        << "with a minimum and a maximum";
       }
     else
       {
@@ -112,6 +117,11 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           }
 
         layoutLocal->addLayout(gridLayout);
+
+        this->setReason() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
+                          << "with an "
+                          << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                          << "and 6 elements";
         }
       else
         {
@@ -123,6 +133,11 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
           }
+
+        this->setReason() << "List of QLineEdit's for an DoubleVectorProperty "
+                          << "with an "
+                          << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                          << "and more than one element";
         }
       }
     }

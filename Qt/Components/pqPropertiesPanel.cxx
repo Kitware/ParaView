@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkEventQtSlotConnect.h"
+#include <vtksys/SystemTools.hxx>
 
 #include "pqView.h"
 #include "pqProxy.h"
@@ -301,6 +302,11 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   : QWidget(p),
     Ui(new Ui::pqPropertiesPanel)
 {
+  // enable debugging of the panel widgets if the PV_DEBUG_PANELS
+  // enviornmental variable is set
+  this->DebugWidgetCreation = 
+    vtksys::SystemTools::GetEnv("PV_DEBUG_PANELS") != NULL;
+
   this->Ui->setupUi(this);
 
   this->setObjectName("propertiesPanel");
@@ -475,6 +481,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     return;
     }
 
+  if(this->DebugWidgetCreation)
+    {
+    qDebug() << "Creating panel widgets for the"
+             << proxy->getProxy()->GetXMLLabel() << "proxy:";
+    }
+
   this->Ui->DeleteButton->setEnabled(true);
   this->Ui->HelpButton->setEnabled(true);
 
@@ -522,6 +534,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     item.LabelWidget = 0;
     item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
     item.IsAdvanced = false;
+
+    if(this->DebugWidgetCreation)
+      {
+      qDebug() << "  - Using custom object panel:"
+               << customPanel->metaObject()->className();
+      }
     widgets.append(item);
     }
   else
@@ -636,6 +654,17 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     this->Ui->DisplayButton->setText("Display");
     }
 
+  if(!repr)
+    {
+    return;
+    }
+
+  if(this->DebugWidgetCreation)
+    {
+    qDebug() << "Creating panel widgets for the"
+             << repr->getProxy()->GetXMLLabel() << "representation:";
+    }
+
   QList<pqPropertiesPanelItem> widgets;
 
   pqDisplayPanel *customPanel = 0;
@@ -655,6 +684,12 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     item.PropertyWidget = new pqDisplayPanelPropertyWidget(customPanel);
     item.IsAdvanced = false;
     widgets.append(item);
+
+    if(this->DebugWidgetCreation)
+      {
+      qDebug() << "  - Using custom display panel:"
+               << customPanel->metaObject()->className();
+      }
     }
   else
     {
@@ -952,6 +987,12 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
     if(QString(group->GetPanelVisibility()) == "never")
       {
       // skip property groups marked as never show
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  - Group" << group->GetXMLLabel()
+                 << "gets skipped because it has panel_visibility of \"never\"";
+        }
+
       continue;
       }
 
@@ -1012,16 +1053,40 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
     if(smProperty->GetInformationOnly())
       {
       // skip information only properties
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it is an information only property";
+        }
+
       continue;
       }
     else if(smProperty->GetIsInternal())
       {
       // skip internal properties
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it is an internal property";
+        }
+
       continue;
       }
     else if(QString(smProperty->GetPanelVisibility()) == "never")
       {
       // skip properties marked as never show
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it has panel_visibility of \"never\"";
+        }
+
       continue;
       }
 
@@ -1121,6 +1186,31 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
       this->connect(this, SIGNAL(viewChanged(pqView*)),
                     propertyWidget, SIGNAL(viewChanged(pqView*)));
+
+      // if debug widget creation is enabled then print the
+      // reason why each property widget was created
+      if(this->DebugWidgetCreation)
+        {
+        QString reason = item.PropertyWidget->reason();
+        vtkSMProperty *smProperty = item.PropertyWidget->property();
+
+        if(!reason.isEmpty())
+          {
+          qDebug() << "  -"
+                   << proxy->getProxy()->GetPropertyName(smProperty)
+                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << "gets a" << item.PropertyWidget->metaObject()->className()
+                   << "containing a" << item.PropertyWidget->reason();
+          }
+        else
+          {
+          qDebug() << "  -"
+                   << proxy->getProxy()->GetPropertyName(smProperty)
+                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << "gets a" << item.PropertyWidget->metaObject()->className()
+                   << "for an unknown reason";
+          }
+        }
 
       widgets.append(item);
       }
