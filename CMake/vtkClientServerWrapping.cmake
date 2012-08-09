@@ -76,15 +76,23 @@ macro(pv_pre_wrap_vtk_mod_cs libname module)
   if(VTK_WRAP_HINTS)
     file(READ ${VTK_WRAP_HINTS} COMBINED_HINTS)
   endif()
+
+  set(hints_added FALSE)
   foreach(_dir ${${module}_INCLUDE_DIRS})
     if(EXISTS ${_dir}/hints)
       file(READ "${_dir}/hints" MODULE_HINTS)
       set(COMBINED_HINTS "${COMBINED_HINTS}\n${MODULE_HINTS}")
+      set(hints_added TRUE)
     endif()
   endforeach()
 
-  if(NOT ${COMBINED_HINTS} EQUAL "")
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints ${COMBINED_HINTS})
+  if(hints_added AND COMBINED_HINTS)
+    # combined hints are generated only we we have more than the default hints
+    # specified by VTK_WRAP_HINTS that need to be used.
+    string(STRIP "${COMBINED_HINTS}" CMAKE_CONFIGURABLE_FILE_CONTENT)
+    configure_file(
+      ${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints @ONLY)
     set(VTK_WRAP_HINTS "${CMAKE_CURRENT_BINARY_DIR}/${module}_wrapping_hints")
   endif()
   
