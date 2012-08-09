@@ -128,6 +128,10 @@ pqView::pqView( const QString& type,
   this->Internal->VTKConnect->Connect(view,
     vtkCommand::EndEvent, this, SIGNAL(endRender()));
 
+  // Fire updateDataEvent
+  this->Internal->VTKConnect->Connect(view,
+    vtkCommand::UpdateDataEvent, this, SIGNAL(updateDataEvent()));
+
   this->Internal->RenderTimer.setSingleShot(true);
   this->Internal->RenderTimer.setInterval(1);
   QObject::connect(&this->Internal->RenderTimer, SIGNAL(timeout()),
