@@ -59,7 +59,8 @@ foreach (name pvserver pvdataserver pvrenderserver)
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
-  find_package(PythonLibs REQUIRED)
+  set (VTK_WRAP_PYTHON_FIND_LIBS 1)
+  include(vtkWrapPython)
   include_directories(${PYTHON_INCLUDE_DIRS})
 
   vtk_module_dep_includes(vtkPVPythonSupport)
@@ -86,7 +87,8 @@ if (PARAVIEW_ENABLE_PYTHON)
     target_link_libraries(${name}
       vtkPVServerManagerApplication
       vtkPVPythonSupport
-      ${dependencies})
+      ${dependencies}
+      ${VTK_PYTHON_LIBRARIES})
   endforeach()
 endif()
 
