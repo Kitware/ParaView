@@ -61,7 +61,9 @@ foreach (_module ${VTK_MODULES_ENABLED})
 endforeach()
 
 # Add link-dependencies on all wrapping classes.
-target_link_libraries(vtkPVServerManagerApplication ${_dependencies})
+target_link_libraries(vtkPVServerManagerApplication
+  LINK_PRIVATE ${_dependencies}
+  LINK_PUBLIC vtkPVServerManagerDefault)
 
 #------------------------------------------------------------------------------
 # Setup SM xmls. 
