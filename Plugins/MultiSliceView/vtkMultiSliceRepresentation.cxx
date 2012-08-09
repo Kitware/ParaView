@@ -21,7 +21,7 @@
 #include "vtkMapper.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkOrthogonalSliceFilter.h"
+#include "vtkThreeSliceFilter.h"
 #include "vtkPlane.h"
 #include "vtkSelection.h"
 
@@ -29,7 +29,7 @@ vtkStandardNewMacro(vtkMultiSliceRepresentation);
 //----------------------------------------------------------------------------
 vtkMultiSliceRepresentation::vtkMultiSliceRepresentation()
 {
-  this->InternalSliceFilter = vtkOrthogonalSliceFilter::New();
+  this->InternalSliceFilter = vtkThreeSliceFilter::New();
 
   // setup the selection mapper so that we don't need to make any selection
   // conversions after rendering.
@@ -58,37 +58,37 @@ void vtkMultiSliceRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceX(int index, double value)
 {
-  this->InternalSliceFilter->SetSliceX(index, value);
+  this->InternalSliceFilter->SetCutValue(0, index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceX(int size)
 {
-  this->InternalSliceFilter->SetNumberOfSliceX(size);
+  this->InternalSliceFilter->SetNumberOfSlice(0, size);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceY(int index, double value)
 {
-  this->InternalSliceFilter->SetSliceY(index, value);
+  this->InternalSliceFilter->SetCutValue(1, index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceY(int size)
 {
-  this->InternalSliceFilter->SetNumberOfSliceY(size);
+  this->InternalSliceFilter->SetNumberOfSlice(1, size);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetSliceZ(int index, double value)
 {
-  this->InternalSliceFilter->SetSliceZ(index, value);
+  this->InternalSliceFilter->SetCutValue(2, index, value);
 }
 
 //----------------------------------------------------------------------------
 void vtkMultiSliceRepresentation::SetNumberOfSliceZ(int size)
 {
-  this->InternalSliceFilter->SetNumberOfSliceZ(size);
+  this->InternalSliceFilter->SetNumberOfSlice(2, size);
 }
 
 //----------------------------------------------------------------------------
