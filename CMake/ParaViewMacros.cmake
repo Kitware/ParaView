@@ -1,9 +1,5 @@
 # File defining miscellaneous macros
 
-# Save the location of the ParaViewPlugins.cmake file. It makes it easier to
-# load the required *.in files for the generated code.
-set(_paraviewmacros_cmake_dir "${CMAKE_CURRENT_LIST_DIR}")
-
 #------------------------------------------------------------------------------
 # GENERATE_QT_RESOURCE_FROM_FILES can be used to generate a Qt resource file
 # from a given set of files.
@@ -239,19 +235,19 @@ function (generate_htmls_from_xmls output_files xmls gui_xmls output_dir)
     # process each html file to sperate it out into files for each proxy.
     COMMAND ${CMAKE_COMMAND}
             -Dxmlpatterns:FILEPATH=${QT_XMLPATTERNS_EXECUTABLE}
-            -Dxml_to_xml_xsl:FILEPATH=${_paraviewmacros_cmake_dir}/smxml_to_xml.xsl
-            -Dxml_to_html_xsl:FILEPATH=${_paraviewmacros_cmake_dir}/xml_to_html.xsl
-            -Dxml_to_wiki_xsl:FILEPATH=${_paraviewmacros_cmake_dir}/xml_to_wiki.xsl.in
+            -Dxml_to_xml_xsl:FILEPATH=${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+            -Dxml_to_html_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_html.xsl
+            -Dxml_to_wiki_xsl:FILEPATH=${ParaView_CMAKE_DIR}/xml_to_wiki.xsl.in
             -Dinput_xmls:STRING=${xmls_string}
             -Dinput_gui_xmls:STRING=${gui_xmls_string}
             -Doutput_dir:PATH=${output_dir}
             -Doutput_file:FILEPATH=${CMAKE_CURRENT_BINARY_DIR}/${first_xml}.xml
-            -P ${_paraviewmacros_cmake_dir}/generate_proxydocumentation.cmake
+            -P ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
     DEPENDS ${xmls}
-            ${_paraviewmacros_cmake_dir}/smxml_to_xml.xsl
-            ${_paraviewmacros_cmake_dir}/xml_to_html.xsl
-            ${_paraviewmacros_cmake_dir}/generate_proxydocumentation.cmake
+            ${ParaView_CMAKE_DIR}/smxml_to_xml.xsl
+            ${ParaView_CMAKE_DIR}/xml_to_html.xsl
+            ${ParaView_CMAKE_DIR}/generate_proxydocumentation.cmake
 
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 
@@ -352,7 +348,7 @@ function(build_help_project name)
             -Dnamespace:STRING="${arg_NAMESPACE}"
             -Dfolder:PATH=${arg_FOLDER}
             -Dname:STRING="${name}"
-            -P "${_paraviewmacros_cmake_dir}/generate_qhp.cmake"
+            -P "${ParaView_CMAKE_DIR}/generate_qhp.cmake"
     )
   else ()
     # toc is provided, we'll just configure the file.
@@ -361,7 +357,7 @@ function(build_help_project name)
       set (files "${files}<file>${filename}</file>\n")
     endforeach()
 
-    configure_file(${_paraviewmacros_cmake_dir}/build_help_project.qhp.in
+    configure_file(${ParaView_CMAKE_DIR}/build_help_project.qhp.in
       ${qhp_filename})
     list (APPEND arg_DEPENDS ${qhp_filename})
   endif()
@@ -369,7 +365,7 @@ function(build_help_project name)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${arg_DESTINATION_DIRECTORY}/${name}.qch
     DEPENDS ${arg_DEPENDS}
-            ${_paraviewmacros_cmake_dir}/generate_qhp.cmake
+            ${ParaView_CMAKE_DIR}/generate_qhp.cmake
   
     ${extra_args}
 

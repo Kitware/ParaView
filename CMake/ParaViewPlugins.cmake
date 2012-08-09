@@ -1,7 +1,3 @@
-# Save the location of the ParaViewPlugins.cmake file. It makes it easier to
-# load the required *.in files for the generated code.
-set(_paraviewplugins_cmake_dir "${CMAKE_CURRENT_LIST_DIR}")
-
 include(ParaViewMacros)
 
 # Requires ParaView_QT_DIR and ParaView_BINARY_DIR to be set.
@@ -129,6 +125,8 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name Version XMLFile)
   
   SET(CS_SRCS)
   IF(HDRS)
+    include(vtkWrapClientServer)
+
     VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
     # only generate the instantiator code for cxx classes that'll be included in
     # the plugin
@@ -225,9 +223,9 @@ MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
   SET(PANEL_XML_GROUP ${ARG_XML_GROUP})
   SET(${OUTIFACES} ${PANEL_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqObjectPanelImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqObjectPanelImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqObjectPanelImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
 
   SET(PANEL_MOC_SRCS)
@@ -257,9 +255,9 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
   SET(PANEL_XML_NAME ${ARG_XML_NAME})
   SET(${OUTIFACES} ${PANEL_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDisplayPanelImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDisplayPanelImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
 
   SET(DISPLAY_MOC_SRCS)
@@ -278,9 +276,9 @@ MACRO(ADD_PARAVIEW_SUMMARY_DISPLAY_PANEL OUTIFACES OUTSRCS REPRESENTATIONS CLASS
   SET(REPRESENTATIONS ${REPRESENTATIONS})
   SET(${OUTIFACES} ${PANEL_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqSummaryPanelImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqSummaryPanelImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqSummaryPanelImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqSummaryPanelImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
 
   SET(DISPLAY_MOC_SRCS)
@@ -368,9 +366,9 @@ MACRO(ADD_PARAVIEW_VIEW_MODULE OUTIFACES OUTSRCS)
     SET(ARG_DISPLAY_TYPE "pqDataRepresentation")
   ENDIF(NOT ARG_DISPLAY_TYPE)
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewModuleImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewModuleImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewModuleImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}Implementation.cxx @ONLY)
 
   IF(PARAVIEW_BUILD_QT_GUI)
@@ -432,9 +430,9 @@ MACRO(ADD_PARAVIEW_VIEW_OPTIONS OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_VIEW_TYPE}Options)
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewOptionsImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewOptionsImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewOptionsImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_VIEW_TYPE}OptionsImplementation.cxx @ONLY)
 
   SET(PANEL_MOC_SRCS)
@@ -463,9 +461,9 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
  
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqActionGroupImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqActionGroupImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqActionGroupImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqActionGroupImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -491,9 +489,9 @@ MACRO(ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP OUTIFACES OUTSRCS)
  
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewFrameActionGroupImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqViewFrameActionGroupImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqViewFrameActionGroupImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -527,9 +525,9 @@ MACRO(ADD_PARAVIEW_DOCK_WINDOW OUTIFACES OUTSRCS)
   ENDIF(NOT ARG_DOCK_AREA)
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDockWindowImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDockWindowImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDockWindowImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDockWindowImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -572,9 +570,9 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
   ENDIF (NOT ARG_SHUTDOWN)
   
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqAutoStartImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqAutoStartImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqAutoStartImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqAutoStartImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -603,9 +601,9 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR OUTIFACES OUTSRCS)
   PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;PANEL_TYPES" "" ${ARGN})
 
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDisplayPanelDecoratorImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqDisplayPanelDecoratorImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqDisplayPanelDecoratorImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -630,9 +628,9 @@ MACRO(ADD_3DWIDGET OUTIFACES OUTSRCS)
   PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;WIDGET_TYPE" "" ${ARGN})
 
   SET(${OUTIFACES} ${ARG_CLASS_NAME})
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pq3DWidgetImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pq3DWidgetImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pq3DWidgetImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
 
   SET(ACTION_MOC_SRCS)
@@ -662,9 +660,9 @@ MACRO(ADD_PARAVIEW_GRAPH_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_STRATEGY_TYPE})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqGraphLayoutStrategyImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqGraphLayoutStrategyImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqGraphLayoutStrategyImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   SET(LAYOUT_MOC_SRCS)
@@ -694,9 +692,9 @@ MACRO(ADD_PARAVIEW_TREE_LAYOUT_STRATEGY OUTIFACES OUTSRCS)
 
   SET(${OUTIFACES} ${ARG_STRATEGY_TYPE})
 
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqTreeLayoutStrategyImplementation.h.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.h @ONLY)
-  CONFIGURE_FILE(${_paraviewplugins_cmake_dir}/pqTreeLayoutStrategyImplementation.cxx.in
+  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqTreeLayoutStrategyImplementation.cxx.in
                  ${CMAKE_CURRENT_BINARY_DIR}/${ARG_STRATEGY_TYPE}Implementation.cxx @ONLY)
 
   SET(LAYOUT_MOC_SRCS)
@@ -961,10 +959,10 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
 
   IF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES OR ARG_PYTHON_MODULES)
     CONFIGURE_FILE(
-      ${_paraviewplugins_cmake_dir}/pqParaViewPlugin.h.in
+      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.h.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h @ONLY)
     CONFIGURE_FILE(
-      ${_paraviewplugins_cmake_dir}/pqParaViewPlugin.cxx.in
+      ${ParaView_CMAKE_DIR}/pqParaViewPlugin.cxx.in
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.cxx @ONLY)
 
     SET (plugin_sources
