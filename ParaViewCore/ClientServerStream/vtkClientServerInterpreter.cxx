@@ -756,6 +756,28 @@ vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
     }
 }
 
+//----------------------------------------------------------------------------
+vtkClientServerCommandFunction
+vtkClientServerInterpreter::GetCommandFunction(const char* cname)
+{
+  if(cname)
+    {
+    // Lookup the function for this object's class.
+    vtkClientServerInterpreterInternals::ClassToFunctionMapType::iterator res;
+    res = this->Internal->ClassToFunctionMap.find(cname);
+    if(res == this->Internal->ClassToFunctionMap.end())
+      {
+      vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
+      return 0;
+      }
+    return res->second;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
 void
 vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
                                                    vtkClientServerNewInstanceFunction f)

@@ -126,6 +126,10 @@ public:
   vtkClientServerCommandFunction GetCommandFunction(vtkObjectBase* obj);
 
   // Description:
+  // Get the command function for an object's class.
+  vtkClientServerCommandFunction GetCommandFunction(const char* classname);
+
+  // Description:
   // Add a function used to create new objects.
   void AddNewInstanceFunction(const char*cname,
                               vtkClientServerNewInstanceFunction f);

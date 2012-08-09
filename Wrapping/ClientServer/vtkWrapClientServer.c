@@ -1034,14 +1034,7 @@ int extractOtherClassesUsed(NewClassInfo *data, const char *classes[])
  */
 void output_InitFunction(FILE *fp, NewClassInfo *data)
 {
-  const char* classes[1000];
-  int totalClasses,i;
-  totalClasses=  extractOtherClassesUsed(data,classes);
   fprintf(fp,"\n");
-  for (i=0; i < totalClasses; ++i)
-    {
-    fprintf(fp,"void %s_Init(vtkClientServerInterpreter* csi);\n",classes[i]);
-    }
   fprintf(fp,
           "\n"
           "//-------------------------------------------------------------------------auto\n"
@@ -1051,8 +1044,6 @@ void output_InitFunction(FILE *fp, NewClassInfo *data)
           "  if(last != csi)\n"
           "    {\n"
           "    last = csi;\n", data->ClassName);
-  for (i=0; i < totalClasses; ++i)
-    fprintf(fp,"    %s_Init(csi);\n",classes[i]);
   if(!data->IsAbstract)
     fprintf(fp,"    csi->AddNewInstanceFunction(\"%s\", %sClientServerNewCommand);\n",
             data->ClassName,data->ClassName);
@@ -1128,17 +1119,6 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
     fprintf(fp,"  return %s::New();\n}\n\n",data->Name);
     }
 
-  for (i = 0; i < data->NumberOfSuperClasses; i++)
-    {
-      {
-      fprintf(fp,
-              "int %sCommand(vtkClientServerInterpreter*, vtkObjectBase*,"
-              " const char*, const vtkClientServerStream&,"
-              " vtkClientServerStream& resultStream);\n",
-              data->SuperClasses[i]);
-      }
-    }
-
   fprintf(fp,
           "\n"
           "int VTK_EXPORT"
@@ -1185,9 +1165,13 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
   /* try superclasses */
   for (i = 0; i < data->NumberOfSuperClasses; i++)
     {
-    fprintf(fp,"\n  if (%sCommand(arlu, op,method,msg,resultStream))\n",
-              data->SuperClasses[i]);
-    fprintf(fp,"    {\n    return 1;\n    }\n");
+    fprintf(fp,
+      "\n"
+      "  {\n"
+      "    vtkClientServerCommandFunction fn = arlu->GetCommandFunction(\"%s\");\n"
+      "    if (fn && fn(arlu, op, method, msg, resultStream)) { return 1; }\n"
+      "  }\n",
+      data->SuperClasses[i]);
     }
   /* Add the Print method to vtkObjectBase. */
   if (!strcmp("vtkObjectBase",data->Name))

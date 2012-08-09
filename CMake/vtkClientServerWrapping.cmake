@@ -30,11 +30,6 @@ macro(vtk_add_cs_wrapping module)
     set_property(TARGET ${module}CS PROPERTY COMPILE_DEFINITIONS
       "${module}_AUTOINIT=1(${module})")
   endif()
-  foreach(dep ${${module}_DEPENDS})
-    if(NOT ${dep}_EXCLUDE_FROM_WRAPPING)
-      target_link_libraries(${module}CS ${dep}CS)
-    endif()
-  endforeach()
 endmacro()
 
 #------------------------------------------------------------------------------

@@ -87,13 +87,14 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         SET(TMP_CONCRETE "--abstract")
       ELSE (TMP_ABSTRACT)
         SET(TMP_CONCRETE "--concrete")
-        # add it to the init file's contents
-        SET (CXX_CONTENTS 
-          "${CXX_CONTENTS}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
-        
-        SET (CXX_CONTENTS2 
-          "${CXX_CONTENTS2}  ${TMP_FILENAME}_Init(csi);\n")
       ENDIF (TMP_ABSTRACT)
+
+      # add it to the init file's contents
+      SET (CXX_CONTENTS 
+        "${CXX_CONTENTS}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
+      
+      SET (CXX_CONTENTS2 
+        "${CXX_CONTENTS2}  ${TMP_FILENAME}_Init(csi);\n")
       
       # new source file is nameClientServer.cxx, add to resulting list
       SET(${SRC_LIST_NAME} ${${SRC_LIST_NAME}} 
