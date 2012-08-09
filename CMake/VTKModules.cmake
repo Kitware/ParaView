@@ -329,3 +329,7 @@ endif()
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()
+
+if (PARAVIEW_USE_VISITBRIDGE)
+  list (APPEND _vtk_modules vtkIOVisItBridge)
+endif()
