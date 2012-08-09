@@ -17,6 +17,7 @@
 #include "vtkActorCollection.h"
 #include "vtkCubeAxesActor.h"
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkProp3DCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
