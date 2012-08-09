@@ -300,6 +300,9 @@ set(_vtk_modules
   #  vtkXMLMultiBlockDataWriter
   #  vtkXMLHierarchicalBoxDataWriter
 
+  vtkIOXdmf2
+  #  Needed for xdmf support.
+
   vtkRenderingFreeType
   # Needed for:
   #  vtkVectorText
