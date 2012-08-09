@@ -1121,6 +1121,12 @@ ENDMACRO(WRAP_PLUGIN_FOR_PYTHON)
 # locates module.cmake files under the current source directory and registers
 # them as modules. All identified modules are treated as enabled and are built.
 macro(pv_process_modules)
+  if (VTK_WRAP_PYTHON)
+    # this is needed to ensure that the PYTHON_INCLUDE_DIRS variable is set when
+    # we process the plugins.
+    find_package(PythonLibs)
+  endif()
+
   unset (VTK_MODULES_ALL)
   file(GLOB_RECURSE files RELATIVE
     "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/module.cmake")
