@@ -564,3 +564,8 @@ endif()
 unset(_vtk_targets)
 unset(_vtk_compiletools_targets)
 unset(_vtk_all_targets)
+
+#-----------------------------------------------------------------------------
+if (BUILD_EXAMPLES)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
+endif()

@@ -9,15 +9,15 @@
 # Z-buffer and currently there's not support to obtain a composited Z-buffer
 # during the rendering stage.
 
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIR}
-    ${PARAVIEW_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
+cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
+
+if (NOT ParaView_BINARY_DIR)
+  find_package(ParaView REQUIRED)
+  include(${PARAVIEW_USE_FILE})
+endif()
+
+include(ParaViewPlugins)
+
 
 # Compile-in all GLSL files are strings.
 # const char* with the names same as that of the file then become available for
@@ -42,6 +42,3 @@ add_paraview_plugin(
           vtkVisibleLinesPainter.cxx
           ${ENCODED_STRING_FILES}
 )
-
-TARGET_LINK_LIBRARIES(HiddenLinesRemoval
-  vtkPVServerManager)
