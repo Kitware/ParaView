@@ -156,11 +156,13 @@ endif()
 # ParaView install rules.
 set (VTK_INSTALL_NO_QT_PLUGIN TRUE)
 
+# ParaView install the vtk python modules specifically to appropriate locations.
+set (VTK_INSTALL_NO_PYTHON TRUE)
+
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
 set (PV_INSTALL_LIB_DIR ${VTK_INSTALL_ARCHIVE_DIR})
 set (PV_INSTALL_EXPORT_NAME ${VTK_INSTALL_EXPORT_NAME})
-set (PV_INSTALL_NO_DEVELOPMENT ${VTK_INSTALL_NO_DEVELOPMENT})
 
 # Setting this ensures that "make install" will leave rpaths to external
 # libraries (not part of the build-tree e.g. Qt, ffmpeg, etc.) intact on
