@@ -86,6 +86,8 @@
 #   )
 # 
 ###############################################################################
+include(vtkForwardingExecutable)
+
 FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
     "APPLICATION_NAME;TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES;INSTALL_BIN_DIR;INSTALL_LIB_DIR"
@@ -194,6 +196,9 @@ FUNCTION(build_paraview_client BPC_NAME)
     "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc"
     "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc"
     )
+  set (ui_resource_init
+    "  Q_INIT_RESOURCE(${BPC_NAME}_generated);\n  Q_INIT_RESOURCE(${BPC_NAME}_configuration);\n")
+
 
   IF (BPC_COMPRESSED_HELP_FILE)
     # If a help collection file is specified, create a resource from it so that
@@ -206,6 +211,8 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET_SOURCE_FILES_PROPERTIES(${outfile}
       PROPERTIES OBJECT_DEPENDS "${BPC_COMPRESSED_HELP_FILE}")
     SET (ui_resources ${ui_resources} "${outfile}")
+    set (ui_resource_init
+      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_help);\n")
   ENDIF (BPC_COMPRESSED_HELP_FILE)
   
   QT4_ADD_RESOURCES(rcs_sources

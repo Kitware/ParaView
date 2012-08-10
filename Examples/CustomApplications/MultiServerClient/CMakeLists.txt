@@ -29,7 +29,17 @@
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #========================================================================
+cmake_minimum_required(VERSION 2.8.8)
 project(MultiServerClient)
+
+find_package(ParaView REQUIRED)
+include(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "MultiServerClient example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
 
 SET (SOURCE_FILES
@@ -45,13 +55,14 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   MultiServerClientMainWindow.ui
 )
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
 )
 
 #------------------------------------------------------------------------------
 # Build the client
+include(ParaViewBranding)
+
 build_paraview_client(multiserverclient
     TITLE "Multi-Server Client (ParaView-based Example Application)"
     ORGANIZATION  "Kitware Inc"

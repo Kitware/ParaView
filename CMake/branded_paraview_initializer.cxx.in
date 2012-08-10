@@ -41,14 +41,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "@BPC_PVMAIN_WINDOW_INCLUDE@"
-#include "pqPVApplicationCore.h"
-#include "pqBrandPluginsLoader.h"
 #include "pqOptions.h"
+#include "pqPVApplicationCore.h"
 #include "pqSettings.h"
+#include "vtkPVPluginTracker.h"
 
 #ifdef Q_WS_X11
 #include <QPlastiqueStyle>
 #endif
+
+#include "vtkPVConfig.h"
 
 //-----------------------------------------------------------------------------
 pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
@@ -86,10 +88,8 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
     return false;
     }
 
-#ifndef PARAVIEW_BUILD_SHARED_LIBS
-  Q_INIT_RESOURCE(@BPC_NAME@_generated);
-  Q_INIT_RESOURCE(@BPC_NAME@_configuration);
-  Q_INIT_RESOURCE(@BPC_NAME@_help);
+#ifndef BUILD_SHARED_LIBS
+@ui_resource_init@
 #endif  
 
   pqSettings *settings = this->PVApp->settings();
@@ -131,18 +131,28 @@ bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
   // Load required application plugins.
   QString plugin_string = "@BPC_REQUIRED_PLUGINS@";
   QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-  pqBrandPluginsLoader loader;
-  if (loader.loadPlugins(plugin_list) == false)
+  QString plugin_xml = "<Plugins>";
+  foreach (const QString plugin_name, plugin_list)
     {
-    qCritical() << "Failed to load required plugins for this application";
-    return false;
+    plugin_xml.append(
+      QString("<Plugin name=\"%1\" auto_load=\"1\" />\n").arg(plugin_name));
     }
+  plugin_xml.append("</Plugins>\n");
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
+    plugin_xml.toAscii().data());
 
   // Load optional plugins.
   plugin_string = "@BPC_OPTIONAL_PLUGINS@";
   plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
-  loader.loadPlugins(plugin_list, true); //quietly skip not-found plugins.
-
+  plugin_xml = "<Plugins>";
+  foreach (const QString plugin_name, plugin_list)
+    {
+    plugin_xml.append(
+      QString("<Plugin name=\"%1\" auto_load=\"1\" />\n").arg(plugin_name));
+    }
+  plugin_xml.append("</Plugins>\n");
+  vtkPVPluginTracker::GetInstance()->LoadPluginConfigurationXMLFromString(
+    plugin_xml.toAscii().data());
 
 #if @BPC_HAS_GUI_CONFIGURATION_XMLS@
   // Load configuration xmls after all components have been instantiated.

@@ -1,14 +1,18 @@
-
-cmake_minimum_required(VERSION 2.6)
-
+cmake_minimum_required(VERSION 2.8.8)
 project(Clone2)
 
 FIND_PACKAGE(ParaView REQUIRED)
-FIND_PACKAGE(Qt4)
 INCLUDE(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "Clone2 example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
+# include rules for creating custom applications.
+include(ParaViewBranding)
+
 
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
@@ -50,5 +54,3 @@ build_paraview_client(paraview_revised_2
     ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
   SOURCES ${ParaView_SOURCE_FILES}
 )
-
-TARGET_LINK_LIBRARIES(paraview_revised_2 ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY}  vtkCommonCore vtkPVCommon pqCore pqComponents)

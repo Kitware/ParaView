@@ -1,17 +1,14 @@
-
-cmake_minimum_required(VERSION 2.6)
-
+cmake_minimum_required(VERSION 2.8.8)
 project(Demo0)
 
-FIND_PACKAGE(ParaView REQUIRED)
-INCLUDE(${PARAVIEW_USE_FILE})
+find_package(ParaView REQUIRED)
+include(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "Demo0 example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
-SET (SOURCE_FILES 
-  DemoApp0.cxx
-)
-
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
-
-ADD_EXECUTABLE(DemoApp0 ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
-TARGET_LINK_LIBRARIES(DemoApp0 pqCore ${QT_LIBRARIES} )
+add_executable(DemoApp0 DemoApp0.cxx)
+target_link_libraries(DemoApp0 pqCore)

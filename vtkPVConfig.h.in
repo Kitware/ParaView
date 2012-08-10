@@ -75,6 +75,11 @@
 #cmakedefine PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
 
 #cmakedefine BUILD_SHARED_LIBS
+#ifdef BUILD_SHARED_LIBS
+// for sake of old code, we define the PARAVIEW_BUILD_SHARED_LIBS variable. This
+// can be deprecated once the cleanup is complete.
+# define PARAVIEW_BUILD_SHARED_LIBS
+#endif
 
 // The ParaView version of VTK_USE_X
 #cmakedefine PARAVIEW_USE_X

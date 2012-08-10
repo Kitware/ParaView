@@ -1,13 +1,14 @@
-
-cmake_minimum_required(VERSION 2.6)
-
+cmake_minimum_required(VERSION 2.8.8)
 project(Demo1)
 
-FIND_PACKAGE(ParaView REQUIRED)
-INCLUDE(${PARAVIEW_USE_FILE})
-
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
+find_package(ParaView REQUIRED)
+include(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "Demo1 example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
 SET (SOURCE_FILES 
   DemoApp1.cxx
@@ -23,10 +24,9 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   myMainWindow.ui
 )
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR})
 
-ADD_EXECUTABLE(DemoApp1 ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
-TARGET_LINK_LIBRARIES(DemoApp1 pqCore pqComponents pqApplicationComponents
-${QT_LIBRARIES} )
+add_executable(DemoApp1 ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
+target_link_libraries(DemoApp1 pqApplicationComponents)

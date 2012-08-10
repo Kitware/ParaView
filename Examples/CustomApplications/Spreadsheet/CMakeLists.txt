@@ -1,9 +1,14 @@
-cmake_minimum_required(VERSION 2.6)
-
+cmake_minimum_required(VERSION 2.8.8)
 project(SpreadSheet)
 
-FIND_PACKAGE(ParaView REQUIRED)
-INCLUDE(${PARAVIEW_USE_FILE})
+find_package(ParaView REQUIRED)
+include(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "SpreadSheet example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
 # Variables that need to be set for installation code to work correctly.
 SET (BUILD_SHARED_LIBS ${PARAVIEW_BUILD_SHARED_LIBS}) # enable shared builds.
@@ -39,6 +44,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
 
 
 #------------------------------------------------------------------------------
+include(ParaViewBranding)
+
 # Build the client
 build_paraview_client(spreadsheet
     TITLE "Raw Data Viewer (ParaView-based Example Application)"
@@ -52,21 +59,3 @@ build_paraview_client(spreadsheet
       ${CMAKE_CURRENT_SOURCE_DIR}/SupportedReader.xml
     SOURCES ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES} ${RCS_BUILT_SOURCES}
 )
-
-#------------------------------------------------------------------------
-# Install ParaView client
-build_paraview_client_cpack_config_init(
-    PACKAGE_NAME "SpreadSheet"
-    ORGANIZATION "Kitware Inc."
-    VERSION_MAJOR "1"
-    VERSION_MINOR "0"
-    VERSION_PATCH "0"
-    DESCRIPTION "ParaView is a scientific visualization tool"
-    PACKAGE_EXECUTABLES "spreadsheet;SpreadSheet"
-    LICENSE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.txt
-    DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README.txt
-)
-
-TARGET_LINK_LIBRARIES(spreadsheet ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommonCore vtkPVCommon pqCore pqComponents)
-
-build_paraview_client_cpack_config()
