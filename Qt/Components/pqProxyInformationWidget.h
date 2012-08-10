@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QPointer>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqOutputPort;
 class QTreeWidgetItem;

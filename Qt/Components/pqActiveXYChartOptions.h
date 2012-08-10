@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqActiveXYChartOptions_h
 #define _pqActiveXYChartOptions_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqActiveViewOptions.h"
 
 class pqOptionsDialog;

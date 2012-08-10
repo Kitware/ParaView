@@ -86,6 +86,8 @@
 #   )
 # 
 ###############################################################################
+include(vtkForwardingExecutable)
+
 FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
     "APPLICATION_NAME;TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES;INSTALL_BIN_DIR;INSTALL_LIB_DIR"
@@ -194,6 +196,9 @@ FUNCTION(build_paraview_client BPC_NAME)
     "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_generated.qrc"
     "${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_configuration.qrc"
     )
+  set (ui_resource_init
+    "  Q_INIT_RESOURCE(${BPC_NAME}_generated);\n  Q_INIT_RESOURCE(${BPC_NAME}_configuration);\n")
+
 
   IF (BPC_COMPRESSED_HELP_FILE)
     # If a help collection file is specified, create a resource from it so that
@@ -206,6 +211,8 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET_SOURCE_FILES_PROPERTIES(${outfile}
       PROPERTIES OBJECT_DEPENDS "${BPC_COMPRESSED_HELP_FILE}")
     SET (ui_resources ${ui_resources} "${outfile}")
+    set (ui_resource_init
+      "${ui_resource_init}  Q_INIT_RESOURCE(${BPC_NAME}_help);\n")
   ENDIF (BPC_COMPRESSED_HELP_FILE)
   
   QT4_ADD_RESOURCES(rcs_sources
@@ -227,12 +234,6 @@ FUNCTION(build_paraview_client BPC_NAME)
                  ${CMAKE_CURRENT_BINARY_DIR}/pq${BPC_NAME}Initializer.cxx @ONLY)
   CONFIGURE_FILE(${branding_source_dir}/branded_paraview_initializer.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/pq${BPC_NAME}Initializer.h @ONLY)
-
-  IF (NOT Q_WS_MAC)
-    SET(pv_exe_name ${BPC_NAME}${PV_EXE_SUFFIX})
-  ELSE (NOT Q_WS_MAC)
-    SET(pv_exe_name ${BPC_NAME})
-  ENDIF (NOT Q_WS_MAC)
 
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_GUI_INCLUDE_DIRS}
@@ -259,14 +260,14 @@ FUNCTION(build_paraview_client BPC_NAME)
     IF (PV_INSTALL_LIB_DIR)
       INSTALL(TARGETS pq${BPC_NAME}Initializer
             DESTINATION ${PV_INSTALL_LIB_DIR}
-            COMPONENT BrandedRuntime)
+            COMPONENT Runtime)
     ENDIF (PV_INSTALL_LIB_DIR)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
   SET (PV_EXE_LIST ${BPC_NAME})
 
   # needed to set up shared forwarding correctly.
-  add_executable_with_forwarding2(pv_exe_suffix
+  vtk_add_executable_with_forwarding2(pv_exe_suffix
                  "${PARAVIEW_LIBRARY_DIRS}"
                  "../${PARAVIEW_INSTALL_LIB_DIR}"
                  "${BPC_INSTALL_LIB_DIR}"
@@ -277,42 +278,35 @@ FUNCTION(build_paraview_client BPC_NAME)
                  ${qt_menu_nib_sources}
                  ${EXE_SRCS}
                  )
-  SET (pv_exe_name ${BPC_NAME}${pv_exe_suffix})
-  TARGET_LINK_LIBRARIES(${pv_exe_name}
+  TARGET_LINK_LIBRARIES(${BPC_NAME}
     pqApplicationComponents
     ${QT_QTMAIN_LIBRARY}
     ${BPC_EXTRA_DEPENDENCIES}
     )
 
-  IF(NOT DEFINED MAKE_BUNDLE)
-    INSTALL(TARGETS ${BPC_NAME}
-      DESTINATION ${BPC_INSTALL_BIN_DIR}
-      COMPONENT BrandedRuntime)
-  ENDIF(NOT DEFINED MAKE_BUNDLE)
-
-  IF (pv_exe_suffix)
-    # Shared forwarding enabled.
-    INSTALL(TARGETS ${pv_exe_name}
-          DESTINATION ${BPC_INSTALL_LIB_DIR}
-          COMPONENT BrandedRuntime)
-  ENDIF (pv_exe_suffix)
-
   IF (BPC_MAKE_INITIALIZER_LIBRARY)
-    TARGET_LINK_LIBRARIES(${pv_exe_name}
+    TARGET_LINK_LIBRARIES(${BPC_NAME}
       pq${BPC_NAME}Initializer)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
+
+  IF (NOT DEFINED MAKE_BUNDLE)
+    if (pv_exe_suffix)
+      install(TARGETS ${BPC_NAME}
+              DESTINATION ${BPC_INSTALL_LIB_DIR}
+              COMPONENT Runtime)
+    endif()
+    install(TARGETS ${BPC_NAME}${pv_exe_suffix}
+            DESTINATION ${BPC_INSTALL_BIN_DIR}
+            COMPONENT Runtime)
+  ENDIF(NOT DEFINED MAKE_BUNDLE)
+
   IF (APPLE)
     IF (BPC_BUNDLE_ICON)
-      SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES
+      SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES
         MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
     ENDIF (BPC_BUNDLE_ICON)
-    SET_TARGET_PROPERTIES(${pv_exe_name} PROPERTIES 
+    SET_TARGET_PROPERTIES(${BPC_NAME} PROPERTIES 
       MACOSX_BUNDLE_BUNDLE_NAME "${BPC_APPLICATION_NAME}")
   ENDIF (APPLE)
-
-  # HACK. When employing shared forwarding, I need to expose the real target so
-  # that dependencies can be added correctly. This will go away once we remove
-  # VTK_USE_RPATH option all together.
-  set (paraview_client_real_exe_name ${pv_exe_name} PARENT_SCOPE)
 ENDFUNCTION(build_paraview_client)

@@ -1,14 +1,17 @@
-
-cmake_minimum_required(VERSION 2.6)
-
+cmake_minimum_required(VERSION 2.8.8)
 project(ParticlesViewer)
 
-FIND_PACKAGE(ParaView REQUIRED)
-FIND_PACKAGE(Qt4)
-INCLUDE(${PARAVIEW_USE_FILE})
+find_package(ParaView REQUIRED)
+include(${PARAVIEW_USE_FILE})
+if (NOT PARAVIEW_BUILD_QT_GUI)
+  message(FATAL_ERROR
+    "ParticlesViewer example requires PARAVIEW_BUILD_QT_GUI to be enabled. "
+    "Please rebuild ParaView (or point to a different build of ParaView) "
+    "with PARAVIEW_BUILD_QT_GUI set to TRUE")
+endif()
 
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
+include(ParaViewBranding)
+include(ParaViewPlugins)
 
 # This application demostrates following concepts:
 # * Building user interface through a plugin
@@ -38,8 +41,6 @@ ADD_PARAVIEW_PLUGIN(ParticlesViewerPlugin "1.0"
   GUI_INTERFACES ${IFACES}
   GUI_SOURCES ${IFACE_SRCS} ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
 
-TARGET_LINK_LIBRARIES(ParticlesViewerPlugin pqApplicationComponents)
-
 #------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(particles_viewer
@@ -49,9 +50,7 @@ build_paraview_client(particles_viewer
     VERSION_MINOR 0
     VERSION_PATCH 0
     REQUIRED_PLUGINS ParticlesViewerPlugin
-                     CSCS_PointSprite_Plugin
+                     PointSprite_Plugin
     GUI_CONFIGURATION_XMLS
       ${CMAKE_CURRENT_SOURCE_DIR}/SupportedReader.xml
 )
-
-TARGET_LINK_LIBRARIES(particles_viewer ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} vtkCommonCore vtkPVCommon pqCore pqComponents)

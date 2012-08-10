@@ -15,7 +15,7 @@
 #ifndef __pqMemoryInspectorPanel_h
 #define __pqMemoryInspectorPanel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QWidget>
 #include <QProcess>
 #include <QMenu>

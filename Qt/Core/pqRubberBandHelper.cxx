@@ -149,8 +149,10 @@ void pqRubberBandHelper::emitEnabledSignals()
     {
     vtkSMRenderViewProxy* proxy =
       this->Internal->RenderView->getRenderViewProxy();
-    emit this->enableSurfaceSelection(proxy->IsSelectionAvailable());
-    emit this->enableSurfacePointsSelection(proxy->IsSelectionAvailable());
+    emit this->enableSurfaceSelection(
+          NULL == proxy->IsSelectVisibleCellsAvailable());
+    emit this->enableSurfacePointsSelection(
+          NULL == proxy->IsSelectVisiblePointsAvailable());
     emit this->enablePick(proxy->IsSelectionAvailable());
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);

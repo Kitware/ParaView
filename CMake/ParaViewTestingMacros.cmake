@@ -1,10 +1,7 @@
 # Set up some common testing environment.
-SET (CLIENT_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
-IF (Q_WS_MAC)
-  SET(CLIENT_EXECUTABLE
-    ${EXECUTABLE_OUTPUT_PATH}/paraview.app/Contents/MacOS/paraview)
-ENDIF (Q_WS_MAC)
-
+SET (CLIENT_EXECUTABLE  "\$<TARGET_FILE:paraview>")
+# FIXME: need to verify that the above points to the paraview executable within
+# the app bundle on Mac.
 
 MACRO (process_args out_extra_args)
   SET (temp_args)
@@ -68,8 +65,8 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
     endwhile (${counter} LESS ${TEST_GROUP_SIZE})
 
     if (extra_args)
-      ADD_TEST("${prefix}${full_test_name}"
-        ${PARAVIEW_SMTESTDRIVER_EXECUTABLE} 
+      ADD_TEST(NAME "${prefix}${full_test_name}"
+        COMMAND smTestDriver
         ${ACT_COMMAND}
         ${extra_args}
         --exit
@@ -78,6 +75,10 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
         set_tests_properties("${prefix}${full_test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}${full_test_name}\"")
       endif()
+ 
+      # add the "PARAVIEW" label to the test properties. this allows for the user
+      # to instruct cmake to run just the ParaView tests with the '-L' flag
+      set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW")
     endif (extra_args)
   endwhile (ACT_TEST_SCRIPTS)
 
@@ -96,7 +97,7 @@ ENDFUNCTION (add_client_tests)
 FUNCTION (add_client_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CS"
     COMMAND
-       --server ${PARAVIEW_SERVER_EXECUTABLE}
+       --server $<TARGET_FILE:pvserver>
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
@@ -107,8 +108,8 @@ ENDFUNCTION (add_client_server_tests)
 FUNCTION (add_client_render_server_tests prefix)
   add_pv_test(${prefix} "_DISABLE_CRS"
     COMMAND
-       --data-server ${PARAVIEW_DATA_SERVER_EXECUTABLE}
-       --render-server ${PARAVIEW_RENDER_SERVER_EXECUTABLE}
+       --data-server $<TARGET_FILE:pvdataserver>
+       --render-server $<TARGET_FILE:pvrenderserver>
        --client ${CLIENT_EXECUTABLE}
        -dr
        --disable-light-kit
@@ -129,10 +130,10 @@ FUNCTION(add_multi_client_tests prefix)
         set (use_old_panels "--use-old-panels")
       endif ()
 
-      add_test("${prefix}.${test_name}"
-          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+      add_test(NAME "${prefix}.${test_name}"
+        COMMAND smTestDriver
         --test-multi-clients
-        --server ${PARAVIEW_SERVER_EXECUTABLE}
+        --server $<TARGET_FILE:pvserver>
 
         --client ${CLIENT_EXECUTABLE}
         -dr
@@ -155,6 +156,8 @@ FUNCTION(add_multi_client_tests prefix)
         set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
         message(STATUS "Running in serial \"${prefix}.${test_name}\"")
       endif (${test_name}_FORCE_SERIAL)
+
+      set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
     endif()
   endforeach(test_script)
 ENDFUNCTION(add_multi_client_tests)
@@ -166,10 +169,10 @@ FUNCTION(add_multi_server_tests prefix nbServers)
     get_filename_component(test_name ${test_script} NAME_WE)
       set (extra_args)
       process_args(extra_args)
-      add_test("${prefix}.${test_name}"
-          ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+      add_test(NAME "${prefix}.${test_name}"
+        COMMAND smTestDriver
         --test-multi-servers ${nbServers}
-        --server ${PARAVIEW_SERVER_EXECUTABLE}
+        --server $<TARGET_FILE:pvserver>
 
         --client ${CLIENT_EXECUTABLE}
         -dr
@@ -179,6 +182,7 @@ FUNCTION(add_multi_server_tests prefix nbServers)
         ${extra_args}
         --exit
         )
+      set_tests_properties("${prefix}.${test_name}" PROPERTIES LABELS "PARAVIEW")
   endforeach(test_script)
 ENDFUNCTION(add_multi_server_tests)
 
@@ -194,10 +198,10 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
         get_filename_component(test_name ${test_script} NAME_WE)
         set (extra_args)
         process_args(extra_args)
-        add_test("${prefix}-${tdx}x${tdy}.${test_name}"
-            ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+        add_test(NAME "${prefix}-${tdx}x${tdy}.${test_name}"
+            COMMAND smTestDriver
             --test-tiled ${tdx} ${tdy}
-            --server ${PARAVIEW_SERVER_EXECUTABLE}
+            --server $<TARGET_FILE:pvserver>
 
             --client ${CLIENT_EXECUTABLE}
             -dr
@@ -215,6 +219,8 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
           set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
           message(STATUS "Running in serial \"${prefix}.${test_name}\"")
         endif (${test_name}_FORCE_SERIAL)
+
+        set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES LABELS "PARAVIEW")
       endforeach(test_script)
     endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
   endif()

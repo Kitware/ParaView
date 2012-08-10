@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPointer>
 #include <QList>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class pqProxyGroupMenuManager;
 class QMainWindow;

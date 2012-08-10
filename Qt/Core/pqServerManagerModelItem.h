@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqServerManagerModelItem_h
 
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 
 class vtkEventQtSlotConnect;

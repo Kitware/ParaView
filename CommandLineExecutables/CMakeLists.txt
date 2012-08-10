@@ -1,114 +1,95 @@
-PROJECT(PVCommmandLineExecutables)
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+if (NOT TARGET vtkPVServerManagerApplication)
+  message(STATUS "vtkPVServerManagerApplication module is not enabled. "
+    "Command line executables will not be built.")
+  return()
+endif()
 
-INCLUDE_DIRECTORIES(
-  ${ParaView_BINARY_DIR}
-  ${PVCommon_SOURCE_DIR}
-  ${PVClientServerCore_SOURCE_DIR}
-  ${PVServerImplementation_SOURCE_DIR}
-  ${PVServerManager_SOURCE_DIR}
-  ${VTK_INCLUDE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  )
+vtk_module_dep_includes(vtkPVServerManagerApplication)
+include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
+                    ${vtkPVServerManagerApplication_INCLUDE_DIRS})
 
-SET(LIBS vtkPVServerManager)
-IF(PARAVIEW_USE_MPI)
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-ENDIF(PARAVIEW_USE_MPI)
+include (vtkForwardingExecutable)
+# these will be removed once vtkForwardingExecutable is fixed.
+set(VTK_INSTALL_BIN_DIR_CM24 ${VTK_INSTALL_RUNTIME_DIR})
+set(VTK_INSTALL_LIB_DIR_CM24 ${VTK_INSTALL_LIBRARY_DIR})
 
-# Add main server executables.
-SET(PV_EXE_LIST
-   pvserver pvrenderserver pvdataserver)
+foreach (name pvserver pvdataserver pvrenderserver)
+  vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
+  #vtk_target_name(${name})
+  #vtk_target_label(${name})
+  #vtk_target_install(${name})
+  if (NOT VTK_INSTALL_NO_RUNTIME)
+    pv_executable_install(${name} "${exe_suffix}")
+  endif()
+  target_link_libraries(${name}
+    vtkPVServerManagerApplication)
+  if (NOT BUILD_SHARED_LIBS)
+    target_link_libraries(${name} ${PARAVIEW_PLUGINLIST})
+  endif()
+endforeach()
 
-FOREACH(pvexe ${PV_EXE_LIST})
-  add_executable_with_forwarding(pv_exe_suffix
-    ${pvexe} ${pvexe}.cxx)
-  TARGET_LINK_LIBRARIES(${pvexe}${pv_exe_suffix} ${LIBS})
+if (PARAVIEW_ENABLE_PYTHON)
+  set (VTK_WRAP_PYTHON_FIND_LIBS 1)
+  include(vtkWrapPython)
+  include_directories(${PYTHON_INCLUDE_DIRS})
 
-  # link enabled plugins if not building in shared library mode
-  if(NOT BUILD_SHARED_LIBS)
-    target_link_libraries(${pvexe}${pv_exe_suffix} ${PARAVIEW_PLUGINLIST})
-  endif(NOT BUILD_SHARED_LIBS)
+  vtk_module_dep_includes(vtkPVPythonSupport)
+  include_directories(${vtkPVPythonSupport_DEPENDS_INCLUDE_DIRS}
+                      ${vtkPVPythonSupport_INCLUDE_DIRS}
+                      ${CMAKE_CURRENT_BINARY_DIR})
 
-  # Install exe
-  IF(NOT PV_INSTALL_NO_RUNTIME)
-    INSTALL(TARGETS ${pvexe}
-            DESTINATION ${PV_INSTALL_BIN_DIR}
-            COMPONENT Runtime)
-    IF (pv_exe_suffix)
-      # Shared forwarding enabled.
-      INSTALL(TARGETS ${pvexe}${pv_exe_suffix}
-              DESTINATION ${PV_INSTALL_LIB_DIR}
-              COMPONENT Runtime)
-    ENDIF (pv_exe_suffix)
-  ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+  set (dependencies)
 
-ENDFOREACH(pvexe)
+  # when building static ParaView, generate a header file to initialize
+  # all the python wrapped modules statically.
+  vtk_write_python_modules_header_for_wrapped_modules(
+    "${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h"
+    dependencies)
 
-SET(PV_TEST_USE_RANDOM_PORTS ON CACHE BOOL
-  "Use random port numbers when testing client-server configurations.")
+  foreach (name pvbatch pvpython)
+    vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
+    #vtk_target_name(${name})
+    #vtk_target_label(${name})
+    #vtk_target_install(${name})
+    if (NOT VTK_INSTALL_NO_RUNTIME)
+      pv_executable_install(${name} "${exe_suffix}")
+    endif()
+    target_link_libraries(${name}
+      vtkPVServerManagerApplication
+      vtkPVPythonSupport
+      ${dependencies}
+      ${VTK_PYTHON_LIBRARIES})
+  endforeach()
+endif()
 
-SET(PV_TEST_INIT_COMMAND "" CACHE STRING
-  "Command to run before a test begins. Multiple commands are separated by ';'.")
-MARK_AS_ADVANCED(PV_TEST_INIT_COMMAND)
-
-SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
-  "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
-MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
-
-SET (PV_TEST_CLIENT "localhost" CACHE STRING
-  "Node which serves as the client node, used to connect from the server side in reverse connection mode.")
-MARK_AS_ADVANCED(PV_TEST_CLIENT)
-
-# Add the test driver executable. This is not done in the above loop to avoid
-# adding dependencies ${LIBS} since we only need vtksys for this executable.
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkSMTestDriverConfig.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMTestDriverConfig.h @ONLY ESCAPE_QUOTES)
-
-add_executable_with_forwarding(pv_exe_suffix smTestDriver vtkSMTestDriver.cxx)
-TARGET_LINK_LIBRARIES(smTestDriver${pv_exe_suffix} vtksys)
-
-#------------------------------------------------------------------------
-# Install ffmpeg, if used.
-IF (VTK_USE_FFMPEG_ENCODER)
-  FOREACH(fmpglib avcodec avformat avutil)
-    IF (FFMPEG_${fmpglib}_LIBRARY)
-      pv_install_library(${FFMPEG_${fmpglib}_LIBRARY}
-        ${PV_INSTALL_LIB_DIR}
-        BrandedRuntime)
-    ENDIF(FFMPEG_${fmpglib}_LIBRARY)
-  ENDFOREACH(fmpglib)
-ENDIF (VTK_USE_FFMPEG_ENCODER)
-
-IF (NOT PV_INSTALL_NO_RUNTIME)
-  INSTALL(TARGETS smTestDriver
-          DESTINATION ${PV_INSTALL_BIN_DIR}
-          COMPONENT Runtime)
-  IF (pv_exe_suffix)
-    # Shared forwarding enabled.
-    INSTALL(TARGETS smTestDriver${pv_exe_suffix} 
-            DESTINATION ${PV_INSTALL_LIB_DIR}
-            COMPONENT Runtime)
-  ENDIF (pv_exe_suffix)
-ENDIF (NOT PV_INSTALL_NO_RUNTIME)
-
-#------------------------------------------------------------------------
-# We setup the CPack scripts for packaging the server.
-# This comes in handy when the Qt client is not built, or we want to package
-# the server executables alone (pvpython, pvbatch as well, if python was
-# enabled).
-INCLUDE(ParaViewBrandingCPack)
-# Install ParaView client
-build_paraview_client_cpack_config_init(
-    PACKAGE_NAME "ParaViewServers"
-    ORGANIZATION "Kitware Inc."
-    VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
-    VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
-    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
-    DESCRIPTION "ParaView is a scientific visualization tool"
-    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-)
-
-SET (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
-  ${CPACK_INSTALL_CMAKE_PROJECTS})
-build_paraview_client_cpack_config()
+#FIXME:MODULARIZATION -- link line for plugins when doing static builds.

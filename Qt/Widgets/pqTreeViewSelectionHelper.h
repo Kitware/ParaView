@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqTreeViewSelectionHelper_h
 
 #include <QObject>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QItemSelection>
 #include <QTreeView>
 
 // pqTreeViewSelectionHelper is analogous to pqTreeWidgetSelectionHelper.
 // We let pqTreeWidgetSelectionHelper be since the check state handling for the
 // tree view isn't as graceful as the tree widget.
-class QTWIDGETS_EXPORT pqTreeViewSelectionHelper : public QObject
+class PQWIDGETS_EXPORT pqTreeViewSelectionHelper : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

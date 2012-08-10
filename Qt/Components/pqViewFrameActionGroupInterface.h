@@ -34,17 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqViewFrameActionGroupInterface_h
 
 #include <QtPlugin>
+#include "pqComponentsModule.h"
+
 class pqViewFrameActionGroup;
 class pqViewFrame;
 class pqView;
 
 /// interface class for plugins that create QActionGroups
 /// for adding actions to view frames
-class pqViewFrameActionGroupInterface
+class PQCOMPONENTS_EXPORT pqViewFrameActionGroupInterface
 {
 public:
   /// destructor
-  virtual ~pqViewFrameActionGroupInterface() {}
+  virtual ~pqViewFrameActionGroupInterface();
 
   /// Add/remove plugin's actions to/from the frame 
   /// depending on the view type. Returns true if it did.

@@ -1,4 +1,0 @@
-vtkPVArrayInformation GetComponentRange 307 2
-vtkGlyph3DRepresentation GetBounds  307 6
-vtkPVImplicitPlaneRepresentation GetTransformedOrigin 307  3
-vtkPVImplicitPlaneRepresentation GetTransformedNormal 307  3

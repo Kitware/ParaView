@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqProxySelection_h
 
 #include <QSet>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqServerManagerModelItem;
 class vtkSMProxySelectionModel;

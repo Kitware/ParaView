@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialogFavoriteModel_h
 #define _pqFileDialogFavoriteModel_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 #include <QAbstractListModel>
 

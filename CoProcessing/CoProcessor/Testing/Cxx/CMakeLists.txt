@@ -1,3 +1,6 @@
+set (CoProcessing_BINARY_DIR ${ParaView_BINARY_DIR}/CoProcessing)
+set (CoProcessing_SOURCE_DIR ${ParaView_SOURCE_DIR}/CoProcessing)
+
 include_directories(
   ${TestDriver_SOURCE_DIR}
   )
@@ -5,6 +8,8 @@ include_directories(
 IF (COPROCESSOR_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF (COPROCESSOR_USE_MPI)
+
+vtk_module_test()
 
 # below is for doing image comparisons
 # they are not done directly in the above python script due to the fact
@@ -14,7 +19,16 @@ TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
   vtkTestingRendering
   vtkRenderingOpenGL
   vtkRenderingFreeTypeOpenGL
-  vtkInteractionStyle)
+  vtkInteractionStyle
+  vtkIOImage
+  )
+
+if (PARAVIEW_USE_MPI)
+  # FIXME: not sure this is the right fix, w.o. this I am getting some missing
+  # ...AutoInit build errors.
+  TARGET_LINK_LIBRARIES(CoProcessingCompareImagesTester
+    vtkIOMPIImage)
+endif()
 
 # specify the real executable path since this gets
 # put in different places on different architectures.
@@ -88,7 +102,7 @@ ENDMACRO(CreateCoProcessingScriptTest)
 
 IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_DATA_ROOT)
   ADD_EXECUTABLE(CoProcessingPythonScriptExample PythonScriptCoProcessingExample.cxx vtkPVCustomTestDriver.cxx)
-  TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessor vtkCPTestDriver)
+  TARGET_LINK_LIBRARIES(CoProcessingPythonScriptExample vtkCoProcessorImplementation vtkCPTestDriver)
 
   CreateCoProcessingScriptTest(CoProcessingTestPythonScript PythonScriptTest.py
     CPGrid0.png CPPressure0.png CPGrid0.png CPPressure0.png "" "")

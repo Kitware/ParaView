@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSpreadSheetViewSelectionModel_h
 
 #include <QItemSelectionModel>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqSpreadSheetViewModel;
 class vtkSMSourceProxy;

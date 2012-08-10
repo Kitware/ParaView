@@ -33,15 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pq3DWidgetInterface_h
 
 #include <QtPlugin>
+#include "pqComponentsModule.h"
 
 class pq3DWidget;
 class vtkSMProxy;
 
 /// Interface for plugins that provide pq3DWidget subclasses.
-class pq3DWidgetInterface
+class PQCOMPONENTS_EXPORT pq3DWidgetInterface
 {
 public:
-  virtual ~pq3DWidgetInterface() {}
+  virtual ~pq3DWidgetInterface();
 
   /// Creates the 3D widget of the requested type is possible otherwise simply
   /// returns NULL.

@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqListWidgetItemObject_h
 #define _pqListWidgetItemObject_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 #include <QListWidgetItem>
 
 /// QListWidgetItem subclass with additional signals, slots, and properties
-class QTWIDGETS_EXPORT pqListWidgetItemObject : public QObject, public QListWidgetItem
+class PQWIDGETS_EXPORT pqListWidgetItemObject : public QObject, public QListWidgetItem
 {
   Q_OBJECT
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)

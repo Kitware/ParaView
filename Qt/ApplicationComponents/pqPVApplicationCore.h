@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPVApplicationCore_h
 
 #include "pqApplicationCore.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 #include <QPointer>
 #include <QList>

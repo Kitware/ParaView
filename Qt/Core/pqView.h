@@ -155,6 +155,9 @@ public:
   vtkSMSourceProxy* getAnnotationLink();
 
 signals:
+  /// Fired when the vtkSMViewProxy fire the vtkCommand::UpdateDataEvent
+  void updateDataEvent();
+
   /// Fired after a representation has been added to this view.
   void representationAdded(pqRepresentation*);
 

@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDoubleRangeWidget_h
 
 #include <QWidget>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
   
 class QSlider;
 class QLineEdit;
 
 /// a widget with a tied slider and line edit for editing a double property
-class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
+class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(double value READ value WRITE setValue USER true)

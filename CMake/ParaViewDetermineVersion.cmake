@@ -28,9 +28,8 @@
 # Arguments are:
 #   source_dir : Source directory
 #   git_command : git executable
-#   alternative_version_file : <deprecated, no longer used>
 #   var_prefix : prefix for variables e.g. "PARAVIEW".
-function(determine_version source_dir git_command alternative_version_file var_prefix)
+function(determine_version source_dir git_command var_prefix)
   set (major)
   set (minor)
   set (patch)
@@ -56,8 +55,6 @@ function(determine_version source_dir git_command alternative_version_file var_p
         set (minor ${CMAKE_MATCH_2})
         set (patch ${CMAKE_MATCH_3})
         set (patch_extra ${CMAKE_MATCH_4})
-        # not sure if I want to write the file out yet.
-        #file (WRITE ${alternative_version_file} ${full})
       endif()
     endif()
   endif()

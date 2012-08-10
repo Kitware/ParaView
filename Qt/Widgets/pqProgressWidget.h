@@ -35,12 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QTime>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 class pqProgressBar;
 class QToolButton;
 
-class QTWIDGETS_EXPORT pqProgressWidget : public QWidget
+class PQWIDGETS_EXPORT pqProgressWidget : public QWidget
 {
   Q_OBJECT
 public:

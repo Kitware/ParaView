@@ -37,7 +37,6 @@
 
 #ifndef SIMPLEOBSERVER_H
 #define SIMPLEOBSERVER_H
-#include <pqComponentsExport.h>
 
 class Subject;
 

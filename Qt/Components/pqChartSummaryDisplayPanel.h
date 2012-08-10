@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QCheckBox>
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 #include "pqPlotSettingsModel.h"

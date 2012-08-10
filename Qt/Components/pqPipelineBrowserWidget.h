@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPipelineBrowserWidget_h
 
 #include "pqFlatTreeView.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqPipelineModel;
 class pqPipelineAnnotationFilterModel;

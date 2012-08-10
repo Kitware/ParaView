@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDialog_h
 
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// This is a QDialog subclass that is aware of the undo-redo
 /// sub-system. Many dialogs show information about server manager

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include "pq3DWidget.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// Provides a complete Qt UI for working with a 3D handle widget
 class PQCOMPONENTS_EXPORT pqHandleWidget : public pq3DWidget

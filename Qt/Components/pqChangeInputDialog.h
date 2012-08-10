@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 #include <QMap>
 #include <QList>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqOutputPort;
 class vtkSMProxy;

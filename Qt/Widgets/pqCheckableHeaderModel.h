@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCheckableHeaderModel_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QAbstractItemModel>
 
 class pqCheckableHeaderModelInternal;
 class pqCheckableHeaderModelItem;
 
 
-class QTWIDGETS_EXPORT pqCheckableHeaderModel : public QAbstractItemModel
+class PQWIDGETS_EXPORT pqCheckableHeaderModel : public QAbstractItemModel
 {
   Q_OBJECT
 

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayColorWidget_h
 
 #include "pqVariableType.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QWidget>
 #include <QPointer>

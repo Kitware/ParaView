@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqActionGroupInterface_h
 
 #include <QtPlugin>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 class QActionGroup;
 
 /// interface class for plugins that create QActionGroups

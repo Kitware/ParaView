@@ -57,12 +57,13 @@ public:
   void RemoveAllHarnesses();
   vtkCollection *GetHarnesses();
 
+//BTX
   // Description:
   // Assign a function that this driver can call to schedule eventual
   // render calls. This allows automatic streaming to work as part of
   // a GUI event loop so that it can be interruptable.
   void AssignRenderLaterFunction(void (*function)(void *), void *arg);
-
+//ETX
   // Description:
   // Sometimes, as in ParaView, window events happen too late.
   // Before assigning a render window, set these to true (the default is false)

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFlatTreeViewEventPlayer_h
 
 #include "pqWidgetEventPlayer.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /**
 Concrete implementation of pqWidgetEventPlayer that translates high-level ParaView events into low-level Qt events.

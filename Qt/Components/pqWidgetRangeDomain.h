@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pq_WidgetRangeDomain_h
 
 #include <QObject>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class vtkSMProperty;
 class QWidget;

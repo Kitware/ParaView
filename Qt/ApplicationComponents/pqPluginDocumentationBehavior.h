@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPluginDocumentationBehavior_h
 
 #include <QObject>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class QHelpEngine;
 class vtkPVPlugin;

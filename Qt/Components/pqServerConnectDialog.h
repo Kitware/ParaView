@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqServerConnectDialog_h
 
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqServerResource.h"
 
 #include <QList>

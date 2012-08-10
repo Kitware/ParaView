@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqAboutDialog_h
 
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 namespace Ui { class pqAboutDialog; }
 

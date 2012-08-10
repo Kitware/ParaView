@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 #include <QPointer>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "ui_pqPluginDialog.h"
 
 class QTreeWidget;

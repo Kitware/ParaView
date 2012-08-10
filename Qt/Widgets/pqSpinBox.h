@@ -33,11 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSpinBox_h
 
 #include <QSpinBox>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 /// QSpinBox which fires editingFinished() signal when the value is changed
 /// by steps (increments).
-class QTWIDGETS_EXPORT pqSpinBox : public QSpinBox
+class PQWIDGETS_EXPORT pqSpinBox : public QSpinBox
 {
   Q_OBJECT
   typedef QSpinBox Superclass;

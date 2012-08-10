@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqServerConfiguration_h
 
 #include <QObject>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "vtkSmartPointer.h"
 
 class vtkPVXMLElement;

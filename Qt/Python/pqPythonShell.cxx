@@ -32,8 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPython.h> // python first
 
-#include "QtPythonConfig.h"
-
 #include "pqApplicationCore.h"
 #include "pqConsoleWidget.h"
 #include "pqPythonShell.h"

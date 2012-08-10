@@ -33,11 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqStandardPropertyWidgetInterface_h
 #define _pqStandardPropertyWidgetInterface_h
 
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 #include "pqPropertyWidgetInterface.h"
 
-class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface : public QObject, pqPropertyWidgetInterface
+class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardPropertyWidgetInterface : public QObject,
+  public pqPropertyWidgetInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqPropertyWidgetInterface)

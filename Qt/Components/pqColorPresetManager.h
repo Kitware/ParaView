@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqColorPresetManager_h
 
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QDialog>
 
 #include "pqColorMapModel.h" // for pqColorMapModel

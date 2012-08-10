@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqColorTableDelegate_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QAbstractItemDelegate>
 
 
-class QTWIDGETS_EXPORT pqColorTableDelegate : public QAbstractItemDelegate
+class PQWIDGETS_EXPORT pqColorTableDelegate : public QAbstractItemDelegate
 {
 public:
   pqColorTableDelegate(QObject *parent=0);

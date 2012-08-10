@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqColorScaleToolbar_h
 #define _pqColorScaleToolbar_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QObject>
 
 class pqColorScaleToolbarInternal;

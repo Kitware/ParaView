@@ -43,7 +43,7 @@ class vtkSMDomain;
 class vtkObject;
 class vtkCommand;
 class vtkEventQtSlotConnect;
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 /// adaptor to which combines cell & point arrays into one selection
 /// this adaptor also takes care of the domain, so there's no need to

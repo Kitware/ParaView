@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqTabbedMultiViewWidget_h
 
 #include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "vtkType.h" // needed for vtkIdType
 
 class pqProxy;

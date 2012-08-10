@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineSource_h
 #define _pqPipelineSource_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqProxy.h"
 
 class pqDataRepresentation;

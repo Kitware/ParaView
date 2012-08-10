@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSampleScalarWidget_h
 
 #include "pqSMProxy.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QWidget>
 #include <QModelIndex>

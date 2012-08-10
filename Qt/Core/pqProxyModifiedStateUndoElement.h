@@ -25,7 +25,7 @@
 #define __pqProxyModifiedStateUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqProxy;
 

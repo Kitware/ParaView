@@ -17,7 +17,7 @@
 
 #include "vtkCPPipeline.h"
 #include "vtkStdString.h"  // for the string
-#include "CPWin32Header.h" // For windows import/export of shared libraries
+#include "vtkCoProcessorImplementationModule.h" // For windows import/export of shared libraries
 
 class vtkCPDataDescription;
 class vtkCPPythonHelper;
@@ -29,7 +29,7 @@ class vtkCPPythonHelper;
 /// from other python modules.  Python is primarily set up in 
 /// vtkCPPythonHelper where it loads servermanager, the coprocessing library
 /// and the trivial producer used to get the grid into the script.
-class COPROCESSING_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
+class VTKCOPROCESSORIMPLEMENTATION_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
 {
 public:
   static vtkCPPythonScriptPipeline* New();

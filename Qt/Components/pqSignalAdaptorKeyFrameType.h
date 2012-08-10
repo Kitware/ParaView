@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSignalAdaptorKeyFrameType_h
 #define __pqSignalAdaptorKeyFrameType_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqSignalAdaptors.h"
 
 class vtkSMProxy;

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPropertiesPanel_h
 #define _pqPropertiesPanel_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include "vtkNew.h"
 #include "vtkEventQtSlotConnect.h"

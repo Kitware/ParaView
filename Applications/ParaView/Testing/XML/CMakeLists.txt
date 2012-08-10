@@ -14,12 +14,12 @@ SET (TESTS_WITH_INLINE_COMPARES
 )
 
 SET (TESTS_WITH_BASELINES)
-IF(NOT PARAVIEW_USE_VISITBRIDGE)
+if(NOT Module_vtkIOVisItBridge)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/AnalyzeReaderWriterPlugin.xml)
-ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
+else()
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
@@ -28,8 +28,21 @@ ELSE(NOT PARAVIEW_USE_VISITBRIDGE)
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
-ENDIF(NOT PARAVIEW_USE_VISITBRIDGE)
+endif()
 
+if(Module_vtkIOXdmf2)
+  SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
+    )
+endif()
 
 SET (TESTS_WITH_BASELINES
   ${TESTS_WITH_BASELINES}
@@ -77,7 +90,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/LoadStateMultiView.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
@@ -122,17 +134,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/VariableSelector1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ViewSettingsDialog.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfRead.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageData.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadImageDataCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadRectilinearGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGrid.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfReadStructuredGridCollection.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/XdmfGridAttributes.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYChart.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ZLibXDMF.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
@@ -226,6 +229,7 @@ set(UnstructuredOutline_USE_NEW_PANELS TRUE)
 set(VariableSelector1_USE_NEW_PANELS TRUE)
 set(VariableSelector_USE_NEW_PANELS TRUE)
 set(ViewSettingsDialog_USE_NEW_PANELS TRUE)
+set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)

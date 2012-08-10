@@ -1,10 +1,14 @@
-PROJECT(VisItReaderExample)
+cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
+if (NOT ParaView_BINARY_DIR)
+  find_package(ParaView REQUIRED)
+  include(${PARAVIEW_USE_FILE})
+endif()
 
-cmake_minimum_required(VERSION 2.8)
-IF( COMMAND CMAKE_POLICY )
-  CMAKE_POLICY( SET CMP0003 NEW )
-ENDIF( COMMAND CMAKE_POLICY )
+if (NOT TARGET vtkIOVisItBridge)
+  message(FATAL_ERROR
+    "Please rebuild ParaView with VisIt reader support enabled.")
+endif()
 
 FIND_PACKAGE(ParaView REQUIRED)
 INCLUDE(${PARAVIEW_USE_FILE})

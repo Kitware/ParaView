@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqThresholdPanel_h
 
 #include "pqNamedObjectPanel.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 class pqDoubleRangeWidget;
 
 class PQCOMPONENTS_EXPORT pqThresholdPanel :

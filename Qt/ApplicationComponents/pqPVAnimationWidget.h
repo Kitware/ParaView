@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPVAnimationWidget_h
 
 #include "pqAnimationViewWidget.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// pqPVAnimationWidget is subclass of pqAnimationViewWidget that connects with
 /// the pqAnimationManager maintained by pqPVApplicationCore.

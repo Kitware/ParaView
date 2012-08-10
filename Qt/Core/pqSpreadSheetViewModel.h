@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractTableModel>
 #include <QPair>
 #include <QSet>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "vtkType.h" // needed for vtkIdType.
 
 /// This is the model used by SpreadSheetView to show the data. This model works

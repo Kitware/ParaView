@@ -20,6 +20,9 @@
 #
 # build_paraview_client_cpack_config()
 #
+message(WARNING "ParaViewBrandingCPack.cmake is deprecated. "
+  "Applications are expected to manage their own cpack rules by "
+  "including CPack.cmake from CMake directly")
 
 MACRO(build_paraview_client_cpack_config_init)
   PV_PARSE_ARGUMENTS("BCC"

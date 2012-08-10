@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqOutputPortComboBox_h
 
 #include <QComboBox>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqOutputPort;
 class pqPipelineSource;

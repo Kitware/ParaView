@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqActivePlotMatrixViewOptions_h
 #define _pqActivePlotMatrixViewOptions_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqActiveViewOptions.h"
 
 class pqOptionsDialog;

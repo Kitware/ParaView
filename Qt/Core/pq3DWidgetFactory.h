@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pq3DWidgetFactory_h
 #define __pq3DWidgetFactory_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 
 class pq3DWidgetFactoryInternal;

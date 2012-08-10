@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerResource_h
 #define _pqServerResource_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 #include <QString>
 

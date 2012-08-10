@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QVariant>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqSMProxy.h"
 
 class vtkSMProxy;

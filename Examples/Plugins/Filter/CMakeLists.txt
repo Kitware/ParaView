@@ -1,10 +1,11 @@
+cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+if (NOT ParaView_BINARY_DIR)
+  find_package(ParaView REQUIRED)
+  include(${PARAVIEW_USE_FILE})
+endif()
 
-IF(NOT ParaView_BINARY_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF(NOT ParaView_BINARY_DIR)
+include(ParaViewPlugins)
 
 # create a paraview plugin containing server manager xml and the server
 # manager classes to build

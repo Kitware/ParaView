@@ -1,18 +1,15 @@
-[submodule "IceT"]
-	path = Utilities/IceT
-	url = git://paraview.org/IceT.git
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
-[submodule "Xdmf"]
-	path = Utilities/Xdmf2
-	url = git://paraview.org/Xdmf.git
-[submodule "Utilities/protobuf"]
-	path = Utilities/protobuf
-	url = git://public.kitware.com/protobuf.git
-[submodule "Qt/Testing"]
-	path = Qt/Testing
-	url = git://paraview.org/QtTesting.git
 [submodule "Utilities/VisItBridge"]
 	path = Utilities/VisItBridge
 	url = git://paraview.org/VisItBridge.git
+[submodule "ThirdParty/IceT/vtkicet"]
+	path = ThirdParty/IceT/vtkicet
+	url = git://paraview.org/IceT.git
+[submodule "ThirdParty/protobuf/vtkprotobuf"]
+	path = ThirdParty/protobuf/vtkprotobuf
+	url = git://public.kitware.com/protobuf.git
+[submodule "ThirdParty/QtTesting/vtkqttesting"]
+	path = ThirdParty/QtTesting/vtkqttesting
+	url = git://paraview.org/QtTesting.git

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCameraToolbar_h
 
 #include <QToolBar>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 #include "vtkWeakPointer.h"
 
 class pqRubberBandHelper;

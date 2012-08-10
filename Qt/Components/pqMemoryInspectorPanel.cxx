@@ -22,7 +22,6 @@ using Ui::pqMemoryInspectorPanelForm;
 // print a process table to stderr during initialization
 // #define MIP_PROCESS_TABLE
 
-#include "pqComponentsExport.h"
 #include "pqActiveObjects.h"
 
 #include "vtkProcessModule.h"

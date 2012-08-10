@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <QtPlugin>
+#include "pqCoreModule.h"
 
 /// Abstract interface for "auto-start" plugins. An auto-start plugin is a
 /// plugin that is notified by ParaView when ParaView starts and exits. 
@@ -66,10 +67,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// the \c startup() is called immediately after the plugin is loaded. When the
 /// applicaiton is about to exit or if the plugin is about to be unloaded, 
 /// \c shutdown() is called on all the registered /// interfaces.
-class pqAutoStartInterface
+class PQCORE_EXPORT pqAutoStartInterface
 {
 public:
-  virtual ~pqAutoStartInterface() {}
+  virtual ~pqAutoStartInterface();
 
   /// Called once after the ParaView starts. If ParaView is already running when
   /// the plugin is loaded, this method will be called when the plugin is loaded.
@@ -79,9 +80,10 @@ public:
   virtual void shutdown() = 0;
 
 protected:
-  pqAutoStartInterface() {}
-  pqAutoStartInterface(const pqAutoStartInterface&);
-  pqAutoStartInterface& operator=(const pqAutoStartInterface&);
+  pqAutoStartInterface();
+
+private:
+Q_DISABLE_COPY(pqAutoStartInterface)
 };
 
 Q_DECLARE_INTERFACE(pqAutoStartInterface, "com.kitware/paraview/autostart")

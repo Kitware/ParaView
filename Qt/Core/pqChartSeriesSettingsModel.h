@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqChartSeriesSettingsModel_h
 
 #include "pqCheckableHeaderModel.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QColor>
 
 class vtkTable;

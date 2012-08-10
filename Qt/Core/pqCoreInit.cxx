@@ -31,15 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 
 #include "pqCoreInit.h"
+#include "vtkPVConfig.h"
 #include <QObject>
 #include <QtPlugin>
 
 void pqCoreInit()
 {
-#ifndef PARAVIEW_BUILD_SHARED_LIBS
+#ifndef BUILD_SHARED_LIBS
   Q_INIT_RESOURCE(pqCore);
   Q_INIT_RESOURCE(QtWidgets);
-  Q_IMPORT_PLUGIN(QtWidgets);
 #endif
 }
 

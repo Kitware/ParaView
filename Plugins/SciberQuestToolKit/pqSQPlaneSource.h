@@ -11,7 +11,6 @@ Copyright 2012 SciberQuest Inc.
 #define pqSQPlaneSource_h
 
 #include "pqNamedObjectPanel.h"
-#include "pqComponentsExport.h"
 
 #include "ui_pqSQPlaneSourceForm.h"
 using Ui::pqSQPlaneSourceForm;

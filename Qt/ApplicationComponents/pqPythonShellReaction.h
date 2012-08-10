@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqPythonShellReaction_h
 
 #include "pqReaction.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// @ingroup Reactions
 /// pqPythonShellReaction is a reaction to handle showing of the python shell.

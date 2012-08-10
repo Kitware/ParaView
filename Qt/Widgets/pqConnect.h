@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqConnect_h
 #define _pqConnect_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 class QObject;
 
@@ -47,7 +47,7 @@ class QObject;
   \sa pqSetName, pqSetData
 */
   
-struct QTWIDGETS_EXPORT pqConnect
+struct PQWIDGETS_EXPORT pqConnect
 {
   pqConnect(const char* Signal, const QObject* Receiver, const char* Method);
   

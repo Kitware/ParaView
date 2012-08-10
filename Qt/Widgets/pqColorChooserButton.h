@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pq_ColorChooserButton_h
 #define pq_ColorChooserButton_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 #include <QToolButton>
 #include <QColor>
 
 /// 
-class QTWIDGETS_EXPORT pqColorChooserButton : public QToolButton
+class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
 {
   Q_OBJECT
   Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor)

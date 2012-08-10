@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogEventTranslator_h
 
 #include <pqWidgetEventTranslator.h>
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QPointer>
 
 class pqFileDialog;

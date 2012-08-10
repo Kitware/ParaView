@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
+#include "vtkPVConfig.h"
 
 #include "pqOptions.h"
 #include "pqActiveObjects.h"
@@ -46,6 +47,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pvStaticPluginsInit.h"
 #endif
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+# include "paraviewpythonmodules.h"
+#endif
+
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
 };
@@ -53,13 +58,11 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
+#ifdef PARAVIEW_ENABLE_PYTHON
+  CMakeLoadAllPythonModules();
+#endif
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
-
-  // load static plugins
-#ifndef BUILD_SHARED_LIBS
-  paraview_static_plugins_init();
-#endif
 
   // Setup default GUI layout.
   this->setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
@@ -146,6 +149,11 @@ ParaViewMainWindow::ParaViewMainWindow()
   // Final step, define application behaviors. Since we want all ParaView
   // behaviors, we use this convenience method.
   new pqParaViewBehaviors(this, this);
+
+  // load static plugins
+#ifndef BUILD_SHARED_LIBS
+  paraview_static_plugins_init();
+#endif
 }
 
 //-----------------------------------------------------------------------------

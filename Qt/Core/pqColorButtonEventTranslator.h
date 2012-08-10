@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqColorButtonEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QColor>
 
 /// pqColorButtonEventTranslator translates events on pqColorChooserButton 

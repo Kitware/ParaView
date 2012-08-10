@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqDelimitedTextParser_h
 #define _pqDelimitedTextParser_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 
 class QIODevice;
@@ -47,7 +47,7 @@ class QIODevice;
   contained within the file.
 */
 
-class QTWIDGETS_EXPORT pqDelimitedTextParser :
+class PQWIDGETS_EXPORT pqDelimitedTextParser :
   public QObject
 {
   Q_OBJECT

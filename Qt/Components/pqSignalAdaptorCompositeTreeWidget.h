@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QVariant>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 
 class pqTreeWidgetItem;

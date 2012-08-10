@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqColorButtonEventPlayer_h
 
 #include "pqWidgetEventPlayer.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 /// pqColorButtonEventPlayer is the player for pqColorChooserButton.
 class PQCORE_EXPORT pqColorButtonEventPlayer : public pqWidgetEventPlayer

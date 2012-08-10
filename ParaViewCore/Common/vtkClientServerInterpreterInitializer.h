@@ -27,10 +27,11 @@
 #define __vtkClientServerInterpreterInitializer_h
 
 #include "vtkObject.h"
+#include "vtkPVCommonModule.h" // needed for export macro
 
 class vtkClientServerInterpreter;
 
-class VTK_EXPORT vtkClientServerInterpreterInitializer : public vtkObject
+class VTKPVCOMMON_EXPORT vtkClientServerInterpreterInitializer : public vtkObject
 {
 public:
   vtkTypeMacro(vtkClientServerInterpreterInitializer, vtkObject);

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCustomFilterDefinitionModel_h
 
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QAbstractItemModel>
 
 class pqCustomFilterDefinitionModelItem;

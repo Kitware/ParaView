@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqUndoStackBuilder_h
 
 #include "vtkSMUndoStackBuilder.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "vtkSMMessageMinimal.h"
 
 class vtkCommand;

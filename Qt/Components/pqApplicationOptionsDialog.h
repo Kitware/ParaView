@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqApplicationOptionsDialog_h
 
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqOptionsDialog.h"
 
 /// pqApplicationOptionsDialog dialog class that allows editing of application

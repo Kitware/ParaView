@@ -32,7 +32,7 @@
 #define _pqDisplayArrayWidget_h
 
 #include "pqVariableType.h"
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 #include <QWidget>
 #include <QPointer>

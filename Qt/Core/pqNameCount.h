@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqNameCount_h
 
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqNameCountInternal;
 class QString;

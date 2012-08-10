@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPythonScriptEditor_h
 #define _pqPythonScriptEditor_h
 
-#include "QtPythonExport.h"
+#include "pqPythonModule.h"
 #include <QMainWindow>
 
 class QAction;
@@ -41,7 +41,7 @@ class QTextEdit;
 
 class pqPythonManager;
 
-class QTPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
+class PQPYTHON_EXPORT pqPythonScriptEditor : public QMainWindow
 {
     Q_OBJECT
 

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTabWidget>
 #include <QPointer>
 #include <QList>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqSILModel;
 class pqTreeView;

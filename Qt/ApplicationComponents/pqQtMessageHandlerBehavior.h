@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqQtMessageHandlerBehavior_h
 
 #include <QObject>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 /// @ingroup Behaviors
 /// pqQtMessageHandlerBehavior install a message handler to capture Qt

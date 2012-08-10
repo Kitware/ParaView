@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqAnimationViewWidget_h
 #define __pqAnimationViewWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QWidget>
 
 class pqAnimationKeyFrame;

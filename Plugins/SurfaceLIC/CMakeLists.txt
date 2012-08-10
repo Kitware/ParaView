@@ -1,6 +1,5 @@
 INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
+  ${VTK_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
@@ -10,8 +9,6 @@ SET( MOC_SRCS )
 SET( UI_SRCS )
 
 IF (PARAVIEW_BUILD_QT_GUI)
-
-  INCLUDE( ${QT_USE_FILE} )
 
   QT4_WRAP_CPP( MOC_SRCS 
     pqSurfaceLICDisplayPanelDecorator.h
@@ -23,17 +20,6 @@ IF (PARAVIEW_BUILD_QT_GUI)
     pqSurfaceLICSummaryDisplayPanel.ui
     )
     
-  INCLUDE_DIRECTORIES(
-    ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
-    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-    ${QtWidgets_BINARY_DIR}
-    ${QtWidgets_SOURCE_DIR}
-    
-    ${pqComponents_BINARY_DIR}
-    ${pqComponents_SOURCE_DIR}
-    ${pqCore_BINARY_DIR}
-    ${pqCore_SOURCE_DIR}
-    )
     
   SET( SURFACE_LIC_SOURCES
     pqSurfaceLICDisplayPanelDecorator.cxx

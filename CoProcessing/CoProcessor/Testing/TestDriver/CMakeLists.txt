@@ -1,19 +1,4 @@
 PROJECT(TestDriver)
-cmake_minimum_required(VERSION 2.6)
-
-#--------------------------------------------------
-# Find and Use ParaView
-#--------------------------------------------------
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
 
 include_directories(
   ${TestDriver_SOURCE_DIR} 
@@ -54,7 +39,7 @@ SET_SOURCE_FILES_PROPERTIES(
 ADD_LIBRARY(vtkCPTestDriver
   ${TestDriver_SRCS} 
 )
-TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessor vtkFiltersCore)
+TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessorImplementation vtkFiltersCore)
 
 IF (VTK_WRAP_PYTHON)
   # Create Python bindings for the co-processing library
@@ -78,15 +63,8 @@ IF (VTK_WRAP_PYTHON)
 
   # Create a python module that can be loaded dynamically.  It links to
   # the shared library containing the wrappers for this kit.
-  PYTHON_ADD_MODULE(vtkCPTestDriverPython vtkCPTestDriverPythonInit.cxx)
+  _vtk_add_python_module(vtkCPTestDriverPython vtkCPTestDriverPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkCPTestDriverPython vtkCPTestDriverPythonD)
-
-  # Python extension modules on Windows must have the extension ".pyd"
-  # instead of ".dll" as of Python 2.5.  Older python versions do support
-  # this suffix.
-  IF(WIN32 AND NOT CYGWIN)
-    SET_TARGET_PROPERTIES(vtkCPTestDriverPython PROPERTIES SUFFIX ".pyd")
-  ENDIF(WIN32 AND NOT CYGWIN)
 
   IF(WIN32 OR APPLE)
     TARGET_LINK_LIBRARIES (vtkCPTestDriverPython ${PYTHON_LIBRARIES})

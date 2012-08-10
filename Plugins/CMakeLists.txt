@@ -1,18 +1,9 @@
-INCLUDE(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
+include(ParaViewPlugins)
 
-# We setup the standard include directories that would be needed by all plugins
-# anyways.
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${PARAVIEW_GUI_INCLUDE_DIRS})
-IF (PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE})
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIR}
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS})
-ENDIF()
+include_directories(${VTK_INCLUDE_DIRS})
+if (PARAVIEW_BUILD_QT_GUI AND QT_USE_FILE)
+  include(${QT_USE_FILE})
+endif()
 
 MACRO(paraview_build_optional_plugin name comment subdirectory default)
   OPTION(PARAVIEW_BUILD_PLUGIN_${name} "Build ${comment}" ${default})
@@ -28,6 +19,7 @@ ENDMACRO(paraview_build_optional_plugin)
 
 paraview_build_optional_plugin(EyeDomeLighting "EyeDomeLighting" EyeDomeLighting OFF)
 paraview_build_optional_plugin(Manta "Manta ray traced rendering" Manta OFF)
+paraview_build_optional_plugin(MultiSliceView "Multi-Slice 3D view rendering" MultiSliceView ON)
 paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields" Moments ON)
 paraview_build_optional_plugin(NonOrthogonalSource "Non Orthogonal Source code sample" NonOrthogonalSource ON)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
@@ -40,7 +32,7 @@ endif()
 
 # The PointSprite plugin does not build in static mode therefore we make sure it is disable
 if(BUILD_SHARED_LIBS)
-  paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON)
+  paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite OFF)
 else(BUILD_SHARED_LIBS)
   set(PARAVIEW_BUILD_PLUGIN_PointSprite OFF CACHE BOOL "Must be disable in static build" FORCE)
 endif(BUILD_SHARED_LIBS)
@@ -50,7 +42,7 @@ IF(PARAVIEW_ENABLE_PYTHON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 paraview_build_optional_plugin(SierraPlotTools "SierraPlotTools" SierraPlotTools ON)
 paraview_build_optional_plugin(SLACTools "SLACTools" SLACTools ON)
-paraview_build_optional_plugin(StreamingView "Streaming View" StreamingView ON)
+paraview_build_optional_plugin(StreamingView "Streaming View" StreamingView OFF)
 paraview_build_optional_plugin( SurfaceLIC "SurfaceLIC" SurfaceLIC ON )
 paraview_build_optional_plugin(VaporPlugin "Plugin to read NCAR VDF files" Vapor OFF)
 paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartReader ON)

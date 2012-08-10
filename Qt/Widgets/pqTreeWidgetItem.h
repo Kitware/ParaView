@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqTreeWidgetItem_h 
 #define __pqTreeWidgetItem_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QTreeWidgetItem>
 
 /// pqTreeWidgetItem is a QTreeWidgetItem with callbacks for whenever the data
 /// for the pqTreeWidgetItem changes. This is designed as a replacement for
 /// pqTreeWidgetItemObject avoid the need for pqTreeWidgetItem to be a QObject
 /// subclass, thus keeping them light-weight.
-class QTWIDGETS_EXPORT pqTreeWidgetItem : public QTreeWidgetItem
+class PQWIDGETS_EXPORT pqTreeWidgetItem : public QTreeWidgetItem
 {
   typedef QTreeWidgetItem Superclass;
 public:

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDisplayProxyEditorWidget_h
 
 #include <QWidget>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqDisplayPanel.h"
 
 class pqOutputPort;

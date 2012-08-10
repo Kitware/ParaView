@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 #include "pqPropertyLinks.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class pqRepresentation;
 

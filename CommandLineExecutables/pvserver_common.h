@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVConfig.h"
 
 #ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
+# include "pvStaticPluginsInit.h"
 #endif
 
 static bool RealMain(int argc, char* argv[],

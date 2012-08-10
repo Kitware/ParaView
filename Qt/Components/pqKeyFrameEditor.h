@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QDialog>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqAnimationCue;
 class pqAnimationScene;

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTreeWidget>
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class PQCOMPONENTS_EXPORT pqPluginTreeWidget : public QTreeWidget
 {

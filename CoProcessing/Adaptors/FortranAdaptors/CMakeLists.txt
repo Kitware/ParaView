@@ -1,25 +1,5 @@
-project(FortranAdaptor)
-cmake_minimum_required(VERSION 2.6)
-include_directories(${CoProcessor_SOURCE_DIR})
-
-#--------------------------------------------------
-# Find and Use ParaView
-#--------------------------------------------------
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
-
 # Attempt to detect if we have a Fortran Compiler available.
 include(${ParaView_SOURCE_DIR}/SuperBuild/CheckFortran.cmake)
-
-include_directories(${FortranAdaptor_BINARY_DIR} ${CoProcessor_BINARY_DIR})
 
 if(CMAKE_Fortran_COMPILER)
   ENABLE_LANGUAGE(Fortran)
@@ -32,18 +12,13 @@ if(CMAKE_Fortran_COMPILER)
   set(COPROCESSOR_MANGLE_FORTRAN 1)
 endif()
 
-CONFIGURE_FILE("${CoProcessing_SOURCE_DIR}/Adaptors/FortranAdaptors/CPUseFortran.h.in"
-               "${FortranAdaptor_BINARY_DIR}/CPUseFortran.h"
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CPUseFortran.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/CPUseFortran.h"
                @ONLY IMMEDIATE)
 
-set(FortranAdaptor_SRCS
+vtk_module_library(${vtk-module}
   FortranAdaptorAPI.cxx
-)
-
-add_library(FortranAdaptor ${FortranAdaptor_SRCS})
-target_link_libraries(
-  FortranAdaptor vtkCoProcessor
-)
+  CPUseFortran.h)
 
 if(CMAKE_Fortran_COMPILER)
   option(BUILD_PHASTA_ADAPTOR "Build Phasta Adaptor" OFF)

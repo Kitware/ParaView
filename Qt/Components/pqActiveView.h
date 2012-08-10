@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqActiveView_h
 
 #include <QObject>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "vtkWeakPointer.h"
 #include "vtkSmartPointer.h"
 

@@ -1,0 +1,91 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVInitializer.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// THIS IS A GENERATED FILE -- DO NOT EDIT ---
+#ifndef __vtkPVInitializer_h
+#define __vtkPVInitializer_h
+#include "vtkPVConfig.h"
+#include "vtkSMGeneratedModules.h" // vtkPVConfig must be included before this
+                                   // file.
+
+#include "vtkPVPlugin.h"
+#include "vtkPVServerManagerPluginInterface.h"
+
+class vtkClientServerInterpreter;
+
+@vtk-module-init-functions@
+void PARAVIEW_CSSTREAMS_INITIALIZE(vtkClientServerInterpreter* interp)
+{
+@vtk-module-init-calls@
+}
+
+class vtkPVInitializerPlugin : public vtkPVPlugin,
+  public vtkPVServerManagerPluginInterface
+{
+  // Description:
+  // Returns the name for this plugin.
+  virtual const char* GetPluginName()
+    {return "vtkPVInitializerPlugin"; }
+
+  // Description:
+  // Returns the version for this plugin.
+  virtual const char* GetPluginVersionString() { return "0.0"; }
+
+  // Description:
+  // Returns true if this plugin is required on the server.
+  virtual bool GetRequiredOnServer() { return false; }
+
+  // Description:
+  // Returns true if this plugin is required on the client.
+  virtual bool GetRequiredOnClient() {return false;}
+
+  // Description:
+  // Returns a ';' separated list of plugin names required by this plugin.
+  virtual const char* GetRequiredPlugins() { return ""; }
+
+  // Description:
+  // Provides access to binary resources compiled into the plugin.
+  // This is primarily used to compile in icons and compressed help project
+  // (qch) files into plugins.
+  virtual void GetBinaryResources(std::vector<std::string>&) {}
+
+  // Description:
+  // Obtain the server-manager configuration xmls, if any.
+  virtual void GetXMLs(std::vector<std::string> &xmls)
+    {
+    (void) xmls;
+    char* init_string = NULL;
+    @xml_init_code@
+    (void) init_string;
+    }
+
+  // Description:
+  // Returns the callback function to call to initialize the interpretor for the
+  // new vtk/server-manager classes added by this plugin. Returning NULL is
+  // perfectly valid.
+  virtual vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
+    GetInitializeInterpreterCallback()
+      {
+      return PARAVIEW_CSSTREAMS_INITIALIZE;
+      }
+};
+
+void PARAVIEW_INITIALIZE()
+{
+  static vtkPVInitializerPlugin instance;
+  vtkPVPlugin::ImportPlugin(&instance);
+}
+
+#endif
+// THIS IS A GENERATED FILE -- DO NOT EDIT ---

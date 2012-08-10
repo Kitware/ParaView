@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqKeyFrameTypeWidget_h
 #define __pqKeyFrameTypeWidget_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include <QWidget>
 class QComboBox;
 

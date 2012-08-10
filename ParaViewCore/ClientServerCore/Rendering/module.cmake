@@ -1,0 +1,13 @@
+vtk_module(vtkPVClientServerCoreRendering
+  GROUPS
+    ParaViewRendering
+  DEPENDS
+    vtkDomainsChemistry
+    vtkFiltersAMR
+    vtkPVClientServerCoreCore
+    vtkPVVTKExtensionsRendering
+    vtkRenderingLabel
+    vtkViewsContext2D
+    vtkViewsCore
+    vtkRenderingVolumeOpenGL
+)

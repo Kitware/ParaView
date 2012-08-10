@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqUndoStack_h
 #define __pqUndoStack_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QObject>
 
 class pqServer;

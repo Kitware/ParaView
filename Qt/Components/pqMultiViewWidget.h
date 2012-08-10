@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QUuid>
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 
 class pqProxy;
 class pqView;

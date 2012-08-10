@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqStandardViewFrameActionGroup_h
 
 #include "pqViewFrameActionGroup.h"
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 
 class QWidget;
 class pqViewFrame;

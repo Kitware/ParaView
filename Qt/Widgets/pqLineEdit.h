@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqLineEdit_h
 
 #include <QLineEdit>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 /// pqLineEdit is a specialization of QLineEdit which provide a new property
 /// 'text2'. When the text on the line widget is set using this 'text2' property
 /// (or using setTextAndResetCursor()), the after the set, the cursor position
 /// is reset to 0.
-class QTWIDGETS_EXPORT pqLineEdit : public QLineEdit
+class PQWIDGETS_EXPORT pqLineEdit : public QLineEdit
 {
   Q_OBJECT
   Q_PROPERTY(QString text2 READ text WRITE setTextAndResetCursor)

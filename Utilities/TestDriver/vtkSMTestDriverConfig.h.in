@@ -1,0 +1,41 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkSMTestDriverConfig.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#cmakedefine VTK_MPIRUN_EXE "@VTK_MPIRUN_EXE@"
+#cmakedefine VTK_MPI_PRENUMPROC_FLAGS "@VTK_MPI_PRENUMPROC_FLAGS@"
+#cmakedefine VTK_MPI_NUMPROC_FLAG "@VTK_MPI_NUMPROC_FLAG@"
+#cmakedefine VTK_MPI_PREFLAGS "@VTK_MPI_PREFLAGS@"
+#cmakedefine VTK_MPI_POSTFLAGS "@VTK_MPI_POSTFLAGS@"
+#cmakedefine VTK_MPI_SERVER_PREFLAGS "@VTK_MPI_SERVER_PREFLAGS@"
+#cmakedefine VTK_MPI_SERVER_POSTFLAGS "@VTK_MPI_SERVER_POSTFLAGS@"
+#cmakedefine VTK_MPI_SERVER_TD_PREFLAGS "@VTK_MPI_SERVER_TD_PREFLAGS@"
+#cmakedefine VTK_MPI_SERVER_TD_POSTFLAGS "@VTK_MPI_SERVER_TD_POSTFLAGS@"
+#cmakedefine VTK_MPI_MAX_NUMPROCS @VTK_MPI_MAX_NUMPROCS@
+#cmakedefine PARAVIEW_USE_MPI
+#cmakedefine PV_TEST_INIT_COMMAND "@PV_TEST_INIT_COMMAND@"
+#cmakedefine PV_TEST_CLEAN_COMMAND "@PV_TEST_CLEAN_COMMAND@"
+
+// host name for the client used when running reverse connect test.
+#cmakedefine PV_TEST_CLIENT "@PV_TEST_CLIENT@"
+
+// ssh command to connect to remote machine, usually ssh -l kitware dash8
+#cmakedefine PV_SSH_FLAGS "@PV_SSH_FLAGS@"
+
+// shell script to execute server, should contain proper port...
+// This line won't be split into smaller arguments
+#cmakedefine PV_SETUP_SCRIPT "@PV_SETUP_SCRIPT@"
+
+// if defined we use random port numbers for testing (needed for parallel
+// tests).
+#cmakedefine PV_TEST_USE_RANDOM_PORTS

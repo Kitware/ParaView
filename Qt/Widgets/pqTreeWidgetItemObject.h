@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqTreeWidgetItemObject_h
 #define _pqTreeWidgetItemObject_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QObject>
 #include <QTreeWidgetItem>
 
 /// QTreeWidgetItem subclass with additional signals, slots, and properties
-class QTWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidgetItem
+class PQWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidgetItem
 {
   Q_OBJECT
   Q_PROPERTY(bool checked READ isChecked WRITE setChecked)

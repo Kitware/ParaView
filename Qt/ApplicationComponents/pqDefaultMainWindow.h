@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqDefaultMainWindow_h
 
 #include <QMainWindow>
-#include "pqApplicationComponentsExport.h"
+#include "pqApplicationComponentsModule.h"
 class PQAPPLICATIONCOMPONENTS_EXPORT pqDefaultMainWindow : public QMainWindow
 {
   Q_OBJECT

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSetData_h
 #define _pqSetData_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 #include <QVariant>
 
 /**
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   \sa pqSetName, pqConnect
 */
   
-struct QTWIDGETS_EXPORT pqSetData
+struct PQWIDGETS_EXPORT pqSetData
 {
   pqSetData(const QVariant& Data);
   const QVariant Data;

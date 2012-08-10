@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqXMLUtil_h
 
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include <QList>
 #include <QString>
 

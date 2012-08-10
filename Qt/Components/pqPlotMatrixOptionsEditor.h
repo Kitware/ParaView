@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPlotMatrixOptionsEditor_h
 #define _pqPlotMatrixOptionsEditor_h
 
-#include "pqComponentsExport.h"
+#include "pqComponentsModule.h"
 #include "pqOptionsContainer.h"
 #include "pqChartValue.h"
 

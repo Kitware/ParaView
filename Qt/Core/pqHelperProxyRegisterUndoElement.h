@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqHelperProxyRegisterUndoElement_h
 
 #include "vtkSMUndoElement.h"
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 
 class pqProxy;
 

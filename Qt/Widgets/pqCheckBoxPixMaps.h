@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QPixmap>
-#include "QtWidgetsExport.h"
+#include "pqWidgetsModule.h"
 
 class QWidget;
 
 /// pqCheckBoxPixMaps is a helper class that can used to create pixmaps for
 /// checkboxs in various states. This is useful for showing checkboxes in qt-views.
-class QTWIDGETS_EXPORT pqCheckBoxPixMaps : public QObject
+class PQWIDGETS_EXPORT pqCheckBoxPixMaps : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;

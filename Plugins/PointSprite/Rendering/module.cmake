@@ -1,0 +1,10 @@
+vtk_module(vtkPointSpriteRendering
+  DEPENDS
+    vtkFiltersHybrid
+    vtkRenderingOpenGL
+    vtkImagingCore
+    vtkInteractionStyle
+    vtkRenderingFreeTypeOpenGL
+  COMPILE_DEPENDS
+    vtkUtilitiesEncodeString
+  EXCLUDE_FROM_WRAP_HIERARCHY)

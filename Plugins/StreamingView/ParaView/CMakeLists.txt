@@ -1,20 +1,10 @@
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIR}
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${vtkStreaming_SOURCE_DIR}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
+include_directories(
+  ${VTK_INCLUDE_DIRS}
+  ${StreamingView_SOURCE_DIR}/VTK
+  ${StreamingView_BINARY_DIR}/VTK
+)
 
-IF(PARAVIEW_BUILD_QT_GUI)
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    )
-  INCLUDE(${QT_USE_FILE})
-
+if (PARAVIEW_BUILD_QT_GUI)
   QT4_WRAP_CPP(MOC_SRCS
     IteratingView.h
     PrioritizingView.h
@@ -74,8 +64,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     INSPECTOR_IFACE1 INSPECTOR_IFACE1_SRCS
     CLASS_NAME pqStreamingControls
     DOCK_AREA Left)
-
-ENDIF()
+endif()
 
 add_paraview_plugin(
   StreamingView "2.0"
@@ -114,7 +103,6 @@ add_paraview_plugin(
     PrioritizingView.cxx
     RefiningView.cxx
     pqStreamingControls.cxx
-  CS_KITS vtkStreaming
 )
 
-TARGET_LINK_LIBRARIES ( StreamingView vtkStreamingCS )
+TARGET_LINK_LIBRARIES (StreamingView vtkStreaming)

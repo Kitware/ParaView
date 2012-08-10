@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineFilter_h
 #define _pqPipelineFilter_h
 
-#include "pqCoreExport.h"
+#include "pqCoreModule.h"
 #include "pqPipelineSource.h"
 #include <QMap>
 

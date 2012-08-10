@@ -1,0 +1,122 @@
+#==========================================================================
+#
+#     Program: ParaView
+#
+#     Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+#     All rights reserved.
+#
+#     ParaView is a free software; you can redistribute it and/or modify it
+#     under the terms of the ParaView license version 1.2.
+#
+#     See License_v1.2.txt for the full ParaView license.
+#     A copy of this license can be obtained by contacting
+#     Kitware Inc.
+#     28 Corporate Drive
+#     Clifton Park, NY 12065
+#     USA
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#==========================================================================
+set (Module_SRCS
+  vtkInitializationHelper.cxx
+)
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkInitializationHelper
+  ABSTRACT
+  )
+
+vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
+
+#------------------------------------------------------------------------------
+# Generate ServerManager (xml and CS stream) initialization header.
+#------------------------------------------------------------------------------
+set(vtk-module-init-functions)
+set(vtk-module-init-calls)
+set(_dependencies)
+foreach (_module ${VTK_MODULES_ENABLED})
+  if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
+      NOT ${_module}_IS_TEST AND
+      NOT ${_module}_THIRD_PARTY AND
+        (NOT _module STREQUAL "vtkPVServerManagerApplication") )
+    #message("${_module} == Adding")
+    set(vtk-module-init-functions
+      "${vtk-module-init-functions}extern \"C\" void ${_module}CS_Initialize(vtkClientServerInterpreter*);\n")
+    set(vtk-module-init-calls
+      "${vtk-module-init-calls}  ${_module}CS_Initialize(interp);\n")
+
+    list(APPEND _dependencies ${_module}CS)
+  endif()
+endforeach()
+
+# Add link-dependencies on all wrapping classes.
+target_link_libraries(vtkPVServerManagerApplication
+  LINK_PRIVATE ${_dependencies}
+  LINK_PUBLIC vtkPVServerManagerDefault)
+
+#------------------------------------------------------------------------------
+# Setup SM xmls. 
+#------------------------------------------------------------------------------
+SET(resourceFiles
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/filters.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/views_and_representations.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
+  ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
+  )
+
+if (PARAVIEW_ENABLE_PYTHON)
+  list(APPEND resourceFiles
+      ${CMAKE_CURRENT_SOURCE_DIR}/Resources/pythonfilter.xml
+  )
+endif(PARAVIEW_ENABLE_PYTHON)
+set (PARAVIEW_SERVERMANAGER_XMLS ${resourceFiles}
+    CACHE INTERNAL "Server Manager XMLs")
+
+get_target_property(kwprocessXML_location kwProcessXML LOCATION)
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+  DEPENDS ${resourceFiles} kwProcessXML
+  COMMAND ${kwprocessXML_location}
+       ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
+       vtkSMDefaultModules Interface GetInterfaces
+       ${resourceFiles}
+  COMMENT "Generating headers for ServerManager XMLs")
+set_source_files_properties(vtkInitializationHelper.cxx
+  PROPERTIES OBJECT_DEPENDS
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
+
+set (xml_init_code "")
+foreach(rf ${resourceFiles})
+  string(REGEX REPLACE "^.*/(.*).(xml|pvsm)$" "\\1" moduleName "${rf}")
+  set (oneModule
+"  init_string =  vtkSMDefaultModules${moduleName}GetInterfaces();
+  xmls.push_back(init_string);
+  delete[] init_string; init_string = NULL;")
+  set(xml_init_code
+    "${xml_init_code}\n${oneModule}")
+endforeach()
+
+#------------------------------------------------------------------------------
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkPVInitializer.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVInitializer.h
+  @ONLY)
+#------------------------------------------------------------------------------

@@ -8,10 +8,7 @@
 #--------------------------------------------------
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS}
     ${MPI_INCLUDE_PATH}
   )
   
@@ -29,12 +26,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
    IF(QT4_FOUND)
       INCLUDE(${QT_USE_FILE})
 
-      INCLUDE_DIRECTORIES(${PARAVIEW_INCLUDE_DIRS}
-                          ${VTK_INCLUDE_DIR}
-                          ${pqCore_BINARY_DIR}
-                          ${pqCore_SOURCE_DIR}
-                          ${pqComponents_BINARY_DIR}
-                          ${pqComponents_SOURCE_DIR}
+      INCLUDE_DIRECTORIES(
+                          ${VTK_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
        )
       
