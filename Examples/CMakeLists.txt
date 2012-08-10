@@ -10,10 +10,6 @@ add_subdirectory(Plugins/SMProxy)
 add_subdirectory(Plugins/Representation)
 add_subdirectory(Plugins/HiddenLinesRemoval)
 
-#if (TARGET vtkIOVisItBridge)
-#  add_subdirectory(Plugins/VisItReader)
-#endif ()
-
 if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Plugins/Autostart)
   add_subdirectory(Plugins/DisplayPanelDecorator)
@@ -31,9 +27,13 @@ if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(CustomApplications/Demo0)
   add_subdirectory(CustomApplications/Demo1)
   add_subdirectory(CustomApplications/MultiServerClient)
-  if (NOT TARGET vtkIOVisItBridge)
-    # ParticlesViewer requires PointSprite plugin which is not always built.
-    add_subdirectory(CustomApplications/ParticlesViewer)
-  endif()
   add_subdirectory(CustomApplications/Spreadsheet)
 endif()
+
+if (TARGET vtkIOVisItBridge)
+  # add_subdirectory(Plugins/VisItReader)
+else (PARAVIEW_BUILD_QT_GUI)
+  # ParticlesViewer requires PointSprite plugin which is not built when
+  # vtkIOVisItBridge is enabled.
+  add_subdirectory(CustomApplications/ParticlesViewer)
+endif ()
