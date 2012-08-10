@@ -15,7 +15,7 @@ def _refHolderMaker(obj):
         tmp = obj
     return _refHolder
 
-def coProcess(grid, time, step, scriptname):
+def coProcess(grid, time, step, scriptname, wholeExtent):
     import vtkCoProcessorPython
     import os
     scriptpath, scriptname = os.path.split(scriptname)
@@ -38,6 +38,10 @@ def coProcess(grid, time, step, scriptname):
         return
 
     inputdescription.SetGrid(grid)
+    if grid.IsA("vtkImageData") == True or grid.IsA("vtkRectilinearGrid") == True \
+            or grid.IsA("vtkStructuredGrid") == True:
+        inputdescription.SetWholeExtent(wholeExtent)
+
     cpscript.DoCoProcessing(datadescription)
 
 try:
@@ -56,7 +60,7 @@ for step in range(numsteps):
     # create the input to the coprocessing library.  normally
     # this will come from the adaptor
     wavelet = pvsimple.Wavelet()
-    #wavelet.WholeExtent = [0, 250, 0, 250, 0, 10]
+    wholeExtent = wavelet.WholeExtent
     wavelet.UpdatePipeline()
     imageData = pvsimple.servermanager.Fetch(wavelet)
 
@@ -67,5 +71,5 @@ for step in range(numsteps):
 
     # "perform" coprocessing.  results are outputted only if
     # the passed in script says we should at time/step
-    coProcess(imageData, time, step, sys.argv[1])
+    coProcess(imageData, time, step, sys.argv[1], wholeExtent)
     imageData = None
