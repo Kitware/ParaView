@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QSpinBox>
-#include <QtDebug>
 #include <QVBoxLayout>
+#include <QtDebug>
 
 #include "pqActiveObjects.h"
 #include "pqAnimatablePropertiesComboBox.h"
@@ -63,12 +63,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineTimeKeyFrameEditor.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "pqSignalAdaptors.h"
-#include "pqSMAdaptor.h"
+#include "pqTimeKeeper.h"
 #include "pqUndoStack.h"
+
 #include "vtkCamera.h"
 #include "vtkPVConfig.h"
 #include "vtkSMProperty.h"
@@ -95,8 +97,11 @@ public:
   QPointer<QDialog> Editor;
   QComboBox* PlayMode;
   QLineEdit* Time;
+  QLabel* TimeLabel;
   QLineEdit* StartTime;
+  QLabel* StartTimeLabel;
   QLineEdit* EndTime;
+  QLabel* EndTimeLabel;
   QLabel* DurationLabel;
   QSpinBox* Duration;
   pqPropertyLinks Links;
@@ -263,12 +268,14 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   this->Internal->PlayMode = new QComboBox(this) << pqSetName("PlayMode");
   this->Internal->PlayMode->addItem("Snap to Timesteps");
   hboxlayout->addWidget(this->Internal->PlayMode);
-  hboxlayout->addWidget(new QLabel("Time:", this));
+  this->Internal->TimeLabel = new QLabel("Time:", this);
+  hboxlayout->addWidget(this->Internal->TimeLabel);
   this->Internal->Time = new QLineEdit(this) << pqSetName("Time");
   this->Internal->Time->setValidator(
     new QDoubleValidator(this->Internal->Time));
   hboxlayout->addWidget(this->Internal->Time);
-  hboxlayout->addWidget(new QLabel("Start Time:", this));
+  this->Internal->StartTimeLabel = new QLabel("Start Time:", this);
+  hboxlayout->addWidget(this->Internal->StartTimeLabel);
   this->Internal->StartTime = new QLineEdit(this) << pqSetName("StartTime");
   this->Internal->StartTime->setValidator(
     new QDoubleValidator(this->Internal->StartTime));
@@ -284,7 +291,8 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
     "as available data times change</html>");
   this->Internal->LockStartTime->setCheckable(true);
   hboxlayout->addWidget(this->Internal->LockStartTime);
-  hboxlayout->addWidget(new QLabel("End Time:", this));
+  this->Internal->EndTimeLabel = new QLabel("End Time:", this);
+  hboxlayout->addWidget(this->Internal->EndTimeLabel);
   this->Internal->EndTime = new QLineEdit(this) << pqSetName("EndTime");
   this->Internal->EndTime->setValidator(
     new QDoubleValidator(this->Internal->EndTime));
@@ -444,10 +452,14 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
       this, SLOT(updateTicks()));
     QObject::connect(scene, SIGNAL(playModeChanged()), 
       this, SLOT(updateSceneTime()));
+    QObject::connect(scene, SIGNAL(timeLabelChanged()),
+      this, SLOT(onTimeLabelChanged()));
+
     this->updateSceneTimeRange();
     this->updateSceneTime();
     this->updatePlayMode();
     this->updateTicks();
+    this->onTimeLabelChanged();
     }
 }
 
@@ -968,4 +980,22 @@ void pqAnimationViewWidget::createPythonTrack()
   qCritical() << "Python support not enabled. Please recompile ParaView "
     "with Python enabled.";
 #endif
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::onTimeLabelChanged()
+{
+  QString timeName = "Time";
+  if(this->Internal->Scene)
+    {
+    timeName =
+        pqSMAdaptor::getElementProperty(
+          this->Internal->Scene->getServer()->getTimeKeeper()->getProxy()->
+          GetProperty("TimeLabel")).toString();
+    }
+
+  // Update labels
+  this->Internal->TimeLabel->setText(timeName);
+  this->Internal->StartTimeLabel->setText(QString("Start %1:").arg(timeName));
+  this->Internal->EndTimeLabel->setText(QString("End %1:").arg(timeName));
 }

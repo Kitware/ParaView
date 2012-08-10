@@ -316,6 +316,11 @@ void pqProxyInformationWidget::fillDataInformation(
     this->Ui->dataTimeLabel->setText(
           QString("Current data %2: %1")
           .arg(dataInformation->GetTime()).arg(timeLabel ? timeLabel : "time"));
+    this->Ui->groupDataTime->setTitle(timeLabel);
+    }
+  else
+    {
+    this->Ui->groupDataTime->setTitle("Time");
     }
 
   vtkPVDataSetAttributesInformation* info[6];
