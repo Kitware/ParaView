@@ -35,15 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 #include <QStringList>
+#include "pqCoreModule.h"
 
 class vtkGraphLayoutStrategy;
 
 /// interface class for plugins that create view modules
-class pqGraphLayoutStrategyInterface
+class PQCORE_EXPORT pqGraphLayoutStrategyInterface
 {
 public:
   /// destructor
-  virtual ~pqGraphLayoutStrategyInterface() {}
+  virtual ~pqGraphLayoutStrategyInterface();
   
   /// Return a list of layout strategies supported by this interface
   virtual QStringList graphLayoutStrategies() const = 0;

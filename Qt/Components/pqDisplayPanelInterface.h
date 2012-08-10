@@ -40,11 +40,11 @@ class pqRepresentation;
 class QWidget;
 
 /// interface class for plugins that create pqDisplayPanels
-class pqDisplayPanelInterface
+class PQCOMPONENTS_EXPORT pqDisplayPanelInterface
 {
 public:
   /// destructor
-  virtual ~pqDisplayPanelInterface() {}
+  virtual ~pqDisplayPanelInterface();
 
   /// Returns true if this panel can be created for the given the proxy.
   virtual bool canCreatePanel(pqRepresentation* display) const = 0;

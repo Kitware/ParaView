@@ -44,10 +44,10 @@ class pqDisplayPanel;
 /// Unlike other plugin interfaces, where ParaView stops after the first
 /// interface implementation that handles the case, for this interface, every
 /// registered implementation gets an opportunity to decorate the panel.
-class pqDisplayPanelDecoratorInterface 
+class PQCOMPONENTS_EXPORT pqDisplayPanelDecoratorInterface 
 {
 public:
-  virtual ~pqDisplayPanelDecoratorInterface() {}
+  virtual ~pqDisplayPanelDecoratorInterface();
 
   /// Returns true if this implementation can decorate the given panel type.
   virtual bool canDecorate(pqDisplayPanel* panel) const = 0;
@@ -56,15 +56,12 @@ public:
   /// only if canDecorate(panel) returns true.
   virtual void decorate(pqDisplayPanel* panel) const =0;
 protected:
-  pqDisplayPanelDecoratorInterface() {}
+  pqDisplayPanelDecoratorInterface();
 
 private:
-  pqDisplayPanelDecoratorInterface(const pqDisplayPanelDecoratorInterface&); // Not implemented.
-  void operator=(const pqDisplayPanelDecoratorInterface&); // Not implemented.
+  Q_DISABLE_COPY(pqDisplayPanelDecoratorInterface)
 };
 
 Q_DECLARE_INTERFACE(pqDisplayPanelDecoratorInterface, "com.kitware/paraview/displaypaneldecorator")
 
 #endif
-
-

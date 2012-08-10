@@ -34,16 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanelInterface_h
 
 #include <QtPlugin>
+#include "pqComponentsModule.h"
+
 class pqObjectPanel;
 class pqProxy;
 class QWidget;
 
 /// interface class for plugins that create pqObjectPanels
-class pqObjectPanelInterface
+class PQCOMPONENTS_EXPORT pqObjectPanelInterface
 {
 public:
   /// destructor
-  virtual ~pqObjectPanelInterface() {}
+  virtual ~pqObjectPanelInterface();
 
   /// Returns true if this panel can be created for the given the proxy.
   virtual bool canCreatePanel(pqProxy* proxy) const = 0;

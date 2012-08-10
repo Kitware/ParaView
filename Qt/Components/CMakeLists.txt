@@ -58,6 +58,8 @@ endmacro(generate_qt_resource_from_files)
 set (Module_SRCS
   pq3DWidget.cxx
   pq3DWidget.h
+  pq3DWidgetInterface.cxx
+  pq3DWidgetInterface.h
   pq3DWidgetPropertyWidget.cxx
   pq3DWidgetPropertyWidget.h
   pqAboutDialog.cxx
@@ -175,6 +177,10 @@ set (Module_SRCS
   pqDisplayColorWidget.h
   pqDisplayPanel.cxx
   pqDisplayPanel.h
+  pqDisplayPanelDecoratorInterface.cxx
+  pqDisplayPanelDecoratorInterface.h
+  pqDisplayPanelInterface.cxx
+  pqDisplayPanelInterface.h
   pqDisplayPanelPropertyWidget.cxx
   pqDisplayPanelPropertyWidget.h
   pqDisplayProxyEditor.cxx
@@ -185,6 +191,8 @@ set (Module_SRCS
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.cxx
   pqDistanceWidget.h
+  pqDockWindowInterface.cxx
+  pqDockWindowInterface.h
   pqDoubleEdit.cxx
   pqDoubleEdit.h
   pqDoubleVectorPropertyWidget.cxx
@@ -249,6 +257,8 @@ set (Module_SRCS
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
   pqObjectPanel.h
+  pqObjectPanelInterface.cxx
+  pqObjectPanelInterface.h
   pqObjectPanelPropertyWidget.cxx
   pqObjectPanelPropertyWidget.h
   pqOptionsContainer.cxx
@@ -409,10 +419,14 @@ set (Module_SRCS
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.cxx
   pqViewContextMenuManager.h
+  pqViewFrameActionGroupInterface.cxx
+  pqViewFrameActionGroupInterface.h
   pqViewFrame.cxx
   pqViewFrame.h
   pqViewManager.cxx
   pqViewManager.h
+  pqViewOptionsInterface.cxx
+  pqViewOptionsInterface.h
   pqWidgetRangeDomain.cxx
   pqWidgetRangeDomain.h
   pqWriterDialog.cxx

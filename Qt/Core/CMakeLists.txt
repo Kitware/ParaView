@@ -27,7 +27,7 @@
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-#==========================================================================
+#=========================================================================
 set(Module_SRCS
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
@@ -39,6 +39,8 @@ set(Module_SRCS
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
+  pqAutoStartInterface.cxx
+  pqAutoStartInterface.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
   pqChartSeriesSettingsModel.cxx
@@ -91,6 +93,8 @@ set(Module_SRCS
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.cxx
   pqFormBuilder.h
+  pqGraphLayoutStrategyInterface.cxx
+  pqGraphLayoutStrategyInterface.h
   pqHelperProxyRegisterUndoElement.cxx
   pqHelperProxyRegisterUndoElement.h
   pqHelperProxyStateLoader.cxx

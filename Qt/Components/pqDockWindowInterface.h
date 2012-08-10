@@ -35,23 +35,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QString>
 #include <QtPlugin>
+#include "pqComponentsModule.h"
 class QDockWidget;
 class QWidget;
 
 /// interface class for plugins that add a QDockWindow
-class pqDockWindowInterface
+class PQCOMPONENTS_EXPORT pqDockWindowInterface
 {
 public:
-  /// destructor
-  virtual ~pqDockWindowInterface() {}
+  pqDockWindowInterface();
+  virtual ~pqDockWindowInterface();
 
   virtual QString dockArea() const = 0;
 
   /// Creates a dock window with the given parent
   virtual QDockWidget* dockWindow(QWidget* p) = 0;
+private:
+  Q_DISABLE_COPY(pqDockWindowInterface)
 };
 
 Q_DECLARE_INTERFACE(pqDockWindowInterface, "com.kitware/paraview/dockwindow")
 
 #endif
-

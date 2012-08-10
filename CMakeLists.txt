@@ -183,9 +183,13 @@ option(PARAVIEW_BUILD_QT_GUI "Enable ParaView Qt-based client" ON)
 option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_PISTON "Build ParaView with Piston GPGPU filters" OFF)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
-cmake_dependent_option(PARAVIEW_INSTALL_DEVELOPMENT_FILES
-  "When enabled, \"make install\" will install development files" OFF
-  "UNIX" OFF)
+
+if (UNIX AND NOT APPLE)
+  # Since development installs are currently being tested only on linuxes. We
+  # can support these for other platforms if time permits.
+  option(PARAVIEW_INSTALL_DEVELOPMENT_FILES
+    "When enabled, \"make install\" will install development files" OFF)
+endif()
 
 cmake_dependent_option(PARAVIEW_USE_MPI_SSEND
   "Use MPI synchronous-send commands for communication" OFF

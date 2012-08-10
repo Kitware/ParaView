@@ -34,15 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqViewOptionsInterface_h
 
 #include <QtPlugin>
+#include "pqComponentsModule.h"
 class pqActiveViewOptions;
 class pqOptionsContainer;
 
 /// interface class for plugins that create view options pages
-class pqViewOptionsInterface
+class PQCOMPONENTS_EXPORT pqViewOptionsInterface
 {
 public:
   /// destructor
-  virtual ~pqViewOptionsInterface() {}
+  virtual ~pqViewOptionsInterface();
 
   /// returns a list of view types that this interface provides options for  
   virtual QStringList viewTypes() const = 0;

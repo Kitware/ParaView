@@ -4,8 +4,8 @@
 #
 # This file is configured by ParaView and used by the UseParaView.cmake module
 # to load ParaView's settings for an external project.
-
-if (@PARAVIEW_CONFIG_INSTALLED@)
+set (__pv_install_tree @PARAVIEW_CONFIG_INSTALLED@)
+if (__pv_install_tree)
   get_filename_component(location "${CMAKE_CURRENT_LIST_FILE}" PATH)
   set (VTK_CONFIG_FILE "${location}/VTKConfig.cmake")
   set (ParaView_CMAKE_DIR "${location}")
@@ -40,7 +40,7 @@ endif()
 # ParaView's modules).
 include("${VTK_CONFIG_FILE}")
 
-if(@PARAVIEW_CONFIG_INSTALLED@)
+if (__pv_install_tree)
 else()
   list(APPEND VTK_INCLUDE_DIRS @ParaView_BINARY_DIR@)
 endif()
@@ -61,3 +61,6 @@ set (PARAVIEW_ENABLE_QT_SUPPORT "@PARAVIEW_ENABLE_QT_SUPPORT@")
 set (PARAVIEW_QT_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 set (PARAVIEW_USE_VISITBRIDGE "@PARAVIEW_USE_VISITBRIDGE@")
 set (PARAVIEW_ENABLE_COPROCESSING "@PARAVIEW_ENABLE_COPROCESSING@")
+
+# cleanup
+unset(__pv_install_tree)
