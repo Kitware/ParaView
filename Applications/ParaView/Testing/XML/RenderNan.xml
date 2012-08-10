@@ -8,8 +8,8 @@
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="currentChangedbyItemName" arguments="SLAC Mesh Files" />
   <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/ModeFileName/FileChooser/FileButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/ModeFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/fields_..mod" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ModeFileName/FileChooser/FileButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ModeFileName/FileChooser/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SLAC/pic-example/fields_..mod" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="efield" />

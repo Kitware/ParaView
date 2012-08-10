@@ -3,14 +3,14 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="HierarchicalFractal" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Dimensions/IntRangeWidget/LineEdit" command="set_string" arguments="8" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/MaximumLevel/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/TwoDimensional/CheckBox" command="set_boolean" arguments="false" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Asymetric/CheckBox" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/RectilinearGrids/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Dimensions/IntRangeWidget/LineEdit" command="set_string" arguments="8" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/MaximumLevel/IntRangeWidget/LineEdit" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/TwoDimensional/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Asymetric/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/RectilinearGrids/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqCutPanel0/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqCutPanel0/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Fractal Volume Fraction" />
 </pqevents>

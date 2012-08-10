@@ -35,7 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 
+#include <sstream>
+
 #include <QWidget>
+#include <QTextStream>
 
 #include "pqPropertyLinks.h"
 
@@ -75,6 +78,10 @@ protected:
                        int smindex = -1);
   void setShowLabel(bool show);
 
+  void setReason(const QString &message);
+  std::stringstream& setReason();
+  QString reason() const;
+
 private:
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
@@ -87,6 +94,7 @@ private:
   vtkSMProperty *Property;
   pqPropertyLinks Links;
   bool ShowLabel;
+  std::stringstream Reason;
 };
 
 #endif // _pqPropertyWidget_h

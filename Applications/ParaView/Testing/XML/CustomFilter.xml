@@ -52,7 +52,7 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyFeatureEdges" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Guess3/CheckBox" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Guess3/CheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
   <pqevent object="pqClientMainWindow/pqCustomFilterManager/CustomFilterList" command="mousePress" arguments="1,1,0,86,6,/0:0" />

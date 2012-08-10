@@ -2,15 +2,15 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CylinderSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="20" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Radius/LineEdit0" command="set_string" arguments="5" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Center/LineEdit0" command="set_string" arguments="3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Radius/LineEdit0" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Center/LineEdit0" command="set_string" arguments="3" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CylinderSource" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="20" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Radius/LineEdit0" command="set_string" arguments="5" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Center/LineEdit0" command="key" arguments="45" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Center/LineEdit0" command="set_string" arguments="-3" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Radius/LineEdit0" command="set_string" arguments="5" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Center/LineEdit0" command="key" arguments="45" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Center/LineEdit0" command="set_string" arguments="-3" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,48,3,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,48,3,/0:0/0:0" />
@@ -24,7 +24,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Cut" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqCutPanel0/CutFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqCutPanel0/CutFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical"
   command="activate" arguments="PlotOnSortedLines" />
@@ -39,5 +39,5 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,10,10,/0:0/2:0/0:0/0:1" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,10,10,/0:0/2:0/0:0/0:1" />
 
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/ColorEditor/1QGroupBox0/1pqGenericSummaryDisplayPanel0/1pqDisplayColorWidget0/Variables" command="set_string" arguments="arc_length" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ColorEditor/1QGroupBox0/1pqGenericSummaryDisplayPanel0/1pqDisplayColorWidget0/Variables" command="set_string" arguments="arc_length" />
 </pqevents>

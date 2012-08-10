@@ -16,8 +16,8 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,67,10,/2:0" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuSources" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CylinderSource" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="60" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="60" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="60" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Resolution/IntRangeWidget/LineEdit" command="set_string" arguments="60" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,60,7,/3:0" />
@@ -27,7 +27,7 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqClipPanel0/ClipFunction/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqClipPanel0/ClipFunction/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
 
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_tabbar" command="set_tab_with_text" arguments="Layout #1" />
   <pqcompareview object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport" baseline="$PARAVIEW_DATA_ROOT/Baseline/TestMultiServer1.png" width="300" height="300" />

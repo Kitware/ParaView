@@ -81,6 +81,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
     layoutLocal->addWidget(checkBox);
+
+    this->setReason() << "QCheckBox for an IntVectorProperty with a BooleanDomain";
     }
   else if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
     {
@@ -100,6 +102,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                           smproperty);
 
     layoutLocal->addWidget(comboBox);
+
+    this->setReason() << "QComboBox for an IntVectorProperty with a "
+                      << "EnumerationDomain (" << ed->GetXMLName() << ")";
     }
   else if(vtkSMCompositeTreeDomain::SafeDownCast(domain))
     {
@@ -115,6 +120,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     layoutLocal->addWidget(treeWidget);
     this->setShowLabel(false);
+
+    this->setReason() << "pqTreeWidget for an IntVectorPropertyWidget with a "
+                      << "CompositeTreeDomain";
     }
   else if(vtkSMIntRangeDomain *range = vtkSMIntRangeDomain::SafeDownCast(domain))
     {
@@ -131,6 +139,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       widget->setMaximum(range->GetMaximum(0));
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(int)), ivp);
       layoutLocal->addWidget(widget);
+
+      this->setReason() << "pqIntRangeWidget for an IntVectorProperty with a "
+                        << "single element and an "
+                        << "IntRangeDomain (" << range->GetXMLName() << ") "
+                        << "with a minimum and a maximum";
       }
     else
       {
@@ -156,6 +169,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
           }
 
         layoutLocal->addLayout(gridLayout);
+
+        this->setReason() << "3x2 grid of QLineEdit's for an IntVectorProperty "
+                          << "with an "
+                          << "IntRangeDomain (" << range->GetXMLName() << ") "
+                          << "and 6 elements";
         }
       else
         {
@@ -167,6 +185,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
           }
+
+        this->setReason() << "List of QLineEdit's for an IntVectorProperty "
+                          << "with an "
+                          << "IntRangeDomain (" << range->GetXMLName() << ") "
+                          << "and more than one element";
         }
       }
     }

@@ -52,6 +52,7 @@ class pqPipelineSource;
 class pqPropertyWidget;
 class pqRepresentation;
 struct pqPropertiesPanelItem;
+class vtkSMProxy;
 class vtkSMProperty;
 
 /// \class pqPropertiesPanel
@@ -154,6 +155,7 @@ private:
   vtkNew<vtkEventQtSlotConnect> RepresentationTypeSignal;
   QList<pqPropertiesPanelItem> ProxyPropertyItems;
   QList<pqPropertiesPanelItem> RepresentationPropertyItems;
+  bool DebugWidgetCreation;
 };
 
 #endif // _pqPropertiesPanel_h

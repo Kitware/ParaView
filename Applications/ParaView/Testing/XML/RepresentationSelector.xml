@@ -5,10 +5,10 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Cone" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/AdvancedButton" command="set_boolean" arguments="true" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/Position/LineEdit0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/Position/LineEdit0" command="set_string" arguments="1" />
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Plane" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/XResolution/LineEdit0" command="set_string" arguments="10" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/YResolution/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/XResolution/LineEdit0" command="set_string" arguments="10" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/YResolution/LineEdit0" command="set_string" arguments="10" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Wireframe" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="currentChanged" arguments="/0/0|0" />
@@ -22,17 +22,17 @@
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,72,12,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,72,12,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Glyph" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="key" arguments="45" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="-1" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="0" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Rotation_2" command="set_string" arguments="90" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="key" arguments="45" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="-1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Rotation_2" command="set_string" arguments="90" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1QComboBox0" command="set_string" arguments="Cylinder" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1QComboBox0" command="set_string" arguments="Cylinder" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1pqProxyPanel0/1pqCollapsedGroup0/Resolution/LineEdit" command="set_string" arguments="30" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1pqProxyPanel0/1pqCollapsedGroup0/Resolution/LineEdit" command="set_string" arguments="30" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1pqProxyPanel0/1pqCollapsedGroup0/Radius" command="set_string" arguments="0.15" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/Source/1pqProxyPanel0/1pqCollapsedGroup0/Radius" command="set_string" arguments="0.15" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/PropertiesGroupBox/PropertiesScrollArea/qt_scrollarea_viewport/PropertiesScrollAreaContents/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="1" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/1pqObjectPanelPropertyWidget0/1pqGlyphPanel0/GlyphTransform/1pqProxyPanel0/1pqCollapsedGroup0/Position_0" command="set_string" arguments="1" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 </pqevents>

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkEventQtSlotConnect.h"
+#include <vtksys/SystemTools.hxx>
 
 #include "pqView.h"
 #include "pqProxy.h"
@@ -301,6 +302,11 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   : QWidget(p),
     Ui(new Ui::pqPropertiesPanel)
 {
+  // enable debugging of the panel widgets if the PV_DEBUG_PANELS
+  // enviornmental variable is set
+  this->DebugWidgetCreation = 
+    vtksys::SystemTools::GetEnv("PV_DEBUG_PANELS") != NULL;
+
   this->Ui->setupUi(this);
 
   this->setObjectName("propertiesPanel");
@@ -389,6 +395,12 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   // connect to advanced button
   this->connect(this->Ui->AdvancedButton, SIGNAL(toggled(bool)),
                 this, SLOT(advancedButtonToggled(bool)));
+
+  this->connect(this->Ui->PropertiesButton, SIGNAL(toggled(bool)),
+                this->Ui->PropertiesFrame, SLOT(setVisible(bool)));
+
+  this->connect(this->Ui->DisplayButton, SIGNAL(toggled(bool)),
+                this->Ui->DisplayFrame, SLOT(setVisible(bool)));
 }
 
 pqPropertiesPanel::~pqPropertiesPanel()
@@ -448,21 +460,16 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     delete item.PropertyWidget;
     }
 
-  // remove spacer item
-  this->Ui->PropertiesLayout->removeItem(
-    this->Ui->PropertiesLayout->itemAtPosition(
-      this->Ui->PropertiesLayout->rowCount() - 1, 0));
-
   this->ProxyPropertyItems.clear();
 
   // update group box name
   if(proxy)
     {
-    this->Ui->PropertiesGroupBox->setTitle(QString("Properties (%1)").arg(proxy->getSMName()));
+    this->Ui->PropertiesButton->setText(QString("Properties (%1)").arg(proxy->getSMName()));
     }
   else
     {
-    this->Ui->PropertiesGroupBox->setTitle("Properties");
+    this->Ui->PropertiesButton->setText("Properties");
     }
 
   if(!proxy)
@@ -472,6 +479,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     this->Ui->DeleteButton->setEnabled(false);
     this->Ui->HelpButton->setEnabled(false);
     return;
+    }
+
+  if(this->DebugWidgetCreation)
+    {
+    qDebug() << "Creating panel widgets for the"
+             << proxy->getProxy()->GetXMLLabel() << "proxy:";
     }
 
   this->Ui->DeleteButton->setEnabled(true);
@@ -521,6 +534,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     item.LabelWidget = 0;
     item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
     item.IsAdvanced = false;
+
+    if(this->DebugWidgetCreation)
+      {
+      qDebug() << "  - Using custom object panel:"
+               << customPanel->metaObject()->className();
+      }
     widgets.append(item);
     }
   else
@@ -559,30 +578,19 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     {
     this->ProxyPropertyItems.append(item);
 
-    int row = this->Ui->PropertiesLayout->rowCount();
-
     if(item.LabelWidget)
       {
-      this->Ui->PropertiesLayout->addWidget(item.LabelWidget, row, 0);
-      this->Ui->PropertiesLayout->addWidget(item.PropertyWidget, row, 1);
+      this->Ui->PropertiesLayout->addRow(item.LabelWidget, item.PropertyWidget);
       }
     else
       {
-      this->Ui->PropertiesLayout->addWidget(item.PropertyWidget, row, 0, 1, 2);
+      this->Ui->PropertiesLayout->addRow(item.PropertyWidget);
       }
 
     // connect to modified signal
     this->connect(item.PropertyWidget, SIGNAL(modified()),
                   this, SLOT(proxyPropertyChanged()));
     }
-
-  // add spacer item
-  this->Ui->PropertiesLayout->addItem(new QSpacerItem(0,
-                                                   0,
-                                                   QSizePolicy::Minimum,
-                                                   QSizePolicy::Expanding),
-                                   this->Ui->PropertiesLayout->rowCount(),
-                                   0);
 
   // update advanced state
   this->advancedButtonToggled(this->Ui->AdvancedButton->isChecked());
@@ -621,11 +629,6 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
   this->Representation = repr;
 
-  // remove spacer item
-  this->Ui->DisplayLayout->removeItem(
-    this->Ui->DisplayLayout->itemAtPosition(
-      this->Ui->DisplayLayout->rowCount() - 1, 0));
-
   // remove old property widgets
   foreach(const pqPropertiesPanelItem &item, this->RepresentationPropertyItems)
     {
@@ -644,11 +647,22 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
   // update group box name
   if(repr)
     {
-    this->Ui->DisplayGroupBox->setTitle(QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
+    this->Ui->DisplayButton->setText(QString("Display (%1)").arg(repr->getProxy()->GetXMLName()));
     }
   else
     {
-    this->Ui->DisplayGroupBox->setTitle("Display");
+    this->Ui->DisplayButton->setText("Display");
+    }
+
+  if(!repr)
+    {
+    return;
+    }
+
+  if(this->DebugWidgetCreation)
+    {
+    qDebug() << "Creating panel widgets for the"
+             << repr->getProxy()->GetXMLLabel() << "representation:";
     }
 
   QList<pqPropertiesPanelItem> widgets;
@@ -670,6 +684,12 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     item.PropertyWidget = new pqDisplayPanelPropertyWidget(customPanel);
     item.IsAdvanced = false;
     widgets.append(item);
+
+    if(this->DebugWidgetCreation)
+      {
+      qDebug() << "  - Using custom display panel:"
+               << customPanel->metaObject()->className();
+      }
     }
   else
     {
@@ -685,12 +705,11 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
     if(item.LabelWidget)
       {
-      this->Ui->DisplayLayout->addWidget(item.LabelWidget, row, 0);
-      this->Ui->DisplayLayout->addWidget(item.PropertyWidget, row, 1);
+      this->Ui->DisplayLayout->addRow(item.LabelWidget, item.PropertyWidget);
       }
     else
       {
-      this->Ui->DisplayLayout->addWidget(item.PropertyWidget, row, 0, 1, 2);
+      this->Ui->DisplayLayout->addRow(item.PropertyWidget);
       }
 
     if(item.PropertyWidget)
@@ -706,14 +725,6 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
         }
       }
     }
-
-  // add spacer item
-  this->Ui->DisplayLayout->addItem(new QSpacerItem(0,
-                                                   0,
-                                                   QSizePolicy::Minimum,
-                                                   QSizePolicy::Expanding),
-                                   this->Ui->DisplayLayout->rowCount(),
-                                   0);
 
   // connect to representation type changed signal
   this->RepresentationTypeSignal->Disconnect();
@@ -976,6 +987,12 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
     if(QString(group->GetPanelVisibility()) == "never")
       {
       // skip property groups marked as never show
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  - Group" << group->GetXMLLabel()
+                 << "gets skipped because it has panel_visibility of \"never\"";
+        }
+
       continue;
       }
 
@@ -1036,16 +1053,40 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
     if(smProperty->GetInformationOnly())
       {
       // skip information only properties
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it is an information only property";
+        }
+
       continue;
       }
     else if(smProperty->GetIsInternal())
       {
       // skip internal properties
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it is an internal property";
+        }
+
       continue;
       }
     else if(QString(smProperty->GetPanelVisibility()) == "never")
       {
       // skip properties marked as never show
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  -"
+                 << proxy->getProxy()->GetPropertyName(smProperty)
+                 << "(" << smProperty->GetXMLLabel() << ")"
+                 << "gets skipped because it has panel_visibility of \"never\"";
+        }
+
       continue;
       }
 
@@ -1145,6 +1186,31 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
       this->connect(this, SIGNAL(viewChanged(pqView*)),
                     propertyWidget, SIGNAL(viewChanged(pqView*)));
+
+      // if debug widget creation is enabled then print the
+      // reason why each property widget was created
+      if(this->DebugWidgetCreation)
+        {
+        QString reason = item.PropertyWidget->reason();
+        vtkSMProperty *smProperty = item.PropertyWidget->property();
+
+        if(!reason.isEmpty())
+          {
+          qDebug() << "  -"
+                   << proxy->getProxy()->GetPropertyName(smProperty)
+                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << "gets a" << item.PropertyWidget->metaObject()->className()
+                   << "containing a" << item.PropertyWidget->reason();
+          }
+        else
+          {
+          qDebug() << "  -"
+                   << proxy->getProxy()->GetPropertyName(smProperty)
+                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << "gets a" << item.PropertyWidget->metaObject()->className()
+                   << "for an unknown reason";
+          }
+        }
 
       widgets.append(item);
       }

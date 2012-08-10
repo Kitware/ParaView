@@ -79,13 +79,13 @@ the renderview active. That's the final state.
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mousePress" arguments="1,1,0,39,5,/0:0/0:0" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser" command="mouseRelease" arguments="1,0,0,39,5,/0:0/0:0" />
   <pqevent
-  object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/CubeAxes/VisibilityCheckBox" command="set_boolean" arguments="true" />
+  object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/CubeAxes/VisibilityCheckBox" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionUndo" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MainControlsToolbar/actionRedo" command="activate" arguments="" />
   <pqevent
-  object="pqClientMainWindow/propertiesDock/propertiesPanel/DisplayGroupBox/DisplayScrollArea/qt_scrollarea_viewport/DisplayScrollAreaContents/CubeAxes/EditButton" command="activate" arguments="" />
+  object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/CubeAxes/EditButton" command="activate" arguments="" />
   <pqevent object="CubeAxesEditorDialog/tabWidget/qt_tabwidget_stackedwidget/xtab/CubeAxesXGridLines" command="set_boolean" arguments="true" />
   <pqevent object="CubeAxesEditorDialog/tabWidget/qt_tabwidget_stackedwidget/xtab/CubeAxesXAxisMinorTickVisibility" command="set_boolean" arguments="false" />
   <pqevent object="CubeAxesEditorDialog/tabWidget/qt_tabwidget_stackedwidget/xtab/CubeAxesXAxisTickVisibility" command="set_boolean" arguments="false" />
