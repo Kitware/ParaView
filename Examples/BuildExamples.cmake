@@ -1,13 +1,17 @@
-# Build the examples as a separate project using a custom target.
+#------------------------------------------------------------------------------
+# Builds the examples as a separate project using a custom target.
+# This is included in ParaView/CMakeLists.txt to build examples as a separate
+# project.
+
+#------------------------------------------------------------------------------
 # Make sure it uses the same build configuration as ParaView.
 if (CMAKE_CONFIGURATION_TYPES)
-  set(ParaViewExamples_CONFIG_TYPE -C "${CMAKE_CFG_INTDIR}")
+  set(build_config_arg -C "${CMAKE_CFG_INTDIR}")
 else()
-  set(ParaViewExamples_CONFIG_TYPE)
+  set(build_config_arg)
 endif()
 
 set (extra_params)
-
 foreach (flag CMAKE_C_FLAGS_DEBUG
               CMAKE_C_FLAGS_RELEASE
               CMAKE_C_FLAGS_MINSIZEREL
@@ -22,11 +26,10 @@ foreach (flag CMAKE_C_FLAGS_DEBUG
   endif()
 endforeach()
 
-
-ADD_CUSTOM_COMMAND(
+add_custom_command(
   OUTPUT ${ParaView_BINARY_DIR}/ParaViewExamples
   COMMAND ${CMAKE_CTEST_COMMAND}
-  ARGS ${ParaViewExamples_CONFIG_TYPE}
+  ARGS ${build_config_arg}
        --build-and-test
        ${ParaView_SOURCE_DIR}/Examples
        ${ParaView_BINARY_DIR}/Examples/All
@@ -41,14 +44,17 @@ ADD_CUSTOM_COMMAND(
                        -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
                        -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
                        -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
-                       ${extra_params}
-                       -DEXECUTABLE_OUTPUT_PATH:PATH=${EXECUTABLE_OUTPUT_PATH}
                        -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-       )
-ADD_CUSTOM_TARGET(ParaViewExamplesTarget ALL DEPENDS
-                  ${ParaView_BINARY_DIR}/ParaViewExamples)
+                       -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+                       ${extra_params}
+  COMMENT "Build examples as a separate project"
+)
 
+# These dependencies ensure that ParaViewExamples are built only after the core
+# modules have been built.
+add_custom_target(ParaViewExamplesTarget ALL DEPENDS
+  ${ParaView_BINARY_DIR}/ParaViewExamples)
 add_dependencies(ParaViewExamplesTarget vtkPVServerManagerApplication)
-IF(PARAVIEW_BUILD_QT_GUI)
+if(PARAVIEW_BUILD_QT_GUI)
   add_dependencies(ParaViewExamplesTarget pqApplicationComponents)
-ENDIF(PARAVIEW_BUILD_QT_GUI)
+endif()

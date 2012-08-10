@@ -567,5 +567,8 @@ unset(_vtk_all_targets)
 
 #-----------------------------------------------------------------------------
 if (BUILD_EXAMPLES)
+  # BuildExamples.cmake builds the examples as a separate project. This ensures
+  # that examples can be built by themselves as well as avoiding pollution of
+  # the ParaView target space with targets (and other things) from examples.
   include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
 endif()
