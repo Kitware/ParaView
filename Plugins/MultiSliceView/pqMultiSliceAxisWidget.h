@@ -65,6 +65,9 @@ public:
   /// the number of values that can be read from the pointer
   const double* getVisibleSlices(int &nbSlices) const;
 
+  /// Update our internal model to reflect the proxy state
+  void updateSlices(double* values, bool* visibility, int numberOfValues);
+
   /// The active size define the number of pixel that are going to be used for
   /// the slider handle.
   void SetActiveSize(int size);

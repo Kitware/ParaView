@@ -50,14 +50,25 @@ public slots:
   void updateAxisBounds(double bounds[6]);
   void updateSlices();
 
+protected slots:
+  void addPropertyListener(pqRepresentation*);
+  void removePropertyListener(pqRepresentation*);
+
 protected:
+  void updateViewModelCallBack(vtkObject*,unsigned long, void*);
+
   /// Helper method to get the concreate 3D widget
   QVTKWidget* getInternalWidget() { return this->InternalWidget; }
 
   QVTKWidget* InternalWidget;
+  bool UserIsInteracting;
   QPointer<pqMultiSliceAxisWidget> AxisX;
   QPointer<pqMultiSliceAxisWidget> AxisY;
   QPointer<pqMultiSliceAxisWidget> AxisZ;
+
+  QMap<pqRepresentation*, unsigned int> ObserverIdX;
+  QMap<pqRepresentation*, unsigned int> ObserverIdY;
+  QMap<pqRepresentation*, unsigned int> ObserverIdZ;
 
 private:
   pqMultiSliceView(const pqMultiSliceView&); // Not implemented.
