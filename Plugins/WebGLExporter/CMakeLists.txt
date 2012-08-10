@@ -14,7 +14,7 @@ SET(PLUGIN_VERSION "1.0")
 
 INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
   )
 
@@ -33,7 +33,7 @@ foreach(file ${JAVASCRIPT_SRCS})
   add_custom_command(
     OUTPUT ${res}
     DEPENDS ${src}
-    COMMAND ${VTK_ENCODESTRING_EXE}
+    COMMAND vtkEncodeString
     ARGS ${res} ${src} ${file}
     )
   set(EXTRA_SRCS ${EXTRA_SRCS} ${res})
