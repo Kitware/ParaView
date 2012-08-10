@@ -58,8 +58,10 @@ IF(PARAVIEW_BUILD_QT_GUI)
     SERVER_MANAGER_SOURCES
       vtkCompositeMultiSliceRepresentation.cxx
       vtkMultiSliceRepresentation.cxx
-      vtkThreeSliceFilter.cxx
+      vtkPVThreeSliceView.cxx
       vtkSMMultiSliceViewProxy.cxx
+      vtkSMThreeSliceViewProxy.cxx
+      vtkThreeSliceFilter.cxx
 
     SERVER_MANAGER_XML
       SliceViews.xml
