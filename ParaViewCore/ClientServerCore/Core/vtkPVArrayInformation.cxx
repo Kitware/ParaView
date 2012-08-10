@@ -14,6 +14,7 @@
  =========================================================================*/
 #include "vtkPVArrayInformation.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkClientServerStream.h"
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
@@ -23,7 +24,11 @@
 #include "vtkStringArray.h"
 #include "vtkStdString.h"
 #include "vtkPVPostFilter.h"
+#include "vtkVariant.h"
+#include "vtkVariantArray.h"
 
+#include <map>
+#include <set>
 #include <vector>
 #include <vtksys/ios/sstream>
 
@@ -38,6 +43,8 @@ namespace
   };
 
   typedef std::vector<vtkPVArrayInformationInformationKey> vtkInternalInformationKeysBase;
+
+  typedef std::map<int,std::set<vtkVariant> > vtkInternalUniqueValuesBase;
 }
 
 class vtkPVArrayInformation::vtkInternalComponentNames:
@@ -50,7 +57,12 @@ class vtkPVArrayInformation::vtkInternalInformationKeys:
 {
 };
 
-vtkStandardNewMacro( vtkPVArrayInformation);
+class vtkPVArrayInformation::vtkInternalUniqueValues:
+    public vtkInternalUniqueValuesBase
+{
+};
+
+vtkStandardNewMacro(vtkPVArrayInformation);
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -60,6 +72,7 @@ vtkPVArrayInformation::vtkPVArrayInformation()
   this->ComponentNames = 0;
   this->DefaultComponentName = 0;
   this->InformationKeys = 0;
+  this->UniqueValues = 0;
   this->Initialize();
 }
 
@@ -110,6 +123,12 @@ void vtkPVArrayInformation::Initialize()
     delete this->InformationKeys;
     this->InformationKeys = 0;
     }
+
+  if ( this->UniqueValues )
+    {
+    delete this->UniqueValues;
+    this->UniqueValues = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -117,6 +136,7 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   int num, idx;
   vtkIndent i2 = indent.GetNextIndent();
+  vtkIndent i3 = i2.GetNextIndent();
 
   this->Superclass::PrintSelf(os, indent);
   if (this->Name)
@@ -162,6 +182,23 @@ void vtkPVArrayInformation::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << i2 << "None" << endl;
     }
+
+  os << indent << "UniqueValues :" << endl;
+  if(this->UniqueValues)
+    {
+    for ( vtkInternalUniqueValues::iterator cit = this->UniqueValues->begin(); cit != this->UniqueValues->end(); ++ cit )
+      {
+      os << i2 << "Component " << cit->first << " (" << cit->second.size() << " values )" << endl;
+      for ( vtkInternalUniqueValues::mapped_type::iterator vit = cit->second.begin(); vit != cit->second.end(); ++ vit )
+        {
+        os << i3 << vit->ToString() << endl;
+        }
+      }
+    }
+  else
+    {
+    os << i2 << "None" << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -194,6 +231,9 @@ void vtkPVArrayInformation::SetNumberOfComponents(int numComps)
     this->Ranges[2 * idx] = VTK_DOUBLE_MAX;
     this->Ranges[2 * idx + 1] = -VTK_DOUBLE_MAX;
     }
+
+  if ( this->UniqueValues )
+    this->UniqueValues->clear();
 }
 
 //----------------------------------------------------------------------------
@@ -423,7 +463,7 @@ void vtkPVArrayInformation::AddRanges(vtkPVArrayInformation *info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
+void vtkPVArrayInformation::DeepCopy( vtkPVArrayInformation* info )
 {
   int num, idx;
 
@@ -490,6 +530,19 @@ void vtkPVArrayInformation::DeepCopy(vtkPVArrayInformation *info)
       {
       this->InformationKeys->push_back(info->InformationKeys->at(i));
       }
+    }
+
+  // Copy the list of unique values for each component.
+  if ( this->UniqueValues && ! info->UniqueValues )
+    {
+    delete this->UniqueValues;
+    this->UniqueValues = 0;
+    }
+  else if ( info->UniqueValues )
+    {
+    if ( ! this->UniqueValues )
+      this->UniqueValues = new vtkInternalUniqueValues;
+    *this->UniqueValues = *info->UniqueValues;
     }
 }
 
@@ -587,6 +640,56 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
       }
     it->Delete();
     }
+
+  // Check whether the array has a small number of unique values
+  // (i.e, test whether the array represents samples from a discrete
+  // set or a continuum).
+  if ( this->UniqueValues )
+    {
+    this->UniqueValues->clear();
+    }
+  else
+    {
+    this->UniqueValues = new vtkInternalUniqueValues;
+    }
+  int nc = this->GetNumberOfComponents();
+  std::vector<int> componentCount( nc + 1, 0 );
+  int ndc = nc; // number of discrete components remaining (tracked during iteration)
+  std::pair<vtkInternalUniqueValues::mapped_type::iterator,bool> result;
+  vtkVariantArray* tuple;
+  for ( vtkIdType i = 0; i < this->GetNumberOfTuples() && ndc; ++ i )
+    {
+    if ( ndc == nc )
+      tuple = vtkVariantArray::New();
+
+    // First, do a component-wise insert.
+    for ( int j = 0; j < nc; ++ j )
+      {
+      if ( componentCount[j] > 127 )
+        continue;
+      result = (*this->UniqueValues)[j].insert( array->GetVariantValue( i * nc + j ) );
+      if ( result.second )
+        {
+        if ( ++ componentCount[j] > 127 )
+          {
+          -- ndc;
+          tuple->Delete();
+          }
+        }
+      tuple->InsertNextValue( *result.first );
+      }
+    if ( componentCount[nc] < 128 && ndc == nc )
+      {
+      result = (*this->UniqueValues)[nc].insert( tuple );
+      if ( result.second )
+        ++ componentCount[nc];
+      }
+    }
+  for ( int i = 0; i <= nc; ++ i )
+    {
+    if ( (*this->UniqueValues)[i].size() > 127 )
+      this->UniqueValues->erase( i );
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -612,9 +715,10 @@ void vtkPVArrayInformation::AddInformation(vtkPVInformation* info)
       }
     else
       {
-      // Leave everything but ranges as original, add ranges.
+      // Leave everything but ranges and unique values as original, add ranges and unique values.
       this->AddRanges(aInfo);
       this->AddInformationKeys(aInfo);
+      this->AddUniqueValues(aInfo);
       }
     }
 }
@@ -661,6 +765,28 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     const char* location = this->GetInformationKeyLocation(key);
     const char* name = this->GetInformationKeyName(key);
     *css << location << name;
+    }
+
+  *css << ( this->UniqueValues ? true : false );
+  if ( this->UniqueValues )
+    {
+    for ( vtkIdType i = 0; i < this->GetNumberOfComponents(); ++ i )
+      {
+      unsigned nuv = (*this->UniqueValues)[i].size();
+      *css << i << nuv;
+      if ( nuv )
+        {
+        vtkVariantArray* aa = vtkVariantArray::New();
+        aa->Allocate( nuv );
+        vtkInternalUniqueValues::mapped_type::iterator vit = (*this->UniqueValues)[i].begin();
+        for ( vit = (*this->UniqueValues)[i].begin(); vit != (*this->UniqueValues)[i].end(); ++ vit )
+          {
+          aa->InsertNextValue( *vit );
+          }
+        *css << aa;
+        aa->Delete();
+        }
+      }
     }
 
   *css << vtkClientServerStream::End;
@@ -789,6 +915,58 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkStdString key_name = name;
     this->AddInformationKey(key_location, key_name);
     }
+
+  bool haveUniqueVals;
+  if ( ! css->GetArgument( 0, ++ pos, &haveUniqueVals ) )
+    {
+    vtkErrorMacro("Error parsing unique value existence from message.");
+    return;
+    }
+  if ( ! haveUniqueVals && this->UniqueValues )
+    {
+    delete this->UniqueValues;
+    this->UniqueValues = 0;
+    }
+  else if ( haveUniqueVals )
+    {
+    if ( ! this->UniqueValues )
+      {
+      this->UniqueValues = new vtkInternalUniqueValues;
+      }
+    unsigned nuv;
+    for ( int i = 0; i < this->NumberOfComponents; ++ i )
+      {
+      if ( ! css->GetArgument( 0, ++ pos, &nuv ) )
+        {
+        vtkErrorMacro( "Error decoding the number of unique values for component " << i );
+        return;
+        }
+      vtkAbstractArray* aa;
+      vtkObjectBase* obj;
+      if ( ! css->GetArgument( 0, ++ pos, &obj ) || ! obj )
+        {
+        vtkErrorMacro( "Error decoding the list of unique values for component " << i );
+        return;
+        }
+      aa = vtkAbstractArray::SafeDownCast( obj );
+      if ( ! aa )
+        {
+        vtkErrorMacro(
+          << "Received " << obj->GetClassName() << " instead of vtkAbstractArray "
+          << "for list of unique values for component " << i );
+        obj->Delete();
+        return;
+        }
+      vtkInternalUniqueValues::mapped_type empty;
+      vtkInternalUniqueValues::value_type blank( i, empty );
+      this->UniqueValues->insert( blank );
+      for ( vtkIdType vi = 0; vi <= aa->GetMaxId(); ++ vi )
+        {
+        (*this->UniqueValues)[i].insert( aa->GetVariantValue( vi ) );
+        }
+      aa->Delete();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -868,4 +1046,55 @@ int vtkPVArrayInformation::HasInformationKey(const char* location,
       }
     }
   return 0;
+}
+
+void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
+{
+  vtkInternalUniqueValues::iterator cit; // component iterator
+  for ( int i = 0; i <= this->NumberOfComponents; ++ i )
+    {
+    cit = info->UniqueValues->find( i );
+    vtkInternalUniqueValues::mapped_type::iterator vit; // iterator over values of component cit->first.
+    bool tooManyValues;
+    if ( cit == info->UniqueValues->end() )
+      { // info had too many values to be rendered as categorical data.
+      tooManyValues = true;
+      }
+    else
+      { // Add info's values to our list of unique keys
+      for ( vit = cit->second.begin(); vit != cit->second.end(); ++ vit )
+        {
+        if ( (*this->UniqueValues)[i].insert( *vit ).second && this->UniqueValues->size() > 127 )
+          break;
+        }
+      if ( this->UniqueValues->size() > 127 )
+        tooManyValues = true;
+      }
+    // If the union of values is too large, delete the list of values
+    if ( tooManyValues )
+      {
+      this->UniqueValues->erase( i );
+      }
+    }
+}
+
+vtkAbstractArray* vtkPVArrayInformation::GetUniqueComponentValuesIfFDiscrete( int component )
+{
+  vtkInternalUniqueValues::iterator compEntry;
+  unsigned nv;
+  if (
+    ! this->UniqueValues ||
+    ( compEntry = this->UniqueValues->find( component ) ) == this->UniqueValues->end() ||
+    ( nv = compEntry->second.size() ) == 0
+    )
+    return 0;
+
+  vtkVariantArray* va = vtkVariantArray::New();
+  vtkInternalUniqueValues::mapped_type::iterator vit;
+  va->Allocate( nv );
+  for ( vit = compEntry->second.begin(); vit != compEntry->second.end(); ++ vit )
+    {
+    va->InsertNextValue( *vit );
+    }
+  return va;
 }
