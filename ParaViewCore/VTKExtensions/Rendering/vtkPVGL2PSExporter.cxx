@@ -59,11 +59,11 @@ void vtkPVGL2PSExporter::WriteData()
 
     vtkRendererCollection *renCol = this->RenderWindow->GetRenderers();
     vtkRenderer *ren;
-    for (renCol->InitTraversal(); ren = renCol->GetNextItem();)
+    for (renCol->InitTraversal(); (ren = renCol->GetNextItem());)
       {
       vtkActorCollection *actorCol = ren->GetActors();
       vtkActor *actor;
-      for (actorCol->InitTraversal(); actor = actorCol->GetNextItem();)
+      for (actorCol->InitTraversal(); (actor = actorCol->GetNextItem());)
         {
         if (actor->IsA("vtkCubeAxesActor"))
           {
