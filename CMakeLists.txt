@@ -294,6 +294,10 @@ mark_as_advanced(VTK_COSMOS_USE_MPI)
 set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_VPIC_USE_MPI)
 
+# this bring in states for additional VTK modules that ParaView GUI needs to
+# work.
+include(VTKModules)
+
 #------------------------------------------------------------------------------
 
 include_directories(${ParaView_BINARY_DIR})
@@ -334,6 +338,7 @@ if (NOT __paraview_configured AND USE_EXTERNAL_VTK)
 endif()
 set (__paraview_configured TRUE CACHE INTERNAL
   "ParaView has been configured" FORCE)
+
 
 if (use_external_vtk)
   find_package(VTK REQUIRED ${required_vtk_modules})
@@ -436,8 +441,12 @@ else()
     "${ParaView_BINARY_DIR}/${dir}")
   endforeach()
 
+  enable_required_modules()
+
   # include VTK
   add_subdirectory(VTK)
+
+  hide_enabled_modules()
 
   # keep VTK cmake variables from polluting the non-advanced space.
   mark_as_advanced(

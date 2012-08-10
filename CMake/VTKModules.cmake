@@ -333,3 +333,16 @@ endif()
 if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
 endif()
+
+macro(enable_required_modules)
+  foreach (module IN LISTS _vtk_modules)
+    set (Module_${module} TRUE
+      CACHE INTERNAL "Enabling module needed for ParaView" FORCE)
+  endforeach()
+endmacro()
+
+macro(hide_enabled_modules)
+  foreach (module IN LISTS _vtk_modules)
+    set_property(CACHE Module_${module} PROPERTY TYPE INTERNAL)
+  endforeach()
+endmacro()
