@@ -218,6 +218,12 @@ void pqMultiSliceView::updateSlices()
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::addPropertyListener(pqRepresentation* rep)
 {
+  // Make sure it's a representation we care for
+  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
+    {
+    return;
+    }
+
   this->ObserverIdX[rep] =
       rep->getProxy()->GetProperty("XSlicesValues")->AddObserver(
         vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
@@ -248,6 +254,12 @@ void pqMultiSliceView::addPropertyListener(pqRepresentation* rep)
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::removePropertyListener(pqRepresentation* rep)
 {
+  // Make sure it's a representation we care for
+  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
+    {
+    return;
+    }
+
   rep->getProxy()->GetProperty("XSlicesValues")->RemoveObserver(this->ObserverIdX[rep]);
   rep->getProxy()->GetProperty("YSlicesValues")->RemoveObserver(this->ObserverIdY[rep]);
   rep->getProxy()->GetProperty("ZSlicesValues")->RemoveObserver(this->ObserverIdZ[rep]);
@@ -269,7 +281,7 @@ void pqMultiSliceView::updateViewModelCallBack(vtkObject*,unsigned long, void*)
   bool needToUpdateUI = true;
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
-    if(!rep->getProxy()->GetProperty("XSlicesValues"))
+    if(rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
       {
       continue;
       }
