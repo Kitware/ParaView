@@ -31,13 +31,21 @@
 vtk_module_impl()
 vtk_module_export("")
 
+include(vtkForwardingExecutable)
 if (NOT CMAKE_CROSSCOMPILING)
-  if (UNIX AND VTK_BUILD_FORWARDING_EXECUTABLES)
-    include(vtkForwardingExecutable)
-    vtk_add_executable_with_forwarding(kwProcessXML ProcessXML.cxx)
-  else ()
-    add_executable(kwProcessXML ProcessXML.cxx)
-  endif()
+  add_executable(kwProcessXML ProcessXML.cxx)
   target_link_libraries(kwProcessXML vtkCommonCore vtksys)
+
+  if (UNIX)
+    # setup install rpath correctly so that kwProcessXML can file needed libraries
+    # at runtime.
+    set (_temp_prefix "/tmp")
+    set (_bin "${_temp_prefix}/${VTK_INSTALL_RUNTIME_DIR}")
+    set (_so "${_temp_prefix}/${VTK_INSTALL_LIBRARY_DIR}")
+    file (RELATIVE_PATH relative_path "${_bin}" "${_so}")
+    set_target_properties(kwProcessXML PROPERTIES
+      INSTALL_RPATH "\$ORIGIN/${relative_path}")
+  endif()
+
   vtk_compile_tools_target(kwProcessXML)
 endif()
