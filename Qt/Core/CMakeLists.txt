@@ -39,8 +39,6 @@ set(Module_SRCS
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
-  pqBrandPluginsLoader.cxx
-  pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
   pqChartSeriesSettingsModel.cxx
@@ -242,7 +240,6 @@ set (Module_MOC_HDRS
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqChartSeriesSettingsModel.h
   pqCollaborationEventPlayer.h
