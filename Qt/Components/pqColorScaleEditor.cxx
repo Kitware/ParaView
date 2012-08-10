@@ -577,6 +577,13 @@ void pqColorScaleEditor::setScalarFromText()
   // Make sure the value is greater than the previous point and less
   // than the next point.
   double scalar[4];
+  // check if the value is actually changed
+  currentItem->GetControlPoint(index, scalar);
+  if(scalar[0] == value)
+    {
+    return;
+    }
+
   bool endpoint = index == 0;
   if(index > 0)
     {
@@ -587,7 +594,7 @@ void pqColorScaleEditor::setScalarFromText()
     if(value <= prev)
       {
       // value not acceptable.
-      this->updateCurrentOpacityPoint();
+      this->updateCurrentColorPoint();
       return;
       }
     }
@@ -601,15 +608,17 @@ void pqColorScaleEditor::setScalarFromText()
     if(value >= next)
       {
       // value not acceptable.
-      this->updateCurrentOpacityPoint();
+      this->updateCurrentColorPoint();
       return;
       }
     }
-  currentItem->GetControlPoint(index, scalar);
-  scalar[0]=value;
+
+  double nodeVal[6];
+  colors->GetNodeValue(index, nodeVal);
+  nodeVal[0]=value;
   // Set the new value on the point in the editor.
   this->Form->IgnoreEditor = true;
-  colors->SetNodeValue(index, scalar);
+  colors->SetNodeValue(index, nodeVal);
   this->Form->IgnoreEditor = false;
 
   // Update the colors on the proxy.
@@ -647,7 +656,13 @@ void pqColorScaleEditor::setOpacityScalarFromText()
     return;
     }
   double scalar[4];
+  // check if the value is actually changed
   currentItem->GetControlPoint(index, scalar);
+  if(scalar[0] == value)
+    {
+    return;
+    }
+
   scalar[0]=value;
   // Set the new value on the point in the editor.
   this->Form->IgnoreEditor = true;
