@@ -2258,6 +2258,154 @@
       </StringVectorProperty>
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkPVGL2PSExporter"
+                             file_extension="ps"
+                             name="GL2PSExporterPS">
+      <Documentation long_help="Export PostScript (PS) Files"
+                     short_help="PS Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="0"
+                         name="FileFormat"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="0"
+                         name="Write3DPropsAsRasterImage"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of GL2PSExporterPS -->
+    </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkPVGL2PSExporter"
+                             file_extension="eps"
+                             name="GL2PSExporterEPS">
+      <Documentation long_help="Export Encapsulated PostScript (EPS) Files"
+                     short_help="EPS Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="1"
+                         name="FileFormat"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="0"
+                         name="Write3DPropsAsRasterImage"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of GL2PSExporterEPS -->
+    </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkPVGL2PSExporter"
+                             file_extension="pdf"
+                             name="GL2PSExporterPDF">
+      <Documentation long_help="Export Portable Document Format (PDF) Files"
+                     short_help="PDF Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="2"
+                         name="FileFormat"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="0"
+                         name="Write3DPropsAsRasterImage"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of GL2PSExporterPDF -->
+    </RenderViewExporterProxy>
+    <RenderViewExporterProxy class="vtkPVGL2PSExporter"
+                             file_extension="svg"
+                             name="GL2PSExporterSVG">
+      <Documentation long_help="Export Scalable Vector Graphics (SVG) Files"
+                     short_help="SVG Files">vtkPVGL2PSExporter is a render
+                     window exporter which writes out the renderered scene into
+                     a variety of vector graphics formats.</Documentation>
+      <StringVectorProperty command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1">
+        <Documentation>Name of the file to be written.</Documentation>
+      </StringVectorProperty>
+      <IntVectorProperty command="SetFileFormat"
+                         default_values="4"
+                         name="FileFormat"
+                         number_of_elements="1">
+        <Documentation>Set the output file format: 0: PostScript, 1:
+        Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetWrite3DPropsAsRasterImage"
+                         default_values="0"
+                         name="Write3DPropsAsRasterImage"
+                         number_of_elements="1">
+        <Documentation>Export all 3D geometry as a rasterized image behind 2D
+        geometry, which is still rendered as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <IntVectorProperty command="SetExcludeCubeAxesActorsFromRasterization"
+                         default_values="1"
+                         name="ExcludeCubeAxesActorsFromRasterization"
+                         number_of_elements="1">
+        <Documentation>If rasterizing 3D geometry, setting this option will
+        export all cube axes actors as vector graphics.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- End of GL2PSExporterSVG -->
+    </RenderViewExporterProxy>
     <!-- End of "exporters" -->
   </ProxyGroup>
   <ProxyGroup name="point_placers">

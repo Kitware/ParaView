@@ -19,6 +19,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkFiltersHyperTree
     vtkFiltersParallel
     vtkInteractionStyle
+    vtkIOExport
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingFreeTypeOpenGL

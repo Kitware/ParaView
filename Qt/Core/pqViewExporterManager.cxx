@@ -123,7 +123,6 @@ QString pqViewExporterManager::getSupportedFileTypes() const
 
   vtkSMProxy* proxy = this->View->getProxy();
 
-  bool first = true;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();
   iter->SetSkipPrototypes(false);
@@ -134,10 +133,6 @@ QString pqViewExporterManager::getSupportedFileTypes() const
       iter->GetProxy());
     if (prototype && prototype->CanExport(proxy))
       {
-      if (!first)
-        {
-        types += ";;";
-        }
       vtkSMDocumentation* doc = prototype->GetDocumentation();
       QString help;
       if (doc && doc->GetShortHelp())
@@ -149,11 +144,29 @@ QString pqViewExporterManager::getSupportedFileTypes() const
         help = QString("%1 Files").arg(QString(prototype->GetFileExtension()).toUpper());
         }
 
-      types += QString("%1 (*.%2)").arg(help).arg(prototype->GetFileExtension());
-      first = false;
+      supportedWriters << QString("%1 (*.%2)").arg(help)
+                          .arg(prototype->GetFileExtension());
       }
     }
   iter->Delete();
+
+  qSort(supportedWriters);
+
+  bool first = true;
+  foreach (const QString& string, supportedWriters)
+    {
+      if (!first)
+        {
+        types += ";;";
+        }
+      else
+        {
+        first = false;
+        }
+
+      types += string;
+    }
+
   return types;
 }
 
