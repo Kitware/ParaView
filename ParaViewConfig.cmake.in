@@ -44,6 +44,12 @@ if(@PARAVIEW_CONFIG_INSTALLED@)
 else()
   list(APPEND VTK_INCLUDE_DIRS @ParaView_BINARY_DIR@)
 endif()
+
+# unless using external vtk (when we start supporting it, that is)
+# PARAVIEW_INCLUDE_DIRS is same as VTK_INCLUDE_DIRS, but to make it easier for
+# ParaView users.
+set (PARAVIEW_INCLUDE_DIRS ${VTK_INCLUDE_DIRS})
+
 #------------------------------------------------------------------------------
 # ParaView global configuration options.
 
@@ -53,3 +59,5 @@ set (PARAVIEW_USE_MPI "@PARAVIEW_USE_MPI@")
 set (PARAVIEW_ENABLE_PYTHON "@PARAVIEW_ENABLE_PYTHON@")
 set (PARAVIEW_ENABLE_QT_SUPPORT "@PARAVIEW_ENABLE_QT_SUPPORT@")
 set (PARAVIEW_QT_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
+set (PARAVIEW_USE_VISITBRIDGE "@PARAVIEW_USE_VISITBRIDGE@")
+set (PARAVIEW_ENABLE_COPROCESSING "@PARAVIEW_ENABLE_COPROCESSING@")
