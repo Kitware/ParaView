@@ -24,6 +24,8 @@ paraview_build_optional_plugin(Moments "Filters for Flux and Circulation Fields"
 paraview_build_optional_plugin(NonOrthogonalSource "Non Orthogonal Source code sample" NonOrthogonalSource ON)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PacMan "Testing plugin" TestPlugin  ON)
+paraview_build_optional_plugin(WebGLExporter "PolyData WebGL Exporter" WebGLExporter OFF)
+
 if(PARAVIEW_USE_PISTON)
   paraview_build_optional_plugin(Piston "LANL Piston GPU accelerated filters" Piston  ON)
 else()

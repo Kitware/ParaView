@@ -1,0 +1,11 @@
+<ServerManagerConfiguration>
+   <ProxyGroup name="exporters">
+      <RenderViewExporterProxy name="WebGLExporter" class="vtkPVWebGLExporter"
+                               file_extension="webgl">
+         <StringVectorProperty name="FileName" command="SetFileName"
+                               number_of_elements="1">
+            <Documentation>Name of the file to write into</Documentation>
+         </StringVectorProperty>
+      </RenderViewExporterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
