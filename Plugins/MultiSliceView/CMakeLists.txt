@@ -4,7 +4,7 @@
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS}
   )
 ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
@@ -53,18 +53,22 @@ IF(PARAVIEW_BUILD_QT_GUI)
     ACTIVE_VIEW_OPTIONS pqActiveThreeSliceRenderViewOptions
   )
 
-  ADD_PARAVIEW_PLUGIN(MultiSliceView "1.0"
+  ADD_PARAVIEW_PLUGIN(SliceViews "1.0"
+
     SERVER_MANAGER_SOURCES
       vtkCompositeMultiSliceRepresentation.cxx
       vtkMultiSliceRepresentation.cxx
       vtkThreeSliceFilter.cxx
       vtkSMMultiSliceViewProxy.cxx
+
     SERVER_MANAGER_XML
       SliceViews.xml
+
     GUI_INTERFACES
       ${VIEW1_IFACE}
       ${VIEW2_IFACE}
       ${VIEW2_OPTIONS_IFACE}
+
     GUI_SOURCES
       ${MOC_SRCS}
       ${UI_SRCS}
