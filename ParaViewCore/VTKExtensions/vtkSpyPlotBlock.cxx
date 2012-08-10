@@ -573,19 +573,15 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   vtkDataArray** materialVolumeFractions,
   const int& downConvertVolumeFraction  ) const
 {
-  vtkIdType arraySize =
-      this->SavedRealDims[0]*this->SavedRealDims[1]*this->SavedRealDims[2];
-  vtkDoubleArray* volumeArray = vtkDoubleArray::New();
-  volumeArray->SetName("Derived Volume");
-  volumeArray->SetNumberOfValues(arraySize);
-
-  vtkDoubleArray* averageDensityArray = vtkDoubleArray::New();
-  averageDensityArray->SetName("Derived Average Density");
-  averageDensityArray->SetNumberOfValues(arraySize);
+  //Make sure we convert zero value dims to 1.
+  const int dims[3] = {
+    this->SavedRealDims[0] > 0 ?  this->SavedRealDims[0] : 1,
+    this->SavedRealDims[1] > 0 ?  this->SavedRealDims[1] : 1,
+    this->SavedRealDims[2] > 0 ?  this->SavedRealDims[2] : 1};
+  vtkIdType arraySize = dims[0] * dims[1] * dims[2];
 
   typedef std::map<int, vtkDoubleArray*> MapOfArrays;
   MapOfArrays materialDensityArrays;
-
   for ( int i=0; i < numberOfMaterials; i++)
     {
     //only create density arrays for materials that we have all the needed information for
@@ -604,6 +600,20 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
       materialDensity->FastDelete();
       }
     }
+
+  if(materialDensityArrays.size() == 0)
+    {
+    //we can't compute derived variables as we have no materials
+    return;
+    }
+
+  vtkDoubleArray* volumeArray = vtkDoubleArray::New();
+  volumeArray->SetName("Derived Volume");
+  volumeArray->SetNumberOfValues(arraySize);
+
+  vtkDoubleArray* averageDensityArray = vtkDoubleArray::New();
+  averageDensityArray->SetName("Derived Average Density");
+  averageDensityArray->SetNumberOfValues(arraySize);
 
   data->AddArray(volumeArray);
   volumeArray->FastDelete();
