@@ -45,6 +45,8 @@ vtk_module_library(vtkPVServerManagerApplication ${Module_SRCS})
 set(vtk-module-init-functions)
 set(vtk-module-init-calls)
 set(_dependencies)
+set(module_sm_xmls)
+
 foreach (_module ${VTK_MODULES_ENABLED})
   if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
       NOT ${_module}_IS_TEST AND
@@ -57,6 +59,14 @@ foreach (_module ${VTK_MODULES_ENABLED})
       "${vtk-module-init-calls}  ${_module}CS_Initialize(interp);\n")
 
     list(APPEND _dependencies ${_module}CS)
+  endif()
+
+  # if module provides server manager xmls, process them.
+  get_property(module_xmls GLOBAL PROPERTY ${_module}_SERVERMANAGER_XMLS)
+  if (module_xmls)
+    foreach(xml_path IN LISTS module_xmls)
+      list(APPEND module_sm_xmls ${xml_path})
+    endforeach()
   endif()
 endforeach()
 
@@ -78,6 +88,7 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/3d_widgets.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
+  ${module_sm_xmls}
   )
 
 if (PARAVIEW_ENABLE_PYTHON)

@@ -37,6 +37,21 @@ if (PARAVIEW_ENABLE_PYTHON)
 endif()
 
 #------------------------------------------------------------------------------
+# ParaView applications provides a mechanism to add gui xmls from modules.
+# This is done by defining variables named ${vtk-module}_PARAVIEW_GUI_XMLS in
+# the module.cmake file for the modules pointing to the paths for the
+# GUI-xmls.  We process those here.
+set (module_gui_xmls)
+foreach (module IN LISTS VTK_MODULES_ENABLED)
+  get_property(gui_xml GLOBAL PROPERTY ${module}_PARAVIEW_GUI_XMLS)
+  if (gui_xml)
+    foreach(xml IN LISTS gui_xml)
+      list(APPEND module_gui_xmls ${xml})
+    endforeach()
+  endif()
+endforeach()
+
+#------------------------------------------------------------------------------
 # Build the client
 build_paraview_client(paraview
     APPLICATION_NAME "ParaView"
@@ -55,7 +70,7 @@ build_paraview_client(paraview
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewReaders.xml
       ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
-      ${PARAVIEW_EXTRA_GUI_RESOURCES} # Add any compiled in GUI configuration xmls
+      ${module_gui_xmls} # Add any compiled in GUI configuration xmls
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
     INSTALL_BIN_DIR "${VTK_INSTALL_RUNTIME_DIR}"

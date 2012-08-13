@@ -363,6 +363,8 @@ else()
     Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
+    Utilities/VisItBridge/Library
+    Utilities/VisItBridge/databases
 
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
