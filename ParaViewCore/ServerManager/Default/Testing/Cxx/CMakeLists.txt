@@ -19,6 +19,7 @@ foreach (name ${test_srcs})
     ${name}.cxx)
   add_test(NAME ${name}
       COMMAND ${name} ${name} -D ${VTK_DATA_ROOT})
+  set_tests_properties(${name} PROPERTIES LABELS "PARAVIEW")
 endforeach()
 
 #------------------------------------------------------------------------------
@@ -48,6 +49,7 @@ if (PARAVIEW_DATA_ROOT)
         -T=${ParaView_BINARY_DIR}/Testing/Temporary
         -V=${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
         ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/${tfile}.pvsm)
+    set_tests_properties(${tfile}-ServerManager PROPERTIES LABELS "PARAVIEW")
   endforeach()
 endif()
 
@@ -72,5 +74,6 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
     add_test(NAME pvunit.${name}
              COMMAND ${name})
     target_link_libraries(${name} ${QT_LIBRARIES})
+    set_tests_properties(pvunit.${name} PROPERTIES LABELS "PARAVIEW")
   endforeach()
 endif()

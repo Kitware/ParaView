@@ -10,4 +10,5 @@ if (PARAVIEW_DATA_ROOT)
             "--test-baseline=${BASELINE_DIR}/pqCoreBasicApp.png"
             --exit
     )
+  set_tests_properties(pqCoreBasicApp PROPERTIES LABELS "PARAVIEW")
 endif()

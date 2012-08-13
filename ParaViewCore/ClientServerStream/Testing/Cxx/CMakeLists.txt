@@ -6,3 +6,4 @@ vtk_module_test_executable(
 add_test(
   NAME vtkClientServerCoverage
   COMMAND ${vtk-module}CxxTests)
+set_tests_properties(vtkClientServerCoverage PROPERTIES LABELS "PARAVIEW")
