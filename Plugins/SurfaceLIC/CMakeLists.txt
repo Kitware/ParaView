@@ -78,5 +78,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
       ${IFACE_SRCS}
       ${SUMMARY_IFACE_SRCS}
     )
-    
+
+  # add dependency with required vtk modules.
+  target_link_libraries(SurfaceLIC vtkRenderingHybridOpenGL)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
