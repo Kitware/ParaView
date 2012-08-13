@@ -4,6 +4,7 @@ IF(NOT CMAKE_CROSSCOMPILING)
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParse.tab.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParsePreprocess.c
                 ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParseMain.c)
+  target_link_libraries(vtkWrapClientServer vtkWrappingCore)
 
   set_property(SOURCE ${ParaView_SOURCE_DIR}/VTK/Wrapping/vtkParseMain.c PROPERTY COMPILE_DEFINITIONS
     VTK_PARSE_VERSION="${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}")

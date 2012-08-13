@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "vtkParse.h"
+#include "vtkParseMain.h"
 
 int numberOfWrappedFunctions = 0;
 FunctionInfo *wrappedFunctions[1000];
@@ -1077,16 +1078,37 @@ int classUsesStdString(ClassInfo *data)
 }
 
 /* print the parsed structures */
-void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
+int main(int argc, char *argv[])
 {
+  OptionInfo *options;
+  FileInfo *fileInfo;
   ClassInfo *data;
+  FILE *fp;
   NewClassInfo *classData;
   int i;
+
+  /* get command-line args and parse the header file */
+  fileInfo = vtkParse_Main(argc, argv);
+
+  /* get the command-line options */
+  options = vtkParse_GetCommandLineOptions();
+
+  /* get the output file */
+  fp = fopen(options->OutputFileName, "w");
+
+  if (!fp)
+    {
+    fprintf(stderr, "Error opening output file %s\n", options->OutputFileName);
+    exit(1);
+    }
 
   data = fileInfo->MainClass;
 
   if(!data)
-    return;
+    {
+    fclose(fp);
+    exit(0);
+    }
 
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->Name);
   fprintf(fp,"#define VTK_WRAPPING_CXX\n");
@@ -1226,4 +1248,7 @@ void vtkParseOutput(FILE *fp, FileInfo *fileInfo)
   getClassInfo(fileInfo,data,classData);
   output_InitFunction(fp,classData);
   free(classData);
+
+  vtkParse_Free(fileInfo);
+  return 0;
 }

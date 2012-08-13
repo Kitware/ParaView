@@ -111,8 +111,9 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         ${TMP_HINTS}
         ${TMP_DEFINITIONS}
         ${_target_includes}
-        ${TMP_INPUT}
-        ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
+        "-o" "${quote}${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx${quote}"
+        "${quote}${TMP_INPUT}${quote}"
+        COMMENT "CS Wrapping - generating ${TMP_FILENAME}ClientServer.cxx"
         )
 
       # Add this output to a custom target if needed.

@@ -321,6 +321,10 @@ paraview_include_gui_resources(${VISITBRIDGE_READERS_GUI_XML_FILE})
 #------------------------------------------------------------------------------
 # Bring in VTK
 #------------------------------------------------------------------------------
+#ParaView's client server wrapping uses VTK's wrapping infrastructure
+#so make sure VTK builds it, even if we aren't wrapping any other language.
+set(VTK_GENERATE_WRAPTOOLS 1 CACHE INTERNAL "ask for vtk wrapper tools" FORCE)
+
 # ParaView provides an advanced option that can be used to make ParaView use a
 # pre-built VTK. For that, the option must be passed to the first cmake command
 # using -D. i.e. to use a separately built VTK, in a clean binary directory, do
