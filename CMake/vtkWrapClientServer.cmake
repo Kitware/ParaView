@@ -18,37 +18,35 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
     endif()
   endif()
 
-  # all the compiler "-D" args
-  get_directory_property(TMP_DEF_LIST DEFINITION COMPILE_DEFINITIONS)
-  set(TMP_DEFINITIONS)
-  foreach(TMP_DEF ${TMP_DEF_LIST})
-    set(TMP_DEFINITIONS ${TMP_DEFINITIONS} -D "${TMP_DEF}")
+  # all the include directories
+  if(VTK_WRAP_INCLUDE_DIRS)
+    set(TMP_INCLUDE_DIRS ${VTK_WRAP_INCLUDE_DIRS})
+  else()
+    set(TMP_INCLUDE_DIRS ${VTK_INCLUDE_DIRS})
+  endif()
+
+  # collect the common wrapper-tool arguments
+  set(_common_args)
+  get_directory_property(_def_list DEFINITION COMPILE_DEFINITIONS)
+  foreach(TMP_DEF ${_def_list})
+    set(_common_args "${_common_args}-D${TMP_DEF}\n")
   endforeach()
-
-  # hints that guide wrapping
-  if (VTK_WRAP_HINTS)
-    set(TMP_HINTS "--hints" "${VTK_WRAP_HINTS}")
-  else ()
-    set(TMP_HINTS)
-  endif ()
-
-  # take all the include directories of this module into account
-  set(TMP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
-  set(TMP_INCLUDE)
   foreach(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
-    set(TMP_INCLUDE ${TMP_INCLUDE} -I "${INCLUDE_DIR}")
+    set(_common_args "${_common_args}-I\"${INCLUDE_DIR}\"\n")
   endforeach()
+  if(VTK_WRAP_HINTS)
+    set(_common_args "${_common_args}--hints \"${VTK_WRAP_HINTS}\"\n")
+  endif()
+  if(KIT_HIERARCHY_FILE)
+    set(_common_args "${_common_args}--types \"${KIT_HIERARCHY_FILE}\"\n")
+  endif()
 
-  set(_include_dirs_file)
-  foreach(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
-    set(_include_dirs_file "${_include_dirs_file}${INCLUDE_DIR}\n")
-  endforeach()
-
-  string(STRIP "${_include_dirs_file}" CMAKE_CONFIGURABLE_FILE_CONTENT)
-  set(_target_includes_file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.inc)
+  # write wrapper-tool arguments to a file
+  string(STRIP "${_common_args}" CMAKE_CONFIGURABLE_FILE_CONTENT)
+  set(_args_file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.args)
   configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
-                 ${_target_includes_file} @ONLY)
-  set(_target_includes "--includes ${_target_includes_file}")
+                 ${_args_file} @ONLY)
+
 
   # For each class
   foreach(FILE ${SOURCES})
@@ -95,13 +93,12 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
       add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         MAIN_DEPENDENCY ${TMP_INPUT}
-        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file}
+        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file} ${_args_file}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS
         ${TMP_CONCRETE}
         ${TMP_HINTS}
-        ${TMP_DEFINITIONS}
-        ${_target_includes}
+        "${quote}@${_args_file}${quote}"
         "-o" "${quote}${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx${quote}"
         "${quote}${TMP_INPUT}${quote}"
         COMMENT "CS Wrapping - generating ${TMP_FILENAME}ClientServer.cxx"
