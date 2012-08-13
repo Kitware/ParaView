@@ -302,26 +302,6 @@ include(VTKModules)
 
 include_directories(${ParaView_BINARY_DIR})
 
-#tell paraview about the visitbridge classes that it has to wrap and expose
-#in the GUI
-macro(PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES RESOURCES)
-  set(PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES
-    ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES} ${RESOURCES})
-endmacro(PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES RESOURCES)
-
-set(VISITBRIDGE_READERS_XML_FILE
-  "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers.xml")
-paraview_include_servermanager_resources(${VISITBRIDGE_READERS_XML_FILE})
-
-set(PARAVIEW_EXTRA_GUI_RESOURCES)
-macro(PARAVIEW_INCLUDE_GUI_RESOURCES RESOURCES)
-  set(PARAVIEW_EXTRA_GUI_RESOURCES ${PARAVIEW_EXTRA_GUI_RESOURCES} ${RESOURCES})
-endmacro(PARAVIEW_INCLUDE_GUI_RESOURCES RESOURCES)
-
-set(VISITBRIDGE_READERS_GUI_XML_FILE
-  "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers_gui.xml")
-paraview_include_gui_resources(${VISITBRIDGE_READERS_GUI_XML_FILE})
-
 #------------------------------------------------------------------------------
 # Bring in VTK
 #------------------------------------------------------------------------------
@@ -383,8 +363,7 @@ else()
     Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
-    Utilities/VisItBridge/Library
-    Utilities/VisItBridge/databases
+
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common
