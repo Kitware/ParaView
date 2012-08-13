@@ -169,16 +169,11 @@ void vtkSMTestDriver::CollectConfiguredOptions()
 /// This adds the debug/build configuration crap for the executable on windows.
 static std::string FixExecutablePath(const std::string& path)
 {
-#ifdef  CMAKE_INTDIR
-  std::string parent_dir =
-    vtksys::SystemTools::GetFilenamePath(path.c_str());
-
-  std::string filename =
-    vtksys::SystemTools::GetFilenameName(path);
-  parent_dir += "/" CMAKE_INTDIR "/";
-  return parent_dir + filename;
-#endif
-
+  // we don't need to FixExecutablePath() anymore. Developers are expected to
+  // add tests using
+  // add_test(NAME ..
+  //          COMMAND ... $<TARGET_FILE:paraview> ...)
+  // for to ensure that the executable is pointed to directly.
   return path;
 }
 
