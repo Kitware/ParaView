@@ -34,6 +34,7 @@
 #include "vtkPVVTKExtensionsCoreModule.h" // needed for export macro
 
 class vtkPVTrivialExtentTranslator;
+struct vtkPVTrivialProducerInternal;
 
 class VTKPVVTKEXTENSIONSCORE_EXPORT vtkPVTrivialProducer : public vtkTrivialProducer
 {
@@ -47,6 +48,11 @@ public:
   // never really modified.
   // Overridden to pass the output to the vtkPVTrivialExtentTranslator.
   virtual void SetOutput(vtkDataObject* output);
+
+  // Description:
+  // Set the output data object as well as time information
+  // for the requests.
+  virtual void SetOutput(vtkDataObject* output, double time);
 
   // Description:
   // Set the whole extent to use for the data this producer is producing.
@@ -76,6 +82,12 @@ protected:
   virtual void ReportReferences(vtkGarbageCollector*);
   vtkPVTrivialExtentTranslator* PVExtentTranslator;
   int WholeExtent[6];
+
+  // Description:
+  // Used to store any time step information. It assumes that the
+  // time steps are ordered oldest to most recent.
+  vtkPVTrivialProducerInternal* Internals;
+
 private:
   vtkPVTrivialProducer(const vtkPVTrivialProducer&); // Not implemented
   void operator=(const vtkPVTrivialProducer&); // Not implemented
