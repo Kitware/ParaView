@@ -45,11 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef BUILD_SHARED_LIBS
 #include "pvStaticPluginsInit.h"
-#endif
-
 #ifdef PARAVIEW_ENABLE_PYTHON
 # include "paraviewpythonmodules.h"
 #endif
+#endif
+
+
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
@@ -58,8 +59,10 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
+#ifndef BUILD_SHARED_LIBS
 #ifdef PARAVIEW_ENABLE_PYTHON
   CMakeLoadAllPythonModules();
+#endif
 #endif
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
