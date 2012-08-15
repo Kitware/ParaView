@@ -66,7 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaActor_h
 #define __vtkMantaActor_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkActor.h"
 
 //BTX
@@ -82,7 +82,7 @@ class vtkMantaProperty;
 class vtkMantaRenderer;
 class vtkMantaManager;
 
-class VTK_vtkManta_EXPORT vtkMantaActor : public vtkActor
+class VTKMANTA_EXPORT vtkMantaActor : public vtkActor
 {
 public:
   static vtkMantaActor *New();

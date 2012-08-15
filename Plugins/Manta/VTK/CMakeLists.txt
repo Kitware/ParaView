@@ -12,31 +12,15 @@ project(vtkManta)
 
 #Configure vtkManta source proper ############################################
 
-# Define a flag exported to vtkMantaConfigure.h which is used in some
-# ParaView-dependent #ifdefs
-IF (NOT BUILD_AGAINST_PARAVIEW)
-  SET ( BUILD_AGAINST_PARAVIEW 0 )
-ENDIF (NOT BUILD_AGAINST_PARAVIEW)
+# Define a flag 
+if (BUILD_AGAINST_PARAVIEW)
+  add_definitions(-DVTKMANTA_FOR_PARAVIEW)
+endif()
 
 # setup include paths
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
-
-# Setup the output directories.
-#TODO: What are these for, are they necessary?
-SET ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
-SET ( EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
-      "Single output directory for building all executables."
-    )
-MARK_AS_ADVANCED ( CMAKE_LIBRARY_OUTPUT_DIRECTORY EXECUTABLE_OUTPUT_PATH )
-
-# Create the header to configure the classes.
-CONFIGURE_FILE ( ${CMAKE_CURRENT_SOURCE_DIR}/vtkMantaConfigure.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/vtkMantaConfigure.h
-                 @ONLY
-                 IMMEDIATE
-               )
 
 # Set vtkManta source files.
 SET ( MANTA_CLASSES
@@ -66,8 +50,7 @@ SET ( MANTA_SRCS
 
 
 vtk_module_library(${vtk-module} ${MANTA_SRCS})
-TARGET_LINK_LIBRARIES (${vtk-module}
-  ${VTK_LINK_LIBRARIES} ${MANTA_LINK_LIBRARIES})
+TARGET_LINK_LIBRARIES (${vtk-module} ${MANTA_LINK_LIBRARIES})
 
 # Manta_Core uses MMTime which is in it's own special library.
 if(WIN32)

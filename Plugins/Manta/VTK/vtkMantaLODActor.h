@@ -65,10 +65,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaLODActor_h
 #define __vtkMantaLODActor_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkPVLODActor.h"
 
-class VTK_vtkManta_EXPORT vtkMantaLODActor : public vtkPVLODActor
+class VTKMANTA_EXPORT vtkMantaLODActor : public vtkPVLODActor
 {
 public:
   static vtkMantaLODActor *New();

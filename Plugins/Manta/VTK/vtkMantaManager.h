@@ -24,7 +24,7 @@
 #define __vtkMantaManager_h
 
 #include "vtkObject.h"
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 
 //BTX
 namespace Manta {
@@ -38,7 +38,7 @@ class SyncDisplay;
 };
 //ETX
 
-class VTK_vtkManta_EXPORT vtkMantaManager : public vtkObject
+class VTKMANTA_EXPORT vtkMantaManager : public vtkObject
 {
 public:
   static vtkMantaManager *New();

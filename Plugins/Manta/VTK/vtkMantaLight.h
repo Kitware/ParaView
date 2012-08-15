@@ -66,7 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaLight_h
 #define __vtkMantaLight_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkLight.h"
 
 //BTX
@@ -79,7 +79,7 @@ class vtkMantaRenderer;
 class vtkTimeStamp;
 class vtkMantaManager;
 
-class VTK_vtkManta_EXPORT vtkMantaLight : public vtkLight
+class VTKMANTA_EXPORT vtkMantaLight : public vtkLight
 {
 public:
   static vtkMantaLight *New();

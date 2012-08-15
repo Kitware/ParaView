@@ -65,7 +65,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaTexture_h
 #define __vtkMantaTexture_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkTexture.h"
 #include "Interface/Texture.h"
 
@@ -82,7 +82,7 @@ namespace Manta {
 class vtkRenderWindow;
 class vtkMantaManager;
 
-class VTK_vtkManta_EXPORT vtkMantaTexture : public vtkTexture
+class VTKMANTA_EXPORT vtkMantaTexture : public vtkTexture
 {
 public:
   static vtkMantaTexture *New();

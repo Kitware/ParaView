@@ -68,8 +68,9 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVMantaRepresentation_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
+#include "vtkMantaModule.h"
 
-class VTK_EXPORT vtkPVMantaRepresentation :
+class VTKMANTA_EXPORT vtkPVMantaRepresentation :
   public vtkGeometryRepresentationWithFaces
 {
 public:

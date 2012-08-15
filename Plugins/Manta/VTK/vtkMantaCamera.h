@@ -66,7 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaCamera_h
 #define __vtkMantaCamera_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkCamera.h"
 
 //BTX
@@ -78,7 +78,7 @@ class Camera;
 class vtkTimeStamp;
 class vtkMantaManager;
  
-class VTK_vtkManta_EXPORT vtkMantaCamera : public vtkCamera
+class VTKMANTA_EXPORT vtkMantaCamera : public vtkCamera
 {
 public:
   static vtkMantaCamera *New();

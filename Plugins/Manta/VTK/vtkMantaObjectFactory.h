@@ -64,10 +64,10 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaObjectFactory_h
 #define __vtkMantaObjectFactory_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkObjectFactory.h"
 
-class VTK_vtkManta_EXPORT vtkMantaObjectFactory : public vtkObjectFactory
+class VTKMANTA_EXPORT vtkMantaObjectFactory : public vtkObjectFactory
 {
 
 public:

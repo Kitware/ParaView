@@ -22,10 +22,10 @@
 #ifndef __vtkMantaTestSource_h
 #define __vtkMantaTestSource_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkPolyDataAlgorithm.h"
 
-class VTK_vtkManta_EXPORT vtkMantaTestSource : public vtkPolyDataAlgorithm
+class VTKMANTA_EXPORT vtkMantaTestSource : public vtkPolyDataAlgorithm
 {
 public:
   // Description:
