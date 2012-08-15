@@ -2,150 +2,125 @@
 # a cmake command to client-server wrap classes
 #
 
-MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
+macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
 
   # clear some variables
-  SET (CXX_CONTENTS)
-  SET (CXX_CONTENTS2)
-  
-  # VS 6 does not like needing to run a huge number of custom commands
-  # when building a single target.  Generate some extra custom targets
-  # that run the custom commands before the main target is built.  This
-  # is a hack to work-around the limitation.
-  IF(CMAKE_GENERATOR MATCHES "^Visual Studio 6$")
-    SET(VTK_WRAP_CS_CUSTOM_TARGETS_LIMIT 128)
-    SET(VTK_WRAP_CS_CUSTOM_NAME ${TARGET})
-    SET(VTK_WRAP_CS_CUSTOM_LIST)
-  ENDIF(CMAKE_GENERATOR MATCHES "^Visual Studio 6$")
+  set (CXX_CONTENTS)
+  set (CXX_CONTENTS2)
 
   # if this is used from outside paraview (e.g. in a plugin, this
   # should come from the ParaViewConfig.cmake file
-  IF(NOT VTK_WRAP_ClientServer_EXE)
+  if(NOT VTK_WRAP_ClientServer_EXE)
     if (TARGET vtkWrapClientServer)
-      SET(VTK_WRAP_ClientServer_EXE vtkWrapClientServer)
+      set(VTK_WRAP_ClientServer_EXE vtkWrapClientServer)
     else ()
       message(FATAL_ERROR "VTK_WRAP_ClientServer_EXE must be set.")
     endif()
-  ENDIF(NOT VTK_WRAP_ClientServer_EXE)
-
-  # all the compiler "-D" args
-  GET_DIRECTORY_PROPERTY(TMP_DEF_LIST DEFINITION COMPILE_DEFINITIONS)
-  SET(TMP_DEFINITIONS)
-  FOREACH(TMP_DEF ${TMP_DEF_LIST})
-    SET(TMP_DEFINITIONS ${TMP_DEFINITIONS} -D "${TMP_DEF}")
-  ENDFOREACH(TMP_DEF ${TMP_DEF_LIST})
+  endif()
 
   # all the include directories
-  SET(TMP_INCLUDE_DIRS ${VTK_INCLUDE_DIR})
-  SET(TMP_INCLUDE)
-  FOREACH(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
-    SET(TMP_INCLUDE ${TMP_INCLUDE} -I "${INCLUDE_DIR}")
-  ENDFOREACH(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
+  if(VTK_WRAP_INCLUDE_DIRS)
+    set(TMP_INCLUDE_DIRS ${VTK_WRAP_INCLUDE_DIRS})
+  else()
+    set(TMP_INCLUDE_DIRS ${VTK_INCLUDE_DIRS})
+  endif()
 
-  IF (VTK_WRAP_HINTS)
-    SET(TMP_HINTS "--hints" "${VTK_WRAP_HINTS}")
-  ELSE (VTK_WRAP_HINTS)
-    SET(TMP_HINTS)
-  ENDIF (VTK_WRAP_HINTS)
-
-  set(_include_dirs_file)
-  foreach(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
-    set(_include_dirs_file "${_include_dirs_file}${INCLUDE_DIR}\n")
+  # collect the common wrapper-tool arguments
+  set(_common_args)
+  get_directory_property(_def_list DEFINITION COMPILE_DEFINITIONS)
+  foreach(TMP_DEF ${_def_list})
+    set(_common_args "${_common_args}-D${TMP_DEF}\n")
   endforeach()
-  
-  string(STRIP "${_include_dirs_file}" CMAKE_CONFIGURABLE_FILE_CONTENT)
-  set(_target_includes_file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.inc)
+  foreach(INCLUDE_DIR ${TMP_INCLUDE_DIRS})
+    set(_common_args "${_common_args}-I\"${INCLUDE_DIR}\"\n")
+  endforeach()
+  if(VTK_WRAP_HINTS)
+    set(_common_args "${_common_args}--hints \"${VTK_WRAP_HINTS}\"\n")
+  endif()
+  if(KIT_HIERARCHY_FILE)
+    set(_common_args "${_common_args}--types \"${KIT_HIERARCHY_FILE}\"\n")
+  endif()
+
+  # write wrapper-tool arguments to a file
+  string(STRIP "${_common_args}" CMAKE_CONFIGURABLE_FILE_CONTENT)
+  set(_args_file ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.args)
   configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
-                 ${_target_includes_file} @ONLY)    
-  set(_target_includes "--includes ${_target_includes_file}")
+                 ${_args_file} @ONLY)
+
 
   # For each class
-  FOREACH(FILE ${SOURCES})
+  foreach(FILE ${SOURCES})
 
     # should we wrap the file?
-    GET_SOURCE_FILE_PROPERTY(TMP_WRAP_EXCLUDE ${FILE} WRAP_EXCLUDE)
-    
+    get_source_file_property(TMP_WRAP_EXCLUDE ${FILE} WRAP_EXCLUDE)
+
     # if we should wrap it
-    IF (NOT TMP_WRAP_EXCLUDE)
-        
+    if (NOT TMP_WRAP_EXCLUDE)
+
       # what is the filename without the extension
-      GET_FILENAME_COMPONENT(TMP_FILENAME ${FILE} NAME_WE)
-      
+      get_filename_component(TMP_FILENAME ${FILE} NAME_WE)
+
       # the input file might be full path so handle that
-      GET_FILENAME_COMPONENT(TMP_FILEPATH ${FILE} PATH)
-      
+      get_filename_component(TMP_FILEPATH ${FILE} PATH)
+
       # compute the input filename
-      IF (TMP_FILEPATH)
-        SET(TMP_INPUT ${TMP_FILEPATH}/${TMP_FILENAME}.h) 
-      ELSE (TMP_FILEPATH)
-        SET(TMP_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/${TMP_FILENAME}.h)
-      ENDIF (TMP_FILEPATH)
-      
+      if (TMP_FILEPATH)
+        set(TMP_INPUT ${TMP_FILEPATH}/${TMP_FILENAME}.h)
+      else ()
+        set(TMP_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/${TMP_FILENAME}.h)
+      endif ()
+
       # is it abstract?
-      GET_SOURCE_FILE_PROPERTY(TMP_ABSTRACT ${FILE} ABSTRACT)
-      IF (TMP_ABSTRACT)
-        SET(TMP_CONCRETE "--abstract")
-      ELSE (TMP_ABSTRACT)
-        SET(TMP_CONCRETE "--concrete")
-      ENDIF (TMP_ABSTRACT)
+      get_source_file_property(TMP_ABSTRACT ${FILE} ABSTRACT)
+      if (TMP_ABSTRACT)
+        set(TMP_CONCRETE "--abstract")
+      else ()
+        set(TMP_CONCRETE "--concrete")
+      endif ()
 
       # add it to the init file's contents
-      SET (CXX_CONTENTS 
+      set (CXX_CONTENTS
         "${CXX_CONTENTS}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
-      
-      SET (CXX_CONTENTS2 
+
+      set (CXX_CONTENTS2
         "${CXX_CONTENTS2}  ${TMP_FILENAME}_Init(csi);\n")
-      
-      # new source file is nameClientServer.cxx, add to resulting list
-      SET(${SRC_LIST_NAME} ${${SRC_LIST_NAME}} 
+
+      # new source file is nameClientServer.cxx, add to resulting list of cs wrapped files to compile
+      set(${SRC_LIST_NAME} ${${SRC_LIST_NAME}}
         ${TMP_FILENAME}ClientServer.cxx)
 
-      # add custom command to output
-      ADD_CUSTOM_COMMAND(
+      # add custom command to generate the cs wrapped file
+      add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
         MAIN_DEPENDENCY ${TMP_INPUT}
-        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file}
+        DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file} ${_args_file}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS
         ${TMP_CONCRETE}
         ${TMP_HINTS}
-        ${TMP_DEFINITIONS}
-        ${_target_includes}
-        ${TMP_INPUT}
-        ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
+        "${quote}@${_args_file}${quote}"
+        "-o" "${quote}${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx${quote}"
+        "${quote}${TMP_INPUT}${quote}"
+        COMMENT "CS Wrapping - generating ${TMP_FILENAME}ClientServer.cxx"
         )
 
-      # Add this output to a custom target if needed.
-      IF(VTK_WRAP_CS_CUSTOM_TARGETS_LIMIT)
-        LIST(APPEND VTK_WRAP_CS_CUSTOM_LIST ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx)
-        LIST(LENGTH VTK_WRAP_CS_CUSTOM_LIST VTK_WRAP_CS_CUSTOM_COUNT)
-        IF("${VTK_WRAP_CS_CUSTOM_COUNT}" EQUAL "${VTK_WRAP_CS_CUSTOM_TARGETS_LIMIT}")
-          SET(VTK_WRAP_CS_CUSTOM_NAME ${VTK_WRAP_CS_CUSTOM_NAME}Hack)
-          ADD_CUSTOM_TARGET(${VTK_WRAP_CS_CUSTOM_NAME} DEPENDS ${VTK_WRAP_CS_CUSTOM_LIST})
-          SET(KIT_CS_DEPS ${VTK_WRAP_CS_CUSTOM_NAME})
-          SET(VTK_WRAP_CS_CUSTOM_LIST)
-        ENDIF("${VTK_WRAP_CS_CUSTOM_COUNT}" EQUAL "${VTK_WRAP_CS_CUSTOM_TARGETS_LIMIT}")
-      ENDIF(VTK_WRAP_CS_CUSTOM_TARGETS_LIMIT)
-    ENDIF (NOT TMP_WRAP_EXCLUDE)
-  ENDFOREACH(FILE)
-  
-  # need the set for the configure file
-  SET (CS_TARGET ${TARGET})
+    endif (NOT TMP_WRAP_EXCLUDE)
+  endforeach(FILE)
 
-  CONFIGURE_FILE(
-    ${ParaView_CMAKE_DIR}/vtkWrapClientServer.cxx.in  
+  # Create the Init File
+  set (CS_TARGET ${TARGET})
+  configure_file(
+    ${ParaView_CMAKE_DIR}/vtkWrapClientServer.cxx.in
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
     COPY_ONLY
     IMMEDIATE
     )
-
-  # Create the Init File
-  SET(${SRC_LIST_NAME} ${${SRC_LIST_NAME}} 
+  #add it to the list of files to compile for the CS wrapped lib
+  set(${SRC_LIST_NAME} ${${SRC_LIST_NAME}}
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx)
-  SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx 
+  set_source_files_properties(
+    ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
     PROPERTIES GENERATED 1 WRAP_EXCLUDE 1 ABSTRACT 0
     )
-  
-ENDMACRO(VTK_WRAP_ClientServer)
 
+endmacro(VTK_WRAP_ClientServer)
