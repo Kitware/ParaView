@@ -454,6 +454,18 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+# Based on state of VTK modules, set up some variables that paraview needs to
+# compile optional code.
+set (VTK_HAS_OGGTHEORA_SUPPORT FALSE)
+set (VTK_HAS_FFMPEG_SUPPORT FALSE)
+if (TARGET vtkoggtheora)
+  set (VTK_HAS_OGGTHEORA_SUPPORT TRUE)
+endif()
+if (TARGET vtkIOFFMPEG)
+set (VTK_HAS_FFMPEG_SUPPORT TRUE)
+endif()
+
+
 configure_file(
   ${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h

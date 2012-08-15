@@ -51,11 +51,11 @@ vtkPVServerInformation::vtkPVServerInformation()
 #if defined(_WIN32)
   this->AVISupport = 1;
 #else
-# if defined(VTK_USE_FFMPEG_ENCODER)
+# if defined(VTK_HAS_FFMPEG_SUPPORT)
   this->AVISupport = 1;
 # endif
 #endif
-#if defined(VTK_USE_OGGTHEORA_ENCODER)
+#if defined(VTK_HAS_OGGTHEORA_SUPPORT)
   this->OGVSupport = 1;
 #else
   this->OGVSupport = 0;
