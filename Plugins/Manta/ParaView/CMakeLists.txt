@@ -1,15 +1,8 @@
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIR}
-    ${PARAVIEW_INCLUDE_DIRS}
-    ${vtkManta_SOURCE_DIR}
-    ${vtkManta_BINARY_DIR}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
-
+include_directories(
+  ${VTK_INCLUDE_DIRS}
+  ${MantaView_SOURCE_DIR}/VTK
+  ${MantaView_BINARY_DIR}/VTK
+)
 
 IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE_DIRECTORIES(
@@ -67,8 +60,6 @@ add_paraview_plugin(
     MantaView.cxx
     MantaDisplay.cxx
     MantaViewOptions.cxx
-  CS_KITS
-    vtkManta
 )
 
-TARGET_LINK_LIBRARIES ( MantaView vtkMantaCS )
+TARGET_LINK_LIBRARIES (MantaView vtkManta)
