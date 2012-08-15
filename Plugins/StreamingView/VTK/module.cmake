@@ -7,6 +7,7 @@ vtk_module(vtkStreaming
    vtkIOCore
    vtkImagingSources
    vtkIONetCDF
+   vtknetcdf
   TEST_DEPENDS
     vtkTestingRendering
   EXCLUDE_FROM_WRAP_HIERARCHY
