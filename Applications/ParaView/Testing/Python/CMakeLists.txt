@@ -84,31 +84,40 @@ include("TestNumPy")
 
 IF ("1" STREQUAL ${HAS_NUMPY})
   # Add pvpython tests
-  add_test("pvpython.TestPythonAnnotationFilter"
-      ${PARAVIEW_PYTHON_EXECUTABLE}
+  add_test(NAME pvpython.TestPythonAnnotationFilter
+      COMMAND pvpython
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
       ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilter.py)
-  add_test("pvpython.TestPythonAnnotationFilterNoMerge"
-      ${PARAVIEW_PYTHON_EXECUTABLE}
+  add_test(NAME pvpython.TestPythonAnnotationFilterNoMerge
+      COMMAND pvpython
       --data=${PARAVIEW_DATA_ROOT}/Data/can.ex2
       ${CMAKE_CURRENT_SOURCE_DIR}/TestPythonAnnotationFilterNoMerge.py)
+  set_tests_properties(
+    pvpython.TestPythonAnnotationFilter
+    pvpython.TestPythonAnnotationFilterNoMerge
+    PROPERTIES LABELS "PARAVIEW")
 ENDIF ("1" STREQUAL ${HAS_NUMPY})
 
 ENDIF (PARAVIEW_DATA_ROOT)
 
 # Python Multi-servers test
-add_test("py-multi-servers.TestMultiServersConfig"
-    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+add_test(NAME py-multi-servers.TestMultiServersConfig
+    COMMAND smTestDriver
     --test-multi-servers 2
-    --server ${PARAVIEW_SERVER_EXECUTABLE}
-    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    --server $<TARGET_FILE:pvserver>
+    --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersConfig.py
 )
 
-add_test("py-multi-servers.TestMultiServersRemoteProxy"
-    ${PARAVIEW_SMTESTDRIVER_EXECUTABLE}
+add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
+    COMMAND smTestDriver
     --test-multi-servers 3
-    --server ${PARAVIEW_SERVER_EXECUTABLE}
-    --client ${PARAVIEW_PYTHON_EXECUTABLE}
+    --server $<TARGET_FILE:pvserver>
+    --client ${TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
 )
+
+set_tests_properties(
+  py-multi-servers.TestMultiServersConfig
+  py-multi-servers.TestMultiServersRemoteProxy
+  PROPERTIES LABELS "PARAVIEW")

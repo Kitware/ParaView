@@ -40,6 +40,8 @@ ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS
 ADD_PARAVIEW_PLUGIN(ParticlesViewerPlugin "1.0"
   GUI_INTERFACES ${IFACES}
   GUI_SOURCES ${IFACE_SRCS} ${SOURCE_FILES} ${MOC_SRCS} ${UI_BUILT_SOURCES})
+target_link_libraries(ParticlesViewerPlugin
+  pqApplicationComponents)
 
 #------------------------------------------------------------------------------
 # Build the client

@@ -31,6 +31,8 @@ FOREACH(name ${ServersFilters_SRCS})
     vtkPVVTKExtensions
     vtkImagingMorphological
     vtkInteractionImage)
+
+  set_tests_properties(${name}  PROPERTIES LABELS "PARAVIEW")
 ENDFOREACH(name)
 
 set (_MPI_TEST_PATH ${CXX_TEST_PATH})
@@ -100,6 +102,14 @@ IF(PARAVIEW_USE_ICE_T AND PARAVIEW_USE_MPI AND
             -T ${ParaView_BINARY_DIR}/Testing/Temporary
             -V Baseline/TestIceTShadowMapPass.cxx.png
             ${VTK_MPI_POSTFLAGS})
+
+  set_tests_properties(
+    TestIceTCompositePassWithBlurAndOrderedCompositing
+    TestIceTCompositePassWithSobel
+    TestIceTCompositePassDepthOnly
+    TestSimpleIceTCompositePass
+    TestIceTShadowMapPass-image
+    PROPERTIES LABELS "PARAVIEW")
 ENDIF()
 
 
@@ -118,6 +128,7 @@ TestPVAMRDualClip
       -V ${PARAVIEW_DATA_ROOT}/Baseline/${name}.png
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVVTKExtensions)
+    set_tests_properties(${name} PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH(name)
 endif()
 
@@ -138,5 +149,6 @@ IF (PARAVIEW_USE_MPI)
             -D ${VTK_DATA_ROOT}
             -T ${VTK_BINARY_DIR}/Testing/Temporary
             ${VTK_MPI_POSTFLAGS})
-
+    set_tests_properties(
+      TestDistributedSubsetSortingTable PROPERTIES LABELS "PARAVIEW")
 ENDIF (PARAVIEW_USE_MPI)

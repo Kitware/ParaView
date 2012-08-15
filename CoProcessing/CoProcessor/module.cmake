@@ -10,5 +10,7 @@ vtk_module(vtkCoProcessorImplementation
     vtkCoProcessor
     vtkPVServerManagerApplication
     ${__depends}
+  TEST_DEPENDS
+    vtkTestingRendering
   EXCLUDE_FROM_WRAPPING
 )

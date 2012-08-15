@@ -22,8 +22,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVPythonInterpretor.h"
 #include <vector>
 
+#ifndef BUILD_SHARED_LIBS
 // file containing static initialization functions for all modules built.
-#include "pvpythonmodules.h"
+# include "pvpythonmodules.h"
+#endif
 
 namespace ParaViewPython {
 
@@ -108,9 +110,11 @@ namespace ParaViewPython {
 
       // Start interpretor
       vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
+#ifndef BUILD_SHARED_LIBS
       // register callback to initialize modules statically. The callback is
       // empty when BUILD_SHARED_LIBS is ON.
       CMakeLoadAllPythonModules();
+#endif
 
       ret_val = interpretor->PyMain(pythonArgs.size(), &*pythonArgs.begin());
       interpretor->Delete();

@@ -2,17 +2,40 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
   <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
-  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected"
-    arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
-
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ApplyDisplacements/CheckBox" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/actionVCRLastFrame" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-
-    <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="True" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="EQPS" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="0." />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/selectionType" command="set_string" arguments="Point" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="200" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="DISPL (Magnitude)" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="0.5" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is &lt;=" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/condition" command="set_string" arguments="is &gt;=" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="0" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/valueStackedWidget/multiBlock/showCompositeTree" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/Blocks" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/Blocks" command="setCurrent" arguments="0.0.0.0.0.0" />
@@ -20,20 +43,35 @@
   <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/pqQueryClauseWidget/pqQueryCompositeTreeDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/extractSelection" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QTabBar1" command="set_tab_with_text" arguments="Properties" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
   <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="(GlobalElementId &gt; 100) &amp; (GlobalElementId &lt; 200)" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/selectionType" command="set_string" arguments="Cell" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog" command="mousePress" arguments="1,1,0,83,9" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog" command="mouseRelease" arguments="1,0,0,83,9" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/selectionType" command="set_string" arguments="Point" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="20" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="200" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_Edit" />
-  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionQuery" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="GlobalElementId == 800" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="80" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="80" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="800" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="DISPL" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="Cell ID" />
-  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalElementId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="Point ID" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="ACCL" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalNodeId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalNodeId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labelColor" command="setChosenColor" arguments="255,255,255" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labelColor" command="setChosenColor" arguments="0,85,0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labelColor" command="setChosenColor" arguments="0,221,0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labelColor" command="setChosenColor" arguments="0,255,0" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/criteria" command="set_string" arguments="GlobalNodeId" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="40" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="40" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/queryClauseFrame/pqQueryClauseWidget/valueStackedWidget/singleValue/value" command="set_string" arguments="400" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/runQuery" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqQueryDialog/labels" command="set_string" arguments="GlobalNodeId" />
   <pqevent object="pqClientMainWindow/pqQueryDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Outline" />
 </pqevents>

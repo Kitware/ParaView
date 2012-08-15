@@ -1,14 +1,16 @@
-unset(_vtk_modules)
-# this file defines all ParaView needed modules and defines "_vtk_modules"
-include(VTKModules)
+set (extra_depends)
+if (PARAVIEW_USE_MPI)
+  list(APPEND extra_depends
+    vtkIOMPIImage)
+endif()
 
 vtk_module(vtkPVServerManagerDefault
   DEPENDS
     vtkPVServerImplementationDefault
     vtkPVServerManagerRendering
-    ${_vtk_modules}
-
+    vtkTestingRendering
+    ${extra_depends}
   TEST_DEPENDS
     vtkPVServerManagerApplication
 )
-unset(_vtk_modules)
+unset(extra_depends)

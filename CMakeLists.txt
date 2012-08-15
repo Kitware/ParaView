@@ -294,29 +294,13 @@ mark_as_advanced(VTK_COSMOS_USE_MPI)
 set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_VPIC_USE_MPI)
 
+# this bring in states for additional VTK modules that ParaView GUI needs to
+# work.
+include(VTKModules)
+
 #------------------------------------------------------------------------------
 
 include_directories(${ParaView_BINARY_DIR})
-
-#tell paraview about the visitbridge classes that it has to wrap and expose
-#in the GUI
-macro(PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES RESOURCES)
-  set(PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES
-    ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES} ${RESOURCES})
-endmacro(PARAVIEW_INCLUDE_SERVERMANAGER_RESOURCES RESOURCES)
-
-set(VISITBRIDGE_READERS_XML_FILE
-  "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers.xml")
-paraview_include_servermanager_resources(${VISITBRIDGE_READERS_XML_FILE})
-
-set(PARAVIEW_EXTRA_GUI_RESOURCES)
-macro(PARAVIEW_INCLUDE_GUI_RESOURCES RESOURCES)
-  set(PARAVIEW_EXTRA_GUI_RESOURCES ${PARAVIEW_EXTRA_GUI_RESOURCES} ${RESOURCES})
-endmacro(PARAVIEW_INCLUDE_GUI_RESOURCES RESOURCES)
-
-set(VISITBRIDGE_READERS_GUI_XML_FILE
-  "${ParaView_SOURCE_DIR}/Utilities/VisItBridge/databases/visit_readers_gui.xml")
-paraview_include_gui_resources(${VISITBRIDGE_READERS_GUI_XML_FILE})
 
 #------------------------------------------------------------------------------
 # Bring in VTK
@@ -338,6 +322,7 @@ if (NOT __paraview_configured AND USE_EXTERNAL_VTK)
 endif()
 set (__paraview_configured TRUE CACHE INTERNAL
   "ParaView has been configured" FORCE)
+
 
 if (use_external_vtk)
   find_package(VTK REQUIRED ${required_vtk_modules})
@@ -384,6 +369,7 @@ else()
     ThirdParty/QtTesting
     Utilities/VisItBridge/Library
     Utilities/VisItBridge/databases
+
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
     ParaViewCore/Common
@@ -440,8 +426,12 @@ else()
     "${ParaView_BINARY_DIR}/${dir}")
   endforeach()
 
+  enable_required_modules()
+
   # include VTK
   add_subdirectory(VTK)
+
+  hide_enabled_modules()
 
   # keep VTK cmake variables from polluting the non-advanced space.
   mark_as_advanced(

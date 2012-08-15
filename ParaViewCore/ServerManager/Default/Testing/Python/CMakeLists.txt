@@ -40,6 +40,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PVServerManagerTestData}/Baseline/${tfile}.png
         --state ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
+    set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH (tfile)
 
   # This is a test that saves a temporary SM state and uses that saved
@@ -52,6 +53,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
         -V ${PVServerManagerTestData}/Baseline/Arrow.png
         --state ${SMSTATE_FILE_DIR}/Arrow.pvsm
         --use_saved_state)
+  set_tests_properties(LoadSave-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
 ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
 ###############################################################################
@@ -84,6 +86,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PVServerManagerTestData}/Baseline/${tfile}.png
         -S ${SMSTATE_FILE_DIR})
+    set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
 
@@ -118,6 +121,7 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
         -D ${PVServerManagerTestData}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -S ${SMSTATE_FILE_DIR})
+    set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH(tfile)
 
   # This is necessary because PythonFilters generates and executes python scripts
@@ -188,6 +192,10 @@ IF (PVServerManagerTestData AND GENERATOR_EXPRESSIONS_SUPPORTED)
           -V ${PVServerManagerTestData}/Baseline/${tfile}.png
           -S ${SMSTATE_FILE_DIR})
     ENDIF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
+    set_tests_properties(
+      ${tfile}-Batch
+      ${tfile}-SymmetricBatch
+      PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH (tfile)
 
   IF ("1" STREQUAL ${HAS_NUMPY})

@@ -28,33 +28,6 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-#------------------------------------------------------------------------------
-# GENERATE_QT_RESOURCE_FROM_FILES can be used to generate a Qt resource file
-# from a given set of files.
-# ARGUMENTS:
-# resource_file: IN : full pathname of the qrc file to generate. 
-# resource_prefix: IN : the name used in the "prefix" attribute for the
-#                       generated qrc file.
-# file_list: IN : list of files to be added into the resource file.
-#------------------------------------------------------------------------------
-macro(generate_qt_resource_from_files resource_file resource_prefix file_list)
-  set (pq_resource_file_contents "<RCC>\n  <qresource prefix=\"${resource_prefix}\">\n")
-  get_filename_component(current_directory ${resource_file} PATH)
-  foreach (resource ${file_list})
-    get_filename_component(alias ${resource} NAME)
-    get_filename_component(resource ${resource} ABSOLUTE)
-    file(RELATIVE_PATH resource "${current_directory}" "${resource}")
-    file(TO_NATIVE_PATH "${resource}" resource)
-    set (pq_resource_file_contents
-      "${pq_resource_file_contents}    <file alias=\"${alias}\">${resource}</file>\n")
-  endforeach (resource)
-  set (pq_resource_file_contents
-    "${pq_resource_file_contents}  </qresource>\n</RCC>\n")
-
-  # Generate the resource file.
-  file (WRITE "${resource_file}" "${pq_resource_file_contents}")
-endmacro(generate_qt_resource_from_files)
-
 set (Module_SRCS
   pq3DWidget.cxx
   pq3DWidget.h
@@ -699,7 +672,7 @@ set (Module_UI_FILES
   Resources/UI/pqXYChartDisplayPanel.ui
 )
 
-generate_qt_resource_from_files(
+GENERATE_QT_RESOURCE_FROM_FILES(
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
   "/ParaViewResources"
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/Placeholder.xml
@@ -725,13 +698,7 @@ add_custom_command(
 
 qt4_wrap_cpp(__Module_MOC_SRCS ${Module_MOC_HDRS})
 qt4_wrap_ui(__Module_UI_SRCS ${Module_UI_FILES})
-
-generate_qt_resource_from_files(
-  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
-  "/ParaViewResources"
-  ${PARAVIEW_EXTRA_GUI_RESOURCES})
-
-qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc")
+qt4_add_resources(__Module_RESOURCE_SRCS ${Module_RESOURCE_FILES})
 
 SOURCE_GROUP("Resources" FILES
   ${Module_UI_FILES}

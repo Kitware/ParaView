@@ -10,4 +10,5 @@ FOREACH(test ${MyTests})
   ADD_TEST(
     NAME pqWidgets${test} 
     COMMAND pqWidgetsTest ${test} --exit)
+  set_tests_properties(pqWidgets${test} PROPERTIES LABELS "PARAVIEW")
 ENDFOREACH()
