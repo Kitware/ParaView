@@ -30,6 +30,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVRenderView.h"
 #include "vtkPlot.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
@@ -45,13 +46,20 @@ pqMultiSliceView::pqMultiSliceView(
     vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
+  // Nothing is changing anything.
+  this->UserIsInteracting = false;
+
   // When data change make sure the bounds are updated
   QObject::connect(this, SIGNAL(updateDataEvent()),
                    this, SLOT(updateAxisBounds()));
 
   // Make sure all the representations share the same slice values
   QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
-                   this, SLOT(updateSlices()));
+                   this, SLOT(addPropertyListener(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
+                   this, SLOT(removePropertyListener(pqRepresentation*)));
+  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
+                   this, SLOT(updateAxisBounds()));
 }
 
 //-----------------------------------------------------------------------------
@@ -173,6 +181,9 @@ void pqMultiSliceView::updateAxisBounds()
 //-----------------------------------------------------------------------------
 void pqMultiSliceView::updateSlices()
 {
+  // Make sure we know that the origin of the changes come from the UI
+  this->UserIsInteracting = true;
+
   int nbSliceX = 0;
   const double* sliceX = this->AxisX->getVisibleSlices(nbSliceX);
   int nbSliceY = 0;
@@ -198,5 +209,113 @@ void pqMultiSliceView::updateSlices()
     smRep->MarkDirty(NULL);
     smRep->UpdateVTKObjects();
     }
+  this->render();
+
+  // Get back to an idle mode
+  this->UserIsInteracting = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::addPropertyListener(pqRepresentation* rep)
+{
+  // Make sure it's a representation we care for
+  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
+    {
+    return;
+    }
+
+  this->ObserverIdX[rep] =
+      rep->getProxy()->GetProperty("XSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
+  this->ObserverIdY[rep] =
+      rep->getProxy()->GetProperty("YSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
+  this->ObserverIdZ[rep] =
+      rep->getProxy()->GetProperty("ZSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
+
+  // Make sure the added representation get synch with the current view configuration
+  int nbSlicesX, nbSlicesY, nbSlicesZ;
+  this->AxisX->getVisibleSlices(nbSlicesX);
+  this->AxisY->getVisibleSlices(nbSlicesY);
+  this->AxisZ->getVisibleSlices(nbSlicesZ);
+
+  // If no slice defined then check if the added representation has some...
+  if(nbSlicesX == 0 && nbSlicesY == 0 && nbSlicesZ == 0)
+    {
+    this->updateViewModelCallBack(NULL, 0, NULL);
+    }
+  else
+    {
+    this->updateSlices();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::removePropertyListener(pqRepresentation* rep)
+{
+  // Make sure it's a representation we care for
+  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
+    {
+    return;
+    }
+
+  rep->getProxy()->GetProperty("XSlicesValues")->RemoveObserver(this->ObserverIdX[rep]);
+  rep->getProxy()->GetProperty("YSlicesValues")->RemoveObserver(this->ObserverIdY[rep]);
+  rep->getProxy()->GetProperty("ZSlicesValues")->RemoveObserver(this->ObserverIdZ[rep]);
+
+  this->ObserverIdX.remove(rep);
+  this->ObserverIdY.remove(rep);
+  this->ObserverIdZ.remove(rep);
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::updateViewModelCallBack(vtkObject*,unsigned long, void*)
+{
+  if(this->UserIsInteracting)
+    {
+    return; // We don't want to update our data model
+    }
+
+  // Let's pick a valid representation and update the view from it
+  bool needToUpdateUI = true;
+  foreach(pqRepresentation* rep, this->getRepresentations())
+    {
+    if(rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
+      {
+      continue;
+      }
+    vtkSMRepresentationProxy* smRep =
+        vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
+
+    if(needToUpdateUI)
+      {
+      std::vector<double> xSlices =
+          vtkSMPropertyHelper(smRep, "XSlicesValues").GetDoubleArray();
+      std::vector<double> ySlices =
+          vtkSMPropertyHelper(smRep, "YSlicesValues").GetDoubleArray();
+      std::vector<double> zSlices =
+          vtkSMPropertyHelper(smRep, "ZSlicesValues").GetDoubleArray();
+
+      assert("The maximum number of slice can not be bigger than 255" &&
+             ( 255 >
+               std::max(
+                 std::max(
+                   xSlices.size(), ySlices.size()), zSlices.size())));
+
+      // Build a tmp array of visibility set to true
+      bool visibility[255];
+      memset(visibility, true, 255);
+
+      this->AxisX->updateSlices(&xSlices[0], visibility, static_cast<int>(xSlices.size()));
+      this->AxisY->updateSlices(&ySlices[0], visibility, static_cast<int>(ySlices.size()));
+      this->AxisZ->updateSlices(&zSlices[0], visibility, static_cast<int>(zSlices.size()));
+      }
+
+    smRep->MarkModified(NULL);
+    smRep->MarkDirty(NULL);
+    smRep->UpdateVTKObjects();
+    }
+
   this->render();
 }

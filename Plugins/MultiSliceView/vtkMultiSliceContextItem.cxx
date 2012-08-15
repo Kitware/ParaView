@@ -402,6 +402,18 @@ const double* vtkMultiSliceContextItem::GetVisibleSlices(int &nbSlices) const
 }
 
 //-----------------------------------------------------------------------------
+void vtkMultiSliceContextItem::SetSlices(double *values, bool *visibility, int numberOfSlices)
+{
+  this->Internal->Slices.clear();
+  this->Internal->SlicesVisibility.clear();
+  for(int i=0; i < numberOfSlices; ++i)
+    {
+    this->Internal->Slices.push_back(values[i]);
+    this->Internal->SlicesVisibility.push_back(visibility[i]);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkAxis* vtkMultiSliceContextItem::GetAxis()
 {
   return this->Internal->Axis.GetPointer();

@@ -196,3 +196,10 @@ void pqMultiSliceAxisWidget::SetEdgeMargin(int margin)
 {
   this->Internal->SliceItem->SetEdgeMargin(margin);
 }
+
+// ----------------------------------------------------------------------------
+void pqMultiSliceAxisWidget::updateSlices( double* values, bool* visibility,
+                                           int numberOfValues)
+{
+  this->Internal->SliceItem->SetSlices(values, visibility, numberOfValues);
+}

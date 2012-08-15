@@ -83,6 +83,10 @@ public:
   // visible slices
   const double* GetVisibleSlices(int &nbSlices) const;
 
+  // Description:
+  // Allow user to programatically update the data model
+  void SetSlices(double* values, bool* visibility, int numberOfSlices);
+
 protected:
   double ScreenToRange(float position);
   double ComputeEpsilon(int numberOfPixel = 5);
