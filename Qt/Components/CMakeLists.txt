@@ -315,6 +315,8 @@ set (Module_SRCS
   pqSaveSnapshotDialog.h
   pqScalarSetModel.cxx
   pqScalarSetModel.h
+  pqScalarValueListPropertyWidget.cxx
+  pqScalarValueListPropertyWidget.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqSelectionInputWidget.cxx
@@ -544,6 +546,7 @@ set (Module_MOC_HDRS
   pqSampleScalarWidget.h
   pqSaveSnapshotDialog.h
   pqScalarSetModel.h
+  pqScalarValueListPropertyWidget.h
   pqSelectionAdaptor.h
   pqSelectionInputWidget.h
   pqSelectionInspectorPanel.h

@@ -38,10 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMBoundsDomain.h"
 
 #include "pqSignalAdaptors.h"
 #include "pqDoubleEdit.h"
 #include "pqDoubleRangeWidget.h"
+#include "pqScalarValueListPropertyWidget.h"
 
 #include <QHBoxLayout>
 #include <QDoubleSpinBox>
@@ -72,7 +74,20 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
   if(vtkSMDoubleRangeDomain *range = vtkSMDoubleRangeDomain::SafeDownCast(domain))
     {
-    if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
+    if(vtkSMBoundsDomain::SafeDownCast(range) && smProperty->GetRepeatable())
+      {
+      pqScalarValueListPropertyWidget *widget =
+        new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
+      widget->setObjectName("ScalarValueList");
+      this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+      layoutLocal->addWidget(widget);
+      this->setShowLabel(false);
+
+      this->setReason() << "pqScalarValueListPropertyWidget for a repeatable "
+                           "DoubleVectorProperty with a BoundsDomain ("  <<
+                           range->GetXMLName() << ") ";
+      }
+    else if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
       {
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);
