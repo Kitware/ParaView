@@ -18,7 +18,6 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
 
   <!-- Create slices -->
-  <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport/1pqMultiSliceAxisWidget1/1QVTKWidget0" command="mouseDblClick" arguments="1,1,0,324,44" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport/1pqMultiSliceAxisWidget0/1QVTKWidget0" command="mouseDblClick" arguments="1,1,0,54,245" />
 
   <!-- Start cell selection -->
