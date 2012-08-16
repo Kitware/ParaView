@@ -87,6 +87,8 @@ pqPassArraysPanel::pqPassArraysPanel(pqProxy* pxy, QWidget* p)
   hbox->addWidget(this->SelectorWidget);
   hbox->setMargin(0);
   hbox->setSpacing(4);
+
+  this->ArrayListInitialized = false;
   // wait a bit before updating the array list so that the info can catch up.
   QTimer::singleShot(10, this, SLOT(updateArrayList() ) );
 }
@@ -340,9 +342,17 @@ void pqPassArraysPanel::updateArrayList()
 
       item->setData(0, Qt::DecorationRole, *(this->TypePixmaps[i]));
       this->SelectorWidget->insertTopLevelItem(index, item);
-      QObject::connect(this->SelectorWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-                       this, SLOT(setModified()));
       }
     }
   this->reset();
+
+  // connect the itemChanged() signal to the setModified() slot only after
+  // the array list was populated for the first time. otherwise this will
+  // cause the apply/reset buttons to be activated incorrectly
+  if(!this->ArrayListInitialized)
+    {
+    QObject::connect(this->SelectorWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)),
+                     this, SLOT(setModified()));
+    this->ArrayListInitialized = true;
+    }
 }
