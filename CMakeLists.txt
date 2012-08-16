@@ -158,6 +158,7 @@ set (VTK_INSTALL_NO_QT_PLUGIN TRUE)
 
 # ParaView install the vtk python modules specifically to appropriate locations.
 set (VTK_INSTALL_NO_PYTHON TRUE)
+set (VTK_INSTALL_PYTHON_USING_CMAKE TRUE)
 
 # for temporary backwards compatibility.
 set (PV_INSTALL_BIN_DIR ${VTK_INSTALL_RUNTIME_DIR})
@@ -229,6 +230,44 @@ cmake_dependent_option(BUILD_PARTICLE_COPROCESSING_ADAPTORS
   "PARAVIEW_ENABLE_COPROCESSING" OFF)
 mark_as_advanced(BUILD_PARTICLE_COPROCESSING_ADAPTORS)
 mark_as_advanced(BUILD_FORTRAN_COPROCESSING_ADAPTORS)
+
+if (APPLE)
+  # If building on apple, we will set cmake rules for ParaView such that "make
+  # install" will result in creation of an application bundle by default.
+  # The trick we play is as such:
+  # 1. We hide the CMAKE_INSTALL_PREFIX variable at force it to a
+  #    internal/temporary location. All generic VTK/ParaView install rules
+  #    happily go about installing under this CMAKE_INSTALL_PREFIX location.
+  # 2. We provide a new vairable MACOSX_APP_INSTALL_PREFIX that user can set to
+  #    point where he wants the app bundle to be placed (default is
+  #    /Applications).
+  # 3. We set CMAKE_INSTALL_NAME_DIR to point to location of runtime libraries
+  #    in the app bundle. Thus when the libraries are installed, cmake
+  #    automatically cleans up the install_name paths for all shared libs that
+  #    we built to point to a location within the app.
+  # 4. To make packaging of plugins easier, we install plugins under a directory
+  #    named "plugins" in the temporary CMAKE_INSTALL_PREFIX location. This just
+  #    a simple trick to avoid having to keep track of plugins we built.
+  # 5. Every application that builds an app, then uses the
+  #    ParaViewBrandingInstallApp.cmake or something similar to put all the
+  #    libraries, plugins, python files etc. within the app bundle itself.
+  # 6. Finally, the bundle generated under the temporary location is copied over
+  #   to the path specified by MACOSX_APP_INSTALL_PREFIX.
+  #
+  # In keeping with our "WE INSTALL WHAT WE BUILD" rule, this app bundle is not
+  # distributable to others since it does not include Qt, or other external
+  # dependencies. For a distributable pacakage, refer to ParaView Super-build
+  # instructions.
+  set (CMAKE_INSTALL_PREFIX
+    ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/__macos_install
+    CACHE INTERNAL "" FORCE)
+  set (MACOSX_APP_INSTALL_PREFIX
+    "/Applications"
+    CACHE PATH
+    "Location where the *.app bundle must be installed.")
+  set(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
+  set(PV_INSTALL_PLUGIN_DIR "plugins")
+endif()
 
 #------------------------------------------------------------------------------
 

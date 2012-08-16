@@ -92,3 +92,24 @@ add_dependencies(paraview
 if (BUILD_TESTING)
   add_subdirectory(Testing)
 endif (BUILD_TESTING)
+
+if (APPLE)
+  # add install rules to generate the App bundle.
+  install(CODE "
+   include(\"${ParaView_CMAKE_DIR}/ParaViewBrandingInstallApp.cmake\")
+
+   #fillup bundle with all the libraries and plugins.
+   cleanup_bundle(
+     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app/Contents/MacOS/paraview
+     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app
+     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_LIBRARY_DIR}
+     \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_PLUGIN_DIR})
+
+   # Place the App at the requested location.
+   file(INSTALL DESTINATION \"${MACOSX_APP_INSTALL_PREFIX}\"
+        TYPE DIRECTORY FILES
+          \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${VTK_INSTALL_RUNTIME_DIR}/paraview.app\"
+        USE_SOURCE_PERMISSIONS)
+   "
+   COMPONENT Runtime)
+endif()
