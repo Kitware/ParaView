@@ -15,9 +15,11 @@
 #include "vtkPVWebGLExporter.h"
 
 #include "vtkBase64Utilities.h"
+#include "vtkCamera.h"
 #include "vtkExporter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkWebGLExporter.h"
@@ -53,16 +55,14 @@ void vtkPVWebGLExporter::WriteData()
   vtkNew<vtkWebGLExporter> exporter;
   exporter->SetMaxAllowedSize(65000);
 
-  // ParaView SPECIFIC code +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-//  double centerOfRotation[3];
-//  vtkPVRenderView::SafeDownCast(
-//        this->RenderWindow->GetRenderers()->GetFirstRenderer())
-//      ->GetInteractor()->GetCenterOfRotation(centerOfRotation);
-
-//  exporter->SetCenterOfRotation( static_cast<float>(centerOfRotation[0]),
-//                                 static_cast<float>(centerOfRotation[1]),
-//                                 static_cast<float>(centerOfRotation[2]));
-  // ParaView SPECIFIC code +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+  // We use the camera focal point to be the center of rotation
+  double centerOfRotation[3];
+  vtkRenderer *ren = this->RenderWindow->GetRenderers()->GetFirstRenderer();
+  vtkCamera *cam = ren->GetActiveCamera();
+  cam->GetFocalPoint(centerOfRotation);
+  exporter->SetCenterOfRotation( static_cast<float>(centerOfRotation[0]),
+                                 static_cast<float>(centerOfRotation[1]),
+                                 static_cast<float>(centerOfRotation[2]));
 
   exporter->parseScene(this->RenderWindow->GetRenderers(), "1", VTK_PARSEALL);
 
