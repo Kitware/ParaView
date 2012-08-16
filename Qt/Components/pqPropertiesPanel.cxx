@@ -439,6 +439,45 @@ pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *prop) c
   return 0;
 }
 
+pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *property,
+                                                             vtkSMProxy *proxy,
+                                                             QWidget *parent)
+{
+  if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
+    {
+    return new pqDoubleVectorPropertyWidget(dvp, proxy, parent);
+    }
+  else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property))
+    {
+    return new pqIntVectorPropertyWidget(ivp, proxy, parent);
+    }
+  else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(property))
+    {
+    return new pqStringVectorPropertyWidget(svp, proxy, parent);
+    }
+  else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
+    {
+    bool selection_input = (pp->GetHints() &&
+      pp->GetHints()->FindNestedElementByName("SelectionInput"));
+
+    // find the domain
+    vtkSMDomain *domain = 0;
+    vtkSMDomainIterator *domainIter = pp->NewDomainIterator();
+    for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
+      {
+      domain = domainIter->GetDomain();
+      }
+    domainIter->Delete();
+
+    if (selection_input || vtkSMProxyListDomain::SafeDownCast(domain))
+      {
+      return new pqProxyPropertyWidget(pp, proxy, parent);
+      }
+    }
+
+  return 0;
+}
+
 void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
   this->Proxy = proxy;
@@ -1112,37 +1151,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
     if(!propertyWidget)
       {
-      if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smProperty))
-        {
-        propertyWidget = new pqDoubleVectorPropertyWidget(dvp, smProxy, this);
-        }
-      else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smProperty))
-        {
-        propertyWidget = new pqIntVectorPropertyWidget(ivp, smProxy, this);
-        }
-      else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smProperty))
-        {
-        propertyWidget = new pqStringVectorPropertyWidget(svp, smProxy, this);
-        }
-      else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(smProperty))
-        {
-        bool selection_input = (pp->GetHints() &&
-          pp->GetHints()->FindNestedElementByName("SelectionInput"));
-
-        // find the domain
-        vtkSMDomain *domain = 0;
-        vtkSMDomainIterator *domainIter = pp->NewDomainIterator();
-        for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
-          {
-          domain = domainIter->GetDomain();
-          }
-        domainIter->Delete();
-
-        if (selection_input || vtkSMProxyListDomain::SafeDownCast(domain))
-          {
-          propertyWidget = new pqProxyPropertyWidget(pp, smProxy, this);
-          }
-        }
+      propertyWidget = this->createWidgetForProperty(smProperty, smProxy, this);
       }
 
     if(propertyWidget)

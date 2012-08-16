@@ -75,6 +75,12 @@ public:
   /// Returns the widget corresponding to the property.
   pqPropertyWidget* getWidgetForProperty(vtkSMProperty *property) const;
 
+  /// Creates and returns a new property widget for the \p property in
+  /// \p proxy with \p parent.
+  static pqPropertyWidget* createWidgetForProperty(vtkSMProperty *property,
+                                                   vtkSMProxy *proxy,
+                                                   QWidget *parent = 0);
+
 public slots:
   /// Sets the current render view to \p view.
   void setView(pqView *view);
