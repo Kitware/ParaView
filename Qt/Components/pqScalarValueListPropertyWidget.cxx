@@ -177,6 +177,8 @@ QListWidgetItem* pqScalarValueListPropertyWidget::addScalar(double scalar)
   d->ListWidget->addItem(item);
 
   emit scalarsChanged();
+
+  return item;
 }
 
 void pqScalarValueListPropertyWidget::addRange()
