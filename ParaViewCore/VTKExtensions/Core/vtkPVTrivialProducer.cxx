@@ -99,7 +99,7 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
     this->GetExecutive()->GetOutputInformation(0)->Set(
       vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
       &this->Internals->TimeSteps[0],
-      this->Internals->TimeSteps.size() );
+      static_cast<int>(this->Internals->TimeSteps.size()) );
     double timeRange[2] = {this->Internals->TimeSteps[0],
                            this->Internals->TimeSteps.back()};
     this->GetExecutive()->GetOutputInformation(0)->Set(
