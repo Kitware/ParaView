@@ -73,7 +73,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
 include(CMakeDependentOption)
-include(ParaViewMacros)
 #------------------------------------------------------------------------------
 
 
@@ -267,8 +266,14 @@ if (APPLE)
     "Location where the *.app bundle must be installed.")
   set(CMAKE_INSTALL_NAME_DIR "@executable_path/../Libraries")
   set(PV_INSTALL_PLUGIN_DIR "plugins")
+
+  # ensure that we don't build forwarding executables on apple.
+  set(VTK_BUILD_FORWARDING_EXECUTABLES FALSE)
 endif()
 
+if (UNIX AND NOT APPLE)
+  set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
+endif()
 #------------------------------------------------------------------------------
 
 
@@ -380,6 +385,7 @@ else()
   set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VTK_CMAKE_DIR})
   include(vtkModuleAPI)
   include(vtkModuleMacros)
+  include(ParaViewMacros)
 
   # Change VTK default, since VTK is set up to enable TK when python wrapping is
   # enabled.

@@ -39,4 +39,15 @@ macro(cleanup_bundle app app_root libdir pluginsdir)
          TYPE DIRECTORY FILES "${python_packages_dir}"
          USE_SOURCE_PERMISSIONS)
   endif()
+
+  # package other executables such as pvserver.
+  get_filename_component(bin_dir "${app_root}" PATH)
+  file(GLOB executables "${bin_dir}/*")
+  foreach(exe IN LISTS executables)
+    if (EXISTS "${exe}" AND NOT IS_DIRECTORY "${exe}")
+      file(INSTALL "${exe}"
+           DESTINATION "${app_root}/Contents/bin"
+           USE_SOURCE_PERMISSIONS)
+    endif()
+  endforeach()
 endmacro()
