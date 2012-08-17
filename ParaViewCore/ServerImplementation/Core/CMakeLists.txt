@@ -51,6 +51,7 @@ set (Module_SRCS
   vtkSISILProperty.cxx
   vtkSISourceProxy.cxx
   vtkSIStringVectorProperty.cxx
+  vtkSITimeLabelProperty.cxx
   vtkSITimeRangeProperty.cxx
   vtkSITimeStepsProperty.cxx
   vtkSIVectorProperty.cxx
