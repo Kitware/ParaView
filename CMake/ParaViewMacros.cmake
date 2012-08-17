@@ -390,22 +390,41 @@ macro(pv_set_link_interface_libs target)
 endmacro()
 
 #------------------------------------------------------------------------------
+# replacement for vtk-add executable that also adds the install rules.
+#------------------------------------------------------------------------------
+include(vtkForwardingExecutable)
+
+function(pv_add_executable name)
+  set (VTK_EXE_SUFFIX)
+  if(UNIX AND VTK_BUILD_FORWARDING_EXECUTABLES)
+    vtk_add_executable_with_forwarding(VTK_EXE_SUFFIX ${name} ${ARGN})
+    set_property(GLOBAL APPEND PROPERTY VTK_TARGETS ${name})
+  else()
+    add_executable(${name} ${ARGN})
+    set_property(GLOBAL APPEND PROPERTY VTK_TARGETS ${name})
+  endif()
+  pv_executable_install(${name} "${VTK_EXE_SUFFIX}")
+endfunction()
+
+#------------------------------------------------------------------------------
 # Function used to add install rules for executables.
 #------------------------------------------------------------------------------
 function (pv_executable_install name exe_suffix)
-  if (exe_suffix)
-    # we have two executables to install, one in the bin dir and another in the
-    # lib dir
+  if (NOT VTK_INSTALL_NO_RUNTIME)
+    if (exe_suffix)
+      # we have two executables to install, one in the bin dir and another in the
+      # lib dir
 
-    # install the real-binary in the lib-dir
-    install(TARGETS ${name}
-            DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
+      # install the real-binary in the lib-dir
+      install(TARGETS ${name}
+              DESTINATION ${VTK_INSTALL_LIBRARY_DIR}
+              COMPONENT Runtime)
+    endif()
+
+    # install the launcher binary in the binary dir. When exe_suffix is empty, the
+    # launcher binary is same as the real binary.
+    install(TARGETS ${name}${exe_suffix}
+            DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
             COMPONENT Runtime)
   endif()
-
-  # install the launcher binary in the binary dir. When exe_suffix is empty, the
-  # launcher binary is same as the real binary.
-  install(TARGETS ${name}${exe_suffix}
-          DESTINATION ${VTK_INSTALL_RUNTIME_DIR}
-          COMPONENT Runtime)
 endfunction()

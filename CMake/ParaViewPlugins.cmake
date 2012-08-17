@@ -8,9 +8,8 @@ include(ParaViewMacros)
 MACRO(internal_paraview_install_plugin name)
   IF (PV_INSTALL_PLUGIN_DIR)
     INSTALL(TARGETS ${name}
-      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
-      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
-      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+            DESTINATION ${PV_INSTALL_PLUGIN_DIR}
+            COMPONENT Runtime)
   ENDIF (PV_INSTALL_PLUGIN_DIR)
 ENDMACRO(internal_paraview_install_plugin)
 

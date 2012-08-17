@@ -57,6 +57,7 @@ vtk_add_executable_with_forwarding(out_exe_suffix
   smTestDriver
   vtkSMTestDriver.cxx
   vtkSMTestDriver.h)
+set_property(GLOBAL APPEND PROPERTY VTK_TARGETS smTestDriver)
 
 target_link_libraries(smTestDriver
   vtksys

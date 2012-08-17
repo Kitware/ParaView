@@ -38,21 +38,9 @@ vtk_module_dep_includes(vtkPVServerManagerApplication)
 include_directories(${vtkPVServerManagerApplication_DEPENDS_INCLUDE_DIRS}
                     ${vtkPVServerManagerApplication_INCLUDE_DIRS})
 
-include (vtkForwardingExecutable)
-# these will be removed once vtkForwardingExecutable is fixed.
-set(VTK_INSTALL_BIN_DIR_CM24 ${VTK_INSTALL_RUNTIME_DIR})
-set(VTK_INSTALL_LIB_DIR_CM24 ${VTK_INSTALL_LIBRARY_DIR})
-
 foreach (name pvserver pvdataserver pvrenderserver)
-  vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
-  #vtk_target_name(${name})
-  #vtk_target_label(${name})
-  #vtk_target_install(${name})
-  if (NOT VTK_INSTALL_NO_RUNTIME)
-    pv_executable_install(${name} "${exe_suffix}")
-  endif()
-  target_link_libraries(${name}
-    vtkPVServerManagerApplication)
+  pv_add_executable(${name} ${name}.cxx)
+  target_link_libraries(${name} vtkPVServerManagerApplication)
   if (NOT BUILD_SHARED_LIBS)
     target_link_libraries(${name} ${PARAVIEW_PLUGINLIST})
   endif()
@@ -77,13 +65,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     dependencies)
 
   foreach (name pvbatch pvpython)
-    vtk_add_executable_with_forwarding(exe_suffix ${name} ${name}.cxx)
-    #vtk_target_name(${name})
-    #vtk_target_label(${name})
-    #vtk_target_install(${name})
-    if (NOT VTK_INSTALL_NO_RUNTIME)
-      pv_executable_install(${name} "${exe_suffix}")
-    endif()
+    pv_add_executable(${name} ${name}.cxx)
     target_link_libraries(${name}
       vtkPVServerManagerApplication
       vtkPVPythonSupport

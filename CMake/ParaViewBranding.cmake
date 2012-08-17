@@ -124,6 +124,10 @@ FUNCTION(build_paraview_client BPC_NAME)
     SET(exe_icon "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
   ENDIF (WIN32 AND BPC_APPLICATION_ICON)
 
+  # executable_flags are used to pass options to add_executable(..) call such as
+  # WIN32 or MACOSX_BUNDLE
+  set (executable_flags)
+
   # If BPC_BUNDLE_ICON is set, setup the macosx bundle.
   IF (APPLE)
     IF (BPC_BUNDLE_ICON)
@@ -134,36 +138,39 @@ FUNCTION(build_paraview_client BPC_NAME)
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
       )
-      IF(QT_MAC_USE_COCOA)
-        IF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
-              GET_FILENAME_COMPONENT(qt_menu_nib
-                "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
-                REALPATH)
-        ELSE (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
-          GET_FILENAME_COMPONENT(qt_menu_nib
-            "@QT_LIBRARY_DIR@/Resources/qt_menu.nib"
-            REALPATH)
-        ENDIF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
-
-        set(qt_menu_nib_sources
-          "${qt_menu_nib}/classes.nib"
-          "${qt_menu_nib}/info.nib"
-          "${qt_menu_nib}/keyedobjects.nib"
-          )
-        SET_SOURCE_FILES_PROPERTIES(
-          ${qt_menu_nib_sources}
-          PROPERTIES
-          MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
-        )
-      ELSE(QT_MAC_USE_COCOA)
-        set(qt_menu_nib_sources)
-      ENDIF(QT_MAC_USE_COCOA)
     ENDIF (BPC_BUNDLE_ICON)
-    SET(MAKE_BUNDLE MACOSX_BUNDLE)
+
+    IF(QT_MAC_USE_COCOA)
+      IF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+            GET_FILENAME_COMPONENT(qt_menu_nib
+              "@QT_QTGUI_LIBRARY_RELEASE@/Resources/qt_menu.nib"
+              REALPATH)
+      ELSE (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+        GET_FILENAME_COMPONENT(qt_menu_nib
+          "@QT_LIBRARY_DIR@/Resources/qt_menu.nib"
+          REALPATH)
+      ENDIF (IS_DIRECTORY "@QT_QTGUI_LIBRARY_RELEASE@")
+
+      set(qt_menu_nib_sources
+        "${qt_menu_nib}/classes.nib"
+        "${qt_menu_nib}/info.nib"
+        "${qt_menu_nib}/keyedobjects.nib"
+        )
+      SET_SOURCE_FILES_PROPERTIES(
+        ${qt_menu_nib_sources}
+        PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources/qt_menu.nib
+      )
+    ELSE(QT_MAC_USE_COCOA)
+      set(qt_menu_nib_sources)
+    ENDIF(QT_MAC_USE_COCOA)
+
+    SET(executable_flags MACOSX_BUNDLE)
   ENDIF (APPLE)
 
   IF(WIN32)
     LINK_DIRECTORIES(${QT_LIBRARY_DIR})
+    set (executable_flags WIN32)
   ENDIF(WIN32)
 
   # If splash image is not specified, use the standard ParaView splash image.
@@ -235,10 +242,6 @@ FUNCTION(build_paraview_client BPC_NAME)
   CONFIGURE_FILE(${branding_source_dir}/branded_paraview_initializer.h.in
                  ${CMAKE_CURRENT_BINARY_DIR}/pq${BPC_NAME}Initializer.h @ONLY)
 
-  INCLUDE_DIRECTORIES(
-    ${PARAVIEW_GUI_INCLUDE_DIRS}
-    )
-
   # If BPC_MAKE_INITIALIZER_LIBRARY is set, then we are creating a separate
   # library for the initializer, otherwise we don't create a separate library to
   # keep things simple.
@@ -271,11 +274,11 @@ FUNCTION(build_paraview_client BPC_NAME)
                  "${PARAVIEW_LIBRARY_DIRS}"
                  "../${PARAVIEW_INSTALL_LIB_DIR}"
                  "${BPC_INSTALL_LIB_DIR}"
-                 ${BPC_NAME} WIN32 ${MAKE_BUNDLE}
+                 ${BPC_NAME}
+                 ${executable_flags}
                  ${BPC_NAME}_main.cxx
                  ${exe_icon}
                  ${apple_bundle_sources}
-                 ${qt_menu_nib_sources}
                  ${EXE_SRCS}
                  )
   TARGET_LINK_LIBRARIES(${BPC_NAME}
@@ -289,17 +292,14 @@ FUNCTION(build_paraview_client BPC_NAME)
       pq${BPC_NAME}Initializer)
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
-
-  IF (NOT DEFINED MAKE_BUNDLE)
-    if (pv_exe_suffix)
-      install(TARGETS ${BPC_NAME}
-              DESTINATION ${BPC_INSTALL_LIB_DIR}
-              COMPONENT Runtime)
-    endif()
-    install(TARGETS ${BPC_NAME}${pv_exe_suffix}
-            DESTINATION ${BPC_INSTALL_BIN_DIR}
+  if (pv_exe_suffix)
+    install(TARGETS ${BPC_NAME}
+            DESTINATION ${BPC_INSTALL_LIB_DIR}
             COMPONENT Runtime)
-  ENDIF(NOT DEFINED MAKE_BUNDLE)
+  endif()
+  install(TARGETS ${BPC_NAME}${pv_exe_suffix}
+          DESTINATION ${BPC_INSTALL_BIN_DIR}
+          COMPONENT Runtime)
 
   IF (APPLE)
     IF (BPC_BUNDLE_ICON)
