@@ -305,10 +305,6 @@ include_directories(${ParaView_BINARY_DIR})
 #------------------------------------------------------------------------------
 # Bring in VTK
 #------------------------------------------------------------------------------
-#ParaView's client server wrapping uses VTK's wrapping infrastructure
-#so make sure VTK builds it, even if we aren't wrapping any other language.
-set(VTK_GENERATE_WRAPTOOLS 1)
-
 # ParaView provides an advanced option that can be used to make ParaView use a
 # pre-built VTK. For that, the option must be passed to the first cmake command
 # using -D. i.e. to use a separately built VTK, in a clean binary directory, do
@@ -364,11 +360,12 @@ else()
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
 
   set (ParaViewModulesDirs
-    Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
-    Utilities/VisItBridge/Library
+    Utilities/ProcessXML
     Utilities/VisItBridge/databases
+    Utilities/VisItBridge/Library
+    Utilities/WrapClientServer
 
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
@@ -468,6 +465,7 @@ endif()
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
+# Wrap all modules ParaView/VTK knows about.
 add_subdirectory(Wrapping/ClientServer)
 
 #------------------------------------------------------------------------------
