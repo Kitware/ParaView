@@ -65,7 +65,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkManta_h
 
 #include "vtkConfigure.h"
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 
 #if defined(__APPLE__) && (defined(VTK_USE_CARBON) || defined(VTK_USE_COCOA))
 # include <OpenGL/gl.h> // Include OpenGL API.

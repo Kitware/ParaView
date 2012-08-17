@@ -66,7 +66,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaRenderer_h
 #define __vtkMantaRenderer_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkOpenGLRenderer.h"
 
 //BTX
@@ -84,7 +84,7 @@ class Light;
 
 class vtkMantaManager;
 
-class VTK_vtkManta_EXPORT vtkMantaRenderer : public vtkOpenGLRenderer
+class VTKMANTA_EXPORT vtkMantaRenderer : public vtkOpenGLRenderer
 {
 public:
   static vtkMantaRenderer *New();

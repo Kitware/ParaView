@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkMantaPolyDataMapper_h
 #define __vtkMantaPolyDataMapper_h
 
-#include "vtkMantaConfigure.h"
+#include "vtkMantaModule.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkMantaTexture.h"
 
@@ -92,7 +92,7 @@ class vtkRenderWindow;
 class vtkMantaRenderer;
 class vtkMantaManager;
 
-class VTK_vtkManta_EXPORT vtkMantaPolyDataMapper : public vtkPolyDataMapper
+class VTKMANTA_EXPORT vtkMantaPolyDataMapper : public vtkPolyDataMapper
 {
 public:
   static vtkMantaPolyDataMapper *New();

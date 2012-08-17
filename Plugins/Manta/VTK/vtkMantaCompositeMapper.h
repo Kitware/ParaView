@@ -21,10 +21,10 @@
 #define __vtkMantaCompositeMapper_h
 
 #include "vtkCompositePolyDataMapper.h"
-
+#include "vtkMantaModule.h"
 class vtkPolyDataMapper;
 
-class VTK_EXPORT vtkMantaCompositeMapper :
+class VTKMANTA_EXPORT vtkMantaCompositeMapper :
   public vtkCompositePolyDataMapper
 {
 
