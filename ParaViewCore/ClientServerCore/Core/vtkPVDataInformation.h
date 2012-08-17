@@ -173,7 +173,7 @@ public:
   vtkGetMacro(Time, double);
 
   // Description:
-  // Returns if the data type is structured.
+  // Returns the label that should be used instead of "Time" if any.
   vtkGetStringMacro(TimeLabel);
 
   // Description:

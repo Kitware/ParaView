@@ -589,6 +589,15 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   // Determine the name of the field
   switch(criteria_type)
     {
+  case INVALID:
+  case BLOCK:
+  case AMR_LEVEL:
+  case AMR_BLOCK:
+  case PROCESSID:
+  case QUERY:
+  case ANY:
+    // Options not supported
+    break;
   case INDEX:
     fieldName = "id";
     break;
