@@ -1,0 +1,58 @@
+if (NOT PARAVIEW_DATA_ROOT)
+  return()
+endif()
+
+include_directories(
+  ${TestDriver_SOURCE_DIR})
+
+vtk_module_test()
+
+#------------------------------------------------------------------------------
+add_executable(CoProcessingPythonScriptExample
+  PythonScriptCoProcessingExample.cxx
+  vtkPVCustomTestDriver.cxx)
+target_link_libraries(CoProcessingPythonScriptExample
+  vtkCoProcessorImplementation vtkCPTestDriver)
+
+#------------------------------------------------------------------------------
+# Generate the image compare tool.
+# below is for doing image comparisons
+add_executable(CoProcessingCompareImagesTester CompareImages.cxx)
+target_link_libraries(CoProcessingCompareImagesTester
+  vtkTestingRendering
+  vtkRenderingOpenGL
+  vtkRenderingFreeTypeOpenGL
+  vtkInteractionStyle
+  vtkIOImage)
+
+if (PARAVIEW_USE_MPI)
+  # FIXME: not sure this is the right fix, w.o. this I am getting some missing
+  # ...AutoInit build errors.
+  target_link_libraries(CoProcessingCompareImagesTester vtkIOMPIImage)
+endif()
+
+
+add_test(NAME CoProcessingTestPythonScript
+         COMMAND ${CMAKE_COMMAND}
+          -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+          -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+          -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+          -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
+          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+
+if (PARAVIEW_USE_MPI)
+  add_test(NAME PCoProcessingTestPythonScript
+          COMMAND ${CMAKE_COMMAND}
+          -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+          -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+          -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+          -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
+          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest2.py
+          -DUSE_MPI:BOOL=TRUE
+          -DMPIEXEC:FILEPATH=${MPIEXEC}
+          -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
+          -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
+          -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+endif()
