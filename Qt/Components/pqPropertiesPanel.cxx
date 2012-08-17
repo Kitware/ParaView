@@ -79,7 +79,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyModifiedStateUndoElement.h"
 
 // custom panels
-#include "pqCutPanel.h"
 #include "pqClipPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqNetCDFPanel.h"
@@ -122,11 +121,6 @@ public:
   {
     if(QString("filters") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
-         QString("GenericCut") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqCutPanel(proxy, p);
-        }
       if(QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("GenericClip") == proxy->getProxy()->GetXMLName())
         {
@@ -188,9 +182,7 @@ public:
   {
     if(QString("filters") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("Cut") == proxy->getProxy()->GetXMLName() ||
-         QString("GenericCut") == proxy->getProxy()->GetXMLName() ||
-         QString("Clip") == proxy->getProxy()->GetXMLName() ||
+      if(QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("GenericClip") == proxy->getProxy()->GetXMLName() ||
          QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
