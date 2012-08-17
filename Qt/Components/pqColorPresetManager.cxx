@@ -362,6 +362,7 @@ void pqColorPresetManager::showEvent(QShowEvent *e)
         header->sectionSizeHint(1));
     header->resizeSection(1, header->sectionSizeHint(1));
     }
+  this->Form->Gradients->scrollToTop();
 }
 
 void pqColorPresetManager::importColorMap()
