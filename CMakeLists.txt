@@ -323,6 +323,8 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
+  configure_file("${ParaView_CMAKE_DIR}/CTestCustom.ctest.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.ctest" @ONLY)
 endif()
 
 # Setup default state for ParaView module groups.
