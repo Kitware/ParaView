@@ -66,6 +66,7 @@ private:
   QPixmap* TypePixmaps[3];
   pqTreeWidget* SelectorWidget;
   std::vector<int> ArrayTypes;
+  bool ArrayListInitialized;
 
   Q_DISABLE_COPY(pqPassArraysPanel)
 };
