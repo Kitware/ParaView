@@ -71,7 +71,6 @@ IF (VTK_WRAP_PYTHON)
   ENDIF(WIN32 OR APPLE)
 ENDIF (VTK_WRAP_PYTHON)
 
-option(BUILD_TESTING "Build TestDriver Testing" ON)
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif(BUILD_TESTING)
