@@ -23,15 +23,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
+#include "vtkPVConfig.h"
 #include "vtkSMAnimationScene.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMUtilities.h"
 #include "vtkSMViewProxy.h"
 #include "vtkTIFFWriter.h"
 #include "vtkToolkits.h"
-#include "vtkSMUtilities.h"
 
 #ifdef VTK_USE_MPEG2_ENCODER
 # include "vtkMPEG2Writer.h"
@@ -44,14 +45,13 @@
 #ifdef _WIN32
 # include "vtkAVIWriter.h"
 #else
-# ifdef VTK_USE_FFMPEG_ENCODER
+# ifdef VTK_HAS_FFMPEG_SUPPORT
 #   include "vtkFFMPEGWriter.h"
 # endif
 #endif
 
-#ifdef VTK_USE_OGGTHEORA_ENCODER
+#ifdef VTK_HAS_OGGTHEORA_SUPPORT
 #  include "vtkOggTheoraWriter.h"
-#  include "vtkPVConfig.h"
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
@@ -344,7 +344,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     mwriter = avi;
     }
 #else
-# ifdef VTK_USE_FFMPEG_ENCODER
+# ifdef VTK_HAS_FFMPEG_SUPPORT
   else if (extension == ".avi")
     {
     vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
@@ -355,7 +355,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     }
 # endif
 #endif
-#ifdef VTK_USE_OGGTHEORA_ENCODER
+#ifdef VTK_HAS_OGGTHEORA_SUPPORT
   else if (extension == ".ogv" || extension == ".ogg")
     {
     vtkOggTheoraWriter *ogvwriter = vtkOggTheoraWriter::New();

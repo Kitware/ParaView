@@ -1,7 +1,10 @@
 set (extra_depends)
 if (PARAVIEW_USE_MPI)
-  list(APPEND extra_depends
-    vtkIOMPIImage)
+  list(APPEND extra_depends vtkIOMPIImage)
+endif()
+
+if (Module_vtkIOFFMPEG)
+  list(APPEND extra_depends vtkIOFFMPEG)
 endif()
 
 vtk_module(vtkPVServerManagerDefault
