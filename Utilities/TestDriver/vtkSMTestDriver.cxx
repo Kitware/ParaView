@@ -431,7 +431,9 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
 
   if (type == CLIENT && this->NumberOfServers > 1)
     {
-    commandLine.insert(++commandLine.begin(), "--multi-servers");
+    vtksys_stl::vector<const char*>::iterator iter = commandLine.begin();
+    iter++;
+    commandLine.insert(iter, "--multi-servers");
     }
 
 #ifdef PV_TEST_USE_RANDOM_PORTS
@@ -1293,7 +1295,9 @@ bool vtkSMTestDriver::SetupClient(
     if (!this->ReverseConnection && !this->ServerURL.empty())
       {
       // push-back server url, if present.
-      clientCommand.insert(++clientCommand.begin(), this->ServerURL.c_str());
+      vtksys_stl::vector<const char*>::iterator iter = clientCommand.begin();
+      iter++;
+      clientCommand.insert(iter, this->ServerURL.c_str());
       clientCommand.push_back(NULL);
       }
     this->ReportCommand(&clientCommand[0], "client");
