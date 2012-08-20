@@ -58,6 +58,9 @@ public:
   // vtkUniformGrid.
   virtual int IsPointVisible(vtkDataSet* ds, vtkIdType ptId);
 
+  void SetKeepRandomPoints(int keepRandomPoints);
+  vtkGetMacro(KeepRandomPoints,int);
+
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
@@ -100,6 +103,10 @@ protected:
   int RandomMode;
 
   virtual void ReportReferences(vtkGarbageCollector*);
+
+  int KeepRandomPoints;
+  vtkIdType MaximumNumberOfPointsOld;
+
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.
   void operator=(const vtkPVGlyphFilter&);  // Not implemented.

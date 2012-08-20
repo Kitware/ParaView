@@ -5500,6 +5500,18 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
 	 If the value of this property is 1, then the points to glyph are chosen randomly. Otherwise the point ids chosen are evenly spaced.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty
+       name="KeepRandomPoints"
+       command="SetKeepRandomPoints"
+       number_of_elements="1"
+       default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is 1 and RandomMode is 1, then the the randomly chosen points to glyph are saved and reused for other timesteps. This is only useful if the coordinates are the same and in the same order between timesteps.
+       </Documentation>
+     </IntVectorProperty>
+
    <Hints>
      <!-- Visibility Element can be used to suggest the GUI about
 	  visibility of this filter (or its input) on creation.
@@ -5678,6 +5690,17 @@ The Glyph filter generates a glyph at each point in the input dataset. The glyph
        <BooleanDomain name="bool"/>
        <Documentation>
 	 If the value of this property is 1, then the points to glyph are chosen randomly. Otherwise the point ids chosen are evenly spaced.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+       name="KeepRandomPoints"
+       command="SetKeepRandomPoints"
+       number_of_elements="1"
+       default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If the value of this property is 1 and RandomMode is 1, then the the randomly chosen points to glyph are saved and reused for other timesteps. This is only useful if the coordinates are the same and in the same order between timesteps.
        </Documentation>
      </IntVectorProperty>
    <Hints>

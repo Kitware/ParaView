@@ -50,6 +50,8 @@ vtkPVGlyphFilter::vtkPVGlyphFilter() :
     vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses() : 1;
   this->UseMaskPoints = 1;
   this->InputIsUniformGrid = 0;
+  this->KeepRandomPoints = 0;
+  this->MaximumNumberOfPointsOld = 0;
 
   this->BlockOnRatio = 0;
   this->BlockMaxNumPts = 0;
@@ -98,6 +100,18 @@ void vtkPVGlyphFilter::SetUseMaskPoints(int useMaskPoints)
     }
   this->UseMaskPoints=useMaskPoints;
   this->BlockGlyphAllPoints= !this->UseMaskPoints;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGlyphFilter::SetKeepRandomPoints(int keepRandomPoints)
+{
+  if( keepRandomPoints == this->KeepRandomPoints )
+  {
+    // no change
+    return;
+  }
+  this->KeepRandomPoints = keepRandomPoints;
   this->Modified();
 }
 
@@ -460,11 +474,13 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
     return;
     }
 
-  //Reset the random points vector
-  this->RandomPtsInDataset.clear();
-
   this->BlockPointCounter = 0;
   this->BlockNumGlyphedPts = 0;
+
+  if( !this->KeepRandomPoints || !this->RandomPtsInDataset.size() || this->MaximumNumberOfPoints != this->MaximumNumberOfPointsOld )
+  {
+  //Reset the random points vector
+  this->RandomPtsInDataset.clear();
 
   //Populate Random points in the vector if random mode selected
   if(this->RandomMode)
@@ -483,6 +499,8 @@ void vtkPVGlyphFilter::CalculatePtsToGlyph(double PtsNotBlanked)
     std::sort( this->RandomPtsInDataset.begin(), this->RandomPtsInDataset.end() );
     }
 
+    this->MaximumNumberOfPointsOld = this->MaximumNumberOfPoints;
+  }
 
   // Identify the first point to glyph.
   if(this->RandomMode && this->RandomPtsInDataset.size() > 0) // FIXME this was a quick fix to prevent some test failure with mpi pvcrs.FindDataDialog.Flow
