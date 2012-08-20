@@ -610,6 +610,10 @@ int vtkSMTestDriver::OutputStringHasError(const char* pname, std::string& output
 int vtkSMTestDriver::Main(int argc, char* argv[])
 {
   vtksys::SystemTools::PutEnv("DASHBOARD_TEST_FROM_CTEST=1");
+  // we add this so that vtksys::SystemTools::EnableMSVCDebugHook() works. At
+  // somepoint vtksys needs to be updated to use the newer variable.
+  vtksys::SystemTools::PutEnv("DART_TEST_FROM_DART=1");
+  vtksys::SystemTools::EnableMSVCDebugHook();
 
 #ifdef PV_TEST_INIT_COMMAND
   // run user-specified commands before initialization.
