@@ -48,13 +48,16 @@ if (PARAVIEW_USE_MPI)
           -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
           -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
           -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
-          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest2.py
+          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
           -DUSE_MPI:BOOL=TRUE
           -DMPIEXEC:FILEPATH=${MPIEXEC}
           -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
           -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
           -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+  # both the parallel and the serial tests create the same output images
+  # so we run this one serially so that they don't interfere.
+  set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
 endif()
 
 

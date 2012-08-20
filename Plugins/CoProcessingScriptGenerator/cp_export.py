@@ -329,3 +329,4 @@ outFile = open(fileName, 'w')
 outFile.write(output_contents % (request_data_description, do_coprocessing, rescale_data_range))
 outFile.close()
 
+smtrace.clear_trace()
