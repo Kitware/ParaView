@@ -21,7 +21,7 @@ class vtkInformationVector;
 
 // .DESCRIPTION
 //
-class vtkSQMedianFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkSQMedianFilter : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQMedianFilter,vtkDataSetAlgorithm);

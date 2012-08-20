@@ -56,7 +56,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="2 0"
         information_property="PointArrayInfo"
         label="Arrays"
-        panel_visibility="default">
+        >
       <ArraySelectionDomain name="array_list">
         <RequiredProperties>
           <Property name="PointArrayInfo" function="ArrayList"/>
@@ -80,7 +80,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="ISubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="ISubsetInfo" function="Range"/>
@@ -103,7 +103,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="JSubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="JSubsetInfo" function="Range"/>
@@ -126,7 +126,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="KSubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="KSubsetInfo" function="Range"/>
@@ -144,7 +144,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetVectorProjection"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="None"/>
         <Entry value="4" text="XY"/>
@@ -163,7 +163,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseCollectiveIO"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -180,10 +180,11 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfIONodes"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <Documentation>
         Set the number of IO nodes. Set to 0 to use the implementation default.
       </Documentation>
+      <IntRangeDomain name="range"/>
     </IntVectorProperty>
 
     <IntVectorProperty
@@ -191,8 +192,8 @@ Copyright 2012 SciberQuest Inc.
         lable="CIO Buffer Size"
         command="SetCollectBufferSize"
         number_of_elements="1"
-        default_values="2147483647"
-        panel_visibility="default">
+        default_values="1073741824"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0"          text="default"/>
         <Entry value="536870912"  text=" 512 MB"/>
@@ -206,12 +207,29 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <IntVectorProperty
+        name="UseDirectIO"
+        lable="Direct IO"
+        command="SetUseDirectIO"
+        number_of_elements="1"
+        default_values="0"
+        >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO direct I/O
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
         name="UseDeferredOpen"
         lable="Deferred Open"
         command="SetUseDeferredOpen"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -228,7 +246,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDataSieving"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -245,7 +263,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSieveBufferSize"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0"        text="default"/>
         <Entry value="1048576"  text="1 MB"/>
@@ -260,22 +278,7 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Meta Flag -->
-    <IntVectorProperty
-        name="MetaRead"
-        command="SetMetaRead"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="never">
-      <BooleanDomain name="bool"/>
-      <Documentation>
-      If checked meta mode is active. Meta data will be read and processed however actual read will be
-      deffered to down stream filters. If unchecked the reader performs as expected, an actual read of
-      the requested arrays.
-      </Documentation>
-    </IntVectorProperty>
     <Hints>
-      <Property name="MetaRead" show="0"/>
       <ReaderFactory extensions="bov" file_description="MPI-I/O brick-of-values."/>
       <View type="RenderView"/>
     </Hints>
@@ -284,7 +287,7 @@ Copyright 2012 SciberQuest Inc.
   <!--========================================================================-->
   <SourceProxy
       name="vtkSQBOVMetaReader"
-      class="vtkSQBOVReader"
+      class="vtkSQBOVMetaReader"
       label="SQ BOV Meta Reader">
     <Documentation
         short_help="BOV reader.">
@@ -297,7 +300,8 @@ Copyright 2012 SciberQuest Inc.
         animateable="0"
         command="SetFileName"
         number_of_elements="1"
-        panel_visibility="never">
+        panel_visibility="never"
+        >
     <FileListDomain name="files"/>
     <Documentation>
       This property specifies the file name for the reader.
@@ -329,7 +333,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="2 0"
         information_property="PointArrayInfo"
         label="Arrays"
-        panel_visibility="default">
+        >
       <ArraySelectionDomain name="array_list">
         <RequiredProperties>
           <Property name="PointArrayInfo" function="ArrayList"/>
@@ -354,7 +358,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="ISubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="ISubsetInfo" function="Range"/>
@@ -377,7 +381,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="JSubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="JSubsetInfo" function="Range"/>
@@ -400,7 +404,7 @@ Copyright 2012 SciberQuest Inc.
         default_values="1 0"
         animateable="0"
         information_property="KSubsetInfo"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
         <RequiredProperties>
             <Property name="KSubsetInfo" function="Range"/>
@@ -418,7 +422,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetVectorProjection"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="None"/>
         <Entry value="4" text="XY"/>
@@ -437,7 +441,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetXHasPeriodicBC"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Apply periodic boundary condition in the x direction during integration.
@@ -450,7 +454,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetYHasPeriodicBC"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Apply periodic boundary condition in the y direction during integration.
@@ -463,7 +467,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetZHasPeriodicBC"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Apply periodic boundary condition in the z direction during integration.
@@ -476,7 +480,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfGhostCells"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <Documentation>
         Number of ghost cells to read.
       </Documentation>
@@ -488,7 +492,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetDecompDims"
         number_of_elements="3"
         default_values="1 1 1"
-        panel_visibility="default">
+        >
       <Documentation>
       Set the number of blocks to be used in an out of core read. The resulting block size
       must be less than 2 GB per block for a scalar and less than 6 GB per block for a vector.
@@ -497,10 +501,10 @@ Copyright 2012 SciberQuest Inc.
 
     <IntVectorProperty
         name="BlockSize"
-        command="SetXHasPeriodicBC"
+        command="SetBlockSizeGUI"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <Documentation>
         Memory used by the largest block in the domain decomposition. Must be less than 2 GB per block
         for a scalar and less than 6 GB per block for a vector.
@@ -513,7 +517,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetBlockCacheSize"
         number_of_elements="1"
         default_values="10"
-        panel_visibility="default">
+        >
       <Documentation>
       Set the number of blocks to cache during out of core operation. Increasing the number of
       blocks cached improves the IO perforomance while increasing the memory footprint.
@@ -522,10 +526,10 @@ Copyright 2012 SciberQuest Inc.
 
     <IntVectorProperty
         name="BlockCacheSize"
-        command="SetXHasPeriodicBC"
+        command="SetBlockCacheSizeGUI"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <Documentation>
         Wrost case bound on memory used by the block cache.
       </Documentation>
@@ -537,7 +541,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetClearCachedBlocks"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         If set the block cache is explcitly cleared after each pipeline update.
@@ -550,8 +554,9 @@ Copyright 2012 SciberQuest Inc.
         lable="Collective IO"
         command="SetUseCollectiveIO"
         number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
+        default_values="1"
+        panel_visibility="never"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -568,7 +573,9 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfIONodes"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <IntRangeDomain name="range"/>
       <Documentation>
         Set the number of IO nodes. Set to 0 to use the implementation default.
       </Documentation>
@@ -579,8 +586,9 @@ Copyright 2012 SciberQuest Inc.
         lable="CIO Buffer Size"
         command="SetCollectBufferSize"
         number_of_elements="1"
-        default_values="2147483647"
-        panel_visibility="default">
+        default_values="1073741824"
+        panel_visibility="never"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0"          text="default"/>
         <Entry value="536870911"  text=" 512 MB"/>
@@ -594,12 +602,31 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <IntVectorProperty
+        name="UseDirectIO"
+        lable="Direct IO"
+        command="SetUseDirectIO"
+        number_of_elements="1"
+        default_values="0"
+        panel_visibility="never"
+        >
+      <EnumerationDomain name="enum">
+        <Entry value="0" text="automatic"/>
+        <Entry value="1" text="disabled"/>
+        <Entry value="2" text="enabled"/>
+      </EnumerationDomain>
+      <Documentation>
+        Turn on/off MPI-IO direct I/O
+      </Documentation>
+    </IntVectorProperty>
+
+    <IntVectorProperty
         name="UseDeferredOpen"
         lable="Deferred Open"
         command="SetUseDeferredOpen"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -616,7 +643,8 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDataSieving"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -633,7 +661,8 @@ Copyright 2012 SciberQuest Inc.
         command="SetSieveBufferSize"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
       <EnumerationDomain name="enum">
         <Entry value="0"        text="default"/>
         <Entry value="1048576"  text="1 MB"/>
@@ -648,23 +677,16 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Meta Flag -->
-    <IntVectorProperty
-        name="MetaRead"
-        command="SetMetaRead"
-        number_of_elements="1"
-        default_values="1"
-        panel_visibility="never">
-      <BooleanDomain name="bool"/>
-      <Documentation>
-      If checked meta mode is active. Meta data will be read and processed however actual read will be
-      deffered to down stream filters. If unchecked the reader performs as expected, an actual read of
-      the requested arrays.
-      </Documentation>
-    </IntVectorProperty>
-
     <Hints>
-      <Property name="MetaRead" show="0"/>
+      <!--
+      <Property name="SieveBufferSize" show="0"/>
+      <Property name="UseDataSieving" show="0"/>
+      <Property name="UseDeferredOpen" show="0"/>
+      <property name="UseDirectIO" show="0"/>
+      <Property name="CollectBufferSize" show="0"/>
+      <Property name="NumberOfIONodes" show="0"/>
+      <Property name="UseCollectiveIO" show="0"/>
+      -->
       <ReaderFactory extensions="bovm" file_description="MPI-I/O brick-of-values (Meta Reader)."/>
     </Hints>
   </SourceProxy>

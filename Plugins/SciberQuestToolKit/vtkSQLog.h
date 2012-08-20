@@ -34,7 +34,7 @@ class LogBuffer;
 
 //BTX
 //=============================================================================
-class vtkSQLogDestructor
+class VTK_EXPORT vtkSQLogDestructor
 {
 public:
   vtkSQLogDestructor() : Log(0) {}
@@ -48,7 +48,7 @@ private:
 //ETX
 
 //=============================================================================
-class vtkSQLog : public vtkObject
+class VTK_EXPORT vtkSQLog : public vtkObject
 {
 public:
   static vtkSQLog *New();

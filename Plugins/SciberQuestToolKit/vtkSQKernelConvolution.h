@@ -26,7 +26,7 @@ class CUDAConvolutionDriver;
 
 // .DESCRIPTION
 //
-class vtkSQKernelConvolution : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkSQKernelConvolution : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQKernelConvolution,vtkDataSetAlgorithm);
@@ -41,6 +41,12 @@ public:
   // Array selection.
   void AddInputArray(const char *name);
   void ClearInputArrays();
+
+  // Description:
+  // Deep copy input arrays to the output. A shallow copy is not possible
+  // due to the presence of ghost layers.
+  void AddArrayToCopy(const char *name);
+  void ClearArraysToCopy();
 
   //BTX
   enum {
@@ -57,8 +63,9 @@ public:
 
   //BTX
   enum {
-    KERNEL_TYPE_GAUSIAN=0,
-    KERNEL_TYPE_CONSTANT=1
+    KERNEL_TYPE_GAUSSIAN=0,
+    KERNEL_TYPE_LOG=1,
+    KERNEL_TYPE_CONSTANT=2
     };
   //ETX
   // Description:
@@ -71,6 +78,10 @@ public:
   // and above by the size of the smallest block
   void SetKernelWidth(int width);
   vtkGetMacro(KernelWidth,int);
+
+  // Description:
+  vtkSetMacro(ComputeResidual,int);
+  vtkGetMacro(ComputeResidual,int);
 
   // Description:
   // Query properties of the current device and available devices.
@@ -147,6 +158,8 @@ private:
   int HostRank;
   //
   set<string> InputArrays;
+  set<string> ArraysToCopy;
+  int ComputeResidual;
   //
   int KernelWidth;
   int KernelType;

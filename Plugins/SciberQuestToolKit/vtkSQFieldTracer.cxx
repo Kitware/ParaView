@@ -121,6 +121,7 @@ vtkSQFieldTracer::vtkSQFieldTracer()
   MinSegmentLength(0.0),
   UseCommWorld(0),
   Mode(MODE_TOPOLOGY),
+  CullPeriodicTransitions(1),
   SqueezeColorMap(0)
 {
   #if vtkSQFieldTracerDEBUG>1
@@ -190,7 +191,7 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
 
   double maxIntegrationInterval=VTK_DOUBLE_MAX;
   GetOptionalAttribute<double,1>(elem,"max_integration_interval",&maxIntegrationInterval);
-  if (maxIntegrationInterval<VTK_DOUBLE_MAX)
+  if (maxIntegrationInterval>0.0)
     {
     this->SetMaxIntegrationInterval(maxIntegrationInterval);
     }
@@ -237,6 +238,13 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
     this->SetNullThreshold(nullThreshold);
     }
 
+  int forwardOnly=0;
+  GetOptionalAttribute<int,1>(elem,"forward_only",&forwardOnly);
+  if (forwardOnly>0)
+    {
+    this->SetForwardOnly(forwardOnly);
+    }
+
   int dynamicScheduler=-1;
   GetOptionalAttribute<int,1>(elem,"dynamic_scheduler",&dynamicScheduler);
   if (dynamicScheduler>0)
@@ -279,6 +287,7 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
     << "#   minSegmentLength=" << this->GetMinSegmentLength() << "\n"
     << "#   maxError=" << this->GetMaxError() << "\n"
     << "#   nullThreshold=" << this->GetNullThreshold() << "\n"
+    << "#   forwardOnly=" << this->GetForardOnly() << "\n"
     << "#   dynamicScheduler=" << this->GetUseDynamicScheduler() << "\n"
     << "#   masterBlockSize=" << this->GetMasterBlockSize() << "\n"
     << "#   workerBlockSize=" << this->GetWorkerBlockSize() << "\n"
@@ -579,7 +588,7 @@ int vtkSQFieldTracer::RequestUpdateExtent(
       }
     }
 
-  // Terminator surface input. Always request all data onall procs.
+  // Terminator surface input. Always request all data on all procs.
   nSources=inInfos[2]->GetNumberOfInformationObjects();
   for (int i=0; i<nSources; ++i)
     {
@@ -779,9 +788,18 @@ int vtkSQFieldTracer::RequestData(
       break;
 
     case MODE_STREAM:
-      traceData=new StreamlineData;
-      traceData->SetSource(source);
-      traceData->SetOutput(out);
+      {
+      unsigned long gid=0;
+      if (!this->UseDynamicScheduler)
+        {
+        gid=this->GetGlobalCellId(source);
+        }
+      StreamlineData *lineData=new StreamlineData;
+      lineData->SetSourceCellGid(gid);
+      lineData->SetSource(source);
+      lineData->SetOutput(out);
+      traceData=lineData;
+      }
       break;
 
     case MODE_POINCARE:
@@ -865,6 +883,14 @@ int vtkSQFieldTracer::RequestData(
           oocr.GetPointer(),
           oocrCache,
           traceData);
+    }
+
+  /// Remove segments where a periodic bc was applied.
+  if ( (this->Mode==MODE_STREAM)
+    && this->CullPeriodicTransitions
+    && (periodicBC[0] || periodicBC[1] || periodicBC[2]) )
+    {
+    ((StreamlineData*)traceData)->CullPeriodicTransitions(pDomain);
     }
 
   /// Clean up
@@ -1164,7 +1190,7 @@ void vtkSQFieldTracer::IntegrateOne(
     {
     #if vtkSQFieldTracerDEBUG>0
     pCerr()
-      << "Terminated: Seed " << Tuple<double>(line->GetSeedPoint(),3)
+      << "Terminated: Seed " << Tuple<float>(line->GetSeedPoint(),3)
       << " outside problem domain.";
     #endif
     #if defined vtkSQFieldTracerTIME

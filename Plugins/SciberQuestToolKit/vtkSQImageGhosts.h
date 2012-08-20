@@ -33,7 +33,7 @@ class vtkInformationVector;
 class vtkDataSetAttributes;
 class vtkPVXMLElement;
 
-class vtkSQImageGhosts : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkSQImageGhosts : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQImageGhosts,vtkDataSetAlgorithm);

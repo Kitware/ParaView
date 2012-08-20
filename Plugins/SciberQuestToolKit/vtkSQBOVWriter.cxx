@@ -159,6 +159,7 @@ void vtkSQBOVWriter::Clear()
   this->UseCollectiveIO=HINT_ENABLED;
   this->NumberOfIONodes=0;
   this->CollectBufferSize=0;
+  this->UseDirectIO=HINT_AUTOMATIC;
   this->UseDeferredOpen=HINT_DEFAULT;
   this->UseDataSieving=HINT_AUTOMATIC;
   this->SieveBufferSize=0;
@@ -173,7 +174,7 @@ int vtkSQBOVWriter::Initialize(vtkPVXMLElement *root)
   vtkPVXMLElement *elem=GetRequiredElement(root,"vtkSQBOVWriter");
   if (elem==0)
     {
-    sqErrorMacro(pCerr(),"Element for vtkSQBOVWriter was not present.");
+    sqErrorMacro(pCerr(),"Element vtkSQBOVWriter was not present.");
     return -1;
     }
 
@@ -441,6 +442,14 @@ void vtkSQBOVWriter::SetMPIFileHints()
     MPI_Info_set(hints,"cb_nodes",const_cast<char *>(os.str().c_str()));
     }
 
+  if (this->CollectBufferSize>0)
+    {
+    ostringstream os;
+    os << this->CollectBufferSize;
+    MPI_Info_set(hints,"cb_buffer_size",const_cast<char *>(os.str().c_str()));
+    //MPI_Info_set(hints,"striping_unit", const_cast<char *>(os.str().c_str()));
+    }
+
   switch (this->UseDirectIO)
     {
     case HINT_DEFAULT:
@@ -471,14 +480,6 @@ void vtkSQBOVWriter::SetMPIFileHints()
     default:
       vtkErrorMacro("Invalid value for UseDeferredOpen.");
       break;
-    }
-
-  if (this->CollectBufferSize>0)
-    {
-    ostringstream os;
-    os << this->CollectBufferSize;
-    MPI_Info_set(hints,"cb_buffer_size",const_cast<char *>(os.str().c_str()));
-    //MPI_Info_set(hints,"striping_unit", const_cast<char *>(os.str().c_str()));
     }
 
   switch (this->UseDataSieving)

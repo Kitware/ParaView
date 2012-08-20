@@ -19,7 +19,7 @@ class vtkInformationVector;
 class vtkDataSetAttributes;
 class vtkPVXMLElement;
 
-class vtkSQImageSource : public vtkImageAlgorithm
+class VTK_EXPORT vtkSQImageSource : public vtkImageAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQImageSource,vtkImageAlgorithm);

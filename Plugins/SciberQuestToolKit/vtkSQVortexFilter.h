@@ -20,7 +20,7 @@ class vtkPVXMLElement;
 class vtkInformation;
 class vtkInformationVector;
 
-class vtkSQVortexFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkSQVortexFilter : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQVortexFilter,vtkDataSetAlgorithm);
@@ -30,6 +30,11 @@ public:
   // Description:
   // Initialize from an xml document.
   int Initialize(vtkPVXMLElement *root);
+
+  // Description:
+  // Array selection.
+  void AddInputArray(const char *name);
+  void ClearInputArrays();
 
   // Description:
   // Deep copy input arrays to the output. A shallow copy is not possible
@@ -114,6 +119,7 @@ protected:
 
 private:
   // controls to turn on/off array generation
+  set<string> InputArrays;
   set<string> ArraysToCopy;
   int SplitComponents;
   int ResultMagnitude;

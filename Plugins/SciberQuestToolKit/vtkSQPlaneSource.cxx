@@ -37,6 +37,9 @@
 using std::map;
 using std::pair;
 
+// #define vtkSQPlaneSourceDEBUG
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQPlaneSource);
 
 //-----------------------------------------------------------------------------
@@ -72,7 +75,7 @@ vtkSQPlaneSource::vtkSQPlaneSource()
 vtkSQPlaneSource::~vtkSQPlaneSource()
 {
   #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
+  cerr << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
   #endif
   this->SetDescriptiveName(0);
 }
@@ -125,7 +128,7 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
 void vtkSQPlaneSource::SetResolution(const int xR, const int yR)
 {
   #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::SetResolution" << endl;
+  cerr << "=====vtkSQPlaneSource::SetResolution" << endl;
   #endif
   // Set the number of x-y subdivisions in the plane.
   if ( xR != this->XResolution || yR != this->YResolution )
@@ -147,7 +150,7 @@ int vtkSQPlaneSource::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef vtkSQPlaneSourceDEBUG
-    cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::RequestInformation" << endl;
+    cerr << "=====vtkSQPlaneSource::RequestInformation" << endl;
   #endif
 
 
@@ -165,7 +168,7 @@ int vtkSQPlaneSource::RequestData(
       vtkInformationVector *outputVector)
 {
   #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::RequestData" << endl;
+  cerr << "=====vtkSQPlaneSource::RequestData" << endl;
   #endif
 
   // get the info object
@@ -531,6 +534,7 @@ void vtkSQPlaneSource::ApplyConstraint()
 {
   #ifdef vtkSQPlaneSourceDEBUG
   cerr << "=====vtkSQPlaneSource::ApplyConstraint" << endl;
+  cerr << "Constraint=" << this->Constraint << endl;
   #endif
 
   double p[3]={0.0};

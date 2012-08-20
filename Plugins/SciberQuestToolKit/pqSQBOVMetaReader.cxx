@@ -53,6 +53,18 @@ pqSQBOVMetaReader::pqSQBOVMetaReader(pqProxy *l_proxy, QWidget *l_parent)
   this->NoBlocksToCache=this->findChild<QLineEdit*>("NBlocksToCache");
   this->BlockCacheSize=this->findChild<QLineEdit*>("BlockCacheSize");
 
+  // disable signals during the constructor. PV 3.16 will create
+  // and destroy the panel as it's selected in the browser.
+  this->blockSignals(true);
+  for (int q=0; q<3; ++q)
+    {
+    this->DecompDims[q]->blockSignals(true);
+    }
+  this->BlockSize->blockSignals(true);
+  this->NoBlocksToCache->blockSignals(true);
+  this->BlockCacheSize->blockSignals(true);
+
+  // display information only
   this->BlockSize->setReadOnly(true);
   this->BlockCacheSize->setReadOnly(true);
 
@@ -105,6 +117,16 @@ pqSQBOVMetaReader::pqSQBOVMetaReader(pqProxy *l_proxy, QWidget *l_parent)
       SIGNAL(textEdited(const QString&)),
       this,
       SLOT(UpdateBlockCacheSize(void)));
+
+  // enable signals again now that we have set things up.
+  this->blockSignals(false);
+  for (int q=0; q<3; ++q)
+    {
+    this->DecompDims[q]->blockSignals(false);
+    }
+  this->BlockSize->blockSignals(false);
+  this->NoBlocksToCache->blockSignals(false);
+  this->BlockCacheSize->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -191,7 +213,7 @@ void pqSQBOVMetaReader::UpdateDecompDims()
   int nCells[3];
   this->Subset.Size(nCells);
 
-  // sanity - prevent log(0)
+  // prevent log(0)
   if (nCells[0]<1 || nCells[1]<1 || nCells[2]<1)
     {
     return;

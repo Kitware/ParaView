@@ -96,11 +96,12 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
     return -1;
     }
 
-
-  // TODO , pass input changed to a list of arrays
-  //int passInput=0;
-  //GetOptionalAttribute<int,1>(elem,"passInput",&passInput);
-  //this->SetPassInput(passInput);
+  // arrays to copy, optional
+  elem=GetOptionalElement(elem,"arraysToCopy");
+  if (elem)
+    {
+    ExtractValues(elem->GetCharacterData(),this->ArraysToCopy);
+    }
 
   int splitComponents=0;
   GetOptionalAttribute<int,1>(elem,"splitComponents",&splitComponents);
@@ -178,6 +179,36 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSQVortexFilter::AddInputArray(const char *name)
+{
+  #ifdef vtkSQVortexFilterDEBUG
+  pCerr()
+    << "=====vtkSQVortexFilter::AddInputArray"
+    << "name=" << name << endl;
+  #endif
+
+  if (this->InputArrays.insert(name).second)
+    {
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQVortexFilter::ClearInputArrays()
+{
+  #ifdef vtkSQVortexFilterDEBUG
+  pCerr()
+    << "=====vtkSQVortexFilter::ClearInputArrays" << endl;
+  #endif
+
+  if (this->InputArrays.size())
+    {
+    this->InputArrays.clear();
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 {
   #ifdef vtkSQVortexFilterDEBUG
@@ -188,7 +219,6 @@ void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 
   if (this->ArraysToCopy.insert(name).second)
     {
-    cerr << "copying " << name << endl;
     this->Modified();
     }
 }
@@ -202,7 +232,6 @@ void vtkSQVortexFilter::ClearArraysToCopy()
 
   if (this->ArraysToCopy.size())
     {
-    cerr << "clearing" << endl;
     this->ArraysToCopy.clear();
     this->Modified();
     }
@@ -476,15 +505,6 @@ int vtkSQVortexFilter::RequestData(
       << endl;
     #endif
 
-    vtkDataArray *V=this->GetInputArrayToProcess(0,inImData);
-
-    if (!V->IsA("vtkFloatArray") && !V->IsA("vtkDoubleArray"))
-      {
-      vtkErrorMacro(
-        << "This filter operates on vector floating point arrays."
-        << "You provided " << V->GetClassName() << ".");
-      return 1;
-      }
 
     // Copy the input field, unfortunately it's a deep copy
     // since the input and output have different extents.
@@ -529,432 +549,636 @@ int vtkSQVortexFilter::RequestData(
     log->EndEvent("vtkSQVortexFilter::PassInput");
     #endif
 
-    // Rotation.
-    if (this->ComputeRotation)
+    begin=this->InputArrays.begin();
+    end=this->InputArrays.end();
+    for (it=begin; it!=end; ++it)
       {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Rotation");
-      #endif
-      string name;
-
-      vtkDataArray *Rx=V->NewInstance();
-      Rx->SetNumberOfComponents(1);
-      Rx->SetNumberOfTuples(outputTups);
-      name="rot-";
-      name+=V->GetName();
-      name+="x";
-      Rx->SetName(name.c_str());
-
-      vtkDataArray *Ry=V->NewInstance();
-      Ry->SetNumberOfComponents(1);
-      Ry->SetNumberOfTuples(outputTups);
-      name="rot-";
-      name+=V->GetName();
-      name+="y";
-      Ry->SetName(name.c_str());
-
-      vtkDataArray *Rz=V->NewInstance();
-      Rz->SetNumberOfComponents(1);
-      Rz->SetNumberOfTuples(outputTups);
-      name="rot-";
-      name+=V->GetName();
-      name+="z";
-      Rz->SetName(name.c_str());
-
-      switch(V->GetDataType())
+      vtkDataArray *V=inImData->GetPointData()->GetArray((*it).c_str());
+      if (V==0)
         {
-        vtkFloatTemplateMacro(
-          Rotation<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)Rx->GetVoidPointer(0),
-              (VTK_TT*)Ry->GetVoidPointer(0),
-              (VTK_TT*)Rz->GetVoidPointer(0));
-          );
+        vtkErrorMacro(
+          << "Array " << (*it).c_str()
+          << " was requested but is not present");
+        continue;
         }
 
-      if (this->SplitComponents)
+      if (!V->IsA("vtkFloatArray") && !V->IsA("vtkDoubleArray"))
         {
-        outImData->GetPointData()->AddArray(Rx);
-        outImData->GetPointData()->AddArray(Ry);
-        outImData->GetPointData()->AddArray(Rz);
+        vtkErrorMacro(
+          << "This filter operates on vector floating point arrays."
+          << "You provided " << V->GetClassName() << ".");
+        return 1;
         }
-      else
+
+      // Rotation.
+      if (this->ComputeRotation)
         {
-        vtkDataArray *R=V->NewInstance();
-        outImData->GetPointData()->AddArray(R);
-        R->Delete();
-        R->SetNumberOfComponents(3);
-        R->SetNumberOfTuples(outputTups);
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Rotation");
+        #endif
+        string name;
+
+        vtkDataArray *Rx=V->NewInstance();
+        Rx->SetNumberOfComponents(1);
+        Rx->SetNumberOfTuples(outputTups);
         name="rot-";
         name+=V->GetName();
-        R->SetName(name.c_str());
+        name+="x";
+        Rx->SetName(name.c_str());
+
+        vtkDataArray *Ry=V->NewInstance();
+        Ry->SetNumberOfComponents(1);
+        Ry->SetNumberOfTuples(outputTups);
+        name="rot-";
+        name+=V->GetName();
+        name+="y";
+        Ry->SetName(name.c_str());
+
+        vtkDataArray *Rz=V->NewInstance();
+        Rz->SetNumberOfComponents(1);
+        Rz->SetNumberOfTuples(outputTups);
+        name="rot-";
+        name+=V->GetName();
+        name+="z";
+        Rz->SetName(name.c_str());
 
         switch(V->GetDataType())
           {
           vtkFloatTemplateMacro(
-            Interleave<VTK_TT>(
-                outputTups,
+            Rotation<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
                 (VTK_TT*)Rx->GetVoidPointer(0),
                 (VTK_TT*)Ry->GetVoidPointer(0),
-                (VTK_TT*)Rz->GetVoidPointer(0),
-                (VTK_TT*)R->GetVoidPointer(0)));
+                (VTK_TT*)Rz->GetVoidPointer(0));
+            );
           }
-        }
-      Rx->Delete();
-      Ry->Delete();
-      Rz->Delete();
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Rotation");
-      #endif
-      }
 
-    // Helicity.
-    if (this->ComputeHelicity)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Helicicty");
-      #endif
-      vtkDataArray *H=V->NewInstance();
-      outImData->GetPointData()->AddArray(H);
-      H->Delete();
-      H->SetNumberOfComponents(1);
-      H->SetNumberOfTuples(outputTups);
-      string name("hel-");
-      name+=V->GetName();
-      H->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          Helicity<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)H->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute helicity on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Helicity");
-      #endif
-      }
+        if (this->SplitComponents)
+          {
+          outImData->GetPointData()->AddArray(Rx);
+          outImData->GetPointData()->AddArray(Ry);
+          outImData->GetPointData()->AddArray(Rz);
+          }
+        else
+          {
+          vtkDataArray *R=V->NewInstance();
+          outImData->GetPointData()->AddArray(R);
+          R->Delete();
+          R->SetNumberOfComponents(3);
+          R->SetNumberOfTuples(outputTups);
+          name="rot-";
+          name+=V->GetName();
+          R->SetName(name.c_str());
 
-    // Normalized Helicity.
-    if (this->ComputeNormalizedHelicity)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::NormalizedHelicty");
-      #endif
-      vtkDataArray *HN=V->NewInstance();
-      outImData->GetPointData()->AddArray(HN);
-      HN->Delete();
-      HN->SetNumberOfComponents(1);
-      HN->SetNumberOfTuples(outputTups);
-      string name("norm-hel-");
-      name+=V->GetName();
-      HN->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          NormalizedHelicity<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)HN->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute normalized helicity on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
-      #endif
-      }
-
-    // Q Criteria
-    if (this->ComputeQ)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Q");
-      #endif
-      vtkDataArray *Q=V->NewInstance();
-      outImData->GetPointData()->AddArray(Q);
-      Q->Delete();
-      Q->SetNumberOfComponents(1);
-      Q->SetNumberOfTuples(outputTups);
-      string name("q-");
-      name+=V->GetName();
-      Q->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          QCriteria<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)Q->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute Q on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Q");
-      #endif
-      }
-
-    // Lambda-1,2,3.
-    if (this->ComputeLambda)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Lambda123");
-      #endif
-      vtkDataArray *L=V->NewInstance();
-      outImData->GetPointData()->AddArray(L);
-      L->Delete();
-      L->SetNumberOfComponents(3);
-      L->SetNumberOfTuples(outputTups);
-      string name("lam-");
-      name+=V->GetName();
-      L->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          Lambda<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)L->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute lambda-1,2,3 on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Lambda123");
-      #endif
-      }
-
-    // Lambda-2.
-    if (this->ComputeLambda2)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Lambda2");
-      #endif
-      vtkDataArray *L2=V->NewInstance();
-      outImData->GetPointData()->AddArray(L2);
-      L2->Delete();
-      L2->SetNumberOfComponents(1);
-      L2->SetNumberOfTuples(outputTups);
-      string name("lam2-");
-      name+=V->GetName();
-      L2->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          Lambda2<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)L2->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute lambda-2 on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Lambda2");
-      #endif
-      }
-
-    // Divergence.
-    if (this->ComputeDivergence)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Divergence");
-      #endif
-      vtkDataArray *D=V->NewInstance();
-      outImData->GetPointData()->AddArray(D);
-      D->Delete();
-      D->SetNumberOfComponents(1);
-      D->SetNumberOfTuples(outputTups);
-      string name("div-");
-      name+=V->GetName();
-      D->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          Divergence<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)D->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute divergence on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Divergence");
-      #endif
-      }
-
-    // Gradient.
-    if (this->ComputeGradient)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::Gradient");
-      #endif
-      string name;
-
-      vtkDataArray *Gxx=V->NewInstance();
-      Gxx->SetNumberOfComponents(1);
-      Gxx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xx";
-      Gxx->SetName(name.c_str());
-
-      vtkDataArray *Gxy=V->NewInstance();
-      Gxy->SetNumberOfComponents(1);
-      Gxy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xy";
-      Gxy->SetName(name.c_str());
-
-      vtkDataArray *Gxz=V->NewInstance();
-      Gxz->SetNumberOfComponents(1);
-      Gxz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xz";
-      Gxz->SetName(name.c_str());
-
-      vtkDataArray *Gyx=V->NewInstance();
-      Gyx->SetNumberOfComponents(1);
-      Gyx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yx";
-      Gyx->SetName(name.c_str());
-
-      vtkDataArray *Gyy=V->NewInstance();
-      Gyy->SetNumberOfComponents(1);
-      Gyy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yy";
-      Gyy->SetName(name.c_str());
-
-      vtkDataArray *Gyz=V->NewInstance();
-      Gyz->SetNumberOfComponents(1);
-      Gyz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yz";
-      Gyz->SetName(name.c_str());
-
-      vtkDataArray *Gzx=V->NewInstance();
-      Gzx->SetNumberOfComponents(1);
-      Gzx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zx";
-      Gzx->SetName(name.c_str());
-
-      vtkDataArray *Gzy=V->NewInstance();
-      Gzy->SetNumberOfComponents(1);
-      Gzy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zy";
-      Gzy->SetName(name.c_str());
-
-      vtkDataArray *Gzz=V->NewInstance();
-      Gzz->SetNumberOfComponents(1);
-      Gzz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zz";
-      Gzz->SetName(name.c_str());
-
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          Gradient<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)Gxx->GetVoidPointer(0),
-              (VTK_TT*)Gxy->GetVoidPointer(0),
-              (VTK_TT*)Gxz->GetVoidPointer(0),
-              (VTK_TT*)Gyx->GetVoidPointer(0),
-              (VTK_TT*)Gyy->GetVoidPointer(0),
-              (VTK_TT*)Gyz->GetVoidPointer(0),
-              (VTK_TT*)Gzx->GetVoidPointer(0),
-              (VTK_TT*)Gzy->GetVoidPointer(0),
-              (VTK_TT*)Gzz->GetVoidPointer(0));
-          );
-        default:
-          vtkErrorMacro(
-            << "Cannot compute gradient on type "
-            << V->GetClassName());
+          switch(V->GetDataType())
+            {
+            vtkFloatTemplateMacro(
+              Interleave<VTK_TT>(
+                  outputTups,
+                  (VTK_TT*)Rx->GetVoidPointer(0),
+                  (VTK_TT*)Ry->GetVoidPointer(0),
+                  (VTK_TT*)Rz->GetVoidPointer(0),
+                  (VTK_TT*)R->GetVoidPointer(0)));
+            }
+          }
+        Rx->Delete();
+        Ry->Delete();
+        Rz->Delete();
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Rotation");
+        #endif
         }
 
-      if (this->SplitComponents)
+      // Helicity.
+      if (this->ComputeHelicity)
         {
-        outImData->GetPointData()->AddArray(Gxx);
-        outImData->GetPointData()->AddArray(Gxy);
-        outImData->GetPointData()->AddArray(Gxz);
-        outImData->GetPointData()->AddArray(Gyx);
-        outImData->GetPointData()->AddArray(Gyy);
-        outImData->GetPointData()->AddArray(Gyz);
-        outImData->GetPointData()->AddArray(Gzx);
-        outImData->GetPointData()->AddArray(Gzy);
-        outImData->GetPointData()->AddArray(Gzz);
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Helicicty");
+        #endif
+        vtkDataArray *H=V->NewInstance();
+        outImData->GetPointData()->AddArray(H);
+        H->Delete();
+        H->SetNumberOfComponents(1);
+        H->SetNumberOfTuples(outputTups);
+        string name("hel-");
+        name+=V->GetName();
+        H->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            Helicity<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)H->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute helicity on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Helicity");
+        #endif
         }
-      else
+
+      // Normalized Helicity.
+      if (this->ComputeNormalizedHelicity)
         {
-        vtkDataArray *G=V->NewInstance();
-        outImData->GetPointData()->AddArray(G);
-        G->Delete();
-        G->SetNumberOfComponents(9);
-        G->SetNumberOfTuples(outputTups);
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::NormalizedHelicty");
+        #endif
+        vtkDataArray *HN=V->NewInstance();
+        outImData->GetPointData()->AddArray(HN);
+        HN->Delete();
+        HN->SetNumberOfComponents(1);
+        HN->SetNumberOfTuples(outputTups);
+        string name("norm-hel-");
+        name+=V->GetName();
+        HN->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            NormalizedHelicity<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)HN->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute normalized helicity on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
+        #endif
+        }
+
+      // Q Criteria
+      if (this->ComputeQ)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Q");
+        #endif
+        vtkDataArray *Q=V->NewInstance();
+        outImData->GetPointData()->AddArray(Q);
+        Q->Delete();
+        Q->SetNumberOfComponents(1);
+        Q->SetNumberOfTuples(outputTups);
+        string name("q-");
+        name+=V->GetName();
+        Q->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            QCriteria<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)Q->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute Q on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Q");
+        #endif
+        }
+
+      // Lambda-1,2,3.
+      if (this->ComputeLambda)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Lambda123");
+        #endif
+        vtkDataArray *L=V->NewInstance();
+        outImData->GetPointData()->AddArray(L);
+        L->Delete();
+        L->SetNumberOfComponents(3);
+        L->SetNumberOfTuples(outputTups);
+        string name("lam-");
+        name+=V->GetName();
+        L->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            Lambda<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)L->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute lambda-1,2,3 on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Lambda123");
+        #endif
+        }
+
+      // Lambda-2.
+      if (this->ComputeLambda2)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Lambda2");
+        #endif
+        vtkDataArray *L2=V->NewInstance();
+        outImData->GetPointData()->AddArray(L2);
+        L2->Delete();
+        L2->SetNumberOfComponents(1);
+        L2->SetNumberOfTuples(outputTups);
+        string name("lam2-");
+        name+=V->GetName();
+        L2->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            Lambda2<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)L2->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute lambda-2 on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Lambda2");
+        #endif
+        }
+
+      // Divergence.
+      if (this->ComputeDivergence)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Divergence");
+        #endif
+        vtkDataArray *D=V->NewInstance();
+        outImData->GetPointData()->AddArray(D);
+        D->Delete();
+        D->SetNumberOfComponents(1);
+        D->SetNumberOfTuples(outputTups);
+        string name("div-");
+        name+=V->GetName();
+        D->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            Divergence<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)D->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute divergence on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Divergence");
+        #endif
+        }
+
+      // Gradient.
+      if (this->ComputeGradient)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::Gradient");
+        #endif
+        string name;
+
+        vtkDataArray *Gxx=V->NewInstance();
+        Gxx->SetNumberOfComponents(1);
+        Gxx->SetNumberOfTuples(outputTups);
         name="grad-";
         name+=V->GetName();
-        G->SetName(name.c_str());
+        name+="xx";
+        Gxx->SetName(name.c_str());
+
+        vtkDataArray *Gxy=V->NewInstance();
+        Gxy->SetNumberOfComponents(1);
+        Gxy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="xy";
+        Gxy->SetName(name.c_str());
+
+        vtkDataArray *Gxz=V->NewInstance();
+        Gxz->SetNumberOfComponents(1);
+        Gxz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="xz";
+        Gxz->SetName(name.c_str());
+
+        vtkDataArray *Gyx=V->NewInstance();
+        Gyx->SetNumberOfComponents(1);
+        Gyx->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yx";
+        Gyx->SetName(name.c_str());
+
+        vtkDataArray *Gyy=V->NewInstance();
+        Gyy->SetNumberOfComponents(1);
+        Gyy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yy";
+        Gyy->SetName(name.c_str());
+
+        vtkDataArray *Gyz=V->NewInstance();
+        Gyz->SetNumberOfComponents(1);
+        Gyz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yz";
+        Gyz->SetName(name.c_str());
+
+        vtkDataArray *Gzx=V->NewInstance();
+        Gzx->SetNumberOfComponents(1);
+        Gzx->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zx";
+        Gzx->SetName(name.c_str());
+
+        vtkDataArray *Gzy=V->NewInstance();
+        Gzy->SetNumberOfComponents(1);
+        Gzy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zy";
+        Gzy->SetName(name.c_str());
+
+        vtkDataArray *Gzz=V->NewInstance();
+        Gzz->SetNumberOfComponents(1);
+        Gzz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zz";
+        Gzz->SetName(name.c_str());
 
         switch(V->GetDataType())
           {
           vtkFloatTemplateMacro(
-            Interleave<VTK_TT>(
-                outputTups,
+            Gradient<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)Gxx->GetVoidPointer(0),
+                (VTK_TT*)Gxy->GetVoidPointer(0),
+                (VTK_TT*)Gxz->GetVoidPointer(0),
+                (VTK_TT*)Gyx->GetVoidPointer(0),
+                (VTK_TT*)Gyy->GetVoidPointer(0),
+                (VTK_TT*)Gyz->GetVoidPointer(0),
+                (VTK_TT*)Gzx->GetVoidPointer(0),
+                (VTK_TT*)Gzy->GetVoidPointer(0),
+                (VTK_TT*)Gzz->GetVoidPointer(0));
+            );
+          default:
+            vtkErrorMacro(
+              << "Cannot compute gradient on type "
+              << V->GetClassName());
+          }
+
+        if (this->SplitComponents)
+          {
+          outImData->GetPointData()->AddArray(Gxx);
+          outImData->GetPointData()->AddArray(Gxy);
+          outImData->GetPointData()->AddArray(Gxz);
+          outImData->GetPointData()->AddArray(Gyx);
+          outImData->GetPointData()->AddArray(Gyy);
+          outImData->GetPointData()->AddArray(Gyz);
+          outImData->GetPointData()->AddArray(Gzx);
+          outImData->GetPointData()->AddArray(Gzy);
+          outImData->GetPointData()->AddArray(Gzz);
+          }
+        else
+          {
+          vtkDataArray *G=V->NewInstance();
+          outImData->GetPointData()->AddArray(G);
+          G->Delete();
+          G->SetNumberOfComponents(9);
+          G->SetNumberOfTuples(outputTups);
+          name="grad-";
+          name+=V->GetName();
+          G->SetName(name.c_str());
+
+          switch(V->GetDataType())
+            {
+            vtkFloatTemplateMacro(
+              Interleave<VTK_TT>(
+                  outputTups,
+                  (VTK_TT*)Gxx->GetVoidPointer(0),
+                  (VTK_TT*)Gxy->GetVoidPointer(0),
+                  (VTK_TT*)Gxz->GetVoidPointer(0),
+                  (VTK_TT*)Gyx->GetVoidPointer(0),
+                  (VTK_TT*)Gyy->GetVoidPointer(0),
+                  (VTK_TT*)Gyz->GetVoidPointer(0),
+                  (VTK_TT*)Gzx->GetVoidPointer(0),
+                  (VTK_TT*)Gzy->GetVoidPointer(0),
+                  (VTK_TT*)Gzz->GetVoidPointer(0),
+                  (VTK_TT*)G->GetVoidPointer(0)));
+            }
+          }
+        Gxx->Delete();
+        Gxy->Delete();
+        Gxz->Delete();
+        Gyx->Delete();
+        Gyy->Delete();
+        Gyz->Delete();
+        Gzx->Delete();
+        Gzy->Delete();
+        Gzz->Delete();
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::Gradient");
+        #endif
+        }
+
+      // EigenvalueDiagnostic.
+      if (this->ComputeEigenvalueDiagnostic)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
+        #endif
+        vtkDataArray *D=V->NewInstance();
+        outImData->GetPointData()->AddArray(D);
+        D->Delete();
+        D->SetNumberOfComponents(1);
+        D->SetNumberOfTuples(outputTups);
+        string name("eigen-diag-");
+        name+=V->GetName();
+        D->SetName(name.c_str());
+        //
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            EigenvalueDiagnostic<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)D->GetVoidPointer(0)));
+          default:
+            vtkErrorMacro(
+              << "Cannot compute eigenvalue diagnostic on type "
+              << V->GetClassName());
+          }
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
+        #endif
+        }
+
+      // Gardient-tensor diagnostic.
+      if (this->ComputeGradientDiagnostic)
+        {
+        #if defined vtkSQVortexFilterTIME
+        log->StartEvent("vtkSQVortexFilter::GradientDiagnostic");
+        #endif
+        string name;
+
+        vtkDataArray *Gxx=V->NewInstance();
+        Gxx->SetNumberOfComponents(1);
+        Gxx->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="xx";
+        Gxx->SetName(name.c_str());
+
+        vtkDataArray *Gxy=V->NewInstance();
+        Gxy->SetNumberOfComponents(1);
+        Gxy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="xy";
+        Gxy->SetName(name.c_str());
+
+        vtkDataArray *Gxz=V->NewInstance();
+        Gxz->SetNumberOfComponents(1);
+        Gxz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="xz";
+        Gxz->SetName(name.c_str());
+
+        vtkDataArray *Gyx=V->NewInstance();
+        Gyx->SetNumberOfComponents(1);
+        Gyx->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yx";
+        Gyx->SetName(name.c_str());
+
+        vtkDataArray *Gyy=V->NewInstance();
+        Gyy->SetNumberOfComponents(1);
+        Gyy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yy";
+        Gyy->SetName(name.c_str());
+
+        vtkDataArray *Gyz=V->NewInstance();
+        Gyz->SetNumberOfComponents(1);
+        Gyz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="yz";
+        Gyz->SetName(name.c_str());
+
+        vtkDataArray *Gzx=V->NewInstance();
+        Gzx->SetNumberOfComponents(1);
+        Gzx->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zx";
+        Gzx->SetName(name.c_str());
+
+        vtkDataArray *Gzy=V->NewInstance();
+        Gzy->SetNumberOfComponents(1);
+        Gzy->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zy";
+        Gzy->SetName(name.c_str());
+
+        vtkDataArray *Gzz=V->NewInstance();
+        Gzz->SetNumberOfComponents(1);
+        Gzz->SetNumberOfTuples(outputTups);
+        name="grad-";
+        name+=V->GetName();
+        name+="zz";
+        Gzz->SetName(name.c_str());
+
+        vtkDataArray *W=V->NewInstance();
+        W->SetNumberOfComponents(3);
+        W->SetNumberOfTuples(outputTups);
+
+        vtkDataArray *S=V->NewInstance();
+        S->SetNumberOfTuples(outputTups);
+        name="mag(";
+        name+=V->GetName();
+        name=".grad(";
+        name+=V->GetName();
+        name+="))/mag(";
+        name+=V->GetName();
+        name+=")";
+        S->SetName(name.c_str());
+        outImData->GetPointData()->AddArray(S);
+        S->Delete();
+
+        switch(V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+
+            Gradient<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                dX,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)Gxx->GetVoidPointer(0),
+                (VTK_TT*)Gxy->GetVoidPointer(0),
+                (VTK_TT*)Gxz->GetVoidPointer(0),
+                (VTK_TT*)Gyx->GetVoidPointer(0),
+                (VTK_TT*)Gyy->GetVoidPointer(0),
+                (VTK_TT*)Gyz->GetVoidPointer(0),
+                (VTK_TT*)Gzx->GetVoidPointer(0),
+                (VTK_TT*)Gzy->GetVoidPointer(0),
+                (VTK_TT*)Gzz->GetVoidPointer(0));
+
+            VectorMatrixMul<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                (VTK_TT*)V->GetVoidPointer(0),
                 (VTK_TT*)Gxx->GetVoidPointer(0),
                 (VTK_TT*)Gxy->GetVoidPointer(0),
                 (VTK_TT*)Gxz->GetVoidPointer(0),
@@ -964,221 +1188,39 @@ int vtkSQVortexFilter::RequestData(
                 (VTK_TT*)Gzx->GetVoidPointer(0),
                 (VTK_TT*)Gzy->GetVoidPointer(0),
                 (VTK_TT*)Gzz->GetVoidPointer(0),
-                (VTK_TT*)G->GetVoidPointer(0)));
+                (VTK_TT*)W->GetVoidPointer(0));
+
+            Magnitude<VTK_TT>(
+                outputTups,
+                (VTK_TT*)W->GetVoidPointer(0),
+                (VTK_TT*)S->GetVoidPointer(0));
+
+            Normalize<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                this->Mode,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)S->GetVoidPointer(0));
+            );
+          default:
+            vtkErrorMacro(
+              << "Cannot compute gradient diagnostic on type "
+              << V->GetClassName());
           }
+        W->Delete();
+        Gxx->Delete();
+        Gxy->Delete();
+        Gxz->Delete();
+        Gyx->Delete();
+        Gyy->Delete();
+        Gyz->Delete();
+        Gzx->Delete();
+        Gzy->Delete();
+        Gzz->Delete();
+        #if defined vtkSQVortexFilterTIME
+        log->EndEvent("vtkSQVortexFilter::GradientDiagnostic");
+        #endif
         }
-      Gxx->Delete();
-      Gxy->Delete();
-      Gxz->Delete();
-      Gyx->Delete();
-      Gyy->Delete();
-      Gyz->Delete();
-      Gzx->Delete();
-      Gzy->Delete();
-      Gzz->Delete();
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::Gradient");
-      #endif
-      }
-
-    // EigenvalueDiagnostic.
-    if (this->ComputeEigenvalueDiagnostic)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
-      #endif
-      vtkDataArray *D=V->NewInstance();
-      outImData->GetPointData()->AddArray(D);
-      D->Delete();
-      D->SetNumberOfComponents(1);
-      D->SetNumberOfTuples(outputTups);
-      string name("eigen-diag-");
-      name+=V->GetName();
-      D->SetName(name.c_str());
-      //
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-          EigenvalueDiagnostic<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)D->GetVoidPointer(0)));
-        default:
-          vtkErrorMacro(
-            << "Cannot compute eigenvalue diagnostic on type "
-            << V->GetClassName());
-        }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
-      #endif
-      }
-
-    // Gardient-tensor diagnostic.
-    if (this->ComputeGradientDiagnostic)
-      {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::GradientDiagnostic");
-      #endif
-      string name;
-
-      vtkDataArray *Gxx=V->NewInstance();
-      Gxx->SetNumberOfComponents(1);
-      Gxx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xx";
-      Gxx->SetName(name.c_str());
-
-      vtkDataArray *Gxy=V->NewInstance();
-      Gxy->SetNumberOfComponents(1);
-      Gxy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xy";
-      Gxy->SetName(name.c_str());
-
-      vtkDataArray *Gxz=V->NewInstance();
-      Gxz->SetNumberOfComponents(1);
-      Gxz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="xz";
-      Gxz->SetName(name.c_str());
-
-      vtkDataArray *Gyx=V->NewInstance();
-      Gyx->SetNumberOfComponents(1);
-      Gyx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yx";
-      Gyx->SetName(name.c_str());
-
-      vtkDataArray *Gyy=V->NewInstance();
-      Gyy->SetNumberOfComponents(1);
-      Gyy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yy";
-      Gyy->SetName(name.c_str());
-
-      vtkDataArray *Gyz=V->NewInstance();
-      Gyz->SetNumberOfComponents(1);
-      Gyz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="yz";
-      Gyz->SetName(name.c_str());
-
-      vtkDataArray *Gzx=V->NewInstance();
-      Gzx->SetNumberOfComponents(1);
-      Gzx->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zx";
-      Gzx->SetName(name.c_str());
-
-      vtkDataArray *Gzy=V->NewInstance();
-      Gzy->SetNumberOfComponents(1);
-      Gzy->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zy";
-      Gzy->SetName(name.c_str());
-
-      vtkDataArray *Gzz=V->NewInstance();
-      Gzz->SetNumberOfComponents(1);
-      Gzz->SetNumberOfTuples(outputTups);
-      name="grad-";
-      name+=V->GetName();
-      name+="zz";
-      Gzz->SetName(name.c_str());
-
-      vtkDataArray *W=V->NewInstance();
-      W->SetNumberOfComponents(3);
-      W->SetNumberOfTuples(outputTups);
-
-      vtkDataArray *S=V->NewInstance();
-      S->SetNumberOfTuples(outputTups);
-      name="mag(";
-      name+=V->GetName();
-      name=".grad(";
-      name+=V->GetName();
-      name+="))/mag(";
-      name+=V->GetName();
-      name+=")";
-      S->SetName(name.c_str());
-      outImData->GetPointData()->AddArray(S);
-      S->Delete();
-
-      switch(V->GetDataType())
-        {
-        vtkFloatTemplateMacro(
-
-          Gradient<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              dX,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)Gxx->GetVoidPointer(0),
-              (VTK_TT*)Gxy->GetVoidPointer(0),
-              (VTK_TT*)Gxz->GetVoidPointer(0),
-              (VTK_TT*)Gyx->GetVoidPointer(0),
-              (VTK_TT*)Gyy->GetVoidPointer(0),
-              (VTK_TT*)Gyz->GetVoidPointer(0),
-              (VTK_TT*)Gzx->GetVoidPointer(0),
-              (VTK_TT*)Gzy->GetVoidPointer(0),
-              (VTK_TT*)Gzz->GetVoidPointer(0));
-
-          VectorMatrixMul<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)Gxx->GetVoidPointer(0),
-              (VTK_TT*)Gxy->GetVoidPointer(0),
-              (VTK_TT*)Gxz->GetVoidPointer(0),
-              (VTK_TT*)Gyx->GetVoidPointer(0),
-              (VTK_TT*)Gyy->GetVoidPointer(0),
-              (VTK_TT*)Gyz->GetVoidPointer(0),
-              (VTK_TT*)Gzx->GetVoidPointer(0),
-              (VTK_TT*)Gzy->GetVoidPointer(0),
-              (VTK_TT*)Gzz->GetVoidPointer(0),
-              (VTK_TT*)W->GetVoidPointer(0));
-
-          Magnitude<VTK_TT>(
-              outputTups,
-              (VTK_TT*)W->GetVoidPointer(0),
-              (VTK_TT*)S->GetVoidPointer(0));
-
-          Normalize<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              this->Mode,
-              (VTK_TT*)V->GetVoidPointer(0),
-              (VTK_TT*)S->GetVoidPointer(0));
-          );
-        default:
-          vtkErrorMacro(
-            << "Cannot compute gradient diagnostic on type "
-            << V->GetClassName());
-        }
-      W->Delete();
-      Gxx->Delete();
-      Gxy->Delete();
-      Gxz->Delete();
-      Gyx->Delete();
-      Gyy->Delete();
-      Gyz->Delete();
-      Gzx->Delete();
-      Gzy->Delete();
-      Gzz->Delete();
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::GradientDiagnostic");
-      #endif
       }
 
     if (this->ResultMagnitude)
@@ -1203,7 +1245,7 @@ int vtkSQVortexFilter::RequestData(
         mda->SetName(name.c_str());
         outImData->GetPointData()->AddArray(mda);
         mda->Delete();
-        switch(V->GetDataType())
+        switch(da->GetDataType())
           {
           vtkFloatTemplateMacro(
             Magnitude<VTK_TT>(
@@ -1214,7 +1256,7 @@ int vtkSQVortexFilter::RequestData(
         default:
           vtkErrorMacro(
             << "Cannot compute magnitude on type "
-            << V->GetClassName());
+            << da->GetClassName());
           }
         }
       #if defined vtkSQVortexFilterTIME

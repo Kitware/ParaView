@@ -1,0 +1,522 @@
+/*
+   ____    _ __           ____               __    ____
+  / __/___(_) /  ___ ____/ __ \__ _____ ___ / /_  /  _/__  ____
+ _\ \/ __/ / _ \/ -_) __/ /_/ / // / -_|_-</ __/ _/ // _ \/ __/
+/___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
+
+Copyright 2012 SciberQuest Inc.
+*/
+#include "TestUtils.h"
+#include "vtkMultiProcessController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkAlgorithm.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkPointData.h"
+#include "vtkCellData.h"
+#include "vtkPolyData.h"
+#include "vtkAppendPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
+#include "vtkRenderer.h"
+#include "vtkScalarsToColors.h"
+#include "vtkRenderWindow.h"
+#include "vtkCamera.h"
+#include "vtkTesting.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkPNGWriter.h"
+#include "vtkDataArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkColorTransferFunction.h"
+#include <cfloat>
+#include <iostream>
+using std::cerr;
+#include <string>
+using std::string;
+#include <vector>
+using std::vector;
+
+// ****************************************************************************
+void Broadcast(vtkMultiProcessController *controller, string &s, int root)
+{
+  int worldRank=controller->GetLocalProcessId();
+
+  vector<char> buffer;
+
+  if (worldRank==root)
+    {
+    buffer.assign(s.begin(),s.end());
+
+    vtkIdType bufferSize=buffer.size();
+    controller->Broadcast(&bufferSize,1,0);
+    controller->Broadcast(&buffer[0],bufferSize,0);
+    }
+  else
+    {
+    vtkIdType bufferSize=0;
+    controller->Broadcast(&bufferSize,1,0);
+
+    buffer.resize(bufferSize,'\0');
+    controller->Broadcast(&buffer[0],bufferSize,0);
+
+    s.assign(buffer.begin(),buffer.end());
+    }
+}
+
+// ****************************************************************************
+void BroadcastConfiguration(
+      vtkMultiProcessController *controller,
+      int argc,
+      char **argv,
+      string &dataRoot,
+      string &tempDir,
+      string &baseline)
+{
+  int worldRank=controller->GetLocalProcessId();
+  if (worldRank==0)
+    {
+    vtkTesting *testHelper = vtkTesting::New();
+    testHelper->AddArguments(argc,const_cast<const char **>(argv));
+
+    dataRoot=NativePath(testHelper->GetDataRoot());
+    baseline=NativePath(testHelper->GetValidImageFileName());
+    tempDir=NativePath(testHelper->GetTempDirectory());
+
+    testHelper->Delete();
+    }
+  Broadcast(controller,dataRoot);
+  Broadcast(controller,tempDir);
+  Broadcast(controller,baseline);
+}
+
+// ****************************************************************************
+vtkPolyData *Gather(
+    vtkMultiProcessController *controller,
+    int rootRank,
+    vtkPolyData *data,
+    int tag)
+{
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
+
+  if (worldRank!=rootRank)
+    {
+    // send
+    controller->Send(data,rootRank,tag);
+    }
+  else
+    {
+    // gather
+    vtkAppendPolyData *apd=vtkAppendPolyData::New();
+    apd->AddInputData(data);
+
+    for (int i=0; i<worldSize; ++i)
+      {
+      if (i==rootRank)
+        {
+        continue;
+        }
+      vtkPolyData* pd = vtkPolyData::New();
+      controller->Receive(pd,vtkMultiProcessController::ANY_SOURCE,tag);
+      apd->AddInputData(pd);
+      pd->Delete();
+      }
+
+    apd->Update();
+    data=apd->GetOutput();
+    data->Register(0);
+    apd->Delete();
+
+    return data;
+    }
+
+  return NULL;
+}
+
+// ****************************************************************************
+vtkStreamingDemandDrivenPipeline *GetParallelExec(
+        int worldRank,
+        int worldSize,
+        vtkAlgorithm *a,
+        double t)
+{
+  vtkStreamingDemandDrivenPipeline* exec
+     = dynamic_cast<vtkStreamingDemandDrivenPipeline*>(a->GetExecutive());
+
+  vtkInformation *info  = exec->GetOutputInformation(0);
+
+  exec->SetUpdateNumberOfPieces(info,worldSize);
+  exec->SetUpdatePiece(info,worldRank);
+  exec->UpdateInformation();
+  exec->SetUpdateExtent(info,worldRank,worldSize,0);
+  exec->SetUpdateTimeStep(0,t);
+  exec->PropagateUpdateExtent(0);
+
+  return exec;
+}
+
+// ****************************************************************************
+vtkDoubleArray *ComputeMagnitude(vtkDataArray *inDa)
+{
+  vtkDoubleArray *outDa=vtkDoubleArray::New();
+
+  if (inDa==NULL)
+    {
+    cerr << "Null pointer to input array." << endl;
+    return outDa;
+    }
+
+  vtkIdType nTups=inDa->GetNumberOfTuples();
+  outDa->SetNumberOfTuples(nTups);
+
+  string name=inDa->GetName();
+  name+="-mag";
+  outDa->SetName(name.c_str());
+
+  int nComps=inDa->GetNumberOfComponents();
+
+  switch(inDa->GetDataType())
+    {
+    vtkTemplateMacro(
+
+      VTK_TT *val = (VTK_TT*)inDa->GetVoidPointer(0);
+      double *mag = (double*)outDa->GetVoidPointer(0);
+
+      double m;
+      double v;
+
+      for (vtkIdType i=0; i<nTups; ++i)
+        {
+        vtkIdType idx=nComps*i;
+
+        m=0.0;
+        for (int j=0; j<nComps; ++j)
+          {
+          v = (double)val[idx+j];
+          m = m + v*v;
+          }
+        m = sqrt(m);
+        mag[i] = m;
+        }
+      );
+    }
+
+  return outDa;
+}
+
+// ****************************************************************************
+void ComputeRange(vtkDataArray *da, double *range)
+{
+  if (da==NULL)
+    {
+    cerr << "Null pointer to input array." << endl;
+    return;
+    }
+
+  int nComps=da->GetNumberOfComponents();
+  if (nComps==1)
+    {
+    da->GetRange(range);
+    }
+  else
+    {
+    range[0]=DBL_MAX;
+    range[1]=-DBL_MAX;
+
+    switch(da->GetDataType())
+      {
+      vtkTemplateMacro(
+        VTK_TT *t=(VTK_TT*)da->GetVoidPointer(0);
+        vtkIdType nTups=da->GetNumberOfTuples();
+        for (vtkIdType i=0; i<nTups; ++i)
+          {
+          vtkIdType idx=nComps*i;
+          VTK_TT m=VTK_TT(0);
+          for (int j=0; j<nComps; ++j)
+            {
+            m+=t[idx+j]*t[idx+j];
+            }
+          m=sqrt((double)m);
+          if (m<range[0])
+            {
+            range[0]=m;
+            }
+          if (m>range[1])
+            {
+            range[1]=m;
+            }
+          }
+        );
+      }
+    }
+  cerr << da->GetName() << "=[" << range[0] << ", " << range[1] << "]" << endl;
+}
+
+// ****************************************************************************
+void PrintArrayNames(vtkDataSetAttributes *dsa)
+{
+  int n=dsa->GetNumberOfArrays();
+  cerr << n << " " << dsa->GetClassName() << " arrays found." << endl;
+  for (int i=0; i<n; ++i)
+    {
+    cerr << dsa->GetArray(i)->GetName() << endl;
+    }
+}
+
+// ****************************************************************************
+void SetLUTToCoolToWarmDiverging(vtkPolyDataMapper *pdm, vtkDataArray *da)
+{
+  double range[2] = {0.0, 0.0};
+
+  da->GetRange(range);
+
+  vtkColorTransferFunction *lut=vtkColorTransferFunction::New();
+  lut->SetColorSpaceToRGB();
+  lut->AddRGBPoint(range[0],0.0,0.0,1.0);
+  lut->AddRGBPoint(range[1],1.0,0.0,0.0);
+  lut->SetColorSpaceToDiverging();
+  lut->Build();
+
+  pdm->SetLookupTable(lut);
+
+  lut->Delete();
+}
+
+// ****************************************************************************
+vtkActor *MapArrayToActor(
+        vtkRenderer *ren,
+        vtkDataSet *data,
+        int arrayType,
+        const char *arrayName)
+{
+  vtkPolyData *pd=dynamic_cast<vtkPolyData*>(data);
+  if (pd==NULL)
+    {
+    cerr << "unsuported dataset type " << data->GetClassName() << endl;
+    return 0;
+    }
+
+  vtkPolyDataMapper *pdm=vtkPolyDataMapper::New();
+  pdm->SetInputData(pd);
+
+  vtkDataArray *da=NULL;
+  vtkDataSetAttributes *atts=NULL;
+
+  if (arrayName)
+    {
+    if (arrayType==POINT_ARRAY)
+      {
+      atts=pd->GetPointData();
+      pdm->SetScalarModeToUsePointData();
+      }
+    else
+    if (arrayType==CELL_ARRAY)
+      {
+      atts=pd->GetCellData();
+      pdm->SetScalarModeToUseCellData();
+      }
+
+    da=atts->GetArray(arrayName);
+    if (da)
+      {
+      if (da->GetNumberOfComponents()>1)
+        {
+        vtkDataArray *mag=ComputeMagnitude(da);
+        pd->GetPointData()->AddArray(mag);
+        mag->Delete();
+        da=mag;
+        }
+      atts->SetActiveScalars(da->GetName());
+
+      SetLUTToCoolToWarmDiverging(pdm,da);
+      }
+    }
+  else
+   {
+   pdm->ScalarVisibilityOff();
+   }
+
+  pdm->Update();
+
+  vtkActor *act=vtkActor::New();
+  act->SetMapper(pdm);
+  pdm->Delete();
+
+  ren->AddActor(act);
+  act->Delete();
+
+  if (arrayName && da==NULL)
+    {
+    cerr << "Error you requested a non-existant array " << arrayName << endl;
+    PrintArrayNames(pd->GetPointData());
+    PrintArrayNames(pd->GetCellData());
+    }
+
+  return act;
+}
+
+// ****************************************************************************
+string NativePath(string path)
+{
+  string nativePath;
+  #ifdef WIN32
+  size_t n=path.size();
+  for (size_t i=0; i<n; ++i)
+    {
+    if (path[i]=='/')
+      {
+      nativePath+='\\';
+      continue;
+      }
+    nativePath+=path[i];
+    }
+  return nativePath;
+  #else
+  return path;
+  #endif
+
+  return "";
+}
+
+// ****************************************************************************
+int SerialRender(
+    vtkMultiProcessController *controller,
+    vtkPolyData *data,
+    string &tempDir,
+    string &baseline,
+    string testName,
+    int iwx,
+    int iwy,
+    double px,
+    double py,
+    double pz,
+    double fx,
+    double fy,
+    double fz,
+    double vux,
+    double vuy,
+    double vuz,
+    double cz)
+{
+  int renderRank=0;
+  int aTestFailed=0;
+
+  // gather
+  data=Gather(controller,renderRank,data,100);
+
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
+
+  // only the render rank needs to continue.
+  if (worldRank==renderRank)
+    {
+    // render point then cell data
+    vtkDataSetAttributes *dsa[2]={
+        data->GetPointData(),
+        data->GetCellData()
+        };
+
+    for (int j=0; j<2; ++j)
+      {
+      const int arrayType=dsa[j]->IsA("vtkPointData");
+
+      int nArrays=dsa[j]->GetNumberOfArrays();
+      for (int i=0; i<nArrays; ++i)
+        {
+        string arrayName=dsa[j]->GetArray(i)->GetName();
+
+        if (arrayName == "ProcessId")
+          {
+          if (worldSize<2)
+            {
+            continue;
+            }
+
+          // render the decomp and save it
+          vtkRenderer *ren=vtkRenderer::New();
+
+          MapArrayToActor(ren,data,arrayType,"ProcessId");
+
+          vtkRenderWindow *rwin=vtkRenderWindow::New();
+          rwin->AddRenderer(ren);
+          rwin->SetSize(iwx,iwy);
+          ren->Delete();
+
+          vtkCamera *cam=ren->GetActiveCamera();
+          cam->SetPosition(px,py,pz);
+          cam->SetFocalPoint(fx,fy,fz);
+          cam->ComputeViewPlaneNormal();
+          cam->SetViewUp(vux,vuy,vuz);
+          cam->OrthogonalizeViewUp();
+          ren->ResetCamera();
+          cam->Zoom(cz);
+
+          rwin->MakeCurrent();
+          rwin->Render();
+          vtkWindowToImageFilter *decompImage = vtkWindowToImageFilter::New();
+          decompImage->SetInput(rwin);
+
+          string tempDecomp;
+          tempDecomp+=tempDir;
+          tempDecomp+="/";
+          tempDecomp+=testName;
+          tempDecomp+="-Decomp.png";
+          tempDecomp=NativePath(tempDecomp);
+
+          vtkPNGWriter *decompWriter = vtkPNGWriter::New();
+          decompWriter->SetFileName(tempDecomp.c_str());
+          decompWriter->SetInputConnection(decompImage->GetOutputPort());
+          decompWriter->Write();
+          decompWriter->Delete();
+          decompImage->Delete();
+
+          rwin->Delete();
+
+          continue;
+          }
+
+        vtkRenderer *ren=vtkRenderer::New();
+
+        MapArrayToActor(ren,data,arrayType,arrayName.c_str());
+
+        vtkRenderWindow *rwin=vtkRenderWindow::New();
+        rwin->AddRenderer(ren);
+        rwin->SetSize(iwx,iwy);
+        ren->Delete();
+
+        vtkCamera *cam=ren->GetActiveCamera();
+        cam->SetPosition(px,py,pz);
+        cam->SetFocalPoint(fx,fy,fz);
+        cam->ComputeViewPlaneNormal();
+        cam->SetViewUp(vux,vuy,vuz);
+        cam->OrthogonalizeViewUp();
+        ren->ResetCamera();
+        cam->Zoom(cz);
+
+        string base;
+        base+=baseline;
+        base+="-";
+        base+=arrayName;
+        base+=".png";
+
+        vtkTesting *testHelper = vtkTesting::New();
+        testHelper->AddArgument("-T");
+        testHelper->AddArgument(tempDir.c_str());
+        testHelper->AddArgument("-V");
+        testHelper->AddArgument(base.c_str());
+        testHelper->SetRenderWindow(rwin);
+        int result=testHelper->RegressionTest(10);
+        if (result!=vtkTesting::PASSED)
+          {
+          aTestFailed=1;
+          cerr << "Test for array " << arrayName << " failed." << endl;
+          }
+        testHelper->Delete();
+        rwin->Delete();
+        }
+      }
+    data->Delete();
+    }
+
+  return aTestFailed?vtkTesting::FAILED:vtkTesting::PASSED;
+}

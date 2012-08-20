@@ -44,7 +44,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetCopyAllArrays"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Copy all point data, if not set only the selected arrays from the ArraysToCopy
@@ -59,7 +59,7 @@ Copyright 2012 SciberQuest Inc.
         repeat_command="1"
         number_of_elements_per_command="1"
         label="Copy selected arrays"
-        panel_visibility="default">
+        >
         <Documentation>
             This property specifies the name(s) array(s) to filter.
         </Documentation>
@@ -122,7 +122,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="5"
         element_types="0 0 0 0 2"
         label="Tensors"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Tensors"
           input_domain_name="input_array1">
         <RequiredProperties>
@@ -162,7 +162,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetExtractEigenvalues"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         Toggle whether to extract eigenvalues from tensor. If false, eigenvalues/eigenvectors are not extracted and
@@ -177,7 +177,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetColorGlyphs"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         This property determines whether or not to color the glyphes.
@@ -191,7 +191,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         default_values="1"
         label="Scalars"
-        panel_visibility="default">
+        >
            <!-- default_values=1 is important to set here and not in Tensors
                 previously. Omitting the setting here would mess up changed
                 tensor input being recognized as tensor input and not as
@@ -213,7 +213,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="0"
         label="Color by"
-        panel_visibility="default">
+        >
             <EnumerationDomain name="enum">
               <Entry value="0" text="input scalars" />
               <Entry value="1" text="eigenvalues" />
@@ -233,7 +233,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetScaling"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         This property determines whether or not to scale glyphs with eigenvalues.
@@ -246,7 +246,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetScaleFactor"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <Documentation>
         This property specifies the scale factor to scale every glyph by.
       </Documentation>
@@ -257,7 +257,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetClampScaling"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         This property determines whether scaling of glyphs by ScaleFactor times eigenvalue should be limited.
@@ -270,7 +270,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxScaleFactor"
         number_of_elements="1"
         default_values="10"
-        panel_visibility="default">
+        >
       <Documentation>
         If scaling by eigenvalues should be limited, this value sets an upper limit for scale factor times
         eigenvalue.
@@ -282,7 +282,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSymmetric"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         This property determines whether or not to draw a mirror of each glyph.
@@ -294,7 +294,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetThreeGlyphs"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool" />
       <Documentation>
         Toggle whether to produce three glyphs, each of which oriented along an eigenvector and scaled according
@@ -333,7 +333,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectDD"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -342,7 +342,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectND"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -351,7 +351,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectSD"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -360,7 +360,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectOD"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -369,7 +369,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectID"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -378,7 +378,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectNN"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -387,7 +387,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectSN"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -396,7 +396,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectON"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -405,7 +405,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectIN"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -414,7 +414,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectSS"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -423,7 +423,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectOS"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -432,7 +432,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectIS"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -441,7 +441,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectOO"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -450,7 +450,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectIO"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -459,7 +459,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSelectII"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -575,7 +575,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -593,12 +593,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
-        <!--<Entry value="3"       text="RK-4-5"/>-->
+        <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters
@@ -608,7 +611,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -622,7 +625,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -635,7 +638,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-4"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
       <Documentation>
         Error bound for adaptive step size integration.
@@ -648,7 +651,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="100000000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
@@ -662,7 +665,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.5">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -679,7 +682,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -692,21 +695,37 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
+    <!--
     <DoubleVectorProperty
         name="MinSegmentLength"
         label="Minimum Segment Length"
         command="SetMinSegmentLength"
         number_of_elements="1"
         default_values="0.0"
-        panel_visibility="default">
+        >
       <Documentation>
         Lower bound on the segments in the resulting streamline
       </Documentation>
     </DoubleVectorProperty>
+    -->
+
+    <!-- output control -->
+    <IntVectorProperty
+        name="CullPeriodicTransition"
+        label="Cull Periodic Transitions"
+        command="SetCullPeriodicTransitions"
+        number_of_elements="1"
+        default_values="1"
+        >
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Remove segments that are the result of the application of a periodic BC.
+      </Documentation>
+    </IntVectorProperty>
 
     <!-- Colormap/Legened control -->
     <IntVectorProperty
@@ -715,7 +734,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       Use the minimum number of intersect colors required. Requires global reduction.
@@ -729,7 +748,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -739,9 +758,8 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         panel_visibility="never">
-      <BooleanDomain name="bool"/>
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -751,7 +769,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -765,7 +783,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="16"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -779,7 +797,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="512"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -788,8 +806,10 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
+      <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
     </Hints>
+
     <!-- End OOCFieldTracer -->
   </SourceProxy>
 
@@ -860,7 +880,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -879,11 +899,13 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="3"
         panel_visibility="never">
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
         <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters -->
@@ -893,7 +915,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -906,7 +928,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -919,7 +941,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-3"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Error bound for adaptive step size integration.
@@ -932,7 +954,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="1000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
@@ -945,7 +967,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.5">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -962,7 +984,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -975,7 +997,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -985,11 +1007,25 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinSegmentLength"
         number_of_elements="1"
         default_values="0.0"
-        panel_visibility="default">
+        >
       <Documentation>
         Lower bound on the segments in the resulting streamline
       </Documentation>
     </DoubleVectorProperty>
+
+    <!-- output control -->
+    <IntVectorProperty
+        name="CullPeriodicTransition"
+        label="Cull Periodic Transitions"
+        command="SetCullPeriodicTransitions"
+        number_of_elements="1"
+        default_values="1"
+        >
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Remove segments that are the result of the application of a periodic BC.
+      </Documentation>
+    </IntVectorProperty>
 
     <!-- Colormap/Legened control -->
     <IntVectorProperty
@@ -998,7 +1034,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       Use the minimum number of intersect colors required. Requires global reduction.
@@ -1012,7 +1048,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -1022,9 +1058,8 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         panel_visibility="never">
-      <BooleanDomain name="bool"/>
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -1034,7 +1069,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -1048,7 +1083,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="16"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -1062,7 +1097,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="512"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -1071,9 +1106,11 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
+      <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
       <Property name="IntegratorType" show="0"/>
     </Hints>
+
     <!-- End OOCFieldTracer -->
   </SourceProxy>
 
@@ -1144,7 +1181,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1162,12 +1199,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="3"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
         <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters -->
@@ -1177,7 +1217,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -1190,7 +1230,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -1203,7 +1243,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-3"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Error bound for adaptive step size integration.
@@ -1216,7 +1256,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="10000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
@@ -1229,7 +1269,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1246,7 +1286,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -1259,7 +1299,8 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="never">
+        panel_visibility="never"
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -1270,7 +1311,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       Use the minimum number of intersect colors required. Requires global reduction.
@@ -1284,7 +1325,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -1294,9 +1335,8 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="2"
         panel_visibility="never">
-      <BooleanDomain name="bool"/>
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -1306,7 +1346,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -1321,7 +1361,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="16"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1" max="131072"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -1335,7 +1375,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="512"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1" max="131072"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -1344,6 +1384,7 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
+      <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
       <Property name="ForwardOnly" show="0"/>
     </Hints>
@@ -1419,7 +1460,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1437,12 +1478,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
-        <!--<Entry value="3"       text="RK-4-5"/>-->
+        <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters
@@ -1452,7 +1496,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -1466,7 +1510,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -1479,7 +1523,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-4"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
       <Documentation>
         Error bound for adaptive step size integration.
@@ -1492,12 +1536,13 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="100000000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
       </Documentation>
-    </IdTypeVectorProperty>-->
+    </IdTypeVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="MaxLineLength"
@@ -1505,7 +1550,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1522,7 +1567,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -1535,7 +1580,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -1546,7 +1591,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Use the minimum number of intersect colors required. Requires global reduction.
@@ -1561,7 +1606,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -1570,10 +1615,10 @@ Copyright 2012 SciberQuest Inc.
         command="SetMode"
         number_of_elements="1"
         default_values="3"
-        panel_visibility="never">
-      <BooleanDomain name="bool"/>
+        panel_visibility="never"
+        >
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -1583,7 +1628,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="never">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -1597,7 +1642,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -1611,7 +1656,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -1620,10 +1665,8 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
+      <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
-      <Property name="UseDynamicScheduler" show="0"/>
-      <Property name="MasterBlockSize" show="1"/>
-      <Property name="WorkerBlockSize" show="1"/>
     </Hints>
 
    <!-- End SQ Poincare Mapper -->
@@ -1696,7 +1739,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1714,12 +1757,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="3"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
         <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters -->
@@ -1729,7 +1775,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -1742,7 +1788,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -1755,7 +1801,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-6"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Error bound for adaptive step size integration.
@@ -1768,7 +1814,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="100000000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
@@ -1781,7 +1827,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="10">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -1792,17 +1838,19 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </DoubleVectorProperty>
 
+    <!--
     <DoubleVectorProperty
         name="MaxIntegrationInterval"
         label="Max Time Interval"
         command="SetMaxIntegrationInterval"
         number_of_elements="1"
-        default_values="100000000"
-        panel_visibility="default">
+        default_values="1.7976931348623158e+308"
+        >
       <Documentation>
         Maximum time interval beyond which line integration is terminated.
       </Documentation>
     </DoubleVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="NullThreshold"
@@ -1810,7 +1858,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -1823,7 +1871,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -1834,7 +1882,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Use the minimum number of intersect colors required. Requires global reduction.
@@ -1849,7 +1897,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -1859,9 +1907,8 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="3"
         panel_visibility="never">
-      <BooleanDomain name="bool"/>
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -1871,7 +1918,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="never">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -1884,7 +1931,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMasterBlockSize"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -1897,7 +1944,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetWorkerBlockSize"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -1908,9 +1955,6 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="Mode" show="0"/>
       <Property name="IntegratorType" show="0"/>
-      <Property name="UseDynamicScheduler" show="0"/>
-      <Property name="MasterBlockSize" show="1"/>
-      <Property name="WorkerBlockSize" show="1"/>
     </Hints>
 
    <!-- End SQ Poincare Mapper -->
@@ -1960,7 +2004,7 @@ Copyright 2012 SciberQuest Inc.
         name="TerminatorInput"
         command="AddTerminatorInputConnection"
         clean_command="ClearTerminatorInputConnections"
-        label="Map Surfaces"
+        label="Terminator Surfaces"
         multiple_input="1"
         optional="1">
       <ProxyGroupDomain name="groups">
@@ -1983,7 +2027,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -2001,12 +2045,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
-        <!--<Entry value="3"       text="RK-4-5"/>-->
+        <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters
@@ -2016,12 +2063,13 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
       </Documentation>
-    </DoubleVectorProperty>-->
+    </DoubleVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="MaxStep"
@@ -2029,7 +2077,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -2042,7 +2090,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-4"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range" min="1.0e-14" max="1.0" />
       <Documentation>
         Error bound for adaptive step size integration.
@@ -2055,12 +2103,13 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="100000000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
       </Documentation>
-    </IdTypeVectorProperty>-->
+    </IdTypeVectorProperty>
+    -->
 
     <DoubleVectorProperty
         name="MaxLineLength"
@@ -2068,7 +2117,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="100">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -2085,7 +2134,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxIntegrationInterval"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <Documentation>
         Maximum time interval beyond which line integration is terminated.
       </Documentation>
@@ -2097,7 +2146,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -2110,7 +2159,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -2121,7 +2170,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Use the minimum number of intersect colors required. Requires global reduction.
@@ -2136,7 +2185,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -2145,10 +2194,10 @@ Copyright 2012 SciberQuest Inc.
         command="SetMode"
         number_of_elements="1"
         default_values="4"
-        panel_visibility="never">
-      <BooleanDomain name="bool"/>
+        panel_visibility="never"
+        >
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -2158,7 +2207,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -2172,7 +2221,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="16"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -2186,7 +2235,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="128"
         animateable="0"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -2195,10 +2244,8 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
+      <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
-      <Property name="UseDynamicScheduler" show="1"/>
-      <Property name="MasterBlockSize" show="1"/>
-      <Property name="WorkerBlockSize" show="1"/>
     </Hints>
 
    <!-- End SQ Displacement Mapper -->
@@ -2271,7 +2318,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         animateable="0"
         label="Vector Field"
-        panel_visibility="default">
+        >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -2289,12 +2336,15 @@ Copyright 2012 SciberQuest Inc.
         command="SetIntegratorType"
         number_of_elements="1"
         default_values="3"
-        panel_visibility="never">
+        panel_visibility="never"
+        >
+      <!--
       <EnumerationDomain name="enum">
         <Entry value="1"       text="RK-2"/>
         <Entry value="2"       text="RK-4"/>
         <Entry value="3"       text="RK-4-5"/>
       </EnumerationDomain>
+      -->
     </IntVectorProperty>
 
     <!-- Integrator parameters -->
@@ -2304,7 +2354,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMinStep"
         number_of_elements="1"
         default_values="1.0e-8"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Minimum integration step size as a multiple of cell lengths.
@@ -2317,7 +2367,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxStep"
         number_of_elements="1"
         default_values="0.1"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Maximum integration step size as a multiple of cell lengths.
@@ -2330,7 +2380,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxError"
         number_of_elements="1"
         default_values="1.0e-6"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Error bound for adaptive step size integration.
@@ -2343,7 +2393,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxNumberOfSteps"
         number_of_elements="1"
         default_values="100000000"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range"/>
       <Documentation>
         Maximum number of steps, beyond which integration is terminated.
@@ -2356,7 +2406,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxLineLength"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="100">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
@@ -2373,7 +2423,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMaxIntegrationInterval"
         number_of_elements="1"
         default_values="1.0"
-        panel_visibility="default">
+        >
       <Documentation>
         Maximum time interval beyond which line integration is terminated.
       </Documentation>
@@ -2385,7 +2435,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNullThreshold"
         number_of_elements="1"
         default_values="0.001"
-        panel_visibility="default" >
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         Vector field magnitude below which particle advection/integration is terminated.
@@ -2398,7 +2448,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetForwardOnly"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
@@ -2409,7 +2459,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSqueezeColorMap"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
         Use the minimum number of intersect colors required. Requires global reduction.
@@ -2424,7 +2474,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetStepUnit"
         number_of_elements="1"
         default_values="2"
-        panel_visibility="default"/>
+        />
     -->
 
     <!-- Mode Flag -->
@@ -2433,10 +2483,10 @@ Copyright 2012 SciberQuest Inc.
         command="SetMode"
         number_of_elements="1"
         default_values="4"
-        panel_visibility="never">
-      <BooleanDomain name="bool"/>
+        panel_visibility="never"
+        >
       <Documentation>
-        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE.
+        Set the mode of operation to one of STREAM,TOPOLOGY,POINCARE,DISPLACEMENT.
       </Documentation>
     </IntVectorProperty>
 
@@ -2446,7 +2496,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDynamicScheduler"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <BooleanDomain name="bool"/>
       <Documentation>
       When set the work is by a simple self-scheduling algorithm. In this case all of the seed source data has to be duplicated
@@ -2459,7 +2509,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetMasterBlockSize"
         number_of_elements="1"
         default_values="16"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work the master does in between servicing work requests
@@ -2472,7 +2522,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetWorkerBlockSize"
         number_of_elements="1"
         default_values="128"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range" min="1"/>
       <Documentation>
         Controls how much work is given to the worker processes at each
@@ -2483,9 +2533,6 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="Mode" show="0"/>
       <Property name="IntegratorType" show="0"/>
-      <Property name="UseDynamicScheduler" show="1"/>
-      <Property name="MasterBlockSize" show="1"/>
-      <Property name="WorkerBlockSize" show="1"/>
     </Hints>
 
    <!-- End SQ Displacement Mapper -->
@@ -2525,7 +2572,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="5"
          element_types="0 0 0 0 2"
          label="Scalar Field"
-         panel_visibility="default">
+         >
             <ArrayListDomain name="array_list" attribute_type="Scalars">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -2542,7 +2589,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetPassInput"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Deep copy the input array to the output
@@ -2555,7 +2602,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSplitComponents"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Convert the result into components arrays.
@@ -2568,7 +2615,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeGradient"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the gradient using a centered stencil.
@@ -2581,7 +2628,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeLaplacian"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the Laplacian using a centered stencil.
@@ -2599,7 +2646,7 @@ Copyright 2012 SciberQuest Inc.
   <SourceProxy
     name="vtkSQFTLE"
     class="vtkSQFTLE"
-    label="SQ Vortex Detect">
+    label="FTLE">
     <Documentation
       long_help="Long Documentation"
       short_help="Short Documentation">
@@ -2625,20 +2672,25 @@ Copyright 2012 SciberQuest Inc.
       </InputProperty>
 
       <StringVectorProperty
-         name="SelectInputVectors"
-         command="SetInputArrayToProcess"
-         number_of_elements="5"
-         element_types="0 0 0 0 2"
-         label="Displacement Map"
-         panel_visibility="default">
-            <ArrayListDomain name="array_list" attribute_type="Vectors">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-            <Documentation>
-              Identifies the displacement map to use to compute the FTLE.
-            </Documentation>
+          name="ArraysToFilter"
+          command="AddInputArray"
+          clean_command="ClearInputArrays"
+          repeat_command="1"
+          number_of_elements_per_command="1"
+          label="Input Arrays"
+          >
+        <Documentation>
+          Identifies the displacement map to use to compute the FTLE.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <!-- none selected by default -->
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
      <IntVectorProperty
@@ -2647,7 +2699,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetPassInput"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Deep copy the input array to the output
@@ -2660,214 +2712,6 @@ Copyright 2012 SciberQuest Inc.
 
   </SourceProxy>
   <!-- End vtkSQFTLE -->
-
-  <!-- ====================================================================
-  <SourceProxy
-    name="vtkSQVortexDetect"
-    class="vtkSQVortexDetect"
-    label="SQ Vortex Detect">
-    <Documentation
-      long_help="Long Documentation"
-      short_help="Short Documentation">
-      Textual Documentation.
-    </Documentation>
-
-     <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkDataSet"/>
-           </DataTypeDomain>
-           <InputArrayDomain name="input_array" attribute_type="point"
-                             number_of_components="3"/>
-           <Documentation>
-             This property specifies the input to the Warp (vector) filter.
-           </Documentation>
-      </InputProperty>
-
-      <StringVectorProperty
-         name="SelectInputVectors"
-         command="SetInputArrayToProcess"
-         number_of_elements="5"
-         element_types="0 0 0 0 2"
-         label="Vector Field"
-         panel_visibility="default">
-            <ArrayListDomain name="array_list" attribute_type="Vectors">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-            <Documentation>
-              Identifies the vector field on which to operate.
-            </Documentation>
-      </StringVectorProperty>
-
-     <IntVectorProperty
-        name="PassInput"
-        label="Copy input"
-        command="SetPassInput"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Deep copy the input array to the output
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="SplitComponents"
-        label="Split components"
-        command="SetSplitComponents"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Convert the result into components arrays.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ResultMagnitude"
-        label="Result magnitude"
-        command="SetResultMagnitude"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the magnitude for all multi-component results.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeGradient"
-        label="Gradient"
-        command="SetComputeGradient"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the gradient tensor on a centered stencil.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeVorticity"
-        label="Vorticity"
-        command="SetComputeVorticity"
-        number_of_elements="1"
-        default_values="1"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the rotation (curl) of the vector field using a point centered stencil.
-        </Documentation>
-     </IntVectorProperty>
-
-      <IntVectorProperty
-        name="ComputeHelicity"
-        label="Helicity"
-        command="SetComputeHelicity"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the helicity (dot of vector and its curl) of the vector field using a point centered stencil.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeNormalizedHelicity"
-        label="Normalized helicity"
-        command="SetComputeNormalizedHelicity"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the normailzed helicity of the vector field using a point centered stencil.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeQ"
-        label="Q"
-        command="SetComputeQ"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute Q-criteria
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeLambda2"
-        label="Lambda-2"
-        command="SetComputeLambda2"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the second eigenvalue of corrected pressure hessian.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeDivergence"
-        label="Divergence"
-        command="SetComputeDivergence"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute the divergence using a centered stencil.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeEigenvalueDiagnostic"
-        label="Eigenvalue diagnostic"
-        command="SetComputeEigenvalueDiagnostic"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Eigenvalue diagnostic of Haimes and Kenwright.
-        </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty
-        name="ComputeFTLE"
-        label="FTLE"
-        command="SetComputeFTLE"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Compute FTLE of the given displacement map.
-        </Documentation>
-     </IntVectorProperty>
-
-    <Hints>
-      <View type="RenderView"/>
-    </Hints>
-
-  </SourceProxy>
-  End vtkSQVortexDetect -->
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -2898,20 +2742,25 @@ Copyright 2012 SciberQuest Inc.
       </InputProperty>
 
       <StringVectorProperty
-         name="SelectInputVectors"
-         command="SetInputArrayToProcess"
-         number_of_elements="5"
-         element_types="0 0 0 0 2"
-         label="Array to filter"
-         panel_visibility="default">
-            <ArrayListDomain name="array_list" attribute_type="Vectors">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-            <Documentation>
-              Identifies the vector field on which to operate.
-            </Documentation>
+          name="ArraysToFilter"
+          command="AddInputArray"
+          clean_command="ClearInputArrays"
+          repeat_command="1"
+          number_of_elements_per_command="1"
+          label="Arrays"
+          >
+        <Documentation>
+          This property specifies the name(s) array(s) to filter.
+        </Documentation>
+        <ArrayListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <!-- none selected by default -->
+        <Hints>
+          <NoDefault />
+        </Hints>
       </StringVectorProperty>
 
      <IntVectorProperty
@@ -2920,7 +2769,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSplitComponents"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Convert the result into components arrays.
@@ -2933,7 +2782,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetResultMagnitude"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the magnitude for all multi-component results.
@@ -2946,7 +2795,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeRotation"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the rotation (curl) of the vector field using a point centered stencil.
@@ -2959,7 +2808,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeHelicity"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the helicity (dot of vector and its curl) of the vector field using a point centered stencil.
@@ -2972,7 +2821,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeNormalizedHelicity"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the normailzed helicity of the vector field using a point centered stencil.
@@ -2985,7 +2834,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeQ"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute Q-criteria
@@ -2998,7 +2847,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeLambda"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the 3 eigenvalues of corrected pressure hessian.
@@ -3011,7 +2860,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeLambda2"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the second eigenvalue of corrected pressure hessian.
@@ -3024,7 +2873,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeDivergence"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the divergence using a centered stencil.
@@ -3037,7 +2886,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeGradient"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Compute the gradient tensor on a centered stencil.
@@ -3050,7 +2899,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeEigenvalueDiagnostic"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           Eigenvalue diagnostic of Haimes and Kenwright.
@@ -3063,7 +2912,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetComputeGradientDiagnostic"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
         <BooleanDomain name="bool" />
         <Documentation>
           bill's metric.
@@ -3077,7 +2926,7 @@ Copyright 2012 SciberQuest Inc.
         repeat_command="1"
         number_of_elements_per_command="1"
         label="Arrays to copy"
-        panel_visibility="default">
+        >
         <Documentation>
             This property specifies the name(s) array(s) to filter.
         </Documentation>
@@ -3133,7 +2982,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetInputArrayToProcess"
          number_of_elements="5"
          element_types="0 0 0 0 2"
-         panel_visibility="default">
+         >
             <ArrayListDomain name="array_list" attribute_type="Tensors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -3150,7 +2999,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="5"
          element_types="0 0 0 0 2"
          default_values="1"
-         panel_visibility="default">
+         >
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -3166,7 +3015,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetNoiseThreshold"
          number_of_elements="1"
          default_values="1.0e-4"
-         panel_visibility="default">
+         >
         <Documentation>
          This controls the correction of negative descriminant in the computation.
          eg: if (-NoiseThreshold less than value less than 0) then value=0.
@@ -3180,6 +3029,134 @@ Copyright 2012 SciberQuest Inc.
   <!-- End vtkSQAgyrotropyFilter -->
   </SourceProxy>
 
+  <!-- ==================================================================== -->
+  <SourceProxy
+    name="vtkSQBinaryThreshold"
+    class="vtkSQBinaryThreshold"
+    label="SQ Binary Threshold">
+    <Documentation
+      long_help="Long Documentation"
+      short_help="Short Documentation">
+      Textual Documentation.
+    </Documentation>
+
+     <InputProperty
+         name="Input"
+         command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+       <InputArrayDomain
+           name="input_array"
+           attribute_type="point"
+           number_of_components="1">
+         <RequiredProperties>
+           <Property name="Scalars" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </InputArrayDomain>
+       <Documentation>
+         This property specifies the input.
+       </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+          name="Scalars"
+          command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2"
+          >
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </FieldDataDomain>
+
+        <Documentation>
+          Identifies the vector field on which to operate.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="Threshold"
+         command="SetThreshold"
+         number_of_elements="1"
+         default_values="0.0"
+         >
+        <ArrayRangeDomain name="range">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="Scalars" function="ArraySelection"/>
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>
+          Threshold value.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="UseLowValue"
+         command="SetUseLowValue"
+         number_of_elements="1"
+         default_values="1"
+         >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set elements with value below the threshold are set to low value.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="LowValue"
+         command="SetLowValue"
+         number_of_elements="1"
+         default_values="-1.0"
+         >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          LowValue value.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="UseHighValue"
+         command="SetUseHighValue"
+         number_of_elements="1"
+         default_values="1"
+         >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          When set elements with value below the threshold are set to low value.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="HighValue"
+         command="SetHighValue"
+         number_of_elements="1"
+         default_values="1.0"
+         >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          HighValue value.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    <Hints>
+      <View type="RenderView"/>
+    </Hints>
+
+  <!-- End vtkSQBinaryThreshold -->
+  </SourceProxy>
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -3211,7 +3188,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="5"
          element_types="0 0 0 0 2"
          label="Vector Field"
-         panel_visibility="default">
+         >
       <ArrayListDomain name="array_list" attribute_type="Vectors">
         <RequiredProperties>
           <Property name="Input" function="Input"/>
@@ -3229,7 +3206,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="3"
         animateable="1"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="3" text="3"/>
         <Entry value="5" text="5"/>
@@ -3294,7 +3271,7 @@ Copyright 2012 SciberQuest Inc.
           repeat_command="1"
           number_of_elements_per_command="1"
           label="Arrays"
-          panel_visibility="default">
+          >
         <Documentation>
           This property specifies the name(s) array(s) to filter.
         </Documentation>
@@ -3315,10 +3292,11 @@ Copyright 2012 SciberQuest Inc.
         command="SetKernelType"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="Gaussian"/>
-        <Entry value="1" text="Constant"/>
+        <Entry value="1" text="L.O.G."/>
+        <Entry value="2" text="Constant"/>
       </EnumerationDomain>
       <Documentation>
         Select a kernel.
@@ -3331,7 +3309,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetKernelWidth"
         number_of_elements="1"
         default_values="3"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="3" text="3"/>
         <Entry value="5" text="5"/>
@@ -3359,12 +3337,49 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <IntVectorProperty
+        name="ComputeResidual"
+        lable="Residual"
+        command="SetComputeResidual"
+        number_of_elements="1"
+        default_values="0"
+        >
+      <BooleanDomain name="bool"/>
+      <Documentation>
+        Compute the residual.
+      </Documentation>
+    </IntVectorProperty>
+
+    <StringVectorProperty
+        name="ArraysToCopy"
+        command="AddArrayToCopy"
+        clean_command="ClearArraysToCopy"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        label="Arrays to copy"
+        >
+      <Documentation>
+          This property specifies the name(s) array(s) to filter.
+      </Documentation>
+      <ArrayListDomain name="array_list">
+        <RequiredProperties>
+          <Property name="Input" function="Input"/>
+        </RequiredProperties>
+      </ArrayListDomain>
+      <Hints>
+      <!-- This overrides the GUI's default mechanism to
+          not set the default value for this property
+          using the domain when the proxy is created -->
+          <NoDefault />
+      </Hints>
+    </StringVectorProperty>
+
+    <IntVectorProperty
         name="CPUDriverOptimization"
         label="CPU Optimization"
         command="SetCPUDriverOptimization"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="Minimize memory usage"/>
         <Entry value="1" text="Minimize cache misses"/>
@@ -3374,13 +3389,14 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
+    <!-- TODO the cuda code needs to be fixed
     <IntVectorProperty
         name="RanksToUseCUDA"
         label="CUDA Ranks Per Host"
         command="SetNumberOfMPIRanksToUseCUDA"
         number_of_elements="1"
         default_values="-1"
-        panel_visibility="default">
+        >
        <Documentation>
          When set larger than 0, ranks are assigned to use GPUs.
        </Documentation>
@@ -3399,7 +3415,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfActiveCUDADevices"
         number_of_elements="1"
         default_values="-1"
-        panel_visibility="default">
+        >
        <Documentation>
          When set larger than 0, work is assigned to GPUs.
        </Documentation>
@@ -3416,7 +3432,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfWarpsPerCUDABlock"
         number_of_elements="1"
         default_values="8"
-        panel_visibility="default">
+        >
        <Documentation>
          Control over domain decomposition. More warps per block means larger blocks.
        </Documentation>
@@ -3428,7 +3444,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetKernelCUDAMemoryType"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="global"/>
         <Entry value="1" text="constant"/>
@@ -3445,7 +3461,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetInputCUDAMemoryType"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <EnumerationDomain name="enum">
         <Entry value="0" text="global"/>
         <Entry value="2" text="texture"/>
@@ -3454,6 +3470,7 @@ Copyright 2012 SciberQuest Inc.
         Control where the input array is placed in device memory.
       </Documentation>
     </IntVectorProperty>
+    -->
 
     <Hints>
       <View type="RenderView"/>
@@ -3520,7 +3537,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="5"
         element_types="0 0 0 0 2"
         label="Scalars"
-        panel_visibility="default">
+        >
           <ArrayListDomain name="array_list" attribute_type="Scalars"
                input_domain_name="input_array1">
             <RequiredProperties>
@@ -3541,7 +3558,7 @@ Copyright 2012 SciberQuest Inc.
         element_types="0 0 0 0 2"
         default_values="1"
         label="Vectors"
-        panel_visibility="default">  <!-- default value=1 so normals go to the right place -->
+        >  <!-- default value=1 so normals go to the right place -->
           <ArrayListDomain name="array_list" attribute_type="Vectors"
                input_domain_name="input_array2">
             <RequiredProperties>
@@ -3562,7 +3579,7 @@ Copyright 2012 SciberQuest Inc.
         animateable="1"
         default_values="6"
         label="Number of Sides"
-        panel_visibility="default">
+        >
        <IntRangeDomain name="range" min="3"/>
        <Documentation>
          The value of this property indicates the number of faces around the circumference of the tube.
@@ -3574,7 +3591,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetCapping"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, endcaps will be drawn on the tube. Otherwise the ends of the tube will be open.
@@ -3586,7 +3603,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetRadius"
          number_of_elements="1"
          default_values="1.0"
-         panel_visibility="default">
+         >
         <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="0.01">
           <RequiredProperties>
              <Property name="Input" function="Input"/>
@@ -3602,7 +3619,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetVaryRadius"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
        <EnumerationDomain name="enum">
          <Entry value="0" text="Off"/>
          <Entry value="1" text="By Scalar"/>
@@ -3622,7 +3639,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetRadiusFactor"
          number_of_elements="1"
          default_values="10"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           If varying the radius (VaryRadius property), the property sets the
@@ -3636,7 +3653,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetUseDefaultNormal"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 0, and the input contains no vector array, then default ribbon normals will be generated (DefaultNormal property); if a vector array has been set (SelectInputVectors property), the ribbon normals will be set from the specified array. If this property is set to 1, the default normal (DefaultNormal property) will be used, regardless of whether the SelectInputVectors property has been set.
@@ -3648,7 +3665,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetDefaultNormal"
         number_of_elements="3"
         default_values="0 0 1"
-        panel_visibility="default">
+        >
        <DoubleRangeDomain name="range"/>
        <Documentation>
          The value of this property specifies the normal to use when the UseDefaultNormal property is set to 1 or the input contains no vector array (SelectInputVectors property).
@@ -3697,7 +3714,7 @@ Copyright 2012 SciberQuest Inc.
       number_of_elements="2"
       default_values="-1.0 1.0"
       information_property="IBoundsInfo"
-      panel_visibility="default">
+      >
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3715,7 +3732,7 @@ Copyright 2012 SciberQuest Inc.
       number_of_elements="2"
       default_values="-1.0 1.0"
       information_property="JBoundsInfo"
-      panel_visibility="default">
+      >
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3733,7 +3750,7 @@ Copyright 2012 SciberQuest Inc.
       number_of_elements="2"
       default_values="-1.0 1.0"
       information_property="KBoundsInfo"
-      panel_visibility="default">
+      >
       <Documentation>
         This property controls the bounds of the seed points.
       </Documentation>
@@ -3746,7 +3763,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNX"
         number_of_elements="3"
         default_values="1 1 1"
-        panel_visibility="default">
+        >
      </IntVectorProperty>
 
      <!-- Transforms -->
@@ -3756,7 +3773,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetTransformPower"
         number_of_elements="3"
         default_values="0.0 0.0 0.0"
-        panel_visibility="default">
+        >
         <Documentation>
           Controls how non-linear the generated points are. 0 is linear.
         </Documentation>
@@ -3799,7 +3816,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSampleSize"
         number_of_elements="1"
         default_values="1"
-        panel_visibility="default">
+        >
       <Documentation>
          Set the number of randomly selected cells to pass through to the output.
        </Documentation>
@@ -3811,7 +3828,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetSeed"
         number_of_elements="1"
         default_values="0"
-        panel_visibility="default">
+        >
       <Documentation>
         Set the seed to the random number generator. -1 means to use system time.
       </Documentation>
@@ -3853,7 +3870,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetNumberOfPoints"
         number_of_elements="1"
         default_values="10"
-        panel_visibility="default">
+        >
      </IntVectorProperty>
 
     <Hints>

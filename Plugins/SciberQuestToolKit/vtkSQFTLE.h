@@ -19,6 +19,11 @@ Copyright 2012 SciberQuest Inc.
 
 #include "vtkDataSetAlgorithm.h"
 
+#include <set> //
+using std::set;
+#include <string> //
+using std::string;
+
 class vtkInformation;
 class vtkInformationVector;
 class vtkPVXMLElement;
@@ -38,7 +43,12 @@ public:
   int Initialize(vtkPVXMLElement *root);
 
   // Description:
-  // Deep copy input arrays to the output.
+  // Array selection.
+  void AddInputArray(const char *name);
+  void ClearInputArrays();
+
+  // Description:
+  // Shallow copy input data arrays to the output.
   vtkSetMacro(PassInput,int);
   vtkGetMacro(PassInput,int);
 
@@ -49,7 +59,7 @@ protected:
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
-  // controls to turn on/off array generation
+  set<string> InputArrays;
   int PassInput;
 
 private:

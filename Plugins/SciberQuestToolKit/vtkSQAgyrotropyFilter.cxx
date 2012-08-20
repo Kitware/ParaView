@@ -43,8 +43,8 @@ using std::max;
 using std::string;
 #include <cmath>
 
-#define vtkSQAgyrotropyFilterDEBUG 0
-#define vtkSQAgyrotropyFilterTIME 0
+// #define vtkSQAgyrotropyFilterDEBUG
+// #define vtkSQAgyrotropyFilterTIME
 
 #if defined vtkSQAgyrotropyFilterTIME
   #include "vtkSQLog.h"
@@ -120,7 +120,7 @@ vtkStandardNewMacro(vtkSQAgyrotropyFilter);
 //-----------------------------------------------------------------------------
 vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined vtkSQAgyrotropyFilterDEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << endl;
   #endif
 
@@ -133,7 +133,7 @@ vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 //-----------------------------------------------------------------------------
 vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined vtkSQAgyrotropyFilterDEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter" << endl;
   #endif
 }
@@ -141,7 +141,7 @@ vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 //-----------------------------------------------------------------------------
 int vtkSQAgyrotropyFilter::Initialize(vtkPVXMLElement *root)
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined vtkSQAgyrotropyFilterDEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::Initialize" << endl;
   #endif
 
@@ -168,7 +168,7 @@ int vtkSQAgyrotropyFilter::RequestData(
                 vtkInformationVector **inputVector,
                 vtkInformationVector *outputVector)
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined vtkSQAgyrotropyFilterDEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::RequestData" << endl;
   #endif
   #if defined vtkSQAgyrotropyFilterTIME

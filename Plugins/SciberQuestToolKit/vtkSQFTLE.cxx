@@ -18,6 +18,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkTensor.h"
+#include "vtkPVXMLElement.h"
+#include "XMLUtils.h"
 
 #include <cmath>
 #include <string>
@@ -109,7 +111,6 @@ void ComputeFTLE(
 
   ftleV->SetNumberOfComponents(1);
   ftleV->SetNumberOfTuples(nCells);
-  ftleV->SetName("ftle");
   double *pFtleV=ftleV->GetPointer(0);
 
   // for each cell
@@ -159,14 +160,6 @@ vtkSQFTLE::vtkSQFTLE() : PassInput(0)
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
-
-  // by default process active point vectors
-  this->SetInputArrayToProcess(
-        0,
-        0,
-        0,
-        vtkDataObject::FIELD_ASSOCIATION_POINTS,
-        vtkDataSetAttributes::VECTORS);
 }
 
 //-----------------------------------------------------------------------------
@@ -176,9 +169,59 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
   pCerr() << "=====vtkSQFTLE::Initialize" << endl;
   #endif
 
-  (void)root;
+  vtkPVXMLElement *elem=0;
+  elem=GetOptionalElement(root,"vtkSQFTLE");
+  if (elem==0)
+    {
+    return -1;
+    }
+
+  // input arrays, optional but must be set somewhwere
+  vtkPVXMLElement *nelem;
+  nelem=GetOptionalElement(elem,"input_arrays");
+  if (nelem)
+    {
+    ExtractValues(nelem->GetCharacterData(),this->InputArrays);
+    }
+
+  int passInput=0;
+  GetOptionalAttribute<int,1>(elem,"pass_input",&passInput);
+  if (passInput>0)
+    {
+    this->SetPassInput(passInput);
+    }
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQFTLE::AddInputArray(const char *name)
+{
+  #ifdef vtkSQFTLEDEBUG
+  pCerr()
+    << "=====vtkSQFTLE::AddInputArray"
+    << "name=" << name << endl;
+  #endif
+
+  if (this->InputArrays.insert(name).second)
+    {
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQFTLE::ClearInputArrays()
+{
+  #ifdef vtkSQFTLEDEBUG
+  pCerr()
+    << "=====vtkSQFTLE::ClearInputArrays" << endl;
+  #endif
+
+  if (this->InputArrays.size())
+    {
+    this->InputArrays.clear();
+    this->Modified();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -223,17 +266,46 @@ int vtkSQFTLE::RequestData(
     return 1;
     }
 
-  // Gradient.
-  vtkDataArray *V=this->GetInputArrayToProcess(0,inInfos);
-  vtkDoubleArray *gradV=vtkDoubleArray::New();
-  ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
+  set<string>::iterator it;
+  set<string>::iterator begin=this->InputArrays.begin();
+  set<string>::iterator end=this->InputArrays.end();
+  for (it=begin; it!=end; ++it)
+    {
+    vtkDataArray *V=input->GetPointData()->GetArray((*it).c_str());
+    if (V==0)
+      {
+      vtkErrorMacro(
+        << "Array " << (*it).c_str()
+        << " was requested but is not present");
+      continue;
+      }
 
-  // FTLE
-  vtkDoubleArray *ftleV=vtkDoubleArray::New();
-  ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
-  output->GetCellData()->AddArray(ftleV);
-  ftleV->Delete();
-  gradV->Delete();
+    if (V->GetNumberOfComponents()!=3)
+      {
+      vtkErrorMacro(
+        << "Array " << (*it).c_str() << " is not a vector.");
+      continue;
+      }
+
+    // Gradient.
+    vtkDoubleArray *gradV=vtkDoubleArray::New();
+    ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
+
+    // FTLE
+    string name;
+    name+="ftle-";
+    name+=V->GetName();
+
+    vtkDoubleArray *ftleV=vtkDoubleArray::New();
+    ftleV->SetName(name.c_str());
+
+    ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
+
+    output->GetCellData()->AddArray(ftleV);
+
+    ftleV->Delete();
+    gradV->Delete();
+    }
 
   return 1;
 }

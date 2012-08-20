@@ -6,7 +6,7 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-/*=========================================================================
+/*=====================
 
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkSQVolumeSource.cxx,v $
@@ -19,7 +19,7 @@ Copyright 2012 SciberQuest Inc.
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*/
+=====================*/
 #include "vtkSQVolumeSource.h"
 
 #include "vtkObjectFactory.h"
@@ -58,7 +58,7 @@ vtkStandardNewMacro(vtkSQVolumeSource);
 vtkSQVolumeSource::vtkSQVolumeSource()
 {
   #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::vtkSQVolumeSource" << endl;
+  cerr << "=====vtkSQVolumeSource::vtkSQVolumeSource" << endl;
   #endif
 
   this->ImmediateMode=1;
@@ -91,7 +91,7 @@ vtkSQVolumeSource::vtkSQVolumeSource()
 vtkSQVolumeSource::~vtkSQVolumeSource()
 {
   #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
+  cerr << "=====vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
   #endif
 }
 
@@ -151,7 +151,7 @@ int vtkSQVolumeSource::RequestInformation(
     vtkInformationVector *outInfos)
 {
   #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::RequestInformation" << endl;
+  cerr << "=====vtkSQVolumeSource::RequestInformation" << endl;
   #endif
 
   (void)req;
@@ -173,7 +173,7 @@ int vtkSQVolumeSource::RequestData(
     vtkInformationVector *outInfos)
 {
   #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::RequestData" << endl;
+  cerr << "=====vtkSQVolumeSource::RequestData" << endl;
   #endif
 
   (void)req;
@@ -221,7 +221,7 @@ int vtkSQVolumeSource::RequestData(
 
   if (!this->ImmediateMode)
     {
-    // In demeand mode a pseduo dataset is generated here for
+    // In demand mode a pseduo dataset is generated here for
     // display in PV, a demand plane source is inserted into
     // the pipeline for down stream access to any of the plane's
     // cell's
@@ -351,7 +351,7 @@ int vtkSQVolumeSource::RequestData(
 void vtkSQVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::PrintSelf" << endl;
+  cerr << "=====vtkSQVolumeSource::PrintSelf" << endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

@@ -17,7 +17,7 @@ class vtkInformationObjectBaseKey;
 /**
 
 */
-class vtkSQCellGenerator : public vtkObject
+class VTK_EXPORT vtkSQCellGenerator : public vtkObject
 {
 public:
   /**

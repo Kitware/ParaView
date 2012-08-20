@@ -22,7 +22,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "vtkObject.h"
 
-class vtkSQPlaneSourceConfigurationFileInfo
+class VTK_EXPORT vtkSQPlaneSourceConfigurationFileInfo
 {
 public:
   vtkSQPlaneSourceConfigurationFileInfo()

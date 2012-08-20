@@ -55,7 +55,7 @@ mark_as_advanced(SQTK_PYTHON_BINDINGS)
 
 if (BUILD_TESTING)
   #message(STATUS "SQTK Building regression tests.")
-  #subdirs(Testing)
+  subdirs(Testing)
 endif()
 
 #--------------------------------------------------
@@ -69,22 +69,25 @@ include(GeneratePythonBindings.cmake)
 include(GetDate.cmake)
 
 # identify the build
-set(SQTK_RELEASE "20120531")
+set(SQTK_RELEASE "20120726")
 set(SQTK_BUILD_DATE)
 GetDate(SQTK_BUILD_DATE)
 set (SQTK_VERSION "SQTK-${SQTK_RELEASE} ${CMAKE_SYSTEM} ${CMAKE_CXX_COMPILER} ${SQTK_BUILD_DATE}")
-message(STATUS "SQTK version ${SQTK_VERSION}")
+#message(STATUS "SQTK version ${SQTK_VERSION}")
 
 # put the plugin inside the pv install
 set(SQTK_LIB_INSTALL_PATH
   "${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}"
   )
-message(STATUS "SQTK will be installed at ${SQTK_LIB_INSTALL_PATH}")
+#message(STATUS "SQTK will be installed at ${SQTK_LIB_INSTALL_PATH}")
 
 # Server manager wrapped sources.
 set(SM_CXX_SOURCES
   vtkSQAgyrotropyFilter.cxx
+  vtkSQBinaryThreshold.cxx
+  vtkSQBOVMetaReader.cxx
   vtkSQBOVReader.cxx
+  vtkSQBOVReaderBase.cxx
   vtkSQBOVWriter.cxx
   vtkSQCellGenerator.cxx
   vtkSQEdgeFilter.cxx
@@ -115,6 +118,7 @@ set(SM_CXX_SOURCES
   )
 
 set_source_files_properties(
+  vtkSQBOVReaderBase.cxx
   vtkSQOOCReader.cxx
   vtkSQCellGenerator.cxx
   ABSTRACT
@@ -181,14 +185,14 @@ if (WIN32)
 endif()
 
 if (CUDA_FOUND AND SQTK_CUDA)
-  message(STATUS "SQTK Including CUDA accelerated filters.")
-  message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
+  #message(STATUS "SQTK Including CUDA accelerated filters.")
+  #message(STATUS "SQTK Cuda ${CUDA_VERSION_STRING} found.")
   set(CUDA_NVCC_FLAGS "-arch=sm_20;--compiler-options;-fPIC" CACHE STRING "nvcc flags")
   set(CUDA_NVCC_DEBUG_FLAGS "-g;-G;" CACHE STRING "nvcc debug flags")
   set(CUDA_NVCC_RELEASE_FLAGS "-O3" CACHE STRING "nvcc release flags")
-  message(STATUS "SQTK CUDA_NVCC_FLAGS=${CUDA_NVCC_FLAGS}")
-  message(STATUS "SQTK CUDA_NVCC_DEBUG_FLAGS=${CUDA_NVCC_DEBUG_FLAGS}")
-  message(STATUS "SQTK CUDA_NVCC_RELEASE_FLAGS=${CUDA_NVCC_FLAGS}")
+  #message(STATUS "SQTK CUDA_NVCC_FLAGS=${CUDA_NVCC_FLAGS}")
+  #message(STATUS "SQTK CUDA_NVCC_DEBUG_FLAGS=${CUDA_NVCC_DEBUG_FLAGS}")
+  #message(STATUS "SQTK CUDA_NVCC_RELEASE_FLAGS=${CUDA_NVCC_FLAGS}")
   set(CU_SOURCES CUDAConvolutionDriver.cu)
   set_property(
     SOURCE ${CU_SOURCES}
@@ -205,7 +209,7 @@ else()
 endif()
 
 if(PARAVIEW_BUILD_QT_GUI)
-  message(STATUS "SQTK Including custom panels.")
+  #message(STATUS "SQTK Including custom panels.")
   set(_IFACES)
   set(_IFACE_SRCS)
   # Qt custom panels
@@ -240,11 +244,21 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACES ${_IFACES} ${IFACES})
   set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
 
+  set(SQTK_SUPPORTS_DYNAMIC_LOAD_BALANCING
+    vtkSQFieldTracer
+    vtkSQFieldTracerRK45
+    vtkSQFieldTopologyMapper
+    vtkSQFieldTopologyMapperRK45
+    vtkSQPoincareMapper
+    vtkSQPoincareMapper45
+    vtkSQDisplacementMapper
+    vtkSQDisplacementMapperRK45
+    )
   QT4_WRAP_CPP(MOC_SRCS pqSQFieldTracer.h)
   ADD_PARAVIEW_OBJECT_PANEL(
     IFACES IFACE_SRCS
     CLASS_NAME pqSQFieldTracer
-    XML_NAME vtkSQFieldTracer vtkSQFieldTracerRK45 vtkSQFieldTopologyMapper
+    XML_NAME ${SQTK_SUPPORTS_DYNAMIC_LOAD_BALANCING}
     XML_GROUP filters)
   set(_IFACES ${_IFACES} ${IFACES})
   set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
@@ -323,7 +337,7 @@ target_link_libraries(SciberQuestToolKit vtkFiltersFlowPaths)
 install(TARGETS SciberQuestToolKit DESTINATION ${SQTK_LIB_INSTALL_PATH})
 
 if (SQTK_PYTHON_BINDINGS)
-  message(STATUS "SQTK generating vtk python bindings.")
+  #message(STATUS "SQTK generating vtk python bindings.")
   generate_python_bindings(SciberQuestToolKit "${SM_CXX_SOURCES}")
   install(TARGETS SciberQuestToolKitPython DESTINATION ${SQTK_LIB_INSTALL_PATH})
   install(TARGETS SciberQuestToolKitPythonD DESTINATION ${SQTK_LIB_INSTALL_PATH})

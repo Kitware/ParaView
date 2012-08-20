@@ -45,7 +45,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
   Mode(CartesianExtent::DIM_MODE_3D)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::vtkSQEdgeFilter" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::vtkSQEdgeFilter" << endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -57,7 +57,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
 vtkSQEdgeFilter::~vtkSQEdgeFilter()
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::~vtkSQEdgeFilter" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::~vtkSQEdgeFilter" << endl;
   #endif
 
 }
@@ -69,7 +69,7 @@ int vtkSQEdgeFilter::RequestDataObject(
     vtkInformationVector* outInfoVec)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::RequestDataObject" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestDataObject" << endl;
   #endif
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
@@ -98,7 +98,7 @@ int vtkSQEdgeFilter::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::RequestInformation" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -162,7 +162,7 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::RequestUpdateExtent" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestUpdateExtent" << endl;
   #endif
 
   (void)req;
@@ -229,7 +229,7 @@ int vtkSQEdgeFilter::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::RequestData" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::RequestData" << endl;
   #endif
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
@@ -472,7 +472,7 @@ int vtkSQEdgeFilter::RequestData(
 void vtkSQEdgeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   #ifdef vtkSQEdgeFilterDEBUG
-  pCerr() << "===============================vtkSQEdgeFilter::PrintSelf" << endl;
+  pCerr() << "=====vtkSQEdgeFilter::PrintSelf" << endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);
