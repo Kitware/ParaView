@@ -7,6 +7,7 @@ from vtkCommonDataModelPython import *
 from vtkCommonExecutionModelPython import *
 from vtkCommonComputationalGeometryPython import *
 from vtkRenderingCorePython import vtkCamera
+from vtkParallelCorePython import *
 
 
 # --------------------------------------
