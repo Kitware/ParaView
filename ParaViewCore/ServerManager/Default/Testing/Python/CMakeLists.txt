@@ -20,7 +20,7 @@ IF (PARAVIEW_DATA_ROOT)
         -D ${PARAVIEW_DATA_ROOT}
         -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PARAVIEW_DATA_ROOT}/Baseline/${tfile}.png
-        ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/${tfile}.pvsm)
+        --state ${CMAKE_CURRENT_SOURCE_DIR}/../SMStates/${tfile}.pvsm)
     set_tests_properties(${tfile}-ServerManagerPython PROPERTIES LABELS "PARAVIEW")
   ENDFOREACH (tfile)
 
