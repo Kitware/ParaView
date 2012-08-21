@@ -59,15 +59,25 @@
     <layout class="QHBoxLayout" name="SearchBoxLayout">
      <item>
       <widget class="QLineEdit" name="SearchLineEdit">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for properties by name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="placeholderText">
         <string>Search...</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="AdvancedButton">
+      <widget class="QToolButton" name="AdvancedButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Toggle advanced properties&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>Advanced</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -221,6 +231,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
  <connections/>
 </ui>
