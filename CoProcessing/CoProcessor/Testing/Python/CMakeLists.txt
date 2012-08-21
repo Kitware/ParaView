@@ -62,18 +62,11 @@ endif()
 
 
 if (PARAVIEW_BUILD_QT_GUI)
-  set (xml_name
-    ${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml)
-  if (APPLE)
-    set (xml_name
-      ${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI-Mac.xml)
-  endif()
-
   add_test(NAME CoProcessingFullWorkflow
            COMMAND ${CMAKE_COMMAND}
            -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
            -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-           -DPARAVIEW_TEST_XML:FILEPATH=${xml_name}
+           -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml
            -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
            -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
            -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
