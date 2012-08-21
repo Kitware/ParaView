@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>336</width>
+    <width>348</width>
     <height>594</height>
    </rect>
   </property>
@@ -95,8 +95,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>328</width>
-        <height>58</height>
+        <width>340</width>
+        <height>38</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -110,14 +110,17 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="PropertiesButton">
-         <property name="text">
+        <widget class="pqExpanderButton" name="PropertiesButton">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="text" stdset="0">
           <string>Properties</string>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
+         <property name="checked" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
@@ -156,14 +159,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="DisplayButton">
-         <property name="text">
+        <widget class="pqExpanderButton" name="DisplayButton">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="text" stdset="0">
           <string>Display</string>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
+         <property name="checked" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
@@ -207,6 +213,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqExpanderButton</class>
+   <extends>QFrame</extends>
+   <header>pqExpanderButton.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
