@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   vtkTestingOptions* options = vtkTestingOptions::New();
 
   vtkInitializationHelper::Initialize(argc, argv,
-    vtkProcessModule::PROCESS_BATCH, options);
+    vtkProcessModule::PROCESS_CLIENT, options);
 
   vtkSMSession* session = vtkSMSession::New();
   vtkProcessModule::GetProcessModule()->RegisterSession(session);
