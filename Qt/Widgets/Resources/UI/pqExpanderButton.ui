@@ -16,10 +16,10 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
       <property name="topMargin">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
-       <number>4</number>
+       <number>2</number>
       </property>
       <item>
        <widget class="QLabel" name="icon">
