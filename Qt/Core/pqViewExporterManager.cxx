@@ -170,12 +170,11 @@ QString pqViewExporterManager::getSupportedFileTypes() const
   return types;
 }
 
-//-----------------------------------------------------------------------------
-bool pqViewExporterManager::write(const QString& filename)
+vtkSMExporterProxy *pqViewExporterManager::proxyForFile(const QString& filename)
 {
   if (!this->View)
     {
-    return false;
+    return 0;
     }
 
   QFileInfo info(filename);
@@ -208,12 +207,21 @@ bool pqViewExporterManager::write(const QString& filename)
 
   if (exporter)
     {
-    pqSMAdaptor::setElementProperty(exporter->GetProperty("FileName"), 
+    pqSMAdaptor::setElementProperty(exporter->GetProperty("FileName"),
       filename);
     exporter->UpdateVTKObjects();
+    }
 
+  return exporter;
+}
+
+//-----------------------------------------------------------------------------
+bool pqViewExporterManager::write(vtkSMExporterProxy *exporter)
+{
+  if (exporter && this->View)
+    {
     // Local calls
-    exporter->SetView(proxy);
+    exporter->SetView(vtkSMViewProxy::SafeDownCast(this->View->getProxy()));
     exporter->Write();
 
     pqSMAdaptor::setProxyProperty(exporter->GetProperty("View"), NULL);
