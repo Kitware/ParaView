@@ -6,10 +6,147 @@
          representation_name="CompositeMultiSliceRepresentation">
       </MultiSliceViewProxy>
 
-      <RenderViewProxy name="ThreeSlice" class="vtkPVRenderView"
-         processes="client|renderserver|dataserver"
-         base_proxygroup="views" base_proxyname="RenderView">
-      </RenderViewProxy>
+      <ThreeSliceViewProxy name="ThreeSlice" class="vtkPVThreeSliceView"
+                           processes="client">
+        <SubProxy>
+            <Proxy name="TopLeft" proxygroup="views" proxyname="RenderView"/>
+        </SubProxy>
+
+        <SubProxy>
+           <Proxy name="TopRight" proxygroup="views" proxyname="RenderView"/>
+       </SubProxy>
+
+       <SubProxy>
+          <Proxy name="BottomLeft" proxygroup="views" proxyname="RenderView"/>
+       </SubProxy>
+
+       <SubProxy>
+          <Proxy name="BottomRight" proxygroup="views" proxyname="RenderView"/>
+          <ExposedProperties>
+            <Property name="LODThreshold" />
+            <Property name="LODResolution" />
+            <Property name="ResetCamera" />
+            <Property name="UseLight" />
+            <!-- Light -->
+            <Property name="LightAmbientColor" />
+            <Property name="LightDiffuseColor" />
+            <Property name="LightSpecularColor" />
+            <Property name="LightIntensity" />
+            <Property name="LightSwitch" />
+            <!-- LightKit -->
+            <Property name="KeyLightWarmth" />
+            <Property name="KeyLightIntensity" />
+            <Property name="KeyLightElevation" />
+            <Property name="KeyLightAzimuth" />
+            <Property name="FillLightWarmth" />
+            <Property name="FillLightK:F Ratio" />
+            <Property name="FillLightElevation" />
+            <Property name="FillLightAzimuth" />
+            <Property name="BackLightWarmth" />
+            <Property name="BackLightK:B Ratio" />
+            <Property name="BackLightElevation" />
+            <Property name="BackLightAzimuth" />
+            <Property name="HeadLightWarmth" />
+            <Property name="HeadLightK:H Ratio" />
+            <Property name="MaintainLuminance" />
+            <!-- ActiveCamera -->
+            <Property name="CameraPositionInfo" />
+            <Property name="CameraPosition" />
+            <Property name="CameraFocalPointInfo" />
+            <Property name="CameraFocalPoint" />
+            <Property name="CameraViewUpInfo" />
+            <Property name="CameraViewUp" />
+            <Property name="CameraViewAngle" />
+            <Property name="CameraClippingRangeInfo" />
+            <Property name="CameraClippingRange" />
+            <Property name="CameraParallelScale" />
+            <Property name="CameraParallelScaleInfo" />
+            <Property name="CameraParallelProjection" />
+            <Property name="EyeAngle" />
+            <!-- Interactor -->
+            <Property name="InteractionMode" />
+            <Property name="Camera3DManipulators" />
+            <Property name="Camera2DManipulators" />
+            <Property name="CenterOfRotation" />
+            <!-- Annotations -->
+            <Property name="CenterAxesVisibility" />
+            <Property name="OrientationAxesInteractivity" />
+            <Property name="OrientationAxesVisibility" />
+            <Property name="OrientationAxesLabelColor" />
+            <Property name="OrientationAxesOutlineColor" />
+            <!-- Renderer -->
+            <Property name="Background" />
+            <Property name="Background2" />
+            <Property name="BackgroundTexture" />
+            <Property name="UseGradientBackground" />
+            <Property name="UseTexturedBackground" />
+            <Property name="StereoRender" />
+            <Property name="StereoType" />
+            <!-- RenderWindow -->
+          </ExposedProperties>
+       </SubProxy>
+
+      <Property name="Trigger" command="Update"/>
+
+      <ProxyProperty name="Representations"
+                     argument_type="SMProxy"
+                     command="AddRepresentation"
+                     remove_command="RemoveRepresentation"
+                     repeatable="1">
+        <Documentation>Representations in this view.</Documentation>
+      </ProxyProperty>
+
+      <DoubleVectorProperty command="SetViewTime"
+                            default_values="none"
+                            name="ViewTime"
+                            number_of_elements="1"
+                            state_ignored="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>The pipeline update time for this view. This gets passed
+        to all representations added to this view.</Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty default_values="none"
+                            name="CacheKey"
+                            number_of_elements="1"
+                            state_ignored="1">
+        <DoubleRangeDomain name="range" />
+        <Documentation>This is the cache key used to indentify which cache
+        entry to use for rendering when caching is enabled.</Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty default_values="0"
+                         name="UseCache"
+                         number_of_elements="1"
+                         state_ignored="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Indicates whether to use cache for subsequent
+        renderings.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="0 0"
+                         name="ViewPosition"
+                         number_of_elements="2">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>Set the position on this view in the multiview
+        configuration.</Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty default_values="400 400"
+                         ignore_synchronization="1"
+                         name="ViewSize"
+                         number_of_elements="2"
+                         state_ignored="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>Set the size of this view in the multiview
+        configuration.</Documentation>
+      </IntVectorProperty>
+
+      </ThreeSliceViewProxy>
    </ProxyGroup>
 
    <!-- ================================================================== -->
@@ -21,13 +158,22 @@
                            base_proxygroup="representations"
                            base_proxyname="SurfaceRepresentation">
 
-
          <DoubleVectorProperty name="XSlicesValues"
                                command="SetSliceX"
                                repeat_command="1"
                                set_number_command="SetNumberOfSliceX"
                                number_of_elements_per_command="1"
                                use_index="1"/>
+
+         <DoubleVectorProperty name="XSlicesNormal"
+                               command="SetSliceXNormal"
+                               number_of_elements="3"
+                               default_values="1 0 0"/>
+
+         <DoubleVectorProperty name="XSlicesOrigin"
+                               command="SetSliceXOrigin"
+                               number_of_elements="3"
+                               default_values="0 0 0"/>
 
          <DoubleVectorProperty name="YSlicesValues"
                                command="SetSliceY"
@@ -36,13 +182,46 @@
                                number_of_elements_per_command="1"
                                use_index="1"/>
 
+         <DoubleVectorProperty name="YSlicesNormal"
+                               command="SetSliceYNormal"
+                               number_of_elements="3"
+                               default_values="0 1 0"/>
+
+         <DoubleVectorProperty name="YSlicesOrigin"
+                               command="SetSliceYOrigin"
+                               number_of_elements="3"
+                               default_values="0 0 0"/>
+
          <DoubleVectorProperty name="ZSlicesValues"
                                command="SetSliceZ"
                                repeat_command="1"
                                set_number_command="SetNumberOfSliceZ"
                                number_of_elements_per_command="1"
                                use_index="1"/>
+
+         <DoubleVectorProperty name="ZSlicesNormal"
+                               command="SetSliceZNormal"
+                               number_of_elements="3"
+                               default_values="0 0 1"/>
+
+         <DoubleVectorProperty name="ZSlicesOrigin"
+                               command="SetSliceZOrigin"
+                               number_of_elements="3"
+                               default_values="0 0 0"/>
+
+         <IntVectorProperty command="SetPortToUse"
+                            default_values="0"
+                            name="OutputType"
+                            number_of_elements="1">
+              <EnumerationDomain name="enum">
+                  <Entry text="ALL" value="0" />
+                  <Entry text="SLICE_X" value="1" />
+                  <Entry text="SLICE_Y" value="2" />
+                  <Entry text="SLICE_Z" value="3" />
+              </EnumerationDomain>
+         </IntVectorProperty>
       </RepresentationProxy>
+
 
       <PVRepresentationProxy name="CompositeMultiSliceRepresentation"
                            class="vtkCompositeMultiSliceRepresentation"
@@ -176,6 +355,15 @@
           <Property name="XSlicesValues" panel_visibility="never"/>
           <Property name="YSlicesValues" panel_visibility="never"/>
           <Property name="ZSlicesValues" panel_visibility="never"/>
+
+          <Property name="XSlicesNormal" panel_visibility="never"/>
+          <Property name="YSlicesNormal" panel_visibility="never"/>
+          <Property name="ZSlicesNormal" panel_visibility="never"/>
+
+          <Property name="XSlicesOrigin" panel_visibility="never"/>
+          <Property name="YSlicesOrigin" panel_visibility="never"/>
+          <Property name="ZSlicesOrigin" panel_visibility="never"/>
+
           <PropertyGroup type="ColorEditor" panel_visibility="default">
             <Property name="AllowSpecularHighlightingWithScalarColoring"/>
             <Property name="Ambient" />
@@ -209,6 +397,7 @@
           <Property name="StaticMode" panel_visibility="never" />
           <Property name="SuppressLOD" panel_visibility="never" />
           <Property name="Texture" panel_visibility="never" />
+          <Property name="OutputType" panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
 

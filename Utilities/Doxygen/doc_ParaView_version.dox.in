@@ -1,0 +1,11 @@
+/*! @mainpage ParaView Documentation (Source Version @PARAVIEW_VERSION_FULL@)
+
+  @image html paraview-logo.png
+  @par Useful ParaView links:
+  @li Home: http://www.paraview.org
+  @li Mailing Lists: http://www.paraview.org/paraview/help/mailing.html
+  @li Wiki: http://wwww.paraview.org/Wiki/ParaView
+  @li Developer Wiki: http://wwww.paraview.org/ParaView3
+  @li Dashboard: http://open.cdash.org/index.php?project=ParaView
+  @li Kitware Home: http://www.kitware.com
+ */

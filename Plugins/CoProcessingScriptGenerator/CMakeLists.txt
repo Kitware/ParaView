@@ -96,13 +96,7 @@ IF (BUILD_TESTING)
   # this test is redundant with the CoProcessingFullWorkflow test
   # in the coprocessing library but that may not be built so we
   # add it here as well. this test though is a subset of that test.
-  if(Q_WS_MAC)
-    add_client_tests("pv"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI-Mac.xml )
-    SET_TESTS_PROPERTIES(pv.CoProcessingGUI-Mac PROPERTIES RUN_SERIAL ON)
-  else(Q_WS_MAC)
-    add_client_tests("pv"
-      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
-    SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
-  endif(Q_WS_MAC)
+  add_client_tests("pv"
+    TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
+  SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
 ENDIF (BUILD_TESTING)

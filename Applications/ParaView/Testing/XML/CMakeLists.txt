@@ -238,6 +238,7 @@ set(XdmfRead_USE_NEW_PANELS TRUE)
 set(XYChart_USE_NEW_PANELS TRUE)
 set(XYHistogram_USE_NEW_PANELS TRUE)
 set(ZLibXDMF_USE_NEW_PANELS TRUE)
+set(AnalyzeReaderWriterPlugin_USE_NEW_PANELS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)

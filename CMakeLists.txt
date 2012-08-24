@@ -323,6 +323,8 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
+  configure_file("${ParaView_CMAKE_DIR}/CTestCustom.ctest.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.ctest" @ONLY)
 endif()
 
 # Setup default state for ParaView module groups.
@@ -349,10 +351,6 @@ include_directories(${ParaView_BINARY_DIR})
 #------------------------------------------------------------------------------
 # Bring in VTK
 #------------------------------------------------------------------------------
-#ParaView's client server wrapping uses VTK's wrapping infrastructure
-#so make sure VTK builds it, even if we aren't wrapping any other language.
-set(VTK_GENERATE_WRAPTOOLS 1)
-
 # ParaView provides an advanced option that can be used to make ParaView use a
 # pre-built VTK. For that, the option must be passed to the first cmake command
 # using -D. i.e. to use a separately built VTK, in a clean binary directory, do
@@ -409,11 +407,12 @@ else()
   # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
 
   set (ParaViewModulesDirs
-    Utilities/ProcessXML
     ThirdParty/protobuf
     ThirdParty/QtTesting
-    Utilities/VisItBridge/Library
+    Utilities/ProcessXML
     Utilities/VisItBridge/databases
+    Utilities/VisItBridge/Library
+    Utilities/WrapClientServer
 
     ParaViewCore/ClientServerStream
     ParaViewCore/PythonSupport
@@ -474,7 +473,10 @@ else()
   enable_required_modules()
 
   # include VTK
+  set (old_build_examples ${BUILD_EXAMPLES})
+  set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE) 
   add_subdirectory(VTK)
+  set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE) 
 
   hide_enabled_modules()
 
@@ -525,6 +527,7 @@ endif()
 #------------------------------------------------------------------------------
 # Client-Server Wrapping for all Modules.
 #------------------------------------------------------------------------------
+# Wrap all modules ParaView/VTK knows about.
 add_subdirectory(Wrapping/ClientServer)
 
 #------------------------------------------------------------------------------
@@ -626,4 +629,10 @@ if (BUILD_EXAMPLES)
   # that examples can be built by themselves as well as avoiding pollution of
   # the ParaView target space with targets (and other things) from examples.
   include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
+endif()
+
+#-----------------------------------------------------------------------------
+# Build doxygen documentation.
+if (BUILD_DOCUMENTATION)
+  add_subdirectory(Utilities/Doxygen)
 endif()

@@ -32,7 +32,7 @@ endif()
 
 if (TARGET vtkIOVisItBridge)
   # add_subdirectory(Plugins/VisItReader)
-else (PARAVIEW_BUILD_QT_GUI)
+elseif (PARAVIEW_BUILD_QT_GUI)
   # ParticlesViewer requires PointSprite plugin which is not built when
   # vtkIOVisItBridge is enabled.
   add_subdirectory(CustomApplications/ParticlesViewer)

@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME pqThreeSliceView - QT GUI that allow 3 slice control across 4 view embedded as 1
+// .NAME pqThreeSliceView - QT GUI that allow 3 slice control across 4 views
+// embedded as 1
 
 #ifndef __pqThreeSliceView_h
 #define __pqThreeSliceView_h
@@ -25,8 +26,8 @@
 class QVTKWidget;
 class pqRenderView;
 class vtkSMPropertyLink;
+class vtkSMThreeSliceViewProxy;
 class vtkSMViewProxy;
-class vtkEventQtSlotConnect;
 
 class pqThreeSliceView : public pqRenderView
 {
@@ -45,9 +46,6 @@ public:
                     pqServer* server,
                     QObject* p);
   virtual ~pqThreeSliceView();
-
-  /// Override to decorate the QVTKWidget
-  virtual QWidget* createWidget();
 
   /// Redirect reset camera to all views
   virtual void resetCamera();
@@ -88,6 +86,16 @@ public:
 
   /// Reset Normal/ViewUp/Origin to their defaults
   void resetDefaultSettings();
+
+  /// Returns the ThreeSlice view proxy.
+  vtkSMThreeSliceViewProxy* getThreeSliceViewProxy() const;
+
+  /// Returns the root render view in the ThreeSlice view.
+  virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
+
+protected:
+  /// Override to decorate the QVTKWidget
+  virtual QWidget* createWidget();
 
 public slots:
   /// Request a StillRender on idle. Multiple calls are collapsed into one.

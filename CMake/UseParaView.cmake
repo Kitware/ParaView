@@ -20,4 +20,9 @@ if (PARAVIEW_ENABLE_QT_SUPPORT)
   endif()
 endif()
 
+# Import some commonly used cmake modules
+include (ParaViewMacros)
+include (ParaViewPlugins)
+include (ParaViewBranding)
+
 # FIXME: there was additional stuff about coprocessing and visit bridge here.

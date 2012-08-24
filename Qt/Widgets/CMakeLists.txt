@@ -63,6 +63,8 @@ set(Module_SRCS
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.cxx
   pqDoubleSpinBox.h
+  pqExpanderButton.cxx
+  pqExpanderButton.h
   pqFlatTreeView.cxx
   pqFlatTreeView.h
   pqHelpWindow.cxx
@@ -132,6 +134,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDelimitedTextParser.h
   pqDoubleRangeWidget.h
   pqDoubleSpinBox.h
+  pqExpanderButton.h
   pqFlatTreeView.h
   pqIntRangeWidget.h
   pqLineEdit.h
@@ -155,8 +158,9 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
 ##########################################################################
 ## Add *.ui files to be uic processed.
 SET(QtWidgets_UI_FORMS
-  Resources/UI/pqQuickLaunchDialog.ui
+  Resources/UI/pqExpanderButton.ui
   Resources/UI/pqHelpWindow.ui
+  Resources/UI/pqQuickLaunchDialog.ui
 )
 
 QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES

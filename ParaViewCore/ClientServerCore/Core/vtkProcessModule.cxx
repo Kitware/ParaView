@@ -172,6 +172,10 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 
   vtkMultiThreader::SetGlobalMaximumNumberOfThreads(1);
 
+  // The running dashboard tests avoid showing the abort/retry popup dialog.
+  vtksys::SystemTools::EnableMSVCDebugHook();
+
+
   // Create the process module.
   vtkProcessModule::Singleton = vtkSmartPointer<vtkProcessModule>::New();
   return true;

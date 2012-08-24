@@ -48,29 +48,25 @@ if (PARAVIEW_USE_MPI)
           -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
           -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
           -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
-          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest2.py
+          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
           -DUSE_MPI:BOOL=TRUE
           -DMPIEXEC:FILEPATH=${MPIEXEC}
           -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
           -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
           -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+  # both the parallel and the serial tests create the same output images
+  # so we run this one serially so that they don't interfere.
+  set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
 endif()
 
 
 if (PARAVIEW_BUILD_QT_GUI)
-  set (xml_name
-    ${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml)
-  if (APPLE)
-    set (xml_name
-      ${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI-Mac.xml)
-  endif()
-
   add_test(NAME CoProcessingFullWorkflow
            COMMAND ${CMAKE_COMMAND}
            -DPARAVIEW_EXECUTABLE:FILEPATH=$<TARGET_FILE:paraview>
            -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-           -DPARAVIEW_TEST_XML:FILEPATH=${xml_name}
+           -DPARAVIEW_TEST_XML:FILEPATH=${ParaView_SOURCE_DIR}/Plugins/CoProcessingScriptGenerator/Testing/CoProcessingGUI.xml
            -DPVPYTHON_EXECUTABLE:FILEPATH=$<TARGET_FILE:pvpython>
            -DCOPROCESSING_DRIVER_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
            -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>

@@ -234,7 +234,7 @@ class Proxy(object):
             self.Observed = None
             self.ObserverTag = -1
             observed.RemoveObserver(tag)
-        if self.SMProxy and (self.SMProxy, self.Port) in _pyproxies:
+        if _pyproxies and self.SMProxy and (self.SMProxy, self.Port) in _pyproxies:
             del _pyproxies[(self.SMProxy, self.Port)]
 
     def InitializeFromProxy(self, aProxy, update=True):

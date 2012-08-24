@@ -5895,6 +5895,18 @@ found and the point will be rejected.</Documentation>
         glyph are chosen randomly. Otherwise the point ids chosen are evenly
         spaced.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetKeepRandomPoints"
+                         default_values="0"
+                         name="KeepRandomPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation> If the value of this property is 1 and RandomMode is
+        1, then the randomly chosen points to glyph are saved and reused for
+        other timesteps. This is only useful if the coordinates are the same
+        and in the same order between timesteps.
+        </Documentation>
+      </IntVectorProperty>
+
       <Hints>
         <!-- Visibility Element can be used to suggest the GUI about
           visibility of this filter (or its input) on creation.
@@ -6079,6 +6091,18 @@ found and the point will be rejected.</Documentation>
         glyph are chosen randomly. Otherwise the point ids chosen are evenly
         spaced.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetKeepRandomPoints"
+                         default_values="0"
+                         name="KeepRandomPoints"
+                         number_of_elements="1">
+        <BooleanDomain name="bool"/>
+        <Documentation> If the value of this property is 1 and RandomMode is
+        1, then the randomly chosen points to glyph are saved and reused for
+        other timesteps. This is only useful if the coordinates are the same
+        and in the same order between timesteps.
+        </Documentation>
+      </IntVectorProperty>
+
       <Hints>
         <!-- Visibility Element can be used to suggest the GUI about
           visibility of this filter (or its input) on creation.

@@ -36,7 +36,7 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
 )
 
-ADD_LIBRARY(vtkCPTestDriver
+vtk_add_library(vtkCPTestDriver
   ${TestDriver_SRCS} 
 )
 TARGET_LINK_LIBRARIES(vtkCPTestDriver vtkCoProcessorImplementation vtkFiltersCore)
@@ -48,7 +48,7 @@ IF (VTK_WRAP_PYTHON)
   # Create a shared library containing the python wrappers.  Executables
   # can link to this but it is not directly loaded dynamically as a
   # module.
-  ADD_LIBRARY(vtkCPTestDriverPythonD ${TestDriverPython_SRCS})
+  vtk_add_library(vtkCPTestDriverPythonD ${TestDriverPython_SRCS})
   TARGET_LINK_LIBRARIES(vtkCPTestDriverPythonD vtkCPTestDriver vtkIOCorePythonD)
 
   # On some UNIX platforms the python library is static and therefore
