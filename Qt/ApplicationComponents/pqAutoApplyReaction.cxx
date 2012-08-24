@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
-#include "pqObjectInspectorWidget.h"
+#include "pqPropertiesPanel.h"
 
 //-----------------------------------------------------------------------------
 pqAutoApplyReaction::pqAutoApplyReaction(QAction* parentObject)
@@ -53,7 +53,7 @@ void pqAutoApplyReaction::checkStateChanged(bool autoAccept)
 //-----------------------------------------------------------------------------
 bool pqAutoApplyReaction::autoApply()
 {
-  return pqObjectInspectorWidget::autoAccept();
+  return pqPropertiesPanel::autoApply();
 }
 
 //-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void pqAutoApplyReaction::setAutoApply(bool autoAccept)
     {
     settings->setValue("autoAccept", autoAccept);
     }
-  pqObjectInspectorWidget::setAutoAccept(autoAccept);
+  pqPropertiesPanel::setAutoApply(autoAccept);
 }
 
 //-----------------------------------------------------------------------------

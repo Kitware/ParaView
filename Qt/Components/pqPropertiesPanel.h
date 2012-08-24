@@ -81,6 +81,18 @@ public:
                                                    vtkSMProxy *proxy,
                                                    QWidget *parent = 0);
 
+  /// Enable/disable auto-apply.
+  static void setAutoApply(bool enabled);
+
+  /// Returns \c true if auto-apply is enabled.
+  static bool autoApply();
+
+  /// Sets the delay for auto-apply to \p delay (in msec).
+  static void setAutoApplyDelay(int delay);
+
+  /// Returns the delay for the auto-apply (in msec).
+  static int autoApplyDelay();
+
 public slots:
   /// Sets the current render view to \p view.
   void setView(pqView *view);
@@ -162,6 +174,8 @@ private:
   QList<pqPropertiesPanelItem> ProxyPropertyItems;
   QList<pqPropertiesPanelItem> RepresentationPropertyItems;
   bool DebugWidgetCreation;
+  static bool AutoApply;
+  static int AutoApplyDelay;
 };
 
 #endif // _pqPropertiesPanel_h
