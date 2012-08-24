@@ -293,7 +293,7 @@ int vtkSMTestDriver::ProcessCommandLine(int argc, char* argv[])
 }
 //-----------------------------------------------------------------------------
 void
-vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
+vtkSMTestDriver::CreateCommandLine(std::vector<const char*>& commandLine,
                                 const char* paraView,
                                 vtkSMTestDriver::ProcessType type,
                                 const char* numProc,
@@ -431,7 +431,9 @@ vtkSMTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
 
   if (type == CLIENT && this->NumberOfServers > 1)
     {
-    commandLine.insert(++commandLine.begin(), "--multi-servers");
+    std::vector<const char*>::iterator iter = commandLine.begin();
+    iter++;
+    commandLine.insert(iter, "--multi-servers");
     }
 
 #ifdef PV_TEST_USE_RANDOM_PORTS
@@ -1242,7 +1244,7 @@ bool vtkSMTestDriver::SetupRenderServer(vtksysProcess* renderServer)
   // Construct the render server process command line
   if(renderServer)
     {
-    vtksys_stl::vector<const char*> renderServerCommand;
+    std::vector<const char*> renderServerCommand;
     this->CreateCommandLine(renderServerCommand,
       this->RenderServerExecutable.c_str(),
       RENDER_SERVER,
@@ -1261,7 +1263,7 @@ bool vtkSMTestDriver::SetupServer(vtksysProcess* server)
 {
   if (server)
     {
-    vtksys_stl::vector<const char*> serverCommand;
+    std::vector<const char*> serverCommand;
     const char* serverExe = this->ServerExecutable.c_str();
     vtkSMTestDriver::ProcessType serverType = SERVER;
     if(this->TestRenderServer)
@@ -1288,7 +1290,7 @@ bool vtkSMTestDriver::SetupClient(
 {
   if (process)
     {
-    vtksys_stl::vector<const char*> clientCommand;
+    std::vector<const char*> clientCommand;
     this->CreateCommandLine(clientCommand,
       info.ClientExecutable.c_str(),
       CLIENT,
@@ -1297,7 +1299,9 @@ bool vtkSMTestDriver::SetupClient(
     if (!this->ReverseConnection && !this->ServerURL.empty())
       {
       // push-back server url, if present.
-      clientCommand.insert(++clientCommand.begin(), this->ServerURL.c_str());
+      std::vector<const char*>::iterator iter = clientCommand.begin();
+      iter++;
+      clientCommand.insert(iter, this->ServerURL.c_str());
       clientCommand.push_back(NULL);
       }
     this->ReportCommand(&clientCommand[0], "client");

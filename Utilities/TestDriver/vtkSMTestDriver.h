@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 #include <vtksys/Process.h>
-#include <vtksys/stl/string>
-#include <vtksys/stl/vector>
 
 class vtkSMTestDriver 
 {
@@ -49,7 +47,7 @@ protected:
   int ReportStatus(vtksysProcess* process, const char* name);
   int ProcessCommandLine(int argc, char* argv[]);
   void CollectConfiguredOptions();
-  void CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
+  void CreateCommandLine(std::vector<const char*>& commandLine,
                          const char* paraView,
                          ProcessType type, 
                          const char* numProc,
