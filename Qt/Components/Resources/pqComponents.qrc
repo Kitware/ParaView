@@ -2,6 +2,7 @@
     <qresource prefix="/pqWidgets" >
         <file>Icons/PVSplashScreen.png</file>
         <file>Icons/pq3DView16.png</file>
+        <file>Icons/pqAdvanced26.png</file>
         <file>Icons/pqAddFavorites16.png</file>
         <file>Icons/pqAppIcon16.png</file>
         <file>Icons/pqAppIcon22.png</file>
