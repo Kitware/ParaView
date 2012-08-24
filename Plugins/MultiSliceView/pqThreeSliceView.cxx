@@ -27,11 +27,15 @@
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkPVRenderView.h"
+#include "vtkSMMultiSliceViewProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMThreeSliceViewProxy.h"
+#include "vtkSMThreeSliceViewProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkView.h"
 
@@ -41,19 +45,23 @@
 class pqThreeSliceView::pqInternal
 {
 public:
-  QPointer<QVTKWidget> MainWidget;
+  QPointer<pqThreeSliceView> Parent;
+
   QPointer<QVTKWidget> TopLeftWidget;
   QPointer<QVTKWidget> TopRightWidget;
   QPointer<QVTKWidget> BottomLeftWidget;
+  QPointer<QVTKWidget> BottomRightWidget;
 
   QPointer<pqRenderView> TopLeftRenderer;
   QPointer<pqRenderView> TopRightRenderer;
   QPointer<pqRenderView> BottomLeftRenderer;
+  QPointer<pqRenderView> BottomRightRenderer;
 
-  vtkSmartPointer<vtkSMViewProxy> ViewProxy;
+  vtkSmartPointer<vtkSMThreeSliceViewProxy> ViewProxy;
   vtkSmartPointer<vtkSMRenderViewProxy> TopLeftProxy;
   vtkSmartPointer<vtkSMRenderViewProxy> TopRightProxy;
   vtkSmartPointer<vtkSMRenderViewProxy> BottomLeftProxy;
+  vtkSmartPointer<vtkSMRenderViewProxy> BottomRightProxy;
 
   std::vector<vtkSmartPointer<vtkSMPropertyLink> > Links;
 
@@ -67,16 +75,9 @@ public:
 
   // ------
 
-  void AddLink(const char* property)
+  pqInternal(pqThreeSliceView* parent)
   {
-    vtkNew<vtkSMPropertyLink> link;
-    link->AddLinkedProperty(this->ViewProxy, property, vtkSMLink::INPUT);
-    link->AddLinkedProperty(this->TopLeftProxy, property, vtkSMLink::OUTPUT);
-    link->AddLinkedProperty(this->TopRightProxy, property, vtkSMLink::OUTPUT);
-    link->AddLinkedProperty(this->BottomLeftProxy, property, vtkSMLink::OUTPUT);
-
-    // Keep it with auto-delete
-    this->Links.push_back(link.GetPointer());
+    this->Parent = parent;
   }
 
   // ------
@@ -109,6 +110,37 @@ public:
     const char* position   = "CameraPosition";
     const char* viewUp     = "CameraViewUp";
 
+    // Update slice origin + normal
+    foreach(pqRepresentation* rep, this->Parent->getRepresentations())
+      {
+      if( rep->isWidgetType() ||
+          !rep->getProxy()->GetProperty("XSlicesValues"))
+        {
+        continue;
+        }
+      vtkSMRepresentationProxy* smRep =
+          vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
+
+      vtkSMPropertyHelper(smRep, "XSlicesOrigin").Set(this->SlicesOrigin, 3);
+      vtkSMPropertyHelper(smRep, "YSlicesOrigin").Set(this->SlicesOrigin, 3);
+      vtkSMPropertyHelper(smRep, "ZSlicesOrigin").Set(this->SlicesOrigin, 3);
+
+      double value[1] = {0.0};
+      vtkSMPropertyHelper(smRep, "XSlicesValues").Set(value, 1);
+      vtkSMPropertyHelper(smRep, "YSlicesValues").Set(value, 1);
+      vtkSMPropertyHelper(smRep, "ZSlicesValues").Set(value, 1);
+
+      vtkSMPropertyHelper(smRep, "XSlicesNormal").Set(this->TopLeftNormal, 3);
+      vtkSMPropertyHelper(smRep, "YSlicesNormal").Set(this->TopRightNormal, 3);
+      vtkSMPropertyHelper(smRep, "ZSlicesNormal").Set(this->BottomLeftNormal, 3);
+
+      smRep->UpdateVTKObjects();
+      }
+
+    // Invalidate the proxy
+    this->Parent->getThreeSliceViewProxy()->MarkDirty(NULL);
+    this->Parent->getThreeSliceViewProxy()->Update();
+
     // Update X (Top-Left)
     vtkSMPropertyHelper(this->TopLeftProxy, focalPoint).Get(cameraPosition, 3);
     vtkMath::Add(cameraPosition, this->TopLeftNormal, cameraPosition);
@@ -129,6 +161,8 @@ public:
     vtkSMPropertyHelper(this->BottomLeftProxy, position).Set(cameraPosition, 3);
     vtkSMPropertyHelper(this->BottomLeftProxy, viewUp).Set(this->BottomLeftViewUp, 3);
     this->BottomLeftProxy->InvokeCommand("ResetCamera");
+
+    this->Parent->render();
   }
 
   // ------
@@ -136,26 +170,19 @@ public:
   void Initialize(pqServer* server, const QString& viewType, const QString& group,
                   const QString& name, vtkSMViewProxy* mainViewProxy, QObject* p)
   {
-    vtkSMSessionProxyManager* spxm = server->proxyManager();
-    const char* g = "views";
-    const char* t = "2DRenderView";
-
     this->ResetToDefault();
 
-    this->ViewProxy = mainViewProxy;
+    this->ViewProxy = vtkSMThreeSliceViewProxy::SafeDownCast(mainViewProxy);
 
-    this->TopLeftProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
-    this->TopLeftProxy->FastDelete();
-
-    this->TopRightProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
-    this->TopRightProxy->FastDelete();
-
-    this->BottomLeftProxy = vtkSMRenderViewProxy::SafeDownCast(spxm->NewProxy(g,t));
-    this->BottomLeftProxy->FastDelete();
+    this->TopLeftProxy = this->ViewProxy->GetTopLeftViewProxy();
+    this->TopRightProxy = this->ViewProxy->GetTopRightViewProxy();
+    this->BottomLeftProxy = this->ViewProxy->GetBottomLeftViewProxy();
+    this->BottomRightProxy = this->ViewProxy->GetBottomRightViewProxy();
 
     this->TopLeftRenderer = new pqRenderView(viewType, group, name, this->TopLeftProxy, server, p);
     this->TopRightRenderer = new pqRenderView(viewType, group, name, this->TopRightProxy, server, p);
     this->BottomLeftRenderer = new pqRenderView(viewType, group, name, this->BottomLeftProxy, server, p);
+    this->BottomRightRenderer = new pqRenderView(viewType, group, name, this->BottomRightProxy, server, p);
   }
 
   // ------
@@ -163,7 +190,7 @@ public:
   QWidget* CreateWidget(pqThreeSliceView* view)
   {
     // Get the internal widget that we want to decorate
-    this->MainWidget = qobject_cast<QVTKWidget*>(view->pqRenderView::createWidget());
+    this->BottomRightWidget = qobject_cast<QVTKWidget*>(this->BottomRightRenderer->getWidget());
     this->TopLeftWidget = qobject_cast<QVTKWidget*>(this->TopLeftRenderer->getWidget());
     this->TopRightWidget = qobject_cast<QVTKWidget*>(this->TopRightRenderer->getWidget());
     this->BottomLeftWidget = qobject_cast<QVTKWidget*>(this->BottomLeftRenderer->getWidget());
@@ -174,26 +201,18 @@ public:
     container->setAutoFillBackground(true);
 
     QGridLayout* gridLayout = new QGridLayout(container);
-    this->MainWidget->setParent(container);
-
     gridLayout->addWidget(this->TopLeftWidget,    0, 0); // TOP-LEFT
     gridLayout->addWidget(this->TopRightWidget,   0, 1); // TOP-RIGHT
     gridLayout->addWidget(this->BottomLeftWidget, 1, 0); // BOTTOM-LEFT
-    gridLayout->addWidget(this->MainWidget,       1, 1); // BOTTOM-RIGHT
+    gridLayout->addWidget(this->BottomRightWidget,1, 1); // BOTTOM-RIGHT
     gridLayout->setContentsMargins(0,0,0,0);
     gridLayout->setSpacing(0);
-
-    // Properly do the binding between the proxy and the 3D widget
-    vtkSMRenderViewProxy* renModule = view->getRenderViewProxy();
-    if (this->MainWidget && renModule)
-      {
-      this->MainWidget->SetRenderWindow(renModule->GetRenderWindow());
-      }
 
     // For axis
     this->TopLeftWidget->SetRenderWindow(this->TopLeftProxy->GetRenderWindow());
     this->TopRightWidget->SetRenderWindow(this->TopRightProxy->GetRenderWindow());
     this->BottomLeftWidget->SetRenderWindow(this->BottomLeftProxy->GetRenderWindow());
+    this->BottomRightWidget->SetRenderWindow(this->BottomRightProxy->GetRenderWindow());
 
     return container;
   }
@@ -205,43 +224,8 @@ pqThreeSliceView::pqThreeSliceView(
     vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
-  this->Internal = new pqInternal();
+  this->Internal = new pqInternal(this);
   this->Internal->Initialize(server, viewType, group, name, viewProxy, this);
-
-  // Bind properties across views
-  this->Internal->AddLink("UseLight");
-  this->Internal->AddLink("LightSwitch");
-  this->Internal->AddLink("CenterAxesVisibility");
-  this->Internal->AddLink("OrientationAxesVisibility");
-  this->Internal->AddLink("KeyLightWarmth");
-  this->Internal->AddLink("KeyLightIntensity");
-  this->Internal->AddLink("KeyLightElevation");
-  this->Internal->AddLink("KeyLightAzimuth");
-  this->Internal->AddLink("FillLightWarmth");
-  this->Internal->AddLink("FillLightK:F Ratio");
-  this->Internal->AddLink("FillLightElevation");
-  this->Internal->AddLink("FillLightAzimuth");
-  this->Internal->AddLink("BackLightWarmth");
-  this->Internal->AddLink("BackLightK:B Ratio");
-  this->Internal->AddLink("BackLightElevation");
-  this->Internal->AddLink("BackLightAzimuth");
-  this->Internal->AddLink("HeadLightWarmth");
-  this->Internal->AddLink("HeadLightK:H Ratio");
-  this->Internal->AddLink("MaintainLuminance");
-  this->Internal->AddLink("Background");
-  this->Internal->AddLink("Background2");
-  this->Internal->AddLink("BackgroundTexture");
-  this->Internal->AddLink("UseGradientBackground");
-  this->Internal->AddLink("UseTexturedBackground");
-  this->Internal->AddLink("LightAmbientColor");
-  this->Internal->AddLink("LightSpecularColor");
-  this->Internal->AddLink("LightDiffuseColor");
-  this->Internal->AddLink("LightIntensity");
-  this->Internal->AddLink("LightType");
-
-  // TMP for debuging/testing
-  this->Internal->AddLink("Representations");
-  this->Internal->AddLink("ResetCamera");
 }
 
 //-----------------------------------------------------------------------------
@@ -265,20 +249,19 @@ QWidget* pqThreeSliceView::createWidget()
 //-----------------------------------------------------------------------------
 void pqThreeSliceView::resetCamera()
 {
-  this->pqRenderView::resetCamera();
-
   this->Internal->TopLeftProxy->InvokeCommand("ResetCamera");
   this->Internal->TopRightProxy->InvokeCommand("ResetCamera");
   this->Internal->BottomLeftProxy->InvokeCommand("ResetCamera");
+  this->Internal->BottomRightProxy->InvokeCommand("ResetCamera");
+  this->render();
 }
 //-----------------------------------------------------------------------------
 void pqThreeSliceView::render()
 {
-  this->pqRenderView::render();
-
   this->Internal->TopLeftRenderer->render();
   this->Internal->TopRightRenderer->render();
   this->Internal->BottomLeftRenderer->render();
+  this->Internal->BottomRightRenderer->render();
 }
 //-----------------------------------------------------------------------------
 const double* pqThreeSliceView::getTopLeftNormal() const
@@ -384,4 +367,16 @@ void pqThreeSliceView::resetDefaultSettings()
 {
   this->Internal->ResetToDefault();
   this->Internal->UpdateSlices();
+}
+//-----------------------------------------------------------------------------
+vtkSMThreeSliceViewProxy* pqThreeSliceView::getThreeSliceViewProxy() const
+{
+  return vtkSMThreeSliceViewProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRenderViewProxy* pqThreeSliceView::getRenderViewProxy() const
+{
+  return vtkSMRenderViewProxy::SafeDownCast(
+    this->getThreeSliceViewProxy()->GetBottomRightViewProxy());
 }

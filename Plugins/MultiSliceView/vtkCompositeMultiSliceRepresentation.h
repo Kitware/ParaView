@@ -12,14 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCompositeRepresentation - a data-representation used by ParaView.
+// .NAME vtkCompositeMultiSliceRepresentation - a data-representation used by ParaView.
 // .SECTION Description
-// vtkPVCompositeRepresentation is a data-representation used by ParaView for showing
-// a type of data-set in the render view. It is a composite-representation with
-// some fixed representations for showing things like selection and cube-axes.
-// This representation has two input ports:
-// \li 0: the dataset to show
-// \li 1: the extracted selection to show
+// vtkCompositeMultiSliceRepresentation is similar to
+// vtkPVCompositeRepresentation but with a MultiSlice Representation as only
+// choice underneath.
 
 #ifndef __vtkCompositeMultiSliceRepresentation_h
 #define __vtkCompositeMultiSliceRepresentation_h

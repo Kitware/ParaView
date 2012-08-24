@@ -38,6 +38,7 @@ public:
   // Similar to IsSelectionAvailable(), however, on failure returns the
   // error message otherwise 0.
   virtual const char* IsSelectVisiblePointsAvailable();
+
 //BTX
 protected:
   vtkSMMultiSliceViewProxy();
