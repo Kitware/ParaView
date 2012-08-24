@@ -476,7 +476,10 @@ else()
   enable_required_modules()
 
   # include VTK
+  set (old_build_examples ${BUILD_EXAMPLES})
+  set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE) 
   add_subdirectory(VTK)
+  set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE) 
 
   hide_enabled_modules()
 

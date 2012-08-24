@@ -1,13 +1,14 @@
+from vtkCommonComputationalGeometryPython import *
 from vtkCommonCorePython import *
+from vtkCommonDataModelPython import *
+from vtkCommonExecutionModelPython import *
 from vtkCommonMathPython import *
 from vtkCommonMiscPython import *
 from vtkCommonSystemPython import *
 from vtkCommonTransformsPython import *
-from vtkCommonDataModelPython import *
-from vtkCommonExecutionModelPython import *
-from vtkCommonComputationalGeometryPython import *
+from vtkFiltersProgrammablePython import *
+from vtkParallelCorePython import *
 from vtkRenderingCorePython import vtkCamera
-
 
 # --------------------------------------
 
