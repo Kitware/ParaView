@@ -627,3 +627,9 @@ if (BUILD_EXAMPLES)
   # the ParaView target space with targets (and other things) from examples.
   include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
 endif()
+
+#-----------------------------------------------------------------------------
+# Build doxygen documentation.
+if (BUILD_DOCUMENTATION)
+  add_subdirectory(Utilities/Doxygen)
+endif()

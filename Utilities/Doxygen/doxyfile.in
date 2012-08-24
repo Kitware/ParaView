@@ -1,9 +1,9 @@
 # -------------------------------------------------------------------------
-# doxyfile for generic project
-# modified by S. Barre (Time-stamp: <2005-11-07 11:45:05 barre>
+# doxyfile for ParaView
+# modified by S. Barre (Time-stamp: <2005-12-05 12:59:07 barre>
 # -------------------------------------------------------------------------
 
-PROJECT_NAME         = @DOXYGEN_PROJECT_NAME@
+PROJECT_NAME         = ParaView
 
 FULL_PATH_NAMES      = YES
 WARN_IF_UNDOCUMENTED = NO
@@ -16,10 +16,11 @@ GENERATE_HTMLHELP    = YES
 GENERATE_LATEX       = NO
 GENERATE_MAN         = NO
 GENERATE_RTF         = NO
-GENERATE_TAGFILE     = "@CMAKE_CURRENT_BINARY_DIR@/@DOXYGEN_PROJECT_NAME@.tag"
+GENERATE_TAGFILE     = "@CMAKE_CURRENT_BINARY_DIR@/ParaView.tag"
 
-HAVE_DOT             = YES
-#HAVE_DOT            = NO
+PDF_HYPERLINKS       = YES
+
+HAVE_DOT             = @HAVE_DOT_YESNO@
 DOT_PATH             = "@DOT_PATH@"
 CLASS_GRAPH          = YES
 COLLABORATION_GRAPH  = YES
@@ -38,15 +39,44 @@ IMAGE_PATH           = "@CMAKE_CURRENT_SOURCE_DIR@"
 OUTPUT_DIRECTORY     = "@CMAKE_CURRENT_BINARY_DIR@/doc"
 
 INPUT                = \
- "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_@DOXYGEN_PROJECT_NAME@_index.dox" \
- @DOXYGEN_PARSED_INPUT_DIRS@
+          "@CMAKE_CURRENT_BINARY_DIR@/dox" \
+          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_version.dox" \
+          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events2.dox" \
+          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_events.dox" \
+          "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_ParaView_index.dox" \
+          @PV_MODULE_DIRS_DOXYGEN_ESCAPED@
 
-#TAGFILES             = "@CMAKE_CURRENT_BINARY_DIR@/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
+
+EXCLUDE_PATTERNS     =
+EXCLUDE              = \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkSetGet.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingSquaresCases.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/DataModel/vtkMarchingCubesCases.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/Core/vtkWindows.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTcl.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTk.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTclUtil.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPython.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPythonUtil.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkJavaAwt.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkJavaUtil.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkPythonUtil.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Common/vtkTclUtil.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Parallel/MPI/vtkMPI.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/Import/vtk3DS.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/Import/vtkVRML.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/IO/PLY/vtkPLY.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Rendering/OpenGL/vtkOpenGL.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Rendering/FreeType/fonts/vtkEmbeddedFonts.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Testing/Rendering/Testing/vtkRegressionTestImage.h" \
+    "@VTK_BINARY_DIR@/Utilities/Doxygen/dox/Testing/Core/Testing/vtkTestDriver.h" \
+
+# TAGFILES           = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk@VTK_MAJOR_VERSION@-nightly.tag"=http://www.vtk.org/doc/nightly/html
 TAGFILES             = @TAGFILES@
-
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO
 EXTRACT_STATIC       = YES
+EXTRACT_LOCAL_CLASSES = NO
 HIDE_UNDOC_MEMBERS   = NO
 HIDE_UNDOC_CLASSES   = YES
 ALWAYS_DETAILED_SEC  = NO
@@ -59,16 +89,18 @@ JAVADOC_AUTOBRIEF    = YES
 SORT_MEMBER_DOCS     = NO
 DISTRIBUTE_GROUP_DOC = YES
 TAB_SIZE             = 3
+DETAILS_AT_TOP       = YES
+SHORT_NAMES          = @DOXYGEN_SHORT_NAMES@
+# PAPER_TYPE           = letter
 
 FILE_PATTERNS        = *.h
-RECURSIVE            = NO
-EXCLUDE              = Common/vtkSetGet.h
-EXCLUDE_PATTERNS     =
+RECURSIVE            = YES
 
 HTML_ALIGN_MEMBERS   = YES
+
 ALPHABETICAL_INDEX   = YES
 COLS_IN_ALPHA_INDEX  = 3
-IGNORE_PREFIX        = @DOXYGEN_IGNORE_PREFIX@
+IGNORE_PREFIX        = vtkPV vtkSM vtk pq vtkCP
 
 ENABLE_PREPROCESSING = YES
 MACRO_EXPANSION      = YES
@@ -138,7 +170,15 @@ PREDEFINED  = "vtkSetMacro(name,type)= \
                    virtual void Set##name(float x, float y); \
                    virtual float *Get##name();" \
                "vtkTypeMacro(thisClass,superclass)= \
+                   typedef superclass Superclass; \
                    virtual const char *GetClassName(); \
                    static int IsTypeOf(const char *type); \
                    virtual int IsA(const char *type); \
-                   static thisClass* SafeDownCast(vtkObject *o);"
+                   static thisClass* SafeDownCast(vtkObject *o);" \
+               "vtkTypeMacro(thisClass,superclass)= \
+                   typedef superclass Superclass; \
+                   virtual const char *GetClassName(); \
+                   static int IsTypeOf(const char *type); \
+                   virtual int IsA(const char *type); \
+                   static thisClass* SafeDownCast(vtkObject *o);" \
+               "VTK_LEGACY(x)= x"
