@@ -123,7 +123,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "conversion from 'size_t' to"
 
   # ignore protobuf generated code warning
-  "vtkPVMessage.pb.h"
+  ".*vtkPVMessage.pb.h"
   "vtkSMMessage.h.*pragma GCC diagnostic"
   "/google/protobuf/"
 
