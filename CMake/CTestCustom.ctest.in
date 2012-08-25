@@ -188,5 +188,6 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "Utilities.VisItBridge.include"
   "Utilities.VisItBridge.visit_vtk"
   "Utilities.protobuf"
+  "ThirdParty.*"
   )
 
