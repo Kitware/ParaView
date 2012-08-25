@@ -326,7 +326,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->EDLShadeProgram == 0)
     {
-    this->EDLShadeProgram = vtkShaderProgram2::New();
+    this->EDLShadeProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->EDLShadeProgram->SetContext(
             static_cast<vtkOpenGLRenderWindow *>
             (this->ProjectionFBO->GetContext()));
@@ -346,7 +346,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->EDLComposeProgram == 0)
     {
-    this->EDLComposeProgram = vtkShaderProgram2::New();
+    this->EDLComposeProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->EDLComposeProgram->SetContext(
         static_cast<vtkOpenGLRenderWindow *> (this->EDLHighFBO->GetContext()));
     vtkShader2 *shader = vtkShader2::New();
@@ -365,7 +365,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->BilateralProgram == 0)
     {
-    this->BilateralProgram = vtkShaderProgram2::New();
+    this->BilateralProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->BilateralProgram->SetContext(
         static_cast<vtkOpenGLRenderWindow *> (this->EDLLowFBO->GetContext()));
     vtkShader2 *shader = vtkShader2::New();

@@ -65,6 +65,7 @@ Ph.D. thesis of Christian BOUCHENY.
 
 #include "vtkDepthImageProcessingPass.h"
 #include "vtkEyeDomeLightingModule.h" // needed for exports.
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
 class vtkOpenGLRenderWindow;
 class vtkDepthPeelingPassLayerList; // Pimpl
@@ -149,9 +150,9 @@ public:
                        // bilateral filter pass
 
   // Shader prohrams
-  vtkShaderProgram2 *EDLShadeProgram;
-  vtkShaderProgram2 *EDLComposeProgram;
-  vtkShaderProgram2 *BilateralProgram;
+  vtkSmartPointer<vtkShaderProgram2> EDLShadeProgram;
+  vtkSmartPointer<vtkShaderProgram2> EDLComposeProgram;
+  vtkSmartPointer<vtkShaderProgram2> BilateralProgram;
 
   float EDLNeighbours[32];
   bool  EDLIsFiltered;

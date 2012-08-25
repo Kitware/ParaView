@@ -62,7 +62,7 @@ class vtkTextureObject;
 class VTKEYEDOMELIGHTING_EXPORT vtkDepthImageProcessingPass : public vtkImageProcessingPass
 {
 public:
-  vtkTypeMacro(vtkDepthImageProcessingPass,vtkRenderPass);
+  vtkTypeMacro(vtkDepthImageProcessingPass, vtkImageProcessingPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
