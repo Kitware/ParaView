@@ -60,7 +60,7 @@ int vtkAMRFileSeriesReader::RequestUpdateTimeDependentInformation (vtkInformatio
     {
     return 1;
     }
-  double upTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  //double upTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
   int index  = this->ChooseInput(outInfo);
   if (index >= static_cast<int>(this->GetNumberOfFileNames()))
     {
