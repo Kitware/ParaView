@@ -128,7 +128,7 @@ protected:
   pqScalarOpacityFunction* createOpacityFunction(pqServer* server,
     const QString& arrayname, int number_of_components, int component);
 
-  /// called when a new scalar is created so that subclasses have a change to
+  /// called when a new scalar is created so that subclasses have a chance to
   /// change the default values as needed.
   virtual void initialize(pqScalarBarRepresentation*);
   
