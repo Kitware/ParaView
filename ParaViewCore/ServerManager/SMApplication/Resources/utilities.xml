@@ -83,7 +83,7 @@
       <DoubleVectorProperty default_values="0"
                             name="ScalarRangeInitialized"
                             number_of_elements="1">
-        <!-- This is used to keep track of whether the 
+        <!-- This is used to keep track of whether the
         user initialized the scalar range -->
         <BooleanDomain name="bool" />
       </DoubleVectorProperty>
@@ -180,6 +180,20 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <StringVectorProperty name="Annotations"
+        clean_command="ResetAnnotations"
+        command="SetAnnotation"
+        element_types="2 2"
+        number_of_elements_per_command="2"
+        repeat_command="1" />
+
+      <IntVectorProperty name="IndexedLookup"
+        command="SetIndexedLookup"
+        default_values="0"
+        number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <!-- End of PVLookupTable -->
     </Proxy>
   </ProxyGroup>
@@ -202,7 +216,7 @@
       </IntVectorProperty>
       <Hints>
         <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no 
+             As far as the ServerManager is concerned, Hints have no
              significance. GUI is free to interpret the hints as
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
@@ -408,7 +422,7 @@
       </DoubleVectorProperty>
       <Hints>
         <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no 
+             As far as the ServerManager is concerned, Hints have no
              significance. GUI is free to interpret the hints as
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
@@ -420,10 +434,10 @@
                     name="Normal" />
         </PropertyGroup>
         <ProxyList>
-          <!-- 
+          <!--
             ProxyList hints are used when this proxy
-            is made a part of a proxy list domain. 
-            It provides a mechanism to link certain 
+            is made a part of a proxy list domain.
+            It provides a mechanism to link certain
             properties from this proxy with properties
             from the proxy which has the property
             with the proxy list domain.
@@ -477,7 +491,7 @@
       </DoubleVectorProperty>
       <Hints>
         <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no 
+             As far as the ServerManager is concerned, Hints have no
              significance. GUI is free to interpret the hints as
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
@@ -512,7 +526,7 @@
       </DoubleVectorProperty>
       <Hints>
         <!-- Hints are metadata associated with the proxy.
-             As far as the ServerManager is concerned, Hints have no 
+             As far as the ServerManager is concerned, Hints have no
              significance. GUI is free to interpret the hints as
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
