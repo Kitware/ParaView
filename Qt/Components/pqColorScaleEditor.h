@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -49,11 +49,36 @@ class QHideEvent;
 class QShowEvent;
 class QString;
 class pqTransferFunctionChartViewWidget;
+class vtkAbstractArray;
 class vtkPlot;
 class vtkObject;
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
 
+/**\brief A dialog for editing color and/or opacity maps.
+  *
+  * This function ties the user interface elements of the color/transfer-function editor to server proxies
+  * that map from point/cell-scalars to color and/or opacity values.
+  *
+  * The \a ColorMapViewer, \a OpacityFunctionViewer, and entries of the internal \a Form member
+  * are GUI elements with proxies in \a ColorMap, \a OpacityFunction, and \a Legend.
+  * \a Display is a proxy used to obtain information on the scalar range (for interval data) or
+  * unique values (for categorical data) of the currently-active representation.
+  * If a small set of unique values exist for the currently-selected field component,
+  * it is cached in \a UniqueValues and added to the Annotations table in the UI when the user
+  * clicks on "Add ## Values" button in the "Annotations" tab of the dialog.
+  *
+  * This class does not strictly follow the Principle of Minimum Astonishment;
+  * while its "Apply" and "Close" buttons are distinct, the original state is not
+  * restored if "Close" is pressed after edits without clicking "Apply".
+  * Instead, changes are always applied when closing the dialog.
+  * Be aware that this means there is no model separate from the state stored in the GUI.
+  *
+  * The purpose behind this inconsistency is to reduce the number of renders while editing the
+  * colormap or transfer function.
+  * At a minimum, the "Apply" button should probably be placed next to the "Render immediately"
+  * checkbox and disabled when "Render immediately" is checked.
+  */
 class PQCOMPONENTS_EXPORT pqColorScaleEditor : public QDialog
 {
   Q_OBJECT
@@ -69,13 +94,22 @@ protected:
 //  virtual void showEvent(QShowEvent *e);
 //  virtual void hideEvent(QHideEvent *e);
 
+  /// Set/get a list of unique values associated with the current array that the user may draw from.
+  vtkAbstractArray* getActiveUniqueValues() { return this->ActiveUniqueValues; }
+  virtual void setActiveUniqueValues( vtkAbstractArray* );
+
 private slots:
   void updateColors();
   void updateOpacity();
 
-  void handleOpacityPointsChanged();
+  /// \name Callbacks invoked upon property changes on proxy objects
+  //@{
   void handleEnableOpacityMappingChanged();
+  void handleOpacityPointsChanged();
   void handleColorPointsChanged();
+  void handleInterpretationChanged();
+  void handleAnnotationsChanged();
+  //@}
 
   void setScalarFromText();
   void setOpacityFromText();
@@ -83,6 +117,7 @@ private slots:
   void setOpacityScalarFromText();
   void setOpacityControlsVisibility(bool visible);
   void setEnableOpacityMapping(int enable);
+  void setInterpretation( int buttonId );
   void updateDisplay();
 
   void setColorSpace(int index);
@@ -96,6 +131,8 @@ private slots:
   void savePreset();
   void loadPreset();
 
+  /// \name Range and scale (linear/log) methods
+  //@{
   void setLogScale(bool on);
 
   void setAutoRescale(bool on);
@@ -104,12 +141,24 @@ private slots:
   void rescaleToDataRangeOverTime();
   void rescaleToSimpleRange();
 
+  void setScalarRange(double min, double max);
+  //@}
+
+  /// \name Interval/ratio colormap discretization options
+  //@{
   void setUseDiscreteColors(bool on);
   void setSizeFromText();
   void setSizeFromSlider(int tableSize);
   void setTableSize(int tableSize);
+  //@}
 
-  void setScalarRange(double min, double max);
+  /// \name Annotation methods
+  //@{
+  void resetAnnotations();
+  void removeAnnotation();
+  void addActiveValues();
+  void addAnnotationEntry();
+  void annotationsChanged();
   //@}
 
   /// \name Color Legend Methods
@@ -129,7 +178,7 @@ private slots:
   void cleanupDisplay();
   void cleanupLegend();
   //@}
-  
+
   /// MakeDefaultButton callback.
   void makeDefault();
 
@@ -145,9 +194,12 @@ private slots:
   void restoreOptionalUserSettings();
 
   // Advanced/Simple management
-  void enableAvancedPanel(bool);
+  void enableAdvancedPanel(bool);
+
+
 private:
   void loadBuiltinColorPresets();
+  void loadAnnotations();
   void loadColorPoints();
   void loadOpacityPoints();
   void initColorScale();
@@ -170,6 +222,7 @@ private:
   void unsetCurrentPoints();
   void pushColors();
   void pushOpacity();
+  void pushAnnotations();
 
 private:
   pqColorScaleEditorForm *Form;
@@ -180,6 +233,7 @@ private:
   pqScalarOpacityFunction *OpacityFunction;
   pqScalarBarRepresentation *Legend;
   bool UseEnableOpacityCheckBox;
+  vtkAbstractArray* ActiveUniqueValues;
 };
 
 #endif

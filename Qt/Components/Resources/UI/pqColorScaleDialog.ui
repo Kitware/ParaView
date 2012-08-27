@@ -6,14 +6,52 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>633</width>
-    <height>595</height>
+    <width>635</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Color Scale Editor</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="ValueTypePanel">
+     <item>
+      <widget class="QLabel" name="ValueInterpretationLabel">
+       <property name="text">
+        <string>Interpret values as:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="IntervalValues">
+       <property name="text">
+        <string>Intervals or ratios</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="CategoricalValues">
+       <property name="text">
+        <string>Categories</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QTabWidget" name="ColorTabs">
      <property name="currentIndex">
@@ -437,6 +475,89 @@
           <string>Enable Opacity Function</string>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="AnnotationsPage">
+      <attribute name="title">
+       <string>Annotations</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QTableWidget" name="AnnotationTable">
+         <property name="dragDropOverwriteMode">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Annotation</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Color</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="AnnotationButtonLayout">
+         <item>
+          <widget class="QPushButton" name="RemoveAnnotation">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ResetAnnotations">
+           <property name="text">
+            <string>Delete all</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="AnnotationSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="AddActiveValues">
+           <property name="text">
+            <string>Add # Active Values</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="NewAnnotation">
+           <property name="text">
+            <string>New Entry</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -1057,7 +1178,7 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout">
+    <layout class="QHBoxLayout" name="ModelessButtonPanel">
      <item>
       <widget class="QCheckBox" name="SwitchToAdvanced">
        <property name="text">
@@ -1119,29 +1240,56 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>IntervalValues</tabstop>
+  <tabstop>CategoricalValues</tabstop>
+  <tabstop>ColorTabs</tabstop>
+  <tabstop>checkBoxImmediateRender</tabstop>
+  <tabstop>SaveButton</tabstop>
   <tabstop>PresetButton</tabstop>
+  <tabstop>pushButtonScalarColor</tabstop>
+  <tabstop>ScalarValue</tabstop>
+  <tabstop>ScalarColor</tabstop>
+  <tabstop>NanColor</tabstop>
+  <tabstop>ColorSpace</tabstop>
+  <tabstop>EnableOpacityFunction</tabstop>
+  <tabstop>opacityScalar</tabstop>
+  <tabstop>Opacity</tabstop>
+  <tabstop>ScalarOpacityUnitDistance</tabstop>
+  <tabstop>UseLogScale</tabstop>
   <tabstop>UseAutoRescale</tabstop>
   <tabstop>RescaleButton</tabstop>
   <tabstop>RescaleToDataButton</tabstop>
+  <tabstop>RescaleToDataOverTimeButton</tabstop>
   <tabstop>UseDiscreteColors</tabstop>
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>
+  <tabstop>UseLogScaleSimple</tabstop>
+  <tabstop>UseAutoRescaleSimple</tabstop>
+  <tabstop>SimpleMin</tabstop>
+  <tabstop>SimpleMax</tabstop>
+  <tabstop>PresetButtonSimple</tabstop>
+  <tabstop>SwitchToAdvanced</tabstop>
+  <tabstop>pushButtonApply</tabstop>
+  <tabstop>MakeDefaultButton</tabstop>
   <tabstop>CloseButton</tabstop>
-  <tabstop>ColorTabs</tabstop>
-  <tabstop>SaveButton</tabstop>
+  <tabstop>AnnotationTable</tabstop>
+  <tabstop>RemoveAnnotation</tabstop>
+  <tabstop>ResetAnnotations</tabstop>
+  <tabstop>AddActiveValues</tabstop>
+  <tabstop>NewAnnotation</tabstop>
   <tabstop>ShowColorLegend</tabstop>
   <tabstop>TitleName</tabstop>
   <tabstop>TitleComponent</tabstop>
   <tabstop>TitleFont</tabstop>
-  <tabstop>TitleBold</tabstop>
   <tabstop>TitleItalic</tabstop>
+  <tabstop>TitleBold</tabstop>
   <tabstop>TitleShadow</tabstop>
   <tabstop>TitleFontSize</tabstop>
   <tabstop>TitleOpacity</tabstop>
   <tabstop>TitleColorButton</tabstop>
   <tabstop>LabelFont</tabstop>
-  <tabstop>LabelBold</tabstop>
   <tabstop>LabelItalic</tabstop>
+  <tabstop>LabelBold</tabstop>
   <tabstop>LabelShadow</tabstop>
   <tabstop>LabelFontSize</tabstop>
   <tabstop>LabelOpacity</tabstop>

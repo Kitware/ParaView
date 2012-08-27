@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqStandardColorLinkAdaptor.h"
 #include "pqTransferFunctionChartViewWidget.h"
+#include "vtkAbstractArray.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
 #include "vtkColorTransferControlPointsItem.h"
@@ -68,12 +69,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkPVTemporalDataInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkType.h"
 #include "vtkSmartPointer.h"
@@ -95,11 +98,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include "QVTKWidget.h"
 
+#include <set>
+
+#define PQ_INTERPRET_INTERVAL 0
+#define PQ_INTERPRET_CATEGORY 1
+
+#define PQ_COLORS_PAGE 0
+#define PQ_ANNOTATION_PAGE 1
+#define PQ_LEGEND_PAGE 2
+
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
 {
 public:
   pqColorScaleEditorForm();
   ~pqColorScaleEditorForm() { }
+
+  void updateInterpretation( bool indexedLookup );
 
   pqPropertyLinks Links; // used to link properties on the legend
   pqPropertyLinks ReprLinks; // used to link properties on the representation.
@@ -111,12 +125,41 @@ public:
   pqSignalAdaptorComboBox *LabelFontAdaptor;
   vtkEventQtSlotConnect *Listener;
   pqColorPresetManager *Presets;
+  QButtonGroup* Interpretation;
   bool InSetColors;
+  // Is the vtkScalarsToColors SM proxy's "Annotations" property being updated via this class (the GUI)?
+  // Or, is the property being changed by the server or another client?
+  // If TRUE, we should not try to update the GUI with the new values. If FALSE, we should update the GUI to match.
+  bool InSetAnnotation;
+  bool InSetInterpretation;
   bool IgnoreEditor;
   bool MakingLegend;
   vtkSmartPointer<vtkEventQtSlotConnect> ColorFunctionConnect;
   vtkSmartPointer<vtkEventQtSlotConnect> OpacityFunctionConnect;
 };
+
+void pqColorScaleEditorForm::updateInterpretation( bool indexedLookup )
+{
+  this->Interpretation->blockSignals( true );
+  this->IntervalValues->setChecked( ! indexedLookup );
+  this->CategoricalValues->setChecked( indexedLookup );
+  this->Interpretation->blockSignals( false );
+  this->ColorTabs->setTabEnabled( PQ_COLORS_PAGE, ! indexedLookup );
+  if ( indexedLookup )
+    {
+    if ( this->ColorTabs->currentIndex() == PQ_COLORS_PAGE )
+      {
+      this->ColorTabs->setCurrentIndex( PQ_ANNOTATION_PAGE );
+      }
+    }
+  else
+    {
+    if ( this->ColorTabs->currentIndex() == PQ_ANNOTATION_PAGE )
+      {
+      this->ColorTabs->setCurrentIndex( PQ_COLORS_PAGE );
+      }
+    }
+}
 
 
 //----------------------------------------------------------------------------
@@ -132,8 +175,11 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->Listener = 0;
   this->Presets = 0;
   this->InSetColors = false;
+  this->InSetAnnotation = false;
+  this->InSetInterpretation = false;
   this->IgnoreEditor = false;
   this->MakingLegend = false;
+  this->Interpretation = new QButtonGroup;
 }
 
 //----------------------------------------------------------------------------
@@ -145,12 +191,20 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->ColorMap = 0;
   this->OpacityFunction = 0;
   this->Legend = 0;
+  this->ActiveUniqueValues = 0;
 
   // Set up the ui.
   this->Form->setupUi(this);
   this->Form->Listener = vtkEventQtSlotConnect::New();
   this->Form->Presets = new pqColorPresetManager(this);
   this->Form->Presets->restoreSettings();
+
+  // Colormap domain value interpretation: interval/ratio or categorical/nominal?
+  this->Form->Interpretation->addButton( this->Form->IntervalValues );
+  this->Form->Interpretation->addButton( this->Form->CategoricalValues );
+  this->Form->Interpretation->setId(    this->Form->IntervalValues, PQ_INTERPRET_INTERVAL );
+  this->Form->Interpretation->setId( this->Form->CategoricalValues, PQ_INTERPRET_CATEGORY );
+  this->connect( this->Form->Interpretation, SIGNAL(buttonClicked(int)), this, SLOT(setInterpretation(int)) );
 
   // Color transfer function widgets
   this->restoreOptionalUserSettings();
@@ -193,7 +247,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->ColorMapViewer->setValidBounds(validBounds);
 
   this->OpacityFunctionViewer->addCompositeFunction(0, 0, true, true);
-  vtkCompositeControlPointsItem* composite = 
+  vtkCompositeControlPointsItem* composite =
     vtkCompositeControlPointsItem::SafeDownCast(
     this->OpacityFunctionViewer->opacityFunctionPlots()[1]);
   composite->SetColorFill(true);
@@ -274,13 +328,13 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->connect(this->Form->TitleComponent, SIGNAL(textChanged(const QString &)),
       this, SLOT(setLegendComponent(const QString &)));
   this->Form->TitleColorAdaptor = new pqSignalAdaptorColor(
-      this->Form->TitleColorButton, "chosenColor", 
+      this->Form->TitleColorButton, "chosenColor",
       SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Form->TitleFontAdaptor = new pqSignalAdaptorComboBox(
       this->Form->TitleFont);
 
   this->Form->LabelColorAdaptor = new pqSignalAdaptorColor(
-      this->Form->LabelColorButton, "chosenColor", 
+      this->Form->LabelColorButton, "chosenColor",
       SIGNAL(chosenColorChanged(const QColor&)), false);
   this->Form->LabelFontAdaptor = new pqSignalAdaptorComboBox(
       this->Form->LabelFont);
@@ -297,8 +351,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Simple UI add-on
   // =========================
   this->connect( this->Form->SwitchToAdvanced, SIGNAL(toggled(bool)),
-                 this, SLOT(enableAvancedPanel(bool)));
-  this->enableAvancedPanel(this->Form->SwitchToAdvanced->isChecked());
+                 this, SLOT(enableAdvancedPanel(bool)));
+  this->enableAdvancedPanel(this->Form->SwitchToAdvanced->isChecked());
 
   this->connect( this->Form->UseLogScaleSimple, SIGNAL(toggled(bool)),
                  this, SLOT(setLogScale(bool)));
@@ -326,6 +380,10 @@ pqColorScaleEditor::~pqColorScaleEditor()
   // Save the color map presets.
   this->Form->Presets->saveSettings();
   this->saveOptionalUserSettings();
+
+  if ( this->ActiveUniqueValues )
+    this->ActiveUniqueValues->Delete();
+
   delete this->Form->LabelColorAdaptor;
   delete this->Form->TitleColorAdaptor;
   delete this->Form->LabelFontAdaptor;
@@ -353,9 +411,11 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       {
       this->disconnect(this->ColorMap, 0, this, 0);
       this->Form->Listener->Disconnect(
-          this->ColorMap->getProxy()->GetProperty("RGBPoints"));
+        this->ColorMap->getProxy()->GetProperty("RGBPoints"));
       this->Form->Listener->Disconnect(
-          this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"));
+        this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"));
+      this->Form->Listener->Disconnect(
+        this->ColorMap->getProxy()->GetProperty( "Annotations" ) );
       }
 
     if(this->OpacityFunction)
@@ -391,11 +451,65 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       this->Form->Listener->Connect(
           this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping"),
           vtkCommand::ModifiedEvent, this, SLOT(handleEnableOpacityMappingChanged()));
+      this->Form->Listener->Connect(
+        this->ColorMap->getProxy()->GetProperty( "IndexedLookup" ),
+        vtkCommand::ModifiedEvent, this, SLOT(handleInterpretationChanged()) );
+      this->Form->Listener->Connect(
+        this->ColorMap->getProxy()->GetProperty( "Annotations" ),
+        vtkCommand::ModifiedEvent, this, SLOT(handleAnnotationsChanged()) );
+
+      //bool indexMode = this->ColorMap->getIndexedLookup();
+      //this->Form->updateInterpretation( indexMode );
+      }
+
+    QString colorArrayName = display->getProxyColorArrayName();
+    int acomp = ( display->getLookupTable()->getVectorMode() == pqScalarsToColors::MAGNITUDE ? -1 :
+      display->getLookupTable()->getVectorComponent() );
+    vtkPVArrayInformation* ainfo = display->getProxyColorArrayInfo();
+    //cout << "Color by " << colorArrayName.toAscii().data() << " comp " << acomp << " info " << ainfo << "\n";
+    if ( ainfo )
+      {
+      if ( acomp == -1 && ainfo->GetNumberOfComponents() == 1 )
+        {
+        acomp = 0;
+        }
+      vtkAbstractArray* uniq = ainfo->GetUniqueComponentValuesIfFDiscrete( acomp );
+      if ( uniq )
+        {
+        //cout << "  " << uniq->GetNumberOfTuples() << " unique values" << "\n";
+        // If the lookup table doesn't have any entries and the active representation has a small set, populate the lookup table
+        // with these values by default. Otherwise, let the user add any new values with the "Add ## active values" button.
+        //if ( this->ColorMap->GetNumberOfAnnotations() == 0 )
+        if ( 1 )
+          {
+          for ( vtkIdType i = 0; i < uniq->GetNumberOfTuples(); ++ i )
+            {
+            int nxtRow = this->Form->AnnotationTable->rowCount();
+            this->Form->AnnotationTable->insertRow( nxtRow );
+            QTableWidgetItem* valItem = new QTableWidgetItem( QString( uniq->GetVariantValue( i ).ToString().c_str() ) );
+            QTableWidgetItem* txtItem = new QTableWidgetItem( QString( uniq->GetVariantValue( i ).ToString().c_str() ) );
+            this->Form->AnnotationTable->setItem( nxtRow, 0, valItem );
+            this->Form->AnnotationTable->setItem( nxtRow, 1, txtItem );
+
+            //cout << "    " << uniq->GetVariantValue( i ).ToString() << "\n";
+            }
+          }
+        else
+          {
+          this->setActiveUniqueValues( uniq );
+          }
+        uniq->Delete();
+        }
+      else
+        {
+        cout << "  No small set of values\n";
+        }
       }
     }
 
   // Disable the gui elements if the color map is null.
   this->Form->ColorTabs->setEnabled(this->ColorMap != 0);
+
   this->initColorScale();
   if(this->ColorMap)
     {
@@ -404,6 +518,9 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
     this->Form->ShowColorLegend->setEnabled(renderModule != 0);
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
     }
+  QObject::connect(
+    this->Form->AnnotationTable, SIGNAL(cellChanged(int,int)),
+    this, SLOT(annotationsChanged()) );
 
   // update opacity mapping gui elements
   this->handleEnableOpacityMappingChanged();
@@ -425,6 +542,7 @@ void pqColorScaleEditor::pushColors()
     this->ColorMapViewer->plots<vtkColorTransferControlPointsItem>())
     {
     vtkColorTransferFunction* tf=plot->GetColorTransferFunction();
+    tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
     int total = tf->GetSize();
     for(int i = 0; i < total; i++)
       {
@@ -439,10 +557,10 @@ void pqColorScaleEditor::pushColors()
       rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
       }
     }
-    
+
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
   pqSMAdaptor::setMultipleElementProperty(
-      lookupTable->GetProperty("RGBPoints"), rgbPoints);
+    lookupTable->GetProperty("RGBPoints"), rgbPoints);
   this->Form->InSetColors = false;
   lookupTable->UpdateVTKObjects();
   this->renderViewOptionally();
@@ -470,7 +588,7 @@ void pqColorScaleEditor::pushOpacity()
       opacityPoints << scalar[0] << scalar[1] << scalar[2] << scalar[3];
       }
     }
-    
+
   vtkSMProxy *points = this->OpacityFunction->getProxy();
   vtkSMDoubleVectorProperty* smProp = vtkSMDoubleVectorProperty::SafeDownCast(
     points->GetProperty("Points"));
@@ -482,31 +600,40 @@ void pqColorScaleEditor::pushOpacity()
   this->renderViewOptionally();
 }
 
-void pqColorScaleEditor::handleColorPointsChanged()
+void pqColorScaleEditor::pushAnnotations()
 {
-  // If the point change was not generated by setColors, update the
-  // points in the editor.
-  if(!this->Form->InSetColors)
+  if ( ! this->ColorMap || this->Form->InSetAnnotation )
     {
-    vtkControlPointsItem* currentItem=this->ColorMapViewer->
-      currentControlPointsItem();
-    int index = currentItem ?
-      currentItem->GetCurrentPoint() : -1;
-
-    // Load the new points.
-    this->Form->IgnoreEditor = true;
-    this->loadColorPoints();
-
-    // Set the current point on the editor.
-    if(index != -1 && this->ColorMapViewer->currentControlPointsItem())
-      {
-      this->ColorMapViewer->currentControlPointsItem()->SetCurrentPoint(index);
-      }
-
-    // Update the displayed values.
-    this->Form->IgnoreEditor = false;
-    this->updateCurrentColorPoint();
+    return;
     }
+
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  //int total = tf->GetNumberOfAnnotatedValues();
+  int total = this->Form->AnnotationTable->rowCount();
+  tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
+
+  vtkSMProxy* lookupTable = this->ColorMap->getProxy();
+  tf->ResetAnnotations();
+  QList<QVariant> categories;
+  for ( int i = 0; i < total; ++ i )
+    {
+    QString val = this->Form->AnnotationTable->item( i, 0 )->text();
+    QString txt = this->Form->AnnotationTable->item( i, 1 )->text();
+    std::cout << "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n";
+    tf->SetAnnotation( val.toStdString(), txt.toStdString() );
+    categories << val << txt;
+    }
+  this->Form->InSetInterpretation = true;
+  pqSMAdaptor::setElementProperty(
+    lookupTable->GetProperty( "IndexedLookup" ), tf->GetIndexedLookup() );
+  this->Form->InSetInterpretation = false; //FIXME: Here, or after UpdateVTKObjects() call below?
+  this->Form->InSetAnnotation = true;
+  pqSMAdaptor::setMultipleElementProperty(
+    lookupTable->GetProperty( "Annotations" ), categories );
+
+  lookupTable->UpdateVTKObjects();
+  this->renderViewOptionally();
+  this->Form->InSetAnnotation = false;
 }
 
 void pqColorScaleEditor::handleEnableOpacityMappingChanged()
@@ -551,6 +678,63 @@ void pqColorScaleEditor::handleOpacityPointsChanged()
     this->updateCurrentOpacityPoint();
     }
 }
+
+void pqColorScaleEditor::handleColorPointsChanged()
+{
+  // If the point change was not generated by setColors, update the
+  // points in the editor.
+  if(!this->Form->InSetColors)
+    {
+    // Save the index of the point currently being edited
+    vtkControlPointsItem* currentItem=this->ColorMapViewer->
+      currentControlPointsItem();
+    int index = currentItem ?
+      currentItem->GetCurrentPoint() : -1;
+
+    // Load the new points.
+    this->Form->IgnoreEditor = true;
+    this->loadColorPoints();
+
+    // Restore the current point being edited to its value before loadColorPoints() was called.
+    if(index != -1 && this->ColorMapViewer->currentControlPointsItem())
+      {
+      this->ColorMapViewer->currentControlPointsItem()->SetCurrentPoint(index);
+      }
+
+    // Update the displayed values.
+    this->Form->IgnoreEditor = false;
+    this->updateCurrentColorPoint();
+    }
+}
+
+/// Update the GUI radio buttons that indicate how to interpret the data when the SM proxy's IndexedLookup property changes
+void pqColorScaleEditor::handleInterpretationChanged()
+{
+  // Only update the radio button states when the proxy change is *not* generated
+  // by the user clicking on the radio buttons. :-) 
+  if ( ! this->Form->InSetInterpretation && this->ColorMap )
+    {
+    bool indexedLookup = this->ColorMap->getIndexedLookup();
+    this->Form->updateInterpretation( indexedLookup );
+    /*
+    vtkColorTransferFunction* colors =this->currentColorFunction();
+    colors->SetIndexedLookup( indexedLookup );
+    this->pushColors();
+    */
+    }
+}
+
+/// A wrapper around loadAnnotations that saves (and restores) the selected annotations before (and after) loading.
+void pqColorScaleEditor::handleAnnotationsChanged()
+{
+  if ( ! this->Form->InSetAnnotation )
+    {
+    // TODO. Save selection
+    this->loadAnnotations();
+    // TODO. Restore selection
+    }
+}
+
 void pqColorScaleEditor::setScalarFromText()
 {
   vtkColorTransferFunction* colors = this->currentColorFunction();
@@ -1082,7 +1266,7 @@ void pqColorScaleEditor::loadPreset()
         this->Form->ScalarColor->blockSignals(true);
         this->Form->ScalarColor->setChosenColor(color);
         this->Form->ScalarColor->blockSignals(false);
-        this->setScalarColor(color);        
+        this->setScalarColor(color);
         }
       else
         {
@@ -1135,28 +1319,6 @@ void pqColorScaleEditor::setAutoRescale(bool on)
 }
 
 //-----------------------------------------------------------------------------
-void pqColorScaleEditor::rescaleToSimpleRange()
-{
-  if(!this->Form->UseAutoRescaleSimple->isChecked() && !this->Form->SwitchToAdvanced->isChecked())
-    {
-    bool okMin = true, okMax = true;
-    double min = this->Form->SimpleMin->text().toDouble(&okMin);
-    double max = this->Form->SimpleMax->text().toDouble(&okMax);
-    if(okMin && okMax)
-      {
-      QPair<double, double> range;
-      this->Form->InSetColors = true;
-      this->unsetCurrentPoints();
-      this->setScalarRange(min, max);
-      this->Form->InSetColors = false;
-      range = this->ColorMap->getScalarRange();
-      this->updateScalarRange(range.first, range.second);
-      this->updateCurrentColorPoint();
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqColorScaleEditor::rescaleToNewRange()
 {
   // Launch the rescale range dialog to get the new range.
@@ -1174,6 +1336,27 @@ void pqColorScaleEditor::rescaleToNewRange()
     this->updateScalarRange(range.first, range.second);
     this->updateCurrentColorPoint();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqColorScaleEditor::rescaleToDataRange()
+{
+  this->Form->InSetColors = true;
+  this->unsetCurrentPoints();
+  pqPipelineRepresentation *pipeline =
+      qobject_cast<pqPipelineRepresentation *>(this->Display);
+  if(pipeline)
+    {
+    pipeline->resetLookupTableScalarRange();
+    pipeline->renderViewEventually();
+    if(this->ColorMap)
+      {
+      QPair<double, double> range = this->ColorMap->getScalarRange();
+      this->updateScalarRange(range.first, range.second);
+      this->updateCurrentColorPoint();
+      }
+    }
+  this->Form->InSetColors = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1208,24 +1391,40 @@ void pqColorScaleEditor::rescaleToDataRangeOverTime()
 }
 
 //-----------------------------------------------------------------------------
-void pqColorScaleEditor::rescaleToDataRange()
+void pqColorScaleEditor::rescaleToSimpleRange()
 {
-  this->Form->InSetColors = true;
-  this->unsetCurrentPoints();
-  pqPipelineRepresentation *pipeline =
-      qobject_cast<pqPipelineRepresentation *>(this->Display);
-  if(pipeline)
+  if(!this->Form->UseAutoRescaleSimple->isChecked() && !this->Form->SwitchToAdvanced->isChecked())
     {
-    pipeline->resetLookupTableScalarRange();
-    pipeline->renderViewEventually();
-    if(this->ColorMap)
+    bool okMin = true, okMax = true;
+    double min = this->Form->SimpleMin->text().toDouble(&okMin);
+    double max = this->Form->SimpleMax->text().toDouble(&okMax);
+    if(okMin && okMax)
       {
-      QPair<double, double> range = this->ColorMap->getScalarRange();
+      QPair<double, double> range;
+      this->Form->InSetColors = true;
+      this->unsetCurrentPoints();
+      this->setScalarRange(min, max);
+      this->Form->InSetColors = false;
+      range = this->ColorMap->getScalarRange();
       this->updateScalarRange(range.first, range.second);
       this->updateCurrentColorPoint();
       }
     }
+}
+
+void pqColorScaleEditor::setScalarRange(double min, double max)
+{
+this->Form->InSetColors = true;
+  // Update the opacity function if volume rendering.
+  if(this->OpacityFunction)
+    {
+    this->OpacityFunction->setScalarRange(min, max);
+    }
+
+  // Update the color map and the rendered views.
+  this->ColorMap->setScalarRange(min, max);
   this->Form->InSetColors = false;
+  this->renderViewOptionally();
 }
 
 //-----------------------------------------------------------------------------
@@ -1278,19 +1477,39 @@ void pqColorScaleEditor::setTableSize(int tableSize)
     }
 }
 
-void pqColorScaleEditor::setScalarRange(double min, double max)
+void pqColorScaleEditor::resetAnnotations()
 {
-this->Form->InSetColors = true;
-  // Update the opacity function if volume rendering.
-  if(this->OpacityFunction)
-    {
-    this->OpacityFunction->setScalarRange(min, max);
-    }
+  this->Form->AnnotationTable->clear();
+}
 
-  // Update the color map and the rendered views.
-  this->ColorMap->setScalarRange(min, max);
-  this->Form->InSetColors = false;
-  this->renderViewOptionally();
+void pqColorScaleEditor::removeAnnotation()
+{
+  std::set<int> rows;
+  QList<QTableWidgetItem*> seln = this->Form->AnnotationTable->selectedItems();
+  QList<QTableWidgetItem*>::iterator it;
+  for ( it = seln.begin(); it != seln.end(); ++ it )
+    {
+    rows.insert( this->Form->AnnotationTable->row( *it ) );
+    }
+  for ( std::set<int>::iterator sit = rows.begin(); sit != rows.end(); ++ sit )
+    {
+    this->Form->AnnotationTable->removeRow( *sit );
+    }
+}
+
+void pqColorScaleEditor::addActiveValues()
+{
+}
+
+void pqColorScaleEditor::addAnnotationEntry()
+{
+  this->Form->AnnotationTable->insertRow( 0 );
+}
+
+void pqColorScaleEditor::annotationsChanged()
+{
+  // Reset annotations on local and proxy color transfer functions.
+  this->pushAnnotations();
 }
 
 void pqColorScaleEditor::checkForLegend()
@@ -1315,8 +1534,8 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       pqLookupTableManager* lutManager =
         pqApplicationCore::instance()->getLookupTableManager();
       pqScalarBarRepresentation* legend = lutManager->setScalarBarVisibility(
-        this->Display, visible);     
-      
+        this->Display, visible);
+
       this->setLegend(legend);
       this->Form->MakingLegend = false;
       }
@@ -1427,6 +1646,41 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 
   // cleanup parser
   xmlParser->Delete();
+}
+
+/// Update the GUI annotations table with values from the SM proxy.
+void pqColorScaleEditor::loadAnnotations()
+{
+  QTableWidget* anno = this->Form->AnnotationTable;
+  if ( ! anno )
+    {
+    return;
+    }
+
+  // Only update from the proxy when we aren't responsible for the changes in the proxy.
+  if ( ! this->Form->InSetAnnotation )
+    {
+    // Empty previous entries.
+    anno->clear();
+
+    QList<QVariant> list;
+    vtkSMProxy* lookupTable = this->ColorMap->getProxy();
+    vtkSMStringVectorProperty* smProp = vtkSMStringVectorProperty::SafeDownCast(
+      lookupTable->GetProperty( "Annotations" ) );
+    int numPerCmd = smProp->GetNumberOfElementsPerCommand();
+    if( numPerCmd != 2 )
+      {
+      return;
+      }
+    list = pqSMAdaptor::getMultipleElementProperty( smProp );
+    anno->setRowCount( list.size() / 2 );
+    for ( int i = 0; (i + 1) < list.size(); i += 2 )
+      {
+      int row = i / 2;
+      anno->item( row, 0 )->setText( list[i].toString() );
+      anno->item( row, 0 )->setText( list[i + 1].toString() );
+      }
+    }
 }
 
 void pqColorScaleEditor::loadColorPoints()
@@ -1658,7 +1912,7 @@ void pqColorScaleEditor::initColorScale()
         this->Form->UseLogScale->isChecked() ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
       }
     }
-  
+
   // Update the displayed current point index.
   this->Form->IgnoreEditor = false;
   if(this->Display)
@@ -1676,7 +1930,7 @@ void pqColorScaleEditor::initColorScale()
     }
   this->ColorMapViewer->blockSignals(false);
   this->OpacityFunctionViewer->blockSignals(false);
-  
+
 }
 
 void pqColorScaleEditor::enablePointControls()
@@ -1779,7 +2033,7 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
 
     // Connect the legend controls.
     vtkSMProxy *proxy = this->Legend->getProxy();
-    this->Form->Links.addPropertyLink(this->Form->TitleColorAdaptor, 
+    this->Form->Links.addPropertyLink(this->Form->TitleColorAdaptor,
         "color", SIGNAL(colorChanged(const QVariant&)),
         proxy, proxy->GetProperty("TitleColor"));
     this->Form->Links.addPropertyLink(this->Form->TitleFontAdaptor,
@@ -1801,7 +2055,7 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         this->Form->TitleOpacity, "value", SIGNAL(valueChanged(double)),
         proxy, proxy->GetProperty("TitleOpacity"));
 
-    this->Form->Links.addPropertyLink(this->Form->LabelColorAdaptor, 
+    this->Form->Links.addPropertyLink(this->Form->LabelColorAdaptor,
         "color", SIGNAL(colorChanged(const QVariant&)),
         proxy, proxy->GetProperty("LabelColor"));
     this->Form->Links.addPropertyLink(this->Form->LabelFontAdaptor,
@@ -1815,7 +2069,7 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         proxy, proxy->GetProperty("LabelItalic"));
     this->Form->Links.addPropertyLink(
         this->Form->LabelShadow, "checked", SIGNAL(toggled(bool)),
-        proxy, proxy->GetProperty("LabelShadow"));   
+        proxy, proxy->GetProperty("LabelShadow"));
     this->Form->Links.addPropertyLink(
         this->Form->LabelFontSize, "value", SIGNAL(editingFinished()),
         proxy, proxy->GetProperty("LabelFontSize"), 1);
@@ -1824,14 +2078,14 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         proxy, proxy->GetProperty("LabelOpacity"));
     this->Form->Links.addPropertyLink(
         this->Form->AutomaticLabelFormat, "checked", SIGNAL(toggled(bool)),
-        proxy, proxy->GetProperty("AutomaticLabelFormat"));   
+        proxy, proxy->GetProperty("AutomaticLabelFormat"));
     this->Form->Links.addPropertyLink(
         this->Form->LabelFormat, "text", SIGNAL(editingFinished()),
         proxy, proxy->GetProperty("LabelFormat"));
     this->connect(this->Form->AutomaticLabelFormat, SIGNAL(toggled(bool)),
                   this, SLOT(updateLabelFormatControls()));
     this->updateLabelFormatControls();
-    
+
     this->Form->Links.addPropertyLink(this->Form->NumberOfLabels,
         "value", SIGNAL(valueChanged(int)),
         proxy, proxy->GetProperty("NumberOfLabels"));
@@ -1902,7 +2156,7 @@ void pqColorScaleEditor::initTransferFunctionView()
   this->OpacityFunctionViewer->clearPlots();
   QObject::connect(this->ColorMapViewer, SIGNAL(plotAdded(vtkPlot*)),
     this, SLOT(onColorPlotAdded(vtkPlot*)));
-    
+
   QObject::connect(this->OpacityFunctionViewer, SIGNAL(plotAdded(vtkPlot*)),
     this, SLOT(onOpacityPlotAdded(vtkPlot*)));
 }
@@ -1914,7 +2168,7 @@ void pqColorScaleEditor::onColorPlotAdded(vtkPlot* plot)
     this->Form->ColorFunctionConnect->Connect(plot,
       vtkControlPointsItem::CurrentPointChangedEvent,
       this, SLOT(updateColors()));
-    QObject::connect(this->ColorMapViewer, 
+    QObject::connect(this->ColorMapViewer,
       SIGNAL(currentPointEdited()), this, SLOT(updateColors()));
 
     vtkColorTransferControlPointsItem* currentItem=
@@ -2052,7 +2306,7 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
       this->Form->Opacity->setText(QString::number(opacity, 'g', 6));
       this->Form->opacityScalar->setText(QString::number(range[0], 'g', 6));
       }
-    }    
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -2150,7 +2404,7 @@ bool pqColorScaleEditor::internalScalarRange(double* range)
     {
     return false;
     }
-  
+
   QPair<double, double> curRange = this->ColorMap->getScalarRange();
   range[0] = curRange.first;
   range[1] = curRange.second;
@@ -2278,6 +2532,21 @@ void pqColorScaleEditor::setEnableOpacityMapping(int enable)
 }
 
 // ----------------------------------------------------------------------------
+void pqColorScaleEditor::setInterpretation( int buttonId )
+{
+  bool indexedLookup = ( buttonId == PQ_INTERPRET_CATEGORY );
+  //this->Form->updateInterpretation( indexedLookup );
+  this->Form->InSetInterpretation = true;
+  this->ColorMap->setIndexedLookup( indexedLookup );
+  // TODO: Do we want to update \a colors?
+  //       The ColorTab should be disabled when indexedLookup is true, so we should never see it...
+  vtkColorTransferFunction* colors = this->currentColorFunction();
+  colors->SetIndexedLookup( indexedLookup );
+  //this->pushInterpretation();
+  this->Form->InSetInterpretation = false;
+}
+
+// ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateDisplay()
 {
   if(this->Form->InSetColors)
@@ -2319,6 +2588,26 @@ void pqColorScaleEditor::unsetCurrentPoints()
     currentItem->SetCurrentPoint(-1);
     }
 }
+
+// ----------------------------------------------------------------------------
+void pqColorScaleEditor::setActiveUniqueValues( vtkAbstractArray* arr )
+{
+  if ( this->ActiveUniqueValues == arr )
+    return;
+
+  if ( this->ActiveUniqueValues )
+    {
+    this->ActiveUniqueValues->Delete();
+    }
+
+  this->ActiveUniqueValues = arr;
+
+  if ( this->ActiveUniqueValues )
+    {
+    this->ActiveUniqueValues->Register( 0 );
+    }
+}
+
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateColors()
 {
@@ -2332,7 +2621,7 @@ void pqColorScaleEditor::updateOpacity()
   this->pushOpacity();
 }
 // ----------------------------------------------------------------------------
-void pqColorScaleEditor::enableAvancedPanel(bool checked)
+void pqColorScaleEditor::enableAdvancedPanel(bool checked)
 {
   // Collapse
   this->Form->ColorTabs->setVisible(false);
