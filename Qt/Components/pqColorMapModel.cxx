@@ -135,6 +135,7 @@ pqColorMapModel::pqColorMapModel(QObject *parentObject)
   this->Internal = new pqColorMapModelInternal();
   this->Space = pqColorMapModel::HsvSpace;
   this->NanColor = QColor(127, 0, 0);
+  this->IndexedLookup = false;
   this->InModify = false;
 }
 
@@ -144,6 +145,7 @@ pqColorMapModel::pqColorMapModel(const pqColorMapModel &other)
   this->Internal = new pqColorMapModelInternal();
   this->Space = other.Space;
   this->NanColor = other.NanColor;
+  this->IndexedLookup = false;
   this->InModify = false;
 
   // Copy the list of points.
@@ -416,6 +418,23 @@ void pqColorMapModel::setNanColor(const QColor &color)
     if (!this->InModify)
       {
       emit nanColorChanged(this->NanColor);
+      }
+    }
+}
+
+bool pqColorMapModel::getIndexedLookup() const
+{
+  return this->IndexedLookup;
+}
+
+void pqColorMapModel::setIndexedLookup( bool indexedLookup )
+{
+  if ( this->IndexedLookup != indexedLookup )
+    {
+    this->IndexedLookup = indexedLookup;
+    if  ( ! this->InModify )
+      {
+      emit indexedLookupChanged( this->IndexedLookup );
       }
     }
 }

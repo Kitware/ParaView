@@ -96,6 +96,9 @@ public:
   void getNanColor(QColor &color) const;
   void setNanColor(const QColor &color);
 
+  bool getIndexedLookup() const;
+  void setIndexedLookup( bool isCategorical );
+
   /// \brief
   ///   Scales the current points to fit in the given range.
   /// \note
@@ -165,10 +168,16 @@ signals:
   /// \param opacity The new opacity for the point.
   void opacityChanged(int index, const pqChartValue &opacity);
 
+  /// \brief
+  ///   Emitted when the color loookup mode changes.
+  /// \param The new value for the lookup mode (true for categorical/indexed lookup, false otherwise)
+  void indexedLookupChanged( bool newIndexLookupValue );
+
 private:
   pqColorMapModelInternal *Internal; ///< Stores the points.
   ColorSpace Space;                  ///< Stores the color space.
   QColor NanColor;                   ///< Stores the NaN color.
+  bool IndexedLookup;                ///< True if annotations should be mapped by index to colors.
   bool InModify;                     ///< True if in modify mode.
 };
 
