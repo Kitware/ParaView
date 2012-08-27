@@ -41,6 +41,7 @@ class vtkStructuredGrid;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridGeometryFilter;
 class vtkAMRBox;
+class vtkOverlappingAMR;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
@@ -144,10 +145,10 @@ protected:
   // Description:
   // A helper method which, given the AMR box of the data in question
   // and the root AMR box, determines whether or not the block is visible.
-  bool IsAMRDataVisible( vtkAMRBox &amrBox,
-                         vtkAMRBox &rootBox,
-                         bool faceextract[6] );
-
+  bool IsAMRDataVisible(vtkOverlappingAMR* amr,
+                        unsigned int level,
+                        unsigned int id,
+                        bool extractface[6] );
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
