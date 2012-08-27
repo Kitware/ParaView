@@ -319,6 +319,21 @@ void pqScalarsToColors::setVectorMode(Mode mode, int comp)
 }
 
 //-----------------------------------------------------------------------------
+bool pqScalarsToColors::getIndexedLookup()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  return pqSMAdaptor::getElementProperty( proxy->GetProperty( "IndexedLookup" ) ).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setIndexedLookup( bool indexedLookup )
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty( proxy->GetProperty( "IndexedLookup" ), indexedLookup );
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
   foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
