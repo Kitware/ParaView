@@ -147,12 +147,26 @@ endmacro()
 # searching for the plugins available, providing options for enabling them and
 # then processing the cmake files for enabled plugins.
 macro(pv_process_plugins root_src root_build)
-  set (PARAVIEW_PLUGINS_ALL)
+  set(PARAVIEW_EXTERNAL_PLUGIN_DIRS "" CACHE STRING
+      "Semi-colon seperated paths to extrenal plugin directories.")
+  mark_as_advanced(PARAVIEW_EXTERNAL_PLUGIN_DIRS)
 
+  set (PARAVIEW_PLUGINS_ALL)
   pv_plugin_search_under_root(${root_src} ${root_build})
 
   # search for available plugins and load information about them.
   pv_plugin_search_from_paths()
+
+  # if PARAVIEW_EXTERNAL_PLUGIN_DIRS is specified, we scan those directories
+  # too.
+  if (PARAVIEW_EXTERNAL_PLUGIN_DIRS)
+    foreach(extra_dir ${PARAVIEW_EXTERNAL_PLUGIN_DIRS})
+      get_filename_component(dir_name "${extra_dir}" NAME)
+      message(STATUS "Processing external plugins under '$extra_dir}'")
+      set (build_dir "${ParaView_BINARY_DIR}/ExternalPlugins/${dir_name}")
+      pv_plugin_search_under_root("${extra_dir}" "${build_dir}")
+    endforeach()
+  endif()
 
   # provide options that user can use to enable/disable plugins.
   foreach (pv-plugin IN LISTS PARAVIEW_PLUGINS_ALL)
