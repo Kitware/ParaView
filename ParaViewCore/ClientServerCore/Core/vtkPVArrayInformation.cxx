@@ -32,6 +32,8 @@
 #include <vector>
 #include <vtksys/ios/sstream>
 
+#define VTK_MAX_CATEGORICAL_VALS (32)
+
 namespace
 {
   typedef std::vector<vtkStdString*> vtkInternalComponentNameBase;
@@ -653,41 +655,56 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
     this->UniqueValues = new vtkInternalUniqueValues;
     }
   int nc = this->GetNumberOfComponents();
-  std::vector<int> componentCount( nc + 1, 0 );
+  std::vector<int> componentCount( nc + 1 );
   int ndc = nc; // number of discrete components remaining (tracked during iteration)
   std::pair<vtkInternalUniqueValues::mapped_type::iterator,bool> result;
+  std::set<std::vector<vtkVariant> > uniqueVectors;
+  std::vector<vtkVariant> uv( nc );
   vtkVariantArray* tuple;
-  for ( vtkIdType i = 0; i < this->GetNumberOfTuples() && ndc; ++ i )
+  // Here we iterate over the components and add to their respective lists of previously encountered
+  // values -- as long as there are not too many values already in the list. We also accumulate each
+  // component's value into a vtkVariantArray named tuple, which is added to the list of unique vectors
+  // -- again assuming it is not already too long.
+  for ( vtkIdType i = 0; i < this->GetNumberOfTuples() && ndc && tuple; ++ i )
     {
-    if ( ndc == nc )
-      tuple = vtkVariantArray::New();
-
-    // First, do a component-wise insert.
+    // First, do per-component insert.
     for ( int j = 0; j < nc; ++ j )
       {
-      if ( componentCount[j] > 127 )
+      if ( componentCount[j] > VTK_MAX_CATEGORICAL_VALS )
         continue;
-      result = (*this->UniqueValues)[j].insert( array->GetVariantValue( i * nc + j ) );
+      uv[j] = array->GetVariantValue( i * nc + j );
+      result = (*this->UniqueValues)[j].insert( uv[j] );
       if ( result.second )
         {
-        if ( ++ componentCount[j] > 127 )
+        if ( ++ componentCount[j] > VTK_MAX_CATEGORICAL_VALS )
           {
           -- ndc;
-          tuple->Delete();
           }
         }
-      tuple->InsertNextValue( *result.first );
       }
-    if ( componentCount[nc] < 128 && ndc == nc )
+    // Now, as long as no component has exceeded VTK_MAX_CATEGORICAL_VALS unique values, it is
+    // worth seeing whether the vector as a whole is unique:
+    if ( ndc == nc )
       {
-      result = (*this->UniqueValues)[nc].insert( tuple );
-      if ( result.second )
-        ++ componentCount[nc];
+      std::pair<std::set<std::vector<vtkVariant> >::iterator,bool> vres = uniqueVectors.insert( uv );
+      if ( vres.second )
+        {
+        if ( ++ componentCount[nc] <= VTK_MAX_CATEGORICAL_VALS )
+          {
+          tuple = vtkVariantArray::New();
+          tuple->SetNumberOfComponents( nc );
+          tuple->SetNumberOfTuples( 1 );
+          for ( int j = 0; j < nc; ++ j )
+            tuple->SetVariantValue( j, uv[j] );
+          result = (*this->UniqueValues)[nc].insert( tuple );
+          tuple->Delete(); // now only owned by vtkVariant in UniqueValues
+          }
+        }
       }
     }
   for ( int i = 0; i <= nc; ++ i )
     {
-    if ( (*this->UniqueValues)[i].size() > 127 )
+    if ( (*this->UniqueValues)[i].size() >= VTK_MAX_CATEGORICAL_VALS )
       this->UniqueValues->erase( i );
     }
 }
@@ -1064,10 +1081,10 @@ void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
       { // Add info's values to our list of unique keys
       for ( vit = cit->second.begin(); vit != cit->second.end(); ++ vit )
         {
-        if ( (*this->UniqueValues)[i].insert( *vit ).second && this->UniqueValues->size() > 127 )
+        if ( (*this->UniqueValues)[i].insert( *vit ).second && this->UniqueValues->size() > VTK_MAX_CATEGORICAL_VALS - 1 )
           break;
         }
-      if ( this->UniqueValues->size() > 127 )
+      if ( this->UniqueValues->size() > VTK_MAX_CATEGORICAL_VALS - 1 )
         tooManyValues = true;
       }
     // If the union of values is too large, delete the list of values
