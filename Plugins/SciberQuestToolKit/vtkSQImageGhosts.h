@@ -74,9 +74,6 @@ public:
   MPI_Comm GetCommunicator(){ return this->Comm; }
 
 protected:
-  //int FillInputPortInformation(int port, vtkInformation *info);
-  //int FillOutputPortInformation(int port, vtkInformation *info);
-  //int RequestDataObject(vtkInformation*,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec);
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
   int RequestUpdateExtent(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
   int RequestInformation(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);

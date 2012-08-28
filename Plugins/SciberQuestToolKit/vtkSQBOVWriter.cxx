@@ -21,7 +21,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkInformationIntegerVectorKey.h"
 #include "vtkPointData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include "vtkMultiProcessController.h"
 #include "vtkExtentTranslator.h"
 #include "vtkPVXMLElement.h"
@@ -47,6 +46,8 @@ using std::max;
 
 #include <sstream>
 using std::ostringstream;
+
+typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
 // #define vtkSQBOVWriterDEBUG
 // #define vtkSQBOVWriterTIME
@@ -91,7 +92,7 @@ vtkSQBOVWriter::vtkSQBOVWriter()
   this->IncrementalMetaData=0;
   this->WriteAllTimeSteps=0;
   this->TimeStepId=0;
-  this->UseCollectiveIO=HINT_DISABLED;
+  this->UseCollectiveIO=HINT_ENABLED;
   this->NumberOfIONodes=0;
   this->CollectBufferSize=0;
   this->UseDirectIO=HINT_AUTOMATIC;
@@ -102,17 +103,6 @@ vtkSQBOVWriter::vtkSQBOVWriter()
   this->StripeCount=0;
   this->WorldRank=0;
   this->WorldSize=1;
-
-  this->HostName[0]='\0';
-  #if defined vtkSQBOVWriterDEBUG
-  char hostname[HOST_NAME_MAX];
-  gethostname(hostname,HOST_NAME_MAX);
-  hostname[4]='\0';
-  for (int i=0; i<5; ++i)
-    {
-    this->HostName[i]=hostname[i];
-    }
-  #endif
 
   #ifdef SQTK_WITHOUT_MPI
   vtkErrorMacro(
@@ -244,8 +234,10 @@ int vtkSQBOVWriter::Initialize(vtkPVXMLElement *root)
 void vtkSQBOVWriter::SetFileName(const char* _arg)
 {
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::SetFileName" << endl;
-  pCerr() << "Set FileName " << safeio(_arg) << "." << endl;
+  ostringstream oss;
+  oss
+    << "=====vtkSQBOVWriter::SetFileName" << endl
+    << "Set FileName " << safeio(_arg) << "." << endl;
   #endif
   #if defined vtkSQBOVWriterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -290,15 +282,15 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
       }
 
     #if defined vtkSQBOVWriterDEBUG
-    pCerr()
-      << "vtkSQBOVWriter "
-      << this->HostName << " "
-      << this->WorldRank
-      << " Open succeeded." << endl;
+    oss << " Open succeeded." << endl;
     #endif
     }
 
   this->Modified();
+  #endif
+
+  #if defined vtkSQBOVWriterDEBUG
+  pCerr() << oss.str() << endl;
   #endif
 
   #if defined vtkSQBOVWriterTIME
@@ -315,6 +307,12 @@ bool vtkSQBOVWriter::IsOpen()
 //-----------------------------------------------------------------------------
 int vtkSQBOVWriter::WriteMetaData()
 {
+  #if defined vtkSQBOVWriterDEBUG
+  ostringstream oss;
+  oss
+    << "=====vtkSQBOVWriter::WriteMetaData" << endl;
+  pCerr() << oss.str() << endl;
+  #endif
   this->Writer->GetMetaData()->ActivateAllArrays();
   return this->Writer->WriteMetaData();
 }
@@ -346,8 +344,11 @@ double vtkSQBOVWriter::GetTimeStep(int i)
 void vtkSQBOVWriter::SetPointArrayStatus(const char *name, int status)
 {
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::SetPointArrayStatus" << endl;
-  pCerr() << safeio(name) << " " << status << endl;
+  ostringstream oss;
+  oss
+    << "=====vtkSQBOVWriter::SetPointArrayStatus" << endl
+    << safeio(name) << " " << status << endl;
+  pCerr() << oss.str() << endl;
   #endif
   if (status)
     {
@@ -505,6 +506,11 @@ void vtkSQBOVWriter::SetMPIFileHints()
     MPI_Info_set(hints,"ind_rd_buffer_size", const_cast<char *>(os.str().c_str()));
     }
 
+
+  if (this->StripeCount==-1)
+    {
+    this->StripeCount=160;
+    }
   if (this->StripeCount>0)
     {
     ostringstream os;
@@ -532,13 +538,20 @@ int vtkSQBOVWriter::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::RequestUpdateExtent" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestUpdateExtent" << endl;
   #endif
 
   (void)req;
   (void)outInfos;
 
   vtkInformation *inInfo=inInfos[0]->GetInformationObject(0);
+
+  #ifdef vtkSQBOVWriterDEBUG
+  oss
+    << "WorldRank=" << this->WorldRank << endl
+    << "UPDATE_PIECE=" << inInfo->Get(vtkSDDPipeline::UPDATE_PIECE_NUMBER()) << endl;
+  #endif
 
   // if we are writing all times we need to set the speciic
   // time value here.
@@ -556,33 +569,28 @@ int vtkSQBOVWriter::RequestUpdateExtent(
         vtkSDDPipeline::WHOLE_EXTENT(),
         wholeExt.GetData());
 
-  vtkExtentTranslator *translator=vtkExtentTranslator::New();
+  vtkExtentTranslator *translator
+    = dynamic_cast<vtkExtentTranslator*>(inInfo->Get(vtkSDDPipeline::EXTENT_TRANSLATOR()));
+
   translator->SetWholeExtent(wholeExt.GetData());
   translator->SetNumberOfPieces(this->WorldSize);
   translator->SetPiece(this->WorldRank);
+  translator->SetGhostLevel(0);
   translator->PieceToExtent();
   CartesianExtent updateExt;
   translator->GetExtent(updateExt.GetData());
-  translator->Delete();
 
   inInfo->Set(
         vtkSDDPipeline::UPDATE_EXTENT(),
         updateExt.GetData(),
         6);
 
-  inInfo->Set(
-        vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(),
-        this->WorldSize);
-
-  inInfo->Set(
-        vtkSDDPipeline::UPDATE_PIECE_NUMBER(),
-        this->WorldRank);
-
   #ifdef vtkSQBOVWriterDEBUG
-  pCerr()
-    << "WHOLE_EXTENT=" << wholeExt << " "
-    << "UPDATE_EXTENT=" << updateExt << " "
+  oss
+    << "WHOLE_EXTENT=" << wholeExt << endl
+    << "UPDATE_EXTENT=" << updateExt << endl
     << "UPDATE_TIME_STEPS=" << time << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -612,7 +620,9 @@ int vtkSQBOVWriter::RequestInformation(
   vtkInformationVector* /*outInfos*/)
 {
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::RequestInformation" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestInformation" << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   if (!this->Writer->IsOpen())
@@ -665,7 +675,8 @@ int vtkSQBOVWriter::RequestData(
         vtkInformationVector * /*outInfos*/)
 {
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::RequestData" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVWriter::RequestData" << endl;
   #endif
   #if defined vtkSQBOVWriterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -719,7 +730,7 @@ int vtkSQBOVWriter::RequestData(
       }
 
     #if defined vtkSQBOVWriterDEBUG
-    pCerr() << "Requested time " << step << " using " << stepId << "." << endl;
+    oss << "Requested time " << step << " using " << stepId << "." << endl;
     #endif
     }
 
@@ -779,10 +790,11 @@ int vtkSQBOVWriter::RequestData(
   md->SetDecomp(decomp);
 
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "WHOLE_EXTENT=" << wholeExtent << endl;
-  pCerr() << "domain=" << domain << endl;
-  pCerr() << "UPDATE_EXTENT=" << updateExtent << endl;
-  pCerr() << "decomp=" << decomp << endl;
+  oss
+    << "WHOLE_EXTENT=" << wholeExtent << endl
+    << "domain=" << domain << endl
+    << "UPDATE_EXTENT=" << updateExtent << endl
+    << "decomp=" << decomp << endl;
   #endif
 
   md->SetDataSetType(input->GetClassName());
@@ -806,8 +818,9 @@ int vtkSQBOVWriter::RequestData(
     md->SetSpacing(dX);
 
     #if defined vtkSQBOVWriterDEBUG
-    pCerr() << "ORIGIN=" << Tuple<double>(X0,3) << endl;
-    pCerr() << "SPACING=" << Tuple<double>(dX,3) << endl;
+    oss
+      << "ORIGIN=" << Tuple<double>(X0,3) << endl
+      << "SPACING=" << Tuple<double>(dX,3) << endl;
     #endif
     }
   else
@@ -856,8 +869,9 @@ int vtkSQBOVWriter::RequestData(
     }
 
   #if defined vtkSQBOVWriterDEBUG
-  this->Writer->PrintSelf(pCerr());
-  //input->Print(pCerr());
+  // this->Writer->PrintSelf(pCerr());
+  // input->Print(pCerr());
+  pCerr() << oss.str() << endl;
   #endif
 
   #if defined vtkSQBOVWriterTIME
@@ -871,7 +885,9 @@ int vtkSQBOVWriter::RequestData(
 void vtkSQBOVWriter::Write()
 {
   #if defined vtkSQBOVWriterDEBUG
-  pCerr() << "=====vtkSQBOVWriter::Write" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVWriter::Write" << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   if (!this->Writer->IsOpen())

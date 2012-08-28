@@ -138,7 +138,8 @@ int vtkSQBOVReader::RequestInformation(
   vtkInformationVector* outInfos)
 {
   #if defined vtkSQBOVReaderDEBUG
-  pCerr() << "=====vtkSQBOVReader::RequestInformation" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVReader::RequestInformation" << endl;
   #endif
 
   if (!this->Reader->IsOpen())
@@ -165,7 +166,7 @@ int vtkSQBOVReader::RequestInformation(
   //     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
 
   #if defined vtkSQBOVReaderDEBUG
-  pCerr() << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << endl;
+  oss << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << endl;
   #endif
 
   if (this->Reader->DataSetTypeIsImage())
@@ -181,10 +182,17 @@ int vtkSQBOVReader::RequestInformation(
     // req->Append(vtkExecutive::KEYS_TO_COPY(),vtkDataObject::SPACING());
 
     #if defined vtkSQBOVReaderDEBUG
-    pCerr() << "ORIGIN=" << Tuple<double>(X0,3) << endl;
-    pCerr() << "SPACING=" << Tuple<double>(dX,3) << endl;
+    oss
+      << "ORIGIN=" << Tuple<double>(X0,3) << endl
+      << "SPACING=" << Tuple<double>(dX,3) << endl;
     #endif
     }
+
+
+
+  #if defined vtkSQBOVReaderDEBUG
+  pCerr() << oss.str() << endl;
+  #endif
 
   return vtkSQBOVReaderBase::RequestInformation(req,inInfos,outInfos);
 }
@@ -196,7 +204,8 @@ int vtkSQBOVReader::RequestData(
         vtkInformationVector *outInfos)
 {
   #if defined vtkSQBOVReaderDEBUG
-  pCerr() << "=====vtkSQBOVReader::RequestData" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVReader::RequestData" << endl;
   #endif
   #if defined vtkSQBOVReaderTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
@@ -223,13 +232,10 @@ int vtkSQBOVReader::RequestData(
   CartesianExtent subset=md->GetSubset();
 
   #if defined vtkSQBOVReaderDEBUG
-  if (this->WorldRank==0)
-    {
-    pCerr()
-      << "subset=" << subset
-      << " size=" << subset.Size()*sizeof(float)
-      << endl;
-    }
+  oss
+    << "WHOLE_EXTENT=" << subset
+    << " size=" << subset.Size()*sizeof(float)
+    << endl;
   #endif
 
   // shift to the dual grid
@@ -255,7 +261,7 @@ int vtkSQBOVReader::RequestData(
   md->SetDecomp(decomp);
 
   #if defined vtkSQBOVReaderDEBUG
-  pCerr() << "decomp=" << decomp << endl;
+  oss << "UPDATE_EXTENT=" << decomp << endl;
   #endif
 
   // Construct MPI File hints for the reader.
@@ -380,8 +386,9 @@ int vtkSQBOVReader::RequestData(
   md->PushPipelineInformation(req, info);
 
   #if defined vtkSQBOVReaderDEBUG
-  this->Reader->PrintSelf(pCerr());
-  output->Print(pCerr());
+  pCerr() << oss.str() << endl;
+  //this->Reader->PrintSelf(pCerr());
+  //output->Print(pCerr());
   #endif
 
   #if defined vtkSQBOVReaderTIME

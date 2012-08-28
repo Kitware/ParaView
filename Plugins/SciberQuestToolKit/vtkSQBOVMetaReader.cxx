@@ -77,6 +77,7 @@ vtkSQBOVMetaReader::vtkSQBOVMetaReader()
   this->SetNumberOfOutputPorts(1);
 
   // Initialize variables
+  this->UseCollectiveIO=HINT_DISABLED;
   this->PeriodicBC[0]=
   this->PeriodicBC[1]=
   this->PeriodicBC[2]=0;

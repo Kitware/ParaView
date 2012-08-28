@@ -55,7 +55,7 @@ Copyright 2012 SciberQuest Inc.
         lable="Collective IO"
         command="SetUseCollectiveIO"
         number_of_elements="1"
-        default_values="0" >
+        default_values="2" >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
         <Entry value="1" text="disabled"/>
@@ -82,7 +82,7 @@ Copyright 2012 SciberQuest Inc.
         lable="CIO Buffer Size"
         command="SetCollectBufferSize"
         number_of_elements="1"
-        default_values="1073741824" >
+        default_values="536870912">
       <EnumerationDomain name="enum">
         <Entry value="0"          text="default"/>
         <Entry value="536870912"  text=" 512 MB"/>
@@ -170,11 +170,13 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="-1" >
       <EnumerationDomain name="enum">
-        <Entry value="0"          text="default"/>
-        <Entry value="536870912"  text=" 512 MB"/>
-        <Entry value="1073741824" text=" 1.0 GB"/>
-        <Entry value="1610612736" text=" 1.5 GB"/>
-        <Entry value="2147483647" text=" 2.0 GB"/>
+        <Entry value="-1"  text="all OST"/>
+        <Entry value="0"   text="default"/>
+        <Entry value="16"  text=" 16 OST"/>
+        <Entry value="32"  text=" 32 OST"/>
+        <Entry value="64"  text=" 64 OST"/>
+        <Entry value="128" text=" 128 OST"/>
+        <Entry value="160" text=" 160 OST"/>
       </EnumerationDomain>
       <Documentation>
         Tell MPI how to set striping parameters. It's not clear if the mpi implementation uses these on Lustre.
@@ -187,7 +189,7 @@ Copyright 2012 SciberQuest Inc.
         lable="Stripe Size"
         command="SetStripeSize"
         number_of_elements="1"
-        default_values="0" >
+        default_values="536870912" >
       <EnumerationDomain name="enum">
         <Entry value="0"          text="default"/>
         <Entry value="4194304"     text="  4 MB"/>

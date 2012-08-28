@@ -682,7 +682,7 @@ void vtkSQKernelConvolution::SetKernelWidth(int width)
 int vtkSQKernelConvolution::UpdateKernel()
 {
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << endl;
+  //pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << endl;
   #endif
 
   if (!this->KernelModified)
@@ -807,12 +807,14 @@ int vtkSQKernelConvolution::UpdateKernel()
   this->KernelModified = 0;
 
   #ifdef vtkSQKernelConvolutionDEBUG
+  /*
   pCerr() << "Kernel=[";
   for (size_t i=0; i<size; ++i)
     {
     cerr << this->Kernel[i] << " ";
     }
   cerr << "]" << endl;
+  */
   #endif
 
   return 0;
@@ -854,7 +856,8 @@ int vtkSQKernelConvolution::RequestInformation(
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestInformation" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -904,12 +907,13 @@ int vtkSQKernelConvolution::RequestInformation(
   outInfo->Set(vtkDataObject::ORIGIN(),X0,3);
 
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr()
+  oss
     << "WHOLE_EXTENT(input)=" << inputDomain << endl
     << "WHOLE_EXTENT(output)=" << outputDomain << endl
     << "ORIGIN=" << Tuple<double>(X0,3) << endl
     << "SPACING=" << Tuple<double>(dX,3) << endl
     << "nGhost=" << nGhosts << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -922,7 +926,8 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
       vtkInformationVector *outInfos)
 {
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
   #endif
 
   (void)req;
@@ -973,10 +978,11 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr()
+  oss
     << "WHOLE_EXTENT=" << wholeExt << endl
     << "UPDATE_EXTENT=" << outputExt << endl
     << "nGhosts=" << nGhosts << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -989,7 +995,8 @@ int vtkSQKernelConvolution::RequestData(
     vtkInformationVector *outInfoVec)
 {
   #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestData" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestData" << endl;
   #endif
 
   #if defined vtkSQKernelConvolutionTIME
@@ -1088,7 +1095,7 @@ int vtkSQKernelConvolution::RequestData(
     int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
     #ifdef vtkSQKernelConvolutionDEBUG
-    pCerr()
+    oss
       << "WHOLE_EXTENT=" << domainExt << endl
       << "UPDATE_EXTENT(input)=" << inputExt << endl
       << "UPDATE_EXTENT(output)=" << outputExt << endl
@@ -1148,7 +1155,7 @@ int vtkSQKernelConvolution::RequestData(
       if (this->EnableCUDA)
         {
         #ifdef vtkSQKernelConvolutionDEBUG
-        pCerr() << "using the GPU" << endl;
+        oss << "using the GPU" << endl;
         #endif
         this->CUDADriver->Convolution(
             inputExt,
@@ -1163,7 +1170,7 @@ int vtkSQKernelConvolution::RequestData(
       else
         {
         #ifdef vtkSQKernelConvolutionDEBUG
-        pCerr() << "using the CPU" << endl;
+        //oss << "using the CPU" << endl;
         #endif
         this->CPUDriver->Convolution(
             inputExt,
@@ -1263,6 +1270,11 @@ int vtkSQKernelConvolution::RequestData(
   #if defined vtkSQKernelConvolutionTIME
   log->EndEvent("vtkSQKernelConvolution::RequestData");
   #endif
+
+  #ifdef vtkSQKernelConvolutionDEBUG
+  pCerr() << oss.str() << endl;
+  #endif
+
 
  return 1;
 }

@@ -162,7 +162,7 @@ Copyright 2012 SciberQuest Inc.
         lable="Collective IO"
         command="SetUseCollectiveIO"
         number_of_elements="1"
-        default_values="0"
+        default_values="2"
         >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
@@ -192,7 +192,7 @@ Copyright 2012 SciberQuest Inc.
         lable="CIO Buffer Size"
         command="SetCollectBufferSize"
         number_of_elements="1"
-        default_values="1073741824"
+        default_values="536870912"
         >
       <EnumerationDomain name="enum">
         <Entry value="0"          text="default"/>
@@ -211,7 +211,7 @@ Copyright 2012 SciberQuest Inc.
         lable="Direct IO"
         command="SetUseDirectIO"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
@@ -245,7 +245,7 @@ Copyright 2012 SciberQuest Inc.
         lable="Data Sieving"
         command="SetUseDataSieving"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         >
       <EnumerationDomain name="enum">
         <Entry value="0" text="automatic"/>
@@ -678,7 +678,6 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
-      <!--
       <Property name="SieveBufferSize" show="0"/>
       <Property name="UseDataSieving" show="0"/>
       <Property name="UseDeferredOpen" show="0"/>
@@ -686,7 +685,6 @@ Copyright 2012 SciberQuest Inc.
       <Property name="CollectBufferSize" show="0"/>
       <Property name="NumberOfIONodes" show="0"/>
       <Property name="UseCollectiveIO" show="0"/>
-      -->
       <ReaderFactory extensions="bovm" file_description="MPI-I/O brick-of-values (Meta Reader)."/>
     </Hints>
   </SourceProxy>

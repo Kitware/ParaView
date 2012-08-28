@@ -153,7 +153,6 @@ private:
   int TimeStepId;          // step id only used for writing all steps.
   int WorldRank;           // rank of this process
   int WorldSize;           // number of processes
-  char HostName[5];        // short host name where this process runs
   int UseCollectiveIO;     // Turn on/off collective IO
   int UseDirectIO;         //
   int NumberOfIONodes;     // Number of aggregator for CIO

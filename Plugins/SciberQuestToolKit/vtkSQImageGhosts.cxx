@@ -173,7 +173,8 @@ int vtkSQImageGhosts::RequestUpdateExtent(
   vtkInformationVector *outputVector)
 {
   #ifdef vtkSQImageGhostsDEBUG
-  pCerr() << "=====vtkSQImageGhosts::RequestUpdateExtent" << endl;
+  ostringstream oss;
+  oss <<  "=====vtkSQImageGhosts::RequestUpdateExtent" << endl;
   #endif
 
   // We require preceding filters to refrain from creating ghost cells.
@@ -219,11 +220,12 @@ int vtkSQImageGhosts::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
   #ifdef vtkSQImageGhostsDEBUG
-  pCerr()
+  oss
     << "WHOLE_EXTENT=" << this->ProblemDomain << endl
     << "UPDATE_EXTENT=" << updateExt << endl
     << "Mode=" << this->Mode << endl
     << "NGhosts=" << this->NGhosts << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -509,7 +511,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
     void *pIn = inArray->GetVoidPointer(0);
 
     #ifdef vtkSQImageGhostsDEBUG
-    cerr << "Copying array " << inArray->GetName() << endl;
+    //cerr << "Copying array " << inArray->GetName() << endl;
     #endif
 
     // copy the valid data directly
@@ -553,7 +555,27 @@ void vtkSQImageGhosts::ExecuteTransactions(
                 tag));
           }
         }
-      MPI_Waitall((int)req.size(), &req[0], MPI_STATUSES_IGNORE);
+      //MPI_Waitall((int)req.size(), &req[0], MPI_STATUSES_IGNORE);
+      int nReqs=(int)req.size();
+      vector<MPI_Status> stat(nReqs);
+      int ierr=MPI_Waitall(nReqs, &req[0],&stat[0]);
+      if (ierr!=MPI_ERR_IN_STATUS)
+        {
+        for (int q=0; q<nReqs; ++q)
+          {
+          ierr=stat[q].MPI_ERROR;
+          if ((ierr != MPI_SUCCESS) && (ierr != MPI_ERR_PENDING))
+            {
+            char eStr[MPI_MAX_ERROR_STRING]={'\0'};
+            int eStrLen=0;
+            MPI_Error_string(ierr,eStr,&eStrLen);
+            pCerr()
+              << "transaction for request " << q << " failed." << endl
+              << eStr << endl
+              << endl;
+            }
+          }
+        }
       }
     #endif
     }
