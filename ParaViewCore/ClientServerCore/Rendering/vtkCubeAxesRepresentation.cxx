@@ -171,6 +171,9 @@ int vtkCubeAxesRepresentation::ProcessViewRequest(
     // any input data, the dataset will be uninitialized.
     vtkPVRenderView::SetPiece(inInfo, this, 
       this->OutlineSource->GetOutputDataObject(0));
+    // We need to deliver to all processes to ensure we get the reduced data
+    // bounds on all process. Otherwise we end up with BUG #0013403.
+    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
