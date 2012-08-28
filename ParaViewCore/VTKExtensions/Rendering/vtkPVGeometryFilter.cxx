@@ -159,7 +159,7 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->GenerateProcessIds = (this->Controller &&
     this->Controller->GetNumberOfProcesses() > 1);
-  
+
   this->OutlineSource = vtkOutlineSource::New();
 
   this->PassThroughCellIds = 1;
@@ -649,20 +649,19 @@ void vtkPVGeometryFilter::AddHierarchicalIndex(vtkPolyData* pd,
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVGeometryFilter::IsAMRDataVisible(
-    vtkAMRBox &amrBox, vtkAMRBox &rootBox, bool extractface[6] )
+bool vtkPVGeometryFilter::IsAMRDataVisible(vtkOverlappingAMR* amr,
+                                           unsigned int level,
+                                           unsigned int id,
+                                           bool extractface[6] )
 {
+  vtkAMRBox amrBox  = amr->GetAMRBox(level,id);
   // Sanity check
-  assert( "pre: AMR box dimensionality must match!" &&
-          (amrBox.GetDimensionality() == rootBox.GetDimensionality() ) );
   assert( "pre: AMR dimension out-of-bounds!"  &&
-          (amrBox.GetDimensionality() >= 1)    &&
-          (amrBox.GetDimensionality() <= 3) );
-
-
+          (amrBox.ComputeDimension() >= 1)    &&
+          (amrBox.ComputeDimension() <= 3) );
 
   // STEP 1: If it's 2-D all blocks are visible
-  if( amrBox.GetDimensionality() <= 2)
+  if( amrBox.ComputeDimension() <= 2)
     {
     for( int i=0; i < 6; ++i )
       {
@@ -685,13 +684,14 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   // -- Get the root cartesian box bounds
   int ndim[3];
   ndim[0]=ndim[1]=ndim[2]=0;
-  double min[3]; double max[3];
-  rootBox.GetMinBounds( min );
-  rootBox.GetMaxBounds( max );
+
+  double min[3],max[3];
+  amr->GetMin(min);
+  amr->GetMax(max);
 
   // -- Get the data spacing
   double spacing[3];
-  amrBox.GetGridSpacing( spacing );
+  amr->GetGridSpacing(level, spacing );
 
   // -- Compute the number of CELLS in tmpBox
   for( int i=0; i < 3; ++i )
@@ -706,17 +706,11 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(
   lo[0]=lo[1]=lo[2]=0;
 
   vtkAMRBox tmpBox;
-  tmpBox.SetDimensionality( 3 );
-  tmpBox.SetDataSetOrigin( min );
-  tmpBox.SetGridSpacing( spacing );
   tmpBox.SetDimensions( lo, ndim );
-  tmpBox.SetLevel( 0 );
-  tmpBox.SetBlockId( 0 );
-  tmpBox.SetProcessId( -1 );
-
 
   // STEP 3: Check if the box is on the boundary
   bool render = false;
+
   for( int i=0; i < 3; ++i )
     {
     if( amrBox.GetLoCorner()[i] == 0 )
@@ -762,7 +756,9 @@ int vtkPVGeometryFilter::RequestAMRData(
   if( this->UseOutline )
     {
     vtkOutlineSource *outline = vtkOutlineSource::New();
-    outline->SetBounds( input->GetBounds() );
+    double bb[6];
+    input->GetBounds(bb);
+    outline->SetBounds(bb);
     outline->Update();
 
     vtkPolyData *AMRDataOutline = vtkPolyData::New();
@@ -803,9 +799,6 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   // NOTE: We assume that the root node covers the entire domain & that it
   // is stored @ (0,0)
-  vtkAMRBox rootAMRBox;
-  input->GetRootAMRBox( rootAMRBox );
-
   // Get the whole extent
   int* wholeExtent =
    vtkStreamingDemandDrivenPipeline::GetWholeExtent(
@@ -830,16 +823,15 @@ int vtkPVGeometryFilter::RequestAMRData(
         }
       else
         {
-        vtkAMRBox amrBox;
-        input->GetMetaData( level, dataIdx, amrBox );
+        vtkAMRBox amrBox = input->GetAMRBox( level, dataIdx);
         bool extractface[6];
-        if( this->IsAMRDataVisible(amrBox,rootAMRBox,extractface) )
+        if( this->IsAMRDataVisible(input,level,dataIdx,extractface) )
           {
           vtkPolyData* tmpOut = vtkPolyData::New();
           this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0, wholeExtent, extractface);
           this->CleanupOutputData(tmpOut, 0);
           this->AddCompositeIndex(
-           tmpOut,input->GetFlatIndex(level,dataIdx));
+           tmpOut,input->GetCompositeIndex(level,dataIdx));
           mpds->SetPiece( dataIdx, tmpOut );
           tmpOut->Delete();
           } // END if AMR data is visible
@@ -931,10 +923,10 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       {
       // This will be used later by vtkSelectionConverter to realize that this
       // multi-block of polydatas is actually coming from an AMR.
-      vtkInformation* metadata = output->GetMetaData(iter);
-      metadata->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
+      vtkDataObject* dataset = output->GetDataSet(iter);
+      dataset->GetInformation()->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
         hdIter->GetCurrentLevel());
-      metadata->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
+      dataset->GetInformation()->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
         hdIter->GetCurrentIndex());
       if (tmpOut)
         {

@@ -574,6 +574,7 @@ int vtkSpyPlotReader::AddAttributes(vtkNonOverlappingAMR *hbds)
 
   return 1;
 }
+
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::RequestData(
   vtkInformation *request,
@@ -802,8 +803,6 @@ int vtkSpyPlotReader::RequestData(
       {
       this->AddBlockIdArray(cds);
       }
-
-
 
   return 1;
 }
@@ -2100,16 +2099,13 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
           }
         }
       }
-
-    if(numberOfLevels>hbDS->GetNumberOfLevels())
-      {
-      hbDS->SetNumberOfLevels(numberOfLevels);
-      }
     }
   // At this point, the global number of levels is set in each processor.
   // Update each level
   // i.e. for each level synchronize the number of datasets (or pieces).
   unsigned int level;
+  std::vector<int> blocksPerLevel(numberOfLevels,0); //collect this
+  std::vector<int> globalIndices(numberOfLevels);
   for (level = 0; level<numberOfLevels; level++)
     {
     int intMsgValue;
@@ -2161,6 +2157,8 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
       globalIndex=intMsgValue;
       }
 
+    globalIndices[level] = globalIndex;
+
     // Send it to children.
     if(left<numProcessors)
       {
@@ -2186,6 +2184,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
           }
         }
       }
+    blocksPerLevel[level] = totalNumberOfDataSets;
 
     // Update the level.
     if(totalNumberOfDataSets>numberOfDataSets)
@@ -2193,34 +2192,6 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
       // save the current datasets
       if (hbDS)
         {
-        if (globalIndex==0)
-          {
-          hbDS->SetNumberOfDataSets(level, totalNumberOfDataSets);
-          }
-        else
-          {
-          std::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
-          std::vector<vtkAMRBox> boxes;
-          int kk;
-          for (kk=0; kk < numberOfDataSets; kk++)
-            {
-//            vtkAMRBox box;
-//            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk, box);
-            vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
-            datasets.push_back(ug);
-//            boxes.push_back(box);
-            }
-          hbDS->SetNumberOfDataSets(level, 0); // removes all current datasets.
-          hbDS->SetNumberOfDataSets(level, totalNumberOfDataSets);
-
-          // put the datasets back starting at globalIndex.
-          // All other indices are in their initialized state.
-          for (kk=0; kk < numberOfDataSets; kk++)
-            {
-            hbDS->SetDataSet(level,kk+globalIndex,datasets[kk]);
-//            hbDS->SetDataSet(level, kk+globalIndex, boxes[kk], datasets[kk]);
-            }
-          }
         }
       else // if (mbDS)
         {
@@ -2248,6 +2219,36 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
         }
       }
     }
+
+  if(hbDS)
+    {
+    hbDS->Initialize(numberOfLevels,&blocksPerLevel[0]);
+    for(unsigned int level = 0; level<numberOfLevels; level++)
+      {
+      int totalNumberOfDataSets=blocksPerLevel[level];
+      int numberOfDataSets= hbDS->GetNumberOfDataSets(level);
+      int globalIndex = globalIndices[level];
+
+      if (globalIndex!=0)
+        {
+        std::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
+        std::vector<vtkAMRBox> boxes;
+        int kk;
+        for (kk=0; kk < numberOfDataSets; kk++)
+          {
+          vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
+          datasets.push_back(ug);
+          }
+        // put the datasets back starting at globalIndex.
+        // All other indices are in their initialized state.
+        for (kk=0; kk < numberOfDataSets; kk++)
+          {
+          hbDS->SetDataSet(level,kk+globalIndex,datasets[kk]);
+          }
+        }
+      }
+    }
+
 }
 
 //-----------------------------------------------------------------------------

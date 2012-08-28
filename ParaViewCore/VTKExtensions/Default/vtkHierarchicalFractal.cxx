@@ -43,7 +43,7 @@ vtkStandardNewMacro(vtkHierarchicalFractal);
 vtkHierarchicalFractal::vtkHierarchicalFractal()
 {
   this->SetNumberOfInputPorts(0);
-  
+
   this->Dimensions = 10;
   this->FractalValue = 9.5;
   this->MaximumLevel = 6;
@@ -53,7 +53,7 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
   this->TwoDimensional = 1;
   this->Asymetric = 1;
   this->Overlap = 1;
-  
+
   this->TopLevelSpacing[0] = 1.0;
   this->TopLevelSpacing[1] = 1.0;
   this->TopLevelSpacing[2] = 1.0;
@@ -61,7 +61,7 @@ vtkHierarchicalFractal::vtkHierarchicalFractal()
   this->TopLevelOrigin[0] = 0.0;
   this->TopLevelOrigin[1] = 0.0;
   this->TopLevelOrigin[2] = 0.0;
-  
+
   this->GenerateRectilinearGrids=0;
 
   this->TimeStep = 0;
@@ -102,7 +102,7 @@ int vtkHierarchicalFractal::RequestDataObject(vtkInformation *,
 //----------------------------------------------------------------------------
 // This handles any alterations necessary for ghost levels.
 void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
-                                          int level, 
+                                          int level,
                                           int *ext,
                                           int onFace[6])
 {
@@ -112,7 +112,7 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
   // onFace[3]:ymax
   // onFace[4]:zmin
   // onFace[5]:zmax
-  
+
   if (this->GhostLevels)
     {
     if(!onFace[0])
@@ -148,7 +148,7 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
   double bds[6];
   double origin[3];
   double spacing[3];
-  
+
   this->CellExtentToBounds(level, ext, bds);
   origin[0] = bds[0];
   origin[1] = bds[2];
@@ -160,7 +160,7 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
   // Handle Lower dimensions.  Assume that cell dimension of 1 is a collapsed
   // dimension.  Point dim equal 1 also.
   int dim[3];
-  
+
   dim[0] = dim[1] = dim[2] = 1;
   if (ext[1] > ext[0])
     {
@@ -174,11 +174,11 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
     {
     dim[2] = ext[5]-ext[4]+2;
     }
-  
+
   grid->SetDimensions(dim);
   grid->SetSpacing(spacing);
   grid->SetOrigin(origin);
-  
+
   if(this->GhostLevels>0)
     {
     this->AddGhostLevelArray(grid,dim,onFace);
@@ -188,7 +188,7 @@ void vtkHierarchicalFractal::SetBlockInfo(vtkUniformGrid *grid,
 //----------------------------------------------------------------------------
 // This handles any alterations necessary for ghost levels.
 void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
-                                           int level, 
+                                           int level,
                                            int *ext,
                                            int onFace[6])
 {
@@ -227,7 +227,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
   double bds[6];
   double origin[3];
   double spacing[3];
-  
+
   this->CellExtentToBounds(level, ext, bds);
   origin[0] = bds[0];
   origin[1] = bds[2];
@@ -239,7 +239,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
   // Handle Lower dimensions.  Assume that cell dimension of 1 is a collapsed
   // dimension.  Point dim equal 1 also.
   int dim[3];
-  
+
   dim[0] = dim[1] = dim[2] = 1;
   if (ext[1] > ext[0])
     {
@@ -253,23 +253,23 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
     {
     dim[2] = ext[5]-ext[4]+2;
     }
-  
+
   grid->SetDimensions(dim);
-  
+
   vtkDoubleArray *coords[3];
-  
+
   vtkMath::RandomSeed(1234);
   int coord=0;
   while(coord<3)
     {
     coords[coord]=vtkDoubleArray::New();
     //grid->SetOrigin(origin);
-    
+
     // first point
     coords[coord]->InsertNextValue(origin[coord]);
-    
+
     double uniformCoordinate;
-    
+
     int i=1;
     int c;
     if(this->GhostLevels && !onFace[coord*2+1])
@@ -281,14 +281,14 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
       c=dim[coord]-1;
       }
     uniformCoordinate=origin[coord];
-    
+
     if(this->GhostLevels && !onFace[coord*2])
       {
       uniformCoordinate+=spacing[coord];
       coords[coord]->InsertNextValue(uniformCoordinate);
       ++i;
       }
-    
+
     while(i<c)
       {
       uniformCoordinate+=spacing[coord];
@@ -297,21 +297,21 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
       coords[coord]->InsertNextValue(uniformCoordinate+epsilon);
       ++i;
       }
-    
+
     if(this->GhostLevels && !onFace[coord*2+1])
       {
       uniformCoordinate+=spacing[coord];
       coords[coord]->InsertNextValue(uniformCoordinate);
       ++i;
       }
-    
-    // last point 
+
+    // last point
     uniformCoordinate+=spacing[coord];
     coords[coord]->InsertNextValue(uniformCoordinate);
-    
+
     ++coord;
     }
-  
+
 //  grid->SetSpacing(spacing);
   grid->SetXCoordinates(coords[0]);
   grid->SetYCoordinates(coords[1]);
@@ -322,7 +322,7 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
     coords[coord]->Delete();
     ++coord;
     }
-  
+
   if(this->GhostLevels>0)
     {
     this->AddGhostLevelArray(grid,dim,onFace);
@@ -330,21 +330,21 @@ void vtkHierarchicalFractal::SetRBlockInfo(vtkRectilinearGrid *grid,
 }
 
 //----------------------------------------------------------------------------
-int vtkHierarchicalFractal::TwoDTest(double bds[6], int level, int target) 
+int vtkHierarchicalFractal::TwoDTest(double bds[6], int level, int target)
 {
   // Test the 4 corners.  Refine if the blocks cross the border.
   int v0, v1, v2, v3;
-  
+
   if (level == target)
     {
     return 0;
     }
-  
+
   if (level < 2)
     {
     return 1;
     }
-  
+
   v0 = this->MandelbrotTest(bds[0], bds[2]);
   v1 = this->MandelbrotTest(bds[1], bds[2]);
   v2 = this->MandelbrotTest(bds[0], bds[3]);
@@ -399,15 +399,15 @@ int vtkHierarchicalFractal::MandelbrotTest(double x, double y)
 // This is called by the superclass.
 // This is the method you should override.
 int vtkHierarchicalFractal::RequestInformation(
-  vtkInformation *request, 
-  vtkInformationVector **inputVector, 
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
   if(!this->Superclass::RequestInformation(request,inputVector,outputVector))
     {
     return 0;
     }
-  
+
   vtkInformation *info=outputVector->GetInformationObject(0);
   info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
   return 1;
@@ -419,15 +419,15 @@ int vtkHierarchicalFractal::RequestInformation(
 // This is called by the superclass.
 // This is the method you should override.
 int vtkHierarchicalFractal::RequestData(
-  vtkInformation *vtkNotUsed(request), 
-  vtkInformationVector **vtkNotUsed(inputVector), 
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
   vtkInformation *info=outputVector->GetInformationObject(0);
   vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
   vtkCompositeDataSet *output;
   output=vtkCompositeDataSet::SafeDownCast(doOutput);
-  
+
   if(output==0)
     {
     vtkErrorMacro("The output is not a HierarchicalDataSet");
@@ -442,9 +442,9 @@ int vtkHierarchicalFractal::RequestData(
     }
 
   output->Initialize(); // remove all previous blocks
-  
-  
-  // By setting SetMaximumNumberOfPieces(-1) 
+
+
+  // By setting SetMaximumNumberOfPieces(-1)
   // then GetUpdateNumberOfPieces() should always return the number
   // of processors in the parallel job and GetUpdatePiece() should
   // return the specific process number
@@ -464,8 +464,8 @@ int vtkHierarchicalFractal::RequestData(
   this->SetTopLevelSpacing(xSize/this->Dimensions,
                            ySize/this->Dimensions,
                            zSize/this->Dimensions);
-  
-  
+
+
   int ext[6];
   ext[0] = ext[2] = ext[4] = 0;
   ext[1] = ext[3] = ext[5] = this->Dimensions - 1;
@@ -497,8 +497,8 @@ int vtkHierarchicalFractal::RequestData(
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
                  ext[5],onFace);
-  
-  
+
+
   double bounds[6];
 
   bounds[0]=ox;
@@ -514,31 +514,29 @@ int vtkHierarchicalFractal::RequestData(
     {
     bounds[5]=oz+zSize;
     }
-  
+
   info->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(),bounds,6);
-  
+
   if(!this->GenerateRectilinearGrids)
     {
     this->AddVectorArray(output);
     this->AddTestArray(output);
     this->AddBlockIdArray(output);
     vtkHierarchicalBoxDataSet *hset = vtkHierarchicalBoxDataSet::SafeDownCast(output);
-    vtkAMRUtilities::GenerateMetaData(
-        hset,vtkMultiProcessController::GetGlobalController());
     this->AddDepthArray(hset);
     hset->GenerateVisibilityArrays();
     info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),hset);
     }
   this->AddFractalArray(output);
-  
+
   return 1;
 }
-  
+
 
 //----------------------------------------------------------------------------
 int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
-                             float x1, float y1, float z1, 
-                             double bds[6]) 
+                             float x1, float y1, float z1,
+                             double bds[6])
 {
   // intersect line with plane.
   float x, y, z;
@@ -568,7 +566,7 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
       {
       return 1;
       }
-    } 
+    }
   // max x
   x = bds[1];
   k = (x- x0) / (x1-x0);
@@ -580,7 +578,7 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
       {
       return 1;
       }
-    } 
+    }
   // min y
   y = bds[2];
   k = (y- y0) / (y1-y0);
@@ -592,7 +590,7 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
       {
       return 1;
       }
-    } 
+    }
   // max y
   y = bds[3];
   k = (y- y0) / (y1-y0);
@@ -604,7 +602,7 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
       {
       return 1;
       }
-    } 
+    }
   // min z
   z = bds[4];
   k = (z- z0) / (z1-z0);
@@ -616,15 +614,15 @@ int vtkHierarchicalFractal::LineTest2(float x0, float y0, float z0,
       {
       return 1;
       }
-    } 
+    }
 
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkHierarchicalFractal::LineTest(float x0, float y0, float z0, 
+int vtkHierarchicalFractal::LineTest(float x0, float y0, float z0,
                             float x1, float y1, float z1,
-                            double bds[6], int level, int target) 
+                            double bds[6], int level, int target)
 {
   if (level >= target)
     {
@@ -678,7 +676,7 @@ int vtkHierarchicalFractal::LineTest(float x0, float y0, float z0,
 //----------------------------------------------------------------------------
 void vtkHierarchicalFractal::Traverse(int &blockId,
                                       int level,
-                                      vtkCompositeDataSet* output, 
+                                      vtkCompositeDataSet* output,
                                       int x0,
                                       int x3,
                                       int y0,
@@ -693,8 +691,8 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
   if (this->TwoDimensional)
     {
     z0 = z3 = 0;
-    }  
-  
+    }
+
   // Get the bounds of the proposed block.
   int ext[6];
   ext[0]=x0; ext[1]=x3; ext[2]=y0; ext[3]=y3, ext[4]=z0; ext[5]=z3;
@@ -719,7 +717,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
     x2 += 2;
     x1 += 2;
     }
-    
+
   int subOnFace[6];
   int generateBlock  = 1;
   if (this->TwoDimensional)
@@ -817,8 +815,8 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 //      subOnface[2]=0;
 //      subOnFace[3]=onFace[3];
       this->Traverse(blockId, nextLevel, output, x2,x3,y2,y3,z0,z1,subOnFace);
-      
-      
+
+
       subOnFace[0]=onFace[0];
       subOnFace[1]=0;
       subOnFace[2]=onFace[2];
@@ -873,7 +871,7 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
 void vtkHierarchicalFractal::AddTestArray(vtkCompositeDataSet *output)
 {
   double *origin = this->GetTopLevelOrigin();
- 
+
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(output->NewIterator());
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -1027,8 +1025,8 @@ void vtkHierarchicalFractal::AddFractalArray(vtkCompositeDataSet *output)
 
       // Shift point to center of voxel.
       fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
-      fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
-        origin[1]+(spacing[1]*0.5), 
+      fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5),
+        origin[1]+(spacing[1]*0.5),
         origin[2]+(spacing[2]*0.5),
         this->TimeStep/10.0);
       fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
@@ -1076,7 +1074,7 @@ void vtkHierarchicalFractal::AddBlockIdArray(vtkCompositeDataSet *output)
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(output->NewIterator());
   iter->SkipEmptyNodesOff();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
     iter->GoToNextItem(), blockId++)
     {
     vtkUniformGrid *grid;
@@ -1113,9 +1111,8 @@ void vtkHierarchicalFractal::AddDepthArray(vtkHierarchicalBoxDataSet* output)
     int block=0;
     while(block<blocks)
       {
-      vtkAMRBox temp;
       vtkUniformGrid *grid;
-      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block, temp));
+      grid=vtkUniformGrid::SafeDownCast(output->GetDataSet(level,block));
       if (grid)
         {
         vtkIntArray* array = vtkIntArray::New();
@@ -1144,12 +1141,12 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet *grid,
   vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
   // we just get the dimensions according to points
   // we need the dimensions according to cells
-  
+
   int dims[3];
   dims[0]=dim[0];
   dims[1]=dim[1];
   dims[2]=dim[2];
-  
+
   if(dims[0]>1)
     {
     --dims[0];
@@ -1162,17 +1159,17 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet *grid,
     {
     --dims[2];
     }
-  
+
   int numCells=grid->GetNumberOfCells();
   array->SetNumberOfTuples(numCells);
-  
+
   int i, j, k;
   int iLevel, jLevel, kLevel, tmp;
   unsigned char* ptr;
-  
+
   ptr = (unsigned char*)(array->GetVoidPointer(0));
-  
-  
+
+
   for (k = 0; k < dims[2]; ++k)
     {
     // ghost level at the beginning
@@ -1240,7 +1237,7 @@ void vtkHierarchicalFractal::AddGhostLevelArray(vtkDataSet *grid,
           tmp = i - dims[0] + 1 + this->GhostLevels;
           }
         if (tmp > iLevel) { iLevel = tmp;}
-        
+
         if (iLevel <= 0)
           {
           *ptr = 0;
@@ -1267,7 +1264,7 @@ void vtkHierarchicalFractal::CellExtentToBounds(int level,
   int spacingFactor = 1;
   double spacing[3];
   spacingFactor = spacingFactor << level;
-  
+
   spacing[0] = this->TopLevelSpacing[0] / (double)(spacingFactor);
   spacing[1] = this->TopLevelSpacing[1] / (double)(spacingFactor);
   spacing[2] = this->TopLevelSpacing[2] / (double)(spacingFactor);
@@ -1288,13 +1285,13 @@ void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
   int a0=0;
   int a1=1;
   int a2=2;
-  
+
   int dims[3];
-  
+
   grid->GetDimensions(dims);
   // we get the dimensions according to the points
   // we need the dimensions according to the cells
-  
+
   if(dims[0]>1)
     {
     --dims[0];
@@ -1307,10 +1304,10 @@ void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
     {
     --dims[2];
     }
-  
+
   int ext[6];
   double p[4];
-  
+
   // Shift point to center of voxel.
 //  fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
   ext[0]=0;
@@ -1319,40 +1316,40 @@ void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
   ext[3]=dims[1]-1;
   ext[4]=0;
   ext[5]=dims[2]-1;
-  
+
   int min0, max0;
   int idx0, idx1, idx2;
   vtkIdType inc0, inc1, inc2;
-  
-//  fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
-//                             origin[1]+(spacing[1]*0.5), 
+
+//  fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5),
+//                             origin[1]+(spacing[1]*0.5),
 //                             origin[2]+(spacing[2]*0.5), 0.0);
-  
+
   double origin[4];
   vtkDataArray *coords[3];
   coords[0]=grid->GetXCoordinates();
   coords[1]=grid->GetYCoordinates();
   coords[2]=grid->GetZCoordinates();
-  
+
   origin[0]=coords[0]->GetTuple1(0)+0.5*(coords[0]->GetTuple1(1)-coords[0]->GetTuple1(0));
   origin[1]=coords[0]->GetTuple1(0)+0.5*(coords[1]->GetTuple1(1)-coords[1]->GetTuple1(0));
   origin[2]=coords[0]->GetTuple1(0)+0.5*(coords[2]->GetTuple1(1)-coords[2]->GetTuple1(0));
   origin[3]=this->TimeStep/10.0;
-  
+
   // Copy origin into pixel
   for (idx0 = 0; idx0 < 4; ++idx0)
     {
     p[idx0] = origin[idx0];
     }
-  
+
   min0 = ext[0];
   max0 = ext[1];
-  
+
   this->GetContinuousIncrements(ext, inc0, inc1, inc2);
-  
-  
+
+
 //  fractalSource->SetSampleCX(spacing[0], spacing[1], spacing[2], 0.1);
-  
+
   for (idx2 = ext[4]; idx2 <= ext[5]; ++idx2)
     {
 //    p[a2] = (double)(origin[a2]) + (double)(idx2)*(sample[a2]);
@@ -1365,10 +1362,10 @@ void vtkHierarchicalFractal::ExecuteRectilinearMandelbrot(
         {
         //      p[a0] = (double)(origin[a0]) + (double)(idx0)*(sample[a0]);
         p[a0] = coords[a0]->GetTuple1(idx0)+0.5*(coords[a0]->GetTuple1(idx0+1)-coords[a0]->GetTuple1(idx0));
-        
+
         // Change fractal into volume fraction (iso surface at 0.5).
         *ptr = this->EvaluateSet(p)/ (2.0 * this->FractalValue);
-        
+
         ++ptr;
         // inc0 is 0
         }
@@ -1387,7 +1384,7 @@ double vtkHierarchicalFractal::EvaluateSet(double p[4])
   double zReal2, zImag2;
 
   const int maximumNumberOfIterations=100;
-  
+
   cReal = p[0];
   cImag = p[1];
   zReal = p[2];
@@ -1423,7 +1420,7 @@ void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
                                                      vtkIdType &incZ)
 {
   int e0, e1, e2, e3;
-  
+
   incX = 0;
 
   e0 = extent[0];
@@ -1432,20 +1429,20 @@ void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
   e3 = extent[3];
 
   // Make sure the increments are up to date
-  
+
   int idx;
-  
+
 // vtkIdType inc = this->GetPointData()->GetScalars()->GetNumberOfComponents();
   vtkIdType inc =1;
-  
+
   int increments[3];
-  
+
   for (idx = 0; idx < 3; ++idx)
     {
     increments[idx] = inc;
     inc *= (extent[idx*2+1] - extent[idx*2] + 1);
     }
-  
+
   incY = increments[1] - (e1 - e0 + 1)*increments[0];
   incZ = increments[2] - (e3 - e2 + 1)*increments[1];
 }
@@ -1460,7 +1457,7 @@ unsigned int vtkHierarchicalFractal::AppendDataSetToLevel(
   (void)extents;
   unsigned int index = 0;
   vtkMultiBlockDataSet* mbDS = vtkMultiBlockDataSet::SafeDownCast(composite);
-  vtkHierarchicalBoxDataSet* hbDS = 
+  vtkHierarchicalBoxDataSet* hbDS =
     vtkHierarchicalBoxDataSet::SafeDownCast(composite);
   if (mbDS)
     {
@@ -1509,7 +1506,7 @@ void vtkHierarchicalFractal::PrintSelf(ostream& os, vtkIndent indent)
     }
   os<< endl;
   os << indent << "TimeStep: " << this->TimeStep << endl;
-  os << indent << "TimeStepRange: " 
+  os << indent << "TimeStepRange: "
      << this->TimeStepRange[0] << " " << this->TimeStepRange[1]
      << endl;
 }
