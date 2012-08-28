@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "vtkCommand.h"
+#include "vtkOutputWindow.h"
 #include "vtkPVProgressHandler.h"
 #include "vtkSMSession.h"
 #include "vtkTimerLog.h"
@@ -79,6 +80,9 @@ void pqProgressManager::onServerAdded(pqServer* server)
     progressHandler, vtkCommand::EndEvent, this, SLOT(onEndProgress()));
   pqCoreUtilities::connect(
     progressHandler, vtkCommand::ProgressEvent, this, SLOT(onProgress(vtkObject*)));
+  pqCoreUtilities::connect(
+    progressHandler, vtkCommand::MessageEvent, this, SLOT(onMessage(vtkObject*)));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -260,4 +264,13 @@ void pqProgressManager::onProgress(vtkObject* caller)
     text = text.mid(3);
     }
   this->setProgress(text, oldProgress);
+}
+
+//-----------------------------------------------------------------------------
+void pqProgressManager::onMessage(vtkObject* caller)
+{
+
+  vtkPVProgressHandler* handler = vtkPVProgressHandler::SafeDownCast(caller);
+  QString text = handler->GetLastMessage();
+  vtkOutputWindow::GetInstance()->DisplayText(text.toStdString().c_str());
 }

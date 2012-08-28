@@ -79,6 +79,10 @@ public:
   vtkGetStringMacro(LastProgressText);
   vtkGetMacro(LastProgress, int);
 
+  // Description:
+  // Temporary storage for most recent message text.
+  vtkGetStringMacro(LastMessage);
+
 //BTX
   // Description:
   // These methods are used by vtkPVMPICommunicator to handle the progress
@@ -93,7 +97,8 @@ protected:
   enum eTAGS
     {
     CLEANUP_TAG = 188969,
-    PROGRESS_EVENT_TAG = 188970
+    PROGRESS_EVENT_TAG = 188970,
+    MESSAGE_EVENT_TAG = 188971
     };
 
   // Description:
@@ -129,6 +134,15 @@ protected:
   char* LastProgressText;
   double ProgressFrequency;
   vtkPVSession* Session;
+
+  void SetLocalMessage(const char* text);
+  int GatherMessage();
+  void SendMessageToRoot();
+  void ReceiveMessagesFromSatellites();
+  void SendMessageToClient(vtkMultiProcessController*);
+  vtkSetStringMacro(LastMessage);
+  char* LastMessage;
+
 private:
   vtkPVProgressHandler(const vtkPVProgressHandler&); // Not implemented
   void operator=(const vtkPVProgressHandler&); // Not implemented
@@ -136,6 +150,10 @@ private:
   // Description:
   // Callback called when vtkCommand::ProgressEvent is received.
   void OnProgressEvent(vtkObject* obj, double progress);
+
+  // Description:
+  // Callback called when vtkCommand::MessageEvent is received.
+  void OnMessageEvent(vtkObject* obj, char* progress);
 
   // Description:
   // Callback called when WrongTagEvent is fired by the controllers.
@@ -152,4 +170,3 @@ private:
 };
 
 #endif
-

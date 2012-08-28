@@ -66,6 +66,8 @@ vtkPVOptions::vtkPVOptions()
 
   this->UseCudaInterop = 0;
 
+  this->SatelliteMessageIds = 0;
+
   // initialize host names
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
@@ -314,6 +316,12 @@ void vtkPVOptions::Initialize()
     &this->UseCudaInterop,
     "When specified, piston classes will use cuda interop for direct rendering",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--enable-satellite-message-ids", "-satellite",
+    &this->SatelliteMessageIds,
+    "When specified, server side messages shown on client show rank of originating process",
+    vtkPVOptions::PVSERVER);
+
 }
 
 //----------------------------------------------------------------------------
@@ -537,5 +545,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EnableStreaming:" <<
     (this->EnableStreaming? "yes" : "no") << endl;
 
-  os << indent << "UseCudaInterop" << this->UseCudaInterop << std::endl;
+  os << indent << "UseCudaInterop " << this->UseCudaInterop << std::endl;
+  os << indent << "SatelliteMessageIds " << this->SatelliteMessageIds << std::endl;
 }

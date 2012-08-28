@@ -20,6 +20,8 @@
 #include "vtkCommunicator.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
+#include "vtkPVOptions.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
@@ -34,6 +36,7 @@
 #include <deque>
 #include <string>
 #include <map>
+#include <vtksys/ios/sstream>
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # define SNPRINTF _snprintf
@@ -119,7 +122,7 @@ class vtkProgressStore
       }
     int numProcs = this->GetNumberOfProcesses();
     vtkRow row;
-    row.ObjectID = objectId; 
+    row.ObjectID = objectId;
     this->Rows.push_back(row);
     this->Rows.back().Progress.resize(numProcs, -1);
     this->Rows.back().Text.resize(numProcs);
@@ -188,7 +191,7 @@ public:
     {
     this->Target = target;
     }
-  
+
   virtual void Execute(vtkObject* wdg, unsigned long event, void* calldata)
     {
     if (this->Target && event == vtkCommand::ProgressEvent)
@@ -202,6 +205,10 @@ public:
         this->AbortFlagOn();
         }
       }
+    if (this->Target && event == vtkCommand::MessageEvent)
+      {
+      this->Target->OnMessageEvent(wdg, reinterpret_cast<char*>(calldata));
+      }
     }
 protected:
   vtkObserver() { this->Target = 0; }
@@ -210,6 +217,8 @@ protected:
 
 #define ASYNCREQUESTDATA_MAX_SIZE (129+sizeof(int)*3)
 
+#define ASYNCHMESSAGE_MAX_SIZE 1024 /*arbitrarily chosen satellite msg buffer size*/
+
 //----------------------------------------------------------------------------
 class vtkPVProgressHandler::vtkInternals
 {
@@ -217,9 +226,14 @@ public:
   typedef std::map<vtkObject*, int> MapOfObjectToInt;
   MapOfObjectToInt RegisteredObjects;
 
+  char AsyncMessageStore[ASYNCHMESSAGE_MAX_SIZE]; //local message temporary storage
+  std::map<int, std::string> Messages; //who sent what to the root
+  bool AsyncMessageRequestValid;
+
   vtkProgressStore ProgressStore;
 #ifdef PARAVIEW_USE_MPI
   vtkMPICommunicator::Request AsyncRequest;
+  vtkMPICommunicator::Request AsyncMessageRequest;
 #endif
   bool AsyncRequestValid;
   char AsyncRequestData[ASYNCREQUESTDATA_MAX_SIZE];
@@ -232,6 +246,8 @@ public:
   vtkInternals()
     {
     this->AsyncRequestValid = false;
+    this->AsyncMessageRequestValid = false;
+
     this->EnableProgress = false;
     this->ForceAsyncRequestReceived = false;
     this->ProgressTimer = vtkTimerLog::New();
@@ -247,6 +263,7 @@ public:
     {
     this->ProgressTimer->Delete();
     this->ProgressTimer = 0;
+    this->Messages.clear();
     }
 
   int GetIDFromObject(vtkObject* obj)
@@ -269,6 +286,7 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->Observer->SetTarget(this);
   this->LastProgress = 0;
   this->LastProgressText = NULL;
+  this->LastMessage = NULL;
   this->ProgressFrequency = 2.0; // seconds
   this->AddedHandlers = false;
 }
@@ -277,6 +295,7 @@ vtkPVProgressHandler::vtkPVProgressHandler()
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
   this->SetLastProgressText(NULL);
+  this->SetLastMessage(NULL);
   this->SetSession(0);
   delete this->Internals;
   this->Observer->SetTarget(0);
@@ -291,6 +310,7 @@ void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
     {
     this->Internals->RegisteredObjects[object] = id;
     object->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+    object->AddObserver(vtkCommand::MessageEvent, this->Observer);
     }
 }
 
@@ -323,6 +343,27 @@ void vtkPVProgressHandler::PrepareProgress()
 
   if (this->AddedHandlers == false)
     {
+#ifdef PARAVIEW_USE_MPI
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if ((pm->GetNumberOfLocalPartitions() != 1) && (pm->GetPartitionId() == 0))
+    {
+      //start waiting for message events before we make our own event
+      vtkMPIController* controller = vtkMPIController::SafeDownCast(
+        vtkMultiProcessController::GetGlobalController());
+
+      controller->NoBlockReceive(this->Internals->AsyncMessageStore,
+        ASYNCHMESSAGE_MAX_SIZE,
+        vtkMultiProcessController::ANY_SOURCE,
+        vtkPVProgressHandler::MESSAGE_EVENT_TAG,
+        this->Internals->AsyncMessageRequest);
+
+      this->Internals->AsyncMessageRequestValid = true;
+    }
+#endif
+
+    vtkOutputWindow::GetInstance()->AddObserver
+      (vtkCommand::MessageEvent, this->Observer);
+
     vtkMultiProcessController* ds_controller = this->Session->GetController(
       vtkPVSession::DATA_SERVER_ROOT);
     vtkMultiProcessController* rs_controller = this->Session->GetController(
@@ -410,6 +451,16 @@ void vtkPVProgressHandler::CleanupSatellites()
     // by the satellites
     if (myId == 0)
       {
+      vtkMultiProcessController* client_controller =
+        this->Session->GetController(vtkPVSession::CLIENT);
+      if (client_controller)
+        {
+        //forward any waiting messages from satellites to client first
+        this->ReceiveMessagesFromSatellites();
+        this->SendMessageToClient(client_controller);
+        this->Internals->Messages.clear();
+        }
+
       for (int cc=1; cc < numProcs; cc++)
         {
         int temp = 0;
@@ -599,7 +650,7 @@ int vtkPVProgressHandler::GatherProgress()
     }
   else
     {
-    // Send local progress to the root node. 
+    // Send local progress to the root node.
     this->SendProgressToRoot();
     }
   return 0;
@@ -617,7 +668,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
   int req_count = 0;
 #ifdef PARAVIEW_USE_MPI
   if (this->Internals->AsyncRequestValid &&
-    (this->Internals->ForceAsyncRequestReceived || 
+    (this->Internals->ForceAsyncRequestReceived ||
      this->Internals->AsyncRequest.Test()))
     {
     int pid, oid, progress;
@@ -636,7 +687,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
     //cout << "----Received: " << text.c_str() << ": " << progress << endl;
 
     this->Internals->ProgressStore.AddRemoteProgress(
-      pid, oid, text, progress/100.0); 
+      pid, oid, text, progress/100.0);
     req_count++;
     this->Internals->AsyncRequestValid = false;
     this->Internals->ForceAsyncRequestReceived =false;
@@ -742,6 +793,14 @@ bool vtkPVProgressHandler::OnWrongTagEvent(void* calldata)
   const char* ptr = data;
   memcpy(&tag, ptr, sizeof(tag));
 
+  if ( tag == vtkPVProgressHandler::MESSAGE_EVENT_TAG)
+    {
+    ptr += sizeof(tag);
+    ptr += sizeof(len);
+    this->SetLocalMessage(ptr);
+    return true;
+    }
+
   // We won't handle this event, let the default handler take care of it.
   // Default handler is defined in vtkPVSession::OnWrongTagEvent().
   if ( tag != vtkPVProgressHandler::PROGRESS_EVENT_TAG)
@@ -764,4 +823,162 @@ bool vtkPVProgressHandler::OnWrongTagEvent(void* calldata)
     this->HandleServerProgress(val, ptr);
     }
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::OnMessageEvent(vtkObject* obj,
+  char* message)
+{
+  this->SetLastMessage(message);
+  this->GatherMessage();
+
+  vtkMultiProcessController* client_controller =
+    this->Session->GetController(vtkPVSession::CLIENT);
+
+  if (client_controller)
+    {
+    this->SendMessageToClient(client_controller);
+    this->Internals->Messages.clear();
+    }
+
+  if ( (this->Session->GetProcessRoles() & vtkPVSession::CLIENT) ==
+    vtkPVSession::CLIENT)
+    {
+    this->InvokeEvent(vtkCommand::MessageEvent, (void*)message);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProgressHandler::GatherMessage()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetNumberOfLocalPartitions() == 1)
+    {
+    return 0;
+    }
+  if (pm->GetPartitionId() == 0)
+    {
+    this->ReceiveMessagesFromSatellites();
+    }
+  else
+    {
+    this->SendMessageToRoot();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SendMessageToRoot()
+{
+#ifdef PARAVIEW_USE_MPI
+  int msgsize = strlen(this->LastMessage)+1; //include null terminator
+  if (msgsize+sizeof(int) > ASYNCHMESSAGE_MAX_SIZE)
+    {
+    msgsize = ASYNCHMESSAGE_MAX_SIZE-sizeof(int);
+    }
+  int pid = vtkProcessModule::GetProcessModule()->GetPartitionId();
+  vtkByteSwap::SwapLE(&pid);
+
+  memcpy(this->Internals->AsyncMessageStore, &pid, sizeof(int));
+  memcpy(this->Internals->AsyncMessageStore+sizeof(int), this->LastMessage,
+        msgsize);
+
+  vtkMPIController* controller = vtkMPIController::SafeDownCast
+    (vtkMultiProcessController::GetGlobalController());
+  controller->NoBlockSend
+    (this->Internals->AsyncMessageStore,
+    msgsize+sizeof(int), 0,
+    vtkPVProgressHandler::MESSAGE_EVENT_TAG,
+    this->Internals->AsyncMessageRequest);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::ReceiveMessagesFromSatellites()
+{
+#ifdef PARAVIEW_USE_MPI
+  vtkMPIController* controller = vtkMPIController::SafeDownCast(
+    vtkMultiProcessController::GetGlobalController());
+
+  if (this->Internals->AsyncMessageRequestValid //we should look
+      &&
+      this->Internals->AsyncMessageRequest.Test()) //there is something
+    {
+    //figure out who sent it
+    int pid = -1;
+    memcpy(&pid, this->Internals->AsyncMessageStore, sizeof(int));
+    vtkByteSwap::SwapLE(&pid);
+
+    //get their message, and ensure it is null terminated if too long
+    this->Internals->AsyncMessageStore[ASYNCHMESSAGE_MAX_SIZE-1]=NULL;
+    std::string text = reinterpret_cast<const char*>(
+          this->Internals->AsyncMessageStore+sizeof(int));
+
+    //add it the cache
+    this->Internals->Messages[pid] = text;
+    this->Internals->AsyncMessageRequestValid = false;
+    }
+
+   if (this->Internals->AsyncMessageRequestValid == false)
+    {
+    //setup to look for next message
+    controller->NoBlockReceive(this->Internals->AsyncMessageStore,
+      ASYNCHMESSAGE_MAX_SIZE,
+      vtkMultiProcessController::ANY_SOURCE,
+      vtkPVProgressHandler::MESSAGE_EVENT_TAG,
+      this->Internals->AsyncMessageRequest);
+
+    this->Internals->AsyncMessageRequestValid = true;
+
+    return this->ReceiveMessagesFromSatellites(); //recurse to loop
+    }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SendMessageToClient(
+  vtkMultiProcessController* controller)
+{
+  int showOrigin = vtkProcessModule::GetProcessModule()->
+    GetOptions()->GetSatelliteMessageIds();
+  vtksys_ios::ostringstream allmessages;
+  if (this->LastMessage)
+    {
+    if (showOrigin)
+      {
+      allmessages << "0 :";
+      }
+    allmessages << this->LastMessage;
+    allmessages << "\n";
+    }
+  std::map<int, std::string>::iterator it;
+  for(it = this->Internals->Messages.begin();
+      it != this->Internals->Messages.end();
+      it++)
+    {
+    vtksys_ios::ostringstream satsmessage;
+    if (showOrigin)
+      {
+      satsmessage << it->first;
+      satsmessage << " :";
+      }
+    satsmessage << it->second;
+    satsmessage << "\n";
+    allmessages << satsmessage.str().c_str();
+    }
+  int len = allmessages.str().size()+1;
+  if (len > 1)
+    {
+    controller->Send(allmessages.str().c_str(), len, 1,
+                     vtkPVProgressHandler::MESSAGE_EVENT_TAG);
+    }
+  this->Internals->Messages.clear();
+  this->SetLastMessage(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SetLocalMessage(const char* text)
+{
+  this->SetLastMessage(text);
+  this->InvokeEvent(vtkCommand::MessageEvent, (void*)text);
 }

@@ -160,6 +160,11 @@ public:
   // When set, use cuda interop feature
   vtkGetMacro(UseCudaInterop, int);
 
+  // Description:
+  // Include originating process id text into server to client messages.
+  vtkSetMacro(SatelliteMessageIds, int);
+  vtkGetMacro(SatelliteMessageIds, int );
+
 protected:
 //BTX
   // Description:
@@ -266,6 +271,7 @@ private:
 
   int UseCudaInterop;
 
+  int SatelliteMessageIds;
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented
