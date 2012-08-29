@@ -42,7 +42,7 @@ include("${VTK_CONFIG_FILE}")
 
 if (__pv_install_tree)
 else()
-  list(APPEND VTK_INCLUDE_DIRS @ParaView_BINARY_DIR@)
+  list(APPEND VTK_INCLUDE_DIRS "@ParaView_BINARY_DIR@")
 endif()
 
 # unless using external vtk (when we start supporting it, that is)
