@@ -48,6 +48,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // -----------------------------------------------------------------------macro
+QPointer<vtkVRConnectionManager> vtkVRConnectionManager::Instance;
+void vtkVRConnectionManager::setInstance(vtkVRConnectionManager* mgr)
+{
+  vtkVRConnectionManager::Instance = mgr;
+}
+
+vtkVRConnectionManager* vtkVRConnectionManager::instance()
+{
+  return vtkVRConnectionManager::Instance;
+}
 
 // --------------------------------------------------------------------internal
 // IMPORTANT: Make sure that this struct has no pointers.  All pointers should
@@ -89,24 +99,28 @@ vtkVRConnectionManager::~vtkVRConnectionManager()
 void vtkVRConnectionManager::add( vtkVRPNConnection* conn )
 {
   this->Internals->VRPNConnections.push_front( conn );
+  emit this->connectionsChanged();
 }
 
 void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
 {
   conn->Stop();
   this->Internals->VRPNConnections.removeAll( conn );
+  emit this->connectionsChanged();
 }
 #endif
 #ifdef PARAVIEW_USE_VRUI
 void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
 {
   this->Internals->VRUIConnections.push_front( conn );
+  emit this->connectionsChanged();
 }
 
 void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
 {
   conn->Stop();
   this->Internals->VRUIConnections.removeAll( conn );
+  emit this->connectionsChanged();
 }
 #endif
 void vtkVRConnectionManager::clear()
@@ -118,6 +132,7 @@ void vtkVRConnectionManager::clear()
 #ifdef PARAVIEW_USE_VRUI
   this->Internals->VRUIConnections.clear();
 #endif
+  emit this->connectionsChanged();
 }
 
 void vtkVRConnectionManager::start()
@@ -227,6 +242,7 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
       this->configureConnections(xml->FindNestedElementByName("VRConnectionManager"),
                                  locator);
       }
+  emit this->connectionsChanged();
 }
 
 void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root )

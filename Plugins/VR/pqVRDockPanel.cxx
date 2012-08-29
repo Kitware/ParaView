@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRStarter.cxx
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,66 +29,65 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqVRStarter.h"
-#include <QtDebug>
-#include <QTimer>
-#include "vtkPVVRConfig.h"
-#include "vtkProcessModule.h"
-#include "vtkPVXMLElement.h"
-#include "vtkVRQueue.h"
-#include "vtkVRQueueHandler.h"
-#include "pqApplicationCore.h"
-#include "vtkVRConnectionManager.h"
+#include "pqVRDockPanel.h"
+#include "ui_pqVRDockPanel.h"
 
-//-----------------------------------------------------------------------------
-class pqVRStarter::pqInternals
+#include <QtDebug>
+
+#include "vtkVRConnectionManager.h"
+#include "pqVRAddConnectionDialog.h"
+
+class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
 public:
-  vtkVRConnectionManager *ConnectionManager;
-  vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
 };
 
 //-----------------------------------------------------------------------------
-pqVRStarter::pqVRStarter(QObject* p/*=0*/)
-  : QObject(p)
+void pqVRDockPanel::constructor()
 {
-  this->Internals = new pqInternals;
-  this->Internals->EventQueue = NULL;
-  this->Internals->Handler = NULL;
-  this->IsShutdown = false;
+  this->setWindowTitle("VR Panel");
+  QWidget* container = new QWidget(this);
+  this->Internals = new pqInternals();
+  this->Internals->setupUi(container);
+  this->setWidget(container);
+
+  QObject::connect(this->Internals->addConnection,
+    SIGNAL(clicked()), this, SLOT(addConnection()));
+
+  vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+  QObject::connect(mgr, SIGNAL(connectionsChanged()),
+    this, SLOT(updateConnections()));
 }
 
 //-----------------------------------------------------------------------------
-pqVRStarter::~pqVRStarter()
+pqVRDockPanel::~pqVRDockPanel()
 {
-  if(!this->IsShutdown)
+  delete this->Internals;
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::updateConnections()
+{
+  this->Internals->connectionsTable->clear();
+  
+  vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+  QList<QString> connectionNames = mgr->connectionNames();
+  foreach (const QString& name, connectionNames)
     {
-      this->onShutdown();
+    this->Internals->connectionsTable->addItem(name);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqVRStarter::onStartup()
+void pqVRDockPanel::addConnection()
 {
-  this->Internals->EventQueue = new vtkVRQueue(this);
-  this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
-  vtkVRConnectionManager::setInstance(this->Internals->ConnectionManager);
-  this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
-  this->Internals->ConnectionManager->start();
-  this->Internals->Handler->start();
-  //qWarning() << "Message from pqVRStarter: Application Started";
-}
+  pqVRAddConnectionDialog dialog(this);
+  if (dialog.exec() == QDialog::Accepted)
+    {
+    qDebug() << "add new connection.";
+    vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
 
-//-----------------------------------------------------------------------------
-void pqVRStarter::onShutdown()
-{
-  this->Internals->Handler->stop();
-  this->Internals->ConnectionManager->stop();
-  vtkVRConnectionManager::setInstance(NULL);
-  delete this->Internals->Handler;
-  delete this->Internals->ConnectionManager;
-  delete this->Internals->EventQueue;
-  this->IsShutdown = true;
-  // qWarning() << "Message from pqVRStarter: Application Shutting down";
+    // create and add new connection to mgr.
+
+    }
 }

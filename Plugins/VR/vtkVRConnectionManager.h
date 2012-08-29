@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVVRConfig.h"
 
 #include <QObject>
-
+#include <QPointer>
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
@@ -62,6 +62,10 @@ public:
 #endif
   void clear();
 
+  QList<QString> connectionNames() const;
+
+  static vtkVRConnectionManager* instance();
+
 public slots:
   /// start/stop connections
   void start();
@@ -74,10 +78,17 @@ public slots:
   // save the connection configuration
   void saveConnectionsConfiguration( vtkPVXMLElement* root );
 
+signals:
+  void connectionsChanged();
+
 private:
   Q_DISABLE_COPY(vtkVRConnectionManager);
   class pqInternals;
   pqInternals* Internals;
+
+  friend class pqVRStarter;
+  static void setInstance(vtkVRConnectionManager*);
+  static QPointer<vtkVRConnectionManager> Instance;
 };
 
 #endif // __vtkVRConnectionManager_h
