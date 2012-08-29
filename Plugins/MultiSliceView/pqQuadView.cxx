@@ -33,11 +33,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include "pqQVTKWidget.h"
+#include "pqUndoStack.h"
 #include "vtkPVQuadRenderView.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 #include <QGridLayout>
 #include <QWidget>
+
+namespace
+{
+  /// override QWidget to update the "ViewSize" property whenever the widget
+  /// resizes.
+  class pqSizableWidget : public QWidget
+  {
+  typedef QWidget Superclass;
+  vtkWeakPointer<vtkSMProxy> Proxy;
+public:
+  pqSizableWidget(vtkSMProxy* proxy) : Proxy(proxy) { }
+protected:
+  virtual void resizeEvent(QResizeEvent* evt)
+    {
+    this->Superclass::resizeEvent(evt);
+    if (this->Proxy)
+      {
+      BEGIN_UNDO_EXCLUDE();
+      int view_size[2];
+      view_size[0] = this->size().width();
+      view_size[1] = this->size().height();
+      vtkSMPropertyHelper(this->Proxy, "ViewSize").Set(view_size, 2);
+      this->Proxy->UpdateProperty("ViewSize");
+      END_UNDO_EXCLUDE();
+      }
+    }
+  };
+}
 
 //-----------------------------------------------------------------------------
 pqQuadView::pqQuadView(
@@ -55,10 +85,11 @@ pqQuadView::~pqQuadView()
 //-----------------------------------------------------------------------------
 QWidget* pqQuadView::createWidget()
 {
+  vtkSMProxy* viewProxy = this->getProxy();
   vtkPVQuadRenderView* clientView = vtkPVQuadRenderView::SafeDownCast(
-    this->getProxy()->GetClientSideObject());
+    viewProxy->GetClientSideObject());
 
-  QWidget* container = new QWidget();
+  QWidget* container = new pqSizableWidget(viewProxy);
   container->setObjectName("QuadView");
   container->setStyleSheet("background-color: white");
   container->setAutoFillBackground(true);
@@ -69,24 +100,25 @@ QWidget* pqQuadView::createWidget()
 
   pqQVTKWidget* vtkwidget = new pqQVTKWidget();
   vtkwidget->setSizePropertyName("ViewSizeTopLeft");
-  vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setViewProxy(viewProxy);
   vtkwidget->SetRenderWindow(clientView->GetOrthoViewWindow(vtkPVQuadRenderView::TOP_LEFT));
   gLayout->addWidget(vtkwidget, 0, 0);
 
   vtkwidget = new pqQVTKWidget();
   vtkwidget->setSizePropertyName("ViewSizeBottomLeft");
-  vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setViewProxy(viewProxy);
   vtkwidget->SetRenderWindow(clientView->GetOrthoViewWindow(vtkPVQuadRenderView::BOTTOM_LEFT));
   gLayout->addWidget(vtkwidget, 1, 0);
 
   vtkwidget = new pqQVTKWidget();
   vtkwidget->setSizePropertyName("ViewSizeTopRight");
-  vtkwidget->setViewProxy(this->getProxy());
+  vtkwidget->setViewProxy(viewProxy);
   vtkwidget->SetRenderWindow(clientView->GetOrthoViewWindow(vtkPVQuadRenderView::TOP_RIGHT));
   gLayout->addWidget(vtkwidget, 0, 1);
 
   vtkwidget = qobject_cast<pqQVTKWidget*>(this->Superclass::createWidget());
   vtkwidget->setParent(container);
+  vtkwidget->setSizePropertyName("ViewSizeBottomRight");
   vtkwidget->setObjectName("View3D");
   vtkwidget->SetRenderWindow(clientView->GetRenderWindow());
   gLayout->addWidget(vtkwidget, 1, 1);

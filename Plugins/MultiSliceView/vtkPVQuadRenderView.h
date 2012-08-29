@@ -77,6 +77,9 @@ public:
   void SetSizeTopRight(int x, int y) { this->SetOrthoSize(TOP_RIGHT, x, y); }
   void SetOrthoSize(ViewTypes type, int x, int y);
 
+  // Description:
+  // Set the bottom-right window size, which is same this superclass' size.
+  void SetSizeBottomRight(int x, int y) { this->Superclass::SetSize(x, y); }
 //BTX
 protected:
   vtkPVQuadRenderView();
