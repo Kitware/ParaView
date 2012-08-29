@@ -67,6 +67,13 @@ public:
   /// Retrun the Proxy ID if any, otherwise return 0
   vtkTypeUInt32 getProxyId();
 
+  /// Set/Get the name of the property to use to update the size of the widget
+  /// on the proxy. By default "ViewSize" is used.
+  void setSizePropertyName(const QString& pname)
+    { this->SizePropertyName = pname; }
+  const QString& sizePropertyName() const
+    { return this->SizePropertyName; }
+
 public slots:
   void paintMousePointer(int x, int y);
 
@@ -90,6 +97,7 @@ private:
   vtkSmartPointer<vtkSMProxy> ViewProxy;
   vtkWeakPointer<vtkSMSession> Session;
   QImage MousePointerToDraw;
+  QString SizePropertyName;
 };
 
 #endif

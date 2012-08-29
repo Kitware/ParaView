@@ -24,7 +24,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     pqThreeSliceView.h
     pqThreeSliceViewOptions.h
 
-    vtkMultiSliceContextItem.h
+    pqQuadView.h
   )
 
   QT4_WRAP_UI(UI_SRCS
@@ -47,6 +47,13 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_XML_NAME ThreeSlice
   )
 
+  add_paraview_view_module(
+    VIEW3_IFACE VIEW3_IFACE_SRCS
+    VIEW_TYPE pqQuadView
+    VIEW_NAME "Quad View"
+    VIEW_XML_GROUP "views"
+    VIEW_XML_NAME "QuadView")
+
   ADD_PARAVIEW_VIEW_OPTIONS(
     VIEW2_OPTIONS_IFACE VIEW2_OPTIONS_IFACE_SRCS
     VIEW_TYPE pqThreeSliceView
@@ -58,8 +65,10 @@ IF(PARAVIEW_BUILD_QT_GUI)
     SERVER_MANAGER_SOURCES
       vtkCompositeMultiSliceRepresentation.cxx
       vtkMultiSliceRepresentation.cxx
+      vtkPVQuadRenderView.cxx
       vtkPVThreeSliceView.cxx
       vtkSMMultiSliceViewProxy.cxx
+      vtkSMQuadViewProxy.cxx
       vtkSMThreeSliceViewProxy.cxx
       vtkThreeSliceFilter.cxx
 
@@ -69,6 +78,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
     GUI_INTERFACES
       ${VIEW1_IFACE}
       ${VIEW2_IFACE}
+      ${VIEW3_IFACE}
       ${VIEW2_OPTIONS_IFACE}
 
     GUI_SOURCES
@@ -76,6 +86,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
       ${UI_SRCS}
       ${VIEW1_IFACE_SRCS}
       ${VIEW2_IFACE_SRCS}
+      ${VIEW3_IFACE_SRCS}
       ${VIEW2_OPTIONS_IFACE_SRCS}
       pqActiveThreeSliceRenderViewOptions.cxx
 
@@ -84,6 +95,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
       pqThreeSliceView.cxx
       pqThreeSliceViewOptions.cxx
+
+      pqQuadView.cxx
 
       vtkMultiSliceContextItem.cxx
   )

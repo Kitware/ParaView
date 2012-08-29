@@ -1,11 +1,58 @@
 <ServerManagerConfiguration>
    <ProxyGroup name="views">
+      <!-- ================================================================ -->
       <MultiSliceViewProxy name="MultiSlice" class="vtkPVRenderView"
          processes="client|renderserver|dataserver"
          base_proxygroup="views" base_proxyname="RenderView"
          representation_name="CompositeMultiSliceRepresentation">
       </MultiSliceViewProxy>
 
+      <!-- ================================================================ -->
+      <QuadViewProxy name="QuadView" class="vtkPVQuadRenderView"
+         processes="client|renderserver|dataserver"
+         base_proxygroup="views" base_proxyname="RenderView">
+         <Documentation>
+          QuadView comprises for 4 render views (3 orthogonal, 1 3D view) for
+          showing slices from a 3D dataset.
+         </Documentation>
+
+         <IntVectorProperty command="SetSizeTopLeft"
+                            default_values="400 400"
+                            ignore_synchronization="1"
+                            name="ViewSizeTopLeft"
+                            number_of_elements="2"
+                            state_ignored="1">
+           <Hints>
+             <NoDefault />
+           </Hints>
+         </IntVectorProperty>
+
+         <IntVectorProperty command="SetSizeBottomLeft"
+                            default_values="400 400"
+                            ignore_synchronization="1"
+                            name="ViewSizeBottomLeft"
+                            number_of_elements="2"
+                            state_ignored="1">
+           <Hints>
+             <NoDefault />
+           </Hints>
+         </IntVectorProperty>
+
+         <IntVectorProperty command="SetSizeTopRight"
+                            default_values="400 400"
+                            ignore_synchronization="1"
+                            name="ViewSizeTopRight"
+                            number_of_elements="2"
+                            state_ignored="1">
+           <Hints>
+             <NoDefault />
+           </Hints>
+         </IntVectorProperty>
+
+
+      </QuadViewProxy>
+
+      <!-- ================================================================ -->
       <ThreeSliceViewProxy name="ThreeSlice" class="vtkPVThreeSliceView"
                            processes="client">
         <SubProxy>
