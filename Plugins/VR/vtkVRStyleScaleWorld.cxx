@@ -197,7 +197,7 @@ void vtkVRStyleScaleWorld::HandleButtonPlus( const vtkVREventData& data )
       if ( proxy )
         {
         prop =
-          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
           vtkTransform *scaleMatrix = vtkTransform::New();
@@ -205,7 +205,7 @@ void vtkVRStyleScaleWorld::HandleButtonPlus( const vtkVREventData& data )
                              this->ScaleFactor,
                              this->ScaleFactor );
           double old[16], neo[16];
-           vtkSMPropertyHelper( proxy, "WandPose" ).Get( &old[0], 16 );
+           vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( &old[0], 16 );
            vtkMatrix4x4::Multiply4x4(&( scaleMatrix->GetMatrix()->Element[0][0] ),
                                      old,
                                      neo);
@@ -254,7 +254,7 @@ void vtkVRStyleScaleWorld::HandleButtonMinus( const vtkVREventData& data )
       if ( proxy )
         {
         prop =
-          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
           vtkTransform *scaleMatrix = vtkTransform::New();
@@ -262,7 +262,7 @@ void vtkVRStyleScaleWorld::HandleButtonMinus( const vtkVREventData& data )
                               this->ScaleFactor,
                               this->ScaleFactor );
           double old[16], neo[16];
-          vtkSMPropertyHelper( proxy, "WandPose" ).Get( &old[0], 16 );
+          vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( &old[0], 16 );
           vtkMatrix4x4::Multiply4x4(&( scaleMatrix->GetMatrix()->Element[0][0] ),
                                     old,
                                     neo);

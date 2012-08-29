@@ -213,7 +213,7 @@ void vtkVRStyleGrabNTranslateWorld::HandleTracker( const vtkVREventData& data )
       if ( proxy )
         {
         prop =
-          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
           // Calculate the delta between the old rcorded value and new value
@@ -226,7 +226,7 @@ void vtkVRStyleGrabNTranslateWorld::HandleTracker( const vtkVREventData& data )
           // Get the current transformation matrix
           std::cout<< "Gettting the wand pose" <<std::endl;
           double oldPose[16];
-          vtkSMPropertyHelper(proxy, "WandPose").
+          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").
             Get(&oldPose[0], 16 );
 
           prop->SetElement( 3,  oldPose[3]  + deltaPos[0]);

@@ -236,7 +236,7 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
       if ( proxy )
         {
         prop =
-          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+          vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
           if ( !this->InitialPositionRecorded )
@@ -252,10 +252,10 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
               }
             // invert the matrix
             vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-            double wandPose[16];
-            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            double modelTransformMatrix[16];
+            vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( modelTransformMatrix, 16 );
             vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
-                                      wandPose,
+                                      modelTransformMatrix,
                                       &this->InitialInvertedPose->Element[0][0]);
              vtkSMPropertyHelper( this->Proxy, "Origin" ).Get(this->Origin, 3 );
              this->Origin[3] =1;
@@ -263,12 +263,12 @@ void vtkVRStyleGrabNTranslateSliceOrigin::HandleTracker( const vtkVREventData& d
             }
           else
             {
-            double wandPose[16];
+            double modelTransformMatrix[16];
             double origin[4];
             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
                                       &this->InitialInvertedPose->Element[0][0],
-                                      wandPose);
-            vtkMatrix4x4::MultiplyPoint( wandPose, this->Origin, origin );
+                                      modelTransformMatrix);
+            vtkMatrix4x4::MultiplyPoint( modelTransformMatrix, this->Origin, origin );
             vtkSMPropertyHelper( this->Proxy, "Origin" ).Set( origin, 3 );
             }
 

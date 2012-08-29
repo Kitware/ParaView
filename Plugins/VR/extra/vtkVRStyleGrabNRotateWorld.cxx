@@ -206,7 +206,7 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
       proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
       if ( proxy )
         {
-        prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+        prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
 #define FANCY_LOGIC 0
@@ -253,19 +253,19 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
               }
             // invert the matrix
             vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-            double wandPose[16];
-            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            double modelTransformMatrix[16];
+            vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( modelTransformMatrix, 16 );
             vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
-                                      wandPose,
+                                      modelTransformMatrix,
                                       &this->InitialInvertedPose->Element[0][0]);
             this->InitialOrientationRecored = true;
             }
           else
             {
-            double wandPose[16];
+            double modelTransformMatrix[16];
             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
                                       &this->InitialInvertedPose->Element[0][0],
-                                      wandPose);
+                                      modelTransformMatrix);
             // // Copy the data into matrix
             // for (int i = 0; i < 4; ++i)
             //   {
@@ -276,7 +276,7 @@ void vtkVRStyleGrabNRotateWorld::HandleTracker( const vtkVREventData& data )
             //   }
             // // invert the matrix
             // vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-            vtkSMPropertyHelper(proxy,"WandPose").Set(wandPose,16);
+            vtkSMPropertyHelper(proxy,"ModelTransformMatrix").Set(modelTransformMatrix,16);
             }
 #else
           prop->SetElement( 0,  data.data.tracker.matrix[0] );
@@ -335,7 +335,7 @@ void vtkVRStyleGrabNRotateWorld::RecordOrientation(vtkSMRenderViewProxy* proxy, 
   // Collect the current rotation matrix
   double old[16];
   double oldMat[3][3];
-  vtkSMPropertyHelper( proxy, "WandPose" ).Get( &old[0], 16 );
+  vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( &old[0], 16 );
   for (int i = 0; i < 3; ++i)
     {
     for (int j = 0; j < 3; ++j)

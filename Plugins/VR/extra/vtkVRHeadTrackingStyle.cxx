@@ -68,7 +68,7 @@ bool vtkVRHeadTrackingStyle::GetHeadPoseProxyNProperty()
     this->Proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
     if ( this->Proxy )
       {
-      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "HeadPose" ) );
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "EyeTransformMatrix" ) );
       if ( this->Property )
         {
         return true;

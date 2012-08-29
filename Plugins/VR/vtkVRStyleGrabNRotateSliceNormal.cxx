@@ -230,7 +230,7 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
       proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
       if ( proxy )
         {
-        prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
+        prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "ModelTransformMatrix" ) );
         if ( prop )
           {
           if( !this->InitialOrientationRecored)
@@ -245,10 +245,10 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
               }
             // invert the matrix
             vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-            double wandPose[16];
-            vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
+            double modelTransformMatrix[16];
+            vtkSMPropertyHelper( proxy, "ModelTransformMatrix" ).Get( modelTransformMatrix, 16 );
             vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
-                                      wandPose,
+                                      modelTransformMatrix,
                                       &this->InitialInvertedPose->Element[0][0]);
              vtkSMPropertyHelper( this->Proxy, "Normal" ).Get(this->Normal, 3 );
              this->Normal[3] =0;
@@ -256,12 +256,12 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
             }
           else
             {
-            double wandPose[16];
+            double modelTransformMatrix[16];
             double normal[4];
             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
                                       &this->InitialInvertedPose->Element[0][0],
-                                      wandPose);
-            vtkMatrix4x4::MultiplyPoint( wandPose, this->Normal, normal );
+                                      modelTransformMatrix);
+            vtkMatrix4x4::MultiplyPoint( modelTransformMatrix, this->Normal, normal );
             vtkSMPropertyHelper( this->Proxy, "Normal" ).Set(normal, 3 );
             }
           }

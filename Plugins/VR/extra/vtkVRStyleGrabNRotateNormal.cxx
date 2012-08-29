@@ -118,64 +118,6 @@ vtkPVXMLElement* vtkVRStyleGrabNRotateSliceNormal::saveConfiguration() const
   return child;
 }
 
-// //----------------------------------------------------------------------private
-// void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data )
-// {
-//   if ( this->Enabled )
-//     {
-//     vtkSMRenderViewProxy *proxy =0;
-//     vtkSMDoubleVectorProperty *prop =0;
-
-//     pqView *view = 0;
-//     view = pqActiveObjects::instance().activeView();
-//     if ( view )
-//       {
-//       proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-//       if ( proxy )
-//         {
-//         prop = vtkSMDoubleVectorProperty::SafeDownCast(proxy->GetProperty( "WandPose" ) );
-//         if ( prop )
-//           {
-//           if( !this->InitialOrientationRecored)
-//             {
-//             // Copy the data into matrix
-//             for (int i = 0; i < 4; ++i)
-//               {
-//               for (int j = 0; j < 4; ++j)
-//                 {
-//                 this->InitialInvertedPose->SetElement( i,j,data.data.tracker.matrix[i*4+j] );
-//                 }
-//               }
-//             // invert the matrix
-//             vtkMatrix4x4::Invert( this->InitialInvertedPose, this->InitialInvertedPose );
-//             double wandPose[16];
-//             vtkSMPropertyHelper( proxy, "WandPose" ).Get( wandPose, 16 );
-//             vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
-//                                       wandPose,
-//                                       &this->InitialInvertedPose->Element[0][0]);
-
-//             this->InitialOrientationRecored = true;
-//             }
-//           else
-//             {
-//             double wandPose[16];
-
-//             vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
-//                                       &this->InitialInvertedPose->Element[0][0],
-//                                       wandPose);
-//             vtkMatrix4x4::MultiplyPoint( wandPose, this->Normal, normal );
-//             vtkSMPropertyHelper( this->Proxy, "Normal" ).Set(normal, 3 );
-//             }
-//           }
-//         }
-//       }
-//     }
-//   else
-//     {
-//     this->InitialOrientationRecored = false;
-//     }
-// }
-
 bool vtkVRStyleGrabNRotateSliceNormal::GetNormalProxyNProperty()
 {
   if ( this->GetProxy( this->NormalProxyName,  &this->NormalProxy ) )
@@ -247,10 +189,11 @@ void vtkVRStyleGrabNRotateSliceNormal::HandleTracker( const vtkVREventData& data
         {
         this->InitialInvertedPose->SetMatrix( data.data.tracker.matrix );
         this->InitialInvertedPose->Inverse();
-        double wandPose[16];
+        double modelTransformationMatrix[16];
         vtkSMPropertyHelper( this->Proxy,
-                             this->PropertyName.c_str()).Get( wandPose, 16 );
-        this->InitialInvertedPose->Concatenate( wandPose );
+                             this->PropertyName.c_str()).Get(
+                             modelTransformationMatrix, 16 );
+        this->InitialInvertedPose->Concatenate(modelTransformationMatrix);
         this->GetPropertyData();
         this->IsInitialRecorded = true;
         }
