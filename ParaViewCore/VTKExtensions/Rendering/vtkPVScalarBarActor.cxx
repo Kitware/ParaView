@@ -32,6 +32,7 @@
 #include "vtkPolyDataMapper2D.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkScalarsToColors.h"
 #include "vtkTextActor.h"
 #include "vtkTextMapper.h"
@@ -112,8 +113,36 @@ void vtkPVScalarBarActor::ReleaseGraphicsResources(vtkWindow *window)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScalarBarActor::GetScalarBarRect(int rect[], vtkViewport *viewport)
+{
+  vtkCoordinate *origin = this->ScalarBarActor->GetPositionCoordinate();
+  int * vpPos = origin->GetComputedViewportValue(viewport);
+  rect[0] = vpPos[0];
+  rect[1] = vpPos[1];
+
+  double *bounds = this->ScalarBar->GetBounds();
+  rect[0] += static_cast<int>(bounds[0] + 0.5);
+  rect[1] += static_cast<int>(bounds[2] + 0.5);
+  rect[2] = static_cast<int>(bounds[1] - bounds[0] + 0.5);
+  rect[3] = static_cast<int>(bounds[3] - bounds[2] + 0.5);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
 {
+  // Is the viewport's RenderWindow capturing GL2PS-special props? We'll need
+  // to handle this specially to get the texture to show up right.
+  if (vtkRenderer *renderer = vtkRenderer::SafeDownCast(viewport))
+    {
+    if (vtkRenderWindow *renderWindow = renderer->GetRenderWindow())
+      {
+      if (renderWindow->GetCapturingGL2PSSpecialProps())
+        {
+        renderer->CaptureGL2PSSpecialProp(this);
+        }
+      }
+    }
+
   int renderedSomething = 0;
   
   if (this->UseOpacity)
