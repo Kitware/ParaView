@@ -32,13 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 
 #include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkVRQueue.h"
+
 #include <sstream>
 #include <algorithm>
 
@@ -46,9 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
   : Superclass(parentObject)
 {
-  this->OutProxy =0;
-  this->OutProperty=0;
-  this->IsFoundOutProxyProperty=false;
 }
 
 // ----------------------------------------------------------------------------
@@ -63,34 +55,10 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
       strcmp(this->metaObject()->className(),
       child->GetAttributeOrEmpty("class")) == 0)
     {
-    std::string outStr = child->GetAttributeOrEmpty( "set_property" );
-    if ( !outStr.size() )
-      {
-      std::cerr << "vtkVRStyleGrabNTranslateSliceOrigin::configure(): "
-                << "set_property not specified "
-                << std::endl
-                << "<Style class=\""
-                << this->metaObject()->className()
-                << "\" "
-                << "set_property=\"ProxyName.PropertyName\"/>"
-                << std::endl;
-      return false;
-      }
-    std::vector<std::string> token = this->tokenize( outStr );
-    if ( token.size()!=2 )
-      {
-      std::cerr << "Expected \"set_property\" Format:  Proxy.Property" << std::endl;
-      return false;
-      }
-    else
-      {
-      this->OutProxyName = token[0];
-      this->OutPropertyName = token[1];
-      this->IsFoundOutProxyProperty = GetOutProxyNProperty();
-      return this->IsFoundOutProxyProperty;
-      }
+    // just do basic validation here. vtkVRInteractorStyle.
     return true;
     }
+
   return false;
 }
 
@@ -100,10 +68,6 @@ vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
   child->AddAttribute("class",this->metaObject()->className());
-  std::stringstream propertyStr;
-  propertyStr << this->OutProxyName << "." << this->OutPropertyName;
-  child->AddAttribute( "set_property",propertyStr.str().c_str() );
-
   return child;
 }
 
@@ -123,42 +87,18 @@ std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetOutProxyNProperty()
-{
-  if(this->GetProxy( this->OutProxyName, &this->OutProxy ) )
-    {
-    if ( !this->GetProperty( this->OutProxy, this->OutPropertyName, &this->OutProperty ) )
-      {
-      std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
-                << std::endl
-                << "Property ( " << this->OutPropertyName << ") :Not Found"
-                <<std::endl;
-      return false;
-      }
-    }
-  else
-    {
-    std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
-              << std::endl
-              << "Proxy ( " << this->OutProxyName << ") :Not Found" << std::endl;
-    return false;
-    }
-  return true;
-}
-
-// ----------------------------------------------------------------------------
 bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
     {
     case BUTTON_EVENT:
-      this->HandleButton( data );
+      this->handleButton( data );
       break;
     case ANALOG_EVENT:
-      this->HandleAnalog( data );
+      this->handleAnalog( data );
       break;
     case TRACKER_EVENT:
-      this->HandleTracker( data );
+      this->handleTracker( data );
       break;
     }
   return false;
@@ -167,53 +107,20 @@ bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
 // -----------------------------------------------------------------------------
 bool vtkVRInteractorStyle::update()
 {
-  if(this->OutProxy)
-    {
-    this->OutProxy->UpdateVTKObjects();
-    }
-  return false;
+  return true;
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
-{
-  vtkSMProxy *p =0;
-  p = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetProxy( name.c_str() );
-  if( p )
-    {
-    *proxy = p;
-    return true;
-    }
-  return false;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetProperty( vtkSMProxy* proxy,
-                                        std::string name,
-                                        vtkSMDoubleVectorProperty** prop )
-{
-  vtkSMDoubleVectorProperty *p =0;
-  p =  vtkSMDoubleVectorProperty::
-      SafeDownCast( proxy->GetProperty( name.c_str()) );
-  if ( p )
-    {
-    *prop = p;
-    return true;
-    }
-  return false;
-}
-
-// ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::HandleButton( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::handleButton( const vtkVREventData& vtkNotUsed( data ) )
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::HandleAnalog( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::handleAnalog( const vtkVREventData& vtkNotUsed( data ) )
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::HandleTracker( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::handleTracker( const vtkVREventData& vtkNotUsed( data ) )
 {
 }

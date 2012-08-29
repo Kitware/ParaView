@@ -31,93 +31,106 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRStyleTracking.h"
 
-#include "pqActiveObjects.h"
-#include "pqDataRepresentation.h"
-#include "pqView.h"
-#include "vtkCamera.h"
-#include "vtkMath.h"
+#include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkPVXMLElement.h"
-#include "vtkTransform.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
+
 #include <sstream>
 #include <algorithm>
+#include <QtDebug>
 
 // ----------------------------------------------------------------------------
 vtkVRStyleTracking::vtkVRStyleTracking(QObject* parentObject) :
   Superclass(parentObject)
 {
-  this->OutPose = vtkTransform::New();
 }
 
 // ----------------------------------------------------------------------------
 vtkVRStyleTracking::~vtkVRStyleTracking()
 {
-  this->OutPose->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkVRStyleTracking::setControlledProxy(vtkSMProxy* proxy)
+{
+  this->ControlledProxy = proxy;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkVRStyleTracking::controlledProxy() const
+{
+  return this->ControlledProxy;
 }
 
 //-----------------------------------------------------------------------------
 bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* locator)
 {
-  if ( Superclass::configure( child,locator ) )
+  int id;
+  if (!this->Superclass::configure(child, locator) &&
+    child->GetScalarAttribute("proxy", &id) == 0&&
+    child->GetAttribute("property") == NULL)
     {
-    vtkPVXMLElement* tracker = child->GetNestedElement(0);
+    return false;
+    }
+
+  this->ControlledProxy = locator->LocateProxy(id);
+  this->ControlledPropertyName = child->GetAttribute("property");
+
+  for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* tracker = child->GetNestedElement(cc);
     if (tracker && tracker->GetName() && strcmp(tracker->GetName(), "Tracker")==0)
       {
-      this->Tracker = tracker->GetAttributeOrEmpty("name");
+      this->TrackerName = tracker->GetAttributeOrEmpty("name");
       }
-    else
-      {
-      std::cerr << "vtkVRStyleTracking::configure(): "
-                << "Please Specify Tracker event" <<std::endl
-                << "<Tracker name=\"TrackerEventName\"/>"
-                << std::endl;
-      return false;
-      }
-    return true;
     }
-  return false;
+
+  if (this->TrackerName.isEmpty() || !this->ControlledProxy ||
+    this->ControlledPropertyName.isEmpty())
+    {
+    qCritical() << "Incorrect state for vtkVRStyleTracking";
+    return false;
+    }
+
+  return true;
 }
 
 // -----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
 {
-  vtkPVXMLElement* child = Superclass::saveConfiguration();
+  vtkPVXMLElement* child = this->Superclass::saveConfiguration();
+  child->AddAttribute("proxy",
+    this->ControlledProxy?
+    this->ControlledProxy->GetGlobalIDAsString() : "0");
+  if (!this->ControlledPropertyName.isEmpty())
+    {
+    child->AddAttribute("property",
+      this->ControlledPropertyName.toAscii().data());
+    }
   vtkPVXMLElement* tracker = vtkPVXMLElement::New();
   tracker->SetName("Tracker");
-  tracker->AddAttribute("name",this->Tracker.c_str() );
+  tracker->AddAttribute("name", this->TrackerName.toAscii().data() );
   child->AddNestedElement(tracker);
   tracker->FastDelete();
   return child;
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStyleTracking::HandleTracker( const vtkVREventData& data )
+void vtkVRStyleTracking::handleTracker( const vtkVREventData& data )
 {
-  if ( this->Tracker == data.name)
+  if ( this->TrackerName == QString(data.name.c_str()))
     {
-    this->OutPose->SetMatrix( data.data.tracker.matrix );
-    this->SetProperty( );
+    if (this->ControlledProxy && !this->ControlledPropertyName.isEmpty())
+      {
+      vtkSMPropertyHelper(this->ControlledProxy,
+        this->ControlledPropertyName.toAscii().data()).Set(
+        data.data.tracker.matrix, 16);
+      this->ControlledProxy->UpdateVTKObjects();
+      }
     }
-}
-
-// ----------------------------------------------------------------------------
-void vtkVRStyleTracking::SetProperty()
-{
-  vtkSMPropertyHelper(this->OutProxy,this->OutPropertyName.c_str())
-    .Set(&this->OutPose->GetMatrix()->Element[0][0],16 );
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRStyleTracking::update()
-{
-  Superclass::update();
-  return false;
 }

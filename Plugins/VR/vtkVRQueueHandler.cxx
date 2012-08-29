@@ -207,24 +207,24 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
           style->configure(child, locator);
           this->add(style);
           }
-        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
-          {
-          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
-          {
-          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRActiveObjectManipulationStyle")==0)
-          {
-          vtkVRActiveObjectManipulationStyle* style = new vtkVRActiveObjectManipulationStyle(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
+//        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
+//          {
+//          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
+//          style->configure(child, locator);
+//          this->add(style);
+//          }
+//        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
+//          {
+//          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
+//          style->configure(child, locator);
+//          this->add(style);
+//          }
+//        else if (strcmp(class_name, "vtkVRActiveObjectManipulationStyle")==0)
+//          {
+//          vtkVRActiveObjectManipulationStyle* style = new vtkVRActiveObjectManipulationStyle(this);
+//          style->configure(child, locator);
+//          this->add(style);
+//          }
         else
           {
           qWarning() << "Unknown interactor style: \"" << class_name << "\"";

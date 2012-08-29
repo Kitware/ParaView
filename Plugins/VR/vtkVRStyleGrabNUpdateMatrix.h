@@ -47,23 +47,19 @@ class vtkVRStyleGrabNUpdateMatrix : public vtkVRStyleTracking
 public:
   vtkVRStyleGrabNUpdateMatrix(QObject* parent);
   ~vtkVRStyleGrabNUpdateMatrix();
+
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleButton( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
-  virtual bool GetProxyNProperty();
-  virtual void GetPropertyData() {}
-  virtual bool update();
+
 protected:
-  vtkSMProxy *Proxy;
-  vtkSMDoubleVectorProperty *Property;
-  std::string ProxyName;
-  std::string PropertyName;
-  bool IsFoundProxyProperty;
-  std::string Button;
+  virtual void handleButton( const vtkVREventData& data );
+  virtual void handleTracker( const vtkVREventData& data );
+
+  QString ButtonName;
   bool Enabled;
+
   bool IsInitialRecorded;
-  vtkTransform *InitialInvertedPose;
+  vtkTransform *InverseInitialMatrix;
 };
 
 #endif //__vtkVRStyleGrabNUpdateMatrix.h_

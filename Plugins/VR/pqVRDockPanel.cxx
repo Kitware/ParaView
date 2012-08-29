@@ -54,9 +54,17 @@ void pqVRDockPanel::constructor()
   QObject::connect(this->Internals->addConnection,
     SIGNAL(clicked()), this, SLOT(addConnection()));
 
+  QObject::connect(this->Internals->addStyle,
+    SIGNAL(clicked()), this, SLOT(addStyle()));
+
+
   vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
   QObject::connect(mgr, SIGNAL(connectionsChanged()),
     this, SLOT(updateConnections()));
+
+  QObject::connect(this->Internals->proxyCombo,
+    SIGNAL(currentProxyChanged(vtkSMProxy*)),
+    this->Internals->propertyCombo, SLOT(setSource(vtkSMProxy*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -90,4 +98,12 @@ void pqVRDockPanel::addConnection()
     // create and add new connection to mgr.
 
     }
+}
+
+void pqVRDockPanel::addStyle()
+{
+  // Show up a dialog to configure the chosen interactor style connected to the
+  // given proxy/property.
+  QDialog dialog(this);
+  dialog.exec();
 }

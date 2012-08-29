@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRStyleTracking_h_
 
 #include "vtkVRInteractorStyle.h"
+#include "vtkWeakPointer.h"
 
-class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
+class vtkSMProxy;
+class vtkSMRenderViewProxy;
 class vtkTransform;
+
 struct vtkVREventData;
 
 class vtkVRStyleTracking : public vtkVRInteractorStyle
@@ -47,16 +50,28 @@ class vtkVRStyleTracking : public vtkVRInteractorStyle
 public:
   vtkVRStyleTracking(QObject* parent);
   ~vtkVRStyleTracking();
+
+  // Specify the proxy and property to control. The property needs to have 16
+  // elements and must be a numerical property.
+  void setControlledProxy(vtkSMProxy* proxy);
+  vtkSMProxy* controlledProxy() const;
+
+  void setControlledPropertyName(const QString& pname)
+    { this->ControlledPropertyName = pname; }
+  const QString& controlledPropertyName() const
+    { return this->ControlledPropertyName; }
+
+
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleTracker( const vtkVREventData& data );
-  virtual bool update();
-protected:
-  virtual void SetProperty( );
 
 protected:
-  std::string Tracker;
-  vtkTransform* OutPose;
+  virtual void handleTracker( const vtkVREventData& data );
+
+protected:
+  QString TrackerName;
+  QString ControlledPropertyName;
+  vtkWeakPointer<vtkSMProxy> ControlledProxy;
 };
 
 #endif //__vtkVRStyleTracking.h_

@@ -49,13 +49,13 @@ QT4_WRAP_CPP(MOC_SRCS
   pqVRStarter.h
   ${VRPN_MOC_SRC}
   ${VRUI_MOC_SRC}
-  vtkVRActiveObjectManipulationStyle.h
+#  vtkVRActiveObjectManipulationStyle.h
   vtkVRConnectionManager.h
   vtkVRInteractorStyle.h
   vtkVRQueue.h
   vtkVRQueueHandler.h
-  vtkVRStyleGrabNRotateSliceNormal.h
-  vtkVRStyleGrabNTranslateSliceOrigin.h
+#  vtkVRStyleGrabNRotateSliceNormal.h
+#  vtkVRStyleGrabNTranslateSliceOrigin.h
   vtkVRStyleGrabNUpdateMatrix.h
   vtkVRStyleTracking.h
   )
@@ -78,9 +78,9 @@ SET( VR_SOURCE_FILES
   vtkVRInteractorStyle.cxx
   vtkVRStyleTracking.cxx
   vtkVRStyleGrabNUpdateMatrix.cxx
-  vtkVRStyleGrabNRotateSliceNormal.cxx
-  vtkVRStyleGrabNTranslateSliceOrigin.cxx
-  vtkVRActiveObjectManipulationStyle.cxx
+#  vtkVRStyleGrabNRotateSliceNormal.cxx
+#  vtkVRStyleGrabNTranslateSliceOrigin.cxx
+#  vtkVRActiveObjectManipulationStyle.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRStarter

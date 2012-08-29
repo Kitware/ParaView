@@ -48,6 +48,7 @@ public:
 protected slots:
   void addConnection();
   void updateConnections();
+  void addStyle();
 
 private:
   Q_DISABLE_COPY(pqVRDockPanel)

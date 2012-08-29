@@ -48,29 +48,22 @@ class vtkVRInteractorStyle : public QObject
 public:
   vtkVRInteractorStyle(QObject* parent=0);
   virtual ~vtkVRInteractorStyle();
+
   virtual bool handleEvent(const vtkVREventData& data);
   virtual bool update();
+
+  /// Load state for the style from XML.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// Save state to xml.
   virtual vtkPVXMLElement* saveConfiguration() const;
-
-  virtual void HandleButton ( const vtkVREventData& data );
-  virtual void HandleAnalog ( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
-  std::vector<std::string> tokenize( std::string input);
-  bool GetProxy( std::string name, vtkSMProxy ** proxy );
-  bool GetProperty( vtkSMProxy* proxy,
-                    std::string name,
-                    vtkSMDoubleVectorProperty** property );
-
 protected:
-  bool GetOutProxyNProperty();
+  virtual void handleButton ( const vtkVREventData& data );
+  virtual void handleAnalog ( const vtkVREventData& data );
+  virtual void handleTracker( const vtkVREventData& data );
 
-protected:
-  std::string OutProxyName;
-  std::string OutPropertyName;
-  vtkSMProxy *OutProxy;
-  vtkSMDoubleVectorProperty *OutProperty;
-  bool IsFoundOutProxyProperty;
+  static std::vector<std::string> tokenize( std::string input);
+
 private:
   Q_DISABLE_COPY(vtkVRInteractorStyle)
 };
