@@ -78,7 +78,7 @@ public:
 
   // Description:
   // Get and set the file name. It is either the name of the case file or the
-  // name of the single binary file.  
+  // name of the single binary file.
   virtual void SetFileName(const char* filename);
   vtkGetStringMacro(FileName);
 
@@ -123,8 +123,8 @@ public:
   vtkBooleanMacro(GenerateActiveBlockArray,int);
 
   // Description:
-  // If true, the reader will extract tracer data at each time 
-  // step and include a field data array for the tracers at that 
+  // If true, the reader will extract tracer data at each time
+  // step and include a field data array for the tracers at that
   // time.
   vtkSetMacro(GenerateTracerArray,int);
   vtkGetMacro(GenerateTracerArray,int);
@@ -164,11 +164,11 @@ public:
   int GetNumberOfCellArrays();
   const char* GetCellArrayName(int idx);
   int GetCellArrayStatus(const char *name);
-  void SetCellArrayStatus(const char *name, int status);  
+  void SetCellArrayStatus(const char *name, int status);
 
   // Description:
   // Set the controller used to coordinate parallel reading.
-  // The "global controller" has all processes while the 
+  // The "global controller" has all processes while the
   // "controller" has only those who have blocks.
   void SetGlobalController(vtkMultiProcessController* controller);
 
@@ -186,7 +186,7 @@ protected:
 
   // Set the global bounds of all readers
   void SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
-                      int total_num_of_block, 
+                      int total_num_of_block,
                       int progressInterval,
                       int *rightHasBounds,
                       int *leftHasBounds);
@@ -213,8 +213,9 @@ protected:
 
   // Set things up to process an AMR Block
   int PrepareAMRData(vtkNonOverlappingAMR *hb,
-                     vtkSpyPlotBlock *block, 
+                     vtkSpyPlotBlock *block,
                      int *level,
+                     int *blockId,
                      int extents[6],
                      int realExtents[6],
                      int realDims[3],
@@ -254,11 +255,11 @@ protected:
     vtkInformationVector **inV,
     vtkInformationVector *outV);
 
-  
+
   // Read the case file and the first binary file do get meta
   // informations (number of files, number of fields, number of timestep).
-  virtual int RequestInformation(vtkInformation *request, 
-                                 vtkInformationVector **inputVector, 
+  virtual int RequestInformation(vtkInformation *request,
+                                 vtkInformationVector **inputVector,
                                  vtkInformationVector *outputVector);
 
   // Read the data: get the number of pieces (=processors) and get
@@ -276,7 +277,7 @@ protected:
   int UpdateMetaData(vtkInformation* request,
                      vtkInformationVector* outputVector);
 
-  int UpdateFile(vtkInformation *request, 
+  int UpdateFile(vtkInformation *request,
                  vtkInformationVector *outputVector);
 
   void AddGhostLevelArray(int numLevels);
@@ -311,10 +312,10 @@ protected:
   // fields. This method rebuilds the vector field from those scalar
   // component fields.
   void MergeVectors(vtkDataSetAttributes *da);
-  int MergeVectors(vtkDataSetAttributes *da, 
+  int MergeVectors(vtkDataSetAttributes *da,
                    vtkDataArray *a1,
                    vtkDataArray *a2);
-  int MergeVectors(vtkDataSetAttributes *da, 
+  int MergeVectors(vtkDataSetAttributes *da,
                    vtkDataArray *a1,
                    vtkDataArray *a2,
                    vtkDataArray *a3);
@@ -331,7 +332,7 @@ protected:
   // vtkSpyPlotReaderMap needs access to GetCellDataArraySelection().
   friend class vtkSpyPlotReaderMap;
   vtkSpyPlotReaderMap *Map;
-  
+
   int DistributeFiles;
 
   vtkBoundingBox *Bounds; //bounds of the hierarchy without the bad ghostcells.
@@ -345,7 +346,7 @@ protected:
   int GenerateTracerArray; // user flag
 
   int DownConvertVolumeFraction;
-  
+
   bool TimeRequestedFromPipeline;
 
   int MergeXYZComponents;

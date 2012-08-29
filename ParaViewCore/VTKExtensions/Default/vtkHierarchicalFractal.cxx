@@ -16,6 +16,7 @@
 
 #include "vtkAMRBox.h"
 #include "vtkAMRUtilities.h"
+#include "vtkAMRInformation.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
@@ -38,6 +39,134 @@
 #include <assert.h>
 
 vtkStandardNewMacro(vtkHierarchicalFractal);
+
+
+//----------------------------------------------------------------------------
+class HierarchicalFractalOutputUtil: public vtkObject
+{
+public:
+  static HierarchicalFractalOutputUtil *New();
+  vtkTypeMacro(HierarchicalFractalOutputUtil,vtkObject);
+
+  void Initialize(int gridDescription, const double* topLevelSpacing)
+  {
+    this->GridDescription = gridDescription;
+    for(int d =0; d<3; d++)
+      {
+      this->TopLevelSpacing[d] = topLevelSpacing[d];
+      }
+  }
+
+  int AddDataSet(vtkDataObject* newData, unsigned int level)
+  {
+    vtkSmartPointer<vtkDataObject> data;
+    data.TakeReference(newData);
+    this->DataSets.push_back(data);
+    this->Levels.push_back(level);
+    int index = static_cast<int>(this->DataSets.size())-1;
+    return index;
+  }
+
+  void SetAMRBox(int index, int ext[6])
+  {
+    vtkAMRBox box;
+    box.SetDimensions(ext[0],ext[2],ext[4],ext[1],ext[3],ext[5], this->GridDescription);
+    for(int i = static_cast<int>(this->Boxes.size()); i<=index; i++)
+      {
+      this->Boxes.push_back(vtkAMRBox());
+      }
+    this->Boxes[index] = box;
+  }
+
+  ~HierarchicalFractalOutputUtil()
+  {
+    this->DataSets.clear();
+    this->Levels.clear();
+  }
+
+  void CreateOutput(vtkMultiBlockDataSet* mbs)
+  {
+    for(size_t i=0; i<this->DataSets.size();i++)
+      {
+      vtkDataObject* dataSet = DataSets[i];
+      unsigned int level = this->Levels[i];
+      vtkMultiBlockDataSet* block = vtkMultiBlockDataSet::SafeDownCast(
+        mbs->GetBlock(level));
+      if (!block)
+        {
+        block = vtkMultiBlockDataSet::New();
+        mbs->SetBlock(level, block);
+        block->Delete();
+        }
+      unsigned int index = block->GetNumberOfBlocks();
+      block->SetBlock(index, dataSet);
+      }
+  }
+  void CreateOutput(vtkHierarchicalBoxDataSet* hbds)
+  {
+    std::vector<int> blocksPerLevel;
+    double origin[3] = {DBL_MAX,DBL_MAX,DBL_MAX};
+    for(size_t i=0; i<this->Levels.size();i++)
+      {
+      unsigned int level = this->Levels[i];
+      vtkUniformGrid* grid  = vtkUniformGrid::SafeDownCast(this->DataSets[i]);
+      if(grid)
+        {
+        double* gridOrigin = grid->GetOrigin();
+        for(int d=0; d<3; d++)
+          {
+          if(gridOrigin[d]<origin[d])
+            {
+            origin[d] = gridOrigin[d];
+            }
+          }
+        }
+      for (unsigned int j= static_cast<unsigned int>(blocksPerLevel.size()); j<=level; j++)
+        {
+        blocksPerLevel.push_back(0);
+        }
+      blocksPerLevel[level]++;
+      }
+
+    std::vector<unsigned int> blockIds(blocksPerLevel.size(),0); //keep track of the id at each level
+    hbds->Initialize(blocksPerLevel.size(), &blocksPerLevel[0], origin, this->GridDescription);
+    for(size_t i=0; i<this->Levels.size();i++)
+      {
+      unsigned int level = this->Levels[i];
+      unsigned int id  = blockIds[level];
+      vtkUniformGrid* grid  = vtkUniformGrid::SafeDownCast(this->DataSets[i]);
+      const vtkAMRBox& box = this->Boxes[i];
+      assert(!box.IsInvalid());
+
+      if(grid)
+        {
+        hbds->GetAMRInfo()->SetAMRBox(level,id, box,grid->GetSpacing());
+        hbds->SetDataSet(level, id, grid);
+        }
+      else
+        {
+        int spacingFactor = 1;
+        spacingFactor = spacingFactor << level;
+        double spacing[3];
+        spacing[0] = this->TopLevelSpacing[0] / (double)(spacingFactor);
+        spacing[1] = this->TopLevelSpacing[1] / (double)(spacingFactor);
+        spacing[2] = this->TopLevelSpacing[2] / (double)(spacingFactor);
+        hbds->GetAMRInfo()->SetAMRBox(level,id, box, spacing);
+        }
+      blockIds[level]++;
+      }
+  }
+
+private:
+  HierarchicalFractalOutputUtil():GridDescription(-1){}
+  std::vector<vtkSmartPointer<vtkDataObject> > DataSets;
+  std::vector<unsigned int> Levels;
+  std::vector<vtkAMRBox> Boxes;
+  int GridDescription;
+  double TopLevelSpacing[3];
+};
+
+vtkStandardNewMacro(HierarchicalFractalOutputUtil);
 
 //----------------------------------------------------------------------------
 vtkHierarchicalFractal::vtkHierarchicalFractal()
@@ -466,6 +595,9 @@ int vtkHierarchicalFractal::RequestData(
                            zSize/this->Dimensions);
 
 
+  this->OutputUtil = vtkSmartPointer<HierarchicalFractalOutputUtil>::New();
+  this->OutputUtil->Initialize(this->TwoDimensional? VTK_XY_PLANE: VTK_XYZ_GRID, this->TopLevelSpacing);
+
   int ext[6];
   ext[0] = ext[2] = ext[4] = 0;
   ext[1] = ext[3] = ext[5] = this->Dimensions - 1;
@@ -498,6 +630,14 @@ int vtkHierarchicalFractal::RequestData(
   this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4],
                  ext[5],onFace);
 
+  if(vtkHierarchicalBoxDataSet::SafeDownCast(output))
+    {
+    this->OutputUtil->CreateOutput(vtkHierarchicalBoxDataSet::SafeDownCast(output));
+    }
+  else if(vtkMultiBlockDataSet::SafeDownCast(output))
+    {
+    this->OutputUtil->CreateOutput(vtkMultiBlockDataSet::SafeDownCast(output));
+    }
 
   double bounds[6];
 
@@ -528,6 +668,8 @@ int vtkHierarchicalFractal::RequestData(
     info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),hset);
     }
   this->AddFractalArray(output);
+
+  this->OutputUtil = NULL;
 
   return 1;
 }
@@ -754,29 +896,38 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       }
     if (generateBlock)
       {
+      int realExt[6] = {ext[0],ext[1],ext[2],ext[3],ext[4],ext[5]};
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)
         {
+        vtkDataObject* newData(NULL);
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          this->AppendDataSetToLevel(output, level, ext, grid);
-          grid->Delete();
+          newData = grid;
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          this->AppendDataSetToLevel(output, level, ext, grid);
-          grid->Delete();
+          newData = grid;
           this->SetBlockInfo(grid, level, ext,onFace);
+          }
+        int newDataIndex = this->OutputUtil->AddDataSet(newData,level);
+        if(!this->GenerateRectilinearGrids)
+          {
+          this->OutputUtil->SetAMRBox(newDataIndex, realExt);
           }
         this->Levels->InsertValue(blockId, level);
         ++blockId;
         }
       else if (this->EndBlock != -1)
         {
-        this->AppendDataSetToLevel(output, level, ext, NULL);
+        int index = this->OutputUtil->AddDataSet(NULL,level);
+        if(!this->GenerateRectilinearGrids)
+          {
+          this->OutputUtil->SetAMRBox(index, realExt);
+          }
         }
       ++this->BlockCount;
       }
@@ -845,19 +996,24 @@ void vtkHierarchicalFractal::Traverse(int &blockId,
       if (this->BlockCount >= this->StartBlock
           && this->BlockCount <= this->EndBlock)
         {
+        vtkDataObject* newData(NULL);
+        int realExt[6] = {ext[0],ext[1],ext[2],ext[3],ext[4],ext[5]};
         if(this->GenerateRectilinearGrids)
           {
           vtkRectilinearGrid *grid=vtkRectilinearGrid::New();
-          this->AppendDataSetToLevel(output, level, ext, grid);
-          grid->Delete();
+          newData = grid;
           this->SetRBlockInfo(grid, level, ext,onFace);
           }
         else
           {
           vtkUniformGrid *grid=vtkUniformGrid::New();
-          this->AppendDataSetToLevel(output, level, ext, grid);
-          grid->Delete();
+          newData = grid;
           this->SetBlockInfo(grid, level, ext,onFace);
+          }
+        int newDataIndex = this->OutputUtil->AddDataSet(newData,level);
+        if(!this->GenerateRectilinearGrids)
+          {
+          this->OutputUtil->SetAMRBox(newDataIndex, realExt);
           }
         this->Levels->InsertValue(blockId, level);
         ++blockId;
@@ -1445,43 +1601,6 @@ void vtkHierarchicalFractal::GetContinuousIncrements(int extent[6],
 
   incY = increments[1] - (e1 - e0 + 1)*increments[0];
   incZ = increments[2] - (e3 - e2 + 1)*increments[1];
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkHierarchicalFractal::AppendDataSetToLevel(
-  vtkCompositeDataSet* composite,
-  unsigned int level,
-  int extents[6],
-  vtkDataSet* dataset)
-{
-  (void)extents;
-  unsigned int index = 0;
-  vtkMultiBlockDataSet* mbDS = vtkMultiBlockDataSet::SafeDownCast(composite);
-  vtkHierarchicalBoxDataSet* hbDS =
-    vtkHierarchicalBoxDataSet::SafeDownCast(composite);
-  if (mbDS)
-    {
-    vtkMultiBlockDataSet* block = vtkMultiBlockDataSet::SafeDownCast(
-      mbDS->GetBlock(level));
-    if (!block)
-      {
-      block = vtkMultiBlockDataSet::New();
-      mbDS->SetBlock(level, block);
-      block->Delete();
-      }
-    index = block->GetNumberOfBlocks();
-    block->SetBlock(index, dataset);
-    }
-  else if (hbDS)
-    {
-    // int dim=this->TwoDimensional? 2:3;
-    // vtkAMRBox box(dim,extents);
-    index = hbDS->GetNumberOfDataSets(level);
-    // hbDS->SetDataSet(level, index, box, vtkUniformGrid::SafeDownCast(dataset));
-    hbDS->SetDataSet(level, index, vtkUniformGrid::SafeDownCast(dataset));
-    }
-
-  return index;
 }
 
 //----------------------------------------------------------------------------

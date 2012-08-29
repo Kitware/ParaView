@@ -687,8 +687,43 @@ int vtkSpyPlotReader::RequestData(
     this->Bounds->GetBounds(b);
     info->Set(vtkStreamingDemandDrivenPipeline::BOUNDS(), b, 6);
 
+    // Gather blocks per level information.
+    // Note that this is a quick fix. Taking this extra pass shouldbe avoided. -Leo
+    if(this->IsAMR)
+      {
+      std::vector<int> blocksPerLevel;
+      for(blockIterator->Start(); blockIterator->IsActive();  blockIterator->Next())
+        {
+        block=blockIterator->GetBlock();
+        int level = 0;
+        int hasBadGhostCells;
+        int realExtents[6];
+        int realDims[3];
+        int extents[6];
+        double bb[6];
+        double spacing[3];
+        double origin[3];
+        hasBadGhostCells = block->GetAMRInformation(bb,
+                                                    &level, spacing,
+                                                    origin, extents,
+                                                    realExtents,
+                                                    realDims);
+        for(int i=blocksPerLevel.size(); i<=level; i++)
+          {
+          blocksPerLevel.push_back(0);
+          }
+        blocksPerLevel[level]++;
+        }
+      hbds->Initialize(static_cast<int>(blocksPerLevel.size()), &blocksPerLevel[0]);
+      }
+
     // Read the blocks/files that are assigned to this process
     int current_block_number;
+    std::vector<int> blockId;
+    if(this->IsAMR)
+      {
+      blockId.resize(hbds->GetNumberOfLevels(),0);
+      }
     for(blockIterator->Start(), current_block_number=1;
         blockIterator->IsActive();
         blockIterator->Next(), current_block_number++)
@@ -736,7 +771,7 @@ int vtkSpyPlotReader::RequestData(
       if (this->IsAMR)
         {
         hasBadGhostCells
-          = this->PrepareAMRData(hbds, block, &level,
+          = this->PrepareAMRData(hbds, block, &level, &blockId[0],
                                  extents, realExtents,
                                  realDims, &cd);
         }
@@ -794,15 +829,15 @@ int vtkSpyPlotReader::RequestData(
     // each block over the all dataset.
 
     // Update the number of levels.
-    if(this->GlobalController)
-      {
-      this->SetGlobalLevels(cds);
-      }
-    // Set the unique block id cell data
-    if(this->GenerateBlockIdArray)
-      {
-      this->AddBlockIdArray(cds);
-      }
+  if(this->GlobalController && this->GlobalController->GetNumberOfProcesses()>1)
+    {
+    this->SetGlobalLevels(cds);
+    }
+  // Set the unique block id cell data
+  if(this->GenerateBlockIdArray)
+    {
+    this->AddBlockIdArray(cds);
+    }
 
   return 1;
 }
@@ -1676,6 +1711,7 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
 int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR *hb,
                                      vtkSpyPlotBlock *block,
                                      int *level,
+                                     int *blockId,
                                      int extents[6],
                                      int realExtents[6],
                                      int realDims[3],
@@ -1716,7 +1752,8 @@ int vtkSpyPlotReader::PrepareAMRData(vtkNonOverlappingAMR *hb,
   ug->SetOrigin(origin);
   *cd = ug->GetCellData();
 
-  hb->SetDataSet( *level, hb->GetNumberOfDataSets(*level), ug );
+  hb->SetDataSet( *level, blockId[*level], ug );
+  blockId[*level]++;
   ug->Delete();
   return needsFixing;
 }
@@ -2103,14 +2140,20 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
   // At this point, the global number of levels is set in each processor.
   // Update each level
   // i.e. for each level synchronize the number of datasets (or pieces).
-  unsigned int level;
   std::vector<int> blocksPerLevel(numberOfLevels,0); //collect this
   std::vector<int> globalIndices(numberOfLevels);
-  for (level = 0; level<numberOfLevels; level++)
+  for (unsigned int level = 0; level<numberOfLevels; level++)
     {
     int intMsgValue;
-    int numberOfDataSets= hbDS? hbDS->GetNumberOfDataSets(level):
-      mbDS->GetNumberOfBlocks();
+    int numberOfDataSets(0);
+    if(hbDS)
+      {
+      numberOfDataSets = level>=hbDS->GetNumberOfLevels()? 0 : hbDS->GetNumberOfDataSets(level);
+      }
+    else
+      {
+      numberOfDataSets = mbDS->GetNumberOfBlocks();
+      }
     int totalNumberOfDataSets=numberOfDataSets;
     int leftNumberOfDataSets=0;
     int rightNumberOfDataSets=0;
@@ -2222,29 +2265,30 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
 
   if(hbDS)
     {
+    //save all the existing data sets
+    std::vector<std::vector<vtkSmartPointer<vtkUniformGrid> > > datasets;
+    for(unsigned int level = 0; level<numberOfLevels; level++)
+      {
+      std::vector<vtkSmartPointer<vtkUniformGrid> > datasetsAtLevel;
+      for (unsigned int kk=0; kk < hbDS->GetNumberOfDataSets(level); kk++)
+        {
+        vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
+        datasetsAtLevel.push_back(ug);
+        }
+      datasets.push_back(datasetsAtLevel);
+      }
+
     hbDS->Initialize(numberOfLevels,&blocksPerLevel[0]);
     for(unsigned int level = 0; level<numberOfLevels; level++)
       {
-      int totalNumberOfDataSets=blocksPerLevel[level];
-      int numberOfDataSets= hbDS->GetNumberOfDataSets(level);
       int globalIndex = globalIndices[level];
-
-      if (globalIndex!=0)
+      int numberOfDataSets = datasets[level].size();
+      // put the datasets back starting at globalIndex.
+      // All other indices are in their initialized state.
+      for (int kk=0; kk < numberOfDataSets; kk++)
         {
-        std::vector<vtkSmartPointer<vtkUniformGrid> > datasets;
-        std::vector<vtkAMRBox> boxes;
-        int kk;
-        for (kk=0; kk < numberOfDataSets; kk++)
-          {
-          vtkUniformGrid* ug = hbDS->GetDataSet(level, kk);
-          datasets.push_back(ug);
-          }
-        // put the datasets back starting at globalIndex.
-        // All other indices are in their initialized state.
-        for (kk=0; kk < numberOfDataSets; kk++)
-          {
-          hbDS->SetDataSet(level,kk+globalIndex,datasets[kk]);
-          }
+        vtkUniformGrid* grid = datasets[level][kk];
+        hbDS->SetDataSet(level,kk+globalIndex,grid);
         }
       }
     }
