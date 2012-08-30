@@ -103,9 +103,16 @@ void vtkPVQuadRenderView::Render(bool interactive, bool skip_rendering)
 {
   this->Superclass::Render(interactive, skip_rendering);
 
-  for (int cc=0; (cc < 3) && !skip_rendering; cc++)
+  for (int cc=0; (cc < 3) && !skip_rendering && !this->GetMakingSelection(); cc++)
     {
-    this->OrthoViews[cc].RenderView->StillRender();
+    if (interactive)
+      {
+      this->OrthoViews[cc].RenderView->InteractiveRender();
+      }
+    else
+      {
+      this->OrthoViews[cc].RenderView->StillRender();
+      }
     }
 }
 

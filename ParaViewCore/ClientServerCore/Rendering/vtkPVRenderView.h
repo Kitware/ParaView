@@ -544,6 +544,10 @@ protected:
   // views on two different clients are in the same state as the server side.
   vtkGetMacro(SynchronizationCounter, unsigned int);
 
+  // Description:
+  // Returns true is currently generating a selection.
+  vtkGetMacro(MakingSelection, bool);
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
