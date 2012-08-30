@@ -298,9 +298,9 @@ void StreamlineData::CullPeriodicTransitions(double *bounds)
   int *pColor=this->IntersectColor->GetPointer(0);
 
   float threshold[3] = {
-      0.8f*fabs(bounds[1]-bounds[0]),
-      0.8f*fabs(bounds[3]-bounds[2]),
-      0.8f*fabs(bounds[5]-bounds[4])};
+      0.8f*fabs(float(bounds[1]-bounds[0])),
+      0.8f*fabs(float(bounds[3]-bounds[2])),
+      0.8f*fabs(float(bounds[5]-bounds[4]))};
 
   vtkIdTypeArray *newCells=vtkIdTypeArray::New();
   vtkIntArray *newCellIds=vtkIntArray::New();

@@ -340,7 +340,7 @@ pqSQPlaneSource::~pqSQPlaneSource()
 }
 
 //-----------------------------------------------------------------------------
-void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *event)
+void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *aEvent)
 {
   #if defined pqSQPlaneSourceDEBUG
   cerr << ":::::pqSQPlaneSource::contextMenuEvent" << endl;
@@ -360,7 +360,7 @@ void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *event)
   connect(transAct, SIGNAL(triggered()), this, SLOT(ShowTranslateDialog()));
   context.addAction(transAct);
 
-  context.exec(event->globalPos());
+  context.exec(aEvent->globalPos());
 }
 
 //-----------------------------------------------------------------------------

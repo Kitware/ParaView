@@ -193,11 +193,10 @@ int main(int argc, char **argv)
     {
     vtkRenderer *ren=vtkRenderer::New();
 
-    vtkActor *act;
-    act=MapArrayToActor(ren,pd1,CELL_ARRAY,0);
+    MapArrayToActor(ren,pd1,CELL_ARRAY,0);
     pd1->Delete();
 
-    act=MapArrayToActor(ren,pd2,POINT_ARRAY,"b");
+    MapArrayToActor(ren,pd2,POINT_ARRAY,"b");
     pd2->Delete();
 
     vtkRenderWindow *rwin;
