@@ -185,6 +185,7 @@ int main(int argc, char **argv)
   int testStatus = SerialRender(
         controller,
         surf->GetOutput(),
+        false,
         tempDir,
         baseline,
         "SciberQuestToolKit-TestFieldTopologyMapper",

@@ -66,7 +66,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   string inputFileName;
-  inputFileName=dataRoot+"/Data/SciberQuestToolKit/Gyres/Gyres.bovm";
+  inputFileName=dataRoot+"/Data/SciberQuestToolKit/Gyres/Gyres.bov";
 
   // ooc reader
   vtkSQBOVMetaReader *r=vtkSQBOVMetaReader::New();
@@ -74,10 +74,13 @@ int main(int argc, char **argv)
   r->SetPointArrayStatus("v",1);
 
   // seed points
+  int ext[6];
+  r->GetSubset(ext);
+
   vtkSQPlaneSource *sp=vtkSQPlaneSource::New();
-  sp->SetOrigin(1,1,0);
-  sp->SetPoint1(126,1,0);
-  sp->SetPoint2(1,126,0);
+  sp->SetOrigin(ext[0],ext[2],ext[4]);
+  sp->SetPoint1(ext[1],ext[2],ext[4]);
+  sp->SetPoint2(ext[0],ext[3],ext[4]);
   sp->SetXResolution(96);
   sp->SetYResolution(96);
 
@@ -129,6 +132,7 @@ int main(int argc, char **argv)
   int testStatus = SerialRender(
         controller,
         surf->GetOutput(),
+        false,
         tempDir,
         baseline,
         "SciberQuestToolKit-TestFTLE",

@@ -448,4 +448,7 @@ void StreamlineData::CullPeriodicTransitions(double *bounds)
 
   this->SourceId->DeepCopy(newCellIds);
   newCellIds->Delete();
+
+  this->IntersectColor->DeepCopy(newColor);
+  newColor->Delete();
 }

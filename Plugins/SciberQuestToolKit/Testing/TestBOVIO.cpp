@@ -87,6 +87,7 @@ int main(int argc, char **argv)
   result = SerialRender(
         controller,
         s1->GetOutput(),
+        false,
         tempDir,
         baseline,
         "SciberQuestToolKit-TestBOVIO",
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
   result = SerialRender(
         controller,
         s2->GetOutput(),
+        false,
         tempDir,
         baseline,
         "SciberQuestToolKit-TestBOVIO",

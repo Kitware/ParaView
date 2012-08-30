@@ -1200,6 +1200,8 @@ void vtkSQFieldTracer::IntegrateOne(
     }
 
   // start by adding the seed point to the forward trace.
+  // adding here simplifies the logic in corner case failures
+  // below, at the cost of a float 3-tuple's worth of memory.
   if ((this->Mode==MODE_STREAM)||(this->MODE_DISPLACEMENT))
     {
     line->PushPoint(1,seed);
@@ -1220,7 +1222,8 @@ void vtkSQFieldTracer::IntegrateOne(
     vtkIdType numSteps=0;                   // cumulative number of steps taken in integration
     double V0[3]={0.0};                     // vector field interpolated at the start point
     double p0[3]={0.0};                     // start point
-    double p1[3]={0.0};                     // integrated point
+    double p1[3]={0.0};                     // integrated point, periodic coordinate space.
+    double p2[3]={0.0};                     // integrated point, non-periodic coordinate space.
     double s0[3]={0.0};                     // segment start point
     int bcSurf=0;                           // set when a periodic boundary condition has been applied.
     static                                  // interpolator
@@ -1230,7 +1233,10 @@ void vtkSQFieldTracer::IntegrateOne(
     double maxStepTaken=VTK_DOUBLE_MIN;
     #endif
 
+    // initialize at the seed point.
     line->GetSeedPoint(p0);
+    line->GetSeedPoint(p1);
+    line->GetSeedPoint(p2);
     line->GetSeedPoint(s0);
 
     // Integrate until the maximum line length is reached, maximum number of
@@ -1342,7 +1348,8 @@ void vtkSQFieldTracer::IntegrateOne(
         pCerr() << "Terminated: Integrator reports outside problem domain." << endl;
         #endif
         line->SetTerminator(i,tcon->GetProblemDomainSurfaceId());
-        if (this->Mode==MODE_STREAM) line->PushPoint(i,p1);
+        // don't push the point , if p1 was not updated then it potentially
+        // leads to an incorrect result.
         break;
         }
 
@@ -1364,13 +1371,23 @@ void vtkSQFieldTracer::IntegrateOne(
         }
       #endif
 
+      double delta[3];
+      delta[0]=p1[0]-p0[0];
+      delta[1]=p1[1]-p0[1];
+      delta[2]=p1[2]-p0[2];
+
+      // update the seed in the non-peridoic coordinate system.
+      if (this->Mode==MODE_DISPLACEMENT)
+        {
+        p2[0]+=delta[0];
+        p2[1]+=delta[1];
+        p2[2]+=delta[2];
+        }
+
       // update the arc length and number of steps taken.
-      double dx=0.0;
-      dx+=(p1[0]-p0[0])*(p1[0]-p0[0]);
-      dx+=(p1[1]-p0[1])*(p1[1]-p0[1]);
-      dx+=(p1[2]-p0[2])*(p1[2]-p0[2]);
-      dx=sqrt(dx);
+      double dx=sqrt(delta[0]*delta[0]+delta[1]*delta[1]+delta[2]*delta[2]);
       lineLength+=dx;
+
       ++numSteps;
 
       // Use v=dx/dt to calculate speed and check if it is below
@@ -1386,9 +1403,15 @@ void vtkSQFieldTracer::IntegrateOne(
           << "thresh=" << this->NullThreshold << "." << endl;
         #endif
         line->SetTerminator(i,tcon->GetFieldNullId());
-        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+
+        if (this->Mode==MODE_STREAM)
           {
           line->PushPoint(i,p1);
+          }
+        else
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
           }
         break;
         }
@@ -1406,9 +1429,15 @@ void vtkSQFieldTracer::IntegrateOne(
           << endl;
         #endif
         line->SetTerminator(i,tcon->GetShortIntegrationId());
-        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+
+        if (this->Mode==MODE_STREAM)
           {
           line->PushPoint(i,p1);
+          }
+        else
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
           }
         break;
 
@@ -1426,9 +1455,15 @@ void vtkSQFieldTracer::IntegrateOne(
           << endl;
         #endif
         line->SetTerminator(i,tcon->GetShortIntegrationId());
-        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+
+        if (this->Mode==MODE_STREAM)
           {
           line->PushPoint(i,p1);
+          }
+        else
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
           }
         break;
         }
@@ -1446,9 +1481,15 @@ void vtkSQFieldTracer::IntegrateOne(
           << endl;
         #endif
         line->SetTerminator(i,tcon->GetShortIntegrationId());
-        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+
+        if (this->Mode==MODE_STREAM)
           {
           line->PushPoint(i,p1);
+          }
+        else
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
           }
         break;
         }
@@ -1464,7 +1505,17 @@ void vtkSQFieldTracer::IntegrateOne(
           << "Surface " << surfIsect-1 << " intersected." << endl;
         #endif
         line->SetTerminator(i,surfIsect);
-        if (!(this->Mode==MODE_TOPOLOGY)) line->PushPoint(i,pi);
+
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
+          }
+        else
+        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_POINCARE))
+          {
+          line->PushPoint(i,pi);
+          }
+
         if (!(this->Mode==MODE_POINCARE)) break;
         }
 
@@ -1495,15 +1546,23 @@ void vtkSQFieldTracer::IntegrateOne(
         pCerr() << "Terminated: Integration outside problem domain." << endl;
         #endif
         line->SetTerminator(i,tcon->GetProblemDomainSurfaceId());
-        if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+        if (this->Mode==MODE_STREAM)
           {
           line->PushPoint(i,p1);
+          }
+        else
+        if (this->Mode==MODE_DISPLACEMENT)
+          {
+          line->PushPoint(i,p2);
           }
         break;
         }
 
-      // add the point to the line.
-      if ((this->Mode==MODE_STREAM)||(this->Mode==MODE_DISPLACEMENT))
+      // add the point to the stream line if it would create a segment
+      // geometry longer than the minimum. This drastically reduces the
+      // number of poly line segments in the output while maintaining
+      // visual quality.
+      if (this->Mode==MODE_STREAM)
         {
         double ds=0.0;
         ds+=(p1[0]-s0[0])*(p1[0]-s0[0]);
@@ -1519,7 +1578,7 @@ void vtkSQFieldTracer::IntegrateOne(
           }
         }
 
-      // Update the seed point
+      // Update the seed point for the next integraiton.
       p0[0]=p1[0];
       p0[1]=p1[1];
       p0[2]=p1[2];

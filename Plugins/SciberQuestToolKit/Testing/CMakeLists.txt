@@ -64,6 +64,7 @@ sq_add_exec(TestVortexFilter)
 sq_add_exec(TestFieldTopologyMapper)
 sq_add_exec(TestPoincareMapper)
 sq_add_exec(TestFTLE)
+sq_add_exec(TestFieldTracer)
 
 if (PARAVIEW_DATA_ROOT)
   if (PARAVIEW_USE_MPI AND (NOT WIN32))
@@ -75,6 +76,7 @@ if (PARAVIEW_DATA_ROOT)
     sq_add_test(TestFieldTopologyMapper 4)
     sq_add_test(TestPoincareMapper 4)
     sq_add_test(TestFTLE 4)
+    sq_add_test(TestFieldTracer 4)
   else()
     # serial invocations, our reader needs mpi these tests use
     # an alternate reader when invoked serially.

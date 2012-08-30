@@ -24,6 +24,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkCamera.h"
 #include "vtkTesting.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkOutlineFilter.h"
 #include "vtkPNGWriter.h"
 #include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
@@ -382,6 +383,7 @@ string NativePath(string path)
 int SerialRender(
     vtkMultiProcessController *controller,
     vtkPolyData *data,
+    bool showBounds,
     string &tempDir,
     string &baseline,
     string testName,
@@ -410,6 +412,17 @@ int SerialRender(
   // only the render rank needs to continue.
   if (worldRank==renderRank)
     {
+    vtkPolyData *outline=NULL;
+    if (showBounds)
+      {
+      vtkOutlineFilter *of=vtkOutlineFilter::New();
+      of->SetInputData(data);
+      of->Update();
+      outline=of->GetOutput();
+      outline->Register(0);
+      of->Delete();
+      }
+
     // render point then cell data
     vtkDataSetAttributes *dsa[2]={
         data->GetPointData(),
@@ -436,6 +449,11 @@ int SerialRender(
           vtkRenderer *ren=vtkRenderer::New();
 
           MapArrayToActor(ren,data,arrayType,"ProcessId");
+
+          if (showBounds)
+            {
+            MapArrayToActor(ren,outline,arrayType,0);
+            }
 
           vtkRenderWindow *rwin=vtkRenderWindow::New();
           rwin->AddRenderer(ren);
@@ -479,6 +497,11 @@ int SerialRender(
 
         MapArrayToActor(ren,data,arrayType,arrayName.c_str());
 
+        if (showBounds)
+          {
+          MapArrayToActor(ren,outline,arrayType,0);
+          }
+
         vtkRenderWindow *rwin=vtkRenderWindow::New();
         rwin->AddRenderer(ren);
         rwin->SetSize(iwx,iwy);
@@ -516,6 +539,11 @@ int SerialRender(
         }
       }
     data->Delete();
+
+    if (showBounds)
+      {
+      outline->Delete();
+      }
     }
 
   return aTestFailed?vtkTesting::FAILED:vtkTesting::PASSED;

@@ -143,6 +143,7 @@ int main(int argc, char **argv)
   int testStatus = SerialRender(
         controller,
         s1->GetOutput(),
+        false,
         tempDir,
         baseline,
         "SciberQuestToolKit-TestVortexFilter",

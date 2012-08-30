@@ -50,6 +50,7 @@ Gather to a single rank, render and test.
 int SerialRender(
     vtkMultiProcessController *controller,
     vtkPolyData *data,
+    bool showBounds,
     string &tempDir,
     string &baseline,
     string testName,
