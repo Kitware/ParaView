@@ -334,6 +334,21 @@ void pqScalarsToColors::setIndexedLookup( bool indexedLookup )
 }
 
 //-----------------------------------------------------------------------------
+QList<QVariant> pqScalarsToColors::getAnnotations()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  return pqSMAdaptor::getMultipleElementProperty( proxy->GetProperty( "Annotations" ) );
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setAnnotations( const QList<QVariant>& annotations )
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setMultipleElementProperty( proxy->GetProperty( "Annotations" ), annotations );
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 void pqScalarsToColors::updateScalarBarTitles(const QString& component)
 {
   foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)

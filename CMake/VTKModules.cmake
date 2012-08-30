@@ -26,6 +26,8 @@ set(_vtk_modules
   # time dependency on
   vtkRenderingVolume
   vtkRenderingLabel
+  vtkRenderingMathText
+  vtkRenderingMatplotlib
   vtkRenderingFreeType
   vtkRenderingFreeTypeOpenGL
   vtkRenderingVolumeOpenGL

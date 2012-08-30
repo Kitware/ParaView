@@ -23,6 +23,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkIOExport
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
+    vtkRenderingMathText
     vtkRenderingMatplotlib
     vtkRenderingFreeTypeOpenGL
     vtkRenderingOpenGL

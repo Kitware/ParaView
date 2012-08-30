@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QPair>
+#include <QList>
+#include <QVariant>
 
 class pqScalarsToColorsInternal;
 class pqScalarBarRepresentation;
@@ -112,8 +114,13 @@ public:
   static void setColorRangeScalingMode(int);
   static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
 
+  /// Set/get whether the colormap domain should be indices of entries in
+  /// the list of annotations (when true) or values in the ScalarRange (when false).
   bool getIndexedLookup();
   void setIndexedLookup( bool );
+
+  QList<QVariant> getAnnotations();
+  virtual void setAnnotations( const QList<QVariant>& annotations );
 
 public slots:
   // This method checks if this LUT is used by any display,

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>635</width>
-    <height>655</height>
+    <width>625</width>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
    <item>
     <widget class="QTabWidget" name="ColorTabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="ScalePage">
       <attribute name="title">
@@ -432,43 +432,6 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <layout class="QHBoxLayout">
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="SaveButton">
-           <property name="whatsThis">
-            <string>Click this button to save the current color map as a preset.</string>
-           </property>
-           <property name="text">
-            <string>&amp;Save</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PresetButton">
-           <property name="whatsThis">
-            <string>Click this button to change the color map to a preset.</string>
-           </property>
-           <property name="text">
-            <string>Choose &amp;Preset</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="4" column="0">
         <widget class="QCheckBox" name="EnableOpacityFunction">
          <property name="text">
@@ -796,7 +759,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Labels</string>
+          <string>Annotations and Tick Marks</string>
          </property>
          <layout class="QGridLayout">
           <item row="0" column="0">
@@ -967,14 +930,14 @@
           <item row="2" column="0" colspan="3">
            <widget class="QCheckBox" name="AutomaticLabelFormat">
             <property name="text">
-             <string>Automatic Label Format</string>
+             <string>Automatic Tick Mark Format</string>
             </property>
            </widget>
           </item>
           <item row="2" column="4">
            <widget class="QLabel" name="LabelFormatLabel">
             <property name="text">
-             <string>Label Format</string>
+             <string>Tick Format</string>
             </property>
            </widget>
           </item>
@@ -993,7 +956,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Max Number of Labels</string>
+          <string>Max Number of Ticks</string>
          </property>
         </widget>
        </item>
@@ -1076,16 +1039,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="UseAutoRescaleSimple">
-              <property name="text">
-               <string>Automatic Color Scaling</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -1096,24 +1049,14 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="PresetButtonSimple">
+             <widget class="QCheckBox" name="UseAutoRescaleSimple">
               <property name="text">
-               <string>Choose Preset</string>
+               <string>Automatic Color Scaling</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
@@ -1200,6 +1143,39 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="PresetButton">
+       <property name="whatsThis">
+        <string>Click this button to change the color map to a preset.</string>
+       </property>
+       <property name="text">
+        <string>Choose &amp;Preset</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="SaveButton">
+       <property name="whatsThis">
+        <string>Click this button to save the current color map as a preset.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButtonApply">
        <property name="text">
         <string>Apply</string>
@@ -1244,8 +1220,6 @@
   <tabstop>CategoricalValues</tabstop>
   <tabstop>ColorTabs</tabstop>
   <tabstop>checkBoxImmediateRender</tabstop>
-  <tabstop>SaveButton</tabstop>
-  <tabstop>PresetButton</tabstop>
   <tabstop>pushButtonScalarColor</tabstop>
   <tabstop>ScalarValue</tabstop>
   <tabstop>ScalarColor</tabstop>
@@ -1264,10 +1238,8 @@
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>
   <tabstop>UseLogScaleSimple</tabstop>
-  <tabstop>UseAutoRescaleSimple</tabstop>
   <tabstop>SimpleMin</tabstop>
   <tabstop>SimpleMax</tabstop>
-  <tabstop>PresetButtonSimple</tabstop>
   <tabstop>SwitchToAdvanced</tabstop>
   <tabstop>pushButtonApply</tabstop>
   <tabstop>MakeDefaultButton</tabstop>
