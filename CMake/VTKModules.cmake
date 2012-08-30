@@ -303,6 +303,9 @@ set(_vtk_modules
   vtkIOXdmf2
   #  Needed for xdmf support.
 
+  vtkIOAMR
+  #  Needed for AMR Readers.
+
   vtkRenderingFreeType
   # Needed for:
   #  vtkVectorText
