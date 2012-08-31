@@ -37,6 +37,8 @@ using std::cerr;
 #include <string>
 using std::string;
 
+#include "DebugUtil.h"
+
 int main(int argc, char **argv)
 {
   vtkMultiProcessController *controller=NULL;
@@ -73,14 +75,10 @@ int main(int argc, char **argv)
   mr->SetXHasPeriodicBC(1);
   mr->SetYHasPeriodicBC(1);
   mr->SetZHasPeriodicBC(1);
+  mr->SetBlockSize(8,8,8);
+  mr->SetBlockCacheSize(1);
 
   // seed points
-  /*
-  vtkSQPointSource *p1=vtkSQPointSource::New();
-  p1->SetCenter(-0.25,-0.25,0.0);
-  p1->SetNumberOfPoints(1);
-  */
-
   vtkSQLineSource *p1=vtkSQLineSource::New();
   p1->SetPoint1(-0.125,-0.125,0.0);
   p1->SetPoint2(-0.5,-0.5,0.0);

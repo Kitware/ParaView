@@ -7,7 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQBOVMetaReader.h"
-
+#include <vtksys/SystemInformation.hxx>
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
@@ -62,6 +62,20 @@ using std::ostringstream;
   #include "vtkSQLog.h"
 #endif
 
+
+// ****************************************************************************
+static
+unsigned long hash(const unsigned char *str)
+{
+  unsigned long hash = 5381;
+  int c;
+
+  while (c = *str++)
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+  return hash;
+}
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQBOVMetaReader);
 
@@ -69,7 +83,8 @@ vtkStandardNewMacro(vtkSQBOVMetaReader);
 vtkSQBOVMetaReader::vtkSQBOVMetaReader()
 {
   #if defined vtkSQBOVMetaReaderDEBUG
-  pCerr() << "=====vtkSQBOVMetaReader::vtkSQBOVMetaReader" << endl;
+  ostringstream oss;
+  oss << "=====vtkSQBOVMetaReader::vtkSQBOVMetaReader" << endl;
   #endif
 
   // Initialize pipeline.
@@ -87,8 +102,15 @@ vtkSQBOVMetaReader::vtkSQBOVMetaReader()
   this->DecompDims[2]=1;
   this->BlockCacheSize=10;
   this->ClearCachedBlocks=1;
-  this->BlockSizeGUI=0;
-  this->BlockCacheSizeGUI=0;
+  this->BlockSize[0]=
+  this->BlockSize[1]=
+  this->BlockSize[2]=96;
+  this->BlockCacheRamFactor=0.75;
+  this->ProcRam=0;
+
+  #if defined vtkSQBOVMetaReaderDEBUG
+  pCerr() << oss.str() << endl;
+  #endif
 }
 
 //-----------------------------------------------------------------------------
@@ -113,8 +135,11 @@ void vtkSQBOVMetaReader::Clear()
   this->DecompDims[2]=1;
   this->BlockCacheSize=10;
   this->ClearCachedBlocks=1;
-  this->BlockSizeGUI=0;
-  this->BlockCacheSizeGUI=0;
+  this->BlockSize[0]=
+  this->BlockSize[1]=
+  this->BlockSize[2]=96;
+  this->BlockCacheRamFactor=0.75;
+  this->ProcRam=0;
 
   vtkSQBOVReaderBase::Clear();
 }
@@ -125,7 +150,7 @@ int vtkSQBOVMetaReader::Initialize(
       const char *fileName,
       vector<string> &arrays)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined vtkSQBOVMetaReaderDEBUG
   pCerr() << "=====vtkSQBOVReader::Initialize" << endl;
   #endif
 
@@ -134,6 +159,14 @@ int vtkSQBOVMetaReader::Initialize(
     {
     return -1;
     }
+
+  int block_size[3]={96,96,96};
+  GetOptionalAttribute<int,3>(elem,"block_size",block_size);
+  this->SetBlockSize(block_size);
+
+  double block_cache_ram_factor=0.75;
+  GetOptionalAttribute<double,1>(elem,"block_cache_ram_factor",&block_cache_ram_factor);
+  this->SetBlockCacheRamFactor(block_cache_ram_factor);
 
   int decomp_dims[3]={0,0,0};
   GetOptionalAttribute<int,3>(elem,"decomp_dims",decomp_dims);
@@ -173,6 +206,8 @@ int vtkSQBOVMetaReader::Initialize(
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   *log
     << "# ::vtkSQBOVMetaReader" << "\n"
+    << "block_size=" << Tuple<int>(block_size,3) << "\n"
+    << "block_cache_ram_factor=" << block_cache_ram_factor << "\n"
     << "decomp_dims=" << Tuple<int>(decomp_dims,3) << "\n"
     << "block_cache_size=" << blok_cache_size << "\n"
     << "periodic_bc=" << Tuple<int>(periodic_bc,3) << "\n"
@@ -182,6 +217,197 @@ int vtkSQBOVMetaReader::Initialize(
   #endif
 
   return vtkSQBOVReaderBase::Initialize(root,fileName,arrays);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQBOVMetaReader::SetFileName(const char* _arg)
+{
+  #if defined vtkSQBOVMetaReaderDEBUG
+  ostringstream oss;
+  oss
+    << "=====vtkSQBOVReader::SetFileName" << endl
+    << (_arg==NULL?"NULL":_arg) << endl;
+  #endif
+
+  if (this->FileName == NULL && _arg == NULL) { return;}
+  if (this->FileName && _arg && (!strcmp(this->FileName,_arg))) { return;}
+
+  this->vtkSQBOVReaderBase::SetFileName(_arg);
+
+  if (_arg == NULL) return;
+
+  BOVMetaData *md=this->Reader->GetMetaData();
+  if (md->IsDatasetOpen())
+    {
+    this->EstimateBlockCacheSize();
+    }
+}
+
+//-----------------------------------------------------------------------------
+long long vtkSQBOVMetaReader::GetProcRam()
+{
+  #if defined vtkSQBOVMetaReaderDEBUG
+  ostringstream oss;
+  oss << "=====vtkSQBOVReader::GetProcRam" << endl;
+  #endif
+  if (this->ProcRam==0)
+    {
+    // gather memory info about this host
+    vtksys::SystemInformation sysInfo;
+    long long hostRam=sysInfo.GetMemoryTotal();
+    string hostName=sysInfo.GetFullyQualifiedDomainName();
+    unsigned long hostId=hash((const unsigned char *)hostName.c_str());
+    long long hostSize=1l;
+
+    #ifndef SQTK_WITHOUT_MPI
+    int worldSize=1;
+    MPI_Comm_size(MPI_COMM_WORLD,&worldSize);
+
+    vector<unsigned long> hostIds(worldSize,0ul);
+    MPI_Allgather(
+          &hostId,
+          1,
+          MPI_UNSIGNED_LONG,
+          &hostIds[0],
+          1,
+          MPI_UNSIGNED_LONG,
+          MPI_COMM_WORLD);
+
+    hostSize=(long long)count(hostIds.begin(),hostIds.end(),hostId);
+    #endif
+
+    this->ProcRam=hostRam/hostSize;
+
+    #if defined vtkSQBOVMetaReaderDEBUG
+    oss
+      << "hostName=" << hostName << endl
+      << "hostId=" << hostId << endl
+      << "hostRam=" << hostRam << endl
+      << "hostSize=" << hostSize << endl
+      << "ProcRam=" << this->ProcRam << endl;
+    pCerr() << oss.str() << endl;
+    #endif
+    }
+
+  return this->ProcRam;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQBOVMetaReader::SetBlockCacheRamFactor(double factor)
+{
+  #if defined vtkSQBOVMetaReaderDEBUG
+  pCerr() << "=====vtkSQBOVReader::SetBlockCacheRamFactor" << endl;
+  #endif
+
+  if (this->BlockCacheRamFactor==factor)
+    {
+    return;
+    }
+
+  if (factor < 0.01)
+    {
+    vtkErrorMacro("BlockCacheRamFactor must be greater than 0.01(1%)");
+    return;
+    }
+
+  this->BlockCacheRamFactor=factor;
+
+  BOVMetaData *md=this->Reader->GetMetaData();
+  if (md->IsDatasetOpen())
+    {
+    this->EstimateBlockCacheSize();
+    }
+
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQBOVMetaReader::SetBlockSize(int nx, int ny, int nz)
+{
+  #if defined vtkSQBOVMetaReaderDEBUG
+  pCerr() << "=====vtkSQBOVReader::SetBlockSize" << endl;
+  #endif
+  if ( (this->BlockSize[0]==nx)
+    && (this->BlockSize[1]==ny)
+    && (this->BlockSize[2]==nz) )
+    {
+    return;
+    }
+
+  long long blockSize=nx*ny*nz;
+  if (blockSize >= 2147483648l)
+    {
+    vtkErrorMacro(
+      << "Block size must be smaller than 2GB "
+      << "because MPI uses int in its API");
+    return;
+    }
+
+  this->BlockSize[0]=nx;
+  this->BlockSize[1]=ny;
+  this->BlockSize[2]=nz;
+
+  BOVMetaData *md=this->Reader->GetMetaData();
+  if (md->IsDatasetOpen())
+    {
+    CartesianExtent subset=md->GetSubset();
+
+    if (blockSize>=subset.Size())
+      {
+      //vtkErrorMacro("Block size cannot be larger than the dataset itself.");
+      subset.Size(this->BlockSize);
+      }
+    this->EstimateBlockCacheSize();
+    }
+
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQBOVMetaReader::EstimateBlockCacheSize()
+{
+  #if defined vtkSQBOVMetaReaderDEBUG
+  ostringstream oss;
+  oss << "=====vtkSQBOVReader::EstimateBlockCacheSize" << endl;
+  #endif
+
+  BOVMetaData *md=this->Reader->GetMetaData();
+  if (!md->IsDatasetOpen())
+    {
+    vtkErrorMacro("Dataset must be open to estimate block cache sizes.");
+    return;
+    }
+
+  // compute decomp dims
+  int subsetSize[3];
+  md->GetSubset().Size(subsetSize);
+
+  int decompDims[3];
+  decompDims[0]=subsetSize[0]/this->BlockSize[0];
+  decompDims[1]=subsetSize[1]/this->BlockSize[1];
+  decompDims[2]=subsetSize[2]/this->BlockSize[2];
+  this->SetDecompDims(decompDims);
+
+  size_t blockSize=this->BlockSize[0]*this->BlockSize[1]*this->BlockSize[2];
+  double blockRam=blockSize*sizeof(float)*3.0/1024.0;
+  double procRam=this->GetProcRam();
+  int maxBlocks=decompDims[0]*decompDims[1]*decompDims[2];
+  int fitBlocks=(int)(procRam*this->BlockCacheRamFactor/blockRam);
+  this->SetBlockCacheSize(min(maxBlocks,fitBlocks));
+
+  #if defined vtkSQBOVMetaReaderDEBUG
+  oss
+    << "subsetSize=" << Tuple<int>(subsetSize,3) << endl
+    << "ProcRam=" << procRam << endl
+    << "BlockCacheRamFactor=" << this->BlockCacheRamFactor << endl
+    << "BlockSize=" << Tuple<int>(this->BlockSize,3) << endl
+    << "blockRam=" << blockRam << endl
+    << "maxBlocks=" << maxBlocks << endl
+    << "fitBlocks=" << fitBlocks << endl
+    << "BlockCacheSize=" << this->BlockCacheSize << endl
+    << "DecompDims=" << Tuple<int>(this->DecompDims,3) << endl;
+  pCerr() << oss.str() << endl;
+  #endif
 }
 
 //-----------------------------------------------------------------------------
@@ -614,8 +840,8 @@ int vtkSQBOVMetaReader::RequestData(
   md->PushPipelineInformation(req, info);
 
   #if defined vtkSQBOVMetaReaderDEBUG
-  this->Reader->PrintSelf(pCerr());
-  output->Print(pCerr());
+  //this->Reader->PrintSelf(pCerr());
+  //output->Print(pCerr());
   #endif
 
   #if defined vtkSQBOVMetaReaderTIME

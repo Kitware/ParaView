@@ -46,6 +46,12 @@ public:
   //ETX
 
   // Description:
+  // Get/Set the file to read. Setting the file name opens
+  // the file. Perhaps it's bad style but this is where open
+  // fits best in VTK/PV pipeline execution.
+  virtual void SetFileName(const char* _arg);
+
+  // Description:
   // Mark a coordinate direction as periodic. When periodic boundaries
   // are specified out of core reads will load ghost cells.
   void SetPeriodicBC(int *flags);
@@ -72,26 +78,26 @@ public:
   vtkGetMacro(BlockCacheSize,int);
 
   // Description:
+  // Sets the size of the blocks to use during out-of-core
+  // operation.
+  void SetBlockSize(int *size){ this->SetBlockSize(size[0],size[1],size[2]); }
+  void SetBlockSize(int nx, int ny, int nz);
+  vtkGetVector3Macro(BlockSize,int);
+
+  // Description:
+  // Sets the amount (in percent of per core) ram  to use per process
+  // for the block cache.
+  void SetBlockCacheRamFactor(double factor);
+  vtkGetMacro(BlockCacheRamFactor,double);
+
+  // Description:
   // If set cahce is cleared after the filter is done
   // with each pass. If you can afford the memory then
   // unset it.
   vtkSetMacro(ClearCachedBlocks,int);
   vtkGetMacro(ClearCachedBlocks,int);
 
-  // Description:
-  // Does nothing, here to support GUI.
-  // TODO -- fix the GUI panel.
-  vtkSetMacro(BlockCacheSizeGUI,int);
-  vtkGetMacro(BlockCacheSizeGUI,int);
-
-  // Description:
-  // Does nothing, here to support GUI.
-  // TODO -- fix the GUI panel.
-  vtkSetMacro(BlockSizeGUI,int);
-  vtkGetMacro(BlockSizeGUI,int);
-
 protected:
-
   virtual int RequestInformation(
         vtkInformation *req,
         vtkInformationVector **inInfos,
@@ -105,7 +111,19 @@ protected:
   vtkSQBOVMetaReader();
   virtual ~vtkSQBOVMetaReader();
 
+  // Description:
+  // Free resources and initialize the object.
   virtual void Clear();
+
+  // Description:
+  // Sets BlockCacheSize and DecompDims based on avalialable ram per core
+  // BlockCacheRamFactor and BlockSize.
+  void EstimateBlockCacheSize();
+
+  // Description:
+  // Get the amount of ram per mpi process available on this
+  // host.
+  long long GetProcRam();
 
 private:
   vtkSQBOVMetaReader(const vtkSQBOVMetaReader &); // Not implemented
@@ -117,8 +135,9 @@ private:
   int DecompDims[3];       // subset split into an LxMxN cartesian decomposition
   int BlockCacheSize;      // number of blocks to cache during ooc oepration
   int ClearCachedBlocks;   // control persistence of cahce
-  int BlockSizeGUI;        // does nothing here to support GUI. TODO -- fix the GUI panel.
-  int BlockCacheSizeGUI;   // does nothing here to support GUI. TODO -- fix the GUI panel.
+  int BlockSize[3];        // size of block in the decomp
+  double BlockCacheRamFactor; // % of per-core ram to use for the block cache
+  long long ProcRam;       // ram available on this host for all ranks.
 };
 
 #endif

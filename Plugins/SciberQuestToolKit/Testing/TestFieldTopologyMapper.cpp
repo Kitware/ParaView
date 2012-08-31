@@ -78,6 +78,8 @@ int main(int argc, char **argv)
   vtkSQBOVMetaReader *r=vtkSQBOVMetaReader::New();
   r->SetFileName(inputFileName.c_str());
   r->SetPointArrayStatus("vi",1);
+  r->SetBlockSize(8,8,8);
+  r->SetBlockCacheSize(1);
 
   // terminator
   vtkSphereSource *s1=vtkSphereSource::New();

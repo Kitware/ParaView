@@ -3189,27 +3189,27 @@ void EigenvalueDiagnostic(
 
           int realIdx;
           int imagIdx1;
-          int imagIdx2;
+          //int imagIdx2;
 
           if (IsReal(e1))
             {
             realIdx=0;
             imagIdx1=1;
-            imagIdx2=2;
+            //imagIdx2=2;
             }
           else
           if (IsReal(e2))
             {
             realIdx=1;
             imagIdx1=0;
-            imagIdx2=2;
+            //imagIdx2=2;
             }
           else
           if (IsReal(e3))
             {
             realIdx=2;
             imagIdx1=0;
-            imagIdx2=1;
+            //imagIdx2=1;
             }
           else
             {

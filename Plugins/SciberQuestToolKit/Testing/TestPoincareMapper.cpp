@@ -87,6 +87,7 @@ int main(int argc, char **argv)
   mr->SetXHasPeriodicBC(1);
   mr->SetYHasPeriodicBC(1);
   mr->SetZHasPeriodicBC(1);
+  mr->SetBlockSize(8,8,8);
 
   // seed points
   vtkSQLineSource *l1=vtkSQLineSource::New();

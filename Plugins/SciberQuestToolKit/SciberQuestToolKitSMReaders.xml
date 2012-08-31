@@ -481,59 +481,47 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="1"
         >
+      <IntRangeDomain name="range"/>
       <Documentation>
         Number of ghost cells to read.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Subset Decomposition -->
-    <IntVectorProperty
-        name="DecompDims"
-        command="SetDecompDims"
-        number_of_elements="3"
-        default_values="1 1 1"
-        >
-      <Documentation>
-      Set the number of blocks to be used in an out of core read. The resulting block size
-      must be less than 2 GB per block for a scalar and less than 6 GB per block for a vector.
-      </Documentation>
-    </IntVectorProperty>
 
+    <IntVectorProperty
+        name="BlockSizeInfo"
+        command="GetBlockSize"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+    </IntVectorProperty>
     <IntVectorProperty
         name="BlockSize"
-        command="SetBlockSizeGUI"
-        number_of_elements="1"
-        default_values="0"
+        command="SetBlockSize"
+        number_of_elements="3"
+        animateable="0"
+        default_values="96 96 96"
+        information_property="BlockSizeInfo"
+        immediate_update="1"
         >
+      <IntRangeDomain name="range" min="16"/>
       <Documentation>
-        Memory used by the largest block in the domain decomposition. Must be less than 2 GB per block
-        for a scalar and less than 6 GB per block for a vector.
+      Set the block size.
       </Documentation>
     </IntVectorProperty>
 
-    <IntVectorProperty
-        name="NBlocksToCache"
-        label="No. Blocks to Cache"
-        command="SetBlockCacheSize"
+    <DoubleVectorProperty
+        name="BlockCacheRamFactor"
+        command="SetBlockCacheRamFactor"
         number_of_elements="1"
-        default_values="10"
+        animateable="0"
+        default_values="0.75"
+        immediate_update="1"
         >
+      <DoubleRangeDomain name="range" min="0.01" max="1.0"/>
       <Documentation>
-      Set the number of blocks to cache during out of core operation. Increasing the number of
-      blocks cached improves the IO perforomance while increasing the memory footprint.
+      Set the percent of local (ram per-core) to use for the block cache.
       </Documentation>
-    </IntVectorProperty>
-
-    <IntVectorProperty
-        name="BlockCacheSize"
-        command="SetBlockCacheSizeGUI"
-        number_of_elements="1"
-        default_values="0"
-        >
-      <Documentation>
-        Wrost case bound on memory used by the block cache.
-      </Documentation>
-    </IntVectorProperty>
+    </DoubleVectorProperty>
 
     <IntVectorProperty
         name="ClearCachedBlocks"

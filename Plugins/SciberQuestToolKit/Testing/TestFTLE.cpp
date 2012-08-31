@@ -72,6 +72,7 @@ int main(int argc, char **argv)
   vtkSQBOVMetaReader *r=vtkSQBOVMetaReader::New();
   r->SetFileName(inputFileName.c_str());
   r->SetPointArrayStatus("v",1);
+  r->SetBlockSize(32,32,1);
 
   // seed points
   int ext[6];

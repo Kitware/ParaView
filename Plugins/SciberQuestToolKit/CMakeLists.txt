@@ -235,15 +235,6 @@ if(PARAVIEW_BUILD_QT_GUI)
   set(_IFACES ${_IFACES} ${IFACES})
   set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
 
-  QT4_WRAP_CPP(MOC_SRCS pqSQBOVMetaReader.h)
-  ADD_PARAVIEW_OBJECT_PANEL(
-    IFACES IFACE_SRCS
-    CLASS_NAME pqSQBOVMetaReader
-    XML_NAME vtkSQBOVMetaReader
-    XML_GROUP sources)
-  set(_IFACES ${_IFACES} ${IFACES})
-  set(_IFACE_SRCS ${_IFACE_SRCS} ${IFACE_SRCS})
-
   set(SQTK_SUPPORTS_DYNAMIC_LOAD_BALANCING
     vtkSQFieldTracer
     vtkSQFieldTracerRK45
@@ -296,7 +287,6 @@ if(PARAVIEW_BUILD_QT_GUI)
     ${MOC_SRCS}
     ${UI_SRCS}
     ${_IFACE_SRCS}
-    pqSQBOVMetaReader.cxx
     pqSQFieldTracer.cxx
     pqSQHemisphereSource.cxx
     pqSQImageGhosts.cxx
