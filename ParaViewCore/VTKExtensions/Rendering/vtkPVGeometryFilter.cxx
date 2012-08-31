@@ -534,7 +534,6 @@ namespace
       {
       return;
       }
-    cout << "Merging pieces" << endl;
 
     std::vector<vtkPolyData*> inputs;
     std::vector<int> points_counts, cell_counts, verts_counts, polys_counts,
