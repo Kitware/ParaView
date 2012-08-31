@@ -744,18 +744,22 @@ int vtkPVGeometryFilter::RequestAMRData(
     return 0;
     }
 
-  // If we are in outline view, just get the bounds from the hierarchicalbox
+  // If we are in outline view, just get the bounds from the AMR
   // dataset.
   if( this->UseOutline )
     {
-    vtkNew<vtkOutlineSource> outline;
-    double bb[6];
-    amr->GetBounds(bb);
-    outline->SetBounds(bb);
-    outline->Update();
-    output->SetNumberOfBlocks( 1 );
-    output->SetBlock(0, outline->GetOutput(0));
-    return 0;
+    double bounds[6];
+    amr->GetBounds(bounds);
+    output->SetNumberOfBlocks(1);
+    output->SetBlock(0, NULL);
+    if (vtkMath::AreBoundsInitialized(bounds))
+      {
+      vtkNew<vtkOutlineSource> outline;
+      outline->SetBounds(bounds);
+      outline->Update();
+      output->SetBlock(0, outline->GetOutput(0));
+      }
+    return 1;
     }
 
   // STEP 1: Construct output object this will be multipiece that has all the
