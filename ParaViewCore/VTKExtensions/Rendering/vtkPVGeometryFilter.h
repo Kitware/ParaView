@@ -178,7 +178,7 @@ protected:
                       int updatePiece,
                       int updateNumPieces,
                       int updateGhosts,
-                      int *wholeExtent,
+                      const int *wholeExtent,
                       bool extractface[6] );
 
   void ExecuteBlock(vtkDataObject* input,
@@ -187,7 +187,7 @@ protected:
                     int updatePiece,
                     int updateNumPieces,
                     int updateGhosts,
-                    int* wholeExtent);
+                    const int* wholeExtent);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
@@ -198,14 +198,14 @@ protected:
                       vtkPolyData* output,
                       int doCommunicate,
                       int updatePiece,
-                      int *wholeExtent,
+                      const int *wholeExtent,
                       bool extractface[6] );
 
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
                         int doCommunicate,
                         int updatePiece,
-                        int* ext);
+                        const int* ext);
 
   void StructuredGridExecute(
     vtkStructuredGrid* input,
@@ -213,7 +213,7 @@ protected:
     int updatePiece,
     int updateNumPieces,
     int updateGhosts,
-    int* wholeExtent);
+    const int* wholeExtent);
 
   void RectilinearGridExecute(
     vtkRectilinearGrid* input,
@@ -221,7 +221,7 @@ protected:
     int updatePiece,
     int updateNumPieces,
     int updateGhosts,
-    int* wholeExtent);
+    const int* wholeExtent);
 
   void UnstructuredGridExecute(
     vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);

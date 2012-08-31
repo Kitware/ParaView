@@ -110,6 +110,7 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   selPainter->SetPointIdArrayName("vtkOriginalPointIds");
   selPainter->SetCellIdArrayName("vtkOriginalCellIds");
   selPainter->SetProcessIdArrayName("vtkProcessId");
+  selPainter->SetCompositeIdArrayName("vtkCompositeIndex");
 
   this->Mapper = mapper;
   this->LODMapper = vtkCompositePolyDataMapper2::New();

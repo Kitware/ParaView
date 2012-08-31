@@ -360,7 +360,7 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 void vtkPVGeometryFilter::ExecuteAMRBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
   int updatePiece, int updateNumPieces, int updateGhosts,
-  int *wholeExtent, bool extractface[6] )
+  const int *wholeExtent, bool extractface[6] )
 {
   (void)updateNumPieces;
   (void)updateGhosts;
@@ -400,7 +400,7 @@ void vtkPVGeometryFilter::ExecuteAMRBlock(
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate,
-  int updatePiece, int updateNumPieces, int updateGhosts, int* wholeExtent)
+  int updatePiece, int updateNumPieces, int updateGhosts, const int* wholeExtent)
 {
   if (input->IsA("vtkImageData"))
     {
@@ -461,24 +461,19 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   if (vtkCompositeDataSet::SafeDownCast(input))
     {
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::RequestData");
-    if( input->IsA( "vtkHierarchicalBoxDataSet" ) ||
-        input->IsA( "vtkOverlappingAMR") )
+    vtkGarbageCollector::DeferredCollectionPush();
+    if (input->IsA( "vtkUniformGridAMR"))
       {
       this->RequestAMRData( request, inputVector, outputVector );
       }
     else
       {
-      vtkGarbageCollector::DeferredCollectionPush();
       this->RequestCompositeData(request, inputVector, outputVector);
-      vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
-      vtkGarbageCollector::DeferredCollectionPop();
-      vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
       }
-    vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
-
     vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::GarbageCollect");
     vtkGarbageCollector::DeferredCollectionPop();
     vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::GarbageCollect");
+    vtkTimerLog::MarkEndEvent("vtkPVGeometryFilter::RequestData");
     return 1;
     }
 
@@ -539,6 +534,7 @@ namespace
       {
       return;
       }
+    cout << "Merging pieces" << endl;
 
     std::vector<vtkPolyData*> inputs;
     std::vector<int> points_counts, cell_counts, verts_counts, polys_counts,
@@ -742,52 +738,37 @@ int vtkPVGeometryFilter::RequestAMRData(
     return 0;
     }
 
-  vtkOverlappingAMR *input=
-      vtkOverlappingAMR::GetData(inputVector[0], 0);
-  if( input == NULL )
+  vtkUniformGridAMR* amr = vtkUniformGridAMR::GetData(inputVector[0], 0);
+  if( amr == NULL )
     {
-    vtkErrorMacro( "Input AMR composite dataset is NULL" );
+    vtkErrorMacro( "Input AMR dataset is NULL" );
     return 0;
     }
-
 
   // If we are in outline view, just get the bounds from the hierarchicalbox
   // dataset.
   if( this->UseOutline )
     {
-    vtkOutlineSource *outline = vtkOutlineSource::New();
+    vtkNew<vtkOutlineSource> outline;
     double bb[6];
-    input->GetBounds(bb);
+    amr->GetBounds(bb);
     outline->SetBounds(bb);
     outline->Update();
-
-    vtkPolyData *AMRDataOutline = vtkPolyData::New();
-    AMRDataOutline->SetPoints(outline->GetOutput()->GetPoints() );
-    AMRDataOutline->SetLines(outline->GetOutput()->GetLines() );
-    AMRDataOutline->SetPolys(outline->GetOutput()->GetPolys() );
-    outline->Delete();
-
     output->SetNumberOfBlocks( 1 );
-    output->SetBlock( 0, AMRDataOutline );
-    AMRDataOutline->Delete();
+    output->SetBlock(0, outline->GetOutput(0));
     return 0;
     }
 
-  // STEP 1: Construct output object, i.e., a multiblock of multiple pieces
-  // that mirrors the vtkHierarchicalBoxDataSet
-  output->SetNumberOfBlocks( input->GetNumberOfLevels() );
-  unsigned int blockIdx = 0;
-  for( ; blockIdx < output->GetNumberOfBlocks(); ++blockIdx )
-    {
-    vtkMultiPieceDataSet *mpds = vtkMultiPieceDataSet::New();
-    mpds->SetNumberOfPieces( input->GetNumberOfDataSets( blockIdx ) );
-    output->SetBlock( blockIdx, mpds );
-    mpds->Delete();
-    }
-
+  // STEP 1: Construct output object this will be multipiece that has all the
+  // datasets under it.
+  vtkNew<vtkMultiPieceDataSet> amrDatasets;
+  output->SetNumberOfBlocks(1);
+  output->SetBlock(0, amrDatasets.GetPointer());
+  amrDatasets->SetNumberOfPieces(amr->GetTotalNumberOfBlocks());
+  
   // STEP 2: Check Attributes
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
-  if( this->CheckAttributes(input) )
+  if( this->CheckAttributes(amr) )
     {
     vtkErrorMacro( "CheckAttributes() failed!" );
     return 0;
@@ -796,55 +777,55 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   // STEP 3: Loop through data, determine if they are visible and call
   // execute block to get the polydata to render.
+  // We use different implementations for overlapping and non-overlapping amrs.
+
+  vtkOverlappingAMR* overlappingAMR = vtkOverlappingAMR::SafeDownCast(amr);
 
   // NOTE: We assume that the root node covers the entire domain & that it
   // is stored @ (0,0)
   // Get the whole extent
-  int* wholeExtent =
-   vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-       inputVector[0]->GetInformationObject(0));
-
-  unsigned int level=0;
-  for( ; level < input->GetNumberOfLevels(); ++level )
+  const int* wholeExtent = vtkStreamingDemandDrivenPipeline::GetWholeExtent(
+    inputVector[0]->GetInformationObject(0));
+  unsigned int block_id=0;
+  for (unsigned int level=0; level < amr->GetNumberOfLevels(); ++level )
     {
-    unsigned int dataIdx=0;
-    for( ; dataIdx < input->GetNumberOfDataSets(level); ++dataIdx )
+    unsigned int num_datasets = amr->GetNumberOfDataSets(level);
+    for (unsigned int dataIdx=0; dataIdx < num_datasets; ++dataIdx, block_id++)
       {
-      vtkUniformGrid *ug = input->GetDataSet( level, dataIdx );
-      vtkMultiPieceDataSet *mpds =
-       vtkMultiPieceDataSet::SafeDownCast( output->GetBlock( level ) );
-      assert( "pre: Multipiece dataset is NULL" && (mpds != NULL) );
-
-      if( ug == NULL )
+      vtkUniformGrid *ug = amr->GetDataSet( level, dataIdx );
+      if (ug != NULL)
         {
-        vtkPolyData *trivialInput = vtkPolyData::New();
-        mpds->SetPiece( dataIdx, trivialInput );
-        trivialInput->Delete();
-        }
-      else
-        {
-        vtkAMRBox amrBox = input->GetAMRBox( level, dataIdx);
-        bool extractface[6];
-        if( this->IsAMRDataVisible(input,level,dataIdx,extractface) )
+        vtkSmartPointer<vtkPolyData> outputBlock;
+        if (overlappingAMR)
           {
-          vtkPolyData* tmpOut = vtkPolyData::New();
-          this->ExecuteAMRBlock(ug,tmpOut,0,0,1,0, wholeExtent, extractface);
-          this->CleanupOutputData(tmpOut, 0);
-          this->AddCompositeIndex(
-           tmpOut,input->GetCompositeIndex(level,dataIdx));
-          mpds->SetPiece( dataIdx, tmpOut );
-          tmpOut->Delete();
-          } // END if AMR data is visible
+          vtkAMRBox amrBox = overlappingAMR->GetAMRBox( level, dataIdx);
+          bool extractface[6];
+          if( this->IsAMRDataVisible(overlappingAMR,level,dataIdx,extractface) )
+            {
+            outputBlock = vtkSmartPointer<vtkPolyData>::New();
+            this->ExecuteAMRBlock(ug, outputBlock,
+              0, 0, 1, 0, wholeExtent, extractface);
+            } // END if AMR data is visible
+          }
         else
           {
-          vtkPolyData *trivialInput = vtkPolyData::New();
-          mpds->SetPiece( dataIdx, trivialInput );
-          trivialInput->Delete();
+          outputBlock = vtkSmartPointer<vtkPolyData>::New();
+          this->ExecuteBlock(ug, outputBlock, 0, 0, 1, 0, wholeExtent);
+          }
+        if (outputBlock.GetPointer() != NULL)
+          {
+          this->CleanupOutputData(outputBlock, /*doCommunicate=*/0);
+          this->AddCompositeIndex(outputBlock, amr->GetCompositeIndex(level,dataIdx));
+          this->AddHierarchicalIndex(outputBlock, level, dataIdx);
+          amrDatasets->SetPiece(block_id, outputBlock);
           }
         } // END else
-
       } // END for all data
     } // END for all levels
+
+  // to avoid overburdening the rendering code with having to render a large
+  // number of pieces, we merge the pieces.
+  vtkPVGeometryFilterMergePieces(amrDatasets.GetPointer());
 
   vtkTimerLog::MarkEndEvent( "vtkPVGeometryFilter::RequestAMRData" );
   return 1;
@@ -863,7 +844,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     return 0;
     }
 
-  vtkCompositeDataSet *input = vtkCompositeDataSet::GetData(inputVector[0], 0);
+  vtkDataObjectTree* input = vtkDataObjectTree::GetData(inputVector[0], 0);
   if (!input)
     {
     return 0;
@@ -881,8 +862,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(input->NewIterator());
 
-  vtkHierarchicalBoxDataIterator* hdIter =
-    vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
   unsigned int totNumBlocks=0;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
@@ -917,22 +896,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       {
       tmpOut->Delete();
       tmpOut = NULL;
-      }
-
-    if (hdIter)
-      {
-      // This will be used later by vtkSelectionConverter to realize that this
-      // multi-block of polydatas is actually coming from an AMR.
-      vtkDataObject* dataset = output->GetDataSet(iter);
-      dataset->GetInformation()->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
-        hdIter->GetCurrentLevel());
-      dataset->GetInformation()->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
-        hdIter->GetCurrentIndex());
-      if (tmpOut)
-        {
-        this->AddHierarchicalIndex(tmpOut,
-          hdIter->GetCurrentLevel(), hdIter->GetCurrentIndex());
-        }
       }
 
     numInputs++;
@@ -1210,11 +1173,11 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::AMRGridExecute(
     vtkImageData* input,vtkPolyData* output,
-    int doCommunicate,int updatePiece, int *wholeExtent, bool extractface[6] )
+    int doCommunicate,int updatePiece, const int *wholeExtent, bool extractface[6] )
 {
   double *spacing;
   double *origin;
-  int    *ext;
+  const int    *ext;
   double bounds[6];
 
   if( doCommunicate )
@@ -1231,7 +1194,7 @@ void vtkPVGeometryFilter::AMRGridExecute(
     if( input->GetNumberOfCells() > 0 )
       {
       this->DataSetSurfaceFilter->UniformGridExecute(
-        input,output,input->GetExtent(),ext, extractface );
+        input,output,input->GetExtent(), const_cast<int*>(ext), extractface );
       }
     this->OutlineFlag = 0;
     return;
@@ -1279,7 +1242,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
                                            vtkPolyData* output,
                                            int doCommunicate,
                                            int updatePiece,
-                                           int* ext)
+                                           const int* ext)
 {
   double *spacing;
   double *origin;
@@ -1301,7 +1264,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     if (input->GetNumberOfCells() > 0)
       {
         this->DataSetSurfaceFilter->StructuredExecute(input,
-          output, input->GetExtent(), ext);
+          output, input->GetExtent(), const_cast<int*>(ext));
       }
     this->OutlineFlag = 0;
     return;
@@ -1348,14 +1311,14 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
                                                 int updatePiece,
                                                 int updateNumPieces,
                                                 int updateGhosts,
-                                                int* wholeExtent)
+                                                const int* wholeExtent)
 {
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)
       {
       this->DataSetSurfaceFilter->StructuredExecute(input, output, input->GetExtent(),
-        wholeExtent);
+        const_cast<int*>(wholeExtent));
       }
     this->OutlineFlag = 0;
     return;
@@ -1388,14 +1351,14 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
                                                 int updatePiece,
                                                 int updateNumPieces,
                                                 int updateGhosts,
-                                                int* wholeExtent)
+                                                const int* wholeExtent)
 {
   if (!this->UseOutline)
     {
     if (input->GetNumberOfCells() > 0)
       {
       this->DataSetSurfaceFilter->StructuredExecute(input, output,
-        input->GetExtent(), wholeExtent);
+        input->GetExtent(), const_cast<int*>(wholeExtent));
       }
     this->OutlineFlag = 0;
     return;
