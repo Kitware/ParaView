@@ -235,7 +235,14 @@ set(_vtk_modules
   #  vtkFLUENTReader
   #  vtkOpenFOAMReader
   #  vtkParticleReader
+
+  vtkIOLegacy
   #  vtkDataSetWriter
+
+  vtkIOMovie
+  #  vtkGenericMovieWriter
+  #  vtkOggTheoraWriter
+  #  vtkAVIWriter
 
   vtkIOImage
   # Needed for:
@@ -323,6 +330,7 @@ set(_vtk_modules
   vtkDomainsChemistry
   # Needed for:
   #  vtkMoleculeRepresentation
+
   )
 
 if(PARAVIEW_USE_PISTON)
