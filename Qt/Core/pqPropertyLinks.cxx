@@ -148,6 +148,7 @@ bool pqPropertyLinks::removePropertyLink(
     if (*existing == connection)
       {
       this->Internals->Connections.removeOne(existing);
+      delete existing;
       return true;
       }
     }
