@@ -70,6 +70,9 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <math.h>
+#include <set>
+#include <algorithm>
 
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
@@ -357,44 +360,116 @@ int vtkPVGeometryFilter::RequestUpdateExtent(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::ExecuteAMRBlock(
-  vtkDataObject* input, vtkPolyData* output, int doCommunicate,
-  int updatePiece, int updateNumPieces, int updateGhosts,
-  const int *wholeExtent, bool extractface[6] )
+void vtkPVGeometryFilter::ExecuteAMRBlockOutline(
+  const double bounds[6], vtkPolyData* output, const bool extractface[6])
 {
-  (void)updateNumPieces;
-  (void)updateGhosts;
+  vtkNew<vtkPoints> points;
+  points->Allocate(8);
 
-//  if (this->UseOutline /*&& this->MakeOutlineOfInput*/ )
-//  {
-//    vtkAlgorithmOutput *pport = input->GetProducerPort();
-//    vtkDataObject *insin = NULL;
-//    if (pport)
-//      {
-//      vtkAlgorithm *alg = pport->GetProducer();
-//      if (alg &&
-//          alg->GetNumberOfInputPorts() &&
-//          alg->GetNumberOfInputConnections(0))
-//        {
-//        insin = alg->GetInputDataObject(0,0);
-//        }
-//      }
-//    if (insin)
-//      {
-//      input = insin;
-//      }
-//  }
+  vtkNew<vtkCellArray> lines;
+  lines->Allocate(lines->EstimateSize(12, 2));
 
-  if( !input->IsA("vtkImageData") )
-  {
-    vtkErrorMacro( "Input data must be vtkImageData for AMR!" );
-    return;
-  }
+  double x[3];
+  x[0] = bounds[0]; x[1] = bounds[2]; x[2] = bounds[4];
+  points->InsertPoint(0,x);
+  x[0] = bounds[1]; x[1] = bounds[2]; x[2] = bounds[4];
+  points->InsertPoint(1,x);
+  x[0] = bounds[0]; x[1] = bounds[3]; x[2] = bounds[4];
+  points->InsertPoint(2,x);
+  x[0] = bounds[1]; x[1] = bounds[3]; x[2] = bounds[4];
+  points->InsertPoint(3,x);
+  x[0] = bounds[0]; x[1] = bounds[2]; x[2] = bounds[5];
+  points->InsertPoint(4,x);
+  x[0] = bounds[1]; x[1] = bounds[2]; x[2] = bounds[5];
+  points->InsertPoint(5,x);
+  x[0] = bounds[0]; x[1] = bounds[3]; x[2] = bounds[5];
+  points->InsertPoint(6,x);
+  x[0] = bounds[1]; x[1] = bounds[3]; x[2] = bounds[5];
+  points->InsertPoint(7,x);
 
-  this->AMRGridExecute(
-   static_cast<vtkImageData*>( input ),output,
-   doCommunicate,updatePiece, wholeExtent, extractface);
+  typedef std::set<std::pair<vtkIdType, vtkIdType> > set_of_pairs;
+  set_of_pairs edges;
 
+  vtkIdType pts[2];
+  // xmin face
+  if (extractface[0])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 2));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 4));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(4, 6));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(2, 6));
+    }
+  // xmax face
+  if (extractface[1])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(1, 3));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(1, 5));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(5, 7));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(3, 7));
+    }
+
+  // ymin face
+  if (extractface[2])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 1));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(1, 5));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(4, 5));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 4));
+    }
+  // ymax face
+  if (extractface[3])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(3, 2));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(3, 7));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(6, 7));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(2, 6));
+    }
+
+  // zmin face
+  if (extractface[4])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 2));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(0, 1));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(2, 3));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(1, 3));
+    }
+  // zmax face
+  if (extractface[5])
+    {
+    edges.insert(std::pair<vtkIdType, vtkIdType>(4, 6));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(4, 5));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(5, 7));
+    edges.insert(std::pair<vtkIdType, vtkIdType>(6, 7));
+    }
+
+  for (set_of_pairs::iterator iter = edges.begin();
+    iter != edges.end(); ++iter)
+    {
+    pts[0] = iter->first;
+    pts[1] = iter->second;
+    lines->InsertNextCell(2, pts);
+    }
+
+  output->SetPoints(points.GetPointer());
+  output->SetLines(lines.GetPointer());
+
+  this->OutlineFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ExecuteAMRBlock(
+  vtkUniformGrid* input, vtkPolyData* output, const bool extractface[6])
+{
+  assert(input != NULL && output != NULL && this->UseOutline == 0);
+  if (input->GetNumberOfCells() > 0)
+    {
+    int extent[6];
+    input->GetExtent(extent);
+    this->DataSetSurfaceFilter->UniformGridExecute(
+      input, output, input->GetExtent(), extent,
+      const_cast<bool*>(extractface));
+    }
+  this->OutlineFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -744,24 +819,6 @@ int vtkPVGeometryFilter::RequestAMRData(
     return 0;
     }
 
-  // If we are in outline view, just get the bounds from the AMR
-  // dataset.
-  if( this->UseOutline )
-    {
-    double bounds[6];
-    amr->GetBounds(bounds);
-    output->SetNumberOfBlocks(1);
-    output->SetBlock(0, NULL);
-    if (vtkMath::AreBoundsInitialized(bounds))
-      {
-      vtkNew<vtkOutlineSource> outline;
-      outline->SetBounds(bounds);
-      outline->Update();
-      output->SetBlock(0, outline->GetOutput(0));
-      }
-    return 1;
-    }
-
   // STEP 1: Construct output object this will be multipiece that has all the
   // datasets under it.
   vtkNew<vtkMultiPieceDataSet> amrDatasets;
@@ -784,11 +841,18 @@ int vtkPVGeometryFilter::RequestAMRData(
 
   vtkOverlappingAMR* overlappingAMR = vtkOverlappingAMR::SafeDownCast(amr);
 
-  // NOTE: We assume that the root node covers the entire domain & that it
-  // is stored @ (0,0)
-  // Get the whole extent
-  const int* wholeExtent = vtkStreamingDemandDrivenPipeline::GetWholeExtent(
-    inputVector[0]->GetInformationObject(0));
+  double bounds[6];
+  amr->GetBounds(bounds);
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+    {
+    // Since bounds are not necessary synced up, especially for non-overlapping
+    // AMR datasets, we sync them up across all processes.
+    vtkPVGeometryFilter::BoundsReductionOperation operation;  
+    double received_bounds[6];
+    this->Controller->AllReduce(bounds, received_bounds, 6, &operation);
+    memcpy(bounds, received_bounds, sizeof(double)*6);
+    }
+
   unsigned int block_id=0;
   for (unsigned int level=0; level < amr->GetNumberOfLevels(); ++level )
     {
@@ -796,39 +860,91 @@ int vtkPVGeometryFilter::RequestAMRData(
     for (unsigned int dataIdx=0; dataIdx < num_datasets; ++dataIdx, block_id++)
       {
       vtkUniformGrid *ug = amr->GetDataSet( level, dataIdx );
-      if (ug != NULL)
+      if ( (ug == NULL && this->UseOutline == 0) ||
+           (ug == NULL && this->UseOutline == 1 && overlappingAMR == NULL))
         {
-        vtkSmartPointer<vtkPolyData> outputBlock;
-        if (overlappingAMR)
+        // if this->UseOutline == 0,we need uniform grid to be present.
+
+        // if this->UseOutline ==1, we need ug only for non-overlapping AMR. For
+        // overlapping AMR, we can generate outline using the meta-data
+        // available.
+        continue;
+        }
+
+      bool extractface[6] = {false, false, false, false, false, false};
+      double data_bounds[6];
+
+      // we have different mechanisms for determining if any of the faces of the
+      // block are visible and what faces are visible based on the type of amr.
+      if (overlappingAMR)
+        {
+        // FIXME: this logic can be consolidated with non-overlapping case,
+        // but leaving it alone for now.
+        if (!this->IsAMRDataVisible(overlappingAMR, level, dataIdx, extractface))
           {
-          vtkAMRBox amrBox = overlappingAMR->GetAMRBox( level, dataIdx);
-          bool extractface[6];
-          if( this->IsAMRDataVisible(overlappingAMR,level,dataIdx,extractface) )
-            {
-            outputBlock = vtkSmartPointer<vtkPolyData>::New();
-            this->ExecuteAMRBlock(ug, outputBlock,
-              0, 0, 1, 0, wholeExtent, extractface);
-            } // END if AMR data is visible
+          continue;
           }
-        else
+
+        // determine the bounds for the box so that we can use it to generate
+        // outlines when data is not available and this->UseOutline is true.
+        double data_spacing[3];
+        overlappingAMR->GetGridSpacing(level, data_spacing);
+        const double *origin = overlappingAMR->GetOrigin();
+
+        vtkAMRBox::GetBounds(overlappingAMR->GetAMRBox(level, dataIdx),
+          const_cast<double*>(origin),
+          data_spacing,
+          data_bounds);
+        }
+      else if (ug)
+        {
+        ug->GetBounds(data_bounds);
+
+        double data_spacing[3];
+        ug->GetSpacing(data_spacing);
+        double error_margin = vtkMath::Norm(data_spacing);
+
+        for (int cc=0; cc < 6; cc++)
           {
-          outputBlock = vtkSmartPointer<vtkPolyData>::New();
-          this->ExecuteBlock(ug, outputBlock, 0, 0, 1, 0, wholeExtent);
+          double delta = fabs(data_bounds[cc] - bounds[cc]);
+          extractface[cc] = (delta < error_margin);
           }
-        if (outputBlock.GetPointer() != NULL)
-          {
-          this->CleanupOutputData(outputBlock, /*doCommunicate=*/0);
-          this->AddCompositeIndex(outputBlock, amr->GetCompositeIndex(level,dataIdx));
-          this->AddHierarchicalIndex(outputBlock, level, dataIdx);
-          amrDatasets->SetPiece(block_id, outputBlock);
-          }
-        } // END else
-      } // END for all data
-    } // END for all levels
+        }
+      else
+        {
+        continue; // skip block.
+        }
+      vtkNew<vtkPolyData> outputBlock;
+      if (this->UseOutline)
+        {
+        this->ExecuteAMRBlockOutline(data_bounds, outputBlock.GetPointer(),
+          extractface);
+        }
+      else
+        {
+        this->ExecuteAMRBlock(ug, outputBlock.GetPointer(), extractface);
+        }
+      if (!this->UseOutline)
+        {
+        // don't process attribute arrays when generating outlines.
+
+        this->CleanupOutputData(outputBlock.GetPointer(), /*doCommunicate=*/0);
+        this->AddCompositeIndex(outputBlock.GetPointer(), amr->GetCompositeIndex(level,dataIdx));
+        this->AddHierarchicalIndex(outputBlock.GetPointer(), level, dataIdx);
+        }
+      amrDatasets->SetPiece(block_id, outputBlock.GetPointer());
+      }
+    }
 
   // to avoid overburdening the rendering code with having to render a large
   // number of pieces, we merge the pieces.
   vtkPVGeometryFilterMergePieces(amrDatasets.GetPointer());
+
+  // since we no longer care about the structure of the blocks in the composite
+  // dataset (we are passing composite ids in the data itself to help identify
+  // what block it came from), we can shrink allocated empty pointers for pieces
+  // that vtkPVGeometryFilterMergePieces merged into one.
+  amrDatasets->SetNumberOfPieces(1);
 
   vtkTimerLog::MarkEndEvent( "vtkPVGeometryFilter::RequestAMRData" );
   return 1;
@@ -1171,73 +1287,6 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
     output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
     output->SetLines(this->OutlineSource->GetOutput()->GetLines());
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::AMRGridExecute(
-    vtkImageData* input,vtkPolyData* output,
-    int doCommunicate,int updatePiece, const int *wholeExtent, bool extractface[6] )
-{
-  double *spacing;
-  double *origin;
-  const int    *ext;
-  double bounds[6];
-
-  if( doCommunicate )
-    {
-    ext = wholeExtent;
-    }
-  else
-    {
-    ext = input->GetExtent();
-    }
-
-  if( !this->UseOutline )
-    {
-    if( input->GetNumberOfCells() > 0 )
-      {
-      this->DataSetSurfaceFilter->UniformGridExecute(
-        input,output,input->GetExtent(), const_cast<int*>(ext), extractface );
-      }
-    this->OutlineFlag = 0;
-    return;
-    }
-
-  this->OutlineFlag = 1;
-
-  //
-  // Otherwise, let OutlineSource do all the work
-  //
-
-  if (ext[1] >= ext[0] && ext[3] >= ext[2] && ext[5] >= ext[4] &&
-    (updatePiece == 0 || !doCommunicate))
-    {
-    spacing = input->GetSpacing();
-    origin = input->GetOrigin();
-
-    bounds[0] = spacing[0] * ((float)ext[0]) + origin[0];
-    bounds[1] = spacing[0] * ((float)ext[1]) + origin[0];
-    bounds[2] = spacing[1] * ((float)ext[2]) + origin[1];
-    bounds[3] = spacing[1] * ((float)ext[3]) + origin[1];
-    bounds[4] = spacing[2] * ((float)ext[4]) + origin[2];
-    bounds[5] = spacing[2] * ((float)ext[5]) + origin[2];
-
-    vtkOutlineSource *outline = vtkOutlineSource::New();
-    outline->SetBounds(bounds);
-    outline->Update();
-
-    output->SetPoints(outline->GetOutput()->GetPoints());
-    output->SetLines(outline->GetOutput()->GetLines());
-    output->SetPolys(outline->GetOutput()->GetPolys());
-    outline->Delete();
-    }
-  else
-    {
-    vtkPoints* pts = vtkPoints::New();
-    output->SetPoints(pts);
-    pts->Delete();
-    }
-
 }
 
 //----------------------------------------------------------------------------

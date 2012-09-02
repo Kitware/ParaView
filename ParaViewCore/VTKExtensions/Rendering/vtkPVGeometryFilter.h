@@ -171,15 +171,20 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
+  // Description:
+  // Produce geometry for a block in the dataset. 
+  // This does not handle producing outlines. Call only when this->UseOutline ==
+  // 0; \c extractface mask it is used to determine external faces.
+  void ExecuteAMRBlock(vtkUniformGrid* input,
+                       vtkPolyData* output,
+                       const bool extractface[6]);
 
-  void ExecuteAMRBlock(vtkDataObject* input,
-                      vtkPolyData* output,
-                      int doCommunicate,
-                      int updatePiece,
-                      int updateNumPieces,
-                      int updateGhosts,
-                      const int *wholeExtent,
-                      bool extractface[6] );
+
+  // Description:
+  // Used instead of ExecuteAMRBlock() when this->UseOutline is true.
+  void ExecuteAMRBlockOutline(const double bounds[6],
+                              vtkPolyData* output,
+                              const bool extractface[6]);
 
   void ExecuteBlock(vtkDataObject* input,
                     vtkPolyData* output,
@@ -193,13 +198,6 @@ protected:
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
-
-  void AMRGridExecute(vtkImageData* input,
-                      vtkPolyData* output,
-                      int doCommunicate,
-                      int updatePiece,
-                      const int *wholeExtent,
-                      bool extractface[6] );
 
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
