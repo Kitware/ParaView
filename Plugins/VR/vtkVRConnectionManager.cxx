@@ -47,13 +47,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QtDebug>
 
-// -----------------------------------------------------------------------macro
+// ----------------------------------------------------------------------------
 QPointer<vtkVRConnectionManager> vtkVRConnectionManager::Instance;
 void vtkVRConnectionManager::setInstance(vtkVRConnectionManager* mgr)
 {
   vtkVRConnectionManager::Instance = mgr;
 }
 
+// ----------------------------------------------------------------------------
 vtkVRConnectionManager* vtkVRConnectionManager::instance()
 {
   return vtkVRConnectionManager::Instance;
@@ -96,12 +97,14 @@ vtkVRConnectionManager::~vtkVRConnectionManager()
 }
 
 #ifdef PARAVIEW_USE_VRPN
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::add( vtkVRPNConnection* conn )
 {
   this->Internals->VRPNConnections.push_front( conn );
   emit this->connectionsChanged();
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
 {
   conn->Stop();
@@ -109,13 +112,16 @@ void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
   emit this->connectionsChanged();
 }
 #endif
+
 #ifdef PARAVIEW_USE_VRUI
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
 {
   this->Internals->VRUIConnections.push_front( conn );
   emit this->connectionsChanged();
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
 {
   conn->Stop();
@@ -123,6 +129,8 @@ void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
   emit this->connectionsChanged();
 }
 #endif
+
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::clear()
 {
   this->stop();
@@ -135,6 +143,13 @@ void vtkVRConnectionManager::clear()
   emit this->connectionsChanged();
 }
 
+// ----------------------------------------------------------------------------
+QList<QString> vtkVRConnectionManager::connectionNames() const
+{
+  return QList<QString>();
+}
+
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::start()
 {
 #ifdef PARAVIEW_USE_VRPN
@@ -157,6 +172,7 @@ void vtkVRConnectionManager::start()
 #endif
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::stop()
 {
 #ifdef PARAVIEW_USE_VRPN
@@ -179,6 +195,7 @@ void vtkVRConnectionManager::stop()
 #endif
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
                                                   vtkSMProxyLocator* locator )
 {
@@ -245,6 +262,7 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
   emit this->connectionsChanged();
 }
 
+// ----------------------------------------------------------------------------
 void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root )
 {
  Q_ASSERT(root != NULL);
