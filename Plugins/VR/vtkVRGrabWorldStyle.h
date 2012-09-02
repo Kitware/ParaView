@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleGrabNUpdateMatrix.h
+   Module:    vtkVRGrabWorldStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,10 +29,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleGrabNUpdateMatrix_h_
-#define __vtkVRStyleGrabNUpdateMatrix_h_
+#ifndef __vtkVRGrabWorldStyle_h_
+#define __vtkVRGrabWorldStyle_h_
 
-#include "vtkVRStyleTracking.h"
+#include "vtkVRTrackStyle.h"
 
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
@@ -40,13 +40,13 @@ class vtkSMIntVectorProperty;
 class vtkTransform;
 struct vtkVREventData;
 
-class vtkVRStyleGrabNUpdateMatrix : public vtkVRStyleTracking
+class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
   Q_OBJECT
-  typedef vtkVRStyleTracking Superclass;
+  typedef vtkVRTrackStyle Superclass;
 public:
-  vtkVRStyleGrabNUpdateMatrix(QObject* parent);
-  ~vtkVRStyleGrabNUpdateMatrix();
+  vtkVRGrabWorldStyle(QObject* parent);
+  ~vtkVRGrabWorldStyle();
 
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
@@ -62,4 +62,4 @@ protected:
   vtkTransform *InverseInitialMatrix;
 };
 
-#endif //__vtkVRStyleGrabNUpdateMatrix.h_
+#endif //__vtkVRGrabWorldStyle.h_

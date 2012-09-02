@@ -33,14 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkVRActiveObjectManipulationStyle.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkVRGrabWorldStyle.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRQueue.h"
-#include "vtkVRStyleTracking.h"
-#include "vtkVRStyleGrabNUpdateMatrix.h"
-#include "vtkVRStyleGrabNRotateSliceNormal.h"
-#include "vtkVRStyleGrabNTranslateSliceOrigin.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkVRTrackStyle.h"
+
 #include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
@@ -195,36 +193,18 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        if (strcmp(class_name, "vtkVRStyleTracking")==0)
+        if (strcmp(class_name, "vtkVRTrackStyle")==0)
           {
-          vtkVRStyleTracking* style = new vtkVRStyleTracking(this);
+          vtkVRTrackStyle* style = new vtkVRTrackStyle(this);
           style->configure(child, locator);
           this->add(style);
           }
-        else if (strcmp(class_name, "vtkVRStyleGrabNUpdateMatrix")==0)
+        else if (strcmp(class_name, "vtkVRGrabWorldStyle")==0)
           {
-          vtkVRStyleGrabNUpdateMatrix* style = new vtkVRStyleGrabNUpdateMatrix(this);
+          vtkVRGrabWorldStyle* style = new vtkVRGrabWorldStyle(this);
           style->configure(child, locator);
           this->add(style);
           }
-//        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
-//          {
-//          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
-//          style->configure(child, locator);
-//          this->add(style);
-//          }
-//        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
-//          {
-//          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
-//          style->configure(child, locator);
-//          this->add(style);
-//          }
-//        else if (strcmp(class_name, "vtkVRActiveObjectManipulationStyle")==0)
-//          {
-//          vtkVRActiveObjectManipulationStyle* style = new vtkVRActiveObjectManipulationStyle(this);
-//          style->configure(child, locator);
-//          this->add(style);
-//          }
         else
           {
           qWarning() << "Unknown interactor style: \"" << class_name << "\"";

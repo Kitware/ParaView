@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleGrabNUpdateMatrix.cxx
+   Module:    vtkVRGrabWorldStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRStyleGrabNUpdateMatrix.h"
+#include "vtkVRGrabWorldStyle.h"
 
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 // -----------------------------------------------------------------------------
-vtkVRStyleGrabNUpdateMatrix::vtkVRStyleGrabNUpdateMatrix(QObject* parentObject) :
+vtkVRGrabWorldStyle::vtkVRGrabWorldStyle(QObject* parentObject) :
   Superclass(parentObject)
 {
   this->Enabled = false;
@@ -52,13 +52,13 @@ vtkVRStyleGrabNUpdateMatrix::vtkVRStyleGrabNUpdateMatrix(QObject* parentObject) 
 }
 
 // -----------------------------------------------------------------------------
-vtkVRStyleGrabNUpdateMatrix::~vtkVRStyleGrabNUpdateMatrix()
+vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 {
   this->InverseInitialMatrix->Delete();
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRStyleGrabNUpdateMatrix::configure(
+bool vtkVRGrabWorldStyle::configure(
   vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
   if (!this->Superclass::configure(child, locator))
@@ -79,7 +79,7 @@ bool vtkVRStyleGrabNUpdateMatrix::configure(
 }
 
 // -----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRStyleGrabNUpdateMatrix::saveConfiguration() const
+vtkPVXMLElement* vtkVRGrabWorldStyle::saveConfiguration() const
 {
   vtkPVXMLElement* child = this->Superclass::saveConfiguration();
 
@@ -92,7 +92,7 @@ vtkPVXMLElement* vtkVRStyleGrabNUpdateMatrix::saveConfiguration() const
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStyleGrabNUpdateMatrix::handleButton( const vtkVREventData& data )
+void vtkVRGrabWorldStyle::handleButton( const vtkVREventData& data )
 {
   if ( this->ButtonName == QString(data.name.c_str()))
     {
@@ -101,7 +101,7 @@ void vtkVRStyleGrabNUpdateMatrix::handleButton( const vtkVREventData& data )
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStyleGrabNUpdateMatrix::handleTracker( const vtkVREventData& data )
+void vtkVRGrabWorldStyle::handleTracker( const vtkVREventData& data )
 {
   if ( this->TrackerName == data.name.c_str() )
     {

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleTracking.h
+   Module:    vtkVRTrackStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleTracking_h_
-#define __vtkVRStyleTracking_h_
+#ifndef __vtkVRTrackStyle_h_
+#define __vtkVRTrackStyle_h_
 
 #include "vtkVRInteractorStyle.h"
 #include "vtkWeakPointer.h"
@@ -43,13 +43,13 @@ class vtkTransform;
 
 struct vtkVREventData;
 
-class vtkVRStyleTracking : public vtkVRInteractorStyle
+class vtkVRTrackStyle : public vtkVRInteractorStyle
 {
   Q_OBJECT
   typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRStyleTracking(QObject* parent);
-  ~vtkVRStyleTracking();
+  vtkVRTrackStyle(QObject* parent);
+  ~vtkVRTrackStyle();
 
   // Specify the proxy and property to control. The property needs to have 16
   // elements and must be a numerical property.
@@ -74,4 +74,4 @@ protected:
   vtkWeakPointer<vtkSMProxy> ControlledProxy;
 };
 
-#endif //__vtkVRStyleTracking.h_
+#endif //__vtkVRTrackStyle.h_

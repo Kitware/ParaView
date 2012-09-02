@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleTracking.cxx
+   Module:    vtkVRTrackStyle.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRStyleTracking.h"
+#include "vtkVRTrackStyle.h"
 
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
@@ -44,30 +44,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ----------------------------------------------------------------------------
-vtkVRStyleTracking::vtkVRStyleTracking(QObject* parentObject) :
+vtkVRTrackStyle::vtkVRTrackStyle(QObject* parentObject) :
   Superclass(parentObject)
 {
 }
 
 // ----------------------------------------------------------------------------
-vtkVRStyleTracking::~vtkVRStyleTracking()
+vtkVRTrackStyle::~vtkVRTrackStyle()
 {
 }
 
 //-----------------------------------------------------------------------------
-void vtkVRStyleTracking::setControlledProxy(vtkSMProxy* proxy)
+void vtkVRTrackStyle::setControlledProxy(vtkSMProxy* proxy)
 {
   this->ControlledProxy = proxy;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkVRStyleTracking::controlledProxy() const
+vtkSMProxy* vtkVRTrackStyle::controlledProxy() const
 {
   return this->ControlledProxy;
 }
 
 //-----------------------------------------------------------------------------
-bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
+bool vtkVRTrackStyle::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* locator)
 {
   int id;
@@ -93,7 +93,7 @@ bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
   if (this->TrackerName.isEmpty() || !this->ControlledProxy ||
     this->ControlledPropertyName.isEmpty())
     {
-    qCritical() << "Incorrect state for vtkVRStyleTracking";
+    qCritical() << "Incorrect state for vtkVRTrackStyle";
     return false;
     }
 
@@ -101,7 +101,7 @@ bool vtkVRStyleTracking::configure(vtkPVXMLElement* child,
 }
 
 // -----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
+vtkPVXMLElement* vtkVRTrackStyle::saveConfiguration() const
 {
   vtkPVXMLElement* child = this->Superclass::saveConfiguration();
   child->AddAttribute("proxy",
@@ -121,7 +121,7 @@ vtkPVXMLElement* vtkVRStyleTracking::saveConfiguration() const
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRStyleTracking::handleTracker( const vtkVREventData& data )
+void vtkVRTrackStyle::handleTracker( const vtkVREventData& data )
 {
   if ( this->TrackerName == QString(data.name.c_str()))
     {
