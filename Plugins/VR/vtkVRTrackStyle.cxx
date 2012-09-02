@@ -71,9 +71,17 @@ bool vtkVRTrackStyle::configure(vtkPVXMLElement* child,
                                    vtkSMProxyLocator* locator)
 {
   int id;
-  if (!this->Superclass::configure(child, locator) &&
-    child->GetScalarAttribute("proxy", &id) == 0&&
-    child->GetAttribute("property") == NULL)
+  if (!this->Superclass::configure(child, locator))
+    {
+    return false;
+    }
+
+  if (child->GetScalarAttribute("proxy", &id) == 0)
+    {
+    return false;
+    }
+
+   if (child->GetAttribute("property") == NULL)
     {
     return false;
     }
