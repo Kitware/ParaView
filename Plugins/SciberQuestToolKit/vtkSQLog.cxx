@@ -8,6 +8,8 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQLog.h"
 
+#include "XMLUtils.h"
+#include "LogBuffer.h"
 #include "SQMacros.h"
 #include "postream.h"
 
@@ -51,225 +53,11 @@ using std::ios_base;
 #include <mpi.h>
 #endif
 
-// set this ini the header since there are conditional compile
-// there as well
-//#define vtkSQLogDEBUG
-
-//=============================================================================
-class LogBuffer
-{
-public:
-  LogBuffer()
-        :
-    Size(0),
-    At(0),
-    GrowBy(4096),
-    Data(0)
-  {}
-
-  ~LogBuffer(){ free(this->Data); }
-
-  /// copiers
-  LogBuffer(const LogBuffer &other)
-        :
-    Size(0),
-    At(0),
-    GrowBy(4096),
-    Data(0)
-  {
-      *this=other;
-  }
-
-  void operator=(const LogBuffer &other)
-  {
-    if (this==&other) return;
-    this->Clear();
-    this->Resize(other.GetSize());
-    memcpy(this->Data,other.Data,other.GetSize());
-  }
-
-  /// accessors
-  const char *GetData() const { return this->Data; }
-  char *GetData(){ return this->Data; }
-  size_t GetSize() const { return this->At; }
-  size_t GetCapacity() const { return this->Size; }
-  void Clear(){ this->At=0; }
-  void ClearForReal()
-  {
-    this->At=0;
-    this->Size=0;
-    free(this->Data);
-    this->Data=0;
-  }
-
-  /// insertion operators
-  LogBuffer &operator<<(const int v)
-  {
-    const char c='i';
-    this->PushBack(&c,1);
-    this->PushBack(&v,sizeof(int));
-    return *this;
-  }
-
-  LogBuffer &operator<<(const double v)
-  {
-    const char c='d';
-    this->PushBack(&c,1);
-    this->PushBack(&v,sizeof(double));
-    return *this;
-  }
-
-  LogBuffer &operator<<(const char *v)
-  {
-    const char c='s';
-    this->PushBack(&c,1);
-    size_t n=strlen(v)+1;
-    this->PushBack(v,n);
-    return *this;
-  }
-
-  template<size_t N>
-  LogBuffer &operator<<(const char v[N])
-  {
-    const char c='s';
-    this->PushBack(&c,1);
-    this->PushBack(&v[0],N);
-    return *this;
-  }
-
-  /// formatted extraction operator.
-  LogBuffer &operator>>(ostringstream &s)
-  {
-    size_t i=0;
-    while (i<this->At)
-      {
-      char c=this->Data[i];
-      ++i;
-      switch (c)
-        {
-        case 'i':
-          s << *((int*)(this->Data+i));
-          i+=sizeof(int);
-          break;
-
-        case 'd':
-          s << *((double*)(this->Data+i));
-          i+=sizeof(double);
-          break;
-
-        case 's':
-          {
-          s << this->Data+i;
-          size_t n=strlen(this->Data+i)+1;
-          i+=n;
-          }
-          break;
-
-        default:
-          sqErrorMacro(
-            pCerr(),
-            "Bad case at " << i-1 << " " << c << ", " << (int)c);
-          return *this;
-        }
-      }
-      return *this;
-  }
-
-  /// collect buffer to a root process
-  void Gather(int worldRank, int worldSize, int rootRank)
-  {
-    #ifdef SQTK_WITHOUT_MPI
-    (void)worldRank;
-    (void)worldSize;
-    (void)rootRank;
-    #else
-    // in serial this is a no-op
-    if (worldSize>1)
-      {
-      int *bufferSizes=0;
-      int *disp=0;
-      if (worldRank==rootRank)
-        {
-        bufferSizes=(int *)malloc(worldSize*sizeof(int));
-        disp=(int *)malloc(worldSize*sizeof(int));
-        }
-      int bufferSize=(int)this->GetSize();
-      MPI_Gather(
-          &bufferSize,
-          1,
-          MPI_INT,
-          bufferSizes,
-          1,
-          MPI_INT,
-          rootRank,
-          MPI_COMM_WORLD);
-      char *log=0;
-      int cumSize=0;
-      if (worldRank==rootRank)
-        {
-        for (int i=0; i<worldSize; ++i)
-          {
-          disp[i]=cumSize;
-          cumSize+=bufferSizes[i];
-          }
-        //this->Resize(cumSize); // can't do inplace since mpi uses memcpy
-        //this->At=cumSize;
-        log=(char*)malloc(cumSize);
-        }
-      MPI_Gatherv(
-        this->Data,
-        bufferSize,
-        MPI_CHAR,
-        //this->Data,
-        log,
-        bufferSizes,
-        disp,
-        MPI_CHAR,
-        rootRank,
-        MPI_COMM_WORLD);
-      if (worldRank==rootRank)
-        {
-        this->Clear();
-        this->PushBack(log,cumSize);
-        free(bufferSizes);
-        free(disp);
-        free(log);
-        }
-      else
-        {
-        this->Clear();
-        }
-      }
-    #endif
-  }
-
-protected:
-  /// push n bytes onto the buffer, resizing if necessary
-  void PushBack(const void *data, size_t n)
-  {
-  size_t nextAt=this->At+n;
-  this->Resize(nextAt);
-  memcpy(this->Data+this->At,data,n);
-  this->At=nextAt;
-  }
-
-  /// resize to at least newSize bytes
-  void Resize(size_t newSize)
-  {
-    //size_t oldSize=this->Size;
-    if (newSize<=this->Size) return;
-    while(this->Size<newSize) this->Size+=this->GrowBy;
-    this->Data=(char*)realloc(this->Data,this->Size);
-    //memset(this->Data+oldSize,-1,this->Size-oldSize);
-  }
-
-private:
-  size_t Size;
-  size_t At;
-  size_t GrowBy;
-  char *Data;
-};
-
+/*
+For singleton pattern
+**/
+vtkSQLog *vtkSQLog::GlobalInstance=0;
+vtkSQLogDestructor vtkSQLog::GlobalInstanceDestructor;
 
 //-----------------------------------------------------------------------------
 vtkSQLogDestructor::~vtkSQLogDestructor()
@@ -280,20 +68,13 @@ vtkSQLogDestructor::~vtkSQLogDestructor()
     }
 }
 
-
-/*
-For singleton pattern
-**/
-vtkSQLog *vtkSQLog::GlobalInstance=0;
-vtkSQLogDestructor vtkSQLog::GlobalInstanceDestructor;
-
-
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQLog);
 
 //-----------------------------------------------------------------------------
 vtkSQLog::vtkSQLog()
         :
+    GlobalLevel(0),
     WorldRank(0),
     WorldSize(1),
     WriterRank(0),
@@ -370,7 +151,43 @@ vtkSQLog *vtkSQLog::GetGlobalInstance()
 void vtkSQLog::Clear()
 {
   this->Log->Clear();
-  this->Header.str("");
+  this->HeaderBuffer.str("");
+}
+
+//-----------------------------------------------------------------------------
+int vtkSQLog::Initialize(vtkPVXMLElement *root)
+{
+  #ifdef vtkSQLogDEBUG
+  //pCerr() << "=====vtkSQLog::Initialize" << endl;
+  #endif
+
+  vtkPVXMLElement *elem=0;
+  elem=GetOptionalElement(root,"vtkSQLog");
+  if (elem==0)
+    {
+    return -1;
+    }
+
+  int global_level=0;
+  GetOptionalAttribute<int,1>(elem,"global_level",&global_level);
+  this->SetGlobalLevel(global_level);
+
+  string file_name;
+  GetOptionalAttribute<string,1>(elem,"file_name",&file_name);
+  if (file_name.size()>0)
+    {
+    this->SetFileName(file_name.c_str());
+    }
+
+  if (this->GlobalLevel>0)
+    {
+    this->GetHeader()
+      << "# ::vtkSQLogSource" << "\n"
+      << "#   global_level=" << this->GlobalLevel << "\n"
+      << "#   file_name=" << this->FileName << "\n";
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -492,7 +309,7 @@ int vtkSQLog::Write()
       }
     time_t t;
     time(&t);
-    f << "# " << ctime(&t) << this->Header.str() << oss.str();
+    f << "# " << ctime(&t) << this->HeaderBuffer.str() << oss.str();
     f.close();
     }
   return 0;

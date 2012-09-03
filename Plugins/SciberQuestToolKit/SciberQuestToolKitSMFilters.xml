@@ -2116,13 +2116,17 @@ Copyright 2012 SciberQuest Inc.
         label="Max Arc Length"
         command="SetMaxLineLength"
         number_of_elements="1"
-        default_values="1.0"
+        default_values="1.0e37"
+        panel_visibility="never"
         >
+      <DoubleRangeDomain name="range"/>
+      <!--
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="100">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
         </RequiredProperties>
       </BoundsDomain>
+      -->
       <Documentation>
         Maximum streamline arc length beyond which line integration is terminated.
       </Documentation>
@@ -2158,7 +2162,8 @@ Copyright 2012 SciberQuest Inc.
         label="Disable reverse integrate"
         command="SetForwardOnly"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
+        panel_visibility="never"
         >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
@@ -2246,6 +2251,8 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="IntegratorType" show="0"/>
       <Property name="Mode" show="0"/>
+      <Property name="MaxLineLength" show="0"/>
+      <Property name="ForwardOnly" show="0"/>
     </Hints>
 
    <!-- End SQ Displacement Mapper -->
@@ -2405,13 +2412,17 @@ Copyright 2012 SciberQuest Inc.
         label="Max Arc Length"
         command="SetMaxLineLength"
         number_of_elements="1"
-        default_values="1.0"
+        default_values="1.0e37"
+        panel_visibility="never"
         >
+      <DoubleRangeDomain name="range"/>
+      <!--
       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="100">
         <RequiredProperties>
           <Property name="DatasetInput" function="Input"/>
         </RequiredProperties>
       </BoundsDomain>
+      -->
       <Documentation>
         Maximum streamline arc length beyond which line integration is terminated.
       </Documentation>
@@ -2447,7 +2458,8 @@ Copyright 2012 SciberQuest Inc.
         label="Disable reverse integrate"
         command="SetForwardOnly"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
+        panel_visibility="never"
         >
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
@@ -2533,6 +2545,8 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="Mode" show="0"/>
       <Property name="IntegratorType" show="0"/>
+      <Property name="MaxLineLength" show="0"/>
+      <Property name="ForwardOnly" show="0"/>
     </Hints>
 
    <!-- End SQ Displacement Mapper -->

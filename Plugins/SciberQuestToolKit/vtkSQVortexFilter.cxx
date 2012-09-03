@@ -12,6 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianExtent.h"
 #include "XMLUtils.h"
 #include "postream.h"
+#include "vtkSQLog.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -37,16 +38,12 @@ using std::pair;
 #include "Numerics.hxx"
 
 // #define vtkSQVortexFilterDEBUG
-// #define vtkSQVortexFilterTIME
-
 #ifdef WIN32
-  #undef vtkSQVortexFilterDEBUG
+#undef vtkSQVortexFilterDEBUG
 #endif
 
-#if defined vtkSQVortexFilterTIME
-  #include<vtkSQLog.h>
-#endif
 
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQVortexFilter);
 
 //-----------------------------------------------------------------------------
@@ -64,7 +61,9 @@ vtkSQVortexFilter::vtkSQVortexFilter()
   ComputeGradient(0),
   ComputeEigenvalueDiagnostic(0),
   ComputeGradientDiagnostic(0),
-  Mode(CartesianExtent::DIM_MODE_3D)
+  Mode(CartesianExtent::DIM_MODE_3D),
+  LogLevel(0)
+
 {
   #ifdef vtkSQVortexFilterDEBUG
   pCerr() << "=====vtkSQVortexFilter::vtkSQVortexFilter" << endl;
@@ -157,23 +156,25 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
     sqErrorMacro(pCerr(),"Nothing to compute.");
     }
 
-  #if defined vtkSQVortexFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQVortexFilter" << "\n"
-    //<< "#   passInput=" << passInput << "\n" TODO
-    << "#   resultMagnitude=" << resultMagnitude << "\n"
-    << "#   splitComponents=" << splitComponents << "\n"
-    << "#   computeRotation=" << computeRotation << "\n"
-    << "#   computeHelicity=" << computeHelicity << "\n"
-    << "#   computeNormalizedHelicity=" << computeNormalizedHelicity << "\n"
-    << "#   computeQ=" << computeQ << "\n"
-    << "#   computeLambda=" << computeLambda << "\n"
-    << "#   computeLambda2=" << computeLambda2 << "\n"
-    << "#   computeDivergence=" << computeDivergence << "\n"
-    << "#   computeGradient=" << computeGradient << "\n"
-    << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    *log
+      << "# ::vtkSQVortexFilter" << "\n"
+      //<< "#   passInput=" << passInput << "\n" TODO
+      << "#   resultMagnitude=" << resultMagnitude << "\n"
+      << "#   splitComponents=" << splitComponents << "\n"
+      << "#   computeRotation=" << computeRotation << "\n"
+      << "#   computeHelicity=" << computeHelicity << "\n"
+      << "#   computeNormalizedHelicity=" << computeNormalizedHelicity << "\n"
+      << "#   computeQ=" << computeQ << "\n"
+      << "#   computeLambda=" << computeLambda << "\n"
+      << "#   computeLambda2=" << computeLambda2 << "\n"
+      << "#   computeDivergence=" << computeDivergence << "\n"
+      << "#   computeGradient=" << computeGradient << "\n"
+      << "\n";
+    }
 
   return 0;
 }
@@ -409,10 +410,12 @@ int vtkSQVortexFilter::RequestData(
   pCerr() << "=====vtkSQVortexFilter::RequestData" << endl;
   #endif
 
-  #if defined vtkSQVortexFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQVortexFilter::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQVortexFilter::RequestData");
+    }
 
   (void)req;
 
@@ -508,9 +511,10 @@ int vtkSQVortexFilter::RequestData(
 
     // Copy the input field, unfortunately it's a deep copy
     // since the input and output have different extents.
-    #if defined vtkSQVortexFilterTIME
-    log->StartEvent("vtkSQVortexFilter::PassInput");
-    #endif
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->StartEvent("vtkSQVortexFilter::PassInput");
+      }
     set<string>::iterator it;
     set<string>::iterator begin=this->ArraysToCopy.begin();
     set<string>::iterator end=this->ArraysToCopy.end();
@@ -545,9 +549,10 @@ int vtkSQVortexFilter::RequestData(
               USE_OUTPUT_BOUNDS));
         }
       }
-    #if defined vtkSQVortexFilterTIME
-    log->EndEvent("vtkSQVortexFilter::PassInput");
-    #endif
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQVortexFilter::PassInput");
+      }
 
     begin=this->InputArrays.begin();
     end=this->InputArrays.end();
@@ -573,9 +578,10 @@ int vtkSQVortexFilter::RequestData(
       // Rotation.
       if (this->ComputeRotation)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Rotation");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Rotation");
+          }
         string name;
 
         vtkDataArray *Rx=V->NewInstance();
@@ -648,17 +654,19 @@ int vtkSQVortexFilter::RequestData(
         Rx->Delete();
         Ry->Delete();
         Rz->Delete();
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Rotation");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Rotation");
+          }
         }
 
       // Helicity.
       if (this->ComputeHelicity)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Helicicty");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Helicicty");
+          }
         vtkDataArray *H=V->NewInstance();
         outImData->GetPointData()->AddArray(H);
         H->Delete();
@@ -683,17 +691,20 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute helicity on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Helicity");
-        #endif
+
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Helicity");
+          }
         }
 
       // Normalized Helicity.
       if (this->ComputeNormalizedHelicity)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::NormalizedHelicty");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::NormalizedHelicty");
+          }
         vtkDataArray *HN=V->NewInstance();
         outImData->GetPointData()->AddArray(HN);
         HN->Delete();
@@ -718,17 +729,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute normalized helicity on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
+          }
         }
 
       // Q Criteria
       if (this->ComputeQ)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Q");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Q");
+          }
         vtkDataArray *Q=V->NewInstance();
         outImData->GetPointData()->AddArray(Q);
         Q->Delete();
@@ -753,17 +766,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute Q on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Q");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Q");
+          }
         }
 
       // Lambda-1,2,3.
       if (this->ComputeLambda)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Lambda123");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Lambda123");
+          }
         vtkDataArray *L=V->NewInstance();
         outImData->GetPointData()->AddArray(L);
         L->Delete();
@@ -788,17 +803,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute lambda-1,2,3 on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Lambda123");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Lambda123");
+          }
         }
 
       // Lambda-2.
       if (this->ComputeLambda2)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Lambda2");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Lambda2");
+          }
         vtkDataArray *L2=V->NewInstance();
         outImData->GetPointData()->AddArray(L2);
         L2->Delete();
@@ -823,17 +840,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute lambda-2 on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Lambda2");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Lambda2");
+          }
         }
 
       // Divergence.
       if (this->ComputeDivergence)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Divergence");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Divergence");
+          }
         vtkDataArray *D=V->NewInstance();
         outImData->GetPointData()->AddArray(D);
         D->Delete();
@@ -858,17 +877,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute divergence on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Divergence");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Divergence");
+          }
         }
 
       // Gradient.
       if (this->ComputeGradient)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::Gradient");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::Gradient");
+          }
         string name;
 
         vtkDataArray *Gxx=V->NewInstance();
@@ -1017,17 +1038,19 @@ int vtkSQVortexFilter::RequestData(
         Gzx->Delete();
         Gzy->Delete();
         Gzz->Delete();
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::Gradient");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::Gradient");
+          }
         }
 
       // EigenvalueDiagnostic.
       if (this->ComputeEigenvalueDiagnostic)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
+          }
         vtkDataArray *D=V->NewInstance();
         outImData->GetPointData()->AddArray(D);
         D->Delete();
@@ -1052,17 +1075,19 @@ int vtkSQVortexFilter::RequestData(
               << "Cannot compute eigenvalue diagnostic on type "
               << V->GetClassName());
           }
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::EigenvalueDiagnostic");
+          }
         }
 
       // Gardient-tensor diagnostic.
       if (this->ComputeGradientDiagnostic)
         {
-        #if defined vtkSQVortexFilterTIME
-        log->StartEvent("vtkSQVortexFilter::GradientDiagnostic");
-        #endif
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQVortexFilter::GradientDiagnostic");
+          }
         string name;
 
         vtkDataArray *Gxx=V->NewInstance();
@@ -1217,17 +1242,20 @@ int vtkSQVortexFilter::RequestData(
         Gzx->Delete();
         Gzy->Delete();
         Gzz->Delete();
-        #if defined vtkSQVortexFilterTIME
-        log->EndEvent("vtkSQVortexFilter::GradientDiagnostic");
-        #endif
+
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQVortexFilter::GradientDiagnostic");
+          }
         }
       }
 
     if (this->ResultMagnitude)
       {
-      #if defined vtkSQVortexFilterTIME
-      log->StartEvent("vtkSQVortexFilter::ResultMagnitude");
-      #endif
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->StartEvent("vtkSQVortexFilter::ResultMagnitude");
+        }
       int nOutArrays=outImData->GetPointData()->GetNumberOfArrays();
       for (int i=0; i<nOutArrays; ++i)
         {
@@ -1259,9 +1287,10 @@ int vtkSQVortexFilter::RequestData(
             << da->GetClassName());
           }
         }
-      #if defined vtkSQVortexFilterTIME
-      log->EndEvent("vtkSQVortexFilter::ResultMagnitude");
-      #endif
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->EndEvent("vtkSQVortexFilter::ResultMagnitude");
+        }
       }
     // outImData->Print(cerr);
     }
@@ -1271,9 +1300,10 @@ int vtkSQVortexFilter::RequestData(
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
 
-  #if defined vtkSQVortexFilterTIME
-  log->EndEvent("vtkSQVortexFilter::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQVortexFilter::RequestData");
+    }
 
  return 1;
 }

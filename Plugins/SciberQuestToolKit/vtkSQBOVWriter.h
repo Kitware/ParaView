@@ -125,6 +125,15 @@ public:
   vtkSetMacro(WriteAllTimeSteps,int);
   vtkGetMacro(WriteAllTimeSteps,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   /// Pipeline internals.
   int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
@@ -162,6 +171,7 @@ private:
   int SieveBufferSize;     // Sieve size.
   int StripeSize;          // Stripe size in bytes
   int StripeCount;         // Stripe count in OST's
+  int LogLevel;            // control timing/logging
 };
 
 #endif

@@ -109,6 +109,15 @@ public:
   vtkSetMacro(ComputeGradientDiagnostic,int);
   vtkGetMacro(ComputeGradientDiagnostic,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   int RequestDataObject(vtkInformation*,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec);
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
@@ -133,13 +142,12 @@ private:
   int ComputeGradient;
   int ComputeEigenvalueDiagnostic;
   int ComputeGradientDiagnostic;
-
   //
   int OutputExt[6];
   int DomainExt[6];
-
   //
   int Mode;
+  int LogLevel;
 
 private:
   vtkSQVortexFilter(const vtkSQVortexFilter &); // Not implemented

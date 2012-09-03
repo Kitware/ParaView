@@ -7,11 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-#include "vtkMPIController.h"
-#else
-#include "vtkDummyController.h"
-#endif
+#include "vtkSQLog.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkAppendPolyData.h"
 #include "vtkProcessIdScalars.h"
@@ -45,19 +41,9 @@ using std::string;
 
 int main(int argc, char **argv)
 {
-  vtkMultiProcessController *controller=NULL;
-  int worldRank=0;
-  int worldSize=1;
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-  controller=vtkMPIController::New();
-  controller->Initialize(&argc,&argv,0);
-  worldRank=controller->GetLocalProcessId();
-  worldSize=controller->GetNumberOfProcesses();
-  #else
-  controller=vtkDummyController::New();
-  #endif
-
-  vtkMultiProcessController::SetGlobalController(controller);
+  vtkMultiProcessController *controller=Initialize(&argc,&argv);
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
 
   // configure
   string dataRoot;
@@ -67,6 +53,11 @@ int main(int argc, char **argv)
 
   string inputFileName;
   inputFileName=dataRoot+"/Data/SciberQuestToolKit/Gyres/Gyres.bov";
+
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFTLE.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
   // ooc reader
   vtkSQBOVMetaReader *r=vtkSQBOVMetaReader::New();
@@ -90,10 +81,7 @@ int main(int argc, char **argv)
   dm->SetMode(vtkSQFieldTracer::MODE_DISPLACEMENT);
   dm->SetIntegratorType(vtkSQFieldTracer::INTEGRATOR_RK4);
   dm->SetForwardOnly(0);
-  dm->SetMinStep(0.1);
   dm->SetMaxStep(0.1);
-  dm->SetMaxNumberOfSteps(1000000);
-  dm->SetMaxLineLength(1000000);
   dm->SetNullThreshold(0.001);
   dm->SetMaxIntegrationInterval(48);
   dm->SetUseDynamicScheduler(1);
@@ -145,10 +133,5 @@ int main(int argc, char **argv)
 
   surf->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return testStatus==vtkTesting::PASSED?0:1;
+  return Finalize(controller,testStatus==vtkTesting::PASSED?0:1);
 }

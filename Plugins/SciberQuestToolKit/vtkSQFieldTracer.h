@@ -189,6 +189,15 @@ public:
   vtkSetMacro(UseDynamicScheduler,int);
   vtkGetMacro(UseDynamicScheduler,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQFieldTracer();
   ~vtkSQFieldTracer();
@@ -304,6 +313,8 @@ private:
   int Mode;
   int CullPeriodicTransitions;
   int SqueezeColorMap;
+
+  int LogLevel;
 
   //BTX
   // units

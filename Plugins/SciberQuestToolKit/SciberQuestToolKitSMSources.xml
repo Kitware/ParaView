@@ -10,6 +10,44 @@ Copyright 2012 SciberQuest Inc.
 <ServerManagerConfiguration>
 <ProxyGroup name="sources">
   <!-- ==================================================================== -->
+   <SourceProxy name="vtkSQLogSource" class="vtkSQLogSource" label="SQ Log Source">
+      <Documentation
+         long_help=""
+         short_help="">
+         Dummy pipleine object that proviedes a UI for the SciberQuest event and timing log.
+         This can be used to enable logging for SciberQuest reader,sources,filters and writers.
+         The log is written during the objects destructor and is a collective mpi operation. Thus
+         destruction must occur prior to MPI_Finalize.
+      </Documentation>
+
+      <IntVectorProperty
+         name="GlobalLevel"
+         command="SetGlobalLevel"
+         number_of_elements="1"
+         default_values="0"
+         >
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the application wide log level.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1"
+          >
+      <FileListDomain name="files"/>
+      <Documentation>
+        This property specifies the file name for the log.
+      </Documentation>
+      </StringVectorProperty>
+
+   <!-- End Log -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
    <SourceProxy name="vtkSQLineSource" class="vtkSQLineSource" label="SQ Line Source">
       <Documentation
          long_help="This source creates a line between two points. The resolution indicates how many segments are in the line."

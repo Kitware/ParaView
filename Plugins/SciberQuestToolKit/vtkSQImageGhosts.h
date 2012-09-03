@@ -73,6 +73,15 @@ public:
   void SetCommunicator(MPI_Comm comm);
   MPI_Comm GetCommunicator(){ return this->Comm; }
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
   int RequestUpdateExtent(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
@@ -102,6 +111,7 @@ private:
   MPI_Comm Comm;
   int CopyAllArrays;
   set<string> ArraysToCopy;
+  int LogLevel;
 
 private:
   vtkSQImageGhosts(const vtkSQImageGhosts &); // Not implemented

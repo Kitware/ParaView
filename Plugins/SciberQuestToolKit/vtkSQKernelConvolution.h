@@ -137,6 +137,15 @@ public:
   void SetCPUDriverOptimization(int opt);
   int GetCPUDriverOptimization();
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   //int FillInputPortInformation(int port, vtkInformation *info);
   //int FillOutputPortInformation(int port, vtkInformation *info);
@@ -180,6 +189,8 @@ private:
   //
   CPUConvolutionDriver *CPUDriver;
   CUDAConvolutionDriver *CUDADriver;
+
+  int LogLevel;
 
 private:
   vtkSQKernelConvolution(const vtkSQKernelConvolution &); // Not implemented

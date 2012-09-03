@@ -24,6 +24,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkMultiProcessController.h"
 #include "vtkPVXMLElement.h"
 
+#include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
 #include "vtkSQOOCBOVReader.h"
 #include "BOVReader.h"
@@ -38,8 +39,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 #include "postream.h"
 
-#include "SQWriteStringsWarningSupression.h"
-
 #ifndef SQTK_WITHOUT_MPI
 #include "SQMPICHWarningSupression.h"
 #include <mpi.h>
@@ -53,22 +52,9 @@ using std::max;
 using std::ostringstream;
 
 // #define vtkSQBOVReaderDEBUG
-// #define vtkSQBOVReaderTIME
 
 #ifdef WIN32
-  // for gethostname on windows.
-  #include <Winsock2.h>
-  // these are only usefull in terminals
-  #undef vtkSQBOVReaderTIME
   #undef vtkSQBOVReaderDEBUG
-#endif
-
-#if defined vtkSQBOVReaderTIME
-  #include "vtkSQLog.h"
-#endif
-
-#ifndef HOST_NAME_MAX
-  #define HOST_NAME_MAX 255
 #endif
 
 //-----------------------------------------------------------------------------
@@ -122,11 +108,12 @@ int vtkSQBOVReader::Initialize(
     return -1;
     }
 
-  #if defined vtkSQBOVReaderTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQBOVReader" << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader() << "# ::vtkSQBOVReader" << "\n";
+    }
 
   return vtkSQBOVReaderBase::Initialize(root,fileName,arrays);
 }
@@ -207,10 +194,13 @@ int vtkSQBOVReader::RequestData(
   ostringstream oss;
   oss << "=====vtkSQBOVReader::RequestData" << endl;
   #endif
-  #if defined vtkSQBOVReaderTIME
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQBOVReader::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQBOVReader::RequestData");
+    }
 
   vtkInformation *info=outInfos->GetInformationObject(0);
 
@@ -391,9 +381,10 @@ int vtkSQBOVReader::RequestData(
   //output->Print(pCerr());
   #endif
 
-  #if defined vtkSQBOVReaderTIME
-  log->EndEvent("vtkSQBOVReader::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQBOVReader::RequestData");
+    }
 
   return 1;
 }

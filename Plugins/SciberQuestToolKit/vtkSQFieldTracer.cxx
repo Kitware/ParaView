@@ -47,6 +47,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkMultiProcessController.h"
 #include "vtkMath.h"
 
+#include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
 #include "vtkSQCellGenerator.h"
 #include "vtkSQMetaDataKeys.h"
@@ -81,7 +82,7 @@ using std::max;
 // logging currently chews through a tremendous amount of ram
 // on the master rank, probably due to log events placed in
 // integrate dynamic.
-//#define vtkSQFieldTracerTIME
+// #define vtkSQFieldTracerTIME
 
 #ifndef vtkSQFieldTracerDEBUG
   // 0 -- no output
@@ -91,13 +92,10 @@ using std::max;
   #define vtkSQFieldTracerDEBUG 0
 #endif
 
-#if defined vtkSQFieldTracerTIME
-  #include "vtkSQLog.h"
-#endif
-
-vtkStandardNewMacro(vtkSQFieldTracer);
-
 const double vtkSQFieldTracer::EPSILON = 1.0E-12;
+
+//-----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkSQFieldTracer);
 
 //-----------------------------------------------------------------------------
 vtkSQFieldTracer::vtkSQFieldTracer()
@@ -112,8 +110,8 @@ vtkSQFieldTracer::vtkSQFieldTracer()
   MinStep(1.0E-8),
   MaxStep(1.0),
   MaxError(1E-4),
-  MaxNumberOfSteps(1000000000),
-  MaxLineLength(1000),
+  MaxNumberOfSteps(VTK_INT_MAX),
+  MaxLineLength(VTK_DOUBLE_MAX),
   MaxIntegrationInterval(VTK_DOUBLE_MAX),
   NullThreshold(1E-3),
   IntegratorType(INTEGRATOR_NONE),
@@ -122,7 +120,8 @@ vtkSQFieldTracer::vtkSQFieldTracer()
   UseCommWorld(0),
   Mode(MODE_TOPOLOGY),
   CullPeriodicTransitions(1),
-  SqueezeColorMap(0)
+  SqueezeColorMap(0),
+  LogLevel(0)
 {
   #if vtkSQFieldTracerDEBUG>1
   pCerr() << "=====vtkSQFieldTracer::vtkSQFieldTracer" << endl;
@@ -273,26 +272,28 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
     this->SetSqueezeColorMap(squeezeColorMap);
     }
 
-  #if defined vtkSQFieldTracerTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQFieldTracer" << "\n"
-    << "#   mode=" << this->GetMode() << "\n"
-    << "#   integrator=" << this->GetIntegratorType() << "\n"
-    << "#   minStepSize=" << this->GetMinStep() << "\n"
-    << "#   maxStepSize=" << this->GetMaxStep() << "\n"
-    << "#   maxNumberOfSteps=" << this->GetMaxNumberOfSteps() << "\n"
-    << "#   maxLineLength=" << this->GetMaxLineLength() << "\n"
-    << "#   maxIntegrationInterval=" << this->GetMaxIntegrationInterval() << "\n"
-    << "#   minSegmentLength=" << this->GetMinSegmentLength() << "\n"
-    << "#   maxError=" << this->GetMaxError() << "\n"
-    << "#   nullThreshold=" << this->GetNullThreshold() << "\n"
-    << "#   forwardOnly=" << this->GetForardOnly() << "\n"
-    << "#   dynamicScheduler=" << this->GetUseDynamicScheduler() << "\n"
-    << "#   masterBlockSize=" << this->GetMasterBlockSize() << "\n"
-    << "#   workerBlockSize=" << this->GetWorkerBlockSize() << "\n"
-    << "#   squeezeColorMap=" << this->GetSqueezeColorMap() << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    *log
+      << "# ::vtkSQFieldTracer" << "\n"
+      << "#   mode=" << this->GetMode() << "\n"
+      << "#   integrator=" << this->GetIntegratorType() << "\n"
+      << "#   minStepSize=" << this->GetMinStep() << "\n"
+      << "#   maxStepSize=" << this->GetMaxStep() << "\n"
+      << "#   maxNumberOfSteps=" << this->GetMaxNumberOfSteps() << "\n"
+      << "#   maxLineLength=" << this->GetMaxLineLength() << "\n"
+      << "#   maxIntegrationInterval=" << this->GetMaxIntegrationInterval() << "\n"
+      << "#   minSegmentLength=" << this->GetMinSegmentLength() << "\n"
+      << "#   maxError=" << this->GetMaxError() << "\n"
+      << "#   nullThreshold=" << this->GetNullThreshold() << "\n"
+      << "#   forwardOnly=" << this->GetForwardOnly() << "\n"
+      << "#   dynamicScheduler=" << this->GetUseDynamicScheduler() << "\n"
+      << "#   masterBlockSize=" << this->GetMasterBlockSize() << "\n"
+      << "#   workerBlockSize=" << this->GetWorkerBlockSize() << "\n"
+      << "#   squeezeColorMap=" << this->GetSqueezeColorMap() << "\n";
+    }
 
   return 0;
 }
@@ -631,10 +632,12 @@ int vtkSQFieldTracer::RequestData(
   pCerr() << "=====vtkSQFieldTracer::RequestData" << endl;
   #endif
 
-  #if defined vtkSQFieldTracerTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQFieldTracer::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQFieldTracer::RequestData");
+    }
 
   #ifdef SQTK_WITHOUT_MPI
   (void)inputVector;
@@ -905,9 +908,10 @@ int vtkSQFieldTracer::RequestData(
   delete traceData;
   #endif
 
-  #if defined vtkSQFieldTracerTIME
-  log->EndEvent("vtkSQFieldTracer::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQFieldTracer::RequestData");
+    }
 
   return 1;
 }

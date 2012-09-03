@@ -20,6 +20,16 @@ class vtkStreamingDemandDrivenPipeline;
 using std::string;
 
 /**
+Initialize MPI and the pipeline.
+*/
+vtkMultiProcessController *Initialize(int *argc, char ***argv);
+
+/**
+Finalize MPI and the pipleine.
+*/
+int Finalize(vtkMultiProcessController* controller, int code);
+
+/**
 Broadcast the string.
 */
 void Broadcast(vtkMultiProcessController *controller, string &s, int root=0);

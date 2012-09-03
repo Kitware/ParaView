@@ -159,6 +159,15 @@ public:
   // opposite direction.
   void Push(double distance);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQPlaneSource();
   virtual ~vtkSQPlaneSource();
@@ -179,6 +188,7 @@ private:
   double Center[3];
   int Constraint;
   char *DescriptiveName;
+  int LogLevel;
 
 private:
   vtkSQPlaneSource(const vtkSQPlaneSource&);  // Not implemented.

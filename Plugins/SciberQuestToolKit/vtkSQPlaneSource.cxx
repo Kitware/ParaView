@@ -26,6 +26,7 @@
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
 
+#include "vtkSQLog.h"
 #include "vtkSQMetaDataKeys.h"
 #include "vtkSQPlaneSourceConstants.h"
 #include "vtkSQPlaneSourceCellGenerator.h"
@@ -67,6 +68,8 @@ vtkSQPlaneSource::vtkSQPlaneSource()
   this->Constraint=SQPS_CONSTRAINT_NONE;
 
   this->DescriptiveName=0;
+
+  this->LogLevel=0;
 
   this->SetNumberOfInputPorts(0);
 }
@@ -110,16 +113,18 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"immediate_mode",&immediate_mode);
   this->SetImmediateMode(immediate_mode);
 
-  #if defined vtkSQPlaneSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQPlaneSource" << "\n"
-    << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
-    << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
-    << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
-    << "#   resolution=" << resolution[0] << ", " << resolution[1] << "\n"
-    << "#   immediate_mode=" << immediate_mode << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    *log
+      << "# ::vtkSQPlaneSource" << "\n"
+      << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
+      << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
+      << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
+      << "#   resolution=" << resolution[0] << ", " << resolution[1] << "\n"
+      << "#   immediate_mode=" << immediate_mode << "\n";
+    }
 
   return 0;
 }
@@ -170,6 +175,12 @@ int vtkSQPlaneSource::RequestData(
   #ifdef vtkSQPlaneSourceDEBUG
   cerr << "=====vtkSQPlaneSource::RequestData" << endl;
   #endif
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQPlaneSource::RequestData");
+    }
 
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
@@ -405,7 +416,10 @@ int vtkSQPlaneSource::RequestData(
   // output->SetPolys(newPolys);
   // newPolys->Delete();
 
-
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQPlaneSource::RequestData");
+    }
 
   return 1;
 }

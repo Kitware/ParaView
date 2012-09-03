@@ -7,11 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-#include "vtkMPIController.h"
-#else
-#include "vtkDummyController.h"
-#endif
+#include "vtkSQLog.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkAppendPolyData.h"
@@ -34,23 +30,9 @@ int main(int argc, char **argv)
   int aTestFailed=0;
   int result=vtkTesting::FAILED;
 
-  vtkMultiProcessController *controller=NULL;
-  int worldRank=0;
-  int worldSize=1;
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-  controller=vtkMPIController::New();
-  controller->Initialize(&argc,&argv,0);
-  worldRank=controller->GetLocalProcessId();
-  worldSize=controller->GetNumberOfProcesses();
-  #else
-  controller=vtkDummyController::New();
-  #endif
-
-  vtkMultiProcessController::SetGlobalController(controller);
-
-  vtkCompositeDataPipeline* cexec=vtkCompositeDataPipeline::New();
-  vtkAlgorithm::SetDefaultExecutivePrototype(cexec);
-  cexec->Delete();
+  vtkMultiProcessController *controller=Initialize(&argc,&argv);
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
 
   // configure
   string dataRoot;
@@ -63,6 +45,11 @@ int main(int argc, char **argv)
 
   string tempOutputFileName;
   tempOutputFileName=NativePath(tempDir+"/SciberQuestToolKit-Asym2D.bov");
+
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestBOVIO.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
   // reader
   vtkSQBOVReader *r1=vtkSQBOVReader::New();
@@ -149,10 +136,5 @@ int main(int argc, char **argv)
     }
   s2->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return aTestFailed;
+  return Finalize(controller,aTestFailed);
 }

@@ -20,6 +20,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkTensor.h"
 #include "vtkPVXMLElement.h"
 #include "XMLUtils.h"
+#include "vtkSQLog.h"
 
 #include <cmath>
 #include <string>
@@ -152,7 +153,10 @@ void ComputeFTLE(
 vtkStandardNewMacro(vtkSQFTLE);
 
 //-----------------------------------------------------------------------------
-vtkSQFTLE::vtkSQFTLE() : PassInput(0)
+vtkSQFTLE::vtkSQFTLE()
+      :
+  PassInput(0),
+  LogLevel(0)
 {
   #ifdef vtkSQFTLEDEBUG
   pCerr() << "=====vtkSQFTLE::vtkSQFTLE" << endl;
@@ -189,6 +193,16 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
   if (passInput>0)
     {
     this->SetPassInput(passInput);
+    }
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    *log
+      << "# ::vtkSQFTLE" << "\n"
+      << "#   pass_input=" << passInput << "\n"
+      << "\n";
     }
 
   return 0;
@@ -233,6 +247,13 @@ int vtkSQFTLE::RequestData(
   #ifdef vtkSQFTLEDEBUG
   pCerr() << "=====vtkSQFTLE::RequestData" << endl;
   #endif
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQFTLE::RequestData");
+    }
 
   vtkInformation *inInfo = inInfos[0]->GetInformationObject(0);
   vtkInformation *outInfo = outInfos->GetInformationObject(0);
@@ -305,6 +326,12 @@ int vtkSQFTLE::RequestData(
 
     ftleV->Delete();
     gradV->Delete();
+    }
+
+
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQFTLE::RequestData");
     }
 
   return 1;

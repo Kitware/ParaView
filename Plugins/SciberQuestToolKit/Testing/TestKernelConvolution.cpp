@@ -7,11 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-#include "vtkMPIController.h"
-#else
-#include "vtkDummyController.h"
-#endif
+#include "vtkSQLog.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkAppendPolyData.h"
@@ -35,23 +31,9 @@ using std::string;
 
 int main(int argc, char **argv)
 {
-  vtkMultiProcessController *controller=NULL;
-  int worldRank=0;
-  int worldSize=1;
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-  controller=vtkMPIController::New();
-  controller->Initialize(&argc,&argv,0);
-  worldRank=controller->GetLocalProcessId();
-  worldSize=controller->GetNumberOfProcesses();
-  #else
-  controller=vtkDummyController::New();
-  #endif
-
-  vtkMultiProcessController::SetGlobalController(controller);
-
-  vtkCompositeDataPipeline* cexec=vtkCompositeDataPipeline::New();
-  vtkAlgorithm::SetDefaultExecutivePrototype(cexec);
-  cexec->Delete();
+  vtkMultiProcessController *controller=Initialize(&argc,&argv);
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
 
   // configure
   string dataRoot;
@@ -68,6 +50,11 @@ int main(int argc, char **argv)
     {
     inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.bov");
     }
+
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestKernelConvolution.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
   // build pipeline
   const int kernelWidth=19;
@@ -147,10 +134,5 @@ int main(int argc, char **argv)
 
   s1->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return aTestFailed;
+  return Finalize(controller,aTestFailed);
 }

@@ -101,6 +101,7 @@ set(SM_CXX_SOURCES
   vtkSQKernelConvolution.cxx
   vtkSQLineSource.cxx
   vtkSQLog.cxx
+  vtkSQLogSource.cxx
   vtkSQMedianFilter.cxx
   vtkSQPlaneSourceCellGenerator.cxx
   vtkSQVolumeSourceCellGenerator.cxx
@@ -152,6 +153,7 @@ set(CXX_SOURCES
   GhostTransaction.cxx
   ImageDecomp.cxx
   IntersectionSet.cxx
+  LogBuffer.cxx
   PolyDataCellCopier.cxx
   PolyDataFieldDisplacementMap.cxx
   PolyDataFieldTopologyMap.cxx

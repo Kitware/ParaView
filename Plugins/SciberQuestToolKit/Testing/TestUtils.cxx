@@ -7,7 +7,13 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "TestUtils.h"
+#include "vtkSQLog.h"
 #include "vtkMultiProcessController.h"
+#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
+#include "vtkMPIController.h"
+#else
+#include "vtkDummyController.h"
+#endif
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkAlgorithm.h"
@@ -36,6 +42,49 @@ using std::cerr;
 using std::string;
 #include <vector>
 using std::vector;
+
+//*****************************************************************************
+vtkMultiProcessController *Initialize(int *argc, char ***argv)
+{
+  vtkMultiProcessController *controller;
+
+  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
+  controller=vtkMPIController::New();
+  controller->Initialize(argc,argv,0);
+  #else
+  controller=vtkDummyController::New();
+  #endif
+
+  vtkMultiProcessController::SetGlobalController(controller);
+
+  vtkCompositeDataPipeline* cexec=vtkCompositeDataPipeline::New();
+  vtkAlgorithm::SetDefaultExecutivePrototype(cexec);
+  cexec->Delete();
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  log->StartEvent(0,"TotalRunTime");
+
+  return controller;
+}
+
+//*****************************************************************************
+int Finalize(vtkMultiProcessController* controller, int code)
+{
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  log->EndEvent(0,"TotalRunTime");
+
+  if (code==0)
+    {
+    log->Update();
+    log->Write();
+    }
+
+  vtkAlgorithm::SetDefaultExecutivePrototype(0);
+  controller->Finalize();
+  controller->Delete();
+
+  return code;
+}
 
 // ****************************************************************************
 void Broadcast(vtkMultiProcessController *controller, string &s, int root)

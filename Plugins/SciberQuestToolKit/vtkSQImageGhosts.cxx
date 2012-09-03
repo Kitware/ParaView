@@ -10,6 +10,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQImageGhosts.h"
 
 #include "SQVTKTemplateMacroWarningSupression.h"
+#include "vtkSQLog.h"
 #include "CartesianExtent.h"
 #include "postream.h"
 #include "Numerics.hxx"
@@ -35,12 +36,8 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 using std::string;
 
 // #define vtkSQImageGhostsDEBUG
-// #define vtkSQImageGhostsTIME
 
-#if defined vtkSQImageGhostsTIME
-  #include "vtkSQLog.h"
-#endif
-
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQImageGhosts);
 
 //-----------------------------------------------------------------------------
@@ -50,7 +47,8 @@ vtkSQImageGhosts::vtkSQImageGhosts()
   WorldRank(0),
   NGhosts(0),
   Mode(CartesianExtent::DIM_MODE_3D),
-  CopyAllArrays(1)
+  CopyAllArrays(1),
+  LogLevel(0)
 {
   #ifdef vtkSQImageGhostsDEBUG
   pCerr() << "=====vtkSQImageGhosts::vtkSQImageGhosts" << endl;
@@ -82,12 +80,13 @@ vtkSQImageGhosts::~vtkSQImageGhosts()
 //-----------------------------------------------------------------------------
 int vtkSQImageGhosts::Initialize(vtkPVXMLElement *root)
 {
-  #if defined vtkSQImageGhostsTIME
-  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQImageGhosts" << "\n"
-    << "\n";
-  #endif
+  if (this-LogLevel)
+    {
+    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+    *log
+      << "# ::vtkSQImageGhosts" << "\n"
+      << "\n";
+    }
 
   (void)root;
 
@@ -281,10 +280,13 @@ int vtkSQImageGhosts::RequestData(
   #ifdef vtkSQImageGhostsDEBUG
   pCerr() << "=====vtkSQImageGhosts::RequestData" << endl;
   #endif
-  #if defined vtkSQImageGhostsTIME
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQImageGhosts::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQImageGhosts::RequestData");
+    }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataSet *inData
@@ -439,9 +441,10 @@ int vtkSQImageGhosts::RequestData(
         transactions,
         false);
 
-  #if defined vtkSQImageGhostsTIME
-  log->EndEvent("vtkSQImageGhosts::RequestData");
-  #endif
+  if ( this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQImageGhosts::RequestData");
+    }
 
   return 1;
 }

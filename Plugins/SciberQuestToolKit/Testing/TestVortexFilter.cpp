@@ -6,12 +6,8 @@
 
 Copyright 2012 SciberQuest Inc.
 */
+#include "vtkSQLog.h"
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-#include "vtkMPIController.h"
-#else
-#include "vtkDummyController.h"
-#endif
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkXMLImageDataReader.h"
@@ -35,23 +31,9 @@ using std::string;
 
 int main(int argc, char **argv)
 {
-  vtkMultiProcessController *controller=NULL;
-  int worldRank=0;
-  int worldSize=1;
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-  controller=vtkMPIController::New();
-  controller->Initialize(&argc,&argv,0);
-  worldRank=controller->GetLocalProcessId();
-  worldSize=controller->GetNumberOfProcesses();
-  #else
-  controller=vtkDummyController::New();
-  #endif
-
-  vtkMultiProcessController::SetGlobalController(controller);
-
-  vtkCompositeDataPipeline* cexec=vtkCompositeDataPipeline::New();
-  vtkAlgorithm::SetDefaultExecutivePrototype(cexec);
-  cexec->Delete();
+  vtkMultiProcessController *controller=Initialize(&argc,&argv);
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
 
   // configure
   string dataRoot;
@@ -68,6 +50,11 @@ int main(int argc, char **argv)
     {
     inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/Asym2D/Asym2D.bov");
     }
+
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestVortexFilter.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
   // build pipeline
   const int kernelWidth=19;
@@ -90,8 +77,7 @@ int main(int argc, char **argv)
     }
 
   // ghost cell
-  vtkSQImageGhosts *ig;
-  ig=vtkSQImageGhosts::New();
+  vtkSQImageGhosts *ig=vtkSQImageGhosts::New();
   ig->SetInputConnection(0,r->GetOutputPort(0));
   r->Delete();
 
@@ -155,10 +141,5 @@ int main(int argc, char **argv)
 
   s1->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return testStatus==vtkTesting::PASSED?0:1;
+  return Finalize(controller,testStatus==vtkTesting::PASSED?0:1);
 }

@@ -25,6 +25,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkExtentTranslator.h"
 #include "vtkPVXMLElement.h"
 
+#include "vtkSQLog.h"
 #include "BOVWriter.h"
 #include "GDAMetaData.h"
 #include "BOVTimeStepImage.h"
@@ -49,30 +50,12 @@ using std::ostringstream;
 
 typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 
-// #define vtkSQBOVWriterDEBUG
-// #define vtkSQBOVWriterTIME
-
 #ifdef WIN32
-  // for gethostname on windows.
-  #include <Winsock2.h>
-  // these are only usefull in terminals
-  #undef vtkSQBOVWriterTIME
+  // only usefull in terminals
   #undef vtkSQBOVWriterDEBUG
 #endif
 
-#ifndef HOST_NAME_MAX
-  #define HOST_NAME_MAX 255
-#endif
-
-#if defined vtkSQBOVWriterTIME
-  #include "vtkSQLog.h"
-#endif
-
-// disbale warning about passing string literals.
-#if !defined(__INTEL_COMPILER) && defined(__GNUG__)
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#endif
-
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQBOVWriter);
 
 //-----------------------------------------------------------------------------
@@ -103,6 +86,7 @@ vtkSQBOVWriter::vtkSQBOVWriter()
   this->StripeCount=0;
   this->WorldRank=0;
   this->WorldSize=1;
+  this->LogLevel=0;
 
   #ifdef SQTK_WITHOUT_MPI
   vtkErrorMacro(
@@ -215,17 +199,19 @@ int vtkSQBOVWriter::Initialize(vtkPVXMLElement *root)
     this->SetUseDirectIO(HINT_ENABLED);
     }
 
-  #if defined vtkSQBOVWriterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQBOVWriter" << "\n"
-    << "#   cb_buffer_size=" << cb_buffer_size << "\n"
-    << "#   stripe_count=" << stripe_count << "\n"
-    << "#   stripe_size=" << stripe_size << "\n"
-    << "#   cb_enable=" << cb_enable << "\n"
-    << "#   direct_io=" << direct_io << "\n"
-    << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQBOVWriter" << "\n"
+      << "#   cb_buffer_size=" << cb_buffer_size << "\n"
+      << "#   stripe_count=" << stripe_count << "\n"
+      << "#   stripe_size=" << stripe_size << "\n"
+      << "#   cb_enable=" << cb_enable << "\n"
+      << "#   direct_io=" << direct_io << "\n"
+      << "\n";
+    }
 
   return 0;
 }
@@ -238,10 +224,6 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
   oss
     << "=====vtkSQBOVWriter::SetFileName" << endl
     << "Set FileName " << safeio(_arg) << "." << endl;
-  #endif
-  #if defined vtkSQBOVWriterTIME
-  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQBOVWriter::SetFileName");
   #endif
 
   #ifdef SQTK_WITHOUT_MPI
@@ -273,9 +255,23 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
   // Open the newly named dataset.
   if (this->FileName)
     {
+    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+    int globalLogLevel=log->GetGlobalLevel();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->StartEvent("vtkSQBOVWriter::Open");
+      }
+
     this->Writer->SetCommunicator(MPI_COMM_WORLD);
     char mode=this->IncrementalMetaData==0?'w':'a';
-    if(!this->Writer->Open(this->FileName,mode))
+    int ok=this->Writer->Open(this->FileName,mode);
+
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQBOVWriter::Open");
+      }
+
+    if(!ok)
       {
       vtkErrorMacro("Failed to open the file \"" << safeio(this->FileName) << "\".");
       return;
@@ -291,10 +287,6 @@ void vtkSQBOVWriter::SetFileName(const char* _arg)
 
   #if defined vtkSQBOVWriterDEBUG
   pCerr() << oss.str() << endl;
-  #endif
-
-  #if defined vtkSQBOVWriterTIME
-  log->EndEvent("vtkSQBOVWriter::SetFileName");
   #endif
 }
 
@@ -678,10 +670,13 @@ int vtkSQBOVWriter::RequestData(
   ostringstream oss;
   oss << "=====vtkSQBOVWriter::RequestData" << endl;
   #endif
-  #if defined vtkSQBOVWriterTIME
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQBOVWriter::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQBOVWriter::RequestData");
+    }
 
   if (!this->Writer->IsOpen())
     {
@@ -874,9 +869,10 @@ int vtkSQBOVWriter::RequestData(
   pCerr() << oss.str() << endl;
   #endif
 
-  #if defined vtkSQBOVWriterTIME
-  log->EndEvent("vtkSQBOVWriter::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQBOVWriter::RequestData");
+    }
 
   return 1;
 }

@@ -7,11 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkMultiProcessController.h"
-#if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-#include "vtkMPIController.h"
-#else
-#include "vtkDummyController.h"
-#endif
+#include "vtkSQLog.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkProcessIdScalars.h"
@@ -37,25 +33,11 @@ using std::cerr;
 #include <string>
 using std::string;
 
-#include "DebugUtil.h"
-
 int main(int argc, char **argv)
 {
-  vtkMultiProcessController *controller=NULL;
-  int worldRank=0;
-  int worldSize=1;
-  #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
-  controller=vtkMPIController::New();
-  controller->Initialize(&argc,&argv,0);
-  worldRank=controller->GetLocalProcessId();
-  worldSize=controller->GetNumberOfProcesses();
-  #else
-  controller=vtkDummyController::New();
-  #endif
-
-  vtkCompositeDataPipeline* cexec=vtkCompositeDataPipeline::New();
-  vtkAlgorithm::SetDefaultExecutivePrototype(cexec);
-  cexec->Delete();
+  vtkMultiProcessController *controller=Initialize(&argc,&argv);
+  int worldRank=controller->GetLocalProcessId();
+  int worldSize=controller->GetNumberOfProcesses();
 
   // configure
   string dataRoot;
@@ -65,6 +47,11 @@ int main(int argc, char **argv)
 
   string inputFileName;
   inputFileName=dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov";
+
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFieldTracer.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
 
   // pipeline 1
   // ooc reader
@@ -131,10 +118,5 @@ int main(int argc, char **argv)
 
   tf->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return testStatus==vtkTesting::PASSED?0:1;
+  return Finalize(controller,testStatus==vtkTesting::PASSED?0:1);
 }

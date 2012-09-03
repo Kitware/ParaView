@@ -24,6 +24,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkMultiProcessController.h"
 #include "vtkPVXMLElement.h"
 
+#include "vtkSQLog.h"
 #include "vtkSQOOCReader.h"
 #include "vtkSQOOCBOVReader.h"
 #include "BOVReader.h"
@@ -38,7 +39,6 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 #include "postream.h"
 
-// #include "SQWriteStringsWarningSupression.h"
 #ifndef SQTK_WITHOUT_MPI
 #include "SQMPICHWarningSupression.h"
 #include <mpi.h>
@@ -47,29 +47,16 @@ Copyright 2012 SciberQuest Inc.
 #include <algorithm>
 using std::min;
 using std::max;
-
 #include <sstream>
 using std::ostringstream;
 
 // #define vtkSQBOVReaderDEBUG
-// #define vtkSQBOVReaderBaseTIME
-
 #ifdef WIN32
-  // for gethostname on windows.
-  #include <Winsock2.h>
-  // these are only usefull in terminals
-  #undef vtkSQBOVReaderBaseTIME
+  // only usefull in terminals
   #undef vtkSQBOVReaderDEBUG
 #endif
 
-#if defined vtkSQBOVReaderBaseTIME
-  #include "vtkSQLog.h"
-#endif
-
-#ifndef HOST_NAME_MAX
-  #define HOST_NAME_MAX 255
-#endif
-
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQBOVReaderBase);
 
 //-----------------------------------------------------------------------------
@@ -107,6 +94,7 @@ vtkSQBOVReaderBase::vtkSQBOVReaderBase()
   this->SieveBufferSize=0;
   this->WorldRank=0;
   this->WorldSize=1;
+  this->LogLevel=0;
 
   // this reader requires MPI, both the build and the runtime
   // but we won't report the error here because pvclient may
@@ -187,8 +175,6 @@ int vtkSQBOVReaderBase::Initialize(
     }
 
   // hints
-  this->SetUseDataSieving(vtkSQBOVReaderBase::HINT_AUTOMATIC);
-  this->SetUseCollectiveIO(vtkSQBOVReaderBase::HINT_AUTOMATIC);
   int cb_enable=0;
   GetOptionalAttribute<int,1>(elem,"cb_enable",&cb_enable);
   if (cb_enable==0)
@@ -266,20 +252,21 @@ int vtkSQBOVReaderBase::Initialize(
       }
     }
 
-  #if defined vtkSQBOVReaderBaseTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQBOVReaderBase" << "\n"
-    << "#   cb_enable=" << cb_enable << "\n"
-    << "#   cb_buffer_size=" << cb_buffer_size << "\n"
-    << "#   wholeExtent=" << Tuple<int>(wholeExtent,6) << "\n"
-    << "#   subsetExtent=" << Tuple<int>(subset,6) << "\n";
-  for (size_t i=0; i<nArrays; ++i)
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
     {
-    *log << "#   arrayName_" << i << "=" << arrays[i] << "\n";
+    *log
+      << "# ::vtkSQBOVReaderBase" << "\n"
+      << "#   cb_enable=" << this->GetUseCollectiveIO() << "\n"
+      << "#   cb_buffer_size=" << this->GetCollectBufferSize() << "\n"
+      << "#   wholeExtent=" << Tuple<int>(wholeExtent,6) << "\n"
+      << "#   subsetExtent=" << Tuple<int>(subset,6) << "\n";
+    for (size_t i=0; i<nArrays; ++i)
+      {
+      *log << "#   arrayName_" << i << "=" << arrays[i] << "\n";
+      }
     }
-  *log << "\n";
-  #endif
 
   return 0;
 }
@@ -315,15 +302,9 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
   pCerr() << "=====vtkSQBOVReaderBase::SetFileName" << endl;
   pCerr() << "Set FileName " << safeio(_arg) << "." << endl;
   #endif
-  #if defined vtkSQBOVReaderBaseTIME
-  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQBOVReaderBase::SetFileName");
-  #endif
 
   #ifdef SQTK_WITHOUT_MPI
   (void)_arg;
-  //vtkErrorMacro(
-  //    << "This class requires MPI however it was built without MPI.");
   #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
@@ -359,8 +340,22 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
   // Open the newly named dataset.
   if (this->FileName)
     {
+    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+    int globalLogLevel=log->GetGlobalLevel();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->StartEvent("vtkSQBOVReaderBase::Open");
+      }
+
     this->Reader->SetCommunicator(MPI_COMM_WORLD);
-    if(!this->Reader->Open(this->FileName))
+    int ok=this->Reader->Open(this->FileName);
+
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQBOVReaderBase::Open");
+      }
+
+    if(!ok)
       {
       vtkErrorMacro("Failed to open the file \"" << safeio(this->FileName) << "\".");
       return;
@@ -384,10 +379,6 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
     }
 
   this->Modified();
-  #endif
-
-  #if defined vtkSQBOVReaderBaseTIME
-  log->EndEvent("vtkSQBOVReaderBase::SetFileName");
   #endif
 }
 
@@ -765,7 +756,6 @@ int vtkSQBOVReaderBase::GetTimeStepId(
 
   return stepId;
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::PrintSelf(ostream& os, vtkIndent indent)

@@ -58,6 +58,7 @@ public:
   Array access
   */
   double &operator[](int i){ return this->Data[i]; }
+  const double &operator[](int i) const { return this->Data[i]; }
   /// \@}
 
 
@@ -133,6 +134,8 @@ private:
 
 ostream &operator<<(ostream &os,const CartesianBounds &bounds);
 
+class vtkUnstructuredGrid;
+vtkUnstructuredGrid &operator<<(vtkUnstructuredGrid &, const CartesianBounds &bounds);
 
 //-----------------------------------------------------------------------------
 inline

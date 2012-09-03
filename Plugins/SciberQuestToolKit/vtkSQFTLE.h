@@ -8,7 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 // .NAME vtkSQFTLE
 // .SECTION Description
-// Compute the FTLE given a displacement map. For  an explanation of this
+// Compute the FTLE given a displacement map. For an explanation of this
 // terminology see http://amath.colorado.edu/cmsms/index.php?page=ftle-of-the-standard-map
 //
 // .SECTION Caveats
@@ -52,6 +52,15 @@ public:
   vtkSetMacro(PassInput,int);
   vtkGetMacro(PassInput,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQFTLE();
   ~vtkSQFTLE(){}
@@ -61,6 +70,7 @@ protected:
 private:
   set<string> InputArrays;
   int PassInput;
+  int LogLevel;
 
 private:
   vtkSQFTLE(const vtkSQFTLE&);  // Not implemented.

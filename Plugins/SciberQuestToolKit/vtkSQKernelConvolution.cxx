@@ -10,12 +10,8 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQKernelConvolution.h"
 
 // #define vtkSQKernelConvolutionDEBUG
-// #define vtkSQKernelConvolutionTIME
 
-#if defined vtkSQKernelConvolutionTIME
-  #include "vtkSQLog.h"
-#endif
-
+#include "vtkSQLog.h"
 #include "Numerics.hxx"
 #include "Tuple.hxx"
 #include "CartesianExtent.h"
@@ -105,7 +101,8 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
   NumberOfActiveCUDADevices(0),
   CUDADeviceId(-1),
   NumberOfMPIRanksToUseCUDA(0),
-  EnableCUDA(0)
+  EnableCUDA(0),
+  LogLevel(0)
 {
   #ifdef vtkSQKernelConvolutionDEBUG
   pCerr() << "=====vtkSQKernelConvolution::vtkSQKernelConvolution" << endl;
@@ -264,7 +261,6 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
   elem=GetOptionalElement(root,"vtkSQKernelConvolution");
   if (elem==0)
     {
-    //sqErrorMacro(pCerr(),"Element for vtkSQKernelConvolution is not present.");
     return -1;
     }
 
@@ -314,15 +310,17 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
   int numberOfMPIRanksToUseCUDA=0;
   GetOptionalAttribute<int,1>(elem,"number_of_mpi_ranks_to_use_cuda",&numberOfMPIRanksToUseCUDA);
 
-  #if defined vtkSQKernelConvolutionTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQKernelConvolution" << "\n"
-    << "#   stencilWidth=" << stencilWidth << "\n"
-    << "#   kernelType=" << kernelType << "\n"
-    << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
-    << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQKernelConvolution" << "\n"
+      << "#   stencilWidth=" << stencilWidth << "\n"
+      << "#   kernelType=" << kernelType << "\n"
+      << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
+      << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
+    }
 
   if (numberOfMPIRanksToUseCUDA)
     {
@@ -353,15 +351,15 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
       this->SetInputCUDAMemoryType(inputCUDAMemType);
       }
 
-    #if defined vtkSQKernelConvolutionTIME
-    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-    *log
-      << "#   numberOfActiveCUDADevices=" << numberOfActiveCUDADevices << "\n"
-      << "#   numberOfWarpsPerCUDABlock=" << numberOfWarpsPerCUDABlock << "\n"
-      << "#   kernelCUDAMemType=" << kernelCUDAMemType << "\n"
-      << "#   inputCUDAMemType=" << inputCUDAMemType << "\n"
-      << "\n";
-    #endif
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->GetHeader()
+        << "#   numberOfActiveCUDADevices=" << numberOfActiveCUDADevices << "\n"
+        << "#   numberOfWarpsPerCUDABlock=" << numberOfWarpsPerCUDABlock << "\n"
+        << "#   kernelCUDAMemType=" << kernelCUDAMemType << "\n"
+        << "#   inputCUDAMemType=" << inputCUDAMemType << "\n"
+        << "\n";
+      }
     }
 
   return 0;
@@ -999,10 +997,12 @@ int vtkSQKernelConvolution::RequestData(
   oss << "=====vtkSQKernelConvolution::RequestData" << endl;
   #endif
 
-  #if defined vtkSQKernelConvolutionTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQKernelConvolution::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQKernelConvolution::RequestData");
+    }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -1149,9 +1149,11 @@ int vtkSQKernelConvolution::RequestData(
       W->Delete();
 
       // convolve
-      #if defined vtkSQKernelConvolutionTIME
-      log->StartEvent("vtkSQKernelConvolution::Convolution");
-      #endif
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->StartEvent("vtkSQKernelConvolution::Convolution");
+        }
+
       if (this->EnableCUDA)
         {
         #ifdef vtkSQKernelConvolutionDEBUG
@@ -1170,7 +1172,7 @@ int vtkSQKernelConvolution::RequestData(
       else
         {
         #ifdef vtkSQKernelConvolutionDEBUG
-        //oss << "using the CPU" << endl;
+        oss << "using the CPU" << endl;
         #endif
         this->CPUDriver->Convolution(
             inputExt,
@@ -1182,15 +1184,19 @@ int vtkSQKernelConvolution::RequestData(
             W,
             this->Kernel);
         }
-      #if defined vtkSQKernelConvolutionTIME
-      log->EndEvent("vtkSQKernelConvolution::Convolution");
-      #endif
 
-      #if defined vtkSQKernelConvolutionTIME
-      log->StartEvent("vtkSQKernelConvolution::Residual");
-      #endif
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->EndEvent("vtkSQKernelConvolution::Convolution");
+        }
+
       if (this->ComputeResidual)
         {
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQKernelConvolution::Residual");
+          }
+
         wname << "-resid";
 
         vtkDataArray *D=V->NewInstance();
@@ -1212,54 +1218,61 @@ int vtkSQKernelConvolution::RequestData(
                 (VTK_TT*)W->GetVoidPointer(0),
                 (VTK_TT*)D->GetVoidPointer(0)));
           }
+
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQKernelConvolution::Residual");
+          }
         }
-      #if defined vtkSQKernelConvolutionTIME
-      log->EndEvent("vtkSQKernelConvolution::Residual");
-      #endif
       }
 
     // Deep copy the input
-    #if defined vtkSQKernelConvolutionTIME
-    log->StartEvent("vtkSQKernelConvolution::PassInput");
-    #endif
-    begin=this->ArraysToCopy.begin();
-    end=this->ArraysToCopy.end();
-    for (it=begin; it!=end; ++it)
+    if (this->ArraysToCopy.size())
       {
-      vtkDataArray *M=inImData->GetPointData()->GetArray((*it).c_str());
-      if (M==0)
+      if (this->LogLevel || globalLogLevel)
         {
-        vtkErrorMacro(
-          << "Array " << (*it).c_str()
-          << " was requested but is not present");
-        continue;
+        log->StartEvent("vtkSQKernelConvolution::PassInput");
         }
 
-      vtkDataArray *W=M->NewInstance();
-      outImData->GetPointData()->AddArray(W);
-      W->Delete();
-      int nCompsM=M->GetNumberOfComponents();
-      W->SetNumberOfComponents(nCompsM);
-      W->SetNumberOfTuples(outputTups);
-      W->SetName(M->GetName());
-      switch(M->GetDataType())
+      begin=this->ArraysToCopy.begin();
+      end=this->ArraysToCopy.end();
+      for (it=begin; it!=end; ++it)
         {
-        vtkTemplateMacro(
-          Copy<VTK_TT>(
-              inputExt.GetData(),
-              outputExt.GetData(),
-              (VTK_TT*)M->GetVoidPointer(0),
-              (VTK_TT*)W->GetVoidPointer(0),
-              nCompsM,
-              this->Mode,
-              USE_OUTPUT_BOUNDS));
+        vtkDataArray *M=inImData->GetPointData()->GetArray((*it).c_str());
+        if (M==0)
+          {
+          vtkErrorMacro(
+            << "Array " << (*it).c_str()
+            << " was requested but is not present");
+          continue;
+          }
+
+        vtkDataArray *W=M->NewInstance();
+        outImData->GetPointData()->AddArray(W);
+        W->Delete();
+        int nCompsM=M->GetNumberOfComponents();
+        W->SetNumberOfComponents(nCompsM);
+        W->SetNumberOfTuples(outputTups);
+        W->SetName(M->GetName());
+        switch(M->GetDataType())
+          {
+          vtkTemplateMacro(
+            Copy<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                (VTK_TT*)M->GetVoidPointer(0),
+                (VTK_TT*)W->GetVoidPointer(0),
+                nCompsM,
+                this->Mode,
+                USE_OUTPUT_BOUNDS));
+          }
+        }
+
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->EndEvent("vtkSQKernelConvolution::PassInput");
         }
       }
-    #if defined vtkSQKernelConvolutionTIME
-    log->EndEvent("vtkSQKernelConvolution::PassInput");
-    #endif
-
-    // outImData->Print(cerr);
     }
   else
   if (isRecti)
@@ -1267,14 +1280,14 @@ int vtkSQKernelConvolution::RequestData(
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
 
-  #if defined vtkSQKernelConvolutionTIME
-  log->EndEvent("vtkSQKernelConvolution::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQKernelConvolution::RequestData");
+    }
 
   #ifdef vtkSQKernelConvolutionDEBUG
   pCerr() << oss.str() << endl;
   #endif
-
 
  return 1;
 }
@@ -1287,7 +1300,5 @@ void vtkSQKernelConvolution::PrintSelf(ostream& os, vtkIndent indent)
   #endif
 
   this->Superclass::PrintSelf(os,indent);
-
   // TODO
-
 }

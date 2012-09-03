@@ -144,8 +144,16 @@ public:
   vtkSetMacro(SieveBufferSize,int);
   vtkGetMacro(SieveBufferSize,int);
 
-protected:
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
 
+protected:
   virtual int RequestInformation(
         vtkInformation *req,
         vtkInformationVector **inInfos,
@@ -190,6 +198,7 @@ protected:
   int UseDataSieving;      // Turn on/off data sieving
   int SieveBufferSize;     // Sieve size.
   int VectorProjection;    // to zero out one vector component
+  int LogLevel;
 };
 
 #endif
