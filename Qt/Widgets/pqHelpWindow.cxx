@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqHelpWindow.h"
 
 #include <QByteArray>
+#include <QByteArray>
+#include <QFileInfo>
 #include <QHelpContentItem>
 #include <QHelpContentModel>
 #include <QHelpContentWidget>
@@ -46,9 +48,92 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 #include <QTimer>
+#include <QtNetwork/QNetworkReply>
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
+
+namespace
+{
+
+// ****************************************************************************
+//            CLASS pqHelpWindowNetworkReply
+// ****************************************************************************
+/// Internal class used to add support to QWebView to load files from
+/// QHelpEngine.
+class pqHelpWindowNetworkReply : public QNetworkReply
+{
+  typedef QNetworkReply Superclass;
+public:
+  pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
+
+  virtual void abort() {}
+  virtual qint64 bytesAvailable() const
+    {
+    return (this->RawData.size() - this->Offset) +
+      this->Superclass::bytesAvailable();
+    }
+  virtual bool isSequential() const {return true;}
+protected:
+  virtual qint64 readData(char *data, qint64 maxSize);
+
+  QByteArray RawData;
+  qint64 Offset;
+private:
+  Q_DISABLE_COPY(pqHelpWindowNetworkReply)
+};
+
+//-----------------------------------------------------------------------------
+pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
+  const QUrl& my_url, QHelpEngineCore* engine) : Superclass(engine), Offset(0)
+{
+  Q_ASSERT(engine);
+
+  this->RawData = engine->fileData(my_url);
+
+  QString content_type = "text/plain";
+  QString extension = QFileInfo(my_url.path()).suffix().toLower();
+  QMap<QString, QString> extension_type_map;
+  extension_type_map["jpg"]   = "image/jpeg";
+  extension_type_map["jpeg"]  = "image/jpeg";
+  extension_type_map["png"]   = "image/png";
+  extension_type_map["gif"]   = "image/gif";
+  extension_type_map["tiff"]  = "image/tiff";
+  extension_type_map["htm"]   = "text/html";
+  extension_type_map["html"]  = "text/html";
+  extension_type_map["css"]   = "text/css";
+  extension_type_map["xml"]   = "text/xml";
+
+  if (extension_type_map.contains(extension))
+    {
+    content_type = extension_type_map[extension];
+    }
+
+  this->setHeader(QNetworkRequest::ContentLengthHeader,
+    QVariant(this->RawData.size()));
+  this->setHeader(QNetworkRequest::ContentTypeHeader, content_type);
+  this->open(QIODevice::ReadOnly|QIODevice::Unbuffered);
+  this->setUrl(my_url);
+  QTimer::singleShot(0, this, SIGNAL(readyRead()));
+  QTimer::singleShot(0, this, SLOT(finished()));
+}
+
+//-----------------------------------------------------------------------------
+qint64 pqHelpWindowNetworkReply::readData(char *data, qint64 maxSize)
+{
+  if (this->Offset <= this->RawData.size())
+    {
+    qint64 end = qMin(this->Offset + maxSize,
+      static_cast<qint64>(this->RawData.size()));
+    qint64 delta = end - this->Offset;
+    memcpy(data, this->RawData.constData() + this->Offset, delta);
+    this->Offset += delta;
+    return delta;
+    }
+  return -1;
+}
+}
+
 
 // ****************************************************************************
 //    CLASS pqHelpWindow::pqNetworkAccessManager
@@ -90,41 +175,6 @@ protected:
 private:
   Q_DISABLE_COPY(pqNetworkAccessManager);
 };
-
-// ****************************************************************************
-//            CLASS pqHelpWindowNetworkReply
-// ****************************************************************************
-
-//-----------------------------------------------------------------------------
-pqHelpWindowNetworkReply::pqHelpWindowNetworkReply(
-  const QUrl& my_url, QHelpEngineCore* engine) : Superclass(engine)
-{
-  Q_ASSERT(engine);
-
-  this->HelpEngine = engine;
-  this->setUrl(my_url);
-
-  // timer is essential since all the signals that are fired when data is
-  // available need to happen after the constructor.
-  QTimer::singleShot(0, this, SLOT(process()));
-}
-
-//-----------------------------------------------------------------------------
-void pqHelpWindowNetworkReply::process()
-{
-  if (this->HelpEngine)
-    {
-    QByteArray rawData = this->HelpEngine->fileData(this->url());
-    this->Buffer.setData(rawData);
-    this->Buffer.open(QIODevice::ReadOnly);
-
-    this->open(QIODevice::ReadOnly|QIODevice::Unbuffered);
-    this->setHeader(QNetworkRequest::ContentLengthHeader, QVariant(rawData.size()));
-    this->setHeader(QNetworkRequest::ContentTypeHeader, "text/html");
-    emit this->readyRead();
-    emit this->finished();
-    }
-}
 
 // ****************************************************************************
 //            CLASS pqHelpWindow
