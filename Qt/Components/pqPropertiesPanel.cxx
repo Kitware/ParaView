@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqProxy.h"
 #include "pq3DWidget.h"
+#include "pqSettings.h"
 #include "pqUndoStack.h"
 #include "pqOutputPort.h"
 #include "pqDisplayPanel.h"
@@ -72,7 +73,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectPanelInterface.h"
 #include "pqProxySelectionWidget.h"
 #include "pq3DWidgetPropertyWidget.h"
-#include "pqApplyPropertiesManager.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
 #include "pqDisplayPanelPropertyWidget.h"
@@ -104,6 +104,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntVectorPropertyWidget.h"
 #include "pqDoubleVectorPropertyWidget.h"
 #include "pqStringVectorPropertyWidget.h"
+
+bool pqPropertiesPanel::AutoApply = false;
+int pqPropertiesPanel::AutoApplyDelay = 0; // in msec
 
 // === pqStandardCustomPanels ============================================== //
 
@@ -299,6 +302,18 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   this->DebugWidgetCreation = 
     vtksys::SystemTools::GetEnv("PV_DEBUG_PANELS") != NULL;
 
+  // enable auto apply for the panel if it enabled in the
+  // global paraview settings
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if(settings)
+    {
+    pqPropertiesPanel::AutoApply = settings->value("autoAccept", false).toBool();
+    }
+  else
+    {
+    pqPropertiesPanel::AutoApply = false;
+    }
+
   this->Ui->setupUi(this);
 
   this->setObjectName("propertiesPanel");
@@ -367,18 +382,9 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   this->connect(smm, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*, int)),
                 this, SLOT(handleConnectionChanged(pqPipelineSource*, pqPipelineSource*)));
 
-  // connect the apply button to the apply properties manager
-  pqApplyPropertiesManager *applyPropertiesManager =
-      qobject_cast<pqApplyPropertiesManager *>(
-        pqApplicationCore::instance()->manager("APPLY_PROPERTIES"));
-
-  if(applyPropertiesManager)
-    {
-    this->connect(applyPropertiesManager, SIGNAL(apply()),
-                  this, SLOT(apply()));
-    this->connect(this->Ui->ApplyButton, SIGNAL(clicked()),
-                  applyPropertiesManager, SLOT(applyProperties()));
-    }
+  // connect the apply button to the apply slot
+  this->connect(this->Ui->ApplyButton, SIGNAL(clicked()),
+                this, SLOT(apply()));
 
   // connect search string
   this->connect(this->Ui->SearchLineEdit, SIGNAL(textChanged(QString)),
@@ -628,6 +634,12 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
 
   // update apply button state
   this->updateButtonState();
+
+  // auto-apply if enabled
+  if(pqPropertiesPanel::AutoApply)
+    {
+    QTimer::singleShot(pqPropertiesPanel::AutoApplyDelay, this, SLOT(apply()));
+    }
 }
 
 void pqPropertiesPanel::setOutputPort(pqOutputPort *port)
@@ -816,6 +828,12 @@ void pqPropertiesPanel::apply()
 
   this->updateButtonState();
 
+  if(this->View)
+    {
+    // re-render the view
+    this->View->render();
+    }
+
   emit this->applied();
 }
 
@@ -934,6 +952,11 @@ void pqPropertiesPanel::proxyPropertyChanged()
   if(this->Proxy->modifiedState() == pqProxy::UNMODIFIED)
     {
     this->Proxy->setModifiedState(pqProxy::MODIFIED);
+    }
+
+  if(pqPropertiesPanel::AutoApply)
+    {
+    QTimer::singleShot(pqPropertiesPanel::AutoApplyDelay, this, SLOT(apply()));
     }
 
   this->updateButtonState();
@@ -1274,4 +1297,24 @@ void pqPropertiesPanel::updateInformationAndDomains()
     {
     inputProperty->UpdateDependentDomains();
     }
+}
+
+void pqPropertiesPanel::setAutoApply(bool enabled)
+{
+  pqPropertiesPanel::AutoApply = enabled;
+}
+
+bool pqPropertiesPanel::autoApply()
+{
+  return pqPropertiesPanel::AutoApply;
+}
+
+void pqPropertiesPanel::setAutoApplyDelay(int delay)
+{
+  pqPropertiesPanel::AutoApplyDelay = delay;
+}
+
+int pqPropertiesPanel::autoApplyDelay()
+{
+  return pqPropertiesPanel::AutoApplyDelay;
 }
