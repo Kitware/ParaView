@@ -193,6 +193,8 @@ protected:
 
   void AddFromMultiPieceDataSet(vtkCompositeDataSet* data);
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
+  void CopyFromCompositeDataSetInitialize(vtkCompositeDataSet* data);
+  void CopyFromCompositeDataSetFinalize(vtkCompositeDataSet* data);
   virtual void CopyFromDataSet(vtkDataSet* data);
   void CopyFromGenericDataSet(vtkGenericDataSet *data);
   void CopyFromGraph(vtkGraph* graph);
@@ -238,6 +240,7 @@ protected:
   vtkPVArrayInformation* PointArrayInformation;
 
   friend class vtkPVDataInformationHelper;
+  friend class vtkPVCompositeDataInformation;
 private:
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented

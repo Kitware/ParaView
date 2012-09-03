@@ -14,7 +14,6 @@
 =========================================================================*/
 
 #include "vtkAMRFileSeriesReader.h"
-#include "vtkAMRBaseReader.h"
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"

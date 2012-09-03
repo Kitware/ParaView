@@ -27,6 +27,7 @@
 #include "vtkPVInformation.h"
 
 class vtkPVDataInformation;
+class vtkUniformGridAMR;
 //BTX
 struct vtkPVCompositeDataInformationInternals;
 //ETX
@@ -89,6 +90,10 @@ public:
 protected:
   vtkPVCompositeDataInformation();
   ~vtkPVCompositeDataInformation();
+
+  // Description:
+  // Copy information from an amr dataset.
+  void CopyFromAMR(vtkUniformGridAMR* amr);
 
   int DataIsMultiPiece;
   int DataIsComposite;

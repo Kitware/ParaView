@@ -235,7 +235,14 @@ set(_vtk_modules
   #  vtkFLUENTReader
   #  vtkOpenFOAMReader
   #  vtkParticleReader
+
+  vtkIOLegacy
   #  vtkDataSetWriter
+
+  vtkIOMovie
+  #  vtkGenericMovieWriter
+  #  vtkOggTheoraWriter
+  #  vtkAVIWriter
 
   vtkIOImage
   # Needed for:
@@ -303,6 +310,9 @@ set(_vtk_modules
   vtkIOXdmf2
   #  Needed for xdmf support.
 
+  vtkIOAMR
+  #  Needed for AMR Readers.
+
   vtkRenderingFreeType
   # Needed for:
   #  vtkVectorText
@@ -320,6 +330,7 @@ set(_vtk_modules
   vtkDomainsChemistry
   # Needed for:
   #  vtkMoleculeRepresentation
+
   )
 
 if(PARAVIEW_USE_PISTON)

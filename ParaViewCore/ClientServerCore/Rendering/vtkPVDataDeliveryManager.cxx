@@ -112,7 +112,7 @@ public:
     { }
 
     void SetDataObject(vtkDataObject* data)
-      { 
+      {
       this->DataObject = data;
       this->ActualMemorySize = data? data->GetActualMemorySize() : 0;
 
@@ -141,7 +141,7 @@ public:
       }
 
     vtkPVTrivialProducer* GetProducer(bool use_redistributed_data)
-      { 
+      {
       if (use_redistributed_data && this->Redistributable)
         {
         this->Producer->SetOutput(this->RedistributedDataObject);
@@ -467,7 +467,7 @@ void vtkPVDataDeliveryManager::SetPiece(
       vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
 
     // SetPiece() is called in every REQUEST_UPDATE() or REQUEST_UPDATE_LOD()
-    // pass irrespective of whether the data has actually changed. 
+    // pass irrespective of whether the data has actually changed.
     // (I think that's a mistake, but the fact that representations can be
     // updated without view makes it tricky since we cannot set the data to
     // deliver in vtkPVDataRepresentation::RequestData() easily). Hence we need
@@ -550,7 +550,7 @@ vtkAlgorithmOutput* vtkPVDataDeliveryManager::GetProducer(
 
 //----------------------------------------------------------------------------
 bool vtkPVDataDeliveryManager::NeedsDelivery(
-  unsigned long timestamp, 
+  unsigned long timestamp,
   std::vector<unsigned int> &keys_to_deliver, bool use_low)
 {
   vtkInternals::ItemsMapType::iterator iter;
@@ -602,12 +602,12 @@ void vtkPVDataDeliveryManager::Deliver(int use_lod, unsigned int size, unsigned 
       {
       // we are dealing with AMR datasets.
       // We assume for now we're not running in render-server mode. We can
-      // ensure that at some point in future. 
+      // ensure that at some point in future.
       // So we are either in pass-through or collect mode.
 
       // FIXME: check that the mode flags are "suitable" for AMR.
       }
- 
+
     vtkNew<vtkMPIMoveData> dataMover;
     dataMover->InitializeForCommunicationForParaView();
     dataMover->SetOutputDataType(data->GetDataObjectType());
@@ -694,7 +694,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(
 
       // delivered object can be null in case we're updating lod and the
       // representation doeesn't have any LOD data.
-      item.GetDeliveredDataObject() == NULL) 
+      item.GetDeliveredDataObject() == NULL)
       {
       continue;
       }
@@ -782,8 +782,8 @@ bool vtkPVDataDeliveryManager::BuildPriorityQueue(double planes[24])
       {
       if (oamr->GetDataSet(level, index) == NULL)
         {
-        vtkAMRBox amrBox;
-        if (!oamr->GetMetaData(level, index, amrBox))
+        vtkAMRBox amrBox = oamr->GetAMRBox(level,index);
+        if (amrBox.IsInvalid())
           {
           vtkWarningMacro("Missing AMRBox meta-data for "
             << level << ", " << index);
@@ -797,7 +797,7 @@ bool vtkPVDataDeliveryManager::BuildPriorityQueue(double planes[24])
         item.Index = index;
 
         double bounds[6];
-        amrBox.GetBounds(bounds);
+        oamr->GetBounds(level,index,bounds);
         double depth = 1.0;
         double coverage = vtkComputeScreenCoverage(planes, bounds, depth);
         //cout << level <<"," << index << "(" << item.BlockId << ")" << " = " << coverage << ", " << depth << endl;
