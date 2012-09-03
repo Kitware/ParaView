@@ -1136,6 +1136,7 @@ macro(pv_process_modules)
   endforeach()
 
   set (current_module_set ${VTK_MODULES_ALL})
+  list(APPEND VTK_MODULES_ENABLED ${VTK_MODULES_ALL})
 
   # sort the modules based on depedencies. This will endup bringing in
   # VTK-modules too. We raise errors if required VTK modules are not already
@@ -1191,7 +1192,6 @@ macro(pv_setup_module_environment _name)
   include(vtkModuleMacros)
   include(vtkModuleAPI)
   include(vtkClientServerWrapping)
-
   # load information about existing modules.
   foreach (mod IN LISTS VTK_MODULES_ENABLED)
     vtk_module_load("${mod}")
