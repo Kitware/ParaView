@@ -23,10 +23,11 @@
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+#include "vtkSmartPointer.h" // needed for vtkWeakPointer.
 
 class vtkCubeAxesActor;
 class vtkPVRenderView;
-class vtkOutlineSource;
+class vtkPolyData;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCubeAxesRepresentation : public vtkPVDataRepresentation
 {
@@ -180,8 +181,8 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
-  vtkOutlineSource* OutlineSource;
   vtkWeakPointer<vtkPVRenderView> View;
+  vtkSmartPointer<vtkPolyData> OutlineGeometry;
   vtkCubeAxesActor* CubeAxesActor;
   double Position[3];
   double Scale[3];
