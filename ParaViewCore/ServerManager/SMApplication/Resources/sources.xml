@@ -212,7 +212,7 @@
                          default_values="6"
                          name="TipResolution"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="advanced">
         <IntRangeDomain max="128"
                         min="1"
                         name="range" />
@@ -247,7 +247,7 @@
                          default_values="6"
                          name="ShaftResolution"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="advanced">
         <IntRangeDomain max="128"
                         min="0"
                         name="range" />
@@ -412,7 +412,8 @@
                          command="SetResolution"
                          default_values="6"
                          name="Resolution"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain max="512"
                         min="0"
                         name="range" />
@@ -585,7 +586,8 @@
       <IntVectorProperty command="SetResolution"
                          default_values="6"
                          name="Resolution"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain max="512"
                         min="2"
                         name="range" />
@@ -651,7 +653,7 @@
                             default_values="-0.5 0.0 0.0"
                             name="Point1"
                             number_of_elements="3"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the first
         endpoint of the line.</Documentation>
@@ -661,7 +663,7 @@
                             default_values="0.5 0.0 0.0"
                             name="Point2"
                             number_of_elements="3"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the second
         endpoint of the line.</Documentation>
@@ -670,7 +672,7 @@
                          default_values="6"
                          name="Resolution"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="never">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property specifies the number of pieces into which
@@ -703,7 +705,7 @@
       <DoubleVectorProperty default_values="-0.5 0.0 0.0"
                             name="Point1"
                             number_of_elements="3"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the first
         endpoint of the line.</Documentation>
@@ -711,7 +713,7 @@
       <DoubleVectorProperty default_values="0.5 0.0 0.0"
                             name="Point2"
                             number_of_elements="3"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain name="range" />
         <Documentation>This property controls the coordinates of the second
         endpoint of the line.</Documentation>
@@ -753,7 +755,7 @@
                          default_values="0 250 0 250 0 0"
                          name="WholeExtent"
                          number_of_elements="6"
-                         panel_visibility="default">
+                         panel_visibility="advanced">
         <IntRangeDomain name="range" />
         <Documentation>The six values in the property indicate the X, Y, and Z
         extent of the output data. The first two numbers are the minimum and
@@ -999,7 +1001,7 @@
                             default_values="0.0 0.0 0.0"
                             name="Center"
                             number_of_elements="3"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the 3D coordinates of the center
         of the point cloud.</Documentation>
@@ -1009,7 +1011,7 @@
                          default_values="1"
                          name="NumberOfPoints"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="never">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property specifies the number of points in the
@@ -1020,7 +1022,7 @@
                             default_values="0.0"
                             name="Radius"
                             number_of_elements="1"
-                            panel_visibility="default">
+                            panel_visibility="never">
         <DoubleRangeDomain min="0"
                            name="range" />
         <Documentation>This property specifies the radius of the point cloud,

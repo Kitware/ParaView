@@ -244,7 +244,8 @@
       <StringVectorProperty command="SetInformationScript"
                             label="RequestInformation Script"
                             name="InformationScript"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Hints>
           <Widget type="multi_line" />
         </Hints>
@@ -255,7 +256,8 @@
       <StringVectorProperty command="SetUpdateExtentScript"
                             label="RequestUpdateExtent Script"
                             name="UpdateExtentScript"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Hints>
           <Widget type="multi_line" />
         </Hints>
@@ -281,7 +283,8 @@
                             repeat_command="1"></StringVectorProperty>
       <StringVectorProperty command="SetPythonPath"
                             name="PythonPath"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>A semi-colon (;) separated list of directories to add to
         the python library search path.</Documentation>
       </StringVectorProperty>
@@ -355,7 +358,8 @@
       <StringVectorProperty command="SetInformationScript"
                             label="Script (RequestInformation)"
                             name="InformationScript"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Hints>
           <Widget type="multi_line" />
         </Hints>
@@ -372,7 +376,8 @@
                             repeat_command="1"></StringVectorProperty>
       <StringVectorProperty command="SetPythonPath"
                             name="PythonPath"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <Documentation>A semi-colon (;) separated list of directories to add to
         the python library search path.</Documentation>
       </StringVectorProperty>
