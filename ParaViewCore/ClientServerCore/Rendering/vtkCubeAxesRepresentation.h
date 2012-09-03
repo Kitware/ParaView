@@ -163,6 +163,11 @@ protected:
   vtkCubeAxesRepresentation();
   ~vtkCubeAxesRepresentation();
 
+  // Description:
+  // Extract Field information from input if any and configure the underneath
+  // cube axes if needed
+  virtual void ConfigureCubeAxes(vtkDataObject* input);
+
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual int RequestData(vtkInformation*,
     vtkInformationVector** inputVector, vtkInformationVector*);
