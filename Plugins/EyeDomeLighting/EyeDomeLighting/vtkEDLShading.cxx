@@ -196,12 +196,13 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
     this->ProjectionColorTexture = vtkTextureObject::New();
     this->ProjectionColorTexture->SetContext(this->ProjectionFBO->GetContext());
     }
-  if (this->ProjectionColorTexture->GetWidth() != static_cast<unsigned int> (w)
+  if (this->ProjectionColorTexture->GetWidth() != static_cast<unsigned int>
+    (this->W)
       || this->ProjectionColorTexture->GetHeight()
-          != static_cast<unsigned int> (h))
+          != static_cast<unsigned int> (this->H))
     {
     this->ProjectionColorTexture->Bind();
-    this->ProjectionColorTexture->Create2D(w, h, 4, VTK_FLOAT, false);
+    this->ProjectionColorTexture->Create2D(this->W, this->H, 4, VTK_FLOAT, false);
     }
   // Depth texture
   if (this->ProjectionDepthTexture == 0)
@@ -209,12 +210,12 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
     this->ProjectionDepthTexture = vtkTextureObject::New();
     this->ProjectionDepthTexture->SetContext(this->ProjectionFBO->GetContext());
     }
-  if (this->ProjectionDepthTexture->GetWidth() != static_cast<unsigned int> (w)
+  if (this->ProjectionDepthTexture->GetWidth() != static_cast<unsigned int> (this->W)
       || this->ProjectionDepthTexture->GetHeight()
-          != static_cast<unsigned int> (h))
+          != static_cast<unsigned int> (this->H))
     {
     this->ProjectionDepthTexture->Bind();
-    this->ProjectionDepthTexture->Create2D(w, h, 1, VTK_VOID, false);
+    this->ProjectionDepthTexture->Create2D(this->W, this->H, 1, VTK_VOID, false);
     }
   // Apply textures
   // to make things clear, we write all
@@ -246,11 +247,11 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
     this->EDLHighShadeTexture = vtkTextureObject::New();
     this->EDLHighShadeTexture->SetContext(this->EDLHighFBO->GetContext());
     }
-  if (this->EDLHighShadeTexture->GetWidth() != static_cast<unsigned int> (w)
+  if (this->EDLHighShadeTexture->GetWidth() != static_cast<unsigned int> (this->W)
       || this->EDLHighShadeTexture->GetHeight()
-          != static_cast<unsigned int> (h))
+          != static_cast<unsigned int> (this->H))
     {
-    this->EDLHighShadeTexture->Create2D(w, h, 4, VTK_FLOAT, false);
+    this->EDLHighShadeTexture->Create2D(this->W, this->H, 4, VTK_FLOAT, false);
     }
   this->EDLHighFBO->SetNumberOfRenderTargets(1);
   this->EDLHighFBO->SetColorBuffer(0, this->EDLHighShadeTexture);
@@ -272,12 +273,12 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
     this->EDLLowShadeTexture = vtkTextureObject::New();
     this->EDLLowShadeTexture->SetContext(this->EDLLowFBO->GetContext());
     }
-  if (this->EDLLowShadeTexture->GetWidth() != static_cast<unsigned int> (w
+  if (this->EDLLowShadeTexture->GetWidth() != static_cast<unsigned int> (this->W
       / EDLLowResFactor) || this->EDLLowShadeTexture->GetHeight()
-      != static_cast<unsigned int> (h / EDLLowResFactor))
+      != static_cast<unsigned int> (this->H / EDLLowResFactor))
     {
-    this->EDLLowShadeTexture->Create2D(w / EDLLowResFactor,
-        h / EDLLowResFactor, 4, VTK_FLOAT, false);
+    this->EDLLowShadeTexture->Create2D(this->W / EDLLowResFactor,
+        this->H / EDLLowResFactor, 4, VTK_FLOAT, false);
     }
   // Blur texture
   if (this->EDLLowBlurTexture == 0)
@@ -285,11 +286,11 @@ void vtkEDLShading::EDLInitializeFramebuffers(vtkRenderState &s)
     this->EDLLowBlurTexture = vtkTextureObject::New();
     this->EDLLowBlurTexture->SetContext(this->EDLLowFBO->GetContext());
     }
-  if (this->EDLLowBlurTexture->GetWidth() != static_cast<unsigned int> (w
+  if (this->EDLLowBlurTexture->GetWidth() != static_cast<unsigned int> (this->W
       / EDLLowResFactor) || this->EDLLowBlurTexture->GetHeight()
-      != static_cast<unsigned int> (h / EDLLowResFactor))
+      != static_cast<unsigned int> (this->H / EDLLowResFactor))
     {
-    this->EDLLowBlurTexture->Create2D(w / EDLLowResFactor, h / EDLLowResFactor,
+    this->EDLLowBlurTexture->Create2D(this->W / EDLLowResFactor, this->H / EDLLowResFactor,
         4, VTK_FLOAT, false);
     }
   this->EDLLowFBO->SetNumberOfRenderTargets(1);
@@ -326,7 +327,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->EDLShadeProgram == 0)
     {
-    this->EDLShadeProgram = vtkShaderProgram2::New();
+    this->EDLShadeProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->EDLShadeProgram->SetContext(
             static_cast<vtkOpenGLRenderWindow *>
             (this->ProjectionFBO->GetContext()));
@@ -346,7 +347,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->EDLComposeProgram == 0)
     {
-    this->EDLComposeProgram = vtkShaderProgram2::New();
+    this->EDLComposeProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->EDLComposeProgram->SetContext(
         static_cast<vtkOpenGLRenderWindow *> (this->EDLHighFBO->GetContext()));
     vtkShader2 *shader = vtkShader2::New();
@@ -365,7 +366,7 @@ void vtkEDLShading::EDLInitializeShaders()
   //
   if (this->BilateralProgram == 0)
     {
-    this->BilateralProgram = vtkShaderProgram2::New();
+    this->BilateralProgram = vtkSmartPointer<vtkShaderProgram2>::New();
     this->BilateralProgram->SetContext(
         static_cast<vtkOpenGLRenderWindow *> (this->EDLLowFBO->GetContext()));
     vtkShader2 *shader = vtkShader2::New();
@@ -399,15 +400,15 @@ bool vtkEDLShading::EDLShadeHigh(vtkRenderState &s)
   int sourceIdZ;
   float d = 1.0;
   float F_scale = 5.0;
-  float SX = 1. / float(w);
-  float SY = 1. / float(h);
+  float SX = 1. / float(this->W);
+  float SY = 1. / float(this->H);
   float L[3] =
     { 0., 0., -1. };
 
   // ACTIVATE FBO
   //
   s.SetFrameBuffer(this->EDLHighFBO);
-  this->EDLHighFBO->Start(w, h, false);
+  this->EDLHighFBO->Start(this->W, this->H, false);
   this->EDLHighFBO->SetColorBuffer(0, this->EDLHighShadeTexture);
   this->EDLHighFBO->SetActiveBuffer(0);
 
@@ -482,7 +483,7 @@ bool vtkEDLShading::EDLShadeHigh(vtkRenderState &s)
     }
 
   // RENDER AND FREE ALL
-  EDLHighFBO->RenderQuad(0, w - 1, 0, h - 1);
+  EDLHighFBO->RenderQuad(0, this->W - 1, 0, this->H - 1);
   //
   this->EDLShadeProgram->Restore();
   tu->Free(sourceIdZ);
@@ -507,15 +508,15 @@ bool vtkEDLShading::EDLShadeLow(vtkRenderState &s)
   int sourceIdZ;
   float d = 2.0;
   float F_scale = 5.0;
-  float SX = 1. / float(w / EDLLowResFactor);
-  float SY = 1. / float(h / EDLLowResFactor);
+  float SX = 1. / float(this->W / EDLLowResFactor);
+  float SY = 1. / float(this->H / EDLLowResFactor);
   float L[3] =
     { 0., 0., -1. };
 
   // ACTIVATE FBO
   //
   s.SetFrameBuffer(this->EDLLowFBO);
-  this->EDLLowFBO->Start(w / EDLLowResFactor, h / EDLLowResFactor, false);
+  this->EDLLowFBO->Start(this->W / EDLLowResFactor, this->H / EDLLowResFactor, false);
   this->EDLLowFBO->SetColorBuffer(0, this->EDLLowBlurTexture);
   this->EDLLowBlurTexture->SetLinearMagnification(true);
   this->EDLLowBlurTexture->Bind();
@@ -560,7 +561,7 @@ bool vtkEDLShading::EDLShadeLow(vtkRenderState &s)
 
   // RENDER AND FREE ALL
   //
-  EDLLowFBO->RenderQuad(0, w / EDLLowResFactor - 1, 0, h / EDLLowResFactor - 1);
+  EDLLowFBO->RenderQuad(0, this->W / EDLLowResFactor - 1, 0, this->H / EDLLowResFactor - 1);
   //
   this->EDLShadeProgram->Restore();
   tu->Free(sourceIdZ);
@@ -585,15 +586,15 @@ bool vtkEDLShading::EDLBlurLow(vtkRenderState &s)
   int sourceIdZ;
   int sourceIdEDL;
   // shader parameters
-  float SX = 1. / float(this->w / EDLLowResFactor);
-  float SY = 1. / float(this->h / EDLLowResFactor);
+  float SX = 1. / float(this->W / EDLLowResFactor);
+  float SY = 1. / float(this->H / EDLLowResFactor);
   int EDL_Bilateral_N = 5;
   float EDL_Bilateral_Sigma = 2.5;
 
   // ACTIVATE FBO
   //
   s.SetFrameBuffer(this->EDLLowFBO);
-  this->EDLLowFBO->Start(this->w / EDLLowResFactor, this->h / EDLLowResFactor,
+  this->EDLLowFBO->Start(this->W / EDLLowResFactor, this->H / EDLLowResFactor,
       false);
   this->EDLLowFBO->SetColorBuffer(0, this->EDLLowBlurTexture);
   this->EDLLowFBO->SetActiveBuffer(0);
@@ -641,8 +642,8 @@ bool vtkEDLShading::EDLBlurLow(vtkRenderState &s)
     {
     // RENDER SSAO AND FREE ALL
     //
-    EDLLowFBO->RenderQuad(0, w / EDLLowResFactor - 1, 0,
-                          h / EDLLowResFactor - 1);
+    EDLLowFBO->RenderQuad(0, this->W / EDLLowResFactor - 1, 0,
+                          this->H / EDLLowResFactor - 1);
     }
   this->BilateralProgram->Restore();
   tu->Free(sourceIdEDL);
@@ -732,9 +733,9 @@ bool vtkEDLShading::EDLCompose(const vtkRenderState *s)
   glDisable(GL_SCISSOR_TEST);
 
   this->EDLHighShadeTexture->CopyToFrameBuffer( 0,  0,
-      this->w - 1 - 2 * this->extraPixels,
-      this->h - 1 - 2 * this->extraPixels, 0, 0,
-      this->width, this->height );
+      this->W - 1 - 2 * this->ExtraPixels,
+      this->H - 1 - 2 * this->ExtraPixels, 0, 0,
+      this->Width, this->Height );
 
   //  FREE ALL
   //
@@ -798,9 +799,9 @@ void vtkEDLShading::Render(const vtkRenderState *s)
     //
     this->ReadWindowSize(s);
     // this->extraPixels = 20; Obsolete
-    this->extraPixels = 0; // extra pixels to zero in the new system
-    this->w = this->width + 2* this ->extraPixels;
-    this->h=this->height+2*this->extraPixels;
+    this->ExtraPixels = 0; // extra pixels to zero in the new system
+    this->W = this->Width + 2* this ->ExtraPixels;
+    this->H=this->Height+2*this->ExtraPixels;
     vtkRenderState s2(r);
     s2.SetPropArrayAndCount(s->GetPropArray(),s->GetPropArrayCount());
 
@@ -843,8 +844,8 @@ void vtkEDLShading::Render(const vtkRenderState *s)
         this->Zn = znear;
         //cout << " -- ZNEAR/ZFAR : " << Zn << " || " << Zf << endl;
         this->ProjectionFBO->Bind();
-        this->RenderDelegate(s,this->width,this->height,
-             this->w,this->h,this->ProjectionFBO,
+        this->RenderDelegate(s,this->Width,this->Height,
+             this->W,this->H,this->ProjectionFBO,
              this->ProjectionColorTexture,this->ProjectionDepthTexture);
 
   this->ProjectionFBO->UnBind();

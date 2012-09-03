@@ -113,9 +113,10 @@ int vtkPVDataRepresentation::RequestData(vtkInformation*,
   return 1;
 }
 
-int vtkPVDataRepresentation::RequestUpdateTime(vtkInformation* request,
+int vtkPVDataRepresentation::RequestUpdateTime(
+  vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector,
-  vtkInformationVector* outputVector)
+  vtkInformationVector* vtkNotUsed(outputVector))
 {
   for (int cc=0; cc < this->GetNumberOfInputPorts(); cc++)
     {
