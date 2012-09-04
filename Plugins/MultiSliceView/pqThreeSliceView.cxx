@@ -187,7 +187,7 @@ public:
 
   // ------
 
-  QWidget* CreateWidget(pqThreeSliceView* view)
+  QWidget* CreateWidget()
   {
     // Get the internal widget that we want to decorate
     this->BottomRightWidget = qobject_cast<QVTKWidget*>(this->BottomRightRenderer->getWidget());
@@ -239,7 +239,7 @@ pqThreeSliceView::~pqThreeSliceView()
 QWidget* pqThreeSliceView::createWidget()
 {
   // Create the widget with all the axes
-  QWidget* container = this->Internal->CreateWidget(this);
+  QWidget* container = this->Internal->CreateWidget();
 
   // Make sure the view are normal to the slices
   this->Internal->UpdateSlices();
