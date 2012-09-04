@@ -484,7 +484,7 @@ void vtkWebGLExporter::generateRendererData(vtkRendererCollection* renderers, co
     ss << "\"size\": [" << (float)(s[0]/(float)fullSize[0]) << "," << (float)(s[1]/(float)fullSize[1]) << "],";    //Render Size
     ss << "\"origin\": [" << (float)(o[0]/(float)fullSize[0]) << "," << (float)(o[1]/(float)fullSize[1]) << "]";   //Render Position
     ss << "}";
-    if (i+1 != renderers->GetNumberOfItems()) ss << ", ";
+    if (static_cast<int>(i+1) != renderers->GetNumberOfItems()) ss << ", ";
     }
   ss << "]";
   this->renderersMetaData = ss.str();
