@@ -118,7 +118,6 @@ void pqExportReaction::exportActiveView()
 
       pqPropertyWidget *propertyWidget =
         pqPropertiesPanel::createWidgetForProperty(smProperty, proxy);
-      QLabel *label = NULL;
       const char *xmlLabel = smProperty->GetXMLLabel();
       if (propertyWidget)
         {
