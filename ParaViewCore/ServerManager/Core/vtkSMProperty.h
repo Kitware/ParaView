@@ -189,7 +189,7 @@ public:
   //   * "advanced": Only show the property in the advanced view.
   //   * "never": Never show the property on the panel.
   //
-  // By default, all properties have "advanced" visibility.
+  // By default, all properties have "default" visibility.
   vtkSetStringMacro(PanelVisibility)
 
   // Description:
@@ -205,6 +205,14 @@ public:
   // Returns which representation type the property will be shown by
   // default for.
   vtkGetStringMacro(PanelVisibilityDefaultForRepresentation)
+
+  // Description:
+  // Sets the name of the custom panel widget to use for the property.
+  vtkSetStringMacro(PanelWidget)
+
+  // Description:
+  // Returns name of the panel widget for the property.
+  vtkGetStringMacro(PanelWidget)
 
   // Description:
   // Copy all property values.
@@ -370,6 +378,7 @@ protected:
 
   char* PanelVisibility;
   char* PanelVisibilityDefaultForRepresentation;
+  char* PanelWidget;
 
   vtkSMDomainIterator* DomainIterator;
 

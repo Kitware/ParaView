@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqArrayStatusPropertyWidget.h"
+#include "pqColorSelectorPropertyWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "pqTextureSelectorPropertyWidget.h"
 
 pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
   : QObject(p)
@@ -57,17 +59,25 @@ pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
                                                            vtkSMProperty *smProperty)
 {
-  pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
-  if(repr && std::string(smProxy->GetPropertyName(smProperty)) == "Representation")
+  // handle properties that specify custom panel widgets
+  const char *custom_widget = smProperty->GetPanelWidget();
+  if(custom_widget)
     {
-    return new pqDisplayRepresentationPropertyWidget(smProxy);
-    }
+    std::string name = custom_widget;
 
-//  if(propert = "textture")
-//    {
-//    pqTextureComboBox;
-//    }
+    if(name == "color_selector")
+      {
+      return new pqColorSelectorPropertyWidget(smProxy, smProperty);
+      }
+    else if(name == "display_representation_selector")
+      {
+      return new pqDisplayRepresentationPropertyWidget(smProxy);
+      }
+    else if(name == "texture_selector")
+      {
+      return new pqTextureSelectorPropertyWidget(smProxy);
+      }
+    }
 
   return 0;
 }
@@ -88,6 +98,7 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
     {
     return new pqArrayStatusPropertyWidget(proxy, group);
     }
+
 
   return 0;
 }
