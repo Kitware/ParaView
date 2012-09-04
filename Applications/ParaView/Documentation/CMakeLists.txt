@@ -8,16 +8,16 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/about.html"
     @ONLY)
 
-set (gui_xmls
-  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewSources.xml
-  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewFilters.xml
-  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewReaders.xml
-  ${ParaView_SOURCE_DIR}/Applications/ParaView/ParaViewWriters.xml)
+# sanity check
+if (NOT application_gui_xmls)
+  message(AUTHOR_WARNING "application_gui_xmls is empty."
+    "It must generally point to all the gui xmls in your application")
+endif()
 
 # generate htmls from the server manager xmls.
 generate_htmls_from_xmls(proxy_html_outputs
   "${PARAVIEW_SERVERMANAGER_XMLS}"
-  "${gui_xmls}"
+  "${application_gui_xmls}"
   "${CMAKE_CURRENT_BINARY_DIR}")
 
 # this function produces a ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch file.
@@ -42,23 +42,28 @@ build_help_project(paraview
   DEPENDS "${proxy_html_outputs}"
   )
 
-ADD_CUSTOM_TARGET (ParaViewOnlineHelp
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch)
+generate_qt_resource_from_files(
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc"
+  "/ParaView/Documentation"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
+set_source_files_properties(
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc"
+  PROPERTIES OBJECT_DEPENDS
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview.qch")
+
+QT4_ADD_RESOURCES(rcs_sources
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_documentation.qrc")
+
+add_library(vtkParaViewDocumentation STATIC
+  ParaViewDocumentationInitializer.cxx
+  ${rcs_sources})
+target_link_libraries(vtkParaViewDocumentation ${QT_LIBRARIES}) 
 
 
-SET(USERS_GUIDE_FILE "ParaView User's Guide ${PARAVIEW_VERSION}.pdf")
-FIND_FILE(PARAVIEW_USERS_GUIDE ${USERS_GUIDE_FILE})
-MARK_AS_ADVANCED(PARAVIEW_USERS_GUIDE)
-
-IF (PARAVIEW_USERS_GUIDE AND EXISTS "${PARAVIEW_USERS_GUIDE}")
-  INSTALL(
-      FILES ${PARAVIEW_USERS_GUIDE}
-      DESTINATION ${VTK_INSTALL_DOC_DIR}
-      COMPONENT Runtime)
-ENDIF()
-
-# Development
 IF (NOT VTK_INSTALL_NO_DEVELOPMENT)
+  # We install the qch file only when installing development files since the
+  # file in compiled into a library for run-time and hence need not be installed
+  # otherwise.
   INSTALL(
       FILES ${CMAKE_CURRENT_BINARY_DIR}/paraview.qch
       DESTINATION ${VTK_INSTALL_DOC_DIR}

@@ -81,32 +81,8 @@ void vtkPVTrivialProducer::SetOutput(vtkDataObject* output, double time)
     vtkWarningMacro("New time step is not after last time step.");
     }
   this->Internals->TimeSteps.push_back(time);
-  this->GetExecutive()->GetOutputInformation(0)->Set(
-    vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
-  if(this->Internals->TimeSteps.size() == 1)
-    {
-    // hack to add in another "ghost" step since we don't really know
-    // what the next step will be but we assume we need at least 2 steps
-    double timeInfo[2] = {this->Internals->TimeSteps[0],
-                          this->Internals->TimeSteps[0]+1};
-    this->GetExecutive()->GetOutputInformation(0)->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeInfo, 2);
-    this->GetExecutive()->GetOutputInformation(0)->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeInfo, 2);
-    }
-  else
-    {
-    this->GetExecutive()->GetOutputInformation(0)->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-      &this->Internals->TimeSteps[0],
-      static_cast<int>(this->Internals->TimeSteps.size()) );
-    double timeRange[2] = {this->Internals->TimeSteps[0],
-                           this->Internals->TimeSteps.back()};
-    this->GetExecutive()->GetOutputInformation(0)->Set(
-      vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
-    }
-  this->Modified();
 
+  this->Modified();
   this->SetOutput(output);
 }
 
@@ -132,9 +108,20 @@ vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
 
   vtkInformation* outputInfo = outputVector->GetInformationObject(0);
 
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
+  if( request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()) &&
+      outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) )
     {
     double uTime = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    if( this->Internals->TimeSteps.empty() )
+      {
+      vtkWarningMacro("Requesting a time step when none is available");
+      }
+    else if(uTime != this->Internals->TimeSteps.back())
+      {
+      vtkWarningMacro("Requesting time " << uTime << " but only "
+                      << this->Internals->TimeSteps.back()
+                      << " is available");
+      }
     outputInfo->Get(vtkDataObject::DATA_OBJECT())->GetInformation()->Set(
       vtkDataObject::DATA_TIME_STEP(), uTime);
     }
@@ -154,6 +141,20 @@ vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
         }
       }
     }
+
+  if(this->Internals->TimeSteps.empty() == false)
+    {
+    // outputInfo->Set(
+    //   vtkDataObject::DATA_TIME_STEP(), this->Internals->TimeSteps.back());
+    outputInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+                    &this->Internals->TimeSteps[0],
+                    static_cast<int>(this->Internals->TimeSteps.size()) );
+    double timeRange[2] = {this->Internals->TimeSteps[0],
+                           this->Internals->TimeSteps.back()};
+    outputInfo->Set(
+      vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
+    }
+
 
   return 1;
 }

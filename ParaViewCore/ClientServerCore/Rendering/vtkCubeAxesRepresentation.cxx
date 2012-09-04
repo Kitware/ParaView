@@ -15,6 +15,7 @@
 #include "vtkCubeAxesRepresentation.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkAxisActor.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataIterator.h"
@@ -26,25 +27,24 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
-#include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkProperty.h"
+#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform.h"
-#include "vtkAxisActor.h"
 
 vtkStandardNewMacro(vtkCubeAxesRepresentation);
 //----------------------------------------------------------------------------
 vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
 {
-  this->OutlineSource = vtkOutlineSource::New();
-  this->OutlineSource->SetBoxTypeToAxisAligned();
+  this->OutlineGeometry = vtkSmartPointer<vtkPolyData>::New();
 
   this->CubeAxesActor = vtkCubeAxesActor::New();
   this->CubeAxesActor->SetPickable(0);
@@ -75,7 +75,6 @@ vtkCubeAxesRepresentation::vtkCubeAxesRepresentation()
 vtkCubeAxesRepresentation::~vtkCubeAxesRepresentation()
 {
   this->CubeAxesActor->Delete();
-  this->OutlineSource->Delete();
   this->SetUserXTitle(NULL);
   this->SetUserYTitle(NULL);
   this->SetUserZTitle(NULL);
@@ -167,10 +166,11 @@ int vtkCubeAxesRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    // we don't call Update() on the outline source, hence on processes without
-    // any input data, the dataset will be uninitialized.
-    vtkPVRenderView::SetPiece(inInfo, this, 
-      this->OutlineSource->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->OutlineGeometry);
+
+    // We need to deliver to all processes to ensure we get the reduced data
+    // bounds on all process. Otherwise we end up with BUG #0013403.
+    vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
@@ -182,7 +182,12 @@ int vtkCubeAxesRepresentation::ProcessViewRequest(
           producerPort->GetIndex()));
       if (ds)
         {
+        // Update local bounds based on the server side information
         ds->GetBounds(this->DataBounds);
+
+        // Configure the cube axes based on the fields data that have been
+        // passed along by the server
+        this->ConfigureCubeAxes(ds);
         }
       }
     this->UpdateBounds();
@@ -196,107 +201,11 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
   vtkInformationVector** inputVector, vtkInformationVector*)
 {
   vtkMath::UninitializeBounds(this->DataBounds);
+  vtkFieldData* fieldDataToKeepAround = NULL;
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
     vtkDataObject* input = vtkDataObject::GetData(inputVector[0], 0);
-
-    // Update axes title informations
-    vtkFieldData* fieldData = input->GetFieldData();
-    vtkStringArray* titleX =
-        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForX"));
-    vtkStringArray* titleY =
-        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
-    vtkStringArray* titleZ =
-        vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
-    if(titleX && titleX->GetNumberOfValues() > 0 && this->UseDefaultXTitle == 1)
-      {
-      this->CubeAxesActor->SetXTitle(titleX->GetValue(0).c_str());
-      }
-    else if(this->UserXTitle)
-      {
-      this->CubeAxesActor->SetXTitle(this->UserXTitle);
-      }
-    if(titleY && titleY->GetNumberOfValues() > 0 && this->UseDefaultYTitle == 1)
-      {
-      this->CubeAxesActor->SetYTitle(titleY->GetValue(0).c_str());
-      }
-    else if(this->UserYTitle)
-      {
-      this->CubeAxesActor->SetYTitle(this->UserYTitle);
-      }
-    if(titleZ && titleZ->GetNumberOfValues() > 0 && this->UseDefaultZTitle == 1)
-      {
-      this->CubeAxesActor->SetZTitle(titleZ->GetValue(0).c_str());
-      }
-    else if(this->UserZTitle)
-      {
-      this->CubeAxesActor->SetZTitle(this->UserZTitle);
-      }
-
-    // Update Axis orientation
-    vtkFloatArray* uBase =
-        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForX"));
-    if(uBase && uBase->GetNumberOfTuples() > 0)
-      {
-      this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple(0));
-      }
-    else
-      {
-      this->CubeAxesActor->SetAxisBaseForX(1,0,0);
-      }
-    vtkFloatArray* vBase =
-        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForY"));
-    if(vBase && vBase->GetNumberOfTuples() > 0)
-      {
-      this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple(0));
-      }
-    else
-      {
-      this->CubeAxesActor->SetAxisBaseForY(0,1,0);
-      }
-    vtkFloatArray* wBase =
-        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForZ"));
-    if(wBase && wBase->GetNumberOfTuples() > 0)
-      {
-      this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple(0));
-      }
-    else
-      {
-      this->CubeAxesActor->SetAxisBaseForZ(0,0,1);
-      }
-
-    // Make sure we enable oriented bounding box if any
-    vtkFloatArray* orientedboundingBox =
-        vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
-    if(orientedboundingBox)
-      {
-      this->UseOrientedBounds = true;
-      double* orientedBounds = orientedboundingBox->GetTuple(0);
-      this->CubeAxesActor->SetUseOrientedBounds(1);
-      this->CubeAxesActor->SetOrientedBounds(orientedBounds);
-      this->CubeAxesActor->SetXAxisRange(&orientedBounds[0]);
-      this->CubeAxesActor->SetYAxisRange(&orientedBounds[2]);
-      this->CubeAxesActor->SetZAxisRange(&orientedBounds[4]);
-      }
-    else
-      {
-      this->UseOrientedBounds = false;
-      this->CubeAxesActor->SetUseOrientedBounds(0);
-      }
-
-    // Make sure we enable the custom origin if any
-    vtkFloatArray* customOrigin =
-        vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisOrigin"));
-    if(customOrigin)
-      {
-      this->CubeAxesActor->SetUseAxisOrigin(1);
-      this->CubeAxesActor->SetAxisOrigin(customOrigin->GetTuple(0));
-      }
-    else
-      {
-      this->CubeAxesActor->SetUseAxisOrigin(0);
-      }
-
+    fieldDataToKeepAround = input->GetFieldData();
 
     vtkDataSet* ds = vtkDataSet::SafeDownCast(input);
     vtkCompositeDataSet* cd = vtkCompositeDataSet::SafeDownCast(input);
@@ -325,10 +234,25 @@ int vtkCubeAxesRepresentation::RequestData(vtkInformation*,
       iter->Delete();
       bbox.GetBounds(this->DataBounds);
       }
-    this->OutlineSource->SetBounds(this->DataBounds);
-    this->OutlineSource->Update();
     }
 
+  if (vtkMath::AreBoundsInitialized(this->DataBounds))
+    {
+    vtkNew<vtkOutlineSource> outlineSource;
+    outlineSource->SetBoxTypeToAxisAligned();
+    outlineSource->SetBounds(this->DataBounds);
+    outlineSource->Update();
+    this->OutlineGeometry->ShallowCopy(outlineSource->GetOutput());
+    }
+  else
+    {
+    this->OutlineGeometry->Initialize();
+    }
+
+  if(fieldDataToKeepAround)
+    {
+    this->OutlineGeometry->GetFieldData()->ShallowCopy(fieldDataToKeepAround);
+    }
 
   // We fire UpdateDataEvent to notify the representation proxy that the
   // representation was updated. The representation proxty will then call
@@ -547,4 +471,107 @@ void vtkCubeAxesRepresentation::SetDrawZGridlines(int val)
 void vtkCubeAxesRepresentation::SetGridLineLocation(int val)
 {
   this->CubeAxesActor->SetGridLineLocation(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
+{
+
+  // Update axes title informations
+  vtkFieldData* fieldData = input->GetFieldData();
+  vtkStringArray* titleX =
+      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForX"));
+  vtkStringArray* titleY =
+      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
+  vtkStringArray* titleZ =
+      vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
+  if(titleX && titleX->GetNumberOfValues() > 0 && this->UseDefaultXTitle == 1)
+    {
+    this->CubeAxesActor->SetXTitle(titleX->GetValue(0).c_str());
+    }
+  else if(this->UserXTitle)
+    {
+    this->CubeAxesActor->SetXTitle(this->UserXTitle);
+    }
+  if(titleY && titleY->GetNumberOfValues() > 0 && this->UseDefaultYTitle == 1)
+    {
+    this->CubeAxesActor->SetYTitle(titleY->GetValue(0).c_str());
+    }
+  else if(this->UserYTitle)
+    {
+    this->CubeAxesActor->SetYTitle(this->UserYTitle);
+    }
+  if(titleZ && titleZ->GetNumberOfValues() > 0 && this->UseDefaultZTitle == 1)
+    {
+    this->CubeAxesActor->SetZTitle(titleZ->GetValue(0).c_str());
+    }
+  else if(this->UserZTitle)
+    {
+    this->CubeAxesActor->SetZTitle(this->UserZTitle);
+    }
+
+  // Update Axis orientation
+  vtkFloatArray* uBase =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForX"));
+  if(uBase && uBase->GetNumberOfTuples() > 0)
+    {
+    this->CubeAxesActor->SetAxisBaseForX(uBase->GetTuple(0));
+    }
+  else
+    {
+    this->CubeAxesActor->SetAxisBaseForX(1,0,0);
+    }
+  vtkFloatArray* vBase =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForY"));
+  if(vBase && vBase->GetNumberOfTuples() > 0)
+    {
+    this->CubeAxesActor->SetAxisBaseForY(vBase->GetTuple(0));
+    }
+  else
+    {
+    this->CubeAxesActor->SetAxisBaseForY(0,1,0);
+    }
+  vtkFloatArray* wBase =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisBaseForZ"));
+  if(wBase && wBase->GetNumberOfTuples() > 0)
+    {
+    this->CubeAxesActor->SetAxisBaseForZ(wBase->GetTuple(0));
+    }
+  else
+    {
+    this->CubeAxesActor->SetAxisBaseForZ(0,0,1);
+    }
+
+  // Make sure we enable oriented bounding box if any
+  vtkFloatArray* orientedboundingBox =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
+  if(orientedboundingBox)
+    {
+    this->UseOrientedBounds = true;
+    double* orientedBounds = orientedboundingBox->GetTuple(0);
+    this->CubeAxesActor->SetUseOrientedBounds(1);
+    this->CubeAxesActor->SetOrientedBounds(orientedBounds);
+    this->CubeAxesActor->SetXAxisRange(&orientedBounds[0]);
+    this->CubeAxesActor->SetYAxisRange(&orientedBounds[2]);
+    this->CubeAxesActor->SetZAxisRange(&orientedBounds[4]);
+    }
+  else
+    {
+    this->UseOrientedBounds = false;
+    this->CubeAxesActor->SetUseOrientedBounds(0);
+    }
+
+  // Make sure we enable the custom origin if any
+  vtkFloatArray* customOrigin =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisOrigin"));
+  if(customOrigin)
+    {
+    this->CubeAxesActor->SetUseAxisOrigin(1);
+    this->CubeAxesActor->SetAxisOrigin(customOrigin->GetTuple(0));
+    }
+  else
+    {
+    this->CubeAxesActor->SetUseAxisOrigin(0);
+    }
+
 }

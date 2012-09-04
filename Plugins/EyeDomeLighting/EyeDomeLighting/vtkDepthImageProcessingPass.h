@@ -62,7 +62,7 @@ class vtkTextureObject;
 class VTKEYEDOMELIGHTING_EXPORT vtkDepthImageProcessingPass : public vtkImageProcessingPass
 {
 public:
-  vtkTypeMacro(vtkDepthImageProcessingPass,vtkRenderPass);
+  vtkTypeMacro(vtkDepthImageProcessingPass, vtkImageProcessingPass);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -118,11 +118,11 @@ public:
   void ReadWindowSize(const vtkRenderState* s);
 
   vtkRenderPass *DelegatePass;
-  int    width;       // parent window width
-  int    height;      // parent window height
-  int    w;           // this width
-  int    h;           // this height
-  int    extraPixels; // w(h) = width(height) + 2*extrapixels
+  int    Width;       // parent window width
+  int    Height;      // parent window height
+  int    W;           // this width
+  int    H;           // this height
+  int    ExtraPixels; // w(h) = width(height) + 2*extrapixels
 
  private:
   vtkDepthImageProcessingPass(const vtkDepthImageProcessingPass&);  // Not implemented.

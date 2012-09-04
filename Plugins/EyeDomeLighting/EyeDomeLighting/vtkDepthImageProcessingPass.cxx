@@ -65,11 +65,11 @@ vtkCxxSetObjectMacro(vtkDepthImageProcessingPass,DelegatePass,vtkRenderPass);
 vtkDepthImageProcessingPass::vtkDepthImageProcessingPass()
 {
   this->DelegatePass = 0;
-  this->width = 0;
-  this->height = 0;
-  this->w = 0;
-  this->h = 0;
-  this->extraPixels = 0;
+  this->Width = 0;
+  this->Height = 0;
+  this->W = 0;
+  this->H = 0;
+  this->ExtraPixels = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -211,14 +211,14 @@ void vtkDepthImageProcessingPass::ReadWindowSize(const vtkRenderState* s)
     vtkRenderer *r = s->GetRenderer();
     if(fbo==0)
     {
-      r->GetTiledSize(&width,&height);
+      r->GetTiledSize(&this->Width,&this->Height);
     }
     else
     {
       int size[2];
       fbo->GetLastSize(size);
-      width=size[0];
-      height=size[1];
+      this->Width=size[0];
+      this->Height=size[1];
     }
 }
 

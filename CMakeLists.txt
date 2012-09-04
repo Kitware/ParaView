@@ -538,12 +538,6 @@ add_subdirectory(Wrapping/ClientServer)
 add_subdirectory(Wrapping/Python)
 
 #------------------------------------------------------------------------------
-if (PARAVIEW_BUILD_QT_GUI)
-  # Don't build documentation is Qt GUI is not being built.
-  add_subdirectory(Documentation)
-endif()
-
-#------------------------------------------------------------------------------
 # Process ParaView Plugins. These are processed similar to VTK modules.
 include(ParaViewPluginsMacros)
 # This will set two variables:

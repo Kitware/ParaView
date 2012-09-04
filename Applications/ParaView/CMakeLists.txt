@@ -7,17 +7,13 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   ParaViewMainWindow.ui
 )
 
-source_group("Generated" FILES
-  ${MOC_BUILT_SOURCES}
-  ${UI_BUILT_SOURCES}
-)
-
 set (QT_USE_QTNETWORK TRUE)
 include(${QT_USE_FILE})
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR})
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Documentation)
 
 set(ParaView_SOURCE_FILES
   ParaViewMainWindow.cxx
@@ -36,20 +32,31 @@ if (PARAVIEW_ENABLE_PYTHON)
     python_dependencies)
 endif()
 
+
 #------------------------------------------------------------------------------
 # ParaView applications provides a mechanism to add gui xmls from modules.
 # This is done by defining variables named ${vtk-module}_PARAVIEW_GUI_XMLS in
 # the module.cmake file for the modules pointing to the paths for the
 # GUI-xmls.  We process those here.
-set (module_gui_xmls)
+set (application_gui_xmls
+       "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml"
+       "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml"
+       "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewReaders.xml"
+       "${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml")
 foreach (module IN LISTS VTK_MODULES_ENABLED)
   get_property(gui_xml GLOBAL PROPERTY ${module}_PARAVIEW_GUI_XMLS)
   if (gui_xml)
     foreach(xml IN LISTS gui_xml)
-      list(APPEND module_gui_xmls ${xml})
+      list(APPEND application_gui_xmls ${xml})
     endforeach()
   endif()
 endforeach()
+
+#------------------------------------------------------------------------------
+# Build Online-Help (aka Embedded Help) for the ParaView application.
+# This is done after the above piece of code that sets the application_gui_xmls
+# variable. Documentation/CMakeLists.txt depends on it.
+add_subdirectory(Documentation)
 
 #------------------------------------------------------------------------------
 # Build the client
@@ -66,33 +73,32 @@ build_paraview_client(paraview
     BUNDLE_ICON   "${CMAKE_CURRENT_SOURCE_DIR}/MacIcon.icns"
     APPLICATION_ICON  "${CMAKE_CURRENT_SOURCE_DIR}/WinIcon.ico"
     GUI_CONFIGURATION_XMLS
-      ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewSources.xml
-      ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewFilters.xml
-      ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewReaders.xml
-      ${CMAKE_CURRENT_SOURCE_DIR}/ParaViewWriters.xml
-      ${module_gui_xmls} # Add any compiled in GUI configuration xmls
-    COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
+      ${application_gui_xmls} # Add any compiled in GUI configuration xmls
     SOURCES ${ParaView_SOURCE_FILES}
     INSTALL_BIN_DIR "${VTK_INSTALL_RUNTIME_DIR}"
     INSTALL_LIB_DIR "${VTK_INSTALL_LIBRARY_DIR}")
 
-# link enabled plugins if not building in shared library mode
-if(NOT BUILD_SHARED_LIBS)
-  target_link_libraries(paraview ${PARAVIEW_PLUGINLIST})
-endif(NOT BUILD_SHARED_LIBS)
+# Link against the documentation module.
+target_link_libraries(paraview vtkParaViewDocumentation) 
 
+# link enabled plugins if not building in shared library mode and
 # add dependecies to linked python modules These are non-empty only when
 # building statically.
-target_link_libraries(paraview ${python_dependencies})
+if(NOT BUILD_SHARED_LIBS)
+  target_link_libraries(paraview
+    ${PARAVIEW_PLUGINLIST}
+    ${python_dependencies})
+endif(NOT BUILD_SHARED_LIBS)
 
-# This ensure that the paraview.qch file is generated.
-add_dependencies(paraview
-  ParaViewOnlineHelp)
 
 if (BUILD_TESTING)
   add_subdirectory(Testing)
 endif (BUILD_TESTING)
 
+#------------------------------------------------------------------------------
+# For Macs, we add install rule to package everything that's built into a single
+# App. Look at the explanation of MACOSX_APP_INSTALL_PREFIX in the top-level
+# CMakeLists.txt file for details.
 if (APPLE)
   # add install rules to generate the App bundle.
   install(CODE "
