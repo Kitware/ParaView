@@ -194,13 +194,15 @@ void pqContourPanel::updateEnableState()
       }
     }
 
+  bool is_input_polydata = false;
   bool is_data_structured = false;
   if (cur_input)
     {
     vtkPVDataInformation* dataInfo = cur_input->getDataInformation();
+    is_input_polydata = dataInfo->DataSetTypeIsA("vtkPolyData");
     is_data_structured = dataInfo->IsDataStructured();
     }
-  this->Implementation->Controls.ComputeScalars->setEnabled(is_data_structured);
+  this->Implementation->Controls.ComputeScalars->setEnabled(!is_input_polydata);
   this->Implementation->Controls.ComputeGradients->setEnabled(is_data_structured);
-  this->Implementation->Controls.ComputeNormals->setEnabled(is_data_structured);
+  this->Implementation->Controls.ComputeNormals->setEnabled(!is_input_polydata);
 }
