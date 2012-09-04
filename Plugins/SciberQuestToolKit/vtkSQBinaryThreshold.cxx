@@ -22,7 +22,7 @@ Copyright 2012 SciberQuest Inc.
 #include <string>
 using std::string;
 
-// #define vtkSQBinaryThresholdDEBUG
+// #define SQTK_DEBUG
 // #define vtkSQBinaryThresholdTIME
 
 #if defined vtkSQBinaryThresholdTIME
@@ -61,7 +61,7 @@ vtkStandardNewMacro(vtkSQBinaryThreshold);
 //-----------------------------------------------------------------------------
 vtkSQBinaryThreshold::vtkSQBinaryThreshold()
 {
-  #if defined vtkSQBinaryThresholdDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBinaryThreshold::vtkSQBinaryThreshold" << endl;
   #endif
 
@@ -78,7 +78,7 @@ vtkSQBinaryThreshold::vtkSQBinaryThreshold()
 //-----------------------------------------------------------------------------
 vtkSQBinaryThreshold::~vtkSQBinaryThreshold()
 {
-  #if defined vtkSQBinaryThresholdDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBinaryThreshold::~vtkSQBinaryThreshold" << endl;
   #endif
 }
@@ -86,7 +86,7 @@ vtkSQBinaryThreshold::~vtkSQBinaryThreshold()
 //-----------------------------------------------------------------------------
 int vtkSQBinaryThreshold::Initialize(vtkPVXMLElement *root)
 {
-  #if defined vtkSQBinaryThresholdDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBinaryThreshold::Initialize" << endl;
   #endif
 
@@ -112,7 +112,7 @@ int vtkSQBinaryThreshold::RequestData(
                 vtkInformationVector **inInfos,
                 vtkInformationVector *outInfos)
 {
-  #if defined vtkSQBinaryThresholdDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBinaryThreshold::RequestData" << endl;
   #endif
   #if defined vtkSQBinaryThresholdTIME

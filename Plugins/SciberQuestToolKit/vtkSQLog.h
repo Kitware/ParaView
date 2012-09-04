@@ -18,7 +18,9 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQLog_h
 #define __vtkSQLog_h
 
-#define vtkSQLogDEBUG
+#ifdef SQTK_DEBUG
+#define vtkSQLogDEBUG 1
+#endif
 
 #include "vtkObject.h"
 
@@ -31,6 +33,12 @@ using std::vector;
 using std::string;
 #include <sstream> // for sstream
 using std::ostringstream;
+
+#if vtkSQLogDEBUG > 0
+#include <iostream> // for cerr
+using std::cerr;
+using std::endl;
+#endif
 //ETX
 
 
@@ -180,7 +188,7 @@ private:
   char *FileName;
   int WriteOnClose;
   vector<double> StartTime;
-  #if defined vtkSQLogDEBUG
+  #if vtkSQLogDEBUG > 0
   vector<string> EventId;
   #endif
 
@@ -203,6 +211,9 @@ vtkSQLog &vtkSQLog::operator<<(const T& s)
   if (this->WorldRank==this->WriterRank)
     {
     this->HeaderBuffer << s;
+    #if vtkSQLogDEBUG > 0
+    cerr << s;
+    #endif
     }
   return *this;
 }
@@ -216,6 +227,9 @@ LogHeaderType &LogHeaderType::operator<<(const T& s)
   if (log->WorldRank==log->WriterRank)
     {
     log->HeaderBuffer << s;
+    #if vtkSQLogDEBUG > 0
+    cerr << s;
+    #endif
     }
 
   return *this;
@@ -228,6 +242,9 @@ LogBodyType &LogBodyType::operator<<(const T& s)
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
 
   *(log->Log) <<  s;
+  #if vtkSQLogDEBUG > 0
+  cerr << s;
+  #endif
 
   return *this;
 }

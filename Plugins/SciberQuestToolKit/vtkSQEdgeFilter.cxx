@@ -31,7 +31,7 @@ using std::string;
 
 #include "Numerics.hxx"
 
-//#define vtkSQEdgeFilterDEBUG
+//#define SQTK_DEBUG
 
 vtkStandardNewMacro(vtkSQEdgeFilter);
 
@@ -44,7 +44,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
   ComputeLaplacian(0),
   Mode(CartesianExtent::DIM_MODE_3D)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::vtkSQEdgeFilter" << endl;
   #endif
 
@@ -56,7 +56,7 @@ vtkSQEdgeFilter::vtkSQEdgeFilter()
 //-----------------------------------------------------------------------------
 vtkSQEdgeFilter::~vtkSQEdgeFilter()
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::~vtkSQEdgeFilter" << endl;
   #endif
 
@@ -68,7 +68,7 @@ int vtkSQEdgeFilter::RequestDataObject(
     vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::RequestDataObject" << endl;
   #endif
 
@@ -97,7 +97,7 @@ int vtkSQEdgeFilter::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
@@ -143,7 +143,7 @@ int vtkSQEdgeFilter::RequestInformation(
   inInfo->Get(vtkDataObject::ORIGIN(),X0);
   outInfo->Set(vtkDataObject::ORIGIN(),X0,3);
 
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT(input)=" << inputDomain << endl
     << "WHOLE_EXTENT(output)=" << outputDomain << endl
@@ -161,7 +161,7 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::RequestUpdateExtent" << endl;
   #endif
 
@@ -212,7 +212,7 @@ int vtkSQEdgeFilter::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(), numPieces);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT=" << wholeExt << endl
     << "UPDATE_EXTENT=" << outputExt << endl
@@ -228,7 +228,7 @@ int vtkSQEdgeFilter::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::RequestData" << endl;
   #endif
 
@@ -311,7 +311,7 @@ int vtkSQEdgeFilter::RequestData(
     outImData->GetDimensions(outputDims);
     int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
-    #ifdef vtkSQEdgeFilterDEBUG
+    #ifdef SQTK_DEBUG
     pCerr()
       << "WHOLE_EXTENT=" << domainExt << endl
       << "UPDATE_EXTENT(input)=" << inputExt << endl
@@ -471,7 +471,7 @@ int vtkSQEdgeFilter::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQEdgeFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQEdgeFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQEdgeFilter::PrintSelf" << endl;
   #endif
 

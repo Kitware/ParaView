@@ -6,7 +6,7 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-/*=========================================================================
+/*=====vtkSQHemisphereSource::=====vtkSQHemisphereSource::===========
 
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkSQHemisphereSource.cxx,v $
@@ -19,7 +19,7 @@ Copyright 2012 SciberQuest Inc.
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*/
+=====vtkSQHemisphereSource::=====vtkSQHemisphereSource::===========*/
 #include "vtkSQHemisphereSource.h"
 
 #include "vtkObjectFactory.h"
@@ -106,8 +106,8 @@ vtkSQHemisphereSource::vtkSQHemisphereSource()
       NorthHemisphereName(0),
       SouthHemisphereName(0)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================vtkSQHemisphereSource" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::vtkSQHemisphereSource" << endl;
   #endif
   this->Radius=1.0;
 
@@ -131,8 +131,8 @@ vtkSQHemisphereSource::vtkSQHemisphereSource()
 //----------------------------------------------------------------------------
 vtkSQHemisphereSource::~vtkSQHemisphereSource()
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================~vtkSQHemisphereSource" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::~vtkSQHemisphereSource" << endl;
   #endif
   this->SetNorthHemisphereName(0);
   this->SetSouthHemisphereName(0);
@@ -141,8 +141,8 @@ vtkSQHemisphereSource::~vtkSQHemisphereSource()
 //-----------------------------------------------------------------------------
 int vtkSQHemisphereSource::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  pCerr() << "===============================vtkSQHemisphereSource::Initialize" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQHemisphereSource::vtkSQHemisphereSource::Initialize" << endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -186,8 +186,8 @@ int vtkSQHemisphereSource::FillInputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================FillInputPortInformation" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::FillInputPortInformation" << endl;
   #endif
   // The input is optional, if used we'll look for some keys that define
   // the sphere's attriibutes coming from upstram (e.g from a reader).
@@ -202,8 +202,8 @@ int vtkSQHemisphereSource::RequestInformation(
       vtkInformationVector** inInfos,
       vtkInformationVector* outInfos)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::RequestInformation" << endl;
   #endif
   // The GDA meta data reader will insert information about
   // the center and radius of the dipole. If its there we'll
@@ -252,8 +252,8 @@ int vtkSQHemisphereSource::RequestData(
       vtkInformationVector ** /*inInfos*/,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::RequestData" << endl;
   this->Print(cerr);
   #endif
 
@@ -317,8 +317,8 @@ int vtkSQHemisphereSource::RequestData(
 //----------------------------------------------------------------------------
 void vtkSQHemisphereSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQHemisphereSourceDEBUG
-  cerr << "===============================PrintSelf" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQHemisphereSource::PrintSelf" << endl;
   #endif
   // this->Superclass::PrintSelf(os,indent);
 

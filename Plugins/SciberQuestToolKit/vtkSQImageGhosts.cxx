@@ -35,7 +35,7 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include <string>
 using std::string;
 
-// #define vtkSQImageGhostsDEBUG
+// #define SQTK_DEBUG
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQImageGhosts);
@@ -50,7 +50,7 @@ vtkSQImageGhosts::vtkSQImageGhosts()
   CopyAllArrays(1),
   LogLevel(0)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::vtkSQImageGhosts" << endl;
   #endif
 
@@ -68,7 +68,7 @@ vtkSQImageGhosts::vtkSQImageGhosts()
 //-----------------------------------------------------------------------------
 vtkSQImageGhosts::~vtkSQImageGhosts()
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::~vtkSQImageGhosts" << endl;
   #endif
 
@@ -140,7 +140,7 @@ void vtkSQImageGhosts::SetCommunicator(MPI_Comm comm)
 //-----------------------------------------------------------------------------
 void vtkSQImageGhosts::AddArrayToCopy(const char *name)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQImageGhosts::ArraysToCopy" << endl
     << "name=" << name << endl;
@@ -155,7 +155,7 @@ void vtkSQImageGhosts::AddArrayToCopy(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQImageGhosts::ClearArraysToCopy()
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::ClearArraysToCopy" << endl;
   #endif
 
@@ -171,7 +171,7 @@ int vtkSQImageGhosts::RequestUpdateExtent(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   ostringstream oss;
   oss <<  "=====vtkSQImageGhosts::RequestUpdateExtent" << endl;
   #endif
@@ -218,7 +218,7 @@ int vtkSQImageGhosts::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 0);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   oss
     << "WHOLE_EXTENT=" << this->ProblemDomain << endl
     << "UPDATE_EXTENT=" << updateExt << endl
@@ -236,7 +236,7 @@ int vtkSQImageGhosts::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
@@ -260,7 +260,7 @@ int vtkSQImageGhosts::RequestInformation(
   outInfo->Get(vtkSDDPipeline::UPDATE_EXTENT(),origExt.GetData());
 
 
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "NGhosts=" << this->NGhosts << endl
     << "Mode=" << this->Mode << endl
@@ -277,7 +277,7 @@ int vtkSQImageGhosts::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::RequestData" << endl;
   #endif
 
@@ -513,7 +513,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
     int nComps = inArray->GetNumberOfComponents();
     void *pIn = inArray->GetVoidPointer(0);
 
-    #ifdef vtkSQImageGhostsDEBUG
+    #ifdef SQTK_DEBUG
     //cerr << "Copying array " << inArray->GetName() << endl;
     #endif
 
@@ -587,7 +587,7 @@ void vtkSQImageGhosts::ExecuteTransactions(
 //-----------------------------------------------------------------------------
 void vtkSQImageGhosts::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQImageGhostsDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageGhosts::PrintSelf" << endl;
   #endif
 

@@ -38,7 +38,7 @@
 using std::map;
 using std::pair;
 
-// #define vtkSQPlaneSourceDEBUG
+// #define SQTK_DEBUG
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQPlaneSource);
@@ -46,8 +46,8 @@ vtkStandardNewMacro(vtkSQPlaneSource);
 //-----------------------------------------------------------------------------
 vtkSQPlaneSource::vtkSQPlaneSource()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::vtkSQPlaneSource" << endl;
   #endif
 
   this->ImmediateMode=1;
@@ -77,8 +77,8 @@ vtkSQPlaneSource::vtkSQPlaneSource()
 //-----------------------------------------------------------------------------
 vtkSQPlaneSource::~vtkSQPlaneSource()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
   #endif
   this->SetDescriptiveName(0);
 }
@@ -132,8 +132,8 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetResolution(const int xR, const int yR)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetResolution" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetResolution" << endl;
   #endif
   // Set the number of x-y subdivisions in the plane.
   if ( xR != this->XResolution || yR != this->YResolution )
@@ -154,8 +154,8 @@ int vtkSQPlaneSource::RequestInformation(
     vtkInformationVector ** /*inInfos*/,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-    cerr << "=====vtkSQPlaneSource::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::RequestInformation" << endl;
   #endif
 
 
@@ -172,8 +172,8 @@ int vtkSQPlaneSource::RequestData(
       vtkInformationVector ** /*inputVector*/,
       vtkInformationVector *outputVector)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::RequestData" << endl;
   #endif
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   int globalLogLevel=log->GetGlobalLevel();
@@ -325,7 +325,7 @@ int vtkSQPlaneSource::RequestData(
 
   source->Delete();
 
-  //output->Print(cerr);
+  //output->Print(pCerr());
 
 
 
@@ -427,8 +427,8 @@ int vtkSQPlaneSource::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetNormal(double N[3])
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetNormal" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetNormal" << endl;
   #endif
 
   // Set the normal to the plane. Will modify the Origin, Point1, and Point2
@@ -500,8 +500,8 @@ void vtkSQPlaneSource::SetNormal(double nx, double ny, double nz)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetCenter(double center[3])
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetCenter" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetCenter" << endl;
   #endif
 
   // Set the center of the plane. Will modify the Origin, Point1, and Point2
@@ -546,9 +546,10 @@ void vtkSQPlaneSource::SetCenter(double x, double y, double z)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::ApplyConstraint()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::ApplyConstraint" << endl;
-  cerr << "Constraint=" << this->Constraint << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::ApplyConstraint "
+    <<  this->Constraint << endl;
   #endif
 
   double p[3]={0.0};
@@ -606,9 +607,10 @@ void vtkSQPlaneSource::ApplyConstraint()
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetConstraint(int type)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetConstraint" << endl;
-  cerr << type << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetConstraint "
+    << type << endl;
   #endif
 
   if (this->Constraint == type )
@@ -624,9 +626,10 @@ void vtkSQPlaneSource::SetConstraint(int type)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetOrigin(double ox, double oy, double oz)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetOrigin" << endl;
-  cerr << ox << " " << oy << " " << oz << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetOrigin "
+    << ox << " " << oy << " " << oz << endl;
   #endif
 
   // modifies the normal and origin
@@ -674,9 +677,10 @@ void vtkSQPlaneSource::SetPoint1(double p[3])
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetPoint1(double x, double y, double z)
 {
-#ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetPoint1" << endl;
-  cerr << x << " " << y << " " << z << endl;
+#ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetPoint1 "
+    << x << " " << y << " " << z << endl;
   #endif
 
   // modifies the normal and origin
@@ -717,9 +721,10 @@ void vtkSQPlaneSource::SetPoint2(double p[3])
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetPoint2(double x, double y, double z)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetPoint2" << endl;
-  cerr << x << " " << y << " " << z << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetPoint2 "
+    << x << " " << y << " " << z << endl;
   #endif
 
   // modifies the normal and origin

@@ -64,7 +64,7 @@ vtkSQLogDestructor::~vtkSQLogDestructor()
 {
   if (this->Log)
     {
-    Log->Delete();
+    this->Log->Delete();
     }
 }
 
@@ -82,6 +82,10 @@ vtkSQLog::vtkSQLog()
     WriteOnClose(0),
     Log(0)
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::vtkSQLog" << endl;
+  #endif
+
   #ifndef SQTK_WITHOUT_MPI
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
@@ -100,6 +104,10 @@ vtkSQLog::vtkSQLog()
 //-----------------------------------------------------------------------------
 vtkSQLog::~vtkSQLog()
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::~vtkSQLog" << endl;
+  #endif
+
   // Alert the user that he left events on the stack,
   // this is usually a sign of trouble.
   if (this->StartTime.size()>0)
@@ -134,6 +142,10 @@ vtkSQLog::~vtkSQLog()
 //-----------------------------------------------------------------------------
 vtkSQLog *vtkSQLog::GetGlobalInstance()
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::GetGlobalInstance" << endl;
+  #endif
+
   if (vtkSQLog::GlobalInstance==0)
     {
     vtkSQLog *log=vtkSQLog::New();
@@ -150,6 +162,10 @@ vtkSQLog *vtkSQLog::GetGlobalInstance()
 //-----------------------------------------------------------------------------
 void vtkSQLog::Clear()
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::Clear" << endl;
+  #endif
+
   this->Log->Clear();
   this->HeaderBuffer.str("");
 }
@@ -157,8 +173,8 @@ void vtkSQLog::Clear()
 //-----------------------------------------------------------------------------
 int vtkSQLog::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQLogDEBUG
-  //pCerr() << "=====vtkSQLog::Initialize" << endl;
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::Initialize" << endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -193,6 +209,10 @@ int vtkSQLog::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQLog::StartEvent(int rank, const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  //pCerr() << "=====vtkSQLog::StartEvent" << endl;
+  #endif
+
   if (this->WorldRank!=rank) return;
   this->StartEvent(event);
 }
@@ -200,6 +220,10 @@ void vtkSQLog::StartEvent(int rank, const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::StartEvent(const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::StartEvent" << endl;
+  #endif
+
   double walls=0.0;
   timeval wallt;
   gettimeofday(&wallt,0x0);
@@ -215,6 +239,10 @@ void vtkSQLog::StartEvent(const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::EndEvent(int rank, const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  //pCerr() << "=====vtkSQLog::EndEvent" << endl;
+  #endif
+
   if (this->WorldRank!=rank) return;
   this->EndEvent(event);
 }
@@ -222,12 +250,16 @@ void vtkSQLog::EndEvent(int rank, const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::EndEvent(const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::EndEvent" << endl;
+  #endif
+
   double walle=0.0;
   timeval wallt;
   gettimeofday(&wallt,0x0);
   walle=(double)wallt.tv_sec+((double)wallt.tv_usec)/1.0E6;
 
-  #if defined(vtkSQLogDEBUG)
+  #if vtkSQLogDEBUG > 0
   if (this->StartTime.size()==0)
     {
     sqErrorMacro(pCerr(),"No event to end! " << event);
@@ -263,6 +295,10 @@ void vtkSQLog::EndEvent(const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::EndEventSynch(int rank, const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::EndEventSynch" << endl;
+  #endif
+
   #ifdef SQTK_WITHOUT_MPI
   (void)rank;
   #else
@@ -275,6 +311,10 @@ void vtkSQLog::EndEventSynch(int rank, const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::EndEventSynch(const char *event)
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::EndEventSynch" << endl;
+  #endif
+
   #ifndef SQTK_WITHOUT_MPI
   MPI_Barrier(MPI_COMM_WORLD);
   #endif
@@ -284,6 +324,10 @@ void vtkSQLog::EndEventSynch(const char *event)
 //-----------------------------------------------------------------------------
 void vtkSQLog::Update()
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::Update" << endl;
+  #endif
+
   this->Log->Gather(
       this->WorldRank,
       this->WorldSize,
@@ -293,8 +337,14 @@ void vtkSQLog::Update()
 //-----------------------------------------------------------------------------
 int vtkSQLog::Write()
 {
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::Write" << endl;
+  #endif
+
   if (this->WorldRank==this->WriterRank)
     {
+    cerr << "Wrote " << this->FileName << endl;
+
     ostringstream oss;
     *this->Log >> oss;
     ofstream f(this->FileName, ios_base::out|ios_base::app);

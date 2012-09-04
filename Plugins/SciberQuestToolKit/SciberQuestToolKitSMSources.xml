@@ -24,7 +24,7 @@ Copyright 2012 SciberQuest Inc.
          name="GlobalLevel"
          command="SetGlobalLevel"
          number_of_elements="1"
-         default_values="0"
+         default_values="1"
          >
         <IntRangeDomain name="range" min="0" />
         <Documentation>
@@ -37,6 +37,7 @@ Copyright 2012 SciberQuest Inc.
           animateable="0"
           command="SetFileName"
           number_of_elements="1"
+          default_values="SQTK-Log.log"
           >
       <FileListDomain name="files"/>
       <Documentation>

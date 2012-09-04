@@ -37,9 +37,9 @@ using std::pair;
 
 #include "Numerics.hxx"
 
-// #define vtkSQVortexFilterDEBUG
+// #define SQTK_DEBUG
 #ifdef WIN32
-#undef vtkSQVortexFilterDEBUG
+#undef SQTK_DEBUG
 #endif
 
 
@@ -65,7 +65,7 @@ vtkSQVortexFilter::vtkSQVortexFilter()
   LogLevel(0)
 
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::vtkSQVortexFilter" << endl;
   #endif
 
@@ -76,7 +76,7 @@ vtkSQVortexFilter::vtkSQVortexFilter()
 //-----------------------------------------------------------------------------
 vtkSQVortexFilter::~vtkSQVortexFilter()
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::~vtkSQVortexFilter" << endl;
   #endif
 }
@@ -84,7 +84,7 @@ vtkSQVortexFilter::~vtkSQVortexFilter()
 //-----------------------------------------------------------------------------
 int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::Initialize" << endl;
   #endif
 
@@ -182,7 +182,7 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQVortexFilter::AddInputArray(const char *name)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQVortexFilter::AddInputArray"
     << "name=" << name << endl;
@@ -197,7 +197,7 @@ void vtkSQVortexFilter::AddInputArray(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQVortexFilter::ClearInputArrays()
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQVortexFilter::ClearInputArrays" << endl;
   #endif
@@ -212,7 +212,7 @@ void vtkSQVortexFilter::ClearInputArrays()
 //-----------------------------------------------------------------------------
 void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQVortexFilter::ArraysToCopy" << endl
     << "name=" << name << endl;
@@ -227,7 +227,7 @@ void vtkSQVortexFilter::AddArrayToCopy(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQVortexFilter::ClearArraysToCopy()
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::ClearArraysToCopy" << endl;
   #endif
 
@@ -244,7 +244,7 @@ int vtkSQVortexFilter::RequestDataObject(
     vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestDataObject" << endl;
   #endif
 
@@ -274,7 +274,7 @@ int vtkSQVortexFilter::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestInformation" << endl;
   #endif
 
@@ -321,7 +321,7 @@ int vtkSQVortexFilter::RequestInformation(
   inInfo->Get(vtkDataObject::ORIGIN(),X0);
   outInfo->Set(vtkDataObject::ORIGIN(),X0,3);
 
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT(input)=" << inputDomain << endl
     << "WHOLE_EXTENT(output)=" << outputDomain << endl
@@ -339,7 +339,7 @@ int vtkSQVortexFilter::RequestUpdateExtent(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestUpdateExtent" << endl;
   #endif
 
@@ -390,7 +390,7 @@ int vtkSQVortexFilter::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(), numPieces);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT=" << wholeExt << endl
     << "UPDATE_EXTENT=" << outputExt << endl
@@ -406,7 +406,7 @@ int vtkSQVortexFilter::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::RequestData" << endl;
   #endif
 
@@ -498,7 +498,7 @@ int vtkSQVortexFilter::RequestData(
     outImData->GetDimensions(outputDims);
     int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
-    #ifdef vtkSQVortexFilterDEBUG
+    #ifdef SQTK_DEBUG
     pCerr()
       << "WHOLE_EXTENT=" << domainExt << endl
       << "UPDATE_EXTENT(input)=" << inputExt << endl
@@ -1311,7 +1311,7 @@ int vtkSQVortexFilter::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQVortexFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQVortexFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexFilter::PrintSelf" << endl;
   #endif
 

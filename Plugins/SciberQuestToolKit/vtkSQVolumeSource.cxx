@@ -49,7 +49,7 @@ using std::pair;
 typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
 typedef pair<vtkIdType,vtkIdType> MapElement;
 
-// #define vtkSQVolumeSourceDEBUG
+// #define SQTK_DEBUG
 // #define vtkSQVolumeSourceTIME
 
 vtkStandardNewMacro(vtkSQVolumeSource);
@@ -57,7 +57,7 @@ vtkStandardNewMacro(vtkSQVolumeSource);
 //----------------------------------------------------------------------------
 vtkSQVolumeSource::vtkSQVolumeSource()
 {
-  #ifdef vtkSQVolumeSourceDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQVolumeSource::vtkSQVolumeSource" << endl;
   #endif
 
@@ -90,7 +90,7 @@ vtkSQVolumeSource::vtkSQVolumeSource()
 //----------------------------------------------------------------------------
 vtkSQVolumeSource::~vtkSQVolumeSource()
 {
-  #ifdef vtkSQVolumeSourceDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
   #endif
 }
@@ -150,7 +150,7 @@ int vtkSQVolumeSource::RequestInformation(
     vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQVolumeSource::RequestInformation" << endl;
   #endif
 
@@ -172,7 +172,7 @@ int vtkSQVolumeSource::RequestData(
     vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQVolumeSource::RequestData" << endl;
   #endif
 
@@ -350,7 +350,7 @@ int vtkSQVolumeSource::RequestData(
 //----------------------------------------------------------------------------
 void vtkSQVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQVolumeSource::PrintSelf" << endl;
   #endif
 

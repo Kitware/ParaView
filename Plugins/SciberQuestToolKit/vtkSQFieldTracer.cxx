@@ -76,7 +76,11 @@ Copyright 2012 SciberQuest Inc.
 using std::min;
 using std::max;
 
+#ifdef SQTK_DEBUG
+#define vtkSQFieldTracerDEBUG 2
+#else
 #define vtkSQFieldTracerDEBUG 0
+#endif
 
 // TODO
 // logging currently chews through a tremendous amount of ram
@@ -1133,21 +1137,17 @@ int vtkSQFieldTracer::IntegrateBlock(
   log->EndEvent("vtkSQFieldTracer::InsertCells");
   #endif
 
-  // double prog=0.0;
-  // double progInc=1.0/(double)nLines;
-  // double progIntv=1.0/min((double)nLines,10.0);
-  // double progNext=0.0;
-
   TerminationCondition *tcon=traceData->GetTerminationCondition();
 
   for (vtkIdType i=0; i<nLines; ++i) //, prog+=progInc)
     {
-    // report progress to PV
-    // if (!this->UseDynamicScheduler && prog>=progNext)
-    //   {
-    //   progNext+=progIntv;
-    //   this->UpdateProgress(prog);
-    //   }
+    // progress report for static load balance. the report
+    // for dunamic load balance is done once for each block.
+    if (!this->UseDynamicScheduler && !(i%10))
+      {
+      double prog=(double)i/(double)nLines;
+      this->UpdateProgress(prog);
+      }
 
     // trace a stream line
     FieldLine *line=traceData->GetFieldLine(i);

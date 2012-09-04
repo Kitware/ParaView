@@ -23,8 +23,8 @@ vtkStandardNewMacro(vtkSQFieldTopologySplit);
 //-----------------------------------------------------------------------------
 vtkSQFieldTopologySplit::vtkSQFieldTopologySplit()
 {
-  #ifdef vtkSQFieldTopologySplitDEBUG
-  cerr << "===============================vtkSQFieldTopologySplit::vtkSQFieldTopologySplit" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQFieldTopologySplit::vtkSQFieldTopologySplit" << endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -34,8 +34,8 @@ vtkSQFieldTopologySplit::vtkSQFieldTopologySplit()
 //-----------------------------------------------------------------------------
 vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit()
 {
-  #ifdef vtkSQFieldTopologySplitDEBUG
-  cerr << "===============================vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQFieldTopologySplit::~vtkSQFieldTopologySplit" << endl;
   #endif
 }
 
@@ -44,8 +44,8 @@ int vtkSQFieldTopologySplit::FillInputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  #ifdef vtkSQFieldTopologySplitDEBUG
-  cerr << "===============================vtkSQFieldTopologySplit::FillInputPortInformation" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQFieldTopologySplit::FillInputPortInformation" << endl;
   #endif
 
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(),"vtkDataSet");
@@ -58,8 +58,8 @@ int vtkSQFieldTopologySplit::FillOutputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  #if vtkSQFieldTopologySplitDEBUG>1
-  pCerr() << "===============================vtkSQFieldTopologySplit::FillOutputPortInformation" << endl;
+  #if SQTK_DEBUG>1
+  pCerr() << "=====vtkSQFieldTopologySplit::FillOutputPortInformation" << endl;
   #endif
 
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkUnstructuredGrid");
@@ -72,8 +72,8 @@ int vtkSQFieldTopologySplit::RequestInformation(
     vtkInformationVector ** /*inInfos*/,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQFieldTopologySplitDEBUG
-    cerr << "===============================vtkSQFieldTopologySplit::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+    cerr << "=====vtkSQFieldTopologySplit::RequestInformation" << endl;
   #endif
 
 
@@ -94,8 +94,8 @@ int vtkSQFieldTopologySplit::RequestData(
       vtkInformationVector **inputVector,
       vtkInformationVector *outputVector)
 {
-  #ifdef vtkSQFieldTopologySplitDEBUG
-  cerr << "===============================vtkSQFieldTopologySplit::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQFieldTopologySplit::RequestData" << endl;
   #endif
 
   vtkInformation *inInfo=inputVector[0]->GetInformationObject(0);

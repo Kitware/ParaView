@@ -49,9 +49,8 @@ typedef pair<set<unsigned long long>::iterator,bool> SetInsert;
 #include <mpi.h>
 #endif
 
-// #define vtkSQRandomCellsDEBUG
+// #define SQTK_DEBUG
 
-vtkStandardNewMacro(vtkSQRandomCells);
 
 //*****************************************************************************
 void dumpBlocks(IdBlock *bins, int n)
@@ -114,9 +113,12 @@ int findProcByCellId(unsigned long long cellId, IdBlock *bins, int s, int e)
 }
 
 //----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkSQRandomCells);
+
+//----------------------------------------------------------------------------
 vtkSQRandomCells::vtkSQRandomCells()
 {
-  #ifdef vtkSQRandomCellsDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQRandomCells::vtkSQRandomCells" << endl;
   #endif
 
@@ -130,7 +132,7 @@ vtkSQRandomCells::vtkSQRandomCells()
 //----------------------------------------------------------------------------
 vtkSQRandomCells::~vtkSQRandomCells()
 {
-  #ifdef vtkSQRandomCellsDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQRandomCells::~vtkSQRandomCells" << endl;
   #endif
 }
@@ -141,7 +143,7 @@ int vtkSQRandomCells::RequestInformation(
     vtkInformationVector ** /*inInfos*/,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQRandomCellsDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQRandomCells::RequestInformation" << endl;
   #endif
 
@@ -160,7 +162,7 @@ int vtkSQRandomCells::RequestData(
     vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQRandomCellsDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQRandomCells::RequestData" << endl;
   #endif
 
@@ -472,7 +474,7 @@ int vtkSQRandomCells::RequestData(
 //----------------------------------------------------------------------------
 void vtkSQRandomCells::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQRandomCellsDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "=====vtkSQRandomCells::PrintSelf" << endl;
   #endif
 

@@ -50,10 +50,10 @@ using std::max;
 #include <sstream>
 using std::ostringstream;
 
-// #define vtkSQBOVReaderDEBUG
+// #define SQTK_DEBUG
 #ifdef WIN32
   // only usefull in terminals
-  #undef vtkSQBOVReaderDEBUG
+  #undef SQTK_DEBUG
 #endif
 
 //-----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ vtkStandardNewMacro(vtkSQBOVReaderBase);
 //-----------------------------------------------------------------------------
 vtkSQBOVReaderBase::vtkSQBOVReaderBase()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::vtkSQBOVReaderBase" << endl;
   #endif
 
@@ -120,7 +120,7 @@ vtkSQBOVReaderBase::vtkSQBOVReaderBase()
 //-----------------------------------------------------------------------------
 vtkSQBOVReaderBase::~vtkSQBOVReaderBase()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::~vtkSQBOVReaderBase" << endl;
   #endif
 
@@ -162,7 +162,7 @@ int vtkSQBOVReaderBase::Initialize(
       const char *fileName,
       vector<string> &arrays)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::Initialize" << endl;
   #endif
 
@@ -274,7 +274,7 @@ int vtkSQBOVReaderBase::Initialize(
 //-----------------------------------------------------------------------------
 int vtkSQBOVReaderBase::CanReadFile(const char *file)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::CanReadFile" << endl;
   pCerr() << "Check " << safeio(file) << "." << endl;
   #endif
@@ -298,7 +298,7 @@ int vtkSQBOVReaderBase::CanReadFile(const char *file)
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::SetFileName(const char* _arg)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::SetFileName" << endl;
   pCerr() << "Set FileName " << safeio(_arg) << "." << endl;
   #endif
@@ -370,7 +370,7 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
     this->KSubsetRange[0]=this->Subset[4]=subset[4];
     this->KSubsetRange[1]=this->Subset[5]=subset[5];
 
-    #if defined vtkSQBOVReaderDEBUG
+    #if defined SQTK_DEBUG
     pCerr()
       << "vtkSQBOVReaderBase "
       << this->WorldRank
@@ -391,7 +391,7 @@ bool vtkSQBOVReaderBase::IsOpen()
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::SetSubset(const int *s)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::SetSubset*" << endl;
   #endif
   this->SetSubset(s[0],s[1],s[2],s[3],s[4],s[5]);
@@ -400,7 +400,7 @@ void vtkSQBOVReaderBase::SetSubset(const int *s)
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::SetSubset(int ilo,int ihi, int jlo, int jhi, int klo, int khi)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::SetSubset" << endl;
   #endif
   // Avoid unecessary pipeline execution.
@@ -426,7 +426,7 @@ void vtkSQBOVReaderBase::SetSubset(int ilo,int ihi, int jlo, int jhi, int klo, i
   // Mark object dirty.
   this->Modified();
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "SetSubset(" << subset << ")" << endl;
   #endif
 }
@@ -485,7 +485,7 @@ void vtkSQBOVReaderBase::GetTimeSteps(double *times)
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::SetPointArrayStatus(const char *name, int status)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::SetPointArrayStatus" << endl;
   pCerr() << safeio(name) << " " << status << endl;
   #endif
@@ -503,7 +503,7 @@ void vtkSQBOVReaderBase::SetPointArrayStatus(const char *name, int status)
 //-----------------------------------------------------------------------------
 int vtkSQBOVReaderBase::GetPointArrayStatus(const char *name)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::GetPointArrayStatus" << endl;
   #endif
   return this->Reader->GetMetaData()->IsArrayActive(name);
@@ -512,7 +512,7 @@ int vtkSQBOVReaderBase::GetPointArrayStatus(const char *name)
 //-----------------------------------------------------------------------------
 int vtkSQBOVReaderBase::GetNumberOfPointArrays()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::GetNumberOfPointArrays" << endl;
   #endif
   return (int)this->Reader->GetMetaData()->GetNumberOfArrays();
@@ -521,7 +521,7 @@ int vtkSQBOVReaderBase::GetNumberOfPointArrays()
 //-----------------------------------------------------------------------------
 const char* vtkSQBOVReaderBase::GetPointArrayName(int idx)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::GetArrayName" << endl;
   #endif
   return this->Reader->GetMetaData()->GetArrayName(idx);
@@ -530,7 +530,7 @@ const char* vtkSQBOVReaderBase::GetPointArrayName(int idx)
 //-----------------------------------------------------------------------------
 void vtkSQBOVReaderBase::ClearPointArrayStatus()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::ClearPointArrayStatus" << endl;
   #endif
 
@@ -548,7 +548,7 @@ int vtkSQBOVReaderBase::RequestDataObject(
       vtkInformationVector** /*inInfos*/,
       vtkInformationVector* outInfos)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReaderBase::RequestDataObject" << endl;
   #endif
 
@@ -562,7 +562,7 @@ int vtkSQBOVReaderBase::RequestDataObject(
 
   dataset->Delete();
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "datasetType=" << info->Get(vtkDataObject::DATA_TYPE_NAME()) << endl;
   pCerr() << "dataset=" << info->Get(vtkDataObject::DATA_OBJECT()) << endl;
   pCerr() << "info="; info->Print(cerr);
@@ -577,7 +577,7 @@ int vtkSQBOVReaderBase::RequestInformation(
   vtkInformationVector **inInfos,
   vtkInformationVector* outInfos)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::RequestInformationImage" << endl;
   #endif
 
@@ -599,7 +599,7 @@ int vtkSQBOVReaderBase::RequestInformation(
     times[i]=(double)steps[i]; // use the index rather than the actual.
     }
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << times << endl;
   pCerr() << "Total: " << nSteps << endl;
   #endif
@@ -749,7 +749,7 @@ int vtkSQBOVReaderBase::GetTimeStepId(
     inInfo->Set(vtkDataObject::DATA_TIME_STEP(),step);
     outInfo->Set(vtkDataObject::DATA_TIME_STEP(),step);
 
-    #if defined vtkSQBOVReaderDEBUG
+    #if defined SQTK_DEBUG
     pCerr() << "Requested time " << step << " using " << stepId << "." << endl;
     #endif
     }

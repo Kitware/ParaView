@@ -158,7 +158,7 @@ vtkSQFTLE::vtkSQFTLE()
   PassInput(0),
   LogLevel(0)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::vtkSQFTLE" << endl;
   #endif
 
@@ -169,7 +169,7 @@ vtkSQFTLE::vtkSQFTLE()
 //-----------------------------------------------------------------------------
 int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::Initialize" << endl;
   #endif
 
@@ -211,7 +211,7 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQFTLE::AddInputArray(const char *name)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQFTLE::AddInputArray"
     << "name=" << name << endl;
@@ -226,7 +226,7 @@ void vtkSQFTLE::AddInputArray(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQFTLE::ClearInputArrays()
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQFTLE::ClearInputArrays" << endl;
   #endif
@@ -244,7 +244,7 @@ int vtkSQFTLE::RequestData(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::RequestData" << endl;
   #endif
 

@@ -51,10 +51,10 @@ using std::max;
 #include <sstream>
 using std::ostringstream;
 
-// #define vtkSQBOVReaderDEBUG
+// #define SQTK_DEBUG
 
 #ifdef WIN32
-  #undef vtkSQBOVReaderDEBUG
+  #undef SQTK_DEBUG
 #endif
 
 //-----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ vtkStandardNewMacro(vtkSQBOVReader);
 //-----------------------------------------------------------------------------
 vtkSQBOVReader::vtkSQBOVReader()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::vtkSQBOVReader" << endl;
   #endif
 
@@ -75,7 +75,7 @@ vtkSQBOVReader::vtkSQBOVReader()
 //-----------------------------------------------------------------------------
 vtkSQBOVReader::~vtkSQBOVReader()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::~vtkSQBOVReader" << endl;
   #endif
 
@@ -85,7 +85,7 @@ vtkSQBOVReader::~vtkSQBOVReader()
 //-----------------------------------------------------------------------------
 void vtkSQBOVReader::Clear()
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::Clear" << endl;
   #endif
 
@@ -98,7 +98,7 @@ int vtkSQBOVReader::Initialize(
       const char *fileName,
       vector<string> &arrays)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBOVReader::Initialize" << endl;
   #endif
 
@@ -124,7 +124,7 @@ int vtkSQBOVReader::RequestInformation(
   vtkInformationVector **inInfos,
   vtkInformationVector* outInfos)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   ostringstream oss;
   oss << "=====vtkSQBOVReader::RequestInformation" << endl;
   #endif
@@ -152,7 +152,7 @@ int vtkSQBOVReader::RequestInformation(
   //     vtkExecutive::KEYS_TO_COPY(),
   //     vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   oss << "WHOLE_EXTENT=" << Tuple<int>(wholeExtent,6) << endl;
   #endif
 
@@ -168,7 +168,7 @@ int vtkSQBOVReader::RequestInformation(
     info->Set(vtkDataObject::SPACING(),dX,3);
     // req->Append(vtkExecutive::KEYS_TO_COPY(),vtkDataObject::SPACING());
 
-    #if defined vtkSQBOVReaderDEBUG
+    #if defined SQTK_DEBUG
     oss
       << "ORIGIN=" << Tuple<double>(X0,3) << endl
       << "SPACING=" << Tuple<double>(dX,3) << endl;
@@ -177,7 +177,7 @@ int vtkSQBOVReader::RequestInformation(
 
 
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << oss.str() << endl;
   #endif
 
@@ -190,7 +190,7 @@ int vtkSQBOVReader::RequestData(
         vtkInformationVector ** /*input*/,
         vtkInformationVector *outInfos)
 {
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   ostringstream oss;
   oss << "=====vtkSQBOVReader::RequestData" << endl;
   #endif
@@ -221,7 +221,7 @@ int vtkSQBOVReader::RequestData(
   BOVMetaData *md=this->Reader->GetMetaData();
   CartesianExtent subset=md->GetSubset();
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   oss
     << "WHOLE_EXTENT=" << subset
     << " size=" << subset.Size()*sizeof(float)
@@ -250,7 +250,7 @@ int vtkSQBOVReader::RequestData(
   // Set the region to be read.
   md->SetDecomp(decomp);
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   oss << "UPDATE_EXTENT=" << decomp << endl;
   #endif
 
@@ -375,7 +375,7 @@ int vtkSQBOVReader::RequestData(
   // into the pipeline.
   md->PushPipelineInformation(req, info);
 
-  #if defined vtkSQBOVReaderDEBUG
+  #if defined SQTK_DEBUG
   pCerr() << oss.str() << endl;
   //this->Reader->PrintSelf(pCerr());
   //output->Print(pCerr());

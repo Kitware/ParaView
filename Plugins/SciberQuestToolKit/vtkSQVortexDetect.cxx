@@ -404,7 +404,7 @@ vtkSQVortexDetect::vtkSQVortexDetect()
   ComputeFTLE(0),
   ComputeEigenvalueDiagnostic(0)
 {
-  #ifdef vtkSQVortexDetectDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexDetect::vtkSQVortexDetect" << endl;
   #endif
 
@@ -423,7 +423,7 @@ vtkSQVortexDetect::vtkSQVortexDetect()
 //-----------------------------------------------------------------------------
 int vtkSQVortexDetect::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQVortexDetectDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexDetect::Initialize" << endl;
   #endif
 
@@ -438,7 +438,7 @@ int vtkSQVortexDetect::RequestData(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVortexDetectDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQVortexDetect::RequestData" << endl;
   #endif
 

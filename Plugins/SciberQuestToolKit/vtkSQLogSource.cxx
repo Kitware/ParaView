@@ -16,6 +16,9 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQLog.h"
 #include "Tuple.hxx"
 #include "SQMacros.h"
+#include "postream.h"
+
+// #define SQTK_DEBUG
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQLogSource);
@@ -26,8 +29,8 @@ vtkSQLogSource::vtkSQLogSource()
       GlobalLevel(0),
       FileName(NULL)
 {
-  #ifdef vtkSQLogSourceDEBUG
-  cerr << "=====vtkSQLogSource::vtkSQLogSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::vtkSQLogSource" << endl;
   #endif
 
   this->SetNumberOfInputPorts(0);
@@ -37,8 +40,8 @@ vtkSQLogSource::vtkSQLogSource()
 //----------------------------------------------------------------------------
 vtkSQLogSource::~vtkSQLogSource()
 {
-  #ifdef vtkSQLogSourceDEBUG
-  cerr << "=====vtkSQLogSource::~vtkSQLogSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::~vtkSQLogSource" << endl;
   #endif
 
   if (this->GlobalLevel && this->FileName)
@@ -57,7 +60,7 @@ vtkSQLogSource::~vtkSQLogSource()
 //-----------------------------------------------------------------------------
 int vtkSQLogSource::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQLogSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQLogSource::Initialize" << endl;
   #endif
 
@@ -67,11 +70,13 @@ int vtkSQLogSource::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQLogSource::SetGlobalLevel(int level)
 {
-  #ifdef vtkSQLogSourceDEBUG
-  pCerr() << "=====vtkSQLogSource::Initialize" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::SetGlobalLevel" << endl;
   #endif
 
   if (this->GlobalLevel==level) return;
+
+  this->GlobalLevel=level;
 
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   log->SetGlobalLevel(level);
@@ -83,8 +88,8 @@ int vtkSQLogSource::RequestInformation(
       vtkInformationVector** inInfos,
       vtkInformationVector* outInfos)
 {
-  #ifdef vtkSQLogSourceDEBUG
-  cerr << "=====vtkSQLogSource::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::RequestInformation" << endl;
   #endif
 
   return 1;
@@ -96,9 +101,9 @@ int vtkSQLogSource::RequestData(
       vtkInformationVector ** /*inInfos*/,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQLogSourceDEBUG
-  cerr << "=====vtkSQLogSource::RequestData" << endl;
-  this->Print(cerr);
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::RequestData" << endl;
+  //this->Print(cerr);
   #endif
 
   return 1;
@@ -107,8 +112,15 @@ int vtkSQLogSource::RequestData(
 //----------------------------------------------------------------------------
 void vtkSQLogSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQLogSourceDEBUG
-  cerr << "=====vtkSQLogSource::PrintSelf" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQLogSource::PrintSelf" << endl;
   #endif
+
+  const char *fileName = (this->FileName==NULL?"NULL":this->FileName);
+  os
+    << "GlobalLevel=" << this->GlobalLevel << endl
+    << "FileName=" << fileName << endl
+    << endl;
+
   // this->Superclass::PrintSelf(os,indent);
 }

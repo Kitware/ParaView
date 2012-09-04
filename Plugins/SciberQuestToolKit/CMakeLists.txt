@@ -58,7 +58,12 @@ if (BUILD_TESTING)
   subdirs(Testing)
 endif()
 
-#--------------------------------------------------
+set(SQTK_DEBUG OFF CACHE BOOL "Enable debug output to std err.")
+mark_as_advanced(SQTK_DEBUG)
+if (SQTK_DEBUG)
+  add_definitions(-DSQTK_DEBUG)
+endif()
+
 include(EigenConfig.cmake)
 
 if (SQTK_CUDA)
@@ -69,7 +74,7 @@ include(GeneratePythonBindings.cmake)
 include(GetDate.cmake)
 
 # identify the build
-set(SQTK_RELEASE "20120726")
+set(SQTK_RELEASE "20120904")
 set(SQTK_BUILD_DATE)
 GetDate(SQTK_BUILD_DATE)
 set (SQTK_VERSION "SQTK-${SQTK_RELEASE} ${CMAKE_SYSTEM} ${CMAKE_CXX_COMPILER} ${SQTK_BUILD_DATE}")
