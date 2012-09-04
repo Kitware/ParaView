@@ -78,8 +78,10 @@ public:
   // Set number of slices for a given cutter
   void SetNumberOfSlice(int cutIndex, int size);
 
+  // Override all GetInternalOutputPort methods
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn);
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port);
+  virtual vtkAlgorithmOutput* GetInternalOutputPort();
 
   // Description:
   // Access the internal filter that is used to slice the input dataset

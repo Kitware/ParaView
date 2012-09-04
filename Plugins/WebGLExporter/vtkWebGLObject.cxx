@@ -30,7 +30,7 @@ vtkWebGLObject::vtkWebGLObject()
 {
   this->iswireframeMode = false;
   this->hasChanged = false;
-  this->type = wTRIANGLES;
+  this->webGlType = wTRIANGLES;
   this->hasTransparency = false;
   this->iswidget = false;
   this->interactAtServer = false;
@@ -52,7 +52,7 @@ void vtkWebGLObject::SetId(std::string i)
 
 void vtkWebGLObject::SetType(WebGLObjectTypes t)
   {
-  this->type = t;
+  this->webGlType = t;
   }
 
 void vtkWebGLObject::SetTransformationMatrix(vtkMatrix4x4* m)

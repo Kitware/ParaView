@@ -54,7 +54,7 @@ public:
 
 vtkWebGLPolyData::vtkWebGLPolyData()
   {
-  this->type = wTRIANGLES;
+  this->webGlType = wTRIANGLES;
   this->iswidget = false;
   this->Internal = new vtkInternal();
   }
@@ -73,7 +73,7 @@ vtkWebGLPolyData::~vtkWebGLPolyData()
 
 void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _index, int _numberOfIndexes, float* _normals, unsigned char* _colors, float* _tcoords, int maxSize)
   {
-  this->type = wTRIANGLES;
+  this->webGlType = wTRIANGLES;
 
   vtkWebGLDataSet* obj;
   while(this->Internal->Parts.size() != 0)
@@ -177,7 +177,7 @@ void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _in
 
 void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index, int _numberOfIndex, unsigned char *_colors, int maxSize)
   {
-  this->type = wLINES;
+  this->webGlType = wLINES;
 
   vtkWebGLDataSet* obj;
   while(this->Internal->Parts.size() != 0)
@@ -277,9 +277,9 @@ void vtkWebGLPolyData::GenerateBinaryData()
     }
   if(this->Internal->Parts.size() != 0)
     {
-    std::string MD5 = md5((char*)ss.str().c_str(), ss.str().size());
-    this->hasChanged = this->MD5.compare(MD5) != 0;
-    this->MD5 = MD5;
+    std::string localMD5 = md5((char*)ss.str().c_str(), ss.str().size());
+    this->hasChanged = this->MD5.compare(localMD5) != 0;
+    this->MD5 = localMD5;
     }
   else cout << "Warning: GenerateBinaryData() @ vtkWebGLObject: This isn\'t supposed to happen.";
   }
@@ -366,7 +366,7 @@ void vtkWebGLPolyData::GetLinesFromPolygon(vtkMapper *mapper, vtkActor *actor, i
       index[curr*2 + j*2 + 1] = pos;
       if(j==np-1) index[curr*2 + j*2 + 1] = b;
 
-      vtkIdType id = cell->GetPointIds()->GetId(j);
+      vtkIdType pointId = cell->GetPointIds()->GetId(j);
       if (numberOfComponents == 0)
         {
         actor->GetProperty()->GetColor(rgb);
@@ -376,16 +376,16 @@ void vtkWebGLPolyData::GetLinesFromPolygon(vtkMapper *mapper, vtkActor *actor, i
         switch(mode)
           {
         case vtkScalarsToColors::MAGNITUDE:
-            mag = 0; for (int w=0; w<numberOfComponents; w++) mag += (double)array->GetComponent(id, w)*(double)array->GetComponent(id, w);
+            mag = 0; for (int w=0; w<numberOfComponents; w++) mag += (double)array->GetComponent(pointId, w)*(double)array->GetComponent(pointId, w);
             mag = sqrt(mag);
             table->GetColor(mag, &rgb[0]);
             break;
           case vtkScalarsToColors::COMPONENT:
-            mag = array->GetComponent(id, colorComponent);
+            mag = array->GetComponent(pointId, colorComponent);
             table->GetColor(mag, &rgb[0]);
             break;
           case vtkScalarsToColors::RGBCOLORS:
-            array->GetTuple(id, &rgb[0]);
+            array->GetTuple(pointId, &rgb[0]);
             break;
           }
         }
@@ -430,7 +430,7 @@ void vtkWebGLPolyData::GetLines(vtkTriangleFilter* polydata, vtkActor* actor, in
 
 void vtkWebGLPolyData::SetPoints(float *points, int numberOfPoints, unsigned char *colors, int maxSize)
   {
-  this->type = wPOINTS;
+  this->webGlType = wPOINTS;
 
   // Delete Old Objects
   vtkWebGLDataSet* obj;
