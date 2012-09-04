@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>625</width>
-    <height>627</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
    <item>
     <widget class="QTabWidget" name="ColorTabs">
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="ScalePage">
       <attribute name="title">
@@ -447,19 +447,36 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QTableWidget" name="AnnotationTable">
-         <property name="dragDropOverwriteMode">
-          <bool>true</bool>
-         </property>
+        <widget class="QTreeWidget" name="AnnotationTree">
          <property name="dragDropMode">
           <enum>QAbstractItemView::InternalMove</enum>
          </property>
+         <property name="defaultDropAction">
+          <enum>Qt::MoveAction</enum>
+         </property>
          <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights">
           <bool>true</bool>
          </property>
          <property name="sortingEnabled">
           <bool>true</bool>
          </property>
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>Color</string>
+          </property>
+         </column>
          <column>
           <property name="text">
            <string>Value</string>
@@ -468,11 +485,6 @@
          <column>
           <property name="text">
            <string>Annotation</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Color</string>
           </property>
          </column>
         </widget>
@@ -1121,34 +1133,11 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="ModelessButtonPanel">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QCheckBox" name="SwitchToAdvanced">
+      <widget class="QPushButton" name="MakeDefaultButton">
        <property name="text">
-        <string>Advanced</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>251</width>
-         <height>27</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="PresetButton">
-       <property name="whatsThis">
-        <string>Click this button to change the color map to a preset.</string>
-       </property>
-       <property name="text">
-        <string>Choose &amp;Preset</string>
+        <string>Make Default</string>
        </property>
       </widget>
      </item>
@@ -1176,16 +1165,43 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonApply">
+      <widget class="QPushButton" name="PresetButton">
+       <property name="whatsThis">
+        <string>Click this button to change the color map to a preset.</string>
+       </property>
        <property name="text">
-        <string>Apply</string>
+        <string>Choose &amp;Preset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="ModelessButtonPanel">
+     <item>
+      <widget class="QCheckBox" name="SwitchToAdvanced">
+       <property name="text">
+        <string>Advanced</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="MakeDefaultButton">
+      <spacer>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>251</width>
+         <height>27</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonApply">
        <property name="text">
-        <string>Make Default</string>
+        <string>Apply</string>
        </property>
       </widget>
      </item>
@@ -1242,9 +1258,7 @@
   <tabstop>SimpleMax</tabstop>
   <tabstop>SwitchToAdvanced</tabstop>
   <tabstop>pushButtonApply</tabstop>
-  <tabstop>MakeDefaultButton</tabstop>
   <tabstop>CloseButton</tabstop>
-  <tabstop>AnnotationTable</tabstop>
   <tabstop>RemoveAnnotation</tabstop>
   <tabstop>ResetAnnotations</tabstop>
   <tabstop>AddActiveValues</tabstop>

@@ -98,6 +98,9 @@ protected:
   vtkAbstractArray* getActiveUniqueValues() { return this->ActiveUniqueValues; }
   virtual void setActiveUniqueValues( vtkAbstractArray* );
 
+  /// A helper to capture user-directed reorderings (via drag and drop) of items in the annotation list.
+  virtual bool eventFilter( QObject* obj, QEvent* event );
+
 private slots:
   void updateColors();
   void updateOpacity();
