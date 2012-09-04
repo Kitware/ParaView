@@ -14,7 +14,6 @@
 =========================================================================*/
 
 #include "vtkAMRFileSeriesReader.h"
-#include "vtkAMRBaseReader.h"
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -60,7 +59,7 @@ int vtkAMRFileSeriesReader::RequestUpdateTimeDependentInformation (vtkInformatio
     {
     return 1;
     }
-  double upTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+  //double upTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
   int index  = this->ChooseInput(outInfo);
   if (index >= static_cast<int>(this->GetNumberOfFileNames()))
     {

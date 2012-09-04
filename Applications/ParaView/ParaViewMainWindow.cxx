@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+#include "ParaViewDocumentationInitializer.h"
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {
@@ -64,6 +65,9 @@ ParaViewMainWindow::ParaViewMainWindow()
   CMakeLoadAllPythonModules();
 #endif
 #endif
+  // init the ParaView embedded documentation.
+  PARAVIEW_DOCUMENTATION_INIT();
+
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
 

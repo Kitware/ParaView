@@ -41,6 +41,7 @@ class vtkStructuredGrid;
 class vtkUnstructuredGrid;
 class vtkUnstructuredGridGeometryFilter;
 class vtkAMRBox;
+class vtkOverlappingAMR;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkPVGeometryFilter : public vtkDataObjectAlgorithm
 {
@@ -144,10 +145,10 @@ protected:
   // Description:
   // A helper method which, given the AMR box of the data in question
   // and the root AMR box, determines whether or not the block is visible.
-  bool IsAMRDataVisible( vtkAMRBox &amrBox,
-                         vtkAMRBox &rootBox,
-                         bool faceextract[6] );
-
+  bool IsAMRDataVisible(vtkOverlappingAMR* amr,
+                        unsigned int level,
+                        unsigned int id,
+                        bool extractface[6] );
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
@@ -170,15 +171,20 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
+  // Description:
+  // Produce geometry for a block in the dataset. 
+  // This does not handle producing outlines. Call only when this->UseOutline ==
+  // 0; \c extractface mask it is used to determine external faces.
+  void ExecuteAMRBlock(vtkUniformGrid* input,
+                       vtkPolyData* output,
+                       const bool extractface[6]);
 
-  void ExecuteAMRBlock(vtkDataObject* input,
-                      vtkPolyData* output,
-                      int doCommunicate,
-                      int updatePiece,
-                      int updateNumPieces,
-                      int updateGhosts,
-                      int *wholeExtent,
-                      bool extractface[6] );
+
+  // Description:
+  // Used instead of ExecuteAMRBlock() when this->UseOutline is true.
+  void ExecuteAMRBlockOutline(const double bounds[6],
+                              vtkPolyData* output,
+                              const bool extractface[6]);
 
   void ExecuteBlock(vtkDataObject* input,
                     vtkPolyData* output,
@@ -186,25 +192,18 @@ protected:
                     int updatePiece,
                     int updateNumPieces,
                     int updateGhosts,
-                    int* wholeExtent);
+                    const int* wholeExtent);
 
   void DataSetExecute(vtkDataSet* input, vtkPolyData* output,
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
 
-  void AMRGridExecute(vtkImageData* input,
-                      vtkPolyData* output,
-                      int doCommunicate,
-                      int updatePiece,
-                      int *wholeExtent,
-                      bool extractface[6] );
-
   void ImageDataExecute(vtkImageData* input,
                         vtkPolyData* output,
                         int doCommunicate,
                         int updatePiece,
-                        int* ext);
+                        const int* ext);
 
   void StructuredGridExecute(
     vtkStructuredGrid* input,
@@ -212,7 +211,7 @@ protected:
     int updatePiece,
     int updateNumPieces,
     int updateGhosts,
-    int* wholeExtent);
+    const int* wholeExtent);
 
   void RectilinearGridExecute(
     vtkRectilinearGrid* input,
@@ -220,7 +219,7 @@ protected:
     int updatePiece,
     int updateNumPieces,
     int updateGhosts,
-    int* wholeExtent);
+    const int* wholeExtent);
 
   void UnstructuredGridExecute(
     vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);

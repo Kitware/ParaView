@@ -80,39 +80,4 @@ private:
   friend class pqNetworkAccessManager;
 };
 
-
-#include <QtNetwork/QNetworkReply>
-#include <QBuffer>
-/// Internal class used to add support to QWebView to load files from
-/// QHelpEngine.
-class PQWIDGETS_EXPORT pqHelpWindowNetworkReply : public QNetworkReply
-{
-  Q_OBJECT;
-  typedef QNetworkReply Superclass;
-public:
-  pqHelpWindowNetworkReply(const QUrl& url, QHelpEngineCore* helpEngine);
-
-  virtual void abort() {}
-  virtual qint64 bytesAvailable() const
-    { return this->Buffer.bytesAvailable(); }
-  virtual bool isSequential() const
-    { return this->Buffer.isSequential(); }
-
-private slots:
-  /// reads the raw data fires signals to notify data is available.
-  void process();
-
-protected:
-  virtual qint64 readData(char *data, qint64 maxSize)
-    {
-    return this->Buffer.read(data, maxSize);
-    }
-
-  QPointer<QHelpEngineCore> HelpEngine;
-  QBuffer Buffer;
-
-private:
-  Q_DISABLE_COPY(pqHelpWindowNetworkReply)
-};
-
 #endif

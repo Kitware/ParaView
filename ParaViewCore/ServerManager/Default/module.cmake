@@ -12,6 +12,7 @@ vtk_module(vtkPVServerManagerDefault
     vtkPVServerImplementationDefault
     vtkPVServerManagerRendering
     vtkTestingRendering
+    vtkIOMovie
     ${extra_depends}
   TEST_DEPENDS
     vtkPVServerManagerApplication

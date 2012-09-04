@@ -167,34 +167,6 @@
                        type="Handle"></PropertyGroup>
       </Hints>
     </SourceProxy>
-    <SourceProxy class="vtkUniformGridPartitioner"
-                 label="Partition UniformGrid by RCB"
-                 name="UniformGridPartitioner">
-      <Documentation long_help="Partitions a uniform grid by RCB"
-                     short_help="Partitions a Uniform grid by RCB">This filters
-                     partitions a uniform grid instance. The output is a
-                     multiblock of uniform grids.</Documentation>
-      <InputProperty command="SetInputConnection"
-                     name="Input">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-          <Group name="filters" />
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkImageData" />
-        </DataTypeDomain>
-        <Documentation>This property specifies the input for this
-        filter.</Documentation>
-      </InputProperty>
-      <IntVectorProperty command="SetNumberOfSubdivisions"
-                         default_values="0"
-                         name="NumberOfSubdivisions"
-                         number_of_elements="1">
-        <IntRangeDomain name="range" />
-        <Documentation>Set the number of subdivisions for recursive coordinate
-        bisection.</Documentation>
-      </IntVectorProperty>
-    </SourceProxy>
     <SourceProxy class="vtkAMRResampleFilter"
                  label="Resample AMR"
                  name="AMRResampleFilter">
@@ -1969,7 +1941,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetCoordinateResults"
                          default_values="0"
                          name="CoordinateResults"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>The value of this property determines whether the
         results of this computation should be used as point coordinates or as a
@@ -1994,7 +1967,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Replace Invalid Results"
                          name="ReplaceInvalidValues"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>This property determines whether invalid values in the
         computation will be replaced with a specific value. (See the
@@ -2003,7 +1977,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetReplacementValue"
                             default_values="0.0"
                             name="ReplacementValue"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>If invalid values in the computation are to be replaced
         with another value, this property contains that value.</Documentation>
@@ -2213,7 +2188,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetFasterApproximation"
                          default_values="0"
                          name="FasterApproximation"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>When this flag is on, the gradient filter will provide a
         less accurate (but close) algorithm that performs fewer derivative
@@ -2225,19 +2201,37 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="0"
                          name="ComputeVorticity"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>When this flag is on, the gradient filter will compute
         the vorticity/curl of a 3 component array.</Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetVorticityArrayName"
+                            default_values="Vorticity"
+                            name="VorticityArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>This property provides a name for the output array
+        containing the vorticity vector.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetComputeQCriterion"
                          default_values="0"
                          name="ComputeQCriterion"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>When this flag is on, the gradient filter will compute
         the Q-criterion of a 3 component array.</Documentation>
       </IntVectorProperty>
+      <StringVectorProperty command="SetQCriterionArrayName"
+                            default_values="Q-criterion"
+                            name="QCriterionArrayName"
+                            number_of_elements="1"
+                            panel_visibility="advanced">
+        <Documentation>This property provides a name for the output array
+        containing Q criterion.</Documentation>
+      </StringVectorProperty>
       <!-- End UnstructuredGradient -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -2888,7 +2882,8 @@ found and the point will be rejected.</Documentation>
                          default_values="0"
                          label="Proportionally Distribute Maximum Number Of Points"
                          name="ProportionalMaximumNumberOfPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>When this is off, the maximum number of points is taken
         per processor when running in parallel (total number of points = number
@@ -2903,7 +2898,8 @@ found and the point will be rejected.</Documentation>
                          command="SetOffset"
                          default_values="0"
                          name="Offset"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="0"
                         name="range" />
         <Documentation>The value of this property indicates the starting point
@@ -2914,7 +2910,8 @@ found and the point will be rejected.</Documentation>
                          default_values="0"
                          label="Random Sampling"
                          name="RandomMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is set to true, then the
         points in the output will be randomly selected from the input in
@@ -2925,7 +2922,8 @@ found and the point will be rejected.</Documentation>
                          default_values="0"
                          label="Random Sampling Mode"
                          name="RandomModeType"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Randomized Id Strides"
                  value="0" />
@@ -2945,7 +2943,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetGenerateVertices"
                          default_values="0"
                          name="GenerateVertices"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>This property specifies whether to generate vertex cells
         as the topography of the output. If set to 1, the geometry (vertices)
@@ -2955,7 +2954,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetSingleVertexPerCell"
                          default_values="0"
                          name="SingleVertexPerCell"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Tell filter to only generate one vertex per cell instead
         of multiple vertices in one cell.</Documentation>
@@ -4973,16 +4973,6 @@ found and the point will be rejected.</Documentation>
                      the specified plane. The Slice filter takes any type of
                      dataset as input. The output of this filter is polygonal
                      data.</Documentation>
-      <IntVectorProperty command="PreserveInputCells"
-                         default_values="0"
-                         label="Crinkle slice"
-                         name="PreserveInputCells"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This parameter controls whether to extract the entire
-        cells that are sliced by the region or just extract a triangulated
-        surface of that region.</Documentation>
-      </IntVectorProperty>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -5021,6 +5011,16 @@ found and the point will be rejected.</Documentation>
           </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
+      <IntVectorProperty command="PreserveInputCells"
+                         default_values="0"
+                         label="Crinkle slice"
+                         name="PreserveInputCells"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter controls whether to extract the entire
+        cells that are sliced by the region or just extract a triangulated
+        surface of that region.</Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Slice Offset Values"
@@ -5028,7 +5028,8 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             set_number_command="SetNumberOfContours"
-                            use_index="1">
+                            use_index="1"
+                            panel_visibility="advanced">
         <BoundsDomain mode="magnitude"
                       name="bounds">
           <RequiredProperties>
@@ -5140,16 +5141,6 @@ found and the point will be rejected.</Documentation>
                      implicit plane. This filter operates on all types of data
                      sets, and it returns unstructured grid data on
                      output.</Documentation>
-      <IntVectorProperty command="PreserveInputCells"
-                         default_values="0"
-                         label="Crinkle clip"
-                         name="PreserveInputCells"
-                         number_of_elements="1">
-        <BooleanDomain name="bool" />
-        <Documentation>This parameter controls whether to extract entire cells
-        in the given region or clip those cells so all of the output one stay
-        only inside that region.</Documentation>
-      </IntVectorProperty>
       <InputProperty command="SetInputConnection"
                      name="Input">
         <ProxyGroupDomain name="groups">
@@ -5257,6 +5248,16 @@ found and the point will be rejected.</Documentation>
         <Documentation>If UseValueAsOffset is true, Value is used as an offset
         parameter to the implicit function. Otherwise, Value is used only when
         clipping using a scalar array.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="PreserveInputCells"
+                         default_values="0"
+                         label="Crinkle clip"
+                         name="PreserveInputCells"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter controls whether to extract entire cells
+        in the given region or clip those cells so all of the output one stay
+        only inside that region.</Documentation>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
@@ -5791,7 +5792,8 @@ found and the point will be rejected.</Documentation>
         </Hints>
       </InputProperty>
       <ProxyProperty command="SetSourceTransform"
-                     name="GlyphTransform">
+                     name="GlyphTransform"
+                     panel_visibility="advanced">
         <ProxyListDomain name="proxy_list">
           <Proxy group="extended_sources"
                  name="Transform2" />
@@ -5804,7 +5806,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Orient"
                          name="SetOrient"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, the glyphs will be
         oriented based on the selected vector array.</Documentation>
@@ -5813,7 +5816,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Scale Mode"
                          name="SetScaleMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="scalar"
                  value="0" />
@@ -5834,7 +5838,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
                             name="SetScaleFactor"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <BoundsDomain mode="scaled_extent"
                       name="bounds"
                       scale_factor="0.1">
@@ -5867,7 +5872,8 @@ found and the point will be rejected.</Documentation>
                          default_values="5000"
                          label="Maximum Number of Points"
                          name="MaximumNumberOfPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="0"
                         name="range" />
         <Documentation>The value of this property specifies the maximum number
@@ -5879,7 +5885,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Mask Points"
                          name="UseMaskPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is set to 1, limit the
         maximum number of glyphs to the value indicated by
@@ -5889,7 +5896,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetRandomMode"
                          default_values="1"
                          name="RandomMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is 1, then the points to
         glyph are chosen randomly. Otherwise the point ids chosen are evenly
@@ -5898,7 +5906,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetKeepRandomPoints"
                          default_values="0"
                          name="KeepRandomPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation> If the value of this property is 1 and RandomMode is
         1, then the randomly chosen points to glyph are saved and reused for
@@ -6003,7 +6012,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Orient"
                          name="SetOrient"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, the glyphs will be
         oriented based on the selected vector array.</Documentation>
@@ -6012,7 +6022,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Scale Mode"
                          name="SetScaleMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="scalar"
                  value="0" />
@@ -6030,7 +6041,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
                             name="SetScaleFactor"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <BoundsDomain mode="scaled_extent"
                       name="bounds"
                       scale_factor="0.1">
@@ -6063,7 +6075,8 @@ found and the point will be rejected.</Documentation>
                          default_values="5000"
                          label="Maximum Number of Points"
                          name="MaximumNumberOfPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="0"
                         name="range" />
         <Documentation>The value of this property specifies the maximum number
@@ -6075,7 +6088,8 @@ found and the point will be rejected.</Documentation>
                          default_values="1"
                          label="Mask Points"
                          name="UseMaskPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is set to 1, limit the
         maximum number of glyphs to the value indicated by
@@ -6085,7 +6099,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetRandomMode"
                          default_values="1"
                          name="RandomMode"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is 1, then the points to
         glyph are chosen randomly. Otherwise the point ids chosen are evenly
@@ -6094,7 +6109,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetKeepRandomPoints"
                          default_values="0"
                          name="KeepRandomPoints"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool"/>
         <Documentation> If the value of this property is 1 and RandomMode is
         1, then the randomly chosen points to glyph are saved and reused for
@@ -6161,7 +6177,8 @@ found and the point will be rejected.</Documentation>
                          command="SetSampleRateI"
                          default_values="1"
                          name="SampleRateI"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property indicates the sampling rate in the I
@@ -6172,7 +6189,8 @@ found and the point will be rejected.</Documentation>
                          command="SetSampleRateJ"
                          default_values="1"
                          name="SampleRateJ"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property indicates the sampling rate in the J
@@ -6183,7 +6201,8 @@ found and the point will be rejected.</Documentation>
                          command="SetSampleRateK"
                          default_values="1"
                          name="SampleRateK"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain min="1"
                         name="range" />
         <Documentation>This property indicates the sampling rate in the K
@@ -6193,7 +6212,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetIncludeBoundary"
                          default_values="0"
                          name="IncludeBoundary"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If the value of this property is 1, then if the sample
         rate in any dimension is greater than 1, the boundary indices of the
@@ -7811,7 +7831,8 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1"
                             set_number_command="SetNumberOfContours"
-                            use_index="1">
+                            use_index="1"
+                            panel_visibility="advanced">
         <BoundsDomain mode="magnitude"
                       name="bounds">
           <RequiredProperties>
@@ -8784,7 +8805,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetCalculateAverages"
                          default_values="1"
                          name="CalculateAverages"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>This option controls whether the algorithm calculates
         averages of variables other than the primary variable that fall into
@@ -8793,7 +8815,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetUseCustomBinRanges"
                          default_values="0"
                          name="UseCustomBinRanges"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>When set to true, CustomBinRanges will be used instead
         of using the full range for the selected array. By default, set to
@@ -8802,7 +8825,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetCustomBinRanges"
                             default_values="0.0 100.0"
                             name="CustomBinRanges"
-                            number_of_elements="2">
+                            number_of_elements="2"
+                            panel_visibility="advanced">
         <Documentation>Set custom bin ranges to use. These are used only when
         UseCustomBinRanges is set to true.</Documentation>
         <ArrayRangeDomain name="scalar_range">

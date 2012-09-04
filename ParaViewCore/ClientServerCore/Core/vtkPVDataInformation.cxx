@@ -320,10 +320,33 @@ void vtkPVDataInformation::AddFromMultiPieceDataSet(vtkCompositeDataSet* data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
+void vtkPVDataInformation::CopyFromCompositeDataSetInitialize(
+  vtkCompositeDataSet* data)
 {
   this->Initialize();
   this->CompositeDataInformation->CopyFromObject(data);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromCompositeDataSetFinalize(
+  vtkCompositeDataSet* data)
+{
+  this->SetCompositeDataClassName(data->GetClassName());
+  this->CompositeDataSetType = data->GetDataObjectType();
+
+  if (this->DataSetType == -1)
+    {
+    // This is a composite dataset with no non-empty leaf node. Set some data
+    // type (Look at BUG #7144).
+    this->SetDataClassName("vtkDataSet");
+    this->DataSetType = VTK_DATA_SET;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
+{
+  this->CopyFromCompositeDataSetInitialize(data);
 
   unsigned int numDataSets = this->CompositeDataInformation->GetNumberOfChildren();
   if (this->CompositeDataInformation->GetDataIsMultiPiece())
@@ -344,17 +367,8 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
         }
       }
     }
-  this->SetCompositeDataClassName(data->GetClassName());
-  this->CompositeDataSetType = data->GetDataObjectType();
 
-  if (this->DataSetType == -1)
-    {
-    // This is a composite dataset with no non-empty leaf node. Set some data
-    // type (Look at BUG #7144).
-    this->SetDataClassName("vtkDataSet");
-    this->DataSetType = VTK_DATA_SET;
-    }
-
+  this->CopyFromCompositeDataSetFinalize(data);
 
   // AddInformation should have updated NumberOfDataSets correctly to count
   // number of non-zero datasets. We don't need to fix it here.

@@ -18,10 +18,13 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkInformation.h"
 #include "vtkMultiPieceDataSet.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
+#include "vtkUniformGridAMR.h"
+#include "vtkUniformGrid.h"
 
 #include <vector>
 #include <string>
@@ -182,6 +185,14 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
+  vtkUniformGridAMR* amr = vtkUniformGridAMR::SafeDownCast(cds);
+  if (amr)
+    {
+    this->CopyFromAMR(amr);
+    return;
+    }
+
+  // This is generic composite dataset.
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(cds->NewIterator());
   iter->VisitOnlyLeavesOff();
@@ -212,6 +223,46 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       }
     }
   // vtkTimerLog::MarkEndEvent("Copying information from composite data");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeDataInformation::CopyFromAMR(vtkUniformGridAMR* amr)
+{
+  unsigned int num_levels = amr->GetNumberOfLevels();
+  if (num_levels == 0)
+    {
+    this->Internal->ChildrenInformation.clear();
+    }
+  else
+    {
+    this->Internal->ChildrenInformation.resize(num_levels);
+    }
+
+  // we use this to "simulate" a composite tree from AMR 
+  vtkNew<vtkMultiPieceDataSet> tempMultiPiece;
+  vtkNew<vtkPVDataInformation> tempDSInfo;
+
+  for (unsigned int level=0; level < num_levels; level++)
+    {
+    unsigned int num_datasets = amr->GetNumberOfDataSets(level);
+    tempMultiPiece->SetNumberOfPieces(num_datasets);
+
+    vtkNew<vtkPVDataInformation> levelInfo;
+    levelInfo->CopyFromCompositeDataSetInitialize(tempMultiPiece.GetPointer());
+
+    // now fill up levelInfo with meta-data about arrays.
+    for (unsigned int idx=0; idx < num_datasets; idx++)
+      {
+      vtkUniformGrid* dataset = amr->GetDataSet(level, idx);
+      if (dataset)
+        {
+        tempDSInfo->CopyFromObject(dataset);
+        levelInfo->AddInformation(tempDSInfo.GetPointer(), 1);
+        }
+      }
+    levelInfo->CopyFromCompositeDataSetFinalize(tempMultiPiece.GetPointer());
+    this->Internal->ChildrenInformation[level].Info = levelInfo.GetPointer();
+    }
 }
 
 //----------------------------------------------------------------------------
