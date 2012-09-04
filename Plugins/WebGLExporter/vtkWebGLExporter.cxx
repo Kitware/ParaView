@@ -129,7 +129,7 @@ void vtkWebGLExporter::SetCenterOfRotation(float a1, float a2, float a3)
   }
 
 
-void vtkWebGLExporter::parseRenderer(vtkRenderer *renderer, const char *viewId, bool onlyWidget, void* mapTime)
+void vtkWebGLExporter::parseRenderer(vtkRenderer *renderer, const char* vtkNotUsed(viewId), bool onlyWidget, void* vtkNotUsed(mapTime))
   {
   vtkPropCollection* propCollection = renderer->GetViewProps();
   for (int i=0; i<propCollection->GetNumberOfItems(); i++)

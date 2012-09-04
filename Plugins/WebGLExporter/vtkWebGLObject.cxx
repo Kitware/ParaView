@@ -146,6 +146,6 @@ void vtkWebGLObject::SetInteractAtServer(bool i)
   }
 
 void vtkWebGLObject::GenerateBinaryData(){this->hasChanged = false;}
-unsigned char* vtkWebGLObject::GetBinaryData(int part){return NULL;}
-int vtkWebGLObject::GetBinarySize(int part){return 0;}
+unsigned char* vtkWebGLObject::GetBinaryData(int vtkNotUsed(part)){return NULL;}
+int vtkWebGLObject::GetBinarySize(int vtkNotUsed(part)){return 0;}
 int vtkWebGLObject::GetNumberOfParts(){return 0;}

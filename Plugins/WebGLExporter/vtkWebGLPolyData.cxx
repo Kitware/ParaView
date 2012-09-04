@@ -100,7 +100,6 @@ void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _in
     }
   else
     {
-    int pieces = (int)ceil(_numberOfIndexes/(float)div);
     int total = _numberOfIndexes;
     int curr = 0;
     int size = 0;
@@ -203,7 +202,6 @@ void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index,
     }
   else
     {
-    int pieces = (int)ceil(_numberOfIndex/(float)div);
     int total = _numberOfIndex;
     int curr = 0;
     int size = 0;
@@ -247,7 +245,10 @@ void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index,
 void vtkWebGLPolyData::SetTransformationMatrix(vtkMatrix4x4* m)
   {
   this->Superclass::SetTransformationMatrix(m);
-  for (int i=0; i<this->Internal->Parts.size(); i++) this->Internal->Parts[i]->SetMatrix(this->Matrix);
+  for (size_t i=0; i<this->Internal->Parts.size(); i++)
+    {
+    this->Internal->Parts[i]->SetMatrix(this->Matrix);
+    }
   }
 
 unsigned char* vtkWebGLPolyData::GetBinaryData(int part)
@@ -268,7 +269,7 @@ void vtkWebGLPolyData::GenerateBinaryData()
   vtkWebGLDataSet* obj;
   this->hasChanged = false;
   std::stringstream ss;
-  for(int i=0; i<this->Internal->Parts.size(); i++)
+  for(size_t i=0; i<this->Internal->Parts.size(); i++)
     {
     obj = this->Internal->Parts[i];
     obj->GenerateBinaryData();
@@ -471,7 +472,6 @@ void vtkWebGLPolyData::SetPoints(float *points, int numberOfPoints, unsigned cha
 void vtkWebGLPolyData::GetPoints(vtkTriangleFilter *polydata, vtkActor *actor, int maxSize)
   {
   vtkWebGLPolyData* object = this;
-  vtkPoints* vtkpoints = polydata->GetOutput(0)->GetPoints();//Wendel
 
   // Points
   double point[3];
@@ -492,8 +492,6 @@ void vtkWebGLPolyData::GetPoints(vtkTriangleFilter *polydata, vtkActor *actor, i
 
 void vtkWebGLPolyData::GetColorsFromPolyData(unsigned char* color, vtkPolyData* polydata, vtkActor* actor)
   {
-  double point[3];
-
   int celldata;
   vtkDataArray* array = vtkAbstractMapper::GetScalars(polydata, actor->GetMapper()->GetScalarMode(),
                                                       actor->GetMapper()->GetArrayAccessMode(), actor->GetMapper()->GetArrayId(),
@@ -586,7 +584,6 @@ void vtkWebGLPolyData::GetPolygonsFromCellData(vtkTriangleFilter* polydata, vtkA
   unsigned char* colors   = new unsigned char[data->GetNumberOfCells()*3*4];
   int* indexes  = new int[data->GetNumberOfCells()*3*3];
 
-  int npts;
   vtkGenericCell* cell = vtkGenericCell::New();
   double tuple[3], normal[3], color[3];
   color[0] = 1.0; color[1] = 1.0; color[2] = 1.0;
@@ -695,7 +692,6 @@ void vtkWebGLPolyData::GetColorsFromPointData(unsigned char* color, vtkPointData
     {
     double rgb[3];
     double alpha = 0;
-    double mag=0;
     int celldata;
     array = vtkAbstractMapper::GetScalars(polydata, actor->GetMapper()->GetScalarMode(),
                                           actor->GetMapper()->GetArrayAccessMode(), actor->GetMapper()->GetArrayId(),

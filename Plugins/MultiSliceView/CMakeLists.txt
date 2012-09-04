@@ -23,8 +23,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
     pqThreeSliceView.h
     pqThreeSliceViewOptions.h
-
-    vtkMultiSliceContextItem.h
   )
 
   QT4_WRAP_UI(UI_SRCS

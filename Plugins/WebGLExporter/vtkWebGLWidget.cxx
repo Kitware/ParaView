@@ -45,13 +45,13 @@ vtkWebGLWidget::~vtkWebGLWidget()
     }
   }
 
-unsigned char* vtkWebGLWidget::GetBinaryData(int part)
+unsigned char* vtkWebGLWidget::GetBinaryData(int vtkNotUsed(part))
   {
   this->hasChanged = false;
   return this->binaryData;
   }
 
-int vtkWebGLWidget::GetBinarySize(int part)
+int vtkWebGLWidget::GetBinarySize(int vtkNotUsed(part))
   {
   return this->binarySize;
   }
@@ -78,7 +78,7 @@ void vtkWebGLWidget::GenerateBinaryData()
   memcpy(&this->binaryData[pos], &this->position, sizeof(float)*2); pos+=sizeof(float)*2;     //Position (double[2])
   memcpy(&this->binaryData[pos], &this->size, sizeof(float)*2); pos+=sizeof(float)*2;         //Size (double[2])
   unsigned char rgb[3];
-  for(int i=0; i<colors.size(); i++)                                                          //Array of Colors (double, char[3])
+  for(size_t i=0; i<colors.size(); i++)                                                       //Array of Colors (double, char[3])
     {
     float v = (float)this->colors[i][0];
     memcpy(&this->binaryData[pos], &v, sizeof(float)); pos+=sizeof(float);
