@@ -23,7 +23,7 @@
 
 #include "pqSLACManager.h"
 
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
@@ -133,7 +133,8 @@ void pqSLACDataLoadManager::setupPipeline()
     pqPipelineSource *meshReader
       = builder->createReader("sources", "SLACReader", meshFiles, this->Server);
 
-    vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+    vtkSMSourceProxy* meshReaderProxy =
+      vtkSMSourceProxy::SafeDownCast(meshReader->getProxy());
 
     // Set up mode (if any).
     QStringList modeFiles = this->ui->modeFile->filenames();
@@ -143,6 +144,9 @@ void pqSLACDataLoadManager::setupPipeline()
     // Push changes to server so that when the representation gets updated,
     // it uses the property values we set.
     meshReaderProxy->UpdateVTKObjects();
+
+    // ensures that new timestep range, if any gets fetched from the server.
+    meshReaderProxy->UpdatePipelineInformation();
 
     // Make representations.
     pqDataRepresentation *repr;
