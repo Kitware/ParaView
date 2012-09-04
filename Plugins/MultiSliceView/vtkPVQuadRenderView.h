@@ -80,6 +80,10 @@ public:
   // Description:
   // Set the bottom-right window size, which is same this superclass' size.
   void SetSizeBottomRight(int x, int y) { this->Superclass::SetSize(x, y); }
+
+  void ResetCamera();
+  void ResetCamera(double bounds[6]);
+
 //BTX
 protected:
   vtkPVQuadRenderView();

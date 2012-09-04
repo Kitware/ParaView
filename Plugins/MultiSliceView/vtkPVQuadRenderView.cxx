@@ -17,12 +17,11 @@
 #include "vtkCamera.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVInteractorStyle.h"
 #include "vtkPVSynchronizedRenderWindows.h"
-#include "vtkRenderer.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
-#include "vtkPVInteractorStyle.h"
-#include "vtkTrackballPan.h"
+#include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
@@ -113,6 +112,26 @@ void vtkPVQuadRenderView::Render(bool interactive, bool skip_rendering)
       {
       this->OrthoViews[cc].RenderView->StillRender();
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::ResetCamera()
+{
+  this->Superclass::ResetCamera();
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->ResetCamera();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::ResetCamera(double bounds[6])
+{
+  this->Superclass::ResetCamera(bounds);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->ResetCamera(bounds);
     }
 }
 

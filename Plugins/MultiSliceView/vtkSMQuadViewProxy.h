@@ -28,6 +28,16 @@ public:
   vtkTypeMacro(vtkSMQuadViewProxy, vtkSMRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Create a default representation for the given source proxy.
+  // Returns a new proxy.
+  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
+
+  // Description:
+  // Similar to IsSelectionAvailable(), however, on failure returns the
+  // error message otherwise 0.
+  virtual const char* IsSelectVisiblePointsAvailable();
+
 //BTX
 protected:
   vtkSMQuadViewProxy();

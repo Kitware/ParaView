@@ -70,6 +70,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
       vtkSMMultiSliceViewProxy.cxx
       vtkSMQuadViewProxy.cxx
       vtkSMThreeSliceViewProxy.cxx
+      vtkSliceExtractorRepresentation.cxx
       vtkThreeSliceFilter.cxx
 
     SERVER_MANAGER_XML

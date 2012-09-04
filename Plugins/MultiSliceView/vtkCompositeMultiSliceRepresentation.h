@@ -24,6 +24,7 @@
 #include "vtkPVCompositeRepresentation.h"
 
 class vtkOutlineRepresentation;
+class vtkSliceExtractorRepresentation;
 
 class VTK_EXPORT vtkCompositeMultiSliceRepresentation : public vtkPVCompositeRepresentation
 {
@@ -78,6 +79,11 @@ protected:
   virtual bool RemoveFromView(vtkView* view);
 
   vtkOutlineRepresentation* OutlineRepresentation;
+  vtkSliceExtractorRepresentation* Slice1;
+  vtkSliceExtractorRepresentation* Slice2;
+  vtkSliceExtractorRepresentation* Slice3;
+
+  void ModifiedInternalCallback(vtkObject* src, unsigned long event, void* data);
 
 private:
   vtkCompositeMultiSliceRepresentation(const vtkCompositeMultiSliceRepresentation&); // Not implemented

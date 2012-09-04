@@ -14,12 +14,21 @@
 =========================================================================*/
 #include "vtkSMQuadViewProxy.h"
 
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVQuadRenderView.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkRenderWindow.h"
-#include "vtkNew.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+
+#include <assert.h>
+
 namespace
 {
   class vtkRenderHelper : public vtkPVRenderViewProxy
@@ -91,4 +100,51 @@ void vtkSMQuadViewProxy::CreateVTKObjects()
 void vtkSMQuadViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMQuadViewProxy::CreateDefaultRepresentation(
+  vtkSMProxy* source, int opport)
+{
+  if (!source)
+    {
+    return 0;
+    }
+
+  assert("Session should be valid" && this->GetSession());
+  vtkSMSessionProxyManager* pxm = this->GetSessionProxyManager();
+
+  // Update with time to avoid domains updating without time later.
+  vtkSMSourceProxy* sproxy = vtkSMSourceProxy::SafeDownCast(source);
+  if (sproxy)
+    {
+    double view_time = vtkSMPropertyHelper(this, "ViewTime").GetAsDouble();
+    sproxy->UpdatePipeline(view_time);
+    }
+
+  // Choose which type of representation proxy to create.
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations",
+    "QuadViewCompositeMultiSliceRepresentation");
+  vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool sg = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (sg)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "QuadViewCompositeMultiSliceRepresentation"));
+    return repr;
+    }
+
+  // Currently only images can be shown
+  vtkErrorMacro("This view only supports Multi-Slice representation.");
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMQuadViewProxy::IsSelectVisiblePointsAvailable()
+{
+  // The original dataset and the slice don't share the same points
+  return "Multi-Slice View do not allow point selection";
 }

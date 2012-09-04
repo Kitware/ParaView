@@ -79,6 +79,10 @@ public:
   void SetNumberOfSlice(int cutIndex, int size);
 
   virtual vtkAlgorithmOutput* GetInternalOutputPort(int port, int conn);
+  virtual vtkAlgorithmOutput* GetInternalOutputPort()
+  { return this->GetInternalOutputPort(0); }
+  virtual vtkAlgorithmOutput* GetInternalOutputPort(int port)
+  { return this->GetInternalOutputPort(port, 0); }
 
   // Description:
   // Access the internal filter that is used to slice the input dataset
