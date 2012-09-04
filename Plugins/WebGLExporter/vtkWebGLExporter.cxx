@@ -113,7 +113,7 @@ void vtkWebGLExporter::SetMaxAllowedSize(int mesh, int lines)
   if (this->lineObjMaxSize*2 > 65534) this->lineObjMaxSize = 65534/2;
   if (this->meshObjMaxSize < 10) this->meshObjMaxSize = 10;
   if (this->lineObjMaxSize < 10) this->lineObjMaxSize = 10;
-  for(int i=0; i<this->Internal->Objects.size(); i++) this->Internal->Objects[i]->GenerateBinaryData();
+  for(size_t i=0; i<this->Internal->Objects.size(); i++) this->Internal->Objects[i]->GenerateBinaryData();
   }
 
 void vtkWebGLExporter::SetMaxAllowedSize(int size)
@@ -141,9 +141,9 @@ void vtkWebGLExporter::parseRenderer(vtkRenderer *renderer, const char* vtkNotUs
       {
       vtkPropCollection* allactors = vtkPropCollection::New();
       prop->GetActors(allactors);
-      for (int i=0; i<allactors->GetNumberOfItems(); i++)
+      for (int j=0; j<allactors->GetNumberOfItems(); j++)
         {
-        vtkActor* actor = vtkActor::SafeDownCast(allactors->GetItemAsObject(i));
+        vtkActor* actor = vtkActor::SafeDownCast(allactors->GetItemAsObject(j));
         unsigned long key = (unsigned long)actor;
         unsigned long previousValue = this->Internal->OldActorTimestamp[key];
         this->parseActor(actor, previousValue, (long)renderer, renderer->GetLayer(), trt != NULL);
@@ -154,9 +154,9 @@ void vtkWebGLExporter::parseRenderer(vtkRenderer *renderer, const char* vtkNotUs
       {
       vtkPropCollection* all2dactors = vtkPropCollection::New();
       prop->GetActors2D(all2dactors);
-      for (int i=0; i<all2dactors->GetNumberOfItems(); i++)
+      for (int k=0; k<all2dactors->GetNumberOfItems(); k++)
         {
-        vtkActor2D* actor = vtkActor2D::SafeDownCast(all2dactors->GetItemAsObject(i));
+        vtkActor2D* actor = vtkActor2D::SafeDownCast(all2dactors->GetItemAsObject(k));
         unsigned long key = (unsigned long)actor;
         unsigned long previousValue = this->Internal->OldActorTimestamp[key];
         this->parseActor2D(actor, previousValue, (long)renderer, renderer->GetLayer(), trt != NULL);
@@ -210,7 +210,7 @@ void vtkWebGLExporter::parseActor2D(vtkActor2D *actor, long actorTime, long rend
     this->Internal->ActorTimestamp[key] = dataMTime;
     std::stringstream ss;
     ss << (long)actor;
-    for (int i=0; i<this->Internal->tempObj.size(); i++)
+    for (size_t i=0; i<this->Internal->tempObj.size(); i++)
       {
       if (this->Internal->tempObj[i]->GetId().compare(ss.str()) == 0)
         {
@@ -223,7 +223,7 @@ void vtkWebGLExporter::parseActor2D(vtkActor2D *actor, long actorTime, long rend
     }
   }
 
-void vtkWebGLExporter::parseActor(vtkActor* actor, long actorTime, long rendererId, int layer, bool isWidget)
+void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long rendererId, int layer, bool isWidget)
   {
   vtkMapper* mapper = actor->GetMapper();
   if (mapper)
@@ -254,7 +254,7 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, long actorTime, long renderer
       vtkWebGLObject* obj = NULL;
       std::stringstream ss;
       ss << (long)actor;
-      for (int i=0; i<this->Internal->tempObj.size(); i++)
+      for (size_t i=0; i<this->Internal->tempObj.size(); i++)
         {
         if (this->Internal->tempObj[i]->GetId().compare(ss.str()) == 0)
           {
@@ -371,7 +371,7 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, long actorTime, long renderer
       this->Internal->ActorTimestamp[key] = actorTime;
       std::stringstream ss;
       ss << (long)actor;
-      for (int i=0; i<this->Internal->tempObj.size(); i++)
+      for (size_t i=0; i<this->Internal->tempObj.size(); i++)
         {
         if (this->Internal->tempObj[i]->GetId().compare(ss.str()) == 0)
           {
@@ -443,7 +443,7 @@ bool sortLayer(vtkRenderer* i,vtkRenderer* j)
   return (i->GetLayer() < j->GetLayer());
   }
 
-void vtkWebGLExporter::generateRendererData(vtkRendererCollection* renderers, const char *viewId)
+void vtkWebGLExporter::generateRendererData(vtkRendererCollection* renderers, const char* vtkNotUsed(viewId))
   {
   std::stringstream ss;
   ss << "\"Renderers\": [";
@@ -453,7 +453,7 @@ void vtkWebGLExporter::generateRendererData(vtkRendererCollection* renderers, co
   std::sort(orderedList.begin(), orderedList.begin()+orderedList.size(), sortLayer);
 
   int *fullSize;
-  for(int i=0; i<orderedList.size(); i++)
+  for(size_t i=0; i<orderedList.size(); i++)
     {
     vtkRenderer* renderer = orderedList[i];
 
@@ -543,7 +543,7 @@ const char* vtkWebGLExporter::GenerateMetadata()
 
   ss << " \"Objects\":[";
   bool first = true;
-  for (int i=0; i<this->Internal->Objects.size(); i++)
+  for (size_t i=0; i<this->Internal->Objects.size(); i++)
     {
     vtkWebGLObject* obj = this->Internal->Objects[i];
     if (obj->isVisible())
@@ -579,7 +579,7 @@ const char* vtkWebGLExporter::GenerateExportMetadata()
 
   ss << " \"Objects\":[";
   bool first = true;
-  for (int i=0; i<this->Internal->Objects.size(); i++)
+  for (size_t i=0; i<this->Internal->Objects.size(); i++)
     {
     vtkWebGLObject* obj = this->Internal->Objects[i];
     if (obj->isVisible())
@@ -625,7 +625,7 @@ const char* vtkWebGLExporter::GetId()
 
 bool vtkWebGLExporter::hasChanged()
 {
-  for (int i=0; i<this->Internal->Objects.size(); i++) if (this->Internal->Objects[i]->HasChanged()) return true;
+  for (size_t i=0; i<this->Internal->Objects.size(); i++) if (this->Internal->Objects[i]->HasChanged()) return true;
   return false;
 }
 
