@@ -2216,6 +2216,7 @@
       <IntVectorProperty command="SetFastest"
                          default_values="0"
                          name="Fastest"
+                         panel_visibility="never"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
         <Documentation>In binary mode use fastest instead of best
