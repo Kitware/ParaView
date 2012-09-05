@@ -280,7 +280,7 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    *log
+    log->GetHeader()
       << "# ::vtkSQFieldTracer" << "\n"
       << "#   mode=" << this->GetMode() << "\n"
       << "#   integrator=" << this->GetIntegratorType() << "\n"
@@ -1153,10 +1153,9 @@ int vtkSQFieldTracer::IntegrateBlock(
     FieldLine *line=traceData->GetFieldLine(i);
     this->IntegrateOne(oocr,oocrCache,fieldName,line,tcon);
 
-    if (this->Mode==MODE_POINCARE)
-      {
-      cerr << ".";
-      }
+    #if defined vtkSQFieldTracerDEBUG
+    cerr << ".";
+    #endif
     }
 
   // sync results to output. free resources in preparation

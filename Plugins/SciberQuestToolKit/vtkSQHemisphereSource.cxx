@@ -40,8 +40,6 @@ Copyright 2012 SciberQuest Inc.
 
 #include <math.h>
 
-// #define vtkSQHemisphereSourceTIME
-
 //*****************************************************************************
 void LocateHemisphere(float *pX, size_t nx,double *C, double *N)
 {
@@ -124,6 +122,8 @@ vtkSQHemisphereSource::vtkSQHemisphereSource()
   this->SetNorthHemisphereName("North");
   this->SetSouthHemisphereName("South");
 
+  this->LogLevel=0;
+
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(2);
 }
@@ -168,15 +168,17 @@ int vtkSQHemisphereSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"resolution",&resolution);
   this->SetResolution(resolution);
 
-  #if defined vtkSQHemisphereSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQHemisphereSource" << "\n"
-    << "#   center=" << center[0] << ", " << center[1] << ", " << center[2] << "\n"
-    << "#   north=" << north[0] << ", " << north[1] << ", " << north[2] << "\n"
-    << "#   radius=" << radius << "\n"
-    << "#   resolution=" << resolution << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQHemisphereSource" << "\n"
+      << "#   center=" << Tuple<double>(this->Center,3) << "\n"
+      << "#   north=" << Tuple<double>(this->North,3) << "\n"
+      << "#   radius=" << this->Radius << "\n"
+      << "#   resolution=" << this->Resolution << "\n";
+    }
 
   return 0;
 }

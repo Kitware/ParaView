@@ -12,6 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 #include "Numerics.hxx"
 #include "GhostTransaction.h"
+#include "vtkSQLog.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -31,9 +32,6 @@ using std::string;
 // #define SQTK_DEBUG
 // #define vtkSQImageSourceTIME
 
-#if defined vtkSQImageSourceTIME
-  #include "vtkSQLog.h"
-#endif
 
 
 vtkStandardNewMacro(vtkSQImageSource);

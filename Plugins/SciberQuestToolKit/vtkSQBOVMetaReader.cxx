@@ -64,7 +64,7 @@ unsigned long hash(const unsigned char *str)
   unsigned long hash = 5381;
   int c;
 
-  while (c = *str++)
+  while ((c = *str++))
     hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
   return hash;
@@ -263,8 +263,10 @@ long long vtkSQBOVMetaReader::GetProcRam()
     {
     // gather memory info about this host
     vtksys::SystemInformation sysInfo;
+    sysInfo.RunOSCheck(); // TODO -- fix SystemInformation::GetHostname
+
     long long hostRam=sysInfo.GetMemoryTotal();
-    string hostName=sysInfo.GetFullyQualifiedDomainName();
+    string hostName=sysInfo.GetHostname();
     unsigned long hostId=hash((const unsigned char *)hostName.c_str());
     long long hostSize=1l;
 
@@ -343,7 +345,7 @@ void vtkSQBOVMetaReader::SetBlockSize(int nx, int ny, int nz)
     return;
     }
 
-  long long blockSize=nx*ny*nz;
+  unsigned long long blockSize=nx*ny*nz;
   if (blockSize >= 2147483648l)
     {
     vtkErrorMacro(
@@ -415,10 +417,10 @@ void vtkSQBOVMetaReader::EstimateBlockCacheSize()
   #if defined SQTK_DEBUG
   oss
     << "subsetSize=" << Tuple<int>(subsetSize,3) << endl
-    << "ProcRam=" << procRam << endl
+    << "ProcRam(kib)=" << procRam << endl
     << "BlockCacheRamFactor=" << this->BlockCacheRamFactor << endl
     << "BlockSize=" << Tuple<int>(this->BlockSize,3) << endl
-    << "blockRam=" << blockRam << endl
+    << "blockRam(kib)=" << blockRam << endl
     << "maxBlocks=" << maxBlocks << endl
     << "fitBlocks=" << fitBlocks << endl
     << "BlockCacheSize=" << this->BlockCacheSize << endl

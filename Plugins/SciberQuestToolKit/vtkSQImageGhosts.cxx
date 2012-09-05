@@ -83,9 +83,8 @@ int vtkSQImageGhosts::Initialize(vtkPVXMLElement *root)
   if (this-LogLevel)
     {
     vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-    *log
-      << "# ::vtkSQImageGhosts" << "\n"
-      << "\n";
+    log->GetHeader()
+      << "# ::vtkSQImageGhosts" << "\n";
     }
 
   (void)root;

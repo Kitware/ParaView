@@ -61,7 +61,6 @@ using std::max;
 #include <mpi.h>
 #endif
 
-
 // ****************************************************************************
 static
 const char *GetKernelTypeAsString(int type)

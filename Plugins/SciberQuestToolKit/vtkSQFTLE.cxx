@@ -199,7 +199,7 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    *log
+    log->GetHeader()
       << "# ::vtkSQFTLE" << "\n"
       << "#   pass_input=" << passInput << "\n"
       << "\n";

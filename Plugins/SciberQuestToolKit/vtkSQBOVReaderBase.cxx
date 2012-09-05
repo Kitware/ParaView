@@ -256,16 +256,18 @@ int vtkSQBOVReaderBase::Initialize(
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    *log
+    log->GetHeader()
       << "# ::vtkSQBOVReaderBase" << "\n"
       << "#   cb_enable=" << this->GetUseCollectiveIO() << "\n"
       << "#   cb_buffer_size=" << this->GetCollectBufferSize() << "\n"
       << "#   wholeExtent=" << Tuple<int>(wholeExtent,6) << "\n"
-      << "#   subsetExtent=" << Tuple<int>(subset,6) << "\n";
+      << "#   subsetExtent=" << Tuple<int>(subset,6) << "\n"
+      << "#   arrays=";
     for (size_t i=0; i<nArrays; ++i)
       {
-      *log << "#   arrayName_" << i << "=" << arrays[i] << "\n";
+      *log << " " << arrays[i];
       }
+    log->GetHeader() << "\n";
     }
 
   return 0;

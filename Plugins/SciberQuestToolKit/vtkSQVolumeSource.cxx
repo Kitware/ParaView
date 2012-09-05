@@ -50,7 +50,6 @@ typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
 typedef pair<vtkIdType,vtkIdType> MapElement;
 
 // #define SQTK_DEBUG
-// #define vtkSQVolumeSourceTIME
 
 vtkStandardNewMacro(vtkSQVolumeSource);
 
@@ -82,6 +81,8 @@ vtkSQVolumeSource::vtkSQVolumeSource()
   this->Point3[0]=0.0;
   this->Point3[1]=0.0;
   this->Point3[2]=1.0;
+
+  this->LogLevel=0;
 
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
@@ -129,17 +130,19 @@ int vtkSQVolumeSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"immediate_mode",&immediate_mode);
   this->SetImmediateMode(immediate_mode);
 
-  #if defined vtkSQVolumeSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQVolumeSource" << "\n"
-    << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
-    << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
-    << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
-    << "#   point3=" << point3[0] << ", " << point3[1] << ", " << point3[2] << "\n"
-    << "#   resolution=" << resolution[0] << ", " << resolution[1] << ", " << resolution[2] << "\n"
-    << "#   immediate_mode=" << immediate_mode << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+     log->GetHeader()
+      << "# ::vtkSQVolumeSource" << "\n"
+      << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
+      << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
+      << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
+      << "#   point3=" << point3[0] << ", " << point3[1] << ", " << point3[2] << "\n"
+      << "#   resolution=" << resolution[0] << ", " << resolution[1] << ", " << resolution[2] << "\n"
+      << "#   immediate_mode=" << immediate_mode << "\n";
+    }
 
   return 0;
 }

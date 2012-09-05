@@ -18,6 +18,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQLog_h
 #define __vtkSQLog_h
 
+//#define vtkSQLogDEBUG 1
 #ifdef SQTK_DEBUG
 #define vtkSQLogDEBUG 1
 #endif

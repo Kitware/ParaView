@@ -54,6 +54,15 @@ public:
   // in demand mode a cell generator is placed in the pipeline and
   // a single cell is placed in the output.
   vtkSetMacro(ImmediateMode,int);
+
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
   vtkGetMacro(ImmediateMode,int);
 
 protected:
@@ -72,6 +81,7 @@ private:
   double Point2[3];
   double Point3[3];
   int Resolution[3];
+  int LogLevel;
 
 private:
   vtkSQVolumeSource(const vtkSQVolumeSource&);  // Not implemented.

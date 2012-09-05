@@ -56,6 +56,15 @@ public:
   vtkSetMacro(UseHighValue,int);
   vtkGetMacro(UseHighValue,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQBinaryThreshold();
   ~vtkSQBinaryThreshold();
@@ -73,6 +82,7 @@ private:
   double HighValue;
   int UseLowValue;
   int UseHighValue;
+  int LogLevel;
 };
 
 #endif

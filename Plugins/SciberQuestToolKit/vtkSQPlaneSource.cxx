@@ -30,6 +30,7 @@
 #include "vtkSQMetaDataKeys.h"
 #include "vtkSQPlaneSourceConstants.h"
 #include "vtkSQPlaneSourceCellGenerator.h"
+#include "Tuple.hxx"
 #include "XMLUtils.h"
 #include "SQMacros.h"
 #include "postream.h"
@@ -117,13 +118,13 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    *log
+    log->GetHeader()
       << "# ::vtkSQPlaneSource" << "\n"
-      << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
-      << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
-      << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
-      << "#   resolution=" << resolution[0] << ", " << resolution[1] << "\n"
-      << "#   immediate_mode=" << immediate_mode << "\n";
+      << "#   origin=" << Tuple<double>(this->Origin,3) << "\n"
+      << "#   point1=" << Tuple<double>(this->Point1,3) << "\n"
+      << "#   point2=" << Tuple<double>(this->Point2,3) << "\n"
+      << "#   resolution=" << this->XResolution << ", " << this->YResolution << "\n"
+      << "#   immediate_mode=" << this->ImmediateMode << "\n";
     }
 
   return 0;

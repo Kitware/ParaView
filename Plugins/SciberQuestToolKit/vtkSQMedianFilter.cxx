@@ -9,11 +9,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQMedianFilter.h"
 
 // #define SQTK_DEBUG
-// #define vtkSQMedianFilterTIME
-
-#if defined vtkSQMedianFilterTIME
-  #include "vtkSQLog.h"
-#endif
 
 #include "SQPosixOnWindows.h"
 #include "SQVTKTemplateMacroWarningSupression.h"
@@ -24,6 +19,7 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianExtent.h"
 #include "CPUConvolutionDriver.h"
 #include "CUDAConvolutionDriver.h"
+#include "vtkSQLog.h"
 #include "XMLUtils.h"
 #include "postream.h"
 #include "SQMacros.h"
@@ -68,12 +64,13 @@ vtkSQMedianFilter::vtkSQMedianFilter()
   KernelType(KERNEL_TYPE_MEDIAN),
   //Kernel(0),
   KernelModified(1),
-  Mode(CartesianExtent::DIM_MODE_3D)
+  Mode(CartesianExtent::DIM_MODE_3D),
   //NumberOfCUDADevices(0),
   //NumberOfActiveCUDADevices(0),
   //CUDADeviceId(-1),
   //NumberOfMPIRanksToUseCUDA(0),
-  //EnableCUDA(0)
+  //EnableCUDA(0),
+  LogLevel(0)
 {
   #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQMedianFilter::vtkSQMedianFilter" << endl;
@@ -264,15 +261,18 @@ int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"numberOfMPIRanksToUseCUDA",&numberOfMPIRanksToUseCUDA);
   */
 
-  #if defined vtkSQMedianFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQMedianFilter" << "\n"
-    << "#   stencilWidth=" << stencilWidth << "\n"
-    << "#   kernelType=" << kernelType << "\n";
-    //<< "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
-    //<< "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+    log->GetHeader()
+      << "# ::vtkSQMedianFilter" << "\n"
+      << "#   stencilWidth=" << stencilWidth << "\n"
+      << "#   kernelType=" << kernelType << "\n";
+      //<< "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
+      //<< "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
+    }
 
   /*
   if (numberOfMPIRanksToUseCUDA)
@@ -783,10 +783,12 @@ int vtkSQMedianFilter::RequestData(
   pCerr() << "=====vtkSQMedianFilter::RequestData" << endl;
   #endif
 
-  #if defined vtkSQMedianFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQMedianFilter::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQMedianFilter::RequestData");
+    }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -1036,9 +1038,10 @@ int vtkSQMedianFilter::RequestData(
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
 
-  #if defined vtkSQMedianFilterTIME
-  log->EndEvent("vtkSQMedianFilter::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQMedianFilter::RequestData");
+    }
 
  return 1;
 }

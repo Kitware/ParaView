@@ -142,38 +142,32 @@ int vtkSQVortexFilter::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"computeGradient",&computeGradient);
   this->SetComputeGradient(computeGradient);
 
-  if (!(
-      computeRotation ||
-      computeHelicity ||
-      computeNormalizedHelicity ||
-      computeQ ||
-      computeLambda ||
-      computeLambda2 ||
-      computeDivergence ||
-      computeGradient
-      ))
-    {
-    sqErrorMacro(pCerr(),"Nothing to compute.");
-    }
-
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
-    *log
+    log->GetHeader()
       << "# ::vtkSQVortexFilter" << "\n"
       //<< "#   passInput=" << passInput << "\n" TODO
-      << "#   resultMagnitude=" << resultMagnitude << "\n"
-      << "#   splitComponents=" << splitComponents << "\n"
-      << "#   computeRotation=" << computeRotation << "\n"
-      << "#   computeHelicity=" << computeHelicity << "\n"
-      << "#   computeNormalizedHelicity=" << computeNormalizedHelicity << "\n"
-      << "#   computeQ=" << computeQ << "\n"
-      << "#   computeLambda=" << computeLambda << "\n"
-      << "#   computeLambda2=" << computeLambda2 << "\n"
-      << "#   computeDivergence=" << computeDivergence << "\n"
-      << "#   computeGradient=" << computeGradient << "\n"
-      << "\n";
+      << "#   resultMagnitude=" << this->ResultMagnitude << "\n"
+      << "#   splitComponents=" << this->SplitComponents << "\n"
+      << "#   computeRotation=" << this->ComputeRotation << "\n"
+      << "#   computeHelicity=" << this->ComputeHelicity << "\n"
+      << "#   computeNormalizedHelicity=" << this->ComputeNormalizedHelicity << "\n"
+      << "#   computeQ=" << this->ComputeQ << "\n"
+      << "#   computeLambda=" << this->ComputeLambda << "\n"
+      << "#   computeLambda2=" << this->ComputeLambda2 << "\n"
+      << "#   computeDivergence=" << this->ComputeDivergence << "\n"
+      << "#   computeGradient=" << this->ComputeGradient << "\n"
+      << "#   arraysToCopy=";
+
+    set<string>::iterator it=this->ArraysToCopy.begin();
+    set<string>::iterator end=this->ArraysToCopy.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << " " << *it;
+      }
+    log->GetHeader() << "\n";
     }
 
   return 0;

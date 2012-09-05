@@ -16,6 +16,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 
+#include "vtkSQLog.h"
 #include "XMLUtils.h"
 #include "SQMacros.h"
 
@@ -25,9 +26,6 @@ using std::string;
 // #define SQTK_DEBUG
 // #define vtkSQBinaryThresholdTIME
 
-#if defined vtkSQBinaryThresholdTIME
-  #include "vtkSQLog.h"
-#endif
 
 // ****************************************************************************
 template<typename T>
@@ -70,6 +68,7 @@ vtkSQBinaryThreshold::vtkSQBinaryThreshold()
   this->HighValue=1.0;
   this->UseLowValue=1;
   this->UseHighValue=1;
+  this->LogLevel=0;
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
@@ -97,11 +96,13 @@ int vtkSQBinaryThreshold::Initialize(vtkPVXMLElement *root)
     return -1;
     }
 
-  #if defined vtkSQBinaryThresholdTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQBinaryThreshold" << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQBinaryThreshold" << "\n";
+    }
 
   return 0;
 }
@@ -115,10 +116,13 @@ int vtkSQBinaryThreshold::RequestData(
   #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQBinaryThreshold::RequestData" << endl;
   #endif
-  #if defined vtkSQBinaryThresholdTIME
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQBinaryThreshold::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQBinaryThreshold::RequestData");
+    }
 
   (void)req;
 
@@ -185,9 +189,10 @@ int vtkSQBinaryThreshold::RequestData(
           << S->GetClassName());
     }
 
-  #if defined vtkSQBinaryThresholdTIME
-  log->EndEvent("vtkSQBinaryThreshold::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQBinaryThreshold::RequestData");
+    }
 
   return 1;
 }
