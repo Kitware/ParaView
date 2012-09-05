@@ -200,12 +200,6 @@ vtkPVPluginTracker* vtkPVPluginTracker::GetInstance()
       vtkPVPluginTrackerDebugMacro(
         "Could not find .plugins file for distributed plugins");
       }
-
-    // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
-    // These are always loaded (not merely located).
-    vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
-    loader->LoadPluginsFromPluginSearchPath();
-    loader->Delete();
     }
 
   return Instance;
