@@ -1122,7 +1122,7 @@
           <Property name="Texture"
                     panel_visibility="advanced" />
           <Property name="AllowSpecularHighlightingWithScalarColoring"
-                    panel_visibility="advanced" />
+                    panel_visibility="never" />
           <Property name="EdgeColor"
                     panel_widget="color_selector"
                     panel_visibility="advanced" />
@@ -1416,7 +1416,9 @@
                     panel_visibility="never" />
           <Property name="ExtractedBlockIndex"
                     panel_visibility="never" />
-          <Property name="SelectMapper" />
+          <Property name="SelectMapper"
+                    panel_visibility="advanced"
+                    panel_visibility_default_for_representation="volume" />
         </ExposedProperties>
       </SubProxy>
       <!-- End of UnstructuredGridRepresentation -->
