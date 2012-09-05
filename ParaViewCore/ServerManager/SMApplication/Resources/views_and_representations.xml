@@ -1655,7 +1655,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="1"
@@ -1839,7 +1839,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="2"
@@ -2041,7 +2041,7 @@
                          default_values="1"
                          name="Pickable"
                          number_of_elements="1">
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="2"
@@ -2493,7 +2493,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
@@ -2726,7 +2726,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <ProxyProperty command="SetTexture"
                      name="Texture"
