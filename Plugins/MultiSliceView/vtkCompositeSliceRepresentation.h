@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkCompositeMultiSliceRepresentation.h
+  Module:    vtkCompositeSliceRepresentation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,25 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCompositeMultiSliceRepresentation - a data-representation used by ParaView.
+// .NAME vtkCompositeSliceRepresentation - a data-representation used by ParaView.
 // .SECTION Description
 // vtkCompositeMultiSliceRepresentation is similar to
 // vtkPVCompositeRepresentation but with a MultiSlice Representation as only
 // choice underneath.
 
-#ifndef __vtkCompositeMultiSliceRepresentation_h
-#define __vtkCompositeMultiSliceRepresentation_h
+#ifndef __vtkCompositeSliceRepresentation_h
+#define __vtkCompositeSliceRepresentation_h
 
 #include "vtkPVCompositeRepresentation.h"
 
 class vtkOutlineRepresentation;
-class vtkSliceExtractorRepresentation;
+class vtkSliceFriendGeometryRepresentation;
+class vtkThreeSliceFilter;
 
-class VTK_EXPORT vtkCompositeMultiSliceRepresentation : public vtkPVCompositeRepresentation
+class vtkCompositeSliceRepresentation : public vtkPVCompositeRepresentation
 {
 public:
-  static vtkCompositeMultiSliceRepresentation* New();
-  vtkTypeMacro(vtkCompositeMultiSliceRepresentation, vtkPVCompositeRepresentation);
+  static vtkCompositeSliceRepresentation* New();
+  vtkTypeMacro(vtkCompositeSliceRepresentation, vtkPVCompositeRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -61,10 +62,15 @@ public:
   virtual void SetForceUseCache(bool val);
   virtual void SetForcedCacheKey(double val);
 
+  // Description:
+  // Override that method in order to retrieve the Slice representation one
+  // so we can internally bind it to our slice filter.
+  virtual void AddRepresentation(const char* key, vtkPVDataRepresentation* repr);
+
 //BTX
 protected:
-  vtkCompositeMultiSliceRepresentation();
-  ~vtkCompositeMultiSliceRepresentation();
+  vtkCompositeSliceRepresentation();
+  ~vtkCompositeSliceRepresentation();
 
   // Description:
   // Adds the representation to the view.  This is called from
@@ -79,15 +85,17 @@ protected:
   virtual bool RemoveFromView(vtkView* view);
 
   vtkOutlineRepresentation* OutlineRepresentation;
-  vtkSliceExtractorRepresentation* Slice1;
-  vtkSliceExtractorRepresentation* Slice2;
-  vtkSliceExtractorRepresentation* Slice3;
+  vtkSliceFriendGeometryRepresentation* Slices[4];
+  vtkThreeSliceFilter* InternalSliceFilter;
 
   void ModifiedInternalCallback(vtkObject* src, unsigned long event, void* data);
+  void UpdateSliceConfigurationCallBack(vtkObject* src, unsigned long event, void* data);
+
+  unsigned long ViewObserverId;
 
 private:
-  vtkCompositeMultiSliceRepresentation(const vtkCompositeMultiSliceRepresentation&); // Not implemented
-  void operator=(const vtkCompositeMultiSliceRepresentation&); // Not implemented
+  vtkCompositeSliceRepresentation(const vtkCompositeSliceRepresentation&); // Not implemented
+  void operator=(const vtkCompositeSliceRepresentation&); // Not implemented
 //ETX
 };
 

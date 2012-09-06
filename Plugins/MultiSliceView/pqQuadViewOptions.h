@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqThreeSliceViewOptions.h
+   Module:  pqQuadViewOptions.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,23 +30,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqThreeSliceViewOptions_h
-#define _pqThreeSliceViewOptions_h
+#ifndef _pqQuadViewOptions_h
+#define _pqQuadViewOptions_h
 
 #include "pqOptionsContainer.h"
 #include <QPointer>
 
 class pqView;
-class pqThreeSliceView;
+class pqQuadView;
 
 /// options container for pages of my view options
-class pqThreeSliceViewOptions : public pqOptionsContainer
+class pqQuadViewOptions : public pqOptionsContainer
 {
   Q_OBJECT
 
 public:
-  pqThreeSliceViewOptions(QWidget *parent=0);
-  virtual ~pqThreeSliceViewOptions();
+  pqQuadViewOptions(QWidget *parent=0);
+  virtual ~pqQuadViewOptions();
 
   // set the view to show options for
   void setView(pqView* view);
@@ -65,7 +65,7 @@ public:
   virtual bool isApplyUsed() const { return true; }
 
 protected:
-  QPointer<pqThreeSliceView> View;
+  QPointer<pqQuadView> View;
 
 private:
   class pqInternal;

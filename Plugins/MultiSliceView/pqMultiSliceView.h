@@ -50,10 +50,6 @@ public slots:
   void updateAxisBounds(double bounds[6]);
   void updateSlices();
 
-protected slots:
-  void addPropertyListener(pqRepresentation*);
-  void removePropertyListener(pqRepresentation*);
-
 protected:
   void updateViewModelCallBack(vtkObject*,unsigned long, void*);
 

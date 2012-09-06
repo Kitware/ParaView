@@ -54,12 +54,19 @@ pqMultiSliceView::pqMultiSliceView(
                    this, SLOT(updateAxisBounds()));
 
   // Make sure all the representations share the same slice values
-  QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
-                   this, SLOT(addPropertyListener(pqRepresentation*)));
-  QObject::connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
-                   this, SLOT(removePropertyListener(pqRepresentation*)));
   QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
                    this, SLOT(updateAxisBounds()));
+
+  // Make sure if the proxy change by undo-redo, we properly update the Qt UI
+  viewProxy->GetProperty("XSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this,
+        &pqMultiSliceView::updateViewModelCallBack);
+  viewProxy->GetProperty("YSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this,
+        &pqMultiSliceView::updateViewModelCallBack);
+  viewProxy->GetProperty("ZSlicesValues")->AddObserver(
+        vtkCommand::ModifiedEvent, this,
+        &pqMultiSliceView::updateViewModelCallBack);
 }
 
 //-----------------------------------------------------------------------------
@@ -191,82 +198,17 @@ void pqMultiSliceView::updateSlices()
   int nbSliceZ = 0;
   const double* sliceZ = this->AxisZ->getVisibleSlices(nbSliceZ);
 
-  foreach(pqRepresentation* rep, this->getRepresentations())
-    {
-    if( rep->isWidgetType() ||
-        !rep->getProxy()->GetProperty("XSlicesValues"))
-      {
-      continue;
-      }
-    vtkSMRepresentationProxy* smRep =
-        vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
+  // Update view which will notify its representation that care about those info
+  vtkSMViewProxy* view = this->getViewProxy();
+  vtkSMPropertyHelper(view, "XSlicesValues").Set(sliceX, nbSliceX);
+  vtkSMPropertyHelper(view, "YSlicesValues").Set(sliceY, nbSliceY);
+  vtkSMPropertyHelper(view, "ZSlicesValues").Set(sliceZ, nbSliceZ);
+  view->UpdateVTKObjects();
 
-    vtkSMPropertyHelper(smRep, "XSlicesValues").Set(sliceX, nbSliceX);
-    vtkSMPropertyHelper(smRep, "YSlicesValues").Set(sliceY, nbSliceY);
-    vtkSMPropertyHelper(smRep, "ZSlicesValues").Set(sliceZ, nbSliceZ);
-
-    smRep->MarkModified(NULL);
-    smRep->MarkDirty(NULL);
-    smRep->UpdateVTKObjects();
-    }
   this->render();
 
   // Get back to an idle mode
   this->UserIsInteracting = false;
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiSliceView::addPropertyListener(pqRepresentation* rep)
-{
-  // Make sure it's a representation we care for
-  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
-    {
-    return;
-    }
-
-  this->ObserverIdX[rep] =
-      rep->getProxy()->GetProperty("XSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
-  this->ObserverIdY[rep] =
-      rep->getProxy()->GetProperty("YSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
-  this->ObserverIdZ[rep] =
-      rep->getProxy()->GetProperty("ZSlicesValues")->AddObserver(
-        vtkCommand::ModifiedEvent, this, &pqMultiSliceView::updateViewModelCallBack);
-
-  // Make sure the added representation get synch with the current view configuration
-  int nbSlicesX, nbSlicesY, nbSlicesZ;
-  this->AxisX->getVisibleSlices(nbSlicesX);
-  this->AxisY->getVisibleSlices(nbSlicesY);
-  this->AxisZ->getVisibleSlices(nbSlicesZ);
-
-  // If no slice defined then check if the added representation has some...
-  if(nbSlicesX == 0 && nbSlicesY == 0 && nbSlicesZ == 0)
-    {
-    this->updateViewModelCallBack(NULL, 0, NULL);
-    }
-  else
-    {
-    this->updateSlices();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMultiSliceView::removePropertyListener(pqRepresentation* rep)
-{
-  // Make sure it's a representation we care for
-  if( rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
-    {
-    return;
-    }
-
-  rep->getProxy()->GetProperty("XSlicesValues")->RemoveObserver(this->ObserverIdX[rep]);
-  rep->getProxy()->GetProperty("YSlicesValues")->RemoveObserver(this->ObserverIdY[rep]);
-  rep->getProxy()->GetProperty("ZSlicesValues")->RemoveObserver(this->ObserverIdZ[rep]);
-
-  this->ObserverIdX.remove(rep);
-  this->ObserverIdY.remove(rep);
-  this->ObserverIdZ.remove(rep);
 }
 
 //-----------------------------------------------------------------------------
@@ -277,45 +219,26 @@ void pqMultiSliceView::updateViewModelCallBack(vtkObject*,unsigned long, void*)
     return; // We don't want to update our data model
     }
 
-  // Let's pick a valid representation and update the view from it
-  bool needToUpdateUI = true;
-  foreach(pqRepresentation* rep, this->getRepresentations())
-    {
-    if(rep->isWidgetType() || !rep->getProxy()->GetProperty("XSlicesValues"))
-      {
-      continue;
-      }
-    vtkSMRepresentationProxy* smRep =
-        vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
+  std::vector<double> xSlices =
+      vtkSMPropertyHelper(this->getViewProxy(), "XSlicesValues").GetDoubleArray();
+  std::vector<double> ySlices =
+      vtkSMPropertyHelper(this->getViewProxy(), "YSlicesValues").GetDoubleArray();
+  std::vector<double> zSlices =
+      vtkSMPropertyHelper(this->getViewProxy(), "ZSlicesValues").GetDoubleArray();
 
-    if(needToUpdateUI)
-      {
-      std::vector<double> xSlices =
-          vtkSMPropertyHelper(smRep, "XSlicesValues").GetDoubleArray();
-      std::vector<double> ySlices =
-          vtkSMPropertyHelper(smRep, "YSlicesValues").GetDoubleArray();
-      std::vector<double> zSlices =
-          vtkSMPropertyHelper(smRep, "ZSlicesValues").GetDoubleArray();
+  assert("The maximum number of slice can not be bigger than 255" &&
+         ( 255 >
+           std::max(
+             std::max(
+               xSlices.size(), ySlices.size()), zSlices.size())));
 
-      assert("The maximum number of slice can not be bigger than 255" &&
-             ( 255 >
-               std::max(
-                 std::max(
-                   xSlices.size(), ySlices.size()), zSlices.size())));
+  // Build a tmp array of visibility set to true
+  bool visibility[255];
+  memset(visibility, true, 255);
 
-      // Build a tmp array of visibility set to true
-      bool visibility[255];
-      memset(visibility, true, 255);
-
-      this->AxisX->updateSlices(&xSlices[0], visibility, static_cast<int>(xSlices.size()));
-      this->AxisY->updateSlices(&ySlices[0], visibility, static_cast<int>(ySlices.size()));
-      this->AxisZ->updateSlices(&zSlices[0], visibility, static_cast<int>(zSlices.size()));
-      }
-
-    smRep->MarkModified(NULL);
-    smRep->MarkDirty(NULL);
-    smRep->UpdateVTKObjects();
-    }
+  this->AxisX->updateSlices(&xSlices[0], visibility, static_cast<int>(xSlices.size()));
+  this->AxisY->updateSlices(&ySlices[0], visibility, static_cast<int>(ySlices.size()));
+  this->AxisZ->updateSlices(&zSlices[0], visibility, static_cast<int>(zSlices.size()));
 
   this->render();
 }

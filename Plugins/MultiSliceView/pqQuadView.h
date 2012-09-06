@@ -49,9 +49,53 @@ public:
              pqServer* server,
              QObject* p);
   virtual ~pqQuadView();
+
+
+  /// Access Normals for all slices
+  //@{
+  const double* getTopLeftNormal();
+  const double* getTopRightNormal();
+  const double* getBottomLeftNormal();
+  //@}
+
+  /// Access ViewUp for all slices
+  //@{
+  const double* getTopLeftViewUp();
+  const double* getTopRightViewUp();
+  const double* getBottomLeftViewUp();
+  //@}
+
+  /// Access Origin of all slices
+  const double* getSlicesOrigin();
+
+  /// Set Slices Normals
+  //@{
+  void setTopLeftNormal(double x, double y, double z);
+  void setTopRightNormal(double x, double y, double z);
+  void setBottomLeftNormal(double x, double y, double z);
+  //@}
+
+  /// Set Slices ViewUp
+  //@{
+  void setTopLeftViewUp(double x, double y, double z);
+  void setTopRightViewUp(double x, double y, double z);
+  void setBottomLeftViewUp(double x, double y, double z);
+  //@}
+
+  /// Set Slices Origin
+  void setSlicesOrigin(double x, double y, double z);
+
+  /// Reset Normal/ViewUp/Origin to their defaults
+  void resetDefaultSettings();
+
 protected:
   /// Override to decorate the QVTKWidget
   virtual QWidget* createWidget();
+
+  // Store the property information and return the pointer to that location
+  const double* getVector(const char* propertyName, int offset);
+  const double* setVector(const char* propertyName, int offset, double x, double y, double z);
+  double DataHolder[21];
 
 private:
   Q_DISABLE_COPY(pqQuadView)

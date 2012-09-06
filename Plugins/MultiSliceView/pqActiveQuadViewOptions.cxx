@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqActiveThreeSliceRenderViewOptions.cxx
+   Module:  pqActiveQuadViewOptions.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,37 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqActiveThreeSliceRenderViewOptions.cxx
+/// \file pqActiveQuadViewOptions.cxx
 /// \date 8/02/2012
 
-#include "pqActiveThreeSliceRenderViewOptions.h"
+#include "pqActiveQuadViewOptions.h"
 
 #include <QPointer>
 
 #include "pqRenderViewOptions.h"
 #include "pqOptionsDialog.h"
-#include "pqThreeSliceViewOptions.h"
+#include "pqQuadViewOptions.h"
 
-class pqActiveThreeSliceRenderViewOptions::pqInternal
+class pqActiveQuadViewOptions::pqInternal
 {
 public:
   QPointer<pqOptionsDialog> Dialog;
   pqRenderViewOptions* GeneralOptions;
-  pqThreeSliceViewOptions* Options;
+  pqQuadViewOptions* Options;
 };
 
-pqActiveThreeSliceRenderViewOptions::pqActiveThreeSliceRenderViewOptions(QObject *parentObject)
+pqActiveQuadViewOptions::pqActiveQuadViewOptions(QObject *parentObject)
   : pqActiveViewOptions(parentObject)
 {
   this->Internal = new pqInternal;
 }
 
-pqActiveThreeSliceRenderViewOptions::~pqActiveThreeSliceRenderViewOptions()
+pqActiveQuadViewOptions::~pqActiveQuadViewOptions()
 {
   delete this->Internal;
 }
 
-void pqActiveThreeSliceRenderViewOptions::showOptions(
+void pqActiveQuadViewOptions::showOptions(
     pqView *view, const QString &page, QWidget *widgetParent)
 {
   if(!this->Internal->Dialog)
@@ -70,7 +70,7 @@ void pqActiveThreeSliceRenderViewOptions::showOptions(
     this->Internal->Dialog->setObjectName("ActiveRenderViewOptions");
     this->Internal->Dialog->setWindowTitle("View Settings (Render View)");
     this->Internal->GeneralOptions = new pqRenderViewOptions;
-    this->Internal->Options = new pqThreeSliceViewOptions;
+    this->Internal->Options = new pqQuadViewOptions;
     this->Internal->Dialog->addOptions(this->Internal->GeneralOptions);
     this->Internal->Dialog->addOptions(this->Internal->Options);
     if(page.isEmpty())
@@ -95,13 +95,13 @@ void pqActiveThreeSliceRenderViewOptions::showOptions(
   this->Internal->Dialog->show();
 }
 
-void pqActiveThreeSliceRenderViewOptions::changeView(pqView *view)
+void pqActiveQuadViewOptions::changeView(pqView *view)
 {
   this->Internal->GeneralOptions->setView(view);
   this->Internal->Options->setView(view);
 }
 
-void pqActiveThreeSliceRenderViewOptions::closeOptions()
+void pqActiveQuadViewOptions::closeOptions()
 {
   if(this->Internal->Dialog)
     {
@@ -109,7 +109,7 @@ void pqActiveThreeSliceRenderViewOptions::closeOptions()
     }
 }
 
-void pqActiveThreeSliceRenderViewOptions::finishDialog()
+void pqActiveQuadViewOptions::finishDialog()
 {
   emit this->optionsClosed(this);
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqActiveThreeSliceRenderViewOptions.h
+   Module:  pqActiveQuadViewOptions.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,27 +30,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqActiveThreeSliceRenderViewOptions.h
+/// \file pqActiveQuadViewOptions.h
 /// \date 8/01/2012
 
-#ifndef _pqActiveThreeSliceRenderViewOptions_h
-#define _pqActiveThreeSliceRenderViewOptions_h
+#ifndef _pqActiveQuadViewOptions_h
+#define _pqActiveQuadViewOptions_h
 
 
 #include "pqActiveViewOptions.h"
 
 
-/// \class pqActiveThreeSliceRenderViewOptions
+/// \class pqActiveQuadViewOptions
 /// \brief
-///   The pqActiveThreeSliceRenderViewOptions class is used to dislpay an
+///   The pqActiveQuadViewOptions class is used to dislpay an
 ///   options dialog for the ThreeSlice render view.
-class pqActiveThreeSliceRenderViewOptions : public pqActiveViewOptions
+class pqActiveQuadViewOptions : public pqActiveViewOptions
 {
   Q_OBJECT
 
 public:
-  pqActiveThreeSliceRenderViewOptions(QObject *parent=0);
-  virtual ~pqActiveThreeSliceRenderViewOptions();
+  pqActiveQuadViewOptions(QObject *parent=0);
+  virtual ~pqActiveQuadViewOptions();
 
   /// \name pqActiveViewOptions Methods
   //@{

@@ -16,19 +16,16 @@ IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE_DIRECTORIES(${PARAVIEW_GUI_INCLUDE_DIRS})
 
   QT4_WRAP_CPP(MOC_SRCS
-    pqActiveThreeSliceRenderViewOptions.h
-
     pqMultiSliceAxisWidget.h
     pqMultiSliceView.h
 
-    pqThreeSliceView.h
-    pqThreeSliceViewOptions.h
-
     pqQuadView.h
+    pqQuadViewOptions.h
+    pqActiveQuadViewOptions.h
   )
 
   QT4_WRAP_UI(UI_SRCS
-    pqThreeSliceViewOptions.ui
+    pqQuadViewOptions.ui
   )
 
   ADD_PARAVIEW_VIEW_MODULE(
@@ -39,16 +36,8 @@ IF(PARAVIEW_BUILD_QT_GUI)
     VIEW_XML_NAME MultiSlice
   )
 
-  ADD_PARAVIEW_VIEW_MODULE(
-    VIEW2_IFACE VIEW2_IFACE_SRCS
-    VIEW_TYPE pqThreeSliceView
-    VIEW_NAME "ThreeSlice View"
-    VIEW_XML_GROUP views
-    VIEW_XML_NAME ThreeSlice
-  )
-
   add_paraview_view_module(
-    VIEW3_IFACE VIEW3_IFACE_SRCS
+    VIEW2_IFACE VIEW2_IFACE_SRCS
     VIEW_TYPE pqQuadView
     VIEW_NAME "Quad View"
     VIEW_XML_GROUP "views"
@@ -56,21 +45,19 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
   ADD_PARAVIEW_VIEW_OPTIONS(
     VIEW2_OPTIONS_IFACE VIEW2_OPTIONS_IFACE_SRCS
-    VIEW_TYPE pqThreeSliceView
-    ACTIVE_VIEW_OPTIONS pqActiveThreeSliceRenderViewOptions
+    VIEW_TYPE pqQuadView
+    ACTIVE_VIEW_OPTIONS pqActiveQuadViewOptions
   )
 
   ADD_PARAVIEW_PLUGIN(SliceViews "1.0"
 
     SERVER_MANAGER_SOURCES
-      vtkCompositeMultiSliceRepresentation.cxx
-      vtkMultiSliceRepresentation.cxx
+      vtkCompositeSliceRepresentation.cxx
+      vtkPVMultiSliceView.cxx
       vtkPVQuadRenderView.cxx
-      vtkPVThreeSliceView.cxx
       vtkSMMultiSliceViewProxy.cxx
       vtkSMQuadViewProxy.cxx
-      vtkSMThreeSliceViewProxy.cxx
-      vtkSliceExtractorRepresentation.cxx
+      vtkSliceFriendGeometryRepresentation.cxx
       vtkThreeSliceFilter.cxx
 
     SERVER_MANAGER_XML
@@ -79,7 +66,6 @@ IF(PARAVIEW_BUILD_QT_GUI)
     GUI_INTERFACES
       ${VIEW1_IFACE}
       ${VIEW2_IFACE}
-      ${VIEW3_IFACE}
       ${VIEW2_OPTIONS_IFACE}
 
     GUI_SOURCES
@@ -87,23 +73,20 @@ IF(PARAVIEW_BUILD_QT_GUI)
       ${UI_SRCS}
       ${VIEW1_IFACE_SRCS}
       ${VIEW2_IFACE_SRCS}
-      ${VIEW3_IFACE_SRCS}
       ${VIEW2_OPTIONS_IFACE_SRCS}
-      pqActiveThreeSliceRenderViewOptions.cxx
+      pqActiveQuadViewOptions.cxx
 
       pqMultiSliceAxisWidget.cxx
       pqMultiSliceView.cxx
 
-      pqThreeSliceView.cxx
-      pqThreeSliceViewOptions.cxx
-
       pqQuadView.cxx
+      pqQuadViewOptions.cxx
+      pqActiveQuadViewOptions.cxx
 
       vtkMultiSliceContextItem.cxx
   )
 
 ENDIF(PARAVIEW_BUILD_QT_GUI)
-
 
 # Add testing if necessary
 if (BUILD_TESTING)

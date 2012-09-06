@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:  pqThreeSliceViewOptions.cxx
+   Module:  pqQuadViewOptions.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqThreeSliceViewOptions.h"
-#include "ui_pqThreeSliceViewOptions.h"
+#include "pqQuadViewOptions.h"
+#include "ui_pqQuadViewOptions.h"
 
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 
 #include <QHBoxLayout>
 
-#include "pqThreeSliceView.h"
+#include "pqQuadView.h"
 
 #include "pqActiveView.h"
 
-class pqThreeSliceViewOptions::pqInternal
+class pqQuadViewOptions::pqInternal
 {
 public:
-  Ui::pqThreeSliceViewOptions ui;
+  Ui::pqQuadViewOptions ui;
 };
 
 //----------------------------------------------------------------------------
-pqThreeSliceViewOptions::pqThreeSliceViewOptions(QWidget *widgetParent)
+pqQuadViewOptions::pqQuadViewOptions(QWidget *widgetParent)
   : pqOptionsContainer(widgetParent)
 {
   this->Internal = new pqInternal();
@@ -128,25 +128,25 @@ pqThreeSliceViewOptions::pqThreeSliceViewOptions(QWidget *widgetParent)
 }
 
 //----------------------------------------------------------------------------
-pqThreeSliceViewOptions::~pqThreeSliceViewOptions()
+pqQuadViewOptions::~pqQuadViewOptions()
 {
 }
 
 //----------------------------------------------------------------------------
-void pqThreeSliceViewOptions::setPage(const QString&)
+void pqQuadViewOptions::setPage(const QString&)
 {
 }
 
 //----------------------------------------------------------------------------
-QStringList pqThreeSliceViewOptions::getPageList()
+QStringList pqQuadViewOptions::getPageList()
 {
   QStringList ret;
-  ret << "Three Slice View";
+  ret << "Quad View";
   return ret;
 }
 
 //----------------------------------------------------------------------------
-void pqThreeSliceViewOptions::applyChanges()
+void pqQuadViewOptions::applyChanges()
 {
   if(!this->View)
     {
@@ -183,7 +183,7 @@ void pqThreeSliceViewOptions::applyChanges()
 }
 
 //----------------------------------------------------------------------------
-void pqThreeSliceViewOptions::resetChanges()
+void pqQuadViewOptions::resetChanges()
 {
   if(!this->View)
     {
@@ -195,9 +195,9 @@ void pqThreeSliceViewOptions::resetChanges()
 }
 
 //----------------------------------------------------------------------------
-void pqThreeSliceViewOptions::setView(pqView* view)
+void pqQuadViewOptions::setView(pqView* view)
 {
-  this->View = qobject_cast<pqThreeSliceView*>(view);
+  this->View = qobject_cast<pqQuadView*>(view);
 
   if(!this->View)
     {

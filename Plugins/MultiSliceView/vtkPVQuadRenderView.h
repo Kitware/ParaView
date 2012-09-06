@@ -19,14 +19,14 @@
 #ifndef __vtkPVQuadRenderView_h
 #define __vtkPVQuadRenderView_h
 
-#include "vtkPVRenderView.h"
+#include "vtkPVMultiSliceView.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
-class vtkPVQuadRenderView : public vtkPVRenderView
+class vtkPVQuadRenderView : public vtkPVMultiSliceView
 {
 public:
   static vtkPVQuadRenderView* New();
-  vtkTypeMacro(vtkPVQuadRenderView, vtkPVRenderView);
+  vtkTypeMacro(vtkPVQuadRenderView, vtkPVMultiSliceView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -42,8 +42,8 @@ public:
   enum ViewTypes
     {
     TOP_LEFT = 0,
-    BOTTOM_LEFT = 1,
-    TOP_RIGHT = 2
+    TOP_RIGHT = 1,
+    BOTTOM_LEFT = 2
     };
 
   vtkRenderWindow* GetOrthoViewWindow(ViewTypes type);
@@ -81,8 +81,27 @@ public:
   // Set the bottom-right window size, which is same this superclass' size.
   void SetSizeBottomRight(int x, int y) { this->Superclass::SetSize(x, y); }
 
-  void ResetCamera();
-  void ResetCamera(double bounds[6]);
+  virtual void ResetCamera();
+  virtual void ResetCamera(double bounds[6]);
+
+  // Description:
+  // Set the camera to look perpendicular to the slice as well as setting the
+  // slice normal for the "X" ones.
+  void SetViewNormalTopLeft(double x, double y, double z);
+
+  // Description:
+  // Set the camera to look perpendicular to the slice as well as setting the
+  // slice normal for the "Y" ones.
+  void SetViewNormalTopRight(double x, double y, double z);
+
+  // Description:
+  // Set the camera to look perpendicular to the slice as well as setting the
+  // slice normal for the "Z" ones.
+  void SetViewNormalBottomLeft(double x, double y, double z);
+
+  void SetViewUpTopLeft(double x, double y, double z);
+  void SetViewUpTopRight(double x, double y, double z);
+  void SetViewUpBottomLeft(double x, double y, double z);
 
 //BTX
 protected:

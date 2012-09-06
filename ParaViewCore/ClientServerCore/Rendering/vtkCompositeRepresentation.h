@@ -48,9 +48,9 @@ public:
   // Description:
   // Add/Remove representations. \c key is a unique string used to identify
   // that representation.
-  void AddRepresentation(const char* key, vtkPVDataRepresentation* repr);
-  void RemoveRepresentation(vtkPVDataRepresentation* repr);
-  void RemoveRepresentation(const char* key);
+  virtual void AddRepresentation(const char* key, vtkPVDataRepresentation* repr);
+  virtual void RemoveRepresentation(vtkPVDataRepresentation* repr);
+  virtual void RemoveRepresentation(const char* key);
 
   // Description:
   // Set the active key. If a valid key is not specified, then none of the

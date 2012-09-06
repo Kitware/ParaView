@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVQuadRenderView.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMViewProxy.h"
 
 #include <QGridLayout>
 #include <QWidget>
@@ -75,6 +76,10 @@ pqQuadView::pqQuadView(
     vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : Superclass(viewType, group, name, viewProxy, server, p)
 {
+  for(int i=0; i < 21; ++i)
+    {
+    this->DataHolder[i] = 0.0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -125,3 +130,115 @@ QWidget* pqQuadView::createWidget()
 
   return container;
 }
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getVector(const char* propertyName, int offset)
+{
+  std::vector<double> values =
+      vtkSMPropertyHelper(this->getViewProxy(), propertyName).GetDoubleArray();
+  for(int i=0;i<3;++i)
+    {
+    this->DataHolder[i+ (3*offset)] = values[i];
+    }
+  return &this->DataHolder[(3*offset)];
+}
+
+//-----------------------------------------------------------------------------
+const double* pqQuadView::setVector(const char* propertyName, int offset, double x, double y, double z)
+{
+  this->DataHolder[0 + (3*offset)] = x;
+  this->DataHolder[1 + (3*offset)] = y;
+  this->DataHolder[2 + (3*offset)] = z;
+
+  vtkSMPropertyHelper(this->getViewProxy(), propertyName).Set(&this->DataHolder[(3*offset)], 3);
+  this->getViewProxy()->UpdateVTKObjects();
+
+  return &this->DataHolder[(3*offset)];
+}
+
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getTopLeftNormal()
+{
+  return this->getVector("XSlicesNormal", 1);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getTopRightNormal()
+{
+  return this->getVector("YSlicesNormal",2);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getBottomLeftNormal()
+{
+  return this->getVector("ZSlicesNormal",3);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getTopLeftViewUp()
+{
+  return this->getVector("TopLeftViewUp",4);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getTopRightViewUp()
+{
+  return this->getVector("TopRightViewUp",5);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getBottomLeftViewUp()
+{
+  return this->getVector("BottomLeftViewUp",6);
+}
+//-----------------------------------------------------------------------------
+const double* pqQuadView::getSlicesOrigin()
+{
+  return this->getVector("XSlicesOrigin",0);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setTopLeftNormal(double x, double y, double z)
+{
+  this->setVector("XSlicesNormal", 1, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setTopRightNormal(double x, double y, double z)
+{
+  this->setVector("YSlicesNormal", 2, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setBottomLeftNormal(double x, double y, double z)
+{
+  this->setVector("ZSlicesNormal", 3, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setTopLeftViewUp(double x, double y, double z)
+{
+  this->setVector("TopLeftViewUp", 4, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setTopRightViewUp(double x, double y, double z)
+{
+  this->setVector("TopRightViewUp", 5, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setBottomLeftViewUp(double x, double y, double z)
+{
+  this->setVector("BottomLeftViewUp", 6, x, y, z);
+}
+//-----------------------------------------------------------------------------
+void pqQuadView::setSlicesOrigin(double x, double y, double z)
+{
+  this->setVector("XSlicesOrigin", 0, x, y, z);
+}
+
+//-----------------------------------------------------------------------------
+void pqQuadView::resetDefaultSettings()
+{
+  double value = 0;
+  vtkSMPropertyHelper(this->getViewProxy(), "XSlicesValues").Set(value);
+  vtkSMPropertyHelper(this->getViewProxy(), "YSlicesValues").Set(value);
+  vtkSMPropertyHelper(this->getViewProxy(), "YSlicesValues").Set(value);
+  this->setSlicesOrigin(0,0,0);
+  this->setTopLeftNormal(1,0,0);
+  this->setTopRightNormal(0,1,0);
+  this->setBottomLeftNormal(0,0,1);
+  this->setTopLeftViewUp(0,1,0);
+  this->setTopRightViewUp(0,0,1);
+  this->setBottomLeftViewUp(0,1,0);
+}
+

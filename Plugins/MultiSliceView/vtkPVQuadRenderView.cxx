@@ -15,6 +15,7 @@
 #include "vtkPVQuadRenderView.h"
 
 #include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
@@ -35,6 +36,13 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
       0.1*cc, 0.2*cc, 0.4*cc);
     this->OrthoViews[cc].RenderView->SetInteractionMode(INTERACTION_MODE_2D);
     this->OrthoViews[cc].RenderView->SetCenterAxesVisibility(true);
+    }
+
+  // Create a single slice for each axis by default
+  for(int i=0; i < 3; ++i)
+    {
+    this->SetNumberOfSlice(i, 1);
+    this->SetSlice(i, 0, 0);
     }
 }
 
@@ -119,9 +127,11 @@ void vtkPVQuadRenderView::Render(bool interactive, bool skip_rendering)
 void vtkPVQuadRenderView::ResetCamera()
 {
   this->Superclass::ResetCamera();
+  double bounds[6];
+  this->GeometryBounds.GetBounds(bounds);
   for (int cc=0; cc < 3; cc++)
     {
-    this->OrthoViews[cc].RenderView->ResetCamera();
+    this->OrthoViews[cc].RenderView->ResetCamera(bounds);
     }
 }
 
@@ -139,4 +149,103 @@ void vtkPVQuadRenderView::ResetCamera(double bounds[6])
 void vtkPVQuadRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewNormalTopLeft(double x, double y, double z)
+{
+  vtkPVRenderView* view = this->GetOrthoRenderView(TOP_LEFT);
+  vtkCamera* camera = view->GetActiveCamera();
+  double newCameraPosition[3];
+  camera->GetFocalPoint(newCameraPosition);
+  newCameraPosition[0] += x;
+  newCameraPosition[1] += y;
+  newCameraPosition[2] += z;
+  camera->SetPosition(newCameraPosition);
+
+  // Make sure the viewUp is not // at view normal
+  double* viewUp = camera->GetViewUp();
+  double* normal = camera->GetViewPlaneNormal();
+  if ( fabs(vtkMath::Dot(viewUp,normal)) > 0.999 )
+    {
+    // Need to change viewUp
+    camera->SetViewUp(-viewUp[2], viewUp[0], viewUp[1]);
+    }
+
+  // Update slice X
+  this->SetSliceXNormal(x,y,z);
+
+  this->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewNormalTopRight(double x, double y, double z)
+{
+  vtkPVRenderView* view = this->GetOrthoRenderView(TOP_RIGHT);
+  vtkCamera* camera = view->GetActiveCamera();
+  double newCameraPosition[3] = {0,0,0};
+  camera->GetFocalPoint(newCameraPosition);
+  newCameraPosition[0] += x;
+  newCameraPosition[1] += y;
+  newCameraPosition[2] += z;
+  camera->SetPosition(newCameraPosition);
+
+  // Make sure the viewUp is not // at view normal
+  double* viewUp = camera->GetViewUp();
+  double* normal = camera->GetViewPlaneNormal();
+  if ( fabs(vtkMath::Dot(viewUp,normal)) > 0.999 )
+    {
+    // Need to change viewUp
+    camera->SetViewUp(-viewUp[2], viewUp[0], viewUp[1]);
+    }
+
+  // Update slice Y
+  this->SetSliceYNormal(x,y,z);
+
+  this->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewNormalBottomLeft(double x, double y, double z)
+{
+  vtkPVRenderView* view = this->GetOrthoRenderView(BOTTOM_LEFT);
+  vtkCamera* camera = view->GetActiveCamera();
+  double newCameraPosition[3] = {0,0,0};
+  camera->GetFocalPoint(newCameraPosition);
+  newCameraPosition[0] += x;
+  newCameraPosition[1] += y;
+  newCameraPosition[2] += z;
+  camera->SetPosition(newCameraPosition);
+
+  // Make sure the viewUp is not // at view normal
+  double* viewUp = camera->GetViewUp();
+  double* normal = camera->GetViewPlaneNormal();
+  if ( fabs(vtkMath::Dot(viewUp,normal)) > 0.999 )
+    {
+    // Need to change viewUp
+    camera->SetViewUp(-viewUp[2], viewUp[0], viewUp[1]);
+    }
+
+  // Update slice Z
+  this->SetSliceZNormal(x,y,z);
+
+  this->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewUpTopLeft(double x, double y, double z)
+{
+  this->GetOrthoRenderView(TOP_LEFT)->GetActiveCamera()->SetViewUp(x,y,z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewUpTopRight(double x, double y, double z)
+{
+  this->GetOrthoRenderView(TOP_RIGHT)->GetActiveCamera()->SetViewUp(x,y,z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetViewUpBottomLeft(double x, double y, double z)
+{
+  this->GetOrthoRenderView(BOTTOM_LEFT)->GetActiveCamera()->SetViewUp(x,y,z);
 }
