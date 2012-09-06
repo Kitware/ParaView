@@ -23,6 +23,8 @@
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "vtkNew.h"
+#include "vtkCameraManipulator.h"
 
 vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
@@ -32,8 +34,8 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
     {
     this->OrthoViews[cc].RenderView = vtkSmartPointer<vtkPVRenderView>::New();
     this->OrthoViews[cc].RenderView->GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
-    this->OrthoViews[cc].RenderView->GetRenderer()->SetBackground(
-      0.1*cc, 0.2*cc, 0.4*cc);
+    this->OrthoViews[cc].RenderView->GetRenderer()->SetBackground(this->GetRenderer()->GetBackground());
+//      0.1*cc, 0.2*cc, 0.4*cc);
     this->OrthoViews[cc].RenderView->SetInteractionMode(INTERACTION_MODE_2D);
     this->OrthoViews[cc].RenderView->SetCenterAxesVisibility(true);
     }
@@ -248,4 +250,44 @@ void vtkPVQuadRenderView::SetViewUpTopRight(double x, double y, double z)
 void vtkPVQuadRenderView::SetViewUpBottomLeft(double x, double y, double z)
 {
   this->GetOrthoRenderView(BOTTOM_LEFT)->GetActiveCamera()->SetViewUp(x,y,z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::Add2DManipulator(vtkCameraManipulator* val)
+{
+  this->Superclass::Add2DManipulator(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->Add2DManipulator(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::RemoveAll2DManipulators()
+{
+  this->Superclass::RemoveAll2DManipulators();
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->RemoveAll2DManipulators();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::Add3DManipulator(vtkCameraManipulator* val)
+{
+  this->Superclass::Add3DManipulator(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->Add3DManipulator(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::RemoveAll3DManipulators()
+{
+  this->Superclass::RemoveAll3DManipulators();
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->RemoveAll3DManipulators();
+    }
 }

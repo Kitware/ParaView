@@ -400,10 +400,10 @@ public:
 
   //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
-  void Add2DManipulator(vtkCameraManipulator* val);
-  void RemoveAll2DManipulators();
-  void Add3DManipulator(vtkCameraManipulator* val);
-  void RemoveAll3DManipulators();
+  virtual void Add2DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll2DManipulators();
+  virtual void Add3DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll3DManipulators();
 
   // Description:
   // Overridden to synchronize information among processes whenever data

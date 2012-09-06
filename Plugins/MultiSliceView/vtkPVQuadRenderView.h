@@ -103,6 +103,12 @@ public:
   void SetViewUpTopRight(double x, double y, double z);
   void SetViewUpBottomLeft(double x, double y, double z);
 
+  // Forward accross all the views
+  virtual void Add2DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll2DManipulators();
+  virtual void Add3DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll3DManipulators();
+
 //BTX
 protected:
   vtkPVQuadRenderView();

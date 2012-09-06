@@ -44,6 +44,9 @@ protected:
   ~vtkSMQuadViewProxy();
 
   virtual void CreateVTKObjects();
+  virtual vtkImageData* CaptureWindowInternal(int magnification);
+
+  void UpdateInternalViewExtent(vtkImageData * image, int columnIndex, int rowIndex);
 
 private:
   vtkSMQuadViewProxy(const vtkSMQuadViewProxy&); // Not implemented

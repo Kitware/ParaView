@@ -253,6 +253,7 @@
             <ShareProperties subproxy="SurfaceRepresentation">
               <Exception name="Visibility" />
               <Exception name="Representation" />
+              <Exception name="Opacity" />
             </ShareProperties>
          </SubProxy>
 
@@ -266,6 +267,7 @@
             <ShareProperties subproxy="SurfaceRepresentation">
               <Exception name="Visibility" />
               <Exception name="Representation" />
+              <Exception name="Opacity" />
             </ShareProperties>
          </SubProxy>
 
@@ -279,6 +281,7 @@
             <ShareProperties subproxy="SurfaceRepresentation">
               <Exception name="Visibility" />
               <Exception name="Representation" />
+              <Exception name="Opacity" />
             </ShareProperties>
          </SubProxy>
 

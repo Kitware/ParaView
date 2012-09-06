@@ -14,18 +14,25 @@
 =========================================================================*/
 #include "vtkSMQuadViewProxy.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkDataArray.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVQuadRenderView.h"
 #include "vtkPVRenderViewProxy.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
+#include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkWindowToImageFilter.h"
 
 #include <assert.h>
 
@@ -147,4 +154,109 @@ const char* vtkSMQuadViewProxy::IsSelectVisiblePointsAvailable()
 {
   // The original dataset and the slice don't share the same points
   return "Multi-Slice View do not allow point selection";
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMQuadViewProxy::CaptureWindowInternal(int magnification)
+{
+  vtkPVQuadRenderView* quadView =
+      vtkPVQuadRenderView::SafeDownCast(this->GetClientSideObject());
+
+  // Global var used to loop over
+  vtkRenderWindow* allWindows[4] = {
+    quadView->GetOrthoViewWindow(vtkPVQuadRenderView::TOP_LEFT),
+    quadView->GetOrthoViewWindow(vtkPVQuadRenderView::TOP_RIGHT),
+    quadView->GetOrthoViewWindow(vtkPVQuadRenderView::BOTTOM_LEFT),
+    quadView->GetRenderWindow()
+  };
+
+  vtkPVRenderView* allView[4] = {
+    quadView->GetOrthoRenderView(vtkPVQuadRenderView::TOP_LEFT),
+    quadView->GetOrthoRenderView(vtkPVQuadRenderView::TOP_RIGHT),
+    quadView->GetOrthoRenderView(vtkPVQuadRenderView::BOTTOM_LEFT),
+    quadView
+  };
+
+  // Combined image vars
+  vtkImageData* finalImage = vtkImageData::New();
+
+  // Image generation
+  vtkImageData* currentWindowImage = NULL;
+  vtkNew<vtkWindowToImageFilter> w2i;
+  w2i->SetMagnification(magnification);
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
+  w2i->FixBoundaryOn();
+
+  for(int i=0; i < 4; ++i)
+    {
+#if !defined(__APPLE__)
+    vtkPVRenderView* view = allView[i];
+    vtkRenderWindow* window = allWindows[i];
+    int prevOffscreen = window->GetOffScreenRendering();
+    bool use_offscreen = view->GetUseOffscreenRendering() ||
+                         view->GetUseOffscreenRenderingForScreenshots();
+    window->SetOffScreenRendering(use_offscreen? 1: 0);
+#endif
+
+    allWindows[i]->SwapBuffersOff();
+    this->CaptureWindowInternalRender();
+
+    w2i->SetInput(allWindows[i]);
+    // BUG #8715: We go through this indirection since the active connection needs
+    // to be set during update since it may request re-renders if magnification >1.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << w2i.GetPointer() << "Update"
+           << vtkClientServerStream::End;
+    this->ExecuteStream(stream, false, vtkProcessModule::CLIENT);
+
+    allWindows[i]->SwapBuffersOn();
+
+#if !defined(__APPLE__)
+    window->SetOffScreenRendering(prevOffscreen);
+#endif
+
+    // Update capture information and write data into it.
+    currentWindowImage = w2i->GetOutput();
+
+    // Initialize big picture if needed
+    if(i==0)
+      {
+      // Need to initialize the size of the output data
+      int dimension[3];
+      currentWindowImage->GetDimensions(dimension);
+      dimension[0] *= 2;
+      dimension[1] *= 2;
+      finalImage->SetDimensions(dimension);
+      finalImage->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+      }
+
+    // There is a bug where the cloned views do not correctly
+    // track their own view position (and therefore extent),
+    // so for now we'll manually adjust their extent information.
+    this->UpdateInternalViewExtent(currentWindowImage, i%2, i/2);
+
+    // Merge view into fullImage
+    vtkSMAnimationSceneImageWriter::Merge(finalImage, currentWindowImage);
+    allWindows[i]->Frame();
+    }
+
+  return finalImage;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMQuadViewProxy::UpdateInternalViewExtent(vtkImageData * image,
+                                                  int columnIndex, int rowIndex)
+{
+  int extent[6];
+  int dimensions[3];
+  image->GetDimensions(dimensions);
+  image->GetExtent(extent);
+  extent[0] = columnIndex*dimensions[0];
+  extent[1] = extent[0]+dimensions[0]-1;
+  extent[2] = rowIndex*dimensions[1];
+  extent[3] = extent[2]+dimensions[1]-1;
+  extent[4] = extent[5] = 0;
+  image->SetExtent(extent);
 }
