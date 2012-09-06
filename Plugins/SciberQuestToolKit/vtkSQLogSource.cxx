@@ -84,27 +84,35 @@ void vtkSQLogSource::SetGlobalLevel(int level)
 
 //----------------------------------------------------------------------------
 int vtkSQLogSource::RequestInformation(
-      vtkInformation* /*req*/,
-      vtkInformationVector** inInfos,
-      vtkInformationVector* outInfos)
+      vtkInformation *req,
+      vtkInformationVector **inInfos,
+      vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQLogSource::RequestInformation" << endl;
   #endif
+
+  (void)req;
+  (void)inInfos;
+  (void)outInfos;
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkSQLogSource::RequestData(
-      vtkInformation * /*req*/,
-      vtkInformationVector ** /*inInfos*/,
+      vtkInformation *req,
+      vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
   #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQLogSource::RequestData" << endl;
   //this->Print(cerr);
   #endif
+
+  (void)req;
+  (void)inInfos;
+  (void)outInfos;
 
   return 1;
 }
@@ -115,6 +123,8 @@ void vtkSQLogSource::PrintSelf(ostream& os, vtkIndent indent)
   #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQLogSource::PrintSelf" << endl;
   #endif
+
+  (void)indent;
 
   const char *fileName = (this->FileName==NULL?"NULL":this->FileName);
   os

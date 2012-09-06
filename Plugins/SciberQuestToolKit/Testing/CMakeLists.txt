@@ -41,21 +41,24 @@ macro(sq_add_test _name _np)
   set(TEMP_PATH "${ParaView_BINARY_DIR}/Testing/Temporary")
   set(BASE_IMAGE "Baseline/SciberQuestToolKit-${_name}")
   if(${_np} LESS 1)
+    set(TEST_NAME ${TEST_NAME}-Serial)
     add_test(
-      ${TEST_NAME}-Serial
+      ${TEST_NAME}
       ${TEST_EXEC}
       -D ${DATA_PATH}
       -T ${TEMP_PATH}
       -V ${BASE_IMAGE})
   else()
+    set(TEST_NAME ${TEST_NAME}-Parallel)
     add_test(
-      ${TEST_NAME}-Parallel
+      ${TEST_NAME}
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} ${_np} ${VTK_MPI_PREFLAGS}
       ${TEST_EXEC}
       -D ${DATA_PATH}
       -T ${TEMP_PATH}
       -V ${BASE_IMAGE})
   endif()
+  set_tests_properties(${TEST_NAME} PROPERTIES LABELS "PARAVIEW")
 endmacro()
 
 sq_add_exec(TestBOVIO)

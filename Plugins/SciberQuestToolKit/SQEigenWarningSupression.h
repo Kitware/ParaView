@@ -13,6 +13,8 @@ Copyright 2012 SciberQuest Inc.
 #define GCC_VER  (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #if GCC_VER > 40200
 #pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#if GCC_VER > 40400
 #pragma GCC diagnostic ignored "-Wenum-compare"
 #endif
 #endif
