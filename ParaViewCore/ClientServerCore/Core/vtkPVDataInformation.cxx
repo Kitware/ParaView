@@ -732,7 +732,6 @@ void vtkPVDataInformation::AddInformation(
 {
   vtkPVDataInformation *info;
   int             i,j;
-  double*         bounds;
   int*            ext;
 
   info = vtkPVDataInformation::SafeDownCast(pvi);
