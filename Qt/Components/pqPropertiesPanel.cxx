@@ -302,6 +302,11 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   this->DebugWidgetCreation = 
     vtksys::SystemTools::GetEnv("PV_DEBUG_PANELS") != NULL;
 
+  // enable debugging of the apply button state if the PV_DEBUG_APPLY_BUTTON
+  // enviornmental variable is set
+  this->DebugApplyButtonState =
+    vtksys::SystemTools::GetEnv("PV_DEBUG_APPLY_BUTTON") != NULL;
+
   // enable auto apply for the panel if it enabled in the
   // global paraview settings
   pqSettings *settings = pqApplicationCore::instance()->settings();
@@ -937,10 +942,22 @@ void pqPropertiesPanel::updateButtonState()
     {
     if(this->Proxy->modifiedState() == pqProxy::UNINITIALIZED)
       {
+      if(this->DebugApplyButtonState)
+        {
+        qDebug() << "Enabling the Apply button because the current proxy "
+                    "is uninitialized";
+        }
+
       this->Ui->ApplyButton->setEnabled(true);
       }
     else if(this->Proxy->modifiedState() == pqProxy::MODIFIED)
       {
+      if(this->DebugApplyButtonState)
+        {
+        qDebug() << "Enabling the Apply button because the current proxy "
+                    "is modified";
+        }
+
       this->Ui->ApplyButton->setEnabled(true);
       this->Ui->ResetButton->setEnabled(true);
       }
@@ -949,6 +966,24 @@ void pqPropertiesPanel::updateButtonState()
 
 void pqPropertiesPanel::proxyPropertyChanged()
 {
+  if(this->DebugApplyButtonState)
+    {
+    qDebug() << "Proxy Property Changed";
+    QObject *sender = this->sender();
+    if(sender)
+      {
+      qDebug() << "  sender class: " << sender->metaObject()->className();
+
+      pqPropertyWidget *senderWidget =
+          qobject_cast<pqPropertyWidget *>(sender);
+      if(senderWidget)
+        {
+        qDebug() << "  xml label: " << senderWidget->property()->GetXMLLabel();
+        qDebug() << "  widget reason: " << senderWidget->reason();
+        }
+      }
+    }
+
   if(this->Proxy->modifiedState() == pqProxy::UNMODIFIED)
     {
     this->Proxy->setModifiedState(pqProxy::MODIFIED);
