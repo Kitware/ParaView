@@ -724,7 +724,7 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(vtkOverlappingAMR* amr,
                                            unsigned int id,
                                            bool extractface[6] )
 {
-  vtkAMRBox amrBox  = amr->GetAMRBox(level,id);
+  const vtkAMRBox& amrBox  = amr->GetAMRBox(level,id);
   // Sanity check
   assert( "pre: AMR dimension out-of-bounds!"  &&
           (amrBox.ComputeDimension() >= 1)    &&
