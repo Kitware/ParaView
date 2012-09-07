@@ -186,12 +186,74 @@
          <DoubleVectorProperty name="TopRightViewUp"
                                command="SetViewUpTopRight"
                                number_of_elements="3"
-                               default_values="0 0 1"/>
+                               default_values="-1 0 0"/>
 
          <DoubleVectorProperty name="BottomLeftViewUp"
                                command="SetViewUpBottomLeft"
                                number_of_elements="3"
                                default_values="0 1 0"/>
+
+         <ProxyProperty command="AddRepresentationToTopLeft"
+                        is_internal="1"
+                        name="TopLeftRepresentations"
+                        remove_command="RemoveRepresentationToTopLeft"
+                        repeatable="1"/>
+
+         <ProxyProperty command="AddRepresentationToTopRight"
+                        is_internal="1"
+                        name="TopRightRepresentations"
+                        remove_command="RemoveRepresentationToTopRight"
+                        repeatable="1"/>
+
+         <ProxyProperty command="AddRepresentationToBottomLeft"
+                        is_internal="1"
+                        name="BottomLeftRepresentations"
+                        remove_command="RemoveRepresentationToBottomLeft"
+                        repeatable="1"/>
+
+         <ProxyProperty command="SetSliceOriginSource"
+                        name="SliceOriginSource"/>
+
+         <SubProxy>
+            <Proxy name="WidgetTopLeft"
+                   proxygroup="representations"
+                   proxyname="PointSourceWidgetRepresentation">
+            </Proxy>
+         </SubProxy>
+
+         <SubProxy>
+            <Proxy name="WidgetTopRight"
+                   proxygroup="representations"
+                   proxyname="PointSourceWidgetRepresentation">
+            </Proxy>
+         </SubProxy>
+
+         <SubProxy>
+            <Proxy name="WidgetBottomLeft"
+                   proxygroup="representations"
+                   proxyname="PointSourceWidgetRepresentation">
+            </Proxy>
+         </SubProxy>
+
+         <SubProxy>
+            <Proxy name="SliceOrigin"
+                   class="vtkPointSource"
+                   processes="client|renderserver|dataserver">
+                   <DoubleVectorProperty animateable="1"
+                                         command="SetCenter"
+                                         default_values="0.0 0.0 0.0"
+                                         name="WorldPosition"
+                                         number_of_elements="3"
+                                         panel_visibility="never">
+                     <DoubleRangeDomain name="range" />
+                     <Documentation>This property specifies the 3D coordinates of the center
+                     of the point cloud.</Documentation>
+                   </DoubleVectorProperty>
+            </Proxy>
+            <ExposedProperties>
+              <Property exposed_name="SlicesCenter" name="WorldPosition"/>
+            </ExposedProperties>
+         </SubProxy>
 
       </QuadViewProxy>
    </ProxyGroup>

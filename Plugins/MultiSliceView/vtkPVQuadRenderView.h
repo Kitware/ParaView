@@ -22,9 +22,19 @@
 #include "vtkPVMultiSliceView.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
+class vtkPointSource;
+
 class vtkPVQuadRenderView : public vtkPVMultiSliceView
 {
 public:
+  // ViewType enum
+  enum ViewTypes
+    {
+    TOP_LEFT = 0,
+    TOP_RIGHT = 1,
+    BOTTOM_LEFT = 2
+    };
+
   static vtkPVQuadRenderView* New();
   vtkTypeMacro(vtkPVQuadRenderView, vtkPVMultiSliceView);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -39,14 +49,14 @@ public:
   // This can be called only after Initialize().
   virtual void SetPosition(int, int);
 
-  enum ViewTypes
-    {
-    TOP_LEFT = 0,
-    TOP_RIGHT = 1,
-    BOTTOM_LEFT = 2
-    };
 
+  // Decription:
+  // Return the internal vtkRenderWindow corresponding to the given view type.
   vtkRenderWindow* GetOrthoViewWindow(ViewTypes type);
+
+  // Description:
+  // Return the internal vtkRenderWindow corresponding to the given view type
+  // if valid otherwise return NULL.
   vtkRenderWindow* GetOrthoViewWindow(int type)
     {
     switch (type)
@@ -59,7 +69,13 @@ public:
     return NULL;
     }
 
+  // Decription:
+  // Return the internal vtkPVRenderView corresponding to the given view type.
   vtkPVRenderView* GetOrthoRenderView(ViewTypes type);
+
+  // Description:
+  // Return the internal vtkPVRenderView corresponding to the given view type
+  // if valid otherwise return NULL.
   vtkPVRenderView* GetOrthoRenderView(int type)
     {
     switch (type)
@@ -72,16 +88,33 @@ public:
     return NULL;
     }
 
+  // Description:
+  // Set the size of the internal RenderView for TopLeft
   void SetSizeTopLeft(int x, int y) { this->SetOrthoSize(TOP_LEFT, x, y); }
+
+  // Description:
+  // Set the size of the internal RenderView for BottomLeft
   void SetSizeBottomLeft(int x, int y) { this->SetOrthoSize(BOTTOM_LEFT, x, y); }
+
+  // Description:
+  // Set the size of the internal RenderView for TopRight
   void SetSizeTopRight(int x, int y) { this->SetOrthoSize(TOP_RIGHT, x, y); }
+
+  // Description:
+  // Set the size of the internal RenderView for the provided view type.
   void SetOrthoSize(ViewTypes type, int x, int y);
 
   // Description:
   // Set the bottom-right window size, which is same this superclass' size.
   void SetSizeBottomRight(int x, int y) { this->Superclass::SetSize(x, y); }
 
+  // Description:
+  // Custom management across all the internal views to avoid the internal
+  // Update() call.
   virtual void ResetCamera();
+
+  // Description:
+  // Forwarded to all the internal views
   virtual void ResetCamera(double bounds[6]);
 
   // Description:
@@ -99,33 +132,66 @@ public:
   // slice normal for the "Z" ones.
   void SetViewNormalBottomLeft(double x, double y, double z);
 
+  // Description:
+  // Set the viewUp of the TopLeft view
   void SetViewUpTopLeft(double x, double y, double z);
+
+  // Description:
+  // Set the viewUp of the TopLeft view
   void SetViewUpTopRight(double x, double y, double z);
+
+  // Description:
+  // Set the viewUp of the TopLeft view
   void SetViewUpBottomLeft(double x, double y, double z);
 
-  // Forward accross all the views
+  // Description:
+  // Link this view to an object that is synched accross all process thanks to
+  // Proxies. That object hold the origin of all the slices as a single double[3]
+  // Internally we attach a listener to it to update the slice origins.
+  void SetSliceOriginSource(vtkPointSource* source);
+
+  //*****************************************************************
+  // Forwarded accross all the views
   virtual void Add2DManipulator(vtkCameraManipulator* val);
   virtual void RemoveAll2DManipulators();
   virtual void Add3DManipulator(vtkCameraManipulator* val);
   virtual void RemoveAll3DManipulators();
+  virtual void SetBackground(double r, double g, double b);
+  virtual void SetBackground2(double r, double g, double b);
+  virtual void SetBackgroundTexture(vtkTexture* val);
+  virtual void SetGradientBackground(int val);
+  virtual void SetTexturedBackground(int val);
+
+  //*****************************************************************
+  // Helper method that is usefull at the proxy layer to register
+  // representations into one of the internal view.
+  // In our case we add the point widget that way.
+  void AddRepresentationToTopLeft(vtkDataRepresentation* rep);
+  void AddRepresentationToTopRight(vtkDataRepresentation* rep);
+  void AddRepresentationToBottomLeft(vtkDataRepresentation* rep);
+  void RemoveRepresentationToTopLeft(vtkDataRepresentation* rep);
+  void RemoveRepresentationToTopRight(vtkDataRepresentation* rep);
+  void RemoveRepresentationToBottomLeft(vtkDataRepresentation* rep);
 
 //BTX
 protected:
   vtkPVQuadRenderView();
   ~vtkPVQuadRenderView();
 
+  // Internal method to keep track of SliceOrigin change
+  void WidgetCallback(vtkObject* src, unsigned long event, void* data);
+
+  // Custom render method to deal with internal views
   virtual void Render(bool interactive, bool skip_rendering);
 
-  struct OrthoViewInfo
-    {
-    vtkSmartPointer<vtkPVRenderView> RenderView;
-    };
-
+  struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];
-
 private:
   vtkPVQuadRenderView(const vtkPVQuadRenderView&); // Not implemented
   void operator=(const vtkPVQuadRenderView&); // Not implemented
+
+  class vtkQuadInternal;
+  vtkQuadInternal* QuadInternal;
 //ETX
 };
 

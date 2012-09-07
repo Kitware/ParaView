@@ -14,12 +14,15 @@
 =========================================================================*/
 // .NAME vtkSMQuadViewProxy
 // .SECTION Description
-//
+// Custom proxy used to managed the QuadView initialization and customed
+// default representation as well as the ImageCapture code.
 
 #ifndef __vtkSMQuadViewProxy_h
 #define __vtkSMQuadViewProxy_h
 
 #include "vtkSMRenderViewProxy.h"
+
+class vtkSMProxyLink;
 
 class vtkSMQuadViewProxy : public vtkSMRenderViewProxy
 {
@@ -45,8 +48,12 @@ protected:
 
   virtual void CreateVTKObjects();
   virtual vtkImageData* CaptureWindowInternal(int magnification);
+  virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
+    vtkPVXMLElement *element);
 
   void UpdateInternalViewExtent(vtkImageData * image, int columnIndex, int rowIndex);
+
+  vtkSMProxyLink* WidgetLinker;
 
 private:
   vtkSMQuadViewProxy(const vtkSMQuadViewProxy&); // Not implemented

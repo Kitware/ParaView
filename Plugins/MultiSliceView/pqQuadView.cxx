@@ -31,10 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqQuadView.h"
 
+#include "pqCoreUtilities.h"
 #include "pqProxy.h"
 #include "pqQVTKWidget.h"
 #include "pqUndoStack.h"
 #include "vtkPVQuadRenderView.h"
+#include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMViewProxy.h"
@@ -76,6 +78,11 @@ pqQuadView::pqQuadView(
     vtkSMViewProxy* viewProxy, pqServer* server, QObject* p)
   : Superclass(viewType, group, name, viewProxy, server, p)
 {
+  this->ObserverId =
+      pqCoreUtilities::connect(
+        viewProxy->GetProperty("SlicesCenter"), vtkCommand::ModifiedEvent,
+        this, SIGNAL(fireSliceOriginChanged()));
+
   for(int i=0; i < 21; ++i)
     {
     this->DataHolder[i] = 0.0;
@@ -188,7 +195,7 @@ const double* pqQuadView::getBottomLeftViewUp()
 //-----------------------------------------------------------------------------
 const double* pqQuadView::getSlicesOrigin()
 {
-  return this->getVector("XSlicesOrigin",0);
+  return this->getVector("SlicesCenter",0);
 }
 //-----------------------------------------------------------------------------
 void pqQuadView::setTopLeftNormal(double x, double y, double z)
@@ -223,7 +230,7 @@ void pqQuadView::setBottomLeftViewUp(double x, double y, double z)
 //-----------------------------------------------------------------------------
 void pqQuadView::setSlicesOrigin(double x, double y, double z)
 {
-  this->setVector("XSlicesOrigin", 0, x, y, z);
+  this->setVector("SlicesCenter", 0, x, y, z);
 }
 
 //-----------------------------------------------------------------------------
@@ -238,7 +245,7 @@ void pqQuadView::resetDefaultSettings()
   this->setTopRightNormal(0,1,0);
   this->setBottomLeftNormal(0,0,1);
   this->setTopLeftViewUp(0,1,0);
-  this->setTopRightViewUp(0,0,1);
+  this->setTopRightViewUp(-1,0,0);
   this->setBottomLeftViewUp(0,1,0);
 }
 

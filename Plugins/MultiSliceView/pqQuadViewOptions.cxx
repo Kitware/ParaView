@@ -197,12 +197,16 @@ void pqQuadViewOptions::resetChanges()
 //----------------------------------------------------------------------------
 void pqQuadViewOptions::setView(pqView* view)
 {
+  QObject::disconnect(this, SLOT(onSliceOriginChanged()));
+
   this->View = qobject_cast<pqQuadView*>(view);
 
   if(!this->View)
     {
     return;
     }
+
+  QObject::connect(this->View.data(), SIGNAL(fireSliceOriginChanged()), this, SLOT(onSliceOriginChanged()));
 
   // Update UI with the current values
   const double* vector = this->View->getTopLeftNormal();
@@ -239,4 +243,16 @@ void pqQuadViewOptions::setView(pqView* view)
   this->Internal->ui.X->setText(QString::number(vector[0]));
   this->Internal->ui.Y->setText(QString::number(vector[1]));
   this->Internal->ui.Z->setText(QString::number(vector[2]));
+}
+
+//----------------------------------------------------------------------------
+void pqQuadViewOptions::onSliceOriginChanged()
+{
+  if(this->View)
+    {
+    const double* vector = this->View->getSlicesOrigin();
+    this->Internal->ui.X->setText(QString::number(vector[0]));
+    this->Internal->ui.Y->setText(QString::number(vector[1]));
+    this->Internal->ui.Z->setText(QString::number(vector[2]));
+    }
 }

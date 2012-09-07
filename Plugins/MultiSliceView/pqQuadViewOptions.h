@@ -64,6 +64,9 @@ public:
   // tell pqOptionsDialog that we want an apply button
   virtual bool isApplyUsed() const { return true; }
 
+public slots:
+  void onSliceOriginChanged();
+
 protected:
   QPointer<pqQuadView> View;
 

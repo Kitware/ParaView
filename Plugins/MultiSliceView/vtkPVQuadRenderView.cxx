@@ -14,18 +14,78 @@
 =========================================================================*/
 #include "vtkPVQuadRenderView.h"
 
+#include "vtk3DWidgetRepresentation.h"
+#include "vtkAbstractWidget.h"
 #include "vtkCamera.h"
+#include "vtkCameraManipulator.h"
+#include "vtkCommand.h"
+#include "vtkHandleRepresentation.h"
+#include "vtkHandleWidget.h"
 #include "vtkMath.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPointSource.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "vtkNew.h"
-#include "vtkCameraManipulator.h"
+#include "vtkTextActor.h"
+#include "vtkTextProperty.h"
+#include "vtkWeakPointer.h"
 
+#include <sstream>
+
+class vtkQuadInternal;
+vtkQuadInternal* QuadInternal;
+//============================================================================
+class vtkPVQuadRenderView::vtkQuadInternal
+{
+public:
+  vtkQuadInternal(vtkPVQuadRenderView* parent)
+  {
+    this->Owner = parent;
+    this->ObserverId = 0;
+
+//    this->Coordinates->GetTextProperty()->SetJustificationToCentered();
+//    this->Coordinates->SetPosition(.5, .9);
+    this->Owner->GetOrthoRenderView(TOP_RIGHT)->GetRenderer()->AddActor(this->Coordinates.GetPointer());
+  }
+
+  void SetSliceOriginSource(vtkPointSource* source)
+  {
+    if(this->ObserverId && this->SliceOriginSource)
+      {
+      this->SliceOriginSource->RemoveObserver(this->ObserverId);
+      this->ObserverId = 0;
+      }
+
+    this->SliceOriginSource = source;
+    if(this->SliceOriginSource)
+      {
+      this->ObserverId =
+          this->SliceOriginSource->AddObserver(
+            vtkCommand::AnyEvent, this->Owner,
+            &vtkPVQuadRenderView::WidgetCallback);
+      }
+  }
+
+  void UpdateSliceOrigin(double* origin)
+  {
+    std::stringstream stream;
+    stream << origin[0] << ", " << origin[1] << ", " << origin[2];
+    this->Coordinates->SetInput(stream.str().c_str());
+  }
+
+private:
+  vtkPVQuadRenderView* Owner;
+  unsigned long ObserverId;
+  vtkWeakPointer<vtkPointSource> SliceOriginSource;
+  vtkNew<vtkTextActor> Coordinates;
+};
+
+//============================================================================
 vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::vtkPVQuadRenderView()
@@ -34,10 +94,8 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
     {
     this->OrthoViews[cc].RenderView = vtkSmartPointer<vtkPVRenderView>::New();
     this->OrthoViews[cc].RenderView->GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
-    this->OrthoViews[cc].RenderView->GetRenderer()->SetBackground(this->GetRenderer()->GetBackground());
-//      0.1*cc, 0.2*cc, 0.4*cc);
     this->OrthoViews[cc].RenderView->SetInteractionMode(INTERACTION_MODE_2D);
-    this->OrthoViews[cc].RenderView->SetCenterAxesVisibility(true);
+    this->OrthoViews[cc].RenderView->SetCenterAxesVisibility(false);
     }
 
   // Create a single slice for each axis by default
@@ -46,11 +104,15 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
     this->SetNumberOfSlice(i, 1);
     this->SetSlice(i, 0, 0);
     }
+
+  this->QuadInternal = new vtkQuadInternal(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::~vtkPVQuadRenderView()
 {
+  delete this->QuadInternal;
+  this->QuadInternal = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -289,5 +351,111 @@ void vtkPVQuadRenderView::RemoveAll3DManipulators()
   for (int cc=0; cc < 3; cc++)
     {
     this->OrthoViews[cc].RenderView->RemoveAll3DManipulators();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetBackground(double r, double g, double b)
+{
+  this->Superclass::SetBackground(r,g,b);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetBackground(r,g,b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetBackground2(double r, double g, double b)
+{
+  this->Superclass::SetBackground2(r,g,b);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetBackground2(r,g,b);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetBackgroundTexture(vtkTexture* val)
+{
+  this->Superclass::SetBackgroundTexture(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetBackgroundTexture(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetGradientBackground(int val)
+{
+  this->Superclass::SetGradientBackground(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetGradientBackground(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetTexturedBackground(int val)
+{
+  this->Superclass::SetTexturedBackground(val);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetTexturedBackground(val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::AddRepresentationToTopLeft(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(TOP_LEFT)->AddRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::AddRepresentationToTopRight(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(TOP_RIGHT)->AddRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::AddRepresentationToBottomLeft(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(BOTTOM_LEFT)->AddRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::RemoveRepresentationToTopLeft(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(TOP_LEFT)->RemoveRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::RemoveRepresentationToTopRight(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(TOP_RIGHT)->RemoveRepresentation(rep);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::RemoveRepresentationToBottomLeft(vtkDataRepresentation* rep)
+{
+  this->GetOrthoRenderView(BOTTOM_LEFT)->RemoveRepresentation(rep);
+}
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetSliceOriginSource(vtkPointSource* source)
+{
+  this->QuadInternal->SetSliceOriginSource(source);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::WidgetCallback(vtkObject* src, unsigned long, void*)
+{
+  vtkPointSource* source = vtkPointSource::SafeDownCast(src);
+  if(source)
+    {
+    double* center = source->GetCenter();
+    for(int i=0;i<3;++i)
+      {
+      this->SetSliceOrigin(i, center[0], center[1], center[2]);
+      }
+    this->QuadInternal->UpdateSliceOrigin(center);
     }
 }

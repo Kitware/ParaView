@@ -27,6 +27,7 @@
 #include "vtkSMAnimationSceneImageWriter.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSessionProxyManager.h"
@@ -69,11 +70,46 @@ vtkStandardNewMacro(vtkSMQuadViewProxy);
 //----------------------------------------------------------------------------
 vtkSMQuadViewProxy::vtkSMQuadViewProxy()
 {
+  this->WidgetLinker = vtkSMProxyLink::New();
+  this->WidgetLinker->PropagateUpdateVTKObjectsOff();
 }
 
 //----------------------------------------------------------------------------
 vtkSMQuadViewProxy::~vtkSMQuadViewProxy()
 {
+  this->WidgetLinker->Delete();
+  this->WidgetLinker = NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkSMQuadViewProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
+  vtkPVXMLElement *elm)
+{
+  int result = this->Superclass::CreateSubProxiesAndProperties(pm, elm);
+
+  // Create link across proxies
+  // Let's add our widgets sub-proxy to our hidden representation property
+  vtkSMProxy* widget = NULL;
+  widget = this->GetSubProxy("WidgetTopLeft");
+  vtkSMPropertyHelper(widget, "Enabled").Set(1);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::INPUT);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::OUTPUT);
+
+  widget = this->GetSubProxy("WidgetTopRight");
+  vtkSMPropertyHelper(widget, "Enabled").Set(1);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::INPUT);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::OUTPUT);
+
+  widget = this->GetSubProxy("WidgetBottomLeft");
+  vtkSMPropertyHelper(widget, "Enabled").Set(1);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::INPUT);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::OUTPUT);
+
+  // Bind the center
+  this->WidgetLinker->AddLinkedProxy(this->GetSubProxy("SliceOrigin"), vtkSMProxyLink::INPUT);
+  this->WidgetLinker->AddLinkedProxy(this->GetSubProxy("SliceOrigin"), vtkSMProxyLink::OUTPUT);
+
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -101,6 +137,14 @@ void vtkSMQuadViewProxy::CreateVTKObjects()
     quadView->GetOrthoRenderView(cc)->GetInteractor()->SetPVRenderView(
       helper.GetPointer());
     }
+
+  // Register widgets
+  vtkSMPropertyHelper(this, "TopLeftRepresentations").Add(this->GetSubProxy("WidgetTopLeft"));
+  vtkSMPropertyHelper(this, "TopRightRepresentations").Add(this->GetSubProxy("WidgetTopRight"));
+  vtkSMPropertyHelper(this, "BottomLeftRepresentations").Add(this->GetSubProxy("WidgetBottomLeft"));
+
+  // Register origin listener
+  vtkSMPropertyHelper(this, "SliceOriginSource").Add(this->GetSubProxy("SliceOrigin"));
 }
 
 //----------------------------------------------------------------------------

@@ -88,6 +88,9 @@ public:
   /// Reset Normal/ViewUp/Origin to their defaults
   void resetDefaultSettings();
 
+signals:
+  void fireSliceOriginChanged();
+
 protected:
   /// Override to decorate the QVTKWidget
   virtual QWidget* createWidget();
@@ -96,6 +99,7 @@ protected:
   const double* getVector(const char* propertyName, int offset);
   const double* setVector(const char* propertyName, int offset, double x, double y, double z);
   double DataHolder[21];
+  unsigned long ObserverId;
 
 private:
   Q_DISABLE_COPY(pqQuadView)
