@@ -47,6 +47,8 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
   : pqPropertyWidget(smProxy, parentObject)
 {
   QVBoxLayout *vbox = new QVBoxLayout;
+  vbox->setMargin(0);
+  vbox->setSpacing(0);
 
   bool selection_input = (smProperty->GetHints() &&
     smProperty->GetHints()->FindNestedElementByName("SelectionInput"));

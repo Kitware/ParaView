@@ -1046,7 +1046,8 @@
                             default_values="Surface"
                             name="Representation"
                             number_of_elements="1"
-                            panel_visibility="default">
+                            panel_visibility="default"
+                            panel_widget="display_representation_selector" >
         <Documentation>Choose the type for the representation.</Documentation>
         <StringListDomain name="list">
           <RequiredProperties>
@@ -1081,23 +1082,13 @@
         <ExposedProperties>
           <PropertyGroup panel_visibility="default"
                          type="ColorEditor">
-            <Property name="AllowSpecularHighlightingWithScalarColoring" />
             <Property name="Ambient" />
             <Property name="AmbientColor" />
-            <Property name="BackfaceAmbientColor" />
-            <Property name="BackfaceDiffuseColor" />
-            <Property name="BackfaceOpacity" />
             <Property name="ColorArrayName" />
             <Property name="ColorAttributeType" />
             <Property name="Diffuse" />
             <Property name="DiffuseColor" />
-            <Property name="EdgeColor" />
-            <Property name="Interpolation" />
             <Property name="LookupTable" />
-            <Property name="NonlinearSubdivisionLevel" />
-            <Property name="Specular" />
-            <Property name="SpecularColor" />
-            <Property name="SpecularPower" />
           </PropertyGroup>
           <Property name="MapScalars"
                     panel_visibility="advanced" />
@@ -1105,6 +1096,8 @@
                     panel_visibility="advanced" />
           <Property name="Opacity"
                     panel_visibility="default" />
+          <Property name="Interpolation"
+                    panel_visibility="advanced" />
           <Property name="LineWidth"
                     panel_visibility="advanced" />
           <Property name="BackfaceRepresentation"
@@ -1118,7 +1111,7 @@
           <Property name="Origin"
                     panel_visibility="advanced" />
           <Property name="Pickable"
-                    panel_visibility="never" />
+                    panel_visibility="advanced" />
           <Property name="PointSize"
                     panel_visibility="advanced"
                     panel_visibility_default_for_representation="points" />
@@ -1127,7 +1120,29 @@
           <Property name="SuppressLOD"
                     panel_visibility="never" />
           <Property name="Texture"
+                    panel_visibility="advanced" />
+          <Property name="AllowSpecularHighlightingWithScalarColoring"
                     panel_visibility="never" />
+          <Property name="EdgeColor"
+                    panel_widget="color_selector"
+                    panel_visibility="advanced" />
+          <Property name="Specular"
+                    panel_visibility="advanced" />
+          <Property name="SpecularColor"
+                    panel_widget="color_selector"
+                    panel_visibility="advanced" />
+          <Property name="SpecularPower"
+                    panel_visibility="advanced" />
+          <Property name="BackfaceAmbientColor"
+                    panel_widget="color_selector"
+                    panel_visibility="advanced" />
+          <Property name="BackfaceDiffuseColor"
+                    panel_widget="color_selector"
+                    panel_visibility="advanced" />
+          <Property name="BackfaceOpacity"
+                    panel_visibility="advanced" />
+          <Property name="NonlinearSubdivisionLevel"
+                    panel_visibility="advanced" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1401,7 +1416,9 @@
                     panel_visibility="never" />
           <Property name="ExtractedBlockIndex"
                     panel_visibility="never" />
-          <Property name="SelectMapper" />
+          <Property name="SelectMapper"
+                    panel_visibility="advanced"
+                    panel_visibility_default_for_representation="volume" />
         </ExposedProperties>
       </SubProxy>
       <!-- End of UnstructuredGridRepresentation -->
@@ -1640,7 +1657,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="1"
@@ -1824,7 +1841,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="2"
@@ -2026,7 +2043,7 @@
                          default_values="1"
                          name="Pickable"
                          number_of_elements="1">
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty command="SetInterpolationType"
                          default_values="2"
@@ -2478,7 +2495,7 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty command="SetOpacity"
                             default_values="1.0"
@@ -2556,6 +2573,7 @@
       <StringVectorProperty command="SetRepresentation"
                             default_values="Surface"
                             name="Representation"
+                            panel_widget="display_representation_selector"
                             number_of_elements="1">
         <StringListDomain name="string_list">
           <String value="Points" />
@@ -2710,10 +2728,11 @@
         <Hints>
           <NoDefault />
         </Hints>
-        <IntRangeDomain name="bool" />
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
       <ProxyProperty command="SetTexture"
                      name="Texture"
+                     panel_widget="texture_selector"
                      null_on_empty="1">
         <ProxyGroupDomain name="groups">
           <Group name="textures" />
@@ -3557,6 +3576,7 @@
       <IntVectorProperty command="SetRepresentation"
                          default_values="1"
                          name="Representation"
+                         panel_widget="display_representation_selector"
                          number_of_elements="1">
         <EnumerationDomain name="enum">
           <Entry text="Points"

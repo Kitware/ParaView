@@ -49,6 +49,7 @@ vtkSMProperty::vtkSMProperty()
   this->XMLLabel = 0;
   this->PanelVisibility = 0;
   this->PanelVisibilityDefaultForRepresentation = 0;
+  this->PanelWidget = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -374,6 +375,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     {
     this->SetPanelVisibilityDefaultForRepresentation(
       panel_visibility_default_for_representation);
+    }
+
+  const char *panel_widget = element->GetAttribute("panel_widget");
+  if(panel_widget)
+    {
+    this->SetPanelWidget(panel_widget);
     }
 
   // Manage deprecated XML definition
