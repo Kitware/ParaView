@@ -174,6 +174,7 @@ private:
   QList<pqPropertiesPanelItem> ProxyPropertyItems;
   QList<pqPropertiesPanelItem> RepresentationPropertyItems;
   bool DebugWidgetCreation;
+  bool DebugApplyButtonState;
   static bool AutoApply;
   static int AutoApplyDelay;
 };
