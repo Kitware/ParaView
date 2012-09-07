@@ -33,8 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
+#include "pqPropertiesPanel.h"
+#include "pqPropertyWidget.h"
 #include "pqViewExporterManager.h"
 #include "pqFileDialog.h"
+
+#include "vtkNew.h"
+#include "vtkSMExporterProxy.h"
+#include "vtkSMOrderedPropertyIterator.h"
+#include "vtkSMProperty.h"
+
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QFormLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QVBoxLayout>
 
 //-----------------------------------------------------------------------------
 pqExportReaction::pqExportReaction(QAction* parentObject)
@@ -78,7 +91,98 @@ void pqExportReaction::exportActiveView()
   if (file_dialog.exec() == QDialog::Accepted &&
     file_dialog.getSelectedFiles().size() > 0)
     {
-    if (!this->Exporter->write(file_dialog.getSelectedFiles()[0]))
+    vtkSMExporterProxy *proxy = this->Exporter->proxyForFile(
+      file_dialog.getSelectedFiles().first());
+
+    if (!proxy)
+      {
+      qCritical("Couldn't handle export filename.");
+      return;
+      }
+
+    // Create widgets for exporter properties
+    QList<pqPropertyWidget*> widgets;
+    QStringList labels;
+    vtkNew<vtkSMOrderedPropertyIterator> propertyIter;
+    propertyIter->SetProxy(proxy);
+
+    for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
+      {
+      vtkSMProperty *smProperty = propertyIter->GetProperty();
+
+      if (smProperty->GetIsInternal() || smProperty->GetInformationOnly() ||
+          QString(smProperty->GetPanelVisibility()) == "never")
+        {
+        continue;
+        }
+
+      pqPropertyWidget *propertyWidget =
+        pqPropertiesPanel::createWidgetForProperty(smProperty, proxy);
+      const char *xmlLabel = smProperty->GetXMLLabel();
+      if (propertyWidget)
+        {
+        widgets << propertyWidget;
+        if (xmlLabel)
+          {
+          labels << xmlLabel;
+          }
+        else
+          {
+          labels << propertyIter->GetKey();
+          }
+        }
+      }
+
+    if (labels.size() != widgets.size())
+      {
+      qWarning("Number of labels does not match number of widgets for export "
+               "configuration. Using defaults.");
+      labels.clear();
+      qDeleteAll(widgets);
+      widgets.clear();
+      }
+
+    // Show a configuration dialog if options are available:
+    if (widgets.size() != 0)
+      {
+      QDialog dialog;
+      QVBoxLayout layout;
+      QFormLayout form;
+      for (int i = 0; i < widgets.size(); ++i)
+        {
+        widgets[i]->setParent(&dialog);
+        form.addRow(labels[i], widgets[i]);
+        }
+      layout.addLayout(&form);
+
+      QDialogButtonBox bbox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+      connect(&bbox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+      connect(&bbox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+      layout.addWidget(&bbox);
+
+      dialog.setLayout(&layout);
+
+      dialog.setWindowTitle(tr("Export Options"));
+
+      // Show the dialog:
+      int dialogCode = dialog.exec();
+
+      if (static_cast<QDialog::DialogCode>(dialogCode) == QDialog::Rejected)
+        {
+        proxy->Delete();
+        return;
+        }
+
+      foreach (pqPropertyWidget *widget, widgets)
+        {
+        widget->apply();
+        }
+
+      // Widgets are cleaned up by the dialog
+      widgets.clear();
+      }
+
+    if (!this->Exporter->write(proxy))
       {
       qCritical("Failed to export correctly.");
       }
