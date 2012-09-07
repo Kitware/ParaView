@@ -129,7 +129,20 @@ public:
       }
 
     std::vector<unsigned int> blockIds(blocksPerLevel.size(),0); //keep track of the id at each level
-    hbds->Initialize(blocksPerLevel.size(), &blocksPerLevel[0], origin, this->GridDescription);
+    hbds->Initialize(blocksPerLevel.size(), &blocksPerLevel[0]);
+    hbds->SetOrigin(origin);
+    hbds->SetGridDescription(this->GridDescription);
+    for(unsigned int level=0; level<hbds->GetNumberOfLevels(); level++)
+      {
+      int spacingFactor = 1;
+      spacingFactor = spacingFactor << level;
+      double spacing[3];
+      spacing[0] = this->TopLevelSpacing[0] / (double)(spacingFactor);
+      spacing[1] = this->TopLevelSpacing[1] / (double)(spacingFactor);
+      spacing[2] = this->TopLevelSpacing[2] / (double)(spacingFactor);
+      hbds->SetSpacing(level, spacing);
+      }
+
     for(size_t i=0; i<this->Levels.size();i++)
       {
       unsigned int level = this->Levels[i];
@@ -138,20 +151,10 @@ public:
       const vtkAMRBox& box = this->Boxes[i];
       assert(!box.IsInvalid());
 
+      hbds->SetAMRBox(level,id, box);
       if(grid)
         {
-        hbds->GetAMRInfo()->SetAMRBox(level,id, box,grid->GetSpacing());
         hbds->SetDataSet(level, id, grid);
-        }
-      else
-        {
-        int spacingFactor = 1;
-        spacingFactor = spacingFactor << level;
-        double spacing[3];
-        spacing[0] = this->TopLevelSpacing[0] / (double)(spacingFactor);
-        spacing[1] = this->TopLevelSpacing[1] / (double)(spacingFactor);
-        spacing[2] = this->TopLevelSpacing[2] / (double)(spacingFactor);
-        hbds->GetAMRInfo()->SetAMRBox(level,id, box, spacing);
         }
       blockIds[level]++;
       }
@@ -664,7 +667,7 @@ int vtkHierarchicalFractal::RequestData(
     this->AddBlockIdArray(output);
     vtkHierarchicalBoxDataSet *hset = vtkHierarchicalBoxDataSet::SafeDownCast(output);
     this->AddDepthArray(hset);
-    hset->GenerateVisibilityArrays();
+    vtkAMRUtilities::BlankCells(hset,vtkMultiProcessController::GetGlobalController());
     info->Set( vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA(),hset);
     }
   this->AddFractalArray(output);
