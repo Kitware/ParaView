@@ -7352,6 +7352,15 @@ found and the point will be rejected.</Documentation>
         <Documentation>Compute vorticity and angular rotation of particles as
         they progress</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
+      </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkStreaklineFilter"
@@ -7458,6 +7467,15 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool" />
         <Documentation>Compute vorticity and angular rotation of particles as
         they progress</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
