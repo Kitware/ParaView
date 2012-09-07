@@ -368,11 +368,14 @@ int vtkSQLog::Write()
 //-----------------------------------------------------------------------------
 void vtkSQLog::PrintSelf(ostream& os, vtkIndent indent)
 {
+  time_t t;
+  time(&t);
+  os << "# " << ctime(&t);
+  if (this->WorldRank==this->WriterRank)
+    {
+    os << this->HeaderBuffer.str();
+    }
   ostringstream oss;
   *this->Log >> oss;
-  os
-    << indent << "WorldRank=" << this->WorldRank << endl
-    << indent << "WorldSize=" << this->WorldSize << endl
-    << indent << "WriterRank=" << this->WriterRank << endl
-    << indent << "Log=" << oss.str() << endl;
+  os << oss.str();
 }

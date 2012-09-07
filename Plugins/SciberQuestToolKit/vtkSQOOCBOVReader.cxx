@@ -264,6 +264,7 @@ void vtkSQOOCBOVReader::Close()
 
     log->GetBody()
       << worldRank
+      << " vtkSQOOCBOVReader::BlockCacheStats"
       << " CacheSize=" << this->BlockCacheSize
       << " nUniqueBlocks=" << nUsed
       << " HitCount=" << this->CacheHitCount

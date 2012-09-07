@@ -1153,7 +1153,7 @@ int vtkSQFieldTracer::IntegrateBlock(
     FieldLine *line=traceData->GetFieldLine(i);
     this->IntegrateOne(oocr,oocrCache,fieldName,line,tcon);
 
-    #if defined vtkSQFieldTracerDEBUG
+    #if vtkSQFieldTracerDEBUG<0
     cerr << ".";
     #endif
     }

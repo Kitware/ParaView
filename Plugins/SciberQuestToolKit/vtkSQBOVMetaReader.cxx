@@ -414,6 +414,21 @@ void vtkSQBOVMetaReader::EstimateBlockCacheSize()
      }
   this->SetBlockCacheSize(min(maxBlocks,fitBlocks));
 
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetBody()
+      << this->WorldRank
+      << " vtkSQBOVMetaReader::BlockCacheSettings"
+      << " BlockCacheSize=" << this->BlockCacheSize
+      << " DecompDims=("
+      << this->DecompDims[0] << ", "
+      << this->DecompDims[1] << ", "
+      << this->DecompDims[2] << ")"
+      << "\n";
+    }
+
   #if defined SQTK_DEBUG
   oss
     << "subsetSize=" << Tuple<int>(subsetSize,3) << endl
