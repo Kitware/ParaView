@@ -78,7 +78,7 @@ void vtkWebGLDataSet::SetVertices(float* v, int size)
   if (this->vertices) delete[] this->vertices;
   this->vertices = v;
   this->NumberOfVertices = size;
-  this->type = wTRIANGLES;
+  this->webGLType = wTRIANGLES;
   this->hasChanged = true;
   }
 
@@ -109,7 +109,7 @@ void vtkWebGLDataSet::SetPoints(float* p, int size)
   if (this->points) delete[] this->points;
   this->points = p;
   this->NumberOfPoints = size;
-  this->type = wLINES;
+  this->webGLType = wLINES;
   this->hasChanged = true;
   }
 
@@ -139,7 +139,7 @@ void vtkWebGLDataSet::SetMatrix(float* m)
 
 void vtkWebGLDataSet::GenerateBinaryData()
   {
-  if (this->NumberOfIndexes == 0 && this->type != wPOINTS)
+  if (this->NumberOfIndexes == 0 && this->webGLType != wPOINTS)
     {
     return;
     }
@@ -150,7 +150,7 @@ void vtkWebGLDataSet::GenerateBinaryData()
     }
   this->binarySize = 0;
 
-  if(this->type == wLINES)
+  if(this->webGLType == wLINES)
     {
     pos = sizeof(pos);
     size = this->NumberOfPoints*sizeof(this->points[0]);
@@ -173,7 +173,7 @@ void vtkWebGLDataSet::GenerateBinaryData()
     memcpy(&this->binary[0], &pos, sizeof(pos));
     this->binarySize = total;
     }
-  else if (this->type == wTRIANGLES)
+  else if (this->webGLType == wTRIANGLES)
     {
     pos = sizeof(pos);
     size = sizeof(this->vertices[0])*this->NumberOfVertices;
@@ -199,7 +199,7 @@ void vtkWebGLDataSet::GenerateBinaryData()
     memcpy(&this->binary[0], &pos, sizeof(pos));
     this->binarySize = total;
     }
-  else if (this->type == wPOINTS)
+  else if (this->webGLType == wPOINTS)
     {
     pos = sizeof(pos);
     size = this->NumberOfPoints*sizeof(this->points[0]);
@@ -225,7 +225,7 @@ void vtkWebGLDataSet::GenerateBinaryData()
 
 void vtkWebGLDataSet::SetType(WebGLObjectTypes t)
   {
-  this->type = t;
+  this->webGLType = t;
   }
 
 bool vtkWebGLDataSet::HasChanged()

@@ -1540,6 +1540,13 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement
       panel_visibility_default_for_representation);
     }
 
+  // override panel_widget with that of the exposed property
+  const char *panel_widget = propertyElement->GetAttribute("panel_widget");
+  if(panel_widget)
+    {
+    prop->SetPanelWidget(panel_widget);
+    }
+
   // override label with that of the exposed property
   const char *label = propertyElement->GetAttribute("label");
   if(label)

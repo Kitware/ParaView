@@ -87,7 +87,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
                            "DoubleVectorProperty with a BoundsDomain ("  <<
                            range->GetXMLName() << ") ";
       }
-    else if(range->GetMinimumExists(0) && range->GetMaximumExists(0))
+    else if(dvp->GetNumberOfElements() == 1 &&
+            range->GetMinimumExists(0) &&
+            range->GetMaximumExists(0))
       {
       // bounded ranges are represented with a slider and a spin box
       pqDoubleRangeWidget *widget = new pqDoubleRangeWidget(this);

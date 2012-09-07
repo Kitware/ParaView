@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayRepresentationWidget.h
+   Module: pqTextureSelectorPropertyWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,57 +29,47 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDisplayRepresentationWidget_h
-#define __pqDisplayRepresentationWidget_h
 
-#include "pqComponentsModule.h"
-#include <QWidget>
-#include "pqPropertyWidget.h"
+#include "pqTextureSelectorPropertyWidget.h"
 
-class pqDisplayRepresentationWidgetInternal;
-class pqDataRepresentation;
+#include <QVBoxLayout>
 
-/// A widget for representation of a display proxy.
-class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
+#include "pqRenderView.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
+#include "pqPipelineRepresentation.h"
+
+pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
+  : pqPropertyWidget(proxy, parent)
 {
-  Q_OBJECT
+  QVBoxLayout *l = new QVBoxLayout;
+  l->setMargin(0);
 
-public:
-  pqDisplayRepresentationWidget(QWidget* parent=0);
-  virtual ~pqDisplayRepresentationWidget();
+  this->Selector = new pqTextureComboBox(this);
 
-signals:
-  void currentTextChanged(const QString&);
+  pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
+  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(proxy);
+  if(repr)
+    {
+    this->Selector->setRepresentation(repr);
+    }
 
-public slots:
-  void setRepresentation(pqDataRepresentation* display);
-  
-  void reloadGUI();
+  this->connect(this, SIGNAL(viewChanged(pqView*)),
+                this, SLOT(handleViewChanged(pqView*)));
 
-private slots:
-  void onCurrentTextChanged(const QString&);
+  l->addWidget(this->Selector);
+  this->setLayout(l);
+}
 
-  /// Called when the qt widget changes, we mark undo set
-  /// and push the widget changes to the property.
-  void onQtWidgetChanged();
-
-  void updateLinks();
-private:
-  pqDisplayRepresentationWidgetInternal* Internal;
-};
-
-/// A property widget for selecting the display representation.
-class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPropertyWidget
+pqTextureSelectorPropertyWidget::~pqTextureSelectorPropertyWidget()
 {
-  Q_OBJECT
+}
 
-public:
-  pqDisplayRepresentationPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
-  ~pqDisplayRepresentationPropertyWidget();
-
-private:
-  pqDisplayRepresentationWidget *Widget;
-};
-
-#endif
-
+void pqTextureSelectorPropertyWidget::handleViewChanged(pqView *view)
+{
+  pqRenderView *renderView = qobject_cast<pqRenderView *>(view);
+  if(renderView)
+    {
+    this->Selector->setRenderView(renderView);
+    }
+}

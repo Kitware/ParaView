@@ -375,6 +375,8 @@ set (Module_SRCS
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.cxx
   pqTextureComboBox.h
+  pqTextureSelectorPropertyWidget.cxx
+  pqTextureSelectorPropertyWidget.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
   pqTimerLogDisplay.cxx
@@ -575,6 +577,7 @@ set (Module_MOC_HDRS
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
+  pqTextureSelectorPropertyWidget.h
   pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h

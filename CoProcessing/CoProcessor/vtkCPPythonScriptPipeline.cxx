@@ -91,6 +91,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
 
   vtkCPPythonHelper::GetPythonInterpretor()->RunSimpleString(pythonInput.str().c_str());
   vtkCPPythonHelper::GetPythonInterpretor()->FlushMessages();
+
   return dataDescription->GetIfAnyGridNecessary()? 1: 0;
 }
 
@@ -114,7 +115,8 @@ int vtkCPPythonScriptPipeline::CoProcess(
   vtkCPPythonHelper::GetPythonInterpretor()->RunSimpleString(
     pythonInput.str().c_str());
   vtkCPPythonHelper::GetPythonInterpretor()->FlushMessages();
-  return 1;  
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -143,6 +145,3 @@ void vtkCPPythonScriptPipeline::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "PythonScriptName: " << this->PythonScriptName << "\n";
 }
-
-
-

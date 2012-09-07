@@ -345,6 +345,11 @@ if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
 endif()
 
+
+if (PARAVIEW_ENABLE_FFMPEG)
+  list (APPEND _vtk_modules vtkIOFFMPEG)
+endif()
+
 macro(enable_required_modules)
   foreach (module IN LISTS _vtk_modules)
     set (Module_${module} TRUE

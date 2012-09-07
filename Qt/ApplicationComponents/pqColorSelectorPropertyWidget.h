@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqColorChooserButton.h
+   Module: pqColorSelectorPropertyWidget.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2012 Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -30,51 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef pq_ColorChooserButton_h
-#define pq_ColorChooserButton_h
+#ifndef _pqColorSelectorPropertyWidget_h
+#define _pqColorSelectorPropertyWidget_h
 
-#include "pqWidgetsModule.h"
+#include "pqApplicationComponentsModule.h"
 
-#include <QToolButton>
-#include <QColor>
+#include "pqPropertyWidget.h"
 
-/// 
-class PQWIDGETS_EXPORT pqColorChooserButton : public QToolButton
+/// A property widget with a tool button for selecting a single color.
+///
+/// To use this widget for a property add the 'panel_widget="color_selector"'
+/// to the property's XML.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqColorSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-  Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor)
+
 public:
-  /// constructor requires a QComboBox
-  pqColorChooserButton(QWidget* p);
-  /// get the color
-  QColor chosenColor() const;
-
-  /// Set the label to be used when firing beginUndo() signal.
-  void setUndoLabel(const QString& lbl)
-    { this->UndoLabel = lbl; }
-  const QString& undoLabel() const
-    { return this->UndoLabel; }
-
-signals:
-  /// Signals fired before and after the chosenColorChanged() signal is fired.
-  /// This is used in ParaView to set up the creation of undo set.
-  void beginUndo(const QString&);
-  void endUndo();
-
-  /// signal color changed
-  void chosenColorChanged(const QColor&);  
-  /// signal color selected
-  void validColorChosen(const QColor&);  
-public slots:
-  /// set the color
-  virtual void setChosenColor(const QColor&);
-
-  /// show a dialog to choose the color
-  virtual void chooseColor();
-protected:
-  QColor Color;
-  QString UndoLabel;
+  pqColorSelectorPropertyWidget(vtkSMProxy *proxy,
+                               vtkSMProperty *property,
+                               QWidget *parent = 0);
+  ~pqColorSelectorPropertyWidget();
 };
 
-#endif
-
+#endif // _pqColorSelectorPropertyWidget_h

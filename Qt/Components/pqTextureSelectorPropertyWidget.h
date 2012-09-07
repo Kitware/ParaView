@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayRepresentationWidget.h
+   Module: pqTextureSelectorPropertyWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,57 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqDisplayRepresentationWidget_h
-#define __pqDisplayRepresentationWidget_h
+
+#ifndef _pqTextureSelectorPropertyWidget_h
+#define _pqTextureSelectorPropertyWidget_h
 
 #include "pqComponentsModule.h"
-#include <QWidget>
+
 #include "pqPropertyWidget.h"
+#include "pqTextureComboBox.h"
 
-class pqDisplayRepresentationWidgetInternal;
-class pqDataRepresentation;
-
-/// A widget for representation of a display proxy.
-class PQCOMPONENTS_EXPORT pqDisplayRepresentationWidget : public QWidget
+/// Property widget for selecting the texture to apply to a surface.
+///
+/// To use this widget for a property add the 'panel_widget="texture_selector"'
+/// to the property's XML.
+class PQCOMPONENTS_EXPORT pqTextureSelectorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
 
 public:
-  pqDisplayRepresentationWidget(QWidget* parent=0);
-  virtual ~pqDisplayRepresentationWidget();
-
-signals:
-  void currentTextChanged(const QString&);
-
-public slots:
-  void setRepresentation(pqDataRepresentation* display);
-  
-  void reloadGUI();
+  pqTextureSelectorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
+  ~pqTextureSelectorPropertyWidget();
 
 private slots:
-  void onCurrentTextChanged(const QString&);
-
-  /// Called when the qt widget changes, we mark undo set
-  /// and push the widget changes to the property.
-  void onQtWidgetChanged();
-
-  void updateLinks();
-private:
-  pqDisplayRepresentationWidgetInternal* Internal;
-};
-
-/// A property widget for selecting the display representation.
-class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPropertyWidget
-{
-  Q_OBJECT
-
-public:
-  pqDisplayRepresentationPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
-  ~pqDisplayRepresentationPropertyWidget();
+  void handleViewChanged(pqView *view);
 
 private:
-  pqDisplayRepresentationWidget *Widget;
+  pqTextureComboBox *Selector;
 };
 
-#endif
-
+#endif // _pqTextureSelectorPropertyWidget_h

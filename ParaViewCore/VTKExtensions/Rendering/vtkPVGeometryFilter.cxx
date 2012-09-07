@@ -761,7 +761,7 @@ bool vtkPVGeometryFilter::IsAMRDataVisible(vtkOverlappingAMR* amr,
 
   // -- Get the data spacing
   double spacing[3];
-  amr->GetGridSpacing(level, spacing );
+  amr->GetSpacing(level, spacing );
 
   // -- Compute the number of CELLS in tmpBox
   for( int i=0; i < 3; ++i )
@@ -825,7 +825,7 @@ int vtkPVGeometryFilter::RequestAMRData(
   output->SetNumberOfBlocks(1);
   output->SetBlock(0, amrDatasets.GetPointer());
   amrDatasets->SetNumberOfPieces(amr->GetTotalNumberOfBlocks());
-  
+
   // STEP 2: Check Attributes
   vtkTimerLog::MarkStartEvent("vtkPVGeometryFilter::CheckAttributes");
   if( this->CheckAttributes(amr) )
@@ -847,7 +847,7 @@ int vtkPVGeometryFilter::RequestAMRData(
     {
     // Since bounds are not necessary synced up, especially for non-overlapping
     // AMR datasets, we sync them up across all processes.
-    vtkPVGeometryFilter::BoundsReductionOperation operation;  
+    vtkPVGeometryFilter::BoundsReductionOperation operation;
     double received_bounds[6];
     this->Controller->AllReduce(bounds, received_bounds, 6, &operation);
     memcpy(bounds, received_bounds, sizeof(double)*6);
@@ -888,7 +888,7 @@ int vtkPVGeometryFilter::RequestAMRData(
         // determine the bounds for the box so that we can use it to generate
         // outlines when data is not available and this->UseOutline is true.
         double data_spacing[3];
-        overlappingAMR->GetGridSpacing(level, data_spacing);
+        overlappingAMR->GetSpacing(level, data_spacing);
         const double *origin = overlappingAMR->GetOrigin();
 
         vtkAMRBox::GetBounds(overlappingAMR->GetAMRBox(level, dataIdx),

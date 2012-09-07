@@ -1,3 +1,8 @@
+# the code below is needed to import objects from paraview.simple
+# plus the definition of vtkTrivialProducer into this python script.
+try: paraview.simple
+except: from paraview.simple import *
+
 def DoCoProcessing(datadescription):
   timestep = datadescription.GetTimeStep()
 
@@ -5,50 +10,55 @@ def DoCoProcessing(datadescription):
   pressure = grid.GetPointData().GetArray('Pressure')
 
   grid.GetPointData().SetScalars(pressure)
+  trivialproducer = PVTrivialProducer()
+  obj = trivialproducer.GetClientSideObject()
   obj.SetOutput(grid)
 
+  if grid.IsA("vtkImageData") == True or grid.IsA("vtkStructuredGrid") == True or grid.IsA("vtkRectilinearGrid") == True:
+    extent = datadescription.GetInputDescriptionByName("input").GetWholeExtent()
+    trivialproducer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
+
   # get global range of Pressure
-  di = trivialproducer.GetDataInformation(0)
   trivialproducer.UpdatePipeline()
-  di.Update()
-  pdi = di.GetPointDataInformation()
-  ai = pdi.GetArrayInformation('Pressure')
-  pressurerange = ai.GetComponentRange(0)
+  RenderView1 = GetRenderView()
+  RenderView1.ViewSize = [200, 300]
+  DataRepresentation1 = Show()
+  DataRepresentation1.Visibility = 0
+  Contour1 = Contour( PointMergeMethod="Uniform Binning" )
 
-  contour.Isosurfaces = .5*(pressurerange[0]+pressurerange[1])
+  Contour1.PointMergeMethod = "Uniform Binning"
+  Contour1.ContourBy = ['POINTS', 'Pressure']
+  Contour1.Isosurfaces = [2952.0]
 
-  # now output the results to the screen as well as taking
-  # a screen shot of the view
-  #setup a window
-  rep = Show(contour)
-  ren = Render()
+  RenderView1.Background = [1,1,1]
 
-  #set the background color
-  ren.Background=[1,1,1]  #white
+  RenderView1.CameraPosition = [5.0, 25.0, 347.53624862725769]
+  RenderView1.CameraFocalPoint = [5.0, 25.0, 307.5]
+  RenderView1.CameraClippingRange = [24.710886140985117, 59.424292356666555]
+  RenderView1.CameraParallelScale = 13.743685418725535
+  DataRepresentation2 = Show()
+  DataRepresentation2.ScaleFactor = 1.5
+  DataRepresentation2.EdgeColor = [0.0, 0.0, 0.50000762951094835]
 
-  #set image size
-  ren.ViewSize = [200, 300] #[width, height]
+  fname = 'CPGrid' + str(timestep) + '.png'
+  WriteImage(fname)
 
-  #set representation
-  rep.Representation="Surface"
+  DataRepresentation2 = Show(trivialproducer)
+  DataRepresentation2.LookupTable = MakeBlueToRedLT(2702, 3202)
+  DataRepresentation2.ColorArrayName = 'Pressure'
+  DataRepresentation2.ColorAttributeType = 'POINT_DATA'
+  DataRepresentation2.Representation="Surface"
+  DataRepresentation2 = Show(Contour1)
+  RenderView1 = Render()
+  RenderView1.Background=[1,1,1]  #white
+  RenderView1.CameraPosition = [5.0, 25.0, 347.53624862725769]
+  RenderView1.CameraFocalPoint = [5.0, 25.0, 307.5]
+  RenderView1.CameraClippingRange = [24.710886140985117, 59.424292356666555]
+  RenderView1.CameraParallelScale = 13.743685418725535
 
-  #save screenshot
-  gridimagefilename = 'CPGrid'+str(timestep) + '.png'
-  WriteImage(gridimagefilename)
+  fname = 'CPPressure' + str(timestep) + '.png'
+  WriteImage(fname)
 
-  rep = Show(trivialproducer)
-  rep.LookupTable = MakeBlueToRedLT(pressurerange[0], pressurerange[1])
-  rep.ColorArrayName = 'Pressure'
-  rep.ColorAttributeType = 'POINT_DATA'
-  #set representation
-  rep.Representation="Surface"
-  rep = Show(contour)
-  #set the background color
-  ren = Render()
-  ren.Background=[1,1,1]  #white
-
-  pressureimagefilename = 'CPPressure'+str(timestep) + '.png'
-  WriteImage(pressureimagefilename)
 
   # explicitly delete the proxies -- may have to do this multiple times
   tobedeleted = GetNextProxyToDelete()
@@ -81,12 +91,3 @@ def RequestDataDescription(datadescription):
     datadescription.GetInputDescriptionByName("input").AddPointField("Pressure")
     datadescription.GetInputDescriptionByName('input').GenerateMeshOn()
   return
-
-# the code below is needed to import objects from paraview.simple
-# plus the definition of vtkTrivialProducer into this python script.
-try: paraview.simple
-except: from paraview.simple import *
-
-trivialproducer = TrivialProducer()
-contour = Contour(Input=trivialproducer)
-obj = trivialproducer.GetClientSideObject()

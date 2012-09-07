@@ -48,8 +48,7 @@ vtkSpyPlotBlock::vtkSpyPlotBlock() :
   this->SavedExtents[1]=this->SavedExtents[3]=this->SavedExtents[5]=0;
   this->SavedRealExtents[0]=this->SavedRealExtents[2]=this->SavedRealExtents[4]=1;
   this->SavedRealExtents[1]=this->SavedRealExtents[3]=this->SavedRealExtents[5]=0;
-  this->SavedRealDims[0]=this->SavedRealDims[2]=this->SavedRealDims[4]=1;
-  this->SavedRealDims[1]=this->SavedRealDims[3]=this->SavedRealDims[5]=0;
+  this->SavedRealDims[0]=this->SavedRealDims[1]=this->SavedRealDims[2]=0;
   //
   this->Status.Active = 0;
   this->Status.Allocated = 0;
@@ -310,7 +309,7 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
     if (this->Dimensions[i] == 1)
       {
       realExtents[j++] = 0;
-      realExtents[j++] = 1;
+      realExtents[j] = 1;
       realDims[i] = 1;
       ca[i] = 0;
       continue;
@@ -573,12 +572,18 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   vtkDataArray** materialVolumeFractions,
   const int& downConvertVolumeFraction  ) const
 {
+  // this->SavedRealDims are to be used when this->Status.Fixed is true,
+  // otherwise this->SavedRealDims is never set and we must use
+  // this->Dimensions.
+  const int *dimensions = this->Status.Fixed?
+    this->SavedRealDims : this->Dimensions;
+  vtkIdType arraySize = dimensions[0] * dimensions[1] * dimensions[2];
+
   //Make sure we convert zero value dims to 1.
-  const int dims[3] = {
-    this->SavedRealDims[0] > 0 ?  this->SavedRealDims[0] : 1,
-    this->SavedRealDims[1] > 0 ?  this->SavedRealDims[1] : 1,
-    this->SavedRealDims[2] > 0 ?  this->SavedRealDims[2] : 1};
-  vtkIdType arraySize = dims[0] * dims[1] * dims[2];
+  if (arraySize <= 0)
+    {
+    return;
+    }
 
   typedef std::map<int, vtkDoubleArray*> MapOfArrays;
   MapOfArrays materialDensityArrays;
@@ -622,11 +627,11 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
   averageDensityArray->FastDelete();
 
   vtkIdType pos = 0;
-  for ( int k=0; k < this->SavedRealDims[2]; k++)
+  for ( int k=0; k < dimensions[2]; k++)
     {
-    for ( int j=0; j < this->SavedRealDims[1]; j++)
+    for ( int j=0; j < dimensions[1]; j++)
       {
-      for ( int i=0; i < this->SavedRealDims[0]; i++, pos++)
+      for ( int i=0; i < dimensions[0]; i++, pos++)
         {
         //sum the mass for each each material
         volumeArray->SetValue(pos, this->GetCellVolume(i,j,k));
@@ -669,12 +674,17 @@ void vtkSpyPlotBlock::ComputeDerivedVariables( vtkCellData *data,
 //-----------------------------------------------------------------------------
 double vtkSpyPlotBlock::GetCellVolume(int i, int j, int k) const
 {
+  // this->SavedRealDims are to be used when this->Status.Fixed is true,
+  // otherwise this->SavedRealDims is never set and we must use
+  // this->Dimensions.
+  const int *dimensions = this->Status.Fixed?
+    this->SavedRealDims : this->Dimensions;
 
   //make sure the cell index is valid;
   double volume = -1;
-  if ( i < 0 || i >= this->SavedRealDims[0] ||
-       j < 0 || j >= this->SavedRealDims[1] ||
-       k < 0 || k >= this->SavedRealDims[2] )
+  if ( i < 0 || i >= dimensions[0] ||
+       j < 0 || j >= dimensions[1] ||
+       k < 0 || k >= dimensions[2] )
     {
     //invalid coordinate
     return volume;

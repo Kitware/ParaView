@@ -86,7 +86,7 @@ int vtkShearedCubeSource::RequestData(
 
   double x[3], n[3];
   int numPolys=6, numPts=8;
-  int i, j, k;
+  int i, j, k, coord;
   vtkIdType pts[4];
   vtkPoints *newPoints;
   vtkFloatArray *newNormals;
@@ -110,17 +110,17 @@ int vtkShearedCubeSource::RequestData(
   //
 
   // Do planes normal to U
-  for(int k=0; k < 2; k++)
+  for(k = 0; k < 2; k++)
     {
-    for(int j=0; j < 2; j++)
+    for(j = 0; j < 2; j++)
       {
-     for(int i=0; i < 2; i++)
+     for(i = 0; i < 2; i++)
         {
-        for(int coord=0; coord < 3; coord++)
+        for(coord = 0; coord < 3; coord++)
           {
           x[coord] = this->BaseU[coord]*this->OrientedBoundingBox[i] +
-              this->BaseV[coord]*this->OrientedBoundingBox[2+j] +
-              this->BaseW[coord]*this->OrientedBoundingBox[4+k];
+                     this->BaseV[coord]*this->OrientedBoundingBox[2+j] +
+                     this->BaseW[coord]*this->OrientedBoundingBox[4+k];
           }
         newPoints->InsertNextPoint(x);
         }

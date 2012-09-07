@@ -20,7 +20,7 @@
 #include "CPSystemInformation.h"
 #ifdef COPROCESSOR_USE_MPI
 #define MPICH_SKIP_MPICXX
-#include "mpi.h"
+#include "vtkMPI.h"
 #endif
 #include <iostream>
 
@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
     return 1;
     }
 #ifdef COPROCESSOR_USE_MPI
-  cout << "Initializing MPI.\n";
   MPI_Init(&argc,&argv);
 #endif
   int errors = 0;
@@ -42,7 +41,7 @@ int main(int argc, char* argv[])
     testDriver->SetNumberOfTimeSteps(1);
     testDriver->SetStartTime(0);
     testDriver->SetEndTime(.5);
-    
+
     if(testDriver->Run())
       {
       errors++;

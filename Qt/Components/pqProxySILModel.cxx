@@ -71,11 +71,6 @@ pqProxySILModel::pqProxySILModel(const QString& hierarchyName, QObject* _parent)
     QApplication::style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, 
       &painter);
     }
-
-  this->DelayedValuesChangedSignalTimer.setInterval(10);
-  this->DelayedValuesChangedSignalTimer.setSingleShot(true);
-  QObject::connect(&this->DelayedValuesChangedSignalTimer, SIGNAL(timeout()),
-    this, SIGNAL(valuesChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -158,7 +153,7 @@ void pqProxySILModel::setValues(const QList<QVariant>& arg)
 //-----------------------------------------------------------------------------
 void pqProxySILModel::onCheckStatusChanged()
 {
-  this->DelayedValuesChangedSignalTimer.start();
+  emit valuesChanged();
 }
 
 //-----------------------------------------------------------------------------
