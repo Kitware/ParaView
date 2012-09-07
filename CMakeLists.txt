@@ -184,6 +184,10 @@ option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_PISTON "Build ParaView with Piston GPGPU filters" OFF)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 
+if (UNIX)
+  option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
+endif()
+
 if (UNIX AND NOT APPLE)
   # Since development installs are currently being tested only on linuxes. We
   # can support these for other platforms if time permits.
