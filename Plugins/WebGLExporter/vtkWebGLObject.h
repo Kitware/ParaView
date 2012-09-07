@@ -77,7 +77,7 @@ protected:
     bool hasChanged;
     bool iswireframeMode;
     bool isvisible;
-    WebGLObjectTypes type;
+    WebGLObjectTypes webGlType;
     bool hasTransparency;
     bool iswidget;
     bool interactAtServer;

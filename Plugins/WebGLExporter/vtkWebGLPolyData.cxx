@@ -54,7 +54,7 @@ public:
 
 vtkWebGLPolyData::vtkWebGLPolyData()
   {
-  this->type = wTRIANGLES;
+  this->webGlType = wTRIANGLES;
   this->iswidget = false;
   this->Internal = new vtkInternal();
   }
@@ -73,7 +73,7 @@ vtkWebGLPolyData::~vtkWebGLPolyData()
 
 void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _index, int _numberOfIndexes, float* _normals, unsigned char* _colors, float* _tcoords, int maxSize)
   {
-  this->type = wTRIANGLES;
+  this->webGlType = wTRIANGLES;
 
   vtkWebGLDataSet* obj;
   while(this->Internal->Parts.size() != 0)
@@ -100,7 +100,6 @@ void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _in
     }
   else
     {
-    int pieces = (int)ceil(_numberOfIndexes/(float)div);
     int total = _numberOfIndexes;
     int curr = 0;
     int size = 0;
@@ -178,7 +177,7 @@ void vtkWebGLPolyData::SetMesh(float* _vertices, int _numberOfVertices, int* _in
 
 void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index, int _numberOfIndex, unsigned char *_colors, int maxSize)
   {
-  this->type = wLINES;
+  this->webGlType = wLINES;
 
   vtkWebGLDataSet* obj;
   while(this->Internal->Parts.size() != 0)
@@ -203,7 +202,6 @@ void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index,
     }
   else
     {
-    int pieces = (int)ceil(_numberOfIndex/(float)div);
     int total = _numberOfIndex;
     int curr = 0;
     int size = 0;
@@ -247,7 +245,10 @@ void vtkWebGLPolyData::SetLine(float *_points, int _numberOfPoints, int *_index,
 void vtkWebGLPolyData::SetTransformationMatrix(vtkMatrix4x4* m)
   {
   this->Superclass::SetTransformationMatrix(m);
-  for (int i=0; i<this->Internal->Parts.size(); i++) this->Internal->Parts[i]->SetMatrix(this->Matrix);
+  for (size_t i=0; i<this->Internal->Parts.size(); i++)
+    {
+    this->Internal->Parts[i]->SetMatrix(this->Matrix);
+    }
   }
 
 unsigned char* vtkWebGLPolyData::GetBinaryData(int part)
@@ -268,7 +269,7 @@ void vtkWebGLPolyData::GenerateBinaryData()
   vtkWebGLDataSet* obj;
   this->hasChanged = false;
   std::stringstream ss;
-  for(int i=0; i<this->Internal->Parts.size(); i++)
+  for(size_t i=0; i<this->Internal->Parts.size(); i++)
     {
     obj = this->Internal->Parts[i];
     obj->GenerateBinaryData();
@@ -276,9 +277,9 @@ void vtkWebGLPolyData::GenerateBinaryData()
     }
   if(this->Internal->Parts.size() != 0)
     {
-    std::string MD5 = md5((char*)ss.str().c_str(), ss.str().size());
-    this->hasChanged = this->MD5.compare(MD5) != 0;
-    this->MD5 = MD5;
+    std::string localMD5 = md5((char*)ss.str().c_str(), ss.str().size());
+    this->hasChanged = this->MD5.compare(localMD5) != 0;
+    this->MD5 = localMD5;
     }
   else cout << "Warning: GenerateBinaryData() @ vtkWebGLObject: This isn\'t supposed to happen.";
   }
@@ -365,7 +366,7 @@ void vtkWebGLPolyData::GetLinesFromPolygon(vtkMapper *mapper, vtkActor *actor, i
       index[curr*2 + j*2 + 1] = pos;
       if(j==np-1) index[curr*2 + j*2 + 1] = b;
 
-      vtkIdType id = cell->GetPointIds()->GetId(j);
+      vtkIdType pointId = cell->GetPointIds()->GetId(j);
       if (numberOfComponents == 0)
         {
         actor->GetProperty()->GetColor(rgb);
@@ -375,16 +376,16 @@ void vtkWebGLPolyData::GetLinesFromPolygon(vtkMapper *mapper, vtkActor *actor, i
         switch(mode)
           {
         case vtkScalarsToColors::MAGNITUDE:
-            mag = 0; for (int w=0; w<numberOfComponents; w++) mag += (double)array->GetComponent(id, w)*(double)array->GetComponent(id, w);
+            mag = 0; for (int w=0; w<numberOfComponents; w++) mag += (double)array->GetComponent(pointId, w)*(double)array->GetComponent(pointId, w);
             mag = sqrt(mag);
             table->GetColor(mag, &rgb[0]);
             break;
           case vtkScalarsToColors::COMPONENT:
-            mag = array->GetComponent(id, colorComponent);
+            mag = array->GetComponent(pointId, colorComponent);
             table->GetColor(mag, &rgb[0]);
             break;
           case vtkScalarsToColors::RGBCOLORS:
-            array->GetTuple(id, &rgb[0]);
+            array->GetTuple(pointId, &rgb[0]);
             break;
           }
         }
@@ -429,7 +430,7 @@ void vtkWebGLPolyData::GetLines(vtkTriangleFilter* polydata, vtkActor* actor, in
 
 void vtkWebGLPolyData::SetPoints(float *points, int numberOfPoints, unsigned char *colors, int maxSize)
   {
-  this->type = wPOINTS;
+  this->webGlType = wPOINTS;
 
   // Delete Old Objects
   vtkWebGLDataSet* obj;
@@ -471,7 +472,6 @@ void vtkWebGLPolyData::SetPoints(float *points, int numberOfPoints, unsigned cha
 void vtkWebGLPolyData::GetPoints(vtkTriangleFilter *polydata, vtkActor *actor, int maxSize)
   {
   vtkWebGLPolyData* object = this;
-  vtkPoints* vtkpoints = polydata->GetOutput(0)->GetPoints();//Wendel
 
   // Points
   double point[3];
@@ -492,8 +492,6 @@ void vtkWebGLPolyData::GetPoints(vtkTriangleFilter *polydata, vtkActor *actor, i
 
 void vtkWebGLPolyData::GetColorsFromPolyData(unsigned char* color, vtkPolyData* polydata, vtkActor* actor)
   {
-  double point[3];
-
   int celldata;
   vtkDataArray* array = vtkAbstractMapper::GetScalars(polydata, actor->GetMapper()->GetScalarMode(),
                                                       actor->GetMapper()->GetArrayAccessMode(), actor->GetMapper()->GetArrayId(),
@@ -586,7 +584,6 @@ void vtkWebGLPolyData::GetPolygonsFromCellData(vtkTriangleFilter* polydata, vtkA
   unsigned char* colors   = new unsigned char[data->GetNumberOfCells()*3*4];
   int* indexes  = new int[data->GetNumberOfCells()*3*3];
 
-  int npts;
   vtkGenericCell* cell = vtkGenericCell::New();
   double tuple[3], normal[3], color[3];
   color[0] = 1.0; color[1] = 1.0; color[2] = 1.0;
@@ -695,7 +692,6 @@ void vtkWebGLPolyData::GetColorsFromPointData(unsigned char* color, vtkPointData
     {
     double rgb[3];
     double alpha = 0;
-    double mag=0;
     int celldata;
     array = vtkAbstractMapper::GetScalars(polydata, actor->GetMapper()->GetScalarMode(),
                                           actor->GetMapper()->GetArrayAccessMode(), actor->GetMapper()->GetArrayId(),

@@ -126,9 +126,9 @@ void pqCommandLineOptionsBehavior::processCommandLineOptions()
     {
     vtkSMProxy* proxy =
         vtkSMProxyManager::GetProxyManager()->NewProxy("tile_helper","TileDisplayHelper");
-    vtkSMStringVectorProperty* property =
+    vtkSMStringVectorProperty* pathProperty =
         vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("DumpImagePath"));
-    property->SetElement(0, options->GetTileImagePath());
+    pathProperty->SetElement(0, options->GetTileImagePath());
     proxy->UpdateVTKObjects();
     proxy->Delete();
     }

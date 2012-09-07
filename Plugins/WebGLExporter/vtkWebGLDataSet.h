@@ -53,7 +53,7 @@ protected:
   int NumberOfVertices;
   int NumberOfPoints;
   int NumberOfIndexes;
-  WebGLObjectTypes type;
+  WebGLObjectTypes webGLType;
 
   float* Matrix;
   float* vertices;

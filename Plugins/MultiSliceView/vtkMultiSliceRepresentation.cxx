@@ -208,6 +208,17 @@ vtkAlgorithmOutput* vtkMultiSliceRepresentation::GetInternalOutputPort(int port,
 
   return this->InternalSliceFilter->GetOutputPort(this->PortToUse);
 }
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkMultiSliceRepresentation::GetInternalOutputPort(int port)
+{
+  return this->Superclass::GetInternalOutputPort(port);
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkMultiSliceRepresentation::GetInternalOutputPort()
+{
+  return this->Superclass::GetInternalOutputPort();
+}
 
 //----------------------------------------------------------------------------
 vtkThreeSliceFilter* vtkMultiSliceRepresentation::GetInternalVTKFilter()
