@@ -119,7 +119,7 @@ vtkSQLog::~vtkSQLog()
       << " remaining.");
     }
 
-  #if defined(vtkSQLogDEBUG)
+  #if vtkSQLogDEBUG < 0
   if (this->EventId.size()>0)
     {
     size_t nIds=this->EventId.size();
@@ -157,6 +157,20 @@ vtkSQLog *vtkSQLog::GetGlobalInstance()
     vtkSQLog::GlobalInstanceDestructor.SetLog(log);
     }
   return vtkSQLog::GlobalInstance;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQLog::DeleteGlobalInstance()
+{
+  #if vtkSQLogDEBUG > 1
+  pCerr() << "=====vtkSQLog::GetGlobalInstance" << endl;
+  #endif
+
+  if (vtkSQLog::GlobalInstance)
+    {
+    vtkSQLog::GlobalInstance->Delete();
+    vtkSQLog::GlobalInstanceDestructor.SetLog(0);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +243,7 @@ void vtkSQLog::StartEvent(const char *event)
   gettimeofday(&wallt,0x0);
   walls=(double)wallt.tv_sec+((double)wallt.tv_usec)/1.0E6;
 
-  #if defined(vtkSQLogDEBUG)
+  #if vtkSQLogDEBUG < 0
   this->EventId.push_back(event);
   #endif
 
@@ -278,7 +292,7 @@ void vtkSQLog::EndEvent(const char *event)
     << walle-walls
     << "\n";
 
-  #if defined(vtkSQLogDEBUG)
+  #if vtkSQLogDEBUG < 0
   const string &sEventId=this->EventId.back();
   const string eEventId=event;
   if (sEventId!=eEventId)

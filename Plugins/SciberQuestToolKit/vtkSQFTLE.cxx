@@ -281,53 +281,49 @@ int vtkSQFTLE::RequestData(
     }
 
   vtkIdType nCells=input->GetNumberOfCells();
-  if (nCells<1)
+  if (nCells>0)
     {
-    vtkErrorMacro("No cells on input.");
-    return 1;
-    }
-
-  set<string>::iterator it;
-  set<string>::iterator begin=this->InputArrays.begin();
-  set<string>::iterator end=this->InputArrays.end();
-  for (it=begin; it!=end; ++it)
-    {
-    vtkDataArray *V=input->GetPointData()->GetArray((*it).c_str());
-    if (V==0)
+    set<string>::iterator it;
+    set<string>::iterator begin=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (it=begin; it!=end; ++it)
       {
-      vtkErrorMacro(
-        << "Array " << (*it).c_str()
-        << " was requested but is not present");
-      continue;
+      vtkDataArray *V=input->GetPointData()->GetArray((*it).c_str());
+      if (V==0)
+        {
+        vtkErrorMacro(
+          << "Array " << (*it).c_str()
+          << " was requested but is not present");
+        continue;
+        }
+
+      if (V->GetNumberOfComponents()!=3)
+        {
+        vtkErrorMacro(
+          << "Array " << (*it).c_str() << " is not a vector.");
+        continue;
+        }
+
+      // Gradient.
+      vtkDoubleArray *gradV=vtkDoubleArray::New();
+      ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
+
+      // FTLE
+      string name;
+      name+="ftle-";
+      name+=V->GetName();
+
+      vtkDoubleArray *ftleV=vtkDoubleArray::New();
+      ftleV->SetName(name.c_str());
+
+      ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
+
+      output->GetCellData()->AddArray(ftleV);
+
+      ftleV->Delete();
+      gradV->Delete();
       }
-
-    if (V->GetNumberOfComponents()!=3)
-      {
-      vtkErrorMacro(
-        << "Array " << (*it).c_str() << " is not a vector.");
-      continue;
-      }
-
-    // Gradient.
-    vtkDoubleArray *gradV=vtkDoubleArray::New();
-    ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
-
-    // FTLE
-    string name;
-    name+="ftle-";
-    name+=V->GetName();
-
-    vtkDoubleArray *ftleV=vtkDoubleArray::New();
-    ftleV->SetName(name.c_str());
-
-    ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
-
-    output->GetCellData()->AddArray(ftleV);
-
-    ftleV->Delete();
-    gradV->Delete();
     }
-
 
   if (this->LogLevel || globalLogLevel)
     {

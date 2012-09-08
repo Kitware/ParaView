@@ -79,6 +79,9 @@ int Finalize(vtkMultiProcessController* controller, int code)
     log->Write();
     }
 
+  vtkSQLog::DeleteGlobalInstance();
+
+  vtkMultiProcessController::SetGlobalController(0);
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
   controller->Finalize();
   controller->Delete();

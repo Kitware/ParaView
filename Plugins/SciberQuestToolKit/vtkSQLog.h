@@ -18,10 +18,10 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQLog_h
 #define __vtkSQLog_h
 
+#define vtkSQLogDEBUG -1
+//#ifdef SQTK_DEBUG
 //#define vtkSQLogDEBUG 1
-#ifdef SQTK_DEBUG
-#define vtkSQLogDEBUG 1
-#endif
+//#endif
 
 #include "vtkObject.h"
 
@@ -95,7 +95,6 @@ public:
   // intialize from an xml document.
   int Initialize(vtkPVXMLElement *root);
 
-
   // Description:
   // Set the rank who writes.
   vtkSetMacro(WriterRank,int);
@@ -155,14 +154,19 @@ public:
   int Write();
 
   // Description:
-  // The log class implements the singleton patern. It's optional.
-  // When used this way when objects are finished with the log they
-  // are required to call Update to push the local changes to the
-  // root. When the root is destroyed the data is written to disk.
+  // The log class implements the singleton patern so that it
+  // may be shared accross class boundaries. If the log instance
+  // doesn't exist then one is created. It will be automatically
+  // destroyed at exit by the signleton destructor. It can be
+  // destroyed explicitly by calling DeleteGlobalInstance.
   static vtkSQLog *GetGlobalInstance();
 
   // Description:
-  // If enabled(default) and used as a singleton the log will write
+  // Explicitly delete the singleton.
+  static void DeleteGlobalInstance();
+
+  // Description:
+  // If enabled and used as a singleton the log will write
   // it's contents to disk during program termination.
   vtkSetMacro(WriteOnClose,int);
   vtkGetMacro(WriteOnClose,int);
@@ -189,7 +193,7 @@ private:
   char *FileName;
   int WriteOnClose;
   vector<double> StartTime;
-  #if vtkSQLogDEBUG > 0
+  #if vtkSQLogDEBUG < 0
   vector<string> EventId;
   #endif
 

@@ -179,7 +179,7 @@ public:
   // Sets the work unit (in number of seed points) for the master. This should
   // be much less than the slave block size, so that the master can respond
   // timely to slave requests.
-  vtkSetClampMacro(MasterBlockSize,int,1,VTK_INT_MAX);
+  vtkSetClampMacro(MasterBlockSize,int,0,VTK_INT_MAX);
   vtkGetMacro(MasterBlockSize,int);
 
   // Description:

@@ -181,7 +181,7 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"mode",&mode);
   this->SetMode(mode);
 
-  int integratorType=INTEGRATOR_RK45;
+  int integratorType=INTEGRATOR_RK4;
   GetOptionalAttribute<int,1>(elem,"integrator_type",&integratorType);
   this->SetIntegratorType(integratorType);
 
@@ -192,7 +192,7 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
     this->SetMaxLineLength(maxArcLength);
     }
 
-  double maxIntegrationInterval=VTK_DOUBLE_MAX;
+  double maxIntegrationInterval=0.0;
   GetOptionalAttribute<double,1>(elem,"max_integration_interval",&maxIntegrationInterval);
   if (maxIntegrationInterval>0.0)
     {
@@ -241,37 +241,37 @@ int vtkSQFieldTracer::Initialize(vtkPVXMLElement *root)
     this->SetNullThreshold(nullThreshold);
     }
 
-  int forwardOnly=0;
+  int forwardOnly=-1;
   GetOptionalAttribute<int,1>(elem,"forward_only",&forwardOnly);
-  if (forwardOnly>0)
+  if (forwardOnly>=0)
     {
     this->SetForwardOnly(forwardOnly);
     }
 
   int dynamicScheduler=-1;
   GetOptionalAttribute<int,1>(elem,"dynamic_scheduler",&dynamicScheduler);
-  if (dynamicScheduler>0)
+  if (dynamicScheduler>=0)
     {
     this->SetUseDynamicScheduler(dynamicScheduler);
     }
 
-  int masterBlockSize=0;
+  int masterBlockSize=-1;
   GetOptionalAttribute<int,1>(elem,"master_block_size",&masterBlockSize);
-  if (masterBlockSize)
+  if (masterBlockSize>=0)
     {
     this->SetMasterBlockSize(masterBlockSize);
     }
 
-  int workerBlockSize=0;
+  int workerBlockSize=-1;
   GetOptionalAttribute<int,1>(elem,"worker_block_size",&workerBlockSize);
-  if (workerBlockSize)
+  if (workerBlockSize>=0)
     {
     this->SetWorkerBlockSize(workerBlockSize);
     }
 
-  int squeezeColorMap=0;
+  int squeezeColorMap=-1;
   GetOptionalAttribute<int,1>(elem,"squeeze_color_map",&squeezeColorMap);
-  if (squeezeColorMap)
+  if (squeezeColorMap>=0)
     {
     this->SetSqueezeColorMap(squeezeColorMap);
     }
@@ -978,7 +978,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
   (void)traceData;
   #else
   const int masterProcId=(nProcs>1?1:0); // NOTE: proc 0 is busy with PV overhead.
-  const int BLOCK_REQ=2222;
+  const int BLOCK_REQ=12345;
   // Master process distributes the work and integrates
   // in between servicing requests for work.
   // when running poincare mapper master should not start integrating until
@@ -986,8 +986,11 @@ int vtkSQFieldTracer::IntegrateDynamic(
   // leaving workers idle.
   if (procId==masterProcId)
     {
+    vector<MPI_Request> reqs;
     int workerBlockSize=min(this->WorkerBlockSize,max((int)nCells/nProcs,1));
-    int masterBlockSize=min(workerBlockSize,this->MasterBlockSize);
+    int masterBlockSize;
+    if (nProcs==1) masterBlockSize=workerBlockSize;
+    else masterBlockSize=min(workerBlockSize,this->MasterBlockSize);
     WorkQueue Q((int)nCells);
     int nActiveWorkers=nProcs-1;
     int moreWork=1;
@@ -1009,24 +1012,27 @@ int vtkSQFieldTracer::IntegrateDynamic(
           // message itself contains no useful information.
           int buf;
           int otherProc=stat.MPI_SOURCE;
-          MPI_Recv(&buf,1,MPI_INT,otherProc,BLOCK_REQ,MPI_COMM_WORLD,&stat);
+          MPI_Recv(&buf,0,MPI_INT,otherProc,BLOCK_REQ,MPI_COMM_WORLD,&stat);
           // get a block of work.
           IdBlock sourceIds;
           moreWork=Q.GetBlock(sourceIds,workerBlockSize);
           // send the work. If there is no more, send zero sized block
           // this closes all workers.
-          MPI_Send(
+          MPI_Request req;
+          MPI_Isend(
               sourceIds.data(),
               (int)sourceIds.dataSize(),
               MPI_UNSIGNED_LONG_LONG,
               otherProc,
               BLOCK_REQ,
-              MPI_COMM_WORLD);
+              MPI_COMM_WORLD,
+              &req);
+          reqs.push_back(req);
           if (!moreWork)
             {
             --nActiveWorkers;
             }
-           #if vtkSQFieldTracerDEBUG>1
+           #if vtkSQFieldTracerDEBUG>0
            pCerr() << "Master filled request from " << otherProc << " " << sourceIds << endl;
            #endif
           }
@@ -1038,13 +1044,13 @@ int vtkSQFieldTracer::IntegrateDynamic(
 
       // now that all the worker that need work have it. Do a small amount
       // of work while the others are busy.
-      if (!(this->Mode==MODE_POINCARE) || (nProcs==1))
+      if ((masterBlockSize>0) || (nProcs==1))
         {
         IdBlock sourceIds;
         moreWork=Q.GetBlock(sourceIds,masterBlockSize);
         if (moreWork)
           {
-          #if vtkSQFieldTracerDEBUG>1
+          #if vtkSQFieldTracerDEBUG>0
           pCerr() << "Master integrating " << sourceIds << endl;
           #endif
           this->IntegrateBlock(
@@ -1059,6 +1065,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
           }
         }
       }
+      MPI_Waitall((int)reqs.size(),&reqs[0],MPI_STATUS_IGNORE);
     }
   // Work processes receive chunks of seed cell ids and
   // integrate.
@@ -1066,7 +1073,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
     {
     while (1)
       {
-      #if vtkSQFieldTracerDEBUG>1
+      #if vtkSQFieldTracerDEBUG>0
       pCerr() << "Slave " << procId << " requesting work" << endl;
       #endif
       #if defined vtkSQFieldTracerTIME
@@ -1075,7 +1082,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
       #endif
 
       // get a block of seed cell ids to process.
-      MPI_Send(&procId,1,MPI_INT,masterProcId,BLOCK_REQ,MPI_COMM_WORLD);
+      MPI_Send(&procId,0,MPI_INT,masterProcId,BLOCK_REQ,MPI_COMM_WORLD);
       MPI_Status stat;
       IdBlock sourceIds;
       MPI_Recv(
@@ -1087,7 +1094,7 @@ int vtkSQFieldTracer::IntegrateDynamic(
           MPI_COMM_WORLD,
           &stat);
 
-      #if vtkSQFieldTracerDEBUG>1
+      #if vtkSQFieldTracerDEBUG>0
       pCerr() << "Slave " << procId << " received " << sourceIds << endl;
       #endif
       #if defined vtkSQFieldTracerTIME
@@ -1191,7 +1198,7 @@ void vtkSQFieldTracer::IntegrateOne(
   line->GetSeedPoint(seed);
   if (tcon->OutsideProblemDomain(seed))
     {
-    #if vtkSQFieldTracerDEBUG>0
+    #if vtkSQFieldTracerDEBUG>1
     pCerr()
       << "Terminated: Seed " << Tuple<float>(line->GetSeedPoint(),3)
       << " outside problem domain.";
@@ -1281,7 +1288,7 @@ void vtkSQFieldTracer::IntegrateOne(
       // check for field null
       if ((speed==0) || (speed<=this->NullThreshold))
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr() << "Terminated: Interpolated field null." << endl;
         #endif
         line->SetTerminator(i,tcon->GetFieldNullId());
@@ -1347,7 +1354,7 @@ void vtkSQFieldTracer::IntegrateOne(
       // classification as a field null.
       if (iErr==1)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr() << "Terminated: Integrator reports outside problem domain." << endl;
         #endif
         line->SetTerminator(i,tcon->GetProblemDomainSurfaceId());
@@ -1399,7 +1406,7 @@ void vtkSQFieldTracer::IntegrateOne(
       double v=dx/dt;
       if (v<=this->NullThreshold)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr()
           << "Terminated: Field null encountered. "
           << "v=" << v << ". "
@@ -1423,7 +1430,7 @@ void vtkSQFieldTracer::IntegrateOne(
       timeInterval+=dt;
       if (timeInterval>=this->MaxIntegrationInterval)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr()
           << "Terminated: Max integration interval exceeded. "
           << "nSteps= " << numSteps << "."
@@ -1449,7 +1456,7 @@ void vtkSQFieldTracer::IntegrateOne(
       // check arc-length for a termination condition
       if (lineLength>this->MaxLineLength)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr()
           << "Terminated: Max arc length exceeded. "
           << "nSteps= " << numSteps << "."
@@ -1475,7 +1482,7 @@ void vtkSQFieldTracer::IntegrateOne(
       if ( (this->IntegratorType==INTEGRATOR_RK45)
         && (numSteps>this->MaxNumberOfSteps) )
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr()
           << "Terminated: Max number of steps exceeded. "
           << "nSteps= " << numSteps << "."
@@ -1502,7 +1509,7 @@ void vtkSQFieldTracer::IntegrateOne(
       int surfIsect=tcon->IntersectsTerminationSurface(p0,p1,pi);
       if (surfIsect)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr()
           << (this->Mode==MODE_POINCARE?"Continued:":"Terminated:")
           << "Surface " << surfIsect-1 << " intersected." << endl;
@@ -1535,7 +1542,7 @@ void vtkSQFieldTracer::IntegrateOne(
         }
       if (bcSurf)
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr() << "Periodic BC Applied: At " << bcSurf << "." << endl;
         #endif
         }
@@ -1545,7 +1552,7 @@ void vtkSQFieldTracer::IntegrateOne(
       else
       if (tcon->OutsideProblemDomain(p0,p1))
         {
-        #if vtkSQFieldTracerDEBUG>0
+        #if vtkSQFieldTracerDEBUG>1
         pCerr() << "Terminated: Integration outside problem domain." << endl;
         #endif
         line->SetTerminator(i,tcon->GetProblemDomainSurfaceId());

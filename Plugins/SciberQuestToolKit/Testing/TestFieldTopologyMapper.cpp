@@ -12,7 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkAppendPolyData.h"
 #include "vtkProcessIdScalars.h"
 #include "vtkSphereSource.h"
-#include "vtkPlaneSource.h"
+#include "vtkSQPlaneSource.h"
 #include "vtkSQBOVMetaReader.h"
 #include "vtkSQFieldTracer.h"
 #include "vtkSQVolumeSource.h"
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     {
     case PLANE:
       {
-      vtkPlaneSource *p=vtkPlaneSource::New();
+      vtkSQPlaneSource *p=vtkSQPlaneSource::New();
       p->SetOrigin(1.0,3.5,0.25);
       p->SetPoint1(6.0,3.5,0.25);
       p->SetPoint2(1.0,3.5,4.75);
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
   ftm->SetSqueezeColorMap(1);
   ftm->SetForwardOnly(0);
   ftm->SetUseDynamicScheduler(1);
-  ftm->SetMasterBlockSize(16);
+  ftm->SetMasterBlockSize(0);
   ftm->SetWorkerBlockSize(128);
   ftm->AddInputConnection(0,r->GetOutputPort(0));
   ftm->AddInputConnection(1,sp->GetOutputPort(0));
@@ -185,10 +185,5 @@ int main(int argc, char **argv)
 
   surf->Delete();
 
-  vtkAlgorithm::SetDefaultExecutivePrototype(0);
-
-  controller->Finalize();
-  controller->Delete();
-
-  return testStatus==vtkTesting::PASSED?0:1;
+  return Finalize(controller,testStatus==vtkTesting::PASSED?0:1);
 }
