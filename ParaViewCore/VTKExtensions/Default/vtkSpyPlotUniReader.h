@@ -148,7 +148,6 @@ public:
     char Comment[80];
     int Index;
   };
-
   struct Variable
   {
     char* Name;
@@ -173,6 +172,13 @@ public:
     vtkFloatArray *TracerCoord;
     vtkIntArray *TracerBlock;
   };
+  struct MaterialMarker
+  {
+    int NumMarks;
+    int NumRealMarks;
+    int NumVars;
+    // MarkerMaterialField *Variables;
+  };
 
   vtkSpyPlotBlock* GetDataBlock(int block);
 
@@ -193,6 +199,7 @@ private:
                           unsigned char* out, int outSize);
 
   int ReadHeader(vtkSpyPlotIStream *spis);
+  int ReadMarkerHeader(vtkSpyPlotIStream *spis);
   int ReadCellVariableInfo(vtkSpyPlotIStream *spis);
   int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
@@ -215,6 +222,10 @@ private:
   double GlobalMax[3];
   int NumberOfBlocks;
   int MaximumNumberOfLevels;
+  int MarkersOn;
+
+  // Marker Header Information
+  MaterialMarker* Markers;
 
   // For storing possible cell/material fields meta data
   int NumberOfPossibleCellFields;

@@ -1089,6 +1089,19 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
     vtkErrorMacro( "Cannot read number of blocks" );
     return 0;
     }
+  if ( this->FileVersion >= 105 )
+    {
+    if ( !spis->ReadInt32s(&(this->MarkersOn),1) )
+      {
+      vtkErrorMacro( "Cannot reader marker flag" );
+      return 0;
+      }
+    if (this->MarkersOn) 
+      {
+      vtkErrorMacro( "Markers enabled in file, but not yet available in ParaView" );
+      return 0;
+      }
+    }
   if ( !spis->ReadInt32s(&(this->MaximumNumberOfLevels), 1) )
     {
     vtkErrorMacro( "Cannot read maximum number of levels" );
@@ -1096,6 +1109,11 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
     }
   // Done with header
   return 1;
+}
+
+int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis) 
+{
+  return 0;
 }
 
 int vtkSpyPlotUniReader::ReadGroupHeaderInformation(vtkSpyPlotIStream *spis)
