@@ -106,6 +106,9 @@ public:
   // ROOT_RANKS_PID.log
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //BTX
+  void SetFileName(const string &fileName){ this->SetFileName(fileName.c_str()); }
+  //ETX
 
   // Description:
   // The log works as an event stack. EventStart pushes the

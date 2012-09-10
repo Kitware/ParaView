@@ -232,6 +232,10 @@ int vtkSQPlaneSource::RequestData(
     }
   else
     {
+    if (outInfo->Has(vtkSQCellGenerator::CELL_GENERATOR()))
+      {
+      outInfo->Remove(vtkSQCellGenerator::CELL_GENERATOR());
+      }
     // Immediate mode domain decomposition
     int nCells=this->XResolution*this->YResolution;
     int pieceSize=nCells/nPieces;

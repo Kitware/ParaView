@@ -2720,6 +2720,19 @@ Copyright 2012 SciberQuest Inc.
         </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty
+        name="TimeInterval"
+        label="Time Interval"
+        command="SetTimeInterval"
+        number_of_elements="1"
+        default_values="1.0"
+        >
+        <DoubleRangeDomain name="range" min="0.0"/>
+        <Documentation>
+          Time range displacement map was computed over.
+        </Documentation>
+     </IntVectorProperty>
+
     <Hints>
       <View type="RenderView"/>
     </Hints>

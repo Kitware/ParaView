@@ -101,6 +101,7 @@ void ComputeFTLE(
       double prog1,
       vtkIdType nCells,
       vtkDoubleArray *gradV,
+      double timeInterval,
       vtkDoubleArray *ftleV)
 {
   const vtkIdType nProgSteps=10;
@@ -142,7 +143,7 @@ void ComputeFTLE(
     lam=max(lam,e(2,0));
     lam=max(lam,1.0);
 
-    pFtleV[0]=log(sqrt(lam));
+    pFtleV[0]=log(sqrt(lam))/timeInterval;
 
     pFtleV+=1;
     pGradV+=9;
@@ -156,6 +157,7 @@ vtkStandardNewMacro(vtkSQFTLE);
 vtkSQFTLE::vtkSQFTLE()
       :
   PassInput(0),
+  TimeInterval(1.0),
   LogLevel(0)
 {
   #ifdef SQTK_DEBUG
@@ -195,14 +197,30 @@ int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
     this->SetPassInput(passInput);
     }
 
+  double timeInterval=0.0;
+  GetOptionalAttribute<double,1>(elem,"time_interval",&timeInterval);
+  if (timeInterval>0.0)
+    {
+    this->SetTimeInterval(timeInterval);
+    }
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
   int globalLogLevel=log->GetGlobalLevel();
   if (this->LogLevel || globalLogLevel)
     {
     log->GetHeader()
       << "# ::vtkSQFTLE" << "\n"
-      << "#   pass_input=" << passInput << "\n"
-      << "\n";
+      << "#   pass_input=" << this->PassInput << "\n"
+      << "#   time_interval=" << this->TimeInterval << "\n"
+      << "#   input_arrays=";
+
+    set<string>::iterator it=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader() << "\n";
     }
 
   return 0;
@@ -316,7 +334,7 @@ int vtkSQFTLE::RequestData(
       vtkDoubleArray *ftleV=vtkDoubleArray::New();
       ftleV->SetName(name.c_str());
 
-      ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
+      ComputeFTLE(this,0.5,1.0,nCells,gradV,this->TimeInterval,ftleV);
 
       output->GetCellData()->AddArray(ftleV);
 

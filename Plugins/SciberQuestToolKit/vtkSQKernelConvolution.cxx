@@ -318,7 +318,24 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
       << "#   stencilWidth=" << stencilWidth << "\n"
       << "#   kernelType=" << kernelType << "\n"
       << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
-      << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
+      << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n"
+      << "#   input_arrays=";
+    set<string>::iterator it=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader()
+      << "\n"
+      << "#   arrays_to_copy=";
+    it=this->ArraysToCopy.begin();
+    end=this->ArraysToCopy.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader() << "\n";
     }
 
   if (numberOfMPIRanksToUseCUDA)

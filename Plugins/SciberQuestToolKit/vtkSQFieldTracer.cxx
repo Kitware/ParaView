@@ -79,7 +79,7 @@ using std::max;
 #ifdef SQTK_DEBUG
 #define vtkSQFieldTracerDEBUG 2
 #else
-#define vtkSQFieldTracerDEBUG 0
+#define vtkSQFieldTracerDEBUG -1
 #endif
 
 // TODO
@@ -106,7 +106,7 @@ vtkSQFieldTracer::vtkSQFieldTracer()
       :
   WorldSize(1),
   WorldRank(0),
-  UseDynamicScheduler(1),
+  UseDynamicScheduler(0),
   WorkerBlockSize(16),
   MasterBlockSize(256),
   ForwardOnly(0),
@@ -122,7 +122,7 @@ vtkSQFieldTracer::vtkSQFieldTracer()
   Integrator(0),
   MinSegmentLength(0.0),
   UseCommWorld(0),
-  Mode(MODE_TOPOLOGY),
+  Mode(MODE_STREAM),
   CullPeriodicTransitions(1),
   SqueezeColorMap(0),
   LogLevel(0)
@@ -708,8 +708,7 @@ int vtkSQFieldTracer::RequestData(
   info=inputVector[1]->GetInformationObject(0);
 
   vtkSmartPointer<vtkSQCellGenerator> sourceGen=0;
-  if ( ((this->Mode==MODE_TOPOLOGY) || (this->Mode==MODE_DISPLACEMENT))
-     && this->UseDynamicScheduler )
+  if ( this->UseDynamicScheduler && !(this->Mode==MODE_STREAM) )
     {
     sourceGen
     =dynamic_cast<vtkSQCellGenerator*>(info->Get(vtkSQCellGenerator::CELL_GENERATOR()));
@@ -759,15 +758,6 @@ int vtkSQFieldTracer::RequestData(
           {
           traceData=new PolyDataFieldDisplacementMap;
           }
-        if (sourceGen)
-          {
-          traceData->SetSource(sourceGen);
-          }
-        else
-          {
-          traceData->SetSource(sourcePd);
-          }
-        traceData->SetOutput(outPd);
         }
       else
       if ((sourceUg=dynamic_cast<vtkUnstructuredGrid*>(source))
@@ -781,16 +771,23 @@ int vtkSQFieldTracer::RequestData(
           {
           traceData=new UnstructuredFieldDisplacementMap;
           }
-        if (sourceGen)
-          {
-          traceData->SetSource(sourceGen);
-          }
-        else
-          {
-          traceData->SetSource(sourceUg);
-          }
-        traceData->SetOutput(outUg);
         }
+      else
+        {
+        vtkErrorMacro(
+          << "Unsupported combination of seed("
+          << safeio(source->GetClassName()) << ") or input("
+          << safeio(out->GetClassName()) << ") types.");
+        }
+      if (sourceGen)
+        {
+        traceData->SetSource(sourceGen);
+        }
+      else
+        {
+        traceData->SetSource(source);
+        }
+      traceData->SetOutput(out);
       }
       break;
 
@@ -811,14 +808,21 @@ int vtkSQFieldTracer::RequestData(
 
     case MODE_POINCARE:
       {
-      unsigned long gid=0;
-      if (!this->UseDynamicScheduler)
-        {
-        gid=this->GetGlobalCellId(source);
-        }
       PoincareMapData *mapData=new PoincareMapData;
-      mapData->SetSourceCellGid(gid);
-      mapData->SetSource(source);
+      if (sourceGen)
+        {
+        mapData->SetSource(sourceGen);
+        }
+      else
+        {
+        unsigned long gid=0;
+        if (!this->UseDynamicScheduler)
+          {
+          gid=this->GetGlobalCellId(source);
+          }
+        mapData->SetSourceCellGid(gid);
+        mapData->SetSource(source);
+        }
       mapData->SetOutput(out);
       traceData=mapData;
       }
@@ -1160,7 +1164,7 @@ int vtkSQFieldTracer::IntegrateBlock(
     FieldLine *line=traceData->GetFieldLine(i);
     this->IntegrateOne(oocr,oocrCache,fieldName,line,tcon);
 
-    #if vtkSQFieldTracerDEBUG<0
+    #if vtkSQFieldTracerDEBUG>=0
     cerr << ".";
     #endif
     }

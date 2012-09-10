@@ -53,6 +53,12 @@ public:
   vtkGetMacro(PassInput,int);
 
   // Description:
+  // Set/Get the time interval overwhich displacement map was
+  // integrated.
+  vtkSetMacro(TimeInterval,double);
+  vtkGetMacro(TimeInterval,double);
+
+  // Description:
   // Set the log level.
   // 0 -- no logging
   // 1 -- basic logging
@@ -70,6 +76,7 @@ protected:
 private:
   set<string> InputArrays;
   int PassInput;
+  double TimeInterval;
   int LogLevel;
 
 private:
