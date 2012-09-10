@@ -35,6 +35,10 @@ public:
   vtkBooleanMacro(AllowInputConnectionSetting, bool);
 
   // Description:
+  // Initialize mapper for slice selection
+  void InitializeMapperForSliceSelection();
+
+  // Description:
   // Overridden to be able to disable them when we don't want to change the input
   virtual void SetInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void SetInputConnection(vtkAlgorithmOutput* input);

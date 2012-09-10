@@ -105,6 +105,11 @@ int vtkSMQuadViewProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* 
   this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::INPUT);
   this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::OUTPUT);
 
+  widget = this->GetSubProxy("WidgetBottomRight");
+  vtkSMPropertyHelper(widget, "Enabled").Set(1);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::INPUT);
+  this->WidgetLinker->AddLinkedProxy(widget, vtkSMProxyLink::OUTPUT);
+
   // Bind the center
   this->WidgetLinker->AddLinkedProxy(this->GetSubProxy("SliceOrigin"), vtkSMProxyLink::INPUT);
   this->WidgetLinker->AddLinkedProxy(this->GetSubProxy("SliceOrigin"), vtkSMProxyLink::OUTPUT);
@@ -142,6 +147,7 @@ void vtkSMQuadViewProxy::CreateVTKObjects()
   vtkSMPropertyHelper(this, "TopLeftRepresentations").Add(this->GetSubProxy("WidgetTopLeft"));
   vtkSMPropertyHelper(this, "TopRightRepresentations").Add(this->GetSubProxy("WidgetTopRight"));
   vtkSMPropertyHelper(this, "BottomLeftRepresentations").Add(this->GetSubProxy("WidgetBottomLeft"));
+  vtkSMPropertyHelper(this, "HiddenRepresentations").Add(this->GetSubProxy("WidgetBottomRight"));
 
   // Register origin listener
   vtkSMPropertyHelper(this, "SliceOriginSource").Add(this->GetSubProxy("SliceOrigin"));

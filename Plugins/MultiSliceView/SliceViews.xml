@@ -236,6 +236,13 @@
          </SubProxy>
 
          <SubProxy>
+            <Proxy name="WidgetBottomRight"
+                   proxygroup="representations"
+                   proxyname="PointSourceWidgetRepresentation">
+            </Proxy>
+         </SubProxy>
+
+         <SubProxy>
             <Proxy name="SliceOrigin"
                    class="vtkPointSource"
                    processes="client|renderserver|dataserver">

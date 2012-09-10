@@ -14,6 +14,8 @@
 =========================================================================*/
 #include "vtkSliceFriendGeometryRepresentation.h"
 
+#include "vtkCompositePolyDataMapper2.h"
+#include "vtkHardwareSelectionPolyDataPainter.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSliceFriendGeometryRepresentation);
@@ -85,4 +87,18 @@ void vtkSliceFriendGeometryRepresentation::RemoveInputConnection(int port, int i
     {
     this->Superclass::RemoveInputConnection(port, idx);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSliceFriendGeometryRepresentation::InitializeMapperForSliceSelection()
+{
+  // setup the selection mapper so that we don't need to make any selection
+  // conversions after rendering.
+  vtkCompositePolyDataMapper2* mapper =
+      vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper);
+  vtkHardwareSelectionPolyDataPainter* selPainter =
+      vtkHardwareSelectionPolyDataPainter::SafeDownCast(
+        mapper->GetSelectionPainter()->GetDelegatePainter());
+  selPainter->SetPointIdArrayName("-");
+  selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
 }
