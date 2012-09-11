@@ -567,13 +567,29 @@ void pqColorScaleEditor::pushColors()
     {
     vtkColorTransferFunction* tf=plot->GetColorTransferFunction();
     if ( ! tf ) continue;
+    if ( tf->GetIndexedLookup() )
+      {
+      cout << "Skipping indexed pushColor (" << tf->GetClassName() << "*)" << tf << "\n";
+      continue;
+      }
     //tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
     int total = tf->GetSize();
+    double nodeValue[6];
     for(int i = 0; i < total; i++)
       {
-      plot->GetControlPoint(i, scalar);
-      tf->GetColor(scalar[0], rgb);
-      rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
+      tf->GetNodeValue( i, nodeValue );
+      rgbPoints
+        << /* x */nodeValue[0]
+        << /* R */nodeValue[1]
+        << /* G */nodeValue[2]
+        << /* B */nodeValue[3];
+      // AHA!!! When tf->Discretize is set, this does a lookup into a possibly improper vtkLookupTable and
+      // uses that to set the color of the control point. But that should never be; the control points on
+      // the proxy should be set to the colors of the control points on the client... discretization will
+      // take effect on the server as well.
+      //plot->GetControlPoint(i, scalar);
+      //tf->GetColor(scalar[0], rgb);
+      //rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
       }
     // If there is only one control point in the transfer function originally,
     // we need to add another control point.
