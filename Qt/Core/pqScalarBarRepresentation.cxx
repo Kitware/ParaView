@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -128,10 +128,10 @@ pqScalarsToColors* pqScalarBarRepresentation::getLookupTable() const
 //-----------------------------------------------------------------------------
 void pqScalarBarRepresentation::onLookupTableModified()
 {
-  pqServerManagerModel* smmodel = 
+  pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
 
-  vtkSMProxy* curLUTProxy = 
+  vtkSMProxy* curLUTProxy =
     pqSMAdaptor::getProxyProperty(this->getProxy()->GetProperty("LookupTable"));
   pqScalarsToColors* curLUT = smmodel->findItem<pqScalarsToColors*>(curLUTProxy);
 
@@ -175,7 +175,7 @@ void pqScalarBarRepresentation::setTitle(const QString& name, const QString& com
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Title"),
     name.trimmed());
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("ComponentTitle"),
-    comp.trimmed());    
+    comp.trimmed());
   this->getProxy()->UpdateVTKObjects();
 }
 
@@ -191,7 +191,7 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
 
   // Set default arrays and lookup table.
   vtkSMProxy* proxy = this->getProxy();
-  
+
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Selectable"), 0);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Enabled"), 1);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Resizable"), 1);
