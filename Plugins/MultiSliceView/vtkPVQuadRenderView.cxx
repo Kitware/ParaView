@@ -459,3 +459,13 @@ void vtkPVQuadRenderView::WidgetCallback(vtkObject* src, unsigned long, void*)
     this->QuadInternal->UpdateSliceOrigin(center);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::Update()
+{
+  this->Superclass::Update();
+  for(int i=0; i < 3; ++i)
+    {
+    this->GetOrthoRenderView(i)->CopyViewUpdateOptions(this);
+    }
+}

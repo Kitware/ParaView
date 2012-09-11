@@ -475,6 +475,13 @@ public:
   // Provides access to the time when Update() was last called.
   unsigned long GetUpdateTimeStamp()
     { return this->UpdateTimeStamp; }
+
+  // Description:
+  // Copy internal fields that are used for rendering decision such as
+  // remote/local rendering, composite and so on. This method was introduced
+  // for the quad view so internal views could use the decision that were made
+  // in the main view.
+  void CopyViewUpdateOptions(vtkPVRenderView* otherView);
 //BTX
 protected:
   vtkPVRenderView();

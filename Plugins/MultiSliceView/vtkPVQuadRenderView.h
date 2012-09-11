@@ -109,6 +109,11 @@ public:
   void SetSizeBottomRight(int x, int y) { this->Superclass::SetSize(x, y); }
 
   // Description:
+  // Override update so the decision made in the main view are shared across all
+  // other internal views.
+  virtual void Update();
+
+  // Description:
   // Custom management across all the internal views to avoid the internal
   // Update() call.
   virtual void ResetCamera();
