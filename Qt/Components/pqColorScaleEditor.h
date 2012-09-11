@@ -162,6 +162,7 @@ private slots:
   void addActiveValues();
   void addAnnotationEntry();
   void annotationsChanged();
+  void resetAnnotationSort();
   //@}
 
   /// \name Color Legend Methods

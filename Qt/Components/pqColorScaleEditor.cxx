@@ -221,6 +221,9 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->AnnotationTree->setDragEnabled( true );
   this->Form->AnnotationTree->setDragDropMode( QAbstractItemView::InternalMove );
   this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
+  QObject::connect(
+    this->Form->AnnotationTree->header(), SIGNAL(sectionDoubleClicked(int)),
+    this, SLOT(resetAnnotationSort()));
   //this->Form->AnnotationTree->setSortingEnabled( false );
   //this->Form->AnnotationTree->verticalHeader()->setMovable( true );
   this->Form->AnnotationTree->viewport()->installEventFilter( this );
@@ -652,14 +655,14 @@ void pqColorScaleEditor::pushAnnotations()
 
   int total = this->Form->AnnotationTree->topLevelItemCount();
   cout << "  pushing " << total << " rows\n";
-  /*
+  /* */
   vtkColorTransferFunction* tf = this->currentColorFunction();
   if ( tf )
     {
-    tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
+    //tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
     tf->ResetAnnotations();
     }
-    */
+    /* */
 
   vtkSMProxy* lookupTable = this->ColorMap->getProxy();
   QList<QVariant> categories;
@@ -672,11 +675,17 @@ void pqColorScaleEditor::pushAnnotations()
     QString txt( valItem->data( PQ_ANN_ENTRY_COL, Qt::DisplayRole ).toString() );
     //std::cout << "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n";
     categories << val << txt;
+    if ( tf )
+      {
+      tf->SetAnnotation( val.toStdString(), txt.toStdString() );
+      }
     }
+  /*
   this->Form->InSetInterpretation = true;
   pqSMAdaptor::setElementProperty(
     lookupTable->GetProperty( "IndexedLookup" ), this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
   this->Form->InSetInterpretation = false; //FIXME: Here, or after UpdateVTKObjects() call below?
+  */
   this->Form->InSetAnnotation = true;
   pqSMAdaptor::setMultipleElementProperty(
     lookupTable->GetProperty( "Annotations" ), categories );
@@ -1655,6 +1664,12 @@ void pqColorScaleEditor::annotationsChanged()
 {
   // Reset annotations on local and proxy color transfer functions.
   this->pushAnnotations();
+}
+
+void pqColorScaleEditor::resetAnnotationSort()
+{
+  // Turn off sorting of annotations so drag-and-drop reordering will work.
+  this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
 }
 
 void pqColorScaleEditor::checkForLegend()
@@ -2797,6 +2812,10 @@ bool pqColorScaleEditor::eventFilter( QObject* src, QEvent* event )
     this->pushAnnotations();
     event->setAccepted( true );
     return true;
+    }
+  if ( event->type() == QEvent::Drop && src == annotationTree )
+    { // Turn off sorting so the drop can reorder the rows.
+    this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
     }
   bool retval = QObject::eventFilter( src, event );
   if ( event->type() == QEvent::Drop && src == annotationTree )
