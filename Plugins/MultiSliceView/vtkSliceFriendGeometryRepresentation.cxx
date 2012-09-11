@@ -103,3 +103,20 @@ void vtkSliceFriendGeometryRepresentation::InitializeMapperForSliceSelection()
   selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
   selPainter->SetCompositeIdArrayName("vtkSliceCompositeIndex");
 }
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkSliceFriendGeometryRepresentation::GetRenderedDataObject(int port)
+{
+  if(this->RepresentationForRenderedDataObject)
+    {
+    return this->RepresentationForRenderedDataObject->GetRenderedDataObject(port);
+    }
+
+  return this->Superclass::GetRenderedDataObject(port);
+}
+
+//----------------------------------------------------------------------------
+void vtkSliceFriendGeometryRepresentation::SetRepresentationForRenderedDataObject(vtkPVDataRepresentation* rep)
+{
+  this->RepresentationForRenderedDataObject = rep;
+}

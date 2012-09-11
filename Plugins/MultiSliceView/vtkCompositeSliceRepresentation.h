@@ -67,6 +67,10 @@ public:
   // so we can internally bind it to our slice filter.
   virtual void AddRepresentation(const char* key, vtkPVDataRepresentation* repr);
 
+  // Description:
+  // Override to provide input array name regardless if any slice cut the actual data.
+  virtual vtkDataObject* GetRenderedDataObject(int port);
+
 //BTX
 protected:
   vtkCompositeSliceRepresentation();

@@ -363,6 +363,7 @@ void vtkCompositeSliceRepresentation::AddRepresentation(const char *key, vtkPVDa
     this->Slices[index]->SetAllowInputConnectionSetting(allowDynaInput); // Make slices immutable input wise
     this->Slices[index]->Register(this);
     this->Slices[index]->InitializeMapperForSliceSelection();
+    this->Slices[index]->SetRepresentationForRenderedDataObject(this);
     }
 
   if(addToParent)
@@ -402,4 +403,9 @@ void vtkCompositeSliceRepresentation::UpdateSliceConfigurationCallBack(vtkObject
     }
 
   this->MarkModified();
+}
+//----------------------------------------------------------------------------
+vtkDataObject* vtkCompositeSliceRepresentation::GetRenderedDataObject(int port)
+{
+  return this->InternalSliceFilter->GetInputDataObject(0,0);
 }

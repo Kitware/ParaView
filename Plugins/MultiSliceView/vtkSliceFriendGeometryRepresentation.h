@@ -22,6 +22,7 @@
 #define __vtkSliceFriendGeometryRepresentation_h
 
 #include "vtkGeometryRepresentationWithFaces.h"
+#include "vtkWeakPointer.h" // Needed
 
 class vtkSliceFriendGeometryRepresentation : public vtkGeometryRepresentationWithFaces
 {
@@ -47,6 +48,17 @@ public:
   virtual void RemoveInputConnection(int port, vtkAlgorithmOutput* input);
   virtual void RemoveInputConnection(int port, int idx);
 
+  // Description:
+  // Override to provide input array name regardless if any slice cut the actual data.
+  virtual vtkDataObject* GetRenderedDataObject(int port);
+
+  // Description:
+  // Create a dependancy link between this slice friendly representation
+  // and the real parent representation that own the slice filter
+  // so it could be skipped in order to be sure to provide the whole data array
+  // names regardless if any data is actually cut or not.
+  void SetRepresentationForRenderedDataObject(vtkPVDataRepresentation* rep);
+
 //BTX
 protected:
   vtkSliceFriendGeometryRepresentation();
@@ -55,6 +67,7 @@ protected:
   friend class vtkCompositeSliceRepresentation;
 
   bool AllowInputConnectionSetting;
+  vtkWeakPointer<vtkPVDataRepresentation> RepresentationForRenderedDataObject;
 
 private:
   vtkSliceFriendGeometryRepresentation(const vtkSliceFriendGeometryRepresentation&); // Not implemented
