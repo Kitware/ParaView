@@ -48,9 +48,18 @@ public:
     this->Owner = parent;
     this->ObserverId = 0;
 
-//    this->Coordinates->GetTextProperty()->SetJustificationToCentered();
-//    this->Coordinates->SetPosition(.5, .9);
-    this->Owner->GetOrthoRenderView(TOP_RIGHT)->GetRenderer()->AddActor(this->Coordinates.GetPointer());
+    this->Owner->GetOrthoRenderView(TOP_LEFT)->GetNonCompositedRenderer()->AddActor(this->CoordinatesX.GetPointer());
+    this->Owner->GetOrthoRenderView(TOP_RIGHT)->GetNonCompositedRenderer()->AddActor(this->CoordinatesY.GetPointer());
+    this->Owner->GetOrthoRenderView(BOTTOM_LEFT)->GetNonCompositedRenderer()->AddActor(this->CoordinatesZ.GetPointer());
+//    this->CoordinatesX->SetPosition(.95,.05);
+//    this->CoordinatesX->GetTextProperty()->SetJustificationToRight();
+//    this->CoordinatesX->GetTextProperty()->SetVerticalJustificationToBottom();
+//    this->CoordinatesY->SetPosition(.05,.05);
+//    this->CoordinatesY->GetTextProperty()->SetJustificationToLeft();
+//    this->CoordinatesY->GetTextProperty()->SetVerticalJustificationToBottom();
+//    this->CoordinatesZ->SetPosition(.95,.95);
+//    this->CoordinatesZ->GetTextProperty()->SetJustificationToRight();
+//    this->CoordinatesZ->GetTextProperty()->SetVerticalJustificationToTop();
   }
 
   void SetSliceOriginSource(vtkPointSource* source)
@@ -73,16 +82,22 @@ public:
 
   void UpdateSliceOrigin(double* origin)
   {
-    std::stringstream stream;
-    stream << origin[0] << ", " << origin[1] << ", " << origin[2];
-    this->Coordinates->SetInput(stream.str().c_str());
+    std::stringstream x,y,z;
+    x << origin[0];
+    y << origin[1];
+    z << origin[2];
+    this->CoordinatesX->SetInput(x.str().c_str());
+    this->CoordinatesY->SetInput(y.str().c_str());
+    this->CoordinatesZ->SetInput(z.str().c_str());
   }
 
 private:
   vtkPVQuadRenderView* Owner;
   unsigned long ObserverId;
   vtkWeakPointer<vtkPointSource> SliceOriginSource;
-  vtkNew<vtkTextActor> Coordinates;
+  vtkNew<vtkTextActor> CoordinatesX;
+  vtkNew<vtkTextActor> CoordinatesY;
+  vtkNew<vtkTextActor> CoordinatesZ;
 };
 
 //============================================================================
