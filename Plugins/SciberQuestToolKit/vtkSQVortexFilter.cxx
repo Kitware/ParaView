@@ -42,7 +42,6 @@ using std::pair;
 #undef SQTK_DEBUG
 #endif
 
-
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQVortexFilter);
 
@@ -659,7 +658,7 @@ int vtkSQVortexFilter::RequestData(
         {
         if (this->LogLevel || globalLogLevel)
           {
-          log->StartEvent("vtkSQVortexFilter::Helicicty");
+          log->StartEvent("vtkSQVortexFilter::Helicity");
           }
         vtkDataArray *H=V->NewInstance();
         outImData->GetPointData()->AddArray(H);
@@ -725,7 +724,7 @@ int vtkSQVortexFilter::RequestData(
           }
         if (this->LogLevel || globalLogLevel)
           {
-          log->EndEvent("vtkSQVortexFilter::NormaizedHelicty");
+          log->EndEvent("vtkSQVortexFilter::NormalizedHelicty");
           }
         }
 

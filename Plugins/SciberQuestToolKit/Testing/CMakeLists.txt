@@ -1,7 +1,3 @@
-
-# NOTES:
-# on windows you need to run "ctest -C Debug"
-
 include_directories(
   ${ParaView_SOURCE_DIR}/VTK/Common/Testing/Cxx/
   ${ParaView_SOURCE_DIR}/VTK/Rendering/Testing/Cxx/
@@ -26,9 +22,16 @@ macro(sq_add_exec _name)
   add_executable(${TEST_NAME} ${_name}.cpp TestUtils.cxx)
   if (PARAVIEW_USE_MPI AND (NOT WIN32))
     add_definitions(-DPARAVIEW_USE_MPI)
-    target_link_libraries(${TEST_NAME} SciberQuestToolKit ${MPI_LIBRARIES})
+    target_link_libraries(
+        ${TEST_NAME}
+        SciberQuestToolKit
+        vtkPVServerManagerApplication
+        ${MPI_LIBRARIES})
   else()
-    target_link_libraries(${TEST_NAME} SciberQuestToolKit)
+    target_link_libraries(
+        ${TEST_NAME}
+        SciberQuestToolKit
+        vtkPVServerManagerApplication)
   endif()
 endmacro()
 
