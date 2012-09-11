@@ -164,7 +164,7 @@ pqColorMapModel::pqColorMapModel(const pqColorMapModel &other)
   this->InternalTxt = new pqColorMapModelInternalTxt();
   this->Space = other.Space;
   this->NanColor = other.NanColor;
-  this->IndexedLookup = false;
+  this->IndexedLookup = other.IndexedLookup;
   this->InModify = false;
 
   // Copy the list of points.
