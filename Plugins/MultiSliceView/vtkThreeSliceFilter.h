@@ -31,6 +31,9 @@
 class vtkAppendPolyData;
 class vtkCutter;
 class vtkPlane;
+class vtkPolyData;
+class vtkDataSet;
+class vtkCompositeDataSet;
 
 class vtkThreeSliceFilter : public vtkPolyDataAlgorithm
 {
@@ -84,6 +87,12 @@ protected:
   vtkCutter* Slices[3];
   vtkPlane* Planes[3];
   vtkAppendPolyData* CombinedFilteredInput;
+
+  void Process(vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex);
+  void Process(vtkCompositeDataSet* input, vtkCompositeDataSet* outputs[4]);
+  void Merge(vtkCompositeDataSet* compositeOutput[4], vtkPolyData* polydataOutput[4]);
+  void Append(vtkCompositeDataSet* composite, vtkAppendPolyData* appender);
+  void Append(vtkPolyData* polydata, vtkAppendPolyData* appender);
 
 private:
   vtkThreeSliceFilter(const vtkThreeSliceFilter&);  // Not implemented.

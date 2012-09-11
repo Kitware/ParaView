@@ -101,4 +101,5 @@ void vtkSliceFriendGeometryRepresentation::InitializeMapperForSliceSelection()
         mapper->GetSelectionPainter()->GetDelegatePainter());
   selPainter->SetPointIdArrayName("-");
   selPainter->SetCellIdArrayName("vtkSliceOriginalCellIds");
+  selPainter->SetCompositeIdArrayName("vtkSliceCompositeIndex");
 }
