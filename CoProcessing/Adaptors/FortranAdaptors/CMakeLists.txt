@@ -31,3 +31,8 @@ option(BUILD_NPIC_ADAPTOR "Build NPIC Adaptor" OFF)
 if(BUILD_NPIC_ADAPTOR)
   add_subdirectory(NPICAdaptor)
 endif(BUILD_NPIC_ADAPTOR)
+
+option(BUILD_CTH_ADAPTOR "Build CTH Adaptor" OFF)
+if(BUILD_CTH_ADAPTOR)
+  add_subdirectory(CTHAdaptor)
+endif(BUILD_CTH_ADAPTOR)
