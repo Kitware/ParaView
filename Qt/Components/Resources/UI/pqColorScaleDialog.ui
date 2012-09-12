@@ -470,13 +470,8 @@
           <bool>true</bool>
          </property>
          <property name="columnCount">
-          <number>3</number>
+          <number>2</number>
          </property>
-         <column>
-          <property name="text">
-           <string>Color</string>
-          </property>
-         </column>
          <column>
           <property name="text">
            <string>Value</string>

@@ -108,9 +108,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PQ_ANNOTATION_PAGE 1
 #define PQ_LEGEND_PAGE 2
 
-#define PQ_ANN_COLOR_COL 0
-#define PQ_ANN_VALUE_COL 1
-#define PQ_ANN_ENTRY_COL 2
+#define PQ_ANN_VALUE_COL 0
+#define PQ_ANN_ENTRY_COL 1
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
 {
