@@ -7,24 +7,49 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>480</height>
+    <height>500</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Dialog</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label">
+  <property name="windowTitle">
+   <string>Add VR Connection</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::ExpandingFieldsGrow</enum>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Add VR Connection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Type:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="connectionType">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Connection Name:</string>
+      <string>Name:</string>
      </property>
     </widget>
    </item>
@@ -32,28 +57,40 @@
     <widget class="QLineEdit" name="connectionName"/>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Type:</string>
+      <string>Address:</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="comboBox">
-     <item>
-      <property name="text">
-       <string>VRPN</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>VRUI</string>
-      </property>
-     </item>
+    <widget class="QLineEdit" name="connectionAddress"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="portLabel">
+     <property name="text">
+      <string>Port:</string>
+     </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="1">
+    <widget class="QSpinBox" name="connectionPort">
+     <property name="maximum">
+      <number>99999</number>
+     </property>
+     <property name="value">
+      <number>8555</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
     <widget class="QListWidget" name="listWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
      <item>
       <property name="text">
        <string>&lt;add buttons&gt;</string>
@@ -61,10 +98,10 @@
      </item>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,0,0">
+   <item row="6" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,0,0,0">
      <item>
-      <widget class="QComboBox" name="comboBox_2">
+      <widget class="QComboBox" name="inputType">
        <item>
         <property name="text">
          <string>Analog</string>
@@ -83,21 +120,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="inputId">
        <property name="placeholderText">
         <string>id</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="inputName">
        <property name="placeholderText">
         <string>name</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QToolButton" name="insertInput">
        <property name="text">
         <string/>
        </property>
@@ -107,15 +144,29 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="eraseInput">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../Qt/Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqMinus16.png</normaloff>:/QtWidgets/Icons/pqMinus16.png</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -132,8 +183,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>252</x>
+     <y>475</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -148,12 +199,44 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>320</x>
+     <y>475</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inputId</sender>
+   <signal>returnPressed()</signal>
+   <receiver>inputName</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>428</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inputName</sender>
+   <signal>returnPressed()</signal>
+   <receiver>insertInput</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>554</x>
+     <y>435</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>581</x>
+     <y>437</y>
     </hint>
    </hints>
   </connection>

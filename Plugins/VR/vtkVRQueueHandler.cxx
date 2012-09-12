@@ -101,18 +101,36 @@ vtkVRQueueHandler::~vtkVRQueueHandler()
 void vtkVRQueueHandler::add(vtkVRInteractorStyle* style)
 {
   this->Internals->Styles.push_front(style);
+  emit stylesChanged();
 }
 
 //----------------------------------------------------------------------------
 void vtkVRQueueHandler::remove(vtkVRInteractorStyle* style)
 {
   this->Internals->Styles.removeAll(style);
+  emit stylesChanged();
 }
 
 //----------------------------------------------------------------------public
 void vtkVRQueueHandler::clear()
 {
   this->Internals->Styles.clear();
+  emit stylesChanged();
+}
+
+//----------------------------------------------------------------------public
+QList<vtkVRInteractorStyle *> vtkVRQueueHandler::styles()
+{
+  QList<vtkVRInteractorStyle*> result;
+  foreach (vtkVRInteractorStyle *style, this->Internals->Styles)
+    {
+    if (style)
+      {
+      result << style;
+      }
+    }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------
@@ -232,6 +250,8 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
                           locator);
     }
+
+  emit stylesChanged();
 }
 
 //----------------------------------------------------------------------------

@@ -32,7 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqVRDockPanel_h
 #define __pqVRDockPanel_h
 
-#include <QDockWidget>
+#include <QtGui/QDockWidget>
+
+class pqView;
+class QListWidgetItem;
+class vtkSMProxy;
 
 class pqVRDockPanel : public QDockWidget
 {
@@ -47,8 +51,19 @@ public:
 
 protected slots:
   void addConnection();
+  void removeConnection();
   void updateConnections();
+  void connectionDoubleClicked(QListWidgetItem *);
+
   void addStyle();
+  void removeStyle();
+  void updateStyles();
+  void styleDoubleClicked(QListWidgetItem *);
+
+  void proxyChanged(vtkSMProxy*);
+  void setActiveView(pqView*);
+
+  void updateDebugLabel();
 
 private:
   Q_DISABLE_COPY(pqVRDockPanel)

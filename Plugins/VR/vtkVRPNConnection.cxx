@@ -160,9 +160,9 @@ void vtkVRPNConnection::SetName(std::string name)
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetAddress(std::string name)
+void vtkVRPNConnection::SetAddress(std::string address)
 {
-  this->Address = name;
+  this->Address = address;
 }
 
 // ----------------------------------------------------------------------public

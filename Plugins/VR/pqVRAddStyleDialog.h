@@ -29,52 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRAddConnectionDialog_h
-#define __pqVRAddConnectionDialog_h
+#ifndef __pqVRAddStyleDialog_h
+#define __pqVRAddStyleDialog_h
 
-#include <QDialog>
+#include <QtGui/QDialog>
 
-#include "vtkPVVRConfig.h"
+class vtkVRInteractorStyle;
 
-#ifdef PARAVIEW_USE_VRPN
-class vtkVRPNConnection;
-#endif
-#ifdef PARAVIEW_USE_VRUI
-class vtkVRUIConnection;
-#endif
-
-class pqVRAddConnectionDialog : public QDialog
+class pqVRAddStyleDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  pqVRAddConnectionDialog(QWidget* parent=0, Qt::WindowFlags f=0);
-  virtual ~pqVRAddConnectionDialog();
+  pqVRAddStyleDialog(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqVRAddStyleDialog();
 
-#ifdef PARAVIEW_USE_VRPN
-  void setConnection(vtkVRPNConnection *conn);
-  vtkVRPNConnection* getVRPNConnection();
-  bool isVRPN();
-#endif
-#ifdef PARAVIEW_USE_VRUI
-  void setConnection(vtkVRUIConnection *conn);
-  vtkVRUIConnection* getVRUIConnection();
-  bool isVRUI();
-#endif
+  void setInteractorStyle(vtkVRInteractorStyle *, const QString &name);
+  void updateInteractorStyle();
 
-  void updateConnection();
-
-protected:
-  void keyPressEvent(QKeyEvent *);
+  // Returns true if there are any user-configurable options.
+  bool isConfigurable();
 
 private slots:
-  void addInput();
-  void removeInput();
-
-  void connectionTypeChanged();
 
 private:
-  Q_DISABLE_COPY(pqVRAddConnectionDialog)
+  Q_DISABLE_COPY(pqVRAddStyleDialog)
 
   class pqInternals;
   pqInternals* Internals;

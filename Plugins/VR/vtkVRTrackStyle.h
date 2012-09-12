@@ -61,6 +61,8 @@ public:
   const QString& controlledPropertyName() const
     { return this->ControlledPropertyName; }
 
+  void setTrackerName(const QString &tracker) { this->TrackerName = tracker; }
+  QString trackerName() const { return this->TrackerName; }
 
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;

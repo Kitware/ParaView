@@ -111,6 +111,25 @@ void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
   this->Internals->VRPNConnections.removeAll( conn );
   emit this->connectionsChanged();
 }
+
+// ----------------------------------------------------------------------------
+vtkVRPNConnection *
+vtkVRConnectionManager::GetVRPNConnection(const QString &name)
+{
+  std::string target = name.toStdString();
+  foreach (const QPointer<vtkVRPNConnection> &conn,
+           this->Internals->VRPNConnections)
+    {
+    if (!conn.isNull())
+      {
+      if (conn->GetName() == target)
+        {
+        return conn.data();
+        }
+      }
+    }
+  return NULL;
+}
 #endif
 
 #ifdef PARAVIEW_USE_VRUI
@@ -127,6 +146,24 @@ void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
   conn->Stop();
   this->Internals->VRUIConnections.removeAll( conn );
   emit this->connectionsChanged();
+}
+
+// ----------------------------------------------------------------------------
+vtkVRUIConnection *
+vtkVRConnectionManager::GetVRUIConnection(const QString &name)
+{
+  std::string target = name.toStdString();
+  foreach (QPointer<vtkVRPNConnection> &conn, this->Internals->VRPNConnections)
+    {
+    if (!conn.isNull())
+      {
+      if (conn->GetName() == target)
+        {
+        return conn.data();
+        }
+      }
+    }
+  return NULL;
 }
 #endif
 
@@ -146,7 +183,27 @@ void vtkVRConnectionManager::clear()
 // ----------------------------------------------------------------------------
 QList<QString> vtkVRConnectionManager::connectionNames() const
 {
-  return QList<QString>();
+  QList<QString> result;
+#ifdef PARAVIEW_USE_VRPN
+  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+    {
+    if (conn)
+      {
+      result << QString::fromStdString(conn->GetName());
+      }
+    }
+#endif
+#ifdef PARAVIEW_USE_VRUI
+  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+    {
+    if (conn)
+      {
+      result << QString::fromStdString(conn->GetName());
+      }
+    }
+#endif
+  qSort(result);
+  return result;
 }
 
 // ----------------------------------------------------------------------------

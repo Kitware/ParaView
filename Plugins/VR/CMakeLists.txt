@@ -45,6 +45,7 @@ endif(PARAVIEW_USE_VRUI)
 
 QT4_WRAP_CPP(MOC_SRCS
   pqVRAddConnectionDialog.h
+  pqVRAddStyleDialog.h
   pqVRDockPanel.h
   pqVRStarter.h
   ${VRPN_MOC_SRC}
@@ -59,7 +60,9 @@ QT4_WRAP_CPP(MOC_SRCS
 
 QT4_WRAP_UI(UI_SRCS
   pqVRDockPanel.ui
-  pqVRAddConnectionDialog.ui)
+  pqVRAddConnectionDialog.ui
+  pqVRAddStyleDialog.ui
+  )
 
 
 if(PARAVIEW_USE_VRPN)
@@ -92,6 +95,7 @@ ADD_PARAVIEW_PLUGIN(
   GUI_INTERFACES ${IFACES} ${IFACES_WINDOW}
   GUI_SOURCES
           pqVRAddConnectionDialog.cxx
+          pqVRAddStyleDialog.cxx
           pqVRDockPanel.cxx
           pqVRStarter.cxx
           ${MOC_SRCS}

@@ -56,6 +56,8 @@ public:
   void remove(vtkVRInteractorStyle* style);
   void clear();
 
+  QList<vtkVRInteractorStyle*> styles();
+
   static vtkVRQueueHandler* instance();
 
 public slots:
@@ -69,6 +71,9 @@ public slots:
 
   /// saves the styles configuration.
   void saveStylesConfiguration(vtkPVXMLElement* root);
+
+signals:
+  void stylesChanged();
 
 protected slots:
   /// called to processes events from the queue.

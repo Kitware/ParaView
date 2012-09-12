@@ -55,10 +55,12 @@ public:
 #ifdef PARAVIEW_USE_VRPN
   void add( vtkVRPNConnection* conn );
   void remove ( vtkVRPNConnection *conn );
+  vtkVRPNConnection *GetVRPNConnection(const QString &name);
 #endif
 #ifdef PARAVIEW_USE_VRUI
   void add( vtkVRUIConnection* conn );
   void remove ( vtkVRUIConnection *conn );
+  vtkVRUIConnection *GetVRUIConnection(const QString &name);
 #endif
   void clear();
 

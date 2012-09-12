@@ -53,15 +53,26 @@ public:
   vtkVRUIConnection(QObject *parent=0);
   ~vtkVRUIConnection();
 
-  /// Name of the device. For example, "Tracker0@localhost". Initial value is a
-  /// NULL pointer.
-  void SetAddress(std::string name);
+  // Description:
+  // Address of the device. For example, "Tracker0@localhost"
+  void SetAddress(std::string address);
+
+  // Description:
+  // Address of the device. For example, "Tracker0@localhost"
+  std::string GetAddress() { return this->Address; }
 
   /// Port number of the VRUI server. Initial value is 8555.
   void SetPort(std::string port);
 
+  /// Port number of the VRUI server. Initial value is 8555.
+  std::string GetPort() { return this->Port; }
+
   /// Set the device name.
   void SetName(std::string name);
+
+  // Description:
+  // Get the device name.
+  std::string GetName() { return this->Name; }
 
   /// Add button device
   void AddButton(std::string id, std::string name);
@@ -91,6 +102,42 @@ public:
 
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
+
+  /// Access to analog map
+  std::map<std::string, std::string> GetAnalogMap()
+  {
+    return this->AnalogMapping;
+  }
+  /// Access to analog map
+  void SetAnalogMap(const std::map<std::string, std::string> &m)
+  {
+    this->AnalogMapping = m;
+    this->AnalogPresent = (this->AnalogMapping.size() > 0);
+  }
+
+  /// Access to button map
+  std::map<std::string, std::string> GetButtonMap()
+  {
+    return this->ButtonMapping;
+  }
+  /// Access to button map
+  void SetButtonMap(const std::map<std::string, std::string> &m)
+  {
+    this->ButtonMapping = m;
+    this->ButtonPresent = (this->ButtonMapping.size() > 0);
+  }
+
+  /// Access to tracker map
+  std::map<std::string, std::string> GetTrackerMap()
+  {
+    return this->TrackerMapping;
+  }
+  /// Access to tracker map
+  void SetTrackerMap(const std::map<std::string, std::string> &m)
+  {
+    this->TrackerMapping = m;
+    this->TrackerPresent = (this->TrackerMapping.size() > 0);
+  }
 
  protected slots:
   void run();

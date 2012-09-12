@@ -331,9 +331,9 @@ void vtkVRUIConnection::SetName(std::string name)
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRUIConnection::SetAddress(std::string name)
+void vtkVRUIConnection::SetAddress(std::string address)
 {
-  this->Address = name;
+  this->Address = address;
 }
 
 // ----------------------------------------------------------------------------

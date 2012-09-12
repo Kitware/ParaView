@@ -51,6 +51,9 @@ public:
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* saveConfiguration() const;
 
+  void setButtonName(const QString &button) { this->ButtonName = button; }
+  QString buttonName() const { return this->ButtonName; }
+
 protected:
   virtual void handleButton( const vtkVREventData& data );
   virtual void handleTracker( const vtkVREventData& data );
