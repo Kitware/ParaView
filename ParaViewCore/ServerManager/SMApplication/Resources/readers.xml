@@ -4022,7 +4022,9 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the Spy Plot
         reader.</Documentation>
@@ -4055,7 +4057,8 @@
       <IntVectorProperty command="SetDistributeFiles"
                          default_values="1"
                          name="DistributeFiles"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>In parallel mode, if this property is set to 1, the
         reader will distribute files or blocks.</Documentation>
@@ -4063,7 +4066,8 @@
       <IntVectorProperty command="SetGenerateLevelArray"
                          default_values="0"
                          name="GenerateLevelArray"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, a cell array will be
         generated that stores the level of each block.</Documentation>
@@ -4071,7 +4075,8 @@
       <IntVectorProperty command="SetGenerateActiveBlockArray"
                          default_values="0"
                          name="GenerateActiveBlockArray"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, a cell array will be
         generated that stores the active status of a block.</Documentation>
@@ -4080,7 +4085,7 @@
                          default_values="0"
                          name="GenerateTracerArray"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, a cell array will be
         generated that stores the coordinates of any tracers.</Documentation>
@@ -4088,7 +4093,8 @@
       <IntVectorProperty command="SetGenerateBlockIdArray"
                          default_values="0"
                          name="GenerateBlockIdArray"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, a cell array will be
         generated that stores a unique blockId for each block.</Documentation>
@@ -4097,7 +4103,7 @@
                          default_values="1"
                          name="MergeXYZComponents"
                          number_of_elements="1"
-                         panel_visibility="default">
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>If this property is set to 1, cell arrays named (for
         example) X velocity, Y velocity and Z velocity will be combined into a
@@ -4144,7 +4150,8 @@
       <StringVectorProperty animateable="0"
                             command="SetMetaFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This points to a special metadata file that lists the
         output files for each restart.</Documentation>
@@ -4152,7 +4159,8 @@
       <IntVectorProperty command="SetUseMetaFile"
                          default_values="1"
                          name="UseMetaFile"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never" >
         <BooleanDomain name="bool" />
         <Documentation>This hidden property must always be set to 1 for this
         proxy to work.</Documentation>
@@ -4163,9 +4171,6 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <!-- This property is here simply to set it. -->
-        <Property name="UseMetaFile"
-                  show="0" />
         <ReaderFactory extensions="spcth-timeseries"
                        file_description="Case file for restarted CTH outputs" />
       </Hints>
@@ -4181,7 +4186,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the VRML
         reader.</Documentation>
@@ -4224,7 +4230,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the VRML
         reader.</Documentation>
@@ -4250,7 +4257,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the PLY
         reader.</Documentation>
@@ -4273,7 +4281,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the PDB
         reader.</Documentation>
@@ -4295,7 +4304,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the XYZ
         reader.</Documentation>
@@ -4327,7 +4337,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the Phasta
         reader.</Documentation>
@@ -4401,7 +4412,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the BYU
         reader.</Documentation>
@@ -4424,7 +4436,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the OBJ
         reader.</Documentation>
@@ -4450,7 +4463,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the Gaussian
         Cube reader.</Documentation>
@@ -4734,7 +4748,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>The name of the file to read (or the meta data file that
         will point to the actual file).</Documentation>
@@ -5122,13 +5137,13 @@
           <Property name="HasModeShapes" />
           <Property name="ModeShape" />
           <Property name="AnimateVibrations" />
-          <Property name="FilePrefix" />
+          <Property name="FilePrefix" panel_visibility="advanced" />
           <Property name="FilePrefixInfo" />
-          <Property name="FilePattern" />
+          <Property name="FilePattern" panel_visibility="advanced"/>
           <Property name="FilePatternInfo" />
-          <Property name="FileRange" />
+          <Property name="FileRange" panel_visibility="advanced" />
           <Property name="FileRangeInfo" />
-          <Property name="XMLFileName" />
+          <Property name="XMLFileName" panel_visibility="advanced"/>
           <Property name="XMLFileNameInfo" />
           <Property name="Refresh" />
         </ExposedProperties>
@@ -5153,7 +5168,8 @@
       <IntVectorProperty command="SetUseMetaFile"
                          default_values="0"
                          name="UseMetaFile"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never" >
         <BooleanDomain name="bool" />
         <Documentation>This hidden property must always be set to 1 for this
         proxy to work.</Documentation>
@@ -5165,8 +5181,6 @@
       </DoubleVectorProperty>
       <Hints>
         <!-- This property is here simply to set it. -->
-        <Property name="UseMetaFile"
-                  show="0" />
         <!-- This is for special GUI control. -->
         <Property name="Refresh"
                   show="0" />
@@ -5265,13 +5279,13 @@
           <Property name="HasModeShapes" />
           <Property name="ModeShape" />
           <Property name="AnimateVibrations" />
-          <Property name="FilePrefix" />
+          <Property name="FilePrefix" panel_visibility="advanced"/>
           <Property name="FilePrefixInfo" />
-          <Property name="FilePattern" />
+          <Property name="FilePattern" panel_visibility="advanced"/>
           <Property name="FilePatternInfo" />
-          <Property name="FileRange" />
+          <Property name="FileRange" panel_visibility="advanced"/>
           <Property name="FileRangeInfo" />
-          <Property name="XMLFileName" />
+          <Property name="XMLFileName" panel_visibility="advanced"/>
           <Property name="XMLFileNameInfo" />
           <Property name="Refresh" />
         </ExposedProperties>
@@ -5285,7 +5299,8 @@
                             command="SetMetaFileName"
                             information_property="FileNameInfo"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This points to a special metadata file that lists the
         output files for each restart.</Documentation>
@@ -5293,7 +5308,9 @@
       <IntVectorProperty command="SetUseMetaFile"
                          default_values="1"
                          name="UseMetaFile"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never"
+                         >
         <BooleanDomain name="bool" />
         <Documentation>This hidden property must always be set to 1 for this
         proxy to work.</Documentation>
@@ -5304,9 +5321,6 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <!-- This property is here simply to set it. -->
-        <Property name="UseMetaFile"
-                  show="0" />
         <!-- This is for special GUI control. -->
         <Property name="Refresh"
                   show="0" />
@@ -5384,7 +5398,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the Facet
         reader.</Documentation>
@@ -5406,7 +5421,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never" >
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the TIFF
         reader.</Documentation>
@@ -5427,7 +5443,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the SESAME
         reader.</Documentation>
@@ -5472,7 +5489,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name for the
         reader.</Documentation>
@@ -5651,8 +5669,6 @@
       <Hints>
         <ReaderFactory extensions="foam"
                        file_description="OpenFOAM" />
-        <Property name="FileName"
-                  show="1" />
         <Property name="Refresh"
                   show="0" />
       </Hints>
@@ -5673,7 +5689,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>Set the file name for the MFIX reader.</Documentation>
       </StringVectorProperty>
@@ -5757,7 +5774,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>Set the file name for the proSTAR (STARCD)
         reader.</Documentation>
@@ -5784,7 +5802,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>Set the file name for the LSDyna reader.</Documentation>
       </StringVectorProperty>
@@ -6375,7 +6394,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>ASCII .vpc file describes locations of data files, grid
         sizes, time step sizes and type and order of data written to the
@@ -6548,7 +6568,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFilename"
                             name="Filename"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>ASCII .wind file describes locations of data files, grid
         sizes and variable deltas, time step sizes, whether topology is used,
@@ -6873,7 +6894,8 @@
       <StringVectorProperty animateable="0"
                             command="SetFileName"
                             name="FileName"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="never">
         <FileListDomain name="files" />
         <Documentation>This property specifies the file name to read. It should
         be an MPAS format NetCDF file ending in .nc.</Documentation>
