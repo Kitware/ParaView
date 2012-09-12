@@ -1165,7 +1165,6 @@ void pqColorScaleEditor::savePreset()
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
   // Save the current color scale settings as a preset.
-  double rgb[3];
   double scalar = 0.0;
   pqColorMapModel colorMap;
   colorMap.setColorSpaceFromInt( this->Form->ColorSpace->currentIndex() );
@@ -1175,22 +1174,23 @@ void pqColorScaleEditor::savePreset()
   int total = tf->GetSize();
   double scalars[4];//[x, y, midpoint, sharpness]
   vtkPiecewiseFunction* pwf=this->currentOpacityFunction();
+  double nodeValue[6]; // [x,r,g,b,smoothness]
 
   for(int i = 0; i < total; i++)
     {
     plot->GetControlPoint(i, scalars);
     scalar = scalars[0];
-    tf->GetColor(scalar, rgb);
+    tf->GetNodeValue(i, nodeValue);
     if(this->OpacityFunction && pwf)
       {
       double opacity = pwf->GetValue(scalar);
       colorMap.addPoint(pqChartValue(scalar),
-          QColor::fromRgbF(rgb[0], rgb[1], rgb[2]), pqChartValue(opacity));
+          QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]), pqChartValue(opacity));
       }
     else
       {
       colorMap.addPoint(pqChartValue(scalar),
-          QColor::fromRgbF(rgb[0], rgb[1], rgb[2]));
+          QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
       }
     }
   colorMap.setNanColor( this->Form->NanColor->chosenColor() );
@@ -1265,6 +1265,7 @@ void pqColorScaleEditor::loadPreset()
       int numPoints = colorMap->getNumberOfPoints();
       if(colors && numPoints > 0)
         {
+        colors->SetIndexedLookup(indexedLookup);
         colors->RemoveAllPoints();
         if(singleScalar)
           {

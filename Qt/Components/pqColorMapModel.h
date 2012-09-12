@@ -133,6 +133,10 @@ public:
   static void MshToRGB(double M, double s, double h,
                        double *red, double *green, double *blue);
 
+protected:
+  virtual QPixmap generateIntervalPreview(const QSize &size) const;
+  virtual QPixmap generateCategoricalPreview(const QSize &size) const;
+
 signals:
   /// Emitted when the color space changes.
   void colorSpaceChanged();
