@@ -96,12 +96,12 @@ public:
   int GridType;
   int Notation;
   int Precision;
-  int AxisLayout;
   int TitleAlignment;
   bool ShowAxis;
   bool ShowGrid;
   bool ShowLabels;
   bool UseLogScale;
+  bool UseCustomLabels;
 };
 
 class pqXYChartOptionsEditorForm : public Ui::pqChartOptionsWidget
@@ -129,12 +129,12 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
   this->GridType = 0;
   this->Notation = 0;
   this->Precision = 2;
-  this->AxisLayout = 0;
   this->TitleAlignment = 1;
   this->ShowAxis = true;
   this->ShowGrid = true;
   this->ShowLabels = true;
   this->UseLogScale = false;
+  this->UseCustomLabels = false;
 }
 
 //----------------------------------------------------------------------------
@@ -946,6 +946,53 @@ void pqXYChartOptionsEditor::updateOptions()
   this->Internal->Form->TooltipPrecision->setValue(
     pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipPrecision")).toInt());
 
+  values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisUseCustomLabels"));
+  if (values.size() == 4)
+    {
+    for (int cc=0; cc < 4; cc++)
+      {
+      this->Internal->Form->AxisData[cc]->UseCustomLabels = values[cc].toBool();
+      }
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisLabelsLeft"));
+  QStringList labels;
+  foreach (const QVariant& val, values)
+    {
+    labels << val.toString();
+    }
+  this->Internal->Form->AxisData[vtkAxis::LEFT]->Labels.setStringList(labels);
+  labels.clear();
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisLabelsBottom"));
+  foreach (const QVariant& val, values)
+    {
+    labels << val.toString();
+    }
+  this->Internal->Form->AxisData[vtkAxis::BOTTOM]->Labels.setStringList(labels);
+  labels.clear();
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisLabelsRight"));
+  foreach (const QVariant& val, values)
+    {
+    labels << val.toString();
+    }
+  this->Internal->Form->AxisData[vtkAxis::RIGHT]->Labels.setStringList(labels);
+  labels.clear();
+
+  values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisLabelsTop"));
+  foreach (const QVariant& val, values)
+    {
+    labels << val.toString();
+    }
+  this->Internal->Form->AxisData[vtkAxis::TOP]->Labels.setStringList(labels);
+  labels.clear();
+
   this->blockSignals(false);
 
 }
@@ -1068,14 +1115,14 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLabelPrecision"), values);
 
-  // Axis behavior
+  // Axis use custom labels.
   values.clear();
   for(int i = 0; i < 4; ++i)
     {
-    values.append(this->Internal->Form->AxisData[i]->AxisLayout);
+    values.append(this->Internal->Form->AxisData[i]->UseCustomLabels);
     }
   pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisBehavior"), values);
+      proxy->GetProperty("AxisUseCustomLabels"), values);
 
   // Custom axis labels for the bottom axis
   values.clear();
@@ -1114,13 +1161,6 @@ void pqXYChartOptionsEditor::applyAxisOptions()
     }
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLabelsTop"), values);
-
-  // Force the update of these properties, assume they are always dirty as the
-  // axis does not retain this list when they render other label schemes.
-  proxy->UpdateProperty("AxisLabelsLeft", 1);
-  proxy->UpdateProperty("AxisLabelsBottom", 1);
-  proxy->UpdateProperty("AxisLabelsRight", 1);
-  proxy->UpdateProperty("AxisLabelsTop", 1);
 
   // Axis use log scale
   values.clear();
@@ -1164,6 +1204,8 @@ void pqXYChartOptionsEditor::applyAxisOptions()
     }
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisTitleFont"), values);
+
+  proxy->UpdateVTKObjects();
 }
 
 void pqXYChartOptionsEditor::loadAxisPage()
@@ -1189,14 +1231,13 @@ void pqXYChartOptionsEditor::loadAxisLayoutPage()
   pqXYChartOptionsEditorAxis *axis =
           this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
   this->Internal->Form->UseLogScale->setChecked(axis->UseLogScale);
-  if (axis->AxisLayout == vtkAxis::AUTO)
+  if (axis->UseCustomLabels)
     {
-    this->Internal->Form->UseChartSelect->setChecked(true);
+    this->Internal->Form->UseFixedInterval->setChecked(true);
     }
   else
     {
-    Q_ASSERT(axis->AxisLayout == vtkAxis::CUSTOM);
-    this->Internal->Form->UseFixedInterval->setChecked(true);
+    this->Internal->Form->UseChartSelect->setChecked(true);
     }
   this->changeLayoutPage(true);
 
@@ -1239,13 +1280,13 @@ void pqXYChartOptionsEditor::changeLayoutPage(bool checked)
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->ListPage);
-      axis->AxisLayout = vtkAxis::CUSTOM;
+      axis->UseCustomLabels = true;
       }
     else
       {
       this->Internal->Form->AxisLayoutPages->setCurrentWidget(
               this->Internal->Form->BlankPage);
-      axis->AxisLayout = vtkAxis::AUTO;
+      axis->UseCustomLabels = false;
       }
     this->changesAvailable();
     }

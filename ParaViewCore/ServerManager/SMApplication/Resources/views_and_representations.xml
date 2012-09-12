@@ -838,6 +838,22 @@
                            min="0"
                            name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetAxisUseCustomLabels"
+                            default_values="0 0 0 0"
+                            name="AxisUseCustomLabels"
+                            number_of_elements="4"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use custom labels for each of the axis. Labels
+          specified by AxisLabelsLeft, AxisLabelsRight, etc. are used only when
+          the corresponding AxisUseCustomLabels flag is set to 1.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty command="SetAxisLabelsLeft"
                             name="AxisLabelsLeft"
                             repeat_command="1"
