@@ -209,6 +209,7 @@ private:
   void initColorScale();
   void enablePointControls();
   void updatePointValues();
+  void updateAnnotationColors();
   void enableRescaleControls(bool enable);
   void enableResolutionControls(bool enable);
   void updateScalarRange(double min, double max);

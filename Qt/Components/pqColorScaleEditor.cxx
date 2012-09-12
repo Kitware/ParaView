@@ -111,6 +111,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PQ_ANN_VALUE_COL 0
 #define PQ_ANN_ENTRY_COL 1
 
+// A simple subclass of QTreeWidgetItem that overrides the default sorting behavior.
+// If both items being compared can be converted to numbers, they are compared as numbers.
+// Otherwise, string comparison is used.
+class pqAnnotationTreeItem : public QTreeWidgetItem
+{
+public:
+  pqAnnotationTreeItem(QTreeWidget* parent) : QTreeWidgetItem(parent) { }
+protected:
+  virtual bool operator < ( const QTreeWidgetItem& other ) const
+    {
+    int column = this->treeWidget()->sortColumn();
+    vtkVariant x( this->data( column, Qt::DisplayRole ).toString().toAscii().data() );
+    vtkVariant y( other.data( column, Qt::DisplayRole ).toString().toAscii().data() );
+    double dx, dy;
+    bool vx, vy;
+    dx = x.ToNumeric( &vx, &dx );
+    dy = y.ToNumeric( &vy, &dy );
+    if ( vx && vy )
+      {
+      return dx < dy;
+      }
+    return x < y;
+    }
+};
+
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
 {
 public:
@@ -569,11 +594,13 @@ void pqColorScaleEditor::pushColors()
     {
     vtkColorTransferFunction* tf=plot->GetColorTransferFunction();
     if ( ! tf ) continue;
+    /*
     if ( tf->GetIndexedLookup() )
       {
       cout << "Skipping indexed pushColor (" << tf->GetClassName() << "*)" << tf << "\n";
       continue;
       }
+      */
     //tf->SetIndexedLookup( this->Form->Interpretation->checkedId() == PQ_INTERPRET_CATEGORY );
     int total = tf->GetSize();
     double nodeValue[6];
@@ -646,12 +673,12 @@ void pqColorScaleEditor::pushOpacity()
 
 void pqColorScaleEditor::pushAnnotations()
 {
-  cout << "pushAnnotations\n";
   if ( ! this->ColorMap || this->Form->InSetAnnotation )
     {
     return;
     }
 
+  cout << "pushAnnotations\n";
   int total = this->Form->AnnotationTree->topLevelItemCount();
   cout << "  pushing " << total << " rows\n";
   /* */
@@ -1088,10 +1115,12 @@ void pqColorScaleEditor::setNanColor(const QColor &color)
                                   lookupTable->GetProperty("NanColor"), values);
     this->Form->InSetColors = false;
     lookupTable->UpdateVTKObjects();
+    this->updateAnnotationColors();
     this->renderViewOptionally();
     this->renderTransferFunctionViews();
     }
 }
+
 void pqColorScaleEditor::setScalarColor(const QColor &color)
 {
   if (!this->Form->InSetColors && this->ColorMap)
@@ -1264,7 +1293,6 @@ void pqColorScaleEditor::loadPreset()
       int numPoints = colorMap->getNumberOfPoints();
       if(colors && numPoints > 0)
         {
-        colors->SetIndexedLookup(indexedLookup);
         colors->RemoveAllPoints();
         if(singleScalar)
           {
@@ -1294,6 +1322,7 @@ void pqColorScaleEditor::loadPreset()
               }
             }
           }
+        colors->SetIndexedLookup(indexedLookup);
         }
 
       // Update the color space.
@@ -1631,8 +1660,15 @@ void pqColorScaleEditor::addActiveValues()
       }
     if ( ! duplicate )
       {
-      valItem = new QTreeWidgetItem( this->Form->AnnotationTree );
+      valItem = new pqAnnotationTreeItem( this->Form->AnnotationTree );
       valItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+      vtkColorTransferFunction* tf = this->currentColorFunction();
+      if ( tf && tf->GetSize() )
+        {
+        double nodeValue[6];
+        tf->GetNodeValue(nr % tf->GetSize(), nodeValue);
+        valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+        }
       valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( sval.c_str() ) );
       valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( sval.c_str() ) );
       valItem->setFlags( valItem->flags() & ~(Qt::ItemIsDropEnabled) );
@@ -1651,7 +1687,14 @@ void pqColorScaleEditor::addActiveValues()
 void pqColorScaleEditor::addAnnotationEntry()
 {
   int nxtRow = this->Form->AnnotationTree->topLevelItemCount();
-  QTreeWidgetItem* valItem = new QTreeWidgetItem( this->Form->AnnotationTree );
+  QTreeWidgetItem* valItem = new pqAnnotationTreeItem( this->Form->AnnotationTree );
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  if ( tf && tf->GetSize() )
+    {
+    double nodeValue[6];
+    tf->GetNodeValue(nxtRow % tf->GetSize(), nodeValue);
+    valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+    }
   valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( "" ) );
   valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( "Note" ) );
   valItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
@@ -1812,7 +1855,6 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 /// Update the GUI annotations table with values from the SM proxy.
 void pqColorScaleEditor::loadAnnotations()
 {
-  cout << "loadAnnotations\n";
   QTreeWidget* anno = this->Form->AnnotationTree;
   if ( ! anno )
     {
@@ -1820,33 +1862,49 @@ void pqColorScaleEditor::loadAnnotations()
     }
 
   // Only update from the proxy when we aren't responsible for the changes in the proxy.
-  if ( ! this->Form->InSetAnnotation )
+  if ( this->Form->InSetAnnotation )
     {
-    // Empty previous entries.
-    anno->clear();
-
-    QList<QVariant> list;
-    vtkSMProxy* lookupTable = this->ColorMap->getProxy();
-    vtkSMStringVectorProperty* smProp = vtkSMStringVectorProperty::SafeDownCast(
-      lookupTable->GetProperty( "Annotations" ) );
-    int numPerCmd = smProp->GetNumberOfElementsPerCommand();
-    if( numPerCmd != 2 )
-      {
-      return;
-      }
-    list = pqSMAdaptor::getMultipleElementProperty( smProp );
-    vtkIdType nr = list.size() / 2;
-    cout << "  Fetched " << nr << " rows\n";
-    //anno->setRowCount( nr -- );
-    for ( int i = 0; (i + 1) < list.size(); i += 2, -- nr )
-      {
-      QTreeWidgetItem* valItem = new QTreeWidgetItem( this->Form->AnnotationTree );
-      valItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
-      valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, list[i] );
-      valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, list[i + 1] );
-      valItem->setFlags( valItem->flags() & ~(Qt::ItemIsDropEnabled) );
-      }
+    return;
     }
+
+  cout << "loadAnnotations\n";
+  // Empty previous entries.
+  anno->clear();
+
+  QList<QVariant> list;
+  vtkSMProxy* lookupTable = this->ColorMap->getProxy();
+  vtkSMStringVectorProperty* smProp = vtkSMStringVectorProperty::SafeDownCast(
+    lookupTable->GetProperty( "Annotations" ) );
+  int numPerCmd = smProp->GetNumberOfElementsPerCommand();
+  if( numPerCmd != 2 )
+    {
+    return;
+    }
+  list = pqSMAdaptor::getMultipleElementProperty( smProp );
+  vtkIdType nr = list.size() / 2;
+  cout << "  Fetched " << nr << " rows\n";
+  //anno->setRowCount( nr -- );
+  //for ( int i = 0; (i + 1) < list.size(); i += 2, -- nr )
+  this->Form->InSetAnnotation = true;
+  for ( int i = list.size() - 2; i >= 0; i -= 2 )
+    {
+    QTreeWidgetItem* valItem = new pqAnnotationTreeItem( this->Form->AnnotationTree );
+    valItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+    valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, list[i] );
+    valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, list[i + 1] );
+    valItem->setFlags( valItem->flags() & ~(Qt::ItemIsDropEnabled) );
+    vtkColorTransferFunction* tf = this->currentColorFunction();
+    if ( tf && tf->GetSize() )
+      {
+      double nodeValue[6];
+      //tf->GetNodeValue((nr - (i / 2) - 1) % tf->GetSize(), nodeValue);
+      tf->GetNodeValue((i / 2) % tf->GetSize(), nodeValue);
+      valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+      }
+    //this->Form->AnnotationTree->insertTopLevelItem( valItem, nr );
+    cout << "   item " << (i/2) << " or " << (nr -(i/2)-1) << ": " << list[i].toString().toStdString() << endl;
+    }
+  this->Form->InSetAnnotation = false;
 }
 
 void pqColorScaleEditor::loadColorPoints()
@@ -1888,6 +1946,7 @@ void pqColorScaleEditor::loadColorPoints()
     this->Form->MinimumLabel->setText("");
     this->Form->MaximumLabel->setText("");
     }
+  this->updateAnnotationColors();
 }
 void pqColorScaleEditor::loadOpacityPoints()
 {
@@ -2118,6 +2177,40 @@ void pqColorScaleEditor::updatePointValues()
   this->updateCurrentColorPoint();
   this->updateCurrentOpacityPoint();
   this->Form->InSetColors = false;
+}
+
+// When the order of annotations has changed, or the colors have changed,
+// call this method to reassign colors to each annotation row.
+void pqColorScaleEditor::updateAnnotationColors()
+{
+  QTreeWidget* atab = this->Form->AnnotationTree;
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  if ( ! tf || ! atab )
+    {
+    return;
+    }
+  atab->blockSignals( true );
+  int total = atab->topLevelItemCount();
+  int nc = tf->GetSize();
+  for ( int i = 0; i < total; ++ i )
+    {
+    QTreeWidgetItem* valItem = atab->topLevelItem( i );
+    if ( valItem )
+      {
+      if ( nc )
+        {
+        double nodeValue[6];
+        tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
+        valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
+          QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
+        }
+      else
+        {
+        valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole, this->Form->NanColor->chosenColor() );
+        }
+      }
+    }
+  atab->blockSignals( false );
 }
 
 void pqColorScaleEditor::enableRescaleControls(bool enable)
@@ -2807,26 +2900,27 @@ void pqColorScaleEditor::setActiveUniqueValues( vtkAbstractArray* arr )
 bool pqColorScaleEditor::eventFilter( QObject* src, QEvent* event )
 {
   QObject* annotationTree = this->Form->AnnotationTree->viewport();
-  if ( src == annotationTree && event->type() == QEvent::User )
-    { // eat this event... it's something we queued below and we must respond to it now.
-    this->pushAnnotations();
-    event->setAccepted( true );
-    return true;
-    }
-  if ( event->type() == QEvent::Drop && src == annotationTree )
-    { // Turn off sorting so the drop can reorder the rows.
-    this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
+  if ( src == annotationTree )
+    {
+    if ( event->type() == QEvent::User )
+      { // eat this event... it's something we queued below and we must respond to it now.
+      this->pushAnnotations();
+      this->updateAnnotationColors();
+      event->setAccepted( true );
+      return true;
+      }
+    else if ( event->type() == QEvent::Drop )
+      { // Turn off sorting so the drop can reorder the rows.
+      this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
+      }
     }
   bool retval = QObject::eventFilter( src, event );
-  if ( event->type() == QEvent::Drop && src == annotationTree )
+  if ( src == annotationTree && event->type() == QEvent::Drop )
     {
     // We can't just pushAnnotations() here since the drop isn't complete...
     // instead, we'll add an event to the end of the queue (which won't be processed
     // until the drop completes) and call pushAnnotations() when we receive it.
-      {
-      cout << "Arf\n";
-      QApplication::postEvent( annotationTree, new QEvent( QEvent::User ) );
-      }
+    QApplication::postEvent( annotationTree, new QEvent( QEvent::User ) );
     }
   return retval;
 }
