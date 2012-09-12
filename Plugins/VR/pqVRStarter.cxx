@@ -75,6 +75,7 @@ void pqVRStarter::onStartup()
   this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
   vtkVRConnectionManager::setInstance(this->Internals->ConnectionManager);
   this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
+  vtkVRQueueHandler::setInstance(this->Internals->Handler);
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
   //qWarning() << "Message from pqVRStarter: Application Started";
@@ -86,6 +87,7 @@ void pqVRStarter::onShutdown()
   this->Internals->Handler->stop();
   this->Internals->ConnectionManager->stop();
   vtkVRConnectionManager::setInstance(NULL);
+  vtkVRQueueHandler::setInstance(NULL);
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
   delete this->Internals->EventQueue;

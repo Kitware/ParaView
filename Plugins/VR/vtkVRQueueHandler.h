@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkVRQueueHandler_h
 #define __vtkVRQueueHandler_h
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 class vtkVRInteractorStyle;
 class vtkVRQueue;
@@ -55,6 +56,8 @@ public:
   void remove(vtkVRInteractorStyle* style);
   void clear();
 
+  static vtkVRQueueHandler* instance();
+
 public slots:
   /// start/stop queue processing.
   void start();
@@ -76,6 +79,10 @@ private:
   void render();
   class pqInternals;
   pqInternals* Internals;
+
+  friend class pqVRStarter;
+  static void setInstance(vtkVRQueueHandler*);
+  static QPointer<vtkVRQueueHandler> Instance;
 };
 
 #endif

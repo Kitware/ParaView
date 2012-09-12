@@ -57,6 +57,21 @@ public:
 };
 
 //----------------------------------------------------------------------------
+QPointer<vtkVRQueueHandler> vtkVRQueueHandler::Instance;
+
+//----------------------------------------------------------------------------
+vtkVRQueueHandler *vtkVRQueueHandler::instance()
+{
+  return vtkVRQueueHandler::Instance;
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueueHandler::setInstance(vtkVRQueueHandler *inst)
+{
+  vtkVRQueueHandler::Instance = inst;
+}
+
+//----------------------------------------------------------------------------
 vtkVRQueueHandler::vtkVRQueueHandler(
   vtkVRQueue* queue, QObject* parentObject)
   : Superclass(parentObject)
