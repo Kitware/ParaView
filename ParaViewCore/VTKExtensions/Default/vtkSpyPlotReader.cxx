@@ -473,8 +473,6 @@ int vtkSpyPlotReader::AddBlockIdArray(vtkCompositeDataSet *cds)
   int blockId=0;
   vtkSmartPointer<vtkCompositeDataIterator> cdIter;
   cdIter.TakeReference(cds->NewIterator());
-  cdIter->VisitOnlyLeavesOn();
-  cdIter->TraverseSubTreeOn();
   for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal();
     cdIter->GoToNextItem(), blockId++)
     {

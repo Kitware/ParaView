@@ -23,7 +23,7 @@
 #include "vtkCellTypes.h"
 #include "vtkCleanArrays.h"
 #include "vtkCommand.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -926,7 +926,12 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   // Merge mutli-pieces to avoid efficiency setbacks when ordered
   // compositing is employed.
   iter.TakeReference(output->NewIterator());
-  iter->VisitOnlyLeavesOff();
+  vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
+  if(treeIter)
+    {
+    treeIter->VisitOnlyLeavesOff();
+    }
+
 
   std::vector<vtkMultiPieceDataSet*> pieces_to_merge;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
@@ -968,7 +973,10 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
 
       vtkPolyData* trivalInput = vtkPolyData::New();
       iter->SkipEmptyNodesOff();
-      iter->VisitOnlyLeavesOff();
+      if(treeIter)
+        {
+        treeIter->VisitOnlyLeavesOff();
+        }
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
         iter->GoToNextItem())
         {
