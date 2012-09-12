@@ -527,17 +527,12 @@ void vtkPVXYChartView::Render(bool interactive)
     {
     if (this->Internals->UseCustomLabels[axis])
       {
-      vtkNew<vtkDoubleArray> clone;
-      clone->DeepCopy(this->Internals->CustomLabelPositions[axis].GetPointer());
-      this->Chart->GetAxis(axis)->SetTickPositions(clone.GetPointer());
-      // this ensures that labels are recomputed for the ticks
-      this->Chart->GetAxis(axis)->GetTickLabels()->SetNumberOfTuples(0);
+      this->Chart->GetAxis(axis)->SetCustomTickPositions(
+        this->Internals->CustomLabelPositions[axis].GetPointer());
       }
-    else if (this->Chart->GetAxis(axis)->GetCustomTickLabels())
+    else
       {
-      vtkNew<vtkDoubleArray> clone;
-      this->Chart->GetAxis(axis)->SetTickPositions(clone.GetPointer());
-      this->Chart->GetAxis(axis)->SetCustomTickLabels(false);
+      this->Chart->GetAxis(axis)->SetCustomTickPositions(NULL);
       }
     this->Chart->GetAxis(axis)->Update();
     }
