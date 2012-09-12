@@ -72,7 +72,7 @@ public:
 
   // Description:
   // Enable/Disable LOD;
-  void SetSuppressLOD(bool suppress)
+  virtual void SetSuppressLOD(bool suppress)
     { this->SuppressLOD = suppress; }
 
   // Description:
@@ -137,7 +137,7 @@ public:
 
   //***************************************************************************
   // Forwarded to vtkPVGeometryFilter
-  void SetUseOutline(int);
+  virtual void SetUseOutline(int);
   void SetNonlinearSubdivisionLevel(int);
 
   //***************************************************************************
