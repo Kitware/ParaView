@@ -27,6 +27,7 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVSynchronizedRenderWindows.h"
+#include "vtkPointHandleRepresentation3D.h"
 #include "vtkPointSource.h"
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
@@ -36,6 +37,7 @@
 #include "vtkWeakPointer.h"
 
 #include <sstream>
+#include <set>
 
 class vtkQuadInternal;
 vtkQuadInternal* QuadInternal;
@@ -91,6 +93,48 @@ public:
     this->CoordinatesZ->SetInput(z.str().c_str());
   }
 
+  void UpdateHandleSize()
+  {
+    int viewSize[2];
+    this->Owner->GetSize(viewSize);
+    int size = 2*std::max(viewSize[0], viewSize[1]);
+
+    std::set<vtkWeakPointer<vtkPointHandleRepresentation3D> >::iterator iter;
+    for(iter = this->PointHandles.begin(); iter != this->PointHandles.end(); iter++)
+      {
+      if(*iter)
+        {
+        iter->GetPointer()->SetHandleSize(size);
+        }
+      }
+  }
+
+  void AddWidget(vtkDataRepresentation* rep)
+  {
+    vtk3DWidgetRepresentation* widget = vtk3DWidgetRepresentation::SafeDownCast(rep);
+    if(widget)
+      {
+      vtkPointHandleRepresentation3D* pointRep = vtkPointHandleRepresentation3D::SafeDownCast(widget->GetRepresentation());
+      if(pointRep)
+        {
+        this->PointHandles.insert(pointRep);
+        }
+      }
+  }
+
+  void RemoveWidget(vtkDataRepresentation* rep)
+  {
+    vtk3DWidgetRepresentation* widget = vtk3DWidgetRepresentation::SafeDownCast(rep);
+    if(widget)
+      {
+      vtkPointHandleRepresentation3D* pointRep = vtkPointHandleRepresentation3D::SafeDownCast(widget->GetRepresentation());
+      if(pointRep)
+        {
+        this->PointHandles.erase(pointRep);
+        }
+      }
+  }
+
 private:
   vtkPVQuadRenderView* Owner;
   unsigned long ObserverId;
@@ -98,6 +142,7 @@ private:
   vtkNew<vtkTextActor> CoordinatesX;
   vtkNew<vtkTextActor> CoordinatesY;
   vtkNew<vtkTextActor> CoordinatesZ;
+  std::set<vtkWeakPointer<vtkPointHandleRepresentation3D> > PointHandles;
 };
 
 //============================================================================
@@ -423,36 +468,42 @@ void vtkPVQuadRenderView::SetTexturedBackground(int val)
 void vtkPVQuadRenderView::AddRepresentationToTopLeft(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(TOP_LEFT)->AddRepresentation(rep);
+  this->QuadInternal->AddWidget(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::AddRepresentationToTopRight(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(TOP_RIGHT)->AddRepresentation(rep);
+  this->QuadInternal->AddWidget(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::AddRepresentationToBottomLeft(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(BOTTOM_LEFT)->AddRepresentation(rep);
+  this->QuadInternal->AddWidget(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::RemoveRepresentationToTopLeft(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(TOP_LEFT)->RemoveRepresentation(rep);
+  this->QuadInternal->RemoveWidget(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::RemoveRepresentationToTopRight(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(TOP_RIGHT)->RemoveRepresentation(rep);
+  this->QuadInternal->RemoveWidget(rep);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::RemoveRepresentationToBottomLeft(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(BOTTOM_LEFT)->RemoveRepresentation(rep);
+  this->QuadInternal->RemoveWidget(rep);
 }
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::SetSliceOriginSource(vtkPointSource* source)
@@ -483,4 +534,5 @@ void vtkPVQuadRenderView::Update()
     {
     this->GetOrthoRenderView(i)->CopyViewUpdateOptions(this);
     }
+  this->QuadInternal->UpdateHandleSize();
 }
