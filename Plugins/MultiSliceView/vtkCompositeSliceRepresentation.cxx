@@ -405,7 +405,7 @@ void vtkCompositeSliceRepresentation::UpdateSliceConfigurationCallBack(vtkObject
   this->MarkModified();
 }
 //----------------------------------------------------------------------------
-vtkDataObject* vtkCompositeSliceRepresentation::GetRenderedDataObject(int port)
+vtkDataObject* vtkCompositeSliceRepresentation::GetRenderedDataObject(int vtkNotUsed(port))
 {
   return this->InternalSliceFilter->GetInputDataObject(0,0);
 }

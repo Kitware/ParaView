@@ -103,7 +103,7 @@ public:
 
 //-----------------------------------------------------------------------------
 pqMultiSliceAxisWidget::pqMultiSliceAxisWidget(
-                             QWidget* parentWidget/*=NULL*/):Superclass(parentWidget)
+                             QWidget* parentW/*=NULL*/):Superclass(parentW)
 {
   this->Internal = new pqMultiSliceAxisWidget::pqInternal(*this);
   this->Internal->init();
@@ -186,9 +186,9 @@ const double* pqMultiSliceAxisWidget::getVisibleSlices(int &nbSlices) const
 }
 
 // ----------------------------------------------------------------------------
-void pqMultiSliceAxisWidget::SetActiveSize(int size)
+void pqMultiSliceAxisWidget::SetActiveSize(int value)
 {
-  this->Internal->SliceItem->SetActiveSize(size);
+  this->Internal->SliceItem->SetActiveSize(value);
 }
 
 // ----------------------------------------------------------------------------
