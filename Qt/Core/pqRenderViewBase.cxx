@@ -73,6 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTimer.h"
 #include "pqRenderView.h"
 
+#include <string>
+
 class pqRenderViewBase::pqInternal
 {
 public:
@@ -336,12 +338,12 @@ bool pqRenderViewBase::setCameraManipulators(const QString &cameraManipulatorNam
     }
 
   vtkSMProxy* viewproxy = this->getProxy();
-  const char* propertyName = cameraManipulatorName.toAscii().data();
+  std::string propertyName = cameraManipulatorName.toStdString();
 
   pqSMAdaptor::setProxyListProperty(
-    viewproxy->GetProperty(propertyName),
+    viewproxy->GetProperty(propertyName.c_str()),
     manipulators);
-  viewproxy->UpdateProperty(propertyName, 1);
+  viewproxy->UpdateProperty(propertyName.c_str(), 1);
   return true;
 }
 
