@@ -1,32 +1,20 @@
 INCLUDE(ParaViewTestingMacros)
 
 set(MULTI_SLICE_TESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuadViewSliceMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/QuadViewSliceWavelet.xml
 )
 
 set(MULTI_SLICE_SERVER_TESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/serverMultiSliceMultiBlock.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/serverMultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/serverQuadViewSliceMultiBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/serverQuadViewSliceWavelet.xml
 )
 
-set(MultiSliceWavelet_BREAK TRUE)
-set(MultiSliceWavelet_USE_NEW_PANELS TRUE)
-set(MultiSliceMultiBlock_BREAK TRUE)
-set(MultiSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(QuadViewSliceMultiBlock_BREAK TRUE)
 set(QuadViewSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(QuadViewSliceWavelet_BREAK TRUE)
 set(QuadViewSliceWavelet_USE_NEW_PANELS TRUE)
 
-set(serverMultiSliceWavelet_BREAK TRUE)
-set(serverMultiSliceWavelet_USE_NEW_PANELS TRUE)
-set(serverMultiSliceMultiBlock_BREAK TRUE)
-set(serverMultiSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(serverQuadViewSliceMultiBlock_BREAK TRUE)
 set(serverQuadViewSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(serverQuadViewSliceWavelet_BREAK TRUE)
