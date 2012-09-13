@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // PV includes
 #include "QVTKWidget.h"
-#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqSMAdaptor.h"

@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqMultiSliceAxisWidget_h
 #define __pqMultiSliceAxisWidget_h
 
+#include "pqCoreModule.h"
+
 #include <QWidget>
 #include <QPointer>
 
@@ -39,7 +41,7 @@ class vtkContextScene;
 class vtkObject;
 class QVTKWidget;
 
-class pqMultiSliceAxisWidget : public QWidget
+class PQCORE_EXPORT pqMultiSliceAxisWidget : public QWidget
 {
   Q_OBJECT
   typedef QWidget Superclass;

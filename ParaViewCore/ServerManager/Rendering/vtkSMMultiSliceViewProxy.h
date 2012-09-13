@@ -20,9 +20,10 @@
 #ifndef __vtkSMMultiSliceViewProxy_h
 #define __vtkSMMultiSliceViewProxy_h
 
+#include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMRenderViewProxy.h"
 
-class VTK_EXPORT vtkSMMultiSliceViewProxy : public vtkSMRenderViewProxy
+class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMMultiSliceViewProxy : public vtkSMRenderViewProxy
 {
 public:
   static vtkSMMultiSliceViewProxy* New();

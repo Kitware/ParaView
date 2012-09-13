@@ -26,6 +26,7 @@
 #ifndef __vtkThreeSliceFilter_h
 #define __vtkThreeSliceFilter_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkAppendPolyData;
@@ -35,7 +36,7 @@ class vtkPolyData;
 class vtkDataSet;
 class vtkCompositeDataSet;
 
-class vtkThreeSliceFilter : public vtkPolyDataAlgorithm
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkThreeSliceFilter : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkThreeSliceFilter,vtkPolyDataAlgorithm);

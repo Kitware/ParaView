@@ -18,7 +18,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineRepresentation.h"
-#include "vtkPVQuadRenderView.h"
+#include "vtkPVMultiSliceView.h"
 #include "vtkPVSession.h"
 #include "vtkProcessModule.h"
 #include "vtkSliceFriendGeometryRepresentation.h"
@@ -164,28 +164,6 @@ bool vtkCompositeSliceRepresentation::AddToView(vtkView* view)
           &vtkCompositeSliceRepresentation::UpdateSliceConfigurationCallBack);
     this->UpdateSliceConfigurationCallBack(sliceView, 0, NULL);
     }
-
-  // Custom management of representation for QuadView
-  if(vtkPVQuadRenderView* quadView = vtkPVQuadRenderView::SafeDownCast(view))
-    {
-    for(int i=0; i < 3; ++i)
-      {
-      if(this->Slices[i+1] == NULL)
-        {
-        continue;
-        }
-
-      vtkPVRenderView* internalQuadView = quadView->GetOrthoRenderView(i);
-
-      // Make the main view as master for delivery management
-      quadView->AddRepresentation(this->Slices[i+1]);
-
-      // Move actor from main view to our internal view
-      this->Slices[i+1]->RemoveFromView(quadView);
-      this->Slices[i+1]->AddToView(internalQuadView);
-      }
-    }
-
   return this->Superclass::AddToView(view);
 }
 
@@ -201,23 +179,6 @@ bool vtkCompositeSliceRepresentation::RemoveFromView(vtkView* view)
     sliceView->RemoveObserver(this->ViewObserverId);
     this->ViewObserverId = 0;
     }
-
-  // Custom management of representation for QuadView
-  if(vtkPVQuadRenderView* quadView = vtkPVQuadRenderView::SafeDownCast(view))
-    {
-    for(int i=0; i < 3; ++i)
-      {
-      if(this->Slices[i+1] == NULL)
-        {
-        continue;
-        }
-
-      vtkPVRenderView* internalQuadView = quadView->GetOrthoRenderView(i);
-      quadView->RemoveRepresentation(this->Slices[i+1]);
-      this->Slices[i+1]->RemoveFromView(internalQuadView);
-      }
-    }
-
   return this->Superclass::RemoveFromView(view);
 }
 

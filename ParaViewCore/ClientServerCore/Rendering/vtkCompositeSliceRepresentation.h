@@ -21,13 +21,14 @@
 #ifndef __vtkCompositeSliceRepresentation_h
 #define __vtkCompositeSliceRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVCompositeRepresentation.h"
 
 class vtkOutlineRepresentation;
 class vtkSliceFriendGeometryRepresentation;
 class vtkThreeSliceFilter;
 
-class vtkCompositeSliceRepresentation : public vtkPVCompositeRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkCompositeSliceRepresentation : public vtkPVCompositeRepresentation
 {
 public:
   static vtkCompositeSliceRepresentation* New();

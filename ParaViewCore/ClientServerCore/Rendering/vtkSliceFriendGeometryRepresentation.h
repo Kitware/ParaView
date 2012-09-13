@@ -21,10 +21,11 @@
 #ifndef __vtkSliceFriendGeometryRepresentation_h
 #define __vtkSliceFriendGeometryRepresentation_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkWeakPointer.h" // Needed
 
-class vtkSliceFriendGeometryRepresentation : public vtkGeometryRepresentationWithFaces
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSliceFriendGeometryRepresentation : public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkSliceFriendGeometryRepresentation* New();
@@ -65,6 +66,7 @@ protected:
   ~vtkSliceFriendGeometryRepresentation();
 
   friend class vtkCompositeSliceRepresentation;
+  friend class vtkQuadRepresentation;
 
   bool AllowInputConnectionSetting;
   vtkWeakPointer<vtkPVDataRepresentation> RepresentationForRenderedDataObject;

@@ -20,9 +20,10 @@
 #ifndef __vtkPVMultiSliceView_h
 #define __vtkPVMultiSliceView_h
 
+#include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
 #include "vtkPVRenderView.h"
 
-class vtkPVMultiSliceView : public vtkPVRenderView
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVMultiSliceView : public vtkPVRenderView
 {
 public:
   static vtkPVMultiSliceView* New();

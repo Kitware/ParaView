@@ -17,11 +17,12 @@
 #ifndef __vtkMultiSliceContextItem_h
 #define __vtkMultiSliceContextItem_h
 
+#include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkContextItem.h"
 
 class vtkAxis;
 
-class vtkMultiSliceContextItem: public vtkContextItem
+class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkMultiSliceContextItem: public vtkContextItem
 {
 public:
   static vtkMultiSliceContextItem* New();

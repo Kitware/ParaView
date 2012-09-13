@@ -17,6 +17,7 @@
 #ifndef __pqMultiSliceView_h
 #define __pqMultiSliceView_h
 
+#include "pqCoreModule.h"
 #include "pqRenderView.h"
 
 #include <QtCore>
@@ -24,13 +25,13 @@
 
 class pqMultiSliceAxisWidget;
 
-class pqMultiSliceView : public pqRenderView
+class PQCORE_EXPORT pqMultiSliceView : public pqRenderView
 {
   Q_OBJECT
   typedef pqRenderView Superclass;
 public:
-  static QString pqMultiSliceViewType() { return "MultiSliceView"; }
-  static QString pqMultiSliceViewTypeName() { return "Multi Slice 3D View"; }
+  static QString multiSliceViewType() { return "MultiSlice"; }
+  static QString multiSliceViewTypeName() { return "Slice View"; }
 
   /// constructor takes a bunch of init stuff and must have this signature to
   /// satisfy pqView
