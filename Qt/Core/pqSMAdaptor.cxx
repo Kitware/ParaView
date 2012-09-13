@@ -1762,16 +1762,17 @@ void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
       {
       if(Value[0] == domain->GetEntryText(i))
         {
-        const char *text = QString("%1").arg(domain->GetEntryValue(i)).toAscii().data();
+        std::string text = QString("%1").arg(
+          domain->GetEntryValue(i)).toStdString();
 
         if(Type == CHECKED)
           {
-          Property->SetElement(3, text);
+          Property->SetElement(3, text.c_str());
           Property->SetElement(4, Value[1].toAscii().data());
           }
         else if(Type == UNCHECKED)
           {
-          Property->SetUncheckedElement(3, text);
+          Property->SetUncheckedElement(3, text.c_str());
           Property->SetUncheckedElement(4, Value[1].toAscii().data());
           Property->UpdateDependentDomains();
           }
@@ -1832,15 +1833,16 @@ void pqSMAdaptor::setFieldSelectionMode(vtkSMProperty* prop,
       {
       if(val == domain->GetEntryText(i))
         {
-        const char *text = QString("%1").arg(domain->GetEntryValue(i)).toAscii().data();
+        std::string text = QString("%1").arg(
+          domain->GetEntryValue(i)).toStdString();
 
         if(Type == CHECKED)
           {
-          Property->SetElement(3, text);
+          Property->SetElement(3, text.c_str());
           }
         else if(Type == UNCHECKED)
           {
-          Property->SetUncheckedElement(3, text);
+          Property->SetUncheckedElement(3, text.c_str());
           Property->UpdateDependentDomains();
           }
         break;
