@@ -32,14 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRAddStyleDialog.h"
 #include "ui_pqVRAddStyleDialog.h"
 
-#include "vtkSMProxy.h"
-#include "vtkVRConnectionManager.h"
+#include "pqVRConnectionManager.h"
 #ifdef PARAVIEW_USE_VRPN
-#include "vtkVRPNConnection.h"
+#include "pqVRPNConnection.h"
 #endif
 #ifdef PARAVIEW_USE_VRUI
-#include "vtkVRUIConnection.h"
+#include "pqVRUIConnection.h"
 #endif
+
+#include "vtkSMProxy.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRTrackStyle.h"
 #include "vtkVRGrabWorldStyle.h"
@@ -70,7 +71,7 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject,
   this->Internals->CanConfigure = false;
 
   // Populate input lists
-  vtkVRConnectionManager *mgr = vtkVRConnectionManager::instance();
+  pqVRConnectionManager *mgr = pqVRConnectionManager::instance();
 
   std::map<std::string, std::string> analogs;
   std::map<std::string, std::string> buttons;
@@ -84,22 +85,22 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject,
     // Lookup connection
     bool found = false;
 #ifdef PARAVIEW_USE_VRPN
-    if (vtkVRPNConnection *conn = mgr->GetVRPNConnection(connName))
+    if (pqVRPNConnection *conn = mgr->GetVRPNConnection(connName))
       {
-      analogs = conn->GetAnalogMap();
-      buttons = conn->GetButtonMap();
-      trackers = conn->GetTrackerMap();
+      analogs = conn->analogMap();
+      buttons = conn->buttonMap();
+      trackers = conn->trackerMap();
       found = true;
       }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-    if (vtkVRUIConnection *conn = mgr->GetVRUIConnection(connName))
+    if (pqVRUIConnection *conn = mgr->GetVRUIConnection(connName))
       {
       if (!found)
         {
-        analogs = conn->GetAnalogMap();
-        buttons = conn->GetButtonMap();
-        trackers = conn->GetTrackerMap();
+        analogs = conn->analogMap();
+        buttons = conn->buttonMap();
+        trackers = conn->trackerMap();
         found = true;
         }
       }
@@ -163,15 +164,15 @@ void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle *style,
   QString button;
   QString tracker;
 
-  if (vtkVRTrackStyle *trackStyle = qobject_cast<vtkVRTrackStyle*>(style))
+  if (vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::SafeDownCast(style))
     {
     needsTracker = true;
-    tracker = trackStyle->trackerName();
+    tracker = trackStyle->GetTrackerName();
     if (vtkVRGrabWorldStyle *grabStyle =
-        qobject_cast<vtkVRGrabWorldStyle*>(trackStyle))
+        vtkVRGrabWorldStyle::SafeDownCast(trackStyle))
       {
       needsButton = true;
-      button = grabStyle->buttonName();
+      button = grabStyle->GetButtonName();
       }
     }
 
@@ -212,16 +213,18 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     }
 
   if (vtkVRTrackStyle *trackStyle =
-      qobject_cast<vtkVRTrackStyle*>(this->Internals->Style))
+      vtkVRTrackStyle::SafeDownCast(this->Internals->Style))
     {
-    QString tracker = this->Internals->trackerCombo->currentText();
-    trackStyle->setTrackerName(tracker);
+    QByteArray tracker =
+        this->Internals->trackerCombo->currentText().toLocal8Bit();
+    trackStyle->SetTrackerName(tracker.data());
 
     if (vtkVRGrabWorldStyle *grabStyle =
-        qobject_cast<vtkVRGrabWorldStyle*>(trackStyle))
+        vtkVRGrabWorldStyle::SafeDownCast(trackStyle))
       {
-      QString button = this->Internals->buttonCombo->currentText();
-      grabStyle->setButtonName(button);
+      QByteArray button =
+          this->Internals->buttonCombo->currentText().toLocal8Bit();
+      grabStyle->SetButtonName(button.data());
       }
     }
 }

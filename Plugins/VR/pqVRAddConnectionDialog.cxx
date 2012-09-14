@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRAddConnectionDialog.h"
 #include "ui_pqVRAddConnectionDialog.h"
 
-#include "vtkVRConnectionManager.h"
+#include "pqVRConnectionManager.h"
 #ifdef PARAVIEW_USE_VRPN
-#include "vtkVRPNConnection.h"
+#include "pqVRPNConnection.h"
 #endif
 #ifdef PARAVIEW_USE_VRUI
-#include "vtkVRUIConnection.h"
+#include "pqVRUIConnection.h"
 #endif
 
 #include <QtGui/QKeyEvent>
@@ -118,11 +118,11 @@ public:
   }
 
 #ifdef PARAVIEW_USE_VRPN
-  vtkVRPNConnection *VRPNConn;
+  pqVRPNConnection *VRPNConn;
   void updateVRPNConnection();
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  vtkVRUIConnection *VRUIConn;
+  pqVRUIConnection *VRUIConn;
   void updateVRUIConnection();
 #endif
 
@@ -168,24 +168,24 @@ pqVRAddConnectionDialog::~pqVRAddConnectionDialog()
 
 #ifdef PARAVIEW_USE_VRPN
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::setConnection(vtkVRPNConnection *conn)
+void pqVRAddConnectionDialog::setConnection(pqVRPNConnection *conn)
 {
   this->Internals->VRPNConn = conn;
   this->Internals->Type = pqInternals::VRPN;
   this->Internals->connectionName->setText(
-        QString::fromStdString(conn->GetName()));
+        QString::fromStdString(conn->name()));
   this->Internals->connectionAddress->setText(
-        QString::fromStdString(conn->GetAddress()));
+        QString::fromStdString(conn->address()));
   this->Internals->SetSelectedConnectionType(pqInternals::VRPN);
   this->Internals->connectionType->setEnabled(false);
-  this->Internals->AnalogMapping = conn->GetAnalogMap();
-  this->Internals->ButtonMapping = conn->GetButtonMap();
-  this->Internals->TrackerMapping = conn->GetTrackerMap();
+  this->Internals->AnalogMapping = conn->analogMap();
+  this->Internals->ButtonMapping = conn->buttonMap();
+  this->Internals->TrackerMapping = conn->trackerMap();
   this->Internals->updateUi();
 }
 
 //-----------------------------------------------------------------------------
-vtkVRPNConnection *pqVRAddConnectionDialog::getVRPNConnection()
+pqVRPNConnection *pqVRAddConnectionDialog::getVRPNConnection()
 {
   if (this->Internals->Type == pqInternals::VRPN)
     {
@@ -203,26 +203,26 @@ bool pqVRAddConnectionDialog::isVRPN()
 
 #ifdef PARAVIEW_USE_VRUI
 //-----------------------------------------------------------------------------
-void pqVRAddConnectionDialog::setConnection(vtkVRUIConnection *conn)
+void pqVRAddConnectionDialog::setConnection(pqVRUIConnection *conn)
 {
   this->Internals->VRUIConn = conn;
-  this->Internals->Type = VRUI;
+  this->Internals->Type = pqInternals::VRUI;
   this->Internals->connectionName->setText(
-        QString::fromStdString(conn->GetName()));
+        QString::fromStdString(conn->name()));
   this->Internals->connectionAddress->setText(
-        QString::fromStdString(conn->GetAddress()));
+        QString::fromStdString(conn->address()));
   this->Internals->connectionPort->setValue(
-        QString::fromStdString(conn->GetPort()).toInt());
+        QString::fromStdString(conn->port()).toInt());
   this->Internals->SetSelectedConnectionType(pqInternals::VRUI);
   this->Internals->connectionType->setEnabled(false);
-  this->Internals->AnalogMapping = conn->GetAnalogMap();
-  this->Internals->ButtonMapping = conn->GetButtonMap();
-  this->Internals->TrackerMapping = conn->GetTrackerMap();
+  this->Internals->AnalogMapping = conn->analogMap();
+  this->Internals->ButtonMapping = conn->buttonMap();
+  this->Internals->TrackerMapping = conn->trackerMap();
   this->Internals->updateUi();
 }
 
 //-----------------------------------------------------------------------------
-vtkVRUIConnection *pqVRAddConnectionDialog::getVRUIConnection()
+pqVRUIConnection *pqVRAddConnectionDialog::getVRUIConnection()
 {
   if (this->Internals->Type == pqInternals::VRUI)
     {
@@ -337,15 +337,15 @@ void pqVRAddConnectionDialog::pqInternals::updateVRPNConnection()
 {
   if (!this->VRPNConn)
     {
-    this->VRPNConn = new vtkVRPNConnection(vtkVRConnectionManager::instance());
+    this->VRPNConn = new pqVRPNConnection(pqVRConnectionManager::instance());
     this->Type = VRPN;
     }
 
-  this->VRPNConn->SetName(this->connectionName->text().toStdString());
-  this->VRPNConn->SetAddress(this->connectionAddress->text().toStdString());
-  this->VRPNConn->SetAnalogMap(this->AnalogMapping);
-  this->VRPNConn->SetButtonMap(this->ButtonMapping);
-  this->VRPNConn->SetTrackerMap(this->TrackerMapping);
+  this->VRPNConn->setName(this->connectionName->text().toStdString());
+  this->VRPNConn->setAddress(this->connectionAddress->text().toStdString());
+  this->VRPNConn->setAnalogMap(this->AnalogMapping);
+  this->VRPNConn->setButtonMap(this->ButtonMapping);
+  this->VRPNConn->setTrackerMap(this->TrackerMapping);
 }
 #endif
 
@@ -355,17 +355,17 @@ void pqVRAddConnectionDialog::pqInternals::updateVRUIConnection()
 {
   if (!this->VRUIConn)
     {
-    this->VRUIConn = new vtkVRUIConnection(vtkVRConnectionManager::instance());
+    this->VRUIConn = new pqVRUIConnection(pqVRConnectionManager::instance());
     this->Type = VRUI;
     }
 
-  this->VRUIConn->SetName(this->connectionName->text().toStdString());
-  this->VRUIConn->SetAddress(this->connectionAddress->text().toStdString());
-  this->VRUIConn->SetPort(
+  this->VRUIConn->setName(this->connectionName->text().toStdString());
+  this->VRUIConn->setAddress(this->connectionAddress->text().toStdString());
+  this->VRUIConn->setPort(
         QString::number(this->connectionPort->value()).toStdString());
-  this->VRUIConn->SetAnalogMap(this->AnalogMapping);
-  this->VRUIConn->SetButtonMap(this->ButtonMapping);
-  this->VRUIConn->SetTrackerMap(this->TrackerMapping);
+  this->VRUIConn->setAnalogMap(this->AnalogMapping);
+  this->VRUIConn->setButtonMap(this->ButtonMapping);
+  this->VRUIConn->setTrackerMap(this->TrackerMapping);
 }
 #endif
 

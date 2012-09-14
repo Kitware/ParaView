@@ -40,19 +40,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqVRAddConnectionDialog.h"
 #include "pqVRAddStyleDialog.h"
+#include "pqVRConnectionManager.h"
+#include "pqVRQueueHandler.h"
+
+#ifdef PARAVIEW_USE_VRPN
+#include "pqVRPNConnection.h"
+#endif
+#ifdef PARAVIEW_USE_VRUI
+#include "pqVRUIConnection.h"
+#endif
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkVRConnectionManager.h"
-#ifdef PARAVIEW_USE_VRPN
-#include "vtkVRPNConnection.h"
-#endif
-#ifdef PARAVIEW_USE_VRUI
-#include "vtkVRUIConnection.h"
-#endif
 #include "vtkVRGrabWorldStyle.h"
-#include "vtkVRQueueHandler.h"
 #include "vtkVRTrackStyle.h"
 #include "vtkWeakPointer.h"
 
@@ -68,7 +69,7 @@ public:
   QString createName(vtkVRInteractorStyle *);
 
   vtkWeakPointer<vtkCamera> Camera;
-  QMap<QString, QPointer<vtkVRInteractorStyle> > StyleNameMap;
+  QMap<QString, vtkVRInteractorStyle*> StyleNameMap;
 };
 
 //-----------------------------------------------------------------------------
@@ -91,7 +92,7 @@ void pqVRDockPanel::constructor()
           SIGNAL(itemDoubleClicked(QListWidgetItem*)),
           this, SLOT(connectionDoubleClicked(QListWidgetItem*)));
 
-  connect(vtkVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
+  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
           this, SLOT(updateConnections()));
 
   // Styles
@@ -105,7 +106,7 @@ void pqVRDockPanel::constructor()
           SIGNAL(itemDoubleClicked(QListWidgetItem*)),
           this, SLOT(styleDoubleClicked(QListWidgetItem*)));
 
-  connect(vtkVRQueueHandler::instance(), SIGNAL(stylesChanged()),
+  connect(pqVRQueueHandler::instance(), SIGNAL(stylesChanged()),
           this, SLOT(updateStyles()));
 
   // Other
@@ -135,7 +136,7 @@ void pqVRDockPanel::updateConnections()
 {
   this->Internals->connectionsTable->clear();
   
-  vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+  pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
   QList<QString> connectionNames = mgr->connectionNames();
   foreach (const QString& name, connectionNames)
     {
@@ -152,19 +153,19 @@ void pqVRDockPanel::connectionDoubleClicked(QListWidgetItem *item)
     }
   // Lookup connection
   QString connName = item->text();
-  vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+  pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
   pqVRAddConnectionDialog dialog(this);
   bool set = false;
 #ifdef PARAVIEW_USE_VRPN
-  if (vtkVRPNConnection *vrpnConn = mgr->GetVRPNConnection(connName))
+  if (pqVRPNConnection *vrpnConn = mgr->GetVRPNConnection(connName))
     {
     set = true;
     dialog.setConnection(vrpnConn);
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  if (vtkVRUIConnection *vruiConn = mgr->GetVRUIConnection(connName))
+  if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(connName))
     {
     if (!set)
       {
@@ -193,19 +194,19 @@ void pqVRDockPanel::addConnection()
   pqVRAddConnectionDialog dialog(this);
   if (dialog.exec() == QDialog::Accepted)
     {
-    vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+    pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
     dialog.updateConnection();
 #ifdef PARAVIEW_USE_VRPN
     if (dialog.isVRPN())
       {
-      vtkVRPNConnection *conn = dialog.getVRPNConnection();
+      pqVRPNConnection *conn = dialog.getVRPNConnection();
       mgr->add(conn);
       }
 #endif
 #ifdef PARAVIEW_USE_VRUI
     if (dialog.isVRUI())
       {
-      vtkVRUIConnection *conn = dialog.getVRUIConnection();
+      pqVRUIConnection *conn = dialog.getVRUIConnection();
       mgr->add(conn);
       }
 #endif
@@ -221,12 +222,12 @@ void pqVRDockPanel::removeConnection()
     return;
     }
   QString name = item->text();
-  vtkVRConnectionManager* mgr = vtkVRConnectionManager::instance();
+  pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
 
   pqVRAddConnectionDialog dialog(this);
   bool done = false;
 #ifdef PARAVIEW_USE_VRPN
-  if (vtkVRPNConnection *vrpnConn = mgr->GetVRPNConnection(name))
+  if (pqVRPNConnection *vrpnConn = mgr->GetVRPNConnection(name))
     {
     done = true;
     mgr->remove(vrpnConn);
@@ -235,7 +236,7 @@ void pqVRDockPanel::removeConnection()
 #ifdef PARAVIEW_USE_VRUI
   if (!done)
     {
-    if (vtkVRUIConnection *vruiConn = mgr->GetVRUIConnection(name))
+    if (pqVRUIConnection *vruiConn = mgr->GetVRUIConnection(name))
       {
       done = true;
       mgr->remove(vruiConn);
@@ -248,24 +249,30 @@ void pqVRDockPanel::removeConnection()
 void pqVRDockPanel::addStyle()
 {
   vtkSMProxy *proxy = this->Internals->proxyCombo->getCurrentProxy();
-  QString property = this->Internals->propertyCombo->getCurrentPropertyName();
+  QByteArray property =
+      this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
   QString styleString = this->Internals->stylesCombo->currentText();
 
   vtkVRInteractorStyle *style = NULL;
-  vtkVRQueueHandler *handler = vtkVRQueueHandler::instance();
+  pqVRQueueHandler *handler = pqVRQueueHandler::instance();
   if (styleString == "Grab")
     {
-    vtkVRGrabWorldStyle *grabStyle = new vtkVRGrabWorldStyle(handler);
-    grabStyle->setControlledProxy(proxy);
-    grabStyle->setControlledPropertyName(property);
+    vtkVRGrabWorldStyle *grabStyle = vtkVRGrabWorldStyle::New();
+    grabStyle->SetControlledProxy(proxy);
+    grabStyle->SetControlledPropertyName(property.data());
     style = grabStyle;
     }
   else if (styleString == "Track")
     {
-    vtkVRTrackStyle *trackStyle = new vtkVRTrackStyle(handler);
-    trackStyle->setControlledProxy(proxy);
-    trackStyle->setControlledPropertyName(property);
+    vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::New();
+    trackStyle->SetControlledProxy(proxy);
+    trackStyle->SetControlledPropertyName(property.data());
     style = trackStyle;
+    }
+
+  if (!style)
+    {
+    return;
     }
 
   pqVRAddStyleDialog dialog(this);
@@ -276,10 +283,9 @@ void pqVRDockPanel::addStyle()
     dialog.updateInteractorStyle();
     handler->add(style);
     }
-  else
-    {
-    style->deleteLater();
-    }
+
+  // Clean up reference
+  style->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -298,7 +304,7 @@ void pqVRDockPanel::removeStyle()
     return;
     }
 
-  vtkVRQueueHandler::instance()->remove(style);
+  pqVRQueueHandler::instance()->remove(style);
 }
 
 //-----------------------------------------------------------------------------
@@ -307,7 +313,7 @@ void pqVRDockPanel::updateStyles()
   this->Internals->StyleNameMap.clear();
   this->Internals->stylesTable->clear();
 
-  foreach(vtkVRInteractorStyle *style, vtkVRQueueHandler::instance()->styles())
+  foreach(vtkVRInteractorStyle *style, pqVRQueueHandler::instance()->styles())
     {
     QString name = this->Internals->createName(style);
     this->Internals->StyleNameMap.insert(name, style);
@@ -399,15 +405,15 @@ QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle *style)
   pqApplicationCore *core = pqApplicationCore::instance();
   pqServerManagerModel *model = core->getServerManagerModel();
 
-  QString className = style->metaObject()->className();
+  QString className = style->GetClassName();
   QString name = QString("%1").arg(className);
-  if (vtkVRTrackStyle *trackStyle = qobject_cast<vtkVRTrackStyle*>(style))
+  if (vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::SafeDownCast(style))
     {
-    vtkSMProxy *smControlledProxy = trackStyle->controlledProxy();
+    vtkSMProxy *smControlledProxy = trackStyle->GetControlledProxy();
     pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
     name.append(QString(" on %1's %2")
                        .arg(pqControlledProxy->getSMName())
-                       .arg(trackStyle->controlledPropertyName()));
+                       .arg(trackStyle->GetControlledPropertyName()));
     }
   return name;
 }

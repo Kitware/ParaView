@@ -31,61 +31,96 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRQueue.h"
 
+#include "vtkConditionVariable.h"
+#include "vtkMutexLock.h"
+
 //----------------------------------------------------------------------------
-vtkVRQueue::vtkVRQueue(QObject* parentObject) : Superclass(parentObject)
+vtkStandardNewMacro(vtkVRQueue);
+
+//----------------------------------------------------------------------------
+vtkVRQueue::vtkVRQueue() : Superclass()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueue::enqueue(const vtkVREventData& data)
+vtkVRQueue::~vtkVRQueue()
 {
-  QMutexLocker lock(&this->Mutex);
-  this->Queue.enqueue(data);
-  lock.unlock();
-  this->CondVar.wakeOne();
 }
 
 //----------------------------------------------------------------------------
-bool vtkVRQueue::isEmpty() const
+void vtkVRQueue::Enqueue(const vtkVREventData& data)
 {
-  QMutexLocker lock(&this->Mutex);
-  return this->Queue.isEmpty();
+  this->Mutex->Lock();
+  this->Queue.push(data);
+  this->Mutex->Unlock();
+  this->CondVar->Signal();
 }
 
 //----------------------------------------------------------------------------
-bool vtkVRQueue::tryDequeue(vtkVREventData& data)
+bool vtkVRQueue::IsEmpty() const
 {
-  QMutexLocker lock(&this->Mutex);
-  if(this->Queue.isEmpty())
+  this->Mutex->Lock();
+  bool result = this->Queue.empty();
+  this->Mutex->Unlock();
+  return result;
+}
+
+//----------------------------------------------------------------------------
+bool vtkVRQueue::TryDequeue(vtkVREventData& data)
+{
+  this->Mutex->Lock();
+  bool result = false;
+  if (!this->Queue.empty())
     {
-    return false;
+    result = true;
+    data = this->Queue.front();
+    this->Queue.pop();
+    }
+  this->Mutex->Unlock();
+
+  return result;
+}
+
+//----------------------------------------------------------------------------
+void vtkVRQueue::Dequeue(vtkVREventData& data)
+{
+  this->Mutex->Lock();
+  while (this->Queue.empty())
+    {
+    this->CondVar->Wait(this->Mutex.GetPointer());
     }
 
-  data=this->Queue.dequeue();
+  data = this->Queue.front();
+  this->Queue.pop();
+  this->Mutex->Unlock();
+}
+
+//----------------------------------------------------------------------------
+bool vtkVRQueue::TryDequeue(std::queue<vtkVREventData> &data)
+{
+  this->Mutex->Lock();
+  bool result = false;
+  if (!this->Queue.empty())
+    {
+    data = this->Queue;
+    while (!this->Queue.empty())
+      {
+      this->Queue.pop();
+      }
+    result = true;
+    }
+  this->Mutex->Unlock();
   return true;
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueue::dequeue(vtkVREventData& data)
+void vtkVRQueue::PrintSelf(ostream &os, vtkIndent indent)
 {
-  QMutexLocker lock(&this->Mutex);
-  while(this->Queue.isEmpty())
-    {
-    this->CondVar.wait(lock.mutex());
-    }
+  this->Superclass::PrintSelf(os, indent);
 
-  data=this->Queue.dequeue();
-}
-
-//----------------------------------------------------------------------------
-bool vtkVRQueue::tryDequeue(QQueue<vtkVREventData>& data)
-{
-  QMutexLocker lock(&this->Mutex);
-  if (this->Queue.isEmpty())
-    {
-    return false;
-    }
-  data = this->Queue;
-  this->Queue.clear();
-  return true;
+  os << indent << "Queued Events: " << this->Queue.size() << endl;
+  os << indent << "Mutex:" << endl;
+  this->Mutex->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "CondVar:" << endl;
+  this->CondVar->PrintSelf(os, indent.GetNextIndent());
 }

@@ -27,7 +27,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkVRPNConnection.h"
+#include "pqVRPNConnection.h"
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -37,20 +37,20 @@
 // ----------------------------------------------------------------------------
 void VRPN_CALLBACK handleAnalogChange(void* userdata, const vrpn_ANALOGCB b)
 {
-  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
-  self->NewAnalogValue( b );
+  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
+  self->newAnalogValue( b );
 }
 
 // ----------------------------------------------------------------------------
 void VRPN_CALLBACK handleButtonChange(void* userdata, vrpn_BUTTONCB b)
 {
-  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
-  self->NewButtonValue( b );
+  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
+  self->newButtonValue( b );
 }
 
 // ----------------------------------------------------------------------------
 void VRPN_CALLBACK handleTrackerChange(void *userdata, const vrpn_TRACKERCB t)
 {
-  vtkVRPNConnection *self = static_cast<vtkVRPNConnection*> ( userdata );
-  self->NewTrackerValue( t );
+  pqVRPNConnection *self = static_cast<pqVRPNConnection*> ( userdata );
+  self->newTrackerValue( t );
 }

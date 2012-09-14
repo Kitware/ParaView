@@ -43,9 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 // -----------------------------------------------------------------------------
-vtkVRGrabWorldStyle::vtkVRGrabWorldStyle(QObject* parentObject) :
-  Superclass(parentObject)
+vtkStandardNewMacro(vtkVRGrabWorldStyle)
+
+// -----------------------------------------------------------------------------
+vtkVRGrabWorldStyle::vtkVRGrabWorldStyle() :
+  Superclass()
 {
+  this->ButtonName = NULL;
   this->Enabled = false;
   this->IsInitialRecorded =false;
   this->InverseInitialMatrix = vtkTransform::New();
@@ -54,14 +58,15 @@ vtkVRGrabWorldStyle::vtkVRGrabWorldStyle(QObject* parentObject) :
 // -----------------------------------------------------------------------------
 vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 {
+  this->SetButtonName(NULL);
   this->InverseInitialMatrix->Delete();
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRGrabWorldStyle::configure(
+bool vtkVRGrabWorldStyle::Configure(
   vtkPVXMLElement* child, vtkSMProxyLocator* locator)
 {
-  if (!this->Superclass::configure(child, locator))
+  if (!this->Superclass::Configure(child, locator))
     {
     return false;
     }
@@ -69,42 +74,44 @@ bool vtkVRGrabWorldStyle::configure(
   for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
     {
     vtkPVXMLElement* button = child->GetNestedElement(cc);
-    if (button && button->GetName() && strcmp(button->GetName(), "Button")==0)
+    if (button && button->GetName() && strcmp(button->GetName(), "Button") == 0)
       {
-      this->ButtonName = button->GetAttributeOrEmpty("name");
+      this->SetButtonName(button->GetAttributeOrEmpty("name"));
       }
     }
 
-  return !this->ButtonName.isEmpty();
+  return this->ButtonName != NULL && this->ButtonName[0] != '\0';
 }
 
 // -----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRGrabWorldStyle::saveConfiguration() const
+vtkPVXMLElement* vtkVRGrabWorldStyle::SaveConfiguration() const
 {
-  vtkPVXMLElement* child = this->Superclass::saveConfiguration();
+  vtkPVXMLElement* child = this->Superclass::SaveConfiguration();
 
   vtkPVXMLElement* button = vtkPVXMLElement::New();
   button->SetName("Button");
-  button->AddAttribute("name", this->ButtonName.toAscii().data() );
+  button->AddAttribute("name", this->ButtonName);
   child->AddNestedElement(button);
   button->FastDelete();
   return child;
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRGrabWorldStyle::handleButton( const vtkVREventData& data )
+void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
 {
-  if ( this->ButtonName == QString(data.name.c_str()))
+  if (data.name.size() > 0)
     {
+    this->SetButtonName(data.name.c_str());
     this->Enabled = data.data.button.state;
     }
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRGrabWorldStyle::handleTracker( const vtkVREventData& data )
+void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 {
-  if ( this->TrackerName == data.name.c_str() )
+  if (data.name.size() > 0)
     {
+    this->SetTrackerName(data.name.c_str());
     if ( this->Enabled )
       {
       if ( !this->IsInitialRecorded )
@@ -122,16 +129,15 @@ void vtkVRGrabWorldStyle::handleTracker( const vtkVREventData& data )
         double currentValue[16];
         vtkSMPropertyHelper(
           this->ControlledProxy,
-          this->ControlledPropertyName.toAscii().data()).Get(currentValue,
-          16);
+          this->ControlledPropertyName).Get(currentValue, 16);
         vtkNew<vtkTransform> currentValueTransform;
         currentValueTransform->SetMatrix(currentValue);
         currentTransform->Concatenate(currentValueTransform.GetPointer());
 
         vtkSMPropertyHelper(
           this->ControlledProxy,
-          this->ControlledPropertyName.toAscii().data()).Set(
-          &currentTransform->GetMatrix()->Element[0][0], 16);
+          this->ControlledPropertyName).Set(
+              &currentTransform->GetMatrix()->Element[0][0], 16);
         this->ControlledProxy->UpdateVTKObjects();
         }
       }
@@ -139,5 +145,25 @@ void vtkVRGrabWorldStyle::handleTracker( const vtkVREventData& data )
       {
       this->IsInitialRecorded = false;
       }
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+
+  os << indent << "ButtonName: " << this->ButtonName << endl;
+  os << indent << "Enabled: " << this->Enabled << endl;
+  os << indent << "IsInitialRecorded: " << this->IsInitialRecorded << endl;
+  if (this->InverseInitialMatrix)
+    {
+    os << indent << "InverseInitialMatrix:" << endl;
+    this->InverseInitialMatrix->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "InverseInitialMatrix: (None)" << endl;
     }
 }

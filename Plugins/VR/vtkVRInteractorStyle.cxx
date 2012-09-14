@@ -38,8 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
-vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
-  : Superclass(parentObject)
+vtkStandardNewMacro(vtkVRInteractorStyle)
+
+// ----------------------------------------------------------------------------
+vtkVRInteractorStyle::vtkVRInteractorStyle()
+  : Superclass()
 {
 }
 
@@ -49,10 +52,10 @@ vtkVRInteractorStyle::~vtkVRInteractorStyle()
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
+bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 {
   if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
-      strcmp(this->metaObject()->className(),
+      strcmp(this->GetClassName(),
       child->GetAttributeOrEmpty("class")) == 0)
     {
     // just do basic validation here. vtkVRInteractorStyle.
@@ -63,16 +66,16 @@ bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 }
 
 // ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
+vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
-  child->AddAttribute("class",this->metaObject()->className());
+  child->AddAttribute("class",this->GetClassName());
   return child;
 }
 
 // ----------------------------------------------------------------------------
-std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
+std::vector<std::string> vtkVRInteractorStyle::Tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
   std::istringstream stm( input );
@@ -87,40 +90,46 @@ std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
+bool vtkVRInteractorStyle::HandleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
     {
     case BUTTON_EVENT:
-      this->handleButton( data );
+      this->HandleButton( data );
       break;
     case ANALOG_EVENT:
-      this->handleAnalog( data );
+      this->HandleAnalog( data );
       break;
     case TRACKER_EVENT:
-      this->handleTracker( data );
+      this->HandleTracker( data );
       break;
     }
   return false;
 }
 
 // -----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::update()
+bool vtkVRInteractorStyle::Update()
 {
   return true;
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::handleButton( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::HandleButton( const vtkVREventData& vtkNotUsed( data ) )
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::handleAnalog( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::HandleAnalog( const vtkVREventData& vtkNotUsed( data ) )
 {
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRInteractorStyle::handleTracker( const vtkVREventData& vtkNotUsed( data ) )
+void vtkVRInteractorStyle::HandleTracker( const vtkVREventData& vtkNotUsed( data ) )
 {
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::PrintSelf(ostream &os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
 }

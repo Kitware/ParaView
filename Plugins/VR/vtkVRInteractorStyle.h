@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkVRInteractorStyle_h
 #define __vtkVRInteractorStyle_h
 
-#include <QObject>
+#include <vtkObject.h>
 #include <vector>
 
 class vtkPVXMLElement;
@@ -41,31 +41,35 @@ class vtkSMProxy;
 class vtkSMDoubleVectorProperty;
 struct vtkVREventData;
 
-class vtkVRInteractorStyle : public QObject
+class vtkVRInteractorStyle : public vtkObject
 {
-  Q_OBJECT
-  typedef QObject Superclass;
 public:
-  vtkVRInteractorStyle(QObject* parent=0);
-  virtual ~vtkVRInteractorStyle();
+  static vtkVRInteractorStyle *New();
+  vtkTypeMacro(vtkVRInteractorStyle, vtkObject)
+  void PrintSelf(ostream &os, vtkIndent indent);
 
-  virtual bool handleEvent(const vtkVREventData& data);
-  virtual bool update();
+  virtual bool HandleEvent(const vtkVREventData& data);
+  virtual bool Update();
 
   /// Load state for the style from XML.
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 
   /// Save state to xml.
-  virtual vtkPVXMLElement* saveConfiguration() const;
-protected:
-  virtual void handleButton ( const vtkVREventData& data );
-  virtual void handleAnalog ( const vtkVREventData& data );
-  virtual void handleTracker( const vtkVREventData& data );
+  virtual vtkPVXMLElement* SaveConfiguration() const;
 
-  static std::vector<std::string> tokenize( std::string input);
+protected:
+  vtkVRInteractorStyle();
+  virtual ~vtkVRInteractorStyle();
+
+  virtual void HandleButton ( const vtkVREventData& data );
+  virtual void HandleAnalog ( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
+
+  static std::vector<std::string> Tokenize( std::string input);
 
 private:
-  Q_DISABLE_COPY(vtkVRInteractorStyle)
+  vtkVRInteractorStyle(const vtkVRInteractorStyle&); // Not implemented.
+  void operator=(const vtkVRInteractorStyle&); // Not implemented.
 };
 
 #endif

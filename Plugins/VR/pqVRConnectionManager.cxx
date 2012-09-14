@@ -29,54 +29,56 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkVRConnectionManager.h"
+#include "pqVRConnectionManager.h"
 
 // --------------------------------------------------------------------includes
 #include "pqApplicationCore.h"
-#include <QPointer>
-#include "vtkPVVRConfig.h"
 #ifdef PARAVIEW_USE_VRPN
-#include "vtkVRPNConnection.h"
+#include "pqVRPNConnection.h"
 #endif
 #ifdef PARAVIEW_USE_VRUI
-#include "vtkVRUIConnection.h"
+#include "pqVRUIConnection.h"
 #endif
+
+#include "vtkObjectFactory.h"
+#include "vtkPVVRConfig.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"
-#include "vtkObjectFactory.h"
+#include "vtkWeakPointer.h"
+
 #include <QList>
 #include <QtDebug>
 
 // ----------------------------------------------------------------------------
-QPointer<vtkVRConnectionManager> vtkVRConnectionManager::Instance;
-void vtkVRConnectionManager::setInstance(vtkVRConnectionManager* mgr)
+QPointer<pqVRConnectionManager> pqVRConnectionManager::Instance;
+void pqVRConnectionManager::setInstance(pqVRConnectionManager* mgr)
 {
-  vtkVRConnectionManager::Instance = mgr;
+  pqVRConnectionManager::Instance = mgr;
 }
 
 // ----------------------------------------------------------------------------
-vtkVRConnectionManager* vtkVRConnectionManager::instance()
+pqVRConnectionManager* pqVRConnectionManager::instance()
 {
-  return vtkVRConnectionManager::Instance;
+  return pqVRConnectionManager::Instance;
 }
 
 // --------------------------------------------------------------------internal
 // IMPORTANT: Make sure that this struct has no pointers.  All pointers should
 // be put in the class declaration. For all newly defined pointers make sure to
 // update constructor and destructor methods.
-struct vtkVRConnectionManager::pqInternals
+struct pqVRConnectionManager::pqInternals
 {
 #ifdef PARAVIEW_USE_VRPN
-  QList<QPointer<vtkVRPNConnection> > VRPNConnections;
+  QList<QPointer<pqVRPNConnection> > VRPNConnections;
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  QList<QPointer<vtkVRUIConnection> > VRUIConnections;
+  QList<QPointer<pqVRUIConnection> > VRUIConnections;
 #endif
-  QPointer<vtkVRQueue> Queue;
+  vtkWeakPointer<vtkVRQueue> Queue;
 };
 
 // -----------------------------------------------------------------------cnstr
-vtkVRConnectionManager::vtkVRConnectionManager(vtkVRQueue* queue,
+pqVRConnectionManager::pqVRConnectionManager(vtkVRQueue* queue,
                                                QObject* parentObject ):
   Superclass( parentObject )
 {
@@ -91,38 +93,38 @@ vtkVRConnectionManager::vtkVRConnectionManager(vtkVRQueue* queue,
 }
 
 // -----------------------------------------------------------------------destr
-vtkVRConnectionManager::~vtkVRConnectionManager()
+pqVRConnectionManager::~pqVRConnectionManager()
 {
   delete this->Internals;
 }
 
 #ifdef PARAVIEW_USE_VRPN
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::add( vtkVRPNConnection* conn )
+void pqVRConnectionManager::add( pqVRPNConnection* conn )
 {
   this->Internals->VRPNConnections.push_front( conn );
   emit this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::remove( vtkVRPNConnection *conn )
+void pqVRConnectionManager::remove( pqVRPNConnection *conn )
 {
-  conn->Stop();
+  conn->stop();
   this->Internals->VRPNConnections.removeAll( conn );
   emit this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
-vtkVRPNConnection *
-vtkVRConnectionManager::GetVRPNConnection(const QString &name)
+pqVRPNConnection *
+pqVRConnectionManager::GetVRPNConnection(const QString &name)
 {
   std::string target = name.toStdString();
-  foreach (const QPointer<vtkVRPNConnection> &conn,
+  foreach (const QPointer<pqVRPNConnection> &conn,
            this->Internals->VRPNConnections)
     {
     if (!conn.isNull())
       {
-      if (conn->GetName() == target)
+      if (conn->name() == target)
         {
         return conn.data();
         }
@@ -134,30 +136,31 @@ vtkVRConnectionManager::GetVRPNConnection(const QString &name)
 
 #ifdef PARAVIEW_USE_VRUI
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::add( vtkVRUIConnection* conn )
+void pqVRConnectionManager::add( pqVRUIConnection* conn )
 {
   this->Internals->VRUIConnections.push_front( conn );
   emit this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::remove( vtkVRUIConnection *conn )
+void pqVRConnectionManager::remove( pqVRUIConnection *conn )
 {
-  conn->Stop();
+  conn->stop();
   this->Internals->VRUIConnections.removeAll( conn );
   emit this->connectionsChanged();
 }
 
 // ----------------------------------------------------------------------------
-vtkVRUIConnection *
-vtkVRConnectionManager::GetVRUIConnection(const QString &name)
+pqVRUIConnection *
+pqVRConnectionManager::GetVRUIConnection(const QString &name)
 {
   std::string target = name.toStdString();
-  foreach (QPointer<vtkVRPNConnection> &conn, this->Internals->VRPNConnections)
+  foreach (const QPointer<pqVRUIConnection> &conn,
+           this->Internals->VRUIConnections)
     {
     if (!conn.isNull())
       {
-      if (conn->GetName() == target)
+      if (conn->name() == target)
         {
         return conn.data();
         }
@@ -168,7 +171,7 @@ vtkVRConnectionManager::GetVRUIConnection(const QString &name)
 #endif
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::clear()
+void pqVRConnectionManager::clear()
 {
   this->stop();
 #ifdef PARAVIEW_USE_VRPN
@@ -181,24 +184,24 @@ void vtkVRConnectionManager::clear()
 }
 
 // ----------------------------------------------------------------------------
-QList<QString> vtkVRConnectionManager::connectionNames() const
+QList<QString> pqVRConnectionManager::connectionNames() const
 {
   QList<QString> result;
 #ifdef PARAVIEW_USE_VRPN
-  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     if (conn)
       {
-      result << QString::fromStdString(conn->GetName());
+      result << QString::fromStdString(conn->name());
       }
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn)
       {
-      result << QString::fromStdString(conn->GetName());
+      result << QString::fromStdString(conn->name());
       }
     }
 #endif
@@ -207,21 +210,21 @@ QList<QString> vtkVRConnectionManager::connectionNames() const
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::start()
+void pqVRConnectionManager::start()
 {
 #ifdef PARAVIEW_USE_VRPN
-  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections )
     {
-    if (conn && conn->Init())
+    if (conn && conn->init())
       {
         conn->start();
       }
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections )
     {
-    if (conn && conn->Init())
+    if (conn && conn->init())
       {
         conn->start();
       }
@@ -230,30 +233,30 @@ void vtkVRConnectionManager::start()
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::stop()
+void pqVRConnectionManager::stop()
 {
 #ifdef PARAVIEW_USE_VRPN
-  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     if (conn)
       {
-        conn->Stop();
+        conn->stop();
       }
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-    foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+    foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     if (conn)
       {
-        conn->Stop();
+        conn->stop();
       }
     }
 #endif
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
+void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
                                                   vtkSMProxyLocator* locator )
 {
   if (!xml)
@@ -276,10 +279,10 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
 #ifdef PARAVIEW_USE_VRPN        // TODO: Need to throw some warning if VRPN is
                                 // used when not compiled. For now we will
                                 // simply ignore VRPN configuration
-            vtkVRPNConnection* device = new vtkVRPNConnection(this);
-            device->SetQueue( this->Internals->Queue );
-            device->SetName( name );
-            device->SetAddress( address );
+            pqVRPNConnection* device = new pqVRPNConnection(this);
+            device->setQueue( this->Internals->Queue );
+            device->setName( name );
+            device->setAddress( address );
             device->configure(child, locator);
             this->add(device);
 #endif
@@ -292,13 +295,13 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
 #ifdef PARAVIEW_USE_VRUI        // TODO: Need to throw some warning if VRUI is
                                 // used when not compiled. For not we will
                                 // simply ignore VRUI configuration
-            vtkVRUIConnection* device = new vtkVRUIConnection(this);
-            device->SetQueue( this->Internals->Queue );
-            device->SetName( name );
-            device->SetAddress( address );
+            pqVRUIConnection* device = new pqVRUIConnection(this);
+            device->setQueue( this->Internals->Queue );
+            device->setName( name );
+            device->setAddress( address );
             ( port )
-              ? device->SetPort( port )
-              : device->SetPort("8555"); // default
+              ? device->setPort( port )
+              : device->setPort("8555"); // default
             device->configure(child, locator);
             this->add(device);
 #endif
@@ -320,13 +323,13 @@ void vtkVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
 }
 
 // ----------------------------------------------------------------------------
-void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root )
+void pqVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root )
 {
  Q_ASSERT(root != NULL);
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRConnectionManager");
 #ifdef PARAVIEW_USE_VRPN
-  foreach (vtkVRPNConnection* conn, this->Internals->VRPNConnections )
+  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)
@@ -337,7 +340,7 @@ void vtkVRConnectionManager::saveConnectionsConfiguration( vtkPVXMLElement* root
     }
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  foreach (vtkVRUIConnection* conn, this->Internals->VRUIConnections )
+  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections )
     {
     vtkPVXMLElement* child = conn->saveConfiguration();
     if (child)

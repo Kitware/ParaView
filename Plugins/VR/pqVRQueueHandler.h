@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program: ParaView
-  Module:  vtkVRConnectionManager.h
+   Program: ParaView
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,69 +28,66 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __vtkVRConnectionManager_h
-#define __vtkVRConnectionManager_h
-#include "vtkPVVRConfig.h"
+========================================================================*/
+#ifndef __vtkVRQueueHandler_h
+#define __vtkVRQueueHandler_h
 
-#include <QObject>
-#include <QPointer>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+
+class vtkVRInteractorStyle;
 class vtkVRQueue;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
-#ifdef PARAVIEW_USE_VRUI
-class vtkVRUIConnection;
-#endif
-#ifdef PARAVIEW_USE_VRPN
-class vtkVRPNConnection;
-#endif
 
-class vtkVRConnectionManager: public QObject
+/// pqVRQueueHandler is a class that process events stacked on to vtkVRQueue
+/// one by one. One adds vtkVRInteractorStyles to the handler to do any actual
+/// work with these events.
+class pqVRQueueHandler : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 public:
-  vtkVRConnectionManager(vtkVRQueue* quque, QObject* parent=0);
-  virtual ~vtkVRConnectionManager();
-#ifdef PARAVIEW_USE_VRPN
-  void add( vtkVRPNConnection* conn );
-  void remove ( vtkVRPNConnection *conn );
-  vtkVRPNConnection *GetVRPNConnection(const QString &name);
-#endif
-#ifdef PARAVIEW_USE_VRUI
-  void add( vtkVRUIConnection* conn );
-  void remove ( vtkVRUIConnection *conn );
-  vtkVRUIConnection *GetVRUIConnection(const QString &name);
-#endif
+  pqVRQueueHandler(vtkVRQueue* queue, QObject* parent=0);
+  virtual ~pqVRQueueHandler();
+
+  /// Add/remove interactor style.
+  void add(vtkVRInteractorStyle* style);
+  void remove(vtkVRInteractorStyle* style);
   void clear();
 
-  QList<QString> connectionNames() const;
+  QList<vtkVRInteractorStyle*> styles();
 
-  static vtkVRConnectionManager* instance();
+  static pqVRQueueHandler* instance();
 
 public slots:
-  /// start/stop connections
+  /// start/stop queue processing.
   void start();
   void stop();
 
-  /// Clears current connections and loads a new set of connections from the XML
-  /// Configuration
-  void configureConnections( vtkPVXMLElement* xml, vtkSMProxyLocator* locator );
+  /// clears current interactor styles and loads a new set of styles from the
+  /// XML configuration.
+  void configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* locator);
 
-  // save the connection configuration
-  void saveConnectionsConfiguration( vtkPVXMLElement* root );
+  /// saves the styles configuration.
+  void saveStylesConfiguration(vtkPVXMLElement* root);
 
 signals:
-  void connectionsChanged();
+  void stylesChanged();
+
+protected slots:
+  /// called to processes events from the queue.
+  void processEvents();
 
 private:
-  Q_DISABLE_COPY(vtkVRConnectionManager);
+  Q_DISABLE_COPY(pqVRQueueHandler);
+  void render();
   class pqInternals;
   pqInternals* Internals;
 
   friend class pqVRStarter;
-  static void setInstance(vtkVRConnectionManager*);
-  static QPointer<vtkVRConnectionManager> Instance;
+  static void setInstance(pqVRQueueHandler*);
+  static QPointer<pqVRQueueHandler> Instance;
 };
 
-#endif // __vtkVRConnectionManager_h
+#endif

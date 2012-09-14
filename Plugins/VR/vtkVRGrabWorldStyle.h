@@ -42,27 +42,33 @@ struct vtkVREventData;
 
 class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
-  Q_OBJECT
-  typedef vtkVRTrackStyle Superclass;
 public:
-  vtkVRGrabWorldStyle(QObject* parent);
-  ~vtkVRGrabWorldStyle();
+  static vtkVRGrabWorldStyle *New();
+  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle)
+  void PrintSelf(ostream &os, vtkIndent indent);
 
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* SaveConfiguration() const;
 
-  void setButtonName(const QString &button) { this->ButtonName = button; }
-  QString buttonName() const { return this->ButtonName; }
+  vtkSetStringMacro(ButtonName)
+  vtkGetStringMacro(ButtonName)
 
 protected:
-  virtual void handleButton( const vtkVREventData& data );
-  virtual void handleTracker( const vtkVREventData& data );
+  vtkVRGrabWorldStyle();
+  ~vtkVRGrabWorldStyle();
 
-  QString ButtonName;
+  virtual void HandleButton( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
+
+  char *ButtonName;
   bool Enabled;
 
   bool IsInitialRecorded;
   vtkTransform *InverseInitialMatrix;
+
+private:
+  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
+  void operator=(const vtkVRGrabWorldStyle&); // Not implemented.
 };
 
 #endif //__vtkVRGrabWorldStyle.h_

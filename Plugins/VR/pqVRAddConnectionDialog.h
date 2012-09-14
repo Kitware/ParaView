@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVVRConfig.h"
 
 #ifdef PARAVIEW_USE_VRPN
-class vtkVRPNConnection;
+class pqVRPNConnection;
 #endif
 #ifdef PARAVIEW_USE_VRUI
-class vtkVRUIConnection;
+class pqVRUIConnection;
 #endif
 
 class pqVRAddConnectionDialog : public QDialog
@@ -52,13 +52,13 @@ public:
   virtual ~pqVRAddConnectionDialog();
 
 #ifdef PARAVIEW_USE_VRPN
-  void setConnection(vtkVRPNConnection *conn);
-  vtkVRPNConnection* getVRPNConnection();
+  void setConnection(pqVRPNConnection *conn);
+  pqVRPNConnection* getVRPNConnection();
   bool isVRPN();
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  void setConnection(vtkVRUIConnection *conn);
-  vtkVRUIConnection* getVRUIConnection();
+  void setConnection(pqVRUIConnection *conn);
+  pqVRUIConnection* getVRUIConnection();
   bool isVRUI();
 #endif
 

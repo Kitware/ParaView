@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRPNConnection.h"
+#include "pqVRPNConnection.h"
 
 #include <vrpn_Tracker.h>
 #include <vrpn_Button.h>
@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkMath.h"
 
-class vtkVRPNConnection::pqInternals
+class pqVRPNConnection::pqInternals
 {
 public:
   pqInternals()
@@ -101,9 +101,8 @@ public:
   vrpn_Text_Receiver  *Text;
 };
 
-
 // -----------------------------------------------------------------------cnstr
-vtkVRPNConnection::vtkVRPNConnection(QObject* parentObject)
+pqVRPNConnection::pqVRPNConnection(QObject* parentObject)
   :Superclass( parentObject )
 {
   this->Internals=new pqInternals();
@@ -120,14 +119,14 @@ vtkVRPNConnection::vtkVRPNConnection(QObject* parentObject)
 }
 
 // -----------------------------------------------------------------------destr
-vtkVRPNConnection::~vtkVRPNConnection()
+pqVRPNConnection::~pqVRPNConnection()
 {
   delete this->Internals;
   this->Transformation->Delete();
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::AddButton(std::string id, std::string name)
+void pqVRPNConnection::addButton(std::string id, std::string name)
 {
   std::stringstream returnStr;
   returnStr << "button." << id;
@@ -136,7 +135,7 @@ void vtkVRPNConnection::AddButton(std::string id, std::string name)
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::AddAnalog(std::string id, std::string name )
+void pqVRPNConnection::addAnalog(std::string id, std::string name )
 {
   std::stringstream returnStr;
   returnStr << "analog." << id;
@@ -145,7 +144,7 @@ void vtkVRPNConnection::AddAnalog(std::string id, std::string name )
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::AddTracking( std::string id, std::string name)
+void pqVRPNConnection::addTracking( std::string id, std::string name)
 {
   std::stringstream returnStr;
   returnStr << "tracker." << id;
@@ -154,25 +153,25 @@ void vtkVRPNConnection::AddTracking( std::string id, std::string name)
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetName(std::string name)
+void pqVRPNConnection::setName(std::string name)
 {
   this->Name = name;
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetAddress(std::string address)
+void pqVRPNConnection::setAddress(std::string address)
 {
   this->Address = address;
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetQueue( vtkVRQueue* queue )
+void pqVRPNConnection::setQueue( vtkVRQueue* queue )
 {
   this->EventQueue = queue;
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRPNConnection::Init()
+bool pqVRPNConnection::init()
 {
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
@@ -199,7 +198,7 @@ bool vtkVRPNConnection::Init()
 }
 
 // ----------------------------------------------------------------private-slot
-void vtkVRPNConnection::run()
+void pqVRPNConnection::run()
 {
   while ( !this->_Stop )
     {
@@ -216,7 +215,7 @@ void vtkVRPNConnection::run()
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::Stop()
+void pqVRPNConnection::stop()
 {
   this->Initialized = false;
   this->_Stop = true;
@@ -224,11 +223,11 @@ void vtkVRPNConnection::Stop()
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::NewAnalogValue(vrpn_ANALOGCB data)
+void pqVRPNConnection::newAnalogValue(vrpn_ANALOGCB data)
 {
   vtkVREventData temp;
   temp.connId = this->Address;
-  temp.name = GetName( ANALOG_EVENT);
+  temp.name = name( ANALOG_EVENT);
   temp.eventType = ANALOG_EVENT;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
   temp.data.analog.num_channel = data.num_channel;
@@ -236,28 +235,28 @@ void vtkVRPNConnection::NewAnalogValue(vrpn_ANALOGCB data)
     {
     temp.data.analog.channel[i] = data.channel[i];
     }
-  this->EventQueue->enqueue( temp );
+  this->EventQueue->Enqueue( temp );
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::NewButtonValue(vrpn_BUTTONCB data)
+void pqVRPNConnection::newButtonValue(vrpn_BUTTONCB data)
 {
   vtkVREventData temp;
   temp.connId = this->Address;
-  temp.name = this->GetName( BUTTON_EVENT, data.button );
+  temp.name = this->name( BUTTON_EVENT, data.button );
   temp.eventType = BUTTON_EVENT;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
   temp.data.button.button = data.button;
   temp.data.button.state = data.state;
-  this->EventQueue->enqueue( temp );
+  this->EventQueue->Enqueue( temp );
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
+void pqVRPNConnection::newTrackerValue(vrpn_TRACKERCB data )
 {
   vtkVREventData temp;
   temp.connId = this->Address;
-  temp.name = GetName( TRACKER_EVENT, data.sensor );
+  temp.name = name( TRACKER_EVENT, data.sensor );
   temp.eventType = TRACKER_EVENT;
   temp.timeStamp =   QDateTime::currentDateTime().toTime_t();
   temp.data.tracker.sensor = data.sensor;
@@ -357,11 +356,11 @@ void vtkVRPNConnection::NewTrackerValue(vrpn_TRACKERCB data )
   temp.data.tracker.matrix[15] = matrix->Element[3][3];
 #endif
   matrix->Delete();
-  this->EventQueue->enqueue( temp );
+  this->EventQueue->Enqueue( temp );
 }
 
 // ---------------------------------------------------------------------private
-std::string vtkVRPNConnection::GetName( int eventType, int id )
+std::string pqVRPNConnection::name( int eventType, int id )
 {
   std::stringstream returnStr,connection,e;
   if(this->Name.size())
@@ -396,7 +395,7 @@ std::string vtkVRPNConnection::GetName( int eventType, int id )
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::verifyConfig( const char* id,
+void pqVRPNConnection::verifyConfig( const char* id,
                                       const char* name )
 {
   if ( !id )
@@ -410,7 +409,7 @@ void vtkVRPNConnection::verifyConfig( const char* id,
 }
 
 // ----------------------------------------------------------------------public
-bool vtkVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
+bool pqVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 {
   bool returnVal = false;
   if (child->GetName() && strcmp(child->GetName(),"VRPNConnection") == 0 )
@@ -426,15 +425,15 @@ bool vtkVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 
         if ( strcmp( e->GetName(), "Button" )==0 )
           {
-          this->AddButton( id, name );
+          this->addButton( id, name );
           }
         else if ( strcmp( e->GetName(), "Analog" )==0 )
           {
-          this->AddAnalog( id, name );
+          this->addAnalog( id, name );
           }
         else if ( strcmp ( e->GetName(),  "Tracker" ) ==0 )
           {
-          this->AddTracking( id, name );
+          this->addTracking( id, name );
           }
         else if ( strcmp ( e->GetName(),  "TrackerTransform" ) ==0 )
           {
@@ -453,7 +452,7 @@ bool vtkVRPNConnection::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::configureTransform( vtkPVXMLElement* child )
+void pqVRPNConnection::configureTransform( vtkPVXMLElement* child )
 {
   if (child->GetName() && strcmp( child->GetName(), "TrackerTransform" )==0 )
     {
@@ -465,7 +464,7 @@ void vtkVRPNConnection::configureTransform( vtkPVXMLElement* child )
 }
 
 // ----------------------------------------------------------------------public
-vtkPVXMLElement* vtkVRPNConnection::saveConfiguration() const
+vtkPVXMLElement* pqVRPNConnection::saveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("VRPNConnection");
@@ -479,7 +478,7 @@ vtkPVXMLElement* vtkVRPNConnection::saveConfiguration() const
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
+void pqVRPNConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
 {
   if(!this->ButtonPresent) return;
   for ( std::map<std::string,std::string>::const_iterator it = this->ButtonMapping.begin();
@@ -510,7 +509,7 @@ void vtkVRPNConnection::saveButtonEventConfig( vtkPVXMLElement* child )const
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
+void pqVRPNConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
 {
   if(!this->AnalogPresent) return;
   for ( std::map<std::string,std::string>::const_iterator it = this->AnalogMapping.begin();
@@ -541,7 +540,7 @@ void vtkVRPNConnection::saveAnalogEventConfig( vtkPVXMLElement* child ) const
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
+void pqVRPNConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
 {
   if(!this->TrackerPresent) return;
   for ( std::map<std::string,std::string>::const_iterator it = this->TrackerMapping.begin();
@@ -572,7 +571,7 @@ void vtkVRPNConnection::saveTrackerEventConfig( vtkPVXMLElement* child ) const
 }
 
 // ---------------------------------------------------------------------private
-void vtkVRPNConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child ) const
+void pqVRPNConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child ) const
 {
   if(!this->TrackerTransformPresent) return;
   vtkPVXMLElement* transformationMatrix = vtkPVXMLElement::New();
@@ -588,7 +587,7 @@ void vtkVRPNConnection::saveTrackerTransformationConfig( vtkPVXMLElement* child 
 }
 
 // ----------------------------------------------------------------------public
-void vtkVRPNConnection::SetTransformation( vtkMatrix4x4* matrix )
+void pqVRPNConnection::setTransformation( vtkMatrix4x4* matrix )
 {
   for (int i = 0; i < 4; ++i)
     {

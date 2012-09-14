@@ -36,17 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkVRQueue.h"
-#include "vtkVRQueueHandler.h"
+#include "pqVRQueueHandler.h"
 #include "pqApplicationCore.h"
-#include "vtkVRConnectionManager.h"
+#include "pqVRConnectionManager.h"
 
 //-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
 {
 public:
-  vtkVRConnectionManager *ConnectionManager;
+  pqVRConnectionManager *ConnectionManager;
   vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
+  pqVRQueueHandler* Handler;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,11 +71,11 @@ pqVRStarter::~pqVRStarter()
 //-----------------------------------------------------------------------------
 void pqVRStarter::onStartup()
 {
-  this->Internals->EventQueue = new vtkVRQueue(this);
-  this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
-  vtkVRConnectionManager::setInstance(this->Internals->ConnectionManager);
-  this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
-  vtkVRQueueHandler::setInstance(this->Internals->Handler);
+  this->Internals->EventQueue = vtkVRQueue::New();
+  this->Internals->ConnectionManager = new pqVRConnectionManager(this->Internals->EventQueue,this);
+  pqVRConnectionManager::setInstance(this->Internals->ConnectionManager);
+  this->Internals->Handler = new pqVRQueueHandler(this->Internals->EventQueue, this);
+  pqVRQueueHandler::setInstance(this->Internals->Handler);
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
   //qWarning() << "Message from pqVRStarter: Application Started";
@@ -86,11 +86,11 @@ void pqVRStarter::onShutdown()
 {
   this->Internals->Handler->stop();
   this->Internals->ConnectionManager->stop();
-  vtkVRConnectionManager::setInstance(NULL);
-  vtkVRQueueHandler::setInstance(NULL);
+  pqVRConnectionManager::setInstance(NULL);
+  pqVRQueueHandler::setInstance(NULL);
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
-  delete this->Internals->EventQueue;
+  this->Internals->EventQueue->Delete();
   this->IsShutdown = true;
   // qWarning() << "Message from pqVRStarter: Application Shutting down";
 }

@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRTrackStyle_h_
 
 #include "vtkVRInteractorStyle.h"
-#include "vtkWeakPointer.h"
 
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
@@ -45,35 +44,38 @@ struct vtkVREventData;
 
 class vtkVRTrackStyle : public vtkVRInteractorStyle
 {
-  Q_OBJECT
-  typedef vtkVRInteractorStyle Superclass;
 public:
-  vtkVRTrackStyle(QObject* parent);
-  ~vtkVRTrackStyle();
+  static vtkVRTrackStyle *New();
+  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle)
+  void PrintSelf(ostream &os, vtkIndent indent);
 
+  // Description:
   // Specify the proxy and property to control. The property needs to have 16
   // elements and must be a numerical property.
-  void setControlledProxy(vtkSMProxy* proxy);
-  vtkSMProxy* controlledProxy() const;
+  virtual void SetControlledProxy(vtkSMProxy *);
+  vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
 
-  void setControlledPropertyName(const QString& pname)
-    { this->ControlledPropertyName = pname; }
-  const QString& controlledPropertyName() const
-    { return this->ControlledPropertyName; }
+  vtkSetStringMacro(ControlledPropertyName)
+  vtkGetStringMacro(ControlledPropertyName)
 
-  void setTrackerName(const QString &tracker) { this->TrackerName = tracker; }
-  QString trackerName() const { return this->TrackerName; }
+  vtkSetStringMacro(TrackerName)
+  vtkGetStringMacro(TrackerName)
 
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* SaveConfiguration() const;
 
 protected:
-  virtual void handleTracker( const vtkVREventData& data );
+  vtkVRTrackStyle();
+  ~vtkVRTrackStyle();
+  virtual void HandleTracker( const vtkVREventData& data );
 
-protected:
-  QString TrackerName;
-  QString ControlledPropertyName;
-  vtkWeakPointer<vtkSMProxy> ControlledProxy;
+  char *TrackerName;
+  char *ControlledPropertyName;
+  vtkSMProxy *ControlledProxy;
+
+private:
+  vtkVRTrackStyle(const vtkVRTrackStyle&); // Not implemented.
+  void operator=(const vtkVRTrackStyle&); // Not implemented.
 };
 
 #endif //__vtkVRTrackStyle.h_
