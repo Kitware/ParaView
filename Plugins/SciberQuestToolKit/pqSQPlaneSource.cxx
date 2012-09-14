@@ -326,6 +326,14 @@ pqSQPlaneSource::pqSQPlaneSource(
       SIGNAL(currentIndexChanged(int)),
       pProxy,
       pProxy->GetProperty("Constraint"));
+
+  this->Links->addPropertyLink(
+      this->Form->decompType,
+      "currentIndex",
+      SIGNAL(currentIndexChanged(int)),
+      pProxy,
+      pProxy->GetProperty("DecompType"));
+
 }
 
 //-----------------------------------------------------------------------------
@@ -829,6 +837,26 @@ int pqSQPlaneSource::CalculateNormal(double *n)
 }
 
 //-----------------------------------------------------------------------------
+int pqSQPlaneSource::GetDecompType()
+{
+  #if defined pqSQPlaneSourceDEBUG
+  cerr << ":::::pqSQPlaneSource::GetDecompType" << endl;
+  #endif
+
+  return this->Form->constraint->currentIndex();
+}
+
+//-----------------------------------------------------------------------------
+void pqSQPlaneSource::SetDecompType(int type)
+{
+  #if defined pqSQPlaneSourceDEBUG
+  cerr << ":::::pqSQPlaneSource::SetDecompType" << endl;
+  #endif
+
+  this->Form->constraint->setCurrentIndex(type);
+}
+
+//-----------------------------------------------------------------------------
 int pqSQPlaneSource::GetConstraint()
 {
   #if defined pqSQPlaneSourceDEBUG
@@ -1173,6 +1201,12 @@ void pqSQPlaneSource::PullServerConfig()
   pProxy->UpdatePropertyInformation(constraintProp);
   this->SetConstraint(constraintProp->GetElement(0));
 
+  // DecompTypes
+  vtkSMIntVectorProperty *decompProp
+    = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("DecompType"));
+  pProxy->UpdatePropertyInformation(decompProp);
+  this->SetDecompType(decompProp->GetElement(0));
+
   // update derived/computed values.
   this->DimensionsModified();
 }
@@ -1232,6 +1266,12 @@ void pqSQPlaneSource::PushServerConfig()
     = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("Constraint"));
   pProxy->UpdatePropertyInformation(constraintProp);
   constraintProp->SetElement(0,this->GetConstraint());
+
+  // DecompType
+  vtkSMIntVectorProperty *decompProp
+    = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("DecompType"));
+  pProxy->UpdatePropertyInformation(decompProp);
+  decompProp->SetElement(0,this->GetDecompType());
 
   // Let proxy send updated values.
   pProxy->UpdateVTKObjects();

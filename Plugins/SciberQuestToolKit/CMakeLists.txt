@@ -144,7 +144,9 @@ set(CXX_SOURCES
   CartesianDataBlockIODescriptor.cxx
   CartesianDataBlockIODescriptorIterator.cxx
   CartesianExtent.cxx
+  CartesianExtentIterator.cxx
   CellCopier.cxx
+  CellIdIterator.cxx
   CPUConvolutionDriver.cxx
   IdBlock.cxx
   FieldDisplacementMapData.cxx

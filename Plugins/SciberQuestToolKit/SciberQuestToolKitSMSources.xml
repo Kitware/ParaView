@@ -273,6 +273,18 @@ Copyright 2012 SciberQuest Inc.
       </IntVectorProperty>
 
       <IntVectorProperty
+         name="DecompType"
+         command="SetDecompType"
+         number_of_elements="1"
+         default_values="0"
+         panel_visibility="default">
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          This property specifies the number of divisions along the Y axis of the parallelogram.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
          name="ImmediateMode"
          command="SetImmediateMode"
          number_of_elements="1"

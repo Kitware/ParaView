@@ -215,7 +215,7 @@ int main(int argc, char **argv)
     testHelper->AddArgument("-V");
     testHelper->AddArgument(base.c_str());
     testHelper->SetRenderWindow(rwin);
-    int result=testHelper->RegressionTest(5.0);
+    int result=testHelper->RegressionTest(40.0);
     testStatus=result==vtkTesting::PASSED?0:1;
     testHelper->Delete();
 

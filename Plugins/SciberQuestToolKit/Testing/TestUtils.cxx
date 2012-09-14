@@ -43,6 +43,25 @@ using std::string;
 #include <vector>
 using std::vector;
 
+// when not set process id arrays are rendered
+// and written to the temp dir.
+#define SKIP_PROCESS_ID 1
+
+// TODO -- there must be a better way...
+// explicitly register vtk object factries
+#define vtkRenderingOpenGL_AUTOINIT 1(vtkRenderingOpenGL)
+#include "vtkRenderingOpenGLModule.h"
+#define vtkRenderingFreeTypeOpenGL_AUTOINIT 1(vtkRenderingFreeTypeOpenGL)
+#include "vtkRenderingFreeTypeOpenGLModule.h"
+#define vtkRenderingVolumeOpenGL_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+#include "vtkRenderingVolumeOpenGLModule.h"
+#define vtkInteractionStyle_AUTOINIT 1(vtkInteractionStyle)
+#include "vtkInteractionStyleModule.h"
+#define vtkIOParallelExodus_AUTOINIT 1(vtkIOParallelExodus)
+#include "vtkIOParallelExodusModule.h"
+#define vtkIOMPIImage_AUTOINIT 1(vtkIOMPIImage)
+#include "vtkIOMPIImageModule.h"
+
 //*****************************************************************************
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
@@ -450,7 +469,8 @@ int SerialRender(
     double vux,
     double vuy,
     double vuz,
-    double cz)
+    double cz,
+    double threshold)
 {
   int renderRank=0;
   int aTestFailed=0;
@@ -492,7 +512,7 @@ int SerialRender(
 
         if (arrayName == "ProcessId")
           {
-          if (worldSize<2)
+          if ((worldSize<2) || SKIP_PROCESS_ID)
             {
             continue;
             }
@@ -580,7 +600,7 @@ int SerialRender(
         testHelper->AddArgument("-V");
         testHelper->AddArgument(base.c_str());
         testHelper->SetRenderWindow(rwin);
-        int result=testHelper->RegressionTest(10);
+        int result=testHelper->RegressionTest(threshold);
         if (result!=vtkTesting::PASSED)
           {
           aTestFailed=1;
@@ -597,6 +617,10 @@ int SerialRender(
       outline->Delete();
       }
     }
+
+  // sync up here, if not when this function
+  // is called in a loop, the gather's may cross
+  controller->Barrier();
 
   return aTestFailed?vtkTesting::FAILED:vtkTesting::PASSED;
 }

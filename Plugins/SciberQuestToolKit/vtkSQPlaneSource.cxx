@@ -31,6 +31,10 @@
 #include "vtkSQPlaneSourceConstants.h"
 #include "vtkSQPlaneSourceCellGenerator.h"
 #include "Tuple.hxx"
+#include "CartesianExtent.h"
+#include "CellIdIterator.h"
+#include "CartesianExtentIterator.h"
+#include "Numerics.hxx"
 #include "XMLUtils.h"
 #include "SQMacros.h"
 #include "postream.h"
@@ -38,8 +42,112 @@
 #include <map>
 using std::map;
 using std::pair;
+#include <vector>
+using std::vector;
+#include <list>
+using std::list;
 
 // #define SQTK_DEBUG
+
+// ****************************************************************************
+static
+CellIdIterator *DecomposeStrips(
+      int nPieces,
+      int pieceNo,
+      int xResolution,
+      int yResolution,
+      int immediateMode)
+{
+  // The default domain decomposition of one cell per process
+  // is used in demand mode. If immediate mode is on then these
+  // will be reset.
+  int nLocal=1;
+  int startId=pieceNo;
+  int endId=pieceNo+1;
+  int resolution[2]={1,nPieces};
+
+  if (immediateMode)
+    {
+    // Immediate mode domain decomposition
+    int nCells=xResolution*yResolution;
+    int pieceSize=nCells/nPieces;
+    int nLarge=nCells%nPieces;
+    nLocal=pieceSize+(pieceNo<nLarge?1:0);
+    startId=pieceSize*pieceNo+(pieceNo<nLarge?pieceNo:nLarge);
+    endId=startId+nLocal-1;
+
+    resolution[0]=xResolution;
+    resolution[1]=yResolution;
+    }
+
+  return new CellIdIterator(startId,endId);
+}
+
+// ****************************************************************************
+static
+CartesianExtentIterator *DecomposePatches(
+      int nPieces,
+      int pieceNo,
+      int xResolution,
+      int yResolution)
+{
+  CartesianExtent domain(0,xResolution-1,0,yResolution-1,0,0);
+
+  int nPasses[2]={0,0};
+  int maxPasses[2]={xResolution/2,yResolution/2};
+
+  vector<CartesianExtent> blocks;
+  blocks.push_back(domain);
+
+  vector<CartesianExtent> splitBlocks;
+
+  int dir=0;
+  while(1)
+    {
+     // stop when we have enough blocks or all blocks have unit size
+    int nBlocks=blocks.size();
+    if (nBlocks>=nPieces) break;
+    if ((nPasses[0]>maxPasses[0]) && (nPasses[1]>maxPasses[1])) break;
+
+    for (int i=0; i<nBlocks; ++i)
+      {
+      int nBlocksTotal=blocks.size()+splitBlocks.size();
+      if (nBlocksTotal>=nPieces) break;
+
+      // split this block into two
+      CartesianExtent block=blocks.back();
+      blocks.pop_back();
+
+      CartesianExtent newBlock=block.Split(dir);
+
+      splitBlocks.push_back(block);
+
+      if (!newBlock.Empty())
+        {
+        splitBlocks.push_back(newBlock);
+        }
+      }
+
+    // transfer the split blocks to the head so that
+    // they are split agaion only after others.
+    blocks.insert(blocks.begin(),splitBlocks.begin(),splitBlocks.end());
+    splitBlocks.clear();
+
+    nPasses[dir]+=1;
+
+    // alternate splitting direction
+    dir=(dir+1)%2;
+    if (nPasses[dir]>maxPasses[dir]) dir=(dir+1)%2;
+    }
+
+  CartesianExtentIterator *it=new CartesianExtentIterator;
+  if (pieceNo<(int)blocks.size())
+    {
+    it->SetDomain(domain);
+    it->SetExtent(blocks[pieceNo]);
+    }
+  return it;
+}
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQPlaneSource);
@@ -54,6 +162,8 @@ vtkSQPlaneSource::vtkSQPlaneSource()
   this->ImmediateMode=1;
 
   this->XResolution=this->YResolution=1;
+
+  this->DecompType=DECOMP_TYPE_PATCHES;
 
   this->Origin[0]=this->Origin[1]=this->Origin[2]
     =this->Point1[0]=this->Point1[1]=this->Point1[2]
@@ -159,14 +269,12 @@ int vtkSQPlaneSource::RequestInformation(
   pCerr() << "=====vtkSQPlaneSource::RequestInformation" << endl;
   #endif
 
-
   // tell the excutive that we are handling our own decomposition.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
   outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
 
   return 1;
 }
-
 //-----------------------------------------------------------------------------
 int vtkSQPlaneSource::RequestData(
       vtkInformation *req,
@@ -200,15 +308,16 @@ int vtkSQPlaneSource::RequestData(
   if (pieceNo>=nPieces)
     {
     output->Initialize();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQPlaneSource::RequestData");
+      }
     return 1;
     }
 
   // The default domain decomposition of one cell per process
   // is used in demand mode. If immediate mode is on then these
   // will be reset.
-  int nLocal=1;
-  int startId=pieceNo;
-  int endId=pieceNo+1;
   int resolution[2]={1,nPieces};
 
   if (!this->ImmediateMode)
@@ -232,20 +341,49 @@ int vtkSQPlaneSource::RequestData(
     }
   else
     {
+    // remove the cell generator it may be present from
+    // a previous execution in deffered mode.
     if (outInfo->Has(vtkSQCellGenerator::CELL_GENERATOR()))
       {
       outInfo->Remove(vtkSQCellGenerator::CELL_GENERATOR());
       }
-    // Immediate mode domain decomposition
-    int nCells=this->XResolution*this->YResolution;
-    int pieceSize=nCells/nPieces;
-    int nLarge=nCells%nPieces;
-    nLocal=pieceSize+(pieceNo<nLarge?1:0);
-    startId=pieceSize*pieceNo+(pieceNo<nLarge?pieceNo:nLarge);
-    endId=startId+nLocal;
-
     resolution[0]=this->XResolution;
     resolution[1]=this->YResolution;
+    }
+
+  // create a parallel iterator that we'll use to
+  // select the cells owned by this rank.
+  CellIdIterator *it;
+  if (!this->ImmediateMode || (this->DecompType==DECOMP_TYPE_STRIPS))
+    {
+    it=DecomposeStrips(
+        nPieces,
+        pieceNo,
+        this->XResolution,
+        this->YResolution,
+        this->ImmediateMode);
+    }
+  else
+  if (this->DecompType==DECOMP_TYPE_PATCHES)
+    {
+    it=DecomposePatches(
+        nPieces,
+        pieceNo,
+        this->XResolution,
+        this->YResolution);
+    }
+
+  // nothing to do
+  int nLocal=it->Size();
+  if (nLocal<1)
+    {
+    delete it;
+    output->Initialize();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQPlaneSource::RequestData");
+      }
+    return 1;
     }
 
   // Configure the output
@@ -273,7 +411,7 @@ int vtkSQPlaneSource::RequestData(
   output->SetPolys(polys);
   polys->Delete();
 
-  // cell generator
+  // use this cell generator to create the output geometry
   vtkSQPlaneSourceCellGenerator *source=vtkSQPlaneSourceCellGenerator::New();
   source->SetOrigin(this->Origin);
   source->SetPoint1(this->Point1);
@@ -284,8 +422,10 @@ int vtkSQPlaneSource::RequestData(
   map<vtkIdType,vtkIdType> idMap;
   pair<map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert;
 
-  for (int cid=startId; cid<endId; ++cid)
+  for (;it->Good(); it->Increment())
     {
+    int cid=it->Index();
+
     // get the grid indexes which are used as keys to
     // insure a single insertion of each coordinate.
     vtkIdType cpids[4];
@@ -318,6 +458,8 @@ int vtkSQPlaneSource::RequestData(
       ++pIa;
       }
     }
+  source->Delete();
+  delete it;
 
   // update point array
   X->SetNumberOfTuples(ptId);
@@ -328,10 +470,7 @@ int vtkSQPlaneSource::RequestData(
     outInfo->Set(vtkSQMetaDataKeys::DESCRIPTIVE_NAME(),this->DescriptiveName);
     }
 
-  source->Delete();
-
   //output->Print(pCerr());
-
 
 
   // double x[3], tc[2], v1[3], v2[3];

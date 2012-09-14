@@ -64,6 +64,43 @@ int CartesianExtent::GetDimensionMode(
 }
 
 //-----------------------------------------------------------------------------
+int CartesianExtent::GetDimensionMode(const CartesianExtent &problemDomain)
+{
+  // Identify lower dimensional input and handle special cases.
+  // Everything but 3D is a special case.
+  const int minExt = 1;
+  int inExt[3];
+  problemDomain.Size(inExt);
+
+  // 0D and 1D
+  // ambiguous: can we treat the trivial case as 3D?
+  // TODO: handle the trivial cases.
+  if (((inExt[0]<=minExt) && (inExt[1]<=minExt))
+    ||((inExt[0]<=minExt) && (inExt[2]<=minExt))
+    ||((inExt[1]<=minExt) && (inExt[2]<=minExt)))
+    {
+    return DIM_MODE_3D;
+    }
+  //  Identify 2D cases
+  if (inExt[0]<=minExt)
+    {
+    return DIM_MODE_2D_YZ;
+    }
+  else
+  if (inExt[1]<=minExt)
+    {
+    return DIM_MODE_2D_XZ;
+    }
+  else
+  if (inExt[2]<=minExt)
+    {
+    return DIM_MODE_2D_XY;
+    }
+  // It's 3D
+  return DIM_MODE_3D;
+}
+
+//-----------------------------------------------------------------------------
 CartesianExtent CartesianExtent::Grow(
       const CartesianExtent &inputExt,
       const CartesianExtent &problemDomain,

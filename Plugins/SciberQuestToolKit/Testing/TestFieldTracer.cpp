@@ -114,7 +114,8 @@ int main(int argc, char **argv)
         13,13,13,
         0,0,0,
         0,0,1,
-        1.1);
+        1.1,
+        30.0);
 
   tf->Delete();
 

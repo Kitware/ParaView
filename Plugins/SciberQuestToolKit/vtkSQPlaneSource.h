@@ -103,6 +103,17 @@ public:
   void GetResolution(int& xR,int& yR) {
     xR=this->XResolution; yR=this->YResolution; }
 
+  //BTX
+  enum {
+    DECOMP_TYPE_PATCHES=0,
+    DECOMP_TYPE_STRIPS=1
+    };
+  //ETX
+  // Description:
+  // Specify the somain decomposition.
+  vtkSetMacro(DecompType,int);
+  vtkGetMacro(DecompType,int);
+
   // Description:
   // Specify a point defining the origin of the plane.
   void SetOrigin(double x, double y, double z);
@@ -181,6 +192,7 @@ private:
   int ImmediateMode;
   int XResolution;
   int YResolution;
+  int DecompType;
   double Origin[3];
   double Point1[3];
   double Point2[3];

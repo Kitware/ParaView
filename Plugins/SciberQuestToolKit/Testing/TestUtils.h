@@ -75,7 +75,8 @@ int SerialRender(
     double vux,
     double vuy,
     double vuz,
-    double cz);
+    double cz,
+    double threshold=10.0);
 
 /**
 Get the pipeline executive for parallel execution.

@@ -16,6 +16,37 @@ using std::endl;
 //-----------------------------------------------------------------------------
 FlatIndex::FlatIndex(int ni, int nj, int nk, int mode)
 {
+  this->Initialize(ni,nj,nk,mode);
+}
+
+//-----------------------------------------------------------------------------
+FlatIndex::FlatIndex(const CartesianExtent &ext, int nghost)
+{
+  this->Initialize(ext,nghost);
+}
+
+//-----------------------------------------------------------------------------
+void FlatIndex::Initialize(const CartesianExtent &ext, int nghost)
+{
+  int nx[3];
+  ext.Size(nx);
+
+  int mode=0;
+  if (nghost)
+    {
+    mode=CartesianExtent::GetDimensionMode(ext,nghost);
+    }
+  else
+    {
+    mode=CartesianExtent::GetDimensionMode(ext);
+    }
+
+  this->Initialize(nx[0],nx[1],nx[2],mode);
+}
+
+//-----------------------------------------------------------------------------
+void FlatIndex::Initialize(int ni, int nj, int nk, int mode)
+{
   (void)nk;
   switch(mode)
     {

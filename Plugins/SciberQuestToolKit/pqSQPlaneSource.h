@@ -51,6 +51,9 @@ public:
   int GetConstraint();
   void SetConstraint(int type);
 
+  int GetDecompType();
+  void SetDecompType(int type);
+
   void contextMenuEvent(QContextMenuEvent *event);
 
 protected slots:
