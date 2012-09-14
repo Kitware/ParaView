@@ -65,11 +65,6 @@ public:
   vtkGetStringMacro(ColorArrayName);
 
   // Description:
-  //Select the type of rendering approach to use.
-  vtkSetMacro(RequestedRenderMode, int);
-  vtkGetMacro(RequestedRenderMode, int);
-
-  // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
   // typically called by the vtkView to request meta-data from the
   // representations or ask them to perform certain tasks e.g.
@@ -109,6 +104,10 @@ public:
   void SetSpecularPower(double);
   void SetShade(bool);
   void SetIndependantComponents(bool);
+  
+  //***************************************************************************
+  // Forwarded to vtkSmartVolumeMapper.
+  void SetRequestedRenderMode(int);
 
 //BTX
 protected:
@@ -158,7 +157,6 @@ protected:
 
   int ColorAttributeType;
   char* ColorArrayName;
-  int RequestedRenderMode;
   double DataBounds[6];
 
 private:

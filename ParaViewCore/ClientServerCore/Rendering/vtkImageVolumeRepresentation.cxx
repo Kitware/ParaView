@@ -39,7 +39,6 @@ vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 {
-  this->RequestedRenderMode = 0; // Use Smart Mode
   this->VolumeMapper = vtkSmartVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
 
@@ -209,7 +208,6 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkImageVolumeRepresentation::UpdateMapperParameters()
 {
   this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
-  this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
   switch (this->ColorAttributeType)
     {
   case CELL_DATA:
@@ -329,4 +327,10 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
 {
   this->Property->SetIndependentComponents(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
+{
+  this->VolumeMapper->SetRequestedRenderMode(mode);
 }
