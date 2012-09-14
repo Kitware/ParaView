@@ -42,8 +42,6 @@
 #include <map>
 using std::map;
 using std::pair;
-#include <vector>
-using std::vector;
 #include <list>
 using std::list;
 
@@ -64,7 +62,6 @@ CellIdIterator *DecomposeStrips(
   int nLocal=1;
   int startId=pieceNo;
   int endId=pieceNo+1;
-  int resolution[2]={1,nPieces};
 
   if (immediateMode)
     {
@@ -75,9 +72,6 @@ CellIdIterator *DecomposeStrips(
     nLocal=pieceSize+(pieceNo<nLarge?1:0);
     startId=pieceSize*pieceNo+(pieceNo<nLarge?pieceNo:nLarge);
     endId=startId+nLocal-1;
-
-    resolution[0]=xResolution;
-    resolution[1]=yResolution;
     }
 
   return new CellIdIterator(startId,endId);
@@ -96,10 +90,10 @@ CartesianExtentIterator *DecomposePatches(
   int nPasses[2]={0,0};
   int maxPasses[2]={xResolution/2,yResolution/2};
 
-  vector<CartesianExtent> blocks;
+  list<CartesianExtent> blocks;
   blocks.push_back(domain);
 
-  vector<CartesianExtent> splitBlocks;
+  list<CartesianExtent> splitBlocks;
 
   int dir=0;
   while(1)
@@ -143,8 +137,10 @@ CartesianExtentIterator *DecomposePatches(
   CartesianExtentIterator *it=new CartesianExtentIterator;
   if (pieceNo<(int)blocks.size())
     {
+    list<CartesianExtent>::iterator bit=blocks.begin();
+    for (int i=0; i<pieceNo; ++i,++bit);
     it->SetDomain(domain);
-    it->SetExtent(blocks[pieceNo]);
+    it->SetExtent(*bit);
     }
   return it;
 }
@@ -220,6 +216,10 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,2>(elem,"resolution",resolution);
   this->SetResolution(resolution);
 
+  int decomp_type=DECOMP_TYPE_PATCHES;
+  GetOptionalAttribute<int,1>(elem,"decomp_type",&decomp_type);
+  this->SetDecompType(decomp_type);
+
   int immediate_mode=1;
   GetOptionalAttribute<int,1>(elem,"immediate_mode",&immediate_mode);
   this->SetImmediateMode(immediate_mode);
@@ -234,6 +234,7 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
       << "#   point1=" << Tuple<double>(this->Point1,3) << "\n"
       << "#   point2=" << Tuple<double>(this->Point2,3) << "\n"
       << "#   resolution=" << this->XResolution << ", " << this->YResolution << "\n"
+      << "#   decomp=" << this->DecompType << "\n"
       << "#   immediate_mode=" << this->ImmediateMode << "\n";
     }
 

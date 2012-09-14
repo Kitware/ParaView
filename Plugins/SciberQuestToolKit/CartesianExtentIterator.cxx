@@ -46,7 +46,9 @@ CartesianExtentIterator::CartesianExtentIterator(
 
 //-----------------------------------------------------------------------------
 CartesianExtentIterator::CartesianExtentIterator(
-      const CartesianExtentIterator &other)
+  const CartesianExtentIterator &other)
+      :
+  CellIdIterator(other)
 {
   *this=other;
 }
