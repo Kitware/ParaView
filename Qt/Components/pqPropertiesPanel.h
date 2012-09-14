@@ -168,7 +168,7 @@ private:
   Ui::pqPropertiesPanel *Ui;
   QPointer<pqView> View;
   QPointer<pqProxy> Proxy;
-  pqOutputPort *OutputPort;
+  QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   vtkNew<vtkEventQtSlotConnect> RepresentationTypeSignal;
   QList<pqPropertiesPanelItem> ProxyPropertyItems;

@@ -14,26 +14,39 @@
 =========================================================================*/
 // .NAME vtkOutlineRepresentation - representation for outline.
 // .SECTION Description
-// vtkOutlineRepresentation is merely a vtkGeometryRepresentation that forces
-// the geometry filter to produce outlines. It also
+// vtkOutlineRepresentation is merely a vtkGeometryRepresentationWithFaces that forces
+// the geometry filter to produce outlines.
 
 #ifndef __vtkOutlineRepresentation_h
 #define __vtkOutlineRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
-#include "vtkGeometryRepresentation.h"
+#include "vtkGeometryRepresentationWithFaces.h"
 
-class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation : public vtkGeometryRepresentation
+class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkOutlineRepresentation :
+  public vtkGeometryRepresentationWithFaces
 {
 public:
   static vtkOutlineRepresentation* New();
-  vtkTypeMacro(vtkOutlineRepresentation, vtkGeometryRepresentation);
+  vtkTypeMacro(vtkOutlineRepresentation, vtkGeometryRepresentationWithFaces);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  virtual void SetRepresentation(const char*)
+    { this->Superclass::SetRepresentation("Wireframe"); }
+  virtual void SetUseOutline(int)
+    { this->Superclass::SetUseOutline(1); }
+  virtual void SetSuppressLOD(bool)
+    { this->Superclass::SetSuppressLOD(true); }
+  virtual void SetPickable(int)
+    { this->Superclass::SetPickable(0); }
 
 //BTX
 protected:
   vtkOutlineRepresentation();
   ~vtkOutlineRepresentation();
+
+  virtual void SetRepresentation(int)
+    { this->Superclass::SetRepresentation(WIREFRAME); }
 
 private:
   vtkOutlineRepresentation(const vtkOutlineRepresentation&); // Not implemented
