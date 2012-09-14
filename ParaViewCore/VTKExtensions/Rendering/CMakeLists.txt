@@ -75,6 +75,7 @@ set(Module_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVUpdateSuppressor.cxx
   vtkReductionFilter.cxx
+  vtkResampledAMRImageSource.cxx
   vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
   vtkSortedTableStreamer.cxx

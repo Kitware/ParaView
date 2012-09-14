@@ -61,7 +61,7 @@ vtkPVOptions::vtkPVOptions()
 
   this->TellVersion = 0;
 
-  this->AMRStreaming = 0;
+  this->EnableStreaming = 0;
 
   this->UseCudaInterop = 0;
 
@@ -298,11 +298,10 @@ void vtkPVOptions::Initialize()
     "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
 
-  this->AddBooleanArgument("--amr-streaming", "-amr",
-    &this->AMRStreaming,
-    "EXPERIMENTAL: When specified, AMR streaming for volume rendering is "
-    "enabled",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+  this->AddBooleanArgument("--enable-streaming", 0, &this->EnableStreaming,
+    "EXPERIMENTAL: When specified, view-based streaming is enabled for certain "
+    "views and representation types.",
+    vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--use-cuda-interop", "-cudaiop",
     &this->UseCudaInterop,
@@ -378,16 +377,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     return 0;
     }
 #endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
-
-  if (this->AMRStreaming)
-    {
-    vtkErrorMacro("FIXME");
-//  vtkPVView::SetEnableStreaming(true);
-    }
-  else
-    {
-//  vtkPVView::SetEnableStreaming(false);
-    }
 
   return 1;
 }
@@ -538,7 +527,8 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
   os << indent << "ServerURL: "
      << (this->ServerURL? this->ServerURL : "(none)") << endl;
-  os << indent << "AMRStreaming:" << this->AMRStreaming << endl;
+  os << indent << "EnableStreaming:" <<
+    (this->EnableStreaming? "yes" : "no") << endl;
 
   os << indent << "UseCudaInterop" << this->UseCudaInterop << std::endl;
 }

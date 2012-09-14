@@ -33,6 +33,7 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
@@ -90,6 +91,9 @@ public:
     // Data object after re-distributing when using ordered compositing, for
     // example.
     vtkSmartPointer<vtkDataObject> RedistributedDataObject;
+
+    // Data object for a streamed piece.
+    vtkSmartPointer<vtkDataObject> StreamedPiece;
 
     unsigned long TimeStamp;
     unsigned long ActualMemorySize;
@@ -165,6 +169,15 @@ public:
         return this->ActualMemorySize;
         }
       return 0;
+      }
+
+    void SetNextStreamedPiece(vtkDataObject* data)
+      {
+      this->StreamedPiece = data;
+      }
+    vtkDataObject* GetStreamedPiece()
+      {
+      return this->StreamedPiece;
       }
     };
 
@@ -436,13 +449,6 @@ void vtkPVDataDeliveryManager::MarkAsRedistributable(
 void vtkPVDataDeliveryManager::SetStreamable(
   vtkPVDataRepresentation* repr, bool val)
 {
-  if (!repr->IsA("vtkAMRVolumeRepresentation") && val == true)
-    {
-    vtkWarningMacro(
-      "Only vtkAMRVolumeRepresentation streaming is currently supported.");
-    return;
-    }
-
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
   vtkInternals::vtkItem* low_item = this->Internals->GetItem(repr, true);
   if (item)
@@ -734,195 +740,83 @@ vtkPKdTree* vtkPVDataDeliveryManager::GetKdTree()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVDataDeliveryManager::BuildPriorityQueue(double planes[24])
+void vtkPVDataDeliveryManager::SetNextStreamedPiece(
+  vtkPVDataRepresentation* repr, vtkDataObject* data)
 {
-  cout << "BuildPriorityQueue" << endl;
-  // just find the first visible AMR dataset and build priority queue for that
-  // dataset alone. In future, we can fix it to use information provided by
-  // representation indicating if streaming is possible (since not every AMR
-  // source is streambale).
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, /*low_res=*/false);
+  if (item == NULL)
+    {
+    vtkErrorMacro("Invalid argument.");
+    return;
+    }
+  
+  // For now, I am going to keep things simple. Piece is delivered to the
+  // representation separately. That's it.
+  item->SetNextStreamedPiece(data);
+}
 
+//----------------------------------------------------------------------------
+vtkDataObject* vtkPVDataDeliveryManager::GetCurrentStreamedPiece(
+  vtkPVDataRepresentation* repr)
+{
+  vtkInternals::vtkItem* item = this->Internals->GetItem(repr, /*low_res=*/false);
+  if (item == NULL)
+    {
+    vtkErrorMacro("Invalid argument.");
+    return NULL;
+    }
+  return item->GetStreamedPiece();
+}
 
-  this->Internals->PriorityQueue = vtkInternals::PriorityQueueType();
-
-  vtkOverlappingAMR* oamr = NULL;
-
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::ClearStreamedPieces()
+{
+  // I am not too sure if I want to do this. Right now I am thinking once a
+  // piece is delivered, the delivery manager should no longer bother about it.
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin();
     iter != this->Internals->ItemsMap.end(); ++iter)
     {
     vtkInternals::vtkItem& item = iter->second.first;
-    if (item.Representation &&
-      item.Representation->GetVisibility() &&
-      item.Streamable &&
-      item.GetDataObject() &&
-      item.GetDataObject()->IsA("vtkOverlappingAMR"))
-      {
-      oamr = vtkOverlappingAMR::SafeDownCast(item.GetDataObject());
-      break;
-      }
-    }
-  if (oamr == NULL)
-    {
-    return true;
-    }
-
-  // note: amr block ids currently don't match up with composite dataset ids :/.
-  // now build a priority queue for absent blocks using the current camera.
-
-  //double planes[24];
-  //vtkRenderer* ren = this->RenderView->GetRenderer();
-  //ren->GetActiveCamera()->GetFrustumPlanes(
-  //  ren->GetTiledAspectRatio(), planes);
-
-  for (unsigned int level=0; level < oamr->GetNumberOfLevels(); level++)
-    {
-    for (unsigned int index=0;
-      index < oamr->GetNumberOfDataSets(level); index++)
-      {
-      if (oamr->GetDataSet(level, index) == NULL)
-        {
-        vtkAMRBox amrBox = oamr->GetAMRBox(level,index);
-        if (amrBox.IsInvalid())
-          {
-          vtkWarningMacro("Missing AMRBox meta-data for "
-            << level << ", " << index);
-          continue;
-          }
-
-        vtkInternals::vtkPriorityQueueItem item;
-        item.RepresentationId = iter->first;
-        item.BlockId = oamr->GetCompositeIndex(level, index);
-        item.Level = level;
-        item.Index = index;
-
-        double bounds[6];
-        oamr->GetBounds(level,index,bounds);
-        double depth = 1.0;
-        double coverage = vtkComputeScreenCoverage(planes, bounds, depth);
-        //cout << level <<"," << index << "(" << item.BlockId << ")" << " = " << coverage << ", " << depth << endl;
-        if (coverage == 0.0)
-          {
-          // skip blocks that are not covered in the view.
-          continue;
-          }
-
-        item.Priority = coverage / (depth > 1? depth : 1.0);
-        this->Internals->PriorityQueue.push(item);
-        }
-      }
-    }
-  return true;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataDeliveryManager::StreamingDeliver(unsigned int key)
-{
-  vtkInternals::vtkItem* item = this->Internals->GetItem(key, false);
-  if (vtkOverlappingAMR::SafeDownCast(item->GetDataObject()) == NULL)
-    {
-    cout << "ERROR: StreamingDeliver can only deliver AMR datasets for now" << endl;
-    abort();
-    }
-
-  if (this->Internals->PriorityQueue.empty())
-    {
-    vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(
-      item->GetDeliveredDataObject());
-
-    // client side.
-    vtkNew<vtkMPIMoveData> dataMover;
-    dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-    dataMover->SetMoveModeToCollect();
-    dataMover->SetInputConnection(NULL);
-    dataMover->Update();
-
-    // now put the piece in right place.
-    vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(
-      dataMover->GetOutputDataObject(0));
-
-    if (mb->GetNumberOfBlocks() == 1 && mb->GetBlock(0) != NULL)
-      {
-      vtkNew<vtkUniformGrid> ug;
-      ug->ShallowCopy(mb->GetBlock(0));
-
-      vtkUnsignedIntArray* array = vtkUnsignedIntArray::SafeDownCast(
-        ug->GetPointData()->GetArray("AMRIndex"));
-      unsigned int index, level;
-      level = array->GetValue(0);
-      index = array->GetValue(1);
-      ug->GetPointData()->RemoveArray("AMRIndex");
-      oamr->SetDataSet(level, index, ug.GetPointer());
-      oamr->Modified();
-      }
-    else
-      {
-      // vtkWarningMacro("Empty data (or incorrect data) received");
-      }
-    }
-  else
-    {
-    vtkInternals::vtkPriorityQueueItem qitem =
-      this->Internals->PriorityQueue.top();
-    this->Internals->PriorityQueue.pop();
-    assert(qitem.RepresentationId == key);
-
-    vtkAMRVolumeRepresentation* repr = vtkAMRVolumeRepresentation::SafeDownCast(
-      item->Representation);
-    repr->SetStreamingBlockId(qitem.BlockId);
-    this->RenderView->StreamingUpdate();
-    repr->ResetStreamingBlockId();
-
-    vtkOverlappingAMR* oamr = vtkOverlappingAMR::SafeDownCast(
-      item->GetDataObject());
-
-    vtkNew<vtkMultiBlockDataSet> mb;
-
-    vtkUniformGrid* piece = oamr->GetDataSet(qitem.Level, qitem.Index);
-    if (piece == NULL)
-      {
-      // vtkWarningMacro("Null piece delivered!");
-      }
-    else
-      {
-      vtkNew<vtkImageData> img;
-      img->ShallowCopy(piece);
-      mb->SetBlock(0, img.GetPointer());
-
-      vtkNew<vtkUnsignedIntArray> indexArray;
-      indexArray->SetName("AMRIndex");
-      indexArray->SetNumberOfComponents(2);
-      indexArray->SetNumberOfTuples(1);
-      indexArray->SetValue(0, qitem.Level);
-      indexArray->SetValue(1, qitem.Index);
-
-      // this should be added in field data, however
-      // vtkStructuredPointsReader/Writer get confused when field data is
-      // present. So adding this as point data for now.
-      img->GetPointData()->AddArray(indexArray.GetPointer());
-      }
-
-    // the one bad thing about this is that we are sending the full amr
-    // meta-data again. We can do better here and not send it again.
-    vtkNew<vtkMPIMoveData> dataMover;
-    dataMover->InitializeForCommunicationForParaView();
-    dataMover->SetOutputDataType(VTK_MULTIBLOCK_DATA_SET);
-    dataMover->SetMoveModeToCollect();
-    dataMover->SetInputData(mb.GetPointer());
-    dataMover->Update();
+    item.SetNextStreamedPiece(NULL);
     }
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVDataDeliveryManager::GetRepresentationIdFromQueue()
+bool vtkPVDataDeliveryManager::DeliverStreamedPieces()
 {
-  if (!this->Internals->PriorityQueue.empty())
-    {
-    return this->Internals->PriorityQueue.top().RepresentationId;
-    }
+  // This method gets called on all processes to deliver any streamed pieces
+  // currently available.
 
-  return 0;
+  // Representations can provide overrides, e.g. though the view says data is
+  // merely "pass-through", some representation says we need to clone the data
+  // everywhere. That makes it critical that this method is called on all
+  // processes at the same time to avoid deadlocks and other complications.
+  //
+  // This method will be implemented in "view-specific" subclasses since how the
+  // data is delivered is very view specific.
+
+  //bool using_remote_rendering =
+  //  this->RenderView->GetUseDistributedRenderingForStillRender();
+  //int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
+
+  // FIXME: This only support built-in operation for now. We will have to add
+  // support for client-server modes. The challenge is how do we deliver data
+  // "gracefully".
+
+  bool something_delivered = false;
+  vtkInternals::ItemsMapType::iterator iter;
+  for (iter = this->Internals->ItemsMap.begin();
+    iter != this->Internals->ItemsMap.end(); ++iter)
+    {
+    vtkInternals::vtkItem& item = iter->second.first;
+    if (item.Representation && item.Streamable && item.GetStreamedPiece())
+      {
+      // FIXME: do data delivery.
+      something_delivered = true;
+      }
+    }
+  return something_delivered;
 }
 
 //----------------------------------------------------------------------------

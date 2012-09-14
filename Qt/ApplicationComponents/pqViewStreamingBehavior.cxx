@@ -31,16 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqViewStreamingBehavior.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkCommand.h"
-#include "pqActiveObjects.h"
-#include "vtkPVView.h"
-#include "pqServer.h"
-#include "vtkSMSession.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVStreamingMacros.h"
+#include "vtkPVView.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMSession.h"
 
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
@@ -54,6 +55,11 @@ pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
   QObject::connect(&this->Timer, SIGNAL(timeout()),
     this, SLOT(onTimeout()));
   this->Timer.setSingleShot(true);
+
+  foreach (pqView* view, smmodel->findItems<pqView*>())
+    {
+    this->onViewAdded(view);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -75,11 +81,14 @@ void pqViewStreamingBehavior::onViewAdded(pqView* view)
 void pqViewStreamingBehavior::onViewUpdated(
   vtkObject* caller, unsigned long, void*)
 {
+  // every time the view "updates", we may have to stream new data and hence we
+  // restart the streaming loop.
   vtkSMRenderViewProxy* rvProxy = vtkSMRenderViewProxy::SafeDownCast(caller);
   if (vtkPVView::GetEnableStreaming())
     {
+    vtkStreamingStatusMacro("View updated. Restarting streaming loop.");
     this->Pass = 0;
-    this->Timer.start(3000);
+    this->Timer.start(1000);
     rvProxy->GetInteractor()->AddObserver(
       vtkCommand::StartInteractionEvent,
       this, &pqViewStreamingBehavior::onStartInteractionEvent);
@@ -93,12 +102,20 @@ void pqViewStreamingBehavior::onViewUpdated(
 void pqViewStreamingBehavior::onStartInteractionEvent()
 {
   this->DelayUpdate = true;
+  if (this->Timer.isActive())
+    {
+    vtkStreamingStatusMacro("Pausing updates while interacting.");
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqViewStreamingBehavior::onEndInteractionEvent()
 {
   this->DelayUpdate = false;
+  if (this->Timer.isActive())
+    {
+    vtkStreamingStatusMacro("Resuming updates since done interacting.");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -117,12 +134,16 @@ void pqViewStreamingBehavior::onTimeout()
       }
     else
       {
-      cout << "Update Pass: " << this->Pass << endl;
+      vtkStreamingStatusMacro("Update Pass: " << this->Pass);
       bool to_continue = rvProxy->StreamingUpdate(true);
       if (to_continue)
         {
         this->Pass++;
-        this->Timer.start(100);
+        this->Timer.start(0);
+        }
+      else
+        {
+        vtkStreamingStatusMacro("Finished. Stopping loop.");
         }
       }
     }

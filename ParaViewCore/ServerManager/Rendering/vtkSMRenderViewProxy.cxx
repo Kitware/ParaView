@@ -235,8 +235,22 @@ bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
 {
   this->GetSession()->PrepareProgress();
 
-  // Tell the delivery manager to fetch next piece in queue, if any. 
-  bool something_delivered = this->DeliveryManager->DeliverNextPiece();
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  double planes[24];
+  vtkRenderer* ren = view->GetRenderer();
+  ren->GetActiveCamera()->GetFrustumPlanes(
+    ren->GetTiledAspectRatio(), planes);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "StreamingUpdate"
+         << vtkClientServerStream::InsertArray(planes, 24)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  // Now fetch any pieces that the server streamed back to the client.
+  bool something_delivered = this->DeliveryManager->DeliverStreamedPieces();
   if (render_if_needed && something_delivered)
     {
     this->StillRender();
