@@ -3,6 +3,7 @@
 # to ensure all ParaView needed modules are turned on when building the complete
 # application.
 
+
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
@@ -15,6 +16,9 @@ set(_vtk_mpi_modules
   vtkIOParallelNetCDF
   # Needed for:
   #  vtkPNetCDFPOPReader
+
+  vtkFiltersParallelFlowPaths
+  #  vtkStreamTracer (Parallel)
   )
 
 set(_vtk_modules
@@ -346,19 +350,7 @@ if (PARAVIEW_USE_VISITBRIDGE)
 endif()
 
 
-if (PARAVIEW_ENABLE_FFMPEG)
-  list (APPEND _vtk_modules vtkIOFFMPEG)
-endif()
-
-macro(enable_required_modules)
-  foreach (module IN LISTS _vtk_modules)
-    set (Module_${module} TRUE
-      CACHE INTERNAL "Enabling module needed for ParaView" FORCE)
-  endforeach()
-endmacro()
-
-macro(hide_enabled_modules)
-  foreach (module IN LISTS _vtk_modules)
-    set_property(CACHE Module_${module} PROPERTY TYPE INTERNAL)
-  endforeach()
-endmacro()
+# Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
+# list of modules to ensure that these are enabled when the corresponding module
+# is enabled.
+set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})

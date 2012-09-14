@@ -3,7 +3,7 @@ if (PARAVIEW_USE_MPI)
   list(APPEND extra_depends vtkIOMPIImage)
 endif()
 
-if (Module_vtkIOFFMPEG)
+if (PARAVIEW_ENABLE_FFMPEG)
   list(APPEND extra_depends vtkIOFFMPEG)
 endif()
 
