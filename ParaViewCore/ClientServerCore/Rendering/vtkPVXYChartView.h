@@ -196,6 +196,12 @@ public:
   // corresponding properties to change these values.
   void SetAxisTitleColor(int index, double red, double green, double blue);
 
+
+  // Description:
+  // Set whether the chart uses custom labels or if the labels/ticks are placed
+  // automatically.
+  void SetAxisUseCustomLabels(int index, bool use_custom_labels);
+
   // Description:
   // Set the number of labels for the supplied axis.
   void SetAxisLabelsNumber(int axis, int number);
@@ -274,13 +280,12 @@ protected:
 
   void SelectionChanged();
 
-  // Command implementation and object pointer - listen to selection updates.
-  class CommandImpl;
-  CommandImpl* Command;
-
 private:
   vtkPVXYChartView(const vtkPVXYChartView&); // Not implemented
   void operator=(const vtkPVXYChartView&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

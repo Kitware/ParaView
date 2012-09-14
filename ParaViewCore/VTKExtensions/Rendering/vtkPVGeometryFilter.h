@@ -122,14 +122,6 @@ public:
   vtkBooleanMacro(GenerateProcessIds, bool);
 
   // Description:
-  // If off, which is the default, extracts the surface of the data fed
-  // into the geometry filter. If on, it produces a bounding box for the
-  // input to the filter that is producing that data instead.
-//   vtkSetMacro(MakeOutlineOfInput,int);
-//   vtkGetMacro(MakeOutlineOfInput,int);
-//   vtkBooleanMacro(MakeOutlineOfInput,int);
-
-  // Description:
   // These keys are put in the output composite-data metadata for multipieces
   // since this filter merges multipieces together.
   static vtkInformationIntegerVectorKey* POINT_OFFSETS();
@@ -142,13 +134,6 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
-  // Description:
-  // A helper method which, given the AMR box of the data in question
-  // and the root AMR box, determines whether or not the block is visible.
-  bool IsAMRDataVisible(vtkOverlappingAMR* amr,
-                        unsigned int level,
-                        unsigned int id,
-                        bool extractface[6] );
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
@@ -285,7 +270,6 @@ protected:
   int ForceUseStrips;
   vtkTimeStamp     StripSettingMTime;
   int StripModFirstPass;
-//   int MakeOutlineOfInput;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented

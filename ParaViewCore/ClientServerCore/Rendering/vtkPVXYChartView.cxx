@@ -15,9 +15,10 @@
 #include "vtkPVXYChartView.h"
 
 #include "vtkAxis.h"
+#include "vtkChartLegend.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkChartXY.h"
-#include "vtkChartLegend.h"
+#include "vtkCommand.h"
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkDoubleArray.h"
@@ -27,41 +28,33 @@
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
+#include "vtkNew.h"
+#include <string>
+#include <vtksys/ios/sstream>
 
-#include "string"
-#include "vtksys/ios/sstream"
-
-#include "vtkCommand.h"
-
-// Command implementation
-class vtkPVXYChartView::CommandImpl : public vtkCommand
+class vtkPVXYChartView::vtkInternals
 {
 public:
-  static CommandImpl* New(vtkPVXYChartView *proxy)
-  {
-    return new CommandImpl(proxy);
-  }
-
-  CommandImpl(vtkPVXYChartView* proxy)
-    : Target(proxy), Initialized(false)
-  { }
-
-  virtual void Execute(vtkObject*, unsigned long, void*)
-  {
-    Target->SelectionChanged();
-  }
-  vtkPVXYChartView* Target;
-  bool Initialized;
+  // Keeps track of custom labels for each of the axis.
+  vtkNew<vtkDoubleArray> CustomLabelPositions[4];
+  bool UseCustomLabels[4];
+  vtkInternals()
+    {
+    this->UseCustomLabels[0] = this->UseCustomLabels[1]
+      = this->UseCustomLabels[2] = this->UseCustomLabels[3] = false;
+    }
 };
+
 
 vtkStandardNewMacro(vtkPVXYChartView);
 
 //----------------------------------------------------------------------------
 vtkPVXYChartView::vtkPVXYChartView()
 {
+  this->Internals = new vtkInternals();
+
   this->Chart = NULL;
   this->InternalTitle = NULL;
-  this->Command = CommandImpl::New(this);
   this->PlotTime = vtkPVPlotTime::New();
 
   // Use the buffer id - performance issues are fixed.
@@ -81,7 +74,8 @@ vtkPVXYChartView::~vtkPVXYChartView()
   this->PlotTime = NULL;
 
   this->SetInternalTitle(NULL);
-  this->Command->Delete();
+
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +110,8 @@ void vtkPVXYChartView::SetChartType(const char *type)
     this->SetAxisTitle(1, "");
     this->Chart->AddPlot(this->PlotTime);
 
-    this->Chart->AddObserver(vtkCommand::SelectionChangedEvent, this->Command);
+    this->Chart->AddObserver(vtkCommand::SelectionChangedEvent,
+      this, &vtkPVXYChartView::SelectionChanged);
     this->ContextView->GetScene()->AddItem(this->Chart);
     }
 }
@@ -389,33 +384,23 @@ void vtkPVXYChartView::SetAxisTitleColor(int index, double red,
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVXYChartView::SetAxisUseCustomLabels(int index, bool use_custom_labels)
+{
+  this->Internals->UseCustomLabels[index] = use_custom_labels;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisLabelsNumber(int axis, int n)
 {
-  if (this->Chart && this->Chart->GetAxis(axis))
-    {
-    this->Chart->GetAxis(axis)->GetTickPositions()->SetNumberOfTuples(n);
-    this->Chart->GetAxis(axis)->GetTickLabels()->SetNumberOfTuples(0);
-    }
+  this->Internals->CustomLabelPositions[axis]->SetNumberOfTuples(n);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisLabels(int axisIndex, int i, double value)
 {
-  if (this->Chart && this->Chart->GetAxis(axisIndex))
-    {
-    vtkAxis *axis = this->Chart->GetAxis(axisIndex);
-    axis->GetTickPositions()->SetTuple1(i, value);
-    if (i == 0)
-      {
-      axis->SetMinimum(value);
-      }
-    else if (i == axis->GetTickPositions()->GetNumberOfTuples() - 1)
-      {
-      axis->SetMaximum(value);
-      this->Chart->RecalculateBounds();
-      }
-    }
+  this->Internals->CustomLabelPositions[axisIndex]->SetValue(i, value);
 }
 
 //----------------------------------------------------------------------------
@@ -534,6 +519,23 @@ void vtkPVXYChartView::Render(bool interactive)
       }
     }
   // For now we only handle X-axis time. If needed we can add support for Y-axis.
+
+  // handle custom labels. We specify custom labels in render since vtkAxis will
+  // discard the custom labels when the mode was set to not use custom labels,
+  // so we need to provide the labels each time to the chart.
+  for (int axis=0; axis < 4; axis++)
+    {
+    if (this->Internals->UseCustomLabels[axis])
+      {
+      this->Chart->GetAxis(axis)->SetCustomTickPositions(
+        this->Internals->CustomLabelPositions[axis].GetPointer());
+      }
+    else
+      {
+      this->Chart->GetAxis(axis)->SetCustomTickPositions(NULL);
+      }
+    this->Chart->GetAxis(axis)->Update();
+    }
 
   this->Superclass::Render(interactive);
 }
