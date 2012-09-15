@@ -783,40 +783,65 @@ void vtkPVDataDeliveryManager::ClearStreamedPieces()
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVDataDeliveryManager::DeliverStreamedPieces()
+bool vtkPVDataDeliveryManager::GetRepresentationsReadyToStreamPieces(
+  std::vector<unsigned int>& keys)
 {
-  // This method gets called on all processes to deliver any streamed pieces
-  // currently available.
-
-  // Representations can provide overrides, e.g. though the view says data is
-  // merely "pass-through", some representation says we need to clone the data
-  // everywhere. That makes it critical that this method is called on all
-  // processes at the same time to avoid deadlocks and other complications.
-  //
-  // This method will be implemented in "view-specific" subclasses since how the
-  // data is delivered is very view specific.
-
-  //bool using_remote_rendering =
-  //  this->RenderView->GetUseDistributedRenderingForStillRender();
-  //int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
-
-  // FIXME: This only support built-in operation for now. We will have to add
-  // support for client-server modes. The challenge is how do we deliver data
-  // "gracefully".
-
-  bool something_delivered = false;
+  // I am not too sure if I want to do this. Right now I am thinking once a
+  // piece is delivered, the delivery manager should no longer bother about it.
   vtkInternals::ItemsMapType::iterator iter;
   for (iter = this->Internals->ItemsMap.begin();
     iter != this->Internals->ItemsMap.end(); ++iter)
     {
     vtkInternals::vtkItem& item = iter->second.first;
-    if (item.Representation && item.Streamable && item.GetStreamedPiece())
+    if (item.Representation &&
+      item.Representation->GetVisibility() &&
+      item.Streamable &&
+      item.GetStreamedPiece())
       {
-      // FIXME: do data delivery.
-      something_delivered = true;
+      keys.push_back(iter->first);
       }
     }
-  return something_delivered;
+  return (keys.size() > 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataDeliveryManager::DeliverStreamedPieces(
+  unsigned int size, unsigned int *values)
+{
+  // This method gets called on all processes to deliver any streamed pieces
+  // currently available. This is similar to Deliver(...) except that this deals
+  // with only delivering pieces for streaming. 
+
+  bool using_remote_rendering =
+    this->RenderView->GetUseDistributedRenderingForStillRender();
+  int mode = this->RenderView->GetDataDistributionMode(using_remote_rendering);
+
+  for (unsigned int cc=0; cc < size; cc++)
+    {
+    vtkInternals::vtkItem* item = this->Internals->GetItem(values[cc], false);
+
+    // FIXME: we need information about the datatype on all processes. For now
+    // we assume that the data type is same as the full-data (which is not
+    // really necessary). We can API to allow representations to be able to
+    // specify the data type.
+    vtkDataObject* data = item->GetDataObject();
+    vtkDataObject* piece = item->GetStreamedPiece();
+
+    vtkNew<vtkMPIMoveData> dataMover;
+    dataMover->InitializeForCommunicationForParaView();
+    dataMover->SetOutputDataType(data->GetDataObjectType());
+    dataMover->SetMoveMode(mode);
+    if (item->AlwaysClone)
+      {
+      dataMover->SetMoveModeToClone();
+      }
+    dataMover->SetInputData(piece);
+    dataMover->Update();
+    if (dataMover->GetOutputGeneratedOnProcess())
+      {
+      item->SetNextStreamedPiece(dataMover->GetOutputDataObject(0));
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

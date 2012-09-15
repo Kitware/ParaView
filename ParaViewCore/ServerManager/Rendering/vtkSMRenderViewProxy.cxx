@@ -233,6 +233,8 @@ void vtkSMRenderViewProxy::UpdateLOD()
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
 {
+  // FIXME: add a check to not do anything when in multi-client mode. We don't
+  // support streaming in multi-client mode.
   this->GetSession()->PrepareProgress();
 
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());

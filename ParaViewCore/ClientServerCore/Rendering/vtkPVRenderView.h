@@ -205,7 +205,7 @@ public:
 
   // Description:
   void StreamingUpdate(const double view_planes[24]);
-  bool DeliverStreamedPieces();
+  void DeliverStreamedPieces(unsigned int size, unsigned int *representation_ids);
 
   // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.

@@ -147,7 +147,14 @@ public:
   // Deliver streamed pieces. Unlike regular data, streamed pieces are delivered
   // and released. Representations are expected to manage the pieces once they
   // are delivered to them.
-  bool DeliverStreamedPieces();
+  void DeliverStreamedPieces(unsigned int size, unsigned int *keys);
+
+//BTX
+  // Description:
+  // Fills up the vector with the keys for representations that have non-null
+  // streaming pieces.
+  bool GetRepresentationsReadyToStreamPieces(std::vector<unsigned int>& keys);
+//ETX
 
   // *******************************************************************
 

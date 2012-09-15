@@ -659,6 +659,7 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_rendering)
 {
+
   switch (vtkProcessModule::GetProcessType())
     {
   case vtkProcessModule::PROCESS_DATA_SERVER:
@@ -668,7 +669,9 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
     return true;
 
   default:
-    return using_distributed_rendering;
+    return using_distributed_rendering || 
+      this->InTileDisplayMode() ||
+      this->SynchronizedWindows->GetIsInCave();
     }
 }
 
@@ -1439,22 +1442,29 @@ void vtkPVRenderView::StreamingUpdate(const double view_planes[24])
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVRenderView::DeliverStreamedPieces()
+void vtkPVRenderView::DeliverStreamedPieces(
+  unsigned int size, unsigned int *representation_ids)
 {
   // the plan now is to fetch the piece and then simply give it to the
   // representation as "next piece". Representation can decide what to do with
   // it, including adding to the existing datastructure.
   vtkTimerLog::MarkStartEvent("vtkPVRenderView::DeliverStreamedPieces");
-  bool ret_val = this->Internals->DeliveryManager->DeliverStreamedPieces();
+  this->Internals->DeliveryManager->DeliverStreamedPieces(
+    size, representation_ids);
 
-  // tell representations to "deal with" the newly streamed piece.
-  this->CallProcessViewRequest(vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE(),
-    this->RequestInformation, this->ReplyInformationVector);
+  if (this->GetLocalProcessDoesRendering(
+      this->GetUseDistributedRenderingForStillRender()))
+    {
+    // tell representations to "deal with" the newly streamed piece on the
+    // rendering nodes.
+    this->CallProcessViewRequest(vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE(),
+      this->RequestInformation, this->ReplyInformationVector);
+    }
 
   this->Internals->DeliveryManager->ClearStreamedPieces();
+  //                                  ^--- the most dubious part of this code.
 
   vtkTimerLog::MarkEndEvent("vtkPVRenderView::DeliverStreamedPieces");
-  return ret_val;
 }
 
 //----------------------------------------------------------------------------
