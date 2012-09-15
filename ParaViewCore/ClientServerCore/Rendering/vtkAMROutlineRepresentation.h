@@ -25,6 +25,7 @@
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // for smart pointer.
+#include "vtkWeakPointer.h" // for weak pointer.
 #include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
 class vtkAMRStreamingPriorityQueue;
@@ -125,12 +126,8 @@ protected:
   vtkSmartPointer<vtkDataObject> ProcessedPiece;
 
   // Description:
-  // This is a trivial producer we use to feed data to the rendering pipeline.
-  // This doesn't need to be a vtkTrivialProducer, we could have just saved the
-  // data object. However, currently vtkAlgorithm doesn't provide a simple way
-  // to connect input data object without modifying the algorithm. Once that's
-  // fixed, we can clean this up.
-  vtkSmartPointer<vtkTrivialProducer> RenderedDataProducer;
+  // Helps us keep track of the data being rendered.
+  vtkWeakPointer<vtkDataObject> RenderedData;
 
   // Description:
   // vtkAMRStreamingPriorityQueue is a helper class we used to compute the order
@@ -166,12 +163,6 @@ private:
   // and we need to clear our streaming buffers since the streamed data is no
   // longer valid.
   bool InStreamingUpdate;
-
-  // Description:
-  // This flag is used as a hack for the time being to determine when the
-  // RenderedDataProducer is supposed to be empty. This is needed since the
-  // mapper cannot have NULL input.
-  bool RenderedDataProducerIsEmpty;
 
 //ETX
 };

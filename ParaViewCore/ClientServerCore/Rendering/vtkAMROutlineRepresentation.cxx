@@ -42,16 +42,9 @@ vtkAMROutlineRepresentation::vtkAMROutlineRepresentation()
 {
   this->StreamingCapablePipeline = false;
   this->InStreamingUpdate = false;
-  this->RenderedDataProducerIsEmpty = true;
 
   this->PriorityQueue = vtkSmartPointer<vtkAMRStreamingPriorityQueue>::New();
-  this->RenderedDataProducer= vtkSmartPointer<vtkTrivialProducer>::New();
-
-  vtkNew<vtkMultiBlockDataSet> tempData;
-  this->RenderedDataProducer->SetOutput(tempData.GetPointer());
-
   this->Mapper = vtkSmartPointer<vtkCompositePolyDataMapper2>::New();
-  this->Mapper->SetInputConnection(this->RenderedDataProducer->GetOutputPort());
 
   this->Actor = vtkSmartPointer<vtkPVLODActor>::New();
   this->Actor->SetMapper(this->Mapper);
@@ -100,6 +93,19 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
     // know that this representation is streaming capable (or not).
     vtkPVRenderView::SetStreamable(inInfo, this, this->GetStreamingCapablePipeline());
     }
+  else if (request_type == vtkPVView::REQUEST_RENDER())
+    {
+    if (this->RenderedData == NULL)
+      {
+      vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
+      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+      vtkAlgorithm* producer = producerPort->GetProducer();
+
+      this->RenderedData =
+        producer->GetOutputDataObject(producerPort->GetIndex());
+      this->Mapper->SetInputDataObject(this->RenderedData);
+      }
+    }
   else if (request_type == vtkPVRenderView::REQUEST_STREAMING_UPDATE())
     {
     if (this->GetStreamingCapablePipeline())
@@ -121,34 +127,17 @@ int vtkAMROutlineRepresentation::ProcessViewRequest(
     vtkDataObject* piece = vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this);
     if (piece)
       {
-      assert (this->RenderedDataProducerIsEmpty == false);
+      assert (this->RenderedData != NULL);
       vtkStreamingStatusMacro( << this << ": received new piece.");
 
       // merge with what we are already rendering.
       vtkNew<vtkAppendCompositeDataLeaves> appender;
-      appender->SetInputData(0, piece);
-      appender->AddInputConnection(0,
-        this->RenderedDataProducer->GetOutputPort());
+      appender->AddInputDataObject(piece);
+      appender->AddInputDataObject(this->RenderedData);
       appender->Update();
 
-      this->RenderedDataProducer->SetOutput(
-        appender->GetOutputDataObject(0));
-      }
-    }
-  else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
-    if (this->RenderedDataProducerIsEmpty)
-      {
-      vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
-      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-      vtkAlgorithm* producer = producerPort->GetProducer();
-      vtkDataObject* clone = producer->GetOutputDataObject(
-        producerPort->GetIndex())->NewInstance();
-      clone->ShallowCopy(producer->GetOutputDataObject(producerPort->GetIndex()));
-      this->RenderedDataProducer->SetOutput(clone);
-      clone->Delete();
-
-      this->RenderedDataProducerIsEmpty = false;
+      this->RenderedData = appender->GetOutputDataObject(0);
+      this->Mapper->SetInputDataObject(this->RenderedData);
       }
     }
 
@@ -241,6 +230,7 @@ int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
       }
     }
 
+  this->ProcessedPiece = 0;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
     // Do the streaming independent "transformation" of the data here, in our
@@ -261,7 +251,6 @@ int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
     if (!this->GetInStreamingUpdate())
       {
       this->ProcessedData = geomFilter->GetOutputDataObject(0);
-      this->ProcessedPiece = vtkSmartPointer<vtkMultiBlockDataSet>::New();
 
       double bounds[6];
       input->GetBounds(bounds);
@@ -278,17 +267,17 @@ int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
     // create an empty dataset. This is needed so that view knows what dataset
     // to expect from the other processes on this node.
     this->ProcessedData = vtkSmartPointer<vtkMultiBlockDataSet>::New();
-    this->ProcessedPiece = vtkSmartPointer<vtkMultiBlockDataSet>::New();
     this->DataBounds.Reset();
     }
 
   if (!this->GetInStreamingUpdate())
     {
-    // when not doing a streaming update, we reset the data that we will render.
-    // otherwise, we keep on accumulating the data.
-    vtkNew<vtkMultiBlockDataSet> tempData;
-    this->RenderedDataProducer->SetOutput(tempData.GetPointer());
-    this->RenderedDataProducerIsEmpty = true;
+    this->RenderedData = 0;
+
+    // provide the mapper with an empty input. This is needed only because
+    // mappers die when input is NULL, currently.
+    vtkNew<vtkMultiBlockDataSet> tmp;
+    this->Mapper->SetInputDataObject(tmp.GetPointer());
     }
 
   return this->Superclass::RequestData(rqst, inputVector, outputVector);
