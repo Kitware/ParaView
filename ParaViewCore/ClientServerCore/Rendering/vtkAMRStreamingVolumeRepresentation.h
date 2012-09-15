@@ -23,7 +23,7 @@
 
 #include "vtkPVDataRepresentation.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
-#include "vtkWeakPointer.h" // needed for vtkSmartPointer.
+#include "vtkBoundingBox.h" // needed for vtkBoundingBox.
 
 class vtkAMRStreamingPriorityQueue;
 class vtkColorTransferFunction;
@@ -128,46 +128,99 @@ protected:
   // Fill input port information.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  virtual int RequestData(vtkInformation*,
-    vtkInformationVector**, vtkInformationVector*);
-
-  vtkWeakPointer<vtkOverlappingAMR> InputData;
-  vtkResampledAMRImageSource* Resampler;
-  vtkSmartVolumeMapper* VolumeMapper;
-  vtkVolumeProperty* Property;
-  vtkPVLODVolume* Actor;
-  double DataBounds[6];
-
-
-  //***************************************************************************
-  // For streaming support.
-  virtual int RequestUpdateExtent(vtkInformation* request,
-    vtkInformationVector** inputVector,
-    vtkInformationVector* outputVector);
-
+  // Description:
+  // Overridden to check if the input pipeline is streaming capable. This method
+  // should check if streaming is enabled i.e. vtkPVView::GetEnableStreaming()
+  // and the input pipeline provides necessary AMR meta-data.
   virtual int RequestInformation(vtkInformation* request,
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
   // Description:
-  // Returns true if this representation has a "next piece" that it streamed. 
+  // Setup the block request. During StreamingUpdate, this will request the
+  // blocks based on priorities determined by the vtkAMRStreamingPriorityQueue,
+  // otherwise it doesn't make any specific request. AMR sources can treat the
+  // absence of specific block request to mean various things. It's expected
+  // that read only the root block (or a few more) in that case.
+  virtual int RequestUpdateExtent(vtkInformation* request,
+    vtkInformationVector** inputVector,
+    vtkInformationVector* outputVector);
+
+  // Description:
+  // Process the current input for volume rendering (if anything).
+  // When not in StreamingUpdate, this also initializes the priority queue since
+  // the input AMR may have totally changed, including its structure.
+  virtual int RequestData(vtkInformation*,
+    vtkInformationVector**, vtkInformationVector*);
+
+  // Description:
+  // Returns true when the input pipeline supports streaming. It is set in
+  // RequestInformation().
+  vtkGetMacro(StreamingCapablePipeline, bool);
+
+  // Description:
+  // Returns true when StreamingUpdate() is being processed.
+  vtkGetMacro(InStreamingUpdate, bool);
+
+  // Description:
+  // Returns true if this representation has a "next piece" that it streamed.
+  // This method will update the PriorityQueue using the view planes specified
+  // and then call Update() on the representation, making it reexecute and
+  // regenerate the outline for the next "piece" of data.
   bool StreamingUpdate(const double view_planes[24]);
 
   // Description:
-  // Set to true if the input pipeline is streaming capable. Note, in
-  // client-server mode, this is valid only on the data-server nodes i.e. the
-  // nodes that have input pipelines connected to begin with.
-  bool StreamingCapablePipeline;
+  // This is the data object generated processed by the most recent call to
+  // RequestData() while not streaming. 
+  // This is non-empty only on the data-server nodes.
+  vtkSmartPointer<vtkDataObject> ProcessedData;
 
   // Description:
-  // Flag used to determine if RequestData() was called during streaming.
-  bool InStreamingUpdate;
+  // This is the data object generated processed by the most recent call to
+  // RequestData() while streaming. 
+  // This is non-empty only on the data-server nodes.
+  vtkSmartPointer<vtkDataObject> ProcessedPiece;
 
+  // Description:
+  // vtkAMRStreamingPriorityQueue is a helper class we used to compute the order
+  // in which to request blocks from the input pipeline. Implementations can
+  // come up with their own rules to decide the request order based on
+  // application and data type.
   vtkSmartPointer<vtkAMRStreamingPriorityQueue> PriorityQueue;
+
+  // Description:
+  // vtkImageData source used to resample an AMR dataset into a uniform grid
+  // suitable for volume rendering.
+  vtkSmartPointer<vtkResampledAMRImageSource> Resampler;
+
+  // Description:
+  // Rendering components.
+  vtkSmartPointer<vtkSmartVolumeMapper> VolumeMapper;
+  vtkSmartPointer<vtkVolumeProperty> Property;
+  vtkSmartPointer<vtkPVLODVolume> Actor;
+
+  // Description:
+  // Used to keep track of data bounds.
+  vtkBoundingBox DataBounds;
 
 private:
   vtkAMRStreamingVolumeRepresentation(const vtkAMRStreamingVolumeRepresentation&); // Not implemented
   void operator=(const vtkAMRStreamingVolumeRepresentation&); // Not implemented
+
+  // Description:
+  // This flag is set to true if the input pipeline is streaming capable in
+  // RequestInformation(). Note that in client-server mode, this is valid only
+  // on the data-server nodes since all other nodes don't have input pipelines
+  // connected, they cannot indicate if the pipeline supports streaming.
+  bool StreamingCapablePipeline;
+
+  // Description:
+  // This flag is used to indicate that the representation is being updated
+  // during the streaming pass. RequestData() can use this flag to reset
+  // internal datastructures when the input changes for non-streaming reasons
+  // and we need to clear our streaming buffers since the streamed data is no
+  // longer valid.
+  bool InStreamingUpdate;
 
 //ETX
 };

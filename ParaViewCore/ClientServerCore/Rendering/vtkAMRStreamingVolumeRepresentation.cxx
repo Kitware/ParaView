@@ -35,35 +35,30 @@ vtkStandardNewMacro(vtkAMRStreamingVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
 {
-  this->VolumeMapper = vtkSmartVolumeMapper::New();
-  this->Property = vtkVolumeProperty::New();
-  this->Actor = vtkPVLODVolume::New();
-  this->Actor->SetProperty(this->Property);
-  this->Actor->SetMapper(this->VolumeMapper);
-  this->Resampler = vtkResampledAMRImageSource::New();
-  this->Resampler->SetMaxDimensions(32, 32, 32);
-
-  this->VolumeMapper->SetInputConnection(
-    this->Resampler->GetOutputPort());
-
-  vtkMath::UninitializeBounds(this->DataBounds);
-
   this->StreamingCapablePipeline = false;
   this->InStreamingUpdate = false;
+
   this->PriorityQueue = vtkSmartPointer<vtkAMRStreamingPriorityQueue>::New();
+  this->Resampler = vtkSmartPointer<vtkResampledAMRImageSource>::New();
+  this->Resampler->SetMaxDimensions(32, 32, 32);
+
+  this->VolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+  this->VolumeMapper->SetInputConnection(this->Resampler->GetOutputPort());
+
+  this->Property = vtkSmartPointer<vtkVolumeProperty>::New();
+  this->Actor = vtkSmartPointer<vtkPVLODVolume>::New();
+  this->Actor->SetProperty(this->Property);
+  this->Actor->SetMapper(this->VolumeMapper);
 }
 
 //----------------------------------------------------------------------------
 vtkAMRStreamingVolumeRepresentation::~vtkAMRStreamingVolumeRepresentation()
 {
-  this->Resampler->Delete();
-  this->VolumeMapper->Delete();
-  this->Property->Delete();
-  this->Actor->Delete();
 }
 
 //----------------------------------------------------------------------------
-int vtkAMRStreamingVolumeRepresentation::FillInputPortInformation(int port,
+int vtkAMRStreamingVolumeRepresentation::FillInputPortInformation(
+  int vtkNotUsed(port),
   vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkOverlappingAMR");
@@ -89,41 +84,50 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    // FIXME:STREAMING -- currently, only data-server rendering is supported and
-    // that too in non-parallel mode.
-    //vtkPVRenderView::SetPiece(inInfo, this,
-    //  this->OutlineSource->GetOutputDataObject(0));
-    // outInfo->Set(vtkPVRenderView::NEED_ORDERED_COMPOSITING(), 1);
-    vtkPVRenderView::SetPiece(inInfo, this, this->InputData);
+    // Standard representation stuff, first.
+    // 1. Provide the data being rendered.
+    vtkPVRenderView::SetPiece(inInfo, this, this->ProcessedData);
+
+    // 2. Provide the bounds.
+    double bounds[6];
+    this->DataBounds.GetBounds(bounds);
 
     // Just let the view know of out data bounds.
-    vtkPVRenderView::SetGeometryBounds(inInfo, this->DataBounds);
-    vtkPVRenderView::SetStreamable(inInfo, this, this->StreamingCapablePipeline);
+    vtkPVRenderView::SetGeometryBounds(inInfo, bounds);
+
+    // The only thing extra we need to do here is that we need to let the view
+    // know that this representation is streaming capable (or not).
+    vtkPVRenderView::SetStreamable(inInfo, this, this->GetStreamingCapablePipeline());
+
+    // in theory, we need ordered compositing, but we are not going to support
+    // parallel AMR volume rendering for now.
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
-    vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-    vtkAlgorithm* producer = producerPort->GetProducer();
-    vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
-      producer->GetOutputDataObject(producerPort->GetIndex()));
-
-    // FIXME:STREAMING - this needs to called only when the resampler hasn't
-    // been updated at all. Not for every render.
     if (this->Resampler->NeedsInitialization())
       {
+      vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
+      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+      vtkAlgorithm* producer = producerPort->GetProducer();
+      vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
+        producer->GetOutputDataObject(producerPort->GetIndex()));
+      assert (amr != NULL);
       this->Resampler->UpdateResampledVolume(amr);
       }
     }
   else if (request_type == vtkPVRenderView::REQUEST_STREAMING_UPDATE())
     {
-    if (this->StreamingCapablePipeline)
+    if (this->GetStreamingCapablePipeline())
       {
-      // this is a streaming update request. request next piece.
+      // This is a streaming update request, request next piece.
       double view_planes[24];
       inInfo->Get(vtkPVRenderView::VIEW_PLANES(), view_planes);
       if (this->StreamingUpdate(view_planes))
         {
-        vtkPVRenderView::SetNextStreamedPiece(inInfo, this, this->InputData);
+        // since we indeed "had" a next piece to produce, give it to the view
+        // so it can deliver it to the rendering nodes.
+        vtkPVRenderView::SetNextStreamedPiece(
+          inInfo, this, this->ProcessedPiece);
         }
       }
     }
@@ -149,7 +153,8 @@ int vtkAMRStreamingVolumeRepresentation::RequestInformation(
   // Determine if the input is streaming capable. A pipeline is streaming
   // capable if it provides us with COMPOSITE_DATA_META_DATA() in the
   // RequestInformation() pass. It implies that we can request arbitrary blocks
-  // from the input pipeline which implies streamability.
+  // from the input pipeline which implies stream-ability.
+
   this->StreamingCapablePipeline = false;
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
@@ -208,37 +213,60 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
 }
 
 //----------------------------------------------------------------------------
-int vtkAMRStreamingVolumeRepresentation::RequestData(vtkInformation* request,
+int vtkAMRStreamingVolumeRepresentation::RequestData(vtkInformation* rqst,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  vtkMath::UninitializeBounds(this->DataBounds);
-
   if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     if (inInfo->Has(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()) &&
-      vtkPVView::GetEnableStreaming() && !this->InStreamingUpdate)
+      this->GetStreamingCapablePipeline() &&
+      !this->GetInStreamingUpdate())
       {
+      // Since the representation reexecuted, it means that the input changed
+      // and we should initialize our streaming.
       vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
         inInfo->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_META_DATA()));
       this->PriorityQueue->Initialize(amr->GetAMRInfo());
       }
     }
 
-  if (!this->InStreamingUpdate)
+  if (!this->GetInStreamingUpdate())
     {
     this->Resampler->Reset();
     }
 
-  if (inputVector[0]->GetNumberOfInformationObjects()==1)
+  this->ProcessedPiece = NULL;
+  if (inputVector[0]->GetNumberOfInformationObjects() == 1)
     {
-    vtkOverlappingAMR* amr = vtkOverlappingAMR::GetData(inputVector[0], 0);
-    amr->GetBounds(this->DataBounds);
-    this->InputData = amr;
+    // Do the streaming independent "transformation" of the data here, in our
+    // case, generate the outline from the input data.
+    // To keep things simple here, we don't bother about the "flip-book" caching
+    // support used for animation playback.
+    vtkOverlappingAMR* input = vtkOverlappingAMR::GetData(inputVector[0], 0);
+    if (!this->GetInStreamingUpdate())
+      {
+      this->ProcessedData = input;
+
+      double bounds[6];
+      input->GetBounds(bounds);
+      this->DataBounds.SetBounds(bounds);
+      }
+    else
+      {
+      this->ProcessedPiece = input;
+      }
+    }
+  else
+    {
+    // create an empty dataset. This is needed so that view knows what dataset
+    // to expect from the other processes on this node.
+    this->ProcessedData = vtkSmartPointer<vtkOverlappingAMR>::New();
+    this->DataBounds.Reset();
     }
 
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  return this->Superclass::RequestData(rqst, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
@@ -322,8 +350,8 @@ void vtkAMRStreamingVolumeRepresentation::SetScale(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkAMRStreamingVolumeRepresentation::SetVisibility(bool val)
 {
-  this->Superclass::SetVisibility(val);
   this->Actor->SetVisibility(val? 1 : 0);
+  this->Superclass::SetVisibility(val);
 }
 
 //***************************************************************************
