@@ -15,33 +15,22 @@
 #include "vtkPVDataDeliveryManager.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkAMRBox.h"
-#include "vtkAMRVolumeRepresentation.h"
 #include "vtkBSPCutsGenerator.h"
-#include "vtkCamera.h"
 #include "vtkDataObject.h"
-#include "vtkMath.h"
 #include "vtkMPIMoveData.h"
-#include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOrderedCompositeDistributor.h"
-#include "vtkOverlappingAMR.h"
 #include "vtkPKdTree.h"
-#include "vtkPointData.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
-#include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTimerLog.h"
-#include "vtkUniformGridAMRDataIterator.h"
-#include "vtkUniformGrid.h"
-#include "vtkUnsignedIntArray.h"
 #include "vtkWeakPointer.h"
 
 #include <assert.h>
@@ -230,101 +219,6 @@ public:
 
   RepresentationToIdMapType RepresentationToIdMap;
   ItemsMapType ItemsMap;
-};
-//*****************************************************************************
-namespace
-{
-  // this code is stolen from vtkFrustumCoverageCuller.
-  double vtkComputeScreenCoverage(const double planes[24],
-    const double bounds[6], double &distance)
-    {
-    distance = 0.0;
-
-    // a duff dataset like a polydata with no cells will have bad bounds
-    if (!vtkMath::AreBoundsInitialized(const_cast<double*>(bounds)))
-      {
-      return 0.0;
-      }
-    double screen_bounds[4];
-
-    double center[3];
-    center[0] = (bounds[0] + bounds[1]) / 2.0;
-    center[1] = (bounds[2] + bounds[3]) / 2.0;
-    center[2] = (bounds[4] + bounds[5]) / 2.0;
-    double radius = 0.5 * sqrt(
-      ( bounds[1] - bounds[0] ) * ( bounds[1] - bounds[0] ) +
-      ( bounds[3] - bounds[2] ) * ( bounds[3] - bounds[2] ) +
-      ( bounds[5] - bounds[4] ) * ( bounds[5] - bounds[4] ) );
-    for (int i = 0; i < 6; i++ )
-      {
-      // Compute how far the center of the sphere is from this plane
-      double d = planes[i*4 + 0] * center[0] +
-        planes[i*4 + 1] * center[1] +
-        planes[i*4 + 2] * center[2] +
-        planes[i*4 + 3];
-      // If d < -radius the prop is not within the view frustum
-      if ( d < -radius )
-        {
-        return 0.0;
-        }
-
-      // The first four planes are the ones bounding the edges of the
-      // view plane (the last two are the near and far planes) The
-      // distance from the edge of the sphere to these planes is stored
-      // to compute coverage.
-      if ( i < 4 )
-        {
-        screen_bounds[i] = d - radius;
-        }
-      // The fifth plane is the near plane - use the distance to
-      // the center (d) as the value to sort by
-      if ( i == 4 )
-        {
-        distance = d;
-        }
-      }
-
-    // If the prop wasn't culled during the plane tests...
-    // Compute the width and height of this slice through the
-    // view frustum that contains the center of the sphere
-    double full_w = screen_bounds[0] + screen_bounds[1] + 2.0 * radius;
-    double full_h = screen_bounds[2] + screen_bounds[3] + 2.0 * radius;
-    // Subtract from the full width to get the width of the square
-    // enclosing the circle slice from the sphere in the plane
-    // through the center of the sphere. If the screen bounds for
-    // the left and right planes (0,1) are greater than zero, then
-    // the edge of the sphere was a positive distance away from the
-    // plane, so there is a gap between the edge of the plane and
-    // the edge of the box.
-    double part_w = full_w;
-    if ( screen_bounds[0] > 0.0 )
-      {
-      part_w -= screen_bounds[0];
-      }
-    if ( screen_bounds[1] > 0.0 )
-      {
-      part_w -= screen_bounds[1];
-      }
-    // Do the same thing for the height with the top and bottom
-    // planes (2,3).
-    double part_h = full_h;
-    if ( screen_bounds[2] > 0.0 )
-      {
-      part_h -= screen_bounds[2];
-      }
-    if ( screen_bounds[3] > 0.0 )
-      {
-      part_h -= screen_bounds[3];
-      }
-
-    // Compute the fraction of coverage
-    if ((full_w * full_h)!=0.0)
-      {
-      return (part_w * part_h) / (full_w * full_h);
-      }
-
-    return 0;
-    }
 };
 
 //*****************************************************************************
