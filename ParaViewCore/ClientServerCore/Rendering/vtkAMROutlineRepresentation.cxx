@@ -258,7 +258,6 @@ int vtkAMROutlineRepresentation::RequestData(vtkInformation *rqst,
       }
     else
       {
-      this->DataBounds.Reset();
       this->ProcessedPiece = geomFilter->GetOutputDataObject(0);
       }
     }
