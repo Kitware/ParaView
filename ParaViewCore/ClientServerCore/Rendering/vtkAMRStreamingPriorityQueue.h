@@ -32,6 +32,7 @@
 #include "vtkObject.h"
 
 class vtkAMRInformation;
+class vtkMultiProcessController;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkAMRStreamingPriorityQueue : public vtkObject
 {
@@ -39,6 +40,17 @@ public:
   static vtkAMRStreamingPriorityQueue* New();
   vtkTypeMacro(vtkAMRStreamingPriorityQueue, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // If the controller is specified, the queue can be used in parallel. So long
+  // as Initialize(), Update() and Pop() methods are called on all processes
+  // (need not be synchronized) and all process get the same amr tree and
+  // view_planes (which is generally true with ParaView), the blocks are
+  // distributed among the processes.
+  // By default, this is set to the
+  // vtkMultiProcessController::GetGlobalController();
+  void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
   // Description:
   // Initializes the queue. All information about items in the is lost.
@@ -63,6 +75,8 @@ public:
 protected:
   vtkAMRStreamingPriorityQueue();
   ~vtkAMRStreamingPriorityQueue();
+
+  vtkMultiProcessController* Controller;
 
 private:
   vtkAMRStreamingPriorityQueue(const vtkAMRStreamingPriorityQueue&); // Not implemented

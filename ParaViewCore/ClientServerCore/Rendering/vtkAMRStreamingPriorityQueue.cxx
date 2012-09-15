@@ -16,10 +16,12 @@
 
 #include "vtkAMRInformation.h"
 #include "vtkMath.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
-#include <queue>
 #include <algorithm>
+#include <assert.h>
+#include <queue>
 
 //*****************************************************************************
 namespace
@@ -143,10 +145,13 @@ public:
 };
 
 vtkStandardNewMacro(vtkAMRStreamingPriorityQueue);
+vtkCxxSetObjectMacro(vtkAMRStreamingPriorityQueue, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkAMRStreamingPriorityQueue::vtkAMRStreamingPriorityQueue()
 {
   this->Internals = new vtkInternals();
+  this->Controller = 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
 }
 
 //----------------------------------------------------------------------------
@@ -154,6 +159,7 @@ vtkAMRStreamingPriorityQueue::~vtkAMRStreamingPriorityQueue()
 {
   delete this->Internals;
   this->Internals = 0;
+  this->SetController(0);
 }
 
 //----------------------------------------------------------------------------
@@ -189,10 +195,21 @@ unsigned int vtkAMRStreamingPriorityQueue::Pop()
     return 0;
     }
 
-  vtkInternals::vtkPriorityQueueItem item =
-    this->Internals->PriorityQueue.top();
-  this->Internals->PriorityQueue.pop();
-  return item.BlockId;
+  int num_procs = this->Controller? this->Controller->GetNumberOfProcesses() : 1;
+  int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
+  assert(myid < num_procs);
+
+  vtkInternals::vtkPriorityQueueItem items[num_procs];
+  for (int cc=0; cc < num_procs && !this->Internals->PriorityQueue.empty(); cc++)
+    {
+    items[cc] = this->Internals->PriorityQueue.top();
+    this->Internals->PriorityQueue.pop();
+    }
+
+  // at the end, when the queue empties out in the middle of a pop, right now,
+  // all other processes are simply going to ask for block 0 (set in
+  // initialization of vtkPriorityQueueItem). We can change that, if needed.
+  return items[myid].BlockId;
 }
 
 //----------------------------------------------------------------------------
@@ -235,4 +252,5 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
 void vtkAMRStreamingPriorityQueue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Controller: " << this->Controller << endl;
 }
