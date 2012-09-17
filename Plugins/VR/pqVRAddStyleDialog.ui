@@ -41,7 +41,11 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QComboBox" name="analogCombo"/>
+    <widget class="QComboBox" name="analogCombo">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the analog input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="buttonLabel">
@@ -54,7 +58,11 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="buttonCombo"/>
+    <widget class="QComboBox" name="buttonCombo">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the button input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="trackerLabel">
@@ -67,7 +75,11 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QComboBox" name="trackerCombo"/>
+    <widget class="QComboBox" name="trackerCombo">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the tracking input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </item>
    <item row="4" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -84,9 +96,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../Qt/Widgets/Resources/QtWidgets.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
