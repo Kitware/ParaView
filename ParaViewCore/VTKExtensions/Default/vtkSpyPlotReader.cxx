@@ -298,7 +298,10 @@ int vtkSpyPlotReader::UpdateMetaData(
 
     vtkSpyPlotUniReader *uniReader = this->Map->GetReader(iter, this);
     // Open the file and get the number time steps and arrays.
-    uniReader->ReadInformation();
+    if (uniReader->ReadInformation() == 0) 
+      {
+      return 0;
+      }
     uniReader->GetTimeStepRange(this->TimeStepRange);
     int num_timesteps  = this->TimeStepRange[1] + 1;
     timesteps.insert(timesteps.end(),
