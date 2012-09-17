@@ -4,7 +4,7 @@
 #include "vtkAlgorithm.h"
 #include "vtkCellData.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
@@ -313,22 +313,38 @@ int vtkSciVizStatistics::RequestData(
   vtkCompositeDataIterator* inModelIter = compModelIn ?  compModelIn->NewIterator() : 0;
   vtkDataObject* currentModel = singleModel;
 
-  inDataIter->VisitOnlyLeavesOff();
-  inDataIter->TraverseSubTreeOff();
+  if(vtkDataObjectTreeIterator::SafeDownCast(inDataIter))
+    {
+    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(inDataIter);
+    treeIter->VisitOnlyLeavesOff();
+    treeIter->TraverseSubTreeOff();
+    }
   //inDataIter->SkipEmptyNodesOff();
 
-  ouDataIter->VisitOnlyLeavesOff();
-  ouDataIter->TraverseSubTreeOff();
+  if(vtkDataObjectTreeIterator::SafeDownCast(ouDataIter))
+    {
+    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(ouDataIter);
+    treeIter->VisitOnlyLeavesOff();
+    treeIter->TraverseSubTreeOff();
+    }
   //ouDataIter->SkipEmptyNodesOff();
 
-  ouModelIter->VisitOnlyLeavesOff();
-  ouModelIter->TraverseSubTreeOff();
+  if(vtkDataObjectTreeIterator::SafeDownCast(ouModelIter))
+    {
+    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(ouModelIter);
+    treeIter->VisitOnlyLeavesOff();
+    treeIter->TraverseSubTreeOff();
+    }
   ouModelIter->SkipEmptyNodesOff(); // Cannot skip since we may need to copy or create models as we go.
 
   if ( inModelIter )
     {
-    inModelIter->VisitOnlyLeavesOff();
-    inModelIter->TraverseSubTreeOff();
+    if(vtkDataObjectTreeIterator::SafeDownCast(inModelIter))
+      {
+      vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(inModelIter);
+      treeIter->VisitOnlyLeavesOff();
+      treeIter->TraverseSubTreeOff();
+      }
     //inModelIter->SkipEmptyNodesOff();
 
     inModelIter->InitTraversal();
@@ -475,7 +491,7 @@ int vtkSciVizStatistics::RequestData(
     outData->ShallowCopy( inData );
     }
   if ( this->Task != CREATE_MODEL && this->Task != MODEL_INPUT )
-    { 
+    {
     // Assess the data using the input or the just-created model
     vtkMultiBlockDataSet* outModelDS = vtkMultiBlockDataSet::SafeDownCast( outModel );
     if ( ! outModelDS )

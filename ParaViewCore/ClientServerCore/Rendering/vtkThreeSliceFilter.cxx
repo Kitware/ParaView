@@ -234,16 +234,11 @@ void vtkThreeSliceFilter::Process(vtkCompositeDataSet* input, vtkCompositeDataSe
 
   // Manage the composite dataset
   vtkCompositeDataIterator* iter = input->NewIterator();
-  iter->VisitOnlyLeavesOn();
-  iter->SkipEmptyNodesOff(); // We're iterating over the output, whose leaves are all empty.
+  iter->SetSkipEmptyNodes(1);
   int idx = 0;
   for ( iter->InitTraversal(); ! iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++idx )
     {
     vtkDataObject* obj = input->GetDataSet( iter );
-    if ( ! obj )
-      {
-      continue; // no input had a non-NULL dataset
-      }
     vtkCompositeDataSet* inputComposite = vtkCompositeDataSet::SafeDownCast(obj);
     vtkDataSet* inputDataset = vtkDataSet::SafeDownCast(obj);
 
@@ -333,8 +328,7 @@ void vtkThreeSliceFilter::Append(vtkCompositeDataSet* composite,
                                  vtkAppendPolyData* appender)
 {
   vtkCompositeDataIterator* iter = composite->NewIterator();
-  iter->VisitOnlyLeavesOn();
-  iter->SkipEmptyNodesOn();
+  iter->SetSkipEmptyNodes(1);
   for ( iter->InitTraversal(); ! iter->IsDoneWithTraversal(); iter->GoToNextItem() )
     {
     vtkDataObject* obj = composite->GetDataSet( iter );
