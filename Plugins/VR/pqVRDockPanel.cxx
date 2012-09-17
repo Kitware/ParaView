@@ -52,7 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkVRGrabWorldStyle.h"
 #include "vtkVRTrackStyle.h"
 #include "vtkWeakPointer.h"
@@ -342,17 +344,27 @@ void pqVRDockPanel::styleDoubleClicked(QListWidgetItem *item)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
 {
-  if(vtkSMRenderViewProxy::SafeDownCast(pxy))
+  this->Internals->propertyCombo->setSourceWithoutProperties(pxy);
+  vtkSmartPointer<vtkSMPropertyIterator> iter;
+  iter.TakeReference(pxy->NewPropertyIterator());
+  // Show only 16 element properties (e.g. 4x4 matrices)
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
-    this->Internals->propertyCombo->setSourceWithoutProperties(pxy);
-    this->Internals->propertyCombo->addSMProperty("Eye Transform",
-                                                  "EyeTransformMatrix", 0);
-    this->Internals->propertyCombo->addSMProperty("Model Transform",
-                                                  "ModelTransformMatrix", 0);
-    }
-  else
-    {
-    this->Internals->propertyCombo->setSource(pxy);
+    vtkSMVectorProperty* smproperty =
+      vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
+    if (!smproperty || !smproperty->GetAnimateable() ||
+      smproperty->GetInformationOnly())
+      {
+      continue;
+      }
+    unsigned int num_elems = smproperty->GetNumberOfElements();
+    if (num_elems != 16)
+      {
+      continue;
+      }
+
+    this->Internals->propertyCombo->addSMProperty(
+          iter->GetProperty()->GetXMLLabel(), iter->GetKey(), 0);
     }
 }
 
@@ -360,10 +372,21 @@ void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
 void pqVRDockPanel::setActiveView(pqView *view)
 {
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
-  this->Internals->proxyCombo->removeProxy("RenderView");
-  if (rview && this->Internals->proxyCombo->findText("RenderView") == -1)
+
+  // Remove any RenderView.* entries in the combobox
+  Qt::MatchFlags matchFlags = Qt::MatchStartsWith | Qt::MatchCaseSensitive;
+  int ind = this->Internals->proxyCombo->findText("RenderView", matchFlags);
+  while (ind != -1 )
     {
-    this->Internals->proxyCombo->addProxy(0, "RenderView", rview->getProxy());
+    QString label = this->Internals->proxyCombo->itemText(ind);
+    this->Internals->proxyCombo->removeProxy(label);
+    ind = this->Internals->proxyCombo->findText("RenderView", matchFlags);
+    }
+
+  if (rview)
+    {
+    this->Internals->proxyCombo->addProxy(0, rview->getSMName(),
+                                          rview->getProxy());
     }
 
   this->Internals->Camera = NULL;
