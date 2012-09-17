@@ -189,6 +189,9 @@ protected:
   // Custom render method to deal with internal views
   virtual void Render(bool interactive, bool skip_rendering);
 
+  // Internal method used to update layout of the views
+  virtual void UpdateViewLayout();
+
   struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];
 private:

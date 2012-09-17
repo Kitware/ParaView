@@ -536,3 +536,29 @@ void vtkPVQuadRenderView::Update()
     }
   this->QuadInternal->UpdateHandleSize();
 }
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::UpdateViewLayout()
+{
+  int spacingX, spacingY, width, height;
+  spacingX = spacingY = this->QuadInternal->Spacing;
+  int *size   = this->QuadInternal->Size;
+  int *pos    = this->QuadInternal->Position;
+
+  // Compute the real spacing/size
+  width = (size[0] - spacingX) / 2;
+  spacingX = size[0] - (width*2);
+  height = (size[1] - spacingY) / 2;
+  spacingY = size[1] - (height*2);
+
+  // Update sizes
+  this->OrthoViews[TOP_LEFT].RenderView->SetSize(width, height);
+  this->OrthoViews[BOTTOM_LEFT].RenderView->SetSize(width, height);
+  this->OrthoViews[TOP_RIGHT].RenderView->SetSize(width, height);
+  this->Superclass::SetSize(width, height);
+
+  // Update positions
+  this->OrthoViews[TOP_LEFT].RenderView->SetPosition(pos[0], pos[1]);
+  this->OrthoViews[BOTTOM_LEFT].RenderView->SetPosition(pos[0], pos[1] + width + spacingX);
+  this->OrthoViews[TOP_RIGHT].RenderView->SetPosition(pos[0] + width + spacingX, pos[1]);
+  this->Superclass::SetPosition(pos[0] + width + spacingX, pos[1] + height + spacingY);
+}
