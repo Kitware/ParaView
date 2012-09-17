@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QtGui/QKeyEvent>
+#include <QtGui/QRegExpValidator>
 
 #include <QtCore/QDebug>
 #include <QtCore/QPair>
@@ -151,6 +152,20 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject,
   this->Internals->connectionType->addItem("VRUI");
 #endif
   this->connectionTypeChanged();
+
+  // Restrict input in some line edits
+  QRegExpValidator *connNameValidator =
+      new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
+  QRegExpValidator *addressValidator =
+      new QRegExpValidator(QRegExp("[0-9a-zA-Z]+(@[0-9a-zA-Z]+)?"), this);
+  QRegExpValidator *inputIdValidator =
+      new QRegExpValidator(QRegExp("[0-9]+"), this);
+  QRegExpValidator *inputNameValidator =
+      new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
+  this->Internals->connectionName->setValidator(connNameValidator);
+  this->Internals->connectionAddress->setValidator(addressValidator);
+  this->Internals->inputId->setValidator(inputIdValidator);
+  this->Internals->inputName->setValidator(inputNameValidator);
 
   connect(this->Internals->insertInput, SIGNAL(clicked()),
           this, SLOT(addInput()));
