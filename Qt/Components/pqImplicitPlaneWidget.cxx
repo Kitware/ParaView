@@ -187,7 +187,7 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget = 
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ImplicitPlaneWidgetRepresentation", server);
+    get3DWidget("ImplicitPlaneWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();

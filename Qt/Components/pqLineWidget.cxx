@@ -296,7 +296,7 @@ void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
 {
   vtkSMNewWidgetRepresentationProxy* const widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
-      xmlname, server);
+      xmlname, server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();

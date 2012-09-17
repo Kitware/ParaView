@@ -103,7 +103,7 @@ void pqSplineWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("SplineWidgetRepresentation", server);
+    get3DWidget("SplineWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   
   widget->UpdateVTKObjects();

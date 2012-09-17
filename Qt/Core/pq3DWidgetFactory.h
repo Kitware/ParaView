@@ -59,7 +59,7 @@ public:
   /// can call free3DWidget() when it is done with the 3D Widget, that 
   /// way it can be used by others.
   vtkSMNewWidgetRepresentationProxy* get3DWidget(const QString& name,
-    pqServer* server);
+    pqServer* server, vtkSMProxy *referenceProxy = 0);
 
   /// Call this method when done with using a 3D widget, this makes
   /// the 3DWidget available for reuse.

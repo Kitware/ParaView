@@ -46,12 +46,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerObserver.h"
 #include "pqServer.h"
 
+// used by the 3D widget factory to store information about each widget
+// it creates and passes to the user.
+struct WidgetRecord
+{
+  vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
+  vtkSMProxy *ReferenceProxy;
+};
+
 class pq3DWidgetFactoryInternal
 {
 public:
-  typedef QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > ListOfWidgetProxies;
-  ListOfWidgetProxies Widgets;
-  ListOfWidgetProxies WidgetsInUse;
+  QList<WidgetRecord> Widgets;
+  QList<WidgetRecord> WidgetsInUse;
 };
 
 //-----------------------------------------------------------------------------
@@ -72,17 +79,18 @@ pq3DWidgetFactory::~pq3DWidgetFactory()
 
 //-----------------------------------------------------------------------------
 vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
-    pqServer* server)
+    pqServer* server, vtkSMProxy *referenceProxy)
 {
-  pq3DWidgetFactoryInternal::ListOfWidgetProxies::iterator iter =
-    this->Internal->Widgets.begin();
+  QList<WidgetRecord>::iterator iter = this->Internal->Widgets.begin();
   for (; iter != this->Internal->Widgets.end(); iter++)
     {
-    vtkSMNewWidgetRepresentationProxy* proxy = iter->GetPointer();
-    if (proxy && proxy->GetSession() == server->session() &&
-      name == proxy->GetXMLName())
+    vtkSMNewWidgetRepresentationProxy* proxy = iter->WidgetProxy.GetPointer();
+    if (proxy &&
+        proxy->GetSession() == server->session() &&
+        name == proxy->GetXMLName() &&
+        iter->ReferenceProxy == referenceProxy)
       {
-      this->Internal->WidgetsInUse.push_back(proxy);
+      this->Internal->WidgetsInUse.push_back(*iter);
       this->Internal->Widgets.erase(iter);
       return proxy;
       }
@@ -102,21 +110,26 @@ vtkSMNewWidgetRepresentationProxy* pq3DWidgetFactory::get3DWidget(const QString&
     qDebug() << "Could not create the 3D widget with name: " << name;
     return NULL;
     }
-  this->Internal->WidgetsInUse.push_back(proxy);
+
+  // make record for this newly created 3D widget
+  WidgetRecord record;
+  record.WidgetProxy = proxy;
+  record.ReferenceProxy = referenceProxy;
+  this->Internal->WidgetsInUse.push_back(record);
+
   return proxy;
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidgetFactory::free3DWidget(vtkSMNewWidgetRepresentationProxy* widget)
 {
-  pq3DWidgetFactoryInternal::ListOfWidgetProxies::iterator iter =
-    this->Internal->WidgetsInUse.begin();
+  QList<WidgetRecord>::iterator iter = this->Internal->WidgetsInUse.begin();
   for (; iter != this->Internal->WidgetsInUse.end(); iter++)
     {
-    vtkSMNewWidgetRepresentationProxy* proxy = iter->GetPointer();
+    vtkSMNewWidgetRepresentationProxy* proxy = iter->WidgetProxy.GetPointer();
     if (proxy == widget)
       {
-      this->Internal->Widgets.push_back(proxy);
+      this->Internal->Widgets.push_back(*iter);
       this->Internal->WidgetsInUse.erase(iter);
       return;
       }
@@ -136,11 +149,11 @@ void pq3DWidgetFactory::proxyUnRegistered(QString group,
     return;
     }
   // Check if the unregistered proxy is the one managed by this class.
-  pq3DWidgetFactoryInternal::ListOfWidgetProxies::iterator iter;
+  QList<WidgetRecord>::iterator iter;
   for (iter = this->Internal->WidgetsInUse.begin(); 
     iter != this->Internal->WidgetsInUse.end(); iter++)
     {
-    if (iter->GetPointer() == widget)
+    if (iter->WidgetProxy.GetPointer() == widget)
       {
       this->Internal->WidgetsInUse.erase(iter);
       break;
@@ -150,7 +163,7 @@ void pq3DWidgetFactory::proxyUnRegistered(QString group,
   for (iter = this->Internal->Widgets.begin();
     iter != this->Internal->Widgets.end(); ++iter)
     {
-    if (iter->GetPointer() == widget)
+    if (iter->WidgetProxy.GetPointer() == widget)
       {
       this->Internal->Widgets.erase(iter);
       break;

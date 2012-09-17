@@ -110,11 +110,11 @@ void pqContourWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget = NULL;
   widget = pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ContourWidgetRepresentation2", server);
+    get3DWidget("ContourWidgetRepresentation2", server, this->getReferenceProxy());
   if ( !widget )
     {
     widget = pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ContourWidgetRepresentation", server);
+    get3DWidget("ContourWidgetRepresentation", server, this->getReferenceProxy());
     }
 
   this->setWidgetProxy(widget);

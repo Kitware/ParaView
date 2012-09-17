@@ -364,7 +364,7 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 {
   this->Internal->VTKConnect->Disconnect();
 
-    vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   pqRenderViewBase* rview = this->renderView();
   vtkSMProxy* viewProxy = rview? rview->getProxy() : NULL;
   if (rview && widget)
@@ -389,6 +389,9 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
       this, SIGNAL(widgetInteraction()));
     this->Internal->VTKConnect->Connect(pxy, vtkCommand::EndInteractionEvent,
       this, SIGNAL(widgetEndInteraction()));
+
+    bool visible = vtkSMPropertyHelper(pxy, "Visibility").GetAsInt() == 1;
+    this->setWidgetVisible(visible);
     }
 
   if (rview && pxy)
@@ -396,7 +399,6 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->updateWidgetVisibility();
     vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Add(widget);
     viewProxy->UpdateVTKObjects();
     rview->render();
