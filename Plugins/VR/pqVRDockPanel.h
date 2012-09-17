@@ -63,6 +63,9 @@ protected slots:
   void proxyChanged(vtkSMProxy*);
   void setActiveView(pqView*);
 
+  void saveState();
+  void restoreState();
+
   void updateDebugLabel();
 
 private:

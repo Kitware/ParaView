@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqRenderView.h"
+#include "pqLoadStateReaction.h"
+#include "pqSaveStateReaction.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
 #include "pqVRAddConnectionDialog.h"
@@ -122,11 +124,17 @@ void pqVRDockPanel::constructor()
           this, SLOT(updateStyles()));
 
   // Other
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
-    this, SLOT(setActiveView(pqView*)));
+  connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+          this, SLOT(setActiveView(pqView*)));
 
   connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)),
           this, SLOT(proxyChanged(vtkSMProxy*)));
+
+  connect(this->Internals->saveState, SIGNAL(clicked()),
+          this, SLOT(saveState()));
+
+  connect(this->Internals->restoreState, SIGNAL(clicked()),
+          this, SLOT(restoreState()));
 
   // Add the render view to the proxy combo
   pqServerManagerModel* smmodel =
@@ -411,6 +419,18 @@ void pqVRDockPanel::setActiveView(pqView *view)
       }
     }
   this->updateDebugLabel();
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::saveState()
+{
+  pqSaveStateReaction::saveState();
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::restoreState()
+{
+  pqLoadStateReaction::loadState();
 }
 
 //-----------------------------------------------------------------------------
