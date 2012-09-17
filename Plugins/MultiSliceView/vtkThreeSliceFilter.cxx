@@ -191,6 +191,81 @@ int vtkThreeSliceFilter::RequestData( vtkInformation *,
             vtkDataObject::DATA_OBJECT()));
     }
 
+  if(inputComposite)
+    {
+    // Composite DS
+    vtkCompositeDataSet* innerOutputs[4];
+    for(int i=0;i<4;++i)
+      {
+      innerOutputs[i] = inputComposite->NewInstance();
+      innerOutputs[i]->CopyStructure(inputComposite);
+      }
+    this->Process(inputComposite, innerOutputs);
+
+    // Append polydata
+    this->Merge(innerOutputs, outputs);
+
+    // Free internal structure
+    for(int i=0;i<4;++i)
+      {
+      innerOutputs[i]->Delete();
+      }
+    }
+  else if(inputDataset)
+    {
+    this->Process(inputDataset, outputs, VTK_UNSIGNED_INT_MAX);
+    }
+
+  return 1;
+}
+//----------------------------------------------------------------------------
+void vtkThreeSliceFilter::Process(vtkCompositeDataSet* input, vtkCompositeDataSet* outputs[4])
+{
+  // Init outputs
+  for(int i=0;i<4;++i)
+    {
+    outputs[i]->CopyStructure(input);
+    }
+
+  // Manage the composite dataset
+  vtkCompositeDataIterator* iter = input->NewIterator();
+  iter->SetSkipEmptyNodes(1);
+  int idx = 0;
+  for ( iter->InitTraversal(); ! iter->IsDoneWithTraversal(); iter->GoToNextItem(), ++idx )
+    {
+    vtkDataObject* obj = input->GetDataSet( iter );
+    vtkCompositeDataSet* inputComposite = vtkCompositeDataSet::SafeDownCast(obj);
+    vtkDataSet* inputDataset = vtkDataSet::SafeDownCast(obj);
+
+    if(inputComposite)
+      {
+      vtkCompositeDataSet* innerOutputs[4];
+      for(int i=0;i<4;++i)
+        {
+        innerOutputs[i] = inputComposite->NewInstance();
+        outputs[i]->SetDataSet(iter, innerOutputs[i]);
+        innerOutputs[i]->FastDelete();
+        }
+      this->Process(inputComposite, innerOutputs);
+      }
+    else if(inputDataset)
+      {
+      vtkPolyData* innerOutputs[4];
+      for(int i=0;i<4;++i)
+        {
+        vtkNew<vtkPolyData> ds;
+        outputs[i]->SetDataSet(iter, ds.GetPointer());
+        innerOutputs[i] = ds.GetPointer();
+        }
+      this->Process(inputDataset, innerOutputs, static_cast<int>(iter->GetCurrentFlatIndex()));
+      }
+    }
+  iter->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkThreeSliceFilter::Process(vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex)
+{
+  // Process dataset
   // Add CellIds to allow cell selection to work
   vtkIdType nbCells = input->GetNumberOfCells();
   vtkNew<vtkIdTypeArray> originalCellIds;
@@ -219,5 +294,31 @@ int vtkThreeSliceFilter::RequestData( vtkInformation *,
   output[2]->ShallowCopy(this->Slices[1]->GetOutput());
   output[3]->ShallowCopy(this->Slices[2]->GetOutput());
 
-  return 1;
+//----------------------------------------------------------------------------
+void vtkThreeSliceFilter::Append(vtkCompositeDataSet* composite,
+                                 vtkAppendPolyData* appender)
+{
+  vtkCompositeDataIterator* iter = composite->NewIterator();
+  iter->SetSkipEmptyNodes(1);
+  for ( iter->InitTraversal(); ! iter->IsDoneWithTraversal(); iter->GoToNextItem() )
+    {
+    vtkDataObject* obj = composite->GetDataSet( iter );
+    vtkCompositeDataSet* compositeDS = vtkCompositeDataSet::SafeDownCast(obj);
+    vtkPolyData* polyDS = vtkPolyData::SafeDownCast(obj);
+    if(compositeDS)
+      {
+      this->Append(compositeDS, appender);
+      }
+    else if(polyDS)
+      {
+      this->Append(polyDS, appender);
+      }
+    }
+  iter->Delete();
+}
+//----------------------------------------------------------------------------
+void vtkThreeSliceFilter::Append(vtkPolyData* polydata,
+                                vtkAppendPolyData* appender)
+{
+  appender->AddInputData(polydata);
 }
