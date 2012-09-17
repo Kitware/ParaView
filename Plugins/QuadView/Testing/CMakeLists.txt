@@ -33,11 +33,21 @@ IF (PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
   )
 
   # No selection are available on pvcrs
-  #IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
-  #  add_client_render_server_tests("pvcrs"
-  #    BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-  #    TEST_SCRIPTS ${MULTI_SLICE_SERVER_TESTS}
-  #  )
-  #ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+
+
+  add_tile_display_tests("pvcs-tile-display" 2 1
+     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Tile2x1-QuadViewSliceWavelet.xml
+  )
+
+  add_tile_display_tests("pvcs-tile-display" 1 2
+     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Tile1x2-QuadViewSliceWavelet.xml
+  )
+
+  add_tile_display_tests("pvcs-tile-display" 2 2
+     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Tile2x2-QuadViewSliceWavelet.xml
+  )
 
 ENDIF ()
