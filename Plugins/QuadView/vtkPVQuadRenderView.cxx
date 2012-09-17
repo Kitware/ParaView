@@ -150,6 +150,7 @@ vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::vtkPVQuadRenderView()
 {
+  this->ViewPosition[0] = this->ViewPosition[1] = 0;
   for (int cc=0; cc < 3; cc++)
     {
     this->OrthoViews[cc].RenderView = vtkSmartPointer<vtkPVRenderView>::New();
@@ -191,23 +192,15 @@ void vtkPVQuadRenderView::Initialize(unsigned int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVQuadRenderView::SetPosition(int posx, int posy)
+void vtkPVQuadRenderView::SetViewPosition(int posx, int posy)
 {
+  this->ViewPosition[0] = posx;
+  this->ViewPosition[1] = posy;
   if (this->Identifier == 0)
     {
     this->Superclass::SetPosition(posx, posy);
     return;
     }
-
-  const int spacing = 2;
-
-  int size[2];
-  this->OrthoViews[TOP_LEFT].RenderView->GetSize(size);
-
-  this->OrthoViews[TOP_LEFT].RenderView->SetPosition(posx, posy);
-  this->OrthoViews[BOTTOM_LEFT].RenderView->SetPosition(posx, posy + size[1] + spacing);
-  this->OrthoViews[TOP_RIGHT].RenderView->SetPosition(posx + size[0] + spacing, posy);
-  this->Superclass::SetPosition(posx + size[0] + spacing, posy + size[1] + spacing);
 }
 
 //----------------------------------------------------------------------------
@@ -529,6 +522,7 @@ void vtkPVQuadRenderView::WidgetCallback(vtkObject* src, unsigned long, void*)
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::Update()
 {
+  this->UpdateViewLayout();
   this->Superclass::Update();
   for(int i=0; i < 3; ++i)
     {
@@ -539,26 +533,15 @@ void vtkPVQuadRenderView::Update()
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::UpdateViewLayout()
 {
-  int spacingX, spacingY, width, height;
-  spacingX = spacingY = this->QuadInternal->Spacing;
-  int *size   = this->QuadInternal->Size;
-  int *pos    = this->QuadInternal->Position;
+  const int spacing = 2;
+  int posx = this->ViewPosition[0];
+  int posy = this->ViewPosition[1];
 
-  // Compute the real spacing/size
-  width = (size[0] - spacingX) / 2;
-  spacingX = size[0] - (width*2);
-  height = (size[1] - spacingY) / 2;
-  spacingY = size[1] - (height*2);
+  int size[2];
+  this->OrthoViews[TOP_LEFT].RenderView->GetSize(size);
 
-  // Update sizes
-  this->OrthoViews[TOP_LEFT].RenderView->SetSize(width, height);
-  this->OrthoViews[BOTTOM_LEFT].RenderView->SetSize(width, height);
-  this->OrthoViews[TOP_RIGHT].RenderView->SetSize(width, height);
-  this->Superclass::SetSize(width, height);
-
-  // Update positions
-  this->OrthoViews[TOP_LEFT].RenderView->SetPosition(pos[0], pos[1]);
-  this->OrthoViews[BOTTOM_LEFT].RenderView->SetPosition(pos[0], pos[1] + width + spacingX);
-  this->OrthoViews[TOP_RIGHT].RenderView->SetPosition(pos[0] + width + spacingX, pos[1]);
-  this->Superclass::SetPosition(pos[0] + width + spacingX, pos[1] + height + spacingY);
+  this->OrthoViews[TOP_LEFT].RenderView->SetPosition(posx, posy);
+  this->OrthoViews[BOTTOM_LEFT].RenderView->SetPosition(posx, posy + size[1] + spacing);
+  this->OrthoViews[TOP_RIGHT].RenderView->SetPosition(posx + size[0] + spacing, posy);
+  this->Superclass::SetPosition(posx + size[0] + spacing, posy + size[1] + spacing);
 }

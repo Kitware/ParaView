@@ -67,6 +67,18 @@
            -->
          </IntVectorProperty>
 
+      <IntVectorProperty command="SetViewPosition"
+                         default_values="0 0"
+                         name="ViewPosition"
+                         number_of_elements="2"
+                         override="1">
+        <Hints>
+          <NoDefault />
+        </Hints>
+        <Documentation>Set the position on this view in the multiview
+        configuration.</Documentation>
+      </IntVectorProperty>
+
          <DoubleVectorProperty name="XSlicesValues"
                                command="SetSliceX"
                                repeat_command="1"

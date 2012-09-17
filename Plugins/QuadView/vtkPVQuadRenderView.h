@@ -45,10 +45,8 @@ public:
   virtual void Initialize(unsigned int id);
 
   // Description:
-  // Set the position on this view in the multiview configuration.
-  // This can be called only after Initialize().
-  virtual void SetPosition(int, int);
-
+  // Set the position of the global view
+  virtual void SetViewPosition(int, int);
 
   // Decription:
   // Return the internal vtkRenderWindow corresponding to the given view type.
@@ -191,6 +189,7 @@ protected:
 
   // Internal method used to update layout of the views
   virtual void UpdateViewLayout();
+  int ViewPosition[2];
 
   struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];
