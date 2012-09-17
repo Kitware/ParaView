@@ -49,16 +49,15 @@ vtkStandardNewMacro(vtkVRGrabWorldStyle)
 vtkVRGrabWorldStyle::vtkVRGrabWorldStyle() :
   Superclass()
 {
-  this->ButtonName = NULL;
   this->Enabled = false;
   this->IsInitialRecorded =false;
   this->InverseInitialMatrix = vtkTransform::New();
+  this->NeedsButton = true;
 }
 
 // -----------------------------------------------------------------------------
 vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 {
-  this->SetButtonName(NULL);
   this->InverseInitialMatrix->Delete();
 }
 
@@ -71,29 +70,19 @@ bool vtkVRGrabWorldStyle::Configure(
     return false;
     }
 
-  for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
+  if (this->ButtonName == NULL || this->ButtonName[0] == '\0')
     {
-    vtkPVXMLElement* button = child->GetNestedElement(cc);
-    if (button && button->GetName() && strcmp(button->GetName(), "Button") == 0)
-      {
-      this->SetButtonName(button->GetAttributeOrEmpty("name"));
-      }
+    vtkErrorMacro(<<"Incorrect state for vtkVRGrabWorldStyle");
+    return false;
     }
 
-  return this->ButtonName != NULL && this->ButtonName[0] != '\0';
+  return true;
 }
 
 // -----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRGrabWorldStyle::SaveConfiguration() const
 {
-  vtkPVXMLElement* child = this->Superclass::SaveConfiguration();
-
-  vtkPVXMLElement* button = vtkPVXMLElement::New();
-  button->SetName("Button");
-  button->AddAttribute("name", this->ButtonName);
-  child->AddNestedElement(button);
-  button->FastDelete();
-  return child;
+  return this->Superclass::SaveConfiguration();
 }
 
 // ----------------------------------------------------------------------------
@@ -153,8 +142,6 @@ void vtkVRGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-
-  os << indent << "ButtonName: " << this->ButtonName << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "IsInitialRecorded: " << this->IsInitialRecorded << endl;
   if (this->InverseInitialMatrix)

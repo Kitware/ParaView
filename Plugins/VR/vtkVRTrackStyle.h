@@ -49,18 +49,6 @@ public:
   vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  // Description:
-  // Specify the proxy and property to control. The property needs to have 16
-  // elements and must be a numerical property.
-  virtual void SetControlledProxy(vtkSMProxy *);
-  vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
-
-  vtkSetStringMacro(ControlledPropertyName)
-  vtkGetStringMacro(ControlledPropertyName)
-
-  vtkSetStringMacro(TrackerName)
-  vtkGetStringMacro(TrackerName)
-
   virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* SaveConfiguration() const;
 
@@ -68,10 +56,6 @@ protected:
   vtkVRTrackStyle();
   ~vtkVRTrackStyle();
   virtual void HandleTracker( const vtkVREventData& data );
-
-  char *TrackerName;
-  char *ControlledPropertyName;
-  vtkSMProxy *ControlledProxy;
 
 private:
   vtkVRTrackStyle(const vtkVRTrackStyle&); // Not implemented.

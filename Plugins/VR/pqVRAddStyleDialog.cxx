@@ -42,8 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxy.h"
 #include "vtkVRInteractorStyle.h"
-#include "vtkVRTrackStyle.h"
-#include "vtkVRGrabWorldStyle.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
@@ -156,25 +154,13 @@ void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle *style,
   this->Internals->infoLabel->setText(
         QString("Configuring style %1.").arg(name));
 
-  bool needsAnalog = false;
-  bool needsButton = false;
-  bool needsTracker = false;
+  bool needsAnalog = style->GetNeedsAnalog();
+  bool needsButton = style->GetNeedsButton();
+  bool needsTracker = style->GetNeedsTracker();
 
-  QString analog;
-  QString button;
-  QString tracker;
-
-  if (vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::SafeDownCast(style))
-    {
-    needsTracker = true;
-    tracker = trackStyle->GetTrackerName();
-    if (vtkVRGrabWorldStyle *grabStyle =
-        vtkVRGrabWorldStyle::SafeDownCast(trackStyle))
-      {
-      needsButton = true;
-      button = grabStyle->GetButtonName();
-      }
-    }
+  QString analog(style->GetAnalogName());
+  QString button(style->GetButtonName());
+  QString tracker(style->GetTrackerName());
 
   this->Internals->analogLabel->setVisible(needsAnalog);
   this->Internals->analogCombo->setVisible(needsAnalog);
@@ -212,20 +198,23 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     return;
     }
 
-  if (vtkVRTrackStyle *trackStyle =
-      vtkVRTrackStyle::SafeDownCast(this->Internals->Style))
+  if (this->Internals->Style->GetNeedsAnalog())
+    {
+    QByteArray analog =
+        this->Internals->analogCombo->currentText().toLocal8Bit();
+    this->Internals->Style->SetTrackerName(analog.data());
+    }
+  else if (this->Internals->Style->GetNeedsButton())
+    {
+    QByteArray button =
+        this->Internals->buttonCombo->currentText().toLocal8Bit();
+    this->Internals->Style->SetButtonName(button.data());
+    }
+  else if (this->Internals->Style->GetNeedsTracker())
     {
     QByteArray tracker =
         this->Internals->trackerCombo->currentText().toLocal8Bit();
-    trackStyle->SetTrackerName(tracker.data());
-
-    if (vtkVRGrabWorldStyle *grabStyle =
-        vtkVRGrabWorldStyle::SafeDownCast(trackStyle))
-      {
-      QByteArray button =
-          this->Internals->buttonCombo->currentText().toLocal8Bit();
-      grabStyle->SetButtonName(button.data());
-      }
+    this->Internals->Style->SetTrackerName(tracker.data());
     }
 }
 

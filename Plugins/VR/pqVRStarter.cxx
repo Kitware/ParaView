@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVVRConfig.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
 #include "pqVRQueueHandler.h"
 #include "pqApplicationCore.h"
@@ -47,6 +48,7 @@ public:
   pqVRConnectionManager *ConnectionManager;
   vtkVRQueue* EventQueue;
   pqVRQueueHandler* Handler;
+  vtkVRInteractorStyleFactory *StyleFactory;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,6 +58,7 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals = new pqInternals;
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
+  this->Internals->StyleFactory = NULL;
   this->IsShutdown = false;
 }
 
@@ -76,6 +79,8 @@ void pqVRStarter::onStartup()
   pqVRConnectionManager::setInstance(this->Internals->ConnectionManager);
   this->Internals->Handler = new pqVRQueueHandler(this->Internals->EventQueue, this);
   pqVRQueueHandler::setInstance(this->Internals->Handler);
+  this->Internals->StyleFactory = vtkVRInteractorStyleFactory::New();
+  vtkVRInteractorStyleFactory::SetInstance(this->Internals->StyleFactory);
   this->Internals->ConnectionManager->start();
   this->Internals->Handler->start();
   //qWarning() << "Message from pqVRStarter: Application Started";
@@ -88,9 +93,11 @@ void pqVRStarter::onShutdown()
   this->Internals->ConnectionManager->stop();
   pqVRConnectionManager::setInstance(NULL);
   pqVRQueueHandler::setInstance(NULL);
+  vtkVRInteractorStyleFactory::SetInstance(NULL);
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
   this->Internals->EventQueue->Delete();
+  this->Internals->StyleFactory->Delete();
   this->IsShutdown = true;
   // qWarning() << "Message from pqVRStarter: Application Shutting down";
 }

@@ -50,9 +50,6 @@ public:
   virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
   virtual vtkPVXMLElement* SaveConfiguration() const;
 
-  vtkSetStringMacro(ButtonName)
-  vtkGetStringMacro(ButtonName)
-
 protected:
   vtkVRGrabWorldStyle();
   ~vtkVRGrabWorldStyle();
@@ -60,7 +57,6 @@ protected:
   virtual void HandleButton( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
 
-  char *ButtonName;
   bool Enabled;
 
   bool IsInitialRecorded;

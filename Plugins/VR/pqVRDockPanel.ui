@@ -44,16 +44,6 @@
        <property name="sizeAdjustPolicy">
         <enum>QComboBox::AdjustToContents</enum>
        </property>
-       <item>
-        <property name="text">
-         <string>Grab</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Track</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>

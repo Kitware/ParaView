@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 
 #include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
 
 #include <sstream>
@@ -39,30 +41,72 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyle)
+vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy)
 
 // ----------------------------------------------------------------------------
 vtkVRInteractorStyle::vtkVRInteractorStyle()
-  : Superclass()
+  : Superclass(), ControlledProxy(NULL), ControlledPropertyName(NULL),
+    NeedsAnalog(false), NeedsButton(false), NeedsTracker(false),
+    AnalogName(NULL), ButtonName(NULL), TrackerName(NULL)
 {
 }
 
 // ----------------------------------------------------------------------------
 vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
+  this->SetControlledProxy(NULL);
+  this->SetControlledPropertyName(NULL);
+  this->SetAnalogName(NULL);
+  this->SetButtonName(NULL);
+  this->SetTrackerName(NULL);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::Configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
+bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
+                                     vtkSMProxyLocator *locator)
 {
-  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
-      strcmp(this->GetClassName(),
-      child->GetAttributeOrEmpty("class")) == 0)
+  if (!child->GetName() || strcmp(child->GetName(),"Style") != 0 ||
+      strcmp(this->GetClassName(), child->GetAttributeOrEmpty("class")) != 0)
     {
-    // just do basic validation here. vtkVRInteractorStyle.
-    return true;
+    return false;
     }
 
-  return false;
+  int id;
+  if (child->GetScalarAttribute("proxy", &id) == 0)
+    {
+    return false;
+    }
+
+  if (child->GetAttribute("property") == NULL)
+    {
+    return false;
+    }
+
+
+  for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* element = child->GetNestedElement(cc);
+    if (element && element->GetName())
+      {
+      if (strcmp(element->GetName(), "Analog") == 0)
+        {
+        this->SetAnalogName(element->GetAttributeOrEmpty("name"));
+        }
+      else if (strcmp(element->GetName(), "Button") == 0)
+        {
+        this->SetButtonName(element->GetAttributeOrEmpty("name"));
+        }
+      else if (strcmp(element->GetName(), "Tracker") == 0)
+        {
+        this->SetTrackerName(element->GetAttributeOrEmpty("name"));
+        }
+      }
+    }
+
+  this->ControlledProxy = locator->LocateProxy(id);
+  this->SetControlledPropertyName(child->GetAttribute("property"));
+
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -71,6 +115,41 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
   child->AddAttribute("class",this->GetClassName());
+  child->AddAttribute("proxy",
+    this->ControlledProxy?
+    this->ControlledProxy->GetGlobalIDAsString() : "0");
+  if (this->ControlledPropertyName != NULL &&
+      this->ControlledPropertyName[0] != '\0')
+    {
+    child->AddAttribute("property",
+      this->ControlledPropertyName);
+    }
+
+  if (this->NeedsAnalog && this->AnalogName)
+    {
+    vtkPVXMLElement *analog = vtkPVXMLElement::New();
+    analog->SetName("Analog");
+    analog->AddAttribute("name", this->AnalogName);
+    child->AddNestedElement(analog);
+    analog->FastDelete();
+    }
+  if (this->NeedsButton && this->ButtonName)
+    {
+    vtkPVXMLElement *button = vtkPVXMLElement::New();
+    button->SetName("Button");
+    button->AddAttribute("name", this->ButtonName);
+    child->AddNestedElement(button);
+    button->FastDelete();
+    }
+  if (this->NeedsTracker && this->TrackerName)
+    {
+    vtkPVXMLElement* tracker = vtkPVXMLElement::New();
+    tracker->SetName("Tracker");
+    tracker->AddAttribute("name", this->TrackerName);
+    child->AddNestedElement(tracker);
+    tracker->FastDelete();
+    }
+
   return child;
 }
 
@@ -132,4 +211,21 @@ void vtkVRInteractorStyle::HandleTracker( const vtkVREventData& vtkNotUsed( data
 void vtkVRInteractorStyle::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ControlledPropertyName: "
+     << this->ControlledPropertyName << endl;
+  if (this->ControlledProxy)
+    {
+    os << indent << "ControlledProxy:" << endl;
+    this->ControlledProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "ControlledProxy: (None)" << endl;
+    }
+  os << indent << "NeedsAnalog: " << this->NeedsAnalog << endl;
+  os << indent << "AnalogName: " << this->AnalogName << endl;
+  os << indent << "NeedsButton: " << this->NeedsButton << endl;
+  os << indent << "ButtonName: " << this->ButtonName << endl;
+  os << indent << "NeedsTracker: " << this->NeedsTracker << endl;
+  os << indent << "TrackerName: " << this->TrackerName << endl;
 }

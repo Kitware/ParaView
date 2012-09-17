@@ -48,8 +48,32 @@ public:
   vtkTypeMacro(vtkVRInteractorStyle, vtkObject)
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  // Description:
+  // Specify the proxy and property to control. The property needs to have 16
+  // elements and must be a numerical property.
+  virtual void SetControlledProxy(vtkSMProxy *);
+  vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
+
+  vtkSetStringMacro(ControlledPropertyName)
+  vtkGetStringMacro(ControlledPropertyName)
+
   virtual bool HandleEvent(const vtkVREventData& data);
   virtual bool Update();
+
+  // Description:
+  // Returns true if the specified input type is needed.
+  vtkGetMacro(NeedsAnalog, bool);
+  vtkGetMacro(NeedsButton, bool);
+  vtkGetMacro(NeedsTracker, bool);
+
+  // Description:
+  // Set/Get the name of the associated input
+  vtkSetStringMacro(AnalogName)
+  vtkGetStringMacro(AnalogName)
+  vtkSetStringMacro(ButtonName)
+  vtkGetStringMacro(ButtonName)
+  vtkSetStringMacro(TrackerName)
+  vtkGetStringMacro(TrackerName)
 
   /// Load state for the style from XML.
   virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
@@ -66,6 +90,17 @@ protected:
   virtual void HandleTracker( const vtkVREventData& data );
 
   static std::vector<std::string> Tokenize( std::string input);
+
+  vtkSMProxy *ControlledProxy;
+  char *ControlledPropertyName;
+
+  bool NeedsAnalog;
+  bool NeedsButton;
+  bool NeedsTracker;
+
+  char *AnalogName;
+  char *ButtonName;
+  char *TrackerName;
 
 private:
   vtkVRInteractorStyle(const vtkVRInteractorStyle&); // Not implemented.

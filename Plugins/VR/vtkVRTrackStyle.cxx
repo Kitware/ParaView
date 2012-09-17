@@ -44,56 +44,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRTrackStyle)
-vtkCxxSetObjectMacro(vtkVRTrackStyle, ControlledProxy, vtkSMProxy)
 
 // ----------------------------------------------------------------------------
 vtkVRTrackStyle::vtkVRTrackStyle() :
   Superclass()
 {
-  this->TrackerName = NULL;
-  this->ControlledProxy = NULL;
-  this->ControlledPropertyName = NULL;
+  this->NeedsTracker = true;
 }
 
 // ----------------------------------------------------------------------------
 vtkVRTrackStyle::~vtkVRTrackStyle()
 {
-  this->SetTrackerName(NULL);
-  this->SetControlledProxy(NULL);
-  this->SetControlledPropertyName(NULL);
 }
 
 //-----------------------------------------------------------------------------
-bool vtkVRTrackStyle::Configure(vtkPVXMLElement* child,
-                                   vtkSMProxyLocator* locator)
+bool vtkVRTrackStyle::Configure(vtkPVXMLElement *child, vtkSMProxyLocator *loc)
 {
-  int id;
-  if (!this->Superclass::Configure(child, locator))
+  if (!this->Superclass::Configure(child, loc))
     {
     return false;
-    }
-
-  if (child->GetScalarAttribute("proxy", &id) == 0)
-    {
-    return false;
-    }
-
-   if (child->GetAttribute("property") == NULL)
-    {
-    return false;
-    }
-
-  this->ControlledProxy = locator->LocateProxy(id);
-  this->SetControlledPropertyName(child->GetAttribute("property"));
-
-  for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
-    {
-    vtkPVXMLElement* tracker = child->GetNestedElement(cc);
-    if (tracker && tracker->GetName() &&
-        strcmp(tracker->GetName(), "Tracker") == 0)
-      {
-      this->SetTrackerName(tracker->GetAttributeOrEmpty("name"));
-      }
     }
 
   if (this->TrackerName == NULL || this->TrackerName[0] == '\0' ||
@@ -111,22 +80,7 @@ bool vtkVRTrackStyle::Configure(vtkPVXMLElement* child,
 // -----------------------------------------------------------------------------
 vtkPVXMLElement* vtkVRTrackStyle::SaveConfiguration() const
 {
-  vtkPVXMLElement* child = this->Superclass::SaveConfiguration();
-  child->AddAttribute("proxy",
-    this->ControlledProxy?
-    this->ControlledProxy->GetGlobalIDAsString() : "0");
-  if (this->ControlledPropertyName != NULL &&
-      this->ControlledPropertyName[0] != '\0')
-    {
-    child->AddAttribute("property",
-      this->ControlledPropertyName);
-    }
-  vtkPVXMLElement* tracker = vtkPVXMLElement::New();
-  tracker->SetName("Tracker");
-  tracker->AddAttribute("name", this->TrackerName);
-  child->AddNestedElement(tracker);
-  tracker->FastDelete();
-  return child;
+  return this->Superclass::SaveConfiguration();
 }
 
 // ----------------------------------------------------------------------------
@@ -149,17 +103,4 @@ void vtkVRTrackStyle::HandleTracker( const vtkVREventData& data )
 void vtkVRTrackStyle::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "TrackerName: " << this->TrackerName << endl;
-  os << indent << "ControlledPropertyName: "
-     << this->ControlledPropertyName << endl;
-  if (this->ControlledProxy)
-    {
-    os << indent << "ControlledProxy:" << endl;
-    this->ControlledProxy->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << indent << "ControlledProxy: (None)" << endl;
-    }
 }

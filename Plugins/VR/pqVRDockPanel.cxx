@@ -55,8 +55,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMVectorProperty.h"
-#include "vtkVRGrabWorldStyle.h"
-#include "vtkVRTrackStyle.h"
+#include "vtkVRInteractorStyle.h"
+#include "vtkVRInteractorStyleFactory.h"
 #include "vtkWeakPointer.h"
 
 #include <QtGui/QListWidgetItem>
@@ -82,6 +82,16 @@ void pqVRDockPanel::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
   this->setWidget(container);
+
+  vtkVRInteractorStyleFactory *styleFactory =
+      vtkVRInteractorStyleFactory::GetInstance();
+  std::vector<std::string> styleDescs =
+      styleFactory->GetInteractorStyleDescriptions();
+  for (int i = 0; i < styleDescs.size(); ++i)
+    {
+    this->Internals->stylesCombo->addItem(
+          QString::fromStdString(styleDescs[i]));
+    }
 
   // Connections
   connect(this->Internals->addConnection, SIGNAL(clicked()),
@@ -255,27 +265,19 @@ void pqVRDockPanel::addStyle()
       this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
   QString styleString = this->Internals->stylesCombo->currentText();
 
-  vtkVRInteractorStyle *style = NULL;
-  pqVRQueueHandler *handler = pqVRQueueHandler::instance();
-  if (styleString == "Grab")
-    {
-    vtkVRGrabWorldStyle *grabStyle = vtkVRGrabWorldStyle::New();
-    grabStyle->SetControlledProxy(proxy);
-    grabStyle->SetControlledPropertyName(property.data());
-    style = grabStyle;
-    }
-  else if (styleString == "Track")
-    {
-    vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::New();
-    trackStyle->SetControlledProxy(proxy);
-    trackStyle->SetControlledPropertyName(property.data());
-    style = trackStyle;
-    }
+  vtkVRInteractorStyleFactory *styleFactory =
+      vtkVRInteractorStyleFactory::GetInstance();
+  vtkVRInteractorStyle *style =
+      styleFactory->NewInteractorStyleFromDescription(
+        styleString.toStdString());
 
   if (!style)
     {
     return;
     }
+
+  style->SetControlledProxy(proxy);
+  style->SetControlledPropertyName(property.data());
 
   pqVRAddStyleDialog dialog(this);
   QString name = this->Internals->createName(style);
@@ -283,6 +285,7 @@ void pqVRDockPanel::addStyle()
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
     {
     dialog.updateInteractorStyle();
+    pqVRQueueHandler *handler = pqVRQueueHandler::instance();
     handler->add(style);
     }
 
@@ -345,6 +348,11 @@ void pqVRDockPanel::styleDoubleClicked(QListWidgetItem *item)
 void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
 {
   this->Internals->propertyCombo->setSourceWithoutProperties(pxy);
+  if (!pxy)
+    {
+    return;
+    }
+
   vtkSmartPointer<vtkSMPropertyIterator> iter;
   iter.TakeReference(pxy->NewPropertyIterator());
   // Show only 16 element properties (e.g. 4x4 matrices)
@@ -429,14 +437,11 @@ QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle *style)
   pqServerManagerModel *model = core->getServerManagerModel();
 
   QString className = style->GetClassName();
-  QString name = QString("%1").arg(className);
-  if (vtkVRTrackStyle *trackStyle = vtkVRTrackStyle::SafeDownCast(style))
-    {
-    vtkSMProxy *smControlledProxy = trackStyle->GetControlledProxy();
-    pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
-    name.append(QString(" on %1's %2")
-                       .arg(pqControlledProxy->getSMName())
-                       .arg(trackStyle->GetControlledPropertyName()));
-    }
+  vtkSMProxy *smControlledProxy = style->GetControlledProxy();
+  pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
+  QString name = QString("%1 on %2's %3").arg(className)
+      .arg(pqControlledProxy->getSMName())
+      .arg(style->GetControlledPropertyName());
+
   return name;
 }
