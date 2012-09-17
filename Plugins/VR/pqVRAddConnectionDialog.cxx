@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <QtGui/QKeyEvent>
+#include <QtGui/QMessageBox>
 #include <QtGui/QRegExpValidator>
 
 #include <QtCore/QDebug>
@@ -286,7 +287,28 @@ void pqVRAddConnectionDialog::updateConnection()
         qWarning() << "Cannot create connection...unsupported connection type.";
         return;
       }
+  }
+}
+
+void pqVRAddConnectionDialog::accept()
+{
+  QString missingVar;
+  if (this->Internals->connectionName->text().isEmpty())
+    {
+    missingVar = "Connection name";
     }
+  if (this->Internals->connectionAddress->text().isEmpty())
+    {
+    missingVar = "Connection address";
+    }
+
+  if (!missingVar.isEmpty())
+    {
+    QMessageBox::critical(this, "Missing value", QString("%1 is not set!")
+                          .arg(missingVar));
+    return;
+    }
+  this->Superclass::accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -315,6 +337,24 @@ void pqVRAddConnectionDialog::keyPressEvent(QKeyEvent *e)
 //-----------------------------------------------------------------------------
 void pqVRAddConnectionDialog::addInput()
 {
+
+  QString missingVar;
+  if (this->Internals->inputName->text().isEmpty())
+    {
+    missingVar = "Input name";
+    }
+  if (this->Internals->inputId->text().isEmpty())
+    {
+    missingVar = "Input id";
+    }
+
+  if (!missingVar.isEmpty())
+    {
+    QMessageBox::critical(this, "Missing value", QString("%1 is not set!")
+                          .arg(missingVar));
+    return;
+    }
+
   this->Internals->addInput();
 }
 

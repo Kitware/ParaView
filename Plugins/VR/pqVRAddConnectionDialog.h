@@ -64,6 +64,9 @@ public:
 
   void updateConnection();
 
+public slots:
+  void accept();
+
 protected:
   void keyPressEvent(QKeyEvent *);
 
