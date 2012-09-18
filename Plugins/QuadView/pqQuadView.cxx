@@ -34,11 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreUtilities.h"
 #include "pqProxy.h"
 #include "pqQVTKWidget.h"
+#include "pqRepresentation.h"
 #include "pqUndoStack.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVQuadRenderView.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
 
 #include <QGridLayout>
@@ -87,6 +90,13 @@ pqQuadView::pqQuadView(
     {
     this->DataHolder[i] = 0.0;
     }
+
+  QObject::connect( this, SIGNAL(representationAdded(pqRepresentation*)),
+                    this, SLOT(resetSliceOrigin()));
+  QObject::connect( this, SIGNAL(representationVisibilityChanged(pqRepresentation*,bool)),
+                    this, SLOT(resetSliceOrigin()));
+  QObject::connect( this, SIGNAL(representationRemoved(pqRepresentation*)),
+                    this, SLOT(resetSliceOrigin()));
 }
 
 //-----------------------------------------------------------------------------
@@ -249,3 +259,25 @@ void pqQuadView::resetDefaultSettings()
   this->setBottomLeftViewUp(0,1,0);
 }
 
+//-----------------------------------------------------------------------------
+void pqQuadView::resetSliceOrigin()
+{
+  // We only reset slice origin when only one representation is registered and visible
+  if( this->getRepresentations().size() == 1 &&
+      this->getNumberOfVisibleRepresentations() == 1)
+    {
+    vtkSMRepresentationProxy* representation =
+        vtkSMRepresentationProxy::SafeDownCast(
+          this->getRepresentation(0)->getProxy());
+    double * bounds =
+        representation->GetRepresentedDataInformation()->GetBounds();
+
+    double center[3];
+    for(int i=0; i<3; ++i)
+      {
+      center[i] = (bounds[2*i] + bounds[2*i+1])/2;
+      }
+
+    this->setSlicesOrigin(center[0],center[1],center[2]);
+    }
+}

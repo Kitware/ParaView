@@ -88,6 +88,9 @@ public:
   /// Reset Normal/ViewUp/Origin to their defaults
   void resetDefaultSettings();
 
+protected slots:
+  void resetSliceOrigin();
+
 signals:
   void fireSliceOriginChanged();
 
