@@ -255,6 +255,7 @@ set(ExodusModeShapes_BREAK TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
+set (ProbePicking_FORCE_SERIAL TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
