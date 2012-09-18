@@ -109,6 +109,12 @@ signals:
   void representationChanged(pqDataRepresentation*);
   void representationChanged(pqRepresentation*);
   void selectionChanged(const pqProxySelection&);
+
+  /// this signal is fired when the active source fires the dataUpdated()
+  /// signal. This is used by components in the GUI that need to be updated when
+  /// the active source's pipeline updates.
+  void dataUpdated();
+
   /// These signals are fired when a UserEvent is invoked from one of the active
   /// objects. The introduction of those signal was to allow Python trace to
   /// Show/Hide widget for a given active source.

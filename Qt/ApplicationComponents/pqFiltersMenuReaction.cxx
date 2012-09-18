@@ -128,8 +128,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
     &this->Timer, SLOT(start()));
   QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
     &this->Timer, SLOT(start()));
-  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
-    SIGNAL(dataUpdated(pqPipelineSource*)),
+  QObject::connect(activeObjects, SIGNAL(dataUpdated()),
     &this->Timer, SLOT(start()));
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
                    SIGNAL(pluginsUpdated()),
@@ -193,16 +192,7 @@ void pqFiltersMenuReaction::updateEnableState()
       if (source && source->modifiedState() == pqProxy::UNINITIALIZED)
         {
         enabled = false;
-        // we listen to state change so that we can update enable state when the
-        // proxy gets initialized.
-        //
-        // It is better to expect a dataUpdated(pqPipelineSource*) signal than
-        // modifiedStateChanged(pqServerManagerModelItem*)
-        // as the rest of the GUI expect the dataUpdated(pqPipelineSource*))
-        // SIGNAL to happen after an apply even if the data did not changed.
-        QObject::connect(source,
-          SIGNAL(dataUpdated(pqPipelineSource*)),
-          this, SLOT(onDataUpdated()));
+        // we will update when the active representation updates the data.
         break;
         }
 
@@ -294,13 +284,6 @@ void pqFiltersMenuReaction::updateEnableState()
     {
     mgr->setEnabled(false);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqFiltersMenuReaction::onDataUpdated()
-{
-  QObject::disconnect(this->sender(), 0, this, 0);
-  this->Timer.start(10);
 }
 
 //-----------------------------------------------------------------------------
