@@ -79,7 +79,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
@@ -176,7 +175,6 @@ set(ExTimeseries2_USE_NEW_PANELS TRUE)
 set(ExTimeseries_USE_NEW_PANELS TRUE)
 set(ExtractBlock_USE_NEW_PANELS TRUE)
 set(ExtractLevel_USE_NEW_PANELS TRUE)
-set(EyeDomeLighting_USE_NEW_PANELS TRUE)
 set(FFTOverTime_USE_NEW_PANELS TRUE)
 set(FindDataDialog_USE_NEW_PANELS TRUE)
 set(Flow2_USE_NEW_PANELS TRUE)
@@ -300,7 +298,6 @@ SET (PropertyConversion2_BREAK TRUE)
 SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
-set (EyeDomeLighting_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
@@ -402,22 +399,16 @@ IF (NOT BUILD_SHARED_LIBS)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
-SET (EyeDomeLighting_DISABLE_CS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
-SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
-
-IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
-  SET(EyeDomeLighting_DISABLE_C TRUE)
-ENDIF()
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
@@ -429,7 +420,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
+#     - LoadPlugins, NiftiReaderWriterPlugin, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
 #     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
