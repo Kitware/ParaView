@@ -14,7 +14,7 @@ SET (TESTS_WITH_INLINE_COMPARES
 )
 
 SET (TESTS_WITH_BASELINES)
-if(NOT Module_vtkIOVisItBridge)
+if(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
