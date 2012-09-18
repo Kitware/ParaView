@@ -47,6 +47,39 @@ using std::vector;
 // and written to the temp dir.
 #define SKIP_PROCESS_ID 1
 
+/**
+Use a single render window for each run. This was suggested
+after strange x11 errors on the Blight dashboard system.
+*/
+class vtkRenderWindowSingleton
+{
+public:
+  /// get or create the instance.
+  static vtkRenderWindow *GetGlobalInstance()
+  {
+    if (vtkRenderWindowSingleton::RenderWindow==NULL)
+      {
+      vtkRenderWindowSingleton::RenderWindow=vtkRenderWindow::New();
+      }
+  return vtkRenderWindowSingleton::RenderWindow;
+  }
+
+  /// delete the instance
+  static void DeleteGlobalInstance()
+  {
+    if (vtkRenderWindowSingleton::RenderWindow)
+      {
+      vtkRenderWindowSingleton::RenderWindow->Delete();
+      vtkRenderWindowSingleton::RenderWindow=NULL;
+      }
+  }
+
+private:
+  static vtkRenderWindow *RenderWindow;
+};
+
+vtkRenderWindow *vtkRenderWindowSingleton::RenderWindow=NULL;
+
 //*****************************************************************************
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
@@ -84,6 +117,8 @@ int Finalize(vtkMultiProcessController* controller, int code)
     }
 
   vtkSQLog::DeleteGlobalInstance();
+
+  vtkRenderWindowSingleton::DeleteGlobalInstance();
 
   vtkMultiProcessController::SetGlobalController(0);
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
@@ -512,7 +547,7 @@ int SerialRender(
             MapArrayToActor(ren,outline,arrayType,0);
             }
 
-          vtkRenderWindow *rwin=vtkRenderWindow::New();
+          vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
           rwin->AddRenderer(ren);
           rwin->SetSize(iwx,iwy);
           ren->Delete();
@@ -545,7 +580,7 @@ int SerialRender(
           decompWriter->Delete();
           decompImage->Delete();
 
-          rwin->Delete();
+          //rwin->Delete();
 
           continue;
           }
@@ -559,7 +594,7 @@ int SerialRender(
           MapArrayToActor(ren,outline,arrayType,0);
           }
 
-        vtkRenderWindow *rwin=vtkRenderWindow::New();
+        vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
         rwin->AddRenderer(ren);
         rwin->SetSize(iwx,iwy);
         ren->Delete();
@@ -592,7 +627,7 @@ int SerialRender(
           cerr << "Test for array " << arrayName << " failed." << endl;
           }
         testHelper->Delete();
-        rwin->Delete();
+        //rwin->Delete();
         }
       }
     data->Delete();

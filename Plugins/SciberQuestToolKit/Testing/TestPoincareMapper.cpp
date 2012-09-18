@@ -7,12 +7,13 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQLog.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
 #include "vtkMultiProcessController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkAppendPolyData.h"
 #include "vtkProcessIdScalars.h"
-#include "vtkSphereSource.h"
 #include "vtkPlaneSource.h"
 #include "vtkSQBOVMetaReader.h"
 #include "vtkSQBOVReader.h"
@@ -24,6 +25,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkPlane.h"
 #include "vtkGlyph3D.h"
 #include "vtkSphereSource.h"
+#include "vtkDiskSource.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
@@ -97,9 +99,9 @@ int main(int argc, char **argv)
 
   // map plane
   vtkSQPlaneSource *map=vtkSQPlaneSource::New();
-  map->SetOrigin(-3,0,-3);
-  map->SetPoint1(3,0,-3);
-  map->SetPoint2(-3,0,3);
+  map->SetOrigin(-3,0.1,-3);
+  map->SetPoint1(3,0.1,-3);
+  map->SetPoint2(-3,0.1,3);
   map->SetXResolution(1);
   map->SetYResolution(1);
 
@@ -129,17 +131,27 @@ int main(int argc, char **argv)
   pid->SetInputConnection(0,pm->GetOutputPort(0));
   pm->Delete();
 
-  vtkSphereSource *s1=vtkSphereSource::New();
-  s1->SetThetaResolution(8);
-  s1->SetPhiResolution(8);
-  s1->SetRadius(0.08);
+  vtkDiskSource *d1=vtkDiskSource::New();
+  d1->SetInnerRadius(0);
+  d1->SetOuterRadius(0.04);
+  d1->SetCircumferentialResolution(16);
+
+  vtkTransform *t=vtkTransform::New();
+  t->RotateX(90.0);
+  //t->Translate(0,0.01,0);
+
+  vtkTransformPolyDataFilter *pdt=vtkTransformPolyDataFilter::New();
+  pdt->SetInputConnection(0,d1->GetOutputPort(0));
+  pdt->SetTransform(t);
+  d1->Delete();
+  t->Delete();
 
   vtkGlyph3D *g1=vtkGlyph3D::New();
   g1->ScalingOff();
   g1->SetInputConnection(0,pid->GetOutputPort(0));
-  g1->SetSourceConnection(0,s1->GetOutputPort(0));
+  g1->SetSourceConnection(0,pdt->GetOutputPort(0));
   pid->Delete();
-  s1->Delete();
+  pdt->Delete();
 
   // execute
   GetParallelExec(worldRank,worldSize,g1,0.0);
@@ -215,7 +227,7 @@ int main(int argc, char **argv)
     testHelper->AddArgument("-V");
     testHelper->AddArgument(base.c_str());
     testHelper->SetRenderWindow(rwin);
-    int result=testHelper->RegressionTest(40.0);
+    int result=testHelper->RegressionTest(10);
     testStatus=result==vtkTesting::PASSED?0:1;
     testHelper->Delete();
 
