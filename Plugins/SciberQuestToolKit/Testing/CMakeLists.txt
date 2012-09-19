@@ -91,3 +91,6 @@ if (PARAVIEW_DATA_ROOT)
     sq_add_test(TestVortexFilter 0)
   endif()
 endif()
+
+# Increase timeout for long tests (400 = 6m40s)
+SET_TESTS_PROPERTIES(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES TIMEOUT 400)
