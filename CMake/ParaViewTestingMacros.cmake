@@ -215,11 +215,7 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
             )
         set_property(TEST "${prefix}-${tdx}x${tdy}.${test_name}"
                      PROPERTY ENVIRONMENT "PV_ICET_WINDOW_BORDERS=1")
-        if (${test_name}_FORCE_SERIAL)
-          set_tests_properties("${prefix}.${test_name}" PROPERTIES RUN_SERIAL ON)
-          message(STATUS "Running in serial \"${prefix}.${test_name}\"")
-        endif (${test_name}_FORCE_SERIAL)
-
+        set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES RUN_SERIAL ON)
         set_tests_properties("${prefix}-${tdx}x${tdy}.${test_name}" PROPERTIES LABELS "PARAVIEW")
       endforeach(test_script)
     endif(${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
