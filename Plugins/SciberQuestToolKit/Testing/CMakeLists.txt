@@ -85,16 +85,18 @@ if (PARAVIEW_DATA_ROOT)
     sq_add_test(TestFieldTracer 4)
     sq_add_test(TestPlaneSource 4)
 
-    # Increase timeout for long tests (400 = 6m40s)
-    SET_TESTS_PROPERTIES(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES TIMEOUT 400)
+    # Increase timeout for long tests (600 = 10m)
+    set_tests_properties(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES TIMEOUT 600)
+    set_tests_properties(SciberQuestToolKit-TestVortexFilter-Parallel PROPERTIES RUN_SERIAL ON)
   else()
     # serial invocations, our reader needs mpi these tests use
     # an alternate reader when invoked serially.
     sq_add_test(TestKernelConvolution 0)
     sq_add_test(TestVortexFilter 0)
 
-    # Increase timeout for long tests (400 = 6m40s)
-    SET_TESTS_PROPERTIES(SciberQuestToolKit-TestVortexFilter-Serial PROPERTIES TIMEOUT 400)
+    # Increase timeout for long tests (600 = 10m)
+    set_tests_properties(SciberQuestToolKit-TestVortexFilter-Serial PROPERTIES TIMEOUT 600)
+    set_tests_properties(SciberQuestToolKit-TestVortexFilter-Serial PROPERTIES RUN_SERIAL ON)
   endif()
 endif()
 
