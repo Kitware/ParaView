@@ -17,6 +17,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
+#include "pqPropertyLinks.h"
 #include "pqSettings.h"
 #include "pqRenderView.h"
 #include "pqFileDialog.h"
@@ -30,8 +31,6 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSMPropertyHelper.h"
 #include "vtkPVXMLParser.h"
 #include "vtkMath.h"
-
-// #include "vtkEventQtSlotConnect.h"
 
 #include <QMenu>
 #include <QAction>
@@ -54,8 +53,6 @@ using std::string;
 using std::cerr;
 using std::endl;
 
-// I think these can be removed when the old configuration
-// writing code is cleaned up.
 #include "FsUtils.h"
 #include <fstream>
 using std::ofstream;
@@ -65,6 +62,8 @@ using std::ios_base;
 using std::ostringstream;
 using std::istringstream;
 
+// #define pqSQPlaneSourceDEBUG
+
 //-----------------------------------------------------------------------------
 pqSQPlaneSource::pqSQPlaneSource(
       pqProxy* l_proxy,
@@ -73,7 +72,7 @@ pqSQPlaneSource::pqSQPlaneSource(
       pqNamedObjectPanel(l_proxy, widget)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQPlaneSource" << endl;
+  cerr << ":::::pqSQPlaneSource::pqSQPlaneSource" << endl;
   #endif
 
   this->Dims[0]=this->Dims[1]=1.0;
@@ -98,68 +97,64 @@ pqSQPlaneSource::pqSQPlaneSource(
   this->Form->dx->setValidator(new QDoubleValidator(this->Form->dx));
   this->Form->dy->setValidator(new QDoubleValidator(this->Form->dy));
 
-  this->SetSpacing(this->Dx);
-  this->SetResolution(this->Nx);
-  this->SetNormal(this->N);
-
-  this->Form->constraintNone->click();
-
-  //   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
-  //
-  //   // Connect to server side pipeline's UpdateInformation events.
-  //   this->VTKConnect=vtkEventQtSlotConnect::New();
-  //   this->VTKConnect->Connect(
-  //       pProxy,
-  //       vtkCommand::UpdateInformationEvent,
-  //       this, SLOT(PullServerConfig()));
-
-  // Set up configuration viewer
-  this->PullServerConfig();
-
   // set up save/restore buttons
-  QObject::connect(this->Form->save,SIGNAL(clicked()),this,SLOT(saveConfiguration()));
-  QObject::connect(this->Form->restore,SIGNAL(clicked()),this,SLOT(loadConfiguration()));
-  //QObject::connect(this->Form->restore,SIGNAL(clicked()),this,SLOT(Restore()));
-  QObject::connect(this->Form->snap,SIGNAL(clicked()),this,SLOT(SnapViewToNormal()));
+  QObject::connect(
+      this->Form->save,
+      SIGNAL(clicked()),
+      this,
+      SLOT(saveConfiguration()));
+
+  QObject::connect(
+      this->Form->restore,
+      SIGNAL(clicked()),
+      this,
+      SLOT(loadConfiguration()));
+
+  //
+  QObject::connect(
+      this->Form->snap,
+      SIGNAL(clicked()),
+      this,
+      SLOT(SnapViewToNormal()));
 
   // set up the dimension calculator
   QObject::connect(
       this->Form->o_x,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->o_y,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->o_z,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   //
   QObject::connect(
       this->Form->p1_x,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->p1_y,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->p1_z,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   //
   QObject::connect(
       this->Form->p2_x,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->p2_y,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
   QObject::connect(
       this->Form->p2_z,
-      SIGNAL(editingFinished()),
+      SIGNAL(textChanged(QString)),
       this, SLOT(DimensionsModified()));
 
   // link resolution to spacing
@@ -190,131 +185,173 @@ pqSQPlaneSource::pqSQPlaneSource(
       SIGNAL(toggled(bool)),
       this, SLOT(SpacingModified()));
 
-  // These connection let PV know that we have changed, and makes the apply
-  // button activated.
-  QObject::connect(
-      this->Form->name,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->o_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->o_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->o_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->p1_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p1_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p1_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->p2_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p2_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p2_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->res_x,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->res_y,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->dx,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->dy,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->immediateMode,
-      SIGNAL(stateChanged(int)),
-      this, SLOT(setModified()));
-
   // These configure UI for constraints.
   QObject::connect(
-      this->Form->constraintNone,
-      SIGNAL(clicked()),
-      this, SLOT(ApplyConstraint()));
-  //
-  QObject::connect(
-      this->Form->constraintXy,
-      SIGNAL(clicked()),
-      this, SLOT(ApplyConstraint()));
-  //
-  QObject::connect(
-      this->Form->constraintXz,
-      SIGNAL(clicked()),
-      this, SLOT(ApplyConstraint()));
-  //
-  QObject::connect(
-      this->Form->constraintYz,
-      SIGNAL(clicked()),
+      this->Form->constraint,
+      SIGNAL(currentIndexChanged(int)),
       this, SLOT(ApplyConstraint()));
 
-  // These make sure constrained values get updated in the UI.
+  // make sure constrained values get updated in the UI.
   QObject::connect(
       this->Form->o_x,
       SIGNAL(textChanged(QString)),
       this, SLOT(ApplyConstraint()));
+
   QObject::connect(
       this->Form->o_y,
       SIGNAL(textChanged(QString)),
       this, SLOT(ApplyConstraint()));
+
   QObject::connect(
       this->Form->o_z,
       SIGNAL(textChanged(QString)),
       this, SLOT(ApplyConstraint()));
 
-  pqNamedObjectPanel::linkServerManagerProperties();
+  // link qt to sm
+  this->Links = new pqPropertyLinks;
+  this->Links->setUseUncheckedProperties(false);
+  this->Links->setAutoUpdateVTKObjects(true);
+
+  QObject::connect(
+      this->Links,
+      SIGNAL(qtWidgetChanged()),
+      this,
+      SLOT(setModified()));
+
+  vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
+
+  this->Links->addPropertyLink(
+      this->Form->name,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Name"));
+
+  this->Links->addPropertyLink(
+      this->Form->o_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->o_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->o_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->res_x,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("XResolution"));
+
+  this->Links->addPropertyLink(
+      this->Form->res_y,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("YResolution"));
+
+  this->Links->addPropertyLink(
+      this->Form->immediateMode,
+      "checked",
+      SIGNAL(stateChanged(int)),
+      pProxy,
+      pProxy->GetProperty("ImmediateMode"));
+
+  this->Links->addPropertyLink(
+      this->Form->constraint,
+      "currentIndex",
+      SIGNAL(currentIndexChanged(int)),
+      pProxy,
+      pProxy->GetProperty("Constraint"));
+
+  this->Links->addPropertyLink(
+      this->Form->decompType,
+      "currentIndex",
+      SIGNAL(currentIndexChanged(int)),
+      pProxy,
+      pProxy->GetProperty("DecompType"));
+
 }
 
 //-----------------------------------------------------------------------------
 pqSQPlaneSource::~pqSQPlaneSource()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::~pqSQPlaneSource" << endl;
+  cerr << ":::::pqSQPlaneSource::~pqSQPlaneSource" << endl;
   #endif
 
   delete this->Form;
-  /*
-  this->VTKConnect->Delete();
-  this->VTKConnect=0;*/
+  delete this->Links;
 }
 
 //-----------------------------------------------------------------------------
-void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *event)
+void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *aEvent)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::contextMenuEvent" << endl;
+  cerr << ":::::pqSQPlaneSource::contextMenuEvent" << endl;
   #endif
 
   QMenu context(this);
@@ -331,14 +368,14 @@ void pqSQPlaneSource::contextMenuEvent(QContextMenuEvent *event)
   connect(transAct, SIGNAL(triggered()), this, SLOT(ShowTranslateDialog()));
   context.addAction(transAct);
 
-  context.exec(event->globalPos());
+  context.exec(aEvent->globalPos());
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::CopyConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::CopyConfiguration" << endl;
+  cerr << ":::::pqSQPlaneSource::CopyConfiguration" << endl;
   #endif
 
   // grab the current configuration.
@@ -361,7 +398,7 @@ void pqSQPlaneSource::CopyConfiguration()
 void pqSQPlaneSource::PasteConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::PasteConfiguration" << endl;
+  cerr << ":::::pqSQPlaneSource::PasteConfiguration" << endl;
   #endif
 
   QClipboard *clipboard=QApplication::clipboard();
@@ -400,7 +437,7 @@ void pqSQPlaneSource::PasteConfiguration()
 void pqSQPlaneSource::ShowTranslateDialog()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQPlaneSource::ShowTranslateDialog" << endl;
+  cerr << ":::::pqSQPlaneSource::pqSQPlaneSource::ShowTranslateDialog" << endl;
   #endif
 
   pqSQTranslateDialog dialog(this,0);
@@ -530,7 +567,7 @@ void pqSQPlaneSource::Restore()
 void pqSQPlaneSource::Save()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::Save" << endl;
+  cerr << ":::::pqSQPlaneSource::Save" << endl;
   #endif
 
   QString fn=QFileDialog::getSaveFileName(this,"Save SQ Plane Source","","*.sqps");
@@ -571,7 +608,6 @@ void pqSQPlaneSource::Save()
     }
 }
 
-
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::loadConfiguration()
 {
@@ -606,7 +642,7 @@ void pqSQPlaneSource::loadConfiguration()
 void pqSQPlaneSource::saveConfiguration()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::saveConfiguration" << endl;
+  cerr << ":::::pqSQPlaneSource::saveConfiguration" << endl;
   #endif
 
   vtkSQPlaneSourceConfigurationWriter *writer=vtkSQPlaneSourceConfigurationWriter::New();
@@ -637,7 +673,7 @@ void pqSQPlaneSource::saveConfiguration()
 int pqSQPlaneSource::ValidateCoordinates()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::ValidateCoordinates" << endl;
+  cerr << ":::::pqSQPlaneSource::ValidateCoordinates" << endl;
   #endif
 
   double n[3]={0.0};
@@ -756,7 +792,7 @@ void pqSQPlaneSource::SetNormal(double *n)
 int pqSQPlaneSource::CalculateNormal(double *n)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::CaclulateNormal" << endl;
+  cerr << ":::::pqSQPlaneSource::CaclulateNormal" << endl;
   #endif
 
   this->Form->coordStatus->setText("OK");
@@ -781,10 +817,12 @@ int pqSQPlaneSource::CalculateNormal(double *n)
   v2[1]=p2[1]-o[1];
   v2[2]=p2[2]-o[2];
 
+  int ok=1;
   vtkMath::Cross(v1,v2,n);
-  int ok=(int)vtkMath::Normalize(n);
-  if (!ok)
+  double norm=vtkMath::Normalize(n);
+  if (norm<=1.0e-6)
     {
+    ok=0;
     this->Form->coordStatus->setText("Error");
     this->Form->coordStatus->setStyleSheet("color:red; background-color:lightyellow;");
     this->Form->n_x->setText("Error");
@@ -799,77 +837,53 @@ int pqSQPlaneSource::CalculateNormal(double *n)
 }
 
 //-----------------------------------------------------------------------------
+int pqSQPlaneSource::GetDecompType()
+{
+  #if defined pqSQPlaneSourceDEBUG
+  cerr << ":::::pqSQPlaneSource::GetDecompType" << endl;
+  #endif
+
+  return this->Form->constraint->currentIndex();
+}
+
+//-----------------------------------------------------------------------------
+void pqSQPlaneSource::SetDecompType(int type)
+{
+  #if defined pqSQPlaneSourceDEBUG
+  cerr << ":::::pqSQPlaneSource::SetDecompType" << endl;
+  #endif
+
+  this->Form->constraint->setCurrentIndex(type);
+}
+
+//-----------------------------------------------------------------------------
 int pqSQPlaneSource::GetConstraint()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::GetConstraint" << endl;
+  cerr << ":::::pqSQPlaneSource::GetConstraint" << endl;
   #endif
 
-  if (this->Form->constraintNone->isChecked())
-    {
-    return SQPS_CONSTRAINT_NONE;
-    }
-  else
-  if (this->Form->constraintXy->isChecked())
-    {
-    return SQPS_CONSTRAINT_XY;
-    }
-  else
-  if (this->Form->constraintXz->isChecked())
-    {
-    return SQPS_CONSTRAINT_XZ;
-    }
-  else
-  if (this->Form->constraintYz->isChecked())
-    {
-    return SQPS_CONSTRAINT_YZ;
-    }
-
-  this->Form->constraintNone->setChecked(true);
-  return SQPS_CONSTRAINT_NONE;
+  return this->Form->constraint->currentIndex();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::SetConstraint(int type)
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::SetConstraint" << endl;
+  cerr << ":::::pqSQPlaneSource::SetConstraint" << endl;
   #endif
 
-  switch(type)
-    {
-    case SQPS_CONSTRAINT_NONE:
-      this->Form->constraintNone->click();
-      break;
-
-    case SQPS_CONSTRAINT_XY:
-      this->Form->constraintXy->click();
-      break;
-
-    case SQPS_CONSTRAINT_XZ:
-      this->Form->constraintXz->click();
-      break;
-
-    case SQPS_CONSTRAINT_YZ:
-      this->Form->constraintYz->click();
-      break;
-
-    default:
-      sqErrorMacro(qDebug(),"Invalid constraint " << type << ".");
-      break;
-    }
-  this->ApplyConstraint();
+  this->Form->constraint->setCurrentIndex(type);
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::ApplyConstraint()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::ApplyConstraint" << endl;
+  cerr << ":::::pqSQPlaneSource::ApplyConstraint" << endl;
   #endif
 
-  int type=this->GetConstraint();
-
+  int type=this->Form->constraint->currentIndex();
   switch(type)
     {
     case SQPS_CONSTRAINT_NONE:
@@ -922,15 +936,13 @@ void pqSQPlaneSource::ApplyConstraint()
       sqErrorMacro(qDebug(),"Invalid constraint " << type << ".");
       break;
     }
-
-    this->setModified();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::DimensionsModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::DimensionsModified" << endl;
+  cerr << ":::::pqSQPlaneSource::DimensionsModified" << endl;
   #endif
 
   int ok=this->CalculateNormal(this->N);
@@ -969,7 +981,8 @@ void pqSQPlaneSource::DimensionsModified()
 
   // recompute resolution based on the current grid spacing
   // settings.
-  this->SpacingModified();
+  //this->SpacingModified();
+  this->ResolutionModified();
 
   return;
 }
@@ -978,56 +991,38 @@ void pqSQPlaneSource::DimensionsModified()
 void pqSQPlaneSource::SpacingModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::SpacingModified" << endl;
+  cerr << ":::::pqSQPlaneSource::SpacingModified" << endl;
   #endif
 
-  if (this->Form->spacingLock->isChecked())
+  // retreive the requested spacing.
+  this->GetSpacing(this->Dx);
+
+  // enforce uniform pixel aspect ratio
+  if (this->Form->aspectLock->isChecked())
     {
-    // retreive the requested spacing.
-    this->GetSpacing(this->Dx);
-
-    // enforce uniform pixel aspect ratio
-    if (this->Form->aspectLock->isChecked())
-      {
-      this->Dx[1]=this->Dx[0];
-      this->Form->dy->setText(QString("%1").arg(this->Dx[0]));
-      }
-
-    // update the grid resolution to match the requested grid spacing
-    // as closely as possible.
-    this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
-    this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
-    this->SetResolution(this->Nx);
+    this->Dx[1]=this->Dx[0];
+    this->SetSpacing(this->Dx);
     }
-  else
-    {
-    // update the spacing to match the requested resolution as closely
-    // as possible.
-    this->GetResolution(this->Nx);
 
-    if (this->Form->aspectLock->isChecked())
-      {
-      this->Nx[1]=(int)ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
-      }
+  // update the grid resolution to match the requested grid spacing
+  // as closely as possible.
+  this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
+  this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
 
-    this->SetResolution(this->Nx);
-    }
+  this->SetResolution(this->Nx);
 
   // compute the new number of cells.
   int nCells=this->Nx[0]*this->Nx[1];
   this->Form->nCells->setText(QString("%1").arg(nCells));
 
-  // update the spacing to match the actual spacing that will be used.
-  this->Dx[0]=this->Dims[0]/this->Nx[0];
-  this->Dx[1]=this->Dims[1]/this->Nx[1];
-  this->SetSpacing(this->Dx);
+  this->Links->accept();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::ResolutionModified()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::ResolutionModified" << endl;
+  cerr << ":::::pqSQPlaneSource::ResolutionModified" << endl;
   #endif
 
   // retreive the requested resolution.
@@ -1050,13 +1045,15 @@ void pqSQPlaneSource::ResolutionModified()
   // compute the new number of cells.
   int nCells=this->Nx[0]*this->Nx[1];
   this->Form->nCells->setText(QString("%1").arg(nCells));
+
+  this->Links->accept();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQPlaneSource::SnapViewToNormal()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::SnapViewToNormal" << endl;
+  cerr << ":::::pqSQPlaneSource::SnapViewToNormal" << endl;
   #endif
 
   double o[3];
@@ -1143,19 +1140,10 @@ void pqSQPlaneSource::SnapViewToNormal()
 }
 
 //-----------------------------------------------------------------------------
-void pqSQPlaneSource::UpdateInformationEvent()
-{
-  #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::UpdateInformationEvent" << endl;
-  #endif
-  // vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
-}
-
-//-----------------------------------------------------------------------------
 void pqSQPlaneSource::PullServerConfig()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::PullServerConfig" << endl;
+  cerr << ":::::pqSQPlaneSource::PullServerConfig" << endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -1213,6 +1201,12 @@ void pqSQPlaneSource::PullServerConfig()
   pProxy->UpdatePropertyInformation(constraintProp);
   this->SetConstraint(constraintProp->GetElement(0));
 
+  // DecompTypes
+  vtkSMIntVectorProperty *decompProp
+    = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("DecompType"));
+  pProxy->UpdatePropertyInformation(decompProp);
+  this->SetDecompType(decompProp->GetElement(0));
+
   // update derived/computed values.
   this->DimensionsModified();
 }
@@ -1221,7 +1215,7 @@ void pqSQPlaneSource::PullServerConfig()
 void pqSQPlaneSource::PushServerConfig()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::PushServerConfig" << endl;
+  cerr << ":::::pqSQPlaneSource::PushServerConfig" << endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -1273,6 +1267,12 @@ void pqSQPlaneSource::PushServerConfig()
   pProxy->UpdatePropertyInformation(constraintProp);
   constraintProp->SetElement(0,this->GetConstraint());
 
+  // DecompType
+  vtkSMIntVectorProperty *decompProp
+    = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("DecompType"));
+  pProxy->UpdatePropertyInformation(decompProp);
+  decompProp->SetElement(0,this->GetDecompType());
+
   // Let proxy send updated values.
   pProxy->UpdateVTKObjects();
 }
@@ -1281,15 +1281,13 @@ void pqSQPlaneSource::PushServerConfig()
 void pqSQPlaneSource::accept()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::accept" << endl;
+  cerr << ":::::pqSQPlaneSource::accept" << endl;
   #endif
 
   if (!this->ValidateCoordinates())
     {
     sqErrorMacro(qDebug(),"Invalid coordinate system.");
     }
-
-  this->PushServerConfig();
 
   pqNamedObjectPanel::accept();
 }
@@ -1300,10 +1298,8 @@ void pqSQPlaneSource::accept()
 void pqSQPlaneSource::reset()
 {
   #if defined pqSQPlaneSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::reset" << endl;
+  cerr << ":::::pqSQPlaneSource::reset" << endl;
   #endif
-
-  this->PullServerConfig();
 
   pqNamedObjectPanel::reset();
 }

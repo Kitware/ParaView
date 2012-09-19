@@ -60,6 +60,27 @@ int fequal(T a, T b, T tol)
 
 //*****************************************************************************
 template <typename T>
+T LaplacianOfGaussian(T X[3], T a, T B[3], T c)
+{
+  // X - evaluate at this location
+  // a - peak height
+  // B - center
+  // c - width
+
+  T x,y,z;
+  x=X[0]-B[0];
+  y=X[1]-B[1];
+  z=X[2]-B[2];
+
+  T r2 = x*x+y*y+z*z;
+  T c2 = c*c;
+
+  return -a/c2 * (((T)1)-r2/c2) * ((T)exp(-r2/(((T)2)*c2)));
+}
+
+
+//*****************************************************************************
+template <typename T>
 T Gaussian(T X[3], T a, T B[3], T c)
 {
   // X - evaluate at this location
@@ -464,6 +485,27 @@ void Magnitude(
     }
 }
 
+// Difference of two arrays D=A-B
+//*****************************************************************************
+template <typename T>
+void Difference(
+      size_t nt, // number of tuples
+      size_t nc, // number of components
+      T * __restrict__ A,
+      T * __restrict__ B,
+      T * __restrict__ D)
+{
+  for (size_t q=0; q<nt; ++q)
+    {
+    size_t qq=nc*q;
+    for (size_t c=0; c<nc; ++c)
+      {
+      size_t r=qq+c;
+      D[r]=A[r]-B[r];
+      }
+    }
+}
+
 //*****************************************************************************
 template<typename T>
 void Split(
@@ -644,6 +686,64 @@ void Copy(
         for (int c=0; c<nComp; ++c)
           {
           W[_vi+c] = V[vi+c];
+          }
+        }
+      }
+    }
+}
+
+// input  -> patch input array is defined on
+// output -> patch outpu array is defined on
+// nComp  -> number of components in V
+// V      -> input patch scalar or vector field
+// W      -> output patch scalar or vector field
+// D      -> output patch scalar or vector field
+//*****************************************************************************
+template <typename T>
+void Difference(
+      int *input,
+      int *output,
+      int nComp,
+      int mode,
+      T* __restrict__  V,
+      T* __restrict__  W,
+      T* __restrict__  D)
+{
+  // input array bounds.
+  const int ni=input[1]-input[0]+1;
+  const int nj=input[3]-input[2]+1;
+  const int nk=input[5]-input[4]+1;
+  FlatIndex idx(ni,nj,nk,mode);
+
+  // output array bounds
+  const int _ni=output[1]-output[0]+1;
+  const int _nj=output[3]-output[2]+1;
+  const int _nk=output[5]-output[4]+1;
+  FlatIndex _idx(_ni,_nj,_nk,mode);
+
+  // loop over output in patch coordinates (both patches are in the same space)
+  for (int r=output[4]; r<=output[5]; ++r)
+    {
+    const int _k=r-output[4];
+    const int  k=r-input[4];
+
+    for (int q=output[2]; q<=output[3]; ++q)
+      {
+      const int _j=q-output[2];
+      const int  j=q-input[2];
+
+      for (int p=output[0]; p<=output[1]; ++p)
+        {
+        const int _i=p-output[0];
+        const int  i=p-input[0];
+
+        const int _pi=nComp*_idx.Index(_i,_j,_k);
+
+        int vi = nComp*idx.Index(i,j,k);
+
+        for (int c=0; c<nComp; ++c)
+          {
+          D[_pi+c] = V[vi+c] - W[_pi+c];
           }
         }
       }
@@ -1015,7 +1115,7 @@ void ScalarMedianFilter2D(
   (void)nGhost;
 
   unsigned long *ids=0;
-  posix_memalign((void**)ids,16,knij*sizeof(unsigned long));
+  posix_memalign((void**)&ids,16,knij*sizeof(unsigned long));
 
   IndirectCompare<T> comp(V);
 
@@ -1072,7 +1172,7 @@ void ScalarMedianFilter3D(
   (void)nGhost;
 
   unsigned long *ids=0;
-  posix_memalign((void**)ids,16,knijk*sizeof(unsigned long));
+  posix_memalign((void**)&ids,16,knijk*sizeof(unsigned long));
 
   IndirectCompare<T> comp(V);
 
@@ -3089,27 +3189,27 @@ void EigenvalueDiagnostic(
 
           int realIdx;
           int imagIdx1;
-          int imagIdx2;
+          //int imagIdx2;
 
           if (IsReal(e1))
             {
             realIdx=0;
             imagIdx1=1;
-            imagIdx2=2;
+            //imagIdx2=2;
             }
           else
           if (IsReal(e2))
             {
             realIdx=1;
             imagIdx1=0;
-            imagIdx2=2;
+            //imagIdx2=2;
             }
           else
           if (IsReal(e3))
             {
             realIdx=2;
             imagIdx1=0;
-            imagIdx2=1;
+            //imagIdx2=1;
             }
           else
             {

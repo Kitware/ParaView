@@ -57,6 +57,15 @@ public:
   vtkSetStringMacro(SouthHemisphereName);
   vtkGetStringMacro(SouthHemisphereName);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQHemisphereSource();
   ~vtkSQHemisphereSource();
@@ -78,6 +87,7 @@ private:
   int Resolution;
   char *NorthHemisphereName;
   char *SouthHemisphereName;
+  int LogLevel;
 };
 
 #endif

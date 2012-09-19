@@ -26,9 +26,15 @@
 #include "vtkPolyData.h"
 #include "vtkTransform.h"
 
+#include "vtkSQLog.h"
 #include "vtkSQMetaDataKeys.h"
 #include "vtkSQPlaneSourceConstants.h"
 #include "vtkSQPlaneSourceCellGenerator.h"
+#include "Tuple.hxx"
+#include "CartesianExtent.h"
+#include "CellIdIterator.h"
+#include "CartesianExtentIterator.h"
+#include "Numerics.hxx"
 #include "XMLUtils.h"
 #include "SQMacros.h"
 #include "postream.h"
@@ -36,19 +42,124 @@
 #include <map>
 using std::map;
 using std::pair;
+#include <list>
+using std::list;
 
+// #define SQTK_DEBUG
+
+// ****************************************************************************
+static
+CellIdIterator *DecomposeStrips(
+      int nPieces,
+      int pieceNo,
+      int xResolution,
+      int yResolution,
+      int immediateMode)
+{
+  // The default domain decomposition of one cell per process
+  // is used in demand mode. If immediate mode is on then these
+  // will be reset.
+  int nLocal=1;
+  int startId=pieceNo;
+  int endId=pieceNo+1;
+
+  if (immediateMode)
+    {
+    // Immediate mode domain decomposition
+    int nCells=xResolution*yResolution;
+    int pieceSize=nCells/nPieces;
+    int nLarge=nCells%nPieces;
+    nLocal=pieceSize+(pieceNo<nLarge?1:0);
+    startId=pieceSize*pieceNo+(pieceNo<nLarge?pieceNo:nLarge);
+    endId=startId+nLocal-1;
+    }
+
+  return new CellIdIterator(startId,endId);
+}
+
+// ****************************************************************************
+static
+CartesianExtentIterator *DecomposePatches(
+      int nPieces,
+      int pieceNo,
+      int xResolution,
+      int yResolution)
+{
+  CartesianExtent domain(0,xResolution-1,0,yResolution-1,0,0);
+
+  int nPasses[2]={0,0};
+  int maxPasses[2]={xResolution/2,yResolution/2};
+
+  list<CartesianExtent> blocks;
+  blocks.push_back(domain);
+
+  list<CartesianExtent> splitBlocks;
+
+  int dir=0;
+  while(1)
+    {
+     // stop when we have enough blocks or all blocks have unit size
+    int nBlocks=blocks.size();
+    if (nBlocks>=nPieces) break;
+    if ((nPasses[0]>maxPasses[0]) && (nPasses[1]>maxPasses[1])) break;
+
+    for (int i=0; i<nBlocks; ++i)
+      {
+      int nBlocksTotal=blocks.size()+splitBlocks.size();
+      if (nBlocksTotal>=nPieces) break;
+
+      // split this block into two
+      CartesianExtent block=blocks.back();
+      blocks.pop_back();
+
+      CartesianExtent newBlock=block.Split(dir);
+
+      splitBlocks.push_back(block);
+
+      if (!newBlock.Empty())
+        {
+        splitBlocks.push_back(newBlock);
+        }
+      }
+
+    // transfer the split blocks to the head so that
+    // they are split agaion only after others.
+    blocks.insert(blocks.begin(),splitBlocks.begin(),splitBlocks.end());
+    splitBlocks.clear();
+
+    nPasses[dir]+=1;
+
+    // alternate splitting direction
+    dir=(dir+1)%2;
+    if (nPasses[dir]>maxPasses[dir]) dir=(dir+1)%2;
+    }
+
+  CartesianExtentIterator *it=new CartesianExtentIterator;
+  if (pieceNo<(int)blocks.size())
+    {
+    list<CartesianExtent>::iterator bit=blocks.begin();
+    for (int i=0; i<pieceNo; ++i,++bit);
+    it->SetDomain(domain);
+    it->SetExtent(*bit);
+    }
+  return it;
+}
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQPlaneSource);
 
 //-----------------------------------------------------------------------------
 vtkSQPlaneSource::vtkSQPlaneSource()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::vtkSQPlaneSource" << endl;
   #endif
 
   this->ImmediateMode=1;
 
   this->XResolution=this->YResolution=1;
+
+  this->DecompType=DECOMP_TYPE_PATCHES;
 
   this->Origin[0]=this->Origin[1]=this->Origin[2]
     =this->Point1[0]=this->Point1[1]=this->Point1[2]
@@ -65,14 +176,16 @@ vtkSQPlaneSource::vtkSQPlaneSource()
 
   this->DescriptiveName=0;
 
+  this->LogLevel=0;
+
   this->SetNumberOfInputPorts(0);
 }
 
 //-----------------------------------------------------------------------------
 vtkSQPlaneSource::~vtkSQPlaneSource()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::~vtkSQPlaneSource" << endl;
   #endif
   this->SetDescriptiveName(0);
 }
@@ -103,20 +216,27 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,2>(elem,"resolution",resolution);
   this->SetResolution(resolution);
 
+  int decomp_type=DECOMP_TYPE_PATCHES;
+  GetOptionalAttribute<int,1>(elem,"decomp_type",&decomp_type);
+  this->SetDecompType(decomp_type);
+
   int immediate_mode=1;
   GetOptionalAttribute<int,1>(elem,"immediate_mode",&immediate_mode);
   this->SetImmediateMode(immediate_mode);
 
-  #if defined vtkSQPlaneSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQPlaneSource" << "\n"
-    << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
-    << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
-    << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
-    << "#   resolution=" << resolution[0] << ", " << resolution[1] << "\n"
-    << "#   immediate_mode=" << immediate_mode << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQPlaneSource" << "\n"
+      << "#   origin=" << Tuple<double>(this->Origin,3) << "\n"
+      << "#   point1=" << Tuple<double>(this->Point1,3) << "\n"
+      << "#   point2=" << Tuple<double>(this->Point2,3) << "\n"
+      << "#   resolution=" << this->XResolution << ", " << this->YResolution << "\n"
+      << "#   decomp=" << this->DecompType << "\n"
+      << "#   immediate_mode=" << this->ImmediateMode << "\n";
+    }
 
   return 0;
 }
@@ -124,8 +244,8 @@ int vtkSQPlaneSource::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetResolution(const int xR, const int yR)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::SetResolution" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetResolution" << endl;
   #endif
   // Set the number of x-y subdivisions in the plane.
   if ( xR != this->XResolution || yR != this->YResolution )
@@ -146,10 +266,9 @@ int vtkSQPlaneSource::RequestInformation(
     vtkInformationVector ** /*inInfos*/,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-    cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::RequestInformation" << endl;
   #endif
-
 
   // tell the excutive that we are handling our own decomposition.
   vtkInformation *outInfo=outInfos->GetInformationObject(0);
@@ -157,16 +276,21 @@ int vtkSQPlaneSource::RequestInformation(
 
   return 1;
 }
-
 //-----------------------------------------------------------------------------
 int vtkSQPlaneSource::RequestData(
       vtkInformation *req,
       vtkInformationVector ** /*inputVector*/,
       vtkInformationVector *outputVector)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::vtkSQPlaneSource::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::RequestData" << endl;
   #endif
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQPlaneSource::RequestData");
+    }
 
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
@@ -185,15 +309,16 @@ int vtkSQPlaneSource::RequestData(
   if (pieceNo>=nPieces)
     {
     output->Initialize();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQPlaneSource::RequestData");
+      }
     return 1;
     }
 
   // The default domain decomposition of one cell per process
   // is used in demand mode. If immediate mode is on then these
   // will be reset.
-  int nLocal=1;
-  int startId=pieceNo;
-  int endId=pieceNo+1;
   int resolution[2]={1,nPieces};
 
   if (!this->ImmediateMode)
@@ -217,16 +342,49 @@ int vtkSQPlaneSource::RequestData(
     }
   else
     {
-    // Immediate mode domain decomposition
-    int nCells=this->XResolution*this->YResolution;
-    int pieceSize=nCells/nPieces;
-    int nLarge=nCells%nPieces;
-    nLocal=pieceSize+(pieceNo<nLarge?1:0);
-    startId=pieceSize*pieceNo+(pieceNo<nLarge?pieceNo:nLarge);
-    endId=startId+nLocal;
-
+    // remove the cell generator it may be present from
+    // a previous execution in deffered mode.
+    if (outInfo->Has(vtkSQCellGenerator::CELL_GENERATOR()))
+      {
+      outInfo->Remove(vtkSQCellGenerator::CELL_GENERATOR());
+      }
     resolution[0]=this->XResolution;
     resolution[1]=this->YResolution;
+    }
+
+  // create a parallel iterator that we'll use to
+  // select the cells owned by this rank.
+  CellIdIterator *it;
+  if (!this->ImmediateMode || (this->DecompType==DECOMP_TYPE_STRIPS))
+    {
+    it=DecomposeStrips(
+        nPieces,
+        pieceNo,
+        this->XResolution,
+        this->YResolution,
+        this->ImmediateMode);
+    }
+  else
+  if (this->DecompType==DECOMP_TYPE_PATCHES)
+    {
+    it=DecomposePatches(
+        nPieces,
+        pieceNo,
+        this->XResolution,
+        this->YResolution);
+    }
+
+  // nothing to do
+  int nLocal=it->Size();
+  if (nLocal<1)
+    {
+    delete it;
+    output->Initialize();
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->EndEvent("vtkSQPlaneSource::RequestData");
+      }
+    return 1;
     }
 
   // Configure the output
@@ -254,7 +412,7 @@ int vtkSQPlaneSource::RequestData(
   output->SetPolys(polys);
   polys->Delete();
 
-  // cell generator
+  // use this cell generator to create the output geometry
   vtkSQPlaneSourceCellGenerator *source=vtkSQPlaneSourceCellGenerator::New();
   source->SetOrigin(this->Origin);
   source->SetPoint1(this->Point1);
@@ -265,8 +423,10 @@ int vtkSQPlaneSource::RequestData(
   map<vtkIdType,vtkIdType> idMap;
   pair<map<vtkIdType,vtkIdType>::iterator,bool> idMapInsert;
 
-  for (int cid=startId; cid<endId; ++cid)
+  for (;it->Good(); it->Increment())
     {
+    int cid=it->Index();
+
     // get the grid indexes which are used as keys to
     // insure a single insertion of each coordinate.
     vtkIdType cpids[4];
@@ -299,6 +459,8 @@ int vtkSQPlaneSource::RequestData(
       ++pIa;
       }
     }
+  source->Delete();
+  delete it;
 
   // update point array
   X->SetNumberOfTuples(ptId);
@@ -309,10 +471,7 @@ int vtkSQPlaneSource::RequestData(
     outInfo->Set(vtkSQMetaDataKeys::DESCRIPTIVE_NAME(),this->DescriptiveName);
     }
 
-  source->Delete();
-
-  //output->Print(cerr);
-
+  //output->Print(pCerr());
 
 
   // double x[3], tc[2], v1[3], v2[3];
@@ -402,7 +561,10 @@ int vtkSQPlaneSource::RequestData(
   // output->SetPolys(newPolys);
   // newPolys->Delete();
 
-
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQPlaneSource::RequestData");
+    }
 
   return 1;
 }
@@ -410,8 +572,8 @@ int vtkSQPlaneSource::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetNormal(double N[3])
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetNormal" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetNormal" << endl;
   #endif
 
   // Set the normal to the plane. Will modify the Origin, Point1, and Point2
@@ -483,8 +645,8 @@ void vtkSQPlaneSource::SetNormal(double nx, double ny, double nz)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetCenter(double center[3])
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetCenter" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQPlaneSource::SetCenter" << endl;
   #endif
 
   // Set the center of the plane. Will modify the Origin, Point1, and Point2
@@ -529,8 +691,10 @@ void vtkSQPlaneSource::SetCenter(double x, double y, double z)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::ApplyConstraint()
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::ApplyConstraint" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::ApplyConstraint "
+    <<  this->Constraint << endl;
   #endif
 
   double p[3]={0.0};
@@ -588,9 +752,10 @@ void vtkSQPlaneSource::ApplyConstraint()
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetConstraint(int type)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetConstraint" << endl;
-  cerr << type << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetConstraint "
+    << type << endl;
   #endif
 
   if (this->Constraint == type )
@@ -606,9 +771,10 @@ void vtkSQPlaneSource::SetConstraint(int type)
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetOrigin(double ox, double oy, double oz)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetOrigin" << endl;
-  cerr << ox << " " << oy << " " << oz << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetOrigin "
+    << ox << " " << oy << " " << oz << endl;
   #endif
 
   // modifies the normal and origin
@@ -656,9 +822,10 @@ void vtkSQPlaneSource::SetPoint1(double p[3])
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetPoint1(double x, double y, double z)
 {
-#ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetPoint1" << endl;
-  cerr << x << " " << y << " " << z << endl;
+#ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetPoint1 "
+    << x << " " << y << " " << z << endl;
   #endif
 
   // modifies the normal and origin
@@ -699,9 +866,10 @@ void vtkSQPlaneSource::SetPoint2(double p[3])
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSource::SetPoint2(double x, double y, double z)
 {
-  #ifdef vtkSQPlaneSourceDEBUG
-  cerr << "=====vtkSQPlaneSource::SetPoint2" << endl;
-  cerr << x << " " << y << " " << z << endl;
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQPlaneSource::SetPoint2 "
+    << x << " " << y << " " << z << endl;
   #endif
 
   // modifies the normal and origin

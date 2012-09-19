@@ -9,6 +9,7 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __FlatIndex_h
 #define __FlatIndex_h
 
+class CartesianExtent;
 
 /// FlatIndex - A class to convert i,j,k tuples into flat indices
 /**
@@ -27,8 +28,11 @@ class FlatIndex
 {
 public:
   FlatIndex() : A(0), B(0), C(0) {}
-
   FlatIndex(int ni, int nj, int nk, int mode);
+  FlatIndex(const CartesianExtent &ext, int nghost=0);
+
+  void Initialize(int ni, int nj, int nk, int mode);
+  void Initialize(const CartesianExtent &ext, int nghost=0);
 
   int Index(int i, int j, int k)
   {

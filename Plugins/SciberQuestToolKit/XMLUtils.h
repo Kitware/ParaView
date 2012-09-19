@@ -122,7 +122,7 @@ Delim(istream &s,char c);
 template<typename S, typename T>
 void ExtractValues(
     S dataStr,
-    vector<T> &data)
+    T &data)
 {
   istringstream ss(dataStr);
 
@@ -131,9 +131,9 @@ void ExtractValues(
       Delim(ss,'\n') && (ss >> std::ws) &&
       Delim(ss,'\t') && (ss >> std::ws))
     {
-    T val;
+    typename T::value_type val;
     ss >> val;
-    data.push_back(val);
+    data.insert(data.end(),val);
     }
 }
 
@@ -141,7 +141,7 @@ template<typename T>
 int ExtractValues(
     vtkXMLDataElement *elem,
     const string &xml,
-    vector<T> &data
+    T &data
     )
 {
   // expecting no nested elements
@@ -186,9 +186,9 @@ int ExtractValues(
       Delim(ss,'\n') && (ss >> ws) &&
       Delim(ss,'\t') && (ss >> ws))
     {
-    T val;
+    typename T::value_type val;
     ss >> val;
-    data.push_back(val);
+    data.insert(data.end(),val);
     }
 
   cerr << endl << endl << data << endl << endl;

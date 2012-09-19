@@ -18,6 +18,9 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkTensor.h"
+#include "vtkPVXMLElement.h"
+#include "XMLUtils.h"
+#include "vtkSQLog.h"
 
 #include <cmath>
 #include <string>
@@ -98,6 +101,7 @@ void ComputeFTLE(
       double prog1,
       vtkIdType nCells,
       vtkDoubleArray *gradV,
+      double timeInterval,
       vtkDoubleArray *ftleV)
 {
   const vtkIdType nProgSteps=10;
@@ -109,7 +113,6 @@ void ComputeFTLE(
 
   ftleV->SetNumberOfComponents(1);
   ftleV->SetNumberOfTuples(nCells);
-  ftleV->SetName("ftle");
   double *pFtleV=ftleV->GetPointer(0);
 
   // for each cell
@@ -140,7 +143,7 @@ void ComputeFTLE(
     lam=max(lam,e(2,0));
     lam=max(lam,1.0);
 
-    pFtleV[0]=log(sqrt(lam));
+    pFtleV[0]=log(sqrt(lam))/timeInterval;
 
     pFtleV+=1;
     pGradV+=9;
@@ -151,34 +154,106 @@ void ComputeFTLE(
 vtkStandardNewMacro(vtkSQFTLE);
 
 //-----------------------------------------------------------------------------
-vtkSQFTLE::vtkSQFTLE() : PassInput(0)
+vtkSQFTLE::vtkSQFTLE()
+      :
+  PassInput(0),
+  TimeInterval(1.0),
+  LogLevel(0)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::vtkSQFTLE" << endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
-
-  // by default process active point vectors
-  this->SetInputArrayToProcess(
-        0,
-        0,
-        0,
-        vtkDataObject::FIELD_ASSOCIATION_POINTS,
-        vtkDataSetAttributes::VECTORS);
 }
 
 //-----------------------------------------------------------------------------
 int vtkSQFTLE::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::Initialize" << endl;
   #endif
 
-  (void)root;
+  vtkPVXMLElement *elem=0;
+  elem=GetOptionalElement(root,"vtkSQFTLE");
+  if (elem==0)
+    {
+    return -1;
+    }
+
+  // input arrays, optional but must be set somewhwere
+  vtkPVXMLElement *nelem;
+  nelem=GetOptionalElement(elem,"input_arrays");
+  if (nelem)
+    {
+    ExtractValues(nelem->GetCharacterData(),this->InputArrays);
+    }
+
+  int passInput=0;
+  GetOptionalAttribute<int,1>(elem,"pass_input",&passInput);
+  if (passInput>0)
+    {
+    this->SetPassInput(passInput);
+    }
+
+  double timeInterval=0.0;
+  GetOptionalAttribute<double,1>(elem,"time_interval",&timeInterval);
+  if (timeInterval>0.0)
+    {
+    this->SetTimeInterval(timeInterval);
+    }
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQFTLE" << "\n"
+      << "#   pass_input=" << this->PassInput << "\n"
+      << "#   time_interval=" << this->TimeInterval << "\n"
+      << "#   input_arrays=";
+
+    set<string>::iterator it=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader() << "\n";
+    }
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQFTLE::AddInputArray(const char *name)
+{
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQFTLE::AddInputArray"
+    << "name=" << name << endl;
+  #endif
+
+  if (this->InputArrays.insert(name).second)
+    {
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQFTLE::ClearInputArrays()
+{
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQFTLE::ClearInputArrays" << endl;
+  #endif
+
+  if (this->InputArrays.size())
+    {
+    this->InputArrays.clear();
+    this->Modified();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -187,9 +262,16 @@ int vtkSQFTLE::RequestData(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQFTLEDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQFTLE::RequestData" << endl;
   #endif
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQFTLE::RequestData");
+    }
 
   vtkInformation *inInfo = inInfos[0]->GetInformationObject(0);
   vtkInformation *outInfo = outInfos->GetInformationObject(0);
@@ -217,23 +299,54 @@ int vtkSQFTLE::RequestData(
     }
 
   vtkIdType nCells=input->GetNumberOfCells();
-  if (nCells<1)
+  if (nCells>0)
     {
-    vtkErrorMacro("No cells on input.");
-    return 1;
+    set<string>::iterator it;
+    set<string>::iterator begin=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (it=begin; it!=end; ++it)
+      {
+      vtkDataArray *V=input->GetPointData()->GetArray((*it).c_str());
+      if (V==0)
+        {
+        vtkErrorMacro(
+          << "Array " << (*it).c_str()
+          << " was requested but is not present");
+        continue;
+        }
+
+      if (V->GetNumberOfComponents()!=3)
+        {
+        vtkErrorMacro(
+          << "Array " << (*it).c_str() << " is not a vector.");
+        continue;
+        }
+
+      // Gradient.
+      vtkDoubleArray *gradV=vtkDoubleArray::New();
+      ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
+
+      // FTLE
+      string name;
+      name+="ftle-";
+      name+=V->GetName();
+
+      vtkDoubleArray *ftleV=vtkDoubleArray::New();
+      ftleV->SetName(name.c_str());
+
+      ComputeFTLE(this,0.5,1.0,nCells,gradV,this->TimeInterval,ftleV);
+
+      output->GetCellData()->AddArray(ftleV);
+
+      ftleV->Delete();
+      gradV->Delete();
+      }
     }
 
-  // Gradient.
-  vtkDataArray *V=this->GetInputArrayToProcess(0,inInfos);
-  vtkDoubleArray *gradV=vtkDoubleArray::New();
-  ComputeVectorGradient(this,0.0,0.4,input,nCells,V,gradV);
-
-  // FTLE
-  vtkDoubleArray *ftleV=vtkDoubleArray::New();
-  ComputeFTLE(this,0.5,1.0,nCells,gradV,ftleV);
-  output->GetCellData()->AddArray(ftleV);
-  ftleV->Delete();
-  gradV->Delete();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQFTLE::RequestData");
+    }
 
   return 1;
 }

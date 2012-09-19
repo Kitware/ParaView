@@ -5,7 +5,6 @@
 /___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
-
 */
 #ifndef __pqSQImageGhosts_h
 #define __pqSQImageGhosts_h

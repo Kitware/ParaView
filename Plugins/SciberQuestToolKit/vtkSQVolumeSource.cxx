@@ -6,7 +6,7 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-/*=========================================================================
+/*=====================
 
   Program:   Visualization Toolkit
   Module:    $RCSfile: vtkSQVolumeSource.cxx,v $
@@ -19,7 +19,7 @@ Copyright 2012 SciberQuest Inc.
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notice for more information.
 
-=========================================================================*/
+=====================*/
 #include "vtkSQVolumeSource.h"
 
 #include "vtkObjectFactory.h"
@@ -49,16 +49,15 @@ using std::pair;
 typedef pair<map<vtkIdType,vtkIdType>::iterator,bool> MapInsert;
 typedef pair<vtkIdType,vtkIdType> MapElement;
 
-// #define vtkSQVolumeSourceDEBUG
-// #define vtkSQVolumeSourceTIME
+// #define SQTK_DEBUG
 
 vtkStandardNewMacro(vtkSQVolumeSource);
 
 //----------------------------------------------------------------------------
 vtkSQVolumeSource::vtkSQVolumeSource()
 {
-  #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::vtkSQVolumeSource" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQVolumeSource::vtkSQVolumeSource" << endl;
   #endif
 
   this->ImmediateMode=1;
@@ -83,6 +82,8 @@ vtkSQVolumeSource::vtkSQVolumeSource()
   this->Point3[1]=0.0;
   this->Point3[2]=1.0;
 
+  this->LogLevel=0;
+
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
 }
@@ -90,8 +91,8 @@ vtkSQVolumeSource::vtkSQVolumeSource()
 //----------------------------------------------------------------------------
 vtkSQVolumeSource::~vtkSQVolumeSource()
 {
-  #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQVolumeSource::~vtkSQVolumeSource" << endl;
   #endif
 }
 
@@ -129,17 +130,19 @@ int vtkSQVolumeSource::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"immediate_mode",&immediate_mode);
   this->SetImmediateMode(immediate_mode);
 
-  #if defined vtkSQVolumeSourceTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQVolumeSource" << "\n"
-    << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
-    << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
-    << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
-    << "#   point3=" << point3[0] << ", " << point3[1] << ", " << point3[2] << "\n"
-    << "#   resolution=" << resolution[0] << ", " << resolution[1] << ", " << resolution[2] << "\n"
-    << "#   immediate_mode=" << immediate_mode << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+     log->GetHeader()
+      << "# ::vtkSQVolumeSource" << "\n"
+      << "#   origin=" << origin[0] << ", " << origin[1] << ", " << origin[2] << "\n"
+      << "#   point1=" << point1[0] << ", " << point1[1] << ", " << point1[2] << "\n"
+      << "#   point2=" << point2[0] << ", " << point2[1] << ", " << point2[2] << "\n"
+      << "#   point3=" << point3[0] << ", " << point3[1] << ", " << point3[2] << "\n"
+      << "#   resolution=" << resolution[0] << ", " << resolution[1] << ", " << resolution[2] << "\n"
+      << "#   immediate_mode=" << immediate_mode << "\n";
+    }
 
   return 0;
 }
@@ -150,8 +153,8 @@ int vtkSQVolumeSource::RequestInformation(
     vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQVolumeSource::RequestInformation" << endl;
   #endif
 
   (void)req;
@@ -172,8 +175,8 @@ int vtkSQVolumeSource::RequestData(
     vtkInformationVector **inInfos,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQVolumeSource::RequestData" << endl;
   #endif
 
   (void)req;
@@ -221,7 +224,7 @@ int vtkSQVolumeSource::RequestData(
 
   if (!this->ImmediateMode)
     {
-    // In demeand mode a pseduo dataset is generated here for
+    // In demand mode a pseduo dataset is generated here for
     // display in PV, a demand plane source is inserted into
     // the pipeline for down stream access to any of the plane's
     // cell's
@@ -350,8 +353,8 @@ int vtkSQVolumeSource::RequestData(
 //----------------------------------------------------------------------------
 void vtkSQVolumeSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQVolumeSourceDEBUG
-  cerr << "===============================vtkSQVolumeSource::PrintSelf" << endl;
+  #ifdef SQTK_DEBUG
+  cerr << "=====vtkSQVolumeSource::PrintSelf" << endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

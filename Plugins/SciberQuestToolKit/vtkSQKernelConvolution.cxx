@@ -9,13 +9,9 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQKernelConvolution.h"
 
-// #define vtkSQKernelConvolutionDEBUG
-// #define vtkSQKernelConvolutionTIME
+// #define SQTK_DEBUG
 
-#if defined vtkSQKernelConvolutionTIME
-  #include "vtkSQLog.h"
-#endif
-
+#include "vtkSQLog.h"
 #include "Numerics.hxx"
 #include "Tuple.hxx"
 #include "CartesianExtent.h"
@@ -46,6 +42,8 @@ Copyright 2012 SciberQuest Inc.
   #include <unistd.h>
 #endif
 
+#include <sstream>
+using std::ostringstream;
 #include <string>
 using std::string;
 #include <map>
@@ -58,12 +56,31 @@ using std::pair;
 using std::min;
 using std::max;
 
-
 #ifndef SQTK_WITHOUT_MPI
 #include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif
 
+// ****************************************************************************
+static
+const char *GetKernelTypeAsString(int type)
+{
+  switch(type)
+    {
+    case vtkSQKernelConvolution::KERNEL_TYPE_GAUSSIAN:
+      return "gauss";
+      break;
+    case vtkSQKernelConvolution::KERNEL_TYPE_LOG:
+      return "log";
+      break;
+    case vtkSQKernelConvolution::KERNEL_TYPE_CONSTANT:
+      return "avg";
+      break;
+    }
+  return "invalid";
+}
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQKernelConvolution);
 
 //-----------------------------------------------------------------------------
@@ -73,8 +90,9 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
   WorldRank(0),
   HostSize(1),
   HostRank(0),
+  ComputeResidual(0),
   KernelWidth(3),
-  KernelType(KERNEL_TYPE_GAUSIAN),
+  KernelType(KERNEL_TYPE_GAUSSIAN),
   Kernel(0),
   KernelModified(1),
   Mode(CartesianExtent::DIM_MODE_3D),
@@ -82,9 +100,10 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
   NumberOfActiveCUDADevices(0),
   CUDADeviceId(-1),
   NumberOfMPIRanksToUseCUDA(0),
-  EnableCUDA(0)
+  EnableCUDA(0),
+  LogLevel(0)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::vtkSQKernelConvolution" << endl;
   #endif
 
@@ -207,7 +226,7 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
     }
   this->SetNumberOfActiveCUDADevices(this->NumberOfCUDADevices);
 
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "HostSize=" << this->HostSize << endl;
   pCerr() << "HostRank=" << this->HostRank << endl;
   #endif
@@ -216,7 +235,7 @@ vtkSQKernelConvolution::vtkSQKernelConvolution()
 //-----------------------------------------------------------------------------
 vtkSQKernelConvolution::~vtkSQKernelConvolution()
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::~vtkSQKernelConvolution" << endl;
   #endif
 
@@ -233,7 +252,7 @@ vtkSQKernelConvolution::~vtkSQKernelConvolution()
 //-----------------------------------------------------------------------------
 int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::Initialize" << endl;
   #endif
 
@@ -241,82 +260,122 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
   elem=GetOptionalElement(root,"vtkSQKernelConvolution");
   if (elem==0)
     {
-    //sqErrorMacro(pCerr(),"Element for vtkSQKernelConvolution is not present.");
     return -1;
     }
 
   int stencilWidth=0;
-  GetOptionalAttribute<int,1>(elem,"stencilWidth",&stencilWidth);
+  GetOptionalAttribute<int,1>(elem,"stencil_width",&stencilWidth);
   if (stencilWidth>2)
     {
     this->SetKernelWidth(stencilWidth);
     }
 
   int kernelType=-1;
-  GetOptionalAttribute<int,1>(elem,"kernelType",&kernelType);
+  GetOptionalAttribute<int,1>(elem,"kernel_type",&kernelType);
   if (kernelType>=0)
     {
     this->SetKernelType(kernelType);
     }
 
+  // input arrays, optional but must be set somewhwere
+  vtkPVXMLElement *nelem;
+  nelem=GetOptionalElement(elem,"input_arrays");
+  if (nelem)
+    {
+    ExtractValues(nelem->GetCharacterData(),this->InputArrays);
+    }
+
+  // arrays to copy, optional
+  nelem=GetOptionalElement(elem,"arrays_to_copy");
+  if (nelem)
+    {
+    ExtractValues(nelem->GetCharacterData(),this->ArraysToCopy);
+    }
+
+  int computeResidual=0;
+  GetOptionalAttribute<int,1>(elem,"compute_residual",&computeResidual);
+  if (computeResidual>0)
+    {
+    this->SetComputeResidual(computeResidual);
+    }
+
   int CPUDriverOptimization=-1;
-  GetOptionalAttribute<int,1>(elem,"CPUDriverOptimization",&CPUDriverOptimization);
+  GetOptionalAttribute<int,1>(elem,"cpu_driver_optimization",&CPUDriverOptimization);
   if (CPUDriverOptimization>=0)
     {
     this->SetCPUDriverOptimization(CPUDriverOptimization);
     }
 
   int numberOfMPIRanksToUseCUDA=0;
-  GetOptionalAttribute<int,1>(elem,"numberOfMPIRanksToUseCUDA",&numberOfMPIRanksToUseCUDA);
+  GetOptionalAttribute<int,1>(elem,"number_of_mpi_ranks_to_use_cuda",&numberOfMPIRanksToUseCUDA);
 
-  #if defined vtkSQKernelConvolutionTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQKernelConvolution" << "\n"
-    << "#   stencilWidth=" << stencilWidth << "\n"
-    << "#   kernelType=" << kernelType << "\n"
-    << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
-    << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQKernelConvolution" << "\n"
+      << "#   stencilWidth=" << stencilWidth << "\n"
+      << "#   kernelType=" << kernelType << "\n"
+      << "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
+      << "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n"
+      << "#   input_arrays=";
+    set<string>::iterator it=this->InputArrays.begin();
+    set<string>::iterator end=this->InputArrays.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader()
+      << "\n"
+      << "#   arrays_to_copy=";
+    it=this->ArraysToCopy.begin();
+    end=this->ArraysToCopy.end();
+    for (; it!=end; ++it)
+      {
+      log->GetHeader() << *it << " ";
+      }
+    log->GetHeader() << "\n";
+    }
 
   if (numberOfMPIRanksToUseCUDA)
     {
     this->SetNumberOfMPIRanksToUseCUDA(numberOfMPIRanksToUseCUDA);
 
     int numberOfActiveCUDADevices=1;
-    GetOptionalAttribute<int,1>(elem,"numberOfActiveCUDADevices",&numberOfActiveCUDADevices);
+    GetOptionalAttribute<int,1>(elem,"number_of_active_cuda_devices",&numberOfActiveCUDADevices);
     this->SetNumberOfActiveCUDADevices(numberOfActiveCUDADevices);
 
     int numberOfWarpsPerCUDABlock=0;
-    GetOptionalAttribute<int,1>(elem,"numberOfWarpsPerCUDABlock",&numberOfWarpsPerCUDABlock);
+    GetOptionalAttribute<int,1>(elem,"number_of_warps_per_cuda_block",&numberOfWarpsPerCUDABlock);
     if (numberOfWarpsPerCUDABlock)
       {
       this->SetNumberOfWarpsPerCUDABlock(numberOfWarpsPerCUDABlock);
       }
 
     int kernelCUDAMemType=-1;
-    GetOptionalAttribute<int,1>(elem,"kernelCUDAMemoryType",&kernelCUDAMemType);
+    GetOptionalAttribute<int,1>(elem,"kernel_cuda_memory_type",&kernelCUDAMemType);
     if (kernelCUDAMemType>=0)
       {
       this->SetKernelCUDAMemoryType(kernelCUDAMemType);
       }
 
     int inputCUDAMemType=-1;
-    GetOptionalAttribute<int,1>(elem,"inputCUDAMemoryType",&inputCUDAMemType);
+    GetOptionalAttribute<int,1>(elem,"input_cuda_memory_type",&inputCUDAMemType);
     if (inputCUDAMemType>=0)
       {
       this->SetInputCUDAMemoryType(inputCUDAMemType);
       }
 
-    #if defined vtkSQKernelConvolutionTIME
-    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-    *log
-      << "#   numberOfActiveCUDADevices=" << numberOfActiveCUDADevices << "\n"
-      << "#   numberOfWarpsPerCUDABlock=" << numberOfWarpsPerCUDABlock << "\n"
-      << "#   kernelCUDAMemType=" << kernelCUDAMemType << "\n"
-      << "#   inputCUDAMemType=" << inputCUDAMemType << "\n"
-      << "\n";
-    #endif
+    if (this->LogLevel || globalLogLevel)
+      {
+      log->GetHeader()
+        << "#   numberOfActiveCUDADevices=" << numberOfActiveCUDADevices << "\n"
+        << "#   numberOfWarpsPerCUDABlock=" << numberOfWarpsPerCUDABlock << "\n"
+        << "#   kernelCUDAMemType=" << kernelCUDAMemType << "\n"
+        << "#   inputCUDAMemType=" << inputCUDAMemType << "\n"
+        << "\n";
+      }
     }
 
   return 0;
@@ -325,7 +384,7 @@ int vtkSQKernelConvolution::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::AddInputArray(const char *name)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::AddInputArray"
     << "name=" << name << endl;
@@ -340,7 +399,7 @@ void vtkSQKernelConvolution::AddInputArray(const char *name)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::ClearInputArrays()
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::ClearInputArrays" << endl;
   #endif
@@ -353,9 +412,38 @@ void vtkSQKernelConvolution::ClearInputArrays()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSQKernelConvolution::AddArrayToCopy(const char *name)
+{
+  #ifdef SQTK_DEBUG
+  pCerr()
+    << "=====vtkSQKernelConvolution::ArraysToCopy" << endl
+    << "name=" << name << endl;
+  #endif
+
+  if (this->ArraysToCopy.insert(name).second)
+    {
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSQKernelConvolution::ClearArraysToCopy()
+{
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQKernelConvolution::ClearArraysToCopy" << endl;
+  #endif
+
+  if (this->ArraysToCopy.size())
+    {
+    this->ArraysToCopy.clear();
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetCPUDriverOptimization(int opt)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetCPUDriverOptimization"
     << " " << opt << endl;
@@ -373,7 +461,7 @@ int vtkSQKernelConvolution::GetCPUDriverOptimization()
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA(int allUse)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA"
     << " " << allUse
@@ -391,7 +479,7 @@ void vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA(int allUse)
 
   this->Modified();
 
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
   #endif
 }
@@ -399,7 +487,7 @@ void vtkSQKernelConvolution::SetAllMPIRanksToUseCUDA(int allUse)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA"
     << " " << nRanks
@@ -433,7 +521,7 @@ void vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 
   this->Modified();
 
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
   #endif
 }
@@ -441,7 +529,7 @@ void vtkSQKernelConvolution::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetNumberOfActiveCUDADevices(int nActive)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetNumberOfActiveCUDADevices"
     << " " << nActive
@@ -470,7 +558,7 @@ void vtkSQKernelConvolution::SetNumberOfActiveCUDADevices(int nActive)
     {
     int deviceId=this->HostRank%this->NumberOfActiveCUDADevices;
     this->SetCUDADeviceId(deviceId);
-    #ifdef vtkSQKernelConvolutionDEBUG
+    #ifdef SQTK_DEBUG
     pCerr() << "assigned to cuda device " << deviceId << endl;
     #endif
     }
@@ -481,7 +569,7 @@ void vtkSQKernelConvolution::SetNumberOfActiveCUDADevices(int nActive)
 //-----------------------------------------------------------------------------
 int vtkSQKernelConvolution::SetCUDADeviceId(int deviceId)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetCUDADeviceId"
     << " " << deviceId
@@ -501,7 +589,7 @@ int vtkSQKernelConvolution::SetCUDADeviceId(int deviceId)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetKernelCUDAMemoryType(int memType)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetKernelCUDAMemoryType"
     << " " << memType << endl;
@@ -519,7 +607,7 @@ int vtkSQKernelConvolution::GetKernelCUDAMemoryType()
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetInputCUDAMemoryType(int memType)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "=====vtkSQKernelConvolution::SetInputCUDAMemoryType"
     << " " << memType << endl;
@@ -550,7 +638,7 @@ int vtkSQKernelConvolution::GetNumberOfWarpsPerCUDABlock()
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetMode(int mode)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::SetMode" << endl;
   #endif
 
@@ -567,7 +655,7 @@ void vtkSQKernelConvolution::SetMode(int mode)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetKernelType(int type)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::SetKernelType" << endl;
   #endif
 
@@ -584,7 +672,7 @@ void vtkSQKernelConvolution::SetKernelType(int type)
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::SetKernelWidth(int width)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::SetKernelWidth" << endl;
   #endif
 
@@ -607,8 +695,8 @@ void vtkSQKernelConvolution::SetKernelWidth(int width)
 //-----------------------------------------------------------------------------
 int vtkSQKernelConvolution::UpdateKernel()
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << endl;
+  #ifdef SQTK_DEBUG
+  //pCerr() << "=====vtkSQKernelConvolution::UpdateKernel" << endl;
   #endif
 
   if (!this->KernelModified)
@@ -648,7 +736,7 @@ int vtkSQKernelConvolution::UpdateKernel()
   this->Kernel=new float [size];
   float kernelNorm=0.0;
 
-  if (this->KernelType==KERNEL_TYPE_GAUSIAN)
+  if (this->KernelType==KERNEL_TYPE_GAUSSIAN)
     {
     float *X=new float[this->KernelWidth];
     linspace<float>(-1.0f,1.0f, this->KernelWidth, X);
@@ -671,6 +759,36 @@ int vtkSQKernelConvolution::UpdateKernel()
           int q = this->KernelWidth*this->KernelWidth*k+this->KernelWidth*j+i;
 
           this->Kernel[q]=Gaussian(x,a,B,c);
+          kernelNorm+=this->Kernel[q];
+          }
+        }
+      }
+    delete [] X;
+    }
+  else
+  if (this->KernelType==KERNEL_TYPE_LOG)
+    {
+    float *X=new float[this->KernelWidth];
+    linspace<float>(-1.0f,1.0f, this->KernelWidth, X);
+
+    float B[3]={0.0f,0.0f,0.0f};
+    float a=1.0f;
+    float c=0.55f;
+
+    int H=(this->Mode==CartesianExtent::DIM_MODE_3D?this->KernelWidth:1);
+
+    for (int k=0; k<H; ++k)
+      {
+      for (int j=0; j<this->KernelWidth; ++j)
+        {
+        for (int i=0; i<this->KernelWidth; ++i)
+          {
+          float x[3]
+            = {X[i],X[j],(this->Mode==CartesianExtent::DIM_MODE_3D)?X[k]:0.0f};
+
+          int q = this->KernelWidth*this->KernelWidth*k+this->KernelWidth*j+i;
+
+          this->Kernel[q]=LaplacianOfGaussian(x,a,B,c);
           kernelNorm+=this->Kernel[q];
           }
         }
@@ -702,13 +820,15 @@ int vtkSQKernelConvolution::UpdateKernel()
 
   this->KernelModified = 0;
 
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
+  /*
   pCerr() << "Kernel=[";
-  for (int i=0; i<size; ++i)
+  for (size_t i=0; i<size; ++i)
     {
     cerr << this->Kernel[i] << " ";
     }
   cerr << "]" << endl;
+  */
   #endif
 
   return 0;
@@ -720,7 +840,7 @@ int vtkSQKernelConvolution::RequestDataObject(
     vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::RequestDataObject" << endl;
   #endif
 
@@ -749,8 +869,9 @@ int vtkSQKernelConvolution::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -799,13 +920,14 @@ int vtkSQKernelConvolution::RequestInformation(
   inInfo->Get(vtkDataObject::ORIGIN(),X0);
   outInfo->Set(vtkDataObject::ORIGIN(),X0,3);
 
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr()
+  #ifdef SQTK_DEBUG
+  oss
     << "WHOLE_EXTENT(input)=" << inputDomain << endl
     << "WHOLE_EXTENT(output)=" << outputDomain << endl
     << "ORIGIN=" << Tuple<double>(X0,3) << endl
     << "SPACING=" << Tuple<double>(dX,3) << endl
     << "nGhost=" << nGhosts << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -817,8 +939,9 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
+  #ifdef SQTK_DEBUG
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestUpdateExtent" << endl;
   #endif
 
   (void)req;
@@ -868,11 +991,12 @@ int vtkSQKernelConvolution::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(), numPieces);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr()
+  #ifdef SQTK_DEBUG
+  oss
     << "WHOLE_EXTENT=" << wholeExt << endl
     << "UPDATE_EXTENT=" << outputExt << endl
     << "nGhosts=" << nGhosts << endl;
+  pCerr() << oss.str() << endl;
   #endif
 
   return 1;
@@ -884,14 +1008,17 @@ int vtkSQKernelConvolution::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
-  pCerr() << "=====vtkSQKernelConvolution::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  ostringstream oss;
+  oss << "=====vtkSQKernelConvolution::RequestData" << endl;
   #endif
 
-  #if defined vtkSQKernelConvolutionTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQKernelConvolution::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQKernelConvolution::RequestData");
+    }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -963,9 +1090,6 @@ int vtkSQKernelConvolution::RequestData(
     return 1;
     }
 
-  // NOTE You can't do a shallow copy because the array dimensions are
-  // different on output and input because of the ghost layers.
-
   if (isImage)
     {
     vtkImageData *inImData=dynamic_cast<vtkImageData *>(inData);
@@ -986,8 +1110,8 @@ int vtkSQKernelConvolution::RequestData(
     outImData->GetDimensions(outputDims);
     int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
-    #ifdef vtkSQKernelConvolutionDEBUG
-    pCerr()
+    #ifdef SQTK_DEBUG
+    oss
       << "WHOLE_EXTENT=" << domainExt << endl
       << "UPDATE_EXTENT(input)=" << inputExt << endl
       << "UPDATE_EXTENT(output)=" << outputExt << endl
@@ -1018,17 +1142,38 @@ int vtkSQKernelConvolution::RequestData(
         return 1;
         }
 
+      // construct the output array
       int nComps = V->GetNumberOfComponents();
 
       vtkDataArray *W=V->NewInstance();
       W->SetNumberOfComponents(nComps);
       W->SetNumberOfTuples(outputTups);
-      W->SetName(V->GetName());
+
+      ostringstream wname;
+      wname << V->GetName();
+      if (this->ComputeResidual || (this->ArraysToCopy.size() > 0))
+        {
+        wname
+          << "-"
+          << GetKernelTypeAsString(this->KernelType)
+          << "-"
+          << this->KernelWidth;
+        }
+      W->SetName(wname.str().c_str());
+
+      outImData->GetPointData()->AddArray(W);
+      W->Delete();
+
+      // convolve
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->StartEvent("vtkSQKernelConvolution::Convolution");
+        }
 
       if (this->EnableCUDA)
         {
-        #ifdef vtkSQKernelConvolutionDEBUG
-        pCerr() << "using the GPU" << endl;
+        #ifdef SQTK_DEBUG
+        oss << "using the GPU" << endl;
         #endif
         this->CUDADriver->Convolution(
             inputExt,
@@ -1042,8 +1187,8 @@ int vtkSQKernelConvolution::RequestData(
         }
       else
         {
-        #ifdef vtkSQKernelConvolutionDEBUG
-        pCerr() << "using the CPU" << endl;
+        #ifdef SQTK_DEBUG
+        oss << "using the CPU" << endl;
         #endif
         this->CPUDriver->Convolution(
             inputExt,
@@ -1056,11 +1201,94 @@ int vtkSQKernelConvolution::RequestData(
             this->Kernel);
         }
 
-      outImData->GetPointData()->AddArray(W);
-      W->Delete();
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->EndEvent("vtkSQKernelConvolution::Convolution");
+        }
+
+      if (this->ComputeResidual)
+        {
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->StartEvent("vtkSQKernelConvolution::Residual");
+          }
+
+        wname << "-resid";
+
+        vtkDataArray *D=V->NewInstance();
+        D->SetNumberOfComponents(nComps);
+        D->SetNumberOfTuples(outputTups);
+        D->SetName(wname.str().c_str());
+        outImData->GetPointData()->AddArray(D);
+        D->Delete();
+
+        switch (V->GetDataType())
+          {
+          vtkFloatTemplateMacro(
+            ::Difference<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                V->GetNumberOfComponents(),
+                this->Mode,
+                (VTK_TT*)V->GetVoidPointer(0),
+                (VTK_TT*)W->GetVoidPointer(0),
+                (VTK_TT*)D->GetVoidPointer(0)));
+          }
+
+        if (this->LogLevel || globalLogLevel)
+          {
+          log->EndEvent("vtkSQKernelConvolution::Residual");
+          }
+        }
       }
 
-    // outImData->Print(cerr);
+    // Deep copy the input
+    if (this->ArraysToCopy.size())
+      {
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->StartEvent("vtkSQKernelConvolution::PassInput");
+        }
+
+      begin=this->ArraysToCopy.begin();
+      end=this->ArraysToCopy.end();
+      for (it=begin; it!=end; ++it)
+        {
+        vtkDataArray *M=inImData->GetPointData()->GetArray((*it).c_str());
+        if (M==0)
+          {
+          vtkErrorMacro(
+            << "Array " << (*it).c_str()
+            << " was requested but is not present");
+          continue;
+          }
+
+        vtkDataArray *W=M->NewInstance();
+        outImData->GetPointData()->AddArray(W);
+        W->Delete();
+        int nCompsM=M->GetNumberOfComponents();
+        W->SetNumberOfComponents(nCompsM);
+        W->SetNumberOfTuples(outputTups);
+        W->SetName(M->GetName());
+        switch(M->GetDataType())
+          {
+          vtkTemplateMacro(
+            Copy<VTK_TT>(
+                inputExt.GetData(),
+                outputExt.GetData(),
+                (VTK_TT*)M->GetVoidPointer(0),
+                (VTK_TT*)W->GetVoidPointer(0),
+                nCompsM,
+                this->Mode,
+                USE_OUTPUT_BOUNDS));
+          }
+        }
+
+      if (this->LogLevel || globalLogLevel)
+        {
+        log->EndEvent("vtkSQKernelConvolution::PassInput");
+        }
+      }
     }
   else
   if (isRecti)
@@ -1068,8 +1296,13 @@ int vtkSQKernelConvolution::RequestData(
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
 
-  #if defined vtkSQKernelConvolutionTIME
-  log->EndEvent("vtkSQKernelConvolution::RequestData");
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQKernelConvolution::RequestData");
+    }
+
+  #ifdef SQTK_DEBUG
+  pCerr() << oss.str() << endl;
   #endif
 
  return 1;
@@ -1078,12 +1311,10 @@ int vtkSQKernelConvolution::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQKernelConvolution::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQKernelConvolutionDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQKernelConvolution::PrintSelf" << endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);
-
   // TODO
-
 }

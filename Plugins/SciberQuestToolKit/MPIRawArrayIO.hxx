@@ -33,6 +33,7 @@ typedef void * MPI_Info;
 typedef void * MPI_File;
 typedef void * MPI_Comm;
 #else
+#include "SQWriteStringsWarningSupression.h"
 #include "SQMPICHWarningSupression.h"
 #include <mpi.h>
 #endif

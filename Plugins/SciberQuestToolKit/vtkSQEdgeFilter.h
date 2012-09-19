@@ -15,7 +15,7 @@ Copyright 2012 SciberQuest Inc.
 class vtkInformation;
 class vtkInformationVector;
 
-class vtkSQEdgeFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT  vtkSQEdgeFilter : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQEdgeFilter,vtkDataSetAlgorithm);

@@ -23,11 +23,12 @@ class vtkUnsignedCharArray;
 class vtkIdTypeArray;
 class vtkSQCellGenerator;
 
-/// Interface to the topology map.
+/// Records the end point(displacement) of a stream line.
 /**
-Abstract collection of datastructures needed to build the topology map.
-The details of building the map change drastically depending on the input
-data type. Concrete classes deal with these specifics.
+The displacement map, maps the end point(s) of a streamline onto
+the seed geometry. This map is used in FTLE computations.
+
+UnstructuredGrid implementation.
 */
 class UnstructuredFieldDisplacementMap : public FieldDisplacementMapData
 {

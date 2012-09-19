@@ -10,6 +10,45 @@ Copyright 2012 SciberQuest Inc.
 <ServerManagerConfiguration>
 <ProxyGroup name="sources">
   <!-- ==================================================================== -->
+   <SourceProxy name="vtkSQLogSource" class="vtkSQLogSource" label="SQ Log Source">
+      <Documentation
+         long_help=""
+         short_help="">
+         Dummy pipleine object that proviedes a UI for the SciberQuest event and timing log.
+         This can be used to enable logging for SciberQuest reader,sources,filters and writers.
+         The log is written during the objects destructor and is a collective mpi operation. Thus
+         destruction must occur prior to MPI_Finalize.
+      </Documentation>
+
+      <IntVectorProperty
+         name="GlobalLevel"
+         command="SetGlobalLevel"
+         number_of_elements="1"
+         default_values="1"
+         >
+        <IntRangeDomain name="range" min="0" />
+        <Documentation>
+          Set the application wide log level.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1"
+          default_values="SQTK-Log.log"
+          >
+      <FileListDomain name="files"/>
+      <Documentation>
+        This property specifies the file name for the log.
+      </Documentation>
+      </StringVectorProperty>
+
+   <!-- End Log -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
    <SourceProxy name="vtkSQLineSource" class="vtkSQLineSource" label="SQ Line Source">
       <Documentation
          long_help="This source creates a line between two points. The resolution indicates how many segments are in the line."
@@ -24,7 +63,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="-0.5 0.0 0.0"
-         panel_visibility="default">
+         >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the first endpoint of the line.
@@ -37,7 +76,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.5 0.0 0.0"
-         panel_visibility="default">
+         >
          <DoubleRangeDomain name="range" />
          <Documentation>
            This property controls the coordinates of the second endpoint of the line.
@@ -49,7 +88,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetResolution"
          number_of_elements="1"
          default_values="6"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           This property specifies the number of pieces into which to divide the line.
@@ -80,7 +119,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the center of the point cloud.
@@ -93,7 +132,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="1"
-         panel_visibility="default">
+         >
          <IntRangeDomain name="range" min="1"/>
          <Documentation>
            Specifies the number of points in the point cloud.
@@ -106,7 +145,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           Specifies the radius of the point cloud.
@@ -137,7 +176,7 @@ Copyright 2012 SciberQuest Inc.
          name="Name"
          command="SetDescriptiveName"
          number_of_elements="1"
-         panel_visibility="default">
+         >
         <Documentation>
           Give the object a name that may be used downstream to identify it.
         </Documentation>
@@ -154,7 +193,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate of the origin (one corner) of the plane.
@@ -176,7 +215,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="1.0 0.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate a second corner of the parallelogram.
@@ -189,7 +228,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 1.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate a third corner of the parallelogram.
@@ -202,7 +241,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="0"
          default_values="0"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range"/>
         <Documentation>
           This property specifies a constraint type.
@@ -214,7 +253,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetXResolution"
          number_of_elements="1"
          default_values="1"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range" min="1" />
         <Documentation>
           This property specifies the number of divisions along the X axis of the parallelogram.
@@ -226,8 +265,20 @@ Copyright 2012 SciberQuest Inc.
          command="SetYResolution"
          number_of_elements="1"
          default_values="1"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          This property specifies the number of divisions along the Y axis of the parallelogram.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="DecompType"
+         command="SetDecompType"
+         number_of_elements="1"
+         default_values="0"
+         panel_visibility="default">
+        <IntRangeDomain name="range" min="0" />
         <Documentation>
           This property specifies the number of divisions along the Y axis of the parallelogram.
         </Documentation>
@@ -238,7 +289,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetImmediateMode"
          number_of_elements="1"
          default_values="1"
-         panel_visibility="default">
+         >
         <BooleanDomain name="bool"/>
         <Documentation>
           Switch between immediate and demand mode.
@@ -265,7 +316,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         animateable="1"
         default_values="0.0 0.0 0.0"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         This property specifies the coordinate of the origin (one corner) of the hexaderon.
@@ -287,7 +338,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         animateable="1"
         default_values="1.0 0.0 0.0"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         This property specifies the coordinate a second corner of the hexaderon.
@@ -300,7 +351,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         animateable="1"
         default_values="0.0 1.0 0.0"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         This property specifies the coordinate a third corner of the hexaderon.
@@ -313,7 +364,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="3"
         animateable="1"
         default_values="0.0 0.0 1.0"
-        panel_visibility="default">
+        >
       <DoubleRangeDomain name="range"/>
       <Documentation>
         This property specifies the coordinate a fourth corner of the hexaderon.
@@ -327,7 +378,7 @@ Copyright 2012 SciberQuest Inc.
         command="SetResolution"
         number_of_elements="3"
         default_values="1 1 1"
-        panel_visibility="default">
+        >
      </IntVectorProperty>
 
       <IntVectorProperty
@@ -335,7 +386,7 @@ Copyright 2012 SciberQuest Inc.
          command="SetImmediateMode"
          number_of_elements="1"
          default_values="1"
-         panel_visibility="default">
+         >
         <BooleanDomain name="bool"/>
         <Documentation>
           Switch between immediate and demand mode.
@@ -353,14 +404,15 @@ Copyright 2012 SciberQuest Inc.
       <Documentation
         long_help="Create a 3D sphere given a center and radius."
         short_help="Create a 3D sphere">
-          The Sphere source can be used to add a polygonal sphere to the 3D scene. The output of the Sphere source is polygonal data with point normals defined.
+          The Sphere source can be used to add a polygonal sphere to the 3D scene. The output
+          of the Sphere source is polygonal data with point normals defined.
       </Documentation>
 
       <StringVectorProperty
          name="Name"
          command="SetDescriptiveName"
          number_of_elements="1"
-         panel_visibility="default">
+         >
         <Documentation>
           Give the object a name that may be used downstream to identify it.
         </Documentation>
@@ -371,7 +423,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinates for the center of the sphere.
@@ -384,7 +436,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="0.5"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0"/>
         <Documentation>
           This property specifies the radius of the sphere.
@@ -396,10 +448,13 @@ Copyright 2012 SciberQuest Inc.
          command="SetThetaResolution"
          number_of_elements="1"
          default_values="8"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range" min="3" max="1024" />
         <Documentation>
-          The value of this property represents the number of divisions between Start Theta and End Theta around the sphere. (See the Start Theta and End Theta properties.) The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be.
+          The value of this property represents the number of divisions between Start Theta
+          and End Theta around the sphere. (See the Start Theta and End Theta properties.) The
+          theta divisions are similar to longitude lines on the earth. The higher the resolution,
+          the closer the approximation will come to a sphere, and the more polygons there will be.
         </Documentation>
       </IntVectorProperty>
 
@@ -409,10 +464,12 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0" max="360" />
         <Documentation>
-          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Theta property should be 360 degrees. The value of this property can be adjusted to form only a portion of a sphere.
+          To form a complete sphere, the value of this property should be 0 degrees, and the
+          value of the End Theta property should be 360 degrees. The value of this property
+          can be adjusted to form only a portion of a sphere.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -422,10 +479,11 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="360"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0" max="360" />
         <Documentation>
-          The value of this property can be adjusted to form only a portion of a sphere. This value is measured in degrees.
+          The value of this property can be adjusted to form only a portion of a sphere. This
+          value is measured in degrees.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -434,10 +492,12 @@ Copyright 2012 SciberQuest Inc.
          command="SetPhiResolution"
          number_of_elements="1"
          default_values="8"
-         panel_visibility="default">
+         >
         <IntRangeDomain name="range" min="3" max="1024" />
         <Documentation>
-          The value of this property represents the number of divisions between Start Phi and End Phi on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar to latitude lines on the earth.
+          The value of this property represents the number of divisions between Start Phi and End Phi
+          on the sphere. (See the Start Phi and End Phi properties.) The phi divisions are similar
+          to latitude lines on the earth.
         </Documentation>
       </IntVectorProperty>
 
@@ -447,10 +507,12 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0" max="180" />
         <Documentation>
-          To form a complete sphere, the value of this property should be 0 degrees, and the value of the End Phi property should be 180 degrees. The value of this property can be adjusted to form only a portion of a sphere.
+          To form a complete sphere, the value of this property should be 0 degrees, and the
+          value of the End Phi property should be 180 degrees. The value of this property can
+          be adjusted to form only a portion of a sphere.
           Set the starting angle (in degrees) in the latitudinal direction.
         </Documentation>
       </DoubleVectorProperty>
@@ -461,7 +523,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          animateable="1"
          default_values="180"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range" min="0" max="180" />
         <Documentation>
           The value of this property can be adjusted to form only a portion of a sphere. The value is measured in degrees.
@@ -478,7 +540,8 @@ Copyright 2012 SciberQuest Inc.
     <Documentation
       long_help="Create a 3D sphere given a center and radius."
       short_help="Create a 3D sphere">
-      The Hemisphere source can be used to add a polygonal sphere to the 3D scene. The output of the Hemisphere source is polygonal data with point normals defined.
+      The Hemisphere source can be used to add a polygonal sphere to the 3D scene.
+      The output of the Hemisphere source is polygonal data with point normals defined.
     </Documentation>
 
     <!-- Out -->
@@ -498,7 +561,7 @@ Copyright 2012 SciberQuest Inc.
       animateable="1"
       default_values="0.0 0.0 0.0"
       information_property="GetCenter"
-      panel_visibility="default">
+      >
     <DoubleRangeDomain name="range"/>
     <Documentation>
       The center of the sphere.
@@ -518,7 +581,7 @@ Copyright 2012 SciberQuest Inc.
       animateable="1"
       default_values="0.0 1.0 0.0"
       information_property="GetNorth"
-      panel_visibility="default">
+      >
     <DoubleRangeDomain name="range"/>
     <Documentation>
       The center of the sphere.
@@ -538,7 +601,7 @@ Copyright 2012 SciberQuest Inc.
     animateable="1"
     default_values="0.5"
     information_property="GetRadius"
-    panel_visibility="default">
+    >
     <DoubleRangeDomain name="range" min="1E-15"/>
     <Documentation>
       This property specifies the radius of the sphere.
@@ -557,7 +620,7 @@ Copyright 2012 SciberQuest Inc.
       number_of_elements="1"
       default_values="32"
       information_property="GetResolution"
-      panel_visibility="default">
+      >
     <IntRangeDomain name="range" min="3" max="1024" />
     <Documentation>
       The value of this property controls the number of lat-lon linies in the output.
@@ -583,7 +646,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="0.0 0.0 0.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the 3D coordinate of the origin (one corner) of the image.
@@ -596,7 +659,7 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="3"
          animateable="1"
          default_values="1.0 1.0 1.0"
-         panel_visibility="default">
+         >
         <DoubleRangeDomain name="range"/>
         <Documentation>
           This property specifies the grid spacing of the dataset.
@@ -610,7 +673,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="2"
         default_values="0 1"
         animateable="1"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
       </IntRangeDomain>
       <Documentation>
@@ -623,7 +686,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="2"
         default_values="0 1"
         animateable="1"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
       </IntRangeDomain>
       <Documentation>
@@ -636,7 +699,7 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="2"
         default_values="0 1"
         animateable="1"
-        panel_visibility="default">
+        >
       <IntRangeDomain name="range">
       </IntRangeDomain>
       <Documentation>

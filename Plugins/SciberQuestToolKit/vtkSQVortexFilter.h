@@ -20,7 +20,7 @@ class vtkPVXMLElement;
 class vtkInformation;
 class vtkInformationVector;
 
-class vtkSQVortexFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkSQVortexFilter : public vtkDataSetAlgorithm
 {
 public:
   vtkTypeMacro(vtkSQVortexFilter,vtkDataSetAlgorithm);
@@ -30,6 +30,11 @@ public:
   // Description:
   // Initialize from an xml document.
   int Initialize(vtkPVXMLElement *root);
+
+  // Description:
+  // Array selection.
+  void AddInputArray(const char *name);
+  void ClearInputArrays();
 
   // Description:
   // Deep copy input arrays to the output. A shallow copy is not possible
@@ -104,6 +109,15 @@ public:
   vtkSetMacro(ComputeGradientDiagnostic,int);
   vtkGetMacro(ComputeGradientDiagnostic,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   int RequestDataObject(vtkInformation*,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec);
   int RequestData(vtkInformation *req, vtkInformationVector **input, vtkInformationVector *output);
@@ -114,6 +128,7 @@ protected:
 
 private:
   // controls to turn on/off array generation
+  set<string> InputArrays;
   set<string> ArraysToCopy;
   int SplitComponents;
   int ResultMagnitude;
@@ -127,13 +142,12 @@ private:
   int ComputeGradient;
   int ComputeEigenvalueDiagnostic;
   int ComputeGradientDiagnostic;
-
   //
   int OutputExt[6];
   int DomainExt[6];
-
   //
   int Mode;
+  int LogLevel;
 
 private:
   vtkSQVortexFilter(const vtkSQVortexFilter &); // Not implemented
