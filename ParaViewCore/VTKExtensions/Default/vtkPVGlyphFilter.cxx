@@ -209,9 +209,9 @@ int vtkPVGlyphFilter::RequestData(
   if (!this->UseMaskPoints)
     {
     // yes.
+    this->BlockGlyphAllPoints= !this->UseMaskPoints;
     int retVal
       = this->Superclass::RequestData(request, inputVector, outputVector);
-    this->BlockGlyphAllPoints= !this->UseMaskPoints;
     return retVal;
     }
 
@@ -226,6 +226,14 @@ int vtkPVGlyphFilter::RequestData(
 
   maxNumPts = (maxNumPts > numPts) ? numPts : maxNumPts;
 
+  // We will glyph this many points.
+  this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
+  if (this->BlockMaxNumPts == 0)
+    {
+    return 1;
+    }
+  this->CalculatePtsToGlyph( numPts );
+
   vtkInformationVector* inputVs[2];
 
   vtkInformationVector* inputV = inputVector[0];
@@ -236,16 +244,6 @@ int vtkPVGlyphFilter::RequestData(
   inputVs[0]->SetInformationObject(0, newInInfo);
   newInInfo->Delete();
   inputVs[1] = inputVector[1];
-
-
-
-  // We will glyph this many points.
-  this->BlockMaxNumPts = static_cast<vtkIdType>(maxNumPts + 0.5) ;
-  if (this->BlockMaxNumPts == 0)
-    {
-    return 1;
-    }
-  this->CalculatePtsToGlyph( numPts );
 
   // We have set all ofthe parameters that will be used in 
   // our overloaded IsPoitVisible. Now let the glypher take over.
