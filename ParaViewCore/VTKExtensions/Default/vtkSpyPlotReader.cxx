@@ -700,10 +700,9 @@ int vtkSpyPlotReader::RequestData(
         int realExtents[6];
         int realDims[3];
         int extents[6];
-        double bb[6];
         double spacing[3];
         double origin[3];
-        hasBadGhostCells = block->GetAMRInformation(bb,
+        hasBadGhostCells = block->GetAMRInformation(*this->Bounds,
                                                     &level, spacing,
                                                     origin, extents,
                                                     realExtents,

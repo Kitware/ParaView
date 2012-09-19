@@ -270,13 +270,17 @@ void pqActiveObjects::sourceSelectionChanged()
     return;
     }
 
-  // Disconnect previous ActiveSource with our notification Observer
   if(this->ActiveSource)
     {
+    // Disconnect previous ActiveSource with our notification Observer
     this->VTKConnector->Disconnect(this->ActiveSource->getProxy(),
                                    vtkCommand::UserEvent,
                                    this,
                                    SLOT(onNotification(vtkObject*,ulong,void*,void*)));
+
+    QObject::disconnect(this->ActiveSource,
+      SIGNAL(dataUpdated(pqPipelineSource*)),
+      this, SIGNAL(dataUpdated()));
     }
 
   pqServerManagerModel* smmodel =
@@ -310,13 +314,17 @@ void pqActiveObjects::sourceSelectionChanged()
   this->ActiveSource = source;
   this->ActivePort = opPort;
 
-  // Connect current ActiveSource with our notification Observer
   if(this->ActiveSource)
     {
+    // Connect current ActiveSource with our notification Observer
     this->VTKConnector->Connect(this->ActiveSource->getProxy(),
                                 vtkCommand::UserEvent,
                                 this,
                                 SLOT(onNotification(vtkObject*,ulong,void*,void*)));
+
+    QObject::connect(this->ActiveSource,
+      SIGNAL(dataUpdated(pqPipelineSource*)),
+      this, SIGNAL(dataUpdated()));
     }
 
   // Update the Selection.
