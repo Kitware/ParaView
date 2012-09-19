@@ -7,6 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "TestUtils.h"
+#include "vtkInitializationHelper.h"
 #include "vtkSQLog.h"
 #include "vtkMultiProcessController.h"
 #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
@@ -47,6 +48,9 @@ using std::vector;
 // and written to the temp dir.
 #define SKIP_PROCESS_ID 1
 
+
+
+
 /**
 Use a single render window for each run. This was suggested
 after strange x11 errors on the Blight dashboard system.
@@ -83,6 +87,8 @@ vtkRenderWindow *vtkRenderWindowSingleton::RenderWindow=NULL;
 //*****************************************************************************
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
+  vtkInitializationHelper::TestingInitialize();
+
   vtkMultiProcessController *controller;
 
   #if defined(PARAVIEW_USE_MPI) && !defined(WIN32)
@@ -124,6 +130,8 @@ int Finalize(vtkMultiProcessController* controller, int code)
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
   controller->Finalize();
   controller->Delete();
+
+  vtkInitializationHelper::TestingFinalize();
 
   return code;
 }

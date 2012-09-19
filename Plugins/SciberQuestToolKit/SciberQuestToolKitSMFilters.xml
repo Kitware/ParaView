@@ -813,13 +813,12 @@ Copyright 2012 SciberQuest Inc.
     <!-- End OOCFieldTracer -->
   </SourceProxy>
 
-  <!-- ==================================================================== -->
+  <!-- ====================================================================
   <SourceProxy
       name="vtkSQFieldTracerRK45"
       label="SQ Field Tracer RK-4-5"
       class="vtkSQFieldTracer">
 
-    <!-- Inputs -->
     <InputProperty
         name="DatasetInput"
         command="AddVectorInputConnection"
@@ -869,10 +868,8 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </InputProperty>
 
-    <!-- Outputs -->
     <OutputPort name="Streamlines" index="0"/>
 
-    <!-- Vector Field Selection -->
     <StringVectorProperty
         name="SelectInputVectors"
         command="SetInputArrayToProcess"
@@ -891,7 +888,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </StringVectorProperty>
 
-    <!-- Integrator type -->
     <IntVectorProperty
         name="IntegratorType"
         label="Integrator"
@@ -899,16 +895,8 @@ Copyright 2012 SciberQuest Inc.
         number_of_elements="1"
         default_values="3"
         panel_visibility="never">
-      <!--
-      <EnumerationDomain name="enum">
-        <Entry value="1"       text="RK-2"/>
-        <Entry value="2"       text="RK-4"/>
-        <Entry value="3"       text="RK-4-5"/>
-      </EnumerationDomain>
-      -->
     </IntVectorProperty>
 
-    <!-- Integrator parameters -->
     <DoubleVectorProperty
         name="MinStep"
         label="Min Step Size"
@@ -1013,7 +1001,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </DoubleVectorProperty>
 
-    <!-- output control -->
     <IntVectorProperty
         name="CullPeriodicTransition"
         label="Cull Periodic Transitions"
@@ -1027,7 +1014,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Colormap/Legened control -->
     <IntVectorProperty
         name="SqueezeColorMap"
         label="Squeeze Color Map"
@@ -1041,17 +1027,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Integration parameter unit (2=cell length)
-    <IntVectorProperty
-        name="StepUnit"
-        label="Step Unit"
-        command="SetStepUnit"
-        number_of_elements="1"
-        default_values="2"
-        />
-    -->
-
-    <!-- Mode Flag -->
     <IntVectorProperty
         name="Mode"
         command="SetMode"
@@ -1063,7 +1038,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Load balancing/work scheduling controls -->
     <IntVectorProperty
         name="UseDynamicScheduler"
         command="SetUseDynamicScheduler"
@@ -1111,8 +1085,8 @@ Copyright 2012 SciberQuest Inc.
       <Property name="IntegratorType" show="0"/>
     </Hints>
 
-    <!-- End OOCFieldTracer -->
   </SourceProxy>
+  -->
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -1672,13 +1646,12 @@ Copyright 2012 SciberQuest Inc.
    <!-- End SQ Poincare Mapper -->
   </SourceProxy>
 
-  <!-- ==================================================================== -->
+  <!-- ====================================================================
   <SourceProxy
     name="vtkSQPoincareMapperRK45"
     label="SQ Poincare Mapper RK-4-5"
     class="vtkSQFieldTracer">
 
-    <!-- Inputs -->
     <InputProperty
         name="DatasetInput"
         command="AddVectorInputConnection"
@@ -1728,10 +1701,8 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </InputProperty>
 
-    <!-- Outputs -->
     <OutputPort name="Poincare Map" index="0" />
 
-    <!-- Vector Field Selection -->
     <StringVectorProperty
         name="SelectInputVectors"
         command="SetInputArrayToProcess"
@@ -1750,7 +1721,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </StringVectorProperty>
 
-    <!-- Integrator type -->
     <IntVectorProperty
         name="IntegratorType"
         label="Integrator"
@@ -1759,16 +1729,8 @@ Copyright 2012 SciberQuest Inc.
         default_values="3"
         panel_visibility="never"
         >
-      <!--
-      <EnumerationDomain name="enum">
-        <Entry value="1"       text="RK-2"/>
-        <Entry value="2"       text="RK-4"/>
-        <Entry value="3"       text="RK-4-5"/>
-      </EnumerationDomain>
-      -->
     </IntVectorProperty>
 
-    <!-- Integrator parameters -->
     <DoubleVectorProperty
         name="MinStep"
         label="Min Step Size"
@@ -1838,20 +1800,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </DoubleVectorProperty>
 
-    <!--
-    <DoubleVectorProperty
-        name="MaxIntegrationInterval"
-        label="Max Time Interval"
-        command="SetMaxIntegrationInterval"
-        number_of_elements="1"
-        default_values="1.7976931348623158e+308"
-        >
-      <Documentation>
-        Maximum time interval beyond which line integration is terminated.
-      </Documentation>
-    </DoubleVectorProperty>
-    -->
-
     <DoubleVectorProperty
         name="NullThreshold"
         label="Null Threshold"
@@ -1875,32 +1823,6 @@ Copyright 2012 SciberQuest Inc.
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
-    <!-- Colormap/Legened control
-    <IntVectorProperty
-        name="SqueezeColorMap"
-        label="Squeeze Color Map"
-        command="SetSqueezeColorMap"
-        number_of_elements="1"
-        default_values="0"
-        >
-      <BooleanDomain name="bool"/>
-      <Documentation>
-        Use the minimum number of intersect colors required. Requires global reduction.
-      </Documentation>
-    </IntVectorProperty>
-    -->
-
-    <!-- Integration parameter unit (2=cell length)
-    <IntVectorProperty
-        name="StepUnit"
-        label="Step Unit"
-        command="SetStepUnit"
-        number_of_elements="1"
-        default_values="2"
-        />
-    -->
-
-    <!-- Mode Flag -->
     <IntVectorProperty
         name="Mode"
         command="SetMode"
@@ -1912,7 +1834,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Load balancing/work scheduling controls -->
     <IntVectorProperty
         name="UseDynamicScheduler"
         command="SetUseDynamicScheduler"
@@ -1957,8 +1878,8 @@ Copyright 2012 SciberQuest Inc.
       <Property name="IntegratorType" show="0"/>
     </Hints>
 
-   <!-- End SQ Poincare Mapper -->
   </SourceProxy>
+  -->
 
   <!-- ==================================================================== -->
   <SourceProxy
@@ -2258,13 +2179,12 @@ Copyright 2012 SciberQuest Inc.
    <!-- End SQ Displacement Mapper -->
   </SourceProxy>
 
-  <!-- ==================================================================== -->
+  <!-- ====================================================================
   <SourceProxy
     name="vtkSQDisplacementMapperRK45"
     label="SQ Displacement Mapper RK-4-5"
     class="vtkSQFieldTracer">
 
-    <!-- Inputs -->
     <InputProperty
         name="DatasetInput"
         command="AddVectorInputConnection"
@@ -2314,10 +2234,8 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </InputProperty>
 
-    <!-- Outputs -->
     <OutputPort name="Displacement Map" index="0" />
 
-    <!-- Vector Field Selection -->
     <StringVectorProperty
         name="SelectInputVectors"
         command="SetInputArrayToProcess"
@@ -2336,7 +2254,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </StringVectorProperty>
 
-    <!-- Integrator type -->
     <IntVectorProperty
         name="IntegratorType"
         label="Integrator"
@@ -2345,16 +2262,8 @@ Copyright 2012 SciberQuest Inc.
         default_values="3"
         panel_visibility="never"
         >
-      <!--
-      <EnumerationDomain name="enum">
-        <Entry value="1"       text="RK-2"/>
-        <Entry value="2"       text="RK-4"/>
-        <Entry value="3"       text="RK-4-5"/>
-      </EnumerationDomain>
-      -->
     </IntVectorProperty>
 
-    <!-- Integrator parameters -->
     <DoubleVectorProperty
         name="MinStep"
         label="Min Step Size"
@@ -2416,13 +2325,6 @@ Copyright 2012 SciberQuest Inc.
         panel_visibility="never"
         >
       <DoubleRangeDomain name="range"/>
-      <!--
-      <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="100">
-        <RequiredProperties>
-          <Property name="DatasetInput" function="Input"/>
-        </RequiredProperties>
-      </BoundsDomain>
-      -->
       <Documentation>
         Maximum streamline arc length beyond which line integration is terminated.
       </Documentation>
@@ -2464,32 +2366,6 @@ Copyright 2012 SciberQuest Inc.
       <BooleanDomain name="bool"/>
     </IntVectorProperty>
 
-    <!-- Colormap/Legened control
-    <IntVectorProperty
-        name="SqueezeColorMap"
-        label="Squeeze Color Map"
-        command="SetSqueezeColorMap"
-        number_of_elements="1"
-        default_values="0"
-        >
-      <BooleanDomain name="bool"/>
-      <Documentation>
-        Use the minimum number of intersect colors required. Requires global reduction.
-      </Documentation>
-    </IntVectorProperty>
-    -->
-
-    <!-- Integration parameter unit (2=cell length)
-    <IntVectorProperty
-        name="StepUnit"
-        label="Step Unit"
-        command="SetStepUnit"
-        number_of_elements="1"
-        default_values="2"
-        />
-    -->
-
-    <!-- Mode Flag -->
     <IntVectorProperty
         name="Mode"
         command="SetMode"
@@ -2502,7 +2378,6 @@ Copyright 2012 SciberQuest Inc.
       </Documentation>
     </IntVectorProperty>
 
-    <!-- Load balancing/work scheduling controls -->
     <IntVectorProperty
         name="UseDynamicScheduler"
         command="SetUseDynamicScheduler"
@@ -2549,8 +2424,8 @@ Copyright 2012 SciberQuest Inc.
       <Property name="ForwardOnly" show="0"/>
     </Hints>
 
-   <!-- End SQ Displacement Mapper -->
   </SourceProxy>
+  -->
 
   <!-- ==================================================================== -->
   <SourceProxy
