@@ -94,6 +94,20 @@ vtkVRInteractorStyleFactory::GetInteractorStyleDescriptions()
 }
 
 //-----------------------------------------------------------------------------
+std::string vtkVRInteractorStyleFactory::GetDescriptionFromClassName(
+    const std::string &className)
+{
+  for (int i = 0; i < this->InteractorStyleClassNames.size(); ++i)
+    {
+    if (this->InteractorStyleClassNames[i] == className)
+      {
+      return this->InteractorStyleDescriptions[i];
+      }
+    }
+  return std::string("Unknown");
+}
+
+//-----------------------------------------------------------------------------
 vtkVRInteractorStyle *
 vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
     const std::string &name)

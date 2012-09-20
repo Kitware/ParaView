@@ -60,6 +60,10 @@ public:
   std::vector<std::string> GetInteractorStyleDescriptions();
 
   // Description:
+  // Get the action description for a style classname
+  std::string GetDescriptionFromClassName(const std::string &className);
+
+  // Description:
   // Create a new interactor style instance. The input string
   // must be in the vector returned by GetInteractorStyleClassNames().
   vtkVRInteractorStyle *NewInteractorStyleFromClassName(const std::string &);

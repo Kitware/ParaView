@@ -455,11 +455,15 @@ QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle *style)
 {
   pqApplicationCore *core = pqApplicationCore::instance();
   pqServerManagerModel *model = core->getServerManagerModel();
+  vtkVRInteractorStyleFactory *styleFactory
+      = vtkVRInteractorStyleFactory::GetInstance();
 
   QString className = style->GetClassName();
+  QString desc = QString::fromStdString(
+        styleFactory->GetDescriptionFromClassName(className.toStdString()));
   vtkSMProxy *smControlledProxy = style->GetControlledProxy();
   pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
-  QString name = QString("%1 on %2's %3").arg(className)
+  QString name = QString("%1 on %2's %3").arg(desc)
       .arg(pqControlledProxy->getSMName())
       .arg(style->GetControlledPropertyName());
 
