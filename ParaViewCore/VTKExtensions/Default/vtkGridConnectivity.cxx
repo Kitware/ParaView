@@ -1078,7 +1078,7 @@ void vtkGridConnectivity::GenerateOutput(
 
   // Add all of the integration arrays to field data.
   // Should we change the names to integrated...?
-  numCellArrays = this->CellAttributesIntegration.size();
+  numCellArrays = static_cast<int>(this->CellAttributesIntegration.size());
   for (int ii = 0; ii < numCellArrays; ++ii)
     {
     da = this->CellAttributesIntegration[ii];
@@ -1087,7 +1087,7 @@ void vtkGridConnectivity::GenerateOutput(
 
   // Add all of the integration arrays to field data.
   // Should we change the names to integrated...?
-  numPointArrays = this->PointAttributesIntegration.size();
+  numPointArrays = static_cast<int>(this->PointAttributesIntegration.size());
   for (int ii = 0; ii < numPointArrays; ++ii)
     {
     da = this->PointAttributesIntegration[ii];
