@@ -150,6 +150,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="editConnection">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the selected VR connection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Edit...</string>
        </property>
@@ -230,6 +233,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="editStyle">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the selected interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Edit...</string>
        </property>
