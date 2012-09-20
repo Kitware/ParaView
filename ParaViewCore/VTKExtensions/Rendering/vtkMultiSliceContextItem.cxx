@@ -134,8 +134,8 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
   // Local vars
   int width  = this->GetScene()->GetViewWidth();
   int height = this->GetScene()->GetViewHeight();
-  int x1,y1,x2,y2;
-  float slicerX1, slicerY1, slicerX2, slicerY2;
+  int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+  float slicerX1 = 0.f, slicerY1 = 0.f, slicerX2 = 0.f, slicerY2 = 0.f;
   slicerX2 = slicerY2 = activeSize;
 
   // Reset active area
