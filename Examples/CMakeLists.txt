@@ -3,6 +3,8 @@ project(ParaViewExamples)
 
 find_package(ParaView REQUIRED)
 include(${PARAVIEW_USE_FILE})
+# For use/not-use of shared libs with that of ParaViews.
+set (BUILD_SHARED_LIBS ${PARAVIEW_BUILD_SHARED_LIBS} CACHE INTERNAL "" FORCE)
 
 add_subdirectory(Plugins/Filter)
 add_subdirectory(Plugins/ParametricSource)
