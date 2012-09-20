@@ -5,12 +5,27 @@ include("@VTK_BINARY_DIR@/CTestCustom.cmake")
 #------------------------------------------------------------------------------
 # Regular expression for warning exception during build process
 set (CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+
+  #ignore protobuf related warnings.
   "ThirdParty.protobuf/"
-  "google/protobuf"
+  "google.protobuf"
+  "vtkPVMessage.pb.h"
+
+  #ignore warnings coming from QT headers.
+  "qtcore"
+  "qthelp"
+  "QtCore"
+  "QtHelp"
+
+
   "vtk[^\\.]+ClientServer.cxx"
 
   # ignore VRPN warnings
   ".*vrpn.*"
+
+  # ignore warnings from openmpi.
+  ".*openmpi.*"
 )
 
 #------------------------------------------------------------------------------
