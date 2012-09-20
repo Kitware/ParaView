@@ -42,13 +42,13 @@ vtkVRInteractorStyleFactory *vtkVRInteractorStyleFactory::Instance = NULL;
 //-----------------------------------------------------------------------------
 vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
 {
-  // Add GrabWorldStyle
-  this->InteractorStyleClassNames.push_back("vtkVRGrabWorldStyle");
-  this->InteractorStyleDescriptions.push_back("Grab");
-
   // Add TrackStyle
   this->InteractorStyleClassNames.push_back("vtkVRTrackStyle");
   this->InteractorStyleDescriptions.push_back("Track");
+
+  // Add GrabWorldStyle
+  this->InteractorStyleClassNames.push_back("vtkVRGrabWorldStyle");
+  this->InteractorStyleDescriptions.push_back("Grab");
 }
 
 //-----------------------------------------------------------------------------
@@ -112,13 +112,13 @@ vtkVRInteractorStyle *
 vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
     const std::string &name)
 {
-  if (name == "vtkVRGrabWorldStyle")
-    {
-    return vtkVRGrabWorldStyle::New();
-    }
-  else if (name == "vtkVRTrackStyle")
+  if (name == "vtkVRTrackStyle")
     {
     return vtkVRTrackStyle::New();
+    }
+  else if (name == "vtkVRGrabWorldStyle")
+    {
+    return vtkVRGrabWorldStyle::New();
     }
 
   return NULL;
