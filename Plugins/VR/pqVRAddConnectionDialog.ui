@@ -103,7 +103,7 @@
      </property>
      <item>
       <property name="text">
-       <string>&lt;add buttons&gt;</string>
+       <string>&lt;add inputs&gt;</string>
       </property>
      </item>
     </widget>
