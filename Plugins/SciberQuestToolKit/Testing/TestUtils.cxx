@@ -588,7 +588,7 @@ int SerialRender(
           decompWriter->Delete();
           decompImage->Delete();
 
-          //rwin->Delete();
+          rwin->RemoveRenderer(ren);
 
           continue;
           }
@@ -635,7 +635,7 @@ int SerialRender(
           cerr << "Test for array " << arrayName << " failed." << endl;
           }
         testHelper->Delete();
-        //rwin->Delete();
+        rwin->RemoveRenderer(ren);
         }
       }
     data->Delete();
