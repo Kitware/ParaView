@@ -85,4 +85,6 @@
 #cmakedefine VTK_HAS_FFMPEG_SUPPORT
 #cmakedefine VTK_HAS_OGGTHEORA_SUPPORT
 
+#cmakedefine PARAVIEW_USE_PISTON
+
 #endif

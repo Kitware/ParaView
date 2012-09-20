@@ -337,10 +337,6 @@ set(_vtk_modules
 
   )
 
-if(PARAVIEW_USE_PISTON)
-  list(APPEND _vtk_modules vtkAcceleratorsPiston)
-endif() 
-
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()

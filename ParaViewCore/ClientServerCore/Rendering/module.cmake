@@ -1,3 +1,8 @@
+set (__dependencies)
+if (PARAVIEW_USE_PISTON)
+  list (APPEND __dependencies vtkAcceleratorsPiston)
+endif()
+
 vtk_module(vtkPVClientServerCoreRendering
   GROUPS
     ParaViewRendering
@@ -10,4 +15,5 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkViewsContext2D
     vtkViewsCore
     vtkRenderingVolumeOpenGL
+    ${__dependencies}
 )
