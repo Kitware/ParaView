@@ -22,6 +22,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 #ifndef BUILD_SHARED_LIBS
 # include "pvStaticPluginsInit.h"
+
+# ifdef PARAVIEW_ENABLE_PYTHON
+// file containing static initialization functions for all modules built.
+#   include "pvpythonmodules.h"
+# endif
+
 #endif
 
 static bool RealMain(int argc, char* argv[],
@@ -43,8 +49,15 @@ static bool RealMain(int argc, char* argv[],
     return 1;
     }
 
-  // load static plugins
 #ifndef BUILD_SHARED_LIBS
+
+# ifdef PARAVIEW_ENABLE_PYTHON
+  // register callback to initialize modules statically. The callback is
+  // empty when BUILD_SHARED_LIBS is ON.
+  CMakeLoadAllPythonModules();
+# endif
+
+  // load static plugins
   paraview_static_plugins_init();
 #endif
 
