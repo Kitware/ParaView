@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 #include "pqComparativeXYBarChartView.h"
 #include "pqComparativeXYChartView.h"
+#include "pqMultiSliceView.h"
 #include "pqParallelCoordinatesChartView.h"
 #include "pqPlotMatrixView.h"
 #include "pqRenderView.h"
@@ -47,8 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QDebug>
 
@@ -72,6 +73,7 @@ QStringList pqStandardViewModules::viewTypes() const
     pqComparativeXYChartView::chartViewType() <<
     pqComparativeXYBarChartView::chartViewType() <<
     pqParallelCoordinatesChartView::chartViewType() <<
+    pqMultiSliceView::multiSliceViewType() <<
     pqPlotMatrixView::viewType();
 }
 
@@ -121,6 +123,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if (type == pqPlotMatrixView::viewType())
     {
     return pqPlotMatrixView::viewTypeName();
+    }
+  else if (type == pqMultiSliceView::multiSliceViewType())
+    {
+    return pqMultiSliceView::multiSliceViewTypeName();
     }
 
   return QString();
@@ -172,6 +178,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "PlotMatrixView";
     }
+  else if (viewtype == pqMultiSliceView::multiSliceViewType())
+    {
+    root_xmlname = "MultiSlice";
+    }
 
   if (root_xmlname)
     {
@@ -197,6 +207,15 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqSpreadSheetView(
       group, viewname, viewmodule, server, p);
+    }
+  else if (viewtype == pqMultiSliceView::multiSliceViewType())
+    {
+    return new pqMultiSliceView(viewtype,
+                                group,
+                                viewname,
+                                viewmodule,
+                                server,
+                                p);
     }
   else if (viewmodule->IsA("vtkSMRenderViewProxy"))
     {

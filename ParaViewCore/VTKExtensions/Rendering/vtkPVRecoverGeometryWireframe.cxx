@@ -53,12 +53,20 @@ namespace vtkPVRecoverGeometryWireframeNamespace
       : MinEndPoint((endpointA < endpointB) ? endpointA : endpointB),
         MaxEndPoint((endpointA < endpointB) ? endpointB : endpointA)
     {}
+    EdgeEndpoints(const EdgeEndpoints &other)
+      : MinEndPoint(other.MinEndPoint),
+        MaxEndPoint(other.MaxEndPoint)
+    {}
+    ~EdgeEndpoints()
+    {}
     const vtkIdType MinEndPoint;
     const vtkIdType MaxEndPoint;
     inline bool operator==(const EdgeEndpoints &other) const {
       return (   (this->MinEndPoint == other.MinEndPoint)
               && (this->MaxEndPoint == other.MaxEndPoint) );
     }
+  private:
+    void operator=(const EdgeEndpoints&);
   };
   struct EdgeEndpointsHash {
   public:

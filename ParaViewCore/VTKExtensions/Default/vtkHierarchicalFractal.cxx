@@ -129,7 +129,7 @@ public:
       }
 
     std::vector<unsigned int> blockIds(blocksPerLevel.size(),0); //keep track of the id at each level
-    hbds->Initialize(blocksPerLevel.size(), &blocksPerLevel[0]);
+    hbds->Initialize(static_cast<int>(blocksPerLevel.size()), &blocksPerLevel[0]);
     hbds->SetOrigin(origin);
     hbds->SetGridDescription(this->GridDescription);
     for(unsigned int level=0; level<hbds->GetNumberOfLevels(); level++)

@@ -57,12 +57,14 @@ public:
   // This can be called only after Initialize().
   // @CallOnAllProcessess
   virtual void SetPosition(int, int);
-
+  vtkGetVector2Macro(Position, int);
+  
   // Description:
   // Set the size of this view in the multiview configuration.
   // This can be called only after Initialize().
   // @CallOnAllProcessess
   virtual void SetSize(int, int);
+  vtkGetVector2Macro(Size, int);
 
   // Description:
   // Triggers a high-resolution render.

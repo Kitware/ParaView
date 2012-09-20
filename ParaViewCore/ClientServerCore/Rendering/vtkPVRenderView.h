@@ -373,13 +373,13 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
-  void SetUseDepthPeeling(int val);
-  void SetMaximumNumberOfPeels(int val);
-  void SetBackground(double r, double g, double b);
-  void SetBackground2(double r, double g, double b);
-  void SetBackgroundTexture(vtkTexture* val);
-  void SetGradientBackground(int val);
-  void SetTexturedBackground(int val);
+  virtual void SetUseDepthPeeling(int val);
+  virtual void SetMaximumNumberOfPeels(int val);
+  virtual void SetBackground(double r, double g, double b);
+  virtual void SetBackground2(double r, double g, double b);
+  virtual void SetBackgroundTexture(vtkTexture* val);
+  virtual void SetGradientBackground(int val);
+  virtual void SetTexturedBackground(int val);
 
   //*****************************************************************
   // Forward to vtkLight.
@@ -400,10 +400,10 @@ public:
 
   //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
-  void Add2DManipulator(vtkCameraManipulator* val);
-  void RemoveAll2DManipulators();
-  void Add3DManipulator(vtkCameraManipulator* val);
-  void RemoveAll3DManipulators();
+  virtual void Add2DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll2DManipulators();
+  virtual void Add3DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll3DManipulators();
 
   // Description:
   // Overridden to synchronize information among processes whenever data
@@ -475,6 +475,13 @@ public:
   // Provides access to the time when Update() was last called.
   unsigned long GetUpdateTimeStamp()
     { return this->UpdateTimeStamp; }
+
+  // Description:
+  // Copy internal fields that are used for rendering decision such as
+  // remote/local rendering, composite and so on. This method was introduced
+  // for the quad view so internal views could use the decision that were made
+  // in the main view.
+  void CopyViewUpdateOptions(vtkPVRenderView* otherView);
 //BTX
 protected:
   vtkPVRenderView();
@@ -543,6 +550,10 @@ protected:
   // SynchronizationCounter is used in multi-clients mode to ensure that the
   // views on two different clients are in the same state as the server side.
   vtkGetMacro(SynchronizationCounter, unsigned int);
+
+  // Description:
+  // Returns true is currently generating a selection.
+  vtkGetMacro(MakingSelection, bool);
 
   vtkLight* Light;
   vtkLightKit* LightKit;

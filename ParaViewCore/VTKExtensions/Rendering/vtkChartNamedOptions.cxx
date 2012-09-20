@@ -243,7 +243,7 @@ void vtkChartNamedOptions::RefreshPlots()
 
   PlotMapType newMap;
 
-  int defaultVisible = 1;
+  bool defaultVisible = true;
 
   // For each series (column in the table)
   const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();

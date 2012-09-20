@@ -43,6 +43,8 @@ protected:
   const int FileBufferSize;
   char* Buffer;
   istream *IStream;
+private:
+  void operator=(const vtkSpyPlotIStream&);
 };
 
 inline istream*vtkSpyPlotIStream::GetStream()
