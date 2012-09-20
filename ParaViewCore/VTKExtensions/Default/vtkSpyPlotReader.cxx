@@ -668,6 +668,7 @@ int vtkSpyPlotReader::RequestData(
     assert("FieldData should not be NULL!" && hbds->GetFieldData()!=NULL );
 
     vtkFieldData *fd = hbds->GetFieldData();
+    (void) fd; // only used for asserts
     assert("Must have a GlobalBounds array!" && fd->HasArray("GlobalBounds"));
     assert("Must have a GlobalBoxSize array!" && fd->HasArray("GlobalBoxSize"));
     assert("Must have a MinLevel array!" && fd->HasArray("MinLevel"));
