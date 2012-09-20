@@ -31,7 +31,7 @@
 #include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -1421,7 +1421,7 @@ vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper
   if (iter != helpers.end())
     {
     std::string helperclassname = iter->second;
-    vtkObject* obj = vtkInstantiator::CreateInstance(helperclassname.c_str());
+    vtkObject* obj = vtkPVInstantiator::CreateInstance(helperclassname.c_str());
     vtkPVDataInformationHelper* helper =
       vtkPVDataInformationHelper::SafeDownCast(obj);
     if(!helper)
