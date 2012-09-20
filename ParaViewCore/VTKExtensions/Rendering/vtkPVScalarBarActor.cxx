@@ -22,6 +22,7 @@
 #include "vtkPVScalarBarActor.h"
 
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
@@ -971,6 +972,8 @@ void vtkPVScalarBarActor::PositionScalarBar(const int propSize[2],
     textCoords->SetTuple2(3, 0, 0);
     }
   this->ScalarBar->GetPointData()->SetTCoords(textCoords);
+  // If the subclass has defined cell scalars, remove them here.
+  this->ScalarBar->GetCellData()->Initialize();
 }
 
 void vtkPVScalarBarActor::BuildScalarBarTexture()
