@@ -15,7 +15,7 @@
 #include "vtkPVCompositeDataInformation.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkInformation.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkNew.h"
@@ -88,13 +88,13 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
     (*index) -= this->NumberOfPieces;
     }
 
-  vtkPVCompositeDataInformationInternals::VectorOfDataInformation::iterator iter = 
+  vtkPVCompositeDataInformationInternals::VectorOfDataInformation::iterator iter =
     this->Internal->ChildrenInformation.begin();
   for ( ; iter!= this->Internal->ChildrenInformation.end(); ++iter)
     {
     if (iter->Info)
       {
-      vtkPVDataInformation* info = 
+      vtkPVDataInformation* info =
         iter->Info->GetDataInformationForCompositeIndex(index);
       if ( (*index) == -1)
         {
@@ -126,7 +126,7 @@ void vtkPVCompositeDataInformation::Initialize()
 unsigned int vtkPVCompositeDataInformation::GetNumberOfChildren()
 {
   return this->DataIsMultiPiece?
-    this->NumberOfPieces : 
+    this->NumberOfPieces :
     static_cast<int>(this->Internal->ChildrenInformation.size());
 }
 
@@ -168,7 +168,7 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
 {
   this->Initialize();
 
-  vtkCompositeDataSet* cds = 
+  vtkCompositeDataSet* cds =
     vtkCompositeDataSet::SafeDownCast(object);
   if (!cds)
     {
@@ -195,8 +195,12 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
   // This is generic composite dataset.
   vtkSmartPointer<vtkCompositeDataIterator> iter;
   iter.TakeReference(cds->NewIterator());
-  iter->VisitOnlyLeavesOff();
-  iter->TraverseSubTreeOff();
+  if(vtkDataObjectTreeIterator::SafeDownCast(iter))
+    {
+    vtkDataObjectTreeIterator* treeIter = vtkDataObjectTreeIterator::SafeDownCast(iter);
+    treeIter->VisitOnlyLeavesOff();
+    treeIter->TraverseSubTreeOff();
+    }
   iter->SkipEmptyNodesOff();
 
   // vtkTimerLog::MarkStartEvent("Copying information from composite data");
@@ -208,7 +212,7 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
     if (curDO)
       {
       childInfo = vtkSmartPointer<vtkPVDataInformation>::New();
-      childInfo->CopyFromObject(curDO); 
+      childInfo->CopyFromObject(curDO);
       }
     this->Internal->ChildrenInformation.resize(index+1);
     this->Internal->ChildrenInformation[index].Info = childInfo;
@@ -217,7 +221,7 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       vtkInformation* info = iter->GetCurrentMetaData();
       if (info->Has(vtkCompositeDataSet::NAME()))
         {
-        this->Internal->ChildrenInformation[index].Name = 
+        this->Internal->ChildrenInformation[index].Name =
           info->Get(vtkCompositeDataSet::NAME());
         }
       }
@@ -238,7 +242,7 @@ void vtkPVCompositeDataInformation::CopyFromAMR(vtkUniformGridAMR* amr)
     this->Internal->ChildrenInformation.resize(num_levels);
     }
 
-  // we use this to "simulate" a composite tree from AMR 
+  // we use this to "simulate" a composite tree from AMR
   vtkNew<vtkMultiPieceDataSet> tempMultiPiece;
   vtkNew<vtkPVDataInformation> tempDSInfo;
 
@@ -348,18 +352,18 @@ void vtkPVCompositeDataInformation::CopyToStream(
   unsigned int numChildren = static_cast<unsigned int>(
     this->Internal->ChildrenInformation.size());
   *css << numChildren;
-  
+
   for(unsigned i=0; i<numChildren; i++)
     {
     vtkPVDataInformation* dataInf = this->Internal->ChildrenInformation[i].Info;
     if (dataInf)
       {
-      *css << i 
+      *css << i
            << this->Internal->ChildrenInformation[i].Name.c_str();
 
       vtkClientServerStream dcss;
       dataInf->CopyToStream(&dcss);
-      
+
       size_t length;
       const unsigned char* data;
       dcss.GetData(&data, &length);
@@ -404,7 +408,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
     }
   int msgIdx = 3;
   this->Internal->ChildrenInformation.resize(numChildren);
-  
+
   while (1)
     {
     msgIdx++;
@@ -430,7 +434,7 @@ void vtkPVCompositeDataInformation::CopyFromStream(
     vtkTypeUInt32 length;
     std::vector<unsigned char> data;
     vtkClientServerStream dcss;
-    
+
     msgIdx++;
     // Data information.
     vtkPVDataInformation* dataInf = vtkPVDataInformation::New();

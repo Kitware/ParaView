@@ -166,8 +166,6 @@ bool vtkCPInputDataDescription::IsInputSufficient()
   if(composite)
     {
     vtkCompositeDataIterator* iter = composite->NewIterator();
-    iter->VisitOnlyLeavesOn();
-    iter->TraverseSubTreeOn();
     iter->SkipEmptyNodesOn();
     for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
       {

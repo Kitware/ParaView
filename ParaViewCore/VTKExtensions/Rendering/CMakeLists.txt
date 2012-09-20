@@ -45,6 +45,7 @@ set(Module_SRCS
   vtkKdTreeManager.cxx
   vtkMarkSelectedRows.cxx
   vtkMultiProcessControllerHelper.cxx
+  vtkMultiSliceContextItem.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPVArrowSource.cxx
   vtkPVAxesActor.cxx

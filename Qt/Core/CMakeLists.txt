@@ -111,6 +111,10 @@ set(Module_SRCS
   pqLinkViewWidget.h
   pqLookupTableManager.cxx
   pqLookupTableManager.h
+  pqMultiSliceAxisWidget.cxx
+  pqMultiSliceAxisWidget.h
+  pqMultiSliceView.cxx
+  pqMultiSliceView.h
   pqNameCount.cxx
   pqNameCount.h
   pqNonEditableStyledItemDelegate.cxx
@@ -273,6 +277,8 @@ set (Module_MOC_HDRS
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
+  pqMultiSliceAxisWidget.h
+  pqMultiSliceView.h
   pqNonEditableStyledItemDelegate.h
   pqObjectBuilder.h
   pqOutputPort.h

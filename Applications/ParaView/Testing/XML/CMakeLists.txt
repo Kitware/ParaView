@@ -90,6 +90,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
@@ -190,6 +192,8 @@ set(LoadSaveStateAnimation_USE_NEW_PANELS TRUE)
 set(LoadState_USE_NEW_PANELS TRUE)
 set(NiftiReaderWriterPlugin_USE_NEW_PANELS TRUE)
 set(MemoryInspectorPanel_USE_NEW_PANELS TRUE)
+set(MultiSliceWavelet_USE_NEW_PANELS TRUE)
+set(MultiSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(NewColorEditor1_USE_NEW_PANELS TRUE)
 set(NewColorEditor3_USE_NEW_PANELS TRUE)
 set(NormalGlyphs_USE_NEW_PANELS TRUE)
@@ -240,6 +244,10 @@ set(XYChart_USE_NEW_PANELS TRUE)
 set(XYHistogram_USE_NEW_PANELS TRUE)
 set(ZLibXDMF_USE_NEW_PANELS TRUE)
 set(AnalyzeReaderWriterPlugin_USE_NEW_PANELS TRUE)
+
+# Selection is not available in CRS mode
+set(MultiSliceWavelet_DISABLE_CRS TRUE)
+set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)

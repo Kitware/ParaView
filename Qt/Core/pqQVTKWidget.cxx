@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
-  : Superclass(parentObject, f)
+  : Superclass(parentObject, f), SizePropertyName("ViewSize")
 {
   this->setAutomaticImageCacheEnabled(getenv("DASHBOARD_TEST_FROM_CTEST")==NULL);
 
@@ -65,6 +65,7 @@ pqQVTKWidget::pqQVTKWidget(QWidget* parentObject, Qt::WFlags f)
 
   // Save the loaded image
   this->MousePointerToDraw = image.mirrored();
+  
 }
 
 //----------------------------------------------------------------------------
@@ -88,8 +89,10 @@ void pqQVTKWidget::updateSizeProperties()
     int view_size[2];
     view_size[0] = this->size().width();
     view_size[1] = this->size().height();
-    vtkSMPropertyHelper(this->ViewProxy, "ViewSize").Set(view_size, 2);
-    this->ViewProxy->UpdateProperty("ViewSize");
+    vtkSMPropertyHelper(
+      this->ViewProxy, this->SizePropertyName.toAscii().data()).Set(view_size, 2);
+    this->ViewProxy->UpdateProperty(
+      this->SizePropertyName.toAscii().data());
     END_UNDO_EXCLUDE();
     }
 

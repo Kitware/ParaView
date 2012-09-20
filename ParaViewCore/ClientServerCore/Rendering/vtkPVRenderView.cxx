@@ -868,6 +868,17 @@ void vtkPVRenderView::Update()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::CopyViewUpdateOptions(vtkPVRenderView* otherView)
+{
+  this->NeedsOrderedCompositing = otherView->NeedsOrderedCompositing;
+  this->UseLODForInteractiveRender = otherView->UseLODForInteractiveRender;
+  this->UseDistributedRenderingForStillRender = otherView->UseDistributedRenderingForStillRender;
+  this->StillRenderProcesses = otherView->StillRenderProcesses;
+  this->InteractiveRenderProcesses = otherView->InteractiveRenderProcesses;
+  this->UseDistributedRenderingForInteractiveRender = otherView->UseDistributedRenderingForInteractiveRender;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateLOD()
 {
   vtkTimerLog::MarkStartEvent("RenderView::UpdateLOD");
