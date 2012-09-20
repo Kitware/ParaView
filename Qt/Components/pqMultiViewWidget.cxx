@@ -611,6 +611,15 @@ void pqMultiViewWidget::reload()
     iter.next();
     if (iter.value() == NULL)
       {
+      // since we are in the process of destroying the view, cancel any pending
+      // render requests. This addresses a Windows issue where the view would
+      // occassionally popout and render when undoing the creation of the view
+      // or closing it.
+      pqView* view = getPQView(iter.key());
+      if (view)
+        {
+        view->cancelPendingRenders();
+        }
       iter.remove();
       }
     }
