@@ -102,9 +102,15 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->removeConnection, SIGNAL(clicked()),
           this, SLOT(removeConnection()));
 
+  connect(this->Internals->editConnection, SIGNAL(clicked()),
+          this, SLOT(editConnection()));
+
   connect(this->Internals->connectionsTable,
           SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-          this, SLOT(connectionDoubleClicked(QListWidgetItem*)));
+          this, SLOT(editConnection(QListWidgetItem*)));
+
+  connect(this->Internals->connectionsTable, SIGNAL(currentRowChanged(int)),
+          this, SLOT(updateConnectionButtons(int)));
 
   connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
           this, SLOT(updateConnections()));
@@ -116,9 +122,15 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->removeStyle, SIGNAL(clicked()),
           this, SLOT(removeStyle()));
 
+  connect(this->Internals->editStyle, SIGNAL(clicked()),
+          this, SLOT(editStyle()));
+
   connect(this->Internals->stylesTable,
           SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-          this, SLOT(styleDoubleClicked(QListWidgetItem*)));
+          this, SLOT(editStyle(QListWidgetItem*)));
+
+  connect(this->Internals->stylesTable, SIGNAL(currentRowChanged(int)),
+          this, SLOT(updateStyleButtons(int)));
 
   connect(pqVRQueueHandler::instance(), SIGNAL(stylesChanged()),
           this, SLOT(updateStyles()));
@@ -135,6 +147,10 @@ void pqVRDockPanel::constructor()
 
   connect(this->Internals->restoreState, SIGNAL(clicked()),
           this, SLOT(restoreState()));
+
+  this->updateConnectionButtons(
+        this->Internals->connectionsTable->currentRow());
+  this->updateStyleButtons(this->Internals->stylesTable->currentRow());
 
   // Add the render view to the proxy combo
   pqServerManagerModel* smmodel =
@@ -165,12 +181,18 @@ void pqVRDockPanel::updateConnections()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::connectionDoubleClicked(QListWidgetItem *item)
+void pqVRDockPanel::editConnection(QListWidgetItem *item)
 {
+  if (!item)
+    {
+    item = this->Internals->connectionsTable->currentItem();
+    }
+
   if (!item)
     {
     return;
     }
+
   // Lookup connection
   QString connName = item->text();
   pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
@@ -206,6 +228,14 @@ void pqVRDockPanel::connectionDoubleClicked(QListWidgetItem *item)
     dialog.updateConnection();
     this->updateConnections();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::updateConnectionButtons(int row)
+{
+  bool enabled = (row >= 0);
+  this->Internals->editConnection->setEnabled(enabled);
+  this->Internals->removeConnection->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -335,8 +365,18 @@ void pqVRDockPanel::updateStyles()
 }
 
 //-----------------------------------------------------------------------------
-void pqVRDockPanel::styleDoubleClicked(QListWidgetItem *item)
+void pqVRDockPanel::editStyle(QListWidgetItem *item)
 {
+  if (!item)
+    {
+    item = this->Internals->stylesTable->currentItem();
+    }
+
+  if (!item)
+    {
+    return;
+    }
+
   pqVRAddStyleDialog dialog(this);
   QString name = item->text();
   vtkVRInteractorStyle *style = this->Internals->StyleNameMap.value(name, NULL);
@@ -349,7 +389,15 @@ void pqVRDockPanel::styleDoubleClicked(QListWidgetItem *item)
   if (!dialog.isConfigurable() || dialog.exec() == QDialog::Accepted)
     {
     dialog.updateInteractorStyle();
-    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::updateStyleButtons(int row)
+{
+  bool enabled = (row >= 0);
+  this->Internals->editStyle->setEnabled(enabled);
+  this->Internals->removeStyle->setEnabled(enabled);
 }
 
 //-----------------------------------------------------------------------------

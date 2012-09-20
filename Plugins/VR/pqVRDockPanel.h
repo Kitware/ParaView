@@ -53,12 +53,14 @@ protected slots:
   void addConnection();
   void removeConnection();
   void updateConnections();
-  void connectionDoubleClicked(QListWidgetItem *);
+  void editConnection(QListWidgetItem *item = NULL);
+  void updateConnectionButtons(int row);
 
   void addStyle();
   void removeStyle();
   void updateStyles();
-  void styleDoubleClicked(QListWidgetItem *);
+  void editStyle(QListWidgetItem *item = NULL);
+  void updateStyleButtons(int row);
 
   void proxyChanged(vtkSMProxy*);
   void setActiveView(pqView*);
