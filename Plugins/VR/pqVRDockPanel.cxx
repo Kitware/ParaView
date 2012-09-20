@@ -72,6 +72,8 @@ class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 public:
   QString createName(vtkVRInteractorStyle *);
 
+  bool IsRunning;
+
   vtkWeakPointer<vtkCamera> Camera;
   QMap<QString, vtkVRInteractorStyle*> StyleNameMap;
 };
@@ -84,6 +86,10 @@ void pqVRDockPanel::constructor()
   this->Internals = new pqInternals();
   this->Internals->setupUi(container);
   this->setWidget(container);
+
+  this->Internals->IsRunning = false;
+  this->Internals->startButton->setEnabled(true);
+  this->Internals->stopButton->setEnabled(false);
 
   vtkVRInteractorStyleFactory *styleFactory =
       vtkVRInteractorStyleFactory::GetInstance();
@@ -148,6 +154,12 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->restoreState, SIGNAL(clicked()),
           this, SLOT(restoreState()));
 
+  connect(this->Internals->startButton, SIGNAL(clicked()),
+          this, SLOT(start()));
+
+  connect(this->Internals->stopButton, SIGNAL(clicked()),
+          this, SLOT(stop()));
+
   this->updateConnectionButtons(
         this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
@@ -164,6 +176,10 @@ void pqVRDockPanel::constructor()
 //-----------------------------------------------------------------------------
 pqVRDockPanel::~pqVRDockPanel()
 {
+  if (this->Internals->IsRunning)
+    {
+    this->stop();
+    }
   delete this->Internals;
 }
 
@@ -479,6 +495,38 @@ void pqVRDockPanel::saveState()
 void pqVRDockPanel::restoreState()
 {
   pqLoadStateReaction::loadState();
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::start()
+{
+  if (this->Internals->IsRunning)
+    {
+    qWarning() << "pqVRDockPanel: Cannot start listening for VR events --"
+                  " already running!";
+    return;
+    }
+  this->Internals->IsRunning = true;
+  this->Internals->startButton->setEnabled(false);
+  this->Internals->stopButton->setEnabled(true);
+  pqVRConnectionManager::instance()->start();
+  pqVRQueueHandler::instance()->start();
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::stop()
+{
+  if (!this->Internals->IsRunning)
+    {
+    qWarning() << "pqVRDockPanel: Cannot stop listening for VR events --"
+                  " not started!";
+    return;
+    }
+  this->Internals->startButton->setEnabled(true);
+  this->Internals->stopButton->setEnabled(false);
+  this->Internals->IsRunning = false;
+  pqVRConnectionManager::instance()->stop();
+  pqVRQueueHandler::instance()->stop();
 }
 
 //-----------------------------------------------------------------------------

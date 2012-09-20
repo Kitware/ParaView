@@ -68,6 +68,9 @@ protected slots:
   void saveState();
   void restoreState();
 
+  void start();
+  void stop();
+
   void updateDebugLabel();
 
 private:

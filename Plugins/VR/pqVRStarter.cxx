@@ -59,7 +59,7 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
   this->Internals->StyleFactory = NULL;
-  this->IsShutdown = false;
+  this->IsShutdown = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -74,6 +74,12 @@ pqVRStarter::~pqVRStarter()
 //-----------------------------------------------------------------------------
 void pqVRStarter::onStartup()
 {
+  if (!this->IsShutdown)
+    {
+    qWarning() << "pqVRStarter: Cannot startup -- already started.";
+    return;
+    }
+  this->IsShutdown = false;
   this->Internals->EventQueue = vtkVRQueue::New();
   this->Internals->ConnectionManager = new pqVRConnectionManager(this->Internals->EventQueue,this);
   pqVRConnectionManager::setInstance(this->Internals->ConnectionManager);
@@ -81,16 +87,17 @@ void pqVRStarter::onStartup()
   pqVRQueueHandler::setInstance(this->Internals->Handler);
   this->Internals->StyleFactory = vtkVRInteractorStyleFactory::New();
   vtkVRInteractorStyleFactory::SetInstance(this->Internals->StyleFactory);
-  this->Internals->ConnectionManager->start();
-  this->Internals->Handler->start();
-  //qWarning() << "Message from pqVRStarter: Application Started";
 }
 
 //-----------------------------------------------------------------------------
 void pqVRStarter::onShutdown()
 {
-  this->Internals->Handler->stop();
-  this->Internals->ConnectionManager->stop();
+  if (this->IsShutdown)
+    {
+    qWarning() << "pqVRStarter: Cannot shutdown -- not started yet.";
+    return;
+    }
+  this->IsShutdown = true;
   pqVRConnectionManager::setInstance(NULL);
   pqVRQueueHandler::setInstance(NULL);
   vtkVRInteractorStyleFactory::SetInstance(NULL);
@@ -98,6 +105,4 @@ void pqVRStarter::onShutdown()
   delete this->Internals->ConnectionManager;
   this->Internals->EventQueue->Delete();
   this->Internals->StyleFactory->Delete();
-  this->IsShutdown = true;
-  // qWarning() << "Message from pqVRStarter: Application Shutting down";
 }

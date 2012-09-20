@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>363</width>
+    <width>479</width>
     <height>613</height>
    </rect>
   </property>
@@ -27,6 +27,20 @@
    <item row="11" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
+      <widget class="QPushButton" name="saveState">
+       <property name="text">
+        <string>Save State</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="restoreState">
+       <property name="text">
+        <string>Restore State</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -40,16 +54,22 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="saveState">
+      <widget class="QPushButton" name="startButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start listening for VR events on the configured connections.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>Save State</string>
+        <string>Start</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="restoreState">
+      <widget class="QPushButton" name="stopButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stop listening for VR events.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
-        <string>Restore State</string>
+        <string>Stop</string>
        </property>
       </widget>
      </item>
