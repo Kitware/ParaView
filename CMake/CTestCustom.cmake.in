@@ -38,4 +38,8 @@ set (CTEST_CUSTOM_COVERAGE_EXCLUDE
   ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
   ".*/VTK/.*"
   "vtk[^\\.]+ClientServer.cxx"
+  "vtk[^\\.]+Python.cxx"
+  "ui_[^\\.]+.h"
+  "moc_[^\\.]+.h"
+  "vtkprotobuf"
 )
