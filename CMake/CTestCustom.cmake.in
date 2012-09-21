@@ -11,6 +11,7 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "ThirdParty.protobuf/"
   "google.protobuf"
   "vtkPVMessage.pb.h"
+  "google::protobuf::Message"
 
   #ignore warnings coming from QT headers.
   "qtcore"
@@ -26,6 +27,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore warnings from openmpi.
   ".*openmpi.*"
+
+  # ignore warnings about unsafe str* functions.
+  "_CRT_SECURE_NO_WARNINGS"
 )
 
 #------------------------------------------------------------------------------
