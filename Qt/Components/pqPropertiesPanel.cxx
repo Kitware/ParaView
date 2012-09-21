@@ -791,6 +791,8 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
 void pqPropertiesPanel::apply()
 {
+  BEGIN_UNDO_SET("Apply");
+
   QSet<pqProxy*> proxiesToShow;
 
   if(this->Proxy)
@@ -838,6 +840,8 @@ void pqPropertiesPanel::apply()
     }
 
   emit this->applied();
+
+  END_UNDO_SET();
 }
 
 void pqPropertiesPanel::reset()

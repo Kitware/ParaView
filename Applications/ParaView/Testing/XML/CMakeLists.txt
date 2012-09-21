@@ -14,7 +14,7 @@ SET (TESTS_WITH_INLINE_COMPARES
 )
 
 SET (TESTS_WITH_BASELINES)
-if(NOT Module_vtkIOVisItBridge)
+if(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
@@ -28,6 +28,13 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
+  set(VisItBridgeChombo_USE_NEW_PANELS TRUE)
+  set(VisItBridgeEnzo_USE_NEW_PANELS TRUE)
+  set(VisItBridgeNas_USE_NEW_PANELS TRUE)
+  set(VisItBridgeNek_USE_NEW_PANELS TRUE)
+  set(VisItBridgePdb_USE_NEW_PANELS TRUE)
+  set(VisItBridgePixie_USE_NEW_PANELS TRUE)
+  set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 endif()
 
 if(Module_vtkIOXdmf2)
@@ -226,6 +233,7 @@ set(TemporalShiftScale_USE_NEW_PANELS TRUE)
 set(Tessellate_USE_NEW_PANELS TRUE)
 set(TestIsoVolume_USE_NEW_PANELS TRUE)
 set(UndoRedo1_USE_NEW_PANELS TRUE)
+set(UndoRedo2_USE_NEW_PANELS TRUE)
 set(UndoRedo5_USE_NEW_PANELS TRUE)
 set(UndoRedo6_USE_NEW_PANELS TRUE)
 set(UndoRedo7_USE_NEW_PANELS TRUE)
@@ -234,7 +242,6 @@ set(UnstructuredOutline_USE_NEW_PANELS TRUE)
 set(VariableSelector1_USE_NEW_PANELS TRUE)
 set(VariableSelector_USE_NEW_PANELS TRUE)
 set(ViewSettingsDialog_USE_NEW_PANELS TRUE)
-set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
@@ -257,6 +264,7 @@ set(ExodusModeShapes_BREAK TRUE)
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
+set (ProbePicking_FORCE_SERIAL TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
@@ -515,8 +523,8 @@ set (SpreadSheet1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (SPTimeseries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (SpyPlotHistoryReader_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (StreamTracerUpdates_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (TemporalInterpolator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (TemporalShiftScale_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+#set (TemporalInterpolator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+#set (TemporalShiftScale_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (Tessellate_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (Threshold_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (UnstructuredOutline_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})

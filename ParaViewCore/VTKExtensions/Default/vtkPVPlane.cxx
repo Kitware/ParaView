@@ -21,6 +21,7 @@ vtkStandardNewMacro(vtkPVPlane);
 vtkPVPlane::vtkPVPlane()
 {
   this->Plane = vtkPlane::New();
+  this->Offset = 0;
 }
 
 //----------------------------------------------------------------------------
