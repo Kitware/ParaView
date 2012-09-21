@@ -749,8 +749,6 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     {
     this->RepresentationPropertyItems.append(item);
 
-    int row = this->Ui->DisplayLayout->rowCount();
-
     if(item.LabelWidget)
       {
       this->Ui->DisplayLayout->addRow(item.LabelWidget, item.PropertyWidget);

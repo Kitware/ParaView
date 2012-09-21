@@ -1392,7 +1392,7 @@ void vtkAMRDualGridHelper::DegenerateRegionMessageSize(vtkIdTypeArray* srcProcs,
   for (region = this->DegenerateRegionQueue.begin();
        region != this->DegenerateRegionQueue.end(); region++)
     {
-    vtkIdType messageLength;
+    vtkIdType messageLength = 0;
     if (   (region->SourceBlock->ProcessId == myProc)
         || (region->ReceivingBlock->ProcessId == myProc) )
       {

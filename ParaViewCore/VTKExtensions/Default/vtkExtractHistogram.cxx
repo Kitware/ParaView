@@ -413,7 +413,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
         vtkSmartPointer<vtkDoubleArray>::New();
       std::string newname2 = iter->first + "_average";
       aa->SetName(newname2.c_str());
-      int numComps = iter->second.TotalValues[0].size();
+      int numComps = static_cast<int>(iter->second.TotalValues[0].size());
       da->SetNumberOfComponents(numComps);
       da->SetNumberOfTuples(this->BinCount);
       aa->SetNumberOfComponents(numComps);

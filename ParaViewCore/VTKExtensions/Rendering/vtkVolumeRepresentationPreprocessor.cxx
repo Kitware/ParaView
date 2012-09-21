@@ -121,7 +121,7 @@ vtkUnstructuredGrid *vtkVolumeRepresentationPreprocessor::TriangulateDataSet(
 
 //----------------------------------------------------------------------------
 /// Extracts a single block from a multiblock dataset and attempts to downcast
-/// the extracted block to dataset before returning. 
+/// the extracted block to dataset before returning.
 vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
   vtkMultiBlockDataSet *input)
 {
@@ -141,7 +141,6 @@ vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
   // use an iterator to get the dataset at the leaf node.
   vtkDataSet * dataset = 0;
   vtkCompositeDataIterator *iter = output->NewIterator();
-  iter->SetVisitOnlyLeaves(1);
   iter->GoToFirstItem();
   dataset = vtkDataSet::SafeDownCast(output->GetDataSet(iter));
   iter->Delete();

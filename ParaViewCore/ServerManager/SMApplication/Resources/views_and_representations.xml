@@ -4242,6 +4242,361 @@
       </DoubleVectorProperty>
       <!-- End of FrustumWidget -->
     </Proxy>
+
+    <!-- ================================================================== -->
+
+    <RepresentationProxy name="SliceFriendRepresentation"
+                         class="vtkSliceFriendGeometryRepresentation"
+                         processes="client|renderserver|dataserver"
+                         base_proxygroup="representations"
+                         base_proxyname="SurfaceRepresentation"
+    />
+
+    <!-- ================================================================ -->
+
+    <PVRepresentationProxy name="CompositeMultiSliceRepresentation"
+                           class="vtkCompositeSliceRepresentation"
+                           processes="client|renderserver|dataserver">
+
+       <InputProperty command="SetInputConnection"
+                      name="Input">
+         <DataTypeDomain composite_data_supported="1"
+                         name="input_type">
+            <DataType value="vtkDataSet" />
+            <DataType value="vtkGenericDataSet" />
+         </DataTypeDomain>
+         <InputArrayDomain attribute_type="cell"
+                           name="input_array_cell"
+                           optional="1"></InputArrayDomain>
+         <InputArrayDomain attribute_type="point"
+                           name="input_array_point"
+                           optional="1"></InputArrayDomain>
+         <Documentation>Set the input to the representation.</Documentation>
+       </InputProperty>
+
+       <RepresentationType  subproxy="SurfaceRepresentation" text="Slices" subtype="Surface"/>
+
+       <SubProxy>
+          <Proxy name="SurfaceRepresentation"
+                 proxygroup="representations"
+                 proxyname="SliceFriendRepresentation">
+          </Proxy>
+          <ExposedProperties>
+            <PropertyGroup panel_visibility="default"
+                           type="ColorEditor">
+              <Property name="AllowSpecularHighlightingWithScalarColoring" />
+              <Property name="Ambient" />
+              <Property name="AmbientColor" />
+              <Property name="BackfaceAmbientColor" />
+              <Property name="BackfaceDiffuseColor" />
+              <Property name="BackfaceOpacity" />
+              <Property name="ColorArrayName" />
+              <Property name="ColorAttributeType" />
+              <Property name="Diffuse" />
+              <Property name="DiffuseColor" />
+              <Property name="EdgeColor" />
+              <Property name="Interpolation" />
+              <Property name="LookupTable" />
+              <Property name="NonlinearSubdivisionLevel" />
+              <Property name="Specular" />
+              <Property name="SpecularColor" />
+              <Property name="SpecularPower" />
+            </PropertyGroup>
+            <Property name="MapScalars"
+                      panel_visibility="advanced" />
+            <Property name="InterpolateScalarsBeforeMapping"
+                      panel_visibility="advanced" />
+            <Property name="Opacity"
+                      panel_visibility="default" />
+            <Property name="LineWidth"
+                      panel_visibility="advanced" />
+            <Property name="BackfaceRepresentation"
+                      panel_visibility="advanced" />
+            <Property name="Position"
+                      panel_visibility="advanced" />
+            <Property name="Scale"
+                      panel_visibility="advanced" />
+            <Property name="Orientation"
+                      panel_visibility="advanced" />
+            <Property name="Origin"
+                      panel_visibility="advanced" />
+            <Property name="Pickable"
+                      panel_visibility="never" />
+            <Property name="PointSize"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points" />
+            <Property name="StaticMode"
+                      panel_visibility="never" />
+            <Property name="SuppressLOD"
+                      panel_visibility="never" />
+            <Property name="Texture"
+                      panel_visibility="never" />
+          </ExposedProperties>
+       </SubProxy>
+
+    <Documentation>ParaView's default representation for showing any type of
+    dataset in the render view.</Documentation>
+    <IntVectorProperty command="SetVisibility"
+                       default_values="1"
+                       name="Visibility"
+                       number_of_elements="1"
+                       panel_visibility="never">
+      <BooleanDomain name="bool" />
+      <Documentation>Set the visibility for this
+      representation.</Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty command="SetForceUseCache"
+                       default_values="0"
+                       is_internal="1"
+                       name="ForceUseCache"
+                       number_of_elements="1">
+      <BooleanDomain name="bool" />
+      <Documentation>Typically UseCache and CacheKey are updated by the View
+      and representations cache based on what the view tells it. However in
+      some cases we may want to force a representation to cache irrespective
+      of the view (e.g. comparative views). In which case these ivars can up
+      set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+      Instead, ForcedCacheKey is used.</Documentation>
+    </IntVectorProperty>
+    <DoubleVectorProperty command="SetForcedCacheKey"
+                          default_values="none"
+                          is_internal="1"
+                          name="ForcedCacheKey"
+                          number_of_elements="1">
+      <DoubleRangeDomain name="range" />
+      <Documentation>Typically UseCache and CacheKey are updated by the View
+      and representations cache based on what the view tells it. However in
+      some cases we may want to force a representation to cache irrespective
+      of the view (e.g. comparative views). In which case these ivars can up
+      set. If ForcedCacheKey is true, it overrides UseCache and CacheKey.
+      Instead, ForcedCacheKey is used.</Documentation>
+    </DoubleVectorProperty>
+    <IntVectorProperty command="SetSelectionVisibility"
+                       default_values="1"
+                       name="SelectionVisibility"
+                       number_of_elements="1"
+                       panel_visibility="never">
+      <BooleanDomain name="bool" />
+      <Documentation>Set the visibility for the selection, if
+      any.</Documentation>
+    </IntVectorProperty>
+    <IntVectorProperty command="SetCubeAxesVisibility"
+                       default_values="0"
+                       name="CubeAxesVisibility"
+                       number_of_elements="1"
+                       panel_visibility="never">
+      <BooleanDomain name="bool" />
+      <Documentation>Set the visibility for the cube axes.</Documentation>
+      <Hints>
+        <ShowInSummaryPanel />
+      </Hints>
+    </IntVectorProperty>
+    <StringVectorProperty command="GetRepresentationTypes"
+                          information_only="1"
+                          name="RepresentationTypesInfo"
+                          si_class="vtkSIDataArrayProperty">
+      <Documentation>Property that lists the available representation types.
+      This is used by the domain for "Representation" to setup the list of
+      types available correctly.</Documentation>
+    </StringVectorProperty>
+    <StringVectorProperty command="SetActiveRepresentation"
+                          default_values="Slices"
+                          name="Representation"
+                          number_of_elements="1"
+                          panel_visibility="default">
+      <Documentation>Choose the type for the representation.</Documentation>
+      <StringListDomain name="list">
+        <RequiredProperties>
+          <Property function="StringList"
+                    name="RepresentationTypesInfo" />
+        </RequiredProperties>
+      </StringListDomain>
+      <Hints>
+        <ShowInSummaryPanel />
+      </Hints>
+    </StringVectorProperty>
+    <StringVectorProperty command="SetCellFieldDataArrayName"
+                          default_values="vtkOriginalCellIds"
+                          name="SelectionCellFieldDataArrayName"
+                          number_of_elements="1"
+                          panel_visibility="never">
+      <ArrayListDomain input_domain_name="input_array_cell"
+                       name="array_list"></ArrayListDomain>
+    </StringVectorProperty>
+    <StringVectorProperty command="SetPointFieldDataArrayName"
+                          default_values="vtkOriginalPointIds"
+                          name="SelectionPointFieldDataArrayName"
+                          number_of_elements="1"
+                          panel_visibility="never">
+      <ArrayListDomain input_domain_name="input_array_point"
+                       name="array_list"></ArrayListDomain>
+    </StringVectorProperty>
+    <SubProxy>
+      <Proxy name="CubeAxesRepresentation"
+             proxygroup="representations"
+             proxyname="CubeAxesRepresentation"></Proxy>
+      <ExposedProperties>
+        <PropertyGroup label="Cube Axes"
+                       name="CubeAxes"
+                       panel_visibility="default"
+                       type="CubeAxes">
+          <Property exposed_name="CubeAxesColor"
+                    name="Color" />
+          <Property exposed_name="CubeAxesCornerOffset"
+                    name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode"
+                    name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia"
+                    name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation"
+                    name="TickLocation" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility"
+                    name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility"
+                    name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility"
+                    name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines"
+                    name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle"
+                    name="XTitle" />
+          <Property exposed_name="CubeAxesUseDefaultXTitle"
+                    name="UseDefaultXTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility"
+                    name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility"
+                    name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility"
+                    name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines"
+                    name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle"
+                    name="YTitle" />
+          <Property exposed_name="CubeAxesUseDefaultYTitle"
+                    name="UseDefaultYTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility"
+                    name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility"
+                    name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility"
+                    name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines"
+                    name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle"
+                    name="ZTitle" />
+          <Property exposed_name="CubeAxesUseDefaultZTitle"
+                    name="UseDefaultZTitle" />
+          <Property exposed_name="CubeAxesGridLineLocation"
+                    name="GridLineLocation" />
+          <Property name="DataBounds" />
+          <Property name="CustomBounds" />
+          <Property name="CustomBoundsActive" />
+          <Property name="OriginalBoundsRangeActive" />
+          <Property name="CustomRange" />
+          <Property name="CustomRangeActive" />
+        </PropertyGroup>
+      </ExposedProperties>
+      <ShareProperties subproxy="SurfaceRepresentation">
+        <Exception name="Input" />
+        <Exception name="Visibility" />
+      </ShareProperties>
+    </SubProxy>
+    <SubProxy>
+      <Proxy name="SelectionRepresentation"
+             proxygroup="representations"
+             proxyname="SelectionRepresentation" />
+      <ShareProperties subproxy="SurfaceRepresentation">
+        <Exception name="Input" />
+        <Exception name="Visibility" />
+        <Exception name="Representation" />
+        <Exception name="Color" />
+        <Exception name="LineWidth" />
+        <Exception name="Opacity" />
+        <Exception name="PointSize" />
+      </ShareProperties>
+      <ExposedProperties>
+        <Property exposed_name="SelectionCellLabelBold"
+                  name="CellLabelBold"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelColor"
+                  name="CellLabelColor"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelFontFamily"
+                  name="CellLabelFontFamily"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelFontSize"
+                  name="CellLabelFontSize"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelFormat"
+                  name="CellLabelFormat"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelItalic"
+                  name="CellLabelItalic"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelJustification"
+                  name="CellLabelJustification"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelOpacity"
+                  name="CellLabelOpacity"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelShadow"
+                  name="CellLabelShadow"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionCellLabelVisibility"
+                  name="CellLabelVisibility"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionColor"
+                  name="Color"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionLineWidth"
+                  name="LineWidth"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionOpacity"
+                  name="Opacity"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelBold"
+                  name="PointLabelBold"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelColor"
+                  name="PointLabelColor"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelFontFamily"
+                  name="PointLabelFontFamily"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelFontSize"
+                  name="PointLabelFontSize"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelFormat"
+                  name="PointLabelFormat"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelItalic"
+                  name="PointLabelItalic"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelJustification"
+                  name="PointLabelJustification"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelOpacity"
+                  name="PointLabelOpacity"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelShadow"
+                  name="PointLabelShadow"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointLabelVisibility"
+                  name="PointLabelVisibility"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionPointSize"
+                  name="PointSize"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionRepresentation"
+                  name="Representation"
+                  panel_visibility="never" />
+        <Property exposed_name="SelectionUseOutline"
+                  name="UseOutline"
+                  panel_visibility="never" />
+      </ExposedProperties>
+    </SubProxy>
+    </PVRepresentationProxy>
+
   </ProxyGroup>
   <ProxyGroup name="views">
     <!-- ================================================================== -->
@@ -4488,5 +4843,64 @@
       </SubProxy>
       <!-- End of ComparativeXYBarChartView -->
     </ComparativeViewProxy>
+     <!-- ================================================================== -->
+     <MultiSliceViewProxy name="MultiSlice" class="vtkPVMultiSliceView"
+        processes="client|renderserver|dataserver"
+        base_proxygroup="views" base_proxyname="RenderView"
+        representation_name="CompositeMultiSliceRepresentation">
+
+        <DoubleVectorProperty name="XSlicesValues"
+                              command="SetSliceX"
+                              repeat_command="1"
+                              set_number_command="SetNumberOfSliceX"
+                              number_of_elements_per_command="1"
+                              use_index="1"/>
+
+        <DoubleVectorProperty name="XSlicesNormal"
+                              command="SetSliceXNormal"
+                              number_of_elements="3"
+                              default_values="1 0 0"/>
+
+        <DoubleVectorProperty name="XSlicesOrigin"
+                              command="SetSliceXOrigin"
+                              number_of_elements="3"
+                              default_values="0 0 0"/>
+
+        <DoubleVectorProperty name="YSlicesValues"
+                              command="SetSliceY"
+                              repeat_command="1"
+                              set_number_command="SetNumberOfSliceY"
+                              number_of_elements_per_command="1"
+                              use_index="1"/>
+
+        <DoubleVectorProperty name="YSlicesNormal"
+                              command="SetSliceYNormal"
+                              number_of_elements="3"
+                              default_values="0 1 0"/>
+
+        <DoubleVectorProperty name="YSlicesOrigin"
+                              command="SetSliceYOrigin"
+                              number_of_elements="3"
+                              default_values="0 0 0"/>
+
+        <DoubleVectorProperty name="ZSlicesValues"
+                              command="SetSliceZ"
+                              repeat_command="1"
+                              set_number_command="SetNumberOfSliceZ"
+                              number_of_elements_per_command="1"
+                              use_index="1"/>
+
+        <DoubleVectorProperty name="ZSlicesNormal"
+                              command="SetSliceZNormal"
+                              number_of_elements="3"
+                              default_values="0 0 1"/>
+
+        <DoubleVectorProperty name="ZSlicesOrigin"
+                              command="SetSliceZOrigin"
+                              number_of_elements="3"
+                              default_values="0 0 0"/>
+
+     </MultiSliceViewProxy>
+     <!-- ================================================================== -->
   </ProxyGroup>
 </ServerManagerConfiguration>

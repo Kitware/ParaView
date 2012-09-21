@@ -16,7 +16,7 @@
 
 #include "vtkAppendFilter.h"
 #include "vtkCleanArrays.h"
-#include "vtkCompositeDataIterator.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -54,7 +54,7 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
 
 
   vtkAppendFilter* appender = vtkAppendFilter::New();
-  appender->SetMergePoints(this->MergePoints? 1 : 0);  
+  appender->SetMergePoints(this->MergePoints? 1 : 0);
   if (ds)
     {
     this->AddDataSet(ds, appender);
@@ -65,10 +65,14 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
       {
       this->ExecuteSubTree(cd, appender);
       }
-
-    vtkCompositeDataIterator* iter = cd->NewIterator();
+    vtkDataObjectTreeIterator* iter = vtkDataObjectTreeIterator::SafeDownCast(cd->NewIterator());
+    if(!iter)
+      {
+      vtkErrorMacro("Composite data is not a tree");
+      return 0;
+      }
     iter->VisitOnlyLeavesOff();
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal() && 
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal() &&
       iter->GetCurrentFlatIndex() <= this->SubTreeCompositeIndex;
       iter->GoToNextItem())
       {
@@ -116,7 +120,7 @@ void vtkCompositeDataToUnstructuredGridFilter::ExecuteSubTree(
   for (iter2->InitTraversal(); !iter2->IsDoneWithTraversal();
     iter2->GoToNextItem())
     {
-    vtkDataSet* curDS = 
+    vtkDataSet* curDS =
       vtkDataSet::SafeDownCast(iter2->GetCurrentDataObject());
     if (curDS)
       {
@@ -165,7 +169,7 @@ void vtkCompositeDataToUnstructuredGridFilter::PrintSelf(ostream& os,
   vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SubTreeCompositeIndex: " 
+  os << indent << "SubTreeCompositeIndex: "
     << this->SubTreeCompositeIndex << endl;
 }
 

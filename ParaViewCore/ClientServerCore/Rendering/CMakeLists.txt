@@ -35,6 +35,7 @@ set (Module_SRCS
   vtkChartRepresentation.cxx
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
+  vtkCompositeSliceRepresentation.cxx
   vtkCubeAxesRepresentation.cxx
   vtkDataLabelRepresentation.cxx
   vtkGeometryRepresentation.cxx
@@ -63,6 +64,7 @@ set (Module_SRCS
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMultiSliceView.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
@@ -78,9 +80,11 @@ set (Module_SRCS
   vtkPVXYChartView.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
+  vtkSliceFriendGeometryRepresentation.cxx
   vtkSpreadSheetRepresentation.cxx
   vtkSpreadSheetView.cxx
   vtkTextSourceRepresentation.cxx
+  vtkThreeSliceFilter.cxx
   vtkUnstructuredGridVolumeRepresentation.cxx
   vtkXYChartRepresentation.cxx
 )

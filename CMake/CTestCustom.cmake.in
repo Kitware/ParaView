@@ -1,0 +1,48 @@
+#------------------------------------------------------------------------------
+# Inherit VTK's exclusions. We don't have to redefine them in this file anymore.
+include("@VTK_BINARY_DIR@/CTestCustom.cmake")
+
+#------------------------------------------------------------------------------
+# Regular expression for warning exception during build process
+set (CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+
+  #ignore protobuf related warnings.
+  "ThirdParty.protobuf/"
+  "google.protobuf"
+  "vtkPVMessage.pb.h"
+  "google::protobuf::Message"
+
+  #ignore warnings coming from QT headers.
+  "qtcore"
+  "qthelp"
+  "QtCore"
+  "QtHelp"
+
+
+  "vtk[^\\.]+ClientServer.cxx"
+
+  # ignore VRPN warnings
+  ".*vrpn.*"
+
+  # ignore warnings from openmpi.
+  ".*openmpi.*"
+
+  # ignore warnings about unsafe str* functions.
+  "_CRT_SECURE_NO_WARNINGS"
+
+  # ignore warnings from documentation generation tools.
+  "Warning.*Skipping it."
+)
+
+#------------------------------------------------------------------------------
+# Regular expression for excluding files from coverage testing
+set (CTEST_CUSTOM_COVERAGE_EXCLUDE
+  ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
+  ".*/VTK/.*"
+  "vtk[^\\.]+ClientServer.cxx"
+  "vtk[^\\.]+Python.cxx"
+  "ui_[^\\.]+.h"
+  "moc_[^\\.]+.h"
+  "vtkprotobuf"
+)

@@ -364,7 +364,7 @@ unsigned int vtkSMSessionProxyManager::GetNumberOfProxies(const char* group)
       {
       size += it2->second.size();
       }
-    return size;
+    return static_cast<unsigned int>(size);
     }
   return 0;
 }
@@ -901,7 +901,7 @@ void vtkSMSessionProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMSessionProxyManager::GetNumberOfLinks()
 {
-  return this->Internals->RegisteredLinkMap.size();
+  return static_cast<int>(this->Internals->RegisteredLinkMap.size());
 }
 
 //---------------------------------------------------------------------------

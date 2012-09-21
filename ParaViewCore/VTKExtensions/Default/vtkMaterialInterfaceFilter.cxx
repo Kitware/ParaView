@@ -2373,7 +2373,6 @@ int vtkMaterialInterfaceFilter::GetNumberOfLocalBlocks(
 {
   vtkCompositeDataIterator *it=hbds->NewIterator();
   it->InitTraversal();
-  it->VisitOnlyLeavesOn();
   it->SkipEmptyNodesOn();
   int nLocalBlocks=0;
   while ( !it->IsDoneWithTraversal() )
@@ -3165,7 +3164,6 @@ void vtkMaterialInterfaceFilter::PrepareForPass(
   // are integrating vector or scalars, in order to build the
   // appropriate accumulator
   vtkCompositeDataIterator *hbdsIt=hbdsInput->NewIterator();
-  hbdsIt->VisitOnlyLeavesOn();
   hbdsIt->SkipEmptyNodesOn();
   hbdsIt->InitTraversal();
   vtkImageData *testImage=0;
@@ -6335,7 +6333,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
       apf->AddInputData(srcMesh);
       apf->Update();
       vtkPolyData *mergedMesh=apf->GetOutput();
-      
+
       //mergedMesh->Register(0); // Do I have to? no because multi piece does it
       resolvedFragments->SetPiece(globalId, mergedMesh);
       apf->Delete();
@@ -6439,7 +6437,7 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
     cpd->SetInputData(fragmentMesh);
     cpd->Update();
     vtkPolyData *cleanedFragmentMesh=cpd->GetOutput();
-    
+
     #ifdef vtkMaterialInterfaceFilterDEBUG
     nFinal+=cleanedFragmentMesh->GetNumberOfPoints();
     #endif
