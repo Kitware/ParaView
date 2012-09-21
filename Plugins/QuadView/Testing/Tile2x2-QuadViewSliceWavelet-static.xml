@@ -33,8 +33,8 @@
   <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile0.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile1.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-Tile2.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile2.png" />
-  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-Tile3.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile3.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-static-Tile0.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile0.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-static-Tile1.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile1.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-static-Tile2.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile2.png" />
+  <pqcompareimage image="$PARAVIEW_TEST_ROOT/Tile2x2-QuadViewSliceWavelet-static-Tile3.png" baseline="$PARAVIEW_DATA_ROOT/Baseline/Tile2x2-QuadViewSliceWavelet-static-Tile3.png" />
 </pqevents>
