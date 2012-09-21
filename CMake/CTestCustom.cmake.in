@@ -30,6 +30,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore warnings about unsafe str* functions.
   "_CRT_SECURE_NO_WARNINGS"
+
+  # ignore warnings from documentation generation tools.
+  "Warning.*Skipping it."
 )
 
 #------------------------------------------------------------------------------
