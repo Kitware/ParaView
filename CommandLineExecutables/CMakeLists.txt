@@ -73,5 +73,3 @@ if (PARAVIEW_ENABLE_PYTHON)
       ${VTK_PYTHON_LIBRARIES})
   endforeach()
 endif()
-
-#FIXME:MODULARIZATION -- link line for plugins when doing static builds.
