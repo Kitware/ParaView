@@ -144,7 +144,7 @@ void pqSphereWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("SphereWidgetRepresentation", server);
+    get3DWidget("SphereWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();

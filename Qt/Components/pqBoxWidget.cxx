@@ -127,7 +127,7 @@ void pqBoxWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("BoxWidgetRepresentation", server);
+    get3DWidget("BoxWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();

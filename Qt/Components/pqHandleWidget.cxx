@@ -139,7 +139,7 @@ void pqHandleWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PointSourceWidgetRepresentation", server);
+    get3DWidget("PointSourceWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   
   widget->UpdateVTKObjects();
