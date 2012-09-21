@@ -32,11 +32,12 @@
 #ifndef __vtk1DGaussianTransferFunction_h
 #define __vtk1DGaussianTransferFunction_h
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"
 
 class vtkDoubleArray;
 
-class VTK_EXPORT vtk1DGaussianTransferFunction: public vtk1DTransferFunction
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DGaussianTransferFunction: public vtk1DTransferFunction
 {
 public:
   static vtk1DGaussianTransferFunction* New();
