@@ -38,18 +38,18 @@ namespace ParaViewPython {
                              int argc, char* argv[] )
     {
     pythonArgs.clear();
-    pythonArgs.push_back(vtksys::DuplicateString(argv[0]));
+    pythonArgs.push_back(vtksys::SystemTools::DuplicateString(argv[0]));
     if(script)
       {
-      pythonArgs.push_back(vtksys::DuplicateString(script));
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(script));
       }
     else if (argc > 1)
       {
-      pythonArgs.push_back(vtksys::DuplicateString("-"));
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString("-"));
       }
     for (int cc=1; cc < argc; cc++)
       {
-      pythonArgs.push_back(vtksys::DuplicateString(argv[cc]));
+      pythonArgs.push_back(vtksys::SystemTools::DuplicateString(argv[cc]));
       }
     }
 
