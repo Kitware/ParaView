@@ -717,33 +717,16 @@ bool vtkSMStateVersionController::ConvertExodusIIReader(vtkPVXMLElement* root)
     {
     vtkPVXMLElement* prop = root->GetNestedElement(cc);
     const char* propName = prop->GetAttribute("name");
-    if (propName && (strcmp(propName, "ElementBlocks")==0))
+    for (unsigned int dd=0; dd < prop->GetNumberOfNestedElements(); dd++)
       {
-      for (unsigned int dd=0; dd < prop->GetNumberOfNestedElements(); dd++)
+      vtkPVXMLElement* blockProp = prop->GetNestedElement(dd);
+      const char* blockPropName = blockProp->GetAttribute("name");
+      if(blockPropName && strcmp(blockPropName,"array_list")==0)
         {
-        vtkPVXMLElement* blockProp = prop->GetNestedElement(dd);
-        const char* blockPropName = blockProp->GetAttribute("name");
-        if(blockPropName && strcmp(blockPropName,"array_list")==0)
+        for (unsigned int ee=0; ee < blockProp->GetNumberOfNestedElements(); ee++)
           {
-          for (unsigned int ee=0; ee < blockProp->GetNumberOfNestedElements(); ee++)
-            {
-            vtkPVXMLElement* listProp = blockProp->GetNestedElement(ee);
-            const char* value = listProp->GetAttribute("text");
-            if(value)
-              {
-              vtkStdString bname(value);
-              size_t i = bname.find(" Size: ");
-              if(i!= vtkStdString::npos)
-                {
-                bname.erase(i);
-                listProp->SetAttribute("value",bname);
-                }
-              }
-            }
-          }
-        else
-          {
-          const char* value = blockProp->GetAttribute("value");
+          vtkPVXMLElement* listProp = blockProp->GetNestedElement(ee);
+          const char* value = listProp->GetAttribute("text");
           if(value)
             {
             vtkStdString bname(value);
@@ -751,8 +734,22 @@ bool vtkSMStateVersionController::ConvertExodusIIReader(vtkPVXMLElement* root)
             if(i!= vtkStdString::npos)
               {
               bname.erase(i);
-              blockProp->SetAttribute("value",bname);
+              listProp->SetAttribute("value",bname);
               }
+            }
+          }
+        }
+      else
+        {
+        const char* value = blockProp->GetAttribute("value");
+        if(value)
+          {
+          vtkStdString bname(value);
+          size_t i = bname.find(" Size: ");
+          if(i!= vtkStdString::npos)
+            {
+            bname.erase(i);
+            blockProp->SetAttribute("value",bname);
             }
           }
         }
@@ -1250,7 +1247,7 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
        }
      }
 
-   // ExodusIIReader now uses shorter block name without "Size: ... "
+   // ExodusIIReader now uses shorter name without "Size: ... "
    // This deals with old state files
    if(root)
      {
