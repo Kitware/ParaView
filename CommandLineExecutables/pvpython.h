@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSession.h"
 
 #include "vtkPVPythonInterpretor.h"
+
+#include <vtksys/SystemTools.hxx>
 #include <vector>
 
 #ifndef BUILD_SHARED_LIBS
@@ -31,32 +33,23 @@ namespace ParaViewPython {
 
   //---------------------------------------------------------------------------
 
-  char* clone(const char* str)
-    {
-    char *newStr = new char[ strlen(str) + 1 ];
-    strcpy(newStr, str);
-    return newStr;
-    }
-
-  //---------------------------------------------------------------------------
-
   void ProcessArgsForPython( std::vector<char*> & pythonArgs,
                              const char *script,
                              int argc, char* argv[] )
     {
     pythonArgs.clear();
-    pythonArgs.push_back(clone(argv[0]));
+    pythonArgs.push_back(vtksys::DuplicateString(argv[0]));
     if(script)
       {
-      pythonArgs.push_back(clone(script));
+      pythonArgs.push_back(vtksys::DuplicateString(script));
       }
     else if (argc > 1)
       {
-      pythonArgs.push_back(clone("-"));
+      pythonArgs.push_back(vtksys::DuplicateString("-"));
       }
     for (int cc=1; cc < argc; cc++)
       {
-      pythonArgs.push_back(clone(argv[cc]));
+      pythonArgs.push_back(vtksys::DuplicateString(argv[cc]));
       }
     }
 
@@ -116,7 +109,7 @@ namespace ParaViewPython {
       CMakeLoadAllPythonModules();
 #endif
 
-      ret_val = interpretor->PyMain(pythonArgs.size(), &*pythonArgs.begin());
+      ret_val = interpretor->PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
       interpretor->Delete();
 
       // Free python args
