@@ -8,7 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 // .NAME vtkSQFTLE
 // .SECTION Description
-// Compute the FTLE given a displacement map. For  an explanation of this
+// Compute the FTLE given a displacement map. For an explanation of this
 // terminology see http://amath.colorado.edu/cmsms/index.php?page=ftle-of-the-standard-map
 //
 // .SECTION Caveats
@@ -18,6 +18,11 @@ Copyright 2012 SciberQuest Inc.
 #define __vtkSQFTLE_h
 
 #include "vtkDataSetAlgorithm.h"
+
+#include <set> //
+using std::set;
+#include <string> //
+using std::string;
 
 class vtkInformation;
 class vtkInformationVector;
@@ -38,9 +43,29 @@ public:
   int Initialize(vtkPVXMLElement *root);
 
   // Description:
-  // Deep copy input arrays to the output.
+  // Array selection.
+  void AddInputArray(const char *name);
+  void ClearInputArrays();
+
+  // Description:
+  // Shallow copy input data arrays to the output.
   vtkSetMacro(PassInput,int);
   vtkGetMacro(PassInput,int);
+
+  // Description:
+  // Set/Get the time interval overwhich displacement map was
+  // integrated.
+  vtkSetMacro(TimeInterval,double);
+  vtkGetMacro(TimeInterval,double);
+
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
 
 protected:
   vtkSQFTLE();
@@ -49,8 +74,10 @@ protected:
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
-  // controls to turn on/off array generation
+  set<string> InputArrays;
   int PassInput;
+  double TimeInterval;
+  int LogLevel;
 
 private:
   vtkSQFTLE(const vtkSQFTLE&);  // Not implemented.

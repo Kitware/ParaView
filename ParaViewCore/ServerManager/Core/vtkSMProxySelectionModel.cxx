@@ -312,9 +312,9 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
   vtkSMProxy* currentProxy = NULL;
   if( msg->GetExtension(ProxySelectionModelState::current_proxy) != 0)
     {
-    currentProxy =
-        locator->LocateProxy(
-          msg->GetExtension(ProxySelectionModelState::current_proxy));
+    vtkTypeUInt32 currentProxyId =
+        msg->GetExtension(ProxySelectionModelState::current_proxy);
+    currentProxy = locator->LocateProxy(currentProxyId);
     if(currentProxy)
       {
       if(msg->GetExtension(ProxySelectionModelState::current_port) != -1)
@@ -330,7 +330,11 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
       }
     else
       {
-      vtkErrorMacro("Did not find the CURRENT proxy for selection Model");
+      // Switch to warning as the selected proxy could be simply removed by
+      // master when we finally decided to select it.
+      vtkWarningMacro(
+            "Did not find the CURRENT proxy for selection Model with ID: "
+            << currentProxyId);
       }
     }
 
@@ -354,10 +358,6 @@ void vtkSMProxySelectionModel::LoadState( const vtkSMMessage* msg, vtkSMProxyLoc
 
       // Just add the proxy in the set
       new_selection.insert(proxy);
-      }
-    else
-      {
-      vtkErrorMacro("Did not find the proxy for selection Model");
       }
     }
 

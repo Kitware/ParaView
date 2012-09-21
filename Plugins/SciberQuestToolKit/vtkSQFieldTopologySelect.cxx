@@ -34,7 +34,7 @@ vtkStandardNewMacro(vtkSQFieldTopologySelect);
 //-----------------------------------------------------------------------------
 vtkSQFieldTopologySelect::vtkSQFieldTopologySelect()
 {
-  #ifdef vtkSQFieldTopologySelectDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "===============================vtkSQFieldTopologySelect::vtkSQFieldTopologySelect" << endl;
   #endif
 
@@ -51,7 +51,7 @@ vtkSQFieldTopologySelect::vtkSQFieldTopologySelect()
 //-----------------------------------------------------------------------------
 vtkSQFieldTopologySelect::~vtkSQFieldTopologySelect()
 {
-  #ifdef vtkSQFieldTopologySelectDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "===============================vtkSQFieldTopologySelect::~vtkSQFieldTopologySelect" << endl;
   #endif
 }
@@ -61,7 +61,7 @@ int vtkSQFieldTopologySelect::FillInputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  #ifdef vtkSQFieldTopologySelectDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "===============================vtkSQFieldTopologySelect::FillInputPortInformation" << endl;
   #endif
 
@@ -75,7 +75,7 @@ int vtkSQFieldTopologySelect::FillOutputPortInformation(
       int /*port*/,
       vtkInformation *info)
 {
-  #if vtkSQFieldTopologySelectDEBUG>1
+  #if SQTK_DEBUG>1
   pCerr() << "===============================vtkSQFieldTopologySelect::FillOutputPortInformation" << endl;
   #endif
 
@@ -89,7 +89,7 @@ int vtkSQFieldTopologySelect::RequestInformation(
     vtkInformationVector ** /*inInfos*/,
     vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQFieldTopologySelectDEBUG
+  #ifdef SQTK_DEBUG
     cerr << "===============================vtkSQFieldTopologySelect::RequestInformation" << endl;
   #endif
 
@@ -106,7 +106,7 @@ int vtkSQFieldTopologySelect::RequestData(
       vtkInformationVector **inputVector,
       vtkInformationVector *outputVector)
 {
-  #ifdef vtkSQFieldTopologySelectDEBUG
+  #ifdef SQTK_DEBUG
   cerr << "===============================vtkSQFieldTopologySelect::RequestData" << endl;
   #endif
 

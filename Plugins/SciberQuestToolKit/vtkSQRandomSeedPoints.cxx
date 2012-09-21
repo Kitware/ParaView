@@ -28,8 +28,9 @@
 
 #include <time.h>
 
-// #define vtkSQRandomSeedPointsDEBUG
+// #define SQTK_DEBUG
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQRandomSeedPoints);
 
 //----------------------------------------------------------------------------
@@ -106,7 +107,7 @@ int vtkSQRandomSeedPoints::RequestData(
   int nLarge=this->NumberOfPoints%nPieces;
   int nLocal=this->NumberOfPoints/nPieces+(pieceNo<nLarge?1:0);
 
-  #ifdef vtkSQRandomSeedPointsDEBUG
+  #ifdef SQTK_DEBUG
   cerr
     << "pieceNo = " << pieceNo << endl
     << "nPieces = " << nPieces << endl

@@ -35,9 +35,10 @@
 #ifndef __vtkImageSpriteSource_h
 #define __vtkImageSpriteSource_h
 
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkImageAlgorithm.h"
 
-class VTK_EXPORT vtkImageSpriteSource : public vtkImageAlgorithm
+class VTKPOINTSPRITERENDERING_EXPORT vtkImageSpriteSource : public vtkImageAlgorithm
 {
 public:
   static vtkImageSpriteSource *New();

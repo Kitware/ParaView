@@ -32,12 +32,12 @@
 #ifndef __vtk1DTransferFunction_h
 #define __vtk1DTransferFunction_h
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSetGet.h"
 
 class vtkDataArray;
 
-class VTK_EXPORT vtk1DTransferFunction: public vtkObject
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DTransferFunction: public vtkObject
 {
 public:
   vtkTypeMacro(vtk1DTransferFunction, vtkObject);

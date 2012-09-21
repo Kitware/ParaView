@@ -14,11 +14,10 @@ Copyright 2012 SciberQuest Inc.
 class vtkDataSet;
 class vtkFloatArray;
 
-/// Interface to the topology map.
+/// Records the end point(displacement) of a stream line.
 /**
-Abstract collection of datastructures needed to build the topology map.
-The details of building the map change drastically depending on the input
-data type. Concrete classes deal with these specifics.
+The displacement map, maps the end point(s) of a streamline onto
+the seed geometry. This map is used in FTLE computations.
 */
 class FieldDisplacementMapData : public FieldTraceData
 {

@@ -44,9 +44,11 @@ void StreamlineData::ClearOut()
   if (this->OutPts){ this->OutPts->Delete(); }
   if (this->OutCells){ this->OutCells->Delete(); }
   if (this->Length){ this->Length->Delete(); }
+  if (this->SourceId){ this->SourceId->Delete(); }
   this->OutPts=0;
   this->OutCells=0;
   this->Length=0;
+  this->SourceId=0;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,8 +154,11 @@ void StreamlineData::SetOutput(vtkDataSet *o)
 
   this->Length=vtkFloatArray::New();
   this->Length->SetName("length");
-  this->Length->Register(0);
   out->GetCellData()->AddArray(this->Length);
+
+  this->SourceId=vtkIntArray::New();
+  this->SourceId->SetName("SourceId");
+  out->GetCellData()->AddArray(this->SourceId);
 }
 
 //-----------------------------------------------------------------------------
@@ -202,7 +207,7 @@ vtkIdType StreamlineData::InsertCells(IdBlock *SourceIds)
     seed[1]/=((float)nPtIds);
     seed[2]/=((float)nPtIds);
 
-    this->Lines[lId]=new FieldLine(seed,cId);
+    this->Lines[lId]=new FieldLine(seed,this->SourceCellGid+cId);
     this->Lines[lId]->AllocateTrace();
     ++lId;
     }
@@ -232,8 +237,12 @@ int StreamlineData::SyncGeometry()
   vtkIdType *pLineCells
     = lineCells->WritePointer(lineCells->GetNumberOfTuples(),nNewPtsTotal+nLines);
 
-  //
+  // resize cells
   this->OutCells->SetNumberOfCells(this->OutCells->GetNumberOfCells()+nLines);
+
+  // resize scalars
+  vtkIdType nExIds=this->SourceId->GetNumberOfTuples();
+  int *pId=this->SourceId->WritePointer(nExIds,nLines);
 
   float *pLength
     = this->Length->WritePointer(this->Length->GetNumberOfTuples(),nLines);
@@ -244,6 +253,10 @@ int StreamlineData::SyncGeometry()
     {
     // copy the points
     vtkIdType nNewPts=this->Lines[i]->CopyPoints(pLinePts);
+
+    // add gid
+    *pId=(int)this->Lines[i]->GetSeedId();
+    ++pId;
 
     // compute the arc-length
     *pLength=0.0f;
@@ -272,4 +285,170 @@ int StreamlineData::SyncGeometry()
     }
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void StreamlineData::CullPeriodicTransitions(double *bounds)
+{
+  float *pPts=this->OutPts->GetPointer(0);
+  vtkIdType *pCells=this->OutCells->GetData()->GetPointer(0);
+  vtkIdType nCells=this->OutCells->GetNumberOfCells();
+  int *pCellIds=this->SourceId->GetPointer(0);
+  float *pLen=this->Length->GetPointer(0);
+  int *pColor=this->IntersectColor->GetPointer(0);
+
+  float threshold[3] = {
+      0.8f*(float)fabs(bounds[1]-bounds[0]),
+      0.8f*(float)fabs(bounds[3]-bounds[2]),
+      0.8f*(float)fabs(bounds[5]-bounds[4])};
+
+  vtkIdTypeArray *newCells=vtkIdTypeArray::New();
+  vtkIntArray *newCellIds=vtkIntArray::New();
+  vtkFloatArray *newLen=vtkFloatArray::New();
+  vtkIntArray *newColor=vtkIntArray::New();
+
+  vector<vtkIdType> newCell;
+  vtkIdType nNewCells=0;
+
+  // traverse cells
+  for (vtkIdType q=0; q<nCells; ++q)
+    {
+    vtkIdType nPts=*pCells;
+    ++pCells;
+
+    vtkIdType pid0=*pCells;
+
+    // start a new cell, always add the first point
+    // under the assumption the first segment will
+    // not be a splitting point. if it is we correct
+    // our mistake below.
+    newCell.resize(nPts+1,0);
+    newCell[0]=1;
+    newCell[1]=pid0;
+
+    // traverse cell pts
+    for (vtkIdType i=1; i<nPts; ++i)
+      {
+      vtkIdType pid1=pCells[i];
+
+      // compute segment length
+      float *x0 = pPts+3*pid0;
+      float *x1 = pPts+3*pid1;
+
+      float dx=fabs(x1[0]-x0[0]);
+      float dy=fabs(x1[1]-x0[1]);
+      float dz=fabs(x1[2]-x0[2]);
+
+      if ( (dx>=threshold[0]) || (dy>=threshold[1]) || (dz>=threshold[2]) )
+        {
+        if (newCell[0]>1)
+          {
+          // outside the threshold copy this poriton of the input
+          // cell into the output
+          vtkIdType n=newCell[0]+1;
+
+          vtkIdType *pNewCell
+            = newCells->WritePointer(newCells->GetNumberOfTuples(),n);
+
+          for (vtkIdType j=0; j<n; ++j)
+            {
+            pNewCell[j]=newCell[j];
+            }
+
+          nNewCells+=1;
+
+          // copy cell data
+          int *pNewCellIds
+            = newCellIds->WritePointer(newCellIds->GetNumberOfTuples(),1);
+
+          *pNewCellIds=*pCellIds;
+
+          float *pNewLen
+            = newLen->WritePointer(newLen->GetNumberOfTuples(),1);
+
+          *pNewLen=*pLen;
+
+          int *pNewColor
+            = newColor->WritePointer(newColor->GetNumberOfTuples(),1);
+
+          *pNewColor=*pColor;
+
+          // start a new output cell for the remainder of this
+          // input cell
+          newCell[0]=1;
+          newCell[1]=pid1;
+          }
+        else
+          {
+          // the first segment was a splitting point, correct
+          // our first point.
+          newCell[1]=pid1;
+          }
+        }
+      else
+        {
+        // inside the threshold add this point to the current
+        // cell
+        vtkIdType idx=newCell[0]+1;
+        newCell[idx]=pid1;
+        newCell[0]+=1;
+        }
+
+      pid0=pid1;
+      }
+
+    // copy what remains of the input cell into the output.
+    // note, if the last segment is a splitting point there
+    // will be nothing to do here.
+    if (newCell[0]>1)
+      {
+      vtkIdType n=newCell[0]+1;
+
+      vtkIdType *pNewCells
+        = newCells->WritePointer(newCells->GetNumberOfTuples(),n);
+
+      for (vtkIdType j=0; j<n; ++j)
+        {
+        pNewCells[j]=newCell[j];
+        }
+
+      nNewCells+=1;
+
+      // copy id and length
+      int *pNewCellIds
+        = newCellIds->WritePointer(newCellIds->GetNumberOfTuples(),1);
+
+      *pNewCellIds=*pCellIds;
+
+      float *pNewLen
+        = newLen->WritePointer(newLen->GetNumberOfTuples(),1);
+
+      *pNewLen=*pLen;
+
+      int *pNewColor
+        = newColor->WritePointer(newColor->GetNumberOfTuples(),1);
+
+      *pNewColor=*pColor;
+      }
+
+    // increment cell and cell data pointers
+    pCells+=1;
+    pLen+=1;
+    pCellIds+=1;
+    pColor+=1;
+    }
+
+  // update output
+  this->OutCells->GetData()->DeepCopy(newCells);
+  this->OutCells->SetNumberOfCells(nNewCells);
+  newCells->Delete();
+
+  this->Length->DeepCopy(newLen);
+  newLen->Delete();
+
+  this->SourceId->DeepCopy(newCellIds);
+  newCellIds->Delete();
+
+  this->IntersectColor->DeepCopy(newColor);
+  newColor->Delete();
 }

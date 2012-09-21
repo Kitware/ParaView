@@ -32,11 +32,12 @@
 #ifndef __vtk1DLookupTableTransferFunction_h
 #define __vtk1DLookupTableTransferFunction_h
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"
 
 class vtkDoubleArray;
 
-class VTK_EXPORT vtk1DLookupTableTransferFunction: public vtk1DTransferFunction
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DLookupTableTransferFunction: public vtk1DTransferFunction
 {
 public:
   static vtk1DLookupTableTransferFunction* New();

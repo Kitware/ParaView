@@ -40,6 +40,15 @@ public:
   vtkSetMacro(NoiseThreshold,double);
   vtkGetMacro(NoiseThreshold,double);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQAgyrotropyFilter();
   ~vtkSQAgyrotropyFilter();
@@ -53,7 +62,7 @@ private:
 
 private:
   double NoiseThreshold;
-
+  int LogLevel;
 };
 
 #endif

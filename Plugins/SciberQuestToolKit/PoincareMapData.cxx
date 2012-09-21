@@ -33,8 +33,10 @@ PoincareMapData::~PoincareMapData()
 //-----------------------------------------------------------------------------
 void PoincareMapData::ClearSource()
 {
+  if (this->SourceGen){ this->SourceGen->Delete(); }
   if (this->SourcePts){ this->SourcePts->Delete(); }
   if (this->SourceCells){ this->SourceCells->Delete(); }
+  this->SourceGen=0;
   this->SourcePts=0;
   this->SourceCells=0;
 }
@@ -53,8 +55,13 @@ void PoincareMapData::ClearOut()
 //-----------------------------------------------------------------------------
 void PoincareMapData::SetSource(vtkSQCellGenerator *sourceGen)
 {
-  (void)sourceGen;
-  sqErrorMacro(pCerr(),"Cell generator source is not supported.");
+  if (this->SourceGen==sourceGen){ return; }
+  if (this->SourceGen){ this->SourceGen->Delete(); }
+  this->SourceGen=sourceGen;
+  if (this->SourceGen)
+    {
+    this->SourceGen->Register(0);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +163,16 @@ void PoincareMapData::SetOutput(vtkDataSet *o)
 //-----------------------------------------------------------------------------
 vtkIdType PoincareMapData::InsertCells(IdBlock *SourceIds)
 {
+  if (this->SourceGen)
+    {
+    return this->InsertCellsFromGenerator(SourceIds);
+    }
+  return this->InsertCellsFromDataset(SourceIds);
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType PoincareMapData::InsertCellsFromDataset(IdBlock *SourceIds)
+{
   vtkIdType startId=SourceIds->first();
   vtkIdType endId=SourceIds->last();
 
@@ -205,6 +222,59 @@ vtkIdType PoincareMapData::InsertCells(IdBlock *SourceIds)
     }
 
   return nSeeds;
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType PoincareMapData::InsertCellsFromGenerator(IdBlock *SourceIds)
+{
+  vtkIdType startCellId=SourceIds->first();
+  vtkIdType nCellsLocal=SourceIds->size();
+
+  vtkIdType polyId=startCellId;
+
+  size_t lId=this->Lines.size();
+  this->Lines.resize(lId+nCellsLocal,0);
+
+  vector<vtkIdType> sourcePtIds;
+  vector<float> sourcePts;
+
+  // For each cell asigned to us we'll get its center (this is the seed point)
+  // and build corresponding cell in the output, The output only will have
+  // the cells assigned to this process.
+  for (vtkIdType i=0; i<nCellsLocal; ++i)
+    {
+    // Get the cell that belong to us.
+    vtkIdType nSourcePtIds=this->SourceGen->GetNumberOfCellPoints(polyId);
+    sourcePtIds.resize(nSourcePtIds);
+    sourcePts.resize(3*nSourcePtIds);
+    this->SourceGen->GetCellPointIndexes(polyId,&sourcePtIds[0]);
+    this->SourceGen->GetCellPoints(polyId,&sourcePts[0]);
+
+    // the seed point is the center of the cell
+    float seed[3]={0.0f,0.0f,0.0f};
+
+    // transfer from input to output (only what we own)
+    for (vtkIdType j=0; j<nSourcePtIds; ++j)
+      {
+      // compute contribution to cell center.
+      vtkIdType idx=3*j;
+
+      seed[0]+=sourcePts[idx  ];
+      seed[1]+=sourcePts[idx+1];
+      seed[2]+=sourcePts[idx+2];
+      }
+    // finsih the seed point computation (at cell center).
+    seed[0]/=((float)nSourcePtIds);
+    seed[1]/=((float)nSourcePtIds);
+    seed[2]/=((float)nSourcePtIds);
+
+    this->Lines[lId]=new FieldLine(seed,polyId);
+    this->Lines[lId]->AllocateTrace();
+    ++polyId;
+    ++lId;
+    }
+
+  return nCellsLocal;
 }
 
 //-----------------------------------------------------------------------------

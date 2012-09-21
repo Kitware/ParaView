@@ -12,6 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "SQMacros.h"
 
 #include "pqProxy.h"
+#include "pqPropertyLinks.h"
 #include "pqFileDialog.h"
 
 #include "vtkSMProxy.h"
@@ -40,8 +41,6 @@ Copyright 2012 SciberQuest Inc.
 #include <PrintUtils.h>
 #endif
 
-#include <vector>
-using std::vector;
 #include <string>
 using std::string;
 #include <fstream>
@@ -55,7 +54,6 @@ using std::istringstream;
 using std::cerr;
 using std::endl;
 
-
 //-----------------------------------------------------------------------------
 pqSQHemisphereSource::pqSQHemisphereSource(
       pqProxy* l_proxy,
@@ -64,7 +62,7 @@ pqSQHemisphereSource::pqSQHemisphereSource(
       pqNamedObjectPanel(l_proxy,l_parent)
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::pqSQHemisphereSource" << endl;
+  cerr << ":::::pqSQHemisphereSource::pqSQHemisphereSource" << endl;
   #endif
 
   // Construct Qt form.
@@ -82,65 +80,94 @@ pqSQHemisphereSource::pqSQHemisphereSource(
 
   this->Form->r->setValidator(new QDoubleValidator(this->Form->r));
 
-
-//   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
-
-//   // Connect to server side pipeline's UpdateInformation events.
-//   // The server side will look for keys during request information.
-//   this->VTKConnect=vtkEventQtSlotConnect::New();
-//   this->VTKConnect->Connect(
-//       pProxy,
-//       vtkCommand::UpdateInformationEvent,
-//       this, SLOT(PullServerConfig()));
-
   // Set up configuration viewer
   this->PullServerConfig();
-  this->setModified();
 
   // set up save/restore buttons
-  QObject::connect(this->Form->save,SIGNAL(clicked()),this,SLOT(saveConfiguration()));
-  QObject::connect(this->Form->restore,SIGNAL(clicked()),this,SLOT(loadConfiguration()));
-
-  // These connection let PV know that we have changed, and makes the apply
-  // button activated.
   QObject::connect(
+      this->Form->save,
+      SIGNAL(clicked()),
+      this,SLOT(saveConfiguration()));
+
+  QObject::connect(
+      this->Form->restore,
+      SIGNAL(clicked()),
+      this,SLOT(loadConfiguration()));
+
+  // link qt to sm
+  this->Links = new pqPropertyLinks;
+  this->Links->setUseUncheckedProperties(false);
+  this->Links->setAutoUpdateVTKObjects(true);
+
+  QObject::connect(
+      this->Links,
+      SIGNAL(qtWidgetChanged()),
+      this,
+      SLOT(setModified()));
+
+  vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
+
+  this->Links->addPropertyLink(
       this->Form->c_x,
+      "text",
       SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->c_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->c_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->n_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->n_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->n_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->r,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->res,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
+      pProxy,
+      pProxy->GetProperty("Center"),
+      0);
 
-  // Let the super class do the undocumented stuff that needs to hapen.
-  pqNamedObjectPanel::linkServerManagerProperties();
+  this->Links->addPropertyLink(
+      this->Form->c_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Center"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->c_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Center"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->n_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("North"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->n_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("North"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->n_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("North"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->r,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Radius"));
+
+  this->Links->addPropertyLink(
+      this->Form->res,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("Resolution"));
 
 }
 
@@ -148,13 +175,11 @@ pqSQHemisphereSource::pqSQHemisphereSource(
 pqSQHemisphereSource::~pqSQHemisphereSource()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::~pqSQHemisphereSource" << endl;
+  cerr << ":::::pqSQHemisphereSource::~pqSQHemisphereSource" << endl;
   #endif
 
   delete this->Form;
-
-//   this->VTKConnect->Delete();
-//   this->VTKConnect=0;
+  delete this->Links;
 }
 
 //-----------------------------------------------------------------------------
@@ -213,13 +238,19 @@ void pqSQHemisphereSource::Restore()
         }
       else
         {
-        QMessageBox::warning(this,"Open SQ Hemisphere Source","Error: Bad format not a SQ plane source file.");
+        QMessageBox::warning(
+            this,
+            "Open SQ Hemisphere Source",
+            "Error: Bad format not a SQ plane source file.");
         }
       f.close();
       }
     else
       {
-      QMessageBox::warning(this,"Save SQ Hemisphere Source","Error: Could not open the file.");
+      QMessageBox::warning(
+            this,
+            "Save SQ Hemisphere Source",
+            "Error: Could not open the file.");
       }
     }
 }
@@ -227,7 +258,9 @@ void pqSQHemisphereSource::Restore()
 //-----------------------------------------------------------------------------
 void pqSQHemisphereSource::Save()
 {
-  QString fn=QFileDialog::getSaveFileName(this,"Save SQ Hemisphere Source","","*.sqhs");
+  QString fn
+    = QFileDialog::getSaveFileName(this,"Save SQ Hemisphere Source","","*.sqhs");
+
   if (fn.size())
     {
     QString lastUsedDir(StripFileNameFromPath(fn.toStdString()).c_str());
@@ -255,7 +288,10 @@ void pqSQHemisphereSource::Save()
       }
     else
       {
-      QMessageBox::warning(this,"Save SQ Hemisphere Source","Error: Failed to create the file.");
+      QMessageBox::warning(
+            this,
+            "Save SQ Hemisphere Source",
+            "Error: Failed to create the file.");
       }
     }
 }
@@ -263,7 +299,9 @@ void pqSQHemisphereSource::Save()
 //-----------------------------------------------------------------------------
 void pqSQHemisphereSource::loadConfiguration()
 {
-  vtkSQHemisphereSourceConfigurationReader *reader=vtkSQHemisphereSourceConfigurationReader::New();
+  vtkSQHemisphereSourceConfigurationReader *reader
+    = vtkSQHemisphereSourceConfigurationReader::New();
+
   reader->SetProxy(this->proxy());
 
   QString filters
@@ -294,10 +332,12 @@ void pqSQHemisphereSource::loadConfiguration()
 void pqSQHemisphereSource::saveConfiguration()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::saveConfiguration" << endl;
+  cerr << ":::::pqSQHemisphereSource::saveConfiguration" << endl;
   #endif
 
-  vtkSQHemisphereSourceConfigurationWriter *writer=vtkSQHemisphereSourceConfigurationWriter::New();
+  vtkSQHemisphereSourceConfigurationWriter *writer
+    = vtkSQHemisphereSourceConfigurationWriter::New();
+
   writer->SetProxy(this->proxy());
 
   QString filters
@@ -322,20 +362,10 @@ void pqSQHemisphereSource::saveConfiguration()
 }
 
 //-----------------------------------------------------------------------------
-void pqSQHemisphereSource::UpdateInformationEvent()
-{
-  #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::UpdateInformationEvent" << endl;
-  #endif
-
-  this->PullServerConfig();
-}
-
-//-----------------------------------------------------------------------------
 void pqSQHemisphereSource::PullServerConfig()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::PullServerConfig" << endl;
+  cerr << ":::::pqSQHemisphereSource::PullServerConfig" << endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -386,7 +416,7 @@ void pqSQHemisphereSource::PullServerConfig()
 void pqSQHemisphereSource::PushServerConfig()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::PushServerConfig" << endl;
+  cerr << ":::::pqSQHemisphereSource::PushServerConfig" << endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -439,95 +469,18 @@ void pqSQHemisphereSource::PushServerConfig()
 void pqSQHemisphereSource::accept()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::accept" << endl;
+  cerr << ":::::pqSQHemisphereSource::accept" << endl;
   #endif
 
-  this->PushServerConfig();
-
-  // Let our superclass do the undocumented stuff that needs to be done.
   pqNamedObjectPanel::accept();
 }
-
 
 //-----------------------------------------------------------------------------
 void pqSQHemisphereSource::reset()
 {
   #if defined pqSQHemisphereSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQHemisphereSource::reset" << endl;
+  cerr << ":::::pqSQHemisphereSource::reset" << endl;
   #endif
 
-  this->PullServerConfig();
-
-  // Let our superclass do the undocumented stuff that needs to be done.
-  pqNamedObjectPanel::accept();
+  pqNamedObjectPanel::reset();
 }
-
-/// VTK stuffs
-//   // Connect to server side pipeline's UpdateInformation events.
-//   this->VTKConnect=vtkEventQtSlotConnect::New();
-//   this->VTKConnect->Connect(
-//       dbbProxy,
-//       vtkCommand::UpdateInformationEvent,
-//       this, SLOT(UpdateInformationEvent()));
-//   // Get our initial state from the server side. In server side RequestInformation
-//   // the database view is encoded in vtkInformationObject. We are relying on the
-//   // fact that there is a pending event waiting for us.
-//   this->UpdateInformationEvent();
-
-//
-//   // These connection let PV know that we have changed, and makes the apply button
-//   // is activated.
-//   QObject::connect(
-//       this->Form->DatabaseView,
-//       SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-//       this, SLOT(setModified()));
-
-// vtkSMProxy* dbbProxy=this->referenceProxy()->getProxy();
-/// Example of how to get stuff from the server side.
-// vtkSMIntVectorProperty *serverDVMTimeProp
-//   =dynamic_cast<vtkSMIntVectorProperty *>(dbbProxy->GetProperty("DatabaseViewMTime"));
-// dbbProxy->UpdatePropertyInformation(serverDVMTimeProp);
-// const int *serverDVMTime=dvmtProp->GetElement(0);
-/// Example of how to get stuff from the XML configuration.
-// vtkSMStringVectorProperty *ppProp
-//   =dynamic_cast<vtkSMStringVectorProperty *>(dbbProxy->GetProperty("PluginPath"));
-// const char *pp=ppProp->GetElement(0);
-// this->Form->PluginPath->setText(pp);
-/// Imediate update example.
-// These are bad because it gets updated more than when you call
-// modified, see the PV guide.
-//  iuiProp->SetImmediateUpdate(1); set this in constructor
-// vtkSMProperty *iuiProp=dbbProxy->GetProperty("InitializeUI");
-// iuiProp->Modified();
-/// Do some changes and force a push.
-// vtkSMIntVectorProperty *meshProp
-//   = dynamic_cast<vtkSMIntVectorProperty *>(dbbProxy->GetProperty("PushMeshId"));
-// meshProp->SetElement(meshIdx,meshId);
-// ++meshIdx;
-// dbbProxy->UpdateProperty("PushMeshId");
-/// Catch all, update anything else that may need updating.
-// dbbProxy->UpdateVTKObjects();
-/// How a wiget in custom panel tells PV that things need to be applied
-// QObject::connect(
-//     this->Form->DatabaseView,
-//     SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-//     this, SLOT(setModified()));
-  // Pull run time configuration from server. The values are transfered
-  // in the form of an ascii stream.
-//   vtkSMIntVectorProperty *pidProp
-//     = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("Pid"));
-//   pProxy->UpdatePropertyInformation(pidProp);
-//   pid_t p=pidProp->GetElement(0);
-//   cerr << "PID=" << p << endl;
-/*
-  vtkSMProxy* reader = this->referenceProxy()->getProxy();
-  reader->UpdatePropertyInformation(reader->GetProperty("Pid"));
-  int stamp = vtkSMPropertyHelper(reader, "Pid").GetAsInt();
-  cerr << stamp;*/
-
-
-
-
-  /// NOTE how to get something from the server.
-  /// dbbProxy->UpdatePropertyInformation(reader->GetProperty("SILUpdateStamp"));
-  /// int stamp = vtkSMPropertyHelper(dbbProxy, "SILUpdateStamp").GetAsInt();

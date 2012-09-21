@@ -9,6 +9,7 @@ set(Eigen_DIR
   ${CMAKE_CURRENT_SOURCE_DIR}/eigen-3.0.3/eigen-eigen-3.0.3
   CACHE FILEPATH
   "Path to Eigen install.")
+mark_as_advanced(Eigen_DIR)
 
 if (NOT EXISTS ${Eigen_DIR})
   message(FATAL_ERROR
@@ -27,6 +28,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "Intel")
     /path/to/intel/include/intel64
     CACHE FILEPATH
     "Path to intel intrinsics.")
+mark_as_advanced(EXTRA_INTEL_INCLUDES)
 
   if (NOT EXISTS ${EXTRA_INTEL_INCLUDES})
     message(FATAL_ERROR

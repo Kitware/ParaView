@@ -5,22 +5,17 @@
 /___/\__/_/_.__/\__/_/  \___\_\_,_/\__/___/\__/ /___/_//_/\__(_)
 
 Copyright 2012 SciberQuest Inc.
-
 */
 #ifndef __pqSQVolumeSource_h
 #define __pqSQVolumeSource_h
 
 #include "pqNamedObjectPanel.h"
-//#include "pqComponentsExport.h"
 
 #include "ui_pqSQVolumeSourceForm.h"
 using Ui::pqSQVolumeSourceForm;
 
-// Define the following to enable debug io
-// #define pqSQVolumeSourceDEBUG
-
 class pqProxy;
-class vtkEventQtSlotConnect;
+class pqPropertyLinks;
 class QWidget;
 
 class pqSQVolumeSource : public pqNamedObjectPanel
@@ -99,7 +94,7 @@ private:
 
 private:
   pqSQVolumeSourceForm *Form;
-  vtkEventQtSlotConnect *VTKConnect;
+  pqPropertyLinks *Links;
 };
 
 #endif

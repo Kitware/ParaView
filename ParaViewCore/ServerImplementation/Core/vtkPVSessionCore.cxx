@@ -119,11 +119,11 @@ public:
   void UnRegisterSI(vtkTypeUInt32 globalUniqueId, int origin)
     {
     // Update map to keep track on which client is pointing to what
-    this->ClientSIRegistrationMap[origin].erase(globalUniqueId);
+    size_t found = this->ClientSIRegistrationMap[origin].erase(globalUniqueId);
 
     // Remove SI (ServerImplementation) object
     SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
-    if (iter != this->SIObjectMap.end())
+    if (found && iter != this->SIObjectMap.end())
       {
       if(iter->second)
         {
@@ -134,16 +134,20 @@ public:
   //---------------------------------------------------------------------------
   void RegisterSI(vtkTypeUInt32 globalUniqueId, int origin)
     {
+    bool newRegister = false;
     // Update map to keep track on which client is pointing to what
-    if(origin > 0)
+    if(origin >= 0)
       {
       this->KnownClients.insert(origin);
+      size_t before = this->ClientSIRegistrationMap[origin].size();
       this->ClientSIRegistrationMap[origin].insert(globalUniqueId);
+      size_t after = this->ClientSIRegistrationMap[origin].size();
+      newRegister = (before != after);
       }
 
-    // Remove SI (ServerImplementation) object
+    // Register SI (ServerImplementation) object
     SIObjectMapType::iterator iter = this->SIObjectMap.find(globalUniqueId);
-    if (iter != this->SIObjectMap.end())
+    if (newRegister && iter != this->SIObjectMap.end())
       {
       if(iter->second)
         {
@@ -541,6 +545,9 @@ void vtkPVSessionCore::PullState(vtkSMMessage* message)
   vtkSIObject* obj = this->Internals->GetSIObject(message->global_id());
   if (obj != NULL)
     {
+    // Register the object in case some concurrent request will delete it
+    this->RegisterSIObject(message);
+
     // Generic SIObject
     obj->Pull(message);
     }

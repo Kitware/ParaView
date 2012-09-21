@@ -31,6 +31,7 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkFloatArray.h"
 #include "vtkDoubleArray.h"
 
+#include "vtkSQLog.h"
 #include "XMLUtils.h"
 #include "SQMacros.h"
 
@@ -43,12 +44,7 @@ using std::max;
 using std::string;
 #include <cmath>
 
-#define vtkSQAgyrotropyFilterDEBUG 0
-#define vtkSQAgyrotropyFilterTIME 0
-
-#if defined vtkSQAgyrotropyFilterTIME
-  #include "vtkSQLog.h"
-#endif
+// #define SQTK_DEBUG
 
 // ****************************************************************************
 template<typename T>
@@ -120,11 +116,12 @@ vtkStandardNewMacro(vtkSQAgyrotropyFilter);
 //-----------------------------------------------------------------------------
 vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter" << endl;
   #endif
 
   this->NoiseThreshold=1.0e-4;
+  this->LogLevel=0;
 
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
@@ -133,7 +130,7 @@ vtkSQAgyrotropyFilter::vtkSQAgyrotropyFilter()
 //-----------------------------------------------------------------------------
 vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter" << endl;
   #endif
 }
@@ -141,7 +138,7 @@ vtkSQAgyrotropyFilter::~vtkSQAgyrotropyFilter()
 //-----------------------------------------------------------------------------
 int vtkSQAgyrotropyFilter::Initialize(vtkPVXMLElement *root)
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::Initialize" << endl;
   #endif
 
@@ -152,12 +149,13 @@ int vtkSQAgyrotropyFilter::Initialize(vtkPVXMLElement *root)
     return -1;
     }
 
-  #if defined vtkSQAgyrotropyFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQAgyrotropyFilter" << "\n";
-    //<< "#   mode=" << this->GetMode() << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->GetHeader()
+      << "# ::vtkSQAgyrotropyFilter" << "\n";
+    }
 
   return 0;
 }
@@ -168,13 +166,16 @@ int vtkSQAgyrotropyFilter::RequestData(
                 vtkInformationVector **inputVector,
                 vtkInformationVector *outputVector)
 {
-  #if vtkSQAgyrotropyFilterDEBUG>1
+  #if defined SQTK_DEBUG
   pCerr() << "=====vtkSQAgyrotropyFilter::RequestData" << endl;
   #endif
-  #if defined vtkSQAgyrotropyFilterTIME
+
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQAgyrotropyFilter::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQAgyrotropyFilter::RequestData");
+    }
 
   vtkInformation *info;
 
@@ -245,9 +246,10 @@ int vtkSQAgyrotropyFilter::RequestData(
           << V->GetClassName());
     }
 
-  #if defined vtkSQAgyrotropyFilterTIME
-  log->EndEvent("vtkSQAgyrotropyFilter::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQAgyrotropyFilter::RequestData");
+    }
 
   return 1;
 }

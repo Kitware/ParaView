@@ -212,6 +212,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -230,6 +233,9 @@
      <item row="1" column="5">
       <widget class="QSpinBox" name="res_z">
        <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
         <bool>false</bool>
        </property>
        <property name="minimum">
@@ -263,16 +269,6 @@
          </property>
          <property name="checked">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="spacingLock">
-         <property name="text">
-          <string>lock grid spacing</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -448,7 +444,6 @@
   <tabstop>res_y</tabstop>
   <tabstop>res_z</tabstop>
   <tabstop>aspectLock</tabstop>
-  <tabstop>spacingLock</tabstop>
   <tabstop>coordStatus</tabstop>
   <tabstop>nCells</tabstop>
   <tabstop>dim_x</tabstop>

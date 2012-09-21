@@ -90,7 +90,7 @@ ADD_PARAVIEW_PLUGIN(
     cp_export_py.cxx
 )
 
-IF (BUILD_TESTING)
+IF (BUILD_TESTING AND BUILD_SHARED_LIBS)
   include(ParaViewTestingMacros)
   set(CoProcessingGUI_USE_NEW_PANELS TRUE)
   # this test is redundant with the CoProcessingFullWorkflow test
@@ -99,4 +99,4 @@ IF (BUILD_TESTING)
   add_client_tests("pv"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
   SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
-ENDIF (BUILD_TESTING)
+ENDIF (BUILD_TESTING AND BUILD_SHARED_LIBS)

@@ -1,6 +1,7 @@
 set (extra_depends)
 if (PARAVIEW_USE_MPI)
-  list(APPEND extra_depends vtkIOMPIImage)
+  list(APPEND extra_depends vtkIOMPIImage
+    )
 endif()
 
 if (PARAVIEW_ENABLE_FFMPEG)
@@ -9,10 +10,12 @@ endif()
 
 vtk_module(vtkPVServerManagerDefault
   DEPENDS
+    vtkIOMovie
+    vtkIOParallelExodus
     vtkPVServerImplementationDefault
     vtkPVServerManagerRendering
+    vtkRenderingVolumeOpenGL
     vtkTestingRendering
-    vtkIOMovie
     ${extra_depends}
   TEST_DEPENDS
     vtkPVServerManagerApplication

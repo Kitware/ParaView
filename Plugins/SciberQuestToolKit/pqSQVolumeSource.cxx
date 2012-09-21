@@ -15,6 +15,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "pqApplicationCore.h"
 #include "pqProxy.h"
+#include "pqPropertyLinks.h"
 #include "pqSettings.h"
 #include "pqRenderView.h"
 #include "pqFileDialog.h"
@@ -53,6 +54,8 @@ using std::endl;
 #include <sstream>
 using std::ostringstream;
 
+// #define pqSQVolumeSourceDEBUG
+
 //-----------------------------------------------------------------------------
 pqSQVolumeSource::pqSQVolumeSource(
       pqProxy* l_proxy,
@@ -61,7 +64,7 @@ pqSQVolumeSource::pqSQVolumeSource(
       pqNamedObjectPanel(l_proxy, widget)
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::pqSQVolumeSource" << endl;
+  cerr << ":::::pqSQVolumeSource::pqSQVolumeSource" << endl;
   #endif
 
   // Construct Qt form.
@@ -85,6 +88,7 @@ pqSQVolumeSource::pqSQVolumeSource(
   this->Form->dy->setValidator(new QDoubleValidator(this->Form->dy));
   this->Form->dz->setValidator(new QDoubleValidator(this->Form->dy));
 
+  // defaults
   this->Dims[0]=
   this->Dims[1]=
   this->Dims[2]=1.0;
@@ -97,15 +101,18 @@ pqSQVolumeSource::pqSQVolumeSource(
   this->Nx[1]=
   this->Nx[2]=1;
 
-  this->SetSpacing(this->Dx);
-  this->SetResolution(this->Nx);
-
-  // Set up configuration viewer
-  this->PullServerConfig();
-
   // set up save/restore buttons
-  QObject::connect(this->Form->save,SIGNAL(clicked()),this,SLOT(saveConfiguration()));
-  QObject::connect(this->Form->restore,SIGNAL(clicked()),this,SLOT(loadConfiguration()));
+  QObject::connect(
+      this->Form->save,
+      SIGNAL(clicked()),
+      this,
+      SLOT(saveConfiguration()));
+
+  QObject::connect(
+      this->Form->restore,
+      SIGNAL(clicked()),
+      this,
+      SLOT(loadConfiguration()));
 
   // set up the dimension calculator
   QObject::connect(
@@ -195,102 +202,156 @@ pqSQVolumeSource::pqSQVolumeSource(
       SIGNAL(toggled(bool)),
       this, SLOT(SpacingModified()));
 
-  // These connection let PV know that we have changed, and makes the apply
-  // button activated.
-  QObject::connect(
-      this->Form->o_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->o_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->o_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->p1_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p1_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p1_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->p2_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p2_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p2_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->p3_x,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p3_y,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->p3_z,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->res_x,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->res_y,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->res_z,
-      SIGNAL(valueChanged(int)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->dx,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->dy,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  QObject::connect(
-      this->Form->dz,
-      SIGNAL(textChanged(QString)),
-      this, SLOT(setModified()));
-  //
-  QObject::connect(
-      this->Form->immediateMode,
-      SIGNAL(stateChanged(int)),
-      this, SLOT(setModified()));
+  // link qt to sm
+  this->Links = new pqPropertyLinks;
+  this->Links->setUseUncheckedProperties(false);
+  this->Links->setAutoUpdateVTKObjects(true);
 
-  pqNamedObjectPanel::linkServerManagerProperties();
+  QObject::connect(
+      this->Links,
+      SIGNAL(qtWidgetChanged()),
+      this,
+      SLOT(setModified()));
+
+  vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
+
+  this->Links->addPropertyLink(
+      this->Form->o_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->o_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->o_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Origin"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->p1_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point1"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->p2_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point2"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->p3_x,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point3"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->p3_y,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point3"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->p3_z,
+      "text",
+      SIGNAL(textChanged(QString)),
+      pProxy,
+      pProxy->GetProperty("Point3"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->res_x,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("Resolution"),
+      0);
+
+  this->Links->addPropertyLink(
+      this->Form->res_y,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("Resolution"),
+      1);
+
+  this->Links->addPropertyLink(
+      this->Form->res_z,
+      "value",
+      SIGNAL(valueChanged(int)),
+      pProxy,
+      pProxy->GetProperty("Resolution"),
+      2);
+
+  this->Links->addPropertyLink(
+      this->Form->immediateMode,
+      "checked",
+      SIGNAL(stateChanged(int)),
+      pProxy,
+      pProxy->GetProperty("ImmediateMode"));
 }
 
 //-----------------------------------------------------------------------------
 pqSQVolumeSource::~pqSQVolumeSource()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::~pqSQVolumeSource" << endl;
+  cerr << ":::::pqSQVolumeSource::~pqSQVolumeSource" << endl;
   #endif
 
   delete this->Form;
+  delete this->Links;
 }
 
 //-----------------------------------------------------------------------------
@@ -399,7 +460,7 @@ void pqSQVolumeSource::loadConfiguration()
 void pqSQVolumeSource::saveConfiguration()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::saveConfiguration" << endl;
+  cerr << ":::::pqSQVolumeSource::saveConfiguration" << endl;
   #endif
 
   vtkSQVolumeSourceConfigurationWriter *writer
@@ -503,9 +564,16 @@ void pqSQVolumeSource::GetResolution(int *res)
 //-----------------------------------------------------------------------------
 void pqSQVolumeSource::SetResolution(int *res)
 {
+  this->Form->res_x->blockSignals(true);
+  this->Form->res_y->blockSignals(true);
+  this->Form->res_z->blockSignals(true);
   this->Form->res_x->setValue(res[0]);
   this->Form->res_y->setValue(res[1]);
   this->Form->res_z->setValue(res[2]);
+  this->Form->res_x->blockSignals(false);
+  this->Form->res_y->blockSignals(false);
+  this->Form->res_z->blockSignals(false);
+  this->setModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -519,16 +587,23 @@ void pqSQVolumeSource::GetSpacing(double *dx)
 //-----------------------------------------------------------------------------
 void pqSQVolumeSource::SetSpacing(double *dx)
 {
+  this->Form->dx->blockSignals(true);
+  this->Form->dy->blockSignals(true);
+  this->Form->dz->blockSignals(true);
   this->Form->dx->setText(QString("%1").arg(dx[0]));
   this->Form->dy->setText(QString("%1").arg(dx[1]));
   this->Form->dz->setText(QString("%1").arg(dx[2]));
+  this->Form->dx->blockSignals(false);
+  this->Form->dy->blockSignals(false);
+  this->Form->dz->blockSignals(false);
+  this->setModified();
 }
 
 //-----------------------------------------------------------------------------
 int pqSQVolumeSource::ValidateCoordinates()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::ValidateCoordinates" << endl;
+  cerr << ":::::pqSQVolumeSource::ValidateCoordinates" << endl;
   #endif
 
   this->Form->coordStatus->setText("OK");
@@ -562,11 +637,12 @@ int pqSQVolumeSource::ValidateCoordinates()
 
     double *a1=axes+3*cases[qq];
     double *a2=axes+3*cases[qq+1];
+
     double n[3];
     vtkMath::Cross(a1,a2,n);
 
-    int ok=(int)vtkMath::Normalize(n);
-    if (!ok)
+    double norm=vtkMath::Normalize(n);
+    if (norm<1.0e-6)
       {
       ostringstream os;
       os
@@ -594,7 +670,7 @@ int pqSQVolumeSource::ValidateCoordinates()
 void pqSQVolumeSource::DimensionsModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::DimensionsModified" << endl;
+  cerr << ":::::pqSQVolumeSource::DimensionsModified" << endl;
   #endif
 
   if (!this->ValidateCoordinates())
@@ -648,60 +724,39 @@ void pqSQVolumeSource::DimensionsModified()
 void pqSQVolumeSource::SpacingModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::SpacingModified" << endl;
+  cerr << ":::::pqSQVolumeSource::SpacingModified" << endl;
   #endif
 
-  if (this->Form->spacingLock->isChecked())
+  // retreive the requested spacing.
+  this->GetSpacing(this->Dx);
+
+  // enforce uniform pixel aspect ratio
+  if (this->Form->aspectLock->isChecked())
     {
-    // retreive the requested spacing.
-    this->GetSpacing(this->Dx);
-
-    // enforce uniform pixel aspect ratio
-    if (this->Form->aspectLock->isChecked())
-      {
-      this->Dx[2]=
-      this->Dx[1]=this->Dx[0];
-      this->SetSpacing(this->Dx);
-      }
-
-    // update the grid resolution to match the requested grid spacing
-    // as closely as possible.
-    this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
-    this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
-    this->Nx[2]=(int)ceil(this->Dims[2]/this->Dx[2]);
-    this->SetResolution(this->Nx);
+    this->Dx[2]=this->Dx[1]=this->Dx[0];
+    this->SetSpacing(this->Dx);
     }
-  else
-    {
-    // update the spacing to match the requested resolution as closely
-    // as possible.
-    this->GetResolution(this->Nx);
 
-    if (this->Form->aspectLock->isChecked())
-      {
-      this->Nx[1]=(int)ceil(this->Nx[0]*this->Dims[1]/this->Dims[0]);
-      this->Nx[2]=(int)ceil(this->Nx[0]*this->Dims[2]/this->Dims[0]);
-      }
+  // update the grid resolution to match the requested grid spacing
+  // as closely as possible.
+  this->Nx[0]=(int)ceil(this->Dims[0]/this->Dx[0]);
+  this->Nx[1]=(int)ceil(this->Dims[1]/this->Dx[1]);
+  this->Nx[2]=(int)ceil(this->Dims[2]/this->Dx[2]);
 
-    this->SetResolution(this->Nx);
-    }
+  this->SetResolution(this->Nx);
 
   // compute the new number of cells.
   int nCells=this->Nx[0]*this->Nx[1]*this->Nx[2];
   this->Form->nCells->setText(QString("%1").arg(nCells));
 
-  // update the spacing to match the actual spacing that will be used.
-  this->Dx[0]=this->Dims[0]/this->Nx[0];
-  this->Dx[1]=this->Dims[1]/this->Nx[1];
-  this->Dx[2]=this->Dims[2]/this->Nx[2];
-  this->SetSpacing(this->Dx);
+  this->Links->accept();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQVolumeSource::ResolutionModified()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::ResolutionModified" << endl;
+  cerr << ":::::pqSQVolumeSource::ResolutionModified" << endl;
   #endif
 
   // retreive the requested resolution.
@@ -721,18 +776,21 @@ void pqSQVolumeSource::ResolutionModified()
   this->Dx[0]=this->Dims[0]/this->Nx[0];
   this->Dx[1]=this->Dims[1]/this->Nx[1];
   this->Dx[2]=this->Dims[2]/this->Nx[2];
+
   this->SetSpacing(this->Dx);
 
   // compute the new number of cells.
   int nCells=this->Nx[0]*this->Nx[1]*this->Nx[2];
   this->Form->nCells->setText(QString("%1").arg(nCells));
+
+  this->Links->accept();
 }
 
 //-----------------------------------------------------------------------------
 void pqSQVolumeSource::PullServerConfig()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::PullServerConfig" << endl;
+  cerr << ":::::pqSQVolumeSource::PullServerConfig" << endl;
   #endif
 
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
@@ -777,9 +835,6 @@ void pqSQVolumeSource::PullServerConfig()
     = dynamic_cast<vtkSMIntVectorProperty*>(pProxy->GetProperty("ImmediateMode"));
   pProxy->UpdatePropertyInformation(modeProp);
   this->Form->immediateMode->setChecked(modeProp->GetElement(0));
-
-  // update derived/computed values.
-  this->DimensionsModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -787,7 +842,7 @@ void pqSQVolumeSource::PushServerConfig()
 {
   #if defined pqSQVolumeSourceDEBUG
 
-  cerr << ":::::::::::::::::::::::::::::::PushServerConfig" << endl;
+  cerr << ":::::pqSQVolumeSource::PushServerConfig" << endl;
   #endif
   vtkSMProxy* pProxy=this->referenceProxy()->getProxy();
 
@@ -840,7 +895,7 @@ void pqSQVolumeSource::PushServerConfig()
 void pqSQVolumeSource::accept()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::accept" << endl;
+  cerr << ":::::pqSQVolumeSource::accept" << endl;
   #endif
 
   if (!this->ValidateCoordinates())
@@ -848,21 +903,15 @@ void pqSQVolumeSource::accept()
     sqErrorMacro(qDebug(),"Invalid coordinate system.");
     }
 
-  this->PushServerConfig();
-
   pqNamedObjectPanel::accept();
 }
-
-
 
 //-----------------------------------------------------------------------------
 void pqSQVolumeSource::reset()
 {
   #if defined pqSQVolumeSourceDEBUG
-  cerr << ":::::::::::::::::::::::::::::::reset" << endl;
+  cerr << ":::::pqSQVolumeSource::reset" << endl;
   #endif
-
-  this->PullServerConfig();
 
   pqNamedObjectPanel::reset();
 }

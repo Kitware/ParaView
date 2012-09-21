@@ -37,8 +37,9 @@
 #define __vtkDepthSortPainter_h
 
 
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkPainter.h"
-#include "vtkWeakPointer.h"
+#include "vtkWeakPointer.h" // Needed
 
 class vtkFloatArray;
 class vtkIdTypeArray;
@@ -50,7 +51,7 @@ class vtkTexture;
 class vtkDepthSortPolyData;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkDepthSortPainter : public vtkPainter
+class VTKPOINTSPRITERENDERING_EXPORT vtkDepthSortPainter : public vtkPainter
 {
 public:
   vtkTypeMacro(vtkDepthSortPainter, vtkPainter);

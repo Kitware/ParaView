@@ -22,7 +22,7 @@ Copyright 2012 SciberQuest Inc.
 
 #include "vtkObject.h"
 
-class vtkSQVolumeSourceConfigurationFileInfo
+class VTK_EXPORT vtkSQVolumeSourceConfigurationFileInfo
 {
 public:
   vtkSQVolumeSourceConfigurationFileInfo()

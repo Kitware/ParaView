@@ -39,13 +39,13 @@
 #ifndef _vtkCellPointsFilter_h
 #define _vtkCellPointsFilter_h
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkPolyDataAlgorithm.h"
-
 
 class vtkAppendPolyData;
 class vtkCompositeDataSet;
 
-class VTK_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgorithm
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgorithm
 {
   public:
     // Description:
@@ -91,6 +91,10 @@ class VTK_EXPORT vtkCellPointsFilter : public vtkPolyDataAlgorithm
     int VertexCells;
     int GenerateGroupScalars;
     int CurrentGroup;
+
+private:
+  vtkCellPointsFilter(const vtkCellPointsFilter&); // Not implemented.
+  void operator=(const vtkCellPointsFilter&); // Not implemented.
 };
 
 #endif

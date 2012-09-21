@@ -13,7 +13,11 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkRectilinearGrid.h"
 #include "vtkFloatArray.h"
 #include "vtkDataSetWriter.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkCellData.h"
+#include "vtkIntArray.h"
 
+#include "vtkSQLog.h"
 #include "BOVMetaData.h"
 #include "BOVReader.h"
 #include "BOVTimeStepImage.h"
@@ -29,6 +33,14 @@ Copyright 2012 SciberQuest Inc.
 #include <sstream>
 using std::ostringstream;
 
+#include <iostream>
+#include <iomanip>
+
+#ifndef SQTK_WITHOUT_MPI
+#include "SQMPICHWarningSupression.h"
+#include <mpi.h>
+#endif
+
 //#define vtkSQOOCBOVReaderDEBUG 1
 
 #ifndef vtkSQOOCBOVReaderDEBUG
@@ -39,6 +51,47 @@ using std::ostringstream;
   #define vtkSQOOCBOVReaderDEBUG 0
 #endif
 
+// ****************************************************************************
+static
+void WriteBlockUse(
+      vector<int> &cacheHit,
+      vector<int> &cacheMiss,
+      CartesianDecomp *decomp,
+      const char *fileName)
+{
+  vtkUnstructuredGrid *data=vtkUnstructuredGrid::New();
+
+  vtkIntArray *hit=vtkIntArray::New();
+  hit->SetName("cache-hit");
+  data->GetCellData()->AddArray(hit);
+  hit->Delete();
+
+  vtkIntArray *miss=vtkIntArray::New();
+  miss->SetName("cache-miss");
+  data->GetCellData()->AddArray(miss);
+  miss->Delete();
+
+  int nBlocks=cacheHit.size();
+  for (int q=0; q<nBlocks; ++q)
+    {
+    if (cacheMiss[q]>0)
+      {
+      *data << decomp->GetBlock(q)->GetBounds();
+      *hit->WritePointer(hit->GetNumberOfTuples(),1)=cacheHit[q];
+      *miss->WritePointer(miss->GetNumberOfTuples(),1)=cacheMiss[q];
+      }
+    }
+
+  vtkDataSetWriter *idw=vtkDataSetWriter::New();
+  idw->SetFileName(fileName);
+  idw->SetInputData(data);
+  idw->Write();
+  idw->Delete();
+
+  data->Delete();
+}
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSQOOCBOVReader);
 
 //-----------------------------------------------------------------------------
@@ -52,7 +105,8 @@ vtkSQOOCBOVReader::vtkSQOOCBOVReader()
   LRUQueue(0),
   CloseClearsCachedBlocks(1),
   CacheHitCount(0),
-  CacheMissCount(0)
+  CacheMissCount(0),
+  LogLevel(0)
 {
   this->LRUQueue=new PriorityQueue<unsigned long int>;
 }
@@ -60,7 +114,7 @@ vtkSQOOCBOVReader::vtkSQOOCBOVReader()
 //-----------------------------------------------------------------------------
 vtkSQOOCBOVReader::~vtkSQOOCBOVReader()
 {
-  this->Close();
+  // this->Close(); expect the user to close
   this->SetReader(0);
   this->SetDomainDecomp(0);
   delete this->LRUQueue;
@@ -81,7 +135,8 @@ void vtkSQOOCBOVReader::InitializeBlockCache()
 
   this->LRUQueue->Initialize(this->BlockCacheSize,nBlocks);
 
-  this->BlockUse.assign(nBlocks,0);
+  this->CacheHit.assign(nBlocks,0);
+  this->CacheMiss.assign(nBlocks,0);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,12 +155,10 @@ void vtkSQOOCBOVReader::ClearBlockCache()
     block->SetData(0);
     }
 
-  //#if vtkSQOOCBOVReaderDEBUG>0
-  size_t nBlocks=this->BlockUse.size();
-  this->BlockUse.assign(nBlocks,0);
-  //#endif
+  int nBlocks=(int)this->DomainDecomp->GetNumberOfBlocks();
+  this->CacheHit.assign(nBlocks,0);
+  this->CacheMiss.assign(nBlocks,0);
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkSQOOCBOVReader::SetCommunicator(MPI_Comm comm)
@@ -116,7 +169,13 @@ void vtkSQOOCBOVReader::SetCommunicator(MPI_Comm comm)
 //-----------------------------------------------------------------------------
 int vtkSQOOCBOVReader::Open()
 {
-  this->Close();
+  this->ClearBlockCache();
+
+  if (this->Image)
+    {
+    this->Reader->CloseTimeStep(this->Image);
+    this->Image=0;
+    }
 
   this->Image=this->Reader->OpenTimeStep(this->TimeIndex);
   if (!this->Image)
@@ -131,24 +190,87 @@ int vtkSQOOCBOVReader::Open()
 //-----------------------------------------------------------------------------
 void vtkSQOOCBOVReader::Close()
 {
-  #if vtkSQOOCBOVReaderDEBUG>0
-  if (this->CacheMissCount>0)
+  int worldRank=0;
+  #ifndef SQTK_WITHOUT_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD,&worldRank);
+  #endif
+
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+  int globalLogLevel=log->GetGlobalLevel();
+  if ((this->LogLevel>1) || (globalLogLevel>1))
     {
-    size_t nBlocks=this->BlockUse.size();
-    size_t nUsed=0;
+    // write a datatset that could be used to visualize
+    // cache hits.
+    ostringstream oss;
+    oss << "cache." << setfill('0') << setw(6) << worldRank << ".vtk";
+
+    WriteBlockUse(
+          this->CacheHit,
+          this->CacheMiss,
+          this->DomainDecomp,oss.str().c_str());
+
+    log->GetBody() << worldRank << " wrote " << oss.str().c_str() << "\n";
+
+    #ifndef SQTK_WITHOUT_MPI
+    int nBlocks=(int)this->DomainDecomp->GetNumberOfBlocks();
+
+    vector<int> globalCacheHit(nBlocks,0);
+    MPI_Reduce(
+          &this->CacheHit[0],
+          &globalCacheHit[0],
+          nBlocks,
+          MPI_INT,
+          MPI_SUM,
+          0,
+          MPI_COMM_WORLD);
+
+    vector<int> globalCacheMiss(nBlocks,0);
+    MPI_Reduce(
+          &this->CacheMiss[0],
+          &globalCacheMiss[0],
+          nBlocks,
+          MPI_INT,
+          MPI_SUM,
+          0,
+          MPI_COMM_WORLD);
+
+    if (worldRank==0)
+      {
+      oss.str("");
+      oss << "cache.global.vtk";
+
+      WriteBlockUse(
+            globalCacheHit,
+            globalCacheMiss,
+            this->DomainDecomp,
+            oss.str().c_str());
+
+      log->GetBody() << worldRank << " wrote " << oss.str().c_str() << "\n";
+      }
+    #endif
+    }
+
+  if (this->LogLevel || globalLogLevel)
+    {
+    size_t nBlocks=this->CacheMiss.size();
+    int nUsed=0;
     for (size_t i=0; i<nBlocks; ++i)
       {
-      nUsed+=this->BlockUse[i];
+      if (this->CacheMiss[i]>0)
+        {
+        nUsed+=1;
+        }
       }
 
-    pCerr()
+    log->GetBody()
+      << worldRank
+      << " vtkSQOOCBOVReader::BlockCacheStats"
       << " CacheSize=" << this->BlockCacheSize
       << " nUniqueBlocks=" << nUsed
       << " HitCount=" << this->CacheHitCount
       << " MissCount=" << this->CacheMissCount
-      << endl;
+      << "\n";
     }
-  #endif
 
   if (this->CloseClearsCachedBlocks)
     {
@@ -196,9 +318,8 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
     cerr << "\tCache hit" << endl;
     #endif
 
-    #if vtkSQOOCBOVReaderDEBUG>0
-    ++this->CacheHitCount;
-    #endif
+    this->CacheHitCount+=1;
+    this->CacheHit[block->GetIndex()]+=1;
 
     // The data is locally cached. Update the LRU queue with the block's
     // new access time, and return the cached dataset.
@@ -212,10 +333,8 @@ vtkDataSet *vtkSQOOCBOVReader::ReadNeighborhood(
     cerr << "\tCache miss";
     #endif
 
-    #if vtkSQOOCBOVReaderDEBUG>0
-    ++this->CacheMissCount;
-    this->BlockUse[block->GetIndex()]=1;
-    #endif
+    this->CacheMissCount+=1;
+    this->CacheMiss[block->GetIndex()]+=1;
 
     // The data is not cached. If the cache is full then remove
     // the least recently used block and delete it's dataset. Insert

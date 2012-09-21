@@ -17,7 +17,7 @@ Copyright 2012 SciberQuest Inc.
 Given a cell id the source provides corresponding
 cell points and indexes (globally unique ids).
 */
-class vtkSQPlaneSourceCellGenerator : public vtkSQCellGenerator
+class VTK_EXPORT vtkSQPlaneSourceCellGenerator : public vtkSQCellGenerator
 {
 public:
   static vtkSQPlaneSourceCellGenerator *New();

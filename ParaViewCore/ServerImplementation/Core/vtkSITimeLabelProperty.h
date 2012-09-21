@@ -19,9 +19,10 @@
 #ifndef __vtkSITimeLabelProperty_h
 #define __vtkSITimeLabelProperty_h
 
+#include "vtkPVServerImplementationCoreModule.h" //needed for exports
 #include "vtkSIProperty.h"
 
-class VTK_EXPORT vtkSITimeLabelProperty : public vtkSIProperty
+class VTKPVSERVERIMPLEMENTATIONCORE_EXPORT vtkSITimeLabelProperty : public vtkSIProperty
 {
 public:
   static vtkSITimeLabelProperty* New();

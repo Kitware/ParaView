@@ -41,7 +41,8 @@ public:
     SourceCells(0),
     OutPts(0),
     OutCells(0),
-    Length(0)
+    Length(0),
+    SourceId(0)
        {}
 
   virtual ~StreamlineData();
@@ -73,6 +74,18 @@ public:
   // into the vtk output data.
   virtual int SyncGeometry();
 
+  /**
+  Set the global id of cell 0 in this processes source cells.
+  */
+  void SetSourceCellGid(unsigned long gid){ this->SourceCellGid=gid; }
+  unsigned long GetSourceCellGid(){ return this->SourceCellGid; }
+
+  /**
+  Remove segments that resulted from a periodic bc application
+  from the output set of lines. The whole bounding box is used
+  to identify these segments.
+  */
+  void CullPeriodicTransitions(double *bounds);
 
 private:
   void ClearSource();
@@ -85,6 +98,9 @@ private:
   vtkFloatArray *OutPts;
   vtkCellArray *OutCells;
   vtkFloatArray *Length;
+  vtkIntArray *SourceId;
+
+  unsigned int SourceCellGid;
 };
 
 #endif

@@ -33,11 +33,12 @@
 #ifndef __vtkPointSpriteDefaultPainter_h__
 #define __vtkPointSpriteDefaultPainter_h__
 
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkDefaultPainter.h"
 
 class vtkDepthSortPainter;
 
-class VTK_EXPORT vtkPointSpriteDefaultPainter : public vtkDefaultPainter
+class VTKPOINTSPRITERENDERING_EXPORT vtkPointSpriteDefaultPainter : public vtkDefaultPainter
 {
 public :
   static vtkPointSpriteDefaultPainter* New();
