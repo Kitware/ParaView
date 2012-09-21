@@ -3,4 +3,6 @@ vtk_module(vtkCoProcessor
     CoProcessing
   DEPENDS
     vtkPVServerManagerCore
+  TEST_LABELS
+    PARAVIEW CATALYST
 )

@@ -4,4 +4,6 @@ vtk_module(FortranAdaptor
   DEPENDS
     vtkCoProcessorImplementation
   EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW CATALYST
 )

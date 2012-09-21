@@ -7,4 +7,6 @@ vtk_module(vtkPVCommon
     vtkClientServer
   TEST_DEPENDS
     vtkTestingCore
+  TEST_LABELS
+    PARAVIEW
 )

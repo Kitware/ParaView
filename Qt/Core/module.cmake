@@ -12,4 +12,6 @@ vtk_module(pqCore
     vtkPVServerManagerApplication
     ${__depends}
   EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW
 )

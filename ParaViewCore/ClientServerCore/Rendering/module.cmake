@@ -16,4 +16,6 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkViewsCore
     vtkRenderingVolumeOpenGL
     ${__dependencies}
+  TEST_LABELS
+    PARAVIEW
 )

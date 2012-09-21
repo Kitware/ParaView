@@ -19,5 +19,7 @@ vtk_module(vtkPVServerManagerDefault
     ${extra_depends}
   TEST_DEPENDS
     vtkPVServerManagerApplication
+  TEST_LABELS
+    PARAVIEW
 )
 unset(extra_depends)
