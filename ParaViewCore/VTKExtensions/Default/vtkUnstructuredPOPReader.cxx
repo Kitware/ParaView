@@ -566,11 +566,11 @@ int vtkUnstructuredPOPReader::ProcessGrid(
           for(size_t iy=0;iy<count[1];iy++)
             {
             point[1] = y[iy];
-            ind[1] = iy;
+            ind[1] = static_cast<int>(iy);
             for(size_t ix=0;ix<count[2];ix++)
               {
               point[0] = x[ix];
-              ind[0] = ix;
+              ind[0] = static_cast<int>(ix);
               vtkIdType id = ix + iy*count[2] + iz*count[2]*count[1];
               indexArray->SetTupleValue(id, ind);
               points->SetPoint(id, point);
@@ -819,7 +819,8 @@ bool vtkUnstructuredPOPReader::Transform(
           vtkErrorMacro("doooh");
           }
         size_t latlonIndex = GetPOPIndexFromGridIndices(
-          2, dimensions, start+1, rStride, i, j, k);
+          2, dimensions, start+1, rStride,
+          static_cast<int>(i), static_cast<int>(j), static_cast<int>(k));
         if(latlonIndex >= dimensions[0]*dimensions[1])
           {
           vtkErrorMacro("Bad lat-lon index.");
