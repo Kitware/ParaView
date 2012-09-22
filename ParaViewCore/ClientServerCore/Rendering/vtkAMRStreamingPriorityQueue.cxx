@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <queue>
+#include <vector>
 
 //*****************************************************************************
 namespace
@@ -199,7 +200,8 @@ unsigned int vtkAMRStreamingPriorityQueue::Pop()
   int myid = this->Controller? this->Controller->GetLocalProcessId() : 0;
   assert(myid < num_procs);
 
-  vtkInternals::vtkPriorityQueueItem items[num_procs];
+  std::vector<vtkInternals::vtkPriorityQueueItem> items;
+  items.resize(num_procs);
   for (int cc=0; cc < num_procs && !this->Internals->PriorityQueue.empty(); cc++)
     {
     items[cc] = this->Internals->PriorityQueue.top();
