@@ -91,6 +91,7 @@ public:
   void SetOrigin(double, double, double);
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
+  void SetUserTransform(const double[16]);
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is

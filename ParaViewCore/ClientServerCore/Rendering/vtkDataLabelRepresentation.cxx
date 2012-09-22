@@ -22,6 +22,7 @@
 #include "vtkInformationVector.h"
 #include "vtkLabeledDataMapper.h"
 #include "vtkMPIMoveData.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVRenderView.h"
@@ -404,5 +405,14 @@ void vtkDataLabelRepresentation::SetPosition(double x, double y, double z)
 void vtkDataLabelRepresentation::SetScale(double x, double y, double z)
 {
   this->TransformHelperProp->SetScale(x, y, z);
+  this->UpdateTransform();
+}
+
+//----------------------------------------------------------------------------
+void vtkDataLabelRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->TransformHelperProp->SetUserTransform(transform.GetPointer());
   this->UpdateTransform();
 }

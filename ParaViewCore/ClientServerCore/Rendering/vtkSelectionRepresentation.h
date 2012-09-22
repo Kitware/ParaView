@@ -86,6 +86,7 @@ public:
   void SetOrigin(double, double, double);
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
+  void SetUserTransform(const double[16]);
 
   // Description:
   // Forwarded to vtkDataLabelRepresentation.
