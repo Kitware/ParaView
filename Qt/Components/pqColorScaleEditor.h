@@ -128,6 +128,7 @@ private slots:
     vtkColorTransferFunction*);
 
   void setNanColor(const QColor &color);
+  void setNanColor2(const QColor &color);
   void setScalarColor(const QColor &color);
   void setScalarButtonColor(const QColor &color);
 
@@ -163,6 +164,7 @@ private slots:
   void addAnnotationEntry();
   void annotationsChanged();
   void resetAnnotationSort();
+  void updateAnnotationColors();
   //@}
 
   /// \name Color Legend Methods
@@ -209,7 +211,6 @@ private:
   void initColorScale();
   void enablePointControls();
   void updatePointValues();
-  void updateAnnotationColors();
   void enableRescaleControls(bool enable);
   void enableResolutionControls(bool enable);
   void updateScalarRange(double min, double max);

@@ -445,8 +445,8 @@
       <attribute name="title">
        <string>Annotations</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
         <widget class="QTreeWidget" name="AnnotationTree">
          <property name="dragDropMode">
           <enum>QAbstractItemView::InternalMove</enum>
@@ -484,8 +484,35 @@
          </column>
         </widget>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="AnnotationButtonLayout">
+       <item row="0" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QPushButton" name="NewAnnotation">
+           <property name="text">
+            <string>New Entry</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="AddActiveValues">
+           <property name="text">
+            <string>Add # Active Values</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QPushButton" name="RemoveAnnotation">
            <property name="text">
@@ -500,32 +527,29 @@
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="AnnotationSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="pqColorChooserButton" name="NanColor2">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="AddActiveValues">
            <property name="text">
-            <string>Add # Active Values</string>
+            <string>NaN Color</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="NewAnnotation">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_11">
            <property name="text">
-            <string>New Entry</string>
+            <string>NaN Annotation</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="lineEdit"/>
          </item>
         </layout>
        </item>
@@ -1254,10 +1278,6 @@
   <tabstop>SwitchToAdvanced</tabstop>
   <tabstop>pushButtonApply</tabstop>
   <tabstop>CloseButton</tabstop>
-  <tabstop>RemoveAnnotation</tabstop>
-  <tabstop>ResetAnnotations</tabstop>
-  <tabstop>AddActiveValues</tabstop>
-  <tabstop>NewAnnotation</tabstop>
   <tabstop>ShowColorLegend</tabstop>
   <tabstop>TitleName</tabstop>
   <tabstop>TitleComponent</tabstop>

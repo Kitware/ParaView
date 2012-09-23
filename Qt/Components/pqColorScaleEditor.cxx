@@ -246,8 +246,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->AnnotationTree->setDragDropMode( QAbstractItemView::InternalMove );
   this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
   QObject::connect(
-    this->Form->AnnotationTree->header(), SIGNAL(sectionDoubleClicked(int)),
-    this, SLOT(resetAnnotationSort()));
+    this->Form->AnnotationTree->header(), SIGNAL(sectionClicked(int)),
+    this, SLOT(updateAnnotationColors()));
   //this->Form->AnnotationTree->setSortingEnabled( false );
   //this->Form->AnnotationTree->verticalHeader()->setMovable( true );
   this->Form->AnnotationTree->viewport()->installEventFilter( this );
@@ -350,6 +350,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
 
   this->connect(this->Form->NanColor,SIGNAL(chosenColorChanged(const QColor &)),
                 this, SLOT(setNanColor(const QColor &)));
+  this->connect(this->Form->NanColor2,SIGNAL(chosenColorChanged(const QColor &)),
+                this, SLOT(setNanColor2(const QColor &)));
 
   this->connect(this->Form->SaveButton, SIGNAL(clicked()),
       this, SLOT(savePreset()));
@@ -692,6 +694,28 @@ void pqColorScaleEditor::pushAnnotations()
 
   vtkSMProxy* lookupTable = this->ColorMap->getProxy();
   QList<QVariant> categories;
+  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+  QTreeWidgetItem* valItem;
+  // Find top-most item in list
+  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
+    {
+    last = valItem;
+    }
+  valItem = last;
+  // Traverse list from top down
+  while (valItem)
+    {
+    QString val( valItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toString() );
+    QString txt( valItem->data( PQ_ANN_ENTRY_COL, Qt::DisplayRole ).toString() );
+    //std::cout << "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n";
+    categories << val << txt;
+    if ( tf )
+      {
+      tf->SetAnnotation( val.toStdString(), txt.toStdString() );
+      }
+    valItem = this->Form->AnnotationTree->itemBelow(valItem);
+    }
+  /*
   for ( int i = total - 1; i >= 0; -- i )
     {
     QTreeWidgetItem* valItem = this->Form->AnnotationTree->topLevelItem( i );
@@ -706,6 +730,7 @@ void pqColorScaleEditor::pushAnnotations()
       tf->SetAnnotation( val.toStdString(), txt.toStdString() );
       }
     }
+    */
   /*
   this->Form->InSetInterpretation = true;
   pqSMAdaptor::setElementProperty(
@@ -1119,6 +1144,30 @@ void pqColorScaleEditor::setNanColor(const QColor &color)
     this->renderViewOptionally();
     this->renderTransferFunctionViews();
     }
+  this->Form->NanColor2->blockSignals( true );
+  this->Form->NanColor2->setChosenColor(color);
+  this->Form->NanColor2->blockSignals( false );
+}
+
+void pqColorScaleEditor::setNanColor2(const QColor &color)
+{
+  if (this->ColorMap)
+    {
+    this->Form->InSetColors = true;
+    vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+    QList<QVariant> values;
+    values << color.redF() << color.greenF() << color.blueF();
+    pqSMAdaptor::setMultipleElementProperty(
+                                  lookupTable->GetProperty("NanColor"), values);
+    this->Form->InSetColors = false;
+    lookupTable->UpdateVTKObjects();
+    this->updateAnnotationColors();
+    this->renderViewOptionally();
+    this->renderTransferFunctionViews();
+    }
+  this->Form->NanColor->blockSignals( true );
+  this->Form->NanColor->setChosenColor(color);
+  this->Form->NanColor->blockSignals( false );
 }
 
 void pqColorScaleEditor::setScalarColor(const QColor &color)
@@ -1355,6 +1404,7 @@ void pqColorScaleEditor::loadPreset()
       colorMap->getNanColor(nanColor);
       this->Form->NanColor->blockSignals(true);
       this->Form->NanColor->setChosenColor(nanColor);
+      this->Form->NanColor2->setChosenColor(nanColor);
       this->Form->NanColor->blockSignals(false);
 
       if (this->ColorMap)
@@ -1886,7 +1936,7 @@ void pqColorScaleEditor::loadAnnotations()
   //anno->setRowCount( nr -- );
   //for ( int i = 0; (i + 1) < list.size(); i += 2, -- nr )
   this->Form->InSetAnnotation = true;
-  for ( int i = list.size() - 2; i >= 0; i -= 2 )
+  for ( int i = 0; i < list.size() - 1; i += 2 )
     {
     QTreeWidgetItem* valItem = new pqAnnotationTreeItem( this->Form->AnnotationTree );
     valItem->setFlags( Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
@@ -2114,6 +2164,7 @@ void pqColorScaleEditor::initColorScale()
       this->currentColorFunction());
     // Set up the NaN color.
     this->Form->NanColor->blockSignals(true);
+    this->Form->NanColor2->blockSignals(true);
     QList<QVariant> nanColorValues = pqSMAdaptor::getMultipleElementProperty(
                                           lookupTable->GetProperty("NanColor"));
     QColor nanColor;
@@ -2121,7 +2172,9 @@ void pqColorScaleEditor::initColorScale()
                      nanColorValues[1].toDouble(),
                      nanColorValues[2].toDouble());
     this->Form->NanColor->setChosenColor(nanColor);
+    this->Form->NanColor2->setChosenColor(nanColor);
     this->Form->NanColor->blockSignals(false);
+    this->Form->NanColor2->blockSignals(false);
 
     // Set up the log scale checkbox. If the log scale is not valid
     // because of the range, loadColorPoints will clear the flag.
@@ -2192,23 +2245,30 @@ void pqColorScaleEditor::updateAnnotationColors()
   atab->blockSignals( true );
   int total = atab->topLevelItemCount();
   int nc = tf->GetSize();
-  for ( int i = 0; i < total; ++ i )
+  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+  QTreeWidgetItem* valItem;
+  // Find top-most item in list
+  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
     {
-    QTreeWidgetItem* valItem = atab->topLevelItem( i );
-    if ( valItem )
+    last = valItem;
+    }
+  valItem = last;
+  // Traverse list from top down
+  for (int i = 0; valItem; ++i)
+    {
+    if ( nc )
       {
-      if ( nc )
-        {
-        double nodeValue[6];
-        tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
-        valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
-          QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
-        }
-      else
-        {
-        valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole, this->Form->NanColor->chosenColor() );
-        }
+      double nodeValue[6];
+      //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
+      tf->GetNodeValue( i % nc, nodeValue );
+      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
+        QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
       }
+    else
+      {
+      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole, this->Form->NanColor->chosenColor() );
+      }
+    valItem = this->Form->AnnotationTree->itemBelow(valItem);
     }
   atab->blockSignals( false );
 }
