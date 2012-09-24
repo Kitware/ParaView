@@ -172,13 +172,31 @@ public:
     vtkFloatArray *TracerCoord;
     vtkIntArray *TracerBlock;
   };
+  struct MarkerMaterialField
+  {
+    char Name[30];
+    char Label[256];
+  };
   struct MaterialMarker
   {
     int NumMarks;
     int NumRealMarks;
     int NumVars;
-    // MarkerMaterialField *Variables;
+    MarkerMaterialField *Variables;
   };
+  struct MarkerDump
+  {
+    vtkFloatArray *XLoc;
+    vtkFloatArray *YLoc;
+    vtkFloatArray *ZLoc;
+    vtkFloatArray *ILoc;
+    vtkFloatArray *JLoc;
+    vtkFloatArray *KLoc;
+    vtkFloatArray *Block;
+    vtkFloatArray **Variables;
+  };
+  MaterialMarker* Markers;
+  MarkerDump* MarkersDumps;
 
   vtkSpyPlotBlock* GetDataBlock(int block);
 
@@ -204,6 +222,7 @@ private:
   int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
   int ReadDataDumps(vtkSpyPlotIStream *spis);
+  int ReadMarkerDumps(vtkSpyPlotIStream *spis);
 
   vtkDataArray* GetMaterialField(const int& block, const int& materialIndex, const char* Id);
 
@@ -223,9 +242,6 @@ private:
   int NumberOfBlocks;
   int MaximumNumberOfLevels;
   int MarkersOn;
-
-  // Marker Header Information
-  MaterialMarker* Markers;
 
   // For storing possible cell/material fields meta data
   int NumberOfPossibleCellFields;
