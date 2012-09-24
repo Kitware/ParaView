@@ -117,7 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnnotationTreeItem : public QTreeWidgetItem
 {
 public:
-  pqAnnotationTreeItem(QTreeWidget* parent) : QTreeWidgetItem(parent) { }
+  pqAnnotationTreeItem(QTreeWidget* parnt) : QTreeWidgetItem(parnt) { }
 protected:
   virtual bool operator < ( const QTreeWidgetItem& other ) const
     {
@@ -662,7 +662,6 @@ void pqColorScaleEditor::pushAnnotations()
     return;
     }
 
-  int total = this->Form->AnnotationTree->topLevelItemCount();
   vtkColorTransferFunction* tf = this->currentColorFunction();
   if ( tf )
     {
@@ -2046,7 +2045,6 @@ void pqColorScaleEditor::loadAnnotations()
     return;
     }
   list = pqSMAdaptor::getMultipleElementProperty( smProp );
-  vtkIdType nr = list.size() / 2;
   this->Form->InSetAnnotation = true;
   for ( int i = 0; i < list.size() - 1; i += 2 )
     {
@@ -3004,25 +3002,25 @@ void pqColorScaleEditor::setActiveUniqueValues( vtkAbstractArray* arr )
 }
 
 // ----------------------------------------------------------------------------
-bool pqColorScaleEditor::eventFilter( QObject* src, QEvent* event )
+bool pqColorScaleEditor::eventFilter( QObject* src, QEvent* evnt )
 {
   QObject* annotationTree = this->Form->AnnotationTree->viewport();
   if ( src == annotationTree )
     {
-    if ( event->type() == QEvent::User )
+    if ( evnt->type() == QEvent::User )
       { // eat this event... it's something we queued below and we must respond to it now.
       this->pushAnnotations();
       this->updateAnnotationColors();
-      event->setAccepted( true );
+      evnt->setAccepted( true );
       return true;
       }
-    else if ( event->type() == QEvent::Drop )
+    else if ( evnt->type() == QEvent::Drop )
       { // Turn off sorting so the drop can reorder the rows.
       this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
       }
     }
-  bool retval = QObject::eventFilter( src, event );
-  if ( src == annotationTree && event->type() == QEvent::Drop )
+  bool retval = QObject::eventFilter( src, evnt );
+  if ( src == annotationTree && evnt->type() == QEvent::Drop )
     {
     // We can't just pushAnnotations() here since the drop isn't complete...
     // instead, we'll add an event to the end of the queue (which won't be processed

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -708,10 +708,10 @@ void pqColorMapModel::LabToRGB(double L, double a, double b,
   double var_Y = ( L + 16 ) / 116;
   double var_X = a / 500 + var_Y;
   double var_Z = var_Y - b / 200;
-    
+
   if ( pow(var_Y,3) > 0.008856 ) var_Y = pow(var_Y,3);
   else var_Y = ( var_Y - 16.0 / 116.0 ) / 7.787;
-                                                            
+
   if ( pow(var_X,3) > 0.008856 ) var_X = pow(var_X,3);
   else var_X = ( var_X - 16.0 / 116.0 ) / 7.787;
 
@@ -727,11 +727,11 @@ void pqColorMapModel::LabToRGB(double L, double a, double b,
   var_X = x / 100;        //X = From 0 to ref_X
   var_Y = y / 100;        //Y = From 0 to ref_Y
   var_Z = z / 100;        //Z = From 0 to ref_Z
- 
+
   double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
   double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
   double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
- 
+
   if ( var_R > 0.0031308 ) var_R = 1.055 * ( pow(var_R, ( 1 / 2.4 )) ) - 0.055;
   else var_R = 12.92 * var_R;
   if ( var_G > 0.0031308 ) var_G = 1.055 * ( pow(var_G ,( 1 / 2.4 )) ) - 0.055;
@@ -742,7 +742,7 @@ void pqColorMapModel::LabToRGB(double L, double a, double b,
   *red   = var_R;
   *green = var_G;
   *blue  = var_B;
-  
+
   //clip colors. ideally we would do something different for colors
   //out of gamut, but not really sure what to do atm.
   if (*red<0)   *red=0;
@@ -981,8 +981,7 @@ QPixmap pqColorMapModel::generateCategoricalPreview(const QSize &size) const
       hmp = size.height() - PQ_SWATCH_PAD;
 
   // I. Determine the maximum number of rows and columns of swatches
-  int Nhmax = wmp / (PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD),
-      Nvmax = hmp / (PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD);
+  int Nvmax = hmp / (PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD);
 
   // II. Determine the actual number of rows and columns
   int N = static_cast<int>(this->InternalPts->size()),
