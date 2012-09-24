@@ -86,7 +86,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqIsoVolumePanel.h"
-#include "pqCalculatorPanel.h"
 #include "pqPassArraysPanel.h"
 #include "pqStreamTracerPanel.h"
 #include "pqTextRepresentation.h"
@@ -128,10 +127,6 @@ public:
          QString("GenericClip") == proxy->getProxy()->GetXMLName())
         {
         return new pqClipPanel(proxy, p);
-        }
-      if(QString("Calculator") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqCalculatorPanel(proxy, p);
         }
       if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
         {
@@ -187,7 +182,6 @@ public:
       {
       if(QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("GenericClip") == proxy->getProxy()->GetXMLName() ||
-         QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
          QString("Glyph") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||

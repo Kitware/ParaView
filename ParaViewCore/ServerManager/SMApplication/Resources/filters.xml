@@ -1915,29 +1915,22 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the input dataset to the
         Calculator filter. The scalar and vector variables may be chosen from
         this dataset's arrays.</Documentation>
       </InputProperty>
-      <StringVectorProperty command="SetResultArrayName"
-                            default_values="Result"
-                            name="ResultArrayName"
-                            number_of_elements="1">
-        <Documentation>This property contains the name for the output array
-        containing the result of this computation.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetFunction"
-                            name="Function"
-                            number_of_elements="1">
-        <Documentation>This property contains the equation for computing the
-        new array.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
-      </StringVectorProperty>
+      <IntVectorProperty command="SetAttributeMode"
+                         default_values="1"
+                         name="AttributeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Point Data" value="1" />
+          <Entry text="Cell Data" value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines whether the computation is to
+        be performed on point-centered or cell-centered data.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetCoordinateResults"
                          default_values="0"
                          name="CoordinateResults"
@@ -1948,21 +1941,20 @@ found and the point will be rejected.</Documentation>
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetAttributeMode"
-                         default_values="0"
-                         name="AttributeMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="point_data"
-                 value="1" />
-          <Entry text="cell_data"
-                 value="2" />
-          <Entry text="field_data"
-                 value="5" />
-        </EnumerationDomain>
-        <Documentation>This property determines whether the computation is to
-        be performed on point-centered or cell-centered data.</Documentation>
-      </IntVectorProperty>
+      <StringVectorProperty command="SetResultArrayName"
+                            default_values="Result"
+                            name="ResultArrayName"
+                            number_of_elements="1">
+        <Documentation>This property contains the name for the output array
+        containing the result of this computation.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFunction"
+                            name="Function"
+                            number_of_elements="1"
+                            panel_widget="calculator" >
+        <Documentation>This property contains the equation for computing the
+        new array.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetReplaceInvalidValues"
                          default_values="1"
                          label="Replace Invalid Results"
