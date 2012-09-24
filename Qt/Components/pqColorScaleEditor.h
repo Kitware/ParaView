@@ -233,10 +233,6 @@ private:
   void pushAnnotations();
 
 private:
-  // These 2 functions make vtkDebugMacro() functional in the class.
-  int GetDebug() const { return 0; }
-  virtual const char* GetClassName() const { return "pqColorScaleEditor"; }
-
   pqColorScaleEditorForm *Form;
   pqTransferFunctionChartViewWidget* ColorMapViewer;
   pqTransferFunctionChartViewWidget* OpacityFunctionViewer;
