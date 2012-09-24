@@ -17,13 +17,11 @@
 //
 // .SECTION Description
 //  vtkPVArrayCalculator performs operations on vectors or scalars in field
-//  data arrays.  It uses vtkFunctionParser to do the parsing and to
-//  evaluate the function for each entry in the input arrays.  The arrays
-//  used in a given function must be all in point data or all in cell data.
-//  The resulting array will be stored as a field data array.  The result
-//  array can either be stored in a new array or it can overwrite an 
-//  existing array.
-//
+//  data arrays.
+//  vtkArrayCalculator provides API for users to add scalar/vector fields and
+//  their mapping with the input fields. We extend vtkArrayCalculator to
+//  automatically add scalar/vector fields mapping using the array available in
+//  the input.
 // .SECTION See Also
 //  vtkArrayCalculator vtkFunctionParser
 
