@@ -784,8 +784,9 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     *css << location << name;
     }
 
-  *css << ( this->UniqueValues ? true : false );
-  if ( this->UniqueValues )
+  int haveUniqueValues = this->UniqueValues ? 1 : 0;
+  *css << haveUniqueValues;
+  if (haveUniqueValues)
     {
     for ( vtkIdType i = 0; i < this->GetNumberOfComponents(); ++ i )
       {
@@ -933,8 +934,8 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     this->AddInformationKey(key_location, key_name);
     }
 
-  bool haveUniqueVals;
-  if ( ! css->GetArgument( 0, ++ pos, &haveUniqueVals ) )
+  int haveUniqueVals;
+  if ( ! css->GetArgument( 0, pos++, &haveUniqueVals ) )
     {
     vtkErrorMacro("Error parsing unique value existence from message.");
     return;
@@ -953,14 +954,14 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     unsigned nuv;
     for ( int i = 0; i < this->NumberOfComponents; ++ i )
       {
-      if ( ! css->GetArgument( 0, ++ pos, &nuv ) )
+      if ( ! css->GetArgument( 0, pos++, &nuv ) )
         {
         vtkErrorMacro( "Error decoding the number of unique values for component " << i );
         return;
         }
       vtkAbstractArray* aa;
       vtkObjectBase* obj;
-      if ( ! css->GetArgument( 0, ++ pos, &obj ) || ! obj )
+      if ( ! css->GetArgument( 0, pos++, &obj ) || ! obj )
         {
         vtkErrorMacro( "Error decoding the list of unique values for component " << i );
         return;
