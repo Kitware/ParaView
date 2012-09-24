@@ -1029,9 +1029,6 @@
                          panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>Set the visibility for the cube axes.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </IntVectorProperty>
       <RepresentationType subproxy="OutlineRepresentation"
                           text="Outline" />
@@ -1071,9 +1068,6 @@
                       name="RepresentationTypesInfo" />
           </RequiredProperties>
         </StringListDomain>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="SetCellFieldDataArrayName"
                             default_values="vtkOriginalCellIds"
@@ -4387,9 +4381,6 @@
                        panel_visibility="never">
       <BooleanDomain name="bool" />
       <Documentation>Set the visibility for the cube axes.</Documentation>
-      <Hints>
-        <ShowInSummaryPanel />
-      </Hints>
     </IntVectorProperty>
     <StringVectorProperty command="GetRepresentationTypes"
                           information_only="1"
@@ -4411,9 +4402,6 @@
                     name="RepresentationTypesInfo" />
         </RequiredProperties>
       </StringListDomain>
-      <Hints>
-        <ShowInSummaryPanel />
-      </Hints>
     </StringVectorProperty>
     <StringVectorProperty command="SetCellFieldDataArrayName"
                           default_values="vtkOriginalCellIds"
