@@ -24,7 +24,6 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingMathText
-    vtkRenderingMatplotlib
     vtkRenderingFreeTypeOpenGL
     vtkRenderingOpenGL
     vtkRenderingParallel
