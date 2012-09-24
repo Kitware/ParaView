@@ -250,6 +250,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
     this, SLOT(updateAnnotationColors()));
   //this->Form->AnnotationTree->setSortingEnabled( false );
   //this->Form->AnnotationTree->verticalHeader()->setMovable( true );
+  QObject::connect(this->Form->AnnotationTree, SIGNAL(itemSelectionChanged()),
+    this, SLOT(annotationSelectionChanged()));
   this->Form->AnnotationTree->viewport()->installEventFilter( this );
   QObject::connect(
     this->Form->AnnotationTree->model(), SIGNAL(layoutChanged()),
@@ -260,7 +262,11 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   QObject::connect( this->Form->RemoveAnnotation, SIGNAL(clicked()), this, SLOT(removeAnnotation()) );
   QObject::connect( this->Form->ResetAnnotations, SIGNAL(clicked()), this, SLOT(resetAnnotations()) );
   QObject::connect( this->Form->AddActiveValues,  SIGNAL(clicked()), this, SLOT(addActiveValues()) );
-  QObject::connect( this->Form->NewAnnotation,    SIGNAL(clicked()), this, SLOT(addAnnotationEntry()) );
+
+  // Force a redraw immediately when the "Render View Immediately" button gets checked...
+  // Some changes may already have been made.
+  this->connect(this->Form->checkBoxImmediateRender, SIGNAL(clicked()),
+    this, SLOT(renderViewOptionally()));
 
   // Color transfer function widgets
   this->restoreOptionalUserSettings();
@@ -352,6 +358,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
                 this, SLOT(setNanColor(const QColor &)));
   this->connect(this->Form->NanColor2,SIGNAL(chosenColorChanged(const QColor &)),
                 this, SLOT(setNanColor2(const QColor &)));
+  this->connect(this->Form->AnnotationSwatch,SIGNAL(chosenColorChanged(const QColor &)),
+                this, SLOT(editAnnotationColor(const QColor &)));
 
   this->connect(this->Form->SaveButton, SIGNAL(clicked()),
       this, SLOT(savePreset()));
@@ -457,7 +465,7 @@ pqColorScaleEditor::~pqColorScaleEditor()
 
 void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
 {
-  cout << "setRepr( " << display << " )\n";
+  vtkDebugMacro(<< "setRepr( " << display << " )\n");
   if(this->Display == display)
     {
     return;
@@ -531,7 +539,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
     int acomp = ( display->getLookupTable()->getVectorMode() == pqScalarsToColors::MAGNITUDE ? -1 :
       display->getLookupTable()->getVectorComponent() );
     vtkPVArrayInformation* ainfo = display->getProxyColorArrayInfo();
-    //cout << "Color by " << colorArrayName.toAscii().data() << " comp " << acomp << " info " << ainfo << "\n";
+    //vtkDebugMacro(<< "Color by " << colorArrayName.toAscii().data() << " comp " << acomp << " info " << ainfo << "\n");
     bool haveActiveValues = false;
     if ( ainfo )
       {
@@ -543,7 +551,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       if ( uniq )
         {
         haveActiveValues = true;
-        //cout << "  " << uniq->GetNumberOfTuples() << " unique values" << "\n";
+        //vtkDebugMacro(<< "  " << uniq->GetNumberOfTuples() << " unique values" << "\n");
         // If the lookup table doesn't have any entries and the active representation has a small set, populate the lookup table
         // with these values by default. Otherwise, let the user add any new values with the "Add ## active values" button.
         this->setActiveUniqueValues( uniq );
@@ -557,7 +565,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       }
     if ( ! haveActiveValues )
       {
-      cout << "  No small set of values\n";
+      vtkDebugMacro(<< "  No small set of values\n");
       this->Form->AddActiveValues->setText( "Too Many/Few Values" );
       this->Form->AddActiveValues->setEnabled( false );
       }
@@ -580,7 +588,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
 
 void pqColorScaleEditor::pushColors()
 {
-  cout << "pushColors\n";
+  vtkDebugMacro(<< "pushColors\n");
   if(!this->ColorMap || this->Form->InSetColors)
     {
     return;
@@ -599,7 +607,7 @@ void pqColorScaleEditor::pushColors()
     /*
     if ( tf->GetIndexedLookup() )
       {
-      cout << "Skipping indexed pushColor (" << tf->GetClassName() << "*)" << tf << "\n";
+      vtkDebugMacro(<< "Skipping indexed pushColor (" << tf->GetClassName() << "*)" << tf << "\n");
       continue;
       }
       */
@@ -640,7 +648,6 @@ void pqColorScaleEditor::pushColors()
 
 void pqColorScaleEditor::pushOpacity()
 {
-  cout << "pushOpacity\n";
   if(!this->OpacityFunction || this->Form->InSetColors)
     {
     return;
@@ -648,6 +655,7 @@ void pqColorScaleEditor::pushOpacity()
 
   QList<QVariant> opacityPoints;
   this->Form->InSetColors = true;
+  vtkDebugMacro(<< "pushOpacity\n");
 
   double scalar[4];//[x, value, midpoint, sharpness]
   foreach(vtkCompositeControlPointsItem* plot,
@@ -680,9 +688,9 @@ void pqColorScaleEditor::pushAnnotations()
     return;
     }
 
-  cout << "pushAnnotations\n";
+  vtkDebugMacro(<< "pushAnnotations\n");
   int total = this->Form->AnnotationTree->topLevelItemCount();
-  cout << "  pushing " << total << " rows\n";
+  vtkDebugMacro(<< "  pushing " << total << " rows\n");
   /* */
   vtkColorTransferFunction* tf = this->currentColorFunction();
   if ( tf )
@@ -707,7 +715,7 @@ void pqColorScaleEditor::pushAnnotations()
     {
     QString val( valItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toString() );
     QString txt( valItem->data( PQ_ANN_ENTRY_COL, Qt::DisplayRole ).toString() );
-    //std::cout << "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n";
+    //std::vtkDebugMacro(<< "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n");
     categories << val << txt;
     if ( tf )
       {
@@ -723,7 +731,7 @@ void pqColorScaleEditor::pushAnnotations()
       continue;
     QString val( valItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toString() );
     QString txt( valItem->data( PQ_ANN_ENTRY_COL, Qt::DisplayRole ).toString() );
-    //std::cout << "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n";
+    //std::vtkDebugMacro(<< "annote " << i << ": " << val.toAscii().data() << "  " << txt.toAscii().data() << "\n");
     categories << val << txt;
     if ( tf )
       {
@@ -748,9 +756,9 @@ void pqColorScaleEditor::pushAnnotations()
 
 void pqColorScaleEditor::handleEnableOpacityMappingChanged()
 {
-  cout << "handleEnableOpacityMappingChanged\n";
   if(this->UseEnableOpacityCheckBox)
     {
+    vtkDebugMacro(<< "handleEnableOpacityMappingChanged\n");
     bool enabled = pqSMAdaptor::getElementProperty(
       this->ColorMap->getProxy()->GetProperty("EnableOpacityMapping")).toBool();
 
@@ -763,11 +771,11 @@ void pqColorScaleEditor::handleEnableOpacityMappingChanged()
 
 void pqColorScaleEditor::handleOpacityPointsChanged()
 {
-  cout << "handleOpacityPointsChanged\n";
   // If the point change was not generated by setColors, update the
   // points in the editor.
   if(!this->Form->InSetColors)
     {
+    vtkDebugMacro(<< "handleOpacityPointsChanged\n");
     // Save the current point index to use after the change.
     vtkControlPointsItem* currentItem=this->OpacityFunctionViewer->
       currentControlPointsItem();
@@ -793,11 +801,11 @@ void pqColorScaleEditor::handleOpacityPointsChanged()
 
 void pqColorScaleEditor::handleColorPointsChanged()
 {
-  cout << "handleColorPointsChanged\n";
   // If the point change was not generated by setColors, update the
   // points in the editor.
   if(!this->Form->InSetColors)
     {
+    vtkDebugMacro(<< "handleColorPointsChanged\n");
     // Save the index of the point currently being edited
     vtkControlPointsItem* currentItem=this->ColorMapViewer->
       currentControlPointsItem();
@@ -823,7 +831,7 @@ void pqColorScaleEditor::handleColorPointsChanged()
 /// Update the GUI radio buttons that indicate how to interpret the data when the SM proxy's IndexedLookup property changes
 void pqColorScaleEditor::handleInterpretationChanged()
 {
-  cout << "handleInterpretationChanged\n";
+  vtkDebugMacro(<< "handleInterpretationChanged\n");
   // Only update the radio button states when the proxy change is *not* generated
   // by the user clicking on the radio buttons. :-)
   if ( ! this->Form->InSetInterpretation && this->ColorMap )
@@ -831,23 +839,16 @@ void pqColorScaleEditor::handleInterpretationChanged()
     bool indexedLookup = this->ColorMap->getIndexedLookup();
     this->Form->updateInterpretation( indexedLookup );
     this->pushColors();
-    /*
-    vtkColorTransferFunction* colors =this->currentColorFunction();
-    colors->SetIndexedLookup( indexedLookup );
-    this->pushColors();
-    */
     }
 }
 
 /// A wrapper around loadAnnotations that saves (and restores) the selected annotations before (and after) loading.
 void pqColorScaleEditor::handleAnnotationsChanged()
 {
-  cout << "handleAnnotationsChanged\n";
+  vtkDebugMacro(<< "handleAnnotationsChanged\n");
   if ( ! this->Form->InSetAnnotation )
     {
-    // TODO. Save selection
     this->loadAnnotations();
-    // TODO. Restore selection
     }
 }
 
@@ -1227,7 +1228,7 @@ void pqColorScaleEditor::setScalarButtonColor(const QColor &color)
 
 void pqColorScaleEditor::renderTransferFunctionViews()
 {
-  cout << "renderTransferFunctionViews\n";
+  vtkDebugMacro(<< "renderTransferFunctionViews\n");
   this->ColorMapViewer->renderView();
   if(this->OpacityFunction)
     {
@@ -1237,7 +1238,7 @@ void pqColorScaleEditor::renderTransferFunctionViews()
 
 void pqColorScaleEditor::savePreset()
 {
-  cout << "savePreset\n";
+  vtkDebugMacro(<< "savePreset\n");
   // Get the color preset model from the manager.
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
@@ -1299,7 +1300,7 @@ void pqColorScaleEditor::savePreset()
 
 void pqColorScaleEditor::loadPreset()
 {
-  cout << "loadPreset\n";
+  vtkDebugMacro(<< "loadPreset\n");
   this->Form->Presets->setUsingCloseButton(false);
   if(this->Form->Presets->exec() == QDialog::Accepted)
     {
@@ -1684,7 +1685,7 @@ void pqColorScaleEditor::removeAnnotation()
 
 void pqColorScaleEditor::addActiveValues()
 {
-  cout << "addActiveValues\n";
+  vtkDebugMacro(<< "addActiveValues\n");
   vtkAbstractArray* uniq = this->ActiveUniqueValues;
   if ( ! uniq )
     {
@@ -1725,7 +1726,7 @@ void pqColorScaleEditor::addActiveValues()
       this->Form->AnnotationTree->insertTopLevelItem( nr, valItem );
       ++ nr;
       }
-    //cout << "    " << uniq->GetVariantValue( i ).ToString() << "\n";
+    //vtkDebugMacro(<< "    " << uniq->GetVariantValue( i ).ToString() << "\n");
     }
   // If we added any items, re-render.
   if ( nr != orig )
@@ -1763,6 +1764,186 @@ void pqColorScaleEditor::resetAnnotationSort()
 {
   // Turn off sorting of annotations so drag-and-drop reordering will work.
   this->Form->AnnotationTree->sortByColumn( -1, Qt::DescendingOrder );
+}
+
+// When the order of annotations has changed, or the colors have changed,
+// call this method to reassign colors to each annotation row.
+void pqColorScaleEditor::updateAnnotationColors()
+{
+  QTreeWidget* atab = this->Form->AnnotationTree;
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  if ( ! tf || ! atab )
+    {
+    return;
+    }
+  atab->blockSignals( true );
+  int nc = tf->GetSize();
+  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+  QTreeWidgetItem* valItem;
+  // Find top-most item in list
+  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
+    {
+    last = valItem;
+    }
+  valItem = last;
+  // Traverse list from top down
+  for (int i = 0; valItem; ++i)
+    {
+    if ( nc )
+      {
+      double nodeValue[6];
+      //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
+      tf->GetNodeValue( i % nc, nodeValue );
+      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
+        QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
+      }
+    else
+      {
+      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole, this->Form->NanColor->chosenColor() );
+      }
+    valItem = this->Form->AnnotationTree->itemBelow(valItem);
+    }
+  this->annotationSelectionChanged(); // the selection stays the same, but its color changes...
+  atab->blockSignals( false );
+}
+
+/// When the annotatation selected in the list changes, update the color chooser swatch to show it.
+void pqColorScaleEditor::annotationSelectionChanged()
+{
+  QTreeWidget* atab = this->Form->AnnotationTree;
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  if (!tf || !atab)
+    {
+    return;
+    }
+  QList<QTreeWidgetItem*> seln = atab->selectedItems();
+  if (seln.size() < 1)
+    {
+    return;
+    }
+  QTreeWidgetItem* selectedItem = seln[0];
+  int nc = tf->GetSize();
+  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+  QTreeWidgetItem* valItem;
+  // Find top-most item in list
+  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
+    {
+    last = valItem;
+    }
+  valItem = last;
+  // Traverse list from top down searching for our item and counting colors along the way.
+  for (int i = 0; valItem; ++i)
+    {
+    if ( valItem == selectedItem )
+      {
+      if ( nc )
+        {
+        double nodeValue[6];
+        //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
+        tf->GetNodeValue( i % nc, nodeValue );
+        QColor newColor;
+        newColor.setRgbF(nodeValue[1], nodeValue[2], nodeValue[3]);
+        this->Form->AnnotationSwatch->blockSignals(true);
+        this->Form->AnnotationSwatch->setChosenColor(newColor);
+        this->Form->AnnotationSwatch->blockSignals(false);
+        }
+      else
+        {
+        this->Form->AnnotationSwatch->blockSignals(true);
+        this->Form->AnnotationSwatch->setChosenColor(this->Form->NanColor->chosenColor());
+        this->Form->AnnotationSwatch->blockSignals(false);
+        }
+      return;
+      }
+    valItem = this->Form->AnnotationTree->itemBelow(valItem);
+    }
+}
+
+/**\brief When the annotation swatch color is changed by the user, update the appropriate color transfer control point.
+ *
+ * When the currently selected annotation index is larger than the number of control points in the color transfer
+ * function, we add to the list of control points.
+ * The addition goes as follows: if there are originally N control points and M>N annotations, with annotation P's color
+ * being updated (where N>=P>M) then we add k multiples of N control points until kN>P.
+ * The colors at the new control points duplicate the original N control points.
+ */
+void pqColorScaleEditor::editAnnotationColor(const QColor& newColor)
+{
+  QTreeWidget* atab = this->Form->AnnotationTree;
+  vtkColorTransferFunction* tf = this->currentColorFunction();
+  if (!tf || !atab)
+    {
+    return;
+    }
+  QList<QTreeWidgetItem*> seln = atab->selectedItems();
+  if (seln.size() < 1)
+    {
+    return;
+    }
+  this->Form->AnnotationSwatch->blockSignals(true);
+  QTreeWidgetItem* selectedItem = seln[seln.size() - 1];
+  int nc = tf->GetSize();
+  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+  QTreeWidgetItem* valItem;
+  // Find top-most item in list
+  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
+    {
+    last = valItem;
+    }
+  valItem = last;
+  // Traverse list from top down searching for our item and counting colors along the way.
+  for (int i = 0; valItem; ++i)
+    {
+    if ( valItem == selectedItem )
+      {
+      if ( nc )
+        { // At least one transfer function control point.
+        double nodeValue[6];
+        if ( i >= nc )
+          { // Need to add control points.
+          double xRange[2];
+          tf->GetRange(xRange);
+          // Keep adding control points past point i until we reach a multiple of nc.
+          int nc_mod = (((i + 1) / nc) + ((i + 1) % nc ? 1 : 0)) * nc;
+          for (int j = nc; j < nc_mod; ++j)
+            {
+            tf->GetNodeValue(j % nc, nodeValue);
+            tf->AddRGBPoint(xRange[1] + j + 1, nodeValue[1], nodeValue[2], nodeValue[3], nodeValue[4], nodeValue[5]);
+            }
+          // Now overwrite the i-th entry with the new color
+          tf->GetNodeValue(i, nodeValue);
+          nodeValue[1] = newColor.redF();
+          nodeValue[2] = newColor.greenF();
+          nodeValue[3] = newColor.blueF();
+          tf->SetNodeValue(i, nodeValue);
+          }
+        else
+          { // No need to add control points.
+          tf->GetNodeValue( i % nc, nodeValue );
+          nodeValue[1] = newColor.redF();
+          nodeValue[2] = newColor.greenF();
+          nodeValue[3] = newColor.blueF();
+          tf->SetNodeValue( i, nodeValue );
+          }
+        }
+      else
+        {
+        // No transfer function control points.
+        // Insert NanColor entries up to our selection and then add the new color as the last entry.
+        QColor nan(this->Form->NanColor->chosenColor());
+        for (int j = 0; j < i - 1; ++j)
+          {
+          tf->AddRGBPoint(j / (i - 1.), nan.redF(), nan.greenF(), nan.blueF());
+          }
+        tf->AddRGBPoint(1., newColor.redF(), newColor.greenF(), newColor.blueF());
+        }
+      this->pushColors();
+      this->updateAnnotationColors();
+      break;
+      }
+    valItem = this->Form->AnnotationTree->itemBelow(valItem);
+    }
+  this->Form->AnnotationSwatch->blockSignals(false);
 }
 
 void pqColorScaleEditor::checkForLegend()
@@ -1867,7 +2048,7 @@ void pqColorScaleEditor::cleanupLegend()
 
 void pqColorScaleEditor::loadBuiltinColorPresets()
 {
-  cout << "loadBuiltinColorPresets\n";
+  vtkDebugMacro(<< "loadBuiltinColorPresets\n");
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
   // get builtin color maps xml
@@ -1917,7 +2098,7 @@ void pqColorScaleEditor::loadAnnotations()
     return;
     }
 
-  cout << "loadAnnotations\n";
+  vtkDebugMacro(<< "loadAnnotations\n");
   // Empty previous entries.
   anno->clear();
 
@@ -1932,7 +2113,7 @@ void pqColorScaleEditor::loadAnnotations()
     }
   list = pqSMAdaptor::getMultipleElementProperty( smProp );
   vtkIdType nr = list.size() / 2;
-  cout << "  Fetched " << nr << " rows\n";
+  vtkDebugMacro(<< "  Fetched " << nr << " rows\n");
   //anno->setRowCount( nr -- );
   //for ( int i = 0; (i + 1) < list.size(); i += 2, -- nr )
   this->Form->InSetAnnotation = true;
@@ -1952,14 +2133,14 @@ void pqColorScaleEditor::loadAnnotations()
       valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
       }
     //this->Form->AnnotationTree->insertTopLevelItem( valItem, nr );
-    cout << "   item " << (i/2) << " or " << (nr -(i/2)-1) << ": " << list[i].toString().toStdString() << endl;
+    vtkDebugMacro(<< "   item " << (i/2) << " or " << (nr -(i/2)-1) << ": " << list[i].toString().toStdString() << endl);
     }
   this->Form->InSetAnnotation = false;
 }
 
 void pqColorScaleEditor::loadColorPoints()
 {
-  cout << "loadColorPoints\n";
+  vtkDebugMacro(<< "loadColorPoints\n");
   vtkColorTransferFunction *colors = this->currentColorFunction();
   if(!colors)
     {
@@ -2000,7 +2181,7 @@ void pqColorScaleEditor::loadColorPoints()
 }
 void pqColorScaleEditor::loadOpacityPoints()
 {
-  cout << "loadOpacityPoints\n";
+  vtkDebugMacro(<< "loadOpacityPoints\n");
   vtkPiecewiseFunction *opacities = this->currentOpacityFunction();
   if(!opacities || !this->OpacityFunction)
     {
@@ -2026,7 +2207,7 @@ void pqColorScaleEditor::loadOpacityPoints()
 
 void pqColorScaleEditor::initColorScale()
 {
-  cout << "initColorScale\n";
+  vtkDebugMacro(<< "initColorScale\n");
   // Clear any pending changes and clear the current point index.
 
   // Ignore changes during editor setup.
@@ -2216,61 +2397,20 @@ void pqColorScaleEditor::initColorScale()
 
 void pqColorScaleEditor::enablePointControls()
 {
-  cout << "enablePointControls\n";
+  vtkDebugMacro(<< "enablePointControls\n");
   this->enableColorPointControls();
   this->enableOpacityPointControls();
 }
 
 void pqColorScaleEditor::updatePointValues()
 {
-  cout << "updatePointValues\n";
+  vtkDebugMacro(<< "updatePointValues\n");
   this->Form->InSetColors = true;
   this->loadColorPoints();
   this->loadOpacityPoints();
   this->updateCurrentColorPoint();
   this->updateCurrentOpacityPoint();
   this->Form->InSetColors = false;
-}
-
-// When the order of annotations has changed, or the colors have changed,
-// call this method to reassign colors to each annotation row.
-void pqColorScaleEditor::updateAnnotationColors()
-{
-  QTreeWidget* atab = this->Form->AnnotationTree;
-  vtkColorTransferFunction* tf = this->currentColorFunction();
-  if ( ! tf || ! atab )
-    {
-    return;
-    }
-  atab->blockSignals( true );
-  int total = atab->topLevelItemCount();
-  int nc = tf->GetSize();
-  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
-  QTreeWidgetItem* valItem;
-  // Find top-most item in list
-  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
-    {
-    last = valItem;
-    }
-  valItem = last;
-  // Traverse list from top down
-  for (int i = 0; valItem; ++i)
-    {
-    if ( nc )
-      {
-      double nodeValue[6];
-      //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
-      tf->GetNodeValue( i % nc, nodeValue );
-      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
-        QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
-      }
-    else
-      {
-      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole, this->Form->NanColor->chosenColor() );
-      }
-    valItem = this->Form->AnnotationTree->itemBelow(valItem);
-    }
-  atab->blockSignals( false );
 }
 
 void pqColorScaleEditor::enableRescaleControls(bool enable)
@@ -2474,7 +2614,7 @@ void pqColorScaleEditor::makeDefault()
 //-----------------------------------------------------------------------------
 void pqColorScaleEditor::initTransferFunctionView()
 {
-  cout << "initTransferFunctionView\n";
+  vtkDebugMacro(<< "initTransferFunctionView\n");
   this->Form->ColorFunctionConnect->Disconnect();
   this->Form->OpacityFunctionConnect->Disconnect();
   this->ColorMapViewer->clearPlots();
@@ -2488,7 +2628,7 @@ void pqColorScaleEditor::initTransferFunctionView()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::onColorPlotAdded(vtkPlot* plot)
 {
-  cout << "onColorPlotAdded\n";
+  vtkDebugMacro(<< "onColorPlotAdded\n");
   if (vtkControlPointsItem::SafeDownCast(plot))
     {
     this->Form->ColorFunctionConnect->Connect(plot,
@@ -2511,7 +2651,7 @@ void pqColorScaleEditor::onColorPlotAdded(vtkPlot* plot)
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::onOpacityPlotAdded(vtkPlot* plot)
 {
-  cout << "onOpacityPlotAdded\n";
+  vtkDebugMacro(<< "onOpacityPlotAdded\n");
   if (vtkControlPointsItem::SafeDownCast(plot))
     {
     this->Form->OpacityFunctionConnect->Connect(plot,
@@ -2530,7 +2670,7 @@ void pqColorScaleEditor::onOpacityPlotAdded(vtkPlot* plot)
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateCurrentColorPoint()
 {
-  cout << "updateCurrentColorPoint\n";
+  vtkDebugMacro(<< "updateCurrentColorPoint\n");
   this->enableColorPointControls();
   double range[2]={0,1};
   bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
@@ -2577,7 +2717,6 @@ void pqColorScaleEditor::updateCurrentColorPoint()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateCurrentOpacityPoint()
 {
-  cout << "updateCurrentOpacityPoint\n";
   this->enableOpacityPointControls();
   double range[2]={0,1};
   bool singleScalar = this->internalScalarRange(range) && range[0]==range[1];
@@ -2603,6 +2742,7 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
         }
       else
         {
+        vtkDebugMacro(<< "updateCurrentOpacityPoint\n");
         currentItem->GetControlPoint(i, scalar);
         double opacity = scalar[1];
         this->Form->Opacity->setText(QString::number(opacity, 'g', 6));
@@ -2641,7 +2781,7 @@ void pqColorScaleEditor::updateCurrentOpacityPoint()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::enableColorPointControls()
 {
-  cout << "enableColorPointControls\n";
+  vtkDebugMacro(<< "enableColorPointControls\n");
   vtkControlPointsItem* currentItem=this->ColorMapViewer->
     currentControlPointsItem();
   double range[2]={0,1};
@@ -2673,7 +2813,7 @@ void pqColorScaleEditor::enableColorPointControls()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::enableOpacityPointControls()
 {
-  cout << "enableOpacityPointControls\n";
+  vtkDebugMacro(<< "enableOpacityPointControls\n");
   vtkControlPointsItem* currentItem=this->OpacityFunctionViewer->
     currentControlPointsItem();
   double range[2]={0,1};
@@ -2746,7 +2886,7 @@ bool pqColorScaleEditor::internalScalarRange(double* range)
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateColorFunctionVisibility()
 {
-  cout << "updateColorFunctionVisibility\n";
+  vtkDebugMacro(<< "updateColorFunctionVisibility\n");
   double range[2]={0.0, 1.0};
   if(this->internalScalarRange(range))
     {
@@ -2771,7 +2911,7 @@ void pqColorScaleEditor::updateColorFunctionVisibility()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateOpacityFunctionVisibility()
 {
-  cout << "updateOpacityFunctionVisibility\n";
+  vtkDebugMacro(<< "updateOpacityFunctionVisibility\n");
   double range[2]={0.0, 1.0};
   if(this->internalScalarRange(range))
     {
@@ -2801,6 +2941,7 @@ void pqColorScaleEditor::renderViewOptionally()
 {
   if(this->Display && this->Form->checkBoxImmediateRender->isChecked())
     {
+    vtkDebugMacro(<< "Render requested");
     this->Display->renderViewEventually();
     }
 }
@@ -2868,7 +3009,7 @@ void pqColorScaleEditor::setEnableOpacityMapping(int enable)
 void pqColorScaleEditor::setInterpretation( int buttonId )
 {
   bool indexedLookup = ( buttonId == PQ_INTERPRET_CATEGORY );
-  cout << "setInterpretation(" << buttonId << "=" << ( indexedLookup ? "t" : "f" ) << ")\n";
+  vtkDebugMacro(<< "setInterpretation(" << buttonId << "=" << ( indexedLookup ? "t" : "f" ) << ")\n");
   this->Form->InSetInterpretation = true;
   vtkColorTransferFunction* colors = this->currentColorFunction();
   colors->SetIndexedLookup( indexedLookup );
@@ -2884,7 +3025,7 @@ void pqColorScaleEditor::setInterpretation( int buttonId )
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateDisplay()
 {
-  cout << "updateDisplay\n";
+  vtkDebugMacro(<< "updateDisplay\n");
   if(this->Form->InSetColors)
     {
     return;
@@ -2911,7 +3052,7 @@ void pqColorScaleEditor::updateDisplay()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::unsetCurrentPoints()
 {
-  cout << "unsetCurrentPoints\n";
+  vtkDebugMacro(<< "unsetCurrentPoints\n");
   vtkControlPointsItem* currentItem=this->ColorMapViewer->
     currentControlPointsItem();
   if(currentItem)
@@ -2929,7 +3070,7 @@ void pqColorScaleEditor::unsetCurrentPoints()
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::setActiveUniqueValues( vtkAbstractArray* arr )
 {
-  cout << "setActiveUniqueValues\n";
+  vtkDebugMacro(<< "setActiveUniqueValues\n");
   if ( this->ActiveUniqueValues == arr )
     return;
 
@@ -2988,13 +3129,14 @@ bool pqColorScaleEditor::eventFilter( QObject* src, QEvent* event )
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateColors()
 {
-  cout << "updateColors\n";
+  vtkDebugMacro(<< "updateColors\n");
   this->updateCurrentColorPoint();
   this->pushColors();
 }
 // ----------------------------------------------------------------------------
 void pqColorScaleEditor::updateOpacity()
 {
+  vtkDebugMacro(<< "updateOpacity\n");
   this->updateCurrentOpacityPoint();
   this->pushOpacity();
 }

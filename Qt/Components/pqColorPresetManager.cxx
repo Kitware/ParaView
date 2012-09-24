@@ -541,7 +541,7 @@ pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *ele
     ilkup == "on" ||
     ilkup == "On" ||
     ilkup == "ON" );
-  cout << element->GetAttribute( "name" ) << " indexedLookup is " << ilkup.toAscii().data() << " (" << ( indexedLookup ? "T" : "F" ) << ")\n";
+  //cout << element->GetAttribute( "name" ) << " indexedLookup is " << ilkup.toAscii().data() << " (" << ( indexedLookup ? "T" : "F" ) << ")\n";
   colorMap.setIndexedLookup( indexedLookup );
 
   // Loop through the point elements.

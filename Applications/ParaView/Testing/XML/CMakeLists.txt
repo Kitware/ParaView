@@ -69,6 +69,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColorScalarBar1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
