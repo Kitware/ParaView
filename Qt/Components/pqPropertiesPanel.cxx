@@ -446,6 +446,22 @@ pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *prop
                                                              vtkSMProxy *proxy,
                                                              QWidget *parent)
 {
+  // check for custom widgets
+  pqInterfaceTracker *interfaceTracker =
+    pqApplicationCore::instance()->interfaceTracker();
+  foreach(pqPropertyWidgetInterface *interface,
+          interfaceTracker->interfaces<pqPropertyWidgetInterface *>())
+    {
+    pqPropertyWidget *widget =
+      interface->createWidgetForProperty(proxy, property);
+
+    if(widget)
+      {
+      // stop if we successfully created a property widget
+      return widget;
+      }
+    }
+
   if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
     {
     return new pqDoubleVectorPropertyWidget(dvp, proxy, parent);
@@ -1187,24 +1203,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       continue;
       }
 
-    pqPropertyWidget *propertyWidget = 0;
-
-    pqInterfaceTracker *interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-    foreach(pqPropertyWidgetInterface *interface, interfaceTracker->interfaces<pqPropertyWidgetInterface *>())
-      {
-      propertyWidget = interface->createWidgetForProperty(smProxy, smProperty);
-
-      if(propertyWidget)
-        {
-        // stop if we successfully created a property widget
-        break;
-        }
-      }
-
-    if(!propertyWidget)
-      {
-      propertyWidget = this->createWidgetForProperty(smProperty, smProxy, this);
-      }
+    // create property widget
+    pqPropertyWidget *propertyWidget =
+      this->createWidgetForProperty(smProperty, smProxy, this);
 
     if(propertyWidget)
       {
