@@ -176,7 +176,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->UseInteractiveRenderingForSceenshots = false;
   this->UseOffscreenRendering = (options->GetUseOffscreenRendering() != 0);
   this->Selector = vtkPVHardwareSelector::New();
-  this->SynchronizationCounter  = 0;
   this->PreviousParallelProjectionStatus = 0;
   this->NeedsOrderedCompositing = false;
 
@@ -377,9 +376,6 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
   vtkPVDataRepresentation* dataRep = vtkPVDataRepresentation::SafeDownCast(rep);
   if (dataRep != NULL)
     {
-    // We only increase that counter when widget are not involved as in
-    // collaboration mode only the master has the widget in its representation
-    this->SynchronizationCounter++;
     this->Internals->DeliveryManager->RegisterRepresentation(dataRep);
     }
 
@@ -393,10 +389,6 @@ void vtkPVRenderView::RemoveRepresentationInternal(vtkDataRepresentation* rep)
   if (dataRep != NULL)
     {
     this->Internals->DeliveryManager->UnRegisterRepresentation(dataRep);
-
-    // We only increase that counter when widget are not involved as in
-    // collaboration mode only the master has the widget in its representation
-    this->SynchronizationCounter++;
     }
 
   this->Superclass::RemoveRepresentationInternal(rep);
@@ -716,21 +708,23 @@ bool vtkPVRenderView::TestCollaborationCounter()
 
   if (this->SynchronizedWindows->GetMode() == vtkPVSynchronizedRenderWindows::CLIENT)
     {
-    r_controller->Send(&this->SynchronizationCounter, 1, 1, 41000);
-    unsigned int server_sync_counter;
+    int magicNumber = this->GetDeliveryManager()->GetSynchronizationMagicNumber();
+    r_controller->Send(&magicNumber, 1, 1, 41000);
+    int server_sync_counter;
     r_controller->Receive(&server_sync_counter, 1, 1, 41001);
-    return (server_sync_counter == this->SynchronizationCounter);
+    return (server_sync_counter == magicNumber);
     }
   else
     {
     bool counterSynchronizedSuccessfully = false;
     if (r_controller)
       {
-      unsigned int client_sync_counter;
+      int client_sync_counter;
+      int magicNumber = this->GetDeliveryManager()->GetSynchronizationMagicNumber();
       r_controller->Receive(&client_sync_counter, 1, 1, 41000);
-      r_controller->Send(&this->SynchronizationCounter, 1, 1, 41001 );
+      r_controller->Send(&magicNumber, 1, 1, 41001 );
       counterSynchronizedSuccessfully =
-        (client_sync_counter == this->SynchronizationCounter);
+        (client_sync_counter == magicNumber);
       }
 
     if (p_controller)

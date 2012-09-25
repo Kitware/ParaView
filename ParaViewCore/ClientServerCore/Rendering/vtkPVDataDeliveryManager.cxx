@@ -895,3 +895,18 @@ void vtkPVDataDeliveryManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+int vtkPVDataDeliveryManager::GetSynchronizationMagicNumber()
+{
+  const int prime = 31;
+  int result = 1;
+  result = prime * result + static_cast<int>(this->Internals->ItemsMap.size());
+  vtkInternals::ItemsMapType::iterator iter = this->Internals->ItemsMap.begin();
+  for(;iter != this->Internals->ItemsMap.end(); iter++)
+    {
+    result = prime * result + static_cast<int>(iter->first);
+    }
+
+  return result;
+}
