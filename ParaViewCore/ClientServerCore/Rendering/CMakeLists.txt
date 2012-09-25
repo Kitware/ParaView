@@ -33,7 +33,6 @@ set (Module_SRCS
   vtkAMROutlineRepresentation.cxx
   vtkAMRStreamingPriorityQueue.cxx
   vtkAMRStreamingVolumeRepresentation.cxx
-  vtkAMRVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkClientServerMoveData.cxx

@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set(Module_SRCS
-  vtkAMRIncrementalResampleHelper.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
   vtkBSPCutsGenerator.cxx
