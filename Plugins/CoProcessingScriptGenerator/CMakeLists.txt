@@ -99,4 +99,6 @@ IF (BUILD_TESTING AND BUILD_SHARED_LIBS)
   add_client_tests("pv"
     TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
   SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
+  # we overwrite existing labels so we have to add both ParaView and Catalyst.
+  SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES LABELS "PARAVIEW CATALYST")
 ENDIF (BUILD_TESTING AND BUILD_SHARED_LIBS)

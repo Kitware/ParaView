@@ -41,6 +41,8 @@ add_test(NAME CoProcessingTestPythonScript
           -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
           -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 
+set_tests_properties(CoProcessingTestPythonScript PROPERTIES LABELS "PARAVIEW CATALYST")
+
 if (PARAVIEW_USE_MPI)
   add_test(NAME PCoProcessingTestPythonScript
           COMMAND ${CMAKE_COMMAND}
@@ -58,8 +60,8 @@ if (PARAVIEW_USE_MPI)
   # both the parallel and the serial tests create the same output images
   # so we run this one serially so that they don't interfere.
   set_tests_properties(PCoProcessingTestPythonScript PROPERTIES RUN_SERIAL ON)
+  set_tests_properties(PCoProcessingTestPythonScript PROPERTIES LABELS "PARAVIEW CATALYST")
 endif()
-
 
 if (PARAVIEW_BUILD_QT_GUI)
   add_test(NAME CoProcessingFullWorkflow
@@ -73,4 +75,5 @@ if (PARAVIEW_BUILD_QT_GUI)
            -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
            -DCOPROCESSING_OUTPUTCHECK_SCRIPT:FILEPATH=${CMAKE_CURRENT_SOURCE_DIR}/outputcheck.py
            -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingFullWorkflowTest.cmake)
+  set_tests_properties(CoProcessingFullWorkflow PROPERTIES LABELS "PARAVIEW CATALYST")
 endif()
