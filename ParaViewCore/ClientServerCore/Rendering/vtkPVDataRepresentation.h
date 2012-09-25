@@ -64,6 +64,25 @@ public:
   virtual void MarkModified();
 
   // Description:
+  // Initialize the representation with an identifier range so each internal
+  // representation can own a unique ID.
+  // If a representation requires more IDs than the set of ids provided,
+  // the representation MUST complains by an error or abort explaining how many
+  // ids where expected so the number of reserved ids could be easily adjust.
+  // Unless noted otherwise, this method must be called before calling any
+  // other methods on this class.
+  // @CallOnAllProcessess
+  // Internally you can pick an id that follow that condition
+  // minIdAvailable <= id <= maxIdAvailable
+  // Return the minIdAvailable after initialization so that new range could be used
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
+  // Description:
+  // Return 0 if the Initialize() method was not called otherwise a unique ID
+  // that will be shared across the processes for that same object.
+  unsigned int GetUniqueIdentifier() { return this->UniqueIdentifier; }
+
+  // Description:
   // Get/Set the visibility for this representation. When the visibility of
   // representation of false, all view passes are ignored.
   virtual void SetVisibility(bool val)
@@ -172,6 +191,7 @@ protected:
 
   double UpdateTime;
   bool UpdateTimeValid;
+  unsigned int UniqueIdentifier;
 private:
   vtkPVDataRepresentation(const vtkPVDataRepresentation&); // Not implemented
   void operator=(const vtkPVDataRepresentation&); // Not implemented

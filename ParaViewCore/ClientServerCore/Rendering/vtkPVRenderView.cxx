@@ -83,12 +83,8 @@ class vtkPVRenderView::vtkInternals
   std::map<int, vtkWeakPointer<vtkPVDataRepresentation> > PropMap;
 
 public:
-  unsigned int UniqueId;
   vtkNew<vtkPVDataDeliveryManager> DeliveryManager;
 
-  vtkInternals() : UniqueId(1)
-  {
-  }
   void RegisterSelectionProp(
     int id, vtkProp*, vtkPVDataRepresentation* rep)
     {
@@ -384,8 +380,7 @@ void vtkPVRenderView::AddRepresentationInternal(vtkDataRepresentation* rep)
     // We only increase that counter when widget are not involved as in
     // collaboration mode only the master has the widget in its representation
     this->SynchronizationCounter++;
-    unsigned int id = this->Internals->UniqueId++;
-    this->Internals->DeliveryManager->RegisterRepresentation(id, dataRep);
+    this->Internals->DeliveryManager->RegisterRepresentation(dataRep);
     }
 
   this->Superclass::AddRepresentationInternal(rep);

@@ -56,6 +56,9 @@ public:
   // Called after the view updates.
   virtual void ViewUpdated(vtkSMProxy* view);
 
+  // Description:
+  // Overridden to reserve additional IDs for use by internal composite representation
+  virtual vtkTypeUInt32 GetGlobalID();
 //BTX
 protected:
   vtkSMRepresentationProxy();

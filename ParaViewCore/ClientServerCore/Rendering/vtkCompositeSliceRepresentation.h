@@ -72,6 +72,11 @@ public:
   // Override to provide input array name regardless if any slice cut the actual data.
   virtual vtkDataObject* GetRenderedDataObject(int port);
 
+  // Description:
+  // Override because of internal composite representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
 //BTX
 protected:
   vtkCompositeSliceRepresentation();

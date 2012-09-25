@@ -51,9 +51,8 @@ public:
   // makes it possible for representations to communicate with the storage
   // directly using a self pointer, while enables views on different processes
   // to communicate information about representations using their unique ids.
-  void RegisterRepresentation(unsigned int id, vtkPVDataRepresentation*);
+  void RegisterRepresentation(vtkPVDataRepresentation *repr);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
-  unsigned int GetRepresentationId(vtkPVDataRepresentation*);
   vtkPVDataRepresentation* GetRepresentation(unsigned int);
 
   // Description:
