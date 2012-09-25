@@ -784,25 +784,20 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     *css << location << name;
     }
 
-  int haveUniqueValues = this->UniqueValues ? 1 : 0;
-  *css << haveUniqueValues;
-  if (haveUniqueValues)
+  int numberOfUniqueValueComponents = this->UniqueValues ? this->UniqueValues->size() : 0;
+  *css << numberOfUniqueValueComponents;
+  if (numberOfUniqueValueComponents)
     {
-    for ( vtkIdType i = 0; i < this->GetNumberOfComponents(); ++ i )
+    // Iterate over component numbers:
+    vtkInternalUniqueValues::iterator cit;
+    for (cit = this->UniqueValues->begin(); cit != this->UniqueValues->end(); ++cit)
       {
-      unsigned nuv = (*this->UniqueValues)[i].size();
-      *css << i << nuv;
-      if ( nuv )
+      unsigned nuv = cit->second.size();
+      *css << cit->first << nuv;
+      vtkInternalUniqueValues::mapped_type::iterator vit;
+      for (vit = cit->second.begin(); vit != cit->second.end(); ++ vit)
         {
-        vtkVariantArray* aa = vtkVariantArray::New();
-        aa->Allocate( nuv );
-        vtkInternalUniqueValues::mapped_type::iterator vit = (*this->UniqueValues)[i].begin();
-        for ( vit = (*this->UniqueValues)[i].begin(); vit != (*this->UniqueValues)[i].end(); ++ vit )
-          {
-          aa->InsertNextValue( *vit );
-          }
-        *css << aa;
-        aa->Delete();
+        *css << *vit;
         }
       }
     }
@@ -934,55 +929,51 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     this->AddInformationKey(key_location, key_name);
     }
 
-  int haveUniqueVals;
-  if ( ! css->GetArgument( 0, pos++, &haveUniqueVals ) )
+  int numberOfUniqueValueComponents;
+  if ( ! css->GetArgument( 0, pos++, &numberOfUniqueValueComponents ) )
     {
     vtkErrorMacro("Error parsing unique value existence from message.");
     return;
     }
-  if ( ! haveUniqueVals && this->UniqueValues )
+  if ( ! numberOfUniqueValueComponents && this->UniqueValues )
     {
     delete this->UniqueValues;
     this->UniqueValues = 0;
     }
-  else if ( haveUniqueVals )
+  else if ( numberOfUniqueValueComponents )
     {
     if ( ! this->UniqueValues )
       {
       this->UniqueValues = new vtkInternalUniqueValues;
       }
-    unsigned nuv;
-    for ( int i = 0; i < this->NumberOfComponents; ++ i )
+    else
       {
+      this->UniqueValues->clear();
+      }
+    for ( int i = 0; i < numberOfUniqueValueComponents; ++ i )
+      {
+      int component;
+      if (!css->GetArgument(0, pos++, &component))
+        {
+        vtkErrorMacro( "Error decoding the " << i << "-th unique-value component ID." );
+        return;
+        }
+      unsigned nuv;
       if ( ! css->GetArgument( 0, pos++, &nuv ) )
         {
         vtkErrorMacro( "Error decoding the number of unique values for component " << i );
         return;
         }
-      vtkAbstractArray* aa;
-      vtkObjectBase* obj;
-      if ( ! css->GetArgument( 0, pos++, &obj ) || ! obj )
+      for (unsigned j = 0; j < nuv; ++j)
         {
-        vtkErrorMacro( "Error decoding the list of unique values for component " << i );
-        return;
+        vtkVariant val;
+        if (!css->GetArgument(0, pos, &val))
+          {
+          vtkErrorMacro("Error decoding the " << j << "-th unique value for component " << i);
+          return;
+          }
+        (*this->UniqueValues)[component].insert(val);
         }
-      aa = vtkAbstractArray::SafeDownCast( obj );
-      if ( ! aa )
-        {
-        vtkErrorMacro(
-          << "Received " << obj->GetClassName() << " instead of vtkAbstractArray "
-          << "for list of unique values for component " << i );
-        obj->Delete();
-        return;
-        }
-      vtkInternalUniqueValues::mapped_type empty;
-      vtkInternalUniqueValues::value_type blank( i, empty );
-      this->UniqueValues->insert( blank );
-      for ( vtkIdType vi = 0; vi <= aa->GetMaxId(); ++ vi )
-        {
-        (*this->UniqueValues)[i].insert( aa->GetVariantValue( vi ) );
-        }
-      aa->Delete();
       }
     }
 }
