@@ -80,6 +80,9 @@ void coprocessorinitialize(char* pythonFileName, int* pythonFileNameLength )
 {
   if(!ParaViewCoProcessing::coProcessor)
     {
+    ParaViewCoProcessing::coProcessor = vtkCPProcessor::New();
+    ParaViewCoProcessing::coProcessor->Initialize();
+
     char cPythonFileName[200];
     ParaViewCoProcessing::ConvertFortranStringToCString(
       pythonFileName, *pythonFileNameLength, cPythonFileName, 200);
@@ -87,8 +90,6 @@ void coprocessorinitialize(char* pythonFileName, int* pythonFileNameLength )
     vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
     pipeline->Initialize(cPythonFileName);
 
-    ParaViewCoProcessing::coProcessor = vtkCPProcessor::New();
-    ParaViewCoProcessing::coProcessor->Initialize();
     ParaViewCoProcessing::coProcessor->AddPipeline(pipeline);
     pipeline->Delete();
     }
@@ -184,9 +185,6 @@ void needtocreategrid(int* needGrid)
       if(multiBlock)
         {
         vtkCompositeDataIterator* iter = multiBlock->NewIterator();
-        iter->VisitOnlyLeavesOn();
-        iter->TraverseSubTreeOn();
-        iter->SkipEmptyNodesOn();
         iter->InitTraversal();
         for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
           {
