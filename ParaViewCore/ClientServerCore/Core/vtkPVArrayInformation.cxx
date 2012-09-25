@@ -665,7 +665,7 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
   // values -- as long as there are not too many values already in the list. We also accumulate each
   // component's value into a vtkVariantArray named tuple, which is added to the list of unique vectors
   // -- again assuming it is not already too long.
-  for ( vtkIdType i = 0; i < this->GetNumberOfTuples() && ndc && tuple; ++ i )
+  for ( vtkIdType i = 0; i < this->GetNumberOfTuples() && ndc; ++ i )
     {
     // First, do per-component insert.
     for ( int j = 0; j < nc; ++ j )
@@ -784,7 +784,8 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     *css << location << name;
     }
 
-  int numberOfUniqueValueComponents = this->UniqueValues ? this->UniqueValues->size() : 0;
+  int numberOfUniqueValueComponents = static_cast<int>(
+    this->UniqueValues ? this->UniqueValues->size() : 0);
   *css << numberOfUniqueValueComponents;
   if (numberOfUniqueValueComponents)
     {
@@ -792,7 +793,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
     vtkInternalUniqueValues::iterator cit;
     for (cit = this->UniqueValues->begin(); cit != this->UniqueValues->end(); ++cit)
       {
-      unsigned nuv = cit->second.size();
+      unsigned nuv = static_cast<unsigned>(cit->second.size());
       *css << cit->first << nuv;
       vtkInternalUniqueValues::mapped_type::iterator vit;
       for (vit = cit->second.begin(); vit != cit->second.end(); ++ vit)
@@ -1023,7 +1024,7 @@ void vtkPVArrayInformation::AddUniqueInformationKey(const char* location,
 
 int vtkPVArrayInformation::GetNumberOfInformationKeys()
 {
-  return (this->InformationKeys ? this->InformationKeys->size() : 0);
+  return static_cast<int>(this->InformationKeys ? this->InformationKeys->size() : 0);
 }
 
 const char* vtkPVArrayInformation::GetInformationKeyLocation(int index)
@@ -1071,7 +1072,7 @@ void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
     {
     cit = info->UniqueValues->find( i );
     vtkInternalUniqueValues::mapped_type::iterator vit; // iterator over values of component cit->first.
-    bool tooManyValues;
+    bool tooManyValues = false;
     if ( cit == info->UniqueValues->end() )
       { // info had too many values to be rendered as categorical data.
       tooManyValues = true;
@@ -1101,7 +1102,7 @@ vtkAbstractArray* vtkPVArrayInformation::GetUniqueComponentValuesIfFDiscrete( in
   if (
     ! this->UniqueValues ||
     ( compEntry = this->UniqueValues->find( component ) ) == this->UniqueValues->end() ||
-    ( nv = compEntry->second.size() ) == 0
+    ( nv = static_cast<unsigned>(compEntry->second.size()) ) == 0
     )
     return 0;
 
