@@ -62,6 +62,7 @@ set(Module_SRCS
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVMergeTables.cxx
+  vtkPVMergeTablesMultiBlock.cxx
   vtkPVPlotTime.cxx
   vtkPVRecoverGeometryWireframe.cxx
   vtkPVRenderViewProxy.cxx

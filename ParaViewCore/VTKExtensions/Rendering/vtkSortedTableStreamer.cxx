@@ -43,7 +43,6 @@
 #include "vtkIntArray.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
-#include "vtkPVMergeTables.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkDoubleArray.h"

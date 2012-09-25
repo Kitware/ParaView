@@ -3448,22 +3448,28 @@
           </RequiredProperties>
         </FieldDataDomain>
       </IntVectorProperty>
-      <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="0"
+      <IntVectorProperty clean_command="ResetCompositeDataSetIndices"
+                         command="AddCompositeDataSetIndex"
+                         default_values="1"
+			 number_of_elements="1"
                          name="CompositeDataSetIndex"
-                         number_of_elements="1">
-        <Documentation>In case of Composite datasets, set the flat index of the
-        dataset to pass. The flat index must point to a non-empty,
-        non-composite dataset for anything to be passed through. If the input
-        is not a composite dataset, then this index is ignored.</Documentation>
-        <CompositeTreeDomain mode="leaves"
+                         number_of_elements_per_command="1"
+                         panel_visibility="default"
+                         repeat_command="1">
+        <CompositeTreeDomain mode="all"
                              name="tree">
           <RequiredProperties>
             <Property function="Input"
                       name="Input" />
           </RequiredProperties>
         </CompositeTreeDomain>
+        <Documentation>This property lists the ids of the blocks to extract
+        from the input multiblock dataset.</Documentation>
       </IntVectorProperty>
+
+
+
+
       <StringVectorProperty element_types="2"
                             information_only="1"
                             name="SeriesNamesInfo"
@@ -3608,7 +3614,7 @@
         </FieldDataDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="0"
+                         default_values="1"
                          name="CompositeDataSetIndex"
                          number_of_elements="1">
         <Documentation>In case of Composite datasets, set the flat index of the
@@ -3773,7 +3779,7 @@
         </FieldDataDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetCompositeDataSetIndex"
-                         default_values="0"
+                         default_values="1"
                          name="CompositeDataSetIndex"
                          number_of_elements="1">
         <Documentation>In case of Composite datasets, set the flat index of the
