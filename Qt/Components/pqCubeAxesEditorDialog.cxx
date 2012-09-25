@@ -234,6 +234,7 @@ void pqCubeAxesEditorDialog::done(int res)
     BEGIN_UNDO_SET("Cube Axes Parameters");
     this->Internal->PropertyManager->accept();
     END_UNDO_SET();
+    pqApplicationCore::instance()->render();
     }
   this->Superclass::done(res);
 }

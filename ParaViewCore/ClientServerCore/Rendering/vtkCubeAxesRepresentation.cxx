@@ -387,6 +387,7 @@ void vtkCubeAxesRepresentation::SetXTitle(const char* val)
 void vtkCubeAxesRepresentation::SetXAxisVisibility(int val)
 {
   this->CubeAxesActor->SetXAxisVisibility(val);
+  this->CubeAxesActor->SetXAxisLabelVisibility(val);
 }
 
 //----------------------------------------------------------------------------
@@ -417,6 +418,7 @@ void vtkCubeAxesRepresentation::SetYTitle(const char* val)
 void vtkCubeAxesRepresentation::SetYAxisVisibility(int val)
 {
   this->CubeAxesActor->SetYAxisVisibility(val);
+  this->CubeAxesActor->SetYAxisLabelVisibility(val);
 }
 
 //----------------------------------------------------------------------------
@@ -447,6 +449,7 @@ void vtkCubeAxesRepresentation::SetZTitle(const char* val)
 void vtkCubeAxesRepresentation::SetZAxisVisibility(int val)
 {
   this->CubeAxesActor->SetZAxisVisibility(val);
+  this->CubeAxesActor->SetZAxisLabelVisibility(val);
 }
 
 //----------------------------------------------------------------------------
