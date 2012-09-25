@@ -54,6 +54,7 @@ vtkPVOptions::vtkPVOptions()
   this->ClientMode = 0;
   this->ServerMode = 0;
   this->MultiClientMode = 0;
+  this->MultiClientModeWithErrorMacro = 0;
   this->MultiServerMode = 0;
 
   this->RenderServerMode = 0;
@@ -163,6 +164,12 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument("--multi-clients", 0, &this->MultiClientMode,
                            "Allow server to keep listening for serveral client to"
                            "connect to it and share the same visualization session.",
+                           vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--multi-clients-debug", 0, &this->MultiClientModeWithErrorMacro,
+                           "Allow server to keep listening for serveral client to"
+                           "connect to it and share the same visualization session."
+                           "While keeping the error macro on the server session for debug.",
                            vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--multi-servers", 0, &this->MultiServerMode,

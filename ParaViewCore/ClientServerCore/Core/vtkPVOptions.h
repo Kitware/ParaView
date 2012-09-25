@@ -123,7 +123,9 @@ public:
   // Is this server was started for collaboration meaning that it allow
   // several clients to connect to the same server and share the same
   // pipeline and visualization.
-  vtkGetMacro(MultiClientMode, int);
+  virtual int GetMultiClientMode()
+  { return (this->MultiClientMode || this->MultiClientModeWithErrorMacro) ?1:0; }
+  virtual int IsMultiClientModeDebug() { return this->MultiClientModeWithErrorMacro; }
 
   // Description:
   // Is this client allow multiple server connection in parallel
@@ -215,6 +217,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
   int MultiClientMode;
+  int MultiClientModeWithErrorMacro;
   int MultiServerMode;
 
   int SymmetricMPIMode;

@@ -19,28 +19,29 @@
 #include "vtkClientServerInterpreterInitializer.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkPVInstantiator.h"
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSIProxy.h"
-#include "vtkPVSession.h"
-#include "vtkReservedRemoteObjectIds.h"
 #include "vtkPVInformation.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVOptions.h"
-#include "vtkProcessModule.h"
-#include "vtkSMMessage.h"
-#include "vtkSIProxyDefinitionManager.h"
+#include "vtkPVSession.h"
 #include "vtkPVSessionCoreInterpreterHelper.h"
+#include "vtkProcessModule.h"
+#include "vtkReservedRemoteObjectIds.h"
+#include "vtkSIProxy.h"
+#include "vtkSIProxyDefinitionManager.h"
+#include "vtkSMMessage.h"
 #include "vtkSmartPointer.h"
 
-#include "assert.h"
+#include <assert.h>
 #include <fstream>
 #include <set>
 #include <string>
 #include <vtksys/ios/sstream>
+
 
 #define LOG(x)\
   if (this->LogStream)\
@@ -87,7 +88,17 @@ class vtkPVSessionCore::vtkInternals
 public:
   vtkInternals()
     {
-    }
+    this->DisableErrorMacro = false;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if(pm)
+      {
+      if(vtkPVOptions *options = pm->GetOptions())
+        {
+        this->DisableErrorMacro =
+            (options->GetMultiClientMode() && !options->IsMultiClientModeDebug());
+        }
+      }
+  }
   ~vtkInternals()
     {
     // Remove SIObjects inter-dependency
@@ -232,6 +243,9 @@ public:
   unsigned long InterpreterObserverID;
   std::map<vtkTypeUInt32, vtkSMMessage > MessageCacheMap;
   std::set<int> KnownClients;
+  // Used for collaboration as client may trigger invalid server request when
+  // they are in a transitional state.
+  bool DisableErrorMacro;
 };
 
 //****************************************************************************/
@@ -259,6 +273,7 @@ vtkPVSessionCore::vtkPVSessionCore()
   helper->Delete();
 
   this->Internals = new vtkInternals();
+  helper->SetLogLevel(this->Internals->DisableErrorMacro ? 1 : 0);
 
   vtkMemberFunctionCommand<vtkPVSessionCore>* observer =
       vtkMemberFunctionCommand<vtkPVSessionCore>::New();
@@ -365,13 +380,16 @@ void vtkPVSessionCore::OnInterpreterError( vtkObject*, unsigned long,
     (last.GetCommand(0) == vtkClientServerStream::Error) &&
     last.GetArgument(0, 0, &errorMessage) && this->Interpreter->GetGlobalWarningDisplay())
     {
-    vtksys_ios::ostringstream error;
-    error << "\nwhile processing\n";
-    info->css->PrintMessage(error, info->message);
-    error << ends;
-    vtkErrorMacro(<< errorMessage << error.str().c_str());
-    vtkErrorMacro("Aborting execution for debugging purposes.");
-    cout << "############ ABORT #############" << endl;
+    if(!this->Internals->DisableErrorMacro)
+      {
+      vtksys_ios::ostringstream error;
+      error << "\nwhile processing\n";
+      info->css->PrintMessage(error, info->message);
+      error << ends;
+      vtkErrorMacro(<< errorMessage << error.str().c_str());
+      vtkErrorMacro("Aborting execution for debugging purposes.");
+      cout << "############ ABORT #############" << endl;
+      }
     return;
     //abort();
     }
@@ -420,11 +438,14 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
 
     if (!message->HasExtension(DefinitionHeader::server_class))
       {
-      vtkErrorMacro("Message missing DefinitionHeader."
-                    "Aborting for debugging purposes.");
+      if(!this->Internals->DisableErrorMacro)
+        {
+        vtkErrorMacro("Message missing DefinitionHeader."
+                      "Aborting for debugging purposes.");
 
-      message->PrintDebugString();
-      cout << "############ ABORT #############" << endl;
+        message->PrintDebugString();
+        cout << "############ ABORT #############" << endl;
+        }
       return;
       //abort();
       }
@@ -802,7 +823,10 @@ bool vtkPVSessionCore::GatherInformationInternal( vtkPVInformation* information,
   vtkSIObject* siObject = this->GetSIObject(globalid);
   if (!siObject)
     {
-    vtkErrorMacro("No object with global-id: " << globalid);
+    if(!this->Internals->DisableErrorMacro)
+      {
+      vtkErrorMacro("No object with global-id: " << globalid);
+      }
     return false;
     }
 
