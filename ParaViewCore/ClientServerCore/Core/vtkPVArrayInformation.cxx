@@ -1059,6 +1059,13 @@ int vtkPVArrayInformation::HasInformationKey(const char* location,
 
 void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
 {
+  if ( ! info->UniqueValues )
+    { // Must have too many values, so erase our list.
+    delete this->UniqueValues;
+    this->UniqueValues = 0;
+    return;
+    }
+
   vtkInternalUniqueValues::iterator cit; // component iterator
   for ( int i = 0; i <= this->NumberOfComponents; ++ i )
     {
