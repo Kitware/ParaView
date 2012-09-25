@@ -14,9 +14,14 @@
 =========================================================================*/
 #include "vtkClientServerStream.h"
 
+#include "vtkAbstractArray.h"
+#include "vtkArrayIterator.h"
+#include "vtkArrayIteratorIncludes.h"
 #include "vtkByteSwap.h"
 #include "vtkSmartPointer.h"
+#include "vtkType.h"
 #include "vtkTypeTraits.h"
+#include "vtkVariantExtract.h"
 
 #include <string>
 #include <vector>
@@ -252,7 +257,7 @@ void vtkClientServerStream::Reset()
 {
   // Empty the entire stream.
   vtkClientServerStreamInternals::DataType().swap(this->Internal->Data);
-  
+
   this->Internal->ValueOffsets.erase(this->Internal->ValueOffsets.begin(),
                                      this->Internal->ValueOffsets.end());
   this->Internal->MessageIndexes.erase(this->Internal->MessageIndexes.begin(),
@@ -422,6 +427,68 @@ vtkClientServerStream::operator << (vtkObjectBase* obj)
   // Store the vtk_object_pointer type and then the pointer value itself.
   *this << vtkClientServerStream::vtk_object_pointer;
   return this->Write(&obj, sizeof(obj));
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream&
+vtkClientServerStream::operator << (const vtkStdString& val)
+{
+  (*this) << val.c_str();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+template<typename iterT>
+void vtkClientServerPutArrayVariant(vtkClientServerStream& css, iterT* it)
+{
+  vtkIdType numVals = it->GetNumberOfValues();
+  for (vtkIdType i = 0; i < numVals; ++i)
+    {
+    css << it->GetValue(i);
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream&
+vtkClientServerStream::operator << (const vtkVariant& val)
+{
+  vtkTypeUInt8 variantValid = val.IsValid();
+  if (variantValid && val.IsVTKObject() && !val.IsArray())
+    { // If val is a VTK object that is not an array, fail by encoding an invalid vtkVariant value.
+    variantValid = 0;
+    }
+  (*this) << variantValid;
+
+  if (variantValid)
+    {
+    vtkTypeUInt8 variantType = static_cast<vtkTypeUInt8>(val.GetType());
+    (*this) << variantType;
+
+    bool validDummy;
+    switch (variantType)
+      {
+      vtkExtendedTemplateMacro(
+        (*this) << vtkVariantExtract<VTK_TT>(val, validDummy));
+    case VTK_OBJECT:
+        { // The object must be an array; encode it.
+        vtkAbstractArray* array = val.ToArray();
+        vtkTypeInt32 arrayType = array->GetDataType();
+        vtkTypeInt32 numComponents = array->GetNumberOfComponents();
+        vtkTypeInt64 numTuples = array->GetNumberOfTuples();
+        (*this) << arrayType << numComponents << numTuples;
+        vtkArrayIterator* iter = array->NewIterator();
+        switch(array->GetDataType())
+          {
+          vtkExtendedArrayIteratorTemplateMacro(
+            vtkClientServerPutArrayVariant<VTK_TT>(*this,static_cast<VTK_TT*>(iter)));
+          }
+        iter->Delete();
+
+        }
+      break;
+      }
+    }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -1055,6 +1122,17 @@ int vtkClientServerStream::GetArgument(int message, int argument,
   return 0;
 }
 
+int vtkClientServerStream::GetArgument(int message, int argument, vtkStdString* value) const
+{
+  char* tmp;
+  if (this->GetArgument(message, argument, &tmp))
+    {
+    *value = tmp;
+    return 1;
+    }
+  return 0;
+}
+
 //----------------------------------------------------------------------------
 int vtkClientServerStream::GetArgument(int message, int argument,
                                        vtkClientServerStream* value) const
@@ -1168,6 +1246,93 @@ int vtkClientServerStream::GetArgument(int message, int argument,
       default:
         break;
       }
+    }
+  return result;
+}
+
+template<typename T>
+int vtkClientServerGetVariant(const vtkClientServerStream* self, int message, int& argument, vtkVariant& out)
+{
+  T raw;
+  int result = self->GetArgument(message, argument++, &raw);
+  if (!result) return result;
+  out = raw;
+  return result; // result != 0 by definition
+}
+
+// Specialize for vtkVariant as \a argument is handled differently.
+template<>
+int vtkClientServerGetVariant<vtkVariant>(const vtkClientServerStream* self, int message, int& argument, vtkVariant& out)
+{
+  int result = self->GetArgument(message, argument, &out);
+  if (!result) return result;
+  return result; // result != 0 by definition
+}
+
+template<typename T>
+int vtkClientServerGetArrayVariant(const vtkClientServerStream* self, int message, int& argument, vtkAbstractArray* array)
+{
+  vtkVariant value;
+  vtkIdType maxId = array->GetMaxId();
+  int result = 1;
+  for (vtkIdType i = 0; i <= maxId; ++i)
+    {
+    result = vtkClientServerGetVariant<T>(self, message, argument, value);
+    if (!result) return result;
+    array->SetVariantValue(i, value);
+    }
+  return result;
+}
+
+int vtkClientServerStream::GetArgument(int message, int& argument, vtkVariant* value) const
+{
+  int result;
+
+  vtkTypeUInt8 variantValid;
+  result = this->GetArgument(message, argument++, &variantValid);
+  if (!result) return result;
+
+  if (variantValid)
+    {
+    vtkTypeUInt8 variantType;
+    result = this->GetArgument(message, argument++, &variantType);
+    if (!result) return result;
+
+    switch (variantType)
+      {
+      vtkExtendedTemplateMacro(
+        vtkClientServerGetVariant<VTK_TT>(this, message, argument, *value));
+    case VTK_OBJECT:
+        {
+        // Only vtkAbstractArray subclasses are supported, and only their raw values are encoded (no vtkInformation keys)
+        // Packed values include: the array type, the # components(nc), # tuples(nt), nc*nt raw values.
+        vtkTypeInt32 arrayType;
+        vtkTypeInt32 numComponents;
+        vtkTypeInt64 numTuples;
+        result = this->GetArgument(message, argument++, &arrayType);
+        if (!result) return result;
+        result = this->GetArgument(message, argument++, &numComponents);
+        if (!result) return result;
+        result = this->GetArgument(message, argument++, &numTuples);
+        if (!result) return result;
+        vtkSmartPointer<vtkAbstractArray> array;
+        array.TakeReference(vtkAbstractArray::CreateArray(arrayType));
+        if (!array) return 1;
+        array->SetNumberOfComponents(numComponents);
+        array->SetNumberOfTuples(numTuples);
+        switch (arrayType)
+          {
+          vtkExtraExtendedTemplateMacro(
+            vtkClientServerGetArrayVariant<VTK_TT>(this, message, argument, array));
+          }
+        *value = array.GetPointer();
+        }
+      break;
+      }
+    }
+  else
+    {
+    *value = vtkVariant();
     }
   return result;
 }

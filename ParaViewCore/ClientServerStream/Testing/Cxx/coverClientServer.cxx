@@ -1,4 +1,11 @@
 #include "vtkClientServerStream.h"
+#include "vtkVariantArray.h"
+#include "vtkStringArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkNew.h"
+
+static double dblIni[] = { 904., 906., 917. };
+static const char* strIni[] = { "901", "Turbo", "Targa" };
 
 template <class T>
 struct Help
@@ -53,6 +60,51 @@ void do_store(vtkClientServerStream& css)
 #endif
   Help<float>::Store(css);
   Help<double>::Store(css);
+
+  vtkVariant varStr("911");
+  css << varStr;
+  vtkVariant varNum(356.0);
+  css << varNum;
+
+  // Test a variant that is itself an array of primitives (doubles).
+  vtkNew<vtkDoubleArray> dblArr;
+  dblArr->SetArray(dblIni, sizeof(dblIni) / sizeof(dblIni[0]), 1);
+  vtkVariant varDblArr(dblArr.GetPointer());
+  css << varDblArr;
+
+  // Test a variant that is itself an array of composites (strings).
+  vtkNew<vtkStringArray> strArr;
+  strArr->SetNumberOfValues(sizeof(strIni) / sizeof(strIni[0]));
+  for (vtkIdType i = 0; i < strArr->GetNumberOfValues(); ++i)
+    {
+    strArr->SetValue(i, strIni[i]);
+    }
+  vtkVariant varStrArr(strArr.GetPointer());
+  css << varStrArr;
+
+  // Test a variant that is itself an array of composites (variants).
+  vtkNew<vtkVariantArray> varArr;
+  varArr->SetNumberOfValues(sizeof(strIni) / sizeof(strIni[0]));
+  for (vtkIdType i = 0; i < varArr->GetNumberOfValues(); ++i)
+    {
+    vtkVariant tmp(strIni[i]);
+    bool numeric;
+    double x = tmp.ToNumeric(&numeric, &x);;
+    if (numeric)
+      {
+      varArr->SetVariantValue(i, x);
+      }
+    else
+      {
+      varArr->SetVariantValue(i, strIni[i]);
+      }
+    }
+  vtkVariant varVarArr(varArr.GetPointer());
+  css << varVarArr;
+
+  vtkVariant varInvalid;
+  css << varInvalid;
+
   css << "123";
   {
   vtkClientServerStream nested;
@@ -110,6 +162,63 @@ bool do_check(vtkClientServerStream& css)
 #endif
   if(!Help<float>::Check(css, arg)) { return false; }
   if(!Help<double>::Check(css, arg)) { return false; }
+  }
+  {
+  vtkVariant varOut;
+  if (!css.GetArgument(0, arg, &varOut) || varOut.ToString() != "911")
+    {
+    cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 911\n";
+    return false;
+    }
+  if (!css.GetArgument(0, arg, &varOut) || varOut.ToDouble() != 356.0 )
+    {
+    cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of 356.0\n";
+    return false;
+    }
+  vtkDoubleArray* dblArr;
+  if (
+    !css.GetArgument(0, arg, &varOut) ||
+    !(dblArr = vtkDoubleArray::SafeDownCast(varOut.ToArray())) ||
+    dblArr->GetMaxId() != (sizeof(dblIni) / sizeof(dblIni[0]) - 1) ||
+    dblArr->GetValue(0) != dblIni[0] ||
+    dblArr->GetValue(1) != dblIni[1] ||
+    dblArr->GetValue(2) != dblIni[2]
+    )
+    {
+    cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of (904.0, 906.0, 917.0)\n";
+    return false;
+    }
+  vtkStringArray* strArr;
+  if (
+    !css.GetArgument(0, arg, &varOut) ||
+    !(strArr = vtkStringArray::SafeDownCast(varOut.ToArray())) ||
+    strArr->GetMaxId() != (sizeof(strIni) / sizeof(strIni[0]) - 1) ||
+    strArr->GetValue(0) != strIni[0] ||
+    strArr->GetValue(1) != strIni[1] ||
+    strArr->GetValue(2) != strIni[2]
+    )
+    {
+    cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of (\"901\", \"Turbo\", \"Targa\")\n";
+    return false;
+    }
+  vtkVariantArray* varArr;
+  if (
+    !css.GetArgument(0, arg, &varOut) ||
+    !(varArr = vtkVariantArray::SafeDownCast(varOut.ToArray())) ||
+    varArr->GetMaxId() != (sizeof(strIni) / sizeof(strIni[0]) - 1) ||
+    varArr->GetValue(0) != vtkVariant(strIni[0]).ToDouble() ||
+    varArr->GetValue(1) != strIni[1] ||
+    varArr->GetValue(2) != strIni[2]
+    )
+    {
+    cout << "Variant was \"" << varOut.ToString().c_str() << "\" instead of (901.0, \"Turbo\", \"Targa\")\n";
+    return false;
+    }
+  if (!css.GetArgument(0, arg, &varOut) || varOut.IsValid())
+    {
+    cout << "Variant that was supposed to be invalid is valid\n";
+    return false;
+    }
   }
   {
   const char* s;
