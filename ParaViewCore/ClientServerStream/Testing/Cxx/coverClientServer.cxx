@@ -89,7 +89,7 @@ void do_store(vtkClientServerStream& css)
     {
     vtkVariant tmp(strIni[i]);
     bool numeric;
-    double x = tmp.ToNumeric(&numeric, &x);;
+    double x = tmp.ToDouble(&numeric);
     if (numeric)
       {
       varArr->SetVariantValue(i, x);
