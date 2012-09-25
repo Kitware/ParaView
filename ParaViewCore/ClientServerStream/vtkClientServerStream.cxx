@@ -21,6 +21,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkType.h"
 #include "vtkTypeTraits.h"
+#include <typeinfo>
 #include "vtkVariantExtract.h"
 
 #include <string>
