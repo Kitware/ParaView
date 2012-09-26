@@ -262,6 +262,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   QObject::connect( this->Form->RemoveAnnotation, SIGNAL(clicked()), this, SLOT(removeAnnotation()) );
   QObject::connect( this->Form->ResetAnnotations, SIGNAL(clicked()), this, SLOT(resetAnnotations()) );
   QObject::connect( this->Form->AddActiveValues,  SIGNAL(clicked()), this, SLOT(addActiveValues()) );
+  QObject::connect( this->Form->NewAnnotation,    SIGNAL(clicked()), this, SLOT(addAnnotationEntry()) );
 
   // Force a redraw immediately when the "Render View Immediately" button gets checked...
   // Some changes may already have been made.
