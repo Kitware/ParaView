@@ -115,6 +115,13 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(
 //----------------------------------------------------------------------------
 bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 {
+  if (amr->GetNumberOfLevels() < 1 ||
+    amr->GetNumberOfDataSets(0) < 1)
+    {
+    // this is an empty AMR. Nothing to do here.
+    return false;
+    }
+
   vtkNew<vtkImageData> output;
 
   double amr_bounds[6];

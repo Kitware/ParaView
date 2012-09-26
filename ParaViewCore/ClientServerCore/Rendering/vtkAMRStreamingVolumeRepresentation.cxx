@@ -262,7 +262,15 @@ int vtkAMRStreamingVolumeRepresentation::RequestData(vtkInformation* rqst,
     {
     // create an empty dataset. This is needed so that view knows what dataset
     // to expect from the other processes on this node.
-    this->ProcessedData = vtkSmartPointer<vtkOverlappingAMR>::New();
+    vtkSmartPointer<vtkOverlappingAMR> amr =
+      vtkSmartPointer<vtkOverlappingAMR>::New();
+
+    // FIXME: Currently, an empty overlapping AMR causes segfaults in the rest of the
+    // pipeline. Until that's fixed, we initialize the dataset with 1 level and
+    // 0 blocks.
+    int blocks = 0;
+    amr->Initialize(1, &blocks);
+    this->ProcessedData = amr;
     this->DataBounds.Reset();
     }
 
