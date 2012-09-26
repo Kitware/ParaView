@@ -1316,6 +1316,11 @@ int vtkSpyPlotUniReader::ReadInformation()
   //now that the group header has been read create the data dumps
   this->DataDumps = new vtkSpyPlotUniReader::DataDump[this->NumberOfDataDumps];
 
+  // clear the memory, instead of using constructors
+  const std::size_t length = sizeof(vtkSpyPlotUniReader::DataDump) *
+                             static_cast<std::size_t>(this->NumberOfDataDumps);
+  memset(this->DataDumps, 0, length);
+
   //Setup time information
   this->TimeStepRange[1] = this->NumberOfDataDumps-1;
   this->TimeRange[0] = this->DumpTime[0];
@@ -1437,7 +1442,7 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
       }
     spis->Seek(offset);
     vtkSpyPlotUniReader::DataDump *dh = &this->DataDumps[dump];
-    memset(dh, 0, sizeof(dh));
+
     if ( !spis->ReadInt32s(&(dh->NumVars), 1) )
       {
       vtkErrorMacro( "Cannot read number of variables" );
