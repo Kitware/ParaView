@@ -126,8 +126,8 @@ protected:
     vtkVariant y( other.data( column, Qt::DisplayRole ).toString().toAscii().data() );
     double dx, dy;
     bool vx, vy;
-    dx = x.ToNumeric( &vx, &dx );
-    dy = y.ToNumeric( &vy, &dy );
+    dx = x.ToDouble( &vx );
+    dy = y.ToDouble( &vy );
     if ( vx && vy )
       {
       return dx < dy;
