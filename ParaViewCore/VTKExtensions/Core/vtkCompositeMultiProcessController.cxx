@@ -102,7 +102,7 @@ struct Controller
 
   bool RemoveRMICallback(unsigned long observerTagId)
     {
-    int size = this->RMICallbackIdMapping[observerTagId].size();
+    int size = static_cast<int>(this->RMICallbackIdMapping[observerTagId].size());
     bool result = false;
     for(int i=0;i<size;i++)
       {
@@ -307,7 +307,7 @@ public:
   //-----------------------------------------------------------------
   int GetNumberOfRegisteredControllers()
     {
-    return this->Controllers.size();
+    return static_cast<int>(this->Controllers.size());
     }
   //-----------------------------------------------------------------
   vtkCommunicator* GetActiveCommunicator()
@@ -390,7 +390,7 @@ public:
   //-----------------------------------------------------------------
   int GetNumberOfControllers()
     {
-    return this->Controllers.size();
+    return static_cast<int>(this->Controllers.size());
     }
   //-----------------------------------------------------------------
   int GetControllerId(int idx)

@@ -136,7 +136,7 @@ vtkTypeUInt32 vtkSMSourceProxy::GetGlobalID()
 //---------------------------------------------------------------------------
 unsigned int vtkSMSourceProxy::GetNumberOfOutputPorts()
 {
-  return this->PInternals->OutputPorts.size();
+  return static_cast<int>(this->PInternals->OutputPorts.size());
 }
 
 //---------------------------------------------------------------------------

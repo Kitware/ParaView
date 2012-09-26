@@ -2079,7 +2079,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 
   // Make sure all dependent domains are updated. UpdateInformation()
   // might have produced new information that invalidates the domains.
-  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+  for (int i=0, nb=static_cast<int>(touchedProperties.size()); i < nb; i++)
     {
     touchedProperties[i]->UpdateDependentDomains();
     }

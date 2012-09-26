@@ -706,7 +706,7 @@ int vtkSpyPlotReader::RequestData(
                                  origin, extents,
                                  realExtents,
                                  realDims);
-        for(int i=blocksPerLevel.size(); i<=level; i++)
+        for(int i=static_cast<int>(blocksPerLevel.size()); i<=level; i++)
           {
           blocksPerLevel.push_back(0);
           }
@@ -2280,7 +2280,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
     for(unsigned int level = 0; level<numberOfLevels; level++)
       {
       int globalIndex = globalIndices[level];
-      int numberOfDataSets = datasets[level].size();
+      int numberOfDataSets = static_cast<int>(datasets[level].size());
       // put the datasets back starting at globalIndex.
       // All other indices are in their initialized state.
       for (int kk=0; kk < numberOfDataSets; kk++)

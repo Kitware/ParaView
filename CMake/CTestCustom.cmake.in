@@ -10,7 +10,8 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   #ignore protobuf related warnings.
   "ThirdParty.protobuf/"
   "google.protobuf"
-  "vtkPVMessage.pb.h"
+  "vtkPVMessage.pb"
+  "vtkSMMessage"
   "google::protobuf::Message"
 
   #ignore warnings coming from QT headers.
