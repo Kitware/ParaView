@@ -156,7 +156,7 @@ bool pqCheckableHeaderView::eventFilter(QObject *, QEvent *e)
   return false;
 }
 
-void pqCheckableHeaderView::mousePressEvent(QMouseEvent *event)
+void pqCheckableHeaderView::mousePressEvent(QMouseEvent *e)
 {
   QAbstractItemModel *current = this->model();
 
@@ -179,17 +179,17 @@ void pqCheckableHeaderView::mousePressEvent(QMouseEvent *event)
 
     // Capture mouse clicks on the checkbox icon and emit checkStateChanged signals.
     // Assuming left/bottom aligned checkbox
-    if(event->x() <= (icon.width() + buttonMargin - 1) &&
-       event->x() >= (buttonMargin - 1) &&
-       event->y() <= (icon.height() + buttonMargin - 1) &&
-       event->y() >= (buttonMargin - 1))
+    if(e->x() <= (icon.width() + buttonMargin - 1) &&
+       e->x() >= (buttonMargin - 1) &&
+       e->y() <= (icon.height() + buttonMargin - 1) &&
+       e->y() >= (buttonMargin - 1))
       {
         emit checkStateChanged();
         return;
       }
     }
   this->update();
-  QHeaderView::mousePressEvent(event);
+  QHeaderView::mousePressEvent(e);
 }
 
 void pqCheckableHeaderView::setModel(QAbstractItemModel *newModel)
