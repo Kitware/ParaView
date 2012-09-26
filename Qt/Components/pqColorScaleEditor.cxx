@@ -587,8 +587,6 @@ void pqColorScaleEditor::pushColors()
   QList<QVariant> rgbPoints;
   this->Form->InSetColors = true;
 
-  double rgb[3];
-  double scalar[4];//[x, r, g, b]
   foreach(vtkColorTransferControlPointsItem* plot,
     this->ColorMapViewer->plots<vtkColorTransferControlPointsItem>())
     {
@@ -609,7 +607,7 @@ void pqColorScaleEditor::pushColors()
     // we need to add another control point.
     if(total == 1)
       {
-      rgbPoints << scalar[0] << rgb[0] << rgb[1] << rgb[2];
+      rgbPoints << nodeValue[0] << nodeValue[1] << nodeValue[2] << nodeValue[3];
       }
     }
 
@@ -1991,7 +1989,7 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   // create xml parser
   vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
   xmlParser->InitializeParser();
-  xmlParser->ParseChunk(xml, strlen(xml));
+  xmlParser->ParseChunk(xml, static_cast<unsigned>(strlen(xml)));
   xmlParser->CleanupParser();
 
   // parse each color map element
