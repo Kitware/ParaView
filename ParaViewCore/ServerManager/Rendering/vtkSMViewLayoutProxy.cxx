@@ -777,7 +777,7 @@ vtkSMViewProxy* vtkSMViewLayoutProxy::GetView(int location)
   if (!this->Internals->IsCellValid(location))
     {
     vtkErrorMacro("Invalid location '" << location << "' specified.");
-    return false;
+    return NULL;
     }
 
   return this->Internals->KDTree[location].ViewProxy;

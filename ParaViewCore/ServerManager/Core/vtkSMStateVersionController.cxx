@@ -716,7 +716,6 @@ bool vtkSMStateVersionController::ConvertExodusIIReader(vtkPVXMLElement* root)
   for (unsigned int cc=0; cc < numElements; cc++)
     {
     vtkPVXMLElement* prop = root->GetNestedElement(cc);
-    const char* propName = prop->GetAttribute("name");
     for (unsigned int dd=0; dd < prop->GetNumberOfNestedElements(); dd++)
       {
       vtkPVXMLElement* blockProp = prop->GetNestedElement(dd);
@@ -756,7 +755,6 @@ bool vtkSMStateVersionController::ConvertExodusIIReader(vtkPVXMLElement* root)
       }
     }
   return true;
-
 }
 
 namespace

@@ -389,7 +389,7 @@ void pqXYChartDisplayPanel::setCurrentSeriesThickness(int thickness)
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesStyle(int style)
+void pqXYChartDisplayPanel::setCurrentSeriesStyle(int newStyle)
 {
   QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if (model)
@@ -399,14 +399,14 @@ void pqXYChartDisplayPanel::setCurrentSeriesStyle(int style)
     QModelIndexList::Iterator iter = indexes.begin();
     for( ; iter != indexes.end(); ++iter)
       {
-      this->Internal->SettingsModel->setSeriesStyle(iter->row(), style);
+      this->Internal->SettingsModel->setSeriesStyle(iter->row(), newStyle);
       }
     this->Internal->InChange = false;
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int style)
+void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int newStyle)
 {
   QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if (model)
@@ -416,7 +416,7 @@ void pqXYChartDisplayPanel::setCurrentSeriesMarkerStyle(int style)
     QModelIndexList::Iterator iter = indexes.begin();
     for( ; iter != indexes.end(); ++iter)
       {
-      this->Internal->SettingsModel->setSeriesMarkerStyle(iter->row(), style);
+      this->Internal->SettingsModel->setSeriesMarkerStyle(iter->row(), newStyle);
       }
     this->Internal->InChange = false;
     }

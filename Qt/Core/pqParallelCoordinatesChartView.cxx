@@ -42,8 +42,8 @@ pqParallelCoordinatesChartView::pqParallelCoordinatesChartView(const QString& gr
                              const QString& name,
                              vtkSMContextViewProxy* viewModule,
                              pqServer* server,
-                             QObject* parent/*=NULL*/):
-  Superclass(chartViewType(), group, name, viewModule, server, parent)
+                             QObject* p/*=NULL*/):
+  Superclass(chartViewType(), group, name, viewModule, server, p)
 {
   QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
     this, SLOT(onAddRepresentation(pqRepresentation*)));
