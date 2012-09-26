@@ -61,8 +61,7 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(
   vtkOverlappingAMR* amr)
 {
   assert(amr);
-  if (this->NeedsInitialization() ||
-    amr->GetAMRInfo()->GetMTime() > this->InitializationTime)
+  if (this->NeedsInitialization())
     {
     if (!this->Initialize(amr))
       {

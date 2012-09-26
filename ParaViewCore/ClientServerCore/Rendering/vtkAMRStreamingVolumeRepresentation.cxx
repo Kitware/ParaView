@@ -101,6 +101,9 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
 
     // in theory, we need ordered compositing, but we are not going to support
     // parallel AMR volume rendering for now.
+    // FIXME: vtkAMRStreamingVolumeRepresentation doesn't support parallel
+    // volume rendering. We support parallel-server+local+rendering,
+    // single-server+remote-rendering and builtin configurations.
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
     {
