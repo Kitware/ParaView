@@ -1196,9 +1196,9 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
 
   // Set version number on the state element.
   vtksys_ios::ostringstream version_string;
-  vtkSMProxyManager* px = vtkSMProxyManager::GetProxyManager();
-  version_string << px->GetVersionMajor() << "."
-    << px->GetVersionMinor() << "." << px->GetVersionPatch();
+  version_string << vtkSMProxyManager::GetVersionMajor() << "."
+                 << vtkSMProxyManager::GetVersionMinor() << "."
+                 << vtkSMProxyManager::GetVersionPatch();
   rootElement->AddAttribute("version", version_string.str().c_str());
 
 
