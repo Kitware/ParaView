@@ -2640,4 +2640,16 @@
     <Point x="1" r="1" g="0.9294117647058824" b="0.4352941176470588" o="1.0"/>
     <NaN r="1" g="0.9294117647058824" b="0.4352941176470588"/>
   </ColorMap>
+  <ColorMap name="Traffic Lights" space="HSV" indexedLookup="true">
+    <Point x="0.0" r="1" g="0"        b="0" o="0"  />
+    <Point x="0.5" r="1" g="0.862745" b="0" o="0.5"/>
+    <Point x="1.0" r="0" g="0.695201" b="0" o="1"  />
+    <NaN r="0.803922" g="0" b="0.803922"/>
+  </ColorMap>
+  <ColorMap name="Traffic Lights For Deuteranopes" space="HSV" indexedLookup="true">
+    <Point x="0.0" r="0.908659" g="0.604013" b="0.581857" o="0"  />
+    <Point x="0.5" r="1"        g="0.862745" b="0"        o="0.5"/>
+    <Point x="1.0" r="0"        g="0.695201" b="0.0"      o="1"  />
+    <NaN r="0.803922" g="0" b="0.803922"/>
+  </ColorMap>
 </ColorMaps>
