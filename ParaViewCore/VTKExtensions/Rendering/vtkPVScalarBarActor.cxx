@@ -265,7 +265,8 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
     if ( this->ComponentTitle && strlen(this->ComponentTitle) > 0 )
       {
       //need to account for a space between title & component and null term
-      int str_len = strlen(this->Title) + strlen(this->ComponentTitle) + 2;
+      int str_len = static_cast<int>(
+        strlen(this->Title) + strlen(this->ComponentTitle) + 2);
       char *combinedTitle = new char[ str_len ];
       strcpy(combinedTitle, this->Title );
       strcat( combinedTitle, " " );
