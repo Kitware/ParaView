@@ -156,14 +156,9 @@ find_file(smooth_flash NAMES smooth.flash
           NO_DEFAULT_PATH)
 mark_as_advanced(smooth_flash)
 if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
-  if (PARAVIEW_USE_VISITBRIDGE)
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.VisIt.xml.in"
-                   "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
-  else()
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.NoVisIt.xml.in"
-                   "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
-  endif()
-
+  # we configure the file since we need to point to smooth_flash.
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.xml.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
   set (streaming_tests
     ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
   set(AMRStreaming_USE_NEW_PANELS TRUE)
