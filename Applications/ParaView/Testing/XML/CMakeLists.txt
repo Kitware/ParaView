@@ -147,6 +147,54 @@ SET (TESTS_WITH_BASELINES
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
 
+#------------------------------------------------------------------------------
+# Add streaming tests.
+# We need to locate smooth.flash since it's not included in the default testing
+# datasets.
+find_file(smooth_flash NAMES smooth.flash
+          DOC "Path to smooth.flash data file."
+          NO_DEFAULT_PATH)
+mark_as_advanced(smooth_flash)
+if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
+  if (PARAVIEW_USE_VISITBRIDGE)
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.VisIt.xml.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
+  else()
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.NoVisIt.xml.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
+  endif()
+
+  set (streaming_tests
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
+  set(AMRStreaming_USE_NEW_PANELS TRUE)
+
+  foreach (tname ${streaming_tests})
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND --client ${CLIENT_EXECUTABLE}
+              -dr
+              --enable-streaming
+              --disable-light-kit
+              --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      TEST_SCRIPTS ${tname})
+
+    # testing framework doesn't allow adding of arguments of pvserver. We need
+    # to extend testing framework to pass in enable-streaming argument.
+    #add_pv_test(pvcs "_DISABLE_CS"
+    #  COMMAND
+    #     --server $<TARGET_FILE:pvserver> --enable-streaming
+    #     --client ${CLIENT_EXECUTABLE}
+    #     -dr
+    #     --enable-streaming
+    #     --disable-light-kit
+    #     --test-directory=${PARAVIEW_TEST_DIR}
+    #  BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+    #  TEST_SCRIPTS ${tname})
+  endforeach()
+endif()
+
+#------------------------------------------------------------------------------
+
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
 

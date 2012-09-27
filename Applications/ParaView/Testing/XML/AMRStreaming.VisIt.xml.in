@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="@smooth_flash@" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="mousePress" arguments="1,1,0,81,5,/0:0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/listWidget" command="mouseRelease" arguments="1,0,0,81,5,/0:0" />
+  <pqevent object="pqClientMainWindow/pqSelectReaderDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ArrayStatus/SelectionWidget" command="setCheckState" arguments="6.0,2" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+
+  <!-- stop automatic streaming -->
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="stop_streaming" />
+
+  <!-- switch to a representation that supports streaming -->
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="AMR Blocks" />
+
+  <!-- step down the streaming updates a few times -->
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+  <pqevent object="pqClientMainWindow" command="pqViewStreamingBehavior" arguments="next" />
+
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveY" command="activate" arguments="" />
+</pqevents>

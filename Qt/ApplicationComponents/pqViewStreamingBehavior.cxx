@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqCoreTestUtility.h"
+#include "pqEventPlayer.h"
+#include "pqWidgetEventPlayer.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
@@ -43,10 +46,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSession.h"
 
+class pqStreamingTestingEventPlayer : public pqWidgetEventPlayer
+{
+  typedef pqWidgetEventPlayer Superclass;
+public:
+  QPointer<pqViewStreamingBehavior> StreamingBehavior;
+
+  pqStreamingTestingEventPlayer(QObject* p) : Superclass(p) { }
+  virtual bool playEvent(QObject*,
+    const QString& command, const QString& arguments, bool& error)
+    {
+    if (command == "pqViewStreamingBehavior" && this->StreamingBehavior)
+      {
+      if (arguments == "stop_streaming")
+        {
+        this->StreamingBehavior->stopAutoUpdates();
+        }
+      else if (arguments == "resume_streaming")
+        {
+        this->StreamingBehavior->resumeAutoUpdates();
+        }
+      else if (arguments == "next")
+        {
+        this->StreamingBehavior->triggerSingleUpdate();
+        }
+      else
+        {
+        error = true;
+        }
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+    }
+};
+
 //-----------------------------------------------------------------------------
 pqViewStreamingBehavior::pqViewStreamingBehavior(QObject* parentObject)
-  : Superclass(parentObject), Pass(0), DelayUpdate(false)
+  : Superclass(parentObject), Pass(0), DelayUpdate(false), DisableAutomaticUpdates(false)
 {
+  pqStreamingTestingEventPlayer* player = new pqStreamingTestingEventPlayer(NULL);
+  player->StreamingBehavior = this;
+
+  // the testUtility takes ownership of the player.
+  pqApplicationCore::instance()->testUtility()->eventPlayer()->addWidgetEventPlayer(
+    player);
+
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
@@ -88,7 +135,10 @@ void pqViewStreamingBehavior::onViewUpdated(
     {
     vtkStreamingStatusMacro("View updated. Restarting streaming loop.");
     this->Pass = 0;
-    this->Timer.start(1000);
+    if (!this->DisableAutomaticUpdates)
+      {
+      this->Timer.start(1000);
+      }
     rvProxy->GetInteractor()->AddObserver(
       vtkCommand::StartInteractionEvent,
       this, &pqViewStreamingBehavior::onStartInteractionEvent);
@@ -139,7 +189,14 @@ void pqViewStreamingBehavior::onTimeout()
       if (to_continue)
         {
         this->Pass++;
-        this->Timer.start(0);
+        if (this->DisableAutomaticUpdates)
+          {
+          vtkStreamingStatusMacro("Pausing, since automatic updates are disabled.");
+          }
+        else
+          {
+          this->Timer.start(0);
+          }
         }
       else
         {
@@ -147,4 +204,27 @@ void pqViewStreamingBehavior::onTimeout()
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewStreamingBehavior::stopAutoUpdates()
+{
+  vtkStreamingStatusMacro("Pausing automatic updates.");
+  this->Timer.stop();
+  this->DisableAutomaticUpdates = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewStreamingBehavior::resumeAutoUpdates()
+{
+  vtkStreamingStatusMacro("Resuming automatic updates.");
+  this->Timer.start(1000);
+  this->DisableAutomaticUpdates = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewStreamingBehavior::triggerSingleUpdate()
+{
+  vtkStreamingStatusMacro("Trigger single automatic updates.");
+  this->onTimeout();
 }

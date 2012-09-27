@@ -50,6 +50,12 @@ public:
   pqViewStreamingBehavior(QObject* parent=0);
   virtual ~pqViewStreamingBehavior();
 
+  /// This API is for testing purposes. It enables pausing/stepping/resuming
+  /// automatic updates.
+  void stopAutoUpdates();
+  void resumeAutoUpdates();
+  void triggerSingleUpdate();
+
 protected slots:
   void onViewAdded(pqView*);
   void onViewUpdated(vtkObject*, unsigned long, void*);
@@ -60,6 +66,7 @@ private:
   QTimer Timer;
   int Pass;
   bool DelayUpdate;
+  bool DisableAutomaticUpdates;
 
   void onStartInteractionEvent();
   void onEndInteractionEvent();
