@@ -60,10 +60,10 @@ struct vtkMultiSliceContextItem::vtkInternal {
   bool IsInActiveArea(float x, float y)
   {
     return
-        x >= this->ActiveArea.X() &&
-        y >= this->ActiveArea.Y() &&
-        x <= (this->ActiveArea.X() + this->ActiveArea.Width()) &&
-        y <= (this->ActiveArea.Y() + this->ActiveArea.Height());
+        x >= this->ActiveArea.GetX() &&
+        y >= this->ActiveArea.GetY() &&
+        x <= (this->ActiveArea.GetX() + this->ActiveArea.GetWidth()) &&
+        y <= (this->ActiveArea.GetY() + this->ActiveArea.GetHeight());
   }
 
   // Return -1 if not found
@@ -248,7 +248,7 @@ bool vtkMultiSliceContextItem::Paint(vtkContext2D* painter)
 bool vtkMultiSliceContextItem::Hit(const vtkContextMouseEvent &mouse)
 {
   vtkVector2f position = mouse.GetPos();
-  return this->Internal->IsInActiveArea(position.X(),position.Y());
+  return this->Internal->IsInActiveArea(position.GetX(),position.GetY());
 }
 
 //-----------------------------------------------------------------------------
@@ -260,11 +260,11 @@ bool vtkMultiSliceContextItem::MouseButtonPressEvent(const vtkContextMouseEvent 
     {
   case vtkAxis::LEFT:
   case vtkAxis::RIGHT:
-     value = this->ScreenToRange(position.Y() - this->Internal->EdgeMargin);
+     value = this->ScreenToRange(position.GetY() - this->Internal->EdgeMargin);
     break;
   case vtkAxis::BOTTOM:
   case vtkAxis::TOP:
-    value = this->ScreenToRange(position.X() - this->Internal->EdgeMargin);
+    value = this->ScreenToRange(position.GetX() - this->Internal->EdgeMargin);
     break;
     }
   // find corresponding slice index
@@ -301,11 +301,11 @@ bool vtkMultiSliceContextItem::MouseDoubleClickEvent(const vtkContextMouseEvent 
     {
   case vtkAxis::LEFT:
   case vtkAxis::RIGHT:
-    value = this->ScreenToRange(mouse.GetPos().Y() - this->Internal->EdgeMargin);
+    value = this->ScreenToRange(mouse.GetPos().GetY() - this->Internal->EdgeMargin);
     break;
   case vtkAxis::BOTTOM:
   case vtkAxis::TOP:
-    value = this->ScreenToRange(mouse.GetPos().X() - this->Internal->EdgeMargin);
+    value = this->ScreenToRange(mouse.GetPos().GetX() - this->Internal->EdgeMargin);
   break;
     }
 
@@ -343,11 +343,11 @@ bool vtkMultiSliceContextItem::MouseMoveEvent(const vtkContextMouseEvent &mouse)
       {
     case vtkAxis::LEFT:
     case vtkAxis::RIGHT:
-      value = this->ScreenToRange(mouse.GetPos().Y() - this->Internal->EdgeMargin);
+      value = this->ScreenToRange(mouse.GetPos().GetY() - this->Internal->EdgeMargin);
       break;
     case vtkAxis::BOTTOM:
     case vtkAxis::TOP:
-      value = this->ScreenToRange(mouse.GetPos().X() - this->Internal->EdgeMargin);
+      value = this->ScreenToRange(mouse.GetPos().GetX() - this->Internal->EdgeMargin);
     break;
       }
     this->Internal->Slices[Internal->ActiveSliceIndex] = value;
