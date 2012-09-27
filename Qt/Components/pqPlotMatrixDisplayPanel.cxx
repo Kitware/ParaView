@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 #include "ui_pqPlotMatrixDisplayPanel.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "vtkSMIntVectorProperty.h"
 
 pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representation, QWidget *pWidget)
   : pqDisplayPanel(representation, pWidget)
@@ -115,6 +117,17 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
                               proxy,
                               proxy->GetProperty("ScatterPlotMarkerStyle"));
 
+  this->CompositeIndexAdaptor = new pqSignalAdaptorCompositeTreeWidget(
+    ui.CompositeIndex,  vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty("CompositeDataSetIndex")),
+    /*autoUpdateVisibility=*/true);
+
+  this->Links.addPropertyLink(this->CompositeIndexAdaptor,
+                              "values",
+                              SIGNAL(valuesChanged()),
+                              proxy,
+                              proxy->GetProperty("CompositeDataSetIndex"));
+
   QObject::connect(this->SettingsModel,
                    SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                    this,
@@ -127,11 +140,13 @@ pqPlotMatrixDisplayPanel::pqPlotMatrixDisplayPanel(pqRepresentation *representat
   this->Series = ui.Series;
 
   QObject::connect(dispRep, SIGNAL(dataUpdated()), this, SLOT(reloadSeries()));
+
   this->reloadSeries();
 }
 
 pqPlotMatrixDisplayPanel::~pqPlotMatrixDisplayPanel()
 {
+  delete this->CompositeIndexAdaptor;
 }
 
 void pqPlotMatrixDisplayPanel::dataChanged(QModelIndex topLeft, QModelIndex bottomRight)
