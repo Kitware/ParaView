@@ -63,8 +63,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqCalculatorWidget::pqCalculatorWidget(
-  vtkSMProxy* proxy, vtkSMProperty* smproperty, QWidget* parentWidget)
-  : Superclass(proxy, parentWidget), Internals (new pqInternals())
+  vtkSMProxy* smproxy, vtkSMProperty* smproperty, QWidget* parentObject)
+  : Superclass(smproxy, parentObject), Internals (new pqInternals())
 {
   this->Internals->setupUi(this);
   this->setShowLabel(false);
