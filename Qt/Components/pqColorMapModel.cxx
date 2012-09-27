@@ -274,11 +274,7 @@ void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color,
   QList<pqColorMapModelItem *>::Iterator iter = this->InternalPts->begin();
   for( ; iter != this->InternalPts->end(); ++iter)
     {
-    if(value == (*iter)->Value)
-      {
-      return;
-      }
-    else if(value < (*iter)->Value)
+    if(value < (*iter)->Value)
       {
       break;
       }

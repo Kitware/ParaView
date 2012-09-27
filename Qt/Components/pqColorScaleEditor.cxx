@@ -2358,7 +2358,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   vtkColorTransferFunction* colors = this->currentColorFunction();
   if(colors)
     {
-    colors->SetAllowDuplicateScalars(min==max);
+    colors->SetAllowDuplicateScalars(1);
     this->ColorMapViewer->chartBounds(chartBounds);
     chartBounds[2] = min;
     chartBounds[3] = max;
@@ -2377,7 +2377,7 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   vtkPiecewiseFunction* pwf = this->currentOpacityFunction();
   if(pwf)
     {
-    pwf->SetAllowDuplicateScalars(min==max);
+    pwf->SetAllowDuplicateScalars(1);
     }
   if(this->ColorMap)
     {
