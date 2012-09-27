@@ -235,11 +235,6 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
     double block_bounds[6];
     this->Internals->AMRMetadata->GetBounds(level, index, block_bounds);
 
-    double center[3];
-    center[0] = (block_bounds[0] + block_bounds[1]) / 2.0;
-    center[1] = (block_bounds[2] + block_bounds[3]) / 2.0;
-    center[2] = (block_bounds[4] + block_bounds[5]) / 2.0;
-
     double distance;
     double coverage = vtkComputeScreenCoverage(
       view_planes, block_bounds, distance);
