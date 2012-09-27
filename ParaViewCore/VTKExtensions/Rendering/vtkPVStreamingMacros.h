@@ -20,7 +20,13 @@
 #ifndef __vtkPVStreamingMacros_h
 #define __vtkPVStreamingMacros_h
 
-#define vtkStreamingStatusMacro(x)\
+#ifndef NDEBUG
+// vtkStreamingStatusMacro simply prints out debugging text. We define the macro
+// as empty when NDEBUG is defined (i.e. building in release mode).
+# define vtkStreamingStatusMacro(x)\
   cout << "streaming: " x << endl;
+#else
+# define vtkStreamingStatusMacro(x)
+#endif
 
 #endif
