@@ -42,6 +42,13 @@ class vtkObject;
 /// @ingroup Behaviors
 /// pqViewStreamingBehavior is used to manage rendering of render-view when
 /// streaming is enabled.
+///
+/// pqViewStreamingBehavior listens to updates on render-views when
+/// vtkPVView::GetEnableStreaming() returns true and periodically calls
+/// vtkSMRenderViewProxy::StreamingUpdate() on the view until the view reports
+/// there is no more data to be streamed. The periodic updates resume after the
+/// next time the view updates since the view now may have newer data that needs
+/// to be streamed.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqViewStreamingBehavior : public QObject
 {
   Q_OBJECT
