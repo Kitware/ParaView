@@ -171,7 +171,7 @@ vtkAMRDualGridHelperDegenerateRegion::vtkAMRDualGridHelperDegenerateRegion()
 struct vtkAMRDualGridHelperCommRequest
 {
   vtkMPICommunicator::Request Request;
-  vtkSmartPointer<vtkCharArray> Buffer;
+  vtkSmartPointer<vtkDataArray> Buffer;
   int SendProcess;
   int ReceiveProcess;
 };
@@ -2139,23 +2139,18 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueueMPIAsynchronous(
     }
   int myProc = controller->GetLocalProcessId();
 
-/*
-  vtkIdType messageLength
-    = this->DegenerateRegionMessageSize(sendProc, myProc);
-
-  if (messageLength == 0) return;
-*/
+  vtkSmartPointer<vtkCharArray> recvBuffer = vtkSmartPointer<vtkCharArray>::New();
+  recvBuffer->SetNumberOfValues(messageLength);
 
   vtkAMRDualGridHelperCommRequest request;
   request.SendProcess = sendProc;
   request.ReceiveProcess = myProc;
-  request.Buffer = vtkSmartPointer<vtkCharArray>::New();
-  request.Buffer->SetNumberOfValues(messageLength);
+  request.Buffer = recvBuffer;
 
   // This static cast will cause big problems if we ever have a buffer
   // larger than 2 GB.  Then again, we are unlikely to hit that without
   // running out of memory anyway.
-  controller->NoBlockReceive(request.Buffer->GetPointer(0),
+  controller->NoBlockReceive(recvBuffer->GetPointer (0),
                              static_cast<int>(messageLength),
                              sendProc, DEGENERATE_REGION_TAG,
                              request.Request);
@@ -2178,25 +2173,20 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueMPIAsynchronous(
     }
   int myProc = controller->GetLocalProcessId();
 
-/*
-  vtkIdType messageLength
-    = this->DegenerateRegionMessageSize(myProc, recvProc);
-
-  if (messageLength == 0) return;
-*/
+  vtkSmartPointer<vtkCharArray> sendBuffer = vtkSmartPointer<vtkCharArray>::New();
+  sendBuffer->SetNumberOfValues(messageLength);
 
   vtkAMRDualGridHelperCommRequest request;
   request.SendProcess = myProc;
   request.ReceiveProcess = recvProc;
-  request.Buffer = vtkSmartPointer<vtkCharArray>::New();
-  request.Buffer->SetNumberOfValues(messageLength);
+  request.Buffer = sendBuffer
 
-  this->MarshalDegenerateRegionMessage(request.Buffer->GetPointer(0), recvProc);
+  this->MarshalDegenerateRegionMessage(sendBuffer->GetPointer(0), recvProc);
 
   // This static cast will cause big problems if we ever have a buffer
   // larger than 2 GB.  Then again, we are unlikely to hit that without
   // running out of memory anyway.
-  controller->NoBlockSend(request.Buffer->GetPointer(0),
+  controller->NoBlockSend(sendBuffer->GetPointer(0),
                           static_cast<int>(messageLength),
                           recvProc, DEGENERATE_REGION_TAG,
                           request.Request);
@@ -2212,8 +2202,9 @@ void vtkAMRDualGridHelper::FinishDegenerateRegionsCommMPIAsynchronous(
   while (!receiveList.empty())
     {
     vtkAMRDualGridHelperCommRequest request = receiveList.WaitAny();
-    this->UnmarshalDegenerateRegionMessage(request.Buffer->GetPointer(0), 
-                                           request.Buffer->GetNumberOfTuples (),
+    vtkCharArray* recvBuffer = vtkCharArray::SafeDownCast (request.Buffer);
+    this->UnmarshalDegenerateRegionMessage(recvBuffer->GetPointer(0), 
+                                           recvBuffer->GetNumberOfTuples (),
                                            request.SendProcess, hackLevelFlag);
     }
 
@@ -2406,15 +2397,14 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocks", this->Controller);
     }
 
   VTK_CREATE(vtkIntArray, sendBuffer);
-  sendBuffer->SetNumberOfValues (4096);
+  // sendBuffer->SetNumberOfValues (4096);
   VTK_CREATE(vtkIntArray, recvBuffer);
 
-  int messageLength = this->MarshalBlocks(sendBuffer->GetPointer(0), 16384);
-  sendBuffer->SetNumberOfValues (messageLength);
+  this->MarshalBlocks(sendBuffer);
 
   this->Controller->AllGatherV(sendBuffer, recvBuffer);
 
-  this->UnmarshalBlocks(recvBuffer->GetPointer(0));
+  this->UnmarshalBlocks(recvBuffer);
 }
 
 void vtkAMRDualGridHelper::ShareBlocksWithNeighbors (vtkIntArray *neighbors)
@@ -2463,13 +2453,16 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsAsync", this->Contr
     {
     int neighborProc = neighbors->GetValue (i); 
 
+    vtkSmartPointer<vtkIntArray> recvBuffer = vtkSmartPointer<vtkIntArray>::New();
+    // Set this large enough to capture the number of blocks contained in neighbors
+    recvBuffer->SetNumberOfValues(131072);
+
     vtkAMRDualGridHelperCommRequest request;
     request.SendProcess = neighborProc;
     request.ReceiveProcess = myProc;
-    request.Buffer = vtkSmartPointer<vtkCharArray>::New();
-    request.Buffer->SetNumberOfValues(131072);
+    request.Buffer = recvBuffer;
 
-    controller->NoBlockReceive(request.Buffer->GetPointer(0),
+    controller->NoBlockReceive(recvBuffer->GetPointer (0),
                                131072,
                                neighborProc, SHARED_BLOCK_TAG,
                                request.Request);
@@ -2481,16 +2474,16 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsAsync", this->Contr
     {
     int neighborProc = neighbors->GetValue (i); 
 
+    vtkSmartPointer<vtkIntArray> sendBuffer = vtkSmartPointer<vtkIntArray>::New ();
+    this->MarshalBlocks(sendBuffer);
+
     vtkAMRDualGridHelperCommRequest request;
     request.SendProcess = myProc;
     request.ReceiveProcess = neighborProc;
-    request.Buffer = vtkSmartPointer<vtkCharArray>::New ();
-    request.Buffer->SetNumberOfValues (131072);
+    request.Buffer = sendBuffer;
 
-    int messageLength = this->MarshalBlocks(request.Buffer->GetPointer (0), 131072) * sizeof (int);
-
-    controller->NoBlockSend(request.Buffer->GetPointer(0),
-                            messageLength,
+    controller->NoBlockSend(sendBuffer->GetPointer(0),
+                            sendBuffer->GetNumberOfValues (),
                             neighborProc, SHARED_BLOCK_TAG,
                             request.Request);
 
@@ -2500,7 +2493,8 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsAsync", this->Contr
   while (!receiveList.empty())
     {
     vtkAMRDualGridHelperCommRequest request = receiveList.WaitAny();
-    this->UnmarshalBlocksFromOne (request.Buffer->GetPointer (0), request.SendProcess);
+    vtkIntArray* buffer = vtkIntArray::SafeDownCast (request.Buffer);
+    this->UnmarshalBlocksFromOne (buffer, request.SendProcess);
     }
 
   sendList.WaitAll();
@@ -2515,14 +2509,14 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsSync", this->Contro
     return;
     }
 
-  VTK_CREATE(vtkCharArray, sendBuffer);
-  sendBuffer->SetNumberOfValues (131072);
-  VTK_CREATE(vtkCharArray, recvBuffer);
+  VTK_CREATE(vtkIntArray, sendBuffer);
+  VTK_CREATE(vtkIntArray, recvBuffer);
   recvBuffer->SetNumberOfValues (131072);
 
   int myProc = this->Controller->GetLocalProcessId();
 
-  int messageLength = this->MarshalBlocks(sendBuffer->GetPointer (0), 131072) * sizeof (int);
+  this->MarshalBlocks(sendBuffer);
+  int messageLength = sendBuffer->GetNumberOfTuples ();
 
   for (vtkIdType i = 0; i < neighbors->GetNumberOfTuples (); i++) 
     {
@@ -2537,51 +2531,36 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsSync", this->Contro
       this->Controller->Receive (recvBuffer->GetPointer(0), 131072, neighborProc, SHARED_BLOCK_TAG);
       this->Controller->Send (sendBuffer->GetPointer(0), messageLength, neighborProc, SHARED_BLOCK_TAG);
       }    
-    this->UnmarshalBlocksFromOne (recvBuffer->GetPointer (0), neighborProc);
+    this->UnmarshalBlocksFromOne (recvBuffer, neighborProc);
     }
 }
-int vtkAMRDualGridHelper::MarshalBlocks(void *inBuffer, unsigned int sizeLimit)
+void vtkAMRDualGridHelper::MarshalBlocks(vtkIntArray* inBuffer)
 {
-  int *buffer = static_cast<int *>(inBuffer);
+  inBuffer->SetNumberOfValues (0);
   // Marshal the procs.
   // numlevels, level0NumBlocks,(gridx,gridy,gridz,...),level1NumBlocks,(...)
-  vtkIdType messageLength = 1; // One int for the number of levels.
   int numLevels = this->GetNumberOfLevels();
-  for (int levelIdx = 0; levelIdx < numLevels; ++levelIdx)
-    {
-    // One int for the number of blocks in this level.
-    ++messageLength;
-    messageLength += 4* (int)(this->Levels[levelIdx]->Blocks.size());
-    }
-
-  if ((messageLength*sizeof(int)) >= sizeLimit) 
-   {
-   vtkErrorMacro (<< "Number of blocks too large for limit");
-   return 0;
-   }	
 
   // Now create the message.
-  *buffer++ = numLevels;
+  inBuffer->InsertNextValue (numLevels);
   for (int levelIdx = 0; levelIdx < numLevels; levelIdx++)
     {
     vtkAMRDualGridHelperLevel *level = this->Levels[levelIdx];
     int numBlocks = static_cast<int>(level->Blocks.size());
-    *buffer++ = numBlocks;
+    inBuffer->InsertNextValue (numBlocks);
     for (int blockIdx =0; blockIdx < numBlocks; blockIdx++)
       {
       vtkAMRDualGridHelperBlock* block = level->Blocks[blockIdx];
-      *buffer++ = block->GridIndex[0];
-      *buffer++ = block->GridIndex[1];
-      *buffer++ = block->GridIndex[2];
-      *buffer++ = block->ProcessId;
+      inBuffer->InsertNextValue (block->GridIndex[0]);
+      inBuffer->InsertNextValue (block->GridIndex[1]);
+      inBuffer->InsertNextValue (block->GridIndex[2]);
+      inBuffer->InsertNextValue (block->ProcessId);
       }
     }
-
-  return messageLength;
 }
-void vtkAMRDualGridHelper::UnmarshalBlocks(void *inBuffer)
+void vtkAMRDualGridHelper::UnmarshalBlocks(vtkIntArray *inBuffer)
 {
-  int *buffer = static_cast<int *>(inBuffer);
+  int *buffer = inBuffer->GetPointer (0);
   // Unmarshal the procs.
   // Each process sent a message of this form.
   //
@@ -2622,9 +2601,9 @@ void vtkAMRDualGridHelper::UnmarshalBlocks(void *inBuffer)
       }
     }
 }
-void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(void *inBuffer, int vtkNotUsed(blockProc))
+void vtkAMRDualGridHelper::UnmarshalBlocksFromOne(vtkIntArray *inBuffer, int vtkNotUsed(blockProc))
 {
-  int *buffer = static_cast<int *>(inBuffer);
+  int *buffer = inBuffer->GetPointer (0);
   // Unmarshal the procs.
   // Each process sent a message of this form.
   //
