@@ -24,10 +24,10 @@
 #define __vtkPVStreamingPiecesInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkPVClientServerCoreRenderingModule.h"
+#include "vtkPVClientServerCoreRenderingModule.h" // needed for export macro
 
 //BTX
-#include <vector>
+#include <vector> // needed for internal API
 //ETX
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVStreamingPiecesInformation : public vtkPVInformation
