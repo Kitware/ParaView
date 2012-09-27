@@ -178,18 +178,17 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${tname})
 
-    # testing framework doesn't allow adding of arguments of pvserver. We need
-    # to extend testing framework to pass in enable-streaming argument.
-    #add_pv_test(pvcs "_DISABLE_CS"
-    #  COMMAND
-    #     --server $<TARGET_FILE:pvserver> --enable-streaming
-    #     --client ${CLIENT_EXECUTABLE}
-    #     -dr
-    #     --enable-streaming
-    #     --disable-light-kit
-    #     --test-directory=${PARAVIEW_TEST_DIR}
-    #  BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
-    #  TEST_SCRIPTS ${tname})
+    add_pv_test(pvcs "_DISABLE_CS"
+      COMMAND
+         --server $<TARGET_FILE:pvserver>
+         --server-postflags --enable-streaming
+         --client ${CLIENT_EXECUTABLE}
+         -dr
+         --enable-streaming
+         --disable-light-kit
+         --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      TEST_SCRIPTS ${tname})
   endforeach()
 endif()
 
