@@ -137,6 +137,9 @@ QWidget* pqMultiSliceView::createWidget()
   QObject::connect(this->AxisZ, SIGNAL(modelUpdated()),
                    this, SLOT(updateSlices()));
 
+  // Make sure the UI reflect the proxy state
+  this->updateViewModelCallBack(NULL, 0, NULL);
+
   return container;
 }
 //-----------------------------------------------------------------------------
