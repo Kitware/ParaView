@@ -91,6 +91,10 @@ void pqVRDockPanel::constructor()
   this->Internals->startButton->setEnabled(true);
   this->Internals->stopButton->setEnabled(false);
 
+  QFont font = this->Internals->debugLabel->font();
+  font.setFamily("Courier");
+  this->Internals->debugLabel->setFont(font);
+
   vtkVRInteractorStyleFactory *styleFactory =
       vtkVRInteractorStyleFactory::GetInstance();
   std::vector<std::string> styleDescs =
@@ -535,8 +539,24 @@ void pqVRDockPanel::updateDebugLabel()
   if (this->Internals->Camera)
     {
     double *pos = this->Internals->Camera->GetPosition();
-    QString debugString = QString("Camera position: %1 %2 %3")
+    QString debugString = QString("Camera position: %1 %2 %3\n")
         .arg(pos[0]).arg(pos[1]).arg(pos[2]);
+    vtkMatrix4x4 *mv = this->Internals->Camera->GetModelViewTransformMatrix();
+    debugString += "ModelView Matrix:\n";
+    for (int i = 0; i < 4; ++i)
+    {
+      double e0 = mv->GetElement(i, 0);
+      double e1 = mv->GetElement(i, 1);
+      double e2 = mv->GetElement(i, 2);
+      double e3 = mv->GetElement(i, 3);
+      debugString += QString("%1 %2 %3 %4\n")
+          .arg(e0 < 1e-10 ? 0.0 : e0, 8, 'g', 3)
+          .arg(e1 < 1e-10 ? 0.0 : e1, 8, 'g', 3)
+          .arg(e2 < 1e-10 ? 0.0 : e2, 8, 'g', 3)
+          .arg(e3 < 1e-10 ? 0.0 : e3, 8, 'g', 3);
+    }
+    // Pop off trailing newline
+    debugString.remove(QRegExp("\n$"));
     this->Internals->debugLabel->setText(debugString);
     this->Internals->debugLabel->show();
     }
