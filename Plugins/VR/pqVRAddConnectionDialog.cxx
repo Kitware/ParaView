@@ -158,7 +158,8 @@ pqVRAddConnectionDialog::pqVRAddConnectionDialog(QWidget* parentObject,
   QRegExpValidator *connNameValidator =
       new QRegExpValidator(QRegExp("[0-9a-zA-Z]+"), this);
   QRegExpValidator *addressValidator =
-      new QRegExpValidator(QRegExp("([0-9a-zA-Z.]+@)?[0-9a-zA-Z.]+"), this);
+      new QRegExpValidator(
+        QRegExp("([0-9a-zA-Z.]+@)?([a-zA-Z]+://)?[0-9a-zA-Z.]+"), this);
   QRegExpValidator *inputIdValidator =
       new QRegExpValidator(QRegExp("[0-9]+"), this);
   QRegExpValidator *inputNameValidator =
