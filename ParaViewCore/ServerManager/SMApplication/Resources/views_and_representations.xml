@@ -1265,6 +1265,8 @@
             <Property name="OriginalBoundsRangeActive" />
             <Property name="CustomRange" />
             <Property name="CustomRangeActive" />
+            <Property name="UseAxesOrigin" />
+            <Property name="AxesOrigin" />
           </PropertyGroup>
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
@@ -3138,6 +3140,19 @@
         </EnumerationDomain>
         <Documentation>Set the location of tick marks.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetAxesOrigin"
+                            default_values="0 0 0"
+                            name="AxesOrigin"
+                            number_of_elements="3">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <IntVectorProperty command="SetUseOfAxesOrigin"
+                         default_values="0"
+                         name="UseAxesOrigin"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Specify if the AxesCenter should be used to draw the axes.</Documentation>
+      </IntVectorProperty>
       <!-- End of CubeAxesRepresentation -->
     </RepresentationProxy>
     <!-- ================================================================== -->
@@ -4494,6 +4509,8 @@
           <Property name="OriginalBoundsRangeActive" />
           <Property name="CustomRange" />
           <Property name="CustomRangeActive" />
+          <Property name="UseAxesOrigin" />
+          <Property name="AxesOrigin" />
         </PropertyGroup>
       </ExposedProperties>
       <ShareProperties subproxy="SurfaceRepresentation">

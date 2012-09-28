@@ -158,6 +158,11 @@ public:
   virtual void SetDrawZGridlines(int val);
 
   virtual void SetGridLineLocation(int val);
+
+  virtual void SetUseOfAxesOrigin(int val);
+  virtual void SetAxesOrigin(double valX, double valY, double valZ);
+  virtual void SetAxesOrigin(double val[3]);
+
 //BTX
 protected:
   vtkCubeAxesRepresentation();

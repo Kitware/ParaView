@@ -475,6 +475,23 @@ void vtkCubeAxesRepresentation::SetGridLineLocation(int val)
 {
   this->CubeAxesActor->SetGridLineLocation(val);
 }
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetUseOfAxesOrigin(int val)
+{
+  this->CubeAxesActor->SetUseAxisOrigin(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetAxesOrigin(double valX, double valY, double valZ)
+{
+  this->CubeAxesActor->SetAxisOrigin(valX, valY, valZ);
+}
+
+//----------------------------------------------------------------------------
+void vtkCubeAxesRepresentation::SetAxesOrigin(double val[3])
+{
+  this->CubeAxesActor->SetAxisOrigin(val);
+}
 
 //----------------------------------------------------------------------------
 void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
@@ -563,18 +580,4 @@ void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
     this->UseOrientedBounds = false;
     this->CubeAxesActor->SetUseOrientedBounds(0);
     }
-
-  // Make sure we enable the custom origin if any
-  vtkFloatArray* customOrigin =
-      vtkFloatArray::SafeDownCast(fieldData->GetArray("AxisOrigin"));
-  if(customOrigin)
-    {
-    this->CubeAxesActor->SetUseAxisOrigin(1);
-    this->CubeAxesActor->SetAxisOrigin(customOrigin->GetTuple(0));
-    }
-  else
-    {
-    this->CubeAxesActor->SetUseAxisOrigin(0);
-    }
-
 }

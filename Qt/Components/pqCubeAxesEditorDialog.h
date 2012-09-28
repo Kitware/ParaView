@@ -52,6 +52,9 @@ public:
   /// Overridden to push changes if user hit accept.
   virtual void done(int r);
 
+protected slots:
+  void onUseAxesOriginChange(bool);
+
 private:
   pqCubeAxesEditorDialog(const pqCubeAxesEditorDialog&); // Not implemented.
   void operator=(const pqCubeAxesEditorDialog&); // Not implemented.
