@@ -60,7 +60,7 @@ protected:
   bool Enabled;
 
   bool IsInitialRecorded;
-  vtkTransform *InverseInitialMatrix;
+  vtkTransform *InverseInitialTransform;
 
 private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.

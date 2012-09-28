@@ -51,14 +51,14 @@ vtkVRGrabWorldStyle::vtkVRGrabWorldStyle() :
 {
   this->Enabled = false;
   this->IsInitialRecorded =false;
-  this->InverseInitialMatrix = vtkTransform::New();
+  this->InverseInitialTransform = vtkTransform::New();
   this->NeedsButton = true;
 }
 
 // -----------------------------------------------------------------------------
 vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 {
-  this->InverseInitialMatrix->Delete();
+  this->InverseInitialTransform->Delete();
 }
 
 // ----------------------------------------------------------------------------
@@ -103,23 +103,21 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
       {
       if ( !this->IsInitialRecorded )
         {
-        this->InverseInitialMatrix->SetMatrix( data.data.tracker.matrix );
-        this->InverseInitialMatrix->Inverse();
+        this->InverseInitialTransform->SetMatrix( data.data.tracker.matrix );
+        this->InverseInitialTransform->Inverse();
+        double currentValue[16];
+        vtkSMPropertyHelper(
+          this->ControlledProxy,
+          this->ControlledPropertyName).Get(currentValue, 16);
+        this->InverseInitialTransform->Concatenate(currentValue);
+
         this->IsInitialRecorded = true;
         }
       else
         {
         vtkNew<vtkTransform> currentTransform;
-        currentTransform->SetMatrix(data.data.tracker.matrix );
-        currentTransform->Concatenate(this->InverseInitialMatrix);
-
-        double currentValue[16];
-        vtkSMPropertyHelper(
-          this->ControlledProxy,
-          this->ControlledPropertyName).Get(currentValue, 16);
-        vtkNew<vtkTransform> currentValueTransform;
-        currentValueTransform->SetMatrix(currentValue);
-        currentTransform->Concatenate(currentValueTransform.GetPointer());
+        currentTransform->SetMatrix(data.data.tracker.matrix);
+        currentTransform->Concatenate(this->InverseInitialTransform);
 
         vtkSMPropertyHelper(
           this->ControlledProxy,
@@ -142,10 +140,10 @@ void vtkVRGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
 
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "IsInitialRecorded: " << this->IsInitialRecorded << endl;
-  if (this->InverseInitialMatrix)
+  if (this->InverseInitialTransform)
     {
     os << indent << "InverseInitialMatrix:" << endl;
-    this->InverseInitialMatrix->PrintSelf(os, indent.GetNextIndent());
+    this->InverseInitialTransform->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {
