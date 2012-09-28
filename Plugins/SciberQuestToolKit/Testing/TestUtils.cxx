@@ -87,7 +87,7 @@ vtkRenderWindow *vtkRenderWindowSingleton::RenderWindow=NULL;
 //*****************************************************************************
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
-  vtkInitializationHelper::TestingInitialize();
+  vtkInitializationHelper::StandaloneInitialize();
 
   vtkMultiProcessController *controller;
 
@@ -131,7 +131,7 @@ int Finalize(vtkMultiProcessController* controller, int code)
   controller->Finalize();
   controller->Delete();
 
-  vtkInitializationHelper::TestingFinalize();
+  vtkInitializationHelper::StandaloneFinalize();
 
   return code;
 }

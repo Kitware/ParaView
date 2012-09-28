@@ -131,7 +131,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 }
 
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::TestingInitialize()
+void vtkInitializationHelper::StandaloneInitialize()
 {
   // Verify that the version of the library that we linked against is
   // compatible with the version of the headers we compiled against.
@@ -149,7 +149,7 @@ void vtkInitializationHelper::Finalize()
 }
 
 //----------------------------------------------------------------------------
-void vtkInitializationHelper::TestingFinalize()
+void vtkInitializationHelper::StandaloneFinalize()
 {
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
