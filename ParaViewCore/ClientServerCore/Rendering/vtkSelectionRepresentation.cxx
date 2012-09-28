@@ -269,6 +269,13 @@ void vtkSelectionRepresentation::SetScale(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetUserTransform(const double matrix[16])
+{
+  this->GeometryRepresentation->SetUserTransform(matrix);
+  this->LabelRepresentation->SetUserTransform(matrix);
+}
+
+//----------------------------------------------------------------------------
 void vtkSelectionRepresentation::SetPointFieldDataArrayName(const char* val)
 {
   this->LabelRepresentation->SetPointFieldDataArrayName(val);

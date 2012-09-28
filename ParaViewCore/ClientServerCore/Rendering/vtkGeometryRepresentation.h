@@ -161,6 +161,7 @@ public:
   virtual void SetPosition(double, double, double);
   virtual void SetScale(double, double, double);
   virtual void SetTexture(vtkTexture*);
+  virtual void SetUserTransform(const double[16]); 
 
   //***************************************************************************
   // Forwarded to Mapper and LODMapper.

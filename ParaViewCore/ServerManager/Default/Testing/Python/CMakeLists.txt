@@ -119,6 +119,7 @@ ENDIF ()
 
 SET (PVBATCH_TESTS
   Simple
+  UserTransformOnRepresentation
   ParallelImageWriter
   ParallelSerialWriter
 )

@@ -1159,6 +1159,8 @@
                     panel_visibility="advanced" />
           <Property name="NonlinearSubdivisionLevel"
                     panel_visibility="advanced" />
+          <Property name="UserTransform"
+                    panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -2594,6 +2596,22 @@
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetUserTransform"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="UserTransform"
+                            number_of_elements="16">
+        <Documentation>
+          In addition to the instance variables such as position and
+          orientation, you can add an additional transformation for your own
+          use. This transformation is concatenated with the actor's internal
+          transformation, which you implicitly create through the use of
+          Position, Origin, Orientation. The value is 4x4 matrix for the linear
+          tranform to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty command="SetPickable"
                          default_values="1"
                          name="Pickable"
@@ -3490,6 +3508,22 @@
                             number_of_elements="3">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty argument_is_array="1"
+                            command="SetUserTransform"
+                            default_values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"
+                            name="UserTransform"
+                            number_of_elements="16">
+        <Documentation>
+          In addition to the instance variables such as position and
+          orientation, you can add an additional transformation for your own
+          use. This transformation is concatenated with the actor's internal
+          transformation, which you implicitly create through the use of
+          Position, Origin, Orientation. The value is 4x4 matrix for the linear
+          tranform to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <SubProxy>
         <Proxy name="LabelRepresentation"
                proxygroup="representations"
