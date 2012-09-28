@@ -31,21 +31,26 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
     REPLACE "([0-9])\\.([0-9])(\\.[0-9])?" "\\1\\2"
     INTEL_COMP_VERSION ${INTEL_COMP_VERSION})
   set(INTEL_XMMINTRIN)
+  mark_as_advanced(INTEL_XMMINTRIN)
   #if (INTEL_COMP_VERSION LESS 120)
+    set(_PATH_TOK)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-      find_file(INTEL_XMMINTRIN
-        NAMES xmmintrin.h
-        PATHS "${INTEL_COMP_ROOT}/../../include/intel64"
-        NO_DEFAULT_PATH)
+      set(_PATH_TOK "intel64")
     else()
-      find_file(INTEL_XMMINTRIN
-        NAMES xmmintrin.h
-        PATHS "${INTEL_COMP_ROOT}/../../include/ia32"
-        NO_DEFAULT_PATH)
+      set(_PATH_TOK "ia32")
     endif()
-    mark_as_advanced(INTEL_XMMINTRIN)
+    file(GLOB_RECURSE _XMM_INTRINS FOLLOW_SYMLINKS "${INTEL_COMP_ROOT}/../../xmmintrin.h*")
+    foreach(_XMM_INTRIN ${_XMM_INTRINS})
+      string(REGEX MATCH "${_PATH_TOK}/xmmintrin.h" _X ${_XMM_INTRIN})
+      if (_X)
+        set(INTEL_XMMINTRIN ${_XMM_INTRIN})
+      endif()
+    endforeach()
     if (NOT INTEL_XMMINTRIN)
       message(WARNING "The Intel compiler may need EXTRA_INTEL_INCLUDES set to the directory containing xmmintrin.h")
+      message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+      message(STATUS "INTEL_COMP_ROOT=${INTEL_COMP_ROOT}")
+      message(STATUS "INTEL_COMP_VERSION=${INTEL_COMP_VERSION}")
     endif ()
   #endif ()
   get_filename_component(INTEL_XMMINTRIN_PATH ${INTEL_XMMINTRIN} PATH)
