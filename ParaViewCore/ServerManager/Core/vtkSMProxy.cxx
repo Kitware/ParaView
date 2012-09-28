@@ -790,6 +790,28 @@ bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMProxy::GatherInformation(
+  vtkPVInformation* information, vtkTypeUInt32 location)
+{
+  assert(information);
+  vtkTypeUInt32 realLocation = (this->Location & location);
+  if (this->GetSession() && realLocation != 0)
+    {
+    // ensure that the proxy is created.
+    this->CreateVTKObjects();
+
+    return this->GetSession()->GatherInformation(
+      realLocation, information, this->GetGlobalID());
+    }
+  if ((this->Location != 0) && (realLocation == 0) && (location != 0))
+    {
+    vtkWarningMacro("GatherInformation was called with location "
+      "on which the proxy does not exist. Ignoring.");
+    }
+  return false;
+}
+
+//---------------------------------------------------------------------------
 bool vtkSMProxy::WarnIfDeprecated()
 {
   if (this->Deprecated)

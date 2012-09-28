@@ -170,6 +170,9 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->ForceUseStrips = 0;
   this->StripModFirstPass = 1;
 
+  this->HideInternalAMRFaces = true;
+  this->UseNonOverlappingAMRMetaDataForOutlines = true;
+
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_RANGES(), 1);
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_BOUNDS(), 1);
   this->GetInformation()->Set(vtkAlgorithm::PRESERVES_TOPOLOGY(), 1);
@@ -772,7 +775,14 @@ int vtkPVGeometryFilter::RequestAMRData(
         continue;
         }
 
-      bool extractface[6] = {false, false, false, false, false, false};
+      if (overlappingAMR != NULL &&
+        !this->UseNonOverlappingAMRMetaDataForOutlines &&
+        ug == NULL)
+        {
+        // for non-overlapping AMR, if we were told to not use meta-data, dont.
+        continue;
+        }
+
       double data_bounds[6];
       double error_margin = 0.01;
 
@@ -782,7 +792,6 @@ int vtkPVGeometryFilter::RequestAMRData(
         {
         // for overlappingAMR, we use the meta-data to determine AMR bounds.
         overlappingAMR->GetAMRInfo()->GetBounds(level, dataIdx, data_bounds);
-
         double data_spacing[3];
         overlappingAMR->GetAMRInfo()->GetSpacing(level, data_spacing);
         error_margin = vtkMath::Norm(data_spacing);
@@ -802,7 +811,8 @@ int vtkPVGeometryFilter::RequestAMRData(
         continue; // skip block.
         }
 
-      for (int cc=0; cc < 6; cc++)
+      bool extractface[6] = {true, true, true, true, true, true};
+      for (int cc=0; this->HideInternalAMRFaces && cc < 6; cc++)
         {
         double delta = fabs(data_bounds[cc] - bounds[cc]);
         extractface[cc] = (delta < error_margin);

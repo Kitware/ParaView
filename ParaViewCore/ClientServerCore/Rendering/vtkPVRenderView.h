@@ -204,10 +204,8 @@ public:
   vtkBooleanMacro(UseLightKit, bool);
 
   // Description:
-  // EXPERIMENTAL: Components of the streaming API for the render view. This is
-  // still under development.
-  unsigned int GetNextPieceToDeliver(double planes[24]);
-  void StreamingUpdate();
+  void StreamingUpdate(const double view_planes[24]);
+  void DeliverStreamedPieces(unsigned int size, unsigned int *representation_ids);
 
   // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.
@@ -226,6 +224,19 @@ public:
   // Representation can publish this key in their REQUEST_INFORMATION() pass to
   // indicate that the representation needs ordered compositing.
   static vtkInformationIntegerKey* NEED_ORDERED_COMPOSITING();
+
+  // Description:
+  // Key used to pass meta-data about the view frustum in REQUEST_STREAMING_UPDATE()
+  // pass. The value is a double vector with exactly 24 values.
+  static vtkInformationDoubleVectorKey* VIEW_PLANES();
+
+  // Description:
+  // Streaming pass request.
+  static vtkInformationRequestKey* REQUEST_STREAMING_UPDATE();
+
+  // Description:
+  // Pass to relay the streamed "piece" to the representations.
+  static vtkInformationRequestKey* REQUEST_PROCESS_STREAMED_PIECE();
 
   // Description:
   // Make a selection. This will result in setting up of this->LastSelection
@@ -315,6 +326,10 @@ public:
     double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
+  static void SetNextStreamedPiece(
+    vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
+  static vtkDataObject* GetCurrentStreamedPiece(
+    vtkInformation* info, vtkPVDataRepresentation* repr);
 
   // Description:
   // Hack to pass along image data producer to use to generate the KdTree cuts

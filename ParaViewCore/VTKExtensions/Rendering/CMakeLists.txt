@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set(Module_SRCS
-  vtkAMRIncrementalResampleHelper.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
   vtkBSPCutsGenerator.cxx
@@ -75,6 +74,7 @@ set(Module_SRCS
   vtkPVTrackballZoom.cxx
   vtkPVUpdateSuppressor.cxx
   vtkReductionFilter.cxx
+  vtkResampledAMRImageSource.cxx
   vtkSelectionConverter.cxx
   vtkSelectionSerializer.cxx
   vtkSortedTableStreamer.cxx

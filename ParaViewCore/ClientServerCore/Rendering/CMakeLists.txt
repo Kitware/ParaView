@@ -30,7 +30,9 @@
 #==========================================================================
 set (Module_SRCS
   vtk3DWidgetRepresentation.cxx
-  vtkAMRVolumeRepresentation.cxx
+  vtkAMROutlineRepresentation.cxx
+  vtkAMRStreamingPriorityQueue.cxx
+  vtkAMRStreamingVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
   vtkClientServerMoveData.cxx
@@ -74,6 +76,7 @@ set (Module_SRCS
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSelectionInformation.cxx
+  vtkPVStreamingPiecesInformation.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx

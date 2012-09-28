@@ -44,6 +44,7 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCenterAxesActor.h"
 #include "vtkPVConfig.h"
+#include "vtkPVDataDeliveryManager.h"
 #include "vtkPVDataRepresentation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -51,6 +52,7 @@
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVOptions.h"
 #include "vtkPVSession.h"
+#include "vtkPVStreamingMacros.h"
 #include "vtkPVSynchronizedRenderer.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkPVTrackballRotate.h"
@@ -59,7 +61,6 @@
 #include "vtkRenderViewBase.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "vtkPVDataDeliveryManager.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -137,6 +138,11 @@ vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_OUTLINE_FOR_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, LOD_RESOLUTION, Double);
 vtkInformationKeyMacro(vtkPVRenderView, NEED_ORDERED_COMPOSITING, Integer);
+vtkInformationKeyMacro(vtkPVRenderView, REQUEST_STREAMING_UPDATE, Request);
+vtkInformationKeyMacro(vtkPVRenderView, REQUEST_PROCESS_STREAMED_PIECE, Request);
+vtkInformationKeyRestrictedMacro(
+  vtkPVRenderView, VIEW_PLANES, DoubleVector, 24);
+
 vtkCxxSetObjectMacro(vtkPVRenderView, LastSelection, vtkSelection);
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -653,6 +659,7 @@ void vtkPVRenderView::SynchronizeGeometryBounds()
 //----------------------------------------------------------------------------
 bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_rendering)
 {
+
   switch (vtkProcessModule::GetProcessType())
     {
   case vtkProcessModule::PROCESS_DATA_SERVER:
@@ -662,7 +669,9 @@ bool vtkPVRenderView::GetLocalProcessDoesRendering(bool using_distributed_render
     return true;
 
   default:
-    return using_distributed_rendering;
+    return using_distributed_rendering || 
+      this->InTileDisplayMode() ||
+      this->SynchronizedWindows->GetIsInCave();
     }
 }
 
@@ -938,49 +947,6 @@ void vtkPVRenderView::InteractiveRender()
   this->Render(true, false);
 
   vtkTimerLog::MarkEndEvent("Interactive Render");
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkPVRenderView::GetNextPieceToDeliver(double planes[24])
-{
-  if (!vtkPVView::GetEnableStreaming())
-    {
-    return 0;
-    }
-
-  bool force_modified = false;
-  static double prev_planes[24];
-  for (int cc=0; cc < 24 && !force_modified;cc++)
-    {
-    force_modified = prev_planes[cc] != planes[cc];
-    }
-  memcpy(prev_planes, planes, 24*sizeof(double));
-
-
-  if (this->UpdateTimeStamp > this->PriorityQueueBuildTimeStamp ||
-    this->GetActiveCamera()->GetMTime() > this->PriorityQueueBuildTimeStamp ||
-    force_modified)
-    {
-    // either the data or the camera has changed. Regenerate the priority queue.
-    // Priority queue contains a list of (representation-id, block-id) tuples
-    // indicating the blocks to request.
-    vtkTimerLog::MarkStartEvent("Build View Priority Queue");
-    this->GetDeliveryManager()->BuildPriorityQueue(planes);
-    vtkTimerLog::MarkEndEvent("Build View Priority Queue");
-    this->PriorityQueueBuildTimeStamp.Modified();
-    }
-
-  return this->GetDeliveryManager()->GetRepresentationIdFromQueue();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::StreamingUpdate()
-{
-  vtkTimerLog::MarkStartEvent("Streaming Update");
-  // Update the representations.
-  this->CallProcessViewRequest(vtkPVView::REQUEST_UPDATE(),
-    this->RequestInformation, this->ReplyInformationVector);
-  vtkTimerLog::MarkEndEvent("Streaming Update");
 }
 
 //----------------------------------------------------------------------------
@@ -1306,6 +1272,35 @@ void vtkPVRenderView::SetGeometryBounds(vtkInformation* info,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetNextStreamedPiece(
+  vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece)
+{
+  vtkPVRenderView* self= vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return;
+    }
+  vtkStreamingStatusMacro(
+    << repr << " streamed piece of size: " << (piece? piece->GetActualMemorySize() : 0))
+  self->GetDeliveryManager()->SetNextStreamedPiece(repr, piece);
+}
+
+//----------------------------------------------------------------------------
+vtkDataObject* vtkPVRenderView::GetCurrentStreamedPiece(
+  vtkInformation* info, vtkPVDataRepresentation* repr)
+{
+  vtkPVRenderView* self= vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
+  if (!self)
+    {
+    vtkGenericWarningMacro("Missing VIEW().");
+    return NULL;
+    }
+
+  return self->GetDeliveryManager()->GetCurrentStreamedPiece(repr);
+}
+
+//----------------------------------------------------------------------------
 bool vtkPVRenderView::ShouldUseDistributedRendering(double geometry_size)
 {
   if (this->GetRemoteRenderingAvailable() == false)
@@ -1425,6 +1420,51 @@ double vtkPVRenderView::GetZbufferDataAtPoint(int x, int y)
   // whether remote rendering was needed or not.
   return this->SynchronizedWindows->GetZbufferDataAtPoint(x, y,
     this->GetIdentifier());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StreamingUpdate(const double view_planes[24])
+{
+  vtkTimerLog::MarkStartEvent("vtkPVRenderView::StreamingUpdate");
+
+  // Provide information about the view planes to the representations.
+  // Representations are free to ignore them.
+  this->RequestInformation->Set(vtkPVRenderView::VIEW_PLANES(),
+    const_cast<double*>(view_planes), 24);
+
+  // Now call REQUEST_STREAMING_UPDATE() on all representations. Most representations
+  // simply ignore it, but those that support streaming update the pipeline to
+  // get the "next phase" of the data from the input pipeline.
+  this->CallProcessViewRequest(vtkPVRenderView::REQUEST_STREAMING_UPDATE(),
+    this->RequestInformation, this->ReplyInformationVector);
+
+  vtkTimerLog::MarkEndEvent("vtkPVRenderView::StreamingUpdate");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::DeliverStreamedPieces(
+  unsigned int size, unsigned int *representation_ids)
+{
+  // the plan now is to fetch the piece and then simply give it to the
+  // representation as "next piece". Representation can decide what to do with
+  // it, including adding to the existing datastructure.
+  vtkTimerLog::MarkStartEvent("vtkPVRenderView::DeliverStreamedPieces");
+  this->Internals->DeliveryManager->DeliverStreamedPieces(
+    size, representation_ids);
+
+  if (this->GetLocalProcessDoesRendering(
+      this->GetUseDistributedRenderingForStillRender()))
+    {
+    // tell representations to "deal with" the newly streamed piece on the
+    // rendering nodes.
+    this->CallProcessViewRequest(vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE(),
+      this->RequestInformation, this->ReplyInformationVector);
+    }
+
+  this->Internals->DeliveryManager->ClearStreamedPieces();
+  //                                  ^--- the most dubious part of this code.
+
+  vtkTimerLog::MarkEndEvent("vtkPVRenderView::DeliverStreamedPieces");
 }
 
 //----------------------------------------------------------------------------

@@ -131,18 +131,32 @@ public:
   // *******************************************************************
 
   // Description:
-  // Mark a representation as streamable. Currently only
-  // vtkAMRVolumeRepresentation is supported.
+  // Mark a representation as streamable. Any representation can indicate that
+  // it is streamable i.e. the view can call streaming passses on it and it will
+  // deliver data incrementally.
   void SetStreamable(vtkPVDataRepresentation*, bool);
 
   // Description:
-  // Based on the current camera and currently available datasets, build a
-  // priority queue.
-  bool BuildPriorityQueue(double planes[24]);
-  unsigned int GetRepresentationIdFromQueue();
-  void StreamingDeliver(unsigned int key);
-  // *******************************************************************
+  // Passes the current streamed piece. This is the piece that will be delivered
+  // to the rendering node.
+  void SetNextStreamedPiece(vtkPVDataRepresentation* repr, vtkDataObject* piece);
+  vtkDataObject* GetCurrentStreamedPiece(vtkPVDataRepresentation* repr);
+  void ClearStreamedPieces();
 
+  // Description:
+  // Deliver streamed pieces. Unlike regular data, streamed pieces are delivered
+  // and released. Representations are expected to manage the pieces once they
+  // are delivered to them.
+  void DeliverStreamedPieces(unsigned int size, unsigned int *keys);
+
+//BTX
+  // Description:
+  // Fills up the vector with the keys for representations that have non-null
+  // streaming pieces.
+  bool GetRepresentationsReadyToStreamPieces(std::vector<unsigned int>& keys);
+//ETX
+
+  // *******************************************************************
 
   // *******************************************************************
   // HACK for dealing with volume rendering for image data

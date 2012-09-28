@@ -150,8 +150,9 @@ public:
   vtkSetStringMacro(ParaViewDataName);
 
   // Description:
-  // EXPERIMENTAL: When set, AMR streaming is enabled.
-  vtkGetMacro(AMRStreaming, int);
+  // Until streaming becomes mainstream, we enable streaming support by passing
+  // a command line argument to all processes.
+  vtkGetMacro(EnableStreaming, int);
 
   // Description:
   // When set, use cuda interop feature
@@ -258,7 +259,7 @@ private:
   vtkSetStringMacro(StereoType);
   char* StereoType;
 
-  int AMRStreaming;
+  int EnableStreaming;
 
   int UseCudaInterop;
 

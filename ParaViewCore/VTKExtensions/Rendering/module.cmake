@@ -30,4 +30,10 @@ vtk_module(vtkPVVTKExtensionsRendering
     ${__dependencies}
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
+
+  TEST_DEPENDS
+    vtkInteractionStyle
+    vtkIOAMR
+    vtkRenderingOpenGL
+    vtkTestingRendering
 )

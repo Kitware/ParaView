@@ -122,6 +122,27 @@ public:
   vtkBooleanMacro(GenerateProcessIds, bool);
 
   // Description:
+  // This property affects the way AMR outlines and faces are generated.
+  // When set to true (default), internal data-set faces/outlines for datasets within
+  // the AMR grids are hidden. Set it to false to see boxes for all the datasets
+  // in the AMR, internal or otherwise.
+  vtkSetMacro(HideInternalAMRFaces, bool);
+  vtkGetMacro(HideInternalAMRFaces, bool);
+  vtkBooleanMacro(HideInternalAMRFaces, bool);
+
+  // Description:
+  // For overlapping AMR, this property controls affects the way AMR
+  // outlines are generated. When set to true (default), it uses the
+  // overlapping AMR meta-data to identify the blocks present in the AMR.
+  // Which implies that even if the input did not fill in the uniform grids for
+  // all datasets in the AMR, this filter can generate outlines using the
+  // metadata alone. When set to false, the filter will only generate outlines
+  // for datasets that are actually present. Note, this only affects overlapping
+  // AMR.
+  vtkSetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+  vtkGetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+  vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+
   // These keys are put in the output composite-data metadata for multipieces
   // since this filter merges multipieces together.
   static vtkInformationIntegerVectorKey* POINT_OFFSETS();
@@ -270,6 +291,9 @@ protected:
   int ForceUseStrips;
   vtkTimeStamp     StripSettingMTime;
   int StripModFirstPass;
+
+  bool HideInternalAMRFaces;
+  bool UseNonOverlappingAMRMetaDataForOutlines;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented

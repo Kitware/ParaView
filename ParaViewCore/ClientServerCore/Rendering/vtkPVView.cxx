@@ -22,7 +22,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataRepresentation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVSession.h"
+#include "vtkPVStreamingMacros.h"
 #include "vtkPVSynchronizedRenderWindows.h"
 #include "vtkTimerLog.h"
 
@@ -69,6 +71,7 @@ bool vtkPVView::EnableStreaming = false;
 void vtkPVView::SetEnableStreaming(bool val)
 {
   vtkPVView::EnableStreaming = val;
+  vtkStreamingStatusMacro("Setting streaming status: " << val);
 }
 
 //----------------------------------------------------------------------------
@@ -80,6 +83,9 @@ bool vtkPVView::GetEnableStreaming()
 //----------------------------------------------------------------------------
 vtkPVView::vtkPVView()
 {
+  vtkStreamingStatusMacro(
+    "View Streaming  Status: " << vtkPVView::GetEnableStreaming());
+
   // Ensure vtkProcessModule is setup correctly.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
@@ -137,6 +143,13 @@ void vtkPVView::Initialize(unsigned int id)
   this->Identifier = id;
   this->SetSize(this->Size[0], this->Size[1]);
   this->SetPosition(this->Position[0], this->Position[1]);
+
+  // enable/disable streaming. This doesn't need to done on every Initialize()
+  // call, but no harm even if it is done.
+  if (vtkPVOptions *options = vtkProcessModule::GetProcessModule()->GetOptions())
+    {
+    vtkPVView::SetEnableStreaming(options->GetEnableStreaming());
+    }
 }
 
 //----------------------------------------------------------------------------
