@@ -410,6 +410,7 @@ else()
     ThirdParty/protobuf
     ThirdParty/QtTesting
     Utilities/ProcessXML
+    Utilities/ColorSeriesToXML
     Utilities/VisItBridge/databases
     Utilities/VisItBridge/Library
     Utilities/WrapClientServer
