@@ -210,6 +210,31 @@ QList<QString> pqVRConnectionManager::connectionNames() const
 }
 
 // ----------------------------------------------------------------------------
+int pqVRConnectionManager::numConnections() const
+{
+  int result = 0;
+#ifdef PARAVIEW_USE_VRPN
+  foreach (pqVRPNConnection* conn, this->Internals->VRPNConnections )
+    {
+    if (conn)
+      {
+      result++;
+      }
+    }
+  #endif
+  #ifdef PARAVIEW_USE_VRUI
+  foreach (pqVRUIConnection* conn, this->Internals->VRUIConnections )
+    {
+    if (conn)
+      {
+      result++;
+      }
+    }
+  #endif
+  return result;
+}
+
+// ----------------------------------------------------------------------------
 void pqVRConnectionManager::start()
 {
 #ifdef PARAVIEW_USE_VRPN
@@ -312,7 +337,6 @@ void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             }
           }
         }
-      this->start();
       }
     else
       {

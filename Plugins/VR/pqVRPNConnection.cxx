@@ -173,6 +173,11 @@ void pqVRPNConnection::setQueue( vtkVRQueue* queue )
 // ----------------------------------------------------------------------------
 bool pqVRPNConnection::init()
 {
+  if (this->Initialized)
+    {
+    return true;
+    }
+
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
@@ -194,12 +199,14 @@ bool pqVRPNConnection::init()
     this->Internals->Button->register_change_handler( static_cast<void*>( this ),
                                                       handleButtonChange );
     }
+
   return this->Initialized;
 }
 
 // ----------------------------------------------------------------private-slot
 void pqVRPNConnection::run()
 {
+  this->_Stop = false;
   while ( !this->_Stop )
     {
     if(this->Initialized)
@@ -217,9 +224,17 @@ void pqVRPNConnection::run()
 // ---------------------------------------------------------------------private
 void pqVRPNConnection::stop()
 {
-  this->Initialized = false;
   this->_Stop = true;
-  QThread::wait();
+  this->wait();
+
+  this->Initialized = false;
+  delete this->Internals->Analog;
+  this->Internals->Analog = NULL;
+  delete this->Internals->Button;
+  this->Internals->Button = NULL;
+  delete this->Internals->Tracker;
+  this->Internals->Tracker = NULL;
+
 }
 
 // ---------------------------------------------------------------------private

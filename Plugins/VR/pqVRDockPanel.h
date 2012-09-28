@@ -68,6 +68,7 @@ protected slots:
   void saveState();
   void restoreState();
 
+  void updateStartStopButtonStates();
   void start();
   void stop();
 

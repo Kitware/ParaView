@@ -381,6 +381,7 @@ void pqVRUIConnection::stop()
   this->_Stop = true;
   this->Internals->stopStream();
   this->Internals->deactivate();
+  this->Initialized=false;
   QThread::wait();
 }
 

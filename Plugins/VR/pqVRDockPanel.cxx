@@ -88,8 +88,7 @@ void pqVRDockPanel::constructor()
   this->setWidget(container);
 
   this->Internals->IsRunning = false;
-  this->Internals->startButton->setEnabled(true);
-  this->Internals->stopButton->setEnabled(false);
+  this->updateStartStopButtonStates();
 
   QFont font = this->Internals->debugLabel->font();
   font.setFamily("Courier");
@@ -124,6 +123,9 @@ void pqVRDockPanel::constructor()
 
   connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
           this, SLOT(updateConnections()));
+
+  connect(pqVRConnectionManager::instance(), SIGNAL(connectionsChanged()),
+          this, SLOT(updateStartStopButtonStates()));
 
   // Styles
   connect(this->Internals->addStyle, SIGNAL(clicked()),
@@ -502,6 +504,18 @@ void pqVRDockPanel::restoreState()
 }
 
 //-----------------------------------------------------------------------------
+void pqVRDockPanel::updateStartStopButtonStates()
+{
+  pqVRConnectionManager *mgr = pqVRConnectionManager::instance();
+  bool canStart = !this->Internals->IsRunning && mgr->numConnections() != 0;
+  bool canStop = this->Internals->IsRunning;
+
+  this->Internals->startButton->setEnabled(canStart);
+  this->Internals->stopButton->setEnabled(canStop);
+
+}
+
+//-----------------------------------------------------------------------------
 void pqVRDockPanel::start()
 {
   if (this->Internals->IsRunning)
@@ -510,11 +524,10 @@ void pqVRDockPanel::start()
                   " already running!";
     return;
     }
-  this->Internals->IsRunning = true;
-  this->Internals->startButton->setEnabled(false);
-  this->Internals->stopButton->setEnabled(true);
   pqVRConnectionManager::instance()->start();
   pqVRQueueHandler::instance()->start();
+  this->Internals->IsRunning = true;
+  this->updateStartStopButtonStates();
 }
 
 //-----------------------------------------------------------------------------
@@ -526,11 +539,10 @@ void pqVRDockPanel::stop()
                   " not started!";
     return;
     }
-  this->Internals->startButton->setEnabled(true);
-  this->Internals->stopButton->setEnabled(false);
-  this->Internals->IsRunning = false;
   pqVRConnectionManager::instance()->stop();
   pqVRQueueHandler::instance()->stop();
+  this->Internals->IsRunning = false;
+  this->updateStartStopButtonStates();
 }
 
 //-----------------------------------------------------------------------------

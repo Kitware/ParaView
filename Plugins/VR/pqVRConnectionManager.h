@@ -66,6 +66,8 @@ public:
 
   QList<QString> connectionNames() const;
 
+  int numConnections() const;
+
   static pqVRConnectionManager* instance();
 
 public slots:
