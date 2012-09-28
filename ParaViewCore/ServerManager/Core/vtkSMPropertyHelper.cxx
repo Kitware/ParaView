@@ -146,8 +146,10 @@ inline const char* vtkSMPropertyHelper::GetProperty(unsigned int index) const
           this->Property->FindDomain("vtkSMEnumerationDomain"));
     if(domain != NULL)
       {
-      const char* entry = domain->GetEntryTextForValue(this->IntVectorProperty->GetElement(index));
-      if(entry)
+      const char* entry = domain->GetEntryTextForValue(
+        (this->UseUnchecked ? this->IntVectorProperty->GetUncheckedElement(index) :
+                              this->IntVectorProperty->GetElement(index)));
+      if (entry)
         {
         return entry;
         }

@@ -34,17 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqArrayStatusPropertyWidget.h"
-#include "pqColorSelectorPropertyWidget.h"
+#include "pqCalculatorWidget.h"
 #include "pqColorEditorPropertyWidget.h"
+#include "pqColorSelectorPropertyWidget.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
+#include "pqTextureSelectorPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "pqTextureSelectorPropertyWidget.h"
+
+#include <QtDebug>
 
 pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
   : QObject(p)
@@ -76,6 +79,14 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     else if(name == "texture_selector")
       {
       return new pqTextureSelectorPropertyWidget(smProxy);
+      }
+    else if (name == "calculator")
+      {
+      return new pqCalculatorWidget(smProxy, smProperty);
+      }
+    else
+      {
+      qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
       }
     }
 
