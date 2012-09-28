@@ -4936,9 +4936,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property contains the name of the
         vector array by which to warp the dataset's point
         coordinates.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
@@ -4949,9 +4946,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>Each component of the selected vector array will be
         multiplied by the value of this property before being used to compute
         new point coordinates.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <!-- End WarpVector -->
     </SourceProxy>
@@ -5241,9 +5235,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>This property specifies the parameters of the clip
         function (an implicit plane) used to clip the dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </ProxyProperty>
       <DoubleVectorProperty information_only="1"
                             name="InputBounds">
@@ -5501,9 +5492,6 @@ found and the point will be rejected.</Documentation>
         </FieldDataDomain>
         <Documentation>The value of this property contains the name of the
         scalar array from which to perform thresholding.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="ThresholdBetween"
                             default_values="0 0"
@@ -5520,9 +5508,6 @@ found and the point will be rejected.</Documentation>
         </ArrayRangeDomain>
         <Documentation>The values of this property specify the upper and lower
         bounds of the thresholding operation.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetAllScalars"
                          default_values="1"
@@ -5536,7 +5521,6 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
-        <ShowInSummaryPanel />
       </Hints>
       <!-- End Threshold -->
     </SourceProxy>
@@ -5658,9 +5642,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the name of the scalar array
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
@@ -5682,9 +5663,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the values at which to compute
         isosurfaces/isolines and also the number of such
         values.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
@@ -5799,9 +5777,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property indicates the name of the scalar array on
         which to operate. The indicated array may be used for scaling the
         glyphs. (See the SetScaleMode property.)</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             default_values="1"
@@ -5822,9 +5797,6 @@ found and the point will be rejected.</Documentation>
         which to operate. The indicated array may be used for scaling and/or
         orienting the glyphs. (See the SetScaleMode and SetOrient
         properties.)</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <InputProperty command="SetSourceConnection"
                      label="Glyph Type"
@@ -5854,9 +5826,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>This property determines which type of glyph will be
         placed at the points in the input dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </InputProperty>
       <ProxyProperty command="SetSourceTransform"
                      name="GlyphTransform"
@@ -5898,9 +5867,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property specifies how/if the glyphs
         should be scaled based on the point-centered scalars/vectors in the
         input dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
@@ -6484,9 +6450,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>The value of this property determines how the seeds for
         the streamlines will be generated.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -6503,9 +6466,6 @@ found and the point will be rejected.</Documentation>
         </ArrayListDomain>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <IntVectorProperty default_values="100"
                          information_only="1"
@@ -12136,9 +12096,6 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a point array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearCellDataArrays"
@@ -12149,9 +12106,6 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a cell array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearFieldDataArrays"
@@ -12162,9 +12116,6 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a field array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <!-- End PassArrays -->
     </SourceProxy>

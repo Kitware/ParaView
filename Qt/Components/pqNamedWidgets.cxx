@@ -708,12 +708,6 @@ static void processHints(QGridLayout* panelLayout,
     return;
     }
 
-  // check if we are only showing summary properties
-  if(summaryOnly && hints->FindNestedElementByName("ShowInSummaryPanel") == 0)
-    {
-    return;
-    }
-
   // Check for any hints about whether to show or hide the widget associated
   // with a particular property.
   unsigned int numHints = hints->GetNumberOfNestedElements();
@@ -897,12 +891,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bo
       }
 
     vtkPVXMLElement *hints = SMProperty->GetHints();
-
-    // skip non-summary properties if summaryOnly is true
-    if(summaryOnly && (!hints || hints->FindNestedElementByName("ShowInSummaryPanel") == 0))
-      {
-      continue;
-      }
 
     // update domains we might ask for
     SMProperty->UpdateDependentDomains();
