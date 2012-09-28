@@ -79,7 +79,7 @@ int vtkPVPlotMatrixView::GetActiveRow()
 {
   if (this->PlotMatrix)
     {
-    return this->PlotMatrix->GetActivePlot().X();
+    return this->PlotMatrix->GetActivePlot().GetX();
     }
   return 0;
 }
@@ -89,7 +89,7 @@ int vtkPVPlotMatrixView::GetActiveColumn()
 {
   if (this->PlotMatrix)
     {
-    return this->PlotMatrix->GetActivePlot().Y();
+    return this->PlotMatrix->GetActivePlot().GetY();
     }
   return 0;
 }
