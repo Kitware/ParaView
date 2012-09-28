@@ -69,12 +69,17 @@ public:
   // Used by vtkPVSessionCore to pass the core. This is not reference counted.
   void SetCore(vtkPVSessionCore*);
 
+  // Description:
+  // Switch from 0:vtkErrorMacro to 1:vtkWarningMacro
+  vtkSetMacro(LogLevel, int);
+
 //BTX
 protected:
   vtkPVSessionCoreInterpreterHelper();
   ~vtkPVSessionCoreInterpreterHelper();
 
   vtkWeakPointer<vtkPVSessionCore> Core;
+  int LogLevel;
 private:
   vtkPVSessionCoreInterpreterHelper(const vtkPVSessionCoreInterpreterHelper&); // Not implemented
   void operator=(const vtkPVSessionCoreInterpreterHelper&); // Not implemented

@@ -184,16 +184,7 @@ public:
 
   vtkItem* GetItem(vtkPVDataRepresentation* repr, bool use_second)
     {
-    RepresentationToIdMapType::iterator iter =
-      this->RepresentationToIdMap.find(repr);
-    if (iter != this->RepresentationToIdMap.end())
-      {
-      unsigned int index = iter->second;
-      return use_second? &(this->ItemsMap[index].second) :
-        &(this->ItemsMap[index].first);
-      }
-
-    return NULL;
+    return this->GetItem(repr->GetUniqueIdentifier(), use_second);
     }
 
   unsigned long GetVisibleDataSize(bool use_second_if_available)
@@ -214,10 +205,6 @@ public:
     return size;
     }
 
-  typedef std::map<vtkPVDataRepresentation*, unsigned int>
-    RepresentationToIdMapType;
-
-  RepresentationToIdMapType RepresentationToIdMap;
   ItemsMapType ItemsMap;
 };
 
@@ -256,47 +243,25 @@ unsigned long vtkPVDataDeliveryManager::GetVisibleDataSize(bool low_res)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataDeliveryManager::RegisterRepresentation(
-  unsigned int id, vtkPVDataRepresentation* repr)
+void vtkPVDataDeliveryManager::RegisterRepresentation(vtkPVDataRepresentation* repr)
 {
-  this->Internals->RepresentationToIdMap[repr] = id;
+  assert( "A representation must have a valid UniqueIdentifier"
+          && repr->GetUniqueIdentifier());
 
   vtkInternals::vtkItem item;
   item.Representation = repr;
-  this->Internals->ItemsMap[id].first = item;
+  this->Internals->ItemsMap[repr->GetUniqueIdentifier()].first = item;
 
   vtkInternals::vtkItem item2;
   item2.Representation = repr;
-  this->Internals->ItemsMap[id].second= item2;
+  this->Internals->ItemsMap[repr->GetUniqueIdentifier()].second= item2;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVDataDeliveryManager::UnRegisterRepresentation(
   vtkPVDataRepresentation* repr)
 {
-  vtkInternals::RepresentationToIdMapType::iterator iter =
-    this->Internals->RepresentationToIdMap.find(repr);
-  if (iter == this->Internals->RepresentationToIdMap.end())
-    {
-    vtkErrorMacro("Invalid argument.");
-    return;
-    }
-  this->Internals->ItemsMap.erase(iter->second);
-  this->Internals->RepresentationToIdMap.erase(iter);
-}
-
-//----------------------------------------------------------------------------
-unsigned int vtkPVDataDeliveryManager::GetRepresentationId(
-  vtkPVDataRepresentation* repr)
-{
-  vtkInternals::RepresentationToIdMapType::iterator iter =
-    this->Internals->RepresentationToIdMap.find(repr);
-  if (iter == this->Internals->RepresentationToIdMap.end())
-    {
-    vtkErrorMacro("Invalid argument.");
-    return 0;
-    }
-  return iter->second;
+  this->Internals->ItemsMap.erase(repr->GetUniqueIdentifier());
 }
 
 //----------------------------------------------------------------------------
@@ -742,4 +707,19 @@ void vtkPVDataDeliveryManager::DeliverStreamedPieces(
 void vtkPVDataDeliveryManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDataDeliveryManager::GetSynchronizationMagicNumber()
+{
+  const int prime = 31;
+  int result = 1;
+  result = prime * result + static_cast<int>(this->Internals->ItemsMap.size());
+  vtkInternals::ItemsMapType::iterator iter = this->Internals->ItemsMap.begin();
+  for(;iter != this->Internals->ItemsMap.end(); iter++)
+    {
+    result = prime * result + static_cast<int>(iter->first);
+    }
+
+  return result;
 }

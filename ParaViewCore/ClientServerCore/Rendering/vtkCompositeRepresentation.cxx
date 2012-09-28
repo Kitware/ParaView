@@ -77,6 +77,9 @@ void vtkCompositeRepresentation::AddRepresentation(
 {
   assert(repr != NULL && key != NULL);
 
+  // Make sure the representation that we register is already initialized
+  repr->Initialize(1,0); // Should abort if no initialized as 1 > 0
+
   if (this->Internals->Representations.find(key) !=
     this->Internals->Representations.end())
     {

@@ -47,13 +47,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Returned a hash number that can be used to verify that both client and
+  // server side are in synch representation wise for delivery.
+  int GetSynchronizationMagicNumber();
+
+  // Description:
   // View uses these methods to register a representation with the storage. This
   // makes it possible for representations to communicate with the storage
   // directly using a self pointer, while enables views on different processes
   // to communicate information about representations using their unique ids.
-  void RegisterRepresentation(unsigned int id, vtkPVDataRepresentation*);
+  void RegisterRepresentation(vtkPVDataRepresentation *repr);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
-  unsigned int GetRepresentationId(vtkPVDataRepresentation*);
   vtkPVDataRepresentation* GetRepresentation(unsigned int);
 
   // Description:

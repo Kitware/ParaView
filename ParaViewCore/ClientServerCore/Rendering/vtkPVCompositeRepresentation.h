@@ -79,6 +79,11 @@ public:
   virtual void SetPointFieldDataArrayName(const char*);
   virtual void SetCellFieldDataArrayName(const char*);
 
+  // Description:
+  // Override because of internal composite representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
 //BTX
 protected:
   vtkPVCompositeRepresentation();

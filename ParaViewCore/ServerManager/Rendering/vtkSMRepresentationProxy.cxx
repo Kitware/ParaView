@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+#define MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS 10
+
 vtkStandardNewMacro(vtkSMRepresentationProxy);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
@@ -55,6 +57,16 @@ void vtkSMRepresentationProxy::CreateVTKObjects()
     {
     return;
     }
+
+  // Initialize vtkPVDataRepresentation with a unique ID
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "Initialize"
+         << static_cast<unsigned int>(this->GetGlobalID())
+         << static_cast<unsigned int>(this->GetGlobalID() + MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
 
   vtkObject::SafeDownCast(this->GetClientSideObject())->AddObserver(
     vtkCommand::UpdateDataEvent,
@@ -278,4 +290,19 @@ void vtkSMRepresentationProxy::ViewTimeChanged()
 void vtkSMRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//---------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMRepresentationProxy::GetGlobalID()
+{
+  bool has_gid = this->HasGlobalID();
+
+  if (!has_gid && this->Session != NULL)
+    {
+    // reserve 1+MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS contiguous IDs for the source proxies and possible extract
+    // selection proxies.
+    this->SetGlobalID(
+      this->GetSession()->GetNextChunkGlobalUniqueIdentifier(1 +
+        MAX_NUMBER_OF_INTERNAL_REPRESENTATIONS));
+    }
+  return this->GlobalID;
 }

@@ -235,3 +235,13 @@ void vtkPVCompositeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+//----------------------------------------------------------------------------
+unsigned int vtkPVCompositeRepresentation::Initialize(unsigned int minIdAvailable,
+                                                    unsigned int maxIdAvailable)
+{
+  unsigned int minId = minIdAvailable;
+  minId = this->CubeAxesRepresentation->Initialize(minId, maxIdAvailable);
+  minId = this->SelectionRepresentation->Initialize(minId, maxIdAvailable);
+
+  return  this->Superclass::Initialize(minId, maxIdAvailable);
+}

@@ -370,3 +370,13 @@ vtkDataObject* vtkCompositeSliceRepresentation::GetRenderedDataObject(int vtkNot
 {
   return this->InternalSliceFilter->GetInputDataObject(0,0);
 }
+
+//----------------------------------------------------------------------------
+unsigned int vtkCompositeSliceRepresentation::Initialize(unsigned int minIdAvailable,
+                                                         unsigned int maxIdAvailable)
+{
+  unsigned int newMin =
+      this->OutlineRepresentation->Initialize(minIdAvailable, maxIdAvailable);
+
+  return  this->Superclass::Initialize(newMin, maxIdAvailable);
+}

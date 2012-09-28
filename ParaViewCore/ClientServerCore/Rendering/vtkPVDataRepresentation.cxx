@@ -48,6 +48,8 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
   this->ForcedCacheKey = 0.0;
 
   this->NeedUpdate = true;
+
+  this->UniqueIdentifier = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +81,7 @@ vtkExecutive* vtkPVDataRepresentation::CreateDefaultExecutive()
 int vtkPVDataRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request, vtkInformation*, vtkInformation*)
 {
+  assert("We must have an ID at that time" && this->UniqueIdentifier);
   assert(this->GetExecutive()->IsA("vtkPVDataRepresentationPipeline"));
   if (this->GetVisibility() == false)
     {
@@ -98,6 +101,20 @@ void vtkPVDataRepresentation::MarkModified()
 {
   this->Modified();
   this->NeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVDataRepresentation::Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable)
+{
+  // Already initialized ?
+  if(this->UniqueIdentifier)
+    {
+    return minIdAvailable;
+    }
+
+  assert("Invalid Representation Id. Not enough reserved ids." && (maxIdAvailable >= minIdAvailable));
+  this->UniqueIdentifier = minIdAvailable;
+  return (1 + this->UniqueIdentifier);
 }
 
 //----------------------------------------------------------------------------
