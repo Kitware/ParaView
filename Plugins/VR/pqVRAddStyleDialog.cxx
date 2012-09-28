@@ -202,7 +202,7 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     {
     QByteArray analog =
         this->Internals->analogCombo->currentText().toLocal8Bit();
-    this->Internals->Style->SetTrackerName(analog.data());
+    this->Internals->Style->SetAnalogName(analog.data());
     }
   else if (this->Internals->Style->GetNeedsButton())
     {
