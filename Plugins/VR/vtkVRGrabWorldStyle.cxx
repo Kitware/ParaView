@@ -88,9 +88,8 @@ vtkPVXMLElement* vtkVRGrabWorldStyle::SaveConfiguration() const
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
 {
-  if (data.name.size() > 0)
+  if (data.name == std::string(this->ButtonName))
     {
-    this->SetButtonName(data.name.c_str());
     this->Enabled = data.data.button.state;
     }
 }
@@ -98,9 +97,8 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 {
-  if (data.name.size() > 0)
+  if (data.name == std::string(this->TrackerName))
     {
-    this->SetTrackerName(data.name.c_str());
     if ( this->Enabled )
       {
       if ( !this->IsInitialRecorded )

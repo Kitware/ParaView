@@ -86,9 +86,8 @@ vtkPVXMLElement* vtkVRTrackStyle::SaveConfiguration() const
 // ----------------------------------------------------------------------------
 void vtkVRTrackStyle::HandleTracker( const vtkVREventData& data )
 {
-  if (data.name.size() > 0)
+  if (data.name == std::string(this->TrackerName))
     {
-    this->SetTrackerName(data.name.c_str());
     if (this->ControlledProxy && this->ControlledPropertyName != NULL &&
         this->ControlledPropertyName[0] != '\0')
       {
