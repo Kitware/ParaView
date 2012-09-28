@@ -76,6 +76,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CreateDelete.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/DataOutlines.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
@@ -219,6 +220,7 @@ set(CTHDerivedDensity2DClyinder_USE_NEW_PANELS TRUE)
 set(CustomFilter_USE_NEW_PANELS TRUE)
 set(CustomSourceProbe_USE_NEW_PANELS TRUE)
 set(D3SmallCells_USE_NEW_PANELS TRUE)
+set(DataOutlines_USE_NEW_PANELS TRUE)
 set(DualSphereAnimation_USE_NEW_PANELS TRUE)
 set(EnSight_USE_NEW_PANELS TRUE)
 set(ExodusXML_USE_NEW_PANELS TRUE)
@@ -301,6 +303,7 @@ set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
 set(3DWidgetInCustomFilter_BREAK TRUE)
 set(Threshold_BREAK TRUE)
 set(ExodusModeShapes_BREAK TRUE)
+set(DataOutlines_BREAK TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
