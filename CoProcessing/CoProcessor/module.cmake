@@ -13,4 +13,6 @@ vtk_module(vtkCoProcessorImplementation
   TEST_DEPENDS
     vtkTestingRendering
   EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW CATALYST
 )

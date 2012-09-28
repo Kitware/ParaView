@@ -10,4 +10,6 @@ vtk_module(pqComponents
     pqCore
     ${__depends}
   EXCLUDE_FROM_WRAPPING
+  TEST_LABELS
+    PARAVIEW
 )

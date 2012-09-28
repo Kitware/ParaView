@@ -24,4 +24,6 @@ vtk_module(vtkPVClientServerCoreCore
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 
     vtkUtilitiesWrapClientServer
+  TEST_LABELS
+    PARAVIEW
 )

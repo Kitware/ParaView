@@ -4,4 +4,6 @@ vtk_module(vtkPVServerManagerRendering
   DEPENDS
     vtkPVServerManagerCore
     vtkPVServerImplementationRendering
+  TEST_LABELS
+    PARAVIEW
 )

@@ -11,4 +11,6 @@ vtk_module(vtkPVServerManagerApplication
     vtkUtilitiesProcessXML
     # this enables the necesary modules.
     ${PARAVIEW_DEFAULT_VTK_MODULES}
+  TEST_LABELS
+    PARAVIEW
 )
