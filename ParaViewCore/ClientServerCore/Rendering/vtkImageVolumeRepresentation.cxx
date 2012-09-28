@@ -149,6 +149,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     this->OutlineSource->SetBounds(vtkImageData::SafeDownCast(
         this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
     this->OutlineSource->GetBounds(this->DataBounds);
+    this->OutlineSource->Update();
     }
   else
     {
