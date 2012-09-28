@@ -9,8 +9,8 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   #ignore protobuf related warnings.
   "ThirdParty.protobuf/"
-  "google.protobuf"
-  "vtkPVMessage.pb"
+  "protobuf"
+  "vtkPVMessage"
   "vtkSMMessage"
   "google::protobuf::Message"
 
