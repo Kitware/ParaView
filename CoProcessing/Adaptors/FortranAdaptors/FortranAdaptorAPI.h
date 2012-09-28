@@ -15,6 +15,7 @@
 #ifndef FortranAdaptorAPI_h
 #define FortranAdaptorAPI_h
 
+#include "FortranAdaptorModule.h"
 #include "CPUseFortran.h"
 
 #ifdef COPROCESSOR_MANGLE_FORTRAN
@@ -49,15 +50,15 @@ namespace ParaViewCoProcessing
 {
   // function to return the singleton/static vtkCPDataDescription object
   // that contains the grid and fields stuff
-  vtkCPDataDescription* GetCoProcessorData();
+  FORTRANADAPTOR_EXPORT vtkCPDataDescription* GetCoProcessorData();
 
   // Clear all of the field data from the grids.
-  void ClearFieldDataFromGrid(vtkDataSet* grid);
+  FORTRANADAPTOR_EXPORT void ClearFieldDataFromGrid(vtkDataSet* grid);
 
   // For Fortran strings we can't figure out from C/C++ code
   // how long they are.  This function returns true if successful,
   // false otherwise (e.g. if CStringMaxLength <= FortranStringLength).
-  bool ConvertFortranStringToCString(
+  FORTRANADAPTOR_EXPORT bool ConvertFortranStringToCString(
     char* fortranString, int fortranStringLength,
     char* cString, int cStringMaxLength);
 }
@@ -67,27 +68,27 @@ extern "C" {
 
 // for now assume that the coprocessor is run through a python script
 #ifdef PARAVIEW_ENABLE_PYTHON
-void coprocessorinitialize(char* pythonFileName,
+void FORTRANADAPTOR_EXPORT coprocessorinitialize(char* pythonFileName,
                            int* pythonFileNameLength);
 #else
-  void coprocessorinitialize();
+  void FORTRANADAPTOR_EXPORT coprocessorinitialize();
 #endif
 // call at the end of the simulation
-void coprocessorfinalize();
+void FORTRANADAPTOR_EXPORT coprocessorfinalize();
 
 // this is the function that determines whether or not there
 // is anything to coprocess this time step
-void requestdatadescription(int* timeStep, double* time,
+void FORTRANADAPTOR_EXPORT requestdatadescription(int* timeStep, double* time,
                             int* coprocessThisTimeStep);
 
 // this function sets needgrid to 1 if it does not have a copy of the grid
 // it sets needgrid to 0 if it does have a copy of the grid but does not
 // check if the grid is modified or needs to be updated
-void needtocreategrid(int* needGrid);
+void FORTRANADAPTOR_EXPORT needtocreategrid(int* needGrid);
 
 // do the actual coprocessing.  it is assumed that the vtkCPDataDescription
 // has been filled in elsewhere.
-void coprocess();
+void FORTRANADAPTOR_EXPORT coprocess();
 
 #ifdef __cplusplus
 } /* extern "C" */
