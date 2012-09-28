@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 {
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   vtkInitializationHelper::Initialize( argc, argv,
-                                       vtkProcessModule::PROCESS_BATCH,
+                                       vtkProcessModule::PROCESS_CLIENT,
                                        options );
 
   //---------------------------------------------------------------------------
