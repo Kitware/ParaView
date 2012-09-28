@@ -49,8 +49,6 @@ using std::vector;
 #define SKIP_PROCESS_ID 1
 
 
-
-
 /**
 Use a single render window for each run. This was suggested
 after strange x11 errors on the Blight dashboard system.
@@ -558,7 +556,7 @@ int SerialRender(
           vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
           rwin->AddRenderer(ren);
           rwin->SetSize(iwx,iwy);
-          ren->Delete();
+          //ren->Delete(); hold the ref to work around a bug in vtk
 
           vtkCamera *cam=ren->GetActiveCamera();
           cam->SetPosition(px,py,pz);
@@ -589,6 +587,7 @@ int SerialRender(
           decompImage->Delete();
 
           rwin->RemoveRenderer(ren);
+          ren->Delete(); // ok to release
 
           continue;
           }
@@ -605,7 +604,7 @@ int SerialRender(
         vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
         rwin->AddRenderer(ren);
         rwin->SetSize(iwx,iwy);
-        ren->Delete();
+        //ren->Delete(); hold the ref to work around a bug in vtk
 
         vtkCamera *cam=ren->GetActiveCamera();
         cam->SetPosition(px,py,pz);
@@ -636,6 +635,7 @@ int SerialRender(
           }
         testHelper->Delete();
         rwin->RemoveRenderer(ren);
+        ren->Delete(); // ok to release
         }
       }
     data->Delete();
