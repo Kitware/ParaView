@@ -1,13 +1,10 @@
-
-INCLUDE(ParaViewTestingMacros)
-
-ADD_SUBDIRECTORY(XML)
-
-OPTION(PARAVIEW_CLIENT_RENDER_SERVER_TESTS
+option(PARAVIEW_CLIENT_RENDER_SERVER_TESTS
   "Turn on/off client tests that involve separate data and render servers."
   ON)
-MARK_AS_ADVANCED(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+mark_as_advanced(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
-IF (QT_TESTING_WITH_PYTHON)
-  ADD_SUBDIRECTORY(Python)
-ENDIF (QT_TESTING_WITH_PYTHON)
+include(ParaViewTestingMacros)
+add_subdirectory(XML)
+if (QT_TESTING_WITH_PYTHON)
+  add_subdirectory(Python)
+endif (QT_TESTING_WITH_PYTHON)
