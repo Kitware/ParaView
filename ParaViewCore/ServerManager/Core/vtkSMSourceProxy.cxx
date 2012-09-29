@@ -136,7 +136,7 @@ vtkTypeUInt32 vtkSMSourceProxy::GetGlobalID()
 //---------------------------------------------------------------------------
 unsigned int vtkSMSourceProxy::GetNumberOfOutputPorts()
 {
-  return this->PInternals->OutputPorts.size();
+  return static_cast<int>(this->PInternals->OutputPorts.size());
 }
 
 //---------------------------------------------------------------------------
@@ -549,9 +549,9 @@ void vtkSMSourceProxy::CreateSelectionProxies()
     // This happen in collaboration mode when the SelectionProxy
     // became alive because of the SelectionRepresentation before the
     // CreateSelectionProxies() get called on the original source proxy...
-    if( esProxy =
-        vtkSMSourceProxy::SafeDownCast(
-          this->Session->GetRemoteObject(this->GetGlobalID()+j+1)))
+    if( (esProxy =
+         vtkSMSourceProxy::SafeDownCast(
+           this->Session->GetRemoteObject(this->GetGlobalID()+j+1))) != NULL)
       {
       esProxy->DisableSelectionProxies = true;
       this->PInternals->SelectionProxies[j] = esProxy;

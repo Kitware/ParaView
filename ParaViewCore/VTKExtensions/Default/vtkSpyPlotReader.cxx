@@ -695,18 +695,18 @@ int vtkSpyPlotReader::RequestData(
         {
         block=blockIterator->GetBlock();
         int level = 0;
-        int hasBadGhostCells;
         int realExtents[6];
         int realDims[3];
         int extents[6];
         double spacing[3];
         double origin[3];
-        hasBadGhostCells = block->GetAMRInformation(*this->Bounds,
-                                                    &level, spacing,
-                                                    origin, extents,
-                                                    realExtents,
-                                                    realDims);
-        for(int i=blocksPerLevel.size(); i<=level; i++)
+        // int hasBadGhostCells =
+        block->GetAMRInformation(*this->Bounds,
+                                 &level, spacing,
+                                 origin, extents,
+                                 realExtents,
+                                 realDims);
+        for(int i=static_cast<int>(blocksPerLevel.size()); i<=level; i++)
           {
           blocksPerLevel.push_back(0);
           }
@@ -2280,7 +2280,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
     for(unsigned int level = 0; level<numberOfLevels; level++)
       {
       int globalIndex = globalIndices[level];
-      int numberOfDataSets = datasets[level].size();
+      int numberOfDataSets = static_cast<int>(datasets[level].size());
       // put the datasets back starting at globalIndex.
       // All other indices are in their initialized state.
       for (int kk=0; kk < numberOfDataSets; kk++)

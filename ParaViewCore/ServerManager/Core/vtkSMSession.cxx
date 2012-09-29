@@ -254,6 +254,7 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
                                         bool allowRemoteRendering)
 {
 // FIXME:MODULARIZATION
+  (void) allowRemoteRendering;
 //  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
