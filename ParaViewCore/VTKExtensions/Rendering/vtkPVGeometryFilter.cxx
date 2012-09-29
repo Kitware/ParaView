@@ -23,9 +23,9 @@
 #include "vtkCellTypes.h"
 #include "vtkCleanArrays.h"
 #include "vtkCommand.h"
-#include "vtkDataObjectTreeIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataObjectTreeIterator.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkFloatArray.h"
 #include "vtkGarbageCollector.h"
@@ -51,6 +51,7 @@
 #include "vtkPolyData.h"
 #include "vtkPolygon.h"
 #include "vtkPVRecoverGeometryWireframe.h"
+#include "vtkPVTrivialProducer.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
 #include "vtkSelectionNode.h"
@@ -1296,14 +1297,15 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
     }
   this->OutlineFlag = 1;
 
-  //
-  // Otherwise, let Outline do all the work
-  //
+  vtkNew<vtkPVTrivialProducer> producer;
+  producer->SetOutput(input);
+  producer->SetWholeExtent(
+    wholeExtent[0], wholeExtent[1],
+    wholeExtent[2], wholeExtent[3],
+    wholeExtent[4], wholeExtent[5]);
 
-
-  vtkStructuredGridOutlineFilter *outline = vtkStructuredGridOutlineFilter::New();
-  // Because of streaming, it is important to set the input and not copy it.
-  outline->SetInputData(input);
+  vtkNew<vtkStructuredGridOutlineFilter> outline;
+  outline->SetInputConnection(producer->GetOutputPort());
   vtkStreamingDemandDrivenPipeline::SetUpdateNumberOfPieces(
     outline->GetOutputInformation(0), updateNumPieces);
   vtkStreamingDemandDrivenPipeline::SetUpdatePiece(
@@ -1311,17 +1313,15 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
   vtkStreamingDemandDrivenPipeline::SetUpdateGhostLevel(
     outline->GetOutputInformation(0), updateGhosts);
   outline->Update();
-
   output->CopyStructure(outline->GetOutput());
-  outline->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
                                                  vtkPolyData* output,
-                                                int updatePiece,
-                                                int updateNumPieces,
-                                                int updateGhosts,
+                                                int vtkNotUsed(updatePiece),
+                                                int vtkNotUsed(updateNumPieces),
+                                                int vtkNotUsed(updateGhosts),
                                                 const int* wholeExtent)
 {
   if (!this->UseOutline)
@@ -1336,23 +1336,17 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
     }
   this->OutlineFlag = 1;
 
-  //
-  // Otherwise, let Outline do all the work
-  //
+  vtkNew<vtkPVTrivialProducer> producer;
+  producer->SetOutput(input);
+  producer->SetWholeExtent(
+    wholeExtent[0], wholeExtent[1],
+    wholeExtent[2], wholeExtent[3],
+    wholeExtent[4], wholeExtent[5]);
 
-  vtkRectilinearGridOutlineFilter *outline = vtkRectilinearGridOutlineFilter::New();
-  // Because of streaming, it is important to set the input and not copy it.
-  outline->SetInputData(input);
-  vtkStreamingDemandDrivenPipeline::SetUpdateNumberOfPieces(
-    outline->GetOutputInformation(0), updateNumPieces);
-  vtkStreamingDemandDrivenPipeline::SetUpdatePiece(
-    outline->GetOutputInformation(0), updatePiece);
-  vtkStreamingDemandDrivenPipeline::SetUpdateGhostLevel(
-    outline->GetOutputInformation(0), updateGhosts);
+  vtkNew<vtkRectilinearGridOutlineFilter> outline;
+  outline->SetInputConnection(producer->GetOutputPort());
   outline->Update();
-
   output->CopyStructure(outline->GetOutput());
-  outline->Delete();
 }
 
 //----------------------------------------------------------------------------
