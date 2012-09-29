@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkDataObject.h"
 
 #include <QtDebug>
@@ -274,7 +275,16 @@ pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource()
 }
 
 //-----------------------------------------------------------------------------
-int pqDataRepresentation::getProxyScalarMode( )
+QString pqDataRepresentation::getProxyColorArrayName()
+{
+  QVariant colorArrayName = pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty( "ColorArrayName" ) );
+
+  return colorArrayName.toString();
+}
+
+//-----------------------------------------------------------------------------
+int pqDataRepresentation::getProxyScalarMode()
 {
   vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast( this->getProxy() );
   if (!repr)
@@ -307,6 +317,22 @@ int pqDataRepresentation::getProxyScalarMode( )
     }
 
   return vtkDataObject::FIELD_ASSOCIATION_NONE;
+}
+
+
+//-----------------------------------------------------------------------------
+vtkPVArrayInformation* pqDataRepresentation::getProxyColorArrayInfo()
+{
+  const char* colorArray = 0;
+  vtkSMStringVectorProperty* caProp = vtkSMStringVectorProperty::SafeDownCast( this->getProxy()->GetProperty( "ColorArrayName" ));
+  if ( caProp )
+    {
+    colorArray = caProp->GetElement( 0 );
+    }
+  int fieldType = this->getProxyScalarMode();
+  vtkPVArrayInformation* retval = colorArray ? this->getArrayInformation( colorArray, fieldType ) : 0;
+  //cout << "** " << colorArray << "  " << retval << "\n";
+  return retval;
 }
 
 //-----------------------------------------------------------------------------

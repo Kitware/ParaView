@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartValue.h"
 #include "pqChartPixelScale.h"
 
+#include "vtkMath.h"
+
 #include <QColor>
 #include <QList>
 #include <QPainter>
@@ -66,7 +68,24 @@ public:
 };
 
 
-class pqColorMapModelInternal : public QList<pqColorMapModelItem *> {};
+class pqColorMapModelInternalPts : public QList<pqColorMapModelItem*> {};
+
+//=============================================================================
+class pqColorMapModelNote
+{
+public:
+  pqColorMapModelNote() { }
+  pqColorMapModelNote( const QString& value, const QString& note )
+    : Value( value ), Note( note ) { }
+  ~pqColorMapModelNote() { }
+
+  QString Value;
+  QString Note;
+};
+
+class pqColorMapModelInternalTxt : public QList<pqColorMapModelNote*>
+{
+};
 
 
 //=============================================================================
@@ -132,26 +151,37 @@ pqColorMapModelItem::pqColorMapModelItem(const pqChartValue &value,
 pqColorMapModel::pqColorMapModel(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->Internal = new pqColorMapModelInternal();
+  this->InternalPts = new pqColorMapModelInternalPts();
+  this->InternalTxt = new pqColorMapModelInternalTxt();
   this->Space = pqColorMapModel::HsvSpace;
   this->NanColor = QColor(127, 0, 0);
+  this->IndexedLookup = false;
   this->InModify = false;
 }
 
 pqColorMapModel::pqColorMapModel(const pqColorMapModel &other)
   : QObject(0)
 {
-  this->Internal = new pqColorMapModelInternal();
+  this->InternalPts = new pqColorMapModelInternalPts();
+  this->InternalTxt = new pqColorMapModelInternalTxt();
   this->Space = other.Space;
   this->NanColor = other.NanColor;
+  this->IndexedLookup = other.IndexedLookup;
   this->InModify = false;
 
   // Copy the list of points.
-  QList<pqColorMapModelItem *>::ConstIterator iter = other.Internal->begin();
-  for( ; iter != other.Internal->end(); ++iter)
+  QList<pqColorMapModelItem *>::ConstIterator pit = other.InternalPts->begin();
+  for( ; pit != other.InternalPts->end(); ++pit)
     {
-    this->Internal->append(new pqColorMapModelItem(
-        (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
+    this->InternalPts->append(new pqColorMapModelItem(
+        (*pit)->Value, (*pit)->Color, (*pit)->Opacity));
+    }
+
+  // Copy the list of annotations.
+  QList<pqColorMapModelNote *>::ConstIterator nit = other.InternalTxt->begin();
+  for ( ; nit != other.InternalTxt->end(); ++nit )
+    {
+    this->InternalTxt->append( new pqColorMapModelNote( (*nit)->Value, (*nit)->Note ) );
     }
 }
 
@@ -159,7 +189,9 @@ pqColorMapModel::~pqColorMapModel()
 {
   this->InModify = true;
   this->removeAllPoints();
-  delete this->Internal;
+  delete this->InternalPts;
+  this->removeAllAnnotations();
+  delete this->InternalTxt;
 }
 
 void pqColorMapModel::setColorSpace(pqColorMapModel::ColorSpace space)
@@ -226,7 +258,7 @@ void pqColorMapModel::setColorSpaceFromInt(int space)
 
 int pqColorMapModel::getNumberOfPoints() const
 {
-  return this->Internal->size();
+  return this->InternalPts->size();
 }
 
 void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color)
@@ -239,47 +271,43 @@ void pqColorMapModel::addPoint(const pqChartValue &value, const QColor &color,
 {
   // The list of points should be in ascending value order. Add the
   // new point according to its value.
-  QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
-  for( ; iter != this->Internal->end(); ++iter)
+  QList<pqColorMapModelItem *>::Iterator iter = this->InternalPts->begin();
+  for( ; iter != this->InternalPts->end(); ++iter)
     {
-    if(value == (*iter)->Value)
-      {
-      return;
-      }
-    else if(value < (*iter)->Value)
+    if(value < (*iter)->Value)
       {
       break;
       }
     }
 
   pqColorMapModelItem *item = new pqColorMapModelItem(value, color, opacity);
-  if(iter == this->Internal->end())
+  if(iter == this->InternalPts->end())
     {
     // Add the point to the end of the list if it is greater than all
     // the current points.
-    this->Internal->append(item);
+    this->InternalPts->append(item);
     }
   else
     {
-    this->Internal->insert(iter, item);
+    this->InternalPts->insert(iter, item);
     }
 
   if(!this->InModify)
     {
-    emit this->pointAdded(this->Internal->indexOf(item));
+    emit this->pointAdded(this->InternalPts->indexOf(item));
     }
 }
 
 void pqColorMapModel::removePoint(int index)
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->InternalPts->size())
     {
     if(!this->InModify)
       {
       emit this->removingPoint(index);
       }
 
-    pqColorMapModelItem *item = this->Internal->takeAt(index);
+    pqColorMapModelItem *item = this->InternalPts->takeAt(index);
     delete item;
     if(!this->InModify)
       {
@@ -290,15 +318,15 @@ void pqColorMapModel::removePoint(int index)
 
 void pqColorMapModel::removeAllPoints()
 {
-  if(this->Internal->size() > 0)
+  if(this->InternalPts->size() > 0)
     {
-    QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++ iter)
+    QList<pqColorMapModelItem *>::Iterator iter = this->InternalPts->begin();
+    for( ; iter != this->InternalPts->end(); ++ iter)
       {
       delete (*iter);
       }
 
-    this->Internal->clear();
+    this->InternalPts->clear();
     if(!this->InModify)
       {
       emit this->pointsReset();
@@ -322,18 +350,18 @@ void pqColorMapModel::finishModifyingData()
 
 void pqColorMapModel::getPointValue(int index, pqChartValue &value) const
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->InternalPts->size())
     {
-    value = (*this->Internal)[index]->Value;
+    value = (*this->InternalPts)[index]->Value;
     }
 }
 
 void pqColorMapModel::setPointValue(int index, const pqChartValue &value)
 {
-  if(index >= 0 && index < this->Internal->size() &&
-      (*this->Internal)[index]->Value != value)
+  if(index >= 0 && index < this->InternalPts->size() &&
+      (*this->InternalPts)[index]->Value != value)
     {
-    (*this->Internal)[index]->Value = value;
+    (*this->InternalPts)[index]->Value = value;
     if(!this->InModify)
       {
       emit this->valueChanged(index, value);
@@ -343,18 +371,18 @@ void pqColorMapModel::setPointValue(int index, const pqChartValue &value)
 
 void pqColorMapModel::getPointColor(int index, QColor &color) const
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->InternalPts->size())
     {
-    color = (*this->Internal)[index]->Color;
+    color = (*this->InternalPts)[index]->Color;
     }
 }
 
 void pqColorMapModel::setPointColor(int index, const QColor &color)
 {
-  if(index >= 0 && index < this->Internal->size() &&
-      (*this->Internal)[index]->Color != color)
+  if(index >= 0 && index < this->InternalPts->size() &&
+      (*this->InternalPts)[index]->Color != color)
     {
-    (*this->Internal)[index]->Color = color;
+    (*this->InternalPts)[index]->Color = color;
     if(!this->InModify)
       {
       emit this->colorChanged(index, color);
@@ -364,18 +392,18 @@ void pqColorMapModel::setPointColor(int index, const QColor &color)
 
 void pqColorMapModel::getPointOpacity(int index, pqChartValue &opacity) const
 {
-  if(index >= 0 && index < this->Internal->size())
+  if(index >= 0 && index < this->InternalPts->size())
     {
-    opacity = (*this->Internal)[index]->Opacity;
+    opacity = (*this->InternalPts)[index]->Opacity;
     }
 }
 
 void pqColorMapModel::setPointOpacity(int index, const pqChartValue &opacity)
 {
-  if(index >= 0 && index < this->Internal->size() &&
-      (*this->Internal)[index]->Opacity != opacity)
+  if(index >= 0 && index < this->InternalPts->size() &&
+      (*this->InternalPts)[index]->Opacity != opacity)
     {
-    (*this->Internal)[index]->Opacity = opacity;
+    (*this->InternalPts)[index]->Opacity = opacity;
     if(!this->InModify)
       {
       emit this->opacityChanged(index, opacity);
@@ -385,10 +413,10 @@ void pqColorMapModel::setPointOpacity(int index, const pqChartValue &opacity)
 
 bool pqColorMapModel::isRangeNormalized() const
 {
-  if(this->Internal->size() > 1)
+  if(this->InternalPts->size() > 1)
     {
-    return this->Internal->first()->Value == (float)0.0 &&
-        this->Internal->last()->Value == (float)1.0;
+    return this->InternalPts->first()->Value == (float)0.0 &&
+        this->InternalPts->last()->Value == (float)1.0;
     }
 
   return false;
@@ -396,10 +424,10 @@ bool pqColorMapModel::isRangeNormalized() const
 
 void pqColorMapModel::getValueRange(pqChartValue &min, pqChartValue &max) const
 {
-  if(this->Internal->size() > 0)
+  if(this->InternalPts->size() > 0)
     {
-    min = this->Internal->first()->Value;
-    max = this->Internal->last()->Value;
+    min = this->InternalPts->first()->Value;
+    max = this->InternalPts->last()->Value;
     }
 }
 
@@ -420,24 +448,153 @@ void pqColorMapModel::setNanColor(const QColor &color)
     }
 }
 
+bool pqColorMapModel::getIndexedLookup() const
+{
+  return this->IndexedLookup;
+}
+
+void pqColorMapModel::setIndexedLookup( bool indexedLookup )
+{
+  if ( this->IndexedLookup != indexedLookup )
+    {
+    this->IndexedLookup = indexedLookup;
+    if  ( ! this->InModify )
+      {
+      emit indexedLookupChanged( this->IndexedLookup );
+      }
+    }
+}
+
+int pqColorMapModel::getNumberOfAnnotations() const
+{
+  return this->InternalTxt->size();
+}
+
+QString pqColorMapModel::getAnnotatedValue( int index ) const
+{
+  QString retval;
+  if ( index < 0 || index > this->InternalTxt->size() )
+    return retval;
+
+  retval = this->InternalTxt->at( index )->Value;
+  return retval;
+}
+
+QString pqColorMapModel::getAnnotation( int index ) const
+{
+  QString retval;
+  if ( index < 0 || index > this->InternalTxt->size() )
+    return retval;
+
+  retval = this->InternalTxt->at( index )->Note;
+  return retval;
+}
+
+QList<QVariant> pqColorMapModel::getAnnotations() const
+{
+  QList<QVariant> annotations;
+  for ( pqColorMapModelInternalTxt::const_iterator it = this->InternalTxt->begin(); it != this->InternalTxt->end(); ++ it )
+    {
+    annotations << QVariant( (*it)->Value ) << QVariant( (*it)->Note );
+    }
+  return annotations;
+}
+
+int pqColorMapModel::addAnnotation( const QString& value, const QString& note )
+{
+  return this->insertAnnotation( this->getNumberOfAnnotations(), value, note );
+}
+
+int pqColorMapModel::insertAnnotation( int index, const QString& value, const QString& text )
+{
+  QList<pqColorMapModelNote*>::iterator it;
+  int actualIndex;
+  pqColorMapModelNote* note = 0;
+  for ( actualIndex = 0, it = this->InternalTxt->begin(); it != this->InternalTxt->end();  ++ actualIndex, ++ it )
+    {
+    if ( (*it)->Value == value )
+      {
+      break;
+      }
+    }
+  if ( index < 0 || index > actualIndex )
+    {
+    index = actualIndex;
+    }
+  if ( ! note )
+    {
+    note = new pqColorMapModelNote( value, text );
+    this->InternalTxt->insert( it, note );
+    if ( ! this->InModify )
+      {
+      emit annotationAdded( actualIndex );
+      }
+    }
+  else
+    {
+    note->Note = text;
+    if ( ! this->InModify )
+      {
+      emit this->annotationChanged( actualIndex, text );
+      }
+    }
+  return actualIndex;
+}
+
+void pqColorMapModel::removeAnnotation( int index )
+{
+  if ( index >= 0 && index < this->InternalTxt->size() )
+    {
+    if ( ! this->InModify )
+      {
+      emit this->removingAnnotation( index );
+      }
+
+    pqColorMapModelNote* note = this->InternalTxt->takeAt( index );
+    delete note;
+    if ( ! this->InModify )
+      {
+      emit this->annotationRemoved( index );
+      }
+    }
+}
+
+void pqColorMapModel::removeAllAnnotations()
+{
+  if ( this->InternalTxt->size() > 0 )
+    {
+    QList<pqColorMapModelNote*>::iterator it = this->InternalTxt->begin();
+    for ( ; it != this->InternalTxt->end(); ++ it )
+      {
+      delete (*it);
+      }
+
+    this->InternalTxt->clear();
+    if ( ! this->InModify )
+      {
+      emit this->annotationsReset();
+      }
+    }
+}
+
 void pqColorMapModel::setValueRange(const pqChartValue &min,
     const pqChartValue &max)
 {
-  if(this->Internal->size() == 0)
+  if(this->InternalPts->size() == 0)
     {
     return;
     }
 
   // Scale the current points to fit the given range.
-  if(this->Internal->size() == 1)
+  if(this->InternalPts->size() == 1)
     {
-    this->Internal->first()->Value = min;
+    this->InternalPts->first()->Value = min;
     }
   else
     {
     pqChartValue newMin, newRange;
-    pqChartValue oldMin = this->Internal->first()->Value;
-    pqChartValue oldRange = this->Internal->last()->Value - oldMin;
+    pqChartValue oldMin = this->InternalPts->first()->Value;
+    pqChartValue oldRange = this->InternalPts->last()->Value - oldMin;
     if(max < min)
       {
       newMin = max;
@@ -449,8 +606,8 @@ void pqColorMapModel::setValueRange(const pqChartValue &min,
       newRange = max - min;
       }
 
-    QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
+    QList<pqColorMapModelItem *>::Iterator iter = this->InternalPts->begin();
+    for( ; iter != this->InternalPts->end(); ++iter)
       {
       (*iter)->Value = (((*iter)->Value - oldMin) * newRange) / oldRange;
       (*iter)->Value += newMin;
@@ -465,7 +622,160 @@ void pqColorMapModel::setValueRange(const pqChartValue &min,
 
 QPixmap pqColorMapModel::generateGradient(const QSize &size) const
 {
-  if(this->Internal->size() < 2 || size.width() <= 0 || size.height() <= 0)
+  if (this->IndexedLookup)
+    {
+    return this->generateCategoricalPreview(size);
+    }
+  return this->generateIntervalPreview(size);
+}
+
+pqColorMapModel &pqColorMapModel::operator=(const pqColorMapModel &other)
+{
+  this->Space = other.Space;
+
+  // Remove the current points and copy the new points.
+  bool oldModify = this->InModify;
+  this->InModify = false;
+  this->removeAllPoints();
+  QList<pqColorMapModelItem *>::ConstIterator iter = other.InternalPts->begin();
+  for( ; iter != other.InternalPts->end(); ++iter)
+    {
+    this->InternalPts->append(new pqColorMapModelItem(
+        (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
+    }
+
+  other.getNanColor(this->NanColor);
+
+  this->InModify = oldModify;
+  if(!this->InModify)
+    {
+    emit this->pointsReset();
+    }
+
+  return *this;
+}
+
+
+//-----------------------------------------------------------------------------
+void pqColorMapModel::RGBToLab(double red, double green, double blue,
+                               double *L, double *a, double *b)
+{
+  double var_R = red;
+  double var_G = green;
+  double var_B = blue;
+
+  if ( var_R > 0.04045 ) var_R = pow(( var_R + 0.055 ) / 1.055, 2.4);
+  else                   var_R = var_R / 12.92;
+  if ( var_G > 0.04045 ) var_G = pow(( var_G + 0.055 ) / 1.055, 2.4);
+  else                   var_G = var_G / 12.92;
+  if ( var_B > 0.04045 ) var_B = pow(( var_B + 0.055 ) / 1.055, 2.4);
+  else                   var_B = var_B / 12.92;
+
+  var_R = var_R * 100;
+  var_G = var_G * 100;
+  var_B = var_B * 100;
+
+  double x = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+  double y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+  double z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+  const double ref_X =  95.047;
+  const double ref_Y = 100.000;
+  const double ref_Z = 108.883;
+  double var_X = x / ref_X;  //ref_X =  95.047  Observer= 2 deg, Illuminant= D65
+  double var_Y = y / ref_Y;  //ref_Y = 100.000
+  double var_Z = z / ref_Z;  //ref_Z = 108.883
+
+  if ( var_X > 0.008856 ) var_X = pow(var_X, 1.0/3.0);
+  else                    var_X = ( 7.787 * var_X ) + ( 16.0 / 116.0 );
+  if ( var_Y > 0.008856 ) var_Y = pow(var_Y, 1.0/3.0);
+  else                    var_Y = ( 7.787 * var_Y ) + ( 16.0 / 116.0 );
+  if ( var_Z > 0.008856 ) var_Z = pow(var_Z, 1.0/3.0);
+  else                    var_Z = ( 7.787 * var_Z ) + ( 16.0 / 116.0 );
+
+  *L = ( 116 * var_Y ) - 16;
+  *a = 500 * ( var_X - var_Y );
+  *b = 200 * ( var_Y - var_Z );
+}
+
+void pqColorMapModel::LabToRGB(double L, double a, double b,
+                               double *red, double *green, double *blue)
+{
+  double var_Y = ( L + 16 ) / 116;
+  double var_X = a / 500 + var_Y;
+  double var_Z = var_Y - b / 200;
+
+  if ( pow(var_Y,3) > 0.008856 ) var_Y = pow(var_Y,3);
+  else var_Y = ( var_Y - 16.0 / 116.0 ) / 7.787;
+
+  if ( pow(var_X,3) > 0.008856 ) var_X = pow(var_X,3);
+  else var_X = ( var_X - 16.0 / 116.0 ) / 7.787;
+
+  if ( pow(var_Z,3) > 0.008856 ) var_Z = pow(var_Z,3);
+  else var_Z = ( var_Z - 16.0 / 116.0 ) / 7.787;
+  const double ref_X =  95.047;
+  const double ref_Y = 100.000;
+  const double ref_Z = 108.883;
+  double x = ref_X * var_X;   //ref_X =  95.047  Observer= 2 deg Illuminant= D65
+  double y = ref_Y * var_Y;   //ref_Y = 100.000
+  double z = ref_Z * var_Z;   //ref_Z = 108.883
+
+  var_X = x / 100;        //X = From 0 to ref_X
+  var_Y = y / 100;        //Y = From 0 to ref_Y
+  var_Z = z / 100;        //Z = From 0 to ref_Z
+
+  double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
+  double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
+  double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
+
+  if ( var_R > 0.0031308 ) var_R = 1.055 * ( pow(var_R, ( 1 / 2.4 )) ) - 0.055;
+  else var_R = 12.92 * var_R;
+  if ( var_G > 0.0031308 ) var_G = 1.055 * ( pow(var_G ,( 1 / 2.4 )) ) - 0.055;
+  else  var_G = 12.92 * var_G;
+  if ( var_B > 0.0031308 ) var_B = 1.055 * ( pow(var_B, ( 1 / 2.4 )) ) - 0.055;
+  else var_B = 12.92 * var_B;
+
+  *red   = var_R;
+  *green = var_G;
+  *blue  = var_B;
+
+  //clip colors. ideally we would do something different for colors
+  //out of gamut, but not really sure what to do atm.
+  if (*red<0)   *red=0;
+  if (*green<0) *green=0;
+  if (*blue<0)  *blue=0;
+  if (*red>1)   *red=1;
+  if (*green>1) *green=1;
+  if (*blue>1)  *blue=1;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorMapModel::RGBToMsh(double red, double green, double blue,
+                               double *M, double *s, double *h)
+{
+  double L, a, b;
+  pqColorMapModel::RGBToLab(red, green, blue, &L, &a, &b);
+
+  *M = sqrt(L*L + a*a + b*b);
+  *s = (*M > 0.001) ? acos(L/(*M)) : 0.0;
+  *h = (*s > 0.001) ? atan2(b, a) : 0.0;
+}
+
+void pqColorMapModel::MshToRGB(double M, double s, double h,
+                               double *red, double *green, double *blue)
+{
+  double L, a, b;
+
+  L = M*cos(s);
+  a = M*sin(s)*cos(h);
+  b = M*sin(s)*sin(h);
+
+  pqColorMapModel::LabToRGB(L, a, b, red, green, blue);
+}
+
+QPixmap pqColorMapModel::generateIntervalPreview(const QSize &size) const
+{
+  if (this->InternalPts->size() < 2 || size.width() <= 0 || size.height() <= 0)
     {
     return QPixmap();
     }
@@ -477,13 +787,13 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
   // Set up the pixel-value map for the image size.
   pqChartPixelScale pixelMap;
   pixelMap.setPixelRange(1, size.width() - 1);
-  pixelMap.setValueRange(this->Internal->first()->Value,
-      this->Internal->last()->Value);
+  pixelMap.setValueRange(this->InternalPts->first()->Value,
+      this->InternalPts->last()->Value);
 
   // Draw the first color.
   int i = 0;
   QColor next, previous;
-  QList<pqColorMapModelItem *>::Iterator iter = this->Internal->begin();
+  QList<pqColorMapModelItem *>::Iterator iter = this->InternalPts->begin();
   previous = (*iter)->Color;
   int imageHeight = gradient.height();
   painter.setPen(previous);
@@ -492,7 +802,7 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
   // Loop through the points to draw the gradient(s).
   int px = 1;
   int p1 = pixelMap.getPixel((*iter)->Value);
-  for(++i, ++iter; iter != this->Internal->end(); ++i, ++iter)
+  for(++i, ++iter; iter != this->InternalPts->end(); ++i, ++iter)
     {
     // Draw the colors between the previous and next color.
     next = (*iter)->Color;
@@ -597,7 +907,7 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
               }
             }
 
-          // If one color has no saturation, thin its hue is invalid.  In this
+          // If one color has no saturation, then its hue is invalid.  In this
           // case, we want to set it to something logical so that the
           // interpolation of hue makes sense.
           if ((s_previous < 0.05) && (s_next > 0.05))
@@ -645,146 +955,115 @@ QPixmap pqColorMapModel::generateGradient(const QSize &size) const
   return gradient;
 }
 
-pqColorMapModel &pqColorMapModel::operator=(const pqColorMapModel &other)
-{
-  this->Space = other.Space;
+// The smallest number of pixels along an edge that a color swatch should be.
+#define PQ_MIN_SWATCH_DIM 6
+// The amount of padding between swatches and the edge of the palette and/or a neighbor swatch [pixels].
+#define PQ_SWATCH_PAD 2
+// The number of pixels each swatch's insert border color should be drawn.
+#define PQ_SWATCH_BORDER 1
 
-  // Remove the current points and copy the new points.
-  bool oldModify = this->InModify;
-  this->InModify = false;
-  this->removeAllPoints();
-  QList<pqColorMapModelItem *>::ConstIterator iter = other.Internal->begin();
-  for( ; iter != other.Internal->end(); ++iter)
+QPixmap pqColorMapModel::generateCategoricalPreview(const QSize &size) const
+{
+  if (this->InternalPts->size() < 1 || size.width() <= 0 || size.height() <= 0)
     {
-    this->Internal->append(new pqColorMapModelItem(
-        (*iter)->Value, (*iter)->Color, (*iter)->Opacity));
+    return QPixmap();
     }
 
-  other.getNanColor(this->NanColor);
+  // Create a pixmap and painter.
+  QPixmap palette(size);
+  QPainter painter(&palette);
 
-  this->InModify = oldModify;
-  if(!this->InModify)
+  int wmp = size.width() - PQ_SWATCH_PAD,
+      hmp = size.height() - PQ_SWATCH_PAD;
+
+  // I. Determine the maximum number of rows and columns of swatches
+  int Nvmax = hmp / (PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD);
+
+  // II. Determine the actual number of rows and columns
+  int N = static_cast<int>(this->InternalPts->size()),
+      Nh = N,
+      Nv = 1;
+  while (
+    (wmp / Nh < PQ_MIN_SWATCH_DIM + PQ_SWATCH_PAD) ||
+    ((hmp * Nh * 10) / (Nv * wmp) > 15 && Nv < Nvmax)) // aspect ratio < 2/3 (integer math) and we have headroom.
     {
-    emit this->pointsReset();
+    ++ Nv;
+    // Now determine best value for Nh in [Nh/2,Nh-1]
+    double bestQ = vtkMath::Inf();
+    int best = -1;
+    for (int i = Nh / 2; i < Nh; ++i)
+      {
+      double ar = Nv * wmp / static_cast<double>(hmp * Nh);
+      double q = ( ar >= 1.0 ) ? ar : 1. / ar;
+      if ( q < bestQ )
+        {
+        bestQ = q;
+        best = i;
+        }
+      }
+    Nh = best;
     }
 
-  return *this;
-}
+  // III. Determine swatch size and number of swatches that can actually be displayed
+  int ws = wmp / Nh - PQ_SWATCH_PAD;
+  int hs = hmp / Nv - PQ_SWATCH_PAD;
+  int Nd = Nh * Nv; // This may be more or less than N, but no more than this many swatches will be drawn.
+  int ss = ws < hs ? ws : hs; // Force aspect ratio to 1 and then update Nh, Nv, Nd
+  Nh = wmp / (ss + PQ_SWATCH_PAD);
+  Nv = hmp / (ss + PQ_SWATCH_PAD);
+  Nd = Nh * Nv;
+  int elideLf = (Nd < N ? Nd / 2 : N - 1);
+  int elideRt = (Nd < N ? N - Nd / 2 + 1 : N);
+  Nd = Nd > N ? N : Nd;
 
+  // IV. Clear to background.
+  QPen blank(Qt::NoPen);
+  painter.setBrush(QColor("white"));
+  painter.setPen(blank);
+  painter.drawRect(0, 0,  size.width(), size.height());
 
-//-----------------------------------------------------------------------------
-void pqColorMapModel::RGBToLab(double red, double green, double blue,
-                               double *L, double *a, double *b)
-{
-  double var_R = red;
-  double var_G = green;
-  double var_B = blue;
+  // IV. Draw swatches.
+  QPen outline(Qt::SolidLine);
+  outline.setWidth(PQ_SWATCH_BORDER);
+  painter.setPen(outline);
+  int row, col, swatch;
+  QList<pqColorMapModelItem *>::Iterator curNode = this->InternalPts->begin();
+  for (row = 0, col = 0, swatch = 0; swatch <= elideLf; ++swatch, ++curNode)
+    {
+    //painter.setPen((*curNode)->Color);
+    painter.setBrush((*curNode)->Color);
+    painter.drawRect(PQ_SWATCH_PAD + col * (PQ_SWATCH_PAD + ss)+ 0.5, PQ_SWATCH_PAD + row * (PQ_SWATCH_PAD + ss) + 0.5, ss, ss);
 
-  if ( var_R > 0.04045 ) var_R = pow(( var_R + 0.055 ) / 1.055, 2.4);
-  else                   var_R = var_R / 12.92;
-  if ( var_G > 0.04045 ) var_G = pow(( var_G + 0.055 ) / 1.055, 2.4);
-  else                   var_G = var_G / 12.92;
-  if ( var_B > 0.04045 ) var_B = pow(( var_B + 0.055 ) / 1.055, 2.4);
-  else                   var_B = var_B / 12.92;
+    if (++col == Nh)
+      {
+      col = 0;
+      ++row;
+      }
+    }
 
-  var_R = var_R * 100;
-  var_G = var_G * 100;
-  var_B = var_B * 100;
+  // Advance one entry over the elided swatch
+  if (++col == Nh)
+    {
+    col = 0;
+    ++row;
+    }
+  ++swatch;
+  curNode = this->InternalPts->begin() + elideRt;
 
-  double x = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
-  double y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
-  double z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+  // Now pick up and draw the remaining swatches, if any
+  int entry = elideRt;
+  for (; swatch < Nd; ++swatch, ++entry, ++curNode)
+    {
+    //painter.setPen((*curNode)->Color);
+    painter.setBrush((*curNode)->Color);
+    painter.drawRect(PQ_SWATCH_PAD + col * (PQ_SWATCH_PAD + ss)+ 0.5, PQ_SWATCH_PAD + row * (PQ_SWATCH_PAD + ss) + 0.5, ss, ss);
 
-  const double ref_X =  95.047;
-  const double ref_Y = 100.000;
-  const double ref_Z = 108.883;
-  double var_X = x / ref_X;  //ref_X =  95.047  Observer= 2 deg, Illuminant= D65
-  double var_Y = y / ref_Y;  //ref_Y = 100.000
-  double var_Z = z / ref_Z;  //ref_Z = 108.883
+    if (++col == Nh)
+      {
+      col = 0;
+      ++row;
+      }
+    }
 
-  if ( var_X > 0.008856 ) var_X = pow(var_X, 1.0/3.0);
-  else                    var_X = ( 7.787 * var_X ) + ( 16.0 / 116.0 );
-  if ( var_Y > 0.008856 ) var_Y = pow(var_Y, 1.0/3.0);
-  else                    var_Y = ( 7.787 * var_Y ) + ( 16.0 / 116.0 );
-  if ( var_Z > 0.008856 ) var_Z = pow(var_Z, 1.0/3.0);
-  else                    var_Z = ( 7.787 * var_Z ) + ( 16.0 / 116.0 );
-
-  *L = ( 116 * var_Y ) - 16;
-  *a = 500 * ( var_X - var_Y );
-  *b = 200 * ( var_Y - var_Z );
-}
-
-void pqColorMapModel::LabToRGB(double L, double a, double b,
-                               double *red, double *green, double *blue)
-{
-  double var_Y = ( L + 16 ) / 116;
-  double var_X = a / 500 + var_Y;
-  double var_Z = var_Y - b / 200;
-    
-  if ( pow(var_Y,3) > 0.008856 ) var_Y = pow(var_Y,3);
-  else var_Y = ( var_Y - 16.0 / 116.0 ) / 7.787;
-                                                            
-  if ( pow(var_X,3) > 0.008856 ) var_X = pow(var_X,3);
-  else var_X = ( var_X - 16.0 / 116.0 ) / 7.787;
-
-  if ( pow(var_Z,3) > 0.008856 ) var_Z = pow(var_Z,3);
-  else var_Z = ( var_Z - 16.0 / 116.0 ) / 7.787;
-  const double ref_X =  95.047;
-  const double ref_Y = 100.000;
-  const double ref_Z = 108.883;
-  double x = ref_X * var_X;   //ref_X =  95.047  Observer= 2 deg Illuminant= D65
-  double y = ref_Y * var_Y;   //ref_Y = 100.000
-  double z = ref_Z * var_Z;   //ref_Z = 108.883
-
-  var_X = x / 100;        //X = From 0 to ref_X
-  var_Y = y / 100;        //Y = From 0 to ref_Y
-  var_Z = z / 100;        //Z = From 0 to ref_Z
- 
-  double var_R = var_X *  3.2406 + var_Y * -1.5372 + var_Z * -0.4986;
-  double var_G = var_X * -0.9689 + var_Y *  1.8758 + var_Z *  0.0415;
-  double var_B = var_X *  0.0557 + var_Y * -0.2040 + var_Z *  1.0570;
- 
-  if ( var_R > 0.0031308 ) var_R = 1.055 * ( pow(var_R, ( 1 / 2.4 )) ) - 0.055;
-  else var_R = 12.92 * var_R;
-  if ( var_G > 0.0031308 ) var_G = 1.055 * ( pow(var_G ,( 1 / 2.4 )) ) - 0.055;
-  else  var_G = 12.92 * var_G;
-  if ( var_B > 0.0031308 ) var_B = 1.055 * ( pow(var_B, ( 1 / 2.4 )) ) - 0.055;
-  else var_B = 12.92 * var_B;
-
-  *red   = var_R;
-  *green = var_G;
-  *blue  = var_B;
-  
-  //clip colors. ideally we would do something different for colors
-  //out of gamut, but not really sure what to do atm.
-  if (*red<0)   *red=0;
-  if (*green<0) *green=0;
-  if (*blue<0)  *blue=0;
-  if (*red>1)   *red=1;
-  if (*green>1) *green=1;
-  if (*blue>1)  *blue=1;
-}
-
-//-----------------------------------------------------------------------------
-void pqColorMapModel::RGBToMsh(double red, double green, double blue,
-                               double *M, double *s, double *h)
-{
-  double L, a, b;
-  pqColorMapModel::RGBToLab(red, green, blue, &L, &a, &b);
-
-  *M = sqrt(L*L + a*a + b*b);
-  *s = (*M > 0.001) ? acos(L/(*M)) : 0.0;
-  *h = (*s > 0.001) ? atan2(b, a) : 0.0;
-}
-
-void pqColorMapModel::MshToRGB(double M, double s, double h,
-                               double *red, double *green, double *blue)
-{
-  double L, a, b;
-
-  L = M*cos(s);
-  a = M*sin(s)*cos(h);
-  b = M*sin(s)*sin(h);
-
-  pqColorMapModel::LabToRGB(L, a, b, red, green, blue);
+  return palette;
 }

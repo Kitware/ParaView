@@ -121,8 +121,14 @@ public:
   /// This is only applicable, if this representation is connected to a
   /// data-filter which has a valid input.
   pqDataRepresentation* getRepresentationForUpstreamSource() const;
-  
-  virtual int getProxyScalarMode( );
+
+  /// Convenience method to return the name of the active scalar array.
+  virtual QString getProxyColorArrayName();
+  /// Convenience method to return the active scalar array field association.
+  virtual int getProxyScalarMode();
+  /// Convenience method to return the array information associated with the active scalars.
+  virtual vtkPVArrayInformation* getProxyColorArrayInfo();
+
   virtual int getNumberOfComponents(const char* arrayname, int fieldType);
   virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
 

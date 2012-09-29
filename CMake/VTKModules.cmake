@@ -3,7 +3,6 @@
 # to ensure all ParaView needed modules are turned on when building the complete
 # application.
 
-
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
@@ -26,6 +25,7 @@ set(_vtk_modules
   # time dependency on
   vtkRenderingVolume
   vtkRenderingLabel
+  vtkRenderingMathText
   vtkRenderingFreeType
   vtkRenderingFreeTypeOpenGL
   vtkRenderingVolumeOpenGL
@@ -345,6 +345,15 @@ if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
 endif()
 
+# See if matplotlib is present.
+# If so, add vtkRenderingMatplotlib for math text rendering.
+if (PYTHON_EXECUTABLE)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
+    RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE)
+  if (${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
+    list (APPEND _vtk_modules vtkRenderingMatplotlib)
+  endif()
+endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module

@@ -22,6 +22,7 @@
 #include "vtkPVScalarBarActor.h"
 
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMath.h"
@@ -92,7 +93,7 @@ vtkPVScalarBarActor::~vtkPVScalarBarActor()
 
 void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os, indent); 
+  this->Superclass::PrintSelf(os, indent);
   os << indent << "AspectRatio: " << this->AspectRatio << endl;
   os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat <<endl;
 }
@@ -130,6 +131,11 @@ void vtkPVScalarBarActor::GetScalarBarRect(int rect[], vtkViewport *viewport)
 //----------------------------------------------------------------------------
 int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
 {
+  if ( this->LookupTable && this->LookupTable->GetIndexedLookup() )
+    {
+    return this->Superclass::RenderOverlay( viewport );
+    }
+
   // Is the viewport's RenderWindow capturing GL2PS-special props? We'll need
   // to handle this specially to get the texture to show up right.
   if (vtkRenderer *renderer = vtkRenderer::SafeDownCast(viewport))
@@ -144,7 +150,7 @@ int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
     }
 
   int renderedSomething = 0;
-  
+
   if (this->UseOpacity)
     {
     this->Texture->Render(vtkRenderer::SafeDownCast(viewport));
@@ -174,9 +180,14 @@ int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
 //----------------------------------------------------------------------------
 int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
 {
+  if ( this->LookupTable && this->LookupTable->GetIndexedLookup() )
+    {
+    return this->Superclass::RenderOpaqueGeometry( viewport );
+    }
+
   int renderedSomething = 0;
   int size[2];
-  
+
   if (!this->LookupTable)
     {
     vtkWarningMacro(<<"Need a lookup table to render a scalar bar");
@@ -197,32 +208,32 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
 
   // Check to see whether we have to rebuild everything
   int positionsHaveChanged = 0;
-  if (viewport->GetMTime() > this->BuildTime || 
-      (viewport->GetVTKWindow() && 
+  if (viewport->GetMTime() > this->BuildTime ||
+      (viewport->GetVTKWindow() &&
        viewport->GetVTKWindow()->GetMTime() > this->BuildTime))
     {
     // if the viewport has changed we may - or may not need
     // to rebuild, it depends on if the projected coords chage
     int *barOrigin;
     barOrigin = this->PositionCoordinate->GetComputedViewportValue(viewport);
-    size[0] = 
+    size[0] =
       this->Position2Coordinate->GetComputedViewportValue(viewport)[0] -
       barOrigin[0];
-    size[1] = 
+    size[1] =
       this->Position2Coordinate->GetComputedViewportValue(viewport)[1] -
       barOrigin[1];
-    if (this->LastSize[0] != size[0] || 
+    if (this->LastSize[0] != size[0] ||
         this->LastSize[1] != size[1] ||
-        this->LastOrigin[0] != barOrigin[0] || 
+        this->LastOrigin[0] != barOrigin[0] ||
         this->LastOrigin[1] != barOrigin[1])
       {
       positionsHaveChanged = 1;
       }
     }
-  
+
   // Check to see whether we have to rebuild everything
   if (positionsHaveChanged ||
-      this->GetMTime() > this->BuildTime || 
+      this->GetMTime() > this->BuildTime ||
       this->LookupTable->GetMTime() > this->BuildTime ||
       this->LabelTextProperty->GetMTime() > this->BuildTime ||
       this->TitleTextProperty->GetMTime() > this->BuildTime)
@@ -238,23 +249,24 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
     // get the viewport size in display coordinates
     int *barOrigin;
     barOrigin = this->PositionCoordinate->GetComputedViewportValue(viewport);
-    size[0] = 
+    size[0] =
       this->Position2Coordinate->GetComputedViewportValue(viewport)[0] -
       barOrigin[0];
-    size[1] = 
+    size[1] =
       this->Position2Coordinate->GetComputedViewportValue(viewport)[1] -
       barOrigin[1];
     this->LastOrigin[0] = barOrigin[0];
     this->LastOrigin[1] = barOrigin[1];
     this->LastSize[0] = size[0];
     this->LastSize[1] = size[1];
-    
+
     // Update all the composing objects
     this->TitleActor->GetProperty()->DeepCopy(this->GetProperty());
     if ( this->ComponentTitle && strlen(this->ComponentTitle) > 0 )
       {
       //need to account for a space between title & component and null term
-      int str_len = strlen(this->Title) + strlen(this->ComponentTitle) + 2;
+      int str_len = static_cast<int>(
+        strlen(this->Title) + strlen(this->ComponentTitle) + 2);
       char *combinedTitle = new char[ str_len ];
       strcpy(combinedTitle, this->Title );
       strcat( combinedTitle, " " );
@@ -268,7 +280,7 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
       }
     // find the best size for the title font
     this->PositionTitle(size, viewport);
-    
+
     // find the best size for the ticks
     this->AllocateAndPositionLabels(size, viewport);
 
@@ -624,7 +636,7 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
     targetWidth = propSize[0]/4;
     }
 
-  // is this a vtkLookupTable or a subclass of vtkLookupTable 
+  // is this a vtkLookupTable or a subclass of vtkLookupTable
   // with its scale set to log
   int isLogTable = this->LookupTable->UsingLogScale();
 
@@ -961,6 +973,8 @@ void vtkPVScalarBarActor::PositionScalarBar(const int propSize[2],
     textCoords->SetTuple2(3, 0, 0);
     }
   this->ScalarBar->GetPointData()->SetTCoords(textCoords);
+  // If the subclass has defined cell scalars, remove them here.
+  this->ScalarBar->GetCellData()->Initialize();
 }
 
 void vtkPVScalarBarActor::BuildScalarBarTexture()

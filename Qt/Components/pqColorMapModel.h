@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,13 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsModule.h"
 #include <QObject>
 #include <QPixmap> // Needed for return type.
+#include <QString> // Needed for return type.
+#include <QVariant> // Needed for setAnnotations(), getAnnotations().
 
 class pqChartValue;
-class pqColorMapModelInternal;
+class pqColorMapModelInternalPts;
+class pqColorMapModelInternalTxt;
 class QColor;
 class QSize;
 
-
+/// Model for colormaps used to hold presets, import from XML, and export to XML.
 class PQCOMPONENTS_EXPORT pqColorMapModel : public QObject
 {
   Q_OBJECT
@@ -96,6 +99,18 @@ public:
   void getNanColor(QColor &color) const;
   void setNanColor(const QColor &color);
 
+  bool getIndexedLookup() const;
+  void setIndexedLookup( bool isCategorical );
+
+  int getNumberOfAnnotations() const;
+  QString getAnnotatedValue( int ) const;
+  QString getAnnotation( int ) const;
+  QList<QVariant> getAnnotations() const;
+  int addAnnotation( const QString& value, const QString& note );
+  int insertAnnotation( int index, const QString& value, const QString& note );
+  void removeAnnotation( int index );
+  void removeAllAnnotations();
+
   /// \brief
   ///   Scales the current points to fit in the given range.
   /// \note
@@ -117,6 +132,10 @@ public:
                        double *M, double *s, double *h);
   static void MshToRGB(double M, double s, double h,
                        double *red, double *green, double *blue);
+
+protected:
+  virtual QPixmap generateIntervalPreview(const QSize &size) const;
+  virtual QPixmap generateCategoricalPreview(const QSize &size) const;
 
 signals:
   /// Emitted when the color space changes.
@@ -165,11 +184,48 @@ signals:
   /// \param opacity The new opacity for the point.
   void opacityChanged(int index, const pqChartValue &opacity);
 
+  /// \brief
+  ///   Emitted when the color loookup mode changes.
+  /// \param The new value for the lookup mode (true for categorical/indexed lookup, false otherwise)
+  void indexedLookupChanged( bool newIndexLookupValue );
+
+  /// Emitted when all or many of the annotations have changed.
+  void annotationsReset();
+
+  /// \brief
+  ///   Emitted after an annotation has been added.
+  /// \param index The index of the new annotation.
+  void annotationAdded( int index );
+
+  /// \brief
+  ///   Emitted before an annotation is removed.
+  /// \param index The index of the annotation to be removed.
+  void removingAnnotation( int index );
+
+  /// \brief
+  ///   Emitted after an annotation is removed.
+  /// \param index The index of the removed annotation.
+  void annotationRemoved( int index );
+
+  /// \brief
+  ///   Emitted when an annotated value has been changed.
+  /// \param index The index of the annotation.
+  /// \param value The new annotated value.
+  void annotatedValueChanged( int index, const QString& value );
+
+  /// \brief
+  ///   Emitted when the annotation text of an annotation has been changed.
+  /// \param index The index of the annotation.
+  /// \param note The new text of the annotation.
+  void annotationChanged( int index, const QString& note );
+
 private:
-  pqColorMapModelInternal *Internal; ///< Stores the points.
-  ColorSpace Space;                  ///< Stores the color space.
-  QColor NanColor;                   ///< Stores the NaN color.
-  bool InModify;                     ///< True if in modify mode.
+  pqColorMapModelInternalPts* InternalPts; ///< Stores the points.
+  pqColorMapModelInternalTxt* InternalTxt; ///< Stores the annotations.
+  ColorSpace Space;                        ///< Stores the color space.
+  QColor NanColor;                         ///< Stores the NaN color.
+  bool IndexedLookup;                      ///< True if annotations should be mapped by index to colors.
+  bool InModify;                           ///< True if in modify mode.
 };
 
 #endif

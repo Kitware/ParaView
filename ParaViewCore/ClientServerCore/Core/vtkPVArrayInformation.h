@@ -26,6 +26,7 @@
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkPVInformation.h"
+class vtkAbstractArray;
 class vtkClientServerStream;
 class vtkStdString;
 class vtkStringArray;
@@ -54,9 +55,9 @@ public:
   vtkGetMacro(NumberOfComponents, int);
 
   // Description:
-  // Set the name for a component. Must be >= 1. 
-  void SetComponentName( vtkIdType component, const char *name );
-  
+  // Set the name for a component. Must be >= 1.
+  void SetComponentName( vtkIdType component, const char* name );
+
   //Description:
   // Get the component name for a given component.
   // Note: the const char* that is returned is only valid
@@ -73,36 +74,36 @@ public:
   // Range for component -1 is the range of the vector magnitude.
   // The number of components should be set before these ranges.
   void SetComponentRange(int comp, double min, double max);
-  void SetComponentRange(int comp, double *range)
+  void SetComponentRange(int comp, double* range)
     { this->SetComponentRange(comp, range[0], range[1]);}
-  double *GetComponentRange(int component);
-  void GetComponentRange(int comp, double *range);
+  double* GetComponentRange(int component);
+  void GetComponentRange(int comp, double* range);
 
   // Description:
   // This method return the Min and Max possible range of the native
   // data type. For example if a vtkScalars consists of unsigned char
-  // data these will return (0,255). 
+  // data these will return (0,255).
   // Nothing particular for 12bits data is done
   void GetDataTypeRange(double range[2]);
 
   // Description:
   // Returns 1 if the array can be combined.
   // It must have the same name and number of components.
-  int Compare(vtkPVArrayInformation *info);
+  int Compare(vtkPVArrayInformation* info);
 
   // Description:
   // Merge (union) ranges into this object.
-  void AddRanges(vtkPVArrayInformation *info);
+  void AddRanges(vtkPVArrayInformation* info);
 
-  void DeepCopy(vtkPVArrayInformation *info);
+  void DeepCopy(vtkPVArrayInformation* info);
 
   // Description:
   // Transfer information about a single object into this object.
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromObject( vtkObject* );
 
   // Description:
   // Merge another information object.
-  virtual void AddInformation(vtkPVInformation*);
+  virtual void AddInformation( vtkPVInformation* );
 
   // Description:
   // Manage a serialized version of the information.
@@ -122,7 +123,7 @@ public:
 
   // Description:
   // Merge (union) keys into this object.
-  void AddInformationKeys(vtkPVArrayInformation *info);
+  void AddInformationKeys(vtkPVArrayInformation* info);
   void AddInformationKey(const char* location, const char* name);
   void AddUniqueInformationKey(const char* location, const char* name);
 
@@ -133,6 +134,16 @@ public:
   const char* GetInformationKeyName(int);
   int HasInformationKey(const char* location, const char* name);
 
+  // Description:
+  // Merge another list of unique values.
+  void AddUniqueValues( vtkPVArrayInformation* );
+
+  // Description:
+  // Returns either NULL (array component appears to be continuous) or
+  // a pointer to a vtkAbstractArray (array component appears to be discrete)
+  // containing a sorted list of all unique values encountered in the array component.
+  vtkAbstractArray* GetUniqueComponentValuesIfFDiscrete( int component );
+
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation();
@@ -141,26 +152,31 @@ protected:
   int DataType;
   int NumberOfComponents;
   int NumberOfTuples;
-  char *Name;
-  double *Ranges;
-  
+  char* Name;
+  double* Ranges;
+
   // this array is used to store existing information keys (location/name pairs)
   //BTX
   class vtkInternalInformationKeys;
-  vtkInternalInformationKeys *InformationKeys;
+  vtkInternalInformationKeys* InformationKeys;
   //ETX
 
   //this is used by GetComponentName, so that it always return a valid component name
   //BTX
-  vtkStdString *DefaultComponentName;
+  vtkStdString* DefaultComponentName;
   //ETX
-  
+
   /// assigns to a string to DefaultComponentName for this component
   void DetermineDefaultComponentName( const int &component_no, const int &numComps);
-  
+
   //BTX
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
+  //ETX
+
+  //BTX
+  class vtkInternalUniqueValues;
+  vtkInternalUniqueValues* UniqueValues;
   //ETX
 
   vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented

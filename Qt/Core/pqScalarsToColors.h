@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include <QPair>
+#include <QList>
+#include <QVariant>
 
 class pqScalarsToColorsInternal;
 class pqScalarBarRepresentation;
@@ -58,11 +60,11 @@ public:
   /// Set the scalar range if the range specified is greater than
   /// the current scalar range. This call respects the ScalarRangeLock.
   /// If the lock is set, then this call has no effect.
-  /// If ScalarRangeLock is false, then this call will 
+  /// If ScalarRangeLock is false, then this call will
   /// move all control points uniformly to fit the new range.
   void setWholeScalarRange(double min, double max);
 
-  /// Sets the scalar range. 
+  /// Sets the scalar range.
   /// Does not consider the ScalarRangeLock. Moves all control points
   /// uniformly to fit the new range.
   void setScalarRange(double min, double max);
@@ -81,17 +83,17 @@ public:
     COMPONENT = 1
     };
 
-  // Set the color mode (component/magnitude) and 
+  // Set the color mode (component/magnitude) and
   // component to color by. When mode is magnitude, component is ignored.
   void setVectorMode(Mode mode, int component);
 
-  // Returns the vector mode and component used by the Lookup table. 
+  // Returns the vector mode and component used by the Lookup table.
   // When vector mode is MAGNITUDE, value returned by
   // getVectorComponent() is indeterminate.
   Mode getVectorMode() const;
   int getVectorComponent() const;
 
-  /// Convenience method to update the titles for all color legends showing this 
+  /// Convenience method to update the titles for all color legends showing this
   /// lookup table. This only updates the component part of the title.
   void updateScalarBarTitles(const QString& component);
 
@@ -111,6 +113,14 @@ public:
   /// done.
   static void setColorRangeScalingMode(int);
   static int colorRangeScalingMode(int default_value=GROW_ON_MODIFIED);
+
+  /// Set/get whether the colormap domain should be indices of entries in
+  /// the list of annotations (when true) or values in the ScalarRange (when false).
+  bool getIndexedLookup();
+  void setIndexedLookup( bool );
+
+  QList<QVariant> getAnnotations();
+  virtual void setAnnotations( const QList<QVariant>& annotations );
 
 public slots:
   // This method checks if this LUT is used by any display,
