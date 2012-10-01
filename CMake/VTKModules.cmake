@@ -351,6 +351,7 @@ if (PYTHON_EXECUTABLE)
   execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
     RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE)
   if (${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
+    set(PARAVIEW_MATPLOTLIB_MODULE vtkRenderingMatplotlib)
     list (APPEND _vtk_modules vtkRenderingMatplotlib)
   endif()
 endif()
