@@ -2179,7 +2179,7 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueueMPIAsynchronous(
   vtkAMRDualGridHelperCommRequest request;
   request.SendProcess = myProc;
   request.ReceiveProcess = recvProc;
-  request.Buffer = sendBuffer
+  request.Buffer = sendBuffer;
 
   this->MarshalDegenerateRegionMessage(sendBuffer->GetPointer(0), recvProc);
 
@@ -2483,7 +2483,7 @@ vtkTimerLogSmartMarkEvent markevent("ShareBlocksWithNeighborsAsync", this->Contr
     request.Buffer = sendBuffer;
 
     controller->NoBlockSend(sendBuffer->GetPointer(0),
-                            sendBuffer->GetNumberOfValues (),
+                            sendBuffer->GetNumberOfTuples (),
                             neighborProc, SHARED_BLOCK_TAG,
                             request.Request);
 
