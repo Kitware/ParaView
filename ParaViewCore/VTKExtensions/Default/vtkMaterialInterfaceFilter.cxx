@@ -2326,9 +2326,9 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
       // !!! We have to loop over all axes whose direction component is 0.
       // Convert index to working level.
       levelDifference =  level - blockLevel;
-      int mins[3];
-      int maxs[3];
-      int ix, iy, iz;
+      int mins[3] = {0,0,0};
+      int maxs[3] = {0,0,0};
+      int ix = 0, iy = 0, iz = 0;
 
       // Compupte the range of potential neighbor indexes.
       for (int ii = 0; ii < 3; ++ii)

@@ -113,6 +113,8 @@ unsigned int vtkPVDataRepresentation::Initialize(unsigned int minIdAvailable, un
     }
 
   assert("Invalid Representation Id. Not enough reserved ids." && (maxIdAvailable >= minIdAvailable));
+  (void) maxIdAvailable; // Prevent warning in Release build
+
   this->UniqueIdentifier = minIdAvailable;
   return (1 + this->UniqueIdentifier);
 }

@@ -3151,7 +3151,8 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(vtkPoints* points, long offset,
     *lineRead = this->ReadNextDataLine(line);
     sscanf(line, " %s", subLine);
     char *endptr;
-    strtod(subLine, &endptr); // Testing if we can convert this string to double
+    double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
+    (void) value; // Prevent Warning to show up
     if ( subLine != endptr )
       { // necessary if node ids were listed
       for (i = 0; i < numPts; i++)
@@ -3175,7 +3176,8 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(vtkPoints* points, long offset,
       *lineRead = this->ReadNextDataLine(line);
       sscanf(line, " %s", subLine);
       char *endptr;
-      strtod(subLine, &endptr); // Testing if we can convert this string to double
+      double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
+      (void) value; // Prevent Warning to show up
       if ( subLine != endptr )
         { // necessary if node ids were listed
         for (i = 0; i < numPts; i++)
@@ -3226,7 +3228,8 @@ int vtkPEnSightGoldReader::ReadOrSkipCoordinates(vtkPoints* points, long offset,
       sscanf(line, " %s", subLine);
 
       char *endptr;
-      strtod(subLine, &endptr); // Testing if we can convert this string to double
+      double value = strtod(subLine, &endptr); // Testing if we can convert this string to double
+      (void) value; // Prevent Warning to show up
       if ( subLine != endptr )
         { // necessary if node ids were listed
         for (i = 0; i < numPts; i++)

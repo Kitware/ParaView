@@ -45,6 +45,8 @@ vtkStandardNewMacro(vtkRawStridedReader2);
 
 int vtkRawStridedReader2::Read(float* data, int* uExtents)
 {
+  size_t freadResult = 0; // For warning complain
+
   size_t ir = uExtents[1] - uExtents[0] + 1;
   size_t jr = uExtents[3] - uExtents[2] + 1;
   size_t kr = uExtents[5] - uExtents[4] + 1;
@@ -80,7 +82,7 @@ int vtkRawStridedReader2::Read(float* data, int* uExtents)
           else
             {
             fseek(this->fp, index * sizeof(float), SEEK_SET);
-            fread(&(data[di]), sizeof(float), 1, this->fp);
+            freadResult = fread(&(data[di]), sizeof(float), 1, this->fp);
             }
           }
         }
@@ -98,7 +100,7 @@ int vtkRawStridedReader2::Read(float* data, int* uExtents)
               (uExtents[0] +
                (j + uExtents[2]) * js + (k + uExtents[4]) * ks) *
               sizeof(float), SEEK_SET);
-        fread(&(data[di]), sizeof(float), ir, this->fp);
+        freadResult = fread(&(data[di]), sizeof(float), ir, this->fp);
         }
       }
 #ifndef _WIN32
