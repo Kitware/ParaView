@@ -1,0 +1,99 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkUncertaintySurfacePainter.h
+
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifndef __vtkUncertaintySurfacePainter_h
+#define __vtkUncertaintySurfacePainter_h
+
+#include "vtkPainter.h"
+#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
+#include "vtkLightingHelper.h"
+#include "vtkColorMaterialHelper.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkShaderProgram2.h"
+#include "vtkPiecewiseFunction.h"
+
+class VTK_EXPORT vtkUncertaintySurfacePainter : public vtkPainter
+{
+public:
+  static vtkUncertaintySurfacePainter* New();
+  vtkTypeMacro(vtkUncertaintySurfacePainter, vtkPainter)
+  void PrintSelf(ostream& os, vtkIndent indent);
+  
+  // Description:
+  // Release any graphics resources that are being consumed by this mapper.
+  void ReleaseGraphicsResources(vtkWindow *window);
+
+  // Description:
+  // Get the output data object from this painter.
+  vtkDataObject* GetOutput();
+
+  // Description:
+  // Enable/Disable this painter.
+  vtkSetMacro(Enabled, int)
+  vtkGetMacro(Enabled, int)
+  vtkBooleanMacro(Enabled, int)
+
+  // Description:
+  // Set/get the uncertainty array name.
+  vtkGetStringMacro(UncertaintyArrayName)
+  vtkSetStringMacro(UncertaintyArrayName)
+
+  // Description:
+  // Set/get the uncertainty transfer function.
+  vtkGetObjectMacro(TransferFunction, vtkPiecewiseFunction)
+  vtkSetObjectMacro(TransferFunction, vtkPiecewiseFunction)
+
+protected:
+  vtkUncertaintySurfacePainter();
+  ~vtkUncertaintySurfacePainter();
+
+  // Description:
+  // Prepare to render.
+  void PrepareForRendering(vtkRenderer *renderer,
+                           vtkActor *actor);
+
+  // Description:
+  // Performs the actual rendering.
+  void RenderInternal(vtkRenderer *renderer,
+                      vtkActor *actor,
+                      unsigned long typeFlags,
+                      bool forceCompileOnly);
+
+  // Description:
+  // Passes information.
+  void PassInformation(vtkPainter* toPainter);
+
+  // Description:
+  // Prepares the output data object.
+  bool PrepareOutput();
+
+  // Description:
+  // Add the uncertainties array to the output.
+  void GenerateUncertaintiesArray(vtkDataObject *input, vtkDataObject *output);
+
+private:
+  int Enabled;
+  vtkDataObject *Output;
+  vtkSmartPointer<vtkShaderProgram2> Shader;
+  vtkWeakPointer<vtkOpenGLRenderWindow> LastRenderWindow;
+  vtkSmartPointer<vtkLightingHelper> LightingHelper;
+  vtkSmartPointer<vtkColorMaterialHelper> ColorMaterialHelper;
+  vtkPiecewiseFunction *TransferFunction;
+  char *UncertaintyArrayName;
+  int RenderingPreparationSuccess;
+};
+
+#endif // __vtkUncertaintySurfacePainter_h

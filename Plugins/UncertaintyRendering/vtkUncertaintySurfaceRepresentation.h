@@ -1,0 +1,62 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    $RCSfile$
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkUncertaintySurfaceRepresentation
+// .SECTION Description
+// vtkUncertaintySurfaceRepresentation extends vtkGeometryRepresentation
+// render surfaces with both value and uncertainty data.
+
+#ifndef __vtkUncertaintySurfaceRepresentation_h
+#define __vtkUncertaintySurfaceRepresentation_h
+
+#include "vtkGeometryRepresentation.h"
+
+class vtkPiecewiseFunction;
+class vtkUncertaintySurfacePainter;
+
+class VTK_EXPORT vtkUncertaintySurfaceRepresentation : public vtkGeometryRepresentation
+{
+public:
+  static vtkUncertaintySurfaceRepresentation* New();
+  vtkTypeMacro(vtkUncertaintySurfaceRepresentation, vtkGeometryRepresentation)
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Select the uncertainty array.
+  void SelectUncertaintyArray(int, int, int, int, const char *name)
+  {
+    this->SetUncertaintyArray(name);
+  }
+
+  // Description:
+  // Set/get the uncertainty array name.
+  void SetUncertaintyArray(const char *name);
+  const char* GetUncertaintyArray() const;
+
+  // Description:
+  // Set/get the uncertainty transfer function.
+  void SetUncertaintyTransferFunction(vtkPiecewiseFunction *function);
+  vtkPiecewiseFunction* GetUncertaintyTransferFunction() const;
+
+protected:
+  vtkUncertaintySurfaceRepresentation();
+  ~vtkUncertaintySurfaceRepresentation();
+
+  void UpdateColoringParameters();
+
+private:
+  vtkUncertaintySurfacePainter *Painter;
+};
+
+#endif // __vtkUncertaintySurfaceRepresentation_h
