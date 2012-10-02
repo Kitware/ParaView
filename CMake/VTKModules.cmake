@@ -349,7 +349,9 @@ endif()
 # If so, add vtkRenderingMatplotlib for math text rendering.
 if (PYTHON_EXECUTABLE)
   execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
-    RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE)
+    RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE
+    OUTPUT_VARIABLE IMPORT_MATPLOTLIB_OUTPUT
+    ERROR_VARIABLE IMPORT_MATPLOTLIB_ERROR)
   if (${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
     list (APPEND _vtk_modules vtkRenderingMatplotlib)
   endif()
