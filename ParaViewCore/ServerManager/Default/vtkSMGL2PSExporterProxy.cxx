@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMGL2PSExporterProxy.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkPVGL2PSExporter.h"
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
