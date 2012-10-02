@@ -2278,7 +2278,7 @@
       </StringVectorProperty>
       <!-- End of POVExporter -->
     </RenderViewExporterProxy>
-    <RenderViewExporterProxy class="not-used"
+    <GL2PSExporterProxy class="not-used"
                              name="GL2PSExporterBase">
       <Documentation>Base API definition for all GL2PS vector graphic exporters.
       </Documentation>
@@ -2349,8 +2349,8 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <!-- End of "GL2PSExporterBase" -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy base_proxygroup="exporters"
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
                              base_proxyname="GL2PSExporterBase"
                              class="vtkPVGL2PSExporter"
                              file_extension="ps"
@@ -2375,8 +2375,8 @@
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
       <!-- End of GL2PSExporterPS -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy base_proxygroup="exporters"
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
                              base_proxyname="GL2PSExporterBase"
                              class="vtkPVGL2PSExporter"
                              file_extension="eps"
@@ -2394,8 +2394,8 @@
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
       <!-- End of GL2PSExporterEPS -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy base_proxygroup="exporters"
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
                              base_proxyname="GL2PSExporterBase"
                              class="vtkPVGL2PSExporter"
                              file_extension="pdf"
@@ -2413,8 +2413,8 @@
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
       <!-- End of GL2PSExporterPDF -->
-    </RenderViewExporterProxy>
-    <RenderViewExporterProxy base_proxygroup="exporters"
+    </GL2PSExporterProxy>
+    <GL2PSExporterProxy base_proxygroup="exporters"
                              base_proxyname="GL2PSExporterBase"
                              class="vtkPVGL2PSExporter"
                              file_extension="svg"
@@ -2432,7 +2432,7 @@
         Encapsulated PostScript, 2: PDF, 3: TeX, 4: SVG</Documentation>
       </IntVectorProperty>
       <!-- End of GL2PSExporterSVG -->
-    </RenderViewExporterProxy>
+    </GL2PSExporterProxy>
     <!-- End of "exporters" -->
   </ProxyGroup>
   <ProxyGroup name="point_placers">
