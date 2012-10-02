@@ -112,6 +112,8 @@ int vtkRawStridedReader2::Read(float* data, int* uExtents)
     vtkByteSwap::SwapVoidRange(data, ir * jr * kr, sizeof(float));
     }
 
+  (void)freadResult; // To avoid warning
+
   return 1;
 }
 

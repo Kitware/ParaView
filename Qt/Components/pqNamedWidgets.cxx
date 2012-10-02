@@ -689,7 +689,7 @@ static void processHints(QGridLayout* panelLayout,
                          vtkSMProxy* smProxy,
                          QStringList& propertiesToHide,
                          QStringList& propertiesToShow,
-                         bool summaryOnly)
+                         bool vtkNotUsed(summaryOnly))
 {
   // Obtain the list of input ports, we don't show any widgets for input ports.
   QList<const char*> inputPortNames = 
