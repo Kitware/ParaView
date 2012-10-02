@@ -48,7 +48,6 @@ using std::vector;
 // and written to the temp dir.
 #define SKIP_PROCESS_ID 1
 
-
 /**
 Use a single render window for each run. This was suggested
 after strange x11 errors on the Blight dashboard system.
@@ -176,9 +175,9 @@ void BroadcastConfiguration(
     vtkTesting *testHelper = vtkTesting::New();
     testHelper->AddArguments(argc,const_cast<const char **>(argv));
 
-    dataRoot=NativePath(testHelper->GetDataRoot());
-    baseline=NativePath(testHelper->GetValidImageFileName());
-    tempDir=NativePath(testHelper->GetTempDirectory());
+    dataRoot=testHelper->GetDataRoot();
+    baseline=testHelper->GetValidImageFileName();
+    tempDir=testHelper->GetTempDirectory();
 
     testHelper->Delete();
     }

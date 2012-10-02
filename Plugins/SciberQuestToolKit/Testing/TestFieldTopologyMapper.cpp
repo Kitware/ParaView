@@ -53,6 +53,11 @@ int main(int argc, char **argv)
   string inputFileName;
   inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/SmallVector/SmallVector.bovm");
 
+  string logFileName;
+  logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestFieldTopologyMapper.log");
+  vtkSQLog::GetGlobalInstance()->SetFileName(logFileName.c_str());
+  vtkSQLog::GetGlobalInstance()->SetGlobalLevel(1);
+
   // TODO -- make this a command line option
   enum {
     PLANE=1,
