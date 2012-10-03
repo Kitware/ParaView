@@ -1373,6 +1373,10 @@ void pqColorScaleEditor::loadPreset()
         // Annotations: Update the GUI via the proxy
         this->handleAnnotationsChanged();
         }
+      else
+        {
+        this->addActiveValues();
+        }
 
       // Update the actual color map.
       this->Form->IgnoreEditor = false;
