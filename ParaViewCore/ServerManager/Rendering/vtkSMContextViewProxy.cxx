@@ -220,7 +220,10 @@ void vtkSMContextViewProxy::ResetDisplay()
   vtkSMPropertyHelper(this, "RightAxisRange", true).SetNumberOfElements(0);
   vtkSMPropertyHelper(this, "TopAxisRange", true).SetNumberOfElements(0);
   vtkSMPropertyHelper(this, "BottomAxisRange", true).SetNumberOfElements(0);
-  this->UpdateVTKObjects();
+  this->UpdateProperty("LeftAxisRange", 1);
+  this->UpdateProperty("RightAxisRange", 1);
+  this->UpdateProperty("TopAxisRange", 1);
+  this->UpdateProperty("BottomAxisRange", 1);
   this->StillRender();
 }
 
