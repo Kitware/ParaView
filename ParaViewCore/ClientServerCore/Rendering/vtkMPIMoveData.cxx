@@ -1150,7 +1150,7 @@ void vtkMPIMoveData::MarshalDataToBuffer(vtkDataObject* data)
       extent[3] << " " <<
       extent[4] << " " <<
       extent[5];
-    stream << " ORIGIN: " << origin[0] << " " << origin[1] << " " << origin[2];
+    stream << " ORIGIN " << origin[0] << " " << origin[1] << " " << origin[2];
     writer->SetHeader(stream.str().c_str());
     }
 
@@ -1263,10 +1263,14 @@ void vtkMPIMoveData::ReconstructDataFromBuffer(vtkDataObject* data)
       // need a more intrusive fix in the reader/writer itself.
       int extent[6]= {0, 0, 0, 0, 0, 0};
       float origin[3] = {0, 0, 0};
-      sscanf(reader->GetHeader(),
+      int values_read = sscanf(reader->GetHeader(),
         "EXTENT %d %d %d %d %d %d ORIGIN %f %f %f", &extent[0], &extent[1],
         &extent[2], &extent[3], &extent[4], &extent[5],
         &origin[0], &origin[1], &origin[2]);
+      if (values_read != 9)
+        {
+        vtkWarningMacro("EXTENT and ORIGIN may not have been read correctly.");
+        }
       vtkImageData* clone = vtkImageData::SafeDownCast(
         reader->GetOutputDataObject(0)->NewInstance());
       clone->ShallowCopy(reader->GetOutputDataObject(0));
