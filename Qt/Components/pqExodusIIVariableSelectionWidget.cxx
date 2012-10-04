@@ -137,6 +137,35 @@ public:
     this->Items[key].push_back(item);
     return item;
     }
+  
+  // returns the strings for the given key.
+  QStringList texts(const QString& key)
+    {
+    QStringList values;
+    foreach (pqTreeWidgetItemObject* item, this->Items[key])
+      {
+      if (item)
+        {
+        values << item->text(0);
+        }
+      }
+    return values;
+    }
+
+  // remove a particular item
+  void purge(const QString& key, const QString& text)
+    {
+    for (int cc=0; cc < this->Items[key].size(); cc++)
+      {
+      pqTreeWidgetItemObject* item = this->Items[key][cc];
+      if (item && item->text(0) == text)
+        {
+        delete item;
+        this->Items[key].removeAt(cc);
+        break;
+        }
+      }
+    }
 
   QVariant value(const QString& key)
     {
@@ -209,6 +238,8 @@ void pqExodusIIVariableSelectionWidget::propertyChanged(const QString& pname)
     }
   else
     {
+    QStringList currentStatiiKeys = this->Internals->texts(pname);
+
     QList<QList<QVariant> > status_values =
       properyValue.value<QList<QList<QVariant> > >();
     foreach (const QList<QVariant>& tuple, status_values)
@@ -216,7 +247,14 @@ void pqExodusIIVariableSelectionWidget::propertyChanged(const QString& pname)
       if (tuple.size() == 2)
         {
         this->setStatus(pname, tuple[0].toString(), tuple[1].toBool());
+        currentStatiiKeys.removeAll(tuple[0].toString());
         }
+      }
+
+    // remove any keys that are no longer present.
+    foreach (const QString& key, currentStatiiKeys)
+      {
+      this->Internals->purge(pname, key);
       }
     }
 }
