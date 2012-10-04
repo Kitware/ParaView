@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCalculatorWidget.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
+#include "pqCommandButtonPropertyWidget.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqPipelineRepresentation.h"
@@ -83,6 +84,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     else if (name == "calculator")
       {
       return new pqCalculatorWidget(smProxy, smProperty);
+      }
+    else if(name == "command_button")
+      {
+      return new pqCommandButtonPropertyWidget(smProxy, smProperty);
       }
     else
       {
