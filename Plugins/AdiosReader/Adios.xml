@@ -1,0 +1,103 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="PixieAdiosReader" class="vtkAdiosPixieReader" label="ADIOS Pixie Reader">
+      <Documentation
+         short_help="Read Adios Pixie files."
+         long_help="Load the geometry and data from a bp adios file.">
+      </Documentation>
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1"
+          panel_visibility="never">
+          <FileListDomain name="files"/>
+          <Documentation>
+            This property specifies the file name for the ADIOS reader.
+          </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+          name="ReadMethod"
+          command="SetReadMethod"
+          number_of_elements="1"
+          default_values="0"
+          label="Read Method"
+          panel_visibility="never">
+          <EnumerationDomain name="enum">
+            <Entry value="0" text="BP File"/>
+            <Entry value="3" text="DATASPACES"/>
+          </EnumerationDomain>
+       </IntVectorProperty>
+
+      <StringVectorProperty
+          name="Parameters"
+          animateable="0"
+          command="SetParameters"
+          number_of_elements="1"
+          default_values="verbose=3; app_id=5"
+          panel_visibility="never"/>
+
+       <Property
+           name="NextStep"
+           command="NextStep"
+           panel_widget="command_button"/>
+
+       <Property
+           name="Reset"
+           command="Reset"
+           panel_widget="command_button"/>
+
+       <Hints>
+        <ReaderFactory extensions="bp" file_description="Pixie Adios file"/>
+       </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="PixieAdiosStream" class="vtkAdiosPixieReader" label="ADIOS Pixie Stream Source">
+      <Documentation
+         short_help="Read Adios Pixie stream."
+         long_help="Load the geometry and data from a adios stage stream.">
+      </Documentation>
+      <StringVectorProperty
+          name="FileName"
+          animateable="0"
+          command="SetFileName"
+          number_of_elements="1" >
+          <Documentation>
+            This property specifies the file name for the ADIOS stream.
+          </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+          name="ReadMethod"
+          command="SetReadMethod"
+          number_of_elements="1"
+          default_values="3"
+          label="Read Method"
+          panel_visibility="never">
+          <EnumerationDomain name="enum">
+            <Entry value="0" text="BP File"/>
+            <Entry value="3" text="DATASPACES"/>
+          </EnumerationDomain>
+       </IntVectorProperty>
+
+      <StringVectorProperty
+          name="Parameters"
+          animateable="0"
+          command="SetParameters"
+          number_of_elements="1"
+          default_values="verbose=3; app_id=5"
+          panel_visibility="never"/>
+
+       <Property
+           name="NextStep"
+           command="NextStep"
+           panel_widget="command_button"/>
+
+       <Property
+           name="Reset"
+           command="Reset"
+           panel_widget="command_button"/>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

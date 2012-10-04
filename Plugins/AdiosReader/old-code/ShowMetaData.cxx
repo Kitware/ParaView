@@ -32,7 +32,7 @@ int main( int argc, char *argv[] )
   char* fname = argv[1];
 
   // Create the Adios file manager.
-  AdiosFile* adiosFile = new AdiosFile(fname);
+  AdiosStream* adiosFile = new AdiosStream(fname, ADIOS_READ_METHOD_BP);
   adiosFile->PrintInfo();
   delete adiosFile;
 

@@ -25,7 +25,7 @@ class vtkDataSetAttributes;
 class vtkInformationVector;
 class vtkInformation;
 
-class VTK_IO_EXPORT vtkAdiosReader : public vtkCompositeDataSetAlgorithm
+class vtkAdiosReader : public vtkCompositeDataSetAlgorithm
 {
 public:
   static vtkAdiosReader *New();
