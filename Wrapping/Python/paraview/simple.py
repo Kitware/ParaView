@@ -960,6 +960,34 @@ def GetLayout(view=None):
             return layout
     return None
 
+
+def SelectCells(query=None, proxy=None):
+    """Select cells satisfying the query. If query is None, then all cells are
+       selected. If proxy is None, then the active source is used."""
+    if not proxy:
+        proxy = GetActiveSource()
+    if not proxy:
+        raise RuntimeError, "No active source was found."
+
+    if not query:
+        # This ends up being true for all cells.
+        query = "id >= 0"
+
+    # Note, selSource is not registered with the proxy manager.
+    selSource = servermanager.sources.SelectionQuerySource()
+    selSource.FieldType = "CELL"
+    selSource.QueryString = str(query)
+    proxy.SMProxy.SetSelectionInput(proxy.Port, selSource.SMProxy, 0)
+    return selSource
+
+def ClearSelection(proxy=None):
+    """Clears the selection on the active source."""
+    if not proxy:
+        proxy = GetActiveSource()
+    if not proxy:
+        raise RuntimeError, "No active source was found."
+    proxy.SMProxy.SetSelectionInput(proxy.Port, None, 0)
+
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
     objects are shared between Python and the user interface. This class
