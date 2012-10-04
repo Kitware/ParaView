@@ -31,7 +31,6 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
-class vtkAnnotationLink;
 class vtkBlockDeliveryPreprocessor;
 class vtkClientServerMoveData;
 class vtkChartNamedOptions;
@@ -40,6 +39,7 @@ class vtkPVContextView;
 class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
+class vtkChartSelectionRepresentation;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
@@ -47,6 +47,11 @@ public:
   static vtkChartRepresentation* New();
   vtkTypeMacro(vtkChartRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // These must only be set during initialization before adding the
+  // representation to any views or calling Update().
+  void SetSelectionRepresentation(vtkChartSelectionRepresentation*);
 
   // Description:
   // Set the options object. This must be done before any other state is
@@ -82,6 +87,12 @@ public:
   // Forwarded to vtkBlockDeliveryPreprocessor.
   void SetFieldAssociation(int);
   void SetCompositeDataSetIndex(unsigned int);
+
+  // Description:
+  // Override because of internal selection representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
 
 //BTX
 protected:
@@ -135,12 +146,10 @@ protected:
   vtkWeakPointer<vtkPVContextView> ContextView;
   vtkChartNamedOptions* Options;
 
-  vtkSelectionDeliveryFilter* SelectionDeliveryFilter;
-
-  vtkAnnotationLink* AnnLink;
-
   bool EnableServerSideRendering;
   vtkSmartPointer<vtkTable> LocalOutput;
+
+  vtkChartSelectionRepresentation* SelectionRepresentation;
 
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented

@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkPlotPoints.h"
 #include "vtkAnnotationLink.h"
-#include "vtkSelectionDeliveryFilter.h"
 #include "vtkStringArray.h"
 #include "vtkChartNamedOptions.h"
 
@@ -141,13 +140,6 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
     if (this->Options)
       {
       this->Options->UpdatePlotOptions();
-      }
-
-    if(vtkAnnotationLink* annLink = plotMatrix->GetAnnotationLink())
-      {
-      vtkSelection* sel = vtkSelection::SafeDownCast(
-        this->SelectionDeliveryFilter->GetOutputDataObject(0));
-      annLink->SetCurrentSelection(sel);
       }
     }
 

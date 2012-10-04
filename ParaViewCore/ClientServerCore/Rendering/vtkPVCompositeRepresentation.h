@@ -17,9 +17,10 @@
 // vtkPVCompositeRepresentation is a data-representation used by ParaView for showing
 // a type of data-set in the render view. It is a composite-representation with
 // some fixed representations for showing things like selection and cube-axes.
-// This representation has two input ports:
-// \li 0: the dataset to show
-// \li 1: the extracted selection to show
+// This representation has 1 input port and it ensures that that input is passed
+// on to the internal representations (except SelectionRepresentation) properly.
+// For SelectionRepresentation, the client is expected to setup the input (look
+// at vtkSMPVRepresentationProxy).
 
 #ifndef __vtkPVCompositeRepresentation_h
 #define __vtkPVCompositeRepresentation_h
@@ -63,7 +64,12 @@ public:
   // Overridden to update the cube-axes and selection visibilities.
   virtual void SetVisibility(bool visible);
 
+  // Description:
+  // Set the visibility for the cube-axis.
   void SetCubeAxesVisibility(bool visible);
+
+  // Description:
+  // Set the selection visibility.
   virtual void SetSelectionVisibility(bool visible);
 
   // Description:
@@ -88,10 +94,6 @@ public:
 protected:
   vtkPVCompositeRepresentation();
   ~vtkPVCompositeRepresentation();
-
-  // Description:
-  // Fill input port information.
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   // Description:
   // Adds the representation to the view.  This is called from

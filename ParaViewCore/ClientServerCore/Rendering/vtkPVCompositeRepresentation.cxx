@@ -28,7 +28,6 @@ vtkCxxSetObjectMacro(vtkPVCompositeRepresentation, CubeAxesRepresentation,
 //----------------------------------------------------------------------------
 vtkPVCompositeRepresentation::vtkPVCompositeRepresentation()
 {
-  this->SetNumberOfInputPorts(2);
   this->SelectionRepresentation = vtkSelectionRepresentation::New();
   this->CubeAxesRepresentation = vtkCubeAxesRepresentation::New();
 
@@ -71,21 +70,13 @@ void vtkPVCompositeRepresentation::SetSelectionVisibility(bool visible)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::SetInputConnection(int port, vtkAlgorithmOutput* input)
 {
-  if (port == 0)
-    {
-    this->CubeAxesRepresentation->SetInputConnection(0, input);
-    this->Superclass::SetInputConnection(0, input);
-    }
-  else if (port == 1)
-    {
-    this->SelectionRepresentation->SetInputConnection(0, input);
-    }
+  this->CubeAxesRepresentation->SetInputConnection(port, input);
+  this->Superclass::SetInputConnection(port, input);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::SetInputConnection(vtkAlgorithmOutput* input)
 {
-  // port is assumed to be 0.
   this->CubeAxesRepresentation->SetInputConnection(input);
   this->Superclass::SetInputConnection(input);
 }
@@ -94,21 +85,13 @@ void vtkPVCompositeRepresentation::SetInputConnection(vtkAlgorithmOutput* input)
 void vtkPVCompositeRepresentation::AddInputConnection(
   int port, vtkAlgorithmOutput* input)
 {
- if (port == 0)
-    {
-    this->CubeAxesRepresentation->AddInputConnection(0, input);
-    this->Superclass::AddInputConnection(0, input);
-    }
-  else if (port == 1)
-    {
-    this->SelectionRepresentation->AddInputConnection(0, input);
-    }
+  this->CubeAxesRepresentation->AddInputConnection(port, input);
+  this->Superclass::AddInputConnection(port, input);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::AddInputConnection(vtkAlgorithmOutput* input)
 {
-  // port is assumed to be 0.
   this->CubeAxesRepresentation->AddInputConnection(input);
   this->Superclass::AddInputConnection(input);
 }
@@ -116,29 +99,15 @@ void vtkPVCompositeRepresentation::AddInputConnection(vtkAlgorithmOutput* input)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::RemoveInputConnection(int port, vtkAlgorithmOutput* input)
 {
-  if (port == 0)
-    {
-    this->CubeAxesRepresentation->RemoveInputConnection(0, input);
-    this->Superclass::RemoveInputConnection(0, input);
-    }
-  else if (port == 1)
-    {
-    this->SelectionRepresentation->RemoveInputConnection(0, input);
-    }
+  this->CubeAxesRepresentation->RemoveInputConnection(port, input);
+  this->Superclass::RemoveInputConnection(port, input);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRepresentation::RemoveInputConnection(int port, int index)
 {
-  if (port == 0)
-    {
-    this->CubeAxesRepresentation->RemoveInputConnection(0, index);
-    this->Superclass::RemoveInputConnection(0, index);
-    }
-  else if (port == 1)
-    {
-    this->SelectionRepresentation->RemoveInputConnection(0, index);
-    }
+  this->CubeAxesRepresentation->RemoveInputConnection(port, index);
+  this->Superclass::RemoveInputConnection(port, index);
 }
 
 //----------------------------------------------------------------------------
@@ -163,21 +132,6 @@ void vtkPVCompositeRepresentation::MarkModified()
   this->CubeAxesRepresentation->MarkModified();
   this->SelectionRepresentation->MarkModified();
   this->Superclass::MarkModified();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVCompositeRepresentation::FillInputPortInformation(
-  int port, vtkInformation* info)
-{
-  if (port==0)
-    {
-    return this->Superclass::FillInputPortInformation(port, info);
-    }
-
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
-  return 1;
 }
 
 //----------------------------------------------------------------------------

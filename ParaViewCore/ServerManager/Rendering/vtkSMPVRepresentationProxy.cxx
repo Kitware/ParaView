@@ -83,6 +83,11 @@ void vtkSMPVRepresentationProxy::SetPropertyModifiedFlag(const char* name, int f
 {
   if (!this->InReadXMLAttributes && name && strcmp(name, "Input") == 0)
     {
+    // Whenever the input for the representation is set, we need to setup the
+    // the input for the internal selection representation that shows the
+    // extracted-selection. This is done at the proxy level so that whenever the
+    // selection is changed in the application, the SelectionRepresentation is
+    // 'MarkedModified' correctly, so that it updates itself cleanly.
     vtkSMProxy* selectionRepr = this->GetSubProxy("SelectionRepresentation");
     vtkSMPropertyHelper helper(this, name);
     for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)

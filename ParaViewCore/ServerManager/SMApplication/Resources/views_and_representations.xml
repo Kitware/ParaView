@@ -3529,15 +3529,24 @@
                     name="PlotCornerInfo" />
         </ExposedProperties>
       </SubProxy>
-      <InputProperty command="SetInputConnection"
-                     is_internal="1"
-                     name="InternalInput1"
-                     port_index="1">
-        <Documentation>Internal property. Please don't touch
-        this.</Documentation>
-      </InputProperty>
+
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
       <!-- End of XYChartRepresentationBase -->
     </ChartRepresentationProxy>
+
     <!-- =================================================================== -->
     <ParallelCoordinatesRepresentationProxy class="vtkPVParallelCoordinatesRepresentation"
                                             name="ParallelCoordinatesRepresentation"
@@ -3670,13 +3679,7 @@
                             repeat_command="1">
         <Documentation>Set the opacity of the lines.</Documentation>
       </StringVectorProperty>
-      <InputProperty command="SetInputConnection"
-                     is_internal="1"
-                     name="InternalInput1"
-                     port_index="1">
-        <Documentation>Internal property. Please don't touch
-        this.</Documentation>
-      </InputProperty>
+
       <SubProxy>
         <Proxy name="PlotOptions"
                proxygroup="options"
@@ -3692,7 +3695,23 @@
                     name="LabelInfo" />
         </ExposedProperties>
       </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
     </ParallelCoordinatesRepresentationProxy>
+
     <!-- =================================================================== -->
     <ChartRepresentationProxy base_proxygroup="representations"
                               class="vtkPVPlotMatrixRepresentation"
@@ -3826,13 +3845,7 @@
         <Documentation>Property which sets the marker size for the active
         plots.</Documentation>
       </DoubleVectorProperty>
-      <InputProperty command="SetInputConnection"
-                     is_internal="1"
-                     name="InternalInput1"
-                     port_index="1">
-        <Documentation>Internal property. Please don't touch
-        this.</Documentation>
-      </InputProperty>
+
       <SubProxy>
         <Proxy name="PlotOptions"
                proxygroup="options"
@@ -3848,7 +3861,24 @@
                     name="LabelInfo" />
         </ExposedProperties>
       </SubProxy>
+
+      <SubProxy>
+        <!--
+          SelectionRepresentation proxy is used to convey the selection to view.
+          We keep this separate as subproxy so that when the selection is
+          modified, we don't have to update the representation as well, we can
+          only update the SelectionRepresentation.
+        -->
+        <RepresentationProxy name="SelectionRepresentation"
+               class="vtkChartSelectionRepresentation"
+               processes="client|dataserver|renderserver">
+          <InputProperty command="SetInputConnection"
+                         name="SelectionInput"/>
+        </RepresentationProxy>
+      </SubProxy>
+      <!-- End of PlotMatrixRepresentation -->
     </ChartRepresentationProxy>
+
     <!-- =================================================================== -->
     <!-- New representation for ContextView based charts. -->
     <ChartRepresentationProxy base_proxygroup="representations"

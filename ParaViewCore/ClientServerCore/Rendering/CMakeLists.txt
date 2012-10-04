@@ -35,6 +35,7 @@ set (Module_SRCS
   vtkAMRStreamingVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
+  vtkChartSelectionRepresentation.cxx
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
   vtkCompositeSliceRepresentation.cxx

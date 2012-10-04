@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVXYChartView.h"
 
+#include "vtkAnnotationLink.h"
 #include "vtkAxis.h"
 #include "vtkChartLegend.h"
 #include "vtkChartParallelCoordinates.h"
@@ -22,13 +23,14 @@
 #include "vtkContextScene.h"
 #include "vtkContextView.h"
 #include "vtkDoubleArray.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPen.h"
 #include "vtkPVPlotTime.h"
 #include "vtkStringArray.h"
 #include "vtkTextProperty.h"
 #include "vtkXYChartRepresentation.h"
-#include "vtkNew.h"
+
 #include <string>
 #include <vtksys/ios/sstream>
 
@@ -85,6 +87,19 @@ vtkAbstractContextItem* vtkPVXYChartView::GetContextItem()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVXYChartView::SetSelection(
+  vtkChartRepresentation* repr, vtkSelection* selection)
+{
+  (void)repr;
+
+  if (this->Chart)
+    {
+    // we don't support multiple selection for now.
+    this->Chart->GetAnnotationLink()->SetCurrentSelection(selection);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetChartType(const char *type)
 {
   if (this->Chart)
@@ -113,6 +128,15 @@ void vtkPVXYChartView::SetChartType(const char *type)
     this->Chart->AddObserver(vtkCommand::SelectionChangedEvent,
       this, &vtkPVXYChartView::SelectionChanged);
     this->ContextView->GetScene()->AddItem(this->Chart);
+
+    // setup the annotation link.
+    // Unlike vtkScatterPlotMatrix, vtkChart doesn't have valid annotation link
+    // setup on creation, so create one.
+    if (!this->Chart->GetAnnotationLink())
+      {
+      vtkNew<vtkAnnotationLink> annLink;
+      this->Chart->SetAnnotationLink(annLink.GetPointer());
+      }
     }
 }
 

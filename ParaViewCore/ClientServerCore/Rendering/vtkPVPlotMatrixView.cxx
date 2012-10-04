@@ -15,13 +15,14 @@
 
 #include "vtkPVPlotMatrixView.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkScatterPlotMatrix.h"
-#include "vtkContextView.h"
-#include "vtkContextScene.h"
-#include "vtkRenderWindow.h"
-#include "vtkTextProperty.h"
+#include "vtkAnnotationLink.h"
 #include "vtkCommand.h"
+#include "vtkContextScene.h"
+#include "vtkContextView.h"
+#include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkScatterPlotMatrix.h"
+#include "vtkTextProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotMatrixView);
 
@@ -43,6 +44,8 @@ vtkPVPlotMatrixView::vtkPVPlotMatrixView()
     &vtkPVPlotMatrixView::PlotMatrixSelectionCallback);
 
   this->ContextView->GetScene()->AddItem(this->PlotMatrix);
+  // vtkScatterPlotMatrix always comes with a valid vtkAnnotationLink setup, so
+  // we don't have do anything here.
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +58,16 @@ vtkPVPlotMatrixView::~vtkPVPlotMatrixView()
 vtkAbstractContextItem* vtkPVPlotMatrixView::GetContextItem()
 {
   return this->PlotMatrix;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlotMatrixView::SetSelection(
+  vtkChartRepresentation* repr, vtkSelection* selection)
+{
+  (void)repr;
+
+  // we don't support multiple selection for now.
+  this->PlotMatrix->GetAnnotationLink()->SetCurrentSelection(selection);
 }
 
 //----------------------------------------------------------------------------
