@@ -44,7 +44,7 @@ class vtkSMArrayListDomain;
 /// with its vtkSMArrayListDomain. Whenever the vtkSMArrayListDomain changes,
 /// the widget is "reset" to update using the property's new domain. This is
 /// useful for DescriptiveStatistics panel, for example. Whenever the attribute
-/// selection changes (i.e. use switches from cell-data to point-data), we need
+/// selection changes (i.e. user switches from cell-data to point-data), we need
 /// to update the widget's contents to show the list of array in the
 /// corresponding attribute. This class takes care of that.
 class PQCOMPONENTS_EXPORT pqArrayListDomain : public QObject
