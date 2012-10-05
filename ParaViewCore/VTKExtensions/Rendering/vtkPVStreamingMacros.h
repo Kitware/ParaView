@@ -30,3 +30,4 @@
 #endif
 
 #endif
+// VTK-HeaderTest-Exclude: vtkPVStreamingMacros.h
