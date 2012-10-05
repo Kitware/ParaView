@@ -37,4 +37,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkIOAMR
     vtkRenderingOpenGL
     vtkTestingRendering
+
+  TEST_LABELS
+    PARAVIEW
 )
