@@ -128,6 +128,31 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
   delete [] this->Blocks;
   this->SetFileName(0);
   this->SetCellArraySelection(0);
+
+  if (this->MarkersOn) 
+    {
+    std::cerr << "Deleting the marker data" << std::endl;
+    for (int n = 0; n < this->NumberOfMaterials; n ++) 
+      {
+      this->MarkersDumps[n].XLoc->Delete ();
+      this->MarkersDumps[n].ILoc->Delete ();
+      this->MarkersDumps[n].YLoc->Delete ();
+      this->MarkersDumps[n].JLoc->Delete ();
+      this->MarkersDumps[n].ZLoc->Delete ();
+      this->MarkersDumps[n].KLoc->Delete ();
+      this->MarkersDumps[n].Block->Delete ();
+
+      std::cerr << "deleting marker variables" << std::endl;
+      for (int v = 0; v < this->Markers[n].NumVars; v ++) 
+        {
+        this->MarkersDumps[n].Variables[v]->Delete ();
+        }
+      delete [] this->MarkersDumps[n].Variables;
+      delete [] this->Markers[n].Variables;
+      }
+    delete [] this->Markers;
+    std::cerr << "done Deleting the marker data" << std::endl;
+    }
 }
 
 #define READ_SPCTH_VOLUME_FRACTION "Material volume fraction"
@@ -433,6 +458,15 @@ int vtkSpyPlotUniReader::MakeCurrent()
         }
       }
     }
+
+  std::cerr << "Reading marker vars " << std::endl;
+  if (this->MarkersOn && !this->ReadMarkerDumps(&spis)) 
+    {
+    vtkErrorMacro("Problem reading marker data");
+    return 0;
+    }
+  std::cerr << "Done reading those vars" << std::endl;
+
   this->DataTypeChanged = 0;
   return 1;
 }
@@ -1122,6 +1156,7 @@ int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
 int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis) 
 {
   this->Markers = new MaterialMarker[this->NumberOfMaterials];
+  this->MarkersDumps = new MarkerDump[this->NumberOfMaterials];
   for (int n = 0; n < this->NumberOfMaterials; n ++) 
     {
     if ( !spis->ReadInt32s (&(this->Markers[n].NumMarks), 1) ) 
@@ -1143,7 +1178,16 @@ int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis)
         vtkErrorMacro ("Unable to read number of marker variables");
         return 0;
         }
+      this->MarkersDumps[n].XLoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].ILoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].YLoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].JLoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].ZLoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].KLoc = vtkFloatArray::New ();
+      this->MarkersDumps[n].Block = vtkFloatArray::New ();
+
       this->Markers[n].Variables = new MarkerMaterialField[this->Markers[n].NumVars];
+      this->MarkersDumps[n].Variables = new vtkFloatArray*[this->Markers[n].NumVars];
       for (int v = 0; v < this->Markers[n].NumVars; v ++) 
         {
         if ( !spis->ReadString (this->Markers[n].Variables[v].Name, 30) )
@@ -1156,6 +1200,7 @@ int vtkSpyPlotUniReader::ReadMarkerHeader(vtkSpyPlotIStream *spis)
           vtkErrorMacro ("Unable to read marker label name");
           return 0;
           }
+        this->MarkersDumps[n].Variables[v] = vtkFloatArray::New ();
         }
       }
     }           
@@ -1786,13 +1831,6 @@ int vtkSpyPlotUniReader::ReadDataDumps(vtkSpyPlotIStream *spis)
           }
         }
       }
-    this->MarkersDumps = new MarkerDump[this->NumberOfMaterials];
-
-    if (this->MarkersOn && !this->ReadMarkerDumps(spis)) 
-      {
-      vtkErrorMacro("Problem reading marker data");
-      return 0;
-      }
     }
   return 1;
 }
@@ -1821,7 +1859,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].XLoc = vtkFloatArray::New ();
       this->MarkersDumps[n].XLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       float* ptr = this->MarkersDumps[n].XLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1845,7 +1882,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].ILoc = vtkFloatArray::New ();
       this->MarkersDumps[n].ILoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].ILoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1869,7 +1905,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].YLoc = vtkFloatArray::New ();
       this->MarkersDumps[n].YLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].YLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1893,7 +1928,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].JLoc = vtkFloatArray::New ();
       this->MarkersDumps[n].JLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].JLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1917,7 +1951,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].ZLoc = vtkFloatArray::New ();
       this->MarkersDumps[n].ZLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].ZLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1941,7 +1974,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].KLoc = vtkFloatArray::New ();
       this->MarkersDumps[n].KLoc->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].KLoc->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1965,7 +1997,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem reading the bytes" );
         return 0;
         }
-      this->MarkersDumps[n].Block = vtkFloatArray::New ();
       this->MarkersDumps[n].Block->SetNumberOfValues (this->Markers[n].NumRealMarks);
       ptr = this->MarkersDumps[n].Block->GetPointer(0);
       if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
@@ -1974,7 +2005,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
         vtkErrorMacro( "Problem RLD decoding float data array" );
         return 0;
         }
-      this->MarkersDumps[n].Variables = new vtkFloatArray*[this->Markers[n].NumVars];
       for (int v = 0; v < this->Markers[n].NumVars; v ++)
         {
         if ( !spis->ReadInt32s(&numBytes, 1) )
@@ -1991,7 +2021,6 @@ int vtkSpyPlotUniReader::ReadMarkerDumps(vtkSpyPlotIStream *spis)
           vtkErrorMacro( "Problem reading the bytes" );
           return 0;
           }
-        this->MarkersDumps[n].Variables[n] = vtkFloatArray::New ();
         this->MarkersDumps[n].Variables[n]->SetNumberOfValues (this->Markers[n].NumRealMarks);
         ptr = this->MarkersDumps[n].Variables[n]->GetPointer(0);
         if ( !this->RunLengthDataDecode(&*markerBuffer.begin(), 
