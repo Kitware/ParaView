@@ -10473,11 +10473,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10636,11 +10631,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10840,11 +10830,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10996,11 +10981,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
