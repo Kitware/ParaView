@@ -43,6 +43,7 @@ set (Module_SRCS
   vtkSMCSVExporterProxy.cxx
   vtkSMDirectoryProxy.cxx
   vtkSMExporterProxy.cxx
+  vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
   vtkSMNullProxy.cxx
