@@ -1362,12 +1362,21 @@ void pqColorScaleEditor::loadPreset()
       this->setInterpretation( indexedLookup ? PQ_INTERPRET_CATEGORY : PQ_INTERPRET_INTERVAL );
 
       // Annotations: Update the proxy
-      this->Form->InSetAnnotation = true;
       QList<QVariant> annotations = colorMap->getAnnotations();
-      this->ColorMap->setAnnotations( annotations );
-      this->Form->InSetAnnotation = false;
-      // Annotations: Update the GUI via the proxy
-      this->handleAnnotationsChanged();
+      // Only change the annotations if the preset has some.
+      // Otherwise, keep the current set of annotations.
+      if (annotations.size() > 0)
+        {
+        this->Form->InSetAnnotation = true;
+        this->ColorMap->setAnnotations(annotations);
+        this->Form->InSetAnnotation = false;
+        // Annotations: Update the GUI via the proxy
+        this->handleAnnotationsChanged();
+        }
+      else
+        {
+        this->addActiveValues();
+        }
 
       // Update the actual color map.
       this->Form->IgnoreEditor = false;
