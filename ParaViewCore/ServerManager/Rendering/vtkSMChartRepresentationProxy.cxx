@@ -67,10 +67,15 @@ void vtkSMChartRepresentationProxy::SetPropertyModifiedFlag(
           }
         else
           {
-          // We use these internal properties since we need to add consumer dependecy
-          // on this proxy so that MarkModified() is called correctly.
-          vtkSMPropertyHelper(this, "InternalInput1").Set(esProxy, 1);
-          this->UpdateProperty("InternalInput1");
+          vtkSMProxy* selectionReprProxy =
+            this->GetSubProxy("SelectionRepresentation");
+          if (selectionReprProxy)
+            {
+            // We use these internal properties since we need to add consumer dependecy
+            // on this proxy so that MarkModified() is called correctly.
+            vtkSMPropertyHelper(selectionReprProxy, "SelectionInput").Set(esProxy, 1);
+            selectionReprProxy->UpdateVTKObjects();
+            }
           }
         }
       }

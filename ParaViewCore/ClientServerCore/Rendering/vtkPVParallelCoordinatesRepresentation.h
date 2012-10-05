@@ -60,8 +60,6 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
-  //vtkChartRepresentation* SelectionRepresentation;
-
 private:
   vtkPVParallelCoordinatesRepresentation(
       const vtkPVParallelCoordinatesRepresentation&); // Not implemented
