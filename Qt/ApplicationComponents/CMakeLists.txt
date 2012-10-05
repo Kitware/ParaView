@@ -65,6 +65,8 @@ set (Module_SRCS
   pqColorEditorPropertyWidget.h
   pqColorToolbar.cxx
   pqColorToolbar.h
+  pqCommandButtonPropertyWidget.cxx
+  pqCommandButtonPropertyWidget.h
   pqCommandLineOptionsBehavior.cxx
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.cxx
@@ -230,6 +232,7 @@ set (Module_MOC_HDRS
   pqColorSelectorPropertyWidget.h
   pqColorEditorPropertyWidget.h
   pqColorToolbar.h
+  pqCommandButtonPropertyWidget.h
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
