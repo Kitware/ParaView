@@ -73,7 +73,8 @@ public:
   virtual vtkMPIMToNSocketConnection* GetMPIMToNSocketConnection();
 
   //---------------------------------------------------------------------------
-  // Remote communication API.
+  // Remote communication API. This API is used for communication in the
+  // CLIENT -> SERVER(s) direction.
   //---------------------------------------------------------------------------
 
 //BTX
@@ -107,10 +108,29 @@ public:
     vtkPVInformation* information, vtkTypeUInt32 globalid);
 
   //---------------------------------------------------------------------------
+  // Remote communication API. This API is used for communication in the
+  // SERVER -> CLIENT direction. Since satellite nodes cannot communicate with
+  // the client, these methods have no effect on the satellite nodes and must
+  // only the called on the root-nodes for the server processes.
+  // If these methods are called on a process acting as a client, then it is
+  // processed on that process immediately, as appropriate.
+  //---------------------------------------------------------------------------
+
+//BTX
+  // Description:
+  // Sends the message to all clients.
+  virtual void NotifyAllClients(const vtkSMMessage*)=0;
+
+  // Description:
+  // Sends the message to all but the active client-session.
+  virtual void NotifyOtherClients(const vtkSMMessage*)=0;
+//ETX
+
+  //---------------------------------------------------------------------------
   // API dealing with/forwarded to vtkPVSessionCore dealing with SIObjects and
   // SMObjects.
   //---------------------------------------------------------------------------
-
+  
   // Description:
   // Provides access to the session core.
   vtkGetObjectMacro(SessionCore, vtkPVSessionCore);

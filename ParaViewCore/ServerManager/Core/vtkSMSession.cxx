@@ -27,9 +27,9 @@
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
@@ -378,4 +378,40 @@ unsigned int vtkSMSession::GetRenderClientMode()
     }
 
   return vtkSMSession::RENDERING_UNIFIED;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
+{
+  vtkTypeUInt32 id = message->global_id();
+
+  // Find the object for whom this message is meant.
+  vtkSMRemoteObject* remoteObj =
+    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
+
+  //cout << "##########     Server notification    ##########" << endl;
+  //cout << id << " = " << remoteObj << "(" << (remoteObj?
+  //    remoteObj->GetClassName() : "null") << ")" << endl;
+  //state.PrintDebugString();
+  //cout << "###################################################" << endl;
+
+  // ProcessingRemoteNotification = true prevent
+  // "ignore_synchronization" properties to be loaded...
+  // Therefore camera properties won't be shared
+  // (I don't understand this comment, but copying it from the original code).
+  if(remoteObj)
+    {
+    bool previousValue = this->StartProcessingRemoteNotification();
+    remoteObj->EnableLocalPushOnly();
+    remoteObj->LoadState(message, this->GetProxyLocator());
+    
+    vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
+    if (proxy)
+      {
+      proxy->UpdateVTKObjects();
+      }
+
+    remoteObj->DisableLocalPushOnly();
+    this->StopProcessingRemoteNotification(previousValue);
+    }
 }

@@ -145,6 +145,8 @@ public:
   static void setGlobalImmediateModeRenderingSetting(bool val);
   static bool globalImmediateModeRenderingSetting();
 
+  /// enable/disable monitoring of server notifications.
+  void setMonitorServerNotifications(bool);
 
 signals:
   /// Fired when the name of the proxy is changed.

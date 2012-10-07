@@ -121,6 +121,16 @@ public:
   // Push the state message. Overridden to ensure that the information in the
   // undo-redo state manager is updated.
   virtual void PushState(vtkSMMessage* msg);
+
+  // Description:
+  // Sends the message to all clients.
+  virtual void NotifyAllClients(const vtkSMMessage* msg)
+    { this->ProcessNotification(msg); }
+
+  // Description:
+  // Sends the message to all but the active client-session.
+  virtual void NotifyOtherClients(const vtkSMMessage*)
+    { /* nothing to do. */ }
 //ETX
 
   //---------------------------------------------------------------------------
@@ -190,6 +200,11 @@ protected:
   // has been created/setup correctly.
   vtkSMSession(bool initialize_during_constructor=true, vtkPVSessionCore* preExistingSessionCore=NULL);
   ~vtkSMSession();
+
+  // Description:
+  // Process the Notifation message sent using API to communicate from
+  // server-to-client.
+  virtual void ProcessNotification(const vtkSMMessage*);
 
   // Used by the Auto-MPI to prevent remote rendering, otherwise we should
   // always allow it.

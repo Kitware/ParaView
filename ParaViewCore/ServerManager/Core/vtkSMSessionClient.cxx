@@ -46,10 +46,6 @@
 #include <assert.h>
 #include <set>
 
-#define UPDATE_VTK_OBJECTS(object)                               \
-  if(vtkSMProxy::SafeDownCast(object))                           \
-    vtkSMProxy::SafeDownCast(object)->UpdateVTKObjects();
-
 //****************************************************************************/
 //                    Internal Classes and typedefs
 //****************************************************************************/
@@ -929,34 +925,17 @@ void vtkSMSessionClient::OnServerNotificationMessageRMI(void* message, int messa
 
   vtkSMMessage state;
   state.ParseFromString(data);
+  vtkSMProxyProperty::EnableProxyCreation();
+  this->ProcessNotification(&state);
+  vtkSMProxyProperty::DisableProxyCreation();
+
+
   vtkTypeUInt32 id = state.global_id();
- 
   vtkSMRemoteObject* remoteObj =
-      vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
-
-  //cout << "##########     Server notification    ##########" << endl;
-  //cout << id << " = " << remoteObj << "(" << (remoteObj?
-  //    remoteObj->GetClassName() : "null") << ")" << endl;
-  //state.PrintDebugString();
-  //cout << "###################################################" << endl;
-
-  // ProcessingRemoteNotification = true prevent
-  // "ignore_synchronization" properties to be loaded...
-  // Therefore camera properties won't be shared
-  if(remoteObj)
-    {
-    bool previousValue = this->StartProcessingRemoteNotification();
-    remoteObj->EnableLocalPushOnly();
-    vtkSMProxyProperty::EnableProxyCreation();
-    remoteObj->LoadState(&state, this->GetProxyLocator());
-    UPDATE_VTK_OBJECTS(remoteObj); // If SMProxy will call UpdateVTKObjects()
-    vtkSMProxyProperty::DisableProxyCreation();
-    remoteObj->DisableLocalPushOnly();
-    this->StopProcessingRemoteNotification(previousValue);
-    }
+    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
 
   // Maybe that "share_only" message could be useful for collaboration
-  if(remoteObj != this->GetCollaborationManager() && state.share_only())
+  if (remoteObj != this->GetCollaborationManager() && state.share_only())
     {
     this->GetCollaborationManager()->LoadState(&state, this->GetProxyLocator());
     }

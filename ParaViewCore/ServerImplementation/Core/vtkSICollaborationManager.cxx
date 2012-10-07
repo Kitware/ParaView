@@ -181,5 +181,5 @@ void vtkSICollaborationManager::Pull(vtkSMMessage* msg)
 //----------------------------------------------------------------------------
 void vtkSICollaborationManager::BroadcastToClients(vtkSMMessage* msg)
 {
-  this->Internal->ServerSession->BroadcastToClients(msg);
+  this->Internal->ServerSession->NotifyAllClients(msg);
 }

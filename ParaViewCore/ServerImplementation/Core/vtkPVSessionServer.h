@@ -97,6 +97,14 @@ public:
   void OnClientServerMessageRMI(void* message, int message_length);
   void OnCloseSessionRMI();
 
+  // Description:
+  // Sends the message to all clients.
+  virtual void NotifyAllClients(const vtkSMMessage*);
+
+  // Description:
+  // Sends the message to all but the active client-session.
+  virtual void NotifyOtherClients(const vtkSMMessage*);
+
 protected:
   vtkPVSessionServer();
   ~vtkPVSessionServer();
@@ -114,11 +122,6 @@ protected:
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
 
   bool MultipleConnection;
-
-  // Used for collaboration purpose
-  friend class vtkSICollaborationManager;
-  void SendToNonActiveClients(vtkSMMessage* msg);
-  void BroadcastToClients(vtkSMMessage* msg);
 
   class vtkInternals;
   vtkInternals* Internal;
