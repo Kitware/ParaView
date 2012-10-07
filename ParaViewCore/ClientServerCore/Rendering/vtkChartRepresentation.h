@@ -31,7 +31,7 @@
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 #include <vector> //needed for ivars
-#include <set>
+#include <set> //needed for ivars
 
 class vtkBlockDeliveryPreprocessor;
 class vtkClientServerMoveData;
