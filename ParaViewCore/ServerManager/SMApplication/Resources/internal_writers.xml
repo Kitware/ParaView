@@ -178,11 +178,12 @@
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"
                   base_proxyname="XMLDataSetWriterCore"
-                  class="vtkXMLPHierarchicalBoxDataWriter"
-                  name="XMLPHierarchicalBoxDataWriterCore">
-      <Documentation>Internal proxy used by
-      XMLHierarchicalBoxDataWriter.</Documentation>
-      <!-- End of XMLPHierarchicalBoxDataWriterCore -->
+                  class="vtkXMLPUniformGridAMRWriter"
+                  name="XMLPUniformGridAMRWriter">
+      <Documentation>
+        Internal proxy used by XMLUniformGridAMRWriter
+      </Documentation>
+      <!-- End of XMLPUniformGridAMRWriter-->
     </PWriterProxy>
     <!-- ================================================================= -->
     <PWriterProxy base_proxygroup="internal_writers"

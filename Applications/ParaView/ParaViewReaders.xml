@@ -7,6 +7,7 @@
   <ProxyManager type="reader" />
   <Proxy group="sources" name="LSDynaReader" />
   <Proxy group="sources" name="PVDReader" />
+  <Proxy group="sources" name="XMLHierarchicalBoxDataReader" />
   <Proxy group="sources" name="XMLPolyDataReader"/>
   <Proxy group="sources" name="XMLUnstructuredGridReader" />
   <Proxy group="sources" name="XMLImageDataReader" />
@@ -18,7 +19,7 @@
   <Proxy group="sources" name="XMLPStructuredGridReader" />
   <Proxy group="sources" name="XMLPRectilinearGridReader" />
   <Proxy group="sources" name="XMLMultiBlockDataReader" />
-  <Proxy group="sources" name="XMLHierarchicalBoxDataReader" />
+  <Proxy group="sources" name="XMLUniformGridAMRReader" />
   <Proxy group="sources" name="LegacyVTKFileReader" />
   <Proxy group="sources" name="pvtkfile" />
   <Proxy group="sources" name="ensight" />
