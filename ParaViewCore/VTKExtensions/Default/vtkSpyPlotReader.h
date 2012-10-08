@@ -131,6 +131,14 @@ public:
   vtkBooleanMacro(GenerateTracerArray,int);
 
   // Description:
+  // if true, the reader will extract the marker data at each 
+  // time step and create a set of vtkPoints in the second 
+  // output port.
+  void SetGenerateMarkers (int gm);
+  vtkGetMacro(GenerateMarkers,int);
+  vtkBooleanMacro(GenerateMarkers,int);
+
+  // Description:
   // If true, the reader will convert volume fraction arrays to unsigned char.
   // True by default.
   void SetDownConvertVolumeFraction(int vf);
@@ -246,6 +254,11 @@ protected:
                                int level, int blockID,
                                vtkSpyPlotUniReader *uniReader,
                                vtkCellData *cd);
+
+  // Sets up the markers data on the second output port
+  int PrepareMarkers(vtkMultiBlockDataSet* poly,
+                     vtkSpyPlotUniReader* reader);
+
   // The array selections.
   vtkDataArraySelection *CellDataArraySelection;
 
@@ -344,6 +357,7 @@ protected:
   int GenerateBlockIdArray; // user flag
   int GenerateActiveBlockArray; // user flag
   int GenerateTracerArray; // user flag
+  int GenerateMarkers; // user flag
 
   int DownConvertVolumeFraction;
 

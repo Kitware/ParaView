@@ -139,6 +139,9 @@ public:
   // Returns the number of materials
   int GetNumberOfMaterials( ) const { return NumberOfMaterials; }
 
+  // Returns the number of dimensions
+  int GetNumberOfDimensions() const { return NumberOfDimensions; }
+
   // Returns the coordinate system of the file
   int GetCoordinateSystem( ) const { return IGM; }
 
@@ -189,14 +192,15 @@ public:
     vtkFloatArray *XLoc;
     vtkFloatArray *YLoc;
     vtkFloatArray *ZLoc;
-    vtkFloatArray *ILoc;
-    vtkFloatArray *JLoc;
-    vtkFloatArray *KLoc;
-    vtkFloatArray *Block;
+    vtkIntArray *ILoc;
+    vtkIntArray *JLoc;
+    vtkIntArray *KLoc;
+    vtkIntArray *Block;
     vtkFloatArray **Variables;
   };
   MaterialMarker* Markers;
   MarkerDump* MarkersDumps;
+  vtkSetMacro(GenerateMarkers, int);
 
   vtkSpyPlotBlock* GetDataBlock(int block);
 
@@ -242,6 +246,7 @@ private:
   int NumberOfBlocks;
   int MaximumNumberOfLevels;
   int MarkersOn;
+  int GenerateMarkers;
 
   // For storing possible cell/material fields meta data
   int NumberOfPossibleCellFields;
