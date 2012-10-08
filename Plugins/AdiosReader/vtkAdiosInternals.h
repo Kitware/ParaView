@@ -790,8 +790,8 @@ public:
     uint64_t countCells[3]  = {0, 0, 0};
     uint64_t countPoints[3] = {0, 0, 0};
     AdiosVariableMapIterator varIter;
-    const ADIOS_SELECTION* selectionCells = NULL;
-    const ADIOS_SELECTION* selectionPoints = NULL;
+    ADIOS_SELECTION* selectionCells = NULL;
+    ADIOS_SELECTION* selectionPoints = NULL;
 
     // Retreive grid dimension
     std::string nodeVarName = "/nodes/Z"; // Use Z to overcome a bug
@@ -948,8 +948,8 @@ public:
     uint64_t countCells[3]  = {0, 0, 0};
     uint64_t countPoints[3] = {0, 0, 0};
     AdiosVariableMapIterator varIter;
-    const ADIOS_SELECTION* selectionCells = NULL;
-    const ADIOS_SELECTION* selectionPoints = NULL;
+    ADIOS_SELECTION* selectionCells = NULL;
+    ADIOS_SELECTION* selectionPoints = NULL;
 
     // Retreive grid dimension
     std::string nodeVarName = "/cells/Z"; // Use Z to overcome a bug
