@@ -317,7 +317,7 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     {
     std::vector<vtkTable*> output;
     this->GetLocalOutput(output);
-    this->Options->SetTables(&output[0],output.size());
+    this->Options->SetTables(output.empty()? NULL : &output[0],output.size());
     }
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
