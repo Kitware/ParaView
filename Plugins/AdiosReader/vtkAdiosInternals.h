@@ -904,6 +904,8 @@ public:
     // Load the data and release Adios step
     adios_perform_reads(adiosStreamFile->File, 1); // 1: We block
     adios_release_step (adiosStreamFile->File);
+    adios_selection_delete(selectionPoints);
+    adios_selection_delete(selectionCells);
 
     // Update min/max data array
     for(int i=0; i < grid->GetPointData()->GetNumberOfArrays(); ++i)
@@ -1051,6 +1053,8 @@ public:
     // Load the data and release Adios step
     adios_perform_reads(adiosStreamFile->File, 1); // 1: We block
     adios_release_step (adiosStreamFile->File);
+    adios_selection_delete(selectionPoints);
+    adios_selection_delete(selectionCells);
 
     // Update min/max data array
     for(int i=0; i < grid->GetPointData()->GetNumberOfArrays(); ++i)
