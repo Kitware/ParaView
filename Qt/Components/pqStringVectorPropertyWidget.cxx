@@ -69,8 +69,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
-                                                           QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+                                                           QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget)
 {
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smProperty);
   if(!svp)

@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 #include "pqColorChooserButton.h"
 
-pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *proxy,
-                                                           vtkSMProperty *property,
-                                                           QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy,
+                                                           vtkSMProperty *proxyProperty,
+                                                           QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget)
 {
   QVBoxLayout *l = new QVBoxLayout;
   l->setSpacing(0);
@@ -56,7 +56,7 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *proxy,
   this->addPropertyLink(adaptor,
                         "color",
                         SIGNAL(colorChanged(const QVariant&)),
-                        property);
+                        proxyProperty);
 
   l->addWidget(button);
 

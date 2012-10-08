@@ -981,13 +981,13 @@ void pqPropertiesPanel::proxyPropertyChanged()
   if(this->DebugApplyButtonState)
     {
     qDebug() << "Proxy Property Changed";
-    QObject *sender = this->sender();
-    if(sender)
+    QObject *signalSender = this->sender();
+    if(signalSender)
       {
-      qDebug() << "  sender class: " << sender->metaObject()->className();
+      qDebug() << "  sender class: " << signalSender->metaObject()->className();
 
       pqPropertyWidget *senderWidget =
-          qobject_cast<pqPropertyWidget *>(sender);
+          qobject_cast<pqPropertyWidget *>(signalSender);
       if(senderWidget)
         {
         qDebug() << "  xml label: " << senderWidget->property()->GetXMLLabel();
@@ -1248,21 +1248,21 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       if(this->DebugWidgetCreation)
         {
         QString reason = item.PropertyWidget->reason();
-        vtkSMProperty *smProperty = item.PropertyWidget->property();
+        vtkSMProperty *originProperty = item.PropertyWidget->property();
 
         if(!reason.isEmpty())
           {
           qDebug() << "  -"
-                   << proxy->getProxy()->GetPropertyName(smProperty)
-                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << proxy->getProxy()->GetPropertyName(originProperty)
+                   << "(" << originProperty->GetXMLLabel() << ")"
                    << "gets a" << item.PropertyWidget->metaObject()->className()
                    << "containing a" << item.PropertyWidget->reason();
           }
         else
           {
           qDebug() << "  -"
-                   << proxy->getProxy()->GetPropertyName(smProperty)
-                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << proxy->getProxy()->GetPropertyName(originProperty)
+                   << "(" << originProperty->GetXMLLabel() << ")"
                    << "gets a" << item.PropertyWidget->metaObject()->className()
                    << "for an unknown reason";
           }

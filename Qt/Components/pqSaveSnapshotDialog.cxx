@@ -225,9 +225,9 @@ void pqSaveSnapshotDialog::onHeightEdited()
 //-----------------------------------------------------------------------------
 QString pqSaveSnapshotDialog::palette() const
 {
-  QString data = this->Internal->palette->itemData(
+  QString paletteData = this->Internal->palette->itemData(
     this->Internal->palette->currentIndex()).toString();
-  return data;
+  return paletteData;
 }
 
 

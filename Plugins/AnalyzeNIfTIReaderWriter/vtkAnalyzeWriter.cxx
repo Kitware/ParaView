@@ -772,6 +772,8 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
   outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
+  (void)outExtent;
+  (void)outStride;
 
   unsigned char* tempUnsignedCharData = NULL;
   unsigned char* tempOutUnsignedCharData = NULL;
@@ -966,6 +968,7 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     }
     }
   }
+  (void) outTotalBitNumber;
   char * outP = (char *) (tempUnsignedCharData);
 
   delete tempOutUnsignedCharData;

@@ -112,10 +112,10 @@ pqPythonDialog::~pqPythonDialog()
   delete Implementation;
 }
 
-void pqPythonDialog::closeEvent(QCloseEvent *event)
+void pqPythonDialog::closeEvent(QCloseEvent *e)
 {
   pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
-  event->accept();
+  e->accept();
 }
 
 pqPythonShell* pqPythonDialog::shell()

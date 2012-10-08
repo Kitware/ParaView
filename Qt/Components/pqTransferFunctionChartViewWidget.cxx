@@ -230,7 +230,7 @@ QList<T*> pqTransferFunctionChartViewWidget::plots()const
 }
 //-----------------------------------------------------------------------------
 pqTransferFunctionChartViewWidget::pqTransferFunctionChartViewWidget(
-                             QWidget* parentWidget/*=NULL*/):Superclass(parentWidget)
+                             QWidget* pWidget/*=NULL*/):Superclass(pWidget)
 {
   this->Internal = new pqTransferFunctionChartViewWidget::pqInternal(*this);
   this->Internal->init();

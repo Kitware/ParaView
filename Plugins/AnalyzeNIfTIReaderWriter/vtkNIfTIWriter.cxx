@@ -737,6 +737,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
   outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
   outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
+  (void)outExtent;
 
   unsigned char* tempUnsignedCharData = NULL;
   unsigned char* tempOutUnsignedCharData = NULL;

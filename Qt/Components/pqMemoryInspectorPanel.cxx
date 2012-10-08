@@ -534,10 +534,10 @@ void HostData::Print(ostream &os)
 
 //-----------------------------------------------------------------------------
 pqMemoryInspectorPanel::pqMemoryInspectorPanel(
-        QWidget* parent,
+        QWidget* pWidget,
         Qt::WindowFlags flags)
             :
-        QWidget(parent,flags)
+        QWidget(pWidget,flags)
 {
   #if defined pqMemoryInspectorPanelDEBUG
   cerr << ":::::pqMemoryInspectorPanel::pqMemoryInspectorPanel" << endl;

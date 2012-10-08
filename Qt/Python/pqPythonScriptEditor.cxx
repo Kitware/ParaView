@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 
 //-----------------------------------------------------------------------------
-pqPythonScriptEditor::pqPythonScriptEditor(QWidget* parent) : Superclass(parent)
+pqPythonScriptEditor::pqPythonScriptEditor(QWidget* p) : Superclass(p)
 {
   this->pythonManager = NULL;
   this->TextEdit = new QTextEdit;
@@ -67,19 +67,19 @@ pqPythonScriptEditor::pqPythonScriptEditor(QWidget* parent) : Superclass(parent)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonScriptEditor::closeEvent(QCloseEvent *event)
+void pqPythonScriptEditor::closeEvent(QCloseEvent *e)
 {
   if (this->maybeSave())
     {
     this->TextEdit->clear();
     this->TextEdit->document()->setModified(false);
     this->setWindowModified(false);
-    event->accept();
+    e->accept();
     pqApplicationCore::instance()->settings()->saveState(*this, "PythonScriptEditor");
     }
   else
     {
-    event->ignore();
+    e->ignore();
     }
 }
 
