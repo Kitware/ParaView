@@ -537,7 +537,7 @@ public:
   // Faces are indexed: 0=xMin, 1=xMax, 2=yMin, 3=yMax, 4=zMin, 5=zMax
   int GetNumberOfFaceNeighbors(int face)
   {
-    return this->Neighbors[face].size();
+    return static_cast<int>(this->Neighbors[face].size());
   }
   //
   vtkMaterialInterfaceFilterBlock* GetFaceNeighbor(int face, int neighborId)
@@ -788,7 +788,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(
   image->GetExtent(imageExt);
 
   // get pointers to arrays to volume weighted average
-  this->NVolumeWtdAvgs=volumeWtdAvgArrayNames.size();
+  this->NVolumeWtdAvgs = static_cast<int>(volumeWtdAvgArrayNames.size());
   this->VolumeWtdAvgArrays.clear();
   this->VolumeWtdAvgArrays.resize(this->NVolumeWtdAvgs,0);
   for (int i=0; i<this->NVolumeWtdAvgs; ++i)
@@ -800,7 +800,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(
            && this->VolumeWtdAvgArrays[i]);
     }
   // get pointers to arrays to mass weighted average
-  this->NMassWtdAvgs=massWtdAvgArrayNames.size();
+  this->NMassWtdAvgs = static_cast<int>(massWtdAvgArrayNames.size());
   this->MassWtdAvgArrays.clear();
   this->MassWtdAvgArrays.resize(this->NMassWtdAvgs,0);
   for (int i=0; i<this->NMassWtdAvgs; ++i)
@@ -813,7 +813,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(
     }
   // get pointers to arrays to directly copy to the
   // output.ie Integrated arrays
-  this->NToIntegrate=integratedArrayNames.size();
+  this->NToIntegrate = static_cast<int>(integratedArrayNames.size());
   this->IntegratedArrays.clear();
   this->IntegratedArrays.resize(this->NToIntegrate,0);
   for (int i=0; i<this->NToIntegrate; ++i)
@@ -825,7 +825,7 @@ void vtkMaterialInterfaceFilterBlock::Initialize(
             && this->IntegratedArrays[i]);
     }
   // get pointers to arrays to sum
-  this->NToSum=summedArrayNames.size();
+  this->NToSum = static_cast<int>(summedArrayNames.size());
   this->ArraysToSum.clear();
   this->ArraysToSum.resize(this->NToSum,0);
   for (int i=0; i<this->NToSum; ++i)
@@ -1826,7 +1826,7 @@ void vtkMaterialInterfaceFilter::DeleteAllBlocks()
     }
 
   // Ghost blocks
-  int num = this->GhostBlocks.size();
+  int num = static_cast<int>(this->GhostBlocks.size());
   int ii;
   vtkMaterialInterfaceFilterBlock* block;
   for (ii = 0; ii < num; ++ii)
@@ -1854,7 +1854,7 @@ void vtkMaterialInterfaceFilter::DeleteAllBlocks()
 
   // levels
   int level, numLevels;
-  numLevels = this->Levels.size();
+  numLevels = static_cast<int>(this->Levels.size());
   for (level = 0; level < numLevels; ++level)
     {
     if (this->Levels[level])

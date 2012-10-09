@@ -340,8 +340,8 @@ void vtkMaterialInterfaceCommBuffer::SizeHeader(
                 vector<vtkMaterialInterfaceCommBuffer> &buffers,
                 int nBlocks)
 {
-  int nBuffers=buffers.size();
-  for (int bufferId=0; bufferId<nBuffers; ++bufferId)
+  size_t nBuffers=buffers.size();
+  for (size_t bufferId=0; bufferId<nBuffers; ++bufferId)
     {
     buffers[bufferId].SizeHeader(nBlocks);
     }

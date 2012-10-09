@@ -347,15 +347,13 @@ int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
       {
       vtkInformation* inInfo = inputVector[cc]->GetInformationObject(kk);
 
-      vtkStreamingDemandDrivenPipeline* sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-      int ghostLevels = sddp->GetUpdateGhostLevel(inInfo);
+      int ghostLevels = vtkStreamingDemandDrivenPipeline::GetUpdateGhostLevel(inInfo);
       if (this->RequestGhostCellsIfNeeded &&
         vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
         {
         ghostLevels++;
         }
-      sddp->SetUpdateGhostLevel(inInfo, ghostLevels);
+      vtkStreamingDemandDrivenPipeline::SetUpdateGhostLevel(inInfo, ghostLevels);
       }
     }
 

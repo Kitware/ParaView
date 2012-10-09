@@ -121,14 +121,14 @@ vtkIdType
 vtkMaterialInterfacePieceTransactionMatrix::GetNumberOfTransactions(
                 int procId)
 {
-  int nTransactions=0;
+  size_t nTransactions = 0;
 
   for (int fragmentId=0; fragmentId<this->NFragments; ++fragmentId)
     {
     nTransactions+=this->GetTransactions(fragmentId,procId).size();
     }
 
-  return nTransactions;
+  return static_cast<vtkIdType>(nTransactions);
 }
 #endif
 

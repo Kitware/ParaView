@@ -270,8 +270,6 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
     return can_quit_if_error ? -1 /* Quit */ :
                                 1 /* Pretend it's OK */;
     }
-
-  return 0;
 }
 
 //----------------------------------------------------------------------------

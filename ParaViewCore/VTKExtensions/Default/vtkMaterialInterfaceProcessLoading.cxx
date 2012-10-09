@@ -28,9 +28,9 @@ ostream &operator<<(ostream &sout, vtkMaterialInterfaceProcessLoading &fp)
 //
 ostream &operator<<(ostream &sout, vector<vtkMaterialInterfaceProcessLoading> &vfp)
 {
-  int n=vfp.size();
+  size_t n = vfp.size();
   vtkIdType total=0;
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     total+=vfp[i].GetLoadFactor();
     sout << "(" << vfp[i].GetId() << "," << vfp[i].GetLoadFactor() << ")" << endl;

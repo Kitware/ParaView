@@ -628,13 +628,13 @@ template<typename TCnt, typename TLabel>
 void PrintHistogram(vector<TCnt> &bins, vector<TLabel> &binIds)
 {
   const int maxWidth=40;
-  const int n=bins.size();
+  const size_t n=bins.size();
   if (n==0)
     {
     return;
     }
   int maxBin=*max_element(bins.begin(),bins.end());
-  for (int i=0; i<n; ++i)
+  for (size_t i=0; i<n; ++i)
     {
     if (bins[i]==0)
       {

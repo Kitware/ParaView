@@ -80,8 +80,8 @@ int vtkPVAMRDualContour::RequestData(vtkInformation* vtkNotUsed(request),
                     PV_AMR_SURFACE_VALUE_UNSIGNED_CHAR);
 
   this->InitializeRequest (hbdsInput);
-  size_t noOfArrays = this->Implementation->CellArrays.size();
-  for(size_t i = 0; i < noOfArrays; i++)
+  unsigned int noOfArrays = static_cast<unsigned int>(this->Implementation->CellArrays.size());
+  for(unsigned int i = 0; i < noOfArrays; i++)
     {
     vtkMultiBlockDataSet* out = this->DoRequestData(
       hbdsInput, this->Implementation->CellArrays[i].c_str());

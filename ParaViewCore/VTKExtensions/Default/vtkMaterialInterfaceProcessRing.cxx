@@ -67,7 +67,7 @@ void vtkMaterialInterfaceProcessRing::Initialize(
   this->BufferSize=0;
   this->Buffer.clear();
 
-  int nItems=Q.size();
+  int nItems = static_cast<int>(Q.size());
   assert(nItems>0);
 
   // check that upper bound does not exclude
@@ -104,14 +104,14 @@ void vtkMaterialInterfaceProcessRing::Initialize(
 //
 void vtkMaterialInterfaceProcessRing::Print()
 {
-  int n=this->Buffer.size();
+  size_t n = this->Buffer.size();
   if (n==0)
     {
     cerr << "{}";
     return;
     }
   cerr << "{" << this->Buffer[0];
-  for (int i=1; i<n; ++i)
+  for (size_t i=1; i < n; ++i)
     {
     cerr << ", " << this->Buffer[i];
     }
