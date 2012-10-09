@@ -121,8 +121,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy,
     propertyName.replace(':', '_');
     
     // escape regex chars
-    propertyName.replace(')', "\\)");
-    propertyName.replace('(', "\\(");
+    propertyName = QRegExp::escape(propertyName);
 
     const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
