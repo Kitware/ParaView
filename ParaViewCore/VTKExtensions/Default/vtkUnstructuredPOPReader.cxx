@@ -1345,7 +1345,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
          pointIterator.ColumnPieceHasBottomPoint(true) == false &&
          pointIterator.GetColumnTopPointExtentIndex(true) < pointIterator.GetColumnOceanBottomExtentIndex())
         {
-        int iIndex, jIndex;
+        int iIndex = 0, jIndex = 0;
         pointIterator.GetCurrentColumnExtentIndices(iIndex, jIndex);
         int kIndex = pointIterator.GetColumnBottomPointExtentIndex(false);
         int sendingProc = this->GetPointOwnerPiece(
@@ -1390,7 +1390,7 @@ void vtkUnstructuredPOPReader::CommunicateParallelVerticalVelocity(
       {
       if(pointIterator.IsColumnAReaderGhost() == false)
         {
-        int iIndex, jIndex;
+        int iIndex = 0, jIndex = 0;
         pointIterator.GetCurrentColumnExtentIndices(iIndex, jIndex);
         int kIndex = pointIterator.GetColumnTopPointExtentIndex(true);
         kIndex += 2*numberOfGhostLevels-1;

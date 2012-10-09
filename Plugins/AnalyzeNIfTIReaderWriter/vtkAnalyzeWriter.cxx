@@ -672,8 +672,9 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
 
 void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
-                             int extent[6])
+                                 int extent[6], int wholeExtent[6])
 {
+    (void)wholeExtent; // Not used
    //struct nifti_1_header nhdr ;
    znzFile               fp=NULL;
    //size_t                ss ;

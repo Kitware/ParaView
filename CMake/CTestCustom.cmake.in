@@ -38,6 +38,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # ignore warnings from old plugins
   "H5Part"
   "AnalyzeNIfTIReaderWriter"
+
+  # ignore method call with return value unused
+  "declared with attribute warn_unused_result"
+  "warning: ignoring return value"
 )
 
 #------------------------------------------------------------------------------

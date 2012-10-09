@@ -250,6 +250,7 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
   const unsigned int &level, const unsigned& index, const vtkAMRBox&,
   vtkImageData* donor)
 {
+  (void)index;
   vtkStreamingStatusMacro("Updating with block at " << level << "," << index);
 
   vtkBoundingBox donorBounds(donor->GetBounds());

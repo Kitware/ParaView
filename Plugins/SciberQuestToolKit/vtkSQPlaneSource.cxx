@@ -354,7 +354,7 @@ int vtkSQPlaneSource::RequestData(
 
   // create a parallel iterator that we'll use to
   // select the cells owned by this rank.
-  CellIdIterator *it;
+  CellIdIterator *it = NULL;
   if (!this->ImmediateMode || (this->DecompType==DECOMP_TYPE_STRIPS))
     {
     it=DecomposeStrips(

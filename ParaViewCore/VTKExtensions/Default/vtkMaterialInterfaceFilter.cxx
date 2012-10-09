@@ -2277,7 +2277,7 @@ int vtkMaterialInterfaceFilter::HasNeighbor(
   int neighborDirection[3])
 {
   vtkMaterialInterfaceFilterBlock* neighbor;
-  int idx[3];
+  int idx[3] = {0,0,0};
   int levelDifference;
 
   // Check all levels.
