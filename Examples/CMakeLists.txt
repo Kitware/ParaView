@@ -19,6 +19,7 @@ if (PARAVIEW_BUILD_QT_GUI)
   add_subdirectory(Plugins/GUIView)
   add_subdirectory(Plugins/Reader)
   add_subdirectory(Plugins/RenderPassViews)
+  add_subdirectory(Plugins/RepresentationBehavior)
   add_subdirectory(Plugins/SourceToolbar)
   add_subdirectory(Plugins/Writer)
 
