@@ -18,6 +18,7 @@
 #include "vtkAMRInformation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellData.h"
+#include "vtkIdList.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
@@ -27,6 +28,7 @@
 #include "vtkPVStreamingMacros.h"
 #include "vtkUniformGridAMRDataIterator.h"
 #include "vtkUniformGrid.h"
+#include "vtkVoxel.h"
 #include "vtkXMLImageDataWriter.h"
 
 #include <algorithm>
@@ -102,6 +104,12 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(
       cc++)
       {
       this->ResampledAMR->GetCellData()->GetAbstractArray(cc)->Modified();
+      }
+    for (int cc=0;
+      this->ResampledAMRPointData &&
+      cc < this->ResampledAMRPointData->GetNumberOfArrays(); cc++)
+      {
+      this->ResampledAMRPointData->GetAbstractArray(cc)->Modified();
       }
     }
     
@@ -208,6 +216,20 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   // input.
   output->GetCellData()->CopyAllocate(reference->GetCellData(), numCells);
 
+  if (reference->GetPointData()->GetNumberOfArrays() > 0)
+    {
+    // If reference grid has point data, we are going to pass that through as
+    // well. However we cannot put those in the output->CellData since that will
+    // confuse all CopyData() calls. So we just keep it separate and pass it to
+    // the dualGrid directly.
+    this->ResampledAMRPointData = vtkSmartPointer<vtkPointData>::New();
+    this->ResampledAMRPointData->InterpolateAllocate(reference->GetPointData(), numCells);
+    }
+  else
+    {
+    this->ResampledAMRPointData = NULL;
+    }
+
   // Generate a mask array that's used to keep track of which point comes from
   // which level. We use this array to avoid overwriting data from  higher
   // levels with that from lower levels.
@@ -235,13 +257,32 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   dualGrid->SetSpacing(output->GetSpacing());
   dualGrid->GetPointData()->PassData(output->GetCellData());
 
+  // Pass arrays from this->ResampledAMRPointData to  the dualGrid as well.
+  for (int cc=0;
+       this->ResampledAMRPointData != NULL &&
+       cc < this->ResampledAMRPointData->GetNumberOfArrays();
+       cc++)
+    {
+    vtkAbstractArray* curArray =
+      this->ResampledAMRPointData->GetAbstractArray(cc);
+
+    if (curArray && curArray->GetName() &&
+      dualGrid->GetPointData()->GetAbstractArray(curArray->GetName()) == NULL)
+      {
+      dualGrid->GetPointData()->AddArray(curArray);
+      }
+    }
+
   this->SetOutput(dualGrid.GetPointer());
   this->InitializationTime.Modified();
 
   vtkStreamingStatusMacro("Resample volume has been initialized.");
   vtkStreamingStatusMacro("    number of cells :" << numCells);
-  vtkStreamingStatusMacro("    number of array  :" <<
+  vtkStreamingStatusMacro("    number of cell arrays  :" <<
     output->GetCellData()->GetNumberOfArrays());
+  vtkStreamingStatusMacro("    number of point arrays  :" <<
+    (this->ResampledAMRPointData?
+     this->ResampledAMRPointData->GetNumberOfArrays() : 0))
   return true;
 }
 
@@ -265,6 +306,8 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
   bool something_changed = false;
   double receiver_spacing[3];
   this->ResampledAMR->GetSpacing(receiver_spacing);
+
+  vtkNew<vtkIdList> cellPoints;
 
   for (double z = updateBounds.GetMinPoint()[2] + receiver_spacing[2]/2.0;
     z <= updateBounds.GetMaxPoint()[2]; z+= receiver_spacing[2])
@@ -292,6 +335,25 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
           }
         this->ResampledAMR->GetCellData()->CopyData(
           donor->GetCellData(), donor_cellId, receiver_cellid);
+        if (this->ResampledAMRPointData)
+          {
+          donor->GetCellPoints(donor_cellId, cellPoints.GetPointer());
+          vtkIdType numPoints = cellPoints->GetNumberOfIds();
+          assert(numPoints <= 8);
+          if (numPoints > 0)
+            {
+            double weight, weights[8];
+            weight = 1.0 / numPoints;
+            for (vtkIdType cc=0; cc < numPoints; cc++)
+              {
+              weights[cc] = weight;
+              }
+
+            this->ResampledAMRPointData->InterpolatePoint(
+              donor->GetPointData(), receiver_cellid, cellPoints.GetPointer(),
+              weights);
+            }
+          }
         something_changed = true;
         this->DonorLevel->SetValue(receiver_cellid, static_cast<int>(level));
         }

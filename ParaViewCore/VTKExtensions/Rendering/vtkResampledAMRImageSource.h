@@ -14,9 +14,15 @@
 =========================================================================*/
 // .NAME vtkResampledAMRImageSource - image data source that resamples an AMR
 // dataset to produce the image data.
+//
 // .SECTION Description
 // vtkResampledAMRImageSource is a image data source that resamples a
-// vtkOverlappingAMR dataset to produce an image data.
+// vtkOverlappingAMR dataset to produce an image data. The output AMR will have
+// both the point data and cell data from the input AMR grids passed along as point
+// data for the output image data. This filter assumes that all blocks in the
+// input AMR have exactly the same point/cell arrays in same order. If they are
+// different we will end up with weird runtime issues that may be hard to debug.
+//
 // .SECTION Notes
 // We subclass vtkTrivialProducer since it deals with all the meta-data that
 // needs to be passed down the pipeline for image data, keeping the code here
@@ -29,10 +35,11 @@
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
-class vtkImageData;
-class vtkOverlappingAMR;
 class vtkAMRBox;
+class vtkImageData;
 class vtkIntArray;
+class vtkOverlappingAMR;
+class vtkPointData;
 
 class VTKPVVTKEXTENSIONSRENDERING_EXPORT vtkResampledAMRImageSource :
   public vtkTrivialProducer
@@ -85,6 +92,8 @@ protected:
   double SpatialBounds[6];
 
   vtkSmartPointer<vtkImageData> ResampledAMR;
+  vtkSmartPointer<vtkPointData> ResampledAMRPointData;
+
   vtkSmartPointer<vtkIntArray> DonorLevel;
 
 private:

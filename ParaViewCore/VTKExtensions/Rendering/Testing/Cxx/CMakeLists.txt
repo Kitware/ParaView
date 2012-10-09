@@ -7,7 +7,9 @@ find_file(smooth_flash
           NO_DEFAULT_PATH)
 mark_as_advanced(smooth_flash)
 
-set (MyTests)
+set (MyTests
+  TestResampledAMRImageSourceWithPointData.cxx)
+
 if (EXISTS "${smooth_flash}")
   get_filename_component(smooth_flash_dir "${smooth_flash}" PATH)
   set(MyTests ${MyTests}
