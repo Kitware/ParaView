@@ -390,8 +390,9 @@ int vtkSpyPlotUniReader::MakeCurrent()
         vtkFloatArray* floatArray = 0;
         vtkUnsignedCharArray* unsignedCharArray = 0;
         vtkDataArray* dataArray = 0;
-        if ( this->CellArraySelection->ArrayIsEnabled(var->Name) &&
-             !var->DataBlocks[actualBlockId] )
+        // Note: Always read the last field so that marker file location is set properly
+        if ( (this->CellArraySelection->ArrayIsEnabled(var->Name) || fieldCnt == dp->NumVars - 1) && 
+              !var->DataBlocks[actualBlockId] )
           {
           if ( this->DownConvertVolumeFraction && this->IsVolumeFraction(var) )
             {
