@@ -29,7 +29,9 @@
 #
 #==========================================================================
 set (Modules_SRCS
+  cp_helper_py.cxx
   vtkCPDataDescription.cxx
+  vtkCPHelperScripts.cxx
   vtkCPInputDataDescription.cxx
   vtkCPPipeline.cxx
 )
@@ -37,5 +39,19 @@ set (Modules_SRCS
 set_source_files_properties(
   vtkCPPipeline
   ABSTRACT)
+
+set_source_files_properties(
+  cp_helper_py
+  WRAP_EXCLUDE)
+
+# Embed helper Python script inside code base
+ADD_CUSTOM_COMMAND(
+    OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/cp_helper_py.cxx"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/cp_helper.py"
+            vtkEncodeString
+    COMMAND vtkEncodeString
+    ARGS "${CMAKE_CURRENT_BINARY_DIR}/cp_helper_py.cxx"
+         "${CMAKE_CURRENT_SOURCE_DIR}/cp_helper.py"
+         cp_helper_py)
 
 vtk_module_library(${vtk-module} ${Modules_SRCS})

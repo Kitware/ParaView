@@ -1,6 +1,6 @@
 project(CoProcessingScriptGeneratorPlugin)
 
-
+if(PARAVIEW_ENABLE_COPROCESSING)
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
@@ -90,6 +90,8 @@ ADD_PARAVIEW_PLUGIN(
     cp_export_py.cxx
 )
 
+target_link_libraries(CoProcessingPlugin vtkCoProcessor)
+
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
   # this test is redundant with the CoProcessingFullWorkflow test
@@ -107,3 +109,5 @@ IF (BUILD_TESTING)
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON)
   ENDIF ( BUILD_SHARED_LIBS )
 ENDIF (BUILD_TESTING)
+
+endif(PARAVIEW_ENABLE_COPROCESSING)

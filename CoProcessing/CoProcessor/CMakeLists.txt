@@ -37,7 +37,8 @@ set (Modules_SRCS
 if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Modules_SRCS
     vtkCPPythonHelper.cxx
-    vtkCPPythonScriptPipeline.cxx)
+    vtkCPPythonScriptPipeline.cxx
+    )
 
   include_directories(
   "${VTK_SOURCE_DIR}/Wrapping/Python"

@@ -30,38 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
-#include <QMessageBox>
-#include <QPointer>
-#include <QRegExp>
-#include <QRegExpValidator>
-#include <QWizardPage>
 
 #include <pqApplicationCore.h>
 #include <pqContextView.h>
-#include <pqPipelineRepresentation.h>
 #include <pqFileDialog.h>
 #include <pqPipelineFilter.h>
+#include <pqPipelineRepresentation.h>
 #include <pqPipelineSource.h>
 #include <pqPythonDialog.h>
 #include <pqPythonManager.h>
 #include <pqRenderViewBase.h>
 #include <pqServerManagerModel.h>
 
+#include <vtkCPHelperScripts.h>
+#include <vtkImageData.h>
+#include <vtkNew.h>
+#include <vtkPNGWriter.h>
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <QSize>
-#include <vtkPNGWriter.h>
-#include <vtkImageData.h>
-#include <vtkSmartPointer.h>
-#include <vtkNew.h>
-#include <vtkUnsignedCharArray.h>
-#include <QPixmap>
 #include <QLabel>
+#include <QPixmap>
+#include <QSize>
+#include <QMessageBox>
+#include <QPointer>
+#include <QRegExp>
+#include <QRegExpValidator>
+#include <QWizardPage>
 
 extern const char* cp_export_py;
 
@@ -565,6 +566,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename);
 
+  dialog->runString(vtkCPHelperScripts::GetPythonHelperScript());
   dialog->runString(command);
 
   return true;
