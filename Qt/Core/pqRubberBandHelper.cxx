@@ -80,6 +80,8 @@ public:
   QPointer<pqRenderView> RenderView;
   int PreviousInteractionMode;
   unsigned long ObserverId;
+  unsigned long PressEventObserverId;
+  int LastPressedPosition[2];
 
   QCursor ZoomCursor;
 
@@ -87,7 +89,8 @@ public:
     ZoomCursor(QPixmap(zoom_xpm), 11, 11)
     {
     this->Owner = owner;
-    this->ObserverId = 0;
+    this->ObserverId = this->PressEventObserverId = 0;
+    this->LastPressedPosition[0] = this->LastPressedPosition[1] = -10000;
     }
 
   ~pqInternal()
@@ -131,6 +134,10 @@ public:
             vtkCommand::LeftButtonReleaseEvent,
             this->Owner.data(),
             &pqRubberBandHelper::onPickOnClick);
+      this->PressEventObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::LeftButtonPressEvent,
+            this,
+            &pqRubberBandHelper::pqInternal::UpdatePressedPosition);
       }
   }
 
@@ -139,8 +146,33 @@ public:
     if(this->ObservedProxy && this->ObserverId)
       {
       this->ObservedProxy->RemoveObserver(this->ObserverId);
+      if(this->PressEventObserverId)
+        {
+        this->ObservedProxy->RemoveObserver(this->PressEventObserverId);
+        }
       }
     this->ObserverId = 0;
+    this->PressEventObserverId = 0;
+  }
+
+  void UpdatePressedPosition(vtkObject* obj, unsigned long, void*)
+  {
+    vtkPVGenericRenderWindowInteractor* interactor =
+        vtkPVGenericRenderWindowInteractor::SafeDownCast(obj);
+    if(interactor)
+      {
+      interactor->GetEventPosition(this->LastPressedPosition);
+      }
+  }
+
+  bool IsSamePosition(int pos[2])
+  {
+    return (pos[0] == this->LastPressedPosition[0] && pos[1] == this->LastPressedPosition[1]);
+  }
+
+  void ClearPressPosition()
+  {
+    this->LastPressedPosition[0] = this->LastPressedPosition[1] = -1000;
   }
 };
 
@@ -608,14 +640,20 @@ void pqRubberBandHelper::onPickOnClick(vtkObject*, unsigned long, void*)
   pqRenderView* rm = this->Internal->RenderView;
   rm->getRenderViewProxy()->GetInteractor()->GetEventPosition(region);
 
-  // we need to flip Y.
-  int height = this->Internal->RenderView->getWidget()->size().height();
-  region[1] = height - region[1];
+  if(this->Internal->IsSamePosition(region))
+    {
+    // we need to flip Y.
+    int height = this->Internal->RenderView->getWidget()->size().height();
+    region[1] = height - region[1];
 
-  // Need to duplicate [x,y,0,0] to be [x,y,x,y]
-  region[2] = region[0];
-  region[3] = region[1];
+    // Need to duplicate [x,y,0,0] to be [x,y,x,y]
+    region[2] = region[0];
+    region[3] = region[1];
 
-  // Trigger event
-  this->onSelectionChanged(NULL, 0, region);
+    // Trigger event
+    this->onSelectionChanged(NULL, 0, region);
+
+    // Reset presion press position
+    this->Internal->ClearPressPosition();
+    }
 }
