@@ -447,11 +447,11 @@ bool AdiosStream::Open()
   // Create the Adios file object
   float timeout_msec = 0.0; // 0.0s
 
-  cout << "1: adios_read_open_stream(\"" << this->FileName.c_str() << "\", "
-       << this->Method << ", "
-       << AdiosGlobal::GetMethodMPIController(this->Method)
-       << ", ADIOS_LOCKMODE_CURRENT, "
-       << timeout_msec << ")" << endl;
+//  cout << "1: adios_read_open_stream(\"" << this->FileName.c_str() << "\", "
+//       << this->Method << ", "
+//       << AdiosGlobal::GetMethodMPIController(this->Method)
+//       << ", ADIOS_LOCKMODE_CURRENT, "
+//       << timeout_msec << ")" << endl;
 
   this->File = adios_read_open_stream(
         this->FileName.c_str(),
@@ -464,12 +464,12 @@ bool AdiosStream::Open()
   timeout_msec = 5.0; // Set timeout to 5 seconds
   for(int i=0; (i < 12) && (adios_errno == err_file_not_found); ++i)
     {
-    cout << (i+2) <<": adios_read_open_stream(\""
-         << this->FileName.c_str() << "\", "
-         << this->Method << ", "
-         << AdiosGlobal::GetMethodMPIController(this->Method)
-         << ", ADIOS_LOCKMODE_CURRENT, "
-         << timeout_msec << ")" << endl;
+//    cout << (i+2) <<": adios_read_open_stream(\""
+//         << this->FileName.c_str() << "\", "
+//         << this->Method << ", "
+//         << AdiosGlobal::GetMethodMPIController(this->Method)
+//         << ", ADIOS_LOCKMODE_CURRENT, "
+//         << timeout_msec << ")" << endl;
     cerr << "Wait on stream " << adios_errmsg() << endl;
     sleep(1);
     this->File = adios_read_open_stream(
@@ -518,7 +518,7 @@ void AdiosStream::UpdateMetaData()
     ADIOS_VARINFO *varInfo = adios_inq_var_byid(this->File, varIdx);
     if (varInfo == NULL)
       {
-      cout << "Error opening variable "
+      cerr << "Error opening variable "
            << this->File->var_namelist[varIdx]
            << " of bp file " << this->FileName.c_str() << ":" << endl
            << adios_errmsg() << endl;
@@ -529,7 +529,7 @@ void AdiosStream::UpdateMetaData()
     AdiosVariable newVar(this->File->var_namelist[varIdx], varInfo);
     if(!newVar.IsValid())
       {
-      cout << "Skip variable " << newVar.GetName()
+      cerr << "Skip variable " << newVar.GetName()
            << " - Dimension: " << newVar.GetDimension()
            << " - Type: " << newVar.GetTypeAsString() << endl;
       free(varInfo);
@@ -547,9 +547,9 @@ void AdiosStream::UpdateMetaData()
         }
       else
         {
-        cout << "The field " << newVar.GetName()
-             << " has no value while its dimension is " << newVar.GetDimension()
-             << endl;
+//        cerr << "The field " << newVar.GetName()
+//             << " has no value while its dimension is " << newVar.GetDimension()
+//             << endl;
         }
       }
     else
@@ -571,7 +571,7 @@ void AdiosStream::UpdateMetaData()
 
     if(adios_get_attr_byid(this->File, attrIdx, &attributeType, &size, &data))
       {
-      cout << "Failed to get attribute " << name << endl;
+      cerr << "Failed to get attribute " << name << endl;
       continue;
       }
 
@@ -700,7 +700,7 @@ vtkDataArray* AdiosStream::ReadDataArray(const std::string &key, const ADIOS_SEL
   case adios_complex:     //  8 bytes
   case adios_double_complex: // 16 bytes
   default:
-    cout << "ERROR: Invalid data type" << endl;
+    cerr << "ERROR: Invalid data type" << endl;
     return NULL;
     break;
   }
@@ -760,13 +760,11 @@ bool AdiosStream::NextStep()
     }
   else
     {
-    cout << "Error while trying to move forward: " << adios_errmsg() << endl;
+    cerr << "Error while trying to move forward: " << adios_errmsg() << endl;
     }
 
   this->CurrentStep = this->File->current_step;
   this->LastAvailableStep = this->File->last_step;
-
-  cout << this->CurrentStep << "/" << this->LastAvailableStep << endl;
 
   return (this->CurrentStep <= this->LastAvailableStep);
 }

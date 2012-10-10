@@ -1,6 +1,6 @@
-#--------------------------------------------------
+#------------------------------------------------------------------------------
 # Find and Use ParaView
-#--------------------------------------------------
+#------------------------------------------------------------------------------
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
@@ -18,15 +18,28 @@ IF(PARAVIEW_BUILD_QT_GUI)
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 #------------------------------------------------------------------------------
-#          --- We enable Adios only on MPI ParaView build ---
+# Create client side plugin for any platform
+#------------------------------------------------------------------------------
+ADD_PARAVIEW_PLUGIN( AdiosClientOnly "1.4"
+   SERVER_MANAGER_XML
+      Adios.xml
+   GUI_RESOURCE_FILES
+      AdiosGUIReaders.xml AdiosGUISources.xml)
+
+#------------------------------------------------------------------------------
+# We enable Adios only on MPI ParaView build
 #------------------------------------------------------------------------------
 if(PARAVIEW_USE_MPI)
+
    find_package(MPI)
+
    #--------------------------------------------------
-   # On Windows we don't do anything
+   # On Windows we don't try to build anything
    #--------------------------------------------------
    if(WIN32)
-      message("The Adios Plugin can not be compiled on Windows.")
+      message("
+        The Adios Plugin can not be compiled on Windows.
+        Therefore, we will only a client side plugin will be created.")
    else(WIN32)
       include(FindAdios.cmake)
    endif(WIN32)
@@ -40,9 +53,12 @@ if(PARAVIEW_USE_MPI)
          ${MPI_INCLUDE_PATH})
 
       ADD_PARAVIEW_PLUGIN( Adios "1.4"
-         SERVER_MANAGER_XML Adios.xml
-         SERVER_MANAGER_SOURCES vtkAdiosPixieReader.cxx
-         GUI_RESOURCE_FILES AdiosGUI.xml)
+         SERVER_MANAGER_XML
+            Adios.xml
+         SERVER_MANAGER_SOURCES
+            vtkAdiosPixieReader.cxx
+         GUI_RESOURCE_FILES
+            AdiosGUIReaders.xml AdiosGUISources.xml)
 
       TARGET_LINK_LIBRARIES( Adios
          ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})
