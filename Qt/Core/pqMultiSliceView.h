@@ -46,13 +46,16 @@ public:
   /// Override to decorate the QVTKWidget
   virtual QWidget* createWidget();
 
-  /// Provide access to slices positions
+  /// Provide access to slices positions for any axis.
+  /// 0 <= axisIndex <= 2
   const double* GetSlices(int axisIndex, int &numberOfSlices);
 
-  /// Provide access to slices normal
+  /// Provide access to slices normal for any axis.
+  /// 0 <= axisIndex <= 2
   const double* GetSliceNormal(int axisIndex);
 
-  /// Provide access to slices origin
+  /// Provide access to slices origin for any axis.
+  /// 0 <= axisIndex <= 2
   const double* GetSliceOrigin(int axisIndex);
 
 signals:
