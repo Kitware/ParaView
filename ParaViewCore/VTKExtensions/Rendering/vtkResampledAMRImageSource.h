@@ -65,8 +65,7 @@ public:
   // Description:
   // To restart the incremental resample process, call this method. The output
   // image data is setup in the first call to Update().
-  void Reset()
-    { this->Modified(); }
+  void Reset();
 
   // Description:
   // Updates the volume. Any non-empty pieces provided by the amr are added to

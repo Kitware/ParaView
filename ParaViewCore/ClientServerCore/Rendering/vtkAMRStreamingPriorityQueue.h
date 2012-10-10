@@ -57,6 +57,11 @@ public:
   void Initialize(vtkAMRInformation* amr);
 
   // Description:
+  // Re-initializes the priority queue using the amr structure given to the most
+  // recent call to Initialize().
+  void Reinitialize();
+
+  // Description:
   // Updates the priorities of blocks based on the new view frustum planes.
   // Information about blocks "popped" from the queue is preserved and those
   // blocks are not reinserted in the queue.

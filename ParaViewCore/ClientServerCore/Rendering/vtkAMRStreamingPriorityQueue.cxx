@@ -182,6 +182,16 @@ void vtkAMRStreamingPriorityQueue::Initialize(vtkAMRInformation* amr)
 }
 
 //----------------------------------------------------------------------------
+void vtkAMRStreamingPriorityQueue::Reinitialize()
+{
+  if (this->Internals->AMRMetadata)
+    {
+    vtkSmartPointer<vtkAMRInformation> info = this->Internals->AMRMetadata;
+    this->Initialize(info);
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkAMRStreamingPriorityQueue::IsEmpty()
 {
   return this->Internals->PriorityQueue.empty();

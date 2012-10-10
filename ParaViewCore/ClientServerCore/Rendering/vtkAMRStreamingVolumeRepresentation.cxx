@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkAMRStreamingPriorityQueue.h"
+#include "vtkAMRVolumeMapper.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -26,6 +27,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkResampledAMRImageSource.h"
 #include "vtkSmartVolumeMapper.h"
 #include "vtkUniformGrid.h"
@@ -49,11 +51,25 @@ vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
   this->Actor = vtkSmartPointer<vtkPVLODVolume>::New();
   this->Actor->SetProperty(this->Property);
   this->Actor->SetMapper(this->VolumeMapper);
+
+  this->ResamplingMode =
+    vtkAMRStreamingVolumeRepresentation::RESAMPLE_OVER_DATA_BOUNDS;
 }
 
 //----------------------------------------------------------------------------
 vtkAMRStreamingVolumeRepresentation::~vtkAMRStreamingVolumeRepresentation()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkAMRStreamingVolumeRepresentation::SetResamplingMode(int val)
+{
+  if (val != this->ResamplingMode &&
+    val >= RESAMPLE_OVER_DATA_BOUNDS && val <= RESAMPLE_USING_VIEW_FRUSTUM)
+    {
+    this->ResamplingMode = val;
+    this->MarkModified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -70,6 +86,20 @@ int vtkAMRStreamingVolumeRepresentation::FillInputPortInformation(
 void vtkAMRStreamingVolumeRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ResamplingMode: ";
+  switch (this->ResamplingMode)
+    {
+  case RESAMPLE_OVER_DATA_BOUNDS:
+    os << "RESAMPLE_OVER_DATA_BOUNDS" << endl;
+    break;
+
+  case RESAMPLE_USING_VIEW_FRUSTUM:
+    os << "RESAMPLE_USING_VIEW_FRUSTUM" << endl;
+    break;
+
+  default:
+    os << "(invalid)" << endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +155,9 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
       // This is a streaming update request, request next piece.
       double view_planes[24];
       inInfo->Get(vtkPVRenderView::VIEW_PLANES(), view_planes);
-      if (this->StreamingUpdate(view_planes))
+      vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(
+        inInfo->Get( vtkPVRenderView::VIEW()));
+      if (this->StreamingUpdate(view, view_planes))
         {
         // since we indeed "had" a next piece to produce, give it to the view
         // so it can deliver it to the rendering nodes.
@@ -281,13 +313,42 @@ int vtkAMRStreamingVolumeRepresentation::RequestData(vtkInformation* rqst,
 }
 
 //----------------------------------------------------------------------------
-bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(const double view_planes[24])
+bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(
+  vtkPVRenderView* view, const double view_planes[24])
 {
   assert(this->InStreamingUpdate == false);
   if (!this->PriorityQueue->IsEmpty())
     {
     this->InStreamingUpdate = true;
     vtkStreamingStatusMacro(<< this << ": doing streaming-update.");
+
+    if (this->ResamplingMode == RESAMPLE_USING_VIEW_FRUSTUM &&
+      view && view->GetRenderWindow()->GetDesiredUpdateRate() < 1)
+      {
+      vtkStreamingStatusMacro(<< this << ": compute new volume bounds.");
+
+      double data_bounds[6];
+      this->DataBounds.GetBounds(data_bounds);
+
+      double bounds[6];
+      if (vtkAMRVolumeMapper::ComputeResamplerBoundsFrustumMethod(
+        view->GetActiveCamera(), view->GetRenderer(), data_bounds, bounds))
+        {
+        vtkStreamingStatusMacro(<< this << ": computed volume bounds : "
+          << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
+          << bounds[3] << ", " << bounds[4] << ", " << bounds[5] << ".");
+        this->Resampler->SetSpatialBounds(bounds);
+        }
+      // if the bounds changed from last time, we reset the priority queue as
+      // well. If the bounds didn't change, then the resampler mtime won't
+      // change and it wouldn't think it needs initialization and then we dont'
+      // need to reinitialize the priority queue.
+      if (this->Resampler->NeedsInitialization())
+        {
+        vtkStreamingStatusMacro(<< this << ": reinitializing priority queue.");
+        this->PriorityQueue->Reinitialize();
+        }
+      }
 
     // update the priority queue, if needed.
     this->PriorityQueue->Update(view_planes);
@@ -458,8 +519,11 @@ void vtkAMRStreamingVolumeRepresentation::SetColorAttributeType(int type)
 //----------------------------------------------------------------------------
 void vtkAMRStreamingVolumeRepresentation::SetNumberOfSamples(int x, int y, int z)
 {
-  // if number of samples change, we restart the streaming. This can be
-  // avoided, but it just keeps things simple for now.
-  this->Resampler->SetMaxDimensions(x, y, z);
-  this->MarkModified();
+  if (x >= 10 && y >= 10 && z >= 10)
+    {
+    // if number of samples change, we restart the streaming. This can be
+    // avoided, but it just keeps things simple for now.
+    this->Resampler->SetMaxDimensions(x, y, z);
+    this->MarkModified();
+    }
 }

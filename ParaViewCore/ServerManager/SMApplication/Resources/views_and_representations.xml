@@ -1542,6 +1542,7 @@
           <Property name="ScalarOpacityUnitDistance" />
           <Property name="ScalarOpacityFunction" />
           <Property name="VolumeRenderingMode" />
+          <Property name="ResamplingMode" />
           <Property name="NumberOfSamples" />
           <Property name="Shade" />
         </ExposedProperties>
@@ -4951,6 +4952,18 @@
                  value="4" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <IntVectorProperty command="SetResamplingMode"
+                         default_values="0"
+                         name="ResamplingMode"
+                         number_of_elements="1"
+                         panel_visibility="default" >
+        <EnumerationDomain name="enum">
+          <Entry text="Over Data Bounds" value="0" />
+          <Entry text="Using View Frustum" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <DoubleVectorProperty command="SetScalarOpacityUnitDistance"
                             default_values="1"
                             name="ScalarOpacityUnitDistance"

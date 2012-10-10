@@ -59,6 +59,13 @@ vtkResampledAMRImageSource::~vtkResampledAMRImageSource()
 }
 
 //----------------------------------------------------------------------------
+void vtkResampledAMRImageSource::Reset()
+{
+  vtkMath::UninitializeBounds(this->SpatialBounds);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkResampledAMRImageSource::UpdateResampledVolume(
   vtkOverlappingAMR* amr)
 {
