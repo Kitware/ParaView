@@ -224,8 +224,8 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
   vtkInformation* outInfo0 = outputVector->GetInformationObject(0);
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-  vtkInformation* outInfo1;
 #if defined ENABLE_MARKER_GENERATION
+  vtkInformation* outInfo1;
   if ( this->GenerateMarkers )
     {
     outInfo1 = outputVector->GetInformationObject(1);
@@ -2139,7 +2139,7 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
       }
     }
 
-  if (mbds->GetNumberOfBlocks () != reader->GetNumberOfMaterials ()) 
+  if (static_cast<int>(mbds->GetNumberOfBlocks ()) != reader->GetNumberOfMaterials ()) 
     {
     vtkErrorMacro ("Number of materials not consistent across spyplot files");
     return 0;
@@ -2208,6 +2208,7 @@ int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds,
         }
       }
     }
+  return 1;
 }
 
 /*
