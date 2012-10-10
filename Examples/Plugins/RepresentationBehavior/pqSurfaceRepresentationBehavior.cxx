@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
+#include "pqPipelineRepresentation.h"
 #include "pqRepresentation.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
@@ -56,39 +57,41 @@ pqSurfaceRepresentationBehavior::pqSurfaceRepresentationBehavior(QObject* parent
 //-----------------------------------------------------------------------------
 void pqSurfaceRepresentationBehavior::onRepresentationAdded(pqRepresentation* rep)
 {
-  cout << "Representation added " << rep->getProxy()->GetXMLName() << endl;
+  pqPipelineRepresentation* pipelineRep = qobject_cast<pqPipelineRepresentation*>(rep);
   vtkSMRepresentationProxy* smRep =
       vtkSMRepresentationProxy::SafeDownCast(rep->getProxy());
-  if(smRep && smRep->GetProperty("Representation"))
+  if(pipelineRep && smRep)
     {
+    // Change to surface
+    pipelineRep->setRepresentation("Surface");
 
-    cout << " => Surface" << endl;
-    vtkSMPropertyHelper(smRep, "Representation").Set("Surface");
+    // Setup data array
     vtkSMProxy* input = vtkSMPropertyHelper(smRep, "Input").GetAsProxy();
     vtkSMSourceProxy *sourceProxy = vtkSMSourceProxy::SafeDownCast(input);
-    smRep->UpdateVTKObjects();
-
     if(sourceProxy)
       {
-      cout << "  => Input" << endl;
       vtkPVDataInformation *dataInfo = sourceProxy->GetDataInformation();
+
       if(dataInfo->GetPointDataInformation()->GetNumberOfArrays() > 0)
         {
         const char* scalarName =
             dataInfo->GetPointDataInformation()->GetArrayInformation(0)->GetName();
-        cout << "    => Array " << scalarName << endl;
-        vtkSMPropertyHelper(smRep, "ColorArrayName").Set(scalarName);
-        vtkSMPropertyHelper(smRep, "ColorAttributeType").Set(0); // 0: POINT_DATA / 1:CELL_DATA
-        smRep->UpdateVTKObjects();
+        pipelineRep->colorByArray(scalarName, 0); // 0: POINT_DATA / 1:CELL_DATA
+        }
+      else if (dataInfo->GetCellDataInformation()->GetNumberOfArrays() > 0)
+        {
+        const char* scalarName =
+            dataInfo->GetCellDataInformation()->GetArrayInformation(0)->GetName();
+        pipelineRep->colorByArray(scalarName, 1); // 0: POINT_DATA / 1:CELL_DATA
         }
       }
     }
+
 }
 
 //-----------------------------------------------------------------------------
 void pqSurfaceRepresentationBehavior::onViewAdded(pqView* view)
 {
-  cout << "View added" << endl;
   QObject::connect(view, SIGNAL(representationAdded(pqRepresentation*)),
                    this, SLOT(onRepresentationAdded(pqRepresentation*)),
                    Qt::QueuedConnection);
