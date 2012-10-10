@@ -5007,6 +5007,13 @@ found and the point will be rejected.</Documentation>
         cells that are sliced by the region or just extract a triangulated
         surface of that region.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateTriangles"
+                         default_values="1"
+                         name="Triangulate the slice"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter controls whether to produce triangles in the output.</Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Slice Offset Values"

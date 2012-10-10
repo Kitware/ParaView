@@ -97,3 +97,9 @@ void vtkPVMetaSliceDataSet::PreserveInputCells(int keepCellAsIs)
 {
   this->SetActiveFilter(keepCellAsIs);
 }
+//----------------------------------------------------------------------------
+void vtkPVMetaSliceDataSet::SetGenerateTriangles(int status)
+{
+  this->Internal->Cutter->SetGenerateTriangles(status);
+  this->Modified();
+}
