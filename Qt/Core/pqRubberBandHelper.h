@@ -77,10 +77,6 @@ public:
   // sets up observer to call "pick" when user clicks.
   //ETX
 
-  /// Used in PICK_ON_CLICK mode to capture click events from the rendering
-  /// widget.
-  virtual bool eventFilter(QObject *watched, QEvent *event);
-
 public slots:
   /// Set active view. If a view has been set previously, this method ensures
   /// that it is not in selection mode.
@@ -159,6 +155,12 @@ protected:
   int Mode;
   int Xs, Ys, Xe, Ye;
   int DisableCount;
+
+  // Called whenever a zoom is made in the view
+  void onZoom(vtkObject*, unsigned long, void*);
+
+  // Called whenever a pick_on_click is made in the view
+  void onPickOnClick(vtkObject*, unsigned long, void*);
 
   // Called whenever a selection is made in the view.
   void onSelectionChanged(vtkObject*, unsigned long, void*);
