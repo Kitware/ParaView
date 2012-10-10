@@ -79,6 +79,7 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   this->NeedToCheck = 1; // Indicates non-geometric data needs to be checked
   if ( !this->HaveInformation ) { vtkDebugMacro( << __LINE__ << " " << this << " Read: " << this->HaveInformation ); }
 
+  this->MarkersOn = 0;
   this->GenerateMarkers = 0;
 }
 
