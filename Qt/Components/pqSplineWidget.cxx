@@ -94,7 +94,6 @@ pqSplineWidget::pqSplineWidget(
 //-----------------------------------------------------------------------------
 pqSplineWidget::~pqSplineWidget()
 {
-  this->cleanupWidget();
   delete this->Internals;
 }
 
@@ -118,19 +117,6 @@ void pqSplineWidget::createWidget(pqServer* server)
     this->Internals->PointsAdaptor, "values",
     SIGNAL(valuesChanged()),
     widget, widget->GetProperty("HandlePositions"));
-}
-
-//-----------------------------------------------------------------------------
-void pqSplineWidget::cleanupWidget()
-{
-  this->Internals->Links.removeAllPropertyLinks();
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if (widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

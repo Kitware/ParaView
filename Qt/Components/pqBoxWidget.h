@@ -67,9 +67,6 @@ public:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-  
-  /// Internal method to cleanup widget.
-  void cleanupWidget();
 
 private slots:
   /// Called when the user changes widget visibility

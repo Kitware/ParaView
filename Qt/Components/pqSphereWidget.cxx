@@ -160,18 +160,6 @@ void pqSphereWidget::createWidget(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-void pqSphereWidget::cleanupWidget()
-{
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
-}
-
-//-----------------------------------------------------------------------------
 void pqSphereWidget::onWidgetVisibilityChanged(bool visible)
 {
   this->Implementation->show3DWidget->blockSignals(true);

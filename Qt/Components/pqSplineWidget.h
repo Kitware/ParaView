@@ -64,9 +64,7 @@ protected slots:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-  
-  /// Internal method to cleanup widget.
-  void cleanupWidget();
+
 private:
   pqSplineWidget(const pqSplineWidget&); // Not implemented.
   void operator=(const pqSplineWidget&); // Not implemented.

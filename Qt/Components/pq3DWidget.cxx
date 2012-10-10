@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 // ParaView GUI includes.
+#include "pq3DWidgetFactory.h"
 #include "pq3DWidgetInterface.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -209,6 +210,12 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if(widget)
+    {
+    pqApplicationCore::instance()->get3DWidgetFactory()->free3DWidget(widget);
+    }
+  this->setWidgetProxy(0);
   this->setView(0);
   this->setControlledProxy(0);
   delete this->Internal;
