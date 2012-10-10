@@ -2952,36 +2952,20 @@ Copyright 2012 SciberQuest Inc.
        <DataTypeDomain name="input_type">
          <DataType value="vtkDataSet"/>
        </DataTypeDomain>
-       <InputArrayDomain
-           name="input_array"
-           attribute_type="point"
-           number_of_components="1">
-         <RequiredProperties>
-           <Property name="Scalars" function="FieldDataSelection"/>
-         </RequiredProperties>
-       </InputArrayDomain>
-       <Documentation>
-         This property specifies the input.
-       </Documentation>
+       <InputArrayDomain name="input_array" attribute_type="point"/>
       </InputProperty>
 
       <StringVectorProperty
-          name="Scalars"
+          name="InputArray"
           command="SetInputArrayToProcess"
           number_of_elements="5"
           element_types="0 0 0 0 2"
           >
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
+        <ArrayListDomain name="array_list">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-
-        <FieldDataDomain name="field_list">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </FieldDataDomain>
 
         <Documentation>
           Identifies the vector field on which to operate.
@@ -2994,12 +2978,15 @@ Copyright 2012 SciberQuest Inc.
          number_of_elements="1"
          default_values="0.0"
          >
+        <DoubleRangeDomain name="range"/>
+        <!--
         <ArrayRangeDomain name="range">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
-            <Property name="Scalars" function="ArraySelection"/>
+            <Property name="InputArray" function="ArraySelection"/>
           </RequiredProperties>
         </ArrayRangeDomain>
+        -->
         <Documentation>
           Threshold value.
         </Documentation>
