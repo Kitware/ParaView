@@ -64,6 +64,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
   
   // find the domain
+  vtkSMIntRangeDomain *defaultDomain = NULL;
+
   vtkSMDomain *domain = 0;
   vtkSMDomainIterator *domainIter = ivp->NewDomainIterator();
   for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
@@ -71,6 +73,12 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     domain = domainIter->GetDomain();
     }
   domainIter->Delete();
+
+  if(!domain)
+    {
+    defaultDomain = vtkSMIntRangeDomain::New();
+    domain = defaultDomain;
+    }
 
   QHBoxLayout *layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
@@ -198,4 +206,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
 
   this->setLayout(layoutLocal);
+
+  if (defaultDomain)
+    {
+    defaultDomain->Delete();
+    }
 }

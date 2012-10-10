@@ -60,6 +60,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     }
   
   // find the domain
+  vtkSMDoubleRangeDomain *defaultDomain = NULL;
+
   vtkSMDomain *domain = 0;
   vtkSMDomainIterator *domainIter = dvp->NewDomainIterator();
   for(domainIter->Begin(); !domainIter->IsAtEnd(); domainIter->Next())
@@ -67,6 +69,12 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     domain = domainIter->GetDomain();
     }
   domainIter->Delete();
+
+  if(!domain)
+    {
+    defaultDomain = vtkSMDoubleRangeDomain::New();
+    domain = defaultDomain;
+    }
 
   QHBoxLayout *layoutLocal = new QHBoxLayout;
   layoutLocal->setMargin(0);
@@ -160,4 +168,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
     }
 
   this->setLayout(layoutLocal);
+
+  if (defaultDomain)
+    {
+    defaultDomain->Delete();
+    }
 }
