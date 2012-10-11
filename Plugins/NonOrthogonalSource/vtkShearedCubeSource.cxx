@@ -16,18 +16,19 @@
 
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkDemandDrivenPipeline.h"
+#include "vtkFieldData.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkFieldData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
-#include "vtkMath.h"
-#include "vtkDemandDrivenPipeline.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <vtkNew.h>
 
@@ -36,9 +37,10 @@ vtkStandardNewMacro(vtkShearedCubeSource);
 //----------------------------------------------------------------------------
 vtkShearedCubeSource::vtkShearedCubeSource()
 {
-  this->EnableCustomBase = 0;
-  this->EnableCustomTitle = 0;
-  this->EnableTimeLabel = 0;
+  this->EnableCustomBase       = 0;
+  this->EnableCustomTitle      = 0;
+  this->EnableTimeLabel        = 0;
+  this->EnableCustomLabelRange = 0;
 
   for(int i=0; i < 3; i++)
     {
@@ -49,6 +51,9 @@ vtkShearedCubeSource::vtkShearedCubeSource()
   this->BaseU[0] = this->BaseV[1] = this->BaseW[2] = 1.0;
   this->AxisUTitle = this->AxisVTitle = this->AxisWTitle = NULL;
   this->TimeLabel = NULL;
+
+  LabelRangeU[0] = LabelRangeV[0] = LabelRangeW[0] = 0.0;
+  LabelRangeU[1] = LabelRangeV[1] = LabelRangeW[1] = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -187,6 +192,10 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
   fieldData->RemoveArray("AxisTitleForX");
   fieldData->RemoveArray("AxisTitleForY");
   fieldData->RemoveArray("AxisTitleForZ");
+  fieldData->RemoveArray("LabelRangeForX");
+  fieldData->RemoveArray("LabelRangeForY");
+  fieldData->RemoveArray("LabelRangeForZ");
+  fieldData->RemoveArray("LabelRangeActiveFlag");
 
   // New base meta-data
   if(this->EnableCustomBase != 0)
@@ -253,6 +262,46 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
       wAxisTitle->SetValue(0, this->AxisWTitle);
       fieldData->AddArray(wAxisTitle.GetPointer());
       }
+    }
+
+  vtkNew<vtkUnsignedCharArray> activeLabelRange;
+  activeLabelRange->SetNumberOfComponents(1);
+  activeLabelRange->SetNumberOfTuples(3);
+  activeLabelRange->SetName("LabelRangeActiveFlag");
+  fieldData->AddArray(activeLabelRange.GetPointer());
+
+  if(this->EnableCustomLabelRange)
+    {
+    vtkNew<vtkFloatArray> uLabelRange;
+    uLabelRange->SetNumberOfComponents(2);
+    uLabelRange->SetNumberOfTuples(1);
+    uLabelRange->SetName("LabelRangeForX");
+    uLabelRange->SetTuple(0, this->LabelRangeU);
+    fieldData->AddArray(uLabelRange.GetPointer());
+
+    vtkNew<vtkFloatArray> vLabelRange;
+    vLabelRange->SetNumberOfComponents(2);
+    vLabelRange->SetNumberOfTuples(1);
+    vLabelRange->SetName("LabelRangeForY");
+    vLabelRange->SetTuple(0, this->LabelRangeV);
+    fieldData->AddArray(vLabelRange.GetPointer());
+
+    vtkNew<vtkFloatArray> wLabelRange;
+    wLabelRange->SetNumberOfComponents(2);
+    wLabelRange->SetNumberOfTuples(1);
+    wLabelRange->SetName("LabelRangeForZ");
+    wLabelRange->SetTuple(0, this->LabelRangeW);
+
+    activeLabelRange->SetValue(0, 1);
+    activeLabelRange->SetValue(1, 1);
+    activeLabelRange->SetValue(2, 1);
+    fieldData->AddArray(wLabelRange.GetPointer());
+    }
+  else
+    {
+    activeLabelRange->SetValue(0, 0);
+    activeLabelRange->SetValue(1, 0);
+    activeLabelRange->SetValue(2, 0);
     }
 }
 
