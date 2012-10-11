@@ -79,6 +79,12 @@ public:
   // data is resampled.
   void SetNumberOfSamples(int x, int y, int z);
 
+  // Description:
+  // Set the number of blocks to request at a given time on a single process
+  // when streaming.
+  vtkSetClampMacro(StreamingRequestSize, int, 1, 10000);
+  vtkGetMacro(StreamingRequestSize, int);
+
   //***************************************************************************
   // Scalar coloring API (forwarded for vtkSmartVolumeMapper.
 
@@ -221,6 +227,7 @@ protected:
   vtkBoundingBox DataBounds;
 
   int ResamplingMode;
+  int StreamingRequestSize;
 
 private:
   vtkAMRStreamingVolumeRepresentation(const vtkAMRStreamingVolumeRepresentation&); // Not implemented

@@ -54,6 +54,8 @@ vtkAMRStreamingVolumeRepresentation::vtkAMRStreamingVolumeRepresentation()
 
   this->ResamplingMode =
     vtkAMRStreamingVolumeRepresentation::RESAMPLE_OVER_DATA_BOUNDS;
+
+  this->StreamingRequestSize = 50;
 }
 
 //----------------------------------------------------------------------------
@@ -100,6 +102,8 @@ void vtkAMRStreamingVolumeRepresentation::PrintSelf(ostream& os, vtkIndent inden
   default:
     os << "(invalid)" << endl;
     }
+  os << indent << "StreamingRequestSize: "
+    << this->StreamingRequestSize << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -230,11 +234,17 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
       if (this->InStreamingUpdate)
         {
         assert(this->PriorityQueue->IsEmpty() == false);
-        int cid = static_cast<int>(this->PriorityQueue->Pop());
-        vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
+        int request_ids[this->StreamingRequestSize];
+        for (int jj=0; jj < this->StreamingRequestSize; jj++)
+          {
+          int cid = static_cast<int>(this->PriorityQueue->Pop());
+          //vtkStreamingStatusMacro(<< this << ": requesting blocks: " << cid);
+          request_ids[jj] = cid;
+          }
         // Request the next "group of blocks" to stream.
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
-        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(), &cid, 1);
+        info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
+          request_ids, this->StreamingRequestSize);
         }
       else
         {
