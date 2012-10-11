@@ -129,8 +129,8 @@ public:
     {
     this->UserToFollow = followCamUserId;
     this->State.ClearExtension(ClientsInformation::user);
-    int size = this->Users.size();
-    for(int i=0; i < size; ++i)
+    size_t size = this->Users.size();
+    for(size_t i=0; i < size; ++i)
       {
       ClientsInformation_ClientInfo* user =
           this->State.AddExtension(ClientsInformation::user);
@@ -403,7 +403,7 @@ void vtkSMCollaborationManager::SetUserLabel(int userId, const char* userName)
 //----------------------------------------------------------------------------
 int vtkSMCollaborationManager::GetNumberOfConnectedClients()
 {
-  return this->Internal->Users.size();
+  return static_cast<int>(this->Internal->Users.size());
 }
 
 //----------------------------------------------------------------------------

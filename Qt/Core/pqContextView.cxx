@@ -88,6 +88,9 @@ public:
   }
 
   pqContextView& Target;
+
+private:
+  void operator=(const pqContextView::command&);
 };
 
 class pqContextView::pqInternal

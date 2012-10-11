@@ -1706,7 +1706,7 @@ QStringList pqSMAdaptor::getFieldSelection(vtkSMProperty *Property,
 
   if(StringVectorProperty && domain)
     {
-    int which;
+    int which = -1;
 
     if(Type == CHECKED)
       {
@@ -1793,7 +1793,7 @@ QString pqSMAdaptor::getFieldSelectionMode(vtkSMProperty* prop,
   
   if(Property && domain)
     {
-    int which;
+    int which = -1;
 
     if(Type == CHECKED)
       {

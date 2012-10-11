@@ -308,7 +308,7 @@ void vtkSMPropertyLink::RemoveLinkedProperty(vtkSMProxy* proxy,
 //-----------------------------------------------------------------------------
 unsigned int vtkSMPropertyLink::GetNumberOfLinkedProperties()
 {
-  return this->Internals->LinkedProperties.size();
+  return static_cast<unsigned int>(this->Internals->LinkedProperties.size());
 }
 
 //-----------------------------------------------------------------------------

@@ -702,7 +702,7 @@ unsigned int vtkSMArrayListDomain::AddInformationKey(const char* location, const
   key.Name = name;
   key.Strategy = strategy;
   this->ALDInternals->InformationKeys.push_back(key);
-  return this->ALDInternals->InformationKeys.size() - 1;
+  return static_cast<unsigned int>(this->ALDInternals->InformationKeys.size() - 1);
 }
 
 //---------------------------------------------------------------------------

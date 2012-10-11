@@ -50,6 +50,9 @@ struct PQWIDGETS_EXPORT pqSetData
 {
   pqSetData(const QVariant& Data);
   const QVariant Data;
+
+private:
+  void operator=(const pqSetData&);
 };
 
 /// Sets custom data for a Qt object

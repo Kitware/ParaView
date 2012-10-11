@@ -158,7 +158,7 @@ void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
 //---------------------------------------------------------------------------
 unsigned int vtkSMDomain::GetNumberOfRequiredProperties()
 {
-  return this->Internals->RequiredProperties.size();
+  return static_cast<unsigned int>(this->Internals->RequiredProperties.size());
 }
 
 //---------------------------------------------------------------------------

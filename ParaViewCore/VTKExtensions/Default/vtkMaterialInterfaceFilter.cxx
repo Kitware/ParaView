@@ -6305,7 +6305,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
           && resolvedFragments );
   resolvedFragments->SetNumberOfPieces(this->NumberOfResolvedFragments);
 
-  int nFragmentPieces=this->FragmentMeshes.size();
+  int nFragmentPieces=static_cast<int>(this->FragmentMeshes.size());
   for (int localId=0; localId<nFragmentPieces; ++localId)
     {
     // find out this guy's global id within this material
@@ -6351,7 +6351,7 @@ void vtkMaterialInterfaceFilter::ResolveLocalFragmentGeometry()
   vector<int>::iterator start=resolvedFragmentIds.begin();
   vector<int>::iterator end=resolvedFragmentIds.end();
   vector<int>::iterator shortEnd=end;
-  int nLocal=resolvedFragmentIds.size();
+  int nLocal=static_cast<int>(resolvedFragmentIds.size());
   for (int localId=0; localId<nLocal; ++localId)
     {
     int globalId=resolvedFragmentIds[localId];
@@ -6422,7 +6422,7 @@ void vtkMaterialInterfaceFilter::CleanLocalFragmentGeometry()
   vtkIdType nFinal=0;
   #endif
   // clean each frgament mesh we own.
-  int nLocal=resolvedFragmentIds.size();
+  int nLocal=static_cast<int>(resolvedFragmentIds.size());
   for (int localId=0; localId<nLocal; ++localId)
     {
     // get the material id
@@ -6499,7 +6499,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
 
   vector<int> &resolvedFragmentIds
     = this->ResolvedFragmentIds[this->MaterialId];
-  int nLocal=resolvedFragmentIds.size();
+  int nLocal=static_cast<int>(resolvedFragmentIds.size());
 
   // Start by assuming that all fragment pieces
   // are local(these are not peices but entire fragments).
@@ -6765,7 +6765,7 @@ void vtkMaterialInterfaceFilter::ComputeGeometricAttributes()
       vtkPolyData *localMesh
         = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(fragmentId));
 
-      int nTransactions=transactionList.size();
+      int nTransactions=static_cast<int>(transactionList.size());
       if (nTransactions>0)
         {
         /// send
@@ -7080,7 +7080,7 @@ void vtkMaterialInterfaceFilter::BuildLoadingArray(
   vtkMultiPieceDataSet *resolvedFragments
       = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
 
-  int nLocal=this->ResolvedFragmentIds[this->MaterialId].size();
+  int nLocal=static_cast<int>(this->ResolvedFragmentIds[this->MaterialId].size());
   loadingArray.clear();
   loadingArray.resize(this->NumberOfResolvedFragments,0);
   for (int i=0; i<nLocal; ++i)
@@ -7107,7 +7107,7 @@ int vtkMaterialInterfaceFilter::PackLoadingArray(vtkIdType *&buffer)
   vtkMultiPieceDataSet *resolvedFragments
     = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
 
-  int nLocal=this->ResolvedFragmentIds[this->MaterialId].size();
+  int nLocal=static_cast<int>(this->ResolvedFragmentIds[this->MaterialId].size());
 
   vtkMaterialInterfacePieceLoading pl;
   const int bufSize=pl.SIZE*nLocal;
@@ -7258,7 +7258,7 @@ int vtkMaterialInterfaceFilter::SendGeometricAttributes(const int recipientProcI
   // sized in bytes, and we have to make note of how many
   // fragments we are putting in.
   const unsigned int nLocal
-    = this->ResolvedFragmentIds[this->MaterialId].size();
+    = static_cast<unsigned int>(this->ResolvedFragmentIds[this->MaterialId].size());
   int totalNumberOfComps
     = (!this->ComputeMoments ? 3 : 0)   // coaabb + obb
       + (this->ComputeOBB ? this->FragmentOBBs->GetNumberOfComponents(): 0);
@@ -8600,7 +8600,7 @@ void vtkMaterialInterfaceFilter::ShareGhostEquivalences(
       {
       // Loop through our ghost blocks sending the
       // ones that are owned by otherProc.
-      int num = this->GhostBlocks.size();
+      int num = static_cast<int>(this->GhostBlocks.size());
       for (int blockId = 0; blockId < num; ++blockId)
         {
         vtkMaterialInterfaceFilterBlock* block = this->GhostBlocks[blockId];
@@ -8757,7 +8757,7 @@ void vtkMaterialInterfaceFilter::CopyAttributesToOutput0()
     = this->FragmentSplitMarker[this->MaterialId];
   #endif
 
-  int nLocalFragments=resolvedFragmentIds.size();
+  int nLocalFragments=static_cast<int>(resolvedFragmentIds.size());
   for (int i=0; i<nLocalFragments; ++i)
     {
     int nComps=0;
@@ -9457,7 +9457,7 @@ int vtkMaterialInterfaceFilter::ComputeLocalFragmentOBB()
   vector<int> &fragmentSplitMarker
     = this->FragmentSplitMarker[this->MaterialId];
 
-  int nLocal=resolvedFragmentIds.size();
+  int nLocal=static_cast<int>(resolvedFragmentIds.size());
 
   // OBB set up
   vtkOBBTree *obbCalc;
@@ -9529,7 +9529,7 @@ int vtkMaterialInterfaceFilter::ComputeLocalFragmentAABBCenters()
   vector<int> &fragmentSplitMarker
     = this->FragmentSplitMarker[this->MaterialId];
 
-  int nLocal=resolvedFragmentIds.size();
+  int nLocal=static_cast<int>(resolvedFragmentIds.size());
 
   // AABB set up
   assert("FragmentAABBCenters is expected to be pre-allocated."
@@ -9706,7 +9706,7 @@ int vtkMaterialInterfaceFilter::WriteGeometryOutputToTextFile()
      = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(firstLocalId))->GetFieldData();
 
     int nAttributes=rf0fd->GetNumberOfArrays();
-    int nLocalFragments=resolvedFragmentIds.size();
+    int nLocalFragments=static_cast<int>(resolvedFragmentIds.size());
 
     // write header
     fout << "Header:{" << endl;

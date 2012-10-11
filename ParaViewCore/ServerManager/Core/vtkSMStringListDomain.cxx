@@ -44,7 +44,7 @@ vtkSMStringListDomain::~vtkSMStringListDomain()
 //---------------------------------------------------------------------------
 unsigned int vtkSMStringListDomain::GetNumberOfStrings()
 {
-  return this->SLInternals->Strings.size();
+  return static_cast<unsigned int>(this->SLInternals->Strings.size());
 }
 
 //---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ unsigned int vtkSMStringListDomain::AddString(const char* string)
 {
   this->SLInternals->Strings.push_back(string);
   this->Modified();
-  return this->SLInternals->Strings.size() - 1;
+  return static_cast<unsigned int>(this->SLInternals->Strings.size() - 1);
 }
 
 //---------------------------------------------------------------------------

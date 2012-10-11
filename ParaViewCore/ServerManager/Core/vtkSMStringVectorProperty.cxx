@@ -54,7 +54,7 @@ vtkSMStringVectorProperty::~vtkSMStringVectorProperty()
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetElementType(unsigned int idx, int type)
 {
-  unsigned int size = this->Internals->ElementTypes.size();
+  unsigned int size = static_cast<unsigned int>(this->Internals->ElementTypes.size());
   if (idx >= size)
     {
     this->Internals->ElementTypes.resize(idx+1);

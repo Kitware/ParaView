@@ -109,7 +109,7 @@ void vtkSMProxyGroupDomain::AddGroup(const char* group)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProxyGroupDomain::GetNumberOfGroups()
 {
-  return this->PGInternals->Groups.size();
+  return static_cast<unsigned int>(this->PGInternals->Groups.size());
 }
 
 //---------------------------------------------------------------------------
