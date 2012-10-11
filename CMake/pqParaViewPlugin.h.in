@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// this is set when the plugin has source headers that are wrapped.
 #cmakedefine INITIALIZE_WRAPPING
+#cmakedefine INITIALIZE_EXTRA_CS_MODULES
 
 #include "vtkPVPlugin.h"
 
