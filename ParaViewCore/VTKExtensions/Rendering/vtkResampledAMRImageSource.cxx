@@ -138,12 +138,26 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 
   vtkNew<vtkImageData> output;
 
-  double amr_bounds[6];
-  amr->GetBounds(amr_bounds);
+  double bounds[6];
+  amr->GetBounds(bounds);
 
-  const double *bounds =
-    vtkMath::AreBoundsInitialized(this->SpatialBounds)?
-    this->SpatialBounds : amr_bounds;
+  vtkStreamingStatusMacro("Data bounds: "
+    << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
+    << bounds[3] << ", " << bounds[4] << ", " << bounds[5]);
+
+  vtkBoundingBox amrBBox(bounds);
+  if (vtkMath::AreBoundsInitialized(this->SpatialBounds))
+    {
+    vtkStreamingStatusMacro("Spatial bounds: "
+      << this->SpatialBounds[0] << ", " << this->SpatialBounds[1] << ", "
+      << this->SpatialBounds[2] << ", " << this->SpatialBounds[3] << ", "
+      << this->SpatialBounds[4] << ", " << this->SpatialBounds[5]);
+
+    if (amrBBox.IntersectBox(this->SpatialBounds))
+      {
+      amrBBox.GetBounds(bounds);
+      }
+    }
 
   vtkStreamingStatusMacro("Image bounds: "
     << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
@@ -197,6 +211,15 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   output->SetDimensions(dimensions);
   output->SetOrigin(origin);
   output->SetSpacing(spacing);
+  vtkStreamingStatusMacro("Volume Origin: " << origin[0] << ", "
+                                            << origin[1] << ", "
+                                            << origin[2]);
+  vtkStreamingStatusMacro("Volume Spacing: " << spacing[0] << ", "
+                                             << spacing[1] << ", "
+                                             << spacing[2]);
+  vtkStreamingStatusMacro("Volume Dimensions: " << dimensions[0] << ", "
+                                                << dimensions[1] << ", "
+                                                << dimensions[2]);
 
   // locate first non-null uniform grid in the AMR. That's the one we use to
   // model the field arrays.

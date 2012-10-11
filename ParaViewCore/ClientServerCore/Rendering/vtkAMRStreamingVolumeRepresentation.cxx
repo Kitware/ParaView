@@ -135,19 +135,6 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
     // volume rendering. We support parallel-server+local+rendering,
     // single-server+remote-rendering and builtin configurations.
     }
-  else if (request_type == vtkPVView::REQUEST_RENDER())
-    {
-    if (this->Resampler->NeedsInitialization())
-      {
-      vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
-      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
-      vtkAlgorithm* producer = producerPort->GetProducer();
-      vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
-        producer->GetOutputDataObject(producerPort->GetIndex()));
-      assert (amr != NULL);
-      this->Resampler->UpdateResampledVolume(amr);
-      }
-    }
   else if (request_type == vtkPVRenderView::REQUEST_STREAMING_UPDATE())
     {
     if (this->GetStreamingCapablePipeline())
@@ -166,13 +153,29 @@ int vtkAMRStreamingVolumeRepresentation::ProcessViewRequest(
         }
       }
     }
-  else if (request_type == vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE())
+
+  else if (request_type == vtkPVView::REQUEST_RENDER() ||
+           request_type == vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE())
     {
-    vtkOverlappingAMR* piece = vtkOverlappingAMR::SafeDownCast(
-      vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this));
-    if (piece)
+    if (this->Resampler->NeedsInitialization())
       {
-      this->Resampler->UpdateResampledVolume(piece);
+      vtkStreamingStatusMacro(<< this << ": cloning delivered data.");
+      vtkAlgorithmOutput* producerPort = vtkPVRenderView::GetPieceProducer(inInfo, this);
+      vtkAlgorithm* producer = producerPort->GetProducer();
+      vtkOverlappingAMR* amr = vtkOverlappingAMR::SafeDownCast(
+        producer->GetOutputDataObject(producerPort->GetIndex()));
+      assert (amr != NULL);
+      this->Resampler->UpdateResampledVolume(amr);
+      }
+
+    if (request_type == vtkPVRenderView::REQUEST_PROCESS_STREAMED_PIECE())
+      {
+      vtkOverlappingAMR* piece = vtkOverlappingAMR::SafeDownCast(
+        vtkPVRenderView::GetCurrentStreamedPiece(inInfo, this));
+      if (piece)
+        {
+        this->Resampler->UpdateResampledVolume(piece);
+        }
       }
     }
 
@@ -320,12 +323,12 @@ bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(
   if (!this->PriorityQueue->IsEmpty())
     {
     this->InStreamingUpdate = true;
-    vtkStreamingStatusMacro(<< this << ": doing streaming-update.");
+    //vtkStreamingStatusMacro(<< this << ": doing streaming-update.");
 
     if (this->ResamplingMode == RESAMPLE_USING_VIEW_FRUSTUM &&
       view && view->GetRenderWindow()->GetDesiredUpdateRate() < 1)
       {
-      vtkStreamingStatusMacro(<< this << ": compute new volume bounds.");
+      //vtkStreamingStatusMacro(<< this << ": compute new volume bounds.");
 
       double data_bounds[6];
       this->DataBounds.GetBounds(data_bounds);
@@ -334,9 +337,9 @@ bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(
       if (vtkAMRVolumeMapper::ComputeResamplerBoundsFrustumMethod(
         view->GetActiveCamera(), view->GetRenderer(), data_bounds, bounds))
         {
-        vtkStreamingStatusMacro(<< this << ": computed volume bounds : "
-          << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
-          << bounds[3] << ", " << bounds[4] << ", " << bounds[5] << ".");
+        //vtkStreamingStatusMacro(<< this << ": computed volume bounds : "
+        //  << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
+        //  << bounds[3] << ", " << bounds[4] << ", " << bounds[5] << ".");
         this->Resampler->SetSpatialBounds(bounds);
         }
       // if the bounds changed from last time, we reset the priority queue as
@@ -351,7 +354,8 @@ bool vtkAMRStreamingVolumeRepresentation::StreamingUpdate(
       }
 
     // update the priority queue, if needed.
-    this->PriorityQueue->Update(view_planes);
+    this->PriorityQueue->Update(view_planes,
+      this->Resampler->GetSpatialBounds());
 
     this->MarkModified();
     this->Update();
