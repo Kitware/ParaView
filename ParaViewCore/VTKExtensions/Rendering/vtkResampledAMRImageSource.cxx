@@ -339,13 +339,13 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
 
   vtkNew<vtkIdList> cellPoints;
 
-  for (double z = updateBounds.GetMinPoint()[2] + receiver_spacing[2]/2.0;
+  for (double z = updateBounds.GetMinPoint()[2] ;
     z <= updateBounds.GetMaxPoint()[2]; z+= receiver_spacing[2])
     {
-    for (double y = updateBounds.GetMinPoint()[1] + receiver_spacing[1]/2.0;
+    for (double y = updateBounds.GetMinPoint()[1];
       y <= updateBounds.GetMaxPoint()[1]; y+= receiver_spacing[1])
       {
-      for (double x = updateBounds.GetMinPoint()[0] + receiver_spacing[0]/2.0;
+      for (double x = updateBounds.GetMinPoint()[0];
         x < updateBounds.GetMaxPoint()[0]; x+= receiver_spacing[0])
         {
         double sample_point[3] = {x, y, z};

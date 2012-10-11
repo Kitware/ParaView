@@ -285,7 +285,8 @@ int vtkAMRStreamingVolumeRepresentation::RequestData(vtkInformation* rqst,
     vtkOverlappingAMR* input = vtkOverlappingAMR::GetData(inputVector[0], 0);
     if (!this->GetInStreamingUpdate())
       {
-      this->ProcessedData = input;
+      this->ProcessedData = vtkSmartPointer<vtkOverlappingAMR>::New();
+      this->ProcessedData->ShallowCopy(input);
 
       double bounds[6];
       input->GetBounds(bounds);
