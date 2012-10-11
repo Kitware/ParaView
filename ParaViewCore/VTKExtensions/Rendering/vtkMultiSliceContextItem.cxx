@@ -279,11 +279,19 @@ bool vtkMultiSliceContextItem::MouseButtonReleaseEvent(const vtkContextMouseEven
 {
   // Toggle visibility
   if( this->Internal->ActiveSliceIndex != -1 &&
-      mouse.GetButton() == vtkContextMouseEvent::RIGHT_BUTTON)
+      mouse.GetButton() == vtkContextMouseEvent::RIGHT_BUTTON &&
+      mouse.GetModifiers() == vtkContextMouseEvent::NO_MODIFIER)
     {
     this->Internal->SlicesVisibility[Internal->ActiveSliceIndex] =
         !this->Internal->SlicesVisibility[Internal->ActiveSliceIndex];
     this->InvokeEvent(vtkCommand::ModifiedEvent);
+    }
+
+  // Notify any release action to the user
+  if( this->Internal->ActiveSliceIndex != -1 )
+    {
+    int data[3] = { mouse.GetButton(), mouse.GetModifiers(), this->Internal->ActiveSliceIndex };
+    this->InvokeEvent(vtkCommand::EndInteractionEvent, data);
     }
 
   // Deselect active slice
@@ -429,4 +437,15 @@ void vtkMultiSliceContextItem::SetActiveSize(int size)
 void vtkMultiSliceContextItem::SetEdgeMargin(int size)
 {
   this->Internal->EdgeMargin = size;
+}
+//-----------------------------------------------------------------------------
+double vtkMultiSliceContextItem::GetSliceValue(int sliceIndex)
+{
+  return this->Internal->Slices[sliceIndex];
+}
+
+//-----------------------------------------------------------------------------
+int vtkMultiSliceContextItem::GetNumberOfSlices()
+{
+  return static_cast<int>(this->Internal->Slices.size());
 }

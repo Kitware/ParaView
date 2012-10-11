@@ -142,6 +142,14 @@ QWidget* pqMultiSliceView::createWidget()
   QObject::connect(this->AxisZ, SIGNAL(modelUpdated()),
                    this, SLOT(updateSlices()));
 
+  // Attach click listener to slice marks
+  QObject::connect(this->AxisX, SIGNAL(markClicked(int,int,double)),
+                   this, SLOT(onSliceClicked(int,int,double)));
+  QObject::connect(this->AxisY, SIGNAL(markClicked(int,int,double)),
+                   this, SLOT(onSliceClicked(int,int,double)));
+  QObject::connect(this->AxisZ, SIGNAL(markClicked(int,int,double)),
+                   this, SLOT(onSliceClicked(int,int,double)));
+
   // Make sure the UI reflect the proxy state
   this->updateViewModelCallBack(NULL, 0, NULL);
 
@@ -329,4 +337,22 @@ const double* pqMultiSliceView::GetSliceOrigin(int axisIndex)
     this->OriginValuesHolder[i+ (3*axisIndex)] = values[i];
     }
   return &this->OriginValuesHolder[(3*axisIndex)];
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::onSliceClicked(int button, int modifier, double value)
+{
+  QObject* senderObject = QObject::sender();
+  if(senderObject == this->AxisX.data())
+    {
+    emit sliceClicked(0, value, button, modifier);
+    }
+  else if(senderObject == this->AxisY.data())
+    {
+    emit sliceClicked(1, value, button, modifier);
+    }
+  else if(senderObject == this->AxisZ.data())
+    {
+    emit sliceClicked(2, value, button, modifier);
+    }
 }

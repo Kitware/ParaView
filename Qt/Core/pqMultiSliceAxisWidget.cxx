@@ -68,6 +68,10 @@ public:
     this->View = new QVTKWidget(Widget_ptr);
     this->Range[0] = -10.;
     this->Range[1] = +10.;
+
+    this->SliceItem->AddObserver(vtkCommand::EndInteractionEvent,
+                                 this->Widget_ptr,
+                                 &pqMultiSliceAxisWidget::onMarkClicked);
     }
 
   ~pqInternal()
@@ -201,4 +205,18 @@ void pqMultiSliceAxisWidget::updateSlices( double* values, bool* visibility,
                                            int numberOfValues)
 {
   this->Internal->SliceItem->SetSlices(values, visibility, numberOfValues);
+}
+
+// ----------------------------------------------------------------------------
+void pqMultiSliceAxisWidget::onMarkClicked(vtkObject* src, unsigned long event, void* data)
+{
+  vtkMultiSliceContextItem* item = vtkMultiSliceContextItem::SafeDownCast(src);
+  if(item && event == vtkCommand::EndInteractionEvent)
+    {
+    int *dataArray = reinterpret_cast<int*>(data);
+    int button   = dataArray[0];
+    int modifier = dataArray[1];
+    double value = item->GetSliceValue(dataArray[2]);
+    emit markClicked(button, modifier, value);
+    }
 }

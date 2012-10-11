@@ -60,6 +60,7 @@ public:
 
 signals:
   void slicesChanged();
+  void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
 
 public slots:
   void updateAxisBounds();
@@ -84,6 +85,10 @@ protected:
 
   double NormalValuesHolder[9];
   double OriginValuesHolder[9];
+
+protected slots:
+  // Internal slot that will emit sliceClicked()
+  void onSliceClicked(int button, int modifier, double value);
 
 private:
   pqMultiSliceView(const pqMultiSliceView&); // Not implemented.
