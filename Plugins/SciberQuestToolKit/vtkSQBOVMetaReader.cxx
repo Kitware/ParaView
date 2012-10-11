@@ -264,8 +264,13 @@ long long vtkSQBOVMetaReader::GetProcRam()
     // gather memory info about this host
     vtksys::SystemInformation sysInfo;
 
-    long long hostRam=sysInfo.GetHostMemoryAvailable("PV_HOST_MEMORY_LIMIT");
-    long long procRam=sysInfo.GetProcMemoryAvailable("PV_HOST_MEMORY_LIMIT","PV_PROC_MEMORY_LIMIT");
+    long long hostRam=sysInfo.GetHostMemoryAvailable(
+            "PV_HOST_MEMORY_LIMIT");
+
+    long long procRam=sysInfo.GetProcMemoryAvailable(
+            "PV_HOST_MEMORY_LIMIT",
+            "PV_PROC_MEMORY_LIMIT");
+
     string hostName=sysInfo.GetHostname();
     unsigned long hostId=hash((const unsigned char *)hostName.c_str());
     long long hostSize=1l;
