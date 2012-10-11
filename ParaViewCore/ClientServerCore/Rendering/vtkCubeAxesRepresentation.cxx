@@ -597,9 +597,11 @@ void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
       range->GetTuple(0, &this->CustomRange[i*2]);
       }
 
-    this->CustomRangeActive[i] = (customRangeActiveFlag
-                                  ? (customRangeActiveFlag->GetValue(i) == 0
-                                     ? 0 : 1)
-                                  : 0);
+
+    if(customRangeActiveFlag)
+      {
+      this->CustomRangeActive[i] = (customRangeActiveFlag->GetValue(i) == 0)
+                                   ? 0 : 1;
+      }
     }
 }
