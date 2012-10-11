@@ -412,19 +412,28 @@ void vtkPVXYChartView::SetAxisTitleColor(int index, double red,
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisUseCustomLabels(int index, bool use_custom_labels)
 {
-  this->Internals->UseCustomLabels[index] = use_custom_labels;
+  if (index >= 0 && index < 4)
+    {
+    this->Internals->UseCustomLabels[index] = use_custom_labels;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisLabelsNumber(int axis, int n)
 {
-  this->Internals->CustomLabelPositions[axis]->SetNumberOfTuples(n);
+  if (axis >=0 && axis < 4)
+    {
+    this->Internals->CustomLabelPositions[axis]->SetNumberOfTuples(n);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisLabels(int axisIndex, int i, double value)
+void vtkPVXYChartView::SetAxisLabels(int axis, int i, double value)
 {
-  this->Internals->CustomLabelPositions[axisIndex]->SetValue(i, value);
+  if (axis >=0 && axis < 4)
+    {
+    this->Internals->CustomLabelPositions[axis]->SetValue(i, value);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -547,7 +556,7 @@ void vtkPVXYChartView::Render(bool interactive)
   // handle custom labels. We specify custom labels in render since vtkAxis will
   // discard the custom labels when the mode was set to not use custom labels,
   // so we need to provide the labels each time to the chart.
-  for (int axis=0; axis < 4; axis++)
+  for (int axis=0; axis < 4 && axis < this->Chart->GetNumberOfAxes(); axis++)
     {
     if (this->Internals->UseCustomLabels[axis])
       {
