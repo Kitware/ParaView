@@ -53,7 +53,7 @@ void vtkPVMemoryUseInformation::CopyFromObject(vtkObject *obj)
 
   info.ProcessType=vtkProcessModule::GetProcessType();
   info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
-  info.MemUse=sysInfo.GetMemoryUsed();
+  info.MemUse=sysInfo.GetHostMemoryUsed();
 
   #ifdef vtkPVMemoryUseInformationDEBUG
   info.Print();
