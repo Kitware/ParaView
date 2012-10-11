@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QListWidgetItem>
 #include <QMap>
 #include <QPointer>
+#include <QPushButton>
 #include <QStringList>
 
 class pqQuickLaunchDialog::pqInternal : public Ui::QuickLaunchDialog
@@ -61,6 +62,10 @@ pqQuickLaunchDialog::pqQuickLaunchDialog(QWidget* p):
 
   QObject::connect(this->Internal->options, SIGNAL(currentRowChanged(int)),
     this, SLOT(currentRowChanged(int)));
+
+  QObject::connect(this->Internal->selection, SIGNAL(clicked()),
+                   this, SLOT(accept()));
+
   this->updateSearch();
 }
 
