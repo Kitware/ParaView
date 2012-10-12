@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "vtkSMSession.h"
 
+#include <QInputDialog>
+#include <QMessageBox>
+
 //-----------------------------------------------------------------------------
 pqCatalystConnectReaction::pqCatalystConnectReaction(QAction* parentObject)
   : Superclass(parentObject)
@@ -84,12 +87,29 @@ bool pqCatalystConnectReaction::connect()
 
   if (server != NULL || !this->Managers.contains(server))
     {
+    bool user_ok = false;
+    int portNumber = QInputDialog::getInt(
+      pqCoreUtilities::mainWidget(),
+      "Catalyst Server Port",
+      "Enter the port number to accept connections \nfrom Catalyst on:",
+      22222, 1024, 0x0fffffff, 1, &user_ok);
+    if (!user_ok)
+      {
+      // user cancelled.
+      return false;
+      }
+
     pqLiveInsituVisualizationManager* mgr =
-      new pqLiveInsituVisualizationManager(22222, server);
+      new pqLiveInsituVisualizationManager(portNumber, server);
     this->Managers[server] = mgr;
     this->updateEnableState();
+    QMessageBox::information(pqCoreUtilities::mainWidget(),
+      "Ready for Catalyst connections",
+      QString("Accepting connections from Catalyst Co-Processor \n"
+      "for live-coprocessing on port %1").arg(portNumber));
     return true;
     }
 
+  qWarning("A Catalyst connection has already been established.");
   return false;
 }

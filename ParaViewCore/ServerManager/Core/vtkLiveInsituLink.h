@@ -12,9 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkLiveInsituLink
+// .NAME vtkLiveInsituLink - link for live-coprocessing.
 // .SECTION Description
-//
+// vtkLiveInsituLink manages the communication link between Catalyst and
+// ParaView visualization server. vtkLiveInsituLink is created on both ends of
+// the live-coprocessing channel i.e. in Catalyst code (by instantiating
+// vtkLiveInsituLink directly) and in ParaView application (by using a proxy
+// that instantiates the vtkLiveInsituLink).
 
 #ifndef __vtkLiveInsituLink_h
 #define __vtkLiveInsituLink_h
@@ -64,6 +68,11 @@ public:
   vtkSetClampMacro(ProcessType, int, VISUALIZATION, SIMULATION);
   vtkGetMacro(ProcessType, int);
 
+  // Description:
+  // When instantiated on the ParaView visualization server side using a
+  // vtkSMProxy, ProxyId is used to identify the proxy corresponding to this
+  // instance. That helps us construct notification messages that the
+  // visualization server can send to the client.
   vtkSetMacro(ProxyId, unsigned int);
   vtkGetMacro(ProxyId, unsigned int);
 
