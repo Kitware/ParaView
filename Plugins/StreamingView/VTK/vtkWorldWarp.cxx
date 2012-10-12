@@ -188,17 +188,17 @@ void vtkWorldWarp::SetMapFileName(const char *_arg)
             {
             case ON_LON:
               this->LonMap = new double[values.size()];
-              this->LonMapSize = values.size() -1;
+              this->LonMapSize = static_cast<int>(values.size()) - 1;
               dest = this->LonMap;
               break;
             case ON_LAT:
               this->LatMap = new double[values.size()];
-              this->LatMapSize = values.size() -1;
+              this->LatMapSize = static_cast<int>(values.size()) - 1;
               dest = this->LatMap;
               break;
             case ON_ALT:
               this->AltMap = new double[values.size()];
-              this->AltMapSize = values.size() -1;
+              this->AltMapSize = static_cast<int>(values.size()) - 1;
               dest = this->AltMap;
               break;
             }

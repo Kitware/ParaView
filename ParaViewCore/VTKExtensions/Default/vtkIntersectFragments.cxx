@@ -419,7 +419,7 @@ int vtkIntersectFragments::PackLoadingArray(vtkIdType *&buffer, int blockId)
   size_t nLocal=this->IntersectionIds[blockId].size();
 
   vtkMaterialInterfacePieceLoading pl;
-  const int bufSize=pl.SIZE*nLocal;
+  const int bufSize = static_cast<int>(pl.SIZE*nLocal);
   buffer = new vtkIdType [bufSize];
   vtkIdType *pBuf=buffer;
   for (size_t localId=0; localId<nLocal; ++localId)

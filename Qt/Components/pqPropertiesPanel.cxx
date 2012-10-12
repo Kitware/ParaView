@@ -1082,7 +1082,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
     for(size_t j = 0; j < group->GetNumberOfProperties(); j++)
       {
-      groupProperties.insert(group->GetProperty(j));
+      groupProperties.insert(group->GetProperty(static_cast<unsigned int>(j)));
       }
 
     if(QString(group->GetPanelVisibility()) == "never")
