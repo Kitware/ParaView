@@ -1962,10 +1962,10 @@ QWidget *pqMemoryInspectorPanel::NewGroupWidget(string name, string icon)
 
   QFrame *frame=new QFrame;
   frame->setLayout(hlayout);
-  QFont font(frame->font());
-  font.setPointSize(9);
-  font.setBold(true);
-  frame->setFont(font);
+  QFont ffont(frame->font());
+  ffont.setPointSize(9);
+  ffont.setBold(true);
+  frame->setFont(ffont);
 
   return frame;
 }
