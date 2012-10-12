@@ -175,6 +175,8 @@ void setMemoryUseWidgetColor(
       float fracWarn,
       float fracCrit)
 {
+  (void)fracWarn;
+
   if (fracUsed>fracCrit)
     {
     // danger -> red
@@ -823,9 +825,9 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(
         SLOT(EnableUpdate()));
   */
 
-  QPalette palette=this->Ui->configView->palette();
-  palette.setColor(QPalette::Highlight, Qt::lightGray);
-  this->Ui->configView->setPalette(palette);
+  QPalette pal=this->Ui->configView->palette();
+  pal.setColor(QPalette::Highlight, Qt::lightGray);
+  this->Ui->configView->setPalette(pal);
 }
 
 //-----------------------------------------------------------------------------
@@ -924,12 +926,13 @@ void pqMemoryInspectorPanel::ConnectToView(pqView *view)
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::showEvent(QShowEvent *event)
+void pqMemoryInspectorPanel::showEvent(QShowEvent *e)
 {
   #if defined pqMemoryInspectorPanelDEBUG
   cerr << ":::::pqMemoryInspectorPanel::showEvent" << endl;
   #endif
 
+  (void)e;
   this->Update();
 }
 //-----------------------------------------------------------------------------
@@ -1238,7 +1241,7 @@ int pqMemoryInspectorPanel::Initialize()
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
 
-    QWidget *groupWidget=this->NewGroupWidget("server",":/pqWidgets/Icons/pqDataServer32.png");
+    groupWidget=this->NewGroupWidget("server",":/pqWidgets/Icons/pqDataServer32.png");
     this->Ui->configView->addTopLevelItem(group);
     this->Ui->configView->setItemWidget(group,0,groupWidget);
 
@@ -1945,20 +1948,20 @@ void pqMemoryInspectorPanel::AddEnableStackTraceMenuAction(
 //-----------------------------------------------------------------------------
 QWidget *pqMemoryInspectorPanel::NewGroupWidget(string name, string icon)
 {
-  QHBoxLayout *layout=new QHBoxLayout;
+  QHBoxLayout *hlayout=new QHBoxLayout;
 
   QLabel *label=new QLabel;
   label->setPixmap(QPixmap(icon.c_str()));
   label->setToolTip(name.c_str());
-  layout->addWidget(label);
+  hlayout->addWidget(label);
 
   label=new QLabel;
   label->setText(name.c_str());
-  layout->addWidget(label);
-  layout->addStretch(-1);
+  hlayout->addWidget(label);
+  hlayout->addStretch(-1);
 
   QFrame *frame=new QFrame;
-  frame->setLayout(layout);
+  frame->setLayout(hlayout);
   QFont font(frame->font());
   font.setPointSize(9);
   font.setBold(true);
