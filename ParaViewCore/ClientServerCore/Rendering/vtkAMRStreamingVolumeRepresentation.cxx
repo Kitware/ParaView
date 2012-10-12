@@ -234,7 +234,9 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
       if (this->InStreamingUpdate)
         {
         assert(this->PriorityQueue->IsEmpty() == false);
-        int request_ids[this->StreamingRequestSize];
+        assert(this->StreamingRequestSize > 0);
+
+        int request_ids = new int[this->StreamingRequestSize];
         for (int jj=0; jj < this->StreamingRequestSize; jj++)
           {
           int cid = static_cast<int>(this->PriorityQueue->Pop());
@@ -245,6 +247,7 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
         info->Set(vtkCompositeDataPipeline::LOAD_REQUESTED_BLOCKS(), 1);
         info->Set(vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES(),
           request_ids, this->StreamingRequestSize);
+        delete [] request_ids;
         }
       else
         {
