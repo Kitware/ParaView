@@ -33,6 +33,7 @@ set(Module_SRCS
   vtkCacheSizeKeeper.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeMultiProcessController.cxx
+  vtkMultiProcessControllerHelper.cxx
   vtkPriorityHelper.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationScene.cxx
@@ -61,6 +62,7 @@ set(Module_SRCS
 
 set_source_files_properties(
   vtkCacheSizeKeeper
+  vtkMultiProcessControllerHelper
   WRAP_EXCLUDE
   )
 

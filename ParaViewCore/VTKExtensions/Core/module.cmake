@@ -2,7 +2,10 @@ vtk_module(vtkPVVTKExtensionsCore
   GROUPS
     ParaViewCore
   DEPENDS
-    vtkPVCommon
     vtkFiltersCore
+    vtkFiltersGeneral
+    vtkImagingCore
+    vtkInfovisCore
     vtkParallelCore
+    vtkPVCommon
 )

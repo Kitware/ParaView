@@ -16,9 +16,8 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkDataObject.h"
-// FIXME:MODULARIZATION
-// #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessControllerHelper.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkSocketController.h"
@@ -131,10 +130,8 @@ vtkDataObject* vtkExtractsDeliveryHelper::Collect(
     vtkDataObject* result = NULL;
     if (pieces.size() > 1)
       {
-      //FIXME:MODULARIZATION
-      //result = vtkMPIMoveData::MergePieces(
-      //  &pieces[0], static_cast<unsigned int>(pieces.size()));
-      abort();
+      result = vtkMultiProcessControllerHelper::MergePieces(
+        &pieces[0], static_cast<unsigned int>(pieces.size()));
       }
     else
       {
