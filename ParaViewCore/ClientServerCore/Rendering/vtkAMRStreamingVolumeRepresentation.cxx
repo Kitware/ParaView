@@ -236,7 +236,7 @@ int vtkAMRStreamingVolumeRepresentation::RequestUpdateExtent(
         assert(this->PriorityQueue->IsEmpty() == false);
         assert(this->StreamingRequestSize > 0);
 
-        int request_ids = new int[this->StreamingRequestSize];
+        int *request_ids = new int[this->StreamingRequestSize];
         for (int jj=0; jj < this->StreamingRequestSize; jj++)
           {
           int cid = static_cast<int>(this->PriorityQueue->Pop());
