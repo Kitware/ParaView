@@ -81,14 +81,42 @@ public:
   void Initialize() { this->Initialize(NULL); }
   void Initialize(vtkSMSessionProxyManager*);
 
-  // API to be used from the insitu library.
+  // **************************************************************************
+  //      *** API to be used from the insitu library ***
+
+  // Description:
+  // Must be called at the beginning with the proxy manager. vtkLiveInsituLink
+  // makes an attempt to connect to ParaView,  however that attempt may fail if
+  // ParaView is not yet ready to accept connections. In that case,
+  // vtkLiveInsituLink will make an attempt to connect on every subsequent
+  // SimulationUpdate() call.
   void SimulationInitialize(vtkSMSessionProxyManager* pxm);
+
+  // Description:
+  // Every time Catalyst is ready to communicate with ParaView visualization
+  // engine call this method. The goal of this call is too get the latest
+  // updates from ParaView including changes to state for the co-processing
+  // pipeline or changes in what extract the visualization engine is expecting.
+  // This method's primary goal is to obtain information from ParaView vis
+  // engine. If no active connection to ParaView visualization engine exists,
+  // this will make an attempt to connect to ParaView.
   void SimulationUpdate(double time);
+
+  // Description:
+  // Every time Catalyst is ready to push extracts to ParaView visualization
+  // engine, call this method. If no active ParaView visualization engine
+  // connection exists (or the connection dies), then this method does nothing
+  // (besides some bookkeeping).  Otherwise, this will push any extracts
+  // requested to the ParaView visualization engine.
   void SimulationPostProcess(double time);
 
+  // **************************************************************************
+
+  // **************************************************************************
   // API to be used from the Visualization side.
   void OnSimulationUpdate(double time);
   void OnSimulationPostProcess(double time);
+  // **************************************************************************
 
   enum NotificationTags
     {

@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCommand.h"
+#include "vtkCommunicationErrorCatcher.h"
 #include "vtkExtractsDeliveryHelper.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkNetworkAccessManager.h"
@@ -150,18 +151,21 @@ void vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager* pxm)
     return;
     }
 
+  if (this->ExtractsDeliveryHelper != NULL)
+    {
+    // already initialized (this->Controller is non-existant on satellites)
+    return;
+    }
+
   this->CoprocessorProxyManager = pxm;
-  this->ExtractsDeliveryHelper = vtkSmartPointer<vtkExtractsDeliveryHelper>::New();
 
   switch (this->ProcessType)
     {
   case VISUALIZATION:
-    this->ExtractsDeliveryHelper->SetProcessIsProducer(false);
     this->InitializeVisualization();
     break;
 
   case SIMULATION:
-    this->ExtractsDeliveryHelper->SetProcessIsProducer(true);
     this->InitializeSimulation();
     break;
     }
@@ -298,8 +302,14 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
 void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* controller)
 {
   assert(this->Controller == NULL);
+  assert(this->ExtractsDeliveryHelper.GetPointer() == NULL);
 
   this->Controller = controller;
+
+  this->ExtractsDeliveryHelper =
+    vtkSmartPointer<vtkExtractsDeliveryHelper>::New();
+  this->ExtractsDeliveryHelper->SetProcessIsProducer(
+    this->ProcessType == VISUALIZATION? false : true);
 
   vtkMultiProcessController* parallelController =
     vtkMultiProcessController::GetGlobalController();
@@ -451,6 +461,33 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 {
   assert(this->ProcessType == SIMULATION);
 
+  if (!this->CoprocessorProxyManager)
+    {
+    vtkErrorMacro(
+      "Please call vtkLiveInsituLink::Initialize(vtkSMSessionProxyManager*) "
+      "before using vtkLiveInsituLink::SimulationUpdate().");
+    return;
+    }
+
+  if (!this->ExtractsDeliveryHelper.GetPointer())
+    {
+    // We are not connected to ParaView Vis Engine. That can happen if the
+    // ParaView Vis Engine was not ready the last time we attempted to connect
+    // to it, or ParaView Vis Engine disconnected. We make a fresh attempt to
+    // connect to it.
+    this->SimulationInitialize(this->CoprocessorProxyManager);
+    }
+
+  if (!this->ExtractsDeliveryHelper.GetPointer())
+    {
+    // ParaView is still not ready. Another time.
+    return;
+    }
+
+  // Okay, ParaView Visualization connection is currently valid, but it may
+  // break, so add error interceptor.
+  vtkCommunicationErrorCatcher catcher(this->Controller);
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
   int numProcs = pm->GetNumberOfLocalPartitions();
@@ -526,6 +563,18 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
     }
   delete[] buffer;
 
+  int drop_connection = catcher.GetErrorsRaised()? 1 : 0;
+  if (numProcs > 1)
+    {
+    pm->GetGlobalController()->Broadcast(&drop_connection, 1, 0);
+    }
+  if (drop_connection)
+    {
+    this->Controller = NULL;
+    this->ExtractsDeliveryHelper = NULL;
+    return;
+    }
+
   // This assumes that the coprocessing pipeline is recreated at every timestep
   // and hence we need to reload the state for every timestep. This may be
   // changed once we stop re-creating the coprocessing pipeline.
@@ -581,8 +630,17 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
 {
   assert(this->ProcessType == SIMULATION);
 
+  if (!this->ExtractsDeliveryHelper)
+    {
+    // if this->ExtractsDeliveryHelper is NULL it means we are not connected to
+    // any ParaView Visualization Engine yet. Just skip.
+    return;
+    }
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int myId = pm->GetPartitionId();
+
+  vtkCommunicationErrorCatcher catcher(this->Controller);
   if (myId == 0 && this->Controller)
     {
     // notify vis root node that we are ready to ship extracts.
@@ -590,12 +648,25 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
       POSTPROCESS_RMI_TAG);
     }
 
-  if (this->ExtractsDeliveryHelper)
+  int drop_connection = catcher.GetErrorsRaised()? 1 : 0;
+  if (pm->GetNumberOfLocalPartitions() > 1)
     {
-    // We're done coprocessing. Deliver the extracts to the visualization
-    // processes.
-    this->ExtractsDeliveryHelper->Update();
+    pm->GetGlobalController()->Broadcast(&drop_connection, 1, 0);
     }
+
+  if (drop_connection)
+    {
+    // ParaView has disconnected. Clean up the connection.
+    this->ExtractsDeliveryHelper = NULL;
+    this->Controller = NULL;
+    return;
+    }
+
+  assert(this->ExtractsDeliveryHelper);
+
+  // We're done coprocessing. Deliver the extracts to the visualization
+  // processes.
+  this->ExtractsDeliveryHelper->Update();
 }
 
 //----------------------------------------------------------------------------
