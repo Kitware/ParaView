@@ -1,0 +1,10 @@
+vtk_module(vtkPVVTKExtensionsWebGLExporter
+  GROUPS
+    ParaViewRendering
+  DEPENDS
+    vtkIOExport
+    vtkInteractionWidgets
+    vtkRenderingCore
+  COMPILE_DEPENDS
+    vtkUtilitiesEncodeString
+)

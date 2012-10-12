@@ -76,7 +76,7 @@ void vtkPVWebGLExporter::WriteData()
     vtkErrorMacro(<< "unable to open JSON MetaData file " << metadatFile.c_str());
     return;
     }
-  fprintf(fp,"%s",exporter->GenerateMetadata());
+  fputs(exporter->GenerateMetadata(), fp);
   fclose(fp);
 
   // Write binary objects

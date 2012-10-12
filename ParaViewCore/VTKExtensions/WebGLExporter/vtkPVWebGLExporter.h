@@ -16,8 +16,9 @@
 #define __vtkPVWebGLExporter_h
 
 #include "vtkExporter.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
 
-class vtkPVWebGLExporter : public vtkExporter
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkPVWebGLExporter : public vtkExporter
 {
 public:
   static vtkPVWebGLExporter *New();
@@ -36,10 +37,10 @@ protected:
   void WriteData();
 
   char *FileName;
+
 private:
   vtkPVWebGLExporter(const vtkPVWebGLExporter&);  // Not implemented.
   void operator=(const vtkPVWebGLExporter&);  // Not implemented.
 };
 
 #endif
-

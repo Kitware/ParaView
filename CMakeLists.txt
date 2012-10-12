@@ -421,6 +421,7 @@ else()
     ParaViewCore/VTKExtensions/Core
     ParaViewCore/VTKExtensions/Rendering
     ParaViewCore/VTKExtensions/Default
+    ParaViewCore/VTKExtensions/WebGLExporter
     ParaViewCore/ClientServerCore/Core
     ParaViewCore/ClientServerCore/Rendering
     ParaViewCore/ClientServerCore/Default

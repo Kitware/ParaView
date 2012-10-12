@@ -21,16 +21,17 @@
 
 #include "vtkObject.h"
 #include "vtkWebGLObject.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
 
 #include <string>
 
-class vtkWebGLDataSet : public vtkObject
-  {
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkWebGLDataSet : public vtkObject
+{
 public:
   static vtkWebGLDataSet* New();
   vtkTypeMacro(vtkWebGLDataSet, vtkObject)
   void PrintSelf(ostream &os, vtkIndent indent);
-//BTX
+
   void SetVertices(float* v, int size);
   void SetIndexes(short* i, int size);
   void SetNormals(float* n);
@@ -44,7 +45,10 @@ public:
   int GetBinarySize();
   void GenerateBinaryData();
   bool HasChanged();
+
+  //BTX
   std::string GetMD5();
+  //ETX
 
 protected:
   vtkWebGLDataSet();
@@ -70,7 +74,6 @@ protected:
 private:
   vtkWebGLDataSet(const vtkWebGLDataSet&); // Not implemented
   void operator=(const vtkWebGLDataSet&);   // Not implemented
-  //ETX
-  };
+};
 
 #endif

@@ -20,11 +20,13 @@
 #define __vtkWebGLWidget_h
 
 #include "vtkWebGLObject.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
+
 #include <vector>
 
 class vtkActor2D;
 
-class vtkWebGLWidget : public vtkWebGLObject
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkWebGLWidget : public vtkWebGLObject
 {
 public:
   static vtkWebGLWidget* New();
@@ -38,7 +40,6 @@ public:
 
   void GetDataFromColorMap(vtkActor2D* actor);
 
-//BTX
 protected:
     vtkWebGLWidget();
     ~vtkWebGLWidget();
@@ -58,7 +59,6 @@ private:
   vtkWebGLWidget(const vtkWebGLWidget&); // Not implemented
   void operator=(const vtkWebGLWidget&); // Not implemented
 
-//ETX
 };
 
 #endif

@@ -20,6 +20,8 @@
 #define __vtkWebGLPolyData_h
 
 #include "vtkWebGLObject.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
+
 class vtkActor;
 class vtkMatrix4x4;
 class vtkMapper;
@@ -27,7 +29,7 @@ class vtkPointData;
 class vtkPolyData;
 class vtkTriangleFilter;
 
-class vtkWebGLPolyData : public vtkWebGLObject
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkWebGLPolyData : public vtkWebGLObject
 {
 public:
   static vtkWebGLPolyData* New();
@@ -39,14 +41,12 @@ public:
   int GetBinarySize(int part);
   int GetNumberOfParts();
 
-//BTX
   void GetPoints(vtkTriangleFilter* polydata, vtkActor* actor, int maxSize);
-  //
+
   void GetLinesFromPolygon(vtkMapper* mapper, vtkActor* actor, int lineMaxSize, double* edgeColor);
   void GetLines(vtkTriangleFilter* polydata, vtkActor* actor, int lineMaxSize);
   void GetColorsFromPolyData(unsigned char* color, vtkPolyData* polydata, vtkActor* actor);
-  //
-  //vtkTriangleFilter* GetPolyData(vtkMapper* mapper, unsigned long& dataMTime);
+
   // Get following data from the actor
   void GetPolygonsFromPointData(vtkTriangleFilter* polydata, vtkActor* actor, int maxSize);
   void GetPolygonsFromCellData(vtkTriangleFilter* polydata, vtkActor* actor, int maxSize);
@@ -58,8 +58,8 @@ public:
   void SetTransformationMatrix(vtkMatrix4x4* m);
 
 protected:
-    vtkWebGLPolyData();
-    ~vtkWebGLPolyData();
+  vtkWebGLPolyData();
+  ~vtkWebGLPolyData();
 
 private:
   vtkWebGLPolyData(const vtkWebGLPolyData&); // Not implemented
@@ -69,7 +69,6 @@ private:
 
   class vtkInternal;
   vtkInternal* Internal;
-//ETX
 };
 
 #endif
