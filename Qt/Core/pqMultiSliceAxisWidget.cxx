@@ -208,15 +208,15 @@ void pqMultiSliceAxisWidget::updateSlices( double* values, bool* visibility,
 }
 
 // ----------------------------------------------------------------------------
-void pqMultiSliceAxisWidget::onMarkClicked(vtkObject* src, unsigned long event, void* data)
+void pqMultiSliceAxisWidget::onMarkClicked(vtkObject* src, unsigned long eventId, void* dataArray)
 {
   vtkMultiSliceContextItem* item = vtkMultiSliceContextItem::SafeDownCast(src);
-  if(item && event == vtkCommand::EndInteractionEvent)
+  if(item && eventId == vtkCommand::EndInteractionEvent)
     {
-    int *dataArray = reinterpret_cast<int*>(data);
-    int button   = dataArray[0];
-    int modifier = dataArray[1];
-    double value = item->GetSliceValue(dataArray[2]);
+    int *array = reinterpret_cast<int*>(dataArray);
+    int button   = array[0];
+    int modifier = array[1];
+    double value = item->GetSliceValue(array[2]);
     emit markClicked(button, modifier, value);
     }
 }
