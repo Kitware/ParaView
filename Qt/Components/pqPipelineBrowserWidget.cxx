@@ -242,9 +242,9 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           qobject_cast<pqLiveInsituVisualizationManager*>(
             port->getServer()->property(
               "LiveInsituVisualizationManager").value<QObject*>());
-        if (mgr)
+        if (mgr && mgr->addExtract(port))
           {
-          mgr->addExtract(port);
+          // refresh the pipeline browser icon.
           }
         }
       else

@@ -157,6 +157,12 @@ bool pqLiveInsituVisualizationManager::hasExtracts(pqOutputPort* port) const
 //-----------------------------------------------------------------------------
 bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
 {
+  if (this->hasExtracts(port))
+    {
+    // don't add another extract for the same object.
+    return false;
+    }
+
   pqPipelineSource* source = port->getSource();
 
   vtkSMProxy* proxy = this->Internals->LiveInsituLinkProxy->CreateExtract(
@@ -185,6 +191,13 @@ bool pqLiveInsituVisualizationManager::addExtract(pqOutputPort* port)
   pqproxy->setProperty("CATALYST_EXTRACT", true);
 
   this->Internals->ExtractSourceProxies.push_back(pqproxy);
+
+  // To ensure that the Pipeline browser updates the icon for the port, we fire
+  // a bogus event.
+  pqProxy::ModifiedState curState = source->modifiedState();
+  source->setModifiedState(curState == pqProxy::MODIFIED?
+    pqProxy::UNMODIFIED : pqProxy::MODIFIED);
+  source->setModifiedState(curState);
 
   //pqActiveObjects::instance().setActiveServer(pqproxy->getServer());
   //this->setRepresentationVisibility(
