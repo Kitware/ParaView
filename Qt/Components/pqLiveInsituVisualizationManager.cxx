@@ -97,6 +97,10 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
 
   pqCoreUtilities::connect(adaptor, vtkCommand::UpdateEvent,
     this, SLOT(timestepsUpdated()));
+  pqCoreUtilities::connect(adaptor, vtkCommand::ConnectionClosedEvent,
+    this, SIGNAL(catalystDisconnected()));
+  pqCoreUtilities::connect(adaptor, vtkCommand::ConnectionCreatedEvent,
+    this, SIGNAL(catalystConnected()));
 
   this->Internals->CatalystSession = catalyst;
   this->Internals->LiveInsituLinkProxy = adaptor;
@@ -110,6 +114,23 @@ pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
     {
     core->getObjectBuilder()->removeServer(this->Internals->CatalystSession);
     }
+
+  // Remove the "LiveInsituLink" proxy.
+  if (this->Internals->Session && this->Internals->LiveInsituLinkProxy)
+    {
+    vtkSMSessionProxyManager* pxm = this->Internals->Session->proxyManager();
+    pxm->UnRegisterProxy("coprocessing", pxm->GetProxyName("coprocessing",
+        this->Internals->LiveInsituLinkProxy),
+      this->Internals->LiveInsituLinkProxy);
+    if (this->Internals->LiveInsituLinkProxy != NULL)
+      {
+      qWarning(
+        "LiveInsituLinkProxy must have been unregistered and deleted by now."
+        " Since it wasn't, it would imply a leak.");
+      }
+    this->Internals->LiveInsituLinkProxy = 0;
+    }
+
 
   delete this->Internals;
 }

@@ -63,6 +63,10 @@ public:
   /// pipeline.
   bool addExtract(pqOutputPort*);
 
+signals:
+  void catalystConnected();
+  void catalystDisconnected();
+
 protected slots:
   void timestepsUpdated();
   void sourceRemoved(pqPipelineSource*);

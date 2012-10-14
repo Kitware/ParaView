@@ -121,7 +121,8 @@ public:
   enum NotificationTags
     {
     CONNECTED = 1200,
-    NEXT_TIMESTEP_AVAILABLE = 1201
+    NEXT_TIMESTEP_AVAILABLE = 1201,
+    DISCONNECTED = 1202
     };
 
   void UpdateInsituXMLState(const char* txt)
@@ -131,7 +132,14 @@ public:
     }
 
 //BTX
+  // ***************************************************************
+  // Internal methods, public for callbacks.
   void InsituProcessConnected(vtkMultiProcessController* controller);
+
+  // Description:
+  // Called to drop the connection between Catalyst and ParaView.
+  void DropCatalystParaViewConnection();
+
 protected:
   vtkLiveInsituLink();
   ~vtkLiveInsituLink();
@@ -140,7 +148,8 @@ protected:
     {
     UPDATE_RMI_TAG=8800,
     POSTPROCESS_RMI_TAG=8801,
-    INITIALIZE_CONNECTION=8802
+    INITIALIZE_CONNECTION=8802,
+    DROP_CAT2PV_CONNECTION=8803
     };
 
   // Description:
@@ -154,6 +163,12 @@ protected:
   // Description:
   // Callback on Visualization process when a simulation connects to it.
   void OnConnectionCreatedEvent();
+
+  // Description:
+  // Callback on Visualization process when a connection dies during
+  // vtkNetworkAccessManager::ProcessEvents().
+  void OnConnectionClosedEvent(
+    vtkObject*, unsigned long eventid, void* calldata);
 
   char* Hostname;
   int InsituPort;

@@ -81,10 +81,16 @@ void vtkSMLiveInsituLinkProxy::LoadState(
       {
     case vtkLiveInsituLink::CONNECTED:
       this->InsituConnected(msg->GetExtension(ChatMessage::txt).c_str());
+      this->InvokeEvent(vtkCommand::ConnectionCreatedEvent); 
       break;
 
     case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
       this->NewTimestepAvailable();
+      break;
+
+    case vtkLiveInsituLink::DISCONNECTED:
+      cout << "Catalyst disconnected!!!" << endl;
+      this->InvokeEvent(vtkCommand::ConnectionClosedEvent); 
       break;
       }
     }

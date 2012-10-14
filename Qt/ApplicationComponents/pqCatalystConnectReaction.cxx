@@ -101,6 +101,8 @@ bool pqCatalystConnectReaction::connect()
 
     pqLiveInsituVisualizationManager* mgr =
       new pqLiveInsituVisualizationManager(portNumber, server);
+    QObject::connect(mgr, SIGNAL(catalystDisconnected()),
+      this, SLOT(onCatalystDisconnected()));
     this->Managers[server] = mgr;
     this->updateEnableState();
     QMessageBox::information(pqCoreUtilities::mainWidget(),
@@ -112,4 +114,44 @@ bool pqCatalystConnectReaction::connect()
 
   qWarning("A Catalyst connection has already been established.");
   return false;
+}
+
+
+//-----------------------------------------------------------------------------
+void pqCatalystConnectReaction::onCatalystDisconnected()
+{
+  pqLiveInsituVisualizationManager* mgr =
+    qobject_cast<pqLiveInsituVisualizationManager*>(this->sender());
+  if (!mgr)
+    {
+    return;
+    }
+
+  QMessageBox::information(pqCoreUtilities::mainWidget(),
+    "Catalyst Disconnected",
+    "Connection to Catalyst Co-Processor has been terminated involuntarily. "
+    "This implies either a communication error, or that the "
+    "Catalyst co-processor has terminated. "
+    "The Catalyst session will now be cleaned up. "
+    "You can start a new one if you want to monitor for additional Catalyst "
+    "connection requests.");
+
+  mgr->deleteLater();
+
+  // Remove the mgr from the map, so that we can allow the user to connect to
+  // another Catalyst session, if he wants.
+  for (ManagersType::iterator iter = this->Managers.begin();
+    iter != this->Managers.end(); ++iter)
+    {
+    if (iter.value() == mgr)
+      {
+      this->Managers.erase(iter);
+      break;
+      }
+    }
+
+  // Depending upon which server was currently active, the activeServerChanged()
+  // signal may never be fired. If that happens, we won't get any opportunity to
+  // change update the action enable state. So do it now.
+  this->updateEnableState();
 }

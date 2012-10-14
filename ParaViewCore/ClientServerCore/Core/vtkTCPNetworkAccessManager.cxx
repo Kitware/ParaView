@@ -277,6 +277,9 @@ int vtkTCPNetworkAccessManager::ProcessEventsInternal(
         controller->GetCommunicator());
     comm->CloseConnection();
 
+    // Fire an event letting the world know that the connection was closed.
+    this->InvokeEvent(vtkCommand::ConnectionClosedEvent, controller);
+
     return can_quit_if_error ? -1 /* Quit */ :
                                 1 /* Pretend it's OK */;
     }

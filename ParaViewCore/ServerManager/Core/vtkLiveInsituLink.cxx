@@ -42,13 +42,22 @@
 
 namespace
 {
-  void InitializeConnection(void *localArg,
+  void InitializeConnectionRMI(void *localArg,
     void *vtkNotUsed(remoteArg),
     int vtkNotUsed(remoteArgLength),
     int vtkNotUsed(remoteProcessId))
     {
     vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
     self->InsituProcessConnected(NULL);
+    }
+
+  void DropCatalystParaViewConnectionRMI(void *localArg,
+    void *vtkNotUsed(remoteArg),
+    int vtkNotUsed(remoteArgLength),
+    int vtkNotUsed(remoteProcessId))
+    {
+    vtkLiveInsituLink* self = reinterpret_cast<vtkLiveInsituLink*>(localArg);
+    self->DropCatalystParaViewConnection();
     }
 
   void UpdateRMI(void *localArg,
@@ -193,6 +202,12 @@ void vtkLiveInsituLink::InitializeVisualization()
 
     vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
 
+    // if the Catalyst connection ever drops, we need to communicate to the
+    // client on the VisualizationSession that the catalyst server no longer
+    // exists.
+    nam->AddObserver(vtkCommand::ConnectionClosedEvent,
+      this, &vtkLiveInsituLink::OnConnectionClosedEvent);
+
     vtksys_ios::ostringstream url;
     url << "tcp://localhost:" << this->InsituPort << "?"
       << "listen=true&nonblocking=true&"
@@ -222,11 +237,13 @@ void vtkLiveInsituLink::InitializeVisualization()
     // the command channel between sim and vis nodes is only setup on the root
     // nodes (there are socket connections between satellites for data x'fer but
     // not for any other kind of communication.
-    parallelController->AddRMICallback(&InitializeConnection, this,
+    parallelController->AddRMICallback(&InitializeConnectionRMI, this,
       INITIALIZE_CONNECTION);
     parallelController->AddRMICallback(&UpdateRMI, this, UPDATE_RMI_TAG);
     parallelController->AddRMICallback(&PostProcessRMI, this,
       POSTPROCESS_RMI_TAG);
+    parallelController->AddRMICallback(&DropCatalystParaViewConnectionRMI, this,
+      DROP_CAT2PV_CONNECTION);
     }
 }
 
@@ -288,6 +305,8 @@ void vtkLiveInsituLink::InitializeSimulation()
 // Callback on Visualization process when a simulation connects to it.
 void vtkLiveInsituLink::OnConnectionCreatedEvent()
 {
+  assert(this->ProcessType == VISUALIZATION);
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkNetworkAccessManager* nam = pm->GetNetworkAccessManager();
   vtkMultiProcessController* controller = nam->NewConnection(this->URL);
@@ -296,6 +315,55 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
     this->InsituProcessConnected(controller);
     controller->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+// Callback on Visualization process when a connection dies during
+// ProcessEvents().
+void vtkLiveInsituLink::OnConnectionClosedEvent(
+  vtkObject*, unsigned long eventid, void* calldata)
+{
+  vtkObject* object = reinterpret_cast<vtkObject*>(calldata);
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::SafeDownCast(object);
+  if (controller && this->Controller == controller)
+    {
+    // drop connection.
+
+    // since this is called only on root node, we need to tell all satellites to
+    // drop the connection too.
+    vtkMultiProcessController* parallelController =
+      vtkMultiProcessController::GetGlobalController();
+    int numProcs = parallelController->GetNumberOfProcesses();
+    int myId = parallelController->GetLocalProcessId(); 
+
+    if (numProcs > 1)
+      {
+      assert(myId == 0);
+      parallelController->TriggerRMIOnAllChildren(DROP_CAT2PV_CONNECTION);
+      }
+    this->DropCatalystParaViewConnection();
+
+    // notify client.
+    if (this->VisualizationSession)
+      {
+      assert(myId == 0);
+      vtkSMMessage message;
+      message.set_global_id(this->ProxyId);
+      message.set_location(vtkPVSession::CLIENT);
+      // overloading ChatMessage for now.
+      message.SetExtension(ChatMessage::author, DISCONNECTED);
+      message.SetExtension(ChatMessage::txt, "Bye!");
+      this->VisualizationSession->NotifyAllClients(&message);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkLiveInsituLink::DropCatalystParaViewConnection()
+{
+  this->Controller = 0;
+  this->ExtractsDeliveryHelper = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -568,10 +636,10 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
     {
     pm->GetGlobalController()->Broadcast(&drop_connection, 1, 0);
     }
+
   if (drop_connection)
     {
-    this->Controller = NULL;
-    this->ExtractsDeliveryHelper = NULL;
+    this->DropCatalystParaViewConnection();
     return;
     }
 
@@ -657,8 +725,7 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
   if (drop_connection)
     {
     // ParaView has disconnected. Clean up the connection.
-    this->ExtractsDeliveryHelper = NULL;
-    this->Controller = NULL;
+    this->DropCatalystParaViewConnection();
     return;
     }
 

@@ -51,6 +51,10 @@ public:
   /// Connect to Catalyst 
   bool connect();
 
+protected slots:
+  /// called when Catalyst disconnects. We clean up the Catalyst connection.
+  void onCatalystDisconnected();
+
 protected:
   /// Called when the action is triggered.
   virtual void onTriggered()
@@ -63,7 +67,8 @@ protected:
 private:
   Q_DISABLE_COPY(pqCatalystConnectReaction)
 
-  QMap<void*, QPointer<pqLiveInsituVisualizationManager> > Managers;
+  typedef QMap<void*, QPointer<pqLiveInsituVisualizationManager> > ManagersType;
+  ManagersType Managers;
 };
 
 #endif
