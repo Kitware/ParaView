@@ -75,22 +75,105 @@ class pqRubberBandHelper::pqInternal
 {
 public:
   // Current render view.
+  vtkWeakPointer<vtkObject> ObservedProxy;
+  QPointer<pqRubberBandHelper> Owner;
   QPointer<pqRenderView> RenderView;
-  vtkSmartPointer<vtkCommand> Observer;
-  int StartPosition[2];
   int PreviousInteractionMode;
+  unsigned long ObserverId;
+  unsigned long PressEventObserverId;
+  int LastPressedPosition[2];
 
   QCursor ZoomCursor;
 
-  pqInternal(pqRubberBandHelper*) :
+  pqInternal(pqRubberBandHelper* owner) :
     ZoomCursor(QPixmap(zoom_xpm), 11, 11)
     {
-    this->StartPosition[0] = this->StartPosition[1] = -1000;
+    this->Owner = owner;
+    this->ObserverId = this->PressEventObserverId = 0;
+    this->LastPressedPosition[0] = this->LastPressedPosition[1] = -10000;
     }
 
   ~pqInternal()
     {
+    this->RemoveObserver();
     }
+
+  void AddSelectionObserver(vtkSMRenderViewProxy* proxyToObserver)
+  {
+    this->RemoveObserver();
+    this->ObservedProxy = proxyToObserver;
+    if(this->ObservedProxy)
+      {
+      this->ObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::SelectionChangedEvent,
+            this->Owner.data(),
+            &pqRubberBandHelper::onSelectionChanged);
+      }
+  }
+
+  void AddZoomObserver(vtkPVGenericRenderWindowInteractor* proxyToObserver)
+  {
+    this->RemoveObserver();
+    this->ObservedProxy = proxyToObserver;
+    if(this->ObservedProxy)
+      {
+      this->ObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::LeftButtonReleaseEvent,
+            this->Owner.data(),
+            &pqRubberBandHelper::onZoom);
+      }
+  }
+
+  void AddPickObserver(vtkPVGenericRenderWindowInteractor* proxyToObserver)
+  {
+    this->RemoveObserver();
+    this->ObservedProxy = proxyToObserver;
+    if(this->ObservedProxy)
+      {
+      this->ObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::LeftButtonReleaseEvent,
+            this->Owner.data(),
+            &pqRubberBandHelper::onPickOnClick);
+      this->PressEventObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::LeftButtonPressEvent,
+            this,
+            &pqRubberBandHelper::pqInternal::UpdatePressedPosition);
+      }
+  }
+
+  void RemoveObserver()
+  {
+    if(this->ObservedProxy && this->ObserverId)
+      {
+      this->ObservedProxy->RemoveObserver(this->ObserverId);
+      if(this->PressEventObserverId)
+        {
+        this->ObservedProxy->RemoveObserver(this->PressEventObserverId);
+        }
+      }
+    this->ObserverId = 0;
+    this->PressEventObserverId = 0;
+  }
+
+  void UpdatePressedPosition(vtkObject* obj, unsigned long, void*)
+  {
+    vtkPVGenericRenderWindowInteractor* interactor =
+        vtkPVGenericRenderWindowInteractor::SafeDownCast(obj);
+    if(interactor)
+      {
+      interactor->GetEventPosition(this->LastPressedPosition);
+      }
+  }
+
+  bool IsSamePosition(int pos[2])
+  {
+    return (pos[0] == this->LastPressedPosition[0] && pos[1] == this->LastPressedPosition[1]);
+  }
+
+  void ClearPressPosition()
+  {
+    this->LastPressedPosition[0] = this->LastPressedPosition[1] = -1000;
+  }
 };
 
 //-----------------------------------------------------------------------------
@@ -98,9 +181,6 @@ pqRubberBandHelper::pqRubberBandHelper(QObject* _parent/*=null*/)
 : QObject(_parent)
 {
   this->Internal = new pqInternal(this);
-  this->Internal->Observer.TakeReference(
-    vtkMakeMemberFunctionCommand(
-      *this, &pqRubberBandHelper::onSelectionChanged));
 
   this->Mode = INTERACT;
   this->DisableCount = 0;
@@ -212,23 +292,20 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
       vtkPVRenderView::INTERACTION_MODE_ZOOM);
+    this->Internal->AddZoomObserver(rmp->GetInteractor());
     rmp->UpdateVTKObjects();
     this->Internal->RenderView->getWidget()->setCursor(
       this->Internal->ZoomCursor);
-    this->Internal->RenderView->getWidget()->installEventFilter(this);
     }
   else if (selectionMode == PICK_ON_CLICK)
     {
-    // we don't use render-window-interactor for picking-on-clicking since we
-    // don't want to change the default interaction style. Instead we install an
-    // event filter to listen to mouse click events.
-    this->Internal->RenderView->getWidget()->installEventFilter(this);
+    this->Internal->AddPickObserver(rmp->GetInteractor());
     }
   else // FAST_INTERSECT, SELECT, SELECT_POINTS, FRUSTUM, FRUSTUM_POINTS, BLOCKS, PICK
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
       vtkPVRenderView::INTERACTION_MODE_SELECTION);
-    rmp->AddObserver(vtkCommand::SelectionChangedEvent, this->Internal->Observer);
+    this->Internal->AddSelectionObserver(rmp);
     rmp->UpdateVTKObjects();
     this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
     }
@@ -260,9 +337,7 @@ int pqRubberBandHelper::setRubberBandOff()
   vtkSMPropertyHelper(rmp, "InteractionMode").Set(
     this->Internal->PreviousInteractionMode);
   rmp->UpdateVTKObjects();
-  rmp->RemoveObserver(this->Internal->Observer);
-
-  this->Internal->RenderView->getWidget()->removeEventFilter(this);
+  this->Internal->RemoveObserver();
 
   // set the interaction cursor
   this->Internal->RenderView->getWidget()->setCursor(QCursor());
@@ -272,56 +347,6 @@ int pqRubberBandHelper::setRubberBandOff()
   emit this->selecting(false);
   emit this->stopSelection();
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-bool pqRubberBandHelper::eventFilter(QObject *watched, QEvent *_event)
-{
-  if (this->Mode == PICK_ON_CLICK &&
-    watched == this->Internal->RenderView->getWidget())
-    {
-    if (_event->type() == QEvent::MouseButtonPress)
-      {
-      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
-      if (mouseEvent.button() == Qt::LeftButton)
-        {
-        this->Internal->StartPosition[0] = mouseEvent.x();
-        this->Internal->StartPosition[1] = mouseEvent.y();
-        }
-      }
-    else if (_event->type() == QEvent::MouseButtonRelease)
-      {
-      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
-      if (mouseEvent.button() == Qt::LeftButton)
-        {
-        if (this->Internal->StartPosition[0] == mouseEvent.x() &&
-          this->Internal->StartPosition[1] == mouseEvent.y())
-          {
-          // we need to flip Y.
-          int height = this->Internal->RenderView->getWidget()->size().height();
-          int region[4] = {mouseEvent.x(), height - mouseEvent.y(),
-            mouseEvent.x(), height - mouseEvent.y()};
-          this->onSelectionChanged(NULL, 0, region);
-          }
-        }
-      this->Internal->StartPosition[0] = -1000;
-      this->Internal->StartPosition[1] = -1000;
-      }
-    }
-  else if (this->Mode == ZOOM &&
-    watched == this->Internal->RenderView->getWidget())
-    {
-    if (_event->type() == QEvent::MouseButtonRelease)
-      {
-      QMouseEvent& mouseEvent = (*static_cast<QMouseEvent*>(_event));
-      if (mouseEvent.button() == Qt::LeftButton)
-        {
-        pqTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
-        }
-      }
-    }
-
-  return this->Superclass::eventFilter(watched, _event);
 }
 
 //-----------------------------------------------------------------------------
@@ -593,4 +618,42 @@ void pqRubberBandHelper::triggerFastIntersect()
   this->beginFastIntersect();
   this->onSelectionChanged(NULL, 0, region);
   this->endSelection();
+}
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::onZoom(vtkObject*, unsigned long, void*)
+{
+  pqTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::onPickOnClick(vtkObject*, unsigned long, void*)
+{
+  if(!this->Internal->RenderView->getRenderViewProxy() ||
+     !this->Internal->RenderView->getRenderViewProxy()->GetInteractor())
+    {
+    return; // We can not do anything
+    }
+
+  int region[4] = {0,0,0,0};
+
+  // Get point coordinate
+  pqRenderView* rm = this->Internal->RenderView;
+  rm->getRenderViewProxy()->GetInteractor()->GetEventPosition(region);
+
+  if(this->Internal->IsSamePosition(region))
+    {
+    // we need to flip Y.
+    int height = this->Internal->RenderView->getWidget()->size().height();
+    region[1] = height - region[1];
+
+    // Need to duplicate [x,y,0,0] to be [x,y,x,y]
+    region[2] = region[0];
+    region[3] = region[1];
+
+    // Trigger event
+    this->onSelectionChanged(NULL, 0, region);
+
+    // Reset presion press position
+    this->Internal->ClearPressPosition();
+    }
 }
