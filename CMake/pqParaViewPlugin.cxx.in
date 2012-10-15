@@ -47,16 +47,22 @@ void PushBack(T& vector, F& fun)
 
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
-# ifdef INITIALIZE_WRAPPING
+# if defined(INITIALIZE_WRAPPING) || defined(INITIALIZE_EXTRA_CS_MODULES)
 #  include "vtkClientServerInterpreterInitializer.h"
 #  include "vtkClientServerInterpreter.h"
 
+#   if defined(INITIALIZE_WRAPPING)
 extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *);
+#   endif
+
 @PLUGIN_EXTRA_CS_INITS_EXTERNS@
+
 extern "C" void VTK_EXPORT @PLUGIN_NAME@_CombinedInitialize(
   vtkClientServerInterpreter *interp)
 {
+#   if defined(INITIALIZE_WRAPPING)
   @PLUGIN_NAME@_Initialize(interp);
+#   endif
 
   // Now initialize any extra kits as requested.
   @PLUGIN_EXTRA_CS_INITS@
@@ -83,7 +89,7 @@ void @PLUGIN_NAME@_Plugin::GetBinaryResources(
 vtkClientServerInterpreterInitializer::InterpreterInitializationCallback
 @PLUGIN_NAME@_Plugin::GetInitializeInterpreterCallback()
 {
-# ifdef INITIALIZE_WRAPPING
+# if defined(INITIALIZE_WRAPPING) || defined(INITIALIZE_EXTRA_CS_MODULES)
   return @PLUGIN_NAME@_CombinedInitialize;
 # endif
   return NULL;
