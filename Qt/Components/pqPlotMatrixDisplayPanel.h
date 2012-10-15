@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,6 +42,7 @@ class pqSignalAdaptorColor;
 class pqSignalAdaptorComboBox;
 class pqChartSeriesSettingsModel;
 class pqTreeView;
+class pqSignalAdaptorCompositeTreeWidget;
 
 class PQCOMPONENTS_EXPORT pqPlotMatrixDisplayPanel : public pqDisplayPanel
 {
@@ -68,6 +69,7 @@ private:
   pqSignalAdaptorComboBox *ActivePlotMarkerStyleAdaptor;
   pqSignalAdaptorComboBox *ScatterPlotsMarkerStyleAdaptor;
   pqTreeView *Series;
+  pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
 };
 
 #endif

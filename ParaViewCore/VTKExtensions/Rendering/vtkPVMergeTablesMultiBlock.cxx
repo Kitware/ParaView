@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVMergeTables.cxx
+  Module:    vtkPVMergeTablesMultiBlock.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVMergeTables.h"
+#include "vtkPVMergeTablesMultiBlock.h"
 
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
@@ -23,36 +23,47 @@
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkVariant.h"
+#include "assert.h"
 
-vtkStandardNewMacro(vtkPVMergeTables);
+vtkStandardNewMacro(vtkPVMergeTablesMultiBlock);
 //----------------------------------------------------------------------------
-vtkPVMergeTables::vtkPVMergeTables()
+vtkPVMergeTablesMultiBlock::vtkPVMergeTablesMultiBlock()
+{
+  this->SetNumberOfInputPorts(1);
+  this->SetNumberOfOutputPorts(1);
+}
+
+//----------------------------------------------------------------------------
+vtkPVMergeTablesMultiBlock::~vtkPVMergeTablesMultiBlock()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPVMergeTables::~vtkPVMergeTables()
-{
-}
-
-//----------------------------------------------------------------------------
-int vtkPVMergeTables::FillInputPortInformation(
+int vtkPVMergeTablesMultiBlock::FillInputPortInformation(
   int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 
 //----------------------------------------------------------------------------
-vtkExecutive* vtkPVMergeTables::CreateDefaultExecutive()
+int vtkPVMergeTablesMultiBlock::FillOutputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  // now add our info
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkExecutive* vtkPVMergeTablesMultiBlock::CreateDefaultExecutive()
 {
   return vtkCompositeDataPipeline::New();
 }
 
 //----------------------------------------------------------------------------
-static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
+static void vtkPVMergeTablesMultiBlockMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
 {
   for (int idx = 0; idx < num_inputs; ++idx)
     {
@@ -84,29 +95,22 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTables::RequestData(
-  vtkInformation*,
+int vtkPVMergeTablesMultiBlock::ProcessRequest(
+  vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  int num_connections = this->GetNumberOfInputConnections(0);
-
-  // Get output table
-  vtkTable* outputTable = vtkTable::GetData(outputVector, 0);
-
-  if (vtkTable::GetData(inputVector[0], 0))
+  if(!request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
     {
-    vtkTable** inputs = new vtkTable*[num_connections];
-    for (int idx = 0; idx < num_connections; ++idx)
-      {
-      inputs[idx] = vtkTable::GetData(inputVector[0], idx);
-      }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
-    delete [] inputs;
-    return 1;
+    return this->Superclass::ProcessRequest(request, inputVector, outputVector);
     }
 
   vtkCompositeDataSet* input0 = vtkCompositeDataSet::GetData(inputVector[0], 0);
+  vtkMultiBlockDataSet* outputTables = vtkMultiBlockDataSet::GetData(outputVector, 0);
+  outputTables->CopyStructure(input0);
+  assert(outputTables);
+
+  int num_connections = this->GetNumberOfInputConnections(0);
   vtkCompositeDataIterator* iter = input0->NewIterator();
   iter->SkipEmptyNodesOff();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -132,7 +136,10 @@ int vtkPVMergeTables::RequestData(
         inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
         }
       }
-    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
+    vtkTable* outputTable = vtkTable::New();
+    ::vtkPVMergeTablesMultiBlockMerge(outputTable, inputs, num_connections);
+    outputTables->SetDataSet(iter,outputTable);
+    outputTable->Delete();
     delete [] inputs;
     }
   iter->Delete();
@@ -140,7 +147,7 @@ int vtkPVMergeTables::RequestData(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMergeTables::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVMergeTablesMultiBlock::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

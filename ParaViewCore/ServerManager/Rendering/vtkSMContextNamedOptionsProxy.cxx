@@ -63,23 +63,15 @@ void vtkSMContextNamedOptionsProxy::UpdatePropertyInformationInternal(
     return;
     }
 
-  vtkTable* table = options->GetTable();
-  if (!table)
-    {
-    return;
-    }
-
   bool skip = false;
   const char* propertyName = this->GetPropertyName(prop);
   vtkSmartPointer<vtkStringList> newValues = vtkSmartPointer<vtkStringList>::New();
 
-  // Note: we could iterate over this->Internals->PlotMap, but just for
-  // kicks we'll iterate over the table columns in order to respect the
-  // column ordering, probably not needed...
-  int numberOfColumns = table->GetNumberOfColumns();
-  for (int i = 0; i < numberOfColumns; ++i)
+  std::vector<const char*> seriesNames;
+  options->GetSeriesNames(seriesNames);
+  for(size_t i =0; i<seriesNames.size();i++)
     {
-    const char* seriesName = table->GetColumnName(i);
+    const char* seriesName = seriesNames[i];
     if (!seriesName)
       {
       continue;

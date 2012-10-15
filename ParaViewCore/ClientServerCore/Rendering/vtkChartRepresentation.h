@@ -30,6 +30,8 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include <vector> //needed for ivars
+#include <set> //needed for ivars
 
 class vtkBlockDeliveryPreprocessor;
 class vtkClientServerMoveData;
@@ -40,6 +42,7 @@ class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
 class vtkChartSelectionRepresentation;
+class vtkMultiBlockDataSet;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
@@ -72,6 +75,10 @@ public:
   // to GetSeriesName.
   virtual const char* GetSeriesName(int series);
 
+  //Description:
+  //Get the names of the series
+  void GetSeriesNames(std::vector<const char*>& names);
+
   // Description:
   // Force the chaty to rescale its axes.
   virtual void RescaleChart();
@@ -84,9 +91,11 @@ public:
   virtual void MarkModified();
 
   // *************************************************************************
-  // Forwarded to vtkBlockDeliveryPreprocessor.
+  // methods to control block selection
   void SetFieldAssociation(int);
-  void SetCompositeDataSetIndex(unsigned int);
+  void SetCompositeDataSetIndex(unsigned int); //only used for single block selection
+  void AddCompositeDataSetIndex(unsigned int);
+  void ResetCompositeDataSetIndices();
 
   // Description:
   // Override because of internal selection representations that need to be
@@ -137,7 +146,8 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  vtkTable* GetLocalOutput();
+  bool GetLocalOutput(std::vector<vtkTable*>& tables);
+  void UpdateSeriesNames();
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
@@ -147,7 +157,10 @@ protected:
   vtkChartNamedOptions* Options;
 
   bool EnableServerSideRendering;
-  vtkSmartPointer<vtkTable> LocalOutput;
+  vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
+
+  std::vector<const char*> SeriesNames; //all series names consistent with local output
+  std::set<int> CompositeIndices; //the selected blocks
 
   vtkChartSelectionRepresentation* SelectionRepresentation;
 

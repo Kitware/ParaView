@@ -15,6 +15,15 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="pqTreeWidget" name="CompositeIndex">
+     <column>
+      <property name="text">
+       <string>Select Block</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+    <item>
     <widget class="pqTreeView" name="Series">
      <property name="rootIsDecorated">
       <bool>false</bool>
@@ -167,6 +176,11 @@
    <class>pqTreeView</class>
    <extends>QTreeView</extends>
    <header>pqTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>pqColorChooserButton</class>

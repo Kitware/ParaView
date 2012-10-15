@@ -549,16 +549,20 @@ void vtkPVXYChartView::Render(bool interactive)
   // so we need to provide the labels each time to the chart.
   for (int axis=0; axis < 4; axis++)
     {
+    vtkAxis* chartAxis= this->Chart->GetAxis(axis);
+    if(!chartAxis)
+      {
+      continue;
+      }
     if (this->Internals->UseCustomLabels[axis])
       {
-      this->Chart->GetAxis(axis)->SetCustomTickPositions(
-        this->Internals->CustomLabelPositions[axis].GetPointer());
+      chartAxis->SetCustomTickPositions(this->Internals->CustomLabelPositions[axis].GetPointer());
       }
     else
       {
-      this->Chart->GetAxis(axis)->SetCustomTickPositions(NULL);
+      chartAxis->SetCustomTickPositions(NULL);
       }
-    this->Chart->GetAxis(axis)->Update();
+    chartAxis->Update();
     }
 
   this->Superclass::Render(interactive);

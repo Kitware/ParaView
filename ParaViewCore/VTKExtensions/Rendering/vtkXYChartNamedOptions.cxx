@@ -29,6 +29,7 @@
 
 #include <map>
 #include <sstream>
+#include <vector>
 
 //----------------------------------------------------------------------------
 // Class to store information about each plot.
@@ -36,7 +37,8 @@
 class vtkXYChartNamedOptions::PlotInfo
 {
 public:
-  vtkWeakPointer<vtkPlot> Plot;
+  std::vector<vtkWeakPointer<vtkPlot> > Plots;
+  std::vector<vtkWeakPointer<vtkTable> > Tables;
   vtkStdString Label;
   bool ColorInitialized;
   bool VisibilityInitialized;
@@ -71,7 +73,8 @@ public:
     this->Color[0] = p.Color[0];
     this->Color[1] = p.Color[1];
     this->Color[2] = p.Color[2];
-    this->Plot = p.Plot;
+    this->Plots = p.Plots;
+    this->Tables = p.Tables;
     }
 };
 
@@ -150,10 +153,13 @@ void vtkXYChartNamedOptions::SetXSeriesName(const char* name)
   for (it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {
-    if (it->second.Plot)
+    for(size_t i=0; i<it->second.Plots.size();i++)
       {
-      it->second.Plot->SetInputArray(0, this->Internals->XSeriesName.c_str());
-      it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      if(it->second.Plots[i])
+        {
+        it->second.Plots[i]->SetInputArray(0, this->Internals->XSeriesName.c_str());
+        it->second.Plots[i]->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+        }
       }
     }
 
@@ -173,9 +179,13 @@ void vtkXYChartNamedOptions::SetUseIndexForXAxis(bool useIndex)
   for (it = this->Internals->PlotMap.begin();
        it != this->Internals->PlotMap.end(); ++it)
     {
-    if (it->second.Plot)
+    for(size_t i=0; i<it->second.Plots.size();i++)
       {
-      it->second.Plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+      if(!it->second.Plots[i])
+        {
+        continue;
+        }
+      it->second.Plots[i]->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
       }
     }
 
@@ -203,7 +213,20 @@ void SetPlotInfoColor(vtkXYChartNamedOptions::PlotInfo& plotInfo, vtkColor3ub co
 //----------------------------------------------------------------------------
 void vtkXYChartNamedOptions::RefreshPlots()
 {
-  if (!this->Table)
+  //remove any table that has been deleted
+  std::vector<vtkWeakPointer<vtkTable> > tables;
+  for(size_t tbIndex=0; tbIndex< this->Tables.size(); tbIndex++)
+    {
+    if(this->Tables[tbIndex])
+      {
+      tables.push_back(this->Tables[tbIndex]);
+      }
+    }
+  this->Tables = tables;
+
+  this->RemovePlotsFromChart();
+
+  if(this->Tables.empty())
     {
     return;
     }
@@ -216,48 +239,41 @@ void vtkXYChartNamedOptions::RefreshPlots()
     defaultVisible = 0;
     }
 
-  // For each series (column in the table)
-  const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();
-  for (vtkIdType i = 0; i < numberOfColumns; ++i)
+  for(size_t tbIndex=0; tbIndex< this->Tables.size(); tbIndex++)
     {
-    // Get the series name
-    const char* seriesName = this->Table->GetColumnName(i);
-    if (!seriesName || !seriesName[0])
-      {
-      continue;
-      }
+    vtkTable* table = this->Tables[tbIndex];
 
-    // Get the existing PlotInfo or initialize a new one
-    PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
-    if (!plotInfo.ColorInitialized)
+    // For each series (column in the table)
+    const vtkIdType numberOfColumns = table->GetNumberOfColumns();
+    for (vtkIdType i = 0; i < numberOfColumns; ++i)
       {
-      SetPlotInfoColor(plotInfo, this->Internals->Colors->GetColorRepeating(i));
-      }
-    if (!plotInfo.VisibilityInitialized)
-      {
-      plotInfo.VisibilityInitialized = true;
-      plotInfo.Visible = defaultVisible;
-      }
-
-    // Add the PlotInfo to the new collection
-    newMap[seriesName] = plotInfo;
-    }
-
-  // Now we need to prune old series (table columns that were removed)
-  if (this->Chart)
-    {
-    PlotMapIterator it = this->Internals->PlotMap.begin();
-    for ( ; it != this->Internals->PlotMap.end(); ++it)
-      {
-      // If the series is currently in the chart but has been removed from
-      // the vtkTable then lets remove it from the chart
-      if (it->second.Plot && newMap.find(it->first) == newMap.end())
+      // Get the series name
+      const char* seriesName = table->GetColumnName(i);
+      if (!seriesName || !seriesName[0])
         {
-        this->Chart->RemovePlotInstance(it->second.Plot);
+        continue;
         }
+      // Get the existing PlotInfo or initialize a new onw
+      if(newMap.find(seriesName)==newMap.end())
+        {
+        PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
+        plotInfo.Tables.clear();
+        plotInfo.Plots.clear();
+        if (!plotInfo.ColorInitialized)
+          {
+          SetPlotInfoColor(plotInfo, this->Internals->Colors->GetColorRepeating(i));
+          }
+        if (!plotInfo.VisibilityInitialized)
+          {
+          plotInfo.VisibilityInitialized = true;
+          plotInfo.Visible = defaultVisible;
+          }
+        // Add the PlotInfo to the new collection
+        newMap[seriesName] = plotInfo;
+        }
+      newMap[seriesName].Tables.push_back(table);
       }
     }
-
   this->Internals->PlotMap = newMap;
 }
 
@@ -273,12 +289,13 @@ void vtkXYChartNamedOptions::RemovePlotsFromChart()
        it != this->Internals->PlotMap.end(); ++it)
     {
     PlotInfo& plotInfo = it->second;
-    if (plotInfo.Plot)
+    for(size_t i=0; i<plotInfo.Plots.size();i++)
       {
-      vtkPlot* plot = plotInfo.Plot;
-      plotInfo.Plot = 0; // clear the weak pointer before destroying the plot
+      vtkPlot* plot = plotInfo.Plots[i];
+      plotInfo.Plots[i] = 0; // clear the weak pointer before destroying the plot
       this->Chart->RemovePlotInstance(plot);
       }
+    plotInfo.Plots.clear();
     }
 }
 
@@ -287,32 +304,41 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
                                                        bool visible,
                                                        const char* seriesName)
 {
-  if (plotInfo.Plot)
+  if (plotInfo.Plots.size()>0)
     {
-    plotInfo.Plot->SetVisible(static_cast<bool>(visible));
-    }
-  else if (this->Chart && this->Table && visible)
-    {
-    // Create a new vtkPlot and initialize it
-    vtkPlot *plot = this->Chart->AddPlot(this->ChartType);
-    if (plot)
-      {
-      plotInfo.Plot = plot;
-      plot->SetVisible(static_cast<bool>(visible));
-      plot->SetLabel(plotInfo.Label);
-      plot->SetWidth(plotInfo.LineThickness);
-      plot->GetPen()->SetLineType(plotInfo.LineStyle);
-      plot->SetColor(plotInfo.Color[0], plotInfo.Color[1], plotInfo.Color[2]);
-      // Must downcast to set the marker style...
-      vtkPlotLine *line = vtkPlotLine::SafeDownCast(plot);
-      if (line)
+      for(size_t i=0; i<plotInfo.Plots.size();i++)
         {
-        line->SetMarkerStyle(plotInfo.MarkerStyle);
+        if(plotInfo.Plots[i])
+          {
+          plotInfo.Plots[i]->SetVisible(static_cast<bool>(visible));
+          }
         }
-      plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
-      plot->SetInputData(this->Table,
-                         this->Internals->XSeriesName.c_str(),
-                         seriesName);
+    }
+  else if (this->Chart && visible)
+    {
+    for(size_t i=0; i<plotInfo.Tables.size(); i++)
+      {
+      // Create a new vtkPlot and initialize it
+      vtkPlot *plot = this->Chart->AddPlot(this->ChartType);
+      if (plot)
+        {
+        plotInfo.Plots.push_back(plot);
+        plot->SetVisible(static_cast<bool>(visible));
+        plot->SetLabel(plotInfo.Label);
+        plot->SetWidth(plotInfo.LineThickness);
+        plot->GetPen()->SetLineType(plotInfo.LineStyle);
+        plot->SetColor(plotInfo.Color[0], plotInfo.Color[1], plotInfo.Color[2]);
+        // Must downcast to set the marker style...
+        vtkPlotLine *line = vtkPlotLine::SafeDownCast(plot);
+        if (line)
+          {
+          line->SetMarkerStyle(plotInfo.MarkerStyle);
+          }
+        plot->SetUseIndexForXSeries(this->Internals->UseIndexForXAxis);
+        plot->SetInputData(plotInfo.Tables[i],
+                           this->Internals->XSeriesName.c_str(),
+                           seriesName);
+        }
       }
     }
 }
@@ -363,9 +389,9 @@ void vtkXYChartNamedOptions::SetLineThickness(const char* name,
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.LineThickness = value;
-  if (plotInfo.Plot)
+  for(size_t i=0; i<plotInfo.Plots.size();i++)
     {
-    plotInfo.Plot->SetWidth(value);
+    plotInfo.Plots[i]->SetWidth(value);
     }
 }
 
@@ -374,9 +400,9 @@ void vtkXYChartNamedOptions::SetLineStyle(const char* name, int style)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.LineStyle = style;
-  if (plotInfo.Plot)
+  for(size_t i=0; i<plotInfo.Plots.size();i++)
     {
-    plotInfo.Plot->GetPen()->SetLineType(style);
+    plotInfo.Plots[i]->GetPen()->SetLineType(style);
     }
 }
 
@@ -389,9 +415,9 @@ void vtkXYChartNamedOptions::SetColor(const char* name,
   plotInfo.Color[1] = g;
   plotInfo.Color[2] = b;
   plotInfo.ColorInitialized = true;
-  if (plotInfo.Plot)
+  for(size_t i=0; i<plotInfo.Plots.size();i++)
     {
-    plotInfo.Plot->SetColor(r, g, b);
+    plotInfo.Plots[i]->SetColor(r, g, b);
     }
 }
 
@@ -400,12 +426,15 @@ void vtkXYChartNamedOptions::SetAxisCorner(const char* name, int value)
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Corner = value;
-  if (plotInfo.Plot && this->Chart)
+  if (this->Chart)
     {
     vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Chart);
     if (chart)
       {
-      chart->SetPlotCorner(plotInfo.Plot, value);
+      for(size_t i=0; i<plotInfo.Plots.size();i++)
+        {
+        chart->SetPlotCorner(plotInfo.Plots[i], value);
+        }
       }
     }
 }
@@ -417,10 +446,13 @@ void vtkXYChartNamedOptions::SetMarkerStyle(const char* name, int style)
   plotInfo.MarkerStyle = style;
 
   // Must downcast to set the marker style...
-  vtkPlotLine *line = vtkPlotLine::SafeDownCast(plotInfo.Plot);
-  if (line)
+  for(size_t i=0; i<plotInfo.Plots.size();i++)
     {
-    line->SetMarkerStyle(style);
+    vtkPlotLine *line = vtkPlotLine::SafeDownCast(plotInfo.Plots[i]);
+    if (line)
+      {
+      line->SetMarkerStyle(style);
+      }
     }
 }
 
@@ -430,9 +462,9 @@ void vtkXYChartNamedOptions::SetLabel(const char* name,
 {
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Label = label;
-  if (plotInfo.Plot)
+  for(size_t i=0; i<plotInfo.Plots.size();i++)
     {
-    plotInfo.Plot->SetLabel(label);
+    plotInfo.Plots[i]->SetLabel(label);
     }
 }
 

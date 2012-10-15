@@ -22,6 +22,7 @@
 #include "vtkObject.h"
 #include "vtkWeakPointer.h" // For ivars
 #include "vtkPVVTKExtensionsRenderingModule.h" // needed for export macro
+#include <vector> //For ivars
 
 class vtkChart;
 class vtkTable;
@@ -85,8 +86,10 @@ public:
 
   // Description:
   // Sets the internal table object that can be plotted.
-  void SetTable(vtkTable* table);
-  vtkTable* GetTable();
+  void SetTables(vtkTable** table, int n);
+
+
+  void GetSeriesNames(std::vector<const char*>& names);
 
   virtual void RemovePlotsFromChart();
 
@@ -104,7 +107,7 @@ protected:
   virtual void RefreshPlots();
 
   vtkWeakPointer<vtkChart> Chart;
-  vtkWeakPointer<vtkTable> Table;
+  std::vector<vtkWeakPointer<vtkTable> > Tables;
   vtkWeakPointer<vtkScatterPlotMatrix> PlotMatrix;
   int ChartType;
   bool TableVisibility;
