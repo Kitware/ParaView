@@ -9,6 +9,8 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __CellIdIterator_h
 #define __CellIdIterator_h
 
+#include <cstdlib> // for size_t
+
 /// cell id iterator
 /**
 Iterate over an inclusive range of cell ids.
@@ -17,7 +19,7 @@ class CellIdIterator
 {
 public:
   CellIdIterator();
-  CellIdIterator(int startId, int endId);
+  CellIdIterator(size_t startId, size_t endId);
   CellIdIterator(const CellIdIterator &other);
   virtual ~CellIdIterator(){}
 
@@ -25,26 +27,26 @@ public:
   virtual CellIdIterator &operator=(const CellIdIterator &other);
 
   // initialize
-  virtual void SetStartId(int id){ this->StartId=id; }
-  virtual void SetEndId(int id){ this->EndId=id; }
+  virtual void SetStartId(size_t id){ this->StartId=id; }
+  virtual void SetEndId(size_t id){ this->EndId=id; }
   // begin
   virtual void Reset(){ this->Id=this->StartId; }
   // validate
   virtual int Good(){ return this->Id<=this->EndId; }
   // access
-  virtual int Index(){ return this->Id; }
-  virtual int operator*(){ return this->Index(); }
+  virtual size_t Index(){ return this->Id; }
+  virtual size_t operator*(){ return this->Index(); }
   // increment
   virtual CellIdIterator &Increment();
   virtual CellIdIterator &operator++(){ return this->Increment(); }
 
   // size of the extent
-  virtual int Size(){ return this->EndId-this->StartId+1; }
+  virtual size_t Size(){ return this->EndId-this->StartId+1; }
 
 private:
-  int StartId;
-  int EndId;
-  int Id;
+  size_t StartId;
+  size_t EndId;
+  size_t Id;
 };
 
 //-----------------------------------------------------------------------------

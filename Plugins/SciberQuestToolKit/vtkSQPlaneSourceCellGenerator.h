@@ -60,6 +60,13 @@ public:
   virtual int GetCellPointIndexes(vtkIdType cid, vtkIdType *idx);
 
   /**
+  Copy the texture coordinates from a cell into the provided
+  buffer. buffer is expected to be large enough. return the
+  number of tcoords coppied.
+  */
+  int GetCellTextureCoordinates(vtkIdType cid, float *pts);
+
+  /**
   Set/Get plane cell resolution.
   */
   void SetResolution(int *r);

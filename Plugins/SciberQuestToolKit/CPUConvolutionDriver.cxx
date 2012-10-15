@@ -8,13 +8,15 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "CPUConvolutionDriver.h"
 
+#include "SQVTKTemplateMacroWarningSupression.h"
+#include "SQPOSIXOnWindowsWarningSupression.h"
+
 #include "SQPosixOnWindows.h"
 #include "CartesianExtent.h"
 #include "MemOrder.hxx"
 #include "Numerics.hxx"
 #include "SQMacros.h"
 #include "postream.h"
-#include "SQVTKTemplateMacroWarningSupression.h"
 
 #include "vtkDataArray.h"
 
@@ -53,16 +55,16 @@ int CPUConvolutionDriver::Convolution(
 
   int nV[3];
   extV.Size(nV);
-  unsigned long vnijk=extV.Size();
+  size_t vnijk=extV.Size();
 
   int nW[3];
   extW.Size(nW);
-  unsigned long wnijk=extW.Size();
+  size_t wnijk=extW.Size();
   int nComp=W->GetNumberOfComponents();
 
   int nK[3];
   extK.Size(nK);
-  unsigned long knijk=extK.Size();
+  size_t knijk=extK.Size();
 
   int fastDim=0;
   int slowDim=1;

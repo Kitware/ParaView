@@ -263,7 +263,6 @@ long long vtkSQBOVMetaReader::GetProcRam()
     {
     // gather memory info about this host
     vtksys::SystemInformation sysInfo;
-    sysInfo.RunOSCheck(); // TODO -- fix SystemInformation::GetHostname
 
     long long hostRam=sysInfo.GetHostMemoryTotal();
     string hostName=sysInfo.GetHostname();

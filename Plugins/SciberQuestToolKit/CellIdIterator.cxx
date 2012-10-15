@@ -23,7 +23,7 @@ CellIdIterator::CellIdIterator()
 {}
 
 //-----------------------------------------------------------------------------
-CellIdIterator::CellIdIterator(int startId, int endId)
+CellIdIterator::CellIdIterator(size_t startId, size_t endId)
       :
   StartId(startId),
   EndId(endId),

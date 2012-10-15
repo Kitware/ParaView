@@ -8,6 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #ifndef __FlatIndex_h
 #define __FlatIndex_h
+#include <cstdlib> // for size_t
 
 class CartesianExtent;
 
@@ -34,15 +35,15 @@ public:
   void Initialize(int ni, int nj, int nk, int mode);
   void Initialize(const CartesianExtent &ext, int nghost=0);
 
-  int Index(int i, int j, int k)
+  size_t Index(int i, int j, int k)
   {
     return k*this->A + j*this->B + i*this->C;
   }
 
 private:
-  int A;
-  int B;
-  int C;
+  size_t A;
+  size_t B;
+  size_t C;
 };
 
 #endif
