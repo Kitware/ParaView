@@ -560,7 +560,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
         return vtkSMRepresentationProxy::SafeDownCast(
           pxm->NewProxy("representations", "TextSourceRepresentation"));
         }
-      else if(childName && strcmp(childName, "DefaultRepresentations") == 0)
+      else if(childName && !strcmp(childName, "DefaultRepresentations"))
         {
         unsigned int defaultRepCount = child->GetNumberOfNestedElements();
         for(unsigned int i = 0; i < defaultRepCount; i++)

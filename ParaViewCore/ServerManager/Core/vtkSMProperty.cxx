@@ -175,7 +175,7 @@ vtkSMDomain* vtkSMProperty::FindDomain(const char* classname)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProperty::GetNumberOfDomains()
 {
-  return this->PInternals->Domains.size();
+  return static_cast<unsigned int>(this->PInternals->Domains.size());
 }
 
 //---------------------------------------------------------------------------
@@ -244,7 +244,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
   // "MySPACE" ==> "My SPACE"
   // "My Space" ==> "My Space"
 
-  int max = strlen(xmlname);
+  int max = static_cast<int>(strlen(xmlname));
   char* label = new char[2*max+10];
   char* ptr = label;
 

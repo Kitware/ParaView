@@ -85,8 +85,11 @@ public:
     }
     
   private:
+    void operator=(const SameSchemeAndHost&);
     const pqServerResource& LHS;
   };
+private:
+  void operator=(const pqImplementation&);
 };
 
 /////////////////////////////////////////////////////////////////////////////

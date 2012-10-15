@@ -145,7 +145,7 @@ public:
     qreal height = 0;
     qreal widthUsed = 0;
     this->TextLayout.beginLayout();
-    while (true) {
+    for (;;) {
       QTextLine line = this->TextLayout.createLine();
       if (!line.isValid())
         break;

@@ -71,14 +71,12 @@ int vtkDataSetToRectilinearGrid::RequestInformation(
 
   // Setup ExtentTranslator so that all downstream piece requests are
   // converted to whole extent update requests, as need by the histogram filter.
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
   if (strcmp(
-      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
+      vtkStreamingDemandDrivenPipeline::GetExtentTranslator(outInfo)->GetClassName(),
       "vtkOnePieceExtentTranslator") != 0)
     {
     vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
-    sddp->SetExtentTranslator(outInfo, et);
+    vtkStreamingDemandDrivenPipeline::SetExtentTranslator(outInfo, et);
     et->Delete();
     }
 
@@ -100,17 +98,15 @@ int vtkDataSetToRectilinearGrid::RequestUpdateExtent(
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  if (outInfo->Has(sddp->UPDATE_NUMBER_OF_PIECES()) && 
-    outInfo->Has(sddp->UPDATE_PIECE_NUMBER()) &&
-    outInfo->Has(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS()))
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) &&
+    outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) &&
+    outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()))
     {
-    int piece = outInfo->Get(sddp->UPDATE_PIECE_NUMBER());
-    int numPieces = outInfo->Get(sddp->UPDATE_NUMBER_OF_PIECES());
-    int ghostLevel = outInfo->Get(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS());
+    int piece = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+    int numPieces = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+    int ghostLevel = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
 
-    sddp->SetUpdateExtent(inInfo, piece, numPieces, ghostLevel);
+    vtkStreamingDemandDrivenPipeline::SetUpdateExtent(inInfo, piece, numPieces, ghostLevel);
     }
   return 1;
 }

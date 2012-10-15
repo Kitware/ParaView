@@ -122,7 +122,7 @@ vtkSMDataTypeDomain::~vtkSMDataTypeDomain()
 //---------------------------------------------------------------------------
 unsigned int vtkSMDataTypeDomain::GetNumberOfDataTypes()
 {
-  return this->DTInternals->DataTypes.size();
+  return static_cast<unsigned int>(this->DTInternals->DataTypes.size());
 }
 
 //---------------------------------------------------------------------------

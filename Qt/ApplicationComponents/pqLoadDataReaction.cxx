@@ -172,9 +172,9 @@ pqPipelineSource* pqLoadDataReaction::loadData(const QList<QStringList>& files)
 bool pqLoadDataReaction::TestFileReadability(
   const QString& file,
   pqServer *server,
-  vtkSMReaderFactory *factory)
+  vtkSMReaderFactory *vtkNotUsed(factory))
 {
-  return factory->TestFileReadability(file.toAscii().data(), server->session());
+  return vtkSMReaderFactory::TestFileReadability(file.toAscii().data(), server->session());
 }
 
 //-----------------------------------------------------------------------------

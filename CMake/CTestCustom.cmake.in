@@ -36,12 +36,19 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "Warning.*Skipping it."
 
   # ignore warnings from old plugins
-  "H5Part"
-  "AnalyzeNIfTIReaderWriter"
+  ".*H5Part.*"
+  ".*AnalyzeNIfTIReaderWriter.*"
 
   # ignore method call with return value unused
   "declared with attribute warn_unused_result"
   "warning: ignoring return value"
+
+  # ignore qt library warnings
+  ".*qttest.*testlib.*"
+
+  # MPI 2 deprecation warning
+  ".*MPI_Errhandler_create.*MPI_Comm_create_errhandler.*"
+  ".*MPI_Errhandler_set.*MPI_Comm_set_errhandler.*"
 )
 
 #------------------------------------------------------------------------------

@@ -45,8 +45,8 @@ namespace {
 template<class T>
 void ClearVectorOfPointers( vector<T *> &V )
 {
-  int n=V.size();
-  for (int i=0; i<n; ++i)
+  size_t n=V.size();
+  for (size_t i=0; i<n; ++i)
     {
     if (V[i]!=0)
       {
@@ -59,8 +59,8 @@ void ClearVectorOfPointers( vector<T *> &V )
 template<class T>
 void ClearVectorOfVtkPointers( vector<T *> &V )
 {
-  int n=V.size();
-  for (int i=0; i<n; ++i)
+  size_t n=V.size();
+  for (size_t i=0; i<n; ++i)
     {
     if (V[i]!=0)
       {
@@ -73,8 +73,8 @@ void ClearVectorOfVtkPointers( vector<T *> &V )
 template<class T>
 void ClearVectorOfArrayPointers( vector<T *> &V )
 {
-  int n=V.size();
-  for (int i=0; i<n; ++i)
+  size_t n=V.size();
+  for (size_t i=0; i<n; ++i)
     {
     if (V[i]!=0)
       {
@@ -245,8 +245,8 @@ template<class T>
 inline
 void FillVector( vector<T> &V, const T &v)
 {
-  int n=V.size();
-  for (int i=0; i<n; ++i)
+  size_t n=V.size();
+  for (size_t i=0; i<n; ++i)
     {
     V[i]=v;
     }
@@ -526,8 +526,8 @@ ostream &operator<<(ostream &sout, vtkDoubleArray &da)
 //
 ostream &operator<<(ostream &sout, vector<vtkDoubleArray *> &vda)
 {
-  int nda=vda.size();
-  for (int i=0; i<nda; ++i)
+  size_t nda=vda.size();
+  for (size_t i=0; i<nda; ++i)
     {
     sout << "[" << i << "]\n" << *vda[i] << endl;
     }
@@ -536,18 +536,18 @@ ostream &operator<<(ostream &sout, vector<vtkDoubleArray *> &vda)
 //
 ostream &operator<<(ostream &sout, vector<vector<int> >&vvi)
 {
-  int nv=vvi.size();
-  for (int i=0; i<nv; ++i)
+  size_t nv=vvi.size();
+  for (size_t i=0; i<nv; ++i)
     {
     sout << "[" << i << "]{";
-    int ni=vvi[i].size();
+    size_t ni=vvi[i].size();
     if (ni<1)
       {
       sout << "}" << endl;
       continue;
       }
     sout << vvi[i][0];
-    for (int j=1; j<ni; ++j)
+    for (size_t j=1; j<ni; ++j)
       {
       sout << "," << vvi[i][j];
       }
@@ -559,14 +559,14 @@ ostream &operator<<(ostream &sout, vector<vector<int> >&vvi)
 ostream &operator<<(ostream &sout, vector<int> &vi)
 {
   sout << "{";
-  int ni=vi.size();
+  size_t ni=vi.size();
   if (ni<1)
     {
     sout << "}";
     return sout;
     }
   sout << vi[0];
-  for (int j=1; j<ni; ++j)
+  for (size_t j=1; j<ni; ++j)
     {
     sout << "," << vi[j];
     }
@@ -656,7 +656,7 @@ template<typename TCnt>
 void PrintHistogram(vector<TCnt> &bins)
 {
   // generate default labels, 0...n
-  const int n=bins.size();
+  const int n = static_cast<int>(bins.size());
   vector<int> binIds(n);
   for (int i=0; i<n; ++i)
     {

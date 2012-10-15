@@ -50,6 +50,9 @@ struct PQWIDGETS_EXPORT pqSetName
 {
   pqSetName(const QString& Name);
   const QString Name;
+
+private:
+  void operator=(const pqSetName&);
 };
 
 /// Sets a Qt object's name

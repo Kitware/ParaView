@@ -56,7 +56,7 @@ void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)
 {
   // Prep.
   this->Clear();
-  size_t nLocalIds = ids.size();
+  int nLocalIds = static_cast<int>(ids.size());
   // Anything to do?
   if (nLocalIds<1)
   {
@@ -65,7 +65,7 @@ void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)
   // Make a copy of incoming, convert to list items to track
   // local id as items are sorted.
   this->IdList.resize(nLocalIds);
-  for (size_t localId=0; localId<nLocalIds; ++localId)
+  for (int localId=0; localId<nLocalIds; ++localId)
   {
     int globalId=ids[localId];
     this->IdList[localId].Initialize(localId,globalId);
