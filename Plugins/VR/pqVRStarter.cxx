@@ -39,7 +39,79 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRQueue.h"
 #include "pqVRQueueHandler.h"
 #include "pqApplicationCore.h"
+#include "pqTestUtility.h"
 #include "pqVRConnectionManager.h"
+#include "pqWidgetEventPlayer.h"
+
+// Used for testing:
+#include <pqVRPNConnection.h>
+class pqVREventPlayer : public pqWidgetEventPlayer
+{
+  typedef pqWidgetEventPlayer Superclass;
+public:
+  pqVREventPlayer(QObject* p) : Superclass(p) { }
+  virtual bool playEvent(QObject*, const QString& command,
+                         const QString& arguments, bool& error)
+  {
+    if (command == "pqVREvent")
+      {
+      if (arguments.startsWith("vrpn_trackerEvent"))
+        {
+        // Syntax is (one line:)
+        // "vrpn_trackerEvent:[connName];[sensorid];[pos_x],[pos_y],[pos_z];
+        // [quat_w],[quat_x],[quat_y],[quat_z]"
+        QRegExp capture("vrpn_trackerEvent:"
+                        "([\\w.@]+);" // Connection name
+                        "(\\d+);"     // sensor id
+                        "([\\d.-]+)," // pos_x
+                        "([\\d.-]+)," // pos_y
+                        "([\\d.-]+);" // pos_z
+                        "([\\d.-]+)," // quat_w
+                        "([\\d.-]+)," // quat_x
+                        "([\\d.-]+)," // quat_y
+                        "([\\d.-]+)$" // quat_z
+                        );
+        int ind = capture.indexIn(arguments);
+        if (ind < 0)
+          {
+          qWarning() << "pqVREventPlayer: bad arguments:" << command;
+          error = true;
+          return false;
+          }
+        vrpn_TRACKERCB event;
+        QString connName;
+        connName      = capture.cap(1);
+        event.sensor  = capture.cap(2).toInt();
+        event.pos[0]  = capture.cap(3).toDouble();
+        event.pos[1]  = capture.cap(4).toDouble();
+        event.pos[2]  = capture.cap(5).toDouble();
+        event.quat[0] = capture.cap(6).toDouble();
+        event.quat[1] = capture.cap(7).toDouble();
+        event.quat[2] = capture.cap(8).toDouble();
+        event.quat[3] = capture.cap(9).toDouble();
+        pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
+        pqVRPNConnection *conn = mgr->GetVRPNConnection(connName);
+        if (!conn)
+          {
+          qWarning() << "pqVREventPlayer: bad connection name:" << command;
+          error = true;
+          return false;
+          }
+        conn->newTrackerValue(event);
+        return true;
+        }
+      else
+        {
+        error = true;
+        }
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
+};
 
 //-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
@@ -59,6 +131,11 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
   this->Internals->StyleFactory = NULL;
+
+  pqVREventPlayer *player = new pqVREventPlayer(NULL);
+  pqApplicationCore::instance()->testUtility()->eventPlayer()->
+      addWidgetEventPlayer(player);
+
   this->IsShutdown = true;
 }
 

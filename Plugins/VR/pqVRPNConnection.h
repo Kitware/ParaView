@@ -151,6 +151,8 @@ protected slots:
 
 protected:
   std::string name( int eventType, int id=0 );
+
+  friend class pqVREventPlayer;
   void newAnalogValue(vrpn_ANALOGCB data);
   void newButtonValue(vrpn_BUTTONCB data);
   void newTrackerValue(vrpn_TRACKERCB data );
