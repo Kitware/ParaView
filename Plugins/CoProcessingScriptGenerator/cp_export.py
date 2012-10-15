@@ -21,6 +21,9 @@ rescale_data_range = %4
 # File path that we want to generate
 fileName = "%5"
 
+# Do we do live visualization inside ParaView ?
+live_viz = %6
+
 # -----------------------------------------------------------------------------
 # The output_contents is the templet script that accept 2 arguments:
 #  1) The Pipeline class definition
@@ -39,7 +42,12 @@ except:
   exec vtkCoProcessorPython.vtkCPHelperScripts.GetPythonHelperScript()
 
 # Global variables that will hold the pipeline for each timestep
-pipeline   = None
+pipeline = None
+
+# Live visualization inside ParaView
+live_visu_active = %s
+pv_host = "localhost"
+pv_port = 22222
 
 %s
 
@@ -70,15 +78,12 @@ def DoCoProcessing(datadescription):
     # Write output data
     WriteAllData(datadescription, cp_writers, timestep);
 
-    # rescale data range ?
-    if %s:
-        RescaleDataRange(datadescription, cp_views, timestep)
+    # Write image capture (Last arg: rescale lookup table)
+    WriteAllImages(datadescription, cp_views, timestep, %s)
 
-    # Write image capture
-    WriteAllImages(datadescription, cp_views, timestep)
-
-    # explicitly delete the proxies -- we do it this way to avoid problems with prototypes
-    # (Not sure we still need it) CleanupProxies()
+    # Live Visualization
+    if (len(cp_views) == 0) and live_visu_active:
+       DoLiveInsitu(timestep, pv_host, pv_port)
 
 """
 
@@ -88,6 +93,7 @@ def DoCoProcessing(datadescription):
 
 outFile = open(fileName, 'w')
 outFile.write(output_contents % \
-  ( DumpPipeline(export_rendering, simulation_input_map, screenshot_info), \
+  ( live_viz, \
+    DumpPipeline(export_rendering, simulation_input_map, screenshot_info), \
     rescale_data_range))
 outFile.close()

@@ -18,6 +18,9 @@ print "Initialize Helper Script"
 # boolean telling if we want to export rendering.
 export_rendering = False
 
+# Live institu visualization
+live_insitu = None
+
 # string->string map with key being the proxyname while value being the
 # simulation input name.
 simulation_input_map = { };
@@ -187,7 +190,10 @@ def WriteAllData(datadescription, cp_writers, timestep):
 # Write images to disk based on the frequency for the set of cp_views
 # -----------------------------------------------------------------------------
 
-def WriteAllImages(datadescription, cp_views, timestep):
+def WriteAllImages(datadescription, cp_views, timestep, rescale_lookuptable):
+    if rescale_lookuptable:
+        RescaleDataRange(datadescription, cp_views, timestep)
+
     for view in cp_views:
         if timestep % view.cpFrequency == 0 or datadescription.GetForceOutput() == True:
             fname = view.cpFileName
@@ -396,3 +402,33 @@ def IsInModulo(timestep, frequencyArray):
    return False
 
 # -----------------------------------------------------------------------------
+# Live Insitu Visualization
+# -----------------------------------------------------------------------------
+
+def DoLiveInsitu(timestep, pv_host="localhost", pv_port=22222):
+   global live_insitu
+
+   # make sure the live insitu is initialized
+   if not live_insitu:
+      # Create the vtkLiveInsituLink i.e.  the "link" to the visualization processes.
+      live_insitu = servermanager.vtkLiveInsituLink()
+
+      # Tell vtkLiveInsituLink what host/port must it connect to for the visualization
+      # process.
+      live_insitu.SetHostname(pv_host)
+      live_insitu.SetInsituPort(pv_port)
+
+      # Initialize the "link"
+      live_insitu.SimulationInitialize(servermanager.ActiveConnection.Session.GetSessionProxyManager())
+
+   # For every new timestep, update the simulation state before proceeding.
+   live_insitu.SimulationUpdate(timestep)
+
+   # sources need to be updated by insitu code. vtkLiveInsituLink never updates
+   # the pipeline, it simply uses the data available at the end of the pipeline,
+   # if any.
+   for source in GetSources().values():
+      source.UpdatePipeline(timestep)
+
+   # push extracts to the visualization process.
+   live_insitu.SimulationPostProcess(timestep)
