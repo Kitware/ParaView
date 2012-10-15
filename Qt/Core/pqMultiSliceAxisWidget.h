@@ -84,11 +84,17 @@ signals:
   /// Signal emitted when the model has changed internally
   void modelUpdated();
 
+  /// Signal emitted when a mark is clicked. The value is inside the provided range
+  void markClicked(int button, int modifier, double value);
+
 protected:
   vtkContextScene* scene() const;
 
   /// Internal VTK callback used to emit the modelUpdated() signal
   void invalidateCallback(vtkObject*, unsigned long, void*);
+
+  /// Internal VTK callback used to emit markClicked(...) signale
+  void onMarkClicked(vtkObject*, unsigned long, void*);
 
 private:
   pqMultiSliceAxisWidget(const pqMultiSliceAxisWidget&); // Not implemented.

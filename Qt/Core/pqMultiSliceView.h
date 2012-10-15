@@ -46,6 +46,22 @@ public:
   /// Override to decorate the QVTKWidget
   virtual QWidget* createWidget();
 
+  /// Provide access to slices positions for any axis.
+  /// 0 <= axisIndex <= 2
+  const double* GetSlices(int axisIndex, int &numberOfSlices);
+
+  /// Provide access to slices normal for any axis.
+  /// 0 <= axisIndex <= 2
+  const double* GetSliceNormal(int axisIndex);
+
+  /// Provide access to slices origin for any axis.
+  /// 0 <= axisIndex <= 2
+  const double* GetSliceOrigin(int axisIndex);
+
+signals:
+  void slicesChanged();
+  void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
+
 public slots:
   void updateAxisBounds();
   void updateAxisBounds(double bounds[6]);
@@ -66,6 +82,13 @@ protected:
   QMap<pqRepresentation*, unsigned int> ObserverIdX;
   QMap<pqRepresentation*, unsigned int> ObserverIdY;
   QMap<pqRepresentation*, unsigned int> ObserverIdZ;
+
+  double NormalValuesHolder[9];
+  double OriginValuesHolder[9];
+
+protected slots:
+  // Internal slot that will emit sliceClicked()
+  void onSliceClicked(int button, int modifier, double value);
 
 private:
   pqMultiSliceView(const pqMultiSliceView&); // Not implemented.

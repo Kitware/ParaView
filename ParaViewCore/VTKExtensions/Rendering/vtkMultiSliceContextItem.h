@@ -88,6 +88,14 @@ public:
   // Allow user to programatically update the data model
   void SetSlices(double* values, bool* visibility, int numberOfSlices);
 
+  // Description:
+  // Return the slice position for a given index
+  double GetSliceValue(int sliceIndex);
+
+  // Description:
+  // Return the number of slices
+  int GetNumberOfSlices();
+
 protected:
   double ScreenToRange(float position);
   double ComputeEpsilon(int numberOfPixel = 5);
