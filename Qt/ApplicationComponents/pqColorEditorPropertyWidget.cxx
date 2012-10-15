@@ -60,57 +60,12 @@ pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
 
   pqRepresentation *representation = qobject_cast<pqRepresentation *>(pqproxy);
 
-  QWidget *colorWidget = 0;
-
   if(smProxy->GetProperty("Representation") != NULL)
     {
     QList<pqGenericSummaryDisplayPanel::DisplayAttributes> attributes;
-
-    const char *representationName = vtkSMPropertyHelper(smProxy, "Representation").GetAsString(0);
-
-    if(strcmp(representationName, "Surface") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      }
-    else if(strcmp(representationName, "Points") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      attributes.append(pqGenericSummaryDisplayPanel::PointSize);
-      }
-    else if(strcmp(representationName, "Wireframe") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      attributes.append(pqGenericSummaryDisplayPanel::LineWidth);
-      }
-    else if(strcmp(representationName, "Surface With Edges") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      attributes.append(pqGenericSummaryDisplayPanel::EdgeColor);
-      }
-    else if(strcmp(representationName, "Slice") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      attributes.append(pqGenericSummaryDisplayPanel::SliceDirection);
-      attributes.append(pqGenericSummaryDisplayPanel::SliceNumber);
-      }
-    else if(strcmp(representationName, "Volume") == 0)
-      {
-      attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-      attributes.append(pqGenericSummaryDisplayPanel::VolumeMapper);
-      }
-
-    colorWidget = new pqGenericSummaryDisplayPanel(representation, attributes);
-    }
-  else if(strcmp(smProxy->GetXMLName(), "ImageSliceRepresentation") == 0)
-    {
-    QList<pqGenericSummaryDisplayPanel::DisplayAttributes> attributes;
-    attributes.append(pqGenericSummaryDisplayPanel::SliceDirection);
-    attributes.append(pqGenericSummaryDisplayPanel::SliceNumber);
-    colorWidget = new pqGenericSummaryDisplayPanel(representation, attributes);
-    }
-
-  if(colorWidget)
-    {
+    attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
+    QWidget *colorWidget =
+      new pqGenericSummaryDisplayPanel(representation, attributes);
     groupBoxLayout->addWidget(colorWidget);
     }
 
