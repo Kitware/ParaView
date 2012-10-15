@@ -1272,6 +1272,29 @@
       </StringVectorProperty>
       <!-- End HierarchicalBoxDataReader -->
     </SourceProxy>
+
+    <SourceProxy class="vtkXMLUniformGridAMRReader"
+                 label="XML UniformGrid AMR reader"
+                 name="XMLUniformGridAMRReaderCore">
+      <IntVectorProperty command="SetMaximumLevelsToReadByDefault"
+                         name="DefaultNumberOfLevels"
+                         number_of_elements="1"
+                         default_values="1"
+                         panel_visibility="default">
+        <IntRangeDomain name="range" min="0" max="10" />
+        <Documentation>
+          This reader supports demand-driven heavy data reading i.e. downstream
+          pipeline can request specific blocks from the AMR using
+          vtkCompositeDataPipeline::UPDATE_COMPOSITE_INDICES() key in
+          RequestUpdateExtent() pass. However, when down-stream doesn't provide
+          any specific keys, the default behavior can be setup to read at-most N
+          levels by default. The number of levels read can be set using this
+          method.  Set this to 0 to imply no limit. Default is 0.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End XMLUniformGridAMRReaderCore -->
+    </SourceProxy>
+
     <SourceProxy class="vtkSLACParticleReader"
                  label="SLAC Particle Data Reader"
                  name="SLACParticleReaderCore">
@@ -3164,6 +3187,61 @@
       </Hints>
       <!-- end of XMLMultiBlockDataReader -->
     </SourceProxy>
+
+    <SourceProxy class="vtkFileSeriesReader"
+                 file_name_method="SetFileName"
+                 label="XML UniformGrid AMR Reader"
+                 name="XMLUniformGridAMRReader"
+                 si_class="vtkSIFileSeriesReaderProxy">
+      <Documentation long_help="Reads a VTK XML-based data file containing a AMR datasets ."
+                     short_help="Read a VTK data file containing AMR dataset.">
+                     This reader reads Overlapping and Non-Overlapping AMR
+                     datasets in VTK XML format. This reader reads the newer
+                     version of the format. For version 1.0 and less, use
+                     XMLHierarchicalBoxDataReader.
+                     The expected file extensions is either .vthb or .vth.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="XMLUniformGridAMRReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="DefaultNumberOfLevels" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            information_property="FileNameInfo"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>The list of files to be read by the reader. Each file is
+        expected to be in the VTK XML polygonal dataset format. The standard
+        extension is .vtp. If more than one file is specified, the reader will
+        switch to file series mode in which it will pretend that it can support
+        time and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="vthb vth"
+                       file_description="VTK Hierarchical Box Data Files" />
+      </Hints>
+      <!-- end of XMLUniformGridAMRReader -->
+    </SourceProxy>
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML Hierarchical Box Data reader"
@@ -3206,12 +3284,15 @@
         <TimeStepsInformationHelper />
         <Documentation>Available timestep values.</Documentation>
       </DoubleVectorProperty>
+      <!--
       <Hints>
         <ReaderFactory extensions="vthb vth"
                        file_description="VTK Hierarchical Box Data Files" />
       </Hints>
+      -->
       <!-- end of XMLHierarchicalBoxDataReader -->
     </SourceProxy>
+
     <SourceProxy class="vtkFileSeriesReader"
                  file_name_method="SetFileName"
                  label="XML PolyData Reader"

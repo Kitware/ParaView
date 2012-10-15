@@ -18,6 +18,7 @@
 #include "vtkAMRInformation.h"
 #include "vtkBoundingBox.h"
 #include "vtkCellData.h"
+#include "vtkIdList.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
@@ -27,6 +28,7 @@
 #include "vtkPVStreamingMacros.h"
 #include "vtkUniformGridAMRDataIterator.h"
 #include "vtkUniformGrid.h"
+#include "vtkVoxel.h"
 #include "vtkXMLImageDataWriter.h"
 
 #include <algorithm>
@@ -54,6 +56,13 @@ vtkResampledAMRImageSource::vtkResampledAMRImageSource()
 //----------------------------------------------------------------------------
 vtkResampledAMRImageSource::~vtkResampledAMRImageSource()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkResampledAMRImageSource::Reset()
+{
+  vtkMath::UninitializeBounds(this->SpatialBounds);
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -103,6 +112,12 @@ void vtkResampledAMRImageSource::UpdateResampledVolume(
       {
       this->ResampledAMR->GetCellData()->GetAbstractArray(cc)->Modified();
       }
+    for (int cc=0;
+      this->ResampledAMRPointData &&
+      cc < this->ResampledAMRPointData->GetNumberOfArrays(); cc++)
+      {
+      this->ResampledAMRPointData->GetAbstractArray(cc)->Modified();
+      }
     }
     
   //vtkNew<vtkXMLImageDataWriter> tmp;
@@ -123,12 +138,26 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
 
   vtkNew<vtkImageData> output;
 
-  double amr_bounds[6];
-  amr->GetBounds(amr_bounds);
+  double bounds[6];
+  amr->GetBounds(bounds);
 
-  const double *bounds =
-    vtkMath::AreBoundsInitialized(this->SpatialBounds)?
-    this->SpatialBounds : amr_bounds;
+  vtkStreamingStatusMacro("Data bounds: "
+    << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
+    << bounds[3] << ", " << bounds[4] << ", " << bounds[5]);
+
+  vtkBoundingBox amrBBox(bounds);
+  if (vtkMath::AreBoundsInitialized(this->SpatialBounds))
+    {
+    vtkStreamingStatusMacro("Spatial bounds: "
+      << this->SpatialBounds[0] << ", " << this->SpatialBounds[1] << ", "
+      << this->SpatialBounds[2] << ", " << this->SpatialBounds[3] << ", "
+      << this->SpatialBounds[4] << ", " << this->SpatialBounds[5]);
+
+    if (amrBBox.IntersectBox(this->SpatialBounds))
+      {
+      amrBBox.GetBounds(bounds);
+      }
+    }
 
   vtkStreamingStatusMacro("Image bounds: "
     << bounds[0] << ", " << bounds[1] << ", " << bounds[2] << ", "
@@ -182,6 +211,15 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   output->SetDimensions(dimensions);
   output->SetOrigin(origin);
   output->SetSpacing(spacing);
+  vtkStreamingStatusMacro("Volume Origin: " << origin[0] << ", "
+                                            << origin[1] << ", "
+                                            << origin[2]);
+  vtkStreamingStatusMacro("Volume Spacing: " << spacing[0] << ", "
+                                             << spacing[1] << ", "
+                                             << spacing[2]);
+  vtkStreamingStatusMacro("Volume Dimensions: " << dimensions[0] << ", "
+                                                << dimensions[1] << ", "
+                                                << dimensions[2]);
 
   // locate first non-null uniform grid in the AMR. That's the one we use to
   // model the field arrays.
@@ -207,6 +245,20 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   // Add point arrays in the output that correspond to the cell arrays in the
   // input.
   output->GetCellData()->CopyAllocate(reference->GetCellData(), numCells);
+
+  if (reference->GetPointData()->GetNumberOfArrays() > 0)
+    {
+    // If reference grid has point data, we are going to pass that through as
+    // well. However we cannot put those in the output->CellData since that will
+    // confuse all CopyData() calls. So we just keep it separate and pass it to
+    // the dualGrid directly.
+    this->ResampledAMRPointData = vtkSmartPointer<vtkPointData>::New();
+    this->ResampledAMRPointData->InterpolateAllocate(reference->GetPointData(), numCells);
+    }
+  else
+    {
+    this->ResampledAMRPointData = NULL;
+    }
 
   // Generate a mask array that's used to keep track of which point comes from
   // which level. We use this array to avoid overwriting data from  higher
@@ -235,13 +287,32 @@ bool vtkResampledAMRImageSource::Initialize(vtkOverlappingAMR* amr)
   dualGrid->SetSpacing(output->GetSpacing());
   dualGrid->GetPointData()->PassData(output->GetCellData());
 
+  // Pass arrays from this->ResampledAMRPointData to  the dualGrid as well.
+  for (int cc=0;
+       this->ResampledAMRPointData != NULL &&
+       cc < this->ResampledAMRPointData->GetNumberOfArrays();
+       cc++)
+    {
+    vtkAbstractArray* curArray =
+      this->ResampledAMRPointData->GetAbstractArray(cc);
+
+    if (curArray && curArray->GetName() &&
+      dualGrid->GetPointData()->GetAbstractArray(curArray->GetName()) == NULL)
+      {
+      dualGrid->GetPointData()->AddArray(curArray);
+      }
+    }
+
   this->SetOutput(dualGrid.GetPointer());
   this->InitializationTime.Modified();
 
   vtkStreamingStatusMacro("Resample volume has been initialized.");
   vtkStreamingStatusMacro("    number of cells :" << numCells);
-  vtkStreamingStatusMacro("    number of array  :" <<
+  vtkStreamingStatusMacro("    number of cell arrays  :" <<
     output->GetCellData()->GetNumberOfArrays());
+  vtkStreamingStatusMacro("    number of point arrays  :" <<
+    (this->ResampledAMRPointData?
+     this->ResampledAMRPointData->GetNumberOfArrays() : 0))
   return true;
 }
 
@@ -266,13 +337,15 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
   double receiver_spacing[3];
   this->ResampledAMR->GetSpacing(receiver_spacing);
 
-  for (double z = updateBounds.GetMinPoint()[2] + receiver_spacing[2]/2.0;
+  vtkNew<vtkIdList> cellPoints;
+
+  for (double z = updateBounds.GetMinPoint()[2] ;
     z <= updateBounds.GetMaxPoint()[2]; z+= receiver_spacing[2])
     {
-    for (double y = updateBounds.GetMinPoint()[1] + receiver_spacing[1]/2.0;
+    for (double y = updateBounds.GetMinPoint()[1];
       y <= updateBounds.GetMaxPoint()[1]; y+= receiver_spacing[1])
       {
-      for (double x = updateBounds.GetMinPoint()[0] + receiver_spacing[0]/2.0;
+      for (double x = updateBounds.GetMinPoint()[0];
         x < updateBounds.GetMaxPoint()[0]; x+= receiver_spacing[0])
         {
         double sample_point[3] = {x, y, z};
@@ -292,6 +365,25 @@ bool vtkResampledAMRImageSource::UpdateResampledVolume(
           }
         this->ResampledAMR->GetCellData()->CopyData(
           donor->GetCellData(), donor_cellId, receiver_cellid);
+        if (this->ResampledAMRPointData)
+          {
+          donor->GetCellPoints(donor_cellId, cellPoints.GetPointer());
+          vtkIdType numPoints = cellPoints->GetNumberOfIds();
+          assert(numPoints <= 8);
+          if (numPoints > 0)
+            {
+            double weight, weights[8];
+            weight = 1.0 / numPoints;
+            for (vtkIdType cc=0; cc < numPoints; cc++)
+              {
+              weights[cc] = weight;
+              }
+
+            this->ResampledAMRPointData->InterpolatePoint(
+              donor->GetPointData(), receiver_cellid, cellPoints.GetPointer(),
+              weights);
+            }
+          }
         something_changed = true;
         this->DonorLevel->SetValue(receiver_cellid, static_cast<int>(level));
         }

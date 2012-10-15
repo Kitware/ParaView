@@ -15,6 +15,7 @@
 #include "vtkAMRStreamingPriorityQueue.h"
 
 #include "vtkAMRInformation.h"
+#include "vtkBoundingBox.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -182,6 +183,16 @@ void vtkAMRStreamingPriorityQueue::Initialize(vtkAMRInformation* amr)
 }
 
 //----------------------------------------------------------------------------
+void vtkAMRStreamingPriorityQueue::Reinitialize()
+{
+  if (this->Internals->AMRMetadata)
+    {
+    vtkSmartPointer<vtkAMRInformation> info = this->Internals->AMRMetadata;
+    this->Initialize(info);
+    }
+}
+
+//----------------------------------------------------------------------------
 bool vtkAMRStreamingPriorityQueue::IsEmpty()
 {
   return this->Internals->PriorityQueue.empty();
@@ -217,10 +228,24 @@ unsigned int vtkAMRStreamingPriorityQueue::Pop()
 //----------------------------------------------------------------------------
 void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
 {
+  double clamp_bounds[6];
+  vtkMath::UninitializeBounds(clamp_bounds);
+  this->Update(view_planes, clamp_bounds);
+}
+
+//----------------------------------------------------------------------------
+void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24],
+  const double clamp_bounds[6])
+{
   if (!this->Internals->AMRMetadata)
     {
     return;
     }
+
+  bool clamp_bounds_initialized =
+    (vtkMath::AreBoundsInitialized(const_cast<double*>(clamp_bounds)) != 0);
+  vtkBoundingBox clampBox(
+    const_cast<double*>(clamp_bounds));
 
   vtkInternals::PriorityQueueType current_queue;
   std::swap(current_queue, this->Internals->PriorityQueue);
@@ -234,6 +259,18 @@ void vtkAMRStreamingPriorityQueue::Update(const double view_planes[24])
 
     double block_bounds[6];
     this->Internals->AMRMetadata->GetBounds(level, index, block_bounds);
+
+    if (clamp_bounds_initialized)
+      {
+      if (!clampBox.ContainsPoint(
+          block_bounds[0], block_bounds[2], block_bounds[4]) &&
+        !clampBox.ContainsPoint(
+          block_bounds[1], block_bounds[3], block_bounds[5]))
+        {
+        // if the block_bounds is totally outside the clamp_bounds, skip it.
+        continue;
+        }
+      }
 
     double distance;
     double coverage = vtkComputeScreenCoverage(

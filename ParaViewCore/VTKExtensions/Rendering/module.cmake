@@ -35,6 +35,7 @@ vtk_module(vtkPVVTKExtensionsRendering
   TEST_DEPENDS
     vtkInteractionStyle
     vtkIOAMR
+    vtkIOXML
     vtkRenderingOpenGL
     vtkTestingRendering
 

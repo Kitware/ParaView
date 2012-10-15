@@ -12,9 +12,10 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkPVClientServerCoreCore
     vtkPVVTKExtensionsRendering
     vtkRenderingLabel
+    vtkRenderingVolumeAMR
+    vtkRenderingVolumeOpenGL
     vtkViewsContext2D
     vtkViewsCore
-    vtkRenderingVolumeOpenGL
     ${__dependencies}
   TEST_LABELS
     PARAVIEW

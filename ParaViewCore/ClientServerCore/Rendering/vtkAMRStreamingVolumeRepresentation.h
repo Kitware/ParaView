@@ -31,6 +31,7 @@ class vtkImageData;
 class vtkOverlappingAMR;
 class vtkPiecewiseFunction;
 class vtkPVLODVolume;
+class vtkPVRenderView;
 class vtkResampledAMRImageSource;
 class vtkSmartVolumeMapper;
 class vtkVolumeProperty;
@@ -42,6 +43,22 @@ public:
   static vtkAMRStreamingVolumeRepresentation* New();
   vtkTypeMacro(vtkAMRStreamingVolumeRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
+  
+  enum ResamplingModes
+    {
+    RESAMPLE_OVER_DATA_BOUNDS=0,
+    RESAMPLE_USING_VIEW_FRUSTUM=1
+    };
+
+  // Description:
+  // This control the logic used to determine how to place the resampling grid
+  // within the AMR bounds.
+  // \li RESAMPLE_OVER_DATA_BOUNDS implies that the amr volume is
+  // set to the data bounds and is not updated as the user interacts.
+  // \li RESAMPLE_USING_VIEW_FRUSTUM indicates that the uniform grid must be
+  // repositioned when the camera changes using the current view frustum.
+  void SetResamplingMode(int val);
+  vtkGetMacro(ResamplingMode, int);
 
   // Description:
   // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
@@ -61,6 +78,12 @@ public:
   // Get/Set the resample buffer size. This controls the resolution at which the
   // data is resampled.
   void SetNumberOfSamples(int x, int y, int z);
+
+  // Description:
+  // Set the number of blocks to request at a given time on a single process
+  // when streaming.
+  vtkSetClampMacro(StreamingRequestSize, int, 1, 10000);
+  vtkGetMacro(StreamingRequestSize, int);
 
   //***************************************************************************
   // Scalar coloring API (forwarded for vtkSmartVolumeMapper.
@@ -167,7 +190,7 @@ protected:
   // This method will update the PriorityQueue using the view planes specified
   // and then call Update() on the representation, making it reexecute and
   // regenerate the outline for the next "piece" of data.
-  bool StreamingUpdate(const double view_planes[24]);
+  bool StreamingUpdate(vtkPVRenderView* view, const double view_planes[24]);
 
   // Description:
   // This is the data object generated processed by the most recent call to
@@ -202,6 +225,9 @@ protected:
   // Description:
   // Used to keep track of data bounds.
   vtkBoundingBox DataBounds;
+
+  int ResamplingMode;
+  int StreamingRequestSize;
 
 private:
   vtkAMRStreamingVolumeRepresentation(const vtkAMRStreamingVolumeRepresentation&); // Not implemented
