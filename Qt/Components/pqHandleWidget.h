@@ -65,9 +65,6 @@ private slots:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-  
-  /// Internal method to cleanup widget.
-  void cleanupWidget();
 
   /// Called on pick.
   virtual void pick(double, double, double);

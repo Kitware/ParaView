@@ -101,7 +101,6 @@ pqContourWidget::pqContourWidget(
 //-----------------------------------------------------------------------------
 pqContourWidget::~pqContourWidget()
 {
-  this->cleanupWidget();
   delete this->Internals;
 }
 
@@ -125,20 +124,6 @@ void pqContourWidget::createWidget(pqServer* server)
   this->Internals->ClosedLoopConnect->Connect(
     widget, vtkCommand::EndInteractionEvent,
     this, SLOT(checkContourLoopClosed()));
-}
-
-//-----------------------------------------------------------------------------
-void pqContourWidget::cleanupWidget()
-{
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-
-  if (widget)
-    {
-    widget->InvokeCommand("Initialize");
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

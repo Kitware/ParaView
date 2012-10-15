@@ -106,9 +106,6 @@ protected:
   /// Update the widget visibility according to the WidgetVisible and Selected flags
   virtual void updateWidgetVisibility();
 
-  /// Internal method to cleanup widget.
-  void cleanupWidget();
-
 protected slots:
   void deleteAllNodes();
 
