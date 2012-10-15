@@ -518,27 +518,39 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         // Picking info
         // {r0, r1, 1} => We want to make sure the ray that start from the camera reach
         // the end of the scene so it could cross any cell of the scene
-        double display[3] = { region[0], region[1], 1 };
-        double linePoint1[3], linePoint2[3];
+        double nearDisplayPoint[3] = { region[0], region[1], 0.0 };
+        double farDisplayPoint[3] = { region[0], region[1], 1.0 };
+        double farLinePoint[3];
+        double nearLinePoint[3];
         double* world;
 
         vtkRenderer* renderer = renderViewProxy->GetRenderer();
-        renderer->SetDisplayPoint(display);
+
+        // compute near line point
+        renderer->SetDisplayPoint(nearDisplayPoint);
         renderer->DisplayToWorld();
         world = renderer->GetWorldPoint();
         for (int i=0; i < 3; i++)
           {
-          linePoint1[i] = world[i] / world[3];
+          nearLinePoint[i] = world[i] / world[3];
           }
-        renderer->GetActiveCamera()->GetPosition(linePoint2);
+
+        // compute far line point
+        renderer->SetDisplayPoint(farDisplayPoint);
+        renderer->DisplayToWorld();
+        world = renderer->GetWorldPoint();
+        for (int i=0; i < 3; i++)
+          {
+          farLinePoint[i] = world[i] / world[3];
+          }
 
         // Compute the  intersection...
         double intersection[3] = {0,0,0};
         vtkSMProxy* pickingHelper = spxm->NewProxy("misc","PickingHelper");
         vtkSMPropertyHelper(pickingHelper, "Input").Set( input );
         vtkSMPropertyHelper(pickingHelper, "Selection").Set( selection );
-        vtkSMPropertyHelper(pickingHelper, "PointA").Set(linePoint1, 3);
-        vtkSMPropertyHelper(pickingHelper, "PointB").Set(linePoint2, 3);
+        vtkSMPropertyHelper(pickingHelper, "PointA").Set(nearLinePoint, 3);
+        vtkSMPropertyHelper(pickingHelper, "PointB").Set(farLinePoint, 3);
         pickingHelper->UpdateVTKObjects();
         pickingHelper->UpdateProperty("Update",1);
         vtkSMPropertyHelper(pickingHelper, "Intersection").UpdateValueFromServer();
