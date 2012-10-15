@@ -93,7 +93,7 @@ void vtkPVSystemConfigInformation::CopyFromObject(vtkObject *obj)
   info.SystemType=sysInfo.GetOSIsWindows();
   info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
   info.Pid=sysInfo.GetProcessId();
-  info.Capacity=sysInfo.GetMemoryTotal();
+  info.Capacity=sysInfo.GetHostMemoryTotal();
 
   #ifdef vtkPVSystemConfigInformationDEBUG
   info.Print();
