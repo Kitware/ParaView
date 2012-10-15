@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessGroup.h"
+#include "vtkPolyData.h"
+#include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkUniformGrid.h"
@@ -63,6 +65,8 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
+// #define ENABLE_MARKER_GENERATION
+
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -74,6 +78,9 @@ class vtkSpyPlotReader::VectorOfDoubles : public std::vector<double> {};
 vtkSpyPlotReader::vtkSpyPlotReader()
 {
   this->SetNumberOfInputPorts(0);
+#if defined ENABLE_MARKER_GENERATION
+  this->SetNumberOfOutputPorts(2);
+#endif
 
   this->Map = new vtkSpyPlotReaderMap;
   this->Bounds = new vtkBoundingBox;
@@ -98,6 +105,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
   this->GenerateTracerArray = 0; // by default do not generate tracer array
+  this->GenerateMarkers = 0; // by default do not generate markers
   this->IsAMR = 1;
   this->FileNameChanged = true;
   this->TimeSteps = new vtkSpyPlotReader::VectorOfDoubles();
@@ -167,6 +175,15 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *req,
   outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), outData->GetExtentType());
   outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
   outData->Delete();
+
+#if defined ENABLE_MARKER_GENERATION
+  outInfo = outV->GetInformationObject(1);
+  vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::New ();
+  outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), data->GetExtentType());
+  outInfo->Set(vtkDataObject::DATA_OBJECT(), data);
+  data->Delete ();
+#endif
+
   return 1;
 }
 
@@ -204,20 +221,40 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+  vtkInformation* outInfo0 = outputVector->GetInformationObject(0);
+  outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+#if defined ENABLE_MARKER_GENERATION
+  vtkInformation* outInfo1;
+  if ( this->GenerateMarkers )
+    {
+    outInfo1 = outputVector->GetInformationObject(1);
+    outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    }
+#endif
   if (this->TimeSteps->size() > 0)
     {
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+    outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
       &(*this->TimeSteps)[0],
       static_cast<int>(this->TimeSteps->size()));
-
     double timeRange[2];
     timeRange[0] = this->TimeSteps->front();
     timeRange[1] = this->TimeSteps->back();
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+    outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
       timeRange, 2);
+
+#if defined ENABLE_MARKER_GENERATION
+    if ( this->GenerateMarkers) 
+      {
+      outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+        &(*this->TimeSteps)[0],
+        static_cast<int>(this->TimeSteps->size()));
+
+      outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
+        timeRange, 2);
+      }
+#endif
     }
   return 1;
 }
@@ -298,7 +335,10 @@ int vtkSpyPlotReader::UpdateMetaData(
 
     vtkSpyPlotUniReader *uniReader = this->Map->GetReader(iter, this);
     // Open the file and get the number time steps and arrays.
-    uniReader->ReadInformation();
+    if (uniReader->ReadInformation() == 0) 
+      {
+      return 0;
+      }
     uniReader->GetTimeStepRange(this->TimeStepRange);
     int num_timesteps  = this->TimeStepRange[1] + 1;
     timesteps.insert(timesteps.end(),
@@ -822,6 +862,25 @@ int vtkSpyPlotReader::RequestData(
     delete blockIterator;
     }
 
+#if defined ENABLE_MARKER_GENERATION
+  if (this->GenerateMarkers)
+    {
+    vtkInformation *info=outputVector->GetInformationObject(1);
+    vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
+    vtkMultiBlockDataSet *mbds=vtkMultiBlockDataSet::SafeDownCast(doOutput);
+    mbds->SetNumberOfBlocks (0);
+
+    vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
+    for ( mapIt = this->Map->Files.begin();
+          mapIt != this->Map->Files.end();
+          ++ mapIt )
+      {
+      uniReader = this->Map->GetReader(mapIt, this);
+      this->PrepareMarkers (mbds, uniReader);
+      }
+    }
+#endif
+
     // At this point, each processor has its own blocks
     // They have to exchange the blocks they have get a unique id for
     // each block over the all dataset.
@@ -1239,6 +1298,27 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
     }
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotReader::SetGenerateMarkers (int gm)
+{
+  if (this->GenerateMarkers == gm) 
+    {
+    return;
+    }
+#if defined ENABLE_MARKER_GENERATION
+  vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
+  for ( mapIt = this->Map->Files.begin();
+        mapIt != this->Map->Files.end();
+        ++ mapIt )
+    {
+    this->Map->GetReader(mapIt, this)->SetGenerateMarkers(gm);
+    }
+  this->GenerateMarkers = gm;
+#else
+  vtkErrorMacro ("GenerateMarkers is currently disabled.  Please issue a support request to enable.");
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -2014,6 +2094,123 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
       }
     }
 }
+
+int vtkSpyPlotReader::PrepareMarkers (vtkMultiBlockDataSet* mbds, 
+                vtkSpyPlotUniReader* reader)
+{
+  if (mbds->GetNumberOfBlocks () == 0) 
+    {
+    mbds->SetNumberOfBlocks (reader->GetNumberOfMaterials ());
+    for (int m = 0; m < reader->GetNumberOfMaterials (); m ++) 
+      {
+      vtkPolyData* poly = vtkPolyData::New ();
+      poly->Allocate ();
+      vtkPoints* points = vtkPoints::New ();
+      points->SetNumberOfPoints (0);
+      poly->SetPoints (points);
+      points->Delete ();
+
+      vtkIntArray* location = vtkIntArray::New ();
+      location->SetName ("Location");
+      location->SetNumberOfComponents (3);
+      location->SetNumberOfTuples (0);
+      poly->GetPointData ()->AddArray (location);
+      location->Delete ();
+
+      vtkIntArray* blockId = vtkIntArray::New ();
+      blockId->SetName ("BlockId");
+      blockId->SetNumberOfComponents (1);
+      blockId->SetNumberOfTuples (0);
+      poly->GetPointData ()->AddArray (blockId);
+      blockId->Delete ();
+
+      for (int v = 0; v < reader->Markers[m].NumVars; v ++)
+        {
+        vtkFloatArray* var = vtkFloatArray::New ();
+        var->SetName (reader->Markers[m].Variables[v].Label);
+        var->SetNumberOfComponents (1);
+        var->SetNumberOfTuples (0);
+        poly->GetPointData ()->AddArray (var);
+        var->Delete ();
+        }
+
+      mbds->SetBlock (m, poly);
+      poly->Delete ();
+      }
+    }
+
+  if (static_cast<int>(mbds->GetNumberOfBlocks ()) != reader->GetNumberOfMaterials ()) 
+    {
+    vtkErrorMacro ("Number of materials not consistent across spyplot files");
+    return 0;
+    }
+
+  for (int m = 0; m < reader->GetNumberOfMaterials (); m ++)
+    {
+    vtkPolyData* poly = vtkPolyData::SafeDownCast (mbds->GetBlock (m));
+    vtkPoints* points = poly->GetPoints ();
+    vtkPointData* pd = poly->GetPointData ();
+    vtkIntArray* location = vtkIntArray::SafeDownCast (pd->GetArray ("Location"));
+    vtkIntArray* blockId = vtkIntArray::SafeDownCast (pd->GetArray ("BlockId"));
+
+    int offset = points->GetNumberOfPoints ();
+    int length = offset + reader->Markers[m].NumRealMarks;
+    points->SetNumberOfPoints (length);
+    location->SetNumberOfTuples (length);
+    blockId->SetNumberOfTuples (length);
+
+    vtkFloatArray** vars = new vtkFloatArray*[reader->Markers[m].NumVars];
+    for (int v = 0; v < reader->Markers[m].NumVars; v ++) 
+      {
+      vars[v] = vtkFloatArray::SafeDownCast (pd->GetArray (reader->Markers[m].Variables[v].Label));
+      vars[v]->SetNumberOfTuples (length);
+      } 
+
+
+    for (int mark = 0; mark < reader->Markers[m].NumRealMarks; mark ++) 
+      {
+      float x[3];
+      int b[3];
+
+      x[0] = reader->MarkersDumps[m].XLoc->GetValue (mark);
+      b[0] = reader->MarkersDumps[m].ILoc->GetValue (mark);
+      if (reader->GetNumberOfDimensions () > 1)
+        {
+        x[1] = reader->MarkersDumps[m].YLoc->GetValue (mark);
+        b[1] = reader->MarkersDumps[m].JLoc->GetValue (mark);
+        }
+      else
+        {
+        x[1] = 0;
+        b[1] = 0;
+        }
+      if (reader->GetNumberOfDimensions () > 2)
+        {
+        x[2] = reader->MarkersDumps[m].ZLoc->GetValue (mark);
+        b[2] = reader->MarkersDumps[m].KLoc->GetValue (mark);
+        }
+      else
+        {
+        x[2] = 0;
+        b[2] = 0;
+        }
+      points->SetPoint (mark, x);
+      vtkIdType id = mark;
+      poly->InsertNextCell (VTK_VERTEX, 1, &id);
+
+      location->SetTupleValue (mark, b);
+
+      blockId->SetValue (mark, reader->MarkersDumps[m].Block->GetValue (mark));
+
+      for (int v = 0; v < reader->Markers[m].NumVars; v ++)
+        {
+        vars[v]->SetValue (mark, reader->MarkersDumps[m].Variables[v]->GetValue(mark));
+        }
+      }
+    }
+  return 1;
+}
+
 /*
 int vtkSpyPlotReader::DistributeGlobalStructure(vtkCompositeDataSet *cds)
 {
