@@ -580,4 +580,28 @@ void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
     this->UseOrientedBounds = false;
     this->CubeAxesActor->SetUseOrientedBounds(0);
     }
+
+  // Read custom Label Range
+  const char* labelRangeFieldNames[3] =
+                          {"LabelRangeForX","LabelRangeForY","LabelRangeForZ"};
+  vtkUnsignedCharArray* customRangeActiveFlag =
+      vtkUnsignedCharArray::SafeDownCast(
+        fieldData->GetArray("LabelRangeActiveFlag"));
+
+  for(int i=0; i < 3; ++i)
+    {
+    vtkFloatArray* range = vtkFloatArray::SafeDownCast(
+          fieldData->GetArray(labelRangeFieldNames[i]));
+    if(range && range->GetNumberOfTuples() > 0)
+      {
+      range->GetTuple(0, &this->CustomRange[i*2]);
+      }
+
+
+    if(customRangeActiveFlag)
+      {
+      this->CustomRangeActive[i] = (customRangeActiveFlag->GetValue(i) == 0)
+                                   ? 0 : 1;
+      }
+    }
 }

@@ -46,6 +46,21 @@ public:
   vtkGetVectorMacro(BaseW,double,3);
 
   // Description:
+  // Set the range that will be used for cube axis label along the vector for X
+  vtkSetVector2Macro(LabelRangeU,double);
+  vtkGetVectorMacro(LabelRangeU,double,2);
+
+  // Description:
+  // Set the range that will be used for cube axis label along the vector for Y
+  vtkSetVector2Macro(LabelRangeV,double);
+  vtkGetVectorMacro(LabelRangeV,double,2);
+
+  // Description:
+  // Set the range that will be used for cube axis label along the vector for Z
+  vtkSetVector2Macro(LabelRangeW,double);
+  vtkGetVectorMacro(LabelRangeW,double,2);
+
+  // Description:
   // Set the oriented bounding box
   vtkSetVector6Macro(OrientedBoundingBox,double);
   vtkGetVectorMacro(OrientedBoundingBox,double,6);
@@ -68,6 +83,11 @@ public:
   // Enable/Disable field generation for oriented bounding box annotation
   vtkSetMacro(EnableCustomTitle, int);
   vtkGetMacro(EnableCustomTitle, int);
+
+  // Description:
+  // Enable/Disable LabelRange annotation
+  vtkSetMacro(EnableCustomLabelRange, int);
+  vtkGetMacro(EnableCustomLabelRange, int);
 
   // Description:
   // Enable/Disable field generation for label that will be used for "Time:"
@@ -94,6 +114,9 @@ protected:
   double BaseU[3];
   double BaseV[3];
   double BaseW[3];
+  double LabelRangeU[2];
+  double LabelRangeV[2];
+  double LabelRangeW[2];
   double OrientedBoundingBox[6];
   char* AxisUTitle;
   char* AxisVTitle;
@@ -102,6 +125,7 @@ protected:
 
   int EnableCustomBase;
   int EnableCustomTitle;
+  int EnableCustomLabelRange;
   int EnableTimeLabel;
 
 private:
