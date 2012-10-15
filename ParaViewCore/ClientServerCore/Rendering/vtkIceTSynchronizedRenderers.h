@@ -112,6 +112,12 @@ public:
   void SetUseDepthBuffer(bool);
 
   // Description:
+  // Enable/Disable empty images optimization. Render empty images
+  // is disabled by default. It may be needed if a painter needs to
+  // make MPI global collective communication.
+  void SetRenderEmptyImages(bool);
+
+  // Description:
   // Get/Set geometry rendering pass. This pass is used to render the geometry.
   // If none specified then default rendering pipeline is used. This is
   // typically the render-pass pipeline after the CameraPass. The CameraPass is

@@ -218,6 +218,13 @@ public:
   static vtkInformationIntegerKey* USE_OUTLINE_FOR_LOD();
 
   // Description:
+  // Representation can publish this key in their REQUEST_INFORMATION()
+  // pass to indicate that the representation needs to disable
+  // IceT's empty image optimization. This is typically only needed
+  // if a painter will make use of MPI global collective communications.
+  static vtkInformationIntegerKey* RENDER_EMPTY_IMAGES();
+
+  // Description:
   // Representation can publish this key in their REQUEST_INFORMATION() pass to
   // indicate that the representation needs ordered compositing.
   static vtkInformationIntegerKey* NEED_ORDERED_COMPOSITING();
@@ -512,6 +519,11 @@ public:
   bool GetUseOrderedCompositing();
 
   // Description:
+  // Returns true when the compositor should not use the empty
+  // images optimization.
+  bool GetRenderEmptyImages();
+
+  // Description:
   // Provides access to the time when Update() was last called.
   unsigned long GetUpdateTimeStamp()
     { return this->UpdateTimeStamp; }
@@ -642,6 +654,7 @@ protected:
   bool UseOffscreenRenderingForScreenshots;
   bool UseInteractiveRenderingForSceenshots;
   bool NeedsOrderedCompositing;
+  bool RenderEmptyImages;
 
   double LODResolution;
   bool UseLightKit;

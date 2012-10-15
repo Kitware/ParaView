@@ -6,6 +6,7 @@
 set(_vtk_mpi_modules
   vtkParallelMPI
   vtkFiltersParallelImaging
+  vtkRenderingParallelLIC
   vtkIOMPIImage
   vtkFiltersParallelMPI
   # Note: Not in ParaViewXXX.xml but required by a test.
@@ -39,7 +40,7 @@ set(_vtk_modules
   vtkRenderingVolumeOpenGL
   vtkRenderingOpenGL
   vtkRenderingLOD
-  vtkRenderingHybridOpenGL
+  vtkRenderingLIC
   vtkRenderingContext2D
   vtkRenderingAnnotation
   vtkInteractionStyle

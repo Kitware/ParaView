@@ -103,13 +103,14 @@ vtkIceTCompositePass::vtkIceTCompositePass()
   this->DataReplicatedOnAllProcesses = false;
   this->ImageReductionFactor = 1;
 
+  this->RenderEmptyImages = false;
   this->UseOrderedCompositing = false;
   this->DepthOnly=false;
-  
+
   this->LastRenderedEyes[0] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedEyes[1] = new vtkSynchronizedRenderers::vtkRawImage();
   this->LastRenderedRGBAColors = this->LastRenderedEyes[0];
-    
+
   this->LastRenderedDepths = vtkFloatArray::New();
 
   this->PBO=0;
@@ -141,13 +142,13 @@ vtkIceTCompositePass::~vtkIceTCompositePass()
   this->SetController(0);
   this->IceTContext->Delete();
   this->IceTContext = 0;
-  
+
   delete this->LastRenderedEyes[0];
   delete this->LastRenderedEyes[1];
   this->LastRenderedEyes[0] = NULL;
   this->LastRenderedEyes[1] = NULL;
   this->LastRenderedRGBAColors = NULL;
-  
+
   this->LastRenderedDepths->Delete();
   this->LastRenderedDepths = NULL;
 
@@ -294,6 +295,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   // decisions.
   double allBounds[6];
   render_state->GetRenderer()->ComputeVisiblePropBounds(allBounds);
+
   //Try to detect when bounds are empty and try to let IceT know that
   //nothing is in bounds.
   if (allBounds[0] > allBounds[1])
@@ -394,6 +396,19 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   glClear(clear_mask);
   //icetEnable(ICET_CORRECT_COLORED_BACKGROUND);
 
+  // when a painter needs to use MPI global collective
+  // communications the empty images option ensures
+  // that all painters including those without visible data
+  // are executed
+  if (this->RenderEmptyImages)
+    {
+    icetEnable(ICET_RENDER_EMPTY_IMAGES);
+    }
+  else
+    {
+    icetDisable(ICET_RENDER_EMPTY_IMAGES);
+    }
+
   vtkOpenGLCheckErrorMacro("failed after SetupContext");
 }
 
@@ -421,6 +436,7 @@ void vtkIceTCompositePass::Render(const vtkRenderState* render_state)
   IceTImage renderedImage = icetGLDrawFrame();
   IceTDrawCallbackHandle = NULL;
   IceTDrawCallbackState = NULL;
+
   // isolate vtk from IceT OpenGL errors
   vtkOpenGLClearErrorMacro();
 

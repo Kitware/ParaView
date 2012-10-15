@@ -108,6 +108,10 @@ public:
   // Activates or de-activated the use of Depth Buffer in an ImageProcessingPass
   void SetUseDepthBuffer(bool);
 
+  // Description:
+  // Enable/Disable empty images optimization.
+  void SetRenderEmptyImages(bool);
+
 //BTX
 protected:
   vtkPVSynchronizedRenderer();
@@ -140,6 +144,7 @@ protected:
   vtkOpenGLRenderer* Renderer;
 
   bool UseDepthBuffer;
+  bool RenderEmptyImages;
 private:
   vtkPVSynchronizedRenderer(const vtkPVSynchronizedRenderer&); // Not implemented
   void operator=(const vtkPVSynchronizedRenderer&); // Not implemented

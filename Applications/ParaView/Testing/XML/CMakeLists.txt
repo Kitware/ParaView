@@ -139,6 +139,10 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridVolumeRendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICOnSlice.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICOnMultiblockSurface.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICOnSliceCS.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SurfaceLICOnMultiblockSurfaceCS.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
@@ -315,6 +319,11 @@ SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
 SET (XYHistogram_BREAK TRUE)
 set (ChartAxisRangeAndLabels_BREAK TRUE)
+SET (SurfaceLICOnSlice_BREAK TRUE)
+SET (SurfaceLICOnMultiblockSurface_BREAK TRUE)
+SET (SurfaceLICOnSliceCS_BREAK TRUE)
+SET (SurfaceLICOnMultiblockSurfaceCS_BREAK TRUE)
+
 
 SET(ExtractLevel_BREAK TRUE)
 
@@ -415,6 +424,12 @@ IF (NOT BUILD_SHARED_LIBS)
   SET (LoadPlugins_DISABLE_C TRUE)
   SET (NiftiReaderWriterPlugin_DISABLE_C TRUE)
   SET (SLACTools_DISABLE_C TRUE)
+  SET (SurfaceLICOnSlice_DISABLE_C TRUE)
+  SET (SurfaceLICOnMultiblockSurface_DISABLE_C TRUE)
+  SET (SurfaceLICOnSliceCS_DISABLE_CS TRUE)
+  SET (SurfaceLICOnSliceCS_DISABLE_CRS TRUE)
+  SET (SurfaceLICOnMultiblockSurfaceCS_DISABLE_CS TRUE)
+  SET (SurfaceLICOnMultiblockSurfaceCS_DISABLE_CRS TRUE)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
@@ -425,6 +440,12 @@ SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
+SET (SurfaceLICOnSlice_DISABLE_CS TRUE)
+SET (SurfaceLICOnSlice_DISABLE_CRS TRUE)
+SET (SurfaceLICOnMultiblockSurface_DISABLE_CS TRUE)
+SET (SurfaceLICOnMultiblockSurface_DISABLE_CRS TRUE)
+SET (SurfaceLICOnSliceCS_DISABLE_C TRUE)
+SET (SurfaceLICOnMultiblockSurfaceCS_DISABLE_C TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)

@@ -23,6 +23,8 @@
 #include "vtkGeometryRepresentation.h"
 
 class vtkSurfaceLICPainter;
+class vtkInformationRequestKey;
+class vtkInformation;
 
 class VTK_EXPORT vtkSurfaceLICRepresentation : public vtkGeometryRepresentation
 {
@@ -32,16 +34,59 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // vtkAlgorithm::ProcessRequest() equivalent for rendering passes. This is
+  // typically called by the vtkView to request meta-data from the
+  // representations or ask them to perform certain tasks e.g.
+  // PrepareForRendering.
+  virtual int ProcessViewRequest(vtkInformationRequestKey* request_type,
+    vtkInformation* inInfo, vtkInformation* outInfo);
+
+  // Description:
   // Indicates whether LIC should be used when doing LOD rendering.
   void SetUseLICForLOD(bool val);
 
   //***************************************************************************
   // Forwarded to vtkSurfaceLICPainter
   void SetEnable(bool val);
+
   void SetNumberOfSteps(int val);
   void SetStepSize(double val);
-  void SetLICIntensity(double val);
+  void SetNormalizeVectors(int val);
+
   void SetEnhancedLIC(int val);
+
+  void SetEnhanceContrast(int val);
+  void SetLowLICContrastEnhancementFactor(double val);
+  void SetHighLICContrastEnhancementFactor(double val);
+  void SetLowColorContrastEnhancementFactor(double val);
+  void SetHighColorContrastEnhancementFactor(double val);
+  void SetAntiAlias(int val);
+
+  void SetColorMode(int val);
+  void SetMapModeBias(double val);
+  void SetLICIntensity(double val);
+
+  void SetMaskOnSurface(int val);
+  void SetMaskThreshold(double val);
+  void SetMaskColor(double *val);
+  void SetMaskColor(double r, double g, double b){ double rgb[3]={r,g,b}; this->SetMaskColor(rgb); }
+  void SetMaskIntensity(double val);
+
+  void SetGenerateNoiseTexture(int val);
+  void SetNoiseType(int val);
+  void SetNoiseTextureSize(int val);
+  void SetNoiseGrainSize(int val);
+  void SetMinNoiseValue(double val);
+  void SetMaxNoiseValue(double val);
+  void SetNumberOfNoiseLevels(int val);
+  void SetImpulseNoiseProbability(double val);
+  void SetImpulseNoiseBackgroundValue(double val);
+  void SetNoiseGeneratorSeed(int val);
+
+  void SetCompositeStrategy(int val);
+
+  void WriteTimerLog(const char *fileName);
+
   void SelectInputVectors(int, int, int, int attributeMode, const char* name);
 
 //BTX

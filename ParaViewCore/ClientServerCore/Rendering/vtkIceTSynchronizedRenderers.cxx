@@ -385,6 +385,12 @@ void vtkIceTSynchronizedRenderers::SetRenderer(vtkRenderer* ren)
 }
 
 //----------------------------------------------------------------------------
+void vtkIceTSynchronizedRenderers::SetRenderEmptyImages(bool useREI)
+{
+  this->IceTCompositePass->SetRenderEmptyImages(useREI);
+}
+
+//----------------------------------------------------------------------------
 void vtkIceTSynchronizedRenderers::SetImageReductionFactor(int val)
 {
   // Don't call superclass. Since ice-t has better mechanisms for dealing with

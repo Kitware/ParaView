@@ -116,6 +116,12 @@ public:
   vtkGetObjectMacro(KdTree,vtkPKdTree);
   virtual void SetKdTree(vtkPKdTree *kdtree);
 
+  // Description:
+  // Enable/disable rendering of empty images. Painters that use MPI global
+  // collective communication need to enable this. Initial value is false.
+  vtkGetMacro(RenderEmptyImages, bool);
+  vtkSetMacro(RenderEmptyImages, bool);
+  vtkBooleanMacro(RenderEmptyImages, bool);
 
   // Description:
   // Set this to true, if compositing must be done in a specific order. This is
@@ -192,6 +198,7 @@ protected:
   vtkRenderPass* RenderPass;
   vtkIceTContext* IceTContext;
 
+  bool RenderEmptyImages;
   bool UseOrderedCompositing;
   bool DepthOnly;
   bool DataReplicatedOnAllProcesses;
@@ -204,7 +211,7 @@ protected:
   double PhysicalViewport[4];
 
   int ImageReductionFactor;
-  
+
   vtkFloatArray *LastRenderedDepths;
 
   vtkPixelBufferObject *PBO;
