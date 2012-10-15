@@ -27,6 +27,8 @@
 #include "vtkSMSessionProxyManager.h"
 
 #include <vtksys/ios/sstream>
+// #define vtkSMLiveInsituLinkProxyDebugMacro(x) cout << __LINE__ << " " x << endl;
+#define vtkSMLiveInsituLinkProxyDebugMacro(x)
 
 class vtkSMLiveInsituLinkProxy::vtkInternals
 {
@@ -76,7 +78,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
   if (msg->HasExtension(ChatMessage::author)
     && msg->HasExtension(ChatMessage::txt))
     {
-    cout << "Received message" << endl;
+    vtkSMLiveInsituLinkProxyDebugMacro("Received message");
     switch (msg->GetExtension(ChatMessage::author))
       {
     case vtkLiveInsituLink::CONNECTED:
@@ -89,7 +91,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
       break;
 
     case vtkLiveInsituLink::DISCONNECTED:
-      cout << "Catalyst disconnected!!!" << endl;
+      vtkSMLiveInsituLinkProxyDebugMacro("Catalyst disconnected!!!");
       this->InvokeEvent(vtkCommand::ConnectionClosedEvent); 
       break;
       }
@@ -156,7 +158,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
 {
   if (this->StateDirty)
     {
-    cout << "Push new state to server." << endl;
+    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server.");
     // push new state.
     vtkPVXMLElement* root = this->InsituProxyManager->SaveXMLState();
     vtksys_ios::ostringstream data;
@@ -169,7 +171,7 @@ void vtkSMLiveInsituLinkProxy::PushUpdatedState()
            << "UpdateInsituXMLState"
            << data.str().c_str()
            << vtkClientServerStream::End;
-    cout << "Push new state to server--done" << endl;
+    vtkSMLiveInsituLinkProxyDebugMacro("Push new state to server--done");
     this->ExecuteStream(stream);
 
     this->StateDirty = false;
