@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
 
+#include "pqPVApplicationCore.h"
+
 #include <QVBoxLayout>
 #include <QPushButton>
 
@@ -67,4 +69,7 @@ void pqCommandButtonPropertyWidget::buttonClicked()
 {
   this->Property->Modified();
   this->proxy()->UpdateProperty(this->proxy()->GetPropertyName(this->Property));
+
+  // Trigger a rendering
+  pqPVApplicationCore::instance()->render();
 }
