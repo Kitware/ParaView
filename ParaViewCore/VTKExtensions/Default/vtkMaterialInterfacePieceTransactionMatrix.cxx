@@ -144,7 +144,7 @@ the buffer has this structure:
     for (int i=0; i<this->NFragments; ++i)
       {
       int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
+      int nTransactions = static_cast<int>(this->Matrix[matIdx].size());
 
       // put the count for this i,j
       buf[bufIdx]=nTransactions;
@@ -282,7 +282,7 @@ void vtkMaterialInterfacePieceTransactionMatrix::Print()
     for (int i=0; i<this->NFragments; ++i)
       {
       int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
+      int nTransactions = static_cast<int>(this->Matrix[matIdx].size());
 
       if (nTransactions>0)
         {

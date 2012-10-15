@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqPipelineRepresentation.h"
 
-pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *proxy, QWidget *parent)
-  : pqPropertyWidget(proxy, parent)
+pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *smProxy, QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget)
 {
   QVBoxLayout *l = new QVBoxLayout;
   l->setMargin(0);
@@ -48,7 +48,7 @@ pqTextureSelectorPropertyWidget::pqTextureSelectorPropertyWidget(vtkSMProxy *pro
   this->Selector = new pqTextureComboBox(this);
 
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(proxy);
+  pqPipelineRepresentation *repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
   if(repr)
     {
     this->Selector->setRepresentation(repr);
@@ -65,9 +65,9 @@ pqTextureSelectorPropertyWidget::~pqTextureSelectorPropertyWidget()
 {
 }
 
-void pqTextureSelectorPropertyWidget::handleViewChanged(pqView *view)
+void pqTextureSelectorPropertyWidget::handleViewChanged(pqView *v)
 {
-  pqRenderView *renderView = qobject_cast<pqRenderView *>(view);
+  pqRenderView *renderView = qobject_cast<pqRenderView *>(v);
   if(renderView)
     {
     this->Selector->setRenderView(renderView);

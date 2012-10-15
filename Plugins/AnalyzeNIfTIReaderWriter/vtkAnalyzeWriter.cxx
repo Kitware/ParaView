@@ -672,8 +672,9 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
 
 void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
-                             int extent[6])
+                                 int extent[6], int wholeExtent[6])
 {
+    (void)wholeExtent; // Not used
    //struct nifti_1_header nhdr ;
    znzFile               fp=NULL;
    //size_t                ss ;
@@ -772,6 +773,8 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
   outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
+  (void)outExtent;
+  (void)outStride;
 
   unsigned char* tempUnsignedCharData = NULL;
   unsigned char* tempOutUnsignedCharData = NULL;
@@ -942,29 +945,30 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     int outTotalBitNumber = 0;
 
     for ( idZ = 0 ; idZ < outDim[2] ; idZ++){
-    for ( idY = 0; idY < outDim[1] ; idY++){
-      for (idX = 0; idX < outDim[0] ; idX++){
-      outSliceOffset = tempSliceSizeInt * idZ;
-      outSliceBit =  (idY * outDim[0]) + idX;
-      outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
-      outSliceByte = (int) (outSliceBit / 8);
-      outOffsetByte = outSliceOffset + outSliceByte;
-      outBitNumber = outSliceBit %8;
-        byteBitCount = totalBitCount % 8;
-        byteCount = (int) (totalBitCount / 8);
+      for ( idY = 0; idY < outDim[1] ; idY++){
+        for (idX = 0; idX < outDim[0] ; idX++){
+          outSliceOffset = tempSliceSizeInt * idZ;
+          outSliceBit =  (idY * outDim[0]) + idX;
+          outTotalBitNumber = outSliceBit + (outSliceOffset * 8);
+          outSliceByte = (int) (outSliceBit / 8);
+          outOffsetByte = outSliceOffset + outSliceByte;
+          outBitNumber = outSliceBit %8;
+          byteBitCount = totalBitCount % 8;
+          byteCount = (int) (totalBitCount / 8);
 
-      tempByteValue = tempOutUnsignedCharData[byteCount];
-      tempBitValue = (tempByteValue >> byteBitCount) & 0x01;
+          tempByteValue = tempOutUnsignedCharData[byteCount];
+          tempBitValue = (tempByteValue >> byteBitCount) & 0x01;
 
-      if(outBitNumber==0){
-        tempUnsignedCharData[outOffsetByte] = 0;
-      }
-      tempUnsignedCharData[outOffsetByte]  += (tempBitValue << outBitNumber);
+          if(outBitNumber==0){
+            tempUnsignedCharData[outOffsetByte] = 0;
+          }
+          tempUnsignedCharData[outOffsetByte]  += (tempBitValue << outBitNumber);
 
-        totalBitCount++;
-      } 
+          totalBitCount++;
+          }
+       }
     }
-    }
+    (void) outTotalBitNumber;
   }
   char * outP = (char *) (tempUnsignedCharData);
 

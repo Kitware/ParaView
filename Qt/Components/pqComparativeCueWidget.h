@@ -64,9 +64,9 @@ public:
 
 public slots:
   /// Set the comparative grid size.
-  void setSize(int x, int y)
+  void setSize(int w, int h)
     { 
-    this->Size = QSize(x, y);
+    this->Size = QSize(w, h);
     this->updateGUIOnIdle();
     }
 

@@ -148,7 +148,7 @@ void vtkPVView::Initialize(unsigned int id)
   // call, but no harm even if it is done.
   if (vtkPVOptions *options = vtkProcessModule::GetProcessModule()->GetOptions())
     {
-    vtkPVView::SetEnableStreaming(options->GetEnableStreaming());
+    vtkPVView::SetEnableStreaming(options->GetEnableStreaming() != 0);
     }
 }
 

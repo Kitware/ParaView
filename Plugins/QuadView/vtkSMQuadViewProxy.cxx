@@ -220,12 +220,14 @@ vtkImageData* vtkSMQuadViewProxy::CaptureWindowInternal(int magnification)
     quadView->GetRenderWindow()
   };
 
+#if !defined(__APPLE__)
   vtkPVRenderView* allView[4] = {
     quadView->GetOrthoRenderView(vtkPVQuadRenderView::TOP_LEFT),
     quadView->GetOrthoRenderView(vtkPVQuadRenderView::TOP_RIGHT),
     quadView->GetOrthoRenderView(vtkPVQuadRenderView::BOTTOM_LEFT),
     quadView
   };
+#endif
 
   // Combined image vars
   vtkImageData* finalImage = vtkImageData::New();

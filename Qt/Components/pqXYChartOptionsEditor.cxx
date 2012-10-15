@@ -1088,11 +1088,11 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for (int i = 0; i < 4; ++i)
     {
-    QFont font = this->Internal->Form->AxisData[i]->LabelFont;
-    values.append(QVariant(font.family()));
-    values.append(QVariant(font.pointSize()));
-    values.append(QVariant(font.bold() ? 1 : 0));
-    values.append(QVariant(font.italic() ? 1 : 0));
+    QFont labelFont = this->Internal->Form->AxisData[i]->LabelFont;
+    values.append(QVariant(labelFont.family()));
+    values.append(QVariant(labelFont.pointSize()));
+    values.append(QVariant(labelFont.bold() ? 1 : 0));
+    values.append(QVariant(labelFont.italic() ? 1 : 0));
     }
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLabelFont"), values);
@@ -1196,11 +1196,11 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   values.clear();
   for (int i = 0; i < 4; ++i)
     {
-    QFont font = this->Internal->Form->AxisData[i]->TitleFont;
-    values.append(QVariant(font.family()));
-    values.append(QVariant(font.pointSize()));
-    values.append(QVariant(font.bold() ? 1 : 0));
-    values.append(QVariant(font.italic() ? 1 : 0));
+    QFont titleFont = this->Internal->Form->AxisData[i]->TitleFont;
+    values.append(QVariant(titleFont.family()));
+    values.append(QVariant(titleFont.pointSize()));
+    values.append(QVariant(titleFont.bold() ? 1 : 0));
+    values.append(QVariant(titleFont.italic() ? 1 : 0));
     }
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisTitleFont"), values);
@@ -1301,13 +1301,13 @@ void pqXYChartOptionsEditor::updateRemoveButton()
     }
 }
 
-bool pqXYChartOptionsEditor::pickFont(QLabel *label, QFont &font)
+bool pqXYChartOptionsEditor::pickFont(QLabel *label, QFont &fontToUse)
 {
   bool ok = false;
-  font = QFontDialog::getFont(&ok, font, this);
+  fontToUse = QFontDialog::getFont(&ok, fontToUse, this);
   if(ok)
     {
-    this->updateDescription(label, font);
+    this->updateDescription(label, fontToUse);
     this->changesAvailable();
     return true;
     }

@@ -38,17 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QPushButton>
 
-pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *proxy,
-                                                             vtkSMProperty *property,
-                                                             QWidget *parent)
-  : pqPropertyWidget(proxy, parent),
-    Property(property)
+pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *smProxy,
+                                                             vtkSMProperty *proxyProperty,
+                                                             QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget),
+    Property(proxyProperty)
 {
   QVBoxLayout *l = new QVBoxLayout;
   l->setSpacing(0);
   l->setMargin(0);
 
-  QPushButton *button = new QPushButton(property->GetXMLLabel());
+  QPushButton *button = new QPushButton(proxyProperty->GetXMLLabel());
   connect(button, SIGNAL(clicked()), this, SLOT(buttonClicked()));
   l->addWidget(button);
 

@@ -31,12 +31,12 @@ ostream &operator<<(ostream &sout, vtkMaterialInterfacePieceLoading &fp)
 ostream &operator<<(ostream &sout,
   vector<vector<vtkMaterialInterfacePieceLoading> > &pla)
 {
-  int nProcs=pla.size();
-  for (int procId=0; procId<nProcs; ++procId)
+  size_t nProcs=pla.size();
+  for (size_t procId=0; procId<nProcs; ++procId)
     {
     cerr << "Fragment loading on process " << procId << ":" << endl;
-    int nLocalFragments=pla[procId].size();
-    for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
+    size_t nLocalFragments=pla[procId].size();
+    for (size_t fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
       {
       sout << pla[procId][fragmentIdx] << ", ";
       }
@@ -49,14 +49,14 @@ void PrintPieceLoadingHistogram(vector<vector<vtkIdType> > &pla)
 {
   // cerr << "loading array:" <<endl;
   // cerr << pla << endl;
-  int nProcs=pla.size();
+  size_t nProcs=pla.size();
   // get min and max loading
   vtkIdType minLoading=(vtkIdType)1<<((sizeof(vtkIdType)*8)-2);
   vtkIdType maxLoading=0;
-  for (int procId=0; procId<nProcs; ++procId)
+  for (size_t procId=0; procId<nProcs; ++procId)
     {
-    int nPieces=pla[procId].size();
-    for (int pieceId=0; pieceId<nPieces; ++pieceId)
+    size_t nPieces=pla[procId].size();
+    for (size_t pieceId=0; pieceId<nPieces; ++pieceId)
       {
       vtkIdType loading=pla[procId][pieceId];
       if (loading>0
@@ -75,10 +75,10 @@ void PrintPieceLoadingHistogram(vector<vector<vtkIdType> > &pla)
   const vtkIdType binWidth=(maxLoading-minLoading)/nBins;
   const vtkIdType r=(maxLoading-minLoading)%nBins;
   vector<int> hist(nBins,0);
-  for (int procId=0; procId<nProcs; ++procId)
+  for (size_t procId=0; procId<nProcs; ++procId)
     {
-    int nPieces=pla[procId].size();
-    for (int pieceId=0; pieceId<nPieces; ++pieceId)
+    size_t nPieces=pla[procId].size();
+    for (size_t pieceId=0; pieceId<nPieces; ++pieceId)
       {
       vtkIdType loading=pla[procId][pieceId];
       if (loading==0)

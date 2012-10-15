@@ -240,7 +240,6 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           break;
           }
         }
-      return -1;
     }
 
     void SetId(int id, int value)
@@ -351,7 +350,6 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           break;
           }
         }
-      return 0;
     }
 
     // Just inject the real total number of Ids
@@ -439,7 +437,6 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           break;
           }
         }
-      return 0;
     }
 
     vtkIdTypeArray* GenerateGlobalIdsArray(const char* name)

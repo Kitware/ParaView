@@ -1098,7 +1098,7 @@ void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
 vtkAbstractArray* vtkPVArrayInformation::GetUniqueComponentValuesIfFDiscrete( int component )
 {
   vtkInternalUniqueValues::iterator compEntry;
-  unsigned nv;
+  unsigned nv = 0;
   if (
     ! this->UniqueValues ||
     ( compEntry = this->UniqueValues->find( component ) ) == this->UniqueValues->end() ||

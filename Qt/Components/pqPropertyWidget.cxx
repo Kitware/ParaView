@@ -63,9 +63,9 @@ vtkSMProxy* pqPropertyWidget::proxy() const
   return this->Proxy;
 }
 
-void pqPropertyWidget::setProperty(vtkSMProperty *property)
+void pqPropertyWidget::setProperty(vtkSMProperty *p)
 {
-  this->Property = property;
+  this->Property = p;
 }
 
 vtkSMProperty* pqPropertyWidget::property() const

@@ -660,7 +660,7 @@ int vtkSQBOVMetaReader::RequestData(
   info->Set(vtkSQOOCReader::PERIODIC_BC(),this->PeriodicBC,3);
   req->Append(vtkExecutive::KEYS_TO_COPY(), vtkSQOOCReader::PERIODIC_BC());
 
-  CartesianDecomp *ddecomp;
+  CartesianDecomp *ddecomp = NULL;
 
   // The file extents describe the data as it is on the disk.
   CartesianExtent fileExt=md->GetDomain();
@@ -870,7 +870,7 @@ int vtkSQBOVMetaReader::RequestData(
   OOCReader->SetLogLevel(this->LogLevel);
   info->Set(vtkSQOOCReader::READER(),OOCReader);
   OOCReader->Delete();
-  ddecomp->Delete();
+  if(ddecomp) ddecomp->Delete();
   req->Append(vtkExecutive::KEYS_TO_COPY(),vtkSQOOCReader::READER());
 
   // Give implementation classes a chance to store specialized keys

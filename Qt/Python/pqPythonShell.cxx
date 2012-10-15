@@ -313,7 +313,7 @@ void pqPythonShell::executeScript(const QString& script)
   this->Implementation->promptForInput();
 }
 
-QStringList pqPythonShell::getPythonAttributes(const QString& objectName)
+QStringList pqPythonShell::getPythonAttributes(const QString& pythonObjectName)
 {
   this->makeCurrent();
 
@@ -322,9 +322,9 @@ QStringList pqPythonShell::getPythonAttributes(const QString& objectName)
   Py_INCREF(object);
 
 
-  if (!objectName.isEmpty())
+  if (!pythonObjectName.isEmpty())
     {
-    QStringList tmpNames = objectName.split('.');
+    QStringList tmpNames = pythonObjectName.split('.');
     for (int i = 0; i < tmpNames.size() && object; ++i)
       {
       QByteArray tmpName = tmpNames.at(i).toLatin1();
@@ -386,12 +386,12 @@ void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* calldata
 #include <QVBoxLayout>
 class LineInput : public QDialog {
 public:
-  LineInput(QWidget* parent=NULL) : QDialog(parent, Qt::FramelessWindowHint)
+  LineInput(QWidget* p=NULL) : QDialog(p, Qt::FramelessWindowHint)
   {
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    QVBoxLayout* internalLayout = new QVBoxLayout(this);
+    internalLayout->setMargin(0);
     this->Edit = new QLineEdit;
-    layout->addWidget(this->Edit);
+    internalLayout->addWidget(this->Edit);
     this->connect(this->Edit, SIGNAL(returnPressed()), SLOT(accept()));
   }
   QLineEdit* Edit;
@@ -400,9 +400,9 @@ public:
 void pqPythonShell::readInputLine(vtkObject*, unsigned long, void*, void* calldata)
 {
   vtkStdString* ret = reinterpret_cast<vtkStdString*>(calldata);
-  QPoint pos = this->Implementation->Console.getCursorPosition();
+  QPoint cursorPosition = this->Implementation->Console.getCursorPosition();
   LineInput input(this);
-  input.move(this->mapToGlobal(pos));
+  input.move(this->mapToGlobal(cursorPosition));
   input.exec();
   *ret = input.Edit->text().toAscii().data();
 }

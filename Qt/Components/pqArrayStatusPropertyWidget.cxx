@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
-  vtkSMProxy* proxy, vtkSMPropertyGroup* group, QWidget* parentObject)
-  : Superclass(proxy, parentObject)
+  vtkSMProxy* activeProxy, vtkSMPropertyGroup* group, QWidget* parentObject)
+  : Superclass(activeProxy, parentObject)
 {
   pqExodusIIVariableSelectionWidget* selectorWidget =
     new pqExodusIIVariableSelectionWidget(this);
@@ -59,7 +59,7 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
     if (group->GetProperty(cc) &&
         group->GetProperty(cc)->GetInformationOnly() == 0)
       {
-      const char* property_name = proxy->GetPropertyName(group->GetProperty(cc));
+      const char* property_name = activeProxy->GetPropertyName(group->GetProperty(cc));
       this->addPropertyLink(selectorWidget, property_name,
                             SIGNAL(widgetModified()), group->GetProperty(cc));
       }
@@ -69,25 +69,25 @@ pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(
   this->setShowLabel(false);
 }
 
-pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *proxy,
-    vtkSMProperty* property, QWidget *parentObject)
-: Superclass(proxy, parentObject)
+pqArrayStatusPropertyWidget::pqArrayStatusPropertyWidget(vtkSMProxy *activeProxy,
+    vtkSMProperty* proxyProperty, QWidget *parentObject)
+: Superclass(activeProxy, parentObject)
 {
   pqExodusIIVariableSelectionWidget* selectorWidget =
     new pqExodusIIVariableSelectionWidget(this);
   selectorWidget->setObjectName("SelectionWidget");
 
   selectorWidget->setRootIsDecorated(false);
-  selectorWidget->setHeaderLabel(property->GetXMLLabel());
+  selectorWidget->setHeaderLabel(proxyProperty->GetXMLLabel());
 
   QHBoxLayout* hbox = new QHBoxLayout(this);
   hbox->addWidget(selectorWidget);
   hbox->setMargin(0);
   hbox->setSpacing(4);
 
-  const char* property_name = proxy->GetPropertyName(property);
+  const char* property_name = activeProxy->GetPropertyName(proxyProperty);
   this->addPropertyLink(selectorWidget, property_name,
-                        SIGNAL(widgetModified()), property);
+                        SIGNAL(widgetModified()), proxyProperty);
 
   // dont show label
   this->setShowLabel(false);
