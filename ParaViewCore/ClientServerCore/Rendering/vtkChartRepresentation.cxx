@@ -312,12 +312,12 @@ int vtkChartRepresentation::RequestData(vtkInformation* request,
     cout<<"Delivery output type: "<<CLASSNAME(this->DeliveryFilter->GetOutputDataObject(0))<<endl;
     }
 #endif
-
+ 
   if (this->Options)
     {
     std::vector<vtkTable*> output;
     this->GetLocalOutput(output);
-    this->Options->SetTables(output.empty()? NULL : &output[0],output.size());
+    this->Options->SetTables(output.empty()? NULL : &output[0], static_cast<int>(output.size()));
     }
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }
@@ -356,7 +356,7 @@ void vtkChartRepresentation::SetVisibility(bool visible)
 int vtkChartRepresentation::GetNumberOfSeries()
 {
   this->UpdateSeriesNames();
-  return this->SeriesNames.size();
+  return static_cast<int>(this->SeriesNames.size());
 }
 
 //----------------------------------------------------------------------------
