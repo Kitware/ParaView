@@ -21,6 +21,9 @@
 // watching error during a set of calls and not over the lifetime of the
 // controller/communicator. For that, simply add your own observers for
 // vtkCommand::ErrorEvent and intercept those.
+// Note that is vtkObject::GlobalWarningDisplay is off, this class will not
+// receive any ErrorEvents and hence will not report any errors that were
+// raised.
 
 #ifndef __vtkCommunicationErrorCatcher_h
 #define __vtkCommunicationErrorCatcher_h

@@ -274,7 +274,12 @@ void vtkLiveInsituLink::InitializeSimulation()
     url << "tcp://" << this->Hostname << ":" << this->InsituPort << "?"
       << "timeout=0&handshake=paraview.insitu." << PARAVIEW_VERSION;
     this->SetURL(url.str().c_str());
+    // Suppress any error messages while attempting to connect to ParaView
+    // visualization engine. 
+    int display_errors = vtkObject::GetGlobalWarningDisplay();
+    vtkObject::GlobalWarningDisplayOff();
     vtkMultiProcessController* controller = nam->NewConnection(this->URL);
+    vtkObject::SetGlobalWarningDisplay(display_errors);
     if (numProcs > 1)
       {
       int connection_established = controller != NULL? 1 : 0;
