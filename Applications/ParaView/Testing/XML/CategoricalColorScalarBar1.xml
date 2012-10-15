@@ -13,7 +13,7 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionScalarBarVisibility" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/SwitchToAdvanced" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/pqColorScaleDialog/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/PresetButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/Gradients" command="setCurrent" arguments="127.0" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/OkButton" command="activate" arguments="" />

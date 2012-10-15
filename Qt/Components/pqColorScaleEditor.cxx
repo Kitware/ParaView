@@ -417,9 +417,9 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // =========================
   // Simple UI add-on
   // =========================
-  this->connect( this->Form->SwitchToAdvanced, SIGNAL(toggled(bool)),
+  this->connect( this->Form->AdvancedButton, SIGNAL(toggled(bool)),
                  this, SLOT(enableAdvancedPanel(bool)));
-  this->enableAdvancedPanel(this->Form->SwitchToAdvanced->isChecked());
+  this->enableAdvancedPanel(this->Form->AdvancedButton->isChecked());
 
   this->connect( this->Form->UseLogScaleSimple, SIGNAL(toggled(bool)),
                  this, SLOT(setLogScale(bool)));
@@ -1514,7 +1514,7 @@ void pqColorScaleEditor::rescaleToDataRangeOverTime()
 //-----------------------------------------------------------------------------
 void pqColorScaleEditor::rescaleToSimpleRange()
 {
-  if(!this->Form->UseAutoRescaleSimple->isChecked() && !this->Form->SwitchToAdvanced->isChecked())
+  if(!this->Form->UseAutoRescaleSimple->isChecked() && !this->Form->AdvancedButton->isChecked())
     {
     bool okMin = true, okMax = true;
     double min = this->Form->SimpleMin->text().toDouble(&okMin);
@@ -2874,7 +2874,7 @@ void pqColorScaleEditor::saveOptionalUserSettings()
   settings->setValue("ImmediateRender", QVariant(
     this->Form->checkBoxImmediateRender->isChecked()));
   settings->setValue("AdvancedPanel", QVariant(
-    this->Form->SwitchToAdvanced->isChecked()));
+    this->Form->AdvancedButton->isChecked()));
   settings->endGroup();
 }
 
@@ -2894,7 +2894,7 @@ void pqColorScaleEditor::restoreOptionalUserSettings()
     if(*key == "AdvancedPanel")
       {
       bool checked = settings->value(*key).toBool();
-      this->Form->SwitchToAdvanced->setChecked(checked);
+      this->Form->AdvancedButton->setChecked(checked);
       }
     }
 
