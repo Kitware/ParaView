@@ -50,11 +50,12 @@ public:
   static void Finalize();
 
   // Description:
-  // Initialization for ctests. This is needed to insure that
-  // linker does not remove object factories' auto init during
-  // static linking. It also cleans up after protobuf.
-  static void TestingInitialize();
-  static void TestingFinalize();
+  // Initialization for standalone executables linking against a PV
+  // library. This is needed to insure that linker does not remove object
+  // factories' auto init during static linking. It also cleans up after
+  // protobuf.
+  static void StandaloneInitialize();
+  static void StandaloneFinalize();
 
 protected:
   vtkInitializationHelper() {};

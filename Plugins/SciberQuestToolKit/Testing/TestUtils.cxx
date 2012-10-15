@@ -48,9 +48,6 @@ using std::vector;
 // and written to the temp dir.
 #define SKIP_PROCESS_ID 1
 
-
-
-
 /**
 Use a single render window for each run. This was suggested
 after strange x11 errors on the Blight dashboard system.
@@ -87,7 +84,7 @@ vtkRenderWindow *vtkRenderWindowSingleton::RenderWindow=NULL;
 //*****************************************************************************
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
-  vtkInitializationHelper::TestingInitialize();
+  vtkInitializationHelper::StandaloneInitialize();
 
   vtkMultiProcessController *controller;
 
@@ -131,7 +128,7 @@ int Finalize(vtkMultiProcessController* controller, int code)
   controller->Finalize();
   controller->Delete();
 
-  vtkInitializationHelper::TestingFinalize();
+  vtkInitializationHelper::StandaloneFinalize();
 
   return code;
 }
@@ -178,9 +175,9 @@ void BroadcastConfiguration(
     vtkTesting *testHelper = vtkTesting::New();
     testHelper->AddArguments(argc,const_cast<const char **>(argv));
 
-    dataRoot=NativePath(testHelper->GetDataRoot());
-    baseline=NativePath(testHelper->GetValidImageFileName());
-    tempDir=NativePath(testHelper->GetTempDirectory());
+    dataRoot=testHelper->GetDataRoot();
+    baseline=testHelper->GetValidImageFileName();
+    tempDir=testHelper->GetTempDirectory();
 
     testHelper->Delete();
     }
@@ -558,7 +555,7 @@ int SerialRender(
           vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
           rwin->AddRenderer(ren);
           rwin->SetSize(iwx,iwy);
-          ren->Delete();
+          //ren->Delete(); hold the ref to work around a bug in vtk
 
           vtkCamera *cam=ren->GetActiveCamera();
           cam->SetPosition(px,py,pz);
@@ -589,6 +586,7 @@ int SerialRender(
           decompImage->Delete();
 
           rwin->RemoveRenderer(ren);
+          ren->Delete(); // ok to release
 
           continue;
           }
@@ -605,7 +603,7 @@ int SerialRender(
         vtkRenderWindow *rwin=vtkRenderWindowSingleton::GetGlobalInstance();
         rwin->AddRenderer(ren);
         rwin->SetSize(iwx,iwy);
-        ren->Delete();
+        //ren->Delete(); hold the ref to work around a bug in vtk
 
         vtkCamera *cam=ren->GetActiveCamera();
         cam->SetPosition(px,py,pz);
@@ -636,6 +634,7 @@ int SerialRender(
           }
         testHelper->Delete();
         rwin->RemoveRenderer(ren);
+        ren->Delete(); // ok to release
         }
       }
     data->Delete();

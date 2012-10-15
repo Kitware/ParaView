@@ -62,7 +62,7 @@ int main(int argc, char **argv)
   BroadcastConfiguration(controller,argc,argv,dataRoot,tempDir,baseline);
 
   string inputFileName;
-  inputFileName=dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov";
+  inputFileName=NativePath(dataRoot+"/Data/SciberQuestToolKit/MagneticIslands/MagneticIslands.bov");
 
   string logFileName;
   logFileName=NativePath(tempDir+"/SciberQuestToolKit-TestPoincareMapper.log");

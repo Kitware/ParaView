@@ -26,29 +26,63 @@ using std::string;
 // #define SQTK_DEBUG
 // #define vtkSQBinaryThresholdTIME
 
-
 // ****************************************************************************
 template<typename T>
 void BinaryThreshold(
       T *pS,
       T *pT,
-      size_t n,
+      size_t nTups,
+      int nComps,
       T threshold,
       T lowVal,
       T highVal,
       int useLowVal,
       int useHighVal)
 {
-  for (size_t i=0; i<n; ++i)
+  for (size_t i=0; i<nTups; ++i)
     {
-    if (useLowVal && (pS[i]<threshold))
+    T cval=T(0);         // comparison value
+    T *sval=pS+i*nComps; // source value
+    T *tval=pT+i*nComps; // thresholded value
+
+    // get the comparison value
+    if (nComps>1)
       {
-      pT[i]=lowVal;
+      for (int q=0; q<nComps; ++q)
+        {
+        cval+=(sval[q]*sval[q]);
+        }
+      cval=sqrt(cval);
       }
     else
-    if (useHighVal && (pS[i]>=threshold))
       {
-      pT[i]=highVal;
+      cval=sval[0];
+      }
+
+    if (useLowVal && (cval<threshold))
+      {
+      // reasign with low val
+      for (int q=0; q<nComps; ++q)
+        {
+        tval[q]=lowVal;
+        }
+      }
+    else
+    if (useHighVal && (cval>=threshold))
+      {
+      // reasign with high val
+      for (int q=0; q<nComps; ++q)
+        {
+        tval[q]=highVal;
+        }
+      }
+    else
+      {
+      // pass through
+      for (int q=0; q<nComps; ++q)
+        {
+        tval[q]=sval[q];
+        }
       }
     }
 }
@@ -138,7 +172,7 @@ int vtkSQBinaryThreshold::RequestData(
     return 1;
     }
 
-  /// get input
+  // get input
   info=inInfos[0]->GetInformationObject(0);
   vtkDataSet *in
     = dynamic_cast<vtkDataSet*>(info->Get(vtkDataObject::DATA_OBJECT()));
@@ -148,17 +182,18 @@ int vtkSQBinaryThreshold::RequestData(
     return 1;
     }
 
-  /// construct the output from a shallow copy
+  // construct the output from a shallow copy
   out->ShallowCopy(in);
 
-  /// get scalar array to process
+  // get scalar/vector array to process
   vtkDataArray *S=this->GetInputArrayToProcess(0,inInfos);
   if (S==0)
     {
-    vtkErrorMacro("Scalar array to threshold not found.");
+    vtkErrorMacro("Array to threshold not found.");
     }
   string SName=S->GetName();
   size_t nTups=(size_t)S->GetNumberOfTuples();
+  int nComps=S->GetNumberOfComponents();
 
   // add the agyrotropy array to the output
   vtkDataArray *T=S->NewInstance();
@@ -166,17 +201,20 @@ int vtkSQBinaryThreshold::RequestData(
   TName+="threshold-";
   TName+=SName;
   T->SetName(TName.c_str());
+  T->SetNumberOfComponents(nComps);
   T->SetNumberOfTuples(nTups);
   out->GetPointData()->AddArray(T);
+  T->Delete();
 
-  // compute the agyrotropy
+  // apply the threshold
   switch(T->GetDataType())
     {
-    vtkTemplateMacro(
+    vtkFloatTemplateMacro(
       BinaryThreshold(
           (VTK_TT*)S->GetVoidPointer(0),
           (VTK_TT*)T->GetVoidPointer(0),
           nTups,
+          nComps,
           ((VTK_TT)this->Threshold),
           ((VTK_TT)this->LowValue),
           ((VTK_TT)this->HighValue),
