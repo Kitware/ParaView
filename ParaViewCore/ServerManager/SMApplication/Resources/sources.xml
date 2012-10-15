@@ -1950,7 +1950,8 @@
       <IntVectorProperty command="SetWholeExtent"
                          default_values="0 -1 0 -1 0 -1"
                          name="WholeExtent"
-                         number_of_elements="6">
+                         number_of_elements="6"
+                         panel_visibility="never" >
         <Documentation>The values of this property specify the whole extent of
         the topologically regular grid.</Documentation>
       </IntVectorProperty>
