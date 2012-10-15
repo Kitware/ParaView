@@ -984,7 +984,14 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetDataSetTypeAsString()
 {
-  return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
+  if(this->DataSetType == -1)
+    {
+    return "UnknownType";
+    }
+  else
+    {
+    return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
+    }
 }
 
 //----------------------------------------------------------------------------
