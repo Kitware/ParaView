@@ -131,7 +131,6 @@ pqLiveInsituVisualizationManager::~pqLiveInsituVisualizationManager()
     this->Internals->LiveInsituLinkProxy = 0;
     }
 
-
   delete this->Internals;
 }
 

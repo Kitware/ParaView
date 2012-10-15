@@ -325,8 +325,16 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
       }
     }
 
+
+  // If the port is on a CatalystSession or it hasn't been initialized yet,
+  // it has "no visiblily", so to speak.
   if (port && port->getServer() &&
     port->getServer()->getResource().scheme() == "catalyst")
+    {
+    return NotApplicable;
+    }
+  if (port && port->getSource() &&
+    port->getSource()->modifiedState() == pqProxy::UNINITIALIZED)
     {
     return NotApplicable;
     }
