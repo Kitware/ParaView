@@ -34,6 +34,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSession : public vtkPVSessionBase
 public:
   static vtkSMSession* New();
   static vtkSMSession* New(vtkPVSessionBase* otherSession);
+  static vtkSMSession* New(vtkPVSessionCore* otherSessionCore);
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -143,6 +144,13 @@ public:
   //---------------------------------------------------------------------------
   // Static methods to create and register sessions easily.
   //---------------------------------------------------------------------------
+
+  // Description:
+  // These are static helper methods that help create Catalyst ParaView
+  // sessions. They register the session with the process module and return the
+  // session id. Returns 0 on failure.
+  // This overload is used to create a catalyst built-in session.
+  static vtkIdType ConnectToCatalyst();
 
   // Description:
   // These are static helper methods that help create standard ParaView

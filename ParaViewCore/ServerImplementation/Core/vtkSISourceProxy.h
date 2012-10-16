@@ -63,6 +63,12 @@ public:
   // Disables the creation of an extents translator.
   static void SetDisableExtentsTranslator(bool value);
 
+  // Description:
+  // Allow to shut down pipeline execution. This is particulary useful for
+  // a Catalyst session that does not contains any real data.
+  virtual void SetDisablePipelineExecution(bool value)
+  { this->DisablePipelineExecution = value; }
+
 //BTX
 protected:
   vtkSISourceProxy();
@@ -111,6 +117,7 @@ protected:
 
   char *ExecutiveName;
   vtkSetStringMacro(ExecutiveName);
+  bool DisablePipelineExecution;
 
   friend class vtkSICompoundSourceProxy;
 private:

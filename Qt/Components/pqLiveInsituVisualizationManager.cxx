@@ -87,8 +87,7 @@ pqLiveInsituVisualizationManager::pqLiveInsituVisualizationManager(
   // create a new "server session" that acts as the dummy session representing
   // the insitu viz pipeline.
   pqServer* catalyst = core->getObjectBuilder()->createServer(
-    pqServerResource("builtin:"));
-  catalyst->setResource(pqServerResource("catalyst:"));
+    pqServerResource("catalyst:"));
   catalyst->setProperty("LiveInsituVisualizationManager",
     QVariant::fromValue(static_cast<QObject*>(this)));
   adaptor->SetInsituProxyManager(catalyst->proxyManager());

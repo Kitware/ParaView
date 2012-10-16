@@ -474,6 +474,7 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
     this->Internals->SIObjectMap[globalId] = obj; // WeakPointer map
+    this->InvokeEvent(vtkCommand::UpdateDataEvent, obj);
 
     LOG (
       << "----------------------------------------------------------------\n"

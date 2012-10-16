@@ -17,8 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
-// FIXME:MODULARIZATION
-// #include "vtkPVRenderView.h"
+#include "vtkPVCatalystSessionCore.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
@@ -36,6 +35,9 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
+// FIXME:MODULARIZATION
+// #include "vtkPVRenderView.h"
+
 #include <vtksys/ios/sstream>
 #include <vtkNew.h>
 #include <assert.h>
@@ -49,8 +51,12 @@ vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMSession::New(vtkPVSessionBase *otherSession)
 {
-  vtkPVSessionCore* core = otherSession->GetSessionCore();
-  vtkSMSession* session = new vtkSMSession(true, core);
+  return vtkSMSession::New(otherSession->GetSessionCore());
+}
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMSession::New(vtkPVSessionCore *otherSessionCore)
+{
+  vtkSMSession* session = new vtkSMSession(true, otherSessionCore);
 
 #ifdef VTK_DEBUG_LEAKS
   vtkDebugLeaks::ConstructClass("vtkSMSession");
@@ -241,6 +247,18 @@ vtkIdType vtkSMSession::ConnectToSelf()
     session->Delete();
     }
 
+  return sid;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToCatalyst()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkIdType sid = 0;
+  vtkNew<vtkPVCatalystSessionCore> sessionCore;
+  vtkSMSession* session = vtkSMSession::New(sessionCore.GetPointer());
+  sid = pm->RegisterSession(session);
+  session->Delete();
   return sid;
 }
 
