@@ -153,7 +153,7 @@ private:
 
   // Description:
   // Callback called when vtkCommand::MessageEvent is received.
-  void OnMessageEvent(vtkObject* obj, char* progress);
+  void OnMessageEvent(char* message);
 
   // Description:
   // Callback called when WrongTagEvent is fired by the controllers.

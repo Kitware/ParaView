@@ -207,7 +207,7 @@ public:
       }
     if (this->Target && event == vtkCommand::MessageEvent)
       {
-      this->Target->OnMessageEvent(wdg, reinterpret_cast<char*>(calldata));
+      this->Target->OnMessageEvent(reinterpret_cast<char*>(calldata));
       }
     }
 protected:
@@ -826,8 +826,7 @@ bool vtkPVProgressHandler::OnWrongTagEvent(void* calldata)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::OnMessageEvent(vtkObject* obj,
-  char* message)
+void vtkPVProgressHandler::OnMessageEvent(char* message)
 {
   this->SetLastMessage(message);
   this->GatherMessage();
@@ -910,7 +909,7 @@ void vtkPVProgressHandler::ReceiveMessagesFromSatellites()
     vtkByteSwap::SwapLE(&pid);
 
     //get their message, and ensure it is null terminated if too long
-    this->Internals->AsyncMessageStore[ASYNCHMESSAGE_MAX_SIZE-1]=NULL;
+    this->Internals->AsyncMessageStore[ASYNCHMESSAGE_MAX_SIZE-1]='\0';
     std::string text = reinterpret_cast<const char*>(
           this->Internals->AsyncMessageStore+sizeof(int));
 
