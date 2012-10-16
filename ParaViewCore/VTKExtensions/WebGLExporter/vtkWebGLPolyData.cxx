@@ -662,6 +662,12 @@ void vtkWebGLPolyData::GetColorsFromPointData(unsigned char* color, vtkPointData
     int mode = table->GetVectorMode();
     double mag=0, rgb[3];
     double alpha = 1.0;
+
+    if (numberOfComponents == 1 && mode == vtkScalarsToColors::MAGNITUDE)
+      {
+      mode = vtkScalarsToColors::COMPONENT;
+      colorComponent = 0;
+      }
     for (int i=0; i<colorSize/4; i++)
       {
       switch(mode)
