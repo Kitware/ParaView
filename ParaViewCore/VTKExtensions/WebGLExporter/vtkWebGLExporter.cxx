@@ -385,11 +385,11 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
     }
   }
 
-void vtkWebGLExporter::parseScene(vtkRendererCollection* renderers, const char* viewId, VTKParseType property)
+void vtkWebGLExporter::parseScene(vtkRendererCollection* renderers, const char* viewId, int parseType)
 {
   if (!renderers) return;
 
-  bool onlyWidget = property == VTK_ONLYWIDGET;
+  bool onlyWidget = parseType == VTK_ONLYWIDGET;
   bool cameraOnly = onlyWidget && !this->hasWidget;
 
   this->SceneId = viewId;

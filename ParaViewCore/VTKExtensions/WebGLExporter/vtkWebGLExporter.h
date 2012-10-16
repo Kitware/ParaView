@@ -52,7 +52,7 @@ public:
 
   // Description:
   // Get all the needed information from the vtkRenderer
-  void parseScene(vtkRendererCollection* renderers, const char* viewId, VTKParseType property);
+  void parseScene(vtkRendererCollection* renderers, const char* viewId, int parseType);
   // Generate and return the Metadata
   void exportStaticScene(vtkRendererCollection* renderers, int width, int height, std::string path);
   const char* GenerateMetadata();
