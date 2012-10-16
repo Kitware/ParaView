@@ -39,6 +39,8 @@ vtkKdTreeGenerator::vtkKdTreeGenerator()
   this->NumberOfPieces =1;
   this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
   this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 1;
+  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
+  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 1.0;
   this->ExtentTranslator = 0;
   this->Regions = 0;
   this->KdTree = 0;
@@ -69,30 +71,33 @@ void vtkKdTreeGeneratorOrder(int* &ptr, vtkKdNode* node)
 }
 
 //-----------------------------------------------------------------------------
-int vtkKdTreeGenerator::BuildTree(vtkDataObject* data, vtkInformation* info)
+bool vtkKdTreeGenerator::BuildTree(vtkExtentTranslator* translator,
+  const int extents[6], const double origin[3], const double spacing[3])
 {
-  if (!data)
+  if (!translator)
     {
-    vtkErrorMacro("Cannot generate k-d tree without any data.");
-    return 0;
+    vtkErrorMacro("Cannot generate k-d tree without any ExtentTranslator.");
+    return false;
     }
-  // We need the extent translator and the whole extents from the data.
-  vtkStreamingDemandDrivenPipeline* sddp =
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(
-      vtkExecutive::PRODUCER()->GetExecutive(info));
-  if (sddp)
+
+  if (extents[0] > extents[1] ||
+    extents[2] > extents[3] ||
+    extents[4] > extents[5])
     {
-    this->SetExtentTranslator(sddp->GetExtentTranslator(info));
-    int wholeExtent[6];
-    sddp->GetWholeExtent(info, wholeExtent);
-    this->SetWholeExtent(wholeExtent);
+    vtkErrorMacro("Invalid extents. Cannot generate KdTree.");
+    return false;
     }
-  else
+
+  if (spacing[0] < 0 || spacing[1] < 0 || spacing[2] < 0)
     {
-    vtkErrorMacro("Data must be obtained from pipeline so that "
-      " extent translator is available.");
-    return 0;
+    vtkErrorMacro("Invalid spacing. Cannot generate KdTree.");
+    return false;
     }
+
+  this->SetExtentTranslator(translator);
+  this->SetWholeExtent(const_cast<int*>(extents));
+  this->SetOrigin(const_cast<double*>(origin));
+  this->SetSpacing(const_cast<double*>(spacing));
 
   vtkSmartPointer<vtkKdNode> root = vtkSmartPointer<vtkKdNode>::New();
   root->DeleteChildNodes();
@@ -113,7 +118,7 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data, vtkInformation* info)
     }
 
   // The formed tree is based on extents, we convert it to bounds.
-  if (!this->ConvertToBounds(data, root))
+  if (!this->ConvertToBounds(root))
     {
     return 0;
     }
@@ -353,24 +358,9 @@ static bool vtkConvertToBoundsInternal(
 }
 
 //-----------------------------------------------------------------------------
-bool vtkKdTreeGenerator::ConvertToBounds(vtkDataObject* data, vtkKdNode* node)
+bool vtkKdTreeGenerator::ConvertToBounds(vtkKdNode* node)
 {
-  double origin[3];
-  double spacing[3];
-  
-  vtkImageData* id = vtkImageData::SafeDownCast(data);
-  if (data)
-    {
-    id->GetOrigin(origin);
-    id->GetSpacing(spacing); 
-    }
-  else
-    {
-    vtkErrorMacro(<< data->GetClassName() << " is not supported.");
-    return false;
-    }
-
-  return vtkConvertToBoundsInternal(node, origin, spacing);
+  return vtkConvertToBoundsInternal(node, this->Origin, this->Spacing);
 }
 
 //-----------------------------------------------------------------------------
