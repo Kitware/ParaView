@@ -24,7 +24,6 @@
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPKdTree.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
@@ -328,9 +327,6 @@ void vtkPVDataDeliveryManager::SetPiece(
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (item)
     {
-    vtkPVDataRepresentationPipeline* executive =
-      vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
-
     unsigned long data_time = 0;
     if (data && (data->GetMTime() > data_time))
       {
