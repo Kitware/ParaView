@@ -870,7 +870,7 @@ int vtkPVProgressHandler::GatherMessage()
 void vtkPVProgressHandler::SendMessageToRoot()
 {
 #ifdef PARAVIEW_USE_MPI
-  int msgsize = strlen(this->LastMessage)+1; //include null terminator
+  size_t msgsize = strlen(this->LastMessage)+1; //include null terminator
   if (msgsize+sizeof(int) > ASYNCHMESSAGE_MAX_SIZE)
     {
     msgsize = ASYNCHMESSAGE_MAX_SIZE-sizeof(int);
@@ -965,7 +965,7 @@ void vtkPVProgressHandler::SendMessageToClient(
     satsmessage << "\n";
     allmessages << satsmessage.str().c_str();
     }
-  int len = allmessages.str().size()+1;
+  int len = static_cast<int>(allmessages.str().size())+1;
   if (len > 1)
     {
     controller->Send(allmessages.str().c_str(), len, 1,
