@@ -28,12 +28,8 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
-
-
-
-# This plugin bring the ParaViewWeb WebGL exporter to regular ParaView
-# as a plugin.
-# That plugin will behave as any other ParaView exporter (VRML, X3D, POV...)
+#
+# The exporter will behave as any other ParaView exporter (VRML, X3D, POV...)
 # but will generate several types of files. The main one is the scene graph
 # description define as a JSON object with all the corresponding binary+base64
 # pieces that come along with it. But also with it come a single standalone HTML
