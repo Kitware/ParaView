@@ -2290,7 +2290,7 @@ void Divergence(
         {
         const int  i=p-input[0];
         const int _i=p-output[0];
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         //      __   ->
         //  D = \/ . V
@@ -2440,10 +2440,10 @@ void Laplacian(
       for (int p=output[0]; p<=output[1]; ++p)
         {
         const int _i=p-output[0];
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         const int  i=p-input[0];
-        const int  pi=idx.Index(i,j,k);
+        const size_t  pi=idx.Index(i,j,k);
 
         //      __2
         //  L = \/ S
@@ -2998,8 +2998,8 @@ void VectorMatrixMul(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
-        const int  pi= 3*idx.Index( i, j, k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
+        const size_t  pi= 3*idx.Index( i, j, k);
 
         W[_pi  ] = V[pi  ]*Mxx[_pi] + V[pi+1]*Myx[_pi] + V[pi+2]*Mzx[_pi];
         W[_pi+1] = V[pi+1]*Mxy[_pi] + V[pi+1]*Myy[_pi] + V[pi+2]*Mzy[_pi];
