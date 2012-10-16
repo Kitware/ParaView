@@ -20,7 +20,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkWeakPointer.h"
 #include "vtkLightingHelper.h"
-#include "vtkColorMaterialHelper.h"
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkShaderProgram2.h"
 #include "vtkPiecewiseFunction.h"
@@ -90,7 +89,6 @@ private:
   vtkSmartPointer<vtkShaderProgram2> Shader;
   vtkWeakPointer<vtkOpenGLRenderWindow> LastRenderWindow;
   vtkSmartPointer<vtkLightingHelper> LightingHelper;
-  vtkSmartPointer<vtkColorMaterialHelper> ColorMaterialHelper;
   vtkPiecewiseFunction *TransferFunction;
   char *UncertaintyArrayName;
   int RenderingPreparationSuccess;

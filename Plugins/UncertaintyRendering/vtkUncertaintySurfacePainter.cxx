@@ -51,7 +51,6 @@ vtkUncertaintySurfacePainter::vtkUncertaintySurfacePainter()
   this->Output = 0;
   this->LastRenderWindow = 0;
   this->LightingHelper = vtkSmartPointer<vtkLightingHelper>::New();
-  this->ColorMaterialHelper = vtkSmartPointer<vtkColorMaterialHelper>::New();
   this->TransferFunction = 0;
   this->UncertaintyArrayName = 0;
 }
@@ -90,7 +89,6 @@ void vtkUncertaintySurfacePainter::ReleaseGraphicsResources(vtkWindow *window)
     }
 
   this->LightingHelper->Initialize(0, VTK_SHADER_TYPE_VERTEX);
-  this->ColorMaterialHelper->Initialize(0);
 
   this->LastRenderWindow = 0;
   this->Superclass::ReleaseGraphicsResources(window);
@@ -142,9 +140,8 @@ void vtkUncertaintySurfacePainter::PrepareForRendering(vtkRenderer *renderer,
     this->Shader->GetShaders()->AddItem(fragmentShader);
     fragmentShader->Delete();
 
-    // setup color and lighting helpers
+    // setup lighting helper
     this->LightingHelper->Initialize(this->Shader, VTK_SHADER_TYPE_VERTEX);
-    this->ColorMaterialHelper->Initialize(this->Shader);
     }
 
   // superclass prepare for rendering
@@ -174,7 +171,6 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
   glPushAttrib(GL_ALL_ATTRIB_BITS);
 
   // prepare color and lighting helpers
-  this->ColorMaterialHelper->PrepareForRendering();
   this->LightingHelper->PrepareForRendering();
 
   // build and use the shader
@@ -190,8 +186,6 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
     vtkErrorMacro(<< " validation of the program failed: "
                   << this->Shader->GetLastValidateLog());
     }
-
-  this->ColorMaterialHelper->Render();
 
   // superclass render
   this->Superclass::RenderInternal(renderer,
