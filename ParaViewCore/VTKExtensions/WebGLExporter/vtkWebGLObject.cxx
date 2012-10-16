@@ -17,6 +17,7 @@
 
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <algorithm>
 #include "md5.h"
@@ -144,6 +145,26 @@ void vtkWebGLObject::SetInteractAtServer(bool i)
   {
   this->interactAtServer = i;
   }
+
+void vtkWebGLObject::GetBinaryData(int part, vtkUnsignedCharArray* buffer)
+{
+  if (!buffer)
+    {
+    vtkErrorMacro("Buffer must not be NULL.");
+    return;
+    }
+
+  const int binarySize = this->GetBinarySize(part);
+  const unsigned char* binaryData = this->GetBinaryData(part);
+
+  buffer->SetNumberOfComponents(1);
+  buffer->SetNumberOfTuples(binarySize);
+
+  if (binarySize)
+    {
+    std::copy(binaryData, binaryData+binarySize, buffer->GetPointer(0));
+    }
+}
 
 void vtkWebGLObject::GenerateBinaryData(){this->hasChanged = false;}
 unsigned char* vtkWebGLObject::GetBinaryData(int vtkNotUsed(part)){return NULL;}

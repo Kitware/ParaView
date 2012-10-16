@@ -19,12 +19,13 @@
 #ifndef __vtkWebGLObject_h
 #define __vtkWebGLObject_h
 
-class vtkMatrix4x4;
-
 #include "vtkObject.h"
 #include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
 
 #include <string>
+
+class vtkMatrix4x4;
+class vtkUnsignedCharArray;
 
 enum WebGLObjectTypes {
   wPOINTS = 0,
@@ -43,6 +44,12 @@ public:
   virtual unsigned char* GetBinaryData(int part);
   virtual int GetBinarySize(int part);
   virtual int GetNumberOfParts();
+
+  // Description:
+  // This is a wrapper friendly method for access the binary data.
+  // The binary data for the requested part will be copied into the
+  // given vtkUnsignedCharArray.
+  void GetBinaryData(int part, vtkUnsignedCharArray* buffer);
 
   void SetLayer(int l);
   void SetRendererId(long int i);
