@@ -54,7 +54,6 @@ public:
   void RegisterDataInformation(vtkTypeUInt32 globalid, vtkPVInformation *info)
   {
     vtkTypeUInt32 correctId = this->GetMappedId(globalid);
-    cout << "Update cache for " << globalid << " to " << correctId << endl;
     if(correctId != 0)
       {
       std::string id = this->GenerateID(correctId, info);
@@ -91,9 +90,17 @@ public:
   {
     std::string id = this->GenerateID(globalid, info);
     vtkPVInformation *storedValue = this->DataInformationMap[id];
-    // We don't care of storedValue is NULL...
-    cout << "GatherInformation for " << globalid << " and cache is " << storedValue << endl;
-    info->CopyFromObject(storedValue);
+
+    if(storedValue)
+      {
+      vtkClientServerStream stream;
+      storedValue->CopyToStream(&stream);
+      info->CopyFromStream(&stream);
+      }
+    else
+      {
+      info->CopyFromObject(NULL);
+      }
     return true;
   }
   //---------------------------------------------------------------------------

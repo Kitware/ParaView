@@ -168,17 +168,10 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
     loader->KeepIdMappingOn();
     this->InsituProxyManager->LoadXMLState(parser->GetRootElement(), loader.GetPointer());
 
-
+    // Update session core id mapping
     int size = 0;
     vtkTypeUInt32* mapArray = loader->GetMappingArray(size);
     this->CatalystSessionCore->UpdateIdMap(mapArray, size);
-
-
-    for(int i=0; i < size; ++i)
-    {
-      cout << mapArray[i] << " => " << mapArray[i+1] << endl;
-      ++i;
-    }
 
     this->StateDirty = false;
     }
