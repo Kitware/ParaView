@@ -142,6 +142,7 @@ void vtkUncertaintySurfacePainter::PrepareForRendering(vtkRenderer *renderer,
 
     // setup lighting helper
     this->LightingHelper->Initialize(this->Shader, VTK_SHADER_TYPE_VERTEX);
+    this->LightingHelper->PrepareForRendering();
     }
 
   // superclass prepare for rendering
@@ -169,9 +170,6 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
     vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-  // prepare color and lighting helpers
-  this->LightingHelper->PrepareForRendering();
 
   // build and use the shader
   this->Shader->Build();
