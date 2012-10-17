@@ -65,12 +65,12 @@ void vtkWebGLWidget::GenerateBinaryData()
   std::string oldMD5 = "qqehissorapaz";
   oldMD5 = this->MD5;
 
-  int pos = 0;
+  size_t pos = 0;
   //Calculate the size used
   //NumOfColors, Type, Position, Size, Colors, Orientation, numberOfLabels
-  int total = sizeof(int) + 1 + 4*sizeof(float) + this->colors.size()*(sizeof(float)+3*sizeof(char)) + 1 + 1 + strlen(this->title);
+  int total = static_cast<int>(sizeof(int) + 1 + 4*sizeof(float) + this->colors.size()*(sizeof(float)+3*sizeof(char)) + 1 + 1 + strlen(this->title));
   this->binaryData = new unsigned char[total];
-  int colorSize = this->colors.size();
+  int colorSize = static_cast<int>(this->colors.size());
 
   memset(this->binaryData, 0, total);                                                         //Fill array with 0
   memcpy(&this->binaryData[pos], &colorSize, sizeof(int)); pos+=sizeof(int);                  //Binary Data Size
@@ -113,7 +113,7 @@ void vtkWebGLWidget::GetDataFromColorMap(vtkActor2D *actor)
   vtkScalarBarActor* scalarbar = vtkScalarBarActor::SafeDownCast(actor);
   this->numberOfLabels = scalarbar->GetNumberOfLabels();
   this->title = scalarbar->GetTitle();
-  this->hasTransparency = scalarbar->GetUseOpacity();
+  this->hasTransparency = (scalarbar->GetUseOpacity() != 0);
   this->orientation = scalarbar->GetOrientation();
 
   //Colors

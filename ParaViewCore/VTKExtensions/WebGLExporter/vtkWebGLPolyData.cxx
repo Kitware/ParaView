@@ -277,7 +277,7 @@ void vtkWebGLPolyData::GenerateBinaryData()
     }
   if(this->Internal->Parts.size() != 0)
     {
-    std::string localMD5 = md5((char*)ss.str().c_str(), ss.str().size());
+    std::string localMD5 = md5((char*)ss.str().c_str(), static_cast<int>(ss.str().size()));
     this->hasChanged = this->MD5.compare(localMD5) != 0;
     this->MD5 = localMD5;
     }
@@ -286,7 +286,7 @@ void vtkWebGLPolyData::GenerateBinaryData()
 
 int vtkWebGLPolyData::GetNumberOfParts()
   {
-  return this->Internal->Parts.size();
+  return static_cast<int>(this->Internal->Parts.size());
   }
 
 void vtkWebGLPolyData::PrintSelf(ostream& os, vtkIndent indent)

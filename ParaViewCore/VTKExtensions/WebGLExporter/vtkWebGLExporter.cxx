@@ -172,7 +172,7 @@ void vtkWebGLExporter::parseActor2D(vtkActor2D *actor, long actorTime, long rend
   vtkScalarBarActor* scalarbar = vtkScalarBarActor::SafeDownCast(actor);
 
   long dataMTime = actor->GetMTime() + actor->GetRedrawMTime() + actor->GetProperty()->GetMTime();
-  dataMTime += (bool)actor->GetMapper();
+  dataMTime += (long)actor->GetMapper();
   if (scalarbar) dataMTime += scalarbar->GetLookupTable()->GetMTime();
   if (dataMTime != actorTime && actor->GetVisibility())
     {
@@ -198,7 +198,7 @@ void vtkWebGLExporter::parseActor2D(vtkActor2D *actor, long actorTime, long rend
         obj->SetRendererId(renderId);
         this->Internal->Objects.push_back(obj);
         obj->SetLayer(layer);
-        obj->SetVisibility(actor->GetVisibility());
+        obj->SetVisibility(actor->GetVisibility() != 0);
         obj->SetIsWidget(isWidget);
         obj->SetInteractAtServer(false);
         obj->GenerateBinaryData();
@@ -216,7 +216,7 @@ void vtkWebGLExporter::parseActor2D(vtkActor2D *actor, long actorTime, long rend
         {
         vtkWebGLObject* obj = this->Internal->tempObj[i];
         this->Internal->tempObj.erase(this->Internal->tempObj.begin()+i);
-        obj->SetVisibility(actor->GetVisibility());
+        obj->SetVisibility(actor->GetVisibility() != 0);
         this->Internal->Objects.push_back(obj);
         }
       }
@@ -283,8 +283,8 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
             this->Internal->Objects.push_back(newobj);
             newobj->SetLayer(layer);
             newobj->SetTransformationMatrix(actor->GetMatrix());
-            newobj->SetVisibility(actor->GetVisibility());
-            newobj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry());
+            newobj->SetVisibility(actor->GetVisibility() != 0);
+            newobj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry() != 0);
             newobj->SetIsWidget(isWidget);
             newobj->SetInteractAtServer(isWidget);
             newobj->GenerateBinaryData();
@@ -309,8 +309,8 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
         this->Internal->Objects.push_back(obj);
         obj->SetLayer(layer);
         obj->SetTransformationMatrix(actor->GetMatrix());
-        obj->SetVisibility(actor->GetVisibility());
-        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry());
+        obj->SetVisibility(actor->GetVisibility() != 0);
+        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry() != 0);
         obj->SetIsWidget(isWidget);
         obj->SetInteractAtServer(isWidget);
         obj->GenerateBinaryData();
@@ -323,8 +323,8 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
         this->Internal->Objects.push_back(obj);
         obj->SetLayer(layer);
         obj->SetTransformationMatrix(actor->GetMatrix());
-        obj->SetVisibility(actor->GetVisibility());
-        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry());
+        obj->SetVisibility(actor->GetVisibility() != 0);
+        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry() != 0);
         obj->SetIsWidget(isWidget);
         obj->SetInteractAtServer(isWidget);
         obj->GenerateBinaryData();
@@ -337,8 +337,8 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
         this->Internal->Objects.push_back(obj);
         obj->SetLayer(layer);
         obj->SetTransformationMatrix(actor->GetMatrix());
-        obj->SetVisibility(actor->GetVisibility());
-        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry());
+        obj->SetVisibility(actor->GetVisibility() != 0);
+        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry() != 0);
         obj->SetIsWidget(false);
         obj->SetInteractAtServer(false);
         obj->GenerateBinaryData();
@@ -354,8 +354,8 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
         this->Internal->Objects.push_back(obj);
         obj->SetLayer(layer);
         obj->SetTransformationMatrix(actor->GetMatrix());
-        obj->SetVisibility(actor->GetVisibility());
-        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry());
+        obj->SetVisibility(actor->GetVisibility() != 0);
+        obj->SetHasTransparency(actor->HasTranslucentPolygonalGeometry() != 0);
         obj->SetIsWidget(isWidget);
         obj->SetInteractAtServer(isWidget);
         obj->GenerateBinaryData();
@@ -377,7 +377,7 @@ void vtkWebGLExporter::parseActor(vtkActor* actor, unsigned long actorTime, long
           {
           vtkWebGLObject* obj = this->Internal->tempObj[i];
           this->Internal->tempObj.erase(this->Internal->tempObj.begin()+i);
-          obj->SetVisibility(actor->GetVisibility());
+          obj->SetVisibility(actor->GetVisibility() != 0);
           this->Internal->Objects.push_back(obj);
           }
         }
@@ -401,7 +401,7 @@ void vtkWebGLExporter::parseScene(vtkRendererCollection* renderers, const char* 
 
   if (onlyWidget)
     {
-    for (int i=this->Internal->Objects.size()-1; i>=0; i--)
+    for (int i= static_cast<int>(this->Internal->Objects.size())-1; i>=0; i--)
       {
       vtkWebGLObject* obj = this->Internal->Objects[i];
       if (obj->InteractAtServer())
@@ -610,7 +610,7 @@ vtkWebGLObject* vtkWebGLExporter::GetObject(int index)
 
 int vtkWebGLExporter::GetNumberOfObjects()
   {
-  return this->Internal->Objects.size();
+  return static_cast<int>(this->Internal->Objects.size());
   }
 
 void vtkWebGLExporter::PrintSelf(ostream& os, vtkIndent indent)

@@ -193,7 +193,7 @@ void vtkPieceList::Serialize()
          << mine.ViewPriority << " "
          << mine.CachedPriority << " ";
     }
-  int len = strlen(temp.str().c_str());
+  int len = static_cast<int>(strlen(temp.str().c_str()));
   this->Internals->SerializeBuffer = new char[len+10];
   strcpy(this->Internals->SerializeBuffer, temp.str().c_str());
   this->Internals->BufferSize = len;
