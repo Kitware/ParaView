@@ -34,6 +34,12 @@
 #include "vtkSocketController.h"
 #include "vtkTrivialProducer.h"
 
+#include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMProxyIterator.h"
+
 #include <assert.h>
 #include <map>
 #include <string>
@@ -359,9 +365,17 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
       vtkSMMessage message;
       message.set_global_id(this->ProxyId);
       message.set_location(vtkPVSession::CLIENT);
-      // overloading ChatMessage for now.
-      message.SetExtension(ChatMessage::author, DISCONNECTED);
-      message.SetExtension(ChatMessage::txt, "Bye!");
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
+      user_data->set_key("LiveAction");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::INT); // Arbitrary
+      variant->add_integer(DISCONNECTED);
+
+      // Send message
       this->VisualizationSession->NotifyAllClients(&message);
       }
     }
@@ -465,9 +479,18 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       vtkSMMessage message;
       message.set_global_id(this->ProxyId);
       message.set_location(vtkPVSession::CLIENT);
-      // overloading ChatMessage for now.
-      message.SetExtension(ChatMessage::author, CONNECTED);
-      message.SetExtension(ChatMessage::txt, this->InsituXMLState);
+      message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+      message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+      // Add custom user_data
+      ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
+      user_data->set_key("LiveAction");
+      Variant* variant = user_data->add_variant();
+      variant->set_type(Variant::INT); // Arbitrary
+      variant->add_integer(CONNECTED);
+      variant->add_txt(this->InsituXMLState);
+
+      // Send message
       this->VisualizationSession->NotifyAllClients(&message);
       }
     break;
@@ -651,9 +674,6 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
     return;
     }
 
-  // This assumes that the coprocessing pipeline is recreated at every timestep
-  // and hence we need to reload the state for every timestep. This may be
-  // changed once we stop re-creating the coprocessing pipeline.
   if (this->XMLState)
     {
     vtkNew<vtkSMInsituStateLoader> loader;
@@ -742,6 +762,40 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
   // We're done coprocessing. Deliver the extracts to the visualization
   // processes.
   this->ExtractsDeliveryHelper->Update();
+
+  // Update DataInformations
+  if (myId == 0 && this->Controller)
+    {
+    vtkClientServerStream stream;
+    vtkNew<vtkSMProxyIterator> proxyIterator;
+    proxyIterator->SetSessionProxyManager(this->CoprocessorProxyManager);
+    proxyIterator->SetModeToOneGroup();
+    proxyIterator->Begin("sources");
+
+    // Serialized DataInformation
+    stream << vtkClientServerStream::Reply;
+    while(!proxyIterator->IsAtEnd())
+      {
+      vtkSMSourceProxy* source =
+          vtkSMSourceProxy::SafeDownCast(proxyIterator->GetProxy());
+      if(source)
+        {
+        vtkClientServerStream dataStream;
+        source->GetDataInformation()->CopyToStream(&dataStream);
+        // Serialize the data
+        stream << source->GetGlobalID() << dataStream;
+        }
+      proxyIterator->Next();
+      }
+    stream << vtkClientServerStream::End;
+
+    // notify vis root node that we are ready to ship extracts.
+    const unsigned char* data;
+    size_t size;
+    stream.GetData(&data, &size);
+    this->Controller->Send(&size, 1, 1, 674523);
+    this->Controller->Send(&data[0], size, 1, 674524);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -830,6 +884,35 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
   // Obtains extracts from the simulations processes.
   this->ExtractsDeliveryHelper->Update();
 
+  // Retreive the vtkPVDataInformations
+  std::map<vtkTypeUInt32,std::string> dataInformationToSend;
+  if (myId == 0 && this->Controller)
+    {
+    // Convert serialized version
+    vtkIdType size = 0;
+    this->Controller->Receive(&size, 1, 1, 674523);
+    unsigned char* data = new unsigned char[size];
+    this->Controller->Receive((char*)data, size, 1, 674524);
+    vtkClientServerStream mainStream;
+    mainStream.SetData(data, size);
+
+    int nbArgs = mainStream.GetNumberOfArguments(0);
+    int arg = 0;
+    vtkTypeUInt32 id;
+    vtkClientServerStream stream;
+    while(arg < nbArgs)
+      {
+      mainStream.GetArgument(0, arg++, &id);
+      mainStream.GetArgument(0, arg++, &stream);
+      const unsigned char *oldStr;
+      size_t oldStrSize;
+      stream.GetData(&oldStr, &oldStrSize);
+      std::string newStr((const char*)oldStr, oldStrSize);
+
+      dataInformationToSend[id] = newStr;
+      }
+    }
+
   // notify the client that updated data is available.
   if (this->VisualizationSession)
     {
@@ -841,9 +924,34 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     vtkSMMessage message;
     message.set_global_id(this->ProxyId);
     message.set_location(vtkPVSession::CLIENT);
-    // overloading ChatMessage for now.
-    message.SetExtension(ChatMessage::author, NEXT_TIMESTEP_AVAILABLE);
-    message.SetExtension(ChatMessage::txt, "");
+    message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+    message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+    // Add custom user_data
+    ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
+    user_data->set_key("LiveAction");
+    Variant* variant = user_data->add_variant();
+    variant->set_type(Variant::INT); // Arbitrary
+    variant->add_integer(NEXT_TIMESTEP_AVAILABLE);
+
+    // Add custom user_data for data information
+    if(dataInformationToSend.size() > 0)
+      {
+      ProxyState_UserData* dataInfo = message.AddExtension(ProxyState::user_data);
+      dataInfo->set_key("UpdateDataInformation");
+      std::map<vtkTypeUInt32,std::string>::iterator iter;
+      for( iter = dataInformationToSend.begin();
+           iter != dataInformationToSend.end();
+           iter++ )
+        {
+        Variant* variant = dataInfo->add_variant();
+        variant->set_type(Variant::PROXY); // Arbitrary
+        variant->add_proxy_global_id(iter->first);
+        variant->add_txt(iter->second);
+        }
+      }
+
+    // Send message
     this->VisualizationSession->NotifyAllClients(&message);
     }
 }

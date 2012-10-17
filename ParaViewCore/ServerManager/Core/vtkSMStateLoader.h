@@ -25,6 +25,8 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMDeserializerXML.h"
 
+#include <map> // needed for API
+
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMProxyLocator;
@@ -50,6 +52,19 @@ public:
   void SetProxyLocator(vtkSMProxyLocator* loc);
   vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
+  // Description:
+  // Allow the loader to keep the mapping between the id from the loaded state
+  // to the current proxy attributed id.
+  vtkSetMacro(KeepIdMapping, int);
+  vtkGetMacro(KeepIdMapping, int);
+  vtkBooleanMacro(KeepIdMapping, int);
+
+  // Description:
+  // Return an array of ids. The ids are stored in the following order
+  // and the size of the array is provided as argument.
+  // [key, value, key, value, ...]
+  // The array is kept internaly using a std::vector
+  vtkTypeUInt32* GetMappingArray(int &size);
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
@@ -113,6 +128,7 @@ protected:
 
   vtkPVXMLElement* ServerManagerStateElement;
   vtkSMProxyLocator* ProxyLocator;
+  int KeepIdMapping;
 private:
   vtkSMStateLoader(const vtkSMStateLoader&); // Not implemented
   void operator=(const vtkSMStateLoader&); // Not implemented

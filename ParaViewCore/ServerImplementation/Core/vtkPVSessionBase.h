@@ -212,6 +212,7 @@ protected:
 
   friend class vtkSMRemoteObject;
   friend class vtkSMSessionProxyManager;
+  friend class vtkSMLiveInsituLinkProxy; // Needed to get access to vtkPVCatalystSessionCore
 
   // Description:
   // Methods used to monitor if we are currently processing a server notification

@@ -53,8 +53,13 @@ public:
   //---------------------------------------------------------------------------
   void RegisterDataInformation(vtkTypeUInt32 globalid, vtkPVInformation *info)
   {
-    std::string id = this->GenerateID(globalid, info);
-    this->DataInformationMap[id] = info;
+    vtkTypeUInt32 correctId = this->GetMappedId(globalid);
+    cout << "Update cache for " << globalid << " to " << correctId << endl;
+    if(correctId != 0)
+      {
+      std::string id = this->GenerateID(correctId, info);
+      this->DataInformationMap[id] = info;
+      }
   }
   //---------------------------------------------------------------------------
   void UnRegisterDataInformation(vtkTypeUInt32 globalid)
@@ -87,6 +92,7 @@ public:
     std::string id = this->GenerateID(globalid, info);
     vtkPVInformation *storedValue = this->DataInformationMap[id];
     // We don't care of storedValue is NULL...
+    cout << "GatherInformation for " << globalid << " and cache is " << storedValue << endl;
     info->CopyFromObject(storedValue);
     return true;
   }
@@ -111,11 +117,32 @@ public:
       siSourceProxy->SetDisablePipelineExecution(true);
       }
   }
+  //---------------------------------------------------------------------------
+  void UpdateIdMap(vtkTypeUInt32* data, int size)
+  {
+    this->IdMap.clear();
+    for(int i=0; i < size; i += 2)
+      {
+      this->IdMap[data[i]] = data[i+1];
+      }
+  }
+  //---------------------------------------------------------------------------
+  vtkTypeUInt32 GetMappedId(vtkTypeUInt32 originalId)
+  {
+    std::map<vtkTypeUInt32,vtkTypeUInt32>::iterator iter;
+    iter = this->IdMap.find(originalId);
+    if(iter != this->IdMap.end())
+      {
+      return iter->second;
+      }
+    return 0;
+  }
 
 private:
   vtkWeakPointer<vtkPVCatalystSessionCore> Owner;
   unsigned long ObserverId;
   std::map<std::string, vtkSmartPointer<vtkPVInformation> > DataInformationMap;
+  std::map<vtkTypeUInt32,vtkTypeUInt32> IdMap;
 };
 //****************************************************************************/
 vtkStandardNewMacro(vtkPVCatalystSessionCore);
@@ -159,4 +186,10 @@ bool vtkPVCatalystSessionCore::GatherInformation( vtkTypeUInt32 location,
 void vtkPVCatalystSessionCore::RegisterDataInformation(vtkTypeUInt32 globalid, vtkPVInformation* info)
 {
   this->CatalystInternal->RegisterDataInformation(globalid, info);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCatalystSessionCore::UpdateIdMap(vtkTypeUInt32* idMapArray, int size)
+{
+  this->CatalystInternal->UpdateIdMap(idMapArray, size);
 }

@@ -48,6 +48,8 @@ public:
   void RegisterDataInformation(vtkTypeUInt32 globalid,
                                vtkPVInformation* information);
 
+  void UpdateIdMap(vtkTypeUInt32* idMapArray, int size);
+
 //BTX
 protected:
   vtkPVCatalystSessionCore();

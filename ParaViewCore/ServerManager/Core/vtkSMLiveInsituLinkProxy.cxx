@@ -20,11 +20,15 @@
 #include "vtkLiveInsituLink.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCatalystSessionCore.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxyDefinitionManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMStateLoader.h"
 
 #include <vtksys/ios/sstream>
 // #define vtkSMLiveInsituLinkProxyDebugMacro(x) cout << __LINE__ << " " x << endl;
@@ -66,6 +70,8 @@ void vtkSMLiveInsituLinkProxy::SetInsituProxyManager(
   this->InsituProxyManager = pxm;
   if (pxm)
     {
+    this->CatalystSessionCore =
+        vtkPVCatalystSessionCore::SafeDownCast(pxm->GetSession()->GetSessionCore());
     pxm->AddObserver(vtkCommand::PropertyModifiedEvent,
       this, &vtkSMLiveInsituLinkProxy::MarkStateDirty);
     }
@@ -75,25 +81,51 @@ void vtkSMLiveInsituLinkProxy::SetInsituProxyManager(
 void vtkSMLiveInsituLinkProxy::LoadState(
   const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
-  if (msg->HasExtension(ChatMessage::author)
-    && msg->HasExtension(ChatMessage::txt))
+  if(msg->HasExtension(ProxyState::xml_group) &&
+      msg->GetExtension(ProxyState::xml_group) == "Catalyst_Communication")
     {
-    vtkSMLiveInsituLinkProxyDebugMacro("Received message");
-    switch (msg->GetExtension(ChatMessage::author))
+    int numberOfUserData = msg->ExtensionSize(ProxyState::user_data);
+    for(int i = 0; i < numberOfUserData; ++i)
       {
-    case vtkLiveInsituLink::CONNECTED:
-      this->InsituConnected(msg->GetExtension(ChatMessage::txt).c_str());
-      this->InvokeEvent(vtkCommand::ConnectionCreatedEvent); 
-      break;
+      const ProxyState_UserData& user_data =
+        msg->GetExtension(ProxyState::user_data, i);
 
-    case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
-      this->NewTimestepAvailable();
-      break;
+      // Process User data
+      if (user_data.key() == "LiveAction")
+        {
+        const Variant& value = user_data.variant(0);
+        vtkSMLiveInsituLinkProxyDebugMacro("Received message");
+        switch (value.integer(0))
+          {
+        case vtkLiveInsituLink::CONNECTED:
+          this->InsituConnected(value.txt(0).c_str());
+          this->InvokeEvent(vtkCommand::ConnectionCreatedEvent);
+          break;
 
-    case vtkLiveInsituLink::DISCONNECTED:
-      vtkSMLiveInsituLinkProxyDebugMacro("Catalyst disconnected!!!");
-      this->InvokeEvent(vtkCommand::ConnectionClosedEvent); 
-      break;
+        case vtkLiveInsituLink::NEXT_TIMESTEP_AVAILABLE:
+          this->NewTimestepAvailable();
+          break;
+
+        case vtkLiveInsituLink::DISCONNECTED:
+          vtkSMLiveInsituLinkProxyDebugMacro("Catalyst disconnected!!!");
+          this->InvokeEvent(vtkCommand::ConnectionClosedEvent);
+          break;
+          }
+        }
+      else if (user_data.key() == "UpdateDataInformation" && this->CatalystSessionCore)
+        {
+        int nbVars = user_data.variant_size();
+        for(int varIdx = 0; varIdx < nbVars; ++varIdx)
+          {
+          const Variant& value = user_data.variant(varIdx);
+          vtkTypeUInt32 proxyId = value.proxy_global_id(0);
+          vtkClientServerStream stream;
+          stream.SetData((const unsigned char*)value.txt(0).c_str(), value.txt(0).size());
+          vtkNew<vtkPVDataInformation> info;
+          info->CopyFromStream(&stream);
+          this->CatalystSessionCore->RegisterDataInformation(proxyId, info.GetPointer());
+          }
+        }
       }
     }
   else
@@ -131,7 +163,23 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
   vtkNew<vtkPVXMLParser> parser;
   if (parser->Parse(state))
     {
-    this->InsituProxyManager->LoadXMLState(parser->GetRootElement());
+    vtkNew<vtkSMStateLoader> loader;
+    loader->SetSessionProxyManager(this->InsituProxyManager);
+    loader->KeepIdMappingOn();
+    this->InsituProxyManager->LoadXMLState(parser->GetRootElement(), loader.GetPointer());
+
+
+    int size = 0;
+    vtkTypeUInt32* mapArray = loader->GetMappingArray(size);
+    this->CatalystSessionCore->UpdateIdMap(mapArray, size);
+
+
+    for(int i=0; i < size; ++i)
+    {
+      cout << mapArray[i] << " => " << mapArray[i+1] << endl;
+      ++i;
+    }
+
     this->StateDirty = false;
     }
 }

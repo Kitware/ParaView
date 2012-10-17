@@ -51,6 +51,7 @@ struct vtkSMStateLoaderInternals
   typedef std::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
   typedef std::map<int, VectorOfRegInfo> RegInfoMapType;
   RegInfoMapType RegistrationInformation;
+  std::vector<vtkTypeUInt32> AlignedMappingIdTable;
 };
 
 //---------------------------------------------------------------------------
@@ -58,6 +59,7 @@ vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
   this->ServerManagerStateElement = 0;
+  this->KeepIdMapping = 0;
   this->ProxyLocator = vtkSMProxyLocator::New();
 }
 
@@ -595,6 +597,26 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
       }
     }
 
+  // If KeepIdMapping
+  this->Internal->AlignedMappingIdTable.clear();
+  if(this->KeepIdMapping != 0)
+    {
+    vtkSMStateLoaderInternals::RegInfoMapType::iterator iter =
+        this->Internal->RegistrationInformation.begin();
+    while(iter != this->Internal->RegistrationInformation.end())
+      {
+      vtkSMProxy* proxy =
+          this->LocateExistingProxyUsingRegistrationName(iter->first);
+      if(proxy)
+        {
+        this->Internal->AlignedMappingIdTable.push_back(iter->first);
+        this->Internal->AlignedMappingIdTable.push_back(proxy->GetGlobalID());
+        }
+      // Move forward
+      iter++;
+      }
+    }
+
   // Clear internal data structures.
   this->Internal->RegistrationInformation.clear();
   this->ServerManagerStateElement = 0; 
@@ -605,4 +627,11 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* parent)
 void vtkSMStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//---------------------------------------------------------------------------
+vtkTypeUInt32* vtkSMStateLoader::GetMappingArray(int &size)
+{
+  size = static_cast<int>(this->Internal->AlignedMappingIdTable.size());
+  return &this->Internal->AlignedMappingIdTable[0];
 }

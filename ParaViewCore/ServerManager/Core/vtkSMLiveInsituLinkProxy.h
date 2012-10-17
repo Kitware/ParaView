@@ -22,6 +22,9 @@
 #include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer.
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
+
+class vtkPVCatalystSessionCore;
 
 class VTKPVSERVERMANAGERCORE_EXPORT vtkSMLiveInsituLinkProxy : public vtkSMProxy
 {
@@ -68,6 +71,7 @@ protected:
   void NewTimestepAvailable();
 
   vtkSmartPointer<vtkSMSessionProxyManager> InsituProxyManager;
+  vtkWeakPointer<vtkPVCatalystSessionCore> CatalystSessionCore;
 
   bool StateDirty;
 private:
