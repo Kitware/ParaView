@@ -81,6 +81,19 @@ vtkPiecewiseFunction* vtkUncertaintySurfaceRepresentation::GetUncertaintyTransfe
 }
 
 //----------------------------------------------------------------------------
+void vtkUncertaintySurfaceRepresentation::SetNoiseDensity(double density)
+{
+  this->Painter->SetNoiseDensity(density);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+double vtkUncertaintySurfaceRepresentation::GetNoiseDensity() const
+{
+  return this->Painter->GetNoiseDensity();
+}
+
+//----------------------------------------------------------------------------
 void vtkUncertaintySurfaceRepresentation::UpdateColoringParameters()
 {
   this->Superclass::UpdateColoringParameters();

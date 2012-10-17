@@ -55,6 +55,11 @@ public:
   vtkGetObjectMacro(TransferFunction, vtkPiecewiseFunction)
   vtkSetObjectMacro(TransferFunction, vtkPiecewiseFunction)
 
+  // Description:
+  // Set/get the noise density.
+  vtkSetClampMacro(NoiseDensity, float, 0.0f, 50.0f)
+  vtkGetMacro(NoiseDensity, float)
+
 protected:
   vtkUncertaintySurfacePainter();
   ~vtkUncertaintySurfacePainter();
@@ -92,6 +97,7 @@ private:
   vtkPiecewiseFunction *TransferFunction;
   char *UncertaintyArrayName;
   int RenderingPreparationSuccess;
+  float NoiseDensity;
 };
 
 #endif // __vtkUncertaintySurfacePainter_h

@@ -28,6 +28,7 @@
 #include "vtkInformation.h"
 #include "vtkgl.h"
 #include "vtkGenericVertexAttributeMapping.h"
+#include "vtkUniformVariables.h"
 
 #include "vtkIdTypeArray.h"
 #include "vtkMultiBlockDataSet.h"
@@ -178,6 +179,7 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
     vtkErrorMacro("Shader building failed.");
     abort();
     }
+  this->Shader->GetUniformVariables()->SetUniformf("noiseDensity", 1, &this->NoiseDensity);
   this->Shader->Use();
   if(!this->Shader->IsValid())
     {

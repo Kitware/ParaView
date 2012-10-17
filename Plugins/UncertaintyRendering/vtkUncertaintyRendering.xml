@@ -36,8 +36,18 @@
         <Documentation>
           This property specifies the name of the uncertainty array.
         </Documentation>
-
       </StringVectorProperty>
+
+      <DoubleVectorProperty name="NoiseDensity"
+                            command="SetNoiseDensity"
+                            default_values="10.0"
+                            number_of_elements="1"
+                            label="Uncertainty Noise Density">
+        <DoubleRangeDomain name="range" min="0" max="25"/>
+        <Documentation>
+          This property sets the uncertainty noise density.
+        </Documentation>
+      </DoubleVectorProperty>
 
       <ProxyProperty name="UncertaintyTransferFunction"
                      command="SetUncertaintyTransferFunction"

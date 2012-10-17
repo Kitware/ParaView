@@ -49,6 +49,11 @@ public:
   void SetUncertaintyTransferFunction(vtkPiecewiseFunction *function);
   vtkPiecewiseFunction* GetUncertaintyTransferFunction() const;
 
+  // Description:
+  // Set/get the noise density.
+  void SetNoiseDensity(double density);
+  double GetNoiseDensity() const;
+
 protected:
   vtkUncertaintySurfaceRepresentation();
   ~vtkUncertaintySurfaceRepresentation();

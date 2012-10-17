@@ -18,6 +18,7 @@
         <ExposedProperties>
           <Property name="SelectUncertaintyArray"  exposed_name="SelectUncertaintyArray"/>
           <Property name="UncertaintyTransferFunction" exposed_name="UncertaintyTransferFunction"/>
+          <Property name="NoiseDensity" exposed_name="UncertaintyNoiseDensity"/>
         </ExposedProperties>
       </SubProxy>
     </Extension>
@@ -39,6 +40,7 @@
         <ExposedProperties>
           <Property name="SelectUncertaintyArray"  exposed_name="SelectUncertaintyArray"/>
           <Property name="UncertaintyTransferFunction" exposed_name="UncertaintyTransferFunction"/>
+          <Property name="NoiseDensity" exposed_name="UncertaintyNoiseDensity"/>
         </ExposedProperties>
       </SubProxy>
     </Extension>
@@ -60,6 +62,7 @@
         <ExposedProperties>
           <Property name="SelectUncertaintyArray"  exposed_name="SelectUncertaintyArray"/>
           <Property name="UncertaintyTransferFunction" exposed_name="UncertaintyTransferFunction"/>
+          <Property name="NoiseDensity" exposed_name="UncertaintyNoiseDensity"/>
         </ExposedProperties>
       </SubProxy>
     </Extension>
