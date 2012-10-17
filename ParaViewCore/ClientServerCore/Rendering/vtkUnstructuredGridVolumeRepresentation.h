@@ -128,10 +128,6 @@ protected:
     vtkInformationVector**, vtkInformationVector*);
 
   // Description:
-  // Produce meta-data about this representation that the view may find useful.
-  bool GenerateMetaData(vtkInformation*, vtkInformation*);
-
-  // Description:
   // Adds the representation to the view.  This is called from
   // vtkView::AddRepresentation().  Subclasses should override this method.
   // Returns true if the addition succeeds.
