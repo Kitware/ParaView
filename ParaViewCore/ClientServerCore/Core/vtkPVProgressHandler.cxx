@@ -886,7 +886,7 @@ void vtkPVProgressHandler::SendMessageToRoot()
     (vtkMultiProcessController::GetGlobalController());
   controller->NoBlockSend
     (this->Internals->AsyncMessageStore,
-    msgsize+sizeof(int), 0,
+     static_cast<int>(msgsize+sizeof(int)), 0,
     vtkPVProgressHandler::MESSAGE_EVENT_TAG,
     this->Internals->AsyncMessageRequest);
 #endif
