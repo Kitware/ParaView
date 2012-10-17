@@ -38,7 +38,7 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # ignore external code issue
   ".*pyconfig.h"
   ".*Python.h"
-  ".*\\VC\include\\.*"
+  ".*\\VC\\include\\.*"
   ".*FreeType.*CxxTests.*"
 
   # Ignore invalid warning
