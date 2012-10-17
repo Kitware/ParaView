@@ -131,6 +131,11 @@ public:
     this->SetInsituXMLState(txt);
     }
 
+  // Description:
+  // This method will remove references to proxy that shouldn't be shared with ParaView
+  // Return true if something has been removed
+  static bool FilterXMLState(vtkPVXMLElement* xmlState);
+
 //BTX
   // ***************************************************************
   // Internal methods, public for callbacks.

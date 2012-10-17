@@ -42,9 +42,11 @@
 
 #include <assert.h>
 #include <map>
+#include <pair.h>
+#include <set>
 #include <string>
-#include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 
 // #define vtkLiveInsituLinkDebugMacro(x) cout << __LINE__ << " " x << endl;
 #define vtkLiveInsituLinkDebugMacro(x)
@@ -127,8 +129,32 @@ public:
       Group(group), Name(name), Port(port) {}
     };
 
+  bool IsNew(vtkTypeUInt32 proxyId, vtkPVDataInformation* info)
+  {
+    vtkClientServerStream stream;
+    info->CopyToStream(&stream);
+    size_t length = 0;
+    const unsigned char *data = NULL;
+    stream.GetData(&data, &length);
+    std::string rawData((const char*)data, length);
+
+    // Search if existing value is the same
+    std::map<vtkTypeUInt32, std::string>::iterator iter;
+    iter = this->LastSentDataInformationMap.find(proxyId);
+    if((iter != this->LastSentDataInformationMap.end()) && (iter->second == rawData))
+      {
+      return false;
+      }
+
+    // Store the new MTime
+    this->LastSentDataInformationMap[proxyId] = rawData;
+
+    return true;
+  }
+
   typedef std::map<Key, vtkSmartPointer<vtkTrivialProducer> > ExtractsMap;
   ExtractsMap Extracts;
+  std::map<vtkTypeUInt32, std::string> LastSentDataInformationMap;
 };
 
 vtkStandardNewMacro(vtkLiveInsituLink);
@@ -500,6 +526,10 @@ void vtkLiveInsituLink::InsituProcessConnected(vtkMultiProcessController* contro
       {
       // send startup state to the visualization process.
       vtkPVXMLElement* xml = this->CoprocessorProxyManager->SaveXMLState();
+
+      // Filter XML to remove any view/representation/timeKeeper/animation proxy
+      vtkLiveInsituLink::FilterXMLState(xml);
+
       vtksys_ios::ostringstream xml_string;
       xml->PrintXML(xml_string, vtkIndent());
       xml->Delete();
@@ -778,12 +808,16 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
       {
       vtkSMSourceProxy* source =
           vtkSMSourceProxy::SafeDownCast(proxyIterator->GetProxy());
-      if(source)
+      if( source &&
+          this->Internals->IsNew(source->GetGlobalID(), source->GetDataInformation()))
         {
-        vtkClientServerStream dataStream;
-        source->GetDataInformation()->CopyToStream(&dataStream);
-        // Serialize the data
-        stream << source->GetGlobalID() << dataStream;
+        for(unsigned int port = 0; port < source->GetNumberOfOutputPorts(); ++port)
+          {
+          vtkClientServerStream dataStream;
+          source->GetDataInformation(port)->CopyToStream(&dataStream);
+          // Serialize the data
+          stream << source->GetGlobalID() << port << dataStream;
+          }
         }
       proxyIterator->Next();
       }
@@ -885,7 +919,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
   this->ExtractsDeliveryHelper->Update();
 
   // Retreive the vtkPVDataInformations
-  std::map<vtkTypeUInt32,std::string> dataInformationToSend;
+  std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string> dataInformationToSend;
   if (myId == 0 && this->Controller)
     {
     // Convert serialized version
@@ -899,17 +933,19 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
     int nbArgs = mainStream.GetNumberOfArguments(0);
     int arg = 0;
     vtkTypeUInt32 id;
+    unsigned int port;
     vtkClientServerStream stream;
     while(arg < nbArgs)
       {
       mainStream.GetArgument(0, arg++, &id);
+      mainStream.GetArgument(0, arg++, &port);
       mainStream.GetArgument(0, arg++, &stream);
       const unsigned char *oldStr;
       size_t oldStrSize;
       stream.GetData(&oldStr, &oldStrSize);
       std::string newStr((const char*)oldStr, oldStrSize);
 
-      dataInformationToSend[id] = newStr;
+      dataInformationToSend[std::pair<vtkTypeUInt32, unsigned int>(id,port)] = newStr;
       }
     }
 
@@ -939,14 +975,15 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
       {
       ProxyState_UserData* dataInfo = message.AddExtension(ProxyState::user_data);
       dataInfo->set_key("UpdateDataInformation");
-      std::map<vtkTypeUInt32,std::string>::iterator iter;
+      std::map<std::pair<vtkTypeUInt32,unsigned int>,std::string>::iterator iter;
       for( iter = dataInformationToSend.begin();
            iter != dataInformationToSend.end();
            iter++ )
         {
         Variant* variant = dataInfo->add_variant();
         variant->set_type(Variant::PROXY); // Arbitrary
-        variant->add_proxy_global_id(iter->first);
+        variant->add_proxy_global_id(iter->first.first);
+        variant->add_port_number(iter->first.second);
         variant->add_txt(iter->second);
         }
       }
@@ -1007,4 +1044,57 @@ void vtkLiveInsituLink::UnRegisterExtract(vtkTrivialProducer* producer)
 void vtkLiveInsituLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+//----------------------------------------------------------------------------
+bool vtkLiveInsituLink::FilterXMLState(vtkPVXMLElement* xmlState)
+{
+  // Init search set if needed
+  static std::set<std::string> groupSet;
+  static std::set<std::string> nameSet;
+
+  // Fill search set if empty
+  if(groupSet.size() == 0)
+    {
+    groupSet.insert("animation");
+    groupSet.insert("misc");
+    groupSet.insert("representations");
+    groupSet.insert("views");
+    // ---
+    nameSet.insert("timekeeper");
+    nameSet.insert("animation");
+    nameSet.insert("views");
+    nameSet.insert("representations");
+    }
+
+  bool changed = false;
+  if(!strcmp(xmlState->GetName(), "Proxy"))
+    {
+    std::string group = xmlState->GetAttribute("group");
+    if(groupSet.find(group) != groupSet.end())
+      {
+      xmlState->GetParent()->RemoveNestedElement(xmlState);
+      return true;
+      }
+    }
+  else if(!strcmp(xmlState->GetName(), "ProxyCollection"))
+    {
+    std::string name = xmlState->GetAttribute("name");
+    if(nameSet.find(name) != nameSet.end())
+      {
+      xmlState->GetParent()->RemoveNestedElement(xmlState);
+      return true;
+      }
+    }
+  else
+    {
+    for(unsigned int i=0; i < xmlState->GetNumberOfNestedElements(); ++i)
+      {
+      if(vtkLiveInsituLink::FilterXMLState(xmlState->GetNestedElement(i)))
+        {
+        changed = true;
+        i--;
+        }
+      }
+    }
+  return changed;
 }

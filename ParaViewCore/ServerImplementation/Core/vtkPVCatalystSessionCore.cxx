@@ -16,6 +16,7 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
 #include "vtkPVInformation.h"
 #include "vtkPVSession.h"
 #include "vtkSISourceProxy.h"
@@ -51,19 +52,21 @@ public:
   }
 
   //---------------------------------------------------------------------------
-  void RegisterDataInformation(vtkTypeUInt32 globalid, vtkPVInformation *info)
+  vtkTypeUInt32 RegisterDataInformation(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation *info)
   {
     vtkTypeUInt32 correctId = this->GetMappedId(globalid);
     if(correctId != 0)
       {
-      std::string id = this->GenerateID(correctId, info);
+      //cout << "RegisterDataInformation: " << correctId << " " << port << endl;
+      std::string id = this->GenerateID(correctId, port, info);
       this->DataInformationMap[id] = info;
       }
+    return correctId;
   }
   //---------------------------------------------------------------------------
   void UnRegisterDataInformation(vtkTypeUInt32 globalid)
   {
-    std::string id = this->GenerateID(globalid, NULL);
+    std::string id = this->GenerateID(globalid, 0, NULL);
     std::vector<std::string> keysToDelete;
     std::map<std::string, vtkSmartPointer<vtkPVInformation> >::iterator iter;
     for( iter  = this->DataInformationMap.begin();
@@ -86,9 +89,10 @@ public:
       }
   }
   //---------------------------------------------------------------------------
-  bool GatherInformation(vtkTypeUInt32 globalid, vtkPVInformation *info)
+  bool GatherInformation(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation *info)
   {
-    std::string id = this->GenerateID(globalid, info);
+    //cout << "GatherInformation: " << globalid << " " << port << endl;
+    std::string id = this->GenerateID(globalid, port, info);
     vtkPVInformation *storedValue = this->DataInformationMap[id];
 
     if(storedValue)
@@ -104,13 +108,13 @@ public:
     return true;
   }
   //---------------------------------------------------------------------------
-  std::string GenerateID(vtkTypeUInt32 globalid, vtkPVInformation *info)
+  std::string GenerateID(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation *info)
   {
     vtksys_ios::ostringstream id;
     id << globalid << ":";
     if(info)
       {
-      id << info->GetClassName();
+      id << port << ":" << info->GetClassName();
       }
     return id.str();
   }
@@ -182,17 +186,17 @@ bool vtkPVCatalystSessionCore::GatherInformation( vtkTypeUInt32 location,
     return true;
     }
 
-  if(information->IsA("vtkPVDataInformation"))
+  if(vtkPVDataInformation* dataInfo = vtkPVDataInformation::SafeDownCast(information))
     {
-    return this->CatalystInternal->GatherInformation(globalid, information);
+    return this->CatalystInternal->GatherInformation(globalid, dataInfo->GetPortNumber(), information);
     }
   return this->Superclass::GatherInformation(location, information, globalid);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCatalystSessionCore::RegisterDataInformation(vtkTypeUInt32 globalid, vtkPVInformation* info)
+vtkTypeUInt32 vtkPVCatalystSessionCore::RegisterDataInformation(vtkTypeUInt32 globalid, unsigned int port, vtkPVInformation* info)
 {
-  this->CatalystInternal->RegisterDataInformation(globalid, info);
+  return this->CatalystInternal->RegisterDataInformation(globalid, port, info);
 }
 
 //----------------------------------------------------------------------------

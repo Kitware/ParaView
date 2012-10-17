@@ -28,6 +28,7 @@
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
 
 #include <vtksys/ios/sstream>
@@ -81,6 +82,7 @@ void vtkSMLiveInsituLinkProxy::SetInsituProxyManager(
 void vtkSMLiveInsituLinkProxy::LoadState(
   const vtkSMMessage* msg, vtkSMProxyLocator* locator)
 {
+  std::vector<vtkTypeUInt32> sourceProxyToMarkModified;
   if(msg->HasExtension(ProxyState::xml_group) &&
       msg->GetExtension(ProxyState::xml_group) == "Catalyst_Communication")
     {
@@ -119,11 +121,18 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           {
           const Variant& value = user_data.variant(varIdx);
           vtkTypeUInt32 proxyId = value.proxy_global_id(0);
+          unsigned int port = value.port_number(0);
           vtkClientServerStream stream;
           stream.SetData((const unsigned char*)value.txt(0).c_str(), value.txt(0).size());
           vtkNew<vtkPVDataInformation> info;
           info->CopyFromStream(&stream);
-          this->CatalystSessionCore->RegisterDataInformation(proxyId, info.GetPointer());
+          vtkTypeUInt32 realId =
+              this->CatalystSessionCore->RegisterDataInformation(
+                proxyId, port, info.GetPointer());
+
+          // Add to proxy list that needs a refresh...
+          sourceProxyToMarkModified.push_back(realId);
+          cout << "Add id " << realId << endl;
           }
         }
       }
@@ -131,6 +140,18 @@ void vtkSMLiveInsituLinkProxy::LoadState(
   else
     {
     this->Superclass::LoadState(msg, locator);
+    }
+
+  // Update source proxy that have new data information
+  for(size_t i = 0; i < sourceProxyToMarkModified.size(); ++i)
+    {
+    vtkObject* obj = this->InsituProxyManager->GetSession()->GetRemoteObject(sourceProxyToMarkModified[i]);
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(obj);
+    if(source)
+      {
+      source->MarkModified(NULL);
+      source->UpdatePipeline();
+      }
     }
 }
 

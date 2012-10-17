@@ -45,8 +45,9 @@ public:
   // Description:
   // Update the data information for a given proxy with the given globalid.
   // This will allow the GatherInformation to work with "fake" VTK pipeline.
-  void RegisterDataInformation(vtkTypeUInt32 globalid,
-                               vtkPVInformation* information);
+  // Return the real corresponding proxy id
+  vtkTypeUInt32 RegisterDataInformation(vtkTypeUInt32 globalid, unsigned int port,
+                                        vtkPVInformation* information);
 
   void UpdateIdMap(vtkTypeUInt32* idMapArray, int size);
 
