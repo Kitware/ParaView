@@ -69,8 +69,6 @@ class pqTransferFunctionEditorPropertyWidgetDialog : public QDialog
 public:
   explicit pqTransferFunctionEditorPropertyWidgetDialog(vtkPiecewiseFunction *transferFunction, QWidget *parent = 0);
 
-  vtkPiecewiseFunction* transferFunction() const { return this->TransferFunction.GetPointer(); }
-
 private:
   vtkSmartPointer<vtkPiecewiseFunction> TransferFunction;
 };
