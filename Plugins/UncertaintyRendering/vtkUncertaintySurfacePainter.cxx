@@ -52,7 +52,9 @@ vtkUncertaintySurfacePainter::vtkUncertaintySurfacePainter()
   this->Output = 0;
   this->LastRenderWindow = 0;
   this->LightingHelper = vtkSmartPointer<vtkLightingHelper>::New();
-  this->TransferFunction = 0;
+  this->TransferFunction = vtkPiecewiseFunction::New();
+  this->TransferFunction->AddPoint(0, 0);
+  this->TransferFunction->AddPoint(1, 1);
   this->UncertaintyArrayName = 0;
 }
 
@@ -241,7 +243,8 @@ bool vtkUncertaintySurfacePainter::PrepareOutput()
   if(!this->Output ||
      !this->Output->IsA(input->GetClassName()) ||
      (this->Output->GetMTime() < this->GetMTime()) ||
-     (this->Output->GetMTime() < input->GetMTime()))
+     (this->Output->GetMTime() < input->GetMTime()) ||
+     this->TransferFunction->GetMTime() > this->Output->GetMTime())
     {
     if(this->Output)
       {
@@ -310,32 +313,10 @@ void vtkUncertaintySurfacePainter::GenerateUncertaintiesArray(vtkDataObject *inp
     if(this->TransferFunction)
       {
       // use transfer function
-      double min_value = std::numeric_limits<double>::max();
-      double max_value = std::numeric_limits<double>::min();
-
       for(vtkIdType i = 0; i < inputUnceratintiesArray->GetNumberOfTuples(); i++)
-        {
-        double value = inputUnceratintiesArray->GetVariantValue(i).ToDouble();
-
-        if(value < min_value)
-          {
-          min_value = value;
-          }
-        if(value > max_value)
-          {
-          max_value = value;
-          }
-        }
-
-      this->TransferFunction->RemoveAllPoints();
-      this->TransferFunction->AddPoint(min_value, 1.0);
-      this->TransferFunction->AddPoint(max_value, 0.0);
-
-      for(vtkIdType i = 0; i < outputUncertaintiesArray->GetNumberOfTuples(); i++)
         {
         vtkVariant inputValue = inputUnceratintiesArray->GetVariantValue(i);
         double outputValue = this->TransferFunction->GetValue(inputValue.ToDouble());
-
         outputUncertaintiesArray->SetValue(i, static_cast<float>(outputValue));
         }
       }
