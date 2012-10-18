@@ -104,10 +104,10 @@ void pqAutoLoadPluginXMLBehavior::updateResources()
         {
         std::vector<std::string> xmls;
         smplugin->GetXMLs(xmls);
-        for (size_t cc=0; cc < xmls.size(); cc++)
+        for (size_t kk=0; kk < xmls.size(); kk++)
           {
           pqApplicationCore::instance()->loadConfigurationXML(
-            xmls[cc].c_str());
+            xmls[kk].c_str());
           }
         }
       }
