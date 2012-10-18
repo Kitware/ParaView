@@ -73,7 +73,7 @@ varying float vUncertainty;
 uniform sampler2D texture;
 uniform float noiseDensity;
 
-vec2 mix_random_noise(vec2 input, float uncertainty)
+vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
 {
   vec3 uvw = v_texCoord3D + noiseDensity * vec3(snoise(v_texCoord3D + vec3(0.0f, 0.0f, 1.0f)),
                                          snoise(v_texCoord3D + vec3(43.0f, 17.0f, 1.0f)),
@@ -86,7 +86,7 @@ vec2 mix_random_noise(vec2 input, float uncertainty)
   n += 0.03125f * snoise(uvw * 32.0f - vec3(0.0f, 0.0f, 5.6f));
   n = n * 0.7f - 0.5f;
 
-  return mix(input, vec2(n, n), uncertainty);
+  return mix(inputCoord, vec2(n, n), uncertainty);
 }
 
 void main()
