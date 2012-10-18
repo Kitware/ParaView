@@ -123,7 +123,7 @@ void vtkSMLiveInsituLinkProxy::LoadState(
           vtkTypeUInt32 proxyId = value.proxy_global_id(0);
           unsigned int port = value.port_number(0);
           vtkClientServerStream stream;
-          stream.SetData((const unsigned char*)value.txt(0).c_str(), value.txt(0).size());
+          stream.SetData((const unsigned char*)value.binary(0).c_str(), value.binary(0).size());
           vtkNew<vtkPVDataInformation> info;
           info->CopyFromStream(&stream);
           vtkTypeUInt32 realId =

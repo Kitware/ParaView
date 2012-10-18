@@ -17,6 +17,7 @@ message Variant {
     STRING  = 3;
     PROXY   = 4; // proxy_global_id + port_number
     INPUT   = 5; // proxy_global_id + port_number
+    BYTES   = 6;
     }
 
   required Type    type            = 1;
@@ -26,6 +27,7 @@ message Variant {
   repeated uint64  proxy_global_id = 6;
   repeated int32   port_number     = 7;
   repeated string  txt             = 8;
+  repeated bytes   binary          = 9;
 }
 
 message VariantList {

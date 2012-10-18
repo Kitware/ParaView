@@ -984,7 +984,7 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
         variant->set_type(Variant::PROXY); // Arbitrary
         variant->add_proxy_global_id(iter->first.first);
         variant->add_port_number(iter->first.second);
-        variant->add_txt(iter->second);
+        variant->add_binary(iter->second);
         }
       }
 
@@ -1048,6 +1048,11 @@ void vtkLiveInsituLink::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkLiveInsituLink::FilterXMLState(vtkPVXMLElement* xmlState)
 {
+  if(xmlState == NULL)
+    {
+    return false;
+    }
+
   // Init search set if needed
   static std::set<std::string> groupSet;
   static std::set<std::string> nameSet;
