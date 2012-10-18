@@ -101,8 +101,8 @@ void pqTransferFunctionEditorPropertyWidget::buttonClicked()
 
 // === pqTransferFunctionEditorPropertyWidgetDialog ======================== //
 pqTransferFunctionEditorPropertyWidgetDialog::
-  pqTransferFunctionEditorPropertyWidgetDialog(vtkPiecewiseFunction *transferFunction, QWidget *parent)
-  : QDialog(parent)
+  pqTransferFunctionEditorPropertyWidgetDialog(vtkPiecewiseFunction *transferFunction, QWidget *parent_)
+  : QDialog(parent_)
 {
   QVBoxLayout *l = new QVBoxLayout;
 
