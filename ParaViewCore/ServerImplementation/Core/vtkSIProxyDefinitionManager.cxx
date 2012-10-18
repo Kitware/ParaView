@@ -825,8 +825,16 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
 {
   if (!root)
     {
-    vtkErrorMacro("Must parse a configuration before storing it.");
     return false;
+    }
+
+  if (!root->GetName() ||
+    strcmp(root->GetName(), "ServerManagerConfiguration") != 0)
+    {
+    // find nested ServerManagerConfiguration element and process that.
+    return this->LoadConfigurationXML(
+      root->FindNestedElementByName("ServerManagerConfiguration"),
+      attachHints);
     }
 
   // Attach ShowInMenu hints

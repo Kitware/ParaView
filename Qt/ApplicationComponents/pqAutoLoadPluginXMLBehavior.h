@@ -60,8 +60,7 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqAutoLoadPluginXMLBehavior)
   QSet<QString> PreviouslyParsedResources;
+  QSet<QString> PreviouslyParsedPlugins;
 };
 
 #endif
-
-
