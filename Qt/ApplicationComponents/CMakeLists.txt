@@ -193,6 +193,8 @@ set (Module_SRCS
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.cxx
   pqToggleInteractionViewMode.h
+  pqTransferFunctionEditorPropertyWidget.cxx
+  pqTransferFunctionEditorPropertyWidget.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
@@ -295,6 +297,7 @@ set (Module_MOC_HDRS
   pqTestingReaction.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h
+  pqTransferFunctionEditorPropertyWidget.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h

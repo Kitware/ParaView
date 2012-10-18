@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
 #include "pqTextureSelectorPropertyWidget.h"
+#include "pqTransferFunctionEditorPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -88,6 +89,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     else if(name == "command_button")
       {
       return new pqCommandButtonPropertyWidget(smProxy, smProperty);
+      }
+    else if(name == "transfer_function_editor")
+      {
+      return new pqTransferFunctionEditorPropertyWidget(smProxy, smProperty);
       }
     else
       {
