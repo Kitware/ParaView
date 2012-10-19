@@ -24,7 +24,6 @@
 #include "vtkOrderedCompositeDistributor.h"
 #include "vtkPKdTree.h"
 #include "vtkPVDataRepresentation.h"
-#include "vtkPVDataRepresentationPipeline.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVStreamingMacros.h"
 #include "vtkPVTrivialProducer.h"
@@ -328,21 +327,13 @@ void vtkPVDataDeliveryManager::SetPiece(
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, low_res);
   if (item)
     {
-    vtkPVDataRepresentationPipeline* executive =
-      vtkPVDataRepresentationPipeline::SafeDownCast(repr->GetExecutive());
-
-    // SetPiece() is called in every REQUEST_UPDATE() or REQUEST_UPDATE_LOD()
-    // pass irrespective of whether the data has actually changed.
-    // (I think that's a mistake, but the fact that representations can be
-    // updated without view makes it tricky since we cannot set the data to
-    // deliver in vtkPVDataRepresentation::RequestData() easily). Hence we need
-    // to ensure that the data we are getting is newer than what we have.
-    unsigned long data_time = executive? executive->GetDataTime() : 0;
+    unsigned long data_time = 0;
     if (data && (data->GetMTime() > data_time))
       {
       data_time = data->GetMTime();
       }
-    if (data_time > item->GetTimeStamp())
+    if (data_time > item->GetTimeStamp() ||
+      item->GetDataObject() != data)
       {
       item->SetDataObject(data);
       }
