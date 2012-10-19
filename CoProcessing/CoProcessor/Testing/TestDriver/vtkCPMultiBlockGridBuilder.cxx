@@ -65,8 +65,7 @@ vtkDataObject* vtkCPMultiBlockGridBuilder::GetGrid(
     this->SetGrid(multiBlock);
     multiBlock->Delete();
     }
-  unsigned int numberOfBlocks = static_cast<unsigned int>(
-    this->Internal->GridBuilders.size());
+  unsigned int numberOfBlocks = static_cast<unsigned int>(this->Internal->GridBuilders.size());
   if(this->Grid->GetNumberOfBlocks() != numberOfBlocks)
     {
     builtNewGrid = 1;

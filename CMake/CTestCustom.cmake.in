@@ -34,6 +34,18 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
 
   # ignore warnings from documentation generation tools.
   "Warning.*Skipping it."
+  "warning.*Skipping it."
+
+  # ignore external code issue
+  ".*pyconfig.h"
+  ".*Python.h"
+  ".*\\VC\\include\\.*"
+  ".*FreeType.*CxxTests.*"
+
+  # Ignore invalid warning
+  ".*vtksmrenderviewproxy.cxx.*unreachable code"
+  ".*pqComponentsInit.cxx.*conditional expression is constant"
+  ".*pqCoreInit.cxx.*conditional expression is constant"
 
   # ignore warnings from old plugins
   ".*H5Part.*"
@@ -49,6 +61,10 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # MPI 2 deprecation warning
   ".*MPI_Errhandler_create.*MPI_Comm_create_errhandler.*"
   ".*MPI_Errhandler_set.*MPI_Comm_set_errhandler.*"
+
+  # Ignore warning on Windows for static builds complaining that the archive has
+  # no public symbols and hence will be inaccessible.
+  "warning LNK4221"
 )
 
 #------------------------------------------------------------------------------
