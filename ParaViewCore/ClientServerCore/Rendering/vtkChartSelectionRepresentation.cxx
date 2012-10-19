@@ -93,7 +93,6 @@ int vtkChartSelectionRepresentation::FillInputPortInformation(
 int vtkChartSelectionRepresentation::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
-  cout << "vtkChartSelectionRepresentation::RequestData" << endl;
   if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     return this->Superclass::RequestData(request, inputVector, outputVector);
