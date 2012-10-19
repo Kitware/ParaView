@@ -15,8 +15,9 @@
 #include "vtkPVDataDeliveryManager.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkBSPCutsGenerator.h"
 #include "vtkDataObject.h"
+#include "vtkExtentTranslator.h"
+#include "vtkKdTreeManager.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNew.h"
@@ -66,6 +67,15 @@ public:
   typedef std::priority_queue<vtkPriorityQueueItem> PriorityQueueType;
   PriorityQueueType PriorityQueue;
 
+  class vtkOrderedCompositingInfo
+    {
+  public:
+    vtkSmartPointer<vtkExtentTranslator> Translator;
+    double Origin[3];
+    double Spacing[3];
+    int WholeExtent[6];
+    };
+
   class vtkItem
     {
     vtkSmartPointer<vtkPVTrivialProducer> Producer;
@@ -86,8 +96,7 @@ public:
     unsigned long TimeStamp;
     unsigned long ActualMemorySize;
   public:
-    vtkWeakPointer<vtkAlgorithmOutput> ImageDataProducer;
-      // <-- HACK for image data volume rendering.
+    vtkOrderedCompositingInfo OrderedCompositingInfo;
 
     vtkWeakPointer<vtkPVDataRepresentation> Representation;
     bool AlwaysClone;
@@ -375,13 +384,20 @@ void vtkPVDataDeliveryManager::SetPiece(unsigned int id, vtkDataObject* data, bo
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataDeliveryManager::SetImageDataProducer(
-  vtkPVDataRepresentation* repr, vtkAlgorithmOutput *producer)
+void vtkPVDataDeliveryManager::SetOrderedCompositingInformation(
+  vtkPVDataRepresentation* repr, vtkExtentTranslator* translator,
+  const int whole_extents[6], const double origin[3], const double spacing[3])
 {
   vtkInternals::vtkItem* item = this->Internals->GetItem(repr, false);
   if (item)
     {
-    item->ImageDataProducer = producer;
+    vtkInternals::vtkOrderedCompositingInfo info;
+    info.Translator = translator;
+    memcpy(info.WholeExtent, whole_extents, sizeof(int)*6);
+    memcpy(info.Origin, origin, sizeof(double)*3);
+    memcpy(info.Spacing, spacing, sizeof(double)*3);
+
+    item->OrderedCompositingInfo = info;
     }
   else
     {
@@ -500,7 +516,7 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(
     // need to re-generate the kd-tree.
     this->RedistributionTimeStamp.Modified();
 
-    vtkNew<vtkBSPCutsGenerator> cutsGenerator;
+    vtkNew<vtkKdTreeManager> cutsGenerator;
     vtkInternals::ItemsMapType::iterator iter;
     for (iter = this->Internals->ItemsMap.begin();
       iter != this->Internals->ItemsMap.end(); ++iter)
@@ -509,26 +525,24 @@ void vtkPVDataDeliveryManager::RedistributeDataForOrderedCompositing(
       if (item.Representation &&
         item.Representation->GetVisibility())
         {
-        if (item.Redistributable)
+        if (item.OrderedCompositingInfo.Translator)
           {
-          cutsGenerator->AddInputData(item.GetDeliveredDataObject());
+          // implies that the representation is providing us with means to
+          // override how the ordered compositing happens.
+          const vtkInternals::vtkOrderedCompositingInfo &info =
+            item.OrderedCompositingInfo;
+          cutsGenerator->SetStructuredDataInformation(info.Translator,
+            info.WholeExtent, info.Origin, info.Spacing);
           }
-        else if (item.ImageDataProducer)
+        else if (item.Redistributable)
           {
-          cutsGenerator->AddInputConnection(item.ImageDataProducer);
+          cutsGenerator->AddDataObject(item.GetDeliveredDataObject());
           }
         }
       }
+    cutsGenerator->GenerateKdTree();
+    this->KdTree = cutsGenerator->GetKdTree();
 
-    vtkMultiProcessController* controller =
-      vtkMultiProcessController::GetGlobalController();
-    vtkStreamingDemandDrivenPipeline *sddp = vtkStreamingDemandDrivenPipeline::
-      SafeDownCast(cutsGenerator->GetExecutive());
-    sddp->SetUpdateExtent
-      (0,controller->GetLocalProcessId(),controller->GetNumberOfProcesses(),0);
-    sddp->Update(0);
-
-    this->KdTree = cutsGenerator->GetPKdTree();
     vtkTimerLog::MarkEndEvent("Regenerate Kd-Tree");
     }
 

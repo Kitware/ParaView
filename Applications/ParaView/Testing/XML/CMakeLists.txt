@@ -127,6 +127,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
@@ -270,6 +271,7 @@ set(SpreadSheet2_USE_NEW_PANELS TRUE)
 set(SPTimeseries_USE_NEW_PANELS TRUE)
 set(SpyPlotHistoryReader_USE_NEW_PANELS TRUE)
 set(StreamTracerUpdates_USE_NEW_PANELS TRUE)
+set(StructuredGridVolumeRendering_USE_NEW_PANELS TRUE)
 set(TabbedViews_USE_NEW_PANELS TRUE)
 set(TemporalInterpolator_USE_NEW_PANELS TRUE)
 set(TemporalShiftScale_USE_NEW_PANELS TRUE)
@@ -332,6 +334,12 @@ set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
 set (TestIsoVolume_BREAK TRUE)
 set (TabbedViews_BREAK TRUE)
+
+# Since this test forces remote-rendering, we run it by itself.
+set (StructuredGridVolumeRendering_BREAK TRUE)
+set (StructuredGridVolumeRendering_FORCE_SERIAL TRUE)
+set (StructuredGridVolumeRendering_DISABLE_CRS TRUE) 
+  # <-- since volume rendering is not supported in CRS mode.
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.

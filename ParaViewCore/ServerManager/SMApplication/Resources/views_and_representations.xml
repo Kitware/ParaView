@@ -1437,6 +1437,53 @@
       </SubProxy>
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
+    <!-- ================================================================== -->
+    <PVRepresentationProxy base_proxygroup="representations"
+                           base_proxyname="PVRepresentationBase"
+                           class="vtkPVCompositeRepresentation"
+                           name="StructuredGridRepresentation"
+                           processes="client|renderserver|dataserver">
+      <Documentation>This representation is used to show structured grid as
+      Surface/Outline/Points/Wireframe/Volume</Documentation>
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation"
+                          text="Volume" />
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <DataTypeDomain composite_data_supported="1"
+                        name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array_point"
+                          optional="1"></InputArrayDomain>
+        <Documentation>Set the input to the representation.</Documentation>
+      </InputProperty>
+      <SubProxy>
+        <Proxy name="VolumeRepresentation"
+               proxygroup="representations"
+               proxyname="StructuredGridVolumeRepresentation" />
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="ScalarOpacityFunction"
+                    panel_visibility="never" />
+          <Property name="ScalarOpacityUnitDistance"
+                    panel_visibility="never" />
+          <Property name="ExtractedBlockIndex"
+                    panel_visibility="never" />
+          <Property name="SelectMapper"
+                    panel_visibility="advanced"
+                    panel_visibility_default_for_representation="volume" />
+          <Property name="UseDataParititions"
+                    panel_visibility="advanced"
+                    panel_visibility_default_for_representation="volume" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of StructuredGridRepresentation -->
+    </PVRepresentationProxy>
     <PVRepresentationProxy base_proxygroup="representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
@@ -1761,6 +1808,23 @@
       </SubProxy>
       <!-- end of UnstructuredGridVolumeRepresentation -->
     </RepresentationProxy>
+
+    <!-- ================================================================== -->
+    <RepresentationProxy class="vtkStructuredGridVolumeRepresentation"
+                         name="StructuredGridVolumeRepresentation"
+                         processes="client|renderserver|dataserver"
+                         si_class="vtkSIUnstructuredGridVolumeRepresentationProxy"
+                         base_proxygroup="representations"
+                         base_proxyname="UnstructuredGridVolumeRepresentation">
+      <IntVectorProperty command="SetUseDataParititions"
+                         default_values="1"
+                         name="UseDataParititions"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <!-- end of StructuredGridVolumeRepresentation -->
+    </RepresentationProxy>
+
     <!-- ================================================================== -->
     <RepresentationProxy class="vtkImageVolumeRepresentation"
                          name="UniformGridVolumeRepresentation"

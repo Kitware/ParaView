@@ -87,6 +87,7 @@ set (Module_SRCS
   vtkSliceFriendGeometryRepresentation.cxx
   vtkSpreadSheetRepresentation.cxx
   vtkSpreadSheetView.cxx
+  vtkStructuredGridVolumeRepresentation.cxx
   vtkTextSourceRepresentation.cxx
   vtkThreeSliceFilter.cxx
   vtkUnstructuredGridVolumeRepresentation.cxx

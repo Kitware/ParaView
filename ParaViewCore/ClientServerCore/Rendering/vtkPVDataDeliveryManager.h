@@ -31,9 +31,10 @@
 
 class vtkAlgorithmOutput;
 class vtkDataObject;
+class vtkExtentTranslator;
+class vtkPKdTree;
 class vtkPVDataRepresentation;
 class vtkPVRenderView;
-class vtkPKdTree;
 
 //BTX
 #include <vector>
@@ -116,6 +117,13 @@ public:
   // ensure that the geometries are redistributed, as needed.
   void RedistributeDataForOrderedCompositing(bool use_lod);
 
+  // Description:
+  // Pass the structured-meta-data for determining rendering order for ordered
+  // compositing.
+  void SetOrderedCompositingInformation(
+    vtkPVDataRepresentation* repr, vtkExtentTranslator* translator,
+    const int whole_extents[6], const double origin[3], const double spacing[3]);
+
 //BTX
   // Description:
   // Internal method used to determine the list of representations that need
@@ -161,10 +169,6 @@ public:
 //ETX
 
   // *******************************************************************
-
-  // *******************************************************************
-  // HACK for dealing with volume rendering for image data
-  void SetImageDataProducer(vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
 
 //BTX
 protected:

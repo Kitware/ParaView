@@ -31,7 +31,6 @@
 set(Module_SRCS
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
-  vtkBSPCutsGenerator.cxx
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx

@@ -30,6 +30,7 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCameraManipulator;
+class vtkExtentTranslator;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
@@ -41,6 +42,7 @@ class vtkMatrix4x4;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
+class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVHardwareSelector;
@@ -49,7 +51,6 @@ class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
-class vtkPVDataDeliveryManager;
 class vtkTexture;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
@@ -332,10 +333,12 @@ public:
     vtkInformation* info, vtkPVDataRepresentation* repr);
 
   // Description:
-  // Hack to pass along image data producer to use to generate the KdTree cuts
-  // when volume rendering image data. This code needs refactoring.
-  static void SetImageDataProducer(
-    vtkInformation* info, vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
+  // Pass the structured-meta-data for determining rendering order for ordered
+  // compositing.
+  static void SetOrderedCompositingInformation(
+    vtkInformation* info, vtkPVDataRepresentation* repr,
+    vtkExtentTranslator* translator,
+    const int whole_extents[6], const double origin[3], const double spacing[3]);
 
   // Description:
   // Representations that support hardware (render-buffer based) selection,

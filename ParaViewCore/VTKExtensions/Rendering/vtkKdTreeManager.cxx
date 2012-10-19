@@ -14,32 +14,27 @@
 =========================================================================*/
 #include "vtkKdTreeManager.h"
 
-#include "vtkAlgorithm.h"
-#include "vtkCellType.h"
-#include "vtkCommunicator.h"
+#include "vtkBoundingBox.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkExtentTranslator.h"
 #include "vtkKdTreeGenerator.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkOutlineSource.h"
 #include "vtkPKdTree.h"
-#include "vtkPVUpdateSuppressor.h"
 #include "vtkPoints.h"
-#include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 #include "vtkUnstructuredGrid.h"
-
-#define VTK_CREATE(type, name) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <set>
 #include <vector>
 
-class vtkKdTreeManager::vtkAlgorithmSet : 
-  public std::set<vtkSmartPointer<vtkAlgorithm> > {};
+class vtkKdTreeManager::vtkDataObjectSet : 
+  public std::set<vtkSmartPointer<vtkDataObject> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
 //----------------------------------------------------------------------------
 vtkKdTreeManager::vtkKdTreeManager()
 {
@@ -49,8 +44,7 @@ vtkKdTreeManager::vtkKdTreeManager()
     {
     vtkWarningMacro("No global controller");
     }
-  this->Producers = new vtkAlgorithmSet();
-  this->StructuredProducer = 0;
+  this->DataObjects = new vtkDataObjectSet();
   this->KdTree = 0;
   this->NumberOfPieces = globalController?
     globalController->GetNumberOfProcesses() : 1;
@@ -62,51 +56,32 @@ vtkKdTreeManager::vtkKdTreeManager()
   tree->SetNumberOfRegionsOrMore(this->NumberOfPieces);
   this->SetKdTree(tree);
   tree->FastDelete();
+
+  this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
+  this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 1.0;
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkKdTreeManager::~vtkKdTreeManager()
 {
   this->SetKdTree(0);
-  this->SetStructuredProducer(0);
 
-  delete this->Producers;
+  delete this->DataObjects;
 }
 
 //----------------------------------------------------------------------------
-void vtkKdTreeManager::AddProducer(vtkAlgorithm* producer)
+void vtkKdTreeManager::AddDataObject(vtkDataObject* dataObject)
 {
-  this->Producers->insert(producer);
-  if (this->KdTree)
-    {
-    this->KdTree->RemoveAllDataSets();
-    }
+  this->DataObjects->insert(dataObject);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkKdTreeManager::RemoveProducer(vtkAlgorithm* producer)
+void vtkKdTreeManager::RemoveAllDataObjects()
 {
-  vtkAlgorithmSet::iterator iter = this->Producers->find(producer);
-  if (iter != this->Producers->end())
-    {
-    if (this->KdTree)
-      {
-      this->KdTree->RemoveAllDataSets();
-      }
-    this->Producers->erase(iter);
-    this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKdTreeManager::RemoveAllProducers()
-{
-  if (this->KdTree)
-    {
-    this->KdTree->RemoveAllDataSets();
-    }
-  this->Producers->clear();
+  this->DataObjects->clear();
   this->Modified();
 }
 
@@ -121,41 +96,21 @@ void vtkKdTreeManager::SetKdTree(vtkPKdTree* tree)
 }
 
 //----------------------------------------------------------------------------
-void vtkKdTreeManager::Update()
+void vtkKdTreeManager::SetStructuredDataInformation(
+  vtkExtentTranslator* translator,
+  const int whole_extent[6],
+  const double origin[3], const double spacing[3])
 {
-  vtkAlgorithmSet::iterator iter;
-  std::vector<vtkDataObject*> outputs;
-  std::vector<vtkDataObject*>::iterator dsIter;
-  
-  bool update_required =  (this->GetMTime() > this->UpdateTime);
+  this->ExtentTranslator = translator;
+  this->SetWholeExtent(const_cast<int*>(whole_extent));
+  this->SetOrigin(const_cast<double*>(origin));
+  this->SetSpacing(const_cast<double*>(spacing));
+  this->Modified();
+}
 
-  // Update all inputs.
-  for (iter = this->Producers->begin(); iter != this->Producers->end(); ++iter)
-    {
-    vtkDataObject *output = iter->GetPointer()->GetOutputDataObject(0);
-    if (output)
-      {
-      outputs.push_back(output);
-      update_required |= (output->GetMTime() > this->UpdateTime);
-      }
-    }
-
-  if (this->StructuredProducer)
-    {
-    vtkDataSet* output = vtkDataSet::SafeDownCast(
-      this->StructuredProducer->GetOutputDataObject(0));
-    if (output)
-      {
-      outputs.push_back(output);
-      update_required |= (output->GetMTime() > this->UpdateTime);
-      }
-    }
-
-  if (!update_required)
-    {
-    return;
-    }
-
+//----------------------------------------------------------------------------
+void vtkKdTreeManager::GenerateKdTree()
+{
   this->KdTree->RemoveAllDataSets();
   if (!this->KdTreeInitialized)
     {
@@ -166,27 +121,43 @@ void vtkKdTreeManager::Update()
     //   fine!  
     // Seems like something doesn't get initialized correctly, I have no idea
     // what. This seems to overcome the issue.
-    vtkSphereSource* sphere = vtkSphereSource::New();
+    vtkNew<vtkSphereSource> sphere;
     sphere->Update();
     this->KdTree->AddDataSet(sphere->GetOutput());
-    sphere->Delete();
     this->KdTree->BuildLocator();
     this->KdTree->RemoveAllDataSets();
     this->KdTreeInitialized = true;
     }
-  for (dsIter = outputs.begin(); dsIter != outputs.end(); ++dsIter)
+
+  for (vtkDataObjectSet::iterator iter = this->DataObjects->begin();
+    iter != this->DataObjects->end(); ++iter)
     {
-    this->AddDataObjectToKdTree(*dsIter);
+    this->AddDataObjectToKdTree(iter->GetPointer());
     } 
 
-  if (this->StructuredProducer)
+  if (this->ExtentTranslator)
     {
+    // vtkPKdTree needs a dataset to compute volume bounds correctly. Create an
+    // outline source with the right bounds so that vtkPKdTree is happy.
+    vtkNew<vtkOutlineSource> outline;
+    vtkBoundingBox bbox;
+    bbox.AddPoint(this->Origin);
+    bbox.AddPoint(
+      this->Origin[0]+(this->WholeExtent[1]-this->WholeExtent[0]+1)*this->Spacing[0],
+      this->Origin[1]+(this->WholeExtent[3]-this->WholeExtent[2]+1)*this->Spacing[1],
+      this->Origin[2]+(this->WholeExtent[5]-this->WholeExtent[4]+1)*this->Spacing[2]);
+    double bounds[6];
+    bbox.GetBounds(bounds);
+    outline->SetBounds(bounds);
+    outline->Update();
+    this->AddDataSetToKdTree(outline->GetOutput());
+
     // Ask the vtkKdTreeGenerator to generate the cuts for the kd tree.
     vtkKdTreeGenerator* generator = vtkKdTreeGenerator::New();
     generator->SetKdTree(this->KdTree);
     generator->SetNumberOfPieces(this->NumberOfPieces);
-    generator->BuildTree(this->StructuredProducer->GetOutputDataObject(0),
-                         this->StructuredProducer->GetOutputInformation(0));
+    generator->BuildTree(this->ExtentTranslator, this->WholeExtent,
+      this->Origin, this->Spacing);
     generator->Delete();
     }
   else
@@ -200,13 +171,11 @@ void vtkKdTreeManager::Update()
 
   this->KdTree->BuildLocator();
   //this->KdTree->PrintTree();
-  this->UpdateTime.Modified();
 }
 
 //-----------------------------------------------------------------------------
 void vtkKdTreeManager::AddDataObjectToKdTree(vtkDataObject* data)
 {
-
   vtkCompositeDataSet* mbs = vtkCompositeDataSet::SafeDownCast(data);
   if (!mbs)
     {
@@ -303,14 +272,14 @@ void vtkKdTreeManager::AddDataSetToKdTree(vtkDataSet *data)
     // I don't think vtkPKdTree pays any attention to the type of the data
     // sets.  Thus, it should be safe to create an unstructured grid even
     // if the original data set is not.
-    VTK_CREATE(vtkPoints, dummyPoints);
+    vtkNew<vtkPoints> dummyPoints;
     dummyPoints->SetDataTypeToDouble();
     dummyPoints->InsertNextPoint(pointCoords);
-    VTK_CREATE(vtkUnstructuredGrid, dummyData);
-    dummyData->SetPoints(dummyPoints);
+    vtkNew<vtkUnstructuredGrid> dummyData;
+    dummyData->SetPoints(dummyPoints.GetPointer());
     vtkIdType ptId = 0;
     dummyData->InsertNextCell(VTK_VERTEX, 1, &ptId);
-    this->KdTree->AddDataSet(dummyData);
+    this->KdTree->AddDataSet(dummyData.GetPointer());
     }
 }
 

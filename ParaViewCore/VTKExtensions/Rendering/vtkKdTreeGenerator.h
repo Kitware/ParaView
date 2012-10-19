@@ -12,13 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKdTreeGenerator - given a KdTree paritition, this class
+// .NAME vtkKdTreeGenerator - creates a vtkPKdTree using the partitioning
+// information provided by a vtkExtentTranslator.
 // generates the KdTree
 // .SECTION Description
-// vtkKdTreeGenerator is used to generate a KdTree using the parititioning
-// information available in an input data object. This class uses the 
-// extent translator from the producer of the data to determine the paritioning
-// of the structured data among several processes.
+// vtkKdTreeGenerator is used to generate a KdTree using the partitioning
+// information garnered from a vtkExtentTranslator (or subclass). Since we need
+// spatial bounds for the KdTree, we assume that structured data corresponding
+// to the vtkExtentTranslator is an ImageData with the provided spacing and
+// origin.
 // The algorithm used can be summarized as under:
 // \li Inputs: * Extent Translator, * Number of Pieces
 // \li Determine the bounds for every piece/region using the extent translator.
@@ -64,13 +66,15 @@ public:
   vtkGetObjectMacro(KdTree, vtkPKdTree);
 
   // Description:
-  // Builds the KdTree using the partitioning of the data.
-  int BuildTree(vtkDataObject* data, vtkInformation* info);
-
-  // Description:
   // Get/Set the number of pieces.
   vtkSetMacro(NumberOfPieces, int);
   vtkGetMacro(NumberOfPieces, int);
+
+  // Description:
+  // Builds the KdTree using the partitioning of the data.
+  bool BuildTree(vtkExtentTranslator* translator, const int extents[6],
+    const double origin[3], const double spacing[4]);
+
 protected:
   vtkKdTreeGenerator();
   ~vtkKdTreeGenerator();
@@ -86,6 +90,10 @@ protected:
   vtkGetVector6Macro(WholeExtent, int);
 
   // Description:
+  vtkSetVector3Macro(Origin, double);
+  vtkSetVector3Macro(Spacing, double);
+
+  // Description:
   // Obtains information from the extent translator about the partitioning of
   // the input dataset among processes.
   void FormRegions();
@@ -96,10 +104,14 @@ protected:
   vtkKdTreeGeneratorVector& left, vtkKdTreeGeneratorVector& right);
 
   // Converts extents to bounds in the kdtree.
-  bool ConvertToBounds(vtkDataObject* data, vtkKdNode* node);
+  bool ConvertToBounds(vtkKdNode* node);
 
   vtkPKdTree* KdTree;
   vtkExtentTranslator* ExtentTranslator;
+
+  double Origin[3];
+  double Spacing[3];
+
   int WholeExtent[6];
   int NumberOfPieces;
 

@@ -1183,9 +1183,10 @@ void vtkPVRenderView::SetStreamable(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetImageDataProducer(
+void vtkPVRenderView::SetOrderedCompositingInformation(
   vtkInformation* info, vtkPVDataRepresentation* repr,
-  vtkAlgorithmOutput* producer)
+  vtkExtentTranslator* translator,
+  const int whole_extents[6], const double origin[3], const double spacing[3])
 {
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(info->Get(VIEW()));
   if (!view)
@@ -1193,8 +1194,8 @@ void vtkPVRenderView::SetImageDataProducer(
     vtkGenericWarningMacro("Missing VIEW().");
     return;
     }
-
-  view->GetDeliveryManager()->SetImageDataProducer(repr, producer);
+  view->GetDeliveryManager()->SetOrderedCompositingInformation(
+    repr, translator, whole_extents, origin, spacing);
 }
 
 //----------------------------------------------------------------------------
