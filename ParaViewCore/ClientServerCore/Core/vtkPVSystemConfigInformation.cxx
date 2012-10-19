@@ -20,10 +20,12 @@
 
 #include <sstream>
 using std::ostringstream;
+#include <algorithm>
+using std::sort;
 
 #include <vtksys/SystemInformation.hxx>
 
-//#define vtkPVSystemConfigInformationDEBUG
+// #define vtkPVSystemConfigInformationDEBUG
 
 #define vtkVerifyParseMacro(_call,_field) \
   if (!(_call)) \
@@ -44,7 +46,10 @@ void vtkPVSystemConfigInformation::ConfigInfo::Print()
     << "SystemType=" << this->SystemType << endl
     << "Rank=" << this->Rank << endl
     << "Pid=" << this->Pid << endl
-    << "Capacity=" << this->Capacity << endl;
+    << "HostMemoryTotal=" << this->HostMemoryTotal << endl
+    << "HostMemoryAvailable=" << this->HostMemoryAvailable << endl
+    << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl
+    << "ProcMemoryAvailable=" << this->ProcMemoryAvailable << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -93,7 +98,15 @@ void vtkPVSystemConfigInformation::CopyFromObject(vtkObject *obj)
   info.SystemType=sysInfo.GetOSIsWindows();
   info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
   info.Pid=sysInfo.GetProcessId();
-  info.Capacity=sysInfo.GetHostMemoryTotal();
+  info.HostMemoryTotal=sysInfo.GetHostMemoryTotal();
+  // the folloowing envornment variables are querried, if set they
+  // are the means of reporting limits that are applied in a non-
+  // standard way.
+  info.HostMemoryAvailable=sysInfo.GetHostMemoryAvailable(
+        "PV_HOST_MEMORY_LIMIT");
+  info.ProcMemoryAvailable=sysInfo.GetProcMemoryAvailable(
+        "PV_HOST_MEMORY_LIMIT",
+        "PV_PROC_MEMORY_LIMIT");
 
   #ifdef vtkPVSystemConfigInformationDEBUG
   info.Print();
@@ -147,7 +160,9 @@ void vtkPVSystemConfigInformation::CopyToStream(vtkClientServerStream *css)
       << this->Configs[i].SystemType
       << this->Configs[i].Rank
       << this->Configs[i].Pid
-      << this->Configs[i].Capacity;
+      << this->Configs[i].HostMemoryTotal
+      << this->Configs[i].HostMemoryAvailable
+      << this->Configs[i].ProcMemoryAvailable;
     }
 
   *css << vtkClientServerStream::End;
@@ -229,10 +244,30 @@ void vtkPVSystemConfigInformation::CopyFromStream(
     ++offset;
 
     vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&this->Configs[i].Capacity),
-        "Capacity");
+        css->GetArgument(0,offset,&this->Configs[i].HostMemoryTotal),
+        "HostMemoryTotal");
+    ++offset;
+
+    vtkVerifyParseMacro(
+        css->GetArgument(0,offset,&this->Configs[i].HostMemoryAvailable),
+        "HostMemoryAvailable");
+    ++offset;
+
+    vtkVerifyParseMacro(
+        css->GetArgument(0,offset,&this->Configs[i].ProcMemoryAvailable),
+        "ProcMemoryAvailable");
     ++offset;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSystemConfigInformation::Sort()
+{
+  #ifdef vtkPVSystemConfigInformationDEBUG
+  cerr << "=====vtkPVSystemConfigInformation::Sort" << endl;
+  #endif
+
+  sort(this->Configs.begin(),this->Configs.end());
 }
 
 //----------------------------------------------------------------------------

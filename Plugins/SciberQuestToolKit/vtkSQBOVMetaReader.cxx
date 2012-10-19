@@ -263,9 +263,14 @@ long long vtkSQBOVMetaReader::GetProcRam()
     {
     // gather memory info about this host
     vtksys::SystemInformation sysInfo;
-    sysInfo.RunOSCheck(); // TODO -- fix SystemInformation::GetHostname
 
-    long long hostRam=sysInfo.GetHostMemoryTotal();
+    long long hostRam=sysInfo.GetHostMemoryAvailable(
+            "PV_HOST_MEMORY_LIMIT");
+
+    long long procRam=sysInfo.GetProcMemoryAvailable(
+            "PV_HOST_MEMORY_LIMIT",
+            "PV_PROC_MEMORY_LIMIT");
+
     string hostName=sysInfo.GetHostname();
     unsigned long hostId=hash((const unsigned char *)hostName.c_str());
     long long hostSize=1l;
@@ -287,12 +292,13 @@ long long vtkSQBOVMetaReader::GetProcRam()
     hostSize=(long long)count(hostIds.begin(),hostIds.end(),hostId);
     #endif
 
-    this->ProcRam=hostRam/hostSize;
+    this->ProcRam=min(procRam,hostRam/hostSize);
 
     #if defined SQTK_DEBUG
     oss
       << "hostName=" << hostName << endl
       << "hostId=" << hostId << endl
+      << "procRam=" << procRam << endl
       << "hostRam=" << hostRam << endl
       << "hostSize=" << hostSize << endl
       << "ProcRam=" << this->ProcRam << endl;

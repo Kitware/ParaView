@@ -23,6 +23,11 @@ using Ui::pqMemoryInspectorPanelForm;
 // #define MIP_PROCESS_TABLE
 
 #include "pqActiveObjects.h"
+#include "pqServerManagerModel.h"
+#include "pqApplicationCore.h"
+#include "pqView.h"
+#include "pqRenderView.h"
+#include "vtkSMRenderViewProxy.h"
 
 #include "vtkProcessModule.h"
 #include "vtkPVSystemConfigInformation.h"
@@ -41,6 +46,8 @@ using Ui::pqMemoryInspectorPanelForm;
 #include <QSettings>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QFrame>
+#include <QLabel>
 #include <QPalette>
 #include <QFont>
 #include <QPlastiqueStyle>
@@ -48,6 +55,7 @@ using Ui::pqMemoryInspectorPanelForm;
 #include <QMenu>
 #include <QProcess>
 #include <QDebug>
+#include <QFormLayout>
 
 #include <map>
 using std::map;
@@ -67,6 +75,9 @@ using std::right;
 #include <iomanip>
 using std::setw;
 using std::setfill;
+#include <algorithm>
+using std::min;
+
 
 #define pqErrorMacro(estr)\
   qDebug()\
@@ -90,7 +101,7 @@ class pqMemoryInspectorPanelUI
 enum {
   ITEM_KEY_PROCESS_TYPE=Qt::UserRole,
   ITEM_KEY_PVSERVER_TYPE,      // vtkProcessModule::ProcessTypes
-  ITEM_KEY_PID,                // unsigned long long
+  ITEM_KEY_PID,                // long long
   ITEM_KEY_HOST_NAME,          // string, hostname
   ITEM_KEY_MPI_RANK,           // int
   ITEM_KEY_HOST_OS,            // descriptive string
@@ -114,9 +125,8 @@ enum {
 
 namespace
 {
-
 // ****************************************************************************
-QPlastiqueStyle *getLoadWidgetStyle()
+QPlastiqueStyle *getMemoryUseWidgetStyle()
 {
   // this sets the style for the progress bar used to
   // display % memory usage. If we didn't do this the
@@ -127,7 +137,73 @@ QPlastiqueStyle *getLoadWidgetStyle()
   return &style;
 }
 
-//*****************************************************************************
+// ****************************************************************************
+float getSystemWarningThreshold()
+{
+# ifdef WIN32
+  return 0.90f;
+# else
+  return 0.80f;
+# endif
+}
+
+// ****************************************************************************
+float getSystemCriticalThreshold()
+{
+# ifdef WIN32
+  return 0.95f;
+# else
+  return 0.90f;
+# endif
+}
+
+// ****************************************************************************
+float getProcessWarningThreshold()
+{
+  return 0.70f;
+}
+
+// ****************************************************************************
+float getProcessCriticalThreshold()
+{
+  return 0.80f;
+}
+// ****************************************************************************
+void setMemoryUseWidgetColor(
+      QPalette &palette,
+      float fracUsed,
+      float fracWarn,
+      float fracCrit)
+{
+  (void)fracWarn;
+
+  if (fracUsed>fracCrit)
+    {
+    // danger -> red
+    //palette.setColor(QPalette::Highlight,QColor(232,40,40)); // bright
+    //palette.setColor(QPalette::Highlight,QColor(190,60,60)); // moderate
+    //palette.setColor(QPalette::Highlight,QColor(147,57,57)); // moderate balanced
+    palette.setColor(QPalette::Highlight,QColor(217,84,84));   // cdash red
+    }
+  /*
+  else
+  if (fracUsed>fracWarn)
+    {
+    //palette.setColor(QPalette::Highlight,QColor(219,219,80)); // moderate
+    palette.setColor(QPalette::Highlight,QColor(252,168,84));   // cdash yellow
+    }
+  */
+  else
+    {
+    // ok -> green
+    //palette.setColor(QPalette::Highlight,QColor(66,232,20)); // bright
+    //palette.setColor(QPalette::Highlight,QColor(90,160,70)); // moderate
+    //palette.setColor(QPalette::Highlight,QColor(125,176,74));// cdash yellow
+    palette.setColor(QPalette::Highlight, Qt::darkGray);
+    }
+}
+
+// ****************************************************************************
 QString translateUnits(float memUse)
 {
   QString fmt("%1 %2");
@@ -169,7 +245,7 @@ QString translateUnits(float memUse)
   return fmt.arg(memUse/p250, 0,'f',2).arg("PiB");
 }
 
-//*****************************************************************************
+// ****************************************************************************
 template<typename T>
 void ClearVectorOfPointers(vector<T *> data)
 {
@@ -185,7 +261,7 @@ void ClearVectorOfPointers(vector<T *> data)
   data.clear();
 }
 
-//*****************************************************************************
+// ****************************************************************************
 void unescapeWhitespace(string &s, char escChar)
 {
   size_t n=s.size();
@@ -200,116 +276,161 @@ void unescapeWhitespace(string &s, char escChar)
 
 };
 
-/// data associated with a rank
+/// data associated with an mpi rank
 //=============================================================================
 class RankData
 {
 public:
   RankData(
       int rank,
-      unsigned long long pid,
-      unsigned long long load,
-      unsigned long long capacity);
+      long long pid,
+      long long procMemoryUse,
+      long long hostMemoryUse,
+      long long procAvail);
 
   ~RankData();
 
   void SetRank(int rank){ this->Rank=rank; }
   int GetRank(){ return this->Rank; }
 
-  void SetPid(unsigned long long pid){ this->Pid=pid; }
-  unsigned long long GetPid(){ return this->Pid; }
+  void SetPid(long long pid){ this->Pid=pid; }
+  long long GetPid(){ return this->Pid; }
 
-  void OverrideCapacity(unsigned long long capacity);
-  void SetCapacity(unsigned long long capacity){ this->Capacity=capacity; }
-  unsigned long long GetCapacity(){ return this->Capacity; }
+  void SetProcMemoryAvailable(long long capacity){ this->ProcMemoryAvailable=capacity; }
+  long long GetProcMemoryAvailable(){ return this->ProcMemoryAvailable; }
 
-  void SetLoad(unsigned long long load){ this->Load=load; }
-  unsigned long long GetLoad(){ return this->Load; }
-  float GetLoadFraction(){ return (float)this->Load/(float)this->Capacity; }
+  void SetProcMemoryUse(long long load){ this->ProcMemoryUse=load; }
+  long long GetProcMemoryUse(){ return this->ProcMemoryUse; }
 
-  void SetLoadWidget(QProgressBar *widget){ this->LoadWidget=widget; }
-  QProgressBar *GetLoadWidget(){ return this->LoadWidget; }
-  void UpdateLoadWidget();
-  void InitializeLoadWidget();
+  void SetHostMemoryUse(long long load){ this->HostMemoryUse=load; }
+  long long GetHostMemoryUse(){ return this->HostMemoryUse; }
+
+  float GetProcMemoryUseFraction()
+  { return (float)this->ProcMemoryUse/(float)this->ProcMemoryAvailable; }
+
+  QFrame *GetMemoryUseWidget(){ return this->WidgetContainer; }
+
+  void UpdateMemoryUseWidget();
+  void InitializeMemoryUseWidget();
 
   void Print(ostream &os);
 
 private:
+  void InitializeMemoryUseWidget(QProgressBar *&loadWidget);
+
+private:
   int Rank;
-  unsigned long long Pid;
-  unsigned long long Load;
-  unsigned long long Capacity;
-  QProgressBar *LoadWidget;
-  //HostData *Host;
+  long long Pid;
+  long long ProcMemoryUse;
+  long long HostMemoryUse;
+  long long ProcMemoryAvailable;
+  QProgressBar *MemoryUseWidget;
+  QFrame *WidgetContainer;
 };
 
 //-----------------------------------------------------------------------------
 RankData::RankData(
       int rank,
-      unsigned long long pid,
-      unsigned long long load,
-      unsigned long long capacity)
+      long long pid,
+      long long procMemoryUse,
+      long long hostMemoryUse,
+      long long procAvail)
         :
     Rank(rank),
     Pid(pid),
-    Load(load),
-    Capacity(capacity)
+    ProcMemoryUse(procMemoryUse),
+    HostMemoryUse(hostMemoryUse),
+    ProcMemoryAvailable(procAvail)
 {
-  this->InitializeLoadWidget();
+  this->InitializeMemoryUseWidget();
 }
 
 //-----------------------------------------------------------------------------
 RankData::~RankData()
 {
-  delete this->LoadWidget;
+  delete this->WidgetContainer;
 }
 
 //-----------------------------------------------------------------------------
-void RankData::UpdateLoadWidget()
+void RankData::UpdateMemoryUseWidget()
 {
-  float used = (float)this->GetLoad();
-  float fracUsed = this->GetLoadFraction();
+  float used = (float)this->GetProcMemoryUse();
+  float fracUsed = min(1.0f,this->GetProcMemoryUseFraction());
   float percUsed = fracUsed*100.0f;
   int progVal = (int)(fracUsed*MIP_PROGBAR_MAX);
 
-  this->LoadWidget->setValue(progVal);
-  this->LoadWidget->setFormat(
+  this->MemoryUseWidget->setValue(progVal);
+  this->MemoryUseWidget->setFormat(
     QString("%1 %2%").arg(::translateUnits(used)).arg(percUsed, 0,'f',2));
 
-  QPalette palette(this->LoadWidget->palette());
-  if (fracUsed>0.75)
-    {
-    // danger -> red
-    palette.setColor(QPalette::Highlight,QColor(232,40,40));
-    }
-  else
-    {
-    // ok -> green
-    palette.setColor(QPalette::Highlight,QColor(66,232,20));
-    }
-  this->LoadWidget->setPalette(palette);
+  QPalette palette(this->MemoryUseWidget->palette());
+  ::setMemoryUseWidgetColor(
+        palette,
+        fracUsed,
+        ::getProcessWarningThreshold(),
+        ::getProcessCriticalThreshold());
+  this->MemoryUseWidget->setPalette(palette);
 }
 
 //-----------------------------------------------------------------------------
-void RankData::InitializeLoadWidget()
+void RankData::InitializeMemoryUseWidget()
 {
-  this->LoadWidget=new QProgressBar;
-  this->LoadWidget->setStyle(::getLoadWidgetStyle());
-  this->LoadWidget->setMaximumHeight(15);
-  this->LoadWidget->setMinimum(0);
-  this->LoadWidget->setMaximum(MIP_PROGBAR_MAX);
-  QFont font(this->LoadWidget->font());
+  this->InitializeMemoryUseWidget(this->MemoryUseWidget);
+
+  ostringstream oss;
+  oss << setw(6) << setfill(' ') << this->Rank;
+
+  QLabel *rank=new QLabel;
+  rank->setText(oss.str().c_str());
+
+  oss.str("");
+  oss << setw(10) << setfill(' ') << this->Pid;
+
+  QFrame *vline=new QFrame;
+  vline->setFrameStyle(QFrame::VLine|QFrame::Plain);
+
+  QFrame *vline2=new QFrame;
+  vline2->setFrameStyle(QFrame::VLine|QFrame::Plain);
+
+  QLabel *pid=new QLabel;
+  pid->setText(oss.str().c_str());
+
+  QHBoxLayout *w=new QHBoxLayout;
+  w->addWidget(this->MemoryUseWidget);
+  w->setContentsMargins(2,2,2,2);
+  w->setSpacing(2);
+
+  QHBoxLayout *l=new QHBoxLayout;
+  l->addWidget(rank);
+  l->addWidget(vline);
+  l->addWidget(pid);
+  l->addWidget(vline2);
+  l->addLayout(w);
+  l->setContentsMargins(1,0,1,0);
+  l->setSpacing(0);
+
+  this->WidgetContainer=new QFrame;
+  this->WidgetContainer->setLayout(l);
+  this->WidgetContainer->setFrameStyle(QFrame::Box|QFrame::Plain);
+  this->WidgetContainer->setLineWidth(1);
+  QFont font(this->WidgetContainer->font());
   font.setPointSize(8);
-  this->LoadWidget->setFont(font);
+  this->WidgetContainer->setFont(font);
 
-  this->UpdateLoadWidget();
+  this->UpdateMemoryUseWidget();
 }
 
 //-----------------------------------------------------------------------------
-void RankData::OverrideCapacity(unsigned long long capacity)
+void RankData::InitializeMemoryUseWidget(QProgressBar *&loadWidget)
 {
-  this->Capacity=capacity;
-  this->UpdateLoadWidget();
+  loadWidget=new QProgressBar;
+  loadWidget->setStyle(::getMemoryUseWidgetStyle());
+  loadWidget->setMaximumHeight(15);
+  loadWidget->setMinimum(0);
+  loadWidget->setMaximum(MIP_PROGBAR_MAX);
+  QFont font(loadWidget->font());
+  font.setPointSize(8);
+  loadWidget->setFont(font);
 }
 
 //-----------------------------------------------------------------------------
@@ -319,87 +440,96 @@ void RankData::Print(ostream &os)
     << "RankData(" << this << ")"
     << " Rank=" << this->Rank
     << " Pid=" << this->Pid
-    << " Load=" << this->Load
-    << " Capacity=" << this->Capacity
-    << " LoadWidget=" << this->LoadWidget
+    << " ProcMemoryUse=" << this->ProcMemoryUse
+    << " HostMemoryUse=" << this->HostMemoryUse
+    << " ProcMemoryAvailable=" << this->ProcMemoryAvailable
+    << " MemoryUseWidget=" << this->MemoryUseWidget
     << endl;
 }
 
-/// data associated with the host
+/// data associated with the host (a collection of ranks)
 //=============================================================================
 class HostData
 {
 public:
-  HostData(string hostName,unsigned long long capacity);
+  HostData();
+  HostData(string groupName,string hostName,long long memTotal, long long memAvail);
   HostData(const HostData &other){ *this=other; }
   const HostData &operator=(const HostData &other);
   ~HostData();
 
-  void SetHostName(string name){ this->HostName=name; }
+  RankData *AddRankData(int rank, long long pid, long long procMemAvail);
+  RankData *GetRankData(int i);
+  void ClearRankData();
+
+  string &GetGroupName(){ return this->GroupName; }
   string &GetHostName(){ return this->HostName; }
-
-  void SetRealCapacity(unsigned long long capacity){ this->RealCapacity=capacity; }
-  unsigned long long GetRealCapacity(){ return this->RealCapacity; }
-
-  void SetCapacity(unsigned long long capacity){ this->Capacity=capacity; }
-  unsigned long long GetCapacity(){ return this->Capacity; }
-
-  /**
-  Set the capacity based on some artificial restriction on
-  per-process memory use. eg. shared memory machine. Updates
-  all ranks.
-  */
-  void OverrideCapacity(unsigned long long capacity);
-
-  /**
-  Reset the capacity to the available amount of ram. Updates
-  all ranks.
-  */
-  void ResetCapacity();
+  long long GetHostMemoryTotal(){ return this->HostMemoryTotal; }
+  long long GetHostMemoryAvailable(){ return this->HostMemoryAvailable; }
+  long long GetTotalSystemMemoryUse();
+  long long GetProcessGroupMemoryUse();
 
   void SetTreeItem(QTreeWidgetItem *item){ this->TreeItem=item; }
   QTreeWidgetItem *GetTreeItem(){ return this->TreeItem; }
 
-  void SetLoadWidget(QProgressBar *widget){ this->LoadWidget=widget; }
-  QProgressBar *GetLoadWidget(){ return this->LoadWidget; }
-  void InitializeLoadWidget();
-  void UpdateLoadWidget();
+  QWidget *GetMemoryUseWidget(){ return (QWidget*)this->WidgetContainer; }
+  QProgressBar *GetTotalMemoryUseWidget(){ return this->TotalMemoryUseWidget; }
+  QProgressBar *GetGroupMemoryUseWidget(){ return this->GroupMemoryUseWidget; }
 
-  RankData *AddRankData(int rank, unsigned long long pid);
-  RankData *GetRankData(int i){ return this->Ranks[i]; }
-  void ClearRankData();
+  void InitializeMemoryUseWidget();
+  void InitializeMemoryUseWidget(QProgressBar *&loadWidget);
 
-  unsigned long long GetLoad();
-  float GetLoadFraction(){ return (float)this->GetLoad()/(float)this->Capacity; }
+  void UpdateMemoryUseWidget();
+  void UpdateMemoryUseWidget(
+        QProgressBar *loadWidget,
+        long long used,
+        float fracUsed,
+        float warnFrac,
+        float critFrac);
 
   void Print(ostream &os);
 
 private:
+  string GroupName;
   string HostName;
-  unsigned long long Capacity;     // host memory available to us.
-  unsigned long long RealCapacity; // host memory available.
-  QProgressBar *LoadWidget;
-  QTreeWidgetItem *TreeItem;
-  vector<RankData *> Ranks;
+  long long HostMemoryTotal;     // memory installed
+  long long HostMemoryAvailable; // memory available to us.
+  QProgressBar *TotalMemoryUseWidget; // for displaying all process's use
+  QProgressBar *GroupMemoryUseWidget; // for displaying only pv process's use
+  QFrame *WidgetContainer;       // widget containing both all and proccess group
+  QTreeWidgetItem *TreeItem;     // gui element
+  vector<RankData *> Ranks;      // references to ranks local to this host
 };
 
 //-----------------------------------------------------------------------------
+HostData::HostData()
+          :
+    GroupName(""),
+    HostName(""),
+    HostMemoryTotal(0),
+    HostMemoryAvailable(0)
+{}
+
+//-----------------------------------------------------------------------------
 HostData::HostData(
+      string groupName,
       string hostName,
-      unsigned long long capacity)
-        :
+      long long hostMemTotal,
+      long long hostMemAvail)
+          :
+    GroupName(groupName),
     HostName(hostName),
-    Capacity(capacity),
-    RealCapacity(capacity)
+    HostMemoryTotal(hostMemTotal),
+    HostMemoryAvailable(hostMemAvail)
 {
-  this->InitializeLoadWidget();
+  this->InitializeMemoryUseWidget();
 }
 
 //-----------------------------------------------------------------------------
 HostData::~HostData()
 {
   this->ClearRankData();
-  delete this->LoadWidget;
+  delete this->WidgetContainer;
 }
 
 //-----------------------------------------------------------------------------
@@ -407,14 +537,26 @@ const HostData &HostData::operator=(const HostData &other)
 {
   if (this==&other) return *this;
 
+  this->GroupName=other.GroupName;
   this->HostName=other.HostName;
-  this->Capacity=other.Capacity;
-  this->RealCapacity=other.RealCapacity;
-  this->LoadWidget=other.LoadWidget;
+  this->HostMemoryTotal=other.HostMemoryTotal;
+  this->HostMemoryAvailable=other.HostMemoryAvailable;
+  this->TotalMemoryUseWidget=other.TotalMemoryUseWidget;
+  this->GroupMemoryUseWidget=other.GroupMemoryUseWidget;
   this->TreeItem=other.TreeItem;
   this->Ranks=other.Ranks;
 
   return *this;
+}
+
+//-----------------------------------------------------------------------------
+RankData *HostData::GetRankData(int i)
+{
+  if ((size_t)i<this->Ranks.size())
+    {
+    return this->Ranks[i];
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -424,93 +566,139 @@ void HostData::ClearRankData()
 }
 
 //-----------------------------------------------------------------------------
-RankData *HostData::AddRankData(int rank, unsigned long long pid)
+RankData *HostData::AddRankData(
+      int rank,
+      long long pid,
+      long long procMemAvail)
 {
-  RankData *newRank=new RankData(rank,pid,0,this->Capacity);
+  RankData *newRank=new RankData(rank,pid,0,0,procMemAvail);
   this->Ranks.push_back(newRank);
   return newRank;
 }
 
 //-----------------------------------------------------------------------------
-unsigned long long HostData::GetLoad()
+long long HostData::GetTotalSystemMemoryUse()
 {
-  unsigned long long load=0;
-  size_t n=this->Ranks.size();
-  for (size_t i=0; i<n; ++i)
+  long long load=0;
+  if (this->Ranks.size())
     {
-    load+=this->Ranks[i]->GetLoad();
+    load=this->Ranks[0]->GetHostMemoryUse();
     }
   return load;
 }
 
 //-----------------------------------------------------------------------------
-void HostData::ResetCapacity()
+long long HostData::GetProcessGroupMemoryUse()
 {
-  this->Capacity = this->RealCapacity;
-
+  long long load=0;
   size_t n=this->Ranks.size();
   for (size_t i=0; i<n; ++i)
     {
-    this->Ranks[i]->OverrideCapacity(this->RealCapacity);
+    load+=this->Ranks[i]->GetProcMemoryUse();
     }
-
-  this->UpdateLoadWidget();
+  return load;
 }
 
 //-----------------------------------------------------------------------------
-void HostData::OverrideCapacity(unsigned long long capacity)
+void HostData::InitializeMemoryUseWidget()
 {
-  size_t n=this->Ranks.size();
-  this->Capacity = n*capacity;
+  this->InitializeMemoryUseWidget(this->TotalMemoryUseWidget);
+  this->InitializeMemoryUseWidget(this->GroupMemoryUseWidget);
 
-  for (size_t i=0; i<n; ++i)
-    {
-    this->Ranks[i]->OverrideCapacity(capacity);
-    }
+  QFormLayout *l=new QFormLayout;
+  l->setRowWrapPolicy(QFormLayout::DontWrapRows);
+  l->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
+  l->setFormAlignment(Qt::AlignHCenter|Qt::AlignTop);
+  l->setLabelAlignment(Qt::AlignRight);
+  l->setContentsMargins(2,2,2,2);
+  l->setSpacing(2);
 
-  this->UpdateLoadWidget();
-}
+  l->addRow("System Total",this->TotalMemoryUseWidget);
+  l->addRow(this->GroupName.c_str(),this->GroupMemoryUseWidget);
 
-//-----------------------------------------------------------------------------
-void HostData::InitializeLoadWidget()
-{
+  QLabel *label=new QLabel;
+  label->setText(this->HostName.c_str());
 
-  this->LoadWidget=new QProgressBar;
-  this->LoadWidget->setStyle(::getLoadWidgetStyle());
-  this->LoadWidget->setMaximumHeight(15);
-  this->LoadWidget->setMinimum(0);
-  this->LoadWidget->setMaximum(MIP_PROGBAR_MAX);
-  QFont font(this->LoadWidget->font());
+  QFrame *vline=new QFrame;
+  vline->setFrameStyle(QFrame::VLine|QFrame::Plain);
+
+  QHBoxLayout *h=new QHBoxLayout;
+  h->addWidget(label);
+  h->addWidget(vline);
+  h->addLayout(l);
+  h->setContentsMargins(1,0,1,0);
+  h->setSpacing(0);
+
+  this->WidgetContainer=new QFrame;
+  this->WidgetContainer->setLayout(h);
+  this->WidgetContainer->setFrameStyle(QFrame::Box|QFrame::Plain);
+  QFont font(this->WidgetContainer->font());
   font.setPointSize(8);
-  this->LoadWidget->setFont(font);
+  this->WidgetContainer->setFont(font);
 
-  this->UpdateLoadWidget();
+  this->UpdateMemoryUseWidget();
 }
 
 //-----------------------------------------------------------------------------
-void HostData::UpdateLoadWidget()
+void HostData::InitializeMemoryUseWidget(QProgressBar *&loadWidget)
 {
-  float used = (float)this->GetLoad();
-  float fracUsed = this->GetLoadFraction();
+  loadWidget=new QProgressBar;
+  loadWidget->setStyle(::getMemoryUseWidgetStyle());
+  loadWidget->setMaximumHeight(15);
+  loadWidget->setMinimum(0);
+  loadWidget->setMaximum(MIP_PROGBAR_MAX);
+  QFont font(loadWidget->font());
+  font.setPointSize(8);
+  loadWidget->setFont(font);
+}
+
+//-----------------------------------------------------------------------------
+void HostData::UpdateMemoryUseWidget()
+{
+  long long load;
+  float frac;
+
+  load=this->GetTotalSystemMemoryUse();
+  frac=min(1.0f,(float)load/(float)this->HostMemoryTotal);
+  this->UpdateMemoryUseWidget(
+        this->TotalMemoryUseWidget,
+        load,
+        frac,
+        ::getSystemWarningThreshold(),
+        ::getSystemCriticalThreshold());
+
+  load=this->GetProcessGroupMemoryUse();
+  frac=min(1.0f,(float)load/(float)this->HostMemoryAvailable);
+  this->UpdateMemoryUseWidget(
+        this->GroupMemoryUseWidget,
+        load,
+        frac,
+        ::getProcessWarningThreshold(),
+        ::getProcessCriticalThreshold());
+}
+
+//-----------------------------------------------------------------------------
+void HostData::UpdateMemoryUseWidget(
+        QProgressBar *loadWidget,
+        long long used,
+        float fracUsed,
+        float warnFrac,
+        float critFrac)
+{
   float percUsed = fracUsed*100.0f;
   int progVal = (int)(fracUsed*MIP_PROGBAR_MAX);
 
-  this->LoadWidget->setValue(progVal);
-  this->LoadWidget->setFormat(
+  loadWidget->setValue(progVal);
+  loadWidget->setFormat(
     QString("%1 %2%").arg(::translateUnits(used)).arg(percUsed, 0,'f',2));
 
-  QPalette palette(this->LoadWidget->palette());
-  if (fracUsed>0.75)
-    {
-    // danger -> red
-    palette.setColor(QPalette::Highlight,QColor(232,40,40));
-    }
-  else
-    {
-    // ok -> green
-    palette.setColor(QPalette::Highlight,QColor(66,232,20));
-    }
-  this->LoadWidget->setPalette(palette);
+  QPalette palette(loadWidget->palette());
+  ::setMemoryUseWidgetColor(
+        palette,
+        fracUsed,
+        warnFrac,
+        critFrac);
+  loadWidget->setPalette(palette);
 }
 
 //-----------------------------------------------------------------------------
@@ -519,9 +707,10 @@ void HostData::Print(ostream &os)
   os
     << "HostData(" << this << ")"
     << " HostName=" << this->HostName
-    << " Capacity=" << this->Capacity
-    << " RealCapacity=" << this->RealCapacity
-    << " LoadWidget=" << this->LoadWidget
+    << " HostMemoryTotal=" << this->HostMemoryTotal
+    << " TotalMemoryUseWidget=" << this->TotalMemoryUseWidget
+    << " GroupMemoryUseWidget=" << this->GroupMemoryUseWidget
+    << " WidgetContainer=" << this->WidgetContainer
     << " TreeItem=" << this->TreeItem
     << " Ranks=" << endl;
   size_t nRanks=this->Ranks.size();
@@ -531,6 +720,10 @@ void HostData::Print(ostream &os)
     }
   os << endl;
 }
+
+
+
+
 
 //-----------------------------------------------------------------------------
 pqMemoryInspectorPanel::pqMemoryInspectorPanel(
@@ -543,46 +736,35 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(
   cerr << ":::::pqMemoryInspectorPanel::pqMemoryInspectorPanel" << endl;
   #endif
 
-  this->ClientOnly=0;
+  this->ClientOnly=1;
   this->ClientHost=0;
-  this->ClientRank=0;
+  this->AutoUpdate=true;
+  this->UpdateEnabled=0;
 
   // Construct Qt form.
   this->Ui=new pqMemoryInspectorPanelUI;
   this->Ui->setupUi(this);
   this->Ui->updateMemUse->setIcon(QPixmap(":/pqWidgets/Icons/pqRedo24.png"));
 
-  // Set up configuration viewer
+  // attempt initialization here before we begin to listen
+  // for event's that could trigger and update.
   this->Initialize();
 
-  // apply capacity override
+  // listen for enable/disable auto update
   QObject::connect(
-        this->Ui->overrideCapacity,
-        SIGNAL(editingFinished()),
-        this,
-        SLOT(OverrideCapacity()));
-
-  QObject::connect(
-        this->Ui->enableOverrideCapacity,
+        this->Ui->autoUpdate,
         SIGNAL(toggled(bool)),
         this,
-        SLOT(OverrideCapacity()));
+        SLOT(SetAutoUpdate(bool)));
 
-  // intialize new remote server
-  QObject::connect(
-        &pqActiveObjects::instance(),
-        SIGNAL(serverChanged(pqServer*)),
-        this,
-        SLOT(Initialize()));
-
-  // refresh
+  // listen for manual update request
   QObject::connect(
         this->Ui->updateMemUse,
         SIGNAL(released()),
         this,
-        SLOT(Refresh()));
+        SLOT(Update()));
 
-  // context menu
+  // listen to context menu events
   QObject::connect(
         this->Ui->configView,
         SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -590,7 +772,62 @@ pqMemoryInspectorPanel::pqMemoryInspectorPanel(
         SLOT(ConfigViewContextMenu(const QPoint &)));
   this->Ui->configView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  this->Ui->configView->expandAll();
+  // connect to new views as they are created
+  pqServerManagerModel* smm
+    = pqApplicationCore::instance()->getServerManagerModel();
+
+  // listen for new views, we want to update after render is finished.
+  QObject::connect(
+        smm,
+        SIGNAL(viewAdded(pqView*)),
+        this,
+        SLOT(ConnectToView(pqView*)));
+
+  // listen to the active view for render completed events.
+  pqView* view=pqActiveObjects::instance().activeView();
+  if (view)
+    {
+    this->ConnectToView(view);
+    }
+
+  // listen to servers connecting and disconnecting
+  QObject::connect(
+        smm,
+        SIGNAL(serverAdded(pqServer*)),
+        this,
+        SLOT(ServerConnected()));
+
+  QObject::connect(
+        smm,
+        SIGNAL(finishedRemovingServer()),
+        this,
+        SLOT(ServerDisconnected()));
+
+  /*
+  // TODO -- not sure if these are useful, maybe for responding
+  // to python events?
+  QObject::connect(
+        smm,
+        SIGNAL(dataUpdated(pqPipelineSource*)),
+        this,
+        SLOT(EnableUpdate()));
+
+  QObject::connect(
+        smm,
+        SIGNAL(proxyAdded(pqProxy*)),
+        this,
+        SLOT(EnableUpdate()));
+
+  QObject::connect(
+        smm,
+        SIGNAL(proxRemoved(pqProxy*)),
+        this,
+        SLOT(EnableUpdate()));
+  */
+
+  QPalette pal=this->Ui->configView->palette();
+  pal.setColor(QPalette::Highlight, Qt::lightGray);
+  this->Ui->configView->setPalette(pal);
 }
 
 //-----------------------------------------------------------------------------
@@ -639,17 +876,132 @@ void pqMemoryInspectorPanel::ClearServer(
 //-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::ClearServers()
 {
+  this->ClientOnly=1;
   this->ClearServer(this->ServerHosts,this->ServerRanks);
   this->ClearServer(this->DataServerHosts,this->DataServerRanks);
   this->ClearServer(this->RenderServerHosts,this->RenderServerRanks);
 }
 
 //-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::ServerDisconnected()
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel:;ServerDisconnected" << endl;
+  #endif
+
+  this->ClearClient();
+  this->ClearServers();
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::ServerConnected()
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::ServerConnected" << endl;
+  #endif
+
+  this->Initialize();
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::ConnectToView(pqView *view)
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::ConnectToView" << endl;
+  #endif
+
+  // rendering triggers the update
+  QObject::connect(
+        view,
+        SIGNAL(endRender()),
+        this,
+        SLOT(RenderCompleted()));
+
+  // update only after data is changed
+  QObject::connect(
+        view,
+        SIGNAL(updateDataEvent()),
+        this,
+        SLOT(EnableUpdate()));
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::showEvent(QShowEvent *e)
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::showEvent" << endl;
+  #endif
+
+  (void)e;
+  this->Update();
+}
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::EnableUpdate()
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::EnableUpdate" << endl;
+  #endif
+
+  this->UpdateEnabled=1;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::RenderCompleted()
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::RenderCompleted" << endl;
+  #endif
+
+  if (!this->AutoUpdate || !this->isVisible() || !this->UpdateEnabled)
+    {
+    return;
+    }
+
+  this->Update();
+  return;
+
+  /*
+  // This code is for updating on endRender regardless of whether
+  // or not data was updated.it works better than updating only
+  // after data is udpated. however is disabled because it's slight
+  // over kill
+  if (!this->AutoUpdate || !this->isVisible())
+    {
+    return;
+    }
+
+  // only going to respond to render view's events. other view's
+  // events may be useful to track but need to consider case by
+  // case and verify that we don't flood the server with update
+  // requests.
+  pqRenderView* view
+    = qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
+
+  if (view)
+    {
+    vtkSMRenderViewProxy *viewProxy
+      = dynamic_cast<vtkSMRenderViewProxy*>(view->getProxy());
+    if (viewProxy)
+      {
+      if (!viewProxy->LastRenderWasInteractive() && !this->PendingUpdate)
+        {
+        // there are two still renders after the last
+        // interactive render.
+        QTimer::singleShot(2000, this, SLOT(Update()));
+        this->PendingUpdate=1;
+        }
+      }
+    }
+  */
+}
+
+//-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::InitializeServerGroup(
-    unsigned long long clientPid,
+    long long clientPid,
     vtkPVSystemConfigInformation *configs,
     int validProcessType,
     QTreeWidgetItem *group,
+    string groupName,
     map<string,HostData*> &hosts,
     vector<RankData*> &ranks,
     int &systemType)
@@ -659,7 +1011,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
     {
     // assume that we get what we ask for and nothing more
     // but verify that it's not the builtin
-    unsigned long long pid=configs->GetPid(i);
+    long long pid=configs->GetPid(i);
     if (pid==clientPid)
       {
       // must be the builtin, do not duplicate.
@@ -678,7 +1030,9 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
     string fqdn=configs->GetFullyQualifiedDomainName(i);
     systemType=configs->GetSystemType(i);
     int rank=configs->GetRank(i);
-    unsigned long long capacity=configs->GetCapacity(i);
+    long long hostMemoryTotal=configs->GetHostMemoryTotal(i);
+    long long hostMemoryAvailable=configs->GetHostMemoryAvailable(i);
+    long long procMemoryAvailable=configs->GetProcMemoryAvailable(i);
 
     // it's useful to have hostname's rank's and pid's in
     // the terminal. if the client hangs you can attach
@@ -701,7 +1055,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
     if (ret.second)
       {
       // new host
-      serverHost=new HostData(hostName,capacity);
+      serverHost=new HostData(groupName,hostName,hostMemoryTotal,hostMemoryAvailable);
       ret.first->second=serverHost;
 
       QTreeWidgetItem *serverHostItem=new QTreeWidgetItem(group);
@@ -714,8 +1068,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
       serverHostItem->setData(0,ITEM_KEY_HOST_CPU,QString(cpu.c_str()));
       serverHostItem->setData(0,ITEM_KEY_HOST_MEM,QString(mem.c_str()));
       serverHostItem->setData(0,ITEM_KEY_FQDN,QString(fqdn.c_str()));
-      serverHostItem->setText(0,hostName.c_str());
-      this->Ui->configView->setItemWidget(serverHostItem,1,serverHost->GetLoadWidget());
+      this->Ui->configView->setItemWidget(serverHostItem,0,serverHost->GetMemoryUseWidget());
 
       serverHost->SetTreeItem(serverHostItem);
       }
@@ -724,7 +1077,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
       serverHost=ret.first->second;
       }
     // rank
-    RankData *serverRank=serverHost->AddRankData(rank,pid);
+    RankData *serverRank=serverHost->AddRankData(rank,pid,procMemoryAvailable);
     ranks.push_back(serverRank);
 
     QTreeWidgetItem *serverRankItem=new QTreeWidgetItem(serverHost->GetTreeItem());
@@ -736,8 +1089,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
     serverRankItem->setData(0,ITEM_KEY_PID,QVariant(pid));
     serverRankItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(systemType));
     serverRankItem->setData(0,ITEM_KEY_FQDN,QString(fqdn.c_str()));
-    serverRankItem->setText(0,QString("%1:%2").arg(rank).arg(pid));
-    this->Ui->configView->setItemWidget(serverRankItem,1,serverRank->GetLoadWidget());
+    this->Ui->configView->setItemWidget(serverRankItem,0,serverRank->GetMemoryUseWidget());
     }
 
   // prune off the group if there were none added.
@@ -752,7 +1104,7 @@ void pqMemoryInspectorPanel::InitializeServerGroup(
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::Initialize()
+int pqMemoryInspectorPanel::Initialize()
 {
   #if defined pqMemoryInspectorPanelDEBUG
   cerr << ":::::pqMemoryInspectorPanel::Initialize" << endl;
@@ -778,16 +1130,17 @@ void pqMemoryInspectorPanel::Initialize()
     {
     // this is not necessarilly an error as the panel may be created
     // before the server is connected.
-    return;
+    return 0;
     }
 
-
   // client
-  QTreeWidgetItem *clientGroup
-    = new QTreeWidgetItem(this->Ui->configView,QStringList("paraview"));
+  QTreeWidgetItem *clientGroup=new QTreeWidgetItem(this->Ui->configView);
   clientGroup->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
   clientGroup->setExpanded(true);
   clientGroup->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_CLIENT_GROUP));
+
+  QWidget *groupWidget=this->NewGroupWidget("client",":/pqWidgets/Icons/pqClient32.png");
+  this->Ui->configView->setItemWidget(clientGroup,0,groupWidget);
 
   vtkSMSession *session=NULL;
   vtkPVSystemConfigInformation *configs=NULL;
@@ -800,16 +1153,22 @@ void pqMemoryInspectorPanel::Initialize()
   if (nConfigs!=1)
     {
     pqErrorMacro("There should always be one client.");
-    return;
+    return 0;
     }
 
-  unsigned long long clientPid=configs->GetPid(0);
+  long long clientPid=configs->GetPid(0);
 
   this->ClientHost
-    = new HostData(configs->GetHostName(0),configs->GetCapacity(0));
+    = new HostData(
+        "paraview",
+        configs->GetHostName(0),
+        configs->GetHostMemoryTotal(0),
+        configs->GetHostMemoryAvailable(0));
 
-  this->ClientRank
-   = this->ClientHost->AddRankData(0,configs->GetPid(0));
+  this->ClientHost->AddRankData(
+        0,
+        configs->GetPid(0),
+        configs->GetProcMemoryAvailable(0));
 
   this->ClientSystemType=configs->GetSystemType(0);
 
@@ -822,19 +1181,10 @@ void pqMemoryInspectorPanel::Initialize()
   clientHostItem->setData(0,ITEM_KEY_HOST_OS,QString(configs->GetOSDescriptor(0)));
   clientHostItem->setData(0,ITEM_KEY_HOST_CPU,QString(configs->GetCPUDescriptor(0)));
   clientHostItem->setData(0,ITEM_KEY_HOST_MEM,QString(configs->GetMemoryDescriptor(0)));
+  clientHostItem->setData(0,ITEM_KEY_HOST_NAME,QVariant(configs->GetHostName(0)));
   clientHostItem->setData(0,ITEM_KEY_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
-  clientHostItem->setText(0,configs->GetHostName(0));
-
-  QTreeWidgetItem *clientRankItem=new QTreeWidgetItem(clientHostItem);
-  clientRankItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
-  clientRankItem->setExpanded(true);
-  clientRankItem->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_CLIENT_RANK));
-  clientRankItem->setData(0,ITEM_KEY_HOST_NAME,QVariant(configs->GetHostName(0)));
-  clientRankItem->setData(0,ITEM_KEY_PID,QVariant(configs->GetPid(0)));
-  clientRankItem->setData(0,ITEM_KEY_SYSTEM_TYPE,QVariant(configs->GetSystemType(0)));
-  clientHostItem->setData(0,ITEM_KEY_FQDN,QString(configs->GetFullyQualifiedDomainName(0)));
-  clientRankItem->setText(0,QString("0:%1").arg(configs->GetPid(0)));
-  this->Ui->configView->setItemWidget(clientRankItem,1,this->ClientRank->GetLoadWidget());
+  clientHostItem->setData(0,ITEM_KEY_PID,QVariant(configs->GetPid(0)));
+  this->Ui->configView->setItemWidget(clientHostItem,0,this->ClientHost->GetMemoryUseWidget());
 
   configs->Delete();
 
@@ -877,6 +1227,7 @@ void pqMemoryInspectorPanel::Initialize()
   nConfigs=configs->GetSize();
   if (nConfigs>0)
     {
+    configs->Sort();
 
     // servers
     #ifdef MIP_PROCESS_TABLE
@@ -885,17 +1236,21 @@ void pqMemoryInspectorPanel::Initialize()
       << right << setw(1)  << setfill(' ');
     #endif
     QTreeWidgetItem *group=NULL;
-    group = new QTreeWidgetItem(QStringList("pvserver"));
+    group = new QTreeWidgetItem;
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+
+    groupWidget=this->NewGroupWidget("server",":/pqWidgets/Icons/pqDataServer32.png");
     this->Ui->configView->addTopLevelItem(group);
+    this->Ui->configView->setItemWidget(group,0,groupWidget);
 
     this->InitializeServerGroup(
         clientPid,
         configs,
         vtkProcessModule::PROCESS_SERVER,
         group,
+        "pvserver",
         this->ServerHosts,
         this->ServerRanks,
         this->ServerSystemType);
@@ -906,17 +1261,21 @@ void pqMemoryInspectorPanel::Initialize()
       << left << setw(56) << setfill('=') << "data server" << endl
       << right << setw(1)  << setfill(' ');
     #endif
-    group = new QTreeWidgetItem(QStringList("pvdataserver"));
+    group = new QTreeWidgetItem;
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+
+    groupWidget=this->NewGroupWidget("data server",":/pqWidgets/Icons/pqDataServer32.png");
     this->Ui->configView->addTopLevelItem(group);
+    this->Ui->configView->setItemWidget(group,0,groupWidget);
 
     this->InitializeServerGroup(
         clientPid,
         configs,
         vtkProcessModule::PROCESS_DATA_SERVER,
         group,
+        "pvdataserver",
         this->DataServerHosts,
         this->DataServerRanks,
         this->DataServerSystemType);
@@ -927,17 +1286,21 @@ void pqMemoryInspectorPanel::Initialize()
       << left << setw(56) << setfill('=') << "render server" << endl
       << right << setw(1)  << setfill(' ');
     #endif
-    group = new QTreeWidgetItem(QStringList("pvrenderserver"));
+    group = new QTreeWidgetItem;
     group->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicatorWhenChildless);
     group->setExpanded(true);
     group->setData(0,ITEM_KEY_PROCESS_TYPE,QVariant(ITEM_DATA_SERVER_GROUP));
+
+    groupWidget=this->NewGroupWidget("render server",":/pqWidgets/Icons/pqDataServer32.png");
     this->Ui->configView->addTopLevelItem(group);
+    this->Ui->configView->setItemWidget(group,0,groupWidget);
 
     this->InitializeServerGroup(
         clientPid,
         configs,
         vtkProcessModule::PROCESS_RENDER_SERVER,
         group,
+        "pvrenderserver",
         this->RenderServerHosts,
         this->RenderServerRanks,
         this->RenderServerSystemType);
@@ -955,15 +1318,9 @@ void pqMemoryInspectorPanel::Initialize()
     && (this->ServerHosts.size()==0))
     {
     this->ClientOnly=1;
-    this->Ui->enableOverrideCapacity->setEnabled(false);
-    this->Ui->overrideCapacity->setEnabled(false);
     }
   else
     {
-    this->Ui->enableOverrideCapacity->setEnabled(true);
-    this->Ui->overrideCapacity->setEnabled(
-         this->Ui->enableOverrideCapacity->isChecked());
-
     // update host load to reflect all of its ranks.
     map<string,HostData*>::iterator it;
     map<string,HostData*>::iterator end;
@@ -971,7 +1328,7 @@ void pqMemoryInspectorPanel::Initialize()
     end=this->DataServerHosts.end();
     while (it!=end)
       {
-      it->second->UpdateLoadWidget();
+      it->second->UpdateMemoryUseWidget();
       ++it;
       }
 
@@ -979,7 +1336,7 @@ void pqMemoryInspectorPanel::Initialize()
     end=this->RenderServerHosts.end();
     while (it!=end)
       {
-      it->second->UpdateLoadWidget();
+      it->second->UpdateMemoryUseWidget();
       ++it;
       }
     }
@@ -988,25 +1345,55 @@ void pqMemoryInspectorPanel::Initialize()
   this->Ui->configView->resizeColumnToContents(0);
   this->Ui->configView->resizeColumnToContents(1);
 
-  //
-  this->Refresh();
+  // fecth the remote memory usage
+  this->Update();
 
-  //
-  this->ShowAllRanks();
+  // don't expand by default when there are a lot of
+  // sever hosts
+  if ( (this->RenderServerHosts.size()>1)
+    || (this->DataServerHosts.size()>1)
+    || (this->ServerHosts.size()>2) )
+    {
+    this->ShowOnlyNodes();
+    }
+  else
+    {
+    this->ShowAllRanks();
+    }
+
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::Refresh()
-{
-  this->RefreshRanks();
-  this->RefreshHosts();
-}
-
-//-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::RefreshRanks()
+void pqMemoryInspectorPanel::Update()
 {
   #if defined pqMemoryInspectorPanelDEBUG
-  cerr << ":::::pqMemoryInspectorPanel::Refresh" << endl;
+  cerr << ":::::pqMemoryInspectorPanel::Update" << endl;
+  #endif
+
+  pqServer* server = pqActiveObjects::instance().activeServer();
+  if (!server)
+    {
+    return;
+    }
+
+  if (!this->Initialized() && !this->Initialize())
+    {
+    return;
+    }
+
+  this->UpdateRanks();
+  this->UpdateHosts();
+
+  this->PendingUpdate=0;
+  this->UpdateEnabled=0;
+}
+
+//-----------------------------------------------------------------------------
+void pqMemoryInspectorPanel::UpdateRanks()
+{
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::UpdateRanks" << endl;
   #endif
 
   pqServer* server = pqActiveObjects::instance().activeServer();
@@ -1033,8 +1420,10 @@ void pqMemoryInspectorPanel::RefreshRanks()
     return;
     }
 
-  this->ClientRank->SetLoad(infos->GetMemoryUse(0));
-  this->ClientRank->UpdateLoadWidget();
+  RankData *clientRank=this->ClientHost->GetRankData(0);
+  clientRank->SetProcMemoryUse(infos->GetProcMemoryUse(0));
+  clientRank->SetHostMemoryUse(infos->GetHostMemoryUse(0));
+  clientRank->UpdateMemoryUseWidget();
 
   infos->Delete();
 
@@ -1062,36 +1451,39 @@ void pqMemoryInspectorPanel::RefreshRanks()
     rsinfos->Delete();
     }
 
-
   nInfos=infos->GetSize();
   for (size_t i=0; i<nInfos; ++i)
     {
     int rank=infos->GetRank((int)i);
-    unsigned long long use=infos->GetMemoryUse((int)i);
+    long long procUse=infos->GetProcMemoryUse((int)i);
+    long long hostUse=infos->GetHostMemoryUse((int)i);
 
     switch (infos->GetProcessType((int)i))
       {
       case vtkProcessModule::PROCESS_SERVER:
         if (this->ServerRanks.size())
           {
-          this->ServerRanks[rank]->SetLoad(use);
-          this->ServerRanks[rank]->UpdateLoadWidget();
+          this->ServerRanks[rank]->SetProcMemoryUse(procUse);
+          this->ServerRanks[rank]->SetHostMemoryUse(hostUse);
+          this->ServerRanks[rank]->UpdateMemoryUseWidget();
           }
         break;
 
       case vtkProcessModule::PROCESS_DATA_SERVER:
         if (this->DataServerRanks.size())
           {
-          this->DataServerRanks[rank]->SetLoad(use);
-          this->DataServerRanks[rank]->UpdateLoadWidget();
+          this->DataServerRanks[rank]->SetProcMemoryUse(procUse);
+          this->DataServerRanks[rank]->SetHostMemoryUse(hostUse);
+          this->DataServerRanks[rank]->UpdateMemoryUseWidget();
           }
         break;
 
       case vtkProcessModule::PROCESS_RENDER_SERVER:
         if (this->RenderServerRanks.size())
           {
-          this->RenderServerRanks[rank]->SetLoad(use);
-          this->RenderServerRanks[rank]->UpdateLoadWidget();
+          this->RenderServerRanks[rank]->SetProcMemoryUse(procUse);
+          this->RenderServerRanks[rank]->SetHostMemoryUse(hostUse);
+          this->RenderServerRanks[rank]->UpdateMemoryUseWidget();
           }
         break;
 
@@ -1105,74 +1497,35 @@ void pqMemoryInspectorPanel::RefreshRanks()
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::RefreshHosts()
+void pqMemoryInspectorPanel::UpdateHosts()
 {
-  this->RefreshHosts(this->ServerHosts);
-  this->RefreshHosts(this->DataServerHosts);
-  this->RefreshHosts(this->RenderServerHosts);
+  #if defined pqMemoryInspectorPanelDEBUG
+  cerr << ":::::pqMemoryInspectorPanel::UpdateHosts" << endl;
+  #endif
+
+  this->ClientHost->UpdateMemoryUseWidget();
+
+  if (this->ClientOnly)
+    {
+    return;
+    }
+
+  this->UpdateHosts(this->ServerHosts);
+  this->UpdateHosts(this->DataServerHosts);
+  this->UpdateHosts(this->RenderServerHosts);
 }
 
 //-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::RefreshHosts(map<string,HostData*> &hosts)
+void pqMemoryInspectorPanel::UpdateHosts(map<string,HostData*> &hosts)
 {
   // update host laod to reflect all of its ranks.
   map<string,HostData*>::iterator it=hosts.begin();
   map<string,HostData*>::iterator end=hosts.end();
   while (it!=end)
-    {
-    (*it).second->UpdateLoadWidget();
-    ++it;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::OverrideCapacity()
-{
-  this->OverrideCapacity(this->ServerHosts);
-  this->OverrideCapacity(this->DataServerHosts);
-  this->OverrideCapacity(this->RenderServerHosts);
-}
-
-//-----------------------------------------------------------------------------
-void pqMemoryInspectorPanel::OverrideCapacity(map<string,HostData*> &hosts)
-{
-  #if defined pqMemoryInspectorPanelDEBUG
-  cerr << ":::::pqMemoryInspectorPanel::OverrideCapacity" << endl;
-  #endif
-
-  bool applyOverride = this->Ui->enableOverrideCapacity->isChecked();
-
-  map<string,HostData*>::iterator it=hosts.begin();
-  map<string,HostData*>::iterator end=hosts.end();
-
-  if (applyOverride)
-    {
-    // capacity and usage are reported in kiB, but UI request
-    // in GiB.
-    unsigned long long capacity
-      = (unsigned long long)(this->Ui->overrideCapacity->text().toDouble()*pow(2.0,20));
-
-    if (capacity<=0)
-      {
-      return; // short circuit invalid entry
-      }
-
-    // apply the constrained capacity to each host.
-    while (it!=end)
-      {
-      (*it).second->OverrideCapacity(capacity);
-      ++it;
-      }
-    }
-  else
-    {
-    // reset each host to use real capacity
-    while (it!=end)
-      {
-      (*it).second->ResetCapacity();
-      ++it;
-      }
-    }
+   {
+   (*it).second->UpdateMemoryUseWidget();
+   ++it;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1243,6 +1596,20 @@ void pqMemoryInspectorPanel::ExecuteRemoteCommand()
     bool ok;
     int type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt(&ok);
     if (!ok) return;
+
+    // treate the client group like a rank.
+    if (type==ITEM_DATA_CLIENT_GROUP)
+      {
+      item=item->child(0);
+      if (item==NULL) return;
+      type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt();
+      }
+    // treate the client host like a rank.
+    if (type==ITEM_DATA_CLIENT_HOST)
+      {
+      type=ITEM_DATA_CLIENT_RANK;
+      }
+
     switch (type)
       {
       case ITEM_DATA_CLIENT_RANK:
@@ -1401,6 +1768,15 @@ void pqMemoryInspectorPanel::ShowHostPropertiesDialog()
     }
 
   int type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt();
+
+  // treate the client group like a host.
+  if (type==ITEM_DATA_CLIENT_GROUP)
+    {
+    item=item->child(0);
+    if (item==NULL) return;
+    type=item->data(0,ITEM_KEY_PROCESS_TYPE).toInt();
+    }
+
   if ( (type==ITEM_DATA_CLIENT_HOST)
     || (type==ITEM_DATA_SERVER_HOST) )
     {
@@ -1454,13 +1830,16 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint &position)
         {
         QTreeWidgetItem *child=item->child(0);
         if (child==NULL) return;
+        context.addAction("properties...",this,SLOT(ShowHostPropertiesDialog()));
         int sysType=child->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
-        if (!ok) return;
-        int serverType=child->data(0,ITEM_KEY_PVSERVER_TYPE).toInt(&ok);
         if (!ok) return;
         if (sysType==ITEM_DATA_UNIX_SYSTEM)
           {
+          int serverType=child->data(0,ITEM_KEY_PVSERVER_TYPE).toInt(&ok);
+          if (!ok) return;
+
           this->AddEnableStackTraceMenuAction(serverType,context);
+          context.addAction("remote command...",this,SLOT(ExecuteRemoteCommand()));
           }
         }
         break;
@@ -1484,15 +1863,29 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint &position)
         break;
 
       case ITEM_DATA_CLIENT_HOST:
+      case ITEM_DATA_CLIENT_RANK:
+        {
+        context.addAction("properties...",this,SLOT(ShowHostPropertiesDialog()));
+        int sysType=item->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
+        if (!ok) return;
+        if (sysType==ITEM_DATA_UNIX_SYSTEM)
+          {
+          context.addAction("remote command...",this,SLOT(ExecuteRemoteCommand()));
+          }
+        }
+        break;
+
       case ITEM_DATA_SERVER_HOST:
         {
         context.addAction("properties...",this,SLOT(ShowHostPropertiesDialog()));
         }
         break;
 
-      case ITEM_DATA_CLIENT_RANK:
       case ITEM_DATA_SERVER_RANK:
         {
+        context.addAction("show only nodes",this,SLOT(ShowOnlyNodes()));
+        context.addAction("show all ranks",this,SLOT(ShowAllRanks()));
+
         int sysType=item->data(0,ITEM_KEY_SYSTEM_TYPE).toInt(&ok);
         if (!ok) return;
         if (sysType==ITEM_DATA_UNIX_SYSTEM)
@@ -1506,6 +1899,7 @@ void pqMemoryInspectorPanel::ConfigViewContextMenu(const QPoint &position)
 
   context.exec(this->Ui->configView->mapToGlobal(position));
 }
+
 //-----------------------------------------------------------------------------
 void pqMemoryInspectorPanel::AddEnableStackTraceMenuAction(
       int serverType,
@@ -1549,4 +1943,29 @@ void pqMemoryInspectorPanel::AddEnableStackTraceMenuAction(
       break;
     }
   context.addAction(action);
+}
+
+//-----------------------------------------------------------------------------
+QWidget *pqMemoryInspectorPanel::NewGroupWidget(string name, string icon)
+{
+  QHBoxLayout *hlayout=new QHBoxLayout;
+
+  QLabel *label=new QLabel;
+  label->setPixmap(QPixmap(icon.c_str()));
+  label->setToolTip(name.c_str());
+  hlayout->addWidget(label);
+
+  label=new QLabel;
+  label->setText(name.c_str());
+  hlayout->addWidget(label);
+  hlayout->addStretch(-1);
+
+  QFrame *frame=new QFrame;
+  frame->setLayout(hlayout);
+  QFont ffont(frame->font());
+  ffont.setPointSize(9);
+  ffont.setBold(true);
+  frame->setFont(ffont);
+
+  return frame;
 }

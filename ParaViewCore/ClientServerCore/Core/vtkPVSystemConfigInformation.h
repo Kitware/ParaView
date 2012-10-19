@@ -61,8 +61,14 @@ public:
   int GetProcessType(size_t i){ return this->Configs[i].ProcessType; }
   int GetSystemType(size_t i){ return this->Configs[i].SystemType; }
   int GetRank(size_t i){ return this->Configs[i].Rank; }
-  unsigned long long GetPid(size_t i){ return this->Configs[i].Pid; }
-  unsigned long long GetCapacity(size_t i){ return this->Configs[i].Capacity; }
+  long long GetPid(size_t i){ return this->Configs[i].Pid; }
+  long long GetHostMemoryTotal(size_t i){ return this->Configs[i].HostMemoryTotal; }
+  long long GetHostMemoryAvailable(size_t i){ return this->Configs[i].HostMemoryAvailable; }
+  long long GetProcMemoryAvailable(size_t i){ return this->Configs[i].ProcMemoryAvailable; }
+
+  // Description:
+  // Sort elements by mpi rank.
+  void Sort();
 
 protected:
   vtkPVSystemConfigInformation();
@@ -84,10 +90,16 @@ private:
         SystemType(-1),
         Rank(-1),
         Pid(0),
-        Capacity(0)
+        HostMemoryTotal(0),
+        HostMemoryAvailable(0),
+        ProcMemoryAvailable(0)
       {}
 
       void Print();
+
+      bool operator<(const ConfigInfo &other) const
+      { return this->Rank<other.Rank; }
+
     public:
       string OSDescriptor;
       string CPUDescriptor;
@@ -97,8 +109,10 @@ private:
       int ProcessType;
       int SystemType;
       int Rank;
-      unsigned long long Pid;
-      unsigned long long Capacity;
+      long long Pid;
+      long long HostMemoryTotal;
+      long long HostMemoryAvailable;
+      long long ProcMemoryAvailable;
     };
 
   vector<ConfigInfo> Configs;
