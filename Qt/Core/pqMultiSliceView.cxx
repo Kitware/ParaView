@@ -356,3 +356,16 @@ void pqMultiSliceView::onSliceClicked(int button, int modifier, double value)
     emit sliceClicked(2, value, button, modifier);
     }
 }
+//-----------------------------------------------------------------------------
+void pqMultiSliceView::setCursor(const QCursor &c)
+{
+  if(this->InternalWidget)
+    {
+    this->InternalWidget->setCursor(c);
+    }
+}
+//-----------------------------------------------------------------------------
+QVTKWidget* pqMultiSliceView::getInternalWidget()
+{
+  return this->InternalWidget;
+}
