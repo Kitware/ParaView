@@ -27,6 +27,9 @@
        <property name="text">
         <string>&amp;Apply</string>
        </property>
+       <property name="shortcut">
+        <string>Ctrl+A</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -106,7 +109,7 @@
         <x>0</x>
         <y>0</y>
         <width>340</width>
-        <height>38</height>
+        <height>68</height>
        </rect>
       </property>
       <property name="sizePolicy">
