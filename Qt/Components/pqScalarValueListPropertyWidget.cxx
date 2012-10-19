@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QListWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QVariant>
 
 #include "pqSMAdaptor.h"
 #include "pqCollapsedGroup.h"

@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPropertyWidget.h"
 
+#include <QVariant>
+
 class QListWidgetItem;
 class vtkSMDoubleVectorPropertyWidget;
 class pqScalarValueListPropertyWidgetPrivate;
