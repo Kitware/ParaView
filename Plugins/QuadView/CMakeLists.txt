@@ -42,6 +42,7 @@ IF(PARAVIEW_BUILD_QT_GUI)
 
     SERVER_MANAGER_SOURCES
       vtkPVQuadRenderView.cxx
+      vtkPVQuadViewInformation.cxx
       vtkQuadRepresentation.cxx
       vtkSMQuadViewProxy.cxx
 

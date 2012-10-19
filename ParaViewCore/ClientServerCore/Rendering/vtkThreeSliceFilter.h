@@ -30,11 +30,15 @@
 #include "vtkPolyDataAlgorithm.h"
 
 class vtkAppendPolyData;
-class vtkCutter;
-class vtkPlane;
-class vtkPolyData;
-class vtkDataSet;
+class vtkCellData;
 class vtkCompositeDataSet;
+class vtkCutter;
+class vtkDataSet;
+class vtkPProbeFilter;
+class vtkPlane;
+class vtkPointData;
+class vtkPointSource;
+class vtkPolyData;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkThreeSliceFilter : public vtkPolyDataAlgorithm
 {
@@ -78,6 +82,14 @@ public:
   // Set slice Origin for all cutter
   void SetCutOrigins(double origin[3]);
 
+  // Description:
+  // Enable to probe the dataset at the given cut origin.
+  void EnableProbe(int enable);
+
+  // Description:
+  // Return true if any data is available and provide the value as argument
+  bool GetProbedPointData(const char* arrayName, double &value);
+
 protected:
   vtkThreeSliceFilter();
   ~vtkThreeSliceFilter();
@@ -88,6 +100,8 @@ protected:
   vtkCutter* Slices[3];
   vtkPlane* Planes[3];
   vtkAppendPolyData* CombinedFilteredInput;
+  vtkPProbeFilter* Probe;
+  vtkPointSource* PointToProbe;
 
   void Process(vtkDataSet* input, vtkPolyData* outputs[4], unsigned int compositeIndex);
   void Process(vtkCompositeDataSet* input, vtkCompositeDataSet* outputs[4]);

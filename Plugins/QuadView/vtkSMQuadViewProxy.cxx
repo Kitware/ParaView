@@ -20,7 +20,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVQuadRenderView.h"
+#include "vtkPVQuadViewInformation.h"
 #include "vtkPVRenderViewProxy.h"
+#include "vtkPVSession.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkRenderWindow.h"
@@ -203,7 +205,7 @@ vtkSMRepresentationProxy* vtkSMQuadViewProxy::CreateDefaultRepresentation(
 const char* vtkSMQuadViewProxy::IsSelectVisiblePointsAvailable()
 {
   // The original dataset and the slice don't share the same points
-  return "Multi-Slice View do not allow point selection";
+  return "Quad View do not allow point selection";
 }
 
 //----------------------------------------------------------------------------
@@ -311,4 +313,25 @@ void vtkSMQuadViewProxy::UpdateInternalViewExtent(vtkImageData * image,
   extent[3] = extent[2]+dimensions[1]-1;
   extent[4] = extent[5] = 0;
   image->SetExtent(extent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMQuadViewProxy::PostRender(bool interactive)
+{
+  this->Superclass::PostRender(interactive);
+  if(!interactive)
+    {
+    // Not interacting anymore, let's gather informations
+    vtkNew<vtkPVQuadViewInformation> info;
+    this->GatherInformation(info.GetPointer(), vtkPVSession::DATA_SERVER);
+    vtkPVQuadRenderView* quadView = vtkPVQuadRenderView::SafeDownCast(
+      this->GetClientSideObject());
+
+    // Update Informations
+    quadView->SetXAxisLabel(info->GetXLabel());
+    quadView->SetYAxisLabel(info->GetYLabel());
+    quadView->SetZAxisLabel(info->GetZLabel());
+    quadView->SetScalarLabel(info->GetScalarLabel());
+    quadView->SetScalarValue(info->GetValues()[3]);
+    }
 }
