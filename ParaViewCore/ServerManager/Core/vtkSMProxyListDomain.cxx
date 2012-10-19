@@ -183,7 +183,7 @@ bool vtkSMProxyListDomain::HasProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyListDomain::GetProxy(unsigned int index)
 {
-  if (index > this->Internals->ProxyList.size())
+  if (index >= this->Internals->ProxyList.size())
     {
     vtkErrorMacro("Index " << index << " greater than max "
       << this->Internals->ProxyList.size());
