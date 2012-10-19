@@ -119,6 +119,7 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
@@ -264,6 +265,7 @@ set(RepresentationSelector_USE_NEW_PANELS TRUE)
 set(SaveColorMap_USE_NEW_PANELS TRUE)
 set(SaveCSV_USE_NEW_PANELS TRUE)
 set(SelectReader_USE_NEW_PANELS TRUE)
+set(SelectionLabels_USE_NEW_PANELS TRUE)
 set(SimpleInteraction_USE_NEW_PANELS TRUE)
 set(Slice_USE_NEW_PANELS TRUE)
 set(SpreadSheet1_USE_NEW_PANELS TRUE)
@@ -340,6 +342,9 @@ set (StructuredGridVolumeRendering_BREAK TRUE)
 set (StructuredGridVolumeRendering_FORCE_SERIAL TRUE)
 set (StructuredGridVolumeRendering_DISABLE_CRS TRUE) 
   # <-- since volume rendering is not supported in CRS mode.
+
+# Since this test needs selection, disable in CRS mode.
+set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
