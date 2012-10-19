@@ -108,7 +108,7 @@ bool vtkQuadRepresentation::RemoveFromView(vtkView* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkQuadRepresentation::UpdateDataEventCallBack(vtkObject* src, unsigned long event, void* data)
+void vtkQuadRepresentation::UpdateDataEventCallBack(vtkObject*, unsigned long, void*)
 {
   if(this->AssociatedView && this->GetRenderedDataObject(0) && this->GetRenderedDataObject(0)->GetFieldData())
     {
