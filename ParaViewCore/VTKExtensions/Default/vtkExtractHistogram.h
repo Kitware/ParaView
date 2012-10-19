@@ -78,6 +78,13 @@ protected:
   vtkExtractHistogram();
   ~vtkExtractHistogram();
 
+  // Description:
+  // Returns the data range for the input array to process.
+  // This method is not called with this->UseCustomBinRanges is true.
+  // Returns true is range could be determined correctly, otherwise returns
+  // false and range is set to {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN}. When returning
+  // true, the actual data range is returned (without any extra padding).
+  virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
 

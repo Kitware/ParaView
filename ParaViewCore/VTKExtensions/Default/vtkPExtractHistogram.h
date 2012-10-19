@@ -42,16 +42,13 @@ protected:
   vtkPExtractHistogram();
   ~vtkPExtractHistogram();
 
+  // Description:
+  // Returns the data range for the input array to process.
+  // Overridden to reduce the range in parallel.
+  virtual bool GetInputArrayRange(vtkInformationVector** inputVector, double range[2]);
 
   virtual int RequestData(vtkInformation *request,
     vtkInformationVector **inputVector, vtkInformationVector *outputVector);
-
-
-  // Initialize the bin_extents using the data range for the selected 
-  // array.
-  virtual bool InitializeBinExtents(
-    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents,
-    double& min, double& max);
 
   vtkMultiProcessController* Controller;
 private:

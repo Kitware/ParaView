@@ -16,6 +16,7 @@
 
 #include "vtkAttributeDataReductionFilter.h"
 #include "vtkCellData.h"
+#include "vtkCommunicator.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
@@ -26,11 +27,7 @@
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
-#include "vtkPVConfig.h"
 
-#ifdef PARAVIEW_USE_MPI
-#include "vtkMPICommunicator.h"
-#endif
 
 #include <string>
 #include <vtksys/RegularExpression.hxx>
@@ -51,134 +48,30 @@ vtkPExtractHistogram::~vtkPExtractHistogram()
 }
 
 //-----------------------------------------------------------------------------
-bool vtkPExtractHistogram::InitializeBinExtents(
-  vtkInformationVector** inputVector,
-  vtkDoubleArray* bin_extents,
-  double& min, double& max)
+bool vtkPExtractHistogram::GetInputArrayRange(
+  vtkInformationVector** inputVector, double range[2])
 {
-  if (!this->Controller || this->Controller->GetNumberOfProcesses() <= 1 ||
-    this->UseCustomBinRanges)
+  if (!this->Controller || this->Controller->GetNumberOfProcesses() <= 1)
     {
-    // Nothing extra to do for single process.
-    return this->Superclass::InitializeBinExtents(inputVector, 
-      bin_extents, min, max);
+    return this->Superclass::GetInputArrayRange(inputVector, range);
     }
-#ifndef PARAVIEW_USE_MPI
-  return this->Superclass::InitializeBinExtents( inputVector, bin_extents, min, max );
 
-#else
-  int num_processes = this->Controller->GetNumberOfProcesses();
-  vtkMPICommunicator* comm = vtkMPICommunicator::SafeDownCast(
-    this->Controller->GetCommunicator());
-  if (!comm)
+  double local_range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
+
+  // it's okay if we fail to determine the range locally, hence we ignore the
+  // return value in this call.
+  this->Superclass::GetInputArrayRange(inputVector, local_range);
+
+  if (!this->Controller->AllReduce(
+      &local_range[0], &range[0], 1, vtkCommunicator::MIN_OP) ||
+    !this->Controller->AllReduce(
+      &local_range[1], &range[1], 1, vtkCommunicator::MAX_OP))
     {
-    vtkErrorMacro("vtkMPICommunicator is needed.");
+    vtkErrorMacro("Parallel communication error. Could not reduce ranges.");
     return false;
     }
-  int cc;
 
-  // We need to obtain the data array ranges from all processes.
-  double data[3] = {0.0, 0.0, 0.0}; // 0--valid, (1,2) -- range.
-  double *gathered_data= new double[3*num_processes];
-  std::string array_name = "";
-
-  //get local range and array name. if I don't have that array locally,
-  //then my contribution will be marked as invalid and ignored
-  bool retVal = false;
-  if (this->Superclass::InitializeBinExtents(inputVector, bin_extents,
-        min, max))
-    {
-    data[0] = 1.0;
-    data[1] = min;
-    data[2] = max;
-    array_name = bin_extents->GetName();
-    retVal = true;
-    }
-
-  // If the requested component is out-of-range for the input, we return an
-  // empty dataset
-  if (!comm->AllGather(data, gathered_data, 3))
-    {
-    vtkErrorMacro("Gather failed!");
-    delete[] gathered_data;
-    return 0;
-    }
-
-  // Gather array name (for when some process doesn't have it).
-  vtkIdType *arrayname_lengths = new vtkIdType[num_processes];
-  vtkIdType my_length = array_name.size() + 1; //gather null terminated strings.
-
-  // Collect name lengths.
-  comm->AllGather(&my_length, arrayname_lengths, 1);
-
-  vtkIdType total_size = 0;
-  vtkIdType *offsets = new vtkIdType[num_processes];
-  for (cc=0; cc < num_processes; cc++)
-    {
-    offsets[cc] = total_size;
-    total_size += arrayname_lengths[cc];
-    }
-
-  // Allocate char array to gather array names from all processes.
-  char* gathered_array_names = new char[total_size];
-  comm->AllGatherV(
-    const_cast<char*>(array_name.c_str()), gathered_array_names,
-    my_length, arrayname_lengths, offsets);
-
-  // Locate first non-empty array name, that's our arrayname.
-  for (cc=0; cc < num_processes; cc++)
-    {
-    if (arrayname_lengths[cc] > 1)
-      {
-      array_name = gathered_array_names + offsets[cc];
-      break;
-      }
-    }
-
-  delete[] gathered_array_names;
-  delete[] offsets;
-  delete[] arrayname_lengths;
-
-  bin_extents->SetName(array_name.c_str());
-
-  // Now compute the total range from all the local ranges.
-  double range[2] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN};
-  for (cc=0; cc < num_processes; cc++)
-    {
-    if (gathered_data[3*cc] != 1.0)
-      {
-      // the process does not have valid data array.
-      continue;
-      }
-    if (range[0] > gathered_data[3*cc+1])
-      {
-      range[0] = gathered_data[3*cc+1];
-      }
-    if (range[1] < gathered_data[3*cc+2])
-      {
-      range[1] = gathered_data[3*cc+2];
-      }
-    }
-  delete[] gathered_data;
-
-  if (range[0] == VTK_DOUBLE_MAX && range[1] == VTK_DOUBLE_MIN)
-    {
-    // No process reported a valid range:
-    range[0] = 0;
-    range[1] = 1;
-    }
-
-  if (range[0] == range[1])
-    {
-    // Give it some width.
-    range[1] = range[0]+1;
-    }
-
-  min = range[0];
-  max = range[1];
-  this->FillBinExtents(bin_extents, min, max);
-  return retVal;
-#endif
+  return true;
 }
 
 //-----------------------------------------------------------------------------

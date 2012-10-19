@@ -140,21 +140,14 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
 }
 
 //-----------------------------------------------------------------------------
-bool vtkExtractHistogram::InitializeBinExtents(
-  vtkInformationVector** inputVector,
-  vtkDoubleArray* bin_extents,
-  double& min, double& max)
+bool vtkExtractHistogram::GetInputArrayRange(
+  vtkInformationVector** inputVector, double range[2])
 {
-  double range[2];
   range[0] = VTK_DOUBLE_MAX;
-  range[1] = -VTK_DOUBLE_MAX;
-
-  // Keeping the column name constant causes less issues in the GUI.
-  bin_extents->SetName("bin_extents");
+  range[1] = VTK_DOUBLE_MIN;
 
   //obtain a pointer to the name of the vtkDataArray to bin up
   //and find the range of the data values within it
-
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkCompositeDataSet *cdin = vtkCompositeDataSet::SafeDownCast(input);
@@ -170,23 +163,14 @@ bool vtkExtractHistogram::InitializeBinExtents(
       vtkDataObject *dObj = cdit->GetCurrentDataObject();
       vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
       if (data_array &&
-          this->Component >= 0 &&
-          this->Component < data_array->GetNumberOfComponents())
+        this->Component >= 0 &&
+        this->Component < data_array->GetNumberOfComponents())
         {
-        if (!foundone)
-          {
-          foundone = true;
-          }
+        foundone = true;
         double tRange[2];
         data_array->GetRange(tRange, this->Component);
-        if (tRange[0] < range[0])
-          {
-          range[0] = tRange[0];
-          }
-        if (tRange[1] > range[1])
-          {
-          range[1] = tRange[1];
-          }
+        range[0] = (tRange[0] < range[0])? tRange[0] : range[0];
+        range[1] = (tRange[1] > range[1])? tRange[1] : range[1];
         }
       cdit->GoToNextItem();
       }
@@ -194,7 +178,6 @@ bool vtkExtractHistogram::InitializeBinExtents(
 
     if (!foundone)
       {
-      vtkErrorMacro("Failed to locate array to process in composite input.");
       return false;
       }
     }
@@ -203,27 +186,48 @@ bool vtkExtractHistogram::InitializeBinExtents(
     vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
     if (!data_array)
       {
-      vtkErrorMacro("Failed to locate array to process.");
       return false;
       }
-
     // If the requested component is out-of-range for the input, we return an
     // empty dataset
     if(this->Component < 0 &&
-       this->Component >= data_array->GetNumberOfComponents())
+      this->Component >= data_array->GetNumberOfComponents())
       {
       vtkWarningMacro("Requested component "
-                      <<  this->Component << " is not available.");
-      return true;
+        <<  this->Component << " is not available.");
+      return false;
       }
-
     data_array->GetRange(range, this->Component);
     }
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkExtractHistogram::InitializeBinExtents(
+  vtkInformationVector** inputVector,
+  vtkDoubleArray* bin_extents,
+  double& min, double& max)
+{
+  double range[2];
+  range[0] = VTK_DOUBLE_MAX;
+  range[1] = -VTK_DOUBLE_MAX;
+
+  // Keeping the column name constant causes less issues in the GUI.
+  bin_extents->SetName("bin_extents");
 
   if (this->UseCustomBinRanges)
     {
     range[0] = this->CustomBinRanges[0];
     range[1] = this->CustomBinRanges[1];
+    }
+  else if (!this->GetInputArrayRange(inputVector, range) ||
+    (range[0] > range[1]))
+    {
+    vtkErrorMacro("Could not determine array range. "
+      "The chosen array or component may not be available or "
+      "has invalid range");
+    return false;
     }
 
   // Calculate the extents of each bin, based on the range of values in the
