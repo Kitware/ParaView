@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>454</width>
+    <width>568</width>
     <height>422</height>
    </rect>
   </property>
@@ -137,9 +137,6 @@
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>true</bool>
       </attribute>
-      <attribute name="horizontalHeaderStretchLastSection">
-       <bool>true</bool>
-      </attribute>
       <column>
        <property name="text">
         <string>Pipeline Name</string>
@@ -161,8 +158,15 @@
    <property name="subTitle">
     <string>Select state configuration options.</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0" colspan="2">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QCheckBox" name="liveViz">
+      <property name="text">
+       <string>Live Visualization</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QCheckBox" name="outputRendering">
       <property name="enabled">
        <bool>true</bool>
@@ -175,7 +179,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item>
      <widget class="QCheckBox" name="rescaleDataRange">
       <property name="enabled">
        <bool>true</bool>
@@ -194,7 +198,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="2">
+    <item>
      <widget class="QStackedWidget" name="viewsContainer">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -216,23 +220,23 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="previousView">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Previous View</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
+    <item>
      <widget class="QPushButton" name="nextView">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="text">
        <string>Next View</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="previousView">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Previous View</string>
       </property>
      </widget>
     </item>

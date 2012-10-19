@@ -60,6 +60,7 @@ protected slots:
   void onRemove();
   void incrementView();
   void decrementView();
+  void onVizExportChecked(bool);
 
 private:
   Q_DISABLE_COPY(pqCPExportStateWizard)

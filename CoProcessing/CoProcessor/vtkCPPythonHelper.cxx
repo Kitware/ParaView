@@ -19,15 +19,16 @@
 #include "vtkCPPythonHelper.h"
 
 #include "CPSystemInformation.h"
+#include "vtkCPHelperScripts.h"
 #include "vtkInitializationHelper.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
-#include "vtkSMProxyManager.h"
+#include "vtkProcessModule.h"
 #include "vtkSMObject.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
 
 #include "cppythonmodules.h"
 
@@ -121,6 +122,9 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
       << "from paraview.simple import *\n"
       << "import vtkCoProcessorPython\n";
 
+    // Pre-load set of helper methods
+    loadPythonModules << vtkCPHelperScripts::GetPythonHelperScript() << "\n\n";
+
     vtkCPPythonHelper::Instance->PythonInterpretor->RunSimpleString(
         loadPythonModules.str().c_str());
     vtkCPPythonHelper::Instance->PythonInterpretor->FlushMessages();
@@ -146,6 +150,3 @@ void vtkCPPythonHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-
-

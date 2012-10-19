@@ -30,38 +30,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqCPExportStateWizard.h"
-#include <QMessageBox>
-#include <QPointer>
-#include <QRegExp>
-#include <QRegExpValidator>
-#include <QWizardPage>
 
 #include <pqApplicationCore.h>
 #include <pqContextView.h>
-#include <pqPipelineRepresentation.h>
 #include <pqFileDialog.h>
 #include <pqPipelineFilter.h>
+#include <pqPipelineRepresentation.h>
 #include <pqPipelineSource.h>
 #include <pqPythonDialog.h>
 #include <pqPythonManager.h>
 #include <pqRenderViewBase.h>
 #include <pqServerManagerModel.h>
 
+#include <vtkCPHelperScripts.h>
+#include <vtkImageData.h>
+#include <vtkNew.h>
+#include <vtkPNGWriter.h>
 #include <vtkPVXMLElement.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <QSize>
-#include <vtkPNGWriter.h>
-#include <vtkImageData.h>
-#include <vtkSmartPointer.h>
-#include <vtkNew.h>
-#include <vtkUnsignedCharArray.h>
-#include <QPixmap>
 #include <QLabel>
+#include <QPixmap>
+#include <QSize>
+#include <QMessageBox>
+#include <QPointer>
+#include <QRegExp>
+#include <QRegExpValidator>
+#include <QWizardPage>
+
+#include <QDebug>
 
 extern const char* cp_export_py;
 
@@ -304,6 +307,11 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   QObject::connect(this->Internals->previousView, SIGNAL(pressed()),
                    this, SLOT(decrementView()));
 
+  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
+                   this, SLOT(onVizExportChecked(bool)));
+  QObject::connect(this->Internals->liveViz, SIGNAL(toggled(bool)),
+                   this, SLOT(onVizExportChecked(bool)));
+
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderViewBase*> renderViews = smModel->findItems<pqRenderViewBase*>();
   QList<pqContextView*> contextViews = smModel->findItems<pqContextView*>();
@@ -356,6 +364,24 @@ void pqCPExportStateWizard::updateAddRemoveButton()
     this->Internals->allInputs->selectedItems().size() > 0);
   this->Internals->removeButton->setEnabled(
     this->Internals->simulationInputs->selectedItems().size() > 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqCPExportStateWizard::onVizExportChecked(bool selected)
+{
+  if(selected)
+    {
+    // Only one viz export can stay selected
+    if(QObject::sender() == this->Internals->outputRendering)
+      {
+      this->Internals->liveViz->setChecked(false);
+      }
+    else
+      {
+      this->Internals->outputRendering->setChecked(false);
+      }
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -562,9 +588,15 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString rescale_data_range = (this->Internals->rescaleDataRange->isChecked() == true ?
                                 "True" : "False");
 
-  QString command =
-    QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename);
+  QString live_visualization = (this->Internals->liveViz->isChecked() == true ?
+                                "True" : "False");
 
+  QString command =
+    QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename).arg(live_visualization);
+
+  qDebug() << command;
+
+  dialog->runString(vtkCPHelperScripts::GetPythonHelperScript());
   dialog->runString(command);
 
   return true;
