@@ -543,7 +543,9 @@ void vtkPVArrayInformation::DeepCopy( vtkPVArrayInformation* info )
   else if ( info->UniqueValues )
     {
     if ( ! this->UniqueValues )
+      {
       this->UniqueValues = new vtkInternalUniqueValues;
+      }
     *this->UniqueValues = *info->UniqueValues;
     }
 }
@@ -938,8 +940,7 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   if ( ! numberOfUniqueValueComponents && this->UniqueValues )
     {
-    delete this->UniqueValues;
-    this->UniqueValues = 0;
+    this->UniqueValues->clear();
     }
   else if ( numberOfUniqueValueComponents )
     {
@@ -1061,10 +1062,14 @@ int vtkPVArrayInformation::HasInformationKey(const char* location,
 void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
 {
   if ( ! info->UniqueValues )
-    { // Must have too many values, so erase our list.
-    delete this->UniqueValues;
-    this->UniqueValues = 0;
+    { // Other info is uninitialized; keep the values we have.
     return;
+    }
+
+  if ( ! this->UniqueValues )
+    {
+    vtkDebugMacro("Merge array \"" << this->Name << "\" has no locals");
+    this->UniqueValues = new vtkInternalUniqueValues;
     }
 
   vtkInternalUniqueValues::iterator cit; // component iterator
@@ -1087,6 +1092,7 @@ void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
       if ( this->UniqueValues->size() > VTK_MAX_CATEGORICAL_VALS - 1 )
         tooManyValues = true;
       }
+
     // If the union of values is too large, delete the list of values
     if ( tooManyValues )
       {
