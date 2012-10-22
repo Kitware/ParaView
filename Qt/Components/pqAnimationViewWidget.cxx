@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPushButton>
 #include <QSignalMapper>
-#include <QSpinBox>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QtDebug>
 
@@ -103,13 +103,13 @@ public:
   QLineEdit* EndTime;
   QLabel* EndTimeLabel;
   QLabel* DurationLabel;
-  QSpinBox* Duration;
+  QLineEdit* Duration;
   pqPropertyLinks Links;
   pqPropertyLinks DurationLink;
   pqAnimatableProxyComboBox* CreateSource;
   pqAnimatablePropertiesComboBox* CreateProperty;
-  QPushButton* LockEndTime;
-  QPushButton* LockStartTime;
+  QToolButton* LockEndTime;
+  QToolButton* LockStartTime;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -260,9 +260,13 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
 {
   this->Internal = new pqAnimationViewWidget::pqInternal();
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
+  vboxlayout->setMargin(2);
+  vboxlayout->setSpacing(2);
+
   QHBoxLayout* hboxlayout = new QHBoxLayout;
   vboxlayout->addLayout(hboxlayout);
   hboxlayout->setMargin(0);
+  hboxlayout->setSpacing(2);
 
   hboxlayout->addWidget(new QLabel("Mode:", this));
   this->Internal->PlayMode = new QComboBox(this) << pqSetName("PlayMode");
@@ -273,14 +277,16 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   this->Internal->Time = new QLineEdit(this) << pqSetName("Time");
   this->Internal->Time->setValidator(
     new QDoubleValidator(this->Internal->Time));
+  this->Internal->Time->setMinimumWidth(30);
   hboxlayout->addWidget(this->Internal->Time);
   this->Internal->StartTimeLabel = new QLabel("Start Time:", this);
   hboxlayout->addWidget(this->Internal->StartTimeLabel);
   this->Internal->StartTime = new QLineEdit(this) << pqSetName("StartTime");
+  this->Internal->StartTime->setMinimumWidth(30);
   this->Internal->StartTime->setValidator(
     new QDoubleValidator(this->Internal->StartTime));
   hboxlayout->addWidget(this->Internal->StartTime);
-  this->Internal->LockStartTime = new QPushButton(this) <<
+  this->Internal->LockStartTime = new QToolButton(this) <<
     pqSetName("LockStartTime");
   this->Internal->LockStartTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
   this->Internal->LockStartTime->setToolTip(
@@ -294,10 +300,11 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   this->Internal->EndTimeLabel = new QLabel("End Time:", this);
   hboxlayout->addWidget(this->Internal->EndTimeLabel);
   this->Internal->EndTime = new QLineEdit(this) << pqSetName("EndTime");
+  this->Internal->EndTime->setMinimumWidth(30);
   this->Internal->EndTime->setValidator(
     new QDoubleValidator(this->Internal->EndTime));
   hboxlayout->addWidget(this->Internal->EndTime);
-  this->Internal->LockEndTime = new QPushButton(this) <<
+  this->Internal->LockEndTime = new QToolButton(this) <<
     pqSetName("LockEndTime");
   this->Internal->LockEndTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
   this->Internal->LockEndTime->setToolTip(
@@ -310,8 +317,10 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   hboxlayout->addWidget(this->Internal->LockEndTime);
   this->Internal->DurationLabel = new QLabel(this);
   hboxlayout->addWidget(this->Internal->DurationLabel);
-  this->Internal->Duration = new QSpinBox(this) << pqSetName("Duration");
-  this->Internal->Duration->setRange(1, (int)(~0u >> 1));
+  this->Internal->Duration = new QLineEdit(this) << pqSetName("Duration");
+  this->Internal->Duration->setMinimumWidth(30);
+  this->Internal->Duration->setValidator(
+    new QIntValidator(1, static_cast<int>(~0u >> 1), this->Internal->Duration));
   hboxlayout->addWidget(this->Internal->Duration);
   hboxlayout->addStretch();
 
@@ -736,8 +745,8 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->DurationLabel->setEnabled(true);
     this->Internal->DurationLabel->setText("Duration:");
     this->Internal->DurationLink.addPropertyLink(
-      this->Internal->Duration, "value",
-      SIGNAL(valueChanged(int)), this->Internal->Scene->getProxy(),
+      this->Internal->Duration, "text",
+      SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
       this->Internal->Scene->getProxy()->GetProperty("Duration"));
     }
   else if(mode == "Sequence")
@@ -750,8 +759,8 @@ void pqAnimationViewWidget::updatePlayMode()
     this->Internal->DurationLabel->setEnabled(true);
     this->Internal->DurationLabel->setText("No. Frames:");
     this->Internal->DurationLink.addPropertyLink(
-      this->Internal->Duration, "value",
-      SIGNAL(valueChanged(int)), this->Internal->Scene->getProxy(),
+      this->Internal->Duration, "text",
+      SIGNAL(editingFinished()), this->Internal->Scene->getProxy(),
       this->Internal->Scene->getProxy()->GetProperty("NumberOfFrames"));
     }
   else if(mode == "Snap To TimeSteps")
