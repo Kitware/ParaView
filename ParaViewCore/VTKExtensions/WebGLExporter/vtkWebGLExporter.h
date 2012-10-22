@@ -32,27 +32,27 @@ class vtkWebGLObject;
 class vtkWebGLPolyData;
 
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
+
 #include <map>
 #include <string>
 
-//BTX
 typedef enum {
   VTK_ONLYCAMERA = 0,
   VTK_ONLYWIDGET = 1,
   VTK_PARSEALL   = 2
   } VTKParseType;
-//ETX
 
-class vtkWebGLExporter : public vtkObject
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkWebGLExporter : public vtkObject
 {
 public:
   static vtkWebGLExporter* New();
   vtkTypeMacro(vtkWebGLExporter, vtkObject)
   void PrintSelf(ostream& os, vtkIndent indent);
-//BTX
+
   // Description:
   // Get all the needed information from the vtkRenderer
-  void parseScene(vtkRendererCollection* renderers, const char* viewId, VTKParseType property);
+  void parseScene(vtkRendererCollection* renderers, const char* viewId, int parseType);
   // Generate and return the Metadata
   void exportStaticScene(vtkRendererCollection* renderers, int width, int height, std::string path);
   const char* GenerateMetadata();
@@ -93,9 +93,8 @@ private:
   vtkWebGLExporter(const vtkWebGLExporter&); // Not implemented
   void operator=(const vtkWebGLExporter&);   // Not implemented
 
-class vtkInternal;
-vtkInternal* Internal;
-//ETX
+  class vtkInternal;
+  vtkInternal* Internal;
 };
 
 #endif

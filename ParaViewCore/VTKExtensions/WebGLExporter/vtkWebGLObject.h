@@ -19,20 +19,21 @@
 #ifndef __vtkWebGLObject_h
 #define __vtkWebGLObject_h
 
-class vtkMatrix4x4;
-
 #include "vtkObject.h"
+#include "vtkPVVTKExtensionsWebGLExporterModule.h" // needed for export macro
+
 #include <string>
 
-//BTX
+class vtkMatrix4x4;
+class vtkUnsignedCharArray;
+
 enum WebGLObjectTypes {
   wPOINTS = 0,
   wLINES = 1,
   wTRIANGLES = 2
   };
-//ETX
 
-class vtkWebGLObject : public vtkObject
+class VTKPVVTKEXTENSIONSWEBGLEXPORTER_EXPORT vtkWebGLObject : public vtkObject
 {
 public:
   static vtkWebGLObject* New();
@@ -43,7 +44,13 @@ public:
   virtual unsigned char* GetBinaryData(int part);
   virtual int GetBinarySize(int part);
   virtual int GetNumberOfParts();
-//BTX
+
+  // Description:
+  // This is a wrapper friendly method for access the binary data.
+  // The binary data for the requested part will be copied into the
+  // given vtkUnsignedCharArray.
+  void GetBinaryData(int part, vtkUnsignedCharArray* buffer);
+
   void SetLayer(int l);
   void SetRendererId(long int i);
   void SetId(std::string i);
@@ -60,8 +67,10 @@ public:
   bool isWidget();
   bool HasTransparency();
   bool InteractAtServer();
+  //BTX
   std::string GetMD5();
   std::string GetId();
+  //ETX
   long int GetRendererId();
   int GetLayer();
 
@@ -85,10 +94,6 @@ protected:
 private:
   vtkWebGLObject(const vtkWebGLObject&); // Not implemented
   void operator=(const vtkWebGLObject&);   // Not implemented
-
-//  class vtkInternal;
-//  vtkInternal* Internal;
-//ETX
 };
 
 #endif

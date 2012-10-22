@@ -11,6 +11,7 @@ vtk_module(vtkPVClientServerCoreRendering
     vtkFiltersAMR
     vtkPVClientServerCoreCore
     vtkPVVTKExtensionsRendering
+    vtkPVVTKExtensionsWebGLExporter
     vtkRenderingLabel
     vtkRenderingVolumeAMR
     vtkRenderingVolumeOpenGL

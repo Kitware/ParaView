@@ -237,4 +237,3 @@ void vtkWebGLDataSet::PrintSelf(ostream& os, vtkIndent indent)
   {
   this->Superclass::PrintSelf(os, indent);
   }
-
