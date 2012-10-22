@@ -65,7 +65,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-// #define ENABLE_MARKER_GENERATION
+// #define PARAVIEW_ENABLE_SPYPLOT_MARKERS
 
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
@@ -78,9 +78,9 @@ class vtkSpyPlotReader::VectorOfDoubles : public std::vector<double> {};
 vtkSpyPlotReader::vtkSpyPlotReader()
 {
   this->SetNumberOfInputPorts(0);
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   this->SetNumberOfOutputPorts(2);
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 
   this->Map = new vtkSpyPlotReaderMap;
   this->Bounds = new vtkBoundingBox;
@@ -176,13 +176,13 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *req,
   outInfo->Set(vtkDataObject::DATA_OBJECT(), outData);
   outData->Delete();
 
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   outInfo = outV->GetInformationObject(1);
   vtkMultiBlockDataSet* data = vtkMultiBlockDataSet::New ();
   outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), data->GetExtentType());
   outInfo->Set(vtkDataObject::DATA_OBJECT(), data);
   data->Delete ();
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 
   return 1;
 }
@@ -224,7 +224,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
   vtkInformation* outInfo0 = outputVector->GetInformationObject(0);
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
   outInfo0->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   vtkInformation* outInfo1;
   if ( this->GenerateMarkers )
     {
@@ -232,7 +232,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
     outInfo1->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     }
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (this->TimeSteps->size() > 0)
     {
     outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
@@ -244,7 +244,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     outInfo0->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
       timeRange, 2);
 
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
     if ( this->GenerateMarkers) 
       {
       outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
@@ -254,7 +254,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
       outInfo1->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),
         timeRange, 2);
       }
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
     }
   return 1;
 }
@@ -862,7 +862,7 @@ int vtkSpyPlotReader::RequestData(
     delete blockIterator;
     }
 
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   if (this->GenerateMarkers)
     {
     vtkInformation *info=outputVector->GetInformationObject(1);
@@ -879,7 +879,7 @@ int vtkSpyPlotReader::RequestData(
       this->PrepareMarkers (mbds, uniReader);
       }
     }
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 
     // At this point, each processor has its own blocks
     // They have to exchange the blocks they have get a unique id for
@@ -1307,7 +1307,7 @@ void vtkSpyPlotReader::SetGenerateMarkers (int gm)
     {
     return;
     }
-#if defined ENABLE_MARKER_GENERATION
+#ifdef PARAVIEW_ENABLE_SPYPLOT_MARKERS
   vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
   for ( mapIt = this->Map->Files.begin();
         mapIt != this->Map->Files.end();
@@ -1318,7 +1318,7 @@ void vtkSpyPlotReader::SetGenerateMarkers (int gm)
   this->GenerateMarkers = gm;
 #else
   vtkErrorMacro ("GenerateMarkers is currently disabled.  Please issue a support request to enable.");
-#endif
+#endif // PARAVIEW_ENABLE_SPYPLOT_MARKERS
 }
 
 //-----------------------------------------------------------------------------
