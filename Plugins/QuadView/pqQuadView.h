@@ -88,6 +88,9 @@ public:
   /// Reset Normal/ViewUp/Origin to their defaults
   void resetDefaultSettings();
 
+  /// Override for custom management
+  virtual void setCursor(const QCursor &);
+
 protected slots:
   void resetSliceOrigin();
 

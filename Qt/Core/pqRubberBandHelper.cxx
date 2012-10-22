@@ -294,7 +294,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
       vtkPVRenderView::INTERACTION_MODE_ZOOM);
     this->Internal->AddZoomObserver(rmp->GetInteractor());
     rmp->UpdateVTKObjects();
-    this->Internal->RenderView->getWidget()->setCursor(
+    this->Internal->RenderView->setCursor(
       this->Internal->ZoomCursor);
     }
   else if (selectionMode == PICK_ON_CLICK)
@@ -307,7 +307,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
       vtkPVRenderView::INTERACTION_MODE_SELECTION);
     this->Internal->AddSelectionObserver(rmp);
     rmp->UpdateVTKObjects();
-    this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
+    this->Internal->RenderView->setCursor(Qt::CrossCursor);
     }
 
   this->Mode = selectionMode;
@@ -340,7 +340,7 @@ int pqRubberBandHelper::setRubberBandOff()
   this->Internal->RemoveObserver();
 
   // set the interaction cursor
-  this->Internal->RenderView->getWidget()->setCursor(QCursor());
+  this->Internal->RenderView->setCursor(QCursor());
   this->Mode = INTERACT;
   emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(true);

@@ -176,6 +176,20 @@ public:
   void RemoveRepresentationToTopRight(vtkDataRepresentation* rep);
   void RemoveRepresentationToBottomLeft(vtkDataRepresentation* rep);
 
+  //*****************************************************************
+  // Allow user to set custom label for coordinates
+  vtkSetStringMacro(XAxisLabel);
+  vtkSetStringMacro(YAxisLabel);
+  vtkSetStringMacro(ZAxisLabel);
+  vtkSetStringMacro(ScalarLabel);
+  vtkGetStringMacro(XAxisLabel);
+  vtkGetStringMacro(YAxisLabel);
+  vtkGetStringMacro(ZAxisLabel);
+  vtkGetStringMacro(ScalarLabel);
+
+  void SetScalarValue(double value);
+  double GetScalarValue();
+
 //BTX
 protected:
   vtkPVQuadRenderView();
@@ -193,6 +207,10 @@ protected:
 
   struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];
+  char* XAxisLabel;
+  char* YAxisLabel;
+  char* ZAxisLabel;
+  char* ScalarLabel;
 private:
   vtkPVQuadRenderView(const vtkPVQuadRenderView&); // Not implemented
   void operator=(const vtkPVQuadRenderView&); // Not implemented

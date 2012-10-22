@@ -62,6 +62,10 @@ public:
 //    this->CoordinatesZ->SetPosition(.95,.95);
 //    this->CoordinatesZ->GetTextProperty()->SetJustificationToRight();
 //    this->CoordinatesZ->GetTextProperty()->SetVerticalJustificationToTop();
+    for(int i=0; i < 4; ++i)
+      {
+      this->TextValues[i] = 0.0;
+      }
   }
 
   void SetSliceOriginSource(vtkPointSource* source)
@@ -84,13 +88,66 @@ public:
 
   void UpdateSliceOrigin(double* origin)
   {
-    std::stringstream x,y,z;
-    x << origin[0];
-    y << origin[1];
-    z << origin[2];
-    this->CoordinatesX->SetInput(x.str().c_str());
-    this->CoordinatesY->SetInput(y.str().c_str());
-    this->CoordinatesZ->SetInput(z.str().c_str());
+    for(int i=0; i < 3; ++i)
+      {
+      this->TextValues[i] = origin[i];
+      }
+    this->UpdateLabels();
+  }
+
+  void SetScalarValue(double value)
+  {
+    this->TextValues[3] = value;
+    this->UpdateLabels();
+  }
+
+  double GetScalarValue()
+  {
+    return this->TextValues[3];
+  }
+
+  void UpdateLabels()
+  {
+    std::stringstream zy,xy,zx;
+    if(this->Owner->GetXAxisLabel())
+      {
+      xy << this->Owner->GetXAxisLabel() << "=";
+      }
+    xy << this->TextValues[0] << ", ";
+    if(this->Owner->GetYAxisLabel())
+      {
+      xy << this->Owner->GetYAxisLabel() << "=";
+      }
+    xy << this->TextValues[1]; // Done
+    if(this->Owner->GetZAxisLabel())
+      {
+      zy << this->Owner->GetZAxisLabel() << "=";
+      zx << this->Owner->GetZAxisLabel() << "=";
+      }
+    zy << this->TextValues[2] << ", ";
+    zx << this->TextValues[2] << ", ";
+    if(this->Owner->GetXAxisLabel())
+      {
+      zx << this->Owner->GetXAxisLabel() << "=";
+      }
+    zx << this->TextValues[0]; // Done
+    if(this->Owner->GetYAxisLabel())
+      {
+      zy << this->Owner->GetYAxisLabel() << "=";
+      }
+    zy << this->TextValues[1]; // Done
+
+    // Scalar
+    if(this->Owner->GetScalarLabel())
+      {
+      xy << ", " << this->Owner->GetScalarLabel() << "=" << this->TextValues[3];
+      zy << ", " << this->Owner->GetScalarLabel() << "=" << this->TextValues[3];
+      zx << ", " << this->Owner->GetScalarLabel() << "=" << this->TextValues[3];
+      }
+
+    this->CoordinatesX->SetInput(zy.str().c_str());
+    this->CoordinatesY->SetInput(zx.str().c_str());
+    this->CoordinatesZ->SetInput(xy.str().c_str());
   }
 
   void UpdateHandleSize()
@@ -135,10 +192,13 @@ public:
       }
   }
 
+
+
 private:
   vtkPVQuadRenderView* Owner;
   unsigned long ObserverId;
   vtkWeakPointer<vtkPointSource> SliceOriginSource;
+  double TextValues[4];
   vtkNew<vtkTextActor> CoordinatesX;
   vtkNew<vtkTextActor> CoordinatesY;
   vtkNew<vtkTextActor> CoordinatesZ;
@@ -167,6 +227,7 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
     }
 
   this->QuadInternal = new vtkQuadInternal(this);
+  this->XAxisLabel = this->YAxisLabel = this->ZAxisLabel = this->ScalarLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +235,10 @@ vtkPVQuadRenderView::~vtkPVQuadRenderView()
 {
   delete this->QuadInternal;
   this->QuadInternal = NULL;
+  this->SetXAxisLabel(NULL);
+  this->SetYAxisLabel(NULL);
+  this->SetZAxisLabel(NULL);
+  this->SetScalarLabel(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -544,4 +609,15 @@ void vtkPVQuadRenderView::UpdateViewLayout()
   this->OrthoViews[BOTTOM_LEFT].RenderView->SetPosition(posx, posy + size[1] + spacing);
   this->OrthoViews[TOP_RIGHT].RenderView->SetPosition(posx + size[0] + spacing, posy);
   this->Superclass::SetPosition(posx + size[0] + spacing, posy + size[1] + spacing);
+}
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetScalarValue(double value)
+{
+  this->QuadInternal->SetScalarValue(value);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVQuadRenderView::GetScalarValue()
+{
+  return this->QuadInternal->GetScalarValue();
 }

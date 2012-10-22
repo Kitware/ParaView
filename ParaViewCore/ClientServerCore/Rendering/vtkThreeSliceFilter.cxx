@@ -27,7 +27,10 @@
 #include "vtkInformationVector.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPProbeFilter.h"
 #include "vtkPlane.h"
+#include "vtkPointData.h"
+#include "vtkPointSource.h"
 #include "vtkUnsignedIntArray.h"
 
 #include <math.h>
@@ -53,7 +56,10 @@ vtkThreeSliceFilter::vtkThreeSliceFilter()
     // Bind pipeline
     this->CombinedFilteredInput->AddInputConnection(this->Slices[i]->GetOutputPort());
     }
-
+  this->Probe = NULL;
+  this->PointToProbe = vtkPointSource::New();
+  this->PointToProbe->SetNumberOfPoints(1);
+  this->PointToProbe->SetRadius(0);
   this->SetToDefaultSettings();
 }
 
@@ -70,6 +76,18 @@ vtkThreeSliceFilter::~vtkThreeSliceFilter()
 
   this->CombinedFilteredInput->Delete();
   this->CombinedFilteredInput = NULL;
+
+  if(this->PointToProbe)
+    {
+    this->PointToProbe->Delete();
+    this->PointToProbe = NULL;
+    }
+  if(this->Probe)
+    {
+    this->Probe->ReleaseDataFlagOn();
+    this->Probe->Delete();
+    this->Probe = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -145,6 +163,7 @@ void vtkThreeSliceFilter::SetCutOrigins(double origin[3])
   this->Planes[0]->SetOrigin(origin);
   this->Planes[1]->SetOrigin(origin);
   this->Planes[2]->SetOrigin(origin);
+  this->PointToProbe->SetCenter(origin);
 }
 
 //----------------------------------------------------------------------------
@@ -219,6 +238,16 @@ int vtkThreeSliceFilter::RequestData( vtkInformation *,
   else if(inputDataset)
     {
     this->Process(inputDataset, outputs, VTK_UNSIGNED_INT_MAX);
+    }
+
+
+  // Probe input if needed
+  if(this->Probe)
+    {
+    this->PointToProbe->Update();
+    this->Probe->SetInputData(1, input);
+    this->Probe->SetInputData(0, this->PointToProbe->GetOutput());
+    this->Probe->Update();
     }
 
   return 1;
@@ -350,4 +379,32 @@ void vtkThreeSliceFilter::Append(vtkPolyData* polydata,
                                 vtkAppendPolyData* appender)
 {
   appender->AddInputData(polydata);
+}
+//----------------------------------------------------------------------------
+void vtkThreeSliceFilter::EnableProbe(int enable)
+{
+  if(enable != 0 && this->Probe == NULL)
+    {
+    this->Probe = vtkPProbeFilter::New();
+    }
+  else if(this->Probe != NULL)
+    {
+    this->Probe->Delete();
+    this->Probe = NULL;
+    }
+}
+//----------------------------------------------------------------------------
+bool vtkThreeSliceFilter::GetProbedPointData(const char* arrayName, double &value)
+{
+  if(this->Probe && this->Probe->GetOutput() && this->Probe->GetOutput()->GetPointData())
+    {
+    vtkDataArray* array = this->Probe->GetOutput()->GetPointData()->GetArray(arrayName);
+    if(array && array->GetNumberOfComponents() == 1)
+      {
+      bool valid = false;
+      value = array->GetVariantValue(0).ToDouble(&valid);
+      return valid;
+      }
+    }
+  return false;
 }

@@ -281,3 +281,16 @@ void pqQuadView::resetSliceOrigin()
     this->setSlicesOrigin(center[0],center[1],center[2]);
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqQuadView::setCursor(const QCursor &c)
+{
+  if(this->getWidget())
+    {
+    pqQVTKWidget* widget = this->getWidget()->findChild<pqQVTKWidget*>("View3D");
+     if(widget)
+       {
+       widget->setCursor(c);
+       }
+    }
+}

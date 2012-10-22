@@ -51,6 +51,10 @@ protected:
   virtual int CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
     vtkPVXMLElement *element);
 
+  // Override to gather information when interaction is done from the server side to properly
+  // get fields name and probed data
+  virtual void PostRender(bool interactive);
+
   void UpdateInternalViewExtent(vtkImageData * image, int columnIndex, int rowIndex);
 
   vtkSMProxyLink* WidgetLinker;

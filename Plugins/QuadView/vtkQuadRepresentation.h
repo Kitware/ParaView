@@ -21,6 +21,9 @@
 #define __vtkQuadRepresentation_h
 
 #include "vtkCompositeSliceRepresentation.h"
+#include "vtkWeakPointer.h"
+
+class vtkPVQuadRenderView;
 
 class vtkQuadRepresentation : public vtkCompositeSliceRepresentation
 {
@@ -46,6 +49,15 @@ protected:
   // Returns true if the removal succeeds.
   virtual bool RemoveFromView(vtkView* view);
 
+  // Update slice axis label if any annotation available
+  void UpdateDataEventCallBack(vtkObject* src, unsigned long event, void* data);
+  vtkWeakPointer<vtkPVQuadRenderView> AssociatedView;
+  vtkSetStringMacro(XLabel);
+  vtkSetStringMacro(YLabel);
+  vtkSetStringMacro(ZLabel);
+  char *XLabel;
+  char *YLabel;
+  char *ZLabel;
 private:
   vtkQuadRepresentation(const vtkQuadRepresentation&); // Not implemented
   void operator=(const vtkQuadRepresentation&); // Not implemented

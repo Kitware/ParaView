@@ -58,6 +58,9 @@ public:
   /// 0 <= axisIndex <= 2
   const double* GetSliceOrigin(int axisIndex);
 
+  /// Override for custom management
+  virtual void setCursor(const QCursor &);
+
 signals:
   void slicesChanged();
   void sliceClicked(int axisIndex, double sliceOffsetOnAxis, int button, int modifier);
@@ -71,9 +74,9 @@ protected:
   void updateViewModelCallBack(vtkObject*,unsigned long, void*);
 
   /// Helper method to get the concreate 3D widget
-  QVTKWidget* getInternalWidget() { return this->InternalWidget; }
+  QVTKWidget* getInternalWidget();
 
-  QVTKWidget* InternalWidget;
+  QPointer<QVTKWidget> InternalWidget;
   bool UserIsInteracting;
   QPointer<pqMultiSliceAxisWidget> AxisX;
   QPointer<pqMultiSliceAxisWidget> AxisY;
