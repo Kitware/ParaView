@@ -14,27 +14,29 @@
 =========================================================================*/
 #include "vtkIceTCompositePass.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCamera.h"
+#include "vtkCubeAxesActor.h"
 #include "vtkFloatArray.h"
 #include "vtkFrameBufferObject.h"
 #include "vtkIceTContext.h"
 #include "vtkIntArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkPKdTree.h"
-#include "vtkRenderer.h"
+#include "vtkPixelBufferObject.h"
 #include "vtkRenderState.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
-#include "vtkTilesHelper.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkPixelBufferObject.h"
-#include "vtkTextureObject.h"
-#include "vtkTextureUnitManager.h"
-#include "vtkShaderProgram2.h"
-#include "vtkUniformVariables.h"
+#include "vtkRenderer.h"
 #include "vtkShader2.h"
 #include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkSmartPointer.h"
+#include "vtkTextureObject.h"
+#include "vtkTextureUnitManager.h"
+#include "vtkTilesHelper.h"
+#include "vtkUniformVariables.h"
 
 #include <assert.h>
 #include "vtkgl.h"
@@ -52,6 +54,31 @@ namespace
       {
       IceTDrawCallbackHandle->Draw(IceTDrawCallbackState);
       }
+    }
+
+  void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
+    {
+    vtkBoundingBox bbox(bounds);
+    // scale the bounds a bit so that when showing a box we don't end up with
+    // clipped edges e.g. when a Mandelbrot source was shown with parallel
+    // rendering, the front edges would appear clipped in outline mode.
+    bbox.Scale(1.1, 1.1, 1.1);
+
+    for (int cc=0; cc < rState->GetPropArrayCount(); cc++)
+      {
+      vtkProp* prop = rState->GetPropArray()[cc];
+      vtkCubeAxesActor* cubeAxes = vtkCubeAxesActor::SafeDownCast(prop);
+      if (cubeAxes != NULL && prop->GetVisibility() &&
+        prop->GetUseBounds())
+        {
+        // cubeAxes has not clean API to give us the bounds it's using. So, we
+        // use a heuristic instead. Simply scale the data bounds by 1.5 and we
+        // call it 'even'.
+        bbox.Scale(1.5, 1.5, 1.5);
+        break;
+        }
+      }
+    bbox.GetBounds(bounds);
     }
 };
 
@@ -279,6 +306,14 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
     }
   else
     {
+    // ComputeVisiblePropBounds() includes bounds from all props, however it
+    // cannot include the "real" bounds from vtkCubeAxesActor. Thanks to
+    // vtkCubeAxesActor overriding the 'GetBounds' method to return the inner
+    // bounds rather that the prop  bounds for the actor. That results in BUG#
+    // 13469. Hence, to overcome that issue, we iterate over the props to locate
+    // vtkCubeAxesActor and include the outer bounds.
+    MergeCubeAxesBounds(allBounds, render_state);
+
     icetBoundingBoxd(allBounds[0], allBounds[1], allBounds[2], allBounds[3],
                      allBounds[4], allBounds[5]);
     }
