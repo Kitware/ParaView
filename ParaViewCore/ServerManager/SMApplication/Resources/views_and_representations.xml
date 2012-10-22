@@ -1075,7 +1075,11 @@
                             number_of_elements="1"
                             panel_visibility="never">
         <ArrayListDomain input_domain_name="input_array_cell"
-                         name="array_list"></ArrayListDomain>
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
       <StringVectorProperty command="SetPointFieldDataArrayName"
                             default_values="vtkOriginalPointIds"
@@ -1083,7 +1087,11 @@
                             number_of_elements="1"
                             panel_visibility="never">
         <ArrayListDomain input_domain_name="input_array_point"
-                         name="array_list"></ArrayListDomain>
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input" name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
       </StringVectorProperty>
       <SubProxy>
         <Proxy name="SurfaceRepresentation"
@@ -4346,7 +4354,11 @@
                           number_of_elements="1"
                           panel_visibility="never">
       <ArrayListDomain input_domain_name="input_array_cell"
-                       name="array_list"></ArrayListDomain>
+                       name="array_list">
+        <RequiredProperties>
+          <Property function="Input" name="Input" />
+        </RequiredProperties>
+      </ArrayListDomain>
     </StringVectorProperty>
     <StringVectorProperty command="SetPointFieldDataArrayName"
                           default_values="vtkOriginalPointIds"
@@ -4354,7 +4366,11 @@
                           number_of_elements="1"
                           panel_visibility="never">
       <ArrayListDomain input_domain_name="input_array_point"
-                       name="array_list"></ArrayListDomain>
+                       name="array_list">
+        <RequiredProperties>
+          <Property function="Input" name="Input" />
+        </RequiredProperties>
+      </ArrayListDomain>
     </StringVectorProperty>
     <SubProxy>
       <Proxy name="CubeAxesRepresentation"
