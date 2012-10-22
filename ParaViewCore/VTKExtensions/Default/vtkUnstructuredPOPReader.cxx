@@ -502,8 +502,11 @@ int vtkUnstructuredPOPReader::ProcessGrid(
                              wholeExtent, subExtent);
 
   //setup extents for netcdf library to read the netcdf data file
-  size_t start[]= {subExtent[4]*this->Stride[2], subExtent[2]*this->Stride[1],
-                   subExtent[0]*this->Stride[0]};
+  size_t start[]= {
+    static_cast<size_t>(subExtent[4]*this->Stride[2]),
+    static_cast<size_t>(subExtent[2]*this->Stride[1]),
+    static_cast<size_t>(subExtent[0]*this->Stride[0])
+  };
 
   // the points do not wrap.  e.g. for the lowest latitude the longitude
   // starts at -179.9 and finishes at 180.0
@@ -514,8 +517,11 @@ int vtkUnstructuredPOPReader::ProcessGrid(
                                  subExtent[0] == wholeExtent[0] &&
                                  subExtent[1] == wholeExtent[1]);
 
-  size_t count[]= {subExtent[5]-subExtent[4]+1, subExtent[3]-subExtent[2]+1,
-                   subExtent[1]-subExtent[0]+1};
+  size_t count[]= {
+    static_cast<size_t>(subExtent[5]-subExtent[4]+1),
+    static_cast<size_t>(subExtent[3]-subExtent[2]+1),
+    static_cast<size_t>(subExtent[1]-subExtent[0]+1)
+  };
 
   ptrdiff_t rStride[3] = { (ptrdiff_t)this->Stride[2], (ptrdiff_t)this->Stride[1],
                            (ptrdiff_t)this->Stride[0] };

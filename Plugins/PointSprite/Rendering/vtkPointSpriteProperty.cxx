@@ -245,7 +245,7 @@ void vtkPointSpriteProperty::Render(vtkActor *act, vtkRenderer *ren)
       // send uniforms for the vertex shader
       //
       float pointSizeThreshold = 0.0;
-      float viewport[2] = { rensize[0], rensize[1] };
+      float viewport[2] = { (float)rensize[0], (float)rensize[1] };
 
       this->AddShaderVariable("viewport", 2, viewport);
       this->AddShaderVariable("pointSizeThreshold", 1, &pointSizeThreshold);

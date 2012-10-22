@@ -233,13 +233,12 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           }
         default:
           {
-          if( this->cellVector->size() < (unsigned int)(id + 1) )
-            return -1;
-          else
+          if( this->cellVector->size() > (unsigned int)(id) )
             return (*this->cellVector)[id];
           break;
           }
         }
+      return -1;
     }
 
     void SetId(int id, int value)
@@ -350,6 +349,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           break;
           }
         }
+      return -1; // Just to avoid stupid warning
     }
 
     // Just inject the real total number of Ids
@@ -437,6 +437,7 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           break;
           }
         }
+      return -1; // Just to avoid stupid warning
     }
 
     vtkIdTypeArray* GenerateGlobalIdsArray(const char* name)
