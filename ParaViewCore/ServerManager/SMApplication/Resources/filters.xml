@@ -12175,7 +12175,8 @@ found and the point will be rejected.</Documentation>
       <Documentation long_help="Create a uniform grid from an image data by specified blanking arrays."
                      short_help="Create a uniform grid from an image data.">
         Create a vtkUniformGrid from a vtkImageData by passing in arrays to be used
-        for point and/or cell blanking.
+        for point and/or cell blanking. By default, values of 0 in the specified
+        array will result in a point or cell being blanked. Use Reverse to switch this.
       </Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
@@ -12202,6 +12203,13 @@ found and the point will be rejected.</Documentation>
         </ArrayListDomain>
         <Documentation>Specify the array to use for blanking.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetReverse"
+                         default_values="0"
+                         name="Reverse"
+                         number_of_elements="1">
+        <Documentation>Reverse the array value to whether or not a point or cell is blanked.</Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End ImageDataToUniformGrid -->
     </SourceProxy>
   </ProxyGroup>
