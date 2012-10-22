@@ -29,25 +29,28 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+#include "vtkPVConfig.h"
+#ifndef BUILD_SHARED_LIBS
+# ifdef PARAVIEW_ENABLE_PYTHON
+#   include "paraviewpythonmodules.h"
+# endif
+#endif
+
 #include "ParaViewMainWindow.h"
 #include "ui_ParaViewMainWindow.h"
-#include "vtkPVConfig.h"
 
-#include "pqOptions.h"
 #include "pqActiveObjects.h"
 #include "pqHelpReaction.h"
 #include "pqObjectInspectorWidget.h"
-#include "pqPropertiesPanel.h"
+#include "pqOptions.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
-#include "vtkPVPlugin.h"
+#include "pqPropertiesPanel.h"
 #include "vtkProcessModule.h"
+#include "vtkPVPlugin.h"
 
 #ifndef BUILD_SHARED_LIBS
-#include "pvStaticPluginsInit.h"
-#ifdef PARAVIEW_ENABLE_PYTHON
-# include "paraviewpythonmodules.h"
-#endif
+# include "pvStaticPluginsInit.h"
 #endif
 
 
