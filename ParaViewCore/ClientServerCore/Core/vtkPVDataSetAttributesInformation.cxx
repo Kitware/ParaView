@@ -341,6 +341,7 @@ vtkPVDataSetAttributesInformation
         {
         // Take union of range.
         ai1->AddRanges(ai2);
+        ai1->AddUniqueValues(ai2);
         found = 1;
         // Record default attributes.
         int attribute1 = this->IsArrayAnAttribute(idx1);
