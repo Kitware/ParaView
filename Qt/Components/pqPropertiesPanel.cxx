@@ -778,6 +778,8 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
         {
         this->connect(item.PropertyWidget, SIGNAL(modified()),
                       this->View, SLOT(render()));
+        this->connect(item.PropertyWidget, SIGNAL(modified()),
+                      item.PropertyWidget, SLOT(updateDependentDomains()));
         }
       }
     }

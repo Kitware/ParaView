@@ -69,8 +69,6 @@ set(Module_SRCS
   pqFlatTreeView.h
   pqHelpWindow.cxx
   pqHelpWindow.h
-  pqIntRangeWidget.cxx
-  pqIntRangeWidget.h
   pqLineEdit.cxx
   pqLineEdit.h
   pqListWidgetCheckHelper.cxx
@@ -136,7 +134,6 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDoubleSpinBox.h
   pqExpanderButton.h
   pqFlatTreeView.h
-  pqIntRangeWidget.h
   pqLineEdit.h
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.h

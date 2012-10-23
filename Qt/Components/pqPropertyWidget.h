@@ -70,6 +70,9 @@ signals:
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView *view);
 
+public slots:
+  void updateDependentDomains();
+
 protected:
   void addPropertyLink(QObject *qobject,
                        const char *qproperty,

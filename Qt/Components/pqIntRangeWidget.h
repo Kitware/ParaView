@@ -34,9 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include "pqWidgetsModule.h"
+#include "vtkSmartPointer.h"
   
 class QSlider;
 class QLineEdit;
+class vtkSMIntRangeDomain;
+class vtkEventQtSlotConnect;
 
 /// a widget with a tied slider and line edit for editing a int property
 class PQWIDGETS_EXPORT pqIntRangeWidget : public QWidget
@@ -61,6 +64,10 @@ public:
   
   // returns whether the line edit is also limited 
   bool strictRange() const;
+
+  // Sets the range domain to monitor. This will automatically update
+  // the widgets range when the domain changes.
+  void setDomain(vtkSMIntRangeDomain *domain);
   
 signals:
   /// signal the value changed
@@ -83,6 +90,7 @@ private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
   void updateValidator();
+  void domainChanged();
 
 private:
   int Value;
@@ -92,7 +100,8 @@ private:
   QLineEdit* LineEdit;
   bool BlockUpdate;
   bool StrictRange;
+  vtkSmartPointer<vtkSMIntRangeDomain> Domain;
+  vtkEventQtSlotConnect *DomainConnection;
 };
 
 #endif
-

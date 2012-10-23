@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QIntValidator>
 
+#include "vtkSMIntRangeDomain.h"
+#include "vtkEventQtSlotConnect.h"
+
 pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   : QWidget(p) 
 {
@@ -46,6 +49,8 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   this->Minimum = 0;
   this->Maximum = 1;
   this->StrictRange = false;
+  this->Domain = 0;
+  this->DomainConnection = 0;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
@@ -69,6 +74,10 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
 //-----------------------------------------------------------------------------
 pqIntRangeWidget::~pqIntRangeWidget()
 {
+  if(this->DomainConnection)
+    {
+    this->DomainConnection->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -159,6 +168,34 @@ void pqIntRangeWidget::setStrictRange(bool s)
 }
 
 //-----------------------------------------------------------------------------
+void pqIntRangeWidget::setDomain(vtkSMIntRangeDomain *domain)
+{
+  if(this->Domain == domain)
+    {
+    return;
+    }
+
+  this->Domain = domain;
+
+  if(this->Domain)
+    {
+    if(this->DomainConnection)
+      {
+      this->DomainConnection->Delete();
+      this->DomainConnection = 0;
+      }
+
+    this->DomainConnection = vtkEventQtSlotConnect::New();
+    this->DomainConnection->Connect(this->Domain,
+                                    vtkCommand::DomainModifiedEvent,
+                                    this,
+                                    SLOT(domainChanged()));
+    this->setMinimum(this->Domain->GetMinimum(0));
+    this->setMaximum(this->Domain->GetMaximum(0));
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqIntRangeWidget::sliderChanged(int val)
 {
   if(!this->BlockUpdate)
@@ -183,3 +220,12 @@ void pqIntRangeWidget::textChanged(const QString& text)
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqIntRangeWidget::domainChanged()
+{
+  if(this->Domain)
+    {
+    this->setMinimum(this->Domain->GetMinimum(0));
+    this->setMaximum(this->Domain->GetMaximum(0));
+    }
+}
