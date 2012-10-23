@@ -399,10 +399,15 @@ bool vtkThreeSliceFilter::GetProbedPointData(const char* arrayName, double &valu
   if(this->Probe && this->Probe->GetOutput() && this->Probe->GetOutput()->GetPointData())
     {
     vtkDataArray* array = this->Probe->GetOutput()->GetPointData()->GetArray(arrayName);
-    if(array && array->GetNumberOfComponents() == 1)
+    vtkDataArray* mask = this->Probe->GetOutput()->GetPointData()->GetArray("vtkValidPointMask");
+    if(array && array->GetNumberOfComponents() == 1 && array->GetNumberOfTuples() > 0)
       {
       bool valid = false;
       value = array->GetVariantValue(0).ToDouble(&valid);
+      if(valid && mask)
+        {
+        return (array->GetVariantValue(0).ToUnsignedChar() != 0);
+        }
       return valid;
       }
     }
