@@ -12,10 +12,9 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkProcessModule.h"
+#include "pvpython.h" // include this 1st.
 #include "vtkPVConfig.h" // Required to get build options for paraview
-
-#include "pvpython.h"
+#include "vtkProcessModule.h"
 
 int main(int argc, char* argv[])
 {
