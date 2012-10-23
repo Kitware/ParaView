@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkDataObject.h"
+#include "vtkDataObjectTypes.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessControllerHelper.h"
 #include "vtkMultiProcessStream.h"
@@ -219,6 +220,7 @@ void vtkExtractsDeliveryHelper::Update()
     vtkSocketController* comm = this->Simulation2VisualizationController;
     if (comm)
       {
+      vtkMultiProcessStream data_types_stream;
       while (true)
         {
         std::string key;
@@ -242,7 +244,36 @@ void vtkExtractsDeliveryHelper::Update()
           vtkWarningMacro("Received unidentified extract " <<
             key.c_str() << ". Ignoring.");
           }
+        data_types_stream << '1' << key.c_str() << extract->GetClassName();
         extract->Delete();
+        }
+      data_types_stream << '0';
+      this->ParallelController->Broadcast(data_types_stream, 0);
+      }
+    else
+      {
+      vtkMultiProcessStream data_types_stream;
+      this->ParallelController->Broadcast(data_types_stream, 0);
+      char next;
+      data_types_stream >> next;
+      while (next == '1')
+        {
+        std::string key, data_type;
+        data_types_stream >> key >> data_type;
+        ExtractConsumersType::iterator iter = this->ExtractConsumers.find(key);
+        if (iter != this->ExtractConsumers.end())
+          {
+          vtkDataObject* dObj = vtkDataObjectTypes::NewDataObject(
+            data_type.c_str());
+          iter->second->SetOutput(dObj);
+          dObj->FastDelete();
+          }
+        else
+          {
+          vtkWarningMacro("Received unidentified extract " <<
+            key.c_str() << ". Ignoring.");
+          }
+        data_types_stream >> next;
         }
       }
     }
