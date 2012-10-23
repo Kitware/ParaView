@@ -21,7 +21,6 @@
 #include "vtkDummyController.h"
 #include "vtkDynamicLoader.h"
 #include "vtkFloatingPointExceptions.h"
-#include "vtkMapper.h"
 #include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
@@ -256,9 +255,6 @@ vtkProcessModule::vtkProcessModule()
   vtkCompositeDataPipeline* cddp = vtkCompositeDataPipeline::New();
   vtkAlgorithm::SetDefaultExecutivePrototype(cddp);
   cddp->Delete();
-
-  vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
-  vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 }
 
 //----------------------------------------------------------------------------
