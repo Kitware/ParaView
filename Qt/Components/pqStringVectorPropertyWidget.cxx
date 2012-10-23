@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSILDomain.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMFieldDataDomain.h"
 
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
@@ -57,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSILWidget.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
+#include "pqFieldSelectionAdaptor.h"
 
 #include <QComboBox>
 #include <QLabel>
@@ -93,6 +95,7 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
   vtkSMEnumerationDomain *enumerationDomain = 0;
   vtkSMFileListDomain *fileListDomain = 0;
   vtkSMArrayListDomain *arrayListDomain = 0;
+  vtkSMFieldDataDomain *fieldDataDomain = 0;
   vtkSMStringListDomain *stringListDomain = 0;
   vtkSMSILDomain *silDomain = 0;
   vtkSMArraySelectionDomain *arraySelectionDomain = 0;
@@ -125,6 +128,10 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     if(!arraySelectionDomain)
       {
       arraySelectionDomain = vtkSMArraySelectionDomain::SafeDownCast(domain);
+      }
+    if(!fieldDataDomain)
+      {
+      fieldDataDomain = vtkSMFieldDataDomain::SafeDownCast(domain);
       }
     }
   domainIter->Delete();
@@ -213,6 +220,25 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       this->addPropertyLink(
         selectorWidget, smProxy->GetPropertyName(smProperty),
         SIGNAL(widgetModified()), smProperty);
+      }
+    else if(fieldDataDomain)
+      {
+      QComboBox *comboBox = new QComboBox(this);
+      comboBox->setObjectName("ComboBox");
+
+      pqFieldSelectionAdaptor *adaptor =
+        new pqFieldSelectionAdaptor(comboBox, smProperty);
+
+      this->addPropertyLink(adaptor,
+                            "selection",
+                            SIGNAL(selectionChanged()),
+                            svp);
+
+      vbox->addWidget(comboBox);
+
+      this->setReason() << "QComboBox for a StringVectorProperty with a "
+                           "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")" <<
+                           "and a FieldDataDomain (" << fieldDataDomain->GetXMLName() << ")";
       }
     else
       {
