@@ -337,19 +337,21 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           }
         default:
           {
-          // Point Ids are directly injected in the vector,
-          // contrary to cell Ids which are "stacked" with
-          // InsertNextId. So the real total number of Ids
-          // for Points cannot be the size of the vector.
-          // So we must inject it manually
-          if( this->cellNumberOfIds >= 0 )
-            return this->cellNumberOfIds;
-          else
-            return static_cast<int>(this->cellVector->size());
           break;
           }
         }
-      return -1; // Just to avoid stupid warning
+
+      // Point Ids are directly injected in the vector,
+      // contrary to cell Ids which are "stacked" with
+      // InsertNextId. So the real total number of Ids
+      // for Points cannot be the size of the vector.
+      // So we must inject it manually
+      if( this->cellNumberOfIds >= 0 )
+        {
+        return this->cellNumberOfIds;
+        }
+
+      return static_cast<int>(this->cellVector->size());
     }
 
     // Just inject the real total number of Ids
@@ -419,25 +421,24 @@ class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPEnSightReader : public vtkPGenericEnS
           }
         default:
           {
-          if( this->cellLocalNumberOfIds >= 0 )
-            {
-            return this->cellLocalNumberOfIds;
-            }
-          else
-            {
-            //return this->cellVector->size();
-            int result = 0;
-            for(unsigned int i = 0 ; i < this->cellVector->size() ; i++)
-              {
-              if( (*this->cellVector)[i] != -1 )
-                result++;
-              }
-            return result;
-            }
           break;
           }
         }
-      return -1; // Just to avoid stupid warning
+
+      // Return cellLocalNumberOfIds if valid
+      if( this->cellLocalNumberOfIds >= 0 )
+        {
+        return this->cellLocalNumberOfIds;
+        }
+
+      // Else compute the real size
+      int result = 0;
+      for(unsigned int i = 0 ; i < this->cellVector->size() ; i++)
+        {
+        if( (*this->cellVector)[i] != -1 )
+          result++;
+        }
+      return result;
     }
 
     vtkIdTypeArray* GenerateGlobalIdsArray(const char* name)
