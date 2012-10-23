@@ -114,6 +114,33 @@ void vtkPVAnimationCue::TickInternal(
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAnimationCue::Initialize()
+{
+  if (this->Enabled)
+    {
+    this->Superclass::Initialize();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationCue::Tick(double currenttime, double deltatime, double clocktime)
+{
+  if (this->Enabled)
+    {
+    this->Superclass::Tick(currenttime, deltatime, clocktime);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationCue::Finalize()
+{
+  if (this->Enabled)
+    {
+    this->Superclass::Finalize();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

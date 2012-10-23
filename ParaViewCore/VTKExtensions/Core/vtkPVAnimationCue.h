@@ -74,6 +74,12 @@ public:
   vtkSetMacro(UseAnimationTime, bool);
   vtkGetMacro(UseAnimationTime, bool);
 
+  // Description:
+  // Overridden to ignore the calls when this->Enabled == false.
+  virtual void Initialize();
+  virtual void Tick(double currenttime, double deltatime, double clocktime);
+  virtual void Finalize();
+
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
