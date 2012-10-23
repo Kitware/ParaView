@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqIntRangeWidget_h
 
 #include <QWidget>
-#include "pqWidgetsModule.h"
+#include "pqComponentsModule.h"
 #include "vtkSmartPointer.h"
   
 class QSlider;
@@ -42,7 +42,7 @@ class vtkSMIntRangeDomain;
 class vtkEventQtSlotConnect;
 
 /// a widget with a tied slider and line edit for editing a int property
-class PQWIDGETS_EXPORT pqIntRangeWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqIntRangeWidget : public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(int value READ value WRITE setValue USER true)
