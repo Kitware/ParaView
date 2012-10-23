@@ -151,7 +151,7 @@ int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
 
   int renderedSomething = 0;
 
-  if (this->UseOpacity)
+  if (this->UseOpacity && this->DrawColorBar)
     {
     this->Texture->Render(vtkRenderer::SafeDownCast(viewport));
     renderedSomething += this->TextureActor->RenderOverlay(viewport);
@@ -162,8 +162,11 @@ int vtkPVScalarBarActor::RenderOverlay(vtkViewport *viewport)
     {
     renderedSomething += this->TitleActor->RenderOverlay(viewport);
     }
-  this->ScalarBarTexture->Render(vtkRenderer::SafeDownCast(viewport));
-  renderedSomething += this->ScalarBarActor->RenderOverlay(viewport);
+  if (this->DrawColorBar)
+    {
+    this->ScalarBarTexture->Render(vtkRenderer::SafeDownCast(viewport));
+    renderedSomething += this->ScalarBarActor->RenderOverlay(viewport);
+    }
 
   renderedSomething += this->TickMarksActor->RenderOverlay(viewport);
 
