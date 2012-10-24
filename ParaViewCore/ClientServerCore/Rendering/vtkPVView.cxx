@@ -177,7 +177,7 @@ void vtkPVView::SetSize(int x, int y)
 //----------------------------------------------------------------------------
 void vtkPVView::SetViewTime(double time)
 {
-  if (this->ViewTime != time)
+  if (!this->ViewTimeValid || this->ViewTime != time)
     {
     this->ViewTime = time;
     this->ViewTimeValid = true;
