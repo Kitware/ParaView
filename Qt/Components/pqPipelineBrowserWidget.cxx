@@ -249,6 +249,12 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
         }
       else
         {
+        if(visible)
+          {
+          // Make sure the given port is selected specially if we are in
+          // multi-server / catalyst configuration type
+          pqActiveObjects::instance().setActivePort(port);
+          }
         display_policy->setRepresentationVisibility(
           port, pqActiveObjects::instance().activeView(), visible);
         }
