@@ -132,8 +132,20 @@ void vtkSMLiveInsituLinkProxy::LoadState(
 
           // Add to proxy list that needs a refresh...
           sourceProxyToMarkModified.push_back(realId);
-          cout << "Add id " << realId << endl;
           }
+        }
+      else if (user_data.key() == "IdMapping" && this->CatalystSessionCore)
+        {
+        const Variant& mapTable = user_data.variant(0);
+        int size = mapTable.idtype_size();
+        vtkTypeUInt32* map = new vtkTypeUInt32[size];
+        for(int i=0; i < size; i += 2)
+          {
+          map[i+1] = mapTable.idtype(i+0);
+          map[i+0] = mapTable.idtype(i+1);
+          }
+        this->CatalystSessionCore->UpdateIdMap(map, size);
+        delete[] map;
         }
       }
     }
@@ -192,6 +204,7 @@ void vtkSMLiveInsituLinkProxy::InsituConnected(const char* state)
     // Update session core id mapping
     int size = 0;
     vtkTypeUInt32* mapArray = loader->GetMappingArray(size);
+    this->CatalystSessionCore->ResetIdMap();
     this->CatalystSessionCore->UpdateIdMap(mapArray, size);
 
     this->StateDirty = false;

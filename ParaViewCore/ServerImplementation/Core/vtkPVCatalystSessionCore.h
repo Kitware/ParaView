@@ -50,7 +50,7 @@ public:
                                         vtkPVInformation* information);
 
   void UpdateIdMap(vtkTypeUInt32* idMapArray, int size);
-
+  void ResetIdMap();
 //BTX
 protected:
   vtkPVCatalystSessionCore();

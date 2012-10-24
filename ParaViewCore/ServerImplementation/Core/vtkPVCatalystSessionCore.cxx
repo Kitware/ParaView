@@ -129,13 +129,18 @@ public:
       }
   }
   //---------------------------------------------------------------------------
-  void UpdateIdMap(vtkTypeUInt32* data, int size)
+  void ResetIdMap()
   {
     this->IdMap.clear();
+  }
+  //---------------------------------------------------------------------------
+  void UpdateIdMap(vtkTypeUInt32* data, int size)
+  {
     for(int i=0; i < size; i += 2)
       {
       this->IdMap[data[i]] = data[i+1];
       }
+    cout << endl;
   }
   //---------------------------------------------------------------------------
   vtkTypeUInt32 GetMappedId(vtkTypeUInt32 originalId)
@@ -203,4 +208,10 @@ vtkTypeUInt32 vtkPVCatalystSessionCore::RegisterDataInformation(vtkTypeUInt32 gl
 void vtkPVCatalystSessionCore::UpdateIdMap(vtkTypeUInt32* idMapArray, int size)
 {
   this->CatalystInternal->UpdateIdMap(idMapArray, size);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCatalystSessionCore::ResetIdMap()
+{
+  this->CatalystInternal->ResetIdMap();
 }

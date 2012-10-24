@@ -627,6 +627,7 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
 
   vtkMultiProcessStream extractsMessage;
   extractsMessage << 0; // indicating nothing changed.
+  std::vector<vtkTypeUInt32> idMappingInStateLoading;
 
   if (myId == 0)
     {
@@ -705,11 +706,20 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
     return;
     }
 
+
   if (this->XMLState)
     {
     vtkNew<vtkSMInsituStateLoader> loader;
+    loader->KeepIdMappingOn();
     loader->SetSessionProxyManager(this->CoprocessorProxyManager);
     this->CoprocessorProxyManager->LoadXMLState(this->XMLState, loader.GetPointer());
+    int mappingSize = 0;
+    vtkTypeUInt32* inSituMapping = loader->GetMappingArray(mappingSize);
+    // Save mapping outside that scope
+    for(int i=0;i<mappingSize;++i)
+      {
+      idMappingInStateLoading.push_back(inSituMapping[i]);
+      }
     }
 
   // Process information about extracts.
@@ -748,6 +758,17 @@ void vtkLiveInsituLink::SimulationUpdate(double time)
         {
         vtkErrorMacro("No proxy: " << group.c_str() << ", " << name.c_str());
         }
+      }
+    }
+
+  // Share the id mapping between inSitu and Viz root node
+  if(this->Controller)
+    {
+    int mappingSize = static_cast<int>(idMappingInStateLoading.size());
+    this->Controller->Send(&mappingSize, 1, 1, 8013);
+    if(mappingSize > 0)
+      {
+      this->Controller->Send(&idMappingInStateLoading[0], mappingSize, 1, 8014);
       }
     }
 }
@@ -892,6 +913,43 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
       extractsMessage << 0;
       }
     this->Controller->Send(extractsMessage, 1, 8012);
+
+    // Read the server id mapping
+    int numberOfIds = 0;
+    this->Controller->Receive(&numberOfIds, 1, 1, 8013);
+    if(numberOfIds > 0)
+      {
+      vtkTypeUInt32* idMapTable = new vtkTypeUInt32[numberOfIds];
+      this->Controller->Receive(idMapTable, numberOfIds, 1, 8014);
+
+      // notify the client with the updated ID mapping.
+      if (this->VisualizationSession)
+        {
+        // here we may let the client know exactly what extracts were updated, if
+        // all were not updated. Currently we just assume all extracts are
+        // redelivered and modified.
+        vtkSMMessage message;
+        message.set_global_id(this->ProxyId);
+        message.set_location(vtkPVSession::CLIENT);
+        message.SetExtension(ProxyState::xml_group, "Catalyst_Communication");
+        message.SetExtension(ProxyState::xml_name, "Catalyst_Communication");
+
+        // Add custom user_data
+        ProxyState_UserData* user_data = message.AddExtension(ProxyState::user_data);
+        user_data->set_key("IdMapping");
+        Variant* variant = user_data->add_variant();
+        variant->set_type(Variant::IDTYPE); // Arbitrary
+
+        for(int i=0; i < numberOfIds; ++i)
+          {
+          variant->add_idtype(idMapTable[i]);
+          }
+
+        // Send message
+        this->VisualizationSession->NotifyAllClients(&message);
+        delete[] idMapTable;
+        }
+      }
     }
   else
     {
