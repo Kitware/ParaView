@@ -307,11 +307,6 @@ pqCPExportStateWizard::pqCPExportStateWizard(
   QObject::connect(this->Internals->previousView, SIGNAL(pressed()),
                    this, SLOT(decrementView()));
 
-  QObject::connect(this->Internals->outputRendering, SIGNAL(toggled(bool)),
-                   this, SLOT(onVizExportChecked(bool)));
-  QObject::connect(this->Internals->liveViz, SIGNAL(toggled(bool)),
-                   this, SLOT(onVizExportChecked(bool)));
-
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
   QList<pqRenderViewBase*> renderViews = smModel->findItems<pqRenderViewBase*>();
   QList<pqContextView*> contextViews = smModel->findItems<pqContextView*>();
@@ -364,24 +359,6 @@ void pqCPExportStateWizard::updateAddRemoveButton()
     this->Internals->allInputs->selectedItems().size() > 0);
   this->Internals->removeButton->setEnabled(
     this->Internals->simulationInputs->selectedItems().size() > 0);
-}
-
-//-----------------------------------------------------------------------------
-void pqCPExportStateWizard::onVizExportChecked(bool selected)
-{
-  if(selected)
-    {
-    // Only one viz export can stay selected
-    if(QObject::sender() == this->Internals->outputRendering)
-      {
-      this->Internals->liveViz->setChecked(false);
-      }
-    else
-      {
-      this->Internals->outputRendering->setChecked(false);
-      }
-    }
-
 }
 
 //-----------------------------------------------------------------------------
