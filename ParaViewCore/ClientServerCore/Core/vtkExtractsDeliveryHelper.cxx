@@ -15,6 +15,7 @@
 #include "vtkExtractsDeliveryHelper.h"
 
 #include "vtkAlgorithmOutput.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkMultiProcessController.h"
@@ -220,9 +221,11 @@ void vtkExtractsDeliveryHelper::Update()
     vtkSocketController* comm = this->Simulation2VisualizationController;
     if (comm)
       {
+      std::vector<vtkSmartPointer<vtkCompositeDataSet> > compositeDSToShare;
       vtkMultiProcessStream data_types_stream;
       while (true)
         {
+        int needToShare = 0;
         std::string key;
         vtkMultiProcessStream stream;
         comm->Receive(stream, 1, 12000);
@@ -244,27 +247,56 @@ void vtkExtractsDeliveryHelper::Update()
           vtkWarningMacro("Received unidentified extract " <<
             key.c_str() << ". Ignoring.");
           }
-        data_types_stream << '1' << key.c_str() << extract->GetClassName();
+
+        // Composite dataset need to convey their data structure accross
+        // processes, let's create those empty data object with the proper
+        // data structure to share ONLY if needed.
+        if(extract->IsA("vtkCompositeDataSet"))
+          {
+          vtkCompositeDataSet* dsToShare = vtkCompositeDataSet::SafeDownCast(
+                vtkDataObjectTypes::NewDataObject(extract->GetClassName()));
+          compositeDSToShare.push_back(dsToShare);
+          dsToShare->CopyStructure(vtkCompositeDataSet::SafeDownCast(extract));
+          dsToShare->FastDelete();
+          needToShare = 1;
+          }
+        data_types_stream << key.c_str() << extract->GetClassName() << needToShare;
         extract->Delete();
         }
-      data_types_stream << '0';
+      data_types_stream << "null";
       this->ParallelController->Broadcast(data_types_stream, 0);
+
+      // Send the empty data object that need to share its structure
+      std::vector<vtkSmartPointer<vtkCompositeDataSet> >::iterator dsIter;
+      for(dsIter = compositeDSToShare.begin(); dsIter != compositeDSToShare.end(); dsIter++)
+        {
+        this->ParallelController->Broadcast(dsIter->GetPointer(), 0);
+        }
       }
     else
       {
       vtkMultiProcessStream data_types_stream;
       this->ParallelController->Broadcast(data_types_stream, 0);
-      char next;
-      data_types_stream >> next;
-      while (next == '1')
+      std::string key;
+      int needToReceiveDataObject;
+      data_types_stream >> key;
+      while (key != "null")
         {
-        std::string key, data_type;
-        data_types_stream >> key >> data_type;
+        std::string data_type;
+        data_types_stream >> data_type >> needToReceiveDataObject;
+
         ExtractConsumersType::iterator iter = this->ExtractConsumers.find(key);
         if (iter != this->ExtractConsumers.end())
           {
           vtkDataObject* dObj = vtkDataObjectTypes::NewDataObject(
-            data_type.c_str());
+                data_type.c_str());
+
+          // Fill with proper data structure if needed
+          if(needToReceiveDataObject != 0)
+            {
+            this->ParallelController->Broadcast(dObj, 0);
+            }
+
           iter->second->SetOutput(dObj);
           dObj->FastDelete();
           }
@@ -273,7 +305,9 @@ void vtkExtractsDeliveryHelper::Update()
           vtkWarningMacro("Received unidentified extract " <<
             key.c_str() << ". Ignoring.");
           }
-        data_types_stream >> next;
+
+        // Move forward
+        data_types_stream >> key;
         }
       }
     }
