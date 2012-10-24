@@ -954,6 +954,10 @@ void vtkPVRenderView::Render(bool interactive, bool skip_rendering)
     this->SynchronizeForCollaboration();
     }
 
+  // BUG #13534. Reset the clip planes on every render. Since this does not
+  // involve any communication, doing this on every render is not a big deal.
+  this->ResetCameraClippingRange();
+
   bool in_tile_display_mode = this->InTileDisplayMode();
   bool in_cave_mode = this->SynchronizedWindows->GetIsInCave();
   if (in_cave_mode && !this->RemoteRenderingAvailable)
