@@ -535,6 +535,9 @@
                  value="7" />
           <Entry text="Checkerboard"
                  value="8" />
+          <Entry text="SplitViewportHorizontal"
+                 value="9" />
+        SplitViewportHorizontal
         </EnumerationDomain>
       </IntVectorProperty>
       <IntVectorProperty command="SetMultiSamples"
