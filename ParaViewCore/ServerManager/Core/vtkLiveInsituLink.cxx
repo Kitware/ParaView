@@ -129,8 +129,9 @@ public:
       Group(group), Name(name), Port(port) {}
     };
 
-  bool IsNew(vtkTypeUInt32 proxyId, vtkPVDataInformation* info)
+  bool IsNew(vtkTypeUInt32 proxyId, unsigned int port, vtkPVDataInformation* info)
   {
+    vtkIdType id = static_cast<vtkIdType>(proxyId) * 100 + static_cast<vtkIdType>(port);
     vtkClientServerStream stream;
     info->CopyToStream(&stream);
     size_t length = 0;
@@ -139,22 +140,22 @@ public:
     std::string rawData((const char*)data, length);
 
     // Search if existing value is the same
-    std::map<vtkTypeUInt32, std::string>::iterator iter;
-    iter = this->LastSentDataInformationMap.find(proxyId);
+    std::map<vtkIdType, std::string>::iterator iter;
+    iter = this->LastSentDataInformationMap.find(id);
     if((iter != this->LastSentDataInformationMap.end()) && (iter->second == rawData))
       {
       return false;
       }
 
     // Store the new MTime
-    this->LastSentDataInformationMap[proxyId] = rawData;
+    this->LastSentDataInformationMap[id] = rawData;
 
     return true;
   }
 
   typedef std::map<Key, vtkSmartPointer<vtkTrivialProducer> > ExtractsMap;
   ExtractsMap Extracts;
-  std::map<vtkTypeUInt32, std::string> LastSentDataInformationMap;
+  std::map<vtkIdType, std::string> LastSentDataInformationMap;
 };
 
 vtkStandardNewMacro(vtkLiveInsituLink);
@@ -808,15 +809,17 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
       {
       vtkSMSourceProxy* source =
           vtkSMSourceProxy::SafeDownCast(proxyIterator->GetProxy());
-      if( source &&
-          this->Internals->IsNew(source->GetGlobalID(), source->GetDataInformation()))
+      if( source )
         {
         for(unsigned int port = 0; port < source->GetNumberOfOutputPorts(); ++port)
           {
-          vtkClientServerStream dataStream;
-          source->GetDataInformation(port)->CopyToStream(&dataStream);
-          // Serialize the data
-          stream << source->GetGlobalID() << port << dataStream;
+          if(this->Internals->IsNew(source->GetGlobalID(), port, source->GetDataInformation(port)))
+            {
+            vtkClientServerStream dataStream;
+            source->GetDataInformation(port)->CopyToStream(&dataStream);
+            // Serialize the data
+            stream << source->GetGlobalID() << port << dataStream;
+            }
           }
         }
       proxyIterator->Next();
