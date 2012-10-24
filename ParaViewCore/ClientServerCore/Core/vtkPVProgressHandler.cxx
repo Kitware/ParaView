@@ -255,7 +255,9 @@ public:
 #ifdef PV_DISABLE_PROGRESS_HANDLING
     this->DisableProgressHandling = true;
 #else
-    this->DisableProgressHandling = false;
+    // Symetric mode mean that we disable progress
+    this->DisableProgressHandling =
+        vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode();
 #endif
     }
 
@@ -332,8 +334,9 @@ void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
 void vtkPVProgressHandler::PrepareProgress()
 {
 #ifndef PV_DISABLE_PROGRESS_HANDLING
+  SKIP_IF_DISABLED();
   this->Internals->DisableProgressHandling =
-    this->Session? this->Session->IsMultiClients() : true;
+    this->Session ? this->Session->IsMultiClients() : true;
 #endif
 
   SKIP_IF_DISABLED();
