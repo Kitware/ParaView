@@ -101,10 +101,6 @@ public:
       storedValue->CopyToStream(&stream);
       info->CopyFromStream(&stream);
       }
-    else
-      {
-      info->CopyFromObject(NULL);
-      }
     return true;
   }
   //---------------------------------------------------------------------------
