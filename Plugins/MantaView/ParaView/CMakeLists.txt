@@ -65,3 +65,7 @@ add_paraview_plugin(
 )
 
 TARGET_LINK_LIBRARIES (MantaView vtkManta vtkMantaCS)
+
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()
