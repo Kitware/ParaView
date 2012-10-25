@@ -93,6 +93,8 @@ public:
 
   //Description:
   // Overridden to use manta callbacks to do the work.
+  virtual void SetBackground(double rgb[3])
+    { this->Superclass::SetBackground(rgb); }
   virtual void SetBackground(double r, double g, double b);
 
   //Description:
@@ -210,12 +212,12 @@ protected:
 
   // Manta renderer does not support picking.
   virtual void DevicePickRender() {};
-  virtual void StartPick(unsigned int pickFromSize) {};
+  virtual void StartPick(unsigned int vtkNotUsed(pickFromSizev)) {};
   virtual void UpdatePickId() {};
   virtual void DonePick() {};
   virtual unsigned int GetPickedId() { return 0; };
   virtual unsigned int GetNumPickedIds() { return 0; };
-  virtual int GetPickedIds( unsigned int atMost, unsigned int * callerBuffer )
+  virtual int GetPickedIds( unsigned int vtkNotUsed(atMost), unsigned int * vtkNotUsed(callerBuffer) )
   {
     return 0; 
   };
