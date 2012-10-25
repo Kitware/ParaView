@@ -224,7 +224,9 @@ bool vtkExtractHistogram::InitializeBinExtents(
   else if (!this->GetInputArrayRange(inputVector, range) ||
     (range[0] > range[1]))
     {
-    vtkErrorMacro("Could not determine array range. "
+    // We don't flag this as error since the array may just be missing for
+    // current time-step (BUG #12290).
+    vtkDebugMacro("Could not determine array range. "
       "The chosen array or component may not be available or "
       "has invalid range");
     return false;
