@@ -91,6 +91,10 @@ public:
   /// Override for custom management
   virtual void setCursor(const QCursor &);
 
+  /// Update Label Font Size
+  void setLabelFontSize(int size);
+  int getLabelFontSize();
+
 protected slots:
   void resetSliceOrigin();
 

@@ -294,3 +294,16 @@ void pqQuadView::setCursor(const QCursor &c)
        }
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqQuadView::setLabelFontSize(int size)
+{
+  vtkSMPropertyHelper(this->getViewProxy(), "LabelFontSize").Set(size);
+  this->getViewProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int pqQuadView::getLabelFontSize()
+{
+  return vtkSMPropertyHelper(this->getViewProxy(), "LabelFontSize").GetAsInt();
+}

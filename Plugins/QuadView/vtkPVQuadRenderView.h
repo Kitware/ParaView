@@ -153,6 +153,16 @@ public:
   // Internally we attach a listener to it to update the slice origins.
   void SetSliceOriginSource(vtkPointSource* source);
 
+  // Description:
+  // Set the position of the split in percent along width and height. (0 < r < 1)
+  vtkSetVector2Macro(SplitRatio, double);
+  vtkGetVector2Macro(SplitRatio, double);
+
+  // Description:
+  // Update label font size
+  virtual void SetLabelFontSize(int value);
+  vtkGetMacro(LabelFontSize, int);
+
   //*****************************************************************
   // Forwarded accross all the views
   virtual void Add2DManipulator(vtkCameraManipulator* val);
@@ -214,6 +224,10 @@ protected:
   // Internal method used to update layout of the views
   virtual void UpdateViewLayout();
   int ViewPosition[2];
+  double SplitRatio[2];
+
+  // Label font size
+  int LabelFontSize;
 
   struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];

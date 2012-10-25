@@ -125,6 +125,11 @@ pqQuadViewOptions::pqQuadViewOptions(QWidget *widgetParent)
   QObject::connect( this->Internal->ui.BottomLeftViewUpZ,
                     SIGNAL(textChanged(QString)),
                     this, SIGNAL(changesAvailable()));
+
+  // Label font size
+  QObject::connect( this->Internal->ui.FontSize,
+                    SIGNAL(valueChanged(int)),
+                    this, SIGNAL(changesAvailable()));
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +183,8 @@ void pqQuadViewOptions::applyChanges()
   this->View->setBottomLeftViewUp( this->Internal->ui.BottomLeftViewUpX->text().toDouble(),
                                 this->Internal->ui.BottomLeftViewUpY->text().toDouble(),
                                 this->Internal->ui.BottomLeftViewUpZ->text().toDouble());
+
+  this->View->setLabelFontSize(this->Internal->ui.FontSize->value());
 
   this->View->render();
 }
@@ -243,6 +250,8 @@ void pqQuadViewOptions::setView(pqView* view)
   this->Internal->ui.X->setText(QString::number(vector[0]));
   this->Internal->ui.Y->setText(QString::number(vector[1]));
   this->Internal->ui.Z->setText(QString::number(vector[2]));
+
+  this->Internal->ui.FontSize->setValue(this->View->getLabelFontSize());
 }
 
 //----------------------------------------------------------------------------

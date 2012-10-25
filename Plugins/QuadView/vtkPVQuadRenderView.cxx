@@ -209,6 +209,13 @@ public:
     this->NaturalCoordinates[2] = ((this->TextValues[2] / this->TranformZ[2]) - (this->TextValues[0] * this->TranformX[2]) -  (this->TextValues[1] * this->TranformY[2])) * this->TranformZ[3] + this->TranformZ[4];
   }
 
+  void UpdateLabelFontSize(int fontSize)
+  {
+    this->CoordinatesX->GetTextProperty()->SetFontSize(fontSize);
+    this->CoordinatesY->GetTextProperty()->SetFontSize(fontSize);
+    this->CoordinatesZ->GetTextProperty()->SetFontSize(fontSize);
+  }
+
   void UpdateTransformX(double coef[5])
   {
     this->Copy(coef, this->TranformX, 5);
@@ -250,6 +257,8 @@ vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::vtkPVQuadRenderView()
 {
+  this->SplitRatio[0] = this->SplitRatio[1] = .5;
+  this->LabelFontSize = 20;
   this->ViewPosition[0] = this->ViewPosition[1] = 0;
   for (int cc=0; cc < 3; cc++)
     {
@@ -266,8 +275,9 @@ vtkPVQuadRenderView::vtkPVQuadRenderView()
     this->SetSlice(i, 0, 0);
     }
 
-  this->QuadInternal = new vtkQuadInternal(this);
   this->XAxisLabel = this->YAxisLabel = this->ZAxisLabel = this->ScalarLabel = NULL;
+  this->QuadInternal = new vtkQuadInternal(this);
+  this->QuadInternal->UpdateLabelFontSize(this->LabelFontSize);
 }
 
 //----------------------------------------------------------------------------
@@ -678,4 +688,16 @@ void vtkPVQuadRenderView::SetTransformationForY(double coef[5])
 void vtkPVQuadRenderView::SetTransformationForZ(double coef[5])
 {
   this->QuadInternal->UpdateTransformZ(coef);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetLabelFontSize(int value)
+{
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting LabelFontSize to " << value);
+  if (this->LabelFontSize != value)
+    {
+    this->LabelFontSize = value;
+    this->QuadInternal->UpdateLabelFontSize(this->LabelFontSize);
+    this->Modified();
+    }
 }
