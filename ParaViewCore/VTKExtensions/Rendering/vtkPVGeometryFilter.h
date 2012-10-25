@@ -28,6 +28,7 @@ class vtkDataSetSurfaceFilter;
 class vtkGenericDataSet;
 class vtkGenericGeometryFilter;
 class vtkHyperOctree;
+class vtkHyperTreeGrid;
 class vtkImageData;
 class vtkUniformGrid;
 class vtkInformationIntegerVectorKey;
@@ -235,6 +236,9 @@ protected:
 
   void OctreeExecute(
     vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
+
+  void HyperTreeGridExecute(
+    vtkHyperTreeGrid* input, vtkPolyData* output, int doCommunicate);
 
   // Description:
   // Cleans up the output polydata. If doCommunicate is true the method is free
