@@ -398,8 +398,10 @@ void vtkPVSynchronizedRenderer::SetRenderer(vtkRenderer* ren)
 
   if(ren && !glRenderer)
     {
-    vtkErrorMacro("Received non OpenGL renderer");
-    assert(false);
+    // BUG# 13567. It's not a critical error if the renderer is not a
+    // vtkOpenGLRenderer. We just don't support any render-pass stuff for such
+    // renderers.
+    vtkDebugMacro("Received non OpenGL renderer");
     }
 
   vtkSetObjectBodyMacro(Renderer, vtkOpenGLRenderer, glRenderer);
