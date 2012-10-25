@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 
 pqTransferFunctionEditorPropertyWidget::pqTransferFunctionEditorPropertyWidget(vtkSMProxy *smProxy,
@@ -122,5 +123,12 @@ pqTransferFunctionEditorPropertyWidgetDialog::
   widget->addPiecewiseFunction(this->TransferFunction.GetPointer());
 
   l->addWidget(widget);
+
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
+  QPushButton *closeButton = new QPushButton("Close", this);
+  closeButton->setObjectName("CloseButton");
+  this->connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
+  buttonLayout->addWidget(closeButton);
+  l->addLayout(buttonLayout);
   this->setLayout(l);
 }
