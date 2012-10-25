@@ -119,7 +119,7 @@ int OddWidthImages( int argc, char* argv[] )
     {
     //someone is intercepting the return value which prevents any failures
     cerr << "FAILURE" << endl;
-    _exit(1);
+    exit(1);
     }
   cerr << "SUCCESS" << endl;
   return 0;

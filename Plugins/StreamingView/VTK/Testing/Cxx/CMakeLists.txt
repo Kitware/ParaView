@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-INCLUDE_DIRECTORIES(../..)
-
-create_test_sourcelist(STREAMINGTESTS
-  StreamingCxxTests.cxx
+set(STREAMINGTESTS
   Source.cxx
   Harness.cxx
   PieceCache.cxx
@@ -12,26 +9,26 @@ create_test_sourcelist(STREAMINGTESTS
   Refinement.cxx
 )
 
-ADD_EXECUTABLE( StreamingCxxTests ${STREAMINGTESTS} )
-set (TestsToRun ${STREAMINGTESTS})
-remove (TestsToRun StreamingCxxTests.cxx)
-foreach (test ${TestsToRun})
-  get_filename_component(TName ${test} NAME_WE)
-  add_test(Streaming-Test${TName} ${EXECUTABLE_OUTPUT_PATH}/StreamingCxxTests ${TName}
-    -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
-    -V ${PARAVIEW_DATA_ROOT}/Baseline/StreamingTest${TName}.png
+## Create test source list
+create_test_sourcelist(Tests ${vtk-module}CxxTests.cxx
+    ${STREAMINGTESTS}
+    EXTRA_INCLUDE vtkTestDriver.h
     )
-  set_property(TEST Streaming-Test${TName}
-    PROPERTY FAIL_REGULAR_EXPRESSION "not working")
-endforeach()
-TARGET_LINK_LIBRARIES( StreamingCxxTests
-  vtkStreaming
-  vtkIOCore
-  vtkRenderingOpenGL
-  vtkRenderingFreeTypeOpenGL
-  vtkImagingSources
-  vtkFiltersProgrammable
-  vtkInteractionStyle
-  vtkFiltersParallel
-  vtkTestingRendering
-  )
+vtk_module_test_executable(${vtk-module}CxxTests ${Tests})
+
+set(TestsToRun ${Tests})
+remove(TestsToRun ${vtk-module}CxxTests.cxx)
+
+## Add all executables
+if (PARAVIEW_TEST_DIR AND PARAVIEW_DATA_ROOT)
+  foreach(test ${TestsToRun})
+    get_filename_component(t ${test} NAME_WE)
+    add_test(NAME ${vtk-module}Cxx-${t}
+      COMMAND ${vtk-module}CxxTests ${t}
+              -T {PARAVIEW_TEST_DIR}
+              -V ${PARAVIEW_DATA_ROOT}/Baseline/StreamingTest${t}.png)
+    set_tests_properties(${vtk-module}Cxx-${t}
+      PROPERTIES FAIL_REGULAR_EXPRESSION "not working"
+                 LABELS "${${vtk-module}_TEST_LABELS}")
+  endforeach()
+endif()

@@ -29,4 +29,5 @@ IF(NOT WIN32)
   SET(vtkStreaming_SOURCES ${vtkStreaming_SOURCES} vtkRawStridedReader2.cxx)
 ENDIF(NOT WIN32)
 
+set (${vtk-module}_NO_HeaderTest 1)
 vtk_module_library(${vtk-module} ${vtkStreaming_SOURCES})

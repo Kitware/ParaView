@@ -1,21 +1,33 @@
-create_test_sourcelist(MANTATESTS
-  MantaCxxTests.cxx
+set (MyTests
   ColorMap.cxx
   OddWidthImages.cxx
   CreateDeleteObjects.cxx
 )
 
-ADD_EXECUTABLE( MantaCxxTests ${MANTATESTS} )
-set (TestsToRun ${MANTATESTS})
-remove (TestsToRun MantaCxxTests.cxx)
-foreach (test ${TestsToRun})
-  get_filename_component(TName ${test} NAME_WE)
-  add_test(Manta-Test${TName} ${EXECUTABLE_OUTPUT_PATH}/MantaCxxTests ${TName}
-    -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
-    -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaTest${TName}.png
+## Create test source list
+create_test_sourcelist(Tests ${vtk-module}CxxTests.cxx
+    ${MyTests}
+    EXTRA_INCLUDE vtkTestDriver.h
     )
-endforeach()
-TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRenderingOpenGL)
+vtk_module_test_executable(${vtk-module}CxxTests ${Tests})
+
+set(TestsToRun ${Tests})
+remove(TestsToRun ${vtk-module}CxxTests.cxx)
+
+## Add all executables
+if (PARAVIEW_TEST_DIR AND PARAVIEW_DATA_ROOT)
+  foreach(test ${TestsToRun})
+    get_filename_component(t ${test} NAME_WE)
+    add_test(NAME ${vtk-module}Cxx-${t}
+      COMMAND ${vtk-module}CxxTests ${t}
+              -T {PARAVIEW_TEST_DIR}
+              -V ${PARAVIEW_DATA_ROOT}/Baseline/MyTests${t}.png)
+    set_tests_properties(${vtk-module}Cxx-${t}
+      PROPERTIES LABELS "${${vtk-module}_TEST_LABELS}")
+  endforeach()
+endif()
+
+#TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRenderingOpenGL)
 
 #disabling this until I sort out the shutdown segfault
 #ADD_EXECUTABLE( TriangleStrips TriangleStrips.cxx )
@@ -33,13 +45,14 @@ TARGET_LINK_LIBRARIES( MantaCxxTests vtkManta vtkRenderingOpenGL)
 #          -V ${PARAVIEW_DATA_ROOT}/Baseline/MultiLayerRendering.png )
 
 
-IF ( PARAVIEW_USE_MPI )
-
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-  ADD_EXECUTABLE( MantaBenchmark MantaBenchmark.cxx )
-  TARGET_LINK_LIBRARIES( MantaBenchmark vtkManta vtkFiltersHybrid vtkRenderingOpenGL vtkParallelMPI )
-  ADD_TEST( Manta-TestBenchmark ${EXECUTABLE_OUTPUT_PATH}/MantaBenchmark
-    -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
-    -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaBenchmark.png )
-
-ENDIF (PARAVIEW_USE_MPI)
+if (PARAVIEW_USE_MPI)
+  include_directories(${MPI_C_INCLUDE_PATH})
+  vtk_module_test_executable(MantaBenchmark MantaBenchmark.cxx)
+  target_link_libraries(MantaBenchmark vtkParallelMPI )
+  add_test(NAME Manta-TestBenchmark
+    COMMAND MantaBenchmark
+           -T ${EXECUTABLE_OUTPUT_PATH}/../Testing/Temporary
+           -V ${PARAVIEW_DATA_ROOT}/Baseline/MantaBenchmark.png)
+  set_tests_properties(Manta-TestBenchmark
+    PROPERTIES LABELS "${${vtk-module}_TEST_LABELS}")
+endif()

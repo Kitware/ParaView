@@ -16,5 +16,8 @@ vtk_module(vtkManta
     ${_vtk_modules}
   TEST_DEPENDS
     vtkTestingRendering
-    EXCLUDE_FROM_WRAP_HIERARCHY
+    vtkIOPLY
+  TEST_LABELS
+    PARAVIEW
+  EXCLUDE_FROM_WRAP_HIERARCHY
 )

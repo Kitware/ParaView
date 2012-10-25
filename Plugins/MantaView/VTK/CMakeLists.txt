@@ -48,6 +48,7 @@ SET ( MANTA_SRCS
   vtkMantaObjectFactory.cxx
   )
 
+set (${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${MANTA_SRCS})
 TARGET_LINK_LIBRARIES (${vtk-module} ${MANTA_LINK_LIBRARIES})
