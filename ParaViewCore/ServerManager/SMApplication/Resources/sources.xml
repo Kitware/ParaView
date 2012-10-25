@@ -486,6 +486,14 @@
                      most notably a string descriptor, to generate a vtkHyperTreeGrid instance
                      representing the corresponding a tree-based AMR grid with arbitrary rectilinear
                      geometry and either binary or ternary subdivision.</Documentation>
+      <IntVectorProperty command="SetGridSize"
+                         default_values="1 1 1"
+                         name="GridSize"
+                         number_of_elements="3">
+        <IntRangeDomain name="range" />
+        <Documentation>The three values in this property specify the number
+        of root cells in each dimension of the hyper tree grid.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetDimension"
                          default_values="3"
                          name="Dimension"
