@@ -1299,7 +1299,10 @@ void pqPipelineRepresentation::updateScalarBarVisibility(bool visible)
 //-----------------------------------------------------------------------------
 const char* pqPipelineRepresentation::UNSTRUCTURED_GRID_OUTLINE_THRESHOLD()
 {
-  return "/representation/UnstructuredGridOutlineThreshold";
+  // BUG #13564. I am renaming this key since we want to change the default
+  // value for this key. Renaming the key makes it possible to override the
+  // value without forcing users to reset their .config files.
+  return "/representation/UnstructuredGridOutlineThreshold2";
 }
 
 //-----------------------------------------------------------------------------
@@ -1332,7 +1335,7 @@ double pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()
       }
     }
 
-  return 0.5; //  1/2 million cells.
+  return 250; //  250 million cells.
 }
 
 //-----------------------------------------------------------------------------
