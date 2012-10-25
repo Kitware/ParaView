@@ -10,6 +10,7 @@
   <Proxy group="sources" name="DataObjectGenerator" />
   <Proxy group="sources" name="DiskSource" />
   <Proxy group="sources" name="HierarchicalFractal" />
+  <Proxy group="sources" name="HyperTreeGridSource" />
   <Proxy group="sources" name="LineSource" />
   <Proxy group="sources" name="ImageMandelbrotSource" />
   <Proxy group="sources" name="OctreeFractal" />
