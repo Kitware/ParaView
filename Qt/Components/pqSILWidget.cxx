@@ -85,6 +85,10 @@ void pqSILWidget::onModelReset()
 
   // First add the active-tree.
   pqTreeView* activeTree = new pqTreeView(this);
+  // pqTreeView create a pqCheckableHeaderView which we don't care for since the
+  // pqSILModel handles header-state on its own. We just need to set the default
+  // header.
+  activeTree->setHeader(new QHeaderView(Qt::Horizontal, activeTree));
   activeTree->header()->setStretchLastSection(true);
   activeTree->setRootIsDecorated(false);
   activeTree->header()->setClickable(true);
@@ -104,6 +108,10 @@ void pqSILWidget::onModelReset()
       }
 
     pqTreeView* tree = new pqTreeView(this);
+    // pqTreeView create a pqCheckableHeaderView which we don't care for since the
+    // pqSILModel handles header-state on its own. We just need to set the default
+    // header.
+    tree->setHeader(new QHeaderView(Qt::Horizontal, tree));
     tree->header()->setStretchLastSection(true);
     tree->setRootIsDecorated(false);
 
