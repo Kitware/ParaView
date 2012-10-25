@@ -514,6 +514,15 @@
         <Documentation>This property specifies the subdivision scheme 
         (binary or ternary) of the hyper tree grid.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumLevel"
+                         default_values="1"
+                         name="MaximumLevel"
+                         number_of_elements="1">
+        <IntRangeDomain min="1"
+                        name="range" />
+        <Documentation>The value of this property specifies the maximum
+        number of levels in the hyper tree grid.</Documentation>
+      </IntVectorProperty>
       <!-- End Hyper Tree Grid -->
     </SourceProxy>
     <!-- ==================================================================== -->
