@@ -517,7 +517,7 @@
                      source is a collection of uniform grids. All have the same
                      dimensions. Each block has a different origin and spacing.
                      This source uses the Mandelbrot source to create cell
-                     data. The fractal array is scaled to look like a volme
+                     data. The fractal array is scaled to look like a volume
                      fraction.</Documentation>
       <IntVectorProperty command="SetDimensions"
                          default_values="10"
