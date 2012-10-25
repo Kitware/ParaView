@@ -1631,7 +1631,6 @@ void vtkPVGeometryFilter::HyperTreeGridExecute(
     this->OutlineFlag = 0;
 
     vtkHyperTreeGridGeometry* internalFilter = vtkHyperTreeGridGeometry::New();
-    internalFilter->DualOn();
     //internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
     //internalFilter->SetPassThroughPointIds(this->PassThroughPointIds);
     vtkHyperTreeGrid* htgCopy = vtkHyperTreeGrid::New();
