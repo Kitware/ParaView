@@ -61,11 +61,3 @@ endif()
 IF ( BUILD_EXAMPLES )
   ADD_SUBDIRECTORY(Examples)
 ENDIF ( BUILD_EXAMPLES )
-
-#Tests #######################################################################
-#TODO: Make these tests meaningful and cdash them regularly
-IF ( BUILD_TESTING )
-  ENABLE_TESTING()
-  INCLUDE( CTest )
-  ADD_SUBDIRECTORY(Testing)
-ENDIF ( BUILD_TESTING )

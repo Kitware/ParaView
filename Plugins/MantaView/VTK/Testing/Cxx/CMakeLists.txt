@@ -1,5 +1,3 @@
-INCLUDE_DIRECTORIES(../)
-
 create_test_sourcelist(MANTATESTS
   MantaCxxTests.cxx
   ColorMap.cxx
