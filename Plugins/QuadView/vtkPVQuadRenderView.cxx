@@ -575,6 +575,26 @@ void vtkPVQuadRenderView::SetTexturedBackground(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetOrientationAxesVisibility(bool v)
+{
+  this->Superclass::SetOrientationAxesVisibility(v);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetOrientationAxesVisibility(v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetOrientationAxesInteractivity(bool v)
+{
+  this->Superclass::SetOrientationAxesInteractivity(v);
+  for (int cc=0; cc < 3; cc++)
+    {
+    this->OrthoViews[cc].RenderView->SetOrientationAxesInteractivity(v);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVQuadRenderView::AddRepresentationToTopLeft(vtkDataRepresentation* rep)
 {
   this->GetOrthoRenderView(TOP_LEFT)->AddRepresentation(rep);

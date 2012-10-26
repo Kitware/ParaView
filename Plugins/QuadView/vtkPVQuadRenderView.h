@@ -181,6 +181,8 @@ public:
   virtual void SetBackgroundTexture(vtkTexture* val);
   virtual void SetGradientBackground(int val);
   virtual void SetTexturedBackground(int val);
+  virtual void SetOrientationAxesVisibility(bool);
+  virtual void SetOrientationAxesInteractivity(bool);
 
   //*****************************************************************
   // Helper method that is usefull at the proxy layer to register
