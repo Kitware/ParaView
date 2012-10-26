@@ -163,10 +163,6 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
     return "Cannot support selection in collaboration mode when not MASTER";
     }
 
-  if (session->GetIsAutoMPI())
-    {
-    return "Cannot support selection in auto-mpi mode";
-    }
   if (session->GetController(vtkPVSession::DATA_SERVER_ROOT) !=
     session->GetController(vtkPVSession::RENDER_SERVER_ROOT))
     {
@@ -414,21 +410,38 @@ void vtkSMRenderViewProxy::CreateVTKObjects()
       }
     }
 
-  // Update whether render servers can open display i.e. remote rendering is
-  // possible on all processes.
-  vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
-  this->GetSession()->GatherInformation(
-    vtkPVSession::RENDER_SERVER, info, 0);
-  if (info->GetCanOpenDisplay() == 0)
+  bool remote_rendering_available = true;
+  if (this->GetSession()->GetIsAutoMPI())
+    {
+    // When the session is an auto-mpi session, we don't support remote
+    // rendering.
+    remote_rendering_available = false;
+    }
+ 
+  if (remote_rendering_available)
+    {
+    // Update whether render servers can open display i.e. remote rendering is
+    // possible on all processes.
+    vtkPVDisplayInformation* info = vtkPVDisplayInformation::New();
+    this->GetSession()->GatherInformation(
+      vtkPVSession::RENDER_SERVER, info, 0);
+    if (info->GetCanOpenDisplay() == 0)
+      {
+      remote_rendering_available = false;
+      }
+    info->Delete();
+    }
+
+  // Disable remote rendering on all processes, if not available.
+  if (remote_rendering_available == false)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-      << VTKOBJECT(this)
-      << "RemoteRenderingAvailableOff"
-      << vtkClientServerStream::End;
+           << VTKOBJECT(this)
+           << "RemoteRenderingAvailableOff"
+           << vtkClientServerStream::End;
     this->ExecuteStream(stream);
     }
-  info->Delete();
 
   // Attach to the collaborative session a callback to clear the selection cache
   // on the server side when we became master

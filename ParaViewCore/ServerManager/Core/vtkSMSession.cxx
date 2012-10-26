@@ -36,9 +36,6 @@
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkWeakPointer.h"
 
-// FIXME:MODULARIZATION
-// #include "vtkPVRenderView.h"
-
 #include <vtksys/ios/sstream>
 #include <vtkNew.h>
 #include <assert.h>
@@ -240,8 +237,6 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
 
@@ -249,8 +244,7 @@ vtkIdType vtkSMSession::ConnectToSelf()
     {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
     // Disable Remote-rendering
-    sid = vtkSMSession::ConnectToRemote("localhost", port, false);
-    vtkSMSession::SafeDownCast(pm->GetSession(sid))->IsAutoMPI = true;
+    sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
     }
   else
     {
@@ -277,21 +271,17 @@ vtkIdType vtkSMSession::ConnectToCatalyst()
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 {
-  // By default we allow remote rendering.
-  // Only Auto-MPI has the right to disable it
-  return vtkSMSession::ConnectToRemote(hostname, port, true);
+  return vtkSMSession::ConnectToRemoteInternal(hostname, port, false);
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
-                                        bool allowRemoteRendering)
+vtkIdType vtkSMSession::ConnectToRemoteInternal(
+  const char* hostname, int port, bool is_auto_mpi)
 {
-// FIXME:MODULARIZATION
-  (void) allowRemoteRendering;
-//  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
+  session->IsAutoMPI = is_auto_mpi;
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
@@ -306,8 +296,6 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   const char* rshost, int rsport)
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
@@ -359,8 +347,6 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 vtkIdType vtkSMSession::ReverseConnectToRemote(
   int dsport, int rsport, bool (*callback)())
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkTemp temp;
   temp.Callback = callback;
 

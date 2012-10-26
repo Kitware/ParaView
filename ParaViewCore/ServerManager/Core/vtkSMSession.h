@@ -210,14 +210,14 @@ protected:
   ~vtkSMSession();
 
   // Description:
+  // Internal method used by ConnectToRemote().
+  static vtkIdType ConnectToRemoteInternal(
+    const char* hostname, int port, bool is_auto_mpi);
+
+  // Description:
   // Process the Notifation message sent using API to communicate from
   // server-to-client.
   virtual void ProcessNotification(const vtkSMMessage*);
-
-  // Used by the Auto-MPI to prevent remote rendering, otherwise we should
-  // always allow it.
-  static vtkIdType ConnectToRemote(const char* hostname, int port,
-                                   bool allowRemoteRendering);
 
   // Description:
   // Initialize various internal classes after the session has been setup
