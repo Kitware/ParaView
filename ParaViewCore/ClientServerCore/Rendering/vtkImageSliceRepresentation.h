@@ -114,6 +114,10 @@ public:
   void SetMapScalars(int val);
   void SetUseXYPlane(int val);
 
+  // Description:
+  // Provides access to the actor used by this representation.
+  vtkPVLODActor* GetActor() { return this->Actor; }
+
 //BTX
 protected:
   vtkImageSliceRepresentation();

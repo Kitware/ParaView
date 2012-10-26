@@ -109,6 +109,10 @@ public:
   // Forwarded to vtkSmartVolumeMapper.
   void SetRequestedRenderMode(int);
 
+  // Description:
+  // Provides access to the actor used by this representation.
+  vtkPVLODActor* GetActor() { return this->Actor; }
+
 //BTX
 protected:
   vtkImageVolumeRepresentation();
