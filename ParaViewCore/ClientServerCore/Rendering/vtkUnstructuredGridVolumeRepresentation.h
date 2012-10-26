@@ -116,7 +116,7 @@ public:
 
   // Description:
   // Provides access to the actor used by this representation.
-  vtkPVLODActor* GetActor() { return this->Actor; }
+  vtkPVLODVolume* GetActor() { return this->Actor; }
 
 //BTX
 protected:
