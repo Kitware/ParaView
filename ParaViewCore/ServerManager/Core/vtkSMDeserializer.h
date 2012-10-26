@@ -38,6 +38,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Convenience method for setting the SessionProxyManager. This is equivalent
+  // to calling
+  // vtkSMDeserializer::SetSessionProxyManager(session->GetSessionProxyManager()).
+  void SetSession(vtkSMSession* session);
+
+  // Description:
   // Get/Set the proxy manager on which this deserializer is expected to
   // operate.
   vtkSMSessionProxyManager* GetSessionProxyManager();

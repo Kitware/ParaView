@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMDeserializer.h"
 
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 
 //----------------------------------------------------------------------------
@@ -33,6 +34,13 @@ vtkSMProxy* vtkSMDeserializer::CreateProxy(const char* xmlgroup,
 {
   vtkSMSessionProxyManager* pxm = this->SessionProxyManager;
   return pxm? pxm->NewProxy(xmlgroup, xmlname, subname) : NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMDeserializer::SetSession(vtkSMSession* session)
+{
+  this->SetSessionProxyManager(
+    session? session->GetSessionProxyManager() : NULL);
 }
 
 //----------------------------------------------------------------------------
