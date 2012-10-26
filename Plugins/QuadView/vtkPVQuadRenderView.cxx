@@ -257,6 +257,8 @@ vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::vtkPVQuadRenderView()
 {
+  this->OrientationAxesVisibility = true;
+  this->SliceOrientationAxesVisibility = 0;
   this->ShowCubeAxes = 0;
   this->ShowOutline = 1;
   this->SplitRatio[0] = this->SplitRatio[1] = .5;
@@ -577,11 +579,20 @@ void vtkPVQuadRenderView::SetTexturedBackground(int val)
 //----------------------------------------------------------------------------
 void vtkPVQuadRenderView::SetOrientationAxesVisibility(bool v)
 {
+  this->OrientationAxesVisibility = v;
   this->Superclass::SetOrientationAxesVisibility(v);
   for (int cc=0; cc < 3; cc++)
     {
-    this->OrthoViews[cc].RenderView->SetOrientationAxesVisibility(v);
+    this->OrthoViews[cc].RenderView->SetOrientationAxesVisibility(
+          v && (this->SliceOrientationAxesVisibility != 0));
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetSliceOrientationAxesVisibility(int v)
+{
+  this->SliceOrientationAxesVisibility = v;
+  this->SetOrientationAxesVisibility(this->OrientationAxesVisibility);
 }
 
 //----------------------------------------------------------------------------

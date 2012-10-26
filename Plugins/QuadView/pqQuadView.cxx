@@ -311,7 +311,7 @@ int pqQuadView::getLabelFontSize()
 //-----------------------------------------------------------------------------
 bool pqQuadView::getCubeAxesVisibility()
 {
-return vtkSMPropertyHelper(this->getViewProxy(), "ShowCubeAxes").GetAsInt() != 0;
+  return vtkSMPropertyHelper(this->getViewProxy(), "ShowCubeAxes").GetAsInt() != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -324,12 +324,25 @@ void pqQuadView::setCubeAxesVisibility(bool visible)
 //-----------------------------------------------------------------------------
 bool pqQuadView::getOutlineVisibility()
 {
-return vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").GetAsInt() != 0;
+  return vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").GetAsInt() != 0;
 }
 
 //-----------------------------------------------------------------------------
 void pqQuadView::setOutlineVisibility(bool visible)
 {
   vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").Set(visible ? 1 : 0);
+  this->getViewProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool pqQuadView::getSliceOrientationAxesVisibility()
+{
+  return vtkSMPropertyHelper(this->getViewProxy(), "SliceOrientationAxesVisibility").GetAsInt() != 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqQuadView::setSliceOrientationAxesVisibility(bool visible)
+{
+  vtkSMPropertyHelper(this->getViewProxy(), "SliceOrientationAxesVisibility").Set(visible ? 1 : 0);
   this->getViewProxy()->UpdateVTKObjects();
 }

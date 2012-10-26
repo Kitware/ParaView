@@ -103,6 +103,10 @@ public:
   bool getOutlineVisibility();
   void setOutlineVisibility(bool visible);
 
+  /// Update Slice Orientation Axes visibility
+  bool getSliceOrientationAxesVisibility();
+  void setSliceOrientationAxesVisibility(bool visible);
+
 protected slots:
   void resetSliceOrigin();
 

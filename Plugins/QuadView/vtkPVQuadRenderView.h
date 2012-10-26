@@ -170,6 +170,10 @@ public:
   vtkGetMacro(ShowCubeAxes, int);
   vtkGetMacro(ShowOutline, int);
 
+  // Override SetOrientationAxesVisibility of the 3D view for 2D views
+  void SetSliceOrientationAxesVisibility(int);
+  vtkGetMacro(SliceOrientationAxesVisibility, int);
+
   //*****************************************************************
   // Forwarded accross all the views
   virtual void Add2DManipulator(vtkCameraManipulator* val);
@@ -247,6 +251,8 @@ protected:
 
   int ShowOutline;
   int ShowCubeAxes;
+  int SliceOrientationAxesVisibility;
+  bool OrientationAxesVisibility;
 private:
   vtkPVQuadRenderView(const vtkPVQuadRenderView&); // Not implemented
   void operator=(const vtkPVQuadRenderView&); // Not implemented

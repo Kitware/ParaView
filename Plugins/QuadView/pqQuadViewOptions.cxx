@@ -131,11 +131,14 @@ pqQuadViewOptions::pqQuadViewOptions(QWidget *widgetParent)
                     SIGNAL(valueChanged(int)),
                     this, SIGNAL(changesAvailable()));
 
-  // Show outline/cubeaxes
+  // Show outline/cubeaxes/orientation axes
   QObject::connect( this->Internal->ui.ShowCubeAxes,
                     SIGNAL(stateChanged(int)),
                     this, SIGNAL(changesAvailable()));
   QObject::connect( this->Internal->ui.ShowOutline,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+  QObject::connect( this->Internal->ui.SliceOrientationAxesVisibility,
                     SIGNAL(stateChanged(int)),
                     this, SIGNAL(changesAvailable()));
 }
@@ -196,6 +199,7 @@ void pqQuadViewOptions::applyChanges()
 
   this->View->setCubeAxesVisibility(this->Internal->ui.ShowCubeAxes->isChecked());
   this->View->setOutlineVisibility(this->Internal->ui.ShowOutline->isChecked());
+  this->View->setSliceOrientationAxesVisibility(this->Internal->ui.SliceOrientationAxesVisibility->isChecked());
 
   this->View->render();
 }
@@ -266,6 +270,7 @@ void pqQuadViewOptions::setView(pqView* view)
 
   this->Internal->ui.ShowCubeAxes->setChecked(this->View->getCubeAxesVisibility());
   this->Internal->ui.ShowOutline->setChecked(this->View->getOutlineVisibility());
+  this->Internal->ui.SliceOrientationAxesVisibility->setChecked(this->View->getSliceOrientationAxesVisibility());
 }
 
 //----------------------------------------------------------------------------
