@@ -253,14 +253,18 @@ public:
     this->ForceAsyncRequestReceived = false;
     this->ProgressTimer = vtkTimerLog::New();
     this->ProgressTimer->StartTimer();
+    this->DisableProgressHandling = false;
+
 #ifdef PV_DISABLE_PROGRESS_HANDLING
     this->DisableProgressHandling = true;
 #else
     // Symetric mode mean that we disable progress
-    this->DisableProgressHandling =
-        vtkProcessModule::GetProcessModule()->GetSymmetricMPIMode() ||
-        (vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions()
-         > DISABLE_PROGRESS_FOR_RUN_LARGER_THAN);
+    if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+      {
+      this->DisableProgressHandling =
+        pm->GetSymmetricMPIMode() ||
+        (pm->GetNumberOfLocalPartitions() > DISABLE_PROGRESS_FOR_RUN_LARGER_THAN);
+      }
 #endif
     }
 
