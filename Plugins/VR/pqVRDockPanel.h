@@ -49,7 +49,7 @@ public:
     Superclass(p, f) { this->constructor(); }
   virtual ~pqVRDockPanel();
 
-protected slots:
+private slots:
   void addConnection();
   void removeConnection();
   void updateConnections();
@@ -77,9 +77,10 @@ protected slots:
 private:
   Q_DISABLE_COPY(pqVRDockPanel)
 
+  void constructor();
+
   class pqInternals;
   pqInternals* Internals;
-  void constructor();
 };
 
 #endif

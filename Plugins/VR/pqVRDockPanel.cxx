@@ -54,9 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMVectorProperty.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRInteractorStyleFactory.h"
 #include "vtkWeakPointer.h"
@@ -93,6 +91,8 @@ void pqVRDockPanel::constructor()
   QFont font = this->Internals->debugLabel->font();
   font.setFamily("Courier");
   this->Internals->debugLabel->setFont(font);
+
+  this->Internals->propertyCombo->setCollapseVectors(true);
 
   vtkVRInteractorStyleFactory *styleFactory =
       vtkVRInteractorStyleFactory::GetInstance();
@@ -320,7 +320,7 @@ void pqVRDockPanel::removeConnection()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::addStyle()
 {
-  vtkSMProxy *proxy = this->Internals->proxyCombo->getCurrentProxy();
+  vtkSMProxy *proxy = this->Internals->propertyCombo->getCurrentProxy();
   QByteArray property =
       this->Internals->propertyCombo->getCurrentPropertyName().toLocal8Bit();
   QString styleString = this->Internals->stylesCombo->currentText();
@@ -425,33 +425,7 @@ void pqVRDockPanel::updateStyleButtons(int row)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
 {
-  this->Internals->propertyCombo->setSourceWithoutProperties(pxy);
-  if (!pxy)
-    {
-    return;
-    }
-
-  vtkSmartPointer<vtkSMPropertyIterator> iter;
-  iter.TakeReference(pxy->NewPropertyIterator());
-  // Show only 16 element properties (e.g. 4x4 matrices)
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMVectorProperty* smproperty =
-      vtkSMVectorProperty::SafeDownCast(iter->GetProperty());
-    if (!smproperty || !smproperty->GetAnimateable() ||
-      smproperty->GetInformationOnly())
-      {
-      continue;
-      }
-    unsigned int num_elems = smproperty->GetNumberOfElements();
-    if (num_elems != 16)
-      {
-      continue;
-      }
-
-    this->Internals->propertyCombo->addSMProperty(
-          iter->GetProperty()->GetXMLLabel(), iter->GetKey(), 0);
-    }
+  this->Internals->propertyCombo->setSource(pxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -592,7 +566,8 @@ QString pqVRDockPanel::pqInternals::createName(vtkVRInteractorStyle *style)
   vtkSMProxy *smControlledProxy = style->GetControlledProxy();
   pqProxy *pqControlledProxy = model->findItem<pqProxy*>(smControlledProxy);
   QString name = QString("%1 on %2's %3").arg(desc)
-      .arg(pqControlledProxy->getSMName())
+      .arg(pqControlledProxy ? pqControlledProxy->getSMName()
+                             : smControlledProxy->GetXMLLabel())
       .arg(style->GetControlledPropertyName());
 
   return name;
