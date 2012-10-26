@@ -360,7 +360,7 @@ void vtkLiveInsituLink::OnConnectionCreatedEvent()
 // Callback on Visualization process when a connection dies during
 // ProcessEvents().
 void vtkLiveInsituLink::OnConnectionClosedEvent(
-  vtkObject*, unsigned long eventid, void* calldata)
+  vtkObject*, unsigned long, void* calldata)
 {
   vtkObject* object = reinterpret_cast<vtkObject*>(calldata);
   vtkMultiProcessController* controller =
@@ -374,11 +374,10 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
     vtkMultiProcessController* parallelController =
       vtkMultiProcessController::GetGlobalController();
     int numProcs = parallelController->GetNumberOfProcesses();
-    int myId = parallelController->GetLocalProcessId(); 
 
     if (numProcs > 1)
       {
-      assert(myId == 0);
+      assert(parallelController->GetLocalProcessId() == 0);
       parallelController->TriggerRMIOnAllChildren(DROP_CAT2PV_CONNECTION);
       }
     this->DropCatalystParaViewConnection();
@@ -386,7 +385,7 @@ void vtkLiveInsituLink::OnConnectionClosedEvent(
     // notify client.
     if (this->VisualizationSession)
       {
-      assert(myId == 0);
+      assert(parallelController->GetLocalProcessId() == 0);
       vtkSMMessage message;
       message.set_global_id(this->ProxyId);
       message.set_location(vtkPVSession::CLIENT);
@@ -885,7 +884,7 @@ void vtkLiveInsituLink::OnSimulationUpdate(double time)
     int xml_state_size = 0;
     if (this->InsituXMLStateChanged)
       {
-      xml_state_size = strlen(this->InsituXMLState);
+      xml_state_size = static_cast<int>(strlen(this->InsituXMLState));
       }
     // xml_state_size of 0 indicates that there are not updates to the state.
     // the CoProcessor simply uses the state it received most recently.
