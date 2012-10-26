@@ -291,7 +291,8 @@ private:
     // I'm not a huge fan of this hacky way we are dealing with catalyst. We'll
     // have to come back and cleanly address how the pqPipelineModel deals with
     // "visibility" in a more generic, session-centric way.
-    if (port && port->getServer()->getResource().scheme() == "catalyst")
+    if (port && port->getServer() &&
+        port->getServer()->getResource().scheme() == "catalyst")
       {
       pqLiveInsituVisualizationManager* mgr=
         qobject_cast<pqLiveInsituVisualizationManager*>(
@@ -1008,7 +1009,8 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
 
   QObject::connect(source,
     SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)),
-    this, SLOT(updateVisibility(pqPipelineSource*)));
+    this, SLOT(updateVisibility(pqPipelineSource*)),
+    Qt::QueuedConnection);
 
   QObject::connect(source,
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
