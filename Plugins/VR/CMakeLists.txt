@@ -52,6 +52,8 @@ QT4_WRAP_CPP(MOC_SRCS
   pqVRStarter.h
   ${VRPN_MOC_SRC}
   ${VRUI_MOC_SRC}
+  vtkVRControlSliceOrientationStyle.h
+  vtkVRControlSlicePositionStyle.h
   vtkVRGrabWorldStyle.h
   vtkVRInteractorStyle.h
   vtkVRInteractorStyleFactory.h
@@ -74,6 +76,8 @@ SET( VR_SOURCE_FILES
   pqVRQueueHandler.cxx
   ${VRPN_SOURCE_FILES}
   ${VRUI_SOURCE_FILES}
+  vtkVRControlSliceOrientationStyle.cxx
+  vtkVRControlSlicePositionStyle.cxx
   vtkVRGrabWorldStyle.cxx
   vtkVRInteractorStyle.cxx
   vtkVRInteractorStyleFactory.cxx
