@@ -41,7 +41,7 @@ pqObjectPanel* PrismObjectPanelsImplementation::createPanel(pqProxy* proxy, QWid
     {
     if(!proxy)
       {
-      return false;
+      return NULL;
       }
 
 

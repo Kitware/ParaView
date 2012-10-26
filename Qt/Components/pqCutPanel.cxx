@@ -118,9 +118,9 @@ void pqCutPanel::onRejected()
   this->Implementation->SampleScalarWidget.reset();
 }
 
-void pqCutPanel::setContoursValuesVisibility(bool hide)
+void pqCutPanel::setContoursValuesVisibility(bool hideScalarWidget)
 {
-  if(hide)
+  if(hideScalarWidget)
     {
     this->Implementation->SampleScalarWidgetContainer->hide();
     }

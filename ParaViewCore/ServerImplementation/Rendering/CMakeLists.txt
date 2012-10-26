@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set (Module_SRCS
-  vtkSIAMRVolumeRepresentationProxy.cxx
   vtkSIChartRepresentationProxy.cxx
   vtkSIContextArraysProperty.cxx
   vtkSIImageTextureProxy.cxx

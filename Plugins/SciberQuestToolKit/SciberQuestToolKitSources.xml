@@ -11,6 +11,7 @@ Copyright 2012 SciberQuest Inc.
     <Proxy group="sources" name="vtkSQHemisphereSource"/>
     <Proxy group="sources" name="vtkSQImageSource"/>
     <Proxy group="sources" name="vtkSQLineSource"/>
+    <Proxy group="sources" name="vtkSQLogSource"/>
     <Proxy group="sources" name="vtkSQPointSource"/>
     <Proxy group="sources" name="vtkSQPlaneSource"/>
     <Proxy group="filters" name="vtkSQRandomSeedPoints"/>

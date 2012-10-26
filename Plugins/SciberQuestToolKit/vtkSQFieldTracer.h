@@ -64,10 +64,10 @@ public:
   // Description:
   // Set the run mode of the filter.
   // The enumeration is as follows:
-  //    0  TOPOLOGY filter produces field topology map
   //    1  STREAM   filter produces stream lines
-  //    2  POINCARE filter produces a displacement map
-  //    3  DISPLACEMENT filter produces a poincare map
+  //    2  TOPOLOGY filter produces field topology map
+  //    3  POINCARE filter produces a displacement map
+  //    4  DISPLACEMENT filter produces a poincare map
   // This allows this filter to serve as multiple ParaView filters,
   // the OOCFieldTracer, OOCDTopologyMapper, and OOCDPoincareMapper
   // NOTE This only works if Mode is set before the filter runs.
@@ -88,7 +88,6 @@ public:
   // If set then only forward traces is carried out.
   vtkSetMacro(ForwardOnly,int);
   vtkGetMacro(ForwardOnly,int);
-
 
   // Description:
   // Set integrator type. RK2=1, RK4=2, RK45=3
@@ -159,6 +158,12 @@ public:
   vtkSetMacro(UseCommWorld,int);
   vtkGetMacro(UseCommWorld,int);
 
+  // Descrition:
+  // If set then segments of field lines that are the result of a
+  // periodic boundary condition are removed from the output.
+  vtkSetMacro(CullPeriodicTransitions,int);
+  vtkGetMacro(CullPeriodicTransitions,int);
+
   // Description:
   // If on then color map produced will only contain used colors.
   // NOTE: requires a global communication,
@@ -174,12 +179,24 @@ public:
   // Sets the work unit (in number of seed points) for the master. This should
   // be much less than the slave block size, so that the master can respond
   // timely to slave requests.
-  vtkSetClampMacro(MasterBlockSize,int,1,VTK_INT_MAX);
+  vtkSetClampMacro(MasterBlockSize,int,0,VTK_INT_MAX);
   vtkGetMacro(MasterBlockSize,int);
 
   // Description:
+  // Enable/disable the dynamic scheduler. The dynamic scheduler requires that
+  // a seed generator be inserted into the pipeline, or that all seed points
+  // are generated on all ranks.
   vtkSetMacro(UseDynamicScheduler,int);
   vtkGetMacro(UseDynamicScheduler,int);
+
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
 
 protected:
   vtkSQFieldTracer();
@@ -294,7 +311,10 @@ private:
 
   // Output controls
   int Mode;
+  int CullPeriodicTransitions;
   int SqueezeColorMap;
+
+  int LogLevel;
 
   //BTX
   // units

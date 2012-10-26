@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithmOutput.h"
 #include "vtkCommand.h"
+#include "vtkExtentTranslator.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -29,6 +30,7 @@
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmartVolumeMapper.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkVolumeProperty.h"
 
 #include <map>
@@ -39,7 +41,6 @@ vtkStandardNewMacro(vtkImageVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkImageVolumeRepresentation::vtkImageVolumeRepresentation()
 {
-  this->RequestedRenderMode = 0; // Use Smart Mode
   this->VolumeMapper = vtkSmartVolumeMapper::New();
   this->Property = vtkVolumeProperty::New();
 
@@ -107,8 +108,24 @@ int vtkImageVolumeRepresentation::ProcessViewRequest(
     // will get back to it later.
     if (this->GetNumberOfInputConnections(0) == 1)
       {
-      vtkPVRenderView::SetImageDataProducer(inInfo, this,
-        this->GetInputConnection(0, 0));
+      vtkAlgorithmOutput* connection = this->GetInputConnection(0, 0);
+      vtkAlgorithm* inputAlgo = connection->GetProducer();
+      vtkStreamingDemandDrivenPipeline* sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
+      vtkExtentTranslator* translator =
+        sddp->GetExtentTranslator(connection->GetIndex());
+    
+      int extent[6] = {1, -1, 1, -1, 1, -1};
+      sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
+        extent);
+
+      double origin[3], spacing[3];
+      vtkImageData* image = vtkImageData::SafeDownCast(
+        inputAlgo->GetOutputDataObject(connection->GetIndex()));
+      image->GetOrigin(origin);
+      image->GetSpacing(spacing);
+      vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
+        translator, extent, origin, spacing);
       }
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
@@ -150,6 +167,7 @@ int vtkImageVolumeRepresentation::RequestData(vtkInformation* request,
     this->OutlineSource->SetBounds(vtkImageData::SafeDownCast(
         this->CacheKeeper->GetOutputDataObject(0))->GetBounds());
     this->OutlineSource->GetBounds(this->DataBounds);
+    this->OutlineSource->Update();
     }
   else
     {
@@ -209,7 +227,6 @@ bool vtkImageVolumeRepresentation::RemoveFromView(vtkView* view)
 void vtkImageVolumeRepresentation::UpdateMapperParameters()
 {
   this->VolumeMapper->SelectScalarArray(this->ColorArrayName);
-  this->VolumeMapper->SetRequestedRenderMode(this->RequestedRenderMode);
   switch (this->ColorAttributeType)
     {
   case CELL_DATA:
@@ -329,4 +346,10 @@ void vtkImageVolumeRepresentation::SetShade(bool val)
 void vtkImageVolumeRepresentation::SetIndependantComponents(bool val)
 {
   this->Property->SetIndependentComponents(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkImageVolumeRepresentation::SetRequestedRenderMode(int mode)
+{
+  this->VolumeMapper->SetRequestedRenderMode(mode);
 }

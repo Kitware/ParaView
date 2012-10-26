@@ -264,6 +264,7 @@ public slots:
   /// which different components that support configuration catch and process to
   /// update their behavior.
   void loadConfiguration(const QString& filename);
+  void loadConfigurationXML(const char* xmldata);
 
   /// Renders all windows
   void render();

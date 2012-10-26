@@ -27,6 +27,7 @@
         <file>Icons/pqCaptureScreenshot24.png</file>
         <file>Icons/pqCellCenterData16.png</file>
         <file>Icons/pqCellData16.png</file>
+        <file>Icons/pqClient32.png</file>
         <file>Icons/pqClip24.png</file>
         <file>Icons/pqComparative3DView16.png</file>
         <file>Icons/pqComparativeVis16.png</file>
@@ -35,6 +36,7 @@
         <file>Icons/pqConnect32.png</file>
         <file>Icons/pqCopy22.png</file>
         <file>Icons/pqCut22.png</file>
+        <file>Icons/pqDataServer32.png</file>
         <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect24.png</file>
         <file>Icons/pqDisconnect32.png</file>

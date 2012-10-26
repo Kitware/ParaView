@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 // ParaView GUI includes.
+#include "pq3DWidgetFactory.h"
 #include "pq3DWidgetInterface.h"
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
@@ -209,6 +210,12 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if(widget)
+    {
+    pqApplicationCore::instance()->get3DWidgetFactory()->free3DWidget(widget);
+    }
+  this->setWidgetProxy(0);
   this->setView(0);
   this->setControlledProxy(0);
   delete this->Internal;
@@ -364,7 +371,7 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 {
   this->Internal->VTKConnect->Disconnect();
 
-    vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   pqRenderViewBase* rview = this->renderView();
   vtkSMProxy* viewProxy = rview? rview->getProxy() : NULL;
   if (rview && widget)
@@ -389,6 +396,9 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
       this, SIGNAL(widgetInteraction()));
     this->Internal->VTKConnect->Connect(pxy, vtkCommand::EndInteractionEvent,
       this, SIGNAL(widgetEndInteraction()));
+
+    bool visible = vtkSMPropertyHelper(pxy, "Visibility").GetAsInt() == 1;
+    this->setWidgetVisible(visible);
     }
 
   if (rview && pxy)
@@ -396,7 +406,6 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->updateWidgetVisibility();
     vtkSMPropertyHelper(viewProxy,"HiddenRepresentations").Add(widget);
     viewProxy->UpdateVTKObjects();
     rview->render();

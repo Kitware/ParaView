@@ -133,7 +133,7 @@ public:
     {
     std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
-        1, (void*)data.c_str(), data.size(),
+        1, (void*)data.c_str(), static_cast<int>(data.size()),
         vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, false);
     }
     //-----------------------------------------------------------------
@@ -141,7 +141,7 @@ public:
     {
     std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
-        1, (void*)data.c_str(), data.size(),
+        1, (void*)data.c_str(), static_cast<int>(data.size()),
         vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, true);
     }
   //-----------------------------------------------------------------
@@ -196,7 +196,7 @@ public:
       }
     if(alivedClients.size() > 0)
       {
-      this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], alivedClients.size());
+      this->Owner->SessionCore->GarbageCollectSIObject(&alivedClients[0], static_cast<int>(alivedClients.size()));
       }
     }
   //-----------------------------------------------------------------

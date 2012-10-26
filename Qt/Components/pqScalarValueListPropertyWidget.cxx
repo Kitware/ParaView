@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 
-#include <QListWidget>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QCheckBox>
+#include <QHBoxLayout>
+#include <QListWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include "pqSMAdaptor.h"
 #include "pqCollapsedGroup.h"
@@ -55,8 +55,8 @@ public:
 
 pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *smProperty,
                                                                  vtkSMProxy *smProxy,
-                                                                 QWidget *parent)
-  : pqPropertyWidget(smProxy, parent),
+                                                                 QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget),
     d(new pqScalarValueListPropertyWidgetPrivate)
 {
   this->setShowLabel(false);
@@ -90,9 +90,9 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
   groupBox->setLayout(groupBoxLayout);
 
   // create top-level layout for the group box
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->addWidget(groupBox);
-  this->setLayout(layout);
+  QVBoxLayout *internalLayout = new QVBoxLayout;
+  internalLayout->addWidget(groupBox);
+  this->setLayout(internalLayout);
 
   // set initial values
   this->setScalars(pqSMAdaptor::getMultipleElementProperty(smProperty, pqSMAdaptor::UNCHECKED));
@@ -103,11 +103,11 @@ pqScalarValueListPropertyWidget::~pqScalarValueListPropertyWidget()
   delete d;
 }
 
-void pqScalarValueListPropertyWidget::setScalars(const QVariantList &scalars)
+void pqScalarValueListPropertyWidget::setScalars(const QVariantList &values)
 {
   d->ListWidget->clear();
 
-  foreach(const QVariant &value, scalars)
+  foreach(const QVariant &value, values)
     {
     QListWidgetItem *item = new QListWidgetItem(value.toString());
     item->setFlags(Qt::ItemIsEnabled |
@@ -120,15 +120,15 @@ void pqScalarValueListPropertyWidget::setScalars(const QVariantList &scalars)
 
 QVariantList pqScalarValueListPropertyWidget::scalars() const
 {
-  QVariantList scalars;
+  QVariantList values;
 
   int row = 0;
   while(const QListWidgetItem *item = d->ListWidget->item(row++))
     {
-    scalars.append(item->data(Qt::UserRole));
+    values.append(item->data(Qt::UserRole));
     }
 
-  return scalars;
+  return values;
 }
 
 void pqScalarValueListPropertyWidget::itemChanged(QListWidgetItem *item)

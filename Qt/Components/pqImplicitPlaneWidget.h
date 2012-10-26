@@ -86,9 +86,6 @@ protected:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
-
-  /// Internal method to cleanup widget.
-  void cleanupWidget();
   
 private slots:
   /// Called to show/hide the 3D widget

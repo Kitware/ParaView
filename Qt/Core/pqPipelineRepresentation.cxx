@@ -1029,14 +1029,14 @@ int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& arr
     {
     return 0;
     }
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right((int)strlen(" (cell)")) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop((int)strlen(" (cell)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_CELLS;
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right((int)strlen(" (point)")) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop((int)strlen(" (point)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
     }
 
@@ -1054,14 +1054,14 @@ QString pqPipelineRepresentation::getColorFieldComponentName( const QString& arr
     {
     return 0;
     }
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right((int)strlen(" (cell)")) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop((int)strlen(" (cell)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_CELLS;
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right((int)strlen(" (point)")) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop((int)strlen(" (point)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
     }
 
@@ -1089,14 +1089,14 @@ pqPipelineRepresentation::getColorFieldRange(const QString& array, int component
     {
     return ret;
     }
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right((int)strlen(" (cell)")) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop((int)strlen(" (cell)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_CELLS;
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right((int)strlen(" (point)")) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop((int)strlen(" (point)"));
     fieldType = vtkDataObject::FIELD_ASSOCIATION_POINTS;
     }
 
@@ -1154,15 +1154,15 @@ void pqPipelineRepresentation::setColorField(const QString& value)
     }
   else
     {
-    if(field.right(strlen(" (cell)")) == " (cell)")
+    if(field.right((int)strlen(" (cell)")) == " (cell)")
       {
-      field.chop(strlen(" (cell)"));
+      field.chop((int)strlen(" (cell)"));
       this->colorByArray(field.toAscii().data(), 
                          vtkDataObject::FIELD_ASSOCIATION_CELLS);
       }
-    else if(field.right(strlen(" (point)")) == " (point)")
+    else if(field.right((int)strlen(" (point)")) == " (point)")
       {
-      field.chop(strlen(" (point)"));
+      field.chop((int)strlen(" (point)"));
       this->colorByArray(field.toAscii().data(), 
                          vtkDataObject::FIELD_ASSOCIATION_POINTS);
       }

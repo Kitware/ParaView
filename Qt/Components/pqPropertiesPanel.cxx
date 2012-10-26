@@ -86,7 +86,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqIsoVolumePanel.h"
-#include "pqCalculatorPanel.h"
 #include "pqPassArraysPanel.h"
 #include "pqStreamTracerPanel.h"
 #include "pqTextRepresentation.h"
@@ -128,10 +127,6 @@ public:
          QString("GenericClip") == proxy->getProxy()->GetXMLName())
         {
         return new pqClipPanel(proxy, p);
-        }
-      if(QString("Calculator") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqCalculatorPanel(proxy, p);
         }
       if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
         {
@@ -187,7 +182,6 @@ public:
       {
       if(QString("Clip") == proxy->getProxy()->GetXMLName() ||
          QString("GenericClip") == proxy->getProxy()->GetXMLName() ||
-         QString("Calculator") == proxy->getProxy()->GetXMLName() ||
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
          QString("Glyph") == proxy->getProxy()->GetXMLName() ||
          QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
@@ -301,6 +295,11 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   // enviornmental variable is set
   this->DebugWidgetCreation = 
     vtksys::SystemTools::GetEnv("PV_DEBUG_PANELS") != NULL;
+
+  // enable debugging of the apply button state if the PV_DEBUG_APPLY_BUTTON
+  // enviornmental variable is set
+  this->DebugApplyButtonState =
+    vtksys::SystemTools::GetEnv("PV_DEBUG_APPLY_BUTTON") != NULL;
 
   // enable auto apply for the panel if it enabled in the
   // global paraview settings
@@ -441,6 +440,22 @@ pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *prop
                                                              vtkSMProxy *proxy,
                                                              QWidget *parent)
 {
+  // check for custom widgets
+  pqInterfaceTracker *interfaceTracker =
+    pqApplicationCore::instance()->interfaceTracker();
+  foreach(pqPropertyWidgetInterface *interface,
+          interfaceTracker->interfaces<pqPropertyWidgetInterface *>())
+    {
+    pqPropertyWidget *widget =
+      interface->createWidgetForProperty(proxy, property);
+
+    if(widget)
+      {
+      // stop if we successfully created a property widget
+      return widget;
+      }
+    }
+
   if(vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
     {
     return new pqDoubleVectorPropertyWidget(dvp, proxy, parent);
@@ -744,8 +759,6 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
     {
     this->RepresentationPropertyItems.append(item);
 
-    int row = this->Ui->DisplayLayout->rowCount();
-
     if(item.LabelWidget)
       {
       this->Ui->DisplayLayout->addRow(item.LabelWidget, item.PropertyWidget);
@@ -788,6 +801,8 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
 void pqPropertiesPanel::apply()
 {
+  BEGIN_UNDO_SET("Apply");
+
   QSet<pqProxy*> proxiesToShow;
 
   if(this->Proxy)
@@ -835,6 +850,8 @@ void pqPropertiesPanel::apply()
     }
 
   emit this->applied();
+
+  END_UNDO_SET();
 }
 
 void pqPropertiesPanel::reset()
@@ -937,10 +954,22 @@ void pqPropertiesPanel::updateButtonState()
     {
     if(this->Proxy->modifiedState() == pqProxy::UNINITIALIZED)
       {
+      if(this->DebugApplyButtonState)
+        {
+        qDebug() << "Enabling the Apply button because the current proxy "
+                    "is uninitialized";
+        }
+
       this->Ui->ApplyButton->setEnabled(true);
       }
     else if(this->Proxy->modifiedState() == pqProxy::MODIFIED)
       {
+      if(this->DebugApplyButtonState)
+        {
+        qDebug() << "Enabling the Apply button because the current proxy "
+                    "is modified";
+        }
+
       this->Ui->ApplyButton->setEnabled(true);
       this->Ui->ResetButton->setEnabled(true);
       }
@@ -949,6 +978,24 @@ void pqPropertiesPanel::updateButtonState()
 
 void pqPropertiesPanel::proxyPropertyChanged()
 {
+  if(this->DebugApplyButtonState)
+    {
+    qDebug() << "Proxy Property Changed";
+    QObject *signalSender = this->sender();
+    if(signalSender)
+      {
+      qDebug() << "  sender class: " << signalSender->metaObject()->className();
+
+      pqPropertyWidget *senderWidget =
+          qobject_cast<pqPropertyWidget *>(signalSender);
+      if(senderWidget)
+        {
+        qDebug() << "  xml label: " << senderWidget->property()->GetXMLLabel();
+        qDebug() << "  widget reason: " << senderWidget->reason();
+        }
+      }
+    }
+
   if(this->Proxy->modifiedState() == pqProxy::UNMODIFIED)
     {
     this->Proxy->setModifiedState(pqProxy::MODIFIED);
@@ -1035,7 +1082,7 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
     for(size_t j = 0; j < group->GetNumberOfProperties(); j++)
       {
-      groupProperties.insert(group->GetProperty(j));
+      groupProperties.insert(group->GetProperty(static_cast<unsigned int>(j)));
       }
 
     if(QString(group->GetPanelVisibility()) == "never")
@@ -1150,24 +1197,9 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       continue;
       }
 
-    pqPropertyWidget *propertyWidget = 0;
-
-    pqInterfaceTracker *interfaceTracker = pqApplicationCore::instance()->interfaceTracker();
-    foreach(pqPropertyWidgetInterface *interface, interfaceTracker->interfaces<pqPropertyWidgetInterface *>())
-      {
-      propertyWidget = interface->createWidgetForProperty(smProxy, smProperty);
-
-      if(propertyWidget)
-        {
-        // stop if we successfully created a property widget
-        break;
-        }
-      }
-
-    if(!propertyWidget)
-      {
-      propertyWidget = this->createWidgetForProperty(smProperty, smProxy, this);
-      }
+    // create property widget
+    pqPropertyWidget *propertyWidget =
+      this->createWidgetForProperty(smProperty, smProxy, this);
 
     if(propertyWidget)
       {
@@ -1216,21 +1248,21 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
       if(this->DebugWidgetCreation)
         {
         QString reason = item.PropertyWidget->reason();
-        vtkSMProperty *smProperty = item.PropertyWidget->property();
+        vtkSMProperty *originProperty = item.PropertyWidget->property();
 
         if(!reason.isEmpty())
           {
           qDebug() << "  -"
-                   << proxy->getProxy()->GetPropertyName(smProperty)
-                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << proxy->getProxy()->GetPropertyName(originProperty)
+                   << "(" << originProperty->GetXMLLabel() << ")"
                    << "gets a" << item.PropertyWidget->metaObject()->className()
                    << "containing a" << item.PropertyWidget->reason();
           }
         else
           {
           qDebug() << "  -"
-                   << proxy->getProxy()->GetPropertyName(smProperty)
-                   << "(" << smProperty->GetXMLLabel() << ")"
+                   << proxy->getProxy()->GetPropertyName(originProperty)
+                   << "(" << originProperty->GetXMLLabel() << ")"
                    << "gets a" << item.PropertyWidget->metaObject()->className()
                    << "for an unknown reason";
           }

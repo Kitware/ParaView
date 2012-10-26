@@ -87,6 +87,7 @@
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
 
+  <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="AnnotateGlobalData" />
   <Proxy group="filters" name="Append" />
@@ -108,6 +109,7 @@
   <Proxy group="filters" name="Contour" />
   <Proxy group="filters" name="Curvatures" />
   <Proxy group="filters" name="Cut" />
+  <Proxy group="filters" name="CutEverything" />
   <Proxy group="filters" name="D3" />
   <Proxy group="filters" name="DataSetSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />
@@ -130,6 +132,7 @@
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
+  <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />

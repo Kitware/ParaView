@@ -65,7 +65,7 @@ vtkDataObject* vtkCPMultiBlockGridBuilder::GetGrid(
     this->SetGrid(multiBlock);
     multiBlock->Delete();
     }
-  unsigned int numberOfBlocks = this->Internal->GridBuilders.size();
+  unsigned int numberOfBlocks = static_cast<unsigned int>(this->Internal->GridBuilders.size());
   if(this->Grid->GetNumberOfBlocks() != numberOfBlocks)
     {
     builtNewGrid = 1;
@@ -84,7 +84,6 @@ vtkDataObject* vtkCPMultiBlockGridBuilder::GetGrid(
   return this->Grid;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkCPMultiBlockGridBuilder::AddGridBuilder(vtkCPGridBuilder* gridBuilder)
 {
@@ -95,7 +94,7 @@ void vtkCPMultiBlockGridBuilder::AddGridBuilder(vtkCPGridBuilder* gridBuilder)
 void vtkCPMultiBlockGridBuilder::RemoveGridBuilder(
   vtkCPGridBuilder* gridBuilder)
 {
-  vtkCPMultiBlockGridBuilderInternals::GridBuilderIterator it = 
+  vtkCPMultiBlockGridBuilderInternals::GridBuilderIterator it =
     std::find(this->Internal->GridBuilders.begin(),
                  this->Internal->GridBuilders.end(), gridBuilder);
   if(it != this->Internal->GridBuilders.end())
@@ -117,7 +116,7 @@ unsigned int vtkCPMultiBlockGridBuilder::GetNumberOfGridBuilders()
 }
 
 //----------------------------------------------------------------------------
-vtkCPGridBuilder* 
+vtkCPGridBuilder*
 vtkCPMultiBlockGridBuilder::GetGridBuilder(unsigned int which)
 {
   if(which >= this->GetNumberOfGridBuilders())

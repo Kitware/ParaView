@@ -32,14 +32,14 @@
 #ifndef __vtk1DTransferFunctionChooser_h
 #define __vtk1DTransferFunctionChooser_h
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtk1DTransferFunction.h"
-
 
 class vtk1DLookupTableTransferFunction;
 class vtk1DGaussianTransferFunction;
 class vtkProportionalTransferFunction;
 
-class VTK_EXPORT vtk1DTransferFunctionChooser: public vtk1DTransferFunction
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DTransferFunctionChooser: public vtk1DTransferFunction
 {
 public:
   static vtk1DTransferFunctionChooser* New();

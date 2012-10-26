@@ -184,6 +184,10 @@ option(PARAVIEW_USE_MPI "Enable MPI support for parallel computing" OFF)
 option(PARAVIEW_USE_PISTON "Build ParaView with Piston GPGPU filters" OFF)
 option(PARAVIEW_USE_VISITBRIDGE "Build ParaView with VisIt readers." OFF)
 
+if (UNIX)
+  option(PARAVIEW_ENABLE_FFMPEG "Enable FFMPEG Support." OFF)
+endif()
+
 if (UNIX AND NOT APPLE)
   # Since development installs are currently being tested only on linuxes. We
   # can support these for other platforms if time permits.
@@ -323,8 +327,6 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
-  configure_file("${ParaView_CMAKE_DIR}/CTestCustom.ctest.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.ctest" @ONLY)
 endif()
 
 # Setup default state for ParaView module groups.
@@ -339,10 +341,6 @@ set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_COSMOS_USE_MPI)
 set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
 mark_as_advanced(VTK_VPIC_USE_MPI)
-
-# this bring in states for additional VTK modules that ParaView GUI needs to
-# work.
-include(VTKModules)
 
 #------------------------------------------------------------------------------
 
@@ -410,6 +408,7 @@ else()
     ThirdParty/protobuf
     ThirdParty/QtTesting
     Utilities/ProcessXML
+    Utilities/ColorSeriesToXML
     Utilities/VisItBridge/databases
     Utilities/VisItBridge/Library
     Utilities/WrapClientServer
@@ -420,6 +419,7 @@ else()
     ParaViewCore/VTKExtensions/Core
     ParaViewCore/VTKExtensions/Rendering
     ParaViewCore/VTKExtensions/Default
+    ParaViewCore/VTKExtensions/WebGLExporter
     ParaViewCore/ClientServerCore/Core
     ParaViewCore/ClientServerCore/Rendering
     ParaViewCore/ClientServerCore/Default
@@ -470,15 +470,11 @@ else()
     "${ParaView_BINARY_DIR}/${dir}")
   endforeach()
 
-  enable_required_modules()
-
   # include VTK
   set (old_build_examples ${BUILD_EXAMPLES})
   set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE) 
   add_subdirectory(VTK)
   set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE) 
-
-  hide_enabled_modules()
 
   # keep VTK cmake variables from polluting the non-advanced space.
   mark_as_advanced(
@@ -549,6 +545,7 @@ pv_process_plugins(
   
 add_subdirectory(CommandLineExecutables)
 add_subdirectory(Applications)
+add_subdirectory(Utilities/mpi4py)
 
 #------------------------------------------------------------------------------
 # We add a mechanism to incorporate arbitrary install rules into the
@@ -629,4 +626,12 @@ endif()
 # Build doxygen documentation.
 if (BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
+endif()
+
+
+#-----------------------------------------------------------------------------
+# Configure the CTestCustom.cmake file for exclusions.
+if (BUILD_TESTING)
+  configure_file("${ParaView_CMAKE_DIR}/CTestCustom.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake" @ONLY)
 endif()

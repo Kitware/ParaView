@@ -158,10 +158,20 @@ public:
   virtual void SetDrawZGridlines(int val);
 
   virtual void SetGridLineLocation(int val);
+
+  virtual void SetUseOfAxesOrigin(int val);
+  virtual void SetAxesOrigin(double valX, double valY, double valZ);
+  virtual void SetAxesOrigin(double val[3]);
+
 //BTX
 protected:
   vtkCubeAxesRepresentation();
   ~vtkCubeAxesRepresentation();
+
+  // Description:
+  // Extract Field information from input if any and configure the underneath
+  // cube axes if needed
+  virtual void ConfigureCubeAxes(vtkDataObject* input);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
   virtual int RequestData(vtkInformation*,

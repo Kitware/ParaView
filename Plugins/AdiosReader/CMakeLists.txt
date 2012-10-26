@@ -1,12 +1,12 @@
-#--------------------------------------------------
+#------------------------------------------------------------------------------
 # Find and Use ParaView
-#--------------------------------------------------
+#------------------------------------------------------------------------------
 IF (ParaView_SOURCE_DIR)
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
     ${PARAVIEW_GUI_INCLUDE_DIRS}
     ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-    ${VTK_INCLUDE_DIR}
+    ${VTK_INCLUDE_DIRS}
   )
 ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
@@ -17,78 +17,52 @@ IF(PARAVIEW_BUILD_QT_GUI)
   INCLUDE(${QT_USE_FILE})
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 
-#--------------------------------------------------
-if(WIN32)
-  # Adios is not made for windows, so just build client only plugins
-  ADD_PARAVIEW_PLUGIN(AdiosReaderPlugin "1.0"
-      SERVER_MANAGER_XML vtkAdiosReader.xml
-      GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
+#------------------------------------------------------------------------------
+# Create client side plugin for any platform
+#------------------------------------------------------------------------------
+ADD_PARAVIEW_PLUGIN( AdiosClientOnly "1.4"
+   SERVER_MANAGER_XML
+      Adios.xml
+   GUI_RESOURCE_FILES
+      AdiosGUIReaders.xml AdiosGUISources.xml)
 
-  ADD_PARAVIEW_PLUGIN(AdiosReaderPluginMPI "1.0"
-      SERVER_MANAGER_XML vtkAdiosReader.xml
-      GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
-else(WIN32)
-  include(FindAdios.cmake)
-endif(WIN32)
+#------------------------------------------------------------------------------
+# We enable Adios only on MPI ParaView build
+#------------------------------------------------------------------------------
+if(PARAVIEW_USE_MPI)
 
-#--------------------------------------------------
-# Real plugin management
-#--------------------------------------------------
-IF(ADIOS_INCLUDE_PATH)
+   find_package(MPI)
 
-  INCLUDE_DIRECTORIES(
-       ${ADIOS_INCLUDE_PATH}
-  )
+   #--------------------------------------------------
+   # On Windows we don't try to build anything
+   #--------------------------------------------------
+   if(WIN32)
+      message("
+        The Adios Plugin can not be compiled on Windows.
+        Therefore, we will only a client side plugin will be created.")
+   else(WIN32)
+      include(FindAdios.cmake)
+   endif(WIN32)
 
-  IF(PARAVIEW_USE_MPI)
-     find_package(MPI)
+   #--------------------------------------------------
+   # Real plugin management
+   #--------------------------------------------------
+   IF(ADIOS_INCLUDE_PATH)
+      INCLUDE_DIRECTORIES(
+         ${ADIOS_INCLUDE_PATH}
+         ${MPI_INCLUDE_PATH})
 
-     INCLUDE_DIRECTORIES(
-         ${MPI_INCLUDE_PATH}
-     )
+      ADD_PARAVIEW_PLUGIN( Adios "1.4"
+         SERVER_MANAGER_XML
+            Adios.xml
+         SERVER_MANAGER_SOURCES
+            vtkAdiosPixieReader.cxx
+         GUI_RESOURCE_FILES
+            AdiosGUIReaders.xml AdiosGUISources.xml)
 
-     ADD_PARAVIEW_PLUGIN(AdiosReaderPluginMPI "1.0"
-        SERVER_MANAGER_XML vtkAdiosReader.xml
-        SERVER_MANAGER_SOURCES vtkAdiosReader.cxx
-        GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
+      TARGET_LINK_LIBRARIES( Adios
+         ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})
 
-     TARGET_LINK_LIBRARIES(
-        AdiosReaderPluginMPI
-        ${ADIOS_READ_LIBRARY} ${MPI_LIBRARIES})
+   ENDIF(ADIOS_INCLUDE_PATH)
 
-  ELSE(PARAVIEW_USE_MPI) # ----------- NO MPI ---------------
-
-     ADD_PARAVIEW_PLUGIN(AdiosReaderPlugin "1.0"
-        SERVER_MANAGER_XML vtkAdiosReader.xml
-        SERVER_MANAGER_SOURCES vtkAdiosReader.cxx
-        GUI_RESOURCE_FILES vtkAdiosReaderGUI.xml)
-
-     SET_PROPERTY(
-        TARGET AdiosReaderPlugin
-        APPEND PROPERTY COMPILE_DEFINITIONS "ADIOS_NO_MPI")
-
-     TARGET_LINK_LIBRARIES(
-        AdiosReaderPlugin
-        ${ADIOS_READ_NO_MPI_LIBRARY})
-
-  ENDIF(PARAVIEW_USE_MPI)
-
-  ADD_EXECUTABLE(ShowMetaData ShowMetaData.cxx)
-  TARGET_LINK_LIBRARIES(ShowMetaData ${ADIOS_READ_NO_MPI_LIBRARY})
-  SET_PROPERTY(
-        TARGET ShowMetaData
-        APPEND PROPERTY COMPILE_DEFINITIONS "ADIOS_NO_MPI")
-
-  ADD_EXECUTABLE(TestRealData TestRealData.cxx)
-  TARGET_LINK_LIBRARIES(TestRealData ${ADIOS_READ_NO_MPI_LIBRARY} vtkCommon vtkGraphics)
-  SET_PROPERTY(
-        TARGET TestRealData
-        APPEND PROPERTY COMPILE_DEFINITIONS "ADIOS_NO_MPI")
-
-  ADD_EXECUTABLE(TestRealDataAdiosLib TestRealDataAdiosLib.cxx)
-  TARGET_LINK_LIBRARIES(TestRealDataAdiosLib ${ADIOS_READ_NO_MPI_LIBRARY} vtkCommon )
-  SET_PROPERTY(
-        TARGET TestRealDataAdiosLib
-        APPEND PROPERTY COMPILE_DEFINITIONS "ADIOS_NO_MPI")
-
-ENDIF(ADIOS_INCLUDE_PATH)
+endif(PARAVIEW_USE_MPI)

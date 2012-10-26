@@ -40,8 +40,8 @@ pqXYBarChartView::pqXYBarChartView(const QString& group,
                              const QString& name,
                              vtkSMContextViewProxy* viewModule,
                              pqServer* server,
-                             QObject* parent/*=NULL*/):
-  Superclass(XYBarChartViewType(), group, name, viewModule, server, parent)
+                             QObject* p/*=NULL*/):
+  Superclass(XYBarChartViewType(), group, name, viewModule, server, p)
 {
 }
 

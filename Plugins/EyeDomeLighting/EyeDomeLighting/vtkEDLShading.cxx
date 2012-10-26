@@ -952,6 +952,7 @@ void vtkEDLShading::Render(const vtkRenderState *s)
 void vtkEDLShading::ReleaseGraphicsResources(vtkWindow *w)
 {
   assert("pre: w_exists" && w!=0);
+  (void)w;
 
   //  SHADERS
   if (this->EDLShadeProgram != 0)

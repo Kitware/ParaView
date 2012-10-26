@@ -53,7 +53,8 @@ void vtkPVMemoryUseInformation::CopyFromObject(vtkObject *obj)
 
   info.ProcessType=vtkProcessModule::GetProcessType();
   info.Rank=vtkProcessModule::GetProcessModule()->GetPartitionId();
-  info.MemUse=sysInfo.GetMemoryUsed();
+  info.ProcMemUse=sysInfo.GetProcMemoryUsed();
+  info.HostMemUse=sysInfo.GetHostMemoryUsed();
 
   #ifdef vtkPVMemoryUseInformationDEBUG
   info.Print();
@@ -93,7 +94,8 @@ void vtkPVMemoryUseInformation::CopyToStream(vtkClientServerStream *css)
     *css
       << this->MemInfos[i].ProcessType
       << this->MemInfos[i].Rank
-      << this->MemInfos[i].MemUse;
+      << this->MemInfos[i].ProcMemUse
+      << this->MemInfos[i].HostMemUse;
     }
 
   *css << vtkClientServerStream::End;
@@ -127,8 +129,13 @@ void vtkPVMemoryUseInformation::CopyFromStream(
     ++offset;
 
     vtkVerifyParseMacro(
-        css->GetArgument(0,offset,&MemInfos[i].MemUse),
-        "MemUse");
+        css->GetArgument(0,offset,&MemInfos[i].ProcMemUse),
+        "ProcMemUse");
+    ++offset;
+
+    vtkVerifyParseMacro(
+        css->GetArgument(0,offset,&MemInfos[i].HostMemUse),
+        "HostMemUse");
     ++offset;
     }
 }
@@ -145,5 +152,6 @@ void vtkPVMemoryUseInformation::MemInfo::Print()
   cerr
     << "ProcessType=" << this->ProcessType << endl
     << "Rank=" << this->Rank << endl
-    << "MemUse=" << this->MemUse << endl;
+    << "ProcMemUse=" << this->ProcMemUse << endl
+    << "HostMemUse=" << this->HostMemUse << endl;
 }

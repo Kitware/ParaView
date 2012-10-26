@@ -247,7 +247,8 @@
     </SourceProxy>
     <Proxy class="vtkTexture"
            name="ImageTexture"
-           si_class="vtkSIImageTextureProxy">
+           si_class="vtkSIImageTextureProxy"
+           processes="client|renderserver">
       <Documentation>This is a proxy for a vtkTexture which also includes an
       image file reader. This reader can read an image of client/data server or
       render server and then transmit it to the client/render server where it

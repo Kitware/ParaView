@@ -16,6 +16,7 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
+#include "vtkBoundingBox.h"
 #include "vtkByteSwap.h"
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
@@ -30,7 +31,7 @@
 #include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
-#include "vtkInstantiator.h"
+#include "vtkPVInstantiator.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -548,8 +549,9 @@ void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
-    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
 
   this->MemorySize = data->GetActualMemorySize();
   this->NumberOfCells = 0;
@@ -565,8 +567,9 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
-    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
 
   if(data->GetPoints())
     data->GetPoints()->GetBounds(this->Bounds);
@@ -586,8 +589,9 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
-    = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
+
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
 
   this->MemorySize = data->GetActualMemorySize();
   this->NumberOfCells = data->GetNumberOfRows() * data->GetNumberOfColumns();
@@ -728,7 +732,6 @@ void vtkPVDataInformation::AddInformation(
 {
   vtkPVDataInformation *info;
   int             i,j;
-  double*         bounds;
   int*            ext;
 
   info = vtkPVDataInformation::SafeDownCast(pvi);
@@ -836,25 +839,29 @@ void vtkPVDataInformation::AddInformation(
       }
     }
 
-  // Bounds are only a little harder.
-  bounds = info->GetBounds();
+  vtkBoundingBox bbox;
+  bbox.AddBounds(this->Bounds);
+  bbox.AddBounds(info->GetBounds());
+  if (bbox.IsValid())
+    {
+    bbox.GetBounds(this->Bounds);
+    }
+  else
+    {
+    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
+    }
+
+  // Extents are only a little harder.
   ext = info->GetExtent();
   for (i = 0; i < 3; ++i)
     {
     j = i*2;
-    if (bounds[j] < this->Bounds[j])
-      {
-      this->Bounds[j] = bounds[j];
-      }
     if (ext[j] < this->Extent[j])
       {
       this->Extent[j] = ext[j];
       }
     ++j;
-    if (bounds[j] > this->Bounds[j])
-      {
-      this->Bounds[j] = bounds[j];
-      }
     if (ext[j] > this->Extent[j])
       {
       this->Extent[j] = ext[j];
@@ -977,7 +984,14 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetDataSetTypeAsString()
 {
-  return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
+  if(this->DataSetType == -1)
+    {
+    return "UnknownType";
+    }
+  else
+    {
+    return vtkDataObjectTypes::GetClassNameFromTypeId(this->DataSetType);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1414,7 +1428,7 @@ vtkPVDataInformationHelper* vtkPVDataInformation::FindHelper
   if (iter != helpers.end())
     {
     std::string helperclassname = iter->second;
-    vtkObject* obj = vtkInstantiator::CreateInstance(helperclassname.c_str());
+    vtkObject* obj = vtkPVInstantiator::CreateInstance(helperclassname.c_str());
     vtkPVDataInformationHelper* helper =
       vtkPVDataInformationHelper::SafeDownCast(obj);
     if(!helper)

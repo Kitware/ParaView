@@ -69,7 +69,7 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
       output->DeepCopy(curTable);
       continue;
       }
-    
+
     vtkIdType numRows = curTable->GetNumberOfRows();
     vtkIdType numCols = curTable->GetNumberOfColumns();
     for (vtkIdType i = 0; i < numRows; i++)
@@ -85,8 +85,8 @@ static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_
 
 //----------------------------------------------------------------------------
 int vtkPVMergeTables::RequestData(
-  vtkInformation*, 
-  vtkInformationVector** inputVector, 
+  vtkInformation*,
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   int num_connections = this->GetNumberOfInputConnections(0);
@@ -144,5 +144,3 @@ void vtkPVMergeTables::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

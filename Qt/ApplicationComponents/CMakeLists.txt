@@ -59,10 +59,14 @@ set (Module_SRCS
   pqChartSelectionReaction.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
+  pqColorSelectorPropertyWidget.cxx
+  pqColorSelectorPropertyWidget.h
   pqColorEditorPropertyWidget.cxx
   pqColorEditorPropertyWidget.h
   pqColorToolbar.cxx
   pqColorToolbar.h
+  pqCommandButtonPropertyWidget.cxx
+  pqCommandButtonPropertyWidget.h
   pqCommandLineOptionsBehavior.cxx
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.cxx
@@ -189,6 +193,8 @@ set (Module_SRCS
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.cxx
   pqToggleInteractionViewMode.h
+  pqTransferFunctionEditorPropertyWidget.cxx
+  pqTransferFunctionEditorPropertyWidget.h
   pqUndoRedoBehavior.cxx
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.cxx
@@ -225,8 +231,10 @@ set (Module_MOC_HDRS
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
   pqCollaborationBehavior.h
+  pqColorSelectorPropertyWidget.h
   pqColorEditorPropertyWidget.h
   pqColorToolbar.h
+  pqCommandButtonPropertyWidget.h
   pqCommandLineOptionsBehavior.h
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
@@ -289,6 +297,7 @@ set (Module_MOC_HDRS
   pqTestingReaction.h
   pqTimerLogReaction.h
   pqToggleInteractionViewMode.h
+  pqTransferFunctionEditorPropertyWidget.h
   pqUndoRedoBehavior.h
   pqUndoRedoReaction.h
   pqVCRToolbar.h

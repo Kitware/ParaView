@@ -123,6 +123,15 @@ public:
   virtual void DeActivateAllArrays();
   /// \@}
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   vtkSQOOCBOVReader();
   virtual ~vtkSQOOCBOVReader();
@@ -140,9 +149,12 @@ private:
   PriorityQueue<unsigned long int> *LRUQueue;   // least-recently-used block queue
   int CloseClearsCachedBlocks;                  // controls cache flush on close
 
-  unsigned long int CacheHitCount;              // track block cache hits
-  unsigned long int CacheMissCount;             // track block cache misses
-  vector<int> BlockUse;                         // track the number of blocks used
+  vector<int> CacheHit;                         // count the number of times each block is accessed
+  vector<int> CacheMiss;                        // count the number of times each block is accessed
+  long long CacheHitCount;                      // track block cache hits
+  long long CacheMissCount;                     // track block cache misses
+
+  int LogLevel;                                 // enable logging
 };
 
 #endif

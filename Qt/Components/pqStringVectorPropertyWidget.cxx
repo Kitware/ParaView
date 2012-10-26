@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 
 #include "pqApplicationCore.h"
+#include "pqArrayListDomain.h"
 #include "pqComboBoxDomain.h"
 #include "pqExodusIIVariableSelectionWidget.h"
 #include "pqFileChooserWidget.h"
@@ -68,8 +69,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
-                                                           QWidget *parentWidget)
-  : pqPropertyWidget(smProxy, parentWidget)
+                                                           QWidget *pWidget)
+  : pqPropertyWidget(smProxy, pWidget)
 {
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smProperty);
   if(!svp)
@@ -187,9 +188,6 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       selectorWidget->setObjectName("ArraySelectionWidget");
       selectorWidget->setRootIsDecorated(false);
       selectorWidget->setHeaderLabel(smProperty->GetXMLLabel());
-      this->addPropertyLink(
-        selectorWidget, smProxy->GetPropertyName(smProperty),
-        SIGNAL(widgetModified()), smProperty);
 
       // hide widget label
       this->setShowLabel(false);
@@ -199,6 +197,22 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       this->setReason() << "pqExodusIIVariableSelectionWidget for a "
                         << "StringVectorProperty with a repeatable "
                         << "ArrayListDomain (" << arrayListDomain->GetXMLName() << ")";
+
+      // unlike vtkSMArraySelectionDomain which is doesn't tend to change based
+      // on values of other properties, typically, vtkSMArrayListDomain changes
+      // on other property values e.g. when one switches from point-data to
+      // cell-data, the available arrays change. Hence we "reset" the widget
+      // every time the domain changes.
+      new pqArrayListDomain(selectorWidget,
+        smProxy->GetPropertyName(smProperty),
+        smProxy, smProperty, arrayListDomain);
+
+      this->setReason() 
+        << " Also creating pqArrayListDomain to keep the list updated.";
+
+      this->addPropertyLink(
+        selectorWidget, smProxy->GetPropertyName(smProperty),
+        SIGNAL(widgetModified()), smProperty);
       }
     else
       {

@@ -53,6 +53,7 @@ public:
   /// This adds to already added actions.
   void addActions(const QList<QAction*>& actions);
 
+public slots:
   /// Overridden to trigger the user selected action.
   virtual void accept();
 

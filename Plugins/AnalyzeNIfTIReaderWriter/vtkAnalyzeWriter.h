@@ -45,7 +45,7 @@ protected:
   vtkAnalyzeWriter();
   ~vtkAnalyzeWriter();
   
-  virtual void WriteFile(ofstream *file, vtkImageData *data, int ext[6]);
+  virtual void WriteFile(ofstream *file, vtkImageData *data, int ext[6], int wExtent[6]);
   virtual void WriteFileHeader(ofstream *file, vtkImageData *cache, int wholeExtent[6]);
 private:
 

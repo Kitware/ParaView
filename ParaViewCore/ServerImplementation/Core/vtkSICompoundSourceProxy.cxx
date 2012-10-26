@@ -76,7 +76,7 @@ public:
 
   int GetNumberOfOutputPorts()
     {
-    return this->ExposedPorts.size();
+    return static_cast<int>(this->ExposedPorts.size());
     }
 
   typedef std::vector<PortInfo> VectorOfPortInfo;

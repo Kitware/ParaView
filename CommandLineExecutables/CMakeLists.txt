@@ -72,6 +72,13 @@ if (PARAVIEW_ENABLE_PYTHON)
       ${dependencies}
       ${VTK_PYTHON_LIBRARIES})
   endforeach()
-endif()
 
-#FIXME:MODULARIZATION -- link line for plugins when doing static builds.
+  # add python module dependencies to the server-executables for static builds.
+  foreach (name pvserver pvdataserver pvrenderserver)
+    target_link_libraries(${name}
+        vtkPVPythonSupport
+        ${dependencies}
+        ${VTK_PYTHON_LIBRARIES})
+  endforeach()
+
+endif()

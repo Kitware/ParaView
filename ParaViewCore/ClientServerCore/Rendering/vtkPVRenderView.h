@@ -30,6 +30,7 @@
 class vtkAlgorithmOutput;
 class vtkCamera;
 class vtkCameraManipulator;
+class vtkExtentTranslator;
 class vtkInformationDoubleKey;
 class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
@@ -41,6 +42,7 @@ class vtkMatrix4x4;
 class vtkProp;
 class vtkPVAxesWidget;
 class vtkPVCenterAxesActor;
+class vtkPVDataDeliveryManager;
 class vtkPVDataRepresentation;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVHardwareSelector;
@@ -49,7 +51,6 @@ class vtkPVSynchronizedRenderer;
 class vtkRenderer;
 class vtkRenderViewBase;
 class vtkRenderWindow;
-class vtkPVDataDeliveryManager;
 class vtkTexture;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVRenderView : public vtkPVView
@@ -204,10 +205,8 @@ public:
   vtkBooleanMacro(UseLightKit, bool);
 
   // Description:
-  // EXPERIMENTAL: Components of the streaming API for the render view. This is
-  // still under development.
-  unsigned int GetNextPieceToDeliver(double planes[24]);
-  void StreamingUpdate();
+  void StreamingUpdate(const double view_planes[24]);
+  void DeliverStreamedPieces(unsigned int size, unsigned int *representation_ids);
 
   // Description:
   // USE_LOD indicates if LOD is being used for the current render/update.
@@ -226,6 +225,19 @@ public:
   // Representation can publish this key in their REQUEST_INFORMATION() pass to
   // indicate that the representation needs ordered compositing.
   static vtkInformationIntegerKey* NEED_ORDERED_COMPOSITING();
+
+  // Description:
+  // Key used to pass meta-data about the view frustum in REQUEST_STREAMING_UPDATE()
+  // pass. The value is a double vector with exactly 24 values.
+  static vtkInformationDoubleVectorKey* VIEW_PLANES();
+
+  // Description:
+  // Streaming pass request.
+  static vtkInformationRequestKey* REQUEST_STREAMING_UPDATE();
+
+  // Description:
+  // Pass to relay the streamed "piece" to the representations.
+  static vtkInformationRequestKey* REQUEST_PROCESS_STREAMED_PIECE();
 
   // Description:
   // Make a selection. This will result in setting up of this->LastSelection
@@ -315,12 +327,18 @@ public:
     double bounds[6], vtkMatrix4x4* transform = NULL);
   static void SetStreamable(
     vtkInformation* info, vtkPVDataRepresentation* repr, bool streamable);
+  static void SetNextStreamedPiece(
+    vtkInformation* info, vtkPVDataRepresentation* repr, vtkDataObject* piece);
+  static vtkDataObject* GetCurrentStreamedPiece(
+    vtkInformation* info, vtkPVDataRepresentation* repr);
 
   // Description:
-  // Hack to pass along image data producer to use to generate the KdTree cuts
-  // when volume rendering image data. This code needs refactoring.
-  static void SetImageDataProducer(
-    vtkInformation* info, vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
+  // Pass the structured-meta-data for determining rendering order for ordered
+  // compositing.
+  static void SetOrderedCompositingInformation(
+    vtkInformation* info, vtkPVDataRepresentation* repr,
+    vtkExtentTranslator* translator,
+    const int whole_extents[6], const double origin[3], const double spacing[3]);
 
   // Description:
   // Representations that support hardware (render-buffer based) selection,
@@ -373,13 +391,13 @@ public:
 
   //*****************************************************************
   // Forward to 3D renderer.
-  void SetUseDepthPeeling(int val);
-  void SetMaximumNumberOfPeels(int val);
-  void SetBackground(double r, double g, double b);
-  void SetBackground2(double r, double g, double b);
-  void SetBackgroundTexture(vtkTexture* val);
-  void SetGradientBackground(int val);
-  void SetTexturedBackground(int val);
+  virtual void SetUseDepthPeeling(int val);
+  virtual void SetMaximumNumberOfPeels(int val);
+  virtual void SetBackground(double r, double g, double b);
+  virtual void SetBackground2(double r, double g, double b);
+  virtual void SetBackgroundTexture(vtkTexture* val);
+  virtual void SetGradientBackground(int val);
+  virtual void SetTexturedBackground(int val);
 
   //*****************************************************************
   // Forward to vtkLight.
@@ -400,10 +418,10 @@ public:
 
   //*****************************************************************
   // Forwarded to vtkPVInteractorStyle if present on local processes.
-  void Add2DManipulator(vtkCameraManipulator* val);
-  void RemoveAll2DManipulators();
-  void Add3DManipulator(vtkCameraManipulator* val);
-  void RemoveAll3DManipulators();
+  virtual void Add2DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll2DManipulators();
+  virtual void Add3DManipulator(vtkCameraManipulator* val);
+  virtual void RemoveAll3DManipulators();
 
   // Description:
   // Overridden to synchronize information among processes whenever data
@@ -475,6 +493,13 @@ public:
   // Provides access to the time when Update() was last called.
   unsigned long GetUpdateTimeStamp()
     { return this->UpdateTimeStamp; }
+
+  // Description:
+  // Copy internal fields that are used for rendering decision such as
+  // remote/local rendering, composite and so on. This method was introduced
+  // for the quad view so internal views could use the decision that were made
+  // in the main view.
+  void CopyViewUpdateOptions(vtkPVRenderView* otherView);
 //BTX
 protected:
   vtkPVRenderView();
@@ -543,6 +568,10 @@ protected:
   // SynchronizationCounter is used in multi-clients mode to ensure that the
   // views on two different clients are in the same state as the server side.
   vtkGetMacro(SynchronizationCounter, unsigned int);
+
+  // Description:
+  // Returns true is currently generating a selection.
+  vtkGetMacro(MakingSelection, bool);
 
   vtkLight* Light;
   vtkLightKit* LightKit;

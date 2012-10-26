@@ -25,6 +25,7 @@ vtkStandardNewMacro(vtkPVSessionCoreInterpreterHelper);
 //----------------------------------------------------------------------------
 vtkPVSessionCoreInterpreterHelper::vtkPVSessionCoreInterpreterHelper()
 {
+  this->LogLevel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -56,7 +57,14 @@ vtkObjectBase* vtkPVSessionCoreInterpreterHelper::GetVTKObject(vtkTypeUInt32 gid
     this->Core->GetSIObject(gid));
   if (!siProxy)
     {
-    vtkErrorMacro("No vtkSIProxy for id : " << gid);
+    switch(this->LogLevel)
+      {
+    case 0:
+      vtkErrorMacro("No vtkSIProxy for id : " << gid);
+      break;
+    default:
+      vtkWarningMacro("No vtkSIProxy for id : " << gid);
+      }
     return NULL;
     }
   return siProxy->GetVTKObject();

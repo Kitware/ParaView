@@ -956,3 +956,9 @@ void pqRenderView::onInteractionModeChange()
     emit updateInteractionMode(this->Internal->CurrentInteractionMode);
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqRenderView::setCursor(const QCursor &c)
+{
+  this->getWidget()->setCursor(c);
+}

@@ -34,13 +34,14 @@
 #ifndef __vtkPointSpriteProperty_h_
 #define __vtkPointSpriteProperty_h_
 
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkOpenGLProperty.h"
 
 class vtkRenderWindow;
 class vtkActor;
 class vtkRenderer;
 
-class VTK_EXPORT vtkPointSpriteProperty : public vtkOpenGLProperty
+class VTKPOINTSPRITERENDERING_EXPORT vtkPointSpriteProperty : public vtkOpenGLProperty
 {
 public :
   static vtkPointSpriteProperty* New();

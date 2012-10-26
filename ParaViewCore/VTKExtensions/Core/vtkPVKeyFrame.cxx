@@ -84,7 +84,7 @@ void vtkPVKeyFrame::SetNumberOfKeyValues(unsigned int num)
 //----------------------------------------------------------------------------
 unsigned int vtkPVKeyFrame::GetNumberOfKeyValues()
 {
-  return this->Internals->KeyValues.size();
+  return static_cast<unsigned int>(this->Internals->KeyValues.size());
 }
 
 //----------------------------------------------------------------------------

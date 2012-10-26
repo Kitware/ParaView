@@ -54,6 +54,7 @@ vtkPVOptions::vtkPVOptions()
   this->ClientMode = 0;
   this->ServerMode = 0;
   this->MultiClientMode = 0;
+  this->MultiClientModeWithErrorMacro = 0;
   this->MultiServerMode = 0;
 
   this->RenderServerMode = 0;
@@ -61,9 +62,11 @@ vtkPVOptions::vtkPVOptions()
 
   this->TellVersion = 0;
 
-  this->AMRStreaming = 0;
+  this->EnableStreaming = 0;
 
   this->UseCudaInterop = 0;
+
+  this->SatelliteMessageIds = 0;
 
   // initialize host names
   vtksys::SystemInformation sys_info;
@@ -163,6 +166,12 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument("--multi-clients", 0, &this->MultiClientMode,
                            "Allow server to keep listening for serveral client to"
                            "connect to it and share the same visualization session.",
+                           vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--multi-clients-debug", 0, &this->MultiClientModeWithErrorMacro,
+                           "Allow server to keep listening for serveral client to"
+                           "connect to it and share the same visualization session."
+                           "While keeping the error macro on the server session for debug.",
                            vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
 
   this->AddBooleanArgument("--multi-servers", 0, &this->MultiServerMode,
@@ -298,16 +307,21 @@ void vtkPVOptions::Initialize()
     "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
 
-  this->AddBooleanArgument("--amr-streaming", "-amr",
-    &this->AMRStreaming,
-    "EXPERIMENTAL: When specified, AMR streaming for volume rendering is "
-    "enabled",
-    vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+  this->AddBooleanArgument("--enable-streaming", 0, &this->EnableStreaming,
+    "EXPERIMENTAL: When specified, view-based streaming is enabled for certain "
+    "views and representation types.",
+    vtkPVOptions::ALLPROCESS);
 
   this->AddBooleanArgument("--use-cuda-interop", "-cudaiop",
     &this->UseCudaInterop,
     "When specified, piston classes will use cuda interop for direct rendering",
     vtkPVOptions::PVCLIENT | vtkPVOptions::PVSERVER);
+
+  this->AddBooleanArgument("--enable-satellite-message-ids", "-satellite",
+    &this->SatelliteMessageIds,
+    "When specified, server side messages shown on client show rank of originating process",
+    vtkPVOptions::PVSERVER);
+
 }
 
 //----------------------------------------------------------------------------
@@ -378,16 +392,6 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     return 0;
     }
 #endif //PARAVIEW_ALWAYS_SECURE_CONNECTION
-
-  if (this->AMRStreaming)
-    {
-    vtkErrorMacro("FIXME");
-//  vtkPVView::SetEnableStreaming(true);
-    }
-  else
-    {
-//  vtkPVView::SetEnableStreaming(false);
-    }
 
   return 1;
 }
@@ -538,7 +542,9 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SymmetricMPIMode: " << this->SymmetricMPIMode << endl;
   os << indent << "ServerURL: "
      << (this->ServerURL? this->ServerURL : "(none)") << endl;
-  os << indent << "AMRStreaming:" << this->AMRStreaming << endl;
+  os << indent << "EnableStreaming:" <<
+    (this->EnableStreaming? "yes" : "no") << endl;
 
-  os << indent << "UseCudaInterop" << this->UseCudaInterop << std::endl;
+  os << indent << "UseCudaInterop " << this->UseCudaInterop << std::endl;
+  os << indent << "SatelliteMessageIds " << this->SatelliteMessageIds << std::endl;
 }

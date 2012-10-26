@@ -42,6 +42,7 @@ set (Module_SRCS
   vtkSMContextViewProxy.cxx
   vtkSMDataDeliveryManager.cxx
   vtkSMImplicitPlaneRepresentationProxy.cxx
+  vtkSMMultiSliceViewProxy.cxx
   vtkSMNewWidgetRepresentationProxy.cxx
   vtkSMParallelCoordinatesRepresentationProxy.cxx
   vtkSMPlotMatrixViewProxy.cxx

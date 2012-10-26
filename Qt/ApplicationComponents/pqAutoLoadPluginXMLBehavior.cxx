@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPluginManager.h"
+#include "vtkPVPlugin.h"
+#include "vtkPVPluginTracker.h"
+#include "vtkPVServerManagerPluginInterface.h"
 
 #include <QDir>
 #include "vtkObject.h"
@@ -84,6 +87,29 @@ void pqAutoLoadPluginXMLBehavior::updateResources()
       this->PreviouslyParsedResources.insert(dir);
       }
     }
+
+  // Plugins can also embed gui configuration XMLs. 
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
+    {
+    vtkPVPlugin* plugin = tracker->GetPlugin(cc);
+    if (plugin &&
+        strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") != 0 &&
+        !this->PreviouslyParsedPlugins.contains(plugin->GetPluginName()))
+      {
+      this->PreviouslyParsedPlugins.insert(plugin->GetPluginName());
+      vtkPVServerManagerPluginInterface* smplugin =
+        dynamic_cast<vtkPVServerManagerPluginInterface*>(plugin);
+      if (smplugin)
+        {
+        std::vector<std::string> xmls;
+        smplugin->GetXMLs(xmls);
+        for (size_t kk=0; kk < xmls.size(); kk++)
+          {
+          pqApplicationCore::instance()->loadConfigurationXML(
+            xmls[kk].c_str());
+          }
+        }
+      }
+    }
 }
-
-

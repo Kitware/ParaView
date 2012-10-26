@@ -717,11 +717,18 @@ void pqApplicationCore::loadConfiguration(const QString& filename)
     }
 
   QByteArray dat = xml.readAll();
+  this->loadConfigurationXML(dat.data());
+  xml.close();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadConfigurationXML(const char* xmldata)
+{
   vtkSmartPointer<vtkPVXMLParser> parser =
     vtkSmartPointer<vtkPVXMLParser>::New();
-  if (!parser->Parse(dat.data()))
+
+  if (!parser->Parse(xmldata))
     {
-    xml.close();
     return;
     }
 

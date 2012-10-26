@@ -790,6 +790,28 @@ bool vtkSMProxy::GatherInformation(vtkPVInformation* information)
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMProxy::GatherInformation(
+  vtkPVInformation* information, vtkTypeUInt32 location)
+{
+  assert(information);
+  vtkTypeUInt32 realLocation = (this->Location & location);
+  if (this->GetSession() && realLocation != 0)
+    {
+    // ensure that the proxy is created.
+    this->CreateVTKObjects();
+
+    return this->GetSession()->GatherInformation(
+      realLocation, information, this->GetGlobalID());
+    }
+  if ((this->Location != 0) && (realLocation == 0) && (location != 0))
+    {
+    vtkWarningMacro("GatherInformation was called with location "
+      "on which the proxy does not exist. Ignoring.");
+    }
+  return false;
+}
+
+//---------------------------------------------------------------------------
 bool vtkSMProxy::WarnIfDeprecated()
 {
   if (this->Deprecated)
@@ -1540,6 +1562,13 @@ vtkSMProperty* vtkSMProxy::SetupExposedProperty(vtkPVXMLElement* propertyElement
       panel_visibility_default_for_representation);
     }
 
+  // override panel_widget with that of the exposed property
+  const char *panel_widget = propertyElement->GetAttribute("panel_widget");
+  if(panel_widget)
+    {
+    prop->SetPanelWidget(panel_widget);
+    }
+
   // override label with that of the exposed property
   const char *label = propertyElement->GetAttribute("label");
   if(label)
@@ -2072,7 +2101,7 @@ void vtkSMProxy::LoadState( const vtkSMMessage* message,
 
   // Make sure all dependent domains are updated. UpdateInformation()
   // might have produced new information that invalidates the domains.
-  for (int i=0, nb=touchedProperties.size(); i < nb; i++)
+  for (int i=0, nb=static_cast<int>(touchedProperties.size()); i < nb; i++)
     {
     touchedProperties[i]->UpdateDependentDomains();
     }

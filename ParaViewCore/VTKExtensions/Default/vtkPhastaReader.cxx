@@ -170,7 +170,7 @@ int vtkPhastaReader::readHeader( FILE*       fileObject,
   char Line[1024];
   char junk;
   int FOUND = 0 ;
-  int real_length;
+  size_t real_length;
   int skip_size, integer_value;
   int rewind_count=0;
 
@@ -316,7 +316,7 @@ void vtkPhastaReader::openfile( const char filename[],
     fileArray.push_back( file );
     byte_order.push_back( 0 );         
     header_type.push_back( sizeof(int) );
-    *fileDescriptor = fileArray.size();
+    *fileDescriptor = static_cast<int>(fileArray.size());
     }
   delete [] imode;
 }
@@ -436,7 +436,7 @@ void vtkPhastaReader::readdatablock( int*  fileDescriptor,
     fread( &junk, sizeof(char), 1 , fileObject );
     if ( Wrong_Endian ) 
       {
-      SwapArrayByteOrder( valueArray, type_size, nUnits );
+      SwapArrayByteOrder( valueArray, static_cast<int>(type_size), nUnits );
       }
     } 
   else 

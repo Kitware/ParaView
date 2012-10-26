@@ -18,9 +18,9 @@ Module:    vtkPrismFilter.cxx
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-#include "vtkRectilinearGrid.h" 
+#include "vtkRectilinearGrid.h"
 #include "vtkCellData.h"
-#include "vtkPrismSurfaceReader.h"  
+#include "vtkPrismSurfaceReader.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
@@ -73,7 +73,7 @@ public:
         {
             this->Reader->Delete();
         }
-    } 
+    }
 };
 
 //----------------------------------------------------------------------------
@@ -559,7 +559,7 @@ int vtkPrismFilter::RequestGeometryData(
   vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
     info->Get(vtkDataObject::DATA_OBJECT()));
 
-  if ( !output ) 
+  if ( !output )
     {
     vtkDebugMacro( << "No output found." );
     return 0;
@@ -573,8 +573,6 @@ int vtkPrismFilter::RequestGeometryData(
     unsigned int j=0;
     vtkCompositeDataIterator* iter= inputMB->NewIterator();
     iter->SkipEmptyNodesOn();
-    iter->TraverseSubTreeOn();
-    iter->VisitOnlyLeavesOn();
     iter->GoToFirstItem();
     while(!iter->IsDoneWithTraversal())
       {

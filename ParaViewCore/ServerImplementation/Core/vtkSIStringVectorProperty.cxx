@@ -234,7 +234,7 @@ bool vtkSIStringVectorProperty::Push(const vtkVectorOfStrings &values)
     }
   else
     {
-    int numCommands = values.size() / this->NumberOfElementsPerCommand;
+    int numCommands = static_cast<int>(values.size()) / this->NumberOfElementsPerCommand;
     if (this->SetNumberCommand)
       {
       stream << vtkClientServerStream::Invoke

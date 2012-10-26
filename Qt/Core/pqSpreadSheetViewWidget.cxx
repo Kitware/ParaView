@@ -145,7 +145,7 @@ public:
     qreal height = 0;
     qreal widthUsed = 0;
     this->TextLayout.beginLayout();
-    while (true) {
+    for (;;) {
       QTextLine line = this->TextLayout.createLine();
       if (!line.isValid())
         break;
@@ -195,21 +195,21 @@ pqSpreadSheetViewWidget::~pqSpreadSheetViewWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* model)
+void pqSpreadSheetViewWidget::setModel(QAbstractItemModel* modelToUse)
 {
   // if model is non-null, then it must be a pqSpreadSheetViewModel.
-  Q_ASSERT(model==NULL || qobject_cast<pqSpreadSheetViewModel*>(model) != NULL);
-  this->Superclass::setModel(model);
-  if (model)
+  Q_ASSERT(modelToUse==NULL || qobject_cast<pqSpreadSheetViewModel*>(modelToUse) != NULL);
+  this->Superclass::setModel(modelToUse);
+  if (modelToUse)
     {
     QObject::connect(
-      model, SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
+      modelToUse, SIGNAL(headerDataChanged(Qt::Orientation, int, int)),
       this, SLOT(onHeaderDataChanged()));
     QObject::connect(
-      model, SIGNAL(modelReset()),
+      modelToUse, SIGNAL(modelReset()),
       this, SLOT(onHeaderDataChanged()));
     QObject::connect(
-      model, SIGNAL(modelReset()),
+      modelToUse, SIGNAL(modelReset()),
       this, SLOT(sortColumns()));
     }
 }

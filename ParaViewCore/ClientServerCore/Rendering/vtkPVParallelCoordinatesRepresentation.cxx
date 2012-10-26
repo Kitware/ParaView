@@ -46,18 +46,14 @@ bool vtkPVParallelCoordinatesRepresentation::NumberOfColumnsChanged()
   // I don't think this function should stay around long, column visibility
   // should be set according to the properties ParaView stores and shows in the
   // display panel.
-  if (this->GetLocalOutput())
+  vtkIdType n = GetNumberOfSeries();
+  bool changed = n != this->NumberOfColumns;
+  this->NumberOfColumns = n;
+  if (this->GetChart() && changed)
     {
-    vtkIdType n = this->GetLocalOutput()->GetNumberOfColumns();
-    bool changed = n != this->NumberOfColumns;
-    this->NumberOfColumns = n;
-    if (this->GetChart() && changed)
-      {
-      this->GetChart()->SetColumnVisibilityAll(true);
-      }
-    return changed;
+    this->GetChart()->SetColumnVisibilityAll(true);
     }
-  return false;
+  return changed;
 }
 
 //----------------------------------------------------------------------------
@@ -70,10 +66,15 @@ bool vtkPVParallelCoordinatesRepresentation::AddToView(vtkView* view)
 
   if (this->GetChart())
     {
-    // Set the table, in case it has changed.
-    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
-    this->GetChart()->SetVisible(this->GetVisibility());
-    this->NumberOfColumnsChanged();
+    std::vector<vtkTable*> tables;
+    if(this->GetLocalOutput(tables))
+      {
+      assert(tables.size()==1); //Quick fix: we will need to move sure multiple tables are
+                                // properly handled
+      this->GetChart()->GetPlot(0)->SetInputData(tables[0]);
+      this->GetChart()->SetVisible(this->GetVisibility());
+      this->NumberOfColumnsChanged();
+      }
     }
 
   return true;
@@ -163,8 +164,14 @@ int vtkPVParallelCoordinatesRepresentation::RequestData(vtkInformation* request,
     {
     // Set the table, in case it has changed.
     // FIXME: This causes us to do more work that we should here.
-    this->GetChart()->GetPlot(0)->SetInputData(this->GetLocalOutput());
-    this->NumberOfColumnsChanged();
+    std::vector<vtkTable*> tables;
+    if(this->GetLocalOutput(tables))
+      {
+      assert(tables.size()==1); //Quick fix: we will need to move sure multiple tables are
+                                // properly handled
+      this->GetChart()->GetPlot(0)->SetInputData(tables[0]);
+      this->NumberOfColumnsChanged();
+      }
     }
 
   return 1;

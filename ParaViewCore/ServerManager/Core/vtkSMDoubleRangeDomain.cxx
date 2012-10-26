@@ -117,7 +117,7 @@ int vtkSMDoubleRangeDomain::IsInDomain(unsigned int idx, double val)
 //---------------------------------------------------------------------------
 unsigned int vtkSMDoubleRangeDomain::GetNumberOfEntries()
 {
-  return this->DRInternals->Entries.size();
+  return static_cast<unsigned int>(this->DRInternals->Entries.size());
 }
 
 //---------------------------------------------------------------------------

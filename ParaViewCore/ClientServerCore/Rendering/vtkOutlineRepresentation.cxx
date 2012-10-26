@@ -24,8 +24,6 @@ vtkOutlineRepresentation::vtkOutlineRepresentation()
   this->SetUseOutline(1);
   this->SetRepresentation(WIREFRAME);
 
-  // this doesn't work right now, but once it starts working it will come handy.
-  this->SetSuppressLOD(1);
 
   this->SetAmbient(1);
   this->SetDiffuse(0);
@@ -33,6 +31,8 @@ vtkOutlineRepresentation::vtkOutlineRepresentation()
 
   // you cannot select the outline!
   this->SetPickable(0);
+
+  this->SetSuppressLOD(1);
 }
 
 //----------------------------------------------------------------------------

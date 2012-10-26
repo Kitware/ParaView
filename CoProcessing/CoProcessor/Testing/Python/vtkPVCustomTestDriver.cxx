@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVCustomTestDriver.h"
 
+#include "vtkCommunicator.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPLinearScalarFieldFunction.h"
@@ -22,7 +23,11 @@
 #include "vtkCPPythonScriptPipeline.h"
 #include "vtkCPUniformGridBuilder.h"
 #include "vtkDataObject.h"
+#include "vtkImageData.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStructuredGrid.h"
 
 vtkStandardNewMacro(vtkPVCustomTestDriver);
 
@@ -33,7 +38,7 @@ vtkPVCustomTestDriver::vtkPVCustomTestDriver()
   this->Processor->Initialize();
 
   // Specify how the field varies over space and time.
-  vtkCPLinearScalarFieldFunction* fieldFunction = 
+  vtkCPLinearScalarFieldFunction* fieldFunction =
     vtkCPLinearScalarFieldFunction::New();
   fieldFunction->SetConstant(2.);
   fieldFunction->SetTimeMultiplier(100);
@@ -81,7 +86,7 @@ int vtkPVCustomTestDriver::Run()
     vtkErrorMacro("Need to set the grid builder.");
     return 1;
     }
-  
+
   for(unsigned long i=0;i<this->GetNumberOfTimeSteps();i++)
     {
     // now call the coprocessing library
@@ -89,7 +94,7 @@ int vtkPVCustomTestDriver::Run()
     double time = this->GetTime(i);
     dataDescription->SetTimeData(time, i);
     dataDescription->AddInput("input");
-    
+
     if(this->Processor->RequestDataDescription(dataDescription))
       {
       unsigned int numberOfFields =
@@ -97,10 +102,35 @@ int vtkPVCustomTestDriver::Run()
       if(!numberOfFields)
         {
         cout << "No fields for coprocessing.\n";
-        }      
+        }
       int builtNewGrid = 0;
       vtkDataObject* grid = gridBuilder->GetGrid(i, this->GetTime(i), builtNewGrid);
       dataDescription->GetInputDescriptionByName("input")->SetGrid(grid);
+      // we need to get the whole extent of any structured grids
+      int extent[6];
+      if(vtkImageData* image = vtkImageData::SafeDownCast(grid))
+        {
+        image->GetExtent(extent);
+        }
+      else if(vtkRectilinearGrid* rgrid = vtkRectilinearGrid::SafeDownCast(grid))
+        {
+        rgrid->GetExtent(extent);
+        }
+      else if(vtkStructuredGrid* sgrid = vtkStructuredGrid::SafeDownCast(grid))
+        {
+        sgrid->GetExtent(extent);
+        }
+      for(int j=0;j<3;j++)
+        {
+        extent[2*j] = -extent[2*j];
+        }
+      int wholeExtent[6];
+      vtkMultiProcessController::GetGlobalController()->AllReduce(extent, wholeExtent, 6, vtkCommunicator::MAX_OP);
+      for(int j=0;j<3;j++)
+        {
+        wholeExtent[2*j] = -wholeExtent[2*j];
+        }
+      dataDescription->GetInputDescriptionByName("input")->SetWholeExtent(wholeExtent);
       this->Processor->CoProcess(dataDescription);
       }
     dataDescription->Delete();
@@ -113,7 +143,7 @@ int vtkPVCustomTestDriver::Run()
 int vtkPVCustomTestDriver::Initialize(const char* fileName)
 {
   vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
-  
+
   int success = pipeline->Initialize(fileName);
   this->Processor->AddPipeline(pipeline);
   pipeline->Delete();

@@ -127,7 +127,7 @@ void pqBoxWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("BoxWidgetRepresentation", server);
+    get3DWidget("BoxWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();
@@ -167,18 +167,6 @@ void pqBoxWidget::resetBounds(double input_bounds[6])
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
   widget->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void pqBoxWidget::cleanupWidget()
-{
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

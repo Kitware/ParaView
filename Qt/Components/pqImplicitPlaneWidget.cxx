@@ -177,8 +177,6 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 {
-  this->cleanupWidget();
-
   delete this->Implementation;
 }
 
@@ -187,7 +185,7 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget = 
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("ImplicitPlaneWidgetRepresentation", server);
+    get3DWidget("ImplicitPlaneWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
@@ -225,19 +223,6 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
   this->Implementation->UI->normalZ,
     "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 2);
-}
-
-//-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::cleanupWidget()
-{
-  this->Implementation->Links.removeAllPropertyLinks();
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

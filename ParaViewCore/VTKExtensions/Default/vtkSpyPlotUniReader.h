@@ -139,6 +139,9 @@ public:
   // Returns the number of materials
   int GetNumberOfMaterials( ) const { return NumberOfMaterials; }
 
+  // Returns the number of dimensions
+  int GetNumberOfDimensions() const { return NumberOfDimensions; }
+
   // Returns the coordinate system of the file
   int GetCoordinateSystem( ) const { return IGM; }
 
@@ -148,7 +151,6 @@ public:
     char Comment[80];
     int Index;
   };
-
   struct Variable
   {
     char* Name;
@@ -173,6 +175,32 @@ public:
     vtkFloatArray *TracerCoord;
     vtkIntArray *TracerBlock;
   };
+  struct MarkerMaterialField
+  {
+    char Name[30];
+    char Label[256];
+  };
+  struct MaterialMarker
+  {
+    int NumMarks;
+    int NumRealMarks;
+    int NumVars;
+    MarkerMaterialField *Variables;
+  };
+  struct MarkerDump
+  {
+    vtkFloatArray *XLoc;
+    vtkFloatArray *YLoc;
+    vtkFloatArray *ZLoc;
+    vtkIntArray *ILoc;
+    vtkIntArray *JLoc;
+    vtkIntArray *KLoc;
+    vtkIntArray *Block;
+    vtkFloatArray **Variables;
+  };
+  MaterialMarker* Markers;
+  MarkerDump* MarkersDumps;
+  vtkSetMacro(GenerateMarkers, int);
 
   vtkSpyPlotBlock* GetDataBlock(int block);
 
@@ -193,10 +221,12 @@ private:
                           unsigned char* out, int outSize);
 
   int ReadHeader(vtkSpyPlotIStream *spis);
+  int ReadMarkerHeader(vtkSpyPlotIStream *spis);
   int ReadCellVariableInfo(vtkSpyPlotIStream *spis);
   int ReadMaterialInfo(vtkSpyPlotIStream *spis);
   int ReadGroupHeaderInformation(vtkSpyPlotIStream *spis);
   int ReadDataDumps(vtkSpyPlotIStream *spis);
+  int ReadMarkerDumps(vtkSpyPlotIStream *spis);
 
   vtkDataArray* GetMaterialField(const int& block, const int& materialIndex, const char* Id);
 
@@ -215,6 +245,8 @@ private:
   double GlobalMax[3];
   int NumberOfBlocks;
   int MaximumNumberOfLevels;
+  int MarkersOn;
+  int GenerateMarkers;
 
   // For storing possible cell/material fields meta data
   int NumberOfPossibleCellFields;

@@ -13,13 +13,16 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkPVConfig.h"
-#include "vtkPVInitializer.h"
+
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerInterpreterInitializer.h"
+#include "vtkNew.h"
 #include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
+#include "vtkPVInitializer.h"
 #include "vtkPVOptions.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
@@ -120,6 +123,19 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   // Make sure the ProxyManager get created...
   vtkSMProxyManager::GetProxyManager();
+
+  // Now load any plugins located in the PV_PLUGIN_PATH environment variable.
+  // These are always loaded (not merely located).
+  vtkNew<vtkPVPluginLoader> loader;
+  loader->LoadPluginsFromPluginSearchPath();
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::StandaloneInitialize()
+{
+  // Verify that the version of the library that we linked against is
+  // compatible with the version of the headers we compiled against.
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
 }
 
 //----------------------------------------------------------------------------
@@ -131,7 +147,14 @@ void vtkInitializationHelper::Finalize()
   // Optional:  Delete all global objects allocated by libprotobuf.
   google::protobuf::ShutdownProtobufLibrary();
 }
-  
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::StandaloneFinalize()
+{
+  // Optional:  Delete all global objects allocated by libprotobuf.
+  google::protobuf::ShutdownProtobufLibrary();
+}
+
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::PrintSelf(ostream& os, vtkIndent indent)
 {

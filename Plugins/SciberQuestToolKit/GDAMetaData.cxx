@@ -139,7 +139,7 @@ int GDAMetaData::OpenDatasetForRead(const char *fileName)
     // this represents a small ammount of data thus it's
     // probably better to read on proc 0 and distribute over
     // the network.
-    size_t n[3]={nx+1,ny+1,nz+1};
+    size_t n[3]={size_t(nx+1),size_t(ny+1),size_t(nz+1)};
     char coordId[]="xyz";
     ostringstream coordFn;
 

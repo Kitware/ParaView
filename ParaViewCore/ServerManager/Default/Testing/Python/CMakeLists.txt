@@ -40,6 +40,7 @@ ENDIF ()
 ###############################################################################
 # For python scripts for testing.
 #
+include (TestNumPy)
 
 # Add python script names here.
 SET (PY_TESTS
@@ -52,11 +53,13 @@ SET (PY_TESTS
   PythonSMTraceTest2
   PythonAnimationTrack
   GhostCellsInMergeBlocks
-  Python2DRendering
+#  Python2DRendering =======> REAL Scalar Bar Rendering bug
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )
-
+if (FOUND_NUMPY)
+  list(APPEND PY_TESTS PythonSelection)
+endif()
 
 IF (PARAVIEW_DATA_ROOT)
   FOREACH (tfile ${PY_TESTS})
@@ -119,6 +122,7 @@ ENDIF ()
 
 SET (PVBATCH_TESTS
   Simple
+  UserTransformOnRepresentation
   ParallelImageWriter
   ParallelSerialWriter
 )

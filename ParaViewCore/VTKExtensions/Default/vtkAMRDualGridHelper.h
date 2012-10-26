@@ -140,9 +140,9 @@ private:
   void ShareBlocksWithNeighbors(vtkIntArray *neighbors);
   void ShareBlocksWithNeighborsAsynchronous(vtkIntArray *neighbors);
   void ShareBlocksWithNeighborsSynchronous(vtkIntArray *neighbors);
-  int MarshalBlocks(void *buffer, unsigned int sizeLimit);
-  void UnmarshalBlocks(void *buffer);
-  void UnmarshalBlocksFromOne(void *buffer, int blockProc);
+  void MarshalBlocks(vtkIntArray* buffer);
+  void UnmarshalBlocks(vtkIntArray *buffer);
+  void UnmarshalBlocksFromOne(vtkIntArray *buffer, int blockProc);
 
   vtkMultiProcessController *Controller;
   void ComputeGlobalMetaData(vtkNonOverlappingAMR* input);

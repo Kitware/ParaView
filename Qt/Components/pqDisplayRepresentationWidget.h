@@ -68,6 +68,7 @@ private:
   pqDisplayRepresentationWidgetInternal* Internal;
 };
 
+/// A property widget for selecting the display representation.
 class PQCOMPONENTS_EXPORT pqDisplayRepresentationPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

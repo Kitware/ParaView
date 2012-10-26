@@ -75,7 +75,7 @@ void vtkSMProxyListDomain::AddProxy(const char* group, const char* name)
 //-----------------------------------------------------------------------------
 unsigned int vtkSMProxyListDomain::GetNumberOfProxyTypes()
 {
-  return this->Internals->ProxyTypeList.size();
+  return static_cast<unsigned int>(this->Internals->ProxyTypeList.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void vtkSMProxyListDomain::AddProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 unsigned int vtkSMProxyListDomain::GetNumberOfProxies()
 {
-  return this->Internals->ProxyList.size();
+  return static_cast<unsigned int>(this->Internals->ProxyList.size());
 }
 
 //-----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ bool vtkSMProxyListDomain::HasProxy(vtkSMProxy* proxy)
 //-----------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyListDomain::GetProxy(unsigned int index)
 {
-  if (index > this->Internals->ProxyList.size())
+  if (index >= this->Internals->ProxyList.size())
     {
     vtkErrorMacro("Index " << index << " greater than max "
       << this->Internals->ProxyList.size());

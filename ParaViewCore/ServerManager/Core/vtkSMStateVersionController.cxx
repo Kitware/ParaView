@@ -68,7 +68,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
   // They may or may not have the backwards compatibility issue of
   // the previous release. We assume that they do because updating
   // them should not break anything even if they do not.
-  if (this->GetMajor(version)==3 && 
+  if (this->GetMajor(version)==3 &&
       (this->GetMinor(version)==0 || this->GetMinor(version)==1))
     {
     if (this->GetMinor(version)==0 && this->GetPatch(version) < 2)
@@ -85,7 +85,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     this->UpdateVersion(version, updated_version);
     }
 
-  if (this->GetMajor(version)==3 && 
+  if (this->GetMajor(version)==3 &&
       (this->GetMinor(version)==2 || this->GetMinor(version)==3))
     {
     status = status && this->Process_3_2_To_3_4(root) ;
@@ -105,7 +105,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* parent)
     int updated_version[3] = {3, 6, 0};
     this->UpdateVersion(version, updated_version);
     }
-    
+
   if ( this->GetMajor( version ) == 3 && this->GetMinor( version ) < 8 )
     {
     status = status && this->Process_3_6_to_3_8( root );
@@ -173,7 +173,7 @@ bool ConvertLegacyReader(
 }
 
 //----------------------------------------------------------------------------
-// Called for every data-object display. We will update scalar color 
+// Called for every data-object display. We will update scalar color
 // properties since those changed.
 bool ConvertDataDisplaysToRepresentations(vtkPVXMLElement* root,
   void* vtkNotUsed(callData))
@@ -218,7 +218,7 @@ bool ConvertDataDisplaysToRepresentations(vtkPVXMLElement* root,
       else if (pname && strcmp(pname, "ScalarMode")==0)
         {
         child->SetAttribute("name", "ColorAttributeType");
-        vtkPVXMLElement* valueElement = 
+        vtkPVXMLElement* valueElement =
           child->FindNestedElementByName("Element");
         if (valueElement)
           {
@@ -371,12 +371,21 @@ bool ConvertPVAnimationSceneToAnimationScene(
 //----------------------------------------------------------------------------
 bool ConvertStreamTracer( vtkPVXMLElement * root, void * callData )
 {
-  vtkSMStateVersionController * self 
+  vtkSMStateVersionController * self
     = reinterpret_cast< vtkSMStateVersionController * >( callData );
   return self->ConvertStreamTracer( root );
 }
 
+//----------------------------------------------------------------------------
+bool ConvertExodusIIReader( vtkPVXMLElement * root, void * callData )
+{
+  vtkSMStateVersionController * self
+    = reinterpret_cast< vtkSMStateVersionController * >( callData );
+  return self->ConvertExodusIIReader( root );
+}
+
 }; // namespace end
+
 
 //----------------------------------------------------------------------------
 bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
@@ -538,7 +547,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
     }
 
     {
-    // Remove element inspector representations. 
+    // Remove element inspector representations.
     const char* attrs[] = {
       "type", "ElementInspectorDisplay", 0};
     const char* newAttrs[] = {
@@ -551,7 +560,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
     {
     // Convert Axes to AxesRepresentation.
     const char* attrs[] = {
-      "group", "axes", 
+      "group", "axes",
       "type", "Axes", 0};
     const char* newAttrs[] = {
       "group", "representations",
@@ -573,7 +582,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
 
 
     {
-    // Select all LegacyVTKFileReader elements 
+    // Select all LegacyVTKFileReader elements
     const char* attrs[] = {
       "type", "legacyreader", 0};
     this->Select( root, "Proxy", attrs,
@@ -581,7 +590,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
     }
 
     {
-    // Convert all legacyreader proxies to LegacyVTKFileReader 
+    // Convert all legacyreader proxies to LegacyVTKFileReader
     const char* attrs[] = {
       "type", "legacyreader", 0};
     const char* newAttrs[] = {
@@ -595,7 +604,7 @@ bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
     const char* attrs[] = {
       "type", "PVAnimationScene", 0};
     this->Select(
-      root, "Proxy", attrs, 
+      root, "Proxy", attrs,
       &::ConvertPVAnimationSceneToAnimationScene, this);
     }
 
@@ -669,12 +678,12 @@ bool vtkSMStateVersionController::ConvertPVAnimationSceneToAnimationScene(
     vtksys_ios::ostringstream idST;
     idST << parent->GetAttribute("id") << ".StartTime";
     startTime->SetAttribute("id", idST.str().c_str());
-    
-    vtkPVXMLElement* element = 
+
+    vtkPVXMLElement* element =
       vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(0));
     ctRange->RemoveNestedElement(element);
     startTime->AddNestedElement(element);
-    
+
     parent->AddNestedElement(startTime);
     startTime->Delete();
 
@@ -685,18 +694,66 @@ bool vtkSMStateVersionController::ConvertPVAnimationSceneToAnimationScene(
     vtksys_ios::ostringstream idET;
     idET << parent->GetAttribute("id") << ".EndTime";
     endTime->SetAttribute("id", idET.str().c_str());
-    
+
     element = vtkPVXMLElement::SafeDownCast(elements->GetItemAsObject(1));
     ctRange->RemoveNestedElement(element);
     element->SetAttribute("index", "0");
     endTime->AddNestedElement(element);
-    
+
     parent->AddNestedElement(endTime);
     endTime->Delete();
 
     parent->RemoveNestedElement(ctRange);
     }
 
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::ConvertExodusIIReader(vtkPVXMLElement* root)
+{
+  unsigned int numElements = root->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElements; cc++)
+    {
+    vtkPVXMLElement* prop = root->GetNestedElement(cc);
+    for (unsigned int dd=0; dd < prop->GetNumberOfNestedElements(); dd++)
+      {
+      vtkPVXMLElement* blockProp = prop->GetNestedElement(dd);
+      const char* blockPropName = blockProp->GetAttribute("name");
+      if(blockPropName && strcmp(blockPropName,"array_list")==0)
+        {
+        for (unsigned int ee=0; ee < blockProp->GetNumberOfNestedElements(); ee++)
+          {
+          vtkPVXMLElement* listProp = blockProp->GetNestedElement(ee);
+          const char* value = listProp->GetAttribute("text");
+          if(value)
+            {
+            vtkStdString bname(value);
+            size_t i = bname.find(" Size: ");
+            if(i!= vtkStdString::npos)
+              {
+              bname.erase(i);
+              listProp->SetAttribute("value",bname);
+              }
+            }
+          }
+        }
+      else
+        {
+        const char* value = blockProp->GetAttribute("value");
+        if(value)
+          {
+          vtkStdString bname(value);
+          size_t i = bname.find(" Size: ");
+          if(i!= vtkStdString::npos)
+            {
+            bname.erase(i);
+            blockProp->SetAttribute("value",bname);
+            }
+          }
+        }
+      }
+    }
   return true;
 }
 
@@ -716,7 +773,7 @@ bool ConvertTemporalShiftScale(
   self->SelectAndSetAttributes(
     parent,
    "Property", attrs, newAttrs);
-    
+
   return true;
 }
 };
@@ -725,13 +782,13 @@ bool ConvertTemporalShiftScale(
 bool vtkSMStateVersionController::Process_3_2_To_3_4(vtkPVXMLElement* root)
 {
   {
-  // Select all LegacyVTKFileReader elements 
+  // Select all LegacyVTKFileReader elements
   const char* attrs[] = {
     "type", "TemporalShiftScale", 0};
   this->Select( root, "Proxy", attrs,
     &::ConvertTemporalShiftScale, this);
   }
-  
+
   return true;
 }
 
@@ -763,7 +820,7 @@ bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
 
     {
     // "CTHFragmentConnect" was removed from the open source version due to
-    // export control issues. 
+    // export control issues.
     const char* attrs[] = {"type", "CTHFragmentConnect", 0};
     bool found = false;
     this->Select(root, "Proxy", attrs, &::ElementFound, &found);
@@ -777,7 +834,7 @@ bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
 
     {
     // "CTHFragmentIntersect" was removed from the open source version due to
-    // export control issues. 
+    // export control issues.
     const char* attrs[] = {"type", "CTHFragmentIntersect", 0};
     bool found = false;
     this->Select(root, "Proxy", attrs, &::ElementFound, &found);
@@ -837,7 +894,7 @@ bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
 //----------------------------------------------------------------------------
 bool vtkSMStateVersionController::ConvertStreamTracer(vtkPVXMLElement* parent)
 {
-  // Replace property "InitialIntegrationStepUnit" with property 
+  // Replace property "InitialIntegrationStepUnit" with property
   // "IntegrationStepUnit", ignoring properties "MinimumIntegrationStepUnit",
   // "MaximumIntegrationStepUnit", and "MaximumPropagationUnit".
   const char* attrs[]    = { "name", "InitialIntegrationStepUnit", 0 };
@@ -858,7 +915,7 @@ bool vtkSMStateVersionController::Process_3_6_to_3_8( vtkPVXMLElement * root )
     const char * attrs1[] = { "type", "ArbitrarySourceStreamTracer", 0 };
     this->Select( root, "Proxy", attrs0, &::ElementFound, &found0 );
     this->Select( root, "Proxy", attrs1, &::ElementFound, &found1 );
-    
+
     if ( found0 || found1 )
       {
       vtkWarningMacro( "Your state file uses (vtk)StreamTracer. "
@@ -867,7 +924,7 @@ bool vtkSMStateVersionController::Process_3_6_to_3_8( vtkPVXMLElement * root )
         " the settings may be converted to values other than specified." );
       }
     }
-    
+
     {
     // Replace abandoned properties of vtkStreamTracer with new ones
     const char* attrs0[] = { "type", "StreamTracer",                0 };
@@ -875,7 +932,7 @@ bool vtkSMStateVersionController::Process_3_6_to_3_8( vtkPVXMLElement * root )
     this->Select( root, "Proxy", attrs0, &::ConvertStreamTracer, this );
     this->Select( root, "Proxy", attrs1, &::ConvertStreamTracer, this );
     }
-    
+
   return true;
 }
 
@@ -942,13 +999,13 @@ bool vtkSMStateVersionController::Process_3_12_to_3_14(
     item->SetName("Item");
     item->AddAttribute("id", "1");
     item->AddAttribute("name", "ViewLayout1");
-  
+
     vtkPVXMLElement* layouts = vtkPVXMLElement::New();
     layouts->SetName("ProxyCollection");
     layouts->AddAttribute("name", "layouts");
     layouts->AddNestedElement(item);
     item->Delete();
-    
+
     smroot->AddNestedElement(layouts);
     layouts->Delete();
     }
@@ -1187,6 +1244,14 @@ bool vtkSMStateVersionController::ConvertRepresentationProperty(
          }
        }
      }
+
+   // ExodusIIReader now uses shorter name without "Size: ... "
+   // This deals with old state files
+   if(root)
+     {
+     const char* attrs[] = {"group","sources","type","ExodusIIReader", 0};
+     this->Select( root, "Proxy",attrs, &::ConvertExodusIIReader, this);
+     }
    return true;
  }
 
@@ -1195,5 +1260,3 @@ void vtkSMStateVersionController::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

@@ -15,6 +15,9 @@ set(_vtk_mpi_modules
   vtkIOParallelNetCDF
   # Needed for:
   #  vtkPNetCDFPOPReader
+
+  vtkFiltersParallelFlowPaths
+  #  vtkStreamTracer (Parallel)
   )
 
 set(_vtk_modules
@@ -333,10 +336,6 @@ set(_vtk_modules
 
   )
 
-if(PARAVIEW_USE_PISTON)
-  list(APPEND _vtk_modules vtkAcceleratorsPiston)
-endif() 
-
 if (PARAVIEW_USE_MPI)
   list (APPEND _vtk_modules ${_vtk_mpi_modules})
 endif()
@@ -345,15 +344,20 @@ if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
 endif()
 
-macro(enable_required_modules)
-  foreach (module IN LISTS _vtk_modules)
-    set (Module_${module} TRUE
-      CACHE INTERNAL "Enabling module needed for ParaView" FORCE)
-  endforeach()
-endmacro()
+# See if matplotlib is present.
+# If so, add vtkRenderingMatplotlib for math text rendering.
+if (PYTHON_EXECUTABLE)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
+    RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE
+    OUTPUT_VARIABLE IMPORT_MATPLOTLIB_OUTPUT
+    ERROR_VARIABLE IMPORT_MATPLOTLIB_ERROR)
+  if (${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
+    set(PARAVIEW_MATPLOTLIB_MODULE vtkRenderingMatplotlib)
+    list (APPEND _vtk_modules vtkRenderingMatplotlib)
+  endif()
+endif()
 
-macro(hide_enabled_modules)
-  foreach (module IN LISTS _vtk_modules)
-    set_property(CACHE Module_${module} PROPERTY TYPE INTERNAL)
-  endforeach()
-endmacro()
+# Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
+# list of modules to ensure that these are enabled when the corresponding module
+# is enabled.
+set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})

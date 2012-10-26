@@ -455,20 +455,39 @@ vtkSIProxyDefinitionManager::vtkSIProxyDefinitionManager()
   this->Internals = new vtkInternals;
   this->InternalsFlatten = new vtkInternals;
 
-  // Load the generated modules
-// # include "vtkParaViewIncludeModulesToSMApplication.h"
-
-  // Now register with the plugin tracker, so that when new plugins are loaded,
-  // we parse the XML if provided and automatically add it to the proxy
-  // definitions.
   vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
-  tracker->AddObserver( vtkCommand::RegisterEvent, this,
-                        &vtkSIProxyDefinitionManager::OnPluginLoaded);
-  // process any already loaded plugins.
+
+  // Load the core xmls.
+  // These are loaded from the vtkPVInitializerPlugin plugin.
   for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
     {
-    this->HandlePlugin(tracker->GetPlugin(cc));
+    vtkPVPlugin* plugin = tracker->GetPlugin(cc);
+    if (plugin && strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") == 0)
+      {
+      this->HandlePlugin(plugin);
+      break;
+      }
     }
+
+  // Now, process any other loaded plugins. This has to happen after loading the
+  // core xmls (BUG #13488).
+  for (unsigned int cc=0; cc < tracker->GetNumberOfPlugins(); cc++)
+    {
+    vtkPVPlugin* plugin = tracker->GetPlugin(cc);
+    if (plugin && strcmp(plugin->GetPluginName(), "vtkPVInitializerPlugin") == 0)
+      {
+      continue;
+      }
+
+    this->HandlePlugin(plugin);
+    }
+
+  // Register with the plugin tracker, so that when new plugins are loaded,
+  // we parse the XML if provided and automatically add it to the proxy
+  // definitions.
+  tracker->AddObserver( vtkCommand::RegisterEvent, this,
+                        &vtkSIProxyDefinitionManager::OnPluginLoaded);
+
 }
 
 //---------------------------------------------------------------------------
@@ -806,8 +825,16 @@ bool vtkSIProxyDefinitionManager::LoadConfigurationXML(vtkPVXMLElement* root, bo
 {
   if (!root)
     {
-    vtkErrorMacro("Must parse a configuration before storing it.");
     return false;
+    }
+
+  if (!root->GetName() ||
+    strcmp(root->GetName(), "ServerManagerConfiguration") != 0)
+    {
+    // find nested ServerManagerConfiguration element and process that.
+    return this->LoadConfigurationXML(
+      root->FindNestedElementByName("ServerManagerConfiguration"),
+      attachHints);
     }
 
   // Attach ShowInMenu hints

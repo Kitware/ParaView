@@ -100,7 +100,7 @@ Last modified on April 19, 2007.
 static unsigned   _debug = 0;
 static h5part_int64_t  _h5part_errno = H5PART_SUCCESS;
 static h5part_error_handler _err_handler = H5PartReportErrorHandler;
-static char *__funcname = "NONE";
+static const char *__funcname = "NONE";
 
 /********** Declaration of private functions ******/
 
@@ -161,8 +161,10 @@ _H5Part_open_file (
   MPI_Info info = MPI_INFO_NULL;
 
   /* ks: IBM_large_block_io */
+  char large_block_io_key[] = "IBM_largeblock_io";
+  char large_block_io_value[] = "true";
   MPI_Info_create(&info);
-  MPI_Info_set(info, "IBM_largeblock_io", "true" );
+  MPI_Info_set(info, large_block_io_key, large_block_io_value);
 
   if (MPI_Comm_size (comm, &f->nprocs) != MPI_SUCCESS) {
    HANDLE_MPI_COMM_SIZE_ERR;
@@ -2603,7 +2605,7 @@ _H5Part_print_debug (
 
 void
 _H5Part_set_funcname (
- char  * const fname
+ const char  *fname
  ) {
  __funcname = fname;
 }

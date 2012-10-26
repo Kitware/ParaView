@@ -48,6 +48,8 @@ vtkPVDataRepresentation::vtkPVDataRepresentation()
   this->ForcedCacheKey = 0.0;
 
   this->NeedUpdate = true;
+
+  this->UniqueIdentifier = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +81,7 @@ vtkExecutive* vtkPVDataRepresentation::CreateDefaultExecutive()
 int vtkPVDataRepresentation::ProcessViewRequest(
   vtkInformationRequestKey* request, vtkInformation*, vtkInformation*)
 {
+  assert("We must have an ID at that time" && this->UniqueIdentifier);
   assert(this->GetExecutive()->IsA("vtkPVDataRepresentationPipeline"));
   if (this->GetVisibility() == false)
     {
@@ -98,6 +101,22 @@ void vtkPVDataRepresentation::MarkModified()
 {
   this->Modified();
   this->NeedUpdate = true;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVDataRepresentation::Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable)
+{
+  // Already initialized ?
+  if(this->UniqueIdentifier)
+    {
+    return minIdAvailable;
+    }
+
+  assert("Invalid Representation Id. Not enough reserved ids." && (maxIdAvailable >= minIdAvailable));
+  (void) maxIdAvailable; // Prevent warning in Release build
+
+  this->UniqueIdentifier = minIdAvailable;
+  return (1 + this->UniqueIdentifier);
 }
 
 //----------------------------------------------------------------------------
@@ -122,11 +141,9 @@ int vtkPVDataRepresentation::RequestUpdateTime(
     {
     for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
-      vtkStreamingDemandDrivenPipeline* sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
       if (this->UpdateTimeValid)
         {
-        sddp->SetUpdateTimeStep(
+        vtkStreamingDemandDrivenPipeline::SetUpdateTimeStep(
           inputVector[cc]->GetInformationObject(kk),
           this->UpdateTime);
         }
@@ -150,18 +167,17 @@ int vtkPVDataRepresentation::RequestUpdateExtent(vtkInformation* request,
     {
     for (int kk=0; kk < inputVector[cc]->GetNumberOfInformationObjects(); kk++)
       {
-      vtkStreamingDemandDrivenPipeline* sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-      sddp->SetUpdateExtent(inputVector[cc]->GetInformationObject(kk),
-        controller->GetLocalProcessId(),
-        controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
+      vtkStreamingDemandDrivenPipeline::SetUpdateExtent(
+            inputVector[cc]->GetInformationObject(kk),
+            controller->GetLocalProcessId(),
+            controller->GetNumberOfProcesses(), /*ghost-levels*/ 0);
       inputVector[cc]->GetInformationObject(kk)->Set(
-        vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+            vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
       if (this->UpdateTimeValid)
         {
-        sddp->SetUpdateTimeStep(
-          inputVector[cc]->GetInformationObject(kk),
-          this->UpdateTime);
+        vtkStreamingDemandDrivenPipeline::SetUpdateTimeStep(
+              inputVector[cc]->GetInformationObject(kk),
+              this->UpdateTime);
         }
       }
     }

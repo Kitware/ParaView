@@ -30,8 +30,9 @@
 #include "vtkPVDataRepresentation.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
+#include <vector> //needed for ivars
+#include <set> //needed for ivars
 
-class vtkAnnotationLink;
 class vtkBlockDeliveryPreprocessor;
 class vtkClientServerMoveData;
 class vtkChartNamedOptions;
@@ -40,6 +41,8 @@ class vtkPVContextView;
 class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
+class vtkChartSelectionRepresentation;
+class vtkMultiBlockDataSet;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
@@ -47,6 +50,11 @@ public:
   static vtkChartRepresentation* New();
   vtkTypeMacro(vtkChartRepresentation, vtkPVDataRepresentation);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // These must only be set during initialization before adding the
+  // representation to any views or calling Update().
+  void SetSelectionRepresentation(vtkChartSelectionRepresentation*);
 
   // Description:
   // Set the options object. This must be done before any other state is
@@ -67,6 +75,10 @@ public:
   // to GetSeriesName.
   virtual const char* GetSeriesName(int series);
 
+  //Description:
+  //Get the names of the series
+  void GetSeriesNames(std::vector<const char*>& names);
+
   // Description:
   // Force the chaty to rescale its axes.
   virtual void RescaleChart();
@@ -79,9 +91,17 @@ public:
   virtual void MarkModified();
 
   // *************************************************************************
-  // Forwarded to vtkBlockDeliveryPreprocessor.
+  // methods to control block selection
   void SetFieldAssociation(int);
-  void SetCompositeDataSetIndex(unsigned int);
+  void SetCompositeDataSetIndex(unsigned int); //only used for single block selection
+  void AddCompositeDataSetIndex(unsigned int);
+  void ResetCompositeDataSetIndices();
+
+  // Description:
+  // Override because of internal selection representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
 
 //BTX
 protected:
@@ -126,7 +146,8 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  vtkTable* GetLocalOutput();
+  bool GetLocalOutput(std::vector<vtkTable*>& tables);
+  void UpdateSeriesNames();
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
@@ -135,12 +156,13 @@ protected:
   vtkWeakPointer<vtkPVContextView> ContextView;
   vtkChartNamedOptions* Options;
 
-  vtkSelectionDeliveryFilter* SelectionDeliveryFilter;
-
-  vtkAnnotationLink* AnnLink;
-
   bool EnableServerSideRendering;
-  vtkSmartPointer<vtkTable> LocalOutput;
+  vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
+
+  std::vector<const char*> SeriesNames; //all series names consistent with local output
+  std::set<int> CompositeIndices; //the selected blocks
+
+  vtkChartSelectionRepresentation* SelectionRepresentation;
 
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented

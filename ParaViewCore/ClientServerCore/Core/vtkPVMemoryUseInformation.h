@@ -52,7 +52,8 @@ public:
   size_t GetSize(){ return this->MemInfos.size(); }
   int GetProcessType(int i){ return this->MemInfos[i].ProcessType; }
   int GetRank(int i){ return this->MemInfos[i].Rank; }
-  unsigned long long GetMemoryUse(int i){ return this->MemInfos[i].MemUse; }
+  long long GetProcMemoryUse(int i){ return this->MemInfos[i].ProcMemUse; }
+  long long GetHostMemoryUse(int i){ return this->MemInfos[i].HostMemUse; }
 
 protected:
   vtkPVMemoryUseInformation();
@@ -63,12 +64,13 @@ private:
   class MemInfo
     {
     public:
-      MemInfo() : ProcessType(-1), Rank(0), MemUse(0) {}
+      MemInfo() : ProcessType(-1), Rank(0), ProcMemUse(0), HostMemUse(0) {}
       void Print();
     public:
       int ProcessType;
       int Rank;
-      unsigned long long MemUse;
+      long long ProcMemUse;
+      long long HostMemUse;
     };
   vector<MemInfo> MemInfos;
   //ETX

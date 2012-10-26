@@ -43,14 +43,38 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-         name="AxisOrigin"
-         command="SetAxisOrigin"
-         number_of_elements="3"
-         default_values="0.0 0.0 0.0"
+         name="LabelRangeU"
+         command="SetLabelRangeU"
+         number_of_elements="2"
+         default_values="0.0 1.0"
          panel_visibility="default" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          The values of this property set the corresponding X axis direction.
+          The values of this property set the corresponding X axis data range for the CubeAxes.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="LabelRangeV"
+         command="SetLabelRangeV"
+         number_of_elements="2"
+         default_values="0.0 1.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Y axis data range for the CubeAxes.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="LabelRangeW"
+         command="SetLabelRangeW"
+         number_of_elements="2"
+         default_values="0.0 1.0"
+         panel_visibility="default" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The values of this property set the corresponding Z axis data range for the CubeAxes.
         </Documentation>
       </DoubleVectorProperty>
 
@@ -114,16 +138,6 @@
      </IntVectorProperty>
 
      <IntVectorProperty
-        name="EnableCustomBounds"
-        label="Use Bounds"
-        command="SetEnableCustomBounds"
-        number_of_elements="1"
-        default_values="0"
-        panel_visibility="default">
-        <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty
         name="EnableCustomTitle"
         label="Use Titles"
         command="SetEnableCustomTitle"
@@ -134,9 +148,9 @@
      </IntVectorProperty>
 
      <IntVectorProperty
-        name="EnableCustomOrigin"
-        label="Axes Origin"
-        command="SetEnableCustomOrigin"
+        name="EnableCustomLabelRange"
+        label="Use Custom Range"
+        command="SetEnableCustomLabelRange"
         number_of_elements="1"
         default_values="0"
         panel_visibility="default">

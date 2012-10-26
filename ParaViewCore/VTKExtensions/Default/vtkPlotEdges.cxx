@@ -611,7 +611,6 @@ int vtkPlotEdges::RequestData(
 
     // iterate over the input multiblock to search for the vtkPolyData leaves
     vtkCompositeDataIterator* it = inputMultiBlock->NewIterator();
-    it->SetVisitOnlyLeaves(1);
 
     for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {

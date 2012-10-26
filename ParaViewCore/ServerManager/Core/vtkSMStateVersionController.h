@@ -31,7 +31,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Called before a state is loaded. 
+  // Called before a state is loaded.
   // The argument must be the root element for the state being loaded.
   // eg. for server manager state, it will point to <ServerManagerState />
   // element.
@@ -51,6 +51,7 @@ public:
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
   bool ConvertLegacyReader(vtkPVXMLElement* parent);
   bool ConvertStreamTracer(vtkPVXMLElement* parent);
+  bool ConvertExodusIIReader(vtkPVXMLElement* parent);
   bool ConvertPVAnimationSceneToAnimationScene(vtkPVXMLElement* parent);
   bool ConvertRepresentationProperty(vtkPVXMLElement* element);
 protected:

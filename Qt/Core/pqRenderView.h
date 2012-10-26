@@ -165,6 +165,13 @@ public:
 
   /// restore the default light parameters
   virtual void restoreDefaultLightSettings();
+
+  /// Let internal class handle which internal widget should change its cursor
+  /// This is usually used for selection and in case of QuadView/SliceView
+  /// which contains an aggregation of QWidget, we don't necessary want all of
+  /// them to share the same cursor.
+  virtual void setCursor(const QCursor &);
+
 public:
   /// Return 9 default 3D manipulators (Used inside settings)
   static ManipulatorType* getDefault3DManipulatorTypes()

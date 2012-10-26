@@ -554,8 +554,9 @@ void vtkNIfTIWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
 
 void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
-                             int extent[6])
+                             int extent[6], int wholeExtent[])
 {
+    (void)wholeExtent; // Not used
    //struct nifti_1_header nhdr ;
    znzFile               fp=NULL;
    //size_t                ss ;
@@ -737,6 +738,7 @@ void vtkNIfTIWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data,
   outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
   outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
  }
+  (void)outExtent;
 
   unsigned char* tempUnsignedCharData = NULL;
   unsigned char* tempOutUnsignedCharData = NULL;

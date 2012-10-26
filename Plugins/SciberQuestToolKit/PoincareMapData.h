@@ -37,6 +37,7 @@ class PoincareMapData : public FieldTraceData
 public:
   PoincareMapData()
         :
+    SourceGen(0),
     SourcePts(0),
     SourceCells(0),
     OutPts(0),
@@ -97,10 +98,15 @@ public:
 
 
 private:
+  vtkIdType InsertCellsFromGenerator(IdBlock *SourceIds);
+  vtkIdType InsertCellsFromDataset(IdBlock *SourceIds);
+
   void ClearSource();
   void ClearOut();
 
 private:
+  vtkSQCellGenerator *SourceGen;
+
   vtkFloatArray *SourcePts;
   vtkCellArray *SourceCells;
 

@@ -25,9 +25,11 @@
 
 class vtkAbstractContextItem;
 class vtkChart;
+class vtkChartRepresentation;
 class vtkContextView;
 class vtkInformationIntegerKey;
 class vtkRenderWindow;
+class vtkSelection;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVContextView : public vtkPVView
 {
@@ -67,6 +69,15 @@ public:
   // Overridden to ensure that in multi-client configurations, same set of
   // representations are "dirty" on all processes to avoid race conditions.
   virtual void Update();
+
+  // Description:
+  // Representations can use this method to set the selection for a particular
+  // representation. Subclasses override this method to pass on the selection to
+  // the chart using annotation link. Note this is meant to pass selection for
+  // the local process alone. The view does not manage data movement for the
+  // selection.
+  virtual void SetSelection(vtkChartRepresentation* repr,
+    vtkSelection* selection) = 0;
 
 //BTX
 protected:

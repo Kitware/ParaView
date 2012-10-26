@@ -233,10 +233,26 @@ void vtkSMRenderViewProxy::UpdateLOD()
 //-----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::StreamingUpdate(bool render_if_needed)
 {
+  // FIXME: add a check to not do anything when in multi-client mode. We don't
+  // support streaming in multi-client mode.
   this->GetSession()->PrepareProgress();
 
-  // Tell the delivery manager to fetch next piece in queue, if any. 
-  bool something_delivered = this->DeliveryManager->DeliverNextPiece();
+  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(this->GetClientSideObject());
+  double planes[24];
+  vtkRenderer* ren = view->GetRenderer();
+  ren->GetActiveCamera()->GetFrustumPlanes(
+    ren->GetTiledAspectRatio(), planes);
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << VTKOBJECT(this)
+         << "StreamingUpdate"
+         << vtkClientServerStream::InsertArray(planes, 24)
+         << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  // Now fetch any pieces that the server streamed back to the client.
+  bool something_delivered = this->DeliveryManager->DeliverStreamedPieces();
   if (render_if_needed && something_delivered)
     {
     this->StillRender();
@@ -464,6 +480,20 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     }
 
   prototype = pxm->GetPrototypeProxy("representations",
+    "StructuredGridRepresentation");
+
+  pp = vtkSMInputProperty::SafeDownCast(prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool ssg = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (ssg)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy("representations", "StructuredGridRepresentation"));
+    }
+
+  prototype = pxm->GetPrototypeProxy("representations",
     "UniformGridRepresentation");
   pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
@@ -544,7 +574,7 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
         return vtkSMRepresentationProxy::SafeDownCast(
           pxm->NewProxy("representations", "TextSourceRepresentation"));
         }
-      else if(childName && strcmp(childName, "DefaultRepresentations") == 0)
+      else if(childName && !strcmp(childName, "DefaultRepresentations"))
         {
         unsigned int defaultRepCount = child->GetNumberOfNestedElements();
         for(unsigned int i = 0; i < defaultRepCount; i++)

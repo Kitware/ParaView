@@ -46,9 +46,19 @@ public:
   vtkGetVectorMacro(BaseW,double,3);
 
   // Description:
-  // Set the origin of the cub axis
-  vtkSetVector3Macro(AxisOrigin,double);
-  vtkGetVectorMacro(AxisOrigin,double,3);
+  // Set the range that will be used for cube axis label along the vector for X
+  vtkSetVector2Macro(LabelRangeU,double);
+  vtkGetVectorMacro(LabelRangeU,double,2);
+
+  // Description:
+  // Set the range that will be used for cube axis label along the vector for Y
+  vtkSetVector2Macro(LabelRangeV,double);
+  vtkGetVectorMacro(LabelRangeV,double,2);
+
+  // Description:
+  // Set the range that will be used for cube axis label along the vector for Z
+  vtkSetVector2Macro(LabelRangeW,double);
+  vtkGetVectorMacro(LabelRangeW,double,2);
 
   // Description:
   // Set the oriented bounding box
@@ -71,19 +81,13 @@ public:
 
   // Description:
   // Enable/Disable field generation for oriented bounding box annotation
-  vtkSetMacro(EnableCustomBounds, int);
-  vtkGetMacro(EnableCustomBounds, int);
-
-  // Description:
-  // Enable/Disable field generation for oriented bounding box annotation
   vtkSetMacro(EnableCustomTitle, int);
   vtkGetMacro(EnableCustomTitle, int);
 
   // Description:
-  // Enable/Disable field generation for oriented bounding box annotation
-  vtkSetMacro(EnableCustomOrigin, int);
-  vtkGetMacro(EnableCustomOrigin, int);
-
+  // Enable/Disable LabelRange annotation
+  vtkSetMacro(EnableCustomLabelRange, int);
+  vtkGetMacro(EnableCustomLabelRange, int);
 
   // Description:
   // Enable/Disable field generation for label that will be used for "Time:"
@@ -110,17 +114,18 @@ protected:
   double BaseU[3];
   double BaseV[3];
   double BaseW[3];
+  double LabelRangeU[2];
+  double LabelRangeV[2];
+  double LabelRangeW[2];
   double OrientedBoundingBox[6];
-  double AxisOrigin[3];
   char* AxisUTitle;
   char* AxisVTitle;
   char* AxisWTitle;
   char* TimeLabel;
 
   int EnableCustomBase;
-  int EnableCustomBounds;
   int EnableCustomTitle;
-  int EnableCustomOrigin;
+  int EnableCustomLabelRange;
   int EnableTimeLabel;
 
 private:

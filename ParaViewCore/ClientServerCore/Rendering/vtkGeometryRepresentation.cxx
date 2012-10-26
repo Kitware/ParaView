@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
+#include "vtkHardwareSelectionPolyDataPainter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
@@ -42,8 +43,8 @@
 #include "vtkSelectionNode.h"
 #include "vtkShadowMapBakerPass.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTransform.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkHardwareSelectionPolyDataPainter.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -346,15 +347,13 @@ int vtkGeometryRepresentation::RequestUpdateExtent(vtkInformation* request,
       {
       vtkInformation* inInfo = inputVector[cc]->GetInformationObject(kk);
 
-      vtkStreamingDemandDrivenPipeline* sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-      int ghostLevels = sddp->GetUpdateGhostLevel(inInfo);
+      int ghostLevels = vtkStreamingDemandDrivenPipeline::GetUpdateGhostLevel(inInfo);
       if (this->RequestGhostCellsIfNeeded &&
         vtkGeometryRepresentation::DoRequestGhostCells(inInfo))
         {
         ghostLevels++;
         }
-      sddp->SetUpdateGhostLevel(inInfo, ghostLevels);
+      vtkStreamingDemandDrivenPipeline::SetUpdateGhostLevel(inInfo, ghostLevels);
       }
     }
 
@@ -733,6 +732,14 @@ void vtkGeometryRepresentation::SetPosition(double x, double y, double z)
 void vtkGeometryRepresentation::SetScale(double x, double y, double z)
 {
   this->Actor->SetScale(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetUserTransform(const double matrix[16])
+{
+  vtkNew<vtkTransform> transform;
+  transform->SetMatrix(matrix);
+  this->Actor->SetUserTransform(transform.GetPointer());
 }
 
 //----------------------------------------------------------------------------

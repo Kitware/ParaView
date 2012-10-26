@@ -121,8 +121,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy,
     propertyName.replace(':', '_');
     
     // escape regex chars
-    propertyName.replace(')', "\\)");
-    propertyName.replace('(', "\\(");
+    propertyName = QRegExp::escape(propertyName);
 
     const QString regex = QString("^%1$|^%1_.*$").arg(propertyName);
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
@@ -689,7 +688,7 @@ static void processHints(QGridLayout* panelLayout,
                          vtkSMProxy* smProxy,
                          QStringList& propertiesToHide,
                          QStringList& propertiesToShow,
-                         bool summaryOnly)
+                         bool vtkNotUsed(summaryOnly))
 {
   // Obtain the list of input ports, we don't show any widgets for input ports.
   QList<const char*> inputPortNames = 
@@ -704,12 +703,6 @@ static void processHints(QGridLayout* panelLayout,
   // etc etc.
   vtkPVXMLElement* hints = smProxy->GetHints();
   if (!hints)
-    {
-    return;
-    }
-
-  // check if we are only showing summary properties
-  if(summaryOnly && hints->FindNestedElementByName("ShowInSummaryPanel") == 0)
     {
     return;
     }
@@ -897,12 +890,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy, bo
       }
 
     vtkPVXMLElement *hints = SMProperty->GetHints();
-
-    // skip non-summary properties if summaryOnly is true
-    if(summaryOnly && (!hints || hints->FindNestedElementByName("ShowInSummaryPanel") == 0))
-      {
-      continue;
-      }
 
     // update domains we might ask for
     SMProperty->UpdateDependentDomains();

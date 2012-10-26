@@ -531,6 +531,19 @@ pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *ele
     colorMap.setColorSpace(pqColorMapModel::HsvSpace);
     }
 
+  QString ilkup = element->GetAttribute( "indexedLookup" );
+  bool indexedLookup = (
+    ( ilkup.size() && ( ilkup[0] == 'y' || ilkup[1] == 'Y' ) ) ||
+    ilkup == "1" ||
+    ilkup == "true" ||
+    ilkup == "True" ||
+    ilkup == "TRUE" ||
+    ilkup == "on" ||
+    ilkup == "On" ||
+    ilkup == "ON" );
+  //cout << element->GetAttribute( "name" ) << " indexedLookup is " << ilkup.toAscii().data() << " (" << ( indexedLookup ? "T" : "F" ) << ")\n";
+  colorMap.setIndexedLookup( indexedLookup );
+
   // Loop through the point elements.
   for(unsigned int i = 0; i < element->GetNumberOfNestedElements(); i++)
     {
@@ -612,6 +625,15 @@ pqColorMapModel pqColorPresetManager::createColorMapFromXML(vtkPVXMLElement *ele
       QColor color = QColor::fromRgbF(r, g, b);
       colorMap.setNanColor(color);
       }
+    else if ( QString("Annotation") == point->GetName() )
+      {
+      const char* annVal = point->GetAttribute( "v" );
+      const char* annTxt = point->GetAttributeOrEmpty( "t" );
+      if ( annVal && annVal[0] != '\0' )
+        {
+        colorMap.addAnnotation( annVal, annTxt );
+        }
+      }
     else
       {
       // Unrecognized tag.  Ignore.
@@ -648,6 +670,7 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
   if(colorMap)
     {
     element->SetAttribute("space", spaceNames[colorMap->getColorSpaceAsInt()]);
+    element->SetAttribute("indexedLookup", colorMap->getIndexedLookup() ? "true" : "false");
     for(int i = 0; i < colorMap->getNumberOfPoints(); i++)
       {
       QColor color;
@@ -683,6 +706,16 @@ void pqColorPresetManager::exportColorMap(const QModelIndex &index,
                              QString::number(color.blueF()).toAscii().data());
     element->AddNestedElement(nanElement);
     nanElement->Delete();
+
+    for ( int i = 0; i < colorMap->getNumberOfAnnotations(); ++ i )
+      {
+      vtkPVXMLElement* note = vtkPVXMLElement::New();
+      note->SetName( "Annotation" );
+      note->SetAttribute( "v", colorMap->getAnnotatedValue( i ).toAscii().data() );
+      note->SetAttribute( "t", colorMap->getAnnotation( i ).toAscii().data() );
+      element->AddNestedElement( note );
+      note->Delete();
+      }
     }
 }
 

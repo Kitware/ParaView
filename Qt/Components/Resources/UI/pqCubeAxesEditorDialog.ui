@@ -7,106 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>338</width>
-    <height>601</height>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Edit Cube Axes Properties</string>
   </property>
-  <layout class="QGridLayout">
-   <item row="7" column="0" colspan="2">
-    <spacer>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>313</width>
-       <height>16</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="CubeAxesTickLocation">
-     <item>
-      <property name="text">
-       <string>Inside</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Outside</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Both</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="1" rowspan="2">
-    <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset">
-     <property name="maximum">
-      <double>1.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.050000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" rowspan="2">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Tick Location</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Corner Offset</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="CubeAxesFlyMode">
-     <item>
-      <property name="text">
-       <string>Outer Edges</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Closest Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Furthest Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Static Triad</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Static Edges</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Fly Mode</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -539,13 +447,199 @@
      </widget>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
-    <layout class="QHBoxLayout">
+   <item>
+    <layout class="QGridLayout" name="FormLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Fly Mode</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="CubeAxesFlyMode">
+       <item>
+        <property name="text">
+         <string>Outer Edges</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Closest Triad</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Furthest Triad</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Static Triad</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Static Edges</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Tick Location</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="CubeAxesTickLocation">
+       <item>
+        <property name="text">
+         <string>Inside</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Outside</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Both</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Corner Offset</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="CubeAxesCornerOffset">
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.050000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Grid Line Location</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="CubeAxesGridLineLocation">
+       <item>
+        <property name="text">
+         <string>All Faces</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Furthest Faces</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Closest Faces</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Custom Axes origin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="UseAxesOrigin">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="AxesOriginLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="AxesOriginX">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="AxesOriginY">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="AxesOriginZ">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="pqStandardColorButton" name="Color">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;Set the color to use for axes.&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Set Axes Color...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="VerticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>313</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="ButtonLayout">
      <property name="spacing">
       <number>4</number>
      </property>
      <item>
-      <spacer>
+      <spacer name="HorizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -572,51 +666,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="pqStandardColorButton" name="Color">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;Set the color to use for axes.&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Set Axes Color...</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QComboBox" name="CubeAxesGridLineLocation">
-     <item>
-      <property name="text">
-       <string>All Faces</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Furthest Faces</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Closest Faces</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Grid Line Location</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

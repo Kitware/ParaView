@@ -687,7 +687,7 @@ void vtkPVXMLElement::CopyTo(vtkPVXMLElement* other)
   other->Internal->AttributeNames = this->Internal->AttributeNames;
   other->Internal->AttributeValues = this->Internal->AttributeValues;
   other->AddCharacterData(this->Internal->CharacterData.c_str(),
-                          this->Internal->CharacterData.size());
+                          static_cast<int>(this->Internal->CharacterData.size()));
 
   // Copy recursivly
   vtkPVXMLElementInternals::VectorOfElements::iterator iter;
@@ -709,7 +709,7 @@ void vtkPVXMLElement::CopyAttributesTo(vtkPVXMLElement* other)
   other->Internal->AttributeNames = this->Internal->AttributeNames;
   other->Internal->AttributeValues = this->Internal->AttributeValues;
   other->AddCharacterData(this->Internal->CharacterData.c_str(),
-                          this->Internal->CharacterData.size());
+                          static_cast<int>(this->Internal->CharacterData.size()));
 }
 
 //----------------------------------------------------------------------------

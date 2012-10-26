@@ -12,6 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "postream.h"
 #include "Numerics.hxx"
 #include "GhostTransaction.h"
+#include "vtkSQLog.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -28,12 +29,9 @@ typedef vtkStreamingDemandDrivenPipeline vtkSDDPipeline;
 #include <string>
 using std::string;
 
-// #define vtkSQImageSourceDEBUG
+// #define SQTK_DEBUG
 // #define vtkSQImageSourceTIME
 
-#if defined vtkSQImageSourceTIME
-  #include "vtkSQLog.h"
-#endif
 
 
 vtkStandardNewMacro(vtkSQImageSource);
@@ -41,7 +39,7 @@ vtkStandardNewMacro(vtkSQImageSource);
 //-----------------------------------------------------------------------------
 vtkSQImageSource::vtkSQImageSource()
 {
-  #ifdef vtkSQImageSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageSource::vtkSQImageSource" << endl;
   #endif
 
@@ -67,7 +65,7 @@ vtkSQImageSource::vtkSQImageSource()
 //-----------------------------------------------------------------------------
 vtkSQImageSource::~vtkSQImageSource()
 {
-  #ifdef vtkSQImageSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageSource::~vtkSQImageSource" << endl;
   #endif
 }
@@ -113,7 +111,7 @@ int vtkSQImageSource::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQImageSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageSource::RequestInformation" << endl;
   #endif
 
@@ -136,7 +134,7 @@ int vtkSQImageSource::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQImageSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageSource::RequestData" << endl;
   #endif
   #if defined vtkSQImageSourceTIME
@@ -180,7 +178,7 @@ int vtkSQImageSource::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQImageSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQImageSourceDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "=====vtkSQImageSource::PrintSelf" << endl;
   #endif
 

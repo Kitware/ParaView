@@ -1488,8 +1488,7 @@ bool vtkPVSynchronizedRenderWindows::BroadcastToDataServer(vtkSelection* selecti
     return true;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
+  if (vtkProcessModule::GetProcessType() == vtkProcessModule::PROCESS_RENDER_SERVER)
     {
     return false;
     }

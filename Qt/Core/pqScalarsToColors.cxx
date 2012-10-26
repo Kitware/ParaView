@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -148,7 +148,7 @@ void pqScalarsToColors::hideUnusedScalarBars()
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
 
-  QList<pqPipelineRepresentation*> displays = 
+  QList<pqPipelineRepresentation*> displays =
     smmodel->findItems<pqPipelineRepresentation*>(this->getServer());
 
   bool used_at_all = false;
@@ -200,9 +200,8 @@ void pqScalarsToColors::setScalarRange(double min, double max)
   dnew = (dnew >= 0) ? dnew : 1;
 
   double scale = dnew/dold;
-  int allowDuplicateScalars = (min == max) ? 1 : 0; 
   pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("AllowDuplicateScalars"), allowDuplicateScalars);
+    this->getProxy()->GetProperty("AllowDuplicateScalars"), 1);
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->getProxy()->GetProperty("RGBPoints"));
   QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
@@ -210,7 +209,7 @@ void pqScalarsToColors::setScalarRange(double min, double max)
   int num_elems_per_command = dvp->GetNumberOfElementsPerCommand();
   for (int cc=0; cc < controlPoints.size();  cc += num_elems_per_command)
     {
-    // These checks ensure that the first and last control points match the 
+    // These checks ensure that the first and last control points match the
     // min and max values exactly.
     if (cc==0)
       {
@@ -222,7 +221,7 @@ void pqScalarsToColors::setScalarRange(double min, double max)
       }
     else
       {
-      controlPoints[cc] = 
+      controlPoints[cc] =
         scale * (controlPoints[cc].toDouble()-current_range.first) + min;
       }
     }
@@ -315,6 +314,36 @@ void pqScalarsToColors::setVectorMode(Mode mode, int comp)
     (mode == MAGNITUDE)? "Magnitude" : "Component");
   pqSMAdaptor::setElementProperty(proxy->GetProperty("VectorComponent"),
     (mode == COMPONENT)? comp: 0);
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool pqScalarsToColors::getIndexedLookup()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  return pqSMAdaptor::getElementProperty( proxy->GetProperty( "IndexedLookup" ) ).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setIndexedLookup( bool indexedLookup )
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty( proxy->GetProperty( "IndexedLookup" ), indexedLookup );
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+QList<QVariant> pqScalarsToColors::getAnnotations()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  return pqSMAdaptor::getMultipleElementProperty( proxy->GetProperty( "Annotations" ) );
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::setAnnotations( const QList<QVariant>& annotations )
+{
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setMultipleElementProperty( proxy->GetProperty( "Annotations" ), annotations );
   proxy->UpdateVTKObjects();
 }
 

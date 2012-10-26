@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>476</width>
-    <height>352</height>
+    <width>318</width>
+    <height>293</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -44,31 +44,21 @@
       <property name="toolTip">
        <string/>
       </property>
-      <column>
-       <property name="text">
-        <string>host/rank/pid</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>% memory use</string>
-       </property>
-      </column>
+      <property name="headerHidden">
+       <bool>true</bool>
+      </property>
       <column>
        <property name="text">
         <string/>
        </property>
       </column>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QGridLayout" name="gridLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
-         <item row="0" column="1">
-          <spacer name="horizontalSpacer">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -80,43 +70,23 @@
            </property>
           </spacer>
          </item>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QCheckBox" name="enableOverrideCapacity">
-             <property name="toolTip">
-              <string>The overide the capacity is used on SMP systems that have a massive amount of RAM but limit the user by process. By enabling the override with the per process limit the memory inspector panel will accurately report your use with respect to the limit.</string>
-             </property>
-             <property name="text">
-              <string>Override capacity (GB/proc)</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="overrideCapacity">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>50</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maxLength">
-              <number>6</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         <item>
+          <widget class="QCheckBox" name="autoUpdate">
+           <property name="text">
+            <string>Auto-update</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
-         <item row="0" column="2">
+         <item>
           <widget class="QPushButton" name="updateMemUse">
            <property name="toolTip">
             <string/>
            </property>
            <property name="text">
-            <string>refresh</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -142,22 +112,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>enableOverrideCapacity</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>overrideCapacity</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>97</x>
-     <y>241</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>234</x>
-     <y>242</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

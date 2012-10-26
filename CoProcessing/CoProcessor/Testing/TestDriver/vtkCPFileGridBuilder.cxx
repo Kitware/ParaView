@@ -68,11 +68,9 @@ vtkDataObject* vtkCPFileGridBuilder::GetGrid(
     {
     if(this->Grid->IsA("vtkCompositeDataSet"))
       {
-      vtkCompositeDataIterator* iter = 
+      vtkCompositeDataIterator* iter =
         vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
-      iter->VisitOnlyLeavesOn();
       iter->SkipEmptyNodesOn();
-      iter->TraverseSubTreeOn();
       for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
         {
         vtkDataSet::SafeDownCast(iter->GetCurrentDataObject())->GetPointData()->Initialize();
@@ -89,16 +87,14 @@ vtkDataObject* vtkCPFileGridBuilder::GetGrid(
     {
     if(this->Grid->IsA("vtkCompositeDataSet"))
       {
-      vtkCompositeDataIterator* iter = 
+      vtkCompositeDataIterator* iter =
         vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
-      iter->VisitOnlyLeavesOn();
       iter->SkipEmptyNodesOn();
-      iter->TraverseSubTreeOn();
       for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
         {
         vtkDataSet::SafeDownCast(iter->GetCurrentDataObject())->GetCellData()->Initialize();
         }
-      iter->Delete();      
+      iter->Delete();
       }
     else
       {
@@ -110,17 +106,15 @@ vtkDataObject* vtkCPFileGridBuilder::GetGrid(
     {
     if(this->Grid->IsA("vtkCompositeDataSet"))
       {
-      vtkCompositeDataIterator* iter = 
+      vtkCompositeDataIterator* iter =
         vtkCompositeDataSet::SafeDownCast(this->Grid)->NewIterator();
-      iter->VisitOnlyLeavesOn();
       iter->SkipEmptyNodesOn();
-      iter->TraverseSubTreeOn();
       for(iter->GoToFirstItem();!iter->IsDoneWithTraversal();iter->GoToNextItem())
         {
-        fieldBuilder->BuildField(timeStep, time, 
+        fieldBuilder->BuildField(timeStep, time,
                        vtkDataSet::SafeDownCast(iter->GetCurrentDataObject()));
         }
-      iter->Delete();      
+      iter->Delete();
       }
     else
       {

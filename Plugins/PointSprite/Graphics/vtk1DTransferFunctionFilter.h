@@ -37,10 +37,12 @@
 #ifndef vtk1DTransferFunctionFilter_H_
 #define vtk1DTransferFunctionFilter_H_
 
+#include "vtkPointSpriteGraphicsModule.h" //needed for exports
 #include "vtkPassInputTypeAlgorithm.h"
+
 class vtk1DTransferFunction;
 
-class VTK_EXPORT vtk1DTransferFunctionFilter : public vtkPassInputTypeAlgorithm
+class VTKPOINTSPRITEGRAPHICS_EXPORT vtk1DTransferFunctionFilter : public vtkPassInputTypeAlgorithm
 {
 public:
   vtkTypeMacro(vtk1DTransferFunctionFilter, vtkPassInputTypeAlgorithm);

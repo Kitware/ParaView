@@ -140,7 +140,7 @@ void vtkPVKeyFrameCueManipulator::RemoveAllKeyFrames()
 //----------------------------------------------------------------------------
 unsigned int vtkPVKeyFrameCueManipulator::GetNumberOfKeyFrames()
 {
-  return this->Internals->KeyFrames.size();
+  return static_cast<unsigned int>(this->Internals->KeyFrames.size());
 }
 
 //----------------------------------------------------------------------------

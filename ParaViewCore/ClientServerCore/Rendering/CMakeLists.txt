@@ -30,11 +30,15 @@
 #==========================================================================
 set (Module_SRCS
   vtk3DWidgetRepresentation.cxx
-  vtkAMRVolumeRepresentation.cxx
+  vtkAMROutlineRepresentation.cxx
+  vtkAMRStreamingPriorityQueue.cxx
+  vtkAMRStreamingVolumeRepresentation.cxx
   vtkCaveSynchronizedRenderers.cxx
   vtkChartRepresentation.cxx
+  vtkChartSelectionRepresentation.cxx
   vtkClientServerMoveData.cxx
   vtkCompositeRepresentation.cxx
+  vtkCompositeSliceRepresentation.cxx
   vtkCubeAxesRepresentation.cxx
   vtkDataLabelRepresentation.cxx
   vtkGeometryRepresentation.cxx
@@ -63,6 +67,7 @@ set (Module_SRCS
   vtkPVImplicitPlaneRepresentation.cxx
   vtkPVLastSelectionInformation.cxx
   vtkPVLineChartView.cxx
+  vtkPVMultiSliceView.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVParallelCoordinatesChartView.cxx
   vtkPVParallelCoordinatesRepresentation.cxx
@@ -72,15 +77,19 @@ set (Module_SRCS
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
   vtkPVSelectionInformation.cxx
+  vtkPVStreamingPiecesInformation.cxx
   vtkPVSynchronizedRenderer.cxx
   vtkPVSynchronizedRenderWindows.cxx
   vtkPVView.cxx
   vtkPVXYChartView.cxx
   vtkSelectionDeliveryFilter.cxx
   vtkSelectionRepresentation.cxx
+  vtkSliceFriendGeometryRepresentation.cxx
   vtkSpreadSheetRepresentation.cxx
   vtkSpreadSheetView.cxx
+  vtkStructuredGridVolumeRepresentation.cxx
   vtkTextSourceRepresentation.cxx
+  vtkThreeSliceFilter.cxx
   vtkUnstructuredGridVolumeRepresentation.cxx
   vtkXYChartRepresentation.cxx
 )

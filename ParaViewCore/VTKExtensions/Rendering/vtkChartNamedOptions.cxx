@@ -26,7 +26,7 @@
 
 #include <map>
 #include <sstream>
-
+#include <set>
 //----------------------------------------------------------------------------
 // Class to store information about each plot.
 // A PlotInfo is created for each column in the vtkTable
@@ -187,27 +187,44 @@ void vtkChartNamedOptions::UpdatePlotOptions()
 }
 
 //----------------------------------------------------------------------------
-void vtkChartNamedOptions::SetTable(vtkTable* table)
+void vtkChartNamedOptions::SetTables(vtkTable** tables, int n)
 {
-  if (this->Table == table)
+  bool sameTable=true;
+  if (n!= static_cast<int>(this->Tables.size()))
     {
-    if (table && table->GetMTime() < this->RefreshTime)
+    sameTable = false;
+    }
+  else
+    {
+    for(int i=0; i< n; i++)
       {
-      return;
+      if(tables[i]!=this->Tables[i])
+        {
+        sameTable = false;
+        break;
+        }
+      if (tables[i] && tables[i]->GetMTime() < this->RefreshTime)
+        {
+        sameTable = false;
+        return;
+        }
       }
     }
 
-  this->Table = table;
+  if (sameTable)
+    {
+    return;
+    }
+
+  this->Tables.clear();
+  for(int i=0; i<n; i++)
+    {
+    this->Tables.push_back(tables[i]);
+    }
   this->RefreshPlots();
   this->SetTableVisibility(this->TableVisibility);
   this->RefreshTime.Modified();
   this->Modified();
-}
-
-//----------------------------------------------------------------------------
-vtkTable* vtkChartNamedOptions::GetTable()
-{
-  return this->Table;
 }
 
 //----------------------------------------------------------------------------
@@ -236,36 +253,51 @@ void vtkChartNamedOptions::RemovePlotsFromChart()
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::RefreshPlots()
 {
-  if (!this->Table)
+  //remove any table that has been deleted
+  std::vector<vtkWeakPointer<vtkTable> > tables;
+  for(size_t tbIndex=0; tbIndex< this->Tables.size(); tbIndex++)
+    {
+    if(this->Tables[tbIndex])
+      {
+      tables.push_back(this->Tables[tbIndex]);
+      }
+    }
+  this->Tables = tables;
+
+  if(this->Tables.empty())
     {
     return;
     }
 
   PlotMapType newMap;
 
-  int defaultVisible = 1;
+  bool defaultVisible = true;
 
-  // For each series (column in the table)
-  const vtkIdType numberOfColumns = this->Table->GetNumberOfColumns();
-  for (vtkIdType i = 0; i < numberOfColumns; ++i)
+  for(size_t tbIndex=0; tbIndex< this->Tables.size(); tbIndex++)
     {
-    // Get the series name
-    const char* seriesName = this->Table->GetColumnName(i);
-    if (!seriesName || !seriesName[0])
+    vtkTable* table = this->Tables[tbIndex];
+    // For each series (column in the table)
+    const vtkIdType numberOfColumns = table->GetNumberOfColumns();
+    for (vtkIdType i = 0; i < numberOfColumns; ++i)
       {
-      continue;
-      }
+      // Get the series name
+      const char* seriesName = table->GetColumnName(i);
+      if (!seriesName || !seriesName[0])
+        {
+        continue;
+        }
 
-    // Get the existing PlotInfo or initialize a new one
-    PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
-    if (!plotInfo.VisibilityInitialized)
-      {
-      plotInfo.VisibilityInitialized = true;
-      plotInfo.Visible = defaultVisible;
-      }
+      // Get the existing PlotInfo or initialize a new one
+      PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
+      if (!plotInfo.VisibilityInitialized)
+        {
+        plotInfo.VisibilityInitialized = true;
+        plotInfo.Visible = defaultVisible;
+        }
 
-    // Add the PlotInfo to the new collection
-    newMap[seriesName] = plotInfo;
+      // Add the PlotInfo to the new collection
+      newMap[seriesName] = plotInfo;
+      }
     }
 
   // Now we need to prune old series (table columns that were removed)
@@ -326,4 +358,24 @@ vtkChartNamedOptions::GetPlotInfo(const char* seriesName)
 void vtkChartNamedOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkChartNamedOptions::GetSeriesNames(std::vector<const char*>& seriesNames)
+{
+  seriesNames.clear();
+  std::set<std::string> uniqueNames;
+  for(size_t i=0; i<this->Tables.size(); i++)
+    {
+    vtkTable* table = this->Tables[i];
+    for(vtkIdType j = 0; j< table->GetNumberOfColumns(); j++)
+      {
+      const char* name = table->GetColumnName(j);
+      if(uniqueNames.find(name)==uniqueNames.end())
+        {
+        uniqueNames.insert(name);
+        seriesNames.push_back(name);
+        }
+      }
+    }
 }

@@ -26,6 +26,7 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
     try:
         cpscript = __import__(scriptname)
     except:
+        print sys.exc_info()
         print 'Cannot find ', scriptname, ' -- no coprocessing will be performed.'
         return
 

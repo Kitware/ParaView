@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreModule.h"
 
 class pqView;
+class vtkSMExporterProxy;
 
 /// pqViewExporterManager is a manager that manages exporters for views.
 /// Currently, we are saying all exporters registered in "exporters" group are
@@ -54,9 +55,13 @@ public:
   /// current view will be returned.
   QString getSupportedFileTypes() const;
 
-  /// Exports the current view. The exporter is choosen based on the extension
-  /// of the file.
-  bool write(const QString& filename);
+  /// Retrieve the exporter proxy that handles the given file. The returned
+  /// object will need to be Delete()'ed
+  vtkSMExporterProxy *proxyForFile(const QString& filename);
+
+  /// Exports the current view into the input exporter. The exporter will be
+  /// deleted after writing.
+  bool write(vtkSMExporterProxy *exporter);
 
 public slots:
   /// Reloads the list of exporters available. Must be called after plugins are

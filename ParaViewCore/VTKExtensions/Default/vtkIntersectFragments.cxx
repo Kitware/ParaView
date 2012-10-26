@@ -340,8 +340,8 @@ int vtkIntersectFragments::Intersect()
     vtkMultiPieceDataSet *fragments
       = dynamic_cast<vtkMultiPieceDataSet *>(this->GeomIn->GetBlock(blockId));
     vector<int> &fragmentIds=this->FragmentIds[blockId];
-    int nLocal=fragmentIds.size();
-    for (int localId=0; localId<nLocal; ++localId)
+    size_t nLocal=fragmentIds.size();
+    for (size_t localId=0; localId<nLocal; ++localId)
       {
       int globalId=fragmentIds[localId];
       vtkPolyData *fragment
@@ -388,11 +388,11 @@ void vtkIntersectFragments::BuildLoadingArray(
     = dynamic_cast<vtkMultiPieceDataSet *>(this->GeomOut->GetBlock(blockId));
   int nFragments=intersectGeometry->GetNumberOfPieces();
 
-  int nLocal=this->IntersectionIds[blockId].size();
+  size_t nLocal=this->IntersectionIds[blockId].size();
 
   loadingArray.clear();
   loadingArray.resize(nFragments,0);
-  for (int localId=0; localId<nLocal; ++localId)
+  for (size_t localId=0; localId<nLocal; ++localId)
     {
     int globalId=this->IntersectionIds[blockId][localId];
 
@@ -416,13 +416,13 @@ int vtkIntersectFragments::PackLoadingArray(vtkIdType *&buffer, int blockId)
   vtkMultiPieceDataSet *intersectGeometry
     = dynamic_cast<vtkMultiPieceDataSet *>(this->GeomOut->GetBlock(blockId));
 
-  int nLocal=this->IntersectionIds[blockId].size();
+  size_t nLocal=this->IntersectionIds[blockId].size();
 
   vtkMaterialInterfacePieceLoading pl;
-  const int bufSize=pl.SIZE*nLocal;
+  const int bufSize = static_cast<int>(pl.SIZE*nLocal);
   buffer = new vtkIdType [bufSize];
   vtkIdType *pBuf=buffer;
-  for (int localId=0; localId<nLocal; ++localId)
+  for (size_t localId=0; localId<nLocal; ++localId)
     {
     int globalId=this->IntersectionIds[blockId][localId];
 
@@ -511,7 +511,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
     int nFragments=intersectGeometry->GetNumberOfPieces();
 
     vector<int> &globalIds=this->IntersectionIds[blockId];
-    int nLocal=globalIds.size();
+    size_t nLocal=globalIds.size();
 
     // Start by assuming that all intersection geometry
     // are local. If we are are running client-server
@@ -524,7 +524,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
     intersectSplitMarker.resize(nLocal,0);
     // Size the attribute arrays
     this->IntersectionCenters[blockId]->SetNumberOfComponents(3);
-    this->IntersectionCenters[blockId]->SetNumberOfTuples(nLocal);
+    this->IntersectionCenters[blockId]->SetNumberOfTuples(static_cast<vtkIdType>(nLocal));
     // Prepare for projection onto the cut function
     double r0[3],N[3];
     vtkPlane *plane
@@ -549,7 +549,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
 
     if (nProcs==1)
       {
-      this->NFragmentsIntersected[blockId]=nLocal;
+      this->NFragmentsIntersected[blockId]= static_cast<int>(nLocal);
       }
     // Here we localize fragment geomtery that is split across processes.
     // A controlling process gathers structural information regarding
@@ -724,7 +724,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
         vtkPolyData *localMesh
           = dynamic_cast<vtkPolyData *>(intersectGeometry->GetPiece(fragmentId));
 
-        int nTransactions=transactionList.size();
+        size_t nTransactions=transactionList.size();
         if (nTransactions>0)
           {
           /// send
@@ -796,7 +796,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
 
             // Receive the geometry, perform the requested
             // computations and send back the results.
-            for (int i=0; i<nTransactions; ++i)
+            for (size_t i=0; i<nTransactions; ++i)
               {
               vtkMaterialInterfacePieceTransaction &ta=transactionList[i];
 
@@ -858,7 +858,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
               }
 
             // send attributes back to piece owners
-            for (int i=0; i<nTransactions; ++i)
+            for (size_t i=0; i<nTransactions; ++i)
               {
               vtkMaterialInterfacePieceTransaction &ta=transactionList[i];
               this->Controller->Send(
@@ -894,7 +894,7 @@ void vtkIntersectFragments::ComputeGeometricAttributes()
       = this->IntersectionCenters[blockId]->GetPointer(0);
 
     // Traverse the fragments we own
-    for (int localId=0; localId<nLocal; ++localId)
+    for (size_t localId=0; localId<nLocal; ++localId)
       {
       // skip fragments with geometry split over multiple
       // processes. These have been already taken care of.
@@ -1024,7 +1024,7 @@ int vtkIntersectFragments::SendGeometricAttributes(const int recipientProcId)
   int nBytes=0;
   for (int blockId=0; blockId<this->NBlocks; ++blockId)
     {
-    nFragments[blockId]=this->IntersectionIds[blockId].size();
+    nFragments[blockId]=static_cast<int>(this->IntersectionIds[blockId].size());
     nBytes  // attributes(double) + ids(int)
       += nFragments[blockId]*(nCompsPerBlock*sizeof(double)+sizeof(int));
     buffer.SetNumberOfTuples(blockId,nFragments[blockId]);
@@ -1100,7 +1100,7 @@ int vtkIntersectFragments::PrepareToCollectGeometricAttributes(
         {
         // Because we are going to us IntersectionIds to
         // hold the merged ids we copy our ids to a temp array.
-        int nCenters=this->IntersectionIds[blockId].size();
+        int nCenters=static_cast<int>(this->IntersectionIds[blockId].size());
         ids[myProcId][blockId]=new int[nCenters];
         for (int i=0; i<nCenters; ++i)
           {

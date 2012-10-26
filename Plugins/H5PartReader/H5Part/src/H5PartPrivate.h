@@ -42,7 +42,7 @@ _H5Part_iteration_operator (
 
 void
 _H5Part_set_funcname (
- char * const fname
+ const char *fname
  );
 
 const char *

@@ -54,6 +54,7 @@ public:
     { this->UndoLabel = lbl; }
   const QString& undoLabel() const
     { return this->UndoLabel; }
+
 signals:
   /// Signals fired before and after the chosenColorChanged() signal is fired.
   /// This is used in ParaView to set up the creation of undo set.

@@ -2,7 +2,6 @@ SET (TESTS_WITHOUT_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/AboutDialog.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenHelp.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ServerConnectDialog.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
 )
 
 SET (TESTS_WITH_INLINE_COMPARES
@@ -11,10 +10,11 @@ SET (TESTS_WITH_INLINE_COMPARES
   ${CMAKE_CURRENT_SOURCE_DIR}/RenderNan.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveLargeScreenshot.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SLACTools.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MemoryInspectorPanel.xml
 )
 
 SET (TESTS_WITH_BASELINES)
-if(NOT Module_vtkIOVisItBridge)
+if(NOT PARAVIEW_USE_VISITBRIDGE)
   # Analyze reader test was conflicting with the reader from VisIt. So
   # disabling it.
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
@@ -28,6 +28,13 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
+  set(VisItBridgeChombo_USE_NEW_PANELS TRUE)
+  set(VisItBridgeEnzo_USE_NEW_PANELS TRUE)
+  set(VisItBridgeNas_USE_NEW_PANELS TRUE)
+  set(VisItBridgeNek_USE_NEW_PANELS TRUE)
+  set(VisItBridgePdb_USE_NEW_PANELS TRUE)
+  set(VisItBridgePixie_USE_NEW_PANELS TRUE)
+  set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 endif()
 
 if(Module_vtkIOXdmf2)
@@ -62,6 +69,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor3.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColorScalarBar1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
@@ -69,6 +77,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CreateDelete.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomFilter.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomSourceProbe.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/DataOutlines.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/D3SmallCells.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/DualSphereAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/EnSight.xml
@@ -79,7 +88,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ExTimeseries2.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractBlock.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ExtractLevel.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/EyeDomeLighting.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/FFTOverTime.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Flow2.xml
@@ -90,6 +98,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadPlugins.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadSaveStateAnimation.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/LoadState.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceMultiBlock.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/MultiSliceWavelet.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NormalGlyphs.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NiftiReaderWriterPlugin.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/OpenSaveData.xml
@@ -109,6 +119,7 @@ SET (TESTS_WITH_BASELINES
 #  ${CMAKE_CURRENT_SOURCE_DIR}/SaveAnimationGeometry.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveColorMap.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SaveCSV.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/SelectionLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SelectReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SimpleInteraction.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Slice.xml
@@ -117,6 +128,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/SPTimeseries.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/SpyPlotHistoryReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/StreamTracerUpdates.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/StructuredGridVolumeRendering.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TabbedViews.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalInterpolator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/TemporalShiftScale.xml
@@ -138,6 +150,48 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/XYHistogram.xml
   #  ${CMAKE_CURRENT_SOURCE_DIR}/XYBarChart.xml
 )
+
+#------------------------------------------------------------------------------
+# Add streaming tests.
+# We need to locate smooth.flash since it's not included in the default testing
+# datasets.
+find_file(smooth_flash NAMES smooth.flash
+          DOC "Path to smooth.flash data file."
+          NO_DEFAULT_PATH)
+mark_as_advanced(smooth_flash)
+if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
+  # we configure the file since we need to point to smooth_flash.
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.xml.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
+  set (streaming_tests
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
+  set(AMRStreaming_USE_NEW_PANELS TRUE)
+
+  foreach (tname ${streaming_tests})
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND --client ${CLIENT_EXECUTABLE}
+              -dr
+              --enable-streaming
+              --disable-light-kit
+              --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      TEST_SCRIPTS ${tname})
+
+    add_pv_test(pvcs "_DISABLE_CS"
+      COMMAND
+         --server $<TARGET_FILE:pvserver>
+         --server-postflags --enable-streaming
+         --client ${CLIENT_EXECUTABLE}
+         -dr
+         --enable-streaming
+         --disable-light-kit
+         --test-directory=${PARAVIEW_TEST_DIR}
+      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      TEST_SCRIPTS ${tname})
+  endforeach()
+endif()
+
+#------------------------------------------------------------------------------
 
 # Probe picking does not work in render server mode
 set(ProbePicking_DISABLE_CRS TRUE)
@@ -164,10 +218,12 @@ set(ContourRange_USE_NEW_PANELS TRUE)
 set(Contour_USE_NEW_PANELS TRUE)
 set(CreateDelete_USE_NEW_PANELS TRUE)
 set(CTHAMRBaseline_USE_NEW_PANELS TRUE)
+set(CTHAMRContour_USE_NEW_PANELS TRUE)
 set(CTHDerivedDensity2DClyinder_USE_NEW_PANELS TRUE)
 set(CustomFilter_USE_NEW_PANELS TRUE)
 set(CustomSourceProbe_USE_NEW_PANELS TRUE)
 set(D3SmallCells_USE_NEW_PANELS TRUE)
+set(DataOutlines_USE_NEW_PANELS TRUE)
 set(DualSphereAnimation_USE_NEW_PANELS TRUE)
 set(EnSight_USE_NEW_PANELS TRUE)
 set(ExodusXML_USE_NEW_PANELS TRUE)
@@ -176,7 +232,6 @@ set(ExTimeseries2_USE_NEW_PANELS TRUE)
 set(ExTimeseries_USE_NEW_PANELS TRUE)
 set(ExtractBlock_USE_NEW_PANELS TRUE)
 set(ExtractLevel_USE_NEW_PANELS TRUE)
-set(EyeDomeLighting_USE_NEW_PANELS TRUE)
 set(FFTOverTime_USE_NEW_PANELS TRUE)
 set(FindDataDialog_USE_NEW_PANELS TRUE)
 set(Flow2_USE_NEW_PANELS TRUE)
@@ -189,6 +244,8 @@ set(LoadSaveStateAnimation_USE_NEW_PANELS TRUE)
 set(LoadState_USE_NEW_PANELS TRUE)
 set(NiftiReaderWriterPlugin_USE_NEW_PANELS TRUE)
 set(MemoryInspectorPanel_USE_NEW_PANELS TRUE)
+set(MultiSliceWavelet_USE_NEW_PANELS TRUE)
+set(MultiSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(NewColorEditor1_USE_NEW_PANELS TRUE)
 set(NewColorEditor3_USE_NEW_PANELS TRUE)
 set(NormalGlyphs_USE_NEW_PANELS TRUE)
@@ -208,6 +265,7 @@ set(RepresentationSelector_USE_NEW_PANELS TRUE)
 set(SaveColorMap_USE_NEW_PANELS TRUE)
 set(SaveCSV_USE_NEW_PANELS TRUE)
 set(SelectReader_USE_NEW_PANELS TRUE)
+set(SelectionLabels_USE_NEW_PANELS TRUE)
 set(SimpleInteraction_USE_NEW_PANELS TRUE)
 set(Slice_USE_NEW_PANELS TRUE)
 set(SpreadSheet1_USE_NEW_PANELS TRUE)
@@ -215,12 +273,15 @@ set(SpreadSheet2_USE_NEW_PANELS TRUE)
 set(SPTimeseries_USE_NEW_PANELS TRUE)
 set(SpyPlotHistoryReader_USE_NEW_PANELS TRUE)
 set(StreamTracerUpdates_USE_NEW_PANELS TRUE)
+set(StructuredGridVolumeRendering_USE_NEW_PANELS TRUE)
 set(TabbedViews_USE_NEW_PANELS TRUE)
 set(TemporalInterpolator_USE_NEW_PANELS TRUE)
 set(TemporalShiftScale_USE_NEW_PANELS TRUE)
 set(Tessellate_USE_NEW_PANELS TRUE)
 set(TestIsoVolume_USE_NEW_PANELS TRUE)
 set(UndoRedo1_USE_NEW_PANELS TRUE)
+set(UndoRedo2_USE_NEW_PANELS TRUE)
+set(UndoRedo3_USE_NEW_PANELS TRUE)
 set(UndoRedo5_USE_NEW_PANELS TRUE)
 set(UndoRedo6_USE_NEW_PANELS TRUE)
 set(UndoRedo7_USE_NEW_PANELS TRUE)
@@ -229,7 +290,6 @@ set(UnstructuredOutline_USE_NEW_PANELS TRUE)
 set(VariableSelector1_USE_NEW_PANELS TRUE)
 set(VariableSelector_USE_NEW_PANELS TRUE)
 set(ViewSettingsDialog_USE_NEW_PANELS TRUE)
-set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 set(XdmfReadImageDataCollection_USE_NEW_PANELS TRUE)
 set(XdmfReadImageData_USE_NEW_PANELS TRUE)
 set(XdmfReadRectilinearGridCollection_USE_NEW_PANELS TRUE)
@@ -240,14 +300,20 @@ set(XYHistogram_USE_NEW_PANELS TRUE)
 set(ZLibXDMF_USE_NEW_PANELS TRUE)
 set(AnalyzeReaderWriterPlugin_USE_NEW_PANELS TRUE)
 
+# Selection is not available in CRS mode
+set(MultiSliceWavelet_DISABLE_CRS TRUE)
+set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
+
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)
 set(Threshold_BREAK TRUE)
 set(ExodusModeShapes_BREAK TRUE)
+set(DataOutlines_BREAK TRUE)
 
 # These tests cannot be run using ctest -j since they are affected by focus
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
+set (ProbePicking_FORCE_SERIAL TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
@@ -270,6 +336,15 @@ set(CTHAMRMaterialInterfaceFilter_DISABLE_CRS TRUE)
 
 set (TestIsoVolume_BREAK TRUE)
 set (TabbedViews_BREAK TRUE)
+
+# Since this test forces remote-rendering, we run it by itself.
+set (StructuredGridVolumeRendering_BREAK TRUE)
+set (StructuredGridVolumeRendering_FORCE_SERIAL TRUE)
+set (StructuredGridVolumeRendering_DISABLE_CRS TRUE) 
+  # <-- since volume rendering is not supported in CRS mode.
+
+# Since this test needs selection, disable in CRS mode.
+set (SelectionLabels_DISABLE_CRS TRUE)
 
 # Mark tests that change change state considerably requires a restart of the
 # test suite when grouping tests together for faster playback.
@@ -300,7 +375,6 @@ SET (PropertyConversion2_BREAK TRUE)
 SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
-set (EyeDomeLighting_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
@@ -402,22 +476,16 @@ IF (NOT BUILD_SHARED_LIBS)
 ENDIF (NOT BUILD_SHARED_LIBS)
 # There should be a client server specific version of this test.
 SET (AnalyzeReaderWriterPlugin_DISABLE_CS TRUE)
-SET (EyeDomeLighting_DISABLE_CS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CS TRUE)
 SET (LoadPlugins_DISABLE_CS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CS TRUE)
 SET (AnalyzeReaderWriterPlugin_DISABLE_CRS TRUE)
-SET (EyeDomeLighting_DISABLE_CRS TRUE)
 SET (H5PartReaderPlugin_DISABLE_CRS TRUE)
 SET (LoadPlugins_DISABLE_CRS TRUE)
 SET (NiftiReaderWriterPlugin_DISABLE_CRS TRUE)
 
 # Set image threshold overrides for the tests.
 SET(SaveLargeScreenshot_THRESHOLD 10000)
-
-IF(NOT PARAVIEW_BUILD_PLUGIN_EyeDomeLighting)
-  SET(EyeDomeLighting_DISABLE_C TRUE)
-ENDIF()
 
 # Make these tests use reverse connection.
 SET (CutMulti_REVERSE_CONNECT TRUE)
@@ -429,7 +497,7 @@ SET (CutMulti_REVERSE_CONNECT TRUE)
 #     - Clip, GlobalProperties, UndoRedo, UndoRedo[1-8]
 #
 #   Contains Plugin Loading actions:
-#     - LoadPlugins, NiftiReaderWriterPlugin, EyeDomeLighting, H5PartReaderPlugin
+#     - LoadPlugins, NiftiReaderWriterPlugin, H5PartReaderPlugin
 #
 #   Does not work in CS or CRS mode
 #     - ViewSettingsDialog, NewColorEditor3, RectilinearFractal, NewColorEditor
@@ -506,8 +574,8 @@ set (SpreadSheet1_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (SPTimeseries_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (SpyPlotHistoryReader_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (StreamTracerUpdates_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (TemporalInterpolator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
-set (TemporalShiftScale_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+#set (TemporalInterpolator_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
+#set (TemporalShiftScale_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (Tessellate_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (Threshold_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})
 #set (UnstructuredOutline_ENABLE_COLLAB ${PARAVIEW_COLLABORATION_TESTING})

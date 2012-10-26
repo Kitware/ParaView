@@ -269,6 +269,13 @@ void vtkSelectionRepresentation::SetScale(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
+void vtkSelectionRepresentation::SetUserTransform(const double matrix[16])
+{
+  this->GeometryRepresentation->SetUserTransform(matrix);
+  this->LabelRepresentation->SetUserTransform(matrix);
+}
+
+//----------------------------------------------------------------------------
 void vtkSelectionRepresentation::SetPointFieldDataArrayName(const char* val)
 {
   this->LabelRepresentation->SetPointFieldDataArrayName(val);
@@ -278,4 +285,14 @@ void vtkSelectionRepresentation::SetPointFieldDataArrayName(const char* val)
 void vtkSelectionRepresentation::SetCellFieldDataArrayName(const char* val)
 {
   this->LabelRepresentation->SetCellFieldDataArrayName(val);
+}
+//----------------------------------------------------------------------------
+unsigned int vtkSelectionRepresentation::Initialize(unsigned int minIdAvailable,
+                                                    unsigned int maxIdAvailable)
+{
+  unsigned int minId = minIdAvailable;
+  minId = this->LabelRepresentation->Initialize(minId, maxIdAvailable);
+  minId = this->GeometryRepresentation->Initialize(minId, maxIdAvailable);
+
+  return  this->Superclass::Initialize(minId, maxIdAvailable);
 }

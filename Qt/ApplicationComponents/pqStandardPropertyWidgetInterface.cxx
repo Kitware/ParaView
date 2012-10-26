@@ -34,15 +34,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqArrayStatusPropertyWidget.h"
+#include "pqCalculatorWidget.h"
 #include "pqColorEditorPropertyWidget.h"
+#include "pqColorSelectorPropertyWidget.h"
+#include "pqCommandButtonPropertyWidget.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
+#include "pqTextureSelectorPropertyWidget.h"
+#include "pqTransferFunctionEditorPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+
+#include <QtDebug>
 
 pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
   : QObject(p)
@@ -57,17 +64,41 @@ pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
                                                            vtkSMProperty *smProperty)
 {
-  pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineRepresentation* repr = smm->findItem<pqPipelineRepresentation *>(smProxy);
-  if(repr && std::string(smProxy->GetPropertyName(smProperty)) == "Representation")
+  // handle properties that specify custom panel widgets
+  const char *custom_widget = smProperty->GetPanelWidget();
+  if(custom_widget)
     {
-    return new pqDisplayRepresentationPropertyWidget(smProxy);
-    }
+    std::string name = custom_widget;
 
-//  if(propert = "textture")
-//    {
-//    pqTextureComboBox;
-//    }
+    if(name == "color_selector")
+      {
+      return new pqColorSelectorPropertyWidget(smProxy, smProperty);
+      }
+    else if(name == "display_representation_selector")
+      {
+      return new pqDisplayRepresentationPropertyWidget(smProxy);
+      }
+    else if(name == "texture_selector")
+      {
+      return new pqTextureSelectorPropertyWidget(smProxy);
+      }
+    else if (name == "calculator")
+      {
+      return new pqCalculatorWidget(smProxy, smProperty);
+      }
+    else if(name == "command_button")
+      {
+      return new pqCommandButtonPropertyWidget(smProxy, smProperty);
+      }
+    else if(name == "transfer_function_editor")
+      {
+      return new pqTransferFunctionEditorPropertyWidget(smProxy, smProperty);
+      }
+    else
+      {
+      qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
+      }
+    }
 
   return 0;
 }
@@ -88,6 +119,7 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
     {
     return new pqArrayStatusPropertyWidget(proxy, group);
     }
+
 
   return 0;
 }

@@ -14,6 +14,9 @@ Copyright 2012 SciberQuest Inc.
 #if GCC_VER > 40200
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
+#if GCC_VER > 40400
+#pragma GCC diagnostic ignored "-Wenum-compare"
+#endif
 #endif
 
 #if defined(WIN32)

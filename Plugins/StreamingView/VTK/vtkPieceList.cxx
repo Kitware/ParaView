@@ -113,13 +113,13 @@ void vtkPieceList::Clear()
 //-----------------------------------------------------------------------------
 int vtkPieceList::GetNumberOfPieces()
 {
-  return this->Internals->Pieces.size();
+  return static_cast<int>(this->Internals->Pieces.size());
 }
 
 //------------------------------------------------------------------------------
 int vtkPieceList::GetNumberNonZeroPriority()
 {
-  int last = this->Internals->Pieces.size()-1;
+  int last = static_cast<int>(this->Internals->Pieces.size()) - 1;
   for (int i = last; i >= 0 ; --i)
     {
     if (this->Internals->Pieces[i].GetPriority() > 0.0)
@@ -193,7 +193,7 @@ void vtkPieceList::Serialize()
          << mine.ViewPriority << " "
          << mine.CachedPriority << " ";
     }
-  int len = strlen(temp.str().c_str());
+  int len = static_cast<int>(strlen(temp.str().c_str()));
   this->Internals->SerializeBuffer = new char[len+10];
   strcpy(this->Internals->SerializeBuffer, temp.str().c_str());
   this->Internals->BufferSize = len;

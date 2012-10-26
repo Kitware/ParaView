@@ -36,9 +36,10 @@
 #ifndef __vtkTwoScalarsToColorsPainter_h__
 #define __vtkTwoScalarsToColorsPainter_h__
 
+#include "vtkPointSpriteRenderingModule.h" //needed for exports
 #include "vtkOpenGLScalarsToColorsPainter.h"
 
-class VTK_EXPORT vtkTwoScalarsToColorsPainter : public vtkOpenGLScalarsToColorsPainter
+class VTKPOINTSPRITERENDERING_EXPORT vtkTwoScalarsToColorsPainter : public vtkOpenGLScalarsToColorsPainter
 {
 public :
   static vtkTwoScalarsToColorsPainter* New();

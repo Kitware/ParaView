@@ -73,5 +73,5 @@ vtkSMProperty* vtkSMPropertyGroup::GetProperty(unsigned int index) const
 //---------------------------------------------------------------------------
 unsigned int vtkSMPropertyGroup::GetNumberOfProperties() const
 {
-  return this->Internals->Properties.size();
+  return static_cast<unsigned int>(this->Internals->Properties.size());
 }

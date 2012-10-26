@@ -259,7 +259,7 @@ void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
   // release their references to the proxy
   if ( pm && this->Internal )
     {
-    int size = this->Internal->Links.size();
+    int size = static_cast<int>(this->Internal->Links.size());
     if (size > 0 && this->ReferenceCount == 2 + 2*size)
       {
       vtkSMNewWidgetRepresentationInternals* aInternal = this->Internal;

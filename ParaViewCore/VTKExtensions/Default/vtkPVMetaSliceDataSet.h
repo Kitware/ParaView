@@ -57,6 +57,11 @@ public:
   // Expose method from vtkCutter
   void SetValue(int index, double value);
 
+  // Description:
+  // Expose method from vtkCutter
+  void SetGenerateTriangles(int status);
+
+
 protected:
   vtkPVMetaSliceDataSet();
   ~vtkPVMetaSliceDataSet();

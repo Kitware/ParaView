@@ -62,7 +62,7 @@ void pqDelimitedTextParser::parseColumns(QIODevice& stream)
   
   emit startParsing();
   
-  while(true)
+  for(;;)
     {
     QByteArray line = stream.readLine();
 

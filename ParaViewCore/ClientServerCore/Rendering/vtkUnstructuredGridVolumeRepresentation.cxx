@@ -250,7 +250,7 @@ int vtkUnstructuredGridVolumeRepresentation::ProcessViewRequest(
     this->UpdateMapperParameters();
     }
 
-  return this->Superclass::ProcessViewRequest(request_type, inInfo, outInfo);
+  return 1;
 }
 
 //----------------------------------------------------------------------------

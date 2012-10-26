@@ -125,6 +125,15 @@ public:
   vtkSetMacro(WriteAllTimeSteps,int);
   vtkGetMacro(WriteAllTimeSteps,int);
 
+  // Description:
+  // Set the log level.
+  // 0 -- no logging
+  // 1 -- basic logging
+  // .
+  // n -- advanced logging
+  vtkSetMacro(LogLevel,int);
+  vtkGetMacro(LogLevel,int);
+
 protected:
   /// Pipeline internals.
   int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
@@ -153,7 +162,6 @@ private:
   int TimeStepId;          // step id only used for writing all steps.
   int WorldRank;           // rank of this process
   int WorldSize;           // number of processes
-  char HostName[5];        // short host name where this process runs
   int UseCollectiveIO;     // Turn on/off collective IO
   int UseDirectIO;         //
   int NumberOfIONodes;     // Number of aggregator for CIO
@@ -163,6 +171,7 @@ private:
   int SieveBufferSize;     // Sieve size.
   int StripeSize;          // Stripe size in bytes
   int StripeCount;         // Stripe count in OST's
+  int LogLevel;            // control timing/logging
 };
 
 #endif

@@ -122,14 +122,27 @@ public:
   vtkBooleanMacro(GenerateProcessIds, bool);
 
   // Description:
-  // If off, which is the default, extracts the surface of the data fed
-  // into the geometry filter. If on, it produces a bounding box for the
-  // input to the filter that is producing that data instead.
-//   vtkSetMacro(MakeOutlineOfInput,int);
-//   vtkGetMacro(MakeOutlineOfInput,int);
-//   vtkBooleanMacro(MakeOutlineOfInput,int);
+  // This property affects the way AMR outlines and faces are generated.
+  // When set to true (default), internal data-set faces/outlines for datasets within
+  // the AMR grids are hidden. Set it to false to see boxes for all the datasets
+  // in the AMR, internal or otherwise.
+  vtkSetMacro(HideInternalAMRFaces, bool);
+  vtkGetMacro(HideInternalAMRFaces, bool);
+  vtkBooleanMacro(HideInternalAMRFaces, bool);
 
   // Description:
+  // For overlapping AMR, this property controls affects the way AMR
+  // outlines are generated. When set to true (default), it uses the
+  // overlapping AMR meta-data to identify the blocks present in the AMR.
+  // Which implies that even if the input did not fill in the uniform grids for
+  // all datasets in the AMR, this filter can generate outlines using the
+  // metadata alone. When set to false, the filter will only generate outlines
+  // for datasets that are actually present. Note, this only affects overlapping
+  // AMR.
+  vtkSetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+  vtkGetMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+  vtkBooleanMacro(UseNonOverlappingAMRMetaDataForOutlines, bool);
+
   // These keys are put in the output composite-data metadata for multipieces
   // since this filter merges multipieces together.
   static vtkInformationIntegerVectorKey* POINT_OFFSETS();
@@ -142,13 +155,6 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
-  // Description:
-  // A helper method which, given the AMR box of the data in question
-  // and the root AMR box, determines whether or not the block is visible.
-  bool IsAMRDataVisible(vtkOverlappingAMR* amr,
-                        unsigned int level,
-                        unsigned int id,
-                        bool extractface[6] );
   // Description:
   // Overridden to create vtkMultiBlockDataSet when input is a
   // composite-dataset and vtkPolyData when input is a vtkDataSet.
@@ -285,7 +291,9 @@ protected:
   int ForceUseStrips;
   vtkTimeStamp     StripSettingMTime;
   int StripModFirstPass;
-//   int MakeOutlineOfInput;
+
+  bool HideInternalAMRFaces;
+  bool UseNonOverlappingAMRMetaDataForOutlines;
 
 private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented

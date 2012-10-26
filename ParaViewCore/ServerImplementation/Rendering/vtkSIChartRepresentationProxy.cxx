@@ -14,8 +14,9 @@
 =========================================================================*/
 #include "vtkSIChartRepresentationProxy.h"
 
-#include "vtkChartRepresentation.h"
 #include "vtkChartNamedOptions.h"
+#include "vtkChartRepresentation.h"
+#include "vtkChartSelectionRepresentation.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSIChartRepresentationProxy);
@@ -40,6 +41,16 @@ void vtkSIChartRepresentationProxy::OnCreateVTKObjects()
     vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
       this->GetVTKObject());
     repr->SetOptions(options);
+    }
+
+  vtkSIProxy* selectionProxy = this->GetSubSIProxy("SelectionRepresentation");
+  if (selectionProxy)
+    {
+    vtkChartRepresentation* repr = vtkChartRepresentation::SafeDownCast(
+      this->GetVTKObject());
+    vtkChartSelectionRepresentation* selRepr =
+      vtkChartSelectionRepresentation::SafeDownCast(selectionProxy->GetVTKObject());
+    repr->SetSelectionRepresentation(selRepr);
     }
 }
 

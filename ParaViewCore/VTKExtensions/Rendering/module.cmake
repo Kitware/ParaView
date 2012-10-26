@@ -19,12 +19,25 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkFiltersHyperTree
     vtkFiltersParallel
     vtkInteractionStyle
+    vtkInteractionWidgets
     vtkIOExport
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingFreeTypeOpenGL
+    vtkRenderingOpenGL
     vtkRenderingParallel
+
     ${__dependencies}
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
+
+  TEST_DEPENDS
+    vtkInteractionStyle
+    vtkIOAMR
+    vtkIOXML
+    vtkRenderingOpenGL
+    vtkTestingRendering
+
+  TEST_LABELS
+    PARAVIEW
 )

@@ -49,6 +49,7 @@ vtkSMProperty::vtkSMProperty()
   this->XMLLabel = 0;
   this->PanelVisibility = 0;
   this->PanelVisibilityDefaultForRepresentation = 0;
+  this->PanelWidget = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -174,7 +175,7 @@ vtkSMDomain* vtkSMProperty::FindDomain(const char* classname)
 //---------------------------------------------------------------------------
 unsigned int vtkSMProperty::GetNumberOfDomains()
 {
-  return this->PInternals->Domains.size();
+  return static_cast<unsigned int>(this->PInternals->Domains.size());
 }
 
 //---------------------------------------------------------------------------
@@ -243,7 +244,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
   // "MySPACE" ==> "My SPACE"
   // "My Space" ==> "My Space"
 
-  int max = strlen(xmlname);
+  int max = static_cast<int>(strlen(xmlname));
   char* label = new char[2*max+10];
   char* ptr = label;
 
@@ -374,6 +375,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     {
     this->SetPanelVisibilityDefaultForRepresentation(
       panel_visibility_default_for_representation);
+    }
+
+  const char *panel_widget = element->GetAttribute("panel_widget");
+  if(panel_widget)
+    {
+    this->SetPanelWidget(panel_widget);
     }
 
   // Manage deprecated XML definition

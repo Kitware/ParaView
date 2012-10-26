@@ -489,29 +489,31 @@
       </Hints>
       <!-- End of XMLMultiBlockDataWriter -->
     </WriterProxy>
+
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="FileSeriesWriter"
                  class="vtkFileSeriesWriter"
                  file_name_method="SetFileName"
-                 name="XMLHierarchicalBoxDataWriter"
+                 name="XMLUniformGridAMRWriter"
                  supports_parallel="1">
-      <Documentation short_help="Write a hierarchical box dataset in a xml-based vtk data file.">
-      Writer to write a hierarchical box in a xml-based vtk data file. Can be
-      used for parallel writing as well as serial writing.</Documentation>
+      <Documentation short_help="Write a amr dataset in a xml-based vtk data file.">
+      Writer to write an AMR data-set (overlapping/non-overlapping)
+      in a xml-based vtk data file. Can be used for parallel writing as well as
+      serial writing.</Documentation>
       <InputProperty command="SetInputConnection"
                      name="Input">
-        <DataTypeDomain composite_data_supported="1"
-                        name="input_type">
-          <DataType value="vtkHierarchicalBoxDataSet" />
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUniformGridAMR" />
         </DataTypeDomain>
         <Documentation>The input filter/source whose output dataset is to
         written to the file.</Documentation>
       </InputProperty>
+
       <SubProxy>
         <Proxy name="Writer"
                proxygroup="internal_writers"
-               proxyname="XMLPHierarchicalBoxDataWriterCore"></Proxy>
+               proxyname="XMLPUniformGridAMRWriter"></Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
           <Property name="EncodeAppendedData" />
@@ -519,15 +521,28 @@
         </ExposedProperties>
       </SubProxy>
       <Hints>
-        <Property name="Input"
-                  show="0" />
-        <Property name="FileName"
-                  show="0" />
+        <Property name="Input" show="0" />
+        <Property name="FileName" show="0" />
         <WriterFactory extensions="vthb"
-                       file_description="VTK Hierarchical Box Files" />
+                       file_description="VTK AMR Files" />
       </Hints>
-      <!-- End of XMLPHierarchicalBoxDataWriter -->
+      <!-- End of XMLUniformGridAMRWriter -->
     </WriterProxy>
+
+    <!-- ================================================================= -->
+    <WriterProxy base_proxygroup="writers"
+                 base_proxyname="XMLUniformGridAMRWriter"
+                 class="vtkFileSeriesWriter"
+                 file_name_method="SetFileName"
+                 name="XMLHierarchicalBoxDataWriter"
+                 supports_parallel="1">
+      <Documentation short_help="(DEPRECATED) Write a hierarchical box dataset in a xml-based vtk data file.">
+      (DEPRECATED) Writer to write a hierarchical box in a xml-based vtk data file. Can be
+      used for parallel writing as well as serial writing. This is deprecated.
+      Use XMLUniformGridAMRWriter instead.
+      </Documentation>
+    </WriterProxy>
+
     <!-- ================================================================= -->
     <WriterProxy base_proxygroup="internal_writers"
                  base_proxyname="FileSeriesWriter"

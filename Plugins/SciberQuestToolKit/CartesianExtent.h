@@ -168,6 +168,14 @@ public:
   void Shift(int q, int n);               // shift by the given amount in the given direction
 
   /**
+  Divide the extent in half in the given direction. The
+  operation is done in-place the other half of the split
+  extent is returned. The retunr will be empty if the split
+  could not be made.
+  */
+  CartesianExtent Split(int dir);
+
+  /**
   In-place conversion from cell based to node based extent, and vise-versa.
   */
   void CellToNode();
@@ -192,6 +200,9 @@ public:
   static int GetDimensionMode(
       const CartesianExtent &problemDomain,
       int nGhosts);
+
+  static int GetDimensionMode(
+      const CartesianExtent &problemDomain);
 
   /**
   Get the number in each direction.
@@ -746,6 +757,27 @@ void CartesianExtent::Shift()
     this->Data[qq  ]+=n;
     this->Data[qq+1]+=n;
     }
+}
+
+//-----------------------------------------------------------------------------
+inline
+CartesianExtent CartesianExtent::Split(int dir)
+{
+  CartesianExtent half;
+
+  int q=2*dir;
+  int l=this->Data[q+1]-this->Data[q]+1;
+  int s=l/2;
+
+  if (s)
+    {
+    s+=this->Data[q];
+    half=*this;
+    half.Data[q]=s;
+    this->Data[q+1]=s-1;
+    }
+
+  return half;
 }
 
 //-----------------------------------------------------------------------------

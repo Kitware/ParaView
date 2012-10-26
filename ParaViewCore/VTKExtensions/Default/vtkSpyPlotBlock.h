@@ -128,7 +128,7 @@ protected:
   //for restoring structured once external ghost cells are removed
   int SavedExtents[6];
   int SavedRealExtents[6];
-  int SavedRealDims[6];
+  int SavedRealDims[3];
 private:
   enum CoordinateSystem
     {

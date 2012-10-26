@@ -25,3 +25,8 @@ add_paraview_plugin(
 
 target_link_libraries(EyeDomeLightingView
   vtkEyeDomeLighting)
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif (BUILD_TESTING)

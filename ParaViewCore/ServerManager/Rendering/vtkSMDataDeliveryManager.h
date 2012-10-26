@@ -52,7 +52,9 @@ public:
 
   // Description:
   // EXPERIMEMTAL: Delivery when streaming is enabled.
-  bool DeliverNextPiece();
+  // Returns true when some new data was streamed. When this returns false, it
+  // implies that there is no more data to stream or streaming is not enabled.
+  bool DeliverStreamedPieces();
 
 //BTX
 protected:

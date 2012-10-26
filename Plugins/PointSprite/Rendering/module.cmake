@@ -7,4 +7,7 @@ vtk_module(vtkPointSpriteRendering
     vtkRenderingFreeTypeOpenGL
   COMPILE_DEPENDS
     vtkUtilitiesEncodeString
-  EXCLUDE_FROM_WRAP_HIERARCHY)
+  EXCLUDE_FROM_WRAP_HIERARCHY
+  TEST_LABELS
+    PARAVIEW
+)

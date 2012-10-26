@@ -144,7 +144,7 @@ void pqSphereWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("SphereWidgetRepresentation", server);
+    get3DWidget("SphereWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();
@@ -157,18 +157,6 @@ void pqSphereWidget::createWidget(pqServer* server)
   PVSPHEREWIDGET_LINK(normalX, "HandleDirection", 0);
   PVSPHEREWIDGET_LINK(normalY, "HandleDirection", 1);
   PVSPHEREWIDGET_LINK(normalZ, "HandleDirection", 2);
-}
-
-//-----------------------------------------------------------------------------
-void pqSphereWidget::cleanupWidget()
-{
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

@@ -966,14 +966,25 @@ class ArrayListProperty(VectorProperty):
            not isinstance(values, list):
             values = (values,)
         fullvalues = []
-        for i in range(len(values)):
-            val = self.ConvertValue(values[i])
-            fullvalues.append(val)
-            fullvalues.append('1')
+
+        # WARNING:
+        # The order of the two loops below are delibrately set in this way
+        # so that values passed in will take precedence.
+        # This is needed for backward compatibility of the
+        # property ElementBlocks for vtkExodusIIReader.
+        # If you attemp to change this, please verify that
+        # python state files for opening old .ex2 file (<=3.14) still works.
         for array in self.Available:
             if not values.__contains__(array):
                 fullvalues.append(array)
                 fullvalues.append('0')
+
+        for i in range(len(values)):
+            val = self.ConvertValue(values[i])
+            fullvalues.append(val)
+            fullvalues.append('1')
+
+
         i = 0
         for value in fullvalues:
             self.SMProperty.SetElement(i, value)
@@ -1064,7 +1075,7 @@ class ProxyProperty(Property):
         """Removes the first occurence of the proxy from the property."""
         self.SMProperty.RemoveProxy(proxy.SMProxy)
         self._UpdateProperty()
-        
+
     def __setitem__(self, idx, value):
       """Given a list or tuple of values, sets a slice of values [min, max)"""
       if isinstance(idx, slice):
@@ -2546,7 +2557,7 @@ def createModule(groupName, mdl=None):
             names = [propName]
             if paraview.compatibility.GetVersion() >= 3.5:
                 names = [iter.PropertyLabel]
-                
+
             propDoc = None
             if prop.GetDocumentation():
                 propDoc = prop.GetDocumentation().GetDescription()
@@ -2629,14 +2640,14 @@ def __getName(proxy, group):
     return pxm.GetProxyName(group, proxy)
 
 class MissingRegistrationInformation(Exception):
-    """Exception for missing registration information. Raised when a name or group 
+    """Exception for missing registration information. Raised when a name or group
     is not specified or when a group cannot be deduced."""
     pass
 
 class MissingProxy(Exception):
     """Exception fired when the requested proxy is missing."""
     pass
-    
+
 def Register(proxy, **extraArgs):
     """Registers a proxy with the proxy manager. If no 'registrationGroup' is
     specified, then the group is inferred from the type of the proxy.

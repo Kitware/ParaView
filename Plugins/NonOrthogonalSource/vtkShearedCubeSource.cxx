@@ -16,18 +16,19 @@
 
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkDemandDrivenPipeline.h"
+#include "vtkFieldData.h"
 #include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkFieldData.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
-#include "vtkMath.h"
-#include "vtkDemandDrivenPipeline.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <vtkNew.h>
 
@@ -36,21 +37,23 @@ vtkStandardNewMacro(vtkShearedCubeSource);
 //----------------------------------------------------------------------------
 vtkShearedCubeSource::vtkShearedCubeSource()
 {
-  this->EnableCustomBase = 0;
-  this->EnableCustomBounds = 0;
-  this->EnableCustomTitle = 0;
-  this->EnableCustomOrigin = 0;
-  this->EnableTimeLabel = 0;
+  this->EnableCustomBase       = 0;
+  this->EnableCustomTitle      = 0;
+  this->EnableTimeLabel        = 0;
+  this->EnableCustomLabelRange = 0;
 
   for(int i=0; i < 3; i++)
     {
-    this->BaseU[i] = this->BaseV[i] = this->BaseW[i] = this->AxisOrigin[i] = 0;
+    this->BaseU[i] = this->BaseV[i] = this->BaseW[i] = 0;
     this->OrientedBoundingBox[i*2] = -0.5;
     this->OrientedBoundingBox[i*2 + 1] = +0.5;
     }
   this->BaseU[0] = this->BaseV[1] = this->BaseW[2] = 1.0;
   this->AxisUTitle = this->AxisVTitle = this->AxisWTitle = NULL;
   this->TimeLabel = NULL;
+
+  LabelRangeU[0] = LabelRangeV[0] = LabelRangeW[0] = 0.0;
+  LabelRangeU[1] = LabelRangeV[1] = LabelRangeW[1] = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -86,7 +89,7 @@ int vtkShearedCubeSource::RequestData(
 
   double x[3], n[3];
   int numPolys=6, numPts=8;
-  int i, j, k;
+  int i, j, k, coord;
   vtkIdType pts[4];
   vtkPoints *newPoints;
   vtkFloatArray *newNormals;
@@ -110,17 +113,17 @@ int vtkShearedCubeSource::RequestData(
   //
 
   // Do planes normal to U
-  for(int k=0; k < 2; k++)
+  for(k = 0; k < 2; k++)
     {
-    for(int j=0; j < 2; j++)
+    for(j = 0; j < 2; j++)
       {
-     for(int i=0; i < 2; i++)
+     for(i = 0; i < 2; i++)
         {
-        for(int coord=0; coord < 3; coord++)
+        for(coord = 0; coord < 3; coord++)
           {
           x[coord] = this->BaseU[coord]*this->OrientedBoundingBox[i] +
-              this->BaseV[coord]*this->OrientedBoundingBox[2+j] +
-              this->BaseW[coord]*this->OrientedBoundingBox[4+k];
+                     this->BaseV[coord]*this->OrientedBoundingBox[2+j] +
+                     this->BaseW[coord]*this->OrientedBoundingBox[4+k];
           }
         newPoints->InsertNextPoint(x);
         }
@@ -186,10 +189,13 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
   fieldData->RemoveArray("AxisBaseForY");
   fieldData->RemoveArray("AxisBaseForZ");
   fieldData->RemoveArray("OrientedBoundingBox");
-  fieldData->RemoveArray("AxisOrigin");
   fieldData->RemoveArray("AxisTitleForX");
   fieldData->RemoveArray("AxisTitleForY");
   fieldData->RemoveArray("AxisTitleForZ");
+  fieldData->RemoveArray("LabelRangeForX");
+  fieldData->RemoveArray("LabelRangeForY");
+  fieldData->RemoveArray("LabelRangeForZ");
+  fieldData->RemoveArray("LabelRangeActiveFlag");
 
   // New base meta-data
   if(this->EnableCustomBase != 0)
@@ -214,10 +220,7 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
     wBase->SetName("AxisBaseForZ");
     wBase->SetTuple(0, this->BaseW);
     fieldData->AddArray(wBase.GetPointer());
-    }
 
-  if(this->EnableCustomBounds)
-    {
     // New oriented bounding box
     vtkNew<vtkFloatArray> orientedBoundingBox;
     orientedBoundingBox->SetNumberOfComponents(6);
@@ -225,17 +228,6 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
     orientedBoundingBox->SetName("OrientedBoundingBox");
     orientedBoundingBox->SetTuple(0, this->OrientedBoundingBox);
     fieldData->AddArray(orientedBoundingBox.GetPointer());
-    }
-
-  if(this->EnableCustomOrigin)
-    {
-    // Axis meta-data
-    vtkNew<vtkFloatArray> axisOrigin;
-    axisOrigin->SetNumberOfComponents(3);
-    axisOrigin->SetNumberOfTuples(1);
-    axisOrigin->SetName("AxisOrigin");
-    axisOrigin->SetTuple(0, this->AxisOrigin);
-    fieldData->AddArray(axisOrigin.GetPointer());
     }
 
   if(this->EnableCustomTitle)
@@ -270,6 +262,46 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
       wAxisTitle->SetValue(0, this->AxisWTitle);
       fieldData->AddArray(wAxisTitle.GetPointer());
       }
+    }
+
+  vtkNew<vtkUnsignedCharArray> activeLabelRange;
+  activeLabelRange->SetNumberOfComponents(1);
+  activeLabelRange->SetNumberOfTuples(3);
+  activeLabelRange->SetName("LabelRangeActiveFlag");
+  fieldData->AddArray(activeLabelRange.GetPointer());
+
+  if(this->EnableCustomLabelRange)
+    {
+    vtkNew<vtkFloatArray> uLabelRange;
+    uLabelRange->SetNumberOfComponents(2);
+    uLabelRange->SetNumberOfTuples(1);
+    uLabelRange->SetName("LabelRangeForX");
+    uLabelRange->SetTuple(0, this->LabelRangeU);
+    fieldData->AddArray(uLabelRange.GetPointer());
+
+    vtkNew<vtkFloatArray> vLabelRange;
+    vLabelRange->SetNumberOfComponents(2);
+    vLabelRange->SetNumberOfTuples(1);
+    vLabelRange->SetName("LabelRangeForY");
+    vLabelRange->SetTuple(0, this->LabelRangeV);
+    fieldData->AddArray(vLabelRange.GetPointer());
+
+    vtkNew<vtkFloatArray> wLabelRange;
+    wLabelRange->SetNumberOfComponents(2);
+    wLabelRange->SetNumberOfTuples(1);
+    wLabelRange->SetName("LabelRangeForZ");
+    wLabelRange->SetTuple(0, this->LabelRangeW);
+
+    activeLabelRange->SetValue(0, 1);
+    activeLabelRange->SetValue(1, 1);
+    activeLabelRange->SetValue(2, 1);
+    fieldData->AddArray(wLabelRange.GetPointer());
+    }
+  else
+    {
+    activeLabelRange->SetValue(0, 0);
+    activeLabelRange->SetValue(1, 0);
+    activeLabelRange->SetValue(2, 0);
     }
 }
 

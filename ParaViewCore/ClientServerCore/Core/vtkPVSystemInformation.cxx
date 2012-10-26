@@ -82,6 +82,10 @@ namespace
   public:
     vtkPVSystemInformationSave(vtkClientServerStream& stream):
       Stream(stream) { }
+    vtkPVSystemInformationSave(const vtkPVSystemInformationSave &other)
+      : Stream(other.Stream)
+    {
+    }
     void operator() (
       const vtkPVSystemInformation::SystemInformationType& data)
       {
@@ -101,6 +105,8 @@ namespace
         << data.TotalVirtualMemory
         << data.AvailableVirtualMemory;
       }
+    private:
+      void operator=(const vtkPVSystemInformationSave&);
     };
 
   class vtkPVSystemInformationLoad
@@ -112,6 +118,12 @@ namespace
     vtkPVSystemInformationLoad(const vtkClientServerStream& stream,
       int &offset):
       Stream(stream), LoadSuccessful(true), Offset(offset) { }
+    vtkPVSystemInformationLoad(const vtkPVSystemInformationLoad &other)
+      : Stream(other.Stream),
+        LoadSuccessful(other.LoadSuccessful),
+        Offset(other.Offset)
+    {
+    }
     operator bool () { return this->LoadSuccessful; }
     void operator() (
       vtkPVSystemInformation::SystemInformationType& data)
@@ -197,6 +209,8 @@ namespace
         this->LoadSuccessful = false;
         }
       }
+    private:
+      void operator=(const vtkPVSystemInformationLoad&);
     };
 }
 

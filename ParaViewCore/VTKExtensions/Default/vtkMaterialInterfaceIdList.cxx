@@ -56,7 +56,7 @@ void vtkMaterialInterfaceIdList::Initialize(vector<int> ids, bool preSorted)
 {
   // Prep.
   this->Clear();
-  int nLocalIds=ids.size();
+  int nLocalIds = static_cast<int>(ids.size());
   // Anything to do?
   if (nLocalIds<1)
   {
@@ -86,7 +86,7 @@ int vtkMaterialInterfaceIdList::GetLocalId(int globalId)
          && this->IsInitialized);
 
   const int firstListItem=0;
-  const int lastListItem=this->IdList.size()-1;
+  const int lastListItem = static_cast<int>(this->IdList.size()) - 1;
   vtkMaterialInterfaceIdListItem itemToFind(globalId);
   return
     search(&this->IdList[0],firstListItem,lastListItem,itemToFind);

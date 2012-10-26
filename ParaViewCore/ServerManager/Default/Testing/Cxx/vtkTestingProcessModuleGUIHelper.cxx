@@ -143,7 +143,7 @@ int vtkTestingProcessModuleGUIHelper::Run(vtkSMSession* session)
     vtksys::SystemTools::ReplaceString(str_buffer,
       "${DataDir}", options->GetDataDir());
     }
-  parser->Parse(str_buffer.c_str(), str_buffer.length());
+  parser->Parse(str_buffer.c_str(), static_cast<unsigned int>(str_buffer.length()));
 
   vtkSMSessionProxyManager* pxm = vtkSMProxyManager::GetProxyManager()->GetSessionProxyManager(session);
   pxm->LoadXMLState(parser->GetRootElement());

@@ -874,12 +874,12 @@ void vtkAMRDualClipLocator::CopyNeighborLevelMask(
 unsigned char vtkAMRDualClipLocator::GetLevelMaskValue(int x, int y, int z)
 {
   unsigned char* ptr = this->GetLevelMaskPointer();
-  
+
   if (ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)] != 1)
     {
     //cerr << "debug\n";
     }
-  
+
   return ptr[x+(y*this->YIncrement)+(z*this->ZIncrement)];
 }
 
@@ -2200,7 +2200,7 @@ void vtkAMRDualClip::ProcessDualCell(
         levelMaskValue = this->BlockLocator->GetLevelMaskValue(x+((casePtId&1)?1:0),
                                                                y+((casePtId&2)?1:0),
                                                                z+((casePtId&4)?1:0));
-        if (levelMaskValue == 0) 
+        if (levelMaskValue == 0)
           { // bug !!!!! trying to figure out what is going on.
           levelMaskValue = 1;
           }
@@ -2395,7 +2395,6 @@ void vtkAMRDualClip::InitializeCopyAttributes(
   // Most of this is just getting a block with cell attributes so we can
   // call CopyAllocate.
   vtkCompositeDataIterator* iter = hbdsInput->NewIterator();
-  iter->GetVisitOnlyLeaves();
   iter->InitTraversal();
   if (iter->IsDoneWithTraversal())
     { // Empty input

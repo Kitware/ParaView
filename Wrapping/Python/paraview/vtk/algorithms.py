@@ -315,7 +315,8 @@ def global_mean (narray) :
     N.fill(narray.shape[0])
 
     S = narray.sum(0).astype(numpy.float64)
-    if len(S.shape) == 2 and S.shape[0] == 3 and S.shape[1] == 3 : S.shape = 9
+    if len(S.shape) == 2 and S.shape[0] == 3 and S.shape[1] == 3:
+       S = numpy.reshape(S, 9)
 
     if servermanager.vtkProcessModule.GetProcessModule().GetNumberOfLocalPartitions() > 1 :
        from mpi4py import MPI

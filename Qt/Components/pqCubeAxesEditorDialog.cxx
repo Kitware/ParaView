@@ -129,6 +129,7 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
 
     //fill the ui elements with the correct object bounds
     double pvBounds[6];
+    int axesOriginSelected = 0;
     vtkSMPVRepresentationProxy *pvProxy = vtkSMPVRepresentationProxy::SafeDownCast(repr);
     if ( pvProxy )
       {
@@ -163,6 +164,16 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
       PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForY, "OriginalBoundsRangeActive", 1);
       PV_GROUPBOX_REGISTER(UseOriginalBoundsRangeForZ, "OriginalBoundsRangeActive", 2);
 
+      //link the ui elements to the vtkSMCubeAxesRepresentationProxy
+      PV_LINEEDIT_REGISTER(AxesOriginX, "AxesOrigin", 0);
+      PV_LINEEDIT_REGISTER(AxesOriginY, "AxesOrigin", 1);
+      PV_LINEEDIT_REGISTER(AxesOriginZ, "AxesOrigin", 2);
+
+      // Link Axis origin checkbox
+      PV_GROUPBOX_REGISTER(UseAxesOrigin, "UseAxesOrigin", 0);
+      QObject::connect( this->Internal->UseAxesOrigin, SIGNAL(toggled(bool)),
+                        this, SLOT(onUseAxesOriginChange(bool)));
+
       //now they are linked, set them to objects bounds.
       vtkSMPropertyHelper(repr,"DataBounds").UpdateValueFromServer();
       vtkSMPropertyHelper(repr,"DataBounds").Get(pvBounds,6);
@@ -196,6 +207,14 @@ void pqCubeAxesEditorDialog::setRepresentationProxy(vtkSMProxy* repr)
         this->Internal->CubeAxesZCustomRangeMin,
         this->Internal->CubeAxesZCustomRangeMax);
 
+      // Update UI base on Axis Origin usage
+      vtkSMPropertyHelper(repr,"AxesOrigin").Get(pvBounds,3);
+      this->setupCustomAxes( pvBounds[0], pvBounds[1], true,
+                             this->Internal->AxesOriginX, this->Internal->AxesOriginY);
+      this->setupCustomAxes( pvBounds[2], pvBounds[2], true,
+                             this->Internal->AxesOriginZ, this->Internal->AxesOriginZ);
+      vtkSMPropertyHelper(repr,"UseAxesOrigin").Get(&axesOriginSelected, 1);
+      this->onUseAxesOriginChange( (axesOriginSelected == 1) ? true : false );
       }
     }
 }
@@ -234,6 +253,30 @@ void pqCubeAxesEditorDialog::done(int res)
     BEGIN_UNDO_SET("Cube Axes Parameters");
     this->Internal->PropertyManager->accept();
     END_UNDO_SET();
+    pqApplicationCore::instance()->render();
     }
   this->Superclass::done(res);
+}
+
+//-----------------------------------------------------------------------------
+void pqCubeAxesEditorDialog::onUseAxesOriginChange(bool enableAxesOrigin)
+{
+  this->Internal->AxesOriginX->setEnabled(enableAxesOrigin);
+  this->Internal->AxesOriginY->setEnabled(enableAxesOrigin);
+  this->Internal->AxesOriginZ->setEnabled(enableAxesOrigin);
+  if(enableAxesOrigin)
+    {
+    this->Internal->CubeAxesXGridLines->setChecked(false);
+    this->Internal->CubeAxesYGridLines->setChecked(false);
+    this->Internal->CubeAxesZGridLines->setChecked(false);
+    this->Internal->CubeAxesXGridLines->setEnabled(false);
+    this->Internal->CubeAxesYGridLines->setEnabled(false);
+    this->Internal->CubeAxesZGridLines->setEnabled(false);
+    }
+  else
+    {
+    this->Internal->CubeAxesXGridLines->setEnabled(true);
+    this->Internal->CubeAxesYGridLines->setEnabled(true);
+    this->Internal->CubeAxesZGridLines->setEnabled(true);
+    }
 }

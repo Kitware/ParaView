@@ -1915,29 +1915,22 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
         </DataTypeDomain>
+        <InputArrayDomain name="input_array" />
         <Documentation>This property specifies the input dataset to the
         Calculator filter. The scalar and vector variables may be chosen from
         this dataset's arrays.</Documentation>
       </InputProperty>
-      <StringVectorProperty command="SetResultArrayName"
-                            default_values="Result"
-                            name="ResultArrayName"
-                            number_of_elements="1">
-        <Documentation>This property contains the name for the output array
-        containing the result of this computation.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
-      </StringVectorProperty>
-      <StringVectorProperty command="SetFunction"
-                            name="Function"
-                            number_of_elements="1">
-        <Documentation>This property contains the equation for computing the
-        new array.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
-      </StringVectorProperty>
+      <IntVectorProperty command="SetAttributeMode"
+                         default_values="1"
+                         name="AttributeMode"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Point Data" value="1" />
+          <Entry text="Cell Data" value="2" />
+        </EnumerationDomain>
+        <Documentation>This property determines whether the computation is to
+        be performed on point-centered or cell-centered data.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetCoordinateResults"
                          default_values="0"
                          name="CoordinateResults"
@@ -1948,21 +1941,20 @@ found and the point will be rejected.</Documentation>
         results of this computation should be used as point coordinates or as a
         new array.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty command="SetAttributeMode"
-                         default_values="0"
-                         name="AttributeMode"
-                         number_of_elements="1">
-        <EnumerationDomain name="enum">
-          <Entry text="point_data"
-                 value="1" />
-          <Entry text="cell_data"
-                 value="2" />
-          <Entry text="field_data"
-                 value="5" />
-        </EnumerationDomain>
-        <Documentation>This property determines whether the computation is to
-        be performed on point-centered or cell-centered data.</Documentation>
-      </IntVectorProperty>
+      <StringVectorProperty command="SetResultArrayName"
+                            default_values="Result"
+                            name="ResultArrayName"
+                            number_of_elements="1">
+        <Documentation>This property contains the name for the output array
+        containing the result of this computation.</Documentation>
+      </StringVectorProperty>
+      <StringVectorProperty command="SetFunction"
+                            name="Function"
+                            number_of_elements="1"
+                            panel_widget="calculator" >
+        <Documentation>This property contains the equation for computing the
+        new array.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetReplaceInvalidValues"
                          default_values="1"
                          label="Replace Invalid Results"
@@ -4944,9 +4936,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property contains the name of the
         vector array by which to warp the dataset's point
         coordinates.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
@@ -4957,9 +4946,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>Each component of the selected vector array will be
         multiplied by the value of this property before being used to compute
         new point coordinates.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <!-- End WarpVector -->
     </SourceProxy>
@@ -5021,6 +5007,13 @@ found and the point will be rejected.</Documentation>
         cells that are sliced by the region or just extract a triangulated
         surface of that region.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateTriangles"
+                         default_values="1"
+                         name="Triangulate the slice"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter controls whether to produce triangles in the output.</Documentation>
+      </IntVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Slice Offset Values"
@@ -5047,6 +5040,81 @@ found and the point will be rejected.</Documentation>
       </Hints>
       <!-- End Cut -->
     </SourceProxy>
+    <!-- ==================================================================== -->
+    <SourceProxy class="vtkCompositeCutter"
+                 label="Slice (demand-driven-composite)"
+                 name="CutEverything">
+      <Documentation long_help="This filter slices a data set with a plane. Slicing is similar to a contour. It creates surfaces from volumes and lines from surfaces."
+                     short_help="Slice datasets with planes.">This filter
+                     extracts the portion of the input dataset that lies along
+                     the specified plane. The Slice filter takes any type of
+                     dataset as input. The output of this filter is polygonal
+                     data.</Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>This property specifies the input to the Slice
+        filter.</Documentation>
+      </InputProperty>
+      <ProxyProperty command="SetCutFunction"
+                     label="Slice Type"
+                     name="CutFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions"
+                 name="Plane" />
+          <Proxy group="implicit_functions"
+                 name="Box" />
+          <Proxy group="implicit_functions"
+                 name="Sphere" />
+        </ProxyListDomain>
+        <Documentation>This property sets the parameters of the slice
+        function.</Documentation>
+      </ProxyProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="InputBounds">
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Slice Offset Values"
+                            name="ContourValues"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1"
+                            panel_visibility="advanced">
+        <BoundsDomain mode="magnitude"
+                      name="bounds">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+        <Documentation>The values in this property specify a list of current
+        offset values. This can be used to create multiple slices with
+        different centers. Each entry represents a new slice with its center
+        shifted by the offset value.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <Visibility replace_input="2" />
+      </Hints>
+      <!-- End Cut -->
+    </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkExtractGeometry"
                  label="Extract Cells By Region"
@@ -5174,9 +5242,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>This property specifies the parameters of the clip
         function (an implicit plane) used to clip the dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </ProxyProperty>
       <DoubleVectorProperty information_only="1"
                             name="InputBounds">
@@ -5434,9 +5499,6 @@ found and the point will be rejected.</Documentation>
         </FieldDataDomain>
         <Documentation>The value of this property contains the name of the
         scalar array from which to perform thresholding.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="ThresholdBetween"
                             default_values="0 0"
@@ -5453,9 +5515,6 @@ found and the point will be rejected.</Documentation>
         </ArrayRangeDomain>
         <Documentation>The values of this property specify the upper and lower
         bounds of the thresholding operation.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetAllScalars"
                          default_values="1"
@@ -5469,7 +5528,6 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
-        <ShowInSummaryPanel />
       </Hints>
       <!-- End Threshold -->
     </SourceProxy>
@@ -5591,9 +5649,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the name of the scalar array
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
@@ -5615,9 +5670,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the values at which to compute
         isosurfaces/isolines and also the number of such
         values.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
@@ -5732,9 +5784,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property indicates the name of the scalar array on
         which to operate. The indicated array may be used for scaling the
         glyphs. (See the SetScaleMode property.)</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty command="SetInputArrayToProcess"
                             default_values="1"
@@ -5755,9 +5804,6 @@ found and the point will be rejected.</Documentation>
         which to operate. The indicated array may be used for scaling and/or
         orienting the glyphs. (See the SetScaleMode and SetOrient
         properties.)</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <InputProperty command="SetSourceConnection"
                      label="Glyph Type"
@@ -5787,9 +5833,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>This property determines which type of glyph will be
         placed at the points in the input dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </InputProperty>
       <ProxyProperty command="SetSourceTransform"
                      name="GlyphTransform"
@@ -5831,9 +5874,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property specifies how/if the glyphs
         should be scaled based on the point-centered scalars/vectors in the
         input dataset.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </IntVectorProperty>
       <DoubleVectorProperty command="SetScaleFactor"
                             default_values="1.0"
@@ -6417,9 +6457,6 @@ found and the point will be rejected.</Documentation>
         </ProxyListDomain>
         <Documentation>The value of this property determines how the seeds for
         the streamlines will be generated.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
@@ -6436,9 +6473,6 @@ found and the point will be rejected.</Documentation>
         </ArrayListDomain>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <IntVectorProperty default_values="100"
                          information_only="1"
@@ -7352,6 +7386,15 @@ found and the point will be rejected.</Documentation>
         <Documentation>Compute vorticity and angular rotation of particles as
         they progress</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
+      </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
     <SourceProxy class="vtkStreaklineFilter"
@@ -7458,6 +7501,15 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool" />
         <Documentation>Compute vorticity and angular rotation of particles as
         they progress</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDisableResetCache"
+                         default_values="0"
+                         name="DisableResetCache"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <BooleanDomain name="bool" />
+        <Documentation>Prevents cache from getting reset so that new computation
+          always start from previous results.</Documentation>
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -10428,11 +10480,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10591,11 +10638,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10795,11 +10837,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -10951,11 +10988,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>A previously-calculated model with which to assess a
         separate dataset. This input is optional.</Documentation>
       </InputProperty>
-      <StringVectorProperty information_only="1"
-                            name="SelectArrayInfo">
-        <ArraySelectionInformationHelper attribute_name="Attribute" />
-        <!-- attribute_name => GetNumberOf___Arrays -->
-      </StringVectorProperty>
       <IntVectorProperty command="SetAttributeMode"
                          default_values="0"
                          name="AttributeMode"
@@ -12051,9 +12083,6 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a point array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearCellDataArrays"
@@ -12064,9 +12093,6 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a cell array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="ClearFieldDataArrays"
@@ -12077,11 +12103,70 @@ found and the point will be rejected.</Documentation>
                             number_of_elements_per_command="1"
                             repeat_command="1">
         <Documentation>Add a field array by name to be passed.</Documentation>
-        <Hints>
-          <ShowInSummaryPanel />
-        </Hints>
       </StringVectorProperty>
       <!-- End PassArrays -->
+    </SourceProxy>
+
+    <SourceProxy class="vtkImageToAMR"
+                 label="Image Data To AMR"
+                 multiprocess_support="single_process"
+                 name="ImageDataToAMR">
+      <Documentation long_help="Converts certain images to AMR."
+                     short_help="Convert ImageData to AMR. ">
+      </Documentation>
+      <InputProperty command="SetInputConnection"
+                     name="Input">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+        <Documentation>
+          This property specifies the input to the Cell Data to
+          Point Data filter.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty command="SetNumberOfLevels"
+                         default_values="2"
+                         label="Number of levels"
+                         name="NumberOfLevels"
+                         number_of_elements="1">
+        <IntRangeDomain max="20"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the number of levels in the amr data structure.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetMaximumNumberOfBlocks"
+                         default_values="100"
+                         label="Maximum Number of Blocks"
+                         name="MaximumNumberOfLevels"
+                         number_of_elements="1">
+        <IntRangeDomain max="100000"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the maximum number of blocks in the output
+          amr data structure.
+        </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetRefinementRatio"
+                         default_values="2"
+                         label="Refinement Ratio"
+                         name="RefinementRatio"
+                         number_of_elements="1">
+        <IntRangeDomain max="16"
+                        min="1"
+                        name="range" />
+        <Documentation>
+          This property specifies the refinement ratio between levels.
+        </Documentation>
+      </IntVectorProperty>
+    <!-- End of ImageDataToAMR -->
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

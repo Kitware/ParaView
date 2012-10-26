@@ -28,7 +28,7 @@
 
 #include "vtkObject.h"
 
-class vtkSQHemisphereSourceConfigurationFileInfo
+class VTK_EXPORT vtkSQHemisphereSourceConfigurationFileInfo
 {
 public:
   vtkSQHemisphereSourceConfigurationFileInfo()

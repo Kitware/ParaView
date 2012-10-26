@@ -116,7 +116,7 @@ int vtkSMIntRangeDomain::IsInDomain(unsigned int idx, int val)
 //---------------------------------------------------------------------------
 unsigned int vtkSMIntRangeDomain::GetNumberOfEntries()
 {
-  return this->IRInternals->Entries.size();
+  return static_cast<unsigned int>(this->IRInternals->Entries.size());
 }
 
 //---------------------------------------------------------------------------

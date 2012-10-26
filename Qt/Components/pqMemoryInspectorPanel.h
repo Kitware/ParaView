@@ -32,6 +32,7 @@ class HostData;
 class RankData;
 class QTreeWidgetItem;
 class vtkPVSystemConfigInformation;
+class pqView;
 
 class PQCOMPONENTS_EXPORT pqMemoryInspectorPanel : public QWidget
 {
@@ -40,14 +41,42 @@ public:
   pqMemoryInspectorPanel(QWidget* parent=0, Qt::WindowFlags f=0);
   ~pqMemoryInspectorPanel();
 
-protected slots:
   // Description:
-  // Update the UI with values from the server(s).
-  void Initialize();
+  // Test for successful initialization.
+  int Initialized(){ return this->ClientHost!=NULL; }
+
+protected:
+  // Description:
+  // Update when the panel is made visible.
+  virtual void showEvent(QShowEvent *event);
+
+protected slots:
 
   // Description:
-  // Refresh the UI with the latest values from the server(s).
-  void Refresh();
+  // Configure the UI based on conneccted servers.
+  void ServerDisconnected();
+  void ServerConnected();
+
+  // Description:
+  // The panel will update itself after render events end. Render events are
+  // used because they occur only after all server side action is complete
+  // and rendering initself can use significant resources. The update is
+  // enabled only after pqView::dataUpdatedEvent.
+  void ConnectToView(pqView *view);
+  void RenderCompleted();
+  void EnableUpdate();
+
+  // Description:
+  // Update the UI with values from the server(s).
+  int Initialize();
+
+  // Description:
+  // Update the UI with the latest values from the server(s).
+  void Update();
+
+  // Description:
+  // Enable auto update.
+  void SetAutoUpdate(bool state){ this->AutoUpdate=state; }
 
   // Description:
   // enable/disable stack trace.
@@ -66,11 +95,6 @@ protected slots:
   void ShowHostPropertiesDialog();
 
   // Description:
-  // Use when an artificial limit on per-process memory
-  // consumption is in play, such as on a shared memory system.
-  void OverrideCapacity();
-
-  // Description:
   // Create a context menu for the config view.
   void ConfigViewContextMenu(const QPoint &pos);
 
@@ -87,15 +111,16 @@ private:
       map<string,HostData *> &hosts,
       vector<RankData *> &ranks);
 
-  void RefreshRanks();
-  void RefreshHosts();
-  void RefreshHosts(map<string,HostData*> &hosts);
+  void UpdateRanks();
+  void UpdateHosts();
+  void UpdateHosts(map<string,HostData*> &hosts);
 
   void InitializeServerGroup(
-      unsigned long long clientPid,
+      long long clientPid,
       vtkPVSystemConfigInformation *configs,
       int validProcessType,
       QTreeWidgetItem *group,
+      string groupName,
       map<string,HostData*> &hosts,
       vector<RankData*> &ranks,
       int &systemType);
@@ -103,14 +128,13 @@ private:
   void EnableStackTrace(bool enable,int group);
   void AddEnableStackTraceMenuAction(int serverType, QMenu &context);
 
-  void OverrideCapacity(map<string,HostData*> &hosts);
+  QWidget *NewGroupWidget(string name, string icon);
 
 private:
   pqMemoryInspectorPanelUI *Ui;
 
   int ClientOnly;
   HostData *ClientHost;
-  RankData *ClientRank;
   int ClientSystemType;
   bool StackTraceOnClient;
 
@@ -128,6 +152,10 @@ private:
   vector<RankData *> RenderServerRanks;
   int RenderServerSystemType;
   bool StackTraceOnRenderServer;
+
+  int UpdateEnabled;
+  int PendingUpdate;
+  bool AutoUpdate;
 };
 
 #endif

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStdString.h"
 #include "vtkPlotPoints.h"
 #include "vtkAnnotationLink.h"
-#include "vtkSelectionDeliveryFilter.h"
 #include "vtkStringArray.h"
 #include "vtkChartNamedOptions.h"
 
@@ -79,7 +78,11 @@ bool vtkPVPlotMatrixRepresentation::AddToView(vtkView *view)
 
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
-    plotMatrix->SetInput(this->GetLocalOutput());
+    std::vector<vtkTable*> tables;
+    if(this->GetLocalOutput(tables))
+      {
+      plotMatrix->SetInput(tables[0]);
+      }
     plotMatrix->SetVisible(true);
 
     // set chart properties
@@ -127,27 +130,28 @@ int vtkPVPlotMatrixRepresentation::RequestData(vtkInformation *request,
 
   if(vtkScatterPlotMatrix *plotMatrix = this->GetPlotMatrix())
     {
-    vtkTable* plotInput = this->GetLocalOutput();
-    plotMatrix->SetInput(plotInput);
-    vtkIdType numCols = plotInput->GetNumberOfColumns();
-    if(numCols != this->OrderedColumns->GetNumberOfTuples())
+    std::vector<vtkTable*> tables;
+    if(this->GetLocalOutput(tables))
       {
-      this->OrderedColumns->SetNumberOfTuples(numCols);
-      for (vtkIdType i = 0; i < numCols; ++i)
+      vtkTable* plotInput = tables[0];
+      plotMatrix->SetInput(plotInput);
+      vtkIdType numCols = plotInput->GetNumberOfColumns();
+      if(numCols != this->OrderedColumns->GetNumberOfTuples())
         {
-        this->OrderedColumns->SetValue(i, plotInput->GetColumnName(i));
+        this->OrderedColumns->SetNumberOfTuples(numCols);
+        for (vtkIdType i = 0; i < numCols; ++i)
+          {
+          this->OrderedColumns->SetValue(i, plotInput->GetColumnName(i));
+          }
+        }
+      if (this->Options)
+        {
+        this->Options->UpdatePlotOptions();
         }
       }
     if (this->Options)
       {
       this->Options->UpdatePlotOptions();
-      }
-
-    if(vtkAnnotationLink* annLink = plotMatrix->GetAnnotationLink())
-      {
-      vtkSelection* sel = vtkSelection::SafeDownCast(
-        this->SelectionDeliveryFilter->GetOutputDataObject(0));
-      annLink->SetCurrentSelection(sel);
       }
     }
 

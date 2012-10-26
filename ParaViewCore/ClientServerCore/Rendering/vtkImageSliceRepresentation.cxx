@@ -166,8 +166,17 @@ int vtkImageSliceRepresentation::RequestData(vtkInformation* request,
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
     this->UpdateSliceData(inputVector); 
-    this->CacheKeeper->Update();
     }
+  else
+    {
+    // This happens on the client in client-server mode. We simply mark the data
+    // dirty so that the "delivery" code can fetch new data.
+    if (!this->GetUsingCacheForUpdate())
+      {
+      this->SliceData->Modified();
+      }
+    }
+  this->CacheKeeper->Update();
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
 }

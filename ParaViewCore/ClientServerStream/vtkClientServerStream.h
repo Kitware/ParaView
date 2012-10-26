@@ -25,6 +25,7 @@
 #define __vtkClientServerStream_h
 
 #include "vtkClientServerID.h"
+#include "vtkVariant.h"
 
 class vtkClientServerStreamInternals;
 
@@ -154,9 +155,20 @@ public:
 #endif
   int GetArgument(int message, int argument, const char** value) const;
   int GetArgument(int message, int argument, char** value) const;
+  int GetArgument(int message, int argument, vtkStdString* value) const;
   int GetArgument(int message, int argument, vtkClientServerStream* value) const;
   int GetArgument(int message, int argument, vtkClientServerID* value) const;
   int GetArgument(int message, int argument, vtkObjectBase** value) const;
+
+  // Description:
+  // Get the value of the given argument in the given message.
+  // Returns whether the argument could be converted to the requested
+  // type.
+  //
+  // Note that this version modifies the \a argument number as a vtkVariant
+  // is passed in the stream as a composite type with a variable
+  // number of primitive stream entries required to describe it.
+  int GetArgument(int message, int& argument, vtkVariant* value) const;
 
   // Description:
   // Get the length of an argument of an array type.  Returns whether
@@ -216,6 +228,8 @@ public:
   vtkClientServerStream& operator << (const vtkClientServerStream&);
   vtkClientServerStream& operator << (vtkClientServerID);
   vtkClientServerStream& operator << (vtkObjectBase*);
+  vtkClientServerStream& operator << (const vtkStdString&);
+  vtkClientServerStream& operator << (const vtkVariant&);
 
   // Description:
   // Stream operators for native types.

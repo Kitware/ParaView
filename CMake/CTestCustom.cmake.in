@@ -1,0 +1,81 @@
+#------------------------------------------------------------------------------
+# Inherit VTK's exclusions. We don't have to redefine them in this file anymore.
+include("@VTK_BINARY_DIR@/CTestCustom.cmake")
+
+#------------------------------------------------------------------------------
+# Regular expression for warning exception during build process
+set (CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+
+  #ignore protobuf related warnings.
+  "ThirdParty.protobuf/"
+  "protobuf"
+  "vtkPVMessage"
+  "vtkSMMessage"
+  "google::protobuf::Message"
+
+  #ignore warnings coming from QT headers.
+  "qtcore"
+  "qthelp"
+  "QtCore"
+  "QtHelp"
+
+
+  "vtk[^\\.]+ClientServer.cxx"
+
+  # ignore VRPN warnings
+  ".*vrpn.*"
+
+  # ignore warnings from openmpi.
+  ".*openmpi.*"
+
+  # ignore warnings about unsafe str* functions.
+  "_CRT_SECURE_NO_WARNINGS"
+
+  # ignore warnings from documentation generation tools.
+  "Warning.*Skipping it."
+  "warning.*Skipping it."
+
+  # ignore external code issue
+  ".*pyconfig.h"
+  ".*Python.h"
+  "_POSIX_C_SOURCE"
+  "_XOPEN_SOURCE"
+  ".*FreeType.*CxxTests.*"
+
+  # Ignore invalid warning
+  ".*vtksmrenderviewproxy.cxx.*unreachable code"
+  ".*pqComponentsInit.cxx.*conditional expression is constant"
+  ".*pqCoreInit.cxx.*conditional expression is constant"
+
+  # ignore warnings from old plugins
+  ".*H5Part.*"
+  ".*AnalyzeNIfTIReaderWriter.*"
+
+  # ignore method call with return value unused
+  "declared with attribute warn_unused_result"
+  "warning: ignoring return value"
+
+  # ignore qt library warnings
+  ".*qttest.*testlib.*"
+
+  # MPI 2 deprecation warning
+  ".*MPI_Errhandler_create.*MPI_Comm_create_errhandler.*"
+  ".*MPI_Errhandler_set.*MPI_Comm_set_errhandler.*"
+
+  # Ignore warning on Windows for static builds complaining that the archive has
+  # no public symbols and hence will be inaccessible.
+  "warning LNK4221"
+)
+
+#------------------------------------------------------------------------------
+# Regular expression for excluding files from coverage testing
+set (CTEST_CUSTOM_COVERAGE_EXCLUDE
+  ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
+  ".*/VTK/.*"
+  "vtk[^\\.]+ClientServer.cxx"
+  "vtk[^\\.]+Python.cxx"
+  "ui_[^\\.]+.h"
+  "moc_[^\\.]+.h"
+  "vtkprotobuf"
+)

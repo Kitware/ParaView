@@ -364,7 +364,7 @@ unsigned int vtkSMSessionProxyManager::GetNumberOfProxies(const char* group)
       {
       size += it2->second.size();
       }
-    return size;
+    return static_cast<unsigned int>(size);
     }
   return 0;
 }
@@ -901,7 +901,7 @@ void vtkSMSessionProxyManager::UpdateProxyInOrder(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 int vtkSMSessionProxyManager::GetNumberOfLinks()
 {
-  return this->Internals->RegisteredLinkMap.size();
+  return static_cast<int>(this->Internals->RegisteredLinkMap.size());
 }
 
 //---------------------------------------------------------------------------
@@ -1196,9 +1196,9 @@ vtkPVXMLElement* vtkSMSessionProxyManager::AddInternalState(vtkPVXMLElement *par
 
   // Set version number on the state element.
   vtksys_ios::ostringstream version_string;
-  vtkSMProxyManager* px = vtkSMProxyManager::GetProxyManager();
-  version_string << px->GetVersionMajor() << "."
-    << px->GetVersionMinor() << "." << px->GetVersionPatch();
+  version_string << vtkSMProxyManager::GetVersionMajor() << "."
+                 << vtkSMProxyManager::GetVersionMinor() << "."
+                 << vtkSMProxyManager::GetVersionPatch();
   rootElement->AddAttribute("version", version_string.str().c_str());
 
 

@@ -24,7 +24,9 @@ ostream &pCerr()
 {
   int WorldRank=0;
   #ifndef SQTK_WITHOUT_MPI
-  MPI_Comm_rank(MPI_COMM_WORLD,&WorldRank);
+  int ok;
+  MPI_Initialized(&ok);
+  if (ok) MPI_Comm_rank(MPI_COMM_WORLD,&WorldRank);
   #endif
 
   char host[256]={'\0'};

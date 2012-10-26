@@ -118,7 +118,6 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
 //-----------------------------------------------------------------------------
 pqHandleWidget::~pqHandleWidget()
 {
-  this->cleanupWidget();
   delete this->Implementation;
 }
 
@@ -139,7 +138,7 @@ void pqHandleWidget::createWidget(pqServer* server)
 {
   vtkSMNewWidgetRepresentationProxy* widget =
     pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("PointSourceWidgetRepresentation", server);
+    get3DWidget("PointSourceWidgetRepresentation", server, this->getReferenceProxy());
   this->setWidgetProxy(widget);
   
   widget->UpdateVTKObjects();
@@ -159,19 +158,6 @@ void pqHandleWidget::createWidget(pqServer* server)
     this->Implementation->UI->worldPositionZ, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 2);
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::cleanupWidget()
-{
-  this->Implementation->Links.removeAllPropertyLinks();
-  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if (widget)
-    {
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(widget);
-    }
-  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------

@@ -18,23 +18,39 @@ Copyright 2012 SciberQuest Inc.
 #ifndef __vtkSQLog_h
 #define __vtkSQLog_h
 
-#define vtkSQLogDEBUG
+#define vtkSQLogDEBUG -1
+//#ifdef SQTK_DEBUG
+//#define vtkSQLogDEBUG 1
+//#endif
 
 #include "vtkObject.h"
 
-#include <vector>
+//BTX
+#include "LogBuffer.h" // for LogBuffer
+
+#include <vector> // for vector
 using std::vector;
-#include <string>
+#include <string> // for string
 using std::string;
-#include <sstream>
+#include <sstream> // for sstream
 using std::ostringstream;
 
+#if vtkSQLogDEBUG > 0
+#include <iostream> // for cerr
+using std::cerr;
+using std::endl;
+#endif
+//ETX
+
+
+class vtkPVXMLElement;
 class vtkSQLog;
-class LogBuffer;
 
 //BTX
-//=============================================================================
-class vtkSQLogDestructor
+/**
+A class responsible for delete'ing the global instance of the log.
+*/
+class VTK_EXPORT vtkSQLogDestructor
 {
 public:
   vtkSQLogDestructor() : Log(0) {}
@@ -45,15 +61,39 @@ public:
 private:
   vtkSQLog *Log;
 };
+
+/**
+Type used to direct an output stream into the log's header. The header
+is a buffer used only by the root rank.
+*/
+class VTK_EXPORT LogHeaderType
+{
+public:
+  template<typename T> LogHeaderType &operator<<(const T& s);
+};
+
+/**
+Type used to direct an output stream into the log's body. The body is a
+buffer that all ranks write to.
+*/
+class VTK_EXPORT LogBodyType
+{
+public:
+  template<typename T> LogBodyType &operator<<(const T& s);
+};
 //ETX
 
 //=============================================================================
-class vtkSQLog : public vtkObject
+class VTK_EXPORT vtkSQLog : public vtkObject
 {
 public:
   static vtkSQLog *New();
   vtkTypeMacro(vtkSQLog,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // intialize from an xml document.
+  int Initialize(vtkPVXMLElement *root);
 
   // Description:
   // Set the rank who writes.
@@ -66,6 +106,9 @@ public:
   // ROOT_RANKS_PID.log
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
+  //BTX
+  void SetFileName(const string &fileName){ this->SetFileName(fileName.c_str()); }
+  //ETX
 
   // Description:
   // The log works as an event stack. EventStart pushes the
@@ -86,6 +129,14 @@ public:
   // Insert text into the log header on the writer rank.
   template<typename T>
   vtkSQLog &operator<<(const T& s);
+
+  // Description:
+  // stream output to the log's header(root rank only).
+  LogHeaderType GetHeader(){ return LogHeaderType(); }
+
+  // Description:
+  // stream output to log body(all ranks).
+  LogBodyType GetBody(){ return LogBodyType(); }
   //ETX
 
   // Description:
@@ -106,17 +157,28 @@ public:
   int Write();
 
   // Description:
-  // The log class implements the singleton patern. It's optional.
-  // When used this way when objects are finished with the log they
-  // are required to call Update to push the local changes to the
-  // root. When the root is destroyed the data is written to disk.
+  // The log class implements the singleton patern so that it
+  // may be shared accross class boundaries. If the log instance
+  // doesn't exist then one is created. It will be automatically
+  // destroyed at exit by the signleton destructor. It can be
+  // destroyed explicitly by calling DeleteGlobalInstance.
   static vtkSQLog *GetGlobalInstance();
 
   // Description:
-  // If enabled(default) and used as a singleton the log will write
+  // Explicitly delete the singleton.
+  static void DeleteGlobalInstance();
+
+  // Description:
+  // If enabled and used as a singleton the log will write
   // it's contents to disk during program termination.
   vtkSetMacro(WriteOnClose,int);
   vtkGetMacro(WriteOnClose,int);
+
+  // Description:
+  // Set/Get the global log level. Applications can set this to the
+  // desired level so that all pipeline objects will log data.
+  vtkSetMacro(GlobalLevel,int);
+  vtkGetMacro(GlobalLevel,int);
 
 protected:
   vtkSQLog();
@@ -127,13 +189,14 @@ private:
   void operator=(const vtkSQLog &); // not implemented
 
 private:
+  int GlobalLevel;
   int WorldRank;
   int WorldSize;
   int WriterRank;
   char *FileName;
   int WriteOnClose;
   vector<double> StartTime;
-  #if defined vtkSQLogDEBUG
+  #if vtkSQLogDEBUG < 0
   vector<string> EventId;
   #endif
 
@@ -142,19 +205,56 @@ private:
   static vtkSQLog *GlobalInstance;
   static vtkSQLogDestructor GlobalInstanceDestructor;
 
-  ostringstream Header;
+  ostringstream HeaderBuffer;
+
+  friend class LogHeaderType;
+  friend class LogBodyType;
 };
 
 //BTX
-//-----------------------------------------------------------------------------
+ //-----------------------------------------------------------------------------
 template<typename T>
 vtkSQLog &vtkSQLog::operator<<(const T& s)
 {
   if (this->WorldRank==this->WriterRank)
     {
-    this->Header << s;
+    this->HeaderBuffer << s;
+    #if vtkSQLogDEBUG > 0
+    cerr << s;
+    #endif
     }
-    return *this;
+  return *this;
+}
+
+//-----------------------------------------------------------------------------
+template<typename T>
+LogHeaderType &LogHeaderType::operator<<(const T& s)
+{
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+
+  if (log->WorldRank==log->WriterRank)
+    {
+    log->HeaderBuffer << s;
+    #if vtkSQLogDEBUG > 0
+    cerr << s;
+    #endif
+    }
+
+  return *this;
+}
+
+//-----------------------------------------------------------------------------
+template<typename T>
+LogBodyType &LogBodyType::operator<<(const T& s)
+{
+  vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+
+  *(log->Log) <<  s;
+  #if vtkSQLogDEBUG > 0
+  cerr << s;
+  #endif
+
+  return *this;
 }
 //ETX
 

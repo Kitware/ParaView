@@ -77,10 +77,12 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
   if(vtkSMBooleanDomain::SafeDownCast(domain))
     {
-    QCheckBox *checkBox = new QCheckBox(QString(), this);
+    QCheckBox *checkBox = new QCheckBox(smproperty->GetXMLLabel(), this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
     layoutLocal->addWidget(checkBox);
+
+    this->setShowLabel(false);
 
     this->setReason() << "QCheckBox for an IntVectorProperty with a BooleanDomain";
     }

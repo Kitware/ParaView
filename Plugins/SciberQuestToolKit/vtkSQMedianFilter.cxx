@@ -8,12 +8,7 @@ Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQMedianFilter.h"
 
-// #define vtkSQMedianFilterDEBUG
-// #define vtkSQMedianFilterTIME
-
-#if defined vtkSQMedianFilterTIME
-  #include "vtkSQLog.h"
-#endif
+// #define SQTK_DEBUG
 
 #include "SQPosixOnWindows.h"
 #include "SQVTKTemplateMacroWarningSupression.h"
@@ -24,6 +19,7 @@ Copyright 2012 SciberQuest Inc.
 #include "CartesianExtent.h"
 #include "CPUConvolutionDriver.h"
 #include "CUDAConvolutionDriver.h"
+#include "vtkSQLog.h"
 #include "XMLUtils.h"
 #include "postream.h"
 #include "SQMacros.h"
@@ -68,15 +64,16 @@ vtkSQMedianFilter::vtkSQMedianFilter()
   KernelType(KERNEL_TYPE_MEDIAN),
   //Kernel(0),
   KernelModified(1),
-  Mode(CartesianExtent::DIM_MODE_3D)
+  Mode(CartesianExtent::DIM_MODE_3D),
   //NumberOfCUDADevices(0),
   //NumberOfActiveCUDADevices(0),
   //CUDADeviceId(-1),
   //NumberOfMPIRanksToUseCUDA(0),
-  //EnableCUDA(0)
+  //EnableCUDA(0),
+  LogLevel(0)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::vtkSQMedianFilter" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::vtkSQMedianFilter" << endl;
   #endif
 
   this->SetNumberOfInputPorts(1);
@@ -197,7 +194,7 @@ vtkSQMedianFilter::vtkSQMedianFilter()
     }
   this->SetNumberOfActiveCUDADevices(this->NumberOfCUDADevices);
 
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "HostSize=" << this->HostSize << endl;
   pCerr() << "HostRank=" << this->HostRank << endl;
   #endif
@@ -207,8 +204,8 @@ vtkSQMedianFilter::vtkSQMedianFilter()
 //-----------------------------------------------------------------------------
 vtkSQMedianFilter::~vtkSQMedianFilter()
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::~vtkSQMedianFilter" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::~vtkSQMedianFilter" << endl;
   #endif
 
   /*
@@ -226,8 +223,8 @@ vtkSQMedianFilter::~vtkSQMedianFilter()
 //-----------------------------------------------------------------------------
 int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::Initialize" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::Initialize" << endl;
   #endif
 
   vtkPVXMLElement *elem=0;
@@ -264,15 +261,18 @@ int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
   GetOptionalAttribute<int,1>(elem,"numberOfMPIRanksToUseCUDA",&numberOfMPIRanksToUseCUDA);
   */
 
-  #if defined vtkSQMedianFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  *log
-    << "# ::vtkSQMedianFilter" << "\n"
-    << "#   stencilWidth=" << stencilWidth << "\n"
-    << "#   kernelType=" << kernelType << "\n";
-    //<< "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
-    //<< "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    vtkSQLog *log=vtkSQLog::GetGlobalInstance();
+    log->GetHeader()
+      << "# ::vtkSQMedianFilter" << "\n"
+      << "#   stencilWidth=" << stencilWidth << "\n"
+      << "#   kernelType=" << kernelType << "\n";
+      //<< "#   CPUDriverOptimization=" << CPUDriverOptimization << "\n"
+      //<< "#   numberOfMPIRanksToUseCUDA=" << numberOfMPIRanksToUseCUDA << "\n";
+    }
 
   /*
   if (numberOfMPIRanksToUseCUDA)
@@ -323,9 +323,9 @@ int vtkSQMedianFilter::Initialize(vtkPVXMLElement *root)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetCPUDriverOptimization(int opt)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetCPUDriverOptimization"
+    << "=====vtkSQMedianFilter::SetCPUDriverOptimization"
     << " " << opt << endl;
   #endif
   this->CPUDriver->SetOptimization(opt);
@@ -341,9 +341,9 @@ int vtkSQMedianFilter::GetCPUDriverOptimization()
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetAllMPIRanksToUseCUDA(int allUse)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetAllMPIRanksToUseCUDA"
+    << "=====vtkSQMedianFilter::SetAllMPIRanksToUseCUDA"
     << " " << allUse
     << endl;
   #endif
@@ -359,7 +359,7 @@ void vtkSQMedianFilter::SetAllMPIRanksToUseCUDA(int allUse)
 
   this->Modified();
 
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
   #endif
 }
@@ -367,9 +367,9 @@ void vtkSQMedianFilter::SetAllMPIRanksToUseCUDA(int allUse)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA"
+    << "=====vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA"
     << " " << nRanks
     << endl;
   #endif
@@ -401,7 +401,7 @@ void vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 
   this->Modified();
 
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr() << "EnableCUDA=" << this->EnableCUDA << endl;
   #endif
 }
@@ -409,9 +409,9 @@ void vtkSQMedianFilter::SetNumberOfMPIRanksToUseCUDA(int nRanks)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetNumberOfActiveCUDADevices(int nActive)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetNumberOfActiveCUDADevices"
+    << "=====vtkSQMedianFilter::SetNumberOfActiveCUDADevices"
     << " " << nActive
     << endl;
   #endif
@@ -438,7 +438,7 @@ void vtkSQMedianFilter::SetNumberOfActiveCUDADevices(int nActive)
     {
     int deviceId=this->HostRank%this->NumberOfActiveCUDADevices;
     this->SetCUDADeviceId(deviceId);
-    #ifdef vtkSQMedianFilterDEBUG
+    #ifdef SQTK_DEBUG
     pCerr() << "assigned to cuda device " << deviceId << endl;
     #endif
     }
@@ -449,9 +449,9 @@ void vtkSQMedianFilter::SetNumberOfActiveCUDADevices(int nActive)
 //-----------------------------------------------------------------------------
 int vtkSQMedianFilter::SetCUDADeviceId(int deviceId)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetCUDADeviceId"
+    << "=====vtkSQMedianFilter::SetCUDADeviceId"
     << " " << deviceId
     << endl;
   #endif
@@ -469,9 +469,9 @@ int vtkSQMedianFilter::SetCUDADeviceId(int deviceId)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetKernelCUDAMemoryType(int memType)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetKernelCUDAMemoryType"
+    << "=====vtkSQMedianFilter::SetKernelCUDAMemoryType"
     << " " << memType << endl;
   #endif
   this->CUDADriver->SetKernelMemoryType(memType);
@@ -487,9 +487,9 @@ int vtkSQMedianFilter::GetKernelCUDAMemoryType()
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetInputCUDAMemoryType(int memType)
 {
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
-    << "===============================vtkSQMedianFilter::SetInputCUDAMemoryType"
+    << "=====vtkSQMedianFilter::SetInputCUDAMemoryType"
     << " " << memType << endl;
   #endif
   this->CUDADriver->SetInputMemoryType(memType);
@@ -519,8 +519,8 @@ int vtkSQMedianFilter::GetNumberOfWarpsPerCUDABlock()
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetMode(int mode)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::SetMode" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::SetMode" << endl;
   #endif
 
   if (mode==this->Mode)
@@ -536,8 +536,8 @@ void vtkSQMedianFilter::SetMode(int mode)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetKernelType(int type)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::SetKernelType" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::SetKernelType" << endl;
   #endif
 
   if (type==this->KernelType)
@@ -553,8 +553,8 @@ void vtkSQMedianFilter::SetKernelType(int type)
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::SetKernelWidth(int width)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::SetKernelWidth" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::SetKernelWidth" << endl;
   #endif
 
   if (width==this->KernelWidth)
@@ -576,8 +576,8 @@ void vtkSQMedianFilter::SetKernelWidth(int width)
 //-----------------------------------------------------------------------------
 int vtkSQMedianFilter::UpdateKernel()
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::UpdateKernel" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::UpdateKernel" << endl;
   #endif
 
   if (!this->KernelModified)
@@ -615,8 +615,8 @@ int vtkSQMedianFilter::RequestDataObject(
     vtkInformationVector** inInfoVec,
     vtkInformationVector* outInfoVec)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::RequestDataObject" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::RequestDataObject" << endl;
   #endif
 
 
@@ -644,8 +644,8 @@ int vtkSQMedianFilter::RequestInformation(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::RequestInformation" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::RequestInformation" << endl;
   #endif
   //this->Superclass::RequestInformation(req,inInfos,outInfos);
 
@@ -694,7 +694,7 @@ int vtkSQMedianFilter::RequestInformation(
   inInfo->Get(vtkDataObject::ORIGIN(),X0);
   outInfo->Set(vtkDataObject::ORIGIN(),X0,3);
 
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT(input)=" << inputDomain << endl
     << "WHOLE_EXTENT(output)=" << outputDomain << endl
@@ -712,8 +712,8 @@ int vtkSQMedianFilter::RequestUpdateExtent(
       vtkInformationVector **inInfos,
       vtkInformationVector *outInfos)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::RequestUpdateExtent" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::RequestUpdateExtent" << endl;
   #endif
 
   (void)req;
@@ -763,7 +763,7 @@ int vtkSQMedianFilter::RequestUpdateExtent(
   inInfo->Set(vtkSDDPipeline::UPDATE_NUMBER_OF_PIECES(), numPieces);
   inInfo->Set(vtkSDDPipeline::EXACT_EXTENT(), 1);
 
-  #ifdef vtkSQMedianFilterDEBUG
+  #ifdef SQTK_DEBUG
   pCerr()
     << "WHOLE_EXTENT=" << wholeExt << endl
     << "UPDATE_EXTENT=" << outputExt << endl
@@ -779,14 +779,16 @@ int vtkSQMedianFilter::RequestData(
     vtkInformationVector **inInfoVec,
     vtkInformationVector *outInfoVec)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::RequestData" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::RequestData" << endl;
   #endif
 
-  #if defined vtkSQMedianFilterTIME
   vtkSQLog *log=vtkSQLog::GetGlobalInstance();
-  log->StartEvent("vtkSQMedianFilter::RequestData");
-  #endif
+  int globalLogLevel=log->GetGlobalLevel();
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->StartEvent("vtkSQMedianFilter::RequestData");
+    }
 
   vtkInformation *inInfo=inInfoVec[0]->GetInformationObject(0);
   vtkDataObject *inData=inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -881,7 +883,7 @@ int vtkSQMedianFilter::RequestData(
     outImData->GetDimensions(outputDims);
     int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
-    #ifdef vtkSQMedianFilterDEBUG
+    #ifdef SQTK_DEBUG
     pCerr()
       << "WHOLE_EXTENT=" << domainExt << endl
       << "UPDATE_EXTENT(input)=" << extV << endl
@@ -946,7 +948,7 @@ int vtkSQMedianFilter::RequestData(
         return -1;
       }
 
-    #ifdef vtkSQMedianFilterDEBUG
+    #ifdef SQTK_DEBUG
     pCerr() << "wnijk=" << wnijk << endl;
     pCerr() << "fastDim=" << fastDim << endl;
     pCerr() << "slowDim=" << slowDim << endl;
@@ -1036,9 +1038,10 @@ int vtkSQMedianFilter::RequestData(
     vtkWarningMacro("TODO : implment difference opperators on stretched grids.");
     }
 
-  #if defined vtkSQMedianFilterTIME
-  log->EndEvent("vtkSQMedianFilter::RequestData");
-  #endif
+  if (this->LogLevel || globalLogLevel)
+    {
+    log->EndEvent("vtkSQMedianFilter::RequestData");
+    }
 
  return 1;
 }
@@ -1046,8 +1049,8 @@ int vtkSQMedianFilter::RequestData(
 //-----------------------------------------------------------------------------
 void vtkSQMedianFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
-  #ifdef vtkSQMedianFilterDEBUG
-  pCerr() << "===============================vtkSQMedianFilter::PrintSelf" << endl;
+  #ifdef SQTK_DEBUG
+  pCerr() << "=====vtkSQMedianFilter::PrintSelf" << endl;
   #endif
 
   this->Superclass::PrintSelf(os,indent);

@@ -16,9 +16,11 @@
 
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataDeliveryManager.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVStreamingPiecesInformation.h"
 #include "vtkRenderer.h"
 #include "vtkSMSession.h"
 #include "vtkSMViewProxy.h"
@@ -97,7 +99,7 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
          << static_cast<int>(use_lod)
          << static_cast<unsigned int>(keys_to_deliver.size())
          << vtkClientServerStream::InsertArray(
-           &keys_to_deliver[0], keys_to_deliver.size())
+           &keys_to_deliver[0], static_cast<int>(keys_to_deliver.size()))
          << vtkClientServerStream::End;
   this->ViewProxy->GetSession()->ExecuteStream(
     this->ViewProxy->GetLocation(), stream, false);
@@ -106,62 +108,46 @@ void vtkSMDataDeliveryManager::Deliver(bool interactive)
 }
 
 //----------------------------------------------------------------------------
-bool vtkSMDataDeliveryManager::DeliverNextPiece()
+bool vtkSMDataDeliveryManager::DeliverStreamedPieces()
 {
-  // This method gets called to deliver next piece in queue during streaming.
-  // vtkSMDataDeliveryManager::Deliver() relies on the "client" to decide what
-  // representations are dirty and requests geometries for those. This makes it
-  // possible to work well in multi-clients mode without putting any additional
-  // burden on the server side.
-  //
-  // For streaming, however, we require that multi-clients mode is disabled and
-  // the server decides what pieces need to be delivered since the server has
-  // more information about the data to decide how it should be streamed.
+  // Deliver() relies on the client telling the server about the representation
+  // that need data from the server-side. Deliver() can reliably determine that
+  // since representation objects on client side are indeed updated correctly
+  // when data changes (that's to the update-suppressing behaviour of
+  // vtkPVDataRepresentation subclasses).
 
-  vtkTimerLog::MarkStartEvent("DeliverNextPiece");
-  vtkSMSession* session = this->ViewProxy->GetSession();
+  // However for streaming, only the server-side representations update, hence
+  // client has no information about representations that have pieces to stream.
+  // Hence we do the following:
+  // 1. Ask data-server information about what representations have some pieces
+  //    reader.
+  // 2. Request streamed pieces for those representations.
+  
+  vtkTimerLog::MarkStartEvent(
+    "vtkSMDataDeliveryManager: Deliver Geometry (streaming)");
 
-  vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(
-    this->ViewProxy->GetClientSideObject());
+  vtkNew<vtkPVStreamingPiecesInformation> info;
+  this->ViewProxy->GatherInformation(info.GetPointer(), vtkPVSession::DATA_SERVER);
 
-  double planes[24];
-  vtkRenderer* ren = view->GetRenderer();
-  ren->GetActiveCamera()->GetFrustumPlanes(
-    ren->GetTiledAspectRatio(), planes);
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << VTKOBJECT(this->ViewProxy)
-         << "GetNextPieceToDeliver"
-         << vtkClientServerStream::InsertArray(planes, 24)
-         << vtkClientServerStream::End;
-  session->ExecuteStream(vtkPVSession::DATA_SERVER_ROOT, stream, false);
-
-  const vtkClientServerStream& result = session->GetLastResult(
-    vtkPVSession::DATA_SERVER_ROOT);
-  //result.Print(cout);
-
-  // extract the "piece-key" from the result and then request it.
-  unsigned int representation_id = 0;
-  result.GetArgument(0, 0, &representation_id);
-  if (representation_id != 0)
+  std::vector<unsigned int> keys_to_deliver;
+  info->GetKeys(keys_to_deliver);
+  if (keys_to_deliver.size() != 0)
     {
-    // we have something to deliver.
-    vtkClientServerStream stream2;
-    stream2 << vtkClientServerStream::Invoke
+    vtkSMSession* session = this->ViewProxy->GetSession();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
            << VTKOBJECT(this->ViewProxy)
-           << "GetDeliveryManager"
+           << "DeliverStreamedPieces"
+           << static_cast<unsigned int>(keys_to_deliver.size())
+           << vtkClientServerStream::InsertArray(
+             &keys_to_deliver[0], static_cast<int>(keys_to_deliver.size()))
            << vtkClientServerStream::End;
-    stream2 << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "StreamingDeliver"
-           << representation_id
-           << vtkClientServerStream::End;
-    this->ViewProxy->GetSession()->ExecuteStream(
-      this->ViewProxy->GetLocation(), stream2, false);
+    session->ExecuteStream(this->ViewProxy->GetLocation(), stream, false);
     }
-  vtkTimerLog::MarkEndEvent("DeliverNextPiece");
-  return representation_id != 0;
+
+  vtkTimerLog::MarkEndEvent(
+    "vtkSMDataDeliveryManager: Deliver Geometry (streaming)");
+  return keys_to_deliver.size() > 0;
 }
 
 //----------------------------------------------------------------------------

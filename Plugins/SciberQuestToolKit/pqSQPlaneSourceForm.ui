@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
-    <height>656</height>
+    <width>288</width>
+    <height>602</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
@@ -150,42 +150,63 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QRadioButton" name="constraintNone">
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_13">
          <property name="text">
-          <string>unconstrained</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Constraint:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QRadioButton" name="constraintXy">
+       <item row="0" column="1">
+        <widget class="QComboBox" name="constraint">
+         <item>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>XY</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>XZ</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>YZ</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_14">
          <property name="text">
-          <string>xy-plane</string>
+          <string>Decomp:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QRadioButton" name="constraintXz">
-         <property name="text">
-          <string>xz-plane</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="constraintYz">
-         <property name="text">
-          <string>yz-plane</string>
-         </property>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="decompType">
+         <item>
+          <property name="text">
+           <string>Patches</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Stripes</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer_9">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -219,6 +240,9 @@
        </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="dx">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
           <string>1</string>
          </property>
@@ -312,16 +336,6 @@
          </property>
          <property name="checked">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="spacingLock">
-         <property name="text">
-          <string>lock grid spacing</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -565,7 +579,6 @@
   <tabstop>res_x</tabstop>
   <tabstop>res_y</tabstop>
   <tabstop>aspectLock</tabstop>
-  <tabstop>spacingLock</tabstop>
   <tabstop>coordStatus</tabstop>
   <tabstop>n_x</tabstop>
   <tabstop>n_y</tabstop>

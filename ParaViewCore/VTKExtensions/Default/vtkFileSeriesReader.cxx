@@ -364,6 +364,8 @@ namespace
         this->MTime = this->Object->GetMTime();
         }
       }
+  private:
+    void operator=(const vtkRecordMTime&);
     };
 }
 

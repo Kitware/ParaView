@@ -6,14 +6,69 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>633</width>
-    <height>595</height>
+    <width>625</width>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Color Scale Editor</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="ValueTypePanel">
+     <item>
+      <widget class="QLabel" name="ValueInterpretationLabel">
+       <property name="text">
+        <string>Interpret values as:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="IntervalValues">
+       <property name="text">
+        <string>Intervals or ratios</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="CategoricalValues">
+       <property name="text">
+        <string>Categories</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="AdvancedButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Toggle advanced properties&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqAdvanced26.png</normaloff>:/pqWidgets/Icons/pqAdvanced26.png</iconset>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QTabWidget" name="ColorTabs">
      <property name="currentIndex">
@@ -394,49 +449,150 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <layout class="QHBoxLayout">
-         <item>
-          <spacer>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="SaveButton">
-           <property name="whatsThis">
-            <string>Click this button to save the current color map as a preset.</string>
-           </property>
-           <property name="text">
-            <string>&amp;Save</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="PresetButton">
-           <property name="whatsThis">
-            <string>Click this button to change the color map to a preset.</string>
-           </property>
-           <property name="text">
-            <string>Choose &amp;Preset</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="4" column="0">
         <widget class="QCheckBox" name="EnableOpacityFunction">
          <property name="text">
           <string>Enable Opacity Function</string>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="AnnotationsPage">
+      <attribute name="title">
+       <string>Annotations</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QTreeWidget" name="AnnotationTree">
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::MoveAction</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated">
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>Value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Annotation</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QPushButton" name="NewAnnotation">
+           <property name="text">
+            <string>New Entry</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="AddActiveValues">
+           <property name="text">
+            <string>Add # Active Values</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>18</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="pqColorChooserButton" name="AnnotationSwatch">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
+           </property>
+           <property name="text">
+            <string>Edit selected
+color</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>18</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="RemoveAnnotation">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="ResetAnnotations">
+           <property name="text">
+            <string>Delete all</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="pqColorChooserButton" name="NanColor2">
+           <property name="toolTip">
+            <string>The color to use for not-a-number values.</string>
+           </property>
+           <property name="text">
+            <string>NaN Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>NaN Annotation</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="lineEdit"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -675,7 +831,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Labels</string>
+          <string>Annotations and Tick Marks</string>
          </property>
          <layout class="QGridLayout">
           <item row="0" column="0">
@@ -846,14 +1002,14 @@
           <item row="2" column="0" colspan="3">
            <widget class="QCheckBox" name="AutomaticLabelFormat">
             <property name="text">
-             <string>Automatic Label Format</string>
+             <string>Automatic Tick Mark Format</string>
             </property>
            </widget>
           </item>
           <item row="2" column="4">
            <widget class="QLabel" name="LabelFormatLabel">
             <property name="text">
-             <string>Label Format</string>
+             <string>Tick Format</string>
             </property>
            </widget>
           </item>
@@ -872,7 +1028,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Max Number of Labels</string>
+          <string>Max Number of Ticks</string>
          </property>
         </widget>
        </item>
@@ -955,16 +1111,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="UseAutoRescaleSimple">
-              <property name="text">
-               <string>Automatic Color Scaling</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -975,24 +1121,14 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="PresetButtonSimple">
+             <widget class="QCheckBox" name="UseAutoRescaleSimple">
               <property name="text">
-               <string>Choose Preset</string>
+               <string>Automatic Color Scaling</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
@@ -1057,14 +1193,51 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QCheckBox" name="SwitchToAdvanced">
+      <widget class="QPushButton" name="MakeDefaultButton">
        <property name="text">
-        <string>Advanced</string>
+        <string>Make Default</string>
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="SaveButton">
+       <property name="whatsThis">
+        <string>Click this button to save the current color map as a preset.</string>
+       </property>
+       <property name="text">
+        <string>&amp;Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="PresetButton">
+       <property name="whatsThis">
+        <string>Click this button to change the color map to a preset.</string>
+       </property>
+       <property name="text">
+        <string>Choose &amp;Preset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="ModelessButtonPanel">
      <item>
       <spacer>
        <property name="orientation">
@@ -1082,13 +1255,6 @@
       <widget class="QPushButton" name="pushButtonApply">
        <property name="text">
         <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="MakeDefaultButton">
-       <property name="text">
-        <string>Make Default</string>
        </property>
       </widget>
      </item>
@@ -1119,29 +1285,45 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>PresetButton</tabstop>
+  <tabstop>IntervalValues</tabstop>
+  <tabstop>CategoricalValues</tabstop>
+  <tabstop>ColorTabs</tabstop>
+  <tabstop>checkBoxImmediateRender</tabstop>
+  <tabstop>pushButtonScalarColor</tabstop>
+  <tabstop>ScalarValue</tabstop>
+  <tabstop>ScalarColor</tabstop>
+  <tabstop>NanColor</tabstop>
+  <tabstop>ColorSpace</tabstop>
+  <tabstop>EnableOpacityFunction</tabstop>
+  <tabstop>opacityScalar</tabstop>
+  <tabstop>Opacity</tabstop>
+  <tabstop>ScalarOpacityUnitDistance</tabstop>
+  <tabstop>UseLogScale</tabstop>
   <tabstop>UseAutoRescale</tabstop>
   <tabstop>RescaleButton</tabstop>
   <tabstop>RescaleToDataButton</tabstop>
+  <tabstop>RescaleToDataOverTimeButton</tabstop>
   <tabstop>UseDiscreteColors</tabstop>
   <tabstop>TableSize</tabstop>
   <tabstop>TableSizeText</tabstop>
+  <tabstop>UseLogScaleSimple</tabstop>
+  <tabstop>SimpleMin</tabstop>
+  <tabstop>SimpleMax</tabstop>
+  <tabstop>pushButtonApply</tabstop>
   <tabstop>CloseButton</tabstop>
-  <tabstop>ColorTabs</tabstop>
-  <tabstop>SaveButton</tabstop>
   <tabstop>ShowColorLegend</tabstop>
   <tabstop>TitleName</tabstop>
   <tabstop>TitleComponent</tabstop>
   <tabstop>TitleFont</tabstop>
-  <tabstop>TitleBold</tabstop>
   <tabstop>TitleItalic</tabstop>
+  <tabstop>TitleBold</tabstop>
   <tabstop>TitleShadow</tabstop>
   <tabstop>TitleFontSize</tabstop>
   <tabstop>TitleOpacity</tabstop>
   <tabstop>TitleColorButton</tabstop>
   <tabstop>LabelFont</tabstop>
-  <tabstop>LabelBold</tabstop>
   <tabstop>LabelItalic</tabstop>
+  <tabstop>LabelBold</tabstop>
   <tabstop>LabelShadow</tabstop>
   <tabstop>LabelFontSize</tabstop>
   <tabstop>LabelOpacity</tabstop>
@@ -1151,6 +1333,8 @@
   <tabstop>NumberOfLabels</tabstop>
   <tabstop>AspectRatio</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -168,12 +168,13 @@ private:
   Ui::pqPropertiesPanel *Ui;
   QPointer<pqView> View;
   QPointer<pqProxy> Proxy;
-  pqOutputPort *OutputPort;
+  QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   vtkNew<vtkEventQtSlotConnect> RepresentationTypeSignal;
   QList<pqPropertiesPanelItem> ProxyPropertyItems;
   QList<pqPropertiesPanelItem> RepresentationPropertyItems;
   bool DebugWidgetCreation;
+  bool DebugApplyButtonState;
   static bool AutoApply;
   static int AutoApplyDelay;
 };

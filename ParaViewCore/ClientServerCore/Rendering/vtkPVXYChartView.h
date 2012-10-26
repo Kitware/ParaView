@@ -196,6 +196,12 @@ public:
   // corresponding properties to change these values.
   void SetAxisTitleColor(int index, double red, double green, double blue);
 
+
+  // Description:
+  // Set whether the chart uses custom labels or if the labels/ticks are placed
+  // automatically.
+  void SetAxisUseCustomLabels(int index, bool use_custom_labels);
+
   // Description:
   // Set the number of labels for the supplied axis.
   void SetAxisLabelsNumber(int axis, int number);
@@ -247,6 +253,15 @@ public:
   // Get the context item.
   virtual vtkAbstractContextItem* GetContextItem();
 
+  // Description:
+  // Representations can use this method to set the selection for a particular
+  // representation. Subclasses override this method to pass on the selection to
+  // the chart using annotation link. Note this is meant to pass selection for
+  // the local process alone. The view does not manage data movement for the
+  // selection.
+  virtual void SetSelection(
+    vtkChartRepresentation* repr, vtkSelection* selection);
+
 //BTX
 protected:
   vtkPVXYChartView();
@@ -274,13 +289,12 @@ protected:
 
   void SelectionChanged();
 
-  // Command implementation and object pointer - listen to selection updates.
-  class CommandImpl;
-  CommandImpl* Command;
-
 private:
   vtkPVXYChartView(const vtkPVXYChartView&); // Not implemented
   void operator=(const vtkPVXYChartView&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 

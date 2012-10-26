@@ -26,6 +26,12 @@ foreach (flag CMAKE_C_FLAGS_DEBUG
   endif()
 endforeach()
 
+set (examples_dependencies
+  vtkPVServerManagerApplication)
+if (PARAVIEW_BUILD_QT_GUI)
+  list (APPEND examples_dependencies pqApplicationComponents)
+endif()
+
 add_custom_command(
   OUTPUT ${ParaView_BINARY_DIR}/ParaViewExamples
   COMMAND ${CMAKE_CTEST_COMMAND}
@@ -48,13 +54,5 @@ add_custom_command(
                        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
                        ${extra_params}
   COMMENT "Build examples as a separate project"
+  DEPENDS ${examples_dependencies}
 )
-
-# These dependencies ensure that ParaViewExamples are built only after the core
-# modules have been built.
-add_custom_target(ParaViewExamplesTarget ALL DEPENDS
-  ${ParaView_BINARY_DIR}/ParaViewExamples)
-add_dependencies(ParaViewExamplesTarget vtkPVServerManagerApplication)
-if(PARAVIEW_BUILD_QT_GUI)
-  add_dependencies(ParaViewExamplesTarget pqApplicationComponents)
-endif()

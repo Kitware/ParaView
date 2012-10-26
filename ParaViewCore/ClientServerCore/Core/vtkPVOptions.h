@@ -123,7 +123,9 @@ public:
   // Is this server was started for collaboration meaning that it allow
   // several clients to connect to the same server and share the same
   // pipeline and visualization.
-  vtkGetMacro(MultiClientMode, int);
+  virtual int GetMultiClientMode()
+  { return (this->MultiClientMode || this->MultiClientModeWithErrorMacro) ?1:0; }
+  virtual int IsMultiClientModeDebug() { return this->MultiClientModeWithErrorMacro; }
 
   // Description:
   // Is this client allow multiple server connection in parallel
@@ -150,12 +152,18 @@ public:
   vtkSetStringMacro(ParaViewDataName);
 
   // Description:
-  // EXPERIMENTAL: When set, AMR streaming is enabled.
-  vtkGetMacro(AMRStreaming, int);
+  // Until streaming becomes mainstream, we enable streaming support by passing
+  // a command line argument to all processes.
+  vtkGetMacro(EnableStreaming, int);
 
   // Description:
   // When set, use cuda interop feature
   vtkGetMacro(UseCudaInterop, int);
+
+  // Description:
+  // Include originating process id text into server to client messages.
+  vtkSetMacro(SatelliteMessageIds, int);
+  vtkGetMacro(SatelliteMessageIds, int );
 
 protected:
 //BTX
@@ -215,6 +223,7 @@ protected:
   int ClientMode;
   int RenderServerMode;
   int MultiClientMode;
+  int MultiClientModeWithErrorMacro;
   int MultiServerMode;
 
   int SymmetricMPIMode;
@@ -258,10 +267,11 @@ private:
   vtkSetStringMacro(StereoType);
   char* StereoType;
 
-  int AMRStreaming;
+  int EnableStreaming;
 
   int UseCudaInterop;
 
+  int SatelliteMessageIds;
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

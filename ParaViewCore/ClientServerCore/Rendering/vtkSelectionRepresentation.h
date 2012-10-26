@@ -86,11 +86,17 @@ public:
   void SetOrigin(double, double, double);
   void SetPosition(double, double, double);
   void SetScale(double, double, double);
+  void SetUserTransform(const double[16]);
 
   // Description:
   // Forwarded to vtkDataLabelRepresentation.
   virtual void SetPointFieldDataArrayName(const char* val);
   virtual void SetCellFieldDataArrayName(const char* val);
+
+  // Description:
+  // Override because of internal composite representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
 
 //BTX
 protected:

@@ -391,6 +391,7 @@ public:
   // On success, the \c information object is filled up with details about the
   // VTK object.
   bool GatherInformation(vtkPVInformation* information);
+  bool GatherInformation(vtkPVInformation* information, vtkTypeUInt32 location);
 
   // Description:
   // Saves the state of the proxy. This state can be reloaded

@@ -434,7 +434,7 @@ void vtkPieceCacheFilter::AppendPieces()
     }
 
   vtkIdType cnt = 0;
-  this->AppendFilter->SetNumberOfInputs(this->Cache.size());
+  this->AppendFilter->SetNumberOfInputs(static_cast<int>(this->Cache.size()));
   for (pos = this->Cache.begin(); pos != this->Cache.end(); )
     {
     vtkPolyData *content = vtkPolyData::SafeDownCast(pos->second.second);

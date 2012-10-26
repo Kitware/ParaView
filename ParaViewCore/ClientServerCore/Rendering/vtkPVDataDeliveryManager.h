@@ -31,9 +31,10 @@
 
 class vtkAlgorithmOutput;
 class vtkDataObject;
+class vtkExtentTranslator;
+class vtkPKdTree;
 class vtkPVDataRepresentation;
 class vtkPVRenderView;
-class vtkPKdTree;
 
 //BTX
 #include <vector>
@@ -47,13 +48,17 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Returned a hash number that can be used to verify that both client and
+  // server side are in synch representation wise for delivery.
+  int GetSynchronizationMagicNumber();
+
+  // Description:
   // View uses these methods to register a representation with the storage. This
   // makes it possible for representations to communicate with the storage
   // directly using a self pointer, while enables views on different processes
   // to communicate information about representations using their unique ids.
-  void RegisterRepresentation(unsigned int id, vtkPVDataRepresentation*);
+  void RegisterRepresentation(vtkPVDataRepresentation *repr);
   void UnRegisterRepresentation(vtkPVDataRepresentation*);
-  unsigned int GetRepresentationId(vtkPVDataRepresentation*);
   vtkPVDataRepresentation* GetRepresentation(unsigned int);
 
   // Description:
@@ -112,6 +117,13 @@ public:
   // ensure that the geometries are redistributed, as needed.
   void RedistributeDataForOrderedCompositing(bool use_lod);
 
+  // Description:
+  // Pass the structured-meta-data for determining rendering order for ordered
+  // compositing.
+  void SetOrderedCompositingInformation(
+    vtkPVDataRepresentation* repr, vtkExtentTranslator* translator,
+    const int whole_extents[6], const double origin[3], const double spacing[3]);
+
 //BTX
   // Description:
   // Internal method used to determine the list of representations that need
@@ -131,22 +143,32 @@ public:
   // *******************************************************************
 
   // Description:
-  // Mark a representation as streamable. Currently only
-  // vtkAMRVolumeRepresentation is supported.
+  // Mark a representation as streamable. Any representation can indicate that
+  // it is streamable i.e. the view can call streaming passses on it and it will
+  // deliver data incrementally.
   void SetStreamable(vtkPVDataRepresentation*, bool);
 
   // Description:
-  // Based on the current camera and currently available datasets, build a
-  // priority queue.
-  bool BuildPriorityQueue(double planes[24]);
-  unsigned int GetRepresentationIdFromQueue();
-  void StreamingDeliver(unsigned int key);
-  // *******************************************************************
+  // Passes the current streamed piece. This is the piece that will be delivered
+  // to the rendering node.
+  void SetNextStreamedPiece(vtkPVDataRepresentation* repr, vtkDataObject* piece);
+  vtkDataObject* GetCurrentStreamedPiece(vtkPVDataRepresentation* repr);
+  void ClearStreamedPieces();
 
+  // Description:
+  // Deliver streamed pieces. Unlike regular data, streamed pieces are delivered
+  // and released. Representations are expected to manage the pieces once they
+  // are delivered to them.
+  void DeliverStreamedPieces(unsigned int size, unsigned int *keys);
+
+//BTX
+  // Description:
+  // Fills up the vector with the keys for representations that have non-null
+  // streaming pieces.
+  bool GetRepresentationsReadyToStreamPieces(std::vector<unsigned int>& keys);
+//ETX
 
   // *******************************************************************
-  // HACK for dealing with volume rendering for image data
-  void SetImageDataProducer(vtkPVDataRepresentation* repr, vtkAlgorithmOutput*);
 
 //BTX
 protected:
