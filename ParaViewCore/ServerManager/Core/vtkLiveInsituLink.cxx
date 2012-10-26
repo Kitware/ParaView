@@ -42,7 +42,6 @@
 
 #include <assert.h>
 #include <map>
-#include <pair.h>
 #include <set>
 #include <string>
 #include <vtksys/SystemTools.hxx>
