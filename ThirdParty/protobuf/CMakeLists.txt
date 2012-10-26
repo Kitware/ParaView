@@ -46,8 +46,6 @@ vtk_target_export(protobuf)
 vtk_target_export(protobuf-lite)
 vtk_compile_tools_target_export(protoc_compiler)
 
-# All these exports don't all any install rules. However we make protobuf itself
-# install components at the right location yb setting PROTOBUF_INSTALL_*
+# All these exports don't add any install rules. However we make protobuf itself
+# install components at the right location by setting PROTOBUF_INSTALL_*
 # variables.
-
-mark_as_advanced(protobuf_ENABLE_TESTING)

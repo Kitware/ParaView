@@ -26,6 +26,7 @@
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -210,6 +211,17 @@ void vtkSMSession::Initialize()
 
   // Initialize the plugin manager.
   vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
+
+  // Setup default mapper parameters.
+  vtkSMProxy* globalMapperProperties =
+    this->SessionProxyManager->NewProxy("misc", "GlobalMapperProperties");
+  if (globalMapperProperties)
+    {
+    vtkSMPropertyHelper(globalMapperProperties, "Mode").Set("ShiftZBuffer");
+    vtkSMPropertyHelper(globalMapperProperties, "ZShift").Set(2.0e-3);
+    globalMapperProperties->UpdateVTKObjects();
+    globalMapperProperties->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
