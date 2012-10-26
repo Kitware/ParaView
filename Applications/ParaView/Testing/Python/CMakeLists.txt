@@ -59,12 +59,11 @@ SET (StreamingServerSideTest_BREAK TRUE)
 
 add_client_tests("pypv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
-  PARALLEL)
+  )
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pypv"
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-    PARALLEL
   )
 
   add_client_server_tests("pypvcs"
@@ -80,9 +79,8 @@ IF (PARAVIEW_DATA_ROOT)
 # TODO: remote rendering tests and reverse connect tests.
 
 # only enable TestPythonAnnotationFilter test if numpy is available
-include("TestNumPy")
-
-IF ("1" STREQUAL ${HAS_NUMPY})
+include(TestNumPy)
+if (FOUND_NUMPY)
   # Add pvpython tests
   add_test(NAME pvpython.TestPythonAnnotationFilter
       COMMAND pvpython
@@ -96,7 +94,7 @@ IF ("1" STREQUAL ${HAS_NUMPY})
     pvpython.TestPythonAnnotationFilter
     pvpython.TestPythonAnnotationFilterNoMerge
     PROPERTIES LABELS "PARAVIEW")
-ENDIF ("1" STREQUAL ${HAS_NUMPY})
+endif()
 
 ENDIF (PARAVIEW_DATA_ROOT)
 
@@ -113,7 +111,7 @@ add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
     COMMAND smTestDriver
     --test-multi-servers 3
     --server $<TARGET_FILE:pvserver>
-    --client ${TARGET_FILE:pvpython>
+    --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
 )
 

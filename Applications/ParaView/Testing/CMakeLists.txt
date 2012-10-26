@@ -5,6 +5,6 @@ mark_as_advanced(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
 include(ParaViewTestingMacros)
 add_subdirectory(XML)
-if (QT_TESTING_WITH_PYTHON)
+if (PARAVIEW_ENABLE_PYTHON)
   add_subdirectory(Python)
-endif (QT_TESTING_WITH_PYTHON)
+endif()
