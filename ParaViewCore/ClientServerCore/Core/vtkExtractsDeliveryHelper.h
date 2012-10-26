@@ -21,7 +21,7 @@
 
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
-#include "vtkSmartPointer.h"
+#include "vtkSmartPointer.h" // needed for smart pointer
 
 class vtkAlgorithmOutput;
 class vtkDataObject;
@@ -29,8 +29,8 @@ class vtkMultiProcessController;
 class vtkSocketController;
 class vtkTrivialProducer;
 
-#include <map>
-#include <string>
+#include <map>    // needed for typedef
+#include <string> // needed for typedef
 
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkExtractsDeliveryHelper : public vtkObject
 {
