@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMFieldDataDomain.h"
 
+#include "pqSignalAdaptors.h"
 #include "pqApplicationCore.h"
 #include "pqArrayListDomain.h"
 #include "pqComboBoxDomain.h"
@@ -247,11 +248,12 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       QComboBox *comboBox = new QComboBox(this);
       comboBox->setObjectName("ComboBox");
 
+      pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
       new pqComboBoxDomain(comboBox, smProperty, "array_list");
 
-      this->addPropertyLink(comboBox,
+      this->addPropertyLink(adaptor,
                             "currentText",
-                            SIGNAL(currentIndexChanged(QString)),
+                            SIGNAL(currentTextChanged(QString)),
                             svp);
 
       vbox->addWidget(comboBox);
@@ -265,12 +267,17 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     QComboBox *comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
 
+    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+
     for(unsigned int i = 0; i < stringListDomain->GetNumberOfStrings(); i++)
       {
       comboBox->addItem(stringListDomain->GetString(i));
       }
 
-    this->addPropertyLink(comboBox, "currentText", SIGNAL(currentIndexChanged(QString)), svp);
+    this->addPropertyLink(adaptor,
+                          "currentText",
+                          SIGNAL(currentTextChanged(QString)),
+                          svp);
 
     vbox->addWidget(comboBox);
 
@@ -345,6 +352,13 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     {
     QComboBox *comboBox = new QComboBox(this);
     comboBox->setObjectName("ComboBox");
+
+    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+
+    this->addPropertyLink(adaptor,
+                          "currentText",
+                          SIGNAL(currentTextChanged(QString)),
+                          svp);
 
     for(unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
       {
