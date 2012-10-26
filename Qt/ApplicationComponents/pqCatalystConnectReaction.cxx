@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
 #include "pqLiveInsituVisualizationManager.h"
-#include "pqOptions.h"
 #include "pqServer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMSession.h"
 
 #include <QInputDialog>
@@ -60,12 +60,6 @@ pqCatalystConnectReaction::~pqCatalystConnectReaction()
 //-----------------------------------------------------------------------------
 void pqCatalystConnectReaction::updateEnableState()
 {
-  if (!pqApplicationCore::instance()->getOptions()->GetMultiServerMode())
-    {
-    this->parentAction()->setEnabled(false);
-    return;
-    }
-
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server && 
     server->getResource().scheme() != "catalyst" &&
@@ -87,6 +81,9 @@ bool pqCatalystConnectReaction::connect()
 
   if (server != NULL || !this->Managers.contains(server))
     {
+    // Make sure we are in multi-server mode
+    vtkProcessModule::GetProcessModule()->MultipleSessionsSupportOn();
+
     bool user_ok = false;
     int portNumber = QInputDialog::getInt(
       pqCoreUtilities::mainWidget(),
