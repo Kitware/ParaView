@@ -849,8 +849,8 @@ void vtkLiveInsituLink::SimulationPostProcess(double time)
     size_t size;
     stream.GetData(&data, &size);
     vtkIdType idtype_size = static_cast<vtkIdType>(size);
-    this->Controller->Send(&size, 1, 1, 674523);
-    this->Controller->Send(&data[0], size, 1, 674524);
+    this->Controller->Send(&idtype_size, 1, 1, 674523);
+    this->Controller->Send(&data[0], idtype_size, 1, 674524);
     }
 }
 
