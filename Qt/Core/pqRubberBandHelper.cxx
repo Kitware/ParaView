@@ -518,8 +518,8 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         // Picking info
         // {r0, r1, 1} => We want to make sure the ray that start from the camera reach
         // the end of the scene so it could cross any cell of the scene
-        double nearDisplayPoint[3] = { region[0], region[1], 0.0 };
-        double farDisplayPoint[3] = { region[0], region[1], 1.0 };
+        double nearDisplayPoint[3] = { (double)region[0], (double)region[1], 0.0 };
+        double farDisplayPoint[3]  = { (double)region[0], (double)region[1], 1.0 };
         double farLinePoint[3];
         double nearLinePoint[3];
         double* world;
@@ -579,7 +579,7 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
         double *displayCoord = renderer->GetDisplayPoint();
 
         // Handle display to world conversion
-        double display[3] = {region[0], region[1], displayCoord[2]};
+        double display[3] = {(double)region[0], (double)region[1], displayCoord[2]};
         double center[3];
         renderer->SetDisplayPoint(display);
         renderer->DisplayToWorld();
