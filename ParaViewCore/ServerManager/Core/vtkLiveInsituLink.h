@@ -23,10 +23,11 @@
 #ifndef __vtkLiveInsituLink_h
 #define __vtkLiveInsituLink_h
 
-#include "vtkPVSessionBase.h"
-#include "vtkSmartPointer.h"
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
+
 #include "vtkSMObject.h"
-#include "vtkWeakPointer.h"
+#include "vtkWeakPointer.h"  // Needed for Weak pointer
+#include "vtkSmartPointer.h" // Needed for Smart pointer
 
 class vtkMultiProcessController;
 class vtkSMSessionProxyManager;
@@ -34,7 +35,8 @@ class vtkPVXMLElement;
 class vtkPVSessionBase;
 class vtkTrivialProducer;
 class vtkExtractsDeliveryHelper;
-class VTK_EXPORT vtkLiveInsituLink : public vtkSMObject
+
+class VTKPVSERVERMANAGERCORE_EXPORT vtkLiveInsituLink : public vtkSMObject
 {
 public:
   static vtkLiveInsituLink* New();

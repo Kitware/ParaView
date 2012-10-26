@@ -15,6 +15,7 @@
 #include "vtkLiveInsituLink.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkCommunicationErrorCatcher.h"
 #include "vtkExtractsDeliveryHelper.h"
@@ -22,23 +23,21 @@
 #include "vtkNetworkAccessManager.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVSessionBase.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
-#include "vtkSmartPointer.h"
+#include "vtkProcessModule.h"
 #include "vtkSMInsituStateLoader.h"
 #include "vtkSMMessage.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkTrivialProducer.h"
-
-#include "vtkClientServerStream.h"
-#include "vtkCollection.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSMProxyIterator.h"
 
 #include <assert.h>
 #include <map>
