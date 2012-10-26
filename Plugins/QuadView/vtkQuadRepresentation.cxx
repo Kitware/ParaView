@@ -81,7 +81,7 @@ bool vtkQuadRepresentation::AddToView(vtkView* view)
       this->ViewObserverId = quadView->AddObserver(vtkCommand::ModifiedEvent, this, &vtkQuadRepresentation::UpdateFromViewConfigurationCallBack);
 
       // Enable cube axis annotation on slice views
-      this->Slices[i+1]->SetCubeAxesVisibility(quadView->GetShowCubeAxes());
+      this->Slices[i+1]->SetCubeAxesVisibility(quadView->GetShowCubeAxes() != 0);
 
       // Make the main view as master for delivery management
       quadView->AddRepresentation(this->Slices[i+1]);
@@ -139,9 +139,9 @@ void vtkQuadRepresentation::UpdateFromViewConfigurationCallBack(vtkObject*, unsi
         }
 
       // Enable cube axis annotation on slice views
-      this->Slices[i+1]->SetCubeAxesVisibility(this->AssociatedView->GetShowCubeAxes());
+      this->Slices[i+1]->SetCubeAxesVisibility(this->AssociatedView->GetShowCubeAxes() != 0);
       }
-    this->SetOutlineVisibility(this->AssociatedView->GetShowOutline());
+    this->SetOutlineVisibility(this->AssociatedView->GetShowOutline() != 0);
     }
 }
 
