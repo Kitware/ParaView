@@ -580,7 +580,6 @@ void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
       int axisIndex = sliceAlongAxis->GetValue(0);
       orientedBounds[axisIndex*2 + 1] = orientedBounds[axisIndex*2] =
           (double)sliceAt->GetValue(axisIndex);
-      orientedBounds[axisIndex*2 + 1] += VTK_DBL_EPSILON;
       }
     this->CubeAxesActor->SetUseOrientedBounds(1);
     this->CubeAxesActor->SetOrientedBounds(orientedBounds);

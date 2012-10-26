@@ -307,3 +307,29 @@ int pqQuadView::getLabelFontSize()
 {
   return vtkSMPropertyHelper(this->getViewProxy(), "LabelFontSize").GetAsInt();
 }
+
+//-----------------------------------------------------------------------------
+bool pqQuadView::getCubeAxesVisibility()
+{
+return vtkSMPropertyHelper(this->getViewProxy(), "ShowCubeAxes").GetAsInt() != 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqQuadView::setCubeAxesVisibility(bool visible)
+{
+  vtkSMPropertyHelper(this->getViewProxy(), "ShowCubeAxes").Set(visible ? 1 : 0);
+  this->getViewProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool pqQuadView::getOutlineVisibility()
+{
+return vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").GetAsInt() != 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqQuadView::setOutlineVisibility(bool visible)
+{
+  vtkSMPropertyHelper(this->getViewProxy(), "ShowOutline").Set(visible ? 1 : 0);
+  this->getViewProxy()->UpdateVTKObjects();
+}

@@ -95,6 +95,14 @@ public:
   void setLabelFontSize(int size);
   int getLabelFontSize();
 
+  /// Update Slice CubeAxes visibility
+  bool getCubeAxesVisibility();
+  void setCubeAxesVisibility(bool visible);
+
+  /// Update Slice CubeAxes visibility
+  bool getOutlineVisibility();
+  void setOutlineVisibility(bool visible);
+
 protected slots:
   void resetSliceOrigin();
 

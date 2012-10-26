@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>282</width>
-    <height>510</height>
+    <height>471</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -254,25 +254,6 @@
       <string>Display options</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="SplitWidth">
-        <property name="prefix">
-         <string/>
-        </property>
-        <property name="minimum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>90.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-        <property name="value">
-         <double>50.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="FontSize">
         <property name="minimum">
@@ -294,32 +275,16 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="SplitWidthLabel">
+       <widget class="QCheckBox" name="ShowOutline">
         <property name="text">
-         <string>Split width in %</string>
+         <string>Show Outline</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="SplitHeightLabel">
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="ShowCubeAxes">
         <property name="text">
-         <string>Split height in %</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="SplitHeight">
-        <property name="minimum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>90.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-        <property name="value">
-         <double>50.000000000000000</double>
+         <string>Show Cube Axes</string>
         </property>
        </widget>
       </item>
@@ -327,10 +292,8 @@
      <zorder>FontSizeLabel</zorder>
      <zorder>FontSizeLabel</zorder>
      <zorder>FontSize</zorder>
-     <zorder>SplitWidthLabel</zorder>
-     <zorder>SplitWidth</zorder>
-     <zorder>SplitHeightLabel</zorder>
-     <zorder>SplitHeight</zorder>
+     <zorder>ShowCubeAxes</zorder>
+     <zorder>ShowOutline</zorder>
     </widget>
    </item>
    <item>

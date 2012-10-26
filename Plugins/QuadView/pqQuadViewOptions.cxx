@@ -130,6 +130,14 @@ pqQuadViewOptions::pqQuadViewOptions(QWidget *widgetParent)
   QObject::connect( this->Internal->ui.FontSize,
                     SIGNAL(valueChanged(int)),
                     this, SIGNAL(changesAvailable()));
+
+  // Show outline/cubeaxes
+  QObject::connect( this->Internal->ui.ShowCubeAxes,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+  QObject::connect( this->Internal->ui.ShowOutline,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
 }
 
 //----------------------------------------------------------------------------
@@ -185,6 +193,9 @@ void pqQuadViewOptions::applyChanges()
                                 this->Internal->ui.BottomLeftViewUpZ->text().toDouble());
 
   this->View->setLabelFontSize(this->Internal->ui.FontSize->value());
+
+  this->View->setCubeAxesVisibility(this->Internal->ui.ShowCubeAxes->isChecked());
+  this->View->setOutlineVisibility(this->Internal->ui.ShowOutline->isChecked());
 
   this->View->render();
 }
@@ -252,6 +263,9 @@ void pqQuadViewOptions::setView(pqView* view)
   this->Internal->ui.Z->setText(QString::number(vector[2]));
 
   this->Internal->ui.FontSize->setValue(this->View->getLabelFontSize());
+
+  this->Internal->ui.ShowCubeAxes->setChecked(this->View->getCubeAxesVisibility());
+  this->Internal->ui.ShowOutline->setChecked(this->View->getOutlineVisibility());
 }
 
 //----------------------------------------------------------------------------

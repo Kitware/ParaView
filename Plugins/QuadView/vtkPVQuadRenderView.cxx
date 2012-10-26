@@ -257,6 +257,8 @@ vtkStandardNewMacro(vtkPVQuadRenderView);
 //----------------------------------------------------------------------------
 vtkPVQuadRenderView::vtkPVQuadRenderView()
 {
+  this->ShowCubeAxes = 0;
+  this->ShowOutline = 1;
   this->SplitRatio[0] = this->SplitRatio[1] = .5;
   this->LabelFontSize = 20;
   this->ViewPosition[0] = this->ViewPosition[1] = 0;

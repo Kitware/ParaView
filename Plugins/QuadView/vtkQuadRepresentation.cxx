@@ -17,6 +17,7 @@
 #include "vtkAlgorithm.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h"
+#include "vtkCubeAxesRepresentation.h"
 #include "vtkFieldData.h"
 #include "vtkFloatArray.h"
 #include "vtkObjectFactory.h"
@@ -39,6 +40,7 @@ vtkQuadRepresentation::vtkQuadRepresentation() : vtkCompositeSliceRepresentation
 {
   this->InternalSliceFilter->EnableProbe(1);
   this->XLabel = this->YLabel = this->ZLabel = NULL;
+  this->ViewObserverId = 0;
   this->AddObserver(vtkCommand::UpdateDataEvent, this, &vtkQuadRepresentation::UpdateDataEventCallBack);
 }
 //----------------------------------------------------------------------------
@@ -68,11 +70,22 @@ bool vtkQuadRepresentation::AddToView(vtkView* view)
         continue;
         }
 
+      if(this->ViewObserverId != 0 && this->AssociatedView)
+        {
+        this->AssociatedView->RemoveObserver(this->ViewObserverId);
+        this->ViewObserverId = 0;
+        }
+
       vtkPVRenderView* internalQuadView = quadView->GetOrthoRenderView(i);
       this->AssociatedView = quadView;
+      this->ViewObserverId = quadView->AddObserver(vtkCommand::ModifiedEvent, this, &vtkQuadRepresentation::UpdateFromViewConfigurationCallBack);
+
+      // Enable cube axis annotation on slice views
+      this->Slices[i+1]->SetCubeAxesVisibility(quadView->GetShowCubeAxes());
 
       // Make the main view as master for delivery management
       quadView->AddRepresentation(this->Slices[i+1]);
+      quadView->AddRepresentation(this->Slices[i+1]->GetCubeAxesRepresentation());
 
       // Move actor from main view to our internal view
       this->Slices[i+1]->RemoveFromView(quadView);
@@ -90,6 +103,11 @@ bool vtkQuadRepresentation::RemoveFromView(vtkView* view)
   if(vtkPVQuadRenderView* quadView = vtkPVQuadRenderView::SafeDownCast(view))
     {
     // Clear AssociatedView
+    if(this->ViewObserverId != 0 && this->AssociatedView)
+      {
+      quadView->RemoveObserver(this->ViewObserverId);
+      this->ViewObserverId = 0;
+      }
     this->AssociatedView = NULL;
 
     for(int i=0; i < 3; ++i)
@@ -101,11 +119,30 @@ bool vtkQuadRepresentation::RemoveFromView(vtkView* view)
 
       vtkPVRenderView* internalQuadView = quadView->GetOrthoRenderView(i);
       quadView->RemoveRepresentation(this->Slices[i+1]);
+      quadView->RemoveRepresentation(this->Slices[i+1]->GetCubeAxesRepresentation());
       this->Slices[i+1]->RemoveFromView(internalQuadView);
       }
     }
 
   return this->Superclass::RemoveFromView(view);
+}
+//----------------------------------------------------------------------------
+void vtkQuadRepresentation::UpdateFromViewConfigurationCallBack(vtkObject*, unsigned long, void*)
+{
+  if(this->AssociatedView)
+    {
+    for(int i=0; i < 3; ++i)
+      {
+      if(this->Slices[i+1] == NULL)
+        {
+        continue;
+        }
+
+      // Enable cube axis annotation on slice views
+      this->Slices[i+1]->SetCubeAxesVisibility(this->AssociatedView->GetShowCubeAxes());
+      }
+    this->SetOutlineVisibility(this->AssociatedView->GetShowOutline());
+    }
 }
 
 //----------------------------------------------------------------------------

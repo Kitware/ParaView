@@ -163,6 +163,13 @@ public:
   virtual void SetLabelFontSize(int value);
   vtkGetMacro(LabelFontSize, int);
 
+  // Description:
+  // Drive QuadRepresentation configuration
+  vtkSetMacro(ShowCubeAxes, int);
+  vtkSetMacro(ShowOutline, int);
+  vtkGetMacro(ShowCubeAxes, int);
+  vtkGetMacro(ShowOutline, int);
+
   //*****************************************************************
   // Forwarded accross all the views
   virtual void Add2DManipulator(vtkCameraManipulator* val);
@@ -235,6 +242,9 @@ protected:
   char* YAxisLabel;
   char* ZAxisLabel;
   char* ScalarLabel;
+
+  int ShowOutline;
+  int ShowCubeAxes;
 private:
   vtkPVQuadRenderView(const vtkPVQuadRenderView&); // Not implemented
   void operator=(const vtkPVQuadRenderView&); // Not implemented
