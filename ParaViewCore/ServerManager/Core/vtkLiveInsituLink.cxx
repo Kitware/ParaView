@@ -1039,11 +1039,11 @@ void vtkLiveInsituLink::OnSimulationPostProcess(double time)
            iter != dataInformationToSend.end();
            iter++ )
         {
-        Variant* variant = dataInfo->add_variant();
-        variant->set_type(Variant::PROXY); // Arbitrary
-        variant->add_proxy_global_id(iter->first.first);
-        variant->add_port_number(iter->first.second);
-        variant->add_binary(iter->second);
+        Variant* variant2 = dataInfo->add_variant();
+        variant2->set_type(Variant::PROXY); // Arbitrary
+        variant2->add_proxy_global_id(iter->first.first);
+        variant2->add_port_number(iter->first.second);
+        variant2->add_binary(iter->second);
         }
       }
 
