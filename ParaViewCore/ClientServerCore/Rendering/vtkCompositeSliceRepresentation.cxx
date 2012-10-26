@@ -71,7 +71,7 @@ void vtkCompositeSliceRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 void vtkCompositeSliceRepresentation::SetVisibility(bool visible)
 {
   this->Superclass::SetVisibility(visible);
-  this->SetOutlineVisibility(this->OutlineVisibility);
+  this->OutlineRepresentation->SetVisibility(visible && this->OutlineVisibility);
 
   // Update outline visibility
   this->ModifiedInternalCallback(NULL, 0, NULL);
@@ -339,7 +339,7 @@ void vtkCompositeSliceRepresentation::ModifiedInternalCallback(vtkObject*, unsig
 {
   if(this && this->OutlineRepresentation && this->GetActiveRepresentation() && this->Slices[0])
     {
-    this->OutlineRepresentation->SetVisibility(
+    this->OutlineRepresentation->SetVisibility( this->OutlineVisibility &&
           this->GetActiveRepresentation()->GetVisibility() &&
           this->GetActiveRepresentation() == this->Slices[0]);
     }
@@ -386,5 +386,5 @@ unsigned int vtkCompositeSliceRepresentation::Initialize(unsigned int minIdAvail
 void vtkCompositeSliceRepresentation::SetOutlineVisibility(bool visible)
 {
   this->OutlineVisibility = visible;
-  this->OutlineRepresentation->SetVisibility(this->GetVisibility() && visible);
+  this->SetVisibility(this->GetVisibility());
 }
