@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRGrabWorldStyle.h"
 #include "vtkVRInteractorStyle.h"
+#include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
 #include "vtkVRTrackStyle.h"
 #include "vtkWeakPointer.h"
@@ -236,21 +237,18 @@ void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
   if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles") == 0)
     {
     this->clear();
+    vtkVRInteractorStyleFactory *factory =
+        vtkVRInteractorStyleFactory::GetInstance();
     for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
       {
       vtkPVXMLElement* child = xml->GetNestedElement(cc);
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        if (strcmp(class_name, "vtkVRTrackStyle")==0)
+        vtkVRInteractorStyle *style =
+            factory->NewInteractorStyleFromClassName(class_name);
+        if (style)
           {
-          vtkVRTrackStyle* style = vtkVRTrackStyle::New();
-          style->Configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRGrabWorldStyle")==0)
-          {
-          vtkVRGrabWorldStyle* style = vtkVRGrabWorldStyle::New();
           style->Configure(child, locator);
           this->add(style);
           }
