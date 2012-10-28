@@ -200,10 +200,15 @@ int vtkProcessModuleAutoMPI::ConnectToRemoteBuiltInSelf()
 {
   vtkGetFreePort* freePort = vtkGetFreePort::New();
   int port = freePort->GetFreePort();
-  freePort->Delete();
+  if (port <= 0 )
+    {
+    vtkErrorMacro("Failed to determine free port number.");
+    return 0;
+    }
 
-  this->Internals->StartRemoteBuiltInSelf("localhost",port);
-  return port;
+  freePort->Delete();
+  return this->Internals->StartRemoteBuiltInSelf("localhost",port)?
+    port : 0;
 }
 
 //---------------------------------------------------------------------internal
@@ -494,7 +499,7 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
 {
   if(!server)
     {
-    return 1;
+    return 0;
     }
   cerr << "AutoMPI: starting process " << name << "\n";
   vtksysProcess_SetTimeout(server, this->TimeOut);

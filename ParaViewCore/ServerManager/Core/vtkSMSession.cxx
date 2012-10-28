@@ -240,19 +240,25 @@ vtkIdType vtkSMSession::ConnectToSelf()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
 
-  if(vtkSMSession::AutoMPI->IsPossible())
+  if (vtkSMSession::AutoMPI->IsPossible())
     {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
-    // Disable Remote-rendering
-    sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
-    }
-  else
-    {
-    vtkSMSession* session = vtkSMSession::New();
-    sid = pm->RegisterSession(session);
-    session->Delete();
+    if (port > 0)
+      {
+      sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
+      if (sid > 0)
+        {
+        return sid;
+        }
+      }
+    vtkGenericWarningMacro(
+      "Failed to automatically launch 'pvserver' for multi-core support. "
+      "Defaulting to local session.");
     }
 
+  vtkSMSession* session = vtkSMSession::New();
+  sid = pm->RegisterSession(session);
+  session->Delete();
   return sid;
 }
 

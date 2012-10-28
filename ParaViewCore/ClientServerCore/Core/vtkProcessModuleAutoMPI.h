@@ -43,8 +43,8 @@ public:
   // multicores. When called the systems starts N pvservers on MPI
   // where N is the total number of cores available. The method first
   // scans for an available free port and starts the server on that
-  // port. The port over which the connectio is made is returned for
-  // the client to consequitively connect to it.
+  // port. The port over which the connection is made is returned for
+  // the client to consequently connect to it. Returns 0 on failure.
   int ConnectToRemoteBuiltInSelf ();
 
 private:
