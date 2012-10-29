@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkLiveInsituLink.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
   vtkSMArraySelectionDomain.cxx
@@ -61,9 +62,11 @@ set (Module_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
+  vtkSMInsituStateLoader.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLink.cxx
+  vtkSMLiveInsituLinkProxy.cxx
   vtkSMNamedPropertyIterator.cxx
   vtkSMNumberOfComponentsDomain.cxx
   vtkSMNumberOfGroupsDomain.cxx

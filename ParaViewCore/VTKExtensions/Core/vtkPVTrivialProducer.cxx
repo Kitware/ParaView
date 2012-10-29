@@ -114,7 +114,7 @@ vtkPVTrivialProducer::ProcessRequest(vtkInformation* request,
     double uTime = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     if( this->Internals->TimeSteps.empty() )
       {
-      vtkWarningMacro("Requesting a time step when none is available");
+      //vtkWarningMacro("Requesting a time step when none is available");
       }
     else if(uTime != this->Internals->TimeSteps.back())
       {

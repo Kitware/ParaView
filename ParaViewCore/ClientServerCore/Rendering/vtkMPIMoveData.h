@@ -110,6 +110,8 @@ public:
     COLLECT_AND_PASS_THROUGH=3
   };
 //ETX
+
+//ETX
 protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();

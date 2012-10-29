@@ -61,12 +61,6 @@ public:
   vtkTypeMacro(vtkPVRenderView, vtkPVView);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // This allow the user to overcome the system capability and simply prevent
-  // remote rendering.
-  static bool IsRemoteRenderingAllowed();
-  static void AllowRemoteRendering(bool enable);
-
   enum InteractionModes
     {
     INTERACTION_MODE_3D=0,
@@ -619,8 +613,6 @@ protected:
   bool UseOutlineForLODRendering;
   bool UseDistributedRenderingForStillRender;
   bool UseDistributedRenderingForInteractiveRender;
-
-  static bool RemoteRenderingAllowed;
 
   vtkTypeUInt32 StillRenderProcesses;
   vtkTypeUInt32 InteractiveRenderProcesses;

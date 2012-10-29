@@ -640,7 +640,7 @@ void vtkSMSessionProxyManager::UnRegisterProxies()
   std::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToAll();
-  iter->SetSession(this->Session);
+  iter->SetSessionProxyManager(this);
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProxyManagerProxyInformation info;
@@ -1127,7 +1127,7 @@ void vtkSMSessionProxyManager::LoadXMLState( vtkPVXMLElement* rootElement,
   if (!loader)
     {
     spLoader = vtkSmartPointer<vtkSMStateLoader>::New();
-    spLoader->SetSession(this->GetSession());
+    spLoader->SetSessionProxyManager(this);
     }
   else
     {
@@ -1400,7 +1400,6 @@ void vtkSMSessionProxyManager::LoadCustomProxyDefinitions(const char* filename)
 void vtkSMSessionProxyManager::SaveCustomProxyDefinitions(
   vtkPVXMLElement* rootElement)
 {
-  assert("Session should exist" && this->Session != 0);
   assert("Definition Manager should exist" && this->ProxyDefinitionManager != 0);
   this->ProxyDefinitionManager->SaveCustomProxyDefinitions(rootElement);
 }
@@ -1766,7 +1765,7 @@ void vtkSMSessionProxyManager::UpdateFromRemote()
                 // Setup server only state/proxy Locator
                 vtkNew<vtkSMDeserializerProtobuf> deserializer;
                 deserializer->SetStateLocator(this->Session->GetStateLocator()->GetParentLocator());
-                deserializer->SetSession(this->Session);
+                deserializer->SetSessionProxyManager(this);
                 
                 vtkNew<vtkSMProxyLocator> serverLocator;
                 serverLocator->SetDeserializer(deserializer.GetPointer());

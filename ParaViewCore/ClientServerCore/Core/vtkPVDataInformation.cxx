@@ -650,7 +650,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (!dobj)
     {
     vtkErrorMacro("Could not cast object to a known data set: "
-                  << (object?object->GetClassName():"(null"));
+                  << (object?object->GetClassName():"(null)"));
     return;
     }
 

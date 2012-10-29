@@ -474,6 +474,7 @@ void vtkPVSessionCore::PushStateInternal(vtkSMMessage* message)
     obj->SetGlobalID(globalId);
     obj->Initialize(this);
     this->Internals->SIObjectMap[globalId] = obj; // WeakPointer map
+    this->InvokeEvent(vtkCommand::UpdateDataEvent, obj);
 
     LOG (
       << "----------------------------------------------------------------\n"
@@ -859,7 +860,9 @@ bool vtkPVSessionCore::GatherInformation( vtkTypeUInt32 location,
     return false;
     }
 
-  if (information->GetRootOnly() || (location & vtkProcessModule::SERVERS) == 0)
+  if ( information->GetRootOnly()
+       || (location & vtkProcessModule::SERVERS) == 0
+       || this->SymmetricMPIMode )
     {
     return true;
     }

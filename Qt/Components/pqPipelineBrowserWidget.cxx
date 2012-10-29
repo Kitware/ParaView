@@ -34,11 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
+#include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
-#include "pqPipelineModel.h"
 #include "pqPipelineAnnotationFilterModel.h"
+#include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
@@ -234,8 +236,28 @@ void pqPipelineBrowserWidget::setVisibility(bool visible,
           BEGIN_UNDO_SET(QString("%1 Selected").arg(visible? "Show" : "Hide"));
           }
         }
-      display_policy->setRepresentationVisibility(
-        port, pqActiveObjects::instance().activeView(), visible);
+      if (port->getServer()->getResource().scheme() == "catalyst")
+        {
+        pqLiveInsituVisualizationManager* mgr=
+          qobject_cast<pqLiveInsituVisualizationManager*>(
+            port->getServer()->property(
+              "LiveInsituVisualizationManager").value<QObject*>());
+        if (mgr && mgr->addExtract(port))
+          {
+          // refresh the pipeline browser icon.
+          }
+        }
+      else
+        {
+        if(visible)
+          {
+          // Make sure the given port is selected specially if we are in
+          // multi-server / catalyst configuration type
+          pqActiveObjects::instance().setActivePort(port);
+          }
+        display_policy->setRepresentationVisibility(
+          port, pqActiveObjects::instance().activeView(), visible);
+        }
       }
     }
   if (begun_undo_set)

@@ -47,6 +47,7 @@
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
 // #define PV_DISABLE_PROGRESS_HANDLING
+#define DISABLE_PROGRESS_FOR_RUN_LARGER_THAN 1024
 
 #define SKIP_IF_DISABLED()\
   if (this->Internals->DisableProgressHandling) { return; }
@@ -252,10 +253,18 @@ public:
     this->ForceAsyncRequestReceived = false;
     this->ProgressTimer = vtkTimerLog::New();
     this->ProgressTimer->StartTimer();
+    this->DisableProgressHandling = false;
+
 #ifdef PV_DISABLE_PROGRESS_HANDLING
     this->DisableProgressHandling = true;
 #else
-    this->DisableProgressHandling = false;
+    // Symetric mode mean that we disable progress
+    if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
+      {
+      this->DisableProgressHandling =
+        pm->GetSymmetricMPIMode() ||
+        (pm->GetNumberOfLocalPartitions() > DISABLE_PROGRESS_FOR_RUN_LARGER_THAN);
+      }
 #endif
     }
 
@@ -332,8 +341,9 @@ void vtkPVProgressHandler::SetSession(vtkPVSession* conn)
 void vtkPVProgressHandler::PrepareProgress()
 {
 #ifndef PV_DISABLE_PROGRESS_HANDLING
+  SKIP_IF_DISABLED();
   this->Internals->DisableProgressHandling =
-    this->Session? this->Session->IsMultiClients() : true;
+    this->Session ? this->Session->IsMultiClients() : true;
 #endif
 
   SKIP_IF_DISABLED();

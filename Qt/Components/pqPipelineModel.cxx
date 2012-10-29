@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqDisplayPolicy.h"
+#include "pqLiveInsituVisualizationManager.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -70,6 +71,8 @@ public:
     INDETERMINATE,
     EYEBALL,
     EYEBALL_GRAY,
+    CATALYST_EXTRACT,
+    CATALYST_EXTRACT_GRAY,
     LAST
     };
 public:
@@ -285,6 +288,21 @@ public:
 private:
   IconType getVisibilityIcon(pqOutputPort* port, pqView* view) const
     {
+    // I'm not a huge fan of this hacky way we are dealing with catalyst. We'll
+    // have to come back and cleanly address how the pqPipelineModel deals with
+    // "visibility" in a more generic, session-centric way.
+    if (port && port->getServer()->getResource().scheme() == "catalyst")
+      {
+      pqLiveInsituVisualizationManager* mgr=
+        qobject_cast<pqLiveInsituVisualizationManager*>(
+          port->getServer()->property(
+            "LiveInsituVisualizationManager").value<QObject*>());
+      if (mgr)
+        {
+        return mgr->hasExtracts(port)? CATALYST_EXTRACT :CATALYST_EXTRACT_GRAY;
+        }
+      }
+
     // If no view is present, it implies that a suitable type of view
     // will be created.
     pqApplicationCore* core = pqApplicationCore::instance();
@@ -308,6 +326,11 @@ private:
     }
   IconType getIconType(pqOutputPort* port) const
     {
+    if (port->getSource()->property("CATALYST_EXTRACT").toBool())
+      {
+      return CATALYST_EXTRACT;
+      }
+
     pqApplicationCore* core = pqApplicationCore::instance();
     pqDisplayPolicy* policy = core->getDisplayPolicy();
     if (policy)
@@ -375,6 +398,10 @@ void pqPipelineModel::constructor()
     ":/pqWidgets/Icons/pqEyeball16.png");
   this->PixmapList[pqPipelineModelDataItem::EYEBALL_GRAY].load(
     ":/pqWidgets/Icons/pqEyeballd16.png");
+  this->PixmapList[pqPipelineModelDataItem::CATALYST_EXTRACT].load(
+    ":/pqWidgets/Icons/pqLinkIn16.png");
+  this->PixmapList[pqPipelineModelDataItem::CATALYST_EXTRACT_GRAY].load(
+    ":/pqWidgets/Icons/pqLinkIn16d.png");
 }
 
 //-----------------------------------------------------------------------------

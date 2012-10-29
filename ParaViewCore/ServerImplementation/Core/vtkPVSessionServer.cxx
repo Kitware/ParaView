@@ -129,7 +129,7 @@ public:
     this->ClientURL = client_url;
     }
   //-----------------------------------------------------------------
-  void NotifyOtherClients(vtkSMMessage* msgToBroadcast)
+  void NotifyOtherClients(const vtkSMMessage* msgToBroadcast)
     {
     std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
@@ -137,7 +137,7 @@ public:
         vtkPVSessionServer::SERVER_NOTIFICATION_MESSAGE_RMI, false);
     }
     //-----------------------------------------------------------------
-  void NotifyAllClients(vtkSMMessage* msgToBroadcast)
+  void NotifyAllClients(const vtkSMMessage* msgToBroadcast)
     {
     std::string data = msgToBroadcast->SerializeAsString();
     this->CompositeMultiProcessController->TriggerRMI2All(
@@ -455,7 +455,7 @@ void vtkPVSessionServer::OnClientServerMessageRMI(void* message, int message_len
 
       // Notify when ProxyManager state has changed
       // or any other state change
-      this->SendToNonActiveClients(&msg);
+      this->NotifyOtherClients(&msg);
       }
     break;
 
@@ -602,13 +602,13 @@ void vtkPVSessionServer::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 //----------------------------------------------------------------------------
-void vtkPVSessionServer::SendToNonActiveClients(vtkSMMessage* msg)
+void vtkPVSessionServer::NotifyOtherClients(const vtkSMMessage* msg)
 {
   this->Internal->NotifyOtherClients(msg);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSessionServer::BroadcastToClients(vtkSMMessage* msg)
+void vtkPVSessionServer::NotifyAllClients(const vtkSMMessage* msg)
 {
   this->Internal->NotifyAllClients(msg);
 }

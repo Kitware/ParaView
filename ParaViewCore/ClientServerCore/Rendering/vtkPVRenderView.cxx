@@ -125,10 +125,6 @@ public:
 
 
 //----------------------------------------------------------------------------
-// Statics
-//----------------------------------------------------------------------------
-bool vtkPVRenderView::RemoteRenderingAllowed = true;
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
 vtkInformationKeyMacro(vtkPVRenderView, USE_LOD, Integer);
 vtkInformationKeyMacro(vtkPVRenderView, USE_OUTLINE_FOR_LOD, Integer);
@@ -149,7 +145,7 @@ vtkPVRenderView::vtkPVRenderView()
 
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
 
-  this->RemoteRenderingAvailable = vtkPVRenderView::RemoteRenderingAllowed;
+  this->RemoteRenderingAvailable = true;
 
   this->StillRenderProcesses = vtkPVSession::NONE;
   this->InteractiveRenderProcesses = vtkPVSession::NONE;
@@ -1786,15 +1782,4 @@ void vtkPVRenderView::RemoveAll3DManipulators()
     {
     this->ThreeDInteractorStyle->RemoveAllManipulators();
     }
-}
-//----------------------------------------------------------------------------
-bool vtkPVRenderView::IsRemoteRenderingAllowed()
-{
-  return vtkPVRenderView::RemoteRenderingAllowed;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AllowRemoteRendering(bool allowRemoteRendering)
-{
-  vtkPVRenderView::RemoteRenderingAllowed = allowRemoteRendering;
 }

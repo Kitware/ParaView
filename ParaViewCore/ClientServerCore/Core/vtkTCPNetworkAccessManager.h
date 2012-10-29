@@ -64,6 +64,10 @@ public:
   // nonblocking:- When listen is true, this will result in the call returning
   //               NULL if a client connection is not available immediately.
   //               It leaves the server socket open for client to connect.
+  // timeout   :- When connecting to remote i.e listen==false, specify the time
+  //              (in seconds) for which this call blocks to retry attempts to
+  //              connect to the host/port. If absent, default is 60s. 0 or
+  //              negative implies no retry attempts.
   virtual vtkMultiProcessController* NewConnection(const char* url);
 
   // Description:
@@ -96,7 +100,7 @@ protected:
   // Description:
   // Connects to remote processes.
   vtkMultiProcessController* ConnectToRemote(const char* hostname, int port,
-    const char* handshake);
+    const char* handshake, int timeout_in_seconds);
 
   // Description:
   // Waits for connection from remote process.

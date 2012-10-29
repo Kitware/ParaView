@@ -222,7 +222,7 @@ int vtkSMCompoundSourceProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
   vtkSmartPointer<vtkSMCompoundProxyDefinitionLoader> deserializer;
   deserializer = vtkSmartPointer<vtkSMCompoundProxyDefinitionLoader>::New();
   deserializer->SetRootElement(element);
-  deserializer->SetSession(pm->GetSession());
+  deserializer->SetSessionProxyManager(pm);
   vtkSmartPointer<vtkSMProxyLocator> locator;
   locator = vtkSmartPointer<vtkSMProxyLocator>::New();
   locator->SetDeserializer(deserializer.GetPointer());

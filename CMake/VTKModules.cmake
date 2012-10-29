@@ -360,4 +360,12 @@ endif()
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module
 # is enabled.
-set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})
+set(PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED TRUE
+    CACHE BOOL "Turn off to avoid ParaView depending on all used VTK modules.")
+mark_as_advanced(PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED)
+    
+if (PARAVIEW_ENABLE_VTK_MODULES_AS_NEEDED)
+  set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})
+else ()
+  set (PARAVIEW_DEFAULT_VTK_MODULES ${_vtk_modules})
+endif()

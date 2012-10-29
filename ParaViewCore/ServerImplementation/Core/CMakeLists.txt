@@ -29,6 +29,7 @@
 #
 #==========================================================================
 set (Module_SRCS
+  vtkPVCatalystSessionCore.cxx
   vtkPVProxyDefinitionIterator.cxx
   vtkPVSessionBase.cxx
   vtkPVSessionCore.cxx

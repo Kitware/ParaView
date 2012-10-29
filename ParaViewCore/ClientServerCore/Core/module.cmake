@@ -17,9 +17,8 @@ vtk_module(vtkPVClientServerCoreCore
   GROUPS
     ParaViewCore
   DEPENDS
+    vtkFiltersExtraction
     vtkPVVTKExtensionsCore
-    vtkRenderingCore # needed for vtkMapper in vtkProcessModule. 
-                     # we should fix that.
     ${__dependencies}
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 

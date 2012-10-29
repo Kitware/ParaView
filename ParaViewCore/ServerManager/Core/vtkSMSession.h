@@ -34,6 +34,7 @@ class VTKPVSERVERMANAGERCORE_EXPORT vtkSMSession : public vtkPVSessionBase
 public:
   static vtkSMSession* New();
   static vtkSMSession* New(vtkPVSessionBase* otherSession);
+  static vtkSMSession* New(vtkPVSessionCore* otherSessionCore);
   vtkTypeMacro(vtkSMSession, vtkPVSessionBase);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -121,6 +122,16 @@ public:
   // Push the state message. Overridden to ensure that the information in the
   // undo-redo state manager is updated.
   virtual void PushState(vtkSMMessage* msg);
+
+  // Description:
+  // Sends the message to all clients.
+  virtual void NotifyAllClients(const vtkSMMessage* msg)
+    { this->ProcessNotification(msg); }
+
+  // Description:
+  // Sends the message to all but the active client-session.
+  virtual void NotifyOtherClients(const vtkSMMessage*)
+    { /* nothing to do. */ }
 //ETX
 
   //---------------------------------------------------------------------------
@@ -133,6 +144,13 @@ public:
   //---------------------------------------------------------------------------
   // Static methods to create and register sessions easily.
   //---------------------------------------------------------------------------
+
+  // Description:
+  // These are static helper methods that help create Catalyst ParaView
+  // sessions. They register the session with the process module and return the
+  // session id. Returns 0 on failure.
+  // This overload is used to create a catalyst built-in session.
+  static vtkIdType ConnectToCatalyst();
 
   // Description:
   // These are static helper methods that help create standard ParaView
@@ -191,10 +209,15 @@ protected:
   vtkSMSession(bool initialize_during_constructor=true, vtkPVSessionCore* preExistingSessionCore=NULL);
   ~vtkSMSession();
 
-  // Used by the Auto-MPI to prevent remote rendering, otherwise we should
-  // always allow it.
-  static vtkIdType ConnectToRemote(const char* hostname, int port,
-                                   bool allowRemoteRendering);
+  // Description:
+  // Internal method used by ConnectToRemote().
+  static vtkIdType ConnectToRemoteInternal(
+    const char* hostname, int port, bool is_auto_mpi);
+
+  // Description:
+  // Process the Notifation message sent using API to communicate from
+  // server-to-client.
+  virtual void ProcessNotification(const vtkSMMessage*);
 
   // Description:
   // Initialize various internal classes after the session has been setup

@@ -968,6 +968,10 @@ pqServer* pqObjectBuilder::createServer(const pqServerResource& resource)
       server_resource.renderServerPort(22221),
       &pqObjectBuilderNS::processEvents);
     }
+  else if(server_resource.scheme() == "catalyst")
+    {
+    id = vtkSMSession::ConnectToCatalyst();
+    }
   else
     {
     qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";

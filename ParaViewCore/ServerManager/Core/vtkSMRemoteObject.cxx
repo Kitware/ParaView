@@ -138,8 +138,7 @@ void vtkSMRemoteObject::PushState(vtkSMMessage* msg)
     }
   else
     {
-    vtkErrorMacro("Attempting to PushState() on a " << this->GetClassName()
-      << " after the session has been destroyed.");
+    // no session, nothing to do.
     }
 }
 

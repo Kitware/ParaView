@@ -146,6 +146,19 @@ pqServer::~pqServer()
 }
 
 //-----------------------------------------------------------------------------
+void pqServer::setMonitorServerNotifications(bool val)
+{
+  if (val)
+    {
+    this->IdleCollaborationTimer.start();
+    }
+  else
+    {
+    this->IdleCollaborationTimer.stop();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqServer::initialize()
 {
   vtkSMSessionProxyManager* pxm = this->proxyManager();
@@ -209,7 +222,6 @@ void pqServer::initialize()
   // server notification so collaboration could happen
   if(this->session()->IsMultiClients())
     {
-    this->IdleCollaborationTimer.start();
     vtkSMSessionClient* currentSession = vtkSMSessionClient::SafeDownCast(this->session());
     if(currentSession)
       {
@@ -221,6 +233,7 @@ void pqServer::initialize()
           this,
           SLOT(onCollaborationCommunication(vtkObject*,ulong,void*,void*)));
       }
+    this->setMonitorServerNotifications(true);
     }
 
   // Force a proper active SessionProxyManager once this one is fully initialized
@@ -626,19 +639,25 @@ vtkSMSessionProxyManager* pqServer::proxyManager() const
 void pqServer::processServerNotification()
 {
   vtkSMSessionClient* sessionClient = vtkSMSessionClient::SafeDownCast(this->Session);
-  if (sessionClient && sessionClient->IsNotBusy() && !this->isProgressPending())
+  if ( (sessionClient && !sessionClient->IsNotBusy()) ||
+    this->isProgressPending())
     {
-    // process all server-notification events.
-    while (vtkProcessModule::GetProcessModule()->GetNetworkAccessManager()->ProcessEvents(1) == 1)
+    // try again later.
+    this->IdleCollaborationTimer.start();
+    return;
+    }
+
+  // process all server-notification events.
+  vtkNetworkAccessManager* nam =
+    vtkProcessModule::GetProcessModule()->GetNetworkAccessManager();
+  while (nam->ProcessEvents(1) == 1) { }
+
+  foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
+    {
+    vtkSMViewProxy* viewProxy = view->getViewProxy();
+    if(viewProxy && viewProxy->HasDirtyRepresentation())
       {
-      }
-    foreach(pqView* view, pqApplicationCore::instance()->findChildren<pqView*>())
-      {
-      vtkSMViewProxy* viewProxy = view->getViewProxy();
-      if(viewProxy && viewProxy->HasDirtyRepresentation())
-        {
-        view->render();
-        }
+      view->render();
       }
     }
   this->IdleCollaborationTimer.start();

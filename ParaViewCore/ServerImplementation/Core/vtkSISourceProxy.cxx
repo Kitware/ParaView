@@ -60,6 +60,7 @@ vtkSISourceProxy::vtkSISourceProxy()
   this->SetExecutiveName("vtkPVCompositeDataPipeline");
   this->Internals = new vtkInternals();
   this->PortsCreated = false;
+  this->DisablePipelineExecution = false;
 }
 
 //----------------------------------------------------------------------------
@@ -371,6 +372,11 @@ namespace
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::UpdatePipeline(int port, double time, bool doTime)
 {
+  if(this->DisablePipelineExecution)
+    {
+    return;
+    }
+
   int processid =
     vtkMultiProcessController::GetGlobalController()->GetLocalProcessId();
   int numprocs =
@@ -416,6 +422,11 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
   int pass, int num_of_passes, double resolution,
   int port, double time, bool doTime)
 {
+  if(this->DisablePipelineExecution)
+    {
+    return;
+    }
+
   vtkAlgorithm* algo = this->GetOutputPort(port)->GetProducer();
   assert(algo);
   algo->UpdateInformation();
@@ -450,6 +461,11 @@ void vtkSISourceProxy::UpdateStreamingPipeline(
 //----------------------------------------------------------------------------
 void vtkSISourceProxy::UpdatePipelineInformation()
 {
+  if(this->DisablePipelineExecution)
+    {
+    return;
+    }
+
   if (this->GetVTKObject())
     {
     vtkAlgorithm* algo = vtkAlgorithm::SafeDownCast(this->GetVTKObject());

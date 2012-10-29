@@ -17,8 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
-// FIXME:MODULARIZATION
-// #include "vtkPVRenderView.h"
+#include "vtkPVCatalystSessionCore.h"
 #include "vtkPVServerInformation.h"
 #include "vtkPVSessionCore.h"
 #include "vtkProcessModule.h"
@@ -27,9 +26,10 @@
 #include "vtkSMDeserializerProtobuf.h"
 #include "vtkSMMessage.h"
 #include "vtkSMPluginManager.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRemoteObject.h"
 #include "vtkSMSessionClient.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMStateLocator.h"
@@ -49,8 +49,12 @@ vtkStandardNewMacro(vtkSMSession);
 //----------------------------------------------------------------------------
 vtkSMSession* vtkSMSession::New(vtkPVSessionBase *otherSession)
 {
-  vtkPVSessionCore* core = otherSession->GetSessionCore();
-  vtkSMSession* session = new vtkSMSession(true, core);
+  return vtkSMSession::New(otherSession->GetSessionCore());
+}
+//----------------------------------------------------------------------------
+vtkSMSession* vtkSMSession::New(vtkPVSessionCore *otherSessionCore)
+{
+  vtkSMSession* session = new vtkSMSession(true, otherSessionCore);
 
 #ifdef VTK_DEBUG_LEAKS
   vtkDebugLeaks::ConstructClass("vtkSMSession");
@@ -73,21 +77,23 @@ vtkSMSession::vtkSMSession(bool initialize_during_constructor/*=true*/,
   this->StateLocator = vtkSMStateLocator::New();
   this->IsAutoMPI = false;
 
-  if (initialize_during_constructor)
-    {
-    this->Initialize();
-    }
-
   // Create and setup deserializer for the local ProxyLocator
   vtkNew<vtkSMDeserializerProtobuf> deserializer;
   deserializer->SetStateLocator(this->StateLocator);
-  deserializer->SetSession(this);
 
   // Create and setup proxy locator
   this->ProxyLocator = vtkSMProxyLocator::New();
   this->ProxyLocator->SetDeserializer(deserializer.GetPointer());
   this->ProxyLocator->UseSessionToLocateProxy(true);
-  this->ProxyLocator->SetSession(this);
+
+  // don't set the session on ProxyLocator right now since the
+  // SessionProxyManager is not setup until Initialize().
+  // we will initialize it in this->Initialize().
+
+  if (initialize_during_constructor)
+    {
+    this->Initialize();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -198,9 +204,21 @@ void vtkSMSession::Initialize()
   // Initialize the proxy manager.
   // this updates proxy definitions if we are connected to a remote server.
   this->SessionProxyManager = vtkSMSessionProxyManager::New(this);
+  this->ProxyLocator->SetSession(this);
 
   // Initialize the plugin manager.
   vtkSMProxyManager::GetProxyManager()->GetPluginManager()->RegisterSession(this);
+
+  // Setup default mapper parameters.
+  vtkSMProxy* globalMapperProperties =
+    this->SessionProxyManager->NewProxy("misc", "GlobalMapperProperties");
+  if (globalMapperProperties)
+    {
+    vtkSMPropertyHelper(globalMapperProperties, "Mode").Set("ShiftZBuffer");
+    vtkSMPropertyHelper(globalMapperProperties, "ZShift").Set(2.0e-3);
+    globalMapperProperties->UpdateVTKObjects();
+    globalMapperProperties->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -219,8 +237,6 @@ void vtkSMSession::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSession::ConnectToSelf()
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkIdType sid = 0;
 
@@ -228,8 +244,7 @@ vtkIdType vtkSMSession::ConnectToSelf()
     {
     int port = vtkSMSession::AutoMPI->ConnectToRemoteBuiltInSelf();
     // Disable Remote-rendering
-    sid = vtkSMSession::ConnectToRemote("localhost", port, false);
-    vtkSMSession::SafeDownCast(pm->GetSession(sid))->IsAutoMPI = true;
+    sid = vtkSMSession::ConnectToRemoteInternal("localhost", port, true);
     }
   else
     {
@@ -242,23 +257,31 @@ vtkIdType vtkSMSession::ConnectToSelf()
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
+vtkIdType vtkSMSession::ConnectToCatalyst()
 {
-  // By default we allow remote rendering.
-  // Only Auto-MPI has the right to disable it
-  return vtkSMSession::ConnectToRemote(hostname, port, true);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkIdType sid = 0;
+  vtkNew<vtkPVCatalystSessionCore> sessionCore;
+  vtkSMSession* session = vtkSMSession::New(sessionCore.GetPointer());
+  sid = pm->RegisterSession(session);
+  session->Delete();
+  return sid;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
-                                        bool allowRemoteRendering)
+vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port)
 {
-// FIXME:MODULARIZATION
-  (void) allowRemoteRendering;
-//  vtkPVRenderView::AllowRemoteRendering(allowRemoteRendering);
+  return vtkSMSession::ConnectToRemoteInternal(hostname, port, false);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMSession::ConnectToRemoteInternal(
+  const char* hostname, int port, bool is_auto_mpi)
+{
   vtksys_ios::ostringstream sname;
   sname << "cs://" << hostname << ":" << port;
   vtkSMSessionClient* session = vtkSMSessionClient::New();
+  session->IsAutoMPI = is_auto_mpi;
   vtkIdType sid = 0;
   if (session->Connect(sname.str().c_str()))
     {
@@ -273,8 +296,6 @@ vtkIdType vtkSMSession::ConnectToRemote(const char* hostname, int port,
 vtkIdType vtkSMSession::ConnectToRemote(const char* dshost, int dsport,
   const char* rshost, int rsport)
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtksys_ios::ostringstream sname;
   sname << "cdsrs://" << dshost << ":" << dsport << "/"
     << rshost << ":" << rsport;
@@ -326,8 +347,6 @@ vtkIdType vtkSMSession::ReverseConnectToRemote(int port, bool (*callback)())
 vtkIdType vtkSMSession::ReverseConnectToRemote(
   int dsport, int rsport, bool (*callback)())
 {
-// FIXME:MODULARIZATION
-//  vtkPVRenderView::AllowRemoteRendering(true);
   vtkTemp temp;
   temp.Callback = callback;
 
@@ -378,4 +397,40 @@ unsigned int vtkSMSession::GetRenderClientMode()
     }
 
   return vtkSMSession::RENDERING_UNIFIED;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSession::ProcessNotification(const vtkSMMessage* message)
+{
+  vtkTypeUInt32 id = message->global_id();
+
+  // Find the object for whom this message is meant.
+  vtkSMRemoteObject* remoteObj =
+    vtkSMRemoteObject::SafeDownCast(this->GetRemoteObject(id));
+
+  //cout << "##########     Server notification    ##########" << endl;
+  //cout << id << " = " << remoteObj << "(" << (remoteObj?
+  //    remoteObj->GetClassName() : "null") << ")" << endl;
+  //state.PrintDebugString();
+  //cout << "###################################################" << endl;
+
+  // ProcessingRemoteNotification = true prevent
+  // "ignore_synchronization" properties to be loaded...
+  // Therefore camera properties won't be shared
+  // (I don't understand this comment, but copying it from the original code).
+  if(remoteObj)
+    {
+    bool previousValue = this->StartProcessingRemoteNotification();
+    remoteObj->EnableLocalPushOnly();
+    remoteObj->LoadState(message, this->GetProxyLocator());
+    
+    vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(remoteObj);
+    if (proxy)
+      {
+      proxy->UpdateVTKObjects();
+      }
+
+    remoteObj->DisableLocalPushOnly();
+    this->StopProcessingRemoteNotification(previousValue);
+    }
 }
