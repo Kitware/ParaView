@@ -971,8 +971,9 @@
       <!-- End of SpreadSheetView -->
     </ViewProxy>
   </ProxyGroup>
+
   <!-- ==================================================================== -->
-  <ProxyGroup name="representations">
+  <ProxyGroup name="internal_representations">
     <PVRepresentationProxy class="vtkPVCompositeRepresentation"
                            name="PVRepresentationBase"
                            processes="client|renderserver|dataserver">
@@ -1373,8 +1374,12 @@
         </ExposedProperties>
       </SubProxy>
     </PVRepresentationProxy>
+  </ProxyGroup>
+
+  <!-- ==================================================================== -->
+  <ProxyGroup name="representations">
     <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
+    <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
                            name="GeometryRepresentation"
@@ -1399,7 +1404,7 @@
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
+    <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
                            name="UnstructuredGridRepresentation"
@@ -1446,7 +1451,7 @@
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
+    <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
                            name="StructuredGridRepresentation"
@@ -1492,7 +1497,7 @@
       </SubProxy>
       <!-- End of StructuredGridRepresentation -->
     </PVRepresentationProxy>
-    <PVRepresentationProxy base_proxygroup="representations"
+    <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
                            name="UniformGridRepresentation"
@@ -1560,7 +1565,7 @@
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>
     <!-- ================================================================== -->
-    <PVRepresentationProxy base_proxygroup="representations"
+    <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
                            class="vtkPVCompositeRepresentation"
                            name="AMRRepresentation"

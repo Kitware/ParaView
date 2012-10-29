@@ -224,7 +224,7 @@
       <PVRepresentationProxy name="QuadViewCompositeMultiSliceRepresentation"
                              class="vtkQuadRepresentation"
                              processes="client|renderserver|dataserver"
-                             base_proxygroup="representations"
+                             base_proxygroup="internal_representations"
                              base_proxyname="PVRepresentationBase">
 
          <InputProperty command="SetInputConnection"
