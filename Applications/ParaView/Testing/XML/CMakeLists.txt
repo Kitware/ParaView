@@ -663,4 +663,24 @@ IF (PARAVIEW_DATA_ROOT)
      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/TileDisplay3DTesting-2x2.xml)
 
+
+  #------------------------------------------------------------------
+  # Add tests that test command line arguments (among other things).
+  #------------------------------------------------------------------
+  if (PARAVIEW_DATA_ROOT)
+
+    # The state file need to point to the correct data file. We do that by
+    # configuring the state file.
+    configure_file (
+      "${PARAVIEW_DATA_ROOT}/Data/exodusStateFile.3.14.1.pvsm.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
+    add_pv_test("pv" "_DISABLE_C"
+      COMMAND --client $<TARGET_FILE:paraview>
+              -dr
+              --test-directory=${PARAVIEW_TEST_DIR}
+              --state=${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm
+      BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
+      TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/LoadExodusStateFile.xml)
+  endif()
+
 ENDIF (PARAVIEW_DATA_ROOT)
