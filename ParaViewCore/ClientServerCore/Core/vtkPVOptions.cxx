@@ -228,7 +228,7 @@ void vtkPVOptions::Initialize()
                            "Specify the stereo type. This valid only when "
                            "--stereo is specified. Possible values are "
                            "\"Crystal Eyes\", \"Red-Blue\", \"Interlaced\", "
-                           "\"Dresden\", \"Anaglyph\", \"Checkerboard\"",
+                           "\"Dresden\", \"Anaglyph\", \"Checkerboard\",\"SplitViewportHorizontal\"",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
 
   /*
