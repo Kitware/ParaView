@@ -1135,7 +1135,8 @@ macro(pv_process_modules)
     vtk_add_module(
       "${CMAKE_CURRENT_SOURCE_DIR}/${base}"
       module.cmake
-      "${CMAKE_CURRENT_BINARY_DIR}/${base}")
+      "${CMAKE_CURRENT_BINARY_DIR}/${base}"
+      Cxx)
   endforeach()
 
   set (current_module_set ${VTK_MODULES_ALL})
@@ -1164,9 +1165,17 @@ macro(pv_process_modules)
   endforeach()
 
   foreach(_module IN LISTS current_module_set_sorted)
-    set(vtk-module ${_module})
+    if (NOT ${_module}_IS_TEST)
+      set(vtk-module ${_module})
+    else()
+      set(vtk-module ${${_module}_TESTS_FOR})
+    endif()
     add_subdirectory("${${_module}_SOURCE_DIR}" "${${_module}_BINARY_DIR}")
-    vtk_add_cs_wrapping(${_module})
+    if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
+        NOT ${_module}_IS_TEST AND
+        NOT ${_module}_THIRD_PARTY)
+        vtk_add_cs_wrapping(${_module})
+    endif()
     unset(vtk-module)
   endforeach()
 

@@ -483,7 +483,7 @@ int ColorMap( int argc, char* argv[] )
   if (!retVal)
     {
     //work around manta return code hijacking
-    _exit(-1);
+    exit(-1);
     }
   return 0;
 }

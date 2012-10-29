@@ -9,6 +9,9 @@ vtk_module(vtkStreaming
    vtkIONetCDF
    vtknetcdf
   TEST_DEPENDS
+    vtkFiltersProgrammable
     vtkTestingRendering
+  TEST_LABELS
+    PARAVIEW
   EXCLUDE_FROM_WRAP_HIERARCHY
 )

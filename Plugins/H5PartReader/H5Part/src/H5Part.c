@@ -837,7 +837,7 @@ _H5Part_read_attrib (
  if ( space_id < 0 ) return HANDLE_H5A_GET_SPACE_ERR;
 
  nelem = H5Sget_simple_extent_npoints ( space_id );
- if ( nelem < 0 ) return HANDLE_H5S_GET_SIMPLE_EXTENT_NPOINTS_ERR;
+ // Never gone to happen: if ( nelem < 0 ) return HANDLE_H5S_GET_SIMPLE_EXTENT_NPOINTS_ERR;
 
  type_id = _H5Part_normalize_h5_type ( mytype );
 
@@ -1838,12 +1838,12 @@ _H5Part_get_num_particles (
 
  if ( H5PartHasView ( f ) ) {
   nparticles = H5Sget_select_npoints ( space_id );
-  if ( nparticles < 0 ) return HANDLE_H5S_GET_SELECT_NPOINTS_ERR;
+  // Never gone to happen: if ( nparticles < 0 ) return HANDLE_H5S_GET_SELECT_NPOINTS_ERR;
  }
  else {
   nparticles = H5Sget_simple_extent_npoints ( space_id );
-  if ( nparticles < 0 )
-   return HANDLE_H5S_GET_SIMPLE_EXTENT_NPOINTS_ERR;
+  // Never gone to happen: if ( nparticles < 0 )
+  // Never gone to happen:  return HANDLE_H5S_GET_SIMPLE_EXTENT_NPOINTS_ERR;
  }
  if ( space_id != H5S_ALL ) {
   herr = H5Sclose ( space_id );
@@ -1968,7 +1968,7 @@ _set_view (
    end==-1 to mean end of file
  */
  total = (hsize_t) _H5Part_get_num_particles ( f );
- if ( total < 0 ) return HANDLE_H5PART_GET_NUM_PARTICLES_ERR ( total );
+ // Never gone to happen: if ( total < 0 ) return HANDLE_H5PART_GET_NUM_PARTICLES_ERR ( total );
 
  if ( start == -1 ) start = 0;
  if ( end == -1 )   end = total;

@@ -141,7 +141,7 @@ void addBox(vtkRenderer* renderer)
 
     // Now we'll look at it.
     vtkMantaPolyDataMapper *cubeMapper = vtkMantaPolyDataMapper::New();
-    cubeMapper->SetInput(cube);
+    cubeMapper->SetInputData(cube);
     vtkMantaActor *cubeActor = vtkMantaActor::New();
     cubeActor->SetMapper(cubeMapper);
 
@@ -501,7 +501,7 @@ vtkMapper* generateSidePolygon(vtkParametricFunctionSource* source,
     newPoly->SetPolys(polys);
 
     vtkMantaPolyDataMapper *mapper = vtkMantaPolyDataMapper::New();
-    mapper->SetInput(newPoly);
+    mapper->SetInputData(newPoly);
 
     return mapper;
 }

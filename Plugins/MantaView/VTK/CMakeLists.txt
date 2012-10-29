@@ -48,6 +48,7 @@ SET ( MANTA_SRCS
   vtkMantaObjectFactory.cxx
   )
 
+set (${vtk-module}_NO_HeaderTest 1)
 
 vtk_module_library(${vtk-module} ${MANTA_SRCS})
 TARGET_LINK_LIBRARIES (${vtk-module} ${MANTA_LINK_LIBRARIES})
@@ -61,11 +62,3 @@ endif()
 IF ( BUILD_EXAMPLES )
   ADD_SUBDIRECTORY(Examples)
 ENDIF ( BUILD_EXAMPLES )
-
-#Tests #######################################################################
-#TODO: Make these tests meaningful and cdash them regularly
-IF ( BUILD_TESTING )
-  ENABLE_TESTING()
-  INCLUDE( CTest )
-  ADD_SUBDIRECTORY(Testing)
-ENDIF ( BUILD_TESTING )

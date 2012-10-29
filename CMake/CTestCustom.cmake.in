@@ -66,6 +66,13 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore warning on Windows for static builds complaining that the archive has
   # no public symbols and hence will be inaccessible.
   "warning LNK4221"
+
+  # Ignore clang warning when taking c++ file in c mode has they have .c extension
+  "clang.*warning.*treating.*input as.*when in.*mode, this behavior is deprecated"
+
+  # exclude warning from MantaView  plugin
+  "MantaView.VTK"
+  "manta"
 )
 
 #------------------------------------------------------------------------------
