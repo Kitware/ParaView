@@ -70,6 +70,11 @@ vtkPVPythonInterpretor* vtkPythonAnimationCue::GetInterpretor()
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleStartCueEvent()
 {
+  if (!this->Enabled)
+    {
+    return;
+    }
+
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", this);    
@@ -99,6 +104,11 @@ void vtkPythonAnimationCue::HandleStartCueEvent()
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleTickEvent()
 {
+  if (!this->Enabled)
+    {
+    return;
+    }
+
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", this);    
@@ -127,6 +137,11 @@ void vtkPythonAnimationCue::HandleTickEvent()
 //----------------------------------------------------------------------------
 void vtkPythonAnimationCue::HandleEndCueEvent()
 {
+  if (!this->Enabled)
+    {
+    return;
+    }
+
   // Set self to point to this
   char addrofthis[1024];
   sprintf(addrofthis, "%p", this);    
