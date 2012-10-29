@@ -190,6 +190,16 @@ public:
   void SetScalarValue(double value);
   double GetScalarValue();
 
+  //*****************************************************************
+  // Allow user to trnasform coordinate mapping to reflect natural coordinates
+  // based on some arbitrary set of base vector.
+  // coef = [ vx, vy, vz, a, b ] where (vx, vy, vz) is the base vector used for X
+  // so the natural coordinates could be expressed like:
+  // a.(vx, vy, vz) + b
+  void SetTransformationForX(double coef[5]);
+  void SetTransformationForY(double coef[5]);
+  void SetTransformationForZ(double coef[5]);
+
 //BTX
 protected:
   vtkPVQuadRenderView();

@@ -52,8 +52,11 @@ vtkShearedCubeSource::vtkShearedCubeSource()
   this->AxisUTitle = this->AxisVTitle = this->AxisWTitle = NULL;
   this->TimeLabel = NULL;
 
-  LabelRangeU[0] = LabelRangeV[0] = LabelRangeW[0] = 0.0;
-  LabelRangeU[1] = LabelRangeV[1] = LabelRangeW[1] = 1.0;
+  this->LabelRangeU[0] = this->LabelRangeV[0] = this->LabelRangeW[0] = 0.0;
+  this->LabelRangeU[1] = this->LabelRangeV[1] = this->LabelRangeW[1] = 1.0;
+
+  this->LinearTransformU[1] = LinearTransformV[1] = LinearTransformW[1] = 1.0;
+  this->LinearTransformU[0] = LinearTransformV[0] = LinearTransformW[0] = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -188,6 +191,9 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
   fieldData->RemoveArray("AxisBaseForX");
   fieldData->RemoveArray("AxisBaseForY");
   fieldData->RemoveArray("AxisBaseForZ");
+  fieldData->RemoveArray("LinearTransformForX");
+  fieldData->RemoveArray("LinearTransformForY");
+  fieldData->RemoveArray("LinearTransformForZ");
   fieldData->RemoveArray("OrientedBoundingBox");
   fieldData->RemoveArray("AxisTitleForX");
   fieldData->RemoveArray("AxisTitleForY");
@@ -296,6 +302,37 @@ void vtkShearedCubeSource::UpdateMetaData(vtkDataSet* ds)
     activeLabelRange->SetValue(1, 1);
     activeLabelRange->SetValue(2, 1);
     fieldData->AddArray(wLabelRange.GetPointer());
+
+    // Create custom Linear Affine transform
+    this->LinearTransformU[0] = (this->LabelRangeU[1] - this->LabelRangeU[0]) / (this->OrientedBoundingBox[1] - this->OrientedBoundingBox[0]);
+    this->LinearTransformU[1] = this->LabelRangeU[0] - (this->LinearTransformU[0] * this->OrientedBoundingBox[0]);
+
+    this->LinearTransformV[0] = (this->LabelRangeV[1] - this->LabelRangeV[0]) / (this->OrientedBoundingBox[3] - this->OrientedBoundingBox[2]);
+    this->LinearTransformV[1] = this->LabelRangeV[0] - (this->LinearTransformV[0] * this->OrientedBoundingBox[2]);
+
+    this->LinearTransformW[0] = (this->LabelRangeW[1] - this->LabelRangeW[0]) / (this->OrientedBoundingBox[5] - this->OrientedBoundingBox[4]);
+    this->LinearTransformW[1] = this->LabelRangeW[0] - (this->LinearTransformW[0] * this->OrientedBoundingBox[4]);
+
+    vtkNew<vtkFloatArray> uLinearTransform;
+    uLinearTransform->SetNumberOfComponents(2);
+    uLinearTransform->SetNumberOfTuples(1);
+    uLinearTransform->SetName("LinearTransformForX");
+    uLinearTransform->SetTuple(0, this->LinearTransformU);
+    fieldData->AddArray(uLinearTransform.GetPointer());
+
+    vtkNew<vtkFloatArray> vLinearTransform;
+    vLinearTransform->SetNumberOfComponents(2);
+    vLinearTransform->SetNumberOfTuples(1);
+    vLinearTransform->SetName("LinearTransformForY");
+    vLinearTransform->SetTuple(0, this->LinearTransformV);
+    fieldData->AddArray(vLinearTransform.GetPointer());
+
+    vtkNew<vtkFloatArray> wLinearTransform;
+    wLinearTransform->SetNumberOfComponents(2);
+    wLinearTransform->SetNumberOfTuples(1);
+    wLinearTransform->SetName("LinearTransformForZ");
+    wLinearTransform->SetTuple(0, this->LinearTransformW);
+    fieldData->AddArray(wLinearTransform.GetPointer());
     }
   else
     {

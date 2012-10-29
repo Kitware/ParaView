@@ -117,6 +117,9 @@ protected:
   double LabelRangeU[2];
   double LabelRangeV[2];
   double LabelRangeW[2];
+  double LinearTransformU[2];
+  double LinearTransformV[2];
+  double LinearTransformW[2];
   double OrientedBoundingBox[6];
   char* AxisUTitle;
   char* AxisVTitle;

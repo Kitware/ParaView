@@ -18,6 +18,7 @@
 #include "vtkCellData.h"
 #include "vtkCommand.h"
 #include "vtkFieldData.h"
+#include "vtkFloatArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineRepresentation.h"
 #include "vtkPVMultiSliceView.h"
@@ -122,6 +123,18 @@ void vtkQuadRepresentation::UpdateDataEventCallBack(vtkObject*, unsigned long, v
         vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForY"));
     vtkStringArray* titleZ =
         vtkStringArray::SafeDownCast(fieldData->GetAbstractArray("AxisTitleForZ"));
+    vtkFloatArray* baseX =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("AxisBaseForX"));
+    vtkFloatArray* baseY =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("AxisBaseForY"));
+    vtkFloatArray* baseZ =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("AxisBaseForZ"));
+    vtkFloatArray* transfX =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("LinearTransformForX"));
+    vtkFloatArray* transfY =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("LinearTransformForY"));
+    vtkFloatArray* transfZ =
+        vtkFloatArray::SafeDownCast(fieldData->GetAbstractArray("LinearTransformForZ"));
 
     if(titleX && titleX->GetNumberOfValues() > 0)
       {
@@ -160,5 +173,39 @@ void vtkQuadRepresentation::UpdateDataEventCallBack(vtkObject*, unsigned long, v
     this->AssociatedView->SetXAxisLabel(this->XLabel);
     this->AssociatedView->SetYAxisLabel(this->YLabel);
     this->AssociatedView->SetZAxisLabel(this->ZLabel);
+
+    double tx[5] = {1,0,0,1,0};
+    double ty[5] = {0,1,0,1,0};
+    double tz[5] = {0,0,1,1,0};
+
+    // Update if possible
+    if(baseX)
+      {
+      baseX->GetTuple(0, tx);
+      }
+    if(transfX)
+      {
+      transfX->GetTuple(0, &tx[3]);
+      }
+    if(baseY)
+      {
+      baseY->GetTuple(0, ty);
+      }
+    if(transfY)
+      {
+      transfY->GetTuple(0, &ty[3]);
+      }
+    if(baseZ)
+      {
+      baseZ->GetTuple(0, tz);
+      }
+    if(transfZ)
+      {
+      transfZ->GetTuple(0, &tz[3]);
+      }
+
+    this->AssociatedView->SetTransformationForX(tx);
+    this->AssociatedView->SetTransformationForY(ty);
+    this->AssociatedView->SetTransformationForZ(tz);
     }
 }

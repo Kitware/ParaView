@@ -49,6 +49,12 @@ public:
   {
     this->Owner = parent;
     this->ObserverId = 0;
+    double defaultTX[5] = {1,0,0,1,0};
+    double defaultTY[5] = {0,1,0,1,0};
+    double defaultTZ[5] = {0,0,1,1,0};
+    this->Copy(defaultTX, this->TranformX, 5);
+    this->Copy(defaultTY, this->TranformY, 5);
+    this->Copy(defaultTZ, this->TranformZ, 5);
 
     this->Owner->GetOrthoRenderView(TOP_LEFT)->GetNonCompositedRenderer()->AddActor(this->CoordinatesX.GetPointer());
     this->Owner->GetOrthoRenderView(TOP_RIGHT)->GetNonCompositedRenderer()->AddActor(this->CoordinatesY.GetPointer());
@@ -62,10 +68,13 @@ public:
 //    this->CoordinatesZ->SetPosition(.95,.95);
 //    this->CoordinatesZ->GetTextProperty()->SetJustificationToRight();
 //    this->CoordinatesZ->GetTextProperty()->SetVerticalJustificationToTop();
-    for(int i=0; i < 4; ++i)
+    for(int i=0; i < 3; ++i)
       {
+      this->NaturalCoordinates[i] = 0.0;
       this->TextValues[i] = 0.0;
       }
+    // Scalar init
+    this->TextValues[3] = 0.0;
   }
 
   void SetSliceOriginSource(vtkPointSource* source)
@@ -108,34 +117,35 @@ public:
 
   void UpdateLabels()
   {
+    this->ComputeNaturalCoordinates();
     std::stringstream zy,xy,zx;
     if(this->Owner->GetXAxisLabel())
       {
       xy << this->Owner->GetXAxisLabel() << "=";
       }
-    xy << this->TextValues[0] << ", ";
+    xy << this->NaturalCoordinates[0] << ", ";
     if(this->Owner->GetYAxisLabel())
       {
       xy << this->Owner->GetYAxisLabel() << "=";
       }
-    xy << this->TextValues[1]; // Done
+    xy << this->NaturalCoordinates[1]; // Done
     if(this->Owner->GetZAxisLabel())
       {
       zy << this->Owner->GetZAxisLabel() << "=";
       zx << this->Owner->GetZAxisLabel() << "=";
       }
-    zy << this->TextValues[2] << ", ";
-    zx << this->TextValues[2] << ", ";
+    zy << this->NaturalCoordinates[2] << ", ";
+    zx << this->NaturalCoordinates[2] << ", ";
     if(this->Owner->GetXAxisLabel())
       {
       zx << this->Owner->GetXAxisLabel() << "=";
       }
-    zx << this->TextValues[0]; // Done
+    zx << this->NaturalCoordinates[0]; // Done
     if(this->Owner->GetYAxisLabel())
       {
       zy << this->Owner->GetYAxisLabel() << "=";
       }
-    zy << this->TextValues[1]; // Done
+    zy << this->NaturalCoordinates[1]; // Done
 
     // Scalar
     if(this->Owner->GetScalarLabel())
@@ -192,17 +202,47 @@ public:
       }
   }
 
+  void ComputeNaturalCoordinates()
+  {
+    this->NaturalCoordinates[0] = ((this->TextValues[0] / this->TranformX[0]) - (this->TextValues[1] * this->TranformY[0]) -  (this->TextValues[2] * this->TranformZ[0])) * this->TranformX[3] + this->TranformX[4];
+    this->NaturalCoordinates[1] = ((this->TextValues[1] / this->TranformY[1]) - (this->TextValues[0] * this->TranformX[1]) -  (this->TextValues[2] * this->TranformZ[1])) * this->TranformY[3] + this->TranformY[4];
+    this->NaturalCoordinates[2] = ((this->TextValues[2] / this->TranformZ[2]) - (this->TextValues[0] * this->TranformX[2]) -  (this->TextValues[1] * this->TranformY[2])) * this->TranformZ[3] + this->TranformZ[4];
+  }
 
+  void UpdateTransformX(double coef[5])
+  {
+    this->Copy(coef, this->TranformX, 5);
+  }
+  void UpdateTransformY(double coef[5])
+  {
+    this->Copy(coef, this->TranformY, 5);
+  }
+  void UpdateTransformZ(double coef[5])
+  {
+    this->Copy(coef, this->TranformZ, 5);
+  }
+
+  void Copy(double* a, double* b, int size)
+  {
+    for(int i=0;i<size;i++)
+      {
+      b[i] = a[i];
+      }
+  }
 
 private:
   vtkPVQuadRenderView* Owner;
   unsigned long ObserverId;
   vtkWeakPointer<vtkPointSource> SliceOriginSource;
   double TextValues[4];
+  double NaturalCoordinates[3];
   vtkNew<vtkTextActor> CoordinatesX;
   vtkNew<vtkTextActor> CoordinatesY;
   vtkNew<vtkTextActor> CoordinatesZ;
   std::set<vtkWeakPointer<vtkPointHandleRepresentation3D> > PointHandles;
+  double TranformX[5];
+  double TranformY[5];
+  double TranformZ[5];
 };
 
 //============================================================================
@@ -620,4 +660,22 @@ void vtkPVQuadRenderView::SetScalarValue(double value)
 double vtkPVQuadRenderView::GetScalarValue()
 {
   return this->QuadInternal->GetScalarValue();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetTransformationForX(double coef[5])
+{
+  this->QuadInternal->UpdateTransformX(coef);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetTransformationForY(double coef[5])
+{
+  this->QuadInternal->UpdateTransformY(coef);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVQuadRenderView::SetTransformationForZ(double coef[5])
+{
+  this->QuadInternal->UpdateTransformZ(coef);
 }
