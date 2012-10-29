@@ -172,6 +172,10 @@ public:
 
   virtual void SetAllowSpecularHighlightingWithScalarColoring(int allow);
 
+  // Description:
+  // Provides access to the actor used by this representation.
+  vtkPVLODActor* GetActor() { return this->GetRenderedProp(); }
+
 //BTX
 protected:
   vtkGeometryRepresentation();

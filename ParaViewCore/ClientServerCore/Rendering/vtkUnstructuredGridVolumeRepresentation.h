@@ -114,6 +114,10 @@ public:
   void SetScalarOpacity(vtkPiecewiseFunction* pwf);
   void SetScalarOpacityUnitDistance(double val);
 
+  // Description:
+  // Provides access to the actor used by this representation.
+  vtkPVLODVolume* GetActor() { return this->Actor; }
+
 //BTX
 protected:
   vtkUnstructuredGridVolumeRepresentation();
