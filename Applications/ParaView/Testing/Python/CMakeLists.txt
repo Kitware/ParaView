@@ -13,14 +13,6 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/NonlinearSubdivisionDisplay.py
   )
 
-IF(PARAVIEW_BUILD_PLUGIN_StreamingView)
-  SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingTest.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingClientSideTest.py
-    ${CMAKE_CURRENT_SOURCE_DIR}/StreamingServerSideTest.py
-    )
-ENDIF(PARAVIEW_BUILD_PLUGIN_StreamingView)
-
 IF(PARAVIEW_BUILD_PLUGIN_Manta)
   SET(TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/MantaTest.py
@@ -39,32 +31,13 @@ set (MantaServerSideTest_DISABLE_C TRUE)
 set (MantaServerSideTest_DISABLE_CRS TRUE)
 SET (MantaTest_BREAK TRUE)
 
-# Don't test in cli/serv since number of pieces is function of number of processors.
-set (StreamingTest_DISABLE_CS TRUE)
-set (StreamingTest_DISABLE_CRS TRUE)
-#serializing streaming tests to better tell what breaks where
-SET (StreamingTest_BREAK TRUE)
-
-# This tests verifies that cli/serv mode works
-set (StreamingClientSideTest_DISABLE_CS TRUE) #just to save time
-set (StreamingClientSideTest_DISABLE_CRS TRUE)
-SET (StreamingClientSideTest_BREAK TRUE)
-#loosen tolerance since viewpoint and thus images differ dependent on num processes
-SET (StreamingClientSideTest_THRESHOLD 1000)
-
-# This test verifies that serv side rendering works
-set (StreamingServerSideTest_DISABLE_C TRUE)
-set (StreamingServerSideTest_DISABLE_CRS TRUE)
-SET (StreamingServerSideTest_BREAK TRUE)
-
 add_client_tests("pypv"
   TEST_SCRIPTS ${TESTS_WITHOUT_BASELINES}
-  PARALLEL)
+  )
 
 IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pypv"
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-    PARALLEL
   )
 
   add_client_server_tests("pypvcs"
@@ -80,9 +53,8 @@ IF (PARAVIEW_DATA_ROOT)
 # TODO: remote rendering tests and reverse connect tests.
 
 # only enable TestPythonAnnotationFilter test if numpy is available
-include("TestNumPy")
-
-IF ("1" STREQUAL ${HAS_NUMPY})
+include(TestNumPy)
+if (FOUND_NUMPY)
   # Add pvpython tests
   add_test(NAME pvpython.TestPythonAnnotationFilter
       COMMAND pvpython
@@ -96,7 +68,7 @@ IF ("1" STREQUAL ${HAS_NUMPY})
     pvpython.TestPythonAnnotationFilter
     pvpython.TestPythonAnnotationFilterNoMerge
     PROPERTIES LABELS "PARAVIEW")
-ENDIF ("1" STREQUAL ${HAS_NUMPY})
+endif()
 
 ENDIF (PARAVIEW_DATA_ROOT)
 
@@ -113,7 +85,7 @@ add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
     COMMAND smTestDriver
     --test-multi-servers 3
     --server $<TARGET_FILE:pvserver>
-    --client ${TARGET_FILE:pvpython>
+    --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
 )
 
