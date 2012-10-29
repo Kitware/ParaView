@@ -1753,6 +1753,8 @@ void pqSMAdaptor::setFieldSelection(vtkSMProperty *prop,
 
   if(Value.size() != 2)
     {
+    qDebug() << "pqSMAdaptor::setFieldSelection(): "
+                "Value should be string list with (AttributeType, ArrayName).";
     return;
     }
 
