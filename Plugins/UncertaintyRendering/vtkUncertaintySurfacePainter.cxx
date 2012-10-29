@@ -111,6 +111,13 @@ void vtkUncertaintySurfacePainter::PrepareForRendering(vtkRenderer *renderer,
   vtkOpenGLRenderWindow *renWin =
     vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
 
+  if(!vtkShaderProgram2::IsSupported(renWin))
+    {
+    vtkWarningMacro(<< "vtkShaderProgram2 is not supported.");
+    this->RenderingPreparationSuccess = 0;
+    return;
+    }
+
   // cleanup previous resources if targeting a different render window
   if(this->LastRenderWindow && this->LastRenderWindow != renWin)
     {
@@ -206,6 +213,12 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
 //----------------------------------------------------------------------------
 void vtkUncertaintySurfacePainter::PassInformation(vtkPainter *toPainter)
 {
+  if(!this->RenderingPreparationSuccess)
+    {
+    this->Superclass::PassInformation(toPainter);
+    return;
+    }
+
   this->Superclass::PassInformation(toPainter);
 
   vtkInformation *info = this->GetInformation();
