@@ -4,6 +4,8 @@ vtk_module(pqWidgets
     ParaViewQt
   DEPENDS
     vtkqttesting
+    vtkPVServerManagerCore
+    vtkGUISupportQt
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

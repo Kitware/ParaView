@@ -126,8 +126,7 @@ int vtkImageSliceRepresentation::ProcessViewRequest(
     }
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
-    {
-    // provide the "geometry" to the view so the view can delivery it to the
+    { // provide the "geometry" to the view so the view can delivery it to the
     // rendering nodes as and when needed.
 
     // When this process doesn't have any valid input, the cache-keeper is setup

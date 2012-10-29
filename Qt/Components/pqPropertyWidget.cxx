@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 #include "pqPropertiesPanel.h"
+#include "vtkSMProperty.h"
 
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   : QWidget(parentObject),
@@ -132,4 +133,12 @@ void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)
 void pqPropertyWidget::setUseUncheckedProperties(bool useUnchecked)
 {
   this->Links.setUseUncheckedProperties(useUnchecked);
+}
+
+void pqPropertyWidget::updateDependentDomains()
+{
+  if(this->Property)
+    {
+    this->Property->UpdateDependentDomains();
+    }
 }

@@ -194,6 +194,8 @@ set (Module_SRCS
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqIntRangeWidget.cxx
+  pqIntRangeWidget.h
   pqIntVectorPropertyWidget.cxx
   pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.cxx
@@ -494,6 +496,7 @@ set (Module_MOC_HDRS
   pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqIntRangeWidget.h
   pqIntVectorPropertyWidget.h
   pqIsoVolumePanel.h
   pqItemViewSearchWidget.h

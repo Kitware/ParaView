@@ -139,6 +139,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       widget->setObjectName("IntRangeWidget");
       widget->setMinimum(range->GetMinimum(0));
       widget->setMaximum(range->GetMaximum(0));
+      widget->setDomain(range);
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(int)), ivp);
       layoutLocal->addWidget(widget);
 
