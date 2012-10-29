@@ -47,7 +47,26 @@ set(vtk-module-init-calls)
 set(_dependencies)
 set(module_sm_xmls)
 
-foreach (_module ${VTK_MODULES_ENABLED})
+# Create list of the modules we are going to client server wrap.
+# The user can specify a list in PARAVIEW_CS_MODULES
+if (PARAVIEW_CS_MODULES)
+  # use the user provide variable
+  set(PARAVIEW_CURRENT_CS_MODULES ${PARAVIEW_CS_MODULES} CACHE INTERNAL "List of modules to CS wrap")
+else()
+  # Default to VTK_MODULES_ENABLED but need to filter the list first ( its
+  # used else where without the guards below )
+  set(_tmp_list)
+  foreach (_module ${VTK_MODULES_ENABLED})
+    if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
+        NOT ${_module}_IS_TEST AND
+        NOT ${_module}_THIRD_PARTY)
+      list(APPEND _tmp_list ${_module})
+    endif()
+  endforeach()
+  set(PARAVIEW_CURRENT_CS_MODULES ${_tmp_list} CACHE INTERNAL "List of modules to CS wrap")
+endif()
+
+foreach (_module ${PARAVIEW_CURRENT_CS_MODULES})
   if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
       NOT ${_module}_IS_TEST AND
       NOT ${_module}_THIRD_PARTY AND
