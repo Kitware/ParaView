@@ -1560,7 +1560,7 @@
       </DoubleVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetNumberOfPoints"
-                         default_values="1"
+                         default_values="100"
                          name="NumberOfPoints"
                          number_of_elements="1">
         <IntRangeDomain min="1"

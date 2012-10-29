@@ -87,7 +87,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqThresholdPanel.h"
 #include "pqIsoVolumePanel.h"
 #include "pqPassArraysPanel.h"
-#include "pqStreamTracerPanel.h"
 #include "pqTextRepresentation.h"
 #include "pqProxyPropertyWidget.h"
 #include "pqXYChartDisplayPanel.h"
@@ -137,11 +136,6 @@ public:
         {
         return new pqGlyphPanel(proxy, p);
         }
-      if(QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
-         QString("GenericStreamTracer") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqStreamTracerPanel(proxy, p);
-        }
 //      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
 //        {
 //        return new pqParticleTracerPanel(proxy, p);
@@ -184,8 +178,6 @@ public:
          QString("GenericClip") == proxy->getProxy()->GetXMLName() ||
          QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
          QString("Glyph") == proxy->getProxy()->GetXMLName() ||
-         QString("StreamTracer") == proxy->getProxy()->GetXMLName() ||
-         QString("GenericStreamTracer") == proxy->getProxy()->GetXMLName() ||
 //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
 //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
          QString("Threshold") == proxy->getProxy()->GetXMLName() ||
