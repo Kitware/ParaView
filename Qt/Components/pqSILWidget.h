@@ -43,10 +43,10 @@ class pqProxySILModel;
 
 /// pqSILWidget is a QTabWidget that creates tabs with pqTreeView instances
 /// showing the top-level categories from the SIL.
-class PQCOMPONENTS_EXPORT pqSILWidget : public QTabWidget
+class PQCOMPONENTS_EXPORT pqSILWidget : public QWidget
 {
   Q_OBJECT
-  typedef QTabWidget Superclass;
+
 public:
   /// activeCategory is used to mark one of the top-level categories as the
   /// first one to show. This is typically the sub-tree that you want to set on
@@ -64,12 +64,16 @@ public:
 
 protected slots:
   void onModelReset();
+  void checkSelectedBlocks() { this->toggleSelectedBlocks(true); }
+  void uncheckSelectedBlocks() { this->toggleSelectedBlocks(false); }
+  void toggleSelectedBlocks(bool checked = false);
 
 protected:
- QPointer<pqSILModel> Model;
- QList<pqTreeView*> Trees;
- pqProxySILModel* ActiveModel;
- QString ActiveCategory;
+  QTabWidget *TabWidget;
+  QPointer<pqSILModel> Model;
+  QList<pqTreeView*> Trees;
+  pqProxySILModel* ActiveModel;
+  QString ActiveCategory;
 
 private:
   Q_DISABLE_COPY(pqSILWidget)

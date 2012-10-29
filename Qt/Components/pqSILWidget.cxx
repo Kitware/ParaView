@@ -31,17 +31,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqSILWidget.h"
 
+#include <QDebug>
 #include <QHeaderView>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
 
 #include "pqTreeView.h"
 #include "pqProxySILModel.h"
 #include "pqSILModel.h"
+#include "pqApplicationCore.h"
+#include "pqSelectionManager.h"
+#include "pqOutputPort.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSMSILModel.h"
+#include "pqPipelineSource.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 
 //-----------------------------------------------------------------------------
 pqSILWidget::pqSILWidget(const QString& activeCategory, QWidget* parentObject)
-  : Superclass(parentObject), ActiveCategory(activeCategory)
+  : QWidget(parentObject),
+    ActiveCategory(activeCategory)
 {
+  // create tab widget
+  this->TabWidget = new QTabWidget(this);
+  this->TabWidget->setObjectName("TabWidget");
+
+  // create block selection buttons
+  QPushButton *checkSelectedBlocksButton =
+    new QPushButton("Check Selected Blocks", this);
+  checkSelectedBlocksButton->setObjectName("CheckSelectedBlocksButton");
+  this->connect(checkSelectedBlocksButton, SIGNAL(clicked()),
+                this, SLOT(checkSelectedBlocks()));
+  QPushButton *uncheckSelectedBlocksButton =
+    new QPushButton("Uncheck Selected Blocks", this);
+  uncheckSelectedBlocksButton->setObjectName("UncheckSelectedBlocksButton");
+  this->connect(uncheckSelectedBlocksButton, SIGNAL(clicked()),
+                this, SLOT(uncheckSelectedBlocks()));
+
+  // setup layout
+  QVBoxLayout *layout_ = new QVBoxLayout;
+  layout_->setMargin(0);
+  layout_->addWidget(this->TabWidget);
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
+  buttonLayout->addWidget(checkSelectedBlocksButton);
+  buttonLayout->addWidget(uncheckSelectedBlocksButton);
+  layout_->addLayout(buttonLayout);
+  this->setLayout(layout_);
   
+  // setup model
   this->ActiveModel = new pqProxySILModel(activeCategory, this);
 }
 
@@ -76,7 +118,7 @@ pqSILModel* pqSILWidget::model() const
 //-----------------------------------------------------------------------------
 void pqSILWidget::onModelReset()
 {
-  this->clear();
+  this->TabWidget->clear();
   foreach (pqTreeView* view, this->Trees)
     {
     delete view;
@@ -92,7 +134,7 @@ void pqSILWidget::onModelReset()
     this->ActiveModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
   activeTree->setModel(this->ActiveModel);
   activeTree->expandAll();
-  this->addTab(activeTree, this->ActiveCategory);
+  this->TabWidget->addTab(activeTree, this->ActiveCategory);
 
   int num_tabs = this->Model->rowCount();
   for (int cc=0; cc < num_tabs; cc++)
@@ -117,6 +159,81 @@ void pqSILWidget::onModelReset()
     tree->setModel(proxyModel);
     tree->expandAll();
 
-    this->addTab(tree, proxyModel->headerData(cc, Qt::Horizontal).toString());
+    this->TabWidget->addTab(tree,
+                            proxyModel->headerData(cc, Qt::Horizontal).toString());
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSILWidget::toggleSelectedBlocks(bool checked)
+{
+  pqSelectionManager* selMan = qobject_cast<pqSelectionManager*>(
+    pqApplicationCore::instance()->manager("SelectionManager"));
+  if (!selMan || !selMan->getSelectedPort())
+    {
+    return;
+    }
+
+  pqOutputPort* port = selMan->getSelectedPort();
+  vtkSMProxy* activeSelection = port->getSelectionInput();
+  vtkPVDataInformation* dataInfo = port->getDataInformation();
+
+  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+  std::vector<vtkIdType> block_ids;
+  block_ids.resize(blocksProp.GetNumberOfElements());
+  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  std::sort(block_ids.begin(), block_ids.end());
+
+  // if check is true then we are checking only the selected blocks,
+  // if check is false, then we are un-checking the selected blocks, leaving
+  // the selections for the other blocks as they are.
+  if (checked)
+    {
+    this->Model->setData(this->Model->makeIndex(0),
+                         Qt::Unchecked,
+                         Qt::CheckStateRole);
+    }
+
+  // block selection only has the block ids, now we need to convert the block
+  // ids to names for the blocks (and sets) using the data information.
+  vtkPVCompositeDataInformationIterator* iter =
+    vtkPVCompositeDataInformationIterator::New();
+  iter->SetDataInformation(dataInfo);
+  unsigned int cur_index = 0;
+  for (iter->InitTraversal();
+    !iter->IsDoneWithTraversal() && cur_index < static_cast<unsigned int>(
+      block_ids.size()); iter->GoToNextItem())
+    {
+    if (static_cast<vtkIdType>(
+        iter->GetCurrentFlatIndex()) < block_ids[cur_index])
+      {
+      continue;
+      }
+    if (static_cast<vtkIdType>(
+        iter->GetCurrentFlatIndex()) > block_ids[cur_index])
+      {
+      qDebug() << "Failed to locate block's name for block id: " <<
+        block_ids[cur_index];
+      cur_index++;
+      continue;
+      }
+
+    vtkIdType vertexid =
+      this->Model->findVertex(iter->GetCurrentName());
+    if (vertexid != -1)
+      {
+      this->Model->setData(this->Model->makeIndex(vertexid),
+                           checked ? Qt::Checked : Qt::Unchecked,
+                           Qt::CheckStateRole);
+      }
+    else
+      {
+      // if vertexid==-1 from the SIL, then it's possible that this is a name of
+      // one of the sets, since currently, sets are not part of the SIL. Until
+      // the users ask for it, we will leave enabling/disabling the sets out.
+      }
+    cur_index++;
+    }
+
+  iter->Delete();
 }
