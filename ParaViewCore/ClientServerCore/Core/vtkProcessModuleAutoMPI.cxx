@@ -321,10 +321,13 @@ bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
       options->GetApplicationPath());
 
     search_paths.push_back(binary_dir);
+
+
 #if defined (__APPLE__)
     // for mac, add path to the bin dir within the application.
+    std::string applepath = binary_dir + "/../bin";
     search_paths.push_back(vtksys::SystemTools::CollapseFullPath(
-        binary_dir + "/../bin");
+        applepath.c_str()));
 #endif
     this->ServerExecutablePath = vtksys::SystemTools::FindProgram(
       PARAVIEW_SERVER, search_paths, /*no_system_path=*/ true);
