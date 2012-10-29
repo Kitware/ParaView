@@ -25,9 +25,10 @@
 #include "string"
 #include "vector"
 #include "vtksys/Process.h"
-#include "vtksys/stl/string"
-#include "vtksys/stl/vector"
 #include "vtkSocket.h"
+
+#include <vector>
+#include <string>
 
 int vtkProcessModuleAutoMPI::UseMulticoreProcessors = 0;
 
@@ -91,9 +92,7 @@ public:
   std::vector<std::string> MPIServerPostFlags;
 
   int TotalMulticoreProcessors;
-  double TimeOut;
-  std::string ParaView;  // fullpath to paraview executable
-  std::string ParaViewServer;  // fullpath to paraview server executable
+  std::string ServerExecutablePath;  // fullpath to paraview server executable
   std::string MPINumProcessFlag;
   std::string MPIServerNumProcessFlag;
   std::string MPIRun;  // fullpath to mpirun executable
@@ -140,7 +139,6 @@ vtkStandardNewMacro(vtkProcessModuleAutoMPI);
 vtkProcessModuleAutoMPI::vtkProcessModuleAutoMPI()
 {
   this->Internals = new vtkProcessModuleAutoMPIInternals;
-  this->Internals->TimeOut = 300;
 }
 
 //------------------------------------------------------------------------destr
@@ -225,7 +223,7 @@ int vtkProcessModuleAutoMPIInternals::
 {
   // Create a new server process structure
   vtksysProcess* server =0;
-  server =vtksysProcess_New();
+  server = vtksysProcess_New();
   if(!server)
     {
     vtksysProcess_Delete(server);
@@ -233,51 +231,36 @@ int vtkProcessModuleAutoMPIInternals::
     return 0;
     }
 
-  if(server)
-    {
-    // Construct the Command line that will be executed
-    vtksys_stl::vector<std::string> serverCommandStr;
-    vtksys_stl::vector<const char*> serverCommand;
-    //std::string serverExe = this->ParaViewServer;
+  // Construct the Command line that will be executed
+  std::string serverExe = this->ServerExecutablePath;
+  std::string app_dir= vtksys::SystemTools::GetProgramPath(serverExe.c_str());
 
-    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
-    std::string app_dir =
-      vtksys::SystemTools::GetProgramPath(options->GetApplicationPath());
+  vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
+  vtksysProcess_SetOption(server, vtksysProcess_Option_Detach, 1);
 
-#if defined(__APPLE__)
-    std::string pvserver_rel(app_dir + "/../bin/" + std::string(PARAVIEW_SERVER));
-    std::string serverExe = vtksys::SystemTools::CollapseFullPath(pvserver_rel.c_str());
-    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
-    cerr << "Mac AppDir: " << serverExe << endl;
-    cerr << "Mac ServerExe: " << serverExe << endl;
-#elif defined(WIN32)
-    std::string serverExe = PARAVIEW_SERVER;
-
-    // Set the working directory as the location of pvserver. Some
-    // mpi packages have issue with full paths containing spaces so
-    // lets just invoke mpiexec  with no path to pvserver.
-    cerr << "Setting working directory to be " << app_dir.c_str() << endl;
-    vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
-#else
-    std::string serverExe =
-      app_dir + std::string("/") + std::string(PARAVIEW_SERVER);
+#if defined(WIN32)
+  // On Windows, spaces in the path when launching the MPI job can cause severe
+  // issue. So we use the relative executable path for the server. Since we are
+  // setting the working directory to be the one containing the server
+  // executable, we should not have any issues (mostly).
+  serverExe = PARAVIEW_SERVER;
 #endif
 
-    this->CreateCommandLine(serverCommandStr,
-                      serverExe.c_str(),
-                      this->MPIServerNumProcessFlag.c_str(),
-                      port);
-    vtkCopy(serverCommand, serverCommandStr);
+  vtksys_stl::vector<std::string> serverCommandStr;
+  vtksys_stl::vector<const char*> serverCommand;
+  this->CreateCommandLine(serverCommandStr,
+    serverExe.c_str(),
+    this->MPIServerNumProcessFlag.c_str(),
+    port);
+  vtkCopy(serverCommand, serverCommandStr);
 
-    
-    if(vtksysProcess_SetCommand(server, &serverCommand[0]))
-      {
-      this->ReportCommand(&serverCommand[0], "SUCCESS:");
-      }
-    else
-      {
-      this->ReportCommand(&serverCommand[0], "ERROR:");
-      }
+  if (vtksysProcess_SetCommand(server, &serverCommand[0]))
+    {
+    this->ReportCommand(&serverCommand[0], "SUCCESS:");
+    }
+  else
+    {
+    this->ReportCommand(&serverCommand[0], "ERROR:");
     }
 
   std::vector<char> ServerStdOut;
@@ -291,6 +274,8 @@ int vtkProcessModuleAutoMPIInternals::
     vtksysProcess_Delete(server);;
     return 0;
     }
+
+  // FIXME: 'server' leaks!!!
   return 1;
 }
 
@@ -325,13 +310,31 @@ bool vtkProcessModuleAutoMPIInternals::SetMPIRun(std::string mpiexec)
  */
 bool vtkProcessModuleAutoMPIInternals::CollectConfiguredOptions()
 {
-// set the path to the binary directory
-  this->ParaViewServer = PARAVIEW_BINARY_DIR;
-#ifdef  CMAKE_INTDIR
-  this->ParaViewServer  += "/" CMAKE_INTDIR;
+  if (this->ServerExecutablePath.empty())
+    {
+    vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+
+    // Determine the path to 'pvserver'.
+    std::vector<std::string> search_paths;
+
+    // same location as the client executable.
+    std::string binary_dir = vtksys::SystemTools::GetProgramPath(
+      options->GetApplicationPath());
+
+    search_paths.push_back(binary_dir);
+#if defined (__APPLE__)
+    // for mac, add path to the bin dir within the application.
+    search_paths.push_back(vtksys::SystemTools::CollapseFullPath(
+        binary_dir + "/../bin");
 #endif
-  // now set the final execuable names
-  this->ParaViewServer += "/" PARAVIEW_SERVER;
+    this->ServerExecutablePath = vtksys::SystemTools::FindProgram(
+      PARAVIEW_SERVER, search_paths, /*no_system_path=*/ true);
+    }
+
+  if (this->ServerExecutablePath.empty())
+    {
+    return false;
+    }
 
   // now find all the mpi information if mpi run is set
 #ifdef PARAVIEW_USE_MPI
@@ -501,14 +504,22 @@ int vtkProcessModuleAutoMPIInternals::StartServer(vtksysProcess* server, const c
     {
     return 0;
     }
+
   cerr << "AutoMPI: starting process " << name << "\n";
-  vtksysProcess_SetTimeout(server, this->TimeOut);
   vtksysProcess_Execute(server);
+
   int foundWaiting = 0;
   std::string output;
   while(!foundWaiting)
     {
-    int pipe = this->WaitForAndPrintLine(name, server, output, 100.0, out, err,
+    // We wait for 10s at most to get the "Waiting" text printed out by
+    // pvserver.
+    double timeout = 10.0;
+#ifdef WIN32
+    timeout = 20.0; // windows can be slow with MPI process launch.
+#endif
+
+    int pipe = this->WaitForAndPrintLine(name, server, output, timeout, out, err,
                                          &foundWaiting);
     if(pipe == vtksysProcess_Pipe_None ||
        pipe == vtksysProcess_Pipe_Timeout)
