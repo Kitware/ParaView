@@ -236,7 +236,6 @@ int vtkProcessModuleAutoMPIInternals::
   std::string app_dir= vtksys::SystemTools::GetProgramPath(serverExe.c_str());
 
   vtksysProcess_SetWorkingDirectory(server, app_dir.c_str());
-  vtksysProcess_SetOption(server, vtksysProcess_Option_Detach, 1);
 
 #if defined(WIN32)
   // On Windows, spaces in the path when launching the MPI job can cause severe
