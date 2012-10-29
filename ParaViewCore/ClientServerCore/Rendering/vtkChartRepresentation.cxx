@@ -199,12 +199,18 @@ bool vtkChartRepresentation::GetLocalOutput(std::vector<vtkTable*>& tables)
 
   if(compositeOut)
     {
+    // If 0, which corresponds to the root node for a multiblock dataset, is
+    // present in the set of indices, then we simply pass all the blocks.
+    bool pass_all_blocks = (this->CompositeIndices.find(0) !=
+      this->CompositeIndices.end());
+
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(compositeOut->NewIterator());
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
       int compositeIndex = iter->GetCurrentFlatIndex();
-      if(this->CompositeIndices.find(compositeIndex)!=this->CompositeIndices.end())
+      if (pass_all_blocks ||
+        this->CompositeIndices.find(compositeIndex)!=this->CompositeIndices.end())
         {
         vtkDataObject* inputObj = iter->GetCurrentDataObject();
         if(vtkTable::SafeDownCast(inputObj))
