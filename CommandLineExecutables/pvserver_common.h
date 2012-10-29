@@ -12,22 +12,24 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVConfig.h"
+
+#ifndef BUILD_SHARED_LIBS
+# ifdef PARAVIEW_ENABLE_PYTHON
+// file containing static initialization functions for all modules built.
+#   include "pvpythonmodules.h"
+# endif
+#endif
+
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkNetworkAccessManager.h"
 #include "vtkPVServerOptions.h"
 #include "vtkProcessModule.h"
 #include "vtkPVSessionServer.h"
-#include "vtkPVConfig.h"
 
 #ifndef BUILD_SHARED_LIBS
 # include "pvStaticPluginsInit.h"
-
-# ifdef PARAVIEW_ENABLE_PYTHON
-// file containing static initialization functions for all modules built.
-#   include "pvpythonmodules.h"
-# endif
-
 #endif
 
 static bool RealMain(int argc, char* argv[],

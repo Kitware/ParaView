@@ -12,22 +12,22 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkInitializationHelper.h"
-#include "vtkMultiProcessController.h"
-#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
-#include "vtkPVPythonOptions.h"
-#include "vtkSMSession.h"
-
-#include "vtkPVPythonInterpretor.h"
-
-#include <vtksys/SystemTools.hxx>
-#include <vector>
 
 #ifndef BUILD_SHARED_LIBS
 // file containing static initialization functions for all modules built.
 # include "pvpythonmodules.h"
 #endif
+
+#include "vtkInitializationHelper.h"
+#include "vtkMultiProcessController.h"
+#include "vtkProcessModule.h"
+#include "vtkPVPythonInterpretor.h"
+#include "vtkPVPythonOptions.h"
+#include "vtkSMSession.h"
+
+#include <vtksys/SystemTools.hxx>
+#include <vector>
 
 namespace ParaViewPython {
 
