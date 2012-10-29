@@ -20,6 +20,12 @@
 #include "vtkUncertaintySurfacePainter.h"
 #include "vtkUncertaintySurfaceDefaultPainter.h"
 #include "vtkDataObject.h"
+#include "vtkDataSet.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkPointData.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkIntArray.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkUncertaintySurfaceRepresentation)
@@ -58,6 +64,10 @@ void vtkUncertaintySurfaceRepresentation::PrintSelf(ostream& os,
 void vtkUncertaintySurfaceRepresentation::SetUncertaintyArray(const char *name)
 {
   this->Painter->SetUncertaintyArrayName(name);
+
+  // update transfer function
+  this->RescaleUncertaintyTransferFunctionToDataRange();
+
   this->Modified();
 }
 
@@ -78,6 +88,40 @@ void vtkUncertaintySurfaceRepresentation::SetUncertaintyTransferFunction(vtkPiec
 vtkPiecewiseFunction* vtkUncertaintySurfaceRepresentation::GetUncertaintyTransferFunction() const
 {
   return this->Painter->GetTransferFunction();
+}
+
+//----------------------------------------------------------------------------
+void vtkUncertaintySurfaceRepresentation::RescaleUncertaintyTransferFunctionToDataRange()
+{
+  const char *uncertaintyArrayName = this->GetUncertaintyArray();
+  vtkPiecewiseFunction *transferFunction = this->GetUncertaintyTransferFunction();
+
+  double range[2] = { 0.0, 1.0 };
+
+  vtkDataObject *input = this->GetInput();
+  vtkDataSet *inputDS = vtkDataSet::SafeDownCast(input);
+  if(inputDS)
+    {
+    vtkAbstractArray *array =
+      inputDS->GetPointData()->GetAbstractArray(uncertaintyArrayName);
+    if(vtkIntArray *intArray = vtkIntArray::SafeDownCast(array))
+      {
+      intArray->GetRange(range);
+      }
+    else if(vtkFloatArray *floatArray = vtkFloatArray::SafeDownCast(array))
+      {
+      floatArray->GetRange(range);
+      }
+    else if(vtkDoubleArray *doubleArray = vtkDoubleArray::SafeDownCast(array))
+      {
+      doubleArray->GetRange(range);
+      }
+    }
+
+  // set range
+  transferFunction->RemoveAllPoints();
+  transferFunction->AddPoint(range[0], 0.0, 0.5, 0.0);
+  transferFunction->AddPoint(range[1], 1.0, 0.5, 0.0);
 }
 
 //----------------------------------------------------------------------------

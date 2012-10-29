@@ -39,9 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyListDomain.h"
 #include "pqPVApplicationCore.h"
+#include "vtkChartXY.h"
+#include "vtkAxis.h"
 
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 
 pqTransferFunctionEditorPropertyWidget::pqTransferFunctionEditorPropertyWidget(vtkSMProxy *smProxy,
@@ -110,10 +113,22 @@ pqTransferFunctionEditorPropertyWidgetDialog::
 
   pqTransferFunctionChartViewWidget *widget =
     new pqTransferFunctionChartViewWidget(this);
-  double validBounds[4] = {VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, 0, 1};
+  widget->setTitle("Edit Transfer Function");
+  widget->chart()->GetAxis(vtkAxis::BOTTOM)->SetTitle("Input");
+  widget->chart()->GetAxis(vtkAxis::LEFT)->SetTitle("Output");
+  double range[2];
+  this->TransferFunction->GetRange(range);
+  double validBounds[4] = { VTK_DOUBLE_MIN, VTK_DOUBLE_MAX, range[0], range[1] };
   widget->setValidBounds(validBounds);
   widget->addPiecewiseFunction(this->TransferFunction.GetPointer());
 
   l->addWidget(widget);
+
+  QHBoxLayout *buttonLayout = new QHBoxLayout;
+  QPushButton *closeButton = new QPushButton("Close", this);
+  closeButton->setObjectName("CloseButton");
+  this->connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
+  buttonLayout->addWidget(closeButton);
+  l->addLayout(buttonLayout);
   this->setLayout(l);
 }

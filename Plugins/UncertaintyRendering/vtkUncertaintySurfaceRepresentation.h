@@ -50,6 +50,10 @@ public:
   vtkPiecewiseFunction* GetUncertaintyTransferFunction() const;
 
   // Description:
+  // Rescales the uncertainty transfer function to the data range.
+  void RescaleUncertaintyTransferFunctionToDataRange();
+
+  // Description:
   // Set/get the noise density.
   void SetNoiseDensity(double density);
   double GetNoiseDensity() const;
