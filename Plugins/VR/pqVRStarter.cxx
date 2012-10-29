@@ -35,18 +35,92 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVVRConfig.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkVRInteractorStyleFactory.h"
 #include "vtkVRQueue.h"
-#include "vtkVRQueueHandler.h"
+#include "pqVRQueueHandler.h"
 #include "pqApplicationCore.h"
-#include "vtkVRConnectionManager.h"
+#include "pqTestUtility.h"
+#include "pqVRConnectionManager.h"
+#include "pqWidgetEventPlayer.h"
+
+// Used for testing:
+#include <pqVRPNConnection.h>
+class pqVREventPlayer : public pqWidgetEventPlayer
+{
+  typedef pqWidgetEventPlayer Superclass;
+public:
+  pqVREventPlayer(QObject* p) : Superclass(p) { }
+  virtual bool playEvent(QObject*, const QString& command,
+                         const QString& arguments, bool& error)
+  {
+    if (command == "pqVREvent")
+      {
+      if (arguments.startsWith("vrpn_trackerEvent"))
+        {
+        // Syntax is (one line:)
+        // "vrpn_trackerEvent:[connName];[sensorid];[pos_x],[pos_y],[pos_z];
+        // [quat_w],[quat_x],[quat_y],[quat_z]"
+        QRegExp capture("vrpn_trackerEvent:"
+                        "([\\w.@]+);" // Connection name
+                        "(\\d+);"     // sensor id
+                        "([\\d.-]+)," // pos_x
+                        "([\\d.-]+)," // pos_y
+                        "([\\d.-]+);" // pos_z
+                        "([\\d.-]+)," // quat_w
+                        "([\\d.-]+)," // quat_x
+                        "([\\d.-]+)," // quat_y
+                        "([\\d.-]+)$" // quat_z
+                        );
+        int ind = capture.indexIn(arguments);
+        if (ind < 0)
+          {
+          qWarning() << "pqVREventPlayer: bad arguments:" << command;
+          error = true;
+          return false;
+          }
+        vrpn_TRACKERCB event;
+        QString connName;
+        connName      = capture.cap(1);
+        event.sensor  = capture.cap(2).toInt();
+        event.pos[0]  = capture.cap(3).toDouble();
+        event.pos[1]  = capture.cap(4).toDouble();
+        event.pos[2]  = capture.cap(5).toDouble();
+        event.quat[0] = capture.cap(6).toDouble();
+        event.quat[1] = capture.cap(7).toDouble();
+        event.quat[2] = capture.cap(8).toDouble();
+        event.quat[3] = capture.cap(9).toDouble();
+        pqVRConnectionManager* mgr = pqVRConnectionManager::instance();
+        pqVRPNConnection *conn = mgr->GetVRPNConnection(connName);
+        if (!conn)
+          {
+          qWarning() << "pqVREventPlayer: bad connection name:" << command;
+          error = true;
+          return false;
+          }
+        conn->newTrackerValue(event);
+        return true;
+        }
+      else
+        {
+        error = true;
+        }
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+  }
+};
 
 //-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
 {
 public:
-  vtkVRConnectionManager *ConnectionManager;
+  pqVRConnectionManager *ConnectionManager;
   vtkVRQueue* EventQueue;
-  vtkVRQueueHandler* Handler;
+  pqVRQueueHandler* Handler;
+  vtkVRInteractorStyleFactory *StyleFactory;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,7 +130,13 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals = new pqInternals;
   this->Internals->EventQueue = NULL;
   this->Internals->Handler = NULL;
-  this->IsShutdown = false;
+  this->Internals->StyleFactory = NULL;
+
+  pqVREventPlayer *player = new pqVREventPlayer(NULL);
+  pqApplicationCore::instance()->testUtility()->eventPlayer()->
+      addWidgetEventPlayer(player);
+
+  this->IsShutdown = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -71,22 +151,35 @@ pqVRStarter::~pqVRStarter()
 //-----------------------------------------------------------------------------
 void pqVRStarter::onStartup()
 {
-  this->Internals->EventQueue = new vtkVRQueue(this);
-  this->Internals->ConnectionManager = new vtkVRConnectionManager(this->Internals->EventQueue,this);
-  this->Internals->Handler = new vtkVRQueueHandler(this->Internals->EventQueue, this);
-  this->Internals->ConnectionManager->start();
-  this->Internals->Handler->start();
-  //qWarning() << "Message from pqVRStarter: Application Started";
+  if (!this->IsShutdown)
+    {
+    qWarning() << "pqVRStarter: Cannot startup -- already started.";
+    return;
+    }
+  this->IsShutdown = false;
+  this->Internals->EventQueue = vtkVRQueue::New();
+  this->Internals->ConnectionManager = new pqVRConnectionManager(this->Internals->EventQueue,this);
+  pqVRConnectionManager::setInstance(this->Internals->ConnectionManager);
+  this->Internals->Handler = new pqVRQueueHandler(this->Internals->EventQueue, this);
+  pqVRQueueHandler::setInstance(this->Internals->Handler);
+  this->Internals->StyleFactory = vtkVRInteractorStyleFactory::New();
+  vtkVRInteractorStyleFactory::SetInstance(this->Internals->StyleFactory);
 }
 
 //-----------------------------------------------------------------------------
 void pqVRStarter::onShutdown()
 {
-  this->Internals->Handler->stop();
-  this->Internals->ConnectionManager->stop();
+  if (this->IsShutdown)
+    {
+    qWarning() << "pqVRStarter: Cannot shutdown -- not started yet.";
+    return;
+    }
+  this->IsShutdown = true;
+  pqVRConnectionManager::setInstance(NULL);
+  pqVRQueueHandler::setInstance(NULL);
+  vtkVRInteractorStyleFactory::SetInstance(NULL);
   delete this->Internals->Handler;
   delete this->Internals->ConnectionManager;
-  delete this->Internals->EventQueue;
-  this->IsShutdown = true;
-  // qWarning() << "Message from pqVRStarter: Application Shutting down";
+  this->Internals->EventQueue->Delete();
+  this->Internals->StyleFactory->Delete();
 }

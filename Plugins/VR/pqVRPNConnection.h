@@ -48,42 +48,49 @@ class vtkPVXMLElement;
 class vtkSMProxyLocator;
 
 /// Callback to listen to VRPN events
-class vtkVRPNConnection : public QThread
+class pqVRPNConnection : public QThread
 {
   Q_OBJECT
   typedef QThread Superclass;
 public:
-  vtkVRPNConnection(QObject *parent=0);
-  ~vtkVRPNConnection();
+  pqVRPNConnection(QObject *parent=0);
+  ~pqVRPNConnection();
 
   // Description:
-  // Name of the device. For example, "Tracker0@localhost"
-  // Initial value is a NULL pointer.
-  void SetAddress(std::string name);
+  // Address of the device. For example, "Tracker0@localhost"
+  void setAddress(std::string address);
+
+  // Description:
+  // Address of the device. For example, "Tracker0@localhost"
+  std::string address() { return this->Address; }
 
   // Description:
   // Set the device name.
-  void SetName(std::string name);
+  void setName(std::string name);
+
+  // Description:
+  // Get the device name.
+  std::string name() { return this->Name; }
 
   // Description:
   // Add button device
-  void AddButton(std::string id, std::string name);
+  void addButton(std::string id, std::string name);
 
   // Description:
   // Add Analog device
-  void AddAnalog(std::string id,  std::string name );
+  void addAnalog(std::string id,  std::string name );
 
   // Description:
   // Add tracking device
-  void AddTracking( std::string id,  std::string name);
+  void addTracking( std::string id,  std::string name);
 
   // Description:
   // Adding a transformation matrix
-  void SetTransformation( vtkMatrix4x4* matix );
+  void setTransformation( vtkMatrix4x4* matix );
 
   // Description:
   // Initialize the device with the name.
-  bool Init();
+  bool init();
 
   // Description:
   // Tell if Init() was called succesfully
@@ -91,11 +98,11 @@ public:
 
   // Description:
   // Terminate the thread
-  void Stop();
+  void stop();
 
   // Description:
   // Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRQueue* queue );
+  void setQueue( vtkVRQueue* queue );
 
   /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
@@ -103,14 +110,52 @@ public:
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
 
- protected slots:
+  /// Access to analog map
+  std::map<std::string, std::string> analogMap()
+  {
+    return this->AnalogMapping;
+  }
+  /// Access to analog map
+  void setAnalogMap(const std::map<std::string, std::string> &m)
+  {
+    this->AnalogMapping = m;
+    this->AnalogPresent = (this->AnalogMapping.size() > 0);
+  }
+
+  /// Access to button map
+  std::map<std::string, std::string> buttonMap()
+  {
+    return this->ButtonMapping;
+  }
+  /// Access to button map
+  void setButtonMap(const std::map<std::string, std::string> &m)
+  {
+    this->ButtonMapping = m;
+    this->ButtonPresent = (this->ButtonMapping.size() > 0);
+  }
+
+  /// Access to tracker map
+  std::map<std::string, std::string> trackerMap()
+  {
+    return this->TrackerMapping;
+  }
+  /// Access to tracker map
+  void setTrackerMap(const std::map<std::string, std::string> &m)
+  {
+    this->TrackerMapping = m;
+    this->TrackerPresent = (this->TrackerMapping.size() > 0);
+  }
+
+protected slots:
   void run();
 
 protected:
-  std::string GetName( int eventType, int id=0 );
-  void NewAnalogValue(vrpn_ANALOGCB data);
-  void NewButtonValue(vrpn_BUTTONCB data);
-  void NewTrackerValue(vrpn_TRACKERCB data );
+  std::string name( int eventType, int id=0 );
+
+  friend class pqVREventPlayer;
+  void newAnalogValue(vrpn_ANALOGCB data);
+  void newButtonValue(vrpn_BUTTONCB data);
+  void newTrackerValue(vrpn_TRACKERCB data );
   void verifyConfig( const char* id,
                      const char* name );
 
@@ -145,10 +190,9 @@ protected:
   class pqInternals;
   pqInternals* Internals;
 
-
 private:
-  vtkVRPNConnection(const vtkVRPNConnection&); // Not implemented.
-  void operator=(const vtkVRPNConnection&); // Not implemented.
+  pqVRPNConnection(const pqVRPNConnection&); // Not implemented.
+  void operator=(const pqVRPNConnection&); // Not implemented.
 };
 
 #endif

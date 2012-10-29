@@ -32,83 +32,129 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRInteractorStyle.h"
 
 #include "vtkPVXMLElement.h"
-#include "vtkSMProperty.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMSessionProxyManager.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
+
 #include <sstream>
 #include <algorithm>
 
 // ----------------------------------------------------------------------------
-vtkVRInteractorStyle::vtkVRInteractorStyle(QObject* parentObject)
-  : Superclass(parentObject)
+vtkStandardNewMacro(vtkVRInteractorStyle)
+vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy)
+
+// ----------------------------------------------------------------------------
+vtkVRInteractorStyle::vtkVRInteractorStyle()
+  : Superclass(), ControlledProxy(NULL), ControlledPropertyName(NULL),
+    NeedsAnalog(false), NeedsButton(false), NeedsTracker(false),
+    AnalogName(NULL), ButtonName(NULL), TrackerName(NULL)
 {
-  this->OutProxy =0;
-  this->OutProperty=0;
-  this->IsFoundOutProxyProperty=false;
 }
 
 // ----------------------------------------------------------------------------
 vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
+  this->SetControlledProxy(NULL);
+  this->SetControlledPropertyName(NULL);
+  this->SetAnalogName(NULL);
+  this->SetButtonName(NULL);
+  this->SetTrackerName(NULL);
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::configure(vtkPVXMLElement* child, vtkSMProxyLocator*)
+bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
+                                     vtkSMProxyLocator *locator)
 {
-  if (child->GetName() && strcmp(child->GetName(),"Style") == 0 &&
-      strcmp(this->metaObject()->className(),
-      child->GetAttributeOrEmpty("class")) == 0)
+  if (!child->GetName() || strcmp(child->GetName(),"Style") != 0 ||
+      strcmp(this->GetClassName(), child->GetAttributeOrEmpty("class")) != 0)
     {
-    std::string outStr = child->GetAttributeOrEmpty( "set_property" );
-    if ( !outStr.size() )
-      {
-      std::cerr << "vtkVRStyleGrabNTranslateSliceOrigin::configure(): "
-                << "set_property not specified "
-                << std::endl
-                << "<Style class=\""
-                << this->metaObject()->className()
-                << "\" "
-                << "set_property=\"ProxyName.PropertyName\"/>"
-                << std::endl;
-      return false;
-      }
-    std::vector<std::string> token = this->tokenize( outStr );
-    if ( token.size()!=2 )
-      {
-      std::cerr << "Expected \"set_property\" Format:  Proxy.Property" << std::endl;
-      return false;
-      }
-    else
-      {
-      this->OutProxyName = token[0];
-      this->OutPropertyName = token[1];
-      this->IsFoundOutProxyProperty = GetOutProxyNProperty();
-      return this->IsFoundOutProxyProperty;
-      }
-    return true;
+    return false;
     }
-  return false;
+
+  int id;
+  if (child->GetScalarAttribute("proxy", &id) == 0)
+    {
+    return false;
+    }
+
+  if (child->GetAttribute("property") == NULL)
+    {
+    return false;
+    }
+
+
+  for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* element = child->GetNestedElement(cc);
+    if (element && element->GetName())
+      {
+      if (strcmp(element->GetName(), "Analog") == 0)
+        {
+        this->SetAnalogName(element->GetAttributeOrEmpty("name"));
+        }
+      else if (strcmp(element->GetName(), "Button") == 0)
+        {
+        this->SetButtonName(element->GetAttributeOrEmpty("name"));
+        }
+      else if (strcmp(element->GetName(), "Tracker") == 0)
+        {
+        this->SetTrackerName(element->GetAttributeOrEmpty("name"));
+        }
+      }
+    }
+
+  this->ControlledProxy = locator->LocateProxy(id);
+  this->SetControlledPropertyName(child->GetAttribute("property"));
+
+  return true;
 }
 
 // ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRInteractorStyle::saveConfiguration() const
+vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
 {
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
-  child->AddAttribute("class",this->metaObject()->className());
-  std::stringstream propertyStr;
-  propertyStr << this->OutProxyName << "." << this->OutPropertyName;
-  child->AddAttribute( "set_property",propertyStr.str().c_str() );
+  child->AddAttribute("class",this->GetClassName());
+  child->AddAttribute("proxy",
+    this->ControlledProxy?
+    this->ControlledProxy->GetGlobalIDAsString() : "0");
+  if (this->ControlledPropertyName != NULL &&
+      this->ControlledPropertyName[0] != '\0')
+    {
+    child->AddAttribute("property",
+      this->ControlledPropertyName);
+    }
+
+  if (this->NeedsAnalog && this->AnalogName)
+    {
+    vtkPVXMLElement *analog = vtkPVXMLElement::New();
+    analog->SetName("Analog");
+    analog->AddAttribute("name", this->AnalogName);
+    child->AddNestedElement(analog);
+    analog->FastDelete();
+    }
+  if (this->NeedsButton && this->ButtonName)
+    {
+    vtkPVXMLElement *button = vtkPVXMLElement::New();
+    button->SetName("Button");
+    button->AddAttribute("name", this->ButtonName);
+    child->AddNestedElement(button);
+    button->FastDelete();
+    }
+  if (this->NeedsTracker && this->TrackerName)
+    {
+    vtkPVXMLElement* tracker = vtkPVXMLElement::New();
+    tracker->SetName("Tracker");
+    tracker->AddAttribute("name", this->TrackerName);
+    child->AddNestedElement(tracker);
+    tracker->FastDelete();
+    }
 
   return child;
 }
 
 // ----------------------------------------------------------------------------
-std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
+std::vector<std::string> vtkVRInteractorStyle::Tokenize( std::string input)
 {
   std::replace( input.begin(), input.end(), '.', ' ' );
   std::istringstream stm( input );
@@ -123,31 +169,7 @@ std::vector<std::string> vtkVRInteractorStyle::tokenize( std::string input)
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetOutProxyNProperty()
-{
-  if(this->GetProxy( this->OutProxyName, &this->OutProxy ) )
-    {
-    if ( !this->GetProperty( this->OutProxy, this->OutPropertyName, &this->OutProperty ) )
-      {
-      std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
-                << std::endl
-                << "Property ( " << this->OutPropertyName << ") :Not Found"
-                <<std::endl;
-      return false;
-      }
-    }
-  else
-    {
-    std::cerr << this->metaObject()->className() << "::GetOutProxyNProperty"
-              << std::endl
-              << "Proxy ( " << this->OutProxyName << ") :Not Found" << std::endl;
-    return false;
-    }
-  return true;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
+bool vtkVRInteractorStyle::HandleEvent(const vtkVREventData& data)
 {
   switch( data.eventType )
     {
@@ -165,42 +187,9 @@ bool vtkVRInteractorStyle::handleEvent(const vtkVREventData& data)
 }
 
 // -----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::update()
+bool vtkVRInteractorStyle::Update()
 {
-  if(this->OutProxy)
-    {
-    this->OutProxy->UpdateVTKObjects();
-    }
-  return false;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetProxy( std::string name, vtkSMProxy ** proxy )
-{
-  vtkSMProxy *p =0;
-  p = vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager()->GetProxy( name.c_str() );
-  if( p )
-    {
-    *proxy = p;
-    return true;
-    }
-  return false;
-}
-
-// ----------------------------------------------------------------------------
-bool vtkVRInteractorStyle::GetProperty( vtkSMProxy* proxy,
-                                        std::string name,
-                                        vtkSMDoubleVectorProperty** prop )
-{
-  vtkSMDoubleVectorProperty *p =0;
-  p =  vtkSMDoubleVectorProperty::
-      SafeDownCast( proxy->GetProperty( name.c_str()) );
-  if ( p )
-    {
-    *prop = p;
-    return true;
-    }
-  return false;
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -216,4 +205,27 @@ void vtkVRInteractorStyle::HandleAnalog( const vtkVREventData& vtkNotUsed( data 
 // ----------------------------------------------------------------------------
 void vtkVRInteractorStyle::HandleTracker( const vtkVREventData& vtkNotUsed( data ) )
 {
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::PrintSelf(ostream &os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "ControlledPropertyName: "
+     << this->ControlledPropertyName << endl;
+  if (this->ControlledProxy)
+    {
+    os << indent << "ControlledProxy:" << endl;
+    this->ControlledProxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "ControlledProxy: (None)" << endl;
+    }
+  os << indent << "NeedsAnalog: " << this->NeedsAnalog << endl;
+  os << indent << "AnalogName: " << this->AnalogName << endl;
+  os << indent << "NeedsButton: " << this->NeedsButton << endl;
+  os << indent << "ButtonName: " << this->ButtonName << endl;
+  os << indent << "NeedsTracker: " << this->NeedsTracker << endl;
+  os << indent << "TrackerName: " << this->TrackerName << endl;
 }

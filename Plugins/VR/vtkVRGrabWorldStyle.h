@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    $RCSfile$
+   Module:    vtkVRGrabWorldStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,53 +29,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRQueueHandler_h
-#define __vtkVRQueueHandler_h
+#ifndef __vtkVRGrabWorldStyle_h_
+#define __vtkVRGrabWorldStyle_h_
 
-#include <QObject>
+#include "vtkVRTrackStyle.h"
 
-class vtkVRInteractorStyle;
-class vtkVRQueue;
-class vtkPVXMLElement;
-class vtkSMProxyLocator;
+class vtkSMRenderViewProxy;
+class vtkSMDoubleVectorProperty;
+class vtkSMIntVectorProperty;
+class vtkTransform;
+struct vtkVREventData;
 
-/// vtkVRQueueHandler is a class that process events stacked on to vtkVRQueue
-/// one by one. One adds vtkVRInteractorStyles to the handler to do any actual
-/// work with these events.
-class vtkVRQueueHandler : public QObject
+class vtkVRGrabWorldStyle : public vtkVRTrackStyle
 {
-  Q_OBJECT
-  typedef QObject Superclass;
 public:
-  vtkVRQueueHandler(vtkVRQueue* quque, QObject* parent=0);
-  virtual ~vtkVRQueueHandler();
+  static vtkVRGrabWorldStyle *New();
+  vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle)
+  void PrintSelf(ostream &os, vtkIndent indent);
 
-  /// Add/remove interactor style.
-  void add(vtkVRInteractorStyle* style);
-  void remove(vtkVRInteractorStyle* style);
-  void clear();
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* SaveConfiguration() const;
 
-public slots:
-  /// start/stop queue processing.
-  void start();
-  void stop();
+protected:
+  vtkVRGrabWorldStyle();
+  ~vtkVRGrabWorldStyle();
 
-  /// clears current interactor styles and loads a new set of styles from the
-  /// XML configuration.
-  void configureStyles(vtkPVXMLElement* xml, vtkSMProxyLocator* locator);
+  virtual void HandleButton( const vtkVREventData& data );
+  virtual void HandleTracker( const vtkVREventData& data );
 
-  /// saves the styles configuration.
-  void saveStylesConfiguration(vtkPVXMLElement* root);
+  bool Enabled;
 
-protected slots:
-  /// called to processes events from the queue.
-  void processEvents();
+  bool IsInitialRecorded;
+  vtkTransform *InverseInitialTransform;
 
 private:
-  Q_DISABLE_COPY(vtkVRQueueHandler);
-  void render();
-  class pqInternals;
-  pqInternals* Internals;
+  vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
+  void operator=(const vtkVRGrabWorldStyle&); // Not implemented.
 };
 
-#endif
+#endif //__vtkVRGrabWorldStyle.h_

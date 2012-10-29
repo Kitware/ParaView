@@ -55,6 +55,10 @@ public:
   QString getCurrentPropertyName() const;
   int getCurrentIndex() const;
 
+  /// If true, vector properties will have a single entry. If false, each vector
+  /// component will be displayed separately. Default: false.
+  bool getCollapseVectors() const;
+
   /// Sometimes, we want the combo to show a empty field that does not represent
   /// any property. Set this to true to use such a field.
   void setUseBlankEntry(bool b)
@@ -68,6 +72,10 @@ public slots:
   /// Set source without calling buildPropertyList() internally. Thus the user
   /// will explicitly call addSMProperty to add properties.
   void setSourceWithoutProperties(vtkSMProxy* proxy);
+
+  /// If true, vector properties will have a single entry. If false, each vector
+  /// component will be displayed separately. Default: false.
+  void setCollapseVectors(bool val);
 
   /// Add a property to the widget.
   void addSMProperty(const QString& label, const QString& propertyname, int index);

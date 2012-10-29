@@ -32,11 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkVRQueue_h
 #define __vtkVRQueue_h
 
-#include <QObject>
-#include <QQueue>
-#include <QMutex>
-#include <QWaitCondition>
-#include <QMutexLocker>
+#include "vtkObject.h"
+#include "vtkNew.h"
+
+class vtkConditionVariable;
+class vtkMutexLock;
+
+#include <queue>
 
 #define BUTTON_EVENT 1
 #define ANALOG_EVENT 2
@@ -78,22 +80,30 @@ struct vtkVREventData
 };
 
 
-class vtkVRQueue : public QObject
+class vtkVRQueue : public vtkObject
 {
-  Q_OBJECT
-  typedef QObject Superclass;
 public:
-  vtkVRQueue(QObject* parentObject=0);
-  void enqueue (const vtkVREventData& data);
-  bool isEmpty() const;
-  bool tryDequeue(vtkVREventData& data);
-  bool tryDequeue(QQueue<vtkVREventData>& data);
-  void dequeue(vtkVREventData&  data) ;
+  static vtkVRQueue *New();
+  vtkTypeMacro(vtkVRQueue, vtkObject)
+  void PrintSelf(ostream &os, vtkIndent indent);
+
+  void Enqueue (const vtkVREventData& data);
+  bool IsEmpty() const;
+  bool TryDequeue(vtkVREventData& data);
+  bool TryDequeue(std::queue<vtkVREventData>& data);
+  void Dequeue(vtkVREventData&  data) ;
+
+protected:
+  vtkVRQueue();
+  ~vtkVRQueue();
 
 private:
-  QQueue<vtkVREventData> Queue;
-  mutable QMutex Mutex;
-  QWaitCondition CondVar;
+  vtkVRQueue(const vtkVRQueue&); // Not implemented.
+  void operator=(const vtkVRQueue&); // Not implemented.
+
+  std::queue<vtkVREventData> Queue;
+  mutable vtkNew<vtkMutexLock> Mutex;
+  vtkNew<vtkConditionVariable> CondVar;
 
 };
 #endif // __vtkVRQueue_h

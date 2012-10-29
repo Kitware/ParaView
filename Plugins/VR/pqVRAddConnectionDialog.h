@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program: ParaView
-  Module:  vtkVRConnectionManager.h
+   Program: ParaView
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -28,56 +28,59 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-#ifndef __vtkVRConnectionManager_h
-#define __vtkVRConnectionManager_h
+========================================================================*/
+#ifndef __pqVRAddConnectionDialog_h
+#define __pqVRAddConnectionDialog_h
+
+#include <QDialog>
+
 #include "vtkPVVRConfig.h"
 
-#include <QObject>
-
-class vtkVRQueue;
-class vtkPVXMLElement;
-class vtkSMProxyLocator;
-#ifdef PARAVIEW_USE_VRUI
-class vtkVRUIConnection;
-#endif
 #ifdef PARAVIEW_USE_VRPN
-class vtkVRPNConnection;
+class pqVRPNConnection;
+#endif
+#ifdef PARAVIEW_USE_VRUI
+class pqVRUIConnection;
 #endif
 
-class vtkVRConnectionManager: public QObject
+class pqVRAddConnectionDialog : public QDialog
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef QDialog Superclass;
 public:
-  vtkVRConnectionManager(vtkVRQueue* quque, QObject* parent=0);
-  virtual ~vtkVRConnectionManager();
+  pqVRAddConnectionDialog(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqVRAddConnectionDialog();
+
 #ifdef PARAVIEW_USE_VRPN
-  void add( vtkVRPNConnection* conn );
-  void remove ( vtkVRPNConnection *conn );
+  void setConnection(pqVRPNConnection *conn);
+  pqVRPNConnection* getVRPNConnection();
+  bool isVRPN();
 #endif
 #ifdef PARAVIEW_USE_VRUI
-  void add( vtkVRUIConnection* conn );
-  void remove ( vtkVRUIConnection *conn );
+  void setConnection(pqVRUIConnection *conn);
+  pqVRUIConnection* getVRUIConnection();
+  bool isVRUI();
 #endif
-  void clear();
+
+  void updateConnection();
 
 public slots:
-  /// start/stop connections
-  void start();
-  void stop();
+  void accept();
 
-  /// Clears current connections and loads a new set of connections from the XML
-  /// Configuration
-  void configureConnections( vtkPVXMLElement* xml, vtkSMProxyLocator* locator );
+protected:
+  void keyPressEvent(QKeyEvent *);
 
-  // save the connection configuration
-  void saveConnectionsConfiguration( vtkPVXMLElement* root );
+private slots:
+  void addInput();
+  void removeInput();
+
+  void connectionTypeChanged();
 
 private:
-  Q_DISABLE_COPY(vtkVRConnectionManager);
+  Q_DISABLE_COPY(pqVRAddConnectionDialog)
+
   class pqInternals;
   pqInternals* Internals;
 };
 
-#endif // __vtkVRConnectionManager_h
+#endif

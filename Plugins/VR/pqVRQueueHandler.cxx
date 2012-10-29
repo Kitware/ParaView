@@ -29,41 +29,57 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "vtkVRQueueHandler.h"
+#include "pqVRQueueHandler.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkCollection.h"
 #include "vtkPVXMLElement.h"
-#include "vtkVRActiveObjectManipulationStyle.h"
-#include "vtkVRInteractorStyle.h"
-#include "vtkVRQueue.h"
-#include "vtkVRStyleTracking.h"
-#include "vtkVRStyleGrabNUpdateMatrix.h"
-#include "vtkVRStyleGrabNRotateSliceNormal.h"
-#include "vtkVRStyleGrabNTranslateSliceOrigin.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkVRGrabWorldStyle.h"
+#include "vtkVRInteractorStyle.h"
+#include "vtkVRInteractorStyleFactory.h"
+#include "vtkVRQueue.h"
+#include "vtkVRTrackStyle.h"
+#include "vtkWeakPointer.h"
+
 #include "pqApplicationCore.h"
 #include "pqActiveObjects.h"
 #include "pqView.h"
 
 #include <QList>
-#include <QPointer>
 #include <QtDebug>
 #include <QTimer>
 
-class vtkVRQueueHandler::pqInternals
+class pqVRQueueHandler::pqInternals
 {
 public:
-  QList<QPointer<vtkVRInteractorStyle> > Styles;
-  QPointer<vtkVRQueue> Queue;
+  vtkCollection *Styles;
+  vtkWeakPointer<vtkVRQueue> Queue;
   QTimer Timer;
 };
 
 //----------------------------------------------------------------------------
-vtkVRQueueHandler::vtkVRQueueHandler(
+QPointer<pqVRQueueHandler> pqVRQueueHandler::Instance;
+
+//----------------------------------------------------------------------------
+pqVRQueueHandler *pqVRQueueHandler::instance()
+{
+  return pqVRQueueHandler::Instance;
+}
+
+//----------------------------------------------------------------------------
+void pqVRQueueHandler::setInstance(pqVRQueueHandler *inst)
+{
+  pqVRQueueHandler::Instance = inst;
+}
+
+//----------------------------------------------------------------------------
+pqVRQueueHandler::pqVRQueueHandler(
   vtkVRQueue* queue, QObject* parentObject)
   : Superclass(parentObject)
 {
   this->Internals = new pqInternals();
+  this->Internals->Styles = vtkCollection::New();
   this->Internals->Queue = queue;
   this->Internals->Timer.setInterval(1);
   this->Internals->Timer.setSingleShot(true);
@@ -79,55 +95,84 @@ vtkVRQueueHandler::vtkVRQueueHandler(
 }
 
 //----------------------------------------------------------------------------
-vtkVRQueueHandler::~vtkVRQueueHandler()
+pqVRQueueHandler::~pqVRQueueHandler()
 {
   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::add(vtkVRInteractorStyle* style)
+void pqVRQueueHandler::add(vtkVRInteractorStyle* style)
 {
-  this->Internals->Styles.push_front(style);
+  if (!this->Internals->Styles->IsItemPresent(style))
+    {
+    this->Internals->Styles->AddItem(style);
+    emit stylesChanged();
+    return;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::remove(vtkVRInteractorStyle* style)
+void pqVRQueueHandler::remove(vtkVRInteractorStyle* style)
 {
-  this->Internals->Styles.removeAll(style);
+  this->Internals->Styles->RemoveItem(style);
+  emit stylesChanged();
 }
 
 //----------------------------------------------------------------------public
-void vtkVRQueueHandler::clear()
+void pqVRQueueHandler::clear()
 {
-  this->Internals->Styles.clear();
+  if (this->Internals->Styles->GetNumberOfItems() != 0)
+    {
+    this->Internals->Styles->RemoveAllItems();
+    emit stylesChanged();
+    }
+}
+
+//----------------------------------------------------------------------public
+QList<vtkVRInteractorStyle *> pqVRQueueHandler::styles()
+{
+  vtkVRInteractorStyle *style;
+  QList<vtkVRInteractorStyle*> result;
+  for (this->Internals->Styles->InitTraversal();
+       (style = vtkVRInteractorStyle::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
+    {
+    result << style;
+    }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::start()
+void pqVRQueueHandler::start()
 {
   this->Internals->Timer.start();
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::stop()
+void pqVRQueueHandler::stop()
 {
   this->Internals->Timer.stop();
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::processEvents()
+void pqVRQueueHandler::processEvents()
 {
   Q_ASSERT(this->Internals->Queue != NULL);
-  QQueue<vtkVREventData> events;
-  this->Internals->Queue->tryDequeue(events);
+  std::queue<vtkVREventData> events;
+  this->Internals->Queue->TryDequeue(events);
 
   // Loop through the event queue and pass events to InteractorStyles
-  while (!events.isEmpty())
+  while (!events.empty())
     {
-    vtkVREventData data = events.dequeue();
-    foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+    vtkVREventData data = events.front();
+    events.pop();
+    vtkVRInteractorStyle *style;
+    for (this->Internals->Styles->InitTraversal();
+         (style = vtkVRInteractorStyle::SafeDownCast(
+            this->Internals->Styles->GetNextItemAsObject()));)
       {
-      if (style && style->handleEvent(data))
+      if (style->HandleEvent(data))
         {
         break;
         }
@@ -136,9 +181,12 @@ void vtkVRQueueHandler::processEvents()
 
   // There should be an explicit update for each handler. Otherwise the server
   // side updates will not happen
-  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+  vtkVRInteractorStyle *style;
+  for (this->Internals->Styles->InitTraversal();
+       (style = vtkVRInteractorStyle::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
     {
-    if (style && style->update())
+    if (style->Update())
       {
       break;
       }
@@ -151,7 +199,7 @@ void vtkVRQueueHandler::processEvents()
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::render()
+void pqVRQueueHandler::render()
 {
   vtkSMRenderViewProxy *proxy =0;
   pqView *view = 0;
@@ -178,7 +226,7 @@ void vtkVRQueueHandler::render()
     </Style>
  </VRInteractorStyles>
  */
-void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
+void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
                                         vtkSMProxyLocator* locator)
 {
   if (!xml)
@@ -189,40 +237,19 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
   if (xml->GetName() && strcmp(xml->GetName(), "VRInteractorStyles") == 0)
     {
     this->clear();
+    vtkVRInteractorStyleFactory *factory =
+        vtkVRInteractorStyleFactory::GetInstance();
     for (unsigned cc=0; cc < xml->GetNumberOfNestedElements(); cc++)
       {
       vtkPVXMLElement* child = xml->GetNestedElement(cc);
       if (child && child->GetName() && strcmp(child->GetName(), "Style")==0)
         {
         const char* class_name = child->GetAttributeOrEmpty("class");
-        if (strcmp(class_name, "vtkVRStyleTracking")==0)
+        vtkVRInteractorStyle *style =
+            factory->NewInteractorStyleFromClassName(class_name);
+        if (style)
           {
-          vtkVRStyleTracking* style = new vtkVRStyleTracking(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNUpdateMatrix")==0)
-          {
-          vtkVRStyleGrabNUpdateMatrix* style = new vtkVRStyleGrabNUpdateMatrix(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNTranslateSliceOrigin")==0)
-          {
-          vtkVRStyleGrabNTranslateSliceOrigin* style = new vtkVRStyleGrabNTranslateSliceOrigin(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRStyleGrabNRotateSliceNormal")==0)
-          {
-          vtkVRStyleGrabNRotateSliceNormal* style = new vtkVRStyleGrabNRotateSliceNormal(this);
-          style->configure(child, locator);
-          this->add(style);
-          }
-        else if (strcmp(class_name, "vtkVRActiveObjectManipulationStyle")==0)
-          {
-          vtkVRActiveObjectManipulationStyle* style = new vtkVRActiveObjectManipulationStyle(this);
-          style->configure(child, locator);
+          style->Configure(child, locator);
           this->add(style);
           }
         else
@@ -237,18 +264,23 @@ void vtkVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
     this->configureStyles(xml->FindNestedElementByName("VRInteractorStyles"),
                           locator);
     }
+
+  emit stylesChanged();
 }
 
 //----------------------------------------------------------------------------
-void vtkVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
+void pqVRQueueHandler::saveStylesConfiguration(vtkPVXMLElement* root)
 {
   Q_ASSERT(root != NULL);
 
   vtkPVXMLElement* tempParent = vtkPVXMLElement::New();
   tempParent->SetName("VRInteractorStyles");
-  foreach (vtkVRInteractorStyle* style, this->Internals->Styles)
+  vtkVRInteractorStyle *style;
+  for (this->Internals->Styles->InitTraversal();
+       (style = vtkVRInteractorStyle::SafeDownCast(
+          this->Internals->Styles->GetNextItemAsObject()));)
     {
-    vtkPVXMLElement* child = style->saveConfiguration();
+    vtkPVXMLElement* child = style->SaveConfiguration();
     if (child)
       {
       tempParent->AddNestedElement(child);

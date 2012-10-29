@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkVRInteractorStyle_h
 #define __vtkVRInteractorStyle_h
 
-#include <QObject>
+#include <vtkObject.h>
 #include <vector>
 
 class vtkPVXMLElement;
@@ -41,38 +41,70 @@ class vtkSMProxy;
 class vtkSMDoubleVectorProperty;
 struct vtkVREventData;
 
-class vtkVRInteractorStyle : public QObject
+class vtkVRInteractorStyle : public vtkObject
 {
-  Q_OBJECT
-  typedef QObject Superclass;
 public:
-  vtkVRInteractorStyle(QObject* parent=0);
+  static vtkVRInteractorStyle *New();
+  vtkTypeMacro(vtkVRInteractorStyle, vtkObject)
+  void PrintSelf(ostream &os, vtkIndent indent);
+
+  // Description:
+  // Specify the proxy and property to control. The property needs to have 16
+  // elements and must be a numerical property.
+  virtual void SetControlledProxy(vtkSMProxy *);
+  vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
+
+  vtkSetStringMacro(ControlledPropertyName)
+  vtkGetStringMacro(ControlledPropertyName)
+
+  virtual bool HandleEvent(const vtkVREventData& data);
+  virtual bool Update();
+
+  // Description:
+  // Returns true if the specified input type is needed.
+  vtkGetMacro(NeedsAnalog, bool);
+  vtkGetMacro(NeedsButton, bool);
+  vtkGetMacro(NeedsTracker, bool);
+
+  // Description:
+  // Set/Get the name of the associated input
+  vtkSetStringMacro(AnalogName)
+  vtkGetStringMacro(AnalogName)
+  vtkSetStringMacro(ButtonName)
+  vtkGetStringMacro(ButtonName)
+  vtkSetStringMacro(TrackerName)
+  vtkGetStringMacro(TrackerName)
+
+  /// Load state for the style from XML.
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+
+  /// Save state to xml.
+  virtual vtkPVXMLElement* SaveConfiguration() const;
+
+protected:
+  vtkVRInteractorStyle();
   virtual ~vtkVRInteractorStyle();
-  virtual bool handleEvent(const vtkVREventData& data);
-  virtual bool update();
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
 
   virtual void HandleButton ( const vtkVREventData& data );
   virtual void HandleAnalog ( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
-  std::vector<std::string> tokenize( std::string input);
-  bool GetProxy( std::string name, vtkSMProxy ** proxy );
-  bool GetProperty( vtkSMProxy* proxy,
-                    std::string name,
-                    vtkSMDoubleVectorProperty** property );
 
-protected:
-  bool GetOutProxyNProperty();
+  static std::vector<std::string> Tokenize( std::string input);
 
-protected:
-  std::string OutProxyName;
-  std::string OutPropertyName;
-  vtkSMProxy *OutProxy;
-  vtkSMDoubleVectorProperty *OutProperty;
-  bool IsFoundOutProxyProperty;
+  vtkSMProxy *ControlledProxy;
+  char *ControlledPropertyName;
+
+  bool NeedsAnalog;
+  bool NeedsButton;
+  bool NeedsTracker;
+
+  char *AnalogName;
+  char *ButtonName;
+  char *TrackerName;
+
 private:
-  Q_DISABLE_COPY(vtkVRInteractorStyle)
+  vtkVRInteractorStyle(const vtkVRInteractorStyle&); // Not implemented.
+  void operator=(const vtkVRInteractorStyle&); // Not implemented.
 };
 
 #endif

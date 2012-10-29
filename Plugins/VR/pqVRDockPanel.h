@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleTracking.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,34 +29,58 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleTracking_h_
-#define __vtkVRStyleTracking_h_
+#ifndef __pqVRDockPanel_h
+#define __pqVRDockPanel_h
 
-#include "vtkVRInteractorStyle.h"
+#include <QtGui/QDockWidget>
 
-class vtkSMRenderViewProxy;
-class vtkSMDoubleVectorProperty;
-class vtkSMIntVectorProperty;
-class vtkTransform;
-struct vtkVREventData;
+class pqView;
+class QListWidgetItem;
+class vtkSMProxy;
 
-class vtkVRStyleTracking : public vtkVRInteractorStyle
+class pqVRDockPanel : public QDockWidget
 {
   Q_OBJECT
-  typedef vtkVRInteractorStyle Superclass;
+  typedef QDockWidget Superclass;
 public:
-  vtkVRStyleTracking(QObject* parent);
-  ~vtkVRStyleTracking();
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleTracker( const vtkVREventData& data );
-  virtual bool update();
-protected:
-  virtual void SetProperty( );
+  pqVRDockPanel(const QString &t, QWidget* p = 0, Qt::WindowFlags f=0):
+    Superclass(t, p, f) { this->constructor(); }
+  pqVRDockPanel(QWidget *p=0, Qt::WindowFlags f=0):
+    Superclass(p, f) { this->constructor(); }
+  virtual ~pqVRDockPanel();
 
-protected:
-  std::string Tracker;
-  vtkTransform* OutPose;
+private slots:
+  void addConnection();
+  void removeConnection();
+  void updateConnections();
+  void editConnection(QListWidgetItem *item = NULL);
+  void updateConnectionButtons(int row);
+
+  void addStyle();
+  void removeStyle();
+  void updateStyles();
+  void editStyle(QListWidgetItem *item = NULL);
+  void updateStyleButtons(int row);
+
+  void proxyChanged(vtkSMProxy*);
+  void setActiveView(pqView*);
+
+  void saveState();
+  void restoreState();
+
+  void updateStartStopButtonStates();
+  void start();
+  void stop();
+
+  void updateDebugLabel();
+
+private:
+  Q_DISABLE_COPY(pqVRDockPanel)
+
+  void constructor();
+
+  class pqInternals;
+  pqInternals* Internals;
 };
 
-#endif //__vtkVRStyleTracking.h_
+#endif

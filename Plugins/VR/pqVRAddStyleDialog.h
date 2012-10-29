@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqVRStarter.h
+   Module:    $RCSfile$
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,45 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqVRStarter_h
-#define __pqVRStarter_h
-#include <QObject>
+#ifndef __pqVRAddStyleDialog_h
+#define __pqVRAddStyleDialog_h
 
-class QTimer;
-class vtkVRQueue;
-class pqVRQueueHandler;
-class vtkPVXMLElement;
-class vtkSMProxyLocator;
+#include <QtGui/QDialog>
 
-/// pqVRStarter creates and establishes the framework for VR device. There are
-/// three primary objects that make up the framework, vtkVRConnectionManager,
-/// vtkVRQueue and VRQueueHandler. vtkVRConnectionManager and the
-/// vtkVRQueueHandler are threads one acting as a source and other as the
-/// destination for coming in from various VR connection servers (VRPN and
-/// VRUI). vtkVRQueue is a asynchronous queue established between the
-/// VRConnectionManager and the vtkVRQueueHandler.
-class pqVRStarter : public QObject
+class vtkVRInteractorStyle;
+
+class pqVRAddStyleDialog : public QDialog
 {
   Q_OBJECT
-  typedef QObject Superclass;
-
+  typedef QDialog Superclass;
 public:
-  pqVRStarter(QObject* p=0);
-  ~pqVRStarter();
+  pqVRAddStyleDialog(QWidget* parent=0, Qt::WindowFlags f=0);
+  virtual ~pqVRAddStyleDialog();
 
-  /// Creates and initiates the vtkVRConnectionManager thread the vtkVRQueue and
-  /// vtkVRQueueHandler thread.
-  void onStartup();
+  void setInteractorStyle(vtkVRInteractorStyle *, const QString &name);
+  void updateInteractorStyle();
 
-  /// Stops the vtkVRConnectioManager and vtkVRQueueHandler threads. Also
-  /// deletes the corresponding objects including vtkVRQueue.
-  void onShutdown();
+  // Returns true if there are any user-configurable options.
+  bool isConfigurable();
+
+private slots:
 
 private:
-  Q_DISABLE_COPY(pqVRStarter);
+  Q_DISABLE_COPY(pqVRAddStyleDialog)
+
   class pqInternals;
   pqInternals* Internals;
-  bool IsShutdown;
 };
 
 #endif

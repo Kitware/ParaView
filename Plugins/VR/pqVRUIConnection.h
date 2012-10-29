@@ -44,53 +44,100 @@ class vtkSMProxyLocator;
 class vtkTransform;
 class vtkMatrix4x4;
 
-/// Callback to listen to VRPN events
-class vtkVRUIConnection : public QThread
+/// Callback to listen to VRUI events
+class pqVRUIConnection : public QThread
 {
   Q_OBJECT
   typedef QThread Superclass;
 public:
-  vtkVRUIConnection(QObject *parent=0);
-  ~vtkVRUIConnection();
+  pqVRUIConnection(QObject *parent=0);
+  ~pqVRUIConnection();
 
-  /// Name of the device. For example, "Tracker0@localhost". Initial value is a
-  /// NULL pointer.
-  void SetAddress(std::string name);
+  // Description:
+  // Address of the device. For example, "Tracker0@localhost"
+  void setAddress(std::string address);
+
+  // Description:
+  // Address of the device. For example, "Tracker0@localhost"
+  std::string address() { return this->Address; }
 
   /// Port number of the VRUI server. Initial value is 8555.
-  void SetPort(std::string port);
+  void setPort(std::string port);
+
+  /// Port number of the VRUI server. Initial value is 8555.
+  std::string port() { return this->Port; }
 
   /// Set the device name.
-  void SetName(std::string name);
+  void setName(std::string name);
+
+  // Description:
+  // Get the device name.
+  std::string name() { return this->Name; }
 
   /// Add button device
-  void AddButton(std::string id, std::string name);
+  void addButton(std::string id, std::string name);
 
   /// Add Analog device
-  void AddAnalog(std::string id,  std::string name );
+  void addAnalog(std::string id,  std::string name );
 
   /// Add tracking device
-  void AddTracking( std::string id,  std::string name);
+  void addTracking( std::string id,  std::string name);
 
   /// Adding a transformation matrix
-  void SetTransformation( vtkMatrix4x4* matix );
+  void setTransformation( vtkMatrix4x4* matix );
 
   /// Initialize the device with the name.
-  bool Init();
+  bool init();
 
   /// Tell if Init() was called succesfully bool GetInitialized() const;
 
   /// Terminate the thread
-  void Stop();
+  void stop();
 
   /// Sets the Event Queue into which the vrpn data needs to be written
-  void SetQueue( vtkVRQueue* queue );
+  void setQueue( vtkVRQueue* queue );
 
   /// configure the style using the xml configuration.
   virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
 
   /// save the xml configuration.
   virtual vtkPVXMLElement* saveConfiguration() const;
+
+  /// Access to analog map
+  std::map<std::string, std::string> analogMap()
+  {
+    return this->AnalogMapping;
+  }
+  /// Access to analog map
+  void setAnalogMap(const std::map<std::string, std::string> &m)
+  {
+    this->AnalogMapping = m;
+    this->AnalogPresent = (this->AnalogMapping.size() > 0);
+  }
+
+  /// Access to button map
+  std::map<std::string, std::string> buttonMap()
+  {
+    return this->ButtonMapping;
+  }
+  /// Access to button map
+  void setButtonMap(const std::map<std::string, std::string> &m)
+  {
+    this->ButtonMapping = m;
+    this->ButtonPresent = (this->ButtonMapping.size() > 0);
+  }
+
+  /// Access to tracker map
+  std::map<std::string, std::string> trackerMap()
+  {
+    return this->TrackerMapping;
+  }
+  /// Access to tracker map
+  void setTrackerMap(const std::map<std::string, std::string> &m)
+  {
+    this->TrackerMapping = m;
+    this->TrackerPresent = (this->TrackerMapping.size() > 0);
+  }
 
  protected slots:
   void run();
@@ -99,20 +146,20 @@ public:
 protected:
 
   // void PrintPositionOrientation();
-  void GetNextPacket();
+  void getNextPacket();
 
-  std::string GetName( int eventType, int id=0 );
+  std::string name( int eventType, int id=0 );
 
   void verifyConfig( const char* id,
                      const char* name );
 
-  void GetAndEnqueueButtonData();
-  void GetAndEnqueueAnalogData();
-  void GetAndEnqueueTrackerData();
+  void getAndEnqueueButtonData();
+  void getAndEnqueueAnalogData();
+  void getAndEnqueueTrackerData();
 
-  void NewAnalogValue(std::vector<float> *data);
-  void NewButtonValue(int state,  int button);
-  void NewTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor);
+  void newAnalogValue(std::vector<float> *data);
+  void newButtonValue(int state,  int button);
+  void newTrackerValue(vtkSmartPointer<vtkVRUITrackerState> data, int sensor);
 
   void configureTransform( vtkPVXMLElement* child );
   void saveButtonEventConfig( vtkPVXMLElement* child ) const;
@@ -146,8 +193,8 @@ protected:
   pqInternals* Internals;
 
 private:
-  vtkVRUIConnection(const vtkVRUIConnection&); // Not implemented.
-  void operator=(const vtkVRUIConnection&); // Not implemented.
+  pqVRUIConnection(const pqVRUIConnection&); // Not implemented.
+  void operator=(const pqVRUIConnection&); // Not implemented.
 };
 
 #endif

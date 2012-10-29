@@ -277,10 +277,9 @@ vtkPVXMLElement* vtkVRActiveObjectManipulationStyle::saveConfiguration() const
 
   vtkPVXMLElement* analog = vtkPVXMLElement::New();
   analog->SetName("Analog");
-  analog->AddAttribute("name", this->Analog.c_str() );
+  analog->AddAttribute("name", this->Analog.c_str());
   child->AddNestedElement(analog);
   analog->FastDelete();
 
   return child;
 }
-

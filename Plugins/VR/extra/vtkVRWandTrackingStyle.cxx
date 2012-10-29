@@ -66,7 +66,7 @@ bool vtkVRWandTrackingStyle::GetWandPoseProxyNProperty()
     this->Proxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
     if ( this->Proxy )
       {
-      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "WandPose" ) );
+      this->Property = vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty( "ModelTransformMatrix" ) );
       if ( this->Property )
         {
         return true;

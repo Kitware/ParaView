@@ -55,10 +55,13 @@ public:
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->CollapseVectors = false;
     }
 
   vtkSmartPointer<vtkSMProxy> Source;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+
+  bool CollapseVectors;
 
   struct PropertyInfo
     {
@@ -121,6 +124,16 @@ void pqAnimatablePropertiesComboBox::setSourceWithoutProperties(vtkSMProxy* prox
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimatablePropertiesComboBox::setCollapseVectors(bool val)
+{
+  if (this->Internal->CollapseVectors != val)
+    {
+    this->Internal->CollapseVectors = val;
+    this->buildPropertyList();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimatablePropertiesComboBox::buildPropertyList()
 {
   this->clear();
@@ -153,13 +166,16 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy
       continue;
       }
     unsigned int num_elems = smproperty->GetNumberOfElements();
-    if (smproperty->GetRepeatCommand())
+    bool collapseVectors = this->Internal->CollapseVectors
+        || smproperty->GetRepeatCommand();
+
+    if (collapseVectors)
       {
       num_elems = 1;
       }
     for (unsigned int cc=0; cc < num_elems; cc++)
       {
-      int index = smproperty->GetRepeatCommand()? -1 : static_cast<int>(cc);
+      int index = collapseVectors ? -1 : static_cast<int>(cc);
       QString label = labelPrefix.isEmpty()? "" : labelPrefix + " - ";
       label += iter->GetProperty()->GetXMLLabel();
       label = (num_elems>1) ? label + " (" + QString::number(cc) + ")" : label;
@@ -296,5 +312,11 @@ int pqAnimatablePropertiesComboBox::getCurrentIndex() const
     return info.Index;
     }
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimatablePropertiesComboBox::getCollapseVectors() const
+{
+  return this->Internal->CollapseVectors;
 }
 

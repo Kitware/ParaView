@@ -15,13 +15,9 @@ SET (QT_USE_QTNETWORK TRUE)
 INCLUDE(${QT_USE_FILE})
 
 # Checks to see if we want to use VRPN or VRUI.
-if(APPLE OR UNIX) #  APPLE and UNIX will use VRUI by default
-  SET(PARAVIEW_USE_VRPN OFF CACHE BOOL "Build ParaView with VRPN support")
-  SET(PARAVIEW_USE_VRUI ON CACHE BOOL "Build ParaView with VRUI support")
-else() # Windows will use VRPN by default
-  SET(PARAVIEW_USE_VRPN ON CACHE BOOL "Build ParaView with VRPN support")
-  SET(PARAVIEW_USE_VRUI OFF CACHE BOOL "Build ParaView with VRUI support")
-endif()
+# Both are disabled by default.
+SET(PARAVIEW_USE_VRPN OFF CACHE BOOL "Build ParaView with VRPN support")
+SET(PARAVIEW_USE_VRUI OFF CACHE BOOL "Build ParaView with VRUI support")
 
 # if VRPN
 mark_as_advanced(VRPN_INCLUDE_DIR)
@@ -31,68 +27,87 @@ if(PARAVIEW_USE_VRPN)
     find_path(VRPN_INCLUDE_DIR vrpn_Tracker.h)
   endif()
   find_library(VRPN_LIBRARY vrpn)
-  set(VRPN_MOC_SRC vtkVRPNConnection.h)
+  set(VRPN_MOC_SRC pqVRPNConnection.h)
   set(VRPN_SOURCE_FILES
-    vtkVRPNConnection.cxx
+    pqVRPNConnection.cxx
     vtkVRPNCallBackHandlers.cxx)
 endif(PARAVIEW_USE_VRPN)
 
 # if VRUI
 if(PARAVIEW_USE_VRUI)
-  set(VRUI_MOC_SRC vtkVRUIConnection.h)
+  set(VRUI_MOC_SRC pqVRUIConnection.h)
   set(VRUI_SOURCE_FILES
-    vtkVRUIConnection.cxx
+    pqVRUIConnection.cxx
     vtkVRUIPipe.cxx
     vtkVRUIServerState.cxx
     vtkVRUITrackerState.cxx)
 endif(PARAVIEW_USE_VRUI)
 
 QT4_WRAP_CPP(MOC_SRCS
+  pqVRAddConnectionDialog.h
+  pqVRAddStyleDialog.h
+  pqVRConnectionManager.h
+  pqVRDockPanel.h
+  pqVRQueueHandler.h
   pqVRStarter.h
-  vtkVRConnectionManager.h
   ${VRPN_MOC_SRC}
   ${VRUI_MOC_SRC}
-  vtkVRQueue.h
-  vtkVRQueueHandler.h
+  vtkVRControlSliceOrientationStyle.h
+  vtkVRControlSlicePositionStyle.h
+  vtkVRGrabWorldStyle.h
   vtkVRInteractorStyle.h
-  vtkVRStyleTracking.h
-  vtkVRStyleGrabNUpdateMatrix.h
-  vtkVRStyleGrabNRotateSliceNormal.h
-  vtkVRStyleGrabNTranslateSliceOrigin.h
-  vtkVRActiveObjectManipulationStyle.h
+  vtkVRInteractorStyleFactory.h
+  vtkVRQueue.h
+  vtkVRTrackStyle.h
   )
 
+QT4_WRAP_UI(UI_SRCS
+  pqVRDockPanel.ui
+  pqVRAddConnectionDialog.ui
+  pqVRAddStyleDialog.ui
+  )
 
 if(PARAVIEW_USE_VRPN)
   INCLUDE_DIRECTORIES(${VRPN_INCLUDE_DIR})
 endif(PARAVIEW_USE_VRPN)
 
 SET( VR_SOURCE_FILES
-  vtkVRConnectionManager.cxx
+  pqVRConnectionManager.cxx
+  pqVRQueueHandler.cxx
   ${VRPN_SOURCE_FILES}
   ${VRUI_SOURCE_FILES}
-  vtkVRQueue.cxx
-  vtkVRQueueHandler.cxx
+  vtkVRControlSliceOrientationStyle.cxx
+  vtkVRControlSlicePositionStyle.cxx
+  vtkVRGrabWorldStyle.cxx
   vtkVRInteractorStyle.cxx
-  vtkVRStyleTracking.cxx
-  vtkVRStyleGrabNUpdateMatrix.cxx
-  vtkVRStyleGrabNRotateSliceNormal.cxx
-  vtkVRStyleGrabNTranslateSliceOrigin.cxx
-  vtkVRActiveObjectManipulationStyle.cxx
+  vtkVRInteractorStyleFactory.cxx
+  vtkVRQueue.cxx
+  vtkVRTrackStyle.cxx
   ${MOC_SRCS})
 
 ADD_PARAVIEW_AUTO_START(IFACES IFACE_SRCS CLASS_NAME pqVRStarter
                         STARTUP onStartup
                         SHUTDOWN onShutdown)
 
+ADD_PARAVIEW_DOCK_WINDOW(
+  IFACES_WINDOW IFACES_SRCS_WINDOW
+  CLASS_NAME pqVRDockPanel
+  DOCK_AREA Left)
+
 # create a plugin for this starter
 ADD_PARAVIEW_PLUGIN(
   VRPlugin "1.0"
-  GUI_INTERFACES ${IFACES}
-  SOURCES pqVRStarter.cxx
+  GUI_INTERFACES ${IFACES} ${IFACES_WINDOW}
+  GUI_SOURCES
+          pqVRAddConnectionDialog.cxx
+          pqVRAddStyleDialog.cxx
+          pqVRDockPanel.cxx
+          pqVRStarter.cxx
           ${MOC_SRCS}
           ${VR_SOURCE_FILES}
-          ${RCS_SRCS} ${IFACE_SRCS})
+          ${RCS_SRCS} ${IFACE_SRCS} ${IFACES_SRCS_WINDOW}
+          ${UI_SRCS}
+          )
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPVVRConfig.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPVVRConfig.h

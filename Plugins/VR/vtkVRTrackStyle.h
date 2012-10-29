@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkVRStyleGrabNUpdateMatrix.h
+   Module:    vtkVRTrackStyle.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,41 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __vtkVRStyleGrabNUpdateMatrix_h_
-#define __vtkVRStyleGrabNUpdateMatrix_h_
+#ifndef __vtkVRTrackStyle_h_
+#define __vtkVRTrackStyle_h_
 
-#include "vtkVRStyleTracking.h"
+#include "vtkVRInteractorStyle.h"
 
-class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
+class vtkSMProxy;
+class vtkSMRenderViewProxy;
 class vtkTransform;
+
 struct vtkVREventData;
 
-class vtkVRStyleGrabNUpdateMatrix : public vtkVRStyleTracking
+class vtkVRTrackStyle : public vtkVRInteractorStyle
 {
-  Q_OBJECT
-  typedef vtkVRStyleTracking Superclass;
 public:
-  vtkVRStyleGrabNUpdateMatrix(QObject* parent);
-  ~vtkVRStyleGrabNUpdateMatrix();
-  virtual bool configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* saveConfiguration() const;
-  virtual void HandleButton( const vtkVREventData& data );
-  virtual void HandleTracker( const vtkVREventData& data );
-  virtual bool GetProxyNProperty();
-  virtual void GetPropertyData() {}
-  virtual bool update();
+  static vtkVRTrackStyle *New();
+  vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle)
+  void PrintSelf(ostream &os, vtkIndent indent);
+
+  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
+  virtual vtkPVXMLElement* SaveConfiguration() const;
+
 protected:
-  vtkSMProxy *Proxy;
-  vtkSMDoubleVectorProperty *Property;
-  std::string ProxyName;
-  std::string PropertyName;
-  bool IsFoundProxyProperty;
-  std::string Button;
-  bool Enabled;
-  bool IsInitialRecorded;
-  vtkTransform *InitialInvertedPose;
+  vtkVRTrackStyle();
+  ~vtkVRTrackStyle();
+  virtual void HandleTracker( const vtkVREventData& data );
+
+private:
+  vtkVRTrackStyle(const vtkVRTrackStyle&); // Not implemented.
+  void operator=(const vtkVRTrackStyle&); // Not implemented.
 };
 
-#endif //__vtkVRStyleGrabNUpdateMatrix.h_
+#endif //__vtkVRTrackStyle.h_
