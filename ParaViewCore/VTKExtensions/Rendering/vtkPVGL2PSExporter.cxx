@@ -130,7 +130,7 @@ void vtkPVGL2PSExporter::DrawPVScalarBarActor(vtkPVScalarBarActor *actor,
                                               vtkRenderer *ren)
 {
   // Render the ticks
-  int drawColorBarOrig = actor->GetDrawColorBar();
+  bool drawColorBarOrig = actor->GetDrawColorBar();
   actor->SetDrawColorBar(0);
   actor->RenderOpaqueGeometry(ren);
   actor->RenderOverlay(ren);
