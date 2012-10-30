@@ -101,8 +101,14 @@ void vtkPVGL2PSExporter::WriteData()
       tmpFileName += ".svg";
       break;
     }
+  if (this->Compress)
+    {
+    tmpFileName += ".gz";
+    }
 
-  int result = std::rename(tmpFileName.c_str(), this->FileName.c_str());
+  int result = this->Compress
+      ? std::rename(tmpFileName.c_str(), (this->FileName + ".gz").c_str())
+      : std::rename(tmpFileName.c_str(), this->FileName.c_str());
 
   if (result != 0)
     {
