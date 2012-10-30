@@ -30,13 +30,21 @@ r = XMLPartitionedImageDataReader()
 r.FileName = fname
 r.UpdatePipeline()
 
+# numcells is the local value, we need to get the global value
 numcells =  r.GetDataInformation().DataInformation.GetNumberOfCells()
 
-#only process 0 has the global cell count
-if processId == 0 and numcells != 8000:
-    print "ERROR: ", fname, " has ", \
-        r.GetDataInformation().DataInformation.GetNumberOfCells(), \
-        " but should have 8000."
+# sum up the cell count on process 0 and process 0 checks it
+import paraview.vtk as vtk
+da = vtk.vtkIntArray()
+da.SetNumberOfTuples(1)
+da.SetValue(0, numcells)
+da2 = vtk.vtkIntArray()
+da2.SetNumberOfTuples(1)
+
+pm.GetGlobalController().Reduce(da, da2, 2, 0)
+
+if processId == 0 and da2.GetValue(0) != 8000:
+    print "ERROR: ", fname, " has ", da2.GetValue(0), " but should have 8000."
     sys.exit(1)
 
 print "Test passed."
