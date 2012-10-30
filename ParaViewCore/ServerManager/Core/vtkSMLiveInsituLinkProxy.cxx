@@ -139,10 +139,10 @@ void vtkSMLiveInsituLinkProxy::LoadState(
         const Variant& mapTable = user_data.variant(0);
         int size = mapTable.idtype_size();
         vtkTypeUInt32* map = new vtkTypeUInt32[size];
-        for(int i=0; i < size; i += 2)
+        for(int idx=0; idx < size; idx += 2)
           {
-          map[i+1] = mapTable.idtype(i+0);
-          map[i+0] = mapTable.idtype(i+1);
+          map[idx+1] = mapTable.idtype(idx+0);
+          map[idx+0] = mapTable.idtype(idx+1);
           }
         this->CatalystSessionCore->UpdateIdMap(map, size);
         delete[] map;
