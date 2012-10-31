@@ -3,7 +3,7 @@ vtk_module(vtkPVCommon
     ParaViewCore
   DEPENDS
     vtkCommonCore
-    vtkIOXML
+    vtkIOXMLParser
     vtkClientServer
   TEST_DEPENDS
     vtkTestingCore

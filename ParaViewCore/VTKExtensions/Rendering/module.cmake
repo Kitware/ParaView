@@ -21,6 +21,7 @@ vtk_module(vtkPVVTKExtensionsRendering
     vtkInteractionStyle
     vtkInteractionWidgets
     vtkIOExport
+    vtkIOXML
     vtkPVVTKExtensionsCore
     vtkRenderingAnnotation
     vtkRenderingFreeTypeOpenGL
