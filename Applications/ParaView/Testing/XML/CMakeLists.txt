@@ -163,9 +163,15 @@ if (EXISTS "${smooth_flash}" AND PARAVIEW_DATA_ROOT)
   # we configure the file since we need to point to smooth_flash.
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRStreaming.xml.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml" @ONLY)
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/AMRVolumeRendering.xml.in"
+                 "${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml" @ONLY)
+
   set (streaming_tests
-    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml)
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRStreaming.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/AMRVolumeRendering.xml)
   set(AMRStreaming_USE_NEW_PANELS TRUE)
+  set(AMRVolumeRendering_USE_NEW_PANELS TRUE)
+  set(AMRVolumeRendering_BREAK TRUE)
 
   foreach (tname ${streaming_tests})
     add_pv_test("pv" "_DISABLE_C"
