@@ -232,13 +232,13 @@ void ComputeLambda2(
         double j11=0.0, j12=0.0, j13=0.0;
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           j11=(V[vihi_x]-V[vilo_x])/dx[0];
           j12=(V[vihi_y]-V[vilo_y])/dx[0];
@@ -248,13 +248,13 @@ void ComputeLambda2(
         double j21=0.0, j22=0.0, j23=0.0;
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           j21=(V[vjhi_x]-V[vjlo_x])/dx[1];
           j22=(V[vjhi_y]-V[vjlo_y])/dx[1];
@@ -264,13 +264,13 @@ void ComputeLambda2(
         double j31=0.0, j32=0.0, j33=0.0;
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           j31=(V[vkhi_x]-V[vklo_x])/dx[2];
           j32=(V[vkhi_y]-V[vklo_y])/dx[2];
@@ -290,14 +290,14 @@ void ComputeLambda2(
 
         // compute eigen values, lambda
         Matrix<double,3,1> e;
-        SelfAdjointEigenSolver<Matrix<double,3,3> >solver(HP,false);
+        SelfAdjosize_tEigenSolver<Matrix<double,3,3> >solver(HP,false);
         e=solver.eigenvalues();  // input array bounds.
 
-        const int pi=_idx.Index(_i,_j,_k);
+        const size_t pi=_idx.Index(_i,_j,_k);
         / *
-        const int vi=3*pi;
-        const int vj=vi+1;
-        const int vk=vi+2;
+        const size_t vi=3*pi;
+        const size_t vj=vi+1;
+        const size_t vk=vi+2;
         * /
 
         // extract lambda-2

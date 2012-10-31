@@ -202,6 +202,36 @@ int vtkSQPlaneSourceCellGenerator::GetCellPoints(vtkIdType cid, float *pts)
   return 4;
 }
 
+//-----------------------------------------------------------------------------
+int vtkSQPlaneSourceCellGenerator::GetCellTextureCoordinates(
+        vtkIdType cid,
+        float *pts)
+{
+  // cell index (also lower left pt index)
+  int i,j;
+  indexToIJ((int)cid,this->Resolution[0],i,j);
+
+  // vertex indices
+  int I[8]={
+      i  ,j  ,
+      i+1,j  ,
+      i+1,j+1,
+      i  ,j+1
+      };
+
+  // cell to point
+  float npx=this->Resolution[0];
+  float npy=this->Resolution[1];
+
+  for (int q=0; q<4; ++q)
+    {
+    int qq=q*2;
+    pts[qq  ]=I[qq]/npx;
+    pts[qq+1]=I[qq+1]/npy;
+    }
+
+  return 4;
+}
 
 //-----------------------------------------------------------------------------
 void vtkSQPlaneSourceCellGenerator::PrintSelf(ostream& os, vtkIndent indent)

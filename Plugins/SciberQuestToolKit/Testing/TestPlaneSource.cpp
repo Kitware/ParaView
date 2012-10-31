@@ -84,12 +84,23 @@ int main(int argc, char **argv)
       GetParallelExec(worldRank, worldSize, pid, 0.0);
       pid->Update();
 
-      // rename so it's used in the test.
+      vtkPolyData *output=dynamic_cast<vtkPolyData*>(pid->GetOutput());
+
+      // rename resolution dependent arrays
       ostringstream oss;
       oss << "Decomp-" << decompName[j] << "-" << res[0] << "x" << res[1];
-
-      vtkPolyData *output=dynamic_cast<vtkPolyData*>(pid->GetOutput());
-      output->GetPointData()->GetArray("ProcessId")->SetName(oss.str().c_str());
+      vtkDataArray *ids=output->GetPointData()->GetArray("ProcessId");
+      if (ids)
+        {
+        ids->SetName(oss.str().c_str());
+        }
+      oss.str("");
+      oss << "TCoords-"  << decompName[j] << "-" << res[0] << "x" << res[1];
+      vtkDataArray *tcoord=output->GetPointData()->GetTCoords();
+      if (tcoord)
+        {
+        tcoord->SetName(oss.str().c_str());
+        }
 
       int testStatus = SerialRender(
             controller,

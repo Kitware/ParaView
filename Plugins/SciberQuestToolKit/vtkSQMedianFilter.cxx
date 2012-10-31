@@ -9,9 +9,9 @@ Copyright 2012 SciberQuest Inc.
 #include "vtkSQMedianFilter.h"
 
 // #define SQTK_DEBUG
-
-#include "SQPosixOnWindows.h"
+#include "SQPOSIXOnWindowsWarningSupression.h"
 #include "SQVTKTemplateMacroWarningSupression.h"
+#include "SQPosixOnWindows.h"
 #include "Numerics.hxx"
 #include "MemOrder.hxx"
 #include "Tuple.hxx"
@@ -881,7 +881,7 @@ int vtkSQMedianFilter::RequestData(
 
     int outputDims[3];
     outImData->GetDimensions(outputDims);
-    int outputTups=outputDims[0]*outputDims[1]*outputDims[2];
+    vtkIdType outputTups=outputDims[0]*outputDims[1]*outputDims[2];
 
     #ifdef SQTK_DEBUG
     pCerr()
@@ -912,16 +912,16 @@ int vtkSQMedianFilter::RequestData(
 
     int nV[3];
     extV.Size(nV);
-    unsigned long vnijk=extV.Size();
+    size_t vnijk=extV.Size();
 
     int nW[3];
     extW.Size(nW);
-    unsigned long wnijk=extW.Size();
-    unsigned long nComp=W->GetNumberOfComponents();
+    size_t wnijk=extW.Size();
+    size_t nComp=W->GetNumberOfComponents();
 
     int nK[3];
     this->KernelExt.Size(nK);
-    unsigned long knijk=this->KernelExt.Size();
+    size_t knijk=this->KernelExt.Size();
 
     int fastDim=0;
     int slowDim=1;

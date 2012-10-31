@@ -18,6 +18,7 @@ using std::endl;
 #include <complex>
 using std::complex;
 
+#include "SQPOSIXOnWindowsWarningSupression.h"
 #include "SQPosixOnWindows.h"
 #include "SQEigenWarningSupression.h"
 #include <Eigen/Eigenvalues>
@@ -737,9 +738,9 @@ void Difference(
         const int _i=p-output[0];
         const int  i=p-input[0];
 
-        const int _pi=nComp*_idx.Index(_i,_j,_k);
+        const size_t _pi=nComp*_idx.Index(_i,_j,_k);
 
-        int vi = nComp*idx.Index(i,j,k);
+        size_t vi = nComp*idx.Index(i,j,k);
 
         for (int c=0; c<nComp; ++c)
           {
@@ -804,7 +805,7 @@ void Convolution(
         const int _i=p-output[0];
         const int  i=p-input[0];
 
-        const int _pi=nComp*_idx.Index(_i,_j,_k);
+        const size_t _pi=nComp*_idx.Index(_i,_j,_k);
 
         // intialize the output
         for (int c=0; c<nComp; ++c)
@@ -823,9 +824,9 @@ void Convolution(
             for (int f=kernel[0]; f<=kernel[1]; ++f)
               {
               const int ki=f-kernel[0];
-              int kii = kidx.Index(ki,kj,kk);
+              size_t kii = kidx.Index(ki,kj,kk);
 
-              int vi = nComp*idx.Index(i+f,j+g,k+h);
+              size_t vi = nComp*idx.Index(i+f,j+g,k+h);
 
               for (int c=0; c<nComp; ++c)
                 {
@@ -847,12 +848,12 @@ memory locations. This requires that vtk vectors/tensors etc be split.
 template<typename T>
 void ScalarConvolution2D(
       //int worldRank,
-      unsigned long vni,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long nGhost,
+      size_t vni,
+      size_t wni,
+      size_t wnij,
+      size_t kni,
+      size_t knij,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W,
       float * __restrict__ K)
@@ -862,22 +863,22 @@ void ScalarConvolution2D(
 
   // get a tuple from the current flat index in the output
   // index space
-  for (unsigned long wi=0; wi<wnij; ++wi)
+  for (size_t wi=0; wi<wnij; ++wi)
     {
-    unsigned long i,j;
+    size_t i,j;
     j=wi/wni;
     i=wi-j*wni;
 
     // compute using the aligned buffers
     T w=(0);
-    for (unsigned long g=0; g<kni; ++g)
+    for (size_t g=0; g<kni; ++g)
       {
-      unsigned long b=kni*g;
-      unsigned long q=vni*(j+g)+i;
-      for (unsigned long f=0; f<kni; ++f)
+      size_t b=kni*g;
+      size_t q=vni*(j+g)+i;
+      for (size_t f=0; f<kni; ++f)
         {
-        unsigned long vi=q+f;
-        unsigned long ki=b+f;
+        size_t vi=q+f;
+        size_t ki=b+f;
         w+=V[vi]*((T)K[ki]);
         }
       }
@@ -888,15 +889,15 @@ void ScalarConvolution2D(
 //*****************************************************************************
 template<typename T>
 void ScalarConvolution3D(
-      unsigned long vni,
-      unsigned long vnij,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long wnijk,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long knijk,
-      unsigned long nGhost,
+      size_t vni,
+      size_t vnij,
+      size_t wni,
+      size_t wnij,
+      size_t wnijk,
+      size_t kni,
+      size_t knij,
+      size_t knijk,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W,
       float * __restrict__ K)
@@ -905,27 +906,27 @@ void ScalarConvolution3D(
   (void)nGhost;
 
   // visit each output element
-  for (unsigned long wi=0; wi<wnijk; ++wi)
+  for (size_t wi=0; wi<wnijk; ++wi)
     {
-    unsigned long i,j,k;
+    size_t i,j,k;
     k=wi/wnij;
     j=(wi-k*wnij)/wni;
     i=wi-k*wnij-j*wni;
 
     // compute convolution
     T w=((T)0);
-    for (unsigned long h=0; h<kni; ++h)
+    for (size_t h=0; h<kni; ++h)
       {
-      unsigned long c=knij*h;
-      unsigned long r=vnij*(k+h);
-      for (unsigned long g=0; g<kni; ++g)
+      size_t c=knij*h;
+      size_t r=vnij*(k+h);
+      for (size_t g=0; g<kni; ++g)
         {
-        unsigned long b=c+kni*g;
-        unsigned long q=r+vni*(j+g)+i;
-        for (unsigned long f=0; f<kni; ++f)
+        size_t b=c+kni*g;
+        size_t q=r+vni*(j+g)+i;
+        for (size_t f=0; f<kni; ++f)
           {
-          unsigned long ki=b+f;
-          unsigned long vi=q+f;
+          size_t ki=b+f;
+          size_t vi=q+f;
 
           w+=V[vi]*((T)K[ki]);
           }
@@ -943,23 +944,23 @@ this vectorized version is slightly SLOWER than then unoptimized version
 template<typename T>
 void ScalarConvolution2D(
       //int worldRank,
-      unsigned long vni,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long nGhost,
+      size_t vni,
+      size_t wni,
+      size_t wnij,
+      size_t kni,
+      size_t knij,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W,
       float * __restrict__ K)
 {
   // buffers for vectorized inner loop
-  unsigned long knij4=knij+4-knij%4;
-  unsigned long knij4b=knij4*sizeof(float);
+  size_t knij4=knij+4-knij%4;
+  size_t knij4b=knij4*sizeof(float);
   float * __restrict__ aK=0;
   posix_memalign((void**)&aK,16,knij4b);
   memset(aK,0,knij4b);
-  for (unsigned long ki=0; ki<knij; ++ki)
+  for (size_t ki=0; ki<knij; ++ki)
     {
     aK[ki]=K[ki];
     }
@@ -970,20 +971,20 @@ void ScalarConvolution2D(
 
   // get a tuple from the current flat index in the output
   // index space
-  for (unsigned long wi=0; wi<wnij; ++wi)
+  for (size_t wi=0; wi<wnij; ++wi)
     {
-    unsigned long i,j;
+    size_t i,j;
     j=wi/wni;
     i=wi-j*wni;
 
     // move input elements to the aligned buffer
-    unsigned long avi=0;
-    for (unsigned long g=0; g<kni; ++g)
+    size_t avi=0;
+    for (size_t g=0; g<kni; ++g)
       {
-      unsigned long q=vni*(j+g)+i;
-      for (unsigned long f=0; f<kni; ++f)
+      size_t q=vni*(j+g)+i;
+      for (size_t f=0; f<kni; ++f)
         {
-        unsigned long vi=q+f;
+        size_t vi=q+f;
         aV[avi]=V[vi];
         ++avi;
         }
@@ -991,7 +992,7 @@ void ScalarConvolution2D(
 
     // compute using the aligned buffers
     float w=((T)0);
-    for (unsigned long ki=0; ki<knij4; ++ki)
+    for (size_t ki=0; ki<knij4; ++ki)
       {
       w=w+aV[ki]*aK[ki];
       }
@@ -1006,26 +1007,26 @@ void ScalarConvolution2D(
 // ****************************************************************************
 template<typename T>
 void ScalarConvolution3D(
-      unsigned long vni,
-      unsigned long vnij,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long wnijk,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long knijk,
-      unsigned long nGhost,
+      size_t vni,
+      size_t vnij,
+      size_t wni,
+      size_t wnij,
+      size_t wnijk,
+      size_t kni,
+      size_t knij,
+      size_t knijk,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W,
       float * __restrict__ K)
 {
   // buffers for vectorized inner loop
-  unsigned long knijk4=knijk+4-knijk%4;
-  unsigned long knijk4b=knijk4*sizeof(float);
+  size_t knijk4=knijk+4-knijk%4;
+  size_t knijk4b=knijk4*sizeof(float);
   float * __restrict__ aK=0;
   posix_memalign((void**)&aK,16,knijk4b);
   memset(aK,0,knijk4b);
-  for (unsigned long ki=0; ki<knijk; ++ki)
+  for (size_t ki=0; ki<knijk; ++ki)
     {
     aK[ki]=K[ki];
     }
@@ -1035,24 +1036,24 @@ void ScalarConvolution3D(
   memset(aV,0,knijk4b);
 
   // visit each output element
-  for (unsigned long wi=0; wi<wnijk; ++wi)
+  for (size_t wi=0; wi<wnijk; ++wi)
     {
-    unsigned long i,j,k;
+    size_t i,j,k;
     k=wi/wnij;
     j=(wi-k*wnij)/wni;
     i=wi-k*wnij-j*wni;
 
     // move input data into aligned buffer
-    unsigned long avi=0;
-    for (unsigned long h=0; h<kni; ++h)
+    size_t avi=0;
+    for (size_t h=0; h<kni; ++h)
       {
-      unsigned long r=vnij*(k+h);
-      for (unsigned long g=0; g<kni; ++g)
+      size_t r=vnij*(k+h);
+      for (size_t g=0; g<kni; ++g)
         {
-        unsigned long q=r+vni*(j+g)+i;
-        for (unsigned long f=0; f<kni; ++f)
+        size_t q=r+vni*(j+g)+i;
+        for (size_t f=0; f<kni; ++f)
           {
-          unsigned long vi=q+f;
+          size_t vi=q+f;
 
           aV[avi]=V[vi];
           ++avi;
@@ -1062,7 +1063,7 @@ void ScalarConvolution3D(
 
     // compute convolution
     float w=((T)0);
-    for (unsigned long ki=0; ki<knijk4; ++ki)
+    for (size_t ki=0; ki<knijk4; ++ki)
       {
       w=w+aV[ki]*aK[ki];
       }
@@ -1088,7 +1089,7 @@ public:
   IndirectCompare(T *data) : Data(data) {}
 
   // compare data at the given indices
-  bool operator()(unsigned long l, unsigned long r)
+  bool operator()(size_t l, size_t r)
   { return this->Data[l]<this->Data[r]; }
 
 private:
@@ -1103,38 +1104,38 @@ memory locations. This requires that vtk vectors/tensors etc be split.
 template<typename T>
 void ScalarMedianFilter2D(
       //int worldRank,
-      unsigned long vni,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long nGhost,
+      size_t vni,
+      size_t wni,
+      size_t wnij,
+      size_t kni,
+      size_t knij,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W)
 {
   (void)nGhost;
 
-  unsigned long *ids=0;
-  posix_memalign((void**)&ids,16,knij*sizeof(unsigned long));
+  size_t *ids=0;
+  posix_memalign((void**)&ids,16,knij*sizeof(size_t));
 
   IndirectCompare<T> comp(V);
 
   // get a tuple from the current flat index in the output
   // index space
-  for (unsigned long wi=0; wi<wnij; ++wi)
+  for (size_t wi=0; wi<wnij; ++wi)
     {
-    unsigned long i,j;
+    size_t i,j;
     j=wi/wni;
     i=wi-j*wni;
 
     // setup search space
-    unsigned long ki=0;
-    for (unsigned long g=0; g<kni; ++g)
+    size_t ki=0;
+    for (size_t g=0; g<kni; ++g)
       {
-      unsigned long q=vni*(j+g)+i;
-      for (unsigned long f=0; f<kni; ++f)
+      size_t q=vni*(j+g)+i;
+      for (size_t f=0; f<kni; ++f)
         {
-        unsigned long vi=q+f;
+        size_t vi=q+f;
         ids[ki]=vi;
         ++ki;
         }
@@ -1156,45 +1157,45 @@ void ScalarMedianFilter2D(
 //*****************************************************************************
 template<typename T>
 void ScalarMedianFilter3D(
-      unsigned long vni,
-      unsigned long vnij,
-      unsigned long wni,
-      unsigned long wnij,
-      unsigned long wnijk,
-      unsigned long kni,
-      unsigned long knij,
-      unsigned long knijk,
-      unsigned long nGhost,
+      size_t vni,
+      size_t vnij,
+      size_t wni,
+      size_t wnij,
+      size_t wnijk,
+      size_t kni,
+      size_t knij,
+      size_t knijk,
+      size_t nGhost,
       T * __restrict__ V,
       T * __restrict__ W)
 {
   (void)knij;
   (void)nGhost;
 
-  unsigned long *ids=0;
-  posix_memalign((void**)&ids,16,knijk*sizeof(unsigned long));
+  size_t *ids=0;
+  posix_memalign((void**)&ids,16,knijk*sizeof(size_t));
 
   IndirectCompare<T> comp(V);
 
   // visit each output element
-  for (unsigned long wi=0; wi<wnijk; ++wi)
+  for (size_t wi=0; wi<wnijk; ++wi)
     {
-    unsigned long i,j,k;
+    size_t i,j,k;
     k=wi/wnij;
     j=(wi-k*wnij)/wni;
     i=wi-k*wnij-j*wni;
 
     // set up search space
-    unsigned long ki=0;
-    for (unsigned long h=0; h<kni; ++h)
+    size_t ki=0;
+    for (size_t h=0; h<kni; ++h)
       {
-      unsigned long r=vnij*(k+h);
-      for (unsigned long g=0; g<kni; ++g)
+      size_t r=vnij*(k+h);
+      for (size_t g=0; g<kni; ++g)
         {
-        unsigned long q=r+vni*(j+g)+i;
-        for (unsigned long f=0; f<kni; ++f)
+        size_t q=r+vni*(j+g)+i;
+        for (size_t f=0; f<kni; ++f)
           {
-          unsigned long vi=q+f;
+          size_t vi=q+f;
           ids[ki]=vi;
           ++ki;
           }
@@ -1309,7 +1310,7 @@ void Rotation(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         //      __   ->
         //  w = \/ x V
@@ -1318,11 +1319,11 @@ void Rotation(
         Wz[_pi]=((T)0);
         if (iok)
           {
-          int vilo_y=3*idx.Index(i-1,j,k)+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_y=3*idx.Index(i-1,j,k)+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_y=3*idx.Index(i+1,j,k)+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_y=3*idx.Index(i+1,j,k)+1;
+          size_t vihi_z=vihi_y+1;
 
           Wy[_pi] -= (V[vihi_z]-V[vilo_z])/dx[0];
           Wz[_pi] += (V[vihi_y]-V[vilo_y])/dx[0];
@@ -1330,11 +1331,11 @@ void Rotation(
 
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_z=vjlo_x+2;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_z=vjlo_x+2;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_z=vjhi_x+2;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_z=vjhi_x+2;
 
           Wx[_pi] += (V[vjhi_z]-V[vjlo_z])/dx[1];
           Wz[_pi] -= (V[vjhi_x]-V[vjlo_x])/dx[1];
@@ -1342,11 +1343,11 @@ void Rotation(
 
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
 
           Wx[_pi] -= (V[vkhi_y]-V[vklo_y])/dx[2];
           Wy[_pi] += (V[vkhi_x]-V[vklo_x])/dx[2];
@@ -1482,11 +1483,11 @@ void Helicity(
         T wz=((T)0);
         if (iok)
           {
-          int vilo_y=3*idx.Index(i-1,j,k)+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_y=3*idx.Index(i-1,j,k)+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_y=3*idx.Index(i+1,j,k)+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_y=3*idx.Index(i+1,j,k)+1;
+          size_t vihi_z=vihi_y+1;
 
           wy -= (V[vihi_z]-V[vilo_z])/dx[0];
           wz += (V[vihi_y]-V[vilo_y])/dx[0];
@@ -1494,11 +1495,11 @@ void Helicity(
 
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_z=vjlo_x+2;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_z=vjlo_x+2;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_z=vjhi_x+2;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_z=vjhi_x+2;
 
           wx += (V[vjhi_z]-V[vjlo_z])/dx[1];
           wz -= (V[vjhi_x]-V[vjlo_x])/dx[1];
@@ -1506,21 +1507,21 @@ void Helicity(
 
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
 
           wx -= (V[vkhi_y]-V[vklo_y])/dx[2];
           wy += (V[vkhi_x]-V[vklo_x])/dx[2];
           }
 
-        const int pi=_idx.Index(_i,_j,_k);
+        const size_t pi=_idx.Index(_i,_j,_k);
 
-        const int vi=3*idx.Index(i,j,k);;
-        const int vj=vi+1;
-        const int vk=vj+1;
+        const size_t vi=3*idx.Index(i,j,k);;
+        const size_t vj=vi+1;
+        const size_t vk=vj+1;
 
         //        ->  ->
         // H =  V . w
@@ -1657,11 +1658,11 @@ void NormalizedHelicity(
         T wz=((T)0);
         if (iok)
           {
-          int vilo_y=3*idx.Index(i-1,j,k)+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_y=3*idx.Index(i-1,j,k)+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_y=3*idx.Index(i+1,j,k)+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_y=3*idx.Index(i+1,j,k)+1;
+          size_t vihi_z=vihi_y+1;
 
           wy -= (V[vihi_z]-V[vilo_z])/dx[0];
           wz += (V[vihi_y]-V[vilo_y])/dx[0];
@@ -1669,11 +1670,11 @@ void NormalizedHelicity(
 
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_z=vjlo_x+2;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_z=vjlo_x+2;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_z=vjhi_x+2;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_z=vjhi_x+2;
 
           wx += (V[vjhi_z]-V[vjlo_z])/dx[1];
           wz -= (V[vjhi_x]-V[vjlo_x])/dx[1];
@@ -1681,11 +1682,11 @@ void NormalizedHelicity(
 
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
 
           wx -= (V[vkhi_y]-V[vklo_y])/dx[2];
           wy += (V[vkhi_x]-V[vklo_x])/dx[2];
@@ -1695,16 +1696,16 @@ void NormalizedHelicity(
         // |w|
         const T modW=((T)sqrt(wx*wx+wy*wy+wz*wz));
 
-        const int vi=3*idx.Index(i,j,k);
-        const int vj=vi+1;
-        const int vk=vj+1;
+        const size_t vi=3*idx.Index(i,j,k);
+        const size_t vj=vi+1;
+        const size_t vk=vj+1;
 
         //  ->
         // |V|
         const T modV
           = ((T)sqrt(V[vi]*V[vi]+V[vj]*V[vj]+V[vk]*V[vk]));
 
-        const int pi=_idx.Index(_i,_j,_k);
+        const size_t pi=_idx.Index(_i,_j,_k);
 
         //         ->  ->     -> ->
         // H_n = ( V . w ) / |V||w|
@@ -1866,13 +1867,13 @@ void Lambda(
         T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           j11=(V[vihi_x]-V[vilo_x])/dx[0];
           j12=(V[vihi_y]-V[vilo_y])/dx[0];
@@ -1882,13 +1883,13 @@ void Lambda(
         T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           j21=(V[vjhi_x]-V[vjlo_x])/dx[1];
           j22=(V[vjhi_y]-V[vjlo_y])/dx[1];
@@ -1898,13 +1899,13 @@ void Lambda(
         T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           j31=(V[vkhi_x]-V[vklo_x])/dx[2];
           j32=(V[vkhi_y]-V[vklo_y])/dx[2];
@@ -1927,10 +1928,10 @@ void Lambda(
         SelfAdjointEigenSolver<Matrix<T,3,3> >solver(HP,false);
         e=solver.eigenvalues();
 
-        const int pi=_idx.Index(_i,_j,_k);
-        const int vi=3*pi;
-        const int vj=vi+1;
-        const int vk=vj+1;
+        const size_t pi=_idx.Index(_i,_j,_k);
+        const size_t vi=3*pi;
+        const size_t vj=vi+1;
+        const size_t vk=vj+1;
 
         L[vi]=e(0,0);
         L[vj]=e(1,0);
@@ -2083,13 +2084,13 @@ void Lambda2(
         T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           j11=(V[vihi_x]-V[vilo_x])/dx[0];
           j12=(V[vihi_y]-V[vilo_y])/dx[0];
@@ -2099,13 +2100,13 @@ void Lambda2(
         T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           j21=(V[vjhi_x]-V[vjlo_x])/dx[1];
           j22=(V[vjhi_y]-V[vjlo_y])/dx[1];
@@ -2115,13 +2116,13 @@ void Lambda2(
         T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           j31=(V[vkhi_x]-V[vklo_x])/dx[2];
           j32=(V[vkhi_y]-V[vklo_y])/dx[2];
@@ -2144,11 +2145,11 @@ void Lambda2(
         SelfAdjointEigenSolver<Matrix<T,3,3> >solver(HP,false);
         e=solver.eigenvalues();  // input array bounds.
 
-        const int pi=_idx.Index(_i,_j,_k);
+        const size_t pi=_idx.Index(_i,_j,_k);
         /*
-        const int vi=3*pi;
-        const int vj=vi+1;
-        const int vk=vi+2;
+        const size_t vi=3*pi;
+        const size_t vj=vi+1;
+        const size_t vk=vi+2;
         */
 
         // extract lambda-2
@@ -2289,29 +2290,29 @@ void Divergence(
         {
         const int  i=p-input[0];
         const int _i=p-output[0];
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         //      __   ->
         //  D = \/ . V
         D[_pi]=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vihi_x=3*idx.Index(i+1,j,k);
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vihi_x=3*idx.Index(i+1,j,k);
           D[_pi] += (V[vihi_x]-V[vilo_x])/dx[0];
           }
 
         if (jok)
           {
-          int vjlo_y=3*idx.Index(i,j-1,k)+1;
-          int vjhi_y=3*idx.Index(i,j+1,k)+1;
+          size_t vjlo_y=3*idx.Index(i,j-1,k)+1;
+          size_t vjhi_y=3*idx.Index(i,j+1,k)+1;
           D[_pi] += (V[vjhi_y]-V[vjlo_y])/dx[1];
           }
 
         if (kok)
           {
-          int vklo_z=3*idx.Index(i,j,k-1)+2;
-          int vkhi_z=3*idx.Index(i,j,k+1)+2;
+          size_t vklo_z=3*idx.Index(i,j,k-1)+2;
+          size_t vkhi_z=3*idx.Index(i,j,k+1)+2;
           D[_pi] += (V[vkhi_z]-V[vklo_z])/dx[2];
           }
         }
@@ -2439,32 +2440,32 @@ void Laplacian(
       for (int p=output[0]; p<=output[1]; ++p)
         {
         const int _i=p-output[0];
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         const int  i=p-input[0];
-        const int  pi=idx.Index(i,j,k);
+        const size_t  pi=idx.Index(i,j,k);
 
         //      __2
         //  L = \/ S
         L[_pi]=((T)0);
         if (iok)
           {
-          const int ilo=idx.Index(i-1,j,k);
-          const int ihi=idx.Index(i+1,j,k);
+          const size_t ilo=idx.Index(i-1,j,k);
+          const size_t ihi=idx.Index(i+1,j,k);
           L[_pi] += (S[ihi] + S[ilo] - ((T)2)*S[pi])/dx2[0];
           }
 
         if (jok)
           {
-          const int jlo=idx.Index(i,j-1,k);
-          const int jhi=idx.Index(i,j+1,k);
+          const size_t jlo=idx.Index(i,j-1,k);
+          const size_t jhi=idx.Index(i,j+1,k);
           L[_pi] += (S[jhi] + S[jlo] - ((T)2)*S[pi])/dx2[1];
           }
 
         if (kok)
           {
-          const int klo=idx.Index(i,j,k-1);
-          const int khi=idx.Index(i,j,k+1);
+          const size_t klo=idx.Index(i,j,k-1);
+          const size_t khi=idx.Index(i,j,k+1);
           L[_pi] += (S[khi] + S[klo] - ((T)2)*S[pi])/dx2[2];
           }
         }
@@ -2602,7 +2603,7 @@ void Gradient(
         {
         const int  i=p-input[0];
         const int _i=p-output[0];
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         //      __
         //  G = \/ S
@@ -2611,22 +2612,22 @@ void Gradient(
         Gz[_pi]=((T)0);
         if (iok)
           {
-          int ilo=idx.Index(i-1,j,k);
-          int ihi=idx.Index(i+1,j,k);
+          size_t ilo=idx.Index(i-1,j,k);
+          size_t ihi=idx.Index(i+1,j,k);
           Gx[_pi] = T((S[ihi]-S[ilo])/dx[0]);
           }
 
         if (jok)
           {
-          int jlo=idx.Index(i,j-1,k);
-          int jhi=idx.Index(i,j+1,k);
+          size_t jlo=idx.Index(i,j-1,k);
+          size_t jhi=idx.Index(i,j+1,k);
           Gy[_pi] = T((S[jhi]-S[jlo])/dx[1]);
           }
 
         if (kok)
           {
-          int klo=idx.Index(i,j,k-1);
-          int khi=idx.Index(i,j,k+1);
+          size_t klo=idx.Index(i,j,k-1);
+          size_t khi=idx.Index(i,j,k+1);
           Gz[_pi] = T((S[khi]-S[klo])/dx[2]);
           }
         }
@@ -2763,7 +2764,7 @@ void Gradient(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         // J: gradient tensor, (jacobian)
         Jxx[_pi]=((T)0);
@@ -2771,13 +2772,13 @@ void Gradient(
         Jxz[_pi]=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           Jxx[_pi] = (V[vihi_x]-V[vilo_x])/dx[0];;
           Jxy[_pi] = (V[vihi_y]-V[vilo_y])/dx[0];;
@@ -2789,13 +2790,13 @@ void Gradient(
         Jyz[_pi]=((T)0);
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           Jyx[_pi] = (V[vjhi_x]-V[vjlo_x])/dx[1];;
           Jyy[_pi] = (V[vjhi_y]-V[vjlo_y])/dx[1];;
@@ -2807,13 +2808,13 @@ void Gradient(
         Jzz[_pi]=((T)0);
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           Jzx[_pi] = (V[vkhi_x]-V[vklo_x])/dx[2];;
           Jzy[_pi] = (V[vkhi_y]-V[vklo_y])/dx[2];;
@@ -2877,7 +2878,7 @@ void QCriteria(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
 
         // J: gradient tensor, (jacobian)
         T Jxx=((T)0);
@@ -2885,13 +2886,13 @@ void QCriteria(
         T Jxz=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           Jxx = (V[vihi_x]-V[vilo_x])/dx[0];;
           Jxy = (V[vihi_y]-V[vilo_y])/dx[0];;
@@ -2903,13 +2904,13 @@ void QCriteria(
         T Jyz=((T)0);
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           Jyx = (V[vjhi_x]-V[vjlo_x])/dx[1];;
           Jyy = (V[vjhi_y]-V[vjlo_y])/dx[1];;
@@ -2921,13 +2922,13 @@ void QCriteria(
         T Jzz=((T)0);
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           Jzx = (V[vkhi_x]-V[vklo_x])/dx[2];;
           Jzy = (V[vkhi_y]-V[vklo_y])/dx[2];;
@@ -2997,8 +2998,8 @@ void VectorMatrixMul(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
-        const int  pi= 3*idx.Index( i, j, k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
+        const size_t  pi= 3*idx.Index( i, j, k);
 
         W[_pi  ] = V[pi  ]*Mxx[_pi] + V[pi+1]*Myx[_pi] + V[pi+2]*Mzx[_pi];
         W[_pi+1] = V[pi+1]*Mxy[_pi] + V[pi+1]*Myy[_pi] + V[pi+2]*Mzy[_pi];
@@ -3049,8 +3050,8 @@ void Normalize(
         const int  i=p-input[0];
         const int _i=p-output[0];
 
-        const int _pi=_idx.Index(_i,_j,_k);
-        const int  pi= 3*idx.Index( i, j, k);
+        const size_t _pi=_idx.Index(_i,_j,_k);
+        const size_t  pi= 3*idx.Index( i, j, k);
 
         T mv = ((T)sqrt(V[pi]*V[pi]+V[pi+1]*V[pi+1]+V[pi+2]*V[pi+2]));
 
@@ -3112,13 +3113,13 @@ void EigenvalueDiagnostic(
         T j11=((T)0), j12=((T)0), j13=((T)0);
         if (iok)
           {
-          int vilo_x=3*idx.Index(i-1,j,k);
-          int vilo_y=vilo_x+1;
-          int vilo_z=vilo_y+1;
+          size_t vilo_x=3*idx.Index(i-1,j,k);
+          size_t vilo_y=vilo_x+1;
+          size_t vilo_z=vilo_y+1;
 
-          int vihi_x=3*idx.Index(i+1,j,k);
-          int vihi_y=vihi_x+1;
-          int vihi_z=vihi_y+1;
+          size_t vihi_x=3*idx.Index(i+1,j,k);
+          size_t vihi_y=vihi_x+1;
+          size_t vihi_z=vihi_y+1;
 
           j11=(V[vihi_x]-V[vilo_x])/dx[0];
           j12=(V[vihi_y]-V[vilo_y])/dx[0];
@@ -3128,13 +3129,13 @@ void EigenvalueDiagnostic(
         T j21=((T)0), j22=((T)0), j23=((T)0);
         if (jok)
           {
-          int vjlo_x=3*idx.Index(i,j-1,k);
-          int vjlo_y=vjlo_x+1;
-          int vjlo_z=vjlo_y+1;
+          size_t vjlo_x=3*idx.Index(i,j-1,k);
+          size_t vjlo_y=vjlo_x+1;
+          size_t vjlo_z=vjlo_y+1;
 
-          int vjhi_x=3*idx.Index(i,j+1,k);
-          int vjhi_y=vjhi_x+1;
-          int vjhi_z=vjhi_y+1;
+          size_t vjhi_x=3*idx.Index(i,j+1,k);
+          size_t vjhi_y=vjhi_x+1;
+          size_t vjhi_z=vjhi_y+1;
 
           j21=(V[vjhi_x]-V[vjlo_x])/dx[1];
           j22=(V[vjhi_y]-V[vjlo_y])/dx[1];
@@ -3144,13 +3145,13 @@ void EigenvalueDiagnostic(
         T j31=((T)0), j32=((T)0), j33=((T)0);
         if (kok)
           {
-          int vklo_x=3*idx.Index(i,j,k-1);
-          int vklo_y=vklo_x+1;
-          int vklo_z=vklo_y+1;
+          size_t vklo_x=3*idx.Index(i,j,k-1);
+          size_t vklo_y=vklo_x+1;
+          size_t vklo_z=vklo_y+1;
 
-          int vkhi_x=3*idx.Index(i,j,k+1);
-          int vkhi_y=vkhi_x+1;
-          int vkhi_z=vkhi_y+1;
+          size_t vkhi_x=3*idx.Index(i,j,k+1);
+          size_t vkhi_y=vkhi_x+1;
+          size_t vkhi_z=vkhi_y+1;
 
           j31=(V[vkhi_x]-V[vklo_x])/dx[2];
           j32=(V[vkhi_y]-V[vklo_y])/dx[2];
@@ -3181,7 +3182,7 @@ void EigenvalueDiagnostic(
         // 5 - type 1 saddle spiral
         // 6 - type 2 saddle spiral
         // 7 - attracting spiral
-        const int pi=_idx.Index(_i,_j,_k);
+        const size_t pi=_idx.Index(_i,_j,_k);
         if (IsComplex(e1)||IsComplex(e2)||IsComplex(e3))
           {
           // spiral flow

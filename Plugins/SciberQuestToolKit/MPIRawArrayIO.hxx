@@ -208,7 +208,7 @@ void CreateCartesianView(
   int decompStart[3];
   decomp.GetStartIndex(decompStart,domainStart);
 
-  unsigned long nCells=decomp.Size();
+  unsigned long nCells=static_cast<unsigned long>(decomp.Size());
 
   // use a contiguous type when possible.
   if (domain==decomp)

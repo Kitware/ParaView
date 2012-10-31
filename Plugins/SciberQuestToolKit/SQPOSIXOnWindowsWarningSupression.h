@@ -6,21 +6,12 @@
 
 Copyright 2012 SciberQuest Inc.
 */
-#ifndef __SQPosixOnWindows_h
-#define __SQPosixOnWindows_h
+#ifndef SQPOSIXOnWindowsWarningSupression_h
+#define SQPOSIXOnWindowsWarningSupression_h
 
 #if defined(WIN32)
-
-// imitate posix_memalign on windows.
-#include <malloc.h>
-static
-inline void posix_memalign(void **pData, size_t alignAt, size_t nBytes)
-{
-  *pData=_aligned_malloc(nBytes,alignAt);
-}
-
-#define __restrict__ __restrict
-
+// The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name
+#pragma warning(disable : 4996)
 #endif
 
 #endif

@@ -7,6 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "vtkSQLog.h"
+#include "SQPOSIXOnWindowsWarningSupression.h"
 
 #include "XMLUtils.h"
 #include "LogBuffer.h"

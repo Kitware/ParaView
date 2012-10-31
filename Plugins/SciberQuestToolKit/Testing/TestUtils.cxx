@@ -7,6 +7,7 @@
 Copyright 2012 SciberQuest Inc.
 */
 #include "TestUtils.h"
+#include "vtksys/SystemInformation.hxx"
 #include "vtkInitializationHelper.h"
 #include "vtkSQLog.h"
 #include "vtkMultiProcessController.h"
@@ -85,6 +86,8 @@ vtkRenderWindow *vtkRenderWindowSingleton::RenderWindow=NULL;
 vtkMultiProcessController *Initialize(int *argc, char ***argv)
 {
   vtkInitializationHelper::StandaloneInitialize();
+
+  vtksys::SystemInformation::SetStackTraceOnError(1);
 
   vtkMultiProcessController *controller;
 

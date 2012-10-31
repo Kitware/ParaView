@@ -12,6 +12,7 @@ Copyright 2012 SciberQuest Inc.
 #include "CellIdIterator.h"
 #include "CartesianExtent.h"
 #include "FlatIndex.h"
+#include <cstdlib> // for size_t
 
 /// extent iterator
 /**
@@ -41,14 +42,14 @@ public:
   // validate
   virtual int Good(){ return this->R<=this->Extent[5]; }
   // access
-  virtual int Index(){ return this->Indexer.Index(this->P,this->Q,this->R); }
-  virtual int operator*(){ return this->Index(); }
+  virtual size_t Index(){ return this->Indexer.Index(this->P,this->Q,this->R); }
+  virtual size_t operator*(){ return this->Index(); }
   // increment
   virtual CellIdIterator &Increment();
   virtual CellIdIterator &operator++(){ return this->Increment(); }
 
   // size of the extent
-  virtual int Size(){ return this->Extent.Size(); }
+  virtual size_t Size(){ return this->Extent.Size(); }
 
 private:
   FlatIndex Indexer;
@@ -71,7 +72,7 @@ CellIdIterator &CartesianExtentIterator::Increment()
       {
       this->Q=this->Extent[2];
       this->R+=1;
-      //  if we're output of bounds in k dir
+      //  if we're out of bounds in k dir
       // then we are done. so don't reset R.
       }
     }

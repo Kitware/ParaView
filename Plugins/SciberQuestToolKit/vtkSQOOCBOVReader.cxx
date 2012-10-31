@@ -71,7 +71,7 @@ void WriteBlockUse(
   data->GetCellData()->AddArray(miss);
   miss->Delete();
 
-  int nBlocks=cacheHit.size();
+  int nBlocks=static_cast<int>(cacheHit.size());
   for (int q=0; q<nBlocks; ++q)
     {
     if (cacheMiss[q]>0)
