@@ -2359,6 +2359,13 @@
                      short_help="PS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
                      a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetPS3Shading"
                          default_values="1"
                          name="SetPS3Shading"
@@ -2385,6 +2392,13 @@
                      short_help="EPS Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
                      a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetFileFormat"
                          default_values="1"
                          name="FileFormat"
@@ -2404,6 +2418,13 @@
                      short_help="PDF Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
                      a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="1"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetFileFormat"
                          default_values="2"
                          name="FileFormat"
@@ -2423,6 +2444,13 @@
                      short_help="SVG Files">vtkPVGL2PSExporter is a render
                      window exporter which writes out the renderered scene into
                      a variety of vector graphics formats.</Documentation>
+      <IntVectorProperty command="SetTextAsPath"
+                         default_values="0"
+                         name="SetTextAsPath"
+                         label="Render text as paths"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <IntVectorProperty command="SetFileFormat"
                          default_values="4"
                          name="FileFormat"
