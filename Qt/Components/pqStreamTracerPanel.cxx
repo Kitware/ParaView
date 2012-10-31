@@ -91,28 +91,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
 {
   this->Implementation->UI.setupUi(&this->Implementation->UIContainer);
 
-  // Get the boundaries of the new proxy ...
-  double proxy_center[3] = {0.0, 0.0, 0.0};
-
-  if(vtkSMInputProperty* const input_property =
-    vtkSMInputProperty::SafeDownCast(
-      this->proxy()->GetProperty("Input")))
-    {
-    if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-        input_property->GetProxy(0)))
-      {
-      double input_bounds[6];
-      input_proxy->GetDataInformation(
-        input_property->GetOutputPortForConnection(0))->GetBounds(
-        input_bounds);
-
-      proxy_center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-      proxy_center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-      proxy_center[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
-      }
-    }
-
-
   vtkSMProperty* const source_property =
     this->proxy()->GetProperty("Source");
 
@@ -121,28 +99,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   for(int i = 0; i != sources.size(); ++i)
     {
     pqSMProxy source = sources[i];
-
-    if(source->GetVTKClassName() == QString("vtkPointSource"))
+    if (source->GetVTKClassName() == QString("vtkPointSource"))
       {
-      if(vtkSMDoubleVectorProperty* const center =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          source->GetProperty("Center")))
-        {
-        center->SetNumberOfElements(3);
-        center->SetElement(0, proxy_center[0]);
-        center->SetElement(1, proxy_center[1]);
-        center->SetElement(2, proxy_center[2]);
-        }
-
-      if(vtkSMIntVectorProperty* const number_of_points =
-        vtkSMIntVectorProperty::SafeDownCast(
-          source->GetProperty("NumberOfPoints")))
-        {
-        number_of_points->SetNumberOfElements(1);
-        number_of_points->SetElement(0, 100);
-        }
-      source->UpdateVTKObjects();
-
       this->Implementation->PointSourceWidget =
         new pqPointSourceWidget(this->proxy(), source, NULL);
       this->Implementation->PointSourceWidget->hideWidget();
@@ -162,7 +120,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
             }
           }
         }
-
       }
     else if(source->GetVTKClassName() == QString("vtkLineSource"))
       {
@@ -185,10 +142,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
             }
           }
         }
-
       }
     }
-
 
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->setMargin(0);

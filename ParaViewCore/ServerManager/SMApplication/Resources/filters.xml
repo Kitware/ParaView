@@ -6443,21 +6443,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the input to the Stream Tracer
         filter.</Documentation>
       </InputProperty>
-      <InputProperty command="SetSourceConnection"
-                     label="Seed Type"
-                     name="Source">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-        </ProxyGroupDomain>
-        <ProxyListDomain name="proxy_list">
-          <Proxy group="extended_sources"
-                 name="PointSource" />
-          <Proxy group="extended_sources"
-                 name="HighResLineSource" />
-        </ProxyListDomain>
-        <Documentation>The value of this property determines how the seeds for
-        the streamlines will be generated.</Documentation>
-      </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -6474,14 +6459,11 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty default_values="100"
-                         information_only="1"
-                         name="NumberOfPoints"
-                         number_of_elements="1" />
       <IntVectorProperty command="SetInterpolatorType"
                          default_values="0"
                          name="InterpolatorType"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <EnumerationDomain name="enum">
           <Entry text="Interpolator with Point Locator"
                  value="0" />
@@ -6527,7 +6509,8 @@ found and the point will be rejected.</Documentation>
                          default_values="2"
                          label="Integration Step Unit"
                          name="IntegrationStepUnit"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Length"
                  value="1" />
@@ -6544,7 +6527,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.2"
                             label="Initial Step Length"
                             name="InitialIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the initial integration step
         size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
@@ -6557,7 +6541,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.01"
                             label="Minimum Step Length"
                             name="MinimumIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
         <DoubleRangeDomain name="range" />
         <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
         specifies the minimum integration step size.</Documentation>
@@ -6566,7 +6551,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.5"
                             label="Maximum Step Length"
                             name="MaximumIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
         specifies the maximum integration step size.</Documentation>
@@ -6575,7 +6561,8 @@ found and the point will be rejected.</Documentation>
                          default_values="2000"
                          label="Maximum Steps"
                          name="MaximumNumberOfSteps"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain name="range" />
         <Documentation>This property specifies the maximum number of steps,
         beyond which streamline integration is terminated.</Documentation>
@@ -6601,7 +6588,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.000000000001"
                             label="Terminal Speed"
                             name="TerminalSpeed"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the terminal speed, below which
         particle advection/integration is terminated.</Documentation>
@@ -6609,7 +6597,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetMaximumError"
                             default_values="0.000001"
                             name="MaximumError"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced" >
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the maximum error (for
         Runge-Kutta 4-5) tolerated throughout streamline integration. The
@@ -6619,11 +6608,30 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced" >
         <BooleanDomain name="bool" />
         <Documentation>Specify whether or not to compute
         vorticity.</Documentation>
       </IntVectorProperty>
+
+      <InputProperty command="SetSourceConnection"
+                     label="Seed Type"
+                     name="Source"
+                     panel_visibility="default">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="extended_sources"
+                 name="PointSource" />
+          <Proxy group="extended_sources"
+                 name="HighResLineSource" />
+        </ProxyListDomain>
+        <Documentation>The value of this property determines how the seeds for
+        the streamlines will be generated.</Documentation>
+      </InputProperty>
+
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
@@ -6662,15 +6670,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property specifies the input to the Stream Tracer
         filter.</Documentation>
       </InputProperty>
-      <InputProperty command="SetSourceConnection"
-                     label="Seed Source"
-                     name="Source">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources" />
-        </ProxyGroupDomain>
-        <Documentation>This property specifies the input used to obtain the
-        seed points.</Documentation>
-      </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
@@ -6687,10 +6686,6 @@ found and the point will be rejected.</Documentation>
         <Documentation>This property contains the name of the vector array from
         which to generate streamlines.</Documentation>
       </StringVectorProperty>
-      <IntVectorProperty default_values="100"
-                         information_only="1"
-                         name="NumberOfPoints"
-                         number_of_elements="1" />
       <IntVectorProperty command="SetIntegrationDirection"
                          default_values="2"
                          name="IntegrationDirection"
@@ -6725,7 +6720,8 @@ found and the point will be rejected.</Documentation>
                          default_values="2"
                          label="Integration Step Unit"
                          name="IntegrationStepUnit"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <EnumerationDomain name="enum">
           <Entry text="Length"
                  value="1" />
@@ -6742,7 +6738,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.2"
                             label="Initial Step Length"
                             name="InitialIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the initial integration step
         size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4),
@@ -6755,7 +6752,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.01"
                             label="Minimum Step Length"
                             name="MinimumIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
         specifies the minimum integration step size.</Documentation>
@@ -6764,7 +6762,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.5"
                             label="Maximum Step Length"
                             name="MaximumIntegrationStep"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>When using the Runge-Kutta 4-5 ingrator, this property
         specifies the maximum integration step size.</Documentation>
@@ -6773,7 +6772,8 @@ found and the point will be rejected.</Documentation>
                          default_values="2000"
                          label="Maximum Steps"
                          name="MaximumNumberOfSteps"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <IntRangeDomain name="range" />
         <Documentation>This property specifies the maximum number of steps,
         beyond which streamline integration is terminated.</Documentation>
@@ -6782,7 +6782,8 @@ found and the point will be rejected.</Documentation>
                             default_values="1.0"
                             label="Maximum Streamline Length"
                             name="MaximumPropagation"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <BoundsDomain mode="scaled_extent"
                       name="bounds"
                       scale_factor="1.0">
@@ -6799,7 +6800,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0.000000000001"
                             label="Terminal Speed"
                             name="TerminalSpeed"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the terminal speed, below which
         particle advection/integration is terminated.</Documentation>
@@ -6807,7 +6809,8 @@ found and the point will be rejected.</Documentation>
       <DoubleVectorProperty command="SetMaximumError"
                             default_values="0.000001"
                             name="MaximumError"
-                            number_of_elements="1">
+                            number_of_elements="1"
+                            panel_visibility="advanced">
         <DoubleRangeDomain name="range" />
         <Documentation>This property specifies the maximum error (for
         Runge-Kutta 4-5) tolerated throughout streamline integration. The
@@ -6817,11 +6820,21 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetComputeVorticity"
                          default_values="1"
                          name="ComputeVorticity"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="advanced">
         <BooleanDomain name="bool" />
         <Documentation>Specify whether or not to compute
         vorticity.</Documentation>
       </IntVectorProperty>
+      <InputProperty command="SetSourceConnection"
+                     label="Seed Source"
+                     name="Source">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+        </ProxyGroupDomain>
+        <Documentation>This property specifies the input used to obtain the
+        seed points.</Documentation>
+      </InputProperty>
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
