@@ -672,7 +672,7 @@ IF (PARAVIEW_DATA_ROOT)
     # The state file need to point to the correct data file. We do that by
     # configuring the state file.
     configure_file (
-      "${PARAVIEW_DATA_ROOT}/Data/exodusStateFile.3.14.1.pvsm.in"
+      "${CMAKE_CURRENT_SOURCE_DIR}/exodusStateFile.3.14.1.pvsm.in"
       "${CMAKE_CURRENT_BINARY_DIR}/exodusStateFile.3.14.1.pvsm" @ONLY)
     add_pv_test("pv" "_DISABLE_C"
       COMMAND --client $<TARGET_FILE:paraview>
