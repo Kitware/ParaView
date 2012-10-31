@@ -2835,7 +2835,14 @@ void pqColorScaleEditor::updateOpacityFunctionVisibility()
   double range[2]={0.0, 1.0};
   if(this->internalScalarRange(range))
     {
-    if(range[0]==range[1])
+    bool show_function_widget = (range[0] != range[1]);
+    if (this->UseEnableOpacityCheckBox &&
+      this->Form->EnableOpacityFunction->checkState() != Qt::Checked)
+      {
+      show_function_widget = false;
+      }
+
+    if (show_function_widget == false)
       {
       this->Form->frameOpacity->setVisible(0);
       this->Form->verticalSpacer->changeSize(20, 10,
