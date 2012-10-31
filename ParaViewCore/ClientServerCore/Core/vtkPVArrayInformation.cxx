@@ -1101,7 +1101,7 @@ void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
     }
 }
 
-vtkAbstractArray* vtkPVArrayInformation::GetUniqueComponentValuesIfFDiscrete( int component )
+vtkAbstractArray* vtkPVArrayInformation::GetUniqueComponentValuesIfDiscrete( int component )
 {
   vtkInternalUniqueValues::iterator compEntry;
   unsigned nv = 0;

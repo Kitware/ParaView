@@ -142,7 +142,7 @@ public:
   // Returns either NULL (array component appears to be continuous) or
   // a pointer to a vtkAbstractArray (array component appears to be discrete)
   // containing a sorted list of all unique values encountered in the array component.
-  vtkAbstractArray* GetUniqueComponentValuesIfFDiscrete( int component );
+  vtkAbstractArray* GetUniqueComponentValuesIfDiscrete( int component );
 
 protected:
   vtkPVArrayInformation();

@@ -541,7 +541,7 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
         {
         acomp = 0;
         }
-      vtkAbstractArray* uniq = ainfo->GetUniqueComponentValuesIfFDiscrete( acomp );
+      vtkAbstractArray* uniq = ainfo->GetUniqueComponentValuesIfDiscrete( acomp );
       if ( uniq )
         {
         haveActiveValues = true;
