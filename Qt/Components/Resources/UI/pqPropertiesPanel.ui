@@ -28,7 +28,7 @@
         <string>&amp;Apply</string>
        </property>
        <property name="shortcut">
-        <string>Ctrl+A</string>
+        <string>Alt+A</string>
        </property>
       </widget>
      </item>
