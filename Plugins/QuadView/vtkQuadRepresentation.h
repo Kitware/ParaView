@@ -51,6 +51,10 @@ protected:
 
   // Update slice axis label if any annotation available
   void UpdateDataEventCallBack(vtkObject* src, unsigned long event, void* data);
+
+  // Update Show flag for CubeAxes and Outline
+  void UpdateFromViewConfigurationCallBack(vtkObject* src, unsigned long event, void* data);
+
   vtkWeakPointer<vtkPVQuadRenderView> AssociatedView;
   vtkSetStringMacro(XLabel);
   vtkSetStringMacro(YLabel);
@@ -58,6 +62,7 @@ protected:
   char *XLabel;
   char *YLabel;
   char *ZLabel;
+  unsigned long ViewObserverId;
 private:
   vtkQuadRepresentation(const vtkQuadRepresentation&); // Not implemented
   void operator=(const vtkQuadRepresentation&); // Not implemented

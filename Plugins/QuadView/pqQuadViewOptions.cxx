@@ -125,6 +125,22 @@ pqQuadViewOptions::pqQuadViewOptions(QWidget *widgetParent)
   QObject::connect( this->Internal->ui.BottomLeftViewUpZ,
                     SIGNAL(textChanged(QString)),
                     this, SIGNAL(changesAvailable()));
+
+  // Label font size
+  QObject::connect( this->Internal->ui.FontSize,
+                    SIGNAL(valueChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+
+  // Show outline/cubeaxes/orientation axes
+  QObject::connect( this->Internal->ui.ShowCubeAxes,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+  QObject::connect( this->Internal->ui.ShowOutline,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+  QObject::connect( this->Internal->ui.SliceOrientationAxesVisibility,
+                    SIGNAL(stateChanged(int)),
+                    this, SIGNAL(changesAvailable()));
 }
 
 //----------------------------------------------------------------------------
@@ -178,6 +194,12 @@ void pqQuadViewOptions::applyChanges()
   this->View->setBottomLeftViewUp( this->Internal->ui.BottomLeftViewUpX->text().toDouble(),
                                 this->Internal->ui.BottomLeftViewUpY->text().toDouble(),
                                 this->Internal->ui.BottomLeftViewUpZ->text().toDouble());
+
+  this->View->setLabelFontSize(this->Internal->ui.FontSize->value());
+
+  this->View->setCubeAxesVisibility(this->Internal->ui.ShowCubeAxes->isChecked());
+  this->View->setOutlineVisibility(this->Internal->ui.ShowOutline->isChecked());
+  this->View->setSliceOrientationAxesVisibility(this->Internal->ui.SliceOrientationAxesVisibility->isChecked());
 
   this->View->render();
 }
@@ -243,6 +265,12 @@ void pqQuadViewOptions::setView(pqView* view)
   this->Internal->ui.X->setText(QString::number(vector[0]));
   this->Internal->ui.Y->setText(QString::number(vector[1]));
   this->Internal->ui.Z->setText(QString::number(vector[2]));
+
+  this->Internal->ui.FontSize->setValue(this->View->getLabelFontSize());
+
+  this->Internal->ui.ShowCubeAxes->setChecked(this->View->getCubeAxesVisibility());
+  this->Internal->ui.ShowOutline->setChecked(this->View->getOutlineVisibility());
+  this->Internal->ui.SliceOrientationAxesVisibility->setChecked(this->View->getSliceOrientationAxesVisibility());
 }
 
 //----------------------------------------------------------------------------

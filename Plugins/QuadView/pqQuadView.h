@@ -91,6 +91,22 @@ public:
   /// Override for custom management
   virtual void setCursor(const QCursor &);
 
+  /// Update Label Font Size
+  void setLabelFontSize(int size);
+  int getLabelFontSize();
+
+  /// Update Slice CubeAxes visibility
+  bool getCubeAxesVisibility();
+  void setCubeAxesVisibility(bool visible);
+
+  /// Update Slice CubeAxes visibility
+  bool getOutlineVisibility();
+  void setOutlineVisibility(bool visible);
+
+  /// Update Slice Orientation Axes visibility
+  bool getSliceOrientationAxesVisibility();
+  void setSliceOrientationAxesVisibility(bool visible);
+
 protected slots:
   void resetSliceOrigin();
 

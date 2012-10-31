@@ -153,6 +153,27 @@ public:
   // Internally we attach a listener to it to update the slice origins.
   void SetSliceOriginSource(vtkPointSource* source);
 
+  // Description:
+  // Set the position of the split in percent along width and height. (0 < r < 1)
+  vtkSetVector2Macro(SplitRatio, double);
+  vtkGetVector2Macro(SplitRatio, double);
+
+  // Description:
+  // Update label font size
+  virtual void SetLabelFontSize(int value);
+  vtkGetMacro(LabelFontSize, int);
+
+  // Description:
+  // Drive QuadRepresentation configuration
+  vtkSetMacro(ShowCubeAxes, int);
+  vtkSetMacro(ShowOutline, int);
+  vtkGetMacro(ShowCubeAxes, int);
+  vtkGetMacro(ShowOutline, int);
+
+  // Override SetOrientationAxesVisibility of the 3D view for 2D views
+  void SetSliceOrientationAxesVisibility(int);
+  vtkGetMacro(SliceOrientationAxesVisibility, int);
+
   //*****************************************************************
   // Forwarded accross all the views
   virtual void Add2DManipulator(vtkCameraManipulator* val);
@@ -164,6 +185,8 @@ public:
   virtual void SetBackgroundTexture(vtkTexture* val);
   virtual void SetGradientBackground(int val);
   virtual void SetTexturedBackground(int val);
+  virtual void SetOrientationAxesVisibility(bool);
+  virtual void SetOrientationAxesInteractivity(bool);
 
   //*****************************************************************
   // Helper method that is usefull at the proxy layer to register
@@ -214,6 +237,10 @@ protected:
   // Internal method used to update layout of the views
   virtual void UpdateViewLayout();
   int ViewPosition[2];
+  double SplitRatio[2];
+
+  // Label font size
+  int LabelFontSize;
 
   struct OrthoViewInfo { vtkSmartPointer<vtkPVRenderView> RenderView; };
   OrthoViewInfo OrthoViews[3];
@@ -221,6 +248,11 @@ protected:
   char* YAxisLabel;
   char* ZAxisLabel;
   char* ScalarLabel;
+
+  int ShowOutline;
+  int ShowCubeAxes;
+  int SliceOrientationAxesVisibility;
+  bool OrientationAxesVisibility;
 private:
   vtkPVQuadRenderView(const vtkPVQuadRenderView&); // Not implemented
   void operator=(const vtkPVQuadRenderView&); // Not implemented

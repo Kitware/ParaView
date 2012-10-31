@@ -47,6 +47,10 @@ public:
   virtual void RemoveInputConnection(int port, int index);
 
   // Description:
+  // Set the visibility for the outline.
+  void SetOutlineVisibility(bool visible);
+
+  // Description:
   // Propagate the modification to all internal representations.
   virtual void MarkModified();
 
@@ -102,6 +106,7 @@ protected:
   void UpdateSliceConfigurationCallBack(vtkObject* src, unsigned long event, void* data);
 
   unsigned long ViewObserverId;
+  bool OutlineVisibility;
 
 private:
   vtkCompositeSliceRepresentation(const vtkCompositeSliceRepresentation&); // Not implemented

@@ -22,6 +22,7 @@
 #include "vtkCutter.h"
 #include "vtkDataObject.h"
 #include "vtkDataSet.h"
+#include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -338,6 +339,23 @@ void vtkThreeSliceFilter::Process(vtkDataSet* input, vtkPolyData* outputs[4], un
   outputs[1]->ShallowCopy(this->Slices[0]->GetOutput());
   outputs[2]->ShallowCopy(this->Slices[1]->GetOutput());
   outputs[3]->ShallowCopy(this->Slices[2]->GetOutput());
+
+  // Add meta-data for sliced data
+  vtkNew<vtkFloatArray> sliceAtOrigin;
+  sliceAtOrigin->SetName("SliceAt");
+  sliceAtOrigin->SetNumberOfComponents(3);
+  sliceAtOrigin->SetNumberOfTuples(1);
+  sliceAtOrigin->SetTuple(0, this->PointToProbe->GetCenter());
+  for(int i=0; i < 3; ++i)
+    {
+    vtkNew<vtkIdTypeArray> sliceIndex;
+    sliceIndex->SetName("SliceAlongAxis");
+    sliceIndex->SetNumberOfComponents(1);
+    sliceIndex->SetNumberOfTuples(1);
+    sliceIndex->SetTuple1(0, i);
+    outputs[i+1]->GetFieldData()->AddArray(sliceAtOrigin.GetPointer());
+    outputs[i+1]->GetFieldData()->AddArray(sliceIndex.GetPointer());
+    }
 }
 //----------------------------------------------------------------------------
 void vtkThreeSliceFilter::Merge(vtkCompositeDataSet* compositeOutput[4],

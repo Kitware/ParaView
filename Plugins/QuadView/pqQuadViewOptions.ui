@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
-    <height>386</height>
+    <width>302</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,6 +20,12 @@
       <string>Slices normal</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="TopLeftLabel">
         <property name="text">
@@ -113,36 +119,21 @@
       <string>View Up</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="TopLeftLabelViewUp">
-        <property name="text">
-         <string>Top-Left</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="TopRightLabelViewUp">
-        <property name="text">
-         <string>Top-Right</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="BottomLeftLabelViewUp">
-        <property name="text">
-         <string>Bottom-Left</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="TopLeftViewUpX">
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="TopRightViewUpY">
         <property name="text">
          <string>0</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QLineEdit" name="TopLeftViewUpY">
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="TopRightViewUpZ">
         <property name="text">
          <string>1</string>
         </property>
@@ -155,8 +146,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="TopRightViewUpX">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="TopLeftViewUpX">
         <property name="text">
          <string>0</string>
         </property>
@@ -169,8 +160,36 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QLineEdit" name="TopRightViewUpY">
+      <item row="2" column="0">
+       <widget class="QLabel" name="BottomLeftLabelViewUp">
+        <property name="text">
+         <string>Bottom-Left</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="TopRightLabelViewUp">
+        <property name="text">
+         <string>Top-Right</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="TopLeftViewUpY">
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="TopLeftLabelViewUp">
+        <property name="text">
+         <string>Top-Left</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="BottomLeftViewUpZ">
         <property name="text">
          <string>0</string>
         </property>
@@ -183,15 +202,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QLineEdit" name="TopRightViewUpZ">
-        <property name="text">
-         <string>1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLineEdit" name="BottomLeftViewUpZ">
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="TopRightViewUpX">
         <property name="text">
          <string>0</string>
         </property>
@@ -206,6 +218,12 @@
       <string>Slices origin</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
       <item>
        <widget class="QLineEdit" name="X">
         <property name="text">
@@ -224,6 +242,68 @@
        <widget class="QLineEdit" name="Z">
         <property name="text">
          <string>0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Display options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="ShowCubeAxes">
+        <property name="text">
+         <string>Show Cube Axes in Slice views</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="ShowOutline">
+        <property name="text">
+         <string>Show Outline in 3D view</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="margin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="FontSizeLabel">
+           <property name="text">
+            <string>Label font size</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="FontSize">
+           <property name="minimum">
+            <number>5</number>
+           </property>
+           <property name="maximum">
+            <number>50</number>
+           </property>
+           <property name="value">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="SliceOrientationAxesVisibility">
+        <property name="text">
+         <string>Show Orientation Axes in Slice views</string>
         </property>
        </widget>
       </item>

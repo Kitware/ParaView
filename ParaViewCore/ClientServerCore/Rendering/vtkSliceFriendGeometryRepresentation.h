@@ -25,6 +25,8 @@
 #include "vtkGeometryRepresentationWithFaces.h"
 #include "vtkWeakPointer.h" // Needed
 
+class vtkCubeAxesRepresentation;
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkSliceFriendGeometryRepresentation : public vtkGeometryRepresentationWithFaces
 {
 public:
@@ -60,6 +62,31 @@ public:
   // names regardless if any data is actually cut or not.
   void SetRepresentationForRenderedDataObject(vtkPVDataRepresentation* rep);
 
+  // Description:
+  // Set visibility of the representation.
+  // Overridden to update the cube-axes visibilities.
+  virtual void SetVisibility(bool visible);
+
+  // Description:
+  // Propagate the modification to all internal representations.
+  virtual void MarkModified();
+
+  //vtkGetObjectMacro(CubeAxesRepresentation,vtkCubeAxesRepresentation);
+
+  // Description:
+  // Set the visibility for the cube-axis.
+  void SetCubeAxesVisibility(bool visible);
+
+  // Description:
+  // Override because of internal composite representations that need to be
+  // initilized as well.
+  virtual unsigned int Initialize(unsigned int minIdAvailable, unsigned int maxIdAvailable);
+
+  // Garbage collection support.
+  virtual void ReportReferences(vtkGarbageCollector*);
+
+  vtkGetObjectMacro(CubeAxesRepresentation, vtkCubeAxesRepresentation);
+
 //BTX
 protected:
   vtkSliceFriendGeometryRepresentation();
@@ -70,6 +97,20 @@ protected:
 
   bool AllowInputConnectionSetting;
   vtkWeakPointer<vtkPVDataRepresentation> RepresentationForRenderedDataObject;
+  vtkCubeAxesRepresentation* CubeAxesRepresentation;
+  bool CubeAxesVisibility;
+
+  // Description:
+  // Adds the representation to the view.  This is called from
+  // vtkView::AddRepresentation().  Subclasses should override this method.
+  // Returns true if the addition succeeds.
+  virtual bool AddToView(vtkView* view);
+
+  // Description:
+  // Removes the representation to the view.  This is called from
+  // vtkView::RemoveRepresentation().  Subclasses should override this method.
+  // Returns true if the removal succeeds.
+  virtual bool RemoveFromView(vtkView* view);
 
 private:
   vtkSliceFriendGeometryRepresentation(const vtkSliceFriendGeometryRepresentation&); // Not implemented

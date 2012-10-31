@@ -24,16 +24,17 @@
 #include "vtkDataSet.h"
 #include "vtkFieldData.h"
 #include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
+#include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
 #include "vtkProperty.h"
-#include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
@@ -565,10 +566,21 @@ void vtkCubeAxesRepresentation::ConfigureCubeAxes(vtkDataObject* input)
   // Make sure we enable oriented bounding box if any
   vtkFloatArray* orientedboundingBox =
       vtkFloatArray::SafeDownCast(fieldData->GetArray("OrientedBoundingBox"));
+  vtkFloatArray* sliceAt =
+      vtkFloatArray::SafeDownCast(fieldData->GetArray("SliceAt"));
+  vtkIdTypeArray* sliceAlongAxis =
+      vtkIdTypeArray::SafeDownCast(fieldData->GetArray("SliceAlongAxis"));
   if(orientedboundingBox)
     {
     this->UseOrientedBounds = true;
-    double* orientedBounds = orientedboundingBox->GetTuple(0);
+    double orientedBounds[6] = {0,0,0,0,0,0};
+    orientedboundingBox->GetTuple(0, orientedBounds);
+    if(sliceAlongAxis && sliceAt)
+      {
+      int axisIndex = sliceAlongAxis->GetValue(0);
+      orientedBounds[axisIndex*2 + 1] = orientedBounds[axisIndex*2] =
+          (double)sliceAt->GetValue(axisIndex);
+      }
     this->CubeAxesActor->SetUseOrientedBounds(1);
     this->CubeAxesActor->SetOrientedBounds(orientedBounds);
     this->CubeAxesActor->SetXAxisRange(&orientedBounds[0]);

@@ -8,6 +8,35 @@
           showing slices from a 3D dataset.
          </Documentation>
 
+         <IntVectorProperty command="SetLabelFontSize"
+                            default_values="20"
+                            name="LabelFontSize"
+                            number_of_elements="1">
+         </IntVectorProperty>
+
+         <DoubleVectorProperty name="SplitLocation"
+                               command="SetSplitRatio"
+                               number_of_elements="2"
+                               default_values="50 50"/>
+
+         <IntVectorProperty command="SetShowCubeAxes"
+                            default_values="0"
+                            name="ShowCubeAxes"
+                            number_of_elements="1">
+         </IntVectorProperty>
+
+         <IntVectorProperty command="SetShowOutline"
+                            default_values="1"
+                            name="ShowOutline"
+                            number_of_elements="1">
+         </IntVectorProperty>
+
+         <IntVectorProperty command="SetSliceOrientationAxesVisibility"
+                            default_values="0"
+                            name="SliceOrientationAxesVisibility"
+                            number_of_elements="1">
+         </IntVectorProperty>
+
          <IntVectorProperty command="SetSizeTopLeft"
                             default_values="400 400"
                             ignore_synchronization="1"

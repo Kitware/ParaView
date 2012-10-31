@@ -168,6 +168,8 @@ protected:
   vtkCubeAxesRepresentation();
   ~vtkCubeAxesRepresentation();
 
+  friend class vtkSliceFriendGeometryRepresentation;
+
   // Description:
   // Extract Field information from input if any and configure the underneath
   // cube axes if needed
