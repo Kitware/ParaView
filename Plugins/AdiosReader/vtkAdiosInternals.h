@@ -965,9 +965,9 @@ public:
 
     // Update extent
     wholeExtent[0] = wholeExtent[2] = wholeExtent[4] = 0;
-    wholeExtent[1] = gridSize[0];
+    wholeExtent[1] = gridSize[2];
     wholeExtent[3] = gridSize[1];
-    wholeExtent[5] = gridSize[2];
+    wholeExtent[5] = gridSize[0];
     extentTranslator->SetWholeExtent(wholeExtent);
     extentTranslator->PieceToExtent();
     extentTranslator->GetExtent(pieceExtent);
