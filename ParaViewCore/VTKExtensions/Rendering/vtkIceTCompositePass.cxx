@@ -59,11 +59,8 @@ namespace
   void MergeCubeAxesBounds(double bounds[6], const vtkRenderState* rState)
     {
     vtkBoundingBox bbox(bounds);
-    // scale the bounds a bit so that when showing a box we don't end up with
-    // clipped edges e.g. when a Mandelbrot source was shown with parallel
-    // rendering, the front edges would appear clipped in outline mode.
-    bbox.Scale(1.1, 1.1, 1.1);
 
+    // Hande CubeAxes specifically has it wrongly implement the GetBounds()
     for (int cc=0; cc < rState->GetPropArrayCount(); cc++)
       {
       vtkProp* prop = rState->GetPropArray()[cc];
@@ -71,13 +68,11 @@ namespace
       if (cubeAxes != NULL && prop->GetVisibility() &&
         prop->GetUseBounds())
         {
-        // cubeAxes has not clean API to give us the bounds it's using. So, we
-        // use a heuristic instead. Simply scale the data bounds by 1.5 and we
-        // call it 'even'.
-        bbox.Scale(1.5, 1.5, 1.5);
-        break;
+        // Use custom bounds API for cube axes to embed titles and labels
+        bbox.AddBounds(cubeAxes->GetRenderedBounds());
         }
       }
+
     bbox.GetBounds(bounds);
     }
 };
