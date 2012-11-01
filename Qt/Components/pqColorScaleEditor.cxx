@@ -1637,17 +1637,47 @@ void pqColorScaleEditor::addActiveValues()
     }
   vtkIdType nv = uniq->GetNumberOfTuples();
   vtkIdType nr = this->Form->AnnotationTree->topLevelItemCount();
+  int nc = uniq->GetNumberOfComponents();
   vtkIdType orig = nr;
+  /*
+  // Use something besides the decimal point as a separator for vector entries.
+  char decsep = std::use_facet<std::numpunct<char> >(
+    std::locale::classic()).decimal_point();
+  char numsep = (decsep == '.' ? ',' : ';');
+  */
+  char numsep = ' '; // separator between array entries
   for ( vtkIdType i = nv - 1; i >= 0; -- i )
     {
     bool duplicate = false;
     QTreeWidgetItem* valItem;
     //QTreeWidgetItem* txtItem;
-    std::string sval = uniq->GetVariantValue( i ).ToString();
+    std::ostringstream sval;
+    for ( int c = 0; c < nc; ++ c )
+      {
+      if ( c )
+        {
+        sval << numsep;
+        }
+      vtkVariant comp = uniq->GetVariantValue( i * nc + c );
+      if ( comp.IsDouble() )
+        {
+        sval.precision(17);
+        sval << comp.ToDouble();
+        }
+      else if ( comp.IsFloat() )
+        {
+        sval.precision(8);
+        sval << comp.ToFloat();
+        }
+      else
+        {
+        sval << comp.ToString();
+        }
+      }
     for ( vtkIdType j = 0; j < nr; ++ j )
       {
       valItem = this->Form->AnnotationTree->topLevelItem( j );
-      if ( valItem && valItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toString().toStdString() == sval )
+      if ( valItem && valItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toString().toStdString() == sval.str() )
         {
         duplicate = true;
         break;
@@ -1664,8 +1694,8 @@ void pqColorScaleEditor::addActiveValues()
         tf->GetNodeValue(nr % tf->GetSize(), nodeValue);
         valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
         }
-      valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( sval.c_str() ) );
-      valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( sval.c_str() ) );
+      valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( sval.str().c_str() ) );
+      valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( sval.str().c_str() ) );
       valItem->setFlags( valItem->flags() & ~(Qt::ItemIsDropEnabled) );
       this->Form->AnnotationTree->insertTopLevelItem( nr, valItem );
       ++ nr;
