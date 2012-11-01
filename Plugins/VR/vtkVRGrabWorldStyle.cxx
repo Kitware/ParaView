@@ -31,13 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRGrabWorldStyle.h"
 
+#include "vtkCamera.h"
 #include "vtkMatrix4x4.h"
 #include "vtkNew.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkTransform.h"
 #include "vtkVRQueue.h"
+
+#include "pqActiveObjects.h"
+#include "pqRenderView.h"
+#include "pqView.h"
 
 #include <sstream>
 #include <algorithm>
@@ -105,24 +111,56 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
         {
         this->InverseInitialTransform->SetMatrix( data.data.tracker.matrix );
         this->InverseInitialTransform->Inverse();
-        double currentValue[16];
-        vtkSMPropertyHelper(
-          this->ControlledProxy,
-          this->ControlledPropertyName).Get(currentValue, 16);
-        this->InverseInitialTransform->Concatenate(currentValue);
-
         this->IsInitialRecorded = true;
         }
       else
         {
-        vtkNew<vtkTransform> currentTransform;
-        currentTransform->SetMatrix(data.data.tracker.matrix);
-        currentTransform->Concatenate(this->InverseInitialTransform);
+        // Try to get the current camera...
+        vtkCamera *camera = NULL;
+        pqActiveObjects &activeObjs = pqActiveObjects::instance();
+        if (pqView *pqview = activeObjs.activeView())
+          {
+          if (pqRenderView *rview = qobject_cast<pqRenderView*>(pqview))
+            {
+            if (vtkSMRenderViewProxy *rviewPxy =
+                vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
+              {
+              camera = rviewPxy->GetActiveCamera();
+              }
+            }
+          }
+        if (camera == NULL)
+          {
+          vtkWarningMacro(<<"Cannot grab active camera.");
+          return;
+          }
 
-        vtkSMPropertyHelper(
-          this->ControlledProxy,
-          this->ControlledPropertyName).Set(
-              &currentTransform->GetMatrix()->Element[0][0], 16);
+        // Get the camera matrix and it's inverse
+        vtkNew<vtkMatrix4x4> cameraMatrix;
+        vtkNew<vtkMatrix4x4> invCameraMatrix;
+        cameraMatrix->DeepCopy(camera->GetViewTransformMatrix());
+        invCameraMatrix->DeepCopy(cameraMatrix.GetPointer());
+        invCameraMatrix->Invert();
+
+        // Get the current tracker matrix
+        vtkNew<vtkMatrix4x4> trackerMatrix;
+        trackerMatrix->DeepCopy(data.data.tracker.matrix);
+
+        // Calculate the full transform considering the camera offset
+        vtkMatrix4x4::Multiply4x4(invCameraMatrix.GetPointer(),
+                                  trackerMatrix.GetPointer(),
+                                  trackerMatrix.GetPointer());
+        vtkMatrix4x4::Multiply4x4(this->InverseInitialTransform->GetMatrix(),
+                                  trackerMatrix.GetPointer(),
+                                  trackerMatrix.GetPointer());
+        vtkMatrix4x4::Multiply4x4(cameraMatrix.GetPointer(),
+                                  trackerMatrix.GetPointer(),
+                                  trackerMatrix.GetPointer());
+
+        // Update the proxy.
+        vtkSMPropertyHelper(this->ControlledProxy,
+                            this->ControlledPropertyName).Set(
+              &trackerMatrix->Element[0][0], 16);
         this->ControlledProxy->UpdateVTKObjects();
         }
       }
