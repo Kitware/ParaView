@@ -650,7 +650,11 @@ void vtkPVArrayInformation::CopyFromObject(vtkObject* obj)
       }
     it->Delete();
     }
+}
 
+//----------------------------------------------------------------------------
+void vtkPVArrayInformation::CopyUniqueValuesFromObject(vtkAbstractArray* array)
+{
   // Check whether each component of the array takes on a small number
   // of unique values (i.e, test whether the array represents samples
   // from a discrete set or a continuum).
@@ -1058,15 +1062,9 @@ int vtkPVArrayInformation::HasInformationKey(const char* location,
 
 void vtkPVArrayInformation::AddUniqueValues( vtkPVArrayInformation* info )
 {
-  if ( ! info->UniqueValues )
-    { // Other info is uninitialized; keep the values we have.
+  if ( ! info->UniqueValues || ! this->UniqueValues )
+    { // Some information is uninitialized; do nothing.
     return;
-    }
-
-  if ( ! this->UniqueValues )
-    {
-    vtkDebugMacro("Merge array \"" << this->Name << "\" has no locals");
-    this->UniqueValues = new vtkInternalUniqueValues;
     }
 
   for ( int i = 0; i <= this->NumberOfComponents; ++ i )
