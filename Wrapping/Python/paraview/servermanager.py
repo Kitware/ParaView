@@ -47,17 +47,19 @@ if not paraview.compatibility.minor:
 if not paraview.compatibility.major:
     paraview.compatibility.minor = 5
 
-from vtkPVServerImplementationCorePython import *
 from vtkPVClientServerCoreCorePython import *
+from vtkPVClientServerCoreRenderingPython import *
+from vtkPVClientServerCoreDefaultPython import *
+
+from vtkPVServerImplementationCorePython import *
+from vtkPVServerImplementationRenderingPython import *
+from vtkPVServerImplementationDefaultPython import *
+
 from vtkPVServerManagerCorePython import *
-try:
-  from vtkPVServerManagerRenderingPython import *
-except:
-  print "Error: Cannot import vtkPVServerManagerRenderingPython"
-try:
-  from vtkPVServerManagerApplicationPython import *
-except:
-  print "Error: Cannot import vtkPVServerManagerApplicationPython"
+from vtkPVServerManagerRenderingPython import *
+from vtkPVServerManagerDefaultPython import *
+from vtkPVServerManagerApplicationPython import *
+
 from vtkPVCommonPython import *
 
 def _wrap_property(proxy, smproperty):

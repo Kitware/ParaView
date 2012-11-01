@@ -76,19 +76,13 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     servermanager.ProxyManager().UpdateFromRemote()
     tk = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
     if not tk:
-       try:
-           tk = servermanager.misc.TimeKeeper()
-           servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
-       except AttributeError:
-           print "Error: Could not create TimeKeeper"
+       tk = servermanager.misc.TimeKeeper()
+       servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
 
     scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
     if not scene:
-       try:
-           scene = AnimationScene()
-           scene.TimeKeeper = tk
-       except NameError:
-           print "Error: Could not create AnimationScene"
+       scene = AnimationScene()
+       scene.TimeKeeper = tk
 
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()
@@ -660,15 +654,10 @@ def _create_func(key, module):
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
             if group == "sources":
-                has_tk = True
-                try:
-                    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-                except IndexError:
-                    has_tk = False
-                if has_tk:
-                    sources = tk.TimeSources
-                    if not px in sources:
-                        sources.append(px)
+                tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+                sources = tk.TimeSources
+                if not px in sources:
+                    sources.append(px)
 
                 active_objects.source = px
         except servermanager.MissingRegistrationInformation:

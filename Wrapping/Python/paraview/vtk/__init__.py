@@ -1,32 +1,14 @@
-try:
-    from vtkCommonComputationalGeometryPython import *
-except ImportError:
-    print "Error: Could not import vtkCommonComputationalGeometryPython"
+from vtkCommonComputationalGeometryPython import *
 from vtkCommonCorePython import *
 from vtkCommonDataModelPython import *
 from vtkCommonExecutionModelPython import *
-try:
-    from vtkCommonMathPython import *
-except ImportError:
-    print "Error: Could not import vtkCommonMathPython"
-try:
-    from vtkCommonMiscPython import *
-except ImportError:
-    print "Error: Could not import vtkCommonMiscPython"
-try:
-    from vtkCommonSystemPython import *
-except ImportError:
-    print "Error: Could not import vtkCommonSystemPython"
-try:
-    from vtkCommonTransformsPython import *
-except ImportError:
-    print "Error: Could not import vtkCommonTransformsPython"
+from vtkCommonMathPython import *
+from vtkCommonMiscPython import *
+from vtkCommonSystemPython import *
+from vtkCommonTransformsPython import *
 from vtkFiltersProgrammablePython import *
 from vtkParallelCorePython import *
-try:
-    from vtkRenderingCorePython import vtkCamera
-except ImportError:
-    print "Error: Could not import vtkRenderingCorePython"
+from vtkRenderingCorePython import vtkCamera
 
 # --------------------------------------
 
