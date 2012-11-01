@@ -65,12 +65,12 @@ int vtkAnnotateGlobalDataFilter::RequestData(
   vtkAbstractArray* data = input->GetFieldData()->GetAbstractArray(this->GetFieldArrayName());
   if(data)
     {
-    isDataArray = data->IsA("vtkDataArray");
+    isDataArray = (data->IsA("vtkDataArray") != 0);
     int nbFieldsValues = data->GetNumberOfTuples();
     timeDependent = (nbTimeSteps == nbFieldsValues);
     validExpression = true;
     }
-  else if(input->IsA("vtkCompositeDataSet"))
+  else if(input->IsA("vtkCompositeDataSet") != 0)
     {
     vtkCompositeDataSet* multiBlock = vtkCompositeDataSet::SafeDownCast(input);
     vtkSmartPointer<vtkCompositeDataIterator> iter;
@@ -81,7 +81,7 @@ int vtkAnnotateGlobalDataFilter::RequestData(
       data = iter->GetCurrentDataObject()->GetFieldData()->GetAbstractArray(this->GetFieldArrayName());
       if(data)
         {
-        isDataArray = data->IsA("vtkDataArray");
+        isDataArray = (data->IsA("vtkDataArray") != 0);
         int nbFieldsValues = data->GetNumberOfTuples();
         timeDependent = (nbTimeSteps == nbFieldsValues);
         validExpression = true;
