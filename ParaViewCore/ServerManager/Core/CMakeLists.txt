@@ -118,6 +118,8 @@ set (Module_SRCS
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
+  vtkSMTimeKeeper.cxx
+  vtkSMTimeKeeperProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

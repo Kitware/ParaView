@@ -38,14 +38,14 @@
 #ifndef __vtkSMTimeKeeper_h
 #define __vtkSMTimeKeeper_h
 
-#include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSMProperty;
 class vtkSMSourceProxy;
 class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTimeKeeper : public vtkObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTimeKeeper : public vtkObject
 {
 public:
   static vtkSMTimeKeeper* New();

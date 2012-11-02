@@ -54,8 +54,6 @@ set (Module_SRCS
   vtkSMPWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
-  vtkSMTimeKeeper.cxx
-  vtkSMTimeKeeperProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
