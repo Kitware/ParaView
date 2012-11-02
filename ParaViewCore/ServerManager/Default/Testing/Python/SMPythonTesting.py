@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import exceptions
-from vtkPVServerImplementationDefaultPython import *
+from vtkPVServerManagerDefaultPython import *
 
 # we get different behavior based on how we import servermanager
 # so we want to import servermanager the same way in this module
@@ -105,7 +105,7 @@ def DoRegressionTesting(rmProxy=None):
   global Threshold
   ProcessCommandLineArguments()
   
-  testing = servermanager.vtkSMTesting()
+  testing = vtkSMTesting()
   testing.AddArgument("-T")
   testing.AddArgument(TempDir)
   testing.AddArgument("-V")
