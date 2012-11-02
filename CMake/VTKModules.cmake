@@ -333,7 +333,9 @@ set(_vtk_modules
   vtkDomainsChemistry
   # Needed for:
   #  vtkMoleculeRepresentation
-
+  
+  vtkPVServerManagerDefault
+  # Needed by plugins 
   )
 
 if (PARAVIEW_USE_MPI)
