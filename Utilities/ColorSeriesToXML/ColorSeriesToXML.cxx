@@ -30,7 +30,7 @@
 
 // This program generates discrete color maps to be inserted
 // into the Qt/Components/Resources/XML/ColorMaps.xml file.
-int main( int argc, char* argv[] )
+int main( int vtkNotUsed(argc), char* vtkNotUsed(argv)[] )
 {
   int valResult = 1;
 
@@ -52,16 +52,16 @@ int main( int argc, char* argv[] )
       cout
         << "    <Point"
         << " x=\"" << x << "\""
-        << " r=\"" << color.Red() / 255. << "\""
-        << " g=\"" << color.Green() / 255. << "\""
-        << " b=\"" << color.Blue() / 255. << "\""
+        << " r=\"" << color.GetRed() / 255. << "\""
+        << " g=\"" << color.GetGreen() / 255. << "\""
+        << " b=\"" << color.GetBlue() / 255. << "\""
         << " o=\"1.0\"/>\n";
       }
     cout
       << "    <NaN"
-      << " r=\"" << color.Red() / 255. << "\""
-      << " g=\"" << color.Green() / 255. << "\""
-      << " b=\"" << color.Blue() / 255. << "\""
+      << " r=\"" << color.GetRed() / 255. << "\""
+      << " g=\"" << color.GetGreen() / 255. << "\""
+      << " b=\"" << color.GetBlue() / 255. << "\""
       << "/>\n";
     cout
       << "  </ColorMap>\n";

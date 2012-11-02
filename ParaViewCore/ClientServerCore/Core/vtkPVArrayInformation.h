@@ -102,6 +102,12 @@ public:
   virtual void CopyFromObject( vtkObject* );
 
   // Description:
+  // Transfer information about a single vtkAbstractArray's unique values into this object.
+  // This must be called *after* CopyFromObject has been invoked on the same object so
+  // that information on the number of components is available.
+  virtual void CopyUniqueValuesFromObject( vtkAbstractArray* );
+
+  // Description:
   // Merge another information object.
   virtual void AddInformation( vtkPVInformation* );
 
@@ -142,7 +148,7 @@ public:
   // Returns either NULL (array component appears to be continuous) or
   // a pointer to a vtkAbstractArray (array component appears to be discrete)
   // containing a sorted list of all unique values encountered in the array component.
-  vtkAbstractArray* GetUniqueComponentValuesIfFDiscrete( int component );
+  vtkAbstractArray* GetUniqueComponentValuesIfDiscrete( int component );
 
 protected:
   vtkPVArrayInformation();
