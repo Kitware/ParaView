@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRPNCallBackHandlers.h"
 #include <QDateTime>
 #include <QDebug>
+#include <QtCore/QMutexLocker>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -57,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkMath.h"
+
+QMutex pqVRPNConnection::Lock;
 
 class pqVRPNConnection::pqInternals
 {
@@ -178,6 +181,7 @@ bool pqVRPNConnection::init()
     return true;
     }
 
+  QMutexLocker locker(&this->Lock);
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
@@ -211,12 +215,14 @@ void pqVRPNConnection::run()
     {
     if(this->Initialized)
       {
+      this->Lock.lock();
       // std::cout << "callback()" << std::endl;
       this->Internals->Tracker->mainloop();
       this->Internals->Button->mainloop();
       this->Internals->Analog->mainloop();
       // this->Internals->Dial->mainloop();
       // this->Internals->Text->mainloop();
+      this->Lock.unlock();
       }
     }
 }

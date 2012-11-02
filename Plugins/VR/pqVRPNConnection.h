@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __ParaViewVRPN_h
 
 #include <QThread>
+#include <QtCore/QMutex>
 #include <vrpn_Tracker.h>
 #include <vrpn_Button.h>
 #include <vrpn_Analog.h>
@@ -184,6 +185,7 @@ protected:
 
   bool Initialized;
   bool _Stop;
+  static QMutex Lock;
 
   vtkVRQueue* EventQueue;
 
