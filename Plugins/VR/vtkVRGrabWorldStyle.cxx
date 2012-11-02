@@ -142,6 +142,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
         invCameraMatrix->DeepCopy(cameraMatrix.GetPointer());
         invCameraMatrix->Invert();
 
+        // TODO I'm pretty sure that the multiplication order below is wrong...
         // Get the current tracker matrix
         vtkNew<vtkMatrix4x4> trackerMatrix;
         trackerMatrix->DeepCopy(data.data.tracker.matrix);
@@ -158,9 +159,18 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                                   trackerMatrix.GetPointer());
 
         // Update the proxy.
+        vtkNew<vtkMatrix4x4> controlledMatrix;
+        vtkSMPropertyHelper(this->ControlledProxy,
+                            this->ControlledPropertyName).Get(
+              &controlledMatrix->Element[0][0], 16);
+
+        vtkMatrix4x4::Multiply4x4(trackerMatrix.GetPointer(),
+                                  controlledMatrix.GetPointer(),
+                                  controlledMatrix.GetPointer());
+
         vtkSMPropertyHelper(this->ControlledProxy,
                             this->ControlledPropertyName).Set(
-              &trackerMatrix->Element[0][0], 16);
+              &controlledMatrix->Element[0][0], 16);
         this->ControlledProxy->UpdateVTKObjects();
         }
       }
