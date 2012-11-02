@@ -46,7 +46,6 @@ set (Module_SRCS
   vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
-  vtkSMNullProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx

@@ -120,6 +120,7 @@ set (Module_SRCS
   vtkSMWriterProxy.cxx
   vtkSMTimeKeeper.cxx
   vtkSMTimeKeeperProxy.cxx
+  vtkSMNullProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
