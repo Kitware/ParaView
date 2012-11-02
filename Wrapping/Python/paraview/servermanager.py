@@ -50,6 +50,11 @@ if not paraview.compatibility.major:
 from vtkPVServerImplementationCorePython import *
 from vtkPVClientServerCoreCorePython import *
 from vtkPVServerManagerCorePython import *
+
+try:
+  from vtkPVServerManagerDefaultPython import *
+except:
+  print "Error: Cannot import vtkPVServerManagerDefault"
 try:
   from vtkPVServerManagerRenderingPython import *
 except:
