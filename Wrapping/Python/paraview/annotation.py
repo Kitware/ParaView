@@ -34,6 +34,9 @@ except NameError:
     # in1d was introduced in numpy 1.4.0.
     contains = __vtk_in1d
 
+def _make_name_valid(name):
+    return paraview.make_name_valid(name)
+
 def ComputeAnnotation(self, inputDS, expression, t_value = 0, t_steps = [0,1], t_range = [0,1]):
     # init input object
     input = dataset_adapter.WrapDataObject(inputDS)
@@ -41,8 +44,8 @@ def ComputeAnnotation(self, inputDS, expression, t_value = 0, t_steps = [0,1], t
     # Add Fields names inside current namespace
     numberOfFields = input.GetFieldData().GetNumberOfArrays()
     for index in xrange(numberOfFields):
-       fieldName = input.GetFieldData().GetArray(index).GetName()
-       exec("%s = input.FieldData['%s']" % (fieldName, fieldName))
+       fieldName = input.GetFieldData().GetAbstractArray(index).GetName()
+       exec("%s = input.FieldData['%s']" % (_make_name_valid(fieldName), fieldName))
 
     # handle multi-block
     inputMB = []

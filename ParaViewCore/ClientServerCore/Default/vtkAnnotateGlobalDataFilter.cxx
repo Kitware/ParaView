@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkAnnotateGlobalDataFilter.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataArray.h"
@@ -54,42 +55,63 @@ int vtkAnnotateGlobalDataFilter::RequestData(
 
   // Is it a time dependent field ?
   bool timeDependent = false;
+  bool isDataArray = false;
+  bool validExpression = false;
   bool isFieldOnABlock =
-      (NULL == input->GetFieldData()->GetArray(this->GetFieldArrayName()));
-  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()))
+      (NULL == input->GetFieldData()->GetAbstractArray(this->GetFieldArrayName()));
+  int nbTimeSteps = outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) ?
+        outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) : -1;
+
+  vtkAbstractArray* data = input->GetFieldData()->GetAbstractArray(this->GetFieldArrayName());
+  if(data)
     {
-    int nbTimeSteps = outInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    vtkDataArray* data = input->GetFieldData()->GetArray(this->GetFieldArrayName());
-    if(data)
+    isDataArray = data->IsA("vtkDataArray");
+    int nbFieldsValues = data->GetNumberOfTuples();
+    timeDependent = (nbTimeSteps == nbFieldsValues);
+    validExpression = true;
+    }
+  else if(input->IsA("vtkCompositeDataSet"))
+    {
+    vtkCompositeDataSet* multiBlock = vtkCompositeDataSet::SafeDownCast(input);
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(multiBlock->NewIterator());
+    iter->GoToFirstItem();
+    while(!iter->IsDoneWithTraversal())
       {
-      int nbFieldsValues = data->GetNumberOfTuples();
-      timeDependent = (nbTimeSteps == nbFieldsValues);
-      }
-    else if(input->IsA("vtkCompositeDataSet"))
-      {
-      vtkCompositeDataSet* multiBlock = vtkCompositeDataSet::SafeDownCast(input);
-      vtkSmartPointer<vtkCompositeDataIterator> iter;
-      iter.TakeReference(multiBlock->NewIterator());
-      iter->GoToFirstItem();
-      while(!iter->IsDoneWithTraversal())
+      data = iter->GetCurrentDataObject()->GetFieldData()->GetAbstractArray(this->GetFieldArrayName());
+      if(data)
         {
-        data = iter->GetCurrentDataObject()->GetFieldData()->GetArray(this->GetFieldArrayName());
-        if(data)
-          {
-          int nbFieldsValues = data->GetNumberOfTuples();
-          timeDependent = (nbTimeSteps == nbFieldsValues);
-          }
-        iter->GoToNextItem();
+        isDataArray = data->IsA("vtkDataArray");
+        int nbFieldsValues = data->GetNumberOfTuples();
+        timeDependent = (nbTimeSteps == nbFieldsValues);
+        validExpression = true;
         }
+      iter->GoToNextItem();
       }
     }
 
   // Create the expression based on our local properties
   vtksys_ios::ostringstream expression;
-  expression << "\"" << this->GetPrefix() << " %s\" % str("
-             << (isFieldOnABlock ? "inputMB[0]" : "input")
-             << ".FieldData['" << this->GetFieldArrayName() << "']"
-             << "[" << (timeDependent ? "t_index" : "0") << ",0])";
+
+  if(!validExpression)
+    {
+    expression << "'Invalid expression'";
+    }
+  else if(isDataArray)
+    {
+    expression << "\"" << this->GetPrefix() << " %s\" % str("
+               << (isFieldOnABlock ? "inputMB[0]" : "input")
+               << ".FieldData['" << this->GetFieldArrayName() << "']"
+               << "[" << (timeDependent ? "t_index" : "0") << ",0])";
+    }
+  else
+    {
+    expression << "\"" << this->GetPrefix() << " %s\" % str("
+               << (isFieldOnABlock ? "inputMB[0]" : "input")
+               << ".FieldData['" << this->GetFieldArrayName() << "'].GetValue("
+               << (timeDependent ? "t_index" : "0") << "))";
+    }
+
   this->SetPythonExpression(expression.str().c_str());
 
   return this->Superclass::RequestData(request, inputVector, outputVector);;
