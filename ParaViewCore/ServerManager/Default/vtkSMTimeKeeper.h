@@ -43,7 +43,7 @@
 
 class vtkSMProperty;
 class vtkSMSourceProxy;
-class vtkSMViewProxy;
+class vtkSMProxy;
 
 class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTimeKeeper : public vtkObject
 {
@@ -59,8 +59,8 @@ public:
 
   // Description:
   // Add/Remove view proxy linked to this time keeper.
-  void AddView(vtkSMViewProxy*);
-  void RemoveView(vtkSMViewProxy*);
+  void AddView(vtkSMProxy*);
+  void RemoveView(vtkSMProxy*);
   void RemoveAllViews();
 
   // Description:
