@@ -448,8 +448,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 
   // We do not want to get the number of dual cells from an octree
   // because this triggers generation of connectivity arrays.
-  if ( data->GetDataObjectType() != VTK_HYPER_OCTREE
-       && data->GetDataObjectType() != VTK_HYPER_TREE_GRID )
+  if ( data->GetDataObjectType() != VTK_HYPER_OCTREE )
     {
     this->NumberOfCells = data->GetNumberOfCells();
     }
@@ -518,8 +517,7 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
     }
   // We do not want to get the number of dual cells from an octree
   // because this triggers generation of connectivity arrays.
-  if ( data->GetDataObjectType() != VTK_HYPER_OCTREE
-       && data->GetDataObjectType() != VTK_HYPER_TREE_GRID )
+  if ( data->GetDataObjectType() != VTK_HYPER_OCTREE )
     {
     this->NumberOfCells = data->GetNumberOfCells();
     }
@@ -1014,6 +1012,7 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
         this->DataSetType == VTK_IMAGE_DATA ||
         this->DataSetType == VTK_RECTILINEAR_GRID ||
         this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+        this->DataSetType == VTK_HYPER_TREE_GRID ||
         this->DataSetType == VTK_STRUCTURED_POINTS)
       {
       return 1;
