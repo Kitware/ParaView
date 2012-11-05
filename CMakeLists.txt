@@ -81,11 +81,11 @@ include(CMakeDependentOption)
 #------------------------------------------------------------------------------
 # Determine ParaView Source Version
 set (PARAVIEW_VERSION_MAJOR 3)
-set (PARAVIEW_VERSION_MINOR 14)
-set (PARAVIEW_VERSION_PATCH 1)
+set (PARAVIEW_VERSION_MINOR 98)
+set (PARAVIEW_VERSION_PATCH 0)
 set (PARAVIEW_VERSION_PATCH_EXTRA "enhanced")
-set (PARAVIEW_VERSION "3.14")
-set (PARAVIEW_VERSION_FULL "3.14.1-enhanced")
+set (PARAVIEW_VERSION "3.98")
+set (PARAVIEW_VERSION_FULL "3.98.0-enhanced")
 
 determine_version(${ParaView_SOURCE_DIR} ${GIT_EXECUTABLE} "PARAVIEW")
 
