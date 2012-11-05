@@ -33,11 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRGrabWorldStyle_h_
 
 #include "vtkVRTrackStyle.h"
+#include "vtkNew.h"
 
+class vtkMatrix4x4;
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-class vtkTransform;
 struct vtkVREventData;
 
 class vtkVRGrabWorldStyle : public vtkVRTrackStyle
@@ -60,7 +61,10 @@ protected:
   bool Enabled;
 
   bool IsInitialRecorded;
-  vtkTransform *InverseInitialTransform;
+  vtkNew<vtkMatrix4x4> InverseInitialMatrix;
+
+  bool IsCacheInitialized;
+  vtkNew<vtkMatrix4x4> CachedMatrix;
 
 private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.

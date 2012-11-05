@@ -536,10 +536,10 @@ void pqVRDockPanel::updateDebugLabel()
       double e2 = mv->GetElement(i, 2);
       double e3 = mv->GetElement(i, 3);
       debugString += QString("%1 %2 %3 %4\n")
-          .arg(e0 < 1e-10 ? 0.0 : e0, 8, 'g', 3)
-          .arg(e1 < 1e-10 ? 0.0 : e1, 8, 'g', 3)
-          .arg(e2 < 1e-10 ? 0.0 : e2, 8, 'g', 3)
-          .arg(e3 < 1e-10 ? 0.0 : e3, 8, 'g', 3);
+          .arg(fabs(e0) < 1e-5 ? 0.0 : e0, 8, 'g', 3)
+          .arg(fabs(e1) < 1e-5 ? 0.0 : e1, 8, 'g', 3)
+          .arg(fabs(e2) < 1e-5 ? 0.0 : e2, 8, 'g', 3)
+          .arg(fabs(e3) < 1e-5 ? 0.0 : e3, 8, 'g', 3);
     }
     // Pop off trailing newline
     debugString.remove(QRegExp("\n$"));

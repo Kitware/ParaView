@@ -57,14 +57,13 @@ vtkVRGrabWorldStyle::vtkVRGrabWorldStyle() :
 {
   this->Enabled = false;
   this->IsInitialRecorded =false;
-  this->InverseInitialTransform = vtkTransform::New();
+  this->IsCacheInitialized = false;
   this->NeedsButton = true;
 }
 
 // -----------------------------------------------------------------------------
 vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 {
-  this->InverseInitialTransform->Delete();
 }
 
 // ----------------------------------------------------------------------------
@@ -100,6 +99,16 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
     }
 }
 
+void printMatrix(vtkMatrix4x4 *mat, const char *name)
+{
+#if 0
+  vtkOStrStreamWrapper vtkmsg;
+  vtkmsg << name << ":\n  Det: " << mat->Determinant() << "\n";
+  mat->Print(vtkmsg);
+  vtkOutputWindowDisplayWarningText(vtkmsg.str());
+#endif
+}
+
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 {
@@ -109,14 +118,15 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
       {
       if ( !this->IsInitialRecorded )
         {
-        this->InverseInitialTransform->SetMatrix( data.data.tracker.matrix );
-        this->InverseInitialTransform->Inverse();
+        this->InverseInitialMatrix->DeepCopy( data.data.tracker.matrix );
+        this->InverseInitialMatrix->Invert();
         this->IsInitialRecorded = true;
         }
       else
         {
-        // Try to get the current camera...
-        vtkCamera *camera = NULL;
+        // Try to get the current camera and extract the view matrix
+        vtkNew<vtkMatrix4x4> viewMatrix;
+        bool foundCamera = false;
         pqActiveObjects &activeObjs = pqActiveObjects::instance();
         if (pqView *pqview = activeObjs.activeView())
           {
@@ -125,53 +135,96 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
             if (vtkSMRenderViewProxy *rviewPxy =
                 vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
               {
-              camera = rviewPxy->GetActiveCamera();
+              if (vtkCamera *camera = rviewPxy->GetActiveCamera())
+                {
+                // vtkCamera API is misleading...view transform == modelview
+                vtkNew<vtkMatrix4x4> modelViewMatrix;
+                modelViewMatrix->DeepCopy(camera->GetViewTransformMatrix());
+
+                vtkNew<vtkMatrix4x4> invModelMatrix;
+                vtkSMPropertyHelper(rviewPxy, "ModelTransformMatrix").Get(
+                      &invModelMatrix->Element[0][0]);
+                invModelMatrix->Invert();
+
+                // Calculate the view matrix from what we have
+                vtkMatrix4x4::Multiply4x4(modelViewMatrix.GetPointer(),
+                                          invModelMatrix.GetPointer(),
+                                          viewMatrix.GetPointer());
+
+                foundCamera = true;
+                }
               }
             }
           }
-        if (camera == NULL)
+        if (!foundCamera)
           {
           vtkWarningMacro(<<"Cannot grab active camera.");
           return;
           }
 
-        // Get the camera matrix and it's inverse
-        vtkNew<vtkMatrix4x4> cameraMatrix;
-        vtkNew<vtkMatrix4x4> invCameraMatrix;
-        cameraMatrix->DeepCopy(camera->GetViewTransformMatrix());
-        invCameraMatrix->DeepCopy(cameraMatrix.GetPointer());
-        invCameraMatrix->Invert();
+        // Calculate the inverse view matrix
+        printMatrix(viewMatrix.GetPointer(), "View");
+        vtkNew<vtkMatrix4x4> invViewMatrix;
+        invViewMatrix->DeepCopy(viewMatrix.GetPointer());
+        invViewMatrix->Invert();
 
-        // TODO I'm pretty sure that the multiplication order below is wrong...
-        // Get the current tracker matrix
-        vtkNew<vtkMatrix4x4> trackerMatrix;
-        trackerMatrix->DeepCopy(data.data.tracker.matrix);
-
-        // Calculate the full transform considering the camera offset
-        vtkMatrix4x4::Multiply4x4(invCameraMatrix.GetPointer(),
-                                  trackerMatrix.GetPointer(),
-                                  trackerMatrix.GetPointer());
-        vtkMatrix4x4::Multiply4x4(this->InverseInitialTransform->GetMatrix(),
-                                  trackerMatrix.GetPointer(),
-                                  trackerMatrix.GetPointer());
-        vtkMatrix4x4::Multiply4x4(cameraMatrix.GetPointer(),
-                                  trackerMatrix.GetPointer(),
-                                  trackerMatrix.GetPointer());
-
-        // Update the proxy.
+        // Get the current matrix from the proxy
         vtkNew<vtkMatrix4x4> controlledMatrix;
         vtkSMPropertyHelper(this->ControlledProxy,
                             this->ControlledPropertyName).Get(
               &controlledMatrix->Element[0][0], 16);
 
-        vtkMatrix4x4::Multiply4x4(trackerMatrix.GetPointer(),
+//        if (this->IsCacheInitialized)
+//          {
+//          vtkMatrix4x4::Multiply4x4(controlledMatrix.GetPointer(),
+//                                    this->CachedMatrix.GetPointer(),
+//                                    controlledMatrix.GetPointer());
+//          }
+
+        // Get the current tracker matrix, update with initial data
+        vtkNew<vtkMatrix4x4> transformMatrix;
+        transformMatrix->DeepCopy(data.data.tracker.matrix);
+        vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
+                                  this->InverseInitialMatrix.GetPointer(),
+                                  transformMatrix.GetPointer());
+        printMatrix(transformMatrix.GetPointer(), "Net transform");
+
+        // Account for camera
+//        vtkMatrix4x4::Multiply4x4(invViewMatrix.GetPointer(),
+//                                  transformMatrix.GetPointer(),
+//                                  transformMatrix.GetPointer());
+//        vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
+//                                  viewMatrix.GetPointer(),
+//                                  transformMatrix.GetPointer());
+
+        printMatrix(transformMatrix.GetPointer(), "Net transform w/ camera");
+
+        printMatrix(controlledMatrix.GetPointer(), "Original model");
+
+        // Apply the transformation
+        vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
                                   controlledMatrix.GetPointer(),
                                   controlledMatrix.GetPointer());
 
+        // Adjust for camera
+//        vtkMatrix4x4::Multiply4x4(controlledMatrix.GetPointer(),
+//                                  invViewMatrix.GetPointer(),
+//                                  controlledMatrix.GetPointer());
+
+        printMatrix(controlledMatrix.GetPointer(), "New model");
+
+        // Set the new matrix for the proxy.
         vtkSMPropertyHelper(this->ControlledProxy,
                             this->ControlledPropertyName).Set(
               &controlledMatrix->Element[0][0], 16);
         this->ControlledProxy->UpdateVTKObjects();
+
+        // update the initial matrix to prepare for the next event.
+        this->InverseInitialMatrix->DeepCopy( data.data.tracker.matrix );
+        this->InverseInitialMatrix->Invert();
+
+        this->IsCacheInitialized = true;
+        this->CachedMatrix->DeepCopy(viewMatrix.GetPointer());
         }
       }
     else
@@ -188,13 +241,6 @@ void vtkVRGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
 
   os << indent << "Enabled: " << this->Enabled << endl;
   os << indent << "IsInitialRecorded: " << this->IsInitialRecorded << endl;
-  if (this->InverseInitialTransform)
-    {
-    os << indent << "InverseInitialMatrix:" << endl;
-    this->InverseInitialTransform->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << indent << "InverseInitialMatrix: (None)" << endl;
-    }
+  os << indent << "InverseInitialMatrix:" << endl;
+  this->InverseInitialMatrix->PrintSelf(os, indent.GetNextIndent());
 }
