@@ -86,7 +86,7 @@ public:
 
   // Description:
   // Sets the internal table object that can be plotted.
-  void SetTables(vtkTable** table, int n);
+  void SetTables(vtkTable** table, const char **tableBlockNames, int n);
 
 
   void GetSeriesNames(std::vector<const char*>& names);
@@ -108,6 +108,8 @@ protected:
 
   vtkWeakPointer<vtkChart> Chart;
   std::vector<vtkWeakPointer<vtkTable> > Tables;
+  std::vector<std::string>               TableBlockNames;
+  std::vector<std::string>               CachedSerieNames;
   vtkWeakPointer<vtkScatterPlotMatrix> PlotMatrix;
   int ChartType;
   bool TableVisibility;

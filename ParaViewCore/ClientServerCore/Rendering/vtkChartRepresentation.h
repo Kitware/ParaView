@@ -146,7 +146,7 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  bool GetLocalOutput(std::vector<vtkTable*>& tables);
+  bool GetLocalOutput(std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames = NULL);
   void UpdateSeriesNames();
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
@@ -159,10 +159,15 @@ protected:
   bool EnableServerSideRendering;
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
 
-  std::vector<const char*> SeriesNames; //all series names consistent with local output
+  std::vector<std::string> SeriesNames; //all series names consistent with local output
   std::set<int> CompositeIndices; //the selected blocks
 
   vtkChartSelectionRepresentation* SelectionRepresentation;
+
+  // Vars used to Cache GetLocalOutput call when possible
+  std::vector<vtkTable*>   LocalOutputTableCache;
+  std::vector<std::string> LocalOutputBlockNameCache;
+  unsigned long            LocalOutputCacheTimeStamp;
 
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented

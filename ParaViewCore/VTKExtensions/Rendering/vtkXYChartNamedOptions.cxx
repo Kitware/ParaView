@@ -40,6 +40,7 @@ public:
   std::vector<vtkWeakPointer<vtkPlot> > Plots;
   std::vector<vtkWeakPointer<vtkTable> > Tables;
   vtkStdString Label;
+  vtkStdString SerieName;
   bool ColorInitialized;
   bool VisibilityInitialized;
   int LineThickness;
@@ -70,6 +71,7 @@ public:
     this->MarkerStyle = p.MarkerStyle;
     this->Visible = p.Visible;
     this->Label = p.Label;
+    this->SerieName = p.SerieName;
     this->Color[0] = p.Color[0];
     this->Color[1] = p.Color[1];
     this->Color[2] = p.Color[2];
@@ -253,10 +255,22 @@ void vtkXYChartNamedOptions::RefreshPlots()
         {
         continue;
         }
-      // Get the existing PlotInfo or initialize a new onw
-      if(newMap.find(seriesName)==newMap.end())
+
+      std::ostringstream fullSerieName;
+
+      // Append block name only if blocks
+      if(this->Tables.size() > 1)
         {
-        PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
+        fullSerieName << this->TableBlockNames[tbIndex] << "/";
+        }
+
+      fullSerieName << seriesName;
+
+      // Get the existing PlotInfo or initialize a new one
+      if(newMap.find(fullSerieName.str())==newMap.end())
+        {
+        PlotInfo& plotInfo = this->GetPlotInfo(fullSerieName.str().c_str());
+        plotInfo.SerieName = seriesName;
         plotInfo.Tables.clear();
         plotInfo.Plots.clear();
         if (!plotInfo.ColorInitialized)
@@ -269,9 +283,9 @@ void vtkXYChartNamedOptions::RefreshPlots()
           plotInfo.Visible = defaultVisible;
           }
         // Add the PlotInfo to the new collection
-        newMap[seriesName] = plotInfo;
+        newMap[fullSerieName.str()] = plotInfo;
         }
-      newMap[seriesName].Tables.push_back(table);
+      newMap[fullSerieName.str()].Tables.push_back(table);
       }
     }
   this->Internals->PlotMap = newMap;
@@ -356,6 +370,7 @@ vtkXYChartNamedOptions::GetPlotInfo(const char* seriesName)
     {
     PlotInfo& plotInfo = this->Internals->PlotMap[seriesName];
     plotInfo.Label = seriesName;
+    plotInfo.SerieName = seriesName;
     return plotInfo;
     }
 }
@@ -370,7 +385,7 @@ void vtkXYChartNamedOptions::SetTableVisibility(bool visible)
     {
     PlotInfo& plotInfo = it->second;
     this->SetPlotVisibilityInternal(plotInfo, visible && plotInfo.Visible,
-                                    it->first.c_str());
+                                    plotInfo.SerieName);
     }
 }
 
@@ -380,7 +395,7 @@ void vtkXYChartNamedOptions::SetVisibility(const char* name, int visible)
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible;
   plotInfo.VisibilityInitialized = true;
-  this->SetPlotVisibilityInternal(plotInfo, visible !=0, name);
+  this->SetPlotVisibilityInternal(plotInfo, visible !=0, plotInfo.SerieName);
 }
 
 //----------------------------------------------------------------------------
