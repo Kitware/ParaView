@@ -571,8 +571,6 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename).arg(live_visualization);
 
-  qDebug() << command;
-
   dialog->runString(vtkCPHelperScripts::GetPythonHelperScript());
   dialog->runString(command);
 
