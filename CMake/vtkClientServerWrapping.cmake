@@ -18,7 +18,7 @@ macro(vtk_add_cs_wrapping module)
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
   vtk_module_dep_includes(${module})
   vtk_add_library(${module}CS ${${module}CS_SRCS})
-  target_link_libraries(${module}CS vtkClientServer ${module})
+  target_link_libraries(${module}CS LINK_PUBLIC vtkClientServer LINK_PRIVATE ${module})
   set_property(TARGET ${module}CS APPEND  
     PROPERTY INCLUDE_DIRECTORIES
     ${${module}_DEPENDS_INCLUDE_DIRS}
