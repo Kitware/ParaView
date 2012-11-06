@@ -22,6 +22,8 @@
 #include "vtkChartSelectionRepresentation.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkContextView.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
@@ -29,16 +31,14 @@
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPlot.h"
-#include "vtkProcessModule.h"
 #include "vtkPVCacheKeeper.h"
 #include "vtkPVContextView.h"
 #include "vtkPVMergeTablesMultiBlock.h"
+#include "vtkPlot.h"
+#include "vtkProcessModule.h"
 #include "vtkReductionFilter.h"
 #include "vtkScatterPlotMatrix.h"
 #include "vtkTable.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataIterator.h"
 
 #include <vtksys/ios/sstream>
 #include <set>
@@ -229,36 +229,79 @@ bool vtkChartRepresentation::GetLocalOutput(std::vector<vtkTable*>& tables,
     bool pass_all_blocks = (this->CompositeIndices.find(0) !=
       this->CompositeIndices.end());
 
-    vtkSmartPointer<vtkCompositeDataIterator> iter;
-    iter.TakeReference(compositeOut->NewIterator());
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    // Let's traverse the vtkMultiBlockDataSet
+    vtkMultiBlockDataSet* tree = vtkMultiBlockDataSet::SafeDownCast(compositeOut);
+    if(tree != NULL)
       {
-      int compositeIndex = iter->GetCurrentFlatIndex();
-      if (pass_all_blocks ||
-        this->CompositeIndices.find(compositeIndex)!=this->CompositeIndices.end())
+      std::vector<std::string> tmpNames;
+      std::vector<vtkTable*>   tmpTables;
+      this->FillTableList(tree, tmpTables, &tmpNames, "");
+
+      // Filter based on which block is selected
+      std::set<vtkTable*> tableToRemove;
+      vtkSmartPointer<vtkCompositeDataIterator> iter;
+      iter.TakeReference(compositeOut->NewIterator());
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
         {
-        vtkDataObject* inputObj = iter->GetCurrentDataObject();
-        if(vtkTable::SafeDownCast(inputObj))
+        int compositeIndex = iter->GetCurrentFlatIndex();
+        if(this->CompositeIndices.find(compositeIndex)==this->CompositeIndices.end())
           {
-          vtkTable* table = vtkTable::SafeDownCast(inputObj);
-          tables.push_back(table);
-          this->LocalOutputTableCache.push_back(table);
-
-          // Fill blockname if requested
-          std::ostringstream blockName;
-          if(iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()))
+          vtkTable* inputObj = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+          if(inputObj != NULL)
             {
-            blockName << iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+            tableToRemove.insert(inputObj);
             }
-          else
-            {
-            blockName << "Block " << compositeIndex;
-            }
-          this->LocalOutputBlockNameCache.push_back(blockName.str());
+          }
+        }
+      for(size_t idx = 0; idx < tmpTables.size(); ++idx)
+        {
+        if( tableToRemove.find(tmpTables[idx]) == tableToRemove.end() )
+          {
+          this->LocalOutputBlockNameCache.push_back(tmpNames[idx]);
+          this->LocalOutputTableCache.push_back(tmpTables[idx]);
+          }
+        }
 
-          if(blockNames)
+      // Update values based on the cache
+      tables = this->LocalOutputTableCache;
+      if(blockNames)
+        {
+        (*blockNames) = this->LocalOutputBlockNameCache;
+        }
+      }
+    else // Another type of composite so let's use the iterator
+      {
+      vtkSmartPointer<vtkCompositeDataIterator> iter;
+      iter.TakeReference(compositeOut->NewIterator());
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+        {
+        int compositeIndex = iter->GetCurrentFlatIndex();
+        if (pass_all_blocks ||
+            this->CompositeIndices.find(compositeIndex)!=this->CompositeIndices.end())
+          {
+          vtkDataObject* inputObj = iter->GetCurrentDataObject();
+          if(vtkTable::SafeDownCast(inputObj))
             {
-            blockNames->push_back(blockName.str());
+            vtkTable* table = vtkTable::SafeDownCast(inputObj);
+            tables.push_back(table);
+            this->LocalOutputTableCache.push_back(table);
+
+            // Fill blockname if requested
+            std::ostringstream blockName;
+            if(iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME()))
+              {
+              blockName << iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+              }
+            else
+              {
+              blockName << "Block " << compositeIndex;
+              }
+            this->LocalOutputBlockNameCache.push_back(blockName.str());
+
+            if(blockNames)
+              {
+              blockNames->push_back(blockName.str());
+              }
             }
           }
         }
@@ -530,3 +573,48 @@ unsigned int vtkChartRepresentation::Initialize(
   return  this->Superclass::Initialize(minId, maxId);
 }
 
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::FillTableList(vtkMultiBlockDataSet* tree, std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames, const char* currentPath)
+{
+  if(tree == NULL)
+    {
+    return;
+    }
+
+  // Let's traverse that level
+  unsigned int nbChildren = tree->GetNumberOfBlocks();
+  for(unsigned int i=0; i < nbChildren; ++i)
+    {
+    vtkTable* table = vtkTable::SafeDownCast(tree->GetBlock(i));
+    vtkMultiBlockDataSet* subTree = vtkMultiBlockDataSet::SafeDownCast(tree->GetBlock(i));
+    std::ostringstream blockName;
+    if(tree->HasMetaData(i) && tree->GetMetaData(i)->Has(vtkCompositeDataSet::NAME()))
+      {
+      blockName << currentPath << tree->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+      }
+    else if(table != NULL)
+      {
+      blockName << currentPath << "DataSet " << i;
+      }
+    else if(subTree != NULL)
+      {
+      blockName << currentPath << "Block " << i << "/";
+      }
+
+    // register the table if found
+    if(table != NULL)
+      {
+      tables.push_back(table);
+      if(blockNames != NULL)
+        {
+        blockNames->push_back(blockName.str());
+        }
+      }
+
+    // Go deeper
+    if(subTree != NULL)
+      {
+      this->FillTableList(subTree, tables, blockNames, blockName.str().c_str());
+      }
+    }
+}

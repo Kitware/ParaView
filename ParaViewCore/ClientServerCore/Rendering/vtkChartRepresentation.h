@@ -34,15 +34,16 @@
 #include <set> //needed for ivars
 
 class vtkBlockDeliveryPreprocessor;
-class vtkClientServerMoveData;
 class vtkChartNamedOptions;
+class vtkChartSelectionRepresentation;
+class vtkClientServerMoveData;
+class vtkDataObjectTree;
+class vtkMultiBlockDataSet;
 class vtkPVCacheKeeper;
 class vtkPVContextView;
 class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
-class vtkChartSelectionRepresentation;
-class vtkMultiBlockDataSet;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
@@ -148,6 +149,10 @@ protected:
   // Returns vtkTable at the local processes.
   bool GetLocalOutput(std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames = NULL);
   void UpdateSeriesNames();
+
+  // Description:
+  // Method used recursively to traverse the tree and build the full path name of the blocks.
+  void FillTableList(vtkMultiBlockDataSet* tree, std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames = NULL, const char* currentPath = "");
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
