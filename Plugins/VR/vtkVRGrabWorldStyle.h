@@ -58,13 +58,17 @@ protected:
   virtual void HandleButton( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
 
-  bool Enabled;
+  bool EnableTranslate;
+  bool EnableRotate;
 
-  bool IsInitialRecorded;
-  vtkNew<vtkMatrix4x4> InverseInitialMatrix;
+  bool IsInitialTransRecorded;
+  bool IsInitialRotRecorded;
 
-  bool IsCacheInitialized;
-  vtkNew<vtkMatrix4x4> CachedMatrix;
+  vtkNew<vtkMatrix4x4> InverseInitialTransMatrix;
+  vtkNew<vtkMatrix4x4> InverseInitialRotMatrix;
+
+  vtkNew<vtkMatrix4x4> CachedTransMatrix;
+  vtkNew<vtkMatrix4x4> CachedRotMatrix;
 
 private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
