@@ -148,6 +148,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
       vtkNew<vtkMatrix4x4> rotMatrix;
       vtkNew<vtkMatrix4x4> invModelViewMatrix;
       vtkNew<vtkMatrix4x4> modelMatrix;
+      vtkNew<vtkMatrix4x4> viewMatrix;
       vtkCamera *camera = 0;
 
       if ( !this->IsInitialTransRecorded )
@@ -177,6 +178,15 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                 rotMatrix->SetElement(0, 3, 0.0);
                 rotMatrix->SetElement(1, 3, 0.0);
                 rotMatrix->SetElement(2, 3, 0.0);
+
+                viewMatrix->Identity();
+                viewMatrix->SetElement(0,3, camera->GetCameraViewMatrix()->GetElement(0,3));
+                viewMatrix->SetElement(1,3, camera->GetCameraViewMatrix()->GetElement(1,3));
+                viewMatrix->SetElement(2,3, camera->GetCameraViewMatrix()->GetElement(2,3));
+
+                camera->SetPosition(0.0, 0.0, 0.0);
+                camera->SetFocalPoint(0.0, 0.0, -1.0);
+                camera->SetViewUp(0.0, 1.0, 0.0);
                 foundCamera = true;
                 }
 
@@ -217,6 +227,9 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 
         // Apply rotation if exist
         vtkMatrix4x4::Multiply4x4(totalTrackerMatrix.GetPointer(), rotMatrix.GetPointer(), totalTrackerMatrix.GetPointer());
+        // Apply camera translation if any
+        vtkMatrix4x4::Multiply4x4(viewMatrix.GetPointer(), totalTrackerMatrix.GetPointer(), totalTrackerMatrix.GetPointer());
+
         transformMatrix->DeepCopy(totalTrackerMatrix.GetPointer());
 
         // Set the new matrix for the proxy.
