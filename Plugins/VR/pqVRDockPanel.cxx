@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkMatrix4x4.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRInteractorStyleFactory.h"
