@@ -145,7 +145,6 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
       this->IsInitialRotRecorded = false;
 
       vtkNew<vtkMatrix4x4> rotMatrix;
-      vtkNew<vtkMatrix4x4> viewMatrix;
       vtkCamera *camera = 0;
 
       if ( !this->IsInitialTransRecorded )
@@ -176,16 +175,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                 rotMatrix->SetElement(1, 3, 0.0);
                 rotMatrix->SetElement(2, 3, 0.0);
 
-                viewMatrix->Identity();
-                viewMatrix->SetElement(0,3, camera->GetCameraViewMatrix()->GetElement(0,3));
-                viewMatrix->SetElement(1,3, camera->GetCameraViewMatrix()->GetElement(1,3));
-                viewMatrix->SetElement(2,3, camera->GetCameraViewMatrix()->GetElement(2,3));
-
                 foundCamera = true;
-
-//                camera->SetPosition(0.0, 0.0, 0.0);
-//                camera->SetFocalPoint(0.0, 0.0, -1.0);
-//                camera->SetViewUp(0.0, 1.0, 0.0);
                 }
               }
             }
@@ -275,6 +265,7 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                   camera->SetFocalPoint(0.0, 0.0, -1.0);
                   camera->SetViewUp(0.0, 1.0, 0.0);
 
+                  // Since we are going to reset the camera, preserve the translation
                   this->CachedTransMatrix->DeepCopy(modelViewTransMatrix.GetPointer());
                   }
                 }
