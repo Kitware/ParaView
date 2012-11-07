@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRTrackStyle.h"
 #include "vtkNew.h"
 
+class vtkCamera;
 class vtkMatrix4x4;
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
@@ -73,6 +74,8 @@ protected:
 private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
   void operator=(const vtkVRGrabWorldStyle&); // Not implemented.
+
+  float GetSpeedFactor(vtkCamera *cam);
 };
 
 #endif //__vtkVRGrabWorldStyle.h_

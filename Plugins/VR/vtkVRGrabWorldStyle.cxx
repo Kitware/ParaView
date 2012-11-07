@@ -125,16 +125,6 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
     }
 }
 
-void printMatrix(vtkMatrix4x4 *mat, const char *name)
-{
-#if 0
-  vtkOStrStreamWrapper vtkmsg;
-  vtkmsg << name << ":\n  Det: " << mat->Determinant() << "\n";
-  mat->Print(vtkmsg);
-  vtkOutputWindowDisplayWarningText(vtkmsg.str());
-#endif
-}
-
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 {
@@ -146,69 +136,72 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 
       vtkNew<vtkMatrix4x4> rotMatrix;
       vtkCamera *camera = 0;
+      pqActiveObjects &activeObjs = pqActiveObjects::instance();
+      if (pqView *pqview = activeObjs.activeView())
+        {
+        if (pqRenderView *rview = qobject_cast<pqRenderView*>(pqview))
+          {
+          if (vtkSMRenderViewProxy *rviewPxy =
+              vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
+            {
+            if (camera = rviewPxy->GetActiveCamera())
+              {
+              // vtkCamera API is misleading...view transform == modelview
+              rotMatrix->DeepCopy(camera->GetModelViewTransformMatrix());
+              rotMatrix->SetElement(0, 3, 0.0);
+              rotMatrix->SetElement(1, 3, 0.0);
+              rotMatrix->SetElement(2, 3, 0.0);
+              }
+            }
+          }
+        }
+      if (!camera)
+        {
+        vtkWarningMacro(<<"Cannot grab active camera.");
+        return;
+        }
+
+      double speed = GetSpeedFactor(camera);
 
       if ( !this->IsInitialTransRecorded )
         {
         this->InverseInitialTransMatrix->Identity();
-        this->InverseInitialTransMatrix->SetElement(0, 3, data.data.tracker.matrix[3]);
-        this->InverseInitialTransMatrix->SetElement(1, 3, data.data.tracker.matrix[7]);
-        this->InverseInitialTransMatrix->SetElement(2, 3, data.data.tracker.matrix[11]);
+        this->InverseInitialTransMatrix->SetElement(0, 3, data.data.tracker.matrix[3] * speed);
+        this->InverseInitialTransMatrix->SetElement(1, 3, data.data.tracker.matrix[7] * speed);
+        this->InverseInitialTransMatrix->SetElement(2, 3, data.data.tracker.matrix[11] * speed);
         this->InverseInitialTransMatrix->Invert();
         this->IsInitialTransRecorded = true;
         }
       else
         {
-        bool foundCamera = false;
-        pqActiveObjects &activeObjs = pqActiveObjects::instance();
-        if (pqView *pqview = activeObjs.activeView())
-          {
-          if (pqRenderView *rview = qobject_cast<pqRenderView*>(pqview))
-            {
-            if (vtkSMRenderViewProxy *rviewPxy =
-                vtkSMRenderViewProxy::SafeDownCast(rview->getProxy()))
-              {
-              if (camera = rviewPxy->GetActiveCamera())
-                {
-                // vtkCamera API is misleading...view transform == modelview
-                rotMatrix->DeepCopy(camera->GetModelViewTransformMatrix());
-                rotMatrix->SetElement(0, 3, 0.0);
-                rotMatrix->SetElement(1, 3, 0.0);
-                rotMatrix->SetElement(2, 3, 0.0);
-
-                foundCamera = true;
-                }
-              }
-            }
-          }
-        if (!foundCamera)
-          {
-          vtkWarningMacro(<<"Cannot grab active camera.");
-          return;
-          }
-
         // Get the current tracker matrix, update with initial data
-        vtkNew<vtkMatrix4x4> transformMatrix; transformMatrix->Identity();
+        vtkNew<vtkMatrix4x4> transformMatrix;
+        transformMatrix->Identity();
         vtkNew<vtkMatrix4x4> totalTrackerMatrix;
-        vtkNew<vtkMatrix4x4> tempMatrix; tempMatrix->Identity();
+        vtkNew<vtkMatrix4x4> tempMatrix;
+        tempMatrix->Identity();
 
-        transformMatrix->SetElement(0, 3, data.data.tracker.matrix[3]);
-        transformMatrix->SetElement(1, 3, data.data.tracker.matrix[7]);
-        transformMatrix->SetElement(2, 3, data.data.tracker.matrix[11]);
+        transformMatrix->SetElement(0, 3, data.data.tracker.matrix[3] * speed);
+        transformMatrix->SetElement(1, 3, data.data.tracker.matrix[7] * speed);
+        transformMatrix->SetElement(2, 3, data.data.tracker.matrix[11] * speed);
         tempMatrix->DeepCopy(transformMatrix.GetPointer());
 
         vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
                                   this->InverseInitialTransMatrix.GetPointer(),
                                   transformMatrix.GetPointer());
-        printMatrix(transformMatrix.GetPointer(), "Net transform");
 
         // Compute all transformations via tracker
-        vtkMatrix4x4::Multiply4x4(this->CachedTransMatrix.GetPointer(), transformMatrix.GetPointer(), totalTrackerMatrix.GetPointer());
+        vtkMatrix4x4::Multiply4x4(this->CachedTransMatrix.GetPointer(),
+                                  transformMatrix.GetPointer(),
+                                  totalTrackerMatrix.GetPointer());
 
         // Store all transformations
         this->CachedTransMatrix->DeepCopy(totalTrackerMatrix.GetPointer());
 
         // Apply rotation if exist
-        vtkMatrix4x4::Multiply4x4(totalTrackerMatrix.GetPointer(), rotMatrix.GetPointer(), totalTrackerMatrix.GetPointer());
+        vtkMatrix4x4::Multiply4x4(totalTrackerMatrix.GetPointer(),
+                                  rotMatrix.GetPointer(),
+                                  totalTrackerMatrix.GetPointer());
 
         transformMatrix->DeepCopy(totalTrackerMatrix.GetPointer());
 
@@ -255,15 +248,11 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                   {
                   // vtkCamera API is misleading...view transform == modelview
                   modelViewTransMatrix->Identity();
-                  modelViewTransMatrix->SetElement(0,3, camera->GetModelViewTransformMatrix()->GetElement(0,3));
-                  modelViewTransMatrix->SetElement(1,3, camera->GetModelViewTransformMatrix()->GetElement(1,3));
-                  modelViewTransMatrix->SetElement(2,3, camera->GetModelViewTransformMatrix()->GetElement(2,3));
+                  modelViewTransMatrix->SetElement(0,3, camera->GetModelTransformMatrix()->GetElement(0,3));
+                  modelViewTransMatrix->SetElement(1,3, camera->GetModelTransformMatrix()->GetElement(1,3));
+                  modelViewTransMatrix->SetElement(2,3, camera->GetModelTransformMatrix()->GetElement(2,3));
 
                   foundCamera = true;
-
-                  camera->SetPosition(0.0, 0.0, 0.0);
-                  camera->SetFocalPoint(0.0, 0.0, -1.0);
-                  camera->SetViewUp(0.0, 1.0, 0.0);
 
                   // Since we are going to reset the camera, preserve the translation
                   this->CachedTransMatrix->DeepCopy(modelViewTransMatrix.GetPointer());
@@ -294,10 +283,14 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                                     transformMatrix.GetPointer());
 
           // Compute all transformations via tracker
-          vtkMatrix4x4::Multiply4x4(this->CachedRotMatrix.GetPointer(), transformMatrix.GetPointer(), totalTrackerMatrix.GetPointer());
+          vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
+                                    this->CachedRotMatrix.GetPointer(),
+                                    totalTrackerMatrix.GetPointer());
 
           // Compute new model transform matrix
-          vtkMatrix4x4::Multiply4x4(modelViewTransMatrix.GetPointer(), totalTrackerMatrix.GetPointer(), transformMatrix.GetPointer());
+          vtkMatrix4x4::Multiply4x4(modelViewTransMatrix.GetPointer(),
+                                    totalTrackerMatrix.GetPointer(),
+                                    transformMatrix.GetPointer());
 
           // Store all transformations
           this->CachedRotMatrix->DeepCopy(totalTrackerMatrix.GetPointer());
@@ -333,4 +326,21 @@ void vtkVRGrabWorldStyle::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "IsInitialRotRecorded: " << this->IsInitialRotRecorded << endl;
   os << indent << "InverseInitialTransMatrix:" << endl;
   this->InverseInitialTransMatrix->PrintSelf(os, indent.GetNextIndent());
+}
+
+// ----------------------------------------------------------------------------
+float vtkVRGrabWorldStyle::GetSpeedFactor(vtkCamera *cam)
+{
+  // Return the distance between the camera and the focal point.
+  double pos[3];
+  double foc[3];
+  cam->GetPosition(pos);
+  cam->GetFocalPoint(foc);
+  pos[0] -= foc[0];
+  pos[1] -= foc[1];
+  pos[2] -= foc[2];
+  pos[0] *= pos[0];
+  pos[1] *= pos[1];
+  pos[2] *= pos[2];
+  return sqrt(pos[0] + pos[1] + pos[2]);
 }
