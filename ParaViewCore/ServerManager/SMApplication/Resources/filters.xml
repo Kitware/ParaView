@@ -2881,10 +2881,12 @@ found and the point will be rejected.</Documentation>
         per processor when running in parallel (total number of points = number
         of processors * maximum number of points). When this is on, the maximum
         number of points is proportionally distributed across processors
-        depending on the number of points per processor (total number of points
-        = maximum number of points; maximum number of points per processor =
-        number of points on a processor * maximum number of points / total
-        number of points across all processors).</Documentation>
+        depending on the number of points per processor
+        ("total number of points" is the same as "maximum number of points"
+         maximum number of points per processor = number of points on a processor
+         * maximum number of points / total number of points across all processors
+        ).
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="1"
                          command="SetOffset"
