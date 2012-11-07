@@ -119,7 +119,7 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
     this->IsInitialRotRecorded = false;
     }
   // FIXME: Hardcoded
-  else if (data.name == std::string("wiimote.2"))
+  else if (data.name == std::string("wiimote.4"))
     {
     this->EnableRotate = data.data.button.state;
     }
