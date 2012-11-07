@@ -270,6 +270,10 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
                   invModelViewTransMatrix->DeepCopy(modelViewTransMatrix.GetPointer());
                   invModelViewTransMatrix->Invert();
                   foundCamera = true;
+
+                  camera->SetPosition(0.0, 0.0, 0.0);
+                  camera->SetFocalPoint(0.0, 0.0, -1.0);
+                  camera->SetViewUp(0.0, 1.0, 0.0);
                   }
                 }
               }
