@@ -161,9 +161,6 @@ void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
         }
       else
         {
-        // Try to get the current camera and extract the view matrix
-//        vtkNew<vtkMatrix4x4> viewMatrix;
-
         bool foundCamera = false;
         pqActiveObjects &activeObjs = pqActiveObjects::instance();
         if (pqView *pqview = activeObjs.activeView())
