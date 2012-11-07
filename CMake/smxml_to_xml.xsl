@@ -6,10 +6,9 @@
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:output method="xml"/>
 <xsl:template match="ServerManagerConfiguration/ProxyGroup">
-  <xsl:variable name="group_name" select="@name" />
   <xsl:for-each select="SourceProxy|Proxy|PWriterProxy|WriterProxy|PSWriterProxy">
     <proxy>
-      <group><xsl:value-of select="$group_name" /></group>
+      <group><xsl:value-of select="../@name" /></group>
       <name><xsl:value-of select="@name" /></name>
       <label>
         <xsl:choose>
@@ -259,10 +258,10 @@
 
 <xsl:template name="GenerateCategoryIndex" >
   <xsl:for-each select="Proxy">
-    <item>
-      <group><xsl:value-of select="@group"/></group>
-      <name><xsl:value-of select="@name" /></name>
-    </item>
+    <xsl:element name="item">
+      <xsl:attribute name="proxy_name"><xsl:value-of select="@name"/></xsl:attribute>
+      <xsl:attribute name="proxy_group"><xsl:value-of select="@group"/></xsl:attribute>
+    </xsl:element>
   </xsl:for-each>
 </xsl:template>
 

@@ -7,6 +7,24 @@
   <xsl:apply-templates select="categoryindex" />
 </xsl:template>
 
+<xsl:template name="proxy_index">
+   <xsl:param name="proxy_group" />
+   <xsl:param name="proxy_name" />
+
+   <tr>
+      <td>
+         <xsl:element name="a">
+            <xsl:attribute name="href"><xsl:value-of select="$proxy_group"/>.<xsl:value-of select="$proxy_name"/>.html</xsl:attribute>
+            <xsl:value-of select="/xml/proxy[group=$proxy_group and name=$proxy_name]/label" />
+            <span />
+         </xsl:element>
+      </td>
+      <td>
+         <xsl:value-of select="/xml/proxy[group=$proxy_group and name=$proxy_name]/documentation/brief" />
+      </td>
+   </tr>
+</xsl:template>
+
 <xsl:template match="/xml/categoryindex">
   <html>
     <head>
@@ -17,27 +35,15 @@
     </head>
     <body>
       <h2><xsl:value-of select="label" /></h2>
-      <hr />
+      <hr/>
       <table class="index_table">
-        <tr><th>Name</th><th>Description</th></tr>
-        <xsl:for-each select="item">
-          <tr>
-            <td>
-              <xsl:element name="a">
-                <xsl:attribute name="href"><xsl:value-of select="group" />.<xsl:value-of select="name"/>.html</xsl:attribute>
-                <xsl:variable name="group_name"><xsl:value-of select="group"/></xsl:variable>
-                <xsl:variable name="proxy_name"><xsl:value-of select="name"/></xsl:variable>
-                <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/label" />
-                <span />
-              </xsl:element>
-            </td>
-            <td>
-              <xsl:variable name="group_name"><xsl:value-of select="group"/></xsl:variable>
-              <xsl:variable name="proxy_name"><xsl:value-of select="name"/></xsl:variable>
-              <xsl:value-of select="/xml/proxy[group=$group_name and name=$proxy_name]/documentation/brief" />
-            </td>
-          </tr>
-        </xsl:for-each>
+         <tr><th>Name</th><th>Description</th></tr>
+         <xsl:for-each select="item">
+            <xsl:call-template name="proxy_index">
+               <xsl:with-param name="proxy_group"><xsl:value-of select="@proxy_group"/></xsl:with-param>
+               <xsl:with-param name="proxy_name"><xsl:value-of select="@proxy_name"/></xsl:with-param>
+            </xsl:call-template>
+         </xsl:for-each>
       </table>
     </body>
   </html>
