@@ -80,7 +80,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
            tk = servermanager.misc.TimeKeeper()
            servermanager.ProxyManager().RegisterProxy("timekeeper", "TimeKeeper", tk)
        except AttributeError:
-           print "Error: Could not create TimeKeeper"
+           paraview.print_error("Error: Could not create TimeKeeper")
 
     scene = servermanager.ProxyManager().GetProxy("animation", "AnimationScene")
     if not scene:
@@ -88,7 +88,7 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
            scene = AnimationScene()
            scene.TimeKeeper = tk
        except NameError:
-           print "Error: Could not create AnimationScene"
+           paraview.print_error("Error: Could not create AnimationScene")
 
     servermanager.ProxyManager().EnableStateUpdateNotification()
     servermanager.ProxyManager().TriggerStateUpdate()

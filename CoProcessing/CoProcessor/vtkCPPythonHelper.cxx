@@ -119,7 +119,16 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
     vtksys_ios::ostringstream loadPythonModules;
     loadPythonModules
       << "import sys\n"
+      << "import paraview\n"
+      << "f1 = paraview.print_error\n"
+      << "f2 = paraview.print_debug_info\n"
+      << "def print_dummy(text):\n"
+      << "  pass\n"
+      << "paraview.print_error = print_dummy\n"
+      << "paraview.print_debug_info = print_dummy\n"
       << "from paraview.simple import *\n"
+      << "paraview.print_error = f1\n"
+      << "paraview.print_debug_info = f2\n"
       << "import vtkCoProcessorPython\n";
 
     // Pre-load set of helper methods

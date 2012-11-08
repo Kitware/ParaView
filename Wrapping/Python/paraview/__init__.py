@@ -35,7 +35,7 @@ class compatibility:
     GetVersion = classmethod(GetVersion)
 
 def make_name_valid(name):
-    """"Make a string into a valid Python variable name."""
+    """Make a string into a valid Python variable name."""
     if not name:
         return None
     import string
@@ -58,6 +58,14 @@ class options:
     True to have any effect."""
     symmetric = False
 
+def print_warning(text):
+   print text
+
+def print_error(text):
+   print text
+
+def print_debug_info(text):
+   print text
 
 """Set by vvtkPythonProgrammableFilter"""
 fromFilter = False

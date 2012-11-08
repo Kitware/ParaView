@@ -54,15 +54,15 @@ from vtkPVServerManagerCorePython import *
 try:
   from vtkPVServerManagerDefaultPython import *
 except:
-  print "Error: Cannot import vtkPVServerManagerDefault"
+  paraview.print_error("Error: Cannot import vtkPVServerManagerDefaultPython")
 try:
   from vtkPVServerManagerRenderingPython import *
 except:
-  print "Error: Cannot import vtkPVServerManagerRenderingPython"
+  paraview.print_error("Error: Cannot import vtkPVServerManagerRenderingPython")
 try:
   from vtkPVServerManagerApplicationPython import *
 except:
-  print "Error: Cannot import vtkPVServerManagerApplicationPython"
+  paraview.print_error("Error: Cannot import vtkPVServerManagerApplicationPython")
 from vtkPVCommonPython import *
 
 def _wrap_property(proxy, smproperty):
@@ -1908,7 +1908,7 @@ def InitFromGUI():
     """
     global fromGUI, ActiveConnection
     if not fromGUI:
-       print "from paraview.simple import *"
+       paraview.print_debug_info("from paraview.simple import *")
     fromGUI = True
     # ToggleProgressPrinting() ### FIXME COLLABORATION
     enableMultiServer(vtkProcessModule.GetProcessModule().GetMultipleSessionsSupport())
@@ -2202,19 +2202,19 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     if arg1 == None:
         cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
         if cdinfo.GetDataIsComposite():
-            print "use composite data append"
+            paraview.print_debug_info("use composite data append")
             reducer.PostGatherHelperName = "vtkMultiBlockDataGroupFilter"
 
         elif input.GetDataInformation(idx).GetDataClassName() == "vtkPolyData":
-            print "use append poly data filter"
+            paraview.print_debug_info("use append poly data filter")
             reducer.PostGatherHelperName = "vtkAppendPolyData"
 
         elif input.GetDataInformation(idx).GetDataClassName() == "vtkRectilinearGrid":
-            print "use append rectilinear grid filter"
+            paraview.print_debug_info("use append rectilinear grid filter")
             reducer.PostGatherHelperName = "vtkAppendRectilinearGrid"
 
         elif input.GetDataInformation(idx).IsA("vtkDataSet"):
-            print "use unstructured append filter"
+            paraview.print_debug_info("use unstructured append filter")
             reducer.PostGatherHelperName = "vtkAppendFilter"
 
     elif type(arg1) is types.IntType:
@@ -2534,7 +2534,7 @@ def createModule(groupName, mdl=None):
         proxyName = i['key']
         proto = pxm.GetPrototypeProxy(groupName, proxyName)
         if not proto:
-           print "Error while loading %s/%s %s"%(groupName, i['group'], proxyName)
+           paraview.print_error("Error while loading %s/%s %s"%(groupName, i['group'], proxyName))
            continue
         pname = proxyName
         if paraview.compatibility.GetVersion() >= 3.5 and\
@@ -2545,7 +2545,7 @@ def createModule(groupName, mdl=None):
             continue
         if pname in mdl.__dict__:
             if debug:
-                print "Warning: %s is being overwritten. This may point to an issue in the ParaView configuration files" % pname
+                paraview.print_warning("Warning: %s is being overwritten. This may point to an issue in the ParaView configuration files" % pname)
         cdict = {}
         # Create an Initialize() method for this sub-class.
         cdict['Initialize'] = _createInitialize(groupName, proxyName)
@@ -3028,7 +3028,7 @@ def __exposeActiveModules__():
 
 if hasattr(sys, "ps1"):
     # session is interactive.
-    print vtkSMProxyManager.GetParaViewSourceVersion();
+    paraview.print_debug_info(vtkSMProxyManager.GetParaViewSourceVersion());
 
 def GetConnectionFromId(id):
    for connection in MultiServerConnections:
