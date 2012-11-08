@@ -21,7 +21,6 @@
 #include "vtkGraph.h"
 #include "vtkImageAppend.h"
 #include "vtkImageData.h"
-#include "vtkMergeGraphs.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
@@ -154,25 +153,8 @@ bool vtkMultiProcessControllerHelper::MergePieces(
     }
   else if (vtkGraph::SafeDownCast(result))
     {
-    // graph has to be handled separately because it doesn't have the standard
-    // append-filter API.
-    vtkMergeGraphs* mergegraphs = vtkMergeGraphs::New();
-    mergegraphs->SetInputData(0, pieces[0]);
-    std::vector<vtkSmartPointer<vtkDataObject> >::iterator iter =
-      pieces.begin();
-    iter++;
-    for ( ; iter != pieces.end(); ++iter)
-      {
-      mergegraphs->SetInputData(1, iter->GetPointer());
-      mergegraphs->Update();
-
-      vtkGraph* mergeResult = mergegraphs->GetOutput();
-      mergegraphs->SetInputData(0, mergeResult);
-      }
-    vtkDataObject* mergeResult = mergegraphs->GetInputDataObject(0, 0);
-    result->ShallowCopy(mergeResult);
-    mergegraphs->Delete();
-    return true;
+    vtkGenericWarningMacro("Support for vtkGraph has been depreciated.")
+    return false;
     }
   else if (vtkCompositeDataSet::SafeDownCast(result))
     {

@@ -3,9 +3,6 @@ vtk_module(vtkPVVTKExtensionsCore
     ParaViewCore
   DEPENDS
     vtkFiltersCore
-    vtkFiltersGeneral
-    vtkImagingCore
-    vtkInfovisCore
     vtkParallelCore
     vtkPVCommon
 )

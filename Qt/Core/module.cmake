@@ -10,6 +10,7 @@ vtk_module(pqCore
     pqWidgets
     vtkGUISupportQt
     vtkPVServerManagerApplication
+    vtkPVServerManagerDefault
     ${__depends}
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
