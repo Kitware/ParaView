@@ -25,6 +25,10 @@ live_insitu = None
 # simulation input name.
 simulation_input_map = { };
 
+# string->producer map with key being the simulation input name and the
+# value being the vtkPVTrivialProducer that produces that input
+simulation_producers_map = {}
+
 # This is map of lists of write frequencies. This is used to populate the
 # RequestDataDescription() method so that grids are requested only when needed.
 write_frequencies = {}
@@ -38,6 +42,12 @@ try:
    from paraview import smstate, smtrace
 except:
    raise RuntimeError('could not import paraview.smstate')
+
+try:
+   import vtkPVVTKExtensionsCorePython
+except:
+   raise RuntimeError('could not import vtkPVVTKExtensionsCorePython')
+
 
 # -----------------------------------------------------------------------------
 # From a Proxy return a list of "cpSimulationInput"
@@ -283,17 +293,29 @@ def GetNextProxyToDelete():
 
 def CreateProducer(datadescription, gridname):
     "Creates a producer proxy for the grid"
+    global simulation_producers_map
     if not datadescription.GetInputDescriptionByName(gridname):
         raise RuntimeError, "Simulation input name '%s' does not exist" % gridname
     grid = datadescription.GetInputDescriptionByName(gridname).GetGrid()
     producer = PVTrivialProducer()
-    producer.GetClientSideObject().SetOutput(grid)
+    producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
     if grid.IsA("vtkImageData") == True or grid.IsA("vtkStructuredGrid") == True or grid.IsA("vtkRectilinearGrid") == True:
         extent = datadescription.GetInputDescriptionByName(gridname).GetWholeExtent()
         producer.WholeExtent= [ extent[0], extent[1], extent[2], extent[3], extent[4], extent[5] ]
 
+    simulation_producers_map[gridname] = producer
     producer.UpdatePipeline()
     return producer
+
+# -----------------------------------------------------------------------------
+# Update the producer's output and simulation time for each producer/input
+# -----------------------------------------------------------------------------
+
+def UpdateProducers(datadescription):
+   global simulation_producers_map
+   simtime = datadescription.GetTime()
+   for name,producer in simulation_producers_map.iteritems():
+      producer.GetClientSideObject().SetOutput(datadescription.GetInputDescriptionByName(name).GetGrid(), simtime)
 
 # -----------------------------------------------------------------------------
 # Create a CoProcessing writer with the add-on frequency information
