@@ -1,10 +1,10 @@
-<ServerManaerConfiguration>
+<ServerManagerConfiguration>
   <ProxyGroup name="representations">
     <RepresentationProxy name="MySpecialRepresentation"
       class="vtkMySpecialRepresentation"
       processes="client|renderserver|dataserver"
       base_proxygroup="representations"
-      base_proxyname="SurfaceRepresentation">
+      base_proxyname="SurfaceRepresentationBase">
       <Documentation>
         This is the new representation type we are adding. This is identical to
         the SurfaceRepresentation except that we are overriding the mapper with
@@ -37,4 +37,4 @@
     </Extension>
   </ProxyGroup>
 
-</ServerManaerConfiguration>
+</ServerManagerConfiguration>
