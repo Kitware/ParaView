@@ -50,7 +50,6 @@ set (Module_SRCS
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMPSWriterProxy.cxx
-  vtkSMPWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
 )
