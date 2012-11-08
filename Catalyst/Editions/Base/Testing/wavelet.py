@@ -18,6 +18,9 @@ points = ()
 for i in range(0, num_points):
   points += image_data.GetPoint(i)
 
-assertTrue(hash(points), -3584845732413037660, 'Point hash has changed.')
+md5 = hashlib.md5()
+md5.update(str(points))
+assertTrue(md5.hexdigest(), "c5faaca1a1510d746c41588d4a502e66",
+           'Point hash has changed.')
 assertTrue(image_data.GetBounds(), (-10.0, 10.0, -10.0, 10.0, -10.0, 10.0),
            'Incorrect bounds.')
