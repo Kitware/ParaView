@@ -135,6 +135,12 @@ bool pqServerConfigurationCollection::load(
 }
 
 //-----------------------------------------------------------------------------
+bool pqServerConfigurationCollection::saveNow()
+{
+  return this->save(userServers(), true);
+}
+
+//-----------------------------------------------------------------------------
 bool pqServerConfigurationCollection::save(const QString& filename, bool only_mutable)
 {
   QString contents = this->saveContents(only_mutable);

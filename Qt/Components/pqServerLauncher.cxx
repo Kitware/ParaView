@@ -285,7 +285,7 @@ namespace
           widgets[name] = new pqWidget(widget, "value");
           widget->setProperty("minimum", QVariant(min));
           widget->setProperty("maximum", QVariant(max));
-          widget->setProperty("step", QVariant(step));
+          widget->setProperty("singleStep", QVariant(step));
           }
         else if (strcmp(typeNode->GetName(), "String") == 0)
           {
