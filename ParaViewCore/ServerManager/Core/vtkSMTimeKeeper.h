@@ -38,14 +38,14 @@
 #ifndef __vtkSMTimeKeeper_h
 #define __vtkSMTimeKeeper_h
 
-#include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
 class vtkSMProperty;
 class vtkSMSourceProxy;
-class vtkSMViewProxy;
+class vtkSMProxy;
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMTimeKeeper : public vtkObject
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMTimeKeeper : public vtkObject
 {
 public:
   static vtkSMTimeKeeper* New();
@@ -59,8 +59,8 @@ public:
 
   // Description:
   // Add/Remove view proxy linked to this time keeper.
-  void AddView(vtkSMViewProxy*);
-  void RemoveView(vtkSMViewProxy*);
+  void AddView(vtkSMProxy*);
+  void RemoveView(vtkSMProxy*);
   void RemoveAllViews();
 
   // Description:
