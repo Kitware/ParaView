@@ -1,6 +1,18 @@
-from paraview.simple import *
-import sys
+import paraview
 
+# suppress import errors
+print_error = paraview.print_error
+print_debug = paraview.print_debug_info
+def print_dummy(text):
+  pass
+paraview.print_error = print_dummy
+paraview.print_debug_info = print_dummy
+from paraview.simple import *
+paraview.print_error = print_error
+paraview.print_debug_info = print_debug
+
+import sys
+import hashlib
 
 def assertTrue(actual, excepted, error_message):
   if actual != excepted:
