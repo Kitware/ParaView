@@ -222,8 +222,8 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
           modelTransformMatrix->SetElement(2, 3, 0.0);
 
           // Now put the transform in new coordinate frame
-          vtkMatrix4x4::Multiply4x4(modelTransformMatrix.GetPointer(),
-                                    transformMatrix.GetPointer(),
+          vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
+                                    modelTransformMatrix.GetPointer(),
                                     transformMatrix.GetPointer());
 
           double* transformedPoints = transformMatrix->MultiplyDoublePoint(this->Origin);
