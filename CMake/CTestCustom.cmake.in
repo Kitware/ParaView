@@ -20,6 +20,9 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "QtCore"
   "QtHelp"
 
+  # ignore concrete/abstract wrapping issue
+  "Warning.*the.*concrete option is deprecated and will be ignored"
+  "Warning.*the.*abstract option is deprecated and will be ignored"
 
   "vtk[^\\.]+ClientServer.cxx"
 
