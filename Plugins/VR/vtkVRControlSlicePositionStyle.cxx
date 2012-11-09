@@ -202,9 +202,9 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
         else
           {
           double origin[4];
-      vtkNew<vtkMatrix4x4> transformMatrix;
-      transformMatrix->Identity();
-      transformMatrix->SetElement(0, 3, data.data.tracker.matrix[3]);
+          vtkNew<vtkMatrix4x4> transformMatrix;
+          transformMatrix->Identity();
+          transformMatrix->SetElement(0, 3, data.data.tracker.matrix[3]);
           transformMatrix->SetElement(1, 3, data.data.tracker.matrix[7]);
           transformMatrix->SetElement(2, 3, data.data.tracker.matrix[11]);
 
@@ -212,15 +212,15 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
                                     this->InitialInvertedPose.GetPointer(),
                                     transformMatrix.GetPointer());
 
-      double* transformedPoints = transformMatrix->MultiplyDoublePoint(this->Origin);
-      origin[0] = transformedPoints[0] / transformedPoints[3];
-      origin[1] = transformedPoints[1] / transformedPoints[3];
+          double* transformedPoints = transformMatrix->MultiplyDoublePoint(this->Origin);
+          origin[0] = transformedPoints[0] / transformedPoints[3];
+          origin[1] = transformedPoints[1] / transformedPoints[3];
           origin[2] = transformedPoints[2] / transformedPoints[3];
-      origin[3] = 1;
+          origin[3] = 1;
 
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Set(origin, 3);
-      //this->ControlledProxy->UpdateVTKObjects();
+          //this->ControlledProxy->UpdateVTKObjects();
           }
         }
       }
