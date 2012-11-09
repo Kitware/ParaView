@@ -57,6 +57,14 @@ public:
   vtkGetMacro(Quality, int);
 
   // Description:
+  // Turns on(the default) or off compression.
+  // Turning off compression overrides quality setting.
+  // NOTE: This only affects the FFMPEG backend.
+  vtkSetMacro(Compression, bool);
+  vtkGetMacro(Compression, bool);
+  vtkBooleanMacro(Compression, bool);
+
+  // Description:
   // Get/Set the setting whether the movie encoder should use subsampling of
   // the chrome planes or not, if applicable. Since the human eye is more
   // sensitive to brightness than color variations, subsampling can be
@@ -128,6 +136,7 @@ protected:
   vtkSetVector2Macro(ActualSize, int);
   int ActualSize[2];
   int Quality;
+  bool Compression;
   int Magnification;
   int FileCount;
   int ErrorCode;

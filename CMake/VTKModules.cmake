@@ -333,7 +333,9 @@ set(_vtk_modules
   vtkDomainsChemistry
   # Needed for:
   #  vtkMoleculeRepresentation
-
+  
+  vtkPVServerManagerDefault
+  # Needed by plugins 
   )
 
 if (PARAVIEW_USE_MPI)
@@ -344,17 +346,9 @@ if (PARAVIEW_USE_VISITBRIDGE)
   list (APPEND _vtk_modules vtkIOVisItBridge)
 endif()
 
-# See if matplotlib is present.
-# If so, add vtkRenderingMatplotlib for math text rendering.
+# Enable vtkRenderingMatplotlib for math text rendering if python is available
 if (PYTHON_EXECUTABLE)
-  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import matplotlib"
-    RESULT_VARIABLE IMPORT_MATPLOTLIB_EXITCODE
-    OUTPUT_VARIABLE IMPORT_MATPLOTLIB_OUTPUT
-    ERROR_VARIABLE IMPORT_MATPLOTLIB_ERROR)
-  if (${IMPORT_MATPLOTLIB_EXITCODE} EQUAL 0)
-    set(PARAVIEW_MATPLOTLIB_MODULE vtkRenderingMatplotlib)
-    list (APPEND _vtk_modules vtkRenderingMatplotlib)
-  endif()
+  list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
 
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this

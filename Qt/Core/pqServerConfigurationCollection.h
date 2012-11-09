@@ -76,6 +76,7 @@ public:
   /// load/save configurations from/to file.
   bool load(const QString& filename, bool mutable_configs);
   bool save(const QString& filename, bool only_mutable);
+  bool saveNow();
 
   /// Add a server configuration.
   void addConfiguration(vtkPVXMLElement* configuration, bool mutable_config=true);

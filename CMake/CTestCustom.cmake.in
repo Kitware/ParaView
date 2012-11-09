@@ -66,6 +66,12 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # Ignore clang warning when taking c++ file in c mode has they have .c extension
   "clang.*warning.*treating.*input as.*when in.*mode, this behavior is deprecated"
 
+  # Ignore empty link error
+  "/usr/bin/ld.*warning.*init_array section has zero size"
+
+  # Ignore Mac link error about read_only_relocs
+  "ld.*warning.*read_only_relocs cannot be used with x86_64"
+
   # exclude warning from MantaView  plugin
   "MantaView.VTK"
   "manta"

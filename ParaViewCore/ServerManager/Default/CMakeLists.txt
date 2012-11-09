@@ -46,16 +46,12 @@ set (Module_SRCS
   vtkSMGL2PSExporterProxy.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMMultiServerSourceProxy.cxx
-  vtkSMNullProxy.cxx
   vtkSMPropertyModificationUndoElement.cxx
   vtkSMProxyConfigurationReader.cxx
   vtkSMProxyConfigurationWriter.cxx
   vtkSMPSWriterProxy.cxx
-  vtkSMPWriterProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
   vtkSMTesting.cxx
-  vtkSMTimeKeeper.cxx
-  vtkSMTimeKeeperProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

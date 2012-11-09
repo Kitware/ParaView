@@ -23,6 +23,7 @@ vtk_module(vtkPVClientServerCoreCore
     # of vtkPVVTKExtensionsCore off but still satisfy API dependcy.
     vtkPVCommon
     vtkPVVTKExtensionsCore
+    vtkPVCommon
     ${__dependencies}
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 

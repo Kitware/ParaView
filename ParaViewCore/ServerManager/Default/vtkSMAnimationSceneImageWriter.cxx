@@ -65,6 +65,7 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
   this->Magnification = 1;
   this->ErrorCode = 0;
   this->Quality = 2; // 0 = low, 1 = medium, 2 = high
+  this->Compression = true;
 #ifdef PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
   this->Subsampling = 1;
 #else
@@ -349,6 +350,7 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     {
     vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
     aviwriter->SetQuality(this->Quality);
+    aviwriter->SetCompression(this->Compression);
     aviwriter->SetRate(
       static_cast<int>(this->GetFrameRate()));
     mwriter = aviwriter;
@@ -436,6 +438,7 @@ void vtkSMAnimationSceneImageWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Quality: " << this->Quality << endl;
+  os << indent << "Compression: " << (this->Compression?"on":"off") << endl;
   os << indent << "Magnification: " << this->Magnification << endl;
   os << indent << "Subsampling: " << this->Subsampling << endl;
   os << indent << "ErrorCode: " << this->ErrorCode << endl;

@@ -73,6 +73,7 @@ set (Module_SRCS
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutputPort.cxx
+  vtkSMPWriterProxy.cxx
   vtkSMPipelineState.cxx
   vtkSMPluginLoaderProxy.cxx
   vtkSMPluginManager.cxx
@@ -118,6 +119,9 @@ set (Module_SRCS
   vtkSMVectorProperty.cxx
   vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
+  vtkSMTimeKeeper.cxx
+  vtkSMTimeKeeperProxy.cxx
+  vtkSMNullProxy.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

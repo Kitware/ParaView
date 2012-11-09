@@ -202,17 +202,21 @@ vtkPVDataSetAttributesInformation
     arrayIndx = sortArays[idx].arrayIndx;
     vtkAbstractArray* const array = da->GetAbstractArray( arrayIndx );
 
-    if (array->GetName() && 
+    if (array->GetName() &&
         strcmp(array->GetName(),"vtkGhostLevels") != 0 &&
         strcmp(array->GetName(), "vtkOriginalCellIds") != 0 &&
         strcmp(array->GetName(), "vtkOriginalPointIds") != 0)
       {
+      attribute = da->IsArrayAnAttribute( arrayIndx );
       vtkPVArrayInformation *info = vtkPVArrayInformation::New();
       info->CopyFromObject(array);
+      if (attribute == vtkDataSetAttributes::SCALARS)
+        {
+        info->CopyUniqueValuesFromObject(array);
+        }
       this->ArrayInformation->AddItem(info);
       info->Delete();
       // Record default attributes.
-      attribute = da->IsArrayAnAttribute( arrayIndx );
       if (attribute > -1)
         {
         this->AttributeIndices[attribute] = infoArrayIndex;

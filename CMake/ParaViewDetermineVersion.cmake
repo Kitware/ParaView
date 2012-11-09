@@ -36,7 +36,7 @@ function(determine_version source_dir git_command var_prefix)
   set (full)
   set (patch_extra)
 
-  if (EXISTS ${git_command})
+  if(NOT PARAVIEW_GIT_DESCRIBE AND EXISTS ${git_command})
     execute_process(
       COMMAND ${git_command} describe
       WORKING_DIRECTORY ${source_dir}
@@ -45,17 +45,21 @@ function(determine_version source_dir git_command var_prefix)
       ERROR_QUIET
       OUTPUT_STRIP_TRAILING_WHITESPACE
       ERROR_STRIP_TRAILING_WHITESPACE)
-    if (${result} EQUAL 0)
-      string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
-        version_matches ${output})
-      if (CMAKE_MATCH_0)
-        message(STATUS "Determined Source Version : ${CMAKE_MATCH_0}")
-        set (full ${CMAKE_MATCH_0})
-        set (major ${CMAKE_MATCH_1})
-        set (minor ${CMAKE_MATCH_2})
-        set (patch ${CMAKE_MATCH_3})
-        set (patch_extra ${CMAKE_MATCH_4})
-      endif()
+  else()
+    set(result 0)
+    set(output ${PARAVIEW_GIT_DESCRIBE})
+  endif()
+
+  if (${result} EQUAL 0)
+    string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
+      version_matches ${output})
+    if (CMAKE_MATCH_0)
+      message(STATUS "Determined Source Version : ${CMAKE_MATCH_0}")
+      set (full ${CMAKE_MATCH_0})
+      set (major ${CMAKE_MATCH_1})
+      set (minor ${CMAKE_MATCH_2})
+      set (patch ${CMAKE_MATCH_3})
+      set (patch_extra ${CMAKE_MATCH_4})
     endif()
   endif()
 

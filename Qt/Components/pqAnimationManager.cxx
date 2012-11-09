@@ -519,6 +519,7 @@ bool pqAnimationManager::saveAnimation()
       stereo = 0;
       }
     }
+  bool compression = (dialogUI.compression->checkState() == Qt::Checked);
 
   // Now obtain filename for the animation.
   vtkSmartPointer<vtkPVServerInformation> serverInfo;
@@ -634,6 +635,7 @@ bool pqAnimationManager::saveAnimation()
     vtkSMPropertyHelper(writer, "FileName").Set(filename.toAscii().data());
     vtkSMPropertyHelper(writer, "Magnification").Set(magnification);
     vtkSMPropertyHelper(writer, "FrameRate").Set(dialogUI.frameRate->value());
+    vtkSMPropertyHelper(writer, "Compression").Set(compression);
     writer->UpdateVTKObjects();
     writer->Delete();
 
@@ -689,6 +691,7 @@ bool pqAnimationManager::saveAnimation()
   writer->SetMagnification(magnification);
   writer->SetAnimationScene(sceneProxy);
   writer->SetFrameRate(dialogUI.frameRate->value());
+  writer->SetCompression(compression);
 
   pqProgressManager* progress_manager = 
     pqApplicationCore::instance()->getProgressManager();

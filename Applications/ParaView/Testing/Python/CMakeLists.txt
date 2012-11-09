@@ -73,23 +73,26 @@ endif()
 ENDIF (PARAVIEW_DATA_ROOT)
 
 # Python Multi-servers test
-add_test(NAME py-multi-servers.TestMultiServersConfig
+# => Only for shared build as we dynamically load plugins
+if(BUILD_SHARED_LIBS)
+  add_test(NAME py-multi-servers.TestMultiServersConfig
     COMMAND smTestDriver
     --test-multi-servers 2
     --server $<TARGET_FILE:pvserver>
     --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersConfig.py
-)
+  )
 
-add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
+  add_test(NAME py-multi-servers.TestMultiServersRemoteProxy
     COMMAND smTestDriver
     --test-multi-servers 3
     --server $<TARGET_FILE:pvserver>
     --client $<TARGET_FILE:pvpython>
     ${CMAKE_CURRENT_SOURCE_DIR}/TestMultiServersRemoteProxy.py
-)
+  )
 
-set_tests_properties(
-  py-multi-servers.TestMultiServersConfig
-  py-multi-servers.TestMultiServersRemoteProxy
-  PROPERTIES LABELS "PARAVIEW")
+  set_tests_properties(
+    py-multi-servers.TestMultiServersConfig
+    py-multi-servers.TestMultiServersRemoteProxy
+    PROPERTIES LABELS "PARAVIEW")
+endif(BUILD_SHARED_LIBS)

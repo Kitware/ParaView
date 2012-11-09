@@ -42,7 +42,6 @@ if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND Module_SRCS
     vtkAnnotateGlobalDataFilter.cxx
     vtkPythonCalculator.cxx
-    vtkPythonAnnotationFilter.cxx
     )
 endif()
 

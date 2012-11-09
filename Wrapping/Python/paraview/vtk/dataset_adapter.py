@@ -140,6 +140,9 @@ class DataSetAttributes(VTKObjectWrapper):
         "Given an index or name, returns a VTKArray."
         vtkarray = self.VTKObject.GetArray(idx)
         if not vtkarray:
+            vtkarray = self.VTKObject.GetAbstractArray(idx)
+            if vtkarray:
+                return vtkarray
             return None
         array = vtkDataArrayToVTKArray(vtkarray, self.DataSet())
         array.Association = self.Association

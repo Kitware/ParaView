@@ -92,7 +92,7 @@ endforeach()
 # Add link-dependencies on all wrapping classes.
 target_link_libraries(vtkPVServerManagerApplication
   LINK_PRIVATE ${_dependencies}
-  LINK_PUBLIC vtkPVServerManagerDefault)
+  LINK_PUBLIC vtkPVServerManagerCore)
 
 #------------------------------------------------------------------------------
 # Setup SM xmls. 

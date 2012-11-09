@@ -4,9 +4,11 @@ The book content is automatically generated.
 Instead make your changes online at:
   http://paraview.org/Wiki/ParaView/Users_Guide/Table_Of_Contents
 
-Download in ODT format.
-Open with OpenOffice and export to HTML.
+Download each page that you want to export in ODT format inside a directory ${ODT_DIR}
+Then
+$ git clone git://kwsource.kitwarein.com/miscellaneousprojectsuda/odt_to_html_converter.git odt2html
+$ cd odt2html
+$ ./convert.sh ${ODT_DIR} ${paraview_version}
 
-batch convert png images to jpg
-change references accordingly in html
-split book into chapters
+Then replace the content of the Book directory by the one generated inside 
+> odt2html/Doc/${paraview_version}/Book

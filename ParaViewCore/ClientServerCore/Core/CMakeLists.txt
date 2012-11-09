@@ -82,6 +82,7 @@ if (PARAVIEW_ENABLE_PYTHON)
     vtkPythonAnimationCue.cxx
     vtkPythonExtractSelection.cxx
     vtkPythonProgrammableFilter.cxx
+    vtkPythonAnnotationFilter.cxx
     )
 endif()
 
