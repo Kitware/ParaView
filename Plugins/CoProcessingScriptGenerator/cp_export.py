@@ -74,6 +74,9 @@ def DoCoProcessing(datadescription):
     # Load the Pipeline if not created yet
     if not pipeline:
        pipeline = CreatePipeline(datadescription)
+    else:
+      # update to the new input and time
+      UpdateProducers(datadescription)
 
     # Write output data
     WriteAllData(datadescription, cp_writers, timestep);
