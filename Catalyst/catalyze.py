@@ -145,6 +145,14 @@ def create_cmake_script(config, manifest):
   for key, value in cmake_cache(config, manifest).items():
     cmake_script += '  -D%s=%s \\\n' % (key, value)
 
+  # add ParaView git describe so the build has the correct version
+  try:
+    version = subprocess.check_output(['git', 'describe'], cwd=config.repo)
+  except subprocess.CalledProcessError as err:
+    error(err)
+
+  cmake_script+='  -DPARAVIEW_GIT_DESCRIBE="%s" \\\n' % version.strip()
+
   cmake_script += ' $@\n'
 
   file = config.output_dir + '/cmake.sh'

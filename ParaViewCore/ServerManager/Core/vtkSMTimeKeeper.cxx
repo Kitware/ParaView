@@ -21,7 +21,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMViewProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 
 #include <set>
@@ -31,7 +31,7 @@
 class vtkSMTimeKeeper::vtkInternal
 {
 public:
-  typedef std::set<vtkSmartPointer<vtkSMViewProxy> > ViewsType;
+  typedef std::set<vtkSmartPointer<vtkSMProxy> > ViewsType;
   ViewsType Views;
 
   typedef std::set<vtkSmartPointer<vtkSMSourceProxy> > SourcesType;
@@ -89,7 +89,7 @@ vtkSMTimeKeeper::~vtkSMTimeKeeper()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTimeKeeper::AddView(vtkSMViewProxy* view)
+void vtkSMTimeKeeper::AddView(vtkSMProxy* view)
 {
   if (view)
     {
@@ -109,7 +109,7 @@ void vtkSMTimeKeeper::AddView(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTimeKeeper::RemoveView(vtkSMViewProxy* view)
+void vtkSMTimeKeeper::RemoveView(vtkSMProxy* view)
 {
   if (view)
     {
@@ -169,7 +169,7 @@ void vtkSMTimeKeeper::SetTime(double time)
     for (iter = this->Internal->Views.begin();
       iter != this->Internal->Views.end(); ++iter)
       {
-      vtkSMViewProxy* view = (*iter);
+      vtkSMProxy* view = (*iter);
       if (view)
         {
         vtkSMDoubleVectorProperty* dvp =

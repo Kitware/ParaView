@@ -19,10 +19,10 @@
 #ifndef __vtkSMNullProxy_h
 #define __vtkSMNullProxy_h
 
-#include "vtkPVServerManagerDefaultModule.h" //needed for exports
+#include "vtkPVServerManagerCoreModule.h" //needed for exports
 #include "vtkSMProxy.h"
 
-class VTKPVSERVERMANAGERDEFAULT_EXPORT vtkSMNullProxy : public vtkSMProxy
+class VTKPVSERVERMANAGERCORE_EXPORT vtkSMNullProxy : public vtkSMProxy
 {
 public:
   static vtkSMNullProxy* New();
