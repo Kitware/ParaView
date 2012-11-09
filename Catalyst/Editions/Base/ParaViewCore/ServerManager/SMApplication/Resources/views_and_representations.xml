@@ -1,0 +1,10 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="views">
+  </ProxyGroup>
+  <ProxyGroup name="representations">
+  </ProxyGroup>
+  <ProxyGroup name="views">
+  </ProxyGroup>
+  <ProxyGroup name="internal_representations">
+  </ProxyGroup>
+</ServerManagerConfiguration>

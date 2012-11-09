@@ -1,0 +1,3 @@
+vtkTransferFunctionViewer GetWholeScalarRange             307 2
+vtkTransferFunctionViewer GetVisibleScalarRange           307 2
+vtkTransferFunctionEditorRepresentationsSimple1D GetHandleDisplayPosition 307 2
