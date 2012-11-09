@@ -189,9 +189,6 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
 
           // invert the matrix
           this->InitialInvertedPose->Invert();
-          double modelTransformMatrix[16];
-          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(
-                modelTransformMatrix, 16);
 
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Get(this->Origin,
@@ -210,6 +207,23 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
 
           vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
                                     this->InitialInvertedPose.GetPointer(),
+                                    transformMatrix.GetPointer());
+
+          // Get the current model transform matrix to get the orientation
+          double matrix[16];
+          vtkNew<vtkMatrix4x4> modelTransformMatrix;
+          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(
+                matrix, 16);
+          modelTransformMatrix->DeepCopy(matrix);
+
+          // We need only the rotation component
+          modelTransformMatrix->SetElement(0, 3, 0.0);
+          modelTransformMatrix->SetElement(1, 3, 0.0);
+          modelTransformMatrix->SetElement(2, 3, 0.0);
+
+          // Now put the transform in new coordinate frame
+          vtkMatrix4x4::Multiply4x4(modelTransformMatrix.GetPointer(),
+                                    transformMatrix.GetPointer(),
                                     transformMatrix.GetPointer());
 
           double* transformedPoints = transformMatrix->MultiplyDoublePoint(this->Origin);
