@@ -49,13 +49,12 @@ void vtkPVGL2PSExporter::WriteData()
   vtkStdString tmpFilePrefix (this->FileName + ".pvtmp");
   this->SetFilePrefix(tmpFilePrefix.c_str());
 
-  // Add cubeaxes actors to raster exclusions if requested
-  if (this->Write3DPropsAsRasterImage != 0 &&
-      this->ExcludeCubeAxesActorsFromRasterization != 0)
+  // Setup raster exclusions if needed
+  if (this->Write3DPropsAsRasterImage != 0)
     {
     if (this->RasterExclusions == NULL)
       {
-      vtkNew<vtkProp3DCollection> coll;
+      vtkNew<vtkPropCollection> coll;
       this->SetRasterExclusions(coll.GetPointer());
       }
 
@@ -67,12 +66,24 @@ void vtkPVGL2PSExporter::WriteData()
       vtkActor *actor;
       for (actorCol->InitTraversal(); (actor = actorCol->GetNextItem());)
         {
-        if (actor->IsA("vtkCubeAxesActor"))
+        // Add cubeaxes actors to raster exclusions if requested
+        if (this->ExcludeCubeAxesActorsFromRasterization != 0 &&
+            actor->IsA("vtkCubeAxesActor") &&
+            !this->RasterExclusions->IsItemPresent(actor))
           {
-          if (!this->RasterExclusions->IsItemPresent(actor))
-            {
-            this->RasterExclusions->AddItem(actor);
-            }
+          this->RasterExclusions->AddItem(actor);
+          }
+        }
+
+      vtkPropCollection *viewProps = ren->GetViewProps();
+      vtkProp *prop;
+      for (viewProps->InitTraversal(); (prop = viewProps->GetNextProp());)
+        {
+        // Always exclude instances of PVAxesActor from rasterization
+        if (prop->IsA("vtkPVAxesActor") &&
+            !this->RasterExclusions->IsItemPresent(prop))
+          {
+          this->RasterExclusions->AddItem(prop);
           }
         }
       }
@@ -101,8 +112,14 @@ void vtkPVGL2PSExporter::WriteData()
       tmpFileName += ".svg";
       break;
     }
+  if (this->Compress)
+    {
+    tmpFileName += ".gz";
+    }
 
-  int result = std::rename(tmpFileName.c_str(), this->FileName.c_str());
+  int result = this->Compress
+      ? std::rename(tmpFileName.c_str(), (this->FileName + ".gz").c_str())
+      : std::rename(tmpFileName.c_str(), this->FileName.c_str());
 
   if (result != 0)
     {
