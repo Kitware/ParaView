@@ -204,7 +204,7 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Get(this->Normal,
                                                                 3);
-          this->Normal[3] = 0;
+          this->Normal[3] = 1;
           this->InitialOrientationRecorded = true;
           }
         else
@@ -223,7 +223,7 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
           normal[0] = transformedPoint[0] / transformedPoint[3];
           normal[1] = transformedPoint[1] / transformedPoint[3];
           normal[2] = transformedPoint[2] / transformedPoint[3];
-          normal[3] = 0.0;
+          normal[3] = 1.0;
 
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Set(normal, 3);

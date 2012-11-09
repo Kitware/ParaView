@@ -181,9 +181,9 @@ void vtkVRControlSlicePositionStyle::HandleTracker( const vtkVREventData& data )
         {
         if (!this->InitialPositionRecorded)
           {
-      // Copy the data into matrix
-        this->InitialInvertedPose->Identity();
-      this->InitialInvertedPose->SetElement(0, 3, data.data.tracker.matrix[3]);
+          // Copy the data into matrix
+          this->InitialInvertedPose->Identity();
+          this->InitialInvertedPose->SetElement(0, 3, data.data.tracker.matrix[3]);
           this->InitialInvertedPose->SetElement(1, 3, data.data.tracker.matrix[7]);
           this->InitialInvertedPose->SetElement(2, 3, data.data.tracker.matrix[11]);
 
