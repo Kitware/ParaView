@@ -951,10 +951,21 @@
         animation scene at all. In other words, this is the playback frame rate
         and not the animation generation frame rate.</Documentation>
       </DoubleVectorProperty>
+      <IntVectorProperty command="SetCompression"
+                         default_values="1"
+                         name="Compression"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation> Turns on(the default) or off compression for FFMEG
+         (AVI on Linux and Mac) backend.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Property name="Input"
                   show="0" />
         <Property name="FileName"
+                  show="0" />
+        <Property name="Compression"
                   show="0" />
       </Hints>
       <!-- End of AnimationSceneImageWriter -->
