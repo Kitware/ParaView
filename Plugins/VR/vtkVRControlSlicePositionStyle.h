@@ -64,16 +64,9 @@ protected:
   void HandleButton(const vtkVREventData& data);
   void HandleTracker(const vtkVREventData& data);
 
-  void RecordCurrentPosition(const vtkVREventData& data);
-
   bool Enabled;
   bool InitialPositionRecorded;
-  double InitialPos[3];
   double Origin[4];
-
-  vtkNew<vtkTransform> Old;
-  vtkNew<vtkTransform> Tx;
-  vtkNew<vtkTransform> Neo;
   vtkNew<vtkMatrix4x4> InitialInvertedPose;
 
 private:

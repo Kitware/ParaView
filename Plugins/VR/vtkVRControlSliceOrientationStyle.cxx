@@ -39,15 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkVRQueue.h"
-#include <iostream>
-#include <sstream>
-#include <algorithm>
+#include "vtkMatrix4x4.h"
+#include "vtkMath.h"
+#include "vtkNew.h"
+
 #include "pqView.h"
 #include "pqActiveObjects.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkMatrix4x4.h"
-#include "vtkMath.h"
+
+#include <iostream>
+#include <sstream>
+#include <algorithm>
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRControlSliceOrientationStyle)
@@ -138,19 +141,12 @@ vtkPVXMLElement* vtkVRControlSliceOrientationStyle::SaveConfiguration() const
 // ----------------------------------------------------------------------------
 bool vtkVRControlSliceOrientationStyle::Update()
 {
-  pqView *view = 0;
-  vtkSMRenderViewProxy *proxy =0;
-  view = pqActiveObjects::instance().activeView();
-  if (view)
+  if (!this->ControlledProxy)
     {
-    proxy = vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
-    if (proxy)
-      {
-      this->ControlledProxy->UpdateVTKObjects();
-      proxy->UpdateVTKObjects();
-      }
+    return false;
     }
-  return false;
+
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -158,6 +154,12 @@ void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 {
   if (data.name.compare(this->ButtonName) == 0)
     {
+    if (this->Enabled && data.data.button.state == 0)
+      {
+      this->ControlledProxy->UpdateVTKObjects();
+      this->InitialOrientationRecorded = false;
+      }
+
     this->Enabled = data.data.button.state;
     }
 }
@@ -191,22 +193,14 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
         if (!this->InitialOrientationRecorded)
           {
           // Copy the data into matrix
-          for (int i = 0; i < 4; ++i)
-            {
-            for (int j = 0; j < 4; ++j)
-              {
-              this->InitialInvertedPose->SetElement(
-                    i, j, data.data.tracker.matrix[i*4+j]);
-              }
-            }
-          // invert the matrix
+          this->InitialInvertedPose->DeepCopy(data.data.tracker.matrix);
+          this->InitialInvertedPose->SetElement(0, 3, 0.0);
+          this->InitialInvertedPose->SetElement(1, 3, 0.0);
+          this->InitialInvertedPose->SetElement(2, 3, 0.0);
+
+          // Invert the matrix
           this->InitialInvertedPose->Invert();
-          double modelTransformMatrix[16];
-          vtkSMPropertyHelper(proxy, "ModelTransformMatrix").Get(
-                modelTransformMatrix, 16);
-          vtkMatrix4x4::Multiply4x4(&this->InitialInvertedPose->Element[0][0],
-                                    modelTransformMatrix,
-                                    &this->InitialInvertedPose->Element[0][0]);
+
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Get(this->Normal,
                                                                 3);
@@ -215,13 +209,22 @@ void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data
           }
         else
           {
-          double modelTransformMatrix[16];
+          vtkNew<vtkMatrix4x4> transformMatrix;
+          transformMatrix->DeepCopy(data.data.tracker.matrix);
+          transformMatrix->SetElement(0, 3, 0.0);
+          transformMatrix->SetElement(1, 3, 0.0);
+          transformMatrix->SetElement(2, 3, 0.0);
+
           double normal[4];
-          vtkMatrix4x4::Multiply4x4(data.data.tracker.matrix,
-                                    &this->InitialInvertedPose->Element[0][0],
-                                    modelTransformMatrix);
-          vtkMatrix4x4::MultiplyPoint(modelTransformMatrix, this->Normal,
-                                      normal);
+          vtkMatrix4x4::Multiply4x4(transformMatrix.GetPointer(),
+                                    this->InitialInvertedPose.GetPointer(),
+                                    transformMatrix.GetPointer());
+          double* transformedPoint = transformMatrix->MultiplyDoublePoint(this->Normal);
+          normal[0] = transformedPoint[0] / transformedPoint[3];
+          normal[1] = transformedPoint[1] / transformedPoint[3];
+          normal[2] = transformedPoint[2] / transformedPoint[3];
+          normal[3] = 0.0;
+
           vtkSMPropertyHelper(this->ControlledProxy,
                               this->ControlledPropertyName).Set(normal, 3);
           }
