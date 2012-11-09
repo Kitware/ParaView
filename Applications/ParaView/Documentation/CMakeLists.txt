@@ -27,11 +27,12 @@ build_help_project(paraview
   TABLE_OF_CONTENTS
     "<toc>
        <section title=\"ParaView User Manual\" ref=\"index.html\">
-         <section title=\"Introduction\" ref=\"Book/Book_Chapter1.html\"/>
-         <section title=\"Python Calculator\" ref=\"Book/Book_PythonCalculator.html\"/>
-         <section title=\"Query Data\" ref=\"Book/Book_Chapter6.html\"/>
-         <section title=\"Plugins\" ref=\"Book/Book_Chapter16.html\"/>
-         <section title=\"Appendices\" ref=\"Book/Book_Chapter17.html\"/>
+         <section title=\"Introduction\" ref=\"Book/Book_Chapter_01_Intro.html\"/>
+         <section title=\"Python Calculator\" ref=\"Book/Book_Chapter_06_PythonCalculator.html\"/>
+         <section title=\"Display Data\" ref=\"Book/Book_Chapter_04_DisplayData.html\"/>
+         <section title=\"Query Data\" ref=\"Book/Book_Chapter_06_findData.html\"/>
+         <section title=\"Plugins\" ref=\"Book/Book_Chapter_16_Plugins.html\"/>
+         <section title=\"Appendices\" ref=\"Book/Book_Chapter_17_Appendix.html\"/>
          <section title=\"Sources\" ref=\"Sources.html\"/>
          <section title=\"Filters\" ref=\"Filters.html\"/>
          <section title=\"Readers\" ref=\"Readers.html\"/>
