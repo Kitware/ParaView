@@ -511,7 +511,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
       pqView* view = viewInfo->getView();
       QSize viewSize = view->getSize();
       vtkSMViewProxy* viewProxy = view->getViewProxy();
-      QString info = QString(" '%1' : ['%2', '%3', '%4', '%5', '%6', '%7'],").
+      QString info = QString(" '%1' : ['%2', %3, '%4', '%5', '%6', '%7'],").
         arg(proxyManager->GetProxyName("views", viewProxy)).
         arg(viewInfo->getImageFileName()).arg(viewInfo->getWriteFrequency()).
         arg(static_cast<int>(viewInfo->fitToScreen())).
