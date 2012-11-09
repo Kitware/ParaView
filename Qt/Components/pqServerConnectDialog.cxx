@@ -630,6 +630,7 @@ void pqServerConnectDialog::deleteServer()
     {
     pqApplicationCore::instance()->serverConfigurations().removeConfiguration(
       config.name());
+    pqApplicationCore::instance()->serverConfigurations().saveNow();
     }
 }
 
