@@ -44,7 +44,9 @@ vtk_module_third_party(protobuf
 # build-dir targets ourselves.
 vtk_target_export(protobuf)
 vtk_target_export(protobuf-lite)
-vtk_compile_tools_target_export(protoc_compiler)
+if (NOT CMAKE_CROSSCOMPILING)
+  vtk_compile_tools_target_export(protoc_compiler)
+endif()
 
 # All these exports don't add any install rules. However we make protobuf itself
 # install components at the right location by setting PROTOBUF_INSTALL_*
