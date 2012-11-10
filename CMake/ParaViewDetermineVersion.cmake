@@ -50,7 +50,7 @@ function(determine_version source_dir git_command var_prefix)
     set(output ${PARAVIEW_GIT_DESCRIBE})
   endif()
 
-  if (${result} EQUAL 0)
+  if (${result} EQUAL 0 AND output)
     string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)[-]*(.*)"
       version_matches ${output})
     if (CMAKE_MATCH_0)
