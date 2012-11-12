@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidget.h"
 #include "pqIntRangeWidget.h"
 #include "pqSignalAdaptors.h"
+#include "pqTreeWidgetSelectionHelper.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 
 #include <QLineEdit>
@@ -117,6 +118,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     pqSignalAdaptorCompositeTreeWidget *adaptor =
       new pqSignalAdaptorCompositeTreeWidget(treeWidget, ivp);
+    adaptor->setObjectName("CompositeTreeAdaptor");
+
+    pqTreeWidgetSelectionHelper* helper =
+      new pqTreeWidgetSelectionHelper(treeWidget);
+    helper->setObjectName("CompositeTreeSelectionHelper");
 
     this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), ivp);
 
