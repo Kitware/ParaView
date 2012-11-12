@@ -596,9 +596,9 @@ void vtkChartRepresentation::FillTableList(vtkMultiBlockDataSet* tree, std::vect
       {
       blockName << currentPath << "DataSet " << i;
       }
-    else if(subTree != NULL)
+    else
       {
-      blockName << currentPath << "Block " << i << "/";
+      blockName << currentPath << "Block " << i;
       }
 
     // register the table if found
@@ -614,6 +614,7 @@ void vtkChartRepresentation::FillTableList(vtkMultiBlockDataSet* tree, std::vect
     // Go deeper
     if(subTree != NULL)
       {
+      blockName << "/";
       this->FillTableList(subTree, tables, blockNames, blockName.str().c_str());
       }
     }
