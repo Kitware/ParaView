@@ -103,7 +103,11 @@ pqGenericSummaryDisplayPanel::pqGenericSummaryDisplayPanel(pqRepresentation *rep
     QAction *scalarBarAction = new QAction(this);
     connect(scalarBarButton, SIGNAL(clicked(bool)), scalarBarAction, SLOT(trigger()));
     buttonLayout->addWidget(scalarBarButton);
-    new pqScalarBarVisibilityReaction(scalarBarAction);
+    pqScalarBarVisibilityReaction *scalarBarReaction =
+      new pqScalarBarVisibilityReaction(scalarBarAction);
+    connect(scalarBarReaction, SIGNAL(enableStateToggled(bool)),
+            scalarBarButton, SLOT(setEnabled(bool)));
+    scalarBarReaction->updateEnableState();
 
     // edit color map button
     QPushButton *editColorMapButton = new QPushButton(QIcon(QString(":/pqWidgets/Icons/pqEditColor24.png")), "Edit", this);
