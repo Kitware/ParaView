@@ -12,6 +12,7 @@
 include(ExternalProject)
 
 set(SUPERBUILD_DOWNLOAD_BASE_URL "http://www.paraview.org/files/nightly")
+set(PV_NIGHTLY_VERSION "3.98.0-RC2")
 set(PV_NIGHTLY_PARAVIEW "")
 set(PV_NIGHTLY_PVPYTHON "")
 set(PV_NIGHTLY_PVSERVER "")
@@ -25,8 +26,7 @@ set(PV_NIGHTLY_PVRENDERSERVER "")
 # ---------------------------------
 
 if(UNIX AND NOT APPLE)
-    set(paraview_nightly_server_filename "ParaView-${PARAVIEW_VERSION_FULL}-Linux-${PARAVIEW_BUILD_ARCHITECTURE}bit.tar-NIGHTLY.gz")
-
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Linux-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.tar.gz")
     ExternalProject_Add( Nightly-ParaView
        URL "${SUPERBUILD_DOWNLOAD_BASE_URL}/${paraview_nightly_server_filename}"
        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly
@@ -38,13 +38,13 @@ if(UNIX AND NOT APPLE)
     )
 
     # Setup Unix specific path
-    set(PV_NIGHTLY_PARAVIEW "")
-    set(PV_NIGHTLY_PVPYTHON "")
-    set(PV_NIGHTLY_PVSERVER "")
-    set(PV_NIGHTLY_PVBATCH  "")
-    set(PV_NIGHTLY_PVBLOT   "")
-    set(PV_NIGHTLY_PVDATASERVER   "")
-    set(PV_NIGHTLY_PVRENDERSERVER "")
+    set(PV_NIGHTLY_PARAVIEW "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/paraview")
+    set(PV_NIGHTLY_PVPYTHON "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvpython")
+    set(PV_NIGHTLY_PVSERVER "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvserver")
+    set(PV_NIGHTLY_PVBATCH  "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvbatch")
+    set(PV_NIGHTLY_PVBLOT   "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvblot")
+    set(PV_NIGHTLY_PVDATASERVER   "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvdataserver")
+    set(PV_NIGHTLY_PVRENDERSERVER "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvrenderserver")
 
 endif()
 
@@ -53,7 +53,7 @@ endif()
 # ---------------------------------
 
 if(APPLE)
-    set(paraview_nightly_server_filename "ParaView-${PARAVIEW_VERSION_FULL}-Darwin-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.dmg")
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Darwin-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.dmg")
     set(paraview_nightly_filePath ${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/PVNightly.dmg)
 
     if(NOT EXISTS ${paraview_nightly_filePath})
@@ -108,7 +108,7 @@ endif()
 # ---------------------------------
 
 if(WIN32 OR WIN64)
-    set(paraview_nightly_server_filename "ParaView-${PARAVIEW_VERSION_FULL}-Windows-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.zip")
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Windows-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.zip")
 
     ExternalProject_Add( Nightly-ParaView
        URL "${SUPERBUILD_DOWNLOAD_BASE_URL}/${paraview_nightly_server_filename}"
