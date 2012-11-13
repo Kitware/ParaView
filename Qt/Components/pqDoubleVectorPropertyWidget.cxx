@@ -93,7 +93,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
       this->setReason() << "pqScalarValueListPropertyWidget for a repeatable "
                            "DoubleVectorProperty with a BoundsDomain ("  <<
-                           range->GetXMLName() << ") ";
+                           pqPropertyWidget::getXMLName(range) << ") ";
       }
     else if(dvp->GetNumberOfElements() == 1 &&
             range->GetMinimumExists(0) &&
@@ -112,7 +112,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
       this->setReason() << "pqDoubleRangeWidget for an DoubleVectorProperty "
                         << "with a single element and a "
-                        << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                        << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                         << "with a minimum and a maximum";
       }
     else
@@ -145,7 +145,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
         this->setReason() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
                           << "with an "
-                          << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                           << "and 6 elements";
         }
       else
@@ -161,7 +161,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
         this->setReason() << "List of QLineEdit's for an DoubleVectorProperty "
                           << "with an "
-                          << "DoubleRangeDomain (" << range->GetXMLName() << ") "
+                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
                           << "and more than one element";
         }
       }

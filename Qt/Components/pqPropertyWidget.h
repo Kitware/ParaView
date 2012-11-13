@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
+#include <string>
 #include <sstream>
 
 #include <QWidget>
@@ -44,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqView;
 class vtkSMProxy;
+class vtkSMDomain;
 class vtkSMProperty;
 
 class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
@@ -62,6 +64,23 @@ public:
   vtkSMProperty* property() const;
 
   bool showLabel() const;
+
+  // Description:
+  // This static utility method returns the XML name for an object as
+  // a std::string. This allows for code to get the XML name of an object
+  // without having to explicitly check for a possibly NULL char* pointer.
+  //
+  // This is templated so that it will work with a variety of objects such
+  // as vtkSMProperty's and vtkSMDomain's. It can be called with anything
+  // that has a "char* GetXMLName()" method.
+  //
+  // For example, to get the XML name of a vtkSMIntRangeDomain:
+  // std::string name = pqPropertyWidget::getXMLName(domain);
+  template<class T>
+  static std::string getXMLName(T *object)
+  {
+    return object->GetXMLName() ? object->GetXMLName() : std::string();
+  }
 
 signals:
   /// This signal is emitted when the widget's value is changed by the user.
