@@ -19,7 +19,7 @@ ENDMACRO (process_args)
 SET (TEST_GROUP_SIZE 3)
 
 FUNCTION (add_pv_test prefix skip_test_flag_suffix)
-  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LABELS" "" ${ARGN})
+  PV_PARSE_ARGUMENTS(ACT "TEST_SCRIPTS;BASELINE_DIR;COMMAND;LABELS;DATA_DIR" "" ${ARGN})
   while (ACT_TEST_SCRIPTS)
     set (counter 0)
     set (extra_args)
@@ -52,6 +52,9 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
             if (NOT DEFINED ${test_name}_USE_NEW_PANELS)
               set (extra_args ${extra_args} "--use-old-panels")
             endif ()
+            if(ACT_DATA_DIR)
+              set (extra_args ${extra_args} "--data-directory=${ACT_DATA_DIR}")
+            endif()
           endif (NOT ${test_name}${skip_test_flag_suffix})
         endif (${counter} LESS 100000)
       endif (num_tests)
@@ -80,7 +83,7 @@ FUNCTION (add_pv_test prefix skip_test_flag_suffix)
       # to instruct cmake to run just the ParaView tests with the '-L' flag
       list(LENGTH ACT_LABELS num_labels)
       if (num_labels)
-         set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS ${ACT_LABELS})
+         set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "${ACT_LABELS}")
       else()
          set_tests_properties("${prefix}${full_test_name}" PROPERTIES LABELS "PARAVIEW")
       endif()
@@ -105,7 +108,7 @@ FUNCTION (add_client_tests prefix)
             -dr
             --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}/NightlyTest
-        LABELS "PV_NIGHTLY_BINARY"
+        LABELS "PV_NIGHTLY_BINARY;PARAVIEW"
         ${ARGN})
   endif(NIGHTLY_BINARY_TESTING)
 ENDFUNCTION (add_client_tests)
@@ -128,7 +131,7 @@ FUNCTION (add_client_server_tests prefix)
             -dr
             --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}/NightlyTest
-        LABELS "PV_NIGHTLY_BINARY"
+        LABELS "PV_NIGHTLY_BINARY;PARAVIEW"
         ${ARGN})
   endif(NIGHTLY_BINARY_TESTING)
 ENDFUNCTION (add_client_server_tests)
@@ -153,7 +156,7 @@ FUNCTION (add_client_render_server_tests prefix)
             -dr
             --disable-light-kit
             --test-directory=${PARAVIEW_TEST_DIR}/NightlyTest
-        LABELS "PV_NIGHTLY_BINARY"
+        LABELS "PV_NIGHTLY_BINARY;PARAVIEW"
         ${ARGN})
   endif(NIGHTLY_BINARY_TESTING)
 ENDFUNCTION (add_client_render_server_tests)

@@ -617,11 +617,13 @@ IF (PARAVIEW_DATA_ROOT)
   add_client_tests("pv"
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    DATA_DIR     ${PARAVIEW_DATA_ROOT}
   )
 
   add_client_server_tests("pvcs"
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    DATA_DIR     ${PARAVIEW_DATA_ROOT}
   )
 
   add_client_server_tests("pvcs"
@@ -632,6 +634,7 @@ IF (PARAVIEW_DATA_ROOT)
     add_client_render_server_tests("pvcrs"
       BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline
       TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+      DATA_DIR     ${PARAVIEW_DATA_ROOT}
     )
 
     add_client_render_server_tests("pvcrs"

@@ -333,6 +333,10 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
+  # Create testing dir for nightly build if needed
+  if(NIGHTLY_BINARY_TESTING)
+      make_directory(${PARAVIEW_TEST_DIR}/NightlyTest)
+  endif()
 endif()
 
 # Setup default state for ParaView module groups.
