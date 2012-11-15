@@ -176,8 +176,9 @@ void pqColorScaleEditorForm::updateInterpretation( bool indexedLookup )
   this->ColorTabs->setTabEnabled( PQ_COLORS_PAGE, ! indexedLookup );
   this->UseLogScaleSimple->setDisabled( indexedLookup );
   this->UseAutoRescaleSimple->setDisabled( indexedLookup );
-  this->SimpleMin->setDisabled( indexedLookup );
-  this->SimpleMax->setDisabled( indexedLookup );
+  this->SimpleMin->setDisabled( indexedLookup ? true : (this->UseAutoRescale->isChecked()));
+  this->SimpleMax->setDisabled( indexedLookup ? true : (this->UseAutoRescale->isChecked()));
+
   if ( indexedLookup )
     {
     if ( this->ColorTabs->currentIndex() == PQ_COLORS_PAGE )
