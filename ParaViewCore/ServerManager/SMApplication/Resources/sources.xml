@@ -1142,7 +1142,7 @@
                          default_values="8"
                          name="ThetaResolution"
                          number_of_elements="1"
-                         panel_visibility="advanced">
+                         panel_visibility="default">
         <IntRangeDomain min="3"
                         name="range" />
         <Documentation>The value of this property represents the number of
@@ -1183,7 +1183,7 @@
                          default_values="8"
                          name="PhiResolution"
                          number_of_elements="1"
-                         panel_visibility="advanced">
+                         panel_visibility="default">
         <IntRangeDomain min="3"
                         name="range" />
         <Documentation>The value of this property represents the number of
