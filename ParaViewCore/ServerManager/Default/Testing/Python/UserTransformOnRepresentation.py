@@ -1,6 +1,9 @@
 # Tests support for UserTransform on representations.
 # There's no UI to set UserTransform and only mechanism is to use Python.
 
+# This work was supported by CEA/DIF - Commissariat a l'Energie Atomique,
+# Centre DAM Ile-De-France, BP12, F-91297 Arpajon, France
+
 import SMPythonTesting
 from paraview.simple import *
 
