@@ -35,8 +35,6 @@
 #include "vtkProcessModule.h"
 #include "vtkTransform.h"
 
-#include "vtkGlyph3d.h"
-
 vtkStandardNewMacro(vtkArrowGlyphFilter);
 vtkCxxSetObjectMacro(vtkArrowGlyphFilter, ArrowSourceObject, vtkArrowSource);
 
@@ -155,22 +153,22 @@ vtkIdType vtkArrowGlyphFilter::GatherTotalNumberOfPoints(vtkIdType localNumPts)
       // Sum points on all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
-        controller->Receive(&tmp, 1, i, vtkProcessModule::GlyphNPointsGather);
+        controller->Receive(&tmp, 1, i, GlyphNPointsGather);
         totalNumPts += tmp;
         }
       // Send results back to all processes.
       for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
         {
         controller->Send(&totalNumPts, 1, 
-                         i, vtkProcessModule::GlyphNPointsScatter);
+                         i, GlyphNPointsScatter);
         }
       }
     else
       {
       controller->Send(&localNumPts, 1, 
-                       0, vtkProcessModule::GlyphNPointsGather);
+                       0, GlyphNPointsGather);
       controller->Receive(&totalNumPts, 1, 
-                          0, vtkProcessModule::GlyphNPointsScatter);
+                          0, GlyphNPointsScatter);
       }
     }
 
@@ -240,7 +238,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   //
   vtkDataSet* inputCopy = input->NewInstance();
   inputCopy->ShallowCopy(input);
-  this->MaskPoints->SetInput(inputCopy);
+  this->MaskPoints->SetInputData(inputCopy);
   inputCopy->Delete();
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);

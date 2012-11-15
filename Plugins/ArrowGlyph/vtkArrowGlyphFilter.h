@@ -103,6 +103,12 @@ protected:
   vtkArrowGlyphFilter();
   ~vtkArrowGlyphFilter();
 
+  enum
+    {
+    GlyphNPointsGather = 738233,
+    GlyphNPointsScatter = 738234
+    };
+
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int, vtkInformation *);
