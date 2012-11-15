@@ -19,13 +19,13 @@ print "-------------------------------"
 print "Transformation Matrix: "
 print matrix
 
-flattened_trasform = []
+flattened_transform = []
 for j in range(4):
   for i in range(4):
-    flattened_trasform.append(matrix.GetElement(i, j))
+    flattened_transform.append(matrix.GetElement(i, j))
 
 
-display.UserTransform = flattened_trasform
+display.UserTransform = flattened_transform
 view = Render()
 if not SMPythonTesting.DoRegressionTesting(view.SMProxy):
     raise SMPythonTesting.TestError, 'Test failed.'
