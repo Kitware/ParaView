@@ -2,7 +2,7 @@
 
   Program:   Visualization Toolkit
   Module:    vtkNIfTIReader.h
- 
+
   Copyright (c) Joseph Hennessey
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
@@ -49,19 +49,19 @@ public:
   // Returns a string with a space separated list of extensions in
   // the format .extension
   virtual const char* GetFileExtensions()
-    {
-      return ".nii .img .hdr";
-    }
+  {
+    return ".nii .img .hdr";
+  }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
   virtual const char* GetDescriptiveName()
-    {
-      return "NIfTI";
-    }
+  {
+    return "NIfTI";
+  }
 
-   char * GetFileName(){return(FileName);};
-   unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
+  char * GetFileName(){return(FileName);};
+  unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
   
 protected:
   vtkNIfTIReader();
@@ -69,6 +69,7 @@ protected:
 
   virtual void ExecuteInformation();
   virtual void ExecuteDataWithInformation(vtkDataObject *output, vtkInformation* outInfo);
+
 private:
   vtkNIfTIReader(const vtkNIfTIReader&);  // Not implemented.
   void operator=(const vtkNIfTIReader&);  // Not implemented.
@@ -90,8 +91,5 @@ private:
   vtkUnsignedCharArray *niftiHeader;
   unsigned char * niftiHeaderUnsignedCharArray;
   int niftiHeaderSize;
-
 };
 #endif
-
-

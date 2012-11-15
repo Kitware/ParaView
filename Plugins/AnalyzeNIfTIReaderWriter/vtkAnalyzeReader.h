@@ -1,8 +1,9 @@
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
   Module:    vtkAnalyzeReader.h
- 
+
   Copyright (c) Joseph Hennessey
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
@@ -49,19 +50,19 @@ public:
   // Returns a string with a space separated list of extensions in
   // the format .extension
   virtual const char* GetFileExtensions()
-    {
-      return ".img .hdr";
-    }
+  {
+    return ".img .hdr";
+  }
 
   // Description:
   // Return a descriptive name for the file format that might be useful in a GUI.
   virtual const char* GetDescriptiveName()
-    {
-      return "Analyze";
-    }
+  {
+    return "Analyze";
+  }
 
-   char * GetFileName(){return(FileName);};
-   unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
+  char * GetFileName(){return(FileName);};
+  unsigned int getImageSizeInBytes(){return(imageSizeInBytes);};
   
 protected:
   vtkAnalyzeReader();
@@ -69,6 +70,7 @@ protected:
 
   virtual void ExecuteInformation();
   virtual void ExecuteDataWithInformation(vtkDataObject *out, vtkInformation* outInfo);
+
 private:
   vtkAnalyzeReader(const vtkAnalyzeReader&);  // Not implemented.
   void operator=(const vtkAnalyzeReader&);  // Not implemented.
@@ -91,7 +93,6 @@ private:
   unsigned char * analyzeHeaderUnsignedCharArray;
   int analyzeHeaderSize;
 
+  bool fixFlipError;
 };
 #endif
-
-

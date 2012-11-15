@@ -28,36 +28,41 @@
 #include "vtk_zlib.h"
 #include "vtkDoubleArray.h"
 
+#include "vtkStringArray.h"
+#include <QDir>
+#define NAME_ARRAY "Name"
+#define DEFAULT_NAME ""
+
 vtkStandardNewMacro(vtkNIfTIReader);
 
-
+//----------------------------------------------------------------------------
 vtkNIfTIReader::vtkNIfTIReader()
 {
   q = new double*[4];
   s = new double*[4];
   int count;
-  for(count=0;count<4;count++){
+  for(count=0;count<4;count++)
+    {
     q[count] = new double[4];
     s[count] = new double[4];
-  }
-    this->niftiHeader = 0;
-    this->niftiHeaderUnsignedCharArray = 0;
-    this->niftiHeaderSize = 348;
-    this->niftiType = 0;
-
+    }
+  this->niftiHeader = 0;
+  this->niftiHeaderUnsignedCharArray = 0;
+  this->niftiHeaderSize = 348;
+  this->niftiType = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkNIfTIReader::~vtkNIfTIReader()
 {
   int count;
-  for(count=0;count<4;count++){
+  for(count=0;count<4;count++)
+    {
     delete [] q[count];
     q[count] = NULL;
-
     delete [] s[count];
     s[count] = NULL;
-  }
+    }
   delete [] q;
   delete [] s;
   q = NULL;
@@ -182,11 +187,11 @@ static bool ReadBufferAsBinary(istream& is, void *buffer, unsigned int num)
   // fail() is broken in the Mac. It returns true when reaches eof().
   if ( numberOfBytesRead != numberOfBytesToBeRead )
 #else
-    if ( ( numberOfBytesRead != numberOfBytesToBeRead )  || is.fail() )
+  if ( ( numberOfBytesRead != numberOfBytesToBeRead )  || is.fail() )
 #endif
-      {
-      return false; // read failed
-      }
+    {
+    return false; // read failed
+    }
 
   return true;
 
@@ -210,102 +215,102 @@ void vtkNIfTIReader::ExecuteInformation()
   if (m_NiftiImage == NULL)
     {
     vtkErrorMacro("Read failed");
-  return;
+    return;
     }
 
-   tempNiftiHeader = vtknifti1_io::nifti_convert_nim2nhdr(m_NiftiImage);
+  tempNiftiHeader = vtknifti1_io::nifti_convert_nim2nhdr(m_NiftiImage);
 
-   int count;
+  int count;
 
-   for (count = 0;count<this->niftiHeaderSize;count++){
+  for (count = 0;count<this->niftiHeaderSize;count++){
     this->niftiHeaderUnsignedCharArray[count] = niftiHeaderUnsignedCharArrayPtr[count];
-   }
+    }
 
-   const int dims=m_NiftiImage->ndim;
+  const int dims=m_NiftiImage->ndim;
   size_t numElts = 1;
 
   switch (dims)
     {
-    case 7:
-      numElts *= m_NiftiImage->nw;
-    case 6:
-      numElts *= m_NiftiImage->nv;
-    case 5:
-      numElts *= m_NiftiImage->nu;
-    case 4:
-      numElts *= m_NiftiImage->nt;
-    case 3:
-      numElts *= m_NiftiImage->nz;
-    case 2:
-      numElts *= m_NiftiImage->ny;
-    case 1:
-      numElts *= m_NiftiImage->nx;
-      break;
-    default:
-      numElts = 0;
+  case 7:
+    numElts *= m_NiftiImage->nw;
+  case 6:
+    numElts *= m_NiftiImage->nv;
+  case 5:
+    numElts *= m_NiftiImage->nu;
+  case 4:
+    numElts *= m_NiftiImage->nt;
+  case 3:
+    numElts *= m_NiftiImage->nz;
+  case 2:
+    numElts *= m_NiftiImage->ny;
+  case 1:
+    numElts *= m_NiftiImage->nx;
+    break;
+  default:
+    numElts = 0;
     }
 
-    Type = m_NiftiImage->datatype;
+  Type = m_NiftiImage->datatype;
 
-    switch(Type)
+  switch(Type)
     {
-    case DT_BINARY:
+  case DT_BINARY:
     this->SetDataScalarType(VTK_BIT);
     dataTypeSize = 0.125;
-     break;
-    case DT_UNSIGNED_CHAR:
+    break;
+  case DT_UNSIGNED_CHAR:
     this->SetDataScalarTypeToUnsignedChar();
     dataTypeSize = 1;
-      break;
-    case DT_INT8:
+    break;
+  case DT_INT8:
     this->SetDataScalarTypeToSignedChar();
     dataTypeSize = 1;
-      break;
-    case DT_SIGNED_SHORT:
+    break;
+  case DT_SIGNED_SHORT:
     this->SetDataScalarTypeToShort();
     dataTypeSize = 2;
-      break;
-    case DT_UINT16:
+    break;
+  case DT_UINT16:
     this->SetDataScalarTypeToUnsignedShort();
     dataTypeSize = 2;
-      break;
-    case DT_SIGNED_INT:
+    break;
+  case DT_SIGNED_INT:
     this->SetDataScalarTypeToInt();
     dataTypeSize = 4;
-      break;
-    case DT_UINT32:
+    break;
+  case DT_UINT32:
     this->SetDataScalarTypeToUnsignedInt();
     dataTypeSize = 4;
-      break;
-    case DT_FLOAT:
+    break;
+  case DT_FLOAT:
     this->SetDataScalarTypeToFloat();
     dataTypeSize = 4;
-      break;
-    case DT_DOUBLE:
-     this->SetDataScalarTypeToDouble();
+    break;
+  case DT_DOUBLE:
+    this->SetDataScalarTypeToDouble();
     dataTypeSize = 8;
-      break;
-    case DT_INT64:
+    break;
+  case DT_INT64:
     this->SetDataScalarType(VTK_LONG);
     dataTypeSize = 8;
-      break;
-    case DT_UINT64:
+    break;
+  case DT_UINT64:
     this->SetDataScalarType(VTK_UNSIGNED_LONG);
     dataTypeSize = 8;
-      break;
-    case DT_RGB:
+    break;
+  case DT_RGB:
     this->SetDataScalarTypeToUnsignedChar();
     numComponents = 3;
     dataTypeSize = 3;
-        break;
-    case DT_RGBA32:
+    break;
+  case DT_RGBA32:
     this->SetDataScalarTypeToUnsignedChar();
     numComponents = 4;
     dataTypeSize = 4;
-      break;
-    default:
-      vtkErrorMacro("cannot handle this NIfTI type yet.");
-      break;
+    break;
+  default:
+    vtkErrorMacro("cannot handle this NIfTI type yet.");
+    break;
     }
   //
   // set up the dimension stuff
@@ -337,10 +342,10 @@ void vtkNIfTIReader::ExecuteInformation()
 
   for (row=0;row<4;row++){
     for (col=0;col<4;col++){
-    s[row][col] = m_NiftiImage->sto_xyz.m[row][col];
-    q[row][col] = m_NiftiImage->qto_xyz.m[row][col];
+      s[row][col] = m_NiftiImage->sto_xyz.m[row][col];
+      q[row][col] = m_NiftiImage->qto_xyz.m[row][col];
+      }
     }
-  }
 
   int inDim[3];
   int outDim[3];
@@ -367,192 +372,201 @@ void vtkNIfTIReader::ExecuteInformation()
   inOriginOffset[1] = s[1][3];
   inOriginOffset[2] = s[2][3];
   } else */ if (qform_code>0){
-  inOriginOffset[0] = q[0][3];
-  inOriginOffset[1] = q[1][3];
-  inOriginOffset[2] = q[2][3];
-  } else {
-  inOriginOffset[0] = 0.0;
-  inOriginOffset[1] = 0.0;
-  inOriginOffset[2] = 0.0;
-  }
+    inOriginOffset[0] = q[0][3];
+    inOriginOffset[1] = q[1][3];
+    inOriginOffset[2] = q[2][3];
+    } else {
+    inOriginOffset[0] = 0.0;
+    inOriginOffset[1] = 0.0;
+    inOriginOffset[2] = 0.0;
+    }
 
   if(sform_code>0){
     if(s[0][0]>=1.0){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 0;
-    } else if (s[0][0]<=-1.0){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 0;
+      } else if (s[0][0]<=-1.0){
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 1;
+      }
     if(s[0][1]>=1.0){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 0;
-    } else if (s[0][1]<=-1.0){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 0;
+      } else if (s[0][1]<=-1.0){
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 1;
+      }
     if(s[0][2]>=1.0){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 0;
-    } else if (s[0][2]<=-1.0){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 0;
+      } else if (s[0][2]<=-1.0){
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 1;
+      }
     if(s[1][0]>=1.0){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 0;
-    } else if (s[1][0]<=-1.0){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 0;
+      } else if (s[1][0]<=-1.0){
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 1;
+      }
     if(s[1][1]>=1.0){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 0;
-    } else if (s[1][1]<=-1.0){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 0;
+      } else if (s[1][1]<=-1.0){
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 1;
+      }
     if(s[1][2]>=1.0){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 0;
-    } else if (s[1][2]<=-1.0){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 0;
+      } else if (s[1][2]<=-1.0){
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 1;
+      }
     if(s[2][0]>=1.0){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 0;
-    } else if (s[2][0]<=-1.0){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 0;
+      } else if (s[2][0]<=-1.0){
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+      }
     if(s[2][1]>=1.0){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 0;
-    } else if (s[2][1]<=-1.0){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 0;
+      } else if (s[2][1]<=-1.0){
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+      }
     if(s[2][2]>=1.0){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 0;
-    } else if (s[2][2]<=-1.0){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 1;
-    }
-  } else if(qform_code>0){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 0;
+      } else if (s[2][2]<=-1.0){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 1;
+      }
+    } else if(qform_code>0){
     if(q[0][0]>=1.0){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 0;
-    } else if (q[0][0]<=-1.0){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 0;
+      } else if (q[0][0]<=-1.0){
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 1;
+      }
     if(q[0][1]>=1.0){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 0;
-    } else if (q[0][1]<=-1.0){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 0;
+      } else if (q[0][1]<=-1.0){
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 1;
+      }
     if(q[0][2]>=1.0){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 0;
-    } else if (q[0][2]<=-1.0){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 0;
+      } else if (q[0][2]<=-1.0){
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 1;
+      }
     if(q[1][0]>=1.0){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 0;
-    } else if (q[1][0]<=-1.0){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 0;
+      } else if (q[1][0]<=-1.0){
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 1;
+      }
     if(q[1][1]>=1.0){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 0;
-    } else if (q[1][1]<=-1.0){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 0;
+      } else if (q[1][1]<=-1.0){
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 1;
+      }
     if(q[1][2]>=1.0){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 0;
-    } else if (q[1][2]<=-1.0){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 0;
+      } else if (q[1][2]<=-1.0){
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 1;
+      }
     if(q[2][0]>=1.0){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 0;
-    } else if (q[2][0]<=-1.0){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 0;
+      } else if (q[2][0]<=-1.0){
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+      }
     if(q[2][1]>=1.0){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 0;
-    } else if (q[2][1]<=-1.0){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 0;
+      } else if (q[2][1]<=-1.0){
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+      }
     if(q[2][2]>=1.0){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 0;
-    } else if (q[2][2]<=-1.0){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 1;
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 0;
+      } else if (q[2][2]<=-1.0){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 1;
+      }
     }
-  }
 
+  if((InPlaceFilteredAxes[0]==InPlaceFilteredAxes[1])||(InPlaceFilteredAxes[0]==InPlaceFilteredAxes[2])||(InPlaceFilteredAxes[1]==InPlaceFilteredAxes[2])){
+    flipAxis[0] = 0;
+    flipAxis[1] = 0;
+    flipAxis[2] = 0;
+    InPlaceFilteredAxes[0]=0;
+    InPlaceFilteredAxes[1]=1;
+    InPlaceFilteredAxes[2]=2;
+    }
+  
   for (count=0;count<3;count++){
-  inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
- }
+    inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
+    }
 
   for (count=0;count<3;count++){
     if(flipAxis[count]){
-    flippedOriginOffset[count] = inOriginOffset[count] - inDim[count];
-    } else {
-    flippedOriginOffset[count] = inOriginOffset[count];
+      flippedOriginOffset[count] = inOriginOffset[count] - inDim[count];
+      } else {
+      flippedOriginOffset[count] = inOriginOffset[count];
+      }
     }
-  }
 
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
-  outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
-  outPreFlippedOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
- }
+    outNoFlipOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
+    outPreFlippedOriginOffset[count] = flippedOriginOffset[InPlaceFilteredAxes[count]];
+    }
 
   for (count=0;count<3;count++){
     if(flipAxis[count]){
-    outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count] - outDim[count];
-    } else {
-    outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count];
+      outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count] - outDim[count];
+      } else {
+      outPostFlippedOriginOffset[count] = outNoFlipOriginOffset[count];
+      }
     }
-  }
 
   for (count=0;count<3;count++){
     if(qform_code>0){
-    this->DataOrigin[count]       = outOriginOffset[count];
-    //this->DataOrigin[count]       = outNoFlipOriginOffset[count];
-    } else {
-    this->DataOrigin[count]       = outNoFlipOriginOffset[count];
+      this->DataOrigin[count]       = outOriginOffset[count];
+      //this->DataOrigin[count]       = outNoFlipOriginOffset[count];
+      } else {
+      this->DataOrigin[count]       = outNoFlipOriginOffset[count];
+      }
     }
- }
 
 
   imageSizeInBytes = (int) (numElts * dataTypeSize);
 
-  #define LSB_FIRST 1
-  #define MSB_FIRST 2
+#define LSB_FIRST 1
+#define MSB_FIRST 2
 
   if(m_NiftiImage->byteorder==MSB_FIRST){
-  this->SetDataByteOrderToBigEndian();
-  } else {
-  this->SetDataByteOrderToLittleEndian();
-  }
+    this->SetDataByteOrderToBigEndian();
+    } else {
+    this->SetDataByteOrderToLittleEndian();
+    }
 
   this->vtkImageReader::ExecuteInformation();
 
@@ -568,7 +582,7 @@ void vtkNIfTIReaderUpdate2(vtkNIfTIReader *self, vtkImageData * vtkNotUsed(data)
   //unsigned int dim;
   //char * const p = static_cast<char *>(outPtr);
   char *  p = (char *)(outPtr);
- //4 cases to handle
+  //4 cases to handle
   //1: given .hdr and image is .img
   //2: given .nii
   //3: given .nii.gz
@@ -592,7 +606,7 @@ void vtkNIfTIReaderUpdate2(vtkNIfTIReader *self, vtkImageData * vtkNotUsed(data)
     file_p = ::gzopen( ImageFileName.c_str(), "rb" );
     if( file_p == NULL )
       {
-       //vtkErrorMacro( << "File cannot be read");
+      //vtkErrorMacro( << "File cannot be read");
       }
     }
 
@@ -635,67 +649,84 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   vtkFieldData *fa = data->GetFieldData();
 
   if (!fa)
-  {
+    {
     fa = vtkFieldData::New();
     data->SetFieldData(fa);
     fa->Delete();
     fa = data->GetFieldData();
-  }
+    }
 
   vtkDataArray * validDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
   if (!validDataArray)
-  {
-  this->niftiHeader = vtkUnsignedCharArray::New();
-  this->niftiHeader->SetName(NIFTI_HEADER_ARRAY);
+    {
+    this->niftiHeader = vtkUnsignedCharArray::New();
+    this->niftiHeader->SetName(NIFTI_HEADER_ARRAY);
     this->niftiHeader->SetNumberOfValues(this->niftiHeaderSize);
-  fa->AddArray(this->niftiHeader);
+    fa->AddArray(this->niftiHeader);
     validDataArray = fa->GetArray(NIFTI_HEADER_ARRAY);
-  }
+    }
   this->niftiHeader = vtkUnsignedCharArray::SafeDownCast(validDataArray);
 
   int count;
 
   for(count=0;count<this->niftiHeaderSize;count++){
-   this->niftiHeader->SetValue(count, niftiHeaderUnsignedCharArray[count]);
-  }
+    this->niftiHeader->SetValue(count, niftiHeaderUnsignedCharArray[count]);
+    }
   
   vtkDataArray * tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
   if (!tempVolumeOriginDoubleArray)
-  {
+    {
     vtkDoubleArray * volumeOriginDoubleArray = NULL;
     volumeOriginDoubleArray = vtkDoubleArray::New();
     volumeOriginDoubleArray->SetName(VOLUME_ORIGIN_DOUBLE_ARRAY);
     volumeOriginDoubleArray->SetNumberOfValues(3);
-    volumeOriginDoubleArray->SetValue(0,this->DataOrigin[0]); 
-    volumeOriginDoubleArray->SetValue(1,this->DataOrigin[1]); 
-    volumeOriginDoubleArray->SetValue(2,this->DataOrigin[2]); 
+    volumeOriginDoubleArray->SetValue(0,this->DataOrigin[0]);
+    volumeOriginDoubleArray->SetValue(1,this->DataOrigin[1]);
+    volumeOriginDoubleArray->SetValue(2,this->DataOrigin[2]);
     fa->AddArray(volumeOriginDoubleArray);
     volumeOriginDoubleArray->Delete();
     tempVolumeOriginDoubleArray = fa->GetArray(VOLUME_ORIGIN_DOUBLE_ARRAY);
-  }
+    }
 
   vtkDataArray * tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
   if (!tempVolumeSpacingDoubleArray)
-  {
+    {
     vtkDoubleArray * volumeSpacingDoubleArray = NULL;
     volumeSpacingDoubleArray = vtkDoubleArray::New();
     volumeSpacingDoubleArray->SetName(VOLUME_SPACING_DOUBLE_ARRAY);
     volumeSpacingDoubleArray->SetNumberOfValues(3);
-    volumeSpacingDoubleArray->SetValue(0,this->DataSpacing[0]); 
-    volumeSpacingDoubleArray->SetValue(1,this->DataSpacing[1]); 
-    volumeSpacingDoubleArray->SetValue(2,this->DataSpacing[2]); 
+    volumeSpacingDoubleArray->SetValue(0,this->DataSpacing[0]);
+    volumeSpacingDoubleArray->SetValue(1,this->DataSpacing[1]);
+    volumeSpacingDoubleArray->SetValue(2,this->DataSpacing[2]);
     fa->AddArray(volumeSpacingDoubleArray);
     volumeSpacingDoubleArray->Delete();
     tempVolumeSpacingDoubleArray = fa->GetArray(VOLUME_SPACING_DOUBLE_ARRAY);
-  }
+    }
+
+  vtkStringArray * nameArray;
+  vtkAbstractArray * nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
+  if (!nameAbstractArray)
+    {
+    nameArray = vtkStringArray::New();
+    nameArray->SetName(NAME_ARRAY);
+    nameArray->SetNumberOfValues(1);
+    char * tempCharName = this->GetFileName();
+    QString tempQString = tempCharName;
+    tempQString.remove(0, (tempQString.length() - (tempQString.length() - tempQString.lastIndexOf(QDir::separator()) -1)));
+    nameArray->SetValue(0,std::string(tempQString.toStdString()));
+    fa->AddArray(nameArray);
+    nameArray->Delete();
+    nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
+    }
+  nameArray = vtkStringArray::SafeDownCast(nameAbstractArray);
 
   // Call the correct templated function for the output
   void *outPtr;
   long offset = 348;
- 
-   if (niftiType == 2){
-       offset = 0;
-   }
+
+  if (niftiType == 2){
+    offset = 0;
+    }
 
   // Call the correct templated function for the input
   outPtr = data->GetScalarPointer();
@@ -706,14 +737,14 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   offset = (long) (niftiPointer->vox_offset);
   switch (data->GetScalarType())
     {
-    vtkTemplateMacro(
-      vtkNIfTIReaderUpdate2(this, data, static_cast<VTK_TT*>(outPtr), offset)
-      );
-    default:
-      vtkErrorMacro(<< "Execute: Unknown data type");
+  vtkTemplateMacro(
+        vtkNIfTIReaderUpdate2(this, data, static_cast<VTK_TT*>(outPtr), offset)
+        );
+  default:
+    vtkErrorMacro(<< "Execute: Unknown data type");
     }
 
-// start of variables
+  // start of variables
 
   unsigned char * outUnsignedCharPtr = (unsigned char *) outPtr;
 
@@ -756,133 +787,142 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
 
   if(sform_code>0){
     if((s[0][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 0;
-    } else if ((s[0][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 0;
+      } else if ((s[0][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 1;
+      }
     if((s[0][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 0;
-    } else if ((s[0][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 0;
+      } else if ((s[0][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 1;
+      }
     if((s[0][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 0;
-    } else if ((s[0][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 0;
+      } else if ((s[0][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 1;
+      }
     if((s[1][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 0;
-    } else if ((s[1][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 0;
+      } else if ((s[1][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 1;
+      }
     if((s[1][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 0;
-    } else if ((s[1][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 0;
+      } else if ((s[1][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 1;
+      }
     if((s[1][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 0;
-    } else if ((s[1][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 0;
+      } else if ((s[1][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 1;
+      }
     if((s[2][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 0;
-    } else if ((s[2][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 0;
+      } else if ((s[2][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+      }
     if((s[2][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 0;
-    } else if ((s[2][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 0;
+      } else if ((s[2][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+      }
     if((s[2][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 0;
-    } else if ((s[2][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 1;
-    }
-  } else if(qform_code>0){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 0;
+      } else if ((s[2][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 1;
+      }
+    } else if(qform_code>0){
     if((q[0][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 0;
-    } else if ((q[0][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=0;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 0;
+      } else if ((q[0][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=0;
+      flipAxis[0] = 1;
+      }
     if((q[0][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 0;
-    } else if ((q[0][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=1;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 0;
+      } else if ((q[0][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=1;
+      flipAxis[0] = 1;
+      }
     if((q[0][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 0;
-    } else if ((q[0][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[0]=2;
-    flipAxis[0] = 1;
-    }
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 0;
+      } else if ((q[0][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[0]=2;
+      flipAxis[0] = 1;
+      }
     if((q[1][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 0;
-    } else if ((q[1][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=0;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 0;
+      } else if ((q[1][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=0;
+      flipAxis[1] = 1;
+      }
     if((q[1][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 0;
-    } else if ((q[1][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=1;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 0;
+      } else if ((q[1][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=1;
+      flipAxis[1] = 1;
+      }
     if((q[1][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 0;
-    } else if ((q[1][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[1]=2;
-    flipAxis[1] = 1;
-    }
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 0;
+      } else if ((q[1][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[1]=2;
+      flipAxis[1] = 1;
+      }
     if((q[2][0]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 0;
-    } else if ((q[2][0]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=0;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 0;
+      } else if ((q[2][0]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+      }
     if((q[2][1]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 0;
-    } else if ((q[2][1]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=1;
-    flipAxis[2] = 1;
-    }
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 0;
+      } else if ((q[2][1]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+      }
     if((q[2][2]-1.0)>= -epsilon){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 0;
-    } else if ((q[2][2]+1.0)<=epsilon){
-    InPlaceFilteredAxes[2]=2;
-    flipAxis[2] = 1;
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 0;
+      } else if ((q[2][2]+1.0)<=epsilon){
+      InPlaceFilteredAxes[2]=2;
+      flipAxis[2] = 1;
+      }
     }
-  }
+
+  if((InPlaceFilteredAxes[0]==InPlaceFilteredAxes[1])||(InPlaceFilteredAxes[0]==InPlaceFilteredAxes[2])||(InPlaceFilteredAxes[1]==InPlaceFilteredAxes[2])){
+    flipAxis[0] = 0;
+    flipAxis[1] = 0;
+    flipAxis[2] = 0;
+    InPlaceFilteredAxes[0]=0;
+    InPlaceFilteredAxes[1]=1;
+    InPlaceFilteredAxes[2]=2;
+    }
 
   /*for (count=0;count<3;count++){
     if(flipAxis[count]){
@@ -893,13 +933,13 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
   }*/
 
   for (count=0;count<3;count++){
-  inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
-  inSpacing[count] = this->DataSpacing[count];
-  inExtent[count*2] = this->DataExtent[count*2];
-  inExtent[(count*2)+1] = this->DataExtent[(count*2)+1];
-  inIncrements[count] = this->DataIncrements[count];
-  inOrigin[count] = this->DataOrigin[count];
- }
+    inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
+    inSpacing[count] = this->DataSpacing[count];
+    inExtent[count*2] = this->DataExtent[count*2];
+    inExtent[(count*2)+1] = this->DataExtent[(count*2)+1];
+    inIncrements[count] = this->DataIncrements[count];
+    inOrigin[count] = this->DataOrigin[count];
+    }
 
   inOrigin[0] = -128.5;
   inOrigin[1] = -128.5;
@@ -911,20 +951,20 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
 
   for (count=0;count<3;count++){
     if(flipAxis[count]){
-    inOriginOffset[count] = inOriginOffset[count] - inDim[count];
+      inOriginOffset[count] = inOriginOffset[count] - inDim[count];
+      }
     }
-  }
 
   for (count=0;count<3;count++){
     outDim[count]          = inDim[InPlaceFilteredAxes[count]];
     outStride[count]       = inStride[InPlaceFilteredAxes[count]];
-  outIncrements[count]   = inIncrements[InPlaceFilteredAxes[count]];
-   outSpacing[count]      = inSpacing[InPlaceFilteredAxes[count]];
-  outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
-  outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
+    outIncrements[count]   = inIncrements[InPlaceFilteredAxes[count]];
+    outSpacing[count]      = inSpacing[InPlaceFilteredAxes[count]];
+    outExtent[count*2]     = inExtent[InPlaceFilteredAxes[count]*2];
+    outExtent[(count*2)+1] = inExtent[(InPlaceFilteredAxes[count]*2)+1];
     outOrigin[count]       = inOrigin[InPlaceFilteredAxes[count]];
     outOriginOffset[count] = inOriginOffset[InPlaceFilteredAxes[count]];
- }
+    }
 
   for (count=0;count<3;count++){
     this->DataIncrements[count]   = outIncrements[count];
@@ -932,7 +972,7 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
     this->DataExtent[count*2]     = (int) (outExtent[count*2]);
     this->DataExtent[(count*2)+1] = (int) (outExtent[(count*2)+1]);
     this->DataOrigin[count]       = outOrigin[count];
- }
+    }
 
   unsigned char* tempUnsignedCharData = NULL;
 
@@ -951,14 +991,14 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
     for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
       for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
         inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
- 
-        for (idSize = 0; idSize < scalarSize ; idSize++){ 
-        charInOffset = inOffset + idSize;
-      tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset]; 
-        } 
-      } 
+
+        for (idSize = 0; idSize < scalarSize ; idSize++){
+          charInOffset = inOffset + idSize;
+          tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset];
+          }
+        }
+      }
     }
-  }
 
   long outSliceSize = outDim[0]*outDim[1]*scalarSize;
   long outRowSize   = outDim[0]*scalarSize;
@@ -976,45 +1016,45 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
       outRowOffset = idY * outRowSize;
       for (idX = 0; idX < outDim[0]  ; idX++){
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){ 
-        charOutOffset = outOffset + idSize;
-      outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
-        } 
-      } 
+        for (idSize = 0; idSize < scalarSize ; idSize++){
+          charOutOffset = outOffset + idSize;
+          outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count++];
+          }
+        }
+      }
     }
-  }
 
- //now flip
+  //now flip
 
 
   // Loop through input voxels
   count = 0;
-  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){  
-  if(flipAxis[2]==1){
-    flipIndex[2] = ((outDim[2] -1) - inIndex[2]);
-  } else {
-    flipIndex[2] = inIndex[2];
-  }
+  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
+    if(flipAxis[2]==1){
+      flipIndex[2] = ((outDim[2] -1) - inIndex[2]);
+      } else {
+      flipIndex[2] = inIndex[2];
+      }
     for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
-    if(flipAxis[1]==1){
-    flipIndex[1] = ((outDim[1] -1) - inIndex[1]);
-    } else {
-    flipIndex[1] = inIndex[1];
-    }
+      if(flipAxis[1]==1){
+        flipIndex[1] = ((outDim[1] -1) - inIndex[1]);
+        } else {
+        flipIndex[1] = inIndex[1];
+        }
       for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
-    if(flipAxis[0]==1){
-      flipIndex[0] = ((outDim[0] -1) - inIndex[0]);
-    } else {
-      flipIndex[0] = inIndex[0];
-    }
+        if(flipAxis[0]==1){
+          flipIndex[0] = ((outDim[0] -1) - inIndex[0]);
+          } else {
+          flipIndex[0] = inIndex[0];
+          }
         inOffset = (flipIndex[2] * outSliceSize) + (flipIndex[1] * outRowSize) + (flipIndex[0] * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){ 
-        charInOffset = inOffset + idSize;
-      tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset]; 
-        } 
-      } 
+        for (idSize = 0; idSize < scalarSize ; idSize++){
+          charInOffset = inOffset + idSize;
+          tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset];
+          }
+        }
+      }
     }
-  }
 
   // Loop through output voxels
   int errorNumber = 0;
@@ -1025,23 +1065,21 @@ void vtkNIfTIReader::ExecuteDataWithInformation(vtkDataObject *output, vtkInform
       outRowOffset = idY * outRowSize;
       for (idX = 0; idX < outDim[0]  ; idX++){
         outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
-        for (idSize = 0; idSize < scalarSize ; idSize++){ 
-        charOutOffset = outOffset + idSize;
-        if((charOutOffset < tempUnsignedCharDataSize) && (charOutOffset >=0) && (count >=0) && (count < outPtrSize) ){
+        for (idSize = 0; idSize < scalarSize ; idSize++){
+          charOutOffset = outOffset + idSize;
+          if((charOutOffset < tempUnsignedCharDataSize) && (charOutOffset >=0) && (count >=0) && (count < outPtrSize) ){
             outUnsignedCharPtr[charOutOffset] = tempUnsignedCharData[count];
-        } else {
+            } else {
             errorNumber = 1;
+            }
+          count++;
+          }
         }
-        count++;
-        } 
-      } 
+      }
     }
-  }
 
   delete tempUnsignedCharData;
   tempUnsignedCharData = NULL;
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -1049,11 +1087,6 @@ void vtkNIfTIReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
-
-
-
-
-
 
 //----------------------------------------------------------------------------
 int vtkNIfTIReader::CanReadFile(const char* fname)
@@ -1064,11 +1097,11 @@ int vtkNIfTIReader::CanReadFile(const char* fname)
   // we check that the correction extension is given by the user
   std::string filenameext = GetExtension(filename);
   if(filenameext != std::string("hdr")
-    && filenameext != std::string("img.gz")
-    && filenameext != std::string("img")
-    && filenameext != std::string("nii")
-    && filenameext != std::string("nii.gz")
-    )
+     && filenameext != std::string("img.gz")
+     && filenameext != std::string("img")
+     && filenameext != std::string("nii")
+     && filenameext != std::string("nii.gz")
+     )
     {
     return false;
     }
@@ -1088,7 +1121,7 @@ int vtkNIfTIReader::CanReadFile(const char* fname)
     }
 
   ifstream   local_InputStream;
-  local_InputStream.open( HeaderFileName.c_str(), 
+  local_InputStream.open( HeaderFileName.c_str(),
                           ios::in | ios::binary );
   if( local_InputStream.fail() )
     {
@@ -1110,5 +1143,4 @@ int vtkNIfTIReader::CanReadFile(const char* fname)
   //The final check is to make sure that it is a nifti  file.
   niftiType = vtknifti1_io::is_nifti_file(fname);
   return ((niftiType == 1)||(niftiType == 2));
-
 }
