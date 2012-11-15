@@ -102,6 +102,7 @@ protected:
   virtual bool eventFilter( QObject* obj, QEvent* event );
 
 private slots:
+  void applyPreset();
   void updateColors();
   void updateOpacity();
 
