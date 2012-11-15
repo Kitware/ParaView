@@ -534,7 +534,6 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       //this->Form->updateInterpretation( indexMode );
       }
 
-    QString colorArrayName = display->getProxyColorArrayName();
     int acomp = ( display->getLookupTable()->getVectorMode() == pqScalarsToColors::MAGNITUDE ? -1 :
       display->getLookupTable()->getVectorComponent() );
     vtkPVArrayInformation* ainfo = display->getProxyColorArrayInfo();
