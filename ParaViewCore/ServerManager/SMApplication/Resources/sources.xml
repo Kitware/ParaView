@@ -413,7 +413,7 @@
                          default_values="6"
                          name="Resolution"
                          number_of_elements="1"
-                         panel_visibility="advanced">
+                         panel_visibility="default">
         <IntRangeDomain max="512"
                         min="0"
                         name="range" />
