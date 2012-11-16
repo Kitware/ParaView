@@ -283,7 +283,7 @@ void pqGlobalRenderViewOptions::init()
                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->stillRenderDelay,
-                  SIGNAL(valueChanged(int)),
+                  SIGNAL(valueChanged(double)),
                   this, SIGNAL(changesAvailable()));
 
   for ( int cc = 0; cc < this->Internal->CameraControl3DComboBoxList.size(); cc++ )
@@ -667,7 +667,7 @@ void pqGlobalRenderViewOptions::resetChanges()
   this->Internal->CompressorGroup->setChecked(val.toInt());
 
   val = settings->value("NonInteractiveRenderDelay", 0);
-  this->Internal->stillRenderDelay->setValue(val.toInt());
+  this->Internal->stillRenderDelay->setValue(val.toDouble());
 
   val = settings->value("StillRenderImageReductionFactor", 1);
   if (val.toInt() == 1)

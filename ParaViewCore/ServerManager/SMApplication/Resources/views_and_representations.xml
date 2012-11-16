@@ -237,13 +237,13 @@
                             number_of_elements="3">
         <Documentation>Center of rotation for the interactor.</Documentation>
       </DoubleVectorProperty>
-      <IntVectorProperty command="SetNonInteractiveRenderDelay"
+      <DoubleVectorProperty command="SetNonInteractiveRenderDelay"
                          default_values="0"
                          name="NonInteractiveRenderDelay"
                          number_of_elements="1">
         <Documentation>Set the delay (in seconds) after an interactive render
         before switching to a full-rese render.</Documentation>
-      </IntVectorProperty>
+      </DoubleVectorProperty>
       <ProxyProperty clean_command="RemoveAll2DManipulators"
                      command="Add2DManipulator"
                      is_internal="1"

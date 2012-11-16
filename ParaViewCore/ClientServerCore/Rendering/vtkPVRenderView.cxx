@@ -1534,11 +1534,18 @@ void vtkPVRenderView::SetCenterOfRotation(double x, double y, double z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetNonInteractiveRenderDelay(unsigned int seconds)
+void vtkPVRenderView::SetNonInteractiveRenderDelay(double seconds)
 {
   if (this->Interactor)
     {
-    this->Interactor->SetNonInteractiveRenderDelay(seconds*1000);
+    if(seconds > 0)
+      {
+      this->Interactor->SetNonInteractiveRenderDelay(static_cast<unsigned long>(seconds*1000));
+      }
+    else
+      {
+      this->Interactor->SetNonInteractiveRenderDelay(0);
+      }
     }
 }
 
