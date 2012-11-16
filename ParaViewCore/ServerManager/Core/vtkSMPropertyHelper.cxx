@@ -403,6 +403,16 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const int *values, unsigned in
       this->IntVectorProperty->SetElements(values, count);
       }
     }
+  else if (this->Type == IDTYPE)
+    {
+    vtkIdType *temp = new vtkIdType[count+1];
+    for (int cc=0; cc < count; cc++)
+      {
+      temp[cc] = static_cast<vtkIdType>(values[cc]);
+      }
+    this->SetPropertyArrayIdType(temp, count);
+    delete [] temp;
+    }
   else
     {
     vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
@@ -430,10 +440,9 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const double *values, unsigned
     }
 }
 
-#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
 //----------------------------------------------------------------------------
-template<>
-inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsigned int count)
+inline void vtkSMPropertyHelper::SetPropertyArrayIdType(
+  const vtkIdType *values, unsigned int count)
 {
   if(this->Type == IDTYPE)
     {
@@ -450,6 +459,14 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsig
     {
     vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
+}
+
+#if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
+//----------------------------------------------------------------------------
+template<>
+inline void vtkSMPropertyHelper::SetPropertyArray(const vtkIdType *values, unsigned int count)
+{
+  this->SetPropertyArrayIdType(values, count);
 }
 #endif
 
