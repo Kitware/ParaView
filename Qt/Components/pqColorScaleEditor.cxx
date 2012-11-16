@@ -573,9 +573,10 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
         this->Display->getView());
     this->Form->ShowColorLegend->setEnabled(renderModule != 0);
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
+
+    // update opacity mapping gui elements
+    this->handleEnableOpacityMappingChanged();
     }
-  // update opacity mapping gui elements
-  this->handleEnableOpacityMappingChanged();
 }
 
 void pqColorScaleEditor::pushColors()
