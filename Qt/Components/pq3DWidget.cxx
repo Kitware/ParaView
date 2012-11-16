@@ -150,7 +150,8 @@ public:
     IgnorePropertyChange(false),
     WidgetVisible(true),
     Selected(false),
-    LastWidgetVisibilityGoal(true)
+    LastWidgetVisibilityGoal(true),
+    InDeleteCall(false)
   {
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->IsMaster = pqApplicationCore::instance()->getActiveServer()->isMaster();
@@ -176,6 +177,7 @@ public:
   QPointer<QShortcut> PickShortcut;
   bool IsMaster;
   bool LastWidgetVisibilityGoal;
+  bool InDeleteCall;
 };
 
 //-----------------------------------------------------------------------------
@@ -210,6 +212,7 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
+  this->Internal->InDeleteCall = true;
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if(widget)
     {
@@ -598,7 +601,8 @@ void pq3DWidget::setWidgetVisible(bool visible)
     pqPythonManager* manager =
         qobject_cast<pqPythonManager*>(core->manager("PYTHON_MANAGER"));
     if (manager && manager->interpreterIsInitialized() &&
-        manager->canStopTrace() && this->renderView())
+        manager->canStopTrace() && this->renderView() &&
+        !this->Internal->InDeleteCall)
       {
       QString script =
           QString("try:\n"
