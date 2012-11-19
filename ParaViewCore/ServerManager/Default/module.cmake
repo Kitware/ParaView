@@ -4,6 +4,10 @@ if (PARAVIEW_USE_MPI)
     )
 endif()
 
+if (PARAVIEW_ENABLE_PYTHON)
+  list(APPEND extra_depends vtkRenderingMatplotlib)
+endif()
+
 if (PARAVIEW_ENABLE_FFMPEG)
   list(APPEND extra_depends vtkIOFFMPEG)
 endif()

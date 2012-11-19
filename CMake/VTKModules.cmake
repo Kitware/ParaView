@@ -347,7 +347,7 @@ if (PARAVIEW_USE_VISITBRIDGE)
 endif()
 
 # Enable vtkRenderingMatplotlib for math text rendering if python is available
-if (PYTHON_EXECUTABLE)
+if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
 
