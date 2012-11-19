@@ -287,6 +287,16 @@ void pqQueryClauseWidget::populateSelectionCondition()
       pqQueryClauseWidget::SINGLE_VALUE_GE);
     this->Internals->condition->addItem("is <=",
       pqQueryClauseWidget::SINGLE_VALUE_LE);
+    this->Internals->condition->addItem("is min",
+      pqQueryClauseWidget::SINGLE_VALUE_MIN);
+    this->Internals->condition->addItem("is max",
+      pqQueryClauseWidget::SINGLE_VALUE_MAX);
+    this->Internals->condition->addItem("is less than mean",
+      pqQueryClauseWidget::SINGLE_VALUE_LE_MEAN);
+    this->Internals->condition->addItem("is greater than mean",
+      pqQueryClauseWidget::SINGLE_VALUE_GE_MEAN);
+    this->Internals->condition->addItem("is equal to mean with tolerance",
+      pqQueryClauseWidget::SINGLE_VALUE_MEAN_WITH_TOLERANCE);
     break;
 
   case BLOCK:
@@ -320,6 +330,13 @@ void pqQueryClauseWidget::updateValueWidget()
 {
   switch (this->currentConditionType())
     {
+  case SINGLE_VALUE_MIN:
+  case SINGLE_VALUE_MAX:
+  case SINGLE_VALUE_LE_MEAN:
+  case SINGLE_VALUE_GE_MEAN:
+    this->Internals->valueStackedWidget->setCurrentIndex(4);
+    break;
+  case SINGLE_VALUE_MEAN_WITH_TOLERANCE:
   case SINGLE_VALUE:
   case SINGLE_VALUE_LE:
   case SINGLE_VALUE_GE:
@@ -587,6 +604,7 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
   QString fieldName;
 
   // Determine the name of the field
+  bool ok_no_value = false;
   switch(criteria_type)
     {
   case INVALID:
@@ -703,11 +721,38 @@ void pqQueryClauseWidget::addSelectionQualifiers(vtkSMProxy* selSource)
         }
       }
     break;
-
+  case SINGLE_VALUE_MIN:
+    if(query.isEmpty()) query = "%1  == global_min(%1)";
+    query = query.arg(fieldName);
+    ok_no_value = true;
+    break;
+  case SINGLE_VALUE_MAX:
+    if(query.isEmpty()) query = "%1  == global_max(%1)";
+    query = query.arg(fieldName);
+    ok_no_value = true;
+    break;
+  case SINGLE_VALUE_LE_MEAN:
+    if(query.isEmpty()) query = "%1  <= global_mean(%1)";
+    query = query.arg(fieldName);
+    ok_no_value = true;
+    break;
+  case SINGLE_VALUE_GE_MEAN:
+    if(query.isEmpty()) query = "%1  >= global_mean(%1)";
+    query = query.arg(fieldName);
+    ok_no_value = true;
+    break;
+  case SINGLE_VALUE_MEAN_WITH_TOLERANCE:
+    if(query.isEmpty()) query = "abs(%1 - global_mean(%1)) < %2";
+    if (!this->Internals->value->text().isEmpty())
+      {
+      values << this->Internals->value->text();
+      query = query.arg(fieldName, this->Internals->value->text());
+      }
+    break;
   default: break;
     }
 
-  if (values.size() == 0)
+  if (values.size() == 0 && !ok_no_value)
     {
     return;
     }
