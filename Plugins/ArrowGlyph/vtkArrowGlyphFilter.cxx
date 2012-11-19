@@ -223,8 +223,8 @@ int vtkArrowGlyphFilter::RequestData(
 //----------------------------------------------------------------------------
 int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
                                      vtkDataSet* input,
-                                     vtkInformation* request,
-                                     vtkInformationVector **inputVector,
+                                     vtkInformation* vtkNotUsed(request),
+                                     vtkInformationVector ** vtkNotUsed(inputVector),
                                      vtkInformationVector *outputVector)
 
 {
@@ -303,7 +303,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
 
   double Ashaftradius = this->ArrowSourceObject->GetShaftRadius(); 
   double   Atipradius = this->ArrowSourceObject->GetTipRadius(); 
-  double   Atiplength = this->ArrowSourceObject->GetTipLength(); 
+  // Not used: double   Atiplength = this->ArrowSourceObject->GetTipLength();
 
   // and get useful information from it
   vtkPolyData *arrow = internalArrow->GetOutput();
@@ -349,7 +349,7 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
 
   // track pt, cell increments for copying old point data into new geometry
-  vtkIdType ptIncr=0, cellIncr=0, cellId=0;
+  vtkIdType ptIncr=0;
   vtkSmartPointer<vtkIdList> pts = vtkSmartPointer<vtkIdList>::New();
   pts->Allocate(VTK_CELL_SIZE);
 
@@ -446,9 +446,9 @@ int vtkArrowGlyphFilter::MaskAndExecute(vtkIdType numPts, vtkIdType maxNumPts,
     internalArrow->Update();
 
     // pointers may have changed, so refresh them here before copying
-    vtkPolyData       *arrow = internalArrow->GetOutput();
-    vtkPoints   *arrowpoints = arrow->GetPoints();
-    vtkIdType numArrowPoints = arrowpoints->GetNumberOfPoints();
+    arrow = internalArrow->GetOutput();
+    arrowpoints = arrow->GetPoints();
+    numArrowPoints = arrowpoints->GetNumberOfPoints();
 
     // transform the arrow point to correct glyph position/orientation
     trans->TransformPoints(arrowpoints,newPoints);
