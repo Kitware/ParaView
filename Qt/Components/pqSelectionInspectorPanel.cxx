@@ -730,6 +730,15 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   // This updates the Combo-box for the array name based on the property value.
   this->updateSelectionPointLabelArrayName();
   this->updateSelectionCellLabelArrayName();
+
+  // Fix Bug 13663
+  // Make sure we have valid selection information before going forward
+  if( reprProxy->GetProperty("SelectionPointFieldDataArrayName") == NULL ||
+      reprProxy->GetProperty("SelectionCellFieldDataArrayName") == NULL )
+    {
+    return;
+    }
+
   this->Implementation->VTKConnectRep->Connect(
     reprProxy->GetProperty("SelectionPointFieldDataArrayName"),
     vtkCommand::ModifiedEvent, this,
