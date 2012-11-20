@@ -126,7 +126,7 @@ pqFiltersMenuReaction::pqFiltersMenuReaction(
   pqActiveObjects* activeObjects = &pqActiveObjects::instance();
   QObject::connect(activeObjects, SIGNAL(serverChanged(pqServer*)),
     &this->Timer, SLOT(start()));
-  QObject::connect(activeObjects, SIGNAL(portChanged(pqOutputPort*)),
+  QObject::connect(activeObjects, SIGNAL(selectionChanged(pqProxySelection)),
     &this->Timer, SLOT(start()));
   QObject::connect(activeObjects, SIGNAL(dataUpdated()),
     &this->Timer, SLOT(start()));
