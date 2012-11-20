@@ -152,11 +152,12 @@ void pqPythonDialog::runScript(const QStringList& files)
       QByteArray code = file.readAll();
 
       QString script =
+      "current_script_path = '%1'\n"
       "try:\n"
       "  paraview.smtrace\n"
-      "  paraview.smtrace.trace_save_execute_script('''%1''')\n"
+      "  paraview.smtrace.trace_save_execute_script('''%2''')\n"
       "except AttributeError: pass\n";
-      this->Implementation->Ui.shellWidget->executeScript(script.arg(code.data()));
+      this->Implementation->Ui.shellWidget->executeScript(script.arg(files[i]).arg(code.data()));
 
       this->Implementation->Ui.shellWidget->executeScript(code.data());
 
