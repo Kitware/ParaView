@@ -211,6 +211,7 @@ private:
   template<typename T> unsigned int GetPropertyArray(T *values, unsigned int count = 1);
   template<typename T> void SetProperty(unsigned int index, T value);
   template<typename T> void SetPropertyArray(const T *values, unsigned int count);
+  void SetPropertyArrayIdType(const vtkIdType *values, unsigned int count);
  
   enum PType {
     INT,
