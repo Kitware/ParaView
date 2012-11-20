@@ -70,14 +70,6 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         set(TMP_INPUT ${CMAKE_CURRENT_SOURCE_DIR}/${TMP_FILENAME}.h)
       endif ()
 
-      # is it abstract?
-      get_source_file_property(TMP_ABSTRACT ${FILE} ABSTRACT)
-      if (TMP_ABSTRACT)
-        set(TMP_CONCRETE "--abstract")
-      else ()
-        set(TMP_CONCRETE "--concrete")
-      endif ()
-
       # add it to the init file's contents
       set (CXX_CONTENTS
         "${CXX_CONTENTS}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
@@ -96,7 +88,6 @@ macro(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         DEPENDS ${VTK_WRAP_ClientServer_EXE} ${VTK_WRAP_HINTS} ${_target_includes_file} ${_args_file}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS
-        ${TMP_CONCRETE}
         ${TMP_HINTS}
         "${quote}@${_args_file}${quote}"
         "-o" "${quote}${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx${quote}"
