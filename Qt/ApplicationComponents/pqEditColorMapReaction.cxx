@@ -119,9 +119,15 @@ void pqEditColorMapReaction::editColorMap()
   else
     {
     // Create the color map editor if needed.
-    pqColorScaleEditor editor(pqCoreUtilities::mainWidget());
-    editor.setRepresentation(repr);
-    editor.exec();
+    QWidget* rootWidget = pqCoreUtilities::mainWidget();
+    pqColorScaleEditor* editor = rootWidget->findChild<pqColorScaleEditor*>();
+    if(editor == NULL)
+      {
+      editor = new pqColorScaleEditor(rootWidget);
+      editor->setAttribute(Qt::WA_DeleteOnClose);
+      }
+    editor->setRepresentation(repr);
+    editor->show();
     }
 
   repr->renderViewEventually();

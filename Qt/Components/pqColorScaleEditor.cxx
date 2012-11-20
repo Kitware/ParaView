@@ -176,8 +176,9 @@ void pqColorScaleEditorForm::updateInterpretation( bool indexedLookup )
   this->ColorTabs->setTabEnabled( PQ_COLORS_PAGE, ! indexedLookup );
   this->UseLogScaleSimple->setDisabled( indexedLookup );
   this->UseAutoRescaleSimple->setDisabled( indexedLookup );
-  this->SimpleMin->setDisabled( indexedLookup );
-  this->SimpleMax->setDisabled( indexedLookup );
+  this->SimpleMin->setDisabled( indexedLookup ? true : (this->UseAutoRescale->isChecked()));
+  this->SimpleMax->setDisabled( indexedLookup ? true : (this->UseAutoRescale->isChecked()));
+
   if ( indexedLookup )
     {
     if ( this->ColorTabs->currentIndex() == PQ_COLORS_PAGE )
@@ -230,7 +231,10 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->setupUi(this);
   this->Form->Listener = vtkEventQtSlotConnect::New();
   this->Form->Presets = new pqColorPresetManager(this);
+  this->Form->Presets->setUsingCloseButton(true);
   this->Form->Presets->restoreSettings();
+  this->connect(this->Form->Presets->getSelectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
+                this, SLOT(applyPreset()));
 
   // Put the interval and catorical data interpretation buttons in the "interpretation" button group:
   this->Form->Interpretation->addButton( this->Form->IntervalValues );
@@ -530,7 +534,6 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
       //this->Form->updateInterpretation( indexMode );
       }
 
-    QString colorArrayName = display->getProxyColorArrayName();
     int acomp = ( display->getLookupTable()->getVectorMode() == pqScalarsToColors::MAGNITUDE ? -1 :
       display->getLookupTable()->getVectorComponent() );
     vtkPVArrayInformation* ainfo = display->getProxyColorArrayInfo();
@@ -1237,166 +1240,8 @@ void pqColorScaleEditor::savePreset()
 
 void pqColorScaleEditor::loadPreset()
 {
-  this->Form->Presets->setUsingCloseButton(false);
-  if(this->Form->Presets->exec() == QDialog::Accepted)
-    {
-    // Get the color map from the selection.
-    QItemSelectionModel *selection = this->Form->Presets->getSelectionModel();
-    QModelIndex index = selection->currentIndex();
-    const pqColorMapModel *colorMap =
-        this->Form->Presets->getModel()->getColorMap(index.row());
-    if(colorMap)
-      {
-      this->Form->IgnoreEditor = true;
-      int colorSpace = colorMap->getColorSpaceAsInt();
-      bool indexedLookup = colorMap->getIndexedLookup();
-
-      QColor color;
-      pqChartValue value, opacity;
-      pqColorMapModel temp(*colorMap);
-      if(this->Form->UseAutoRescale->isChecked() ||
-          colorMap->isRangeNormalized())
-        {
-        QPair<double, double> range = this->ColorMap->getScalarRange();
-        temp.setValueRange(range.first, range.second);
-        }
-
-      vtkPiecewiseFunction *opacities = NULL;
-      vtkColorTransferFunction* colors = this->currentColorFunction();
-      this->ColorMapViewer->currentControlPointsItem()->SetCurrentPoint(-1);
-      if(this->OpacityFunction)
-        {
-        opacities = this->currentOpacityFunction();
-        this->OpacityFunctionViewer->currentControlPointsItem()->
-          SetCurrentPoint(-1);
-        opacities->RemoveAllPoints();
-        }
-
-      // Update the displayed range.
-      temp.getValueRange(value, opacity);
-      this->updateScalarRange(value.getDoubleValue(), opacity.getDoubleValue());
-      bool singleScalar = (value.getDoubleValue()==opacity.getDoubleValue());
-      int numPoints = colorMap->getNumberOfPoints();
-      if(colors && numPoints > 0)
-        {
-        colors->RemoveAllPoints();
-        if(singleScalar)
-          {
-          if(numPoints>1)
-            {
-            temp.getPointColor(numPoints-1, color);
-            colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
-              color.greenF(), color.blueF());
-            }
-          temp.getPointColor(0, color);
-          colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
-            color.greenF(), color.blueF());
-          }
-        else
-          {
-          for(int i = 0; i < numPoints; i++)
-            {
-            temp.getPointColor(i, color);
-            temp.getPointValue(i, value);
-            colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
-              color.greenF(), color.blueF());
-            if(this->OpacityFunction)
-              {
-              temp.getPointOpacity(i, opacity);
-              opacities->AddPoint(value.getDoubleValue(),
-                opacity.getDoubleValue());
-              }
-            }
-          }
-        colors->SetIndexedLookup(indexedLookup);
-        }
-
-      // Update the color space.
-      this->internalSetColorSpace(colorSpace, colors);
-
-      // Update the color space chooser.
-      this->Form->ColorSpace->blockSignals(true);
-      this->Form->ColorSpace->setCurrentIndex(colorSpace);
-      this->Form->ColorSpace->blockSignals(false);
-      if(this->ColorMap)
-        {
-        // Set the property on the lookup table.
-        int wrap = colorSpace == 2 ? 1 : 0;
-        if(colorSpace >= 2)
-          {
-          colorSpace--;
-          }
-
-        this->Form->InSetColors = true;
-        vtkSMProxy *lookupTable = this->ColorMap->getProxy();
-        pqSMAdaptor::setElementProperty(
-            lookupTable->GetProperty("ColorSpace"), colorSpace);
-        pqSMAdaptor::setElementProperty(
-            lookupTable->GetProperty("HSVWrap"), wrap);
-        this->Form->InSetColors = false;
-        }
-
-      // Update the NaN color.
-      QColor nanColor;
-      colorMap->getNanColor(nanColor);
-      this->Form->NanColor->blockSignals(true);
-      this->Form->NanColor->setChosenColor(nanColor);
-      this->Form->NanColor2->setChosenColor(nanColor);
-      this->Form->NanColor->blockSignals(false);
-
-      if (this->ColorMap)
-        {
-        // Set the property on the lookup table.
-        this->Form->InSetColors = true;
-        vtkSMProxy *lookupTable = this->ColorMap->getProxy();
-        QList<QVariant> values;
-        values << nanColor.redF() << nanColor.greenF() << nanColor.blueF();
-        pqSMAdaptor::setMultipleElementProperty(
-                                  lookupTable->GetProperty("NanColor"), values);
-        this->Form->InSetColors = false;
-        }
-
-      // IndexedLookup: Update the GUI via the proxy
-      this->Form->updateInterpretation( indexedLookup );
-      // IndexedLookup: Update the proxy
-      this->setInterpretation( indexedLookup ? PQ_INTERPRET_CATEGORY : PQ_INTERPRET_INTERVAL );
-
-      // Annotations: Update the proxy
-      QList<QVariant> annotations = colorMap->getAnnotations();
-      // Only change the annotations if the preset has some.
-      // Otherwise, keep the current set of annotations.
-      if (annotations.size() > 0)
-        {
-        this->Form->InSetAnnotation = true;
-        this->ColorMap->setAnnotations(annotations);
-        this->Form->InSetAnnotation = false;
-        // Annotations: Update the GUI via the proxy
-        this->handleAnnotationsChanged();
-        }
-      else
-        {
-        this->addActiveValues();
-        }
-
-      // Update the actual color map.
-      this->Form->IgnoreEditor = false;
-
-      if(singleScalar)
-        {
-        // the color to set on the color button
-        this->Form->ScalarColor->blockSignals(true);
-        this->Form->ScalarColor->setChosenColor(color);
-        this->Form->ScalarColor->blockSignals(false);
-        this->setScalarColor(color);
-        }
-      else
-        {
-        this->pushColors();
-        }
-
-      this->updatePointValues();
-      }
-    }
+  // The apply is done automatically when selection change
+  this->Form->Presets->show();
 }
 
 void pqColorScaleEditor::setLogScale(bool on)
@@ -3100,4 +2945,170 @@ void pqColorScaleEditor::enableAdvancedPanel(bool checked)
 
   // Adjust size
   this->adjustSize();
+}
+// ----------------------------------------------------------------------------
+void pqColorScaleEditor::applyPreset()
+{
+  if( this->Form == NULL || this->Form->Presets == NULL ||
+      this->Form->Presets->getSelectionModel() == NULL)
+    {
+    return;
+    }
+  // Get the color map from the selection.
+  QItemSelectionModel *selection = this->Form->Presets->getSelectionModel();
+  QModelIndex index = selection->currentIndex();
+  const pqColorMapModel *colorMap =
+      this->Form->Presets->getModel()->getColorMap(index.row());
+  if(colorMap && this->ColorMap)
+    {
+    this->Form->IgnoreEditor = true;
+    int colorSpace = colorMap->getColorSpaceAsInt();
+    bool indexedLookup = colorMap->getIndexedLookup();
+
+    QColor color;
+    pqChartValue value, opacity;
+    pqColorMapModel temp(*colorMap);
+    if(this->Form->UseAutoRescale->isChecked() ||
+        colorMap->isRangeNormalized())
+      {
+      QPair<double, double> range = this->ColorMap->getScalarRange();
+      temp.setValueRange(range.first, range.second);
+      }
+
+    vtkPiecewiseFunction *opacities = NULL;
+    vtkColorTransferFunction* colors = this->currentColorFunction();
+    this->ColorMapViewer->currentControlPointsItem()->SetCurrentPoint(-1);
+    if(this->OpacityFunction)
+      {
+      opacities = this->currentOpacityFunction();
+      this->OpacityFunctionViewer->currentControlPointsItem()->
+        SetCurrentPoint(-1);
+      opacities->RemoveAllPoints();
+      }
+
+    // Update the displayed range.
+    temp.getValueRange(value, opacity);
+    this->updateScalarRange(value.getDoubleValue(), opacity.getDoubleValue());
+    bool singleScalar = (value.getDoubleValue()==opacity.getDoubleValue());
+    int numPoints = colorMap->getNumberOfPoints();
+    if(colors && numPoints > 0)
+      {
+      colors->RemoveAllPoints();
+      if(singleScalar)
+        {
+        if(numPoints>1)
+          {
+          temp.getPointColor(numPoints-1, color);
+          colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+            color.greenF(), color.blueF());
+          }
+        temp.getPointColor(0, color);
+        colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+          color.greenF(), color.blueF());
+        }
+      else
+        {
+        for(int i = 0; i < numPoints; i++)
+          {
+          temp.getPointColor(i, color);
+          temp.getPointValue(i, value);
+          colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
+            color.greenF(), color.blueF());
+          if(this->OpacityFunction)
+            {
+            temp.getPointOpacity(i, opacity);
+            opacities->AddPoint(value.getDoubleValue(),
+              opacity.getDoubleValue());
+            }
+          }
+        }
+      colors->SetIndexedLookup(indexedLookup);
+      }
+
+    // Update the color space.
+    this->internalSetColorSpace(colorSpace, colors);
+
+    // Update the color space chooser.
+    this->Form->ColorSpace->blockSignals(true);
+    this->Form->ColorSpace->setCurrentIndex(colorSpace);
+    this->Form->ColorSpace->blockSignals(false);
+    if(this->ColorMap)
+      {
+      // Set the property on the lookup table.
+      int wrap = colorSpace == 2 ? 1 : 0;
+      if(colorSpace >= 2)
+        {
+        colorSpace--;
+        }
+
+      this->Form->InSetColors = true;
+      vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+      pqSMAdaptor::setElementProperty(
+          lookupTable->GetProperty("ColorSpace"), colorSpace);
+      pqSMAdaptor::setElementProperty(
+          lookupTable->GetProperty("HSVWrap"), wrap);
+      this->Form->InSetColors = false;
+      }
+
+    // Update the NaN color.
+    QColor nanColor;
+    colorMap->getNanColor(nanColor);
+    this->Form->NanColor->blockSignals(true);
+    this->Form->NanColor->setChosenColor(nanColor);
+    this->Form->NanColor2->setChosenColor(nanColor);
+    this->Form->NanColor->blockSignals(false);
+
+    if (this->ColorMap)
+      {
+      // Set the property on the lookup table.
+      this->Form->InSetColors = true;
+      vtkSMProxy *lookupTable = this->ColorMap->getProxy();
+      QList<QVariant> values;
+      values << nanColor.redF() << nanColor.greenF() << nanColor.blueF();
+      pqSMAdaptor::setMultipleElementProperty(
+                                lookupTable->GetProperty("NanColor"), values);
+      this->Form->InSetColors = false;
+      }
+
+    // IndexedLookup: Update the GUI via the proxy
+    this->Form->updateInterpretation( indexedLookup );
+    // IndexedLookup: Update the proxy
+    this->setInterpretation( indexedLookup ? PQ_INTERPRET_CATEGORY : PQ_INTERPRET_INTERVAL );
+
+    // Annotations: Update the proxy
+    QList<QVariant> annotations = colorMap->getAnnotations();
+    // Only change the annotations if the preset has some.
+    // Otherwise, keep the current set of annotations.
+    if (annotations.size() > 0)
+      {
+      this->Form->InSetAnnotation = true;
+      this->ColorMap->setAnnotations(annotations);
+      this->Form->InSetAnnotation = false;
+      // Annotations: Update the GUI via the proxy
+      this->handleAnnotationsChanged();
+      }
+    else
+      {
+      this->addActiveValues();
+      }
+
+    // Update the actual color map.
+    this->Form->IgnoreEditor = false;
+
+    if(singleScalar)
+      {
+      // the color to set on the color button
+      this->Form->ScalarColor->blockSignals(true);
+      this->Form->ScalarColor->setChosenColor(color);
+      this->Form->ScalarColor->blockSignals(false);
+      this->setScalarColor(color);
+      }
+    else
+      {
+      this->pushColors();
+      }
+
+    this->updatePointValues();
+    }
+  this->updateDisplay();
 }
