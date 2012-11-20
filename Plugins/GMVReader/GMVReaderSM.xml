@@ -1,0 +1,232 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_sources">
+    <!-- GMVReader -->
+    <SourceProxy name="GMVReader"
+                 class="vtkGMVReader"
+                 label="GMV Reader">
+      <Documentation short_help="Read a dataset in GMV format."
+                     long_help="Read binary or ASCII files stored in GMV format.">
+        The GMV reader reads binary or ASCII files stored in GMV format.
+        The default file extension is .gmv. The output of this reader is
+        a multi-block dataset.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+                            animateable="0"
+                            command="SetFileName"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          This property specifies the file name for the GMV reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PointArrayStatus"
+                            command="SetPointArrayStatus"
+                            number_of_elements="2"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property contains a list of the point-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell" />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="CellArrayStatus"
+                            command="SetCellArrayStatus"
+                            number_of_elements="2"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property contains a list of the cell-centered arrays to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FieldArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Field" />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FieldArrayStatus"
+                            command="SetFieldArrayStatus"
+                            number_of_elements="2"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="FieldArrayInfo"
+                            label="Field Arrays">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="FieldArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property contains a list of the global variables to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="HasTracers"
+                         command="GetHasTracers"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImportTracers"
+                         command="SetImportTracers"
+                         number_of_elements="1"
+                         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, tracers will be read (and stored in a separate block).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HasPolygons"
+                         command="GetHasPolygons"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ImportPolygons"
+                         command="SetImportPolygons"
+                         number_of_elements="1"
+                         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this property is set to 1, polygons will be read (and stored in a separate block).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HasProbtimeKeyword"
+                         command="GetHasProbtimeKeyword"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <!-- End GMVReader -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+    <!-- Begin GMVSeriesReader -->
+    <SourceProxy name="GMVSeriesReader"
+                           class="vtkFileSeriesReader"
+                           label="GMV Reader"
+                           si_class="vtkSIFileSeriesReaderProxy"
+                           file_name_method="SetFileName">
+      <Documentation
+         short_help="Read a dataset in GMV format."
+         long_help="Read binary or ASCII files stored in GMV format.">
+        The GMV reader reads binary or ASCII files stored in GMV format.
+        The default file extension is .gmv. The output of this reader is
+        a multi-block dataset.
+        This reader also supports file series.
+      </Documentation>
+
+      <Hints>
+        <ReaderFactory extensions="gmv"
+           file_description="GMV Binary/ASCII Files (Plugin)" />
+      </Hints>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="GMVReader">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="CellArrayInfo" />
+          <Property name="CellArrayStatus" />
+          <Property name="PointArrayInfo" />
+          <Property name="PointArrayStatus" />
+          <Property name="FieldArrayInfo" />
+          <Property name="FieldArrayStatus" />
+          <Property name="HasTracers" />
+          <Property name="ImportTracers" />
+          <Property name="HasPolygons" />
+          <Property name="ImportPolygons" />
+          <Property name="HasProbtimeKeyword" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <StringVectorProperty name="FileNameInfo"
+                            command="GetCurrentFileName"
+                            information_only="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FileNames"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            animateable="0"
+                            number_of_elements="0"
+                            repeat_command="1"
+                            information_property="FileNameInfo">
+        <FileListDomain name="files" />
+        <Documentation>
+          The list of files to be read by the reader. If more than 1 file is
+          specified, the reader will switch to file series mode in which it will
+          pretend that it can support time and provide 1 file per time step.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available time step values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- // Purposely ignore reader time by default. Otherwise, trying to
+           // open a series consisting of a few hundred GMV files of size
+           // 100 MiB each takes approximately half an hour. -->
+      <IntVectorProperty name="IgnoreReaderTime"
+                         command="SetIgnoreReaderTime"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="1"
+                         label="Ignore stored time step values / PROBTIME keyword">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether to ignore time step values stored with PROBTIME keyword.
+	  If unchecked, the entire file sequence (!) is parsed once to
+          determine time step values. Depending on its total size, this can
+          take a considerable amount of time. Also, if checked, files with
+          duplicate time step values will be ignored. (Convenient for
+          restarted simulations where simulated times overlap.)
+	  If checked, fake time step values will be used. This allows for
+          stepping through all files of a given series even if all files contain
+          the PROBTIME keyword and all specify a dummy setting of e.g. 0.000.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of GMVSeriesReader -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
