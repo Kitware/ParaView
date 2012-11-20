@@ -210,10 +210,6 @@ vtkPVDataSetAttributesInformation
       attribute = da->IsArrayAnAttribute( arrayIndx );
       vtkPVArrayInformation *info = vtkPVArrayInformation::New();
       info->CopyFromObject(array);
-      if (attribute == vtkDataSetAttributes::SCALARS)
-        {
-        info->CopyUniqueValuesFromObject(array);
-        }
       this->ArrayInformation->AddItem(info);
       info->Delete();
       // Record default attributes.
@@ -345,7 +341,6 @@ vtkPVDataSetAttributesInformation
         {
         // Take union of range.
         ai1->AddRanges(ai2);
-        ai1->AddUniqueValues(ai2);
         found = 1;
         // Record default attributes.
         int attribute1 = this->IsArrayAnAttribute(idx1);

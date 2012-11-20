@@ -41,9 +41,8 @@ class pqScalarOpacityFunction;
 class pqScalarsToColors;
 class vtkPVArrayInformation;
 class vtkPVDataInformation;
+class vtkPVProminentValuesInformation;
 class vtkPVTemporalDataInformation;
-
-
 
 /// pqDataRepresentation is the superclass for a display for a pqPipelineSource
 /// i.e. the input for this display proxy is a pqPiplineSource.
@@ -128,6 +127,9 @@ public:
   virtual int getProxyScalarMode();
   /// Convenience method to return the array information associated with the active scalars.
   virtual vtkPVArrayInformation* getProxyColorArrayInfo();
+  /// Convenience method to return prominent value list associated with the active scalars.
+  virtual vtkPVProminentValuesInformation* getProxyColorProminentValuesInfo(
+    double uncertainty = 1e-6, double minFrequency = 5e-4);
 
   virtual int getNumberOfComponents(const char* arrayname, int fieldType);
   virtual QString getComponentName( const char* arrayname, int fieldtype, int component);
@@ -152,6 +154,8 @@ protected:
     }
 
   virtual vtkPVArrayInformation* getArrayInformation( const char* arrayname, const int &fieldType );
+  virtual vtkPVProminentValuesInformation* getProminentValuesInformation(
+    const char* arrayname, const int &fieldType, double uncertainty, double minFrequency );
 
 private:
   pqDataRepresentation(const pqDataRepresentation&); // Not implemented.

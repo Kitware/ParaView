@@ -73,6 +73,7 @@ set (Module_SRCS
   vtkPVParallelCoordinatesRepresentation.cxx
   vtkPVPlotMatrixRepresentation.cxx
   vtkPVPlotMatrixView.cxx
+  vtkPVProminentValuesInformation.cxx
   vtkPVRayCastPickingHelper.cxx
   vtkPVRenderView.cxx
   vtkPVRepresentedDataInformation.cxx
