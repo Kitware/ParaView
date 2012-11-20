@@ -1,0 +1,214 @@
+<ServerManagerConfiguration>
+
+  <!-- ================================================================ -->
+  <!-- Filters                                                          -->
+  <!-- ================================================================ -->
+  <ProxyGroup name="filters">
+
+    <!-- ================================================================ -->
+    <!-- Arrow Glyph                                                      -->
+    <!-- ================================================================ -->
+    <SourceProxy
+      name="ArrowGlyphFilter"
+      class="vtkArrowGlyphFilter">
+      <Documentation
+         short_help="A customized Glyph filter for arrows only">
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array0"/>
+        <InputArrayDomain name="input_array1" attribute_type="point"
+                          number_of_components="3" optional="1"/>
+        <InputArrayDomain name="input_array2" attribute_type="point"
+                          number_of_components="1" optional="1"/>
+        <Documentation>
+          This property specifies the input to the filter.
+          This is the dataset to which the glyphs will be applied.
+        </Documentation>
+      </InputProperty>
+
+      <ProxyProperty name="ArrowSourceObject" command="SetArrowSourceObject">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+            <Proxy group="sources" name="ArrowSource" />
+          </ProxyListDomain>
+      </ProxyProperty>
+
+      <StringVectorProperty
+        name="OrientationVectorArray"
+        command="SetOrientationVectorArray"
+        number_of_elements="1"
+        animateable="0"
+        default_values="direction"
+        label="Orientation">
+        <ArrayListDomain
+          name="vectors"
+          attribute_type="Vectors"
+          none_string="None"
+          input_domain_name="input_array1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This (mandatory) property indicates the name of the Velocity array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+        name="ScaleByOrientationVectorMagnitude"
+        command="SetScaleByOrientationVectorMagnitude"
+        number_of_elements="1"
+        animateable="0"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Apply a scaling accroding to the vector magnitude
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="ScaleArray"
+        command="SetScaleArray"
+        number_of_elements="1"
+        animateable="0"
+        default_values="Scale"
+        label="Scaling Array">
+        <ArrayListDomain
+          name="any"
+          none_string="None"
+          input_domain_name="input_array0">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The array to use for scaling glyphs
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="ScaleFactor"
+         command="SetScaleFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Apply a fixed scale to the glyphs
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="ShaftRadiusArray"
+        command="SetShaftRadiusArray"
+        number_of_elements="1"
+        animateable="0"
+        default_values="Scale"
+        label="Shaft Radius Scaling Array">
+        <ArrayListDomain
+          name="any"
+          none_string="None"
+          input_domain_name="input_array0">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The array to use for scaling shaft radius
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="ShaftRadiusFactor"
+         command="SetShaftRadiusFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Apply a fixed scale to the shaft radius
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="TipRadiusArray"
+        command="SetTipRadiusArray"
+        number_of_elements="1"
+        animateable="0"
+        default_values="Scale"
+        label="Tip Radius Scaling Array">
+        <ArrayListDomain
+          name="any"
+          none_string="None"
+          input_domain_name="input_array0">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          The array to use for scaling tip radius
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="TipRadiusFactor"
+         command="SetTipRadiusFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Apply a fixed scale to the tip radius
+        </Documentation>
+      </DoubleVectorProperty>
+
+
+      <IntVectorProperty
+         name="MaximumNumberOfPoints"
+         command="SetMaximumNumberOfPoints"
+         number_of_elements="1"
+         default_values="5000"
+         label="Maximum Number of Points">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          The value of this property specifies the maximum number of glyphs that should appear in the output dataset if the value of the UseMaskPoints property is 1. (See the UseMaskPoints property.)
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="UseMaskPoints"
+         command="SetUseMaskPoints"
+         number_of_elements="1"
+         default_values="1"
+         label="Mask Points">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the value of this property is set to 1, limit the maximum number of glyphs to the value indicated by MaximumNumberOfPoints. (See the MaximumNumberOfPoints property.)
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="RandomMode"
+         command="SetRandomMode"
+         number_of_elements="1"
+         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If the value of this property is 1, then the points to glyph are chosen randomly. Otherwise the point ids chosen are evenly spaced.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

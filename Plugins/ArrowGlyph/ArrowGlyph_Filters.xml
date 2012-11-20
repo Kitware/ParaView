@@ -1,0 +1,5 @@
+<ParaViewFilters>
+  <Category name="Custom" menu_label="&amp;Custom">
+    <Filter name="ArrowGlyphFilter" />
+  </Category>
+</ParaViewFilters>
