@@ -2406,19 +2406,6 @@
         dimension (i,j,k) to skip between each point included in this
         output.</Documentation>
       </IntVectorProperty>
-      <IntVectorProperty animateable="0"
-                         command="SetNumberOfReaderProcesses"
-                         default_values="0"
-                         name="NumberOfReaderProcesses"
-                         number_of_elements="1">
-        <IntRangeDomain min="0"
-                        name="range" />
-        <Documentation>This property indicates the amount of processes that
-        will actually read the file and then send out the information to other
-        processes. An default value of 0 is used so that a proper value is set
-        on the server. The actual value will range between 1 and the number of
-        server processes.</Documentation>
-      </IntVectorProperty>
       <Hints>
         <ReaderFactory extensions="pop.ncdf pop.nc"
                        file_description="Parallel POP Ocean NetCDF (Rectilinear)" />
@@ -6866,7 +6853,6 @@
           <Property name="VariableArrayInfo" />
           <Property name="VariableArrayStatus" />
           <Property name="Stride" />
-          <Property name="NumberOfReaderProcesses" />
         </ExposedProperties>
       </SubProxy>
       <StringVectorProperty command="GetCurrentFileName"
