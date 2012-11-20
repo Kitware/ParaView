@@ -35,7 +35,7 @@ public:
   static vtkAnalyzeWriter *New();
   vtkTypeMacro(vtkAnalyzeWriter,vtkImageWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
- 
+
   void SetFileType(int inValue);
   int getFileType();
 
@@ -47,7 +47,10 @@ protected:
   
   virtual void WriteFile(ofstream *file, vtkImageData *data, int ext[6], int wExtent[6]);
   virtual void WriteFileHeader(ofstream *file, vtkImageData *cache, int wholeExtent[6]);
+
 private:
+  vtkAnalyzeWriter(const vtkAnalyzeWriter&);  // Not implemented.
+  void operator=(const vtkAnalyzeWriter&);  // Not implemented.
 
   int FileType;
   unsigned int imageSizeInBytes;
@@ -58,11 +61,7 @@ private:
   bool foundNiftiHeader;
   int * savedFlipAxis;
   int * savedInPlaceFilteredAxes;
-
-  vtkAnalyzeWriter(const vtkAnalyzeWriter&);  // Not implemented.
-  void operator=(const vtkAnalyzeWriter&);  // Not implemented.
+  bool fixFlipError;
 };
 
 #endif
-
-
