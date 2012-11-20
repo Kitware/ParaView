@@ -18,6 +18,9 @@
 // vtkGeometryRepresentation is a representation for showing polygon geometry.
 // It handles non-polygonal datasets by extracting external surfaces. One can
 // use this representation to show surface/wireframe/points/surface-with-edges.
+// .SECTION Thanks
+// The addition of a transformation matrix was supported by CEA/DIF 
+// Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 
 #ifndef __vtkGeometryRepresentation_h
 #define __vtkGeometryRepresentation_h

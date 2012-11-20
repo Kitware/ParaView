@@ -17,6 +17,9 @@
 // vtkSelectionRepresentation is a representation to show the extracted
 // cells. It uses vtkGeometryRepresentation and vtkPVDataRepresentation
 // internally.
+// .SECTION Thanks
+// The addition of a transformation matrix was supported by CEA/DIF 
+// Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 
 #ifndef __vtkSelectionRepresentation_h
 #define __vtkSelectionRepresentation_h

@@ -18,9 +18,12 @@
 // vtkDataLabelRepresentation is a representation for showing cell and/or point
 // labels. This representation relies on all the data being cloned on all nodes
 // hence beware of using this representation for large datasets.
-//
+// .SECTION Caveat
 // Note that vtkDataLabelRepresentation adds the label props to the
 // non-composited renderer.
+// .SECTION Thanks
+// The addition of a transformation matrix was supported by CEA/DIF 
+// Commissariat a l'Energie Atomique, Centre DAM Ile-De-France, Arpajon, France.
 
 #ifndef __vtkDataLabelRepresentation_h
 #define __vtkDataLabelRepresentation_h
