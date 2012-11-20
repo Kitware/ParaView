@@ -16,7 +16,9 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVProminentValuesInformation.h"
 #include "vtkPVRepresentedDataInformation.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSession.h"
@@ -33,6 +35,9 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
   this->SetExecutiveName("vtkPVDataRepresentationPipeline");
   this->RepresentedDataInformationValid = false;
   this->RepresentedDataInformation = vtkPVRepresentedDataInformation::New();
+  this->ProminentValuesInformation = vtkPVProminentValuesInformation::New();
+  this->ProminentValuesFraction = -1;
+  this->ProminentValuesUncertainty = -1;
   this->MarkedModified = false;
 }
 
@@ -40,6 +45,7 @@ vtkSMRepresentationProxy::vtkSMRepresentationProxy()
 vtkSMRepresentationProxy::~vtkSMRepresentationProxy()
 {
   this->RepresentedDataInformation->Delete();
+  this->ProminentValuesInformation->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -267,6 +273,43 @@ vtkPVDataInformation* vtkSMRepresentationProxy::GetRepresentedDataInformation()
     }
 
   return this->RepresentedDataInformation;
+}
+
+//----------------------------------------------------------------------------
+vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInformation(
+  vtkStdString name, int fieldAssoc, int numComponents,
+  double uncertaintyAllowed, double fraction)
+{
+  bool invalid =
+    this->ProminentValuesFraction < 0. || this->ProminentValuesUncertainty < 0. ||
+    this->ProminentValuesFraction > 1. || this->ProminentValuesUncertainty > 1.;
+  bool largerFractionOrLessCertain =
+    this->ProminentValuesFraction < fraction ||
+    this->ProminentValuesUncertainty > uncertaintyAllowed;
+  if (invalid || largerFractionOrLessCertain)
+    {
+    vtkTimerLog::MarkStartEvent(
+      "vtkSMRepresentationProxy::GetProminentValues");
+    this->CreateVTKObjects();
+    this->UpdatePipeline();
+    // Initialize parameters with specified values:
+    this->ProminentValuesInformation->Initialize();
+    this->ProminentValuesInformation->SetFieldAssociation(
+      vtkDataObject::GetAssociationTypeAsString(fieldAssoc));
+    this->ProminentValuesInformation->SetFieldName(name);
+    this->ProminentValuesInformation->SetNumberOfComponents(numComponents);
+    this->ProminentValuesInformation->SetUncertainty(uncertaintyAllowed);
+    this->ProminentValuesInformation->SetFraction(fraction);
+
+    // Ask the server to fill out the rest of the information:
+    this->GatherInformation(this->ProminentValuesInformation);
+    vtkTimerLog::MarkEndEvent(
+      "vtkSMRepresentationProxy::GetProminentValues");
+    this->ProminentValuesFraction = fraction;
+    this->ProminentValuesUncertainty = uncertaintyAllowed;
+    }
+
+  return this->ProminentValuesInformation;
 }
 
 //-----------------------------------------------------------------------------

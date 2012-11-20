@@ -102,12 +102,6 @@ public:
   virtual void CopyFromObject( vtkObject* );
 
   // Description:
-  // Transfer information about a single vtkAbstractArray's unique values into this object.
-  // This must be called *after* CopyFromObject has been invoked on the same object so
-  // that information on the number of components is available.
-  virtual void CopyUniqueValuesFromObject( vtkAbstractArray* );
-
-  // Description:
   // Merge another information object.
   virtual void AddInformation( vtkPVInformation* );
 
@@ -140,16 +134,6 @@ public:
   const char* GetInformationKeyName(int);
   int HasInformationKey(const char* location, const char* name);
 
-  // Description:
-  // Merge another list of unique values.
-  void AddUniqueValues( vtkPVArrayInformation* );
-
-  // Description:
-  // Returns either NULL (array component appears to be continuous) or
-  // a pointer to a vtkAbstractArray (array component appears to be discrete)
-  // containing a sorted list of all unique values encountered in the array component.
-  vtkAbstractArray* GetUniqueComponentValuesIfDiscrete( int component );
-
 protected:
   vtkPVArrayInformation();
   ~vtkPVArrayInformation();
@@ -178,11 +162,6 @@ protected:
   //BTX
   class vtkInternalComponentNames;
   vtkInternalComponentNames* ComponentNames;
-  //ETX
-
-  //BTX
-  class vtkInternalUniqueValues;
-  vtkInternalUniqueValues* UniqueValues;
   //ETX
 
   vtkPVArrayInformation(const vtkPVArrayInformation&); // Not implemented

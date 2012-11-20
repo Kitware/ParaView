@@ -22,6 +22,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMSourceProxy.h"
 
+class vtkPVProminentValuesInformation;
+
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMRepresentationProxy : public vtkSMSourceProxy
 {
 public:
@@ -37,6 +39,24 @@ public:
   // Returns information about the data that is finally rendered by this
   // representation.
   virtual vtkPVDataInformation* GetRepresentedDataInformation();
+
+  // Description:
+  // Returns information about a specific array component's prominent values (or NULL).
+  //
+  // The \a name, \a fieldAssoc, and \a numComponents arguments specify
+  // which arrays on the input dataset to examine. Because multiblock
+  // datasets may have multiple arrays of the same name on different blocks,
+  // and these arrays may not have the same storage type or number of
+  // components, this method requires you to specify the number of
+  // components per tuple the array(s) of interest must have.
+  // You may call GetRepresentedDataInformation() to obtain the number of
+  // components for any array.
+  //
+  // See vtkAbstractArray::GetProminentComponentValues for more information
+  // about the \a uncertaintyAllowed and \a fraction arguments.
+  virtual vtkPVProminentValuesInformation* GetProminentValuesInformation(
+    vtkStdString name, int fieldAssoc, int numComponents,
+    double uncertaintyAllowed = 1e-6, double fraction = 1e-3);
 
   // Description:
   // Calls Update() on all sources. It also creates output ports if
@@ -92,6 +112,11 @@ private:
 
   bool RepresentedDataInformationValid;
   vtkPVDataInformation* RepresentedDataInformation;
+
+  bool ProminentValuesInformationValid;
+  vtkPVProminentValuesInformation* ProminentValuesInformation;
+  double ProminentValuesFraction;
+  double ProminentValuesUncertainty;
 
   // Description:
   // When ViewTime changes, we mark all inputs modified so that they fetch the

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVProminentValuesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMInputProperty.h"
@@ -126,7 +127,7 @@ void pqDataRepresentation::onInputChanged()
     }
   else if (new_proxes_count == 1)
     {
-    pqServerManagerModel* smModel = 
+    pqServerManagerModel* smModel =
       pqApplicationCore::instance()->getServerManagerModel();
     pqPipelineSource* input = smModel->findItem<pqPipelineSource*>(ivp->GetProxy(0));
     if (ivp->GetProxy(0) && !input)
@@ -175,7 +176,7 @@ void pqDataRepresentation::setDefaultPropertyValues()
   vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
     this->getProxy());
   proxy->GetProperty("Input")->UpdateDependentDomains();
-  
+
   this->Superclass::setDefaultPropertyValues();
 }
 
@@ -189,7 +190,7 @@ vtkSMProxy* pqDataRepresentation::getLookupTableProxy()
 //-----------------------------------------------------------------------------
 pqScalarsToColors* pqDataRepresentation::getLookupTable()
 {
-  pqServerManagerModel* smmodel = 
+  pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   vtkSMProxy* lut = this->getLookupTableProxy();
 
@@ -324,36 +325,82 @@ int pqDataRepresentation::getProxyScalarMode()
 vtkPVArrayInformation* pqDataRepresentation::getProxyColorArrayInfo()
 {
   const char* colorArray = 0;
-  vtkSMStringVectorProperty* caProp = vtkSMStringVectorProperty::SafeDownCast( this->getProxy()->GetProperty( "ColorArrayName" ));
+  vtkSMStringVectorProperty* caProp =
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->getProxy()->GetProperty( "ColorArrayName" ));
   if ( caProp )
     {
     colorArray = caProp->GetElement( 0 );
     }
   int fieldType = this->getProxyScalarMode();
-  vtkPVArrayInformation* retval = colorArray ? this->getArrayInformation( colorArray, fieldType ) : 0;
-  //cout << "** " << colorArray << "  " << retval << "\n";
+  vtkPVArrayInformation* retval = colorArray ?
+    this->getArrayInformation( colorArray, fieldType ) : 0;
   return retval;
 }
 
 //-----------------------------------------------------------------------------
-vtkPVArrayInformation* pqDataRepresentation::getArrayInformation( const char* arrayname, const int &fieldType )
+vtkPVArrayInformation* pqDataRepresentation::getArrayInformation(
+  const char* arrayname, const int &fieldType )
 {
- 
+
   vtkPVDataInformation* dataInfo = this->getRepresentedDataInformation(true);
   vtkPVArrayInformation* info = NULL;
   if(fieldType == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-    vtkPVDataSetAttributesInformation* cellinfo = 
+    vtkPVDataSetAttributesInformation* cellinfo =
       dataInfo->GetCellDataInformation();
     info = cellinfo->GetArrayInformation(arrayname);
     }
   else if ( fieldType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-    vtkPVDataSetAttributesInformation* pointinfo = 
+    vtkPVDataSetAttributesInformation* pointinfo =
       dataInfo->GetPointDataInformation();
     info = pointinfo->GetArrayInformation(arrayname);
-    }  
+    }
   return info;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVProminentValuesInformation*
+pqDataRepresentation::getProxyColorProminentValuesInfo(
+  double uncertainty, double fraction)
+{
+  const char* colorArray = 0;
+  vtkSMStringVectorProperty* caProp =
+    vtkSMStringVectorProperty::SafeDownCast(
+      this->getProxy()->GetProperty( "ColorArrayName" ));
+  if ( caProp )
+    {
+    colorArray = caProp->GetElement( 0 );
+    }
+  int fieldType = this->getProxyScalarMode();
+  vtkPVProminentValuesInformation* retval = colorArray ?
+    this->getProminentValuesInformation(
+      colorArray, fieldType, uncertainty, fraction ) :
+    0;
+  return retval;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVProminentValuesInformation*
+pqDataRepresentation::getProminentValuesInformation(
+  const char* arrayName, const int &fieldType,
+  double uncertainty, double minFraction )
+{
+  vtkPVArrayInformation* ainfo =
+    this->getArrayInformation(arrayName, fieldType);
+  if (!ainfo)
+    {
+    return 0;
+    }
+  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+    this->getProxy());
+  // repr == 0 can't happen since (ainfo != 0) => (repr != 0)
+  vtkPVProminentValuesInformation* pvinfo =
+    repr->GetProminentValuesInformation(
+      arrayName, fieldType, ainfo->GetNumberOfComponents(),
+      uncertainty, minFraction );
+  return pvinfo;
 }
 
 //-----------------------------------------------------------------------------
@@ -365,11 +412,11 @@ int pqDataRepresentation::getNumberOfComponents(const char* arrayname, int field
 
 //-----------------------------------------------------------------------------
 QString pqDataRepresentation::getComponentName( const char* arrayname, int fieldType, int component)
-{ 
+{
   vtkPVArrayInformation *info = this->getArrayInformation( arrayname, fieldType );
   if ( info )
      {
-     return QString(info->GetComponentName( component ));     
-     }     
+     return QString(info->GetComponentName( component ));
+     }
   return QString();
 }

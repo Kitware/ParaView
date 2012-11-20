@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVProminentValuesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkPVTemporalDataInformation.h"
@@ -536,15 +537,15 @@ void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
 
     int acomp = ( display->getLookupTable()->getVectorMode() == pqScalarsToColors::MAGNITUDE ? -1 :
       display->getLookupTable()->getVectorComponent() );
-    vtkPVArrayInformation* ainfo = display->getProxyColorArrayInfo();
+    vtkPVProminentValuesInformation* vinfo = display->getProxyColorProminentValuesInfo();
     bool haveActiveValues = false;
-    if ( ainfo )
+    if ( vinfo )
       {
-      if ( acomp == -1 && ainfo->GetNumberOfComponents() == 1 )
+      if ( acomp == -1 && vinfo->GetNumberOfComponents() == 1 )
         {
         acomp = 0;
         }
-      vtkAbstractArray* uniq = ainfo->GetUniqueComponentValuesIfDiscrete( acomp );
+      vtkAbstractArray* uniq = vinfo->GetProminentComponentValues(acomp);
       if ( uniq )
         {
         haveActiveValues = true;
