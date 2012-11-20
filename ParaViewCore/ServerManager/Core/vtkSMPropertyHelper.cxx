@@ -406,7 +406,7 @@ inline void vtkSMPropertyHelper::SetPropertyArray(const int *values, unsigned in
   else if (this->Type == IDTYPE)
     {
     vtkIdType *temp = new vtkIdType[count+1];
-    for (int cc=0; cc < count; cc++)
+    for (unsigned int cc=0; cc < count; cc++)
       {
       temp[cc] = static_cast<vtkIdType>(values[cc]);
       }
