@@ -31,6 +31,8 @@ vtkSMCameraConfigurationWriter::vtkSMCameraConfigurationWriter()
   propNames->AddString("CameraViewUp");
   propNames->AddString("CenterOfRotation");
   propNames->AddString("CameraViewAngle");
+  propNames->AddString("CameraParallelScale");
+  propNames->AddString("CameraParallelProjection");
   vtkSMNamedPropertyIterator *propIt=vtkSMNamedPropertyIterator::New();
   propIt->SetPropertyNames(propNames);
   propNames->Delete();
