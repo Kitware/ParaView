@@ -1,5 +1,10 @@
 # CMake script used to setup ParaView Nightly binary in order to test them
 #
+# The following variable need to be set by you:
+# - PV_NIGHTLY_SUFFIX : Suffix that should be tested on that given computer.
+#                       i.e.: glibc-2.3.6-NIGHTLY, glibc-2.15-NIGHTLY,
+#                             10.6-10.7-NIGHTLY, 10.8-NIGHTLY, 10.8-NoMPI-NIGHTLY
+#
 # The following variable will be set for you:
 # - PV_NIGHTLY_PARAVIEW : ParaView executable
 # - PV_NIGHTLY_PVPYTHON : pvpython executable
@@ -21,12 +26,17 @@ set(PV_NIGHTLY_PVBLOT   "")
 set(PV_NIGHTLY_PVDATASERVER   "")
 set(PV_NIGHTLY_PVRENDERSERVER "")
 
+# If PV_NIGHTLY_SUFFIX not set, then set it to the default NIGHTLY value
+if(NOT PV_NIGHTLY_SUFFIX)
+  set(PV_NIGHTLY_SUFFIX "NIGHTLY")
+endif()
+
 # ---------------------------------
 #             Linux
 # ---------------------------------
 
 if(UNIX AND NOT APPLE)
-    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Linux-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.tar.gz")
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Linux-${PARAVIEW_BUILD_ARCHITECTURE}bit-${PV_NIGHTLY_SUFFIX}.tar.gz")
     ExternalProject_Add( Nightly-ParaView
        URL "${SUPERBUILD_DOWNLOAD_BASE_URL}/${paraview_nightly_server_filename}"
        SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly
@@ -53,7 +63,7 @@ endif()
 # ---------------------------------
 
 if(APPLE)
-    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Darwin-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.dmg")
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Darwin-${PARAVIEW_BUILD_ARCHITECTURE}bit-${PV_NIGHTLY_SUFFIX}.dmg")
     set(paraview_nightly_filePath ${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/PVNightly.dmg)
 
     if(NOT EXISTS ${paraview_nightly_filePath})
@@ -108,7 +118,7 @@ endif()
 # ---------------------------------
 
 if(WIN32 OR WIN64)
-    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Windows-${PARAVIEW_BUILD_ARCHITECTURE}bit-NIGHTLY.zip")
+    set(paraview_nightly_server_filename "ParaView-${PV_NIGHTLY_VERSION}-Windows-${PARAVIEW_BUILD_ARCHITECTURE}bit-${PV_NIGHTLY_SUFFIX}.zip")
 
     ExternalProject_Add( Nightly-ParaView
        URL "${SUPERBUILD_DOWNLOAD_BASE_URL}/${paraview_nightly_server_filename}"
