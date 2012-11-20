@@ -35,16 +35,19 @@ function(determine_version source_dir git_command var_prefix)
   set (patch)
   set (full)
   set (patch_extra)
+  set (result -1)
 
-  if(NOT PARAVIEW_GIT_DESCRIBE AND EXISTS ${git_command})
-    execute_process(
-      COMMAND ${git_command} describe
-      WORKING_DIRECTORY ${source_dir}
-      RESULT_VARIABLE result
-      OUTPUT_VARIABLE output
-      ERROR_QUIET
-      OUTPUT_STRIP_TRAILING_WHITESPACE
-      ERROR_STRIP_TRAILING_WHITESPACE)
+  if (NOT PARAVIEW_GIT_DESCRIBE)
+    if (EXISTS ${git_command})
+      execute_process(
+        COMMAND ${git_command} describe
+        WORKING_DIRECTORY ${source_dir}
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
+        ERROR_QUIET
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_STRIP_TRAILING_WHITESPACE)
+    endif()
   else()
     set(result 0)
     set(output ${PARAVIEW_GIT_DESCRIBE})
