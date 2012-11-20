@@ -34,15 +34,16 @@
 #include <set> //needed for ivars
 
 class vtkBlockDeliveryPreprocessor;
-class vtkClientServerMoveData;
 class vtkChartNamedOptions;
+class vtkChartSelectionRepresentation;
+class vtkClientServerMoveData;
+class vtkDataObjectTree;
+class vtkMultiBlockDataSet;
 class vtkPVCacheKeeper;
 class vtkPVContextView;
 class vtkReductionFilter;
 class vtkSelectionDeliveryFilter;
 class vtkTable;
-class vtkChartSelectionRepresentation;
-class vtkMultiBlockDataSet;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkChartRepresentation : public vtkPVDataRepresentation
 {
@@ -146,8 +147,12 @@ protected:
 
   // Description:
   // Returns vtkTable at the local processes.
-  bool GetLocalOutput(std::vector<vtkTable*>& tables);
+  bool GetLocalOutput(std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames = NULL);
   void UpdateSeriesNames();
+
+  // Description:
+  // Method used recursively to traverse the tree and build the full path name of the blocks.
+  void FillTableList(vtkMultiBlockDataSet* tree, std::vector<vtkTable*>& tables, std::vector<std::string> *blockNames = NULL, const char* currentPath = "");
 
   vtkBlockDeliveryPreprocessor* Preprocessor;
   vtkPVCacheKeeper* CacheKeeper;
@@ -159,10 +164,15 @@ protected:
   bool EnableServerSideRendering;
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
 
-  std::vector<const char*> SeriesNames; //all series names consistent with local output
+  std::vector<std::string> SeriesNames; //all series names consistent with local output
   std::set<int> CompositeIndices; //the selected blocks
 
   vtkChartSelectionRepresentation* SelectionRepresentation;
+
+  // Vars used to Cache GetLocalOutput call when possible
+  std::vector<vtkTable*>   LocalOutputTableCache;
+  std::vector<std::string> LocalOutputBlockNameCache;
+  unsigned long            LocalOutputCacheTimeStamp;
 
 private:
   vtkChartRepresentation(const vtkChartRepresentation&); // Not implemented

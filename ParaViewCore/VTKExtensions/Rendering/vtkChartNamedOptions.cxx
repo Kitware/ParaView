@@ -35,6 +35,7 @@ class vtkChartNamedOptions::PlotInfo
 public:
   vtkWeakPointer<vtkPlot> Plot;
   vtkStdString Label;
+  vtkStdString SerieName;
   bool VisibilityInitialized;
   bool Visible;
 
@@ -45,9 +46,10 @@ public:
   PlotInfo(const PlotInfo &p)
     {
     this->VisibilityInitialized = p.VisibilityInitialized;
-    this->Visible = p.Visible;
-    this->Label = p.Label;
-    this->Plot = p.Plot;
+    this->Visible   = p.Visible;
+    this->Label     = p.Label;
+    this->SerieName = p.SerieName;
+    this->Plot      = p.Plot;
     }
 };
 
@@ -89,7 +91,7 @@ void vtkChartNamedOptions::SetVisibility(const char* name, int visible)
   PlotInfo& plotInfo = this->GetPlotInfo(name);
   plotInfo.Visible = visible != 0;
   plotInfo.VisibilityInitialized = true;
-  this->SetPlotVisibilityInternal(plotInfo, visible != 0, name);
+  this->SetPlotVisibilityInternal(plotInfo, visible != 0, plotInfo.SerieName);
 }
 
 //----------------------------------------------------------------------------
@@ -123,7 +125,7 @@ void vtkChartNamedOptions::SetTableVisibility(bool visible)
     {
     PlotInfo& plotInfo = it->second;
     this->SetPlotVisibilityInternal(plotInfo, visible && plotInfo.Visible,
-                                    it->first.c_str());
+                                    plotInfo.SerieName);
     }
 }
 
@@ -182,12 +184,12 @@ void vtkChartNamedOptions::UpdatePlotOptions()
     {
     PlotInfo& plotInfo = it->second;
     this->SetPlotVisibilityInternal(plotInfo, plotInfo.Visible,
-                                    it->first.c_str());
+                                    plotInfo.SerieName);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkChartNamedOptions::SetTables(vtkTable** tables, int n)
+void vtkChartNamedOptions::SetTables(vtkTable** tables, const char** tableBlockNames, int n)
 {
   bool sameTable=true;
   if (n!= static_cast<int>(this->Tables.size()))
@@ -217,9 +219,11 @@ void vtkChartNamedOptions::SetTables(vtkTable** tables, int n)
     }
 
   this->Tables.clear();
+  this->TableBlockNames.clear();
   for(int i=0; i<n; i++)
     {
     this->Tables.push_back(tables[i]);
+    this->TableBlockNames.push_back(tableBlockNames[i] ? tableBlockNames[i] : "");
     }
   this->RefreshPlots();
   this->SetTableVisibility(this->TableVisibility);
@@ -275,6 +279,7 @@ void vtkChartNamedOptions::RefreshPlots()
 
   for(size_t tbIndex=0; tbIndex< this->Tables.size(); tbIndex++)
     {
+    std::string blockName = this->TableBlockNames[tbIndex];
     vtkTable* table = this->Tables[tbIndex];
     // For each series (column in the table)
     const vtkIdType numberOfColumns = table->GetNumberOfColumns();
@@ -287,8 +292,20 @@ void vtkChartNamedOptions::RefreshPlots()
         continue;
         }
 
+      // Full Path of serie name
+      std::ostringstream fullPathSerieName;
+
+      // Append block name only if blocks
+      if(this->Tables.size() > 1)
+        {
+        fullPathSerieName << blockName << "/";
+        }
+
+      fullPathSerieName << seriesName;
+
       // Get the existing PlotInfo or initialize a new one
-      PlotInfo& plotInfo = this->GetPlotInfo(seriesName);
+      PlotInfo& plotInfo = this->GetPlotInfo(fullPathSerieName.str().c_str());
+      plotInfo.SerieName = seriesName;
       if (!plotInfo.VisibilityInitialized)
         {
         plotInfo.VisibilityInitialized = true;
@@ -296,7 +313,7 @@ void vtkChartNamedOptions::RefreshPlots()
         }
 
       // Add the PlotInfo to the new collection
-      newMap[seriesName] = plotInfo;
+      newMap[fullPathSerieName.str()] = plotInfo;
       }
     }
 
@@ -350,6 +367,7 @@ vtkChartNamedOptions::GetPlotInfo(const char* seriesName)
     {
     PlotInfo& plotInfo = this->Internals->PlotMap[seriesName];
     plotInfo.Label = seriesName;
+    plotInfo.SerieName = seriesName;
     return plotInfo;
     }
 }
@@ -363,18 +381,30 @@ void vtkChartNamedOptions::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkChartNamedOptions::GetSeriesNames(std::vector<const char*>& seriesNames)
 {
+  this->CachedSerieNames.clear();
   seriesNames.clear();
   std::set<std::string> uniqueNames;
   for(size_t i=0; i<this->Tables.size(); i++)
     {
     vtkTable* table = this->Tables[i];
+    std::string blockName = this->TableBlockNames[i];
     for(vtkIdType j = 0; j< table->GetNumberOfColumns(); j++)
       {
       const char* name = table->GetColumnName(j);
-      if(uniqueNames.find(name)==uniqueNames.end())
+      std::ostringstream fullName;
+
+      // Append block name only if blocks
+      if(this->Tables.size() > 1)
         {
-        uniqueNames.insert(name);
-        seriesNames.push_back(name);
+        fullName << blockName << "/";
+        }
+
+      fullName << name;
+      if(uniqueNames.find(fullName.str())==uniqueNames.end())
+        {
+        this->CachedSerieNames.push_back(fullName.str());
+        uniqueNames.insert(this->CachedSerieNames.back());
+        seriesNames.push_back(this->CachedSerieNames.back().c_str());
         }
       }
     }
