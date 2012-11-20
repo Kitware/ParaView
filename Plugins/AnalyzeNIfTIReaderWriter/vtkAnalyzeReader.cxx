@@ -31,7 +31,6 @@
 #include "vtkDoubleArray.h"
 
 #include "vtkStringArray.h"
-#include <QDir>
 #define NAME_ARRAY "Name"
 #define DEFAULT_NAME ""
 
@@ -1139,10 +1138,21 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     nameArray = vtkStringArray::New();
     nameArray->SetName(NAME_ARRAY);
     nameArray->SetNumberOfValues(1);
-    char * tempCharName = this->GetFileName();
-    QString tempQString = tempCharName;
-    tempQString.remove(0, (tempQString.length() - (tempQString.length() - tempQString.lastIndexOf(QDir::separator()) -1)));
-    nameArray->SetValue(0,std::string(tempQString.toStdString()));
+    std::string fileName = this->GetFileName();
+
+    // Remove directory part
+    size_t position = fileName.rfind("/");
+    if(position != std::string::npos)
+      {
+      fileName.erase(0, position + 1);
+      }
+    position = fileName.rfind("\\");
+    if(position != std::string::npos)
+      {
+      fileName.erase(0, position + 1);
+      }
+
+    nameArray->SetValue(0, fileName);
     fa->AddArray(nameArray);
     nameArray->Delete();
     nameAbstractArray = fa->GetAbstractArray(NAME_ARRAY);
