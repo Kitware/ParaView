@@ -73,8 +73,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
 include(CMakeDependentOption)
-#------------------------------------------------------------------------------
-
 
 #------------------------------------------------------------------------------
 # Setup ParaView Environment
@@ -280,6 +278,14 @@ if (UNIX AND NOT APPLE)
 endif()
 #------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------
+# Download and install superbuild binaries for current system if needed
+#------------------------------------------------------------------------------
+option(NIGHTLY_BINARY_TESTING "Run Nightly-Binary ParaView Testing" OFF)
+mark_as_advanced(NIGHTLY_BINARY_TESTING)
+if(NIGHTLY_BINARY_TESTING)
+  include(NightlyBinary)
+endif()
 
 #------------------------------------------------------------------------------
 # Update state based on chosen/imported options.
@@ -327,6 +333,10 @@ if (BUILD_TESTING)
   make_directory(${PARAVIEW_TEST_DIR})
   enable_testing()
   include(CTest)
+  # Create testing dir for nightly build if needed
+  if(NIGHTLY_BINARY_TESTING)
+      make_directory(${PARAVIEW_TEST_DIR}/NightlyTest)
+  endif()
 endif()
 
 # Setup default state for ParaView module groups.
