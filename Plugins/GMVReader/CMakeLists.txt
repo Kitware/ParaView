@@ -43,6 +43,7 @@ FIND_PATH(GMVReader_GMVREAD_LIB_DIR
   )
 IF (GMVReader_GMVREAD_LIB_DIR)
   INCLUDE_DIRECTORIES("${GMVReader_GMVREAD_LIB_DIR}")
+  INCLUDE_DIRECTORIES("${ParaView_SOURCE_DIR}/Utilities/VisItBridge/Library/VisItLib/common/utility")
 ELSE ()
   MESSAGE(FATAL_ERROR "Please set GMVReader_GMVREAD_LIB_DIR to where gmvread.c, gmvread.h and gmvrayread.h in the VisItBridge source tree can be found.")
 ENDIF (GMVReader_GMVREAD_LIB_DIR)
@@ -101,3 +102,8 @@ ELSE (PARAVIEW_BUILD_QT_GUI)
     SERVER_MANAGER_XML GMVReaderSM.xml
     SERVER_MANAGER_SOURCES vtkGMVReader.cxx)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
+
+# Add testing if necessary
+if (BUILD_TESTING)
+  add_subdirectory(Testing)
+endif (BUILD_TESTING)
