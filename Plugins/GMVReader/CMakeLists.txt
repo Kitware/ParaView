@@ -1,7 +1,3 @@
-PROJECT(GMVReader)
-
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-
 OPTION(GMVReader_SKIP_DATARANGE_CALCULATIONS_IN_REQUEST_INFORMATION_CALLS
   "Calculate minimum and maximum of data arrays in RequestInformation calls.
    A feature inherited from AVSucdReader, but it seems this information is
@@ -51,14 +47,6 @@ ELSE ()
   MESSAGE(FATAL_ERROR "Please set GMVReader_GMVREAD_LIB_DIR to where gmvread.c, gmvread.h and gmvrayread.h in the VisItBridge source tree can be found.")
 ENDIF (GMVReader_GMVREAD_LIB_DIR)
 
-
-# -----------------------------------------------------------------------------
-# Add an option for building shared - default to the same choice made for VTK
-# BUILD_SHARED_LIBS is a builtin cmake variable.
-# -----------------------------------------------------------------------------
-SET(BUILD_SHARED_LIBS ${PARAVIEW_BUILD_SHARED_LIBS})
-
-
 # -----------------------------------------------------------------------------
 # Disable some warnings
 # -----------------------------------------------------------------------------
@@ -83,29 +71,6 @@ ELSEIF (UNIX)
   ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 ENDIF (WIN32)
 
-
-# -----------------------------------------------------------------------------
-# Determine suitable servermanager XML file
-# -----------------------------------------------------------------------------
-IF ("${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}" VERSION_GREATER "3.11.0")
-  # -----------------------------------------------------------------------------
-  # ParaView sources contain merely from 2011-Apr-08 onwards "Collaboration code"
-  # which introduced a different servermanager XML requirement.
-  SET(SM_XML GMVReaderSM.xml)
-
-
-ELSE ("${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}")
-  # -----------------------------------------------------------------------------
-  # Be aware that ParaView sources contain merely from 2009-Sep-21 onwards
-  # a version of vtkFileSeriesReader that can deal with file series where
-  # multiple files provide the same time step value, e.g. constant zero for
-  # all files. Adaptions to the XML server manager code are also required
-  # for pre-CollaborationMerge source tree.
-  # -----------------------------------------------------------------------------
-  MESSAGE(FATAL_ERROR "Only ParaView 3.11.0 or higher supported.")
-
-ENDIF ("${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}.${PARAVIEW_VERSION_PATCH}" VERSION_GREATER "3.11.0")
-
 # ---------------------------------------------------------------------------
 # Combined plugin
 # -----------------------------------------------------------------------------
@@ -122,7 +87,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
     REQUIRED_ON_SERVER
     REQUIRED_ON_CLIENT
     DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
-    SERVER_MANAGER_XML ${SM_XML}
+    SERVER_MANAGER_XML GMVReaderSM.xml
     SERVER_MANAGER_SOURCES vtkGMVReader.cxx
     GUI_RESOURCE_FILES GMVReaderGUI.xml
     GUI_INTERFACES ${IFACES}
@@ -133,6 +98,6 @@ ELSE (PARAVIEW_BUILD_QT_GUI)
     REQUIRED_ON_SERVER
     REQUIRED_ON_CLIENT
     DOCUMENTATION_DIR "${CMAKE_CURRENT_SOURCE_DIR}/doc"
-    SERVER_MANAGER_XML ${SM_XML}
+    SERVER_MANAGER_XML GMVReaderSM.xml
     SERVER_MANAGER_SOURCES vtkGMVReader.cxx)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
