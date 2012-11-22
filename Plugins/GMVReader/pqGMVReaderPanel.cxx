@@ -1,7 +1,7 @@
 #include "pqGMVReaderPanel.h"
 
-pqGMVReaderPanel::pqGMVReaderPanel(pqProxy *proxy, QWidget *p)
-  : Superclass(proxy, p)
+pqGMVReaderPanel::pqGMVReaderPanel(pqProxy *prox, QWidget *par)
+  : Superclass(prox, par)
 {
   // Determine whether pipeline has time steps at all
   this->timeSteps = vtkSMIntVectorProperty::SafeDownCast(
