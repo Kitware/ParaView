@@ -141,3 +141,16 @@ void vtkSpreadSheetRepresentation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//----------------------------------------------------------------------------
+void vtkSpreadSheetRepresentation::SetGenerateCellConnectivity(bool v)
+{
+  this->DataConditioner->SetGenerateCellConnectivity(v);
+  this->ExtractedDataConditioner->SetGenerateCellConnectivity(v);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSpreadSheetRepresentation::GetGenerateCellConnectivity()
+{
+  return this->ExtractedDataConditioner->GetGenerateCellConnectivity();
+}

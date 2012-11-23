@@ -38,6 +38,7 @@ vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->AddMetaData = false;
   this->GenerateOriginalIds = false;
+  this->GenerateCellConnectivity = false;
 }
 
 //----------------------------------------------------------------------------
@@ -108,36 +109,39 @@ int vtkAttributeDataToTableFilter::RequestData(
           output->GetRowData()->AddArray(celltypes);
           celltypes->Delete();
 
-          vtkIdTypeArray** indices = new vtkIdTypeArray*[maxpoints];
-          char arrayname[128];
-          for(vtkIdType i = 0; i < maxpoints; i++)
-          {
-            indices[i] = vtkIdTypeArray::New();
-            sprintf(arrayname, "Point Index %ld", (long int)i);
-            indices[i]->SetName(arrayname);
-            indices[i]->SetNumberOfTuples(numcells);
-          }
-          for(vtkIdType cc = 0; cc < numcells; cc++)
+          if(this->GenerateCellConnectivity)
             {
-            ds->GetCellPoints(cc, points);
-            for(vtkIdType pt = 0; pt < maxpoints; pt++)
+            vtkIdTypeArray** indices = new vtkIdTypeArray*[maxpoints];
+            char arrayname[128];
+            for(vtkIdType i = 0; i < maxpoints; i++)
               {
-              if(pt < points->GetNumberOfIds())
-                {
-                indices[pt]->SetValue(cc, points->GetId(pt));
-                }
-              else
-                {
-                indices[pt]->SetValue(cc, -1);
-                }              
+              indices[i] = vtkIdTypeArray::New();
+              sprintf(arrayname, "Point Index %ld", (long int)i);
+              indices[i]->SetName(arrayname);
+              indices[i]->SetNumberOfTuples(numcells);
               }
+            for(vtkIdType cc = 0; cc < numcells; cc++)
+              {
+              ds->GetCellPoints(cc, points);
+              for(vtkIdType pt = 0; pt < maxpoints; pt++)
+                {
+                if(pt < points->GetNumberOfIds())
+                  {
+                  indices[pt]->SetValue(cc, points->GetId(pt));
+                  }
+                else
+                  {
+                  indices[pt]->SetValue(cc, -1);
+                  }
+                }
+              }
+            for(int i = 0; i < maxpoints; i++)
+              {
+              output->GetRowData()->AddArray(indices[i]);
+              indices[i]->Delete();
+              }
+            delete [] indices;
             }
-          for(int i = 0; i < maxpoints; i++)
-            {
-            output->GetRowData()->AddArray(indices[i]);
-            indices[i]->Delete();
-            }
-          delete [] indices;
           points->Delete();
           }
         }

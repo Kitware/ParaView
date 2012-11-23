@@ -64,6 +64,12 @@ public:
   vtkSetMacro(GenerateOriginalIds, bool);
   vtkGetMacro(GenerateOriginalIds, bool);
 
+  // Description:
+  // When set (not the default) the connectivity of each cell will be added by
+  // adding a new column for each point.
+  vtkSetMacro(GenerateCellConnectivity, bool);
+  vtkGetMacro(GenerateCellConnectivity, bool);
+
 //BTX
 protected:
   vtkAttributeDataToTableFilter();
@@ -99,6 +105,7 @@ protected:
   int FieldAssociation;
   bool AddMetaData;
   bool GenerateOriginalIds;
+  bool GenerateCellConnectivity;
 private:
   vtkAttributeDataToTableFilter(const vtkAttributeDataToTableFilter&); // Not implemented
   void operator=(const vtkAttributeDataToTableFilter&); // Not implemented

@@ -121,6 +121,10 @@ public:
   // Export the contents of this view using the exporter.
   bool Export(vtkCSVExporter* exporter);
 
+  // Description:
+  // Allow user to clear the cache if he needs to.
+  void ClearCache();
+
 //BTX
   // INTERNAL METHOD. Don't call directly.
   void FetchBlockCallback(vtkIdType blockindex);
@@ -140,8 +144,6 @@ protected:
   void OnRepresentationUpdated();
 
   vtkTable* FetchBlock(vtkIdType blockindex);
-
-  void ClearCache();
 
   bool ShowExtractedSelection;
   vtkSortedTableStreamer* TableStreamer;

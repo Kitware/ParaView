@@ -46,6 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 
 // ParaView Includes.
+#include "vtkSpreadSheetView.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMViewProxy.h"
 #include "pqApplicationCore.h"
 #include "pqComboBoxDomain.h"
 #include "pqDataRepresentation.h"
@@ -106,6 +109,9 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
 
   QObject::connect(this->Internal->ToggleColumnVisibility, SIGNAL(clicked()),
     this, SLOT(showToggleColumnPopupMenu()));
+
+  QObject::connect(this->Internal->ToggleCellConnectivity, SIGNAL(clicked()),
+    this, SLOT(toggleCellConnectivity()));
 
   QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)),
     this, SLOT(currentIndexChanged(pqOutputPort*)));
@@ -237,5 +243,23 @@ void pqSpreadSheetViewDecorator::updateColumnVisibility()
       {
       this->Spreadsheet->getViewModel()->setVisible(index, a->isChecked());
       }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::toggleCellConnectivity()
+{
+  if(vtkSMProxy* proxy = this->Spreadsheet->getRepresentation(0)->getProxy())
+    {
+    vtkSMPropertyHelper(proxy, "GenerateCellConnectivity").Set(
+          this->Internal->ToggleCellConnectivity->isChecked() ? 1 : 0);
+    proxy->UpdateVTKObjects();
+    if(vtkSpreadSheetView* view =
+       vtkSpreadSheetView::SafeDownCast(
+         this->Spreadsheet->getViewProxy()->GetClientSideView()))
+      {
+      view->ClearCache();
+      }
+    this->Spreadsheet->render();
     }
 }
