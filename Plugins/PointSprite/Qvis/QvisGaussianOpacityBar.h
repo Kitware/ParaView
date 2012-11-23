@@ -35,60 +35,90 @@
 *
 *****************************************************************************/
 
-#ifndef QVIS_SCRIBBLE_OPACITY_BAR_H
-#define QVIS_SCRIBBLE_OPACITY_BAR_H
+#ifndef QVIS_GAUSSIAN_OPACITY_BAR_H
+#define QVIS_GAUSSIAN_OPACITY_BAR_H
+
 #include "QvisAbstractOpacityBar.h"
+#include "vtkQvisModule.h" // for export macro
 
 class QPixmap;
 
 // ****************************************************************************
-//  Class:  QvisScribbleOpacityBar
+//  Class:  QvisGaussianOpacityBar
 //
 //  Purpose:
-//    Freeform implementation of OpacityBar
+//    Gaussian-max implementation of QvisAbstractOpacityBar
 //
 //  Programmer:  Jeremy Meredith
 //  Creation:    January 30, 2001
 //
 //  Modifications:
-//     Brad Whitlock, Fri Apr 6 12:22:25 PDT 2001
-//     Added some new slots to set some default opacity ramps.
 //
 // ****************************************************************************
 
-class QvisScribbleOpacityBar : public QvisAbstractOpacityBar
+class VTKQVIS_EXPORT QvisGaussianOpacityBar : public QvisAbstractOpacityBar
 {
     Q_OBJECT
-public:
-    QvisScribbleOpacityBar(QWidget *parent=NULL, const char *name=NULL);
-    ~QvisScribbleOpacityBar();
-    void   getRawOpacities(int,float*);
-    void   setRawOpacities(int,float*);
+  public:
+                  QvisGaussianOpacityBar(QWidget *parent=NULL, const char *name=NULL);
+                 ~QvisGaussianOpacityBar();
+    void          getRawOpacities(int, float*);
+    int           getNumberOfGaussians();
+    void          getGaussian(int, float*,float*,float*,float*,float*);
+    void          setGaussian(int, float*,float*,float*,float*,float*);
+    void          setAllGaussians(int, float*);
+    void          setMaximumNumberOfGaussians(int);
+    void          setMinimumNumberOfGaussians(int);
 
-signals:
-    void opacitiesChanged();
+  protected:
+    void          mouseMoveEvent(QMouseEvent*);
+    void          mousePressEvent(QMouseEvent*);
+    void          mouseReleaseEvent(QMouseEvent*);
+    void          paintToPixmap(int,int);
+    void          drawControlPoints(QPainter &painter);
 
-public slots:
-    void makeTotallyZero();
-    void makeLinearRamp();
-    void makeInverseLinearRamp();
-    void makeTotallyOne();
-    void smoothCurve();
+  signals:
+    void          mouseReleased();
+    void          mouseMoved();
 
-protected:
-    void mouseMoveEvent(QMouseEvent*);
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
-    void setValue(float,float);
-    void setValues(int,int,int,int);
-    void paintToPixmap(int,int);
+  private:
+    enum Mode     {modeNone, modeX, modeH, modeW, modeWR, modeWL, modeB};
+    // encapsulation of gaussian parameters
+    class Gaussian
+    {
+      public:
+        float x;
+        float h;
+        float w;
+        float bx;
+        float by;
+      public:
+        Gaussian(float x_,float h_,float w_,float bx_,float by_) : x(x_),h(h_),w(w_),bx(bx_),by(by_) {};
+        Gaussian() {};
+        ~Gaussian() {};
+    };
 
-private:
-    int nvalues;
-    float *values;
-    bool mousedown;
-    int lastx;
-    int lasty;
+    // the list of gaussians
+    int         ngaussian;
+    Gaussian    gaussian[200];
+
+    // the current interaction mode and the current gaussian
+    Mode        currentMode;
+    int         currentGaussian;
+
+    // GUI interaction variables
+    bool        mousedown;
+    int         lastx;
+    int         lasty;
+
+    // User specified constraints
+    int         maximumNumberOfGaussians;
+    int         minimumNumberOfGaussians;
+
+    // helper functions
+    bool findGaussianControlPoint(int,int, int*,Mode*);
+    void removeGaussian(int);
+    void addGaussian(float,float,float,float,float);
 };
 
 #endif

@@ -34,9 +34,9 @@
 * DAMAGE.
 *
 *****************************************************************************/
-
 #ifndef ATTRIBUTEGROUP_H
 #define ATTRIBUTEGROUP_H
+
 #include <vector>
 #include <string>
 #include <exception>
@@ -250,5 +250,6 @@ typedef std::vector<AttributeGroup *> AttributeGroupVector;
 
 // An exception class
 class BadDeclareFormatString : public VisItException { };
+
 
 #endif

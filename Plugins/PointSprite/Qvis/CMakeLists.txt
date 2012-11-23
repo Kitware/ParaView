@@ -1,11 +1,4 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/QvisConfigure.h.in"
-  "${PROJECT_BINARY_DIR}/QvisConfigure.h"
-  )
-
-include_directories(${PROJECT_BINARY_DIR})
+include_directories(${QT_INCLUDES})
 
 set(Qvis_SRCS
   QvisAbstractOpacityBar.cpp
@@ -13,19 +6,20 @@ set(Qvis_SRCS
   QvisScribbleOpacityBar.cpp
   QvisSpectrumBar.cpp
   QvisColorGridWidget.cpp
-  DataNode.cpp
+
+  AttributeGroup.cpp
+  AttributeSubject.cpp
   ColorControlPoint.cpp
   ColorControlPointList.cpp
-  AttributeSubject.cpp
-  AttributeGroup.cpp
-  Subject.cpp
+  ColorTableAttributes.cpp
+  DataNode.cpp
   GaussianControlPoint.cpp
   GaussianControlPointList.cpp
-  SimpleObserver.cpp
-  VisItException.cpp
   ImproperUseException.cpp
+  SimpleObserver.cpp
+  Subject.cpp
+  VisItException.cpp
   VolumeAttributes.cpp
-  ColorTableAttributes.cpp
  )
  
 qt4_wrap_cpp(MOC_SRCS 
@@ -36,4 +30,4 @@ qt4_wrap_cpp(MOC_SRCS
   QvisColorGridWidget.h
 )
  
-add_library(Qvis ${Qvis_SRCS} ${MOC_SRCS})
+vtk_module_library(vtkQvis ${Qvis_SRCS} ${MOC_SRCS})

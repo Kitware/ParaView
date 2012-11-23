@@ -39,6 +39,7 @@
 #define QVIS_COLOR_GRID_WIDGET_H
 
 #include <QWidget>
+#include "vtkQvisModule.h" // for export macro
 
 class QPixmap;
 class QPainter;
@@ -69,7 +70,7 @@ class QPainter;
 //
 // ****************************************************************************
 
-class QvisColorGridWidget : public QWidget
+class VTKQVIS_EXPORT QvisColorGridWidget : public QWidget
 {
     Q_OBJECT
 public:
