@@ -76,6 +76,8 @@ class @PLUGIN_NAME@_Plugin :
   Q_OBJECT
 #endif
 public:
+  @PLUGIN_NAME@_Plugin();
+
    // Description:
   // Returns the name for this plugin.
   virtual const char* GetPluginName()

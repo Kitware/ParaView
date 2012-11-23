@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMPluginManager.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPluginsInformation.h"
@@ -38,15 +39,42 @@ public:
   RemoteInfoMapType RemoteInformations;
 };
 
+namespace
+{
+  class vtkFlagStateUpdated
+    {
+    bool Prev;
+    bool &Flag;
+  public:
+    vtkFlagStateUpdated(bool &flag, bool new_val=true) : Prev(flag), Flag(flag)
+      {
+      this->Flag = new_val;
+      }
+    ~vtkFlagStateUpdated()
+      {
+      this->Flag = this->Prev;
+      }
+    };
+}
+
 vtkStandardNewMacro(vtkSMPluginManager);
 //----------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
   this->Internals = new vtkInternals();
 
+  this->InLoadPlugin = false;
+
   // Setup and update local plugins information.
   this->LocalInformation = vtkPVPluginsInformation::New();
   this->LocalInformation->CopyFromObject(NULL);
+
+  // When a plugin is register with the local tracker (either at buildtime or
+  // at runtime, RegisterEvent is fired. We ensure that the PluginLoadedEvent
+  // get fired, especially for plugins brought in a buildtime.
+  vtkPVPluginTracker* tracker = vtkPVPluginTracker::GetInstance();
+  tracker->AddObserver(vtkCommand::RegisterEvent,
+    this, &vtkSMPluginManager::OnPluginRegistered);
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +132,8 @@ vtkPVPluginsInformation* vtkSMPluginManager::GetRemoteInformation(
 //----------------------------------------------------------------------------
 bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
+  vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
+
   vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
   bool ret_val = loader->LoadPlugin(filename);
   loader->Delete();
@@ -130,6 +160,8 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
   vtkSMSession* session)
 {
   assert("Session cannot be NULL" && session != NULL);
+
+  vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
 
   vtkSMSessionProxyManager* pxm = session->GetSessionProxyManager();
   vtkSMPluginLoaderProxy* proxy =
@@ -163,6 +195,7 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
 void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
   const char* xmlcontents, vtkSMSession* session, bool remote)
 {
+  vtkFlagStateUpdated stateUpdater(this->InLoadPlugin);
   if (remote)
     {
     assert("Session should already be set" && (session != NULL));
@@ -191,6 +224,24 @@ void vtkSMPluginManager::LoadPluginConfigurationXMLFromString(
     this->LocalInformation->Update(temp);
     temp->Delete();
     }
+
+  this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPluginManager::OnPluginRegistered()
+{
+  if (this->InLoadPlugin)
+    {
+    return;
+    }
+  // Update local-plugin information.
+  vtkPVPluginsInformation* temp = vtkPVPluginsInformation::New();
+  temp->CopyFromObject(NULL);
+  // we use Update so that any auto-load state changes done in
+  // this->LocalInformation are preserved.
+  this->LocalInformation->Update(temp);
+  temp->Delete();
 
   this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
 }

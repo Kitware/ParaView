@@ -87,6 +87,9 @@ protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
 
+  bool InLoadPlugin;
+  void OnPluginRegistered();
+
   vtkPVPluginsInformation* LocalInformation;
 
 private:

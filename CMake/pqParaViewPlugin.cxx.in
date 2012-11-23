@@ -148,14 +148,23 @@ void @PLUGIN_NAME@_Plugin::GetPythonSourceList(std::vector<std::string>& modules
 #endif
 
 //-----------------------------------------------------------------------------
+@PLUGIN_NAME@_Plugin::@PLUGIN_NAME@_Plugin()
+{
+#ifndef BUILD_SHARED_LIBS
+# ifdef plugin_type_gui
+  // For static builds, initialize the Qt resources as well as the Qt plugin.
+  @QRC_RESOURCES_INIT@
+  Q_IMPORT_PLUGIN(@PLUGIN_NAME@)
+# endif
+#endif
+}
+
+//-----------------------------------------------------------------------------
 // Mark this as a ParaView-ServerManager plugin.
 PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
 
 //-----------------------------------------------------------------------------
-#ifdef BUILD_SHARED_LIBS
 #ifdef plugin_type_gui
-
 // Required to mark this as a Qt plugin.
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
-#endif
 #endif
