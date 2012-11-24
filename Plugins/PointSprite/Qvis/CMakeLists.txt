@@ -32,5 +32,8 @@ qt4_wrap_cpp(MOC_SRCS
   QvisSpectrumBar.h
   QvisColorGridWidget.h
 )
+
+set(vtkQvis_NO_HeaderTest 1)
+
 vtk_module_library(vtkQvis ${Qvis_SRCS} ${MOC_SRCS})
 target_link_libraries(vtkQvis ${QT_LIBRARIES})
