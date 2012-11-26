@@ -7,7 +7,8 @@
 Copyright 2012 SciberQuest Inc.
 -->
 <ParaViewSources>
-  <Category name="SciberQuestSciVis" menu_label="Sciber&amp;Quest">
+  <!-- Remove category as it invalidates so many tests in case of static build -->
+  <!-- <Category name="SciberQuestSciVis" menu_label="Sciber&amp;Quest">       -->
     <Proxy group="sources" name="vtkSQHemisphereSource"/>
     <Proxy group="sources" name="vtkSQImageSource"/>
     <Proxy group="sources" name="vtkSQLineSource"/>
@@ -18,5 +19,5 @@ Copyright 2012 SciberQuest Inc.
     <Proxy group="filters" name="vtkSQSeedPointLatice"/>
     <Proxy group="sources" name="vtkSQSphereSource"/>
     <Proxy group="sources" name="vtkSQVolumeSource"/>
-  </Category>
+  <!-- </Category> -->
 </ParaViewSources>
