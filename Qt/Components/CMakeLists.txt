@@ -293,6 +293,8 @@ set (Module_SRCS
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
   pqProxyPanel.h
+  pqProxyPropertiesPanel.cxx
+  pqProxyPropertiesPanel.h
   pqProxyPropertyWidget.cxx
   pqProxyPropertyWidget.h
   pqProxySelectionWidget.cxx
@@ -543,6 +545,7 @@ set (Module_MOC_HDRS
   pqPropertyWidget.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
+  pqProxyPropertiesPanel.h
   pqProxyPropertyWidget.h
   pqProxySelectionWidget.h
   pqProxySILModel.h

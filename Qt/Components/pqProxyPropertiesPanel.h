@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqPropertiesPanelItem.h
+   Module: pqProxyPropertiesPanel.h
 
    Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,24 +30,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPropertiesPanelItem_h
-#define _pqPropertiesPanelItem_h
+#ifndef _pqProxyPropertiesPanel_h
+#define _pqProxyPropertiesPanel_h
 
-#include <QLabel>
-#include <QString>
+#include "pqComponentsModule.h"
+
 #include <QWidget>
+#include <QPointer>
 
-#include "pqPropertyWidget.h"
+class QFormLayout;
 
-class pqPropertiesPanelItem
+class pqProxy;
+class pqPropertiesPanelItem;
+
+class PQCOMPONENTS_EXPORT pqProxyPropertiesPanel : public QWidget
 {
+  Q_OBJECT
+
 public:
-  QString Name;
-  QLabel *LabelWidget;
-  pqPropertyWidget *PropertyWidget;
-  bool IsAdvanced;
-  QStringList DefaultVisibilityForRepresentations;
-  bool Modified;
+  pqProxyPropertiesPanel(pqProxy *proxy_, QWidget *parent_ = 0);
+  ~pqProxyPropertiesPanel();
+
+  void apply();
+  void reset();
+
+  pqProxy* proxy() const;
+  void addPropertyWidgetItem(pqPropertiesPanelItem item);
+  QList<pqPropertiesPanelItem> propertyWidgetItems() const;
+
+private:
+  QFormLayout *m_layout;
+  QPointer<pqProxy> m_proxy;
+  QList<pqPropertiesPanelItem> m_items;
 };
 
-#endif // _pqPropertiesPanelItem_h
+#endif // _pqProxyPropertiesPanel_h

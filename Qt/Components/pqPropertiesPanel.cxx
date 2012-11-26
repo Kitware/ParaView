@@ -70,6 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqInterfaceTracker.h"
 #include "pqServerManagerModel.h"
 #include "pqPropertiesPanelItem.h"
+#include "pqProxyPropertiesPanel.h"
 #include "pqObjectPanelInterface.h"
 #include "pqProxySelectionWidget.h"
 #include "pq3DWidgetPropertyWidget.h"
@@ -108,8 +109,8 @@ int pqPropertiesPanel::AutoApplyDelay = 0; // in msec
 
 // === pqStandardCustomPanels ============================================== //
 
-namespace
-{
+namespace {
+
 class pqStandardCustomPanels : public QObject, public pqObjectPanelInterface
 {
 public:
@@ -409,25 +410,6 @@ pqView* pqPropertiesPanel::view() const
   return this->View;
 }
 
-pqPropertyWidget* pqPropertiesPanel::getWidgetForProperty(vtkSMProperty *prop) const
-{
-  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
-    {
-    pqPropertyWidget *widget = item.PropertyWidget;
-    if(!widget || !widget->property())
-      {
-      continue;
-      }
-
-    if(widget->property() == prop)
-      {
-      return widget;
-      }
-    }
-
-  return 0;
-}
-
 pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *property,
                                                              vtkSMProxy *proxy,
                                                              QWidget *parent)
@@ -485,26 +467,12 @@ pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *prop
 
 void pqPropertiesPanel::setProxy(pqProxy *proxy)
 {
+  // set current proxy
   this->Proxy = proxy;
   this->updateInformationAndDomains();
 
   // clear any search string
   this->Ui->SearchLineEdit->clear();
-
-  // remove old property widgets
-  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
-    {
-    if(item.LabelWidget)
-      {
-      this->Ui->PropertiesLayout->removeWidget(item.LabelWidget);
-      delete item.LabelWidget;
-      }
-
-    this->Ui->PropertiesLayout->removeWidget(item.PropertyWidget);
-    delete item.PropertyWidget;
-    }
-
-  this->ProxyPropertyItems.clear();
 
   // update group box name
   if(proxy)
@@ -516,6 +484,16 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     this->Ui->PropertiesButton->setText("Properties");
     }
 
+  // hide all proxy panel widgets
+  foreach(pqProxyPropertiesPanel *panel, this->ProxyPanels.values())
+    {
+    if(panel)
+      {
+      panel->setObjectName("HiddenProxyPanel");
+      panel->hide();
+      }
+    }
+
   if(!proxy)
     {
     this->Ui->ApplyButton->setEnabled(false);
@@ -525,116 +503,126 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
     return;
     }
 
-  if(this->DebugWidgetCreation)
+  pqProxyPropertiesPanel *panel = this->ProxyPanels.value(proxy, 0);
+  if(!panel)
     {
-    qDebug() << "Creating panel widgets for the"
-             << proxy->getProxy()->GetXMLLabel() << "proxy:";
-    }
-
-  this->Ui->DeleteButton->setEnabled(true);
-  this->Ui->HelpButton->setEnabled(true);
-
-  // search for a custom panel for the proxy
-  pqObjectPanel *customPanel = 0;
-  pqInterfaceTracker *interfaceTracker =
-    pqApplicationCore::instance()->interfaceTracker();
-  QObjectList interfaces = interfaceTracker->interfaces();
-  foreach(QObject *interface, interfaces)
-    {
-    pqObjectPanelInterface *piface = qobject_cast<pqObjectPanelInterface*>(interface);
-    if(piface && piface->canCreatePanel(proxy))
-      {
-      customPanel = piface->createPanel(proxy, 0);
-      break;
-      }
-    }
-
-  // try using the standard custom panels
-  if(!customPanel)
-    {
-    pqStandardCustomPanels standardCustomPanels;
-
-    if(standardCustomPanels.canCreatePanel(proxy))
-      {
-      customPanel = standardCustomPanels.createPanel(proxy, 0);
-      }
-    }
-
-  // create property widgets
-  QList<pqPropertiesPanelItem> widgets;
-
-  if(customPanel)
-    {
-    // set view for panel
-    customPanel->setView(this->View);
-    connect(this, SIGNAL(viewChanged(pqView*)),
-            customPanel, SLOT(setView(pqView*)));
-
-    // must call select
-    customPanel->select();
-
-    pqPropertiesPanelItem item;
-    item.Name = proxy->getProxy()->GetXMLName();
-    item.LabelWidget = 0;
-    item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
-    item.IsAdvanced = false;
-
+    // create a new panel for the proxy
     if(this->DebugWidgetCreation)
       {
-      qDebug() << "  - Using custom object panel:"
-               << customPanel->metaObject()->className();
+      qDebug() << "Creating panel widgets for the"
+               << proxy->getProxy()->GetXMLLabel() << "proxy:";
       }
-    widgets.append(item);
-    }
-  else
-    {
-    widgets = this->createWidgetsForProxy(proxy);
-    }
 
-  // add 3D widgets
-  vtkSMProxy *smProxy = proxy->getProxy();
-  vtkPVXMLElement *hints = smProxy->GetHints();
-  if(hints)
-    {
-    QList<pq3DWidget*> widgets3d = pq3DWidget::createWidgets(smProxy, smProxy);
-
-    foreach (pq3DWidget *widget, widgets3d)
+    // search for a custom panel for the proxy
+    pqObjectPanel *customPanel = 0;
+    pqInterfaceTracker *interfaceTracker =
+        pqApplicationCore::instance()->interfaceTracker();
+    QObjectList interfaces = interfaceTracker->interfaces();
+    foreach(QObject *interface, interfaces)
       {
+      pqObjectPanelInterface *piface = qobject_cast<pqObjectPanelInterface*>(interface);
+      if(piface && piface->canCreatePanel(proxy))
+        {
+        customPanel = piface->createPanel(proxy, 0);
+        break;
+        }
+      }
+
+    // try using the standard custom panels
+    if(!customPanel)
+      {
+      pqStandardCustomPanels standardCustomPanels;
+
+      if(standardCustomPanels.canCreatePanel(proxy))
+        {
+        customPanel = standardCustomPanels.createPanel(proxy, 0);
+        }
+      }
+
+    // create property widgets
+    QList<pqPropertiesPanelItem> widgets;
+
+    if(customPanel)
+      {
+      // set view for panel
+      customPanel->setView(this->View);
       connect(this, SIGNAL(viewChanged(pqView*)),
-              widget, SLOT(setView(pqView*)));
-      widget->setView(this->view());
-      widget->resetBounds();
-      widget->reset();
+              customPanel, SLOT(setView(pqView*)));
 
       // must call select
-      widget->select();
+      customPanel->select();
 
       pqPropertiesPanelItem item;
+      item.Name = proxy->getProxy()->GetXMLName();
       item.LabelWidget = 0;
-      item.PropertyWidget = new pq3DWidgetPropertyWidget(widget);
+      item.PropertyWidget = new pqObjectPanelPropertyWidget(customPanel);
       item.IsAdvanced = false;
+
+      if(this->DebugWidgetCreation)
+        {
+        qDebug() << "  - Using custom object panel:"
+                 << customPanel->metaObject()->className();
+        }
       widgets.append(item);
-      }
-    }
-
-  // add widgets to the panel
-  foreach(const pqPropertiesPanelItem &item, widgets)
-    {
-    this->ProxyPropertyItems.append(item);
-
-    if(item.LabelWidget)
-      {
-      this->Ui->PropertiesLayout->addRow(item.LabelWidget, item.PropertyWidget);
       }
     else
       {
-      this->Ui->PropertiesLayout->addRow(item.PropertyWidget);
+      widgets = this->createWidgetsForProxy(proxy);
       }
 
-    // connect to modified signal
-    this->connect(item.PropertyWidget, SIGNAL(modified()),
-                  this, SLOT(proxyPropertyChanged()));
+    // add 3D widgets
+    vtkSMProxy *smProxy = proxy->getProxy();
+    vtkPVXMLElement *hints = smProxy->GetHints();
+    if(hints)
+      {
+      QList<pq3DWidget*> widgets3d = pq3DWidget::createWidgets(smProxy, smProxy);
+
+      foreach (pq3DWidget *widget, widgets3d)
+        {
+        connect(this, SIGNAL(viewChanged(pqView*)),
+                widget, SLOT(setView(pqView*)));
+        widget->setView(this->view());
+        widget->resetBounds();
+        widget->reset();
+
+        // must call select
+        widget->select();
+
+        pqPropertiesPanelItem item;
+        item.LabelWidget = 0;
+        item.PropertyWidget = new pq3DWidgetPropertyWidget(widget);
+        item.IsAdvanced = false;
+        widgets.append(item);
+        }
+      }
+
+    // create new proxy panel
+    panel = new pqProxyPropertiesPanel(proxy, this);
+
+    // add widgets to the panel
+    foreach(const pqPropertiesPanelItem &item, widgets)
+      {
+      panel->addPropertyWidgetItem(item);
+
+      // connect to modified signal
+      this->connect(item.PropertyWidget, SIGNAL(modified()),
+                    this, SLOT(proxyPropertyChanged()));
+      }
+
+    // set layout
+    this->Ui->PropertiesLayout->addRow(panel);
+
+    // store proxy panel
+    this->ProxyPanels[proxy] = panel;
     }
+
+  // set button state
+  this->Ui->DeleteButton->setEnabled(true);
+  this->Ui->HelpButton->setEnabled(true);
+
+  // show the current proxy panel widget
+  panel->setObjectName("ProxyPanel");
+  panel->show();
 
   // update advanced state
   this->advancedButtonToggled(this->Ui->AdvancedButton->isChecked());
@@ -797,23 +785,21 @@ void pqPropertiesPanel::apply()
 {
   BEGIN_UNDO_SET("Apply");
 
-  QSet<pqProxy*> proxiesToShow;
-
-  if(this->Proxy)
+  foreach(pqProxy *proxy, this->ProxyPanels.keys())
     {
-    foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
+    if(!proxy)
       {
-      if(item.PropertyWidget)
-        {
-        item.PropertyWidget->apply();
-        }
+      this->ProxyPanels.remove(proxy);
+      continue;
       }
 
-    proxiesToShow.insert(this->Proxy);
-    }
+    // apply each property widget
+    pqProxyPropertiesPanel *panel = this->ProxyPanels[proxy];
+    if(panel)
+      {
+      panel->apply();
+      }
 
-  foreach(pqProxy *proxy, proxiesToShow)
-    {
     pqPipelineSource *source = qobject_cast<pqPipelineSource*>(proxy);
     if(source)
       {
@@ -852,12 +838,10 @@ void pqPropertiesPanel::reset()
 {
   if(this->Proxy)
     {
-    foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems)
+    pqProxyPropertiesPanel *panel = this->ProxyPanels[this->Proxy];
+    if(panel)
       {
-      if(item.PropertyWidget)
-        {
-        item.PropertyWidget->reset();
-        }
+      panel->reset();
       }
 
     this->Proxy->setModifiedState(pqProxy::UNMODIFIED);
@@ -870,7 +854,18 @@ void pqPropertiesPanel::reset()
 
 void pqPropertiesPanel::removeProxy(pqPipelineSource *proxy)
 {
-  Q_UNUSED(proxy);
+  if(!this->ProxyPanels.contains(proxy))
+    {
+    return;
+    }
+
+  pqProxyPropertiesPanel *panel = this->ProxyPanels.value(proxy, 0);
+  if(panel)
+    {
+    delete panel;
+    }
+
+  this->ProxyPanels.remove(proxy);
 }
 
 void pqPropertiesPanel::deleteProxy()
@@ -883,6 +878,9 @@ void pqPropertiesPanel::deleteProxy()
     BEGIN_UNDO_SET(QString("Delete %1").arg(source->getSMName()));
     core->getObjectBuilder()->destroy(source);
     END_UNDO_SET();
+
+    // remove the proxy and its panel
+    this->removeProxy(source);
     }
 }
 
@@ -944,24 +942,31 @@ void pqPropertiesPanel::updateButtonState()
   this->Ui->ApplyButton->setEnabled(false);
   this->Ui->ResetButton->setEnabled(false);
 
-  if(this->Proxy)
+  foreach(pqProxy *proxy, this->ProxyPanels.keys())
     {
-    if(this->Proxy->modifiedState() == pqProxy::UNINITIALIZED)
+    if(!proxy)
+      {
+      continue;
+      }
+
+    if(proxy->modifiedState() == pqProxy::UNINITIALIZED)
       {
       if(this->DebugApplyButtonState)
         {
-        qDebug() << "Enabling the Apply button because the current proxy "
-                    "is uninitialized";
+        qDebug() << "Enabling the Apply button because the " <<
+                    (proxy->getProxy() ? proxy->getProxy()->GetXMLName() : "unknown") <<
+                    "proxy is uninitialized";
         }
 
       this->Ui->ApplyButton->setEnabled(true);
       }
-    else if(this->Proxy->modifiedState() == pqProxy::MODIFIED)
+    else if(proxy->modifiedState() == pqProxy::MODIFIED)
       {
       if(this->DebugApplyButtonState)
         {
-        qDebug() << "Enabling the Apply button because the current proxy "
-                    "is modified";
+        qDebug() << "Enabling the Apply button because the " <<
+                    (proxy->getProxy() ? proxy->getProxy()->GetXMLName() : "unknown") <<
+                    "proxy is modified";
         }
 
       this->Ui->ApplyButton->setEnabled(true);
@@ -1005,7 +1010,15 @@ void pqPropertiesPanel::proxyPropertyChanged()
 
 void pqPropertiesPanel::searchTextChanged(const QString &string)
 {
-  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems + this->RepresentationPropertyItems)
+  QList<pqPropertiesPanelItem> proxyItems;
+  if(pqProxyPropertiesPanel *panel = this->ProxyPanels[this->Proxy])
+    {
+    proxyItems = panel->propertyWidgetItems();
+    }
+
+  QList<pqPropertiesPanelItem> representationItems = this->RepresentationPropertyItems;
+
+  foreach(const pqPropertiesPanelItem &item, proxyItems + representationItems)
     {
     bool visible = isPanelItemVisible(item);
 
@@ -1027,7 +1040,15 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
 {
   Q_UNUSED(state);
 
-  foreach(const pqPropertiesPanelItem &item, this->ProxyPropertyItems + this->RepresentationPropertyItems)
+  QList<pqPropertiesPanelItem> proxyItems;
+  if(pqProxyPropertiesPanel *panel = this->ProxyPanels[this->Proxy])
+    {
+    proxyItems = panel->propertyWidgetItems();
+    }
+
+  QList<pqPropertiesPanelItem> representationItems = this->RepresentationPropertyItems;
+
+  foreach(const pqPropertiesPanelItem &item, proxyItems + representationItems)
     {
     bool visible = isPanelItemVisible(item);
 

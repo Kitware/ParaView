@@ -38,8 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkNew.h"
 #include "vtkEventQtSlotConnect.h"
 
+#include <QMap>
 #include <QWidget>
 #include <QPointer>
+#include <QFormLayout>
+#include <QStackedLayout>
 
 namespace Ui {
   class pqPropertiesPanel;
@@ -51,7 +54,8 @@ class pqOutputPort;
 class pqPipelineSource;
 class pqPropertyWidget;
 class pqRepresentation;
-struct pqPropertiesPanelItem;
+class pqPropertiesPanelItem;
+class pqProxyPropertiesPanel;
 class vtkSMProxy;
 class vtkSMProperty;
 
@@ -71,9 +75,6 @@ public:
 
   /// Returns the current render view.
   pqView* view() const;
-
-  /// Returns the widget corresponding to the property.
-  pqPropertyWidget* getWidgetForProperty(vtkSMProperty *property) const;
 
   /// Creates and returns a new property widget for the \p property in
   /// \p proxy with \p parent.
@@ -171,8 +172,8 @@ private:
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   vtkNew<vtkEventQtSlotConnect> RepresentationTypeSignal;
-  QList<pqPropertiesPanelItem> ProxyPropertyItems;
   QList<pqPropertiesPanelItem> RepresentationPropertyItems;
+  QMap<pqProxy *, pqProxyPropertiesPanel *> ProxyPanels;
   bool DebugWidgetCreation;
   bool DebugApplyButtonState;
   static bool AutoApply;
