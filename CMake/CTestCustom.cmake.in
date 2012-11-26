@@ -76,8 +76,8 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   "MantaView.VTK"
   "manta"
 
-  # Exclude VisitBridge related warnings
-  "databases/GMV/gmvread"
+  # Exclude VisitBridge/GMV related warnings
+  "vtkGMVReader"
 )
 
 #------------------------------------------------------------------------------
