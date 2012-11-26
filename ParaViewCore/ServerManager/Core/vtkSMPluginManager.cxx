@@ -45,6 +45,7 @@ namespace
     {
     bool Prev;
     bool &Flag;
+
   public:
     vtkFlagStateUpdated(bool &flag, bool new_val=true) : Prev(flag), Flag(flag)
       {
@@ -54,7 +55,11 @@ namespace
       {
       this->Flag = this->Prev;
       }
-    };
+
+  private:
+    vtkFlagStateUpdated(const vtkFlagStateUpdated&); // Not implemented
+    void operator=(const vtkFlagStateUpdated&); // Not implemented
+  };
 }
 
 vtkStandardNewMacro(vtkSMPluginManager);
