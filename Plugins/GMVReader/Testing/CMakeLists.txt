@@ -1,16 +1,32 @@
 INCLUDE(ParaViewTestingMacros)
 
-set(GMV_READER_TESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead.xml
-)
+if(VISIT_BUILD_READER_GMV)
+  set(GMV_READER_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead_WithVisitBridge.xml
+  )
 
-set(GMV_READER_SERVER_TESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead.xml
-)
+  set(GMV_READER_SERVER_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead_WithVisitBridge.xml
+  )
 
-set(GMV_READER_STATIC_TESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead-static.xml
-)
+  set(GMV_READER_STATIC_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead_WithVisitBridge-static.xml
+  )
+else()
+  set(GMV_READER_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead.xml
+  )
+
+  set(GMV_READER_SERVER_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/serverGMVReaderBasicRead.xml
+  )
+
+  set(GMV_READER_STATIC_TESTS
+    ${CMAKE_CURRENT_SOURCE_DIR}/GMVReaderBasicRead-static.xml
+  )
+endif()
+
+
 
 set(GMVReaderBasicRead_BREAK TRUE)
 set(GMVReaderBasicRead_USE_NEW_PANELS TRUE)
