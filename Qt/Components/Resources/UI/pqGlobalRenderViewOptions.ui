@@ -1308,6 +1308,12 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
