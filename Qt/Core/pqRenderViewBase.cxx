@@ -35,17 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
-#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
+#include "vtkRenderWindow.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMSessionProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkRenderWindow.h"
 
 // Qt Includes.
 #include <QList>
@@ -830,8 +830,8 @@ void pqRenderViewBase::setStereo(int mode)
 //-----------------------------------------------------------------------------
 void pqRenderViewBase::beginDelayInteractiveRender()
 {
-  vtkSMIntVectorProperty *prop =
-      vtkSMIntVectorProperty::SafeDownCast(
+  vtkSMDoubleVectorProperty *prop =
+      vtkSMDoubleVectorProperty::SafeDownCast(
           this->getProxy()->GetProperty("NonInteractiveRenderDelay"));
   double value = prop ? static_cast<double>(prop->GetElement(0)) : 0;
   this->Internal->startInteractiveRenderDelay(value);
