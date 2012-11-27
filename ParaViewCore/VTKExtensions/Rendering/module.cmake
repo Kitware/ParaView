@@ -10,7 +10,11 @@ if (PARAVIEW_USE_MPI)
 endif()
 
 if (PARAVIEW_ENABLE_QT_SUPPORT)
+    # This is bad to bring Qt dependency here...
+    # this should be clean up for 4.0
     list(APPEND __dependencies vtkGUISupportQt)
+    find_package(Qt4)
+    include(${QT_USE_FILE})
 endif()
 
 vtk_module(vtkPVVTKExtensionsRendering
