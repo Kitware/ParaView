@@ -16,13 +16,13 @@
 #ifndef __vtkForceTime_h_
 #define __vtkForceTime_h_
 
-#include "vtkTemporalDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
-class VTK_EXPORT vtkForceTime : public vtkTemporalDataSetAlgorithm
+class VTK_EXPORT vtkForceTime : public vtkDataObjectAlgorithm
 {
 public :
   static vtkForceTime *New();
-  vtkTypeMacro(vtkForceTime, vtkTemporalDataSetAlgorithm);
+  vtkTypeMacro(vtkForceTime, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
