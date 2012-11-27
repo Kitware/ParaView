@@ -9,6 +9,10 @@ if (PARAVIEW_USE_MPI)
   add_definitions("-DMPICH_IGNORE_CXX_SEEK")
 endif()
 
+if (PARAVIEW_ENABLE_QT_SUPPORT)
+    list(APPEND __dependencies vtkGUISupportQt)
+endif()
+
 vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
     ParaViewRendering
