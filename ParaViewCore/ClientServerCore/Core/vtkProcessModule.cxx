@@ -27,6 +27,7 @@
 #include "vtkPVConfig.h"
 #include "vtkPVOptions.h"
 #include "vtkSessionIterator.h"
+#include "vtkStdString.h"
 #include "vtkTCPNetworkAccessManager.h"
 #include "vtkPVConfig.h"
 
@@ -54,6 +55,25 @@ vtkSmartPointer<vtkMultiProcessController> vtkProcessModule::GlobalController;
 bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
 {
   setlocale(LC_NUMERIC,"C");
+
+  // If python is enabled, matplotlib can be used for text rendering. VTK needs
+  // to know which python interpreter to use (especially for non-system python
+  // installations, e.g. ParaView superbuild). The VTK_MATPLOTLIB_PYTHONINTERP
+  // variable tells vtkMatplotlibMathTextUtilities which interpretor path to
+  // use.
+#ifdef PARAVIEW_ENABLE_PYTHON
+  if (argc > 0)
+    {
+    vtkStdString mplPyInterp;
+    if (!vtksys::SystemTools::GetEnv("VTK_MATPLOTLIB_PYTHONINTERP", mplPyInterp)
+        || mplPyInterp.size() == 0)
+      {
+      mplPyInterp = "VTK_MATPLOTLIB_PYTHONINTERP=";
+      mplPyInterp += argv[0];
+      vtksys::SystemTools::PutEnv(mplPyInterp.c_str());
+      }
+    }
+#endif // PARAVIEW_ENABLE_PYTHON
 
   vtkProcessModule::ProcessType = type;
 
