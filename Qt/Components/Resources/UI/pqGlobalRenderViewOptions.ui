@@ -176,12 +176,12 @@ the LOD threshold.</string>
            </widget>
           </item>
           <item row="3" column="1" colspan="2">
-           <widget class="pqIntRangeWidget" name="stillRenderDelay" native="true">
+           <widget class="pqDoubleRangeWidget" name="stillRenderDelay" native="true">
             <property name="minimum" stdset="0">
              <number>0</number>
             </property>
             <property name="maximum" stdset="0">
-             <number>5</number>
+             <number>10</number>
             </property>
             <property name="strictRange" stdset="0">
              <bool>true</bool>
@@ -1305,6 +1305,12 @@ p, li { white-space: pre-wrap; }
    <class>pqIntRangeWidget</class>
    <extends>QWidget</extends>
    <header>pqIntRangeWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqDoubleRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDoubleRangeWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
