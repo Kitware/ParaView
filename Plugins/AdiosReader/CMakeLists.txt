@@ -39,7 +39,7 @@ if(PARAVIEW_USE_MPI)
    if(WIN32)
       message("
         The Adios Plugin can not be compiled on Windows.
-        Therefore, we will only a client side plugin will be created.")
+        Therefore, only a client side plugin will be created.")
    else(WIN32)
       include(FindAdios.cmake)
    endif(WIN32)
