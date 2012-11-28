@@ -55,11 +55,13 @@ vtkStandardNewMacro(vtkVRGrabWorldStyle)
 vtkVRGrabWorldStyle::vtkVRGrabWorldStyle() :
   Superclass()
 {
+  this->AddButtonRole("Rotate world");
+  this->AddButtonRole("Translate world");
+  this->AddButtonRole("Reset world");
   this->EnableTranslate = false;
   this->EnableRotate = false;
   this->IsInitialTransRecorded = false;
   this->IsInitialRotRecorded = false;
-  this->NeedsButton = true;
   this->CachedTransMatrix->Identity();
   this->CachedRotMatrix->Identity();
 }
@@ -70,40 +72,19 @@ vtkVRGrabWorldStyle::~vtkVRGrabWorldStyle()
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRGrabWorldStyle::Configure(
-  vtkPVXMLElement* child, vtkSMProxyLocator* locator)
-{
-  if (!this->Superclass::Configure(child, locator))
-    {
-    return false;
-    }
-
-  if (this->ButtonName == NULL || this->ButtonName[0] == '\0')
-    {
-    vtkErrorMacro(<<"Incorrect state for vtkVRGrabWorldStyle");
-    return false;
-    }
-
-  return true;
-}
-
-// -----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRGrabWorldStyle::SaveConfiguration() const
-{
-  return this->Superclass::SaveConfiguration();
-}
-
-// ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
 {
-  if (data.name == std::string(this->ButtonName))
+  vtkStdString role = this->GetButtonRole(data.name);
+  if (role == "Translate world")
     {
     this->EnableTranslate = data.data.button.state;
     }
-  // FIXME: Hardcoded
-  else if (data.name == std::string("wiimote.0") && data.data.button.state)
+  else if (role == "Rotate world")
     {
-    // Reset
+    this->EnableRotate = data.data.button.state;
+    }
+  else if (role == "Reset world")
+    {
     this->CachedTransMatrix->Identity();
     this->CachedRotMatrix->Identity();
 
@@ -118,17 +99,13 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
     this->IsInitialTransRecorded = false;
     this->IsInitialRotRecorded = false;
     }
-  // FIXME: Hardcoded
-  else if (data.name == std::string("wiimote.4"))
-    {
-    this->EnableRotate = data.data.button.state;
-    }
 }
 
 // ----------------------------------------------------------------------------
 void vtkVRGrabWorldStyle::HandleTracker( const vtkVREventData& data )
 {
-  if (data.name == std::string(this->TrackerName))
+  vtkStdString role = this->GetTrackerRole(data.name);
+  if (role == "Tracker")
     {
     if (this->EnableTranslate)
       {

@@ -33,12 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRInteractorStyle_h
 
 #include <vtkObject.h>
+#include <vtkStdString.h> // For vtkStdString
+
+#include <map>
 #include <vector>
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 class vtkSMProxy;
 class vtkSMDoubleVectorProperty;
+class vtkStringList;
 struct vtkVREventData;
 
 class vtkVRInteractorStyle : public vtkObject
@@ -61,19 +65,32 @@ public:
   virtual bool Update();
 
   // Description:
-  // Returns true if the specified input type is needed.
-  vtkGetMacro(NeedsAnalog, bool);
-  vtkGetMacro(NeedsButton, bool);
-  vtkGetMacro(NeedsTracker, bool);
+  // Get a list of defined roles for each output type.
+  void GetAnalogRoles(vtkStringList *);
+  void GetButtonRoles(vtkStringList *);
+  void GetTrackerRoles(vtkStringList *);
 
   // Description:
-  // Set/Get the name of the associated input
-  vtkSetStringMacro(AnalogName)
-  vtkGetStringMacro(AnalogName)
-  vtkSetStringMacro(ButtonName)
-  vtkGetStringMacro(ButtonName)
-  vtkSetStringMacro(TrackerName)
-  vtkGetStringMacro(TrackerName)
+  // Get the number of roles defined for each output type.
+  int GetNumberOfAnalogRoles();
+  int GetNumberOfButtonRoles();
+  int GetNumberOfTrackerRoles();
+
+  // Description:
+  // Get the role of the input with the given name. If the name is not
+  // set or recognized, an empty string is returned.
+  vtkStdString GetAnalogRole(const vtkStdString &name);
+  vtkStdString GetButtonRole(const vtkStdString &name);
+  vtkStdString GetTrackerRole(const vtkStdString &name);
+
+  // Description:
+  // Set/Get the name of the input that fulfills the specified role.
+  bool SetAnalogName(const vtkStdString &role, const vtkStdString &name);
+  vtkStdString GetAnalogName(const vtkStdString &role);
+  bool SetButtonName(const vtkStdString &role, const vtkStdString &name);
+  vtkStdString GetButtonName(const vtkStdString &role);
+  bool SetTrackerName(const vtkStdString &role, const vtkStdString &name);
+  vtkStdString GetTrackerName(const vtkStdString &role);
 
   /// Load state for the style from XML.
   virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
@@ -94,13 +111,24 @@ protected:
   vtkSMProxy *ControlledProxy;
   char *ControlledPropertyName;
 
-  bool NeedsAnalog;
-  bool NeedsButton;
-  bool NeedsTracker;
+  // Description:
+  // Add a new input role to the interactor style.
+  void AddAnalogRole(const vtkStdString &role);
+  void AddButtonRole(const vtkStdString &role);
+  void AddTrackerRole(const vtkStdString &role);
 
-  char *AnalogName;
-  char *ButtonName;
-  char *TrackerName;
+  typedef std::map<std::string, std::string> StringMap;
+  StringMap Analogs;
+  StringMap Buttons;
+  StringMap Trackers;
+  void MapKeysToStringList(const StringMap &source,
+                           vtkStringList *target);
+  bool SetValueInMap(StringMap &map_,
+                     const vtkStdString &key, const vtkStdString &value);
+  vtkStdString GetValueInMap(const StringMap &map_,
+                             const vtkStdString &key);
+  vtkStdString GetKeyInMap(const StringMap &map_,
+                           const vtkStdString &value);
 
 private:
   vtkVRInteractorStyle(const vtkVRInteractorStyle&); // Not implemented.

@@ -49,9 +49,6 @@ public:
   vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* SaveConfiguration() const;
-
 protected:
   vtkVRGrabWorldStyle();
   ~vtkVRGrabWorldStyle();

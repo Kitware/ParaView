@@ -40,8 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVRUIConnection.h"
 #endif
 
+#include "vtkNew.h"
 #include "vtkSMProxy.h"
+#include "vtkStringList.h"
 #include "vtkVRInteractorStyle.h"
+
+#include <QtGui/QComboBox>
 
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
@@ -55,9 +59,27 @@ public:
   bool CanConfigure;
   vtkVRInteractorStyle *Style;
 
-  QStringList AnalogInputs;
-  QStringList ButtonInputs;
-  QStringList TrackerInputs;
+  enum InputType
+    {
+    Analog = 0,
+    Button,
+    Tracker
+    };
+
+  struct InputGui
+  {
+    InputType type;
+    vtkStdString role;
+    QComboBox *combo;
+  };
+
+  void AddInput(QWidget *parent, InputType type, const vtkStdString &role,
+                const vtkStdString &name);
+  QList<InputGui> Inputs;
+
+  QStringList AnalogNames;
+  QStringList ButtonNames;
+  QStringList TrackerNames;
 };
 
 //-----------------------------------------------------------------------------
@@ -113,31 +135,27 @@ pqVRAddStyleDialog::pqVRAddStyleDialog(QWidget* parentObject,
     std::map<std::string, std::string>::const_iterator it_end;
     for (it = analogs.begin(), it_end = analogs.end(); it != it_end; ++it)
       {
-      this->Internals->AnalogInputs.append(
+      this->Internals->AnalogNames.append(
             QString("%1.%2").arg(connName)
             .arg(QString::fromStdString(it->second)));
       }
     for (it = buttons.begin(), it_end = buttons.end(); it != it_end; ++it)
       {
-      this->Internals->ButtonInputs.append(
+      this->Internals->ButtonNames.append(
             QString("%1.%2").arg(connName)
             .arg(QString::fromStdString(it->second)));
       }
     for (it = trackers.begin(), it_end = trackers.end(); it != it_end; ++it)
       {
-      this->Internals->TrackerInputs.append(
+      this->Internals->TrackerNames.append(
             QString("%1.%2").arg(connName)
             .arg(QString::fromStdString(it->second)));
       }
     }
 
-  qSort(this->Internals->AnalogInputs);
-  qSort(this->Internals->ButtonInputs);
-  qSort(this->Internals->TrackerInputs);
-
-  this->Internals->analogCombo->addItems(this->Internals->AnalogInputs);
-  this->Internals->buttonCombo->addItems(this->Internals->ButtonInputs);
-  this->Internals->trackerCombo->addItems(this->Internals->TrackerInputs);
+  qSort(this->Internals->AnalogNames);
+  qSort(this->Internals->ButtonNames);
+  qSort(this->Internals->TrackerNames);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,40 +172,31 @@ void pqVRAddStyleDialog::setInteractorStyle(vtkVRInteractorStyle *style,
   this->Internals->infoLabel->setText(
         QString("Configuring style %1.").arg(name));
 
-  bool needsAnalog = style->GetNeedsAnalog();
-  bool needsButton = style->GetNeedsButton();
-  bool needsTracker = style->GetNeedsTracker();
-
-  QString analog(style->GetAnalogName());
-  QString button(style->GetButtonName());
-  QString tracker(style->GetTrackerName());
-
-  this->Internals->analogLabel->setVisible(needsAnalog);
-  this->Internals->analogCombo->setVisible(needsAnalog);
-  this->Internals->buttonLabel->setVisible(needsButton);
-  this->Internals->buttonCombo->setVisible(needsButton);
-  this->Internals->trackerLabel->setVisible(needsTracker);
-  this->Internals->trackerCombo->setVisible(needsTracker);
-
-  int analogIndex = this->Internals->analogCombo->findText(analog);
-  if (analogIndex != -1)
+  // Create gui
+  vtkNew<vtkStringList> roles;
+  style->GetAnalogRoles(roles.GetPointer());
+  for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
     {
-    this->Internals->analogCombo->setCurrentIndex(analogIndex);
+    vtkStdString role(roles->GetString(i));
+    vtkStdString name(style->GetAnalogName(role));
+    this->Internals->AddInput(this, pqInternals::Analog, role, name);
+    }
+  style->GetButtonRoles(roles.GetPointer());
+  for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
+    {
+    vtkStdString role(roles->GetString(i));
+    vtkStdString name(style->GetButtonName(role));
+    this->Internals->AddInput(this, pqInternals::Button, role, name);
+    }
+  style->GetTrackerRoles(roles.GetPointer());
+  for (int i = 0; i < roles->GetNumberOfStrings(); ++i)
+    {
+    vtkStdString role(roles->GetString(i));
+    vtkStdString name(style->GetTrackerName(role));
+    this->Internals->AddInput(this, pqInternals::Tracker, role, name);
     }
 
-  int buttonIndex = this->Internals->buttonCombo->findText(button);
-  if (buttonIndex != -1)
-    {
-    this->Internals->buttonCombo->setCurrentIndex(buttonIndex);
-    }
-
-  int trackerIndex = this->Internals->trackerCombo->findText(tracker);
-  if (trackerIndex != -1)
-    {
-    this->Internals->trackerCombo->setCurrentIndex(trackerIndex);
-    }
-
-  this->Internals->CanConfigure = needsAnalog || needsButton || needsTracker;
+  this->Internals->CanConfigure = (this->Internals->Inputs.size() != 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -198,23 +207,24 @@ void pqVRAddStyleDialog::updateInteractorStyle()
     return;
     }
 
-  if (this->Internals->Style->GetNeedsAnalog())
+  foreach (const pqInternals::InputGui& gui, this->Internals->Inputs)
     {
-    QByteArray analog =
-        this->Internals->analogCombo->currentText().toLocal8Bit();
-    this->Internals->Style->SetAnalogName(analog.data());
-    }
-  if (this->Internals->Style->GetNeedsButton())
-    {
-    QByteArray button =
-        this->Internals->buttonCombo->currentText().toLocal8Bit();
-    this->Internals->Style->SetButtonName(button.data());
-    }
-  if (this->Internals->Style->GetNeedsTracker())
-    {
-    QByteArray tracker =
-        this->Internals->trackerCombo->currentText().toLocal8Bit();
-    this->Internals->Style->SetTrackerName(tracker.data());
+    const vtkStdString &role = gui.role;
+    const vtkStdString &name = gui.combo->currentText().toStdString();
+    switch (gui.type)
+      {
+      case pqInternals::Analog:
+        this->Internals->Style->SetAnalogName(role, name);
+        break;
+      case pqInternals::Button:
+        this->Internals->Style->SetButtonName(role, name);
+        break;
+      case pqInternals::Tracker:
+        this->Internals->Style->SetTrackerName(role, name);
+        break;
+      default:
+        break;
+      }
     }
 }
 
@@ -222,4 +232,39 @@ void pqVRAddStyleDialog::updateInteractorStyle()
 bool pqVRAddStyleDialog::isConfigurable()
 {
   return this->Internals->CanConfigure;
+}
+
+//-----------------------------------------------------------------------------
+void pqVRAddStyleDialog::pqInternals::AddInput(QWidget *parent, InputType type,
+                                               const vtkStdString &role,
+                                               const vtkStdString &name)
+{
+  this->Inputs.push_back(InputGui());
+  InputGui &gui = this->Inputs.back();
+
+  gui.type = type;
+  gui.role = role;
+  gui.combo = new QComboBox(parent);
+  switch (type)
+    {
+    case Analog:
+      gui.combo->addItems(this->AnalogNames);
+      break;
+    case Button:
+      gui.combo->addItems(this->ButtonNames);
+      break;
+    case Tracker:
+      gui.combo->addItems(this->TrackerNames);
+      break;
+    default:
+      qWarning() << "Unknown tracker type: " << type;
+    }
+
+  int comboIndex = gui.combo->findText(QString::fromStdString(name));
+  if (comboIndex != -1)
+    {
+    gui.combo->setCurrentIndex(comboIndex);
+    }
+
+  this->inputForm->addRow(QString::fromStdString(role) + ":", gui.combo);
 }

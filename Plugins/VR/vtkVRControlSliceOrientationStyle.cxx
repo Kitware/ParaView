@@ -60,8 +60,8 @@ vtkVRControlSliceOrientationStyle::vtkVRControlSliceOrientationStyle()
 {
   this->Enabled = false;
   this->InitialOrientationRecorded = false;
-  this->NeedsButton = true;
-  this->NeedsTracker = true;
+  this->AddButtonRole("Grab slice");
+  this->AddTrackerRole("Slice orientation");
 }
 
 // ----------------------------------------------------------------------------
@@ -94,51 +94,6 @@ vtkVRControlSliceOrientationStyle::~vtkVRControlSliceOrientationStyle()
 }
 
 // ----------------------------------------------------------------------------
-bool vtkVRControlSliceOrientationStyle::Configure(vtkPVXMLElement* child,
-                                                  vtkSMProxyLocator* locator)
-{
-  if (!this->Superclass::Configure(child, locator))
-    {
-    return false;
-    }
-
-  if (!this->ButtonName)
-    {
-    std::cerr << "vtkVRControlSliceOrientationStyle::Configure(): "
-              << "Button event has to be specified" << std::endl
-              << "<Button name=\"buttonEventName\"/>"
-              << std::endl;
-    return false;
-    }
-
-  if (!this->TrackerName)
-    {
-    std::cerr << "vtkVRControlSliceOrientationStyle::Configure(): "
-              << "Please Specify Tracker event" << std::endl
-              << "<Tracker name=\"TrackerEventName\"/>"
-              << std::endl;
-    return false;
-    }
-
-  if (this->ControlledProxy == NULL ||
-      this->ControlledPropertyName == NULL ||
-      this->ControlledPropertyName[0] == '\0')
-    {
-    std::cerr << "vtkVRControlSliceOrientationStyle::Configure(): "
-                 "Proxy/property undefined!" << std::endl;
-    return false;
-    }
-
-  return true;
-}
-
-// ----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRControlSliceOrientationStyle::SaveConfiguration() const
-{
-  return this->Superclass::SaveConfiguration();
-}
-
-// ----------------------------------------------------------------------------
 bool vtkVRControlSliceOrientationStyle::Update()
 {
   if (!this->ControlledProxy)
@@ -152,7 +107,8 @@ bool vtkVRControlSliceOrientationStyle::Update()
 // ----------------------------------------------------------------------------
 void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 {
-  if (data.name.compare(this->ButtonName) == 0)
+  vtkStdString role = this->GetButtonRole(data.name);
+  if (role == "Grab slice")
     {
     if (this->Enabled && data.data.button.state == 0)
       {
@@ -167,7 +123,8 @@ void vtkVRControlSliceOrientationStyle::HandleButton(const vtkVREventData& data)
 // ----------------------------------------------------------------------------
 void vtkVRControlSliceOrientationStyle::HandleTracker(const vtkVREventData& data)
 {
-  if (data.name.compare(this->TrackerName) != 0)
+  vtkStdString role = this->GetTrackerRole(data.name);
+  if (role != "Slice orientation")
     {
     return;
     }
