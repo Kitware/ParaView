@@ -2484,7 +2484,8 @@ int vtkGMVReader::CanReadFile(const char *name)
       }
     }
 
-  return 1;
+  rc = 1;
+  return rc;
 }
 
 
