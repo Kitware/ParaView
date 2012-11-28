@@ -2,7 +2,9 @@ include_directories(${VTK_INCLUDE_DIRS}
   ${PointSpritePlugin_SOURCE_DIR}/Graphics
   ${PointSpritePlugin_BINARY_DIR}/Graphics
   ${PointSpritePlugin_SOURCE_DIR}/Rendering
-  ${PointSpritePlugin_BINARY_DIR}/Rendering)
+  ${PointSpritePlugin_BINARY_DIR}/Rendering
+  ${PointSpritePlugin_SOURCE_DIR}/Qvis
+  ${PointSpritePlugin_BINARY_DIR}/Qvis)
     
 set(SM_SOURCES
   vtkSMCustomBoundsDomain.cxx
@@ -23,42 +25,8 @@ set(SM_XMLS_Graphics
 set(PLUGIN_NAME PointSprite_Plugin)
 
 IF(PARAVIEW_BUILD_QT_GUI)
-  INCLUDE(${QT_USE_FILE}) 
-
-    include_directories(
-      ${QT_INCLUDES} 
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis
-    )
+    include_directories(${QT_INCLUDES})
     
-    set(QVIS_SRCS
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisAbstractOpacityBar.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisGaussianOpacityBar.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisScribbleOpacityBar.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisSpectrumBar.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisColorGridWidget.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/DataNode.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/ColorControlPoint.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/ColorControlPointList.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/AttributeSubject.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/AttributeGroup.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/Subject.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/GaussianControlPoint.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/GaussianControlPointList.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/SimpleObserver.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/VisItException.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/ImproperUseException.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/VolumeAttributes.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/ColorTableAttributes.cpp
-     )
-     
-    qt4_wrap_cpp(QVIS_MOC_SRCS 
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisAbstractOpacityBar.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisGaussianOpacityBar.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisScribbleOpacityBar.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisSpectrumBar.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/Qvis/QvisColorGridWidget.h
-    )
-          
     set(UI_FORMS
       Resources/pqPointSpriteDisplayPanelDecorator.ui
       Resources/pqTransferFunctionEditor.ui
@@ -101,12 +69,12 @@ IF(PARAVIEW_BUILD_QT_GUI)
         ${IFACES} 
       GUI_SOURCES 
         ${Plugin_SRCS} 
-        ${QVIS_SRCS} 
-        ${QVIS_MOC_SRCS} 
         ${MOC_SRCS} 
         ${UI_SRCS} 
         ${IFACE_SRCS}
-    ) 
+    )
+    target_link_libraries(${PLUGIN_NAME} vtkQvis)
+
 ELSE(PARAVIEW_BUILD_QT_GUI)
     add_paraview_plugin(${PLUGIN_NAME} "1.0"
         SERVER_MANAGER_SOURCES 

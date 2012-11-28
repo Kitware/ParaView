@@ -1,5 +1,5 @@
-# this plugin doesn't work for static builds.
-if (TARGET vtkIOVisItBridge)
+if (TARGET vtkIOVisItBridge AND NOT BUILD_SHARED_LIBS)
+  # this plugin doesn't work for static builds.
   message(STATUS
     "VisitBridge is enabled. "
     "Due to current limitations, PointSprite plugin cannot be built with "

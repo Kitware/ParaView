@@ -39,6 +39,7 @@
 #define QvisAbstractOpacityBar_H
 
 #include <qframe.h>
+#include "vtkQvisModule.h" // for export macro
 
 class QPixmap;
 class ColorControlPointList;
@@ -53,7 +54,7 @@ class ColorControlPointList;
 //  Creation:    January 30, 2001
 //
 // ****************************************************************************
-class QvisAbstractOpacityBar : public QFrame
+class VTKQVIS_EXPORT QvisAbstractOpacityBar : public QFrame
 {
     Q_OBJECT
   public:

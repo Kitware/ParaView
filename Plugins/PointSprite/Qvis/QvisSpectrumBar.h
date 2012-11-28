@@ -38,6 +38,7 @@
 #ifndef QVIS_SPECTRUM_BAR_H
 #define QVIS_SPECTRUM_BAR_H
 #include <qwidget.h>
+#include "vtkQvisModule.h" // needed for export
 
 // Forward declarations.
 class ControlPointList;
@@ -69,10 +70,7 @@ class QTimer;
 //
 // ****************************************************************************
 
-//#include "QvisConfigure.h"
-
-//class Qvis_EXPORT QvisSpectrumBar : public QWidget
-class QvisSpectrumBar : public QWidget
+class VTKQVIS_EXPORT QvisSpectrumBar : public QWidget
 {
     Q_OBJECT
 public:
