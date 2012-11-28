@@ -20,7 +20,7 @@
   <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface" />
 
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="TextSource" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/Text/Text" command="set_string" arguments="Text&#xA;This is a testing" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Text/Text" command="set_string" arguments="Text&#xA;This is a testing" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/1pqDisplayPanelPropertyWidget0/pqTextDisplayPropertiesWidget/TextPropertyFrame/buttonColor/StandardColorMenu" command="activate" arguments="EdgeColor" />
 
