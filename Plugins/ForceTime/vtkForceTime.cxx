@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkForceTime.h"
 
-#include "vtkTemporalDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
