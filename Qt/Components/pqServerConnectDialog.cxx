@@ -339,7 +339,7 @@ void pqServerConnectDialog::onServerSelected(int row)
     }
   this->Internals->editServer->setEnabled(is_mutable);
   this->Internals->deleteServer->setEnabled(is_mutable);
-  this->Internals->connect->setEnabled(is_mutable);
+  this->Internals->connect->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
