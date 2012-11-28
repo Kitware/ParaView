@@ -6291,15 +6291,15 @@
                  label="CSV Reader"
                  name="CSVReader"
                  si_class="vtkSIFileSeriesReaderProxy">
-      <Documentation long_help="Reads a comma-separated values file into a 1D rectilinear grid."
-                     short_help="Read a comma-separated values file.">The CSV
-                     reader reads a comma-separated values file into a 1D
+      <Documentation long_help="Reads a Delimited Text values file into a 1D rectilinear grid."
+                     short_help="Read a Delimited Text values file.">The CSV
+                     reader reads a Delimited Text values file into a 1D
                      rectilinear grid. If the file was saved using the
                      CSVWriter, then the rectilinear grid's points and point
                      data can be restored as well as the cell data. Otherwise
                      all the data in the CSV file is treated as cell data. The
-                     default file extension is .csv. This can read file series
-                     as well.</Documentation>
+                     default file extension is .csv as well as .txt.
+                     This can read file series as well.</Documentation>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
@@ -6340,8 +6340,8 @@
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
-        <ReaderFactory extensions="csv"
-                       file_description="Comma-separated-values" />
+        <ReaderFactory extensions="csv txt CSV TXT"
+                       file_description="Delimited Text" />
       </Hints>
       <!-- End of CSVReader -->
     </SourceProxy>
