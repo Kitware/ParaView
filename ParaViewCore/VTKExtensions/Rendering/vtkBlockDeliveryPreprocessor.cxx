@@ -36,6 +36,7 @@ vtkBlockDeliveryPreprocessor::vtkBlockDeliveryPreprocessor()
   this->FieldAssociation = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   this->FlattenTable = 0;
   this->GenerateOriginalIds = true;
+  this->GenerateCellConnectivity = false;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +106,7 @@ int vtkBlockDeliveryPreprocessor::RequestData(vtkInformation*,
     vtkSmartPointer<vtkAttributeDataToTableFilter>::New();
   adtf->SetInputData(clone);
   adtf->SetAddMetaData(true);
+  adtf->SetGenerateCellConnectivity(this->GenerateCellConnectivity);
   adtf->SetFieldAssociation(this->FieldAssociation);
   adtf->SetGenerateOriginalIds(this->GenerateOriginalIds);
   adtf->Update();
@@ -185,5 +187,3 @@ void vtkBlockDeliveryPreprocessor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
-

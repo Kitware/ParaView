@@ -1,135 +1,128 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqSpreadSheetViewDecorator</class>
- <widget class="QWidget" name="pqSpreadSheetViewDecorator" >
-  <property name="geometry" >
+ <widget class="QWidget" name="pqSpreadSheetViewDecorator">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <height>26</height>
-    <width>526</width>
+    <width>573</width>
+    <height>32</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" >
-   <property name="spacing" >
+  <layout class="QHBoxLayout">
+   <property name="spacing">
     <number>1</number>
    </property>
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>&lt;b>Showing  &lt;/b></string>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&lt;b&gt;Showing  &lt;/b&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="pqOutputPortComboBox" name="Source" >
-     <property name="sizeAdjustPolicy" >
+    <widget class="pqOutputPortComboBox" name="Source">
+     <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_2" >
-     <property name="text" >
-      <string>&lt;b>   Attribute:&lt;/b></string>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>&lt;b&gt;   Attribute:&lt;/b&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="Attribute" >
-     <property name="sizeAdjustPolicy" >
+    <widget class="QComboBox" name="Attribute">
+     <property name="sizeAdjustPolicy">
       <enum>QComboBox::AdjustToContents</enum>
      </property>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Points</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Cells</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Field Data</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Vertices</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Edges</string>
       </property>
      </item>
      <item>
-      <property name="text" >
+      <property name="text">
        <string>Rows</string>
       </property>
      </item>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_Precision" >
-     <property name="font" >
+    <widget class="QLabel" name="label_Precision">
+     <property name="font">
       <font>
        <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Precision:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QSpinBox" name="spinBoxPrecision" >
-     <property name="alignment" >
+    <widget class="QSpinBox" name="spinBoxPrecision">
+     <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
-     <property name="maximum" >
+     <property name="maximum">
       <number>32</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QToolButton" name="SelectionOnly" >
-     <property name="toolTip" >
+    <widget class="QToolButton" name="SelectionOnly">
+     <property name="toolTip">
       <string>Show only selected elements.</string>
      </property>
-     <property name="statusTip" >
+     <property name="statusTip">
       <string>Show only selected elements.</string>
      </property>
-     <property name="whatsThis" >
+     <property name="whatsThis">
       <string>Show only selected elements.</string>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>Selected</string>
      </property>
-     <property name="icon" >
-      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqSelect16.png</iconset>
+     <property name="icon">
+      <iconset resource="../pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqSelect16.png</normaloff>:/pqWidgets/Icons/pqSelect16.png</iconset>
      </property>
-     <property name="checkable" >
+     <property name="checkable">
       <bool>true</bool>
      </property>
-     <property name="toolButtonStyle" >
+     <property name="toolButtonStyle">
       <enum>Qt::ToolButtonIconOnly</enum>
      </property>
     </widget>
@@ -155,11 +148,28 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="ToggleCellConnectivity">
+     <property name="toolTip">
+      <string>Toggle cell connectivity visibility</string>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</normaloff>:/pqWidgets/Icons/pqProgrammableFilter24.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>58</width>
        <height>23</height>
@@ -177,7 +187,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../pqComponents.qrc" />
+  <include location="../pqComponents.qrc"/>
  </resources>
  <connections/>
 </ui>

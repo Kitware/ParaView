@@ -40,6 +40,11 @@ public:
   void SetCompositeDataSetIndex() { this->SetCompositeDataSetIndex(0); }
 
   // Description:
+  // Allow user to enable/disable cell connectivity generation in the datamodel
+  vtkSetMacro(GenerateCellConnectivity, bool);
+  vtkGetMacro(GenerateCellConnectivity, bool);
+
+  // Description:
   // Select the attribute type. Accepted values are
   // \li vtkDataObject::FIELD_ASSOCIATION_POINTS,
   // \li vtkDataObject::FIELD_ASSOCIATION_CELLS,
@@ -87,6 +92,7 @@ protected:
   unsigned int CompositeDataSetIndex;
   int FlattenTable;
   bool GenerateOriginalIds;
+  bool GenerateCellConnectivity;
 private:
   vtkBlockDeliveryPreprocessor(const vtkBlockDeliveryPreprocessor&); // Not implemented
   void operator=(const vtkBlockDeliveryPreprocessor&); // Not implemented

@@ -4011,6 +4011,13 @@
         <BooleanDomain name="bool" />
         <Documentation>Visibility of the representation.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetGenerateCellConnectivity"
+                         default_values="0"
+                         name="GenerateCellConnectivity"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>Generation of the cell connectivity.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetForceUseCache"
                          default_values="0"
                          is_internal="1"

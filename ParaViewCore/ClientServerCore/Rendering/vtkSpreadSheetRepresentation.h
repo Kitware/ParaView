@@ -46,6 +46,11 @@ public:
   vtkAlgorithmOutput* GetExtractedDataProducer();
   vtkAlgorithmOutput* GetSelectionProducer();
 
+  // Description:
+  // Allow user to enable/disable cell connectivity generation in the datamodel
+  void SetGenerateCellConnectivity(bool);
+  bool GetGenerateCellConnectivity();
+
   //***************************************************************************
   // Forwarded to vtkBlockDeliveryPreprocessor.
   void SetFieldAssociation(int val);
