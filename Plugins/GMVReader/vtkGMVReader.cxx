@@ -1846,8 +1846,10 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
   std::vector < DataInfo<float> > NodeDataInfoTemp, CellDataInfoTemp;
+  DataInfo<float> Info;
 #endif
-
+  double miD, mxD;
+  long miL, mxL;
   double timeStepValue = 0.0;
   bool keepParsing = true;
   this->NumberOfNodeFields = 0;
@@ -1929,18 +1931,13 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (MATERIAL):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-#endif
-          long mi, mx;
-
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, mi, mx);
-            Info.min[0] = float(mi);
-            Info.max[0] = float(mx);
+            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, miL, mxL);
+            Info.min[0] = float(miL);
+            Info.max[0] = float(mxL);
             Info.veclen = 1;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -1951,9 +1948,9 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, mi, mx);
-            Info.min[0] = float(mi);
-            Info.max[0] = float(mx);
+            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, miL, mxL);
+            Info.min[0] = float(miL);
+            Info.max[0] = float(mxL);
             Info.veclen = 1;
             CellDataInfoTemp.push_back(Info);
 #endif
@@ -1975,24 +1972,19 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (VELOCITY):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-          double mi,mx;
-#endif
-
           case (NODE):
             this->NumberOfNodeFields += 3;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
-            GMVRead::minmax(GMVRead::gmv_data.doubledata2, this->NumberOfNodes, mi, mx);
-            Info.min[1] = mi;
-            Info.max[1] = mx;
-            GMVRead::minmax(GMVRead::gmv_data.doubledata3, this->NumberOfNodes, mi, mx);
-            Info.min[2] = mi;
-            Info.max[2] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata2, this->NumberOfNodes, miD, mxD);
+            Info.min[1] = miD;
+            Info.max[1] = mxD;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata3, this->NumberOfNodes, miD, mxD);
+            Info.min[2] = miD;
+            Info.max[2] = mxD;
             Info.veclen = 3;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2003,15 +1995,15 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
             this->NumberOfCellFields += 3;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
-            GMVRead::minmax(GMVRead::gmv_data.doubledata2, this->NumberOfCells, mi, mx);
-            Info.min[1] = mi;
-            Info.max[1] = mx;
-            GMVRead::minmax(GMVRead::gmv_data.doubledata3, this->NumberOfCells, mi, mx);
-            Info.min[2] = mi;
-            Info.max[2] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata2, this->NumberOfCells, miD, mxD);
+            Info.min[1] = miD;
+            Info.max[1] = mxD;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata3, this->NumberOfCells, miD, mxD);
+            Info.min[2] = miD;
+            Info.max[2] = mxD;
             Info.veclen = 3;
             CellDataInfoTemp.push_back(Info);
 #endif
@@ -2029,18 +2021,13 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (VECTORS):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-          double mi, mx;
-#endif
-
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
             Info.veclen = 1;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2051,9 +2038,9 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
             Info.veclen = 1;
             CellDataInfoTemp.push_back(Info);
 #endif
@@ -2073,18 +2060,13 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (VARIABLE):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-          double mi, mx;
-#endif
-
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
             Info.veclen = 1;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2095,9 +2077,9 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
             Info.veclen = 1;
             CellDataInfoTemp.push_back(Info);
 #endif
@@ -2124,15 +2106,11 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-#endif
-
           case (NODE):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, mi, mx);
+            // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfNodes, miD, mxD);
             Info.min[0] = 0;
             Info.max[0] = 0;
             Info.veclen = 1;
@@ -2145,7 +2123,7 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, mi, mx);
+            // GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfCells, miD, mxD);
             Info.min[0] = 0;
             Info.max[0] = 0;
             Info.veclen = 1;
@@ -2190,12 +2168,9 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
           case (TRACERDATA):
             // Determine min/max values for statistics tab
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            DataInfo<float> Info;
-            double mi, mx;
-
-            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfTracers, mi, mx);
-            Info.min[0] = mi;
-            Info.max[0] = mx;
+            GMVRead::minmax(GMVRead::gmv_data.doubledata1, this->NumberOfTracers, miD, mxD);
+            Info.min[0] = miD;
+            Info.max[0] = mxD;
             Info.veclen = 1;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2221,12 +2196,9 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
 
       case (TRACEIDS):
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-        DataInfo<float> Info;
-        long mi, mx;
-
-        GMVRead::minmax(GMVRead::gmv_data.longdata1, int(GMVRead::gmv_data.num), mi, mx);
-        Info.min[0] = float(mi);
-        Info.max[0] = float(mx);
+        GMVRead::minmax(GMVRead::gmv_data.longdata1, int(GMVRead::gmv_data.num), miL, mxL);
+        Info.min[0] = float(miL);
+        Info.max[0] = float(mxL);
         Info.veclen = 1;
         NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2268,18 +2240,13 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (NODEIDS):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-          long mi, mx;
-#endif
-
           case (REGULAR):
             this->NumberOfNodeFields += 1;
             this->NumberOfNodeComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, mi, mx);
-            Info.min[0] = float(mi);
-            Info.max[0] = float(mx);
+            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, miL, mxL);
+            Info.min[0] = float(miL);
+            Info.max[0] = float(mxL);
             Info.veclen = 1;
             NodeDataInfoTemp.push_back(Info);
 #endif
@@ -2293,18 +2260,13 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
       case (CELLIDS):
         switch(GMVRead::gmv_data.datatype)
           {
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-          DataInfo<float> Info;
-          long mi, mx;
-#endif
-
           case (REGULAR):
             this->NumberOfCellFields += 1;
             this->NumberOfCellComponents += 1;
 #ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
-            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, mi, mx);
-            Info.min[0] = float(mi);
-            Info.max[0] = float(mx);
+            GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, miL, mxL);
+            Info.min[0] = float(miL);
+            Info.max[0] = float(mxL);
             Info.veclen = 1;
             CellDataInfoTemp.push_back(Info);
 #endif

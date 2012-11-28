@@ -77,9 +77,6 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # exclude warning from MantaView  plugin
   "MantaView.VTK"
   "manta"
-
-  # Exclude VisitBridge related warnings
-  "databases/GMV/gmvread"
 )
 
 #------------------------------------------------------------------------------
