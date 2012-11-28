@@ -824,6 +824,7 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
   SET(PLUGIN_REQUIRED_PLUGINS)
   SET(HAVE_REQUIRED_PLUGINS 0)
   SET(BINARY_RESOURCES_INIT)
+  SET(QRC_RESOURCES_INIT)
   SET(EXTRA_INCLUDES)
 
   # binary_resources are used to compile in icons and documentation for the
@@ -924,6 +925,17 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
     ENDIF(ARG_GUI_INTERFACES OR ARG_GUI_RESOURCES OR ARG_GUI_SOURCES)
 
     IF(ARG_GUI_RESOURCES)
+      # When building statically, we need to add stub to initialize the Qt
+      # resources otherwise icons, GUI configuration xmls, etc. don't get
+      # loaded/initialized when the plugin is statically imported.
+      if (NOT PARAVIEW_BUILD_SHARED_LIBS)
+        foreach (qrc_file IN LISTS ARG_GUI_RESOURCES)
+          get_filename_component(rc_name "${qrc_file}" NAME_WE)
+          set (QRC_RESOURCES_INIT
+            "${QRC_RESOURCES_INIT}Q_INIT_RESOURCE(${rc_name});\n")
+        endforeach()
+      endif()
+
       PARAVIEW_QT4_ADD_RESOURCES(QT_RCS ${ARG_GUI_RESOURCES})
       SET(GUI_SRCS ${GUI_SRCS} ${QT_RCS})
     ENDIF(ARG_GUI_RESOURCES)
@@ -985,6 +997,11 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
     ELSE (PARAVIEW_BUILD_SHARED_LIBS)
       ADD_LIBRARY(${NAME} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
+      # When building plugins for static builds, Qt requires this flag to be
+      # defined. If not defined, when we link the executable against all the
+      # plugins, we get redefinied symbols from the plugins.
+      set_target_properties(${NAME} PROPERTIES
+                                    COMPILE_DEFINITIONS QT_STATICPLUGIN)
     ENDIF (PARAVIEW_BUILD_SHARED_LIBS)
 
     IF(MSVC)
