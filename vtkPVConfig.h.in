@@ -41,9 +41,6 @@
 // Indicates the Qt support is enabled in VTK.
 #cmakedefine VTK_USE_QVTK
 
-// Indicates the Qt support is enabled in ParaView
-#cmakedefine PARAVIEW_ENABLE_QT_SUPPORT
-
 // Build ParaView with Floating Point Exceptions turned on
 #cmakedefine PARAVIEW_ENABLE_FPE
 //Build ParaView with enforced secure connection (--connect-id)
