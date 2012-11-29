@@ -1,5 +1,5 @@
 # Attempt to detect if we have a Fortran Compiler available.
-include(${ParaView_SOURCE_DIR}/SuperBuild/CheckFortran.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/CheckFortran.cmake)
 
 if(CMAKE_Fortran_COMPILER)
   ENABLE_LANGUAGE(Fortran)
