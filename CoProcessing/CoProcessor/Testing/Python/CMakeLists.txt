@@ -31,15 +31,33 @@ if (PARAVIEW_USE_MPI)
   target_link_libraries(CoProcessingCompareImagesTester vtkIOMPIImage)
 endif()
 
-
-add_test(NAME CoProcessingTestPythonScript
-         COMMAND ${CMAKE_COMMAND}
-          -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
-          -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
-          -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
-          -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
-          -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
-          -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+# the CoProcessingTestPythonScript needs to be run with ${MPIEXEC} if
+# CoProcessingPythonScriptExample was built with MPI because certain
+# machines only allow running MPI programs with the proper ${MPIEXEC}
+if (NOT PARAVIEW_USE_MPI)
+  add_test(NAME CoProcessingTestPythonScript
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+    -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+    -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+else()
+  add_test(NAME CoProcessingTestPythonScript
+    COMMAND ${CMAKE_COMMAND}
+    -DCOPROCESSING_TEST_DRIVER:FILEPATH=$<TARGET_FILE:CoProcessingPythonScriptExample>
+    -DCOPROCESSING_TEST_DIR:PATH=${PARAVIEW_TEST_DIR}
+    -DCOPROCESSING_IMAGE_TESTER:FILEPATH=$<TARGET_FILE:CoProcessingCompareImagesTester>
+    -DCOPROCESSING_DATA_DIR:PATH=${PARAVIEW_DATA_ROOT}
+    -DCOPROCESSING_TEST_SCRIPT=${CMAKE_CURRENT_SOURCE_DIR}/PythonScriptTest.py
+    -DMPIEXEC:FILEPATH=${MPIEXEC}
+    -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
+    -DMPIEXEC_NUMPROCS=1
+    -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
+    -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
+endif()
 
 set(CP_LABELS PARAVIEW CATALYST)
 set_tests_properties(CoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
@@ -55,6 +73,7 @@ if (PARAVIEW_USE_MPI)
           -DUSE_MPI:BOOL=TRUE
           -DMPIEXEC:FILEPATH=${MPIEXEC}
           -DMPIEXEC_NUMPROC_FLAG:STRING=${MPIEXEC_NUMPROC_FLAG}
+          -DMPIEXEC_NUMPROCS=2
           -DMPIEXEC_PREFLAGS:STRING=${MPIEXEC_PREFLAGS}
           -DVTK_MPI_POSTFLAGS:STRING=${VTK_MPI_POSTFLAGS}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
