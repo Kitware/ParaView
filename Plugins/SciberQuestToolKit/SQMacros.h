@@ -25,6 +25,12 @@ using std::cerr;
       << __FILE__ << ", line " << __LINE__ << endl  \
       << "" estr << endl;
 
+#define sqWarningMacro(os,estr)                     \
+    os                                              \
+      << "Warning in:" << endl                      \
+      << __FILE__ << ", line " << __LINE__ << endl  \
+      << "" estr << endl;
+
 #define SafeDelete(a)\
   if (a)\
     {\
