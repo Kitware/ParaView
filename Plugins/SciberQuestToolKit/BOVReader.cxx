@@ -70,7 +70,7 @@ BOVReader::BOVReader()
   MPI_Initialized(&mpiOk);
   if (!mpiOk)
     {
-    sqErrorMacro(
+    sqWarningMacro(
       cerr,
       << "This class requires the MPI runtime, "
       << "you must run ParaView in client-server mode launched via mpiexec.");

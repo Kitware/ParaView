@@ -286,6 +286,16 @@ int vtkSQBOVReaderBase::CanReadFile(const char *file)
   #ifdef SQTK_WITHOUT_MPI
   (void)file;
   #else
+  // first check that MPI is initialized. in builtin mode MPI will
+  // never be initialized and this reader will be unable to read files
+  // so we always return false in this case
+  int mpiOk=0;
+  MPI_Initialized(&mpiOk);
+  if (!mpiOk)
+    {
+    return 0;
+    }
+
   // only rank 0 opens the file, this results in metadata
   // being parsed. If the parsing of md is successful then
   // the file is ours.
@@ -310,7 +320,7 @@ void vtkSQBOVReaderBase::SetFileName(const char* _arg)
   #else
   int mpiOk=0;
   MPI_Initialized(&mpiOk);
-  if (!mpiOk)
+  if (_arg && !mpiOk)
     {
     vtkErrorMacro(
         << "MPI has not been initialized. Restart ParaView using mpiexec.");
