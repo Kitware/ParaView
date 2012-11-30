@@ -280,13 +280,18 @@ vtkPVProminentValuesInformation* vtkSMRepresentationProxy::GetProminentValuesInf
   vtkStdString name, int fieldAssoc, int numComponents,
   double uncertaintyAllowed, double fraction)
 {
+  bool differentAttribute =
+    this->ProminentValuesInformation->GetNumberOfComponents() != numComponents ||
+    this->ProminentValuesInformation->GetFieldName() != name ||
+    strcmp(this->ProminentValuesInformation->GetFieldAssociation(),
+      vtkDataObject::GetAssociationTypeAsString(fieldAssoc));
   bool invalid =
     this->ProminentValuesFraction < 0. || this->ProminentValuesUncertainty < 0. ||
     this->ProminentValuesFraction > 1. || this->ProminentValuesUncertainty > 1.;
   bool largerFractionOrLessCertain =
     this->ProminentValuesFraction < fraction ||
     this->ProminentValuesUncertainty > uncertaintyAllowed;
-  if (invalid || largerFractionOrLessCertain)
+  if (differentAttribute || invalid || largerFractionOrLessCertain)
     {
     vtkTimerLog::MarkStartEvent(
       "vtkSMRepresentationProxy::GetProminentValues");
