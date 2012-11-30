@@ -169,6 +169,7 @@ float getProcessCriticalThreshold()
 {
   return 0.80f;
 }
+
 // ****************************************************************************
 void setMemoryUseWidgetColor(
       QPalette &palette,
@@ -201,6 +202,19 @@ void setMemoryUseWidgetColor(
     //palette.setColor(QPalette::Highlight,QColor(90,160,70)); // moderate
     //palette.setColor(QPalette::Highlight,QColor(125,176,74));// cdash yellow
     palette.setColor(QPalette::Highlight, Qt::darkGray);
+    }
+}
+
+// ****************************************************************************
+void setWidgetContainerColor(QPalette &palette, int rank)
+{
+  if (rank%2)
+    {
+    palette.setColor(QPalette::Base,QColor(250,250,250));
+    }
+  else
+    {
+    palette.setColor(QPalette::Base,QColor(237,237,237));
     }
 }
 
@@ -411,6 +425,15 @@ void RankData::InitializeMemoryUseWidget()
   QFont font(this->WidgetContainer->font());
   font.setPointSize(8);
   this->WidgetContainer->setFont(font);
+
+  QPalette palette(rank->palette());
+  ::setWidgetContainerColor(palette, this->Rank);
+
+  rank->setPalette(palette);
+  rank->setAutoFillBackground(true);
+
+  pid->setPalette(palette);
+  pid->setAutoFillBackground(true);
 
   QFontMetrics fontMet(font);
   int rankWid=fontMet.width("555555");
