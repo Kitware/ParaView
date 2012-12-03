@@ -33,15 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __ParaViewVRPN_h
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
-#include "vtkVRQueue.h"
-#include "vtkTransform.h"
+
 #include "vtkMatrix4x4.h"
+#include "vtkTransform.h"
+#include "vtkVRQueue.h"
+
+#include <QtCore/QMutex>
+
+#include <vrpn_Analog.h>
+#include <vrpn_Button.h>
+#include <vrpn_Tracker.h>
 
 #include <map>
 

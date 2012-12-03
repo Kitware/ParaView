@@ -31,35 +31,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqVRPNConnection.h"
 
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
-#include "vtkMath.h"
 #include "pqActiveObjects.h"
+#include "pqDataRepresentation.h"
 #include "pqVRPNEventListener.h"
 #include "pqView.h"
-#include <pqDataRepresentation.h>
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include "vtkVRPNCallBackHandlers.h"
-#include <QDateTime>
-#include <QDebug>
-#include <QtCore/QMutexLocker>
-#include <QtCore/QThread>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
+
+#include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkMath.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkVRPNCallBackHandlers.h"
+
+#include <QtCore/QDateTime>
+#include <QtCore/QDebug>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
+
+#include <vrpn_Analog.h>
+#include <vrpn_Button.h>
+#include <vrpn_Tracker.h>
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 pqVRPNEventListener *pqVRPNConnection::Listener = NULL;
 
