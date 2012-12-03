@@ -290,6 +290,10 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
   pd = NULL;
   keepParsing = true;
   firstPolygonParsed = false;
+  polygonPoints = NULL;
+  polygonCells = NULL;
+  polygonMaterials = NULL;
+  polygonMaterialPosInDataArray = -1;
 
   if (this->Mesh)
     {
@@ -1192,9 +1196,6 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
             // specify the number of polygons beforehand. Luckily, we already parsed
             // all files in RequestInformation() and stored the number per file.
             blockNo = output->GetNumberOfBlocks();
-            polygonPoints = NULL;
-            polygonCells = NULL;
-            polygonMaterials = NULL;
 
             pd = vtkPolyData::New();
             pd->Allocate(this->NumberOfPolygons);
