@@ -499,10 +499,12 @@ void pqVRDockPanel::start()
                   " already running!";
     return;
     }
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   pqVRConnectionManager::instance()->start();
   pqVRQueueHandler::instance()->start();
   this->Internals->IsRunning = true;
   this->updateStartStopButtonStates();
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -514,10 +516,12 @@ void pqVRDockPanel::stop()
                   " not started!";
     return;
     }
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   pqVRConnectionManager::instance()->stop();
   pqVRQueueHandler::instance()->stop();
   this->Internals->IsRunning = false;
   this->updateStartStopButtonStates();
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
