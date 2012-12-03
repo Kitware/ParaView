@@ -237,15 +237,15 @@ bool pqRemoteControlThread::sendObjects()
 bool pqRemoteControlThread::receiveCameraState()
 {
 
-  CameraStateStruct cameraState;
-  if (this->Internal->Socket->Receive(&cameraState, sizeof(CameraStateStruct)) == 0)
+  CameraStateStruct camState;
+  if (this->Internal->Socket->Receive(&camState, sizeof(CameraStateStruct)) == 0)
     {
     this->close();
     return false;
     }
 
   QMutexLocker locker(&this->Internal->Lock);
-  this->Internal->CameraState = cameraState;
+  this->Internal->CameraState = camState;
   this->Internal->NewCameraState = true;
 
   return (this->Internal->ShouldQuit != true);

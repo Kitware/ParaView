@@ -59,12 +59,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqRemoteControl::pqRemoteControl(QWidget* parent, Qt::WindowFlags flags) : QDockWidget(parent, flags)
+pqRemoteControl::pqRemoteControl(QWidget* p, Qt::WindowFlags flags) : QDockWidget(p, flags)
 {
   this->Internal = new pqInternal;
-  QWidget* widget = new QWidget(this);
-  this->Internal->setupUi(widget);
-  this->setWidget(widget);
+  QWidget* mainWidget = new QWidget(this);
+  this->Internal->setupUi(mainWidget);
+  this->setWidget(mainWidget);
   this->setWindowTitle("Mobile Remote Control");
   this->connect(this->Internal->StartButton, SIGNAL(clicked()), SLOT(onButtonClicked()));
   this->connect(this->Internal->DocLabel, SIGNAL(linkActivated(const QString&)), SLOT(onLinkClicked(const QString&)));
@@ -151,8 +151,8 @@ void pqRemoteControl::updateCamera()
     return;
     }
 
-  pqRenderView* renderView = this->renderView();
-  if (!renderView || !this->Internal->Server.hasNewCameraState())
+  pqRenderView* renView = this->renderView();
+  if (!renView || !this->Internal->Server.hasNewCameraState())
     {
     QTimer::singleShot(33, this, SLOT(updateCamera()));
     return;
@@ -160,22 +160,22 @@ void pqRemoteControl::updateCamera()
 
   const pqRemoteControlThread::CameraStateStruct cameraState = this->Internal->Server.cameraState();
 
-  double pos[3] = {cameraState.Position[0],cameraState.Position[1],cameraState.Position[2]};
-  double focal[3] = {cameraState.FocalPoint[0],cameraState.FocalPoint[1],cameraState.FocalPoint[2]};
-  double viewup[3] = {cameraState.ViewUp[0],cameraState.ViewUp[1],cameraState.ViewUp[2]};
+  double cameraPosition[3] = {cameraState.Position[0],cameraState.Position[1],cameraState.Position[2]};
+  double cameraFocalPoint[3] = {cameraState.FocalPoint[0],cameraState.FocalPoint[1],cameraState.FocalPoint[2]};
+  double cameraViewUp[3] = {cameraState.ViewUp[0],cameraState.ViewUp[1],cameraState.ViewUp[2]};
 
 
-  vtkSMRenderViewProxy* viewProxy = renderView->getRenderViewProxy();
-  vtkSMPropertyHelper(viewProxy, "CameraPosition").Set(pos, 3);
-  vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").Set(focal, 3);
-  vtkSMPropertyHelper(viewProxy, "CameraViewUp").Set(viewup, 3);
+  vtkSMRenderViewProxy* viewProxy = renView->getRenderViewProxy();
+  vtkSMPropertyHelper(viewProxy, "CameraPosition").Set(cameraPosition, 3);
+  vtkSMPropertyHelper(viewProxy, "CameraFocalPoint").Set(cameraFocalPoint, 3);
+  vtkSMPropertyHelper(viewProxy, "CameraViewUp").Set(cameraViewUp, 3);
 
   vtkPVRenderView* view = vtkPVRenderView::SafeDownCast(viewProxy->GetClientSideView());
   if (view)
     {
     view->ResetCameraClippingRange();
     }
-  renderView->render();
+  renView->render();
 
   QTimer::singleShot(33, this, SLOT(updateCamera()));
 }
@@ -231,8 +231,8 @@ pqRenderView* pqRemoteControl::renderView()
 //-----------------------------------------------------------------------------
 void pqRemoteControl::onExportScene()
 {
-  pqRenderView* renderView = this->renderView();
-  vtkRenderWindow* renderWindow = renderView ? renderView->getRenderViewProxy()->GetRenderWindow() : 0;
+  pqRenderView* renView = this->renderView();
+  vtkRenderWindow* renderWindow = renView ? renView->getRenderViewProxy()->GetRenderWindow() : 0;
 
   this->Internal->StatusLabel->setText("Status: exporting scene");
   this->Internal->Server.exportScene(renderWindow);

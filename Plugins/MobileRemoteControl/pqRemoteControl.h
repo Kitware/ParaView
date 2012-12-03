@@ -51,7 +51,7 @@ class pqRemoteControl : public QDockWidget
   Q_OBJECT
 public:
 
-  pqRemoteControl(QWidget* parent=0, Qt::WindowFlags flags=0);
+  pqRemoteControl(QWidget* p=0, Qt::WindowFlags flags=0);
   virtual ~pqRemoteControl();
 
 protected slots:
