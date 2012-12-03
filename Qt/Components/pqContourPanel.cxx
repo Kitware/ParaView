@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -81,22 +81,22 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   QVBoxLayout* l = new QVBoxLayout(group1);
   this->Implementation->ControlsContainer.layout()->setMargin(0);
   l->addWidget(&this->Implementation->ControlsContainer);
-  
+
   // begin: the locator --- a proxy property (incremental_point_locators)
-  // 
+  //
   // make the locator a sibling of the contour sub-panel and a child of 'this'
   pqProxySelectionWidget* locator = new pqProxySelectionWidget
     ( object_proxy->getProxy(), "Locator",
       this->proxy()->GetProperty( "Locator" )->GetXMLLabel(), this );
-  locator->layout()->setMargin( 0 );      
+  locator->layout()->setMargin( 0 );
   locator->setObjectName( "Locator" );
-  
+
   // link this proxy (the GUI element) with "Locator" (the underlying property
   // of the contour filter)
   this->propertyManager()
       ->registerLink( locator, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
                       this->proxy(), this->proxy()->GetProperty("Locator") );
-  
+
   // exchange signals beween the contour and the locator
   QObject::connect( this, SIGNAL(viewChanged(pqView*) ),
                     locator, SLOT(setView(pqView*)) );
@@ -105,17 +105,17 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect( this, SIGNAL(onselect()), locator, SLOT(select()) );
   QObject::connect( this, SIGNAL(ondeselect()), locator, SLOT(deselect()) );
   QObject::connect( locator, SIGNAL(modified()), this, SLOT(setModified()) );
-  QObject::connect( locator, SIGNAL(proxyChanged(pqSMProxy)), 
+  QObject::connect( locator, SIGNAL(proxyChanged(pqSMProxy)),
                     this,    SLOT(setModified()) );
   //
-  // end: the locator --- a proxy property (incremental_point_locators) 
+  // end: the locator --- a proxy property (incremental_point_locators)
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
   group2->setTitle(tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
   l = new QVBoxLayout(group2);
   this->Implementation->SampleScalarWidget.layout()->setMargin(0);
   l->addWidget(&this->Implementation->SampleScalarWidget);
-  
+
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->addWidget(group1);
   panel_layout->addWidget(group2);
@@ -205,4 +205,6 @@ void pqContourPanel::updateEnableState()
   this->Implementation->Controls.ComputeScalars->setEnabled(!is_input_polydata);
   this->Implementation->Controls.ComputeGradients->setEnabled(is_data_structured);
   this->Implementation->Controls.ComputeNormals->setEnabled(!is_input_polydata);
+  this->Implementation->Controls.GenerateTriangles->setEnabled(true);
+
 }
