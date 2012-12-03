@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vrpn_Text.h>
 #include "vtkMath.h"
 #include "pqActiveObjects.h"
+#include "pqVRPNEventListener.h"
 #include "pqView.h"
 #include <pqDataRepresentation.h>
 #include "vtkSMRenderViewProxy.h"
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QDebug>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -59,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkMath.h"
 
-QMutex pqVRPNConnection::Lock;
+pqVRPNEventListener *pqVRPNConnection::Listener = NULL;
 
 class pqVRPNConnection::pqInternals
 {
@@ -109,8 +111,11 @@ pqVRPNConnection::pqVRPNConnection(QObject* parentObject)
   :Superclass( parentObject )
 {
   this->Internals=new pqInternals();
+  if (!this->Listener)
+    {
+    this->Listener = new pqVRPNEventListener();
+    }
   this->Initialized=false;
-  this->_Stop = false;
   this->Address = "";
   this->Name = "";
   this->Type = "VRPN";
@@ -181,57 +186,47 @@ bool pqVRPNConnection::init()
     return true;
     }
 
-  QMutexLocker locker(&this->Lock);
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
-  // this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
-  // this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
 
-  this->Initialized= ( this->Internals->Tracker!=0
-                       && this->Internals->Analog!=0
-                       && this->Internals->Button!=0 );
-                       // && this->Internals->Dial!=0
-                       // && this->Internals->Text!=0 );
+  this->Internals->Tracker->register_change_handler(static_cast<void*>( this ),
+                                                    handleTrackerChange );
+  this->Internals->Analog->register_change_handler(static_cast<void*>( this ),
+                                                   handleAnalogChange );
+  this->Internals->Button->register_change_handler( static_cast<void*>( this ),
+                                                    handleButtonChange );
 
-  if(this->Initialized)
-    {
-    this->Internals->Tracker->register_change_handler(static_cast<void*>( this ),
-                                                      handleTrackerChange );
-    this->Internals->Analog->register_change_handler(static_cast<void*>( this ),
-                                                     handleAnalogChange );
-    this->Internals->Button->register_change_handler( static_cast<void*>( this ),
-                                                      handleButtonChange );
-    }
 
-  return this->Initialized;
+  return this->Initialized = true;
 }
 
 // ----------------------------------------------------------------private-slot
-void pqVRPNConnection::run()
+void pqVRPNConnection::listen()
 {
-  this->_Stop = false;
-  while ( !this->_Stop )
+  if(this->Initialized)
     {
-    if(this->Initialized)
-      {
-      this->Lock.lock();
-      // std::cout << "callback()" << std::endl;
-      this->Internals->Tracker->mainloop();
-      this->Internals->Button->mainloop();
-      this->Internals->Analog->mainloop();
-      // this->Internals->Dial->mainloop();
-      // this->Internals->Text->mainloop();
-      this->Lock.unlock();
-      }
+    this->Internals->Tracker->mainloop();
+    this->Internals->Button->mainloop();
+    this->Internals->Analog->mainloop();
     }
+}
+
+// ----------------------------------------------------------------private-slot
+bool pqVRPNConnection::start()
+{
+  if (!this->Initialized)
+    {
+    return false;
+    }
+
+  this->Listener->addConnection(this);
 }
 
 // ---------------------------------------------------------------------private
 void pqVRPNConnection::stop()
 {
-  this->_Stop = true;
-  this->wait();
+  this->Listener->removeConnection(this);
 
   this->Initialized = false;
   delete this->Internals->Analog;

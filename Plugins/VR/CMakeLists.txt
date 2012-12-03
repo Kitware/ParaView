@@ -34,9 +34,13 @@ if(PARAVIEW_USE_VRPN)
     endif()
   endif()
   find_library(VRPN_LIBRARY vrpn)
-  set(VRPN_MOC_SRC pqVRPNConnection.h)
+  set(VRPN_MOC_SRC
+    pqVRPNConnection.h
+    pqVRPNEventListener.h
+  )
   set(VRPN_SOURCE_FILES
     pqVRPNConnection.cxx
+    pqVRPNEventListener.cxx
     vtkVRPNCallBackHandlers.cxx)
 endif(PARAVIEW_USE_VRPN)
 
