@@ -78,6 +78,7 @@ pqRemoteControl::pqRemoteControl(QWidget* parent, Qt::WindowFlags flags) : QDock
 //-----------------------------------------------------------------------------
 pqRemoteControl::~pqRemoteControl()
 {
+  this->onStop();
   delete this->Internal;
 }
 
