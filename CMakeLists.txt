@@ -208,6 +208,11 @@ cmake_dependent_option(PARAVIEW_ENABLE_QT_SUPPORT
 
 option(PARAVIEW_ENABLE_PYTHON "Enable/Disable Python scripting support" OFF)
 
+# Disable matplotlib support if python is not found or is too old
+cmake_dependent_option(PARAVIEW_USE_MATPLOTLIB
+  "Enable matplotlib MathText support (Requires Python >= 2.6 and matplotlib)." ON
+  "PARAVIEW_ENABLE_PYTHON" OFF)
+
 # Is this a 32 bit or 64bit build. Display this in about dialog.
 if ("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
   set(PARAVIEW_BUILD_ARCHITECTURE "64")
