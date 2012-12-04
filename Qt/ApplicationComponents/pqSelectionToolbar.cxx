@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqRubberBandHelper.h"
 #include "pqActiveObjects.h"
+#include "pqDataQueryReaction.h"
 
 #include <QActionGroup>
 
@@ -63,6 +64,7 @@ void pqSelectionToolbar::constructor()
   modeGroup->addAction(ui.actionSelectFrustumPoints);
   modeGroup->addAction(ui.actionSelect_Block);
   modeGroup->addAction(ui.actionPickObject);
+  // NB: Do not add ui.actionQuery here; it pops up a modeless dialog.
 
   // Set up selection buttons.
   QObject::connect(
@@ -130,6 +132,9 @@ void pqSelectionToolbar::constructor()
     this->SelectionHelper,
     SIGNAL(selectionFinished(int, int, int, int)),
     this->SelectionHelper, SLOT(endSelection()));
+
+  new pqDataQueryReaction(ui.actionQuery);
+  ui.actionQuery->setEnabled(true);
 }
 
 //-----------------------------------------------------------------------------
