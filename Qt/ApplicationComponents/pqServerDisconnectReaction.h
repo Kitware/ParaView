@@ -50,10 +50,14 @@ public:
   static void disconnectFromServerWithWarning();
   static void disconnectFromServer();
 
+public slots:
+  // This slot is used to reenable the disconnect button which is disabled when
+  // the button is clicked (triggered).
+  void reEnableButton();
+
 protected:
   /// Called when the action is triggered.
-  virtual void onTriggered()
-    { pqServerDisconnectReaction::disconnectFromServerWithWarning(); }
+   virtual void onTriggered();
 
 private:
   Q_DISABLE_COPY(pqServerDisconnectReaction)

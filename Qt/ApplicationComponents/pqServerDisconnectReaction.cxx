@@ -33,11 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqAnimationManager.h"
+#include "pqServer.h"
 #include "pqCoreUtilities.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqPVApplicationCore.h"
 
 #include "vtkSMSession.h"
 
@@ -47,6 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqServerDisconnectReaction::pqServerDisconnectReaction(QAction* parentObject)
   : Superclass(parentObject)
 {
+  pqAnimationManager* anim = pqPVApplicationCore::instance()->animationManager();
+  QObject::connect(anim, SIGNAL(activeServerChanged(pqServer*)),
+                    this, SLOT(reEnableButton()));
 }
 
 //-----------------------------------------------------------------------------
@@ -85,3 +91,15 @@ void pqServerDisconnectReaction::disconnectFromServer()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqServerDisconnectReaction::reEnableButton()
+{
+  this->parentAction()->setEnabled(true);
+}
+
+// ----------------------------------------------------------------------------
+void pqServerDisconnectReaction::onTriggered()
+{
+  this->parentAction ()->setEnabled (false);
+  pqServerDisconnectReaction::disconnectFromServerWithWarning();
+}
