@@ -93,7 +93,7 @@
                                 <li>
                                     <p> Adios </p>
                                 </li>
-                            </ul> Loads pixie format files written with the Adios library. This reader support the staging capability of Adios which allow the user to pipe simulation kernels to post-processing tools : such as ParaView throw MPI communication channel and follow in live the computation with no disk IO.  <ul>
+                            </ul> Loads pixie format files written with the Adios library. This reader supports the staging capability of Adios which allow the user to pipe simulation kernels to post-processing tools : such as ParaView throw MPI communication channel and follow in live the computation with no disk IO.  <ul>
                                 <li>
                                     <p> Eye Dome Lighting </p>
                                 </li>
@@ -107,13 +107,17 @@
                                 </li>
                             </ul> Overrides the VTK time requests. This can be used to create complex animation with different datasets following independent times evolutions.  Note: As this filter overrides the time requests, time-aware filters such as PathLines or PlotOverTime will not behave correctly if they are inserted in a pipeline after this filter. <ul>
                                 <li>
+                                    <p> GMV Reader </p>
+                                </li>
+                            </ul> The GMV Reader plugin adds support for reading point and cell based, time varying data stored in ASCII or binary form in the file format defined for LANL's General Mesh Viewer. Structured regular brick meshes, logically rectangular brick meshes and unstructured meshes are supported, as are tracers and polygonal data. Face based, surface and ray data is not. <ul>
+                                <li>
                                     <p> H5PartReader </p>
                                 </li>
                             </ul> The H5Part Reader plugin adds support for reading particle datasets stored in H5Part format. H5Part is a simple wrapper around the HDF5 library and provides a number of convenience functions to manage time steps and access field arrays. The reader supports parallel reading of data using hyperslabs, when used with ParaView compiled with MPI and HDF5 with parallel IO enabled, the reader automatically uses hyperslabs to read portions of data on each process. <ul>
                                 <li>
                                     <p> Nifti </p>
                                 </li>
-                            </ul> Reades time varying volumetric/image data from ANALYZE. Supports single (.nii) and dual (.img &amp; .hdr) file storage including zlib compression.  Able to write out ascii or binary files. <ul>
+                            </ul> Reads time varying volumetric/image data from ANALYZE. Supports single (.nii) and dual (.img &amp; .hdr) file storage including zlib compression.  Able to write out ascii or binary files. <ul>
                                 <li>
                                     <p> Manta View </p>
                                 </li>
