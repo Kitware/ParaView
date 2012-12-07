@@ -200,6 +200,27 @@
     <string>N</string>
    </property>
   </action>
+  <action name="actionQuery">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqFindData24.png</normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find data...</string>
+   </property>
+   <property name="toolTip">
+    <string>Find data by scalar value (v)</string>
+   </property>
+   <property name="shortcut">
+     <string>V</string>
+   </property>
+  </action>
 
   <addaction name="actionMoveMode" />
   <addaction name="actionSelectionMode" />
@@ -208,6 +229,7 @@
   <addaction name="actionSelectFrustumPoints" />
   <addaction name="actionSelect_Block" />
   <addaction name="actionPickObject" />
+  <addaction name="actionQuery" />
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>
