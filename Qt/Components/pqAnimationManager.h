@@ -90,6 +90,9 @@ signals:
   /// emitted when the active scene changes (\c scene may be NULL).
   void activeSceneChanged(pqAnimationScene* scene);
 
+  /// emitted when the active server changes and updated active scene.
+  void activeServerChanged(pqServer* scene);
+
   /// emitted with the current save progress.
   void saveProgress(const QString&, int);
 

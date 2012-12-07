@@ -196,6 +196,7 @@ void pqAnimationManager::onActiveServerChanged(pqServer* server)
   if (server && !this->getActiveScene())
     {
     this->createActiveScene();
+    emit this->activeServerChanged(server);
     }
   emit this->activeSceneChanged(this->getActiveScene());
 }
