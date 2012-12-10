@@ -85,7 +85,7 @@ def DoCoProcessing(datadescription):
     WriteAllImages(datadescription, cp_views, timestep, %s)
 
     # Live Visualization
-    if (len(cp_views) == 0) and live_visu_active:
+    if live_visu_active:
        DoLiveInsitu(timestep, pv_host, pv_port)
 
 """
