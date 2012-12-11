@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QFormLayout>
 #include <QStackedLayout>
+#include <QShortcut>
 
 namespace Ui {
   class pqPropertiesPanel;
@@ -140,6 +141,9 @@ private slots:
   /// Called when the search string changes.
   void searchTextChanged(const QString &string);
 
+  /// Called when Esc key is pressed.
+  void clearSearchText();
+
   /// Called when the advanced button is toggled.
   void advancedButtonToggled(bool state);
 
@@ -167,6 +171,7 @@ private:
 
 private:
   Ui::pqPropertiesPanel *Ui;
+  QShortcut *esc;
   QPointer<pqView> View;
   QPointer<pqProxy> Proxy;
   QPointer<pqOutputPort> OutputPort;

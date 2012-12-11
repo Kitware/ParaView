@@ -382,6 +382,9 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   this->connect(this->Ui->SearchLineEdit, SIGNAL(textChanged(QString)),
                 this, SLOT(searchTextChanged(QString)));
 
+  this->esc = new QShortcut(Qt::Key_Escape,this);
+  QObject::connect(this->esc,SIGNAL(activated()),this,SLOT(clearSearchText()));
+
   // connect to advanced button
   this->connect(this->Ui->AdvancedButton, SIGNAL(toggled(bool)),
                 this, SLOT(advancedButtonToggled(bool)));
@@ -395,6 +398,7 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
 
 pqPropertiesPanel::~pqPropertiesPanel()
 {
+  delete this->esc;
   delete this->Ui;
 }
 
@@ -1034,6 +1038,11 @@ void pqPropertiesPanel::searchTextChanged(const QString &string)
 
     item.PropertyWidget->setVisible(visible);
     }
+}
+
+void pqPropertiesPanel::clearSearchText ()
+{
+  this->Ui->SearchLineEdit->clear ();
 }
 
 void pqPropertiesPanel::advancedButtonToggled(bool state)
