@@ -69,17 +69,10 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 GET_TARGET_PROPERTY(PVBLOT_PVPYTHON_EXECUTABLE pvpython LOCATION)
 SET(PVBLOT_BLOTISH_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
-SET(script_extension)
+SET(script_ext)
 IF(WIN32 AND NOT CYGWIN)
   SET(script_ext ".bat")
 ENDIF(WIN32 AND NOT CYGWIN)
-
-CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_exe}.in"
-  "${EXECUTABLE_OUTPUT_PATH}/pvblot${script_exe}"
-  @ONLY
-  )
-
 
 #############################################################################
 # Set up pvblot script for when ParaView is installed.  This includes
@@ -94,8 +87,8 @@ SET(PVBLOT_BLOTISH_PATH "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
 
 
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_exe}.in"
-  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_exe}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot${script_ext}.in"
+  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot${script_ext}"
   @ONLY
   )
 
