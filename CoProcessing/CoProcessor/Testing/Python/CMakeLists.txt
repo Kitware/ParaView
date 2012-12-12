@@ -7,6 +7,8 @@ include_directories(
 
 vtk_module_test()
 
+set(CP_LABELS PARAVIEW CATALYST)
+
 #------------------------------------------------------------------------------
 add_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
@@ -30,6 +32,15 @@ if (PARAVIEW_USE_MPI)
   # ...AutoInit build errors.
   target_link_libraries(CoProcessingCompareImagesTester vtkIOMPIImage)
 endif()
+
+#------------------------------------------------------------------------------
+# a simple test to see if the input is changing, i.e. that the initial
+# pipeline is having it's trivial producer updated with a new grid
+add_test(NAME CoProcessingTestInput
+  COMMAND pvpython ${CMAKE_CURRENT_SOURCE_DIR}/waveletdriver.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestInput.py 4
+)
+set_tests_properties(CoProcessingTestInput PROPERTIES LABELS "${CP_LABELS}")
 
 # the CoProcessingTestPythonScript needs to be run with ${MPIEXEC} if
 # CoProcessingPythonScriptExample was built with MPI because certain
@@ -60,7 +71,6 @@ else()
     -P ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessingTestPythonScript.cmake)
 endif()
 
-set(CP_LABELS PARAVIEW CATALYST)
 set_tests_properties(CoProcessingTestPythonScript PROPERTIES LABELS "${CP_LABELS}")
 
 if (PARAVIEW_USE_MPI)
