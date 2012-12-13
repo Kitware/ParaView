@@ -36,15 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 #include <QtCore/QThread>
+#include <QtCore/QWaitCondition>
 
 class pqVRPNConnection;
-class pqVRPNEventListener : public QThread
+class pqVRPNThreadBridge; // Defined below
+class pqVRPNEventListener : public QObject
 {
   Q_OBJECT
 public:
-  typedef QThread Superclass;
+  typedef QObject Superclass;
   explicit pqVRPNEventListener(QObject *_parent = NULL);
   ~pqVRPNEventListener();
+
+  // Description:
+  // Returns true if the listener has started.
+  bool isRunning() const { return this->Thread.isRunning(); }
 
 public slots:
   // Description:
@@ -64,14 +70,41 @@ public slots:
   // triggered this call.
   void removeSenderConnection();
 
-protected slots:
+signals:
+
   // Description:
-  // Reimplemented from base class.
-  void run();
+  // Internal use only.
+  void addConnectionInternal(pqVRPNConnection *conn);
+  void removeConnectionInternal(pqVRPNConnection *conn);
+  void listen();
 
 private:
-  QMutex Lock;
+  // Description:
+  // Start the listener.
+  void start();
+
+  // Description:
+  // Stop the listener.
+  void stop();
+
+  pqVRPNThreadBridge *Bridge;
+  QThread Thread;
+};
+
+class pqVRPNThreadBridge : public QObject
+{
+  Q_OBJECT
+public:
+  QMutex SyncMutex;
+  QWaitCondition SyncCondition;
   QList<pqVRPNConnection*> Connections;
+
+public slots:
+  void addConnection(pqVRPNConnection *conn);
+  void removeConnection(pqVRPNConnection *conn);
+
+protected slots:
+  void listen();
 };
 
 

@@ -236,7 +236,6 @@ void pqVRPNConnection::stop()
   this->Internals->Button = NULL;
   delete this->Internals->Tracker;
   this->Internals->Tracker = NULL;
-
 }
 
 // ---------------------------------------------------------------------private

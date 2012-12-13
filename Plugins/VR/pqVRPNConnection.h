@@ -152,8 +152,8 @@ public:
   }
 
 protected slots:
-  /// This is called by VRPNEventListener under a mutex lock, and should not be
-  /// called directly.
+  /// This is called by VRPNEventListener in a threadsafe manner, and should not
+  /// be called directly.
   void listen();
 
 protected:
@@ -193,6 +193,7 @@ protected:
 
   // The shared thread and listener that listens to incoming events.
   friend class pqVRPNEventListener;
+  friend class pqVRPNThreadBridge;
   static pqVRPNEventListener *Listener;
 
   vtkVRQueue* EventQueue;
