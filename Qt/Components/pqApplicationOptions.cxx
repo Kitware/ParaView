@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqChartRepresentation.h"
 #include "pqInterfaceTracker.h"
-#include "pqObjectInspectorWidget.h"
+#include "pqPropertiesPanel.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
@@ -287,7 +287,7 @@ void pqApplicationOptions::applyChanges()
 
   bool autoAccept = this->Internal->AutoAccept->isChecked();
   settings->setValue("autoAccept", autoAccept);
-  pqObjectInspectorWidget::setAutoAccept(autoAccept);
+  pqPropertiesPanel::setAutoApply(autoAccept);
 
   bool autoConvert = this->Internal->AutoConvertProperties->isChecked();
   settings->setValue("GlobalProperties/AutoConvertProperties",autoConvert);
