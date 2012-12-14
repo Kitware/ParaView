@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
+#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "pqSMAdaptor.h"
 
@@ -137,7 +138,7 @@ public:
     this->Items[key].push_back(item);
     return item;
     }
-  
+
   // returns the strings for the given key.
   QStringList texts(const QString& key)
     {
@@ -198,6 +199,9 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
   Internals(new pqInternals())
 {
   this->installEventFilter(this);
+
+  // Make a click anywhere on a variable's row change its checked/unchecked state.
+  new pqTreeWidgetCheckHelper(this, 0, this);
 }
 
 //-----------------------------------------------------------------------------
