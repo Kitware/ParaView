@@ -5,6 +5,7 @@ if len(sys.argv) != 3:
 import paraview
 import paraview.vtk as vtk
 import paraview.simple as pvsimple
+import math
 
 # initialize and read input parameters
 paraview.options.batch = True
@@ -62,6 +63,8 @@ for step in range(numsteps):
     # this will come from the adaptor
     wavelet = pvsimple.Wavelet()
     wholeExtent = wavelet.WholeExtent
+    # put in some variation in the point data that changes with time
+    wavelet.Maximum = 255+200*math.sin(step)
     wavelet.UpdatePipeline()
     imageData = pvsimple.servermanager.Fetch(wavelet)
 
