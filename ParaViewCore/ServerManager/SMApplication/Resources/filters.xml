@@ -5715,6 +5715,16 @@ found and the point will be rejected.</Documentation>
         (containing the contour value) will be added to the output dataset. If
         set to 0, the output will not contain this array.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty animateable="0"
+                         command="SetGenerateTriangles"
+                         default_values="1"
+                         name="GenerateTriangles"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This parameter controls whether to produce triangles in the output.
+        Warning: Many filters do not properly handle non-trianglular polygons.
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
