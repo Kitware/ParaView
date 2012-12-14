@@ -136,7 +136,7 @@ void pqVRPNEventListener::removeSenderConnection()
       qobject_cast<pqVRPNConnection*>(this->sender()))
     {
     this->removeConnection(conn);
-  }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -164,12 +164,9 @@ void pqVRPNEventListener::stop()
 //------------------------------------------------------------------------------
 void pqVRPNThreadBridge::listen()
 {
-  if (!this->Connections.empty())
+  foreach (pqVRPNConnection *conn, this->Connections)
     {
-    foreach (pqVRPNConnection *conn, this->Connections)
-      {
-      conn->listen();
-      }
+    conn->listen();
     }
   // Immediately post another call to this method on the thread's event loop.
   // This way connections can be added and removed safely by serializing access
