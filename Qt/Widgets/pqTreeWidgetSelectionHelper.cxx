@@ -47,8 +47,6 @@ pqTreeWidgetSelectionHelper::pqTreeWidgetSelectionHelper(QTreeWidget* tree):
   tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
   tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  QObject::connect(tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-    this, SLOT(onItemClicked(QTreeWidgetItem*, int)));
   QObject::connect(tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
     this, SLOT(onItemPressed(QTreeWidgetItem*, int)));
   QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -63,31 +61,11 @@ pqTreeWidgetSelectionHelper::~pqTreeWidgetSelectionHelper()
 //-----------------------------------------------------------------------------
 void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int )
 {
-//  qDebug() << "onItemPressed" 
-//  << this->TreeWidget->selectionModel()->selectedIndexes().size();
-
   this->PressState = -1;
   if ((item->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
     {
     this->PressState = item->checkState(0);
     this->Selection = this->TreeWidget->selectionModel()->selection();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqTreeWidgetSelectionHelper::onItemClicked(QTreeWidgetItem* item, int)
-{
-  //  qDebug() << "onItemClicked" 
-  //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
-  if (this->PressState != -1)
-    {
-    Qt::CheckState state = item->checkState(0);
-    if (state != this->PressState)
-      {
-      // Change all checkable items in the this->Selection to match the new
-      // check state.
-      this->setSelectedItemsCheckState(state);
-      }
     }
 }
 

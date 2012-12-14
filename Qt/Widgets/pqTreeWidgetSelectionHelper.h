@@ -55,8 +55,7 @@ public:
   ~pqTreeWidgetSelectionHelper();
 
 protected slots:
-  void onItemClicked (QTreeWidgetItem *item, int column);
-  void onItemPressed (QTreeWidgetItem *item, int column); 
+  void onItemPressed (QTreeWidgetItem *item, int column);
   void showContextMenu(const QPoint&);
 
 private:
