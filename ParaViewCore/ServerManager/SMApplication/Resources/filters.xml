@@ -5528,6 +5528,21 @@ found and the point will be rejected.</Documentation>
         points is within the threshold. This is only relevant when thresholding
         by a point-centered array.</Documentation>
       </IntVectorProperty>
+      <IntVectorProperty command="SetUseContinuousCellRange"
+                         default_values="0"
+                         name="UseContinuousCellRange"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  If off, the vertex scalars are treated as a discrete set. If on, they
+	  are treated as a continuous interval over the minimum and maximum. One
+	  important "on" use case: When setting lower and upper threshold
+	  equal to some value and turning AllScalars off, the results are
+	  cells containing the iso-surface for that value.  WARNING: Whether on
+	  or off, for higher order input, the filter will not give accurate
+	  results.
+	</Documentation>
+      </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
       </Hints>

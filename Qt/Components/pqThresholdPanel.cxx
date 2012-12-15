@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -75,7 +75,8 @@ pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
   QWidget::setTabOrder(Slider0, LineEdit0);
   QWidget::setTabOrder(LineEdit0, Slider1);
   QWidget::setTabOrder(Slider1, LineEdit1);
-  QWidget::setTabOrder(LineEdit1,this->UI->AllScalars);  
+  QWidget::setTabOrder(LineEdit1,this->UI->AllScalars);
+  QWidget::setTabOrder(this->UI->AllScalars,this->UI->UseContinuousCellRange);
 }
 
 pqThresholdPanel::~pqThresholdPanel()
