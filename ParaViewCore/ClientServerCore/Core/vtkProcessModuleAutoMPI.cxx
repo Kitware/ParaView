@@ -30,7 +30,8 @@
 #include <vector>
 #include <string>
 
-int vtkProcessModuleAutoMPI::UseMulticoreProcessors = 0;
+bool vtkProcessModuleAutoMPI::EnableAutoMPI = 0;
+int vtkProcessModuleAutoMPI::NumberOfCores = 0;
 
 namespace
 {
@@ -148,9 +149,15 @@ vtkProcessModuleAutoMPI::~vtkProcessModuleAutoMPI()
 }
 
 //-----------------------------------------------------------------------static
-void vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(int val)
+void vtkProcessModuleAutoMPI::SetEnableAutoMPI(bool val)
 {
-  vtkProcessModuleAutoMPI::UseMulticoreProcessors = val;
+  vtkProcessModuleAutoMPI::EnableAutoMPI = val;
+}
+
+//-----------------------------------------------------------------------static
+void vtkProcessModuleAutoMPI::SetNumberOfCores (int val)
+{
+  vtkProcessModuleAutoMPI::NumberOfCores = val;
 }
 
 //-----------------------------------------------------------------------public
@@ -168,11 +175,11 @@ void vtkProcessModuleAutoMPI::PrintSelf(ostream& os, vtkIndent indent)
 int vtkProcessModuleAutoMPI::IsPossible()
 {
    this->Internals->TotalMulticoreProcessors =
-     vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
+      vtkProcessModuleAutoMPI::NumberOfCores;
 
 #ifdef PARAVIEW_USE_MPI
    if( this->Internals->TotalMulticoreProcessors >1
-       && vtkProcessModuleAutoMPI::UseMulticoreProcessors
+       && vtkProcessModuleAutoMPI::EnableAutoMPI
      && this->Internals->CollectConfiguredOptions())
     {
     return 1;
