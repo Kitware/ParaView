@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMAdaptor.h"
 #include "pqTimer.h"
+#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 
 namespace
@@ -139,7 +140,7 @@ public:
     this->Items[key].push_back(item);
     return item;
     }
-  
+
   // returns the strings for the given key.
   QStringList texts(const QString& key)
     {
@@ -202,6 +203,9 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
   this->installEventFilter(this);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(updateProperty()));
+
+  // Make a click anywhere on a variable's row change its checked/unchecked state.
+  new pqTreeWidgetCheckHelper(this, 0, this);
 }
 
 //-----------------------------------------------------------------------------
