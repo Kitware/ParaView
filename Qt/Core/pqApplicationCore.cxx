@@ -641,9 +641,9 @@ pqSettings* pqApplicationCore::settings()
         QApplication::applicationName() + QApplication::applicationVersion(),
         this);
       }
+    vtkProcessModuleAutoMPI::SetEnableAutoMPI(this->Settings->value("autoMPI").toBool());
+    vtkProcessModuleAutoMPI::SetNumberOfCores(this->Settings->value("autoMPI_NumberOfCores").toInt());
     }
-  vtkProcessModuleAutoMPI::
-    SetUseMulticoreProcessors(this->Settings->value("autoMPI").toBool());
   return this->Settings;
 }
 
