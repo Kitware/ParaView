@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
-#include "pqTreeWidgetItemObject.h"
 #include "pqSMAdaptor.h"
+#include "pqTimer.h"
+#include "pqTreeWidgetItemObject.h"
 
 namespace
 {
@@ -113,6 +114,7 @@ class pqExodusIIVariableSelectionWidget::pqInternals
 {
 public:
   pqPixmapMap Pixmaps;
+  pqTimer Timer;
 
   QMap<QString, QList<QPointer<pqTreeWidgetItemObject> > > Items;
   pqTreeWidgetItemObject* findItem(
@@ -198,6 +200,8 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
   Internals(new pqInternals())
 {
   this->installEventFilter(this);
+  QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
+    this, SLOT(updateProperty()));
 }
 
 //-----------------------------------------------------------------------------
@@ -265,8 +269,17 @@ void pqExodusIIVariableSelectionWidget::setStatus(
 {
   pqTreeWidgetItemObject* item = this->Internals->findItem(this, key, text);
   item->setChecked(value);
+
+  // BUG #13726. To avoid dramatic performance degradation when dealing with
+  // large list of variables, we use a timer to collapse all update requests.
   QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-    this, SLOT(updateProperty()), Qt::UniqueConnection);
+    this, SLOT(updatePropertyOnce()), Qt::UniqueConnection);
+}
+
+//-----------------------------------------------------------------------------
+void pqExodusIIVariableSelectionWidget::updatePropertyOnce()
+{
+  this->Internals->Timer.start(0);
 }
 
 //-----------------------------------------------------------------------------

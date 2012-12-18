@@ -61,6 +61,7 @@ signals:
 
 protected slots:
   void updateProperty();
+  void updatePropertyOnce();
 
 protected:
   /// overridden to handle QDynamicPropertyChangeEvent when properties are
