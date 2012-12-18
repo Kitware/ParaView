@@ -206,7 +206,8 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
 #else
   this->Internal->LabelMultiCore->setEnabled(false);
   this->Internal->AutoMPI->setEnabled(false);
-  this->Internal->AutoMPI_NumberofCores->setEnabled (false);
+  this->Internal->LabelNumberOfCores->setEnabled(false);
+  this->Internal->AutoMPI_NumberOfCores->setEnabled (false);
 #endif
 
   this->onAutoMPINumberOfProcesses ();
