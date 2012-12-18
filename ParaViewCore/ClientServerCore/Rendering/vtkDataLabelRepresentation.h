@@ -29,6 +29,7 @@
 #define __vtkDataLabelRepresentation_h
 
 #include "vtkPVClientServerCoreRenderingModule.h" //needed for exports
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 #include "vtkPVDataRepresentation.h"
 
 class vtkActor2D;
@@ -157,6 +158,8 @@ protected:
 
   vtkProp3D* TransformHelperProp;
   vtkTransform* Transform;
+
+  vtkSmartPointer<vtkDataObject> Dataset;
 
   int PointLabelVisibility;
   int CellLabelVisibility;
