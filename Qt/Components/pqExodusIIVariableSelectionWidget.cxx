@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIVariableSelectionWidget.h"
 
 #include <QDynamicPropertyChangeEvent>
+#include <QList>
 #include <QMap>
 #include <QPixmap>
 #include <QPointer>
@@ -116,6 +117,7 @@ class pqExodusIIVariableSelectionWidget::pqInternals
 public:
   pqPixmapMap Pixmaps;
   pqTimer Timer;
+  QList<QPointer<QObject> > DeferredObjects;
 
   QMap<QString, QList<QPointer<pqTreeWidgetItemObject> > > Items;
   pqTreeWidgetItemObject* findItem(
@@ -200,6 +202,8 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
   : Superclass(parentObject),
   Internals(new pqInternals())
 {
+  this->Internals->Timer.setSingleShot(true);
+
   this->installEventFilter(this);
   QObject::connect(&this->Internals->Timer, SIGNAL(timeout()),
     this, SLOT(updateProperty()));
@@ -277,28 +281,35 @@ void pqExodusIIVariableSelectionWidget::setStatus(
   // BUG #13726. To avoid dramatic performance degradation when dealing with
   // large list of variables, we use a timer to collapse all update requests.
   QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-    this, SLOT(updatePropertyOnce()), Qt::UniqueConnection);
+    this, SLOT(delayedUpdateProperty()), Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
-void pqExodusIIVariableSelectionWidget::updatePropertyOnce()
+void pqExodusIIVariableSelectionWidget::delayedUpdateProperty()
 {
   this->Internals->Timer.start(0);
+  // save the pqTreeWidgetItemObject that fired this signal so we can update
+  // property using its state later.
+  this->Internals->DeferredObjects.push_back(this->sender());
 }
 
 //-----------------------------------------------------------------------------
 void pqExodusIIVariableSelectionWidget::updateProperty()
 {
-  pqTreeWidgetItemObject* item = qobject_cast<pqTreeWidgetItemObject*>(
-    this->sender());
-  if (item)
+  foreach (QObject* qobject, this->Internals->DeferredObjects)
     {
-    QString key = item->data(0, Qt::UserRole).toString();
-    QVariant newValue = this->Internals->value(key);
-    if (this->property(key.toAscii().data()) != newValue)
+    pqTreeWidgetItemObject* item =
+      qobject_cast<pqTreeWidgetItemObject*>(qobject);
+    if (item)
       {
-      this->setProperty(key.toAscii().data(), newValue);
+      QString key = item->data(0, Qt::UserRole).toString();
+      QVariant newValue = this->Internals->value(key);
+      if (this->property(key.toAscii().data()) != newValue)
+        {
+        this->setProperty(key.toAscii().data(), newValue);
+        }
       }
     }
+  this->Internals->DeferredObjects.clear();
   emit this->widgetModified();
 }
