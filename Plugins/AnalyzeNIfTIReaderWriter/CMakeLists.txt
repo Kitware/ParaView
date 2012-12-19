@@ -11,7 +11,8 @@ IF (ParaView_SOURCE_DIR)
     ${VTK_INCLUDE_DIRS}
     ${MPI_INCLUDE_PATH}
   )
-  
+
+# fixme: I am not sure this is needed after modularization.
 IF(VTK_USE_SYSTEM_ZLIB)
   INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 ENDIF(VTK_USE_SYSTEM_ZLIB)
@@ -20,22 +21,6 @@ ELSE (ParaView_SOURCE_DIR)
   FIND_PACKAGE(ParaView REQUIRED)
   INCLUDE(${PARAVIEW_USE_FILE})
 ENDIF (ParaView_SOURCE_DIR)
-
-IF(PARAVIEW_BUILD_QT_GUI)
-   FIND_PACKAGE(Qt4)
-   IF(QT4_FOUND)
-      INCLUDE(${QT_USE_FILE})
-
-      INCLUDE_DIRECTORIES(
-                          ${VTK_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_SOURCE_DIR}
-       )
-      
-      if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
-        include(Qt4Macros-CMake2.8.7)
-      endif()
-   ENDIF(QT4_FOUND)
-ENDIF(PARAVIEW_BUILD_QT_GUI)
 
 ADD_PARAVIEW_PLUGIN(AnalyzeNIfTIIO "1.0"
   SERVER_MANAGER_SOURCES vtkAnalyzeReader.cxx

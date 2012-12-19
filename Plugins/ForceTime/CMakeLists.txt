@@ -1,32 +1,17 @@
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
-IF (ParaView_SOURCE_DIR)
-  INCLUDE_DIRECTORIES(
-    ${VTK_INCLUDE_DIRS}
-  )
-ELSE (ParaView_SOURCE_DIR)
-  FIND_PACKAGE(ParaView REQUIRED)
-  INCLUDE(${PARAVIEW_USE_FILE})
-ENDIF (ParaView_SOURCE_DIR)
-
-IF(PARAVIEW_BUILD_QT_GUI)
-   FIND_PACKAGE(Qt4)
-   IF(QT4_FOUND)
-      INCLUDE(${QT_USE_FILE})
-   ENDIF(QT4_FOUND)
-ENDIF(PARAVIEW_BUILD_QT_GUI)
-
-if(${CMAKE_VERSION} VERSION_LESS 2.8.7 AND NOT WIN32)
-  include(Qt4Macros-CMake2.8.7)
+if(NOT ParaView_SOURCE_DIR)
+  find_package(ParaView)
+  include("${PARAVIEW_USE_FILE}")
+  include (ParaViewPlugins)
+else()
+  # we're building from within ParaView Source.
 endif()
 
-SET(Plugin_SRCS
-  vtkForceTime.cxx
-)
-
-ADD_PARAVIEW_PLUGIN( ForceTime "1.0"
-  SERVER_MANAGER_SOURCES ${Plugin_SRCS}
+include_directories(${VTK_INCLUDE_DIRS})
+add_paraview_plugin(ForceTime "1.0"
+  SERVER_MANAGER_SOURCES vtkForceTime.cxx
   SERVER_MANAGER_XML ForceTimeServer.xml
   GUI_RESOURCE_FILES ForceTimeClient.xml
 )
