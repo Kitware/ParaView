@@ -11,6 +11,11 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
     FIND_PACKAGE(PythonLibs)
     FIND_PACKAGE(MPI)
 
+    # -------------------------------------------------------------------------
+    # For mpich which is not build with fortran some symbols are not found at
+    # link time. The following solution prevents this.
+    set(MPI4PY_COMPILE_FLAGS "-D PyMPI_MISSING_MPI_Type_create_f90_integer -D PyMPI_MISSING_MPI_Type_create_f90_real -D PyMPI_MISSING_MPI_Type_create_f90_complex")
+    list(APPEND MPI_COMPILE_FLAGS "${MPI4PY_COMPILE_FLAGS}")
 
     # -----------------------------------------------------------------------------
     # Note: In ParaView FindPythonLibs.cmake module is additionally defined in VTK
