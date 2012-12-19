@@ -18,25 +18,27 @@
     <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
   </Category>
 
-  <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
-    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1">
+    <Proxy group="filters" name="Calculator"
+            icon=":/pqWidgets/Icons/pqCalculator24.png" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ExtractSelection"
             icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
     <Proxy group="filters" name="ExtractSelectionOverTime"
-            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
+            icon=":/pqWidgets/Icons/pqPlotSelectionOverTime24.png" />
     <Proxy group="filters" name="ExtractHistogram"
-            icon=":/pqWidgets/Icons/pqHistogram24.png"/>
-    <Proxy group="filters" name="IntegrateAttributes" />
-    <Proxy group="filters" name="ExtractFieldDataOverTime" />
+            icon=":/pqWidgets/Icons/pqHistogram24.png" omit_from_toolbar="1"/>
+    <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1"/>
+    <Proxy group="filters" name="ExtractFieldDataOverTime"
+            icon=":/pqWidgets/Icons/pqPlotGlobalOverTime24.png" />
     <Proxy group="filters" name="ProbeLine"
-            icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
+            icon=":/pqWidgets/Icons/pqPlotOverLine24.png" />
     <Proxy group="filters" name="ProbePoint"
             icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
-    <Proxy group="filters" name="PlotAttributes" />
-    <Proxy group="filters" name="PlotOnSortedLines" />
-    <Proxy group="filters" name="PlotOnIntersectionCurves" />
+    <Proxy group="filters" name="PlotAttributes" omit_from_toolbar="1"/>
+    <Proxy group="filters" name="PlotOnSortedLines" omit_from_toolbar="1"/>
+    <Proxy group="filters" name="PlotOnIntersectionCurves" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ProgrammableFilter"
-            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
+            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png" omit_from_toolbar="1"/>
   </Category>
 
   <Category name="Statistics" menu_label="&amp;Statistics">

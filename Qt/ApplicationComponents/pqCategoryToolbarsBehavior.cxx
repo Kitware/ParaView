@@ -72,6 +72,11 @@ void pqCategoryToolbarsBehavior::updateToolbars()
     toolbar->clear();
     for (int cc=0; cc < toolbarActions.size(); cc++)
       {
+      QVariant omitList = toolbarActions[cc]->property("OmitFromToolbar");
+      if (omitList.isValid() && omitList.toStringList().contains(category))
+        {
+        continue;
+        }
       toolbar->addAction(toolbarActions[cc]);
       }
     }
