@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqProxyGroupMenuManager;
 class QMainWindow;
+class QAction;
 
 /// @ingroup Behaviors
 /// pqCategoryToolbarsBehavior is used when the application wants to enable
@@ -60,13 +61,17 @@ protected slots:
   /// Called when menuManager fires the menuPopulated() signal.
   void updateToolbars();
 
+  /// This slot gets attached to a pqEventDispatcher so that some toolbars
+  /// can be hidden before each test starts (to prevent small test-image differences
+  /// due to layout differences between machines).
+  void prepareForTest();
+
 private:
   Q_DISABLE_COPY(pqCategoryToolbarsBehavior)
 
   QPointer<QMainWindow> MainWindow;
   QPointer<pqProxyGroupMenuManager> MenuManager;
+  QList<QAction*> ToolbarsToHide;
 };
 
 #endif
-
-

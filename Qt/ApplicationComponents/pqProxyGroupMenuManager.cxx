@@ -90,11 +90,13 @@ public:
     QString Label;
     bool PreserveOrder;
     bool ShowInToolbar;
+    bool HideForTests;
     QList<QPair<QString, QString> > Proxies;
     CategoryInfo()
       {
       this->PreserveOrder = false;
       this->ShowInToolbar = false;
+      this->HideForTests = false;
       }
     };
 
@@ -282,14 +284,17 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
         curElem->GetAttribute("menu_label") : categoryName;
       int preserve_order = 0;
       curElem->GetScalarAttribute("preserve_order", &preserve_order);
-      int show_in_toolbar=0;
+      int show_in_toolbar = 0;
       curElem->GetScalarAttribute("show_in_toolbar", &show_in_toolbar);
+      int hide_for_tests = 0;
+      curElem->GetScalarAttribute("hide_for_tests", &hide_for_tests);
 
       // Valid category encountered. Update the Internal datastructures.
       pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
       category.Label = categoryLabel;
-      category.PreserveOrder = category.PreserveOrder || (preserve_order==1);
-      category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar==1);
+      category.PreserveOrder = category.PreserveOrder || (preserve_order == 1);
+      category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar == 1);
+      category.HideForTests = category.HideForTests || (hide_for_tests == 1);
       unsigned int numCategoryElems = curElem->GetNumberOfNestedElements();
       for (unsigned int kk=0; kk < numCategoryElems; ++kk)
         {
@@ -299,13 +304,13 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
           const char* name = child->GetAttribute("name");
           const char* group = child->GetAttribute("group");
           const char* icon = child->GetAttribute("icon");
-          const char* omit = child->GetAttribute("omit_from_toolbar");
+          int omit = 0;
+          child->GetScalarAttribute("omit_from_toolbar", &omit);
           if (!name || !group)
             {
             continue;
             }
-          this->Internal->addProxy(group, name, icon,
-            (omit && omit[0] != '0' && omit[0] != 'n' && omit[0] != 'N') ?
+          this->Internal->addProxy(group, name, icon, omit ?
             categoryName : QString());
           if (!category.Proxies.contains(QPair<QString, QString>(group, name)))
             {
@@ -588,6 +593,20 @@ QWidget* pqProxyGroupMenuManager::widgetActionsHolder() const
 QList<QAction*> pqProxyGroupMenuManager::actions() const
 {
   return this->widgetActionsHolder()->actions();
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyGroupMenuManager::hideForTests(const QString& category) const
+{
+  pqInternal::CategoryInfoMap::iterator categoryIter =
+    this->Internal->Categories.find(category);
+  if (
+    categoryIter == this->Internal->Categories.end() ||
+    (categoryIter.value().ShowInToolbar && !categoryIter.value().HideForTests))
+    {
+    return false;
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
