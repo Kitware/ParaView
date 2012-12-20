@@ -112,7 +112,7 @@ void pqCategoryToolbarsBehavior::prepareForTest()
 {
   foreach(QAction* toolbar, this->ToolbarsToHide)
     {
-    if (toolbar && toolbar->isVisible())
+    if (toolbar && toolbar->isChecked())
       {
       toolbar->trigger();
       }
