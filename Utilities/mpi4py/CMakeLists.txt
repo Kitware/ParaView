@@ -194,19 +194,6 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
     TARGET_LINK_LIBRARIES(mpi4py.dl ${PYTHON_LIBRARY})
     TARGET_LINK_LIBRARIES(mpi4py.dl ${CMAKE_DL_LIBS})
 
-
-    # --- mpi4py/bin/python-mpi ---
-    ADD_EXECUTABLE(python-mpi "${mpi4py_SOURCE_DIR}/python.c")
-    SET_TARGET_PROPERTIES(
-      python-mpi PROPERTIES
-      COMPILE_FLAGS "${MPI_COMPILE_FLAGS}"
-      LINK_FLAGS "${MPI_LINK_FLAGS}"
-      RUNTIME_OUTPUT_DIRECTORY "${mpi4py_BINARY_DIR}/bin"
-      LINKER_LANGUAGE C
-      )
-    TARGET_LINK_LIBRARIES(python-mpi ${PYTHON_LIBRARY})
-    TARGET_LINK_LIBRARIES(python-mpi ${MPI_LIBRARIES})
-
     # --- mpi4py/lib-pmpi/libmpe.so ---
     ADD_LIBRARY(pmpi-mpe MODULE "${mpi4py_SOURCE_DIR}/pmpi-mpe.c")
     SET_TARGET_PROPERTIES(
