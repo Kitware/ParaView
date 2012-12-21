@@ -312,6 +312,14 @@ int vtkSpreadSheetView::StreamToClient()
   vtkSpreadSheetRepresentation* cur = this->Internals->ActiveRepresentation;
   if (cur == NULL)
     {
+    if (this->NumberOfRows > 0)
+      {
+      // BUG #13231: It implies that we had some data in the previous render and
+      // we don't have it anymore. We need to trigger "UpdateDataEvent" to
+      // ensure that the UI can update the rows and columns correctly.
+      this->NumberOfRows = 0;
+      this->InvokeEvent(vtkCommand::UpdateDataEvent);
+      }
     return 0;
     }
 
