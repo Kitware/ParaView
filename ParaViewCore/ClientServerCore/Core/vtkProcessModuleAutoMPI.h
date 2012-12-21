@@ -28,8 +28,11 @@ public:
   vtkTypeMacro(vtkProcessModuleAutoMPI, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static int UseMulticoreProcessors;
-  static void SetUseMulticoreProcessors(int val);
+  static bool EnableAutoMPI;
+  static int NumberOfCores;
+  static void SetEnableAutoMPI(bool val);
+  static void SetNumberOfCores(int val);
+
   vtkProcessModuleAutoMPI();
   ~vtkProcessModuleAutoMPI();
 

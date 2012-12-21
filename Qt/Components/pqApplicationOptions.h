@@ -69,6 +69,7 @@ protected slots:
   void onChartDeleteHiddenSeries();
   void onChartResetHiddenSeries();
   void updatePalettes();
+  void onAutoMPINumberOfProcesses();
 
 private:
   class pqInternal;

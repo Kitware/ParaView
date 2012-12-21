@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyDefinitionManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkMultiThreader.h"
 
 #include <QMenu>
 #include <QDoubleValidator>
@@ -129,6 +130,12 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->AutoMPI,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AutoMPI,
+                  SIGNAL(stateChanged(int)),
+                  this, SLOT(onAutoMPINumberOfProcesses()));
+  QObject::connect(this->Internal->AutoMPI_NumberOfCores,
+                  SIGNAL(valueChanged(int)),
+                  this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->StrictLoadBalancing,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
@@ -199,8 +206,11 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
 #else
   this->Internal->LabelMultiCore->setEnabled(false);
   this->Internal->AutoMPI->setEnabled(false);
+  this->Internal->LabelNumberOfCores->setEnabled(false);
+  this->Internal->AutoMPI_NumberOfCores->setEnabled (false);
 #endif
 
+  this->onAutoMPINumberOfProcesses ();
   this->updatePalettes();
 }
 
@@ -270,6 +280,19 @@ QStringList pqApplicationOptions::getPageList()
 }
 
 //-----------------------------------------------------------------------------
+void pqApplicationOptions::onAutoMPINumberOfProcesses ()
+{
+  if(this->Internal->AutoMPI->isChecked ())
+    {
+    this->Internal->AutoMPI_NumberOfCores->setEnabled (true);
+    }
+  else
+    {
+    this->Internal->AutoMPI_NumberOfCores->setEnabled (false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqApplicationOptions::applyChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -297,8 +320,11 @@ void pqApplicationOptions::applyChanges()
 
 #if defined(PARAVIEW_USE_MPI)
   bool autoMPI = this->Internal->AutoMPI->isChecked();
+  int autoMPI_NumberOfCores =  this->Internal->AutoMPI_NumberOfCores->value();
   settings->setValue("autoMPI",autoMPI);
-  vtkProcessModuleAutoMPI::SetUseMulticoreProcessors(autoMPI);
+  settings->setValue("autoMPI_NumberOfCores",autoMPI_NumberOfCores);
+  vtkProcessModuleAutoMPI::SetEnableAutoMPI(autoMPI);
+  vtkProcessModuleAutoMPI::SetNumberOfCores(autoMPI_NumberOfCores);
 #endif
 
   bool specularHighlighting = this->Internal->SpecularHighlighting->isChecked();
@@ -388,6 +414,9 @@ void pqApplicationOptions::resetChanges()
 #if defined(PARAVIEW_USE_MPI)
   this->Internal->AutoMPI->setChecked(
     settings->value("autoMPI", false).toBool());
+  this->Internal->AutoMPI_NumberOfCores->setValue (
+        settings->value("autoMPI_NumberOfCores",
+                        vtkMultiThreader::GetGlobalMaximumNumberOfThreads ()).toInt());
 #endif
 
   this->Internal->SpecularHighlighting->setChecked(
