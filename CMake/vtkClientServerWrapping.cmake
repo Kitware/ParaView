@@ -17,13 +17,17 @@ macro(vtk_add_cs_wrapping module)
 
   pv_pre_wrap_vtk_mod_cs("${module}CS" "${module}")
   vtk_module_dep_includes(${module})
-  vtk_add_library(${module}CS ${${module}CS_SRCS})
+  vtk_add_library(${module}CS STATIC ${${module}CS_SRCS})
   target_link_libraries(${module}CS LINK_PUBLIC vtkClientServer LINK_PRIVATE ${module})
   set_property(TARGET ${module}CS APPEND  
     PROPERTY INCLUDE_DIRECTORIES
     ${${module}_DEPENDS_INCLUDE_DIRS}
     ${${module}_INCLUDE_DIRS}
     ${vtkClientServer_INCLUDE_DIRS})
+  if (NOT WIN32)
+    set_property(TARGET ${module}CS APPEND
+      PROPERTY COMPILE_FLAGS "-fPIC")
+  endif()
 
   # add compile definition for auto init for modules that provide implementation
   if(${module}_IMPLEMENTS)
