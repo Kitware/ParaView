@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkMatrix4x4.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRInteractorStyleFactory.h"
@@ -205,6 +206,11 @@ void pqVRDockPanel::updateConnections()
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::editConnection(QListWidgetItem *item)
 {
+  if (this->Internals->IsRunning)
+    {
+    return;
+    }
+
   if (!item)
     {
     item = this->Internals->connectionsTable->currentItem();
@@ -255,9 +261,12 @@ void pqVRDockPanel::editConnection(QListWidgetItem *item)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::updateConnectionButtons(int row)
 {
-  bool enabled = (row >= 0);
-  this->Internals->editConnection->setEnabled(enabled);
-  this->Internals->removeConnection->setEnabled(enabled);
+  if (!this->Internals->IsRunning)
+    {
+    bool enabled = (row >= 0);
+    this->Internals->editConnection->setEnabled(enabled);
+    this->Internals->removeConnection->setEnabled(enabled);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -478,6 +487,22 @@ void pqVRDockPanel::restoreState()
 }
 
 //-----------------------------------------------------------------------------
+void pqVRDockPanel::disableConnectionButtons()
+{
+  this->Internals->addConnection->setEnabled(false);
+  this->Internals->editConnection->setEnabled(false);
+  this->Internals->removeConnection->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::enableConnectionButtons()
+{
+  this->Internals->addConnection->setEnabled(true);
+  this->Internals->editConnection->setEnabled(true);
+  this->Internals->removeConnection->setEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
 void pqVRDockPanel::updateStartStopButtonStates()
 {
   pqVRConnectionManager *mgr = pqVRConnectionManager::instance();
@@ -498,10 +523,13 @@ void pqVRDockPanel::start()
                   " already running!";
     return;
     }
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  this->disableConnectionButtons();
   pqVRConnectionManager::instance()->start();
   pqVRQueueHandler::instance()->start();
   this->Internals->IsRunning = true;
   this->updateStartStopButtonStates();
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -513,10 +541,15 @@ void pqVRDockPanel::stop()
                   " not started!";
     return;
     }
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  this->enableConnectionButtons();
   pqVRConnectionManager::instance()->stop();
   pqVRQueueHandler::instance()->stop();
   this->Internals->IsRunning = false;
+  this->updateConnectionButtons(
+        this->Internals->connectionsTable->currentRow());
   this->updateStartStopButtonStates();
+  QApplication::restoreOverrideCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -536,10 +569,10 @@ void pqVRDockPanel::updateDebugLabel()
       double e2 = mv->GetElement(i, 2);
       double e3 = mv->GetElement(i, 3);
       debugString += QString("%1 %2 %3 %4\n")
-          .arg(e0 < 1e-10 ? 0.0 : e0, 8, 'g', 3)
-          .arg(e1 < 1e-10 ? 0.0 : e1, 8, 'g', 3)
-          .arg(e2 < 1e-10 ? 0.0 : e2, 8, 'g', 3)
-          .arg(e3 < 1e-10 ? 0.0 : e3, 8, 'g', 3);
+          .arg(fabs(e0) < 1e-5 ? 0.0 : e0, 8, 'g', 3)
+          .arg(fabs(e1) < 1e-5 ? 0.0 : e1, 8, 'g', 3)
+          .arg(fabs(e2) < 1e-5 ? 0.0 : e2, 8, 'g', 3)
+          .arg(fabs(e3) < 1e-5 ? 0.0 : e3, 8, 'g', 3);
     }
     // Pop off trailing newline
     debugString.remove(QRegExp("\n$"));

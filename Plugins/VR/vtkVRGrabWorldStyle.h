@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkVRGrabWorldStyle_h_
 
 #include "vtkVRTrackStyle.h"
+#include "vtkNew.h"
 
+class vtkCamera;
+class vtkMatrix4x4;
 class vtkSMRenderViewProxy;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
-class vtkTransform;
 struct vtkVREventData;
 
 class vtkVRGrabWorldStyle : public vtkVRTrackStyle
@@ -47,9 +49,6 @@ public:
   vtkTypeMacro(vtkVRGrabWorldStyle, vtkVRTrackStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* SaveConfiguration() const;
-
 protected:
   vtkVRGrabWorldStyle();
   ~vtkVRGrabWorldStyle();
@@ -57,14 +56,23 @@ protected:
   virtual void HandleButton( const vtkVREventData& data );
   virtual void HandleTracker( const vtkVREventData& data );
 
-  bool Enabled;
+  bool EnableTranslate;
+  bool EnableRotate;
 
-  bool IsInitialRecorded;
-  vtkTransform *InverseInitialTransform;
+  bool IsInitialTransRecorded;
+  bool IsInitialRotRecorded;
+
+  vtkNew<vtkMatrix4x4> InverseInitialTransMatrix;
+  vtkNew<vtkMatrix4x4> InverseInitialRotMatrix;
+
+  vtkNew<vtkMatrix4x4> CachedTransMatrix;
+  vtkNew<vtkMatrix4x4> CachedRotMatrix;
 
 private:
   vtkVRGrabWorldStyle(const vtkVRGrabWorldStyle&); // Not implemented.
   void operator=(const vtkVRGrabWorldStyle&); // Not implemented.
+
+  float GetSpeedFactor(vtkCamera *cam);
 };
 
 #endif //__vtkVRGrabWorldStyle.h_

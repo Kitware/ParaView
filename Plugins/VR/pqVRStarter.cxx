@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetEventPlayer.h"
 
 // Used for testing:
+#ifdef PARAVIEW_USE_VRPN
 #include <pqVRPNConnection.h>
 class pqVREventPlayer : public pqWidgetEventPlayer
 {
@@ -112,6 +113,7 @@ public:
       }
   }
 };
+#endif // PARAVIEW_USE_VRPN
 
 //-----------------------------------------------------------------------------
 class pqVRStarter::pqInternals
@@ -132,9 +134,11 @@ pqVRStarter::pqVRStarter(QObject* p/*=0*/)
   this->Internals->Handler = NULL;
   this->Internals->StyleFactory = NULL;
 
+#ifdef PARAVIEW_USE_VRPN
   pqVREventPlayer *player = new pqVREventPlayer(NULL);
   pqApplicationCore::instance()->testUtility()->eventPlayer()->
       addWidgetEventPlayer(player);
+#endif // PARAVIEW_USE_VRPN
 
   this->IsShutdown = true;
 }

@@ -20,16 +20,27 @@ SET(PARAVIEW_USE_VRPN OFF CACHE BOOL "Build ParaView with VRPN support")
 SET(PARAVIEW_USE_VRUI OFF CACHE BOOL "Build ParaView with VRUI support")
 
 # if VRPN
+mark_as_advanced(VRPN_LIBUSB_INCLUDE_DIR)
 mark_as_advanced(VRPN_INCLUDE_DIR)
 mark_as_advanced(VRPN_LIBRARY)
 if(PARAVIEW_USE_VRPN)
   if(NOT EXISTS VRPN_INCLUDE_DIR)
     find_path(VRPN_INCLUDE_DIR vrpn_Tracker.h)
   endif()
+  if(UNIX)
+    find_path(VRPN_LIBUSB_INCLUDE_DIR libusb.h PATHS /usr/include /usr/local/include)
+    if(NOT EXISTS VRPN_LIBUSB_INCLUDE_DIR)
+      mark_as_advanced(CLEAR VRPN_LIBUSB_INCLUDE_DIR)
+    endif()
+  endif()
   find_library(VRPN_LIBRARY vrpn)
-  set(VRPN_MOC_SRC pqVRPNConnection.h)
+  set(VRPN_MOC_SRC
+    pqVRPNConnection.h
+    pqVRPNEventListener.h
+  )
   set(VRPN_SOURCE_FILES
     pqVRPNConnection.cxx
+    pqVRPNEventListener.cxx
     vtkVRPNCallBackHandlers.cxx)
 endif(PARAVIEW_USE_VRPN)
 
@@ -68,7 +79,7 @@ QT4_WRAP_UI(UI_SRCS
   )
 
 if(PARAVIEW_USE_VRPN)
-  INCLUDE_DIRECTORIES(${VRPN_INCLUDE_DIR})
+  INCLUDE_DIRECTORIES(${VRPN_INCLUDE_DIR} ${VRPN_LIBUSB_INCLUDE_DIR})
 endif(PARAVIEW_USE_VRPN)
 
 SET( VR_SOURCE_FILES
@@ -117,3 +128,4 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/vtkPVVRConfig.h.in
 if(PARAVIEW_USE_VRPN)
   TARGET_LINK_LIBRARIES (VRPlugin "${VRPN_LIBRARY}")
 endif(PARAVIEW_USE_VRPN)
+TARGET_LINK_LIBRARIES (VRPlugin pqApplicationComponents)

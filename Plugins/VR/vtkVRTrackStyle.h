@@ -49,9 +49,6 @@ public:
   vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-  virtual vtkPVXMLElement* SaveConfiguration() const;
-
 protected:
   vtkVRTrackStyle();
   ~vtkVRTrackStyle();

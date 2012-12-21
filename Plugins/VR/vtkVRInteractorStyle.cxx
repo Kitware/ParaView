@@ -34,10 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkStringList.h"
 #include "vtkVRQueue.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkVRInteractorStyle)
@@ -45,9 +46,7 @@ vtkCxxSetObjectMacro(vtkVRInteractorStyle, ControlledProxy, vtkSMProxy)
 
 // ----------------------------------------------------------------------------
 vtkVRInteractorStyle::vtkVRInteractorStyle()
-  : Superclass(), ControlledProxy(NULL), ControlledPropertyName(NULL),
-    NeedsAnalog(false), NeedsButton(false), NeedsTracker(false),
-    AnalogName(NULL), ButtonName(NULL), TrackerName(NULL)
+  : Superclass(), ControlledProxy(NULL), ControlledPropertyName(NULL)
 {
 }
 
@@ -56,9 +55,6 @@ vtkVRInteractorStyle::~vtkVRInteractorStyle()
 {
   this->SetControlledProxy(NULL);
   this->SetControlledPropertyName(NULL);
-  this->SetAnalogName(NULL);
-  this->SetButtonName(NULL);
-  this->SetTrackerName(NULL);
 }
 
 // ----------------------------------------------------------------------------
@@ -82,7 +78,7 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
     return false;
     }
 
-
+  bool result = true;
   for (unsigned int cc=0; cc < child->GetNumberOfNestedElements(); cc++)
     {
     vtkPVXMLElement* element = child->GetNestedElement(cc);
@@ -90,23 +86,90 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
       {
       if (strcmp(element->GetName(), "Analog") == 0)
         {
-        this->SetAnalogName(element->GetAttributeOrEmpty("name"));
+        const char *role = element->GetAttributeOrDefault("role", NULL);
+        const char *name = element->GetAttributeOrDefault("name", NULL);
+        if (role && name && *role && *name)
+          {
+          if (!this->SetAnalogName(role, name))
+            {
+            vtkWarningMacro(<<"Invalid analog role: " << role);
+            result = false;
+            }
+          }
         }
       else if (strcmp(element->GetName(), "Button") == 0)
         {
-        this->SetButtonName(element->GetAttributeOrEmpty("name"));
+        const char *role = element->GetAttributeOrDefault("role", NULL);
+        const char *name = element->GetAttributeOrDefault("name", NULL);
+        if (role && name && *role && *name)
+          {
+          if (!this->SetButtonName(role, name))
+            {
+            vtkWarningMacro(<<"Invalid button role: " << role);
+            result = false;
+            }
+          }
         }
       else if (strcmp(element->GetName(), "Tracker") == 0)
         {
-        this->SetTrackerName(element->GetAttributeOrEmpty("name"));
+        const char *role = element->GetAttributeOrDefault("role", NULL);
+        const char *name = element->GetAttributeOrDefault("name", NULL);
+        if (role && name && *role && *name)
+          {
+          if (!this->SetTrackerName(role, name))
+            {
+            vtkWarningMacro(<<"Invalid tracker role: " << role);
+            result = false;
+            }
+          }
         }
+      }
+    }
+
+  // Verify that all defined roles have named buttons:
+  for (StringMap::const_iterator it = this->Analogs.begin(),
+       itEnd = this->Analogs.end(); it != itEnd; ++it)
+    {
+    if (it->second.empty())
+      {
+      vtkWarningMacro(<<"Analog role not defined: " << it->first.c_str());
+      result = false;
+      }
+    }
+  for (StringMap::const_iterator it = this->Buttons.begin(),
+       itEnd = this->Buttons.end(); it != itEnd; ++it)
+    {
+    if (it->second.empty())
+      {
+      vtkWarningMacro(<<"Button role not defined: " << it->first.c_str());
+      result = false;
+      }
+    }
+  for (StringMap::const_iterator it = this->Trackers.begin(),
+       itEnd = this->Trackers.end(); it != itEnd; ++it)
+    {
+    if (it->second.empty())
+      {
+      vtkWarningMacro(<<"Tracker role not defined: " << it->first.c_str());
+      result = false;
       }
     }
 
   this->ControlledProxy = locator->LocateProxy(id);
   this->SetControlledPropertyName(child->GetAttribute("property"));
 
-  return true;
+  if (this->ControlledProxy == NULL ||
+      this->ControlledPropertyName == NULL ||
+      this->ControlledPropertyName[0] == '\0')
+    {
+    vtkWarningMacro(<<"Invalid Controlled Proxy or PropertyName. "
+                    << "Proxy: " << id
+                    << "PropertyName: " << this->ControlledPropertyName);
+    result = false;
+    }
+
+
+  return result;
 }
 
 // ----------------------------------------------------------------------------
@@ -125,27 +188,33 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
       this->ControlledPropertyName);
     }
 
-  if (this->NeedsAnalog && this->AnalogName)
+  for (StringMap::const_iterator it = this->Analogs.begin(),
+       itEnd = this->Analogs.end(); it != itEnd; ++it)
     {
     vtkPVXMLElement *analog = vtkPVXMLElement::New();
     analog->SetName("Analog");
-    analog->AddAttribute("name", this->AnalogName);
+    analog->AddAttribute("role", it->first.c_str());
+    analog->AddAttribute("name", it->second.c_str());
     child->AddNestedElement(analog);
     analog->FastDelete();
     }
-  if (this->NeedsButton && this->ButtonName)
+  for (StringMap::const_iterator it = this->Buttons.begin(),
+       itEnd = this->Buttons.end(); it != itEnd; ++it)
     {
     vtkPVXMLElement *button = vtkPVXMLElement::New();
     button->SetName("Button");
-    button->AddAttribute("name", this->ButtonName);
+    button->AddAttribute("role", it->first.c_str());
+    button->AddAttribute("name", it->second.c_str());
     child->AddNestedElement(button);
     button->FastDelete();
     }
-  if (this->NeedsTracker && this->TrackerName)
+  for (StringMap::const_iterator it = this->Trackers.begin(),
+       itEnd = this->Trackers.end(); it != itEnd; ++it)
     {
     vtkPVXMLElement* tracker = vtkPVXMLElement::New();
     tracker->SetName("Tracker");
-    tracker->AddAttribute("name", this->TrackerName);
+    tracker->AddAttribute("role", it->first.c_str());
+    tracker->AddAttribute("name", it->second.c_str());
     child->AddNestedElement(tracker);
     tracker->FastDelete();
     }
@@ -166,6 +235,73 @@ std::vector<std::string> vtkVRInteractorStyle::Tokenize( std::string input)
     token.push_back(word);
     }
   return token;
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::AddAnalogRole(const vtkStdString &role)
+{
+  this->Analogs.insert(StringMap::value_type(role, std::string()));
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::AddButtonRole(const vtkStdString &role)
+{
+  this->Buttons.insert(StringMap::value_type(role, std::string()));
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::AddTrackerRole(const vtkStdString &role)
+{
+  this->Trackers.insert(StringMap::value_type(role, std::string()));
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::MapKeysToStringList(const StringMap &source,
+                                               vtkStringList *target)
+{
+  target->RemoveAllItems();
+  for (StringMap::const_iterator it = source.begin(), itEnd = source.end();
+       it != itEnd; ++it)
+    {
+    target->AddString(it->first.c_str());
+    }
+}
+
+// ----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::SetValueInMap(
+    StringMap &map_,
+    const vtkStdString &key, const vtkStdString &value)
+{
+  StringMap::iterator it = map_.find(key);
+  if (it != map_.end())
+    {
+    it->second = value;
+    return true;
+    }
+  return false;
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetValueInMap(const StringMap &map_,
+                                                 const vtkStdString &key)
+{
+  StringMap::const_iterator it = map_.find(key);
+  return it != map_.end() ? it->second : vtkStdString();
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetKeyInMap(const StringMap &map_,
+                                               const vtkStdString &value)
+{
+  for (StringMap::const_iterator it = map_.begin(), itEnd = map_.end();
+       it != itEnd; ++it)
+    {
+    if (it->second == value)
+      {
+      return it->first;
+      }
+    }
+  return vtkStdString();
 }
 
 // ----------------------------------------------------------------------------
@@ -190,6 +326,99 @@ bool vtkVRInteractorStyle::HandleEvent(const vtkVREventData& data)
 bool vtkVRInteractorStyle::Update()
 {
   return true;
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::GetAnalogRoles(vtkStringList *roles)
+{
+  this->MapKeysToStringList(this->Analogs, roles);
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::GetButtonRoles(vtkStringList *roles)
+{
+  this->MapKeysToStringList(this->Buttons, roles);
+}
+
+// ----------------------------------------------------------------------------
+void vtkVRInteractorStyle::GetTrackerRoles(vtkStringList *roles)
+{
+  this->MapKeysToStringList(this->Trackers, roles);
+}
+
+// ----------------------------------------------------------------------------
+int vtkVRInteractorStyle::GetNumberOfAnalogRoles()
+{
+  return static_cast<int>(this->Analogs.size());
+}
+
+// ----------------------------------------------------------------------------
+int vtkVRInteractorStyle::GetNumberOfButtonRoles()
+{
+  return static_cast<int>(this->Buttons.size());
+}
+
+// ----------------------------------------------------------------------------
+int vtkVRInteractorStyle::GetNumberOfTrackerRoles()
+{
+  return static_cast<int>(this->Trackers.size());
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetAnalogRole(const vtkStdString &name)
+{
+  return this->GetValueInMap(this->Analogs, name);
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetButtonRole(const vtkStdString &name)
+{
+  return this->GetValueInMap(this->Buttons, name);
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetTrackerRole(const vtkStdString &name)
+{
+  return this->GetValueInMap(this->Trackers, name);
+}
+
+// ----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::SetAnalogName(const vtkStdString &role,
+                                         const vtkStdString &name)
+{
+  return this->SetValueInMap(this->Analogs, role, name);
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetAnalogName(const vtkStdString &role)
+{
+  return this->GetValueInMap(this->Analogs, role);
+}
+
+// ----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::SetButtonName(const vtkStdString &role,
+                                         const vtkStdString &name)
+{
+  return this->SetValueInMap(this->Buttons, role, name);
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetButtonName(const vtkStdString &role)
+{
+  return this->GetValueInMap(this->Buttons, role);
+}
+
+// ----------------------------------------------------------------------------
+bool vtkVRInteractorStyle::SetTrackerName(const vtkStdString &role,
+                                          const vtkStdString &name)
+{
+  return this->SetValueInMap(this->Trackers, role, name);
+}
+
+// ----------------------------------------------------------------------------
+vtkStdString vtkVRInteractorStyle::GetTrackerName(const vtkStdString &role)
+{
+  return this->GetValueInMap(this->Trackers, role);
 }
 
 // ----------------------------------------------------------------------------
@@ -222,10 +451,24 @@ void vtkVRInteractorStyle::PrintSelf(ostream &os, vtkIndent indent)
     {
     os << indent << "ControlledProxy: (None)" << endl;
     }
-  os << indent << "NeedsAnalog: " << this->NeedsAnalog << endl;
-  os << indent << "AnalogName: " << this->AnalogName << endl;
-  os << indent << "NeedsButton: " << this->NeedsButton << endl;
-  os << indent << "ButtonName: " << this->ButtonName << endl;
-  os << indent << "NeedsTracker: " << this->NeedsTracker << endl;
-  os << indent << "TrackerName: " << this->TrackerName << endl;
+
+  vtkIndent nextIndent = indent.GetNextIndent();
+  os << indent << "Analogs:" << endl;
+  for (StringMap::const_iterator it = this->Analogs.begin(),
+       itEnd = this->Analogs.end(); it != itEnd; ++it)
+    {
+    os << nextIndent << it->first.c_str() << ": " << it->second.c_str() << endl;
+    }
+  os << indent << "Buttons:" << endl;
+  for (StringMap::const_iterator it = this->Buttons.begin(),
+       itEnd = this->Buttons.end(); it != itEnd; ++it)
+    {
+    os << nextIndent << it->first.c_str() << ": " << it->second.c_str() << endl;
+    }
+  os << indent << "Trackers:" << endl;
+  for (StringMap::const_iterator it = this->Trackers.begin(),
+       itEnd = this->Trackers.end(); it != itEnd; ++it)
+    {
+    os << nextIndent << it->first.c_str() << ": " << it->second.c_str() << endl;
+    }
 }

@@ -49,7 +49,7 @@ vtkStandardNewMacro(vtkVRTrackStyle)
 vtkVRTrackStyle::vtkVRTrackStyle() :
   Superclass()
 {
-  this->NeedsTracker = true;
+  this->AddTrackerRole("Tracker");
 }
 
 // ----------------------------------------------------------------------------
@@ -57,36 +57,11 @@ vtkVRTrackStyle::~vtkVRTrackStyle()
 {
 }
 
-//-----------------------------------------------------------------------------
-bool vtkVRTrackStyle::Configure(vtkPVXMLElement *child, vtkSMProxyLocator *loc)
-{
-  if (!this->Superclass::Configure(child, loc))
-    {
-    return false;
-    }
-
-  if (this->TrackerName == NULL || this->TrackerName[0] == '\0' ||
-      this->ControlledPropertyName == NULL ||
-      this->ControlledPropertyName[0] == '\0' ||
-      !this->ControlledProxy)
-    {
-    vtkErrorMacro(<< "Incorrect state for vtkVRTrackStyle");
-    return false;
-    }
-
-  return true;
-}
-
-// -----------------------------------------------------------------------------
-vtkPVXMLElement* vtkVRTrackStyle::SaveConfiguration() const
-{
-  return this->Superclass::SaveConfiguration();
-}
-
 // ----------------------------------------------------------------------------
 void vtkVRTrackStyle::HandleTracker( const vtkVREventData& data )
 {
-  if (data.name == std::string(this->TrackerName))
+  vtkStdString role = this->GetTrackerRole(data.name);
+  if (role == "Tracker")
     {
     if (this->ControlledProxy && this->ControlledPropertyName != NULL &&
         this->ControlledPropertyName[0] != '\0')

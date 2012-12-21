@@ -50,12 +50,6 @@ public:
   /// external interaction style manager.
   virtual bool Update();
 
-  /// configure the style using the xml configuration.
-  virtual bool Configure(vtkPVXMLElement* child, vtkSMProxyLocator*);
-
-  /// save the xml configuration.
-  virtual vtkPVXMLElement* SaveConfiguration() const;
-
 protected:
   vtkVRControlSliceOrientationStyle();
   ~vtkVRControlSliceOrientationStyle();

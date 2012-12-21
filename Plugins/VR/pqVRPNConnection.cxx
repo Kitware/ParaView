@@ -31,32 +31,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqVRPNConnection.h"
 
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
-#include "vtkMath.h"
 #include "pqActiveObjects.h"
+#include "pqDataRepresentation.h"
+#include "pqVRPNEventListener.h"
 #include "pqView.h"
-#include <pqDataRepresentation.h>
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMRepresentationProxy.h"
-#include "vtkSMPropertyHelper.h"
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include "vtkVRPNCallBackHandlers.h"
-#include <QDateTime>
-#include <QDebug>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
+
+#include "vtkCamera.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkMath.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkSMRepresentationProxy.h"
+#include "vtkVRPNCallBackHandlers.h"
+
+#include <QtCore/QDateTime>
+#include <QtCore/QDebug>
+#include <QtCore/QMutexLocker>
+#include <QtCore/QThread>
+
+#include <vrpn_Analog.h>
+#include <vrpn_Button.h>
+#include <vrpn_Tracker.h>
+
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+pqVRPNEventListener *pqVRPNConnection::Listener = NULL;
 
 class pqVRPNConnection::pqInternals
 {
@@ -106,8 +112,11 @@ pqVRPNConnection::pqVRPNConnection(QObject* parentObject)
   :Superclass( parentObject )
 {
   this->Internals=new pqInternals();
+  if (!this->Listener)
+    {
+    this->Listener = new pqVRPNEventListener();
+    }
   this->Initialized=false;
-  this->_Stop = false;
   this->Address = "";
   this->Name = "";
   this->Type = "VRPN";
@@ -181,51 +190,44 @@ bool pqVRPNConnection::init()
   this->Internals->Tracker = new vrpn_Tracker_Remote(this->Address.c_str());
   this->Internals->Analog = new vrpn_Analog_Remote(this->Address.c_str());
   this->Internals->Button = new vrpn_Button_Remote(this->Address.c_str());
-  // this->Internals->Dial = new vrpn_Dial_Remote(this->Address.c_str());
-  // this->Internals->Text = new vrpn_Text_Receiver(this->Address.c_str());
 
-  this->Initialized= ( this->Internals->Tracker!=0
-                       && this->Internals->Analog!=0
-                       && this->Internals->Button!=0 );
-                       // && this->Internals->Dial!=0
-                       // && this->Internals->Text!=0 );
+  this->Internals->Tracker->register_change_handler(static_cast<void*>( this ),
+                                                    handleTrackerChange );
+  this->Internals->Analog->register_change_handler(static_cast<void*>( this ),
+                                                   handleAnalogChange );
+  this->Internals->Button->register_change_handler( static_cast<void*>( this ),
+                                                    handleButtonChange );
 
-  if(this->Initialized)
-    {
-    this->Internals->Tracker->register_change_handler(static_cast<void*>( this ),
-                                                      handleTrackerChange );
-    this->Internals->Analog->register_change_handler(static_cast<void*>( this ),
-                                                     handleAnalogChange );
-    this->Internals->Button->register_change_handler( static_cast<void*>( this ),
-                                                      handleButtonChange );
-    }
 
-  return this->Initialized;
+  return this->Initialized = true;
 }
 
 // ----------------------------------------------------------------private-slot
-void pqVRPNConnection::run()
+void pqVRPNConnection::listen()
 {
-  this->_Stop = false;
-  while ( !this->_Stop )
+  if(this->Initialized)
     {
-    if(this->Initialized)
-      {
-      // std::cout << "callback()" << std::endl;
-      this->Internals->Tracker->mainloop();
-      this->Internals->Button->mainloop();
-      this->Internals->Analog->mainloop();
-      // this->Internals->Dial->mainloop();
-      // this->Internals->Text->mainloop();
-      }
+    this->Internals->Tracker->mainloop();
+    this->Internals->Button->mainloop();
+    this->Internals->Analog->mainloop();
     }
+}
+
+// ----------------------------------------------------------------private-slot
+bool pqVRPNConnection::start()
+{
+  if (!this->Initialized)
+    {
+    return false;
+    }
+
+  this->Listener->addConnection(this);
 }
 
 // ---------------------------------------------------------------------private
 void pqVRPNConnection::stop()
 {
-  this->_Stop = true;
-  this->wait();
+  this->Listener->removeConnection(this);
 
   this->Initialized = false;
   delete this->Internals->Analog;
@@ -234,7 +236,6 @@ void pqVRPNConnection::stop()
   this->Internals->Button = NULL;
   delete this->Internals->Tracker;
   this->Internals->Tracker = NULL;
-
 }
 
 // ---------------------------------------------------------------------private

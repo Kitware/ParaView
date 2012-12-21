@@ -32,29 +32,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __ParaViewVRPN_h
 #define __ParaViewVRPN_h
 
-#include <QThread>
-#include <vrpn_Tracker.h>
-#include <vrpn_Button.h>
-#include <vrpn_Analog.h>
-#include <vrpn_Dial.h>
-#include <vrpn_Text.h>
-#include "vtkVRQueue.h"
-#include "vtkTransform.h"
+#include <QtCore/QObject>
+
 #include "vtkMatrix4x4.h"
+#include "vtkTransform.h"
+#include "vtkVRQueue.h"
+
+#include <QtCore/QMutex>
+
+#include <vrpn_Analog.h>
+#include <vrpn_Button.h>
+#include <vrpn_Tracker.h>
 
 #include <map>
+
+class pqVRPNEventListener;
 
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
 
 /// Callback to listen to VRPN events
-class pqVRPNConnection : public QThread
+class pqVRPNConnection : public QObject
 {
   Q_OBJECT
-  typedef QThread Superclass;
+  typedef QObject Superclass;
 public:
-  pqVRPNConnection(QObject *parent=0);
-  ~pqVRPNConnection();
+  explicit pqVRPNConnection(QObject *parent=0);
+  virtual ~pqVRPNConnection();
 
   // Description:
   // Address of the device. For example, "Tracker0@localhost"
@@ -93,8 +97,9 @@ public:
   bool init();
 
   // Description:
-  // Tell if Init() was called succesfully
-  // bool GetInitialized() const;
+  // Register this connection with the event listener and request that the
+  // event listener start.
+  bool start();
 
   // Description:
   // Terminate the thread
@@ -147,7 +152,9 @@ public:
   }
 
 protected slots:
-  void run();
+  /// This is called by VRPNEventListener in a threadsafe manner, and should not
+  /// be called directly.
+  void listen();
 
 protected:
   std::string name( int eventType, int id=0 );
@@ -183,7 +190,11 @@ protected:
   vtkMatrix4x4 *Transformation;
 
   bool Initialized;
-  bool _Stop;
+
+  // The shared thread and listener that listens to incoming events.
+  friend class pqVRPNEventListener;
+  friend class pqVRPNThreadBridge;
+  static pqVRPNEventListener *Listener;
 
   vtkVRQueue* EventQueue;
 

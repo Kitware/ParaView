@@ -68,6 +68,9 @@ private slots:
   void saveState();
   void restoreState();
 
+  void disableConnectionButtons();
+  void enableConnectionButtons();
+
   void updateStartStopButtonStates();
   void start();
   void stop();

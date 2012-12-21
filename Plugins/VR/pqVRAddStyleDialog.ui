@@ -30,57 +30,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="analogLabel">
-     <property name="text">
-      <string>Analog:</string>
-     </property>
-     <property name="buddy">
-      <cstring>analogCombo</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="analogCombo">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the analog input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="buttonLabel">
-     <property name="text">
-      <string>Button:</string>
-     </property>
-     <property name="buddy">
-      <cstring>buttonCombo</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="buttonCombo">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the button input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="trackerLabel">
-     <property name="text">
-      <string>Tracker:</string>
-     </property>
-     <property name="buddy">
-      <cstring>trackerCombo</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="trackerCombo">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the tracking input for the new interaction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
@@ -93,6 +42,13 @@
       <bool>false</bool>
      </property>
     </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <layout class="QFormLayout" name="inputForm">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+     </property>
+    </layout>
    </item>
   </layout>
  </widget>
