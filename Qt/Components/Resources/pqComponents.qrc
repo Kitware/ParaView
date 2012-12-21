@@ -121,7 +121,10 @@
         <file>Icons/pqPickCenter24.png</file>
         <file>Icons/pqPipelineList22.png</file>
         <file>Icons/pqPlotCellOverTime24.png</file>
+        <file>Icons/pqPlotGlobalOverTime24.png</file>
         <file>Icons/pqPlotLineOverTime24.png</file>
+        <file>Icons/pqPlotSelectionOverTime24.png</file>
+        <file>Icons/pqPlotOverLine24.png</file>
         <file>Icons/pqPlotPointOverTime24.png</file>
         <file>Icons/PluginGray.png</file>
         <file>Icons/PluginGreen.png</file>

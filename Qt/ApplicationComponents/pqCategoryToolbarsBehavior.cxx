@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -32,9 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCategoryToolbarsBehavior.h"
 
 #include "pqProxyGroupMenuManager.h"
+#include "pqApplicationCore.h"
+#include "pqTestUtility.h"
+#include "pqEventDispatcher.h"
+#include "pqEventTranslator.h"
 
 #include <QMainWindow>
 #include <QToolBar>
+
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
@@ -46,6 +52,22 @@ pqCategoryToolbarsBehavior::pqCategoryToolbarsBehavior(
 
   this->MainWindow = mainWindow;
   this->MenuManager = menuManager;
+
+  // When tests start, hide toolbars that have asked to be off by default.
+  // Do the same when starting to record events for a test.
+  pqTestUtility* testUtil = pqApplicationCore::instance()->testUtility();
+  pqEventDispatcher* testPlayer = testUtil ? testUtil->dispatcher() : NULL;
+  pqEventTranslator* testRecorder = testUtil ? testUtil->eventTranslator() : NULL;
+  if (testPlayer)
+    {
+    QObject::connect(testPlayer, SIGNAL(started()),
+      this, SLOT(prepareForTest()));
+    }
+  if (testRecorder)
+    {
+    QObject::connect(testRecorder, SIGNAL(started()),
+      this, SLOT(prepareForTest()));
+    }
 
   QObject::connect(menuManager, SIGNAL(menuPopulated()),
     this, SLOT(updateToolbars()));
@@ -67,14 +89,32 @@ void pqCategoryToolbarsBehavior::updateToolbars()
       toolbar->setOrientation(Qt::Horizontal);
       toolbar->setWindowTitle(category); // TODO: Get label from MenuManager.
       this->MainWindow->addToolBar(toolbar);
+      if (this->MenuManager->hideForTests(category))
+        {
+        this->ToolbarsToHide << toolbar->toggleViewAction();
+        }
       }
     QList<QAction*> toolbarActions = this->MenuManager->actions(category);
     toolbar->clear();
     for (int cc=0; cc < toolbarActions.size(); cc++)
       {
+      QVariant omitList = toolbarActions[cc]->property("OmitFromToolbar");
+      if (omitList.isValid() && omitList.toStringList().contains(category))
+        {
+        continue;
+        }
       toolbar->addAction(toolbarActions[cc]);
       }
     }
 }
 
-
+void pqCategoryToolbarsBehavior::prepareForTest()
+{
+  foreach(QAction* toolbar, this->ToolbarsToHide)
+    {
+    if (toolbar && toolbar->isChecked())
+      {
+      toolbar->trigger();
+      }
+    }
+}

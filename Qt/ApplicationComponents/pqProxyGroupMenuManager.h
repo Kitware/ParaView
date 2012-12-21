@@ -87,6 +87,9 @@ public:
   /// Returns the list of actions in a category.
   QList<QAction*> actions(const QString& category);
 
+  /// Returns whether or not the category's toolbar should be hidden initially.
+  bool hideForTests(const QString& category) const;
+
   /// Attach an observer to proxy manager to monitor any proxy definition update
   /// The detected proxy have to own a hint
   ///     <ShowInMenu category=""/>

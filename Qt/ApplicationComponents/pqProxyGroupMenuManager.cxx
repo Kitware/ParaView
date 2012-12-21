@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QPair>
 #include <QSet>
+#include <QStringList>
 
 namespace
 {
@@ -78,6 +79,7 @@ public:
   struct Info
     {
     QString Icon; //<-- Name of the icon to use, if any.
+    QStringList OmitFromToolbar; //<-- a list of category names whose toolbars should not contain this action.
     QPointer<QAction> Action; //<-- Action for this proxy.
     };
 
@@ -88,11 +90,13 @@ public:
     QString Label;
     bool PreserveOrder;
     bool ShowInToolbar;
+    bool HideForTests;
     QList<QPair<QString, QString> > Proxies;
-    CategoryInfo() 
-      { 
+    CategoryInfo()
+      {
       this->PreserveOrder = false;
       this->ShowInToolbar = false;
+      this->HideForTests = false;
       }
     };
 
@@ -102,12 +106,16 @@ public:
   {
     this->LocalActiveSession = NULL;
   }
- 
-  void addProxy(const QString& pgroup, const QString& pname, const QString& icon)
+
+  void addProxy(const QString& pgroup, const QString& pname, const QString& icon, const QString& omitFromToolbar = QString())
     {
     if (!pname.isEmpty() && !pgroup.isEmpty())
       {
       Info& info = this->Proxies[QPair<QString, QString>(pgroup, pname)];
+      if (!omitFromToolbar.isEmpty())
+        {
+        info.OmitFromToolbar << omitFromToolbar;
+        }
       if (!icon.isEmpty())
         {
         info.Icon = icon;
@@ -123,7 +131,7 @@ public:
       this->Proxies.remove(pair);
       }
     }
- 
+
   // Proxies and Categories is what gets shown in the menu.
   ProxyInfoMap Proxies;
   CategoryInfoMap Categories;
@@ -276,14 +284,17 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
         curElem->GetAttribute("menu_label") : categoryName;
       int preserve_order = 0;
       curElem->GetScalarAttribute("preserve_order", &preserve_order);
-      int show_in_toolbar=0;
+      int show_in_toolbar = 0;
       curElem->GetScalarAttribute("show_in_toolbar", &show_in_toolbar);
+      int hide_for_tests = 0;
+      curElem->GetScalarAttribute("hide_for_tests", &hide_for_tests);
 
       // Valid category encountered. Update the Internal datastructures.
       pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
       category.Label = categoryLabel;
-      category.PreserveOrder = category.PreserveOrder || (preserve_order==1);
-      category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar==1);
+      category.PreserveOrder = category.PreserveOrder || (preserve_order == 1);
+      category.ShowInToolbar = category.ShowInToolbar || (show_in_toolbar == 1);
+      category.HideForTests = category.HideForTests || (hide_for_tests == 1);
       unsigned int numCategoryElems = curElem->GetNumberOfNestedElements();
       for (unsigned int kk=0; kk < numCategoryElems; ++kk)
         {
@@ -293,11 +304,14 @@ void pqProxyGroupMenuManager::loadConfiguration(vtkPVXMLElement* root)
           const char* name = child->GetAttribute("name");
           const char* group = child->GetAttribute("group");
           const char* icon = child->GetAttribute("icon");
+          int omit = 0;
+          child->GetScalarAttribute("omit_from_toolbar", &omit);
           if (!name || !group)
             {
             continue;
             }
-          this->Internal->addProxy(group, name, icon);
+          this->Internal->addProxy(group, name, icon, omit ?
+            categoryName : QString());
           if (!category.Proxies.contains(QPair<QString, QString>(group, name)))
             {
             category.Proxies.push_back(QPair<QString, QString>(group, name));
@@ -421,7 +435,7 @@ void pqProxyGroupMenuManager::populateMenu()
     }
 
   // Add categories.
-  pqInternal::CategoryInfoMap::iterator categoryIter = 
+  pqInternal::CategoryInfoMap::iterator categoryIter =
     this->Internal->Categories.begin();
   for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
     {
@@ -442,7 +456,7 @@ void pqProxyGroupMenuManager::populateMenu()
       << pqSetName("Alphabetical");
     }
 
-  pqInternal::ProxyInfoMap::iterator proxyIter = 
+  pqInternal::ProxyInfoMap::iterator proxyIter =
     this->Internal->Proxies.begin();
 
   QList<QAction*> someActions;
@@ -499,6 +513,10 @@ QAction* pqProxyGroupMenuManager::getAction(
       QStringList data_list;
       data_list << pgroup << pname;
       action << pqSetName(name) << pqSetData(data_list);
+      if (iter.value().OmitFromToolbar.size() > 0)
+        {
+        action->setProperty("OmitFromToolbar", iter.value().OmitFromToolbar);
+        }
       iter.value().Action = action;
       }
 
@@ -546,7 +564,7 @@ void pqProxyGroupMenuManager::triggered()
     {
     this->Internal->RecentlyUsed.removeAll(key);
     this->Internal->RecentlyUsed.push_front(key);
-    while (this->Internal->RecentlyUsed.size() > 
+    while (this->Internal->RecentlyUsed.size() >
       static_cast<int>(this->RecentlyUsedMenuSize))
       {
       this->Internal->RecentlyUsed.pop_back();
@@ -578,6 +596,20 @@ QList<QAction*> pqProxyGroupMenuManager::actions() const
 }
 
 //-----------------------------------------------------------------------------
+bool pqProxyGroupMenuManager::hideForTests(const QString& category) const
+{
+  pqInternal::CategoryInfoMap::iterator categoryIter =
+    this->Internal->Categories.find(category);
+  if (
+    categoryIter == this->Internal->Categories.end() ||
+    (categoryIter.value().ShowInToolbar && !categoryIter.value().HideForTests))
+    {
+    return false;
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProxy* pqProxyGroupMenuManager::getPrototype(QAction* action) const
 {
   if (!action)
@@ -602,7 +634,7 @@ QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 {
   QStringList categories_in_toolbar;
 
-  pqInternal::CategoryInfoMap::iterator categoryIter = 
+  pqInternal::CategoryInfoMap::iterator categoryIter =
     this->Internal->Categories.begin();
   for (; categoryIter != this->Internal->Categories.end(); ++categoryIter)
     {
@@ -618,7 +650,7 @@ QStringList pqProxyGroupMenuManager::getToolbarCategories() const
 QList<QAction*> pqProxyGroupMenuManager::actions(const QString& category)
 {
   QList<QAction*> category_actions;
-  pqInternal::CategoryInfoMap::iterator categoryIter = 
+  pqInternal::CategoryInfoMap::iterator categoryIter =
     this->Internal->Categories.find(category);
   if (categoryIter == this->Internal->Categories.end())
     {
