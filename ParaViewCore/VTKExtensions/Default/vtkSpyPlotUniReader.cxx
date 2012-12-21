@@ -10,6 +10,8 @@
 #include "vtkByteSwap.h"
 #include <vector>
 #include <vtksys/ios/sstream>
+#include <vtksys/RegularExpression.hxx>
+
 //=============================================================================
 //-----------------------------------------------------------------------------
 
@@ -161,12 +163,14 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
     }
 }
 
-#define READ_SPCTH_VOLUME_FRACTION "Material volume fraction"
+
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::IsVolumeFraction(Variable* var)
 {
-  return strncmp(var->Name, READ_SPCTH_VOLUME_FRACTION, 
-                 strlen(READ_SPCTH_VOLUME_FRACTION)) == 0;
+  // BUG #13473: Matches old style "Material volume fraction" as well as new
+  // style "Volume Fraction" variable names.
+  vtksys::RegularExpression re("[vV]olume [fF]raction");
+  return re.find(var->Name) ? 1 : 0;
 }
 
 //-----------------------------------------------------------------------------
