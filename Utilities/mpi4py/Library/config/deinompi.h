@@ -1,4 +1,0 @@
-#ifndef PyMPI_CONFIG_DEINOMPI_H
-#define PyMPI_CONFIG_DEINOMPI_H
-
-#endif /* !PyMPI_CONFIG_DEINOMPI_H */
