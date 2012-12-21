@@ -14,7 +14,10 @@ add_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
   vtkPVCustomTestDriver.cxx)
 target_link_libraries(CoProcessingPythonScriptExample
-  vtkCoProcessorImplementation vtkCPTestDriver vtkRenderingMatplotlib)
+  vtkCoProcessorImplementation vtkCPTestDriver)
+if (PARAVIEW_USE_MATPLOTLIB)
+  target_link_libraries(CoProcessingPythonScriptExample vtkRenderingMatplotlib)
+endif()
 
 #------------------------------------------------------------------------------
 # Generate the image compare tool.
