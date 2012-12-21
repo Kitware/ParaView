@@ -321,6 +321,11 @@ private slots:
   /// called when visibility of the source may have changed.
   void updateVisibility(pqPipelineSource*);
 
+  /// provides a mechanism to delay updating of visibility while safely handling
+  /// the case where the pqPipelineSource itself gets deleted in the mean time.
+  void delayedUpdateVisibility(pqPipelineSource*);
+  void delayedUpdateVisibilityTimeout();
+
   /// called when the item's name changes.
   void updateData(pqServerManagerModelItem*);
 

@@ -363,18 +363,23 @@ public:
     Root(parent, NULL, pqPipelineModel::Invalid, parent)
   {
   this->ModifiedFont.setBold(true);
+  this->DelayedUpdateVisibilityTimer.setSingleShot(true);
   }
 
   QFont ModifiedFont;
   pqPipelineModelDataItem Root;
+  pqTimer DelayedUpdateVisibilityTimer;
+  QList<QPointer<pqPipelineSource> > DelayedUpdateVisibilityItems;
 };
-
 
 //-----------------------------------------------------------------------------
 void pqPipelineModel::constructor()
 {
   this->FilterRoleSession = NULL;
   this->Internal = new pqPipelineModelInternal(this);
+  QObject::connect(&this->Internal->DelayedUpdateVisibilityTimer,
+    SIGNAL(timeout()), this, SLOT(delayedUpdateVisibilityTimeout()));
+
   this->Editable = true;
   this->View = NULL;
 
@@ -1009,8 +1014,7 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
 
   QObject::connect(source,
     SIGNAL(visibilityChanged(pqPipelineSource*, pqDataRepresentation*)),
-    this, SLOT(updateVisibility(pqPipelineSource*)),
-    Qt::QueuedConnection);
+    this, SLOT(delayedUpdateVisibility(pqPipelineSource*)));
 
   QObject::connect(source,
     SIGNAL(nameChanged(pqServerManagerModelItem*)),
@@ -1241,6 +1245,28 @@ void pqPipelineModel::setView(pqView *newview)
   this->View = newview;
   // update all VisibilityIcons.
   this->Internal->Root.updateVisibilityIcon(newview, true);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::delayedUpdateVisibility(pqPipelineSource* source)
+{
+  this->Internal->DelayedUpdateVisibilityItems.removeAll(source);
+  this->Internal->DelayedUpdateVisibilityItems.push_front(source);
+  this->Internal->DelayedUpdateVisibilityTimer.start(0);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModel::delayedUpdateVisibilityTimeout()
+{
+  foreach (pqPipelineSource* source,
+    this->Internal->DelayedUpdateVisibilityItems)
+    {
+    if (source)
+      {
+      this->updateVisibility(source);
+      }
+    }
+  this->Internal->DelayedUpdateVisibilityItems.clear();
 }
 
 //-----------------------------------------------------------------------------
