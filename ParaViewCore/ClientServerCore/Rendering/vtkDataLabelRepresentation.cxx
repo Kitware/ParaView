@@ -29,6 +29,7 @@
 #include "vtkRenderer.h"
 #include "vtkTextProperty.h"
 #include "vtkTransform.h"
+#include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkDataLabelRepresentation);
 //----------------------------------------------------------------------------
@@ -329,10 +330,13 @@ int vtkDataLabelRepresentation::RequestData(vtkInformation* request,
     this->MergeBlocks->SetInputConnection(
       this->GetInternalOutputPort());
     this->CacheKeeper->Update();
+
+    this->Dataset = this->CacheKeeper->GetOutputDataObject(0);
     }
   else
     {
     this->MergeBlocks->RemoveAllInputs();
+    this->Dataset = vtkSmartPointer<vtkUnstructuredGrid>::New();
     }
 
   return this->Superclass::RequestData(request, inputVector, outputVector);
@@ -351,8 +355,7 @@ int vtkDataLabelRepresentation::ProcessViewRequest(
 
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
-    vtkPVRenderView::SetPiece(inInfo, this, 
-      this->CacheKeeper->GetOutputDataObject(0));
+    vtkPVRenderView::SetPiece(inInfo, this, this->Dataset);
     vtkPVRenderView::SetDeliverToAllProcesses(inInfo, this, true);
     }
   else if (request_type == vtkPVView::REQUEST_RENDER())
