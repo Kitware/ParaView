@@ -495,7 +495,10 @@ QVariant pqSpreadSheetViewModel::data(
         }
       }
     }
-  str.replace(" ", "\t");
+  if (!value.IsString() && !value.IsUnicodeString())
+    {
+    str.replace(" ", "\t");
+    }
   return str;
 }
 
