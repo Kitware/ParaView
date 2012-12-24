@@ -14,8 +14,9 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
     # -------------------------------------------------------------------------
     # For mpich which is not build with fortran some symbols are not found at
     # link time. The following solution prevents this.
-    set(MPI4PY_COMPILE_FLAGS "-D PyMPI_MISSING_MPI_Type_create_f90_integer -D PyMPI_MISSING_MPI_Type_create_f90_real -D PyMPI_MISSING_MPI_Type_create_f90_complex")
-    list(APPEND MPI_COMPILE_FLAGS "${MPI4PY_COMPILE_FLAGS}")
+    add_definitions(-DPyMPI_MISSING_MPI_Type_create_f90_integer
+                    -DPyMPI_MISSING_MPI_Type_create_f90_real
+                    -DPyMPI_MISSING_MPI_Type_create_f90_complex)
 
     # -----------------------------------------------------------------------------
     # Note: In ParaView FindPythonLibs.cmake module is additionally defined in VTK
@@ -93,60 +94,46 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
       SET(mpi4py_pyc ${mpi4py_pyc} "${mpi4py_BINARY_DIR}/${file}c")
       SET(mpi4py_pyo ${mpi4py_pyo} "${mpi4py_BINARY_DIR}/${file}o")
     ENDFOREACH(file)
+    SET(CMAKE_CONFIGURABLE_FILE_CONTENT
+        "from compileall import compile_dir\ncompile_dir(\"${mpi4py_BINARY_DIR}\")")
+    configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+                   "${CMAKE_CURRENT_BINARY_DIR}/compile_py" @ONLY)
+    UNSET(CMAKE_CONFIGURABLE_FILE_CONTENT)
     ADD_CUSTOM_COMMAND(
-      COMMAND ${CMAKE_COMMAND} ARGS -E echo 'from compileall import compile_dir'     > compile_py
-      COMMAND ${CMAKE_COMMAND} ARGS -E echo 'compile_dir(\"${mpi4py_BINARY_DIR}\")' >> compile_py
       COMMAND ${PYTHON_EXECUTABLE} ARGS compile_py
       COMMAND ${PYTHON_EXECUTABLE} ARGS -O compile_py
-      COMMAND ${CMAKE_COMMAND} ARGS -E remove compile_py
-      DEPENDS ${mpi4py_py}
-      OUTPUT  ${mpi4py_pyc} ${mpi4py_pyo}
+      DEPENDS ${mpi4py_py} ${CMAKE_CURRENT_BINARY_DIR}/compile_py
+      OUTPUT  ${mpi4py_pyc} ${mpi4py_pyo} 
       )
     SET(mpi4py_OUTPUT_FILES ${mpi4py_OUTPUT_FILES} ${mpi4py_pyc} ${mpi4py_pyo})
-
-
-    FIND_PROGRAM(MPI_COMPILER_CC
-      NAMES mpicc
-      HINTS "${MPI_BASE_DIR}"
-      PATH_SUFFIXES bin
-      DOC "MPI C compiler wrapper")
-    MARK_AS_ADVANCED(MPI_COMPILER_CC)
-    FIND_PROGRAM(MPI_COMPILER_CXX
-      NAMES mpicxx mpic++ mpiCC
-      HINTS "${MPI_BASE_DIR}"
-      PATH_SUFFIXES bin
-      DOC "MPI C++ compiler wrapper")
-    MARK_AS_ADVANCED(MPI_COMPILER_CXX)
-    find_program(MPI_COMPILER_F77
-      NAMES mpif77
-      HINTS "${MPI_BASE_DIR}"
-      PATH_SUFFIXES bin
-      DOC "MPI F77 compiler wrapper")
-    MARK_AS_ADVANCED(MPI_COMPILER_F77)
-    FIND_PROGRAM(MPI_COMPILER_F90
-      NAMES mpif90
-      HINTS "${MPI_BASE_DIR}"
-      PATH_SUFFIXES bin
-      DOC "MPI F90 compiler wrapper")
-    MARK_AS_ADVANCED(MPI_COMPILER_F90)
+    set (mpicc)
+    set (mpicxx)
+    set (mpif77)
+    set (mpif90)
+    if (MPI_C_FOUND)
+      set (mpicc ${MPI_C_COMPILER})
+    endif()
+    if (MPI_CXX_FOUND)
+      set (mpicxx ${MPI_CXX_COMPILER})
+    endif()
+    # NOTE: We are ignoring the fortran components for now.
     FOREACH(file "mpi.cfg")
       SET(tgt "${mpi4py_BINARY_DIR}/${file}")
-      ADD_CUSTOM_COMMAND(
-        OUTPUT  ${tgt}
-        COMMAND ${CMAKE_COMMAND} ARGS -E echo '[mpi]' > "${tgt}"
-        COMMAND ${CMAKE_COMMAND} ARGS -E echo 'mpicc  = ${MPI_COMPILER_CC}'  >> ${tgt}
-        COMMAND ${CMAKE_COMMAND} ARGS -E echo 'mpicxx = ${MPI_COMPILER_CXX}' >> ${tgt}
-        COMMAND ${CMAKE_COMMAND} ARGS -E echo 'mpif77 = ${MPI_COMPILER_F77}' >> ${tgt}
-        COMMAND ${CMAKE_COMMAND} ARGS -E echo 'mpif90 = ${MPI_COMPILER_F90}' >> ${tgt}
-        COMMENT "write: ${file}"
-        )
+      SET(CMAKE_CONFIGURABLE_FILE_CONTENT "[mpi]
+mpicc  = ${mpicc}
+mpicxx = ${mpicxx}
+mpif77 = ${mpif77}
+mpif90 = ${mpif90}")
+      configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+                     "${tgt}" @ONLY)
+      UNSET(CMAKE_CONFIGURABLE_FILE_CONTENT)
       SET(mpi4py_OUTPUT_FILES ${mpi4py_OUTPUT_FILES} ${tgt})
     ENDFOREACH(file)
 
     ADD_CUSTOM_TARGET(mpi4py ALL DEPENDS ${mpi4py_OUTPUT_FILES})
 
     INCLUDE_DIRECTORIES(
-      ${MPI_INCLUDE_PATH}
+      ${MPI_C_INCLUDE_PATH}
       ${PYTHON_INCLUDE_PATH}
       "${mpi4py_SOURCE_DIR}"
       )
@@ -156,14 +143,14 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
     SET_TARGET_PROPERTIES(
       mpi4py.MPI PROPERTIES
       OUTPUT_NAME "MPI" PREFIX ""
-      COMPILE_FLAGS "${MPI_COMPILE_FLAGS}"
-      LINK_FLAGS "${MPI_LINK_FLAGS}"
+      COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS}"
+      LINK_FLAGS "${MPI_C_LINK_FLAGS}"
       LIBRARY_OUTPUT_DIRECTORY "${mpi4py_BINARY_DIR}"
       RUNTIME_OUTPUT_DIRECTORY "${mpi4py_BINARY_DIR}"
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(mpi4py.MPI ${PYTHON_LIBRARY})
-    TARGET_LINK_LIBRARIES(mpi4py.MPI ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(mpi4py.MPI ${MPI_C_LIBRARIES})
 
 
     # --- mpi4py.MPE ---
@@ -171,15 +158,15 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
     SET_TARGET_PROPERTIES(
       mpi4py.MPE PROPERTIES
       OUTPUT_NAME "MPE" PREFIX ""
-      COMPILE_FLAGS "${MPE_COMPILE_FLAGS}" "${MPI_COMPILE_FLAGS}"
-      LINK_FLAGS "${MPE_LINK_FLAGS}" "${MPI_LINK_FLAGS}"
+      COMPILE_FLAGS "${MPE_COMPILE_FLAGS}" "${MPI_C_COMPILE_FLAGS}"
+      LINK_FLAGS "${MPE_LINK_FLAGS}" "${MPI_C_LINK_FLAGS}"
       LIBRARY_OUTPUT_DIRECTORY ${mpi4py_BINARY_DIR}
       RUNTIME_OUTPUT_DIRECTORY ${mpi4py_BINARY_DIR}
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(mpi4py.MPE ${PYTHON_LIBRARY})
     TARGET_LINK_LIBRARIES(mpi4py.MPE ${MPE_LIBRARY})
-    TARGET_LINK_LIBRARIES(mpi4py.MPE ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(mpi4py.MPE ${MPI_C_LIBRARIES})
 
 
     # --- mpi4py.dl ---
@@ -204,7 +191,7 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(pmpi-mpe ${MPE_LIBRARIES})
-    TARGET_LINK_LIBRARIES(pmpi-mpe ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(pmpi-mpe ${MPI_C_LIBRARIES})
 
     # --- mpi4py/lib-pmpi/libvt.so ---
     ADD_LIBRARY(pmpi-vt MODULE "${mpi4py_SOURCE_DIR}/pmpi-vt.c")
@@ -216,7 +203,7 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(pmpi-vt ${VT_LIBRARIES})
-    TARGET_LINK_LIBRARIES(pmpi-vt ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(pmpi-vt ${MPI_C_LIBRARIES})
 
     # --- mpi4py/lib-pmpi/libvt-mpi.so ---
     ADD_LIBRARY(pmpi-vt-mpi MODULE "${mpi4py_SOURCE_DIR}/pmpi-vt-mpi.c")
@@ -228,7 +215,7 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(pmpi-vt-mpi ${VT_MPI_LIBRARIES})
-    TARGET_LINK_LIBRARIES(pmpi-vt-mpi ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(pmpi-vt-mpi ${MPI_C_LIBRARIES})
 
     # --- mpi4py/lib-pmpi/libvt-hyb.so ---
     ADD_LIBRARY(pmpi-vt-hyb MODULE "${mpi4py_SOURCE_DIR}/pmpi-vt-hyb.c")
@@ -240,7 +227,7 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI AND NOT WIN32)
       LINKER_LANGUAGE C
       )
     TARGET_LINK_LIBRARIES(pmpi-vt-hyb ${VT_HYB_LIBRARIES})
-    TARGET_LINK_LIBRARIES(pmpi-vt-hyb ${MPI_LIBRARIES})
+    TARGET_LINK_LIBRARIES(pmpi-vt-hyb ${MPI_C_LIBRARIES})
 
     # -----------------------------------------------------------------------------
     # Install the paraview module files.
