@@ -28,6 +28,7 @@
 #include "vtkPoints.h"
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPythonProgrammableFilter.h"
+#include "vtkSignedCharArray.h"
 #include "vtkTable.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
@@ -43,8 +44,9 @@ vtkStandardNewMacro(vtkPythonExtractSelection);
 //----------------------------------------------------------------------------
 vtkPythonExtractSelection::vtkPythonExtractSelection()
 {
+  this->PreserveTopology = 0;
   this->SetExecuteMethod(vtkPythonExtractSelection::ExecuteScript, this);
-  
+
   // eventually, once this class starts taking in a real vtkSelection.
   this->SetNumberOfInputPorts(2);
 }
@@ -77,8 +79,8 @@ int vtkPythonExtractSelection::FillInputPortInformation(int port, vtkInformation
 
 //----------------------------------------------------------------------------
 int vtkPythonExtractSelection::RequestDataObject(
-  vtkInformation* vtkNotUsed(request), 
-  vtkInformationVector** inputVector , 
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   // Output type is same as input
@@ -100,7 +102,7 @@ int vtkPythonExtractSelection::RequestDataObject(
       {
       vtkInformation* info = outputVector->GetInformationObject(i);
       vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
-      
+
       if (!output || !output->IsA(outputType))
         {
         vtkDataObject* newOutput =
@@ -133,9 +135,9 @@ void vtkPythonExtractSelection::Exec()
 {
   // Set self to point to this
   char addrofthis[1024];
-  sprintf(addrofthis, "%p", this);    
-  char *aplus = addrofthis; 
-  if ((addrofthis[0] == '0') && 
+  sprintf(addrofthis, "%p", this);
+  char *aplus = addrofthis;
+  if ((addrofthis[0] == '0') &&
       ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
     {
     aplus += 2; //skip over "0x"
@@ -177,7 +179,7 @@ vtkDataObject* vtkPythonExtractSelection::ExtractElements(
     {
     return this->ExtractElements(table, mask);
     }
-  
+
   return NULL;
 }
 
@@ -189,55 +191,72 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractPoints(
     input->GetNumberOfPoints());
   vtkIdType numPoints = input->GetNumberOfPoints();
 
-  vtkPoints *outputPoints = vtkPoints::New();
-  outputPoints->Allocate(numPoints);
-
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
-  output->SetPoints(outputPoints);
-  output->Allocate(1);
-  outputPoints->FastDelete();
-
   vtkDataSetAttributes* inputPD = input->GetPointData();
   vtkDataSetAttributes* outputPD = output->GetPointData();
 
-  outputPD->SetCopyGlobalIds(1);
-  outputPD->SetCopyPedigreeIds(1);
-  outputPD->CopyAllocate(inputPD, numPoints);
-
-  vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
-  originalIds->SetName("vtkOriginalPointIds");
-  originalIds->Allocate(numPoints);
-
-  const char* pmask = mask->GetPointer(0);
-
-  std::vector<vtkIdType> pointIds;
-  for (vtkIdType id = 0; id < numPoints; ++id)
+  if (this->PreserveTopology)
     {
-    if (pmask[id] == 0)
+    // TODO: Determine whether either numpy_to_vtk can return a
+    //   vtkSignedCharArray in a backwards-compatible manner (unlikely)
+    //   or the vtkPVExtractSelection and vtkExtractSelection filters
+    //   can use a vtkCharArray instead of a vtkSignedCharArray (more
+    //   likely possible). That would save us a deep copy here.
+    output->ShallowCopy(input);
+    vtkSignedCharArray* inside = vtkSignedCharArray::New();
+    inside->DeepCopy(mask);
+    inside->SetName("vtkInsidedness");
+    outputPD->AddArray(inside);
+    inside->FastDelete();
+    }
+  else
+    {
+    vtkPoints* outputPoints = vtkPoints::New();
+    outputPoints->Allocate(numPoints);
+
+    output->SetPoints(outputPoints);
+    output->Allocate(1);
+    outputPoints->FastDelete();
+
+    outputPD->SetCopyGlobalIds(1);
+    outputPD->SetCopyPedigreeIds(1);
+    outputPD->CopyAllocate(inputPD, numPoints);
+
+    vtkIdTypeArray* originalIds = vtkIdTypeArray::New();
+    originalIds->SetName("vtkOriginalPointIds");
+    originalIds->Allocate(numPoints);
+
+    const char* pmask = mask->GetPointer(0);
+
+    std::vector<vtkIdType> pointIds;
+    for (vtkIdType id = 0; id < numPoints; ++id)
       {
-      continue;
+      if (pmask[id] == 0)
+        {
+        continue;
+        }
+
+      vtkIdType newId = outputPoints->InsertNextPoint(input->GetPoint(id));
+      outputPD->CopyData(inputPD, id, newId);
+      pointIds.push_back(newId);
+      originalIds->InsertValue(newId, id);
       }
 
-    vtkIdType newId = outputPoints->InsertNextPoint(input->GetPoint(id));
-    outputPD->CopyData(inputPD, id, newId);
-    pointIds.push_back(newId);
-    originalIds->InsertValue(newId, id);
+    if(!pointIds.empty())
+      {
+      output->InsertNextCell(VTK_POLY_VERTEX,
+        static_cast<vtkIdType>(pointIds.size()), &pointIds[0]);
+      }
+
+    outputPD->AddArray(originalIds);
+    // unmark global and pedigree ids.
+    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
+
+    originalIds->FastDelete();
+
+    output->Squeeze();
     }
-
-  if(!pointIds.empty())
-    {
-    output->InsertNextCell(VTK_POLY_VERTEX,
-                           static_cast<vtkIdType>(pointIds.size()), &pointIds[0]);
-    }
-
-  outputPD->AddArray(originalIds);
-  // unmark global and pedigree ids.
-  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-
-  originalIds->FastDelete();
-
-  output->Squeeze();
   return output;
 }
 
@@ -248,108 +267,125 @@ vtkUnstructuredGrid* vtkPythonExtractSelection::ExtractCells(
   assert(mask && input && mask->GetNumberOfTuples() ==
     input->GetNumberOfCells());
 
-  vtkIdType numCells = input->GetNumberOfCells();
-  vtkIdType numPoints = input->GetNumberOfPoints();
-
-  vtkPoints *outputPoints = vtkPoints::New();
-  outputPoints->Allocate(numPoints);
-
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::New();
-  output->SetPoints(outputPoints);
-  output->Allocate(numCells);
-  outputPoints->FastDelete();
+  vtkCellData* inputCD = input->GetCellData();
+  vtkCellData* outputCD = output->GetCellData();
 
-  vtkPointData *inputPD = input->GetPointData();
-  vtkPointData *outputPD = output->GetPointData();
-  vtkCellData *inputCD = input->GetCellData();
-  vtkCellData *outputCD = output->GetCellData();
-
-  outputCD->SetCopyGlobalIds(1);
-  outputPD->SetCopyGlobalIds(1);
-  outputCD->SetCopyPedigreeIds(1);
-  outputPD->SetCopyPedigreeIds(1);
-  outputCD->CopyAllocate(inputCD);
-  outputPD->CopyAllocate(inputPD);
-
-  vtkIdTypeArray* originalPointIds = vtkIdTypeArray::New();
-  originalPointIds->SetName("vtkOriginalPointIds");
-  originalPointIds->Allocate(numPoints);
-
-  vtkIdTypeArray* originalCellIds = vtkIdTypeArray::New();
-  originalCellIds->SetName("vtkOriginalCellIds");
-  originalCellIds->Allocate(numCells);
-
-  std::map<vtkIdType, vtkIdType> outPointIdMap;
-  const char* pmask = mask->GetPointer(0);
-
-  for (vtkIdType inCellId = 0; inCellId < numCells; inCellId++)
+  if (this->PreserveTopology)
     {
-    if (pmask[inCellId] == 0)
-      {
-      continue;
-      }
-
-    vtkCell *cell = input->GetCell(inCellId);
-
-    std::vector<vtkIdType> outPointsInCell;
-
-    // insert points from the cell
-    for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); j++)
-      {
-      vtkIdType inPointId = cell->GetPointId(j);
-
-      vtkIdType outPointId = -1;
-
-      std::map<vtkIdType, vtkIdType>::iterator iter =
-        outPointIdMap.find(inPointId);
-      if (iter == outPointIdMap.end())
-        {
-        // insert copy of the old point
-        outPointId = outputPoints->InsertNextPoint(input->GetPoint(inPointId));
-
-        // copy old point data
-        outputPD->CopyData(inputPD, inPointId, outPointId);
-
-        // add point id to the mapping
-        outPointIdMap[inPointId] = outPointId;
-
-        // add old point id to original point ids
-        originalPointIds->InsertNextValue(inPointId);
-        }
-      else
-        {
-        // already added the point, use its new id
-        outPointId = iter->second;
-        }
-
-      // add point id
-      outPointsInCell.push_back(outPointId);
-      }
-
-    // add new cell
-    vtkIdType outCellId = output->InsertNextCell(cell->GetCellType(),
-      static_cast<vtkIdType>(outPointsInCell.size()),
-      outPointsInCell.size() > 0? &outPointsInCell[0] : NULL);
-
-    // copy cell data
-    outputCD->CopyData(inputCD, inCellId, outCellId);
-
-    originalCellIds->InsertNextValue(inCellId);
+    // TODO: Determine whether either numpy_to_vtk can return a
+    //   vtkSignedCharArray in a backwards-compatible manner (unlikely)
+    //   or the vtkPVExtractSelection and vtkExtractSelection filters
+    //   can use a vtkCharArray instead of a vtkSignedCharArray (more
+    //   likely possible). That would save us a deep copy here.
+    output->ShallowCopy(input);
+    vtkSignedCharArray* inside = vtkSignedCharArray::New();
+    inside->DeepCopy(mask);
+    inside->SetName("vtkInsidedness");
+    outputCD->AddArray(inside);
+    inside->FastDelete();
     }
+  else
+    {
+    vtkIdType numCells = input->GetNumberOfCells();
+    vtkIdType numPoints = input->GetNumberOfPoints();
 
-  outputPD->AddArray(originalPointIds);
-  // unmark global and pedigree ids.
-  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-  outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-  originalPointIds->FastDelete();
+    vtkPoints* outputPoints = vtkPoints::New();
+    outputPoints->Allocate(numPoints);
 
-  outputCD->AddArray(originalCellIds);
-  // unmark global and pedigree ids.
-  outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
-  outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
-  originalCellIds->FastDelete();
-  output->Squeeze();
+    output->SetPoints(outputPoints);
+    output->Allocate(numCells);
+    outputPoints->FastDelete();
 
+    vtkPointData *inputPD = input->GetPointData();
+    vtkPointData *outputPD = output->GetPointData();
+
+    outputCD->SetCopyGlobalIds(1);
+    outputPD->SetCopyGlobalIds(1);
+    outputCD->SetCopyPedigreeIds(1);
+    outputPD->SetCopyPedigreeIds(1);
+    outputCD->CopyAllocate(inputCD);
+    outputPD->CopyAllocate(inputPD);
+
+    vtkIdTypeArray* originalPointIds = vtkIdTypeArray::New();
+    originalPointIds->SetName("vtkOriginalPointIds");
+    originalPointIds->Allocate(numPoints);
+
+    vtkIdTypeArray* originalCellIds = vtkIdTypeArray::New();
+    originalCellIds->SetName("vtkOriginalCellIds");
+    originalCellIds->Allocate(numCells);
+
+    std::map<vtkIdType, vtkIdType> outPointIdMap;
+    const char* pmask = mask->GetPointer(0);
+
+    for (vtkIdType inCellId = 0; inCellId < numCells; inCellId++)
+      {
+      if (pmask[inCellId] == 0)
+        {
+        continue;
+        }
+
+      vtkCell *cell = input->GetCell(inCellId);
+
+      std::vector<vtkIdType> outPointsInCell;
+
+      // insert points from the cell
+      for (vtkIdType j = 0; j < cell->GetNumberOfPoints(); j++)
+        {
+        vtkIdType inPointId = cell->GetPointId(j);
+
+        vtkIdType outPointId = -1;
+
+        std::map<vtkIdType, vtkIdType>::iterator iter =
+          outPointIdMap.find(inPointId);
+        if (iter == outPointIdMap.end())
+          {
+          // insert copy of the old point
+          outPointId = outputPoints->InsertNextPoint(input->GetPoint(inPointId));
+
+          // copy old point data
+          outputPD->CopyData(inputPD, inPointId, outPointId);
+
+          // add point id to the mapping
+          outPointIdMap[inPointId] = outPointId;
+
+          // add old point id to original point ids
+          originalPointIds->InsertNextValue(inPointId);
+          }
+        else
+          {
+          // already added the point, use its new id
+          outPointId = iter->second;
+          }
+
+        // add point id
+        outPointsInCell.push_back(outPointId);
+        }
+
+      // add new cell
+      vtkIdType outCellId = output->InsertNextCell(cell->GetCellType(),
+        static_cast<vtkIdType>(outPointsInCell.size()),
+        outPointsInCell.size() > 0? &outPointsInCell[0] : NULL);
+
+      // copy cell data
+      outputCD->CopyData(inputCD, inCellId, outCellId);
+
+      originalCellIds->InsertNextValue(inCellId);
+      }
+
+    outputPD->AddArray(originalPointIds);
+    // unmark global and pedigree ids.
+    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+    outputPD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
+    originalPointIds->FastDelete();
+
+    outputCD->AddArray(originalCellIds);
+    // unmark global and pedigree ids.
+    outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::GLOBALIDS);
+    outputCD->SetActiveAttribute(-1, vtkDataSetAttributes::PEDIGREEIDS);
+    originalCellIds->FastDelete();
+    output->Squeeze();
+    }
 
   return output;
 }
