@@ -429,6 +429,16 @@ QVariant pqSpreadSheetViewModel::data(
       QItemSelectionModel::Select|QItemSelectionModel::Rows);
     }
 
+  if (value.IsVTKObject() && !value.IsArray())
+    {
+    vtkObjectBase* obj = value.ToVTKObject();
+    if (obj)
+      {
+      return QString("(%1)").arg(obj->GetClassName());
+      }
+    return QString("(null)");
+    }
+
   QString str = value.ToString().c_str();
   if (value.IsChar() || value.IsUnsignedChar() || value.IsSignedChar())
     {
@@ -495,7 +505,10 @@ QVariant pqSpreadSheetViewModel::data(
         }
       }
     }
-  str.replace(" ", "\t");
+  if (!value.IsString() && !value.IsUnicodeString())
+    {
+    str.replace(" ", "\t");
+    }
   return str;
 }
 
