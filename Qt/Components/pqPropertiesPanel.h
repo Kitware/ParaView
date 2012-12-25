@@ -164,7 +164,7 @@ private:
   QList<pqPropertiesPanelItem> createWidgetsForProxy(pqProxy *proxy);
 
   /// Returns \c true if \p item should be visible.
-  bool isPanelItemVisible(const pqPropertiesPanelItem &item) const;
+  bool isPanelItemVisible(const pqPropertiesPanelItem &item, bool show_advanced) const;
 
   /// Update information properties and domains.
   void updateInformationAndDomains();

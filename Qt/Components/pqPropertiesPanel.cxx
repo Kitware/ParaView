@@ -1021,12 +1021,16 @@ void pqPropertiesPanel::searchTextChanged(const QString &string)
     }
 
   QList<pqPropertiesPanelItem> representationItems = this->RepresentationPropertyItems;
+  bool inAdvancedMode = this->Ui->AdvancedButton->isChecked();
 
   foreach(const pqPropertiesPanelItem &item, proxyItems + representationItems)
     {
-    bool visible = isPanelItemVisible(item);
+    // BUG #0013753. We want to show all properties when searching irrespective
+    // of the state of the advanced button.
+    bool visible = this->isPanelItemVisible(item,
+      (string.isEmpty()? inAdvancedMode : true));
 
-    if(visible)
+    if (visible && !string.isEmpty())
       {
       visible = item.Name.contains(string, Qt::CaseInsensitive);
       }
@@ -1038,6 +1042,11 @@ void pqPropertiesPanel::searchTextChanged(const QString &string)
 
     item.PropertyWidget->setVisible(visible);
     }
+
+  // We don't allow the user's to change the "advanced" mode while searching.
+  // Since when we are searching all properties are shown, it doesn't make much
+  // sense.
+  this->Ui->AdvancedButton->setEnabled(string.isEmpty());
 }
 
 void pqPropertiesPanel::clearSearchText ()
@@ -1055,11 +1064,13 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
     proxyItems = panel->propertyWidgetItems();
     }
 
+  bool inAdvancedMode = this->Ui->AdvancedButton->isChecked();
+
   QList<pqPropertiesPanelItem> representationItems = this->RepresentationPropertyItems;
 
   foreach(const pqPropertiesPanelItem &item, proxyItems + representationItems)
     {
-    bool visible = isPanelItemVisible(item);
+    bool visible = this->isPanelItemVisible(item, inAdvancedMode);
 
     if(item.LabelWidget)
       {
@@ -1068,9 +1079,6 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
 
     item.PropertyWidget->setVisible(visible);
     }
-
-  // update the search results
-  searchTextChanged(this->Ui->SearchLineEdit->text());
 }
 
 void pqPropertiesPanel::representationPropertyChanged(vtkObject *object, unsigned long event_, void *data_)
@@ -1301,28 +1309,32 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
   return widgets;
 }
 
-bool pqPropertiesPanel::isPanelItemVisible(const pqPropertiesPanelItem &item) const
+bool pqPropertiesPanel::isPanelItemVisible(
+  const pqPropertiesPanelItem &item, bool show_advanced) const
 {
-  bool inAdvancedMode = this->Ui->AdvancedButton->isChecked();
-
-  if(item.IsAdvanced)
+  if (item.IsAdvanced)
     {
-    // check for representation type
-    if(this->Representation && !item.DefaultVisibilityForRepresentations.isEmpty())
+    if (!show_advanced)
       {
-      const char *currentRepresentationName =
-        vtkSMPropertyHelper(this->Representation->getProxy(), "Representation").GetAsString();
+      // some advanced properties may be shown in non-advanced views as well under
+      // certain conditions. Check for those here.
 
-      if(currentRepresentationName &&
-         item.DefaultVisibilityForRepresentations.contains(
-           currentRepresentationName, Qt::CaseInsensitive))
+      // check for representation type
+      if(this->Representation && !item.DefaultVisibilityForRepresentations.isEmpty())
         {
-        return true;
+        const char *currentRepresentationName =
+          vtkSMPropertyHelper(this->Representation->getProxy(), "Representation").GetAsString();
+
+        if(currentRepresentationName &&
+          item.DefaultVisibilityForRepresentations.contains(
+            currentRepresentationName, Qt::CaseInsensitive))
+          {
+          return true;
+          }
         }
       }
-
     // return true if in advanced mode
-    return inAdvancedMode;
+    return show_advanced;
     }
   else
     {
