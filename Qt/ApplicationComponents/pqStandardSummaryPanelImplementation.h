@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqStandardSummaryPanelImplementation_h
 
 #include "pqSummaryPanelInterface.h"
+#include "pqApplicationComponentsModule.h" // needed for export macros
 
-class pqStandardSummaryPanelImplementation : public QObject, public pqSummaryPanelInterface
+class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardSummaryPanelImplementation :
+  public QObject, public pqSummaryPanelInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqSummaryPanelInterface)
