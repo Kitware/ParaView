@@ -73,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyPropertiesPanel.h"
 #include "pqObjectPanelInterface.h"
 #include "pqProxySelectionWidget.h"
+#include "pqCommandPropertyWidget.h"
 #include "pq3DWidgetPropertyWidget.h"
 #include "pqPropertyWidgetInterface.h"
 #include "pqObjectPanelPropertyWidget.h"
@@ -464,6 +465,10 @@ pqPropertyWidget* pqPropertiesPanel::createWidgetForProperty(vtkSMProperty *prop
       {
       return new pqProxyPropertyWidget(pp, proxy, parent);
       }
+    }
+  else if (property && strcmp(property->GetClassName(), "vtkSMProperty") == 0)
+    {
+    return new pqCommandPropertyWidget(property, proxy, parent);
     }
 
   return 0;

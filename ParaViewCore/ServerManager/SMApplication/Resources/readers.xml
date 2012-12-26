@@ -1445,7 +1445,6 @@
         is on.</Documentation>
       </IntVectorProperty>
       <Property command="UpdateTimeInformation"
-                is_internal="1"
                 name="Refresh">
         <Documentation>Read in additional time steps that have been written to
         the file since it was first opened in ParaView. Useful for monitoring a
@@ -2156,10 +2155,6 @@
         containing part and material descriptions and a mapping to element
         blocks.</Documentation>
       </StringVectorProperty>
-      <Hints>
-        <Property name="Refresh"
-                  show="0" />
-      </Hints>
       <!-- End ExodusIIReaderCore -->
     </SourceProxy>
     <SourceProxy class="vtkTecplotReader"
@@ -5257,10 +5252,6 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <!-- This property is here simply to set it. -->
-        <!-- This is for special GUI control. -->
-        <Property name="Refresh"
-                  show="0" />
         <ReaderFactory extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
                        file_description="ExodusII"
                        filename_patterns="*e-s*" />
@@ -5398,9 +5389,6 @@
         <TimeStepsInformationHelper />
       </DoubleVectorProperty>
       <Hints>
-        <!-- This is for special GUI control. -->
-        <Property name="Refresh"
-                  show="0" />
         <ReaderFactory extensions="ex-timeseries"
                        file_description="Metafile for restarted exodus outputs" />
       </Hints>
@@ -5574,7 +5562,6 @@
       </StringVectorProperty>
       <Property animateable="0"
                 command="SetRefresh"
-                is_internal="1"
                 name="Refresh">
         <Documentation>Refresh time information and selection list metadata.
         Useful when watching a running simulation.</Documentation>
@@ -5746,8 +5733,6 @@
       <Hints>
         <ReaderFactory extensions="foam"
                        file_description="OpenFOAM" />
-        <Property name="Refresh"
-                  show="0" />
       </Hints>
     </SourceProxy>
     <!-- End of OpenFOAM Reader -->
