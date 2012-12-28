@@ -130,13 +130,13 @@ if(WIN32 OR WIN64)
        INSTALL_COMMAND ""
     )
 
-    # Setup Windows specific path
-    set(PV_NIGHTLY_PARAVIEW "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/paraview.exe")
-    set(PV_NIGHTLY_PVPYTHON "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvpython.exe")
-    set(PV_NIGHTLY_PVSERVER "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvserver.exe")
-    set(PV_NIGHTLY_PVBATCH  "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvbatch.exe")
-    set(PV_NIGHTLY_PVBLOT   "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvblot.exe")
-    set(PV_NIGHTLY_PVDATASERVER   "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvdataserver.exe")
-    set(PV_NIGHTLY_PVRENDERSERVER "${CMAKE_CURRENT_BINARY_DIR}/ParaViewNightly/bin/pvrenderserver.exe")
+    # Setup Unix specific path
+    set(PV_NIGHTLY_PARAVIEW "")
+    set(PV_NIGHTLY_PVPYTHON "")
+    set(PV_NIGHTLY_PVSERVER "")
+    set(PV_NIGHTLY_PVBATCH  "")
+    set(PV_NIGHTLY_PVBLOT   "")
+    set(PV_NIGHTLY_PVDATASERVER   "")
+    set(PV_NIGHTLY_PVRENDERSERVER "")
 
 endif()
