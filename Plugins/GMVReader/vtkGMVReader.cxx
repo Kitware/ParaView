@@ -25,7 +25,8 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkLongArray.h"
+#include "vtkTypeInt32Array.h"
+#include "vtkTypeInt64Array.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -232,7 +233,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
   vtkFloatArray *coords;
   vtkIdType *nodeIds;
   vtkIdType list[8];
-  vtkLongArray *polygonMaterials;
+  vtkTypeInt64Array *polygonMaterials;
   vtkPoints *points;
   vtkPoints *polygonPoints;
   vtkPolyData* pd;
@@ -667,7 +668,10 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
       case (MATERIAL):
         switch(GMVRead::gmv_data.datatype)
           {
-          vtkLongArray *materials;
+          // GMV file format documentation, page 91, states:
+          // Only up to 1000 materials supported. (The GMV binary sets materials > 1000 to mod 1000.)
+          // So, vtkTypeInt32Array is sufficient.
+          vtkTypeInt32Array *materials;
 
           case (NODE):
             // Find out whether material property has been selected for reading
@@ -684,12 +688,13 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
 
             if (posInDataArray >= 0 && this->PointDataArraySelection->GetArraySetting(posInDataArray))
               {
-              materials = vtkLongArray::New();
+              materials = vtkTypeInt32Array::New();
               materials->SetNumberOfComponents(1);
               materials->SetNumberOfTuples(this->NumberOfNodes);
               materials->SetName("material id");
               for (unsigned long int i=0; i < this->NumberOfNodes; ++i)
-                materials->SetComponent(i, 0, long(GMVRead::gmv_data.longdata1[i]));
+                // The GMV binary sets materials > 1000 to mod 1000.
+                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % 1000));
               this->Mesh->GetPointData()->AddArray(materials);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
@@ -715,12 +720,13 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
 
             if (posInDataArray >= 0 && this->CellDataArraySelection->GetArraySetting(posInDataArray))
               {
-              materials = vtkLongArray::New();
+              materials = vtkTypeInt32Array::New();
               materials->SetNumberOfComponents(1);
               materials->SetNumberOfTuples(this->NumberOfCells);
               materials->SetName("material id");
               for (unsigned long int i = 0; i < this->NumberOfCells; ++i)
-                materials->SetComponent(i, 0, long(GMVRead::gmv_data.longdata1[i]));
+                // The GMV binary sets materials > 1000 to mod 1000.
+                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % 1000));
               this->Mesh->GetCellData()->AddArray(materials);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
@@ -1223,7 +1229,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
             if (polygonMaterialPosInDataArray >= 0 &&
                 this->CellDataArraySelection->GetArraySetting(polygonMaterialPosInDataArray))
               {
-              polygonMaterials = vtkLongArray::New();
+              polygonMaterials = vtkTypeInt64Array::New();
               polygonMaterials->SetNumberOfComponents(1);
               polygonMaterials->SetNumberOfTuples(this->NumberOfPolygons);
               polygonMaterials->SetName("material id");
@@ -1263,7 +1269,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                               << "  material #" << GMVRead::gmv_data.num
                               << "  total polygon #" << this->NumberOfPolygons);
                 polygonMaterials->SetComponent(polygonCells->GetNumberOfCells() - 1,
-                                               0, GMVRead::gmv_data.num);
+                                               0, vtkTypeInt64(GMVRead::gmv_data.num));
                 }
 
               break;
@@ -1441,14 +1447,14 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
           if (posInDataArray >= 0 &&
               this->PointDataArraySelection->GetArraySetting(posInDataArray))
             {
-            vtkLongArray *tracerIds = vtkLongArray::New();
+            vtkTypeInt64Array *tracerIds = vtkTypeInt64Array::New();
             tracerIds->SetNumberOfComponents(1);
             tracerIds->SetNumberOfTuples(this->NumberOfTracers);
             tracerIds->SetName("tracer id");
 
             for (unsigned long int i = 0; i < this->NumberOfTracers; i++)
               {
-              tracerIds->SetComponent(i, 0, GMVRead::gmv_data.longdata1[i]);
+              tracerIds->SetComponent(i, 0, vtkTypeInt64(GMVRead::gmv_data.longdata1[i]));
               }
 
             this->Tracers->GetPointData()->AddArray(tracerIds);
@@ -1521,7 +1527,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
       case (NODEIDS):
         switch(GMVRead::gmv_data.datatype)
           {
-          vtkLongArray *nodeids;
+          vtkTypeInt64Array *nodeids;
 
           case (REGULAR):
             // Find out whether this variable has been selected for reading
@@ -1538,12 +1544,12 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
 
             if (posInDataArray >= 0 && this->PointDataArraySelection->GetArraySetting(posInDataArray))
               {
-              nodeids = vtkLongArray::New();
+              nodeids = vtkTypeInt64Array::New();
               nodeids->SetNumberOfComponents(1);
               nodeids->SetNumberOfTuples(this->NumberOfNodes);
               nodeids->SetName("Point IDs (Alternate)");
               for (unsigned long int i = 0; i < this->NumberOfNodes; ++i)
-                nodeids->SetComponent(i, 0, long(GMVRead::gmv_data.longdata1[i]));
+                nodeids->SetComponent(i, 0, vtkTypeInt64(GMVRead::gmv_data.longdata1[i]));
               this->Mesh->GetPointData()->AddArray(nodeids);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
@@ -1561,7 +1567,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
       case (CELLIDS):
         switch(GMVRead::gmv_data.datatype)
           {
-          vtkLongArray *cellids;
+          vtkTypeInt64Array *cellids;
 
           case (REGULAR):
             // Find out whether this variable has been selected for reading
@@ -1578,12 +1584,12 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
 
             if (posInDataArray >= 0 && this->CellDataArraySelection->GetArraySetting(posInDataArray))
               {
-              cellids = vtkLongArray::New();
+              cellids = vtkTypeInt64Array::New();
               cellids->SetNumberOfComponents(1);
               cellids->SetNumberOfTuples(this->NumberOfCells);
               cellids->SetName("Cell IDs (Alternate)");
               for (unsigned long int i = 0; i < this->NumberOfCells; ++i)
-                cellids->SetComponent(i, 0, long(GMVRead::gmv_data.longdata1[i]));
+                cellids->SetComponent(i, 0, vtkTypeInt64(GMVRead::gmv_data.longdata1[i]));
               this->Mesh->GetCellData()->AddArray(cellids);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
