@@ -429,11 +429,9 @@ void vtkMantaPolyDataMapper::DrawPolygons(vtkPolyData *polys,
       }
     //cerr << "polygons: # of triangles = " << total_triangles << endl;
 
-    // TODO: memory leak, wald_triangle is not deleted
-    Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
     for ( int i = 0; i < total_triangles; i ++ )
       {
-      mesh->addTriangle( &wald_triangle[i] );
+      mesh->addTriangle( new Manta::WaldTriangle );
       }
     }//VTK_SURFACE
     break;
@@ -650,11 +648,9 @@ void vtkMantaPolyDataMapper::DrawTStrips(vtkPolyData *polys,
     
     //cerr << "strips: # of triangles = " << total_triangles << endl;
     
-    // TODO: memory leak, wald_triangle is not deleted
-    Manta::WaldTriangle *wald_triangle = new Manta::WaldTriangle[total_triangles];
     for ( int i = 0; i < total_triangles; i++ )
       {
-      mesh->addTriangle( &wald_triangle[i] );
+      mesh->addTriangle( new Manta::WaldTriangle );
       }
     }
   }
