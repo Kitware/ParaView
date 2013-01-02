@@ -429,6 +429,7 @@ else()
     ParaViewCore/ServerManager/Core
     ParaViewCore/ServerManager/Rendering
     ParaViewCore/ServerManager/Default
+    ParaViewCore/ServerManager/ParaViewWeb
     ParaViewCore/ServerManager/SMApplication
 
     Qt/Widgets
