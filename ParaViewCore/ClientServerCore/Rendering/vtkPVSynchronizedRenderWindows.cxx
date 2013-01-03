@@ -1141,7 +1141,7 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
           if (geometry[0] <= 0 && geometry[1] <= 0 && geometry[2] <= 0 &&
               geometry[4] <= 0)
             {
-            geometry == NULL;
+            geometry = NULL;
             }
           }
         // Preserve old behavior if no geometry defined.
