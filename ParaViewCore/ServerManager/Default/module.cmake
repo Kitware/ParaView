@@ -4,7 +4,7 @@ if (PARAVIEW_USE_MPI)
     )
 endif()
 
-if (PARAVIEW_USE_MATPLOTLIB)
+if (PARAVIEW_ENABLE_PYTHON)
   list(APPEND extra_depends vtkRenderingMatplotlib)
 endif()
 
