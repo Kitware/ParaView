@@ -1130,13 +1130,39 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
         }
       else if (in_cave_mode)
         {
-        if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+        // Check if a custom window geometry was requested
+        int *geometry = NULL;
+        if (this->ParallelController)
           {
-          this->Internals->SharedRenderWindow->SetSize(400, 400);
+          int idx = this->ParallelController->GetLocalProcessId();
+          geometry = this->Session->GetServerInformation()->GetGeometry(idx);
+          // If the geometry has not been defined, it will be 0 0 0 0. Unset the
+          // geometry pointer in this case.
+          if (geometry[0] <= 0 && geometry[1] <= 0 && geometry[2] <= 0 &&
+              geometry[4] <= 0)
+            {
+            geometry == NULL;
+            }
+          }
+        // Preserve old behavior if no geometry defined.
+        if (!geometry)
+          {
+          if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
+            {
+            this->Internals->SharedRenderWindow->SetSize(400, 400);
+            }
+          else
+            {
+            this->Internals->SharedRenderWindow->SetFullScreen(1);
+            }
           }
         else
           {
-          this->Internals->SharedRenderWindow->SetFullScreen(1);
+          // Use the specified geometry
+          this->Internals->SharedRenderWindow->SetPosition(geometry[0],
+                                                           geometry[1]);
+          this->Internals->SharedRenderWindow->SetSize(geometry[2],
+                                                       geometry[3]);
           }
         }
       else

@@ -45,6 +45,7 @@ public:
   unsigned int GetNumberOfMachines();
   const char* GetMachineName(unsigned int idx);
   const char* GetDisplayName(unsigned int idx);
+  int* GetGeometry(unsigned int idx);
   double* GetLowerLeft(unsigned int idx);
   double* GetLowerRight(unsigned int idx);
   double* GetUpperRight(unsigned int idx);

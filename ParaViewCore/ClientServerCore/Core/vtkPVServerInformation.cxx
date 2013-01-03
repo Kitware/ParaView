@@ -110,6 +110,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
   for (idx = 0; idx < info->GetNumberOfMachines(); idx++)
     {
     this->SetEnvironment(idx, info->GetEnvironment(idx));
+    this->SetGeometry(idx, info->GetGeometry(idx));
     this->SetLowerLeft(idx, info->GetLowerLeft(idx));
     this->SetLowerRight(idx, info->GetLowerRight(idx));
     this->SetUpperRight(idx, info->GetUpperRight(idx));
@@ -150,6 +151,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
     for (idx = 0; idx < serverOptions->GetNumberOfMachines(); idx++)
       {
       this->SetEnvironment(idx, serverOptions->GetDisplayName(idx));
+      this->SetGeometry(idx, serverOptions->GetGeometry(idx));
       this->SetLowerLeft(idx, serverOptions->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
       this->SetUpperRight(idx, serverOptions->GetUpperRight(idx));
@@ -220,6 +222,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     for (idx = 0; idx < serverInfo->GetNumberOfMachines(); idx++)
       {
       this->SetEnvironment(idx, serverInfo->GetEnvironment(idx));
+      this->SetGeometry(idx, serverInfo->GetGeometry(idx));
       this->SetLowerLeft(idx, serverInfo->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
       this->SetUpperRight(idx, serverInfo->GetUpperRight(idx));
@@ -261,6 +264,8 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   for (idx = 0; idx < this->GetNumberOfMachines(); idx++)
     {
     *css << this->GetEnvironment(idx);
+    *css << this->GetGeometry(idx)[0] << this->GetGeometry(idx)[1]
+         << this->GetGeometry(idx)[2] << this->GetGeometry(idx)[3];
     *css << this->GetLowerLeft(idx)[0] << this->GetLowerLeft(idx)[1]
          << this->GetLowerLeft(idx)[2];
     *css << this->GetLowerRight(idx)[0] << this->GetLowerRight(idx)[1]
@@ -343,39 +348,55 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   this->SetNumberOfMachines(numMachines);
   unsigned int idx;
   const char* env;
+  int machineOffset = 13;
+  int valuesPerMachine = 14;
   for (idx = 0; idx < numMachines; idx++)
     {
-    if (!css->GetArgument(0, 13 + idx*10, &env))
+    int machineIndex = machineOffset + idx * valuesPerMachine;
+    int currentValueOffset = 0;
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++, &env))
       {
       vtkErrorMacro("Error parsing display environment from message.");
       return;
       }
     this->MachinesInternals->MachineInformationVector[idx].Environment = env;
-    if (!css->GetArgument(0, 14 + idx*10,
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].Geometry[0]) ||
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].Geometry[1]) ||
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].Geometry[2]) ||
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].Geometry[3]))
+      {
+      vtkErrorMacro("Error parsing window geometry from message.");
+      return;
+      }
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0]) ||
-        !css->GetArgument(0, 15 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
-        !css->GetArgument(0, 16 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2]))
       {
       vtkErrorMacro("Error parsing lower left coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 17 + idx*10,
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[0]) ||
-        !css->GetArgument(0, 18 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
-        !css->GetArgument(0, 19 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[2]))
       {
       vtkErrorMacro("Error parsing lower right coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 20 + idx*10,
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperRight[0]) ||
-        !css->GetArgument(0, 21 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperRight[1]) ||
-        !css->GetArgument(0, 22 + idx*10,
+        !css->GetArgument(0, machineIndex + currentValueOffset++,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperRight[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");
@@ -383,19 +404,20 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
       }
     }
   double eyeSeparation;
-  if (!css->GetArgument(0, 23 + (numMachines-1)*10, &eyeSeparation))
+  int epilogueOffset = machineOffset + numMachines * valuesPerMachine;
+  if (!css->GetArgument(0, epilogueOffset, &eyeSeparation))
     {
     vtkErrorMacro("Error parsing eye-separations from message.");
     return;
     }
   this->SetEyeSeparation(eyeSeparation);
 
-  if(!css->GetArgument(0, 24 + (numMachines-1)*10, &this->MultiClientsEnable))
+  if(!css->GetArgument(0, epilogueOffset + 1, &this->MultiClientsEnable))
     {
     vtkErrorMacro("Error parsing MultiClientsEnable from message.");
     return;
     }
-  if(!css->GetArgument(0, 25 + (numMachines-1)*10, &this->ClientId))
+  if(!css->GetArgument(0, epilogueOffset + 2, &this->ClientId))
     {
     vtkErrorMacro("Error parsing ClientId from message.");
     return;
@@ -459,6 +481,35 @@ const char* vtkPVServerInformation::GetEnvironment(unsigned int idx) const
     return NULL;
     }
   return this->MachinesInternals->MachineInformationVector[idx].Environment.c_str();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerInformation::SetGeometry(unsigned int idx, int geo[])
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    unsigned int i;
+    vtkPVServerOptionsInternals::MachineInformation info;
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
+      {
+      this->MachinesInternals->MachineInformationVector.push_back(info);
+      }
+    }
+
+  for (int i = 0; i < 4; ++i)
+    {
+    this->MachinesInternals->MachineInformationVector[idx].Geometry[i] = geo[i];
+    }
+}
+
+//----------------------------------------------------------------------------
+int* vtkPVServerInformation::GetGeometry(unsigned int idx) const
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    return NULL;
+    }
+  return this->MachinesInternals->MachineInformationVector[idx].Geometry;
 }
 
 //----------------------------------------------------------------------------

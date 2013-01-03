@@ -36,11 +36,16 @@ public:
           this->LowerRight[i] = 0.0;
           this->UpperRight[i] = 0.0;
           }
+        this->Geometry[0] = 0;
+        this->Geometry[1] = 0;
+        this->Geometry[2] = 0;
+        this->Geometry[3] = 0;
         this->CaveBoundsSet = 0;
       }
 
     std::string Name;  // what is the name of the machine
     std::string Environment; // what environment variables should be set
+    int Geometry[4]; // x, y, width, height. For fullscreen, use 0 0 0 0.
     int CaveBoundsSet;  // have the cave bounds been set
     // store the cave bounds  all 0.0 if not set
     double LowerLeft[3];
@@ -59,6 +64,11 @@ public:
         vtkIndent ind2 = ind.GetNextIndent();
         os << ind2 << "Name: " << minfo.Name.c_str() << "\n";
         os << ind2 << "Environment: " << minfo.Environment.c_str() << "\n";
+        os << ind2 << "Geometry: ";
+        for(int i = 0; i < 4; ++i)
+          {
+          os << minfo.Geometry[i] << (i < 4 ? " " : "\n");
+          }
         if(minfo.CaveBoundsSet)
           {
           int j;
