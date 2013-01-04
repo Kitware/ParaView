@@ -511,6 +511,9 @@
       </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="azimuthButton">
+        <property name="toolTip">
+         <string>Rotate around center of screen</string>
+        </property>
         <property name="text">
          <string>Azimuth</string>
         </property>
@@ -529,6 +532,9 @@
       </item>
       <item row="1" column="0">
        <widget class="QPushButton" name="elevationButton">
+        <property name="toolTip">
+         <string>Rotate around horizontal axis</string>
+        </property>
         <property name="text">
          <string>Elevation</string>
         </property>
@@ -547,6 +553,9 @@
       </item>
       <item row="0" column="0">
        <widget class="QPushButton" name="rollButton">
+        <property name="toolTip">
+         <string>Rotate around vertical axis</string>
+        </property>
         <property name="text">
          <string>Roll</string>
         </property>
