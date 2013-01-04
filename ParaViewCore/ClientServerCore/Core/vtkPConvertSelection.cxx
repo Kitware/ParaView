@@ -19,7 +19,9 @@
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVExtractSelection.h"
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
@@ -31,6 +33,8 @@ vtkPConvertSelection::vtkPConvertSelection()
 {
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  vtkNew<vtkPVExtractSelection> se;
+  this->SetSelectionExtractor(se.GetPointer());
 }
 
 //----------------------------------------------------------------------------
@@ -51,7 +55,7 @@ static void vtkTrimTree(vtkSelection* input, int processId)
       vtkSelectionNode* node = input->GetNode(cc);
       int propId = (node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID()))?
         node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID()): -1;
-      if (propId != -1 && processId != -1 && propId != processId) 
+      if (propId != -1 && processId != -1 && propId != processId)
         {
         input->RemoveNode(node);
         }
@@ -95,7 +99,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
   // process.
   int myId = this->Controller->GetLocalProcessId();
 
-  vtkSmartPointer<vtkSelection> newInput = 
+  vtkSmartPointer<vtkSelection> newInput =
     vtkSmartPointer<vtkSelection>::New();
   newInput->ShallowCopy(input);
 
@@ -103,7 +107,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
 
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(data);
-  if ( (ds && ds->GetNumberOfPoints() > 0) || 
+  if ( (ds && ds->GetNumberOfPoints() > 0) ||
     (cds && cds->GetNumberOfPoints() > 0))
     {
     // This is needed since vtkConvertSelection simply shallow copies input to
@@ -120,7 +124,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
     }
 
   // Now add process id to the generated output.
-  ::vtkAddProcessID(output, myId); 
+  ::vtkAddProcessID(output, myId);
   return 1;
 }
 
@@ -131,5 +135,3 @@ void vtkPConvertSelection::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Controller: " << this->Controller << endl;
 }
-
-

@@ -44,6 +44,12 @@ public:
     }
 
   // Description:
+  // Match the PreserveTopology option available on vtkExtractSelectionBase.
+  vtkSetClampMacro(PreserveTopology, int, 0, 1);
+  vtkGetMacro(PreserveTopology, int);
+  vtkBooleanMacro(PreserveTopology, int);
+
+  // Description:
   // Internal method.
   vtkDataObject* ExtractElements(vtkDataObject* data, vtkSelection* selection, vtkCharArray* mask);
 
@@ -67,6 +73,8 @@ protected:
   virtual int RequestDataObject(vtkInformation* request, 
                                 vtkInformationVector** inputVector, 
                                 vtkInformationVector* outputVector);
+
+  int PreserveTopology;
 
 private:
   vtkPythonExtractSelection(const vtkPythonExtractSelection&); // Not implemented

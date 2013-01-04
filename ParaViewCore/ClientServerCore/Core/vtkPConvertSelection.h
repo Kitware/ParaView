@@ -19,12 +19,12 @@
 #ifndef __vtkPConvertSelection_h
 #define __vtkPConvertSelection_h
 
-#include "vtkPVVTKExtensionsDefaultModule.h" //needed for exports
+#include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkConvertSelection.h"
 
 class vtkMultiProcessController;
 
-class VTKPVVTKEXTENSIONSDEFAULT_EXPORT vtkPConvertSelection : public vtkConvertSelection
+class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPConvertSelection : public vtkConvertSelection
 {
 public:
   static vtkPConvertSelection* New();
@@ -42,10 +42,10 @@ protected:
   ~vtkPConvertSelection();
 
   virtual int RequestData(
-    vtkInformation *, 
-    vtkInformationVector **, 
+    vtkInformation *,
+    vtkInformationVector **,
     vtkInformationVector *);
- 
+
   vtkMultiProcessController* Controller;
 private:
   vtkPConvertSelection(const vtkPConvertSelection&); // Not implemented
@@ -53,5 +53,4 @@ private:
 //ETX
 };
 
-#endif
-
+#endif // __vtkPConvertSelection_h

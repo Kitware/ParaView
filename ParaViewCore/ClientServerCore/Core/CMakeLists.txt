@@ -34,6 +34,7 @@ set (Module_SRCS
   vtkMPIMToNSocketConnection.cxx
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkNetworkAccessManager.cxx
+  vtkPConvertSelection.cxx
   vtkProcessModuleAutoMPI.cxx
   vtkProcessModule.cxx
   vtkPVAlgorithmPortsInformation.cxx

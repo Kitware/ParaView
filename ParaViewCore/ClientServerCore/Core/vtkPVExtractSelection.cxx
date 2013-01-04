@@ -140,6 +140,7 @@ int vtkPVExtractSelection::RequestData(
 
     pythonExtractSelection->SetInputData(0, localInputDO);
     pythonExtractSelection->SetInputData(1, localSel);
+    pythonExtractSelection->SetPreserveTopology(this->PreserveTopology);
 
     pythonExtractSelection->Update();
 

@@ -69,7 +69,6 @@ set(Module_SRCS
   vtkMergeCompositeDataSet.cxx
   vtkMinMax.cxx
   vtkParallelSerialWriter.cxx
-  vtkPConvertSelection.cxx
   vtkPEnSightGoldBinaryReader.cxx
   vtkPEnSightGoldReader.cxx
   vtkPEnSightReader.cxx
