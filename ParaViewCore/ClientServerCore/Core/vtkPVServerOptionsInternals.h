@@ -65,9 +65,9 @@ public:
         os << ind2 << "Name: " << minfo.Name.c_str() << "\n";
         os << ind2 << "Environment: " << minfo.Environment.c_str() << "\n";
         os << ind2 << "Geometry: ";
-        for(int i = 0; i < 4; ++i)
+        for(int j = 0; j < 4; ++j)
           {
-          os << minfo.Geometry[i] << (i < 4 ? " " : "\n");
+          os << minfo.Geometry[j] << (j < 4 ? " " : "\n");
           }
         if(minfo.CaveBoundsSet)
           {
