@@ -61,7 +61,7 @@ signals:
 
 protected slots:
   void updateProperty();
-  void delayedUpdateProperty();
+  void delayedUpdateProperty(bool check_state);
 
 protected:
   /// overridden to handle QDynamicPropertyChangeEvent when properties are

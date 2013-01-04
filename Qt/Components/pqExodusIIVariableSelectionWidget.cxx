@@ -118,6 +118,11 @@ public:
   pqPixmapMap Pixmaps;
   pqTimer Timer;
   QList<QPointer<QObject> > DeferredObjects;
+  bool UpdatingSelectionCheckStates;
+
+  pqInternals() : UpdatingSelectionCheckStates(false)
+  {
+  }
 
   QMap<QString, QList<QPointer<pqTreeWidgetItemObject> > > Items;
   pqTreeWidgetItemObject* findItem(
@@ -210,6 +215,9 @@ pqExodusIIVariableSelectionWidget::pqExodusIIVariableSelectionWidget(QWidget* pa
 
   // Make a click anywhere on a variable's row change its checked/unchecked state.
   new pqTreeWidgetCheckHelper(this, 0, this);
+
+  this->setSelectionMode(QAbstractItemView::ContiguousSelection);
+  this->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
 //-----------------------------------------------------------------------------
@@ -281,12 +289,29 @@ void pqExodusIIVariableSelectionWidget::setStatus(
   // BUG #13726. To avoid dramatic performance degradation when dealing with
   // large list of variables, we use a timer to collapse all update requests.
   QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-    this, SLOT(delayedUpdateProperty()), Qt::UniqueConnection);
+    this, SLOT(delayedUpdateProperty(bool)), Qt::UniqueConnection);
 }
 
 //-----------------------------------------------------------------------------
-void pqExodusIIVariableSelectionWidget::delayedUpdateProperty()
+void pqExodusIIVariableSelectionWidget::delayedUpdateProperty(bool check_state)
 {
+  // BUG: 13739. To make toggling of check-states for a bunch of items easier,
+  // we follow the style adopted by GMail: we change the state of all selected
+  // items to match the current items state.
+  if (!this->Internals->UpdatingSelectionCheckStates)
+    {
+    this->Internals->UpdatingSelectionCheckStates = true;
+    foreach (QTreeWidgetItem* selItem, this->selectedItems())
+      {
+      bool item_state = selItem->checkState(0) == Qt::Unchecked? false : true;
+      if (item_state != check_state)
+        {
+        selItem->setCheckState(0, check_state? Qt::Checked : Qt::Unchecked);
+        }
+      }
+    this->Internals->UpdatingSelectionCheckStates = false;
+    }
+
   this->Internals->Timer.start(0);
   // save the pqTreeWidgetItemObject that fired this signal so we can update
   // property using its state later.

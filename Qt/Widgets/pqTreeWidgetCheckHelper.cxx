@@ -44,6 +44,7 @@ pqTreeWidgetCheckHelper::pqTreeWidgetCheckHelper(
   this->Mode = CLICK_IN_ROW;
   this->Tree = tree;
   this->CheckableColumn = checkableColumn;
+  this->PressState = -1;
   QObject::connect(this->Tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
     this, SLOT(onItemClicked(QTreeWidgetItem*, int)));
   QObject::connect(this->Tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
@@ -78,6 +79,7 @@ void pqTreeWidgetCheckHelper::onItemClicked(QTreeWidgetItem* item, int column)
     state = Qt::Unchecked;
     }
   item->setCheckState(this->CheckableColumn, state);
+  this->PressState = -1;
 }
 
 //-----------------------------------------------------------------------------
