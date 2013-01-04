@@ -15,7 +15,7 @@ add_executable(CoProcessingPythonScriptExample
   vtkPVCustomTestDriver.cxx)
 target_link_libraries(CoProcessingPythonScriptExample
   vtkCoProcessorImplementation vtkCPTestDriver)
-if (PARAVIEW_USE_MATPLOTLIB)
+if(PARAVIEW_ENABLE_PYTHON)
   target_link_libraries(CoProcessingPythonScriptExample vtkRenderingMatplotlib)
 endif()
 
