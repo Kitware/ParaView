@@ -113,6 +113,11 @@ public:
   const char* GetEnvironment(unsigned int idx) const;
 
   // Description:
+  // Window geometry for server, specified as x, y, width, height
+  void SetGeometry(unsigned int idx, int geo[4]);
+  int* GetGeometry(unsigned int idx) const;
+
+  // Description:
   // Coordinates of lower left corner of this cave display
   void SetLowerLeft(unsigned int idx, double coord[3]);
   double* GetLowerLeft(unsigned int idx) const;

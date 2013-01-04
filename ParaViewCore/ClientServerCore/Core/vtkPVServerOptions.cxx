@@ -19,6 +19,8 @@
 
 #include <vtksys/ios/sstream>
 
+#include <cstdio>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
 
@@ -56,6 +58,23 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
     else if(key == "Environment")
       {
       info.Environment = value;
+      }
+    else if(key == "Geometry")
+      {
+      for(int j = 0; j < 4; j++)
+        {
+        int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &info.Geometry[0],
+            &info.Geometry[1], &info.Geometry[2], &info.Geometry[3]);
+        if (matches != 4)
+          {
+          vtkErrorMacro("Malformed geometry specification: " << value.c_str()
+                        << " (expected <X>x<Y>+<width>+<height>).");
+          info.Geometry[0] = 0;
+          info.Geometry[1] = 0;
+          info.Geometry[2] = 0;
+          info.Geometry[3] = 0;
+          }
+        }
       }
     else if(key == "LowerLeft")
       {
@@ -167,6 +186,17 @@ const char* vtkPVServerOptions::GetDisplayName(unsigned int idx)
     }
 
   return this->Internals->MachineInformationVector[idx].Environment.c_str();
+}
+
+//----------------------------------------------------------------------------
+int* vtkPVServerOptions::GetGeometry(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return 0;
+    }
+
+  return this->Internals->MachineInformationVector[idx].Geometry;
 }
 
 //----------------------------------------------------------------------------
