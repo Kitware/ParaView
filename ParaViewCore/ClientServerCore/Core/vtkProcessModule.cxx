@@ -57,21 +57,57 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
   setlocale(LC_NUMERIC,"C");
 
   // If python is enabled, matplotlib can be used for text rendering. VTK needs
-  // to know which python interpreter to use (especially for non-system python
-  // installations, e.g. ParaView superbuild). The VTK_MATPLOTLIB_PYTHONINTERP
-  // variable tells vtkMatplotlibMathTextUtilities which interpretor path to
-  // use.
+  // to know which python environment to use (especially for non-system python
+  // installations, e.g. ParaView superbuild).
 #ifdef PARAVIEW_ENABLE_PYTHON
   if (argc > 0)
     {
+    vtkStdString execPath = vtksys::SystemTools::GetFilenamePath(argv[0]);
+    if (execPath.size() != 0)
+      {
+      execPath += "/";
+      }
+#ifdef _WIN32
+      // On windows, remove the drive designation if present
+      if (execPath.size() > 2 && execPath.at(1) == ':')
+        {
+        execPath = execPath.substr(2);
+        }
+#endif // _WIN32
+
+    // The VTK_MATPLOTLIB_PYTHONINTERP variable tells
+    // vtkMatplotlibMathTextUtilities which interpretor path to use. Set it to
+    // our pvpython path. This is passed to Py_SetProgramName.
     vtkStdString mplPyInterp;
     if (!vtksys::SystemTools::GetEnv("VTK_MATPLOTLIB_PYTHONINTERP", mplPyInterp)
         || mplPyInterp.size() == 0)
       {
       mplPyInterp = "VTK_MATPLOTLIB_PYTHONINTERP=";
-      mplPyInterp += argv[0];
+      // Change slashes to appropriate format, escape spaces
+      mplPyInterp += vtksys::SystemTools::ConvertToOutputPath(
+            (execPath + "../bin/pvpython").c_str());
       vtksys::SystemTools::PutEnv(mplPyInterp.c_str());
       }
+
+    // The VTK_MATPLOTLIB_PYTHONPATH variable holds paths which are prepended
+    // to sys.path after initialization.
+#ifdef __APPLE__
+      // On apple, we'll need to give the path to matplotlib in the bundle:
+       vtkStdString mplPyPath;
+       if (!vtksys::SystemTools::GetEnv("VTK_MATPLOTLIB_PYTHONPATH", mplPyPath)
+           || mplPyPath.size() == 0)
+         {
+         mplPyPath = "VTK_MATPLOTLIB_PYTHONPATH=";
+         }
+       else
+         {
+         mplPyPath += ":";
+         }
+       // Change slashes to appropriate format, escape spaces
+       mplPyPath += vtksys::SystemTools::ConvertToOutputPath(
+             (execPath + "../Python").c_str());
+       vtksys::SystemTools::PutEnv(mplPyPath.c_str());
+#endif // __APPLE__
     }
 #endif // PARAVIEW_ENABLE_PYTHON
 
