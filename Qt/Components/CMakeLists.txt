@@ -112,6 +112,8 @@ set (Module_SRCS
   pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
+  pqCommandPropertyWidget.h
+  pqCommandPropertyWidget.cxx
   pqComparativeCueWidget.cxx
   pqComparativeCueWidget.h
   pqComparativeVisPanel.cxx
@@ -462,6 +464,7 @@ set (Module_MOC_HDRS
   pqColorScaleEditor.h
   pqColorScaleToolbar.h
   pqComboBoxDomain.h
+  pqCommandPropertyWidget.h
   pqComparativeCueWidget.h
   pqComparativeVisPanel.h
   pqComponentsTestUtility.h
