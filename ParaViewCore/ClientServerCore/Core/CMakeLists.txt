@@ -49,6 +49,7 @@ set (Module_SRCS
   vtkPVDisableStackTraceSignalHandler.cxx
   vtkPVEnableStackTraceSignalHandler.cxx
   vtkPVExtractSelection.cxx
+  vtkPVExtractArraysOverTime.cxx
   vtkPVGenericAttributeInformation.cxx
   vtkPVInformation.cxx
   vtkPVMemoryUseInformation.cxx
