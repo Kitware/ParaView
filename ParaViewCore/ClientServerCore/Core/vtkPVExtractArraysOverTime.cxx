@@ -15,6 +15,7 @@
 #include "vtkPVExtractArraysOverTime.h"
 
 #include "vtkNew.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVExtractSelection.h"
 
 vtkStandardNewMacro(vtkPVExtractArraysOverTime);
