@@ -177,13 +177,24 @@ void pqFileChooserWidget::chooseFile()
     {
     dialog->setFileMode(pqFileDialog::Directory);
     }
-  else
+  else if (this->forceSingleFile())
     {
     dialog->setFileMode(pqFileDialog::ExistingFile);
     }
+  else
+    {
+    dialog->setFileMode(pqFileDialog::ExistingFiles);
+    }
   if(QDialog::Accepted == dialog->exec())
     {
-    QStringList files = dialog->getSelectedFiles();
+    QStringList files;
+    // The file browser has a list of selected files, each of which could
+    // be a group of files.  Condense them all into a single list.
+    QStringList selectedFiles;
+    foreach(selectedFiles, dialog->getAllSelectedFiles())
+      {
+      files << selectedFiles;
+      }
     if(files.size())
       {
       this->setFilenames(files);
