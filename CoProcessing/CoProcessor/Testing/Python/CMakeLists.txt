@@ -5,36 +5,18 @@ endif()
 include_directories(
   ${TestDriver_SOURCE_DIR})
 
-vtk_module_test()
-
 set(CP_LABELS PARAVIEW CATALYST)
 
 #------------------------------------------------------------------------------
-add_executable(CoProcessingPythonScriptExample
+vtk_module_test_executable(CoProcessingPythonScriptExample
   PythonScriptCoProcessingExample.cxx
   vtkPVCustomTestDriver.cxx)
-target_link_libraries(CoProcessingPythonScriptExample
-  vtkCoProcessorImplementation vtkCPTestDriver)
-if(PARAVIEW_ENABLE_PYTHON)
-  target_link_libraries(CoProcessingPythonScriptExample vtkRenderingMatplotlib)
-endif()
+target_link_libraries(CoProcessingPythonScriptExample vtkCPTestDriver)
 
 #------------------------------------------------------------------------------
 # Generate the image compare tool.
 # below is for doing image comparisons
-add_executable(CoProcessingCompareImagesTester CompareImages.cxx)
-target_link_libraries(CoProcessingCompareImagesTester
-  vtkTestingRendering
-  vtkRenderingOpenGL
-  vtkRenderingFreeTypeOpenGL
-  vtkInteractionStyle
-  vtkIOImage)
-
-if (PARAVIEW_USE_MPI)
-  # FIXME: not sure this is the right fix, w.o. this I am getting some missing
-  # ...AutoInit build errors.
-  target_link_libraries(CoProcessingCompareImagesTester vtkIOMPIImage)
-endif()
+vtk_module_test_executable(CoProcessingCompareImagesTester CompareImages.cxx)
 
 #------------------------------------------------------------------------------
 # a simple test to see if the input is changing, i.e. that the initial
