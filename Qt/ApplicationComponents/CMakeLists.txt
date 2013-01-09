@@ -107,6 +107,8 @@ set (Module_SRCS
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
   pqIgnoreSourceTimeReaction.h
+  pqListPropertyWidget.cxx
+  pqListPropertyWidget.h
   pqLoadDataReaction.cxx
   pqLoadDataReaction.h
   pqLoadStateReaction.cxx
@@ -257,6 +259,7 @@ set (Module_MOC_HDRS
   pqGenericSummaryDisplayPanel.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
+  pqListPropertyWidget.h
   pqLoadDataReaction.h
   pqLoadStateReaction.h
   pqMainControlsToolbar.h

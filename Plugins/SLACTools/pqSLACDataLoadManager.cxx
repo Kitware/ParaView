@@ -23,8 +23,6 @@
 
 #include "pqSLACManager.h"
 
-#include "vtkSMSourceProxy.h"
-
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
@@ -32,6 +30,8 @@
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QPushButton>
 #include <QtDebug>
@@ -112,12 +112,11 @@ void pqSLACDataLoadManager::setupPipeline()
 {
   pqApplicationCore *core = pqApplicationCore::instance();
   pqObjectBuilder *builder = core->getObjectBuilder();
-  pqUndoStack *stack = core->getUndoStack();
   pqDisplayPolicy *displayPolicy = core->getDisplayPolicy();
 
   pqSLACManager *manager = pqSLACManager::instance();
 
-  if (stack) stack->beginUndoSet("SLAC Data Load");
+  BEGIN_UNDO_SET("SLAC Data Load");
 
   // Determine the views.  Do this before deleting existing pipeline objects.
   pqView *meshView = manager->getMeshView();
@@ -147,6 +146,13 @@ void pqSLACDataLoadManager::setupPipeline()
 
     // ensures that new timestep range, if any gets fetched from the server.
     meshReaderProxy->UpdatePipelineInformation();
+
+    // ensures that the FrequencyScale and PhaseShift have correct default
+    // values.
+    meshReaderProxy->GetProperty("FrequencyScale")->Copy(
+      meshReaderProxy->GetProperty("FrequencyScaleInfo"));
+    meshReaderProxy->GetProperty("PhaseShift")->Copy(
+      meshReaderProxy->GetProperty("PhaseShiftInfo"));
 
     // Make representations.
     pqDataRepresentation *repr;
@@ -180,7 +186,6 @@ void pqSLACDataLoadManager::setupPipeline()
     particlesReader->setModifiedState(pqProxy::UNMODIFIED);
     }
 
-  if (stack) stack->endUndoSet();
-
+  END_UNDO_SET();
   emit this->createdPipeline();
 }

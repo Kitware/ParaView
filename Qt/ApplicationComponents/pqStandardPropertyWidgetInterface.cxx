@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCommandButtonPropertyWidget.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqListPropertyWidget.h"
 #include "pqPipelineRepresentation.h"
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
@@ -93,6 +94,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
     else if(name == "transfer_function_editor")
       {
       return new pqTransferFunctionEditorPropertyWidget(smProxy, smProperty);
+      }
+    else if (name == "list")
+      {
+      return new pqListPropertyWidget(smProxy, smProperty);
       }
     else
       {
