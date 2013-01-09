@@ -706,6 +706,21 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   this->ImmediateUpdate = prevImUpdate;
   return 1;
 }
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::UpdateAllInputs()
+{
+  unsigned int numProxies = this->GetNumberOfProxies();
+  for (unsigned int idx=0; idx < numProxies; idx++)
+    {
+    vtkSMProxy* proxy = this->GetProxy(idx);
+    if (proxy)
+      {
+      proxy->UpdateSelfAndAllInputs();
+      }
+    }
+}
+
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::EnableProxyCreation()
 {
