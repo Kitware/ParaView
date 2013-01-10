@@ -1502,6 +1502,8 @@ int pqSelectionInspectorPanel::getContentType() const
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
 {
+  // NB: This code reused in pqQueryDialog.cxx's onFreezeSelection method.
+  // Change both if you change either.
   pqOutputPort* port = this->Implementation->InputPort;
   if (!port)
     {
@@ -1516,10 +1518,11 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
     port->getServer()->isRemote() &&
     (outputType == vtkSelectionNode::INDICES || outputType == vtkSelectionNode::GLOBALIDS))
     {
-    // BUG: 6783. Warn user when converting a Frustum|Threshold selection to
+    // BUG: 6783. Warn user when converting a Frustum|Threshold|Query selection to
     // an id based selection.
     if (strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
-      strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0)
+      strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
+      strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
       {
       // We need to determine how many ids are present approximately.
       vtkSMSourceProxy* sourceProxy =

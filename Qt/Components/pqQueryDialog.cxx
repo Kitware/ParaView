@@ -43,8 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQueryClauseWidget.h"
 #include "pqServer.h"
 #include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqUndoStack.h"
+
 #include "vtkDataObject.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
@@ -55,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSelectionHelper.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
@@ -62,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCompositeDataInformation.h"
 
 #include <QList>
+#include <QMessageBox>
 
 class pqQueryDialog::pqInternals : public Ui::pqQueryDialog
 {
@@ -147,6 +151,8 @@ pqQueryDialog::pqQueryDialog(
     SIGNAL(clicked()), this, SLOT(onExtractSelection()));
   QObject::connect(this->Internals->extractSelectionOverTime,
     SIGNAL(clicked()), this, SLOT(onExtractSelectionOverTime()));
+  QObject::connect(this->Internals->freezeSelection,
+    SIGNAL(clicked()), this, SLOT(onFreezeSelection()));
 
   // Make sure that when the input port selection change we are aware of that
   QObject::connect(this->Internals->source,
@@ -342,6 +348,7 @@ void pqQueryDialog::runQuery()
   this->Internals->labels->setEnabled(true);
   this->Internals->extractSelection->setEnabled(true);
   this->Internals->extractSelectionOverTime->setEnabled(true);
+  this->Internals->freezeSelection->setEnabled(true);
 
   // update the list of available labels.
   this->updateLabels();
@@ -436,6 +443,73 @@ void pqQueryDialog::updateLabels()
 }
 
 //-----------------------------------------------------------------------------
+void pqQueryDialog::onFreezeSelection()
+{
+  // NB: This code adapted from pqSelectionInspectorPanel.cxx's
+  // createNewSelectionSourceIfNeeded method. Change both if you change either.
+  vtkSMSourceProxy* curSelSource = static_cast<vtkSMSourceProxy*>(
+    this->Producer->getSelectionInput());
+
+  if (curSelSource &&
+    this->Producer->getServer()->isRemote())
+    {
+    // BUG: 6783. Warn user when converting a Frustum|Threshold|Query selection to
+    // an id based selection.
+    if (strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
+      strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0 ||
+      strcmp(curSelSource->GetXMLName(), "SelectionQuerySource") == 0)
+      {
+      // We need to determine how many ids are present approximately.
+      vtkSMSourceProxy* sourceProxy =
+        vtkSMSourceProxy::SafeDownCast(this->Producer->getSource()->getProxy());
+      vtkPVDataInformation* selectedInformation = sourceProxy->GetSelectionOutput(
+        this->Producer->getPortNumber())->GetDataInformation();
+      int fdType = pqSMAdaptor::getElementProperty(
+        curSelSource->GetProperty("FieldType")).toInt();
+      if ((fdType == vtkSelectionNode::POINT &&
+          selectedInformation->GetNumberOfPoints() > 10000) ||
+        (fdType == vtkSelectionNode::CELL &&
+         selectedInformation->GetNumberOfCells() > 10000))
+        {
+        if (QMessageBox::warning(this, tr("Convert Selection"),
+            tr("This selection converion can potentially result in fetching a "
+              "large amount of data to the client.\n"
+              "Are you sure you want to continue?"),
+            QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) !=
+          QMessageBox::Ok)
+          {
+          curSelSource = 0;
+          }
+        }
+      }
+    }
+
+  vtkSMSourceProxy* selSource = NULL;
+  if (curSelSource)
+    {
+    selSource = vtkSMSourceProxy::SafeDownCast(
+      vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::INDICES,
+        curSelSource,
+        vtkSMSourceProxy::SafeDownCast(this->Producer->getSource()->getProxy()),
+        this->Producer->getPortNumber()));
+    }
+
+  if (selSource)
+    {
+    if (selSource != curSelSource)
+      {
+      selSource->UpdateVTKObjects();
+      this->Producer->setSelectionInput(selSource, 0);
+      }
+
+    selSource->Delete();
+
+    // Once converted, a selection can no longer be frozen.
+    this->Internals->freezeSelection->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqQueryDialog::setLabel(int index)
 {
   // disabled when not labelling.
@@ -523,6 +597,9 @@ void pqQueryDialog::onSelectionChange(pqOutputPort* newSelectedPort)
   // Reset the spreadsheet view
   this->resetClauses();
   this->freeSMProxy();
+
+  // Once converted, a selection can no longer be frozen.
+  this->Internals->freezeSelection->setEnabled(false);
 
   if(this->Producer != NULL)
     {

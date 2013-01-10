@@ -103,11 +103,14 @@ protected slots:
     this->extractSelection();
     this->accept();
     }
+
   void onExtractSelectionOverTime()
     {
     this->extractSelectionOverTime();
     this->accept();
     }
+
+  void onFreezeSelection();
 
 protected:
   /// populate the list of available labels.
