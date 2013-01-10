@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -135,7 +135,7 @@ pqQueryDialog::pqQueryDialog(
     globalPropertiesManager->GetProperty("SelectionColor"));
 
   this->Internals->LabelColorAdaptor = new pqSignalAdaptorColor(
-    this->Internals->labelColor, 
+    this->Internals->labelColor,
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
 
@@ -364,12 +364,12 @@ namespace
       // from the selection ;).
       if (arrayInfo->GetIsPartial())
         {
-        combobox->addItem(icon, 
-          QString ("%1 (partial)").arg(arrayInfo->GetName()), data); 
+        combobox->addItem(icon,
+          QString ("%1 (partial)").arg(arrayInfo->GetName()), data);
         }
       else
         {
-        combobox->addItem(icon, arrayInfo->GetName(), data); 
+        combobox->addItem(icon, arrayInfo->GetName(), data);
         }
       }
     }
@@ -439,7 +439,7 @@ void pqQueryDialog::updateLabels()
 void pqQueryDialog::setLabel(int index)
 {
   // disabled when not labelling.
-  this->Internals->labelColor->setEnabled(index > 0); 
+  this->Internals->labelColor->setEnabled(index > 0);
 
   pqDataRepresentation* repr =
       this->Internals->source->currentPort()->getRepresentation(
