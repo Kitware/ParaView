@@ -367,6 +367,12 @@
           "path":"vtkContourGrid.h"
         },
         {
+          "path":"vtkContourHelper.cxx"
+        },
+        {
+          "path":"vtkContourHelper.h"
+        },
+        {
           "path":"vtkCutter.cxx"
         },
         {
