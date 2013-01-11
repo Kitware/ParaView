@@ -47,7 +47,6 @@ namespace GMVRead {
 #   include "gmvread.c"
   }
 
-#ifndef GMVREADER_SKIP_DATARANGE_CALCULATIONS
   template <class C> void minmax(C * pointer, size_t len, C& min_out, C& max_out)
   {
     if (len <= 0)
@@ -63,7 +62,6 @@ namespace GMVRead {
       max_out = std::max(max_out, *pointer);
       }
   }
-#endif
 
   template <class C> void cleanup(C **pointer)
   {
@@ -672,6 +670,9 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
           // Only up to 1000 materials supported. (The GMV binary sets materials > 1000 to mod 1000.)
           // So, vtkTypeInt32Array is sufficient.
           vtkTypeInt32Array *materials;
+#define GMV_MAX_MATERIALS 1000
+          long miL, mxL;
+          unsigned long int count;
 
           case (NODE):
             // Find out whether material property has been selected for reading
@@ -692,9 +693,22 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
               materials->SetNumberOfComponents(1);
               materials->SetNumberOfTuples(this->NumberOfNodes);
               materials->SetName("material id");
+              GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfNodes, miL, mxL);
+              if (mxL > GMV_MAX_MATERIALS)
+                vtkWarningMacro("Warning, there are more than " << GMV_MAX_MATERIALS << " materials." << endl
+                                << "   Note, materials > " << GMV_MAX_MATERIALS
+                                << " will be set to mod " << GMV_MAX_MATERIALS);
+              count = 0;
               for (unsigned long int i=0; i < this->NumberOfNodes; ++i)
+                {
+                if (GMVRead::gmv_data.longdata1[i] > GMV_MAX_MATERIALS)
+                  count++;
                 // The GMV binary sets materials > 1000 to mod 1000.
-                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % 1000));
+                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % GMV_MAX_MATERIALS));
+                }
+              if (count > 0)
+                vtkWarningMacro("Warning, there are " << count
+                                << " nodes with material > " << GMV_MAX_MATERIALS << ".");
               this->Mesh->GetPointData()->AddArray(materials);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
@@ -724,9 +738,22 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
               materials->SetNumberOfComponents(1);
               materials->SetNumberOfTuples(this->NumberOfCells);
               materials->SetName("material id");
+              GMVRead::minmax(GMVRead::gmv_data.longdata1, this->NumberOfCells, miL, mxL);
+              if (mxL > GMV_MAX_MATERIALS)
+                vtkWarningMacro("Warning, there are more than " << GMV_MAX_MATERIALS << " materials." << endl
+                                << "   Note, materials > " << GMV_MAX_MATERIALS
+                                << " will be set to mod " << GMV_MAX_MATERIALS);
+              count = 0;
               for (unsigned long int i = 0; i < this->NumberOfCells; ++i)
+                {
+                if (GMVRead::gmv_data.longdata1[i] > GMV_MAX_MATERIALS)
+                  count++;
                 // The GMV binary sets materials > 1000 to mod 1000.
-                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % 1000));
+                materials->SetComponent(i, 0, vtkTypeInt32(GMVRead::gmv_data.longdata1[i] % GMV_MAX_MATERIALS));
+                }
+              if (count > 0)
+                vtkWarningMacro("Warning, there are " << count
+                                << " elements with material > " << GMV_MAX_MATERIALS << ".");
               this->Mesh->GetCellData()->AddArray(materials);
               // VTK File Formats states that the attributes "Scalars"
               // and "Vectors" "of PointData and CellData are used to
