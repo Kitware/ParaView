@@ -6227,6 +6227,51 @@
         no timesteps but you still want to give ParaView a range of values to
         use.</Documentation>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FrequencyScale"
+                            command="SetFrequencyScale"
+                            clean_command="ResetFrequencyScales"
+                            information_property="FrequencyScaleInfo"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            panel_visibility="advanced"
+                            panel_widget="list" >
+        <Documentation>
+          Sets the scale factor for each mode. By default, each scale factor is
+          set to 1.
+        </Documentation>
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetFrequencyScales"
+                            information_only="1"
+                            name="FrequencyScaleInfo"
+                            si_class="vtkSIDataArrayProperty" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PhaseShift"
+                            command="SetPhaseShift"
+                            clean_command="ResetPhaseShifts"
+                            information_property="PhaseShiftInfo"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            use_index="1"
+                            panel_visibility="advanced"
+                            panel_widget="list" >
+        <Documentation>
+          Sets the phase offset for each mode. By default, shift is set to 0.
+        </Documentation>
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="GetPhaseShifts"
+                            information_only="1"
+                            name="PhaseShiftInfo"
+                            si_class="vtkSIDataArrayProperty" >
+      </DoubleVectorProperty>
+
+
       <Hints>
         <ReaderFactory extensions="ncdf nc"
                        file_description="SLAC Mesh Files" />
