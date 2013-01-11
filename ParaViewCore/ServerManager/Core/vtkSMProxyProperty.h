@@ -179,6 +179,10 @@ public:
   // Returns whether the "skip_dependency" attribute is set.
   vtkGetMacro(SkipDependency, bool);
 
+  // Description:
+  // Update all proxies referred by this property (if any).
+  virtual void UpdateAllInputs();
+
 //BTX
 protected:
   vtkSMProxyProperty();
