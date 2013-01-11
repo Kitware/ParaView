@@ -7,8 +7,8 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
-   
+   under the terms of the ParaView license version 1.2.
+
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,7 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqQueryDialog_h 
+#ifndef __pqQueryDialog_h
 #define __pqQueryDialog_h
 
 #include <QDialog>
@@ -99,15 +99,18 @@ protected slots:
   void setLabel(int index);
 
   void onExtractSelection()
-    { 
+    {
     this->extractSelection();
     this->accept();
     }
+
   void onExtractSelectionOverTime()
     {
     this->extractSelectionOverTime();
     this->accept();
     }
+
+  void onFreezeSelection();
 
 protected:
   /// populate the list of available labels.
