@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMap>
 #include <QPixmap>
 #include <QPointer>
+#include <QSet>
 #include <QtDebug>
 
 #include "pqSMAdaptor.h"
@@ -117,7 +118,7 @@ class pqExodusIIVariableSelectionWidget::pqInternals
 public:
   pqPixmapMap Pixmaps;
   pqTimer Timer;
-  QList<QPointer<QObject> > DeferredObjects;
+  QSet<QString> KeysToUpdate;
   bool UpdatingSelectionCheckStates;
 
   pqInternals() : UpdatingSelectionCheckStates(false)
@@ -315,26 +316,26 @@ void pqExodusIIVariableSelectionWidget::delayedUpdateProperty(bool check_state)
   this->Internals->Timer.start(0);
   // save the pqTreeWidgetItemObject that fired this signal so we can update
   // property using its state later.
-  this->Internals->DeferredObjects.push_back(this->sender());
+  pqTreeWidgetItemObject* item =
+    qobject_cast<pqTreeWidgetItemObject*>(this->sender());
+  if (item)
+    {
+    QString key = item->data(0, Qt::UserRole).toString();
+    this->Internals->KeysToUpdate.insert(key);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqExodusIIVariableSelectionWidget::updateProperty()
 {
-  foreach (QObject* qobject, this->Internals->DeferredObjects)
+  foreach (const QString& key, this->Internals->KeysToUpdate)
     {
-    pqTreeWidgetItemObject* item =
-      qobject_cast<pqTreeWidgetItemObject*>(qobject);
-    if (item)
+    QVariant newValue = this->Internals->value(key);
+    if (this->property(key.toAscii().data()) != newValue)
       {
-      QString key = item->data(0, Qt::UserRole).toString();
-      QVariant newValue = this->Internals->value(key);
-      if (this->property(key.toAscii().data()) != newValue)
-        {
-        this->setProperty(key.toAscii().data(), newValue);
-        }
+      this->setProperty(key.toAscii().data(), newValue);
       }
     }
-  this->Internals->DeferredObjects.clear();
+  this->Internals->KeysToUpdate.clear();
   emit this->widgetModified();
 }
