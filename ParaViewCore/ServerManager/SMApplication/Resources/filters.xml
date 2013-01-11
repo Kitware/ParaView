@@ -333,7 +333,7 @@
       </IntVectorProperty>
     </SourceProxy>
     <!-- ==================================================================== -->
-    <SourceProxy class="vtkPExtractArraysOverTime"
+    <SourceProxy class="vtkPVExtractArraysOverTime"
                  label="Plot Selection Over Time"
                  name="ExtractSelectionOverTime">
       <Documentation long_help="Extracts selection over time and then plots it."
@@ -381,6 +381,17 @@
           <SelectionInput />
         </Hints>
       </InputProperty>
+      <IntVectorProperty command="SetReportStatisticsOnly"
+                         default_values="0"
+                         name="Only Report Selection Statistics"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>If this property is set to 1, the min, max,
+          inter-quartile ranges, and (for numeric arrays) mean and standard
+          deviation of all the selected points or cells within each time step
+          are reported -- instead of breaking each selected point's or cell's
+          attributes out into separate time history tables.</Documentation>
+      </IntVectorProperty>
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYChartView" />
