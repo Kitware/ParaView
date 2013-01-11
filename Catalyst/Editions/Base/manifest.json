@@ -120,19 +120,49 @@
     {
       "name":"vtkPVClientServerCoreCore",
       "path":"ParaViewCore/ClientServerCore/Core",
+      "exclude": [
+          { "path": "vtkPConvertSelection*"
+          },
+          { "path": "vtkPVExtractSelection*"
+          },
+          { "path": "vtkPVExtractArraysOverTime*"
+          }
+
+      ],
       "patch":[
-        "diff --git a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-        "index 533271b..43e8db0 100644",
-        "--- a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-        "+++ b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
-        "@@ -47,7 +47,6 @@ set (Module_SRCS",
-        "   vtkPVDataSizeInformation.cxx",
-        "   vtkPVDisableStackTraceSignalHandler.cxx",
-        "   vtkPVEnableStackTraceSignalHandler.cxx",
-        "-  vtkPVExtractSelection.cxx",
-        "   vtkPVGenericAttributeInformation.cxx",
-        "   vtkPVInformation.cxx",
-        "   vtkPVMemoryUseInformation.cxx"
+"diff --git a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
+"index 4f283bd..f05aa2b 100644",
+"--- a/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
+"+++ b/ParaViewCore/ClientServerCore/Core/CMakeLists.txt",
+"@@ -34,7 +34,6 @@ set (Module_SRCS",
+"   vtkMPIMToNSocketConnection.cxx",
+"   vtkMPIMToNSocketConnectionPortInformation.cxx",
+"   vtkNetworkAccessManager.cxx",
+"-  vtkPConvertSelection.cxx",
+"   vtkProcessModuleAutoMPI.cxx",
+"   vtkProcessModule.cxx",
+"   vtkPVAlgorithmPortsInformation.cxx",
+"@@ -48,8 +47,6 @@ set (Module_SRCS",
+"   vtkPVDataSizeInformation.cxx",
+"   vtkPVDisableStackTraceSignalHandler.cxx",
+"   vtkPVEnableStackTraceSignalHandler.cxx",
+"-  vtkPVExtractSelection.cxx",
+"-  vtkPVExtractArraysOverTime.cxx",
+"   vtkPVGenericAttributeInformation.cxx",
+"   vtkPVInformation.cxx",
+"   vtkPVMemoryUseInformation.cxx",
+"diff --git a/ParaViewCore/ClientServerCore/Core/module.cmake b/ParaViewCore/ClientServerCore/Core/module.cmake",
+"index f17c4df..f0db074 100644",
+"--- a/ParaViewCore/ClientServerCore/Core/module.cmake",
+"+++ b/ParaViewCore/ClientServerCore/Core/module.cmake",
+"@@ -18,7 +18,6 @@ vtk_module(vtkPVClientServerCoreCore",
+"     ParaViewCore",
+"   DEPENDS",
+"     vtkFiltersExtraction",
+"-    vtkFiltersParallel",
+"     # Explicitely list (rather than transiently through",
+"     # vtkPVVTKExtensionsCore) because it allows us to turn of wrapping",
+"     # of vtkPVVTKExtensionsCore off but still satisfy API dependcy."
       ],
       "cswrap":true,
       "pythonwrap":true
@@ -325,10 +355,37 @@
     {
       "name":"vtkFiltersExtraction",
       "path":"VTK/Filters/Extraction",
+      "patch": [
+          "diff --git a/Filters/Extraction/CMakeLists.txt b/Filters/Extraction/CMakeLists.txt",
+"index 359b4e7..65de7c9 100644",
+"--- a/Filters/Extraction/CMakeLists.txt",
+"+++ b/Filters/Extraction/CMakeLists.txt",
+"@@ -1,6 +1,5 @@",
+" set(Module_SRCS",
+"   vtkConvertSelection.cxx",
+"-  vtkExtractArraysOverTime.cxx",
+"   vtkExtractBlock.cxx",
+"   vtkExtractCells.cxx",
+"   vtkExtractDataOverTime.cxx",
+"diff --git a/Filters/Extraction/module.cmake b/Filters/Extraction/module.cmake",
+"index c578b62..e979d69 100644",
+"--- a/Filters/Extraction/module.cmake",
+"+++ b/Filters/Extraction/module.cmake",
+"@@ -4,8 +4,6 @@ vtk_module(vtkFiltersExtraction",
+"   DEPENDS",
+"     vtkCommonExecutionModel",
+"     vtkFiltersCore",
+"-    vtkFiltersGeneral",
+"-    vtkFiltersStatistics",
+"   TEST_DEPENDS",
+"     vtkIOLegacy",
+"     vtkIOXML"
+      ],
       "exclude":[
         {
           "path":"Testing"
-        }
+        },
+        {"path": "vtkExtractArraysOverTime*"  }
       ]
     },
     {
@@ -365,6 +422,12 @@
         },
         {
           "path":"vtkContourGrid.h"
+        },
+        {
+          "path":"vtkContourHelper.cxx"
+        },
+        {
+          "path":"vtkContourHelper.h"
         },
         {
           "path":"vtkCutter.cxx"

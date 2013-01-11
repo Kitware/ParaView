@@ -76,6 +76,9 @@ def patch_path(config, path_entry):
     patch = '\n'.join(path_entry['patch'])
     p.stdin.write(patch+'\n')
     p.stdin.close();
+    p.wait()
+    if p.returncode != 0:
+      error('Failed to apply patch for: %s' % path_entry['path'])
   except Exception as err:
     error(err)
 
