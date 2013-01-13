@@ -135,16 +135,13 @@ int vtkTextSourceRepresentation::RequestData(
 
   if (inputVector[0]->GetNumberOfInformationObjects()==1)
     {
-    if (!this->GetUsingCacheForUpdate())
+    vtkTable* input = vtkTable::GetData(inputVector[0], 0);
+    if (input->GetNumberOfRows() > 0 && input->GetNumberOfColumns() > 0)
       {
-      vtkTable* input = vtkTable::GetData(inputVector[0], 0);
-      if (input->GetNumberOfRows() > 0 && input->GetNumberOfColumns() > 0)
-        {
-        this->DummyPolyData->GetFieldData()->ShallowCopy(input->GetRowData());
-        }
+      this->DummyPolyData->GetFieldData()->ShallowCopy(input->GetRowData());
       }
     }
-
+  this->DummyPolyData->Modified();
   this->CacheKeeper->Update();
 
   // It is tempting to try to do the data delivery in RequestData() itself.
