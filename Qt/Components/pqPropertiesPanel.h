@@ -96,6 +96,30 @@ public:
   static int autoApplyDelay();
 
 public slots:
+  /// Apply the changes properties to the proxies.
+  ///
+  /// This is triggered when the user clicks the "Apply" button on the
+  /// properties panel.
+  void apply();
+
+  /// Reset the changes made.
+  ///
+  /// This is triggered when the user clicks the "Reset" button on the
+  /// properties panel.
+  void reset();
+
+  /// Deletes the current proxy.
+  ///
+  /// This is triggered when the user clicks the "Delete" button on the
+  /// properties panel.
+  void deleteProxy();
+
+  /// Shows the help dialog.
+  ///
+  /// This is triggered when the user clicks the "?" button on the
+  /// properties panel.
+  void showHelp();
+
   /// Sets the current render view to \p view.
   void setView(pqView *view);
 
@@ -120,20 +144,8 @@ signals:
   void helpRequested(const QString &groupname, const QString &proxyType);
 
 private slots:
-  /// Apply the changes properties to the proxies.
-  void apply();
-
-  /// Reset the changes made.
-  void reset();
-
   /// Removes the proxy.
   void removeProxy(pqPipelineSource *proxy);
-
-  /// Deletes the current proxy.
-  void deleteProxy();
-
-  /// Shows the help dialog.
-  void showHelp();
 
   /// Sets the enabled state of the delete button.
   void handleConnectionChanged(pqPipelineSource *in, pqPipelineSource *out);
