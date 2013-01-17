@@ -53,8 +53,15 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
-  // Specify the proxy and property to control. The property needs to have 16
-  // elements and must be a numerical property.
+  // Get the vector size of the controlled property this style expects, e.g. a
+  // 4x4 matrix will be 16, a 3D vector will be 3, etc. This is used to limit
+  // the number of options presented to the user when prompting for a property.
+  // This is NOT checked internally by SetControlledPropertyName.
+  //
+  // A value of -1 means no filtering will be done, and all available properties
+  // will be shown.
+  virtual int GetControlledPropertySize() { return -1; }
+
   virtual void SetControlledProxy(vtkSMProxy *);
   vtkGetObjectMacro(ControlledProxy, vtkSMProxy)
 

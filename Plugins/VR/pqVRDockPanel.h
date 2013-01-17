@@ -63,6 +63,7 @@ private slots:
   void updateStyleButtons(int row);
 
   void proxyChanged(vtkSMProxy*);
+  void styleComboChanged(const QString &name);
   void setActiveView(pqView*);
 
   void saveState();

@@ -155,6 +155,9 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->proxyCombo, SIGNAL(currentProxyChanged(vtkSMProxy*)),
           this, SLOT(proxyChanged(vtkSMProxy*)));
 
+  connect(this->Internals->stylesCombo, SIGNAL(currentIndexChanged(QString)),
+          this, SLOT(styleComboChanged(QString)));
+
   connect(this->Internals->saveState, SIGNAL(clicked()),
           this, SLOT(saveState()));
 
@@ -167,6 +170,7 @@ void pqVRDockPanel::constructor()
   connect(this->Internals->stopButton, SIGNAL(clicked()),
           this, SLOT(stop()));
 
+  this->styleComboChanged(this->Internals->stylesCombo->currentText());
   this->updateConnectionButtons(
         this->Internals->connectionsTable->currentRow());
   this->updateStyleButtons(this->Internals->stylesTable->currentRow());
@@ -435,6 +439,21 @@ void pqVRDockPanel::updateStyleButtons(int row)
 void pqVRDockPanel::proxyChanged(vtkSMProxy *pxy)
 {
   this->Internals->propertyCombo->setSource(pxy);
+}
+
+//-----------------------------------------------------------------------------
+void pqVRDockPanel::styleComboChanged(const QString &name)
+{
+  vtkVRInteractorStyleFactory *styleFactory =
+      vtkVRInteractorStyleFactory::GetInstance();
+  vtkVRInteractorStyle *style =
+      styleFactory->NewInteractorStyleFromDescription(name.toStdString());
+  int size = style ? style->GetControlledPropertySize() : -1;
+  if (style)
+    {
+    style->Delete();
+    }
+  this->Internals->propertyCombo->setVectorSizeFilter(size);
 }
 
 //-----------------------------------------------------------------------------
