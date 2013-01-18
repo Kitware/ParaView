@@ -259,17 +259,28 @@ def RescaleDataRange(datadescription, cp_views, timestep):
                         datarange[0] = math.sqrt(datarange[0])
                         datarange[1] = math.sqrt(datarange[1])
 
+
+                    import vtkParallelCorePython
+                    import paraview.vtk as vtk
+                    pm = paraview.servermanager.vtkProcessModule.GetProcessModule()
+                    globalController = pm.GetGlobalController()
+                    localarray = vtk.vtkDoubleArray()
+                    localarray.SetNumberOfTuples(2)
+                    localarray.SetValue(0, -datarange[0]) # negate so that MPI_MAX gets min instead of doing a MPI_MIN and MPI_MAX
+                    localarray.SetValue(1, datarange[1])
+                    globalarray = vtk.vtkDoubleArray()
+                    globalarray.SetNumberOfTuples(2)
+                    globalController.AllReduce(localarray, globalarray, 0)
+                    globaldatarange = [-globalarray.GetValue(0), globalarray.GetValue(1)]
                     rgbpoints = lut.RGBPoints.GetData()
                     numpts = len(rgbpoints)/4
-                    minvalue = min(datarange[0], rgbpoints[0])
-                    maxvalue = max(datarange[1], rgbpoints[(numpts-1)*4])
-                    if minvalue != rgbpoints[0] or maxvalue != rgbpoints[(numpts-1)*4]:
+                    if globaldatarange[0] != rgbpoints[0] or globaldatarange[1] != rgbpoints[(numpts-1)*4]:
                         # rescale all of the points
                         oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]
-                        newrange = maxvalue - minvalue
+                        newrange = globaldatarange[1] - globaldatarange[0]
                         newrgbpoints = list(rgbpoints)
                         for v in range(numpts):
-                            newrgbpoints[v*4] = minvalue+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
+                            newrgbpoints[v*4] = globaldatarange[0]+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
 
                         lut.RGBPoints.SetData(newrgbpoints)
 
