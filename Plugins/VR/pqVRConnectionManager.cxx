@@ -319,7 +319,7 @@ void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             const char* address = child->GetAttributeOrEmpty( "address" );
             const char* port = child->GetAttribute( "port" );
 #ifdef PARAVIEW_USE_VRUI        // TODO: Need to throw some warning if VRUI is
-                                // used when not compiled. For not we will
+                                // used when not compiled. For now we will
                                 // simply ignore VRUI configuration
             pqVRUIConnection* device = new pqVRUIConnection(this);
             device->setName( name );
