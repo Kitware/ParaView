@@ -483,11 +483,13 @@
   </VRConnectionManager>
   <VRInteractorStyles>
     <Style class="vtkVRTrackStyle" proxy="267" property="EyeTransformMatrix">
-      <Tracker name="vrui.head"/>
+      <Tracker role="Tracker" name="vrui.head"/>
     </Style>
     <Style class="vtkVRGrabWorldStyle" proxy="267" property="ModelTransformMatrix">
-      <Tracker name="vrui.wand"/>
-      <Button name="vrui.1"/>
+      <Tracker role="Tracker" name="vrui.wand"/>
+      <Button role="Reset world" name="vrui.3"/>
+      <Button role="Rotate world" name="vrui.1"/>
+      <Button role="Translate world" name="vrui.2"/>
     </Style>
    </VRInteractorStyles>
 </ParaView>
