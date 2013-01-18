@@ -6648,9 +6648,8 @@
     <!-- Start WindBladeReader -->
     <SourceProxy class="vtkWindBladeReader"
                  label="WindBlade reader"
-                 multiprocess_support="multiple_processes"
                  name="WindBladeReader">
-      <Documentation long_help="Reads WindBlade/Firetec simulation files possibly including wind turbines and topolgy files."
+      <Documentation long_help="Reads WindBlade/Firetec simulation files possibly including wind turbines and topology files."
                      short_help="Read WindBlade simulation files.">
                      WindBlade/Firetec is a simulation dealing with the effects
                      of wind on wind turbines or on the spread of fires. It
