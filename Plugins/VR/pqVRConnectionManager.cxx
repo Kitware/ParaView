@@ -103,6 +103,7 @@ pqVRConnectionManager::~pqVRConnectionManager()
 void pqVRConnectionManager::add( pqVRPNConnection* conn )
 {
   this->Internals->VRPNConnections.push_front( conn );
+  conn->setQueue( this->Internals->Queue );
   emit this->connectionsChanged();
 }
 
@@ -139,6 +140,7 @@ pqVRConnectionManager::GetVRPNConnection(const QString &name)
 void pqVRConnectionManager::add( pqVRUIConnection* conn )
 {
   this->Internals->VRUIConnections.push_front( conn );
+  conn->setQueue( this->Internals->Queue );
   emit this->connectionsChanged();
 }
 
@@ -305,7 +307,6 @@ void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
                                 // used when not compiled. For now we will
                                 // simply ignore VRPN configuration
             pqVRPNConnection* device = new pqVRPNConnection(this);
-            device->setQueue( this->Internals->Queue );
             device->setName( name );
             device->setAddress( address );
             device->configure(child, locator);
@@ -321,7 +322,6 @@ void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
                                 // used when not compiled. For not we will
                                 // simply ignore VRUI configuration
             pqVRUIConnection* device = new pqVRUIConnection(this);
-            device->setQueue( this->Internals->Queue );
             device->setName( name );
             device->setAddress( address );
             ( port )
