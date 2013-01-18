@@ -367,19 +367,19 @@ int vtkVRInteractorStyle::GetNumberOfTrackerRoles()
 // ----------------------------------------------------------------------------
 vtkStdString vtkVRInteractorStyle::GetAnalogRole(const vtkStdString &name)
 {
-  return this->GetValueInMap(this->Analogs, name);
+  return this->GetKeyInMap(this->Analogs, name);
 }
 
 // ----------------------------------------------------------------------------
 vtkStdString vtkVRInteractorStyle::GetButtonRole(const vtkStdString &name)
 {
-  return this->GetValueInMap(this->Buttons, name);
+  return this->GetKeyInMap(this->Buttons, name);
 }
 
 // ----------------------------------------------------------------------------
 vtkStdString vtkVRInteractorStyle::GetTrackerRole(const vtkStdString &name)
 {
-  return this->GetValueInMap(this->Trackers, name);
+  return this->GetKeyInMap(this->Trackers, name);
 }
 
 // ----------------------------------------------------------------------------
