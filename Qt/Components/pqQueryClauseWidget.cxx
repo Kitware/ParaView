@@ -53,6 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMap>
 
+// BUG #13806, remove collective operations temporarily since they don't work
+// for composite datasets (esp. in parallel) as expected.
+#define REMOVE_COLLECTIVE_CLAUSES
+
 class pqQueryClauseWidget::pqInternals : public Ui::pqQueryClauseWidget
 {
 public:
@@ -287,6 +291,7 @@ void pqQueryClauseWidget::populateSelectionCondition()
       pqQueryClauseWidget::SINGLE_VALUE_GE);
     this->Internals->condition->addItem("is <=",
       pqQueryClauseWidget::SINGLE_VALUE_LE);
+#ifndef REMOVE_COLLECTIVE_CLAUSES
     this->Internals->condition->addItem("is min",
       pqQueryClauseWidget::SINGLE_VALUE_MIN);
     this->Internals->condition->addItem("is max",
@@ -297,6 +302,7 @@ void pqQueryClauseWidget::populateSelectionCondition()
       pqQueryClauseWidget::SINGLE_VALUE_GE_MEAN);
     this->Internals->condition->addItem("is equal to mean with tolerance",
       pqQueryClauseWidget::SINGLE_VALUE_MEAN_WITH_TOLERANCE);
+#endif
     break;
 
   case BLOCK:
