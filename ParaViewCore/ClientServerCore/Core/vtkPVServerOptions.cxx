@@ -76,6 +76,16 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
           }
         }
       }
+    else if(key == "FullScreen")
+      {
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      str >> info.FullScreen;
+      }
+    else if(key == "ShowBorders")
+      {
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      str >> info.ShowBorders;
+      }
     else if(key == "LowerLeft")
       {
       caveBounds++;
@@ -197,6 +207,28 @@ int* vtkPVServerOptions::GetGeometry(unsigned int idx)
     }
 
   return this->Internals->MachineInformationVector[idx].Geometry;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetFullScreen(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return false;
+    }
+
+  return this->Internals->MachineInformationVector[idx].FullScreen != 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetShowBorders(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return false;
+    }
+
+  return this->Internals->MachineInformationVector[idx].ShowBorders != 0;
 }
 
 //----------------------------------------------------------------------------

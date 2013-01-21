@@ -1132,37 +1132,48 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
         {
         // Check if a custom window geometry was requested
         int *geometry = NULL;
+        bool fullscreen = true;
+        bool showborders = false;
         if (this->ParallelController)
           {
           int idx = this->ParallelController->GetLocalProcessId();
-          geometry = this->Session->GetServerInformation()->GetGeometry(idx);
-          // If the geometry has not been defined, it will be 0 0 0 0. Unset the
-          // geometry pointer in this case.
-          if (geometry[0] <= 0 && geometry[1] <= 0 && geometry[2] <= 0 &&
-              geometry[4] <= 0)
+          fullscreen = this->Session->GetServerInformation()->GetFullScreen(idx);
+          showborders = this->Session->GetServerInformation()->GetShowBorders(idx);
+          if (!fullscreen)
             {
-            geometry = NULL;
+            geometry = this->Session->GetServerInformation()->GetGeometry(idx);
+            // If the geometry has not been defined, it will be 0 0 0 0. Unset the
+            // geometry pointer in this case.
+            if (geometry[0] <= 0 && geometry[1] <= 0 && geometry[2] <= 0 &&
+                geometry[3] <= 0)
+              {
+              geometry = NULL;
+              }
             }
           }
-        // Preserve old behavior if no geometry defined.
-        if (!geometry)
+        this->Internals->SharedRenderWindow->SetBorders(showborders ? 1 : 0);
+        // Preserve old behavior for PV_ICET_WINDOW_BORDERS env var
+        if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
           {
-          if (vtksys::SystemTools::GetEnv("PV_ICET_WINDOW_BORDERS"))
-            {
-            this->Internals->SharedRenderWindow->SetSize(400, 400);
-            }
-          else
-            {
-            this->Internals->SharedRenderWindow->SetFullScreen(1);
-            }
+          this->Internals->SharedRenderWindow->SetSize(400, 400);
           }
         else
           {
-          // Use the specified geometry
-          this->Internals->SharedRenderWindow->SetPosition(geometry[0],
-                                                           geometry[1]);
-          this->Internals->SharedRenderWindow->SetSize(geometry[2],
-                                                       geometry[3]);
+          if (fullscreen)
+            {
+            this->Internals->SharedRenderWindow->SetFullScreen(1);
+            }
+          else
+            {
+            // Use the specified geometry
+            int x = geometry ? geometry[0] : 0;
+            int y = geometry ? geometry[1] : 0;
+            int w = geometry ? geometry[2] : 400;
+            int h = geometry ? geometry[3] : 400;
+            this->Internals->SharedRenderWindow->SetFullScreen(0);
+            this->Internals->SharedRenderWindow->SetPosition(x, y);
+            this->Internals->SharedRenderWindow->SetSize(w, h);
+            }
           }
         }
       else
