@@ -63,8 +63,8 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
       {
       for(int j = 0; j < 4; j++)
         {
-        int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &info.Geometry[0],
-            &info.Geometry[1], &info.Geometry[2], &info.Geometry[3]);
+        int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &info.Geometry[2],
+            &info.Geometry[3], &info.Geometry[0], &info.Geometry[1]);
         if (matches != 4)
           {
           vtkErrorMacro("Malformed geometry specification: " << value.c_str()
