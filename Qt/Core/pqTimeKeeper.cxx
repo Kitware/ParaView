@@ -196,7 +196,9 @@ void pqTimeKeeper::setTime(double time)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
-  if (!source || source->getServer() != this->getServer())
+  if (!source
+      || source->getServer() != this->getServer()
+      || pqApplicationCore::instance ()->isLoadingState ())
     {
     return;
     }
@@ -213,7 +215,9 @@ void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
-  if (!source || source->getServer() != this->getServer())
+  if (!source
+      || source->getServer() != this->getServer()
+      || pqApplicationCore::instance ()->isLoadingState ())
     {
     return;
     }
@@ -240,7 +244,8 @@ bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::viewAdded(pqView* view)
 {
-  if (view->getServer() != this->getServer())
+  if (view->getServer() != this->getServer()
+      || pqApplicationCore::instance ()->isLoadingState ())
     {
     return;
     }
@@ -257,7 +262,8 @@ void pqTimeKeeper::viewAdded(pqView* view)
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::viewRemoved(pqView* view)
 {
-  if (view->getServer() != this->getServer())
+  if (view->getServer() != this->getServer()
+      || pqApplicationCore::instance ()->isLoadingState ())
     {
     return;
     }

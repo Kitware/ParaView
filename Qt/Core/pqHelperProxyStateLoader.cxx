@@ -35,7 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServerManagerModel.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QRegExp>
 
@@ -124,9 +127,11 @@ void pqHelperProxyStateLoader::discoverHelperProxies(vtkSMProxyLocator* locator)
         {
         continue;
         }
-      vtkSMProxy* helper = locator->LocateProxy(helperid);
+      vtkSmartPointer<vtkSMProxy> helper = locator->LocateProxy(helperid);
       if (helper)
         {
+        helper->GetSessionProxyManager()->UnRegisterProxy(
+          groupname, name, helper);
         pq_proxy->addHelperProxy(name, helper);
         }
       }

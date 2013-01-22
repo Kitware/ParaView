@@ -137,7 +137,30 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy( const char* xml_group,
       return scene;
       }
     }
-  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
+  else if (xml_group && xml_name && strcmp(xml_group, "animation")==0
+           && strcmp(xml_name, "TimeAnimationCue")==0)
+    {
+    // If an animation cue already exists, we use that.
+    vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+    iter->SetSessionProxyManager(pxm);
+    vtkSMProxy* cue = 0;
+    for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
+      {
+      if (strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
+          strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
+        {
+        cue = iter->GetProxy();
+        break;
+        }
+      }
+    iter->Delete();
+    if (cue)
+      {
+      cue->Register(this);
+      return cue;
+      }
+    }
+  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0
     && strcmp(xml_name, "TimeKeeper") == 0)
     {
     // There is only one time keeper per connection, simply
