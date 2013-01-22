@@ -49,6 +49,7 @@ public:
   vtkIceTCompositePass* IceTCompositePass;
   vtkRenderPass* DelegatePass;
   bool UseDepthBuffer;
+
   virtual void Render(const vtkRenderState* render_state)
     {
     if (this->DelegatePass)
@@ -80,6 +81,20 @@ public:
     {
     this->UseDepthBuffer = useDB;
     }
+
+  virtual void ReleaseGraphicsResources(vtkWindow *window)
+    {
+    if (this->DelegatePass)
+      {
+      this->DelegatePass->ReleaseGraphicsResources(window);
+      }
+    if (this->IceTCompositePass)
+      {
+      this->IceTCompositePass->ReleaseGraphicsResources(window);
+      }
+    this->Superclass::ReleaseGraphicsResources(window);
+    }
+
 
 protected:
   vtkMyImagePasterPass()
@@ -145,6 +160,15 @@ public:
       {
       this->Superclass::GetTiledSizeAndOrigin(render_state, width, height, originX, originY);
       }
+    }
+
+  virtual void ReleaseGraphicsResources(vtkWindow *window)
+    {
+    if (this->IceTCompositePass)
+      {
+      this->IceTCompositePass->ReleaseGraphicsResources(window);
+      }
+    this->Superclass::ReleaseGraphicsResources(window);
     }
 protected:
   vtkMyCameraPass() {this->IceTCompositePass = NULL; }

@@ -1013,4 +1013,6 @@ void vtkEDLShading::ReleaseGraphicsResources(vtkWindow *w)
     this->EDLLowBlurTexture->Delete();
     this->EDLLowBlurTexture = 0;
     }
+  
+  this->Superclass::ReleaseGraphicsResources(w);
 }
