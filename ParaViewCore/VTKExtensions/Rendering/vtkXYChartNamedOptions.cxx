@@ -77,6 +77,7 @@ public:
     this->Color[2] = p.Color[2];
     this->Plots = p.Plots;
     this->Tables = p.Tables;
+    this->Corner = p.Corner;
     }
 };
 
@@ -330,7 +331,8 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
     }
   else if (this->Chart && visible)
     {
-    for(size_t i=0; i<plotInfo.Tables.size(); i++)
+    vtkChartXY *chartxy = vtkChartXY::SafeDownCast(this->Chart);
+    for (size_t i = 0; i < plotInfo.Tables.size(); i++)
       {
       // Create a new vtkPlot and initialize it
       vtkPlot *plot = this->Chart->AddPlot(this->ChartType);
@@ -342,6 +344,7 @@ void vtkXYChartNamedOptions::SetPlotVisibilityInternal(PlotInfo& plotInfo,
         plot->SetWidth(plotInfo.LineThickness);
         plot->GetPen()->SetLineType(plotInfo.LineStyle);
         plot->SetColor(plotInfo.Color[0], plotInfo.Color[1], plotInfo.Color[2]);
+        chartxy->SetPlotCorner(plot, plotInfo.Corner);
         // Must downcast to set the marker style...
         vtkPlotLine *line = vtkPlotLine::SafeDownCast(plot);
         if (line)
@@ -446,7 +449,7 @@ void vtkXYChartNamedOptions::SetAxisCorner(const char* name, int value)
     vtkChartXY *chart = vtkChartXY::SafeDownCast(this->Chart);
     if (chart)
       {
-      for(size_t i=0; i<plotInfo.Plots.size();i++)
+      for (size_t i=0; i < plotInfo.Plots.size(); i++)
         {
         chart->SetPlotCorner(plotInfo.Plots[i], value);
         }
