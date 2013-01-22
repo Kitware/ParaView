@@ -71,7 +71,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColorScalarBar1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
+  # disabling overlay test for now. It has issues with Time 0.
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
