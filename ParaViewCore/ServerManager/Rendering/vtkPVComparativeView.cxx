@@ -130,6 +130,7 @@ public:
           vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
           helper.Set(0);
           repr->UpdateProperty("ForceUseCache");
+          repr->ClearMarkedModified();
           repr->MarkDirty(NULL);
           helper.Set(1);
           repr->UpdateProperty("ForceUseCache");
@@ -769,22 +770,9 @@ void vtkPVComparativeView::UpdateAllRepresentations(int x, int y)
     this->Internal->Views[0] :
     this->Internal->Views[y*this->Dimensions[0] + x];
 
-  vtkCollection* collection = vtkCollection::New();
-  this->GetRepresentations(x, y, collection);
-  collection->InitTraversal();
-  while (vtkSMRepresentationProxy* repr =
-    vtkSMRepresentationProxy::SafeDownCast(
-      collection->GetNextItemAsObject()))
-    {
-    if (vtkSMPropertyHelper(repr, "Visibility", true).GetAsInt() == 1)
-      {
-      repr->UpdatePipeline(
-        vtkSMPropertyHelper(view, "ViewTime").GetAsDouble());
-      }
-    }
+  // Simply update the corresponding view. That'll update the representations in
+  // that view.
   view->Update();
-
-  collection->Delete();
 }
 
 //----------------------------------------------------------------------------
