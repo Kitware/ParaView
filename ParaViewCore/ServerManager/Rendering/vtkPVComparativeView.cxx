@@ -373,7 +373,7 @@ void vtkPVComparativeView::Build(int dx, int dy)
       vtkInternal::RepresentationData& data = reprIter->second;
 
       // remove old root-clones if extra.
-      if (data.Clones.size() > numReprs)
+      if (data.Clones.size() > (numReprs-1))
         {
         for (cc = data.Clones.size()-1; cc >= numReprs; cc--)
           {
@@ -389,17 +389,7 @@ void vtkPVComparativeView::Build(int dx, int dy)
         // add new root-clones if needed.
         for (cc = data.Clones.size(); cc < numReprs-1; cc++)
           {
-          vtkSMProxy* newRepr =
-            pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName());
-          vtkCopyClone(repr, newRepr); // create a clone
-          newRepr->UpdateVTKObjects(); // create objects
-          data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT); // link properties
-          vtkAddRepresentation(root_view,newRepr);  // add representation to view
-
-          // Now update data structure to include this view/repr clone.
-          data.Clones.push_back(
-            vtkInternal::RepresentationCloneItem(root_view, newRepr));
-          newRepr->Delete();
+          this->Internal->AddRepresentationClone(repr, root_view);
           }
         }
       }
