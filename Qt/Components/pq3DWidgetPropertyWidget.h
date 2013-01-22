@@ -47,6 +47,12 @@ public:
   void apply();
   void reset();
 
+  /// Forwards the call to the internal pq3DWidget instance.
+  void select();
+
+  /// Forwards the call to the internal pq3DWidget instance.
+  void deselect();
+
   pq3DWidget* get3DWidget() const { return this->Widget; }
 
 private:

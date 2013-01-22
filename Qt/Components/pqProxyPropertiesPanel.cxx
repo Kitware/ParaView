@@ -34,9 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QFormLayout>
 
-#include "pqProxy.h"
-#include "pqPropertyWidget.h"
+#include "pq3DWidgetPropertyWidget.h"
 #include "pqPropertiesPanelItem.h"
+#include "pqPropertyWidget.h"
+#include "pqProxy.h"
 
 pqProxyPropertiesPanel::pqProxyPropertiesPanel(pqProxy *proxy_, QWidget *parent_)
   : QWidget(parent_),
@@ -81,6 +82,27 @@ void pqProxyPropertiesPanel::reset()
     if(widget)
       {
       widget->reset();
+      }
+    }
+}
+
+void pqProxyPropertiesPanel::setVisible(bool value)
+{
+  this->Superclass::setVisible(value);
+  foreach(const pqPropertiesPanelItem &item, m_items)
+    {
+    pq3DWidgetPropertyWidget *widget =
+      qobject_cast<pq3DWidgetPropertyWidget*>(item.PropertyWidget);
+    if (widget)
+      {
+      if (value)
+        {
+        widget->select();
+        }
+      else
+        {
+        widget->deselect();
+        }
       }
     }
 }
