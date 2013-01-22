@@ -59,6 +59,11 @@ public:
   /// component will be displayed separately. Default: false.
   bool getCollapseVectors() const;
 
+  /// This class can filter the displayed properties to only show those with a
+  /// specified number of components. Returns the current filter settings. -1
+  /// means no filtering (default).
+  int getVectorSizeFilter() const;
+
   /// Sometimes, we want the combo to show a empty field that does not represent
   /// any property. Set this to true to use such a field.
   void setUseBlankEntry(bool b)
@@ -76,6 +81,11 @@ public slots:
   /// If true, vector properties will have a single entry. If false, each vector
   /// component will be displayed separately. Default: false.
   void setCollapseVectors(bool val);
+
+  /// This class can filter the displayed properties to only show those with a
+  /// specified number of components. Set the current filter setting. -1
+  /// means no filtering (default).
+  void setVectorSizeFilter(int size);
 
   /// Add a property to the widget.
   void addSMProperty(const QString& label, const QString& propertyname, int index);

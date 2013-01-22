@@ -44,6 +44,8 @@ public:
   vtkTypeMacro(vtkVRControlSliceOrientationStyle, vtkVRInteractorStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  virtual int GetControlledPropertySize() { return 3; }
+
   /// called to update all the remote vtkObjects and perhaps even to render.
   /// Typically processing intensive operations go here. The method should not
   /// be called from within the handler and is reserved to be called from an

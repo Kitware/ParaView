@@ -56,12 +56,14 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->CollapseVectors = false;
+    this->VectorSizeFilter = -1;
     }
 
   vtkSmartPointer<vtkSMProxy> Source;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   bool CollapseVectors;
+  int VectorSizeFilter;
 
   struct PropertyInfo
     {
@@ -134,6 +136,16 @@ void pqAnimatablePropertiesComboBox::setCollapseVectors(bool val)
 }
 
 //-----------------------------------------------------------------------------
+void pqAnimatablePropertiesComboBox::setVectorSizeFilter(int size)
+{
+  if (this->Internal->VectorSizeFilter != size)
+    {
+    this->Internal->VectorSizeFilter = size;
+    this->buildPropertyList();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimatablePropertiesComboBox::buildPropertyList()
 {
   this->clear();
@@ -166,6 +178,12 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy
       continue;
       }
     unsigned int num_elems = smproperty->GetNumberOfElements();
+    if (this->Internal->VectorSizeFilter >= 0 &&
+        num_elems != this->Internal->VectorSizeFilter)
+      {
+      continue;
+      }
+
     bool collapseVectors = this->Internal->CollapseVectors
         || smproperty->GetRepeatCommand();
 
@@ -318,5 +336,11 @@ int pqAnimatablePropertiesComboBox::getCurrentIndex() const
 bool pqAnimatablePropertiesComboBox::getCollapseVectors() const
 {
   return this->Internal->CollapseVectors;
+}
+
+//-----------------------------------------------------------------------------
+int pqAnimatablePropertiesComboBox::getVectorSizeFilter() const
+{
+  return this->Internal->VectorSizeFilter;
 }
 

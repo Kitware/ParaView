@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRUIPipe.h"
 #include <cassert>
+#include <unistd.h>
 #ifdef QTSOCK
 #include <QTcpSocket>
 #else

@@ -49,6 +49,8 @@ public:
   vtkTypeMacro(vtkVRTrackStyle, vtkVRInteractorStyle)
   void PrintSelf(ostream &os, vtkIndent indent);
 
+  virtual int GetControlledPropertySize() { return 16; }
+
 protected:
   vtkVRTrackStyle();
   ~vtkVRTrackStyle();
