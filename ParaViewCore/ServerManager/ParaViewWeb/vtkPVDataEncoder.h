@@ -56,7 +56,7 @@ public:
   // the caller code will simply release reference to the data and stop using
   // it. vtkPVDataEncoder takes over the reference for the image and will call
   // vtkObject::UnRegister() on it when it's done.
-  void PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data);
+  void PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data, int quality);
 
   // Description:
   // Get access to the most-recent fully encoded result corresponding to the

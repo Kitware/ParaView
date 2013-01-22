@@ -81,14 +81,20 @@ bool vtkPVWebApplication::GetHasImagesBeingProcessed(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-vtkUnsignedCharArray* vtkPVWebApplication::InteractiveRender(vtkSMViewProxy* view)
+vtkUnsignedCharArray* vtkPVWebApplication::InteractiveRender(vtkSMViewProxy* view, int quality)
 {
   // for now, just do the same as StillRender().
-  return this->StillRender(view);
+  return this->StillRender(view, quality);
 }
 
 //----------------------------------------------------------------------------
-vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view)
+void vtkPVWebApplication::InvalidateCache(vtkSMViewProxy* view)
+{
+  this->Internals->ImageCache[view].NeedsRender = true;
+}
+
+//----------------------------------------------------------------------------
+vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int quality)
 {
   if (!view)
     {
@@ -98,7 +104,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view)
 
   vtkInternals::ImageCacheValueType& value = this->Internals->ImageCache[view];
 
-  if (value.NeedsRender == false && 
+  if (value.NeedsRender == false &&
     value.Data != NULL &&
     view->HasDirtyRepresentation() == false)
     {
@@ -122,7 +128,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view)
   //vtkTimerLog::MarkEndEvent("StillRenderToString");
   //vtkTimerLog::DumpLogWithIndents(&cout, 0.0);
 
-  this->Internals->Encoder->PushAndTakeReference(view->GetGlobalID(), image);
+  this->Internals->Encoder->PushAndTakeReference(view->GetGlobalID(), image, quality);
   assert(image == NULL);
   
   if (value.Data == NULL)
@@ -140,11 +146,13 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVWebApplication::StillRenderToString(vtkSMViewProxy* view)
+const char* vtkPVWebApplication::StillRenderToString(vtkSMViewProxy* view, unsigned long time, int quality)
 {
-  vtkUnsignedCharArray* array = this->StillRender(view);
-  if (array)
+  vtkUnsignedCharArray* array = this->StillRender(view, quality);
+  if (array && array->GetMTime() != time)
     {
+    this->LastStillRenderToStringMTime = array->GetMTime();
+    cout << "Image size: " << array->GetNumberOfTuples() << endl;
     return reinterpret_cast<char*>(array->GetPointer(0));
     }
   return NULL;

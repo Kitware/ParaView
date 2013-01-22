@@ -54,7 +54,8 @@ namespace
     public:
       vtkTypeUInt32 OutputStamp;
       vtkSmartPointer<vtkImageData> Image;
-      InputValueType() : OutputStamp(0), Image(NULL)
+      int Quality;
+      InputValueType() : OutputStamp(0), Image(NULL), Quality(100)
       {
       }
       };
@@ -144,13 +145,14 @@ namespace
     
     //------------------------------------------------------------------------
     void PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data,
-      vtkTypeUInt64 stamp)
+      vtkTypeUInt64 stamp, int quality)
       {
       this->InputsLock.Lock();
         {
         vtkSharedData::InputValueType &value = this->Inputs[key];
         value.Image.TakeReference(data);
         value.OutputStamp = stamp;
+        value.Quality = quality;
         data = NULL;
         }
       this->InputsLock.Unlock();
@@ -175,7 +177,7 @@ namespace
     // NOTE: This method may suspend the calling thread until inputs become
     // available.
     vtkTypeUInt64 GetNextInputToProcess(vtkTypeUInt32& key,
-      vtkSmartPointer<vtkImageData>& image)
+      vtkSmartPointer<vtkImageData>& image, int& quality)
       {
       vtkTypeUInt32 stamp = 0;
 
@@ -192,6 +194,7 @@ namespace
             image = iter->second.Image;
             iter->second.Image = NULL;
             stamp = iter->second.OutputStamp;
+            quality = iter->second.Quality;
             break;
             }
           }
@@ -294,9 +297,9 @@ namespace
       vtkTypeUInt32 key = 0;
       vtkSmartPointer<vtkImageData> image;
       vtkTypeUInt64 timestamp = 0;
+      int quality = 100;
 
-      timestamp = sharedData->GetNextInputToProcess(key, image);
-      //cout << "Awake Thread: " << vtkMultiThreader::GetCurrentThreadID() << endl;
+      timestamp = sharedData->GetNextInputToProcess(key, image, quality);
 
       if (timestamp == 0 || image.GetPointer() == NULL)
         {
@@ -310,7 +313,7 @@ namespace
       vtkNew<vtkJPEGWriter> writer;
       writer->WriteToMemoryOn();
       writer->SetInputData(image);
-      writer->SetQuality(70);
+      writer->SetQuality(quality);
       writer->Write();
       vtkUnsignedCharArray* data = writer->GetResult();
 
@@ -406,14 +409,14 @@ void vtkPVDataEncoder::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataEncoder::PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data)
+void vtkPVDataEncoder::PushAndTakeReference(vtkTypeUInt32 key, vtkImageData* &data, int quality)
 {
   // if data->ReferenceCount != 1, it means the caller thread is keep an extra
   // reference and that's bad.
   assert(data->GetReferenceCount() == 1);
 
   this->Internals->SharedData.PushAndTakeReference(
-    key, data, ++this->Internals->Counter);
+    key, data, ++this->Internals->Counter, quality);
   assert(data == NULL);
 }
 

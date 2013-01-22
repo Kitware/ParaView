@@ -58,9 +58,9 @@ public:
 
   // Description:
   // Render a view and obtain the rendered image.
-  vtkUnsignedCharArray* StillRender(vtkSMViewProxy* view);
-  vtkUnsignedCharArray* InteractiveRender(vtkSMViewProxy* view);
-  const char* StillRenderToString(vtkSMViewProxy* view);
+  vtkUnsignedCharArray* StillRender(vtkSMViewProxy* view, int quality = 100);
+  vtkUnsignedCharArray* InteractiveRender(vtkSMViewProxy* view, int quality = 50);
+  const char* StillRenderToString(vtkSMViewProxy* view, unsigned long time = 0, int quality = 100);
 
   // Description:
   // StillRenderToString() need not necessary returns the most recently rendered
@@ -74,6 +74,14 @@ public:
   bool HandleInteractionEvent(
     vtkSMViewProxy* view, vtkPVWebInteractionEvent* event);
 
+  // Description:
+  // Invalidate view cache
+  void InvalidateCache(vtkSMViewProxy* view);
+
+  // Description:
+  // Return the MTime of the last array exported by StillRenderToString.
+  vtkGetMacro(LastStillRenderToStringMTime, unsigned long);
+
 //BTX
 protected:
   vtkPVWebApplication();
@@ -81,6 +89,7 @@ protected:
 
   int ImageEncoding;
   int ImageCompression;
+  unsigned long LastStillRenderToStringMTime;
 
 private:
   vtkPVWebApplication(const vtkPVWebApplication&); // Not implemented
