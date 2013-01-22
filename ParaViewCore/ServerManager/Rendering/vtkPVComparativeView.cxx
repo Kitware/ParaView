@@ -118,26 +118,6 @@ public:
     VectorOfClones Clones;
     vtkSmartPointer<vtkSMProxyLink> Link;
 
-    void MarkRepresentationsModified()
-      {
-      VectorOfClones::iterator iter;
-      for (iter = this->Clones.begin(); iter != this->Clones.end(); ++iter)
-        {
-        vtkSMRepresentationProxy * repr =
-          vtkSMRepresentationProxy::SafeDownCast(iter->CloneRepresentation);
-        if (repr)
-          {
-          vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
-          helper.Set(0);
-          repr->UpdateProperty("ForceUseCache");
-          repr->ClearMarkedModified();
-          repr->MarkDirty(NULL);
-          helper.Set(1);
-          repr->UpdateProperty("ForceUseCache");
-          }
-        }
-      }
-
     // Returns the representation clone in the given view.
     VectorOfClones::iterator FindRepresentationClone(vtkSMViewProxy* view)
       {
@@ -704,10 +684,6 @@ void vtkPVComparativeView::Update()
     return;
     }
 
-  // ensure that all representation caches are cleared.
-  this->ClearDataCaches();
-  // cout << "-------------" << endl;
-
   vtkSMComparativeAnimationCueProxy* timeCue = NULL;
   // locate time cue.
   for (vtkInternal::VectorOfCues::iterator iter = this->Internal->Cues.begin();
@@ -766,17 +742,20 @@ void vtkPVComparativeView::Update()
 //----------------------------------------------------------------------------
 void vtkPVComparativeView::UpdateAllRepresentations(int x, int y)
 {
+  // Ensure cache is cleared for the representations corresponding to the given
+  // position.
+  this->ClearDataCaches(x, y);
+
   vtkSMViewProxy* view = this->OverlayAllComparisons?
     this->Internal->Views[0] :
     this->Internal->Views[y*this->Dimensions[0] + x];
-
   // Simply update the corresponding view. That'll update the representations in
   // that view.
   view->Update();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeView::ClearDataCaches()
+void vtkPVComparativeView::ClearDataCaches(int x, int y)
 {
   // Mark all representations modified. This clears their caches. It's essential
   // that SetUseCache(false) is called before we do this, otherwise the caches
@@ -789,17 +768,29 @@ void vtkPVComparativeView::ClearDataCaches()
     {
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
       repcloneiter->first);
-    if (repr)
+    vtkSMRepresentationProxy* reprToClear = NULL;
+    if (x == 0 && y == 0)
       {
-      vtkSMPropertyHelper helper(repr, "ForceUseCache", true);
+      reprToClear = repr;
+      }
+    else
+      {
+      assert((x + this->Dimensions[0]*y - 1) < repcloneiter->second.Clones.size());
+      const vtkInternal::RepresentationCloneItem& item =
+        repcloneiter->second.Clones[x + this->Dimensions[0]*y - 1];
+      reprToClear = vtkSMRepresentationProxy::SafeDownCast(
+        item.CloneRepresentation.GetPointer());
+      }
+
+    if (reprToClear)
+      {
+      vtkSMPropertyHelper helper(reprToClear, "ForceUseCache", true);
       helper.Set(0);
-      repr->UpdateProperty("ForceUseCache");
-      // HACK.
-      repr->ClearMarkedModified();
-      repr->MarkDirty(NULL);
-      repcloneiter->second.MarkRepresentationsModified();
+      reprToClear->UpdateProperty("ForceUseCache");
+      reprToClear->ClearMarkedModified(); // HACK.
+      reprToClear->MarkDirty(NULL);
       helper.Set(1);
-      repr->UpdateProperty("ForceUseCache");
+      reprToClear->UpdateProperty("ForceUseCache");
       }
     }
 }
