@@ -25,7 +25,6 @@
   <!-- Specify an explicit range for Y-axis (40, 300). Now verify that over time
   the axis range remains fixed to (40, 300) -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="expand" arguments="1.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/UseFixedRange" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/AxisRangePages/MinMaxPage/RangeMin" command="set_string" arguments="40" />
@@ -42,7 +41,6 @@
   <!-- With fixed Y-axis range, now lets specify custom labels. They should
   remain fixed over time as well. -->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/UseFixedLabels" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/AxisLayoutPages/ListPage/AddButton" command="activate" arguments="" />
@@ -106,7 +104,6 @@
   automatically. The axis range should scale with time, but the labels should
   sitll stay fixed at those we specified.-->
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/OptionsButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="setCurrent" arguments="1.0.0.0" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/AxisLayout/widget_2/ComputeRangeAutomatically" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />

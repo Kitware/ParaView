@@ -448,6 +448,8 @@ void pqOptionsDialog::addOptions(const QString &path, pqOptionsPage *options)
     this->Form->Pages.insert(path, options);
     this->Form->Model->addPath(path);
     }
+
+  this->Form->PageNames->expandAll();
 }
 
 void pqOptionsDialog::addOptions(pqOptionsContainer *options)
