@@ -188,18 +188,16 @@ static void update_property(vtkAxis* axis, vtkSMProperty* prop)
     {
     double range[2];
     axis->GetRange(range);
-    vtkSMPropertyHelper(prop).SetNumberOfElements(2);
     vtkSMPropertyHelper(prop).Set(range, 2);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMContextViewProxy::OnInteractionEvent()
+void vtkSMContextViewProxy::CopyAxisRangesFromChart()
 {
   vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
   if (chartXY)
     {
-    // FIXME: Generalize to support charts with zero to many axes.
     update_property(
       chartXY->GetAxis(vtkAxis::LEFT), this->GetProperty("LeftAxisRange"));
     update_property(
@@ -209,6 +207,21 @@ void vtkSMContextViewProxy::OnInteractionEvent()
     update_property(
       chartXY->GetAxis(vtkAxis::BOTTOM), this->GetProperty("BottomAxisRange"));
     this->UpdateVTKObjects();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMContextViewProxy::OnInteractionEvent()
+{
+  vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
+  if (chartXY)
+    {
+    // On interaction, we ensure that the axis range properties reflect the
+    // values that the user ended up picking due to the interactions. Thus, even
+    // when user picks custom ranges for charts, he can still interact with the
+    // view, we just update the custom range that was specified.
+    this->CopyAxisRangesFromChart();
+    this->UpdateVTKObjects();
     this->InvokeEvent(vtkCommand::InteractionEvent);
     }
 }
@@ -216,15 +229,34 @@ void vtkSMContextViewProxy::OnInteractionEvent()
 //-----------------------------------------------------------------------------
 void vtkSMContextViewProxy::ResetDisplay()
 {
-  vtkSMPropertyHelper(this, "LeftAxisRange", true).SetNumberOfElements(0);
-  vtkSMPropertyHelper(this, "RightAxisRange", true).SetNumberOfElements(0);
-  vtkSMPropertyHelper(this, "TopAxisRange", true).SetNumberOfElements(0);
-  vtkSMPropertyHelper(this, "BottomAxisRange", true).SetNumberOfElements(0);
-  this->UpdateProperty("LeftAxisRange", 1);
-  this->UpdateProperty("RightAxisRange", 1);
-  this->UpdateProperty("TopAxisRange", 1);
-  this->UpdateProperty("BottomAxisRange", 1);
-  this->StillRender();
+  // To simulate reset display, we turn-off using of custom ranges temporarily,
+  // compute the bounds and then restore the state.
+  vtkChartXY *chartXY = vtkChartXY::SafeDownCast(this->GetContextItem());
+  if (chartXY)
+    {
+    bool axis_behavior_fixed[4] = {false, false, false, false};
+    for (int cc=0; cc < 4; cc++)
+      {
+      vtkAxis* axis = chartXY->GetAxis(cc);
+      if (axis && axis->GetBehavior() == vtkAxis::FIXED)
+        {
+        axis_behavior_fixed[cc] = true;
+        axis->SetBehavior(vtkAxis::AUTO);
+        }
+      }
+    this->StillRender();
+    chartXY->RecalculateBounds();
+    this->CopyAxisRangesFromChart();
+    this->UpdateVTKObjects();
+    for (int cc=0; cc < 4; cc++)
+      {
+      vtkAxis* axis = chartXY->GetAxis(cc);
+      if (axis && axis_behavior_fixed[cc])
+        {
+        axis->SetBehavior(vtkAxis::FIXED);
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractItemDelegate>
 #include <QColor>
+#include <QDoubleValidator>
 #include <QFont>
 #include <QFontDialog>
 #include <QItemSelectionModel>
@@ -77,6 +78,22 @@ public:
     };
 
   ChartType Type;
+  const char* AxisRangePropertyNames[4];
+  const char* AxisLabelPropertyNames[4];
+
+  pqInternal()
+    {
+    // This just makes property traversal easier.
+    this->AxisRangePropertyNames[vtkAxis::LEFT] = "LeftAxisRange";
+    this->AxisRangePropertyNames[vtkAxis::RIGHT] = "RightAxisRange";
+    this->AxisRangePropertyNames[vtkAxis::TOP] = "TopAxisRange";
+    this->AxisRangePropertyNames[vtkAxis::BOTTOM] = "BottomAxisRange";
+
+    this->AxisLabelPropertyNames[vtkAxis::LEFT] = "LeftAxisLabels";
+    this->AxisLabelPropertyNames[vtkAxis::RIGHT] = "RightAxisLabels";
+    this->AxisLabelPropertyNames[vtkAxis::TOP] = "TopAxisLabels";
+    this->AxisLabelPropertyNames[vtkAxis::TOP] = "BottomAxisLabels";
+    }
 };
 
 class pqXYChartOptionsEditorAxis
@@ -93,6 +110,7 @@ public:
   QFont TitleFont;
   QString Title;
   QStringListModel Labels;
+  QPair<double, double> Range;
   int GridType;
   int Notation;
   int Precision;
@@ -102,6 +120,7 @@ public:
   bool ShowLabels;
   bool UseLogScale;
   bool UseCustomLabels;
+  bool UseFixedRange;
 };
 
 class pqXYChartOptionsEditorForm : public Ui::pqChartOptionsWidget
@@ -135,6 +154,8 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
   this->ShowLabels = true;
   this->UseLogScale = false;
   this->UseCustomLabels = false;
+  this->UseFixedRange = false;
+  this->Range.first = this->Range.second = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -231,11 +252,15 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form->LabelNotation->addItem("Mixed");
   this->Internal->Form->LabelNotation->addItem("Scientific");
   this->Internal->Form->LabelNotation->addItem("Fixed");
-  //this->Internal->Form->UseFixedInterval->setHidden(true);
+  //this->Internal->Form->UseFixedLabels->setHidden(true);
   this->Internal->Form->label_12->setHidden(true);
   this->Internal->Form->AxisTitleAlignment->setHidden(true);
   this->Internal->Form->label_7->setHidden(true);
   this->Internal->Form->LegendFlow->setHidden(true);
+
+  this->Internal->Form->RangeMin->setValidator(new QDoubleValidator(this));
+  this->Internal->Form->RangeMax->setValidator(new QDoubleValidator(this));
+
 
   // Connect up some of the form elements
   QObject::connect(this->Internal->Form->ChartTitleFontButton,
@@ -243,10 +268,10 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   QObject::connect(this->Internal->Form->ChartTitleColor,
                    SIGNAL(chosenColorChanged(QColor)),
                    this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->Form->UseChartSelect, SIGNAL(toggled(bool)),
-                   this, SLOT(changeLayoutPage(bool)));
-  QObject::connect(this->Internal->Form->UseFixedInterval, SIGNAL(toggled(bool)),
-                   this, SLOT(changeLayoutPage(bool)));
+  QObject::connect(this->Internal->Form->UseFixedLabels, SIGNAL(toggled(bool)),
+                   this, SLOT(changeCustomLabelsPage(bool)));
+  QObject::connect(this->Internal->Form->UseFixedRange, SIGNAL(toggled(bool)),
+                   this, SLOT(changeRangePage(bool)));
   QObject::connect(this->Internal->Form->ShowAxis, SIGNAL(toggled(bool)),
                    this, SLOT(setAxisVisibility(bool)));
   QObject::connect(this->Internal->Form->ShowAxisGrid, SIGNAL(toggled(bool)),
@@ -270,6 +295,10 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   QObject::connect(this->Internal->Form->LabelPrecision,
                    SIGNAL(valueChanged(int)),
                    this, SLOT(setLabelPrecision(int)));
+  QObject::connect(this->Internal->Form->RangeMin, SIGNAL(textChanged(const QString&)),
+                   this, SLOT(setAxisRangeMin(const QString&)));
+  QObject::connect(this->Internal->Form->RangeMax, SIGNAL(textChanged(const QString&)),
+                   this, SLOT(setAxisRangeMax(const QString&)));
 
   QObject::connect(this->Internal->Form->UseLogScale, SIGNAL(toggled(bool)),
                    this, SLOT(setUsingLogScale(bool)));
@@ -618,6 +647,34 @@ void pqXYChartOptionsEditor::setAxisTitle(const QString& text)
     }
 }
 
+void pqXYChartOptionsEditor::setAxisRangeMin(const QString& text)
+{
+  const int index = this->Internal->Form->AxisIndex;
+  double value = text.toDouble();
+  if (index != -1)
+    {
+    if (this->Internal->Form->AxisData[index]->Range.first != value)
+      {
+      this->Internal->Form->AxisData[index]->Range.first = value;
+      this->changesAvailable();
+      }
+    }
+}
+
+void pqXYChartOptionsEditor::setAxisRangeMax(const QString& text)
+{
+  const int index = this->Internal->Form->AxisIndex;
+  double value = text.toDouble();
+  if (index != -1)
+    {
+    if (this->Internal->Form->AxisData[index]->Range.second != value)
+      {
+      this->Internal->Form->AxisData[index]->Range.second = value;
+      this->changesAvailable();
+      }
+    }
+}
+
 void pqXYChartOptionsEditor::addAxisLabel()
 {
   if (this->Internal->Form->AxisIndex != -1)
@@ -947,6 +1004,27 @@ void pqXYChartOptionsEditor::updateOptions()
     pqSMAdaptor::getElementProperty(proxy->GetProperty("TooltipPrecision")).toInt());
 
   values = pqSMAdaptor::getMultipleElementProperty(
+    proxy->GetProperty("AxisUseCustomRange"));
+  if (values.size() == 4)
+    {
+    for (int cc=0; cc < 4; cc++)
+      {
+      this->Internal->Form->AxisData[cc]->UseFixedRange = values[cc].toBool();
+      }
+    }
+
+  for (int cc=0; cc < 4; cc++)
+    {
+    values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty(this->Internal->AxisRangePropertyNames[cc]));
+    if (values.size() == 2)
+      {
+      this->Internal->Form->AxisData[cc]->Range =
+        QPair<double, double>(values[0].toDouble(), values[1].toDouble());
+      }
+    }
+
+  values = pqSMAdaptor::getMultipleElementProperty(
     proxy->GetProperty("AxisUseCustomLabels"));
   if (values.size() == 4)
     {
@@ -956,42 +1034,17 @@ void pqXYChartOptionsEditor::updateOptions()
       }
     }
 
-  values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("AxisLabelsLeft"));
-  QStringList labels;
-  foreach (const QVariant& val, values)
+  for (int cc=0; cc < 4; cc++)
     {
-    labels << val.toString();
+    values = pqSMAdaptor::getMultipleElementProperty(
+      proxy->GetProperty(this->Internal->AxisLabelPropertyNames[cc]));
+    QStringList labels;
+    foreach (const QVariant& val, values)
+      {
+      labels << val.toString();
+      }
+    this->Internal->Form->AxisData[cc]->Labels.setStringList(labels);
     }
-  this->Internal->Form->AxisData[vtkAxis::LEFT]->Labels.setStringList(labels);
-  labels.clear();
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("AxisLabelsBottom"));
-  foreach (const QVariant& val, values)
-    {
-    labels << val.toString();
-    }
-  this->Internal->Form->AxisData[vtkAxis::BOTTOM]->Labels.setStringList(labels);
-  labels.clear();
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("AxisLabelsRight"));
-  foreach (const QVariant& val, values)
-    {
-    labels << val.toString();
-    }
-  this->Internal->Form->AxisData[vtkAxis::RIGHT]->Labels.setStringList(labels);
-  labels.clear();
-
-  values = pqSMAdaptor::getMultipleElementProperty(
-    proxy->GetProperty("AxisLabelsTop"));
-  foreach (const QVariant& val, values)
-    {
-    labels << val.toString();
-    }
-  this->Internal->Form->AxisData[vtkAxis::TOP]->Labels.setStringList(labels);
-  labels.clear();
 
   this->blockSignals(false);
 
@@ -1115,6 +1168,28 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisLabelPrecision"), values);
 
+  // Axis ranges.
+  values.clear();
+  for (int i=0; i < 4; i++)
+    {
+    values.append(this->Internal->Form->AxisData[i]->UseFixedRange);
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+    proxy->GetProperty("AxisUseCustomRange"), values);
+
+  // Set ranges for each of the axis.
+  for (int i=0; i < 4; i++)
+    {
+    values.clear();
+    if (this->Internal->Form->AxisData[i]->UseFixedRange)
+      {
+      values.append(this->Internal->Form->AxisData[i]->Range.first);
+      values.append(this->Internal->Form->AxisData[i]->Range.second);
+      pqSMAdaptor::setMultipleElementProperty(
+        proxy->GetProperty(this->Internal->AxisRangePropertyNames[i]), values);
+      }
+    }
+
   // Axis use custom labels.
   values.clear();
   for(int i = 0; i < 4; ++i)
@@ -1124,43 +1199,19 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisUseCustomLabels"), values);
 
-  // Custom axis labels for the bottom axis
-  values.clear();
-  QStringList labels =
-      this->Internal->Form->AxisData[vtkAxis::LEFT]->Labels.stringList();
-  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+  // Custom axis labels for the each of the axis
+  for (int i=0; i < 4; i++)
     {
-    values.append(it->toDouble());
+    values.clear();
+    QStringList labels =
+      this->Internal->Form->AxisData[i]->Labels.stringList();
+    for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
+      {
+      values.append(it->toDouble());
+      }
+    pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty(this->Internal->AxisLabelPropertyNames[i]), values);
     }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelsLeft"), values);
-
-  values.clear();
-  labels = this->Internal->Form->AxisData[vtkAxis::BOTTOM]->Labels.stringList();
-  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
-    {
-    values.append(it->toDouble());
-    }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelsBottom"), values);
-
-  values.clear();
-  labels = this->Internal->Form->AxisData[vtkAxis::RIGHT]->Labels.stringList();
-  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
-    {
-    values.append(it->toDouble());
-    }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelsRight"), values);
-
-  values.clear();
-  labels = this->Internal->Form->AxisData[vtkAxis::TOP]->Labels.stringList();
-  for(QStringList::Iterator it = labels.begin(); it != labels.end(); ++it)
-    {
-    values.append(it->toDouble());
-    }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelsTop"), values);
 
   // Axis use log scale
   values.clear();
@@ -1231,15 +1282,31 @@ void pqXYChartOptionsEditor::loadAxisLayoutPage()
   pqXYChartOptionsEditorAxis *axis =
           this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
   this->Internal->Form->UseLogScale->setChecked(axis->UseLogScale);
-  if (axis->UseCustomLabels)
+  
+  if (axis->UseFixedRange)
     {
-    this->Internal->Form->UseFixedInterval->setChecked(true);
+    this->Internal->Form->UseFixedRange->setChecked(true);
     }
   else
     {
-    this->Internal->Form->UseChartSelect->setChecked(true);
+    this->Internal->Form->ComputeRangeAutomatically->setChecked(true);
     }
-  this->changeLayoutPage(true);
+  this->changeRangePage(axis->UseFixedRange);
+
+  this->Internal->Form->RangeMin->setText(
+    QString::number(axis->Range.first));
+  this->Internal->Form->RangeMax->setText(
+    QString::number(axis->Range.second));
+
+  if (axis->UseCustomLabels)
+    {
+    this->Internal->Form->UseFixedLabels->setChecked(true);
+    }
+  else
+    {
+    this->Internal->Form->ComputeLabelsAutomatically->setChecked(true);
+    }
+  this->changeCustomLabelsPage(axis->UseCustomLabels);
 
   QItemSelectionModel *model =
           this->Internal->Form->LabelList->selectionModel();
@@ -1269,25 +1336,33 @@ void pqXYChartOptionsEditor::loadAxisTitlePage()
   this->blockSignals(false);
 }
 
-void pqXYChartOptionsEditor::changeLayoutPage(bool checked)
+void pqXYChartOptionsEditor::changeCustomLabelsPage(bool use_custom_labels)
 {
-  if(checked && this->Internal->Form->AxisIndex != -1)
+  if(this->Internal->Form->AxisIndex != -1)
     {
     // Change the axis layout stack page when the user picks an option.
     pqXYChartOptionsEditorAxis *axis =
         this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
-    if(this->Internal->Form->UseFixedInterval->isChecked())
-      {
-      this->Internal->Form->AxisLayoutPages->setCurrentWidget(
-              this->Internal->Form->ListPage);
-      axis->UseCustomLabels = true;
-      }
-    else
-      {
-      this->Internal->Form->AxisLayoutPages->setCurrentWidget(
-              this->Internal->Form->BlankPage);
-      axis->UseCustomLabels = false;
-      }
+    this->Internal->Form->AxisLayoutPages->setCurrentWidget(
+      use_custom_labels?
+      this->Internal->Form->ListPage:
+      this->Internal->Form->BlankPage);
+    axis->UseCustomLabels = use_custom_labels;
+    this->changesAvailable();
+    }
+}
+
+void pqXYChartOptionsEditor::changeRangePage(bool use_fixed_range)
+{
+  if (this->Internal->Form->AxisIndex != -1)
+    {
+    pqXYChartOptionsEditorAxis* axis =
+      this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
+    this->Internal->Form->AxisRangePages->setCurrentWidget(
+      use_fixed_range?
+      this->Internal->Form->MinMaxPage:
+      this->Internal->Form->BlankPage_2);
+    axis->UseFixedRange = use_fixed_range;
     this->changesAvailable();
     }
 }

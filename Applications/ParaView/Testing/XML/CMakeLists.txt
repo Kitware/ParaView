@@ -64,6 +64,7 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/CalcParens.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Calculator.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CameraLink.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/ChartAxisRangeAndLabels.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Clip.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/NewColorEditor1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor2.xml
@@ -216,6 +217,7 @@ set(AnimatePipelineTime_USE_NEW_PANELS TRUE)
 set(CalcParens_USE_NEW_PANELS TRUE)
 set(Calculator_USE_NEW_PANELS TRUE)
 set(CameraLink_USE_NEW_PANELS TRUE)
+set(ChartAxisRangeAndLabels_USE_NEW_PANELS TRUE)
 set(Clip_USE_NEW_PANELS TRUE)
 set(ColorEditor2_USE_NEW_PANELS TRUE)
 set(ColorEditor4_USE_NEW_PANELS TRUE)
@@ -386,6 +388,7 @@ SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)
 SET (XYHistogram_BREAK TRUE)
+set (ChartAxisRangeAndLabels_BREAK TRUE)
 
 SET(ExtractLevel_BREAK TRUE)
 
@@ -401,6 +404,7 @@ SET (UndoRedo4_THRESHOLD 15)
 SET (XYChart_THRESHOLD 150)
 
 SET (XYHistogram_THRESHOLD 60)
+set (ChartAxisRangeAndLabels_THRESHOLD 60)
 
 # The color and opacity are often different on different machines.
 SET (NewColorEditor1_THRESHOLD 60)

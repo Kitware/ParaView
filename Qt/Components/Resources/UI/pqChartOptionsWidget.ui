@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>466</width>
-    <height>731</height>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QStackedWidget" name="ChartPages">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="General">
       <layout class="QGridLayout">
@@ -710,13 +710,20 @@ p, li { white-space: pre-wrap; }
      </widget>
      <widget class="QWidget" name="AxisLayout">
       <layout class="QGridLayout">
-       <property name="margin">
-        <number>0</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <item row="1" column="0" rowspan="4">
+       <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="label_14">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Axis Labels</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -732,7 +739,46 @@ p, li { white-space: pre-wrap; }
          </property>
         </spacer>
        </item>
-       <item row="4" column="1">
+       <item row="1" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>16</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="1" colspan="3">
+        <widget class="QRadioButton" name="ComputeLabelsAutomatically">
+         <property name="whatsThis">
+          <string>Check this option to let the chart choose the best axis labels.</string>
+         </property>
+         <property name="text">
+          <string>Compute axis labels automatically</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" colspan="2">
+        <widget class="QRadioButton" name="UseFixedLabels">
+         <property name="whatsThis">
+          <string>Check this option to specify each of the axis labels. This option gives you the most control.</string>
+         </property>
+         <property name="text">
+          <string>Specify axis labels explicitly</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" colspan="3">
         <widget class="QStackedWidget" name="AxisLayoutPages">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -741,7 +787,7 @@ p, li { white-space: pre-wrap; }
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="BlankPage">
           <property name="sizePolicy">
@@ -807,38 +853,8 @@ p, li { white-space: pre-wrap; }
          </widget>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QRadioButton" name="UseChartSelect">
-         <property name="whatsThis">
-          <string>Check this option to let the chart choose the best axis labels.</string>
-         </property>
-         <property name="text">
-          <string>Compute axis labels automatically</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QRadioButton" name="UseFixedInterval">
-         <property name="whatsThis">
-          <string>Check this option to specify each of the axis labels. This option gives you the most control.</string>
-         </property>
-         <property name="text">
-          <string>Specify labels explicitly</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="UseLogScale">
-         <property name="text">
-          <string>Use Logarithmic Scale When Available</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="label_14">
+        <widget class="QLabel" name="label_15">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -846,8 +862,75 @@ p, li { white-space: pre-wrap; }
           </font>
          </property>
          <property name="text">
-          <string>Axis Layout</string>
+          <string>Axis Range</string>
          </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="UseLogScale">
+            <property name="text">
+             <string>Use Logarithmic Scale When Available</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="ComputeRangeAutomatically">
+            <property name="text">
+             <string>Compute axis range automatically</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="UseFixedRange">
+            <property name="text">
+             <string>Specify axis range explicitly</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QStackedWidget" name="AxisRangePages">
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="BlankPage_2"/>
+            <widget class="QWidget" name="MinMaxPage">
+             <layout class="QGridLayout">
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QLineEdit" name="RangeMin">
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_16">
+                  <property name="text">
+                   <string> - </string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="RangeMax">
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -1079,9 +1162,8 @@ p, li { white-space: pre-wrap; }
   <tabstop>LabelColor</tabstop>
   <tabstop>LabelNotation</tabstop>
   <tabstop>LabelPrecision</tabstop>
-  <tabstop>UseLogScale</tabstop>
-  <tabstop>UseChartSelect</tabstop>
-  <tabstop>UseFixedInterval</tabstop>
+  <tabstop>ComputeLabelsAutomatically</tabstop>
+  <tabstop>UseFixedLabels</tabstop>
   <tabstop>LabelList</tabstop>
   <tabstop>AddButton</tabstop>
   <tabstop>RemoveButton</tabstop>

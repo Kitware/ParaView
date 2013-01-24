@@ -44,7 +44,18 @@ public:
     {
     this->UseCustomLabels[0] = this->UseCustomLabels[1]
       = this->UseCustomLabels[2] = this->UseCustomLabels[3] = false;
+
+    this->AxisRanges[0][0] =
+      this->AxisRanges[1][0] =
+      this->AxisRanges[2][0] =
+      this->AxisRanges[3][0] = 0.0;
+    this->AxisRanges[0][1] =
+      this->AxisRanges[1][1] =
+      this->AxisRanges[2][1] =
+      this->AxisRanges[3][1] = 6.66;
     }
+
+  double AxisRanges[4][2];
 };
 
 
@@ -337,28 +348,48 @@ void vtkPVXYChartView::SetAxisLabelPrecision(int index, int precision)
 //----------------------------------------------------------------------------
 void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
 {
+  // cache for later use.
+  this->Internals->AxisRanges[index][0] = min;
+  this->Internals->AxisRanges[index][1] = max;
+
   if (this->Chart)
     {
     vtkAxis* axis = this->Chart->GetAxis(index);
-    axis->SetBehavior(vtkAxis::FIXED);
-    axis->SetMinimum(min);
-    axis->SetMaximum(max);
-    this->Chart->RecalculateBounds();
+    if (axis->GetBehavior() == vtkAxis::FIXED)
+      {
+      // change only if axes behavior is indeed "FIXED" i.e.
+      // SetAxisUseCustomRange(...) was set to true for this axis.
+      if (axis->GetMinimum() != min || axis->GetMaximum() != max)
+        {
+        axis->SetMinimum(min);
+        axis->SetMaximum(max);
+        this->Chart->RecalculateBounds();
+        }
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::UnsetAxisRange(int index)
+void vtkPVXYChartView::SetAxisUseCustomRange(int index, bool useCustomRange)
 {
   if (this->Chart)
     {
     vtkAxis* axis = this->Chart->GetAxis(index);
-    axis->SetBehavior(vtkAxis::AUTO);
-
-    // we set some random min and max so we can notice them when they get used.
-    axis->SetMinimum(0.0);
-    axis->SetMaximum(6.66);
-    this->Chart->RecalculateBounds();
+    if (useCustomRange && (axis->GetBehavior() != vtkAxis::FIXED))
+      {
+      axis->SetBehavior(vtkAxis::FIXED);
+      axis->SetMinimum(this->Internals->AxisRanges[index][0]);
+      axis->SetMaximum(this->Internals->AxisRanges[index][1]);
+      this->Chart->RecalculateBounds();
+      }
+    else if (!useCustomRange && (axis->GetBehavior() != vtkAxis::AUTO))
+      {
+      axis->SetBehavior(vtkAxis::AUTO);
+      // set to some value so we notice when this gets used.
+      axis->SetMinimum(0.0);
+      axis->SetMaximum(6.66);
+      this->Chart->RecalculateBounds();
+      }
     }
 }
 
