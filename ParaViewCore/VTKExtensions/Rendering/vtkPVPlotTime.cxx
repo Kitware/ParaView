@@ -46,11 +46,18 @@ bool vtkPVPlotTime::Paint(vtkContext2D *painter)
     {
     // using float max and min for some reason ends up with nothing showing for
     // small scaled plots.
-    painter->DrawLine(this->Time, -1.0e+30f, this->Time, 1.0e+30f);
+    // BUG #13311: Drawing a single line from -1e30 to +1e30 causes the line
+    // segment to end up missing sections. Drawing as segments overcomes the
+    // problem.
+    painter->DrawLine(this->Time, -1.0e+30f, this->Time, -100);
+    painter->DrawLine(this->Time, -100, this->Time, 100);
+    painter->DrawLine(this->Time, 100, this->Time, 1.0e+30f);
     }
   else
     {
-    painter->DrawLine(-1.0e+30f, this->Time, 1.0e+30f, this->Time);
+    painter->DrawLine(-1.0e+30f, this->Time, -100, this->Time);
+    painter->DrawLine(-100, this->Time, 100, this->Time);
+    painter->DrawLine(100, this->Time, 1.0e+30f, this->Time);
     }
   return true;
 }
