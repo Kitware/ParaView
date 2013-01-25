@@ -92,7 +92,7 @@ public:
     this->AxisLabelPropertyNames[vtkAxis::LEFT] = "LeftAxisLabels";
     this->AxisLabelPropertyNames[vtkAxis::RIGHT] = "RightAxisLabels";
     this->AxisLabelPropertyNames[vtkAxis::TOP] = "TopAxisLabels";
-    this->AxisLabelPropertyNames[vtkAxis::TOP] = "BottomAxisLabels";
+    this->AxisLabelPropertyNames[vtkAxis::BOTTOM] = "BottomAxisLabels";
     }
 };
 
