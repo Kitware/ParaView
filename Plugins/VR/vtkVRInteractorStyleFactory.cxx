@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkVRInteractorStyleFactory.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkVRControlSliceOrientationStyle.h"
 #include "vtkVRControlSlicePositionStyle.h"
 #include "vtkVRGrabWorldStyle.h"
