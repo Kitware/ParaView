@@ -83,7 +83,7 @@ void vtkVRGrabWorldStyle::HandleButton( const vtkVREventData& data )
     {
     this->EnableRotate = data.data.button.state;
     }
-  else if (role == "Reset world")
+  else if (data.data.button.state && role == "Reset world")
     {
     this->CachedTransMatrix->Identity();
     this->CachedRotMatrix->Identity();
