@@ -111,11 +111,8 @@ public:
   QString Title;
   QStringListModel Labels;
   QPair<double, double> Range;
-  int GridType;
   int Notation;
   int Precision;
-  int TitleAlignment;
-  bool ShowAxis;
   bool ShowGrid;
   bool ShowLabels;
   bool UseLogScale;
@@ -145,11 +142,8 @@ pqXYChartOptionsEditorAxis::pqXYChartOptionsEditorAxis()
   : AxisColor(Qt::black), GridColor(Qt::lightGray), LabelColor(Qt::black),
     TitleColor(Qt::black), LabelFont(), TitleFont(), Title(), Labels()
 {
-  this->GridType = 0;
   this->Notation = 0;
   this->Precision = 2;
-  this->TitleAlignment = 1;
-  this->ShowAxis = true;
   this->ShowGrid = true;
   this->ShowLabels = true;
   this->UseLogScale = false;
@@ -245,16 +239,11 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
   this->Internal->Form->setupUi(this);
 
   // Adjust a few of the form elements
-  this->Internal->Form->GridType->setHidden(true);
-  this->Internal->Form->label_18->setHidden(true);
-  this->Internal->Form->label_25->setHidden(true);
   this->Internal->Form->LabelNotation->clear();
   this->Internal->Form->LabelNotation->addItem("Mixed");
   this->Internal->Form->LabelNotation->addItem("Scientific");
   this->Internal->Form->LabelNotation->addItem("Fixed");
   //this->Internal->Form->UseFixedLabels->setHidden(true);
-  this->Internal->Form->label_12->setHidden(true);
-  this->Internal->Form->AxisTitleAlignment->setHidden(true);
   this->Internal->Form->label_7->setHidden(true);
   this->Internal->Form->LegendFlow->setHidden(true);
 
@@ -272,8 +261,6 @@ pqXYChartOptionsEditor::pqXYChartOptionsEditor(QWidget *widgetParent)
                    this, SLOT(changeCustomLabelsPage(bool)));
   QObject::connect(this->Internal->Form->UseFixedRange, SIGNAL(toggled(bool)),
                    this, SLOT(changeRangePage(bool)));
-  QObject::connect(this->Internal->Form->ShowAxis, SIGNAL(toggled(bool)),
-                   this, SLOT(setAxisVisibility(bool)));
   QObject::connect(this->Internal->Form->ShowAxisGrid, SIGNAL(toggled(bool)),
                    this, SLOT(setGridVisibility(bool)));
   QObject::connect(this->Internal->Form->AxisColor,
@@ -408,11 +395,6 @@ void pqXYChartOptionsEditor::setPage(const QString &page)
       widget = this->Internal->Form->AxisLayout;
       this->loadAxisLayoutPage();
       }
-    else if(path[1] == "Title")
-      {
-      widget = this->Internal->Form->AxisTitle;
-      this->loadAxisTitlePage();
-      }
     }
 
   if(widget)
@@ -427,18 +409,14 @@ QStringList pqXYChartOptionsEditor::getPageList()
   pages.append("General");
   pages.append("Left Axis");
   pages.append("Left Axis.Layout");
-  pages.append("Left Axis.Title");
   pages.append("Bottom Axis");
   pages.append("Bottom Axis.Layout");
-  pages.append("Bottom Axis.Title");
   if (this->Internal->Type == pqInternal::LINE)
     {
     pages.append("Right Axis");
     pages.append("Right Axis.Layout");
-    pages.append("Right Axis.Title");
     pages.append("Top Axis");
     pages.append("Top Axis.Layout");
-    pages.append("Top Axis.Title");
     }
   return pages;
 }
@@ -509,16 +487,6 @@ void pqXYChartOptionsEditor::connectGUI()
 void pqXYChartOptionsEditor::disconnectGUI()
 {
   this->Internal->Links.removeAllLinks();
-}
-
-void pqXYChartOptionsEditor::setAxisVisibility(bool visible)
-{
-  if(this->Internal->Form->AxisIndex != -1)
-    {
-    this->Internal->Form->AxisData[this->Internal->Form->AxisIndex]->ShowAxis
-        = visible;
-    this->changesAvailable();
-    }
 }
 
 void pqXYChartOptionsEditor::setGridVisibility(bool visible)
@@ -875,12 +843,6 @@ void pqXYChartOptionsEditor::updateOptions()
 
   // Get the general axis parameters.
   values = pqSMAdaptor::getMultipleElementProperty(
-      proxy->GetProperty("ShowAxis"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->Form->AxisData[i]->ShowAxis = values[i].toInt() != 0;
-    }
-  values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("AxisLogScale"));
   for(int i = 0; i < 4 && i < values.size(); ++i)
     {
@@ -1074,15 +1036,6 @@ void pqXYChartOptionsEditor::applyAxisOptions()
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("ChartTitleColor"), values);
 
-  // Axis visibility
-  values.clear();
-  for(int i = 0; i < 4; ++i)
-    {
-    values.append(this->Internal->Form->AxisData[i]->ShowAxis);
-    }
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("ShowAxis"), values);
-
   // Show axis grid lines
   values.clear();
   for(int i = 0; i < 4; ++i)
@@ -1264,8 +1217,13 @@ void pqXYChartOptionsEditor::loadAxisPage()
   this->blockSignals(true);
   pqXYChartOptionsEditorAxis *axis =
           this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
-  this->Internal->Form->ShowAxis->setChecked(axis->ShowAxis);
+
   this->Internal->Form->ShowAxisGrid->setChecked(axis->ShowGrid);
+
+  this->Internal->Form->AxisTitleText->setText(axis->Title);
+  this->updateDescription(this->Internal->Form->AxisTitleFont, axis->TitleFont);
+  this->Internal->Form->AxisTitleColor->setChosenColor(axis->TitleColor);
+
   this->Internal->Form->AxisColor->setChosenColor(axis->AxisColor);
   this->Internal->Form->GridColor->setChosenColor(axis->GridColor);
   this->Internal->Form->ShowAxisLabels->setChecked(axis->ShowLabels);
@@ -1321,18 +1279,6 @@ void pqXYChartOptionsEditor::loadAxisLayoutPage()
                                         const QItemSelection &)),
                 this, SLOT(updateRemoveButton()));
   this->updateRemoveButton();
-  this->blockSignals(false);
-}
-
-void pqXYChartOptionsEditor::loadAxisTitlePage()
-{
-  this->blockSignals(true);
-  pqXYChartOptionsEditorAxis *axis =
-          this->Internal->Form->AxisData[this->Internal->Form->AxisIndex];
-  this->Internal->Form->AxisTitleText->setText(axis->Title);
-  this->updateDescription(this->Internal->Form->AxisTitleFont, axis->TitleFont);
-  this->Internal->Form->AxisTitleColor->setChosenColor(axis->TitleColor);
-  this->Internal->Form->AxisTitleAlignment->setCurrentIndex(axis->TitleAlignment);
   this->blockSignals(false);
 }
 

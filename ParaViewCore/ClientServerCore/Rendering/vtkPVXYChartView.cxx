@@ -255,15 +255,6 @@ void vtkPVXYChartView::SetLegendLocation(int location)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXYChartView::SetAxisVisibility(int index, bool visible)
-{
-  if (this->Chart)
-    {
-    this->Chart->GetAxis(index)->SetVisible(visible);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVXYChartView::SetGridVisibility(int index, bool visible)
 {
   if (this->Chart)

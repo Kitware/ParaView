@@ -82,13 +82,6 @@ public:
   void SetLegendLocation(int location);
 
   // Description:
-  // Sets whether or not the given axis is visible.
-  // These methods should not be called directly. They are made public only so
-  // that the client-server-stream-interpreter can invoke them. Use the
-  // corresponding properties to change these values.
-  void SetAxisVisibility(int index, bool visible);
-
-  // Description:
   // Sets whether or not the grid for the given axis is visible.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the

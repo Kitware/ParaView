@@ -673,15 +673,6 @@
                         min="0"
                         name="range" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetAxisVisibility"
-                         default_values="1 1 0 0"
-                         name="ShowAxis"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetAxisLogScale"
                          default_values="0 0 0 0"
                          name="AxisLogScale"
@@ -4763,7 +4754,6 @@
           <Property name="LeftAxisRange" />
           <Property name="LegendLocation" />
           <Property name="RightAxisRange" />
-          <Property name="ShowAxis" />
           <Property name="ShowAxisGrid" />
           <Property name="ShowAxisLabels" />
           <Property name="ShowLegend" />
@@ -4803,7 +4793,6 @@
           <Property name="ChartTitleFont" />
           <Property name="LeftAxisRange" />
           <Property name="RightAxisRange" />
-          <Property name="ShowAxis" />
           <Property name="ShowAxisGrid" />
           <Property name="ShowAxisLabels" />
           <Property name="ShowLegend" />

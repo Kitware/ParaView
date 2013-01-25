@@ -89,7 +89,6 @@ protected slots:
   void changeRangePage(bool use_fixed_range);
 
   // Setters for the axis elements of the form
-  void setAxisVisibility(bool visible);
   void setGridVisibility(bool visible);
   void setAxisColor(const QColor& color);
   void setGridColor(const QColor& color);
@@ -119,7 +118,6 @@ private:
   void applyAxisOptions();
   void loadAxisPage();
   void loadAxisLayoutPage();
-  void loadAxisTitlePage();
   bool pickFont(QLabel *label, QFont &font);
   void updateDescription(QLabel *label, const QFont &newFont);
   vtkSMProxy* getProxy();
