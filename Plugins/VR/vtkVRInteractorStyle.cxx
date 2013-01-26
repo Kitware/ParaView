@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRInteractorStyle.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"

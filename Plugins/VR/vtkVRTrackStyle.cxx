@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRTrackStyle.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
