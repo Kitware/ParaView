@@ -46,13 +46,17 @@ class pqPropertiesPanelItem;
 class PQCOMPONENTS_EXPORT pqProxyPropertiesPanel : public QWidget
 {
   Q_OBJECT
-
+  typedef QWidget Superclass;
 public:
   pqProxyPropertiesPanel(pqProxy *proxy_, QWidget *parent_ = 0);
   ~pqProxyPropertiesPanel();
 
   void apply();
   void reset();
+
+  /// Overridden to hide/show 3D widgets (pq3DWidget subclasses) that may be
+  /// present in the panel.
+  virtual void setVisible(bool);
 
   pqProxy* proxy() const;
   void addPropertyWidgetItem(pqPropertiesPanelItem item);

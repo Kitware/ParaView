@@ -63,3 +63,13 @@ void pq3DWidgetPropertyWidget::reset()
 {
   this->Widget->reset();
 }
+
+void pq3DWidgetPropertyWidget::select()
+{
+  this->Widget->select();
+}
+
+void pq3DWidgetPropertyWidget::deselect()
+{
+  this->Widget->deselect();
+}
