@@ -39,6 +39,21 @@ if ("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
 endif()
 
 #------------------------------------------------------------------------------
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Debug' as none was specified.")
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+    "MinSizeRel" "RelWithDebInfo")
+endif()
+
+#------------------------------------------------------------------------------
+# Choose static or shared libraries.
+option(BUILD_SHARED_LIBS "Build VTK with shared libraries." ON)
+set(VTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+
+#------------------------------------------------------------------------------
 # Setup CMake Environment
 #------------------------------------------------------------------------------
 # Setup cmake policies.
@@ -56,9 +71,9 @@ foreach(policy CMP0017)
   endif()
 endforeach()
 
+#-------------------------------------------------------------------------------
 set (ParaView_CMAKE_DIR "${ParaView_SOURCE_DIR}/CMake")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ParaView_CMAKE_DIR})
-
 
 # Use the new version of the variable names for output of build process.
 # These are consistent with what VTK sets.
@@ -74,7 +89,6 @@ include(Utilities/Git/Git.cmake)
 include(ParaViewDetermineVersion)
 include(CMakeDependentOption)
 #------------------------------------------------------------------------------
-
 
 #------------------------------------------------------------------------------
 # Setup ParaView Environment
@@ -129,6 +143,8 @@ endif()
 if(NOT VTK_MODULES_DIR)
   set(VTK_MODULES_DIR "${ParaView_BINARY_DIR}/${VTK_INSTALL_PACKAGE_DIR}/Modules")
 endif()
+set(PARAVIEW_MODULES_DIR ${VTK_MODULES_DIR})
+
 if (NOT DEFINED VTK_CUSTOM_LIBRARY_SUFFIX)
   set (VTK_CUSTOM_LIBRARY_SUFFIX "-pv${PARAVIEW_VERSION}")
 endif()
@@ -336,15 +352,11 @@ set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
 set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
 set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
-# Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
-set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_COSMOS_USE_MPI)
-set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
-mark_as_advanced(VTK_VPIC_USE_MPI)
-
 #------------------------------------------------------------------------------
 
 include_directories(${ParaView_BINARY_DIR})
+
+set (PARAVIEW_MODULE_ROOTS)
 
 #------------------------------------------------------------------------------
 # Bring in VTK
@@ -358,30 +370,42 @@ include_directories(${ParaView_BINARY_DIR})
 if (NOT __paraview_configured AND USE_EXTERNAL_VTK)
   # the __paraview_configured ensures that USE_EXTERNAL_VTK has no effect except
   # in an empty binary dir.
-  set (use_external_vtk TRUE CACHE INTERNAL "Using external VTK" FORCE)
+  set (PARAVIEW_USING_EXTERNAL_VTK TRUE CACHE INTERNAL "Using external VTK" FORCE)
 endif()
 set (__paraview_configured TRUE CACHE INTERNAL
   "ParaView has been configured" FORCE)
 
+if (PARAVIEW_USING_EXTERNAL_VTK)
+  find_package(VTK REQUIRED)
+  message(STATUS "Using External VTK from \"${VTK_DIR}\"")
 
-if (use_external_vtk)
-  find_package(VTK REQUIRED ${required_vtk_modules})
+  # Update CMAKE_MODULE_PATH to include VTK's cmake files.
+  set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+                         ${VTK_CMAKE_DIR}
+                         ${VTK_MODULES_DIR})
 
-  # TODO: Report errors if key VTK build settings don't match ParaView's. For
-  # now we will assume they do since this setting is only meant for advanced
-  # developers.
-
-  # When VTK is brought in externally, there are several variables that VTK sets
-  # that are no longer set.
-  set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VTK_CMAKE_DIR})
+  # Since importing VTK changes the VTK_MODULES_DIR variable to point to the
+  # location where VTK's modules are, we update the variable. That way new
+  # configuration files generated for modules ParaView adds go in the correct
+  # location.
+  set (VTK_MODULES_DIR ${PARAVIEW_MODULES_DIR})
 
 else()
-  #setup VTK environment and add vtk-subdir
+
+  # Update CMAKE_MODULE_PATH to include VTK's cmake files.
   set (VTK_CMAKE_DIR ${ParaView_SOURCE_DIR}/VTK/CMake)
   set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${VTK_CMAKE_DIR})
-  include(vtkModuleAPI)
-  include(vtkModuleMacros)
-  include(ParaViewMacros)
+
+  #----------------------------------------------------------------------------------
+  # Set some flags that affect VTK's modules.
+  set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL
+                               "Disable Python Threads support" FORCE)
+  
+  # Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
+  set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
+  mark_as_advanced(VTK_COSMOS_USE_MPI)
+  set(VTK_VPIC_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
+  mark_as_advanced(VTK_VPIC_USE_MPI)
 
   # Change VTK default, since VTK is set up to enable TK when python wrapping is
   # enabled.
@@ -390,125 +414,77 @@ else()
   # turn of groups that VTK turns on by default. We will enable modules as
   # needed.
   set(VTK_Group_StandAlone OFF CACHE BOOL "" FORCE)
-  mark_as_advanced(VTK_Group_StandAlone)
   set(VTK_Group_Rendering OFF CACHE BOOL "" FORCE)
-  mark_as_advanced(VTK_Group_Rendering)
 
-  set(VTK_WRAP_PYTHON ${PARAVIEW_ENABLE_PYTHON}
-    CACHE INTERNAL "Should VTK Python wrapping be built?" FORCE)
-
-  # FIXME: How do we handle this when using external VTK? We can't and hence we
-  # need a better mechanism.
-  set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Disbale Python Threads support" FORCE)
-
-  # turn some module ON to avoid warnings from VTK.
-  # set(Module_vtkCommonExecutionModel  ON CACHE INTERNAL "" FORCE)
-
-  set (ParaViewModulesDirs
-    ThirdParty/protobuf
-    ThirdParty/QtTesting
-    Utilities/ProcessXML
-    Utilities/ColorSeriesToXML
-    Utilities/VisItBridge/databases
-    Utilities/VisItBridge/Library
-    Utilities/WrapClientServer
-
-    ParaViewCore/ClientServerStream
-    ParaViewCore/PythonSupport
-    ParaViewCore/Common
-    ParaViewCore/VTKExtensions/Core
-    ParaViewCore/VTKExtensions/Rendering
-    ParaViewCore/VTKExtensions/Default
-    ParaViewCore/VTKExtensions/WebGLExporter
-    ParaViewCore/ClientServerCore/Core
-    ParaViewCore/ClientServerCore/Rendering
-    ParaViewCore/ClientServerCore/Default
-    ParaViewCore/ServerImplementation/Core
-    ParaViewCore/ServerImplementation/Rendering
-    ParaViewCore/ServerImplementation/Default
-    ParaViewCore/ServerManager/Core
-    ParaViewCore/ServerManager/Rendering
-    ParaViewCore/ServerManager/Default
-    ParaViewCore/ServerManager/ParaViewWeb
-    ParaViewCore/ServerManager/SMApplication
-
-    Qt/Widgets
-    Qt/Core
-    Qt/Components
-    Qt/Python
-    Qt/ApplicationComponents
-  )
-
-  if (PARAVIEW_USE_ICE_T)
-    list(APPEND ParaViewModulesDirs
-      ThirdParty/IceT)
-  endif()
-
-  if (PARAVIEW_ENABLE_COPROCESSING)
-    list (APPEND ParaViewModulesDirs
-      CoProcessing/Core
-      CoProcessing/CoProcessor)
-  endif()
-
-  if (BUILD_FORTRAN_COPROCESSING_ADAPTORS)
-    list (APPEND ParaViewModulesDirs
-      CoProcessing/Adaptors/FortranAdaptors)
-  endif()
-
-  if (BUILD_PARTICLE_COPROCESSING_ADAPTORS)
-    list (APPEND ParaViewModulesDirs
-      CoProcessing/Adaptors/ParticleAdaptor)
-  endif()
-
-  if (BUILD_TESTING)
-    list (APPEND  ParaViewModulesDirs
-    Utilities/TestDriver)
-  endif()
-
-  foreach(dir ${ParaViewModulesDirs})
-    vtk_add_to_module_search_path(
-    "${ParaView_SOURCE_DIR}/${dir}"
-    "${ParaView_BINARY_DIR}/${dir}")
-  endforeach()
-
-  # include VTK
-  set (old_build_examples ${BUILD_EXAMPLES})
-  set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE) 
-  add_subdirectory(VTK)
-  set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE) 
-
-  # keep VTK cmake variables from polluting the non-advanced space.
-  mark_as_advanced(
-    VTK_EXTRA_COMPILER_WARNINGS
-    VTK_Group_CoProcessing
-    VTK_Group_Imaging
-    VTK_Group_MPI
-    VTK_Group_ParaView
-    VTK_Group_ParaViewCore
-    VTK_Group_ParaViewPython
-    VTK_Group_ParaViewQt
-    VTK_Group_ParaViewRendering
-    VTK_Group_Qt
-    VTK_Group_Views
-    VTK_USE_TK
-    VTK_WRAP_JAVA
-    VTK_WRAP_TCL)
-
-  include(${ParaView_BINARY_DIR}/VTK/VTKConfig.cmake)
 endif()
+
+#----------------------------------------------------------------------------------
+# Import all essential CMake files. Based on whether we are using internal or
+# external VTK, these modules will be imported for the appropropriate locations.
+include(vtkModuleAPI)
+include(vtkModuleMacros)
+include(ParaViewMacros)
+
+#----------------------------------------------------------------------------------
+list (APPEND PARAVIEW_MODULE_ROOTS
+             ThirdParty
+             Utilities
+             ParaViewCore
+             Qt)
+
+if (PARAVIEW_ENABLE_COPROCESSING)
+  list (APPEND PARAVIEW_MODULE_ROOTS
+               CoProcessing/Core
+               CoProcessing/CoProcessor)
+endif()
+
+if (BUILD_FORTRAN_COPROCESSING_ADAPTORS)
+  list (APPEND PARAVIEW_MODULE_ROOTS
+               CoProcessing/Adaptors/FortranAdaptors)
+endif()
+
+if (BUILD_PARTICLE_COPROCESSING_ADAPTORS)
+  list (APPEND PARAVIEW_MODULE_ROOTS
+               CoProcessing/Adaptors/ParticleAdaptor)
+endif()
+
+include(ParaViewModuleTop)
+
+#----------------------------------------------------------------------------------
+# keep VTK cmake variables from polluting the non-advanced space.
+mark_as_advanced(
+  VTK_EXTRA_COMPILER_WARNINGS
+  VTK_Group_CoProcessing
+  VTK_Group_Imaging
+  VTK_Group_MPI
+  VTK_Group_ParaView
+  VTK_Group_ParaViewCore
+  VTK_Group_ParaViewPython
+  VTK_Group_ParaViewQt
+  VTK_Group_ParaViewRendering
+  VTK_Group_Qt
+  VTK_Group_Rendering
+  VTK_Group_StandAlone
+  VTK_Group_Views
+  VTK_USE_TK
+  VTK_WRAP_JAVA
+  VTK_WRAP_TCL)
+
 
 #------------------------------------------------------------------------------
 # Based on state of VTK modules, set up some variables that paraview needs to
 # compile optional code.
+
+# FIXME: VTK_HAS_* variables need to be removed, it's not wise to enable
+# ParaView components based on if something was enabled in VTK or not.
 set (VTK_HAS_OGGTHEORA_SUPPORT FALSE)
 set (VTK_HAS_FFMPEG_SUPPORT FALSE)
+if (TARGET vtkIOFFMPEG AND PARAVIEW_ENABLE_FFMPEG)
+  set (VTK_HAS_FFMPEG_SUPPORT TRUE)
+endif()
 if (TARGET vtkoggtheora)
   set (VTK_HAS_OGGTHEORA_SUPPORT TRUE)
 endif()
-if (TARGET vtkIOFFMPEG)
-set (VTK_HAS_FFMPEG_SUPPORT TRUE)
-endif()
-
 
 configure_file(
   ${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
