@@ -111,6 +111,8 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     {
     this->SetEnvironment(idx, info->GetEnvironment(idx));
     this->SetGeometry(idx, info->GetGeometry(idx));
+    this->SetFullScreen(idx, info->GetFullScreen(idx));
+    this->SetShowBorders(idx, info->GetShowBorders(idx));
     this->SetLowerLeft(idx, info->GetLowerLeft(idx));
     this->SetLowerRight(idx, info->GetLowerRight(idx));
     this->SetUpperRight(idx, info->GetUpperRight(idx));
@@ -152,6 +154,8 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
       {
       this->SetEnvironment(idx, serverOptions->GetDisplayName(idx));
       this->SetGeometry(idx, serverOptions->GetGeometry(idx));
+      this->SetFullScreen(idx, serverOptions->GetFullScreen(idx));
+      this->SetShowBorders(idx, serverOptions->GetShowBorders(idx));
       this->SetLowerLeft(idx, serverOptions->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
       this->SetUpperRight(idx, serverOptions->GetUpperRight(idx));
@@ -223,6 +227,8 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       {
       this->SetEnvironment(idx, serverInfo->GetEnvironment(idx));
       this->SetGeometry(idx, serverInfo->GetGeometry(idx));
+      this->SetFullScreen(idx, serverInfo->GetFullScreen(idx));
+      this->SetShowBorders(idx, serverInfo->GetShowBorders(idx));
       this->SetLowerLeft(idx, serverInfo->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
       this->SetUpperRight(idx, serverInfo->GetUpperRight(idx));
@@ -266,6 +272,8 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
     *css << this->GetEnvironment(idx);
     *css << this->GetGeometry(idx)[0] << this->GetGeometry(idx)[1]
          << this->GetGeometry(idx)[2] << this->GetGeometry(idx)[3];
+    *css << this->GetFullScreen(idx);
+    *css << this->GetShowBorders(idx);
     *css << this->GetLowerLeft(idx)[0] << this->GetLowerLeft(idx)[1]
          << this->GetLowerLeft(idx)[2];
     *css << this->GetLowerRight(idx)[0] << this->GetLowerRight(idx)[1]
@@ -349,7 +357,7 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   unsigned int idx;
   const char* env;
   int machineOffset = 13;
-  int valuesPerMachine = 14;
+  int valuesPerMachine = 16;
   for (idx = 0; idx < numMachines; idx++)
     {
     int machineIndex = machineOffset + idx * valuesPerMachine;
@@ -370,6 +378,18 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
                           &this->MachinesInternals->MachineInformationVector[idx].Geometry[3]))
       {
       vtkErrorMacro("Error parsing window geometry from message.");
+      return;
+      }
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].FullScreen))
+      {
+      vtkErrorMacro("Error parsing FullScreen flag from message.");
+      return;
+      }
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].ShowBorders))
+      {
+      vtkErrorMacro("Error parsing ShowBorders flag from message.");
       return;
       }
     if (!css->GetArgument(0, machineIndex + currentValueOffset++,
@@ -510,6 +530,60 @@ int* vtkPVServerInformation::GetGeometry(unsigned int idx) const
     return NULL;
     }
   return this->MachinesInternals->MachineInformationVector[idx].Geometry;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerInformation::SetFullScreen(unsigned int idx, bool fullscreen)
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    unsigned int i;
+    vtkPVServerOptionsInternals::MachineInformation info;
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
+      {
+      this->MachinesInternals->MachineInformationVector.push_back(info);
+      }
+    }
+
+  this->MachinesInternals->MachineInformationVector[idx].FullScreen = fullscreen;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerInformation::GetFullScreen(unsigned int idx) const
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    return false;
+    }
+
+  return this->MachinesInternals->MachineInformationVector[idx].FullScreen;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerInformation::SetShowBorders(unsigned int idx, bool borders)
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    unsigned int i;
+    vtkPVServerOptionsInternals::MachineInformation info;
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
+      {
+      this->MachinesInternals->MachineInformationVector.push_back(info);
+      }
+    }
+
+  this->MachinesInternals->MachineInformationVector[idx].ShowBorders = borders;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerInformation::GetShowBorders(unsigned int idx) const
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    return false;
+    }
+
+  return this->MachinesInternals->MachineInformationVector[idx].ShowBorders;
 }
 
 //----------------------------------------------------------------------------

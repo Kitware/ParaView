@@ -63,8 +63,8 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
       {
       for(int j = 0; j < 4; j++)
         {
-        int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &info.Geometry[0],
-            &info.Geometry[1], &info.Geometry[2], &info.Geometry[3]);
+        int matches = sscanf(value.c_str(), "%dx%d+%d+%d", &info.Geometry[2],
+            &info.Geometry[3], &info.Geometry[0], &info.Geometry[1]);
         if (matches != 4)
           {
           vtkErrorMacro("Malformed geometry specification: " << value.c_str()
@@ -75,6 +75,16 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
           info.Geometry[3] = 0;
           }
         }
+      }
+    else if(key == "FullScreen")
+      {
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      str >> info.FullScreen;
+      }
+    else if(key == "ShowBorders")
+      {
+      vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
+      str >> info.ShowBorders;
       }
     else if(key == "LowerLeft")
       {
@@ -197,6 +207,28 @@ int* vtkPVServerOptions::GetGeometry(unsigned int idx)
     }
 
   return this->Internals->MachineInformationVector[idx].Geometry;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetFullScreen(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return false;
+    }
+
+  return this->Internals->MachineInformationVector[idx].FullScreen != 0;
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVServerOptions::GetShowBorders(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return false;
+    }
+
+  return this->Internals->MachineInformationVector[idx].ShowBorders != 0;
 }
 
 //----------------------------------------------------------------------------

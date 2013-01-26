@@ -113,9 +113,20 @@ public:
   const char* GetEnvironment(unsigned int idx) const;
 
   // Description:
-  // Window geometry for server, specified as x, y, width, height
+  // Window geometry for server, specified as x, y, width, height. This is only
+  // used if FullScreen is false.
   void SetGeometry(unsigned int idx, int geo[4]);
   int* GetGeometry(unsigned int idx) const;
+
+  // Description:
+  // Whether to show the server window as fullscreen.
+  void SetFullScreen(unsigned int idx, bool fullscreen);
+  bool GetFullScreen(unsigned int idx) const;
+
+  // Description:
+  // Whether to show the server window with window decorations.
+  void SetShowBorders(unsigned int idx, bool borders);
+  bool GetShowBorders(unsigned int idx) const;
 
   // Description:
   // Coordinates of lower left corner of this cave display

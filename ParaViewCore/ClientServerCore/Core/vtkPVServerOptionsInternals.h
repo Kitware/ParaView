@@ -40,12 +40,16 @@ public:
         this->Geometry[1] = 0;
         this->Geometry[2] = 0;
         this->Geometry[3] = 0;
+        this->FullScreen = false;
+        this->ShowBorders = false;
         this->CaveBoundsSet = 0;
       }
 
     std::string Name;  // what is the name of the machine
     std::string Environment; // what environment variables should be set
-    int Geometry[4]; // x, y, width, height. For fullscreen, use 0 0 0 0.
+    int Geometry[4]; // x, y, width, height
+    bool FullScreen; // Start fullscreen, ignoring Geometry.
+    bool ShowBorders; // Show window decorations
     int CaveBoundsSet;  // have the cave bounds been set
     // store the cave bounds  all 0.0 if not set
     double LowerLeft[3];
@@ -69,6 +73,8 @@ public:
           {
           os << minfo.Geometry[j] << (j < 4 ? " " : "\n");
           }
+        os << ind2 << "FullScreen: " << minfo.FullScreen << "\n";
+        os << ind2 << "ShowBorders: " << minfo.ShowBorders << "\n";
         if(minfo.CaveBoundsSet)
           {
           int j;
