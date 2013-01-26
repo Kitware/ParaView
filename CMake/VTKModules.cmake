@@ -350,6 +350,14 @@ if (PARAVIEW_ENABLE_PYTHON)
   list (APPEND _vtk_modules vtkRenderingMatplotlib)
 endif()
 
+if (PARAVIEW_ENABLE_FFMPEG)
+  list(APPEND extra_depends vtkIOFFMPEG)
+endif()
+
+if (NOT "${CMAKE_C_COMPILER_ID}" MATCHES "^XL$")
+  list(APPEND extra_depends vtkoggtheora)
+endif()
+
 # Any module can import this file and add DEPENDS or COMPILE_DEPENDS on this
 # list of modules to ensure that these are enabled when the corresponding module
 # is enabled.
