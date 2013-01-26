@@ -137,7 +137,7 @@ void pqListPropertyWidget::setValue(const QList<QVariant>& values)
       }
     else
       {
-      QTableWidgetItem* item = new QTableWidgetItem(values[cc].toString());
+      item = new QTableWidgetItem(values[cc].toString());
       item->setFlags(item->flags() | Qt::ItemIsSelectable |
         Qt::ItemIsEditable | Qt::ItemIsEnabled);
       this->TableWidget->setItem(cc, 0, item);

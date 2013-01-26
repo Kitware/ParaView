@@ -77,6 +77,11 @@ set (CTEST_CUSTOM_WARNING_EXCEPTION
   # exclude warning from MantaView  plugin
   "MantaView.VTK"
   "manta"
+
+  # exclude warnings from mpi4py
+  "mpi4py.src.dynload.c"
+  "mpi4py.MPE.c"
+  "mpi4py.MPI.c"
 )
 
 #------------------------------------------------------------------------------

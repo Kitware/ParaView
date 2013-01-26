@@ -78,6 +78,11 @@ protected:
 private:
   vtkSMContextViewProxy(const vtkSMContextViewProxy&); // Not implemented
   void operator=(const vtkSMContextViewProxy&); // Not implemented
+
+  // Description:
+  // Copies axis ranges from each of the vtkAxis on the vtkChartXY to the
+  // SMproperties.
+  void CopyAxisRangesFromChart();
 //ETX
 };
 

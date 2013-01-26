@@ -136,11 +136,11 @@ void pqAnimatablePropertiesComboBox::setCollapseVectors(bool val)
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimatablePropertiesComboBox::setVectorSizeFilter(int size)
+void pqAnimatablePropertiesComboBox::setVectorSizeFilter(int new_size)
 {
-  if (this->Internal->VectorSizeFilter != size)
+  if (this->Internal->VectorSizeFilter != new_size)
     {
-    this->Internal->VectorSizeFilter = size;
+    this->Internal->VectorSizeFilter = new_size;
     this->buildPropertyList();
     }
 }

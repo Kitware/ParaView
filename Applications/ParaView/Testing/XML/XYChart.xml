@@ -10,6 +10,9 @@
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/1pqDisplayPanelPropertyWidget0/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCurrent" arguments="0.0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/1pqDisplayPanelPropertyWidget0/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCurrent" arguments="6.0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/1pqDisplayPanelPropertyWidget0/pqXYChartDisplayPanel/SeriesGroup/SeriesList" command="setCheckState" arguments="6.0,2" />
-  <!-- Make sure the chart is showing everything (Only needed in slow computers) -->
+
+  <!-- ensures that the axes resets consistently on all platforms -->
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuTools" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionTesting_Window_Size" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
 </pqevents>

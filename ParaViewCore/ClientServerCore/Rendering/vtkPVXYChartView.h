@@ -82,13 +82,6 @@ public:
   void SetLegendLocation(int location);
 
   // Description:
-  // Sets whether or not the given axis is visible.
-  // These methods should not be called directly. They are made public only so
-  // that the client-server-stream-interpreter can invoke them. Use the
-  // corresponding properties to change these values.
-  void SetAxisVisibility(int index, bool visible);
-
-  // Description:
   // Sets whether or not the grid for the given axis is visible.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
@@ -146,10 +139,12 @@ public:
   void SetAxisLabelPrecision(int index, int precision);
 
   // Description:
-  // For axis ranges, ParaView overrides the VTK charts behavior. Instead of
-  // letting the user choose the behavior, we only have 2 modes, if any range is
-  // set, then the range is always used. If no range is set, then alone we let
-  // the chart determine the range.
+  // For axis ranges, ParaView overrides the VTK charts behavior.
+  // Users can either specify an explicit range or let the VTK chart determine
+  // the range based on the data. To specify a range explicitly, users should
+  // use SetAxisUseCustomRange() to on for the corresponding axis and then use
+  // these methods to set the ranges. Note these ranges are only respected when
+  // the corresponding AxisUseCustomRange flag it set.
   void SetLeftAxisRange(double minimum, double maximum)
     { this->SetAxisRange(vtkAxis::LEFT, minimum, maximum); }
   void SetRightAxisRange(double minimum, double maximum)
@@ -158,14 +153,12 @@ public:
     { this->SetAxisRange(vtkAxis::TOP, minimum, maximum); }
   void SetBottomAxisRange(double minimum, double maximum)
     { this->SetAxisRange(vtkAxis::BOTTOM, minimum, maximum); }
-  void UnsetLeftAxisRange()
-    { this->UnsetAxisRange(vtkAxis::LEFT); }
-  void UnsetRightAxisRange()
-    { this->UnsetAxisRange(vtkAxis::RIGHT); }
-  void UnsetTopAxisRange()
-    { this->UnsetAxisRange(vtkAxis::TOP); }
-  void UnsetBottomAxisRange()
-    { this->UnsetAxisRange(vtkAxis::BOTTOM); }
+
+  // Description:
+  // Set whether to use the range specified by SetAxisRange(..) (or variants) or
+  // to let the chart determine the range automatically based on the data being
+  // shown.
+  void SetAxisUseCustomRange(int index, bool useCustomRange);
 
   // Description:
   // Sets whether or not the given axis uses a log10 scale.

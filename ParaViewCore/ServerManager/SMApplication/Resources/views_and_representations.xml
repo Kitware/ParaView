@@ -673,15 +673,6 @@
                         min="0"
                         name="range" />
       </IntVectorProperty>
-      <IntVectorProperty command="SetAxisVisibility"
-                         default_values="1 1 0 0"
-                         name="ShowAxis"
-                         number_of_elements="4"
-                         number_of_elements_per_command="1"
-                         repeat_command="1"
-                         use_index="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
       <IntVectorProperty command="SetAxisLogScale"
                          default_values="0 0 0 0"
                          name="AxisLogScale"
@@ -776,36 +767,48 @@
                         min="0"
                         name="range" />
       </IntVectorProperty>
-      <DoubleVectorProperty clean_command="UnsetLeftAxisRange"
-                            command="SetLeftAxisRange"
-                            default_values="none"
+      <IntVectorProperty command="SetAxisUseCustomRange"
+                         default_values="0 0 0 0"
+                         name="AxisUseCustomRange"
+                         number_of_elements="4"
+                         number_of_elements_per_command="1"
+                         repeat_command="1"
+                         use_index="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify whether to use the axis range specified or whether the view
+          should compute the ranges automatically based on the data being shown.
+          The ranges specified by LeftAxisRange, RightAxisRange,
+          BottomAxisRange, TopAxisRange are only respected when the
+          corresponding flag in this property is set to 1.
+        </Documentation>
+      </IntVectorProperty>
+      <DoubleVectorProperty command="SetLeftAxisRange"
+                            default_values="0 1"
                             ignore_synchronization="1"
                             name="LeftAxisRange"
                             number_of_elements="2">
         <Documentation>Set the axis range for the Left axis. Set to empty to
         let the chart determine the range automatically.</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty clean_command="UnsetRightAxisRange"
-                            command="SetRightAxisRange"
-                            default_values="none"
+      <DoubleVectorProperty command="SetRightAxisRange"
+                            default_values="0 1"
                             ignore_synchronization="1"
                             name="RightAxisRange"
                             number_of_elements="2">
         <Documentation>Set the axis range for the Right axis. Set to empty to
         let the chart determine the range automatically.</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty clean_command="UnsetTopAxisRange"
-                            command="SetTopAxisRange"
-                            default_values="none"
+      <DoubleVectorProperty command="SetTopAxisRange"
+                            default_values="0 1"
                             ignore_synchronization="1"
                             name="TopAxisRange"
                             number_of_elements="2">
         <Documentation>Set the axis range for the Top axis. Set to empty to let
         the chart determine the range automatically.</Documentation>
       </DoubleVectorProperty>
-      <DoubleVectorProperty clean_command="UnsetBottomAxisRange"
-                            command="SetBottomAxisRange"
-                            default_values="none"
+      <DoubleVectorProperty command="SetBottomAxisRange"
+                            default_values="0 1"
                             ignore_synchronization="1"
                             name="BottomAxisRange"
                             number_of_elements="2">
@@ -852,28 +855,28 @@
         <BooleanDomain name="bool" />
         <Documentation>
           Specify whether to use custom labels for each of the axis. Labels
-          specified by AxisLabelsLeft, AxisLabelsRight, etc. are used only when
+          specified by LeftAxisLabels, RightAxisLabels, etc. are used only when
           the corresponding AxisUseCustomLabels flag is set to 1.
         </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty command="SetAxisLabelsLeft"
-                            name="AxisLabelsLeft"
+                            name="LeftAxisLabels"
                             repeat_command="1"
                             set_number_command="SetAxisLabelsLeftNumber"
                             use_index="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetAxisLabelsBottom"
-                            name="AxisLabelsBottom"
+                            name="BottomAxisLabels"
                             repeat_command="1"
                             set_number_command="SetAxisLabelsBottomNumber"
                             use_index="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetAxisLabelsRight"
-                            name="AxisLabelsRight"
+                            name="RightAxisLabels"
                             repeat_command="1"
                             set_number_command="SetAxisLabelsRightNumber"
                             use_index="1"></DoubleVectorProperty>
       <DoubleVectorProperty command="SetAxisLabelsTop"
-                            name="AxisLabelsTop"
+                            name="TopAxisLabels"
                             repeat_command="1"
                             set_number_command="SetAxisLabelsTopNumber"
                             use_index="1"></DoubleVectorProperty>
@@ -4751,7 +4754,6 @@
           <Property name="LeftAxisRange" />
           <Property name="LegendLocation" />
           <Property name="RightAxisRange" />
-          <Property name="ShowAxis" />
           <Property name="ShowAxisGrid" />
           <Property name="ShowAxisLabels" />
           <Property name="ShowLegend" />
@@ -4791,7 +4793,6 @@
           <Property name="ChartTitleFont" />
           <Property name="LeftAxisRange" />
           <Property name="RightAxisRange" />
-          <Property name="ShowAxis" />
           <Property name="ShowAxisGrid" />
           <Property name="ShowAxisLabels" />
           <Property name="ShowLegend" />

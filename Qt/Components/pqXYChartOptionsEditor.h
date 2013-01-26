@@ -81,11 +81,14 @@ public:
 protected slots:
   void connectGUI();
   void disconnectGUI();
-  void changeLayoutPage(bool checked);
+  void changeCustomLabelsPage(bool use_custom_labels);
   void updateRemoveButton();
 
+  /// called when the radio button to specify fixed range for any axis is
+  /// toggled.
+  void changeRangePage(bool use_fixed_range);
+
   // Setters for the axis elements of the form
-  void setAxisVisibility(bool visible);
   void setGridVisibility(bool visible);
   void setAxisColor(const QColor& color);
   void setGridColor(const QColor& color);
@@ -98,6 +101,9 @@ protected slots:
   void pickAxisTitleFont();
   void setAxisTitleColor(const QColor& color);
   void setAxisTitle(const QString& title);
+  void setAxisRangeMin(const QString&);
+  void setAxisRangeMax(const QString&);
+
 
   void addAxisLabel();
   void removeSelectedLabels();
@@ -112,7 +118,6 @@ private:
   void applyAxisOptions();
   void loadAxisPage();
   void loadAxisLayoutPage();
-  void loadAxisTitlePage();
   bool pickFont(QLabel *label, QFont &font);
   void updateDescription(QLabel *label, const QFont &newFont);
   vtkSMProxy* getProxy();
