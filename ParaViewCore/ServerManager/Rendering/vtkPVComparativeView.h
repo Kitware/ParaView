@@ -173,7 +173,10 @@ protected:
   // Update all representations belonging for the indicated position.
   void UpdateAllRepresentations(int x, int y);
 
-  void ClearDataCaches();
+  // Description:
+  // Clears the cached data for representations belonging to the indicated
+  // position.
+  void ClearDataCaches(int x, int y);
 
   int Dimensions[2];
   int ViewSize[2];

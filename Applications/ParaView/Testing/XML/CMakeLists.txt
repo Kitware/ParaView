@@ -72,6 +72,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/ColorEditor4.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CategoricalColorScalarBar1.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeVisPanel.xml
+  # disabling overlay test for now. It has issues with Time 0.
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/ComparativeOverlay.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/CompositeSurfaceSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Contour.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ContourRange.xml
@@ -222,6 +224,8 @@ set(Clip_USE_NEW_PANELS TRUE)
 set(ColorEditor2_USE_NEW_PANELS TRUE)
 set(ColorEditor4_USE_NEW_PANELS TRUE)
 set(CompositeSurfaceSelection_USE_NEW_PANELS TRUE)
+set(ComparativeVisPanel_USE_NEW_PANELS TRUE)
+set(ComparativeOverlay_USE_NEW_PANELS TRUE)
 set(ContourRange_USE_NEW_PANELS TRUE)
 set(Contour_USE_NEW_PANELS TRUE)
 set(CreateDelete_USE_NEW_PANELS TRUE)
@@ -384,6 +388,7 @@ SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)
 set (ExodusXML_BREAK TRUE)
 SET (ComparativeVisPanel_BREAK TRUE)
+SET (ComparativeOverlay_BREAK TRUE)
 SET (SpreadSheet1_BREAK TRUE)
 SET (SPTimeseries_BREAK TRUE)
 SET (XYChart_BREAK TRUE)

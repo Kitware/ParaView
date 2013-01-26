@@ -2,20 +2,24 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Close" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/EmptyView/scrollArea/qt_scrollarea_viewport/widgetFoo/ConvertActionsFrame/ComparativeRenderView" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/MainControlsToolbar/actionOpenData" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_File" />
+  <pqevent object="pqClientMainWindow/menubar/menu_File" command="activate" arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ArrayStatus/SelectionWidget/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionPositiveX" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeX" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menu_View" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Outline" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Surface" />
+  <pqevent object="pqClientMainWindow/menubar" command="activate" arguments="menuFilters" />
   <pqevent object="pqClientMainWindow/menubar/menu_View" command="activate" arguments="Comparative View Inspector" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/overlay" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/addParameter" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/layoutY" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="DISPL" />
-  <pqevent object="pqClientMainWindow/cameraToolbar/actionNegativeY" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/variableToolbar/actionEditColorMap" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/ColorTabs/qt_tabwidget_stackedwidget/ScalePage/RescaleToDataOverTimeButton" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/pqColorScaleDialog/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/actionResetCamera" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/overlay" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/comparativePanelDock/comparativeVisPanel/overlay" command="set_boolean" arguments="true" />
 </pqevents>
