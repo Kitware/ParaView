@@ -179,6 +179,13 @@ public:
   // Provides access to the actor used by this representation.
   vtkPVLODActor* GetActor() { return this->GetRenderedProp(); }
 
+  // Description:
+  // Set/get the visibility for a single block.
+  virtual void SetBlockVisibility(unsigned int index, bool visible);
+  virtual bool GetBlockVisibility(unsigned int index) const;
+  virtual void RemoveBlockVisibility(unsigned int index, bool = true);
+  virtual void RemoveBlockVisibilities();
+
 //BTX
 protected:
   vtkGeometryRepresentation();

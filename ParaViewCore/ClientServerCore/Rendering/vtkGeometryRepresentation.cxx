@@ -17,6 +17,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkBoundingBox.h"
 #include "vtkCommand.h"
+#include "vtkCompositeDataDisplayAttributes.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkHardwareSelectionPolyDataPainter.h"
@@ -117,6 +118,15 @@ vtkGeometryRepresentation::vtkGeometryRepresentation()
   this->LODMapper = vtkCompositePolyDataMapper2::New();
   this->Actor = vtkPVLODActor::New();
   this->Property = vtkProperty::New();
+
+  // setup composite display attributes
+  vtkCompositeDataDisplayAttributes *compositeAttributes =
+    vtkCompositeDataDisplayAttributes::New();
+  vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->
+    SetCompositeDataDisplayAttributes(compositeAttributes);
+  vtkCompositePolyDataMapper2::SafeDownCast(this->LODMapper)->
+    SetCompositeDataDisplayAttributes(compositeAttributes);
+  compositeAttributes->Delete();
 
   this->RequestGhostCellsIfNeeded = true;
 
@@ -784,3 +794,27 @@ bool vtkGeometryRepresentation::GenerateMetaData(vtkInformation*,
   return false;
 }
 #endif
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::SetBlockVisibility(unsigned int index, bool visible)
+{
+  vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->SetBlockVisibility(index, visible);
+}
+
+//----------------------------------------------------------------------------
+bool vtkGeometryRepresentation::GetBlockVisibility(unsigned int index) const
+{
+  return vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->GetBlockVisibility(index);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveBlockVisibility(unsigned int index, bool)
+{
+  vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockVisibility(index);
+}
+
+//----------------------------------------------------------------------------
+void vtkGeometryRepresentation::RemoveBlockVisibilities()
+{
+  vtkCompositePolyDataMapper2::SafeDownCast(this->Mapper)->RemoveBlockVisibilites();
+}

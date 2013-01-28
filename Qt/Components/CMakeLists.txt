@@ -226,6 +226,8 @@ set (Module_SRCS
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.cxx
   pqMemoryInspectorPanel.h
+  pqMultiBlockInspectorPanel.cxx
+  pqMultiBlockInspectorPanel.h
   pqMultiViewWidget.cxx
   pqMultiViewWidget.h
   pqNamedObjectPanel.cxx
@@ -516,6 +518,7 @@ set (Module_MOC_HDRS
   pqLoadedFormObjectPanel.h
   pqLockViewSizeCustomDialog.h
   pqMemoryInspectorPanel.h
+  pqMultiBlockInspectorPanel.h
   pqMultiViewWidget.h
   pqNamedObjectPanel.h
   pqNetCDFPanel.h
