@@ -110,6 +110,9 @@ endif()
 #  WRAP_EXCLUDE
 #  )
 
+set (${vtk-module}_INCLUDE_DIRS
+  ${QT_INCLUDES})
+
 set_source_files_properties(
   vtkCameraManipulatorGUIHelper
   vtkImageCompressor
