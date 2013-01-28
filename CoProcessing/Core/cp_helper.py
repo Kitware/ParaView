@@ -278,11 +278,21 @@ def RescaleDataRange(datadescription, cp_views, timestep):
                         # rescale all of the points
                         oldrange = rgbpoints[(numpts-1)*4] - rgbpoints[0]
                         newrange = globaldatarange[1] - globaldatarange[0]
-                        newrgbpoints = list(rgbpoints)
-                        for v in range(numpts):
-                            newrgbpoints[v*4] = globaldatarange[0]+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
+                        # only readjust if the new range isn't zero.
+                        if newrange != 0:
+                           newrgbpoints = list(rgbpoints)
+                           # if the old range isn't 0 then we use that ranges distribution
+                           if oldrange != 0:
+                              for v in range(numpts-1):
+                                 newrgbpoints[v*4] = globaldatarange[0]+(rgbpoints[v*4] - rgbpoints[0])*newrange/oldrange
 
-                        lut.RGBPoints.SetData(newrgbpoints)
+                              # avoid numerical round-off, at least with the last point
+                              newrgbpoints[(numpts-1)*4] = rgbpoints[(numpts-1)*4]
+                           else: # the old range is 0 so the best we can do is to space the new points evenly
+                              for v in range(numpts+1):
+                                 newrgbpoints[v*4] = globaldatarange[0]+v*newrange/(1.0*numpts)
+
+                           lut.RGBPoints.SetData(newrgbpoints)
 
 # -----------------------------------------------------------------------------
 # Find the first proxy that can be deleted (not a prototype, helper or the timekeeper)
