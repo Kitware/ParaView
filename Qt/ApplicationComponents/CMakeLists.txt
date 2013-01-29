@@ -171,6 +171,8 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
+  pqSelection3DHelper.cxx
+  pqSelection3DHelper.h
   pqSelectionInspectorWidget.cxx
   pqSelectionInspectorWidget.h
   pqSelectionToolbar.cxx
@@ -290,6 +292,7 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
+  pqSelection3DHelper.h
   pqSelectionInspectorWidget.h
   pqSelectionToolbar.h
   pqServerConnectReaction.h

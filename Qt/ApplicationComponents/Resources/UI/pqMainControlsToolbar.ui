@@ -109,6 +109,27 @@
     <string>Apply changes to parameters automatically</string>
    </property>
   </action>
+ <action name="actionQuery">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqFindData24.png</normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Find data...</string>
+   </property>
+   <property name="toolTip">
+    <string>Find data by scalar value (v)</string>
+   </property>
+   <property name="shortcut">
+     <string>V</string>
+   </property>
+  </action>
   <addaction name="actionOpenData"/>
   <addaction name="actionSaveData"/>
   <addaction name="separator"/>
@@ -121,6 +142,7 @@
   <addaction name="actionAutoApply"/>
   <addaction name="separator"/>
   <addaction name="actionHelp"/>
+  <addaction name="actionQuery" />
  </widget>
  <resources>
   <include location="../../../Components/Resources/pqComponents.qrc"/>

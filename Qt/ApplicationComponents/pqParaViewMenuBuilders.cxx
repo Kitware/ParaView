@@ -334,11 +334,6 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
   mainToolBar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
 
-  QToolBar* selectionToolbar = new pqSelectionToolbar(&mainWindow)
-    << pqSetName("selectionToolbar");
-  selectionToolbar->layout()->setSpacing(0);
-  mainWindow.addToolBar(Qt::TopToolBarArea, selectionToolbar);
-
   QToolBar* vcrToolbar = new pqVCRToolbar(&mainWindow)
     << pqSetName("VCRToolbar");
   vcrToolbar->layout()->setSpacing(0);
