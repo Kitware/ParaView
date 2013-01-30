@@ -47,7 +47,7 @@
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
 // #define PV_DISABLE_PROGRESS_HANDLING
-#define DISABLE_PROGRESS_FOR_RUN_LARGER_THAN 1024
+#define DISABLE_PROGRESS_FOR_RUN_LARGER_THAN 64
 
 #define SKIP_IF_DISABLED()\
   if (this->Internals->DisableProgressHandling) { return; }
