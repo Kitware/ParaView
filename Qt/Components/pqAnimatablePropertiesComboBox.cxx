@@ -179,7 +179,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy
       }
     unsigned int num_elems = smproperty->GetNumberOfElements();
     if (this->Internal->VectorSizeFilter >= 0 &&
-        num_elems != this->Internal->VectorSizeFilter)
+        static_cast<int>(num_elems) != this->Internal->VectorSizeFilter)
       {
       continue;
       }

@@ -363,7 +363,6 @@ void vtkPVComparativeView::Build(int dx, int dy)
     // match the dimensions.
 
     vtkSMViewProxy* root_view = this->GetRootView();
-    vtkSMSessionProxyManager* pxm = root_view->GetSessionProxyManager();
     size_t numReprs = dx * dy;
     vtkInternal::MapOfReprClones::iterator reprIter;
     for (reprIter = this->Internal->RepresentationClones.begin();
