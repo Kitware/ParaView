@@ -31,13 +31,13 @@
 #define __vtkPVDataEncoder_h
 
 #include "vtkObject.h"
-#include "vtkParaViewWebModule.h" // needed for exports
+#include "vtkParaViewWebCoreModule.h" // needed for exports
 #include "vtkSmartPointer.h" // needed for vtkSmartPointer
 
 class vtkUnsignedCharArray;
 class vtkImageData;
 
-class VTKPARAVIEWWEB_EXPORT vtkPVDataEncoder : public vtkObject
+class VTKPARAVIEWWEBCORE_EXPORT vtkPVDataEncoder : public vtkObject
 {
 public:
   static vtkPVDataEncoder* New();

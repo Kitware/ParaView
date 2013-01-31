@@ -20,9 +20,9 @@
 #define __vtkPVWebInteractionEvent_h
 
 #include "vtkObject.h"
-#include "vtkParaViewWebModule.h" // needed for exports
+#include "vtkParaViewWebCoreModule.h" // needed for exports
 
-class VTK_EXPORT vtkPVWebInteractionEvent : public vtkObject
+class VTKPARAVIEWWEBCORE_EXPORT vtkPVWebInteractionEvent : public vtkObject
 {
 public:
   static vtkPVWebInteractionEvent* New();

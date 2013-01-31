@@ -1,6 +1,6 @@
 # Module for ParaView Web.
 
-vtk_module(vtkParaViewWeb
+vtk_module(vtkParaViewWebCore
   DEPENDS
     vtkPVServerManagerDefault
   TEST_DEPENDS
