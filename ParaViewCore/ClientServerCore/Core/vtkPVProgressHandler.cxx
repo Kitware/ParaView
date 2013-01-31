@@ -361,7 +361,7 @@ bool vtkPVProgressHandler::OnWrongTagEvent(
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::OnMessageEvent(
-  vtkObject* caller, unsigned long eventid, void* calldata)
+  vtkObject* vtkNotUsed(caller), unsigned long eventid, void* calldata)
 {
   SKIP_IF_DISABLED();
 
