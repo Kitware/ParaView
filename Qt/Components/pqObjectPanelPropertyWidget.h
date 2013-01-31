@@ -47,8 +47,10 @@ public:
                               QWidget *parent = 0);
   ~pqObjectPanelPropertyWidget();
 
-  void apply();
-  void reset();
+  virtual void apply();
+  virtual void reset();
+  virtual void select();
+  virtual void deselect();
 
   pqObjectPanel* getObjectPanel() const;
 

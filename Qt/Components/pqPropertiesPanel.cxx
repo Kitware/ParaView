@@ -594,9 +594,6 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
         widget->resetBounds();
         widget->reset();
 
-        // must call select
-        widget->select();
-
         pqPropertiesPanelItem item;
         item.LabelWidget = 0;
         item.PropertyWidget = new pq3DWidgetPropertyWidget(widget);

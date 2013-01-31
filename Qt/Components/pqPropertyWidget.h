@@ -59,6 +59,13 @@ public:
   virtual void apply();
   virtual void reset();
 
+  /// These methods are called when the pqProxyPropertiesPanel containing the
+  /// widget is activated/deactivated. Only widgets that have 3D widgets need to
+  /// override these methods to select/deselect the 3D widgets.
+  /// Default implementation does nothing.
+  virtual void select() {}
+  virtual void deselect() {}
+
   pqView* view() const;
   vtkSMProxy* proxy() const;
   vtkSMProperty* property() const;
