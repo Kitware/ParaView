@@ -35,7 +35,6 @@
 
 #ifdef PARAVIEW_USE_MPI
 # include "vtkMPIController.h"
-# include "vtkPVMPICommunicator.h"
 # include "vtkMPI.h"
 #endif
 
@@ -144,14 +143,6 @@ bool vtkProcessModule::Initialize(ProcessTypes type, int &argc, char** &argv)
     vtkProcessModule::GlobalController = vtkSmartPointer<vtkMPIController>::New();
     vtkProcessModule::GlobalController->Initialize(
       &argc, &argv, /*initializedExternally*/1);
-
-    // Replace the communicator with vtkPVMPICommunicator which handles progress
-    // events better than the conventional vtkMPICommunicator.
-    vtkPVMPICommunicator* comm = vtkPVMPICommunicator::New();
-    comm->CopyFrom(vtkMPICommunicator::GetWorldCommunicator());
-    vtkMPIController::SafeDownCast(
-      vtkProcessModule::GlobalController)->SetCommunicator(comm);
-    comm->Delete();
     }
 #else
   static_cast<void>(argc); // unused warning when MPI is off
