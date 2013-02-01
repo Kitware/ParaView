@@ -2,5 +2,6 @@ vtk_module(vtkParaViewWeb
   DEPENDS
     vtkParaViewWebCore
     vtkParaViewWebJavaScript
-    AutobahnPython
+    vtkParaViewWebPython
+    vtkParaViewWebApplications
   EXCLUDE_FROM_WRAPPING)

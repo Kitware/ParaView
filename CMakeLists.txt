@@ -487,8 +487,9 @@ else()
       ThirdParty/AutobahnPython
       Web
       Web/Core
+      Web/Python
       Web/JavaScript
-      Web/Docs)
+      Web/Applications)
   endif()
 
   if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
