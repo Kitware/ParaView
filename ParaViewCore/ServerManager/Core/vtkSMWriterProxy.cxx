@@ -86,7 +86,18 @@ void vtkSMWriterProxy::UpdatePipeline(double time)
 {
   this->Session->PrepareProgress();
 
+  // we have to manually set the time on the server
+  // through the vtkSIWriterProxy object since normally it's done on the
+  // output port but a writer won't have an output port so we
+  // do it on the writer's inputs' output port corresponding to the writer
   vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << SIPROXY(this)
+         << "UpdatePipelineTime"
+         << time
+         << vtkClientServerStream::End;
+
+  // time is now set so now we can write
   stream << vtkClientServerStream::Invoke
          << VTKOBJECT(this)
          << "Write"
@@ -94,7 +105,6 @@ void vtkSMWriterProxy::UpdatePipeline(double time)
   this->ExecuteStream(stream);
 
   this->Session->CleanupPendingProgress();
-  this->Superclass::UpdatePipeline(time);
 }
 
 //-----------------------------------------------------------------------------
