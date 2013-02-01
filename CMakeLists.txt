@@ -279,6 +279,17 @@ if (UNIX AND NOT APPLE)
   set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
 endif()
 
+option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" OFF)
+
+if (PARAVIEW_ENABLE_WEB AND NOT PARAVIEW_ENABLE_PYTHON)
+  message(
+    WARNING "ParaViewWeb required Python, enable Python support by"
+      "turning on PARAVIEW_ENABLE_PYTHON.")
+endif()
+
+# Hide ???
+set(Module_vtkParaViewWeb ${PARAVIEW_ENABLE_WEB} CACHE BOOL "" FORCE)
+
 option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
 
 set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
@@ -434,7 +445,6 @@ else()
     ParaViewCore/ServerManager/Core
     ParaViewCore/ServerManager/Rendering
     ParaViewCore/ServerManager/Default
-    ParaViewCore/ServerManager/ParaViewWeb
     ParaViewCore/ServerManager/SMApplication
 
     Qt/Widgets
@@ -468,6 +478,17 @@ else()
   if (BUILD_TESTING)
     list (APPEND  ParaViewModulesDirs
     Utilities/TestDriver)
+  endif()
+
+  if (PARAVIEW_ENABLE_WEB)
+    list (APPEND ParaViewModulesDirs
+      ThirdParty/ZopeInterface
+      ThirdParty/Twisted
+      ThirdParty/AutobahnPython
+      Web
+      Web/Core
+      Web/JavaScript
+      Web/Docs)
   endif()
 
   if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
