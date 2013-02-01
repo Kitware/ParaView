@@ -278,6 +278,11 @@ endif()
 if (UNIX AND NOT APPLE)
   set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
 endif()
+
+option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
+
+set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
+  CACHE BOOL "" FORCE)
 #------------------------------------------------------------------------------
 
 
@@ -464,6 +469,12 @@ else()
     list (APPEND  ParaViewModulesDirs
     Utilities/TestDriver)
   endif()
+
+  if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
+    list (APPEND ParaViewModulesDirs
+      Web/Documentation)
+  endif()
+
 
   foreach(dir ${ParaViewModulesDirs})
     vtk_add_to_module_search_path(

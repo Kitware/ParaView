@@ -1,0 +1,21 @@
+{
+    "--title": "ParaViewWeb",
+    "--welcome": "@CMAKE_CURRENT_SOURCE_DIR@/welcome.html",
+    "--warnings": ["-no_doc"],
+    "--categories": "@CMAKE_CURRENT_SOURCE_DIR@/categories.json",
+    "--images": "@CMAKE_CURRENT_SOURCE_DIR@/images",
+    "--guides": "@CMAKE_CURRENT_SOURCE_DIR@/guides.json",
+    "--videos": "@CMAKE_CURRENT_SOURCE_DIR@/videos.json",
+    "--footer": "Kitware",
+    "-o": "@DOC_OUTPUT_DIR@",
+    "--head-html":"<link rel='stylesheet' href='custom.css' type='text/css'>",
+    "--": [
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.launcher.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.connect.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.viewport.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.statistics.js",
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.js",
+        "@CMAKE_CURRENT_SOURCE_DIR@/api/Web.py",
+        "@CMAKE_CURRENT_SOURCE_DIR@/api/server.py"
+    ]
+}

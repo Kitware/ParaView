@@ -1,0 +1,55 @@
+[
+      {
+          "name": "Client",
+          "groups": [
+              {
+                  "name": "Paraview",
+                  "classes": [
+                      "paraview",
+                      "paraview.launcher",
+                      "paraview.connect",
+                      "paraview.viewport",
+                      "paraview.statistics"
+
+                  ]
+              }, {
+                  "name": "ParaView Objects",
+                  "classes": [
+                      "pv.ViewPortConfig",
+                      "pv.ConnectionConfig",
+                      "pv.Connection",
+                      "pv.Session",
+                      "pv.Viewport",
+                      "pv.ViewportStatistics",
+                      "pv.Future"
+                  ]
+              }, {
+                  "name": "Request",
+                  "classes": [
+                      "request.InteractionEvent",
+                      "request.Render"
+                  ]
+              }, {
+                  "name": "Reply",
+                  "classes": [
+                      "reply.Render"
+                  ]
+              }
+          ]
+      },{
+          "name": "Server",
+          "groups": [
+              {
+                  "name": "Protocols",
+                  "classes": [
+                      "server.ParaViewProtocol"
+                  ]
+              },{
+                  "name": "WebHandler",
+                  "classes": [
+                      "server.WebServer"
+                  ]
+              }
+          ]
+      }
+  ]
