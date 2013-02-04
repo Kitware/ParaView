@@ -32,8 +32,7 @@
 
 // define this variable to disable progress all together. This may be useful to
 // doing really large runs.
-// #define PV_DISABLE_PROGRESS_HANDLING
-#define DISABLE_PROGRESS_FOR_RUN_LARGER_THAN 64
+//#define PV_DISABLE_PROGRESS_HANDLING
 
 #define SKIP_IF_DISABLED()\
   if (this->Internals->DisableProgressHandling) { return; }
@@ -72,12 +71,12 @@ public:
 #ifdef PV_DISABLE_PROGRESS_HANDLING
     this->DisableProgressHandling = true;
 #else
-    // Symetric mode mean that we disable progress
+    // In symmetric mode, we disable progress although that's not really
+    // necessary anymore. Since the progress is no longer collected from anyone
+    // but the root node, it really doesn't matter if progress is enabled.
     if (vtkProcessModule* pm = vtkProcessModule::GetProcessModule())
       {
-      this->DisableProgressHandling =
-        pm->GetSymmetricMPIMode() ||
-        (pm->GetNumberOfLocalPartitions() > DISABLE_PROGRESS_FOR_RUN_LARGER_THAN);
+      this->DisableProgressHandling = pm->GetSymmetricMPIMode();
       }
 #endif
     }
