@@ -33,7 +33,7 @@ project(ParaView)
 
 # Disallow in-source build
 if ("${ParaView_SOURCE_DIR}"  STREQUAL "${ParaView_BINARY_DIR}")
-  message(FATAL_ERROR 
+  message(FATAL_ERROR
     "ParaView requires an out of source Build. "
     "Please create a separate binary directory and run CMake there.")
 endif()
@@ -287,13 +287,14 @@ if (PARAVIEW_ENABLE_WEB AND NOT PARAVIEW_ENABLE_PYTHON)
       "turning on PARAVIEW_ENABLE_PYTHON.")
 endif()
 
-# Hide ???
 set(Module_vtkParaViewWeb ${PARAVIEW_ENABLE_WEB} CACHE BOOL "" FORCE)
+mark_as_advanced(Module_vtkParaViewWeb)
 
 option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
 
 set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
   CACHE BOOL "" FORCE)
+mark_as_advanced(Module_vtkParaViewWebDocumentation)
 #------------------------------------------------------------------------------
 
 
@@ -506,9 +507,9 @@ else()
 
   # include VTK
   set (old_build_examples ${BUILD_EXAMPLES})
-  set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE) 
+  set (BUILD_EXAMPLES FALSE CACHE BOOL "" FORCE)
   add_subdirectory(VTK)
-  set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE) 
+  set (BUILD_EXAMPLES ${old_build_examples} CACHE BOOL "" FORCE)
 
   # keep VTK cmake variables from polluting the non-advanced space.
   mark_as_advanced(
@@ -576,7 +577,7 @@ include(ParaViewPluginsMacros)
 pv_process_plugins(
   ${CMAKE_CURRENT_SOURCE_DIR}/Plugins
   ${CMAKE_CURRENT_BINARY_DIR}/Plugins)
-  
+
 add_subdirectory(CommandLineExecutables)
 add_subdirectory(Applications)
 add_subdirectory(Utilities/mpi4py)
