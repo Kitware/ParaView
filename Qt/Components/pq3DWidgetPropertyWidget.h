@@ -48,10 +48,10 @@ public:
   void reset();
 
   /// Forwards the call to the internal pq3DWidget instance.
-  void select();
+  virtual void select();
 
   /// Forwards the call to the internal pq3DWidget instance.
-  void deselect();
+  virtual void deselect();
 
   pq3DWidget* get3DWidget() const { return this->Widget; }
 

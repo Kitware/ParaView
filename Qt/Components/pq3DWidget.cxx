@@ -399,9 +399,6 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
       this, SIGNAL(widgetInteraction()));
     this->Internal->VTKConnect->Connect(pxy, vtkCommand::EndInteractionEvent,
       this, SIGNAL(widgetEndInteraction()));
-
-    bool visible = vtkSMPropertyHelper(pxy, "Visibility").GetAsInt() == 1;
-    this->setWidgetVisible(visible);
     }
 
   if (rview && pxy)

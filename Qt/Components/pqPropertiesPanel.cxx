@@ -558,9 +558,6 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
       connect(this, SIGNAL(viewChanged(pqView*)),
               customPanel, SLOT(setView(pqView*)));
 
-      // must call select
-      customPanel->select();
-
       pqPropertiesPanelItem item;
       item.Name = proxy->getProxy()->GetXMLName();
       item.LabelWidget = 0;
@@ -593,9 +590,6 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
         widget->setView(this->view());
         widget->resetBounds();
         widget->reset();
-
-        // must call select
-        widget->select();
 
         pqPropertiesPanelItem item;
         item.LabelWidget = 0;
