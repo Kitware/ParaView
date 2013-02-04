@@ -13,8 +13,13 @@ if(PARAVIEW_ENABLE_PYTHON)
   list(APPEND __dependencies vtkRenderingMatplotlib)
 endif()
 
+if (PARAVIEW_ENABLE_QT_SUPPORT)
+  list(APPEND __dependencies vtkGUISupportQt)
+endif(PARAVIEW_ENABLE_QT_SUPPORT)
+
 vtk_module(vtkPVVTKExtensionsRendering
   GROUPS
+    Qt
     ParaViewRendering
   DEPENDS
     vtkChartsCore
