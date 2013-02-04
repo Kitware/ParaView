@@ -88,14 +88,6 @@ if (PARAVIEW_ENABLE_PYTHON)
     )
 endif()
 
-if (PARAVIEW_USE_MPI)
-  list(APPEND Module_SRCS
-    vtkPVMPICommunicator.cxx)
-  set_source_files_properties(
-    vtkPVMPICommunicator
-    WRAP_EXCLUDE)
-endif()
-
 set_source_files_properties(
   vtkExtractsDeliveryHelper
   vtkProcessModuleAutoMPI
