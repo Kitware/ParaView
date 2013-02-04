@@ -1,14 +1,13 @@
 # import to process args
 import sys
 import os
+import argparse
 
 # import annotations
 from autobahn.wamp import exportRpc
 
 # import paraview modules.
-from paraview import simple
-from paraview.simple import servermanager
-from web import ParaViewServerProtocol
+from paraview import simple, web, servermanager
 
 # find out the path of the file to load
 reader = None
@@ -18,15 +17,6 @@ timekeeper = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
 fileToLoad = None
 pathToList = "."
 fileList = {}
-
-for arg in sys.argv:
-    if arg.startswith("--file-to-load"):
-        fileToLoad = arg.split("=")[1]
-    if arg.startswith("--path-to-list"):
-        pathToList = arg.split("=")[1]
-
-def getProtocol():
-    return FileOpener
 
 def listFiles(pathToList):
     nodeTree = {}
@@ -45,8 +35,6 @@ def listFiles(pathToList):
             nodeTree[path + '/' + filename] = child
             parent['children'].append(child)
     return rootNode
-
-fileList = listFiles(pathToList)
 
 view = None
 def initializePipeline():
@@ -72,7 +60,7 @@ def initializePipeline():
 
     pass
 
-class FileOpener(ParaViewServerProtocol):
+class FileOpener(web.ParaViewServerProtocol):
 
     @exportRpc("openFile")
     def openFile(self, file):
@@ -125,3 +113,19 @@ class FileOpener(ParaViewServerProtocol):
             print "UpdateTime: ", str(timesteps[currentTimeIndex])
 
         return action
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="ParaView/Web file loader web-application")
+    web.add_arguments(parser)
+    parser.add_argument("--file-to-load", help="path to data file to load",
+        dest=data)
+    parser.add_argument("--path-to-list", default=os.getcwd(),
+        help="path to data directory to list", dest=path)
+    args = parser.parse_args()
+
+    fileToLoad = args.data
+    pathToList = args.path
+    fileList = listFiles(pathToList)
+    initializePipeline()
+    web.start_webserver(options=args, protocol=FileOpener)

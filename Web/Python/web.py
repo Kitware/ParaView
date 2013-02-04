@@ -1,10 +1,17 @@
-# FIXME: This will be placed under "paraview" module, hence users will import as
-# follows:
-#   from paraview import web
+r"""web is a module that enables using ParaView through a web-server. This
+module implments a WampServerProtocol that provides the core RPC-API needed to
+place interactive visualization in web-pages. Developers can extent
+ParaViewServerProtocol to provide additional RPC callbacks for their web-applications.
 
+This module can be used as the entry point to the application. In that case, it
+sets up a Twisted web-server that can generate visualizations as well as serve
+web-pages are determines by the command line arguments passed in.
+Use "--help" to list the supported arguments.
 
-import sys
+"""
+
 import types
+import logging
 from threading import Timer
 
 from twisted.python import log
@@ -13,38 +20,22 @@ from autobahn.websocket import listenWS
 from autobahn.wamp import exportRpc, \
                           WampServerProtocol
 from autobahn.resource import WebSocketResource
+from autobahn.wamp import WampServerFactory
 
 # import paraview modules.
 from paraview import simple
 from vtkParaViewWebPython import vtkPVWebApplication,\
                                  vtkPVWebInteractionEvent
 
-def globalIdToProxy(id):
-    if id == -1:
-        return None
-    return simple.servermanager._getPyProxy(\
-                simple.servermanager.ActiveConnection.Session.GetRemoteObject(id))
-
-def getProtocol():
-    return ParaViewServerProtocol
-
-def initializePipeline():
-    """
-    Called by the default server and serves as a demonstration purpose.
-    This should be overriden by application protocols to setup the
-    application specific pipeline
-    """
-    c = simple.Cone()
-    c.Resolution = 80
-    simple.Show()
-    view = simple.Render()
-    # If this is running on a Mac DO NOT use Offscreen Rendering
-    #view.UseOffscreenRendering = 1
-    pass
-
 class ServerProtocol(WampServerProtocol):
     """
-    Defines the server protocol for core ParaViewWeb
+    Defines the core server protocol for ParaView/Web. Adds support to
+    marshall/unmarshall RPC callbacks that involve ServerManager proxies as
+    arguments or return values.
+
+    Applications typically don't use this class directly, since it doesn't
+    register any RPC callbacks that are required for basic web-applications with
+    interactive visualizations. For that, use ParaViewServerProtocol.
     """
 
     def onAfterCallSuccess(self, result, callid):
@@ -59,8 +50,8 @@ class ServerProtocol(WampServerProtocol):
         :type callid: str
         :returns obj -- Result send back to client.
         """
-        log.msg("onAfterCallSuccess", callid)
-        result = self._mashall(result)
+        log.msg("onAfterCallSuccess", callid, logLevel=logging.DEBUG)
+        result = self.marshall(result)
         return result
         # not sure why the below causes errors.
         #return super(RpcServer1Protocol, self).onAfterCallSuccess(result, callid)
@@ -80,12 +71,13 @@ class ServerProtocol(WampServerProtocol):
         :type isRegistered: bool
         :returns pair -- Must return URI/Args pair.
         """
-        log.msg("onBeforeCall", callid, uri, args, isRegistered)
-        args = self._demarshall(args)
-        log.msg("onBeforeCall -- done")
+        log.msg("onBeforeCall", callid, uri, args, isRegistered,
+            logLevel=logging.DEBUG)
+        args = self.unmarshall(args)
+        log.msg("onBeforeCall -- done", logLevel=logging.DEBUG)
         return uri, args
 
-    def _mashall(self, argument):
+    def marshall(self, argument):
         """
         Marshall the argument to JSON serialization object.
         """
@@ -94,49 +86,66 @@ class ServerProtocol(WampServerProtocol):
                      "__selfid__": argument.GetGlobalIDAsString()}
         return argument
 
-    def _demarshall(self, argument):
+    def unmarshall(self, argument):
         """
         Demarshalls the "argument".
         """
         if isinstance(argument, types.ListType):
-            # for lists, demarshall each argument in the list.
+            # for lists, unmarshall each argument in the list.
             result = []
             for arg in argument:
-                arg = self._demarshall(arg)
+                arg = self.unmarshall(arg)
                 result.append(arg)
             return result
         elif isinstance(argument, types.DictType) and \
             argument.has_key("__jsonclass__") and \
             argument["__jsonclass__"] == "Proxy":
             id = int(argument["__selfid__"])
-            return simple.servermanager._getPyProxy(\
-                simple.servermanager.ActiveConnection.Session.GetRemoteObject(id))
+            return self.mapIdToProxy(id)
         return argument
 
-    def onConnect(self, connection_request):
-      """
-      Callback  fired during WebSocket opening handshake when new WebSocket
-      client connection is about to be established.
+    def mapIdToProxy(self, id):
+        """
+        Maps global-id for a proxy to the proxy instance. May return None if the
+        id is not valid.
+        """
+        id = int(id)
+        if id <= 0:
+            return None
+        return simple.servermanager._getPyProxy(\
+                simple.servermanager.ActiveConnection.Session.GetRemoteObject(id))
 
-      Call the factory to increment the connection count.
-      """
-      self.factory.on_connect()
-      return WampServerProtocol.onConnect(self, connection_request)
+    def onConnect(self, connection_request):
+        """
+        Callback  fired during WebSocket opening handshake when new WebSocket
+        client connection is about to be established.
+
+        Call the factory to increment the connection count.
+        """
+        try:
+            self.factory.on_connect()
+        except AttributeError:
+            pass
+        return WampServerProtocol.onConnect(self, connection_request)
 
     def connectionLost(self, reason):
-      """
-      Called by Twisted when established TCP connection from client was lost.
+        """
+        Called by Twisted when established TCP connection from client was lost.
 
-      Call the factory to decrement the connection count and start a reaper if
-      necessary.
-      """
-      self.factory.connection_lost()
-      WampServerProtocol.connectionLost(self, reason)
+        Call the factory to decrement the connection count and start a reaper if
+        necessary.
+        """
+        try:
+            self.factory.connection_lost()
+        except AttributeError:
+            pass
+        WampServerProtocol.connectionLost(self, reason)
 
 class ParaViewServerProtocol(ServerProtocol):
     """
-    Extends ServerProtocol to add RPC calls for core ParaViewWeb API for
-    rendering images, etc.
+    Extends ServerProtocol to add RPC calls for interacting and rendering views.
+    Applications can extend ParaViewServerProtocol to add additional RPC
+    callbacks updating visualization pipelines, etc.
     """
     WebApplication = vtkPVWebApplication()
     import time
@@ -152,8 +161,11 @@ class ParaViewServerProtocol(ServerProtocol):
 
     @exportRpc("stillRender")
     def stillRender(self, options):
+        """
+        RPC Callback to render a view and obtain the rendered image.
+        """
         beginTime = int(round(ParaViewServerProtocol.time.time() * 1000))
-        view = globalIdToProxy(options['view'])
+        view = self.mapIdToProxy(options['view'])
         if not view:
             # Use active view is none provided.
             view = simple.GetActiveView()
@@ -189,7 +201,10 @@ class ParaViewServerProtocol(ServerProtocol):
 
     @exportRpc("mouseInteraction")
     def mouseInteraction(self, event):
-        view = globalIdToProxy(event['view'])
+        """
+        RPC Callback for mouse interactions.
+        """
+        view = self.mapIdToProxy(event['view'])
         if not view:
             view = simple.GetActiveView()
         if not view:
@@ -225,7 +240,10 @@ class ParaViewServerProtocol(ServerProtocol):
 
     @exportRpc("resetCamera")
     def resetCamera(self, view):
-        view = globalIdToProxy(view)
+        """
+        RPC callback to reset camera.
+        """
+        view = self.mapIdToProxy(view)
         if not view:
             view = simple.GetActiveView()
         if not view:
@@ -234,7 +252,121 @@ class ParaViewServerProtocol(ServerProtocol):
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
-
     @exportRpc("exit")
     def exit(self):
+        """RPC callback to exit"""
         reactor.stop()
+
+class ReapingWampServerFactory(WampServerFactory):
+    """
+    ReapingWampServerFactory is WampServerFactory subclass that adds support to
+    close the web-server after a timeout when the last connected client drops.
+
+    Currently, the protocol must call on_connect() and connection_lost() methods
+    to notify the factory that the connection was started/closed.
+
+    If the connection count drops to zero, then the reap timer
+    is started which will end the process if no other connections are made in
+    the timeout interval.
+    """
+
+    def __init__(self, url, debugWamp, timeout):
+        self._reaper = None
+        self._connection_count = 0
+        self._timeout = timeout
+        WampServerFactory.__init__(self, url, debugWamp)
+
+    def on_connect(self):
+        """
+        Called when a new connection is made.
+        """
+        if self._reaper:
+            log.msg("Client has reconnected, cancelling reaper",
+                logLevel=logging.DEBUG)
+            self._reaper.cancel()
+            self._reaper = None
+
+        self._connection_count += 1
+        log.msg("on_connect: connection count = %s" % self._connection_count,
+            logLevel=logging.DEBUG)
+
+    def connection_lost(self):
+        """
+        Called when a connection is lost.
+        """
+        self._connection_count -= 1
+        log.msg("connection_lost: connection count = %s" % self._connection_count,
+            logLevel=logging.DEBUG)
+        if self._connection_count == 0 and not self._reaper:
+            log.msg("Starting timer, process will terminate in: %ssec" % self._timeout,
+                logLevel=logging.DEBUG)
+            self._reaper = Timer(self._timeout, lambda: reactor.stop())
+            self._reaper.daemon=True
+            self._reaper.start()
+
+def add_arguments(parser):
+    """
+    Add arguments processed know to this module. parser must be
+    argparse.ArgumentParser instance.
+    """
+    import os
+    parser.add_argument("-d", "--debug",
+        help="log debugging messages to stdout",
+        action="store_true")
+    parser.add_argument("-p", "--port", type=int, default=8080,
+        help="port number for the web-server to listen on (default: 8080)")
+    parser.add_argument("-t", "--timeout", type=int, default=300,
+        help="timeout for reaping process on idle in seconds (default: 300s)")
+    parser.add_argument("-c", "--content", default=os.getcwd(),
+        help="root for web-pages to serve (default: current-working-directory)")
+    return parser
+
+def start(argv=None,
+        protocol=ParaViewServerProtocol,
+        description="ParaView/Web web-server based on Twisted."):
+    """
+    Sets up the web-server using with __name__ == '__main__'. This can also be
+    called directly. Pass the opational protocol to override the protocol used.
+    Default is ParaViewServerProtocol.
+    """
+    import argparse
+    parser = argparse.ArgumentParser(description=description)
+    add_arguments(parser)
+    args = parser.parse_args(argv)
+    start_webserver(options=args, protocol=protocol)
+
+
+def start_webserver(options, protocol=ParaViewServerProtocol, disableLogging=False):
+    """
+    Starts the web-server with the given protocol. Options must be an object
+    with the following members:
+        options.port : port number for the web-server to listen on
+        options.timeout : timeout for reaping process on idle in seconds
+        options.content : root for web-pages to serve.
+    """
+    from twisted.internet import reactor
+    from twisted.web.server import Site
+    from twisted.web.static import File
+    import sys
+
+    if not disableLogging:
+        log.startLogging(sys.stdout)
+
+    # setup the server-factory
+    wampFactory = ReapingWampServerFactory(
+        "ws://localhost:%d" % options.port, options.debug, options.timeout)
+    wampFactory.protocol = protocol
+    wsResource = WebSocketResource(wampFactory)
+
+    root = File(options.content)
+    root.putChild("ws", wsResource)
+
+    site = Site(root)
+    reactor.listenTCP(options.port, site)
+
+    wampFactory.startFactory()
+    reactor.run()
+    wampFactory.stopFactory()
+
+if __name__ == "__main__":
+    start()
