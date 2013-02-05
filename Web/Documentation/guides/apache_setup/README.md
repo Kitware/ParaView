@@ -150,7 +150,7 @@ Download the [tarball](http://code.google.com/p/pywebsocket/downloads).
 ### Apache ###
 
 To proxy websocket traffic through Apache, a custom proxy is required. The proxy
-can be download [here](data/ApacheWebsocketProxy.tgz).
+can be download [here](guides/apache_setup/data/ApacheWebsocketProxy.tgz).
 
     $ tar xfz ApacheWebsocketProxy.tgz
 
