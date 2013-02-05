@@ -482,10 +482,10 @@
     </VRUIConnection>
   </VRConnectionManager>
   <VRInteractorStyles>
-    <Style class="vtkVRTrackStyle" proxy="267" property="EyeTransformMatrix">
+    <Style class="vtkVRTrackStyle" proxy="267" proxyName="RenderView1" property="EyeTransformMatrix">
       <Tracker role="Tracker" name="vrui.head"/>
     </Style>
-    <Style class="vtkVRGrabWorldStyle" proxy="267" property="ModelTransformMatrix">
+    <Style class="vtkVRGrabWorldStyle" proxy="267" proxyName="RenderView1" property="ModelTransformMatrix">
       <Tracker role="Tracker" name="vrui.wand"/>
       <Button role="Reset world" name="vrui.3"/>
       <Button role="Rotate world" name="vrui.1"/>

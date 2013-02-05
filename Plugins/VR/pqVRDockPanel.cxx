@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCoreUtilities.h"
+#include "pqFileDialog.h"
 #include "pqRenderView.h"
 #include "pqLoadStateReaction.h"
 #include "pqSaveStateReaction.h"
@@ -55,6 +56,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkMatrix4x4.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkVRInteractorStyle.h"
 #include "vtkVRInteractorStyleFactory.h"
@@ -65,6 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/QDebug>
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
+
+#include <fstream>
 
 class pqVRDockPanel::pqInternals : public Ui::VRDockPanel
 {
@@ -496,13 +501,79 @@ void pqVRDockPanel::setActiveView(pqView *view)
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::saveState()
 {
-  pqSaveStateReaction::saveState();
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(),
+                          "Save VR plugin template",
+                          QString(),
+                          "VR plugin template files (*.pvvr)");
+
+  fileDialog.setFileMode(pqFileDialog::AnyFile);
+
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+    {
+    // User canceled
+    return;
+    }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+
+  vtkNew<vtkPVXMLElement> root;
+  root->SetName("VRPluginState");
+
+  if (pqVRConnectionManager *connMgr = pqVRConnectionManager::instance())
+    {
+    connMgr->saveConnectionsConfiguration(root.GetPointer());
+    }
+  if (pqVRQueueHandler *queueHandler = pqVRQueueHandler::instance())
+    {
+    queueHandler->saveStylesConfiguration(root.GetPointer());
+    }
+
+  // Avoid temporary QByteArrays in QString --> const char * conversion:
+  QByteArray filename_ba = filename.toLocal8Bit();
+  ofstream os(filename_ba.constData(), ios::out);
+  root->PrintXML(os, vtkIndent());
 }
 
 //-----------------------------------------------------------------------------
 void pqVRDockPanel::restoreState()
 {
-  pqLoadStateReaction::loadState();
+  pqFileDialog fileDialog(NULL, pqCoreUtilities::mainWidget(),
+                          "Load VR plugin template",
+                          QString(),
+                          "VR plugin template files (*.pvvr);;"
+                          "ParaView state files (*.pvsm)");
+
+  fileDialog.setFileMode(pqFileDialog::ExistingFile);
+
+  if (fileDialog.exec() != pqFileDialog::Accepted)
+    {
+    // User canceled
+    return;
+    }
+
+  QString filename = fileDialog.getSelectedFiles().first();
+
+  vtkNew<vtkPVXMLParser> xmlParser;
+  xmlParser->SetFileName(qPrintable(filename));
+  xmlParser->Parse();
+
+  vtkPVXMLElement *root = xmlParser->GetRootElement();
+
+  pqVRConnectionManager *connMgr = pqVRConnectionManager::instance();
+  vtkPVXMLElement *connRoot =
+      root->FindNestedElementByName("VRConnectionManager");
+  if (connMgr && connRoot)
+    {
+    connMgr->configureConnections(connRoot, NULL);
+    }
+
+  pqVRQueueHandler *queueHandler = pqVRQueueHandler::instance();
+  vtkPVXMLElement *stylesRoot =
+      root->FindNestedElementByName("VRInteractorStyles");
+  if (queueHandler && stylesRoot)
+    {
+    queueHandler->configureStyles(root, NULL);
+    }
 }
 
 //-----------------------------------------------------------------------------
