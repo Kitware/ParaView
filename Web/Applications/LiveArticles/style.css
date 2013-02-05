@@ -8,7 +8,7 @@ Released for free under a Creative Commons Attribution 2.5 License
 body {
 	margin: 0;
 	padding: 0;
-	background: #FFFFFF url(images/img01.jpg) repeat-x left top;
+	background: #FFFFFF url(./images/img01.jpg) repeat-x left top;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
 	color: #3C3D3F;
@@ -191,11 +191,11 @@ a:hover {
 }
 
 #menu li.active a {
-	background: url(images/img02.jpg) no-repeat left top;
+	background: url(./images/img02.jpg) no-repeat left top;
 }
 
 #menu li.active span {
-	background: url(images/img03.jpg) no-repeat right top;
+	background: url(./images/img03.jpg) no-repeat right top;
 	color: #FFFFFF;
 }
 
@@ -333,14 +333,14 @@ a:hover {
 
 #sidebar li li a {
 	padding: 0px 0px 0px 20px;
-	background: url(images/img05.jpg) no-repeat left 5px;
+	background: url(./images/img05.jpg) no-repeat left 5px;
 }
 
 #sidebar h2 {
 	height: 30px;
 	margin: 0px 0px 20px 0px;
 	padding: 2px 0px 0px 30px;
-	background: url(images/img04.jpg) no-repeat left top;
+	background: url(./images/img04.jpg) no-repeat left top;
 	text-align: left;
 	text-transform: uppercase;
 	letter-spacing: -.5px;
