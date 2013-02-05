@@ -10,6 +10,7 @@
     "-o": "@DOC_OUTPUT_DIR@",
     "--head-html":"<link rel='stylesheet' href='custom.css' type='text/css'>",
     "--": [
+        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.ui.pipeline.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.launcher.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.connect.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.viewport.js",
