@@ -119,9 +119,9 @@ if __name__ == "__main__":
         description="ParaView/Web file loader web-application")
     web.add_arguments(parser)
     parser.add_argument("--file-to-load", help="path to data file to load",
-        dest=data)
+        dest="data")
     parser.add_argument("--path-to-list", default=os.getcwd(),
-        help="path to data directory to list", dest=path)
+        help="path to data directory to list", dest="path")
     args = parser.parse_args()
 
     fileToLoad = args.data
