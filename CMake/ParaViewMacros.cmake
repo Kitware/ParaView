@@ -442,20 +442,18 @@ function(build_python_package package source_dir binary_dir)
     "*.py")
 
   set(_py)
-  set(_pyc)
-  set(_pyo)
-
   foreach(_py_file ${_py_files})
     configure_file("${source_dir}/${_py_file}" "${binary_dir}/${_py_file}"
       COPYONLY)
-
     list(APPEND _py "${binary_dir}/${_py_file}")
-    list(APPEND _pyc "${binary_dir}/${_py_file}c")
-    list(APPEND _pyo "${binary_dir}/${_py_file}o")
   endforeach()
 
   set(CMAKE_CONFIGURABLE_FILE_CONTENT
-    "from compileall import compile_dir\ncompile_dir(\"${binary_dir}\")")
+    "from compileall import compile_dir
+compile_dir('${binary_dir}')
+file = open('${binary_dir}/${package}_complete', 'w')
+file.write('Done')
+")
   configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
     "${CMAKE_CURRENT_BINARY_DIR}/compile_py" @ONLY)
   unset(CMAKE_CONFIGURABLE_FILE_CONTENT)
@@ -463,9 +461,10 @@ function(build_python_package package source_dir binary_dir)
   add_custom_command(
     COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_CURRENT_BINARY_DIR}/compile_py
     COMMAND ${PYTHON_EXECUTABLE} ARGS -O ${CMAKE_CURRENT_BINARY_DIR}/compile_py
-    DEPENDS ${_py} ${CMAKE_CURRENT_BINARY_DIR}/compile_py
-    OUTPUT  ${_pyc} ${_pyo}
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/compile_py
+            ${_py}
+    OUTPUT  "${binary_dir}/${package}_complete"
     COMMENT "Compiling Python files")
 
-  add_custom_target(${package} ALL DEPENDS ${_py} ${_pyc} ${_pyo})
+  add_custom_target(${package} ALL DEPENDS "${binary_dir}/${package}_complete")
 endfunction()
