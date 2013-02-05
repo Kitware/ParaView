@@ -6,6 +6,7 @@ set(Apps_BINARY_DIR "${CMAKE_BINARY_DIR}/www/apps")
 
 file(GLOB_RECURSE files
   RELATIVE ${Apps_SOURCE_DIR}
+  "${Apps_SOURCE_DIR}/LiveArticles/*.*"
   "${Apps_SOURCE_DIR}/WebFileViewer/*.*"
   "${Apps_SOURCE_DIR}/WebVisualizer/*.*")
 
