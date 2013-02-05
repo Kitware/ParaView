@@ -16,6 +16,7 @@ import argparse
 import shutil
 import StringIO
 import string
+import os
 from datetime import date
 
 import rjsmin
@@ -47,11 +48,17 @@ with open(args.b, 'r') as fp:
   banner = template.substitute(vars)
 
 # write output to file
+dir = os.path.dirname(args.m)
+if not os.path.exists(dir):
+  os.makedirs(dir);
 with open(args.m,"w") as fp:
   fp.write(banner)
   fp.write(output.getvalue())
 
 # write minimized output to file
+dir = os.path.dirname(args.o)
+if not os.path.exists(dir):
+  os.makedirs(dir);
 with open(args.o,"w") as fp:
   fp.write(banner)
   fp.write(rjsmin.jsmin(output.getvalue()))
