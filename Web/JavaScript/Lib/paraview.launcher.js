@@ -12,7 +12,7 @@
 (function (GLOBAL, $) {
 
     // Internal field used to store all connection objects
-    var Connections = [], module = {}, console;
+    var Connections = [], module = {}, console = GLOBAL.console;
     
     /**
      * @class pv.ConnectionConfig
