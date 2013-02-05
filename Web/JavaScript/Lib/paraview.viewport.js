@@ -479,7 +479,15 @@
             //canvas.append(bgImage);
 
             // When image ready draw on canvas
-            bgImage.onload = function () {
+            bgImage.onload = function(){paint();};
+        } else {
+            viewport = $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
+        }
+
+        // internal function used to draw update data on the canvas. When not
+        // using canvas, this has no effect.
+        function paint() {
+            if (config.useCanvas) {
                 /**
                  * @member pv.Viewport
                  * @event stop-loading
@@ -489,9 +497,7 @@
                 ctx2d.canvas.height = viewport.parent().innerHeight();
                 ctx2d.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height);
                 renderStatistics();
-            };
-        } else {
-            viewport = $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
+            }
         }
         
         // Extend touch event to mockup normal mouse event
@@ -627,6 +633,8 @@
                 } else {
                     statistics = null;
                 }
+                // repaint the viewport so the stats are either shown or hidden.
+                paint();
             }
         };
     }
