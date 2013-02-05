@@ -324,16 +324,15 @@ void pqVRConnectionManager::configureConnections( vtkPVXMLElement* xml,
             pqVRUIConnection* device = new pqVRUIConnection(this);
             device->setName( name );
             device->setAddress( address );
-            ( port )
-              ? device->setPort( port )
-              : device->setPort("8555"); // default
+            device->setPort(port ? port : "8555");
             device->configure(child, locator);
             this->add(device);
 #endif
             }
           else
             {
-            qWarning() << "Unknown Connection type : \"" << child->GetName() << "\"";
+            qWarning() << "Unknown Connection type : \""
+                       << child->GetName() << "\"";
             }
           }
         }
