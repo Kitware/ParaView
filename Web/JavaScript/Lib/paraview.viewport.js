@@ -111,6 +111,18 @@
         quality = 100,
         headEvent = (GLOBAL.paraview.isMobile ? "v" : "");
 
+        // make canvas "fullscreen" within it's parent's scope. For this to
+        // work, it is essential that the parent either has position absolute or
+        // relative specified.
+        canvas.css({
+            "display": "block",
+            "position": "absolute",
+            "top": "0px",
+            "left": "0px",
+            "width": "100%",
+            "height": "100%"
+        });
+
         //-----
         // Internal function that requests a render on idle. Calling this
         // mutliple times will only result in the request being set once.
@@ -473,8 +485,8 @@
                  * @event stop-loading
                  */
                 viewport.trigger("stop-loading");
-                canvas.attr("width", bgImage.width);
-                canvas.attr("height", bgImage.height);
+                ctx2d.canvas.width = viewport.parent().innerWidth();
+                ctx2d.canvas.height = viewport.parent().innerHeight();
                 ctx2d.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height);
                 renderStatistics();
             };
