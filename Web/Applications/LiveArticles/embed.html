@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1"> 
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
         <link rel="stylesheet" href="jquery-ui-1.10.0.css" />
         <link rel='stylesheet' href='style_embed.css' type='text/css' />
 
@@ -12,6 +12,13 @@
 
         <script type="text/javascript">
         $(function() {
+            // Center the clicktostart element.
+            var clicktostart = $(".clicktostart");
+            clicktostart.css(
+              "margin-top",
+              (clicktostart.parent().innerHeight() - clicktostart.height())*0.5);
+
+
             //-----------------------------------------------------------------------------
             // 'global' variables.
             var pv = {};
@@ -80,8 +87,9 @@
                 // the the page.
                 if (!pv.connection) {
                     $(this).addClass("session_started");
+                    $(".clicktostart").html("Loading ...");
 
-                    var serviceURL = location.protocol + "//" + location.hostname + 
+                    var serviceURL = location.protocol + "//" + location.hostname +
                                      ":" + location.port + "/paraview";
                     var config = {
                         url: serviceURL,
@@ -89,7 +97,7 @@
                         description: "3D visualization with ParaView/Web",
                         application: "loader"
                     };
-                    
+
                     // Start a new ParaView/Web instance.
                     paraview.start(config,
                         function (conn) {
@@ -97,8 +105,8 @@
                         },
                         function (err) {
                             //console.log("Connection failed.");
-                            
-                            var conn = {wampURL: "ws://" + 
+
+                            var conn = {wampURL: "ws://" +
                                        location.hostname + ":" +
                                        location.port + "/ws"};
                             setupConnection(conn);
@@ -150,6 +158,7 @@
                 $("#options").hide();
                 pv = {};
                 $("#viewport").removeClass("session_started");
+                $(".clicktostart").html("Click to Start");
              }
 
             function getParameter(name) {
@@ -169,7 +178,7 @@
     </head>
     <body>
       <div id="viewport" class="fullscreen">
-        <center><img class="pushtostart" src="images/pushtostart.svg" /></center>
+        <p class="clicktostart">Click to Start</p>
       </div>
       <button id="options" class="anchor-bottom-right transparent">Options</button>
       <ul id="menu">

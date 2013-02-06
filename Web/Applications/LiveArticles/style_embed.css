@@ -4,7 +4,6 @@
 
 html, body {
   color: #222222;
-  background: #aaaaaa;
   font-family: Verdana, Aria, Helvetica, sans-serif;
   font-size: 13px;
   margin: 0px;
@@ -60,8 +59,17 @@ button.vertical-center {
   position: relative;
 }
 
-img.pushtostart {
-  width: 350px;
-  height: 350px;
-  margin-top: 20px;
+.clicktostart {
+  font: bold 18px monospace;
+  text-align: center;
+  color: green;
+  cursor: default;
+}
+
+.clicktostart:hover {
+  color: blue;
+}
+
+.clicktostart:active {
+  color: red;
 }
