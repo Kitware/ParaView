@@ -58,7 +58,7 @@ function call.
 
 -- Immediately before the open parenthesis that starts an indexing or slicing:
     Yes: dict["key"] = list[index]
-    No:  dick ["key"] = list [index]
+    No:  dict ["key"] = list [index]
 
 -- More than one space around an assignment (or other) operator to align it with
 another.
