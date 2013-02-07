@@ -24,8 +24,8 @@ from autobahn.wamp import WampServerFactory
 
 # import paraview modules.
 from paraview import simple
-from vtkParaViewWebPython import vtkPVWebApplication,\
-                                 vtkPVWebInteractionEvent
+from vtkParaViewWebCorePython import vtkPVWebApplication,\
+                                     vtkPVWebInteractionEvent
 
 class ServerProtocol(WampServerProtocol):
     """
