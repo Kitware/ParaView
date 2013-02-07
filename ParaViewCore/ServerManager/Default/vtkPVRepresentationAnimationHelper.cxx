@@ -53,7 +53,7 @@ void vtkPVRepresentationAnimationHelper::SetVisibility(int visible)
     {
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
       this->SourceProxy->GetConsumerProxy(cc));
-    if (repr && repr->GetProperty("Visibility"))
+    if (repr && (repr->GetIsSubProxy() == false) && repr->GetProperty("Visibility"))
       {
       vtkSMPropertyHelper(repr, "Visibility").Set(visible);
       repr->UpdateProperty("Visibility");
@@ -73,7 +73,7 @@ void vtkPVRepresentationAnimationHelper::SetOpacity(double opacity)
     {
     vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
       this->SourceProxy->GetConsumerProxy(cc));
-    if (repr && repr->GetProperty("Opacity"))
+    if (repr && (repr->GetIsSubProxy()== false) && repr->GetProperty("Opacity"))
       {
       vtkSMPropertyHelper(repr, "Opacity").Set(opacity);
       repr->UpdateProperty("Opacity");
