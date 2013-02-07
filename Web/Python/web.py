@@ -329,7 +329,13 @@ def start(argv=None,
     called directly. Pass the opational protocol to override the protocol used.
     Default is ParaViewServerProtocol.
     """
-    import argparse
+    try:
+        import argparse
+    except ImportError:
+        # since  Python 2.6 and earlier don't have argparse, we simply provide
+        # the source for the same as _argparse and we use it instead.
+        import _argparse as argparse
+
     parser = argparse.ArgumentParser(description=description)
     add_arguments(parser)
     args = parser.parse_args(argv)

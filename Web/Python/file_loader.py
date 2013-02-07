@@ -1,7 +1,13 @@
 # import to process args
 import sys
 import os
-import argparse
+
+try:
+    import argparse
+except ImportError:
+    # since  Python 2.6 and earlier don't have argparse, we simply provide
+    # the source for the same as _argparse and we use it instead.
+    import _argparse as argparse
 
 # import annotations
 from autobahn.wamp import exportRpc

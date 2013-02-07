@@ -3,7 +3,6 @@ Sample application demonstrating how to present any visualization pipeline for
 consumption over the Web.
 """
 
-import argparse
 import sys
 
 from paraview import simple, web
