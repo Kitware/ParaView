@@ -633,6 +633,7 @@ endif()
 # Build doxygen documentation.
 if (BUILD_DOCUMENTATION)
   add_subdirectory(Utilities/Doxygen)
+  add_subdirectory(Utilities/Sphinx)
 endif()
 
 
