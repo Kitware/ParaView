@@ -7,10 +7,11 @@ sure that it is installed properly.")
 from paraview import numpy_support
 
 class ArrayAssociation :
-    POINT = 1
-    CELL  = 2
-    FIELD = 3
-    ROW = 4
+    """Easy access to vtkDataObject.AttributeTypes"""
+    POINT = 0
+    CELL  = 1
+    FIELD = 2
+    ROW = 6
 
 class VTKObjectWrapper(object):
     "Superclass for classes that wrap VTK objects with Python objects."
@@ -243,6 +244,12 @@ class MultiCompositeDataIterator(CompositeDataIterator):
         return retVal
 
 class DataObject(VTKObjectWrapper):
+
+    def GetAttributes(self, type):
+        """Returns the attributes specified by the type as a DataSetAttributes
+         instance."""
+        return DataSetAttributes(self.VTKObject.GetAttributes(type), self, type)
+
     def GetFieldData(self):
         "Returns the field data as a DataSetAttributes instance."
         return DataSetAttributes(self.VTKObject.GetFieldData(), self, ArrayAssociation.FIELD)
@@ -253,7 +260,7 @@ class DataObject(VTKObjectWrapper):
 class Table(DataObject):
     def GetRowData(self):
         "Returns the row data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetRowData(), self, ArrayAssociation.ROW)
+        return self.GetAttributes(ArrayAssociation.ROW)
 
     RowData = property(GetRowData, None, None, "This property returns \
         the row data of the table.")
@@ -269,11 +276,11 @@ class DataSet(DataObject):
 
     def GetPointData(self):
         "Returns the point data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetPointData(), self, ArrayAssociation.POINT)
+        return self.GetAttributes(ArrayAssociation.POINT)
 
     def GetCellData(self):
         "Returns the cell data as a DataSetAttributes instance."
-        return DataSetAttributes(self.VTKObject.GetCellData(), self, ArrayAssociation.CELL)
+        return self.GetAttributes(ArrayAssociation.CELL)
 
     PointData = property(GetPointData, None, None, "This property returns \
         the point data of the dataset.")
