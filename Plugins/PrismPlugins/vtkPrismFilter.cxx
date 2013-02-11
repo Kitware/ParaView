@@ -380,34 +380,52 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
 
   bool isCellData[3]={true,true,true};
 
+  //global ids and pedigree ids should not be used making the arrays
+  //invalid options.
+  bool isValidArray[3]={false,false,false};
+  vtkDataArray *cdGlobalIds   = inCD->GetGlobalIds();
+  vtkDataArray *pdGlobalIds   = inPD->GetGlobalIds();
+  vtkAbstractArray *cdPedigreeIds = inCD->GetPedigreeIds();
+  vtkAbstractArray *pdPedigreeIds = inPD->GetPedigreeIds();
 
-  inputScalars[0] = inCD->GetScalars( this->GetXAxisVarName() );
-  if(!inputScalars[0])
-  {
-    inputScalars[0] = inPD->GetScalars( this->GetXAxisVarName() );
-    if(inputScalars[0])
+  //get the inputScalars for each coordinate and make sure
+  //they are valid
+  for(int i=0; i < 3; ++i)
     {
-      isCellData[0]=false;
+    inputScalars[i] = inCD->GetScalars(this->Internal->AxisVarName[i].c_str());
+    if(inputScalars[i] != NULL)
+      {
+      //verify that the array doesn't match a global or pedigree id
+      isValidArray[i] = !(inputScalars[i] == cdGlobalIds ||
+                          inputScalars[i] == cdPedigreeIds);
+      }
+    else
+      {
+      //check point data
+      inputScalars[i] = inPD->GetScalars(
+                                       this->Internal->AxisVarName[i].c_str());
+
+      if(inputScalars[i] != NULL)
+        {
+        isCellData[i]=false;
+        isValidArray[i] = !(inputScalars[i] == pdGlobalIds ||
+                            inputScalars[i] == pdPedigreeIds);
+        }
+      else
+        {
+        isValidArray[i] = false;
+        }
+      }
     }
-  }
-  inputScalars[1] = inCD->GetScalars( this->GetYAxisVarName() );
-  if(!inputScalars[1])
+
+  if(!isValidArray[0] || !isValidArray[1] || !isValidArray[2])
   {
-    inputScalars[1] = inPD->GetScalars( this->GetYAxisVarName() );
-    if(inputScalars[1])
-    {
-      isCellData[1]=false;
-    }
+  //some input array are global ids or pedigree ids which can't be used
+  vtkErrorMacro(<< "Some input array are global ids or pedigree ids.");
+  vtkErrorMacro(<< "Please select Scalar cell or point fields.");
+  return 0;
   }
-  inputScalars[2] = inCD->GetScalars( this->GetZAxisVarName() );
-  if(!inputScalars[2])
-  {
-    inputScalars[2] = inPD->GetScalars( this->GetZAxisVarName() );
-    if(inputScalars[2])
-    {
-      isCellData[2]=false;
-    }
-  }
+
 
   vtkIdType newIDs[1] = {0};
   if ( (numCells=inputData->GetNumberOfCells()) < 1 )
@@ -459,9 +477,9 @@ int vtkPrismFilter::CreateGeometry(vtkDataSet *inputData,
         outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
       }
 
-      inputScalars[0] = outPD->GetScalars( this->GetXAxisVarName() );
-      inputScalars[1] = outPD->GetScalars( this->GetYAxisVarName() );
-      inputScalars[2] = outPD->GetScalars( this->GetZAxisVarName() );
+      inputScalars[0] = outPD->GetArray( this->GetXAxisVarName() );
+      inputScalars[1] = outPD->GetArray( this->GetYAxisVarName() );
+      inputScalars[2] = outPD->GetArray( this->GetZAxisVarName() );
 
 
       newPt[0] = inputScalars[0]->GetTuple( cellId )[0];
