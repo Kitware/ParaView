@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMUtilities.h"
 
 #include <string>
 #include <vtksys/ios/sstream>
@@ -109,6 +110,13 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
     str << "paraview version " << PARAVIEW_VERSION_FULL << "\n";
     vtkOutputWindow::GetInstance()->DisplayText(str.str().c_str());
     // TODO: indicate to the caller that application must quit.
+    }
+
+  if (options->GetPrintMonitors())
+    {
+      std::string monitors = vtkSMUtilities::ListAttachedMonitors();
+      vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
+      // TODO: indicate to the caller that application must quit.
     }
 
   vtkProcessModule::GetProcessModule()->SetOptions(options);

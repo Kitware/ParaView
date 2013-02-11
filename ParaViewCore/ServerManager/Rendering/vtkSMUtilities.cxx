@@ -30,7 +30,41 @@
 #include "vtkTransform.h"
 
 #include <vtksys/SystemTools.hxx>
+#include <sstream>
 #include <string>
+
+// Windows-only helper functionality:
+#ifdef _WIN32
+
+#include <Windows.h>
+
+namespace {
+BOOL CALLBACK listMonitorsCallback(HMONITOR hMonitor, HDC /*hdcMonitor*/,
+                                   LPRECT lprcMonitor, LPARAM dwData)
+{
+  std::ostringstream *str = reinterpret_cast<std::ostringstream*>(dwData);
+
+  MONITORINFOEX monitorInfo;
+  monitorInfo.cbSize = sizeof(monitorInfo);
+
+  if (GetMonitorInfo(hMonitor, &monitorInfo))
+    {
+      LPRECT rect = &monitorInfo.rcMonitor;
+      *str << "Device: \"" << monitorInfo.szDevice << "\" "
+           << "Geometry: "
+           << std::noshowpos
+           << rect->right - rect->left << "x"
+           << rect->bottom - rect->top
+           << std::showpos
+           << rect->left << rect->top << " "
+           << ((monitorInfo.dwFlags & MONITORINFOF_PRIMARY)
+               ? "(primary)" : "")
+           << std::endl;
+    }
+  return true;
+}
+} // end anon namespace
+#endif // _WIN32
 
 vtkStandardNewMacro(vtkSMUtilities);
 
@@ -256,6 +290,18 @@ void vtkSMUtilities::Merge(vtkImageData* dest, vtkImageData* src)
     }
 }
 
+//----------------------------------------------------------------------------
+std::string vtkSMUtilities::ListAttachedMonitors()
+{
+#ifndef _WIN32
+  return std::string("Monitor detection only implemented for MS Windows.");
+#else // _WIN32
+  std::ostringstream str;
+  EnumDisplayMonitors(NULL, NULL, listMonitorsCallback,
+                      reinterpret_cast<LPARAM>(&str));
+  return str.str();
+#endif // _WIN32
+}
 
 //----------------------------------------------------------------------------
 void vtkSMUtilities::PrintSelf(ostream& os, vtkIndent indent)

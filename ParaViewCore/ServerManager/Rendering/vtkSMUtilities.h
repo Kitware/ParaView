@@ -22,6 +22,8 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
 
+#include <string>
+
 class vtkImageData;
 class vtkPoints;
 class VTKPVSERVERMANAGERRENDERING_EXPORT vtkSMUtilities : public vtkSMObject
@@ -72,6 +74,12 @@ public:
   // larger one (\c dest). The location of the smaller image in the larger image
   // are determined by their extents.
   static void Merge(vtkImageData* dest, vtkImageData* src);
+
+  // Description:
+  // List the device names and geometries of all attached monitors. Only
+  // implemented for win32.
+  static std::string ListAttachedMonitors();
+
 //BTX
 protected:
   vtkSMUtilities() {}

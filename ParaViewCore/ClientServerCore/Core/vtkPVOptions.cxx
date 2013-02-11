@@ -68,6 +68,8 @@ vtkPVOptions::vtkPVOptions()
 
   this->SatelliteMessageIds = 0;
 
+  this->PrintMonitors = 0;
+
   // initialize host names
   vtksys::SystemInformation sys_info;
   sys_info.RunOSCheck();
@@ -322,6 +324,8 @@ void vtkPVOptions::Initialize()
     "When specified, server side messages shown on client show rank of originating process",
     vtkPVOptions::PVSERVER);
 
+  this->AddBooleanArgument("--print-monitors", 0, &this->PrintMonitors,
+                           "Print detected monitors and exit (windows only).");
 }
 
 //----------------------------------------------------------------------------
@@ -547,4 +551,5 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "UseCudaInterop " << this->UseCudaInterop << std::endl;
   os << indent << "SatelliteMessageIds " << this->SatelliteMessageIds << std::endl;
+  os << indent << "PrintMonitors" << this->PrintMonitors << std::endl;
 }

@@ -45,7 +45,8 @@ static bool RealMain(int argc, char* argv[],
 
   // Init current process type
   vtkInitializationHelper::Initialize( argc, argv, type, options );
-  if (options->GetTellVersion() || options->GetHelpSelected())
+  if (options->GetTellVersion() || options->GetHelpSelected() ||
+      options->GetPrintMonitors())
     {
     vtkInitializationHelper::Finalize();
     return 1;
