@@ -54,9 +54,9 @@ public:
   void RescaleUncertaintyTransferFunctionToDataRange();
 
   // Description:
-  // Set/get the noise density.
-  void SetNoiseDensity(double density);
-  double GetNoiseDensity() const;
+  // Set/get the uncertainty scale factor.
+  void SetUncertaintyScaleFactor(double density);
+  double GetUncertaintyScaleFactor() const;
 
 protected:
   vtkUncertaintySurfaceRepresentation();

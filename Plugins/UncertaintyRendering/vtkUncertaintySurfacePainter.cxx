@@ -37,6 +37,8 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkPointData.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkScalarsToColors.h"
+#include "vtkScalarsToColorsPainter.h"
 
 // vertex and fragment shader source code for the uncertainty surface
 extern const char* vtkUncertaintySurfacePainter_fs;
@@ -56,6 +58,8 @@ vtkUncertaintySurfacePainter::vtkUncertaintySurfacePainter()
   this->TransferFunction->AddPoint(0, 0);
   this->TransferFunction->AddPoint(1, 1);
   this->UncertaintyArrayName = 0;
+  this->UncertaintyScaleFactor = 10.0f;
+  this->ScalarValueRange = 100.0f;
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +99,20 @@ void vtkUncertaintySurfacePainter::ReleaseGraphicsResources(vtkWindow *window)
 
   this->LastRenderWindow = 0;
   this->Superclass::ReleaseGraphicsResources(window);
+}
+
+//----------------------------------------------------------------------------
+void vtkUncertaintySurfacePainter::ProcessInformation(vtkInformation* info)
+{
+    if(info->Has(vtkScalarsToColorsPainter::LOOKUP_TABLE()))
+      {
+      vtkScalarsToColors *lut =
+        vtkScalarsToColors::SafeDownCast(
+          info->Get(vtkScalarsToColorsPainter::LOOKUP_TABLE()));
+
+      double *range = lut->GetRange();
+      this->ScalarValueRange = range[1] - range[0];
+      }
 }
 
 //----------------------------------------------------------------------------
@@ -188,7 +206,9 @@ void vtkUncertaintySurfacePainter::RenderInternal(vtkRenderer *renderer,
     vtkErrorMacro("Shader building failed.");
     abort();
     }
-  this->Shader->GetUniformVariables()->SetUniformf("noiseDensity", 1, &this->NoiseDensity);
+  this->Shader->GetUniformVariables()->SetUniformf("uncertaintyScaleFactor", 1, &this->UncertaintyScaleFactor);
+  this->Shader->GetUniformVariables()->SetUniformf("scalarValueRange", 1, &this->ScalarValueRange);
+
   this->Shader->Use();
   if(!this->Shader->IsValid())
     {
@@ -329,7 +349,8 @@ void vtkUncertaintySurfacePainter::GenerateUncertaintiesArray(vtkDataObject *inp
       for(vtkIdType i = 0; i < inputUnceratintiesArray->GetNumberOfTuples(); i++)
         {
         vtkVariant inputValue = inputUnceratintiesArray->GetVariantValue(i);
-        double outputValue = this->TransferFunction->GetValue(inputValue.ToDouble());
+        double outputValue = inputValue.ToDouble() * 
+                             this->TransferFunction->GetValue(inputValue.ToDouble());
         outputUncertaintiesArray->SetValue(i, static_cast<float>(outputValue));
         }
       }
