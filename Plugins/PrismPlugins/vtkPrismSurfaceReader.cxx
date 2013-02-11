@@ -1822,7 +1822,15 @@ int vtkPrismSurfaceReader::RequestCurveData(  vtkPointSet *curveOutput)
   {
     appendPD->Update();
 
+    //we want to keep the existing field data since it has all the view
+    //keys that we need
+    vtkFieldData *oldFieldData = vtkFieldData::New();
+    oldFieldData->ShallowCopy(curveOutput->GetFieldData());
+
     curveOutput->ShallowCopy(appendPD->GetOutput());
+
+    curveOutput->SetFieldData(oldFieldData);
+    oldFieldData->FastDelete();
   }
   else
   {
