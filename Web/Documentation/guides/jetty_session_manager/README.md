@@ -76,16 +76,8 @@ type of application you will deploy.
 The extended code below supports three types of applications (cone, can, loader):
 
     # Process commands
-    pw.cone.cmd.run.dir=/.../ParaViewWeb/web-server/server
-    pw.cone.cmd=/.../ParaViewWeb/ParaView/build/bin/pvpython simple_server.py --content=/.../ParaViewWeb/web-content/apps/cone --port=PORT
-    pw.cone.cmd.map=PORT:getPort
-    
-    pw.can.cmd.run.dir=/.../ParaViewWeb/web-server/server
-    pw.can.cmd=/.../ParaViewWeb/ParaView/build/bin/pvpython simple_server.py --content=/.../ParaViewWeb/web-content/apps/can --port=PORT --module=file_loader --file-to-load=/.../ParaViewData/Data/can.ex2
-    pw.can.cmd.map=PORT:getPort
-    
-    pw.loader.cmd.run.dir=/.../ParaViewWeb/web-server/server
-    pw.loader.cmd=/.../ParaViewWeb/ParaView/build/bin/pvpython simple_server.py --content=/.../ParaViewWeb/web-content/apps/loader --port=PORT --module=file_loader --path-to-list=/.../ParaViewData/Data
+    pw.loader.cmd.run.dir=..../ParaViewBin
+    pw.loader.cmd=/..../pvpython /..../ParaViewBin/lib/site-packages/paraview/file_loader.py --port PORT --path-to-list /..../ParaViewData/Data
     pw.loader.cmd.map=PORT:getPort
 
 ## Running
@@ -93,4 +85,4 @@ The extended code below supports three types of applications (cone, can, loader)
 Once you have a valid configuration file, execute the following command line to
 run the server. 
 
-    $ java -jar JettySessionManager-Server-1.0.jar -Dpw-config=/path_to_your_config_file/pw-config.properties
+    $ java -cp JettySessionManager-Server-1.0.jar -Dpw-config=<path>/pw-config.properties com.kitware.paraviewweb.handler.WebSocketForwarderHandler
