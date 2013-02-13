@@ -171,10 +171,10 @@ set (Module_SRCS
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.cxx
   pqScalarBarVisibilityReaction.h
+  pqSelection3DHelper.cxx
+  pqSelection3DHelper.h
   pqSelectionInspectorWidget.cxx
   pqSelectionInspectorWidget.h
-  pqSelectionToolbar.cxx
-  pqSelectionToolbar.h
   pqServerConnectReaction.cxx
   pqServerConnectReaction.h
   pqServerDisconnectReaction.cxx
@@ -290,8 +290,8 @@ set (Module_MOC_HDRS
   pqSaveScreenshotReaction.h
   pqSaveStateReaction.h
   pqScalarBarVisibilityReaction.h
+  pqSelection3DHelper.h
   pqSelectionInspectorWidget.h
-  pqSelectionToolbar.h
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
@@ -338,7 +338,6 @@ set (Module_UI_FILES
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqMainControlsToolbar.ui
   Resources/UI/pqPipelineBrowserContextMenu.ui
-  Resources/UI/pqSelectionToolbar.ui
   Resources/UI/pqVCRToolbar.ui
 )
 

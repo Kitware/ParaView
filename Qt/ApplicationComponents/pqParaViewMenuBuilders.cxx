@@ -72,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveDataReaction.h"
 #include "pqSaveScreenshotReaction.h"
 #include "pqSaveStateReaction.h"
-#include "pqSelectionToolbar.h"
 #include "pqServerConnectReaction.h"
 #include "pqServerDisconnectReaction.h"
 #include "pqSetName.h"
@@ -333,11 +332,6 @@ void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
     << pqSetName("MainControlsToolbar");
   mainToolBar->layout()->setSpacing(0);
   mainWindow.addToolBar(Qt::TopToolBarArea, mainToolBar);
-
-  QToolBar* selectionToolbar = new pqSelectionToolbar(&mainWindow)
-    << pqSetName("selectionToolbar");
-  selectionToolbar->layout()->setSpacing(0);
-  mainWindow.addToolBar(Qt::TopToolBarArea, selectionToolbar);
 
   QToolBar* vcrToolbar = new pqVCRToolbar(&mainWindow)
     << pqSetName("VCRToolbar");
