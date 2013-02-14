@@ -19,7 +19,7 @@ configure_file("${docs_source_dir}/custom.css"
 
 # images
 configure_file("${docs_source_dir}/images/logo/logo.png"
-  "${docs_tmp_dir}/resources/logo.png" COPYONLY)
+  "${docs_tmp_dir}/resources/images/logo.png" COPYONLY)
 
 configure_file("${docs_source_dir}/images/web/PVW_Slide.png"
   "${docs_tmp_dir}/images/PVW_Slide.png" COPYONLY)
