@@ -309,6 +309,13 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
 
   this->Ui->setupUi(this);
 
+  // restore advanced button state
+  if(settings)
+    {
+    this->Ui->AdvancedButton->setChecked(
+      settings->value("showAdvancedProperties", false).toBool());
+    }
+
   this->setObjectName("propertiesPanel");
 
   // setup buttons (apply, reset, delete, help)
@@ -1077,6 +1084,13 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
       }
 
     item.PropertyWidget->setVisible(visible);
+    }
+
+  // store state in settings
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  if(settings)
+    {
+    settings->setValue("showAdvancedProperties", state);
     }
 }
 
