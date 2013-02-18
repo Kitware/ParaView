@@ -79,9 +79,11 @@ public:
     vtkSMSession* session, bool remote);
 
   enum
-    {
-    PluginLoadedEvent = 100000
-    };
+  {
+    PluginLoadedEvent       = 100000,
+    LocalPluginLoadedEvent,
+    RemotePluginLoadedEvent
+  };
 //BTX
 protected:
   vtkSMPluginManager();

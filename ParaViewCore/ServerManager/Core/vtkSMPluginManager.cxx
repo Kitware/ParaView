@@ -153,6 +153,7 @@ bool vtkSMPluginManager::LoadLocalPlugin(const char* filename)
     temp->Delete();
 
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
+    this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent,(void*) filename);
     }
 
   // We don't report the error here if ret_val == false since vtkPVPluginLoader
@@ -192,6 +193,7 @@ bool vtkSMPluginManager::LoadRemotePlugin(const char* filename,
     this->Internals->RemoteInformations[session]->Update(temp);
     temp->Delete();
     this->InvokeEvent(vtkSMPluginManager::PluginLoadedEvent);
+    this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent,(void*) filename);
     }
   return status;
 }

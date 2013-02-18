@@ -790,14 +790,26 @@ def on_update_information(o, e):
     print_trace()
     print "-------------------------------------------------"
   
+def on_local_plugin_loaded(o,e):
+  '''Called from LocalPluginLoadedEvent'''
+  filename = o.GetLastLocalPluginLoaded()
+  trace_globals.trace_output.append("LoadPlugin (\"%s\" , False)" % filename)
+
+def on_remote_plugin_loaded(o,e):
+  '''Called from RemotePluginLoadedEvent'''
+  filename = o.GetLastRemotePluginLoaded()
+  trace_globals.trace_output.append("LoadPlugin (\"%s\" , True)" % filename)
 
 def add_observers():
   '''Add callback observers to the instance of vtkSMPythonTraceObserver'''
   o = trace_observer()
+  plm = servermanager.vtkSMProxyManager.GetProxyManager().GetPluginManager()
   o.AddObserver("RegisterEvent", on_proxy_registered)
   o.AddObserver("UnRegisterEvent", on_proxy_unregistered)
   o.AddObserver("PropertyModifiedEvent", on_property_modified)
   o.AddObserver("UpdateInformationEvent", on_update_information)
+  o.AddObserver(plm.LocalPluginLoadedEvent, on_local_plugin_loaded)
+  o.AddObserver(plm.RemotePluginLoadedEvent, on_remote_plugin_loaded)
   trace_globals.observer_active = True
 
 def clear_trace():

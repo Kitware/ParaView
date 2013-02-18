@@ -42,6 +42,8 @@ public:
   const char* GetLastProxyRegisteredName();
   const char* GetLastProxyUnRegisteredGroup();
   const char* GetLastProxyUnRegisteredName();
+  const char* GetLastLocalPluginLoaded();
+  const char* GetLastRemotePluginLoaded();
 
 //BTX
 protected:
