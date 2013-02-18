@@ -88,6 +88,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
         new pqScalarValueListPropertyWidget(smProperty, smProxy, this);
       widget->setObjectName("ScalarValueList");
       this->addPropertyLink(widget, "scalars", SIGNAL(scalarsChanged()), smProperty);
+      this->connect(widget, SIGNAL(scalarsChanged()),
+                    this, SIGNAL(editingFinished()));
       layoutLocal->addWidget(widget);
       this->setShowLabel(false);
 
@@ -106,6 +108,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       widget->setMaximum(range->GetMaximum(0));
 
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(double)), smProperty);
+      this->connect(widget, SIGNAL(valueChanged(double)),
+                    this, SIGNAL(editingFinished()));
 
       layoutLocal->setSpacing(4);
       layoutLocal->addWidget(widget);
@@ -133,12 +137,16 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
           gridLayout->addWidget(lineEdit, 0, i);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
 
           lineEdit = new pqDoubleEdit(this);
           lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
           lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3));
           gridLayout->addWidget(lineEdit, 1, i);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i + 3);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
           }
 
         layoutLocal->addLayout(gridLayout);
@@ -157,6 +165,8 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
           }
 
         this->setReason() << "List of QLineEdit's for an DoubleVectorProperty "

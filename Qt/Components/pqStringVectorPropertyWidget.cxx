@@ -156,6 +156,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                             "filenames",
                             SIGNAL(filenamesChanged(QStringList)),
                             smProperty);
+      this->connect(chooser, SIGNAL(filenamesChanged(QStringList)),
+                    this, SIGNAL(editingFinished()));
       }
     else
       {
@@ -165,6 +167,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                             "singleFilename",
                             SIGNAL(filenameChanged(QString)),
                             smProperty);
+      this->connect(chooser, SIGNAL(filenameChanged(QString)),
+                    this, SIGNAL(editingFinished()));
       }
 
     // If there's a hint on the smproperty indicating that this smproperty expects a
@@ -221,6 +225,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
       this->addPropertyLink(
         selectorWidget, smProxy->GetPropertyName(smProperty),
         SIGNAL(widgetModified()), smProperty);
+      this->connect(selectorWidget, SIGNAL(widgetModified()),
+                    this, SIGNAL(editingFinished()));
       }
     else if(fieldDataDomain)
       {
@@ -234,6 +240,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                             "selection",
                             SIGNAL(selectionChanged()),
                             svp);
+      this->connect(adaptor, SIGNAL(selectionChanged()),
+                    this, SIGNAL(editingFinished()));
 
       vbox->addWidget(comboBox);
 
@@ -255,6 +263,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                             "currentText",
                             SIGNAL(currentTextChanged(QString)),
                             svp);
+      this->connect(adaptor, SIGNAL(currentTextChanged(QString)),
+                    this, SIGNAL(editingFinished()));
 
       vbox->addWidget(comboBox);
 
@@ -278,6 +288,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                           "currentText",
                           SIGNAL(currentTextChanged(QString)),
                           svp);
+    this->connect(adaptor, SIGNAL(currentTextChanged(QString)),
+                    this, SIGNAL(editingFinished()));
 
     vbox->addWidget(comboBox);
 
@@ -298,6 +310,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     this->addPropertyLink(tree->activeModel(), "values",
       SIGNAL(valuesChanged()), smProperty);
+    this->connect(tree->activeModel(), SIGNAL(valuesChanged()),
+                  this, SIGNAL(editingFinished()));
 
     // hide widget label
     setShowLabel(false);
@@ -317,6 +331,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     this->addPropertyLink(
       selectorWidget, smProxy->GetPropertyName(smProperty),
       SIGNAL(widgetModified()), smProperty);
+    this->connect(selectorWidget, SIGNAL(widgetModified()),
+                  this, SIGNAL(editingFinished()));
 
     // hide widget label
     setShowLabel(false);
@@ -342,7 +358,9 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
 
     this->addPropertyLink(textEdit, "plainText",
       SIGNAL(textChanged()), smProperty);
-    
+    this->connect(textEdit, SIGNAL(textChanged()),
+                  this, SIGNAL(editingFinished()));
+
     vbox->addWidget(textEdit);
     this->setShowLabel(false);
 
@@ -359,6 +377,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
                           "currentText",
                           SIGNAL(currentTextChanged(QString)),
                           svp);
+    this->connect(adaptor, SIGNAL(currentTextChanged(QString)),
+                  this, SIGNAL(editingFinished()));
 
     for(unsigned int i = 0; i < enumerationDomain->GetNumberOfEntries(); i++)
       {
@@ -377,6 +397,8 @@ pqStringVectorPropertyWidget::pqStringVectorPropertyWidget(vtkSMProperty *smProp
     lineEdit->setObjectName(smProxy->GetPropertyName(smProperty));
     this->addPropertyLink(lineEdit, "text",
       SIGNAL(textChanged(const QString&)), smProperty);
+    this->connect(lineEdit, SIGNAL(editingFinished()),
+                  this, SIGNAL(editingFinished()));
 
     vbox->addWidget(lineEdit);
 

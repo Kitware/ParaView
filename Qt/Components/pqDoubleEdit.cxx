@@ -34,8 +34,8 @@
 pqDoubleEdit::pqDoubleEdit(QWidget* parentObject) :
   QLineEdit(parentObject)
 {
-  this->connect(this, SIGNAL(textChanged(const QString&)), this,
-      SLOT(valueEdited(const QString&)));
+  this->connect(this, SIGNAL(editingFinished()),
+                this, SLOT(valueEdited()));
 }
 
 pqDoubleEdit::~pqDoubleEdit()
@@ -84,8 +84,14 @@ void pqDoubleEdit::setValue(double dvalue)
     }
 }
 
-void pqDoubleEdit::valueEdited(const QString& /*text*/)
+void pqDoubleEdit::valueEdited()
 {
+  if(this->text() == this->LastValue)
+    {
+    // no change
+    return;
+    }
+
   QString currentText = this->text();
   int currentPos = this->cursorPosition();
   QDoubleValidator* dvalidator = new QDoubleValidator(NULL);
@@ -96,4 +102,6 @@ void pqDoubleEdit::valueEdited(const QString& /*text*/)
     double dvalue = this->text().toDouble();
     emit valueChanged(dvalue);
     }
+
+  this->LastValue = this->text();
 }

@@ -766,7 +766,7 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
       if(this->View)
         {
-        this->connect(item.PropertyWidget, SIGNAL(modified()),
+        this->connect(item.PropertyWidget, SIGNAL(editingFinished()),
                       this->View, SLOT(render()));
         this->connect(item.PropertyWidget, SIGNAL(modified()),
                       item.PropertyWidget, SLOT(updateDependentDomains()));

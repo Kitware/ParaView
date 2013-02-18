@@ -93,6 +93,10 @@ signals:
   /// This signal is emitted when the widget's value is changed by the user.
   void modified();
 
+  /// This signal is emitted when the user is finished editing a property
+  /// either by pressing enter or focusing away from the widget.
+  void editingFinished();
+
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView *view);
 

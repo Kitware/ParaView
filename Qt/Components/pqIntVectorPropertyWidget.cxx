@@ -89,6 +89,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     QCheckBox *checkBox = new QCheckBox(smproperty->GetXMLLabel(), this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
+    this->connect(checkBox, SIGNAL(toggled(bool)),
+                  this, SIGNAL(editingFinished()));
     layoutLocal->addWidget(checkBox);
 
     this->setShowLabel(false);
@@ -112,6 +114,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                           SIGNAL(currentTextChanged(QString)),
                           smproperty);
 
+    this->connect(adaptor, SIGNAL(currentTextChanged(QString)),
+                  this, SIGNAL(editingFinished()));
+
     layoutLocal->addWidget(comboBox);
 
     this->setReason() << "QComboBox for an IntVectorProperty with a "
@@ -134,6 +139,9 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), ivp);
 
+    this->connect(adaptor, SIGNAL(valuesChanged()),
+                  this, SIGNAL(editingFinished()));
+
     layoutLocal->addWidget(treeWidget);
     this->setShowLabel(false);
 
@@ -155,6 +163,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       widget->setMaximum(range->GetMaximum(0));
       widget->setDomain(range);
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(int)), ivp);
+      this->connect(widget, SIGNAL(valueChanged(int)),
+                    this, SIGNAL(editingFinished()));
       layoutLocal->addWidget(widget);
 
       this->setReason() << "pqIntRangeWidget for an IntVectorProperty with a "
@@ -177,12 +187,16 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+0)));
           gridLayout->addWidget(lineEdit, i, 0);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+0);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
 
           lineEdit = new QLineEdit(this);
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+1));
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+1)));
           gridLayout->addWidget(lineEdit, i, 1);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+1);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
           }
 
         layoutLocal->addLayout(gridLayout);
@@ -201,6 +215,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
           layoutLocal->addWidget(lineEdit);
           this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
+          this->connect(lineEdit, SIGNAL(editingFinished()),
+                        this, SIGNAL(editingFinished()));
           }
 
         this->setReason() << "List of QLineEdit's for an IntVectorProperty "

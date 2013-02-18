@@ -49,7 +49,9 @@ public slots:
   void  setValue(double);
 
 protected slots :
-  void  valueEdited(const QString&);
+  void valueEdited();
 
+private:
+  QString LastValue;
 };
 #endif// __pqDoubleEdit_h__
