@@ -400,6 +400,8 @@ else()
   # Set some flags that affect VTK's modules.
   set (VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL
                                "Disable Python Threads support" FORCE)
+  set(VTK_WRAP_PYTHON ${PARAVIEW_ENABLE_PYTHON}
+    CACHE INTERNAL "Should VTK Python wrapping be built?" FORCE)
   
   # Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
   set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
