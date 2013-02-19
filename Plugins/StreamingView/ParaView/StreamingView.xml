@@ -114,7 +114,7 @@
 
      <Hints>
        <ReaderFactory extensions="sraw"
-                      file_description="multiresolution raw format" />
+                      file_description="multiresolution raw format (Plugin)" />
      </Hints>
 
    <!-- End StridedReader1 -->
@@ -173,7 +173,7 @@
 
      <Hints>
        <ReaderFactory extensions="acosmo"
-                      file_description="multiresolution cosmology format" />
+                      file_description="multiresolution cosmology format (Plugin)" />
      </Hints>
    <!-- End ACosmoReader -->
    </SourceProxy>
@@ -244,7 +244,7 @@
 
      <Hints>
        <ReaderFactory extensions="pop.ncdf pop.nc"
-                      file_description="POP Ocean NetCDF (streaming image)" />
+                      file_description="POP Ocean NetCDF (streaming image) (Plugin)" />
      </Hints>
    </SourceProxy>
 

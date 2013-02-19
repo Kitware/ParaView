@@ -21,7 +21,7 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="img hdr" file_description="Analyze Files" />
+        <ReaderFactory extensions="img hdr" file_description="Analyze Files (Plugin)" />
       </Hints>
       <!-- End AnalyzeReader -->
    </SourceProxy>
@@ -46,7 +46,7 @@
       </StringVectorProperty>
 
       <Hints>
-        <ReaderFactory extensions="nii img hdr" file_description="NIfTI Files" />
+        <ReaderFactory extensions="nii img hdr" file_description="NIfTI Files (Plugin)" />
       </Hints>
       <!-- End NIfTIReader -->
    </SourceProxy>
@@ -81,7 +81,7 @@
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-        <WriterFactory extensions="img" file_description="Analyze File Format"/>
+        <WriterFactory extensions="img" file_description="Analyze File Format (Plugin)"/>
       </Hints>
     </WriterProxy>
 
@@ -111,7 +111,7 @@
      <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
-         <WriterFactory extensions="nii" file_description="NIfTI File Format"/>
+         <WriterFactory extensions="nii" file_description="NIfTI File Format (Plugin)"/>
      </Hints>
     </WriterProxy>
 
