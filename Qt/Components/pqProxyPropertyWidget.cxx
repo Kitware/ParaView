@@ -133,3 +133,19 @@ void pqProxyPropertyWidget::apply()
     this->SelectionInputWidget->postAccept();
     }
 }
+
+void pqProxyPropertyWidget::select()
+{
+  if (this->ProxySelectionWidget)
+    {
+    this->ProxySelectionWidget->select();
+    }
+}
+
+void pqProxyPropertyWidget::deselect()
+{
+  if (this->ProxySelectionWidget)
+    {
+    this->ProxySelectionWidget->deselect();
+    }
+}

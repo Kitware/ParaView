@@ -71,13 +71,16 @@ varying vec4 vColor;
 varying vec3 v_texCoord3D;
 varying float vUncertainty;
 uniform sampler2D texture;
-uniform float noiseDensity;
+uniform float uncertaintyScaleFactor;
+uniform float scalarValueRange;
 
 vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
 {
-  vec3 uvw = v_texCoord3D + noiseDensity * vec3(snoise(v_texCoord3D + vec3(0.0f, 0.0f, 1.0f)),
-                                         snoise(v_texCoord3D + vec3(43.0f, 17.0f, 1.0f)),
-                                         snoise(v_texCoord3D + vec3(-17.0f, -43.0f, 1.0f)));
+  vec3 uvw = v_texCoord3D +
+             uncertaintyScaleFactor *
+             vec3(snoise(v_texCoord3D + vec3(0.0f, 0.0f, 1.0f)),
+                  snoise(v_texCoord3D + vec3(43.0f, 17.0f, 1.0f)),
+                  snoise(v_texCoord3D + vec3(-17.0f, -43.0f, 1.0f)));
   float n = snoise(uvw - vec3(0.0f, 0.0f, 1.0f));
   n += 0.5f * snoise(uvw * 2.0f - vec3(0.0f, 0.0f, 1.4f));
   n += 0.25f * snoise(uvw * 4.0f - vec3(0.0f, 0.0f, 2.0f));
@@ -86,13 +89,18 @@ vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
   n += 0.03125f * snoise(uvw * 32.0f - vec3(0.0f, 0.0f, 5.6f));
   n = n * 0.7f - 0.5f;
 
-  return mix(inputCoord, vec2(n, n), uncertainty);
+  float scale = scalarValueRange;
+
+  inputCoord.x =
+    clamp(inputCoord.x + uncertaintyScaleFactor * uncertainty / scale * n,
+          0.0f, 1.0f);
+  return inputCoord;
 }
 
 void main()
 {
   // offset the texture coordinate by the uncertainty value
-  float uncertainty = clamp(vUncertainty, 0.0f, 1.0f);
+  float uncertainty = vUncertainty;
   vec2 coord = mix_random_noise(gl_TexCoord[0].xy, uncertainty);
   gl_FragColor = vColor * texture2D(texture, coord);
 }

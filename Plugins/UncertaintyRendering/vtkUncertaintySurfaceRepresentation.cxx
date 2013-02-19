@@ -120,21 +120,21 @@ void vtkUncertaintySurfaceRepresentation::RescaleUncertaintyTransferFunctionToDa
 
   // set range
   transferFunction->RemoveAllPoints();
-  transferFunction->AddPoint(range[0], 0.0, 0.5, 0.0);
+  transferFunction->AddPoint(range[0], 1.0, 0.5, 0.0);
   transferFunction->AddPoint(range[1], 1.0, 0.5, 0.0);
 }
 
 //----------------------------------------------------------------------------
-void vtkUncertaintySurfaceRepresentation::SetNoiseDensity(double density)
+void vtkUncertaintySurfaceRepresentation::SetUncertaintyScaleFactor(double density)
 {
-  this->Painter->SetNoiseDensity(density);
+  this->Painter->SetUncertaintyScaleFactor(density);
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-double vtkUncertaintySurfaceRepresentation::GetNoiseDensity() const
+double vtkUncertaintySurfaceRepresentation::GetUncertaintyScaleFactor() const
 {
-  return this->Painter->GetNoiseDensity();
+  return this->Painter->GetUncertaintyScaleFactor();
 }
 
 //----------------------------------------------------------------------------

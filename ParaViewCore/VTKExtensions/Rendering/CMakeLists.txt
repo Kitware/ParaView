@@ -109,6 +109,7 @@ endif()
 #set_source_files_properties(
 #  WRAP_EXCLUDE
 #  )
+include_directories(${QT_INCLUDE_DIR})
 
 set_source_files_properties(
   vtkCameraManipulatorGUIHelper

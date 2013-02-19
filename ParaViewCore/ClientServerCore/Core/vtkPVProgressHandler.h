@@ -15,8 +15,12 @@
 // .NAME vtkPVProgressHandler - progress handler.
 // .SECTION Description
 // vtkPVProgressHandler handles the progress messages. It handles progress in
-// all configurations single process, client-server, mpi-batch. One progress
-// handler is created per Session.
+// all configurations single process, client-server. It must be noted that when
+// running in parallel, progress updates are fetched from the root node. Due to
+// performance reasons, we no longer collect progress events (or messages) from
+// satellites, only root-node events are reported back to the client. While this
+// may not faithfully report the progress, this avoid nasty MPI issues that can
+// be painful to debug and diagnose.
 //
 // Progress events are currently not supported in multi-clients mode.
 //
@@ -30,8 +34,6 @@
 // vtkCommand::EndEvent
 // \li fired to indicate end of progress handling
 // \li \c calldata: vtkPVProgressHandler*
-// .SECTION See Also
-// vtkPVMPICommunicator
 
 #ifndef __vtkPVProgressHandler_h
 #define __vtkPVProgressHandler_h
@@ -39,7 +41,6 @@
 #include "vtkPVClientServerCoreCoreModule.h" //needed for exports
 #include "vtkObject.h"
 
-class vtkMPICommunicatorOpaqueRequest;
 class vtkMultiProcessController;
 class vtkPVSession;
 
@@ -84,12 +85,6 @@ public:
   vtkGetStringMacro(LastMessage);
 
 //BTX
-  // Description:
-  // These methods are used by vtkPVMPICommunicator to handle the progress
-  // messages received from satellites while waiting on some receive.
-  vtkMPICommunicatorOpaqueRequest* GetAsyncRequest();
-  void RefreshProgress();
-  void MarkAsyncRequestReceived();
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();
@@ -102,70 +97,37 @@ protected:
     };
 
   // Description:
-  // Called when the client connection (vtkClientConnection) receives progress
-  // from the server.
-  void HandleServerProgress(int progress, const char* text);
+  void RefreshProgress(const char* progress_text, double progress);
+  void RefreshMessage(const char* message_text);
 
-  // Description:
-  // Called on MPI processes to pass around the CLEANUP_TAG marking the end of
-  // the progress messages.
-  void CleanupSatellites();
-
-  // Description:
-  // Returns if current process is the root node.
-  bool GetIsRoot();
-
-  // Description:
-  // Called on a MPI group to gather progress.
-  int GatherProgress();
-
-  // Description:
-  // Returns if the progress should be reported.
-  bool ReportProgress(double progress);
-
-  void SetLocalProgress(int progress, const char* text);
-  void SendProgressToClient(vtkMultiProcessController*);
-  void SendProgressToRoot();
-  int ReceiveProgressFromSatellites();
-  void ReceiveProgressFromServer(vtkMultiProcessController*);
-
-  vtkSetStringMacro(LastProgressText);
-  int LastProgress;
-  char* LastProgressText;
-  double ProgressFrequency;
   vtkPVSession* Session;
-
-  void SetLocalMessage(const char* text);
-  int GatherMessage();
-  void SendMessageToRoot();
-  void ReceiveMessagesFromSatellites();
-  void SendMessageToClient(vtkMultiProcessController*);
-  vtkSetStringMacro(LastMessage);
-  char* LastMessage;
-
+  double ProgressFrequency;
 private:
   vtkPVProgressHandler(const vtkPVProgressHandler&); // Not implemented
   void operator=(const vtkPVProgressHandler&); // Not implemented
 
   // Description:
   // Callback called when vtkCommand::ProgressEvent is received.
-  void OnProgressEvent(vtkObject* obj, double progress);
+  void OnProgressEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   // Description:
   // Callback called when vtkCommand::MessageEvent is received.
-  void OnMessageEvent(char* message);
+  void OnMessageEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   // Description:
   // Callback called when WrongTagEvent is fired by the controllers.
-  bool OnWrongTagEvent(void* calldata);
+  bool OnWrongTagEvent(vtkObject* caller, unsigned long eventid, void* calldata);
 
   bool AddedHandlers;
   class vtkInternals;
   vtkInternals* Internals;
 
-  class vtkObserver;
-  vtkObserver* Observer;
-  friend class vtkObserver;
+  vtkSetStringMacro(LastProgressText);
+  int LastProgress;
+  char* LastProgressText;
+
+  vtkSetStringMacro(LastMessage);
+  char* LastMessage;
 //ETX
 };
 

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
 
+#include <QtGui/QCheckBox>
 #include <QtGui/QDialog>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QFormLayout>
@@ -118,9 +119,18 @@ void pqExportReaction::exportActiveView()
 
       pqPropertyWidget *propertyWidget =
         pqPropertiesPanel::createWidgetForProperty(smProperty, proxy);
+
       const char *xmlLabel = smProperty->GetXMLLabel();
       if (propertyWidget)
         {
+        // Clear the text from any checkboxes -- otherwise the same text appears
+        // on both sides of the check box. We can find out if the property
+        // widget contains a checkbox by inspecting its children.
+        if (QCheckBox *checkBox = propertyWidget->findChild<QCheckBox*>())
+          {
+          checkBox->setText(QString());
+          }
+
         widgets << propertyWidget;
         if (xmlLabel)
           {

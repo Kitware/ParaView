@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqViewFrame.h"
 #include "pqViewModuleInterface.h"
 #include "pqViewSettingsReaction.h"
+#include "pqSelection3DHelper.h"
+#include "pqDataQueryReaction.h"
 
 #include "vtkContextScene.h"
 #include "vtkChart.h"
@@ -101,9 +103,63 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     return true;
     }
 
+  QAction* optionsAction = frame->addTitleBarAction(
+    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options");
+  optionsAction->setObjectName("OptionsButton");
+  new pqViewSettingsReaction(optionsAction, view);
+
   pqRenderView* const render_module = qobject_cast<pqRenderView*>(view);
   if (render_module)
     {
+    pqSelection3DHelper *selectionHelper = new pqSelection3DHelper(this);
+    selectionHelper->setView(view);
+
+    QAction* actionPickObject = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqMousePick15.png"), "Pick Object (n)");
+    actionPickObject->setObjectName("actionPickObject");
+    actionPickObject->setCheckable (true);
+    actionPickObject->setShortcut(QString("n"));
+
+    QAction* actionSelect_Block = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSelectBlock24.png"), "Select Block (b)");
+    actionSelect_Block->setObjectName("actionSelect_Block");
+    actionSelect_Block->setCheckable (true);
+    actionSelect_Block->setShortcut(QString("b"));
+
+    QAction* actionSelectFrustumPoints = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint24.png"),
+      "Select Points Through (g)");
+    actionSelectFrustumPoints->setObjectName("actionSelectFrustumPoints");
+    actionSelectFrustumPoints->setCheckable (true);
+    actionSelectFrustumPoints->setShortcut(QString("g"));
+
+    QAction* actionSelect_Frustum = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqFrustumSelectionCell24.png"),
+      "Select Cells Through (f)");
+    actionSelect_Frustum->setObjectName("actionSelect_Frustum");
+    actionSelect_Frustum->setCheckable (true);
+    actionSelect_Frustum->setShortcut(QString("f"));
+
+    QAction* actionSelectSurfacePoints = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionPoint24.png"), "Select Points On (d)");
+    actionSelectSurfacePoints->setObjectName("actionSelectSurfacePoints");
+    actionSelectSurfacePoints->setCheckable (true);
+    actionSelectSurfacePoints->setShortcut(QString("d"));
+
+    QAction* actionSelectionMode = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqSurfaceSelectionCell24.png"), "Select Cells On (s)");
+    actionSelectionMode->setObjectName("actionSelectionMode");
+    actionSelectionMode->setCheckable (true);
+    actionSelectionMode->setShortcut(QString("s"));
+
+    // Register all actions with the pqSelection3DHelper.
+    selectionHelper->setActionSelectionMode(actionSelectionMode);
+    selectionHelper->setActionSelectSurfacePoints(actionSelectSurfacePoints);
+    selectionHelper->setActionSelect_Frustum(actionSelect_Frustum);
+    selectionHelper->setActionSelectFrustumPoints(actionSelectFrustumPoints);
+    selectionHelper->setActionSelect_Block(actionSelect_Block);
+    selectionHelper->setActionPickObject(actionPickObject);
+
     QAction* cameraAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");
     cameraAction->setObjectName("CameraButton");
@@ -114,27 +170,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     new pqToggleInteractionViewMode(interactionModeAction, view);
     }
 
-  QAction* optionsAction = frame->addTitleBarAction(
-    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options");
-  optionsAction->setObjectName("OptionsButton");
-  new pqViewSettingsReaction(optionsAction, view);
-
-  if (view->supportsUndo())
-    {
-    // Setup undo/redo connections if the view module
-    // supports interaction undo.
-    QAction* forwardAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"),
-      "Camera Redo");
-    forwardAction->setObjectName("ForwardButton");
-    new pqCameraUndoRedoReaction(forwardAction, false, view);
-
-    QAction* backAction = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"),
-      "Camera Undo");
-    backAction->setObjectName("BackButton");
-    new pqCameraUndoRedoReaction(backAction, true, view);
-    }
   // Adding special selection controls for chart/context view
   pqContextView* const chart_view = qobject_cast<pqContextView*>(view);
   if (chart_view && chart_view->supportsSelection())

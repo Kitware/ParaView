@@ -36,6 +36,10 @@ public:
   void ReleaseGraphicsResources(vtkWindow *window);
 
   // Description:
+  // Process information values.
+  void ProcessInformation(vtkInformation* info);
+
+  // Description:
   // Get the output data object from this painter.
   vtkDataObject* GetOutput();
 
@@ -56,9 +60,14 @@ public:
   vtkSetObjectMacro(TransferFunction, vtkPiecewiseFunction)
 
   // Description:
-  // Set/get the noise density.
-  vtkSetClampMacro(NoiseDensity, float, 0.0f, 50.0f)
-  vtkGetMacro(NoiseDensity, float)
+  // Set/get the uncertainty scale factor.
+  vtkSetClampMacro(UncertaintyScaleFactor, float, 0.0f, 50.0f)
+  vtkGetMacro(UncertaintyScaleFactor, float)
+
+  // Description:
+  // Set/get the scalar value range of the array used for coloring.
+  vtkSetMacro(ScalarValueRange, float)
+  vtkGetMacro(ScalarValueRange, float)
 
 protected:
   vtkUncertaintySurfacePainter();
@@ -97,7 +106,8 @@ private:
   vtkPiecewiseFunction *TransferFunction;
   char *UncertaintyArrayName;
   int RenderingPreparationSuccess;
-  float NoiseDensity;
+  float UncertaintyScaleFactor;
+  float ScalarValueRange;
 };
 
 #endif // __vtkUncertaintySurfacePainter_h

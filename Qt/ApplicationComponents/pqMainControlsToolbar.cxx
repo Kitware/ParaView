@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerDisconnectReaction.h"
 #include "pqUndoRedoReaction.h"
 #include "pqAutoApplyReaction.h"
+#include "pqDataQueryReaction.h"
+
 //-----------------------------------------------------------------------------
 void pqMainControlsToolbar::constructor()
 {
@@ -52,6 +54,7 @@ void pqMainControlsToolbar::constructor()
   new pqUndoRedoReaction(ui.actionRedo, false);
   new pqHelpReaction(ui.actionHelp);
   new pqAutoApplyReaction(ui.actionAutoApply);
+  new pqDataQueryReaction(ui.actionQuery);
 }
 
 

@@ -91,18 +91,14 @@ void pqProxyPropertiesPanel::setVisible(bool value)
   this->Superclass::setVisible(value);
   foreach(const pqPropertiesPanelItem &item, m_items)
     {
-    pq3DWidgetPropertyWidget *widget =
-      qobject_cast<pq3DWidgetPropertyWidget*>(item.PropertyWidget);
-    if (widget)
+    pqPropertyWidget *widget = item.PropertyWidget;
+    if (widget && value)
       {
-      if (value)
-        {
-        widget->select();
-        }
-      else
-        {
-        widget->deselect();
-        }
+      widget->select();
+      }
+    else if (widget && !value)
+      {
+      widget->deselect();
       }
     }
 }

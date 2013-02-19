@@ -61,6 +61,17 @@ void pqObjectPanelPropertyWidget::reset()
   this->ObjectPanel->reset();
 }
 
+
+void pqObjectPanelPropertyWidget::select()
+{
+  this->ObjectPanel->select();
+}
+
+void pqObjectPanelPropertyWidget::deselect()
+{
+  this->ObjectPanel->deselect();
+}
+
 pqObjectPanel* pqObjectPanelPropertyWidget::getObjectPanel() const
 {
   return this->ObjectPanel;

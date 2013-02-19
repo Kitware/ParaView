@@ -18,7 +18,7 @@ vec4 colorFrontFace()
 void main()
 {
   vColor = colorFrontFace();
-  v_texCoord3D = gl_Vertex.xyz;
+  v_texCoord3D = gl_Vertex.xyz * 100.0f;
   gl_TexCoord[0] = gl_MultiTexCoord0;
   vUncertainty = uncertainty;
   gl_Position = ftransform();
