@@ -23,13 +23,18 @@ else()
   SET (TESTS_WITH_BASELINES ${TESTS_WITH_BASELINES}
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeLAMMPSDump.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNas.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNek.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
+
   set(VisItBridgeChombo_USE_NEW_PANELS TRUE)
   set(VisItBridgeEnzo_USE_NEW_PANELS TRUE)
+  set(VisItBridgeEnzo_BREAK TRUE)
+  set(VisItBridgeLAMMPSDump_USE_NEW_PANELS TRUE)
+  set(VisItBridgeLAMMPSDump_BREAK TRUE)
   set(VisItBridgeNas_USE_NEW_PANELS TRUE)
   set(VisItBridgeNek_USE_NEW_PANELS TRUE)
   set(VisItBridgePdb_USE_NEW_PANELS TRUE)
@@ -352,7 +357,7 @@ set (TabbedViews_BREAK TRUE)
 # Since this test forces remote-rendering, we run it by itself.
 set (StructuredGridVolumeRendering_BREAK TRUE)
 set (StructuredGridVolumeRendering_FORCE_SERIAL TRUE)
-set (StructuredGridVolumeRendering_DISABLE_CRS TRUE) 
+set (StructuredGridVolumeRendering_DISABLE_CRS TRUE)
   # <-- since volume rendering is not supported in CRS mode.
 
 # Since this test needs selection, disable in CRS mode.
