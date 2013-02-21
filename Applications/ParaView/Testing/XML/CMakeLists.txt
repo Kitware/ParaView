@@ -27,6 +27,7 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNas.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNek.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePFLOTRAN.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePixie.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeSamrai.xml)
 
@@ -36,6 +37,8 @@ else()
   set(VisItBridgeNas_USE_NEW_PANELS TRUE)
   set(VisItBridgeNek_USE_NEW_PANELS TRUE)
   set(VisItBridgePdb_USE_NEW_PANELS TRUE)
+  set(VisItBridgePFLOTRAN_BREAK TRUE)
+  set(VisItBridgePFLOTRAN_USE_NEW_PANELS TRUE)
   set(VisItBridgePixie_USE_NEW_PANELS TRUE)
   set(VisItBridgeSamrai_USE_NEW_PANELS TRUE)
 endif()
