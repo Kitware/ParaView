@@ -1063,7 +1063,7 @@
 
      <Hints>
       <ReaderFactory extensions="sesame"
-          file_description="SESAME" />
+          file_description="SESAME (Plugin)" />
      </Hints>
      <!-- End SESAMEReader -->
    </SourceProxy>

@@ -229,7 +229,7 @@ Copyright 2012 SciberQuest Inc.
     <Hints>
       <Property name="Input" show="0"/>
       <Property name="FileName" show="0"/>
-      <WriterFactory extensions="bov" file_description="Parallel MPI-I/O BOV"/>
+      <WriterFactory extensions="bov" file_description="Parallel MPI-I/O BOV (Plugin)"/>
     </Hints>
     <!-- End of XMLPPolyDataWriter -->
   </WriterProxy>

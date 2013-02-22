@@ -279,7 +279,7 @@ Copyright 2012 SciberQuest Inc.
     </IntVectorProperty>
 
     <Hints>
-      <ReaderFactory extensions="bov" file_description="MPI-I/O brick-of-values."/>
+      <ReaderFactory extensions="bov" file_description="MPI-I/O brick-of-values. (Plugin)"/>
       <View type="RenderView"/>
     </Hints>
   </SourceProxy>
@@ -673,7 +673,7 @@ Copyright 2012 SciberQuest Inc.
       <Property name="CollectBufferSize" show="0"/>
       <Property name="NumberOfIONodes" show="0"/>
       <Property name="UseCollectiveIO" show="0"/>
-      <ReaderFactory extensions="bovm" file_description="MPI-I/O brick-of-values (Meta Reader)."/>
+      <ReaderFactory extensions="bovm" file_description="MPI-I/O brick-of-values (Meta Reader). (Plugin)"/>
     </Hints>
   </SourceProxy>
 </ProxyGroup>

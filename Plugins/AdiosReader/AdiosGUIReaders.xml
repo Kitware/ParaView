@@ -1,5 +1,5 @@
 <ParaViewReaders>
   <Reader name="PixieAdiosReader"
           extensions="bp"
-          file_description="Pixie Adios file" />
+          file_description="Pixie Adios file (Plugin)" />
 </ParaViewReaders>

@@ -49,7 +49,7 @@
            panel_widget="command_button"/>
 
        <Hints>
-          <ReaderFactory extensions="bp" file_description="Pixie Adios file"/>
+          <ReaderFactory extensions="bp" file_description="Pixie Adios file (Plugin)"/>
        </Hints>
     </SourceProxy>
 
