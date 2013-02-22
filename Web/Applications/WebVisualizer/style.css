@@ -96,17 +96,22 @@ canvas {
     text-align: center;
 }
 
-.file-list {
-    overflow: auto;
-}
 .viewport {
     position: absolute;
-    left: 300px;
+    left: 0px;
+    right: 0px;
     top: 0;
+    bottom: 0;
+    z-index: 0;
 }
 .splitter {
     position: absolute;
     top: 35px;
     left: 0;
     right: 0;
+}
+
+.control-panel {
+    z-index: 10;
+    overflow: auto;
 }

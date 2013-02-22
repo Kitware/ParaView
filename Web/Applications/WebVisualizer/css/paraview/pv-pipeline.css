@@ -9,7 +9,7 @@
 
 /* Header BAR */
 
-.pipelineBrowser > div.pipeline-header {
+.pipelineBrowser > div.pipeline-header, .pipelineBrowser div.pipeline-editor-header {
     line-height: 2em;
     background: #cccccc;
     position: relative;
@@ -17,16 +17,12 @@
     outline: solid 0.5px black ;
 }
 
-.pipeline-header span.title {
+.pipeline-header span.title, .pipeline-editor-header span.title {
     font-weight: bolder;
     margin-left: 10px;
 }
 
-.pipeline-header span.title {
-    font-weight: bolder;
-}
-
-.pipeline-header .action {
+.pipeline-header .action, .pipeline-editor-header .action {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -37,7 +33,7 @@
 
 .pipeline-header .add {
     background: url("action/add.png") no-repeat scroll center transparent;
-    right: 25px;
+    right: 35px;
 }
 .pipeline-header .delete {
     background: url("action/delete.png") no-repeat scroll center transparent;
@@ -49,7 +45,26 @@
 }
 .pipeline-header .files {
     background: url("action/file.png") no-repeat scroll center transparent;
-    right: 45px;
+    right: 65px;
+}
+
+.pipeline-header .edit {
+    background: url("action/edit.png") no-repeat scroll center transparent;
+    right: 95px;
+}
+
+.pipeline-header .edit.active {
+    background-color: darkgrey;
+    outline: 1px solid #5F5F5F;
+}
+
+.pipeline-editor-header .apply {
+    background: url("action/apply.png") no-repeat scroll center transparent;
+    right: 5px;
+}
+
+.pipeline-editor {
+    margin-top: 25px;
 }
 
 /* Pipline Tree */

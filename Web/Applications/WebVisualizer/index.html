@@ -37,50 +37,112 @@
             </ul>
         </div>
         <div class="splitter">
-            <div class="control-panel">
-            </div>
             <div class="viewport">
+            </div>
+            <div class="control-panel" style="display: none;">
             </div>
         </div>
 
-        <script src="../../js/ext/autobahn.min.js"></script>
-        <script src="js/jquery-1.9.0.js"></script>
-        <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
-        <script src="../../js/lib/paraview-all.js"></script>
-        <script src="../../js/lib/paraview.pipeline.js"></script>
+        <script src="js/Ext/autobahn.min.js"></script>
+        <script src="js/Ext/jquery-1.8.2.min.js"></script>
+        <script src="js/Ext/jquery-ui-1.10.0.min.js"></script>
+        <script src="js/Lib/paraview.js"></script>
+        <script src="js/Lib/paraview.connect.js"></script>
+        <script src="js/Lib/paraview.launcher.js"></script>
+        <script src="js/Lib/paraview.statistics.js"></script>
+        <script src="js/Lib/paraview.viewport.js"></script>
+        <script src="js/Lib/paraview.ui.pipeline.js"></script>
+
         <script type="text/javascript">
-            var pv = {};
+            var url = { 'wampURL': "ws://localhost:8081/ws"};
+            var connection = {}
+            var pv = {}
+
+            paraview.connect(url, function(connectionData) {
+                // Create pipeline browser
+                connection = connectionData;
+                connection.session.call('pv:getPipeline').then(function(pipeline) {
+                    connection.pipeline = pipeline;
+                    connection.session.call('pv:listFilters').then(function(sources) {
+                        connection.sources = sources;
+                        connection.session.call('pv:listFiles').then(function(files) {
+                            connection.files = files;
+                            createPipeline(connection.session, connection.pipeline, connection.sources, connection.files);
+                            pv.viewport = paraview.createViewport(connection.session);
+                            pv.viewport.bind(".viewport");
+                            $(".loading").hide();
+                        });
+                    });
+                });
+            }, function(code,reason){
+                $(".loading").hide();
+                console.log(reason);
+            });
 
             // Handle control show/hide
             $('.toggle-control').bind('click', function(){
                 var panel = $(".control-panel");
+                var viewport = $(".viewport");
                 if(panel.is(":visible")) {
-                    panel.hide("slide",250);
+                    panel.hide("slide",250, function(){
+                        viewport.css("left", 0);
+                        pv.viewport.render();
+                    });
                 } else {
-                    panel.show("slide",250);
+                    panel.show("slide",250, function(){
+                        viewport.css("left", 400);
+                        pv.viewport.render();
+                    });
                 }
             });
 
-            // Create pipeline browser
-            $('.control-panel').pipelineBrowser({
-            }).bind('proxyModified', function(e){
-                if(e.proxy){
-                    console.log("Proxy change: " + e.proxy.proxy_id + " field: " + e.field + " value: " + e.proxy[e.field]);
-                } else {
-                    console.log("change of ?");
+            function createPipeline(session, pipeline, sources, files) {
+                $('.control-panel').pipelineBrowser({
+                    session: session,
+                    pipeline: pipeline,
+                    sources: sources,
+                    files: files
+                }).bind('proxyModified', function(e){
+                    if(e.proxy){
+                        console.log("Proxy change: " + e.proxy.proxy_id + " field: " + e.field + " value: " + e.proxy[e.field]);
+                    } else {
+                        console.log("change of ?");
+                        console.log(e);
+                    }
+                }).bind('deleteProxy', function(e){
+                    console.log("Delete proxy: ");
                     console.log(e);
+                }).bind('proxySelected', function(e){
+                    console.log("Select proxy: ");
+                    console.log(e.proxy);
+                }).bind('addSource', function(e){
+                    console.log("Create " + e.name + "(" + (e.parent ? e.parent : "") + ")");
+                }).bind('openFile', function(e){
+                    console.log("openFile " + e.path);
+                }).bind('pipelineChanged', function(){
+                    updateView();
+                    setTimout(updateView, 500);
+                });
+            }
+
+            $(window).resize(function() {
+                $(".splitter").height(window.innerHeight - 35);
+                //$(".viewport").height(window.innerHeight - 35);
+                $(".control-panel").height(window.innerHeight - 35);
+                updateView();
+            }).trigger('resize');
+
+            $(".resetCamera").click(function(){
+                if(pv.viewport) {
+                    pv.viewport.resetCamera();
                 }
-            }).bind('deleteProxy', function(e){
-                console.log("Delete proxy: ");
-                console.log(e);
-            }).bind('proxySelected', function(e){
-                console.log("Select proxy: ");
-                console.log(e.proxy);
-            }).bind('addSource', function(e){
-                console.log("Create " + e.name + "(" + (e.parent ? e.parent : "") + ")");
-            }).bind('openFile', function(e){
-                console.log("openFile " + e.path);
             });
+
+            function updateView() {
+                if(pv.viewport) {
+                    pv.viewport.render();
+                }
+            }
         </script>
     </body>
 </html>
