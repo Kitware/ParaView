@@ -199,12 +199,12 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 
   // update vtk property
   vtkSMProxy *proxy = this->Representation->getProxy();
-  vtkSMProperty *property = proxy->GetProperty("BlockVisibility");
+  vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
 
-  if(property)
+  if(property_)
     {
     vtkSMIntVectorProperty *ivp =
-      vtkSMIntVectorProperty::SafeDownCast(property);
+      vtkSMIntVectorProperty::SafeDownCast(property_);
 
     ivp->SetNumberOfElements(vector.size());
     ivp->SetElements(&vector[0]);
