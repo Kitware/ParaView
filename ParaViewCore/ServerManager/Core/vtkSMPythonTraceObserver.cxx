@@ -14,10 +14,11 @@
 =========================================================================*/
 #include "vtkSMPythonTraceObserver.h"
 
-#include "vtkSMProxyManager.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkSMPluginManager.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkWeakPointer.h"
 
@@ -59,6 +60,8 @@ public:
   vtkSMProxyManager::RegisteredProxyInformation LastRegisterProxyInfo;
   vtkSMProxyManager::RegisteredProxyInformation LastUnRegisterProxyInfo;
   vtkSMProxyManager::ModifiedPropertyInformation LastModifiedPropertyInfo;
+  const char* LastLocalPluginLoaded;
+  const char* LastRemotePluginLoaded;
 };
 
 //-----------------------------------------------------------------------------
@@ -74,6 +77,10 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
 
   vtkSMSessionProxyManager* pxm =
       vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  vtkSMPluginManager *pm =
+    vtkSMProxyManager::GetProxyManager()->GetPluginManager();
+
   if(!pxm)
     {
     vtkWarningMacro("No ProxyManager available. No Observation will be made");
@@ -90,6 +97,8 @@ vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
   pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
   pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
   pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer);
+  pm->AddObserver(vtkSMPluginManager::LocalPluginLoadedEvent, this->Observer);
+  pm->AddObserver(vtkSMPluginManager::RemotePluginLoadedEvent, this->Observer);
 
   // Keep the session proxy manager around so we can unregiter observers
   // to the correct one.
@@ -156,6 +165,22 @@ void vtkSMPythonTraceObserver::ExecuteEvent(vtkObject* vtkNotUsed(caller),
       this->InvokeEvent(vtkCommand::UpdateInformationEvent);
       }
     break;
+
+    case vtkSMPluginManager::LocalPluginLoadedEvent:
+      {
+      const char *filename = (reinterpret_cast<const char*>(data));
+      this->Internal->LastLocalPluginLoaded = filename;
+      this->InvokeEvent(vtkSMPluginManager::LocalPluginLoadedEvent);
+      }
+    break;
+
+    case vtkSMPluginManager::RemotePluginLoadedEvent:
+      {
+      const char *filename = (reinterpret_cast<const char*>(data));
+      this->Internal->LastRemotePluginLoaded = filename;
+      this->InvokeEvent(vtkSMPluginManager::RemotePluginLoadedEvent);
+      }
+    break;
     }
 }
 
@@ -206,6 +231,18 @@ const char* vtkSMPythonTraceObserver::GetLastProxyUnRegisteredGroup()
 const char* vtkSMPythonTraceObserver::GetLastProxyUnRegisteredName()
 {
   return this->Internal->LastUnRegisterProxyInfo.ProxyName;
+}
+
+// ----------------------------------------------------------------------------
+const char* vtkSMPythonTraceObserver::GetLastLocalPluginLoaded()
+{
+  return this->Internal->LastLocalPluginLoaded;
+}
+
+// ----------------------------------------------------------------------------
+const char* vtkSMPythonTraceObserver::GetLastRemotePluginLoaded()
+{
+  return this->Internal->LastRemotePluginLoaded;
 }
 
 //-----------------------------------------------------------------------------
