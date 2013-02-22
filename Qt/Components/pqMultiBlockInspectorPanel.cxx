@@ -206,7 +206,7 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
     vtkSMIntVectorProperty *ivp =
       vtkSMIntVectorProperty::SafeDownCast(property_);
 
-    ivp->SetNumberOfElements(vector.size());
+    ivp->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
     ivp->SetElements(&vector[0]);
 
     proxy->UpdateVTKObjects();
