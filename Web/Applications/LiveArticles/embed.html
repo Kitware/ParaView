@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+        <link rel="stylesheet" href="jquery-ui-1.10.0.css" />
+        <link rel='stylesheet' href='style_embed.css' type='text/css' />
+
+        <script src="../../js/ext/autobahn.min.js"></script>
+        <script src="../../js/ext/jquery-1.8.3.min.js"></script>
+        <script src="../../js/lib/paraview-all.js"></script>
+        <script src="../../js/ext/jquery-ui-1.10.0.min.js"></script>
+
+        <script type="text/javascript">
+        $(function() {
+            // Center the clicktostart element.
+            var clicktostart = $(".clicktostart");
+            clicktostart.css(
+              "margin-top",
+              (clicktostart.parent().innerHeight() - clicktostart.height())*0.5);
+
+
+            //-----------------------------------------------------------------------------
+            // 'global' variables.
+            var pv = {};
+
+            $(window).resize(function() {
+                if (pv.viewport) {
+                    pv.viewport.render();
+                }
+            }).trigger('resize');
+
+            //-----------------------------------------------------------------------------
+            // Setup UI
+            $("#menu").hide();
+            $("#options").hide();
+
+            // handlers for selecting of options in the menu.
+            $("#menu").menu({
+                select : function (event, ui) {
+                    event.preventDefault();
+                    $(this).hide();
+                    var selectedItem = ui.item;
+                    if (selectedItem.hasClass("resetview") === true) {
+                        if (pv.viewport) {pv.viewport.resetCamera();}
+                    } else if (selectedItem.hasClass("stats") === true) {
+                        var anchor = selectedItem.find("a");
+                        if (selectedItem.hasClass("show") === true) {
+                            anchor.text("Hide Statistics");
+                            if (pv.stats && pv.viewport) {
+                                pv.stats.start();
+                                pv.viewport.showStatistics(pv.stats);
+                            }
+
+                        } else {
+                            anchor.text("Show Statistics");
+                            if (pv.stats && pv.viewport) {
+                                pv.stats.stop();
+                                pv.viewport.showStatistics(null);
+                            }
+                        }
+                        selectedItem.toggleClass("show");
+                    } else if (selectedItem.hasClass("disconnect") === true) {
+                        cleanup();
+                    }
+                }
+            });
+
+            // show the menu when the mouse enter the "options" button.
+            $("#options").click(function(event) {
+                $("#menu").show("fade").focus();
+                }
+            );
+
+            // hide the menu if the user moves out from the menu.
+            $("#menu").mouseleave(function(event) {
+                $("#menu").hide("fade");
+                }
+            );
+
+            // if the user clicks on the empty viewport, we start a new session
+            // if one hasn't already been started.
+            $("#viewport").click(function() {
+                if ($(this).hasClass("session_started")) {
+                    return;
+                }
+                // We start a new ParaView session everytime the user clicks on
+                // the the page.
+                if (!pv.connection) {
+                    $(this).addClass("session_started");
+                    $(".clicktostart").html("Loading ...");
+
+                    var serviceURL = location.protocol + "//" + location.hostname +
+                                     ":" + location.port + "/paraview";
+                    var config = {
+                        url: serviceURL,
+                        name: "Live Articles",
+                        description: "3D visualization with ParaView/Web",
+                        application: "loader"
+                    };
+
+                    // Start a new ParaView/Web instance.
+                    paraview.start(config,
+                        function (conn) {
+                            setupConnection(conn);
+                        },
+                        function (err) {
+                            //console.log("Connection failed.");
+
+                            var conn = {wampURL: "ws://" +
+                                       location.hostname + ":" +
+                                       location.port + "/ws"};
+                            setupConnection(conn);
+                        }
+                    );
+                }
+            });
+
+            //-----------------------------------------------------------------------------
+            // Setup paraview
+            function setupConnection(connection) {
+                // Mobiles does not support secured web sockets
+                if (paraview.isMobile || location.protocol == "http:") {
+                    connection.wampURL = connection.wampURL.replace("wss:","ws:");
+                }
+
+                // connect to the ParaView/Web instance, so we can start
+                // visualizing.
+                paraview.connect(connection,
+                    function(conn) {
+                        pv.connection = conn;
+                        pv.viewport = paraview.createViewport(conn.session);
+                        pv.viewport.bind("#viewport");
+                        pv.stats = paraview.createViewportStatistics(pv.viewport);
+                        pv.stats.stop();
+
+                        var filePath= getParameter("data");
+                        if (filePath !== "") {
+                            pv.connection.session.call("pv:openFileFromPath", filePath).then(
+                                function(reply){pv.viewport.render();});
+                        }
+                        $("#options").show();
+                    },
+                    function(code,reason){
+                        pv.connection = null;
+                        console.log(reason);
+                        cleanup();
+                    }
+                );
+             }
+
+             function cleanup() {
+                if (pv.viewport) {
+                    pv.viewport.unbind();
+                }
+                if (pv.connection) {
+                    paraview.stop(pv.connection);
+                }
+                $("#options").hide();
+                pv = {};
+                $("#viewport").removeClass("session_started");
+                $(".clicktostart").html("Click to Start");
+             }
+
+            function getParameter(name) {
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                var regexS = "[\\?&]" + name + "=([^&#]*)";
+                var regex = new RegExp(regexS);
+                var results = regex.exec(window.location.search);
+                if (results == null) {
+                    return "";
+                } else {
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+            }
+
+        });
+        </script>
+    </head>
+    <body>
+      <div id="viewport" class="fullscreen">
+        <p class="clicktostart">Click to Start</p>
+      </div>
+      <button id="options" class="anchor-bottom-right transparent">Options</button>
+      <ul id="menu">
+        <li class="resetview"><a>Reset View</a></li>
+        <li class="stats show"><a>Show Statistics</a></li>
+        <li class="disconnect"><a>Disconnect</a></li>
+      </ul>
+    </body>
+</html>

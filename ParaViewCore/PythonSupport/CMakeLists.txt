@@ -36,16 +36,6 @@ set (Module_SRCS
   vtkPVPythonInterpretorWrapper.h
 )
 
-include_directories(
-  "${VTK_SOURCE_DIR}/Wrapping/Python"
-  "${VTK_BINARY_DIR}/Wrapping/Python"
-  "${PYTHON_INCLUDE_PATH}"
-  )
-
-set(VTK_WRAP_PYTHON_FIND_LIBS ON)
-include (vtkWrapPython)
-include_directories("${PYTHON_INCLUDE_PATH}")
-
 vtk_module_library(vtkPVPythonSupport ${Module_SRCS})
 target_link_libraries(vtkPVPythonSupport
   ${VTK_PYTHON_LIBRARIES})

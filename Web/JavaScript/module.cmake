@@ -1,0 +1,2 @@
+vtk_module(vtkParaViewWebJavaScript
+  EXCLUDE_FROM_WRAPPING)

@@ -1,0 +1,23 @@
+ [
+      {
+          "title": "Developer Guide",
+          "items": [
+              {
+                  "name": "developer_style",
+                  "url": "guides/developer_style",
+                  "title": "Code Style Guidelines",
+                  "description": "Coding style guidelines intended for developers contributing to ParaViewWeb."
+              },{
+                  "name": "apache_setup",
+                  "url": "guides/apache_setup",
+                  "title": "Setup Apache front-end",
+                  "description": "This document explain how to use Apache as front-end for ParaViewWeb."
+              },{
+                  "name": "jetty_session_manager",
+                  "url": "guides/jetty_session_manager",
+                  "title": "Session Manager front-end",
+                  "description": "This document explain how to use the Jetty Session Manager front-end for ParaViewWeb."
+              }
+          ]
+      }
+  ]

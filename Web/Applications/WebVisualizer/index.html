@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel='stylesheet' href='style.css' type='text/css'>
+        <link rel='stylesheet' href='css/paraview/pv-pipeline.css' type='text/css'>
+    </head>
+
+    <body class="page">
+        <div class="header">
+            <ul class="toolbar control">
+                <li><img class="action toggle-control" src="images/toolbar/logo.png" alt="Show/Hide control panel"/></li>
+            </ul>
+            <ul class="toolbar view">
+                <li><img class="action showOrientationAxis" src="images/toolbar/view/orientation.png" alt="Toggle orientation widget visibility"/></li>
+                <li><img class="action showRotationCenter" src="images/toolbar/view/center.png" alt="Toggle rotation center visibility"/></li>
+                <li><img class="action resetCamera" src="images/toolbar/view/resetCamera.png" alt="Reset display"/></li>
+                <li><img class="action capture" src="images/toolbar/view/capture.png" alt="Take a capture of the viewport"/></li>
+            </ul>
+            <ul class="toolbar color">
+                <li><select class="lookup-table-type" name="lut-type"><option>HSV</option></select></li>
+                <li><img class="action resetColorRange" src="images/toolbar/color/resetRange.png"/></li>
+            </ul>
+            <ul class="toolbar vcr">
+                <li><img class="action first" src="images/toolbar/vcr/first.png"/></li>
+                <li><img class="action prev" src="images/toolbar/vcr/prev.png"/></li>
+                <li><img class="action play" src="images/toolbar/vcr/play.png"/></li>
+                <li><img class="action pause" src="images/toolbar/vcr/pause.png"/></li>
+                <li><img class="action next" src="images/toolbar/vcr/next.png"/></li>
+                <li><img class="action last" src="images/toolbar/vcr/last.png"/></li>
+            </ul>
+            <ul class="toolbar loading">
+                <li><img src="images/loading.gif" alt="Loading"/></li>
+            </ul>
+            <ul class="toolbar exit">
+                <li><img class="action exit" src="images/toolbar/exit/exit.png" alt="Quit application"/></li>
+            </ul>
+        </div>
+        <div class="splitter">
+            <div class="control-panel">
+            </div>
+            <div class="viewport">
+            </div>
+        </div>
+
+        <script src="../../js/ext/autobahn.min.js"></script>
+        <script src="js/jquery-1.9.0.js"></script>
+        <script src="js/jquery-ui-1.10.0.custom.min.js"></script>
+        <script src="../../js/lib/paraview-all.js"></script>
+        <script src="../../js/lib/paraview.pipeline.js"></script>
+        <script type="text/javascript">
+            var pv = {};
+
+            // Handle control show/hide
+            $('.toggle-control').bind('click', function(){
+                var panel = $(".control-panel");
+                if(panel.is(":visible")) {
+                    panel.hide("slide",250);
+                } else {
+                    panel.show("slide",250);
+                }
+            });
+
+            // Create pipeline browser
+            $('.control-panel').pipelineBrowser({
+            }).bind('proxyModified', function(e){
+                if(e.proxy){
+                    console.log("Proxy change: " + e.proxy.proxy_id + " field: " + e.field + " value: " + e.proxy[e.field]);
+                } else {
+                    console.log("change of ?");
+                    console.log(e);
+                }
+            }).bind('deleteProxy', function(e){
+                console.log("Delete proxy: ");
+                console.log(e);
+            }).bind('proxySelected', function(e){
+                console.log("Select proxy: ");
+                console.log(e.proxy);
+            }).bind('addSource', function(e){
+                console.log("Create " + e.name + "(" + (e.parent ? e.parent : "") + ")");
+            }).bind('openFile', function(e){
+                console.log("openFile " + e.path);
+            });
+        </script>
+    </body>
+</html>

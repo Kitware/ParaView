@@ -192,6 +192,9 @@ FUNCTION (add_tile_display_tests prefix tdx tdy )
 
   MATH(EXPR REQUIRED_CPU '${tdx}*${tdy}-1') # -1 is for LESS
   if (${PARAVIEW_USE_MPI})
+    if (NOT DEFINED VTK_MPI_MAX_NUMPROCS)
+      set (VTK_MPI_MAX_NUMPROCS ${MPIEXEC_MAX_NUMPROCS})
+    endif()
     if (${REQUIRED_CPU} LESS ${VTK_MPI_MAX_NUMPROCS})
       foreach (test_script ${ACT_TEST_SCRIPTS})
 

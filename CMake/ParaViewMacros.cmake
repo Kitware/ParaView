@@ -428,3 +428,43 @@ function (pv_executable_install name exe_suffix)
             COMPONENT Runtime)
   endif()
 endfunction()
+
+#------------------------------------------------------------------------------
+# Function used to copy a Python package into the binary directory and compile
+# it.
+# package     :- The name of the Python package.
+# source_dir  :- The directory containing the Python source.
+# binary_dir  :- The directory to copy files to and compile into.
+#------------------------------------------------------------------------------
+function(build_python_package package source_dir binary_dir)
+  file(GLOB_RECURSE _py_files
+    RELATIVE ${source_dir}
+    "*.py")
+
+  set(_py)
+  foreach(_py_file ${_py_files})
+    configure_file("${source_dir}/${_py_file}" "${binary_dir}/${_py_file}"
+      COPYONLY)
+    list(APPEND _py "${binary_dir}/${_py_file}")
+  endforeach()
+
+  set(CMAKE_CONFIGURABLE_FILE_CONTENT
+    "from compileall import compile_dir
+compile_dir('${binary_dir}')
+file = open('${binary_dir}/${package}_complete', 'w')
+file.write('Done')
+")
+  configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+    "${CMAKE_CURRENT_BINARY_DIR}/compile_py" @ONLY)
+  unset(CMAKE_CONFIGURABLE_FILE_CONTENT)
+
+  add_custom_command(
+    COMMAND ${PYTHON_EXECUTABLE} ARGS ${CMAKE_CURRENT_BINARY_DIR}/compile_py
+    COMMAND ${PYTHON_EXECUTABLE} ARGS -O ${CMAKE_CURRENT_BINARY_DIR}/compile_py
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/compile_py
+            ${_py}
+    OUTPUT  "${binary_dir}/${package}_complete"
+    COMMENT "Compiling Python files")
+
+  add_custom_target(${package} ALL DEPENDS "${binary_dir}/${package}_complete")
+endfunction()
