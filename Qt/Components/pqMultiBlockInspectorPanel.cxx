@@ -29,17 +29,17 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
-pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent)
-  : QWidget(parent)
+pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
+  : QWidget(parent_)
 {
   // setup tree widget
   this->TreeWidget = new QTreeWidget(this);
   this->TreeWidget->setColumnCount(1);
   this->TreeWidget->header()->close();
 
-  QVBoxLayout *layout = new QVBoxLayout;
-  layout->addWidget(this->TreeWidget);
-  setLayout(layout);
+  QVBoxLayout *layout_ = new QVBoxLayout;
+  layout_->addWidget(this->TreeWidget);
+  setLayout(layout_);
 
   // listen to active object changes
   pqActiveObjects *activeObjects = &pqActiveObjects::instance();
@@ -104,7 +104,7 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
 }
 
 void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
-                                           QTreeWidgetItem *parent,
+                                           QTreeWidgetItem *parent_,
                                            unsigned int &flatIndex)
 {
   for(unsigned int i = 0; i < info->GetNumberOfChildren(); i++)
@@ -122,7 +122,7 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
       text = QString("Block #%1").arg(flatIndex);
       }
 
-    QTreeWidgetItem *item = new QTreeWidgetItem(parent, QStringList() << text);
+    QTreeWidgetItem *item = new QTreeWidgetItem(parent_, QStringList() << text);
     item->setData(0, Qt::UserRole, flatIndex++);
     item->setData(0, Qt::CheckStateRole, Qt::Checked);
 
@@ -238,12 +238,12 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 }
 
 void pqMultiBlockInspectorPanel::updateBlockVisibilities(
-  vtkPVCompositeDataInformation *info, QTreeWidgetItem *parent,
+  vtkPVCompositeDataInformation *info, QTreeWidgetItem *parent_,
   unsigned int &flatIndex, bool parentVisibility)
 {
   for(unsigned int i = 0; i < info->GetNumberOfChildren(); i++)
     {
-    QTreeWidgetItem *item = parent->child(i);
+    QTreeWidgetItem *item = parent_->child(i);
     flatIndex++;
 
     bool visibility = parentVisibility;
@@ -331,11 +331,11 @@ void pqMultiBlockInspectorPanel::blockItemChanged(QTreeWidgetItem *item, int col
   this->setBlockVisibility(flat_index, visible);
 }
 
-void pqMultiBlockInspectorPanel::unsetChildVisibilities(QTreeWidgetItem *parent)
+void pqMultiBlockInspectorPanel::unsetChildVisibilities(QTreeWidgetItem *parent_)
 {
-  for(int i = 0; i < parent->childCount(); i++)
+  for(int i = 0; i < parent_->childCount(); i++)
     {
-    QTreeWidgetItem *child = parent->child(i);
+    QTreeWidgetItem *child = parent_->child(i);
     unsigned int flatIndex = child->data(0, Qt::UserRole).value<unsigned int>();
     this->BlockVisibilites.remove(flatIndex);
     unsetChildVisibilities(child);
