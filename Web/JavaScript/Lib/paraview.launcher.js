@@ -21,7 +21,7 @@
      */
     /**
      * @member pv.ConnectionConfig
-     * @property {String} url
+     * @property {String} sessionManagerURL
      * The service URL that will respond to the REST request to start or stop
      * a visualization session.
      *
@@ -83,12 +83,12 @@
 
     /**
      * Start a new ParaView process on the server side.
-     * This method will make a JSON POST request to config.url URL.
+     * This method will make a JSON POST request to config.sessionManagerURL URL.
      *
      * @member paraview.launcher
      *
      * @param {pv.ConnectionConfig} config
-     * Session creation parameters. (url, name, application).
+     * Session creation parameters. (sessionManagerURL, name, application).
      *
      * @param {Function} successCallback
      * The function will be called once the connection is successfully performed.
@@ -102,7 +102,7 @@
         var okCallback = successFunction,
         koCallback = errorFunction,
         arg = {
-            url: config.url,
+            url: config.sessionManagerURL,
             type: "POST",
             dataType: "json",
             data: (JSON.stringify(config)),
@@ -128,17 +128,17 @@
      *
      * @member paraview.launcher
      *
-     * @param {String} serviceUrl
-     * Same as ConnectionConfig.url value.
+     * @param {String} sessionManagerURL
+     * Same as ConnectionConfig.sessionManagerURL value.
      *
      * @param {String} sessionId
      * The unique identifier of a session.
      *
      * @return {pv.Connection} if the session is found.
      */
-    function fetchConnection(serviceUrl, sessionId) {
+    function fetchConnection(sessionManagerURL, sessionId) {
         var config = {
-            url: serviceUrl + '/' + sessionId,
+            url: sessionManagerURL + '/' + sessionId,
             dataType: "json"
         };
         return $.ajax(config);
@@ -153,7 +153,7 @@
      */
     function stop(connection) {
         var config = {
-            url: connection.url + "/" + connection.id,
+            url: connection.sessionManagerURL + "/" + connection.id,
             type: "DELETE",
             dataType: "json",
             success: function (reply) {
