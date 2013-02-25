@@ -29,6 +29,7 @@ class QTreeWidgetItem;
 class pqOutputPort;
 class pqRepresentation;
 class vtkPVCompositeDataInformation;
+class vtkEventQtSlotConnect;
 
 class PQCOMPONENTS_EXPORT pqMultiBlockInspectorPanel : public QWidget
 {
@@ -50,6 +51,12 @@ private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
   void toggleBlockVisibility(QAction *action);
   void blockItemChanged(QTreeWidgetItem *item, int column);
+  void updateTreeWidgetBlockVisibilities();
+  void updateTreeWidgetBlockVisibilities(
+    vtkPVCompositeDataInformation *iter,
+    QTreeWidgetItem *parent,
+    unsigned int &flatIndex,
+    bool visibility);
 
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
@@ -57,10 +64,6 @@ private:
   void setBlockVisibility(unsigned int index, bool visible);
   void clearBlockVisibility(unsigned int index);
   void updateBlockVisibilities();
-  void updateBlockVisibilities(vtkPVCompositeDataInformation *iter,
-                               QTreeWidgetItem *parent,
-                               unsigned int &flatIndex,
-                               bool visibility);
   void buildTree(vtkPVCompositeDataInformation *iter,
                  QTreeWidgetItem *parent,
                  unsigned int &flatIndex);
@@ -71,6 +74,7 @@ private:
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   QMap<unsigned int, bool> BlockVisibilites;
+  vtkEventQtSlotConnect *VisibilityPropertyListener;
 };
 
 #endif // __pqMultiBlockInspectorPanel_h

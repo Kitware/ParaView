@@ -17,12 +17,14 @@
 
 #include "pqActiveObjects.h"
 #include "pqOutputPort.h"
+#include "pqUndoStack.h"
 #include "vtkSMProxy.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "pqTreeWidgetSelectionHelper.h"
+#include "vtkEventQtSlotConnect.h"
 
 #include <QMenu>
 #include <QHeaderView>
@@ -40,6 +42,8 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
 
   pqTreeWidgetSelectionHelper *treeSelectionHelper =
     new pqTreeWidgetSelectionHelper(this->TreeWidget);
+
+  this->VisibilityPropertyListener = vtkEventQtSlotConnect::New();
 
   QVBoxLayout *layout_ = new QVBoxLayout;
   layout_->addWidget(this->TreeWidget);
@@ -62,6 +66,7 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
 
 pqMultiBlockInspectorPanel::~pqMultiBlockInspectorPanel()
 {
+  this->VisibilityPropertyListener->Delete();
 }
 
 void pqMultiBlockInspectorPanel::setOutputPort(pqOutputPort *port)
@@ -104,7 +109,21 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
     return;
     }
 
+  // disconnect from previous representation
+  this->VisibilityPropertyListener->Disconnect();
+
   this->Representation = representation;
+
+  if(this->Representation)
+    {
+    vtkSMProxy *proxy = this->Representation->getProxy();
+    vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
+
+    this->VisibilityPropertyListener->Connect(property_,
+                                              vtkCommand::ModifiedEvent,
+                                              this,
+                                              SLOT(updateTreeWidgetBlockVisibilities()));
+    }
 }
 
 void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
@@ -184,6 +203,12 @@ void pqMultiBlockInspectorPanel::updateInformation()
                     rootItem,
                     flat_index);
 
+    // expand root item
+    this->TreeWidget->expandItem(rootItem);
+
+    // update visibilities
+    this->updateTreeWidgetBlockVisibilities();
+
     this->TreeWidget->blockSignals(false);
     }
 }
@@ -219,6 +244,7 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 
   if(property_)
     {
+    BEGIN_UNDO_SET("Change Block Properties");
     vtkSMIntVectorProperty *ivp =
       vtkSMIntVectorProperty::SafeDownCast(property_);
 
@@ -226,6 +252,31 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
     ivp->SetElements(&vector[0]);
 
     proxy->UpdateVTKObjects();
+    END_UNDO_SET();
+    }
+
+  this->updateTreeWidgetBlockVisibilities();
+}
+
+void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
+{
+  if(!this->Representation)
+    {
+    return;
+    }
+
+  // update BlockVisibility map from vtk property
+  vtkSMProxy *proxy = this->Representation->getProxy();
+  vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property_);
+  this->BlockVisibilites.clear();
+
+  if(ivp)
+    {
+    for(vtkIdType i = 0; i < ivp->GetNumberOfElements(); i += 2)
+      {
+      this->BlockVisibilites[ivp->GetElement(i)] = ivp->GetElement(i+1);
+      }
     }
 
   // update ui
@@ -246,15 +297,15 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
     unsigned int flat_index = 0;
     QTreeWidgetItem *rootItem =
       this->TreeWidget->invisibleRootItem()->child(0);
-    this->updateBlockVisibilities(compositeInfo,
-                                  rootItem,
-                                  flat_index,
-                                  true);
+    this->updateTreeWidgetBlockVisibilities(compositeInfo,
+                                            rootItem,
+                                            flat_index,
+                                            true);
     this->TreeWidget->blockSignals(false);
     }
 }
 
-void pqMultiBlockInspectorPanel::updateBlockVisibilities(
+void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities(
   vtkPVCompositeDataInformation *info, QTreeWidgetItem *parent_,
   unsigned int &flatIndex, bool parentVisibility)
 {
@@ -279,10 +330,10 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities(
 
       if(compositeChildInfo->GetDataIsComposite())
         {
-        this->updateBlockVisibilities(compositeChildInfo,
-                                      item,
-                                      flatIndex,
-                                      visibility);
+        this->updateTreeWidgetBlockVisibilities(compositeChildInfo,
+                                                item,
+                                                flatIndex,
+                                                visibility);
         }
       }
     }
