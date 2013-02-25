@@ -19,7 +19,7 @@
             function connect() {
                 // Mobiles does not support secured web sockets
                 if(paraview.isMobile || location.protocol == "http:") {
-                    pv.connection.wampURL = pv.connection.wampURL.replace("wss:","ws:");
+                    pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
                 }
                 
                 paraview.connect(pv.connection,
@@ -75,7 +75,7 @@
                 }, function(reply){
                     $("#loading").hide();
                     alert("The remote session did not properly start. Try to use embeded url.");
-                    pv.connection = {wampURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
+                    pv.connection = {sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
                     connect();
                 });
                     

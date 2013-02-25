@@ -62,7 +62,7 @@
      */
     /**
      * @member pv.Connection
-     * @property {String} wampURL
+     * @property {String} sessionURL
      * The websocket URL that should be used to connect to the running
      * visualization session.
      */

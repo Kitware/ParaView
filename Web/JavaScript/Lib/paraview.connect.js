@@ -56,13 +56,13 @@
      * part if any.
      *
      *      connection = {
-     *          wampURL: "http://localhost:8080/ws"
+     *          sessionURL: "http://localhost:8080/ws"
      *      }
      *
      *      get extended to once the readyCallback get called:
      *
      *      connection = {
-     *          wampURL: "http://localhost:8080/ws",
+     *          sessionURL: "http://localhost:8080/ws",
      *          session: {pv.Session}
      *      }
      *
@@ -92,17 +92,17 @@
      *      );
      */
     function connect(connection, readyCallback, closeCallback) {
-        var wsuri = connection.wampURL, onReady = readyCallback, onClose = closeCallback;
+        var wsuri = connection.sessionURL, onReady = readyCallback, onClose = closeCallback;
         GLOBAL.ab.connect(wsuri, function (session) {
             session.prefix("pv", "http://paraview.org/pv#");
             session.prefix("event", "http://paraview.org/event#");
             connection.session = session;
-            connections[connection.wampURL] = connection;
+            connections[connection.sessionURL] = connection;
             if (onReady) {
                 onReady(connection);
             }
         }, function (code, reason) {
-            delete connections[connection.wampURL];
+            delete connections[connection.sessionURL];
             if (onClose) {
                 onClose(code, reason);
             }
@@ -114,13 +114,13 @@
      *
      * @member paraview.connect
      *
-     * @param {String} wampURL
-     * The wampURL String.
+     * @param {String} sessionURL
+     * The sessionURL String.
      *
      * @return {pv.Connection} that contains a {@link pv.Session}
      */
-    function getConnection(wampURL) {
-        return connections[wampURL];
+    function getConnection(sessionURL) {
+        return connections[sessionURL];
     }
 
     /**

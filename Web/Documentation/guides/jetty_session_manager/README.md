@@ -63,7 +63,7 @@ will need to create a configuration file as follows, named pw-config.properties.
     pw.process.launcher.wait.keyword=Starting factory
     pw.process.launcher.wait.timeout=10000
 
-    pw.session.public.fields=id,wampURL,name,description,host,port,url,application,idleTimeout,startTime
+    pw.session.public.fields=id,sessionURL,name,description,host,port,url,application,idleTimeout,startTime
     pw.session.max=10
 
 The following section of the configuration file will determine your setup and what
