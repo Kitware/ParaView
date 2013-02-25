@@ -22,6 +22,7 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "pqTreeWidgetSelectionHelper.h"
 
 #include <QMenu>
 #include <QHeaderView>
@@ -36,6 +37,9 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   this->TreeWidget = new QTreeWidget(this);
   this->TreeWidget->setColumnCount(1);
   this->TreeWidget->header()->close();
+
+  pqTreeWidgetSelectionHelper *treeSelectionHelper =
+    new pqTreeWidgetSelectionHelper(this->TreeWidget);
 
   QVBoxLayout *layout_ = new QVBoxLayout;
   layout_->addWidget(this->TreeWidget);
@@ -164,10 +168,22 @@ void pqMultiBlockInspectorPanel::updateInformation()
   if(compositeInfo->GetDataIsComposite())
     {
     this->TreeWidget->blockSignals(true);
-    unsigned int flat_index = 1;
+
+    unsigned int flat_index = 0;
+
+    // create root item
+    QString rootLabel = source->getSMName();
+    QTreeWidgetItem *rootItem =
+      new QTreeWidgetItem(this->TreeWidget->invisibleRootItem(),
+                          QStringList() << rootLabel);
+    rootItem->setData(0, Qt::UserRole, flat_index++);
+    rootItem->setData(0, Qt::CheckStateRole, Qt::Checked);
+
+    // build the rest of the tree
     this->buildTree(compositeInfo,
-                    this->TreeWidget->invisibleRootItem(),
+                    rootItem,
                     flat_index);
+
     this->TreeWidget->blockSignals(false);
     }
 }
@@ -228,13 +244,14 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
     {
     this->TreeWidget->blockSignals(true);
     unsigned int flat_index = 0;
+    QTreeWidgetItem *rootItem =
+      this->TreeWidget->invisibleRootItem()->child(0);
     this->updateBlockVisibilities(compositeInfo,
-                                  this->TreeWidget->invisibleRootItem(),
+                                  rootItem,
                                   flat_index,
                                   true);
     this->TreeWidget->blockSignals(false);
     }
-
 }
 
 void pqMultiBlockInspectorPanel::updateBlockVisibilities(
@@ -273,20 +290,20 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities(
 
 void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoint &)
 {
-  QTreeWidgetItem *item = this->TreeWidget->currentItem();
-  if(!item)
-    {
-    return;
-    }
+  //QTreeWidgetItem *item = this->TreeWidget->currentItem();
+  //if(!item)
+  //  {
+  //  return;
+  //  }
 
-  bool visible = item->data(0, Qt::CheckStateRole).toBool();
+  //bool visible = item->data(0, Qt::CheckStateRole).toBool();
 
-  QMenu menu;
-  menu.addAction(visible ? "Hide" : "Show");
-  menu.addAction("Unset Visibility");
-  connect(&menu, SIGNAL(triggered(QAction*)),
-          this, SLOT(toggleBlockVisibility(QAction*)));
-  menu.exec(QCursor::pos());
+  //QMenu menu;
+  //menu.addAction(visible ? "Hide" : "Show");
+  //menu.addAction("Unset Visibility");
+  //connect(&menu, SIGNAL(triggered(QAction*)),
+  //        this, SLOT(toggleBlockVisibility(QAction*)));
+  //menu.exec(QCursor::pos());
 }
 
 void pqMultiBlockInspectorPanel::toggleBlockVisibility(QAction *action)
