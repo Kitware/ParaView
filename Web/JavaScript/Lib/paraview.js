@@ -1,10 +1,10 @@
 /**
  * ParaViewWeb JavaScript Library.
- * 
+ *
  * This main module just gather into a single namespace all the ParaViewWeb modules.
- * 
+ *
  * @class paraview
- * 
+ *
  * @mixins paraview.launcher
  * @mixins paraview.connect
  * @mixins paraview.viewport

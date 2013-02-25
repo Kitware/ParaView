@@ -1,14 +1,14 @@
 /**
  * ParaViewWeb JavaScript Library.
- * 
+ *
  * This module extend jQuery object to add support for graphical components
  * related to ParaViewWeb usage.
- * 
+ *
  * @class paraview.ui.PipelineBrowser
  */
 (function (GLOBAL, $) {
 
-    var SlideSpeed = 250, 
+    var SlideSpeed = 250,
     DEFAULT_PIPELINE = {
         name: "kitware.com",
         type: 'server',
@@ -88,27 +88,27 @@
         type: 'dataset',
         category: 'source'
     },{
-        name: 'Clip', 
+        name: 'Clip',
         type: 'clip',
         category: 'filter'
     },{
-        name: 'Slice', 
+        name: 'Slice',
         type: 'slice',
         category: 'filter'
     },{
-        name: 'Contour', 
+        name: 'Contour',
         type: 'contour',
         category: 'filter'
     },{
-        name: 'Threshold', 
+        name: 'Threshold',
         type: 'threshold',
         category: 'filter'
     },{
-        name: 'Stream Tracer', 
+        name: 'Stream Tracer',
         type: 'stream',
         category: 'filter'
     },{
-        name: 'Warp', 
+        name: 'Warp',
         type: 'filter',
         category: 'filter'
     }],
@@ -150,9 +150,9 @@
         }]
     }], buffer = null;
 
-    
+
     // ======================= Private helper methods =======================
-    
+
     function createBuffer() {
         var idx = -1, buffer = [];
         return {
@@ -169,9 +169,9 @@
             }
         };
     }
-    
+
     // =============== Search given proxy in the provided tree ===============
-    
+
     function searchProxy(id, listOfProxy) {
         var result = [], i;
         for(i in listOfProxy) {
@@ -185,7 +185,7 @@
         }
         return result;
     }
-    
+
     function getPipelineContainer(obj) {
         var container = obj, i = 0;
         while(container.data('pipeline') === undefined && ++i < 100) {
@@ -193,15 +193,15 @@
         }
         return container;
     }
-    
-    
+
+
     // ======== addFilePanelToBuffer: Fill HTML to global buffer object ========
-    
+
     function addFilePanelToBuffer(fileList, panelClassName, parentClassName) {
         if(fileList === null || fileList === undefined) {
             return;
         }
-        
+
         var childrenList = [], i;
         buffer.append("<ul class='file-panel ");
         buffer.append(panelClassName);
@@ -229,25 +229,25 @@
             buffer.append(fileList[i].name);
             buffer.append("</li>");
         }
-        
+
         buffer.append("</ul>");
-        
+
         // Add all child panels
         for(i in childrenList) {
             addFilePanelToBuffer(childrenList[i].children, childrenList[i].id, panelClassName);
         }
     }
-    
+
     // ======== addSourcesToBuffer: Fill HTML to global buffer object ========
-    
+
     function addSourcesToBuffer(sourceList) {
         if(sourceList === undefined || sourceList === null) {
             return;
         }
-        
+
         // Build proxy line
         var i, item;
-        
+
         buffer.append("<ul>");
         for(i in sourceList) {
             item = sourceList[i];
@@ -261,15 +261,15 @@
         }
         buffer.append("</ul>");
     }
-    
+
     // === hasChild(proxy): Return true if proxy.children.lenght > 0 and exist
-    
+
     function hasChild(proxy) {
         return (proxy && proxy.hasOwnProperty("children") && proxy.children.length > 0);
     }
-    
+
     // ======== addPipelineToBuffer: Fill HTML to global buffer object ========
-    
+
     function addPipelineToBuffer(title, data) {
         // Build header
         buffer.append("<div class='pipeline-header'><span class='title'>");
@@ -279,21 +279,21 @@
         buffer.append("<div class='pipeline-tree'>");
         addProxyToBuffer(data.pipeline, hasChild(data.pipeline), true);
         buffer.append("</div>");
-        
+
         // Build file selector
         buffer.append("<div class='pipeline-files'>");
         addFilePanelToBuffer(data.files, "ROOT", null);
         buffer.append("</div>");
-        
+
         // Build source/filter selector
         buffer.append("<div class='pipeline-add'>");
         addSourcesToBuffer(data.sources);
         buffer.append("</div>");
     }
-    
-    
+
+
     // ==== addProxyToBuffer: Add a proxy with its children to the buffer ====
-    
+
     function addProxyToBuffer(proxy, isLastChild, isRoot) {
         if(proxy === undefined || proxy === null) {
             return;
@@ -324,18 +324,18 @@
         }
         buffer.append("</li>");
     }
-    
+
     // ==== addProxySummaryToBuffer: Add Proxy control line to the buffer ====
-    
+
     function addProxySummaryToBuffer(proxy) {
         if(!proxy.hasOwnProperty('proxy_id')) {
             buffer.append(proxy.name);
-            return;  
+            return;
         }
 
         // Add default empty valid field if missing
         // TODO... $.extend(...)
-        
+
         // Build proxy line
         var i, currentValue;
         buffer.append(proxy.name);
@@ -373,23 +373,23 @@
         buffer.append("'></div>");
         buffer.append("</span>");
     }
-    
+
     // ============= Initialize Pipeline (Listener + Visibility) =============
-    
+
     function initialize (container) {
         // Main panel containers
         var pipelineView = $('.pipeline-tree', container),
         algoView = $('.pipeline-add', container),
         fileView = $('.pipeline-files', container);
-        
+
         // Update visibility
         algoView.hide();
         fileView.hide();
-        
+
         // ===================================================================
         // Delete should behave like:
         // (a) In Pipeline view
-        //     (aa) if proxy selected and delete not disable: 
+        //     (aa) if proxy selected and delete not disable:
         //          => trigger event to delete proxy
         //     (ab) if no proxy selected: nothing
         //     (ac) if the selection/no-selection can not be deleted the icon
@@ -397,7 +397,7 @@
         // (b) In any other view mode (File or Source) that should switch back
         //     to the Pipeline view.
         // ===================================================================
-        
+
         $(".delete",container).click(function(){
             // (a)
             if(pipelineView.is(":visible")) {
@@ -410,13 +410,13 @@
                 returnToPipelineBrowser(pipelineView, algoView, fileView);
             }
         });
-        
+
         // ===================================================================
         // Add should behave like:
-        // 
+        //
         // (c) If the button is not disable
         //    (ca) In Pipeline view
-        //        (caa) if active proxy => Show source list with the filter category 
+        //        (caa) if active proxy => Show source list with the filter category
         //        (cab) if no proxy selected => Show only the sources in source list
         //    (cb) In any other view mode (File or Pipeline) that should switch
         //         back to the Pipeline view.
@@ -444,17 +444,17 @@
                 }
             }
         });
-        
+
         // ===================================================================
         // Files should behave like:
-        // 
+        //
         // (d) If the button is not disable
         //    (da) In Pipeline view
         //        (daa) Show the file list at root
         //    (db) In any other view mode (File or Pipeline) that should switch
-        //         back to the Pipeline view. 
+        //         back to the Pipeline view.
         // ===================================================================
-           
+
         $(".files",container).click(function(){
             if(!$(this).hasClass("disable")) {
                 // (d)
@@ -471,16 +471,16 @@
                 }
             }
         });
-        
+
         // ===================================================================
         // Inside File browser view
         // ===================================================================
-        
+
         $(".open-file", container).click(function() {
             returnToPipelineBrowser(pipelineView, algoView, fileView);
             fireOpenFile(container, $(this).attr('path'));
         });
-        
+
         $(".menu-link", container).click(function() {
             var me = $(this);
             var menuToShow = $("." + me.attr('link'));
@@ -488,11 +488,11 @@
                 menuToShow.show('slide',250);
             });
         });
-        
+
         // ===================================================================
         // Inside Source/Algo view
         // ===================================================================
-        
+
         $(".pipeline-add .action", container).click(function(){
             returnToPipelineBrowser(pipelineView, algoView, fileView);
             var me = $(this);
@@ -500,11 +500,11 @@
             var parentId = (me.attr('category') === 'filter' && proxy) ? proxy.proxy_id : null;
             fireAddSource(container, me.text(), parentId);
         });
-        
+
         // ===================================================================
         // Inside Pipeline view
         // ===================================================================
-        
+
         $(".scalarbar", container).click( function() {
             var me = $(this).toggleClass("active");
             var proxyId = me.parent().parent().attr("proxy_id");
@@ -514,9 +514,9 @@
                 fireProxyChange(container, proxy, 'showScalarBar');
             }
         });
-        
+
         $(".representation", container).click(selectRepresentation);
-        
+
         $('.data-array', container).change(function(){
             var me = $(this),
             id = me.parent().parent().attr("proxy_id"),
@@ -526,23 +526,23 @@
                 fireProxyChange(container, proxy, 'activeData');
             }
         });
-        
+
         $(".proxy", container).click(function(){
             // Handle style classes
             $(".proxy").removeClass('active');
             $(".proxy-control").removeClass('active');
             $('.proxy-control', this).addClass('active').parent().addClass('active');
-            
+
             // Handle active proxy
             var id = $(this).attr('proxy_id'),
             proxy = container.getProxy(id),
             activeProxy = container.getProxy();
-            
+
             if(proxy !== activeProxy){
                 container.data('active_proxy', proxy);
                 fireProxySelected(container, proxy);
             }
-            
+
             // Handle delete disable attribute (ac)
             if(proxy === null || hasChild(proxy)) {
                 $('.pipeline-header .delete', container).addClass("disable");
@@ -551,17 +551,17 @@
             }
         });
     }
-    
+
     // =======================================================================
-    
+
     /**
      * Graphical component use to show and interact with the ParaViewWeb
      * pipeline.
-     * 
+     *
      * @member paraview.ui.PipelineBrowser
      * @method pipelineBrowser
      * @param {pv.PipelineBrowserConfig} options
-     * 
+     *
      * Usage:
      *      $('.pipeline-container-div').pipelineBrowser({
      *          session: sessionObj,
@@ -573,32 +573,32 @@
     $.fn.pipelineBrowser = function(options) {
         return this.each(function(options) {
             var me = $(this).empty().addClass('pipelineBrowser'), opts;
-            
+
             // Initialize global html buffer
             if (buffer === null) {
                 buffer = createBuffer();
             }
             buffer.clear();
-            
+
             // Handle data with default values
             opts = $.extend({},$.fn.pipelineBrowser.defaults, options);
-            
+
             // Fill buffer with pipeline HTML
             addPipelineToBuffer("Pipeline", opts);
-            
+
             // Update DOM
             me.data('pipeline', opts);
             me[0].innerHTML = buffer.toString();
-            
+
             // Initialize pipelineBrowser (Visibility + listeners)
             initialize(me);
         });
     };
-    
+
     /**
      * @class pv.PipelineBrowserConfig
      * Configuration object used to create a Pipeline Browser Widget.
-     * 
+     *
      *     DEFAULT_VALUES = {
      *       session: null,
      *       pipeline: DEFAULT_PIPELINE,
@@ -632,7 +632,7 @@
          */
         files: DEFAULT_FILES
     };
-    
+
     /**
      * Method used to retreive a proxy from the Pipeline browser.
      * If the proxyId is null/undefined the selected proxy will be returned.
@@ -641,12 +641,12 @@
      * @method getProxy
      * @param {Number|undefined|null} proxyId
      * @return {pv.Proxy} proxy that have the given id or null if not found.
-     * 
+     *
      * Usage:
      *      var selectedProxy = $('.pipeline-container-div').getProxy();
      *      var proxy = $('.pipeline-container-div').getProxy(1234);
      */
-    
+
     $.fn.getProxy = function(proxyId) {
         if(proxyId === null || proxyId === undefined) {
             return $(this).data('active_proxy');
@@ -658,7 +658,7 @@
         }
         return null;
     };
-    
+
     // ======================= Listener helper functions =======================
 
     function returnToPipelineBrowser(pipelineView, algoView, fileView) {
@@ -666,14 +666,14 @@
             // (b)
             algoView.hide('slide', SlideSpeed, function(){
                 pipelineView.show('slide', SlideSpeed, function(){
-                    // init what need to be init under the cover 
+                    // init what need to be init under the cover
                     });
             });
         } else if(fileView.is(":visible")) {
             // (b)
             fileView.hide('slide', SlideSpeed, function(){
                 pipelineView.show('slide', SlideSpeed, function(){
-                    // init what need to be init under the cover 
+                    // init what need to be init under the cover
                     $('.file-panel', fileView).hide();
                 });
             });
@@ -681,7 +681,7 @@
     }
 
     // =========================================================================
-    
+
     function selectRepresentation() {
         $(this).removeClass('hide outline wireframe surface surface_edge').unbind('click').bind('click', chooseRepresentation);
     }
@@ -695,16 +695,16 @@
         className = ['hide','outline','wireframe','surface','surface_edge'][Math.floor(pos)],
         id = me.addClass(className).unbind('click').bind('click', selectRepresentation).parent().parent().attr("proxy_id"),
         proxy = container.getProxy(id);
-        
+
         // Update proxy field
         proxy.representation = className;
-        
+
         fireProxyChange(container, container.getProxy(id), 'representation');
     }
-    
-    
+
+
     // ========================== Event fire methods ==========================
-    
+
     /**
      * Event that get triggered when a Proxy get deleted.
      * @member paraview.ui.PipelineBrowser
@@ -714,12 +714,12 @@
      */
     function fireDeleteProxy(container, proxy) {
         container.trigger({
-            type: 'deleteProxy', 
+            type: 'deleteProxy',
             proxy_id: proxy.proxy_id,
             proxy: proxy
         });
     }
-    
+
     /**
      * Event that get triggered when a request for a new file open is made.
      * @member paraview.ui.PipelineBrowser
@@ -729,11 +729,11 @@
      */
     function fireOpenFile(container, filePath) {
         container.trigger({
-            type: 'openFile', 
+            type: 'openFile',
             path: filePath
         });
     }
-    
+
     /**
      * Event that get triggered when a source or a filter is getting added.
      * @member paraview.ui.PipelineBrowser
@@ -745,15 +745,15 @@
      */
     function fireAddSource(container, algoName, parent) {
         container.trigger({
-            type: 'addSource', 
+            type: 'addSource',
             name: algoName,
             parent: parent
         });
     }
-    
+
     /**
      * Event triggered when a Proxy has changed.
-     * 
+     *
      * @member paraview.ui.PipelineBrowser
      * @event proxyModified
      * @param {pv.Proxy} proxy
@@ -763,12 +763,12 @@
      */
     function fireProxyChange(container, proxy, fieldName) {
         container.trigger({
-            type: 'proxyModified', 
+            type: 'proxyModified',
             proxy: proxy,
             field: fieldName
         });
     }
-    
+
     /**
      * Event triggered when selection change in the Pipeline browser.
      * @member paraview.ui.PipelineBrowser
@@ -778,9 +778,9 @@
      */
     function fireProxySelected(container, proxy) {
         container.trigger({
-            type: 'proxySelected', 
+            type: 'proxySelected',
             proxy: proxy
         });
     }
-    
+
 }(window, jQuery));

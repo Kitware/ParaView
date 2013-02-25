@@ -1,8 +1,8 @@
 /**
  * ParaViewWeb JavaScript Library.
- * 
+ *
  * This module focus on performance statistics.
- * 
+ *
  * @class paraview.statistics
  */
 (function (GLOBAL, $) {
@@ -16,7 +16,7 @@
      * viewport. The returned object can be used to obtain various statistics
      * about the viewport's performance such as frame-rate, average size of
      * images delivered, etc.
-     * 
+     *
      * @param {pv.Viewport} viewport
      * Viewport to monitor.
      *
@@ -50,21 +50,21 @@
             renderTime = ms;
             counter += 1;
         }
-        
+
         function roundTripEvent(event) {
             roundTripTime = event.time;
             maxRoundTripTime = (roundTripTime > maxRoundTripTime) ? roundTripTime : maxRoundTripTime;
         }
-        
+
         function serverProcessingEvent(event) {
             serverProcessingTime = event.time;
             maxServerProcessingTime = (serverProcessingTime > maxServerProcessingTime) ? serverProcessingTime : maxServerProcessingTime;
         }
-        
+
         function startLoading() {
             trueLoadTimeStart = new Date().getTime();
         }
-        
+
         function stopLoading() {
             trueLoadTime = new Date().getTime() - trueLoadTimeStart;
         }

@@ -1,10 +1,10 @@
 /**
  * ParaViewWeb JavaScript Library.
- * 
+ *
  * This module allow the Web client to create viewport to ParaView views.
  * Those viewport are interactive windows that are used to render 2D/3D content
  * and response to user mouse interactions.
- * 
+ *
  * @class paraview.viewport
  */
 (function (GLOBAL, $) {
@@ -12,7 +12,7 @@
     /**
      * @class pv.ViewPortConfig
      * Configuration object used to create a viewport.
-     * 
+     *
      *     DEFAULT_VALUES = {
      *       useCanvas: true,
      *       view: -1,
@@ -28,7 +28,7 @@
          * True by default to benefit of HTML5 Canvas tag. If turned off, then
          * basic image tag will be used. But such tag seems to induce flickering
          * inside Firefox.
-         * 
+         *
          * Default: true
          */
         useCanvas: true,
@@ -37,7 +37,7 @@
          * @property {Number} view
          * Specify the GlobalID of the view that we want to render. By default,
          * set to -1 to the active view will be used.
-         * 
+         *
          * Default: -1
          */
         view: -1,
@@ -45,8 +45,8 @@
          * @member pv.ViewPortConfig
          * @property {Boolean} enableInteractions
          * Enable by default the user intaration but any mouse interaction can
-         * be disable if needed. 
-         * 
+         * be disable if needed.
+         *
          * Default: true
          */
         enableInteractions: true,
@@ -55,7 +55,7 @@
          * @property {Number} interactiveQuality
          * Compression quality that should be used to encode the image on the
          * server side while interacting.
-         * 
+         *
          * Default: 30
          */
         interactiveQuality: 30,
@@ -63,26 +63,26 @@
          * @member pv.ViewPortConfig
          * @property {Number} stillQuality
          * Compression quality that should be used to encode the image on the
-         * server side when we stoped interacting. 
-         * 
+         * server side when we stoped interacting.
+         *
          * Default: 100
          */
         stillQuality: 100
-           
+
     }, module = {};
 
     /**
      * Create a new viewport for a ParaView View.
      * The options are defined by {@link pv.ViewPortConfig}.
-     * 
+     *
      * @member paraview.viewport
-     * 
+     *
      * @param {Object} session
      * [Autobahn](http://autobahn.ws/js) session object.
-     * 
+     *
      * @param {pv.ViewPortConfig} options
      * Configure the viewport to create the way we want.
-     * 
+     *
      * @return {pv.Viewport}
      */
     function createViewport(session, options) {
@@ -162,7 +162,7 @@
                  * @class request.Render
                  * Container Object that provide all the input needed to request
                  * a rendering from the server side.
-                 * 
+                 *
                  *      {
                  *        size: [width, height], // Size of the image to generate
                  *        view: 234523,          // View proxy globalId
@@ -297,7 +297,7 @@
                         bgImage.width  = res.size[0];
                         bgImage.height = res.size[1];
                         bgImage.src = "data:image/" + res.format  + "," + res.image;
-                        
+
                         /**
                          * @member pv.Viewport
                          * @event render-end
@@ -309,7 +309,7 @@
                             view: Number(config.view)
                         });
 
-                        /** 
+                        /**
                          * @member pv.Viewport
                          * @event round-trip
                          * @param {Number} time
@@ -320,7 +320,7 @@
                             type: "round-trip",
                             time: Number(new Date().getTime() - res.localTime) - res.workTime
                         });
-                        
+
                         /**
                          * @member pv.Viewport
                          * @event server-processing
@@ -356,7 +356,7 @@
              * @class request.InteractionEvent
              * Container Object used to encapsulate MouseEvent status
              * formated in an handy manner for ParaView.
-             * 
+             *
              *     {
              *       view         : 23452345, // View proxy globalId
              *       action       : "down",   // Enum["down", "up", "move"]
@@ -380,7 +380,7 @@
                  * @member request.InteractionEvent
                  * @property {String}  action
                  * Type of mouse action and can only be one of:
-                 * 
+                 *
                  * - down
                  * - up
                  * - move
@@ -499,7 +499,7 @@
                 renderStatistics();
             }
         }
-        
+
         // Extend touch event to mockup normal mouse event
         function addTouchSupport(event) {
             if (event.which === 0) {
@@ -521,7 +521,7 @@
             viewport.bind("contextmenu click", function (evt) {
                 evt.preventDefault();
             });
-            
+
             viewport.bind(headEvent + "mousedown", function (evt) {
                 evt = addTouchSupport(evt);
                 current_button = evt.which;
@@ -549,17 +549,17 @@
              */
             /**
              * Attach viewport to a DOM element
-             * 
+             *
              * @member pv.Viewport
              * @param {String} selector
              * The will be used internally to get the jQuery associated element
-             * 
+             *
              *     <div class="renderer"></div>
              *     viewport.bind(".renderer");
-             *     
+             *
              *     <div id="renderer"></div>
              *     viewport.bind("#renderer");
-             *     
+             *
              *     <html>
              *       <body>
              *         <!-- renderer -->
@@ -599,7 +599,7 @@
             },
             /**
              * Reset the camera for the given view
-             * 
+             *
              * @member pv.Viewport
              * @param {Function} ondone Function to call after rendering is complete.
              */
