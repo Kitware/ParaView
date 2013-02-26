@@ -26,6 +26,19 @@ from autobahn.wamp import WampServerFactory
 from paraview import simple
 from vtkParaViewWebCorePython import vtkPVWebApplication,\
                                      vtkPVWebInteractionEvent
+from webgl import WebGLResource
+
+# Utility functions
+def mapIdToProxy(id):
+    """
+    Maps global-id for a proxy to the proxy instance. May return None if the
+    id is not valid.
+    """
+    id = int(id)
+    if id <= 0:
+        return None
+    return simple.servermanager._getPyProxy(\
+            simple.servermanager.ActiveConnection.Session.GetRemoteObject(id))
 
 class ServerProtocol(WampServerProtocol):
     """
@@ -101,19 +114,8 @@ class ServerProtocol(WampServerProtocol):
             argument.has_key("__jsonclass__") and \
             argument["__jsonclass__"] == "Proxy":
             id = int(argument["__selfid__"])
-            return self.mapIdToProxy(id)
+            return mapIdToProxy(id)
         return argument
-
-    def mapIdToProxy(self, id):
-        """
-        Maps global-id for a proxy to the proxy instance. May return None if the
-        id is not valid.
-        """
-        id = int(id)
-        if id <= 0:
-            return None
-        return simple.servermanager._getPyProxy(\
-                simple.servermanager.ActiveConnection.Session.GetRemoteObject(id))
 
     def onConnect(self, connection_request):
         """
@@ -165,7 +167,7 @@ class ParaViewServerProtocol(ServerProtocol):
         RPC Callback to render a view and obtain the rendered image.
         """
         beginTime = int(round(ParaViewServerProtocol.time.time() * 1000))
-        view = self.mapIdToProxy(options['view'])
+        view = mapIdToProxy(options['view'])
         if not view:
             # Use active view is none provided.
             view = simple.GetActiveView()
@@ -204,7 +206,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC Callback for mouse interactions.
         """
-        view = self.mapIdToProxy(event['view'])
+        view = mapIdToProxy(event['view'])
         if not view:
             view = simple.GetActiveView()
         if not view:
@@ -243,7 +245,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC callback to reset camera.
         """
-        view = self.mapIdToProxy(view)
+        view = mapIdToProxy(view)
         if not view:
             view = simple.GetActiveView()
         if not view:
@@ -341,7 +343,6 @@ def start(argv=None,
     args = parser.parse_args(argv)
     start_webserver(options=args, protocol=protocol)
 
-
 def start_webserver(options, protocol=ParaViewServerProtocol, disableLogging=False):
     """
     Starts the web-server with the given protocol. Options must be an object
@@ -367,7 +368,12 @@ def start_webserver(options, protocol=ParaViewServerProtocol, disableLogging=Fal
     root = File(options.content)
     root.putChild("ws", wsResource)
 
+
+    webgl = WebGLResource()
+    root.putChild("WebGL", webgl);
+
     site = Site(root)
+
     reactor.listenTCP(options.port, site)
 
     wampFactory.startFactory()
