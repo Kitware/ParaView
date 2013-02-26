@@ -636,6 +636,7 @@ void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->DataType;
   *css << this->NumberOfTuples;
   *css << this->NumberOfComponents;
+  *css << this->IsPartial;
 
   // Range of each component.
   int num = this->NumberOfComponents;
@@ -713,16 +714,23 @@ void vtkPVArrayInformation::CopyFromStream(const vtkClientServerStream* css)
     num++;
     }
 
+  // Is Partial
+  if (!css->GetArgument(0, 4, &this->IsPartial))
+    {
+    vtkErrorMacro("Error parsing IsPartial from message.");
+    return;
+    }
+
   // Range of each component.
   for (int i = 0; i < num; ++i)
     {
-    if (!css->GetArgument(0, 4 + i, this->Ranges + 2 * i, 2))
+    if (!css->GetArgument(0, 5 + i, this->Ranges + 2 * i, 2))
       {
       vtkErrorMacro("Error parsing range of component.");
       return;
       }
     }
-  int pos = 4 + num;
+  int pos = 5 + num;
   int numOfComponentNames;
   if (!css->GetArgument(0, pos++, &numOfComponentNames))
     {
