@@ -25,6 +25,10 @@
 #include "vtkSMIntVectorProperty.h"
 #include "pqTreeWidgetSelectionHelper.h"
 #include "vtkEventQtSlotConnect.h"
+#include "pqSelectionManager.h"
+#include "vtkSelection.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QMenu>
 #include <QHeaderView>
@@ -55,6 +59,16 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
                 this, SLOT(setOutputPort(pqOutputPort*)));
   this->connect(activeObjects, SIGNAL(representationChanged(pqRepresentation*)),
                 this, SLOT(setRepresentation(pqRepresentation*)));
+
+  // listen to selection changes
+  pqSelectionManager *selectionManager =
+    qobject_cast<pqSelectionManager*>(
+      pqApplicationCore::instance()->manager("SelectionManager"));
+  if(selectionManager)
+    {
+    this->connect(selectionManager, SIGNAL(selectionChanged(pqOutputPort*)),
+                  this, SLOT(currentSelectionChanged(pqOutputPort*)));
+    }
 
   // connect to right-click signals in the tree widget
   this->TreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -407,5 +421,36 @@ void pqMultiBlockInspectorPanel::unsetChildVisibilities(QTreeWidgetItem *parent_
     unsigned int flatIndex = child->data(0, Qt::UserRole).value<unsigned int>();
     this->BlockVisibilites.remove(flatIndex);
     unsetChildVisibilities(child);
+    }
+}
+
+void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
+{
+  if(!port)
+    {
+    return;
+    }
+
+  vtkSMSourceProxy *activeSelection = port->getSelectionInput();
+  if(!activeSelection ||
+     strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") != 0)
+    {
+    return;
+    }
+
+  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+  std::vector<vtkIdType> block_ids;
+  block_ids.resize(blocksProp.GetNumberOfElements());
+  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  std::sort(block_ids.begin(), block_ids.end());
+
+  foreach(QTreeWidgetItem *item,
+          this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
+    {
+    unsigned int flatIndex =
+      item->data(0, Qt::UserRole).value<unsigned int>();
+
+    item->setSelected(
+      std::binary_search(block_ids.begin(), block_ids.end(), flatIndex));
     }
 }

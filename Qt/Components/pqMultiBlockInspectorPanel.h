@@ -57,6 +57,7 @@ private slots:
     QTreeWidgetItem *parent,
     unsigned int &flatIndex,
     bool visibility);
+  void currentSelectionChanged(pqOutputPort *port);
 
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
