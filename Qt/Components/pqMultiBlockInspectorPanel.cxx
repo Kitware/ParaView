@@ -29,6 +29,8 @@
 #include "vtkSelection.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QMenu>
 #include <QHeaderView>
@@ -46,6 +48,9 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
 
   pqTreeWidgetSelectionHelper *treeSelectionHelper =
     new pqTreeWidgetSelectionHelper(this->TreeWidget);
+
+  this->connect(this->TreeWidget, SIGNAL(itemSelectionChanged()),
+                this, SLOT(currentTreeItemSelectionChanged()));
 
   this->VisibilityPropertyListener = vtkEventQtSlotConnect::New();
 
@@ -444,6 +449,8 @@ void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
   blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
   std::sort(block_ids.begin(), block_ids.end());
 
+  this->TreeWidget->blockSignals(true);
+
   foreach(QTreeWidgetItem *item,
           this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
     {
@@ -453,4 +460,51 @@ void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
     item->setSelected(
       std::binary_search(block_ids.begin(), block_ids.end(), flatIndex));
     }
+
+  this->TreeWidget->blockSignals(false);
+}
+
+void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
+{
+  // create vector of selected block ids
+  std::vector<vtkIdType> blockIds;
+  foreach(const QTreeWidgetItem *item, this->TreeWidget->selectedItems())
+    {
+    unsigned int flatIndex =
+      item->data(0, Qt::UserRole).value<unsigned int>();
+
+    blockIds.push_back(flatIndex);
+    }
+
+  // create block selection source proxy
+  vtkSMSessionProxyManager *proxyManager =
+    vtkSMProxyManager::GetProxyManager()->GetActiveSessionProxyManager();
+
+  vtkSMProxy* selectionSource =
+    proxyManager->NewProxy("sources", "BlockSelectionSource");
+
+  // set selected blocks
+  vtkSMPropertyHelper(selectionSource, "Blocks").Set(&blockIds[0], blockIds.size());
+  selectionSource->UpdateVTKObjects();
+
+  vtkSMSourceProxy *selectionSourceProxy =
+    vtkSMSourceProxy::SafeDownCast(selectionSource);
+
+  // set the selection
+  this->OutputPort->setSelectionInput(selectionSourceProxy, 0);
+
+  // update the selection manager
+  pqSelectionManager *selectionManager =
+    qobject_cast<pqSelectionManager*>(
+      pqApplicationCore::instance()->manager("SelectionManager"));
+  if(selectionManager)
+    {
+    selectionManager->select(this->OutputPort);
+    }
+
+  // delete the selection source
+  selectionSourceProxy->Delete();
+
+  // update the views
+  this->OutputPort->renderAllViews();
 }
