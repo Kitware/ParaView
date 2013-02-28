@@ -431,21 +431,19 @@ void pqMultiBlockInspectorPanel::unsetChildVisibilities(QTreeWidgetItem *parent_
 
 void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
 {
-  if(!port)
-    {
-    return;
-    }
-
   // find selected block ids
   std::vector<vtkIdType> block_ids;
 
-  vtkSMSourceProxy *activeSelection = port->getSelectionInput();
-  if(activeSelection &&
-     strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
+  if(port)
     {
-    vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
-    block_ids.resize(blocksProp.GetNumberOfElements());
-    blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+    vtkSMSourceProxy *activeSelection = port->getSelectionInput();
+    if(activeSelection &&
+       strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
+      {
+      vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+      block_ids.resize(blocksProp.GetNumberOfElements());
+      blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+      }
     }
 
   // sort block ids so we can use binary_search

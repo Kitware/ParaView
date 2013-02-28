@@ -168,6 +168,12 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
       this->connect(hideBlockAction, SIGNAL(triggered()),
                     this, SLOT(hideBlock()));
 
+      QAction *unsetVisibilityAction =
+        this->Menu->addAction("Unset Block Visibility");
+      unsetVisibilityAction->setData(blockIndex);
+      this->connect(unsetVisibilityAction, SIGNAL(triggered()),
+                    this, SLOT(unsetBlockVisibility()));
+
       this->Menu->addSeparator();
       }
 
@@ -376,6 +382,36 @@ void pqPipelineContextMenuBehavior::hideBlock()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::unsetBlockVisibility()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  unsigned int blockIndex = action->data().value<unsigned int>();
+
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    panel->clearBlockVisibility(blockIndex);
+    }
+}
+
+//-----------------------------------------------------------------------------
 QString pqPipelineContextMenuBehavior::lookupBlockName(unsigned int flatIndex) const
 {
   // get multi-block inspector panel

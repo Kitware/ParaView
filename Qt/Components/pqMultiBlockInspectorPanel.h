@@ -49,6 +49,7 @@ public slots:
   void setRepresentation(pqRepresentation *representation);
   void updateInformation();
   void setBlockVisibility(unsigned int index, bool visible);
+  void clearBlockVisibility(unsigned int index);
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
@@ -66,7 +67,6 @@ private slots:
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
 
-  void clearBlockVisibility(unsigned int index);
   void updateBlockVisibilities();
   void buildTree(vtkPVCompositeDataInformation *iter,
                  QTreeWidgetItem *parent,

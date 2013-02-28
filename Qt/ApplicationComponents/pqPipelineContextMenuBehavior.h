@@ -69,6 +69,11 @@ protected slots:
   /// contain the block index in its data().
   void hideBlock();
 
+  /// called to unset the visibility flag for the block. after this call the
+  /// block will inherit the visibility from its parent. the action which
+  /// emits the signal will contain the block index in its data()
+  void unsetBlockVisibility();
+
   /// called to change the representation type.
   void reprTypeChanged(QAction* action);
 
