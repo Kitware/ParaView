@@ -436,19 +436,22 @@ void pqMultiBlockInspectorPanel::currentSelectionChanged(pqOutputPort *port)
     return;
     }
 
+  // find selected block ids
+  std::vector<vtkIdType> block_ids;
+
   vtkSMSourceProxy *activeSelection = port->getSelectionInput();
-  if(!activeSelection ||
-     strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") != 0)
+  if(activeSelection &&
+     strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
     {
-    return;
+    vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+    block_ids.resize(blocksProp.GetNumberOfElements());
+    blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
     }
 
-  vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
-  std::vector<vtkIdType> block_ids;
-  block_ids.resize(blocksProp.GetNumberOfElements());
-  blocksProp.Get(&block_ids[0], blocksProp.GetNumberOfElements());
+  // sort block ids so we can use binary_search
   std::sort(block_ids.begin(), block_ids.end());
 
+  // update visibilities in the tree widget
   this->TreeWidget->blockSignals(true);
 
   foreach(QTreeWidgetItem *item,
