@@ -25,7 +25,8 @@ from autobahn.wamp import WampServerFactory
 # import paraview modules.
 from paraview import simple
 from vtkParaViewWebCorePython import vtkPVWebApplication,\
-                                     vtkPVWebInteractionEvent
+                                     vtkPVWebInteractionEvent,\
+                                     vtkPVWebUtilities
 from webgl import WebGLResource
 
 # Utility functions
@@ -63,7 +64,7 @@ class ServerProtocol(WampServerProtocol):
         :type callid: str
         :returns obj -- Result send back to client.
         """
-        log.msg("onAfterCallSuccess", callid, logLevel=logging.DEBUG)
+        #log.msg("onAfterCallSuccess", callid, logLevel=logging.DEBUG)
         result = self.marshall(result)
         return result
         # not sure why the below causes errors.
@@ -84,10 +85,10 @@ class ServerProtocol(WampServerProtocol):
         :type isRegistered: bool
         :returns pair -- Must return URI/Args pair.
         """
-        log.msg("onBeforeCall", callid, uri, args, isRegistered,
-            logLevel=logging.DEBUG)
+        #log.msg("onBeforeCall", callid, uri, args, isRegistered,
+        #    logLevel=logging.DEBUG)
         args = self.unmarshall(args)
-        log.msg("onBeforeCall -- done", logLevel=logging.DEBUG)
+        #log.msg("onBeforeCall -- done", logLevel=logging.DEBUG)
         return uri, args
 
     def marshall(self, argument):
@@ -158,7 +159,6 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         self.registerForRpc(self, "http://paraview.org/pv#")
         self.registerForPubSub("http://paraview.org/event#", True)
-
         pass
 
     @exportRpc("stillRender")

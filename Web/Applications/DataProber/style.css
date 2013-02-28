@@ -1,0 +1,122 @@
+html, body {
+  color: #222222;
+  font-family: Verdana, Aria, Helvetica, sans-serif;
+  font-size: 13px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.fullscreen {
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.lefthalf {
+  display: block;
+  position: absolute;
+  left: 0px;
+  width: 50%;
+}
+
+.righthalf {
+  display: block;
+  position: absolute;
+  left: 50%;
+  width: 50%;
+}
+
+.anchor-bottom-right {
+  position: absolute;
+  bottom: 2px;
+  right : 2px;
+}
+
+.transparent {
+  background-color: transparent;
+}
+
+button {
+  border-radius:6px;
+  border:1px solid #dcdcdc;
+  text-shadow: 0.1em 0.1em 0.2em #555555;
+  padding:6px 12px;
+}
+
+button:hover{
+  background-color: #777777;
+}
+
+button:active {
+  background-color: #999999;
+}
+
+.ui-menu {
+  position: absolute;
+  width: 150px;
+  right: 10px;
+  bottom: 10px;
+}
+
+button.vertical-center {
+  vertical-align: middle;
+}
+
+.position-anchor {
+  position: relative;
+}
+
+.toolbar {
+  width: 100%;
+}
+
+#selectdata {
+  background-image: url("icons/data-folder-icon.png");
+  width: 64px;
+  height: 64px;
+  margin: 5px;
+  padding: 5px;
+}
+
+#showbar {
+  background-image: url("icons/Column-Chart-64x64.png");
+  width: 64px;
+  height: 64px;
+  margin: 5px;
+  padding: 5px;
+}
+
+#showline {
+  background-image: url("icons/Going-up-two-bars-64.png");
+  width: 64px;
+  height: 64px;
+  margin: 5px;
+  padding: 5px;
+}
+
+#togglestats {
+  background-image: url("icons/Window-Performance-64.png");
+  width: 64px;
+  height: 64px;
+  margin: 5px;
+  padding: 5px;
+}
+
+#resetview {
+  background-image: url("icons/View-64.png");
+  width: 64px;
+  height: 64px;
+  margin: 5px;
+  padding: 5px;
+}
+
+button.on {
+  border: 2px solid;
+}
+
+.cvl-label-area {
+  height: 30px;
+}

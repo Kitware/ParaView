@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test page</title>
+  <link rel="stylesheet" href="cvl.css"/>
+  <style type="text/css">
+  body {
+    font-family: Verdana;
+  }
+  </style>
+  <script
+    type="text/javascript"
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js">
+  </script>
+  <script type="text/javascript" src="cvl.js"></script>
+  <script type="text/javascript">
+  var cl;
+  jQuery(document).ready(function () {
+    cl = jQuery.fn.jColumnListView({
+      id:               'cl1',
+      width:            400,
+      columnWidth:      150,
+      columnHeight:     200,
+      columnMargin:     8,
+      paramName:        'columnview',
+      columnNum:        4,
+      appendToId:       't1',
+      elementId:        'categories',
+      removeAfter:      false,
+      columnMinWidth:   120,
+      columnMaxWidth:   200,
+      childIndicator:   true,
+      leafMode: true,
+      onItemChecked: function (ci) { console.log(ci); },
+      onItemUnchecked: function (ci) { console.log(ci); }
+    });
+    jQuery.fn.jColumnListView({
+      id:           'cl2',
+      columnWidth:  120,
+      columnHeight: 180,
+      columnMargin: 5,
+      paramName:    'cview',
+      columnNum:    3,
+      appendToId:   't2',
+      elementId:    'categories',
+      removeAfter:  true,
+      showLabels:   false,
+      useSplitters: false,
+      checkAndClick: true,
+      textFormat:            '%cvl-children-counter% %cvl-text%',
+      childrenCounterFormat: '[%cvl-count%]',
+      emptyChildrenCounter:  false,
+      childIndicator:           true
+    });
+
+    $('#t1-lmode').change(function () {
+      cl.getColumnList().setSplitterLeftMode($('#t1-lmode').is(':checked'));
+    });
+  });
+  </script>
+</head>
+<body>
+
+<p>Column List 1 with splitters</p>
+<div id="t1" style="width: 550px;"></div>
+<p>
+Set Left Mode: <input type="checkbox" id="t1-lmode"/> (Modify only left column)
+</p>
+
+<hr/>
+<p>Column list 2 without labels</p>
+<div id="t2" style="width: 550px"></div>
+
+<ul id="categories" style="display: none">
+  <li>CPU
+    <ul>
+    <li>Intel
+      <ul>
+      <li itemValue="Pentium Group">Pentium 1/2/3/4, Pentium D, Pentium M, etc</li>
+            <li itemValue="Core 2 Group">Core 2 Duo, Core 2 Quad, Core 2 Extreme</li>
+            <li itemValue="Core i Group">Core i3, Core i5, Core i7</li>
+            </ul>
+    </li>
+    <li>AMD
+      <ul>
+      <li itemValue="Sempron1">Sempron, Athlon, Others</li>
+      <li itemValue="Sempron2">Sempron</li>
+      <li itemValue="Sempron3">Sempron</li>
+      <li>Athlon</li>
+      <li>Athlon FX</li>
+      <li>Athlon X2</li>
+      <li>Athlon II X2</li>
+      </ul>
+    </li>
+    <li>VIA
+      <ul>
+      <li>Nano X2</li>
+      <li>Eden X2</li>
+      <li>PV530</li>
+      <li>C7-V</li>
+      </ul>
+    </li>
+    <li itemValue="CPU Leaf">Leaf Item</li>
+    </ul>
+  </li>
+  <li>Motherboards
+    <ul>
+    <li>ASUS
+      <ul>
+      <li>P7P55</li>
+      <li>P8P67</li>
+      <li>M4A78</li>
+      <li>M4A77</li>
+      <li>P4P55</li>
+      <li>P4P67</li>
+      <li>M3A78</li>
+      <li>M3A77</li>
+      <li>P1P55</li>
+      <li>P1P67</li>
+      <li>M2A78</li>
+      <li>M2A77</li>
+      </ul>
+    </li>
+    <li>MSI
+      <ul>
+      <li>P55-GD80</li>
+      <li>P55M-GD45</li>
+      <li>GF615M-P33</li>
+      </ul>
+    </li>
+    </ul>
+  </li>
+  <li>Coolers
+    <ul>
+    <li>CoolerMaster 1</li>
+    <li>Zalman 2</li>
+    <li>Zalman 3</li>
+    </ul>
+  </li>
+  <li itemValue="Root Leaf">Leaf Item</li>
+</ul>
+</body>
+</html>
