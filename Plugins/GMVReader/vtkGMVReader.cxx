@@ -35,6 +35,9 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkVertex.h"
+#include "vtkPolyhedron.h"
+#include "vtkCellArray.h"
+#include <set>
 
 vtkStandardNewMacro(vtkGMVReader);
 
@@ -215,21 +218,18 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
   bool keepParsing;
   bool firstPolygonParsed;
   float progress;
-  int *nodeMarker;
   int dims[3];
   int incr = 0;
   int polygonMaterialPosInDataArray;
   int posInDataArray;
-  long *longIds;
   size_t k;
-  size_t numFaces;
+  size_t numFaces;  // number of faces of element i
   size_t numNodes;
   size_t numNodesSoFar = 0;
   unsigned int blockNo;
   vtkCellArray* polygonCells;
   vtkCellArray* tracerCells;
   vtkFloatArray *coords;
-  vtkIdType *nodeIds;
   vtkIdType list[8];
   vtkTypeInt64Array *polygonMaterials;
   vtkPoints *points;
@@ -580,50 +580,77 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
               // GMVRead::gmv_meshdata.cellnnode[i] keeps its default value of 0)
               else if (numNodes == 0 && numFaces > 0)
                 {
-                // (number of nodes per face) x (number of faces of generic element i)
-                unsigned long numNodesAllFaces =
-                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i+1] ]
-                  - GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] ];
-
-                // Initialise nodeMarker to -1
-                nodeMarker = new int[this->NumberOfNodes];
-                for (k = 0; k < this->NumberOfNodes; k++)
+                // Distinguish between 1 face and more than 1 face to avoid using VTK_POLYHEDRON for
+                // all cases as that would introduce unnecessary complexity in downstream filters.
+                if (numFaces == 1) // 2D cell
                   {
-                  nodeMarker[k] = -1;
-                  }
+                  // face offset (= face number, counting from 0)
+                  const unsigned long j = 0;
+                  vtkIdType *pointIds;
+                  // number of unique vertices (of single face) of generic element i
+                  unsigned long numPts =
+                    GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                    GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
 
-                // Get element node ids
-                longIds =
-                  &GMVRead::gmv_meshdata.faceverts[
-                                                   GMVRead::gmv_meshdata.facetoverts[
-                                                                                     GMVRead::gmv_meshdata.celltoface[i] ]];
-
-                // Build element
-                nodeIds = new vtkIdType[numNodesAllFaces];
-                int elementNodeCount = 0;
-                for (k = 0; k < numNodesAllFaces; k++)
-                  {
-                  if (nodeMarker[longIds[k] + incr] < 0)
+                  pointIds = new vtkIdType[numPts];
+                  for (k = 0; k < numPts; k++)
                     {
-                    nodeIds[elementNodeCount] = longIds[k] + incr;
-                    nodeMarker[longIds[k] + incr] = 0;
-                    elementNodeCount += 1;
+                    pointIds[k] =
+                      GMVRead::gmv_meshdata.faceverts[GMVRead::gmv_meshdata.facetoverts[GMVRead::gmv_meshdata.celltoface[i] + j] + k] + incr;
                     }
+
+                  ugrid->InsertNextCell(VTK_POLYGON, numPts, pointIds);
+                  delete [] pointIds;
+                  pointIds = NULL;
                   }
 
-                // Distinguish between 1 face and more than 1 face because
-                // VTK_CONVEX_POINT_SET does not handle the case well
-                // where all points lie in the same plane.
-                if (numFaces == 1)
-                  ugrid->InsertNextCell(VTK_POLYGON,
-                                        elementNodeCount,
-                                        nodeIds);
-                else
-                  ugrid->InsertNextCell(VTK_CONVEX_POINT_SET,
-                                        elementNodeCount,
-                                        nodeIds);
-                delete [] nodeIds;
-                delete [] nodeMarker;
+                else // 3D cell
+                  {
+                  // number of vertices of face j of generic element i
+                  unsigned long numVerts;
+                  // number of unique vertices of generic element i
+                  int numPts;
+                  vtkIdType *pointIds;
+                  std::set<int> auxIds;
+                  std::set<int>::iterator auxIt;
+
+                  vtkIdType *face = NULL;
+                  vtkCellArray *faces = NULL;
+                  faces = vtkCellArray::New();
+                  for (unsigned long j = 0; j < numFaces; j++)
+                    {
+                    numVerts =
+                      GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                      GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
+
+                    face = new vtkIdType[numVerts];
+                    for (k = 0; k < numVerts; k++)
+                      {
+                      face[k] =
+                        GMVRead::gmv_meshdata.faceverts[GMVRead::gmv_meshdata.facetoverts[GMVRead::gmv_meshdata.celltoface[i] + j] + k] + incr;
+                      auxIds.insert(face[k]);
+                      }
+                    faces->InsertNextCell(numVerts, face);
+                    delete [] face;
+                    face = NULL;
+                    }
+
+                  // number of unique vertices of generic element i
+                  numPts = auxIds.size();
+                  pointIds = new vtkIdType[numPts];
+                  for (auxIt = auxIds.begin(), k = 0; auxIt != auxIds.end(); auxIt++, k++)
+                    {
+                    pointIds[k] = *auxIt;
+                    }
+                  ugrid->InsertNextCell(VTK_POLYHEDRON,
+                                        numPts, pointIds,
+                                        faces->GetNumberOfCells(), faces->GetPointer());
+                  delete [] pointIds;
+                  pointIds = NULL;
+                  faces->Delete();
+                  faces = NULL;
+                  }
+
                 }
               // Unknown/no handler yet
               else
