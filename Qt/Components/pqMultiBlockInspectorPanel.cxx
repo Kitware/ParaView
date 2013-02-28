@@ -491,7 +491,10 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
     vtkSMSourceProxy::SafeDownCast(selectionSource);
 
   // set the selection
-  this->OutputPort->setSelectionInput(selectionSourceProxy, 0);
+  if(this->OutputPort)
+    {
+    this->OutputPort->setSelectionInput(selectionSourceProxy, 0);
+    }
 
   // update the selection manager
   pqSelectionManager *selectionManager =
@@ -506,7 +509,10 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
   selectionSourceProxy->Delete();
 
   // update the views
-  this->OutputPort->renderAllViews();
+  if(this->OutputPort)
+    {
+    this->OutputPort->renderAllViews();
+    }
 }
 
 QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) const
