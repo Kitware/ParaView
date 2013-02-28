@@ -108,6 +108,23 @@ pqRenderView::ManipulatorType pqRenderView::DefaultManipulatorTypes[] =
   { 3, 0, 1, "Rotate" , "Camera2DManipulators"},
 };
 
+namespace {
+
+// converts a vtkSMRepresentationProxy to its corresponding pqDataRepresentation
+pqDataRepresentation* findRepresentationFromProxy(vtkSMRepresentationProxy *proxy)
+{
+  if(!proxy)
+    {
+    return 0;
+    }
+
+  pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
+
+  return smm->findItem<pqDataRepresentation*>(proxy);
+}
+
+} // end anonymous namespace
+
 class pqRenderView::pqInternal
 {
 public:
@@ -685,15 +702,24 @@ pqDataRepresentation* pqRenderView::pick(int pos[2])
 {
   vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
   vtkSMRepresentationProxy* repr = renderView->Pick(pos[0], pos[1]);
-  pqDataRepresentation* pq_repr = NULL;
-  if (repr)
+  pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
+  if(pq_repr)
     {
-    pq_repr =
-      pqApplicationCore::instance()->getServerManagerModel()->findItem<pqDataRepresentation*>(repr);
-    if (pq_repr)
-      {
-      emit this->picked(pq_repr->getOutputPortFromInput());
-      }
+    emit this->picked(pq_repr->getOutputPortFromInput());
+    }
+  return pq_repr;
+}
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqRenderView::pickBlock(int pos[2],
+                                              unsigned int &flatIndex)
+{
+  vtkSMRenderViewProxy* renderView = this->getRenderViewProxy();
+  vtkSMRepresentationProxy* repr = renderView->PickBlock(pos[0], pos[1], flatIndex);
+  pqDataRepresentation* pq_repr = findRepresentationFromProxy(repr);
+  if(pq_repr)
+    {
+    emit this->picked(pq_repr->getOutputPortFromInput());
     }
   return pq_repr;
 }

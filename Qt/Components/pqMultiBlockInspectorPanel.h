@@ -42,10 +42,13 @@ public:
   pqOutputPort* getOutputPort() const;
   pqRepresentation* getRepresentation() const;
 
+  QString lookupBlockName(unsigned int flatIndex) const;
+
 public slots:
   void setOutputPort(pqOutputPort *port);
   void setRepresentation(pqRepresentation *representation);
   void updateInformation();
+  void setBlockVisibility(unsigned int index, bool visible);
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
@@ -63,7 +66,6 @@ private slots:
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
 
-  void setBlockVisibility(unsigned int index, bool visible);
   void clearBlockVisibility(unsigned int index);
   void updateBlockVisibilities();
   void buildTree(vtkPVCompositeDataInformation *iter,

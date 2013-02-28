@@ -508,3 +508,20 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
   // update the views
   this->OutputPort->renderAllViews();
 }
+
+QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) const
+{
+  foreach(QTreeWidgetItem *item,
+          this->TreeWidget->findItems("", Qt::MatchContains | Qt::MatchRecursive))
+    {
+    unsigned int itemFlatIndex =
+      item->data(0, Qt::UserRole).value<unsigned int>();
+
+    if(itemFlatIndex == flatIndex)
+      {
+      return item->text(0);
+      }
+    }
+
+  return QString();
+}

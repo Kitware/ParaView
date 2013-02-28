@@ -194,6 +194,11 @@ public:
   /// pick.
   pqDataRepresentation* pick(int pos[2]);
 
+  /// Picks the representation at the given position. Furthermore, if the
+  /// picked representation is a multi-block data set the picked block will
+  /// be returned in the flatIndex variable.
+  pqDataRepresentation* pickBlock(int pos[2], unsigned int &flatIndex);
+
   /// Creates a new frustum selection given the rectangle in display
   /// coordinates.
   void selectFrustum(int rectangle[4]);
