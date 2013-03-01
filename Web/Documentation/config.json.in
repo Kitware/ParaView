@@ -10,12 +10,15 @@
     "-o": "@DOC_OUTPUT_DIR@",
     "--head-html":"<link rel='stylesheet' href='custom.css' type='text/css'>",
     "--": [
-        "@JAVASCRIPT_LIB_DIR@/Lib/paraview.ui.pipeline.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.launcher.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.connect.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.viewport.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.statistics.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/PipelineBrowser/paraview.ui.pipeline.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.lineChart.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.utils.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/RickshawCharts/paraview.rickshaw.graph.js",
         "@CMAKE_CURRENT_SOURCE_DIR@/api/Web.py",
         "@CMAKE_CURRENT_SOURCE_DIR@/api/server.py"
     ]

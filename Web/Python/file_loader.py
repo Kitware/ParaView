@@ -126,7 +126,7 @@ if __name__ == "__main__":
     web.add_arguments(parser)
     parser.add_argument("--file-to-load", help="path to data file to load",
         dest="data")
-    parser.add_argument("--path-to-list", default=os.getcwd(),
+    parser.add_argument("--data-dir", default=os.getcwd(),
         help="path to data directory to list", dest="path")
     args = parser.parse_args()
 

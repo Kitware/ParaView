@@ -2,38 +2,31 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel='stylesheet' href='style.css' type='text/css'>
-        <link rel='stylesheet' href='css/paraview/pv-pipeline.css' type='text/css'>
+
+        <link rel="stylesheet" href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview/pv-pipeline.css' type='text/css'>
+        <link rel='stylesheet' href='main.css' type='text/css'>
+
+        <script src="../../ext/js-core/autobahn.min.js"></script>
+        <script src="../../ext/js-core/jquery-1.8.2.min.js"></script>
+
+        <script src="../../ext/widgets/jscolor/jscolor.js"></script>
+        <script src="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.min.js"></script>
+
+        <script src="../../lib/js/paraview-all.js"></script>
+        <script src="../../lib/js/paraview.ui.pipeline.js"></script>
     </head>
 
     <body class="page">
         <div class="header">
             <ul class="toolbar control">
-                <li><img class="action toggle-control" src="images/toolbar/logo.png" alt="Show/Hide control panel"/></li>
+                <li><img class="action toggle-control" src="../../lib/css/paraview/icons/logo.png" alt="Show/Hide control panel"/></li>
             </ul>
             <ul class="toolbar view">
-                <li><img class="action showOrientationAxis" src="images/toolbar/view/orientation.png" alt="Toggle orientation widget visibility"/></li>
-                <li><img class="action showRotationCenter" src="images/toolbar/view/center.png" alt="Toggle rotation center visibility"/></li>
-                <li><img class="action resetCamera" src="images/toolbar/view/resetCamera.png" alt="Reset display"/></li>
-                <li><img class="action capture" src="images/toolbar/view/capture.png" alt="Take a capture of the viewport"/></li>
+                <li><img class="action resetCamera" src="../../lib/css/paraview/icons/resetCamera.png" alt="Reset display"/></li>
             </ul>
-            <ul class="toolbar color">
-                <li><select class="lookup-table-type" name="lut-type"><option>HSV</option></select></li>
-                <li><img class="action resetColorRange" src="images/toolbar/color/resetRange.png"/></li>
-            </ul>
-            <ul class="toolbar vcr">
-                <li><img class="action first" src="images/toolbar/vcr/first.png"/></li>
-                <li><img class="action prev" src="images/toolbar/vcr/prev.png"/></li>
-                <li><img class="action play" src="images/toolbar/vcr/play.png"/></li>
-                <li><img class="action pause" src="images/toolbar/vcr/pause.png"/></li>
-                <li><img class="action next" src="images/toolbar/vcr/next.png"/></li>
-                <li><img class="action last" src="images/toolbar/vcr/last.png"/></li>
-            </ul>
-            <ul class="toolbar loading">
-                <li><img src="images/loading.gif" alt="Loading"/></li>
-            </ul>
-            <ul class="toolbar exit">
-                <li><img class="action exit" src="images/toolbar/exit/exit.png" alt="Quit application"/></li>
+            <ul class="toolbar info" style="float: right;">
+                <li><img class="action loading" src="../../lib/css/paraview/loading.gif" alt="Load in progress"/></li>
             </ul>
         </div>
         <div class="splitter">
@@ -43,41 +36,61 @@
             </div>
         </div>
 
-        <script src="js/Ext/autobahn.min.js"></script>
-        <script src="js/Ext/jquery-1.8.2.min.js"></script>
-        <script src="js/Ext/jquery-ui-1.10.0.min.js"></script>
-        <script src="js/Lib/paraview.js"></script>
-        <script src="js/Lib/paraview.connect.js"></script>
-        <script src="js/Lib/paraview.launcher.js"></script>
-        <script src="js/Lib/paraview.statistics.js"></script>
-        <script src="js/Lib/paraview.viewport.js"></script>
-        <script src="js/Lib/paraview.ui.pipeline.js"></script>
 
         <script type="text/javascript">
-            var url = { 'wampURL': "ws://localhost:8081/ws"};
-            var connection = {}
+            var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview";
+            var config = {
+                sessionManagerURL: serviceURL,
+                name: "WebVisualizer",
+                application: "pipeline"
+            };
             var pv = {}
 
-            paraview.connect(url, function(connectionData) {
-                // Create pipeline browser
-                connection = connectionData;
-                connection.session.call('pv:getPipeline').then(function(pipeline) {
-                    connection.pipeline = pipeline;
-                    connection.session.call('pv:listFilters').then(function(sources) {
-                        connection.sources = sources;
-                        connection.session.call('pv:listFiles').then(function(files) {
-                            connection.files = files;
-                            createPipeline(connection.session, connection.pipeline, connection.sources, connection.files);
-                            pv.viewport = paraview.createViewport(connection.session);
-                            pv.viewport.bind(".viewport");
-                            $(".loading").hide();
+            paraview.start( config,
+            function(connection){
+                pv.connection = connection;
+
+                if(connection.error) {
+                    alert(connection.error);
+                    window.close();
+                } else {
+                    connect();
+                }
+            }, function(msg){
+                $("#loading").hide();
+                pv.connection = { sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
+                connect();
+            });
+
+
+            function connect() {
+                if(location.protocol == "http:") {
+                    pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
+                }
+
+                paraview.connect(pv.connection, function(connectionData) {
+                    // Create pipeline browser
+                    pv.connection = connectionData;
+                    pv.connection.session.call('pv:getPipeline').then(function(pipeline) {
+                        console.log(pipeline);
+                        pv.connection.pipeline = pipeline;
+                        pv.connection.session.call('pv:listFilters').then(function(sources) {
+                            pv.connection.sources = sources;
+                            pv.connection.session.call('pv:listFiles').then(function(files) {
+                                pv.connection.files = files;
+                                createPipeline(pv.connection.session, pv.connection.pipeline, pv.connection.sources, pv.connection.files);
+                                pv.viewport = paraview.createViewport(pv.connection.session);
+                                pv.viewport.bind(".viewport");
+                                $(".loading").hide();
+                                $('.toggle-control').trigger('click');
+                            });
                         });
                     });
+                }, function(code,reason){
+                    $(".loading").hide();
+                    console.log(reason);
                 });
-            }, function(code,reason){
-                $(".loading").hide();
-                console.log(reason);
-            });
+            }
 
             // Handle control show/hide
             $('.toggle-control').bind('click', function(){
@@ -86,12 +99,16 @@
                 if(panel.is(":visible")) {
                     panel.hide("slide",250, function(){
                         viewport.css("left", 0);
-                        pv.viewport.render();
+                        if(pv.viewport) {
+                            pv.viewport.render();
+                        }
                     });
                 } else {
                     panel.show("slide",250, function(){
                         viewport.css("left", 400);
-                        pv.viewport.render();
+                        if(pv.viewport) {
+                            pv.viewport.render();
+                        }
                     });
                 }
             });
@@ -102,26 +119,6 @@
                     pipeline: pipeline,
                     sources: sources,
                     files: files
-                }).bind('proxyModified', function(e){
-                    if(e.proxy){
-                        console.log("Proxy change: " + e.proxy.proxy_id + " field: " + e.field + " value: " + e.proxy[e.field]);
-                    } else {
-                        console.log("change of ?");
-                        console.log(e);
-                    }
-                }).bind('deleteProxy', function(e){
-                    console.log("Delete proxy: ");
-                    console.log(e);
-                }).bind('proxySelected', function(e){
-                    console.log("Select proxy: ");
-                    console.log(e.proxy);
-                }).bind('addSource', function(e){
-                    console.log("Create " + e.name + "(" + (e.parent ? e.parent : "") + ")");
-                }).bind('openFile', function(e){
-                    console.log("openFile " + e.path);
-                }).bind('pipelineChanged', function(){
-                    updateView();
-                    setTimout(updateView, 500);
                 });
             }
 
@@ -139,9 +136,9 @@
             });
 
             function updateView() {
-                if(pv.viewport) {
-                    pv.viewport.render();
-                }
+                //                if(pv.viewport) {
+                //            pv.viewport.render();
+                //        }
             }
         </script>
     </body>

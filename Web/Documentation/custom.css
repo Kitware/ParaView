@@ -42,6 +42,11 @@
     font-size: 16px;
     line-height: 22px;
 }
+
+.one-third-pane p {
+    color: #666666 !important;
+}
+
 .welcome-page .welcome-block .inner-container img {
     padding: 0 10px;
 }

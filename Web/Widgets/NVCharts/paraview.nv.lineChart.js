@@ -1,9 +1,5 @@
-/**
- * ParaView Web Line Chart (NVD3-based)
- *
- * Provides implementation for a line-chart based on NVD3 (http://nvd3.org)
- */
-
+// ParaView Web Line Chart (NVD3-based)
+// Provides implementation for a line-chart based on NVD3 (http://nvd3.org)
 (function($, undefined) {
     $.widget( "pv.lineChart", {
         version : "0.0.1",

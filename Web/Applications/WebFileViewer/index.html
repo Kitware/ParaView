@@ -8,17 +8,15 @@
     <body onbeforeunload="stop()" onunload="stop()" class="page">
         <div class="header">
             <ul>
-                <li><img style="position: relative; height: 35px; top: 0px;left: -8px;" src="images/PVW_Logo_Full.png" alt=""/></li>
+                <li><img style="position: relative; height: 35px; top: 0px;left: -8px;" src="../../lib/css/paraview/icons/PVW_Logo_Full.png" alt=""/></li>
             </ul>
             <ul class="toolbar" style="position: absolute; right: 10px; top: 2px;display: none;">
-                <li id="direct-link"></li>
-                <li></li>
-                <li><img class="action resetCamera" src="images/resetCamera.png" alt="Previous frame"/></li>
-                <li><img class="action stats" src="images/info.png" alt="Toggle statistics"/></li>
-                <li><img class="action exit" src="images/exit.png" alt="Exit"/></li>
+                <li><img class="action resetCamera" src="../../lib/css/paraview/icons/resetCamera.png" alt="Previous frame"/></li>
+                <li><img class="action stats" src="../../lib/css/paraview/icons/info.png" alt="Toggle statistics"/></li>
+                <li><img class="action exit" src="../../lib/css/paraview/icons/delete.png" alt="Exit"/></li>
             </ul>
             <ul id="loading" style="position: absolute; right: 10px; top: 8px;">
-                <li><img src="images/loading.gif" alt="Loading"/></li>
+                <li><img src="../../lib/css/paraview/loading.gif" alt="Loading"/></li>
             </ul>
         </div>
         <div class="splitter">
@@ -27,9 +25,10 @@
             </div>
         </div>
 
-        <script src="../../js/ext/autobahn.min.js"></script>
-        <script src="../../js/ext/jquery-1.8.2.min.js"></script>
-        <script src="../../js/lib/paraview-all.js"></script>
+        <!-- Core-js ParaViewWeb dependency -->
+        <script type="text/javascript" src="../../ext/js-core/autobahn.min.js"></script>
+        <script type="text/javascript" src="../../ext/js-core/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript" src="../../lib/js/paraview-all.js"></script>
 
         <script src="js/jquery.jstree.js"></script>
 
@@ -99,8 +98,7 @@
             }
 
             function connect() {
-                // Mobiles does not support secured web sockets
-                if(paraview.isMobile || location.protocol == "http:") {
+                if(location.protocol == "http:") {
                     pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
                 }
 
@@ -109,11 +107,6 @@
                     $("#loading").hide();
                     console.log(reason);
                 });
-
-                // Update UI to show direct link if available
-                if(pv.connection.hasOwnProperty('host') && pv.connection.hasOwnProperty('port')) {
-                    $('<a href="http://' + pv.connection.host + ':' + pv.connection.port + '/" target="_blank"><img class="action" src="images/direct.png" alt="Open new tab with direct connection"/></a>').appendTo($("#direct-link"));
-                }
             }
 
             /**

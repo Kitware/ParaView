@@ -18,6 +18,7 @@ from paraview import simple, web, servermanager, web_helper
 # Setup global variables
 timekeeper = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
 pipeline = web_helper.Pipeline('Kitware')
+lutManager = web_helper.LookupTableManager()
 view = None
 fileList = []
 filterList = [{
@@ -26,6 +27,10 @@ filterList = [{
         'category': 'source'
     },{
         'name': 'Sphere',
+        'icon': 'dataset',
+        'category': 'source'
+    },{
+        'name': 'Wavelet',
         'icon': 'dataset',
         'category': 'source'
     },{
@@ -55,21 +60,22 @@ filterList = [{
     }]
 
 def initializePipeline():
-    global view
+    global view, lutManager
     view = simple.GetRenderView()
     simple.Render()
     view.ViewSize = [800,800]
+    lutManager.setView(view)
 
 # Define ParaView Protocol
 class PipelineManager(web.ParaViewServerProtocol):
 
     @exportRpc("getPipeline")
     def getPipeline(self):
-        return pipeline.getRootNode()
+        return pipeline.getRootNode(lutManager)
 
     @exportRpc("addSource")
     def addSource(self, algo_name, parent):
-        global pipeline
+        global pipeline, lutManager
         pid = str(parent)
         parentProxy = web_helper.idToProxy(parent)
         if parentProxy:
@@ -89,8 +95,13 @@ class PipelineManager(web.ParaViewServerProtocol):
         # Add node to pipeline
         pipeline.addNode(pid, newProxy.GetGlobalIDAsString())
 
+        # Create LUT if need be
+        if pid == '0':
+            lutManager.registerFieldData(newProxy.GetPointDataInformation())
+            lutManager.registerFieldData(newProxy.GetCellDataInformation())
+
         # Return the newly created proxy pipeline node
-        return web_helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString())
+        return web_helper.getProxyAsPipelineNode(newProxy.GetGlobalIDAsString(), lutManager)
 
     @exportRpc("deleteSource")
     def deleteSource(self, proxy_id):
@@ -101,10 +112,43 @@ class PipelineManager(web.ParaViewServerProtocol):
 
     @exportRpc("updateDisplayProperty")
     def updateDisplayProperty(self, options):
+        global lutManager;
         proxy = web_helper.idToProxy(options['proxy_id']);
         rep = simple.GetDisplayProperties(proxy)
         web_helper.updateProxyProperties(rep, options)
+
+        # Try to bind the proper lookup table if need be
+        if options.has_key('ColorArrayName') and len(options['ColorArrayName']) > 0:
+            name = options['ColorArrayName']
+            type = options['ColorAttributeType']
+            nbComp = 1
+
+            if type == 'POINT_DATA':
+                data = proxy.GetPointDataInformation()
+                for i in range(data.GetNumberOfArrays()):
+                    array = data.GetArray(i)
+                    if array.Name == name:
+                        nbComp = array.GetNumberOfComponents()
+            elif type == 'CELL_DATA':
+                data = proxy.GetPointDataInformation()
+                for i in range(data.GetNumberOfArrays()):
+                    array = data.GetArray(i)
+                    if array.Name == name:
+                        nbComp = array.GetNumberOfComponents()
+            lut = lutManager.getLookupTable(name, nbComp)
+            rep.LookupTable = lut
+
         simple.Render()
+
+    @exportRpc("pushState")
+    def pushState(self, state):
+        for proxy_id in state:
+            if proxy_id == 'proxy':
+                continue
+            proxy = web_helper.idToProxy(proxy_id);
+            web_helper.updateProxyProperties(proxy, state[proxy_id])
+            simple.Render()
+        return web_helper.getProxyAsPipelineNode(state['proxy'], lutManager)
 
     @exportRpc("openFile")
     def openFile(self, path):
@@ -117,7 +161,11 @@ class PipelineManager(web.ParaViewServerProtocol):
         # Add node to pipeline
         pipeline.addNode('0', reader.GetGlobalIDAsString())
 
-        return web_helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString())
+        # Create LUT if need be
+        lutManager.registerFieldData(reader.GetPointDataInformation())
+        lutManager.registerFieldData(reader.GetCellDataInformation())
+
+        return web_helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), lutManager)
 
     @exportRpc("listFiles")
     def listFiles(self):
@@ -127,12 +175,23 @@ class PipelineManager(web.ParaViewServerProtocol):
     def listFilters(self):
         return filterList
 
+    @exportRpc("updateScalarbarVisibility")
+    def updateScalarbarVisibility(self, options):
+        global lutManager;
+        # Remove unicode
+        if options:
+            for lut in options.values():
+                if type(lut['name']) == unicode:
+                    lut['name'] = str(lut['name'])
+                lutManager.enableScalarBar(lut['name'], lut['size'], lut['enabled'])
+        return lutManager.getScalarbarVisibility()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="ParaView/Web Pipeline Manager web-application")
     web.add_arguments(parser)
-    parser.add_argument("--path-to-list", default=os.getcwd(),
+    parser.add_argument("--data-dir", default=os.getcwd(),
         help="path to data directory to list", dest="path")
     args = parser.parse_args()
 
