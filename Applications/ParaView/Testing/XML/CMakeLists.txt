@@ -24,6 +24,7 @@ else()
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeChombo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeEnzo.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeLAMMPSDump.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeLAMMPSDump2.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNas.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgeNek.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/VisItBridgePdb.xml
@@ -34,6 +35,7 @@ else()
   set(VisItBridgeChombo_USE_NEW_PANELS TRUE)
   set(VisItBridgeEnzo_USE_NEW_PANELS TRUE)
   set(VisItBridgeLAMMPSDump_USE_NEW_PANELS TRUE)
+  set(VisItBridgeLAMMPSDump2_USE_NEW_PANELS TRUE)
   set(VisItBridgeNas_USE_NEW_PANELS TRUE)
   set(VisItBridgeNek_USE_NEW_PANELS TRUE)
   set(VisItBridgePdb_USE_NEW_PANELS TRUE)
