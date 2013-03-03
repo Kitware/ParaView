@@ -98,7 +98,6 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 #if defined(CMAKE_INTDIR)
   pkg_prefix += "/..";
 #endif
-  vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/mpi4py");
   vtkPythonAppInitPrependPath2(pkg_prefix, "/site-packages");
   vtkPythonAppInitPrependPath2(pkg_prefix, "/lib/site-packages");
   vtkPythonAppInitPrependPath2(pkg_prefix, "/../lib/site-packages");

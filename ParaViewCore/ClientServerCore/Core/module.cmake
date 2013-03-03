@@ -13,6 +13,11 @@ if (PARAVIEW_ENABLE_PYTHON)
       vtkFiltersProgrammable)
 endif (PARAVIEW_ENABLE_PYTHON)
 
+set (__compile_dependencies)
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
+  list(APPEND __compile_dependencies vtkmpi4py)
+endif()
+
 vtk_module(vtkPVClientServerCoreCore
   GROUPS
     ParaViewCore
@@ -29,6 +34,7 @@ vtk_module(vtkPVClientServerCoreCore
   COMPILE_DEPENDS
   # This ensures that CS wrappings will be generated 
     vtkUtilitiesWrapClientServer
+    ${__compile_dependencies}
   TEST_LABELS
     PARAVIEW
 )
