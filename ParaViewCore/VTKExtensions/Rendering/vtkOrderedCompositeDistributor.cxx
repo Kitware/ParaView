@@ -332,7 +332,6 @@ int vtkOrderedCompositeDistributor::RequestData(
     this->LastOutput = output->NewInstance();
     }
   this->LastOutput->ShallowCopy(output);
-
-  return 1;
 #endif
+  return 1;
 }
