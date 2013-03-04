@@ -89,15 +89,6 @@ public:
   const char* GetWebGLSceneMetaData(vtkSMViewProxy* view);
 
   // Description:
-  // Return all the binary data for all objects in the scene.
-  // Format: (see vtkWebGLExporter for example)
-  // ["'" + <base64encoded_object(id)_part(n)_string> + "',\n";
-  //  ...
-  //  ...
-  // "''"]
-  const char* GetWebGLBinaryObjects(vtkSMViewProxy* view);
-
-  // Description:
   // Return the binary data given the part index
   // and the webGL object piece id in the scene.
   const char* GetWebGLBinaryData(
