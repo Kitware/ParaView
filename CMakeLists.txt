@@ -551,7 +551,6 @@ pv_process_plugins(
 
 add_subdirectory(CommandLineExecutables)
 add_subdirectory(Applications)
-add_subdirectory(Utilities/mpi4py)
 
 #------------------------------------------------------------------------------
 # We add a mechanism to incorporate arbitrary install rules into the

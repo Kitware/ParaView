@@ -199,3 +199,12 @@ IF (PARAVIEW_DATA_ROOT)
   ENDIF ("1" STREQUAL ${HAS_NUMPY})
 ENDIF ()
 
+if (PARAVIEW_USE_MPI AND VTK_MPIRUN_EXE AND NOT WIN32)
+  add_test(NAME TestMPI4PY-SymmetricBatch
+          COMMAND ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS}
+                  ${VTK_MPI_NUMPROC_FLAG} ${VTK_MPI_MAX_NUMPROCS} ${VTK_MPI_PREFLAGS}
+                  $<TARGET_FILE:pvbatch>
+                  --symmetric
+                  ${CMAKE_CURRENT_SOURCE_DIR}/TestMPI4PY.py)
+    set_tests_properties(TestMPI4PY-SymmetricBatch PROPERTIES LABELS "PARAVIEW")
+endif()

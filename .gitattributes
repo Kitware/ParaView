@@ -18,3 +18,5 @@ pre-commit       crlf=input
 *.txx            whitespace=tab-in-indent,-blank-at-eol
 *.txt            whitespace=tab-in-indent,-blank-at-eol
 *.cmake          whitespace=tab-in-indent,-blank-at-eol
+
+*.c              hooks.MaxObjectKiB=0
