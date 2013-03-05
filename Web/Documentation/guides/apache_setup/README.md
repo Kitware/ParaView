@@ -118,7 +118,7 @@ Configuration file for the session manager executable: (pw-config.properties):
     pw.process.launcher.wait.keyword=Starting factory
     pw.process.launcher.wait.timeout=10000
 
-    pw.session.public.fields=id,wampURL,name,description,url,application,idleTimeout,startTime
+    pw.session.public.fields=id,sessionURL,name,description,url,application,idleTimeout,startTime
 
 Shell script used to start the session manager
 

@@ -92,7 +92,7 @@
                     var serviceURL = location.protocol + "//" + location.hostname +
                                      ":" + location.port + "/paraview";
                     var config = {
-                        url: serviceURL,
+                        sessionManagerURL: serviceURL,
                         name: "Live Articles",
                         description: "3D visualization with ParaView/Web",
                         application: "loader"
@@ -106,7 +106,7 @@
                         function (err) {
                             //console.log("Connection failed.");
 
-                            var conn = {wampURL: "ws://" +
+                            var conn = {sessionURL: "ws://" +
                                        location.hostname + ":" +
                                        location.port + "/ws"};
                             setupConnection(conn);
@@ -120,7 +120,7 @@
             function setupConnection(connection) {
                 // Mobiles does not support secured web sockets
                 if (paraview.isMobile || location.protocol == "http:") {
-                    connection.wampURL = connection.wampURL.replace("wss:","ws:");
+                    connection.sessionURL = connection.sessionURL.replace("wss:","ws:");
                 }
 
                 // connect to the ParaView/Web instance, so we can start

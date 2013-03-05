@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel='stylesheet' href='style.css' type='text/css'>
         <script src="/js/autobahn.min.js"></script>
         <script src="/js/jquery-1.8.2.min.js"></script>
@@ -11,38 +11,38 @@
             var pv = {};
             var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview";
             var config = {
-                url: serviceURL,
+                sessionManagerURL: serviceURL,
                 name: "Can.ex2 viz",
                 description: "3D visaulization with ParaViewWeb 2.0",
                 application: "can"
             };
-            
+
             function connect() {
                 // Mobiles does not support secured web sockets
                 if(paraview.isMobile || location.protocol == "http:") {
-                    pv.connection.wampURL = pv.connection.wampURL.replace("wss:","ws:");
+                    pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
                 }
-                
+
                 paraview.connect(pv.connection,
                 startSession, function(code,reason){
                     $("#loading").hide();
                     $('.ui-loader').hide();
                     console.log(reason);
                 });
-                
+
                 // Update UI to show direct link if available
                 if(pv.connection.hasOwnProperty('host') && pv.connection.hasOwnProperty('port')) {
                     $('<a href="http://' + pv.connection.host + ':' + pv.connection.port + '/" target="_blank"><img class="action" src="images/direct.png" alt="Open new tab with direct connection"/></a>').appendTo($("#direct-link"));
                 }
             }
-            
+
             /**
              * Method called when the ParaView session is ready
              */
             function startSession(connection) {
                 // Save session for later
                 pv.session = connection.session;
-                
+
                 // Create viewport
                 pv.viewport = paraview.createViewport(connection.session);
                 pv.viewport.bind(".viewport");
@@ -51,7 +51,7 @@
                 $('.ui-loader').hide();
                 $(".toolbar").show();
             }
-            
+
             /**
              * Method called when the application close
              */
@@ -62,22 +62,22 @@
                     pv = {};
                 }
             }
-            
+
             /**
-             * Method called when start time animation 
+             * Method called when start time animation
              */
             function play() {
                 pv.playing = true;
                 nextPlayTime();
             }
-            
+
             /**
              * Method called when animation should stop
              */
             function pause() {
                 pv.playing = false;
             }
-            
+
             /**
              * Method that keep calling itself to move to the next frame
              */
@@ -89,28 +89,28 @@
                     });
                 }
             }
-            
+
             // By default start a ParaView on the server
             $(document).bind('pageinit', function(){
                 paraview.start( config,
                 function(connection){
                     pv.connection = connection;
-                    
+
                     if(connection.error) {
                         alert(connection.error);
                         window.close();
                     } else {
-                        connect();   
+                        connect();
                     }
                 }, function(msg){
                     $("#loading").hide();
                     alert("The remote session did not properly start. Try to use embeded url.");
-                    pv.connection = {wampURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
+                    pv.connection = {sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
                     connect();
                 });
-                    
+
                 /**
-                 * Make the viewport be full screen 
+                 * Make the viewport be full screen
                  */
                 $(window).resize(function() {
                     $(".viewport").width(window.innerWidth).height(window.innerHeight - 35);
@@ -118,7 +118,7 @@
                         pv.viewport.render();
                     }
                 }).trigger('resize');
-            
+
                 // Manage VCR + ResetCamera
                 $(".action").click(function(){
                     var me = $(this);
@@ -129,7 +129,7 @@
                     if(me.hasClass("vcr")) {
                         pv.session.call("pv:vcr", me.attr("action")).then(function(){
                             pv.viewport.render();
-                        }); 
+                        });
                     } else if(me.hasClass("resetCamera")) {
                         pv.viewport.resetCamera();
                     } else if(me.hasClass("exit")) {

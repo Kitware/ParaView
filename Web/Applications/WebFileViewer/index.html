@@ -37,7 +37,7 @@
             var pv = {};
             var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview";
             var config = {
-                url: serviceURL,
+                sessionManagerURL: serviceURL,
                 name: "File loader viz",
                 description: "3D visaulization with ParaViewWeb 2.0",
                 application: "loader"
@@ -59,7 +59,7 @@
                 }, function(msg){
                     $("#loading").hide();
                     alert("The remote session did not properly start. Try to use embeded url.");
-                    pv.connection = {wampURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
+                    pv.connection = {sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
                     connect();
                 });
                 /**
@@ -101,7 +101,7 @@
             function connect() {
                 // Mobiles does not support secured web sockets
                 if(paraview.isMobile || location.protocol == "http:") {
-                    pv.connection.wampURL = pv.connection.wampURL.replace("wss:","ws:");
+                    pv.connection.sessionURL = pv.connection.sessionURL.replace("wss:","ws:");
                 }
 
                 paraview.connect(pv.connection,
