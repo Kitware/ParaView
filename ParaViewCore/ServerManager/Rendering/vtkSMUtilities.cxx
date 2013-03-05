@@ -40,7 +40,7 @@
 
 namespace {
 BOOL CALLBACK listMonitorsCallback(HMONITOR hMonitor, HDC /*hdcMonitor*/,
-                                   LPRECT lprcMonitor, LPARAM dwData)
+                                   LPRECT /*lprcMonitor*/, LPARAM dwData)
 {
   std::ostringstream *str = reinterpret_cast<std::ostringstream*>(dwData);
 
