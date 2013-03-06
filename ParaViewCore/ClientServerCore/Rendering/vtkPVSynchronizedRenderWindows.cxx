@@ -545,6 +545,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       window->DoubleBufferOn();
       window->AlphaBitPlanesOn();
       window->SetWindowName("ParaView");
+      window->SetSize(400, 400); // set some default size for the window.
       return window;
       }
 
@@ -587,6 +588,7 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       // cout << "Using shared render window" << endl;
       }
     this->Internals->SharedRenderWindow->Register(this);
+    this->Internals->SharedRenderWindow->SetSize(400, 400); // set some default size for the window.
     return this->Internals->SharedRenderWindow;
 
   case INVALID:
