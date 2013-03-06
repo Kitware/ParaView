@@ -22,7 +22,7 @@
 #include "vtkPVServerManagerRenderingModule.h" //needed for exports
 #include "vtkSMObject.h"
 
-#include <string>
+#include "vtkStdString.h" // for vtkStdString
 
 class vtkImageData;
 class vtkPoints;
@@ -78,7 +78,7 @@ public:
   // Description:
   // List the device names and geometries of all attached monitors. Only
   // implemented for win32.
-  static std::string ListAttachedMonitors();
+  static vtkStdString ListAttachedMonitors();
 
 //BTX
 protected:

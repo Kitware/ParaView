@@ -291,15 +291,15 @@ void vtkSMUtilities::Merge(vtkImageData* dest, vtkImageData* src)
 }
 
 //----------------------------------------------------------------------------
-std::string vtkSMUtilities::ListAttachedMonitors()
+vtkStdString vtkSMUtilities::ListAttachedMonitors()
 {
 #ifndef _WIN32
-  return std::string("Monitor detection only implemented for MS Windows.");
+  return vtkStdString("Monitor detection only implemented for MS Windows.");
 #else // _WIN32
   std::ostringstream str;
   EnumDisplayMonitors(NULL, NULL, listMonitorsCallback,
                       reinterpret_cast<LPARAM>(&str));
-  return str.str();
+  return vtkStdString(str.str());
 #endif // _WIN32
 }
 
