@@ -39,6 +39,11 @@
 #include "vtkCellArray.h"
 #include <set>
 
+#ifdef PARAVIEW_USE_MPI
+#include "vtkMultiProcessController.h"
+vtkCxxSetObjectMacro(vtkGMVReader, Controller, vtkMultiProcessController);
+#endif
+
 vtkStandardNewMacro(vtkGMVReader);
 
 
@@ -169,6 +174,11 @@ vtkGMVReader::vtkGMVReader()
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   // this->CurrentOutput = 0;
+
+#ifdef PARAVIEW_USE_MPI
+  this->Controller = NULL;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
+#endif
 }
 
 
@@ -207,6 +217,10 @@ vtkGMVReader::~vtkGMVReader()
     this->Tracers->Delete();
   if (this->Polygons)
     this->Polygons->Delete();
+
+#ifdef PARAVIEW_USE_MPI
+  this->SetController(NULL);
+#endif
 }
 
 
@@ -1960,6 +1974,16 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
                                      vtkInformationVector **vtkNotUsed(inputVector),
                                      vtkInformationVector *outputVector)
 {
+#ifdef PARAVIEW_USE_MPI
+  if (this->Controller)
+    {
+    if (this->Controller->GetNumberOfProcesses() > 1)
+      {
+      vtkWarningMacro("GMVReader is not parallel-aware: all pvserver processes will read the entire file!");
+      }
+    }
+#endif
+
   vtkDebugMacro( << "GMVReader::RequestInformation: Parsing file " << this->FileName << " for fields, #polygons and time steps");
   int ierr = GMVRead::gmvread_open(this->FileName);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
