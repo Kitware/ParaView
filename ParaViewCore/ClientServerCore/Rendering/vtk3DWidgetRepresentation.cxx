@@ -126,7 +126,12 @@ void vtk3DWidgetRepresentation::UpdateEnabled()
           }
       }
 
-    this->Widget->SetEnabled(this->Enabled);
+    // Not all processes have the interactor setup. Enable 3D widgets only on
+    // those processes that have an interactor.
+    if (this->View->GetInteractor())
+      {
+      this->Widget->SetEnabled(this->Enabled);
+      }
     }
 }
 
