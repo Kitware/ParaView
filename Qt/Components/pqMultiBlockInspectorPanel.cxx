@@ -138,10 +138,13 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
     vtkSMProxy *proxy = this->Representation->getProxy();
     vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
 
-    this->VisibilityPropertyListener->Connect(property_,
-                                              vtkCommand::ModifiedEvent,
-                                              this,
-                                              SLOT(updateTreeWidgetBlockVisibilities()));
+    if(property_)
+      {
+      this->VisibilityPropertyListener->Connect(property_,
+                                                vtkCommand::ModifiedEvent,
+                                                this,
+                                                SLOT(updateTreeWidgetBlockVisibilities()));
+      }
     }
 }
 
