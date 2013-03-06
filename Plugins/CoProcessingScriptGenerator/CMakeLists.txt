@@ -1,6 +1,5 @@
 project(CoProcessingScriptGeneratorPlugin)
 
-if(PARAVIEW_ENABLE_COPROCESSING)
 #--------------------------------------------------
 # Find and Use ParaView
 #--------------------------------------------------
@@ -73,6 +72,9 @@ ADD_CUSTOM_COMMAND(
        "${CMAKE_CURRENT_SOURCE_DIR}/cp_export.py"
        cp_export_py)
 
+vtk_module_load(vtkPVPythonCatalyst)
+include_directories(${vtkPVPythonCatalyst_INCLUDE_DIRS})
+
 ADD_PARAVIEW_PLUGIN(
   CoProcessingPlugin
   #"${CoProcessing_VERSION_MAJOR}.${CoProcessing_VERSION_MINOR}.${CoProcessing_VERSION_PATCH}"
@@ -90,7 +92,8 @@ ADD_PARAVIEW_PLUGIN(
     cp_export_py.cxx
 )
 
-target_link_libraries(CoProcessingPlugin vtkCoProcessor)
+
+target_link_libraries(CoProcessingPlugin vtkPVPythonCatalyst)
 
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
@@ -109,5 +112,3 @@ IF (BUILD_TESTING)
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON)
   ENDIF ( BUILD_SHARED_LIBS )
 ENDIF (BUILD_TESTING)
-
-endif(PARAVIEW_ENABLE_COPROCESSING)

@@ -38,8 +38,8 @@ except: from paraview.simple import *
 try:
   __cp_helper_script_loaded__
 except:
-  import vtkCoProcessorPython
-  exec vtkCoProcessorPython.vtkCPHelperScripts.GetPythonHelperScript()
+  import vtkPVPythonCatalystPython
+  exec vtkPVPythonCatalystPython.vtkCPPythonHelper.GetPythonHelperScript()
 
 # Global variables that will hold the pipeline for each timestep
 pipeline = None

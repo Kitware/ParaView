@@ -1,0 +1,23 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkCPPythonHelperConfig.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#ifndef __vtkCPPythonHelperConfig_h
+#define __vtkCPPythonHelperConfig_h
+
+// These variables are used to locate the python module files since we cannot
+// reply on the executable path to locate python module files.
+#define PARAVIEW_BINARY_DIR "@ParaView_BINARY_DIR@"
+#define PARAVIEW_INSTALL_DIR "@CMAKE_INSTALL_PREFIX@"
+
+#endif

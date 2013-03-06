@@ -14,10 +14,9 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVConfig.h" // Required to get build options for paraview
 
-#ifndef BUILD_SHARED_LIBS
-// file containing static initialization functions for all modules built.
-# include "pvpythonmodules.h"
-#endif
+extern "C" {
+  void vtkPVInitializePythonModules();  
+}
 
 #include "vtkInitializationHelper.h"
 #include "vtkMultiProcessController.h"
@@ -104,11 +103,10 @@ namespace ParaViewPython {
 
       // Start interpretor
       vtkPVPythonInterpretor* interpretor = vtkPVPythonInterpretor::New();
-#ifndef BUILD_SHARED_LIBS
+
       // register callback to initialize modules statically. The callback is
       // empty when BUILD_SHARED_LIBS is ON.
-      CMakeLoadAllPythonModules();
-#endif
+      vtkPVInitializePythonModules();
 
       ret_val = interpretor->PyMain(static_cast<int>(pythonArgs.size()), &*pythonArgs.begin());
       interpretor->Delete();

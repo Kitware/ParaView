@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqRenderViewBase.h>
 #include <pqServerManagerModel.h>
 
-#include <vtkCPHelperScripts.h>
 #include <vtkImageData.h>
 #include <vtkNew.h>
 #include <vtkPNGWriter.h>
@@ -53,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMViewProxy.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkCPPythonHelper.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <QLabel>
@@ -571,7 +571,7 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString command =
     QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename).arg(live_visualization);
 
-  dialog->runString(vtkCPHelperScripts::GetPythonHelperScript());
+  dialog->runString(vtkCPPythonHelper::GetPythonHelperScript());
   dialog->runString(command);
 
   return true;

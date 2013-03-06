@@ -47,38 +47,19 @@ foreach (name pvserver pvdataserver pvrenderserver)
 endforeach()
 
 if (PARAVIEW_ENABLE_PYTHON)
-  set (VTK_WRAP_PYTHON_FIND_LIBS 1)
-  include(vtkWrapPython)
-  include_directories(${PYTHON_INCLUDE_DIRS})
-
-  vtk_module_dep_includes(vtkPVPythonSupport)
-  include_directories(${vtkPVPythonSupport_DEPENDS_INCLUDE_DIRS}
-                      ${vtkPVPythonSupport_INCLUDE_DIRS}
-                      ${CMAKE_CURRENT_BINARY_DIR})
-
-  set (dependencies)
-
-  # when building static ParaView, generate a header file to initialize
-  # all the python wrapped modules statically.
-  vtk_write_python_modules_header_for_wrapped_modules(
-    "${CMAKE_CURRENT_BINARY_DIR}/pvpythonmodules.h"
-    dependencies)
-
   foreach (name pvbatch pvpython)
     pv_add_executable(${name} ${name}.cxx)
     target_link_libraries(${name}
       vtkPVServerManagerApplication
       vtkPVPythonSupport
-      ${dependencies}
+      vtkUtilitiesPythonInitializer
       ${VTK_PYTHON_LIBRARIES})
   endforeach()
 
   # add python module dependencies to the server-executables for static builds.
   foreach (name pvserver pvdataserver pvrenderserver)
     target_link_libraries(${name}
-        vtkPVPythonSupport
-        ${dependencies}
-        ${VTK_PYTHON_LIBRARIES})
+        vtkUtilitiesPythonInitializer)
   endforeach()
 
 endif()

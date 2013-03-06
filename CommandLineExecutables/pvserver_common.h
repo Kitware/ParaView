@@ -14,11 +14,10 @@ PURPOSE.  See the above copyright notice for more information.
 =========================================================================*/
 #include "vtkPVConfig.h"
 
-#ifndef BUILD_SHARED_LIBS
 # ifdef PARAVIEW_ENABLE_PYTHON
-// file containing static initialization functions for all modules built.
-#   include "pvpythonmodules.h"
-# endif
+extern "C" {
+  void vtkPVInitializePythonModules();  
+}
 #endif
 
 #include "vtkInitializationHelper.h"
@@ -52,14 +51,14 @@ static bool RealMain(int argc, char* argv[],
     return 1;
     }
 
-#ifndef BUILD_SHARED_LIBS
 
-# ifdef PARAVIEW_ENABLE_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   // register callback to initialize modules statically. The callback is
   // empty when BUILD_SHARED_LIBS is ON.
-  CMakeLoadAllPythonModules();
-# endif
+  vtkPVInitializePythonModules();
+#endif
 
+#ifndef BUILD_SHARED_LIBS
   // load static plugins
   paraview_static_plugins_init();
 #endif

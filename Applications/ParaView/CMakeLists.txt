@@ -21,18 +21,6 @@ set(ParaView_SOURCE_FILES
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES})
 
-set (python_dependencies)
-if (PARAVIEW_ENABLE_PYTHON)
-  include_directories("${PYTHON_INCLUDE_PATH}")
-
-  # when building static ParaView, generate a header file to initialize
-  # all the python wrapped modules statically.
-  vtk_write_python_modules_header_for_wrapped_modules(
-    "${CMAKE_CURRENT_BINARY_DIR}/paraviewpythonmodules.h"
-    python_dependencies)
-endif()
-
-
 #------------------------------------------------------------------------------
 # ParaView applications provides a mechanism to add gui xmls from modules.
 # This is done by defining variables named ${vtk-module}_PARAVIEW_GUI_XMLS in
@@ -79,15 +67,18 @@ build_paraview_client(paraview
     INSTALL_LIB_DIR "${VTK_INSTALL_LIBRARY_DIR}")
 
 # Link against the documentation module.
-target_link_libraries(paraview vtkParaViewDocumentation) 
+target_link_libraries(paraview vtkParaViewDocumentation)
 
 # link enabled plugins if not building in shared library mode and
 # add dependecies to linked python modules These are non-empty only when
 # building statically.
+if (PARAVIEW_ENABLE_PYTHON)
+  target_link_libraries(paraview vtkUtilitiesPythonInitializer)
+endif()
+
 if(NOT BUILD_SHARED_LIBS)
   target_link_libraries(paraview
-    ${PARAVIEW_PLUGINLIST}
-    ${python_dependencies})
+    ${PARAVIEW_PLUGINLIST})
 endif(NOT BUILD_SHARED_LIBS)
 
 

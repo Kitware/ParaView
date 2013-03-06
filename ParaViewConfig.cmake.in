@@ -38,6 +38,14 @@ endif()
 
 # load VTK config. This will bring in information about all modules (including
 # ParaView's modules).
+set (paraview_build_qt_gui "@PARAVIEW_BUILD_QT_GUI@")
+if (paraview_build_qt_gui)
+  set (VTK_FIND_COMPONENTS pqApplicationComponents)
+else()
+  set (VTK_FIND_COMPONENTS vtkPVServerManagerApplication)
+endif()
+
+set (VTK_FIND_COMPONENTS ${VTK_FIND_COMPONENTS} ${ParaView_FIND_COMPONENTS})
 include("${VTK_CONFIG_FILE}")
 
 if (__pv_install_tree)
