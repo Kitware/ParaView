@@ -50,6 +50,7 @@ public slots:
   void updateInformation();
   void setBlockVisibility(unsigned int index, bool visible);
   void clearBlockVisibility(unsigned int index);
+  void showOnlyBlock(unsigned int index);
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);

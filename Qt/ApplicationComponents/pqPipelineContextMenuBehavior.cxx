@@ -168,6 +168,12 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
       this->connect(hideBlockAction, SIGNAL(triggered()),
                     this, SLOT(hideBlock()));
 
+      QAction *showOnlyBlockAction =
+        this->Menu->addAction(QString("Show Only Block '%1'").arg(blockName));
+      showOnlyBlockAction->setData(blockIndex);
+      this->connect(showOnlyBlockAction, SIGNAL(triggered()),
+                    this, SLOT(showOnlyBlock()));
+
       QAction *unsetVisibilityAction =
         this->Menu->addAction("Unset Block Visibility");
       unsetVisibilityAction->setData(blockIndex);
@@ -379,6 +385,35 @@ void pqPipelineContextMenuBehavior::hideBlock()
   if(panel)
     {
     panel->setBlockVisibility(blockIndex, false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::showOnlyBlock()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  unsigned int blockIndex = action->data().value<unsigned int>();
+
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    panel->showOnlyBlock(blockIndex);
     }
 }
 

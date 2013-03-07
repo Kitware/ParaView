@@ -249,6 +249,15 @@ void pqMultiBlockInspectorPanel::clearBlockVisibility(unsigned int index)
   this->Representation->renderViewEventually();
 }
 
+void pqMultiBlockInspectorPanel::showOnlyBlock(unsigned int index)
+{
+  this->BlockVisibilites.clear();
+  this->BlockVisibilites[0] = false; // hide root block
+  this->BlockVisibilites[index] = true;
+  this->updateBlockVisibilities();
+  this->Representation->renderViewEventually();
+}
+
 void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 {
   std::vector<int> vector;
@@ -317,12 +326,20 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
     {
     this->TreeWidget->blockSignals(true);
     unsigned int flat_index = 0;
+    bool root_visibility = this->BlockVisibilites.value(0, true);
+
+    // get root item and set its visibility
     QTreeWidgetItem *rootItem =
       this->TreeWidget->invisibleRootItem()->child(0);
+    rootItem->setData(0,
+                      Qt::CheckStateRole,
+                      root_visibility ? Qt::Checked : Qt::Unchecked);
+
+    // recurse down the tree updating child visibilities
     this->updateTreeWidgetBlockVisibilities(compositeInfo,
                                             rootItem,
                                             flat_index,
-                                            true);
+                                            root_visibility);
     this->TreeWidget->blockSignals(false);
     }
 }

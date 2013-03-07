@@ -69,6 +69,10 @@ protected slots:
   /// contain the block index in its data().
   void hideBlock();
 
+  /// called to show only the selected block. the action which emits the
+  /// signal will contain the block index in its data().
+  void showOnlyBlock();
+
   /// called to unset the visibility flag for the block. after this call the
   /// block will inherit the visibility from its parent. the action which
   /// emits the signal will contain the block index in its data()
