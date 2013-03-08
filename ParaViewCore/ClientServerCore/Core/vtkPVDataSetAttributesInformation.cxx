@@ -39,7 +39,7 @@ struct  vtkPVDataSetAttributesInformationSortArray
   const char * arrayName;
 };
 
-bool    vtkPVDataSetAttributesInfromationAlphabeticSorting
+bool    vtkPVDataSetAttributesInformationAlphabeticSorting
 ( const vtkPVDataSetAttributesInformationSortArray & thisArray,
   const vtkPVDataSetAttributesInformationSortArray & thatArray )
 {
@@ -62,6 +62,7 @@ vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
     {
     this->AttributeIndices[idx] = -1;
     }
+  this->SortArrays = true;
 }
 
 //----------------------------------------------------------------------------
@@ -88,6 +89,7 @@ vtkPVDataSetAttributesInformation::PrintSelf(ostream& os, vtkIndent indent)
     ai->PrintSelf(os, i2);
     os << endl;
     }
+  os << indent << "SortArrays: " << this->SortArrays << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -179,27 +181,30 @@ vtkPVDataSetAttributesInformation
 
   // sort the arrays alphabetically
   int   arrayIndx = 0;
-  std::vector < vtkPVDataSetAttributesInformationSortArray > sortArays;
-  sortArays.clear();
+  std::vector < vtkPVDataSetAttributesInformationSortArray > sortArrays;
+  sortArrays.clear();
 
   if ( num > 0 )
     {
-    sortArays.resize( num );
+    sortArrays.resize( num );
     for ( int i = 0; i < num; i ++ )
       {
-      sortArays[i].arrayIndx = i;
-      sortArays[i].arrayName = da->GetArrayName( i ) ?
+      sortArrays[i].arrayIndx = i;
+      sortArrays[i].arrayName = da->GetArrayName( i ) ?
         da->GetArrayName(i) : "";
       }
 
-    std::sort( sortArays.begin(), sortArays.end(),
-                  vtkPVDataSetAttributesInfromationAlphabeticSorting );
+    if(this->SortArrays)
+      {
+      std::sort( sortArrays.begin(), sortArrays.end(),
+                 vtkPVDataSetAttributesInformationAlphabeticSorting );
+      }
     }
 
   infoArrayIndex = 0;
   for (idx = 0; idx < num; ++idx)
     {
-    arrayIndx = sortArays[idx].arrayIndx;
+    arrayIndx = sortArrays[idx].arrayIndx;
     vtkAbstractArray* const array = da->GetAbstractArray( arrayIndx );
 
     if (array->GetName() &&
@@ -221,7 +226,7 @@ vtkPVDataSetAttributesInformation
       }
     }
 
-  sortArays.clear();
+  sortArrays.clear();
 }
 
 //----------------------------------------------------------------------------

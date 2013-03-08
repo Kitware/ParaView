@@ -157,6 +157,7 @@ int vtkCompleteArrays::RequestData(
       return 1;
       }
     vtkPVDataInformation* dataInfo = vtkPVDataInformation::New();
+    dataInfo->SetSortArrays(0);
     dataInfo->CopyFromObject(output);
     dataInfo->CopyToStream(&css);
     size_t length;
