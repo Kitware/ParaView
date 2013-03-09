@@ -37,11 +37,6 @@
         "value":"OFF"
       },
       {
-        "name":"VTK_Group_CoProcessing",
-        "type":"BOOL",
-        "value":"OFF"
-      },
-      {
         "name":"Module_vtkFiltersSources",
         "type":"BOOL",
         "value":"ON"
@@ -65,22 +60,20 @@
   },
   "modules":[
     {
-      "name":"vtkCoProcessor",
-      "path":"CoProcessing/Core",
-      "pythonwrap":true
+      "name":"Catalyst",
+      "path":"CoProcessing/Catalyst",
+      "pythonwrap":true,
+      "exclude": [
+        {
+          "path":"Testing"
+        }
+      ]
     },
     {
-      "name":"FortranAdaptors",
-      "path":"CoProcessing/Adaptors/FortranAdaptors"
-    },
-    {
-      "name":"ParticleAdaptor",
-      "path":"CoProcessing/Adaptors/ParticleAdaptor"
-    },
-    {
-      "name":"vtkCoProcessorImplementation",
-      "path":"CoProcessing/CoProcessor",
-      "exclude":[
+      "name":"PythonCatalyst",
+      "path":"CoProcessing/PythonCatalyst",
+      "pythonwrap":true,
+      "exclude": [
         {
           "path":"Testing"
         }
@@ -224,6 +217,10 @@
     {
       "name":"vtkprotobuf",
       "path":"ThirdParty/protobuf"
+    },
+    {
+      "name":"vtkmpi4py",
+      "path":"ThirdParty/mpi4py"
     },
     {
       "name":"vtkqttesting",
@@ -679,9 +676,6 @@
   ],
   "paths":[
     {
-      "path":"CoProcessing/Adaptors/PythonAdaptor"
-    },
-    {
       "path":"ParaViewCore/ServerManager/SMApplication/Resources",
       "replace":[
         {
@@ -874,6 +868,9 @@
     },
     {
       "path":"VTK/Utilities/vtkTclTest2Py"
+    },
+    {
+      "path":"VTK/Utilities/Python"
     }
   ]
 }
