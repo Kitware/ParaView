@@ -148,7 +148,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
 
   this->Internals->Encoder->PushAndTakeReference(view->GetGlobalID(), image, quality);
   assert(image == NULL);
-  
+
   if (value.Data == NULL)
     {
     // we need to wait till output is processed.
@@ -205,7 +205,7 @@ bool vtkPVWebApplication::HandleInteractionEvent(
 
   int viewSize[2];
   vtkSMPropertyHelper(view, "ViewSize").Get(viewSize, 2);
-  
+
   int posX = std::floor(viewSize[0] * event->GetX() + 0.5);
   int posY = std::floor(viewSize[1] * event->GetY() + 0.5);
 
@@ -253,7 +253,7 @@ bool vtkPVWebApplication::HandleInteractionEvent(
       iren->MiddleButtonReleaseEvent();
       }
     }
-  
+
   this->Internals->ButtonStates[view] = event->GetButtons();
 
   bool needs_render = (changed_buttons != 0 || event->GetButtons());
@@ -298,7 +298,7 @@ const char* vtkPVWebApplication::GetWebGLSceneMetaData(vtkSMViewProxy* view)
                                  static_cast<float>(centerOfRotation[1]),
                                  static_cast<float>(centerOfRotation[2]));
 */
-  if(this->Internals->ViewWebGLMap.find(view) == 
+  if(this->Internals->ViewWebGLMap.find(view) ==
     this->Internals->ViewWebGLMap.end())
     {
     this->Internals->ViewWebGLMap[view] =
@@ -337,7 +337,7 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(
     vtkErrorMacro("No view specified.");
     return NULL;
     }
-  if(this->Internals->ViewWebGLMap.find(view) == 
+  if(this->Internals->ViewWebGLMap.find(view) ==
     this->Internals->ViewWebGLMap.end())
     {
     if(this->GetWebGLSceneMetaData(view) == NULL)
@@ -381,39 +381,6 @@ const char* vtkPVWebApplication::GetWebGLBinaryData(
     }
 
   return NULL;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVWebApplication::GetWebGLBinaryObjects(vtkSMViewProxy* view)
-{
-  if (!view)
-    {
-    vtkErrorMacro("No view specified.");
-    return NULL;
-    }
-  vtkWebGLExporter* webglExporter = this->Internals->ViewWebGLMap[view];
-  if(webglExporter == NULL)
-    {
-    vtkErrorMacro("There is no cached WebGL Exporter for: " << view);
-    return NULL;
-    }
-
-  this->Internals->LastAllWebGLBinaryObjects = "[";
-  std::string strObj;
-  for(int i=0; i<webglExporter->GetNumberOfObjects(); ++i)
-    {
-    vtkWebGLObject* wObj = webglExporter->GetObject(i);
-    if(wObj && wObj->isVisible())
-      {
-      for(int j=0; j<wObj->GetNumberOfParts(); ++j)
-        {
-        strObj = this->GetWebGLBinaryData(view, wObj->GetId().c_str(), j);
-        this->Internals->LastAllWebGLBinaryObjects += "'" + strObj + "',\n";
-        }
-      }
-    }
-  this->Internals->LastAllWebGLBinaryObjects += "'']";
-  return this->Internals->LastAllWebGLBinaryObjects.c_str();
 }
 
 //----------------------------------------------------------------------------
