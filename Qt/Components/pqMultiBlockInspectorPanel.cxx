@@ -187,7 +187,9 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
 void pqMultiBlockInspectorPanel::updateInformation()
 {
   // clear previous information
+  this->TreeWidget->blockSignals(true);
   this->TreeWidget->clear();
+  this->TreeWidget->blockSignals(false);
 
   if(!this->OutputPort)
     {
