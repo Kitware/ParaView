@@ -23,7 +23,6 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "pqTreeWidgetSelectionHelper.h"
 #include "vtkEventQtSlotConnect.h"
 #include "pqSelectionManager.h"
 #include "vtkSelection.h"
@@ -45,9 +44,6 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   this->TreeWidget = new QTreeWidget(this);
   this->TreeWidget->setColumnCount(1);
   this->TreeWidget->header()->close();
-
-  pqTreeWidgetSelectionHelper *treeSelectionHelper =
-    new pqTreeWidgetSelectionHelper(this->TreeWidget);
 
   this->connect(this->TreeWidget, SIGNAL(itemSelectionChanged()),
                 this, SLOT(currentTreeItemSelectionChanged()));
