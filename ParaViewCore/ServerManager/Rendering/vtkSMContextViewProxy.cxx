@@ -187,7 +187,7 @@ static void update_property(vtkAxis* axis, vtkSMProperty* prop)
   if (axis && prop)
     {
     double range[2];
-    axis->GetRange(range);
+    axis->GetUnscaledRange(range);
     vtkSMPropertyHelper(prop).Set(range, 2);
     }
 }
