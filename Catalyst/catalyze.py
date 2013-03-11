@@ -194,6 +194,8 @@ def main():
       path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], cwd=config.input_dir)
     except subprocess.CalledProcessError as err:
       error(err)
+  else:
+    path = config.repo
 
   config.repo = path.strip()
 
