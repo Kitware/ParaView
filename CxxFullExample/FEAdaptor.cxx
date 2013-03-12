@@ -2,27 +2,40 @@
 #include "FEAdaptor.h"
 #include "FEDataStructures.h"
 
+#include <vtkCellData.h>
+#include <vtkCellType.h>
+#include <vtkCPDataDescription.h>
+#include <vtkCPInputDataDescription.h>
+#include <vtkCPPythonProcessor.h>
+#include <vtkCPPythonScriptPipeline.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkNew.h>
+#include <vtkPoints.h>
+#include <vtkPointData.h>
+#include <vtkUnstructuredGrid.h>
+
 namespace
 {
-  vtkCPProcessor* Processor = NULL;
+  vtkCPPythonProcessor* Processor = NULL;
   vtkUnstructuredGrid* VTKGrid;
 
   void BuildVTKGrid(Grid& grid)
   {
     // create the points information
-    vtkNew<vtkDoubleArray> pointArray = vtkDoubleArray::New();
+    vtkNew<vtkDoubleArray> pointArray;
     pointArray->SetNumberOfComponents(3);
-    pointArray->SetArray(Grid.GetPointsArray(), static_cast<vtkIdType>(Grid.GetNumberOfPoints()*3), 1);
+    pointArray->SetArray(grid.GetPointsArray(), static_cast<vtkIdType>(grid.GetNumberOfPoints()*3), 1);
     vtkNew<vtkPoints> points;
     points->SetData(pointArray.GetPointer());
-    VTKGrid->SetPoints(points);
+    VTKGrid->SetPoints(points.GetPointer());
 
     // create the cells
-    size_t numCells = Grid.GetNumberOfCells();
+    size_t numCells = grid.GetNumberOfCells();
     VTKGrid->Allocate(static_cast<vtkIdType>(numCells*9));
     for(size_t cell=0;cell<numCells;cell++)
       {
-      unsigned int* cellPoints = Grid.GetCellPoints(cell);
+      unsigned int* cellPoints = grid.GetCellPoints(cell);
       vtkIdType tmp[8] = {cellPoints[0], cellPoints[1], cellPoints[2], cellPoints[3],
                           cellPoints[4], cellPoints[5], cellPoints[6], cellPoints[7]};
       VTKGrid->InsertNextCell(VTK_HEXAHEDRON, 8, tmp);
@@ -33,13 +46,20 @@ namespace
   {
     if(VTKGrid->GetPointData()->GetNumberOfArrays() == 0)
       {
+      // velocity array
       vtkNew<vtkDoubleArray> velocity;
       velocity->SetName("velocity");
       velocity->SetNumberOfComponents(3);
       velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
       VTKGrid->GetPointData()->AddArray(velocity.GetPointer());
+      // pressure array
+      vtkNew<vtkFloatArray> pressure;
+      pressure->SetName("pressure");
+      pressure->SetNumberOfComponents(1);
+      pressure->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
+      VTKGrid->GetPointData()->AddArray(pressure.GetPointer());
       }
-    vtkDoubleArray* velocity = vtkDoubleArray::SafeDowncast(
+    vtkDoubleArray* velocity = vtkDoubleArray::SafeDownCast(
       VTKGrid->GetPointData()->GetArray("velocity"));
     // The velocity array is ordered as vx0,vx1,vx2,..,vy0,vy1,vy2,..,vz0,vz1,vz2,..
     // so we need to create a full copy of it with VTK's ordering of
@@ -52,6 +72,13 @@ namespace
                           velocityData[i+2*numTuples]};
       velocity->SetTupleValue(i, values);
       }
+
+    vtkFloatArray* pressure = vtkFloatArray::SafeDownCast(
+      VTKGrid->GetPointData()->GetArray("pressure"));
+    // The pressure array is a scalar array so we can reuse
+    // memory as long as we ordered the points properly.
+    float* pressureData = attributes.GetPressureArray();
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfPoints()*3), 1);
   }
 
   void BuildVTKDataStructures(Grid& grid, Attributes& attributes)
@@ -64,28 +91,29 @@ namespace
       VTKGrid = vtkUnstructuredGrid::New();
       BuildVTKGrid(grid);
       }
-    UpdateVTKAttributes(attributes);
+    UpdateVTKAttributes(grid, attributes);
   }
 }
 
-namespace Catalyst
+namespace FEAdaptor
 {
 
-  void Initialize(int numScripts, const char* scripts[])
+  void Initialize(int numScripts, char* scripts[])
   {
     if(Processor == NULL)
       {
-      Processor = vtkCPProcessor::New();
+      Processor = vtkCPPythonProcessor::New();
+      Processor->Initialize();
       }
     else
       {
       Processor->RemoveAllPipelines();
       }
-    for(int i=0;i<numScripts;i++)
+    for(int i=1;i<numScripts;i++)
       {
       vtkNew<vtkCPPythonScriptPipeline> pipeline;
       pipeline->Initialize(scripts[i]);
-      processor->AddPipeline(pipeline.Pointer());
+      Processor->AddPipeline(pipeline.GetPointer());
       }
   }
 
@@ -103,16 +131,23 @@ namespace Catalyst
       }
   }
 
-  void CoProcess(Grid& grid, Attributes& attributes, double time, unsigned int timeStep)
+  void CoProcess(Grid& grid, Attributes& attributes, double time,
+                 unsigned int timeStep, bool lastTimeStep)
   {
     vtkNew<vtkCPDataDescription> dataDescription;
     dataDescription->AddInput("input");
     dataDescription->SetTimeData(time, timeStep);
-    if(Processor->RequestDataDescription(dataDescription) != 0)
+    if(lastTimeStep == true)
+      {
+      // assume that we want to all the pipelines to execute if it
+      // is the last time step.
+      dataDescription->ForceOutputOn();
+      }
+    if(Processor->RequestDataDescription(dataDescription.GetPointer()) != 0)
       {
       BuildVTKDataStructures(grid, attributes);
-      dataDescription->GetInputDataDescriptionByName("input")->SetGrid(VTKGrid);
-      Processor->CoProcess(dataDescription);
+      dataDescription->GetInputDescriptionByName("input")->SetGrid(VTKGrid);
+      Processor->CoProcess(dataDescription.GetPointer());
       }
   }
 } // end of Catalyst namespace
