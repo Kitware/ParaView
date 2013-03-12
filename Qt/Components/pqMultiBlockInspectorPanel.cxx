@@ -503,7 +503,8 @@ void pqMultiBlockInspectorPanel::currentTreeItemSelectionChanged()
     proxyManager->NewProxy("sources", "BlockSelectionSource");
 
   // set selected blocks
-  vtkSMPropertyHelper(selectionSource, "Blocks").Set(&blockIds[0], blockIds.size());
+  vtkSMPropertyHelper(selectionSource, "Blocks")
+      .Set(&blockIds[0], static_cast<unsigned int>(blockIds.size()));
   selectionSource->UpdateVTKObjects();
 
   vtkSMSourceProxy *selectionSourceProxy =
