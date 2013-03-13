@@ -57,6 +57,11 @@ class DataProber(web.ParaViewServerProtocol):
         cls.View = simple.CreateRenderView()
         simple.Render()
 
+        # setup animation scene
+        scene = simple.GetAnimationScene()
+        simple.GetTimeTrack()
+        scene.PlayMode = "Snap To TimeSteps"
+
     @classmethod
     def endInteractionCallback(cls, factory):
         def callback(caller, event):
@@ -192,7 +197,7 @@ class DataProber(web.ParaViewServerProtocol):
             probe.Source.Point1 = DataProber.Widget.Point1WorldPosition
             probe.Source.Point2 = DataProber.Widget.Point2WorldPosition
             print "Probing ", probe.Source.Point1, probe.Source.Point2
-            simple.UpdatePipeline(proxy=probe)
+            simple.UpdatePipeline(time=DataProber.View.ViewTime, proxy=probe)
             # fetch probe result from root node.
             do = simple.servermanager.Fetch(probe, 0)
             data = web.vtkPVWebUtilities.WriteAttributesToJavaScript(
@@ -224,6 +229,24 @@ class DataProber(web.ParaViewServerProtocol):
     @exportRpc("getDatabaseAsHTML")
     def getDatabaseAsHTML(self):
         return DataProber.toHTML(DataProber.Database)
+
+    @exportRpc("goToNext")
+    def goToNext(self):
+        oldTime = self.View.ViewTime
+        simple.GetAnimationScene().GoToNext()
+        if oldTime != self.View.ViewTime:
+            self.factory.dispatch("http://paraview.org/event#probeDataChanged", True)
+            return True
+        return False
+
+    @exportRpc("goToPrev")
+    def goToPrev(self):
+        oldTime = self.View.ViewTime
+        simple.GetAnimationScene().GoToPrevious()
+        if oldTime != self.View.ViewTime:
+            self.factory.dispatch("http://paraview.org/event#probeDataChanged", True)
+            return True
+        return False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

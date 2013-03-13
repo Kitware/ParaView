@@ -28,8 +28,18 @@ copy_files_recursive(${nvcharts_source_dir}
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
   LABEL "Copying NVCharts JavaScript files")
 
+
+set(rickshawcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/RickshawCharts")
+set(rickshawcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/js/lib")
+copy_files_recursive(${rickshawcharts_source_dir}
+  DESTINATION ${rickshawcharts_binary_dir_js}
+  REGEX "^(.*\\.js)$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
+  LABEL "Copying RickshawCharts JavaScript files")
+
 add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/ext-css-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
   )

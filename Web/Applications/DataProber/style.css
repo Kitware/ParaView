@@ -73,44 +73,62 @@ button.vertical-center {
   width: 100%;
 }
 
-#selectdata {
-  background-image: url("icons/data-folder-icon.png");
+button.toolbar-button {
   width: 64px;
   height: 64px;
   margin: 5px;
   padding: 5px;
+}
+
+#selectdata {
+  background-image: url("icons/data-folder-icon.png");
 }
 
 #showbar {
-  background-image: url("icons/Column-Chart-64x64.png");
-  width: 64px;
-  height: 64px;
-  margin: 5px;
-  padding: 5px;
+  background-image: url("icons/chart-bar-icon.png");
+}
+
+#showbar-stacked {
+  background-image: url("icons/chart-bar-stacked-icon.png");
 }
 
 #showline {
-  background-image: url("icons/Going-up-two-bars-64.png");
-  width: 64px;
-  height: 64px;
-  margin: 5px;
-  padding: 5px;
+  background-image: url("icons/chart-line-icon.png");
+}
+
+#showline-stacked {
+  background-image: url("icons/chart-line-stacked-icon.png");
+}
+
+#showarea-stacked {
+  background-image: url("icons/chart-area-stacked-icon.png");
+}
+
+#showarea-percentage {
+  background-image: url("icons/chart-area-percentage-icon.png");
+}
+
+#showscatter {
+  background-image: url("icons/chart-scatter-icon.png");
 }
 
 #togglestats {
-  background-image: url("icons/Window-Performance-64.png");
-  width: 64px;
-  height: 64px;
-  margin: 5px;
-  padding: 5px;
+  background-image: url("icons/system-monitor-icon.png");
 }
 
+#prev {
+  background-image: url("icons/go-previous-view-icon.png");
+}
+
+#next {
+  background-image: url("icons/go-next-view-icon.png");
+}
+
+#showkey {
+  background-image: url("icons/format-stroke-color-icon.png");
+}
 #resetview {
-  background-image: url("icons/View-64.png");
-  width: 64px;
-  height: 64px;
-  margin: 5px;
-  padding: 5px;
+  background-image: url("icons/zoom-fit-icon.png");
 }
 
 button.on {
