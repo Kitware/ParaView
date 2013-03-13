@@ -334,11 +334,7 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
     GMVRead::gmvread_data();
     switch(GMVRead::gmv_data.keyword)
       {
-#ifdef GMVABORT
-      // If gmvread.c has been patched such that instead of exiting (original
-      // code) or disabled exiting (VisIt's variant) a decent error code is
-      // returned:
-      case (GMVABORT):
+      case (GMVERROR):
         if (GMVRead::gmv_data.errormsg != NULL)
           {
           vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
@@ -351,7 +347,6 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
         // this->SetupEmptyOutput();
         // this->CurrentOutput = 0;
         return 0;
-#endif
 
       case (GMVEND):
         keepParsing = false;
@@ -2026,11 +2021,7 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
     GMVRead::gmvread_data();
     switch(GMVRead::gmv_data.keyword)
       {
-#ifdef GMVABORT
-      // If gmvread.c has been patched such that instead of exiting (original
-      // code) or disabled exiting (VisIt's variant) a decent error code is
-      // returned:
-      case (GMVABORT):
+      case (GMVERROR):
         if (GMVRead::gmv_data.errormsg != NULL)
           {
           vtkErrorMacro("" << GMVRead::gmv_data.errormsg);
@@ -2043,7 +2034,6 @@ int vtkGMVReader::RequestInformation(vtkInformation *vtkNotUsed(request),
         // this->SetupEmptyOutput();
         // this->CurrentOutput = 0;
         return 0;
-#endif
 
       case (GMVEND):
         keepParsing = false;
