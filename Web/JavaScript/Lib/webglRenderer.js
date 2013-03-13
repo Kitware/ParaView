@@ -250,7 +250,7 @@ WebGLRenderer.prototype.start = function(metadata, objects) {
       this.ctx2d = document.getElementById(this.canvasName + "Widget").getContext('2d');
       // Set up to draw the scene periodically.
       this.drawInterval = requestAnimFrame(new Function("webglRenderers['" + this.view.id + "'].drawScene();"));
-      
+
       if (!this.offlineMode){
         this.requestMetaData();
         this.updateCamera();
