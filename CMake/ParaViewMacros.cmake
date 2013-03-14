@@ -9,7 +9,7 @@
 #                       generated qrc file.
 # file_list: IN : list of files to be added into the resource file.
 #------------------------------------------------------------------------------
-MACRO(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list)
+FUNCTION(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list)
   SET (pq_resource_file_contents "<RCC>\n  <qresource prefix=\"${resource_prefix}\">\n")
   GET_FILENAME_COMPONENT(current_directory ${resource_file} PATH)
   FOREACH (resource ${file_list})
@@ -24,8 +24,11 @@ MACRO(GENERATE_QT_RESOURCE_FROM_FILES resource_file resource_prefix file_list)
     "${pq_resource_file_contents}  </qresource>\n</RCC>\n")
 
   # Generate the resource file.
-  FILE (WRITE "${resource_file}" "${pq_resource_file_contents}")
-ENDMACRO(GENERATE_QT_RESOURCE_FROM_FILES)
+  set (CMAKE_CONFIGURABLE_FILE_CONTENT "${pq_resource_file_contents}")
+  configure_file(${CMAKE_ROOT}/Modules/CMakeConfigurableFile.in
+                 "${resource_file}")
+  unset (CMAKE_CONFIGURABLE_FILE_CONTENT)
+ENDFUNCTION(GENERATE_QT_RESOURCE_FROM_FILES)
 
 #----------------------------------------------------------------------------
 # PV_PARSE_ARGUMENTS is a macro useful for writing macros that take a key-word
