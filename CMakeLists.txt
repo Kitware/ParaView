@@ -295,7 +295,8 @@ if (UNIX AND NOT APPLE)
   set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
 endif()
 
-option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" OFF)
+option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON)
+mark_as_advanced(PARAVIEW_ENABLE_WEB)
 
 if (PARAVIEW_ENABLE_WEB AND NOT PARAVIEW_ENABLE_PYTHON)
   message(
@@ -307,6 +308,7 @@ set(Module_vtkParaViewWeb ${PARAVIEW_ENABLE_WEB} CACHE BOOL "" FORCE)
 mark_as_advanced(Module_vtkParaViewWeb)
 
 option(PARAVIEW_BUILD_WEB_DOCUMENTATION "Enable/Disable web documentation" OFF)
+mark_as_advanced(PARAVIEW_BUILD_WEB_DOCUMENTATION)
 
 set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
   CACHE BOOL "" FORCE)
