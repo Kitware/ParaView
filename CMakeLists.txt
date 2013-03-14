@@ -318,11 +318,13 @@ if (PARAVIEW_ENABLE_CATALYST)
   # enable_language(...), it failed during first cmake configure but worked o
   # subsequent. enable_language(... OPTIONAL) overcomes that issue altogether.
 
-  # Theoretically, CheckFortran should not be needed, but it
-  # enable_language(OPTIONAL) fails with Ninja generator.
-  include(CheckFortran)
-  if  (CMAKE_Fortran_COMPILER)
-    enable_language(Fortran OPTIONAL)
+  if (NOT WIN32)
+    # Theoretically, CheckFortran should not be needed, but it
+    # enable_language(OPTIONAL) fails with Ninja generator.
+    include(CheckFortran)
+    if  (CMAKE_Fortran_COMPILER)
+      enable_language(Fortran OPTIONAL)
+    endif()
   endif()
 else()
   set (Module_vtkPVCatalystTestDriver OFF CACHE BOOL "" FORCE)
