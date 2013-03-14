@@ -2025,6 +2025,20 @@
     <Point x="0.882353" o="1" r="0.951921" g="0.842817" b="0.478545"/>
     <Point x="1" o="1" r="0.881371" g="0.912178" b="0.818099"/>
   </ColorMap>
+  <ColorMap name="blot" space="HSV" indexedLookup="false">
+    <Point x="0.000" o="0" r="0.0"  g="0.0"  b="1.0"/>
+    <Point x="0.166" o="0" r="0.0"  g="0.0"  b="1.0"/>
+    <Point x="0.167" o="0" r="1.0"  g="0.0"  b="1.0"/>
+    <Point x="0.332" o="0" r="1.0"  g="0.0"  b="1.0"/>
+    <Point x="0.333" o="0" r="0.0"  g="1.0"  b="1.0"/>
+    <Point x="0.500" o="0" r="0.0"  g="1.0"  b="1.0"/>
+    <Point x="0.501" o="0" r="0.0"  g="1.0"  b="0.0"/>
+    <Point x="0.666" o="0" r="0.0"  g="1.0"  b="0.0"/>
+    <Point x="0.667" o="0" r="1.0"  g="1.0"  b="0.0"/>
+    <Point x="0.832" o="0" r="1.0"  g="1.0"  b="0.0"/>
+    <Point x="0.833" o="0" r="1.0"  g="0.0"  b="0.0"/>
+    <Point x="1.000" o="0" r="1.0"  g="0"    b="0.0"/>
+  </ColorMap>
   <!-- Categorical Color Maps from vtkColorSeries -->
   <ColorMap name="Spectrum" space="HSV" indexedLookup="true">
     <Point x="0" r="0" g="0" b="0" o="1.0"/>
