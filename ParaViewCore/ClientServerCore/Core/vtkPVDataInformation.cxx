@@ -89,6 +89,7 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->TimeLabel = NULL;
 
   this->PortNumber = -1;
+  this->SortArrays = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1420,6 +1421,14 @@ void vtkPVDataInformation::RegisterHelper(const char *classname,
                                           const char *helper)
 {
   helpers[classname] = helper;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::SetSortArrays(bool sort)
+{
+  this->PointDataInformation->SetSortArrays(sort);
+  this->CellDataInformation->SetSortArrays(sort);
+  this->FieldDataInformation->SetSortArrays(sort);
 }
 
 //----------------------------------------------------------------------------

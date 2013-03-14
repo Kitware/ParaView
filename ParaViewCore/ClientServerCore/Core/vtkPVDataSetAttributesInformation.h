@@ -86,6 +86,13 @@ public:
   virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream*);
 
+  // Description:
+  // Specify whether or not to sort the arrays. The default is
+  // to sort.
+  vtkSetMacro(SortArrays, bool);
+  vtkGetMacro(SortArrays, bool);
+  vtkBooleanMacro(SortArrays, bool);
+
 protected:
   vtkPVDataSetAttributesInformation();
   ~vtkPVDataSetAttributesInformation();
@@ -94,6 +101,9 @@ protected:
   vtkCollection* ArrayInformation;
   // Standard cell attributes.
   short          AttributeIndices[vtkDataSetAttributes::NUM_ATTRIBUTES];
+
+private:
+  bool SortArrays;
 
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
   void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented
