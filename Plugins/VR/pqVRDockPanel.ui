@@ -29,14 +29,14 @@
      <item>
       <widget class="QPushButton" name="saveState">
        <property name="text">
-        <string>Save State</string>
+        <string>Save VR State</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="restoreState">
        <property name="text">
-        <string>Restore State</string>
+        <string>Restore VR State</string>
        </property>
       </widget>
      </item>

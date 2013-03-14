@@ -31,6 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "vtkVRInteractorStyle.h"
 
+#include "pqApplicationCore.h"
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
@@ -68,8 +72,13 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
     return false;
     }
 
-  int id;
-  if (child->GetScalarAttribute("proxy", &id) == 0)
+  // We'll need either the proxyName, or a proxy id and locator in order to set
+  // the proxy
+  int id = -1;
+  bool hasProxyName = static_cast<bool>(child->GetAttribute("proxyName"));
+  bool hasProxyId = static_cast<bool>(locator) &&
+      static_cast<bool>(child->GetScalarAttribute("proxy", &id));
+  if (!hasProxyId && !hasProxyName)
     {
     return false;
     }
@@ -156,15 +165,36 @@ bool vtkVRInteractorStyle::Configure(vtkPVXMLElement *child,
       }
     }
 
-  this->ControlledProxy = locator->LocateProxy(id);
+  // Locate the proxy -- prefer ID lookup.
+  this->ControlledProxy = NULL;
+  if (hasProxyId)
+    {
+    this->ControlledProxy = locator->LocateProxy(id);
+    }
+  else if (hasProxyName)
+    {
+    pqApplicationCore *core = pqApplicationCore::instance();
+    pqServerManagerModel *model = core->getServerManagerModel();
+    pqProxy *proxy = model->findItem<pqProxy*>(
+          child->GetAttribute("proxyName"));
+    if (proxy)
+      {
+      this->ControlledProxy = proxy->getProxy();
+      }
+    }
+
+  // Set property
   this->SetControlledPropertyName(child->GetAttribute("property"));
 
+  // Verify settings
   if (this->ControlledProxy == NULL ||
       this->ControlledPropertyName == NULL ||
       this->ControlledPropertyName[0] == '\0')
     {
     vtkWarningMacro(<<"Invalid Controlled Proxy or PropertyName. "
-                    << "Proxy: " << id
+                    << "this->ControlledProxy: " << this->ControlledProxy << " "
+                    << "Proxy id, locator: " << id << ", " << locator << " "
+                    << "Proxy name: " << child->GetAttribute("proxyName") << " "
                     << "PropertyName: " << this->ControlledPropertyName);
     result = false;
     }
@@ -179,9 +209,20 @@ vtkPVXMLElement* vtkVRInteractorStyle::SaveConfiguration() const
   vtkPVXMLElement* child = vtkPVXMLElement::New();
   child->SetName("Style");
   child->AddAttribute("class",this->GetClassName());
+
+  // Look up proxy name -- we'll store both name and id.
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqServerManagerModel *model = core->getServerManagerModel();
+  pqProxy *pqControlledProxy =
+      model->findItem<pqProxy*>(this->ControlledProxy);
+  QString name = pqControlledProxy ? pqControlledProxy->getSMName()
+                                   : QString("(unknown)");
+  child->AddAttribute("proxyName", qPrintable(name));
+
   child->AddAttribute("proxy",
-    this->ControlledProxy?
-    this->ControlledProxy->GetGlobalIDAsString() : "0");
+                      this->ControlledProxy
+                      ? this->ControlledProxy->GetGlobalIDAsString()
+                      : "0");
   if (this->ControlledPropertyName != NULL &&
       this->ControlledPropertyName[0] != '\0')
     {

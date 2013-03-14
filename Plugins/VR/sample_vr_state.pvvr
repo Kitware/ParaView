@@ -1,0 +1,22 @@
+<VRPluginState>
+  <VRConnectionManager>
+    <VRUIConnection name="vrui" address="localhost" port="8555">
+      <Button id="0" name="1"/>
+      <Button id="1" name="2"/>
+      <Button id="2" name="3"/>
+      <Tracker id="0" name="head"/>
+      <Tracker id="1" name="wand"/>
+    </VRUIConnection>
+  </VRConnectionManager>
+  <VRInteractorStyles>
+    <Style class="vtkVRTrackStyle" proxyName="RenderView1" property="EyeTransformMatrix">
+      <Tracker role="Tracker" name="vrui.head"/>
+    </Style>
+    <Style class="vtkVRGrabWorldStyle" proxyName="RenderView1" property="ModelTransformMatrix">
+      <Button role="Reset world" name="vrui.3"/>
+      <Button role="Rotate world" name="vrui.1"/>
+      <Button role="Translate world" name="vrui.2"/>
+      <Tracker role="Tracker" name="vrui.wand"/>
+    </Style>
+  </VRInteractorStyles>
+</VRPluginState>

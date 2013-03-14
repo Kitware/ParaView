@@ -215,17 +215,6 @@ void pqVRQueueHandler::render()
 }
 
 //----------------------------------------------------------------------------
-/* Sample configuration:
- <VRInteractorStyles>
-    <Style class="vtkVRStyleGrabNRotateWorld">
-      <Button name="wiimote.A"/>
-      <Tracker name="wiimote.tracker"/>
-    </Style>
-    <Style class="vtkVRWandTrackingStyle">
-      <Event name="wiitracker.hand" type = "tracker"/>
-    </Style>
- </VRInteractorStyles>
- */
 void pqVRQueueHandler::configureStyles(vtkPVXMLElement* xml,
                                         vtkSMProxyLocator* locator)
 {
