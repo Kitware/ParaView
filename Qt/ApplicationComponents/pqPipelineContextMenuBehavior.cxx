@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqEditColorMapReaction.h"
 #include "pqPipelineRepresentation.h"
+#include "pqMultiBlockInspectorPanel.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
@@ -42,12 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "vtkSMProxy.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVCompositeDataInformation.h"
 
 #include <QWidget>
 #include <QAction>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QRegExp>
+#include <QApplication>
 
 namespace
 {
@@ -128,8 +132,9 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
           // we need to flip Y.
           int height = senderWidget->size().height();
           pos[1] = height - pos[1];
-          this->PickedRepresentation = view->pick(pos);
-          this->buildMenu(this->PickedRepresentation);
+          unsigned int blockIndex = 0;
+          this->PickedRepresentation = view->pickBlock(pos, blockIndex);
+          this->buildMenu(this->PickedRepresentation, blockIndex);
           this->Menu->popup(senderWidget->mapToGlobal(newPos));
           }
         }
@@ -141,7 +146,8 @@ bool pqPipelineContextMenuBehavior::eventFilter(QObject* caller, QEvent* e)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
+void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
+                                              unsigned int blockIndex)
 {
   pqRenderView* view = qobject_cast<pqRenderView*>(
     pqActiveObjects::instance().activeView());  
@@ -149,6 +155,33 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr)
   if (repr)
     {
     this->Menu->clear();
+
+    vtkPVDataInformation *info = repr->getInputDataInformation();
+    vtkPVCompositeDataInformation *compositeInfo = info->GetCompositeDataInformation();
+    if(compositeInfo && compositeInfo->GetDataIsComposite())
+      {
+      QString blockName = this->lookupBlockName(blockIndex);
+
+      QAction *hideBlockAction =
+        this->Menu->addAction(QString("Hide Block '%1'").arg(blockName));
+      hideBlockAction->setData(blockIndex);
+      this->connect(hideBlockAction, SIGNAL(triggered()),
+                    this, SLOT(hideBlock()));
+
+      QAction *showOnlyBlockAction =
+        this->Menu->addAction(QString("Show Only Block '%1'").arg(blockName));
+      showOnlyBlockAction->setData(blockIndex);
+      this->connect(showOnlyBlockAction, SIGNAL(triggered()),
+                    this, SLOT(showOnlyBlock()));
+
+      QAction *unsetVisibilityAction =
+        this->Menu->addAction("Unset Block Visibility");
+      unsetVisibilityAction->setData(blockIndex);
+      this->connect(unsetVisibilityAction, SIGNAL(triggered()),
+                    this, SLOT(unsetBlockVisibility()));
+
+      this->Menu->addSeparator();
+      }
 
     QAction* action;
     action = this->Menu->addAction("Hide");
@@ -323,5 +356,117 @@ void pqPipelineContextMenuBehavior::hide()
     repr->setVisible(false);
     repr->renderViewEventually();
     END_UNDO_SET();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::hideBlock()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  unsigned int blockIndex = action->data().value<unsigned int>();
+
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    panel->setBlockVisibility(blockIndex, false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::showOnlyBlock()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  unsigned int blockIndex = action->data().value<unsigned int>();
+
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    panel->showOnlyBlock(blockIndex);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::unsetBlockVisibility()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  unsigned int blockIndex = action->data().value<unsigned int>();
+
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    panel->clearBlockVisibility(blockIndex);
+    }
+}
+
+//-----------------------------------------------------------------------------
+QString pqPipelineContextMenuBehavior::lookupBlockName(unsigned int flatIndex) const
+{
+  // get multi-block inspector panel
+  pqMultiBlockInspectorPanel *panel = 0;
+  foreach(QWidget *widget, qApp->topLevelWidgets())
+    {
+    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+    if(panel)
+      {
+      break;
+      }
+    }
+
+  if(panel)
+    {
+    return panel->lookupBlockName(flatIndex);
+    }
+  else
+    {
+    return QString();
     }
 }

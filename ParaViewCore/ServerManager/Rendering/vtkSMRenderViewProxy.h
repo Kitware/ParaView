@@ -63,6 +63,12 @@ public:
   vtkSMRepresentationProxy* Pick(int x, int y);
 
   // Description:
+  // Convenience method to pick a block in a multi-block data set. Will return
+  // the selected representation. Furthermore, if it is a multi-block data set
+  // the flat index of the selected block will be returned in flatIndex.
+  vtkSMRepresentationProxy* PickBlock(int x, int y, unsigned int &flatIndex);
+
+  // Description:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will
   // quietly return an empty selection.

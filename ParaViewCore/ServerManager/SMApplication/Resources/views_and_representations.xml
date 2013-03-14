@@ -1170,6 +1170,8 @@
                     panel_visibility="advanced" />
           <Property name="UserTransform"
                     panel_visibility="never" />
+		  <Property name="BlockVisibility"
+		            panel_visibility="never" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -2533,6 +2535,15 @@
                          number_of_elements="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+	  <IntVectorProperty name="BlockVisibility"
+	                     command="SetBlockVisibility"
+                         clean_command="RemoveBlockVisibilities"
+						 number_of_elements_per_command="2"
+						 repeatable="1">
+	    <Documentation>
+		  Set the visibility for a block. Value is (property, visibility).
+		</Documentation>
+	  </IntVectorProperty>
       <!-- End of SurfaceRepresentationBase -->
     </RepresentationProxy>
     <!-- ================================================================== -->

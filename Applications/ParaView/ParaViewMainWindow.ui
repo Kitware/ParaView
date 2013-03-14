@@ -23,8 +23,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="pqTabbedMultiViewWidget" name="MultiViewWidget">
-     </widget>
+     <widget class="pqTabbedMultiViewWidget" name="MultiViewWidget" native="true"/>
     </item>
    </layout>
   </widget>
@@ -34,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>1152</width>
-     <height>25</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -185,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>77</width>
-          <height>216</height>
+          <width>70</width>
+          <height>178</height>
          </rect>
         </property>
        </widget>
@@ -220,8 +219,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>77</width>
-          <height>214</height>
+          <width>70</width>
+          <height>178</height>
          </rect>
         </property>
        </widget>
@@ -247,6 +246,15 @@
     <number>1</number>
    </attribute>
    <widget class="pqPropertiesPanel" name="propertiesPanel"/>
+  </widget>
+  <widget class="QDockWidget" name="multiBlockInspectorDock">
+   <property name="windowTitle">
+    <string>Multi-block Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="pqMultiBlockInspectorPanel" name="multiBlockInspectorPanel"/>
   </widget>
  </widget>
  <customwidgets>
@@ -325,6 +333,12 @@
    <class>pqPropertiesPanel</class>
    <extends>QWidget</extends>
    <header>pqPropertiesPanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqMultiBlockInspectorPanel</class>
+   <extends>QWidget</extends>
+   <header>pqMultiBlockInspectorPanel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

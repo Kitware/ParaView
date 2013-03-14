@@ -21,6 +21,7 @@
 #include "vtkDataArray.h"
 #include "vtkEventForwarderCommand.h"
 #include "vtkExtractSelectedFrustum.h"
+#include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkMath.h"
@@ -28,6 +29,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
+#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDisplayInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -714,6 +716,62 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::Pick(int x, int y)
     }
   reprs->Delete();
   sources->Delete();
+  return repr;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRepresentationProxy* vtkSMRenderViewProxy::PickBlock(int x,
+                                                          int y,
+                                                          unsigned int &flatIndex)
+{
+  vtkSMRepresentationProxy* repr = NULL;
+  vtkSmartPointer<vtkCollection> reprs = vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> sources = vtkSmartPointer<vtkCollection>::New();
+  int region[4] = {x,y,x,y};
+  if(this->SelectSurfaceCells(region, reprs.GetPointer(), sources.GetPointer(), false))
+    {
+    if (reprs->GetNumberOfItems() > 0)
+      {
+      repr = vtkSMRepresentationProxy::SafeDownCast(reprs->GetItemAsObject(0));
+      }
+    }
+
+  if(!repr)
+    {
+    // nothing selected
+    return 0;
+    }
+
+  // get data information
+  vtkPVDataInformation *info = repr->GetRepresentedDataInformation();
+  vtkPVCompositeDataInformation *compositeInfo = info->GetCompositeDataInformation();
+
+  // get selection in order to determine which block of the data set
+  // set was selected (if it is a composite data set)
+  if(compositeInfo && compositeInfo->GetDataIsComposite())
+    {
+    vtkSMProxy *selectionSource =
+      vtkSMProxy::SafeDownCast(sources->GetItemAsObject(0));
+
+    // get representation input data
+    vtkSMSourceProxy *reprInput =
+      vtkSMSourceProxy::SafeDownCast(
+        vtkSMPropertyHelper(repr, "Input").GetAsProxy());
+
+    // convert cell selection to block selection
+    vtkSMProxy *blockSelection =
+      vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::BLOCKS,
+                                             selectionSource,
+                                             reprInput,
+                                             0);
+
+    // set block index
+    flatIndex = vtkSMPropertyHelper(blockSelection, "Blocks").GetAsInt();
+
+    blockSelection->Delete();
+    }
+
+  // return selected representation
   return repr;
 }
 

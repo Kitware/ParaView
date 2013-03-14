@@ -65,6 +65,19 @@ protected slots:
   /// called to hide the representation.
   void hide();
 
+  /// called to hide the block. the action which emits the signal will
+  /// contain the block index in its data().
+  void hideBlock();
+
+  /// called to show only the selected block. the action which emits the
+  /// signal will contain the block index in its data().
+  void showOnlyBlock();
+
+  /// called to unset the visibility flag for the block. after this call the
+  /// block will inherit the visibility from its parent. the action which
+  /// emits the signal will contain the block index in its data()
+  void unsetBlockVisibility();
+
   /// called to change the representation type.
   void reprTypeChanged(QAction* action);
 
@@ -72,8 +85,10 @@ protected slots:
   void colorMenuTriggered(QAction* action);
 
 protected:
-  /// called to build the context menu for the given representation.
-  virtual void buildMenu(pqDataRepresentation* repr);
+  /// called to build the context menu for the given representation. If the
+  /// picked representation was a composite data set the block index of the
+  /// selected block will be passed in blockIndex.
+  virtual void buildMenu(pqDataRepresentation* repr, unsigned int blockIndex);
 
   /// called to build the color arrays submenu.
   virtual void buildColorFieldsMenu(
@@ -84,6 +99,9 @@ protected:
   /// to eat away the right button release, leaving the render window in a
   /// dragging state.
   virtual bool eventFilter(QObject* caller, QEvent* e);
+
+  /// return the name of the block from its flat index
+  QString lookupBlockName(unsigned int flatIndex) const;
 
   QMenu* Menu;
   QPoint Position;
