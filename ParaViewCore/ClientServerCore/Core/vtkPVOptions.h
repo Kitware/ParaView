@@ -165,6 +165,10 @@ public:
   vtkSetMacro(SatelliteMessageIds, int);
   vtkGetMacro(SatelliteMessageIds, int );
 
+  // Description:
+  // Should this process just print monitor information and exit?
+  vtkGetMacro(PrintMonitors, int);
+
 protected:
 //BTX
   // Description:
@@ -272,6 +276,8 @@ private:
   int UseCudaInterop;
 
   int SatelliteMessageIds;
+
+  int PrintMonitors;
 //ETX
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

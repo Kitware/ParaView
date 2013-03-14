@@ -65,7 +65,8 @@ namespace ParaViewPython {
     static vtkSmartPointer<vtkPVPythonOptions> options =
       vtkSmartPointer<vtkPVPythonOptions>::New();
     vtkInitializationHelper::Initialize( argc, argv, processType, options );
-    if (options->GetTellVersion() || options->GetHelpSelected())
+    if (options->GetTellVersion() || options->GetHelpSelected() ||
+        options->GetPrintMonitors())
       {
       vtkInitializationHelper::Finalize();
       return 1;
