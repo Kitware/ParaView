@@ -1,0 +1,5 @@
+vtk_module_test_executable(SimpleDriver SimpleDriver.cxx)
+vtk_module_test_executable(SimpleDriver2 SimpleDriver2.cxx)
+vtk_module_test_executable(AdaptorDriver
+  AdaptorDriver.cxx
+  vtkCustomUnstructuredGridBuilder.cxx)

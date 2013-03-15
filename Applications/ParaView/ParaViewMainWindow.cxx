@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "vtkPVConfig.h"
-#ifndef BUILD_SHARED_LIBS
-# ifdef PARAVIEW_ENABLE_PYTHON
-#   include "paraviewpythonmodules.h"
-# endif
+#ifdef PARAVIEW_ENABLE_PYTHON
+extern "C" {
+  void vtkPVInitializePythonModules();
+}
 #endif
 
 #include "ParaViewMainWindow.h"
@@ -63,11 +63,10 @@ class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 //-----------------------------------------------------------------------------
 ParaViewMainWindow::ParaViewMainWindow()
 {
-#ifndef BUILD_SHARED_LIBS
 #ifdef PARAVIEW_ENABLE_PYTHON
-  CMakeLoadAllPythonModules();
+  vtkPVInitializePythonModules();
 #endif
-#endif
+
   // init the ParaView embedded documentation.
   PARAVIEW_DOCUMENTATION_INIT();
 

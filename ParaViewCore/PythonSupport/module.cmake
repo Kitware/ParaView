@@ -5,6 +5,7 @@ vtk_module(vtkPVPythonSupport
     vtkCommonCore
     vtksys
     vtkWrappingPython
+    vtkPython
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS
     PARAVIEW

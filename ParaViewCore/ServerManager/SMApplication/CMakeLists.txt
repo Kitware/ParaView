@@ -70,7 +70,8 @@ foreach (_module ${PARAVIEW_CURRENT_CS_MODULES})
   if (NOT ${_module}_EXCLUDE_FROM_WRAPPING AND
       NOT ${_module}_IS_TEST AND
       NOT ${_module}_THIRD_PARTY AND
-        (NOT _module STREQUAL "vtkPVServerManagerApplication") )
+        (NOT _module STREQUAL "vtkPVServerManagerApplication") AND
+        (NOT _module MATCHES ".*Catalyst.*"))
     #message("${_module} == Adding")
     set(vtk-module-init-functions
       "${vtk-module-init-functions}extern \"C\" void ${_module}CS_Initialize(vtkClientServerInterpreter*);\n")

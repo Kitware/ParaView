@@ -238,18 +238,6 @@ FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   ${ParaView_BINARY_DIR}/../ParaViewData
   $ENV{PARAVIEW_DATA_ROOT})
 
-# CoProcessing related options.
-# I am keeping them as they were, we can propobably minimize these as well.
-option(PARAVIEW_ENABLE_COPROCESSING "Enable/Disable the CoProcessing library." ON)
-cmake_dependent_option(BUILD_FORTRAN_COPROCESSING_ADAPTORS
-  "Build a coprocessing adaptor that can be called from Fortran or C" OFF
-  "PARAVIEW_ENABLE_COPROCESSING" OFF)
-cmake_dependent_option(BUILD_PARTICLE_COPROCESSING_ADAPTORS
-  "Build a coprocessing adaptor that renders particle systems" OFF
-  "PARAVIEW_ENABLE_COPROCESSING" OFF)
-mark_as_advanced(BUILD_PARTICLE_COPROCESSING_ADAPTORS)
-mark_as_advanced(BUILD_FORTRAN_COPROCESSING_ADAPTORS)
-
 if (APPLE)
   # If building on apple, we will set cmake rules for ParaView such that "make
   # install" will result in creation of an application bundle by default.
@@ -313,6 +301,36 @@ mark_as_advanced(PARAVIEW_BUILD_WEB_DOCUMENTATION)
 set(Module_vtkParaViewWebDocumentation ${PARAVIEW_BUILD_WEB_DOCUMENTATION}
   CACHE BOOL "" FORCE)
 mark_as_advanced(Module_vtkParaViewWebDocumentation)
+
+option(PARAVIEW_ENABLE_CATALYST "Enable Catalyst CoProcessing modules" ON)
+cmake_dependent_option(PARAVIEW_BUILD_CATALYST_ADAPTORS
+  "Build Adaptors for various simulation codes" ON
+  "PARAVIEW_ENABLE_CATALYST" OFF)
+mark_as_advanced(PARAVIEW_BUILD_CATALYST_ADAPTORS)
+
+set (Module_vtkPVCatalyst ${PARAVIEW_ENABLE_CATALYST} CACHE BOOL "" FORCE)
+mark_as_advanced(Module_vtkPVCatalyst)
+
+if (PARAVIEW_ENABLE_CATALYST)
+  set (Module_vtkPVCatalystTestDriver ${BUILD_TESTING} CACHE BOOL "" FORCE)
+  # When Catalyst is enabled, Fortran is optionally needed. Hence we enable
+  # Fortran at the top level itself. When individual module called
+  # enable_language(...), it failed during first cmake configure but worked o
+  # subsequent. enable_language(... OPTIONAL) overcomes that issue altogether.
+
+  if (NOT WIN32)
+    # Theoretically, CheckFortran should not be needed, but it
+    # enable_language(OPTIONAL) fails with Ninja generator.
+    include(CheckFortran)
+    if  (CMAKE_Fortran_COMPILER)
+      enable_language(Fortran OPTIONAL)
+    endif()
+  endif()
+else()
+  set (Module_vtkPVCatalystTestDriver OFF CACHE BOOL "" FORCE)
+endif()
+mark_as_advanced(Module_vtkPVCatalystTestDriver)
+
 #------------------------------------------------------------------------------
 
 
@@ -369,7 +387,6 @@ set (VTK_Group_ParaViewCore ON CACHE BOOL "")
 set (VTK_Group_ParaViewRendering ON CACHE BOOL "")
 set (VTK_Group_ParaViewQt ${PARAVIEW_BUILD_QT_GUI} CACHE BOOL "" FORCE)
 set (VTK_Group_ParaViewPython ${PARAVIEW_ENABLE_PYTHON} CACHE BOOL "" FORCE)
-set (VTK_Group_CoProcessing ${PARAVIEW_ENABLE_COPROCESSING} CACHE BOOL "" FORCE)
 
 #------------------------------------------------------------------------------
 
@@ -451,7 +468,9 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              ThirdParty
              Utilities
              ParaViewCore
-             Qt)
+             Qt
+             CoProcessing/Catalyst
+             CoProcessing/TestDriver)
 
 if (PARAVIEW_ENABLE_WEB)
   list (APPEND PARAVIEW_MODULE_ROOTS
@@ -463,29 +482,12 @@ if (PARAVIEW_BUILD_WEB_DOCUMENTATION)
     Web/Documentation)
 endif()
 
-if (PARAVIEW_ENABLE_COPROCESSING)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-               CoProcessing/Core
-               CoProcessing/CoProcessor)
-endif()
-
-if (BUILD_FORTRAN_COPROCESSING_ADAPTORS)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-               CoProcessing/Adaptors/FortranAdaptors)
-endif()
-
-if (BUILD_PARTICLE_COPROCESSING_ADAPTORS)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-               CoProcessing/Adaptors/ParticleAdaptor)
-endif()
-
 include(ParaViewModuleTop)
 
 #----------------------------------------------------------------------------------
 # keep VTK cmake variables from polluting the non-advanced space.
 mark_as_advanced(
   VTK_EXTRA_COMPILER_WARNINGS
-  VTK_Group_CoProcessing
   VTK_Group_Imaging
   VTK_Group_MPI
   VTK_Group_ParaView
@@ -540,6 +542,24 @@ add_subdirectory(Wrapping/ClientServer)
 # This merely builds/installs/packages the ParaView specific *.py files.
 #------------------------------------------------------------------------------
 add_subdirectory(Wrapping/Python)
+
+#------------------------------------------------------------------------------
+# Process modules that need to be add at the end, after all other modules have
+# been processed.
+if (PARAVIEW_ENABLE_PYTHON)
+  add_subdirectory(Utilities/PythonInitializer)
+endif()
+
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
+  vtk_add_module(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst
+                module.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/CoProcessing/PythonCatalyst
+                Cxx
+                Python)
+  set(_module vtkPVPythonCatalyst)
+  set(vtk-module ${_module})
+  add_subdirectory("${${_module}_SOURCE_DIR}" "${${_module}_BINARY_DIR}")
+endif()
 
 #------------------------------------------------------------------------------
 # Process ParaView Plugins. These are processed similar to VTK modules.
@@ -627,6 +647,15 @@ if (BUILD_EXAMPLES)
   # that examples can be built by themselves as well as avoiding pollution of
   # the ParaView target space with targets (and other things) from examples.
   include(${CMAKE_CURRENT_SOURCE_DIR}/Examples/BuildExamples.cmake)
+endif()
+
+
+#-----------------------------------------------------------------------------
+if (PARAVIEW_BUILD_CATALYST_ADAPTORS)
+  # BuildAdaptors.cmake builds the adaptors as a separate project. We mark is
+  # OPTIONAL for Catalyst packages that don't have the adaptors included.
+  include(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/Adaptors/BuildAdaptors.cmake
+          OPTIONAL)
 endif()
 
 #-----------------------------------------------------------------------------
