@@ -283,14 +283,10 @@ if (UNIX AND NOT APPLE)
   set(VTK_BUILD_FORWARDING_EXECUTABLES TRUE)
 endif()
 
-option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON)
-mark_as_advanced(PARAVIEW_ENABLE_WEB)
+cmake_dependent_option(PARAVIEW_ENABLE_WEB "Enable/Disable web support" ON
+    "PARAVIEW_ENABLE_PYTHON" OFF)
 
-if (PARAVIEW_ENABLE_WEB AND NOT PARAVIEW_ENABLE_PYTHON)
-  message(
-    WARNING "ParaViewWeb required Python, enable Python support by"
-      "turning on PARAVIEW_ENABLE_PYTHON.")
-endif()
+mark_as_advanced(PARAVIEW_ENABLE_WEB)
 
 set(Module_vtkParaViewWeb ${PARAVIEW_ENABLE_WEB} CACHE BOOL "" FORCE)
 mark_as_advanced(Module_vtkParaViewWeb)
@@ -438,7 +434,7 @@ else()
                                "Disable Python Threads support" FORCE)
   set(VTK_WRAP_PYTHON ${PARAVIEW_ENABLE_PYTHON}
     CACHE INTERNAL "Should VTK Python wrapping be built?" FORCE)
-  
+
   # Turn Cosmo and VPIC MPI build flags based on value of PARAVIEW_USE_MPI
   set(VTK_COSMO_USE_MPI ${PARAVIEW_USE_MPI} CACHE BOOL "" FORCE)
   mark_as_advanced(VTK_COSMOS_USE_MPI)
