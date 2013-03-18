@@ -751,10 +751,12 @@ class ColorArrayProperty(VectorProperty):
                     break
 
         if att == None:
-            raise ValueError("Could not locate array %s in the input." % arr)
-
-        catt = self.Proxy.GetProperty("ColorAttributeType")
-        catt.SetData(att)
+            pvoptions = vtkProcessModule.GetProcessModule().GetOptions()
+            if pvoptions.GetSymmetricMPIMode() == False:
+                raise ValueError("Could not locate array %s in the input." % arr)
+        else:
+            catt = self.Proxy.GetProperty("ColorAttributeType")
+            catt.SetData(att)
         self.SMProperty.SetElement(0, arr)
         self._UpdateProperty()
 
