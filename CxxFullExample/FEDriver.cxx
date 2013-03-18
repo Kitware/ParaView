@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
   Grid grid;
-  unsigned int numPoints[3] = {5, 6, 7};
+  unsigned int numPoints[3] = {70, 60, 44};
   double spacing[3] = {1, 1.1, 1.3};
   grid.Initialize(numPoints, spacing);
   Attributes attributes;

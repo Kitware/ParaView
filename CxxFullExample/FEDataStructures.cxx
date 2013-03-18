@@ -1,5 +1,6 @@
 #include "FEDataStructures.h"
 
+#include <mpi.h>
 #include <iostream>
 
 Grid::Grid()
@@ -11,9 +12,22 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3] )
     {
     std::cerr << "Must have a non-zero amount of points in each direction.\n";
     }
+  // in parallel, we do a simple partitioning in the x-direction.
+  int mpiSize = 1;
+  int mpiRank = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
+
+  unsigned int startXPoint = mpiRank*numPoints[0]/mpiSize;
+  unsigned int endXPoint = (mpiRank+1)*numPoints[0]/mpiSize;
+  if(mpiSize != mpiRank+1)
+    {
+    endXPoint++;
+    }
+
   // create the points -- slowest in the x and fastest in the z directions
   double coord[3] = {0,0,0};
-  for(unsigned int i=0;i<numPoints[0];i++)
+  for(unsigned int i=startXPoint;i<endXPoint;i++)
     {
     coord[0] = i*spacing[0];
     for(unsigned int j=0;j<numPoints[1];j++)
@@ -29,7 +43,8 @@ void Grid::Initialize(const unsigned int numPoints[3], const double spacing[3] )
     }
   // create the hex cells
   unsigned int cellPoints[8];
-  for(unsigned int i=0;i<numPoints[0]-1;i++)
+  unsigned int numXPoints = endXPoint - startXPoint;
+  for(unsigned int i=0;i<numXPoints-1;i++)
     {
     for(unsigned int j=0;j<numPoints[1]-1;j++)
       {
