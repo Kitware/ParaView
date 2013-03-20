@@ -562,11 +562,33 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
               // Pyramid
               else if (numNodes == 5 && numFaces == 5)
                 {
-                // Pyramid node numbering in GMV see page 80. Top of the pyramid is the first node.
-                // Pyramid node number in VTK: top of the pyramd is the last node
-                for (k = 1; k < numNodes; ++k)
-                  list[k-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
-                list[numNodes-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 0] + incr;
+                // This branch catches both the GMV cell types 'pyramid' and 'ppyrmd5'.
+                // Distinguish them by checking the number of vertices used for the first
+                // face of the pyramdi: 3 for 'pyramid', 4 for 'ppyrmd5'.
+
+                // face offset (= face number, counting from 0)
+                const unsigned long j = 0;
+                // number of unique vertices of first face of pyramid element i
+                unsigned long numPtsFirstFace =
+                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j+1 ] -
+                  GMVRead::gmv_meshdata.facetoverts[ GMVRead::gmv_meshdata.celltoface[i] + j ];
+
+                if (numPtsFirstFace == 3)
+                  {
+                  // Node numbering for GMV cell type 'pyramid', see gmvdoc.color.pdf page 80:
+                  //   top of the pyramid is the first node.
+                  // Pyramid node number in VTK: top of the pyramid is the last node
+                  for (k = 1; k < numNodes; ++k)
+                    list[k-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                  list[numNodes-1] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 0] + incr;
+                  }
+                else
+                  {
+                  // Node numbering for GMV cell type 'ppyrmd5', see gmvdoc.color.pdf page 80,
+                  // is identical to that in VTK: top of the pyramid is the last node
+                  for (k = 0; k < numNodes; ++k)
+                    list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                  }
                 ugrid->InsertNextCell(VTK_PYRAMID, numNodes, list);
                 }
               // Prism
