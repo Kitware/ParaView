@@ -531,12 +531,24 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_LINE, numNodes, list);
                 }
+              else if (numNodes == 3 && numFaces == 2)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_EDGE, numNodes, list);
+                }
               // Triangle
               else if (numNodes == 3 && numFaces == 1)
                 {
                 for (k = 0; k < numNodes; ++k)
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_TRIANGLE, numNodes, list);
+                }
+              else if (numNodes == 6 && numFaces == 1)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_TRIANGLE, numNodes, list);
                 }
               // Quad
               else if (numNodes == 4 && numFaces == 1)
@@ -545,6 +557,12 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_QUAD, numNodes, list);
                 }
+              else if (numNodes == 8 && numFaces == 1)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_QUAD, numNodes, list);
+                }
               // Tetraeder
               else if (numNodes == 4 && numFaces == 4)
                 {
@@ -552,12 +570,35 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_TETRA, numNodes, list);
                 }
+              else if (numNodes == 10 && numFaces == 4)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_TETRA, numNodes, list);
+                }
               // Hexaeder
               else if (numNodes == 8 && numFaces == 6)
                 {
                 for (k = 0; k < numNodes; ++k)
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_HEXAHEDRON, numNodes, list);
+                }
+              else if (numNodes == 20 && numFaces == 6)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_HEXAHEDRON, numNodes, list);
+                }
+              else if (numNodes == 27 && numFaces == 48)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+
+                list[20] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 23] + incr;
+                list[22] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 20] + incr;
+                list[23] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + 22] + incr;
+
+                ugrid->InsertNextCell(VTK_TRIQUADRATIC_HEXAHEDRON, numNodes, list);
                 }
               // Pyramid
               else if (numNodes == 5 && numFaces == 5)
@@ -591,12 +632,24 @@ int vtkGMVReader::RequestData(vtkInformation *vtkNotUsed(request),
                   }
                 ugrid->InsertNextCell(VTK_PYRAMID, numNodes, list);
                 }
+              else if (numNodes == 13 && numFaces == 5)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_PYRAMID, numNodes, list);
+                }
               // Prism
               else if (numNodes == 6 && numFaces == 5)
                 {
                 for (k = 0; k < numNodes; ++k)
                   list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
                 ugrid->InsertNextCell(VTK_WEDGE, numNodes, list);
+                }
+              else if (numNodes == 15 && numFaces == 5)
+                {
+                for (k = 0; k < numNodes; ++k)
+                  list[k] = GMVRead::gmv_meshdata.cellnodes[numNodesSoFar + k] + incr;
+                ugrid->InsertNextCell(VTK_QUADRATIC_WEDGE, numNodes, list);
                 }
               // General (generic cell type, the only case where
               // GMVRead::gmv_meshdata.cellnnode[i] keeps its default value of 0)
