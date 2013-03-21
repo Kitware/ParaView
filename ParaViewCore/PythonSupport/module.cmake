@@ -4,7 +4,7 @@ vtk_module(vtkPVPythonSupport
   DEPENDS
     vtkCommonCore
     vtksys
-    vtkWrappingPython
+    vtkWrappingPythonCore
     vtkPython
   EXCLUDE_FROM_WRAPPING
   TEST_LABELS

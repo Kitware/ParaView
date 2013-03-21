@@ -18,7 +18,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h"
-#include "vtkPythonAppInitConfigure.h"
+#include "vtkPVPythonAppInitConfigure.h"
 #include "vtkStdString.h"
 #include "vtkWindows.h"
 
