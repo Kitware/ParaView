@@ -1648,7 +1648,7 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
 
   // Keep depth of crater along clip plane normal.
   this->ClipDepthMax = 0.0;
-  this->ClipDepthMin = VTK_LARGE_FLOAT;
+  this->ClipDepthMin = VTK_FLOAT_MAX;
   this->ClipDepthMaximums = 0;
   this->ClipDepthMinimums = 0;
 
@@ -1708,7 +1708,7 @@ vtkMaterialInterfaceFilter::~vtkMaterialInterfaceFilter()
   this->FragmentId = 0;
   this->FragmentVolume = 0.0;
   this->ClipDepthMax = 0.0;
-  this->ClipDepthMin = VTK_LARGE_FLOAT;
+  this->ClipDepthMin = VTK_FLOAT_MAX;
 
   this->SetClipFunction(0);
 
@@ -1936,8 +1936,8 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(
     this->Levels[level] = new vtkMaterialInterfaceLevel;
 
     int cumulativeExt[6];
-    cumulativeExt[0] = cumulativeExt[2] = cumulativeExt[4] = VTK_LARGE_INTEGER;
-    cumulativeExt[1] = cumulativeExt[3] = cumulativeExt[5] = -VTK_LARGE_INTEGER;
+    cumulativeExt[0] = cumulativeExt[2] = cumulativeExt[4] = VTK_INT_MAX;
+    cumulativeExt[1] = cumulativeExt[3] = cumulativeExt[5] = -VTK_INT_MAX;
 
     int numBlocks = input->GetNumberOfDataSets(level);
     for (int levelBlockId = 0; levelBlockId < numBlocks; ++levelBlockId)
@@ -2526,8 +2526,8 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
   int ext[6];
 
   largestNumCells = 0;
-  globalBounds[0] = globalBounds[2] = globalBounds[4] = VTK_LARGE_FLOAT;
-  globalBounds[1] = globalBounds[3] = globalBounds[5] = -VTK_LARGE_FLOAT;
+  globalBounds[0] = globalBounds[2] = globalBounds[4] = VTK_FLOAT_MAX;
+  globalBounds[1] = globalBounds[3] = globalBounds[5] = -VTK_FLOAT_MAX;
   lowestSpacing[0] = lowestSpacing[1] = lowestSpacing[2] = 0.0;
 
   // Add each block.
@@ -2998,8 +2998,8 @@ int vtkMaterialInterfaceFilter::ComputeRequiredGhostExtent(
   remoteBlockIndex[2] = (remoteBaseCellExt[4]+remoteBaseCellExt[5])
                             / (2*this->StandardBlockDimensions[2]);
 
-  neededExt[0] = neededExt[2] = neededExt[4] = VTK_LARGE_INTEGER;
-  neededExt[1] = neededExt[3] = neededExt[5] = -VTK_LARGE_INTEGER;
+  neededExt[0] = neededExt[2] = neededExt[4] = VTK_INT_MAX;
+  neededExt[1] = neededExt[3] = neededExt[5] = -VTK_INT_MAX;
 
   // These loops visit all 26 face,edge and corner neighbors.
   int direction[3];
@@ -3131,7 +3131,7 @@ void vtkMaterialInterfaceFilter::PrepareForPass(
   if (this->ClipWithPlane)
     {
     this->ClipDepthMax = 0.0;
-    this->ClipDepthMin = VTK_LARGE_FLOAT;
+    this->ClipDepthMin = VTK_FLOAT_MAX;
     ReNewVtkPointer(this->ClipDepthMaximums);
     ReNewVtkPointer(this->ClipDepthMinimums);
     this->ClipDepthMaximums->SetName("ClipDepthMax");
@@ -3737,7 +3737,7 @@ int vtkMaterialInterfaceFilter::ProcessBlock(int blockId)
           // clear the volume accumulator
           this->FragmentVolume = 0.0;
           this->ClipDepthMax = 0.0;
-          this->ClipDepthMin = VTK_LARGE_FLOAT;
+          this->ClipDepthMin = VTK_FLOAT_MAX;
           if (this->ComputeMoments)
             {
             // Save the moments from the last fragment

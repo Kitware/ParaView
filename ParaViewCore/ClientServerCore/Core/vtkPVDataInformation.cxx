@@ -68,8 +68,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->PolygonCount = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
-  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
+  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_INT_MAX;
+  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_INT_MAX;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
   this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
@@ -228,8 +228,8 @@ void vtkPVDataInformation::Initialize()
   this->PolygonCount = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
-  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
-  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
+  this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_INT_MAX;
+  this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_INT_MAX;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
   this->VertexDataInformation->Initialize();
