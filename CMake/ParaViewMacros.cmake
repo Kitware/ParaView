@@ -490,7 +490,7 @@ function(copy_files_recursive source-dir)
 
   set (doing "")
   foreach (arg ${ARGN})
-    if ("${arg}" MATCHES "^(DESTINATION|REGEX|OUTPUT|LABEL)$")
+    if (arg MATCHES "^(DESTINATION|REGEX|OUTPUT|LABEL)$")
       set (doing "${arg}")
     elseif ("${doing}" STREQUAL "DESTINATION")
       set (doing "")
