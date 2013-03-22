@@ -24,15 +24,17 @@ def _get_argument_parser():
   parser = argparse.ArgumentParser()
 
   parser.add_argument('-r', dest='repo', action='store', default='',
-                        help='The source repo, defaults to repo in which the script is contained')
+                        help='the source repo, defaults to repo in which the script is contained')
 
-  parser.add_argument('-i', dest='input_dir', action='store',
-                        help='The directory contain manifest.json and other resources')
-
+  parser.add_argument('-i', dest='input_dirs', action='append',
+                        help='(repeatable) the directory contain manifest.json'\
+                        'and other resources; muliple input decks can be'\
+                        'specified by repeating -i in the order of processing'\
+                        'The directory contain manifest.json and other resources')
   parser.add_argument('-o', dest='output_dir', action='store',
-                        help='The directory where the modified sources will be written')
+                        help='the directory where the modified sources will be written')
 
-  usage = "usage: %prog [options]"
+  usage = "Usage: %prog [options]"
 
   return parser
 
@@ -55,7 +57,7 @@ def copy_path(src, dest, exclude):
 
 def replace_paths(config, paths):
   for replace in paths:
-    replace_with = config.input_dir + '/' + replace['path']
+    replace_with = config.current_input_dir + '/' + replace['path']
     if os.path.isdir(replace_with):
       error('%s is a directory, only support replacing a file' % replace_with)
     if not os.path.exists(replace_with):
@@ -123,21 +125,21 @@ def copy_paths(config, paths):
   except (IOError, os.error) as err:
     error(err)
 
-def create_cmake_script(config, manifest):
+def create_cmake_script(config, manifest_list):
   cmake_script='#!/bin/bash\n';
-  modules = manifest['modules']
-  cs_modules = []
-  python_modules = []
+  cs_modules = set()
+  python_modules = set()
 
-  last = modules[len(modules)-1]
   # what modules to client/server wrap?
 
-  for module in modules:
-    if 'cswrap' in module and module['cswrap']:
-      cs_modules.append(module['name'])
+  for manifest in manifest_list:
+    modules = manifest["modules"]
+    for module in modules:
+      if 'cswrap' in module and module['cswrap']:
+        cs_modules.add(module['name'])
 
-    if 'pythonwrap' in module and module['pythonwrap']:
-      python_modules.append(module['name'])
+      if 'pythonwrap' in module and module['pythonwrap']:
+        python_modules.add(module['name'])
 
   # ClientServer wrap
   cmake_script += 'cmake \\\n'
@@ -145,7 +147,7 @@ def create_cmake_script(config, manifest):
   # Python modules
   cmake_script+='  -DVTK_WRAP_PYTHON_MODULES:STRING="%s" \\\n' % (';'.join(python_modules))
 
-  for key, value in cmake_cache(config, manifest).items():
+  for key, value in cmake_cache(config, manifest_list).items():
     cmake_script += '  -D%s=%s \\\n' % (key, value)
 
   # add ParaView git describe so the build has the correct version
@@ -168,22 +170,32 @@ def create_cmake_script(config, manifest):
   except (IOError, os.error) as err:
     error(err)
 
-def cmake_cache(config, manifest):
+def cmake_cache(config, manifest_list):
   cache_entries = { }
-  for entry in manifest['cmake']['cache']:
-    cache_entries['%s:%s' % (entry['name'], entry['type'])] = entry['value']
-
+  for manifest in manifest_list:
+    try:
+      for entry in manifest['cmake']['cache']:
+        # note manifest_list will be treated as an ordered list with newer
+        # manifests replacing older values set for the same key.
+        cache_entries['%s:%s' % (entry['name'], entry['type'])] = entry['value']
+    except KeyError:
+      pass
   return cache_entries
 
 def process(config):
 
-  with open(config.input_dir + '/manifest.json' , 'r') as fp:
-    manifest = json.load(fp)
+  all_manifests = []
+  for input_dir in config.input_dirs:
+    print "Processing ", input_dir
+    with open(input_dir + '/manifest.json' , 'r') as fp:
+      manifest = json.load(fp)
+      config.current_input_dir  = input_dir
+      copy_paths(config, manifest['paths'])
+      copy_paths(config, manifest['modules'])
 
-  copy_paths(config, manifest['paths'])
-  copy_paths(config, manifest['modules'])
+      all_manifests.append(manifest)
 
-  create_cmake_script(config, manifest)
+  create_cmake_script(config, all_manifests)
 
 def main():
   parser = _get_argument_parser()
@@ -191,13 +203,17 @@ def main():
 
   if len(config.repo.strip()) == 0:
     try:
-      path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], cwd=config.input_dir)
+      path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'],
+                                     cwd=os.path.dirname(os.path.abspath(__file__)))
     except subprocess.CalledProcessError as err:
       error(err)
   else:
     path = config.repo
 
   config.repo = path.strip()
+
+  # cleanup output directory.
+  shutil.rmtree(config.output_dir, ignore_errors=True)
 
   process(config)
 

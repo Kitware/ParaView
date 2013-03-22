@@ -55,6 +55,11 @@
         "name":"Module_vtkIOXML",
         "type":"BOOL",
         "value":"ON"
+      },
+      {
+        "name": "Module_vtkUtilitiesEncodeString",
+        "type": "BOOL",
+        "value": "ON"
       }
     ]
   },

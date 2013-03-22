@@ -27,10 +27,57 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMMessage.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMUtilities.h"
 
 #include <string>
 #include <vtksys/ios/sstream>
+
+// Windows-only helper functionality:
+#ifdef _WIN32
+# include <Windows.h>
+#endif
+
+namespace {
+
+#ifdef _WIN32
+BOOL CALLBACK listMonitorsCallback(HMONITOR hMonitor, HDC /*hdcMonitor*/,
+                                   LPRECT /*lprcMonitor*/, LPARAM dwData)
+{
+  std::ostringstream *str = reinterpret_cast<std::ostringstream*>(dwData);
+
+  MONITORINFOEX monitorInfo;
+  monitorInfo.cbSize = sizeof(monitorInfo);
+
+  if (GetMonitorInfo(hMonitor, &monitorInfo))
+    {
+      LPRECT rect = &monitorInfo.rcMonitor;
+      *str << "Device: \"" << monitorInfo.szDevice << "\" "
+           << "Geometry: "
+           << std::noshowpos
+           << rect->right - rect->left << "x"
+           << rect->bottom - rect->top
+           << std::showpos
+           << rect->left << rect->top << " "
+           << ((monitorInfo.dwFlags & MONITORINFOF_PRIMARY)
+               ? "(primary)" : "")
+           << std::endl;
+    }
+  return true;
+}
+#endif // _WIN32
+
+std::string ListAttachedMonitors()
+{
+#ifndef _WIN32
+  return std::string("Monitor detection only implemented for MS Windows.");
+#else // _WIN32
+  std::ostringstream str;
+  EnumDisplayMonitors(NULL, NULL, listMonitorsCallback,
+                      reinterpret_cast<LPARAM>(&str));
+  return str.str();
+#endif // _WIN32
+}
+
+} // end anon namespace
 
 //----------------------------------------------------------------------------
 void vtkInitializationHelper::Initialize(const char* executable, int type)
@@ -114,7 +161,7 @@ void vtkInitializationHelper::Initialize(int argc, char**argv,
 
   if (options->GetPrintMonitors())
     {
-      std::string monitors = vtkSMUtilities::ListAttachedMonitors();
+      std::string monitors = ListAttachedMonitors();
       vtkOutputWindow::GetInstance()->DisplayText(monitors.c_str());
       // TODO: indicate to the caller that application must quit.
     }
