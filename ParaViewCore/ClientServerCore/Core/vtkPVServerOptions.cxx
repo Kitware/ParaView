@@ -15,11 +15,26 @@
 #include "vtkPVServerOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVServerOptionsInternals.h"
-#include "vtksys/ios/sstream"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
 #include <cstdio>
+
+namespace
+{
+  // redefining from vtkRenderWindow.h to avoid a dependency on rendering.
+  // we need to fix this at some point.
+  static int VTK_STEREO_CRYSTAL_EYES=1;
+  static int VTK_STEREO_RED_BLUE=2;
+  static int VTK_STEREO_INTERLACED=3;
+  static int VTK_STEREO_LEFT=4;
+  static int VTK_STEREO_RIGHT=5;
+  static int VTK_STEREO_DRESDEN=6;
+  static int VTK_STEREO_ANAGLYPH=7;
+  static int VTK_STEREO_CHECKERBOARD=8;
+  static int VTK_STEREO_SPLITVIEWPORT_HORIZONTAL=9;
+};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
@@ -85,6 +100,41 @@ int vtkPVServerOptions::AddMachineInformation(const char** atts)
       {
       vtksys_ios::istringstream str(const_cast<char *>(value.c_str()));
       str >> info.ShowBorders;
+      }
+    else if(key == "StereoType")
+      {
+      std::map<std::string, int> map;
+      map["crystal eyes"] = VTK_STEREO_CRYSTAL_EYES;
+      map["red-blue"] = VTK_STEREO_RED_BLUE;
+      map["interlaced"] = VTK_STEREO_INTERLACED;
+      map["left"] = VTK_STEREO_LEFT;
+      map["right"] = VTK_STEREO_RIGHT;
+      map["dresden"] = VTK_STEREO_DRESDEN;
+      map["anaglyph"] = VTK_STEREO_ANAGLYPH;
+      map["checkerboard"] = VTK_STEREO_CHECKERBOARD;
+      map["splitviewporthorizontal"] = VTK_STEREO_SPLITVIEWPORT_HORIZONTAL;
+
+      value = vtksys::SystemTools::LowerCase(value);
+      if (map.find(value) != map.end())
+        {
+        info.StereoType = map[value];
+        }
+      else
+        {
+        info.StereoType = 0; // no stereo (or invalid stereo mode).
+        }
+      // Currently, we only support left or right stereo. We cannot simply support
+      // other types since that causes multiple renders and those need to match
+      // up across all processes, including the client.
+      if (info.StereoType != VTK_STEREO_LEFT &&
+        info.StereoType != VTK_STEREO_RIGHT &&
+        info.StereoType != 0)
+        {
+        vtkErrorMacro("Only 'Left' or 'Right' can be used as the StereoType. "
+          "For all other modes, please use the command line arguments for the "
+          "ParaView client.");
+        info.StereoType = -1;
+        }
       }
     else if(key == "LowerLeft")
       {
@@ -218,6 +268,17 @@ bool vtkPVServerOptions::GetFullScreen(unsigned int idx)
     }
 
   return this->Internals->MachineInformationVector[idx].FullScreen != 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVServerOptions::GetStereoType(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return -1;
+    }
+
+  return this->Internals->MachineInformationVector[idx].StereoType;
 }
 
 //----------------------------------------------------------------------------

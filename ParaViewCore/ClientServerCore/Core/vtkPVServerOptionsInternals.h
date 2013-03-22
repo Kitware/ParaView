@@ -43,6 +43,7 @@ public:
         this->FullScreen = false;
         this->ShowBorders = false;
         this->CaveBoundsSet = 0;
+        this->StereoType = -1;
       }
 
     std::string Name;  // what is the name of the machine
@@ -50,12 +51,20 @@ public:
     int Geometry[4]; // x, y, width, height
     bool FullScreen; // Start fullscreen, ignoring Geometry.
     bool ShowBorders; // Show window decorations
+
+    // if StereoType is specified, it overrides the settings provided on the
+    // command line. -1 is not defined. 0 is no stereo. Values are in
+    // vtkRenderWindow.h (VTK_STEREO_*).
+    int StereoType;
+
     int CaveBoundsSet;  // have the cave bounds been set
     // store the cave bounds  all 0.0 if not set
     double LowerLeft[3];
     double LowerRight[3];
     double UpperRight[3];
+
   };
+
   void PrintSelf(ostream& os, vtkIndent indent)
     {
       os << indent << "Eye Separation: " << this->EyeSeparation << "\n";
@@ -75,6 +84,7 @@ public:
           }
         os << ind2 << "FullScreen: " << minfo.FullScreen << "\n";
         os << ind2 << "ShowBorders: " << minfo.ShowBorders << "\n";
+        os << ind2 << "StereoType: " << minfo.StereoType << "\n";
         if(minfo.CaveBoundsSet)
           {
           int j;

@@ -129,6 +129,11 @@ public:
   bool GetShowBorders(unsigned int idx) const;
 
   // Description:
+  // Get the stereo-type specified in the pvx. -1=no-specified, 0=no-stereo.
+  int GetStereoType(unsigned int idx) const;
+  void SetStereoType(unsigned int idx, int type);
+
+  // Description:
   // Coordinates of lower left corner of this cave display
   void SetLowerLeft(unsigned int idx, double coord[3]);
   double* GetLowerLeft(unsigned int idx) const;

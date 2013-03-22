@@ -113,6 +113,7 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
     this->SetGeometry(idx, info->GetGeometry(idx));
     this->SetFullScreen(idx, info->GetFullScreen(idx));
     this->SetShowBorders(idx, info->GetShowBorders(idx));
+    this->SetStereoType(idx, info->GetStereoType(idx));
     this->SetLowerLeft(idx, info->GetLowerLeft(idx));
     this->SetLowerRight(idx, info->GetLowerRight(idx));
     this->SetUpperRight(idx, info->GetUpperRight(idx));
@@ -156,6 +157,7 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* vtkNotUsed(obj))
       this->SetGeometry(idx, serverOptions->GetGeometry(idx));
       this->SetFullScreen(idx, serverOptions->GetFullScreen(idx));
       this->SetShowBorders(idx, serverOptions->GetShowBorders(idx));
+      this->SetStereoType(idx, serverOptions->GetStereoType(idx));
       this->SetLowerLeft(idx, serverOptions->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
       this->SetUpperRight(idx, serverOptions->GetUpperRight(idx));
@@ -229,6 +231,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->SetGeometry(idx, serverInfo->GetGeometry(idx));
       this->SetFullScreen(idx, serverInfo->GetFullScreen(idx));
       this->SetShowBorders(idx, serverInfo->GetShowBorders(idx));
+      this->SetStereoType(idx, serverInfo->GetStereoType(idx));
       this->SetLowerLeft(idx, serverInfo->GetLowerLeft(idx));
       this->SetLowerRight(idx, serverInfo->GetLowerRight(idx));
       this->SetUpperRight(idx, serverInfo->GetUpperRight(idx));
@@ -274,6 +277,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
          << this->GetGeometry(idx)[2] << this->GetGeometry(idx)[3];
     *css << this->GetFullScreen(idx);
     *css << this->GetShowBorders(idx);
+    *css << this->GetStereoType(idx);
     *css << this->GetLowerLeft(idx)[0] << this->GetLowerLeft(idx)[1]
          << this->GetLowerLeft(idx)[2];
     *css << this->GetLowerRight(idx)[0] << this->GetLowerRight(idx)[1]
@@ -357,14 +361,14 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   unsigned int idx;
   const char* env;
   int machineOffset = 13;
-  int valuesPerMachine = 16;
+  int valuesPerMachine = 17;
   for (idx = 0; idx < numMachines; idx++)
     {
     int machineIndex = machineOffset + idx * valuesPerMachine;
     int currentValueOffset = 0;
     if (!css->GetArgument(0, machineIndex + currentValueOffset++, &env))
       {
-      vtkErrorMacro("Error parsing display environment from message.");
+      vtkErrorMacro("Error parsing display environment from message for "<< idx);
       return;
       }
     this->MachinesInternals->MachineInformationVector[idx].Environment = env;
@@ -390,6 +394,12 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
                           &this->MachinesInternals->MachineInformationVector[idx].ShowBorders))
       {
       vtkErrorMacro("Error parsing ShowBorders flag from message.");
+      return;
+      }
+    if (!css->GetArgument(0, machineIndex + currentValueOffset++,
+                          &this->MachinesInternals->MachineInformationVector[idx].StereoType))
+      {
+      vtkErrorMacro("Error parsing StereoType flag from message.");
       return;
       }
     if (!css->GetArgument(0, machineIndex + currentValueOffset++,
@@ -584,6 +594,33 @@ bool vtkPVServerInformation::GetShowBorders(unsigned int idx) const
     }
 
   return this->MachinesInternals->MachineInformationVector[idx].ShowBorders;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerInformation::SetStereoType(unsigned int idx, int type)
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    unsigned int i;
+    vtkPVServerOptionsInternals::MachineInformation info;
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
+      {
+      this->MachinesInternals->MachineInformationVector.push_back(info);
+      }
+    }
+
+  this->MachinesInternals->MachineInformationVector[idx].StereoType = type;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVServerInformation::GetStereoType(unsigned int idx) const
+{
+  if (idx >= this->GetNumberOfMachines())
+    {
+    return -1;
+    }
+
+  return this->MachinesInternals->MachineInformationVector[idx].StereoType;
 }
 
 //----------------------------------------------------------------------------
