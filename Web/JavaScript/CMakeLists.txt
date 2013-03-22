@@ -39,15 +39,15 @@ add_custom_command(OUTPUT ${paraview_all_min_js} ${paraview_all_js}
 set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
 set(ext_binary_dir "${CMAKE_BINARY_DIR}/www/js/ext")
 
-file(GLOB ext_js_files
-  RELATIVE ${ext_source_dir} "${ext_source_dir}/*.js")
+copy_files_recursive(${ext_source_dir}
+  DESTINATION ${ext_binary_dir}
+  REGEX "^(.*\\.js)$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete"
+  LABEL "Copying JavaScript files")
 
-foreach(_file ${ext_js_files})
-  configure_file("${ext_source_dir}/${_file}" "${ext_binary_dir}/${_file}"
-      COPYONLY)
-endforeach()
-
-add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS ${paraview_all_min_js})
+add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS
+  ${paraview_all_min_js}
+  "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete")
 
 install(DIRECTORY ${ext_binary_dir}
   DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/js

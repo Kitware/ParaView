@@ -1,0 +1,236 @@
+/*
+ * Text labels (Jaws)
+ */
+
+/* Label element */
+.cvl-selected-label
+{
+	padding: 4px 2px;
+	margin: 2px;
+	background-color: #1F75A8;
+	border: 1px solid #1F75A8;
+	border-radius:         4px;
+	-moz-border-radius:    4px;
+	-webkit-border-radius: 4px;
+	-o-border-radius:      4px;
+	-ms-border-radius:     4px;
+	float: left;
+}
+
+.cvl-selected-label:hover
+{
+	box-shadow:         2px 2px 3px #bbb;
+	-moz-box-shadow:    2px 2px 3px #bbb;
+	-webkit-box-shadow: 2px 2px 3px #bbb;
+	-o-box-shadow:      2px 2px 3px #bbb;
+	-ms-box-shadow:     2px 2px 3px #bbb;
+}
+
+/* Label Del element (x) */
+.cvl-selected-label .cvl-selected-del
+{
+	float: left;
+	color: #ffffff;
+	font-weight: bold;
+	font-family: Verdana;
+	font-size: 11px;
+	width: 14px;
+	padding: 1px 0;
+	margin: 0;
+	margin-right: 2px;
+	border-right: 1px solid #ffffff;
+	text-align: center;
+	cursor: pointer;
+}
+
+/* Label text */
+.cvl-selected-label .cvl-selected-name
+{
+	float: left;
+	padding: 0 4px 0 2px;
+	margin: 0;
+	color: #ffffff;
+	font-family: 'Segoe UI', 'Trebuchet MS', Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+/*
+ * Area with labels
+ */
+
+/* Area box */
+.cvl-label-area
+{
+	border: 1px solid #1F75A8;
+	padding: 2px;
+	background-color: #ffffff;
+	border-radius:         5px;
+	-moz-border-radius:    5px;
+	-webkit-border-radius: 5px;
+	-o-border-radius:      5px;
+	-ms-border-radius:     5px;
+	overflow: hidden;
+}
+
+/*
+ * Item of list column
+ */
+
+/* Column Item box */
+.cvl-column-item
+{
+	padding: 2px 4px;
+	margin: 0;
+	margin-bottom: 2px;
+	background-color: #ffffff;
+	cursor: pointer;
+	overflow: hidden;
+	clear: both;
+	border-color: #ffffff;
+	border-radius:         5px;
+	-moz-border-radius:    5px;
+	-webkit-border-radius: 5px;
+	-o-border-radius:      5px;
+	-ms-border-radius:     5px;
+}
+
+/* Selected column item */
+.cvl-column-item-selected
+{
+	background-color: #15618E !important;
+	color: #ffffff;
+}
+
+/* Highlight item on mouseover */
+.cvl-column-item:hover
+{
+	background-color: #E4F4FC;
+}
+
+/* Box for item's checkbox */
+.cvl-column-item .cvl-column-item-checkbox-box
+{
+	width: 14px;
+	height: 12px;
+	margin: 0px;
+	padding: 2px 0;
+	float: left;
+}
+
+/* Item's checkox */
+.cvl-column-item .cvl-column-item-checkbox
+{
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+
+/* Column item's label */
+.cvl-column-item .cvl-column-item-label
+{
+	font-size: 12px;
+	font-family: Verdana;
+	display: block;
+	margin-left: 20px;
+}
+
+.cvl-column-item-indicator
+{
+	float: right;
+	width: 10px;
+	height: 10px;
+	margin: 3px 2px;
+	background-color: #15618E;
+	border-radius:         5px;
+	-moz-border-radius:    5px;
+	-webkit-border-radius: 5px;
+	-o-border-radius:      5px;
+	-ms-border-radius:     5px;
+}
+
+.cvl-column-item-indicator-selected
+{
+	background-color: #fff !important;
+}
+
+/* Example for text indicator
+.cvl-column-item-indicator
+{
+	float: right;
+	width: 10px;
+	height: 16px;
+	margin: 0 2px;
+	color: #15618E;
+	font-size: 10px;
+	line-height: 16px;
+	font-weight: bold;
+}
+
+.cvl-column-item-indicator-selected
+{
+	color: #fff !important;
+}
+*/
+
+/*
+ * Column Waiter
+ */
+.cvl-column-waiter
+{
+	float: left;
+	width: 32px;
+	height: 32px;
+	background-image: url(columnwaiter.gif);
+	background-repeat: no-repeat;
+}
+
+/*
+ * Column
+ */
+
+.cvl-column
+{
+	float: left;
+	overflow: auto;
+	padding: 4px;
+	border: 1px solid #000;
+	border-radius:         4px;
+	-moz-border-radius:    4px;
+	-webkit-border-radius: 4px;
+	-o-border-radius:      4px;
+	-ms-border-radius:     4px;
+}
+
+/*
+ * Column Separator
+ */
+.cvl-column-splitter
+{
+	float: left;
+	margin: 0 2px;
+	background-color: #777;
+	min-width: 3px;
+	cursor: col-resize;
+}
+
+.cvl-column-splitter-active
+{
+	background-color: #999 !important;
+}
+
+/*
+ * Column List
+ */
+
+.cvl-column-list
+{
+	overflow: hidden;
+	clear: both;
+	margin-bottom: 10px;
+}
+
+.cvl-column-list-view
+{
+
+}

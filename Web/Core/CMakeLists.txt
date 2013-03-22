@@ -32,6 +32,7 @@ set (Module_SRCS
   vtkPVDataEncoder.cxx
   vtkPVWebApplication.cxx
   vtkPVWebInteractionEvent.cxx
+  vtkPVWebUtilities.cxx
 )
 
 vtk_module_library(${vtk-module}

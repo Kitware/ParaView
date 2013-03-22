@@ -170,7 +170,7 @@ const char* vtkPVWebApplication::StillRenderToString(vtkSMViewProxy* view, unsig
   if (array && array->GetMTime() != time)
     {
     this->LastStillRenderToStringMTime = array->GetMTime();
-    cout << "Image size: " << array->GetNumberOfTuples() << endl;
+    //cout << "Image size: " << array->GetNumberOfTuples() << endl;
     return reinterpret_cast<char*>(array->GetPointer(0));
     }
   return NULL;
