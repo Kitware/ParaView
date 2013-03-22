@@ -296,7 +296,7 @@ void vtkIceTCompositePass::SetupContext(const vtkRenderState* render_state)
   if (allBounds[0] > allBounds[1])
     {
     vtkDebugMacro("nothing visible" << endl);
-    IceTFloat tmp = VTK_LARGE_FLOAT;
+    IceTFloat tmp = VTK_FLOAT_MAX;
     icetBoundingVertices(1, ICET_FLOAT, 0, 1, &tmp);
     }
   else

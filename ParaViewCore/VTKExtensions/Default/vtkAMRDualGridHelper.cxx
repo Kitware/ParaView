@@ -2725,8 +2725,8 @@ vtkTimerLogSmartMarkEvent markevent("ComputeGlobalMetaData", this->Controller);
   int ext[6];
 
   largestNumCells = 0;
-  globalBounds[0] = globalBounds[2] = globalBounds[4] = VTK_LARGE_FLOAT;
-  globalBounds[1] = globalBounds[3] = globalBounds[5] = -VTK_LARGE_FLOAT;
+  globalBounds[0] = globalBounds[2] = globalBounds[4] = VTK_FLOAT_MAX;
+  globalBounds[1] = globalBounds[3] = globalBounds[5] = -VTK_FLOAT_MAX;
   lowestSpacing[0] = lowestSpacing[1] = lowestSpacing[2] = 0.0;
 
   this->NumberOfBlocksInThisProcess = 0;

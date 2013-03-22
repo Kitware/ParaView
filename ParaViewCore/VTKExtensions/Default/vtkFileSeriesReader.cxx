@@ -845,7 +845,7 @@ int vtkFileSeriesReader::FillOutputPortInformation(int port,
 //-----------------------------------------------------------------------------
 int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
                                           vtkStringArray *filesToRead,
-                                          int maxFilesToRead /*= VTK_LARGE_INTEGER*/)
+                                          int maxFilesToRead /*= VTK_INT_MAX*/)
 {
   // Open the metafile.
   ifstream metafile(metafilename);

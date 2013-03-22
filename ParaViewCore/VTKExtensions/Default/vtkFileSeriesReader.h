@@ -172,7 +172,7 @@ protected:
   // the file could not be read correctly, 0 is returned.
   virtual int ReadMetaDataFile(const char *metafilename,
                                vtkStringArray *filesToRead,
-                               int maxFilesToRead = VTK_LARGE_INTEGER);
+                               int maxFilesToRead = VTK_INT_MAX);
 
   virtual void SetReaderFileName(const char* fname);
   vtkAlgorithm* Reader;

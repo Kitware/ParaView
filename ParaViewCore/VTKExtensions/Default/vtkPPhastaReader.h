@@ -140,7 +140,7 @@ public:
   
   // Description:
   // Set the step number for the geometry.
-  vtkSetClampMacro(TimeStepIndex, int, 0, VTK_LARGE_INTEGER);
+  vtkSetClampMacro(TimeStepIndex, int, 0, VTK_INT_MAX);
   vtkGetMacro(TimeStepIndex, int);
 
   // Description:

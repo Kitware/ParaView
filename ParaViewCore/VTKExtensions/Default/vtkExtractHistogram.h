@@ -45,12 +45,12 @@ public:
   // Description:
   // Controls which input data component should be binned, for input arrays
   // with more-than-one component
-  vtkSetClampMacro(Component, int, 0, VTK_LARGE_INTEGER);
+  vtkSetClampMacro(Component, int, 0, VTK_INT_MAX);
   vtkGetMacro(Component, int);
   
   // Description:
   // Controls the number of bins N in the output histogram data
-  vtkSetClampMacro(BinCount, int, 1, VTK_LARGE_INTEGER);
+  vtkSetClampMacro(BinCount, int, 1, VTK_INT_MAX);
   vtkGetMacro(BinCount, int);
 
   // Description:

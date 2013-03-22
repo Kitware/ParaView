@@ -563,7 +563,7 @@ void pqGlobalRenderViewOptions::resetChanges()
 
   settings->beginGroup("renderModule");
   QVariant val = settings->value("LODThreshold", 5);
-  if(val.toDouble() >= VTK_LARGE_FLOAT)
+  if(val.toDouble() >= VTK_FLOAT_MAX)
     {
     this->Internal->enableLOD->setCheckState(Qt::Unchecked);
     this->Internal->updateLODThresholdLabel(this->Internal->lodThreshold->value());
@@ -611,7 +611,7 @@ void pqGlobalRenderViewOptions::resetChanges()
 
 
   val = settings->value("RemoteRenderThreshold", 3);
-  if(val.toDouble() >= VTK_LARGE_FLOAT)
+  if(val.toDouble() >= VTK_FLOAT_MAX)
     {
     this->Internal->enableCompositing->setCheckState(Qt::Unchecked);
     this->Internal->updateCompositeThresholdLabel(this->Internal->compositeThreshold->value());
