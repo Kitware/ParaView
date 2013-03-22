@@ -31,21 +31,9 @@ class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVOptions : public vtkCommandOptions
 {
 protected:
 //BTX
-  enum ProcessTypeEnum
-    {
-    PARAVIEW = 0x2,
-    PVCLIENT = 0x4,
-    PVSERVER = 0x8,
-    PVRENDER_SERVER = 0x10,
-    PVDATA_SERVER = 0x20,
-    PVBATCH = 0x40,
-    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER |
-      PVDATA_SERVER | PVBATCH
-    };
   friend class vtkPVOptionsXMLParser;
 //ETX
 public:
-
   static vtkPVOptions* New();
   vtkTypeMacro(vtkPVOptions,vtkCommandOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -168,6 +156,18 @@ public:
   // Description:
   // Should this process just print monitor information and exit?
   vtkGetMacro(PrintMonitors, int);
+
+  enum ProcessTypeEnum
+    {
+    PARAVIEW = 0x2,
+    PVCLIENT = 0x4,
+    PVSERVER = 0x8,
+    PVRENDER_SERVER = 0x10,
+    PVDATA_SERVER = 0x20,
+    PVBATCH = 0x40,
+    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER |
+      PVDATA_SERVER | PVBATCH
+    };
 
 protected:
 //BTX
