@@ -23,6 +23,7 @@
 #include "vtkPVCompositeDataInformation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "pqTreeWidgetSelectionHelper.h"
 #include "vtkEventQtSlotConnect.h"
 #include "pqSelectionManager.h"
 #include "vtkSelection.h"
@@ -44,6 +45,15 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   this->TreeWidget = new QTreeWidget(this);
   this->TreeWidget->setColumnCount(1);
   this->TreeWidget->header()->close();
+
+  // create tree widget selection helper
+  pqTreeWidgetSelectionHelper *treeSelectionHelper =
+    new pqTreeWidgetSelectionHelper(this->TreeWidget);
+
+  // disconnect from selection helper's context menu so that
+  // we can use our own menu with multi-block support
+  this->TreeWidget->disconnect(
+    SIGNAL(customContextMenuRequested(const QPoint&)), 0, 0);
 
   this->connect(this->TreeWidget, SIGNAL(itemSelectionChanged()),
                 this, SLOT(currentTreeItemSelectionChanged()));
@@ -378,47 +388,102 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities(
 
 void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoint &)
 {
-  //QTreeWidgetItem *item = this->TreeWidget->currentItem();
-  //if(!item)
-  //  {
-  //  return;
-  //  }
-
-  //bool visible = item->data(0, Qt::CheckStateRole).toBool();
-
-  //QMenu menu;
-  //menu.addAction(visible ? "Hide" : "Show");
-  //menu.addAction("Unset Visibility");
-  //connect(&menu, SIGNAL(triggered(QAction*)),
-  //        this, SLOT(toggleBlockVisibility(QAction*)));
-  //menu.exec(QCursor::pos());
-}
-
-void pqMultiBlockInspectorPanel::toggleBlockVisibility(QAction *action)
-{
-  QTreeWidgetItem *item = this->TreeWidget->currentItem();
-  if(!item)
+  // selected items
+  QList<QTreeWidgetItem*> items = this->TreeWidget->selectedItems();
+  if(items.isEmpty())
     {
     return;
     }
 
-  unsigned int flat_index = item->data(0, Qt::UserRole).value<unsigned int>();
-
-  QString text = action->text();
-  if(text == "Hide" || text == "Show")
+  int hiddenItemCount = 0;
+  foreach(const QTreeWidgetItem *item, items)
     {
-    bool visible = item->data(0, Qt::CheckStateRole).toBool();
-
-    // first unset any child item visibilites
-    this->unsetChildVisibilities(item);
-
-    this->setBlockVisibility(flat_index, !visible);
-    item->setData(0, Qt::CheckStateRole, visible ? Qt::Unchecked : Qt::Checked);
+    if(item->data(0, Qt::CheckStateRole).toBool() == false)
+      {
+      hiddenItemCount++;
+      }
     }
-  else if(text == "Unset Visibility")
+  int visibleItemCount = items.size() - hiddenItemCount;
+
+  QMenu menu;
+
+  QAction *hideAction = 0;
+  if(visibleItemCount > 0)
     {
-    this->clearBlockVisibility(flat_index);
-    item->setData(0, Qt::CheckStateRole, item->parent()->data(0, Qt::CheckStateRole));
+    QString label;
+    if(visibleItemCount > 1)
+      {
+      label = QString("Hide %1 Blocks").arg(visibleItemCount);
+      }
+    else
+      {
+      label = "Hide Block";
+      }
+    hideAction = menu.addAction(label);
+    }
+  QAction *showAction = 0;
+  if(hiddenItemCount > 0)
+    {
+    QString label;
+    if(hiddenItemCount > 1)
+      {
+      label = QString("Show %1 Blocks").arg(hiddenItemCount);
+      }
+    else
+      {
+      label = "Show Block";
+      }
+    showAction = menu.addAction(label);
+    }
+
+  QAction *unsetVisibilityAction = menu.addAction("Unset Visibility");
+  QAction *action = menu.exec(QCursor::pos());
+
+  if(!action)
+    {
+    return;
+    }
+  else if(action == hideAction)
+    {
+    foreach(QTreeWidgetItem *item, items)
+      {
+      unsigned int flat_index =
+        item->data(0, Qt::UserRole).value<unsigned int>();
+
+      // first unset any child item visibilites
+      this->unsetChildVisibilities(item);
+
+      this->setBlockVisibility(flat_index, false);
+      item->setData(
+        0, Qt::CheckStateRole, Qt::Unchecked);
+      }
+    }
+  else if(action == showAction)
+    {
+    foreach(QTreeWidgetItem *item, items)
+      {
+      unsigned int flat_index =
+        item->data(0, Qt::UserRole).value<unsigned int>();
+
+      // first unset any child item visibilites
+      this->unsetChildVisibilities(item);
+
+      this->setBlockVisibility(flat_index, true);
+      item->setData(
+        0, Qt::CheckStateRole, Qt::Checked);
+      }
+    }
+  else if(action == unsetVisibilityAction)
+    {
+    foreach(QTreeWidgetItem *item, items)
+      {
+      unsigned int flat_index =
+        item->data(0, Qt::UserRole).value<unsigned int>();
+
+      this->clearBlockVisibility(flat_index);
+      item->setData(
+        0, Qt::CheckStateRole, item->parent()->data(0, Qt::CheckStateRole));
+      }
     }
 }
 

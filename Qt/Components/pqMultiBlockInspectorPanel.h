@@ -54,7 +54,6 @@ public slots:
 
 private slots:
   void treeWidgetCustomContextMenuRequested(const QPoint &pos);
-  void toggleBlockVisibility(QAction *action);
   void blockItemChanged(QTreeWidgetItem *item, int column);
   void updateTreeWidgetBlockVisibilities();
   void updateTreeWidgetBlockVisibilities(
