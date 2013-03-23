@@ -362,6 +362,7 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   // change the apply button palette so it is green when it is active
   QPalette applyPalette = this->Ui->ApplyButton->palette();
   applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+  applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
   this->Ui->ApplyButton->setPalette(applyPalette);
 
   // listen to active object changes
