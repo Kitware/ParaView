@@ -55,7 +55,7 @@ public:
   // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
   // is to be used.
   int GetStereoType(unsigned int idx);
-  virtual const char* GetStereoType() { return this->Superclass::GetStereoType(); }
+  virtual char* GetStereoType() { return this->Superclass::GetStereoType(); }
 protected:
   // Description:
   // Add machine information from the xml tag <Machine ....>
