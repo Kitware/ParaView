@@ -99,7 +99,8 @@ void pqTransferFunctionEditorPropertyWidget::buttonClicked()
   dialog.resize(600, 400);
   dialog.exec();
 
-  emit this->modified();
+  emit this->changeAvailable();
+  emit this->changeFinished();
 }
 
 // === pqTransferFunctionEditorPropertyWidgetDialog ======================== //

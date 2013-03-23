@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsModule.h"
   
 class QSlider;
-class QLineEdit;
+class pqLineEdit;
 
 /// a widget with a tied slider and line edit for editing a double property
 class PQWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
@@ -104,7 +104,7 @@ private:
   double Minimum;
   double Maximum;
   QSlider* Slider;
-  QLineEdit* LineEdit;
+  pqLineEdit* LineEdit;
   bool BlockUpdate;
   bool StrictRange;
 };

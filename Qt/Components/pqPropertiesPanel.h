@@ -166,7 +166,9 @@ private slots:
   void updateButtonState();
 
   /// Called when a property on the current proxy changes.
-  void proxyPropertyChanged();
+  void proxyPropertyChanged(bool change_finished=true);
+  void proxyPropertyChangeAvailable()
+    { this->proxyPropertyChanged(false); }
 
 private:
   /// Shows the source.

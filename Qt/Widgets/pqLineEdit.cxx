@@ -38,20 +38,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------
-pqLineEdit::pqLineEdit(QWidget *_parent) :Superclass(_parent)
+pqLineEdit::pqLineEdit(QWidget *_parent) :Superclass(_parent),
+  EditingFinishedPending(false)
 {
+  this->connect(this, SIGNAL(editingFinished()),
+    this, SLOT(onEditingFinished()));
+  this->connect(this, SIGNAL(textEdited(const QString&)),
+    this, SLOT(onTextEdited()));
 }
-
 
 //-----------------------------------------------------------------------------
 pqLineEdit::pqLineEdit(const QString &_contents, QWidget *_parent):
-  Superclass(_contents, _parent)
+  Superclass(_contents, _parent),
+  EditingFinishedPending(false)
 {
+  this->connect(this, SIGNAL(editingFinished()),
+    this, SLOT(onEditingFinished()));
+  this->connect(this, SIGNAL(textEdited(const QString&)),
+    this, SLOT(onTextEdited()));
 }
 
 //-----------------------------------------------------------------------------
 pqLineEdit::~pqLineEdit()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqLineEdit::onTextEdited()
+{
+  this->EditingFinishedPending = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqLineEdit::onEditingFinished()
+{
+  if (this->EditingFinishedPending)
+    {
+    emit this->textChangedAndEditingFinished();
+    this->EditingFinishedPending = false;
+    }
+  this->setCursorPosition(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -63,4 +89,3 @@ void pqLineEdit::setTextAndResetCursor(const QString& val)
     this->setCursorPosition(0);
     }
 }
-

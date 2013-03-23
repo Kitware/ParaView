@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
   
 class QSlider;
-class QLineEdit;
+class pqLineEdit;
 class vtkSMIntRangeDomain;
 class vtkEventQtSlotConnect;
 
@@ -73,6 +73,11 @@ signals:
   /// signal the value changed
   void valueChanged(int);
 
+  /// signal the value was edited
+  /// this means the user is done changing text
+  /// or the slider was moved
+  void valueEdited(int);
+
 public slots:
   /// set the value
   void setValue(int);
@@ -89,6 +94,7 @@ public slots:
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
+  void editingFinished();
   void updateValidator();
   void domainChanged();
 
@@ -97,7 +103,7 @@ private:
   int Minimum;
   int Maximum;
   QSlider* Slider;
-  QLineEdit* LineEdit;
+  pqLineEdit* LineEdit;
   bool BlockUpdate;
   bool StrictRange;
   vtkSmartPointer<vtkSMIntRangeDomain> Domain;

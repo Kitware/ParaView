@@ -38,6 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// 'text2'. When the text on the line widget is set using this 'text2' property
 /// (or using setTextAndResetCursor()), the after the set, the cursor position
 /// is reset to 0.
+///
+/// Additional, this provides a true editingFinished() signal under the name of
+/// textChangedAndEditingFinished(). Unlike QLineEdit::editingFinished() which
+/// gets fired whenever the widget looses focus irrespective of if the text
+/// actually was edited, textChangedAndEditingFinished() is fired only when the
+/// text was changed as well.
 class PQWIDGETS_EXPORT pqLineEdit : public QLineEdit
 {
   Q_OBJECT
@@ -49,12 +55,25 @@ public:
 
   virtual ~pqLineEdit();
 
+signals:
+  /// Unlike QLineEdit::editingFinished() which
+  /// gets fired whenever the widget looses focus irrespective of if the text
+  /// actually was edited, textChangedAndEditingFinished() is fired only when the
+  /// text was changed as well.
+  void textChangedAndEditingFinished();
+
 public slots:
   void setTextAndResetCursor(const QString& text);
+
+private slots:
+  void onTextEdited();
+  void onEditingFinished();
 
 private:
   pqLineEdit(const pqLineEdit&); // Not implemented.
   void operator=(const pqLineEdit&); // Not implemented.
+
+  bool EditingFinishedPending;
 };
 
 #endif

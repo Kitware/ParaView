@@ -68,6 +68,8 @@ pqCalculatorWidget::pqCalculatorWidget(
 {
   this->Internals->setupUi(this);
   this->setShowLabel(false);
+  this->setChangeAvailableAsChangeFinished(false);
+
   this->Internals->Vectors->setMenu(this->Internals->VectorsMenu);
   this->Internals->Scalars->setMenu(this->Internals->ScalarsMenu);
 
@@ -130,7 +132,10 @@ pqCalculatorWidget::pqCalculatorWidget(
 
   this->addPropertyLink(this->Internals->Function, "text",
     SIGNAL(textChanged(const QString&)), smproperty);
-  // not sure if we should connect to editingFinished() signal instead.
+
+  // now when editing is finished, we will fire the changeFinished() signal.
+  this->connect(this->Internals->Function, SIGNAL(textChangedAndEditingFinished()),
+    this, SIGNAL(changeFinished()));
 }
 
 //-----------------------------------------------------------------------------
