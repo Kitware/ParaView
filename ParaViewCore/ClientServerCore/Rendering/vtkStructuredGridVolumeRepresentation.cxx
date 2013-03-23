@@ -24,18 +24,22 @@
 #include "vtkPVRenderView.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
+#include "vtkTableExtentTranslator.h"
 
+#include <assert.h>
 
 vtkStandardNewMacro(vtkStructuredGridVolumeRepresentation);
 //----------------------------------------------------------------------------
 vtkStructuredGridVolumeRepresentation::vtkStructuredGridVolumeRepresentation()
 {
   this->UseDataParititions = false;
+  this->TableExtentTranslator = vtkTableExtentTranslator::New();
 }
 
 //----------------------------------------------------------------------------
 vtkStructuredGridVolumeRepresentation::~vtkStructuredGridVolumeRepresentation()
 {
+  this->TableExtentTranslator->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -66,6 +70,9 @@ int vtkStructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
     return 0;
     }
 
+  this->TableExtentTranslator->SetNumberOfPieces(0);
+  this->TableExtentTranslator->SetNumberOfPiecesInTable(0);
+
   if (inputVector[0]->GetNumberOfInformationObjects()==1 &&
     this->UseDataParititions)
     {
@@ -75,6 +82,33 @@ int vtkStructuredGridVolumeRepresentation::RequestData(vtkInformation* request,
     int numProcs = controller->GetNumberOfProcesses();
     if (numProcs > 1)
       {
+      vtkStructuredGrid* grid = vtkStructuredGrid::GetData(inputVector[0], 0);
+      assert(grid != NULL);
+
+      // AllGather the local extents on each process and then build up the
+      // vtkTableExtentTranslator. vtkTableExtentTranslator is merely used as
+      // the datastructure to pass process->extent mapping to the rendering
+      // code.
+      this->TableExtentTranslator->SetNumberOfPieces(numProcs);
+      this->TableExtentTranslator->SetNumberOfPiecesInTable(numProcs);
+
+      int *gatheredExtents = new int[numProcs * 6];
+      int myExtents[6];
+      grid->GetExtent(myExtents);
+      controller->AllGather(myExtents, gatheredExtents, 6);
+      for (int cc=0; cc < numProcs; cc++)
+        {
+        this->TableExtentTranslator->SetExtentForPiece(
+          cc, gatheredExtents + 6*cc);
+        }
+      delete[] gatheredExtents;
+
+      //if (controller->GetLocalProcessId() == 0)
+      //  {
+      //  this->TableExtentTranslator->Print(cout);
+      //  }
+
+      // Reduce bounds globally.
       double bounds_max[3] = {VTK_DOUBLE_MIN, VTK_DOUBLE_MIN};
       double bounds_min[3] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MAX};
       if (vtkMath::AreBoundsInitialized(this->DataBounds))
@@ -117,15 +151,14 @@ int vtkStructuredGridVolumeRepresentation::ProcessViewRequest(
   if (request_type == vtkPVView::REQUEST_UPDATE())
     {
     if (this->GetNumberOfInputConnections(0) == 1 &&
-        this->UseDataParititions)
+        this->UseDataParititions &&
+        this->TableExtentTranslator->GetNumberOfPiecesInTable() > 0)
       {
       vtkAlgorithmOutput* connection = this->GetInputConnection(0, 0);
       vtkAlgorithm* inputAlgo = connection->GetProducer();
       vtkStreamingDemandDrivenPipeline* sddp =
         vtkStreamingDemandDrivenPipeline::SafeDownCast(inputAlgo->GetExecutive());
-      vtkExtentTranslator* translator =
-        sddp->GetExtentTranslator(connection->GetIndex());
-    
+
       int whole_extent[6] = {1, -1, 1, -1, 1, -1};
       sddp->GetWholeExtent(sddp->GetOutputInformation(connection->GetIndex()),
         whole_extent);
@@ -140,9 +173,9 @@ int vtkStructuredGridVolumeRepresentation::ProcessViewRequest(
       };
 
       vtkPVRenderView::SetOrderedCompositingInformation(inInfo, this,
-        translator, whole_extent, origin, spacing);
+        this->TableExtentTranslator, whole_extent, origin, spacing);
       }
-    else if (!this->UseDataParititions)
+    else
       {
       double origin[3] = {0, 0, 0};
       double spacing[3] = {1, 1, 1};
