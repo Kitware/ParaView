@@ -41,7 +41,8 @@ pq3DWidgetPropertyWidget::pq3DWidgetPropertyWidget(pq3DWidget *widget,
   : pqPropertyWidget(widget->proxy(), parent_)
 {
   this->Widget = widget;
-  this->connect(this->Widget, SIGNAL(modified()), this, SIGNAL(modified()));
+  this->connect(this->Widget, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
+  this->connect(this->Widget, SIGNAL(modified()), this, SIGNAL(changeFinished()));
 
   QVBoxLayout *layout_ = new QVBoxLayout;
   layout_->setMargin(0);

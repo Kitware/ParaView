@@ -89,3 +89,16 @@ void pqLineEdit::setTextAndResetCursor(const QString& val)
     this->setCursorPosition(0);
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqLineEdit::keyPressEvent(QKeyEvent *e)
+{
+  // Since we do not update this->EditingFinishedPending when the text is
+  // changed programmatically, textChangedAndEditingFinished() wasn't getting
+  // fired after setText() was called during test playback. To overcome that
+  // issue, we listen to keyPressEvent(). If we get a key event, we assume the
+  // text has indeed changed.
+  this->EditingFinishedPending = true;
+
+  this->Superclass::keyPressEvent(e);
+}
