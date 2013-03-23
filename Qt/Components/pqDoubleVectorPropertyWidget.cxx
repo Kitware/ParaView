@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMBoundsDomain.h"
 
 #include "pqSignalAdaptors.h"
-#include "pqDoubleEdit.h"
 #include "pqDoubleRangeWidget.h"
 #include "pqScalarValueListPropertyWidget.h"
 
-#include <QHBoxLayout>
 #include <QDoubleSpinBox>
+#include <QHBoxLayout>
+#include <QLineEdit>
 
 pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProperty,
                                                            vtkSMProxy *smProxy,
@@ -132,19 +132,24 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
         for(int i = 0; i < 3; i++)
           {
-          pqDoubleEdit *lineEdit = new pqDoubleEdit(this);
+          QLineEdit *lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QDoubleValidator(lineEdit));
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
-          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
+          lineEdit->setText(QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
           gridLayout->addWidget(lineEdit, 0, i);
-          this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
+          this->addPropertyLink(lineEdit, "text",
+                                SIGNAL(textChanged(const QString&)), dvp, i);
           this->connect(lineEdit, SIGNAL(editingFinished()),
                         this, SIGNAL(editingFinished()));
 
-          lineEdit = new pqDoubleEdit(this);
+          lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QDoubleValidator(lineEdit));
           lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
-          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3));
+          lineEdit->setText(QVariant(
+              vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3)).toString());
           gridLayout->addWidget(lineEdit, 1, i);
-          this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i + 3);
+          this->addPropertyLink(lineEdit, "text",
+                                SIGNAL(textChanged(const QString&)), dvp, i + 3);
           this->connect(lineEdit, SIGNAL(editingFinished()),
                         this, SIGNAL(editingFinished()));
           }
@@ -160,11 +165,13 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
         {
         for(unsigned int i = 0; i < dvp->GetNumberOfElements(); i++)
           {
-          pqDoubleEdit *lineEdit = new pqDoubleEdit(this);
+          QLineEdit *lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QDoubleValidator(lineEdit));
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
-          lineEdit->setValue(vtkSMPropertyHelper(smProperty).GetAsDouble(i));
+          lineEdit->setText(QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
           layoutLocal->addWidget(lineEdit);
-          this->addPropertyLink(lineEdit, "value", SIGNAL(valueChanged(double)), dvp, i);
+          this->addPropertyLink(lineEdit, "text",
+                                SIGNAL(textChanged(const QString&)), dvp, i);
           this->connect(lineEdit, SIGNAL(editingFinished()),
                         this, SIGNAL(editingFinished()));
           }

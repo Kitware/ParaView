@@ -48,10 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QIntValidator>
+#include <QLineEdit>
 
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                                                      vtkSMProxy *smProxy,
@@ -183,6 +184,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
         for(int i = 0; i < 3; i++)
           {
           QLineEdit *lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+0));
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+0)));
           gridLayout->addWidget(lineEdit, i, 0);
@@ -191,6 +193,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                         this, SIGNAL(editingFinished()));
 
           lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+1));
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+1)));
           gridLayout->addWidget(lineEdit, i, 1);
@@ -210,7 +213,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
         {
         for(unsigned int i = 0; i < ivp->GetNumberOfElements(); i++)
           {
-          QLineEdit *lineEdit = new QLineEdit;
+          QLineEdit *lineEdit = new QLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i));
           lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
           layoutLocal->addWidget(lineEdit);

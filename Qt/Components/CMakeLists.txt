@@ -170,8 +170,6 @@ set (Module_SRCS
   pqDistanceWidget.h
   pqDockWindowInterface.cxx
   pqDockWindowInterface.h
-  pqDoubleEdit.cxx
-  pqDoubleEdit.h
   pqDoubleVectorPropertyWidget.cxx
   pqDoubleVectorPropertyWidget.h
   pqExodusIIPanel.cxx
@@ -490,7 +488,6 @@ set (Module_MOC_HDRS
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
   pqDistanceWidget.h
-  pqDoubleEdit.h
   pqDoubleVectorPropertyWidget.h
   pqExodusIIPanel.h
   pqExodusIIVariableSelectionWidget.h
