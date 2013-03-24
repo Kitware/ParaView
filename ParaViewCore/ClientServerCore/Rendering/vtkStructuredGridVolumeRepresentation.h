@@ -29,6 +29,8 @@
 
 #include "vtkUnstructuredGridVolumeRepresentation.h"
 
+class vtkTableExtentTranslator;
+
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkStructuredGridVolumeRepresentation :
   public vtkUnstructuredGridVolumeRepresentation
 {
@@ -67,6 +69,7 @@ protected:
     vtkInformationVector**, vtkInformationVector*);
 
   bool UseDataParititions;
+  vtkTableExtentTranslator* TableExtentTranslator;
 private:
   vtkStructuredGridVolumeRepresentation(const vtkStructuredGridVolumeRepresentation&); // Not implemented
   void operator=(const vtkStructuredGridVolumeRepresentation&); // Not implemented
