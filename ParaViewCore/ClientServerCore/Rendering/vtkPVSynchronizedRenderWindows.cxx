@@ -1152,6 +1152,16 @@ void vtkPVSynchronizedRenderWindows::UpdateWindowLayout()
               geometry = NULL;
               }
             }
+
+          int stereoType = this->Session->GetServerInformation()->GetStereoType(idx);
+          if (stereoType != -1)
+            {
+            this->Internals->SharedRenderWindow->SetStereoRender(stereoType!=0);
+            if (stereoType > 0)
+              {
+              this->Internals->SharedRenderWindow->SetStereoType(stereoType);
+              }
+            }
           }
         this->Internals->SharedRenderWindow->SetBorders(showborders ? 1 : 0);
         // Preserve old behavior for PV_ICET_WINDOW_BORDERS env var

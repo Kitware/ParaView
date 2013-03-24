@@ -52,6 +52,10 @@ public:
   double* GetLowerRight(unsigned int idx);
   double* GetUpperRight(unsigned int idx);
 
+  // Returns -1 to indicate not stereo type was specified. 0 indicate no stereo
+  // is to be used.
+  int GetStereoType(unsigned int idx);
+  virtual char* GetStereoType() { return this->Superclass::GetStereoType(); }
 protected:
   // Description:
   // Add machine information from the xml tag <Machine ....>
