@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>348</width>
+    <width>368</width>
     <height>594</height>
    </rect>
   </property>
@@ -108,8 +108,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>340</width>
-        <height>68</height>
+        <width>360</width>
+        <height>38</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -160,10 +160,10 @@
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
           <property name="horizontalSpacing">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="verticalSpacing">
-           <number>2</number>
+           <number>0</number>
           </property>
           <property name="margin">
            <number>0</number>

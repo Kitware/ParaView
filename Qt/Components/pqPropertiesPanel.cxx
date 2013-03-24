@@ -362,6 +362,7 @@ pqPropertiesPanel::pqPropertiesPanel(QWidget *p)
   // change the apply button palette so it is green when it is active
   QPalette applyPalette = this->Ui->ApplyButton->palette();
   applyPalette.setColor(QPalette::Active, QPalette::Button, QColor(161, 213, 135));
+  applyPalette.setColor(QPalette::Inactive, QPalette::Button, QColor(161, 213, 135));
   this->Ui->ApplyButton->setPalette(applyPalette);
 
   // listen to active object changes
@@ -615,7 +616,9 @@ void pqPropertiesPanel::setProxy(pqProxy *proxy)
       panel->addPropertyWidgetItem(item);
 
       // connect to modified signal
-      this->connect(item.PropertyWidget, SIGNAL(modified()),
+      this->connect(item.PropertyWidget, SIGNAL(changeAvailable()),
+                    this, SLOT(proxyPropertyChangeAvailable()));
+      this->connect(item.PropertyWidget, SIGNAL(changeFinished()),
                     this, SLOT(proxyPropertyChanged()));
       }
 
@@ -766,9 +769,9 @@ void pqPropertiesPanel::setRepresentation(pqRepresentation *repr)
 
       if(this->View)
         {
-        this->connect(item.PropertyWidget, SIGNAL(editingFinished()),
+        this->connect(item.PropertyWidget, SIGNAL(changeFinished()),
                       this->View, SLOT(render()));
-        this->connect(item.PropertyWidget, SIGNAL(modified()),
+        this->connect(item.PropertyWidget, SIGNAL(changeFinished()),
                       item.PropertyWidget, SLOT(updateDependentDomains()));
         }
       }
@@ -985,11 +988,12 @@ void pqPropertiesPanel::updateButtonState()
     }
 }
 
-void pqPropertiesPanel::proxyPropertyChanged()
+void pqPropertiesPanel::proxyPropertyChanged(bool change_finished/*=true*/)
 {
   if(this->DebugApplyButtonState)
     {
-    qDebug() << "Proxy Property Changed";
+    qDebug() << "Proxy Property Change " <<
+      (change_finished? "Finished" : "Available");
     QObject *signalSender = this->sender();
     if(signalSender)
       {
@@ -1010,7 +1014,7 @@ void pqPropertiesPanel::proxyPropertyChanged()
     this->Proxy->setModifiedState(pqProxy::MODIFIED);
     }
 
-  if(pqPropertiesPanel::AutoApply)
+  if(pqPropertiesPanel::AutoApply && change_finished)
     {
     QTimer::singleShot(pqPropertiesPanel::AutoApplyDelay, this, SLOT(apply()));
     }
@@ -1178,7 +1182,6 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
 
       item.PropertyWidget = propertyWidget;
       item.IsAdvanced = QString(group->GetPanelVisibility()) == "advanced";
-      item.Modified = true;
 
       this->connect(this, SIGNAL(viewChanged(pqView*)),
                     propertyWidget, SIGNAL(viewChanged(pqView*)));
@@ -1283,7 +1286,6 @@ QList<pqPropertiesPanelItem> pqPropertiesPanel::createWidgetsForProxy(pqProxy *p
           smProperty->GetPanelVisibilityDefaultForRepresentation());
         }
 
-      item.Modified = true;
 
       this->connect(this, SIGNAL(viewChanged(pqView*)),
                     propertyWidget, SIGNAL(viewChanged(pqView*)));

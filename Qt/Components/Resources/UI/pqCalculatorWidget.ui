@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>200</height>
+    <height>209</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLineEdit" name="Function"/>
+    <widget class="pqLineEdit" name="Function"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -560,6 +560,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

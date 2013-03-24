@@ -47,7 +47,6 @@ public:
   pqPropertyWidget *PropertyWidget;
   bool IsAdvanced;
   QStringList DefaultVisibilityForRepresentations;
-  bool Modified;
 };
 
 #endif // _pqPropertiesPanelItem_h

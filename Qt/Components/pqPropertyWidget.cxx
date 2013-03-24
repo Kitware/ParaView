@@ -40,16 +40,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   : QWidget(parentObject),
     Proxy(smProxy),
-    Property(0)
+    Property(0),
+    ChangeAvailableAsChangeFinished(true),
+    AutoUpdateVTKObjects(false)
 {
   this->ShowLabel = true;
   this->Links.setAutoUpdateVTKObjects(false);
   this->Links.setUseUncheckedProperties(true);
-  this->connect(&this->Links, SIGNAL(qtWidgetChanged()), this, SIGNAL(modified()));
+
+  this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
+                this, SIGNAL(changeAvailable()));
+
+  this->connect(&this->Links, SIGNAL(qtWidgetChanged()),
+                this, SLOT(onChangeAvailable()));
+
+  this->connect(this, SIGNAL(changeFinished()),
+    this, SLOT(onChangeFinished()));
 }
 
 pqPropertyWidget::~pqPropertyWidget()
 {
+}
+
+void pqPropertyWidget::onChangeAvailable()
+{
+  if (this->ChangeAvailableAsChangeFinished)
+    {
+    emit this->changeFinished();
+    }
+}
+
+void pqPropertyWidget::onChangeFinished()
+{
+  if (this->AutoUpdateVTKObjects)
+    {
+    this->apply();
+    }
 }
 
 pqView* pqPropertyWidget::view() const
@@ -128,7 +154,7 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
 
 void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)
 {
-  this->Links.setAutoUpdateVTKObjects(autoUpdate);
+  this->AutoUpdateVTKObjects = autoUpdate;
 }
 
 void pqPropertyWidget::setUseUncheckedProperties(bool useUnchecked)

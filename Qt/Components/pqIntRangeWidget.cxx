@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntRangeWidget.h"
 
 // Qt includes
-#include <QLineEdit>
+#include "pqLineEdit.h"
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QIntValidator>
@@ -58,17 +58,18 @@ pqIntRangeWidget::pqIntRangeWidget(QWidget* p)
   this->Slider->setRange(0,1);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
-  this->LineEdit = new QLineEdit(this);
+  this->LineEdit = new pqLineEdit(this);
   l->addWidget(this->LineEdit);
   this->LineEdit->setObjectName("LineEdit");
   this->LineEdit->setValidator(new QIntValidator(this->LineEdit));
-  this->LineEdit->setText(QString().setNum(this->Value));
+  this->LineEdit->setTextAndResetCursor(QString().setNum(this->Value));
 
   QObject::connect(this->Slider, SIGNAL(valueChanged(int)),
                    this, SLOT(sliderChanged(int)));
   QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)),
                    this, SLOT(textChanged(const QString&)));
-  
+   QObject::connect(this->LineEdit, SIGNAL(textChangedAndEditingFinished()),
+                   this, SLOT(editingFinished()));
 }
 
 //-----------------------------------------------------------------------------
@@ -103,7 +104,7 @@ void pqIntRangeWidget::setValue(int val)
 
     // set the text
     this->LineEdit->blockSignals(true);
-    this->LineEdit->setText(QString().setNum(val));
+    this->LineEdit->setTextAndResetCursor(QString().setNum(val));
     this->LineEdit->blockSignals(false);
     }
 
@@ -201,8 +202,9 @@ void pqIntRangeWidget::sliderChanged(int val)
   if(!this->BlockUpdate)
     {
     this->BlockUpdate = true;
-    this->LineEdit->setText(QString().setNum(val));
+    this->LineEdit->setTextAndResetCursor(QString().setNum(val));
     this->setValue(val);
+    emit this->valueEdited(val);
     this->BlockUpdate = false;
     }
 }
@@ -218,6 +220,11 @@ void pqIntRangeWidget::textChanged(const QString& text)
     this->setValue(val);
     this->BlockUpdate = false;
     }
+}
+//-----------------------------------------------------------------------------
+void pqIntRangeWidget::editingFinished()
+{
+  emit this->valueEdited(this->Value);
 }
 
 //-----------------------------------------------------------------------------

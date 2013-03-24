@@ -64,7 +64,9 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
       SIGNAL(selectionChanged(pqSMProxy)), smProperty);
     
     this->connect(siw, SIGNAL(selectionChanged(pqSMProxy)),
-      this, SIGNAL(modified()));
+      this, SIGNAL(changeAvailable()));
+    this->connect(siw, SIGNAL(selectionChanged(pqSMProxy)),
+      this, SIGNAL(changeFinished()));
 
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
@@ -95,7 +97,8 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
         "proxy",
         SIGNAL(proxyChanged(pqSMProxy)),
         smProperty);
-      this->connect(widget, SIGNAL(modified()), this, SIGNAL(modified()));
+      this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
+      this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeFinished()));
 
       vbox->addWidget(widget);
 

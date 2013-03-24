@@ -39,7 +39,10 @@ pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(pqObjectPanel *objectPa
   : pqPropertyWidget(objectPanel->proxy(), parentObject)
 {
   this->ObjectPanel = objectPanel;
-  this->connect(this->ObjectPanel, SIGNAL(modified()), this, SIGNAL(modified()));
+  this->connect(this->ObjectPanel, SIGNAL(modified()),
+    this, SIGNAL(changeAvailable()));
+  this->connect(this->ObjectPanel, SIGNAL(modified()),
+    this, SIGNAL(changeFinished()));
 
   QVBoxLayout *layoutLocal = new QVBoxLayout;
   layoutLocal->setMargin(0);

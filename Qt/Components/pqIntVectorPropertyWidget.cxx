@@ -42,22 +42,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMEnumerationDomain.h"
 
-#include "pqTreeWidget.h"
 #include "pqIntRangeWidget.h"
-#include "pqSignalAdaptors.h"
-#include "pqTreeWidgetSelectionHelper.h"
+#include "pqLineEdit.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqSignalAdaptors.h"
+#include "pqTreeWidget.h"
+#include "pqTreeWidgetSelectionHelper.h"
 
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
+#include <QIntValidator>
 
 pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                                                      vtkSMProxy *smProxy,
                                                      QWidget *parentObject)
   : pqPropertyWidget(smProxy, parentObject)
 {
+  this->setChangeAvailableAsChangeFinished(false);
+
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty);
   if(!ivp)
     {
@@ -89,8 +92,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     QCheckBox *checkBox = new QCheckBox(smproperty->GetXMLLabel(), this);
     checkBox->setObjectName("CheckBox");
     this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), ivp);
-    this->connect(checkBox, SIGNAL(toggled(bool)),
-                  this, SIGNAL(editingFinished()));
+    this->setChangeAvailableAsChangeFinished(true);
     layoutLocal->addWidget(checkBox);
 
     this->setShowLabel(false);
@@ -113,9 +115,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                           "currentText",
                           SIGNAL(currentTextChanged(QString)),
                           smproperty);
+    this->setChangeAvailableAsChangeFinished(true);
 
-    this->connect(adaptor, SIGNAL(currentTextChanged(QString)),
-                  this, SIGNAL(editingFinished()));
 
     layoutLocal->addWidget(comboBox);
 
@@ -138,9 +139,7 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     helper->setObjectName("CompositeTreeSelectionHelper");
 
     this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()), ivp);
-
-    this->connect(adaptor, SIGNAL(valuesChanged()),
-                  this, SIGNAL(editingFinished()));
+    this->setChangeAvailableAsChangeFinished(true);
 
     layoutLocal->addWidget(treeWidget);
     this->setShowLabel(false);
@@ -163,8 +162,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       widget->setMaximum(range->GetMaximum(0));
       widget->setDomain(range);
       this->addPropertyLink(widget, "value", SIGNAL(valueChanged(int)), ivp);
-      this->connect(widget, SIGNAL(valueChanged(int)),
-                    this, SIGNAL(editingFinished()));
+      this->connect(widget, SIGNAL(valueEdited(int)),
+                    this, SIGNAL(changeFinished()));
       layoutLocal->addWidget(widget);
 
       this->setReason() << "pqIntRangeWidget for an IntVectorProperty with a "
@@ -182,21 +181,25 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
         for(int i = 0; i < 3; i++)
           {
-          QLineEdit *lineEdit = new QLineEdit(this);
+          pqLineEdit *lineEdit = new pqLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+0));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+0)));
+          lineEdit->setTextAndResetCursor(
+            QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+0)));
           gridLayout->addWidget(lineEdit, i, 0);
-          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+0);
-          this->connect(lineEdit, SIGNAL(editingFinished()),
-                        this, SIGNAL(editingFinished()));
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(QString)), ivp, i*2+0);
+          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
+                        this, SIGNAL(changeFinished()));
 
-          lineEdit = new QLineEdit(this);
+          lineEdit = new pqLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i*2+1));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+1)));
+          lineEdit->setTextAndResetCursor(
+            QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i*2+1)));
           gridLayout->addWidget(lineEdit, i, 1);
-          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i*2+1);
-          this->connect(lineEdit, SIGNAL(editingFinished()),
-                        this, SIGNAL(editingFinished()));
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(QString)), ivp, i*2+1);
+          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
+                        this, SIGNAL(changeFinished()));
           }
 
         layoutLocal->addLayout(gridLayout);
@@ -210,13 +213,15 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
         {
         for(unsigned int i = 0; i < ivp->GetNumberOfElements(); i++)
           {
-          QLineEdit *lineEdit = new QLineEdit;
+          pqLineEdit *lineEdit = new pqLineEdit(this);
+          lineEdit->setValidator(new QIntValidator(lineEdit));
           lineEdit->setObjectName("LineEdit" + QString::number(i));
-          lineEdit->setText(QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
+          lineEdit->setTextAndResetCursor(
+            QString::number(vtkSMPropertyHelper(smproperty).GetAsInt(i)));
           layoutLocal->addWidget(lineEdit);
-          this->addPropertyLink(lineEdit, "text", SIGNAL(textChanged(QString)), ivp, i);
-          this->connect(lineEdit, SIGNAL(editingFinished()),
-                        this, SIGNAL(editingFinished()));
+          this->addPropertyLink(lineEdit, "text2", SIGNAL(textChanged(QString)), ivp, i);
+          this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
+                        this, SIGNAL(changeFinished()));
           }
 
         this->setReason() << "List of QLineEdit's for an IntVectorProperty "

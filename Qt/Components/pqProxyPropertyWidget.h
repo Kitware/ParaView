@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSelectionInputWidget;
 class pqProxySelectionWidget;
 
+/// This is a widget for a vtkSMProxyProperty. Not to be confused with
+/// pqProxyPropertiesPanel.
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT

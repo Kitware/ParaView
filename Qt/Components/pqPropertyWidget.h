@@ -48,6 +48,8 @@ class vtkSMProxy;
 class vtkSMDomain;
 class vtkSMProperty;
 
+/// pqPropertyWidget represents a widget created for each property of a proxy on
+/// the pqPropertiesPanel (for the proxy's properties or display properties).
 class PQCOMPONENTS_EXPORT pqPropertyWidget : public QWidget
 {
   Q_OBJECT
@@ -90,15 +92,16 @@ public:
   }
 
 signals:
-  /// This signal is emitted when the widget's value is changed by the user.
-  void modified();
-
-  /// This signal is emitted when the user is finished editing a property
-  /// either by pressing enter or focusing away from the widget.
-  void editingFinished();
-
   /// This signal is emitted when the current view changes.
   void viewChanged(pqView *view);
+
+  /// This signal is fired as soon as the user starts editing in the widget. The
+  /// editing may not be complete.
+  void changeAvailable();
+
+  /// This signal is fired as soon as the user is done with making an atomic
+  /// change. changeAvailable() is always fired before changeFinished().
+  void changeFinished();
 
 public slots:
   void updateDependentDomains();
@@ -115,12 +118,33 @@ protected:
   std::stringstream& setReason();
   QString reason() const;
 
+  /// For most pqPropertyWidget subclasses a changeAvailable() signal,
+  /// corresponds to a changeFinished() signal. Hence by default we connect the
+  /// two together. For subclasses that don't follow this pattern should call
+  /// this method with 'false' to disconnect changeAvailable() and
+  /// changeFinished() signals. In that case, the subclass must explicitly fire
+  /// changeFinished() signal.
+  void setChangeAvailableAsChangeFinished(bool status)
+    { this->ChangeAvailableAsChangeFinished = status; }
+
 private:
+  /// setAutoUpdateVTKObjects no longer simply passes the flag to
+  /// pqPropertyLinks. Instead we set a flag so that when this->changeFinished()
+  /// is fired, we call this->apply(). Thus makes it possible for widgets with
+  /// AutoUpdateVTKObjects set to true handle editing of values correctly and
+  /// not push the values as the values are being edited.
   void setAutoUpdateVTKObjects(bool autoUpdate);
   void setUseUncheckedProperties(bool useUnchecked);
   void setProperty(vtkSMProperty *property);
 
   friend class pqPropertiesPanel;
+
+private slots:
+  /// check if changeFinished() must be fired as well.
+  void onChangeAvailable();
+
+  /// if AutoUpdateVTKObjects is true, call this->apply();
+  void onChangeFinished();
 
 private:
   vtkSMProxy *Proxy;
@@ -128,6 +152,13 @@ private:
   pqPropertyLinks Links;
   bool ShowLabel;
   std::stringstream Reason;
+  bool ChangeAvailableAsChangeFinished;
+  bool AutoUpdateVTKObjects;
+
+  /// Deprecated signals. Making private so developers get errors when they
+  /// use them.
+  void modified();
+  void editingFinished();
 };
 
 #endif // _pqPropertyWidget_h

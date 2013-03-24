@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDoubleRangeWidget.h"
 
 #include "vtkPVConfig.h"
+#include "pqLineEdit.h"
 
 // Qt includes
-#include <QLineEdit>
 #include <QSlider>
 #include <QHBoxLayout>
 #include <QDoubleValidator>
@@ -56,17 +56,17 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   this->Slider->setRange(0, this->Resolution);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
-  this->LineEdit = new QLineEdit(this);
+  this->LineEdit = new pqLineEdit(this);
   l->addWidget(this->LineEdit);
   this->LineEdit->setObjectName("LineEdit");
   this->LineEdit->setValidator(new QDoubleValidator(this->LineEdit));
-  this->LineEdit->setText(QString().setNum(this->Value));
+  this->LineEdit->setTextAndResetCursor(QString().setNum(this->Value));
 
   QObject::connect(this->Slider, SIGNAL(valueChanged(int)),
                    this, SLOT(sliderChanged(int)));
   QObject::connect(this->LineEdit, SIGNAL(textChanged(const QString&)),
                    this, SLOT(textChanged(const QString&)));
-  QObject::connect(this->LineEdit, SIGNAL(editingFinished()),
+  QObject::connect(this->LineEdit, SIGNAL(textChangedAndEditingFinished()),
                    this, SLOT(editingFinished()));
   
 }
@@ -113,7 +113,7 @@ void pqDoubleRangeWidget::setValue(double val)
 
     // set the text
     this->BlockUpdate = true;
-    this->LineEdit->setText(QString().setNum(
+    this->LineEdit->setTextAndResetCursor(QString().setNum(
       val,'g',DEFAULT_DOUBLE_PRECISION_VALUE));
     this->BlockUpdate = false;
     }
@@ -186,7 +186,7 @@ void pqDoubleRangeWidget::sliderChanged(int val)
     double range = this->Maximum - this->Minimum;
     double v = (fraction * range) + this->Minimum;
     this->BlockUpdate = true;
-    this->LineEdit->setText(QString().setNum(v));
+    this->LineEdit->setTextAndResetCursor(QString().setNum(v));
     this->setValue(v);
     emit this->valueEdited(v);
     this->BlockUpdate = false;
