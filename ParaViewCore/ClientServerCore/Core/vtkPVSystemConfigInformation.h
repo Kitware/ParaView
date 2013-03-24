@@ -30,6 +30,46 @@ using std::vector;
 class VTKPVCLIENTSERVERCORECORE_EXPORT vtkPVSystemConfigInformation : public vtkPVInformation
 {
 public:
+  class ConfigInfo
+    {
+    public:
+      ConfigInfo()
+            :
+        OSDescriptor(""),
+        CPUDescriptor(""),
+        MemDescriptor(""),
+        HostName(""),
+        FullyQualifiedDomainName(""),
+        ProcessType(-1),
+        SystemType(-1),
+        Rank(-1),
+        Pid(0),
+        HostMemoryTotal(0),
+        HostMemoryAvailable(0),
+        ProcMemoryAvailable(0)
+      {}
+
+      void Print();
+
+      bool operator<(const ConfigInfo &other) const
+      { return this->Rank<other.Rank; }
+
+    public:
+      string OSDescriptor;
+      string CPUDescriptor;
+      string MemDescriptor;
+      string HostName;
+      string FullyQualifiedDomainName;
+      int ProcessType;
+      int SystemType;
+      int Rank;
+      long long Pid;
+      long long HostMemoryTotal;
+      long long HostMemoryAvailable;
+      long long ProcMemoryAvailable;
+    };
+
+public:
   static vtkPVSystemConfigInformation* New();
   vtkTypeMacro(vtkPVSystemConfigInformation, vtkPVInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -76,45 +116,6 @@ protected:
 
 private:
   //BTX
-  class ConfigInfo
-    {
-    public:
-      ConfigInfo()
-            :
-        OSDescriptor(""),
-        CPUDescriptor(""),
-        MemDescriptor(""),
-        HostName(""),
-        FullyQualifiedDomainName(""),
-        ProcessType(-1),
-        SystemType(-1),
-        Rank(-1),
-        Pid(0),
-        HostMemoryTotal(0),
-        HostMemoryAvailable(0),
-        ProcMemoryAvailable(0)
-      {}
-
-      void Print();
-
-      bool operator<(const ConfigInfo &other) const
-      { return this->Rank<other.Rank; }
-
-    public:
-      string OSDescriptor;
-      string CPUDescriptor;
-      string MemDescriptor;
-      string HostName;
-      string FullyQualifiedDomainName;
-      int ProcessType;
-      int SystemType;
-      int Rank;
-      long long Pid;
-      long long HostMemoryTotal;
-      long long HostMemoryAvailable;
-      long long ProcMemoryAvailable;
-    };
-
   vector<ConfigInfo> Configs;
   //ETX
 

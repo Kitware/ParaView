@@ -157,7 +157,7 @@ public:
 };
 //----------------------------------------------------------------------------
 template<class T>
-class vtkSortedTableStreamer::Internals : public InternalsBase
+class vtkSortedTableStreamer::Internals : public vtkSortedTableStreamer::InternalsBase
 {
 public:
   class Histogram
