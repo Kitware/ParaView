@@ -90,9 +90,10 @@ public:
 
   /// Processing Step:
   /// Provides the grid and the field data for the co-procesor to process.
+  /// Return value is 1 for success and 0 for failure.
   virtual int CoProcess(vtkCPDataDescription* dataDescription);
 
-  /// Called after all co-processing is complete giving the Co-Processor 
+  /// Called after all co-processing is complete giving the Co-Processor
   /// implementation an opportunity to clean up, before it is destroyed.
   virtual int Finalize();
 
