@@ -552,9 +552,15 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
                 ${CMAKE_CURRENT_BINARY_DIR}/CoProcessing/PythonCatalyst
                 Cxx
                 Python)
+  list(APPEND VTK_MODULES_ENABLED vtkPVPythonCatalyst)
   set(_module vtkPVPythonCatalyst)
   set(vtk-module ${_module})
   add_subdirectory("${${_module}_SOURCE_DIR}" "${${_module}_BINARY_DIR}")
+  if (BUILD_TESTING)
+    set (_test_module_name "${vtk-module}-Test-Cxx")
+    add_subdirectory(
+      "${${_test_module_name}_SOURCE_DIR}" "${${_test_module_name}_BINARY_DIR}")
+  endif()
 endif()
 
 #------------------------------------------------------------------------------
@@ -639,6 +645,7 @@ unset(_vtk_all_targets)
 
 #-----------------------------------------------------------------------------
 if (BUILD_EXAMPLES)
+        # Don't do parallel make when cross compiling.
   # BuildExamples.cmake builds the examples as a separate project. This ensures
   # that examples can be built by themselves as well as avoiding pollution of
   # the ParaView target space with targets (and other things) from examples.
