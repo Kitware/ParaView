@@ -350,10 +350,10 @@ void vtkPVXYChartView::SetAxisRange(int index, double min, double max)
       {
       // change only if axes behavior is indeed "FIXED" i.e.
       // SetAxisUseCustomRange(...) was set to true for this axis.
-      if (axis->GetMinimum() != min || axis->GetMaximum() != max)
+      if (axis->GetUnscaledMinimum() != min || axis->GetUnscaledMaximum() != max)
         {
-        axis->SetMinimum(min);
-        axis->SetMaximum(max);
+        axis->SetUnscaledMinimum(min);
+        axis->SetUnscaledMaximum(max);
         this->Chart->RecalculateBounds();
         }
       }
@@ -369,8 +369,8 @@ void vtkPVXYChartView::SetAxisUseCustomRange(int index, bool useCustomRange)
     if (useCustomRange && (axis->GetBehavior() != vtkAxis::FIXED))
       {
       axis->SetBehavior(vtkAxis::FIXED);
-      axis->SetMinimum(this->Internals->AxisRanges[index][0]);
-      axis->SetMaximum(this->Internals->AxisRanges[index][1]);
+      axis->SetUnscaledMinimum(this->Internals->AxisRanges[index][0]);
+      axis->SetUnscaledMaximum(this->Internals->AxisRanges[index][1]);
       this->Chart->RecalculateBounds();
       }
     else if (!useCustomRange && (axis->GetBehavior() != vtkAxis::AUTO))
