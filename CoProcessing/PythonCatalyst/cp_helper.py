@@ -384,7 +384,7 @@ def CreateCPView(proxy_ctor, filename, freq, fittoscreen, magnification, width, 
     view.add_attribute("cpMagnification", magnification)
     view.ViewSize = [ width, height ]
     cp_views.append(view)
-    print "Append view: ", str(view)
+    #print "Append view: ", str(view)
     return view
 
 # -----------------------------------------------------------------------------
