@@ -14,7 +14,10 @@
 // manner with respect to the velocity vector.
 // This is purposefully done to demonstrate
 // the different approaches for getting data
-// into Catalyst. Note that through configuration
+// into Catalyst. In this example we don't
+// use any of the Fortran/C API provided in
+// Catalyst. That is in CFullExample2.
+// Note that through configuration
 // that the driver can be run without linking
 // to Catalyst.
 

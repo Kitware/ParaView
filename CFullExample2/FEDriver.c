@@ -17,7 +17,12 @@
 // manner with respect to the velocity vector.
 // This is purposefully done to demonstrate
 // the different approaches for getting data
-// into Catalyst. Note that through configuration
+// into Catalyst. In this example we use
+// some of the API in CPythonAdaptorAPI.h
+// to assist in setting the problem up.
+// CFullExample does essentially the same
+// thing but without using the existing
+// helper API. Note that through configuration
 // that the driver can be run without linking
 // to Catalyst.
 

@@ -5,16 +5,9 @@
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology
-// grid. We treat the grid as an unstructured
-// grid even though in the example provided it
-// would be best described as a vtkImageData.
-// Also, the points are stored in an inconsistent
-// manner with respect to the velocity vector.
-// This is purposefully done to demonstrate
-// the different approaches for getting data
-// into Catalyst. Note that through configuration
-// that the driver can be run without linking
-// to Catalyst.
+// grid. The grid in this case is a vtkNonOverlappingAMR
+// data set without any attributes specified
+// over the grid.
 
 int main(int argc, char* argv[])
 {

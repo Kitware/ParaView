@@ -10,9 +10,9 @@
 
 // Example of a C++ adaptor for a simulation code
 // where the simulation code has a fixed topology
-// grid. We treat the grid as an unstructured
-// grid even though in the example provided it
-// would be best described as a vtkImageData.
+// grid. We treat the grid as a partitioned
+// regular grid. This is stored as a set of
+// vtkImageDatas in a vtkMultiPieceDataSet.
 // Also, the points are stored in an inconsistent
 // manner with respect to the velocity vector.
 // This is purposefully done to demonstrate
