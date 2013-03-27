@@ -104,12 +104,15 @@ bool vtkSISourceProxy::CreateVTKObjects(vtkSMMessage* message)
   if (this->ExecutiveName &&
     !this->GetVTKObject()->IsA("vtkPVDataRepresentation"))
     {
-    vtkExecutive* executive = vtkExecutive::SafeDownCast(
-      vtkPVInstantiator::CreateInstance(this->ExecutiveName));
-    if (executive)
+    if(!algorithm->GetExecutive()->IsA(this->ExecutiveName))
       {
-      algorithm->SetExecutive(executive);
-      executive->FastDelete();
+      vtkExecutive* executive = vtkExecutive::SafeDownCast(
+        vtkPVInstantiator::CreateInstance(this->ExecutiveName));
+      if (executive)
+        {
+        algorithm->SetExecutive(executive);
+        executive->FastDelete();
+        }
       }
     }
 
