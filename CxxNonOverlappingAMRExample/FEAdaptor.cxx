@@ -1,20 +1,13 @@
-void SetOrigin (const double *)#include <iostream>
+#include <iostream>
 #include "FEAdaptor.h"
 
-#include <vtkCellData.h>
-#include <vtkCellType.h>
-#include <vtkCommunicator.h>
 #include <vtkCompositeDataIterator.h>
 #include <vtkCPDataDescription.h>
 #include <vtkCPInputDataDescription.h>
 #include <vtkCPPythonProcessor.h>
 #include <vtkCPPythonScriptPipeline.h>
-#include <vtkDoubleArray.h>
-#include <vtkFloatArray.h>
 #include <vtkNew.h>
 #include <vtkNonOverlappingAMR.h>
-#include <vtkPoints.h>
-#include <vtkPointData.h>
 #include <vtkUniformGrid.h>
 
 namespace

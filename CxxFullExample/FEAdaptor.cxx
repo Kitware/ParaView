@@ -52,11 +52,14 @@ namespace
       velocity->SetNumberOfComponents(3);
       velocity->SetNumberOfTuples(static_cast<vtkIdType>(grid.GetNumberOfPoints()));
       VTKGrid->GetPointData()->AddArray(velocity.GetPointer());
+      }
+    if(VTKGrid->GetCellData()->GetNumberOfArrays() == 0)
+      {
       // pressure array
       vtkNew<vtkFloatArray> pressure;
       pressure->SetName("pressure");
       pressure->SetNumberOfComponents(1);
-      VTKGrid->GetPointData()->AddArray(pressure.GetPointer());
+      VTKGrid->GetCellData()->AddArray(pressure.GetPointer());
       }
     vtkDoubleArray* velocity = vtkDoubleArray::SafeDownCast(
       VTKGrid->GetPointData()->GetArray("velocity"));
@@ -73,11 +76,11 @@ namespace
       }
 
     vtkFloatArray* pressure = vtkFloatArray::SafeDownCast(
-      VTKGrid->GetPointData()->GetArray("pressure"));
+      VTKGrid->GetCellData()->GetArray("pressure"));
     // The pressure array is a scalar array so we can reuse
     // memory as long as we ordered the points properly.
     float* pressureData = attributes.GetPressureArray();
-    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfPoints()), 1);
+    pressure->SetArray(pressureData, static_cast<vtkIdType>(grid.GetNumberOfCells()), 1);
   }
 
   void BuildVTKDataStructures(Grid& grid, Attributes& attributes)

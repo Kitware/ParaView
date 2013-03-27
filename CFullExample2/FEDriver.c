@@ -3,9 +3,12 @@
 
 #ifdef USE_CATALYST
 #include "FEAdaptor.h"
+#include <CPythonAdaptorAPI.h>
+#include <stdio.h>
+#include <string.h>
 #endif
 
-// Example of a C++ adaptor for a simulation code
+// Example of a C adaptor for a simulation code
 // where the simulation code has a fixed topology
 // grid. We treat the grid as an unstructured
 // grid even though in the example provided it
@@ -21,29 +24,45 @@
 int main(int argc, char* argv[])
 {
   MPI_Init(&argc, &argv);
-  Grid grid;
+  Grid grid = (Grid) { .NumberOfPoints = 0, .Points = 0, .NumberOfCells = 0, .Cells = 0};
   unsigned int numPoints[3] = {70, 60, 44};
   double spacing[3] = {1, 1.1, 1.3};
-  grid.Initialize(numPoints, spacing);
+  InitializeGrid(&grid, numPoints, spacing);
   Attributes attributes;
-  attributes.Initialize(&grid);
+  InitializeAttributes(&attributes, &grid);
 
 #ifdef USE_CATALYST
-  FEAdaptor::Initialize(argc, argv);
+  int fileNameLength = 0;
+  if(argc > 2)
+    {
+    printf("Warning: this example takes at most one Python script.\n");
+    }
+  else
+    {
+    fileNameLength = strlen(argv[1]);
+    }
+  coprocessorinitializewithpython(argv[1], &fileNameLength);
 #endif
   unsigned int numberOfTimeSteps = 100;
-  for(unsigned int timeStep=0;timeStep<numberOfTimeSteps;timeStep++)
+  unsigned int timeStep;
+  for(timeStep=0;timeStep<numberOfTimeSteps;timeStep++)
     {
     // use a time step length of 0.1
     double time = timeStep * 0.1;
-    attributes.UpdateFields(time);
+    UpdateFields(&attributes, time);
 #ifdef USE_CATALYST
-    FEAdaptor::CoProcess(grid, attributes, time, timeStep, timeStep == numberOfTimeSteps-1);
+    int lastTimeStep = 0;
+    if(timeStep == numberOfTimeSteps-1)
+      {
+      lastTimeStep = 1;
+      }
+    CatalystCoProcess(grid.NumberOfPoints, grid.Points, grid.NumberOfCells, grid.Cells,
+                      attributes.Velocity, attributes.Pressure, time, timeStep, lastTimeStep);
 #endif
     }
 
 #ifdef USE_CATALYST
-  FEAdaptor::Finalize();
+  coprocessorfinalize();
 #endif
   MPI_Finalize();
 
