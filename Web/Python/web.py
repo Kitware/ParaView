@@ -153,6 +153,22 @@ class ParaViewServerProtocol(ServerProtocol):
     WebApplication = vtkPVWebApplication()
     import time
 
+    def _getView(self, vid):
+        """
+        Returns the view for a given view ID, if vid is None then return the
+        current active view.
+        :param vid: The view ID
+        :type vid: str
+        """
+        view = mapIdToProxy(vid)
+        if not view:
+            # Use active view is none provided.
+            view = simple.GetActiveView()
+        if not view:
+            raise Exception("no view provided: " + vid)
+
+        return view
+
     def onSessionOpen(self):
         """
         Callback fired when WAMP session was fully established.
@@ -167,12 +183,7 @@ class ParaViewServerProtocol(ServerProtocol):
         RPC Callback to render a view and obtain the rendered image.
         """
         beginTime = int(round(ParaViewServerProtocol.time.time() * 1000))
-        view = mapIdToProxy(options['view'])
-        if not view:
-            # Use active view is none provided.
-            view = simple.GetActiveView()
-        if not view:
-            raise Exception("no view provided to stillRender")
+        view = self._getView(options["view"])
         size = [view.ViewSize[0], view.ViewSize[1]]
         if options and options.has_key("size"):
             size = options["size"]
@@ -206,11 +217,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC Callback for mouse interactions.
         """
-        view = mapIdToProxy(event['view'])
-        if not view:
-            view = simple.GetActiveView()
-        if not view:
-            raise Exception("no view provided to mouseInteraction")
+        view = self._getView(event['view'])
 
         buttons = 0
         if event["buttonLeft"]:
@@ -245,11 +252,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC callback to reset camera.
         """
-        view = mapIdToProxy(view)
-        if not view:
-            view = simple.GetActiveView()
-        if not view:
-            raise Exception("no view provided to resetCamera")
+        view = self._getView(view)
         simple.ResetCamera(view)
         view.CenterOfRotation = view.CameraFocalPoint
 
