@@ -10,6 +10,15 @@
 (function (GLOBAL, $) {
 
     /**
+     * @class pv.Renderer
+     * The types of renderer that can be attached to a viewport.
+     */
+    var Renderer = {
+        Image: "image",
+        WebGL: "webgl"
+    }
+
+    /**
      * @class pv.ViewPortConfig
      * Configuration object used to create a viewport.
      *
@@ -67,9 +76,274 @@
          *
          * Default: 100
          */
-        stillQuality: 100
+        stillQuality: 100,
+
+        /**
+         * @member pv.ViewPortConfig
+         * @property {Boolean} useWebGL
+         * true to enable delivery of geometry to client and client side
+         * WebGL rendering.
+         *
+         * Default: false
+         */
+        renderer: Renderer.Image,
 
     }, module = {};
+
+    //
+    // Internal function that delegates the mouse interaction events top the
+    // currently active renderer.
+    //
+    function mouseInteraction(evt) {
+        var viewport = evt.data.viewport;
+
+        if (viewport.renderer)
+            viewport.renderer.mouseInteraction(evt);
+    }
+
+    //
+    // Class used to represent a viewport.
+    //
+    function ViewPort(session, config) {
+
+        this.session = session;
+        this.config = config;
+        this.current_button = null,
+        this.action_pending = false,
+        this.button_state = {
+                left : false,
+                right: false,
+                middle : false
+            };
+        this.quality = 100;
+
+        this.viewport = $("<div></div>");
+
+        this.viewport.css({
+            "position": "absolute",
+            "top": "0px",
+            "left": "0px",
+            "width": "100%",
+            "height": "100%"
+          });
+
+        var canvas2d = $("<canvas id='2d'></canvas>");
+        canvas2d.css({
+            //"display": "block",
+            "position": "absolute",
+            "top": "0px",
+            "left": "0px",
+            "width": "100%",
+            "height": "100%",
+            "z-index" : "1"
+        });
+
+        this.viewport.append(canvas2d);
+        this.canvas2d = canvas2d.get(0);
+
+        var canvas3d = $("<canvas id='3d'></canvas>");
+        canvas3d.css({
+            //"display": "block",
+            "position": "absolute",
+            "top": "0px",
+            "left": "0px",
+            "width": "100%",
+            "height": "100%",
+            "z-index" : "0"
+        });
+
+        this.viewport.append(canvas3d);
+        this.canvas3d = canvas3d.get(0);
+
+        this.renderers = new Object();
+        // set the delivery type ...
+        this._setRenderer(config.renderer);
+
+        this.button_state = {
+                left : false,
+                right: false,
+                middle : false
+            };
+
+        // this is not access able ....
+        var viewport = this;
+
+        // Attach mouse listeners if needed
+        if (this.config.enableInteractions) {
+
+            this.viewport.on("contextmenu click", function (evt) {
+                evt.preventDefault();
+            });
+
+            this.viewport.mouseover(function (evt) {
+                evt.preventDefault();
+            });
+
+            this.viewport.mousedown({ viewport: this, action: "down" },
+                                    mouseInteraction);
+
+            this.viewport.mouseup({ viewport: this, action: "up"},
+                                  mouseInteraction);
+
+            this.viewport.mousemove({ viewport: this, action: "move"},
+                                    mouseInteraction);
+        }
+    }
+
+    //
+    // Internal version of setRenderer that doesn't update the scene after the
+    // the renderer has been set.
+    //
+    ViewPort.prototype._setRenderer = function(type) {
+        if(type in this.renderers) {
+            this.renderer = this.renderers[type];
+        }
+        else if (type === Renderer.Image) {
+            this.renderer = createImageDeliveryRenderer(this);
+            this.renderers[type] = this.renderer;
+        }
+        else if (type === Renderer.WebGL) {
+
+            this.renderer = createWebGLRenderer(this);
+            this.renderers[type ] = this.renderer;
+        }
+        else {
+            alert("Unrecognized delivery type");
+        }
+    }
+
+    /**
+     * @class pv.Viewport
+     * Set the renderer to be used by the viewport.
+     *
+     * @member pv.Viewport
+     * @param {String} type The renderer type see pv.Renderer
+     *
+     */
+    ViewPort.prototype.setRenderer = function(type) {
+        var oldRenderer = this.renderer;
+
+        this._setRenderer(type);
+
+        if (this.renderer) {
+          this.renderer.updateScene();
+
+          if (oldRenderer)
+            oldRenderer.clear();
+        }
+    }
+
+    /**
+     * @class pv.Viewport
+     * This Object let you attach a remote viewport into your web page
+     * and forward remotely the mouse interaction while keeping the
+     * content of the viewport up-to-date.
+     */
+    /**
+     * Attach viewport to a DOM element
+     *
+     * @member pv.Viewport
+     * @param {String} selector
+     * The will be used internally to get the jQuery associated element
+     *
+     *     <div class="renderer"></div>
+     *     viewport.bind(".renderer");
+     *
+     *     <div id="renderer"></div>
+     *     viewport.bind("#renderer");
+     *
+     *     <html>
+     *       <body>
+     *         <!-- renderer -->
+     *         <div></div>
+     *       </body>
+     *     </html>
+     *     viewport.bind("body > div");
+     */
+    ViewPort.prototype.bind = function (selector) {
+        var container = $(selector);
+        if (container.attr("__pv_viewport__") !== true) {
+            container.attr("__pv_viewport__", true);
+            container.append(this.viewport);
+
+            this.setSize(this.viewport.width(), this.viewport.height());
+            this.render();
+        }
+    }
+
+    /**
+     * Remove viewport from DOM element
+     */
+    ViewPort.prototype.unbind = function () {
+        var parentElement = this.viewport.parent();
+        if (parentElement) {
+            parentElement.attr("__pv_viewport__", false);
+            this.viewport.remove();
+        }
+    }
+
+    /**
+     * Trigger a render of the scene.
+     *
+     *      view.render(function() { console.log("rendering done"); });
+     *
+     * @member pv.Viewport
+     * @param {Function} ondone Function to call after rendering is complete.
+     */
+    ViewPort.prototype.render = function (ondone) {
+        this.renderer.render(ondone);
+    }
+
+    /**
+     * Reset the camera for the given view
+     *
+     * @member pv.Viewport
+     * @param {Function} ondone Function to call after rendering is complete.
+     */
+    ViewPort.prototype.resetCamera = function (ondone) {
+        return session.call("pv:resetCamera", Number(config.view)).then(function () {
+            this.renderer.updateScene();
+        });
+    }
+
+    /**
+     * Provides access to the HTMLElement used for rendering.
+     *
+     * @member pv.Viewport
+     * @return {Object} The div containing the Canvas or Image element used
+     * for rendering.
+     */
+    ViewPort.prototype.getHTMLElement =  function () {
+        return this.viewport;
+    }
+
+    /**
+     * Display the statics collected by the object in the view.
+     *
+     * @member pv.Viewport
+     * @param {pv.ViewportStatistics|null} stats
+     * The ViewportStatistics object to use to show the statistics in
+     * this view. To stop showing the statistics, simply call this
+     * function with null or on arguments.
+     */
+    ViewPort.prototype.showStatistics =  function (stats) {
+        // TODO delegate to the renderer?
+    }
+
+    ViewPort.prototype.setSize = function(width, height) {
+        this.canvas2d.width = width;
+        this.canvas2d.height = height;
+
+        this.canvas3d.width = width;
+        this.canvas3d.height = height;
+
+        if (this.renderer.setSize)
+            this.renderer.setSize(width, height);
+    }
+
+    ViewPort.prototype.updateScene = function() {
+        this.renderer.updateScene();
+    }
 
     /**
      * Create a new viewport for a ParaView View.
@@ -92,11 +366,95 @@
         }
 
         // Internal fields
-        var config = $.extend({}, options, DEFAULT_VIEWPORT_OPTIONS),
-        bgImage = new Image(),
-        canvas = $("<canvas></canvas>"),
-        ctx2d = canvas.get(0).getContext('2d'),
-        viewport = null,
+        var config = $.extend({}, DEFAULT_VIEWPORT_OPTIONS, options);
+
+        return new ViewPort(session, config);
+    }
+
+    function createWebGLRenderer(viewport) {
+        var session = viewport.session;
+        var config = viewport.config;
+
+        var webGLRenderer = new WebGLRenderer(viewport);
+        webGLRenderer.init(pv.connection.id, config.view);
+        webGLRenderer.start();
+
+        var started = false;
+
+        return {
+            //
+            // For WebGL simply draw the scene.
+            //
+            render: function (ondone) {
+                webGLRenderer.drawScene();
+            },
+
+            //
+            // Reset the camera on the server and update the scen.
+            //
+            resetCamera: function (ondone) {
+                return session.call("pv:resetCamera", Number(config.view)).then(function () {
+                    webGLRenderer.updateScene();
+                });
+            },
+
+            //
+            // Set the size of the GL viewport.
+            //
+            // TODO - Need to send size to the server.
+            //
+            setSize : function(x, y) {
+                webGLRenderer.setSize(x, y);
+            },
+
+            //
+            // Clear the 2d and 3d canvas
+            //
+            clear : function() {
+                var canvas2d = viewport.canvas2d;
+                var canvas3d = viewport.canvas3d;
+
+                canvas2d.getContext('2d').clearRect(0, 0, canvas2d.width,
+                                                    canvas2d.height);
+                var  gl = canvas3d.getContext("experimental-webgl");
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            },
+
+            //
+            // To update the scene request the scene metadata which will in
+            // turn cause the scene to be redrawn.
+            //
+
+            updateScene : function() {
+                webGLRenderer.requestMetaData();
+            },
+
+            //
+            // Proxy mouse interaction to WebGL code so the camera position
+            // can be recalculated.
+            //
+            mouseInteraction : function(evt) {
+
+                var action = evt.data.action;
+
+                if (action === "down")
+                    webGLRenderer.handleMouseDown(evt);
+                else if (action === "up")
+                    webGLRenderer.handleMouseUp(evt);
+                else if (action === "move")
+                    webGLRenderer.handleMouseMove(evt);
+
+                webGLRenderer.drawScene();
+            }
+        };
+    }
+
+    function createImageDeliveryRenderer(viewport) {
+        var session = viewport.session;
+        var config = viewport.config;
+        var bgImage = new Image();
+
+        var ctx2d = viewport.canvas2d.getContext('2d'),
         current_button = null,
         action_pending = false,
         force_render = false,
@@ -111,18 +469,6 @@
         quality = 100,
         headEvent = (GLOBAL.paraview.isMobile ? "v" : "");
 
-        // make canvas "fullscreen" within it's parent's scope. For this to
-        // work, it is essential that the parent either has position absolute or
-        // relative specified.
-        canvas.css({
-            "display": "block",
-            "position": "absolute",
-            "top": "0px",
-            "left": "0px",
-            "width": "100%",
-            "height": "100%"
-        });
-
         //-----
         // Internal function that requests a render on idle. Calling this
         // mutliple times will only result in the request being set once.
@@ -131,25 +477,9 @@
                 render_onidle_timeout = GLOBAL.setTimeout(render, 250);
             }
         }
-        // ----
-        /// Internal method that returns true if the mouse interaction event should be
-        /// throttled.
-        function eatMouseEvent(pvevent) {
-            var force_event = (button_state.left !== pvevent.buttonLeft || button_state.right  !== pvevent.buttonRight || button_state.middle !== pvevent.buttonMiddle);
-            if (!force_event && !pvevent.buttonLeft && !pvevent.buttonRight && !pvevent.buttonMiddle) {
-                return true;
-            }
-            if (!force_event && action_pending) {
-                return true;
-            }
-            button_state.left   = pvevent.buttonLeft;
-            button_state.right  = pvevent.buttonRight;
-            button_state.middle = pvevent.buttonMiddle;
-            return false;
-        }
 
         // Setup internal API
-        function render(ondone) {
+        function render(ondone, fetch) {
             if (force_render === false) {
                 if (render_onidle_timeout !== null) {
                     // clear any renderOnIdle requests that are pending since we
@@ -178,7 +508,7 @@
                      * Size of the Viewport for which the image should be render
                      * for. [width, height] in pixel.
                      */
-                    size: [ viewport.parent().innerWidth(), viewport.parent().innerHeight() ],
+                    size: [ viewport.getHTMLElement().innerWidth(), viewport.getHTMLElement().innerHeight() ],
                     /**
                      * @member request.Render
                      * @property {Number} view
@@ -190,7 +520,7 @@
                      * @property {Number} MTime
                      * Last received image MTime.
                      */
-                    mtime: lastMTime,
+                    mtime: fetch ? 0 : lastMTime,
                     /**
                      * @member request.Render
                      * @property {Number} quality
@@ -213,7 +543,7 @@
                  * @param {Number} view
                  * Proxy View ID.
                  */
-                viewport.trigger({
+                viewport.getHTMLElement().trigger({
                     type: "render-start",
                     view: Number(config.view)
                 });
@@ -293,10 +623,15 @@
                          * @member pv.Viewport
                          * @event start-loading
                          */
-                        viewport.trigger("start-loading");
+
+                        viewport.getHTMLElement().trigger("start-loading");
                         bgImage.width  = res.size[0];
                         bgImage.height = res.size[1];
+                        var previousSrc = bgImage.src;
                         bgImage.src = "data:image/" + res.format  + "," + res.image;
+
+                        //if (fetch)
+                        //    $(bgImage).trigger("onload");
 
                         /**
                          * @member pv.Viewport
@@ -304,7 +639,7 @@
                          * @param {Number} view
                          * Proxy View Id.
                          */
-                        viewport.trigger({
+                        viewport.getHTMLElement().trigger({
                             type: "render-end",
                             view: Number(config.view)
                         });
@@ -316,7 +651,7 @@
                          * Time between the sending and the reception of an image less the
                          * server processing time.
                          */
-                        viewport.trigger({
+                        viewport.getHTMLElement().trigger({
                             type: "round-trip",
                             time: Number(new Date().getTime() - res.localTime) - res.workTime
                         });
@@ -328,7 +663,7 @@
                          * Delta time between the reception of the message on the server and
                          * when the reply is construct and return from the method.
                          */
-                        viewport.trigger({
+                        viewport.getHTMLElement().trigger({
                             type: "server-processing",
                             time: Number(res.workTime)
                         });
@@ -345,107 +680,6 @@
                     }
                 });
             }
-        }
-
-        // ----
-        function mouseInteraction(action, evt) {
-            // stop default event handling by the browser.
-            evt.preventDefault();
-
-            /**
-             * @class request.InteractionEvent
-             * Container Object used to encapsulate MouseEvent status
-             * formated in an handy manner for ParaView.
-             *
-             *     {
-             *       view         : 23452345, // View proxy globalId
-             *       action       : "down",   // Enum["down", "up", "move"]
-             *       charCode     : "",       // In key press will hold the char value
-             *       altKey       : false,    // Is alt Key down ?
-             *       ctrlKey      : false,    // Is ctrl Key down ?
-             *       shiftKey     : false,    // Is shift Key down ?
-             *       metaKey      : false,    // Is meta Key down ?
-             *       buttonLeft   : false,    // Is button Left down ?
-             *       buttonMiddle : false,    // Is button Middle down ?
-             *       buttonRight  : false,    // Is button Right down ?
-             *     }
-             */
-            var paraview_event = {
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Number}  view Proxy global ID
-                 */
-                view: Number(config.view),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {String}  action
-                 * Type of mouse action and can only be one of:
-                 *
-                 * - down
-                 * - up
-                 * - move
-                 */
-                action: action,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {String}  charCode
-                 */
-                charCode: evt.charCode,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} altKey
-                 */
-                altKey: evt.altKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} ctrlKey
-                 */
-                ctrlKey: evt.ctrlKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} shiftKey
-                 */
-                shiftKey: evt.shiftKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} metaKey
-                 */
-                metaKey: evt.metaKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonLeft
-                 */
-                buttonLeft: (current_button === 1 ? true : false),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonMiddle
-                 */
-                buttonMiddle: (current_button === 2 ? true : false),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonRight
-                 */
-                buttonRight: (current_button === 3 ? true : false)
-            },
-            elem_position = $(evt.delegateTarget).offset(),
-            pointer = {
-                x : (evt.pageX - elem_position.left),
-                y : (evt.pageY - elem_position.top)
-            };
-
-            paraview_event.x = pointer.x / viewport.width();
-            paraview_event.y = 1.0 - (pointer.y / viewport.height());
-            if (eatMouseEvent(paraview_event)) {
-                return;
-            }
-
-            action_pending = true;
-            session.call("pv:mouseInteraction", paraview_event).then(function (res) {
-                if (res) {
-                    action_pending = false;
-                    render();
-                }
-            });
         }
 
         // internal function to render stats.
@@ -473,17 +707,10 @@
 
         // Choose if rendering is happening in Canvas or image
         if (config.useCanvas) {
-            viewport = canvas;
-
-            // If canvas not supported add image in bg
-            //canvas.append(bgImage);
-
-            // When image ready draw on canvas
-            bgImage.onload = function(){
-                paint();
-            };
-        } else {
-            viewport = $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
+            bgImage.onload = function(){paint();};
+        }
+        else {
+            $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
         }
 
         // internal function used to draw update data on the canvas. When not
@@ -494,177 +721,223 @@
                  * @member pv.Viewport
                  * @event stop-loading
                  */
-                viewport.trigger("stop-loading");
-                ctx2d.canvas.width = viewport.parent().innerWidth();
-                ctx2d.canvas.height = viewport.parent().innerHeight();
+                viewport.getHTMLElement().trigger("stop-loading");
+                ctx2d.canvas.width = viewport.getHTMLElement().innerWidth();
+                ctx2d.canvas.height = viewport.getHTMLElement().innerHeight();
                 ctx2d.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height);
                 renderStatistics();
             }
         }
 
-        // Extend touch event to mockup normal mouse event
-        function addTouchSupport(event) {
-            if (event.which === 0) {
-                // Touch event
-                event = $.extend(event, {
-                    which: 1,
-                    charCode: '',
-                    altKey: false,
-                    shiftKey: false,
-                    metaKey: false,
-                    ctrlKey: false
-                });
-            }
-            return event;
-        }
-
-        // Attach mouse listeners if needed
-        if (config.enableInteractions) {
-            viewport.bind("contextmenu click", function (evt) {
-                evt.preventDefault();
-            });
-
-            viewport.bind(headEvent + "mousedown", function (evt) {
-                evt = addTouchSupport(evt);
-                current_button = evt.which;
-                quality = config.interactiveQuality;
-                mouseInteraction("down", evt);
-            });
-            viewport.bind(headEvent + "mouseup", function (evt) {
-                evt = addTouchSupport(evt);
-                current_button = null;
-                mouseInteraction("up", evt);
-                quality = config.stillQuality;
-            });
-            viewport.bind(headEvent + "mousemove", function (evt) {
-                evt = addTouchSupport(evt);
-                mouseInteraction("move", evt);
-            });
-        }
-
         return {
-            /**
-             * @class pv.Viewport
-             * This Object let you attach a remote viewport into your web page
-             * and forward remotely the mouse interaction while keeping the
-             * content of the viewport up-to-date.
-             */
-            /**
-             * Attach viewport to a DOM element
-             *
-             * @member pv.Viewport
-             * @param {String} selector
-             * The will be used internally to get the jQuery associated element
-             *
-             *     <div class="renderer"></div>
-             *     viewport.bind(".renderer");
-             *
-             *     <div id="renderer"></div>
-             *     viewport.bind("#renderer");
-             *
-             *     <html>
-             *       <body>
-             *         <!-- renderer -->
-             *         <div></div>
-             *       </body>
-             *     </html>
-             *     viewport.bind("body > div");
-             */
-            bind: function (selector) {
-                var container = $(selector);
-                if (container.attr("__pv_viewport__") !== true) {
-                    container.attr("__pv_viewport__", true);
-                    container.append(viewport);
-                    render();
-                }
-            },
-            /**
-             * Remove viewport from DOM element
-             */
-            unbind: function () {
-                var parentElement = viewport.parent();
-                if (parentElement) {
-                    parentElement.attr("__pv_viewport__", false);
-                    viewport.remove();
-                }
-            },
-            /**
-             * Trigger a render on the server side and update the image locally.
-             *
-             *      view.render(function() { console.log("rendering done"); });
-             *
-             * @member pv.Viewport
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            render: function (ondone) {
-                render(ondone);
-            },
-            /**
-             * Reset the camera for the given view
-             *
-             * @member pv.Viewport
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            resetCamera: function (ondone) {
-                return session.call("pv:resetCamera", Number(config.view)).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Update Orientation Axes Visibility for the given view
-             *
-             * @member pv.Viewport
-             * @param {Boolean} show
-             * Show: true / Hide: false
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            updateOrientationAxesVisibility: function (show, ondone) {
-                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Update the Center Axes Visibility for the given view
-             *
-             * @member pv.Viewport
-             * @param {Boolean} show
-             * Show: true / Hide: false
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            updateCenterAxesVisibility: function (show, ondone) {
-                return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Provides access to the HTMLElement used for rendering.
-             *
-             * @member pv.Viewport
-             * @return {Object} Canvas or Image element used for rendering.
-             */
-            getHTMLElement : function () {
-                return viewport;
-            },
+                //
+                // Trigger a render on the server side and update the image locally.
+                //
+                render: function (ondone, fetch) {
+                    render(ondone, fetch);
+                },
 
-            /**
-             * Display the statics collected by the object in the view.
-             *
-             * @member pv.Viewport
-             * @param {pv.ViewportStatistics|null} stats
-             * The ViewportStatistics object to use to show the statistics in
-             * this view. To stop showing the statistics, simply call this
-             * function with null or on arguments.
-             */
-            showStatistics : function (stats) {
-                if (stats !== null) {
-                    statistics = stats;
-                } else {
-                    statistics = null;
+                //
+                // Reset the camera for the given view
+                //
+                resetCamera: function (ondone) {
+                    return session.call("pv:resetCamera", Number(config.view)).then(function () {
+                        render(ondone);
+                    });
+                },
+
+		/**
+		 * Update Orientation Axes Visibility for the given view
+		 *
+		 * @member pv.Viewport
+		 * @param {Boolean} show
+		 * Show: true / Hide: false
+		 * @param {Function} ondone Function to call after rendering is complete.
+		 */
+		updateOrientationAxesVisibility: function (show, ondone) {
+                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
+			render(ondone);
+		    });
+                },
+
+		/**
+		 * Update the Center Axes Visibility for the given view
+		 *
+		 * @member pv.Viewport
+		 * @param {Boolean} show
+		 * Show: true / Hide: false
+		 * @param {Function} ondone Function to call after rendering is complete.
+		 */
+		updateCenterAxesVisibility: function (show, ondone) {
+                return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
+			render(ondone);
+		    });
+	        },
+
+                //
+                // Display the statics collected by the object in the view.
+                //
+                // @member pv.Viewport
+                // @param {pv.ViewportStatistics|null} stats
+                // The ViewportStatistics object to use to show the statistics in
+                // this view. To stop showing the statistics, simply call this
+                // function with null or on arguments.
+                //
+                showStatistics : function (stats) {
+                    if (stats !== null) {
+                        statistics = stats;
+                    } else {
+                        statistics = null;
+                    }
+                    // repaint the viewport so the stats are either shown or hidden.
+                    paint();
+                },
+
+                clear : function() {
+                    var canvas2d = viewport.canvas2d;
+                    canvas2d.getContext('2d').clearRect(0, 0,
+                            canvas2d.width, canvas2d.height);
+                },
+
+                //
+                // Request a render with am mtime of 0 so image is regenerated
+                //
+                updateScene : function() {
+                    render(null, true);
+                },
+
+                //
+                // Mouse interaction
+                //
+                mouseInteraction : function(evt) {
+
+                    var action = evt.data.action;
+                    var viewport = evt.data.viewport;
+
+                    if (action === "down")
+                        viewport.quality = viewport.config.interactiveQuality;
+                    else if (action === "up")
+                        viewport.quality = viewport.config.stillQuality;
+
+                    // ----
+                    /// Internal method that returns true if the mouse interaction event should be
+                    /// throttled.
+                    function eatMouseEvent(pvevent) {
+                        var force_event = (viewport.button_state.left !== pvevent.buttonLeft || viewport.button_state.right  !== pvevent.buttonRight || viewport.button_state.middle !== pvevent.buttonMiddle);
+                        if (!force_event && !pvevent.buttonLeft && !pvevent.buttonRight && !pvevent.buttonMiddle) {
+                            return true;
+                        }
+                        if (!force_event && viewport.action_pending) {
+                            return true;
+                        }
+                        viewport.button_state.left   = pvevent.buttonLeft;
+                        viewport.button_state.right  = pvevent.buttonRight;
+                        viewport.button_state.middle = pvevent.buttonMiddle;
+
+                        return false;
+                    }
+
+                    // stop default event handling by the browser.
+                    evt.preventDefault();
+
+                    viewport.current_button = evt.which;
+
+                    /**
+                     * @class request.InteractionEvent
+                     * Container Object used to encapsulate MouseEvent status
+                     * formated in an handy manner for ParaView.
+                     *
+                     *     {
+                     *       view         : 23452345, // View proxy globalId
+                     *       action       : "down",   // Enum["down", "up", "move"]
+                     *       charCode     : "",       // In key press will hold the char value
+                     *       altKey       : false,    // Is alt Key down ?
+                     *       ctrlKey      : false,    // Is ctrl Key down ?
+                     *       shiftKey     : false,    // Is shift Key down ?
+                     *       metaKey      : false,    // Is meta Key down ?
+                     *       buttonLeft   : false,    // Is button Left down ?
+                     *       buttonMiddle : false,    // Is button Middle down ?
+                     *       buttonRight  : false,    // Is button Right down ?
+                     *     }
+                     */
+                    var paraview_event = {
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Number}  view Proxy global ID
+                         */
+                        view: Number(viewport.config.view),
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {String}  action
+                         * Type of mouse action and can only be one of:
+                         *
+                         * - down
+                         * - up
+                         * - move
+                         */
+                        action: action,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {String}  charCode
+                         */
+                        charCode: evt.charCode,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} altKey
+                         */
+                        altKey: evt.altKey,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} ctrlKey
+                         */
+                        ctrlKey: evt.ctrlKey,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} shiftKey
+                         */
+                        shiftKey: evt.shiftKey,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} metaKey
+                         */
+                        metaKey: evt.metaKey,
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} buttonLeft
+                         */
+                        buttonLeft: (viewport.current_button === 1 ? true : false),
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} buttonMiddle
+                         */
+                        buttonMiddle: (viewport.current_button === 2 ? true : false),
+                        /**
+                         * @member request.InteractionEvent
+                         * @property {Boolean} buttonRight
+                         */
+                        buttonRight: (viewport.current_button === 3 ? true : false)
+                    },
+                    elem_position = $(evt.delegateTarget).offset(),
+                    pointer = {
+                        x : (evt.pageX - elem_position.left),
+                        y : (evt.pageY - elem_position.top)
+                    };
+
+                    paraview_event.x = pointer.x / viewport.viewport.width();
+                    paraview_event.y = 1.0 - (pointer.y / viewport.viewport.height());
+                    if (eatMouseEvent(paraview_event)) {
+                        return;
+                    }
+
+                    viewport.action_pending = true;
+                    viewport.session.call("pv:mouseInteraction", paraview_event).then(function (res) {
+                        if (res) {
+                            viewport.action_pending = false;
+                            viewport.render();
+                        }
+                    });
                 }
-                // repaint the viewport so the stats are either shown or hidden.
-                paint();
-            }
-        };
+            };
     }
 
     // ----------------------------------------------------------------------

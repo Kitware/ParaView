@@ -2,12 +2,8 @@
  * Create a renderer object working fully in WebGL
  * Here is a sample set of command to illustrate how to use this renderer
  *
- * var renderer = new WebGLRenderer('rendererId','http://localhost:8080/ParaWebService')
+ * var renderer = new WebGLRenderer(session, 'http://localhost:8080/ParaWebService')
  * renderer.init(sessionId, viewId);
- * renderer.bindToElementId('containerID'); // => Add a WebGL canvas inside a div tag id 'containerID'
- * renderer.start();
- *
- * renderer.init(otherSessionId, otherViewId);
  * renderer.view.width = '100';
  * renderer.view.height = '400';
  * renderer.setSize('100', '400');
@@ -29,24 +25,25 @@ window.requestAnimFrame = (function(){
           };
 })();
 
-function WebGLRenderer(rendererId, coreServiceURL) {
-    this.baseURL = coreServiceURL + "/WebGL";
-    this.rendererId = rendererId;
+function WebGLRenderer(viewport) {
+
+    this.rendererId = ++arguments.callee.currentId || 1
+    this.viewport = viewport;
+    this.session = viewport.session;
     this.sessionId = "";
     this.viewId = "";
     this.nbError = 0;
     this.localTimeStamp = 0;
     this.offlineMode = false;
-    this.setServerMode(false);
     this.forceSquareSize = false;
 
     this.view = new Object();
-    this.view.width = 100;
-    this.view.height = 100;
-    this.view.id = rendererId;
+    this.view.id = this.rendererId;
     this.view.alt = "ParaView Renderer";
 
     //Default Shaders
+    this.shaders = new Object();
+
     this.view.shaderfs = document.createElement("script");
     this.view.shaderfs.id = "shader-fs";
     this.view.shaderfs.type = "x-shader/x-fragment";
@@ -68,6 +65,8 @@ function WebGLRenderer(rendererId, coreServiceURL) {
           gl_FragColor = vColor*vec4(1.0, 1.0, 1.0, 1.0);\
         }\
     }";
+    this.shaders[this.view.shaderfs.id] = this.view.shaderfs;
+
     this.view.shadervs = document.createElement("script");
     this.view.shadervs.id = "shader-vs";
     this.view.shadervs.type = "x-shader/x-vertex";
@@ -87,8 +86,10 @@ function WebGLRenderer(rendererId, coreServiceURL) {
         vTransformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);\
         vColor = aVertexColor;\
     }";
+    this.shaders[this.view.shadervs.id] = this.view.shadervs;
 
-	// Point Shaders
+
+  // Point Shaders
     this.view.shaderfsPoint = document.createElement("script");
     this.view.shaderfsPoint.id = "shader-fs-Point";
     this.view.shaderfsPoint.type = "x-shader/x-fragment";
@@ -100,6 +101,8 @@ function WebGLRenderer(rendererId, coreServiceURL) {
     void main(void) {\
         gl_FragColor = vColor;\
     }";
+    this.shaders[this.view.shaderfsPoint.id] = this.view.shaderfsPoint;
+
     this.view.shadervsPoint = document.createElement("script");
     this.view.shadervsPoint.id = "shader-vs-Point";
     this.view.shadervsPoint.type = "x-shader/x-vertex";
@@ -117,42 +120,19 @@ function WebGLRenderer(rendererId, coreServiceURL) {
         vColor = aVertexColor*vec4(1.0, 1.0, 1.0, 1.0);\
         gl_PointSize = uPointSize;\
     }";
+    this.shaders[this.view.shadervsPoint.id] = this.view.shadervsPoint;
 
-	//
-    this.canvasName = "glcanvas" + rendererId;
-    this.view.html = '<div><canvas id="' + this.canvasName + '" style="border: none; overflow: hidden;';
-    if (this.forceSquareSize == true) this.view.html += ' position: absolute;';
-    this.view.html += ' left:-1px; top:-1px; right:0px; z-index=0;" width="' + this.view.width
-    + '" height="' + this.view.height + '"onmousedown="handleMouseDown(event,\''+rendererId+'\')"\
-     onmousemove="handleMouseMove(event,\''+rendererId+'\')" onmouseup="handleMouseUp(event,\'' + rendererId
-     + '\')" oncontextmenu="consumeEvent(event)"> Your browser doesn\'t appear to support the HTML5 <code>\
-     &lt;canvas&gt;</code> element.</canvas>';
+    var width = this.viewport.getHTMLElement().innerWidth();
+    var height = this.viewport.getHTMLElement().innerHeight();
+    this.view.width = width;
+    this.view.height = height;
+    this.setSize(width, height);
 
-     this.view.html += '<canvas id="' + this.canvasName + 'Widget" style="position: absolute; left:-1px; top:-1px; z-index:1;';
-     if(this.forceSquareSize == true) this.view.html += 'position: absolute;';
-     this.view.html += '" width="' + this.view.width + '" height="' + this.view.height +
-     '"onmousedown="handleMouseDown(event,\''+rendererId+'\')" onmousemove="handleMouseMove(event,\''+rendererId+'\')"\
-     onmouseup="handleMouseUp(event,\'' + rendererId + '\')" oncontextmenu="consumeEvent(event)"></canvas></div>';
+
     this.fps = 0;
 
     // Register in global var
-    webglRenderers[rendererId] = this;
-}
-
-WebGLRenderer.prototype.bindToElementId = function (elementId) {
-    this.oldInnerHTML = document.getElementById(elementId).innerHTML;
-    document.getElementById(elementId).innerHTML = this.view.html;
-
-    document.getElementById(elementId).appendChild(this.view.shaderfs);
-    document.getElementById(elementId).appendChild(this.view.shadervs);
-    document.getElementById(elementId).appendChild(this.view.shaderfsPoint);
-    document.getElementById(elementId).appendChild(this.view.shadervsPoint);
-}
-
-WebGLRenderer.prototype.unbindToElementId = function (elementId) {
-  document.getElementById(elementId).innerHTML = this.oldInnerHTML;
-  clearTimeout(this.drawInterval);
-  if (typeof(paraview) != "undefined") paraview.updateConfiguration(true, "JPEG", "NO");
+    webglRenderers[this.rendererId] = this;
 }
 
 WebGLRenderer.prototype.setOfflineMode = function (mode) {
@@ -160,36 +140,20 @@ WebGLRenderer.prototype.setOfflineMode = function (mode) {
   this.requestMetaData();
 }
 
-WebGLRenderer.prototype.bindToElement = function (element) {
-    this.oldInnerHTML = element.innerHTML;
-    element.innerHTML = this.view.html;
-
-    element.appendChild(this.view.shaderfs);
-    element.appendChild(this.view.shadervs);
-    element.appendChild(this.view.shaderfsPoint);
-    element.appendChild(this.view.shadervsPoint);
-}
-
-WebGLRenderer.prototype.unbindToElement = function (element) {
-  element.innerHTML = this.oldInnerHTML;
-  clearTimeout(this.drawInterval);
-  if (typeof(paraview) != "undefined") paraview.updateConfiguration(true, "JPEG", "NO");
-}
-
 WebGLRenderer.prototype.init = function (sessionId, viewId) {
     this.sessionId = sessionId;
     this.viewId = viewId;
 }
 
-WebGLRenderer.prototype.start = function(metadata, objects) {
+WebGLRenderer.prototype.start = function() {
     if (typeof(renderers) == "undefined"){
       renderers = Object();
       renderers.current = this;
     }
-    if (typeof(paraview) != "undefined") paraview.updateConfiguration(true, "JPEG", "WebGL");
-    canvas = document.getElementById(this.canvasName);
-    canvas.width = this.view.width;
-    canvas.height = this.view.height;
+    //if (typeof(paraview) != "undefined") paraview.updateConfiguration(true, "JPEG", "WebGL");
+    canvas = this.viewport.canvas3d;
+//    canvas.width = this.view.width;
+//    canvas.height = this.view.height;
 
     this.hasSceneChanged = true;        //Scene Graph Has Changed
     this.oldCamPos = null;              //Last Known Camera Position
@@ -247,9 +211,10 @@ WebGLRenderer.prototype.start = function(metadata, objects) {
 
       this.initShaders();
 
-      this.ctx2d = document.getElementById(this.canvasName + "Widget").getContext('2d');
+      this.ctx2d = this.viewport.canvas2d.getContext('2d');
+      this.stopped = false;
       // Set up to draw the scene periodically.
-      this.drawInterval = requestAnimFrame(new Function("webglRenderers['" + this.view.id + "'].drawScene();"));
+      //this.drawInterval = requestAnimFrame(new Function("webglRenderers['" + this.view.id + "'].drawScene();"));
 
       if (!this.offlineMode){
         this.requestMetaData();
@@ -274,13 +239,17 @@ WebGLRenderer.prototype.start = function(metadata, objects) {
     }
 }
 
+WebGLRenderer.prototype.stop = function() {
+    this.stopped = true;
+}
+
 WebGLRenderer.prototype.setForceSquareSize = function(b){
 this.forceSquareSize = b;
 }
 
 WebGLRenderer.prototype.getPageX = function(){
     var location = 0;
-    var node = document.getElementById(this.canvasName);
+    var node = this.viewport.canvas3d;
     while(node) {
         location += node.offsetLeft;
         node = node.offsetParent;
@@ -290,7 +259,7 @@ WebGLRenderer.prototype.getPageX = function(){
 
 WebGLRenderer.prototype.getPageY = function(){
     var location = 0;
-    var node = document.getElementById(this.canvasName);
+    var node = this.viewport.canvas3d;
     while(node) {
         location += node.offsetTop;
         node = node.offsetParent;
@@ -298,55 +267,12 @@ WebGLRenderer.prototype.getPageY = function(){
     return location;
 }
 
-WebGLRenderer.prototype.setServerMode = function(mode){
-  if (typeof(this.interaction) == "undefined"){
-    this.interaction = new Object();
-    this.interaction.lastRealEvent = 0;
-    this.interaction.needUp = false;
-    this.interaction.lastEvent = 0;
-    this.interaction.isDragging = false;
-    this.interaction.action = " ";
-    this.interaction.keys = " ";
-    this.interaction.button = 0;
-    this.interaction.x = 0;
-    this.interaction.y = 0;
-    this.interaction.xOrigin = 0;
-    this.interaction.yOrigin = 0;
-    this.serverMode = false;
-  }
-  if (this.serverMode == mode) return;
-  this.serverMode = mode;
-  if (!this.serverMode){
-    this.updateId = setTimeout("webglRenderers[\'" + this.view.id + "\'].updateCamera()", this.updateInterval);
-  }
-  canvas = document.getElementById(this.canvasName);
-  canvasWidget = document.getElementById(this.canvasName + "Widget");
-  if (this.serverMode){
-    this.requestOldInterval = this.requestInterval;
-    this.requestInterval = 50;
-    canvas.setAttribute("onmousedown", "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','down',event)");
-    canvas.setAttribute("onmousemove", "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','move',event)");
-    canvas.setAttribute("onmouseup"  , "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','up',event)");
-    canvasWidget.setAttribute("onmousedown", "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','down',event)");
-    canvasWidget.setAttribute("onmousemove", "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','move',event)");
-    canvasWidget.setAttribute("onmouseup"  , "mouseServerInt('"+this.view.id+"','"+this.sessionId+"','"+this.viewId+"','up',event)");
-  } else {
-    this.requestInterval = this.requestOldInterval;
-    canvas.setAttribute("onmousedown", "handleMouseDown(event,'" + this.rendererId + "')");
-    canvas.setAttribute("onmousemove", "handleMouseMove(event,'" + this.rendererId + "')");
-    canvas.setAttribute("onmouseup"  , "handleMouseUp(event,'" + this.rendererId + "')");
-    canvasWidget.setAttribute("onmousedown", "handleMouseDown(event,'" + this.rendererId + "')");
-    canvasWidget.setAttribute("onmousemove", "handleMouseMove(event,'" + this.rendererId + "')");
-    canvasWidget.setAttribute("onmouseup"  , "handleMouseUp(event,'" + this.rendererId + "')");
-  }
-  canvas.setAttribute("oncontextmenu", "consumeEvent(event)");
-}
-
 WebGLRenderer.prototype.setSize = function(width, height) {
-	width = parseFloat(width);
-	height = parseFloat(height);
-	w = width;
-	h = height;
+  width = parseFloat(width);
+  height = parseFloat(height);
+
+  w = width;
+  h = height;
     this.view.aspectRatio = width/height;
     if(this.forceSquareSize){
       if (width > height) height = width;
@@ -354,33 +280,25 @@ WebGLRenderer.prototype.setSize = function(width, height) {
     }
     this.view.width = width;
     this.view.height = height;
-    canvas = document.getElementById(this.canvasName);
-    canvasWidget = document.getElementById(this.canvasName + "Widget");
-    if (canvas){
-	    canvas.width = this.view.width;
-	    canvas.height = this.view.height;
-	    canvasWidget.width = this.view.width;
-	    canvasWidget.height = this.view.height;
-	    if (typeof(this.gl) != "undefined" && this.gl != null){
-	        if (!this.offlineMode) updateRendererSize(this.sessionId, this.viewId, width, height);
-		    this.gl.viewportWidth = this.view.width;
-		    this.gl.viewportHeight = this.view.height;
-	    }
-	    left = 0; tt = 0;
-	    if (this.forceSquareSize){
-	      left = Math.round((w-this.view.width)/2);
-	      tt = Math.round((h-this.view.height)/2);
-	    }
-	    this.view.left = left;
-	    this.view.top = top;
-	    if(this.forceSquareSize == true){
-	      canvas.setAttribute("style", "position: absolute; overflow: hidden; left: " + left + "px; top: " + tt + "px; right: 0px; z-index:0;");
-	      canvasWidget.setAttribute("style", "position: absolute; overflow: hidden; left: " + left + "px; top: " + tt + "px; right: 0px; z-index:1;");
-	    } else {
-	      canvas.setAttribute("style", "overflow: hidden; left: " + left + "px; top: " + tt + "px; right: 0px; z-index:0;");
-	      canvasWidget.setAttribute("style", "position: absolute; overflow: hidden; left: " + left + "px; top: " + tt + "px; right: 0px; z-index:1;");
-	    }
-    }
+//    canvas = this.viewport.canvas3d;
+//    canvasWidget = this.viewport.canvas2d;
+//    if (canvas){
+//      canvas.width = this.view.width;
+//      canvas.height = this.view.height;
+//      canvasWidget.width = this.view.width;
+//      canvasWidget.height = this.view.height;
+      if (typeof(this.gl) != "undefined" && this.gl != null){
+          //if (!this.offlineMode) updateRendererSize(this.sessionId, this.viewId, width, height);
+        this.gl.viewportWidth = this.view.width;
+        this.gl.viewportHeight = this.view.height;
+      }
+      left = 0; tt = 0;
+      if (this.forceSquareSize){
+        left = Math.round((w-this.view.width)/2);
+        tt = Math.round((h-this.view.height)/2);
+      }
+      this.view.left = left;
+      this.view.top = top;
 }
 
 WebGLRenderer.prototype.requestMetaData = function() {
@@ -388,28 +306,16 @@ WebGLRenderer.prototype.requestMetaData = function() {
   if (this.offlineMode) return;
 
   interval = this.requestInterval;
-  if (this.serverMode) interval = interval/2;
-  this.timer = setTimeout("webglRenderers[\'" + this.view.id + "\'].requestMetaData()", interval);
-  var request = new XMLHttpRequest();
-  request.requester = this;
-  filename = this.baseURL + "?sid=" + this.sessionId + "&vid=" + this.viewId + "&q=meta";
-  try {
-    request.open("GET", filename, false);
-    request.overrideMimeType('text/plain; charset=x-user-defined');
-    request.onreadystatechange = function() {
-      if(this.requester.mouseDown) return;
-      if (request.status != 200) this.requester.nbErrors++
-      else if (request.readyState == 4) {
-        aux = JSON.parse(request.responseText);
-        this.requester.hasSceneChanged = JSON.stringify(aux)!=JSON.stringify(this.requester.sceneJSON);
-        this.requester.sceneJSON = JSON.parse(request.responseText);
-        if (this.requester.hasSceneChanged) this.requester.updateScene();
-      }
-    }
-  request.send();
-  } catch (e) {
-    this.nbErrors++;
-  }
+  //this.timer = setTimeout("webglRenderers[\'" + this.view.id + "\'].requestMetaData()", interval);
+  var requester = this;
+
+  this.session.call("pv:getSceneMetaData", this.viewId).then(function(data) {
+      if(requester.mouseDown) return;
+      aux = JSON.parse(data);
+      requester.hasSceneChanged = JSON.stringify(aux)!=JSON.stringify(requester.sceneJSON);
+      requester.sceneJSON = JSON.parse(data);
+      if (requester.hasSceneChanged) requester.updateScene();
+    });
 }
 
 WebGLRenderer.prototype.updateScene = function(){
@@ -429,12 +335,12 @@ WebGLRenderer.prototype.updateScene = function(){
     this.objScale = 1.0;
     mat4.identity(this.rotMatrix);
 
-	this.up = [this.lookAt[4], this.lookAt[5], this.lookAt[6]];
-	this.z_dir = [this.lookAt[1]-this.lookAt[7],
+  this.up = [this.lookAt[4], this.lookAt[5], this.lookAt[6]];
+  this.z_dir = [this.lookAt[1]-this.lookAt[7],
                   this.lookAt[2]-this.lookAt[8],
                   this.lookAt[3]-this.lookAt[9]];
-	vec3.normalize(this.z_dir, this.z_dir);
-	vec3.cross(this.z_dir, this.up, this.right);
+  vec3.normalize(this.z_dir, this.z_dir);
+  vec3.cross(this.z_dir, this.up, this.right);
   }
   this.oldCamPos = this.lookAt;
   var aux = [];
@@ -463,11 +369,11 @@ WebGLRenderer.prototype.updateScene = function(){
       if (!foundit){
         for(k=0; k<this.sceneJSON.Objects[w].parts; k++){
           foundit = false;
-	      for(j=0; j<this.objects.length; j++){
-	        if (this.objects[j].md5==this.sceneJSON.Objects[w].md5 &&
+        for(j=0; j<this.objects.length; j++){
+          if (this.objects[j].md5==this.sceneJSON.Objects[w].md5 &&
               this.objects[j].id==this.sceneJSON.Objects[w].id && this.objects[j].part==k+1 )
-	          foundit=true;
-	      }
+            foundit=true;
+        }
           if(!foundit) this.requestObject(this.sessionId, this.sceneJSON.id, this.sceneJSON.Objects[w].md5,
                                       k+1, this.sceneJSON.Objects[w].id, this.sceneJSON.Objects[w].transparency, this.sceneJSON.Objects[w].layer);
           }
@@ -476,46 +382,41 @@ WebGLRenderer.prototype.updateScene = function(){
     }
   }
   this.hasSceneChanged = false;
-  this.setServerMode(intAtServer);
 }
 
 WebGLRenderer.prototype.requestObject = function(sid, vid, md5, part, id, hastransparency, layer){
   if (this.offlineMode) return;
-  var request = new XMLHttpRequest();
-  request.requester = this;
-  filename = this.baseURL + "?sid=" + sid + "&vid=" + vid + "&hash=" + md5 + "&part=" + part + "&q=mesh&id=" + id;
-  try {
-    request.open("GET", filename, false);
-    request.overrideMimeType('text/plain; charset=x-user-defined');
-    request.onreadystatechange = function() {
-      if (request.status != 200) this.requester.nbErrors++
-      else if (request.readyState == 4) {
-        foundit = -1;
-        for (i=0; i<this.requester.objects.length; i++)
-          if (this.requester.objects[i].md5 == md5 && this.requester.objects[i].part == part
-              && this.requester.objects[i].id == id) foundit = i;
-        if (foundit == -1){
-          foundit = this.requester.objects.length;
-          this.requester.objects.length++;
-        }
-        this.requester.objects[foundit] = new Object();
-        this.requester.objects[foundit].md5 = md5;    //hash
-        this.requester.objects[foundit].part = part;  //part
-        this.requester.objects[foundit].sid = sid;    //scene id
-        this.requester.objects[foundit].vid = vid;    //view id
-        this.requester.objects[foundit].id = id;      //object id
-        this.requester.objects[foundit].data = request.responseText;
-        this.requester.objects[foundit].hasTransparency = hastransparency;
-        this.requester.objects[foundit].layer = layer;
-        this.requester.objects[foundit].render = function(){};
-        this.requester.processQueue[this.requester.processQueue.length] = this.requester.objects[foundit];
-        this.requester.cachedObjects[this.requester.cachedObjects.length] = this.requester.objects[foundit];
-      }
-    }
-    request.send();
-  } catch (e){
-    this.nbErrors++;
-  }
+  var requester = this;
+
+  this.session.call("pv:getWebGLData", vid, id, part).then(function(data) {
+
+      // decode base64
+      data = atob(data);
+
+      foundit = -1;
+      for (i=0; i<requester.objects.length; i++)
+        if (requester.objects[i].md5 == md5 && requester.objects[i].part == part
+              && requester.objects[i].id == id) foundit = i;
+            if (foundit == -1){
+                foundit = requester.objects.length;
+                requester.objects.length++;
+            }
+            requester.objects[foundit] = new Object();
+            requester.objects[foundit].md5 = md5;    //hash
+            requester.objects[foundit].part = part;  //part
+            requester.objects[foundit].sid = sid;    //scene id
+            requester.objects[foundit].vid = vid;    //view id
+            requester.objects[foundit].id = id;      //object id
+            requester.objects[foundit].data = data;
+            requester.objects[foundit].hasTransparency = hastransparency;
+            requester.objects[foundit].layer = layer;
+            requester.objects[foundit].render = function(){};
+            requester.processQueue[requester.processQueue.length] = requester.objects[foundit];
+            requester.cachedObjects[requester.cachedObjects.length] = requester.objects[foundit];
+
+            requester.processObject();
+            requester.drawScene();
+    });
 }
 
 WebGLRenderer.prototype.parseObject = function(obj){
@@ -616,18 +517,18 @@ WebGLRenderer.prototype.parseObject = function(obj){
 
     //Getting Colors
     obj.colors = [];
-	for(c=0; c<obj.numOfColors; c++){
-	  test = new Int8Array(4); for(i=0; i<4; i++) test[i] = ss[pos++];
-	  v = new Float32Array(test.buffer);
-	  xrgb = [v[0], ss[pos++], ss[pos++], ss[pos++]];
-	  obj.colors[c] = xrgb;
-	}
+  for(c=0; c<obj.numOfColors; c++){
+    test = new Int8Array(4); for(i=0; i<4; i++) test[i] = ss[pos++];
+    v = new Float32Array(test.buffer);
+    xrgb = [v[0], ss[pos++], ss[pos++], ss[pos++]];
+    obj.colors[c] = xrgb;
+  }
 
-	obj.orientation = ss[pos++];
-	obj.numOfLabels = ss[pos++];
-	tt = "";
-	for(jj=0; jj<(ss.length-pos); jj++) tt = tt + String.fromCharCode(ss[pos+jj]);
-	obj.title = tt;
+  obj.orientation = ss[pos++];
+  obj.numOfLabels = ss[pos++];
+  tt = "";
+  for(jj=0; jj<(ss.length-pos); jj++) tt = tt + String.fromCharCode(ss[pos+jj]);
+  obj.title = tt;
 
     obj.render = this.renderColorMap;
   }
@@ -951,14 +852,14 @@ WebGLRenderer.prototype.setMatrixUniforms = function(s) {
 
 WebGLRenderer.prototype.processObject = function() {
   if (this.processQueue.length != 0){
-  	obj = this.processQueue[this.processQueue.length-1];
-  	this.processQueue.length -= 1;
-  	this.parseObject(obj);
+    obj = this.processQueue[this.processQueue.length-1];
+    this.processQueue.length -= 1;
+    this.parseObject(obj);
   }
 }
 
 WebGLRenderer.prototype.drawScene = function() {
-  this.drawInterval = requestAnimFrame(new Function("webglRenderers['" + this.view.id + "'].drawScene();"));
+  //this.drawInterval = requestAnimFrame(new Function("webglRenderers['" + this.view.id + "'].drawScene();"));
   if (this.hasSceneChanged){
     this.updateScene();
   }
@@ -975,6 +876,7 @@ WebGLRenderer.prototype.drawScene = function() {
     this.lastTime = currTime;
     this.fps = 50000/diff;
   }
+
   this.processObject();
 
   this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
@@ -1068,7 +970,7 @@ WebGLRenderer.prototype.initShaders = function() {
 }
 
 WebGLRenderer.prototype.getShader = function(id) {
-    var shaderScript = document.getElementById(id);
+    var shaderScript = this.shaders[id];//this.viewport.getHTMLElement().getElementById(id);
     if (!shaderScript) {
         return null;
     }
@@ -1145,8 +1047,7 @@ WebGLRenderer.prototype.forceUpdateCamera = function(){
   vec3.subtract(pos, tt2, pos);
   vec3.subtract(fp , tt2, fp);
 
-  paraviewObjects[parseInt(render.sessionId)].sendEvent("UpdateCamera", render.viewId + " " + fp[0] + " " + fp[1] + " " + fp[2]
-  + " " + up[0] + " " + up[1] + " " + up[2] + " " + pos[0] + " " + pos[1] + " " + pos[2]);
+  this.session.call("pv:updateCamera", this.viewId, fp, up, pos);
   clearTimeout(this.updateId);
   this.updateId = setTimeout("webglRenderers[\'" + this.view.id + "\'].updateCamera()", this.updateInterval);
 }
@@ -1156,9 +1057,54 @@ WebGLRenderer.prototype.updateCamera = function(){
     this.updateId = setTimeout("webglRenderers[\'" + this.view.id + "\'].updateCamera()", this.updateInterval);
     return;
   }
-  if (this.serverMode) return;
+
   this.forceUpdateCamera();
 }
+
+WebGLRenderer.prototype.handleMouseDown = function(event){
+    this.mouseDown = true;
+    this.lastMouseX = event.clientX;
+    this.lastMouseY = event.clientY;
+    event.preventDefault();
+}
+
+WebGLRenderer.prototype.handleMouseUp = function(event) {
+    this.mouseDown = false;
+    this.forceUpdateCamera();
+
+    event.preventDefault();
+}
+
+WebGLRenderer.prototype.handleMouseMove = function(event, id) {
+    if (!this.mouseDown) {
+      return;
+    }
+    var newX = event.clientX;
+    var newY = event.clientY;
+    var deltaX = newX - this.lastMouseX;
+    var deltaY = newY - this.lastMouseY;
+
+    if (event.button == 0){
+      var rX = deltaX/50.0;
+      var rY = deltaY/50.0;
+      var mx = mat4.create(); mat4.identity(mx); mat4.rotate(mx, rX, [0, 1, 0]);
+      var my = mat4.create(); mat4.identity(my); mat4.rotate(my, rY, [1, 0, 0]);
+      mat4.multiply(mx, my, mx);
+      mat4.multiply(mx, this.rotMatrix, this.rotMatrix);
+    } else if (event.button == 1){
+      z = Math.abs(this.sceneJSON.Renderers[0].LookAt[9]-this.sceneJSON.Renderers[0].LookAt[3]);
+      aux = z/this.objScale;
+      this.translation[0] += aux*deltaX/1500.0;
+      this.translation[1] -= aux*deltaY/1500.0;
+    } else if (event.button == 2){
+      this.objScale += this.objScale*(deltaY)/200.0;
+    } else {
+      this.objScale += this.objScale*(deltaY)/200.0;
+    }
+
+    this.lastMouseX = newX;
+    this.lastMouseY = newY;
+  }
 
 /**********************************************************************************/
 
@@ -1174,134 +1120,4 @@ function mvPopMatrix() {
     throw "Invalid popMatrix!";
   }
   return mvMatrixStack.pop();
-}
-
-
-function handleMouseDown(event, id) {
-  render = webglRenderers[id];
-  render.mouseDown = true;
-  render.lastMouseX = event.clientX;
-  render.lastMouseY = event.clientY;
-  if (!render.offlineMode){
-    paraviewObjects[render.sessionId].sendEvent('MouseEvent', render.viewId + ' 0 0');
-    updateRendererSize(render.sessionId, render.viewId, render.view.width/render.interactionRatio, render.view.height/render.interactionRatio);
-  }
-  event.preventDefault();
-  return false;
-}
-
-function handleMouseUp(event, id) {
-  render = webglRenderers[id];
-  render.mouseDown = false;
-  if (!render.offlineMode){
-    paraviewObjects[render.sessionId].sendEvent('MouseEvent', render.viewId + ' 2 0');
-    updateRendererSize(render.sessionId, render.viewId, render.view.width, render.view.height);
-    render.forceUpdateCamera();
-    render.requestMetaData();
-  }
-  event.preventDefault();
-}
-
-function handleMouseMove(event, id) {
-  render = webglRenderers[id];
-  if (!render.mouseDown) {
-    return;
-  }
-  var newX = event.clientX;
-  var newY = event.clientY;
-  var deltaX = newX - render.lastMouseX;
-  var deltaY = newY - render.lastMouseY;
-
-  if (event.button == 0){
-    var rX = deltaX/50.0;
-    var rY = deltaY/50.0;
-    var mx = mat4.create(); mat4.identity(mx); mat4.rotate(mx, rX, [0, 1, 0]);
-    var my = mat4.create(); mat4.identity(my); mat4.rotate(my, rY, [1, 0, 0]);
-    mat4.multiply(mx, my, mx);
-    mat4.multiply(mx, render.rotMatrix, render.rotMatrix);
-  } else if (event.button == 1){
-    z = Math.abs(render.sceneJSON.Renderers[0].LookAt[9]-render.sceneJSON.Renderers[0].LookAt[3]);
-    aux = z/render.objScale;
-    render.translation[0] += aux*deltaX/1500.0;
-    render.translation[1] -= aux*deltaY/1500.0;
-  } else if (event.button == 2){
-    render.objScale += render.objScale*(deltaY)/200.0;
-  } else {
-    render.objScale += render.objScale*(deltaY)/200.0;
-  }
-
-  render.lastMouseX = newX;
-  render.lastMouseY = newY;
-
-  event.preventDefault();
-}
-
-function mouseServerInt(rendererId, sessionId, viewId, action, event){
-    consumeEvent(event);
-	render = webglRenderers[rendererId];
-    render.interaction.lastRealEvent = event;
-    var width = render.view.width;
-    var height = render.view.height;
-
-    if(action == 'down') {
-        if(render.interaction.needUp) {
-            paraviewObjects[sessionId].sendEvent('MouseEvent', viewId + ' 2 ' + render.interaction.lastEvent);
-        }
-        render.interaction.isDragging = true;
-        render.interaction.needUp = true;
-        switch(event.button){
-            case 1:
-                render.interaction.button =  '0 ';
-                break;
-            case 4:
-                render.interaction.button =  '1 ';
-                break;
-            case 2:
-                render.interaction.button =  '2 ';
-                break;
-        }
-        render.interaction.action = " 0 ";
-        render.interaction.keys = "";
-        if(event.ctrlKey) {
-            render.interaction.keys += "1";
-        } else {
-            render.interaction.keys += "0";
-        }
-        if(event.shiftKey) {
-            render.interaction.keys += " 1";
-        } else {
-            render.interaction.keys += " 0";
-        }
-        render.interaction.x = event.screenX;
-        render.interaction.y = event.screenY;
-
-        // Keep relative origin
-        var docX = event.pageX;
-        var docY = event.pageY;
-        render.interaction.xOrigin = docX - render.getPageX();
-        render.interaction.yOrigin = docY - render.getPageY();
-    } else if (action == 'move') {
-        render.interaction.action = " 1 ";
-    } else if ( action == 'up' || action == 'click') {
-        render.interaction.isDragging = false;
-        render.interaction.needUp = false;
-        render.interaction.action = " 2 ";
-        //
-        var mouseInfo = ((event.screenX-render.interaction.x + render.interaction.xOrigin)/height) + " " + (1-(event.screenY-render.interaction.y + render.interaction.yOrigin)/height) + " " + render.interaction.keys ;
-        render.interaction.lastEvent = render.interaction.button + mouseInfo;
-        paraviewObjects[sessionId].sendEvent('MouseEvent', viewId + render.interaction.action + render.interaction.lastEvent);
-        render.interaction.scale = 1;
-        render.interaction.button = event.button + ' ';
-        render.interaction.keys = "0 0"
-    }
-    if(render.interaction.isDragging ){
-        var mouseInfoDrag = ((event.screenX-render.interaction.x + render.interaction.xOrigin)/height) + " " + (1-(event.screenY-render.interaction.y + render.interaction.yOrigin)/height) + " " + render.interaction.keys ;
-        var mouseAction = 'MouseEvent';
-        if(action == 'move') {
-            mouseAction = 'MouseMove';
-        }
-        render.interaction.lastEvent = render.interaction.button + mouseInfoDrag;
-        paraviewObjects[sessionId].sendEvent(mouseAction, viewId + render.interaction.action + render.interaction.lastEvent);
-    }
-    return false;
 }
