@@ -119,14 +119,13 @@
                     pipeline: pipeline,
                     sources: sources,
                     files: files
-                });
+                }).bind('addSource deleteProxy openFile proxyModified apply', updateView);
             }
 
             $(window).resize(function() {
                 $(".splitter").height(window.innerHeight - 35);
                 //$(".viewport").height(window.innerHeight - 35);
                 $(".control-panel").height(window.innerHeight - 35);
-                updateView();
             }).trigger('resize');
 
             $(".resetCamera").click(function(){
@@ -135,10 +134,14 @@
                 }
             });
 
+            function renderLater() {
+                window.setTimeout(updateView, 250);
+            }
+
             function updateView() {
-                //                if(pv.viewport) {
-                //            pv.viewport.render();
-                //        }
+                if(pv.viewport) {
+                    pv.viewport.render();
+                }
             }
         </script>
     </body>
