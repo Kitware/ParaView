@@ -290,6 +290,16 @@ class ParaViewServerProtocol(ServerProtocol):
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
+    @exportRpc("updateCamera")
+    def updateCamera(self, view_id, focal_point, view_up, position):
+        view = self._getView(view_id)
+
+        view.CameraFocalPoint = focal_point
+        view.CameraViewUp = view_up
+        view.CameraPosition = position
+        ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
+
+
     @exportRpc("getSceneMetaData")
     def getSceneMetaData(self, view_id):
         view  = self._getView(view_id);
