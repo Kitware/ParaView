@@ -290,6 +290,22 @@ class ParaViewServerProtocol(ServerProtocol):
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
+    @exportRpc("getSceneMetaData")
+    def getSceneMetaData(self, view_id):
+        view  = self._getView(view_id);
+        data = ParaViewServerProtocol.WebApplication.GetWebGLSceneMetaData(view.SMProxy)
+
+        return data
+
+    @exportRpc("getWebGLData")
+    def getWebGLData(self, view_id, object_id, part):
+        view  = self._getView(view_id);
+        data = ParaViewServerProtocol.WebApplication.GetWebGLBinaryData(view.SMProxy,
+                                                                        str(object_id),
+                                                                        part-1);
+
+        return data
+
     @exportRpc("exit")
     def exit(self):
         """RPC callback to exit"""
