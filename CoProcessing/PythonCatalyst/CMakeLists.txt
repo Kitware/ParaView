@@ -59,7 +59,7 @@ set (CATALYST_FORTRAN_USING_MANGLING)
 if (CMAKE_Fortran_COMPILER_WORKS)
   include(FortranCInterface)
   FortranCInterface_HEADER(FortranPythonAdaptorAPIMangling.h
-    SYMBOLS coprocessorinitializewithpython)
+    SYMBOLS coprocessorinitializewithpython coprocessoraddpythonscript)
   set(CATALYST_FORTRAN_USING_MANGLING ${FortranCInterface_GLOBAL_FOUND})
   set (Module_SRCS
       ${Module_SRCS}

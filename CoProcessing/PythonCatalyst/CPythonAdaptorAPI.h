@@ -24,7 +24,10 @@
 // 'extern "C"' functions as named below for both Fortran and C.
 // C code should include this header file to get the properly
 // mangled function names. This extends CAdaptorAPI.h to add a new
-// initialization function that take a python script.
+// initialization function that takes a Python script and another
+// function to add in extra Python scripts. Note that
+// coprocessorinitializewithpython() isn't required to contain
+// a Python script.
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +37,9 @@ extern "C" {
   void VTKPVPYTHONCATALYST_EXPORT coprocessorinitializewithpython(
     char* pythonFileName, int* pythonFileNameLength);
 
+  // add in another Catalyst Python pipeline script.
+  void VTKPVPYTHONCATALYST_EXPORT coprocessoraddpythonscript(
+    char* pythonFileName, int* pythonFileNameLength);
 
 #ifdef __cplusplus
 } /* extern "C" */

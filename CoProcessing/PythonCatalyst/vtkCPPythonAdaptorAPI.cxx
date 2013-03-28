@@ -24,13 +24,13 @@ void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
     {
     Superclass::CoProcessor = vtkCPPythonProcessor::New();
     Superclass::CoProcessor->Initialize();
-
-    vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
-    pipeline->Initialize(pythonFileName);
-
-    Superclass::CoProcessor->AddPipeline(pipeline);
-    pipeline->Delete();
     }
 
-  Superclass::CoProcessorInitialize();
+  if(pythonFileName)
+    {
+    vtkCPPythonScriptPipeline* pipeline = vtkCPPythonScriptPipeline::New();
+    pipeline->Initialize(pythonFileName);
+    Superclass::CoProcessor->AddPipeline(pipeline);
+    pipeline->FastDelete();
+    }
 }
