@@ -251,6 +251,8 @@ class ParaViewServerProtocol(ServerProtocol):
         if not view:
             raise Exception("no view provided to resetCamera")
         simple.ResetCamera(view)
+        view.CenterOfRotation = view.CameraFocalPoint
+
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
@@ -321,6 +323,9 @@ def add_arguments(parser):
         help="timeout for reaping process on idle in seconds (default: 300s)")
     parser.add_argument("-c", "--content", default=os.getcwd(),
         help="root for web-pages to serve (default: current-working-directory)")
+    parser.add_argument("-j", "--js", default='',
+        help="root for JavaScript to serve (default: none)")
+
     return parser
 
 def start(argv=None,
@@ -368,9 +373,12 @@ def start_webserver(options, protocol=ParaViewServerProtocol, disableLogging=Fal
     root = File(options.content)
     root.putChild("ws", wsResource)
 
-
     webgl = WebGLResource()
     root.putChild("WebGL", webgl);
+
+    # To ease development
+    if len(options.js) > 0:
+        root.putChild("js", File(options.js))
 
     site = Site(root)
 

@@ -5,23 +5,16 @@ vtk_module_export("")
 # Everything under other directories is placed in www/js/lib or www/css/lib/
 
 set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
-set(ext_binary_dir_js "${CMAKE_BINARY_DIR}/www/js/ext")
-set(ext_binary_dir_css "${CMAKE_BINARY_DIR}/www/css/ext")
+set(ext_binary_dir "${CMAKE_BINARY_DIR}/www/ext/widgets")
 
 copy_files_recursive(${ext_source_dir}
-  DESTINATION ${ext_binary_dir_js}
-  REGEX "^(.*\\.js)$"
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete"
-  LABEL "Copying widgets JavaScript files")
-
-copy_files_recursive(${ext_source_dir}
-  DESTINATION ${ext_binary_dir_css}
-  REGEX "^(.*\\.js)$" EXCLUDE
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-css-copy-complete"
-  LABEL "Copying widgets css/image files")
+  DESTINATION ${ext_binary_dir}
+  REGEX "^.*$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
+  LABEL "Copying widgets External files")
 
 set(nvcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/NVCharts")
-set(nvcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/js/lib")
+set(nvcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
 copy_files_recursive(${nvcharts_source_dir}
   DESTINATION ${nvcharts_binary_dir_js}
   REGEX "^(.*\\.js)$"
@@ -30,16 +23,31 @@ copy_files_recursive(${nvcharts_source_dir}
 
 
 set(rickshawcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/RickshawCharts")
-set(rickshawcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/js/lib")
+set(rickshawcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
 copy_files_recursive(${rickshawcharts_source_dir}
   DESTINATION ${rickshawcharts_binary_dir_js}
   REGEX "^(.*\\.js)$"
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
   LABEL "Copying RickshawCharts JavaScript files")
 
+set(paraview_pipeline_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/PipelineBrowser")
+set(paraview_pipeline_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+set(paraview_pipeline_binary_dir_css "${CMAKE_BINARY_DIR}/www/lib/css")
+copy_files_recursive(${paraview_pipeline_source_dir}
+  DESTINATION ${paraview_pipeline_binary_dir_js}
+  REGEX "^(.*\\.js)$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-js-copy-complete"
+  LABEL "Copying ParaView Pipeline JavaScript files")
+copy_files_recursive(${paraview_pipeline_source_dir}
+  DESTINATION ${paraview_pipeline_binary_dir_css}
+  REGEX "^(.*\\.js)$" EXCLUDE
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-css-copy-complete"
+  LABEL "Copying ParaView Pipeline CSS files")
+
 add_custom_target(ParaViewWebWidgets ALL DEPENDS
-  "${CMAKE_CURRENT_BINARY_DIR}/ext-css-copy-complete"
-  "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-js-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-css-copy-complete"
   )

@@ -9,9 +9,7 @@
                       "paraview.launcher",
                       "paraview.connect",
                       "paraview.viewport",
-                      "paraview.statistics",
-                      "paraview.ui.PipelineBrowser"
-
+                      "paraview.statistics"
                   ]
               }, {
                   "name": "ParaView Objects",
@@ -35,6 +33,12 @@
                   "name": "Reply",
                   "classes": [
                       "reply.Render"
+                  ]
+              }, {
+                  "name": "Widgets",
+                  "classes": [
+                      "paraview.ui.PipelineBrowser",
+                      "paraview.ui.nv.utils"
                   ]
               }
           ]

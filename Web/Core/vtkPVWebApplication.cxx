@@ -16,22 +16,23 @@
 
 #include "vtkBase64Utilities.h"
 #include "vtkCamera.h"
+#include "vtkCommand.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
-#include "vtkPointData.h"
 #include "vtkPVDataEncoder.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVWebInteractionEvent.h"
-#include "vtkRendererCollection.h"
+#include "vtkPointData.h"
 #include "vtkRenderWindow.h"
-#include "vtkSmartPointer.h"
+#include "vtkRendererCollection.h"
 #include "vtkSMContextViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSmartPointer.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkWebGLExporter.h"
@@ -50,7 +51,45 @@ public:
     vtkSmartPointer<vtkUnsignedCharArray> Data;
     bool NeedsRender;
     bool HasImagesBeingProcessed;
-    ImageCacheValueType() : NeedsRender(true), HasImagesBeingProcessed(false) { }
+    vtkObject* ViewPointer;
+    unsigned long ObserverId;
+    ImageCacheValueType() : NeedsRender(true), HasImagesBeingProcessed(false), ViewPointer(NULL), ObserverId(0) { }
+
+    void SetListener(vtkObject* view)
+    {
+      if(this->ViewPointer == view)
+        {
+        return;
+        }
+
+      if(this->ViewPointer && this->ObserverId)
+        {
+        this->ViewPointer->RemoveObserver(this->ObserverId);
+        this->ObserverId = 0;
+        }
+      this->ViewPointer = view;
+      if(this->ViewPointer)
+        {
+        this->ObserverId = this->ViewPointer->AddObserver(vtkCommand::AnyEvent, this, &ImageCacheValueType::ViewEventListener);
+        }
+    }
+
+    void RemoveListener(vtkObject* view)
+    {
+      if(this->ViewPointer && this->ObserverId)
+        {
+        this->ViewPointer->RemoveObserver(this->ObserverId);
+        this->ObserverId = 0;
+        this->ViewPointer = NULL;
+        }
+    }
+
+    void ViewEventListener(vtkObject*, unsigned long e, void*)
+    {
+      static int count = 0;
+      //cout << "Need render " << ++count << " - event: " << e << endl;
+      this->NeedsRender = true;
+    }
     };
   typedef std::map<void*, ImageCacheValueType> ImageCacheType;
   ImageCacheType ImageCache;
@@ -121,6 +160,7 @@ vtkUnsignedCharArray* vtkPVWebApplication::StillRender(vtkSMViewProxy* view, int
     }
 
   vtkInternals::ImageCacheValueType& value = this->Internals->ImageCache[view];
+  value.SetListener(view);
 
   if (value.NeedsRender == false &&
     value.Data != NULL &&

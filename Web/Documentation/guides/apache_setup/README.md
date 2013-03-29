@@ -48,12 +48,12 @@ components for a ParaViewWeb deployment.
     $ git submodule update --init
     $ cd ../build
     $ ccmake ../src
-    
+
         PARAVIEW_ENABLE_PYTHON      ON
         PARAVIEW_BUILD_QT_GUI       OFF
         Module_vtkParaViewWeb       ON
         CMAKE_INSTALL_PREFIX        /.../ParaView/install
-    
+
     $ make
     $ make install
 
@@ -63,7 +63,7 @@ In this example, ParaViewWeb is composed of Python scripts (web server),
 a JavaScript library, and a set of sample web applications. In order to install
 it, download the following [archive](guides/apache_setup/data/ParaViewWeb.tgz).
 
-    $ cd ParaViewWeb 
+    $ cd ParaViewWeb
     $ mkdir web-server
     $ cd web-server
     $ curl http://pvw.kitware.com/guides/apache_setup/data/ParaViewWeb.tgz -O
@@ -91,39 +91,55 @@ Configuration file for the session manager executable: (pw-config.properties):
     # Web setup
     pw.web.port=9000
     pw.web.content.dir=
-    
+
     # Process logs
     pw.logging.dir=/tmp/pw-logs
-    
-    # Process commands
-    pw.default.cmd=
-    pw.default.cmd.run.dir=/tmp/
-    pw.default.cmd.map=PORT:getPort|HOST:getHost
-    
+
+    # ==================================================
+    # Process command: data_prober.py      | data_prober
+    # ==================================================
+    pw.data_prober.cmd=./bin/pvpython ../src/Web/Python/data_prober.py --data-dir /Data --port PORT
+    pw.data_prober.cmd.run.dir=/.../paraview-build/
+    pw.data_prober.cmd.map=PORT:getPort
+
+    # ==================================================
+    # Process command: file_loader.py      | loader
+    # ==================================================
+    pw.loader.cmd=./bin/pvpython ../src/Web/Python/file_loader.py --data-dir /Data --port PORT
+    pw.loader.cmd.run.dir=/.../paraview-build/
+    pw.loader.cmd.map=PORT:getPort
+
+    # ==================================================
+    # Process command: pipeline_manager.py | pipeline
+    # ==================================================
+    pw.pipeline.cmd=./bin/pvpython ../src/Web/Python/pipeline_manager.py --data-dir /Data --port PORT
+    pw.pipeline.cmd.run.dir=/.../paraview-build/
+    pw.pipeline.cmd.map=PORT:getPort
+
     # Resources informations
     pw.resources=localhost:9001-9100
-    
+
     # Factory
     pw.factory.proxy.adapter=com.kitware.paraviewweb.external.JsonFileProxyConnectionAdapter
-    pw.factory.wamp.url.generator=com.kitware.paraviewweb.external.GenericWampURLGenerator
+    pw.factory.session.url.generator=com.kitware.paraviewweb.external.GenericSessionURLGenerator
     pw.factory.resource.manager=com.kitware.paraviewweb.external.SimpleResourceManager
     pw.factory.visualization.launcher=com.kitware.paraviewweb.external.ProcessLauncher
     pw.factory.websocket.proxy=com.kitware.paraviewweb.external.SimpleWebSocketProxyManager
     pw.factory.session.manager=com.kitware.paraviewweb.external.MemorySessionManager
-    
+
     # External configurations
     pw.factory.proxy.adapter.file=/home/pvw/proxy/session.map
-    pw.factory.wamp.url.generator.pattern=ws://localhost/proxy?sessionId=SESSION_ID
-    
+    pw.factory.session.url.generator.pattern=ws://localhost/proxy?sessionId=SESSION_ID
+
     pw.process.launcher.wait.keyword=Starting factory
     pw.process.launcher.wait.timeout=10000
 
-    pw.session.public.fields=id,sessionURL,name,description,url,application,idleTimeout,startTime
+    pw.session.public.fields=id,sessionURL,name,description,sessionManagerURL,application,idleTimeout,startTime
 
 Shell script used to start the session manager
 
     export DISPLAY=:0.0
-    java -jar JettySessionManager-Server-1.0.jar -Dpw-config=/.../pw-config.properties
+    java -jar JettySessionManager-Server-1.0.jar /.../pw-config.properties
 
 ### Python 2.7 ###
 
@@ -142,7 +158,7 @@ Download the [zipped file](http://pypi.python.org/pypi/autobahn).
 
 Download the [tarball](http://code.google.com/p/pywebsocket/downloads).
 
-    $ tar xfz mod_pywebsocket-0.7.8.tar.gz 
+    $ tar xfz mod_pywebsocket-0.7.8.tar.gz
     $ cd pywebsocket-0.7.8/src/
     $ python setup.py build
     $ sudo python setup.py install
@@ -193,7 +209,7 @@ The configuration for the proxy is held in proxy.json, that looks like this:
 * *connectionReaper.reapInterval* - This is the interval at which the connection reaper is run at in seconds.
 * *connectionReaper.connectionTimeout* - This is the length of time a connection can remain inactive before the connection will be cleaned up.
 * *sessionMappingFile* - This is the session mapping file produced by the session manager. It maps session IDs to connection endpoints,
-    the proxy uses this to know where to route sessions. See Session manager configuration for details 
+    the proxy uses this to know where to route sessions. See Session manager configuration for details
 
 Place the proxy.json configuration file in the home directory of the user used
 to run apache, usally /var/www
@@ -205,14 +221,14 @@ The virtual host should be the following:
     <VirtualHost *:80>
         ServerName  your.paraviewweb.hostname
         ServerAdmin your@email.com
-    
+
         # Static content directory (js, html, png, css)
         DocumentRoot /home/pvw/ParaViewWeb/www
-        
+
         # Jetty Session Manager
         ProxyPass        /paraview  http://localhost:9000/paraview
         ProxyPassReverse /paraview  http://localhost:9000/paraview
-    
+
         # Proxy web socket to ParaViewWeb processes
         <Directory /home/pvw/ParaViewWeb/www/websockets>
                 Options Indexes FollowSymLinks MultiViews
@@ -223,7 +239,7 @@ The virtual host should be the following:
                 PythonHandler mod_python.publisher
                 PythonDebug On
         </Directory>
-     
+
         # Log management
         LogLevel warn
         ErrorLog  /home/pvw/ParaViewWeb/logs/pvw-error.log`
