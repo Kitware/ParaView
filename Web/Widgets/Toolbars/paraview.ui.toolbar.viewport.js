@@ -11,8 +11,8 @@
     var BASE_TOOLBAR_HTML =
     "<ul>"
     + "<li action='resetCamera' class='action' alt='Reset camera' title='Reset camera'><div class='icon'></div></li>"
-    + "<li action='toggleOrientationAxis' class='action' alt='Toggle visibility of orientation axis' title='Toggle visibility of orientation axis'><div class='icon'></div></li>"
-    + "<li action='toggleCenterOfRotation' class='action' alt='Toggle visibility of center of rotation' title='Toggle visibility of center of rotation'><div class='icon'></div></li>"
+    + "<li action='toggleOrientationAxis' class='action on' alt='Toggle visibility of orientation axis' title='Toggle visibility of orientation axis'><div class='icon'></div></li>"
+    + "<li action='toggleCenterOfRotation' class='action on' alt='Toggle visibility of center of rotation' title='Toggle visibility of center of rotation'><div class='icon'></div></li>"
     + "</ul>\n",
     VIEWPORT_DATA_KEY = 'pvViewport';
 
@@ -57,11 +57,13 @@
         viewport = getViewport(rootWidget),
         action = me.attr('action');
 
-        console.log(action);
-
         if(viewport != null && viewport != undefined) {
             if(action === 'resetCamera') {
                 viewport.resetCamera();
+            } else if(action === 'toggleOrientationAxis') {
+                viewport.updateOrientationAxesVisibility(me.toggleClass('on').hasClass('on'));
+            } else if(action === 'toggleCenterOfRotation') {
+                viewport.updateCenterAxesVisibility(me.toggleClass('on').hasClass('on'));
             }
         }
 

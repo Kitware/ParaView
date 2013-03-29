@@ -479,7 +479,9 @@
             //canvas.append(bgImage);
 
             // When image ready draw on canvas
-            bgImage.onload = function(){paint();};
+            bgImage.onload = function(){
+                paint();
+            };
         } else {
             viewport = $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
         }
@@ -605,6 +607,32 @@
              */
             resetCamera: function (ondone) {
                 return session.call("pv:resetCamera", Number(config.view)).then(function () {
+                    render(ondone);
+                });
+            },
+            /**
+             * Update Orientation Axes Visibility for the given view
+             *
+             * @member pv.Viewport
+             * @param {Boolean} show
+             * Show: true / Hide: false
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            updateOrientationAxesVisibility: function (show, ondone) {
+                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
+                    render(ondone);
+                });
+            },
+            /**
+             * Update the Center Axes Visibility for the given view
+             *
+             * @member pv.Viewport
+             * @param {Boolean} show
+             * Show: true / Hide: false
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            updateCenterAxesVisibility: function (show, ondone) {
+                return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
                     render(ondone);
                 });
             },

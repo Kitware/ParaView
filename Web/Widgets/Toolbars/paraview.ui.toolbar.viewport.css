@@ -16,3 +16,8 @@
     height: 26px;
     width: 26px;
 }
+
+.paraview.toolbar.viewport li.on {
+    border-radius: 8px;
+    background: #cccccc;
+}

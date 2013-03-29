@@ -69,7 +69,10 @@ canvas {
 
 /* ========================= Override default ParaView css ================================== */
 
-.paraview.toolbar li:hover {
-    border-radius: 8px;
+.paraview.toolbar.viewport li.on {
+    background: #006666;
+}
+
+.paraview.toolbar li:hover, .paraview.toolbar.viewport li.on:hover {
     background: #007878;
 }

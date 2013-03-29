@@ -560,7 +560,7 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     display: none;
 }
 
-.view-pipeline-editor .pipeline-editor {
+.pipelineBrowser.view-pipeline.view-pipeline-editor .pipeline-editor {
     display: block;
 }
 
