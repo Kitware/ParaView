@@ -4,7 +4,7 @@
  * This module extend jQuery object to add support for graphical components
  * related to ParaViewWeb usage.
  *
- * @class jQuery.paraview.PipelineBrowser
+ * @class jQuery.paraview.ui.PipelineBrowser
  */
 (function (GLOBAL, $) {
 
@@ -426,7 +426,7 @@
      * Graphical component use to show and interact with the ParaViewWeb
      * pipeline.
      *
-     * @member jQuery.paraview.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @method pipelineBrowser
      * @param {pv.PipelineBrowserConfig} options
      *
@@ -516,7 +516,7 @@
      * Method used to retreive a proxy from the Pipeline browser.
      * If the proxyId is null/undefined the selected proxy will be returned.
      *
-     * @member jQuery.paraview.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @method getProxy
      * @param {Number|undefined|null} proxyId
      * @return {pv.Proxy} proxy that have the given id or null if not found.
@@ -541,7 +541,7 @@
     /**
      * Event triggered when a Proxy has changed.
      *
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event proxyModified
      * @param {Number} id
      * Proxy ID that was changed.
@@ -563,7 +563,7 @@
 
     /**
      * Event triggered when selection change in the Pipeline browser.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event proxySelected
      * @param {Number} id
      * Id of the proxy that get selected in the Pipeline. Can be 0 if no selection.
@@ -597,7 +597,7 @@
 
     /**
      * Event that get triggered when a request for a new file open is made.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event openFile
      * @param {String} path
      * File path that is requested to be open.
@@ -613,7 +613,7 @@
 
     /**
      * Event that get triggered when a source or a filter is getting added.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event addSource
      * @param {String} name
      * Name of the SourceProxy to be created.
@@ -631,7 +631,7 @@
 
     /**
      * Event that get triggered when a Proxy get deleted.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event deleteProxy
      * @param {pv.Proxy} proxy
      * Proxy that is getting deleted.
@@ -647,7 +647,7 @@
     /**
      * Event that get triggered when the apply button is cliked to push proxy
      * properties to the server.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event apply
      */
     function fireApply(uiWidget) {
@@ -658,7 +658,7 @@
     /**
      * Event that get triggered when the reset button is cliked to update
      * ui widget with previous values.
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event reset
      */
     function fireReset(uiWidget) {
@@ -669,7 +669,7 @@
      * Event triggered when anything in the pipeline has changed and therefore
      * a viewport update should occurs.
      *
-     * @member jQuery.paraview.VCRToolbar
+     * @member jQuery.paraview.ui.PipelineBrowser
      * @event dataChanged
      */
 

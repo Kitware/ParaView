@@ -4,19 +4,20 @@
  * This module extend jQuery object to add support for VCR Time control
  * related to ParaViewWeb usage.
  *
- * @class jQuery.paraview.VCRToolbar
+ * @class jQuery.paraview.ui.toolbar.vcr
  */
 (function (GLOBAL, $) {
 
     var BASE_VCR_TOOLBAR_HTML =
     "<ul>"
-    + "<li action='first' class='action'><div class='icon' alt='First frame'></div></li>"
-    + "<li action='prev'  class='action'><div class='icon' alt='Previous frame'></div></li>"
-    + "<li action='play'  class='toggle play'><div class='icon' alt='Play animation'></div></li>"
-    + "<li action='pause' class='toggle hide pause'><div class='icon' alt='Pause animation'></div></li>"
-    + "<li action='next'  class='action'><div class='icon' alt='Next frame'></div></li>"
-    + "<li action='last'  class='action'><div class='icon' alt='Last frame'></div></li>"
-    + "</ul>\n";
+    + "<li action='first' class='action'            alt='First frame' title='First frame'><div class='icon'></div></li>"
+    + "<li action='prev'  class='action'            alt='Previous frame' title='Previous frame'><div class='icon'></div></li>"
+    + "<li action='play'  class='toggle play'       alt='Play animation' title='Play animation'><div class='icon'></div></li>"
+    + "<li action='pause' class='toggle hide pause' alt='Pause animation' title='Pause animation'><div class='icon'></div></li>"
+    + "<li action='next'  class='action'            alt='Next frame' title='Next frame'><div class='icon' alt='Next frame'></div></li>"
+    + "<li action='last'  class='action'            alt='Last frame' title='Last frame'><div class='icon'></div></li>"
+    + "</ul>\n",
+    SESSION_DATA_KEY = 'paraview-session';
 
     // =======================================================================
     // ==== jQuery based methods =============================================
@@ -26,21 +27,21 @@
      * Graphical component use to show and interact with the ParaViewWeb
      * pipeline.
      *
-     * @member jQuery.paraview.VCRToolbar
+     * @member jQuery.paraview.ui.toolbar.vcr
      * @method vcrToolbar
      * @param {pv.Session} session
      * ParaViewWeb session object.
      *
      * Usage:
-     *      $('.-container-div').vcrToolbar(session);
+     *      $('.container-div').vcrToolbar(session);
      */
     $.fn.vcrToolbar = function(session) {
         // Handle data with default values
         return this.each(function() {
-            var me = $(this).addClass('paraview vcrToolbar');
+            var me = $(this).addClass('paraview toolbar vcr');
 
             // Save data
-            me.data('pvSession', session);
+            me.data(SESSION_DATA_KEY, session);
 
             // Update HTML
             me[0].innerHTML = BASE_VCR_TOOLBAR_HTML;
@@ -71,7 +72,7 @@
          * Event triggered when anything in the pipeline has changed and therefore
          * a viewport update should occurs.
          *
-         * @member jQuery.paraview.VCRToolbar
+         * @member jQuery.paraview.ui.toolbar.vcr
          * @event dataChanged
          */
         rootWidget.trigger('dataChanged');
@@ -109,13 +110,13 @@
     // =======================================================================
 
     /**
-         * Event triggered when a Proxy has changed.
-         *
-         * @member jQuery.paraview.VCRToolbar
-         * @event vcr-action
-         * @param {String} action
-         * Type of action that get triggered such as ['first', 'prev', 'play', 'pause', 'next', 'last']
-         */
+     * Event triggered when a Proxy has changed.
+     *
+     * @member jQuery.paraview.ui.toolbar.vcr
+     * @event vcr-action
+     * @param {String} action
+     * Type of action that get triggered such as ['first', 'prev', 'play', 'pause', 'next', 'last']
+     */
     function fireAction(rootWidget, action) {
         rootWidget.trigger({
             type: 'vcr-action',
@@ -123,26 +124,18 @@
         });
     }
 
-    /**
-         * Event triggered when anything in the pipeline has changed and therefore
-         * a viewport update should occurs.
-         *
-         * @member jQuery.paraview.VCRToolbar
-         * @event dataChanged
-         */
-
     // =======================================================================
     // ==== Helper internal functions ========================================
     // =======================================================================
 
     function getSession(anyInnerProxyWidget) {
-        return getVcrToolbarWiget(anyInnerProxyWidget).data('pvSession');
+        return getVcrToolbarWiget(anyInnerProxyWidget).data(SESSION_DATA_KEY);
     }
 
     // =======================================================================
 
     function getVcrToolbarWiget(anyInnerProxyWidget) {
-        return anyInnerProxyWidget.closest('.paraview.vcrToolbar');
+        return anyInnerProxyWidget.closest('.paraview.toolbar.vcr');
     }
 
 }(window, jQuery));

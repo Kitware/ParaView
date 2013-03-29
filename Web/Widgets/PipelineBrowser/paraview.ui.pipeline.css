@@ -7,7 +7,11 @@
 /* ========================================================================= */
 
 .pipelineBrowser {
-    position: relative;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .pipelineBrowser li div {
@@ -53,14 +57,22 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 
 .pipelineBrowser.view-files .pipeline-files {
     display: block;
-    height: 80%;
     overflow-y: auto;
+    position: absolute;
+    top: 35px;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .pipelineBrowser.view-sources .pipeline-sources {
     display: block;
-    height: 80%;
     overflow-y: auto;
+    position: absolute;
+    top: 35px;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 /* =============================  Pipeline  =============================== */
@@ -87,7 +99,7 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     top: 5px;
     width: 25px;
     height: 25px;
-    background: url("icons/server.png") no-repeat transparent;
+    background: url("paraview/pipeline/server.png") no-repeat transparent;
 }
 
 .pipelineBrowser li.proxy {
@@ -155,18 +167,18 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipeline-tree ul ul {
-    background: url("icons/list-item-contents.png") repeat-y scroll 5px center transparent;
+    background: url("paraview/pipeline/list-item-contents.png") repeat-y scroll 5px center transparent;
 }
 
 .pipeline-tree li {
-    background: url("icons/list-item-root.png") no-repeat scroll left top transparent;
+    background: url("paraview/pipeline/list-item-root.png") no-repeat scroll left top transparent;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
 .pipeline-tree li li {
-    background-image: url("icons/list-item.png");
+    background-image: url("paraview/pipeline/list-item.png");
     padding-left: 1.5em;
 }
 
@@ -175,15 +187,15 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipeline-tree li.lastChild {
-    background-image: url("icons/list-item-last.png");
+    background-image: url("paraview/pipeline/list-item-last.png");
 }
 
 .pipeline-tree li.open {
-    background-image: url("icons/list-item-open.png");
+    background-image: url("paraview/pipeline/list-item-open.png");
 }
 
 .pipeline-tree li.open.lastChild {
-    background-image: url("icons/list-item-last-open.png");
+    background-image: url("paraview/pipeline/list-item-last-open.png");
 }
 
 .pipeline-tree li ul {
@@ -251,20 +263,20 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .server .pipeline-control .edit .icon {
-    background: url("icons/edit.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/edit.png") no-repeat center center transparent;
 }
 
 .server .pipeline-control .files .icon {
-    background: url("icons/folder.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/folder.png") no-repeat center center transparent;
 }
 .server .pipeline-control .add .icon {
-    background: url("icons/add.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/add.png") no-repeat center center transparent;
 }
 .server .pipeline-control .delete .icon {
-    background: url("icons/delete.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/delete.png") no-repeat center center transparent;
 }
 .server .pipeline-control .delete.disabled .icon {
-    background: url("icons/delete_disabled.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/delete_disabled.png") no-repeat center center transparent;
 }
 
 /* ==========================  Representations  ============================ */
@@ -317,7 +329,7 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     position: relative;
     width: 25px;
     height: 26px;
-    background: url("icons/representations.png") no-repeat center center transparent;
+    background: url("paraview/pipeline/representations.png") no-repeat center center transparent;
     z-index: 105;
 }
 
@@ -387,12 +399,12 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipelineBrowser .colorBy.points {
-    background: url("icons/colorByPoints.png") no-repeat transparent !important;
+    background: url("paraview/pipeline/colorByPoints.png") no-repeat transparent !important;
     width: 25px !important;
 }
 
 .pipelineBrowser .colorBy.cells {
-    background: url("icons/colorByCells.png") no-repeat transparent !important;
+    background: url("paraview/pipeline/colorByCells.png") no-repeat transparent !important;
     width: 25px !important;
 }
 
@@ -402,7 +414,7 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     position: relative;
     width: 25px;
     height: 25px;
-    background: url("icons/scalarbar.png") no-repeat transparent;
+    background: url("paraview/pipeline/scalarbar.png") no-repeat transparent;
     background-position: 0px;
 }
 .pipelineBrowser .scalarbar.disable, .pipelineBrowser .scalarbar.off {
@@ -446,17 +458,17 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipelineBrowser .array-selector li.points {
-    background: url("icons/colorByPoints.png") no-repeat left top transparent;
+    background: url("paraview/pipeline/colorByPoints.png") no-repeat left top transparent;
     padding-left: 30px;
 }
 
 .pipelineBrowser .array-selector li.cells {
-    background: url("icons/colorByCells.png") no-repeat left top transparent;
+    background: url("paraview/pipeline/colorByCells.png") no-repeat left top transparent;
     padding-left: 30px;
 }
 
 .pipelineBrowser .array-selector li.color {
-    background: url("icons/pickColor.png") no-repeat left top transparent;
+    background: url("paraview/pipeline/pickColor.png") no-repeat left top transparent;
     padding-left: 30px;
     border-bottom: 1px solid black;
 }
@@ -493,11 +505,11 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipeline-files li.menu-link .icon {
-    background: url("icons/folder.png") no-repeat left center transparent;
+    background: url("paraview/pipeline/folder.png") no-repeat left center transparent;
 }
 
 .pipeline-files li.open-file .icon {
-    background: url("icons/file.png") no-repeat left center transparent;
+    background: url("paraview/pipeline/file.png") no-repeat left center transparent;
 }
 
 .pipeline-files li:hover {
@@ -527,11 +539,11 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipeline-sources li.action[category=filter] .icon {
-    background: url("icons/filter.png") no-repeat left center transparent;
+    background: url("paraview/pipeline/filter.png") no-repeat left center transparent;
 }
 
 .pipeline-sources li.action[category=source] .icon {
-    background: url("icons/source.png") no-repeat left center transparent;
+    background: url("paraview/pipeline/source.png") no-repeat left center transparent;
 }
 
 .pipeline-sources li.action:hover {
@@ -592,14 +604,14 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 
 .pipeline-editor-header .apply .icon {
-    background: url("icons/apply.png") no-repeat scroll center transparent;
+    background: url("paraview/pipeline/apply.png") no-repeat scroll center transparent;
 }
 .pipeline-editor-header .apply.modified .icon {
-    background: url("icons/apply_modified.png") no-repeat scroll center transparent;
+    background: url("paraview/pipeline/apply_modified.png") no-repeat scroll center transparent;
 }
 
 .pipeline-editor-header .reset .icon {
-    background: url("icons/reset.png") no-repeat scroll center transparent;
+    background: url("paraview/pipeline/reset.png") no-repeat scroll center transparent;
 }
 
 .pipeline-editor {

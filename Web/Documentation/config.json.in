@@ -16,6 +16,8 @@
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.statistics.js",
         "@JAVASCRIPT_LIB_DIR@/Lib/paraview.js",
         "@JAVASCRIPT_WIDGETS_DIR@/PipelineBrowser/paraview.ui.pipeline.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Toolbars/paraview.ui.toolbar.vcr.js",
+        "@JAVASCRIPT_WIDGETS_DIR@/Toolbars/paraview.ui.toolbar.viewport.js",
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.lineChart.js",
         "@JAVASCRIPT_WIDGETS_DIR@/NVCharts/paraview.nv.utils.js",
         "@JAVASCRIPT_WIDGETS_DIR@/RickshawCharts/paraview.rickshaw.graph.js",

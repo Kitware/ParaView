@@ -50,6 +50,9 @@ function exit(){}
  *
  * @class jQuery
  *
- * @mixins jQuery.paraview.PipelineBrowser
+ * @mixins jQuery.paraview.ui.PipelineBrowser
+ * @mixins jQuery.paraview.ui.toolbar.vcr
+ * @mixins jQuery.paraview.ui.toolbar.viewport
+ *
  * @singleton
  */
