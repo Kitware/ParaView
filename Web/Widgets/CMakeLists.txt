@@ -1,8 +1,12 @@
 vtk_module_impl()
 vtk_module_export("")
 
-# Everything under Ext is built in www/js/ext/ or www/css/ext/
-# Everything under other directories is placed in www/js/lib or www/css/lib/
+# Everything under Ext is built in www/ext/
+# Everything under other directories is placed in www/lib/js or www/lib/css
+
+# =================================================================
+# External components
+# =================================================================
 
 set(ext_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Ext")
 set(ext_binary_dir "${CMAKE_BINARY_DIR}/www/ext/widgets")
@@ -13,36 +17,75 @@ copy_files_recursive(${ext_source_dir}
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
   LABEL "Copying widgets External files")
 
+# =================================================================
+# NV charts
+# =================================================================
+
 set(nvcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/NVCharts")
 set(nvcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+
 copy_files_recursive(${nvcharts_source_dir}
   DESTINATION ${nvcharts_binary_dir_js}
   REGEX "^(.*\\.js)$"
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/nvcharts-js-copy-complete"
   LABEL "Copying NVCharts JavaScript files")
 
+# =================================================================
+# Rickshaw charts
+# =================================================================
 
 set(rickshawcharts_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/RickshawCharts")
 set(rickshawcharts_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+
 copy_files_recursive(${rickshawcharts_source_dir}
   DESTINATION ${rickshawcharts_binary_dir_js}
   REGEX "^(.*\\.js)$"
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
   LABEL "Copying RickshawCharts JavaScript files")
 
+# =================================================================
+# Pipeline browser
+# =================================================================
+
 set(paraview_pipeline_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/PipelineBrowser")
 set(paraview_pipeline_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
 set(paraview_pipeline_binary_dir_css "${CMAKE_BINARY_DIR}/www/lib/css")
+
 copy_files_recursive(${paraview_pipeline_source_dir}
   DESTINATION ${paraview_pipeline_binary_dir_js}
   REGEX "^(.*\\.js)$"
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-js-copy-complete"
   LABEL "Copying ParaView Pipeline JavaScript files")
+
 copy_files_recursive(${paraview_pipeline_source_dir}
   DESTINATION ${paraview_pipeline_binary_dir_css}
   REGEX "^(.*\\.js)$" EXCLUDE
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-css-copy-complete"
   LABEL "Copying ParaView Pipeline CSS files")
+
+# =================================================================
+# VCR Toolbar
+# =================================================================
+
+set(paraview_vcr_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/VcrControl")
+set(paraview_vcr_binary_dir_js "${CMAKE_BINARY_DIR}/www/lib/js")
+set(paraview_vcr_binary_dir_css "${CMAKE_BINARY_DIR}/www/lib/css")
+
+copy_files_recursive(${paraview_vcr_source_dir}
+  DESTINATION ${paraview_vcr_binary_dir_js}
+  REGEX "^(.*\\.js)$"
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_vcr-js-copy-complete"
+  LABEL "Copying ParaView VCR Toolbar JavaScript files")
+
+copy_files_recursive(${paraview_vcr_source_dir}
+  DESTINATION ${paraview_vcr_binary_dir_css}
+  REGEX "^(.*\\.js)$" EXCLUDE
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/paraview_vcr-css-copy-complete"
+  LABEL "Copying ParaView VCR Toolbar CSS files")
+
+# =================================================================
+# Dependency
+# =================================================================
 
 add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/ext-copy-complete"
@@ -50,4 +93,6 @@ add_custom_target(ParaViewWebWidgets ALL DEPENDS
   "${CMAKE_CURRENT_BINARY_DIR}/rickshawcharts-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-js-copy-complete"
   "${CMAKE_CURRENT_BINARY_DIR}/paraview_pipeline-css-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_vcr-js-copy-complete"
+  "${CMAKE_CURRENT_BINARY_DIR}/paraview_vcr-css-copy-complete"
   )

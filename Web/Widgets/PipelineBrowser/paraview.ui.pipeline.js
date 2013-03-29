@@ -4,7 +4,7 @@
  * This module extend jQuery object to add support for graphical components
  * related to ParaViewWeb usage.
  *
- * @class paraview.ui.PipelineBrowser
+ * @class jQuery.paraview.PipelineBrowser
  */
 (function (GLOBAL, $) {
 
@@ -426,7 +426,7 @@
      * Graphical component use to show and interact with the ParaViewWeb
      * pipeline.
      *
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.PipelineBrowser
      * @method pipelineBrowser
      * @param {pv.PipelineBrowserConfig} options
      *
@@ -516,7 +516,7 @@
      * Method used to retreive a proxy from the Pipeline browser.
      * If the proxyId is null/undefined the selected proxy will be returned.
      *
-     * @member paraview.ui.PipelineBrowser
+     * @member jQuery.paraview.PipelineBrowser
      * @method getProxy
      * @param {Number|undefined|null} proxyId
      * @return {pv.Proxy} proxy that have the given id or null if not found.
@@ -558,6 +558,7 @@
             origin: origin,
             changeSet: changeSet
         });
+        dataChanged(uiWidget);
     }
 
     /**
@@ -606,6 +607,7 @@
             type: 'openFile',
             path: filePath
         });
+        dataChanged(uiWidget);
     }
 
 
@@ -624,6 +626,7 @@
             name: algoName,
             parent_id: parent
         });
+        dataChanged(container);
     }
 
     /**
@@ -638,6 +641,7 @@
             type: 'deleteProxy',
             proxy_id: getActiveProxyId(uiWidget)
         });
+        dataChanged(uiWidget);
     }
 
     /**
@@ -648,6 +652,7 @@
      */
     function fireApply(uiWidget) {
         getPipeline(uiWidget).trigger('apply');
+        dataChanged(uiWidget);
     }
 
     /**
@@ -658,6 +663,18 @@
      */
     function fireReset(uiWidget) {
         getPipeline(uiWidget).trigger('reset');
+    }
+
+    /**
+     * Event triggered when anything in the pipeline has changed and therefore
+     * a viewport update should occurs.
+     *
+     * @member jQuery.paraview.VCRToolbar
+     * @event dataChanged
+     */
+
+    function dataChanged(uiWidget) {
+        getPipeline(uiWidget).trigger('dataChanged');
     }
 
     // =======================================================================

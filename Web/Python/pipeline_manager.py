@@ -16,6 +16,8 @@ from autobahn.wamp import exportRpc
 from paraview import simple, web, servermanager, web_helper
 
 # Setup global variables
+timesteps = []
+currentTimeIndex = 0
 timekeeper = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
 pipeline = web_helper.Pipeline('Kitware')
 lutManager = web_helper.LookupTableManager()
@@ -152,6 +154,7 @@ class PipelineManager(web.ParaViewServerProtocol):
 
     @exportRpc("openFile")
     def openFile(self, path):
+        global timesteps;
         reader = simple.OpenDataFile(path)
         simple.RenameSource( path.split("/")[-1], reader)
         simple.Show()
@@ -164,6 +167,12 @@ class PipelineManager(web.ParaViewServerProtocol):
         # Create LUT if need be
         lutManager.registerFieldData(reader.GetPointDataInformation())
         lutManager.registerFieldData(reader.GetCellDataInformation())
+
+        try:
+            if len(timesteps) == 0:
+                timesteps = reader.TimestepValues
+        except:
+            pass
 
         return web_helper.getProxyAsPipelineNode(reader.GetGlobalIDAsString(), lutManager)
 
@@ -186,6 +195,30 @@ class PipelineManager(web.ParaViewServerProtocol):
                 lutManager.enableScalarBar(lut['name'], lut['size'], lut['enabled'])
         return lutManager.getScalarbarVisibility()
 
+    @exportRpc("vcr")
+    def updateTime(self,action):
+        global currentTimeIndex, timekeeper, timesteps, reader
+        if len(timesteps) == 0:
+            print 'No time information for ', action
+            return 'No time information'
+        updateTime = False
+        if action == "next":
+            currentTimeIndex = (currentTimeIndex + 1) % len(timesteps)
+            updateTime = True
+        if action == "prev":
+            currentTimeIndex = (currentTimeIndex - 1 + len(timesteps)) % len(timesteps)
+            updateTime = True
+        if action == "first":
+            currentTimeIndex = 0
+            updateTime = True
+        if action == "last":
+            currentTimeIndex = len(timesteps) - 1
+            updateTime = True
+        if updateTime:
+            timekeeper.Time = timesteps[currentTimeIndex]
+            print "UpdateTime: ", str(timesteps[currentTimeIndex])
+
+        return action
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

@@ -15,7 +15,7 @@
 
 /**
  * Render an image for a given viewport
- * 
+ *
  * @param  {request.Render}    options
  * @return {reply.Render}
  */
@@ -34,7 +34,7 @@ function mouseInteraction(event, view){}
  * ResetCamera on the given view.
  *
  * @param {Number} viewId
- * The view proxy global id. 
+ * The view proxy global id.
  */
 function resetCamera(viewId){}
 
@@ -43,3 +43,13 @@ function resetCamera(viewId){}
  * Request the visualization process to exit.
  */
 function exit(){}
+
+
+/**
+ * jQuery JavaScript Library.
+ *
+ * @class jQuery
+ *
+ * @mixins jQuery.paraview.PipelineBrowser
+ * @singleton
+ */
