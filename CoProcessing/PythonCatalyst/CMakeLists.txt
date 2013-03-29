@@ -37,6 +37,10 @@ set (Module_SRCS
   vtkCPPythonScriptPipeline.cxx
 )
 
+set_source_files_properties(
+  vtkCPPythonAdaptorAPI
+  ABSTRACT)
+
 # Embed helper Python script inside code base
 add_custom_command(
     OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/cp_helper_py.cxx"
