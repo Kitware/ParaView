@@ -2348,6 +2348,24 @@
         export all cube axes actors as vector graphics.</Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <DoubleVectorProperty command="SetLineWidthFactor"
+                            default_values="0.714"
+                            name="LineWidthFactor"
+                            label="Line width scaling factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty command="SetPointSizeFactor"
+                            default_values="0.714"
+                            name="PointSizeFactor"
+                            label="Point size scaling factor"
+                            number_of_elements="1">
+        <DoubleRangeDomain max="10"
+                           min="0"
+                           name="range" />
+      </DoubleVectorProperty>
       <!-- End of "GL2PSExporterBase" -->
     </GL2PSExporterProxy>
     <GL2PSExporterProxy base_proxygroup="exporters"
