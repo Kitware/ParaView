@@ -28,6 +28,9 @@
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #==========================================================================
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkPVPythonAppInitConfigure.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkPVPythonAppInitConfigure.h)
+
 set (Module_SRCS
   vtkPVPythonInteractiveInterpretor.cxx
   vtkPVPythonInteractiveInterpretor.h

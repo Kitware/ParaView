@@ -4,7 +4,7 @@ set (vtkUtilitiesWrapClientServer_BINARY_DIR
   ${CMAKE_CURRENT_BINARY_DIR})
 vtk_module(vtkUtilitiesPythonInitializer
   DEPENDS
-    vtkWrappingPython
+    vtkWrappingPythonCore
     vtkCommonCore
   EXCLUDE_FROM_ALL
   EXCLUDE_FROM_WRAPPING)
@@ -27,6 +27,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 vtk_module_library(${vtk-module}
   vtkPVPythonInitializer.cxx)
 target_link_libraries(${vtk-module}
-  LINK_PUBLIC vtkWrappingPython vtkCommonCore
+  LINK_PUBLIC vtkWrappingPythonCore vtkCommonCore
   LINK_PRIVATE ${dependencies})
 unset(vtk-module)
