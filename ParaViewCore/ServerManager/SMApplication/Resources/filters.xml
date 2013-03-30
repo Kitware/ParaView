@@ -3582,25 +3582,24 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
-        <Documentation>This property specifies the input of the
-        filter.</Documentation>
+        <InputArrayDomain attribute_type="cell" name="input_array" />
+        <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
-                            name="SelectSourceArray"
+                            name="QuadratureSchemeDefinition"
+                            label="Quadrature Scheme Def"
                             number_of_elements="5">
         <Documentation>Specifies the offset array from which we interpolate
         values to quadrature points.</Documentation>
         <ArrayListDomain attribute_type="Scalars"
-                         data_type="VTK_ID_TYPE"
                          key_locations="vtkQuadratureSchemeDefinition"
                          key_names="DICTIONARY"
                          key_strategies="NEED_KEY"
                          name="array_list">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
@@ -3613,10 +3612,8 @@ found and the point will be rejected.</Documentation>
                      short_help="Create a point set with data at quadrature points.">
                      "Create a point set with data at quadrature
                      points."</Documentation>
-      <OutputPort index="0"
-                  name="Quadrature Points" />
-      <InputProperty command="SetInputConnection"
-                     name="Input">
+      <OutputPort index="0" name="Quadrature Points" />
+      <InputProperty command="SetInputConnection" name="Input">
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
@@ -3624,28 +3621,25 @@ found and the point will be rejected.</Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkUnstructuredGrid" />
         </DataTypeDomain>
-        <InputArrayDomain attribute_type="cell"
-                          name="input_array" />
-        <Documentation>This property specifies the input of the
-        filter.</Documentation>
+        <InputArrayDomain attribute_type="cell" name="input_array" />
+        <Documentation>This property specifies the input of the filter.</Documentation>
       </InputProperty>
       <!-- Source Array-->
       <StringVectorProperty animateable="0"
                             command="SetInputArrayToProcess"
                             element_types="0 0 0 0 2"
-                            name="SelectSourceArray"
+                            name="QuadratureSchemeDefinition"
+                            label="Quadrature Scheme Def"
                             number_of_elements="5">
         <Documentation>Specifies the offset array from which we generate
         quadrature points.</Documentation>
         <ArrayListDomain attribute_type="Scalars"
-                         data_type="VTK_ID_TYPE"
                          key_locations="vtkQuadratureSchemeDefinition"
                          key_names="DICTIONARY"
                          key_strategies="NEED_KEY"
                          name="array_list">
           <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
+            <Property function="Input" name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>

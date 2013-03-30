@@ -89,6 +89,13 @@
     <Proxy group="filters" name="ExtractHierarchicalDataSets" />
   </Category>
 
+  <Category name="Quadrature Points" menu_label="&amp;Quadrature Points">
+    <Proxy group="filters" name="QuadraturePointInterpolator" />
+    <Proxy group="filters" name="QuadraturePointsGenerator" />
+    <Proxy group="filters" name="QuadraturePointStatistics" />
+    <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
+  </Category>
+
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="AnnotateGlobalData" />
@@ -166,10 +173,7 @@
   <Proxy group="filters" name="PythonCalculator" />
   <Proxy group="filters" name="PythonAnnotation" />
   <Proxy group="filters" name="PythonExtractSelection" />
-  <Proxy group="filters" name="QuadraturePointInterpolator" />
-  <Proxy group="filters" name="QuadraturePointsGenerator" />
-  <Proxy group="filters" name="QuadraturePointStatistics" />
-  <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
+
   <Proxy group="filters" name="QuadricClustering" />
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
