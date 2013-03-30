@@ -37,7 +37,10 @@
               }, {
                   "name": "Widgets",
                   "classes": [
-                      "paraview.ui.PipelineBrowser",
+                      "jQuery",
+                      "jQuery.paraview.ui.PipelineBrowser",
+                      "jQuery.paraview.ui.toolbar.vcr",
+                      "jQuery.paraview.ui.toolbar.viewport",
                       "paraview.ui.nv.utils"
                   ]
               }

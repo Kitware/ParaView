@@ -4,7 +4,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" type='text/css'>
-        <link rel='stylesheet' href='../../lib/css/paraview/pv-pipeline.css' type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.pipeline.css'           type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.css'            type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.vcr.css'        type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.viewport.css'   type='text/css'>
         <link rel='stylesheet' href='main.css' type='text/css'>
 
         <script src="../../ext/js-core/autobahn.min.js"></script>
@@ -15,22 +18,19 @@
 
         <script src="../../lib/js/paraview-all.js"></script>
         <script src="../../lib/js/paraview.ui.pipeline.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
     </head>
 
     <body class="page">
-        <div class="header">
-            <ul class="toolbar control">
-                <li><img class="action toggle-control" src="../../lib/css/paraview/icons/logo.png" alt="Show/Hide control panel"/></li>
-            </ul>
-            <ul class="toolbar view">
-                <li><img class="action resetCamera" src="../../lib/css/paraview/icons/resetCamera.png" alt="Reset display"/></li>
-            </ul>
-            <ul class="toolbar info" style="float: right;">
-                <li><img class="action loading" src="../../lib/css/paraview/loading.gif" alt="Load in progress"/></li>
-            </ul>
+        <div class="header toolbar">
+            <div class="logo" alt="Toggle pipeline browser visibility"></div>
+            <div class="viewport-toolbar"></div>
+            <div class="vcr-toolbar"></div>
+            <div class="loading"></div>
         </div>
         <div class="splitter">
-            <div class="viewport">
+            <div class="viewport-container">
             </div>
             <div class="control-panel" style="display: none;">
             </div>
@@ -38,18 +38,34 @@
 
 
         <script type="text/javascript">
-            var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview";
-            var config = {
+
+            // ==== Global variables ===========================================
+
+            var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview",
+            config = {
                 sessionManagerURL: serviceURL,
                 name: "WebVisualizer",
                 application: "pipeline"
-            };
-            var pv = {}
+            },
+            pv = { pipeline: null, sources: null, files: null},
+            fetchDataQueueSize = 0;
+
+            // ==== Helper method ==============================================
+
+            function fetchServerData(method, dataKey) {
+                fetchDataQueueSize++;
+                pv.connection.session.call(method).then(function(obj) {
+                    pv[dataKey] = obj;
+                    fetchDataQueueSize--;
+                    onFetchDataDone();
+                });
+            }
+
+            // ==== Start a new ParaView Session ===============================
 
             paraview.start( config,
             function(connection){
                 pv.connection = connection;
-
                 if(connection.error) {
                     alert(connection.error);
                     window.close();
@@ -62,6 +78,7 @@
                 connect();
             });
 
+            // ==== Connect to the started ParaView session ====================
 
             function connect() {
                 if(location.protocol == "http:") {
@@ -71,72 +88,85 @@
                 paraview.connect(pv.connection, function(connectionData) {
                     // Create pipeline browser
                     pv.connection = connectionData;
-                    pv.connection.session.call('pv:getPipeline').then(function(pipeline) {
-                        console.log(pipeline);
-                        pv.connection.pipeline = pipeline;
-                        pv.connection.session.call('pv:listFilters').then(function(sources) {
-                            pv.connection.sources = sources;
-                            pv.connection.session.call('pv:listFiles').then(function(files) {
-                                pv.connection.files = files;
-                                createPipeline(pv.connection.session, pv.connection.pipeline, pv.connection.sources, pv.connection.files);
-                                pv.viewport = paraview.createViewport(pv.connection.session);
-                                pv.viewport.bind(".viewport");
-                                $(".loading").hide();
-                                $('.toggle-control').trigger('click');
-                            });
-                        });
-                    });
+
+                    // Fetch server state
+                    fetchServerData('pv:getPipeline', 'pipeline');
+                    fetchServerData('pv:listFilters', 'sources');
+                    fetchServerData('pv:listFiles', 'files');
+
+                    // onFetchDataDone() will be called automatically
                 }, function(code,reason){
                     $(".loading").hide();
                     console.log(reason);
                 });
             }
 
-            // Handle control show/hide
-            $('.toggle-control').bind('click', function(){
-                var panel = $(".control-panel");
-                var viewport = $(".viewport");
-                if(panel.is(":visible")) {
-                    panel.hide("slide",250, function(){
-                        viewport.css("left", 0);
-                        if(pv.viewport) {
-                            pv.viewport.render();
-                        }
-                    });
-                } else {
-                    panel.show("slide",250, function(){
-                        viewport.css("left", 400);
-                        if(pv.viewport) {
-                            pv.viewport.render();
-                        }
-                    });
-                }
-            });
 
-            function createPipeline(session, pipeline, sources, files) {
+            // ==== onParaViewReady ============================================
+
+            function onFetchDataDone() {
+                if(fetchDataQueueSize != 0) {
+                    return; // Not ready yet
+                }
+
+                // Update UI
+
+                // - pipeline browser
                 $('.control-panel').pipelineBrowser({
-                    session: session,
-                    pipeline: pipeline,
-                    sources: sources,
-                    files: files
-                }).bind('addSource deleteProxy openFile proxyModified apply', updateView);
+                    session: pv.connection.session,
+                    pipeline: pv.pipeline,
+                    sources: pv.sources,
+                    files: pv.files
+                }).bind('dataChanged', updateView);
+
+                // - viewport
+                pv.viewport = paraview.createViewport(pv.connection.session);
+                console.log('viewport');
+                console.log(pv.viewport);
+                pv.viewport.bind(".viewport-container");
+                console.log('container');
+                console.log($(".viewport-container"));
+
+                // - vcr toolbar
+                $('.vcr-toolbar').vcrToolbar(pv.connection.session).bind('dataChanged', updateView);
+
+                // - viewport toolbar
+                $('.viewport-toolbar').viewportToolbar(pv.viewport);
+
+                // - Toggle pipeline visibility
+                $('.logo').bind('click', function(){
+                    var panel = $(".control-panel");
+                    var viewport = $(".viewport-container");
+                    if(panel.is(":visible")) {
+                        panel.hide("slide",250, function(){
+                            viewport.css("left", 0);
+                            if(pv.viewport) {
+                                pv.viewport.render();
+                            }
+                        });
+                    } else {
+                        panel.show("slide",250, function(){
+                            viewport.css("left", 400);
+                            if(pv.viewport) {
+                                pv.viewport.render();
+                            }
+                        });
+                    }
+                }).trigger('click');
+
+
+                // - loading done...
+                $(".loading").hide();
             }
+
+            // ==== onResize ===================================================
 
             $(window).resize(function() {
                 $(".splitter").height(window.innerHeight - 35);
-                //$(".viewport").height(window.innerHeight - 35);
                 $(".control-panel").height(window.innerHeight - 35);
             }).trigger('resize');
 
-            $(".resetCamera").click(function(){
-                if(pv.viewport) {
-                    pv.viewport.resetCamera();
-                }
-            });
-
-            function renderLater() {
-                window.setTimeout(updateView, 250);
-            }
+            // ==== forceRender ================================================
 
             function updateView() {
                 if(pv.viewport) {

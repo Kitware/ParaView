@@ -256,6 +256,37 @@ class ParaViewServerProtocol(ServerProtocol):
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
         return view.GetGlobalIDAsString()
 
+    @exportRpc("updateOrientationAxesVisibility")
+    def updateOrientationAxesVisibility(self, view, showAxis):
+        """
+        RPC callback to show/hide OrientationAxis.
+        """
+        view = mapIdToProxy(view)
+        if not view:
+            view = simple.GetActiveView()
+        if not view:
+            raise Exception("no view provided to resetCamera")
+        view.OrientationAxesVisibility = (showAxis if 1 else 0);
+
+        ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
+        return view.GetGlobalIDAsString()
+
+
+    @exportRpc("updateCenterAxesVisibility")
+    def updateCenterAxesVisibility(self, view, showAxis):
+        """
+        RPC callback to show/hide CenterAxesVisibility.
+        """
+        view = mapIdToProxy(view)
+        if not view:
+            view = simple.GetActiveView()
+        if not view:
+            raise Exception("no view provided to resetCamera")
+        view.CenterAxesVisibility = (showAxis if 1 else 0);
+
+        ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
+        return view.GetGlobalIDAsString()
+
     @exportRpc("exit")
     def exit(self):
         """RPC callback to exit"""

@@ -9,6 +9,7 @@
  * @mixins paraview.connect
  * @mixins paraview.viewport
  * @mixins paraview.statistics
+ * @mixins paraview.ui.nv.utils
  * @singleton
  */
 (function (GLOBAL, $) {
