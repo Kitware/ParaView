@@ -25,6 +25,8 @@ void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
     Superclass::CoProcessor = vtkCPPythonProcessor::New();
     Superclass::CoProcessor->Initialize();
     }
+  // needed to initialize vtkCPDataDescription.
+  Superclass::CoProcessorInitialize();
 
   if(pythonFileName)
     {
