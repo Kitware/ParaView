@@ -468,6 +468,13 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              CoProcessing/Catalyst
              CoProcessing/TestDriver)
 
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
+set (Module_vtkPVPythonCatalyst ${PARAVIEW_ENABLE_CATALYST} CACHE BOOL "" FORCE)
+mark_as_advanced(Module_vtkPVPythonCatalyst)
+  list (APPEND PARAVIEW_MODULE_ROOTS
+    CoProcessing/PythonCatalyst)
+endif()
+
 if (PARAVIEW_ENABLE_WEB)
   list (APPEND PARAVIEW_MODULE_ROOTS
                Web)
@@ -544,24 +551,6 @@ add_subdirectory(Wrapping/Python)
 # been processed.
 if (PARAVIEW_ENABLE_PYTHON)
   add_subdirectory(Utilities/PythonInitializer)
-endif()
-
-if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
-  vtk_add_module(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst
-                module.cmake
-                ${CMAKE_CURRENT_BINARY_DIR}/CoProcessing/PythonCatalyst
-                Cxx
-                Python)
-  list(APPEND VTK_MODULES_ENABLED vtkPVPythonCatalyst)
-  set(_module vtkPVPythonCatalyst)
-  set(vtk-module ${_module})
-  set(${vtk-module}_WRAP_PYTHON ON)
-  add_subdirectory("${${_module}_SOURCE_DIR}" "${${_module}_BINARY_DIR}")
-  if (BUILD_TESTING)
-    set (_test_module_name "${vtk-module}-Test-Cxx")
-    add_subdirectory(
-      "${${_test_module_name}_SOURCE_DIR}" "${${_test_module_name}_BINARY_DIR}")
-  endif()
 endif()
 
 #------------------------------------------------------------------------------
