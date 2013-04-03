@@ -1082,6 +1082,13 @@ void pqPropertiesPanel::advancedButtonToggled(bool state)
     {
     bool visible = this->isPanelItemVisible(item, inAdvancedMode);
 
+    QString searchString = this->Ui->SearchLineEdit->text();
+
+    if (visible && !searchString.isEmpty())
+      {
+      visible = item.Name.contains(searchString, Qt::CaseInsensitive);
+      }
+
     if(item.LabelWidget)
       {
       item.LabelWidget->setVisible(visible);
