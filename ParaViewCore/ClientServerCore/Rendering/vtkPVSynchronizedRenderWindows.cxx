@@ -582,13 +582,13 @@ vtkRenderWindow* vtkPVSynchronizedRenderWindows::NewRenderWindow()
       window->SetSwapBuffers(swap_buffers? 1 : 0);
       //window->SetSwapBuffers(1); // for debugging FIXME.
       this->Internals->SharedRenderWindow.TakeReference(window);
+      this->Internals->SharedRenderWindow->SetSize(400, 400); // set some default size for the window.
       }
     else
       {
       // cout << "Using shared render window" << endl;
       }
     this->Internals->SharedRenderWindow->Register(this);
-    this->Internals->SharedRenderWindow->SetSize(400, 400); // set some default size for the window.
     return this->Internals->SharedRenderWindow;
 
   case INVALID:
