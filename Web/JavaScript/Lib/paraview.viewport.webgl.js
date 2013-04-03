@@ -258,40 +258,48 @@
 
     // ----------------------------------------------------------------------
 
-    function renderMesh(sceneJSON, renderingContext) {
+    function renderMesh(sceneJSON, renderingContext, camera) {
         try {
-            var obj = this, cameraRot, inverse, objTransp, icenter;
+            var obj = this, cameraRot, inverse, objTransp, icenter,
+               mvMatrix = mat4.create(camera.getCameraMatrices()[0]);
 
             renderingContext.gl.useProgram(renderingContext.shaderProgram);
-
             renderingContext.gl.uniform1i(renderingContext.shaderProgram.uIsLine, false);
 
-            cameraRot = mat4.toRotationMat(renderingContext.mvMatrix);
+            // @todo this code needs to go away
+            cameraRot = mat4.toRotationMat(mvMatrix);
             mat4.transpose(cameraRot);
             inverse = mat4.create();
             mat4.inverse(cameraRot, inverse);
+
+            // This code is imp
             objTransp = mat4.create(obj.matrix);
             mat4.transpose(objTransp);
 
-            icenter = [-sceneJSON.Center[0], -sceneJSON.Center[1], -sceneJSON.Center[2]];
+//            icenter = [-sceneJSON.Center[0], -sceneJSON.Center[1], -sceneJSON.Center[2]];
 
-            mvPushMatrix(renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, renderingContext.transform.translation);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
+            /*mvPushMatrix(mvMatrix);
 
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, sceneJSON.Center);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
+            // @todo this code should go away
+            mat4.multiply(mvMatrix, cameraRot, mvMatrix);
+            if(obj.layer == 0) mat4.translate(mvMatrix, renderingContext.transform.translation);
+            mat4.multiply(mvMatrix, inverse, mvMatrix);
+
+            if(obj.layer == 0) mat4.translate(mvMatrix, sceneJSON.Center);
+            mat4.multiply(mvMatrix, cameraRot, mvMatrix);
             if(obj.layer == 0){
-                mat4.scale( renderingContext.mvMatrix, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale],renderingContext.mvMatrix);
+                mat4.scale( mvMatrix, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale],mvMatrix);
             }
-            mat4.multiply(renderingContext.mvMatrix, renderingContext.transform.rotation, renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, icenter);
 
-            renderingContext.transform.rotation2 = renderingContext.mvMatrix;
+            mat4.multiply(mvMatrix, renderingContext.transform.rotation, mvMatrix);
+            mat4.multiply(mvMatrix, inverse, mvMatrix);
 
-            mat4.multiply(renderingContext.mvMatrix, objTransp, renderingContext.mvMatrix);
+            // @todo this is a good code
+            if(obj.layer == 0) mat4.translate(mvMatrix, icenter);
+
+            renderingContext.transform.rotation2 = mvMatrix;
+
+            mat4.multiply(mvMatrix, objTransp, mvMatrix);*/
 
             renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.vbuff);
             renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexPositionAttribute, obj.vbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
@@ -301,10 +309,11 @@
             renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexColorAttribute, obj.cbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
             renderingContext.gl.bindBuffer(renderingContext.gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
 
-            setMatrixUniforms(renderingContext, renderingContext.shaderProgram);
+            /// @todo pass matrices and change the signature of the function
+            setMatrixUniforms(renderingContext, renderingContext.shaderProgram, projMatrix, mvMatrix);
 
             renderingContext.gl.drawElements(renderingContext.gl.TRIANGLES, obj.numberOfIndex, renderingContext.gl.UNSIGNED_SHORT, 0);
-            renderingContext.mvMatrix = mvPopMatrix();
+            mvMatrix = mvPopMatrix();
         } catch(error) {
             console.log(error);
         }
@@ -504,7 +513,11 @@
             gl.useProgram(renderingContext.shaderProgram);
             gl.uniform1i(renderingContext.shaderProgram.uIsLine, false);
 
-            mat4.translate(renderingContext.mvMatrix, [0.0, 0.0, -1.0]);
+            var projMatrix = mat4.create(camera.getCameraMatrices()[0]);
+            var mvMatrix = mat4.create(camera.getCameraMatrices()[1]);
+
+            // @note Not sure if this is required
+            mat4.translate(mvMatrix, [0.0, 0.0, -1.0]);
 
             gl.bindBuffer(gl.ARRAY_BUFFER, background.vbuff);
             gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, background.vbuff.itemSize, gl.FLOAT, false, 0, 0);
@@ -514,7 +527,14 @@
             gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, background.cbuff.itemSize, gl.FLOAT, false, 0, 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, background.ibuff);
 
-            setMatrixUniforms(renderingContext, shaderProgram);
+            var mvMatrixInv = mat4.create(),
+            normalMatrix = mat4.create();
+            mat4.inverse(mvMatrix, mvMatrixInv);
+            mat4.transpose(mvMatrixInv, normalMatrix);
+
+            renderingContext.gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projMatrix);
+            renderingContext.gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+            if(shaderProgram.nMatrixUniform != null) renderingContext.gl.uniformMatrix4fv(shaderProgram.nMatrixUniform, false, normalMatrix);
 
             gl.drawElements(gl.TRIANGLES, background.numberOfIndex, gl.UNSIGNED_SHORT, 0);
         } catch(error) {
@@ -1062,29 +1082,17 @@
             ctx2d: ctx2d,
             shaderProgram: shaderProgram,
             pointShaderProgram: pointShaderProgram,
-            mvMatrix: mat4.create(),
-            pMatrix: mat4.create(),
-            transform: {
-                translation: [0.0, 0.0, 0.0],
-                rotation: mat4.create(),
-                rotation2: mat4.create(),
-                scale: 1.0
-            }
-        },
-        oldLookAt = [0,0,0,0,0,0,0,0,0],
-        camera = {
-            lookAt: [0,0,0,0,1,0,0,0,1],
-            z_dir: [],
-            up: [],
-            right: []
+            camera : createCamera()
+//            mvMatrix: mat4.create(),
+//            pMatrix: mat4.create(),
+//            transform: {
+//                translation: [0.0, 0.0, 0.0],
+//                rotation: mat4.create(),
+//                rotation2: mat4.create(),
+//                scale: 1.0
+//            }
         },
         background = null;
-
-        // Init rotation to be identity
-        mat4.identity(renderingContext.mvMatrix);
-        mat4.identity(renderingContext.pMatrix);
-        mat4.identity(renderingContext.transform.rotation);
-        mat4.identity(renderingContext.transform.rotation2);
 
         // Helper functions -------------------------------------------------
 
@@ -1186,18 +1194,20 @@
                 gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-                mat4.ortho(-1.0, 1.0, -1.0, 1.0, 1.0, 1000000.0, renderingContext.pMatrix);
-                mat4.identity(renderingContext.mvMatrix);
-
                 // Draw background
                 gl.disable(gl.DEPTH_TEST);
                 if(background != null) {
+                    camera.enableOrtho();
                     background.render(sceneJSON, renderingContext);
+                    camera.enablePerspective();
                 }
                 gl.enable(gl.DEPTH_TEST);
 
                 // Clear 2D overlay canvas
                 ctx2d.clearRect(0, 0, width, height);
+
+                // @todo Get the view angle from the stream
+                camera.setViewAspect(width/height);
 
                 // Render each layer on top of each other (Starting with the background one)
                 for(layer = sceneJSON.Renderers.length - 1; layer >= 0; layer--) {
@@ -1215,14 +1225,16 @@
 
                     // Setup viewport
                     gl.viewport(localX, localY, localWidth, localHeight);
-
-                    mat4.perspective(localRenderer.LookAt[0], width/height, 0.1, 1000000.0, renderingContext.pMatrix);
-                    mat4.identity(renderingContext.mvMatrix);
-                    mat4.lookAt(
-                        [localRenderer.LookAt[7], localRenderer.LookAt[8], localRenderer.LookAt[9]],
-                        [localRenderer.LookAt[1], localRenderer.LookAt[2], localRenderer.LookAt[3]],
-                        [localRenderer.LookAt[4], localRenderer.LookAt[5], localRenderer.LookAt[6]],
-                        renderingContext.mvMatrix);
+                    camera.setCameraParameters(localRenderer.LookAt[0],
+                                               vec3.create(localRenderer.LookAt[7],
+                                                           localRenderer.LookAt[8],
+                                                           localRenderer.LookAt[9]),
+                                               vec3.create(localRenderer.LookAt[1],
+                                                           localRenderer.LookAt[2],
+                                                           localRenderer.LookAt[3]),
+                                               vec3.create(localRenderer.LookAt[4],
+                                                           localRenderer.LookAt[5],
+                                                           localRenderer.LookAt[6]));
 
                     // Render non-transparent objects for the current layer
                     nbObjects += objectHandler.renderSolid(layer, renderingContext);
@@ -1436,6 +1448,94 @@
                 drawScene();
             }
         });
+    }
+
+    // ----------------------------------------------------------------------
+    // Camera object
+    // ----------------------------------------------------------------------
+    function createCamera() {
+      var viewAngle = 30.0,
+          aspect = 1.0,
+          left = -1.0,
+          right = 1.0,
+          bottom = -1.0,
+          top = 1.0,
+          near = 0.01,
+          far = 10000.0,
+          position = [0.0, 0.0, 0.0],
+          focalPoint = [0.0, 0.0, -1.0],
+          viewUp = [0.0, 1.0, 0.0],
+          rightDir = [1.0, 0.0, 0.0],
+          projectionMatrix = mat4.create(),
+          modelViewMatrix = mat4.create(),
+          modified = true;
+
+      // Initialize to identity (just to be safe)
+      mat4.identity(modelViewMatrix);
+      mat4.identity(projectionMatrix);
+
+      function computeOrthogonalAxes() {
+        var dir = new vec3.create();
+        vec3.direction(focalPoint, position, dir);
+        vec3.normalize(dir);
+        vec3.normalize(viewUp);
+        vec3.cross(dir, viewUp, rightDir);
+        vec3.normalize(rightDir);
+      };
+
+      return {
+        setCameraParameters : function(angle, pos, focal, up) {
+          viewAngle = angle;
+          position = pos;
+          focalPoint = focal;
+          viewUp = up;
+          modified = true;
+        },
+        setViewAspect : function(val) {
+          aspect = val;
+          modified = true;
+        },
+        enableOrtho : function() {
+          perspective = false;
+          modified = true;
+        },
+        enablePerspective : function() {
+          perspective = true;
+          modified = true;
+        },
+        zoom : function(dx, dy) {
+          modified = true;
+        },
+        pan : function(dx, dy) {
+          position[0] += dx;
+          position[1] += dy;
+          focalPoint[0] += dx;
+          focalPoint[1] += dy;
+
+          modified = true;
+        },
+        rotate : function(dx, dy) {
+          modified = true;
+        },
+        getCameraMatrices : function() {
+          if (modified) {
+
+            // Compute project matrix
+            if (perspective) {
+              mat4.perspective(viewAngle, aspect, near, far, projectionMatrix);
+            } else {
+              mat4.ortho(left, right, bottom, top, near, far, projectionMatrix);
+            }
+
+            // Compute modelview matrix
+            computeOrthogonalAxes();
+            mat4.lookAt(position, focalPoint, viewUp, modelViewMatrix);
+            modified = false;
+          };
+
+          return [projectionMatrix, modelViewMatrix];
+        }
+      };
     }
 
     // ----------------------------------------------------------------------
