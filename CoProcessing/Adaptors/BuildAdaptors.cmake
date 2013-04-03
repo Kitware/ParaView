@@ -86,12 +86,19 @@ if (PARAVIEW_USE_MPI)
 endif()
 
 #------------------------------------------------------------------------------
-# Adaptors that need Fortran
+# Adaptors that need Fortran -- we disable them by default because not all
+# systems load all of the proper Fortran dependencies like MPI_Fortran_LIBRARIES
 #------------------------------------------------------------------------------
 if (CMAKE_Fortran_COMPILER_WORKS)
-  build_adaptor(PhastaAdaptor
-                COMMENT "Building Phasta Adaptor"
-                DEPENDS vtkPVCatalyst)
+  cmake_dependent_option(BUILD_PHASTA_ADAPTOR
+    "Build the Phasta Catalyst Adaptor" OFF
+    "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
+
+  if(BUILD_PHASTA_ADAPTOR)
+    build_adaptor(PhastaAdaptor
+      COMMENT "Building Phasta Adaptor"
+      DEPENDS vtkPVCatalyst)
+  endif()
 endif()
 
 #------------------------------------------------------------------------------
