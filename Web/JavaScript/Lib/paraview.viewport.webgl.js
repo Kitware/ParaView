@@ -244,15 +244,15 @@
     // GL rendering metods
     // ----------------------------------------------------------------------
 
-    function setMatrixUniforms(renderingContext, shaderProgram) {
+    function setMatrixUniforms(renderingContext, shaderProgram, projMatrix, mvMatrix) {
         var mvMatrixInv = mat4.create(),
         normal = mat4.create();
 
         mat4.inverse(renderingContext.mvMatrix, mvMatrixInv);
         mat4.transpose(mvMatrixInv, normal);
 
-        renderingContext.gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, renderingContext.pMatrix);
-        renderingContext.gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, renderingContext.mvMatrix);
+        renderingContext.gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projMatrix);
+        renderingContext.gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
         if(shaderProgram.nMatrixUniform != null) renderingContext.gl.uniformMatrix4fv(shaderProgram.nMatrixUniform, false, normal);
     }
 
@@ -261,45 +261,13 @@
     function renderMesh(sceneJSON, renderingContext, camera) {
         try {
             var obj = this, cameraRot, inverse, objTransp, icenter,
-               mvMatrix = mat4.create(camera.getCameraMatrices()[0]);
+               mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
+               projMatrix = mat4.create(camera.getCameraMatrices()[1]);
 
             renderingContext.gl.useProgram(renderingContext.shaderProgram);
             renderingContext.gl.uniform1i(renderingContext.shaderProgram.uIsLine, false);
 
-            // @todo this code needs to go away
-            cameraRot = mat4.toRotationMat(mvMatrix);
-            mat4.transpose(cameraRot);
-            inverse = mat4.create();
-            mat4.inverse(cameraRot, inverse);
-
-            // This code is imp
-            objTransp = mat4.create(obj.matrix);
-            mat4.transpose(objTransp);
-
-//            icenter = [-sceneJSON.Center[0], -sceneJSON.Center[1], -sceneJSON.Center[2]];
-
-            /*mvPushMatrix(mvMatrix);
-
-            // @todo this code should go away
-            mat4.multiply(mvMatrix, cameraRot, mvMatrix);
-            if(obj.layer == 0) mat4.translate(mvMatrix, renderingContext.transform.translation);
-            mat4.multiply(mvMatrix, inverse, mvMatrix);
-
-            if(obj.layer == 0) mat4.translate(mvMatrix, sceneJSON.Center);
-            mat4.multiply(mvMatrix, cameraRot, mvMatrix);
-            if(obj.layer == 0){
-                mat4.scale( mvMatrix, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale],mvMatrix);
-            }
-
-            mat4.multiply(mvMatrix, renderingContext.transform.rotation, mvMatrix);
-            mat4.multiply(mvMatrix, inverse, mvMatrix);
-
-            // @todo this is a good code
-            if(obj.layer == 0) mat4.translate(mvMatrix, icenter);
-
-            renderingContext.transform.rotation2 = mvMatrix;
-
-            mat4.multiply(mvMatrix, objTransp, mvMatrix);*/
+            mvMatrix = mat4.multiply(mvMatrix, obj.matrix, mvMatrix);
 
             renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.vbuff);
             renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexPositionAttribute, obj.vbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
@@ -310,7 +278,7 @@
             renderingContext.gl.bindBuffer(renderingContext.gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
 
             /// @todo pass matrices and change the signature of the function
-            setMatrixUniforms(renderingContext, renderingContext.shaderProgram, projMatrix, mvMatrix);
+            (renderingContext, renderingContext.shaderProgram, projMatrix, mvMatrix);
 
             renderingContext.gl.drawElements(renderingContext.gl.TRIANGLES, obj.numberOfIndex, renderingContext.gl.UNSIGNED_SHORT, 0);
             mvMatrix = mvPopMatrix();
