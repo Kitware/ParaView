@@ -93,7 +93,7 @@
         }
 
         // Setup internal API
-        function render(ondone, fetch) {
+        function render(fetch) {
             if (force_render === false) {
                 if (render_onidle_timeout !== null) {
                     // clear any renderOnIdle requests that are pending since we
@@ -149,7 +149,7 @@
                      * Equals to new Date().getTime().
                      */
                     localTime : new Date().getTime()
-                }, done_callback = ondone;
+                };
 
                 /**
                  * @member pv.Viewport
@@ -281,9 +281,8 @@
                     }
                     renderStatistics();
                     force_render = false;
-                    if (done_callback) {
-                        done_callback();
-                    }
+                    container.trigger('done');
+
                     // the image we received is not the latest, we should
                     // request another render to try to get the latest image.
                     if (res.stale === true) {
@@ -336,13 +335,13 @@
         }
 
         // Attach listener to container for mouse interaction and invalidateScene
-        container.bind('invalidateScene', function(evt) {
+        container.bind('invalidateScene', function() {
             if(renderer.hasClass('active')){
-                render(evt.callback, true);
+                render(true);
             }
-        }).bind('render', function(evt){
+        }).bind('render', function(){
             if(renderer.hasClass('active')){
-                render(evt.callback, false);
+                render(false);
             }
         }).bind('mouse', function(evt){
             if(renderer.hasClass('active')){
@@ -444,7 +443,7 @@
                     }
                 });
             }
-        }).append(renderer);;
+        }).append(renderer);
     }
 
     // ----------------------------------------------------------------------

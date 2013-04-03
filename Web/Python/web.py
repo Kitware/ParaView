@@ -264,11 +264,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC callback to show/hide OrientationAxis.
         """
-        view = mapIdToProxy(view)
-        if not view:
-            view = simple.GetActiveView()
-        if not view:
-            raise Exception("no view provided to resetCamera")
+        view = self._getView(view)
         view.OrientationAxesVisibility = (showAxis if 1 else 0);
 
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
@@ -280,11 +276,7 @@ class ParaViewServerProtocol(ServerProtocol):
         """
         RPC callback to show/hide CenterAxesVisibility.
         """
-        view = mapIdToProxy(view)
-        if not view:
-            view = simple.GetActiveView()
-        if not view:
-            raise Exception("no view provided to resetCamera")
+        view = self._getView(view)
         view.CenterAxesVisibility = (showAxis if 1 else 0);
 
         ParaViewServerProtocol.WebApplication.InvalidateCache(view.SMProxy)
@@ -309,11 +301,8 @@ class ParaViewServerProtocol(ServerProtocol):
 
     @exportRpc("getWebGLData")
     def getWebGLData(self, view_id, object_id, part):
-        view  = self._getView(view_id);
-        data = ParaViewServerProtocol.WebApplication.GetWebGLBinaryData(view.SMProxy,
-                                                                        str(object_id),
-                                                                        part-1);
-
+        view  = self._getView(view_id)
+        data = ParaViewServerProtocol.WebApplication.GetWebGLBinaryData(view.SMProxy, str(object_id), part-1)
         return data
 
     @exportRpc("exit")

@@ -20,7 +20,8 @@
         "left": "0px",
         "right": "0px",
         "bottom": "0px",
-        "z-index" : "0"
+        "z-index" : "0",
+        "overflow": "hidden"
     },
 
     DEFAULT_MOUSE_LISTENER_HTML = "<div class='mouse-listener'></div>",
@@ -95,12 +96,24 @@
             if(event.hasOwnProperty("type")) {
                 if(event.type === 'mouseup') {
                     current_button = null;
-                    renderersContainer.trigger($.extend(event, { type: 'mouse', action: 'up', current_button: current_button}));
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'up',
+                        current_button: current_button
+                    }));
                 } else if(event.type === 'mousedown') {
                     current_button = event.which;
-                    renderersContainer.trigger($.extend(event, { type: 'mouse', action: 'down', current_button: current_button}));
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'down',
+                        current_button: current_button
+                    }));
                 } else if(event.type === 'mousemove' && current_button != null) {
-                    renderersContainer.trigger($.extend(event, { type: 'mouse', action: 'move', current_button: current_button}));
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'move',
+                        current_button: current_button
+                    }));
                 }
             }
         }
@@ -134,6 +147,7 @@
         session = options.session,
         rendererContainer = $(DEFAULT_RENDERERS_CONTAINER_HTML).css(DEFAULT_RENDERERS_CONTAINER_CSS),
         mouseListener = $(DEFAULT_MOUSE_LISTENER_HTML).css(DEFAULT_MOUSE_LISTENER_CSS),
+        onDoneQueue = [],
         viewport = {
             /**
              * Update the active renderer to be something else.
@@ -148,6 +162,7 @@
              */
             setActiveRenderer: function(rendererName) {
                 $('.' + rendererName, rendererContainer).addClass('active').show().siblings().removeClass('active').hide();
+                rendererContainer.trigger('active');
             },
 
             /**
@@ -158,10 +173,8 @@
              * @param {Function} ondone Function to call after rendering is complete.
              */
             invalidateScene: function(onDone) {
-                rendererContainer.trigger({
-                    type: 'invalidateScene',
-                    callback: onDone
-                });
+                onDoneQueue.push(onDone);
+                rendererContainer.trigger('invalidateScene');
             },
 
             /**
@@ -173,10 +186,8 @@
              * @param {Function} ondone Function to call after rendering is complete.
              */
             render: function(onDone) {
-                rendererContainer.trigger({
-                    type: 'render',
-                    callback: onDone
-                });
+                onDoneQueue.push(onDone);
+                rendererContainer.trigger('render');
             },
 
             /**
@@ -187,6 +198,7 @@
              * @param {Function} ondone Function to call after rendering is complete.
              */
             resetCamera: function(onDone) {
+                onDoneQueue.push(onDone);
                 return session.call("pv:resetCamera", Number(config.view)).then(function () {
                     rendererContainer.trigger('invalidateScene');
                 });
@@ -200,12 +212,10 @@
              * Show: true / Hide: false
              * @param {Function} ondone Function to call after rendering is complete.
              */
-            updateOrientationAxesVisibility: function (show, ondone) {
-                return session.call("pv:updateOrientationAxesVisibility", Number(options.view), show).then(function () {
-                    rendererContainer.trigger({
-                        type: 'render',
-                        callback: onDone
-                    });
+            updateOrientationAxesVisibility: function (show, onDone) {
+                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
+                    onDoneQueue.push(onDone);
+                    rendererContainer.trigger('invalidateScene');
                 });
             },
 
@@ -217,12 +227,10 @@
              * Show: true / Hide: false
              * @param {Function} ondone Function to call after rendering is complete.
              */
-            updateCenterAxesVisibility: function (show, ondone) {
+            updateCenterAxesVisibility: function (show, onDone) {
                 return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
-                    rendererContainer.trigger({
-                        type: 'render',
-                        callback: onDone
-                    });
+                    onDoneQueue.push(onDone);
+                    rendererContainer.trigger('invalidateScene');
                 });
             },
 
@@ -249,8 +257,8 @@
              */
             bind: function (selector) {
                 var container = $(selector);
-                if (container.attr("__pv_viewport__") !== true) {
-                    container.attr("__pv_viewport__", true);
+                if (container.attr("__pv_viewport__") !== "true") {
+                    container.attr("__pv_viewport__", "true");
                     container.append(rendererContainer).append(mouseListener);
                     rendererContainer.trigger('invalidateScene');
                 }
@@ -264,7 +272,7 @@
             unbind: function () {
                 var parentElement = rendererContainer.parent();
                 if (parentElement) {
-                    parentElement.attr("__pv_viewport__", false);
+                    parentElement.attr("__pv_viewport__", "false");
                     rendererContainer.remove();
                     mouseListener.remove();
                 }
@@ -273,6 +281,21 @@
 
         // Attach config object to renderer parent
         rendererContainer.data('config', config);
+
+        // Attach onDone listener
+        rendererContainer.bind('done', function(){
+            while(onDoneQueue.length > 0) {
+                var callback = onDoneQueue.pop();
+                try {
+                    if(callback) {
+                        callback();
+                    }
+                } catch(error) {
+                    console.log("On Done callback error:");
+                    console.log(error);
+                }
+            }
+        });
 
         // Create any renderer type that is available
         for(var key in paraview.ViewportFactory) {
