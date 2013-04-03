@@ -833,6 +833,10 @@
       "path":"VTK/Wrapping/Python"
     },
     {
+      "path":"VTK/Wrapping/PythonCore"
+    },
+
+    {
       "path":"VTK/Utilities/GitSetup"
     },
     {
