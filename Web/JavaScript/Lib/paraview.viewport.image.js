@@ -39,8 +39,36 @@
     FACTORY_KEY = 'image',
     FACTORY = {
         'builder': createImageDeliveryRenderer,
-        'options': DEFAULT_OPTIONS
+        'options': DEFAULT_OPTIONS,
+        'stats': {
+            'image-fps': {
+                label: 'Framerate:',
+                type: 'time',
+                convert: function(value) {
+                    if(value === 0) {
+                        return 0;
+                    }
+                    return Math.floor(1000 / value);
+                }
+            },
+            'image-round-trip': {
+                label: 'Round trip (ms):',
+                type: 'value',
+                convert: NoOp
+            },
+            'image-server-processing': {
+                label: 'Server side processing (ms):',
+                type: 'value',
+                convert: NoOp
+            }
+        }
     };
+
+    // ----------------------------------------------------------------------
+
+    function NoOp(a) {
+        return a;
+    }
 
     // ----------------------------------------------------------------------
     // Image Delivery renderer - factory method
@@ -151,15 +179,10 @@
                     localTime : new Date().getTime()
                 };
 
-                /**
-                 * @member pv.Viewport
-                 * @event render-start
-                 * @param {Number} view
-                 * Proxy View ID.
-                 */
-                $(container).parent().trigger({
-                    type: "render-start",
-                    view: Number(options.view)
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'image-fps',
+                    stat_value: 0 // start
                 });
 
                 session.call("pv:stillRender", renderCfg).then(function (res) {
@@ -244,39 +267,22 @@
                         var previousSrc = bgImage.src;
                         bgImage.src = "data:image/" + res.format  + "," + res.image;
 
-                        /**
-                         * @member pv.Viewport
-                         * @event render-end
-                         * @param {Number} view
-                         * Proxy View Id.
-                         */
-                        $(container).parent().trigger({
-                            type: "render-end",
-                            view: Number(options.view)
+                        container.trigger({
+                            type: 'stats',
+                            stat_id: 'image-fps',
+                            stat_value: 1 // stop
                         });
 
-                        /**
-                         * @member pv.Viewport
-                         * @event round-trip
-                         * @param {Number} time
-                         * Time between the sending and the reception of an image less the
-                         * server processing time.
-                         */
-                        $(container).parent().trigger({
-                            type: "round-trip",
-                            time: Number(new Date().getTime() - res.localTime) - res.workTime
+                        container.trigger({
+                            type: 'stats',
+                            stat_id: 'image-round-trip',
+                            stat_value: Number(new Date().getTime() - res.localTime) - res.workTime
                         });
 
-                        /**
-                         * @member pv.Viewport
-                         * @event server-processing
-                         * @param {Number} time
-                         * Delta time between the reception of the message on the server and
-                         * when the reply is construct and return from the method.
-                         */
-                        $(container).parent().trigger({
-                            type: "server-processing",
-                            time: Number(res.workTime)
+                        container.trigger({
+                            type: 'stats',
+                            stat_id: 'image-server-processing',
+                            stat_value: Number(res.workTime)
                         });
                     }
                     renderStatistics();

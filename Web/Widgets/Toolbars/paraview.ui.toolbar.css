@@ -63,3 +63,13 @@
     background: url("paraview/toolbar/common/logo_title.png") no-repeat left top transparent;
     height: 32px;
 }
+
+table.viewport-stat {
+    color: #ffffff;
+    border: 0;
+    width: 80%;
+}
+
+table.viewport-stat td {
+    width: 20%;
+}

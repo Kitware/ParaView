@@ -37,10 +37,44 @@
     FACTORY_KEY = 'webgl',
     FACTORY = {
         'builder': createGeometryDeliveryRenderer,
-        'options': DEFAULT_OPTIONS
+        'options': DEFAULT_OPTIONS,
+        'stats': {
+            'webgl-fps': {
+                label: 'Framerate:',
+                type: 'time',
+                convert: function(value) {
+                    if(value === 0) {
+                        return 0;
+                    }
+                    return Math.floor(1000 / value);
+                }
+            },
+            'webgl-nb-objects': {
+                label: 'Number of 3D objects:',
+                type: 'value',
+                convert: NoOp
+            },
+            'webgl-fetch-scene': {
+                label: 'Fetch scene (ms):',
+                type: 'time',
+                convert: NoOp
+            },
+            'webgl-fetch-object': {
+                label: 'Fetch object (ms):',
+                type: 'time',
+                convert: NoOp
+            }
+        }
     },
     DEFAULT_SHADERS = {},
     mvMatrixStack = [];
+
+
+    // ----------------------------------------------------------------------
+
+    function NoOp(a) {
+        return a;
+    }
 
     // ----------------------------------------------------------------------
     // Initialize the Shaders
@@ -1037,7 +1071,6 @@
                 scale: 1.0
             }
         },
-        fps, frames = 0, lastFpsUpdate = new Date(), // Frame rate computation
         oldLookAt = [0,0,0,0,0,0,0,0,0],
         camera = {
             lookAt: [0,0,0,0,1,0,0,0,1],
@@ -1056,8 +1089,18 @@
         // Helper functions -------------------------------------------------
 
         function fetchScene() {
+            container.trigger({
+                type: 'stats',
+                stat_id: 'webgl-fetch-scene',
+                stat_value: 0
+            });
             session.call("pv:getSceneMetaData", Number(options.view)).then(function(data) {
                 sceneJSON = JSON.parse(data);
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'webgl-fetch-scene',
+                    stat_value: 1
+                });
                 updateScene();
             });
         }
@@ -1069,10 +1112,20 @@
                 var viewId = Number(options.view),
                 newObject;
 
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'webgl-fetch-object',
+                    stat_value: 0
+                });
                 session.call("pv:getWebGLData", viewId, sceneObject.id, part).then(function(data) {
                     try {
                         // decode base64
                         data = atob(data);
+                        container.trigger({
+                            type: 'stats',
+                            stat_id: 'webgl-fetch-object',
+                            stat_value: 1
+                        });
 
                         newObject = {
                             md5: sceneObject.md5,
@@ -1115,14 +1168,11 @@
                 nbObjects = 0;
 
                 // Update frame rate
-                frames++;
-                if(frames >= 50) {
-                    frames = 0;
-                    deltaT = currentTime - lastFpsUpdate;
-                    lastFpsUpdate = currentTime;
-                    fps = 50000 / deltaT;
-                // FIXME trigger fps to main container
-                }
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'webgl-fps',
+                    stat_value: 0
+                });
 
                 // Update viewport size
                 ctx2d.canvas.width = width;
@@ -1187,6 +1237,19 @@
                     gl.disable(gl.POLYGON_OFFSET_FILL);
                     gl.disable(gl.BLEND);
                 }
+
+                // Update frame rate
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'webgl-fps',
+                    stat_value: 1
+                });
+
+                container.trigger({
+                    type: 'stats',
+                    stat_id: 'webgl-nb-objects',
+                    stat_value: nbObjects
+                });
             } catch(error) {
                 console.log(error);
             }

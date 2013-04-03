@@ -33,6 +33,17 @@
         "bottom": "0px",
         "z-index" : "1000"
     },
+
+    DEFAULT_STATISTIC_HTML = "<div class='statistics'></div>",
+    DEFAULT_STATISTIC_CSS = {
+        "position": "absolute",
+        "top": "0px",
+        "left": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "z-index" : "999"
+    },
+
     module = {},
 
     /**
@@ -124,6 +135,203 @@
     }
 
     // ----------------------------------------------------------------------
+    // Viewport statistic manager
+    // ----------------------------------------------------------------------
+
+    function createStatisticManager() {
+        var statistics = {}, formatters = {};
+
+        // Fill stat formatters
+        for(var factoryKey in paraview.ViewportFactory) {
+            var factory = paraview.ViewportFactory[factoryKey];
+            if(factory.hasOwnProperty('stats')) {
+                for(var key in factory.stats) {
+                    formatters[key] =  factory.stats[key];
+                }
+            }
+        }
+
+        function handleEvent(event) {
+            var id = event.stat_id,
+            value = event.stat_value,
+            statObject = null;
+
+            if(!statistics.hasOwnProperty(id) && formatters.hasOwnProperty(id)) {
+                if(formatters[id].type === 'time') {
+                    statObject = statistics[id] = createTimeValueRecord();
+                } else if (formatters[id].type === 'value') {
+                    statObject = statistics[id] = createValueRecord();
+                }
+            } else {
+                statObject = statistics[id];
+            }
+
+            if(statObject != null) {
+                statObject.record(value);
+            }
+        }
+
+        // ------------------------------------------------------------------
+
+        function toHTML() {
+            var buffer = createBuffer(), hasContent = false, key, formater, stat;
+
+            // Extract stat data
+            buffer.append("<table class='viewport-stat'>");
+            buffer.append("<tr><td></td><td>Current</td><td>Min</td><td>Max</td><td>Average</td></tr>");
+            for(key in statistics) {
+                if(formatters.hasOwnProperty(key) && statistics[key].valid) {
+                    formater = formatters[key];
+                    stat = statistics[key];
+                    hasContent = true;
+
+                    buffer.append("<tr><td>");
+                    buffer.append(formater.label);
+                    buffer.append("</td><td class='value'>");
+                    buffer.append(formater.convert(stat.value));
+                    buffer.append("</td><td class='min'>");
+                    buffer.append(formater.convert(stat.min));
+                    buffer.append("</td><td class='max'>");
+                    buffer.append(formater.convert(stat.max));
+                    buffer.append("</td><td class='avg'>");
+                    buffer.append(formater.convert(stat.getAverageValue()));
+                    buffer.append("</td></tr>");
+                }
+            }
+            buffer.append("</table>");
+
+            return hasContent ? buffer.toString() : "";
+        }
+
+        // ------------------------------------------------------------------
+
+        return {
+            eventHandler: handleEvent,
+            toHTML: toHTML,
+            reset: function() {
+                statistics = {};
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createBuffer() {
+        var idx = -1, buffer = [];
+        return {
+            clear: function(){
+                idx = -1;
+                buffer = [];
+            },
+            append: function(str) {
+                buffer[++idx] = str;
+                return this;
+            },
+            toString: function() {
+                return buffer.join('');
+            }
+        };
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createTimeValueRecord() {
+        var lastTime, sum, count;
+
+        // Default values
+        lastTime = 0;
+        sum = 0;
+
+        return {
+            value: 0.0,
+            valid: false,
+            min: +1000000000.0,
+            max: -1000000000.0,
+
+            record: function(v) {
+                if(v === 0) {
+                    this.start();
+                } else if (v === 1) {
+                    this.stop();
+                }
+            },
+
+            start: function() {
+                lastTime = new Date().getTime();
+            },
+
+            stop: function() {
+                if(lastTime != 0) {
+                    this.valid = true;
+                    var time = new Date().getTime();
+                    this.value = time - lastTime;
+                    this.min = (this.min < this.value) ? this.min : this.value;
+                    this.max = (this.max > this.value) ? this.max : this.value;
+                    //
+                    sum += this.value;
+                    count++;
+                }
+            },
+
+            reset: function() {
+                count = 0;
+                sum = 0;
+                lastTime = 0;
+                this.value = 0;
+                this.min = +1000000000.0;
+                this.max = -1000000000.0;
+                this.valid = false;
+            },
+
+            getAverageValue: function() {
+                if(count == 0) {
+                    return 0;
+                }
+                return (sum / count);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createValueRecord() {
+        var sum, count;
+
+        return {
+            value: 0.0,
+            valid: false,
+            min: +1000000000.0,
+            max: -1000000000.0,
+
+            record: function(v) {
+                this.valid = true;
+                this.value = v;
+                this.min = (this.min < this.value) ? this.min : this.value;
+                this.max = (this.max > this.value) ? this.max : this.value;
+                //
+                sum += this.value;
+                count++;
+            },
+
+            reset: function() {
+                count = 0;
+                sum = 0;
+                this.value = 0;
+                this.min = +1000000000.0;
+                this.max = -1000000000.0;
+                this.valid = false;
+            },
+
+            getAverageValue: function() {
+                if(count === 0) {
+                    return 0;
+                }
+                return (sum / count);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
     // Viewport container definition
     // ----------------------------------------------------------------------
 
@@ -147,7 +355,9 @@
         session = options.session,
         rendererContainer = $(DEFAULT_RENDERERS_CONTAINER_HTML).css(DEFAULT_RENDERERS_CONTAINER_CSS),
         mouseListener = $(DEFAULT_MOUSE_LISTENER_HTML).css(DEFAULT_MOUSE_LISTENER_CSS),
+        statContainer = $(DEFAULT_STATISTIC_HTML).css(DEFAULT_STATISTIC_CSS),
         onDoneQueue = [],
+        statisticManager = createStatisticManager(),
         viewport = {
             /**
              * Update the active renderer to be something else.
@@ -163,6 +373,8 @@
             setActiveRenderer: function(rendererName) {
                 $('.' + rendererName, rendererContainer).addClass('active').show().siblings().removeClass('active').hide();
                 rendererContainer.trigger('active');
+                statContainer[0].innerHTML = '';
+                statisticManager.reset();
             },
 
             /**
@@ -259,7 +471,7 @@
                 var container = $(selector);
                 if (container.attr("__pv_viewport__") !== "true") {
                     container.attr("__pv_viewport__", "true");
-                    container.append(rendererContainer).append(mouseListener);
+                    container.append(rendererContainer).append(mouseListener).append(statContainer);
                     rendererContainer.trigger('invalidateScene');
                 }
             },
@@ -275,7 +487,32 @@
                     parentElement.attr("__pv_viewport__", "false");
                     rendererContainer.remove();
                     mouseListener.remove();
+                    statContainer.remove();
                 }
+            },
+
+            /**
+             * Update statistic visibility
+             *
+             * @member pv.Viewport
+             * @param {Boolean} visible
+             */
+            statVisibility: function(isVisible) {
+                if(isVisible) {
+                    statContainer.show();
+                } else {
+                    statContainer.hide();
+                }
+            },
+
+            /**
+             * Clear current statistic values
+             *
+             * @member pv.Viewport
+             */
+            resetStatistics: function() {
+                statisticManager.reset();
+                statContainer.empty();
             }
         };
 
@@ -314,6 +551,12 @@
         if (config.enableInteractions) {
             attachMouseListener(mouseListener, rendererContainer);
         }
+
+        // Attach stat listener
+        rendererContainer.bind('stats', function(event){
+            statisticManager.eventHandler(event);
+            statContainer[0].innerHTML = statisticManager.toHTML();
+        });
 
         return viewport;
     }
