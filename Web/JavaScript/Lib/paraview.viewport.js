@@ -115,6 +115,17 @@
                     }));
                 } else if(event.type === 'mousedown') {
                     current_button = event.which;
+
+                    // Override button if modifier is used
+                    // Middle: Alt - Right: Shift
+                    if(event.shiftKey) {
+                        current_button = 3;
+                        event.shiftKey = false;
+                    } else if(event.altKey) {
+                        current_button = 2;
+                        event.altKey = false;
+                    }
+
                     renderersContainer.trigger($.extend(event, {
                         type: 'mouse',
                         action: 'down',
