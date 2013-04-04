@@ -73,3 +73,7 @@ table.viewport-stat {
 table.viewport-stat td {
     width: 20%;
 }
+
+table.viewport-stat td.label {
+    text-align: right;
+}

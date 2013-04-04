@@ -29,6 +29,12 @@
     width: 26px;
 }
 
+.paraview.toolbar.viewport li[action=toggleInfo] div.icon {
+    background: url("paraview/toolbar/viewport/info.png") no-repeat center center transparent;
+    height: 26px;
+    width: 26px;
+}
+
 .paraview.toolbar.viewport li.on {
     border-radius: 8px;
     background: #cccccc;
