@@ -50,7 +50,8 @@ public:
     RESET_POSITIVE_Z,
     RESET_NEGATIVE_X,
     RESET_NEGATIVE_Y,
-    RESET_NEGATIVE_Z
+    RESET_NEGATIVE_Z,
+    ZOOM_TO_DATA
     };
 
   pqCameraReaction(QAction* parent, Mode mode);
@@ -65,6 +66,7 @@ public:
   static void resetDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z);
+  static void zoomToData();
 
 public slots:
   /// Updates the enabled state. Applications need not explicitly call

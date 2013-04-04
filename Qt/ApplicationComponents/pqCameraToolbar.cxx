@@ -47,6 +47,7 @@ void pqCameraToolbar::constructor()
   Ui::pqCameraToolbar ui;
   ui.setupUi(this);
   new pqCameraReaction(ui.actionResetCamera, pqCameraReaction::RESET_CAMERA);
+  new pqCameraReaction(ui.actionZoomToData, pqCameraReaction::ZOOM_TO_DATA);
   new pqCameraReaction(ui.actionPositiveX, pqCameraReaction::RESET_POSITIVE_X);
   new pqCameraReaction(ui.actionNegativeX, pqCameraReaction::RESET_NEGATIVE_X);
   new pqCameraReaction(ui.actionPositiveY, pqCameraReaction::RESET_POSITIVE_Y);

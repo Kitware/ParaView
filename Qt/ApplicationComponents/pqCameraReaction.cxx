@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqRenderView.h"
+#include "vtkSMRenderViewProxy.h"
+#include "pqPipelineRepresentation.h"
 
 //-----------------------------------------------------------------------------
 pqCameraReaction::pqCameraReaction(QAction* parentObject,
@@ -94,6 +96,9 @@ void pqCameraReaction::onTriggered()
     break;
   case RESET_NEGATIVE_Z:
     this->resetNegativeZ();
+    break;
+  case ZOOM_TO_DATA:
+    this->zoomToData();
     break;
     }
 }
@@ -157,3 +162,17 @@ void pqCameraReaction::resetNegativeZ()
   pqCameraReaction::resetDirection(0, 0, -1, 0, 1, 0);
 }
 
+//-----------------------------------------------------------------------------
+void pqCameraReaction::zoomToData()
+{
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(
+    pqActiveObjects::instance().activeView());
+  pqPipelineRepresentation *repr = qobject_cast<pqPipelineRepresentation*>(
+    pqActiveObjects::instance().activeRepresentation());
+  if (renModule && repr)
+    {
+    vtkSMRenderViewProxy* rm = renModule->getRenderViewProxy();
+    rm->ZoomTo(repr->getProxy());
+    renModule->render();
+    }
+}
