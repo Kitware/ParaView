@@ -93,7 +93,6 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   cmake_dependent_option(BUILD_PHASTA_ADAPTOR
     "Build the Phasta Catalyst Adaptor" OFF
     "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
-
   if(BUILD_PHASTA_ADAPTOR)
     build_adaptor(PhastaAdaptor
       COMMENT "Building Phasta Adaptor"
