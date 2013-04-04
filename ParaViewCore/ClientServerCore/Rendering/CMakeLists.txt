@@ -111,8 +111,6 @@ set_source_files_properties(
   vtkPVView
   ABSTRACT)
 
-# until VTK comes up with a cleaner mechanism, we set the hints like so.
-set (old_VTK_WRAP_HINTS ${VTK_WRAP_HINTS})
-set (VTK_WRAP_HINTS ${CMAKE_CURRENT_SOURCE_DIR}/hints)
+# Use a custom hints file for this module.
+set(${vtk-module}_WRAP_HINTS "${CMAKE_CURRENT_SOURCE_DIR}/hints")
 vtk_module_library(vtkPVClientServerCoreRendering ${Module_SRCS})
-set (VTK_WRAP_HINTS ${VTK_WRAP_HINTS})
