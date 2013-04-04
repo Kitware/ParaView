@@ -2,35 +2,38 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.css" type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.pipeline.css'           type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.css'            type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.vcr.css'        type='text/css'>
+        <link rel='stylesheet' href='../../lib/css/paraview.ui.toolbar.viewport.css'   type='text/css'>
         <link rel='stylesheet' href='style.css' type='text/css'>
+
+        <script src="../../ext/js-core/autobahn.min.js"></script>
+        <script src="../../ext/js-core/jquery-1.8.2.min.js"></script>
+        <script src="../../ext/js-core/glMatrix-0.9.5.min.js"></script>
+
+        <script src="../../lib/js/paraview-all.js"></script>
+        <script src="../../lib/js/paraview.ui.pipeline.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.vcr.js"></script>
+        <script src="../../lib/js/paraview.ui.toolbar.viewport.js"></script>
+
+        <script src="js/jquery.jstree.js"></script>
     </head>
 
     <body onbeforeunload="stop()" onunload="stop()" class="page">
-        <div class="header">
-            <ul>
-                <li><img style="position: relative; height: 35px; top: 0px;left: -8px;" src="../../lib/css/paraview/icons/PVW_Logo_Full.png" alt=""/></li>
-            </ul>
-            <ul class="toolbar" style="position: absolute; right: 10px; top: 2px;display: none;">
-                <li><img class="action resetCamera" src="../../lib/css/paraview/icons/resetCamera.png" alt="Previous frame"/></li>
-                <li><img class="action stats" src="../../lib/css/paraview/icons/info.png" alt="Toggle statistics"/></li>
-                <li><img class="action exit" src="../../lib/css/paraview/icons/delete.png" alt="Exit"/></li>
-            </ul>
-            <ul id="loading" style="position: absolute; right: 10px; top: 8px;">
-                <li><img src="../../lib/css/paraview/loading.gif" alt="Loading"/></li>
-            </ul>
+        <div class="header toolbar">
+            <div class="logo" alt="Toggle pipeline browser visibility"></div>
+            <div class="viewport-toolbar"></div>
+            <div class="vcr-toolbar"></div>
+            <div class="loading"></div>
         </div>
         <div class="splitter">
             <div class="file-list"></div>
-            <div class="viewport">
+            <div class="viewport-container">
             </div>
         </div>
-
-        <!-- Core-js ParaViewWeb dependency -->
-        <script type="text/javascript" src="../../ext/js-core/autobahn.min.js"></script>
-        <script type="text/javascript" src="../../ext/js-core/jquery-1.8.3.min.js"></script>
-        <script type="text/javascript" src="../../lib/js/paraview-all.js"></script>
-
-        <script src="js/jquery.jstree.js"></script>
 
         <script type="text/javascript">
             var pv = {};
@@ -41,6 +44,8 @@
                 description: "3D visaulization with ParaViewWeb 2.0",
                 application: "loader"
             };
+            var fileList = $('.file-list');
+            var viewport = $(".viewport-container");
 
             // By default start a ParaView on the server
             if(!$('body').hasClass("initialized")) {
@@ -56,7 +61,7 @@
                         connect();
                     }
                 }, function(msg){
-                    $("#loading").hide();
+                    $(".loading").hide();
                     alert("The remote session did not properly start. Try to use embeded url.");
                     pv.connection = {sessionURL: "ws://" + location.hostname + ":" + location.port + "/ws"};
                     connect();
@@ -65,35 +70,21 @@
                  * Make the viewport be full screen
                  */
                 $(window).resize(function() {
-                    $('.file-list').width(300).height(window.innerHeight - 35);
-                    $(".spliter").width(window.innerWidth).height(window.innerHeight - 35);
-                    $(".viewport").width(window.innerWidth - 300).height(window.innerHeight - 35);
                     if(pv.viewport) {
                         pv.viewport.render();
                     }
                 }).trigger('resize');
 
                 // Manage VCR + ResetCamera
-                $(".action").click(function(){
-                    var me = $(this);
-                    if(me.hasClass("toggle")) {
-                        me.hide();
-                        $("."+me.attr("other")).show();
+                $(".logo").click(function(){
+                    if(fileList.is(':visible')) {
+                        fileList.hide();
+                        viewport.css('left',0);
+                    } else {
+                        fileList.show();
+                        viewport.css('left',fileList.width());
                     }
-                    if(me.hasClass("resetCamera")) {
-                        pv.viewport.resetCamera();
-                    } else if(me.hasClass("exit")) {
-                        stop();
-                    } else if (me.hasClass("stats")) {
-                        if (me.hasClass("show")) {
-                            pv.viewport.showStatistics(null);
-                        } else {
-                            pv.viewport.showStatistics(pv.stats);
-                            pv.stats.reset();
-                        }
-                        me.toggleClass("show");
-                        pv.viewport.render();
-                    }
+                    updateView();
                 });
             }
 
@@ -104,7 +95,7 @@
 
                 paraview.connect(pv.connection,
                 startSession, function(code,reason){
-                    $("#loading").hide();
+                    $(".loading").hide();
                     console.log(reason);
                 });
             }
@@ -117,11 +108,15 @@
                 pv.session = connection.session;
 
                 // Create viewport
-                pv.viewport = paraview.createViewport(connection.session);
-                pv.viewport.bind(".viewport");
-                pv.stats  = paraview.createViewportStatistics(pv.viewport);
-                $("#loading").hide();
-                $(".toolbar").show();
+                pv.viewport = paraview.createViewport({session:connection.session});
+                pv.viewport.bind(".viewport-container");
+
+                $('.vcr-toolbar').vcrToolbar(pv.session).bind('dataChanged', updateView);
+
+                // - viewport toolbar
+                $('.viewport-toolbar').viewportToolbar(pv.viewport);
+
+                $(".loading").hide();
 
                 // Load the remote fs
                 pv.session.call("pv:listFiles").then(function(fileTree){
@@ -138,6 +133,12 @@
                         }
                     });
                 });
+            }
+
+            function updateView() {
+                if(pv.viewport) {
+                    pv.viewport.invalidateScene();
+                }
             }
 
             /**

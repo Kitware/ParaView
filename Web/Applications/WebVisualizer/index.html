@@ -122,11 +122,7 @@
 
                 // - viewport
                 pv.viewport = paraview.createViewport({session: pv.connection.session});
-                console.log('viewport');
-                console.log(pv.viewport);
                 pv.viewport.bind(".viewport-container");
-                console.log('container');
-                console.log($(".viewport-container"));
 
                 // - vcr toolbar
                 $('.vcr-toolbar').vcrToolbar(pv.connection.session).bind('dataChanged', updateView);
