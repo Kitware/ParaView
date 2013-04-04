@@ -261,8 +261,8 @@
     function renderMesh(renderingContext, camera) {
         try {
             var obj = this,
-            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
-            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            mvMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[0]),
             gl = renderingContext.gl,
             shaderProgram = renderingContext.shaderProgram;
 
@@ -292,8 +292,8 @@
     function renderLine(renderingContext, camera) {
         try {
             var obj = this,
-            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
-            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            mvMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[0]),
             gl = renderingContext.gl,
             shaderProgram = renderingContext.shaderProgram;
 
@@ -329,8 +329,8 @@
     function renderPoints(renderingContext, camera) {
         try {
             var obj = this,
-            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
-            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            mvMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[0]),
             gl = renderingContext.gl,
             pointShaderProgram = renderingContext.pointShaderProgram;
 
@@ -1164,6 +1164,17 @@
 
         // ------------------------------------------------------------------
 
+        function pushCameraState() {
+            if(cameraLayerZero != null) {
+                var fp = cameraLayerZero.getFocalPoint(),
+                up = cameraLayerZero.getViewUp(),
+                pos = cameraLayerZero.getPosition();
+                session.call("pv:updateCamera", Number(options.view), fp, up, pos);
+            }
+        }
+
+        // ------------------------------------------------------------------
+
         function updateScene() {
             try{
                 if(sceneJSON === null || typeof(sceneJSON) === "undefined") {
@@ -1237,6 +1248,8 @@
                     var newX = event.clientX, newY = event.clientY,
                     deltaX = newX - mouseHandling.lastX,
                     deltaY = newY - mouseHandling.lastY;
+                    mouseHandling.lastX = newX;
+                    mouseHandling.lastY = newY;
 
                     if (mouseHandling.button === 1) {
                         console.log('Rotate ' + deltaX + " " + deltaY);
@@ -1251,9 +1264,9 @@
                         console.log('zoom ' + deltaX + " " + deltaY);
                         cameraLayerZero.zoom(deltaX, deltaY);
                     }
-                    mouseHandling.lastX = newX;
-                    mouseHandling.lastX = newY;
+
                     drawScene();
+                    pushCameraState();
                 }
             }
         }).bind('active', function(){
@@ -1284,6 +1297,7 @@
 
     function createCamera() {
         var viewAngle = 30.0,
+        centerOfRotation = [0.0,0.0,-1.0],
         aspect = 1.0,
         left = -1.0,
         right = 1.0,
@@ -1313,6 +1327,15 @@
         };
 
         return {
+            getFocalPoint: function() {
+              return focalPoint;
+            },
+            getPosition: function() {
+              return position;
+            },
+            getViewUp: function() {
+              return viewUp;
+            },
             setCameraParameters : function(angle, pos, focal, up) {
                 console.log("[CAMERA] angle: " + angle + " position: " + pos + " focal: " + focal + " up: " + up );
                 viewAngle = angle;
@@ -1345,10 +1368,18 @@
                 modified = true;
             },
             pan : function(dx, dy) {
-                position[0] += dx;
-                position[1] += dy;
-                focalPoint[0] += dx;
-                focalPoint[1] += dy;
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                position[0] += dx / 10.0;
+                position[1] += dy / 10.0;
+                focalPoint[0] += dx / 10.0;
+                focalPoint[1] += dy / 10.0;
 
                 modified = true;
             },
