@@ -1384,14 +1384,32 @@
                 modified = true;
             },
             rotate : function(dx, dy) {
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
-                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // Calculate the angles in radians first
+                var distanceVec = new vec3.create();
+                distanceVec[0] = centerOfRotation[0] - position[0];
+                distanceVec[1] = centerOfRotation[1] - position[1];
+                distanceVec[2] = centerOfRotation[2] - position[2];
+
+                var distance = sqrt(distanceVec[0] * distanceVec[0] +
+                                     distanceVec[1] * distanceVec[1] +
+                                     distanceVec[2] * distanceVec[2]);
+
+                var theta = atan(dx/distance);
+                var phi = atan(dy/distance);
+
+                var inv = new vec3.create();
+                inv[0] = -centerOfRotation[0];
+                inv[1] = -centerOfRotation[1];
+                inv[2] = -centerOfRotation[2];
+
+                var mat = new mat4.create();
+                mat4.translate(mat, centerOfRotation, mat);
+                mat4.rotate(mat, theta, viewUp, mat);
+                mat4.rotate(mat, phi, rightDir, mat);
+                mat4.translate(mat, inv, mat);
+
+                mat4.multiplyVec3(mat, position, position);
+                computeOrthogonalAxes();
                 modified = true;
             },
             getCameraMatrices : function() {
