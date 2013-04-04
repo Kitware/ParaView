@@ -50,17 +50,17 @@
                 }
             },
             'webgl-nb-objects': {
-                label: 'Number of 3D objects:',
+                label: 'Number&nbsp;of&nbsp;3D&nbsp;objects:',
                 type: 'value',
                 convert: NoOp
             },
             'webgl-fetch-scene': {
-                label: 'Fetch scene (ms):',
+                label: 'Fetch&nbsp;scene&nbsp;(ms):',
                 type: 'time',
                 convert: NoOp
             },
             'webgl-fetch-object': {
-                label: 'Fetch object (ms):',
+                label: 'Fetch&nbsp;object&nbsp;(ms):',
                 type: 'time',
                 convert: NoOp
             }

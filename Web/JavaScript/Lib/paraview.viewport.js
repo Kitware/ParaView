@@ -41,7 +41,8 @@
         "left": "0px",
         "right": "0px",
         "bottom": "0px",
-        "z-index" : "999"
+        "z-index" : "999",
+        "display" : "none"
     },
 
     module = {},
@@ -174,25 +175,30 @@
         // ------------------------------------------------------------------
 
         function toHTML() {
-            var buffer = createBuffer(), hasContent = false, key, formater, stat;
+            var buffer = createBuffer(), hasContent = false, key, formater, stat,
+            min, max;
 
             // Extract stat data
             buffer.append("<table class='viewport-stat'>");
-            buffer.append("<tr><td></td><td>Current</td><td>Min</td><td>Max</td><td>Average</td></tr>");
+            buffer.append("<tr class='header'><td class='label'></td><td class='value'>Current</td><td class='min'>Min</td><td class='max'>Max</td><td class='avg'>Average</td></tr>");
             for(key in statistics) {
                 if(formatters.hasOwnProperty(key) && statistics[key].valid) {
                     formater = formatters[key];
                     stat = statistics[key];
                     hasContent = true;
 
-                    buffer.append("<tr><td>");
+                    // The functiion may swap the order
+                    min = formater.convert(stat.min);
+                    max = formater.convert(stat.max);
+
+                    buffer.append("<tr><td class='label'>");
                     buffer.append(formater.label);
                     buffer.append("</td><td class='value'>");
                     buffer.append(formater.convert(stat.value));
                     buffer.append("</td><td class='min'>");
-                    buffer.append(formater.convert(stat.min));
+                    buffer.append((min < max) ? min : max);
                     buffer.append("</td><td class='max'>");
-                    buffer.append(formater.convert(stat.max));
+                    buffer.append((min > max) ? min : max);
                     buffer.append("</td><td class='avg'>");
                     buffer.append(formater.convert(stat.getAverageValue()));
                     buffer.append("</td></tr>");

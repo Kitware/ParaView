@@ -52,12 +52,12 @@
                 }
             },
             'image-round-trip': {
-                label: 'Round trip (ms):',
+                label: 'Round&nbsp;trip&nbsp;(ms):',
                 type: 'value',
                 convert: NoOp
             },
             'image-server-processing': {
-                label: 'Server side processing (ms):',
+                label: 'Processing&nbsp;Time&nbsp;(ms):',
                 type: 'value',
                 convert: NoOp
             }
