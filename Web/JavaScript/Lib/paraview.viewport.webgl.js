@@ -244,44 +244,44 @@
     // GL rendering metods
     // ----------------------------------------------------------------------
 
-    function setMatrixUniforms(renderingContext, shaderProgram, projMatrix, mvMatrix) {
+    function setMatrixUniforms(gl, shaderProgram, projMatrix, mvMatrix) {
         var mvMatrixInv = mat4.create(),
         normal = mat4.create();
 
-        mat4.inverse(renderingContext.mvMatrix, mvMatrixInv);
+        mat4.inverse(mvMatrix, mvMatrixInv);
         mat4.transpose(mvMatrixInv, normal);
 
-        renderingContext.gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projMatrix);
-        renderingContext.gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-        if(shaderProgram.nMatrixUniform != null) renderingContext.gl.uniformMatrix4fv(shaderProgram.nMatrixUniform, false, normal);
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, projMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        if(shaderProgram.nMatrixUniform != null) gl.uniformMatrix4fv(shaderProgram.nMatrixUniform, false, normal);
     }
 
     // ----------------------------------------------------------------------
 
-    function renderMesh(sceneJSON, renderingContext, camera) {
+    function renderMesh(renderingContext, camera) {
         try {
-            var obj = this, cameraRot, inverse, objTransp, icenter,
-               mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
-               projMatrix = mat4.create(camera.getCameraMatrices()[1]);
+            var obj = this,
+            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            gl = renderingContext.gl,
+            shaderProgram = renderingContext.shaderProgram;
 
-            renderingContext.gl.useProgram(renderingContext.shaderProgram);
-            renderingContext.gl.uniform1i(renderingContext.shaderProgram.uIsLine, false);
+            gl.useProgram(shaderProgram);
+            gl.uniform1i(shaderProgram.uIsLine, false);
 
             mvMatrix = mat4.multiply(mvMatrix, obj.matrix, mvMatrix);
 
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.vbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexPositionAttribute, obj.vbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.nbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexNormalAttribute, obj.nbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.cbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexColorAttribute, obj.cbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.vbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, obj.vbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.nbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, obj.nbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.cbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, obj.cbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
 
-            /// @todo pass matrices and change the signature of the function
-            (renderingContext, renderingContext.shaderProgram, projMatrix, mvMatrix);
+            setMatrixUniforms(gl, shaderProgram, projMatrix, mvMatrix);
 
-            renderingContext.gl.drawElements(renderingContext.gl.TRIANGLES, obj.numberOfIndex, renderingContext.gl.UNSIGNED_SHORT, 0);
-            mvMatrix = mvPopMatrix();
+            gl.drawElements(gl.TRIANGLES, obj.numberOfIndex, gl.UNSIGNED_SHORT, 0);
         } catch(error) {
             console.log(error);
         }
@@ -289,56 +289,36 @@
 
     // ----------------------------------------------------------------------
 
-    function renderLine(sceneJSON, renderingContext) {
+    function renderLine(renderingContext, camera) {
         try {
-            var obj = this, cameraRot, inverse, objTransp, icenter;
+            var obj = this,
+            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            gl = renderingContext.gl,
+            shaderProgram = renderingContext.shaderProgram;
 
-            renderingContext.gl.useProgram(renderingContext.shaderProgram);
+            gl.useProgram(shaderProgram);
 
-            renderingContext.gl.enable(renderingContext.gl.POLYGON_OFFSET_FILL);  //Avoid zfighting
-            renderingContext.gl.polygonOffset(-1.0, -1.0);
+            gl.enable(gl.POLYGON_OFFSET_FILL);  //Avoid zfighting
+            gl.polygonOffset(-1.0, -1.0);
 
-            renderingContext.gl.uniform1i(renderingContext.shaderProgram.uIsLine, true);
+            gl.uniform1i(shaderProgram.uIsLine, true);
 
-            cameraRot = mat4.toRotationMat(renderingContext.mvMatrix);
-            mat4.transpose(cameraRot);
-            inverse = mat4.create();
-            mat4.inverse(cameraRot, inverse);
-            objTransp = mat4.create(obj.matrix);
-            mat4.transpose(objTransp);
+            mvMatrix = mat4.multiply(mvMatrix, obj.matrix, mvMatrix);
 
-            icenter = [-sceneJSON.Center[0], -sceneJSON.Center[1], -sceneJSON.Center[2]];
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.lbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, obj.lbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.nbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, obj.nbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.cbuff);
+            gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, obj.cbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
 
-            mvPushMatrix(renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, renderingContext.transform.translation);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
+            setMatrixUniforms(gl, shaderProgram, projMatrix, mvMatrix);
 
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, sceneJSON.Center);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.scale(renderingContext.mvMatrix, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale], renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, renderingContext.transform.rotation, renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, icenter);
+            gl.drawElements(gl.LINES, obj.numberOfIndex, gl.UNSIGNED_SHORT, 0);
 
-            renderingContext.transform.rotation2 = renderingContext.mvMatrix;
-
-            mat4.multiply(renderingContext.mvMatrix, objTransp, renderingContext.mvMatrix);
-
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.lbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexPositionAttribute, obj.lbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.nbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexNormalAttribute, obj.nbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.cbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.shaderProgram.vertexColorAttribute, obj.cbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ELEMENT_ARRAY_BUFFER, obj.ibuff);
-
-            setMatrixUniforms(renderingContext, renderingContext.shaderProgram);
-
-            renderingContext.gl.drawElements(renderingContext.gl.LINES, obj.numberOfIndex, renderingContext.gl.UNSIGNED_SHORT, 0);
-            renderingContext.mvMatrix = mvPopMatrix();
-
-            renderingContext.gl.disable(renderingContext.gl.POLYGON_OFFSET_FILL);
+            gl.disable(gl.POLYGON_OFFSET_FILL);
         } catch(error) {
             console.log(error);
         }
@@ -346,53 +326,33 @@
 
     // ----------------------------------------------------------------------
 
-    function renderPoints(sceneJSON, renderingContext) {
+    function renderPoints(renderingContext, camera) {
         try {
-            var obj = this, cameraRot, inverse, objTransp, icenter;
+            var obj = this,
+            mvMatrix = mat4.create(camera.getCameraMatrices()[0]),
+            projMatrix = mat4.create(camera.getCameraMatrices()[1]),
+            gl = renderingContext.gl,
+            pointShaderProgram = renderingContext.pointShaderProgram;
 
-            renderingContext.gl.useProgram(renderingContext.pointShaderProgram);
+            gl.useProgram(pointShaderProgram);
 
-            renderingContext.gl.enable(renderingContext.gl.POLYGON_OFFSET_FILL);  //Avoid zfighting
-            renderingContext.gl.polygonOffset(-1.0, -1.0);
+            gl.enable(gl.POLYGON_OFFSET_FILL);  //Avoid zfighting
+            gl.polygonOffset(-1.0, -1.0);
 
-            renderingContext.gl.uniform1f(renderingContext.pointShaderProgram.uPointSize, 2.0);//Wendel
+            gl.uniform1f(pointShaderProgram.uPointSize, 2.0);
 
-            cameraRot = mat4.toRotationMat(renderingContext.mvMatrix);
-            mat4.transpose(cameraRot);
-            inverse = mat4.create();
-            mat4.inverse(cameraRot, inverse);
-            objTransp = mat4.create(obj.matrix);
-            mat4.transpose(objTransp);
+            mvMatrix = mat4.multiply(mvMatrix, obj.matrix, mvMatrix);
 
-            icenter = [-sceneJSON.Center[0], -sceneJSON.Center[1], -sceneJSON.Center[2]];
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.pbuff);
+            gl.vertexAttribPointer(pointShaderProgram.vertexPositionAttribute, obj.pbuff.itemSize, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, obj.cbuff);
+            gl.vertexAttribPointer(pointShaderProgram.vertexColorAttribute, obj.cbuff.itemSize, gl.FLOAT, false, 0, 0);
 
-            mvPushMatrix(renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, renderingContext.transform.translation);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
+            setMatrixUniforms(gl, pointShaderProgram, projMatrix, mvMatrix);
 
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, sceneJSON.Center);
-            mat4.multiply(renderingContext.mvMatrix, cameraRot, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.scale(renderingContext.mvMatrix, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale], renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, renderingContext.transform.rotation, renderingContext.mvMatrix);
-            mat4.multiply(renderingContext.mvMatrix, inverse, renderingContext.mvMatrix);
-            if(obj.layer == 0) mat4.translate(renderingContext.mvMatrix, icenter);
+            gl.drawArrays(gl.POINTS, 0, obj.numberOfPoints);
 
-            renderingContext.transfrom.rotation2 = renderingContext.mvMatrix;
-
-            mat4.multiply(renderingContext.mvMatrix, objTransp, renderingContext.mvMatrix);
-
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.pbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.pointShaderProgram.vertexPositionAttribute, obj.pbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-            renderingContext.gl.bindBuffer(renderingContext.gl.ARRAY_BUFFER, obj.cbuff);
-            renderingContext.gl.vertexAttribPointer(renderingContext.pointShaderProgram.vertexColorAttribute, obj.cbuff.itemSize, renderingContext.gl.FLOAT, false, 0, 0);
-
-            setMatrixUniforms(renderingContext, renderingContext.pointShaderProgram);
-
-            renderingContext.gl.drawArrays(renderingContext.gl.POINTS, 0, obj.numberOfPoints);
-            renderingContext.mvMatrix = mvPopMatrix();
-
-            renderingContext.gl.disable(renderingContext.gl.POLYGON_OFFSET_FILL);
+            gl.disable(gl.POLYGON_OFFSET_FILL);
         } catch(error) {
             console.log(error);
         }
@@ -400,7 +360,7 @@
 
     // ----------------------------------------------------------------------
 
-    function renderColorMap(sceneJSON, renderingContext) {
+    function renderColorMap(renderingContext, camera) {
         try {
             var obj = this, ctx = renderingContext.ctx2d, range, txt, color, c, v,
             size, pos, dx, dy, realSize, textSizeX, textSizeY, grad,
@@ -474,7 +434,7 @@
 
     // ----------------------------------------------------------------------
 
-    function renderBackground(sceneJSON, renderingContext) {
+    function renderBackground(renderingContext, camera) {
         try {
             var background = this, gl = renderingContext.gl, shaderProgram = renderingContext.shaderProgram;
 
@@ -537,14 +497,14 @@
         }
 
         // ------------------------------------------------------------------
-        function render(displayList, renderingContext) {
+        function render(displayList, renderingContext, camera) {
             var i, k, key, array;
             for(i in displayList) {
                 key = displayList[i];
                 if(objectIndex.hasOwnProperty(key)) {
                     array = objectIndex[key];
                     for(k in array) {
-                        array[k].render(sceneJSON, renderingContext);
+                        array[k].render(renderingContext, camera);
                     }
                 }
             }
@@ -589,16 +549,16 @@
 
             // --------------------------------------------------------------
 
-            renderTransparent: function(layer, renderingContext) {
+            renderTransparent: function(layer, renderingContext, camera) {
                 var displayList = getLayerDisplayList(layer).transparent;
-                return render(displayList, renderingContext);
+                return render(displayList, renderingContext, camera);
             },
 
             // --------------------------------------------------------------
 
-            renderSolid: function(layer, renderingContext) {
+            renderSolid: function(layer, renderingContext, camera) {
                 var displayList = getLayerDisplayList(layer).solid;
-                return render(displayList, renderingContext);
+                return render(displayList, renderingContext, camera);
             },
 
             // --------------------------------------------------------------
@@ -1005,23 +965,6 @@
     }
 
     // ----------------------------------------------------------------------
-
-    function mvPushMatrix(m) {
-        var copy = mat4.create();
-        mat4.set(m, copy);
-        mvMatrixStack.push(copy);
-    }
-
-    // ----------------------------------------------------------------------
-
-    function mvPopMatrix() {
-        if (mvMatrixStack.length == 0) {
-            throw "Invalid popMatrix!";
-        }
-        return mvMatrixStack.pop();
-    }
-
-    // ----------------------------------------------------------------------
     // Geometry Delivery renderer - factory method
     // ----------------------------------------------------------------------
 
@@ -1039,6 +982,8 @@
         renderer = $(divContainer).addClass(FACTORY_KEY).css(RENDERER_CSS).append($(canvas2D).css(RENDERER_CSS).css(RENDERER_CSS_2D)).append($(canvas3D).css(RENDERER_CSS).css(RENDERER_CSS_3D)),
         sceneJSON = null,
         objectHandler = create3DObjectHandler(),
+        cameraLayerZero = null,
+        otherCamera = [],
         mouseHandling = {
             button: null,
             lastX: 0,
@@ -1049,16 +994,7 @@
             gl: gl,
             ctx2d: ctx2d,
             shaderProgram: shaderProgram,
-            pointShaderProgram: pointShaderProgram,
-            camera : createCamera()
-//            mvMatrix: mat4.create(),
-//            pMatrix: mat4.create(),
-//            transform: {
-//                translation: [0.0, 0.0, 0.0],
-//                rotation: mat4.create(),
-//                rotation2: mat4.create(),
-//                scale: 1.0
-//            }
+            pointShaderProgram: pointShaderProgram
         },
         background = null;
 
@@ -1135,13 +1071,13 @@
 
         function drawScene() {
             try {
-                if (sceneJSON == null){
+                if (sceneJSON === null || cameraLayerZero === null){
                     return;
                 }
-                var currentTime = new Date().getTime(), deltaT,
-                width = renderer.width(), height = renderer.height(),
-                layer, localRenderer, localWidth, localHeight, localX, localY,
-                nbObjects = 0;
+                var localRenderer, localWidth, localHeight, localX, localY,
+                width = renderer.width(),
+                height = renderer.height(),
+                nbObjects = 0, layer, localCamera;
 
                 // Update frame rate
                 container.trigger({
@@ -1165,23 +1101,21 @@
                 // Draw background
                 gl.disable(gl.DEPTH_TEST);
                 if(background != null) {
-                    camera.enableOrtho();
-                    background.render(sceneJSON, renderingContext);
-                    camera.enablePerspective();
+                    cameraLayerZero.enableOrtho();
+                    background.render(renderingContext, cameraLayerZero);
+                    cameraLayerZero.enablePerspective();
                 }
                 gl.enable(gl.DEPTH_TEST);
 
                 // Clear 2D overlay canvas
                 ctx2d.clearRect(0, 0, width, height);
 
-                // @todo Get the view angle from the stream
-                camera.setViewAspect(width/height);
-
                 // Render each layer on top of each other (Starting with the background one)
                 for(layer = sceneJSON.Renderers.length - 1; layer >= 0; layer--) {
                     localRenderer = sceneJSON.Renderers[layer];
                     localWidth = localRenderer.size[0] - localRenderer.origin[0];
                     localHeight = localRenderer.size[1] - localRenderer.origin[1];
+                    localCamera = localRenderer.camera;
 
                     // Convert % to pixel based
                     localWidth *= width;
@@ -1191,28 +1125,21 @@
                     localX = (localX < 0) ? 0 : localX;
                     localY = (localY < 0) ? 0 : localY;
 
+                    // Update renderer camera aspect ratio
+                    localCamera.setViewAspect(width/height); // FIXME maybe use the local width/height
+
                     // Setup viewport
                     gl.viewport(localX, localY, localWidth, localHeight);
-                    camera.setCameraParameters(localRenderer.LookAt[0],
-                                               vec3.create(localRenderer.LookAt[7],
-                                                           localRenderer.LookAt[8],
-                                                           localRenderer.LookAt[9]),
-                                               vec3.create(localRenderer.LookAt[1],
-                                                           localRenderer.LookAt[2],
-                                                           localRenderer.LookAt[3]),
-                                               vec3.create(localRenderer.LookAt[4],
-                                                           localRenderer.LookAt[5],
-                                                           localRenderer.LookAt[6]));
 
                     // Render non-transparent objects for the current layer
-                    nbObjects += objectHandler.renderSolid(layer, renderingContext);
+                    nbObjects += objectHandler.renderSolid(layer, renderingContext, localCamera);
 
                     // Now render transparent objects
                     gl.enable(gl.BLEND);                //Enable transparency
                     gl.enable(gl.POLYGON_OFFSET_FILL);  //Avoid zfighting
                     gl.polygonOffset(-1.0, -1.0);
 
-                    nbObjects += objectHandler.renderTransparent(layer, renderingContext);
+                    nbObjects += objectHandler.renderTransparent(layer, renderingContext, localCamera);
 
                     gl.disable(gl.POLYGON_OFFSET_FILL);
                     gl.disable(gl.BLEND);
@@ -1244,35 +1171,30 @@
                 }
 
                 // Local variables
-                var bgColor1 = [0,0,0], bgColor2 = [0,0,0];
+                var bgColor1 = [0,0,0], bgColor2 = [0,0,0], renderer;
 
-                // Update Background (Layer 0)
+                // Create camera for each renderer + handle Background (Layer 0)
+                otherCamera = [];
                 for(var idx = 0; idx < sceneJSON.Renderers.length; idx++) {
-                    if(sceneJSON.Renderers[idx].layer == 0) {
-                        camera.lookAt = sceneJSON.Renderers[idx].LookAt;
-                        bgColor1 = bgColor2 = sceneJSON.Renderers[idx].Background1;
-                        if(typeof(sceneJSON.Renderers[idx].Background2) != "undefined") {
-                            bgColor2 = sceneJSON.Renderers[idx].Background2;
+                    renderer = sceneJSON.Renderers[idx];
+                    renderer.camera = createCamera();
+                    renderer.camera.setCameraParameters( renderer.LookAt[0],
+                        [renderer.LookAt[7], renderer.LookAt[8], renderer.LookAt[9]],
+                        [renderer.LookAt[1], renderer.LookAt[2], renderer.LookAt[3]],
+                        [renderer.LookAt[4], renderer.LookAt[5], renderer.LookAt[6]]);
+
+                    // Custom handling of layer 0
+                    if(renderer.layer === 0) {
+                        cameraLayerZero = renderer.camera;
+                        bgColor1 = bgColor2 = renderer.Background1;
+                        if(typeof(renderer.Background2) != "undefined") {
+                            bgColor2 = renderer.Background2;
                         }
+                    } else {
+                        otherCamera.push(renderer.camera);
                     }
                 }
                 background = buildBackground(gl, bgColor1, bgColor2);
-
-                // Handle camera position
-                if (JSON.stringify(oldLookAt) != JSON.stringify(camera.lookAt)) {
-                    renderingContext.transform.translation = [0.0, 0.0, 0.0];
-                    renderingContext.transform.scale = 1.0;
-                    mat4.identity(renderingContext.transform.rotation);
-
-                    camera.up = [camera.lookAt[4], camera.lookAt[5], camera.lookAt[6]];
-                    camera.z_dir = [
-                    camera.lookAt[1]-camera.lookAt[7],
-                    camera.lookAt[2]-camera.lookAt[8],
-                    camera.lookAt[3]-camera.lookAt[9]];
-                    vec3.normalize(camera.z_dir, camera.z_dir);
-                    vec3.cross(camera.z_dir, camera.up, camera.right);
-                }
-                oldLookAt = camera.lookAt;
 
                 // Update the list of object to render
                 objectHandler.updateDisplayList(sceneJSON);
@@ -1285,57 +1207,6 @@
             } catch(error) {
                 console.log(error);
             }
-        }
-
-        // ------------------------------------------------------------------
-
-        function updateCamera() {
-            if(sceneJSON === null || typeof(sceneJSON) === "undefined") {
-                return;
-            }
-
-            var pos = [camera.lookAt[7], camera.lookAt[8], camera.lookAt[9]],
-            up  = [camera.lookAt[4], camera.lookAt[5], camera.lookAt[6]],
-            fp  = [camera.lookAt[1], camera.lookAt[2], camera.lookAt[3]],
-            tt  = [renderingContext.transform.translation[0], renderingContext.transform.translation[1], 0.0],
-            center = [sceneJSON.Center[0], sceneJSON.Center[1], sceneJSON.Center[2]],
-            cameraRot, inverse, inv,
-            viewId = Number(options.view);
-
-            cameraRot = mat4.toRotationMat(renderingContext.mvMatrix);
-            mat4.transpose(cameraRot);
-            inverse = mat4.create();
-            mat4.inverse(cameraRot, inverse);
-
-            inv = mat4.create();
-            mat4.identity(inv);
-            mat4.multiply(inv, cameraRot, inv);
-            mat4.scale(inv, [renderingContext.transform.scale, renderingContext.transform.scale, renderingContext.transform.scale], inv);
-            mat4.multiply(inv, renderingContext.transform.rotation, inv);
-            mat4.multiply(inv, inverse, inv);
-
-            mat4.inverse(inv, inv);
-            fp = vec3.subtract(fp, center, fp);
-            pos = vec3.subtract(pos, center, pos);
-            mat4.multiplyVec3(inv, fp, fp);
-            mat4.multiplyVec3(inv, pos, pos);
-            mat4.multiplyVec3(inv, up, up);
-            fp = vec3.add(fp, center, fp);
-            pos = vec3.add(pos, center, pos);
-            vec3.normalize(up, up);
-
-            tt2 = [0, 0, 0];
-            tt2[0] += tt[0]*camera.right[0];
-            tt2[1] += tt[0]*camera.right[1];
-            tt2[2] += tt[0]*camera.right[2];
-            tt2[0] += tt[1]*camera.up[0];
-            tt2[1] += tt[1]*camera.up[1];
-            tt2[2] += tt[1]*camera.up[2];
-
-            vec3.subtract(pos, tt2, pos);
-            vec3.subtract(fp , tt2, fp);
-
-        // this.session.call("pv:updateCamera", viewId, fp, up, pos);
         }
 
         // ------------------------------------------------------------------
@@ -1362,33 +1233,23 @@
                     mouseHandling.lastY = event.clientY;
                 } else if (event.action === 'up') {
                     mouseHandling.button = null;
-                } else if (event.action === 'move' && mouseHandling.button != null) {
-                    var newX = event.clientX,
-                    newY = event.clientY,
-                    deltaX = newX - mouseHandling.lastMouseX,
-                    deltaY = newY - mouseHandling.lastMouseY,
-                    rX, rY, mx, my, z, pan;
+                } else if (event.action === 'move' && mouseHandling.button != null && cameraLayerZero != null) {
+                    var newX = event.clientX, newY = event.clientY,
+                    deltaX = newX - mouseHandling.lastX,
+                    deltaY = newY - mouseHandling.lastY;
 
-                    if (mouseHandling.button == 0){
-                        rX = deltaX/50.0;
-                        rY = deltaY/50.0;
-                        mx = mat4.create();
-                        mat4.identity(mx);
-                        mat4.rotate(mx, rX, [0, 1, 0]);
-                        my = mat4.create();
-                        mat4.identity(my);
-                        mat4.rotate(my, rY, [1, 0, 0]);
-                        mat4.multiply(mx, my, mx);
-                        mat4.multiply(mx, renderingContext.transform.rotation, renderingContext.transform.rotation);
-                    } else if (event.button == 1){
-                        z = Math.abs(sceneJSON.Renderers[0].LookAt[9]-sceneJSON.Renderers[0].LookAt[3]);
-                        pan = z/renderingContext.transform.scale;
-                        this.translation[0] += pan*deltaX/1500.0;
-                        this.translation[1] -= pan*deltaY/1500.0;
-                    } else if (event.button == 2){
-                    //renderingContext.transform.scale += renderingContext.transform.scale*(deltaY)/200.0;
-                    } else {
-                    //renderingContext.transform.scale += renderingContext.transform.scale*(deltaY)/200.0;
+                    if (mouseHandling.button === 1) {
+                        console.log('Rotate ' + deltaX + " " + deltaY);
+                        cameraLayerZero.rotate(deltaX, deltaY);
+                        for(var i in otherCamera) {
+                            otherCamera[i].rotate(deltaX, deltaY);
+                        }
+                    } else if (mouseHandling.button === 2) {
+                        console.log('pan ' + deltaX + " " + deltaY);
+                        cameraLayerZero.pan(deltaX, deltaY);
+                    } else if (mouseHandling.button === 3) {
+                        console.log('zoom ' + deltaX + " " + deltaY);
+                        cameraLayerZero.zoom(deltaX, deltaY);
                     }
                     mouseHandling.lastX = newX;
                     mouseHandling.lastX = newY;
@@ -1412,7 +1273,6 @@
 
                 // Ready to render data
                 fetchScene();
-                updateCamera();
                 drawScene();
             }
         });
@@ -1421,89 +1281,106 @@
     // ----------------------------------------------------------------------
     // Camera object
     // ----------------------------------------------------------------------
+
     function createCamera() {
-      var viewAngle = 30.0,
-          aspect = 1.0,
-          left = -1.0,
-          right = 1.0,
-          bottom = -1.0,
-          top = 1.0,
-          near = 0.01,
-          far = 10000.0,
-          position = [0.0, 0.0, 0.0],
-          focalPoint = [0.0, 0.0, -1.0],
-          viewUp = [0.0, 1.0, 0.0],
-          rightDir = [1.0, 0.0, 0.0],
-          projectionMatrix = mat4.create(),
-          modelViewMatrix = mat4.create(),
-          modified = true;
+        var viewAngle = 30.0,
+        aspect = 1.0,
+        left = -1.0,
+        right = 1.0,
+        bottom = -1.0,
+        top = 1.0,
+        near = 0.01,
+        far = 10000.0,
+        position = [0.0, 0.0, 0.0],
+        focalPoint = [0.0, 0.0, -1.0],
+        viewUp = [0.0, 1.0, 0.0],
+        rightDir = [1.0, 0.0, 0.0],
+        projectionMatrix = mat4.create(),
+        modelViewMatrix = mat4.create(),
+        modified = true;
 
-      // Initialize to identity (just to be safe)
-      mat4.identity(modelViewMatrix);
-      mat4.identity(projectionMatrix);
+        // Initialize to identity (just to be safe)
+        mat4.identity(modelViewMatrix);
+        mat4.identity(projectionMatrix);
 
-      function computeOrthogonalAxes() {
-        var dir = new vec3.create();
-        vec3.direction(focalPoint, position, dir);
-        vec3.normalize(dir);
-        vec3.normalize(viewUp);
-        vec3.cross(dir, viewUp, rightDir);
-        vec3.normalize(rightDir);
-      };
+        function computeOrthogonalAxes() {
+            var dir = new vec3.create();
+            vec3.direction(focalPoint, position, dir);
+            vec3.normalize(dir);
+            vec3.normalize(viewUp);
+            vec3.cross(dir, viewUp, rightDir);
+            vec3.normalize(rightDir);
+        };
 
-      return {
-        setCameraParameters : function(angle, pos, focal, up) {
-          viewAngle = angle;
-          position = pos;
-          focalPoint = focal;
-          viewUp = up;
-          modified = true;
-        },
-        setViewAspect : function(val) {
-          aspect = val;
-          modified = true;
-        },
-        enableOrtho : function() {
-          perspective = false;
-          modified = true;
-        },
-        enablePerspective : function() {
-          perspective = true;
-          modified = true;
-        },
-        zoom : function(dx, dy) {
-          modified = true;
-        },
-        pan : function(dx, dy) {
-          position[0] += dx;
-          position[1] += dy;
-          focalPoint[0] += dx;
-          focalPoint[1] += dy;
+        return {
+            setCameraParameters : function(angle, pos, focal, up) {
+                console.log("[CAMERA] angle: " + angle + " position: " + pos + " focal: " + focal + " up: " + up );
+                viewAngle = angle;
+                position = pos;
+                focalPoint = focal;
+                viewUp = up;
+                modified = true;
+            },
+            setViewAspect : function(val) {
+                aspect = val;
+                modified = true;
+            },
+            enableOrtho : function() {
+                perspective = false;
+                modified = true;
+            },
+            enablePerspective : function() {
+                perspective = true;
+                modified = true;
+            },
+            zoom : function(dx, dy) {
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                modified = true;
+            },
+            pan : function(dx, dy) {
+                position[0] += dx;
+                position[1] += dy;
+                focalPoint[0] += dx;
+                focalPoint[1] += dy;
 
-          modified = true;
-        },
-        rotate : function(dx, dy) {
-          modified = true;
-        },
-        getCameraMatrices : function() {
-          if (modified) {
+                modified = true;
+            },
+            rotate : function(dx, dy) {
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                // FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME  FIXME
+                modified = true;
+            },
+            getCameraMatrices : function() {
+                if (modified) {
+                    // Compute project matrix
+                    if (perspective) {
+                        mat4.perspective(viewAngle, aspect, near, far, projectionMatrix);
+                    } else {
+                        mat4.ortho(left, right, bottom, top, near, far, projectionMatrix);
+                    }
 
-            // Compute project matrix
-            if (perspective) {
-              mat4.perspective(viewAngle, aspect, near, far, projectionMatrix);
-            } else {
-              mat4.ortho(left, right, bottom, top, near, far, projectionMatrix);
+                    // Compute modelview matrix
+                    computeOrthogonalAxes();
+                    mat4.lookAt(position, focalPoint, viewUp, modelViewMatrix);
+                    modified = false;
+                };
+
+                return [projectionMatrix, modelViewMatrix];
             }
-
-            // Compute modelview matrix
-            computeOrthogonalAxes();
-            mat4.lookAt(position, focalPoint, viewUp, modelViewMatrix);
-            modified = false;
-          };
-
-          return [projectionMatrix, modelViewMatrix];
-        }
-      };
+        };
     }
 
     // ----------------------------------------------------------------------
