@@ -179,14 +179,12 @@
                 $("#togglestats").click(function() {
                     var this$ = $(this);
                     if (this$.hasClass("on")) {
-                        if (pv.stats && pv.viewport) {
-                            pv.stats.stop();
-                            pv.viewport.showStatistics(null);
+                        if (pv.viewport) {
+                            pv.viewport.showStatistics(false);
                         }
                     } else {
-                        if (pv.stats && pv.viewport) {
-                            pv.stats.start();
-                            pv.viewport.showStatistics(pv.stats);
+                        if (pv.viewport) {
+                            pv.viewport.showStatistics(true);
                         }
                     }
                     this$.toggleClass("on");
@@ -241,10 +239,8 @@
                     paraview.connect(connection,
                     function(conn) {
                         pv.connection = conn;
-                        pv.viewport = paraview.createViewport(conn.session);
+                        pv.viewport = paraview.createViewport({session:conn.session});
                         pv.viewport.bind("#viewport");
-                        pv.stats = paraview.createViewportStatistics(pv.viewport);
-                        pv.stats.stop();
 
                         // setup the chart for rendering.
                         //pv.chart = $("#chart svg").lineChart({connection : conn});

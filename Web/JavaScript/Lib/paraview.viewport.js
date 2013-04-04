@@ -503,7 +503,7 @@
              * @member pv.Viewport
              * @param {Boolean} visible
              */
-            statVisibility: function(isVisible) {
+            showStatistics: function(isVisible) {
                 if(isVisible) {
                     statContainer.show();
                 } else {

@@ -76,7 +76,7 @@
             } else if(action === 'toggleCenterOfRotation') {
                 viewport.updateCenterAxesVisibility(me.toggleClass('on').hasClass('on'));
             } else if(action === 'toggleInfo') {
-                viewport.statVisibility(me.toggleClass('on').hasClass('on'));
+                viewport.showStatistics(me.toggleClass('on').hasClass('on'));
             }
         }
 
