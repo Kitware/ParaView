@@ -44,14 +44,12 @@ components for a ParaViewWeb deployment.
     $ mkdir build install
     $ git clone git://paraview.org/stage/ParaView.git src
     $ cd src
-    $ git checkout -b ParaViewWeb2.0 origin/ParaViewWeb2.0
     $ git submodule update --init
     $ cd ../build
     $ ccmake ../src
 
         PARAVIEW_ENABLE_PYTHON      ON
         PARAVIEW_BUILD_QT_GUI       OFF
-        Module_vtkParaViewWeb       ON
         CMAKE_INSTALL_PREFIX        /.../ParaView/install
 
     $ make
@@ -59,19 +57,12 @@ components for a ParaViewWeb deployment.
 
 ### ParaViewWeb
 
-In this example, ParaViewWeb is composed of Python scripts (web server),
-a JavaScript library, and a set of sample web applications. In order to install
-it, download the following [archive](guides/apache_setup/data/ParaViewWeb.tgz).
+In this example, ParaViewWeb is directly embedded inside the ParaView repository
+and building ParaView will create a web directory that should be served by apache.
+In the Apache configuration, we use the following path '/home/pvw/ParaViewWeb/www'.
+Therefore, if you want to keep it that way you should execute the following command line.
 
-    $ cd ParaViewWeb
-    $ mkdir web-server
-    $ cd web-server
-    $ curl http://pvw.kitware.com/guides/apache_setup/data/ParaViewWeb.tgz -O
-    $ tar xvzf ParaViewWeb.tgz
-
-After unarchiving the file, there will be two main directories, one for the pvpython
-modules (server) and one for the static web content (web-content). The static web
-content directory will need to be served by a session manager like the one below.
+    $ cp -r /home/pvw/ParaViewWeb/build/www /home/pvw/ParaViewWeb/www
 
 ### Session Manager
 
