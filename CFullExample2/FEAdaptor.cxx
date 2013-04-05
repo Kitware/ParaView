@@ -105,7 +105,7 @@ void CatalystCoProcess(unsigned int numberOfPoints, double* pointsData,
   vtkCPDataDescription* dataDescription = vtkCPAdaptorAPI::GetCoProcessorData();
   if(processor == NULL || dataDescription == NULL)
     {
-    cerr << "ERROR: Catalyst not proper initialized.\n";
+    cerr << "ERROR: Catalyst not properly initialized.\n";
     return;
     }
 

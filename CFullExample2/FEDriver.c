@@ -38,15 +38,15 @@ int main(int argc, char* argv[])
 
 #ifdef USE_CATALYST
   int fileNameLength = 0;
-  if(argc > 2)
-    {
-    printf("Warning: this example takes at most one Python script.\n");
-    }
-  else
-    {
-    fileNameLength = strlen(argv[1]);
-    }
+  fileNameLength = strlen(argv[1]);
   coprocessorinitializewithpython(argv[1], &fileNameLength);
+  int i;
+  for(i=2;i<argc;i++)
+    {
+    // Add in any other Python script pipelines that are passed in.
+    fileNameLength = strlen(argv[i]);
+    coprocessoraddpythonscript(argv[i], &fileNameLength);
+    }
 #endif
   unsigned int numberOfTimeSteps = 100;
   unsigned int timeStep;
