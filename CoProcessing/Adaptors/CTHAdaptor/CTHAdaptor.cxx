@@ -33,12 +33,12 @@ void handler (int sig) {
 // c functions prototyped in pvspy_public.h.  
 // called from within spy_fortran.c in cth
 //---------------------------------------------------------------------------
-void pvspy_qa(char *qadate, char *qatime, char *qajobn)
+void pvspy_qa(char * /*qadate*/, char * /*qatime*/, char * /*qajobn*/)
 {
   // vtkSMPVSpy::GetSingletonInstance ()->qa (qadate, qatime, qajobn);
 }
 
-void pvspy_fil(char *filename, int len, char *runid, int *error)
+void pvspy_fil(char *filename, int len, char * /*runid*/, int * /*error*/)
 {
   // signal (SIGSEGV, handler);
 
@@ -66,8 +66,7 @@ void pvspy_fil(char *filename, int len, char *runid, int *error)
     len = 0;
     ifstream is;
     is.open (filename, ifstream::in);
-    int start = 0;
-    while (is.good ()) 
+    uhile (is.good ()) 
       {
       is.getline(line, 256);
       char *tok = strtok (line, " ");
@@ -98,7 +97,7 @@ int pvspy_vizcheck(int cycle, double ptime)
   return coProcessor->RequestDataDescription (coProcessorData);
 }
 
-void pvspy_viz(int cycle, double ptime, double pdt, int, int)
+void pvspy_viz(int cycle, double ptime, double /*pdt*/, int, int)
 {
   coProcessorData->SetTimeData (ptime, cycle);
   if (coProcessor->RequestDataDescription (coProcessorData)) 
@@ -174,7 +173,6 @@ void pvspy_sta(int block_id, int allocated, int active,
                int nbypa11, int nbypa21, int nbypa12, int nbypa22,
                int nbzpa11, int nbzpa21, int nbzpa12, int nbzpa22)
 {
-/*
   int np[24] = {
        npxma11, npxma21, npxma12, npxma22,
        npyma11, npyma21, npyma12, npyma22,
@@ -190,16 +188,17 @@ void pvspy_sta(int block_id, int allocated, int active,
        nbxpa11, nbxpa21, nbxpa12, nbxpa22,
        nbypa11, nbypa21, nbypa12, nbypa22,
        nbzpa11, nbzpa21, nbzpa12, nbzpa22 };
-*/
+/*
   int np[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   int nb[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+*/
 
   gSource.UpdateBlock(block_id, allocated, active, level, max_level,
-                       bxbot, bxtop, bybot, bytop, bzbot, bztop, np, nb);
+                      bxbot, bxtop, bybot, bytop, bzbot, bztop, np, nb);
 }
 
-void pvspy_trc(int num, double *xt, double *yt, double *zt, 
-               int *id, int *lt, int *it, int *jt, int *kt)
+void pvspy_trc(int /*num*/, double * /*xt*/, double * /*yt*/, double * /*zt*/, 
+               int * /*id*/, int * /*lt*/, int * /*it*/, int * /*jt*/, int * /*kt*/)
 {
   // gSource->InitializeTracers (
                   // num, xt, yt, zt, id, lt, it, jk, kt);
