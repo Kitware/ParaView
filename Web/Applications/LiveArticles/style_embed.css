@@ -23,6 +23,7 @@ html, body {
     position: absolute;
     bottom: 2px;
     right : 2px;
+    z-index: 2000;
 }
 
 .transparent {
@@ -49,6 +50,7 @@ button:active {
     width: 150px;
     right: 10px;
     bottom: 10px;
+    z-index: 2000;
 }
 
 button.vertical-center {
@@ -72,4 +74,18 @@ button.vertical-center {
 
 .clicktostart:active {
     color: red;
+}
+
+table.viewport-stat {
+    color: #ffffff;
+    border: 0;
+    width: 80%;
+}
+
+table.viewport-stat td {
+    width: 20%;
+}
+
+table.viewport-stat td.label {
+    text-align: right;
 }

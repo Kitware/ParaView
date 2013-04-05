@@ -13,6 +13,8 @@
     + "<li action='resetCamera' class='action' alt='Reset camera' title='Reset camera'><div class='icon'></div></li>"
     + "<li action='toggleOrientationAxis' class='action on' alt='Toggle visibility of orientation axis' title='Toggle visibility of orientation axis'><div class='icon'></div></li>"
     + "<li action='toggleCenterOfRotation' class='action on' alt='Toggle visibility of center of rotation' title='Toggle visibility of center of rotation'><div class='icon'></div></li>"
+    + "<li action='image' class='switch' other='webgl' alt='Toggle delivery mechanism from Image to Geometry' title='Toggle delivery mechanism from Image to Geometry'><div class='icon'></div></li>"
+    + "<li action='toggleInfo' class='action' alt='Toggle viewport information' title='Toggle viewport information'><div class='icon'></div></li>"
     + "</ul>\n",
     VIEWPORT_DATA_KEY = 'pvViewport';
 
@@ -45,6 +47,15 @@
 
             // Attach listeners
             $('li.action', me).bind('click', actionListener);
+            $('li.switch', me).bind('click', switchListener).hide();
+
+            // Make sure webgl is enable to show the switch button
+            try {
+                if(paraview.ViewportFactory.webgl) {
+                    $('li.switch', me).show();
+                }
+            } catch(error) {}
+
         });
     };
 
@@ -64,6 +75,8 @@
                 viewport.updateOrientationAxesVisibility(me.toggleClass('on').hasClass('on'));
             } else if(action === 'toggleCenterOfRotation') {
                 viewport.updateCenterAxesVisibility(me.toggleClass('on').hasClass('on'));
+            } else if(action === 'toggleInfo') {
+                viewport.showStatistics(me.toggleClass('on').hasClass('on'));
             }
         }
 
@@ -80,6 +93,26 @@
         rootWidget.trigger({
             type: 'viewport-action',
             action: action,
+            status: true
+        });
+    }
+
+    // =======================================================================
+
+    function switchListener() {
+        var me = $(this), rootWidget = getToolbarWiget(me),
+        viewport = getViewport(rootWidget),
+        action = me.attr('action'),
+        other = me.attr('other');
+
+        if(viewport != null && viewport != undefined) {
+            me.attr('action', other).attr('other', action);
+            viewport.setActiveRenderer(other);
+        }
+
+        rootWidget.trigger({
+            type: 'viewport-action',
+            action: other,
             status: true
         });
     }

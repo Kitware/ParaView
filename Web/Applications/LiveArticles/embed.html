@@ -47,16 +47,14 @@
                             var anchor = selectedItem.find("a");
                             if (selectedItem.hasClass("show") === true) {
                                 anchor.text("Hide Statistics");
-                                if (pv.stats && pv.viewport) {
-                                    pv.stats.start();
-                                    pv.viewport.showStatistics(pv.stats);
+                                if (pv.viewport) {
+                                    pv.viewport.showStatistics(true);
                                 }
 
                             } else {
                                 anchor.text("Show Statistics");
-                                if (pv.stats && pv.viewport) {
-                                    pv.stats.stop();
-                                    pv.viewport.showStatistics(null);
+                                if (pv.viewport) {
+                                    pv.viewport.showStatistics(false);
                                 }
                             }
                             selectedItem.toggleClass("show");
@@ -128,10 +126,8 @@
                     paraview.connect(connection,
                     function(conn) {
                         pv.connection = conn;
-                        pv.viewport = paraview.createViewport(conn.session);
+                        pv.viewport = paraview.createViewport({session:conn.session});
                         pv.viewport.bind("#viewport");
-                        pv.stats = paraview.createViewportStatistics(pv.viewport);
-                        pv.stats.stop();
 
                         var filePath= getParameter("data");
                         if (filePath !== "") {

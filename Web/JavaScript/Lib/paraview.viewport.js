@@ -9,34 +9,62 @@
  */
 (function (GLOBAL, $) {
 
+    // ----------------------------------------------------------------------
+    // Viewport constants
+    // ----------------------------------------------------------------------
+
+    var DEFAULT_RENDERERS_CONTAINER_HTML = "<div class='renderers'></div>",
+    DEFAULT_RENDERERS_CONTAINER_CSS = {
+        "position": "absolute",
+        "top": "0px",
+        "left": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "z-index" : "0",
+        "overflow": "hidden"
+    },
+
+    DEFAULT_MOUSE_LISTENER_HTML = "<div class='mouse-listener'></div>",
+    DEFAULT_MOUSE_LISTENER_CSS = {
+        "position": "absolute",
+        "top": "0px",
+        "left": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "z-index" : "1000"
+    },
+
+    DEFAULT_STATISTIC_HTML = "<div class='statistics'></div>",
+    DEFAULT_STATISTIC_CSS = {
+        "position": "absolute",
+        "top": "0px",
+        "left": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "z-index" : "999",
+        "display" : "none"
+    },
+
+    module = {},
+
     /**
      * @class pv.ViewPortConfig
      * Configuration object used to create a viewport.
-     *
-     *     DEFAULT_VALUES = {
-     *       useCanvas: true,
-     *       view: -1,
-     *       enableInteractions: true,
-     *       interactiveQuality: 30,
-     *       stillQuality: 100
-     *     }
      */
-    var DEFAULT_VIEWPORT_OPTIONS = {
+    DEFAULT_VIEWPORT_OPTIONS = {
         /**
          * @member pv.ViewPortConfig
-         * @property {Boolean} useCanvas
-         * True by default to benefit of HTML5 Canvas tag. If turned off, then
-         * basic image tag will be used. But such tag seems to induce flickering
-         * inside Firefox.
+         * @property {pv.Session} session
+         * Object used to communicate with the remote server.
          *
-         * Default: true
+         * Default: null but MUST BE OVERRIDE !!!
          */
-        useCanvas: true,
+        session: null,
         /**
          * @member pv.ViewPortConfig
          * @property {Number} view
          * Specify the GlobalID of the view that we want to render. By default,
-         * set to -1 to the active view will be used.
+         * set to -1 to use the active view.
          *
          * Default: -1
          */
@@ -50,505 +78,391 @@
          * Default: true
          */
         enableInteractions: true,
-        /**
-         * @member pv.ViewPortConfig
-         * @property {Number} interactiveQuality
-         * Compression quality that should be used to encode the image on the
-         * server side while interacting.
-         *
-         * Default: 30
-         */
-        interactiveQuality: 30,
-        /**
-         * @member pv.ViewPortConfig
-         * @property {Number} stillQuality
-         * Compression quality that should be used to encode the image on the
-         * server side when we stoped interacting.
-         *
-         * Default: 100
-         */
-        stillQuality: 100
 
-    }, module = {};
+        /**
+         * @member pv.ViewPortConfig
+         * @property {String} renderer
+         * Name of the renderer to be used. Can only be 'image' or 'webgl'.
+         *
+         * Default: 'image'
+         */
+        renderer: 'image'
+    };
+
+    // ----------------------------------------------------------------------
+    // Mouse interaction helper methods for viewport
+    // ----------------------------------------------------------------------
+
+    function preventDefault(event) {
+        event.preventDefault();
+    }
+
+    // ----------------------------------------------------------------------
+
+    function attachMouseListener(mouseListenerContainer, renderersContainer) {
+        var current_button = null;
+
+        // Internal method used to pre-process the interaction to standardise it
+        // for a ParaView usage.
+        function mouseInteraction(event) {
+            if(event.hasOwnProperty("type")) {
+                if(event.type === 'mouseup') {
+                    current_button = null;
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'up',
+                        current_button: current_button
+                    }));
+                } else if(event.type === 'mousedown') {
+                    current_button = event.which;
+
+                    // Override button if modifier is used
+                    // Middle: Alt - Right: Shift
+                    if(event.shiftKey) {
+                        current_button = 3;
+                        event.shiftKey = false;
+                    } else if(event.altKey) {
+                        current_button = 2;
+                        event.altKey = false;
+                    }
+
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'down',
+                        current_button: current_button
+                    }));
+                } else if(event.type === 'mousemove' && current_button != null) {
+                    renderersContainer.trigger($.extend(event, {
+                        type: 'mouse',
+                        action: 'move',
+                        current_button: current_button
+                    }));
+                }
+            }
+        }
+
+        // Bind listener to UI container
+        mouseListenerContainer.bind("contextmenu click mouseover", preventDefault);
+        mouseListenerContainer.bind('mousedown mouseup mousemove', mouseInteraction);
+    }
+
+    // ----------------------------------------------------------------------
+    // Viewport statistic manager
+    // ----------------------------------------------------------------------
+
+    function createStatisticManager() {
+        var statistics = {}, formatters = {};
+
+        // Fill stat formatters
+        for(var factoryKey in paraview.ViewportFactory) {
+            var factory = paraview.ViewportFactory[factoryKey];
+            if(factory.hasOwnProperty('stats')) {
+                for(var key in factory.stats) {
+                    formatters[key] =  factory.stats[key];
+                }
+            }
+        }
+
+        function handleEvent(event) {
+            var id = event.stat_id,
+            value = event.stat_value,
+            statObject = null;
+
+            if(!statistics.hasOwnProperty(id) && formatters.hasOwnProperty(id)) {
+                if(formatters[id].type === 'time') {
+                    statObject = statistics[id] = createTimeValueRecord();
+                } else if (formatters[id].type === 'value') {
+                    statObject = statistics[id] = createValueRecord();
+                }
+            } else {
+                statObject = statistics[id];
+            }
+
+            if(statObject != null) {
+                statObject.record(value);
+            }
+        }
+
+        // ------------------------------------------------------------------
+
+        function toHTML() {
+            var buffer = createBuffer(), hasContent = false, key, formater, stat,
+            min, max;
+
+            // Extract stat data
+            buffer.append("<table class='viewport-stat'>");
+            buffer.append("<tr class='stat-header'><td class='label'></td><td class='value'>Current</td><td class='min'>Min</td><td class='max'>Max</td><td class='avg'>Average</td></tr>");
+            for(key in statistics) {
+                if(formatters.hasOwnProperty(key) && statistics[key].valid) {
+                    formater = formatters[key];
+                    stat = statistics[key];
+                    hasContent = true;
+
+                    // The functiion may swap the order
+                    min = formater.convert(stat.min);
+                    max = formater.convert(stat.max);
+
+                    buffer.append("<tr><td class='label'>");
+                    buffer.append(formater.label);
+                    buffer.append("</td><td class='value'>");
+                    buffer.append(formater.convert(stat.value));
+                    buffer.append("</td><td class='min'>");
+                    buffer.append((min < max) ? min : max);
+                    buffer.append("</td><td class='max'>");
+                    buffer.append((min > max) ? min : max);
+                    buffer.append("</td><td class='avg'>");
+                    buffer.append(formater.convert(stat.getAverageValue()));
+                    buffer.append("</td></tr>");
+                }
+            }
+            buffer.append("</table>");
+
+            return hasContent ? buffer.toString() : "";
+        }
+
+        // ------------------------------------------------------------------
+
+        return {
+            eventHandler: handleEvent,
+            toHTML: toHTML,
+            reset: function() {
+                statistics = {};
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createBuffer() {
+        var idx = -1, buffer = [];
+        return {
+            clear: function(){
+                idx = -1;
+                buffer = [];
+            },
+            append: function(str) {
+                buffer[++idx] = str;
+                return this;
+            },
+            toString: function() {
+                return buffer.join('');
+            }
+        };
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createTimeValueRecord() {
+        var lastTime, sum, count;
+
+        // Default values
+        lastTime = 0;
+        sum = 0;
+
+        return {
+            value: 0.0,
+            valid: false,
+            min: +1000000000.0,
+            max: -1000000000.0,
+
+            record: function(v) {
+                if(v === 0) {
+                    this.start();
+                } else if (v === 1) {
+                    this.stop();
+                }
+            },
+
+            start: function() {
+                lastTime = new Date().getTime();
+            },
+
+            stop: function() {
+                if(lastTime != 0) {
+                    this.valid = true;
+                    var time = new Date().getTime();
+                    this.value = time - lastTime;
+                    this.min = (this.min < this.value) ? this.min : this.value;
+                    this.max = (this.max > this.value) ? this.max : this.value;
+                    //
+                    sum += this.value;
+                    count++;
+                }
+            },
+
+            reset: function() {
+                count = 0;
+                sum = 0;
+                lastTime = 0;
+                this.value = 0;
+                this.min = +1000000000.0;
+                this.max = -1000000000.0;
+                this.valid = false;
+            },
+
+            getAverageValue: function() {
+                if(count == 0) {
+                    return 0;
+                }
+                return (sum / count);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+
+    function createValueRecord() {
+        var sum, count;
+
+        return {
+            value: 0.0,
+            valid: false,
+            min: +1000000000.0,
+            max: -1000000000.0,
+
+            record: function(v) {
+                this.valid = true;
+                this.value = v;
+                this.min = (this.min < this.value) ? this.min : this.value;
+                this.max = (this.max > this.value) ? this.max : this.value;
+                //
+                sum += this.value;
+                count++;
+            },
+
+            reset: function() {
+                count = 0;
+                sum = 0;
+                this.value = 0;
+                this.min = +1000000000.0;
+                this.max = -1000000000.0;
+                this.valid = false;
+            },
+
+            getAverageValue: function() {
+                if(count === 0) {
+                    return 0;
+                }
+                return (sum / count);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Viewport container definition
+    // ----------------------------------------------------------------------
 
     /**
      * Create a new viewport for a ParaView View.
      * The options are defined by {@link pv.ViewPortConfig}.
-     *
-     * @member paraview.viewport
-     *
-     * @param {Object} session
-     * [Autobahn](http://autobahn.ws/js) session object.
      *
      * @param {pv.ViewPortConfig} options
      * Configure the viewport to create the way we want.
      *
      * @return {pv.Viewport}
      */
-    function createViewport(session, options) {
+    function createViewport(options) {
         // Make sure we have a valid autobahn session
-        if (session === null) {
-            throw "'session' must be provided.";
+        if (options.session === null) {
+            throw "'session' must be provided within the option.";
         }
 
-        // Internal fields
-        var config = $.extend({}, options, DEFAULT_VIEWPORT_OPTIONS),
-        bgImage = new Image(),
-        canvas = $("<canvas></canvas>"),
-        ctx2d = canvas.get(0).getContext('2d'),
-        viewport = null,
-        current_button = null,
-        action_pending = false,
-        force_render = false,
-        statistics = null,
-        button_state = {
-            left : false,
-            right: false,
-            middle : false
-        },
-        lastMTime = 0,
-        render_onidle_timeout = null,
-        quality = 100,
-        headEvent = (GLOBAL.paraview.isMobile ? "v" : "");
-
-        // make canvas "fullscreen" within it's parent's scope. For this to
-        // work, it is essential that the parent either has position absolute or
-        // relative specified.
-        canvas.css({
-            "display": "block",
-            "position": "absolute",
-            "top": "0px",
-            "left": "0px",
-            "width": "100%",
-            "height": "100%"
-        });
-
-        //-----
-        // Internal function that requests a render on idle. Calling this
-        // mutliple times will only result in the request being set once.
-        function renderOnIdle() {
-            if (render_onidle_timeout === null) {
-                render_onidle_timeout = GLOBAL.setTimeout(render, 250);
-            }
-        }
-        // ----
-        /// Internal method that returns true if the mouse interaction event should be
-        /// throttled.
-        function eatMouseEvent(pvevent) {
-            var force_event = (button_state.left !== pvevent.buttonLeft || button_state.right  !== pvevent.buttonRight || button_state.middle !== pvevent.buttonMiddle);
-            if (!force_event && !pvevent.buttonLeft && !pvevent.buttonRight && !pvevent.buttonMiddle) {
-                return true;
-            }
-            if (!force_event && action_pending) {
-                return true;
-            }
-            button_state.left   = pvevent.buttonLeft;
-            button_state.right  = pvevent.buttonRight;
-            button_state.middle = pvevent.buttonMiddle;
-            return false;
-        }
-
-        // Setup internal API
-        function render(ondone) {
-            if (force_render === false) {
-                if (render_onidle_timeout !== null) {
-                    // clear any renderOnIdle requests that are pending since we
-                    // are sending a render request.
-                    GLOBAL.clearTimeout(render_onidle_timeout);
-                    render_onidle_timeout = null;
-                }
-                force_render = true;
-                /**
-                 * @class request.Render
-                 * Container Object that provide all the input needed to request
-                 * a rendering from the server side.
-                 *
-                 *      {
-                 *        size: [width, height], // Size of the image to generate
-                 *        view: 234523,          // View proxy globalId
-                 *        mtime: 23423456,       // Last Modified time image received
-                 *        quality: 100,          // Image quality expected
-                 *        localtime: 3563456     // Local time at sending for round trip computation statistic
-                 *      }
-                 */
-                var renderCfg = {
-                    /**
-                     * @member request.Render
-                     * @property {Array} size
-                     * Size of the Viewport for which the image should be render
-                     * for. [width, height] in pixel.
-                     */
-                    size: [ viewport.parent().innerWidth(), viewport.parent().innerHeight() ],
-                    /**
-                     * @member request.Render
-                     * @property {Number} view
-                     * GlobalID of the view Proxy.
-                     */
-                    view: Number(config.view),
-                    /**
-                     * @member request.Render
-                     * @property {Number} MTime
-                     * Last received image MTime.
-                     */
-                    mtime: lastMTime,
-                    /**
-                     * @member request.Render
-                     * @property {Number} quality
-                     * Image compression quality.
-                     * -   0: Looks Bad but small in size.
-                     * - 100: Looks good bug big in size.
-                     */
-                    quality: quality,
-                    /**
-                     * @property {Number} localTime
-                     * Local client time used to compute the round trip time cost.
-                     * Equals to new Date().getTime().
-                     */
-                    localTime : new Date().getTime()
-                }, done_callback = ondone;
-
-                /**
-                 * @member pv.Viewport
-                 * @event render-start
-                 * @param {Number} view
-                 * Proxy View ID.
-                 */
-                viewport.trigger({
-                    type: "render-start",
-                    view: Number(config.view)
-                });
-
-                session.call("pv:stillRender", renderCfg).then(function (res) {
-                    /**
-                     * @class reply.Render
-                     * Object returned from the server as a response to a
-                     * stillRender request. It includes information about the
-                     * rendered image along with the rendered image itself.
-                     *
-                     *    {
-                     *       image     : "sdfgsdfg/==",      // Image encoding in a String
-                     *       size      : [width, height],    // Image size
-                     *       format    : "jpeg;base64",      // Image type + encoding
-                     *       global_id : 234652436,          // View Proxy ID
-                     *       stale     : false,              // Image is stale
-                     *       mtime     : 23456345,           // Image MTime
-                     *       localTime : 3563456,            // Value provided at request
-                     *       workTime  : 10                  // Number of ms that were needed for the processing
-                     *    }
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {String} image
-                     * Rendered image content encoded as a String.
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Array} size
-                     * Size of the rendered image (width, height).
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {String} format
-                     * String indicating the format and encoding for the image
-                     * e.g. "jpeg;base64" or "png;base64".
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Number} global_id
-                     * GlobalID of the view proxy from which the image is
-                     * obtained.
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Boolean} stale
-                     * For better frame-rates when interacting, ParaView may
-                     * return a stale rendered image, while the newly rendered
-                     * image is being processed. This flag indicates that a new
-                     * rendering for this view is currently being processed on
-                     * the server.
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Number} mtime
-                     * Timestamp of the generated image. This is used to prevent
-                     * a redelivery of the same image.
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Number} localTime
-                     * Unchanged value that was in the request. This will help
-                     * to compute round trip cost.
-                     */
-                    /**
-                     * @member reply.Render
-                     * @property {Number} workTime
-                     * Delta time that was needed on the server side to handle
-                     * the request. This does not include the json parsing.
-                     * Just the high level opeartion achieved by ParaView.
-                     */
-                    config.view = Number(res.global_id);
-                    lastMTime = res.mtime;
-                    if(res.hasOwnProperty("image") && res.image !== null) {
-                        /**
-                         * @member pv.Viewport
-                         * @event start-loading
-                         */
-                        viewport.trigger("start-loading");
-                        bgImage.width  = res.size[0];
-                        bgImage.height = res.size[1];
-                        bgImage.src = "data:image/" + res.format  + "," + res.image;
-
-                        /**
-                         * @member pv.Viewport
-                         * @event render-end
-                         * @param {Number} view
-                         * Proxy View Id.
-                         */
-                        viewport.trigger({
-                            type: "render-end",
-                            view: Number(config.view)
-                        });
-
-                        /**
-                         * @member pv.Viewport
-                         * @event round-trip
-                         * @param {Number} time
-                         * Time between the sending and the reception of an image less the
-                         * server processing time.
-                         */
-                        viewport.trigger({
-                            type: "round-trip",
-                            time: Number(new Date().getTime() - res.localTime) - res.workTime
-                        });
-
-                        /**
-                         * @member pv.Viewport
-                         * @event server-processing
-                         * @param {Number} time
-                         * Delta time between the reception of the message on the server and
-                         * when the reply is construct and return from the method.
-                         */
-                        viewport.trigger({
-                            type: "server-processing",
-                            time: Number(res.workTime)
-                        });
-                    }
-                    renderStatistics();
-                    force_render = false;
-                    if (done_callback) {
-                        done_callback();
-                    }
-                    // the image we received is not the latest, we should
-                    // request another render to try to get the latest image.
-                    if (res.stale === true) {
-                        renderOnIdle();
-                    }
-                });
-            }
-        }
-
-        // ----
-        function mouseInteraction(action, evt) {
-            // stop default event handling by the browser.
-            evt.preventDefault();
-
+        // Create viewport
+        var config = $.extend({}, DEFAULT_VIEWPORT_OPTIONS, options),
+        session = options.session,
+        rendererContainer = $(DEFAULT_RENDERERS_CONTAINER_HTML).css(DEFAULT_RENDERERS_CONTAINER_CSS),
+        mouseListener = $(DEFAULT_MOUSE_LISTENER_HTML).css(DEFAULT_MOUSE_LISTENER_CSS),
+        statContainer = $(DEFAULT_STATISTIC_HTML).css(DEFAULT_STATISTIC_CSS),
+        onDoneQueue = [],
+        statisticManager = createStatisticManager(),
+        viewport = {
             /**
-             * @class request.InteractionEvent
-             * Container Object used to encapsulate MouseEvent status
-             * formated in an handy manner for ParaView.
+             * Update the active renderer to be something else.
+             * This allow the user to switch from Image Delivery to Geometry delivery
+             * or even any other available renderer type available.
              *
-             *     {
-             *       view         : 23452345, // View proxy globalId
-             *       action       : "down",   // Enum["down", "up", "move"]
-             *       charCode     : "",       // In key press will hold the char value
-             *       altKey       : false,    // Is alt Key down ?
-             *       ctrlKey      : false,    // Is ctrl Key down ?
-             *       shiftKey     : false,    // Is shift Key down ?
-             *       metaKey      : false,    // Is meta Key down ?
-             *       buttonLeft   : false,    // Is button Left down ?
-             *       buttonMiddle : false,    // Is button Middle down ?
-             *       buttonRight  : false,    // Is button Right down ?
-             *     }
+             * The available renderers are indexed inside the following object paraview.ViewportFactory.
+             *
+             * @member pv.Viewport
+             * @param {String} rendererName
+             * Key used to ID the renderer type.
              */
-            var paraview_event = {
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Number}  view Proxy global ID
-                 */
-                view: Number(config.view),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {String}  action
-                 * Type of mouse action and can only be one of:
-                 *
-                 * - down
-                 * - up
-                 * - move
-                 */
-                action: action,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {String}  charCode
-                 */
-                charCode: evt.charCode,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} altKey
-                 */
-                altKey: evt.altKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} ctrlKey
-                 */
-                ctrlKey: evt.ctrlKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} shiftKey
-                 */
-                shiftKey: evt.shiftKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} metaKey
-                 */
-                metaKey: evt.metaKey,
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonLeft
-                 */
-                buttonLeft: (current_button === 1 ? true : false),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonMiddle
-                 */
-                buttonMiddle: (current_button === 2 ? true : false),
-                /**
-                 * @member request.InteractionEvent
-                 * @property {Boolean} buttonRight
-                 */
-                buttonRight: (current_button === 3 ? true : false)
+            setActiveRenderer: function(rendererName) {
+                $('.' + rendererName, rendererContainer).addClass('active').show().siblings().removeClass('active').hide();
+                rendererContainer.trigger('active');
+                statContainer[0].innerHTML = '';
+                statisticManager.reset();
             },
-            elem_position = $(evt.delegateTarget).offset(),
-            pointer = {
-                x : (evt.pageX - elem_position.left),
-                y : (evt.pageY - elem_position.top)
-            };
 
-            paraview_event.x = pointer.x / viewport.width();
-            paraview_event.y = 1.0 - (pointer.y / viewport.height());
-            if (eatMouseEvent(paraview_event)) {
-                return;
-            }
-
-            action_pending = true;
-            session.call("pv:mouseInteraction", paraview_event).then(function (res) {
-                if (res) {
-                    action_pending = false;
-                    render();
-                }
-            });
-        }
-
-        // internal function to render stats.
-        function renderStatistics() {
-            if (statistics) {
-                ctx2d.font = "bold 12px sans-serif";
-                //ctx2d.fillStyle = "white";
-                ctx2d.fillStyle = "black";
-                ctx2d.fillRect(10, 10, 240, 100);
-                //ctx2d.fillStyle = "black";
-                ctx2d.fillStyle = "white";
-                ctx2d.fillText("Frame Rate: " + statistics.frameRate().toFixed(2), 15, 25);
-                ctx2d.fillText("Average Frame Rate: " + statistics.averageFrameRate().toFixed(2),
-                    15, 40);
-                ctx2d.fillText("Round trip: " + statistics.roundTrip() + " ms - Max: " + statistics.maxRoundTrip() + " ms",
-                    15, 55);
-                ctx2d.fillText("Server work time: " + statistics.serverWorkTime() + " ms - Max: " + statistics.maxServerWorkTime() + " ms",
-                    15, 70);
-                ctx2d.fillText("Minimum Frame Rate: " + statistics.minFrameRate().toFixed(2),
-                    15, 85);
-                ctx2d.fillText("Loading time: " + statistics.trueLoadTime(),
-                    15, 100);
-            }
-        }
-
-        // Choose if rendering is happening in Canvas or image
-        if (config.useCanvas) {
-            viewport = canvas;
-
-            // If canvas not supported add image in bg
-            //canvas.append(bgImage);
-
-            // When image ready draw on canvas
-            bgImage.onload = function(){
-                paint();
-            };
-        } else {
-            viewport = $(bgImage).attr("alt", "ParaView (JavaScript) Renderer");
-        }
-
-        // internal function used to draw update data on the canvas. When not
-        // using canvas, this has no effect.
-        function paint() {
-            if (config.useCanvas) {
-                /**
-                 * @member pv.Viewport
-                 * @event stop-loading
-                 */
-                viewport.trigger("stop-loading");
-                ctx2d.canvas.width = viewport.parent().innerWidth();
-                ctx2d.canvas.height = viewport.parent().innerHeight();
-                ctx2d.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height);
-                renderStatistics();
-            }
-        }
-
-        // Extend touch event to mockup normal mouse event
-        function addTouchSupport(event) {
-            if (event.which === 0) {
-                // Touch event
-                event = $.extend(event, {
-                    which: 1,
-                    charCode: '',
-                    altKey: false,
-                    shiftKey: false,
-                    metaKey: false,
-                    ctrlKey: false
-                });
-            }
-            return event;
-        }
-
-        // Attach mouse listeners if needed
-        if (config.enableInteractions) {
-            viewport.bind("contextmenu click", function (evt) {
-                evt.preventDefault();
-            });
-
-            viewport.bind(headEvent + "mousedown", function (evt) {
-                evt = addTouchSupport(evt);
-                current_button = evt.which;
-                quality = config.interactiveQuality;
-                mouseInteraction("down", evt);
-            });
-            viewport.bind(headEvent + "mouseup", function (evt) {
-                evt = addTouchSupport(evt);
-                current_button = null;
-                mouseInteraction("up", evt);
-                quality = config.stillQuality;
-            });
-            viewport.bind(headEvent + "mousemove", function (evt) {
-                evt = addTouchSupport(evt);
-                mouseInteraction("move", evt);
-            });
-        }
-
-        return {
             /**
-             * @class pv.Viewport
-             * This Object let you attach a remote viewport into your web page
-             * and forward remotely the mouse interaction while keeping the
-             * content of the viewport up-to-date.
+             * Method that should be called each time something in the scene as changed
+             * and we want to update the viewport to reflect the latest state of the scene.
+             *
+             * @member pv.Viewport
+             * @param {Function} ondone Function to call after rendering is complete.
              */
+            invalidateScene: function(onDone) {
+                onDoneQueue.push(onDone);
+                rendererContainer.trigger('invalidateScene');
+            },
+
+            /**
+             * Method that should be called when nothing has changed in the scene
+             * but for some reason the viewport has been dirty.
+             * (i.e. Toggeling the statistic information within the viewport)
+             *
+             * @member pv.Viewport
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            render: function(onDone) {
+                onDoneQueue.push(onDone);
+                rendererContainer.trigger('render');
+            },
+
+            /**
+             * Reset the camera of the scene to make it fit in the screen as well
+             * as invalidating the scene automatically.
+             *
+             * @member pv.Viewport
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            resetCamera: function(onDone) {
+                onDoneQueue.push(onDone);
+                return session.call("pv:resetCamera", Number(config.view)).then(function () {
+                    rendererContainer.trigger('invalidateScene');
+                });
+            },
+
+            /**
+             * Update Orientation Axes Visibility for the given view
+             *
+             * @member pv.Viewport
+             * @param {Boolean} show
+             * Show: true / Hide: false
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            updateOrientationAxesVisibility: function (show, onDone) {
+                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
+                    onDoneQueue.push(onDone);
+                    rendererContainer.trigger('invalidateScene');
+                });
+            },
+
+            /**
+             * Update the Center Axes Visibility for the given view
+             *
+             * @member pv.Viewport
+             * @param {Boolean} show
+             * Show: true / Hide: false
+             * @param {Function} ondone Function to call after rendering is complete.
+             */
+            updateCenterAxesVisibility: function (show, onDone) {
+                return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
+                    onDoneQueue.push(onDone);
+                    rendererContainer.trigger('invalidateScene');
+                });
+            },
+
             /**
              * Attach viewport to a DOM element
              *
@@ -572,99 +486,96 @@
              */
             bind: function (selector) {
                 var container = $(selector);
-                if (container.attr("__pv_viewport__") !== true) {
-                    container.attr("__pv_viewport__", true);
-                    container.append(viewport);
-                    render();
+                if (container.attr("__pv_viewport__") !== "true") {
+                    container.attr("__pv_viewport__", "true");
+                    container.append(rendererContainer).append(mouseListener).append(statContainer);
+                    rendererContainer.trigger('invalidateScene');
                 }
-            },
-            /**
-             * Remove viewport from DOM element
-             */
-            unbind: function () {
-                var parentElement = viewport.parent();
-                if (parentElement) {
-                    parentElement.attr("__pv_viewport__", false);
-                    viewport.remove();
-                }
-            },
-            /**
-             * Trigger a render on the server side and update the image locally.
-             *
-             *      view.render(function() { console.log("rendering done"); });
-             *
-             * @member pv.Viewport
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            render: function (ondone) {
-                render(ondone);
-            },
-            /**
-             * Reset the camera for the given view
-             *
-             * @member pv.Viewport
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            resetCamera: function (ondone) {
-                return session.call("pv:resetCamera", Number(config.view)).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Update Orientation Axes Visibility for the given view
-             *
-             * @member pv.Viewport
-             * @param {Boolean} show
-             * Show: true / Hide: false
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            updateOrientationAxesVisibility: function (show, ondone) {
-                return session.call("pv:updateOrientationAxesVisibility", Number(config.view), show).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Update the Center Axes Visibility for the given view
-             *
-             * @member pv.Viewport
-             * @param {Boolean} show
-             * Show: true / Hide: false
-             * @param {Function} ondone Function to call after rendering is complete.
-             */
-            updateCenterAxesVisibility: function (show, ondone) {
-                return session.call("pv:updateCenterAxesVisibility", Number(config.view), show).then(function () {
-                    render(ondone);
-                });
-            },
-            /**
-             * Provides access to the HTMLElement used for rendering.
-             *
-             * @member pv.Viewport
-             * @return {Object} Canvas or Image element used for rendering.
-             */
-            getHTMLElement : function () {
-                return viewport;
             },
 
             /**
-             * Display the statics collected by the object in the view.
+             * Remove viewport from DOM element
              *
              * @member pv.Viewport
-             * @param {pv.ViewportStatistics|null} stats
-             * The ViewportStatistics object to use to show the statistics in
-             * this view. To stop showing the statistics, simply call this
-             * function with null or on arguments.
              */
-            showStatistics : function (stats) {
-                if (stats !== null) {
-                    statistics = stats;
-                } else {
-                    statistics = null;
+            unbind: function () {
+                var parentElement = rendererContainer.parent();
+                if (parentElement) {
+                    parentElement.attr("__pv_viewport__", "false");
+                    rendererContainer.remove();
+                    mouseListener.remove();
+                    statContainer.remove();
                 }
-                // repaint the viewport so the stats are either shown or hidden.
-                paint();
+            },
+
+            /**
+             * Update statistic visibility
+             *
+             * @member pv.Viewport
+             * @param {Boolean} visible
+             */
+            showStatistics: function(isVisible) {
+                if(isVisible) {
+                    statContainer.show();
+                } else {
+                    statContainer.hide();
+                }
+            },
+
+            /**
+             * Clear current statistic values
+             *
+             * @member pv.Viewport
+             */
+            resetStatistics: function() {
+                statisticManager.reset();
+                statContainer.empty();
             }
         };
+
+        // Attach config object to renderer parent
+        rendererContainer.data('config', config);
+
+        // Attach onDone listener
+        rendererContainer.bind('done', function(){
+            while(onDoneQueue.length > 0) {
+                var callback = onDoneQueue.pop();
+                try {
+                    if(callback) {
+                        callback();
+                    }
+                } catch(error) {
+                    console.log("On Done callback error:");
+                    console.log(error);
+                }
+            }
+        });
+
+        // Create any renderer type that is available
+        for(var key in paraview.ViewportFactory) {
+            try {
+                paraview.ViewportFactory[key].builder(rendererContainer);
+            } catch(error) {
+                console.log("Error while trying to load renderer: " + key);
+                console.log(error);
+            }
+        }
+
+        // Set default renderer
+        viewport.setActiveRenderer(config.renderer);
+
+        // Attach mouse listener if requested
+        if (config.enableInteractions) {
+            attachMouseListener(mouseListener, rendererContainer);
+        }
+
+        // Attach stat listener
+        rendererContainer.bind('stats', function(event){
+            statisticManager.eventHandler(event);
+            statContainer[0].innerHTML = statisticManager.toHTML();
+        });
+
+        return viewport;
     }
 
     // ----------------------------------------------------------------------
@@ -679,7 +590,7 @@
     // ----------------------------------------------------------------------
     // Export internal methods to the paraview module
     // ----------------------------------------------------------------------
-    module.createViewport = function (session, option) {
-        return createViewport(session, option);
+    module.createViewport = function (option) {
+        return createViewport(option);
     };
 }(window, jQuery));

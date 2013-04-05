@@ -14,7 +14,10 @@ set(lib_js_min_files
   "${lib_source_dir}/paraview.launcher.js"
   "${lib_source_dir}/paraview.connect.js"
   "${lib_source_dir}/paraview.viewport.js"
-  "${lib_source_dir}/paraview.statistics.js")
+  "${lib_source_dir}/paraview.viewport.image.js"
+  "${lib_source_dir}/paraview.viewport.webgl.js"
+  "${lib_source_dir}/paraview.statistics.js"
+  )
 
 list(APPEND args "-i")
 
