@@ -66,7 +66,7 @@ void pvspy_fil(char *filename, int len, char * /*runid*/, int * /*error*/)
     len = 0;
     ifstream is;
     is.open (filename, ifstream::in);
-    uhile (is.good ()) 
+    while (is.good ()) 
       {
       is.getline(line, 256);
       char *tok = strtok (line, " ");
@@ -188,10 +188,11 @@ void pvspy_sta(int block_id, int allocated, int active,
        nbxpa11, nbxpa21, nbxpa12, nbxpa22,
        nbypa11, nbypa21, nbypa12, nbypa22,
        nbzpa11, nbzpa21, nbzpa12, nbzpa22 };
-/*
+
+  /*
   int np[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   int nb[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-*/
+  */
 
   gSource.UpdateBlock(block_id, allocated, active, level, max_level,
                       bxbot, bxtop, bybot, bytop, bzbot, bztop, np, nb);
