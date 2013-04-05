@@ -5,6 +5,13 @@
  * mechanism for rendering.
  *
  * @class paraview.viewport.image
+ *
+ *     Viewport Factory description:
+ *       - Key: image
+ *       - Stats:
+ *         - image-fps
+ *         - image-round-trip
+ *         - image-server-processing
  */
 (function (GLOBAL, $) {
     var module = {},
