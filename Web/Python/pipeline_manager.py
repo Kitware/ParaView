@@ -52,11 +52,11 @@ filterList = [{
         'icon': 'threshold',
         'category': 'filter'
     },{
-        'name': 'Stream Tracer',
+        'name': 'StreamTracer',
         'icon': 'stream',
         'category': 'filter'
     },{
-        'name': 'Warp',
+        'name': 'WarpByScalar',
         'icon': 'filter',
         'category': 'filter'
     }]
