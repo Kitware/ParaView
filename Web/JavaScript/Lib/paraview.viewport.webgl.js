@@ -1432,8 +1432,8 @@
             pan : function(dx, dy) {
                 var distance = vec3.distance(position, focalPoint),
                 displacement = vec3.set(vec3.create(),0,0,0);
-                vec3.scaleAndAdd(displacement, displacement, rightDir, -dx /100);
-                vec3.scaleAndAdd(displacement, displacement, viewUp, dy / 100);
+                vec3.scaleAndAdd(displacement, displacement, rightDir, -dx /1000);
+                vec3.scaleAndAdd(displacement, displacement, viewUp, dy / 1000);
                 vec3.add(position, position, displacement);
                 vec3.add(focalPoint, focalPoint, displacement);
                 computeOrthogonalAxes();
