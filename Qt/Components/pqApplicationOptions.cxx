@@ -145,6 +145,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->DisableSplashScreen,
                    SIGNAL(toggled(bool)),
                    this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->OnlyApplyCurrentPanel,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
 
   QObject::connect(this->Internal->ForegroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
@@ -336,6 +339,9 @@ void pqApplicationOptions::applyChanges()
   bool disableSpashScreen = this->Internal->DisableSplashScreen->isChecked();
   settings->setValue("disableSplashScreen", disableSpashScreen);
 
+  bool onlyApplyCurrentPanel = this->Internal->OnlyApplyCurrentPanel->isChecked();
+  settings->setValue("onlyApplyCurrentPanel", onlyApplyCurrentPanel);
+
   settings->setValue("GlobalProperties/ForegroundColor",
     this->Internal->ForegroundColor->chosenColor());
   settings->setValue("GlobalProperties/SurfaceColor",
@@ -427,6 +433,9 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->DisableSplashScreen->setChecked(
     settings->value("disableSplashScreen", false).toBool());
+
+  this->Internal->OnlyApplyCurrentPanel->setChecked(
+    settings->value("onlyApplyCurrentPanel", false).toBool());
 
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",
