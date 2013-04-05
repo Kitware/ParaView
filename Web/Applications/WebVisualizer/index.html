@@ -12,7 +12,7 @@
 
         <script src="../../ext/js-core/autobahn.min.js"></script>
         <script src="../../ext/js-core/jquery-1.8.2.min.js"></script>
-        <script src="../../ext/js-core/glMatrix-0.9.5.min.js"></script>
+        <script src="../../ext/js-core/gl-matrix-min.js"></script>
 
         <script src="../../ext/widgets/jscolor/jscolor.js"></script>
         <script src="../../ext/widgets/jquery-ui/jquery-ui-1.10.0.min.js"></script>
@@ -121,6 +121,7 @@
                 }).bind('dataChanged', updateView);
 
                 // - viewport
+                $(".viewport-container").empty();
                 pv.viewport = paraview.createViewport({session: pv.connection.session});
                 pv.viewport.bind(".viewport-container");
 
@@ -131,7 +132,7 @@
                 $('.viewport-toolbar').viewportToolbar(pv.viewport);
 
                 // - Toggle pipeline visibility
-                $('.logo').bind('click', function(){
+                $('.logo').unbind().bind('click', function(){
                     var panel = $(".control-panel");
                     var viewport = $(".viewport-container");
                     if(panel.is(":visible")) {
