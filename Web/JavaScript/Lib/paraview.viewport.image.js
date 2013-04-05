@@ -354,6 +354,13 @@
                 // stop default event handling by the browser.
                 evt.preventDefault();
 
+                // Update quality based on the type of the event
+                if(evt.action === 'up') {
+                    quality = options.stillQuality;
+                } else {
+                    quality = options.interactiveQuality;
+                }
+
                 /**
                  * @class request.InteractionEvent
                  * Container Object used to encapsulate MouseEvent status
