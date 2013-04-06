@@ -1,6 +1,7 @@
 #include "vtkCPVTKPipeline.h"
 
 #include <vtkCommunicator.h>
+#include <vtkCompleteArrays..h>
 #include <vtkCPDataDescription.h>
 #include <vtkDataArray.h>
 #include <vtkCPInputDataDescription.h>
@@ -110,8 +111,14 @@ int vtkCPVTKPipeline::CoProcess(
     0, 0, 0, "vtkDataObject::FIELD_ASSOCIATION_POINTS", "velocity magnitude");
   threshold->ThresholdBetween(0.9*globalRange[1], globalRange[1]);
 
+  // If process 0 doesn't have any points or cells, the writer may
+  // have problems in parallel so we use completeArrays to fill in
+  // the missing information.
+  vtkNew<vtkCompleteArray> completeArrays;
+  completeArrays->SetInputConnection(threshold->GetOutputPort());
+
   vtkNew<vtkXMLPUnstructuredGridWriter> writer;
-  writer->SetInputConnection(threshold->GetOutputPort());
+  writer->SetInputConnection(completeArrays->GetOutputPort());
   std::ostringstream o;
   o << dataDescription->GetTimeStep();
   std::string name = this->FileName + o.str() + ".pvtu";

@@ -5,14 +5,14 @@ set(USE_CATALYST ON CACHE BOOL "Link the simulator with Catalyst")
 if(USE_CATALYST)
   # We have a C++ pipeline so we don't need to link with Python
   # or vtkPVPythonCatalyst since vtkPVCatalyst is sufficient.
-  find_package(ParaView 3.98 REQUIRED COMPONENTS vtkPVCatalyst vtkPVVTKExtensionsDefault)
+  find_package(ParaView 3.98 REQUIRED COMPONENTS vtkPVCatalyst vtkPVVTKExtensionsDefault vtkPVClientServerCoreCore)
   include("${PARAVIEW_USE_FILE}")
   set(Adaptor_SRCS
     FEAdaptor.cxx
     vtkCPVTKPipeline.cxx
     )
   add_library(Adaptor ${Adaptor_SRCS})
-  target_link_libraries(Adaptor vtkPVCatalyst vtkPVVTKExtensionsDefault)
+  target_link_libraries(Adaptor vtkPVCatalyst vtkPVVTKExtensionsDefault vtkPVClientServerCoreCore)
   add_definitions("-DUSE_CATALYST")
 else()
   find_package(MPI REQUIRED)
