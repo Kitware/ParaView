@@ -9,7 +9,8 @@
                       "paraview.launcher",
                       "paraview.connect",
                       "paraview.viewport",
-                      "paraview.statistics"
+                      "paraview.viewport.image",
+                      "paraview.viewport.webgl"
                   ]
               }, {
                   "name": "ParaView Objects",
@@ -20,7 +21,6 @@
                       "pv.Connection",
                       "pv.Session",
                       "pv.Viewport",
-                      "pv.ViewportStatistics",
                       "pv.Future"
                   ]
               }, {

@@ -591,6 +591,9 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
     margin-right: 1%;
     position: relative;
 }
+.pipeline-editor .pv-widget > select {
+    width: 96%;
+}
 
 .pipeline-editor .pv-widget-slider {
     margin: 10px;

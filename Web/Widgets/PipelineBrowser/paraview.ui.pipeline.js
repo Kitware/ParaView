@@ -1200,10 +1200,6 @@
             }
 
             // Extract property values
-            $('select', property).each(function(){
-                value = isNumber ? Number($(this).val()) : $(this).val();
-                values.push(value);
-            });
             $('input[type=text]', property).each(function(){
                 value = isNumber ? Number($(this).val()) : $(this).val();
                 values.push(value);
@@ -1211,13 +1207,21 @@
             $('input[type=checkbox]', property).each(function(){
                 values.push($(this).is(':checked') ? 1 : 0);
             });
+            $('select[type=array]', property).each(function(){
+                values = $(this).val().split(';');
+            });
+            $('select[type=enum]', property).each(function(){
+                value = Number($(this).val());
+                values.push(value);
+            });
 
             // Build property info
             if(!state.hasOwnProperty(property.attr('proxy'))) {
                 state[property.attr('proxy')] = {};
             }
-            state[property.attr('proxy')][property.attr('name')] = values;
+            state[property.attr('proxy')][property.attr('label')] = values;
         });
+        console.log(state);
         return state;
     }
 
@@ -1713,6 +1717,39 @@
 
     // =======================================================================
 
+    function isInputArrayDomain(domainList) {
+        for(var idx in domainList) {
+            if(domainList[idx].type === 'ArrayList') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // =======================================================================
+
+    function isEnumDomain(domainList) {
+        for(var idx in domainList) {
+            if(domainList[idx].type === 'Enumeration') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // =======================================================================
+
+    function getInputArrayNumberOfComponents(domainList) {
+        for(var idx in domainList) {
+            if(domainList[idx].type === 'ArrayList') {
+                return domainList[idx].nb_components;
+            }
+        }
+        return -1;
+    }
+
+    // =======================================================================
+
     function updateProxyProperties(pipelineBrowser, proxy) {
         var me = $(".pipeline-editor-content",pipelineBrowser).empty(), key, value;
 
@@ -1748,7 +1785,7 @@
     // =======================================================================
 
     function addPropertyToBuffer(proxyId, key, value, domain) {
-        var idx, filterList = ['proxy_id', 'type', 'domains'];
+        var idx, filterList = ['proxy_id', 'type', 'domains'], nbComponents;
         for(idx in filterList) {
             if(key === filterList[idx]) {
                 return;
@@ -1767,6 +1804,12 @@
             buffer.append(value);
             buffer.append("' order='");
             buffer.append(domain['order']);
+            buffer.append("' label='");
+            if(domain.hasOwnProperty('label') && domain['label'] && domain['label'].length > 0) {
+                buffer.append(domain['label']);
+            } else {
+                buffer.append(key);
+            }
             buffer.append("' widget-type='");
 
             if(domain['domains'].length == 1 && domain['domains'][0]['type'] == 'Boolean') {
@@ -1779,6 +1822,21 @@
                 buffer.append(domain['domains'][0]['max']);
                 buffer.append("' data-type='");
                 buffer.append(domain['type']);
+            } else if (isInputArrayDomain(domain['domains'])) {
+                // Handle input array
+                nbComponents = getInputArrayNumberOfComponents(domain['domains']);
+                buffer.append("array' nb_comp='");
+                buffer.append(nbComponents);
+                buffer.append("' proxy='");
+                buffer.append(proxyId);
+                buffer.append("' selected_array_type='");
+                buffer.append(value[0]);
+                buffer.append("' selected_array='");
+                buffer.append(value[1]);
+                buffer.append("'");
+            } else if (isEnumDomain(domain['domains'])) {
+                buffer.append("enum' key='");
+                buffer.append(key);
             } else if (domain.hasOwnProperty('size')) {
                 buffer.append('text');
                 buffer.append("' size='");
@@ -1796,7 +1854,7 @@
     function generateWidget(container) {
         $('.property', container).each(function(){
             var property = $(this).empty();
-            var propertyName = property.attr('name');
+            var propertyName = property.attr('label');
 
             var propertyValue = property.attr('data-value');
             createWidget(property, propertyName, propertyValue);
@@ -1823,11 +1881,12 @@
             createCheckbox(container, propertyName, value);
         } else if (widgetType === 'text') {
             createTextField(container, propertyName, container.attr('size'), container.attr('data-type'), value);
-        } else if (widgetType === 'list') {
-            console.log('Dont know what to do LIST');
-        //createEnumeration(container, propertyName, list, value);
+        } else if (widgetType === 'enum') {
+            createEnumeration(container, container.attr('proxy'), propertyName, container.attr('key'), value);
         } else if (widgetType === 'range') {
             createSlider(container, propertyName, container.attr('min'), container.attr('max'), container.attr('data-type'), value)
+        } else if (widgetType === 'array') {
+            createArraySelector(container, propertyName, container.attr('proxy'), Number(container.attr('nb_comp')), container.attr('selected_array_type'), container.attr('selected_array'));
         }
     }
 
@@ -1864,13 +1923,13 @@
     // =======================================================================
 
     function createTextField(container, propertyName, nbFields, type, propertyValue) {
-        var values = [];
+        var values = [], tmpBuffer = createBuffer();
         if(nbFields === 1) {
             values = [ propertyValue ]
         } else {
             values =  propertyValue.split(',');
         }
-        tmpBuffer = createBuffer();
+
         tmpBuffer.append("<td class='title'>");
         tmpBuffer.append(propertyName);
         tmpBuffer.append("</td><td class='pv-widget text-");
@@ -1892,7 +1951,7 @@
     // =======================================================================
 
     function createCheckbox(container, propertyName, propertyValue) {
-        tmpBuffer = createBuffer();
+        var tmpBuffer = createBuffer();
         tmpBuffer.append("<td class='title'>");
         tmpBuffer.append(propertyName);
         tmpBuffer.append("</td><td class='pv-widget'>");
@@ -1910,22 +1969,79 @@
 
     // =======================================================================
 
-    function createEnumeration(container, propertyName, list, propertyValue) {
-        tmpBuffer = createBuffer();
+    function createEnumeration(container, proxyId, propertyLabel, propertyName, propertyValue) {
+        var tmpBuffer = createBuffer(), proxy = getProxy(container, proxyId),
+        list = proxy.state.domains[propertyName].domains[0]['enum'];
         tmpBuffer.append("<td class='title'>");
         tmpBuffer.append(propertyName);
-        tmpBuffer.append("</td><td class='pv-widget'><select>");
+        tmpBuffer.append("</td><td class='pv-widget'><select type='enum'>");
         for(var i in list) {
             tmpBuffer.append("<option value='");
             tmpBuffer.append(list[i]['value']);
             tmpBuffer.append("'");
-            if(propertyValue === list[i]['value']) {
+            if(propertyValue === list[i]['text']) {
                 tmpBuffer.append(" SELECTED");
             }
             tmpBuffer.append(">");
             tmpBuffer.append(list[i]['text']);
             tmpBuffer.append("</option>");
         }
+        tmpBuffer.append("</select></td>");
+
+        container[0].innerHTML = tmpBuffer.toString();
+        $('input', container).change(function(){
+            markProxyModified(container);
+        });
+    }
+
+    // =======================================================================
+
+    function createArraySelector(container, propertyName, proxyId, nbComponents, arrayType, arrayName) {
+        var tmpBuffer = createBuffer(), list, isArrayInList,
+        parentProxy = getProxy(container, getParentProxyId(container, proxyId));
+
+        tmpBuffer.append("<td class='title'>");
+        tmpBuffer.append(propertyName);
+        tmpBuffer.append("</td><td class='pv-widget'><select type='array'>");
+
+        // Point data
+        list = parentProxy.pointData;
+        isArrayInList = (arrayType === 'POINTS');
+        for(var i in list) {
+            if(list[i]['size'] != nbComponents) {
+                continue;
+            }
+
+            tmpBuffer.append("<option value='POINTS;");
+            tmpBuffer.append(list[i]['name']);
+            tmpBuffer.append("'");
+            if(isArrayInList && arrayName === list[i]['name']) {
+                tmpBuffer.append(" SELECTED");
+            }
+            tmpBuffer.append(">");
+            tmpBuffer.append(list[i]['name']);
+            tmpBuffer.append("</option>");
+        }
+
+        // Cell data
+        list = parentProxy.cellData;
+        isArrayInList = (arrayType === 'CELLS');
+        for(var i in list) {
+            if(list[i]['size'] != nbComponents) {
+                continue;
+            }
+
+            tmpBuffer.append("<option value='CELLS;");
+            tmpBuffer.append(list[i]['name']);
+            tmpBuffer.append("'");
+            if(isArrayInList && arrayName === list[i]['name']) {
+                tmpBuffer.append(" SELECTED");
+            }
+            tmpBuffer.append(">");
+            tmpBuffer.append(list[i]['name']);
+            tmpBuffer.append("</option>");
+        }
+
         tmpBuffer.append("</select></td>");
 
         container[0].innerHTML = tmpBuffer.toString();

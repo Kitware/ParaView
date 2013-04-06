@@ -8,7 +8,8 @@
  * @mixins paraview.launcher
  * @mixins paraview.connect
  * @mixins paraview.viewport
- * @mixins paraview.statistics
+ * @mixins paraview.viewport.image
+ * @mixins paraview.viewport.webgl
  * @mixins paraview.ui.nv.utils
  * @singleton
  */

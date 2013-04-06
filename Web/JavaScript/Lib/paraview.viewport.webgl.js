@@ -4,6 +4,14 @@
  * This module extend the ParaView viewport to add support for WebGL rendering.
  *
  * @class paraview.viewport.webgl
+ *
+ *     Viewport Factory description:
+ *       - Key: webgl
+ *       - Stats:
+ *         - webgl-fps
+ *         - webgl-nb-objects
+ *         - webgl-fetch-scene
+ *         - webgl-fetch-object
  */
 (function (GLOBAL, $) {
     var module = {},
@@ -245,8 +253,7 @@
     // ----------------------------------------------------------------------
 
     function setMatrixUniforms(gl, shaderProgram, projMatrix, mvMatrix) {
-        var mvMatrixInv = mat4.create(),
-        normal = mat4.create();
+        var mvMatrixInv = mat4.create(), normal = mat4.create();
 
         mat4.invert(mvMatrixInv, mvMatrix);
         mat4.transpose(normal, mvMatrixInv);
@@ -583,15 +590,15 @@
             // --------------------------------------------------------------
 
             garbageCollect: function() {
-                var refCount = {};
-                for(var key in objectIndex) {
+                var refCount = {}, key, layer, array, idx;
+                for(key in objectIndex) {
                     refCount[key] = 0;
                 }
 
                 // Start registering display list
-                for(var layer in displayList) {
-                    var array = displayList[layer].solid.concat(displayList[layer].transparent);
-                    for(var idx in array) {
+                for(layer in displayList) {
+                    array = displayList[layer].solid.concat(displayList[layer].transparent);
+                    for(idx in array) {
                         if(refCount.hasOwnProperty(array[idx])) {
                             refCount[array[idx]]++;
                         }
@@ -599,7 +606,7 @@
                 }
 
                 // Remove entry with no reference
-                for(var key in refCount) {
+                for(key in refCount) {
                     if(refCount[key] === 0) {
                         delete objectIndex[key];
                     }
@@ -1314,6 +1321,7 @@
         rightDir = vec3.set(vec3.create(), 1.0, 0.0, 0.0),
         projectionMatrix = mat4.create(),
         modelViewMatrix = mat4.create(),
+        perspective = true,
         width = 100,
         height = 100,
         modified = true;
@@ -1399,8 +1407,8 @@
             setCameraParameters : function(angle, pos, focal, up) {
                 //console.log("[CAMERA] angle: " + angle + " position: " + pos + " focal: " + focal + " up: " + up );
                 viewAngle = angle * Math.PI / 180;
-                position = pos;
-                focalPoint = focal;
+                vec3.set(position, pos[0], pos[1], pos[2]);
+                vec3.set(focalPoint, focal[0], focal[1], focal[2]);
                 vec3.set(viewUp, up[0], up[1], up[2]);
                 modified = true;
             },

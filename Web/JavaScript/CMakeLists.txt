@@ -11,12 +11,12 @@ set(lib_source_dir "${CMAKE_CURRENT_SOURCE_DIR}/Lib")
 set(lib_binary_dir "${CMAKE_BINARY_DIR}/www/lib/js")
 
 set(lib_js_min_files
+  "${lib_source_dir}/paraview.js"
   "${lib_source_dir}/paraview.launcher.js"
   "${lib_source_dir}/paraview.connect.js"
   "${lib_source_dir}/paraview.viewport.js"
   "${lib_source_dir}/paraview.viewport.image.js"
   "${lib_source_dir}/paraview.viewport.webgl.js"
-  "${lib_source_dir}/paraview.statistics.js"
   )
 
 list(APPEND args "-i")

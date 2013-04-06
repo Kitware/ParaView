@@ -5,6 +5,13 @@
  * mechanism for rendering.
  *
  * @class paraview.viewport.image
+ *
+ *     Viewport Factory description:
+ *       - Key: image
+ *       - Stats:
+ *         - image-fps
+ *         - image-round-trip
+ *         - image-server-processing
  */
 (function (GLOBAL, $) {
     var module = {},
@@ -353,6 +360,13 @@
             if(renderer.hasClass('active')){
                 // stop default event handling by the browser.
                 evt.preventDefault();
+
+                // Update quality based on the type of the event
+                if(evt.action === 'up') {
+                    quality = options.stillQuality;
+                } else {
+                    quality = options.interactiveQuality;
+                }
 
                 /**
                  * @class request.InteractionEvent

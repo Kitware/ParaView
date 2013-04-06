@@ -366,11 +366,22 @@ def updateProxyProperties(proxy, properties):
    """
    allowedProperties = proxy.ListProperties()
    for key in properties:
-      if key in allowedProperties:
-         value = properties[key]
-         if type(value) == unicode:
-            value = str(value)
-         proxy.GetProperty(key).SetData(value)
+      validKey = servermanager._make_name_valid(key)
+      if validKey in allowedProperties:
+         value = removeUnicode(properties[key])
+         proxy.GetProperty(validKey).SetData(value)
+
+# --------------------------------------------------------------------------
+
+def removeUnicode(value):
+    if type(value) == unicode:
+        return str(value)
+    if type(value) == list:
+        result = []
+        for v in value:
+            result.append(removeUnicode(v))
+        return result
+    return value
 
 # =============================================================================
 # XML and Proxy Definition for GUI generation
@@ -414,6 +425,7 @@ def getProxyDomains(id):
 def extractProperty(xmlPropertyElement):
     propInfo = {}
     propInfo['name'] = xmlPropertyElement.GetAttribute('name')
+    propInfo['label'] = xmlPropertyElement.GetAttribute('label')
     if xmlPropertyElement.GetAttribute('number_of_elements') != None:
         propInfo['size'] = xmlPropertyElement.GetAttribute('number_of_elements')
     propInfo['type'] = xmlPropertyElement.GetName()[:-14]
@@ -448,6 +460,16 @@ def extractDomain(xmlDomainElement):
             xmlChild = xmlDomainElement.GetNestedElement(i)
             if xmlChild.GetName() == "Entry":
                 domainObj['enum'].append({'text': xmlChild.GetAttribute('text'), 'value': xmlChild.GetAttribute('value')})
+
+    # Handle ArrayListDomain
+    if name.__contains__('ArrayListDomain'):
+        dataType = xmlDomainElement.GetAttribute('attribute_type')
+        if dataType == 'Scalars':
+            domainObj['nb_components'] = 1
+        elif dataType == 'Vectors':
+            domainObj['nb_components'] = 3
+        else:
+            domainObj['nb_components'] = -1
 
     return domainObj
 

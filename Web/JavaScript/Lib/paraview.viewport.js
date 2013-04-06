@@ -356,6 +356,7 @@
      * Create a new viewport for a ParaView View.
      * The options are defined by {@link pv.ViewPortConfig}.
      *
+     * @member paraview.viewport
      * @param {pv.ViewPortConfig} options
      * Configure the viewport to create the way we want.
      *
