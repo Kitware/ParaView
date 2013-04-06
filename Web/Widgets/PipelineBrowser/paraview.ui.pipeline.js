@@ -582,9 +582,9 @@
 
         // Allow delete ?
         if(activeProxyId === 0 || $('ul', proxyWidget).children().length > 0) {
-            $('.pipeline-control .delete', getPipeline(uiWidget)).addClass('disabled');
+            $('.pipeline-control .delete-proxy', getPipeline(uiWidget)).addClass('disabled');
         } else {
-            $('.pipeline-control .delete', getPipeline(uiWidget)).removeClass('disabled');
+            $('.pipeline-control .delete-proxy', getPipeline(uiWidget)).removeClass('disabled');
             getPipeline(uiWidget).addClass('view-filters');
         }
 
@@ -900,7 +900,7 @@
         // Handle UI part
         $('.proxy[proxy_id=' + proxyId + ']', pipelineBrowser).remove();
         updateUIPipeline(pipelineBrowser);
-        $('.delete', pipelineBrowser).addClass('disabled');
+        $('.delete-proxy', pipelineBrowser).addClass('disabled');
         $('.property', pipelineBrowser).remove();
 
         setActiveProxyId(pipelineBrowser, 0);
@@ -928,7 +928,7 @@
         // Build pipeline header
         buffer.append("<div class='pipeline-tree'><ul><li class='server'><div class='pipeline-line server'><div class='head-icon server'></div><div class='label'>");
         buffer.append(title);
-        buffer.append("</div><div class='pipeline-control'><div class='action edit'><div class='icon' alt='Toggle visibility of the Proxy property editor' title='Toggle visibility of the Proxy property editor'></div></div><div class='action files'><div class='icon' alt='Show the list of files that can be open on the server' title='Show the list of files that can be open on the server'></div></div><div class='action add'><div class='icon' alt='Add a source or a filter to the currently selected source' title='Add a source or a filter to the currently selected source'></div></div><div class='action delete disabled'><div class='icon' alt='Delete the selected source' title='Delete the selected source'></div></div></div></div>");
+        buffer.append("</div><div class='pipeline-control'><div class='action edit'><div class='icon' alt='Toggle visibility of the Proxy property editor' title='Toggle visibility of the Proxy property editor'></div></div><div class='action files'><div class='icon' alt='Show the list of files that can be open on the server' title='Show the list of files that can be open on the server'></div></div><div class='action add'><div class='icon' alt='Add a source or a filter to the currently selected source' title='Add a source or a filter to the currently selected source'></div></div><div class='action delete-proxy disabled'><div class='icon' alt='Delete the selected source' title='Delete the selected source'></div></div></div></div>");
 
         addProxiesToBuffer(data.pipeline.children);
 
@@ -1221,7 +1221,6 @@
             }
             state[property.attr('proxy')][property.attr('label')] = values;
         });
-        console.log(state);
         return state;
     }
 
@@ -1369,10 +1368,10 @@
         // Handle delete button status
         var selectedProxy = $('.proxy > div.selected', pipelineBrowser);
         if(selectedProxy.length > 0) {
-            $('.server .delete', pipelineBrowser).removeClass('disabled');
-            selectedProxy.parent().children('ul').children('li').closest('.server').find('.delete').addClass('disabled');
+            $('.server .delete-proxy', pipelineBrowser).removeClass('disabled');
+            selectedProxy.parent().children('ul').children('li').closest('.server').find('.delete-proxy').addClass('disabled');
         } else {
-            $('.server .delete', pipelineBrowser).addClass('disabled');
+            $('.server .delete-proxy', pipelineBrowser).addClass('disabled');
         }
 
     }
@@ -1681,7 +1680,7 @@
 
         // ============= Delete Selected Proxy ===========
 
-        $('.delete', pipelineBrowser).unbind().click(function(){
+        $('.delete-proxy', pipelineBrowser).unbind().click(function(){
             var me = $(this);
             if(!me.hasClass('disabled')) {
                 fireDeleteProxy(me);
@@ -1838,7 +1837,11 @@
                 buffer.append("enum' key='");
                 buffer.append(key);
             } else if (domain.hasOwnProperty('size')) {
-                buffer.append('text');
+                if(domain['size'] === '0') {
+                    buffer.append('multi-value');
+                } else {
+                    buffer.append('text');
+                }
                 buffer.append("' size='");
                 buffer.append(domain['size']);
                 buffer.append("' data-type='");
@@ -1887,6 +1890,9 @@
             createSlider(container, propertyName, container.attr('min'), container.attr('max'), container.attr('data-type'), value)
         } else if (widgetType === 'array') {
             createArraySelector(container, propertyName, container.attr('proxy'), Number(container.attr('nb_comp')), container.attr('selected_array_type'), container.attr('selected_array'));
+        } else if (widgetType === 'multi-value') {
+            var array = value.length === 0 ? [] : value.split(',');
+            createMultiValue(container, propertyName, array);
         }
     }
 
@@ -2048,6 +2054,45 @@
         $('input', container).change(function(){
             markProxyModified(container);
         });
+    }
+
+    // =======================================================================
+
+    function createMultiValue(container, propertyName, propertyValue) {
+        var tmpBuffer = createBuffer(), emptyLineHTML = "<tr><td></td><td><input class='multi-value' type='text' value='0.0'></td><td class='delete-value'></td></tr>";
+
+        function addEntry() {
+            attachListener($(emptyLineHTML).appendTo($('table', container)));
+            markProxyModified(container);
+        }
+
+        function attachListener(parent) {
+            $('input', parent).change(function(){
+                markProxyModified(container);
+            });
+            $('.add', parent).click(addEntry);
+            $('.delete-value', parent).click(function(){
+                $(this).parent().remove();
+                markProxyModified(container);
+            });
+        }
+
+        // First line with title
+        tmpBuffer.append("<td colspan='2'><table class='multi-value' style='width: 100%;'><tr><td class='title'>");
+        tmpBuffer.append(propertyName);
+        tmpBuffer.append("</td><td><input class='multi-value' type='text'></td><td class='add'></td></tr>");
+        tmpBuffer.append("</table></td>");
+
+        container[0].innerHTML = tmpBuffer.toString();
+        attachListener(container);
+
+        // Update values
+        for(var idx = 1; idx < propertyValue.length; idx++) {
+            addEntry();
+        }
+        for(idx in propertyValue) {
+            $('input.multi-value', container).eq(idx).val(propertyValue[idx]);
+        }
     }
 
 }(window, jQuery));

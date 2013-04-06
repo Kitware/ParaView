@@ -272,10 +272,10 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 .server .pipeline-control .add .icon {
     background: url("paraview/pipeline/add.png") no-repeat center center transparent;
 }
-.server .pipeline-control .delete .icon {
+.server .pipeline-control .delete-proxy .icon {
     background: url("paraview/pipeline/delete.png") no-repeat center center transparent;
 }
-.server .pipeline-control .delete.disabled .icon {
+.server .pipeline-control .delete-proxy.disabled .icon {
     background: url("paraview/pipeline/delete_disabled.png") no-repeat center center transparent;
 }
 
@@ -593,6 +593,20 @@ div.pipelineBrowser:not(.view-pipeline) .pipeline-tree li {
 }
 .pipeline-editor .pv-widget > select {
     width: 96%;
+}
+
+.pipeline-editor .property input.multi-value {
+    width: 96%;
+}
+
+.pipeline-editor .property .multi-value .add {
+    width: 26px;
+    background: url("paraview/pipeline/add.png") no-repeat scroll center transparent;
+}
+
+.pipeline-editor .property .multi-value .delete-value {
+    width: 26px;
+    background: url("paraview/pipeline/delete.png") no-repeat scroll center transparent;
 }
 
 .pipeline-editor .pv-widget-slider {
