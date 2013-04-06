@@ -57,7 +57,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   set (${vtk-module}_HDRS
        ${${vtk-module}_HDRS}
        FortranPythonAdaptorAPI.h
-       FortranPythonAdaptorAPIMangling.h)
+       ${CMAKE_CURRENT_BINARY_DIR}/FortranPythonAdaptorAPIMangling.h)
 endif()
 
 vtk_module_library(${vtk-module} ${Module_SRCS})

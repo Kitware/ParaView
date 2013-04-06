@@ -70,7 +70,7 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   set (${vtk-module}_HDRS
        ${${vtk-module}_HDRS}
        FortranAdaptorAPI.h
-       FortranAdaptorAPIMangling.h)
+       ${CMAKE_CURRENT_BINARY_DIR}/FortranAdaptorAPIMangling.h)
 endif()
 
 vtk_module_library(${vtk-module} ${Module_SRCS})
