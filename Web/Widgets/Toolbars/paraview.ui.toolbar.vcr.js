@@ -16,6 +16,7 @@
     + "<li action='pause' class='toggle hide pause' alt='Pause animation' title='Pause animation'><div class='icon'></div></li>"
     + "<li action='next'  class='action'            alt='Next frame' title='Next frame'><div class='icon' alt='Next frame'></div></li>"
     + "<li action='last'  class='action'            alt='Last frame' title='Last frame'><div class='icon'></div></li>"
+    + "<input type='text' class='time' value='0' disabled>"
     + "</ul>\n",
     SESSION_DATA_KEY = 'paraview-session';
 
@@ -63,7 +64,9 @@
         action = me.attr('action');
 
         if(session != null && session != undefined) {
-            session.call("pv:vcr", action);
+            session.call("pv:vcr", action).then(function(time){
+                $('input.time', rootWidget).val(time);
+            });
         }
 
         fireAction(rootWidget, action);
@@ -86,7 +89,8 @@
 
         function next() {
             if(session != null && session != undefined) {
-                session.call("pv:vcr", 'next').then(function(){
+                session.call("pv:vcr", 'next').then(function(time){
+                    $('input.time', rootWidget).val(time);
                     rootWidget.trigger('dataChanged');
                     if($('.pause', rootWidget).is(':visible')) {
                         setTimeout(next, 10);
