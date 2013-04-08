@@ -1122,7 +1122,7 @@
             buffer.append("'>");
             buffer.append(proxy.cellData[idx].name);
             buffer.append(" [");
-            buffer.append(proxy.pointData[idx].size);
+            buffer.append(proxy.cellData[idx].size);
             buffer.append("]</li>\n");
         }
 

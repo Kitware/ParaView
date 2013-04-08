@@ -400,7 +400,7 @@ def getProxyDomains(id):
        name = xmlChild.GetName()
        if name.__contains__('Property'):
            propName = xmlChild.GetAttribute('name')
-           jsonDefinition[propName] = extractProperty(xmlChild)
+           jsonDefinition[propName] = extractProperty(proxy, xmlChild)
            jsonDefinition[propName]['order'] = i
 
    # Look for proxy properties and their domain
@@ -422,7 +422,7 @@ def getProxyDomains(id):
 
    return jsonDefinition
 
-def extractProperty(xmlPropertyElement):
+def extractProperty(proxy, xmlPropertyElement):
     propInfo = {}
     propInfo['name'] = xmlPropertyElement.GetAttribute('name')
     propInfo['label'] = xmlPropertyElement.GetAttribute('label')
@@ -437,10 +437,10 @@ def extractProperty(xmlPropertyElement):
         xmlChild = xmlPropertyElement.GetNestedElement(i)
         name = xmlChild.GetName()
         if name.__contains__('Domain'):
-            propInfo['domains'].append(extractDomain(xmlChild))
+            propInfo['domains'].append(extractDomain(proxy, propInfo['name'], xmlChild))
     return propInfo
 
-def extractDomain(xmlDomainElement):
+def extractDomain(proxy, propertyName, xmlDomainElement):
     domainObj = {}
     name = xmlDomainElement.GetName()
     domainObj['type'] = name[:-6]
@@ -470,6 +470,10 @@ def extractDomain(xmlDomainElement):
             domainObj['nb_components'] = 3
         else:
             domainObj['nb_components'] = -1
+
+    # Handle ProxyListDomain
+    if name.__contains__('ProxyListDomain'):
+        domainObj['list'] = proxy.GetProperty(propertyName).Available
 
     return domainObj
 
