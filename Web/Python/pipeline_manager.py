@@ -210,6 +210,12 @@ class PipelineManager(web.ParaViewServerProtocol):
 
         return view.ViewTime
 
+    @exportRpc("updateScalarRange")
+    def updateScalarRange(self, proxyId):
+        global lutManager;
+        proxy = web_helper.idToProxy(proxyId);
+        lutManager.registerFieldData(proxy.GetPointDataInformation())
+        lutManager.registerFieldData(proxy.GetCellDataInformation())
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

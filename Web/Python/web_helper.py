@@ -145,16 +145,18 @@ class LookupTableManager:
     def registerArray(self, name, number_of_components, range):
         key = self.getLutId(name, number_of_components)
         if self.range.has_key(key):
-            # do we need to extend the range ?
-            # ... fixme ...
-            pass
+            self.range[key] = range;
+            self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].VectorMode = 'Magnitude'
+            self.luts[key].ColorSpace = 'HSV'
         else:
             self.range[key] = range;
             # ... fixme ... Create default lut with proper range/title/color scheme
             self.luts[key] = simple.GetLookupTableForArray(name, number_of_components)
 
             # Setup default config
-            self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].RGBPoints  = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].VectorMode = 'Magnitude'
             self.luts[key].ColorSpace = 'HSV'
 
             self.scalarbars[key] = simple.CreateScalarBar(LookupTable=self.luts[key])

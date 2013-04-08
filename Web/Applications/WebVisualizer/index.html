@@ -28,6 +28,7 @@
             <div class="logo" alt="Toggle pipeline browser visibility"></div>
             <div class="viewport-toolbar"></div>
             <div class="vcr-toolbar"></div>
+            <div class="rescale-data"><img src="../../lib/css/paraview/pipeline/resetRange.png" style="position: relative; top: 5px;" title="Rescale data range to the current time step" alt="Rescale data range to the current time step"/></div>
             <div class="loading"></div>
         </div>
         <div class="splitter">
@@ -182,6 +183,15 @@
                     pv = {};
                 }
             }
+
+            // ==== Rescale data range =========================================
+
+            $('.rescale-data').click(function(){
+                if(pv.connection.session) {
+                    proxyId = $('.pipelineBrowser').getProxy().proxy_id;
+                    pv.connection.session.call('pv:updateScalarRange', proxyId);
+                }
+            });
         </script>
     </body>
 </html>
