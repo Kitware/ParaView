@@ -849,6 +849,9 @@
 
         // Attach listeners
         initializeListener(pipelineLineBefore);
+
+        // Update proxy editor
+        updateProxyProperties(pipelineBrowser, proxy);
     }
 
     // =======================================================================
@@ -1214,6 +1217,10 @@
                 value = Number($(this).val());
                 values.push(value);
             });
+            $('select[type=list]', property).each(function(){
+                value = $(this).val();
+                values.push(value);
+            });
 
             // Build property info
             if(!state.hasOwnProperty(property.attr('proxy'))) {
@@ -1221,6 +1228,8 @@
             }
             state[property.attr('proxy')][property.attr('label')] = values;
         });
+
+        console.log(state);
         return state;
     }
 
@@ -1738,6 +1747,17 @@
 
     // =======================================================================
 
+    function isProxyListDomain(domainList) {
+        for(var idx in domainList) {
+            if(domainList[idx].type === 'ProxyList') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // =======================================================================
+
     function getInputArrayNumberOfComponents(domainList) {
         for(var idx in domainList) {
             if(domainList[idx].type === 'ArrayList') {
@@ -1759,6 +1779,8 @@
             for(key in proxy.state.properties) {
                 if(proxy.state.domains.hasOwnProperty(key)) {
                     addPropertyToBuffer(proxy.state['proxy_id'], key, proxy.state.properties[key], proxy.state.domains[key]);
+                } else {
+                    addPropertyToBuffer(proxy.state['proxy_id'], key, proxy.state.properties[key], null);
                 }
             }
         }
@@ -1790,9 +1812,13 @@
                 return;
             }
         }
-        if(typeof(value) === "object" && !(value instanceof Array)) {
-            for(var key2 in value.properties) {
-                addPropertyToBuffer(value['proxy_id'], key2, value.properties[key2], value.domains[key2]);
+        if(domain === null) {
+            if(value.hasOwnProperty('proxy_id')) {
+                buffer.append("<tr class='sub-proxy'><table>");
+                for(var key2 in value.properties) {
+                    addPropertyToBuffer(value['proxy_id'], key2, value.properties[key2], value.domains[key2]);
+                }
+                buffer.append("</table></tr>");
             }
         } else {
             buffer.append("<tr class='property' name='");
@@ -1835,6 +1861,9 @@
                 buffer.append("'");
             } else if (isEnumDomain(domain['domains'])) {
                 buffer.append("enum' key='");
+                buffer.append(key);
+            } else if (isProxyListDomain(domain['domains'])) {
+                buffer.append("list' key='");
                 buffer.append(key);
             } else if (domain.hasOwnProperty('size')) {
                 if(domain['size'] === '0') {
@@ -1886,6 +1915,8 @@
             createTextField(container, propertyName, container.attr('size'), container.attr('data-type'), value);
         } else if (widgetType === 'enum') {
             createEnumeration(container, container.attr('proxy'), propertyName, container.attr('key'), value);
+        } else if (widgetType === 'list') {
+            createList(container, container.attr('proxy'), propertyName, container.attr('key'), value);
         } else if (widgetType === 'range') {
             createSlider(container, propertyName, container.attr('min'), container.attr('max'), container.attr('data-type'), value)
         } else if (widgetType === 'array') {
@@ -1893,6 +1924,7 @@
         } else if (widgetType === 'multi-value') {
             var array = value.length === 0 ? [] : value.split(',');
             createMultiValue(container, propertyName, array);
+
         }
     }
 
@@ -1995,7 +2027,43 @@
         tmpBuffer.append("</select></td>");
 
         container[0].innerHTML = tmpBuffer.toString();
-        $('input', container).change(function(){
+        $('select', container).change(function(){
+            markProxyModified(container);
+        });
+    }
+
+    // =======================================================================
+
+    function createList(container, proxyId, propertyLabel, propertyName, propertyValue)
+    {
+        var tmpBuffer = createBuffer(), proxy = getProxy(container, proxyId),
+        list = [], domains = proxy.state.domains[propertyName].domains, idx;
+
+        // Search the list domain
+        for(idx in domains) {
+            if(domains[idx].hasOwnProperty('list')) {
+                list = domains[idx].list
+            }
+        }
+
+        tmpBuffer.append("<td class='title'>");
+        tmpBuffer.append(propertyLabel);
+        tmpBuffer.append("</td><td class='pv-widget'><select type='list'>");
+        for(var i in list) {
+            tmpBuffer.append("<option value='");
+            tmpBuffer.append(list[i]);
+            tmpBuffer.append("'");
+            if(propertyValue === list[i]) {
+                tmpBuffer.append(" SELECTED");
+            }
+            tmpBuffer.append(">");
+            tmpBuffer.append(list[i]);
+            tmpBuffer.append("</option>");
+        }
+        tmpBuffer.append("</select></td>");
+
+        container[0].innerHTML = tmpBuffer.toString();
+        $('select', container).change(function(){
             markProxyModified(container);
         });
     }
