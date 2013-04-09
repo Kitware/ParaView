@@ -1253,12 +1253,12 @@
 
                 if(event.action === 'down') {
                     mouseHandling.button = event.current_button;
-                    mouseHandling.lastX = event.clientX;
-                    mouseHandling.lastY = event.clientY;
+                    mouseHandling.lastX = event.pageX;
+                    mouseHandling.lastY = event.pageY;
                 } else if (event.action === 'up') {
                     mouseHandling.button = null;
                 } else if (event.action === 'move' && mouseHandling.button != null && cameraLayerZero != null) {
-                    var newX = event.clientX, newY = event.clientY,
+                    var newX = event.pageX, newY = event.pageY,
                     deltaX = newX - mouseHandling.lastX,
                     deltaY = newY - mouseHandling.lastY;
                     mouseHandling.lastX = newX;

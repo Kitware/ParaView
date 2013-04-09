@@ -54,7 +54,7 @@ tbody, tfoot, thead, tr, th, td {
 /* ========================= Control panel ================================== */
 
 .control-panel {
-    width: 400px;
+    width: 320px;
     border-right: 1px solid black;
     z-index: 10;
     overflow: auto;

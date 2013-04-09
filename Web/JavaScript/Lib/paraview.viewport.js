@@ -147,6 +147,89 @@
     }
 
     // ----------------------------------------------------------------------
+
+    function attachTouchListener(mouseListenerContainer, renderersContainer, viewport) {
+        var current_button = null, posX, posY,
+        isZooming = false, mouseAction = 'up', target;
+
+        function mobileTouchInteraction(evt) {
+            evt.gesture.preventDefault();
+            switch(evt.type) {
+                case 'drag':
+                    if(isZooming) {
+                        return;
+                    }
+                    current_button = 1;
+                    if(mouseAction === 'up') {
+                        mouseAction = "down";
+                        mouseListenerContainer.html('');
+                        target = evt.gesture.target;
+                    } else {
+                        mouseAction = "move";
+                    }
+
+                    posX = evt.gesture.touches[0].pageX;
+                    posY = evt.gesture.touches[0].pageY;
+                    break;
+                case 'release':
+                    current_button = 0;
+                    mouseAction = "up";
+                    isZooming = false;
+                    break;
+                case 'doubletap':
+                    viewport.resetCamera();
+                    return;
+                case 'pinch':
+                    isZooming = true;
+                    current_button = 3;
+                    if(mouseAction === 'up') {
+                        mouseAction = 'down';
+                        posX = 0;
+                        posY = mouseListenerContainer.height();
+                        target = evt.gesture.target;
+                        mouseListenerContainer.html('');
+                    } else {
+                        mouseAction = 'move';
+                        posY = mouseListenerContainer.height() * (1+(evt.gesture.scale-1)/2);
+                    }
+                    break;
+            }
+
+            //mouseListenerContainer.html(mouseAction + ' (' + posX + ', ' + posY + ') b:' + current_button + ' z: ' + isZooming ).css('color','#FFFFFF');
+
+            // Trigger event
+            renderersContainer.trigger({
+                type: 'mouse',
+                action: mouseAction,
+                current_button: current_button,
+                charCode: '',
+                altKey: false,
+                ctrlKey: false,
+                shiftKey: false,
+                metaKey: false,
+                delegateTarget: target,
+                pageX: posX,
+                pageY: posY
+            });
+        }
+
+        // Bind listener to UI container
+        mouseListenerContainer.hammer({
+            prevent_default : true,
+            no_mouseevents : true,
+            transform : true,
+            transform_always_block : true,
+            transform_min_scale : 0.03,
+            transform_min_rotation : 2,
+            drag : true,
+            drag_max_touches : 1,
+            drag_min_distance : 10,
+            swipe : false,
+            hold : false
+        }).on("doubletap pinch drag release", mobileTouchInteraction);
+    }
+
+    // ----------------------------------------------------------------------
     // Viewport statistic manager
     // ----------------------------------------------------------------------
 
@@ -568,6 +651,12 @@
         // Attach mouse listener if requested
         if (config.enableInteractions) {
             attachMouseListener(mouseListener, rendererContainer);
+            try {
+                attachTouchListener(mouseListener, rendererContainer, viewport);
+            } catch(error) {
+                console.log('Hammer is not properly initialized');
+                console.log(error);
+            }
         }
 
         // Attach stat listener
