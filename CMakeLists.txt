@@ -582,7 +582,8 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
   endif()
 
   # reset INCLUDE_DIRECTORIES to what it was before we added to it
-  set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES ${tempdirs})
+  set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+  include_directories(${tempdirs})
 
 endif()
 
