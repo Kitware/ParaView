@@ -149,21 +149,23 @@
     // ----------------------------------------------------------------------
 
     function attachTouchListener(mouseListenerContainer, renderersContainer, viewport) {
-        var current_button = null, posX, posY,
-        isZooming = false, mouseAction = 'up', target;
+        var current_button = null, posX, posY, defaultDragButton = 1,
+        isZooming = false, isDragging = false, mouseAction = 'up', target;
 
         function mobileTouchInteraction(evt) {
+            console.log('touch');
             evt.gesture.preventDefault();
             switch(evt.type) {
                 case 'drag':
                     if(isZooming) {
                         return;
                     }
-                    current_button = 1;
+                    current_button = defaultDragButton;
                     if(mouseAction === 'up') {
                         mouseAction = "down";
-                        mouseListenerContainer.html('');
+
                         target = evt.gesture.target;
+                        isDragging = true;
                     } else {
                         mouseAction = "move";
                     }
@@ -171,23 +173,37 @@
                     posX = evt.gesture.touches[0].pageX;
                     posY = evt.gesture.touches[0].pageY;
                     break;
+                case 'hold':
+                    if(defaultDragButton === 1) {
+                        defaultDragButton = 2;
+                        mouseListenerContainer.html("Pan mode").css('color','#FFFFFF');
+                    } else {
+                        defaultDragButton = 1;
+                        mouseListenerContainer.html("Rotation mode").css('color','#FFFFFF');
+                    }
+
+                    break;
                 case 'release':
+                    mouseListenerContainer.html('');
                     current_button = 0;
                     mouseAction = "up";
                     isZooming = false;
+                    isDragging = false;
                     break;
                 case 'doubletap':
                     viewport.resetCamera();
                     return;
                 case 'pinch':
-                    isZooming = true;
+                    if(isDragging) {
+                        return;
+                    }
                     current_button = 3;
                     if(mouseAction === 'up') {
                         mouseAction = 'down';
                         posX = 0;
                         posY = mouseListenerContainer.height();
                         target = evt.gesture.target;
-                        mouseListenerContainer.html('');
+                        isZooming = true;
                     } else {
                         mouseAction = 'move';
                         posY = mouseListenerContainer.height() * (1+(evt.gesture.scale-1)/2);
@@ -216,7 +232,7 @@
         // Bind listener to UI container
         mouseListenerContainer.hammer({
             prevent_default : true,
-            no_mouseevents : true,
+            prevent_mouseevents : true,
             transform : true,
             transform_always_block : true,
             transform_min_scale : 0.03,
@@ -225,8 +241,8 @@
             drag_max_touches : 1,
             drag_min_distance : 10,
             swipe : false,
-            hold : false
-        }).on("doubletap pinch drag release", mobileTouchInteraction);
+            hold : true // To switch from rotation to pan
+        }).on("doubletap pinch drag release hold", mobileTouchInteraction);
     }
 
     // ----------------------------------------------------------------------
