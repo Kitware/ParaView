@@ -764,7 +764,7 @@ void vtkPVComparativeView::ClearDataCaches(int x, int y)
       }
     else
       {
-      assert((x + this->Dimensions[0]*y - 1) < repcloneiter->second.Clones.size());
+      assert(static_cast<size_t>(x + this->Dimensions[0]*y - 1) < repcloneiter->second.Clones.size());
       const vtkInternal::RepresentationCloneItem& item =
         repcloneiter->second.Clones[x + this->Dimensions[0]*y - 1];
       reprToClear = vtkSMRepresentationProxy::SafeDownCast(
