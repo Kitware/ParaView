@@ -563,15 +563,6 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
     ${ParaView_BINARY_DIR}/CoProcessing/PythonCatalyst/
     ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst/)
 
-  # trying to figure out all of the proper sources and targets to set the
-  # include directories for is a pain so I just set it globally but first
-  # I keep track of the current ones are so that I can reset them later.
-  get_property(tempdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-
-  include_directories(${VTK_INCLUDE_DIRS}
-    ${PYTHON_INCLUDE_DIR}
-    ${vtkPVPythonCatalyst_INCLUDE_DIRS}
-    ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
   list(APPEND VTK_PYTHON_MODULES ${vtk-module})
   set(vtkPVPythonCatalyst_HEADERS vtkCPPythonHelper vtkCPPythonScriptPipeline vtkCPPythonProcessor)
   vtk_add_python_wrapping(${vtk-module})
@@ -581,10 +572,14 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
       "${${_test_module_name}_SOURCE_DIR}" "${${_test_module_name}_BINARY_DIR}")
   endif()
 
-  # reset INCLUDE_DIRECTORIES to what it was before we added to it
-  set_property(DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-  include_directories(${tempdirs})
-
+  set_property(TARGET vtkPVPythonCatalystPythonD PROPERTY INCLUDE_DIRECTORIES
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${vtkPVPythonCatalyst_INCLUDE_DIRS}
+    ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
+  set_property(TARGET vtkPVPythonCatalystPython PROPERTY INCLUDE_DIRECTORIES
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${vtkPVPythonCatalyst_INCLUDE_DIRS}
+    ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
 endif()
 
 #------------------------------------------------------------------------------
