@@ -2678,6 +2678,15 @@
         <Documentation>This property specifies the .q (solution) file name for
         the PLOT3D reader.</Documentation>
       </StringVectorProperty>
+      <IntVectorProperty command="SetAutoDetectFormat"
+                         default_values="1"
+                         name="AutoDetectFormat"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>When this options is enabled, the reader will try to
+	automatically figure out various settings for a binary file. The other
+	options are ignored. Does not work for text (ascii) files.</Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetBinaryFile"
                          default_values="1"
                          name="BinaryFile"
@@ -2725,6 +2734,14 @@
         <BooleanDomain name="bool" />
         <Documentation>This property indicates whether to attempt to read the
         file even if it appears corrupt</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetDoublePrecision"
+                         default_values="0"
+                         name="DoublePrecision"
+                         number_of_elements="1">
+        <BooleanDomain name="bool" />
+        <Documentation>This property specifies whether floating points values
+	are in double precision.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetByteOrder"
                          default_values="0"
@@ -7162,27 +7179,6 @@
                      extension for the solution files is .q. The output of this
                      reader is a multi-block dataset containing curvilinear
                      (structured grid) datasets.</Documentation>
-      <SubProxy>
-        <Proxy name="Reader"
-               proxygroup="internal_sources"
-               proxyname="P3DReaderCore"></Proxy>
-        <ExposedProperties>
-          <Property name="FileName" />
-          <Property name="BinaryFile" />
-          <Property name="MultiGrid" />
-          <Property name="HasByteCount" />
-          <Property name="IBlanking" />
-          <Property name="TwoDimensionalGeometry" />
-          <Property name="ForceRead" />
-          <Property name="ByteOrder" />
-          <Property name="Functions" />
-        </ExposedProperties>
-      </SubProxy>
-      <StringVectorProperty command="GetCurrentFileName"
-                            information_only="1"
-                            name="FileNameInfo">
-        <SimpleStringInformationHelper />
-      </StringVectorProperty>
       <StringVectorProperty animateable="0"
                             clean_command="RemoveAllFileNames"
                             command="AddFileName"
@@ -7195,6 +7191,29 @@
         There can be more than one. If more that one file is specified, the
         reader will switch to file-series mode in which it will pretend that it
         can support time and provide one file per time step.</Documentation>
+      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="P3DReaderCore"></Proxy>
+        <ExposedProperties>
+          <Property name="FileName" />
+	  <Property name="AutoDetectFormat"/>
+          <Property name="BinaryFile" />
+          <Property name="MultiGrid" />
+          <Property name="HasByteCount" />
+          <Property name="IBlanking" />
+          <Property name="TwoDimensionalGeometry" />
+          <Property name="DoublePrecision" />
+          <Property name="ByteOrder" />
+          <Property name="Functions" />
+          <Property name="ForceRead" />
+        </ExposedProperties>
+      </SubProxy>
+      <StringVectorProperty command="GetCurrentFileName"
+                            information_only="1"
+                            name="FileNameInfo">
+        <SimpleStringInformationHelper />
       </StringVectorProperty>
       <DoubleVectorProperty information_only="1"
                             name="TimestepValues"
@@ -7210,6 +7229,31 @@
         <DefaultFileNameProperty name="FileName" />
       </Hints>
       <!-- End plot3d reader-->
+    </SourceProxy>
+    <!-- Plot3D Meta Reader -->
+    <SourceProxy class="vtkPlot3DMetaReader"
+                 label="PLOT3D Meta-File Reader"
+                 name="Plot3DMetaReader">
+      <StringVectorProperty animateable="0"
+                            command="SetFileName"
+                            name="FileName"
+                            number_of_elements="1"
+                            panel_visibility="never">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the meta file
+        name</Documentation>
+      </StringVectorProperty>
+      <DoubleVectorProperty information_only="1"
+                            name="TimestepValues"
+                            repeatable="1">
+        <TimeStepsInformationHelper />
+        <Documentation>Available timestep values.</Documentation>
+      </DoubleVectorProperty>
+      <Hints>
+        <ReaderFactory extensions="p3d"
+                       file_description="PLOT3D Meta Files" />
+      </Hints>
+      <!-- End Plot3D Meta Reader-->
     </SourceProxy>
     <!-- CML Reader -->
     <SourceProxy class="vtkCMLMoleculeReader"

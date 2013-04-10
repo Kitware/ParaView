@@ -687,7 +687,7 @@ int vtkFileSeriesReader::RequestUpdateExtent(
     }
   if (index<0)
     {
-    vtkErrorMacro("Inputs are not set.");
+    vtkDebugMacro("Inputs are not set.");
     return 0;
     }
 
