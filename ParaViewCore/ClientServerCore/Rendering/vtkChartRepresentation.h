@@ -81,6 +81,10 @@ public:
   void GetSeriesNames(std::vector<const char*>& names);
 
   // Description:
+  // Get the names of the arrays
+  void GetArraysNames(std::vector<const char*>& names);
+
+  // Description:
   // Force the chaty to rescale its axes.
   virtual void RescaleChart();
 
@@ -165,6 +169,7 @@ protected:
   vtkSmartPointer<vtkMultiBlockDataSet> LocalOutput;
 
   std::vector<std::string> SeriesNames; //all series names consistent with local output
+  std::set<std::string> ArrayNames; // Similar to array name without block name prefix
   std::set<int> CompositeIndices; //the selected blocks
 
   vtkChartSelectionRepresentation* SelectionRepresentation;
