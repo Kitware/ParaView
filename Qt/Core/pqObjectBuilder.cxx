@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCoreUtilities.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
@@ -844,48 +845,8 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 //-----------------------------------------------------------------------------
 QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 {
-  if (proxy->GetHints())
-    {
-    vtkPVXMLElement* filenameHint =
-      proxy->GetHints()->FindNestedElementByName("DefaultFileNameProperty");
-    if (filenameHint &&
-      filenameHint->GetAttribute("name") &&
-      proxy->GetProperty(filenameHint->GetAttribute("name")))
-      {
-      return filenameHint->GetAttribute("name");
-      }
-    }
-
-  // Find the first property that has a vtkSMFileListDomain. Assume that
-  // it is the property used to set the filename.
-  vtkSmartPointer<vtkSMPropertyIterator> piter;
-  piter.TakeReference(proxy->NewPropertyIterator());
-  piter->Begin();
-  while(!piter->IsAtEnd())
-    {
-    vtkSMProperty* prop = piter->GetProperty();
-    if (prop && prop->IsA("vtkSMStringVectorProperty"))
-      {
-      vtkSmartPointer<vtkSMDomainIterator> diter;
-      diter.TakeReference(prop->NewDomainIterator());
-      diter->Begin();
-      while(!diter->IsAtEnd())
-        {
-        if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
-          {
-          return piter->GetKey();
-          }
-        diter->Next();
-        }
-      if (!diter->IsAtEnd())
-        {
-        break;
-        }
-      }
-    piter->Next();
-    }
-
-  return QString::Null();
+  const char* fname = vtkSMCoreUtilities::GetFileNameProperty(proxy);
+  return fname? QString(fname): QString::Null();
 }
 
 //-----------------------------------------------------------------------------

@@ -184,10 +184,10 @@ def OpenDataFile(filename, **extraArgs):
       reader_factor.GetReaderGroup(), reader_factor.GetReaderName())
     xml_name = paraview.make_name_valid(prototype.GetXMLLabel())
     reader_func = _create_func(xml_name, servermanager.sources)
-    if prototype.GetProperty("FileNames"):
-      reader = reader_func(FileNames=filename, **extraArgs)
-    else :
-      reader = reader_func(FileName=filename, **extraArgs)
+    pname = servermanager.vtkSMCoreUtilities.GetFileNameProperty(prototype)
+    if pname:
+        extraArgs[pname] = filename
+        reader = reader_func(**extraArgs)
     return reader
 
 def CreateWriter(filename, proxy=None, **extraArgs):
