@@ -325,7 +325,6 @@ void vtkCTHDataArray::LookupValue (vtkVariant var, vtkIdList* ids)
     this->Fallback->LookupValue (var, ids);
     return;
     }
-  double *dummy = 0;
   bool valid = true;
   double val = var.ToDouble (&valid);
   ids->Reset ();
