@@ -29,6 +29,10 @@ try:
     from vtkRenderingCorePython import vtkCamera
 except ImportError:
     paraview.print_error("Error: Could not import vtkRenderingCorePython")
+try:
+    from vtkFiltersCore import *
+except ImportError:
+    paraview.print_error("Error: Could not import vtkFiltersCore")
 
 # --------------------------------------
 
