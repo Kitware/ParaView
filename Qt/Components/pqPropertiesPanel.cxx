@@ -802,36 +802,10 @@ void pqPropertiesPanel::apply()
   bool onlyApplyCurrentPanel =
     settings->value("onlyApplyCurrentPanel", false).toBool();
 
-  if(onlyApplyCurrentPanel)
+  if (onlyApplyCurrentPanel)
     {
     // apply current panel proxy only
-    pqProxyPropertiesPanel *panel = this->ProxyPanels[this->Proxy];
-    if(panel)
-      {
-      panel->apply();
-
-      pqProxy *proxy = this->Proxy;
-      if(proxy)
-        {
-        pqPipelineSource *source = qobject_cast<pqPipelineSource*>(panel->proxy());
-        if(source)
-          {
-          if(proxy->modifiedState() == pqProxy::UNINITIALIZED)
-            {
-            this->show(source);
-
-            pqProxyModifiedStateUndoElement* undoElement =
-                pqProxyModifiedStateUndoElement::New();
-            undoElement->SetSession(source->getServer()->session());
-            undoElement->MadeUnmodified(source);
-            ADD_UNDO_ELEM(undoElement);
-            undoElement->Delete();
-            }
-          }
-
-        proxy->setModifiedState(pqProxy::UNMODIFIED);
-        }
-      }
+    this->applyProxyPanel(this->Proxy);
     }
   else
     {
@@ -845,45 +819,51 @@ void pqPropertiesPanel::apply()
         }
 
       // apply each property widget
-      pqProxyPropertiesPanel *panel = this->ProxyPanels[proxy];
-      if(panel)
-        {
-        panel->apply();
-        }
-
-      pqPipelineSource *source = qobject_cast<pqPipelineSource*>(proxy);
-      if(source)
-        {
-        if(proxy->modifiedState() == pqProxy::UNINITIALIZED)
-          {
-          this->show(source);
-
-          pqProxyModifiedStateUndoElement* undoElement =
-              pqProxyModifiedStateUndoElement::New();
-          undoElement->SetSession(source->getServer()->session());
-          undoElement->MadeUnmodified(source);
-          ADD_UNDO_ELEM(undoElement);
-          undoElement->Delete();
-          }
-        }
-
-      proxy->setModifiedState(pqProxy::UNMODIFIED);
+      this->applyProxyPanel(proxy);
       }
     }
-
   this->updateInformationAndDomains();
-
   this->updateButtonState();
-
-  if(this->View)
-    {
-    // re-render the view
-    this->View->render();
-    }
 
   emit this->applied();
 
   END_UNDO_SET();
+}
+
+void pqPropertiesPanel::applyProxyPanel(pqProxy* proxy)
+{
+  if (!proxy)
+    {
+    return;
+    }
+
+  pqProxyPropertiesPanel *panel = this->ProxyPanels[proxy];
+  if (!panel)
+    {
+    return;
+    }
+  panel->apply();
+
+  pqPipelineSource *source = qobject_cast<pqPipelineSource*>(panel->proxy());
+  if (!source)
+    {
+    return;
+    }
+
+  if (proxy->modifiedState() == pqProxy::UNINITIALIZED)
+    {
+    this->show(source);
+
+    pqProxyModifiedStateUndoElement* undoElement =
+      pqProxyModifiedStateUndoElement::New();
+    undoElement->SetSession(source->getServer()->session());
+    undoElement->MadeUnmodified(source);
+    ADD_UNDO_ELEM(undoElement);
+    undoElement->Delete();
+    }
+  proxy->setModifiedState(pqProxy::UNMODIFIED);
+
+  source->renderAllViews();
 }
 
 void pqPropertiesPanel::reset()
