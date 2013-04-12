@@ -234,6 +234,13 @@ public:
   vtkGetMacro(WriteStatisticsOutput,bool);
 
   // Description:
+  // Variable used to specify the number of ghost level
+  // is available in each block.
+  // By Default set to 1 which is what the scth reader provides
+  vtkSetMacro(BlockGhostLevel, unsigned char);
+  vtkGetMacro(BlockGhostLevel, unsigned char);
+
+  // Description:
   // Sets modified if array selection changes.
   static void SelectionModifiedCallback( vtkObject*,
                                          unsigned long,
@@ -477,7 +484,7 @@ protected:
                        std::vector<std::string> &massWtdAvgArrayNames,
                        std::vector<std::string> &summedArrayNames,
                        std::vector<std::string> &integratedArrayNames);
-  void AddBlock(vtkMaterialInterfaceFilterBlock* block);
+  void AddBlock(vtkMaterialInterfaceFilterBlock* block, unsigned char levelOfGhostLayer);
 
   // New methods for connecting neighbors.
   void CheckLevelsForNeighbors(
@@ -700,6 +707,10 @@ protected:
 
   // Variable that will invert a material.
   int InvertVolumeFraction;
+
+  // Specify the number of Ghost level available in each block.
+  // By default set to 1
+  unsigned char BlockGhostLevel;
 
 
 #ifdef vtkMaterialInterfaceFilterPROFILE

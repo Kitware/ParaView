@@ -493,7 +493,8 @@ public:
 
   // Determine the extent without overlap using the standard block
   // dimensions. (ie indexes region excluding ghosts)
-  void ComputeBaseExtent(int blockDims[3]);
+  // And the overlapping dimension (usually 1 or 0)
+  void ComputeBaseExtent(int blockDims[3], unsigned char levelOfGhostLayer);
 
   // For ghost layers received by other processes.
   // The argument list here is getting a bit long ....
@@ -922,9 +923,15 @@ void vtkMaterialInterfaceFilterBlock::Initialize(
 // Memory is managed differently.
 // Skip much of the initialization because ghost layers produce no surface.
 // Ghost layers need half edges too.
-void vtkMaterialInterfaceFilterBlock::ComputeBaseExtent(int blockDims[3])
+// ----
+// This method is used to remove ghost layer of each block as ghost layers
+// are managed by the filter itself.
+// scth reader always provide one row that is shared by the next block
+// which is not the case for regular Non overlapping AMR.
+// ----
+void vtkMaterialInterfaceFilterBlock::ComputeBaseExtent(int blockDims[3], unsigned char levelOfGhostLayer)
 {
-  if (this->GhostFlag)
+  if (this->GhostFlag || levelOfGhostLayer == 0)
     {
     // This computation does not work for ghost cells.
     // InitializeGhostCell should setup the base extent properly.
@@ -937,20 +944,32 @@ void vtkMaterialInterfaceFilterBlock::ComputeBaseExtent(int blockDims[3])
   // the outer surface of the data.
   int baseDim;
   int iMin, iMax;
-  int tmp;
+  int minExt, maxExt;
+  int nbLevel = static_cast<int>(levelOfGhostLayer);
   for (int ii = 0; ii < 3; ++ii)
     {
     baseDim = blockDims[ii];
     iMin = 2* ii;
     iMax = iMin + 1;
-    // This assumes that all extents are positive.  ceil is too complicated.
-    tmp = this->BaseCellExtent[iMin];
-    tmp = (tmp+baseDim-1) / baseDim;
-    this->BaseCellExtent[iMin] = tmp*baseDim;
 
-    tmp = this->BaseCellExtent[iMax]+1;
-    tmp = tmp / baseDim;
-    this->BaseCellExtent[iMax] = tmp*baseDim - 1;
+    // This assumes that all extents are positive.  ceil is too complicated.
+    minExt = this->BaseCellExtent[iMin];
+    minExt = (minExt+baseDim-nbLevel) / baseDim;
+    minExt = minExt*baseDim;
+
+    maxExt = this->BaseCellExtent[iMax]+1;
+    maxExt = maxExt / baseDim;
+    maxExt = maxExt*baseDim - nbLevel;
+
+    if(minExt < maxExt)
+      {
+      this->BaseCellExtent[iMin] = minExt;
+      this->BaseCellExtent[iMax] = maxExt;
+      }
+    else
+      {
+      cerr << "vtkMaterialInterfaceFilter.cxx:" << __LINE__ << " Invalid Block Ghost Level information. " << (int)levelOfGhostLayer << endl;
+      }
     }
 }
 
@@ -1695,6 +1714,9 @@ vtkMaterialInterfaceFilter::vtkMaterialInterfaceFilter()
 
   // Variable that will invert a material.
   this->InvertVolumeFraction = 0;
+
+  // 1 Layer of ghost cell by block by default
+  this->BlockGhostLevel = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1986,10 +2008,10 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(
     // We might have a problem with level 0 here since blockDims is not global yet.
     cumulativeExt[0] = cumulativeExt[0] / this->StandardBlockDimensions[0];
     cumulativeExt[1] = cumulativeExt[1] / this->StandardBlockDimensions[0];
-    cumulativeExt[2] = cumulativeExt[2] / this->StandardBlockDimensions[0];
-    cumulativeExt[3] = cumulativeExt[3] / this->StandardBlockDimensions[0];
-    cumulativeExt[4] = cumulativeExt[4] / this->StandardBlockDimensions[0];
-    cumulativeExt[5] = cumulativeExt[5] / this->StandardBlockDimensions[0];
+    cumulativeExt[2] = cumulativeExt[2] / this->StandardBlockDimensions[1];
+    cumulativeExt[3] = cumulativeExt[3] / this->StandardBlockDimensions[1];
+    cumulativeExt[4] = cumulativeExt[4] / this->StandardBlockDimensions[2];
+    cumulativeExt[5] = cumulativeExt[5] / this->StandardBlockDimensions[2];
 
     // Expand extent to cover all processes.
     if (myProc > 0)
@@ -2028,7 +2050,7 @@ int vtkMaterialInterfaceFilter::InitializeBlocks(
   for (ii = 0; ii < this->NumberOfInputBlocks; ++ii)
     {
     block = this->InputBlocks[ii];
-    this->AddBlock(block);
+    this->AddBlock(block, this->GetBlockGhostLevel());
     }
 
 #ifdef vtkMaterialInterfaceFilterPROFILE
@@ -2410,52 +2432,123 @@ void vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacing(
   vtkDoubleArray *minLevelSpacingDa
     = dynamic_cast<vtkDoubleArray*>(inputFd->GetArray("MinLevelSpacing"));
 
+  // Update ghostLayer if available
+  if(vtkUnsignedCharArray *blockGhostLayer
+     = vtkUnsignedCharArray::SafeDownCast(inputFd->GetArray("GhostLayer")))
+    {
+    this->SetBlockGhostLevel(blockGhostLayer->GetValue(0));
+    }
+  else if(globalBoundsDa == NULL)
+    {
+    // Update ghostLayer if available
+    // CAUTION: as no global fields were provided we assume that it is not the
+    // spcth reader and therefore we don't have any ghost layer.
+    this->SetBlockGhostLevel(0);
+    }
+
   // if these are not present then the dataset
   // is malformed.
-  assert( "Incomplete FieldData on filter input." &&
-          globalBoundsDa &&
-          standardBoxSizeIa &&
-          minLevelIa &&
-          minLevelSpacingDa );
+  if(globalBoundsDa == NULL || standardBoxSizeIa == NULL || minLevelIa == NULL || minLevelSpacingDa == NULL)
+    {
+    // Need to figure out those informations
+    int nbProcs = this->Controller->GetNumberOfProcesses();
 
-  // global bounds
-  double *pd=globalBoundsDa->GetPointer(0);
-  double globalBounds[6];
-  for (int q=0; q<6; ++q)
-    {
-    globalBounds[q]=pd[q];
+    // - GlobalOrigin
+    double localBounds[6];
+    double *receivedBounds = new double[nbProcs * 6];
+    input->GetBounds(localBounds);
+    this->Controller->AllGather(localBounds, receivedBounds, 6);
+    for(int i=0; i < 3; ++i)
+      {
+      double globalValue = VTK_DOUBLE_MAX;
+      double localValue;
+      for(int j=0; j < nbProcs; ++j)
+        {
+        localValue = receivedBounds[6*j + i*2];
+        globalValue = (globalValue < localValue) ? globalValue : localValue;
+        }
+
+      // Update GlobalOrigin
+      this->GlobalOrigin[i] = globalValue;
+      }
+    delete[] receivedBounds;
+
+    // - The value of the lower level inside the AMR dataset
+    unsigned int nbLevels = input->GetNumberOfLevels();
+    unsigned int globalNbLevels = 0;
+    this->Controller->Reduce(&nbLevels, &globalNbLevels, 1, vtkCommunicator::MIN_OP, 0);
+    this->Controller->Broadcast(&globalNbLevels, 1, 0);
+    assert("Invalid number of levels" && globalNbLevels > 0);
+    unsigned int minLevel = globalNbLevels - 1;
+    int coarsen = 1 << minLevel;
+
+    // - Global Box Size (Each block MUST have the same dimension
+    //   -> This is the dimension of a block in the higher level)
+    // - The spacing for that lower AMR level
+    int localBlockSize[3] = {-1,-1,-1};
+    int *receivedBlockSize = new int[nbProcs * 3];
+    double localSpacing[3] = {0,0,0};
+    double *receivedSpacing = new double[nbProcs * 3];
+    unsigned int dsIdxSize = input->GetNumberOfDataSets(minLevel);
+    for(unsigned int dsIdx = 0; dsIdx < dsIdxSize; ++dsIdx)
+      {
+      vtkUniformGrid* grid = input->GetDataSet(minLevel, dsIdx);
+      if(grid)
+        {
+        grid->GetDimensions(localBlockSize);
+        grid->GetSpacing(localSpacing);
+        }
+      }
+    this->Controller->AllGather(localBlockSize, receivedBlockSize, 3);
+    this->Controller->AllGather(localSpacing, receivedSpacing, 3);
+    for(int i=0; i < 3; ++i)
+      {
+      double globalSpacing = 0;
+      double globalValue = -1;
+      double localValue;
+      for(int j=0; j < nbProcs; ++j)
+        {
+        // Spacing
+        globalSpacing = (globalSpacing < receivedSpacing[3*j + i]) ? receivedSpacing[3*j + i] : globalSpacing;
+
+        // Block size
+        localValue = receivedBlockSize[3*j + i];
+        globalValue = (globalValue == -1 || globalValue == localValue) ? localValue : globalValue;
+        assert("Block size must be the same accross all processes" && globalValue == localValue);
+        }
+
+      // Update block dimension
+      this->StandardBlockDimensions[i] = (globalValue > 1 + this->BlockGhostLevel) ? (globalValue - 1 - this->BlockGhostLevel) : 1;
+
+      // Extract root spacing (Level 0)
+      this->RootSpacing[i] = globalSpacing * coarsen;
+      }
+    delete[] receivedBlockSize;
+    delete[] receivedSpacing;
+
+
     }
-  // standard block size
-  int *pi=standardBoxSizeIa->GetPointer(0);
-  for (int q=0; q<3; ++q)
+  else
     {
-    this->StandardBlockDimensions[q]=pi[q]-2;
+    // Find out the coarsen for level 0
+    int coarsen = 1 << minLevelIa->GetValue(0);
+
+    for(int i=0; i < 3; ++i)
+      {
+      // Extract block dimension + Fix block dimension in case of 2d case
+      this->StandardBlockDimensions[i] = standardBoxSizeIa->GetValue(i) - 1 - (int)this->BlockGhostLevel;
+      this->StandardBlockDimensions[i] = (this->StandardBlockDimensions[i] < 1)
+          ? 1 : this->StandardBlockDimensions[i];
+
+      // Extract global origin
+      this->GlobalOrigin[i] = globalBoundsDa->GetValue(i*2);
+
+      // Extract root spacing (Level 0)
+      this->RootSpacing[i] = minLevelSpacingDa->GetValue(i) * coarsen;
+      }
     }
-  // For 2d case
-  if (this->StandardBlockDimensions[2] < 1)
-    {
-    this->StandardBlockDimensions[2] = 1;
-    }
-  // min level in use
-  int minLevel = minLevelIa->GetValue(0);
-  // min level spacing
-  double minLevelSpacing[3];
-  pd=minLevelSpacingDa->GetPointer(0);
-  for (int q=0; q<3; ++q)
-    {
-    minLevelSpacing[q]=pd[q];
-    }
-  // compute spacing of level 0/root
-  int coarsen = 1 << minLevel;
-  for (int q=0; q<3; ++q)
-    {
-    this->RootSpacing[q]=minLevelSpacing[q]*coarsen;
-    }
-  // set the data set origin from the global bounds
-  for (int q=0; q<3; ++q)
-    {
-    this->GlobalOrigin[q]=globalBounds[2*q];
-    }
+
+
 
   //TODO the following code doesn't work on small(wrt blocks) datasets
   // it looks like 3x3x3 is the smallest that will work...
@@ -2664,9 +2757,9 @@ int vtkMaterialInterfaceFilter::ComputeOriginAndRootSpacingOld(
 
   if (myId == 0)
     {
-    this->StandardBlockDimensions[0] = largestDims[0]-2;
-    this->StandardBlockDimensions[1] = largestDims[1]-2;
-    this->StandardBlockDimensions[2] = largestDims[2]-2;
+    this->StandardBlockDimensions[0] = largestDims[0] - 1 - static_cast<int>(this->BlockGhostLevel);
+    this->StandardBlockDimensions[1] = largestDims[1] - 1 - static_cast<int>(this->BlockGhostLevel);
+    this->StandardBlockDimensions[2] = largestDims[2] - 1 - static_cast<int>(this->BlockGhostLevel);
     // For 2d case
     if (this->StandardBlockDimensions[2] < 1)
       {
@@ -2903,7 +2996,7 @@ void vtkMaterialInterfaceFilter::ComputeAndDistributeGhostBlocks(
           // Save for deleting.
           this->GhostBlocks.push_back(ghostBlock);
           // Add to grid and connect up neighbors.
-          this->AddBlock(ghostBlock);
+          this->AddBlock(ghostBlock, this->GetBlockGhostLevel());
           }
         // Move to the next block.
         blockMetaDataPtr += 7;
@@ -3049,12 +3142,12 @@ int vtkMaterialInterfaceFilter::ComputeRequiredGhostExtent(
 
 //----------------------------------------------------------------------------
 // We need ghostblocks to connect as neighbors too.
-void vtkMaterialInterfaceFilter::AddBlock(vtkMaterialInterfaceFilterBlock* block)
+void vtkMaterialInterfaceFilter::AddBlock(vtkMaterialInterfaceFilterBlock* block, unsigned char levelOfGhostLayer)
 {
   vtkMaterialInterfaceLevel* level = this->Levels[block->GetLevel()];
   int dims[3];
   level->GetBlockDimensions(dims);
-  block->ComputeBaseExtent(dims);
+  block->ComputeBaseExtent(dims, levelOfGhostLayer);
   this->CheckLevelsForNeighbors(block);
   level->AddBlock(block);
 }
