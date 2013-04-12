@@ -147,6 +147,105 @@
     }
 
     // ----------------------------------------------------------------------
+
+    function attachTouchListener(mouseListenerContainer, renderersContainer, viewport) {
+        var current_button = null, posX, posY, defaultDragButton = 1,
+        isZooming = false, isDragging = false, mouseAction = 'up', target;
+
+        function mobileTouchInteraction(evt) {
+            console.log('touch');
+            evt.gesture.preventDefault();
+            switch(evt.type) {
+                case 'drag':
+                    if(isZooming) {
+                        return;
+                    }
+                    current_button = defaultDragButton;
+                    if(mouseAction === 'up') {
+                        mouseAction = "down";
+
+                        target = evt.gesture.target;
+                        isDragging = true;
+                    } else {
+                        mouseAction = "move";
+                    }
+
+                    posX = evt.gesture.touches[0].pageX;
+                    posY = evt.gesture.touches[0].pageY;
+                    break;
+                case 'hold':
+                    if(defaultDragButton === 1) {
+                        defaultDragButton = 2;
+                        mouseListenerContainer.html("Pan mode").css('color','#FFFFFF');
+                    } else {
+                        defaultDragButton = 1;
+                        mouseListenerContainer.html("Rotation mode").css('color','#FFFFFF');
+                    }
+
+                    break;
+                case 'release':
+                    mouseListenerContainer.html('');
+                    current_button = 0;
+                    mouseAction = "up";
+                    isZooming = false;
+                    isDragging = false;
+                    break;
+                case 'doubletap':
+                    viewport.resetCamera();
+                    return;
+                case 'pinch':
+                    if(isDragging) {
+                        return;
+                    }
+                    current_button = 3;
+                    if(mouseAction === 'up') {
+                        mouseAction = 'down';
+                        posX = 0;
+                        posY = mouseListenerContainer.height();
+                        target = evt.gesture.target;
+                        isZooming = true;
+                    } else {
+                        mouseAction = 'move';
+                        posY = mouseListenerContainer.height() * (1+(evt.gesture.scale-1)/2);
+                    }
+                    break;
+            }
+
+            //mouseListenerContainer.html(mouseAction + ' (' + posX + ', ' + posY + ') b:' + current_button + ' z: ' + isZooming ).css('color','#FFFFFF');
+
+            // Trigger event
+            renderersContainer.trigger({
+                type: 'mouse',
+                action: mouseAction,
+                current_button: current_button,
+                charCode: '',
+                altKey: false,
+                ctrlKey: false,
+                shiftKey: false,
+                metaKey: false,
+                delegateTarget: target,
+                pageX: posX,
+                pageY: posY
+            });
+        }
+
+        // Bind listener to UI container
+        mouseListenerContainer.hammer({
+            prevent_default : true,
+            prevent_mouseevents : true,
+            transform : true,
+            transform_always_block : true,
+            transform_min_scale : 0.03,
+            transform_min_rotation : 2,
+            drag : true,
+            drag_max_touches : 1,
+            drag_min_distance : 10,
+            swipe : false,
+            hold : true // To switch from rotation to pan
+        }).on("doubletap pinch drag release hold", mobileTouchInteraction);
+    }
+
+    // ----------------------------------------------------------------------
     // Viewport statistic manager
     // ----------------------------------------------------------------------
 
@@ -568,6 +667,12 @@
         // Attach mouse listener if requested
         if (config.enableInteractions) {
             attachMouseListener(mouseListener, rendererContainer);
+            try {
+                attachTouchListener(mouseListener, rendererContainer, viewport);
+            } catch(error) {
+                console.log('Hammer is not properly initialized');
+                console.log(error);
+            }
         }
 
         // Attach stat listener
