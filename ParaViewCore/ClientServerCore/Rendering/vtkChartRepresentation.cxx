@@ -516,6 +516,21 @@ void vtkChartRepresentation::GetSeriesNames(std::vector<const char*>& seriesName
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkChartRepresentation::GetArraysNames(std::vector<const char*>& arraysNames)
+{
+  this->UpdateSeriesNames();
+  arraysNames.clear();
+  std::set<std::string>::iterator iter = this->ArrayNames.begin();
+  while(iter != this->ArrayNames.end())
+    {
+    arraysNames.push_back(iter->c_str());
+
+    // Next name
+    iter++;
+    }
+}
+//----------------------------------------------------------------------------
 void vtkChartRepresentation::AddCompositeDataSetIndex(unsigned int v)
 {
 #ifdef DEBUGME
@@ -537,6 +552,7 @@ void vtkChartRepresentation::ResetCompositeDataSetIndices()
 void vtkChartRepresentation::UpdateSeriesNames()
 {
   this->SeriesNames.clear();
+  this->ArrayNames.clear();
   std::vector<vtkTable*> tables;
   std::vector<std::string> blockNames;
   std::set<std::string> uniqueNames;
@@ -561,6 +577,9 @@ void vtkChartRepresentation::UpdateSeriesNames()
         uniqueNames.insert(fullName.str());
         this->SeriesNames.push_back(fullName.str());
         }
+
+      // Keep track of any array name
+      this->ArrayNames.insert(name);
       }
     }
 }

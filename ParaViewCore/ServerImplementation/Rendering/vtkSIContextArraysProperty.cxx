@@ -51,7 +51,7 @@ bool vtkSIContextArraysProperty::Pull(vtkSMMessage* msgToFill)
   Variant *variant = prop->mutable_value();
   variant->set_type(Variant::STRING);
   std::vector<const char*> seriesNames;
-  vtk_rep->GetSeriesNames(seriesNames);
+  vtk_rep->GetArraysNames(seriesNames);
   for (size_t i = 0; i < seriesNames.size(); ++i)
     {
     variant->add_txt(seriesNames[i]);
