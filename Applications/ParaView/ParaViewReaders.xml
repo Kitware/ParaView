@@ -33,6 +33,7 @@
   <Proxy group="sources" name="pdbreader" />
   <Proxy group="sources" name="xyzreader" />
   <Proxy group="sources" name="P3DReader" />
+  <Proxy group="sources" name="Plot3DMetaReader"/>
   <Proxy group="sources" name="spcthreader" />
   <Proxy group="sources" name="SPCTHRestartReader" />
   <Proxy group="sources" name="spcthhistoryreader" />
