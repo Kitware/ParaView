@@ -40,7 +40,7 @@ make_directory("${BINARY_DIR}")
 #------------------------------------------------------------------------------
 # Function to easy adding separate custom-commands to build the adaptors.
 #------------------------------------------------------------------------------
-function(build_adaptor name)
+function(build_adaptor name fortran_options)
   string(TOLOWER "${name}" lname)
   add_custom_command(
     OUTPUT "${BINARY_DIR}/${lname}.done"
@@ -61,7 +61,7 @@ function(build_adaptor name)
                             -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
                             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
                             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-                            -DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}
+                            ${fortran_options}
                             ${extra_params}
     COMMAND ${CMAKE_COMMAND}
             -E touch "${BINARY_DIR}/${lname}.done"
@@ -93,8 +93,10 @@ if (CMAKE_Fortran_COMPILER_WORKS)
   cmake_dependent_option(BUILD_PHASTA_ADAPTOR
     "Build the Phasta Catalyst Adaptor" OFF
     "PARAVIEW_BUILD_CATALYST_ADAPTORS" OFF)
+  mark_as_advanced(BUILD_PHASTA_ADAPTOR)
   if(BUILD_PHASTA_ADAPTOR)
     build_adaptor(PhastaAdaptor
+      "-DCMAKE_Fortran_COMPILER:FILEPATH=${CMAKE_Fortran_COMPILER}"
       COMMENT "Building Phasta Adaptor"
       DEPENDS vtkPVCatalyst)
   endif()
