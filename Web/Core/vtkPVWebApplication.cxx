@@ -76,7 +76,7 @@ public:
 
     void RemoveListener(vtkObject* view)
     {
-      if(this->ViewPointer && this->ObserverId)
+      if(this->ViewPointer && this->ViewPointer == view && this->ObserverId)
         {
         this->ViewPointer->RemoveObserver(this->ObserverId);
         this->ObserverId = 0;
@@ -84,10 +84,8 @@ public:
         }
     }
 
-    void ViewEventListener(vtkObject*, unsigned long e, void*)
+    void ViewEventListener(vtkObject*, unsigned long, void*)
     {
-      static int count = 0;
-      //cout << "Need render " << ++count << " - event: " << e << endl;
       this->NeedsRender = true;
     }
     };
