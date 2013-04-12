@@ -71,8 +71,8 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
     // don't show label for the proxy selection widget
     this->setShowLabel(false);
 
-    this->setReason() << "pqSelectionInputWidget for a ProxyProperty with a "
-                      << "SelectionInput hint";
+    PV_DEBUG_PANELS() << "pqSelectionInputWidget for a ProxyProperty with a "
+                  << "SelectionInput hint";
     }
   else
     {
@@ -92,13 +92,14 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
         smProperty->GetXMLLabel(),
         this);
       widget->setView(this->view());
-      widget->select();
       this->addPropertyLink(widget,
         "proxy",
         SIGNAL(proxyChanged(pqSMProxy)),
         smProperty);
       this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeAvailable()));
       this->connect(widget, SIGNAL(modified()), this, SIGNAL(changeFinished()));
+      this->connect(this, SIGNAL(viewChanged(pqView*)), widget,
+        SLOT(setView(pqView*)));
 
       vbox->addWidget(widget);
 
@@ -109,8 +110,8 @@ pqProxyPropertyWidget::pqProxyPropertyWidget(vtkSMProperty *smProperty,
       // don't show label for the proxy selection widget
       this->setShowLabel(false);
 
-      this->setReason() << "pqProxySelectionWidget for a "
-                        << "ProxyListDomain (" << domain->GetXMLName() << ")";
+      PV_DEBUG_PANELS() << "pqProxySelectionWidget for a "
+                    << "ProxyListDomain (" << domain->GetXMLName() << ")";
       }
     }
 

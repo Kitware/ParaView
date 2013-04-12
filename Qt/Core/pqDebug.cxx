@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericSummaryDisplayPanel.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,43 +28,31 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#include "pqDebug.h"
 
-#ifndef _pqGenericSummaryDisplayPanel_h
-#define _pqGenericSummaryDisplayPanel_h
+#include <QProcessEnvironment>
 
-#include <QWidget>
-
-#include "pqPropertyLinks.h"
-#include "pqApplicationComponentsModule.h"
-
-class pqRepresentation;
-
-class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericSummaryDisplayPanel : public QWidget
+//-----------------------------------------------------------------------------
+pqDebugType::pqDebugType(const QString& envVariable/*=QString()*/)
 {
-  Q_OBJECT
+  // since call to systemEnvironment is expensive, we only do it once.
+  static QProcessEnvironment systemEnvironment =
+    QProcessEnvironment::systemEnvironment();
 
-public:
-  enum DisplayAttributes
-    {
-    ColorBy,
-    LineWidth,
-    PointSize,
-    EdgeColor,
-    SliceDirection,
-    SliceNumber,
-    VolumeMapper
-    };
+  this->Enabled = envVariable.isEmpty()? true:
+    systemEnvironment.contains(envVariable);
+}
 
-  pqGenericSummaryDisplayPanel(pqRepresentation *representation,
-                               const QList<DisplayAttributes> &attributes,
-                               QWidget *parent = 0);
-  ~pqGenericSummaryDisplayPanel();
+//-----------------------------------------------------------------------------
+pqDebugType::~pqDebugType()
+{
+}
 
-private:
-  pqRepresentation *Representation;
-  pqPropertyLinks Links;
-  QList<DisplayAttributes> Attributes;
-};
-
-#endif
+//-----------------------------------------------------------------------------
+QDebug pqDebug(const pqDebugType& type/*=pqDebugType()*/)
+{
+  static QString messageEater;
+  messageEater.clear();
+  return type? QDebug(QtDebugMsg) : QDebug(&messageEater);
+}

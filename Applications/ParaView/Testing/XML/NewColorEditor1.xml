@@ -4,9 +4,9 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/pqProxyGroupMenuManager0/Clip" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/1pqObjectPanelPropertyWidget0/1pqClipPanel0/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/ClipFunction/1pqProxySelectionWidget0/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ColorEditor/1QGroupBox0/1pqGenericSummaryDisplayPanel0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/DisplayFrame/ProxyPanel/ColorEditor/EditColorMap" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/AdvancedButton" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/PresetButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/pqColorScaleDialog/pqColorPresetDialog/CancelButton" command="activate" arguments="" />

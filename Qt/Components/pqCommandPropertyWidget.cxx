@@ -59,7 +59,7 @@ pqCommandPropertyWidget::pqCommandPropertyWidget(vtkSMProperty *smproperty,
   layoutLocal->addWidget(button);
   layoutLocal->addStretch();
 
-  this->setReason() << "QPushButton for a vtkSMProperty";
+  PV_DEBUG_PANELS() << "QPushButton for a vtkSMProperty";
   this->setShowLabel(false);
 }
 

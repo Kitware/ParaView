@@ -82,6 +82,9 @@ vtkSMProperty::~vtkSMProperty()
   this->SetDocumentation(0);
   this->SetHints(0);
   this->SetParent(0);
+  this->SetPanelVisibility(0);
+  this->SetPanelVisibilityDefaultForRepresentation(0);
+  this->SetPanelWidget(0);
 }
 
 //-----------------------------------------------------------------------------

@@ -71,6 +71,8 @@ set(Module_SRCS
   pqCoreUtilities.h
   pqDataRepresentation.cxx
   pqDataRepresentation.h
+  pqDebug.cxx
+  pqDebug.h
   pqDisplayPolicy.cxx
   pqDisplayPolicy.h
   pqFileDialog.cxx

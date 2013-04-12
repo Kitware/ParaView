@@ -1,11 +1,9 @@
-// Generated file.  Do not edit.
-
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSummaryPanelImplementation.h.in
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -31,22 +29,36 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
+#ifndef __pqClipScalarsDecorator_h
+#define __pqClipScalarsDecorator_h
 
-#ifndef _@PANEL_NAME@Implementation_h
-#define _@PANEL_NAME@Implementation_h
+#include "pqApplicationComponentsModule.h"
+#include "pqPropertyWidgetDecorator.h"
+#include "vtkWeakPointer.h"
 
-#include <QObject>
-#include "pqSummaryPanelInterface.h"
+class vtkObject;
 
-class @PANEL_NAME@Implementation : public QObject, public pqSummaryPanelInterface
+/// pqClipScalarsDecorator is a pqPropertyWidgetDecorator subclass used by \c
+/// Clip filter (and similar filters) to control the visibility of widgets that
+/// let the user pick the scalars to clip with. This looks at the current state
+/// of the "ClipType" property and determine whether the widgets being decorated
+/// should be shown.
+class PQAPPLICATIONCOMPONENTS_EXPORT pqClipScalarsDecorator : public pqPropertyWidgetDecorator
 {
   Q_OBJECT
-  Q_INTERFACES(pqSummaryPanelInterface)
-
+  typedef pqPropertyWidgetDecorator Superclass;
 public:
-  @PANEL_NAME@Implementation(QObject *p = 0);
+  pqClipScalarsDecorator(vtkPVXMLElement* config, pqPropertyWidget* parent);
+  virtual ~pqClipScalarsDecorator();
 
-  virtual QWidget* createDisplayPanel(pqRepresentation *representation) const;
+  /// Overridden to hide the widget when not clipping by scalars.
+  virtual bool canShowWidget(bool show_advanced) const;
+
+private:
+  Q_DISABLE_COPY(pqClipScalarsDecorator)
+
+  vtkWeakPointer<vtkObject> ObservedObject;
+  unsigned long ObserverId;
 };
 
 #endif

@@ -1106,7 +1106,8 @@
                proxyname="SurfaceRepresentation"></Proxy>
         <ExposedProperties>
           <PropertyGroup panel_visibility="default"
-                         type="ColorEditor">
+                         type="ColorEditor"
+                         label="Coloring" >
             <Property name="Ambient" />
             <Property name="AmbientColor" />
             <Property name="ColorArrayName" />
@@ -1115,63 +1116,86 @@
             <Property name="DiffuseColor" />
             <Property name="LookupTable" />
           </PropertyGroup>
-          <Property name="MapScalars"
-                    panel_visibility="advanced" />
-          <Property name="InterpolateScalarsBeforeMapping"
-                    panel_visibility="advanced" />
-          <Property name="Opacity"
-                    panel_visibility="default" />
-          <Property name="Interpolation"
-                    panel_visibility="advanced" />
-          <Property name="LineWidth"
-                    panel_visibility="advanced" />
-          <Property name="BackfaceRepresentation"
-                    panel_visibility="advanced" />
-          <Property name="Position"
-                    panel_visibility="advanced" />
-          <Property name="Scale"
-                    panel_visibility="advanced" />
-          <Property name="Orientation"
-                    panel_visibility="advanced" />
-          <Property name="Origin"
-                    panel_visibility="advanced" />
-          <Property name="Pickable"
-                    panel_visibility="advanced" />
-          <Property name="PointSize"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="points" />
-          <Property name="StaticMode"
-                    panel_visibility="never" />
-          <Property name="SuppressLOD"
-                    panel_visibility="never" />
-          <Property name="Texture"
-                    panel_visibility="advanced" />
-          <Property name="AllowSpecularHighlightingWithScalarColoring"
-                    panel_visibility="never" />
-          <Property name="EdgeColor"
-                    panel_widget="color_selector"
-                    panel_visibility="advanced" />
-          <Property name="Specular"
-                    panel_visibility="advanced" />
-          <Property name="SpecularColor"
-                    panel_widget="color_selector"
-                    panel_visibility="advanced" />
-          <Property name="SpecularPower"
-                    panel_visibility="advanced" />
-          <Property name="BackfaceAmbientColor"
-                    panel_widget="color_selector"
-                    panel_visibility="advanced" />
-          <Property name="BackfaceDiffuseColor"
-                    panel_widget="color_selector"
-                    panel_visibility="advanced" />
-          <Property name="BackfaceOpacity"
-                    panel_visibility="advanced" />
-          <Property name="NonlinearSubdivisionLevel"
-                    panel_visibility="advanced" />
-          <Property name="UserTransform"
-                    panel_visibility="never" />
-		  <Property name="BlockVisibility"
-		            panel_visibility="never" />
+
+          <PropertyGroup label="Scalar Coloring">
+            <Property name="MapScalars"
+                      panel_visibility="advanced" />
+            <Property name="InterpolateScalarsBeforeMapping"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Styling">
+            <Property name="Opacity"
+                      panel_visibility="default" />
+            <Property name="PointSize"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="points" />
+            <Property name="LineWidth"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="wireframe" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Lighting">
+            <Property name="Interpolation"
+                      panel_visibility="advanced" />
+            <Property name="Specular"
+                      panel_visibility="advanced" />
+            <Property name="SpecularColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced" />
+            <Property name="SpecularPower"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Edge Styling">
+            <Property name="EdgeColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="Surface With Edges" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Backface Styling">
+            <Property name="BackfaceRepresentation"
+                      panel_visibility="advanced" />
+            <Property name="BackfaceAmbientColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced" />
+            <Property name="BackfaceDiffuseColor"
+                      panel_widget="color_selector"
+                      panel_visibility="advanced" />
+            <Property name="BackfaceOpacity"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Transforming">
+            <Property name="Position"
+                      panel_visibility="advanced" />
+            <Property name="Scale"
+                      panel_visibility="advanced" />
+            <Property name="Orientation"
+                      panel_visibility="advanced" />
+            <Property name="Origin"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
+
+          <PropertyGroup label="Miscellaneous">
+            <Property name="Pickable"
+                      panel_visibility="advanced" />
+            <Property name="StaticMode"
+                      panel_visibility="never" />
+            <Property name="SuppressLOD"
+                      panel_visibility="never" />
+            <Property name="Texture"
+                      panel_visibility="advanced" />
+            <Property name="AllowSpecularHighlightingWithScalarColoring"
+                      panel_visibility="never" />
+            <Property name="UserTransform"
+                      panel_visibility="never" />
+		        <Property name="BlockVisibility"
+		                  panel_visibility="never" />
+            <Property name="NonlinearSubdivisionLevel"
+                      panel_visibility="advanced" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1208,7 +1232,8 @@
                     panel_visibility="never" />
           <Property name="SelectScaleArray"
                     panel_visibility="never" />
-          <Property name="Source" />
+          <Property name="Source"
+                    panel_visibility="never" />
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
@@ -1221,7 +1246,6 @@
                proxyname="CubeAxesRepresentation"></Proxy>
         <ExposedProperties>
           <PropertyGroup label="Cube Axes"
-                         name="CubeAxes"
                          panel_visibility="default"
                          type="CubeAxes">
             <Property exposed_name="CubeAxesColor"
@@ -1458,6 +1482,7 @@
       </SubProxy>
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
+
     <!-- ================================================================== -->
     <PVRepresentationProxy base_proxygroup="internal_representations"
                            base_proxyname="PVRepresentationBase"
@@ -1489,18 +1514,20 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityFunction"
-                    panel_visibility="never" />
-          <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="never" />
-          <Property name="ExtractedBlockIndex"
-                    panel_visibility="never" />
-          <Property name="SelectMapper"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume" />
-          <Property name="UseDataParititions"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume" />
+          <PropertyGroup label="Volume Rendering">
+            <Property name="ScalarOpacityFunction"
+                      panel_visibility="never" />
+            <Property name="ScalarOpacityUnitDistance"
+                      panel_visibility="never" />
+            <Property name="ExtractedBlockIndex"
+                      panel_visibility="never" />
+            <Property name="SelectMapper"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="UseDataParititions"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of StructuredGridRepresentation -->
@@ -1540,17 +1567,20 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="ScalarOpacityUnitDistance"
-                    panel_visibility="never" />
-          <Property name="ScalarOpacityFunction"
-                    panel_visibility="never" />
-          <Property name="VolumeRenderingMode"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="volume" />
-          <Property name="Shade"
-                    panel_visibility="advanced" />
-          <Property name="InterpolationType"
-                    panel_visibility="never" />
+          <PropertyGroup label="Volume Rendering">
+            <Property name="ScalarOpacityUnitDistance"
+                      panel_visibility="never" />
+            <Property name="ScalarOpacityFunction"
+                      panel_visibility="never" />
+            <Property name="VolumeRenderingMode"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="Shade"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="volume" />
+            <Property name="InterpolationType"
+                      panel_visibility="never" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1562,12 +1592,14 @@
           <Exception name="Visibility" />
         </ShareProperties>
         <ExposedProperties>
-          <Property name="Slice"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="slice" />
-          <Property name="SliceMode"
-                    panel_visibility="advanced"
-                    panel_visibility_default_for_representation="slice" />
+          <PropertyGroup label="Slicing">
+            <Property name="SliceMode"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="slice" />
+            <Property name="Slice"
+                      panel_visibility="advanced"
+                      panel_visibility_default_for_representation="slice" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of UniformGridRepresentation -->
@@ -4251,6 +4283,7 @@
           </Proxy>
           <ExposedProperties>
             <PropertyGroup panel_visibility="default"
+                           label="Color"
                            type="ColorEditor">
               <Property name="AllowSpecularHighlightingWithScalarColoring" />
               <Property name="Ambient" />
@@ -4407,7 +4440,6 @@
              proxyname="CubeAxesRepresentation"></Proxy>
       <ExposedProperties>
         <PropertyGroup label="Cube Axes"
-                       name="CubeAxes"
                        panel_visibility="default"
                        type="CubeAxes">
           <Property exposed_name="CubeAxesColor"

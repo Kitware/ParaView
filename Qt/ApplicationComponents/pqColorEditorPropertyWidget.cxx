@@ -29,54 +29,80 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqColorEditorPropertyWidget.h"
+#include "ui_pqColorEditorPropertyWidget.h"
 
-#include <QGroupBox>
-#include <QVBoxLayout>
-
-#include "vtkSMProxy.h"
-#include "vtkSMPropertyHelper.h"
-
-
-#include "pqProxy.h"
-#include "pqRepresentation.h"
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
+#include "pqEditColorMapReaction.h"
+#include "pqPropertiesPanel.h"
+#include "pqResetScalarRangeReaction.h"
+#include "pqScalarBarVisibilityReaction.h"
 #include "pqServerManagerModel.h"
-#include "pqGenericSummaryDisplayPanel.h"
 
-pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
-  QWidget *parentObject)
-  : pqPropertyWidget(smProxy, parentObject)
+class pqColorEditorPropertyWidget::pqInternals
 {
-  QVBoxLayout *layoutLocal = new QVBoxLayout;
-  layoutLocal->setMargin(2);
-  QGroupBox *groupBox = new QGroupBox("Color");
-  QVBoxLayout *groupBoxLayout = new QVBoxLayout;
-  groupBoxLayout->setMargin(0);
+public:
+  Ui::ColorEditorPropertyWidget Ui;
+  QPointer<pqScalarBarVisibilityReaction> ScalarBarVisibilityReaction;
+};
 
+//-----------------------------------------------------------------------------
+pqColorEditorPropertyWidget::pqColorEditorPropertyWidget(vtkSMProxy *smProxy,
+  QWidget *parentObject) :
+  Superclass(smProxy, parentObject),
+  Internals(new pqColorEditorPropertyWidget::pqInternals())
+{
+  this->setShowLabel(true);
+
+  Ui::ColorEditorPropertyWidget &Ui = this->Internals->Ui;
+  Ui.setupUi(this);
+  Ui.gridLayout->setMargin(pqPropertiesPanel::suggestedMargin());
+  Ui.gridLayout->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+  Ui.gridLayout->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+
+  // Setup various widget properties.
   pqServerManagerModel *smm = pqApplicationCore::instance()->getServerManagerModel();
   pqProxy *pqproxy = smm->findItem<pqProxy *>(smProxy);
+  pqDataRepresentation *representation = qobject_cast<pqDataRepresentation*>(pqproxy);
+  Ui.DisplayColorWidget->setRepresentation(representation);
 
-  pqRepresentation *representation = qobject_cast<pqRepresentation *>(pqproxy);
+  // show scalar bar button
+  QAction *scalarBarAction = new QAction(this);
+  QObject::connect(Ui.ShowScalarBar, SIGNAL(clicked(bool)), scalarBarAction, SLOT(trigger()));
+  pqScalarBarVisibilityReaction *scalarBarReaction =
+    new pqScalarBarVisibilityReaction(scalarBarAction);
+  QObject::connect(scalarBarAction, SIGNAL(changed()),
+                   this, SLOT(updateEnableState()));
+  // FIXME: this isn't working as expected. We need to ensure that the button's
+  // check state matches action's check state.
+  QObject::connect(scalarBarAction, SIGNAL(toggled(bool)),
+                   Ui.ShowScalarBar, SLOT(setChecked(bool)));
+  this->Internals->ScalarBarVisibilityReaction = scalarBarReaction;
 
-  if(smProxy->GetProperty("Representation") != NULL)
-    {
-    QList<pqGenericSummaryDisplayPanel::DisplayAttributes> attributes;
-    attributes.append(pqGenericSummaryDisplayPanel::ColorBy);
-    QWidget *colorWidget =
-      new pqGenericSummaryDisplayPanel(representation, attributes);
-    groupBoxLayout->addWidget(colorWidget);
-    }
+  // edit color map button
+  QAction *editColorMapAction = new QAction(this);
+  QObject::connect(Ui.EditColorMap, SIGNAL(clicked()), editColorMapAction, SLOT(trigger()));
+  new pqEditColorMapReaction(editColorMapAction);
 
-  groupBox->setLayout(groupBoxLayout);
+  // reset range button
+  QAction *resetRangeAction = new QAction(this);
+  QObject::connect(Ui.Rescale, SIGNAL(clicked()), resetRangeAction, SLOT(trigger()));
+  new pqResetScalarRangeReaction(resetRangeAction);
 
-  layoutLocal->addWidget(groupBox);
-  setLayout(layoutLocal);
-
-  setShowLabel(false);
+  this->updateEnableState();
 }
 
+//-----------------------------------------------------------------------------
 pqColorEditorPropertyWidget::~pqColorEditorPropertyWidget()
 {
+  delete this->Internals;
+  this->Internals = NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqColorEditorPropertyWidget::updateEnableState()
+{
+  this->Internals->Ui.ShowScalarBar->setEnabled(
+    this->Internals->ScalarBarVisibilityReaction->parentAction()->isEnabled());
 }

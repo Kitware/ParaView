@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ColorEditorPropertyWidget</class>
+ <widget class="QWidget" name="ColorEditorPropertyWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>320</width>
+    <height>82</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="1">
+    <widget class="QPushButton" name="EditColorMap">
+     <property name="toolTip">
+      <string>Edit Color Map</string>
+     </property>
+     <property name="statusTip">
+      <string>Edit Color Map</string>
+     </property>
+     <property name="text">
+      <string>Edit</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqEditColor24.png</normaloff>:/pqWidgets/Icons/pqEditColor24.png</iconset>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="ShowScalarBar">
+     <property name="toolTip">
+      <string>Toggle Color Legend Visibility</string>
+     </property>
+     <property name="statusTip">
+      <string>Toggle Color Legend Visibility</string>
+     </property>
+     <property name="text">
+      <string>Show</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqScalarBar24.png</normaloff>:/pqWidgets/Icons/pqScalarBar24.png</iconset>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
+    <widget class="pqDisplayColorWidget" name="DisplayColorWidget" native="true"/>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="Rescale">
+     <property name="toolTip">
+      <string>Rescale to Data Range</string>
+     </property>
+     <property name="statusTip">
+      <string>Rescale to Data Range</string>
+     </property>
+     <property name="text">
+      <string>Rescale</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../../Components/Resources/pqComponents.qrc">
+       <normaloff>:/pqWidgets/Icons/pqResetRange24.png</normaloff>:/pqWidgets/Icons/pqResetRange24.png</iconset>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::MinimumExpanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDisplayColorWidget</class>
+   <extends>QWidget</extends>
+   <header>pqDisplayColorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

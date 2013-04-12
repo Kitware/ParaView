@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqStandardSummaryPanelImplementation.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,25 +28,23 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqMyPropertyWidgetForProperty_h
+#define __pqMyPropertyWidgetForProperty_h
 
-#ifndef _pqStandardSummaryPanelImplementation_h
-#define _pqStandardSummaryPanelImplementation_h
+#include "pqPropertyWidget.h"
 
-#include "pqSummaryPanelInterface.h"
-#include "pqApplicationComponentsModule.h" // needed for export macros
-
-class PQAPPLICATIONCOMPONENTS_EXPORT pqStandardSummaryPanelImplementation :
-  public QObject, public pqSummaryPanelInterface
+class pqMyPropertyWidgetForProperty : public pqPropertyWidget
 {
   Q_OBJECT
-  Q_INTERFACES(pqSummaryPanelInterface)
-
+  typedef pqPropertyWidget Superclass;
 public:
-  pqStandardSummaryPanelImplementation(QObject *parent = 0);
+  pqMyPropertyWidgetForProperty(
+    vtkSMProxy *smproxy, vtkSMProperty *smproperty, QWidget *parentObject=0);
+  virtual ~pqMyPropertyWidgetForProperty();
 
-  virtual pqObjectPanel* createPropertiesPanel(pqProxy *proxy) const;
-  virtual QWidget* createDisplayPanel(pqRepresentation *representation) const;
+private:
+  Q_DISABLE_COPY(pqMyPropertyWidgetForProperty)
 };
 
 #endif

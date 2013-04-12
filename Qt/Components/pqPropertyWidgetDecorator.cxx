@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSummaryPanel.cxx
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,31 +28,35 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#include "pqPropertyWidgetDecorator.h"
 
-#ifndef _pqSurfaceLICSummaryDisplayPanel_h
-#define _pqSurfaceLICSummaryDisplayPanel_h
+#include "pqPropertyWidget.h"
+#include "vtkPVXMLElement.h"
 
-#include <QWidget>
-
-#include "pqPropertyLinks.h"
-#include "pqRepresentation.h"
-
-namespace Ui {
-    class pqSurfaceLICSummaryDisplayPanel;
+//-----------------------------------------------------------------------------
+pqPropertyWidgetDecorator::pqPropertyWidgetDecorator(
+  vtkPVXMLElement* xml,
+  pqPropertyWidget* parentObject)
+  : Superclass(parentObject),
+  XML(xml)
+{
+  Q_ASSERT(parentObject != NULL);
+  parentObject->addDecorator(this);
 }
 
-class pqSurfaceLICSummaryDisplayPanel : public QWidget
+//-----------------------------------------------------------------------------
+pqPropertyWidgetDecorator::~pqPropertyWidgetDecorator()
 {
-    Q_OBJECT
+}
 
-public:
-    explicit pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent = 0);
-    ~pqSurfaceLICSummaryDisplayPanel();
+vtkPVXMLElement* pqPropertyWidgetDecorator::xml() const
+{
+  return this->XML.GetPointer();
+}
 
-private:
-    Ui::pqSurfaceLICSummaryDisplayPanel *ui;
-    pqPropertyLinks Links;
-};
-
-#endif
+//-----------------------------------------------------------------------------
+pqPropertyWidget* pqPropertyWidgetDecorator::parentWidget() const
+{
+  return qobject_cast<pqPropertyWidget*>(this->parent());
+}

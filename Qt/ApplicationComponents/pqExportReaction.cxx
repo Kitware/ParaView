@@ -33,14 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqActiveObjects.h"
 #include "pqCoreUtilities.h"
-#include "pqPropertiesPanel.h"
-#include "pqPropertyWidget.h"
-#include "pqViewExporterManager.h"
 #include "pqFileDialog.h"
+#include "pqProxyWidget.h"
+#include "pqViewExporterManager.h"
 
-#include "vtkNew.h"
 #include "vtkSMExporterProxy.h"
-#include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMProperty.h"
 
 #include <QtGui/QCheckBox>
@@ -101,76 +98,20 @@ void pqExportReaction::exportActiveView()
       return;
       }
 
-    // Create widgets for exporter properties
-    QList<pqPropertyWidget*> widgets;
-    QStringList labels;
-    vtkNew<vtkSMOrderedPropertyIterator> propertyIter;
-    propertyIter->SetProxy(proxy);
-
-    for (propertyIter->Begin(); !propertyIter->IsAtEnd(); propertyIter->Next())
-      {
-      vtkSMProperty *smProperty = propertyIter->GetProperty();
-
-      if (smProperty->GetIsInternal() || smProperty->GetInformationOnly() ||
-          QString(smProperty->GetPanelVisibility()) == "never")
-        {
-        continue;
-        }
-
-      pqPropertyWidget *propertyWidget =
-        pqPropertiesPanel::createWidgetForProperty(smProperty, proxy);
-
-      const char *xmlLabel = smProperty->GetXMLLabel();
-      if (propertyWidget)
-        {
-        // Clear the text from any checkboxes -- otherwise the same text appears
-        // on both sides of the check box. We can find out if the property
-        // widget contains a checkbox by inspecting its children.
-        if (QCheckBox *checkBox = propertyWidget->findChild<QCheckBox*>())
-          {
-          checkBox->setText(QString());
-          }
-
-        widgets << propertyWidget;
-        if (xmlLabel)
-          {
-          labels << xmlLabel;
-          }
-        else
-          {
-          labels << propertyIter->GetKey();
-          }
-        }
-      }
-
-    if (labels.size() != widgets.size())
-      {
-      qWarning("Number of labels does not match number of widgets for export "
-               "configuration. Using defaults.");
-      labels.clear();
-      qDeleteAll(widgets);
-      widgets.clear();
-      }
+    QPointer<pqProxyWidget> proxyWidget = new pqProxyWidget(proxy);
+    proxyWidget->setApplyChangesImmediately(true);
 
     // Show a configuration dialog if options are available:
-    if (widgets.size() != 0)
+    if (proxyWidget->filterWidgets(true))
       {
-      QDialog dialog;
-      QVBoxLayout layout;
-      QFormLayout form;
-      for (int i = 0; i < widgets.size(); ++i)
-        {
-        widgets[i]->setParent(&dialog);
-        form.addRow(labels[i], widgets[i]);
-        }
-      layout.addLayout(&form);
+      QDialog dialog(pqCoreUtilities::mainWidget());
+      QVBoxLayout* vbox = new QVBoxLayout(&dialog);
+      vbox->addWidget(proxyWidget);
 
       QDialogButtonBox bbox(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
       connect(&bbox, SIGNAL(accepted()), &dialog, SLOT(accept()));
       connect(&bbox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-      layout.addWidget(&bbox);
-
-      dialog.setLayout(&layout);
+      vbox->addWidget(&bbox);
 
       dialog.setWindowTitle(tr("Export Options"));
 
@@ -182,15 +123,9 @@ void pqExportReaction::exportActiveView()
         proxy->Delete();
         return;
         }
-
-      foreach (pqPropertyWidget *widget, widgets)
-        {
-        widget->apply();
-        }
-
-      // Widgets are cleaned up by the dialog
-      widgets.clear();
       }
+
+    delete proxyWidget;
 
     if (!this->Exporter->write(proxy))
       {

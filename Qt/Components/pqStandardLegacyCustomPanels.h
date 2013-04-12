@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSummaryPanelInterface.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,40 +28,35 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqStandardLegacyCustomPanels_h
+#define __pqStandardLegacyCustomPanels_h
 
-#ifndef _pqSummaryPanelInterface_h
-#define _pqSummaryPanelInterface_h
-
-#include <QtPlugin>
+#include <QObject>
+#include "pqObjectPanelInterface.h"
 
 #include "pqComponentsModule.h"
 
-class QWidget;
-
-class pqProxy;
-class pqObjectPanel;
-class pqRepresentation;
-
-// Interface class for plugins that create widgets to be shown on
-// the summary panel.
-class PQCOMPONENTS_EXPORT pqSummaryPanelInterface
+/// pqStandardLegacyCustomPanels is used by pqPropertiesPanel to create legacy
+/// custom panels. In time, this class needs to disappear with all panels being
+/// created using the newer panels API.
+class PQCOMPONENTS_EXPORT pqStandardLegacyCustomPanels :
+  public QObject,
+  public pqObjectPanelInterface
 {
+  Q_OBJECT
+  typedef QObject Superclass;
 public:
-  // Destroys the summary panel interface object.
-  virtual ~pqSummaryPanelInterface();
+  pqStandardLegacyCustomPanels(QObject* parent=0);
+  virtual ~pqStandardLegacyCustomPanels();
 
-  // Creates and returns a widget to show in the properties frame
-  // on the summary panel for the proxy. Returns 0 if the proxy is
-  // not supported.
-  virtual pqObjectPanel* createPropertiesPanel(pqProxy *proxy) const;
+  /// create panel for proxy.
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* parent);
 
-  // Creates and returns a widget to show in the display frame on
-  // the summary panel for the representation. Returns 0 if the
-  // representation is not supported.
-  virtual QWidget* createDisplayPanel(pqRepresentation *representation) const;
+  /// returns if a panel can be created.
+  virtual bool canCreatePanel(pqProxy* proxy) const;
+
+private:
+  Q_DISABLE_COPY(pqStandardLegacyCustomPanels)
 };
-
-Q_DECLARE_INTERFACE(pqSummaryPanelInterface, "com.kitware/paraview/summarypanel")
-
 #endif

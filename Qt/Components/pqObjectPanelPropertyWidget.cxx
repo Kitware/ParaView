@@ -44,6 +44,9 @@ pqObjectPanelPropertyWidget::pqObjectPanelPropertyWidget(pqObjectPanel *objectPa
   this->connect(this->ObjectPanel, SIGNAL(modified()),
     this, SIGNAL(changeFinished()));
 
+  this->connect(this, SIGNAL(viewChanged(pqView*)),
+                this->ObjectPanel, SLOT(setView(pqView*)));
+
   QVBoxLayout *layoutLocal = new QVBoxLayout;
   layoutLocal->setMargin(0);
   layoutLocal->addWidget(objectPanel);

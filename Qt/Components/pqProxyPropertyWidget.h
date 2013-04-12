@@ -39,12 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqSelectionInputWidget;
 class pqProxySelectionWidget;
 
-/// This is a widget for a vtkSMProxyProperty. Not to be confused with
-/// pqProxyPropertiesPanel.
+/// This is a widget for a vtkSMProxyProperty. It handles a "SelectionInput"
+/// property and properties with ProxyListDomain.
 class PQCOMPONENTS_EXPORT pqProxyPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-
   typedef pqPropertyWidget Superclass;
 public:
   pqProxyPropertyWidget(vtkSMProperty *property,

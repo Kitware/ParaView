@@ -29,21 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqColorEditorPropertyWidget_h
 #define _pqColorEditorPropertyWidget_h
 
 #include "pqApplicationComponentsModule.h"
-
 #include "pqPropertyWidget.h"
 
+/// This is a pqPropertyWidget subclass that presents a widget to edit the color
+/// of a representation and other related functionality. It's used as the
+/// "widget" for \c ColorEditor property group.
 class PQAPPLICATIONCOMPONENTS_EXPORT pqColorEditorPropertyWidget : public pqPropertyWidget
 {
   Q_OBJECT
-
 public:
+  typedef pqPropertyWidget Superclass;
+
   pqColorEditorPropertyWidget(vtkSMProxy *proxy, QWidget *parent = 0);
   ~pqColorEditorPropertyWidget();
+
+private slots:
+  void updateEnableState();
+
+private:
+  class pqInternals;
+  pqInternals* Internals;
+
+  Q_DISABLE_COPY(pqColorEditorPropertyWidget)
 };
 
 #endif // _pqColorEditorPropertyWidget_h

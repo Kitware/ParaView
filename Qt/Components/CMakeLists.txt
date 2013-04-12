@@ -289,20 +289,22 @@ set (Module_SRCS
   pqPropertiesPanel.h
   pqPropertyWidget.cxx
   pqPropertyWidget.h
+  pqPropertyWidgetDecorator.h
+  pqPropertyWidgetDecorator.cxx
   pqPropertyWidgetInterface.cxx
   pqPropertyWidgetInterface.h
   pqProxyInformationWidget.cxx
   pqProxyInformationWidget.h
   pqProxyPanel.cxx
   pqProxyPanel.h
-  pqProxyPropertiesPanel.cxx
-  pqProxyPropertiesPanel.h
   pqProxyPropertyWidget.cxx
   pqProxyPropertyWidget.h
   pqProxySelectionWidget.cxx
   pqProxySelectionWidget.h
   pqProxySILModel.cxx
   pqProxySILModel.h
+  pqProxyWidget.h
+  pqProxyWidget.cxx
   pqQueryClauseWidget.cxx
   pqQueryClauseWidget.h
   pqQueryDialog.cxx
@@ -371,14 +373,14 @@ set (Module_SRCS
   pqStandardColorButton.h
   pqStandardColorLinkAdaptor.cxx
   pqStandardColorLinkAdaptor.h
+  pqStandardLegacyCustomPanels.cxx
+  pqStandardLegacyCustomPanels.h
+  pqStandardLegacyDisplayPanels.cxx
+  pqStandardLegacyDisplayPanels.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqStringVectorPropertyWidget.cxx
   pqStringVectorPropertyWidget.h
-  pqSummaryPanel.cxx
-  pqSummaryPanel.h
-  pqSummaryPanelInterface.cxx
-  pqSummaryPanelInterface.h
   pqTabbedMultiViewWidget.cxx
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.cxx
@@ -546,12 +548,13 @@ set (Module_MOC_HDRS
   pqPQLookupTableManager.h
   pqPropertiesPanel.h
   pqPropertyWidget.h
+  pqPropertyWidgetDecorator.h
   pqProxyInformationWidget.h
   pqProxyPanel.h
-  pqProxyPropertiesPanel.h
   pqProxyPropertyWidget.h
   pqProxySelectionWidget.h
   pqProxySILModel.h
+  pqProxyWidget.h
   pqQueryClauseWidget.h
   pqQueryDialog.h
   pqRecentFilesMenu.h
@@ -586,9 +589,10 @@ set (Module_MOC_HDRS
   pqSpreadSheetViewDecorator.h
   pqStandardColorButton.h
   pqStandardColorLinkAdaptor.h
+  pqStandardLegacyCustomPanels.h
+  pqStandardLegacyDisplayPanels.h
   pqStreamTracerPanel.h
   pqStringVectorPropertyWidget.h
-  pqSummaryPanel.h
   pqTabbedMultiViewWidget.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h

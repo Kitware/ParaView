@@ -62,8 +62,8 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy
 
   this->setLayout(l);
 
-  this->setReason() << "pqColorSelectorPropertyWidget for a property with "
-                    << "the panel_widget=\"color_chooser\" attribute";
+  PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
+                << "the panel_widget=\"color_chooser\" attribute";
 }
 
 pqColorSelectorPropertyWidget::~pqColorSelectorPropertyWidget()

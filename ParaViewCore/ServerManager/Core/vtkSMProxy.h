@@ -671,6 +671,12 @@ protected:
   vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
+  // Parses the XML to create a new property group. This can handle
+  // <PropertyGroup /> elements defined in both regular Proxy section or when
+  // exposing properties from sub-proxies.
+  vtkSMPropertyGroup* NewPropertyGroup(vtkPVXMLElement* propElement);
+
+  // Description:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMSessionProxyManager* pm, vtkPVXMLElement* element);
   void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);

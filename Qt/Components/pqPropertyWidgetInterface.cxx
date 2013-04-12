@@ -29,27 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqPropertyWidgetInterface.h"
 
+//-----------------------------------------------------------------------------
 pqPropertyWidgetInterface::~pqPropertyWidgetInterface()
 {
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *proxy,
                                                                      vtkSMProperty *property)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(property);
-
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget* pqPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
                                                                           vtkSMPropertyGroup *group)
 {
   Q_UNUSED(proxy);
   Q_UNUSED(group);
-
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqPropertyWidgetDecorator* pqPropertyWidgetInterface::createWidgetDecorator(
+    const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
+{
+  Q_UNUSED(type);
+  Q_UNUSED(config);
+  Q_UNUSED(widget);
+  return NULL;
 }
