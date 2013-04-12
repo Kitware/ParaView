@@ -17,9 +17,6 @@ from paraview import simple, web, servermanager
 
 # find out the path of the file to load
 reader = None
-timesteps = []
-currentTimeIndex = 0
-timekeeper = servermanager.ProxyManager().GetProxy("timekeeper", "TimeKeeper")
 fileToLoad = None
 pathToList = "."
 fileList = {}
@@ -64,7 +61,10 @@ def initializePipeline():
         simple.Render()
         view.ViewSize = [800,800]
 
-    pass
+    # setup animation scene
+    scene = simple.GetAnimationScene()
+    simple.GetTimeTrack()
+    scene.PlayMode = "Snap To TimeSteps"
 
 class FileOpener(web.ParaViewServerProtocol):
 
@@ -98,27 +98,23 @@ class FileOpener(web.ParaViewServerProtocol):
 
     @exportRpc("vcr")
     def updateTime(self,action):
-        global currentTimeIndex, timekeeper, timesteps, reader
-        if len(timesteps) == 0:
-            timesteps = reader.TimestepValues
-        updateTime = False
-        if action == "next":
-            currentTimeIndex = (currentTimeIndex + 1) % len(timesteps)
-            updateTime = True
-        if action == "prev":
-            currentTimeIndex = (currentTimeIndex - 1 + len(timesteps)) % len(timesteps)
-            updateTime = True
-        if action == "first":
-            currentTimeIndex = 0
-            updateTime = True
-        if action == "last":
-            currentTimeIndex = len(timesteps) - 1
-            updateTime = True
-        if updateTime:
-            timekeeper.Time = timesteps[currentTimeIndex]
-            print "UpdateTime: ", str(timesteps[currentTimeIndex])
+        animationScene = simple.GetAnimationScene()
+        currentTime = view.ViewTime
 
-        return action
+        if action == "next":
+            animationScene.GoToNext()
+            if currentTime == view.ViewTime:
+                animationScene.GoToFirst()
+        if action == "prev":
+            animationScene.GoToPrevious()
+            if currentTime == view.ViewTime:
+                animationScene.GoToLast()
+        if action == "first":
+            animationScene.GoToFirst()
+        if action == "last":
+            animationScene.GoToLast()
+
+        return view.ViewTime
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

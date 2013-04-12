@@ -5,10 +5,11 @@ new protocols and process ParaView data structure into web friendly ones.
 import types
 import sys
 import os
+import traceback
 
 # import paraview modules.
 from paraview import simple, servermanager
-from paraview.servermanager import ProxyProperty
+from paraview.servermanager import ProxyProperty, InputProperty
 
 # =============================================================================
 # Pipeline management
@@ -145,16 +146,18 @@ class LookupTableManager:
     def registerArray(self, name, number_of_components, range):
         key = self.getLutId(name, number_of_components)
         if self.range.has_key(key):
-            # do we need to extend the range ?
-            # ... fixme ...
-            pass
+            self.range[key] = range;
+            self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].VectorMode = 'Magnitude'
+            self.luts[key].ColorSpace = 'HSV'
         else:
             self.range[key] = range;
             # ... fixme ... Create default lut with proper range/title/color scheme
             self.luts[key] = simple.GetLookupTableForArray(name, number_of_components)
 
             # Setup default config
-            self.luts[key].RGBPoints = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].RGBPoints  = [range[0], 0, 0, 1, range[1], 1, 0, 0]
+            self.luts[key].VectorMode = 'Magnitude'
             self.luts[key].ColorSpace = 'HSV'
 
             self.scalarbars[key] = simple.CreateScalarBar(LookupTable=self.luts[key])
@@ -335,7 +338,7 @@ def getProxyAsState(id):
     if proxy:
        for property in proxy.ListProperties():
           propertyName = proxy.GetProperty(property).Name
-          if propertyName in ["Refresh"] or propertyName.__contains__("Info"):
+          if propertyName in ["Refresh", "Input"] or propertyName.__contains__("Info"):
              continue
 
           data = proxy.GetProperty(property).GetData()
@@ -343,10 +346,26 @@ def getProxyAsState(id):
               properties[propertyName] = data
               continue
 
-          print "Skip property: ", property, str(type(data)), str(type(data) in allowedTypes)
-          print data
+          # Not a simple property
+          # Need more investigation
+          prop = proxy.GetProperty(property)
+          pythonProp = servermanager._wrap_property(proxy, prop)
+          proxyList = []
+          try:
+            proxyList = pythonProp.Available
+          except:
+              pass
+          if len(proxyList) and prop.GetNumberOfProxies() == 1:
+            listdomain = prop.GetDomain('proxy_list')
+            if listdomain:
+              proxyPropertyValue = prop.GetProxy(0)
+              for i in xrange(listdomain.GetNumberOfProxies()):
+                if listdomain.GetProxy(i) == proxyPropertyValue:
+                    properties[propertyName] = proxyList[i]
+                    # Add selected proxy in list of prop to edit
+                    properties[propertyName + '_internal'] = getProxyAsState(listdomain.GetProxy(i).GetGlobalID())
 
-          if type(proxy.GetProperty(property)) == ProxyProperty:
+          elif type(prop) == ProxyProperty:
               try:
                   subProxyId = proxy.GetProperty(property).GetData().GetGlobalID()
                   properties[propertyName] = getProxyAsState(subProxyId)
@@ -364,12 +383,25 @@ def updateProxyProperties(proxy, properties):
    Loop over the properties object and update the mapping properties
    to the given proxy.
    """
-   allowedProperties = proxy.ListProperties()
-   for key in properties:
-      validKey = servermanager._make_name_valid(key)
-      if validKey in allowedProperties:
-         value = removeUnicode(properties[key])
-         proxy.GetProperty(validKey).SetData(value)
+   try:
+       allowedProperties = proxy.ListProperties()
+       for key in properties:
+          validKey = servermanager._make_name_valid(key)
+          if validKey in allowedProperties:
+             value = removeUnicode(properties[key])
+             property = servermanager._wrap_property(proxy, proxy.GetProperty(validKey))
+             if property.GetDomain('proxy_list') and len(value) == 1 and type(value[0]) == str:
+                 try:
+                    idx = property.GetAvailable().index(value[0])
+                    proxyToSet = servermanager._getPyProxy(property.GetDomain('proxy_list').GetProxy(idx))
+                    property.SetData(proxyToSet)
+                 except:
+                    traceback.print_stack()
+                    pass
+             else:
+                property.SetData(value)
+   except:
+        traceback.print_stack()
 
 # --------------------------------------------------------------------------
 
@@ -400,7 +432,7 @@ def getProxyDomains(id):
        name = xmlChild.GetName()
        if name.__contains__('Property'):
            propName = xmlChild.GetAttribute('name')
-           jsonDefinition[propName] = extractProperty(xmlChild)
+           jsonDefinition[propName] = extractProperty(proxy, xmlChild)
            jsonDefinition[propName]['order'] = i
 
    # Look for proxy properties and their domain
@@ -422,7 +454,7 @@ def getProxyDomains(id):
 
    return jsonDefinition
 
-def extractProperty(xmlPropertyElement):
+def extractProperty(proxy, xmlPropertyElement):
     propInfo = {}
     propInfo['name'] = xmlPropertyElement.GetAttribute('name')
     propInfo['label'] = xmlPropertyElement.GetAttribute('label')
@@ -437,10 +469,10 @@ def extractProperty(xmlPropertyElement):
         xmlChild = xmlPropertyElement.GetNestedElement(i)
         name = xmlChild.GetName()
         if name.__contains__('Domain'):
-            propInfo['domains'].append(extractDomain(xmlChild))
+            propInfo['domains'].append(extractDomain(proxy, propInfo['name'], xmlChild))
     return propInfo
 
-def extractDomain(xmlDomainElement):
+def extractDomain(proxy, propertyName, xmlDomainElement):
     domainObj = {}
     name = xmlDomainElement.GetName()
     domainObj['type'] = name[:-6]
@@ -470,6 +502,10 @@ def extractDomain(xmlDomainElement):
             domainObj['nb_components'] = 3
         else:
             domainObj['nb_components'] = -1
+
+    # Handle ProxyListDomain
+    if name.__contains__('ProxyListDomain'):
+        domainObj['list'] = proxy.GetProperty(propertyName).Available
 
     return domainObj
 

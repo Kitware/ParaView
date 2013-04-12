@@ -29,6 +29,7 @@
             <div class="logo" alt="Toggle pipeline browser visibility"></div>
             <div class="viewport-toolbar"></div>
             <div class="vcr-toolbar"></div>
+            <div class="rescale-data" style="display: none;"><img src="../../lib/css/paraview/pipeline/resetRange.png" style="position: relative; top: 5px;" title="Rescale data range to the current time step" alt="Rescale data range to the current time step"/></div>
             <div class="loading"></div>
         </div>
         <div class="splitter">
@@ -132,6 +133,16 @@
                 // - viewport toolbar
                 $('.viewport-toolbar').viewportToolbar(pv.viewport);
 
+                // - rescal data array
+                $('.rescale-data').show().click(function(){
+                    if(pv.connection.session) {
+                        proxyId = $('.pipelineBrowser').getProxy().proxy_id;
+                        pv.connection.session.call('pv:updateScalarRange', proxyId).then(function(){
+                            updateView();
+                        });
+                    }
+                });
+
                 // - Toggle pipeline visibility
                 $('.logo').unbind().bind('click', function(){
                     var panel = $(".control-panel");
@@ -183,6 +194,7 @@
                     pv = {};
                 }
             }
+
         </script>
     </body>
 </html>

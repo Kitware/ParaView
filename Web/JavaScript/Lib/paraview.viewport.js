@@ -357,6 +357,7 @@
         // Default values
         lastTime = 0;
         sum = 0;
+        count = 0;
 
         return {
             value: 0.0,
@@ -403,7 +404,7 @@
                 if(count == 0) {
                     return 0;
                 }
-                return (sum / count);
+                return Math.floor(sum / count);
             }
         }
     }
@@ -411,7 +412,7 @@
     // ----------------------------------------------------------------------
 
     function createValueRecord() {
-        var sum, count;
+        var sum = 0, count = 0;
 
         return {
             value: 0.0,
@@ -442,7 +443,7 @@
                 if(count === 0) {
                     return 0;
                 }
-                return (sum / count);
+                return Math.floor(sum / count);
             }
         }
     }

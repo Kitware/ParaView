@@ -34,3 +34,9 @@
     height: 26px;
     width: 26px;
 }
+
+.paraview.toolbar.vcr input.time {
+    position: relative;
+    top: -6px;
+    width: 80px;
+}
