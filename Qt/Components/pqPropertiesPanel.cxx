@@ -1028,7 +1028,7 @@ void pqPropertiesPanel::proxyPropertyChanged(bool change_finished/*=true*/)
       }
     }
 
-  if(this->Proxy->modifiedState() == pqProxy::UNMODIFIED)
+  if(this->Proxy && this->Proxy->modifiedState() == pqProxy::UNMODIFIED)
     {
     this->Proxy->setModifiedState(pqProxy::MODIFIED);
     }
