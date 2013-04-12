@@ -183,6 +183,10 @@ private:
   /// Update information properties and domains.
   void updateInformationAndDomains();
 
+  /// Method used to apply the change associated with the panel for a particular
+  /// proxy.
+  void applyProxyPanel(pqProxy*);
+
 private:
   Ui::pqPropertiesPanel *Ui;
   QShortcut *esc;
