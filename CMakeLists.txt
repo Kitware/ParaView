@@ -468,13 +468,6 @@ list (APPEND PARAVIEW_MODULE_ROOTS
              CoProcessing/Catalyst
              CoProcessing/TestDriver)
 
-if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
-set (Module_vtkPVPythonCatalyst ${PARAVIEW_ENABLE_CATALYST} CACHE BOOL "" FORCE)
-mark_as_advanced(Module_vtkPVPythonCatalyst)
-  list (APPEND PARAVIEW_MODULE_ROOTS
-    CoProcessing/PythonCatalyst)
-endif()
-
 if (PARAVIEW_ENABLE_WEB)
   list (APPEND PARAVIEW_MODULE_ROOTS
                Web)
@@ -551,6 +544,42 @@ add_subdirectory(Wrapping/Python)
 # been processed.
 if (PARAVIEW_ENABLE_PYTHON)
   add_subdirectory(Utilities/PythonInitializer)
+endif()
+
+if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
+  vtk_add_module(${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst
+                module.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/CoProcessing/PythonCatalyst
+                Cxx
+                Python)
+  list(APPEND VTK_MODULES_ENABLED vtkPVPythonCatalyst)
+  # the following variable needs to stay vtk-module
+  set(vtk-module vtkPVPythonCatalyst)
+  add_subdirectory("${${vtk-module}_SOURCE_DIR}" "${${vtk-module}_BINARY_DIR}")
+  set(${vtk-module}_WRAP_PYTHON ON)
+  set_property(GLOBAL APPEND PROPERTY VTK_PYTHON_WRAPPED ${vtk-module})
+
+  set(vtkPVPythonCatalyst_INCLUDE_DIRS
+    ${ParaView_BINARY_DIR}/CoProcessing/PythonCatalyst/
+    ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst/)
+
+  list(APPEND VTK_PYTHON_MODULES ${vtk-module})
+  set(vtkPVPythonCatalyst_HEADERS vtkCPPythonHelper vtkCPPythonScriptPipeline vtkCPPythonProcessor)
+  vtk_add_python_wrapping(${vtk-module})
+  if (BUILD_TESTING)
+    set (_test_module_name "${vtk-module}-Test-Cxx")
+    add_subdirectory(
+      "${${_test_module_name}_SOURCE_DIR}" "${${_test_module_name}_BINARY_DIR}")
+  endif()
+
+  set_property(TARGET vtkPVPythonCatalystPythonD PROPERTY INCLUDE_DIRECTORIES
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${vtkPVPythonCatalyst_INCLUDE_DIRS}
+    ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
+  set_property(TARGET vtkPVPythonCatalystPython PROPERTY INCLUDE_DIRECTORIES
+    ${VTK_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIR}
+    ${vtkPVPythonCatalyst_INCLUDE_DIRS}
+    ${ParaView_BINARY_DIR}/CoProcessing/Catalyst)
 endif()
 
 #------------------------------------------------------------------------------
