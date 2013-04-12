@@ -263,7 +263,6 @@ void vtkCTHSource::UpdateRepresentation ()
 {
   // A call to viz implies that our data is modified.
   vtkMultiProcessController* ctrl = vtkMultiProcessController::GetGlobalController ();
-  int localId = ctrl->GetLocalProcessId ();
   for (size_t i = 0; i < Blocks.size (); i ++)
     {
     Block &b = this->Blocks[i]; 
