@@ -40,6 +40,7 @@ set (Module_SRCS
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundSourceProxyDefinitionBuilder.cxx
+  vtkSMCoreUtilities.cxx
   vtkSMDataSourceProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDeserializer.cxx
