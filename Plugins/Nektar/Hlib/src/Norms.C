@@ -24,6 +24,9 @@
 #include "nekstruct.h"
 
 #include <stdio.h>
+// jai added
+using namespace nektarTri;
+
 
 /*
 

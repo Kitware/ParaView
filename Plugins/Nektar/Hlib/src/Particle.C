@@ -5,6 +5,9 @@
 #include "nekstruct.h"
 
 #include <stdio.h>
+// jai added
+using namespace nektarTri;
+
 
 /* This function inspects point Xi to see if it lies the other side of
    the line defined by the normal direction n and with a point X in the plane.

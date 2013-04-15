@@ -4,6 +4,10 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
+
 void Tri_reset_basis(Basis *B);
 Basis *Tri_addbase(int, int, int, int);
 void Tri_get_point_shape(Element *, double, double, double *, double *);

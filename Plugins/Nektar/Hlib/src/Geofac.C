@@ -20,6 +20,10 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
+
 Geom *Tri_gen_geofac   (Tri *E, int id);
 Geom *Quad_gen_geofac  (Quad *E, int id);
 Geom *Tet_gen_geofac   (Element *E, int id);

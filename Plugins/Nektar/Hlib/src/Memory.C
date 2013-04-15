@@ -22,6 +22,9 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
 nektar::scoped_c_ptr<double> Tri_wk;
 
  double *Quad_wk = (double*)0;

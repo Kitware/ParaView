@@ -17,6 +17,10 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
+
 #ifndef BTYPE
 #if defined(i860) || defined (__alpha) || defined (__WIN32__) || defined(__linux__)
 #define BTYPE "ieee_little_endian"

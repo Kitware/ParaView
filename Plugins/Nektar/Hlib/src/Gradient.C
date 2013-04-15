@@ -21,6 +21,9 @@
 #include <stdio.h>
 
 using namespace polylib;
+// jai added
+using namespace nektarTri;
+
 
 
 /*

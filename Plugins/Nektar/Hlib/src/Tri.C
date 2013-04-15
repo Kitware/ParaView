@@ -20,6 +20,9 @@
 
 #include <stdio.h>
 
+namespace nektarTri
+{
+
 #define Tri_DIM 2
 
 
@@ -133,7 +136,6 @@ Tri::Tri(int i_d, char ty, int L, int Qa, int Qb, int Qc, Coord *X){
 
 Tri::Tri(int , char , int *, int *, Coord *){
 }
-
 
 static void CheckVertLoc(Element *U, Element *E, int fac);
 
@@ -663,3 +665,5 @@ void Tri::BET_Mat(Element *P, LocMatDiv *bet, double *beta, double *sigma){
   dneg(N  *P->Nmodes,*dyi,1);
   */
   }
+
+}  // end namespage nektarTri

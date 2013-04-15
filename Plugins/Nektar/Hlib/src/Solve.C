@@ -1000,8 +1000,7 @@ void PreconDirectOverlap(Bsystem *B, double *pin, double *zout);
     }
     else{ //parallel solver - ScaLapack
 
-#ifdef PARALLEL
-
+#if defined(PARALLEL) && !defined(NOSCALAPACK)
 
 #if 1
             //gdsum(ztmp,nvs,ztmp+nvs);

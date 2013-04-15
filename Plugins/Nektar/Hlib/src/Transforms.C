@@ -19,6 +19,9 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
 static void Hex_map_hj(Element *E, double *d);
 
 static void getlm(int p, int *i, int *j, int l);

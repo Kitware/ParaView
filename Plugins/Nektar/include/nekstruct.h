@@ -3,19 +3,19 @@
  *                                                                           *
  * $Source: /homedir/cvs/Nektar/include/nekstruct.h,v $
  * $Revision: 1.8 $
- * $Date: 2006/08/10 17:46:10 $
- * $Author: ssherw $
- * $State: Exp $
+ * $Date: 2006/08/10 17:46:10 $ 
+ * $Author: ssherw $ 
+ * $State: Exp $ 
  *---------------------------------------------------------------------------*/
 /*
- * This file contains all structures used by the Nektar source code
+ * This file contains all structures used by the Nektar source code  
  */
 
 #ifndef NEKSTRUCT_H
 #define NEKSTRUCT_H
 
 
-#define MAXFIELDS 15
+#define MAXFIELDS 15 
 
 class Vert;
 class Edge;
@@ -88,7 +88,7 @@ enum Nek_State{
   QF,
   QP,
   J,
-  Q
+  Q  
   };
 
   // Ce107
@@ -270,7 +270,7 @@ class C_Free {
     double **dx_dvdw; // derivatieves d^2x/dvdw
     double **dy_dvdw; // derivatieves d^2y/dvdw
     double **dz_dvdw; // derivatieves d^2z/dvdw
-
+ 
     double **C,**CT;  // C - standard interpolating  matrix  CT = transpose(C)
     double *V;        // V = [1 v v^2 v^3]
     double *W;        // W = [1 w w^2 w^3]
@@ -337,7 +337,7 @@ class C_Sheet {/* .......... Sheet ......................... */
   double   ax, ay, az;       /* Direction vector of axis                */
   double   twist;            /* Twist of sheet rate/z unit              */
   double   zerotwistz;       /* Twist of the sheet in at zero 'z'       */
-};                   /* --------------------------------------- */
+};                   /* --------------------------------------- */      
 
 class C_Spiral {/* .......... Spiral ....................... */
  public:
@@ -347,7 +347,7 @@ class C_Spiral {/* .......... Spiral ....................... */
   double   piperadius;       /* pipe radius                             */
   double   pitch;            /* Twist of spiral  rate/z unit              */
   double   zerotwistz;       /* Twist of the sheet in at zero 'z'       */
-};
+};     
 
 class C_Taurus {/* .......... Taurus ....................... */
  public:
@@ -355,7 +355,7 @@ class C_Taurus {/* .......... Taurus ....................... */
   double   ax, ay, az;       /* Direction vector of axis                */
   double   axialradius;      /* axial radius                            */
   double   piperadius;       /* pipe radius                             */
-};
+};     
 
 class C_Naca3d {/* .......... Naca3d ....................... */
  public:
@@ -363,17 +363,17 @@ class C_Naca3d {/* .......... Naca3d ....................... */
   Coord    *axis;
   Coord    *lead;
   Coord    *locz;
-  double   length;           /* length of foil                          */
-  double   thickness;        /* % of length                             */
-};
+  double   length;           /* length of foil                          */   
+  double   thickness;        /* % of length                             */   
+};     
 
 class C_Naca2d {/* .......... Naca3d ....................... */
  public:
-  double   length;           /* length of foil                          */
-  double   thickness;        /* % of length                             */
+  double   length;           /* length of foil                          */   
+  double   thickness;        /* % of length                             */   
   double   xo;
   double   yo;
-};
+};     
 
 
 union CurveInfo {    /* ....... Curved Side Infos ....... */
@@ -384,7 +384,7 @@ union CurveInfo {    /* ....... Curved Side Infos ....... */
   C_Sin      sin;
   C_Naca2d   nac2d;        /* Symmetric naca */
   C_Ellipse  ellipse;
-
+  
   C_Cylinder cyl;           /* cylinder specification            */
   C_Cone     cone;          /* cone     specification            */
   C_Sphere   sph;           /* sphere   specification            */
@@ -401,7 +401,7 @@ enum  CurveType{            /* ....... Curved Side Types ....... */
   T_Straight,               /* straight edge                     */
   T_Arc,                    /* arc                               */
   T_Naca4,                  /* Naca 4 digit aerofoil             */
-  T_File,                   /* Spline fit from file data         */
+  T_File,                   /* Spline fit from file data         */ 
   T_Sin,                    /* Sin curve                          */
   T_Naca2d,                 /* Symmetric Naca foil */
   T_Ellipse,                /* Ellipse                          */
@@ -442,7 +442,7 @@ class Element{
   int     id;               /* Element number                             */
   char    type;             /* Element type                               */
   char    state;            /* transformed state: 'p'=physical,           */
-                /*                    't'=transformed         */
+		            /*                    't'=transformed         */
   int     Nverts;           /* Number of vertices                         */
   int     Nedges;           /* Number of vertices                         */
   int     Nfaces;           /* Number of edges                            */
@@ -486,15 +486,15 @@ class Element{
   virtual void PSE_Mat(Element *E, Metric *lambda, LocMat *pse, double *DU);
   virtual void PSE_Mat(Element *E, LocMat *pse, double *DU){
     fprintf(stderr,"Not valid call on Element"); exit(1);}
-  virtual void BET_Mat(Element *P, LocMatDiv *bet, double *beta,
-           double *sigma){
+  virtual void BET_Mat(Element *P, LocMatDiv *bet, double *beta, 
+		       double *sigma){
     fprintf(stderr,"Not valid call on Element"); exit(1);}
   virtual void LapMat  (LocMat *);                   // return Laplacian op.
   virtual void mat_free(LocMat *m);
   virtual LocMat *mat_mem();
   virtual void fill_diag_massmat();         // fill modes with mass diagonal
   virtual void fill_diag_helmmat(Metric *lambda);   // fill modes with helm diagonal
-
+  
 
   // Memory storage functions
   virtual void Mem_J(int *, char);
@@ -506,18 +506,18 @@ class Element{
   // Inner Product routines
   virtual double iprod(Mode *x, Mode *y);
   virtual double iprodlap(Mode *x, Mode *y, Mode *fac);
-
-  // Helmholtz
+  
+  // Helmholtz 
   virtual void HelmHoltz(Metric *lambda);
   virtual void form_diprod(double *u1, double *u2, double *u3, Mode *m);
-
+  
   // Global matrix routines
   virtual void condense(LocMat *m, Bsystem *Ubsys, char trip);
   virtual void project(LocMat *m, Bsystem *Ubsys);
-  virtual void LowEnergyModes(Bsystem *B, int *Ne, int *Nf,
-            double ***Rv, double ***Rvi, double ***Re);
-  virtual void MakeLowEnergyModes(Bsystem *B, int *Ne, int *Nf,
-          double ***Rv, double ***Rvi, double ***Re);
+  virtual void LowEnergyModes(Bsystem *B, int *Ne, int *Nf, 
+			      double ***Rv, double ***Rvi, double ***Re);
+  virtual void MakeLowEnergyModes(Bsystem *B, int *Ne, int *Nf, 
+				  double ***Rv, double ***Rvi, double ***Re);
 
 
   // Bndry routines
@@ -545,10 +545,10 @@ class Element{
   virtual void Obwd  (double *, double *, int);
   virtual void Ofwd  (double *, double *, int);
   virtual void Ofwd  (double *, double *, int, int);
-  virtual void Add_Surface_Contrib(Element *, double *in, char dir,
-           int edge );
-  virtual void Add_Surface_Contrib(Element *, double *in, char dir,
-           int edge, int invjac);
+  virtual void Add_Surface_Contrib(Element *, double *in, char dir, 
+				   int edge );
+  virtual void Add_Surface_Contrib(Element *, double *in, char dir, 
+				   int edge, int invjac);
   virtual void Add_Surface_Contrib(double *in, char dir,  int edge );
   virtual void Add_Surface_Contrib(double *in, char dir,  int edge, int invjac);
   virtual void Add_Surface_Contrib(Element *, double *in, char dir);
@@ -567,32 +567,32 @@ class Element{
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
   virtual void Grad_d (double *, double *, double *, char Trip);
-  virtual void Grad_h (double *, double *, double *, double *, char Trip);
+  virtual void Grad_h (double *, double *, double *, double *, char Trip); 
   virtual void GradT_h (double *, double *, double *, double *, char Trip){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
   virtual void GradT_h (double *, double *, double *, double *, char Trip, bool invW){
     fprintf(stderr,"This function is not yet define for the region\n");
     exit(1);}
-
+  
   //Get differential matrix
   virtual void getD(double ***da, double ***dat,double ***db,double ***dbt,
-        double ***dc, double ***dct);
+		    double ***dc, double ***dct);
 
   virtual void fillElmt(Mode *v);
   virtual void fill_gradbase(Mode *gb, Mode *m, Mode *mb, Mode *fac);
   virtual Basis *getbasis();
   virtual Basis *derbasis();
-
+  
   // Co-ordinate functions
   virtual void set_curved(Curve*);                    // fix curve sides
   virtual void coord(Coord *X);                       // get quadrature coords
-  virtual void fillvec(Mode *v, double *f);
-  virtual void straight_elmt(Coord *X);
-  virtual void curved_elmt(Coord *X);
-  virtual void straight_edge(Coord *X, int edge);
-  virtual void GetFaceCoord(int face, Coord *X);
-
+  virtual void fillvec(Mode *v, double *f);         
+  virtual void straight_elmt(Coord *X);             
+  virtual void curved_elmt(Coord *X);               
+  virtual void straight_edge(Coord *X, int edge);   
+  virtual void GetFaceCoord(int face, Coord *X);    
+  
   // Error functions
   virtual void   Set_field(char *string);             // set field to function
   virtual void   Error(char *string);                 // compare with function
@@ -605,23 +605,23 @@ class Element{
   virtual void   Norm_l2m(double *l2, double *area);
   virtual double Norm_h1();
   virtual void   Norm_h1m(double *h1, double  *area);
-
+  
   virtual double Norm_beta();
 
   // Curved sides
   virtual void set_curved_elmt(Element_List*);
   virtual void CoordTransEdge(double *f, double *fhat, int edge);
   virtual void get_mmat1d(double **mat, int L);
-
-  // Geometric factors
+  
+  // Geometric factors 
   virtual void set_geofac();
   virtual void free_geofac();
   virtual void move_vertices(Coord *X);
 
   virtual void Surface_geofac(Bndry *B);
   virtual void InterpToFace1(int from_face, double *f, double *fi);
-  virtual void InterpToGaussFace(int from_face, double *f,
-         int qaf, int qbf, double *fi);
+  virtual void InterpToGaussFace(int from_face, double *f, 
+				 int qaf, int qbf, double *fi);
   virtual void GetFace(double *, int, double*);
   virtual void dump_mesh(FILE *);
 
@@ -635,21 +635,21 @@ class Element{
   virtual int  fnum1(int,int);
   virtual int  ednum(int,int);
   virtual int  ednum1(int,int);
-  virtual int  ednum2(int,int);
+  virtual int  ednum2(int,int); 
 
 
   virtual int  dim();
   virtual int  Nfverts(int);
 
   // Eigenvalue routines
-  virtual void fill_column(double **Mat, int loc, Bsystem *B,
-         int nm, int offset);
+  virtual void fill_column(double **Mat, int loc, Bsystem *B, 
+			   int nm, int offset);
   virtual void WeakDiff(Mode *m, double *ux, double *uy,double *uz, int con);
 
   // field file routines
   virtual int  data_len(int *size);
   virtual void Copy_field(double *, int *);
-
+  
   virtual void close_split(Element_List *EL, Bndry **, int, int *&flag);
   virtual void split_element(Element_List *EL, Bndry **, int, int *&flag);
   virtual void split_edge(int edg, Element_List *EL, Bndry **Ubc, int nfields,int *flag);
@@ -660,22 +660,22 @@ class Element{
   virtual void PutFace(double*, int);
 
   virtual void GetZW(double **za, double **wa, double **zb, double **wb,
-         double **zc, double **wc);
+		     double **zc, double **wc);
   virtual int edvnum(int,int);
 
   virtual void DivMat  (LocMatDiv *, Element *P);    // return Divergence op.
-  virtual void divmat_free(LocMatDiv *m);
+  virtual void divmat_free(LocMatDiv *m);				  
   virtual LocMatDiv *divmat_mem(Element *P);
-  virtual double get_1diag_massmat(int id);  /* get diagional component of
-            mass matrix corres. to id */
-  virtual void condense_stokes(LocMat *m, LocMatDiv *d, Bsystem *Ubsys,
-             Bsystem *Pbsys, Element *P);
+  virtual double get_1diag_massmat(int id);  /* get diagional component of 
+						mass matrix corres. to id */
+  virtual void condense_stokes(LocMat *m, LocMatDiv *d, Bsystem *Ubsys, 
+			       Bsystem *Pbsys, Element *P);
   virtual void project_stokes(Bsystem *Pbsys, int asize, int geom_id);
-
+  
 
   // Particle.C routines
-  virtual int intersect_bnd    (Coord *Xi, double *vp,
-        double *dt_remain, int *face)=0;
+  virtual int intersect_bnd    (Coord *Xi, double *vp, 
+				double *dt_remain, int *face)=0;
   virtual int  lcoords2face    (Coord *Xi, int *fac)=0;
   virtual void face2lcoords    (Coord *Xi, int *fac)=0;
   virtual void Cart_to_coll    (Coord csi, Coord *A)=0;
@@ -720,11 +720,11 @@ public:
   int       hjtot;  // sum of Nmodes over elements in one level
   double   *base_h;
   double   *base_hj;
-
+  
   // Fourier information
   Element_List **flevels;      // Fourier lists
   int           nz;
-  int           nztot;
+  int           nztot; 
 
   Element_List();
   Element_List(Element **hea, int n);
@@ -733,7 +733,7 @@ public:
   virtual Element *operator()(int i);
   virtual Element *operator[](int i);
 
-  virtual void Cat_mem();
+  virtual void Cat_mem();  
   virtual void Mem_shift(double *, double *);
 
   virtual Element_List *gen_aux_field(char ty);
@@ -750,11 +750,11 @@ public:
   virtual void HelmHoltz(Metric *lambda);
   virtual void Set_field(char *string);
   virtual void zerofield();
-  virtual void FFT(Element_List *EL, Nek_Trans_Type ntt);
-  virtual void Grad_z(Element_List *EL);
+  virtual void FFT(Element_List *EL, Nek_Trans_Type ntt); 
+  virtual void Grad_z(Element_List *EL); 
   virtual void Set_state(char type);
-  virtual void H_Refine(int * to_split, int nfields, Bndry **Ubc, int *flag);
-
+  virtual void H_Refine(int * to_split, int nfields, Bndry **Ubc, int *flag);  
+  
 };
 
 
@@ -762,9 +762,9 @@ public:
 class Bndry{
  public:
   int        id;                  /* bndry  number                         */
-  char       type;                /* type of boundary used by library      */
-  char    usrtype;                /* type of boundary used by src          */
-
+  char       type;                /* type of boundary used by library      */  
+  char    usrtype;                /* type of boundary used by src          */  
+  
   int        face;                /* face/edge boundary conditions are for */
   double    *bvert;               /* vertex boundary information           */
   double     sigma;               /* coefficient for Robin boundary cond.  */
@@ -779,7 +779,7 @@ class Bndry{
                                   /* values (not used if not initialised   */
   char      *bstring;             /* String read in from .rea file         */
   char      *blabel;           /*LG: label of baoundary, read in from .rea */
-
+ 
   double   *vertu;
   double   **edgeu;
   double   *faceu;
@@ -811,7 +811,7 @@ class Bndry{
 
   double    *phys_val;            /* physical values for Dirichlet b.c.    */
   double    *phys_val_g;          /* physical values for Dirichlet b.c.    */
-
+  
   double   *centre;
   int      **edge_ids;
   double   uvel;
@@ -887,7 +887,7 @@ class P_LEnergy{
   int      nvert;       /* number of vertices             */
   int      bw;          /* band width of vertex system    */
   double  **ivert;      /* vertex preconditioner          */
-  /* These next two matrices are only used in parallel solve */
+  /* These next two matrices are only used in parallel solve */  
   double  **ivert_B;    /* Boundary-interior vertex preconditioner */
   double  **ivert_C;    /* interior-interior vertex preconditioner  */
 
@@ -900,7 +900,7 @@ class P_LEnergy{
   double **iface;       /* face   preconditioner          */
   double *levert;       /* inverse of low energy vertices */
 
-  SMatrix *SM_local;    /* sparce matrix to store local
+  SMatrix *SM_local;    /* sparce matrix to store local 
                            values of ivert                */
   int *DESC_ivert, *DESC_rhs;
   int *BLACS_PARAMS;
@@ -911,7 +911,7 @@ class P_LEnergy{
   int first_row;        /* A_local[row = 0][] = A_global[row = first_row][] */
   int first_col;        /* A_local[][col = 0] = A_global[][col = first_col] */
   int *col_displs;      /* displacement vector and receive counter          */
-  int *col_rcvcnt;      /* required for parallel_dgemv                      */
+  int *col_rcvcnt;      /* required for parallel_dgemv                      */ 
   int  *GS_col_sendcntr;  /*  */
   int  *GS_col_recvcntr;
   int **GS_col_index_list_send;
@@ -949,7 +949,7 @@ public:
 
 enum OverlapType{
   NoOverlap,
-  File,
+  File, 
   VertexPatch,
   ElementPatch,
   Coarse
@@ -1053,8 +1053,8 @@ class Rsolver{
   struct{
     double *inva;
     double **a;
-    int    *pivota;
-  } A;
+    int    *pivota; 
+  } A;   
   /* final boundary system                              */
   Precond *precon;   /* preconditioner for iterative solver if required    */
 };
@@ -1062,13 +1062,15 @@ class Rsolver{
 #include "csgs.h"
 //#include "sgs.h"
 //#include "gs_nektar.h"
-
+#ifdef PARALLEL
+#include "nektar_mex.h"  
+#endif
 /* mapping information for parallel solver          */
 class Pllmap{
  public:
   int  nv_solve;            /* global vertices to solve                   */
   int  nsolve;              /* global nsolve                              */
-  int  nglobal;             /* global unkowns                             */
+  int  nglobal;             /* global unkowns                             */ 
   int  nv_gpsolve;          /* number of global vertices along partitions */
   int  nv_lpsolve;          /* number of global vertices along partitions */
                             /* within local partition                     */
@@ -1079,12 +1081,15 @@ class Pllmap{
   struct gather_scatter_id *known; /* known map for 'gs' routine          */
 
 #ifdef PARALLEL
-  CSGS csgs_solve;
+  NEKTAR_MEX *mex_solve;
+  NEKTAR_MEX *mex_known;
+
+  CSGS csgs_solve; 
   CSGS csgs_known;
 #endif
 
   double *mult;             /* multiplicity of data over processors       */
-};
+}; 
 
 class Metric{
  public:
@@ -1123,16 +1128,17 @@ class Bsystem{
   double  *signchange; /* connectivity Z matrix */
   struct gather_scatter_id *egather; /* parallel gather for LE precon   */
   struct gather_scatter_id *fgather; /* parallel gather for LE precon   */
-
-#ifdef PARALLEL
+ 
+#ifdef PARALLEL 
   CSGS gs;
- // GS_nektar GS_egather;
+  NEKTAR_MEX *mex;
+ // GS_nektar GS_egather; 
  // SGS *SGS_egather;
 #endif
 
-  // Multiple RHS
+  // Multiple RHS 
   Multi_RHS *mrhs;
-
+  
   // Overlapping info.
   Overlap      *overlap;
 };
@@ -1167,14 +1173,14 @@ class Membrane{
 public:
 
   Membrane();                                     //constructor
-  Membrane(double tension, double mass_density, int lbc, int rbc);
+  Membrane(double tension, double mass_density, int lbc, int rbc); 
   Membrane(Membrane &M);                          //copy constructor
   ~Membrane();                                    //destuctor
   void Setup(Element_List *EL, Bndry *UBc);
   void CalcMeshVelocity(Element_List *EL, Bndry *UBc, Bndry *VBc, int nstep, double dt);
 
   //---------------------------------------------------------------
-  int nelmt;             //number of elements across top
+  int nelmt;             //number of elements across top 
   int norder;            //num quad points per element
   double * xpts;         //x coords from left to right
   double * netp;         //net pressure at xpts
@@ -1183,12 +1189,12 @@ public:
   int ** top_elmts;      //[][0] = elmt number; [][1] = face num;
   int ** bottom_elmts;
   int * BCflags;
-  double *physdata;  /*Physical data of the membrane ([0] = tension: [1] = mass density)*/
+  double *physdata;  /*Physical data of the membrane ([0] = tension: [1] = mass density)*/     
   double phead;
   int pvert;
   int pelmt;
 };
-#ifdef ALE
+#ifdef ALE 
 class Corner{
 public:
    int elem[7];
@@ -1203,7 +1209,7 @@ public:
 class PBC1DLINATREE;
 
 /* Impedance outlet boundary condtions.    */
-/* class added by Leopold Grinberg         */
+/* class added by Leopold Grinberg         */  
 #include "small_atree.h"
 #include "PBC_1D_LIN_ATREE.h"
 
@@ -1218,3 +1224,7 @@ class PBC1DLINATREE;
 #include "Hex.h"
 
 #endif
+
+
+
+

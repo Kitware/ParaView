@@ -16,6 +16,10 @@
 #include "Tri.h"
 #include "Quad.h"
 
+// jai added
+using namespace nektarTri;
+
+
 static void MemPrecon (Element_List *U, Bsystem *B, Bsystem *BP);
 static void FillPrecon(Element_List *U, Bsystem *B);
 static void InvtPrecon(Element_List *U, Bsystem *B);

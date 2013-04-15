@@ -18,6 +18,9 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
 /*
 
 Function name: Element::GetFace

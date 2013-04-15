@@ -20,6 +20,10 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
+
 static void Hex_map_to_hj(Element *E, double *d);
 
 /*

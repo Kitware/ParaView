@@ -4,68 +4,26 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-//#include <algorithm>
 
 #include <nektar.h>
 #include <gen_utils.h>
 
-#include <mpi.h>
+using namespace nektarTri;
 
 #include "vtkUnstructuredGridAlgorithm.h"
-#include "vtkPoints.h"
-#include "vtkCellType.h"
-
-
+class vtkPoints;
 class vtkDataArraySelection;
 
 #include "nektarObject.h"
 
-
 class VTK_EXPORT vtkNektarReader : public vtkUnstructuredGridAlgorithm
 {
-public:
+ public:
   static vtkNektarReader *New();
   vtkTypeMacro(vtkNektarReader,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   unsigned long GetMTime();
-
-  // Description:
-  // Get the output data object for a port on this algorithm.
-  vtkUnstructuredGrid* GetOutput();
-  vtkUnstructuredGrid* GetOutput(int);
-  virtual void SetOutput(vtkDataObject* d);
-
-  // Description:
-  // see vtkAlgorithm for details
-  virtual int ProcessRequest(vtkInformation*,
-                             vtkInformationVector**,
-                             vtkInformationVector*);
-
-  // this method is not recommended for use, but lots of old style filters
-  // use it
-  vtkDataObject *GetInput(int port);
-  vtkDataObject *GetInput() { return this->GetInput(0); };
-  vtkUnstructuredGrid *GetUnstructuredGridInput(int port);
-
-  // Description:
-  // Set an input of this algorithm. You should not override these
-  // methods because they are not the only way to connect a pipeline.
-  // Note that these methods support old-style pipeline connections.
-  // When writing new code you should use the more general
-  // vtkAlgorithm::SetInputConnection().  These methods transform the
-  // input index to the input port index, not an index of a connection
-  // within a single port.
-  void SetInput(vtkDataObject *);
-  void SetInput(int, vtkDataObject*);
-
-  // Description:
-  // Add an input of this algorithm.  Note that these methods support
-  // old-style pipeline connections.  When writing new code you should
-  // use the more general vtkAlgorithm::AddInputConnection().  See
-  // SetInput() for details.
-  void AddInput(vtkDataObject *);
-  void AddInput(int, vtkDataObject*);
 
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
@@ -73,24 +31,25 @@ public:
   vtkSetStringMacro(DataFileName);
   vtkGetStringMacro(DataFileName);
 
-  // Description:
-  // Which TimeStep to read.
-  vtkSetMacro(TimeStep, int);
-  vtkGetMacro(TimeStep, int);
-
   vtkGetMacro(NumberOfTimeSteps, int);
   // Description:
   // Returns the available range of valid integer time steps.
   vtkGetVector2Macro(TimeStepRange,int);
   vtkSetVector2Macro(TimeStepRange,int);
 
+  // set/get whether projection should be used
+  vtkSetMacro(UseProjection, int);
+  vtkGetMacro(UseProjection, int);
 
   // set/get the resolution to use for each element of the input grid
   void SetElementResolution(int);
-  int GetElementResolution();
+  vtkGetMacro(ElementResolution, int);
 
+  // set/get the resolution to use for each boundary element of the input grid (for wss)
+  void SetWSSResolution(int);
+  vtkGetMacro(WSSResolution, int);
 
-    // Description:
+  // Description:
   // Get the number of point arrays available in the input.
   int GetNumberOfPointArrays(void);
 
@@ -109,7 +68,6 @@ public:
   // Turn on/off all point arrays.
   void DisableAllPointArrays();
   void EnableAllPointArrays();
-
 
   // Description:
   // Get the number of derived variables available in the input.
@@ -131,19 +89,25 @@ public:
   void DisableAllDerivedVariableArrays();
   void EnableAllDerivedVariableArrays();
 
+  // Description:
+  // Get the names of any additional variables stored in the data
+  void GetVariableNamesFromData();
 
-
-protected:
+ protected:
   vtkNektarReader();
   ~vtkNektarReader();
 
   char* FileName;
   char* DataFileName;
   int ElementResolution;
+  int WSSResolution;
   int nfields;
   int my_patch_id;
-  int my_rank;
 
+  int num_extra_vars;
+  char** extra_var_names;
+
+  //Tri* T;
   nektarList *myList;
   nektarObject *curObj;
   int displayed_step;
@@ -152,8 +116,12 @@ protected:
 
   FileList       fl;
   Element_List **master;
+  Bndry         *Ubc;
+  double        **WSS_all_vals;
+  int            wss_mem_step;
 
   static int next_patch_id;
+  static bool NEED_TO_MANAGER_INIT;
 
   // to be read from .nektar file
   char paramFile[256];
@@ -176,27 +144,39 @@ protected:
   void setActive();  // set my_patch_id as the active one
   static int getNextPatchID(){return(next_patch_id++);}
 
-
   vtkDataArraySelection* PointDataArraySelection;
   vtkDataArraySelection* DerivedVariableDataArraySelection;
 
   // copy the data from nektar to pv
-  void updateVtuData(vtkUnstructuredGrid* pv_ugrid);
+  void updateVtuData(vtkUnstructuredGrid* pv_ugrid, vtkUnstructuredGrid* pv_wss_ugrid);
+  void addCellsToContinuumMesh(int qa, double ***num);
+  void interpolateAndCopyContinuumPoints(int alloc_res, int interp_res, vtkPoints* points);
+  void interpolateAndCopyContinuumData(vtkUnstructuredGrid* pv_ugrid, double **data_array, int interp_res, int num_verts);
+  void interpolateAndCopyWSSPoints(int alloc_res, int interp_res, vtkPoints* wss_points);
+  void interpolateAndCopyWSSData(int alloc_res, int num_verts, int interp_res);
+  void addCellsToWSSMesh(int * wss_index, int qa);
+  void generateWSSconnectivity(int * wss_index, int res);
 
-  vtkPoints* points;
-  vtkUnstructuredGrid* ugrid;
-  bool CALC_GEOM_FLAG;  // true = need to calculate geometry; false = geom is up to date
-  bool READ_GEOM_FLAG;  // true = need geom from disk
+  vtkUnstructuredGrid* UGrid;
+  vtkUnstructuredGrid* WSS_UGrid;
+  bool CALC_GEOM_FLAG; // true = need to calculate continuum geometry; false = geom is up to date
+  bool CALC_WSS_GEOM_FLAG; // true = need to calculate wss geometry; false = wss geom is up to date
+  bool HAVE_WSS_GEOM_FLAG; // true = we have wss geometry; false = geom has not been read yet
+
+  bool READ_GEOM_FLAG; // true = need continuum geom from disk
+  bool READ_WSS_GEOM_FLAG; // true = need wss geom from disk
   bool IAM_INITIALLIZED;
   bool I_HAVE_DATA;
   bool FIRST_DATA;
+  bool USE_MESH_ONLY;
 
-  int TimeStep;
+  //int TimeStep;
   int ActualTimeStep;
   int NumberOfTimeSteps;
   double TimeValue;
   int TimeStepRange[2];
-  double *TimeSteps;
+  std::vector<double> TimeSteps;
+  int UseProjection;
 
   // Time query function. Called by ExecuteInformation().
   // Fills the TimestepValues array.
@@ -206,8 +186,6 @@ protected:
   // Populates the TIME_STEPS and TIME_RANGE keys based on file metadata.
   void AdvertiseTimeSteps( vtkInformation* outputInfo );
 
-
-  // convenience method
   virtual int RequestInformation(vtkInformation* request,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
@@ -219,23 +197,7 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
-
-  // Description:
-  // This method is the old style execute method
-  virtual void ExecuteData(vtkDataObject *output);
-  virtual void Execute();
-
-  // see algorithm for more info
-  virtual int FillOutputPortInformation(int port, vtkInformation* info);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-
-private:
+ private:
   vtkNektarReader(const vtkNektarReader&);  // Not implemented.
   void operator=(const vtkNektarReader&);  // Not implemented.
 };

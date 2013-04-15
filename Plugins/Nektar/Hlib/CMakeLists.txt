@@ -21,7 +21,7 @@ if(NOT WIN32)
   set(CMAKE_Fortran_FLAGS "-fPIC -ffast-math -funroll-loops -w")
 endif()
 
-add_definitions(-DPARALLEL -DMETIS -DHOSURF -DZERONULLDIV -DSVVSYMM -DACCELERATOR -DCSGSLIB -DNDEBUG -DPBC_1D_LIN_ATREE)
+add_definitions(-DPARALLEL -DMETIS -DHOSURF -DZERONULLDIV -DSVVSYMM -DACCELERATOR -DCSGSLIB -DNDEBUG -DPBC_1D_LIN_ATREE -DNOSCALAPACK)
 
 #defines  =  HOSURF ZERONULLDIV SVVSYMM ACCELERATOR  CSGSLIB NDEBUG PBC_1D_LIN_ATREE #LE_VERT_OLD PARALLEL #VELINTERP #Lanczos #DUMPLEMODES
 
@@ -51,6 +51,7 @@ set(hybrid_sources
   src/Matrix.C
   src/MatrixR.C
   src/Matrix_Stokes.C
+  src/MC3D_nektar_mex.C
   src/Memory.C
   src/Misc.C
   src/Mrhs.C

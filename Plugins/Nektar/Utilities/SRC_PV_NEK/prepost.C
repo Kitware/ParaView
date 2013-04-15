@@ -1,11 +1,11 @@
 /*---------------------------------------------------------------------------*
  *                        RCS Information                                    *
  *                                                                           *
- * $Source: /homedir/cvs/Nektar/Utilities/src/prepost.C,v $
+ * $Source: /homedir/cvs/Nektar/Utilities/src/prepost.C,v $  
  * $Revision: 1.2 $
- * $Date: 2006/05/08 14:18:48 $
- * $Author: ssherw $
- * $State: Exp $
+ * $Date: 2006/05/08 14:18:48 $    
+ * $Author: ssherw $  
+ * $State: Exp $   
  *---------------------------------------------------------------------------*/
 
 #include <math.h>
@@ -63,12 +63,12 @@ void parse_args(int argc, char *argv[])
 #endif
 
   /* initialize the parser and install the defaults */
-
+  
   manager_init();
 
-  for (i = 0; nektar_ops[i].name; i++)
+  for (i = 0; nektar_ops[i].name; i++) 
     option_set(nektar_ops[i].name, nektar_ops[i].val);
-
+  
   if(argc == 1) goto showUsage;
 
   while (--argc && (*++argv)[0] == '-') {
@@ -87,84 +87,84 @@ void parse_args(int argc, char *argv[])
     while (c = *++argv[0])
       switch (c) {
       case 'a':
-  option_set("binary",0);
-  break;
+	option_set("binary",0);
+	break;
       case 'b':
-  fprintf(stderr,"Option b is now automatic\n");
-  break;
+	fprintf(stderr,"Option b is now automatic\n");
+	break;
       case 'c':
-  { int n;
-    if (*++argv[0])
-      n = atoi (*argv);
-    else {
-      n = atoi (*++argv);
-      argc--;
-    }
-    option_set("TORDER",n);
-    (*argv)[1] = '\0';
-  break;
-  }
+	{ int n; 
+	  if (*++argv[0]) 
+	    n = atoi (*argv);
+	  else {
+	    n = atoi (*++argv);
+	    argc--;
+	  }
+	  option_set("TORDER",n);
+	  (*argv)[1] = '\0'; 
+	break;
+	}
       case 'i':
-  option_set("iterative",1);
-  break;
-      case 'I':
-  option_set("Initcond",1);
-  break;
+	option_set("iterative",1);
+	break;
+      case 'I': 
+	option_set("Initcond",1);
+	break;
       case 'm':
-  option_set("mixediter",1);
-  break;
+	option_set("mixediter",1);
+	break;
       case 'n':
-  { int n;
-    if (*++argv[0])
-      n = atoi (*argv);
-    else {
-      n = atoi (*++argv);
-      argc--;
-    }
-    option_set("NORDER.REQ",n);
-    (*argv)[1] = '\0';
-  }
-  break;
+	{ int n; 
+	  if (*++argv[0]) 
+	    n = atoi (*argv);
+	  else {
+	    n = atoi (*++argv);
+	    argc--;
+	  }
+	  option_set("NORDER.REQ",n);
+	  (*argv)[1] = '\0'; 
+	}
+	break;
       case 'r':
-  { int n;
-    if (*++argv[0])
-      n = atoi (*argv);
-    else {
-      n = atoi (*++argv);
-      argc--;
-    }
-    option_set("recursive",n);
-    (*argv)[1] = '\0';
-  }
-  break;
+	{ int n; 
+	  if (*++argv[0]) 
+	    n = atoi (*argv);
+	  else {
+	    n = atoi (*++argv);
+	    argc--;
+	  }
+	  option_set("recursive",n);
+	  (*argv)[1] = '\0'; 
+	}
+	break;
       case 'S':
-  {
-    option_set("SLICES",1);
-    break;
-  }
+	{
+	  option_set("SLICES",1);
+	  break;
+	}
       case 't':
-  { double n;
-    if (*++argv[0])
-      n = atof (*argv);
-    else {
-      n = atof (*++argv);
-      argc--;
-    }
-    dparam_set("THETA",n);
-    (*argv)[1] = '\0';
-  }
-  break;
+	{ double n; 
+	  if (*++argv[0]) 
+	    n = atof (*argv);
+	  else {
+	    n = atof (*++argv);
+	    argc--;
+	  }
+	  dparam_set("THETA",n);
+	  (*argv)[1] = '\0'; 
+	}
+	break;
       case 'T':
-  option_set("timeavg",1);
-  break;
+	option_set("timeavg",1);
+	break;
       case 'v':
-  option_set("verbose",2);
-  break;
+	option_set("verbose",2);
+	break;
       case 'V':
-  option_set("tvarying",1);
-  break;
+	option_set("tvarying",1);
+	break;
       default:
-  goto showUsage;
+	goto showUsage;
       }
   }
   return;
@@ -172,13 +172,13 @@ void parse_args(int argc, char *argv[])
  showUsage:
   ROOTONLY{
     fputs("usage: nektar [options] file[.rea]\n\n"
-    "options:\n", stderr);
+	  "options:\n", stderr);
     for (i = 0; nektar_ops[i].name; i++)
       fprintf(stderr, "%s\n", nektar_ops[i].descrip);
   }
   exit(-1);
 }
-
+  
 void LocalNumScheme  (Element_List *E, Bsystem *Bsys, Gmap *gmap);
 Gmap *GlobalNumScheme(Element_List *E, Bndry *Ebc);
 
@@ -227,7 +227,7 @@ Domain *PreProcess(int argc, char **argv)
   }
 #endif
 
-  ROOTONLY
+  ROOTONLY 
     sprintf(session.fce, "%s.fce" , argv[argc-1]);
 
   omega->name     = argv[argc-1];
@@ -237,7 +237,7 @@ Domain *PreProcess(int argc, char **argv)
     error_msg(PreProcess(): Could not open input file(s));
 
   omega->fld_file = fopen(session.fld,"w");
-  ROOTONLY
+  ROOTONLY 
     omega->fce_file = fopen(session.fce,"w");
 
   /* Read the input parameters */
@@ -247,14 +247,14 @@ Domain *PreProcess(int argc, char **argv)
   ReadLogics  (rea_file);
 
   Je = iparam("INTYPE");
-
+  
   /* Build the mesh */
   Mesh   = ReadMesh(rea_file, session.name);
-  Meshbc = ReadMeshBCs(rea_file,Mesh);
+  Meshbc = ReadMeshBCs(rea_file,Mesh);   
   gmap   = GlobalNumScheme(Mesh, Meshbc);
 
-  U = LocalMesh(Mesh,session.name);
-  P = U->gen_aux_field ('p');
+  U = LocalMesh(Mesh,session.name); 
+  P = U->gen_aux_field ('p');    
 
   DO_PARALLEL{ // recall global numbering to put partition vertices first
     free_gmap(gmap);
@@ -285,7 +285,7 @@ Domain *PreProcess(int argc, char **argv)
   omega->Uf = U->gen_aux_field('u');
 
   omega->V   = U->gen_aux_field ('v');
-  omega->Vbc = ReadBCs       (rea_file,omega->V->fhead);
+  omega->Vbc = ReadBCs       (rea_file,omega->V->fhead);   
 
   if(option("REFLECT1")||option("REFLECT0")){
     Reflect_Global_Velocity    (Mesh, Meshbc, 1);
@@ -298,9 +298,9 @@ Domain *PreProcess(int argc, char **argv)
     omega->Vsys = omega->Usys;
 
   omega->W   = U->gen_aux_field ('w');
-  omega->Wbc = ReadBCs       (rea_file,omega->W->fhead);
+  omega->Wbc = ReadBCs       (rea_file,omega->W->fhead);   
   omega->Wf  = omega->W->gen_aux_field('w');
-
+   
   if(option("REFLECT2")||
      (option("REFLECT0")&&option("REFLECT1")&&(!option("REFLECT2")))){
     Reflect_Global_Velocity   (Mesh, Meshbc, 2);
@@ -315,11 +315,11 @@ Domain *PreProcess(int argc, char **argv)
     Replace_Local_Numbering(omega->W,omega->V);
     omega->Wsys = omega->Vsys;
   }
-
+  
   omega->Vf  = omega->V->gen_aux_field('v');
-
+  
   omega->U     = U;  omega->Ubc   = Ubc;
-  omega->P     = P;  omega->Pbc   = Pbc;
+  omega->P     = P;  omega->Pbc   = Pbc; 
 
   dt = dparam("DELT");
   omega->soln = NULL;
@@ -327,11 +327,11 @@ Domain *PreProcess(int argc, char **argv)
 
   Re = 1.0 / dparam("KINVIS");
 
-  ReadKinvis (omega);
+  ReadKinvis (omega);  
 
   Pbsys->lambda = (Metric*) calloc(P->nel, sizeof(Metric));
   ROOTONLY{
-    fprintf(stdout,"Generating pressure system [.");
+    fprintf(stdout,"Generating pressure system [."); 
     fflush(stdout);
   }
   GenMat (P,Pbc,Pbsys,Pbsys->lambda,Helm);
@@ -339,30 +339,30 @@ Domain *PreProcess(int argc, char **argv)
     fprintf(stdout,"]\n");
     fflush(stdout);
   }
-
+    
   Ubsys->lambda = (Metric*) calloc(U->nel, sizeof(Metric));
-
+  
   if(omega->kinvis->p){
     Ubsys->lambda->p = dvector(0, U->htot-1);
     dcopy( U->htot, omega->kinvis->p,1,Ubsys->lambda->p, 1);
   }
-
+  
   int skip = 0;
   for(k=0;k<U->nel;++k){
     Ubsys->lambda[k].d = Re*getgamma(1)/dt;
     if(omega->kinvis[k].p)
       Ubsys->lambda[k].p = Ubsys->lambda->p + skip;
-
+    
     skip += U->flist[k]->qtot;
   }
-
+    
   ROOTONLY {
-    fprintf(stdout,"Generating velocity system [.");
+    fprintf(stdout,"Generating velocity system [."); 
     fflush(stdout);
   }
   GenMat (U,Ubc,Ubsys,Ubsys->lambda,Helm);
   ROOTONLY {
-    fprintf(stdout,"]\n");
+    fprintf(stdout,"]\n"); 
     fflush(stdout);
   }
 #ifndef PARALLEL
@@ -394,8 +394,8 @@ Domain *PreProcess(int argc, char **argv)
 
   free_Mesh_Facets(Mesh); // free edges, vertices
   free_Mesh_Structure(Mesh);
-
-  // Set up multistep storage
+  
+  // Set up multistep storage 
   omega->u  = (double**) malloc(Je*sizeof(double*));
   for(k = 0; k < Je; ++k){
     omega->u[k] = dvector(0,U->htot*U->nz-1);
@@ -412,13 +412,13 @@ Domain *PreProcess(int argc, char **argv)
     omega->v[k] = dvector(0,omega->V->htot*omega->V->nz-1);
     dzero(U->htot*U->nz, omega->v[k], 1);
   }
-
+  
   omega->vf  = (double**) malloc(Je*sizeof(double*));
   for(k = 0; k < Je; ++k){
     omega->vf[k] = dvector(0,omega->Vf->htot*omega->Vf->nz-1);
     dzero(U->htot*U->nz, omega->vf[k], 1);
   }
-
+  
   omega->w  = (double**) malloc(Je*sizeof(double*));
   for(k = 0; k < Je; ++k){
     omega->w[k] = dvector(0,omega->W->htot*omega->W->nz-1);
@@ -441,9 +441,9 @@ Domain *PreProcess(int argc, char **argv)
   }
   else{
     sprintf(session.fld, "%s.fld", omega->name);
-    omega->fld_file = fopen(session.fld,"w");
+    omega->fld_file = fopen(session.fld,"w"); 
     omega->dat_file = omega->fld_file;
- }
+ }    
   fclose(rea_file);
   return omega;
 }
@@ -460,15 +460,15 @@ void PostProcess(Domain *omega, int step, double time){
 
 
   V = (Element_List**) malloc(nfields*sizeof(Element_List*));
-
+  
   V[0] = omega->U;
   V[1] = omega->V;
   V[2] = omega->W;
   V[3] = omega->P;
-
+  
 
   Writefld(fp, omega->name, step, time, nfields, V);
-
+    
   DO_PARALLEL{
     fclose(fp[0]);
     fclose(fp[1]);
@@ -490,7 +490,7 @@ void PostProcess(Domain *omega, int step, double time){
 
 static void Summary (void)
 {
-
+  
    printf ("Input File          : %s\n",session.name);
   printf ("Reynolds number     : %g\n",1./dparam("KINVIS"));
 #ifdef OSSCYL
@@ -525,20 +525,20 @@ static void Summary (void)
     break;
   }
 
-  printf("Integration time    : %g, or %d steps\n",
-   dparam("FINTIME"), iparam("NSTEPS"));
+  printf("Integration time    : %g, or %d steps\n", 
+	 dparam("FINTIME"), iparam("NSTEPS"));
   printf("I/O time for saves  : %g, or %d steps",
-   dparam("IOTIME"),  iparam("IOSTEP"));
-
+	 dparam("IOTIME"),  iparam("IOSTEP"));
+  
   if  (option("checkpt"))
     fputs (" [checkpoint]\n", stdout);
-  else {
+  else { 
     putchar ('\n');
     if(iparam("NSTEPS"))
       if (iparam("NSTEPS") / iparam("IOSTEP") > 10)
-  fputs ("Summary: " "You have more than 10 dumps..."
-          "did you want to use -chk?\n", stderr);
-  }
+	fputs ("Summary: " "You have more than 10 dumps..."
+		      "did you want to use -chk?\n", stderr);
+  } 
 
   if(option("iterative")){
     printf("Solver Type         : Iterative ");
@@ -584,11 +584,15 @@ Bsystem *gen_bsystem(Element_List *UL, Gmap *gmap){
 
   if(option("iterative")){
     Bsys->smeth = iterative;
-    Bsys->Precon = (enum PreType) (int) dparam("PRECON");
+    //Bsys->Precon = (enum PreType) (int) dparam("PRECON");
+    Bsys->Precon = (enum PreType) 0;
   }
 
+  //fprintf(stderr, "prepost.C: in gen_bsystem(): rank: %d :about to call LocalNumScheme()\n", mynode());
   /* basis numbering scheme for vertices, edges and faces */
   LocalNumScheme(UL,Bsys,gmap);
+
+  //fprintf(stderr, "prepost.C: in gen_bsystem(): rank: %d :after LocalNumScheme()\n", mynode());
 
   if(option("recursive")&&!option("iterative"))
     Mlevel_SC_decom(UL,Bsys);
@@ -596,7 +600,7 @@ Bsystem *gen_bsystem(Element_List *UL, Gmap *gmap){
     bandwidthopt(E,Bsys,'a');
     ROOTONLY{
       fprintf(stderr,"rcm bandwidth (%c)   : %d [%d (%d)] \n",E->type,
-        bandwidth(E,Bsys),Bsys->nsolve,suminterior(E));
+	      bandwidth(E,Bsys),Bsys->nsolve,suminterior(E));
       fflush(stdout);
     }
   }
@@ -614,7 +618,7 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   register int i;
   int       nvg,nvs,neg,nes,nfg,nfs,scnt,ncnt;
   int      *gsolve,*gbmap,l,l1;
-  Bndry    *Ubc;
+  Bndry    *Ubc; 
   Vert     *v;
   Edge     *e;
   Face     *f;
@@ -628,7 +632,7 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   /* This part of the routine re-orders the vertices, edges and then
      the faces so that the knowns are listed first. For the edges and
      the faces it also initialises a cummalative list stored in Bsys. */
-
+  
   /*--------------------*/
   /* Vertex re-ordering */
   /*--------------------*/
@@ -643,36 +647,36 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   gbmap  = ivector(0,nvg-1);
 
   ifill(nvg, 1, gsolve,1);
-  // Assemble vertex solve mask to sort out multiplicity issues
+  // Assemble vertex solve mask to sort out multiplicity issues 
   for(E=U; E; E = E->next)
     for(i = 0; i < E->Nverts; ++i) // note vert[i].solve can have mag of 1 or 2
-      gsolve[E->vert[i].gid] = (gsolve[E->vert[i].gid]*E->vert[i].solve)?
-  max(gsolve[E->vert[i].gid],E->vert[i].solve):0;
+      gsolve[E->vert[i].gid] = (gsolve[E->vert[i].gid]*E->vert[i].solve)? 
+	max(gsolve[E->vert[i].gid],E->vert[i].solve):0;
        //gsolve[E->vert[i].gid] &= E->vert[i].solve;
-
-  // copy back mask
+  
+  // copy back mask 
   for(E=U; E; E = E->next){
     v = E->vert;
     for(i = 0; i < E->Nverts; ++i)
      v[i].solve = gsolve[E->vert[i].gid];
   }
-
+  
   scnt = 0; ncnt = 0;
 
   DO_PARALLEL{
-    /* reset vertex solve id ordering so that points on parallel
+    /* reset vertex solve id ordering so that points on parallel 
        patches are first  */
     for(i = 0; i < nvg; ++i)
       if(gsolve[i] == 2)
-  gbmap[i] =  scnt++;
+	gbmap[i] =  scnt++;
       else if(gsolve[i] == 0)
-  gbmap[i] = ncnt++;
-
+	gbmap[i] = ncnt++;
+    
     gmap->nv_psolve = scnt;
 
     for(i = 0; i < nvg; ++i)
       if(gsolve[i] == 1)
-  gbmap[i] =  scnt++;
+	gbmap[i] =  scnt++;
   }
   else{
     for(i = 0; i < nvg; ++i)
@@ -681,7 +685,7 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   nvs = scnt;
 
   /* place unknowns at the end of the pile */
-  for(i = 0; i < nvg; i++)
+  for(i = 0; i < nvg; i++) 
     gbmap[i] += gsolve[i]?  0:nvs;
 
   /* replace vertices numbering into vertex structures */
@@ -692,7 +696,7 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
 
   /* optimise vertex ordering for iterative solver */
   if(option("iterative")&&0){ // turn off form moment since going to use static
-    Bsystem B;                // condensation on vertex solve
+    Bsystem B;                // condensation on vertex solve 
 
     /* set up dummy B system */
     B.nel = UL->nel;
@@ -722,12 +726,12 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
       E = Ubc->elmt;
       l = Ubc->face;
       if(E->dim() == 2)
-  gsolve[E->edge[l].gid] = 0;
-      else
-  for(i = 0; i < E->Nfverts(l); ++i)
-    gsolve[E->edge[E->ednum(l,i)].gid] = 0;
+	gsolve[E->edge[l].gid] = 0;
+      else 
+	for(i = 0; i < E->Nfverts(l); ++i)
+	  gsolve[E->edge[E->ednum(l,i)].gid] = 0;
     }
-
+  
   scnt = 0;  ncnt = 0;
   for(i = 0; i < neg; ++i)
     gbmap[i] = gsolve[i]? (scnt++):(ncnt++);
@@ -741,43 +745,43 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   for(E = U; E; E = E->next)
     for(i = 0; i < E->Nedges; ++i)
       E->edge[i].gid = gbmap[E->edge[i].gid];
-
+  
   if(U->dim() == 3){
     /*------------------*/
     /* Face re-ordering */
     /*------------------*/
-
+    
     /* find maximum number of global faces; */
     for(E = U, nfg = 0; E; E = E->next)
       for(i = 0; i < E->Nfaces; ++i)
-  nfg = (E->face[i].gid > nfg)? E->face[i].gid:nfg;
+	nfg = (E->face[i].gid > nfg)? E->face[i].gid:nfg;
     ++nfg;
-
+    
     gsolve = ivector(0,nfg-1);
     gbmap  = ivector(0,nfg-1);
-
+    
     /* form faces part of gsolve, gbmap */
     ifill(nfg, 1, gsolve,1);
     for(Ubc = Ebc; Ubc; Ubc = Ubc->next)
       if((Ubc->type == 'V')||(Ubc->type == 'W')||(Ubc->type == 'o'))
-  gsolve[Ubc->elmt->face[Ubc->face].gid] = 0;
-
+	gsolve[Ubc->elmt->face[Ubc->face].gid] = 0;
+    
     scnt = 0; ncnt = 0;
     for(i = 0; i < nfg; ++i)
       gbmap[i] = gsolve[i]? (scnt++):(ncnt++);
     nfs = scnt;
-
+    
     /* place unknowns at the end of the pile */
     for(i = 0; i < nfg; ++i)
       gbmap[i] += gsolve[i]?  0:nfs;
-
+    
     /* replace sorted gid's */
     for(E=U;E;E=E->next){
       f=E->face;
       for(i = 0; i < E->Nfaces; ++i)
-  f[i].gid = gbmap[f[i].gid];
+	f[i].gid = gbmap[f[i].gid];
     }
-
+    
     free(gsolve); free(gbmap);
   }
   else{
@@ -805,17 +809,17 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
     for(i = 0; i < E->Nedges; ++i)
       elen[E->edge[i].gid] = E->edge[i].l;
   }
-
+  
   if(U->dim() == 3){
     flen  = ivector(0,nfg-1);
-
+    
     for(E=U;E;E=E->next)
       for(i = 0; i < E->Nfaces; ++i)
-  flen[E->face[i].gid] = (E->Nfverts(i) == 3) ?
-    (E->face[i].l)*(E->face[i].l+1)/2 :
-    (E->face[i].l)*(E->face[i].l);
+	flen[E->face[i].gid] = (E->Nfverts(i) == 3) ?
+	  (E->face[i].l)*(E->face[i].l+1)/2 :
+	  (E->face[i].l)*(E->face[i].l);
   }
-
+  
   /* set up global numbering scheme */
   int cnt = 0;
   for(i = 0; i < nvs; ++i)
@@ -829,7 +833,7 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
       gmap->fgid[i] = cnt;
 
   gmap->nsolve = cnt;
-
+  
   for(i = nvs; i < nvg; ++i)
     gmap->vgid[i] = cnt++;
 
@@ -839,14 +843,14 @@ Gmap *GlobalNumScheme(Element_List *UL, Bndry *Ebc){
   if(U->dim() == 3)
     for(i = nfs; i < nfg;  cnt +=flen[i],++i)
       gmap->fgid[i] = cnt;
-
+  
   gmap->nglobal = cnt;
 
-  free(elen);
-
+  free(elen); 
+  
   if(U->dim() == 3)
     free(flen);
-
+  
   return gmap;
 
 }
@@ -855,7 +859,7 @@ void free_gmap(Gmap *gmap){
   free(gmap->vgid);
   free(gmap->egid);
   free(gmap->fgid);
-  free(gmap);
+  free(gmap);  
 }
 
 void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
@@ -890,15 +894,15 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
   nvs = 0;
   for(i = 0; i < gmap->nvs; ++i)
     if(vmap[i]+1) vmap[i] = nvs++;
-
+  
   /* count the number of locally known vertices and set up mapping */
   /* Note: haven't added nvs onto vmap here since need to add nsolve
      at end of routine. */
   nvk = 0;
   for(i = gmap->nvs; i < gmap->nvg; ++i)
     if(vmap[i]+1) vmap[i] = nvk++;
-
-
+  
+  
   /*--------------------*/
   /* Edge re-ordering   */
   /*--------------------*/
@@ -908,7 +912,7 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
   elen = ivector(0,gmap->neg-1);
   ifill(gmap->neg,-1,emap,1);
   ifill(gmap->neg,-1,elen,1);
-
+  
   for(E=EL->fhead;E;E=E->next)
     for(i = 0; i < E->Nedges; ++i){
       emap[E->edge[i].gid] = 1;
@@ -921,12 +925,12 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
   for(i = 0; i < gmap->nes; ++i)
     if(emap[i]+1)  emap[i]  = nes++;
 
-  /* count the number of locally known edges and make up cummalative
+  /* count the number of locally known edges and make up cummalative 
      edge list*/
   nek = 0;
   for(i = gmap->nes; i < gmap->neg; ++i)
     if(emap[i]+1) emap[i]  = nes + nek++;
-
+  
   /* set up cumulative edge list */
   Bsys->edge = ivector(0,nes+nek);
   ncnt = 0;
@@ -941,69 +945,71 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
   /* work out total number of local solve values */
   Bsys->nv_solve  = nvs;
   Bsys->ne_solve  = nes;
-
+  
   Bsys->nel       = EL->nel;
   Bsys->nsolve    = nvs + Bsys->edge[nes];
   Bsys->nglobal   = nvs + nvk + Bsys->edge[nes+nek];
-
+  
+  //ROOTONLY fprintf(stderr,"prepost.C: LocalNumScheme(): before Face re-ordering\n");
   if(dim == 3){
     /*--------------------*/
     /* Face re-ordering   */
     /*--------------------*/
-
+    
     /* find the number of solved and known faces  in local mesh; */
-
+    
     fmap  = ivector(0,gmap->nfg-1);
     flen  = ivector(0,gmap->nfg-1);
     ifill(gmap->nfg,-1,fmap,1);
     ifill(gmap->nfg,-1,flen,1);
-
+    
     for(E=EL->fhead;E;E=E->next)
       for(i = 0; i < E->Nfaces; ++i){
-  fmap[E->face[i].gid] = 1;
-  flen[E->face[i].gid] = (E->Nfverts(i) == 3) ?
-    E->face[i].l*(E->face[i].l+1)/2 : E->face[i].l*E->face[i].l;
+	fmap[E->face[i].gid] = 1;
+	flen[E->face[i].gid] = (E->Nfverts(i) == 3) ? 
+	  E->face[i].l*(E->face[i].l+1)/2 : E->face[i].l*E->face[i].l;
       }
-
+    
     /* count the number of locally solved faces and set up cummalative
        face list */
     nfs  = 0;
     for(i = 0; i < gmap->nfs; ++i)
       if(fmap[i]+1) fmap[i] = nfs++;
-
-
+    
+    
     /* count the number of locally known vertices and set up mapping */
     nfk = 0;
     for(i = gmap->nfs; i < gmap->nfg; ++i)
       if(fmap[i]+1) fmap[i] =  nfs + nfk++;
-
+    
     /* set up cumulative face list */
     Bsys->face = ivector(0,nfs+nfk);
     ncnt = 0;
     for(i = 0,cnt= 0; i < gmap->nfg; ++i){
       if(flen[i]+1){
-  Bsys->face[cnt++] = ncnt;
-  ncnt += flen[i];
+	Bsys->face[cnt++] = ncnt;
+	ncnt += flen[i];
       }
     }
     Bsys->face[cnt] = ncnt; /* this puts total edge length in final value */
 
     /* work out total number of local solve values */
     Bsys->nf_solve  = nfs;
-
+    
     Bsys->nsolve    = nvs + Bsys->edge[nes] + Bsys->face[nfs];
     Bsys->nglobal   = nvs + nvk + Bsys->edge[nes+nek] + Bsys->face[nfs+nfk];
   }
-
+  
+  //ROOTONLY fprintf(stderr,"prepost.C: LocalNumScheme(): after Face re-ordering\n");
   /* We want a local ordering scheme where the solved vertices are
      first followed by the solved edges and then solved faces. We then
      wish to order the known vertices followed by the known edges and
      finally the known face which is done below */
-
+  
   /* Add nsolve to known vertices */
   for(i = gmap->nvs; i < gmap->nvg; ++i)
     if(vmap[i]+1) vmap[i] += Bsys->nsolve;
-
+  
   /* Sort out values in cumalative list of face and edges. If faces
      are used these need to be done first because of requried
      information stored in edge list */
@@ -1029,94 +1035,118 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
   for(E=EL->fhead;E;E=E->next){
     for(i = 0; i < E->Nverts; ++i)
       E->vert[i].gid = vmap[E->vert[i].gid];
-
+    
     for(i = 0; i < E->Nedges; ++i)
       E->edge[i].gid = emap[E->edge[i].gid];
   }
 
   if(dim == 3){
     for(i = 0; i < nfs; ++i)
-      Bsys->face[i] += nvstot + nestot;
+      Bsys->face[i] += nvstot + nestot;  
     for(i = 0; i < nfk+1; ++i)
       Bsys->face[nfs+i] += nvstot + nestot + nvktot + nektot;
 
     for(E=EL->fhead;E;E=E->next)
       for(i = 0; i < E->Nfaces; ++i)
-  E->face[i].gid = fmap[E->face[i].gid];
+	E->face[i].gid = fmap[E->face[i].gid];
   }
-
+  
   /* finally if parallel option then there is enough information in
      vmap,emap,fmap and gmap to define a global-local mapping for the
      boundary degrees of freedom */
 #ifdef PARALLEL
   int j;
+  int active_handle = get_active_handle();
   Pllmap *p;
   /* set up mapping for solved points */
   p = Bsys->pll = (Pllmap*)malloc(sizeof(Pllmap));
   p->nv_solve = gmap->nvs;
   p->nsolve  = gmap->nsolve;
   p->nglobal = gmap->nglobal;
-
+  
   /* set up solve map */
   p->solvemap = ivector(0,Bsys->nsolve-1);
-
+  
   for(i = 0; i < gmap->nvs; ++i)
     if(vmap[i]+1)
       p->solvemap[vmap[i]] = gmap->vgid[i];
-
+  
   for(i = 0; i < gmap->nes; ++i)
     if(emap[i]+1)
       for(j = 0; j < elen[i]; ++j)
-  p->solvemap[Bsys->edge[emap[i]] + j] = gmap->egid[i] + j;
-
+	p->solvemap[Bsys->edge[emap[i]] + j] = gmap->egid[i] + j;
+  
   for(i = 0; i < gmap->nfs; ++i)
     if(fmap[i]+1)
       for(j=0; j < flen[i]; ++j)
-  p->solvemap[Bsys->face[fmap[i]]+j] = gmap->fgid[i] + j;
-
+	p->solvemap[Bsys->face[fmap[i]]+j] = gmap->fgid[i] + j;
+  
+  //ROOTONLY 
+  //    fprintf(stderr,"prepost.C: LocalNumScheme(): before gs_init : mynode(%d)\n", mynode());
   /* extra mappings for ddot sums in Bsolve_CG */
-  p->solve = gs_init(p->solvemap,Bsys->nsolve,option("GSLEVEL"));
 
+#ifdef CSGSLIB
+    p->mex_solve = new NEKTAR_MEX[1];
+    p->mex_solve[0].MEX_init(p->solvemap,Bsys->nsolve,pllinfo[active_handle].AdjacentPartitions,pllinfo[active_handle].NAdjacentPartitions,MPI_COMM_WORLD);
+
+    //p->csgs_solve = CSGS_init(p->solvemap,Bsys->nsolve,pllinfo.AdjacentPartitions,pllinfo.NAdjacentPartitions,pllinfo.AdjacentPartitions,getcomm_3D());
+#else
+    //p->solve = gs_init(p->solvemap,Bsys->nsolve,option("GSLEVEL"));
+#endif
+
+  
   if(Bsys->nsolve){
     p->mult = dvector(0,Bsys->nsolve-1);
     dfill(Bsys->nsolve,1.,p->mult,1);
-    gs_gop(p->solve, p->mult, "+");
-    dvrecp(Bsys->nsolve,p->mult,1,p->mult,1);
-  }
-
-  if(Bsys->nglobal - Bsys->nsolve){
-    int nloc, nglo;
-
-    nloc = Bsys->nsolve;
-    nglo = gmap->nsolve;
-
-    p->knownmap = ivector(0,Bsys->nglobal - Bsys->nsolve);
-
-    for(i = gmap->nvs; i < gmap->nvg; ++i)
-      if(vmap[i]+1)
-  p->knownmap[vmap[i]-nloc] = gmap->vgid[i]-nglo;
-
-    for(i = gmap->nes; i < gmap->neg; ++i)
-      if(emap[i]+1)
-  for(j=0; j < elen[i]; ++j)
-    p->knownmap[Bsys->edge[emap[i]]-nloc+j] = gmap->egid[i]+j -nglo;
-
-    for(i = gmap->nfs; i < gmap->nfg; ++i)
-      if(fmap[i]+1)
-  for(j=0; j < flen[i]; ++j)
-    p->knownmap[Bsys->face[fmap[i]]-nloc+j] = gmap->fgid[i]+j-nglo;
-
-  }
-  else
-    p->knownmap = ivector(0,0);
-
-  /* this must be called outside of if statement since even if there
-     are no points all processors must send gs_init */
-
-  p->known=gs_init(p->knownmap,Bsys->nglobal-Bsys->nsolve,option("GSLEVEL"));
+#ifdef CSGSLIB
+      p->mex_solve[0].MEX_plus(p->mult);
+      //CSGS_plus(p->csgs_solve,p->mult);
+#else
+      gs_gop(p->solve, p->mult, "+");
 #endif
 
-  free(vmap); free(emap);  free(elen);
+    dvrecp(Bsys->nsolve,p->mult,1,p->mult,1);
+  }
+  
+  if(Bsys->nglobal - Bsys->nsolve){
+    int nloc, nglo;
+    
+    nloc = Bsys->nsolve;
+    nglo = gmap->nsolve;
+    
+    p->knownmap = ivector(0,Bsys->nglobal - Bsys->nsolve);
+    
+    for(i = gmap->nvs; i < gmap->nvg; ++i)
+      if(vmap[i]+1)
+	p->knownmap[vmap[i]-nloc] = gmap->vgid[i]-nglo;
+    
+    for(i = gmap->nes; i < gmap->neg; ++i)
+      if(emap[i]+1)
+	for(j=0; j < elen[i]; ++j)
+	  p->knownmap[Bsys->edge[emap[i]]-nloc+j] = gmap->egid[i]+j -nglo;
+    
+    for(i = gmap->nfs; i < gmap->nfg; ++i)
+      if(fmap[i]+1)
+	for(j=0; j < flen[i]; ++j)
+	  p->knownmap[Bsys->face[fmap[i]]-nloc+j] = gmap->fgid[i]+j-nglo;
+    
+  }
+  else
+    p->knownmap = ivector(0,0); 
+  
+  /* this must be called outside of if statement since even if there
+     are no points all processors must send gs_init */
+#ifdef CSGSLIB
+    p->mex_known =  new NEKTAR_MEX[1];
+    p->mex_known[0].MEX_init(p->knownmap,Bsys->nglobal-Bsys->nsolve,pllinfo[active_handle].AdjacentPartitions,pllinfo[active_handle].NAdjacentPartitions,MPI_COMM_WORLD);
+    //p->csgs_known = CSGS_init(p->knownmap,Bsys->nglobal-Bsys->nsolve,pllinfo.AdjacentPartitions,pllinfo.NAdjacentPartitions,pllinfo.AdjacentPartitions,getcomm_3D());
+#else
+    //p->known=gs_init(p->knownmap,Bsys->nglobal-Bsys->nsolve,option("GSLEVEL"));
+#endif
+
+#endif
+  
+  free(vmap); free(emap);  free(elen); 
   if(dim == 3){
     free(fmap);
     free(flen);
@@ -1124,7 +1154,7 @@ void LocalNumScheme(Element_List *EL, Bsystem *Bsys, Gmap *gmap){
 }
 
 typedef struct vertnum {
-  int    id;
+  int    id; 
   struct vertnum *base;
   struct vertnum *link;
 } Vertnum;
@@ -1142,38 +1172,38 @@ static void setGid(Element_List *UL){
 
   /* set vector of consequative numbers */
   /* set up vertex list */
-
+  
   if(U->dim() == 2){
     for(E = U; E; E = E->next)
       for(i = 0; i < E->Nedges; ++i){
-  for(j = 0; j < E->dim(); ++j){
+	for(j = 0; j < E->dim(); ++j){
 
-    v = E->vert + E->fnum(i,j);
+	  v = E->vert + E->fnum(i,j);
 
-    if(E->edge[i].base){
-      if(E->edge[i].link){
-        eid  = E->edge[i].link->eid;
-        face = E->edge[i].link->id;
-      }
-      else{
-        eid  = E->edge[i].base->eid;
-        face = E->edge[i].base->id;
-      }
-
-      vb = UL->flist[eid]->vert[UL->flist[eid]->fnum1(face,j)].base;
-
-      if(eid < E->id){  /* connect to lower element */
-        if(!v->base) v->base = v;
-
-        /* search through all points and assign to same base */
-        for(;vb->link;vb = vb->link);
-        if(vb->base != v->base) vb->link = v->base;
-        for(v = v->base;v; v = v->link) v->base = vb->base;
-      }
-      else if(!v->base) v->base = v;
-    }
-    else if(!v->base) v->base = v;
-  }
+	  if(E->edge[i].base){
+	    if(E->edge[i].link){
+	      eid  = E->edge[i].link->eid;
+	      face = E->edge[i].link->id;
+	    }
+	    else{
+	      eid  = E->edge[i].base->eid;
+	      face = E->edge[i].base->id;
+	    }
+	    
+	    vb = UL->flist[eid]->vert[UL->flist[eid]->fnum1(face,j)].base;
+	    
+	    if(eid < E->id){  /* connect to lower element */
+	      if(!v->base) v->base = v;
+	      
+	      /* search through all points and assign to same base */
+	      for(;vb->link;vb = vb->link);
+	      if(vb->base != v->base) vb->link = v->base;
+	      for(v = v->base;v; v = v->link) v->base = vb->base;
+	    }
+	    else if(!v->base) v->base = v;
+	  }
+	  else if(!v->base) v->base = v;
+	}
       }
   }
 
@@ -1181,115 +1211,115 @@ static void setGid(Element_List *UL){
     double x, y, z, x1, y1, z1, cx, cy, cz, TOL = 1E-5;
     int vn, vn1, flag, nfv;
     Element *F;
-
+    
     for(E = U; E; E = E->next)
       for(i = 0; i < E->Nfaces; ++i){
-  for(j = 0; j < E->Nfverts(i); ++j){
-    vn = E->vnum(i,j);
+	for(j = 0; j < E->Nfverts(i); ++j){ 	  
+	  vn = E->vnum(i,j);
+	  
+	  v = E->vert + vn;
+	  
+	  if(E->face[i].link){
+	    eid  = E->face[i].link->eid;
+	    face = E->face[i].link->id;
+	    F    = UL->flist[eid];
+	    
+	    nfv = F->Nfverts(face);
+	    
+	    x = E->vert[vn].x, y = E->vert[vn].y, z = E->vert[vn].z;
+	    
+	    cx = 0.0; cy = 0.0; cz = 0.0;
+	    for(k=0;k<nfv;++k){
+	      cx += F->vert[F->vnum(face,k)].x - E->vert[E->vnum(i,k)].x;
+	      cy += F->vert[F->vnum(face,k)].y - E->vert[E->vnum(i,k)].y;
+	      cz += F->vert[F->vnum(face,k)].z - E->vert[E->vnum(i,k)].z;
+	    }
+	    cx /= 1.*nfv;      cy /= 1.*nfv;      cz /= 1.*nfv;
 
-    v = E->vert + vn;
-
-    if(E->face[i].link){
-      eid  = E->face[i].link->eid;
-      face = E->face[i].link->id;
-      F    = UL->flist[eid];
-
-      nfv = F->Nfverts(face);
-
-      x = E->vert[vn].x, y = E->vert[vn].y, z = E->vert[vn].z;
-
-      cx = 0.0; cy = 0.0; cz = 0.0;
-      for(k=0;k<nfv;++k){
-        cx += F->vert[F->vnum(face,k)].x - E->vert[E->vnum(i,k)].x;
-        cy += F->vert[F->vnum(face,k)].y - E->vert[E->vnum(i,k)].y;
-        cz += F->vert[F->vnum(face,k)].z - E->vert[E->vnum(i,k)].z;
+	    // loop through vertices on neighbour face
+	    // break out when match is made
+	    flag = 1;
+	    for(k=0;k < nfv;++k){
+	      vn1 = F->vnum(face,k);
+	      x1  = F->vert[vn1].x-cx; 
+	      y1  = F->vert[vn1].y-cy;
+	      z1  = F->vert[vn1].z-cz;
+	      if(sqrt((x1-x)*(x1-x)+ (y1-y)*(y1-y) + (z1-z)*(z1-z)) < TOL){
+		flag = 0;
+		break;
+	      }
+	    }
+	    
+	    if(flag) 
+	      fprintf(stderr, "Error in SetGid  Elmt:%d Face:%d Vertex:%d\n",
+		      E->id, i, j);
+	    
+	    vb = F->vert[vn1].base;
+	    
+	    /* connect to lower element */
+	    
+	    if(eid <= E->id){  
+	      if(!v->base) v->base = v;
+	      
+	      /* search through all points and assign to same base */
+	      if(vb){
+		for(;vb->link;vb = vb->link);
+		if(vb->base != v->base) vb->link = v->base;
+		for(v = v->base;v; v = v->link) v->base = vb->base;
+	      }
+	    }
+	    else if(!v->base) v->base = v;
+	  }
+	  else if(!v->base) v->base = v;
+	}
       }
-      cx /= 1.*nfv;      cy /= 1.*nfv;      cz /= 1.*nfv;
-
-      // loop through vertices on neighbour face
-      // break out when match is made
-      flag = 1;
-      for(k=0;k < nfv;++k){
-        vn1 = F->vnum(face,k);
-        x1  = F->vert[vn1].x-cx;
-        y1  = F->vert[vn1].y-cy;
-        z1  = F->vert[vn1].z-cz;
-        if(sqrt((x1-x)*(x1-x)+ (y1-y)*(y1-y) + (z1-z)*(z1-z)) < TOL){
-    flag = 0;
-    break;
-        }
-      }
-
-      if(flag)
-        fprintf(stderr, "Error in SetGid  Elmt:%d Face:%d Vertex:%d\n",
-          E->id, i, j);
-
-      vb = F->vert[vn1].base;
-
-      /* connect to lower element */
-
-      if(eid <= E->id){
-        if(!v->base) v->base = v;
-
-        /* search through all points and assign to same base */
-        if(vb){
-    for(;vb->link;vb = vb->link);
-    if(vb->base != v->base) vb->link = v->base;
-    for(v = v->base;v; v = v->link) v->base = vb->base;
-        }
-      }
-      else if(!v->base) v->base = v;
-    }
-    else if(!v->base) v->base = v;
   }
-      }
-  }
-
+  
   /* number vertices consequatively - start from 1 initially */
   for(E = U, nvg = 1; E; E = E->next)
     for(i = 0; i < E->Nverts; ++i)
       if(!E->vert[i].base->gid)
-  E->vert[i].gid = E->vert[i].base->gid = nvg++;
-      else
-  E->vert[i].gid = E->vert[i].base->gid;
+	E->vert[i].gid = E->vert[i].base->gid = nvg++;
+      else                       
+	E->vert[i].gid = E->vert[i].base->gid; 
   nvg--;
-
+  
   /* subtract off extra 1 value to make numbering start from zero */
   for(E = U; E; E = E->next)
     for(i = 0; i < E->Nverts; ++i)
       E->vert[i].gid -= 1;
-
+  
   /* set gid's to -1 */
   for(E = U; E; E = E->next){
     for(i = 0; i < E->Nedges; ++i) E->edge[i].gid = -1;
     for(i = 0; i < E->Nfaces; ++i) E->face[i].gid = -1;
   }
-
+  
   /* at present just number edge and faces consequatively */
   faceid = 0; edgeid = 0;
   for(E = U; E; E = E->next){
     e = E->edge;
     for(i = 0; i < E->Nedges; ++i){
       if(e[i].gid==-1)
-  if(e[i].base){
-    for(ed = e[i].base; ed; ed = ed->link)
-      ed->gid = edgeid;
-    ++edgeid;
-  }
-  else
-    e[i].gid = edgeid++;
+	if(e[i].base){
+	  for(ed = e[i].base; ed; ed = ed->link)
+	    ed->gid = edgeid;
+	  ++edgeid;
+	}
+	else
+	  e[i].gid = edgeid++;
     }
     f = E->face;
     for(i = 0; i < E->Nfaces; ++i)
       if(f[i].gid==-1)
-  if(f[i].link){
-    f[i].gid       = faceid;
-    f[i].link->gid = faceid++;
+	if(f[i].link){
+	  f[i].gid       = faceid;
+	  f[i].link->gid = faceid++;
+	}
+	else
+	  f[i].gid       = faceid++;
   }
-  else
-    f[i].gid       = faceid++;
-  }
-
+  
   return;
 }
 #else
@@ -1301,46 +1331,46 @@ static void setGid(Element_List *UL){
   Edge     *e,*ed;
   Face     *f;
   Vertnum  *V,*vb,*v,*vc;
-
+  
   Element *E;
 
   /* set vector of consequative numbers */
   /* set up vertex list */
   vertmax = Max_Nverts;
-
+  
   V = (Vertnum *) calloc(vertmax*nel,sizeof(Vertnum));
-
+  
   if(U->dim() == 2){
     for(E = U; E; E = E->next)
       for(i = 0; i < E->Nedges; ++i){
-  for(j = 0; j < E->dim(); ++j){
+	for(j = 0; j < E->dim(); ++j){
 
-    v = V+E->id*vertmax + E->fnum(i,j);
+	  v = V+E->id*vertmax + E->fnum(i,j);
 
-    if(E->edge[i].base){
-      if(E->edge[i].link){
-        eid  = E->edge[i].link->eid;
-        face = E->edge[i].link->id;
-      }
-      else{
-        eid  = E->edge[i].base->eid;
-        face = E->edge[i].base->id;
-      }
+	  if(E->edge[i].base){
+	    if(E->edge[i].link){
+	      eid  = E->edge[i].link->eid;
+	      face = E->edge[i].link->id;
+	    }
+	    else{
+	      eid  = E->edge[i].base->eid;
+	      face = E->edge[i].base->id;
+	    }
 
-      vb = V[eid*vertmax + UL->flist[eid]->fnum1(face,j)].base;
-
-      if(eid < E->id){  /* connect to lower element */
-        if(!v->base) v->base = v;
-
-        /* search through all points and assign to same base */
-        for(;vb->link;vb = vb->link);
-        if(vb->base != v->base) vb->link = v->base;
-        for(v = v->base;v; v = v->link) v->base = vb->base;
-      }
-      else if(!v->base) v->base = v;
-    }
-    else if(!v->base) v->base = v;
-  }
+	    vb = V[eid*vertmax + UL->flist[eid]->fnum1(face,j)].base;
+	    
+	    if(eid < E->id){  /* connect to lower element */
+	      if(!v->base) v->base = v;
+	      
+	      /* search through all points and assign to same base */
+	      for(;vb->link;vb = vb->link);
+	      if(vb->base != v->base) vb->link = v->base;
+	      for(v = v->base;v; v = v->link) v->base = vb->base;
+	    }
+	    else if(!v->base) v->base = v;
+	  }
+	  else if(!v->base) v->base = v;
+	}
       }
   }
 
@@ -1348,114 +1378,114 @@ static void setGid(Element_List *UL){
     double x, y, z, x1, y1, z1, cx, cy, cz, TOL = 1E-5;
     int vn, vn1, flag, nfv;
     Element *F;
-
+    
     for(E = U; E; E = E->next)
       for(i = 0; i < E->Nfaces; ++i){
-  for(j = 0; j < E->Nfverts(i); ++j){
-    vn = E->vnum(i,j);
+	for(j = 0; j < E->Nfverts(i); ++j){ 	  
+	  vn = E->vnum(i,j);
+	  
+	  v = V+E->id*vertmax + vn;
+	  
+	  if(E->face[i].link){
+	    eid  = E->face[i].link->eid;
+	    face = E->face[i].link->id;
+	    F    = UL->flist[eid];
+	    
+	    nfv = F->Nfverts(face);
+	    
+	    x = E->vert[vn].x, y = E->vert[vn].y, z = E->vert[vn].z;
+	    
+	    cx = 0.0; cy = 0.0; cz = 0.0;
+	    for(k=0;k<nfv;++k){
+	      cx += F->vert[F->vnum(face,k)].x - E->vert[E->vnum(i,k)].x;
+	      cy += F->vert[F->vnum(face,k)].y - E->vert[E->vnum(i,k)].y;
+	      cz += F->vert[F->vnum(face,k)].z - E->vert[E->vnum(i,k)].z;
+	    }
+	    cx /= 1.*nfv;      cy /= 1.*nfv;      cz /= 1.*nfv;
 
-    v = V+E->id*vertmax + vn;
-
-    if(E->face[i].link){
-      eid  = E->face[i].link->eid;
-      face = E->face[i].link->id;
-      F    = UL->flist[eid];
-
-      nfv = F->Nfverts(face);
-
-      x = E->vert[vn].x, y = E->vert[vn].y, z = E->vert[vn].z;
-
-      cx = 0.0; cy = 0.0; cz = 0.0;
-      for(k=0;k<nfv;++k){
-        cx += F->vert[F->vnum(face,k)].x - E->vert[E->vnum(i,k)].x;
-        cy += F->vert[F->vnum(face,k)].y - E->vert[E->vnum(i,k)].y;
-        cz += F->vert[F->vnum(face,k)].z - E->vert[E->vnum(i,k)].z;
+	    // loop through vertices on neighbour face
+	    // break out when match is made
+	    flag = 1;
+	    for(k=0;k < nfv;++k){
+	      vn1 = F->vnum(face,k);
+	      x1  = F->vert[vn1].x-cx; 
+	      y1  = F->vert[vn1].y-cy;
+	      z1  = F->vert[vn1].z-cz;
+	      if(sqrt((x1-x)*(x1-x)+ (y1-y)*(y1-y) + (z1-z)*(z1-z)) < TOL){
+		flag = 0;
+		break;
+	      }
+	    }
+	    
+	    if(flag) 
+	      fprintf(stderr, "Error in SetGid  Elmt:%d Face:%d Vertex:%d\n",
+		      E->id, i, j);
+	    
+	    vb = V[eid*vertmax + vn1].base;
+	    
+	    /* connect to lower element */
+	    
+	    if(eid <= E->id){  
+	      if(!v->base) v->base = v;
+	      
+	      /* search through all points and assign to same base */
+	      if(vb){
+		for(;vb->link;vb = vb->link);
+		if(vb->base != v->base) vb->link = v->base;
+		for(v = v->base;v; v = v->link) v->base = vb->base;
+	      }
+	    }
+	    else if(!v->base) v->base = v;
+	  }
+	  else if(!v->base) v->base = v;
+	}
       }
-      cx /= 1.*nfv;      cy /= 1.*nfv;      cz /= 1.*nfv;
-
-      // loop through vertices on neighbour face
-      // break out when match is made
-      flag = 1;
-      for(k=0;k < nfv;++k){
-        vn1 = F->vnum(face,k);
-        x1  = F->vert[vn1].x-cx;
-        y1  = F->vert[vn1].y-cy;
-        z1  = F->vert[vn1].z-cz;
-        if(sqrt((x1-x)*(x1-x)+ (y1-y)*(y1-y) + (z1-z)*(z1-z)) < TOL){
-    flag = 0;
-    break;
-        }
-      }
-
-      if(flag)
-        fprintf(stderr, "Error in SetGid  Elmt:%d Face:%d Vertex:%d\n",
-          E->id, i, j);
-
-      vb = V[eid*vertmax + vn1].base;
-
-      /* connect to lower element */
-
-      if(eid <= E->id){
-        if(!v->base) v->base = v;
-
-        /* search through all points and assign to same base */
-        if(vb){
-    for(;vb->link;vb = vb->link);
-    if(vb->base != v->base) vb->link = v->base;
-    for(v = v->base;v; v = v->link) v->base = vb->base;
-        }
-      }
-      else if(!v->base) v->base = v;
-    }
-    else if(!v->base) v->base = v;
   }
-      }
-  }
-
+  
   /* number vertices consequatively */
   for(E = U, nvg = 1; E; E = E->next)
     for(i = 0; i < E->Nverts; ++i)
-      if(!V[E->id*vertmax+i].base->id)
-  V[E->id*vertmax+i].id = V[E->id*vertmax+i].base->id = nvg++;
-      else
-  V[E->id*vertmax+i].id = V[E->id*vertmax+i].base->id;
+      if(!V[E->id*vertmax+i].base->id) 
+	V[E->id*vertmax+i].id = V[E->id*vertmax+i].base->id = nvg++;
+      else                       
+	V[E->id*vertmax+i].id = V[E->id*vertmax+i].base->id;
   nvg--;
 
   for(E = U; E; E = E->next)
     for(i = 0; i < E->Nverts; ++i)
       E->vert[i].gid = V[E->id*vertmax+i].id-1;
-
+  
   /* set gid's to -1 */
   for(E = U; E; E = E->next){
     for(i = 0; i < E->Nedges; ++i) E->edge[i].gid = -1;
     for(i = 0; i < E->Nfaces; ++i) E->face[i].gid = -1;
   }
-
+  
   /* at present just number edge and faces consequatively */
   faceid = 0; edgeid = 0;
   for(E = U; E; E = E->next){
     e = E->edge;
     for(i = 0; i < E->Nedges; ++i){
       if(e[i].gid==-1)
-  if(e[i].base){
-    for(ed = e[i].base; ed; ed = ed->link)
-      ed->gid = edgeid;
-    ++edgeid;
-  }
-  else
-    e[i].gid = edgeid++;
+	if(e[i].base){
+	  for(ed = e[i].base; ed; ed = ed->link)
+	    ed->gid = edgeid;
+	  ++edgeid;
+	}
+	else
+	  e[i].gid = edgeid++;
     }
     f = E->face;
     for(i = 0; i < E->Nfaces; ++i)
       if(f[i].gid==-1)
-  if(f[i].link){
-    f[i].gid       = faceid;
-    f[i].link->gid = faceid++;
+	if(f[i].link){
+	  f[i].gid       = faceid;
+	  f[i].link->gid = faceid++;
+	}
+	else
+	  f[i].gid       = faceid++;
   }
-  else
-    f[i].gid       = faceid++;
-  }
-
+  
   free(V);
   return;
 }
@@ -1487,7 +1517,7 @@ static void set_bmap(Element *U, Bsystem *B){
   for(E=U;E;E=E->next){
     for(j = 0; j < E->Nverts; ++j)
       bmap[E->id][j] = E->vert[j].gid;
-
+    
     for(j = 0,n = E->Nverts; j < E->Nedges; ++j,n+=l){
       l = E->edge[j].l;
       for(k = 0; k < l; ++k)
@@ -1496,28 +1526,28 @@ static void set_bmap(Element *U, Bsystem *B){
 
     if(E->dim() == 3)
       for(k = 0; k < E->Nfaces; ++k){
-  l = E->face[k].l;
+	l = E->face[k].l;
 
-  if(E->Nfverts(k) == 3){ // triangle face
-    l = l*(l+1)/2;
-    for(i = 0; i < l; ++i)
-      bmap[E->id][n+i] = B->face[E->face[k].gid] + i;
-    n += l;
-  }
-  else{  // square face
-    if(E->face[k].con < 4){
-      for(i=0;i<l;++i)
-        for(j=0;j<l;++j)
-    bmap[E->id][n+j+i*l] = B->face[E->face[k].gid]+j+i*l;
-    }
-    else{ // transpose modes
-      for(i=0;i<l;++i)
-        for(j=0;j<l;++j)
-    bmap[E->id][n+i+j*l] = B->face[E->face[k].gid]+j+i*l;
-      //      E->face[k].con -= 4;
-    }
-    n += l*l;
-  }
+	if(E->Nfverts(k) == 3){ // triangle face
+	  l = l*(l+1)/2;
+	  for(i = 0; i < l; ++i)
+	    bmap[E->id][n+i] = B->face[E->face[k].gid] + i;
+	  n += l;
+	}
+	else{  // square face
+	  if(E->face[k].con < 4){
+	    for(i=0;i<l;++i)
+	      for(j=0;j<l;++j)
+		bmap[E->id][n+j+i*l] = B->face[E->face[k].gid]+j+i*l;
+	  }
+	  else{ // transpose modes
+	    for(i=0;i<l;++i)
+	      for(j=0;j<l;++j)
+		bmap[E->id][n+i+j*l] = B->face[E->face[k].gid]+j+i*l;
+	    //	    E->face[k].con -= 4;
+	  }
+	  n += l*l;
+	}
       }
   }
 
@@ -1528,7 +1558,7 @@ void free_Mesh_Facets(Element_List *Mesh){
   Element *E;
   Curve    *cur;
 
-  // free vertices
+  // free vertices 
   for(E=Mesh->fhead;E;E=E->next){
     free(E->vert);
     free(E->edge);
@@ -1544,16 +1574,16 @@ void free_Mesh_Facets(Element_List *Mesh){
 }
 
 void free_Mesh_Structure(Element_List *Mesh){
-
+  
    Element *E,*F;
 
-   // free vertices
+   // free vertices 
    for(E=Mesh->fhead;E;){
      F = E->next;
      delete(E);
      E = F;
    }
-
+   
    free(Mesh->flist);
    delete(Mesh);
 }
@@ -1589,16 +1619,16 @@ void Reflect_Global_Velocity(Element_List *Mesh, Bndry *Meshbcs, int dir){
   DO_PARALLEL{ /* set interface solve masks to 2 */
     if((Mesh->fhead->dim() == 3)&&(pllinfo[active_handle].partition)){
       for(U = Mesh->fhead; U; U = U->next)
-  for(i = 0; i < U->Nfaces; ++i)
-    if(U->face[i].link)
-      if(pllinfo[active_handle].partition[U->id]
-         != pllinfo[active_handle].partition[U->face[i].link->eid])
-        for(j = 0; j < U->Nfverts(i); ++j){
-    id = U->vnum(i,j);
-    U->vert[id].solve *= 2;
-    //clamp for mult calls
-    U->vert[id].solve = min(U->vert[id].solve,2);
-        }
+	for(i = 0; i < U->Nfaces; ++i)
+	  if(U->face[i].link)
+	    if(pllinfo[active_handle].partition[U->id] 
+	       != pllinfo[active_handle].partition[U->face[i].link->eid])
+	      for(j = 0; j < U->Nfverts(i); ++j){
+		id = U->vnum(i,j);
+		U->vert[id].solve *= 2;
+		//clamp for mult calls
+		U->vert[id].solve = min(U->vert[id].solve,2); 
+	      }
     }
   }
 
@@ -1606,21 +1636,21 @@ void Reflect_Global_Velocity(Element_List *Mesh, Bndry *Meshbcs, int dir){
   for(B = Meshbcs; B; B = B->next){
     switch (B->usrtype) {
     case 'V': case 'v':
-    case 'W':
+    case 'W': 
       B->type = 'V';
       U = B->elmt;
-      for(i = 0; i < U->Nfverts(B->face); ++i)
-  U->vert[U->vnum(B->face,i)].solve = 0;
+      for(i = 0; i < U->Nfverts(B->face); ++i) 
+	U->vert[U->vnum(B->face,i)].solve = 0;
       break;
     case 'Z':
       U = B->elmt;
       if(B->bvert[0] == dir){
-  B->type = 'V';
-  for(i = 0; i < U->Nfverts(B->face); ++i)
-    U->vert[U->vnum(B->face,i)].solve = 0;
+	B->type = 'V';
+	for(i = 0; i < U->Nfverts(B->face); ++i) 
+	  U->vert[U->vnum(B->face,i)].solve = 0;
       }
       else
-  B->type = 'F';
+	B->type = 'F';
       break;
     }
   }

@@ -249,8 +249,17 @@ void ifexists(double *in, double *inout, int *n, MPI_Datatype *size);
 
 void BCreduce(double *bc, Bsystem *Ubsys){
 #if 1
-  gs_gop(Ubsys->pll->known,bc,"A");
+
+#ifdef CSGSLIB
+    Ubsys->pll->mex_known[0].MEX_max_fabs(bc);
 #else
+#ifndef BUILD_EXE
+    gs_gop(Ubsys->pll->known,bc,"A");
+#endif
+#endif
+  
+#else
+
   register int i;
   int      ngk = Ubsys->pll->nglobal - Ubsys->pll->nsolve;
   int      nlk = Ubsys->nglobal - Ubsys->nsolve;
@@ -322,9 +331,9 @@ void GatherBlockMatrices(Element *U,Bsystem *B){
   /*   end of  STEP 1 */
 #endif
 
-
-  gs_gop(B->egather,edge,"+");
-
+#ifndef BUILD_EXE
+  //gs_gop(B->egather,edge,"+");
+#endif
   free(B->egather);
 
   //gs_gop(B->fgather,face,"+");
@@ -559,8 +568,9 @@ void Set_Comm_GatherBlockMatrices(Element *U, Bsystem *B){
 	iramp(l,&start,&one,map+pos[e->gid],1);
       }
     }
-  
-  B->egather = gs_init(map,pos[nes],option("GSLEVEL"));
+#ifndef BUILD_EXE
+  //B->egather = gs_init(map,pos[nes],option("GSLEVEL"));
+#endif
   free(map);
   
 
@@ -584,8 +594,10 @@ void Set_Comm_GatherBlockMatrices(Element *U, Bsystem *B){
 	iramp(l,&start,&one,map+pos[f->gid],1);
       }
     }
+
+#ifndef BUILD_EXE
   B->fgather = gs_init(map,pos[nfs],option("GSLEVEL"));
- 
+#endif
   free(map);
 #endif
 
@@ -724,7 +736,13 @@ void ifexists(double *in, double *inout, int *n, MPI_Datatype *size){
 }
 
 void parallel_gather(double *w, Bsystem *B){
-  gs_gop(B->pll->solve,w,"+");
+#ifdef CSGSLIB
+    B->pll->mex_solve[0].MEX_plus(w);
+#else
+#ifndef BUILD_EXE
+    gs_gop(B->pll->solve,w,"+");
+#endif
+#endif
 }
 
 
@@ -754,7 +772,7 @@ void default_partitioner(Element_List *EL, int *partition){
   int *xadj, *adjncy;
   int opt[5];
   Element *E;
- 
+
   //fprintf(stderr,"default_partitioner: ENTER\n");
 
   ROOTONLY

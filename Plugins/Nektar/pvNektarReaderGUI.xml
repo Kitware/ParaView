@@ -1,5 +1,5 @@
 <ParaViewReaders>
   <Reader name="pvNektarReader" extensions="nektar"
-         file_description=".nektar files, with meta data about .rea and .rst files (Plugin)">
+         file_description=".nektar files, with meta data about .rea and .rst files">
   </Reader>
 </ParaViewReaders>
