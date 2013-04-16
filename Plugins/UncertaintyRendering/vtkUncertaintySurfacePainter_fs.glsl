@@ -1,93 +1,145 @@
 #version 120
 
-vec3 mod289(vec3 x)
-{
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 mod289(vec4 x)
-{
-  return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
-
-vec4 permute(vec4 x)
-{
-  return mod289(((x*34.0)+1.0)*x);
-}
-
-vec4 taylorInvSqrt(vec4 r)
-{
-  return 1.79284291400159 - 0.85373472095314 * r;
-}
-
-float snoise(vec3 v)
-{
-  const vec2 C = vec2(1.0/6.0, 1.0/3.0) ;
-  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-  vec3 i = floor(v + dot(v, C.yyy) );
-  vec3 x0 = v - i + dot(i, C.xxx) ;
-  vec3 g = step(x0.yzx, x0.xyz);
-  vec3 l = 1.0 - g;
-  vec3 i1 = min( g.xyz, l.zxy );
-  vec3 i2 = max( g.xyz, l.zxy );
-  vec3 x1 = x0 - i1 + C.xxx;
-  vec3 x2 = x0 - i2 + C.yyy;
-  vec3 x3 = x0 - D.yyy;
-  i = mod289(i);
-  vec4 p = permute( permute( permute(
-             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-  float n_ = 0.142857142857;
-  vec3 ns = n_ * D.wyz - D.xzx;
-  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-  vec4 x_ = floor(j * ns.z);
-  vec4 y_ = floor(j - 7.0 * x_ );
-  vec4 x = x_ *ns.x + ns.yyyy;
-  vec4 y = y_ *ns.x + ns.yyyy;
-  vec4 h = 1.0 - abs(x) - abs(y);
-  vec4 b0 = vec4( x.xy, y.xy );
-  vec4 b1 = vec4( x.zw, y.zw );
-  vec4 s0 = floor(b0)*2.0 + 1.0;
-  vec4 s1 = floor(b1)*2.0 + 1.0;
-  vec4 sh = -step(h, vec4(0.0));
-  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-  vec3 p0 = vec3(a0.xy,h.x);
-  vec3 p1 = vec3(a0.zw,h.y);
-  vec3 p2 = vec3(a1.xy,h.z);
-  vec3 p3 = vec3(a1.zw,h.w);
-  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-  p0 *= norm.x;
-  p1 *= norm.y;
-  p2 *= norm.z;
-  p3 *= norm.w;
-  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-  m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
-}
-
 varying vec4 vColor;
 varying vec3 v_texCoord3D;
 varying float vUncertainty;
 uniform sampler2D texture;
 uniform float uncertaintyScaleFactor;
 uniform float scalarValueRange;
+uniform sampler2D permTexture;
+uniform sampler1D simplexTexture;
+uniform sampler2D gradTexture;
+
+/*
+ * To create offsets of one texel and one half texel in the
+ * texture lookup, we need to know the texture image size.
+ */
+#define ONE 0.00390625
+#define ONEHALF 0.001953125
+// The numbers above are 1/256 and 0.5/256, change accordingly
+// if you change the code to use another texture size.
+
+/*
+ * 4D simplex noise. A lot faster than classic 4D noise, and better looking.
+ */
+float snoise(vec4 P)
+{
+
+// The skewing and unskewing factors are hairy again for the 4D case
+// This is (sqrt(5.0)-1.0)/4.0
+#define F4 0.309016994375
+// This is (5.0-sqrt(5.0))/20.0
+#define G4 0.138196601125
+
+  // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
+ 	float s = (P.x + P.y + P.z + P.w) * F4; // Factor for 4D skewing
+  vec4 Pi = floor(P + s);
+  float t = (Pi.x + Pi.y + Pi.z + Pi.w) * G4;
+  vec4 P0 = Pi - t; // Unskew the cell origin back to (x,y,z,w) space
+  Pi = Pi * ONE + ONEHALF; // Integer part, scaled and offset for texture lookup
+
+  vec4 Pf0 = P - P0;  // The x,y distances from the cell origin
+
+  // For the 4D case, the simplex is a 4D shape I won't even try to describe.
+  // To find out which of the 24 possible simplices we're in, we need to
+  // determine the magnitude ordering of x, y, z and w components of Pf0.
+  // The method below is presented without explanation. It uses a small 1D
+  // texture as a lookup table. The table is designed to work for both
+  // 3D and 4D noise and contains 64 indices, of which only 24 are actually
+  // used. An extension to 5D would require a larger texture here.
+  float c1 = (Pf0.x > Pf0.y) ? 0.5078125 : 0.0078125; // 1/2 + 1/128
+  float c2 = (Pf0.x > Pf0.z) ? 0.25 : 0.0;
+  float c3 = (Pf0.y > Pf0.z) ? 0.125 : 0.0;
+  float c4 = (Pf0.x > Pf0.w) ? 0.0625 : 0.0;
+  float c5 = (Pf0.y > Pf0.w) ? 0.03125 : 0.0;
+  float c6 = (Pf0.z > Pf0.w) ? 0.015625 : 0.0;
+  float sindex = c1 + c2 + c3 + c4 + c5 + c6;
+  vec4 offsets = texture1D(simplexTexture, sindex).rgba;
+  vec4 o1 = step(0.625, offsets);
+  vec4 o2 = step(0.375, offsets);
+  vec4 o3 = step(0.125, offsets);
+
+  // Noise contribution from simplex origin
+  float perm0xy = texture2D(permTexture, Pi.xy).a;
+  float perm0zw = texture2D(permTexture, Pi.zw).a;
+  vec4  grad0 = texture2D(gradTexture, vec2(perm0xy, perm0zw)).rgba * 4.0 - 1.0;
+  float t0 = 0.6 - dot(Pf0, Pf0);
+  float n0;
+  if (t0 < 0.0) n0 = 0.0;
+  else {
+    t0 *= t0;
+    n0 = t0 * t0 * dot(grad0, Pf0);
+  }
+
+  // Noise contribution from second corner
+  vec4 Pf1 = Pf0 - o1 + G4;
+  o1 = o1 * ONE;
+  float perm1xy = texture2D(permTexture, Pi.xy + o1.xy).a;
+  float perm1zw = texture2D(permTexture, Pi.zw + o1.zw).a;
+  vec4  grad1 = texture2D(gradTexture, vec2(perm1xy, perm1zw)).rgba * 4.0 - 1.0;
+  float t1 = 0.6 - dot(Pf1, Pf1);
+  float n1;
+  if (t1 < 0.0) n1 = 0.0;
+  else {
+    t1 *= t1;
+    n1 = t1 * t1 * dot(grad1, Pf1);
+  }
+  
+  // Noise contribution from third corner
+  vec4 Pf2 = Pf0 - o2 + 2.0 * G4;
+  o2 = o2 * ONE;
+  float perm2xy = texture2D(permTexture, Pi.xy + o2.xy).a;
+  float perm2zw = texture2D(permTexture, Pi.zw + o2.zw).a;
+  vec4  grad2 = texture2D(gradTexture, vec2(perm2xy, perm2zw)).rgba * 4.0 - 1.0;
+  float t2 = 0.6 - dot(Pf2, Pf2);
+  float n2;
+  if (t2 < 0.0) n2 = 0.0;
+  else {
+    t2 *= t2;
+    n2 = t2 * t2 * dot(grad2, Pf2);
+  }
+  
+  // Noise contribution from fourth corner
+  vec4 Pf3 = Pf0 - o3 + 3.0 * G4;
+  o3 = o3 * ONE;
+  float perm3xy = texture2D(permTexture, Pi.xy + o3.xy).a;
+  float perm3zw = texture2D(permTexture, Pi.zw + o3.zw).a;
+  vec4  grad3 = texture2D(gradTexture, vec2(perm3xy, perm3zw)).rgba * 4.0 - 1.0;
+  float t3 = 0.6 - dot(Pf3, Pf3);
+  float n3;
+  if (t3 < 0.0) n3 = 0.0;
+  else {
+    t3 *= t3;
+    n3 = t3 * t3 * dot(grad3, Pf3);
+  }
+  
+  // Noise contribution from last corner
+  vec4 Pf4 = Pf0 - vec4(1.0-4.0*G4);
+  float perm4xy = texture2D(permTexture, Pi.xy + vec2(ONE, ONE)).a;
+  float perm4zw = texture2D(permTexture, Pi.zw + vec2(ONE, ONE)).a;
+  vec4  grad4 = texture2D(gradTexture, vec2(perm4xy, perm4zw)).rgba * 4.0 - 1.0;
+  float t4 = 0.6 - dot(Pf4, Pf4);
+  float n4;
+  if(t4 < 0.0) n4 = 0.0;
+  else {
+    t4 *= t4;
+    n4 = t4 * t4 * dot(grad4, Pf4);
+  }
+
+  // Sum up and scale the result to cover the range [-1,1]
+  return 27.0 * (n0 + n1 + n2 + n3 + n4);
+}
 
 vec2 mix_random_noise(vec2 inputCoord, float uncertainty)
 {
-  vec3 uvw = v_texCoord3D +
-             uncertaintyScaleFactor *
-             vec3(snoise(v_texCoord3D + vec3(0.0f, 0.0f, 1.0f)),
-                  snoise(v_texCoord3D + vec3(43.0f, 17.0f, 1.0f)),
-                  snoise(v_texCoord3D + vec3(-17.0f, -43.0f, 1.0f)));
-  float n = snoise(uvw - vec3(0.0f, 0.0f, 1.0f));
-  n += 0.5f * snoise(uvw * 2.0f - vec3(0.0f, 0.0f, 1.4f));
-  n += 0.25f * snoise(uvw * 4.0f - vec3(0.0f, 0.0f, 2.0f));
-  n += 0.125f * snoise(uvw * 8.0f - vec3(0.0f, 0.0f, 2.8f));
-  n += 0.0625f * snoise(uvw * 16.0f - vec3(0.0f, 0.0f, 4.0f));
-  n += 0.03125f * snoise(uvw * 32.0f - vec3(0.0f, 0.0f, 5.6f));
-  n = n * 0.7f - 0.5f;
+  float n = 0.0;
+  float s = uncertaintyScaleFactor;
+  int octs = 5;
+  for(int i = 0; i < octs; i++)
+  {
+    n += snoise(vec4(4.0 * pow(2.0, float(i)) * s * v_texCoord3D.xyz, gl_TexCoord[0].x));
+  }
+  n /= float(octs);
 
   float scale = scalarValueRange;
 
