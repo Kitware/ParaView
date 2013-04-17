@@ -43,6 +43,7 @@
 #include <EqualVal.h>
 #include <Interpolator.h>
 
+namespace pointsprite {
 //
 // These constants represent the types of attributes.
 //
@@ -2697,4 +2698,5 @@ operator << (ostream& os, const AttributeGroup& atts)
     indentLevel--;
 
     return os;
+}
 }

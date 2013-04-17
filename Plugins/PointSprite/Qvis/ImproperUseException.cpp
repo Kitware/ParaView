@@ -41,6 +41,7 @@
 
 #include <ImproperUseException.h>
 
+namespace pointsprite {
 using std::string;
 
 
@@ -59,5 +60,4 @@ ImproperUseException::ImproperUseException(std::string reason)
     else
         msg = "The pipeline object is being used improperly: " + reason;
 }
-
-
+}

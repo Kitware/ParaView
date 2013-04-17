@@ -39,6 +39,7 @@
 #define DATANODE_H
 #include <AttributeGroup.h>
 
+namespace pointsprite {
 typedef enum
 {
     INTERNAL_NODE = 0,
@@ -206,4 +207,5 @@ private:
 const char *NodeTypeName(NodeTypeEnum e);
 NodeTypeEnum GetNodeType(const char *str);
 
+}
 #endif

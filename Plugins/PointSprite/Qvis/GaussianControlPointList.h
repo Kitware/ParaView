@@ -38,6 +38,8 @@
 #ifndef GAUSSIANCONTROLPOINTLIST_H
 #define GAUSSIANCONTROLPOINTLIST_H
 #include <AttributeSubject.h>
+
+namespace pointsprite {
 class GaussianControlPoint;
 
 // ****************************************************************************
@@ -113,4 +115,5 @@ private:
     static const char *TypeMapFormatString;
 };
 
+}
 #endif

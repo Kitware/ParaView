@@ -39,6 +39,7 @@
 #define COLORCONTROLPOINT_H
 #include <AttributeSubject.h>
 
+namespace pointsprite {
 // ****************************************************************************
 // Class: ColorControlPoint
 //
@@ -100,5 +101,7 @@ private:
     unsigned char colors[4];
     float         position;
 };
+
+}
 
 #endif

@@ -24,8 +24,8 @@ set(Qvis_SRCS
   VisItException.cpp
   VolumeAttributes.cpp
  )
- 
-qt4_wrap_cpp(MOC_SRCS 
+
+qt4_wrap_cpp(MOC_SRCS
   QvisAbstractOpacityBar.h
   QvisGaussianOpacityBar.h
   QvisScribbleOpacityBar.h

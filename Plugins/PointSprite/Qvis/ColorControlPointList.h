@@ -38,6 +38,9 @@
 #ifndef COLORCONTROLPOINTLIST_H
 #define COLORCONTROLPOINTLIST_H
 #include <AttributeSubject.h>
+
+namespace pointsprite {
+
 class ColorControlPoint;
 
 // ****************************************************************************
@@ -128,4 +131,5 @@ private:
     static const char *TypeMapFormatString;
 };
 
+}
 #endif

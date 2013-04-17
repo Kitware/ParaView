@@ -38,6 +38,7 @@
 #ifndef SIMPLEOBSERVER_H
 #define SIMPLEOBSERVER_H
 
+namespace pointsprite {
 class Subject;
 
 // *******************************************************************
@@ -73,4 +74,5 @@ private:
     bool doUpdate;
 };
 
+}
 #endif

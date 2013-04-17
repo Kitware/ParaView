@@ -43,6 +43,7 @@
 #include <visitstream.h>
 #include <VisItException.h>
 
+namespace pointsprite {
 // Forward declaration
 class AttributeGroup;
 //class Connection;
@@ -244,12 +245,16 @@ private:
 
 ostream& operator<<(ostream& os, const AttributeGroup&);
 
+}
 // Some vector typedefs.
 #include <vectortypes.h>
+
+namespace pointsprite
+{
 typedef std::vector<AttributeGroup *> AttributeGroupVector;
 
 // An exception class
 class BadDeclareFormatString : public VisItException { };
-
+}
 
 #endif

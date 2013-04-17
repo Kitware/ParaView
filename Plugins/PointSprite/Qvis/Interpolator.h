@@ -40,6 +40,7 @@
 
 #include <vector>
 
+namespace pointsprite {
 // ****************************************************************************
 //  Class:  ConstInterp
 //
@@ -378,5 +379,5 @@ LinInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, doubl
         out[i]->InterpolateLinear(a1[i],a2[i],f);
     }
 }
-
+}
 #endif

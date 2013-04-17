@@ -40,6 +40,7 @@
 #include <string>
 #include <vector>
 
+namespace pointsprite {
 // Some vector typedefs.
 typedef std::vector<bool>             boolVector;
 typedef std::vector<char>             charVector;
@@ -49,5 +50,6 @@ typedef std::vector<long>             longVector;
 typedef std::vector<float>            floatVector;
 typedef std::vector<double>           doubleVector;
 typedef std::vector<std::string>      stringVector;
+}
 
 #endif

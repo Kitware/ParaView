@@ -113,12 +113,12 @@ void QvisAbstractOpacityBar::SetShowBackgroundPixmap(bool showFlag)
 //
 // ****************************************************************************
 
-void QvisAbstractOpacityBar::SetBackgroundColorControlPoints(const ColorControlPointList *ccp)
+void QvisAbstractOpacityBar::SetBackgroundColorControlPoints(const pointsprite::ColorControlPointList *ccp)
 {
   if (backgroundColorControlPoints) delete backgroundColorControlPoints;
   backgroundColorControlPoints = NULL;
   if (ccp) {
-    backgroundColorControlPoints = new ColorControlPointList(*ccp);
+    backgroundColorControlPoints = new pointsprite::ColorControlPointList(*ccp);
   }
   this->update();
 }

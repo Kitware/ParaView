@@ -40,6 +40,8 @@
 #include <AttributeGroup.h>
 #include <Subject.h>
 
+namespace pointsprite {
+
 // ****************************************************************************
 // Class: AttributeSubject
 //
@@ -84,4 +86,5 @@ public:
     virtual bool VarChangeRequiresReset(void) { return false; };
 };
 
+}
 #endif

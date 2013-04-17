@@ -39,6 +39,7 @@
 #define GAUSSIANCONTROLPOINT_H
 #include <AttributeSubject.h>
 
+namespace pointsprite {
 // ****************************************************************************
 // Class: GaussianControlPoint
 //
@@ -106,4 +107,5 @@ private:
     float yBias;
 };
 
+}
 #endif
