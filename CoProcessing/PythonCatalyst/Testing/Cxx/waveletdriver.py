@@ -29,6 +29,7 @@ def coProcess(grid, time, step, scriptname, wholeExtent):
     except:
         print sys.exc_info()
         print 'Cannot find ', scriptname, ' -- no coprocessing will be performed.'
+        sys.exit(1)
         return
 
     datadescription = vtkPVCatalystPython.vtkCPDataDescription()
