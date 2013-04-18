@@ -23,7 +23,6 @@ namespace
       // the first time it's needed. If we needed the memory
       // we could delete it and rebuild as necessary.
       VTKGrid = vtkNonOverlappingAMR::New();
-      BuildVTKGrid();
       }
 
     // Note that all of the vtkUniformGrids in the vtkNonOverlappingAMR

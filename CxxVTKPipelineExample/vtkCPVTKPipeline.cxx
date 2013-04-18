@@ -1,7 +1,7 @@
 #include "vtkCPVTKPipeline.h"
 
 #include <vtkCommunicator.h>
-#include <vtkCompleteArrays..h>
+#include <vtkCompleteArrays.h>
 #include <vtkCPDataDescription.h>
 #include <vtkDataArray.h>
 #include <vtkCPInputDataDescription.h>
@@ -114,7 +114,7 @@ int vtkCPVTKPipeline::CoProcess(
   // If process 0 doesn't have any points or cells, the writer may
   // have problems in parallel so we use completeArrays to fill in
   // the missing information.
-  vtkNew<vtkCompleteArray> completeArrays;
+  vtkNew<vtkCompleteArrays> completeArrays;
   completeArrays->SetInputConnection(threshold->GetOutputPort());
 
   vtkNew<vtkXMLPUnstructuredGridWriter> writer;

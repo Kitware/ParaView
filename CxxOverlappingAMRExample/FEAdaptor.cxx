@@ -63,18 +63,11 @@ namespace
     level0Grid->SetExtent(0, 25, 0, 25, 0, 25);
     VTKGrid->SetDataSet(0, 0, level0Grid.GetPointer());
 
-    // the first mid-level grid
+    // the mid-level grid
     vtkNew<vtkUniformGrid> level1Grid0;
     level1Grid0->SetSpacing(level1Spacing);
     level1Grid0->SetExtent(0, 20, 0, 20, 0, 20);
     VTKGrid->SetDataSet(1, 0, level1Grid0.GetPointer());
-
-    // the second mid-level grid
-    // vtkNew<vtkUniformGrid> level1Grid1;
-    // level1Grid1->SetSpacing(2, 2, 2);
-    // level1Grid1->SetOrigin(40, 40, 0);
-    // level1Grid1->SetExtent(0, 40, 0, 20, 0, 40);
-    // VTKGrid->SetDataSet(1, 1, level1Grid1.GetPointer());
 
     // the lowest level grid
     vtkNew<vtkUniformGrid> level2Grid;
