@@ -274,12 +274,12 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
       strcpy(combinedTitle, this->Title );
       strcat( combinedTitle, " " );
       strcat( combinedTitle, this->ComponentTitle );
-      this->TitleMapper->SetInput(combinedTitle);
+      this->TitleActor->SetInput(combinedTitle);
       delete [] combinedTitle;
       }
     else
       {
-      this->TitleMapper->SetInput(this->Title);
+      this->TitleActor->SetInput(this->Title);
       }
     // find the best size for the title font
     this->PositionTitle(size, viewport);
@@ -562,25 +562,25 @@ void vtkPVScalarBarActor::PositionTitle(const int propSize[2],
     }
 
   // Reset the text size.
-  this->TitleMapper->GetTextProperty()->ShallowCopy(this->TitleTextProperty);
-  this->TitleMapper->GetTextProperty()->SetJustificationToCentered();
+  this->TitleActor->GetTextProperty()->ShallowCopy(this->TitleTextProperty);
+  this->TitleActor->GetTextProperty()->SetJustificationToCentered();
 
   // Get the size of the font in pixels.
-  int targetSize[2];
-  this->TitleMapper->GetSize(viewport, targetSize);
+  double targetSize[2];
+  this->TitleActor->GetSize(viewport, targetSize);
 
   // Resize the font based on the viewport size.
   double fontScale = vtkTextActor::GetFontScale(viewport);
-  targetSize[0] = (int)(fontScale*targetSize[0]);
-  targetSize[1] = (int)(fontScale*targetSize[1]);
+  targetSize[0] = fontScale*targetSize[0];
+  targetSize[1] = fontScale*targetSize[1];
 
   // Ask the mapper to rescale the font based on the new metrics.
-  this->TitleMapper->SetConstrainedFontSize(viewport,
+  this->TitleActor->SetConstrainedFontSize(viewport,
                                             targetSize[0], targetSize[1]);
 
   // Get the actual size of the text.
-  int titleSize[2];
-  this->TitleMapper->GetSize(viewport, titleSize);
+  double titleSize[2];
+  this->TitleActor->GetSize(viewport, titleSize);
 
   // Position the title.
   if (this->Orientation == VTK_ORIENT_VERTICAL)
@@ -600,8 +600,8 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
                                                     vtkViewport *viewport)
 {
   // Get the size of the title.
-  int titleSize[2];
-  this->TitleMapper->GetSize(viewport, titleSize);
+  double titleSize[2];
+  this->TitleActor->GetSize(viewport, titleSize);
 
   double fontScaling = vtkTextActor::GetFontScale(viewport);
 
@@ -915,8 +915,8 @@ void vtkPVScalarBarActor::PositionScalarBar(const int propSize[2],
                                             vtkViewport *viewport)
 {
   // Get the size of the title.
-  int titleSize[2];
-  this->TitleMapper->GetSize(viewport, titleSize);
+  double titleSize[2];
+  this->TitleActor->GetSize(viewport, titleSize);
 
   // Determine bounds of scalar bar.
   double pLow[2], pHigh[2];
