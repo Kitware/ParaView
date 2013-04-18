@@ -32,13 +32,18 @@ macro(cleanup_bundle app app_root libdir pluginsdir)
          USE_SOURCE_PERMISSIONS)
   endif()
 
-  # HACK: this refers to "paraview" directly. Not a good idea.
-  set (python_packages_dir "${libdir}/site-packages/paraview")
-  if (EXISTS "${python_packages_dir}")
-    file(INSTALL DESTINATION ${app_root}/Contents/Python
-         TYPE DIRECTORY FILES "${python_packages_dir}"
-         USE_SOURCE_PERMISSIONS)
-  endif()
+  # Handle any python package/module
+  file(GLOB pyModules ${libdir}/site-packages/*)
+  foreach(pyModule IN LISTS pyModules)
+    if (EXISTS "${pyModule}/")
+      file(INSTALL "${pyModule}"
+           DESTINATION ${app_root}/Contents/Python
+           USE_SOURCE_PERMISSIONS)
+    endif()
+  endforeach()
+
+  # Package web server content
+  file(INSTALL ${libdir}/www DESTINATION ${app_root}/Contents)
 
   # package other executables such as pvserver.
   get_filename_component(bin_dir "${app_root}" PATH)
