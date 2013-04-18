@@ -23,10 +23,10 @@ in a custom environment.
 ## Download
 
 The first step is to to download the server, either through this
-[link](guides/jetty_session_manager/JettySessionManager-Server-1.0.jar)
+[link](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar)
 or with the following command line.
 
-    $ wget http://pvw.kitware.com/guides/jetty_session_manager/JettySessionManager-Server-1.0.jar
+    $ wget http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar
 
 ## Configuration
 
