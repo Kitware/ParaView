@@ -40,6 +40,7 @@ class pqDataRepresentation;
 class QAction;
 class QVTKWidget;
 class vtkCollection;
+class vtkIntArray;
 class vtkSMRenderViewProxy;
 
 // This is a PQ abstraction of a render view.
@@ -208,6 +209,10 @@ public:
   /// block selection is selection of a block in a composite dataset.
   void selectBlock(int rectangle[4], bool expand=false);
 
+  /// Creates a new surface points selection given the polygon in display
+  /// coordinates.
+  void selectPolygonPoints(vtkIntArray* polygon, bool expand=false);
+
 signals:
   // Triggered when interaction mode change underneath
   void updateInteractionMode(int mode);
@@ -329,6 +334,9 @@ private:
   pqInternal* Internal;
   void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&,
     bool select_points, bool expand, bool select_blocks);
+  void selectPolygonInternal(vtkIntArray* polygon, QList<pqOutputPort*>&,
+    bool select_points, bool expand, bool select_blocks);
+
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,

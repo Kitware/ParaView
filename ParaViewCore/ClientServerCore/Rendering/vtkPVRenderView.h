@@ -36,6 +36,7 @@ class vtkInformationDoubleVectorKey;
 class vtkInformationIntegerKey;
 class vtkInteractorStyleRubberBand3D;
 class vtkInteractorStyleRubberBandZoom;
+class vtkInteractorStyleDrawPolygon;
 class vtkLight;
 class vtkLightKit;
 class vtkMatrix4x4;
@@ -66,7 +67,8 @@ public:
     INTERACTION_MODE_3D=0,
     INTERACTION_MODE_2D, // not implemented yet.
     INTERACTION_MODE_SELECTION,
-    INTERACTION_MODE_ZOOM
+    INTERACTION_MODE_ZOOM,
+    INTERACTION_MODE_POLYGON
     };
 
   // Description:
@@ -250,6 +252,17 @@ public:
     this->SelectPoints(r);
     }
   void Select(int field_association, int region[4]);
+
+  // Description:
+  // Make a selection with a polygon. The polygon2DArray should contain
+  // the polygon points in display units of (x, y) tuples, and arrayLen
+  // is the total length of polygon2DArray.
+  // This will result in setting up of this->LastSelection
+  // which can be accessed using GetLastSelection().
+  // @CallOnAllProcessess
+  void SelectPolygonPoints(int* polygon2DArray, vtkIdType arrayLen);
+  void SelectPolygonCells(int* polygon2DArray, vtkIdType arrayLen);
+  void SelectPolygon(int field_association, int* polygon2DArray, vtkIdType arrayLen);
 
   // Description:
   // Provides access to the last selection.
@@ -567,6 +580,15 @@ protected:
   // Returns true is currently generating a selection.
   vtkGetMacro(MakingSelection, bool);
 
+  // Description:
+  // Prepare for selection.
+  // Returns false if it is currently generating a selection.
+  bool PrepareSelect(int fieldAssociation);
+
+  // Description:
+  // Post process after selection.
+  void PostSelect(vtkSelection* sel);
+
   vtkLight* Light;
   vtkLightKit* LightKit;
   vtkRenderViewBase* RenderView;
@@ -575,6 +597,7 @@ protected:
   vtkPVGenericRenderWindowInteractor* Interactor;
   vtkInteractorStyleRubberBand3D* RubberBandStyle;
   vtkInteractorStyleRubberBandZoom* RubberBandZoom;
+  vtkInteractorStyleDrawPolygon* PolygonStyle;
   vtkPVCenterAxesActor* CenterAxes;
   vtkPVAxesWidget* OrientationWidget;
   vtkPVHardwareSelector* Selector;
@@ -631,6 +654,7 @@ private:
 
   bool MakingSelection;
   void OnSelectionChangedEvent();
+  void OnPolygonSelectionEvent();
   void FinishSelection(vtkSelection*);
 
   // This flag is set to false when not all processes cannot render e.g. cannot

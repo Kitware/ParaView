@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkIntArray.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
@@ -834,6 +835,50 @@ void pqRenderView::selectPointsOnSurface(int rect[4], bool expand)
   // Fire selection event to let the world know that this view selected
   // something.
   this->emitSelectionSignal(output_ports);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, bool expand)
+{
+  QList<pqOutputPort*> output_ports;
+  this->selectPolygonInternal(polygon, output_ports, true, expand, false);
+  // Fire selection event to let the world know that this view selected
+  // something.
+  this->emitSelectionSignal(output_ports);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
+  QList<pqOutputPort*>& pqOutputPorts,  bool select_points,
+  bool expand, bool select_blocks)
+{
+  vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
+
+  vtkSmartPointer<vtkCollection> selectedRepresentations =
+    vtkSmartPointer<vtkCollection>::New();
+  vtkSmartPointer<vtkCollection> selectionSources =
+    vtkSmartPointer<vtkCollection>::New();
+  if (select_points)
+    {
+    if (!renderModuleP->SelectPolygonPoints(polygon,
+      selectedRepresentations, selectionSources,
+      this->UseMultipleRepresentationSelection))
+      {
+      return;
+      }
+    }
+  else
+    {
+    //if (!renderModuleP->SelectPolygonCellss(polygon,
+    //  selectedRepresentations, selectionSources,
+    //  this->UseMultipleRepresentationSelection))
+    //  {
+    //  return;
+    //  }
+    }
+
+  this->collectSelectionPorts(selectedRepresentations,
+    selectionSources, pqOutputPorts, expand, select_blocks);
 }
 
 //-----------------------------------------------------------------------------

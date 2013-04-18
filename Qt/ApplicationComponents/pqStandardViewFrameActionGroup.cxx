@@ -152,6 +152,12 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     actionSelectionMode->setCheckable (true);
     actionSelectionMode->setShortcut(QString("s"));
 
+    QAction* actionSelectionPolygonPoints = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfacePoint24.png"), "Select Points With Polygon");
+    actionSelectionMode->setObjectName("actionPolygonSelectionPoints");
+    actionSelectionMode->setCheckable (true);
+    //actionSelectionMode->setShortcut(QString("p"));
+
     // Register all actions with the pqSelection3DHelper.
     selectionHelper->setActionSelectionMode(actionSelectionMode);
     selectionHelper->setActionSelectSurfacePoints(actionSelectSurfacePoints);
@@ -159,6 +165,7 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     selectionHelper->setActionSelectFrustumPoints(actionSelectFrustumPoints);
     selectionHelper->setActionSelect_Block(actionSelect_Block);
     selectionHelper->setActionPickObject(actionPickObject);
+    selectionHelper->setActionSelectPolygonPoints(actionSelectionPolygonPoints);
 
     QAction* cameraAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");

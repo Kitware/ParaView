@@ -27,6 +27,8 @@
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationRequestKey.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkInteractorStyleDrawPolygon.h"
 #include "vtkInteractorStyleRubberBand3D.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkLight.h"
@@ -68,6 +70,7 @@
 #include "vtkTimerLog.h"
 #include "vtkTrackballPan.h"
 #include "vtkTrivialProducer.h"
+#include "vtkVector.h"
 #include "vtkWeakPointer.h"
 
 #ifdef PARAVIEW_USE_PISTON
@@ -265,6 +268,12 @@ vtkPVRenderView::vtkPVRenderView()
     observer2->Delete();
 
     this->RubberBandZoom = vtkInteractorStyleRubberBandZoom::New();
+    this->PolygonStyle = vtkInteractorStyleDrawPolygon::New();
+    vtkCommand* observer3 = vtkMakeMemberFunctionCommand(*this,
+      &vtkPVRenderView::OnPolygonSelectionEvent);
+    this->PolygonStyle->AddObserver(vtkCommand::PolygonSelectionEvent,
+      observer3);
+    observer3->Delete();
     }
 
   this->OrientationWidget->SetParentRenderer(this->GetRenderer());
@@ -326,6 +335,11 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     this->RubberBandZoom->Delete();
     this->RubberBandZoom = 0;
+    }
+  if (this->PolygonStyle)
+    {
+    this->PolygonStyle->Delete();
+    this->PolygonStyle = 0;
     }
 
   delete this->Internals;
@@ -472,6 +486,10 @@ void vtkPVRenderView::SetInteractionMode(int mode)
       this->Interactor->SetInteractorStyle(this->RubberBandStyle);
       break;
 
+    case INTERACTION_MODE_POLYGON:
+      this->Interactor->SetInteractorStyle(this->PolygonStyle);
+      break;
+
     case INTERACTION_MODE_ZOOM:
       this->Interactor->SetInteractorStyle(this->RubberBandZoom);
       break;
@@ -501,6 +519,31 @@ void vtkPVRenderView::OnSelectionChangedEvent()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::OnPolygonSelectionEvent()
+{
+  // NOTE: This gets called on the driver i.e. client or root-node in batch mode.
+  // That's not necessarily the node on which the selection can be made, since
+  // data may not be on this process.
+  // selection is a data-selection (not geometry selection).
+  std::vector<vtkVector2i> points = this->PolygonStyle->GetPolygonPoints();
+  if(points.size() >= 3)
+    {
+    vtkNew<vtkIntArray> polygonPointsArray;
+    polygonPointsArray->SetNumberOfComponents(2);
+    polygonPointsArray->SetNumberOfTuples(points.size());
+    for (unsigned int j = 0; j < points.size(); ++j)
+      {
+      const vtkVector2i &v = points[j];
+      int pos[2] = {v[0], v[1]};
+      polygonPointsArray->SetTupleValue(j, pos);
+      }
+
+    this->InvokeEvent(vtkCommand::PolygonSelectionEvent,
+      polygonPointsArray.GetPointer());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SelectPoints(int region[4])
 {
   this->Select(vtkDataObject::FIELD_ASSOCIATION_POINTS, region);
@@ -513,7 +556,7 @@ void vtkPVRenderView::SelectCells(int region[4])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Select(int fieldAssociation, int region[4])
+bool vtkPVRenderView::PrepareSelect(int fieldAssociation)
 {
   // NOTE: selection is only supported in builtin or client-server mode. Not
   // supported in tile-display or batch modes.
@@ -521,7 +564,7 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
   if (this->MakingSelection)
     {
     vtkErrorMacro("Select was called while making another selection.");
-    return;
+    return false;
     }
 
   this->MakingSelection = true;
@@ -536,26 +579,74 @@ void vtkPVRenderView::Select(int fieldAssociation, int region[4])
 
   this->Selector->SetRenderer(this->GetRenderer());
   this->Selector->SetFieldAssociation(fieldAssociation);
+  return true;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Select(int fieldAssociation, int region[4])
+{
+  if(!this->PrepareSelect(fieldAssociation))
+    {
+    return;
+    }
   vtkSmartPointer<vtkSelection> sel;
   if (this->SynchronizedWindows->GetEnabled() ||
     this->SynchronizedWindows->GetLocalProcessIsDriver())
     {
     sel.TakeReference(this->Selector->Select(region));
-    if (this->SynchronizedWindows->GetLocalProcessIsDriver())
-      {
-      // valid selection is only generated on the driver process. Other's are
-      // merely rendering the passes so that the result is composited correctly.
-      this->FinishSelection(sel);
-      }
     }
+  this->PostSelect(sel);
+}
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::PostSelect(vtkSelection* sel)
+{
+  if (this->SynchronizedWindows->GetLocalProcessIsDriver() && sel)
+    {
+    // valid selection is only generated on the driver process. Other's are
+    // merely rendering the passes so that the result is composited correctly.
+    this->FinishSelection(sel);
+    }
   // look at ::Render(..,..). We need to disable these once we are done with
   // rendering.
   this->SynchronizedWindows->SetEnabled(false);
   this->SynchronizedRenderers->SetEnabled(false);
 
   this->MakingSelection = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SelectPolygonPoints(
+  int* polygonPoints, vtkIdType arrayLen)
+{
+  this->SelectPolygon(vtkDataObject::FIELD_ASSOCIATION_POINTS,
+    polygonPoints, arrayLen);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SelectPolygonCells(
+  int* polygonPoints, vtkIdType arrayLen)
+{
+  this->SelectPolygon(vtkDataObject::FIELD_ASSOCIATION_CELLS,
+    polygonPoints, arrayLen);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SelectPolygon(
+  int fieldAssociation, int* polygonPoints, vtkIdType arrayLen)
+{
+  if(!this->PrepareSelect(fieldAssociation))
+    {
+    return;
+    }
+  vtkSmartPointer<vtkSelection> sel;
+  if (this->SynchronizedWindows->GetEnabled() ||
+    this->SynchronizedWindows->GetLocalProcessIsDriver())
+    {
+    sel.TakeReference(this->Selector->PolygonSelect(
+        polygonPoints, arrayLen));
+    }
+  this->PostSelect(sel);
 }
 
 //----------------------------------------------------------------------------

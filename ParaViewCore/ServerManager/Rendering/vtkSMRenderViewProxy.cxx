@@ -24,6 +24,7 @@
 #include "vtkIdTypeArray.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -1025,6 +1026,43 @@ bool vtkSMRenderViewProxy::SelectFrustumInternal(int region[4],
   extractor->Delete();
   selectionSource->Delete();
   return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectPolygonPoints(vtkIntArray* polygonPts,
+  vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources,
+  bool multiple_selections)
+{
+  if (!this->IsSelectionAvailable())
+    {
+    return false;
+    }
+  return this->SelectPolygonInternal(polygonPts, selectedRepresentations,
+    selectionSources, multiple_selections, "SelectPolygonPoints");
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
+  vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources,
+  bool multiple_selections,
+  const char* method)
+{
+  this->IsSelectionCached = true;
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+  << VTKOBJECT(this)
+  << method
+  << vtkClientServerStream::InsertArray(polygonPts->GetPointer(0),
+     polygonPts->GetNumberOfTuples()*polygonPts->GetNumberOfComponents())
+  << polygonPts->GetNumberOfTuples()*polygonPts->GetNumberOfComponents()
+  << vtkClientServerStream::End;
+  this->ExecuteStream(stream);
+
+  return this->FetchLastSelection(
+    multiple_selections, selectedRepresentations, selectionSources);
 }
 
 //----------------------------------------------------------------------------
