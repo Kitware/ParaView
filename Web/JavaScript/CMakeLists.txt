@@ -54,5 +54,5 @@ install(DIRECTORY ${ext_binary_dir}
   COMPONENT Runtime)
 
 install(DIRECTORY ${lib_binary_dir}
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/js
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
   COMPONENT Runtime)
