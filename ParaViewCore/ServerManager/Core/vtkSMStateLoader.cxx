@@ -15,10 +15,9 @@
 #include "vtkSMStateLoader.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
-// FIXME:MODULARIZATION
-//#include "vtkSMCameraLink.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
@@ -26,10 +25,10 @@
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 #include "vtkSMSessionProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
-#include "vtkSMSession.h"
 
 #include <map>
 #include <string>
@@ -432,46 +431,28 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
     const char* linkname = currentElement->GetAttribute("name");
     if (name && linkname)
       {
-      vtkSMLink* link = 0;
-      if (strcmp(name, "PropertyLink") == 0)
+      vtkSMLink* link = pxm->GetRegisteredLink(linkname);
+      if (link == NULL)
         {
-        link = pxm->GetRegisteredLink(linkname);
-        if (!link)
+        std::string classname = "vtkSM";
+        classname += name;
+        vtkSmartPointer<vtkObject> obj;
+        obj.TakeReference(vtkPVInstantiator::CreateInstance(classname.c_str()));
+        link = vtkSMLink::SafeDownCast(obj);
+        if (link == NULL)
           {
-          link = vtkSMPropertyLink::New();
-          pxm->RegisterLink(linkname, link);
-          link->Delete();
+          vtkWarningMacro("Failed to create object for link (name="
+            << name
+            << "). Expected type was " << classname.c_str()
+            << ". Skipping.");
+          continue;
           }
+        pxm->RegisterLink(linkname, link);
         }
-      else if (strcmp(name, "ProxyLink") == 0)
+      assert(link != NULL);
+      if (!link->LoadXMLState(currentElement, this->ProxyLocator))
         {
-        link = pxm->GetRegisteredLink(linkname);
-        if (!link)
-          {
-          link = vtkSMProxyLink::New();
-          pxm->RegisterLink(linkname, link);
-          link->Delete();
-          }       
-        }
-      else if (strcmp(name, "CameraLink") == 0)
-        {
-        link = pxm->GetRegisteredLink(linkname);
-        if (!link)
-          {
-
-          // FIXME:MODULARIZATION
-          vtkErrorMacro("Need to fix camera link states");
-          // link = vtkSMCameraLink::New();
-          // pxm->RegisterLink(linkname, link);
-          // link->Delete();
-          }       
-        }
-      if (link)
-        {
-        if (!link->LoadXMLState(currentElement, this->ProxyLocator))
-          {
-          return 0;
-          }
+        return 0;
         }
       }
     }
