@@ -75,7 +75,7 @@ web server inside an embedded application. More information can be found on the
 team, and the executable can be downloaded
 [here](http://pvw.kitware.com/SessionManager/project-summary.html).
 
-The executable can be downloaded [here](guides/jetty_session_manager/data/JettySessionManager-Server-1.0.jar)
+The executable can be downloaded [here](http://paraview.org/files/dependencies/ParaViewWeb/JettySessionManager-Server-1.0.jar)
 
 Configuration file for the session manager executable: (pw-config.properties):
 
