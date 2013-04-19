@@ -45,6 +45,8 @@
 
 #include <VisItException.h>
 
+namespace pointsprite {
+
 
 // ****************************************************************************
 //  Class: PipelineException
@@ -64,7 +66,5 @@ class PipelineException : public VisItException
                          ~PipelineException() VISIT_THROW_NOTHING {;};
 };
 
-
+}
 #endif
-
-

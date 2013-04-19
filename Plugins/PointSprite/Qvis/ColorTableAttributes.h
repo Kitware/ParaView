@@ -39,6 +39,8 @@
 #define COLORTABLEATTRIBUTES_H
 #include <string>
 #include <AttributeSubject.h>
+
+namespace pointsprite {
 class ColorControlPointList;
 
 // ****************************************************************************
@@ -136,4 +138,5 @@ private:
     static const char *TypeMapFormatString;
 };
 
+}
 #endif

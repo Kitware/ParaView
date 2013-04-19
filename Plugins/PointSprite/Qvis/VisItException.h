@@ -55,6 +55,7 @@
 #define VISIT_THROW_NOTHING throw()
 #endif
 
+namespace pointsprite {
 // ****************************************************************************
 //  Class: VisItException
 //
@@ -132,7 +133,9 @@ class VisItException
     ostream           *log;
 };
 
+}
 #ifndef FAKE_EXCEPTIONS
+
 //
 // This is the case where we can count on C++ to do exceptions for us.
 //
@@ -182,9 +185,9 @@ class VisItException
 }
 
 #define TRY                 try {
-#define CATCH(T)            } catch(T)   { VisItException::LogCatch(#T, __FILE__,  __LINE__);
-#define CATCH2(T, A)        } catch(T &A) { VisItException::LogCatch(#T, __FILE__,  __LINE__);
-#define CATCHALL(T)         } catch(...) { VisItException::LogCatch(#T, __FILE__,  __LINE__);
+#define CATCH(T)            } catch(T)   { pointsprite::VisItException::LogCatch(#T, __FILE__,  __LINE__);
+#define CATCH2(T, A)        } catch(T &A) { pointsprite::VisItException::LogCatch(#T, __FILE__,  __LINE__);
+#define CATCHALL(T)         } catch(...) { pointsprite::VisItException::LogCatch(#T, __FILE__,  __LINE__);
 #define ENDTRY              }
 #define RETHROW             throw
 #define CATCH_RETURN(n)     return
@@ -203,7 +206,7 @@ extern int             jump_stack_top;
 extern jmp_buf         jump_stack[100];
 extern int             jump_retval;
 extern bool            exception_caught;
-extern VisItException *exception_object;
+extern pointsprite::VisItException *exception_object;
 
 // Some prototypes that are used in the fake exception calls.
 int  exception_lookup(const char *name);
@@ -255,7 +258,7 @@ int  exception_default_id();
 
 #define RECONSTITUTE_EXCEPTION(E, M) \
 { \
-    exception_object = new VisItException(M); \
+    exception_object = new pointsprite::VisItException(M); \
     exception_object->SetType(E);\
     exception_object->SetThrowLocation(__LINE__, __FILE__);\
     exception_object->Log();\
@@ -278,7 +281,7 @@ int  exception_default_id();
     } \
     else if(exception_compatible(#e)) \
     { \
-        VisItException::LogCatch(#e, __FILE__,  __LINE__); \
+        pointsprite::VisItException::LogCatch(#e, __FILE__,  __LINE__); \
         exception_caught = true;
 
 
@@ -287,7 +290,7 @@ int  exception_default_id();
     } \
     else if(exception_compatible(#e)) \
     { \
-        VisItException::LogCatch(#e, __FILE__,  __LINE__); \
+        pointsprite::VisItException::LogCatch(#e, __FILE__,  __LINE__); \
         e & N = *((e *)exception_object); \
         exception_caught = true;
 
@@ -297,7 +300,7 @@ int  exception_default_id();
     } \
     else \
     { \
-        VisItException::LogCatch(#e, __FILE__,  __LINE__); \
+        pointsprite::VisItException::LogCatch(#e, __FILE__,  __LINE__); \
         exception_caught = true; \
 
 

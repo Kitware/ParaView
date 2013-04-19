@@ -39,6 +39,7 @@
 #define SUBJECT_H
 #include <vector>
 
+namespace pointsprite {
 // Forward declaration
 class SimpleObserver;
 
@@ -73,4 +74,5 @@ private:
     std::vector<SimpleObserver *> observers;
 };
 
+}
 #endif

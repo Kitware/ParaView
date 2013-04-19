@@ -40,14 +40,16 @@
 
 #include <vector>
 
+namespace pointsprite {
+
 // ****************************************************************************
-//  Class:  EqualVal 
+//  Class:  EqualVal
 //
 //  Purpose:
 //    Comparison functions
 //
-//  Programmer:  Mark C. Miller 
-//  Creation:    06May03 
+//  Programmer:  Mark C. Miller
+//  Creation:    06May03
 //
 // ****************************************************************************
 template <class T>
@@ -73,11 +75,11 @@ struct EqualVal
 //
 //  Arguments:
 //    a1         the pointer to the first operand of comparison
-//    a2         the pointer to the second operand of comparison 
+//    a2         the pointer to the second operand of comparison
 //    l          (where applicable) the length of the array
 //
 //  Programmer:  Mark C. Miller (cut/paste/modify from Jeremey's stuff)
-//  Creation:    06May03 
+//  Creation:    06May03
 //
 // ****************************************************************************
 template <class T>
@@ -138,11 +140,11 @@ EqualVal<T>::EqualVector(void *a1_, void *a2_)
 //    Specialized method for equality of Attribute Group Vectors.
 //
 //  Arguments:
-//    a1         the pointer to the first  operand of comparsion 
-//    a2         the pointer to the second operand of comparison 
+//    a1         the pointer to the first  operand of comparsion
+//    a2         the pointer to the second operand of comparison
 //
-//  Programmer:  Mark C. Miller 
-//  Creation:    06May03 
+//  Programmer:  Mark C. Miller
+//  Creation:    06May03
 //
 // ****************************************************************************
 template<>
@@ -164,5 +166,5 @@ EqualVal<AttributeGroup*>::EqualVector(void *a1_, void *a2_)
     }
     return true;
 }
-
+}
 #endif

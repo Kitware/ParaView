@@ -42,7 +42,8 @@
 #include "vtkQvisModule.h" // for export macro
 
 class QPixmap;
-class ColorControlPointList;
+
+namespace pointsprite { class ColorControlPointList; }
 
 // ****************************************************************************
 //  Class:  QvisAbstractOpacityBar
@@ -61,7 +62,7 @@ class VTKQVIS_EXPORT QvisAbstractOpacityBar : public QFrame
                    QvisAbstractOpacityBar(QWidget *parent=NULL, const char *name=NULL);
     virtual       ~QvisAbstractOpacityBar();
     virtual void   getRawOpacities(int, float *) = 0;
-    void           SetBackgroundColorControlPoints(const ColorControlPointList *ccp);
+    void           SetBackgroundColorControlPoints(const pointsprite::ColorControlPointList *ccp);
     void           SetBackgroundPixmap(QPixmap *background);
     void           SetShowBackgroundPixmap(bool show);
 
@@ -79,7 +80,7 @@ class VTKQVIS_EXPORT QvisAbstractOpacityBar : public QFrame
     QPixmap       *pix;
     QPixmap       *backgroundPixmap;
     bool           showBackgroundPixmap;
-    const ColorControlPointList *backgroundColorControlPoints;
+    const pointsprite::ColorControlPointList *backgroundColorControlPoints;
 
   signals:
     void           mouseReleased();

@@ -41,6 +41,8 @@
 
 #include <VisItException.h>
 
+namespace pointsprite {
+
 // ****************************************************************************
 //  Method:  VisItException constructor
 //
@@ -65,11 +67,11 @@ VisItException::VisItException()
 // ****************************************************************************
 //  Method:  VisItException constructor
 //
-//  Programmer: Kathleen Bonnell 
-//  Creation:   April 27, 2001 
+//  Programmer: Kathleen Bonnell
+//  Creation:   April 27, 2001
 //
 //  Modifications:
-//  
+//
 //    Mark C. Miller, Sun Dec  3 12:20:11 PST 2006
 //    Added component name to exception string
 //
@@ -151,12 +153,12 @@ VisItException::Log(void)
     // so wrap this around a try and catch any exception it might throw.
     //
 #ifdef FAKE_EXCEPTIONS
-    (*log) << "(" << type << ") " << filename << ", line " << line << ": " 
+    (*log) << "(" << type << ") " << filename << ", line " << line << ": "
            << msg << endl;
 #else
     try
     {
-        (*log) << "(" << type.c_str() << ") " << filename.c_str() << ", line " << line << ": " 
+        (*log) << "(" << type.c_str() << ") " << filename.c_str() << ", line " << line << ": "
                << msg.c_str() << endl;
     }
     catch(...)
@@ -169,7 +171,7 @@ VisItException::Log(void)
 // ****************************************************************************
 // Method: VisItException::LogCatch
 //
-// Purpose: 
+// Purpose:
 //   Saves information about a caught exception to the log file.
 //
 // Arguments:
@@ -181,7 +183,7 @@ VisItException::Log(void)
 // Creation:   Mon Aug 25 15:15:26 PST 2003
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 void
@@ -191,7 +193,10 @@ VisItException::LogCatch(
 //    debug1_real << "catch(" << exceptionName << ") " << srcFile << ":" << srcLine << endl;
 }
 
+}
+
 #ifdef FAKE_EXCEPTIONS
+namespace pointsprite {
 // ****************************************************************************
 //          Fake C++ exception code that gets us by on sucky platforms.
 // ****************************************************************************
@@ -226,8 +231,8 @@ typedef struct
 //   Brad Whitlock, Fri Jul 26 11:18:05 PDT 2002
 //   Added FileDoesNotExistException.
 //
-//   Kathleen Bonnell, Fri Aug 16 16:37:08 PDT 2002 
-//   Added GhostCellException, InvalidCategoryException, 
+//   Kathleen Bonnell, Fri Aug 16 16:37:08 PDT 2002
+//   Added GhostCellException, InvalidCategoryException,
 //   InvalidSetException and LogicalIndexException.
 //
 //   Hank Childs, Wed Aug 28 16:41:20 PDT 2002
@@ -239,28 +244,28 @@ typedef struct
 //   Hank Childs, Mon Oct 14 09:19:12 PDT 2002
 //   Added InvalidDBTypeException.
 //
-//   Kathleen Bonnell, Wed Oct 23 15:11:44 PDT 2002 
+//   Kathleen Bonnell, Wed Oct 23 15:11:44 PDT 2002
 //   Added NonQueryableInputException.
 //
 //   Brad Whitlock, Fri Dec 27 12:33:05 PDT 2002
 //   I added IncompatibleSecurityTokenException.
 //
-//   Kathleen Bonnell, Thu Mar 13 11:22:05 PST 2003  
+//   Kathleen Bonnell, Thu Mar 13 11:22:05 PST 2003
 //   Added NoEngineException.
 //
 //   Brad Whitlock, Fri Apr 25 10:29:45 PDT 2003
 //   Added InvalidColortableException.
 //
-//   Kathleen Bonnell, Tue May 20 14:25:11 PDT 2003  
-//   Added BadVectorException. 
+//   Kathleen Bonnell, Tue May 20 14:25:11 PDT 2003
+//   Added BadVectorException.
 //
 //   Jeremy Meredith, Fri Aug 15 11:19:25 PDT 2003
 //   Added RecursiveExpressionException and InvalidExpressionException.
 //
-//   Kathleen Bonnell, Tue Dec 16 14:58:46 PST 2003 
+//   Kathleen Bonnell, Tue Dec 16 14:58:46 PST 2003
 //   Added UnexpectedValueException.
 //
-//   Kathleen Bonnell, Tue Jan 13 08:48:14 PST 2004 
+//   Kathleen Bonnell, Tue Jan 13 08:48:14 PST 2004
 //   Added BadNodeException.
 //
 //   Mark C. Miller, Mon Apr 19 11:41:07 PDT 2004
@@ -344,13 +349,13 @@ static const int num_exception_names = sizeof(exception_tree)/(2*sizeof(const ch
 //   This function does a binary search through the exception info to get the
 //   index that contains the specified exception name.
 //
-// Notes:      
+// Notes:
 //
 // Programmer: Brad Whitlock
 // Creation:   Mon Oct 22 20:55:05 PST 2001
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 static int
@@ -377,7 +382,7 @@ recursive_exception_lookup(const char *name, int start, int end)
 // ****************************************************************************
 // Function: exception_lookup
 //
-// Purpose: 
+// Purpose:
 //   Returns the arbitrary id that is associated with an exception name.
 //
 // Arguments:
@@ -387,7 +392,7 @@ recursive_exception_lookup(const char *name, int start, int end)
 // Creation:   Mon Oct 22 19:22:51 PST 2001
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 int
@@ -410,7 +415,7 @@ exception_lookup(const char *name)
 // ****************************************************************************
 // Function: exception_default_id
 //
-// Purpose: 
+// Purpose:
 //   Returns the id for VisItException.
 //
 // Returns:    The id for VisItException.
@@ -419,7 +424,7 @@ exception_lookup(const char *name)
 // Creation:   Tue Oct 23 14:27:03 PST 2001
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 int
@@ -431,7 +436,7 @@ exception_default_id()
 // ****************************************************************************
 // Function: exception_compatible
 //
-// Purpose: 
+// Purpose:
 //   This function determines if the specified exception type is compatible
 //   with the current exception. This is how exception inheritance is being
 //   handled.
@@ -443,7 +448,7 @@ exception_default_id()
 // Creation:   Mon Oct 22 19:24:17 PST 2001
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 bool
@@ -477,7 +482,7 @@ exception_compatible(const char *name)
                     noErrors = false;
                 }
                 else
-                { 
+                {
                     compatible = (strcmp(eptr, name) == 0);
                     if(!compatible)
                         index = exception_lookup(eptr) - 100;
@@ -492,7 +497,7 @@ exception_compatible(const char *name)
 // ****************************************************************************
 // Function: exception_propagate
 //
-// Purpose: 
+// Purpose:
 //   Does a longjmp to the top of the jump stack minus the backup amount. If
 //   there are not enough try's on the stack it is an unhandled exception and
 //   we abort the program.
@@ -504,7 +509,7 @@ exception_compatible(const char *name)
 // Creation:   Mon Oct 22 21:44:14 PST 2001
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 void
@@ -536,7 +541,7 @@ exception_throw(int backup)
 // Purpose:
 //   This function deletes the exception object based on a condition.
 //
-// Notes:      
+// Notes:
 //
 // Programmer: Brad Whitlock
 // Creation:   Mon Oct 22 21:50:08 PST 2001
@@ -559,4 +564,5 @@ exception_delete(bool condition)
     }
 }
 
+}
 #endif

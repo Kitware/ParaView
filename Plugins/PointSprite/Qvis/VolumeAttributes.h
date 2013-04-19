@@ -42,6 +42,8 @@
 #include <ColorControlPointList.h>
 #include <GaussianControlPointList.h>
 
+namespace pointsprite {
+
 // ****************************************************************************
 // Class: VolumeAttributes
 //
@@ -54,7 +56,7 @@
 // Creation:   Tue Mar 13 14:48:05 PST 2007
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 class VolumeAttributes : public AttributeSubject
@@ -236,4 +238,5 @@ private:
     static const char *TypeMapFormatString;
 };
 
+}
 #endif

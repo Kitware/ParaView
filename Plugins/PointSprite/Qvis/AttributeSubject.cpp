@@ -37,10 +37,12 @@
 
 #include <AttributeSubject.h>
 
+namespace pointsprite {
+
 // *******************************************************************
 // Method: AttributeSubject::AttributeSubject
 //
-// Purpose: 
+// Purpose:
 //   Constructor for the AttributeSubject class.
 //
 // Arguments:
@@ -51,10 +53,10 @@
 // Creation:   Mon Aug 7 12:53:39 PDT 2000
 //
 // Modifications:
-//   
+//
 // *******************************************************************
 
-AttributeSubject::AttributeSubject(const char *formatString) : 
+AttributeSubject::AttributeSubject(const char *formatString) :
     AttributeGroup(formatString), Subject()
 {
     // nothing special here.
@@ -63,14 +65,14 @@ AttributeSubject::AttributeSubject(const char *formatString) :
 // *******************************************************************
 // Method: AttributeSubject::~AttributeSubject
 //
-// Purpose: 
+// Purpose:
 //   Destructor for the AttributeSubject class.
 //
 // Programmer: Brad Whitlock
 // Creation:   Mon Aug 7 12:54:49 PDT 2000
 //
 // Modifications:
-//   
+//
 // *******************************************************************
 
 AttributeSubject::~AttributeSubject()
@@ -81,14 +83,14 @@ AttributeSubject::~AttributeSubject()
 // *******************************************************************
 // Method: AttributeSubject::Notify()
 //
-// Purpose: 
+// Purpose:
 //   Tells all Observers to update, then unselects all the attributes.
 //
 // Programmer: Brad Whitlock
 // Creation:   Wed Aug 9 15:55:06 PST 2000
 //
 // Modifications:
-//   
+//
 // *******************************************************************
 
 void
@@ -105,14 +107,14 @@ AttributeSubject::Notify()
 // ****************************************************************************
 // Method: AttributeSubject::CreateCompatible
 //
-// Purpose: 
+// Purpose:
 //   Creates a compatible object of the specified type.
 //
 // Programmer: Brad Whitlock
 // Creation:   Wed Oct 30 14:11:37 PST 2002
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 AttributeSubject *
@@ -124,16 +126,16 @@ AttributeSubject::CreateCompatible(const std::string &) const
 // ****************************************************************************
 // Method: AttributeSubject::TypeName
 //
-// Purpose: 
+// Purpose:
 //   Returns the name of the type.
 //
 // Returns:    The name of the type.
 //
-// Programmer: Kathleen Bonnell 
-// Creation:   June 20, 2006 
+// Programmer: Kathleen Bonnell
+// Creation:   June 20, 2006
 //
 // Modifications:
-//   
+//
 // ****************************************************************************
 
 const std::string
@@ -142,3 +144,4 @@ AttributeSubject::TypeName() const
     return "AttributeSubject";
 }
 
+}
