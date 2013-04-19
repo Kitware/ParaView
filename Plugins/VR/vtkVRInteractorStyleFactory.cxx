@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVRControlSliceOrientationStyle.h"
 #include "vtkVRControlSlicePositionStyle.h"
 #include "vtkVRGrabWorldStyle.h"
+#include "vtkVRSpaceNavigatorGrabWorldStyle.h"
 #include "vtkVRTrackStyle.h"
 
 //-----------------------------------------------------------------------------
@@ -60,6 +61,10 @@ vtkVRInteractorStyleFactory::vtkVRInteractorStyleFactory()
   // Add ControlSliceOrientationStyle
   this->InteractorStyleClassNames.push_back("vtkVRControlSliceOrientationStyle");
   this->InteractorStyleDescriptions.push_back("Slice Orientation");
+
+  // Add SpaceNavigatorGrabWorldStye
+  this->InteractorStyleClassNames.push_back("vtkVRSpaceNavigatorGrabWorldStyle");
+  this->InteractorStyleDescriptions.push_back("Space Navigator Grab");
 }
 
 //-----------------------------------------------------------------------------
@@ -138,6 +143,10 @@ vtkVRInteractorStyleFactory::NewInteractorStyleFromClassName(
   else if (name == "vtkVRControlSliceOrientationStyle")
     {
     return vtkVRControlSliceOrientationStyle::New();
+    }
+  else if (name == "vtkVRSpaceNavigatorGrabWorldStyle")
+    {
+    return vtkVRSpaceNavigatorGrabWorldStyle::New();
     }
 
   return NULL;
