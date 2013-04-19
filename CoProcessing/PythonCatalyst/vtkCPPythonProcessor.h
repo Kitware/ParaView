@@ -20,7 +20,7 @@
 
 /// @ingroup CoProcessing
 /// CoProcessing code should use vtkCPPythonProcessor instead of
-/// vtkCPProcessor when if they need Python processing capabilities.
+/// vtkCPProcessor when/if they need Python processing capabilities.
 class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonProcessor : public vtkCPProcessor
 {
 public:
