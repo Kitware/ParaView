@@ -79,6 +79,9 @@ public:
   /// Sets the SelectPolygonPoints Action
   void setActionSelectPolygonPoints(QAction *action);
 
+  /// Sets the SelectPolygonCells Action
+  void setActionSelectPolygonCells(QAction *action);
+
 private slots:
   /// toggles selection modes based on the current state.
   void toggleSurfaceSelection();
@@ -88,6 +91,7 @@ private slots:
   void toggleBlockSelection();
   void togglePick();
   void togglePolygonPointsSelection();
+  void togglePolygonCellsSelection();
 
   /// Based on which mode is selected this slot toggels the internal
   /// state between activation (pressed) and deactivation (release).
@@ -103,6 +107,7 @@ private:
   QAction *ActionSelectSurfacePoints;
   QAction *ActionSelectionMode;
   QAction *ActionSelectPolygonPoints;
+  QAction *ActionSelectPolygonCells;
 
   bool PickObject;
   bool Select_Block;
@@ -111,6 +116,7 @@ private:
   bool SelectSurfacePoints;
   bool SelectionMode;
   bool SelectPolygonPoints;
+  bool SelectPolygonCells;
 };
 
 #endif

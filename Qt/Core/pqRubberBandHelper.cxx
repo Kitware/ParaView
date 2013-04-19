@@ -237,6 +237,8 @@ void pqRubberBandHelper::emitEnabledSignals()
     emit this->enableSurfacePointsSelection(false);
     emit this->enableFrustumSelection(false);
     emit this->enableFrustumPointSelection(false);
+    emit this->enablePolygonPointsSelection(false);
+    emit this->enablePolygonCellsSelection(false);
     return;
     }
 
@@ -248,6 +250,10 @@ void pqRubberBandHelper::emitEnabledSignals()
           NULL == proxy->IsSelectVisibleCellsAvailable() : false);
     emit this->enableSurfacePointsSelection(proxy ?
           NULL == proxy->IsSelectVisiblePointsAvailable() : false);
+    emit this->enablePolygonCellsSelection(proxy ?
+      NULL == proxy->IsSelectVisibleCellsAvailable() : false);
+    emit this->enablePolygonPointsSelection(proxy ?
+      NULL == proxy->IsSelectVisiblePointsAvailable() : false);
     emit this->enablePick(proxy ?
           proxy->IsSelectionAvailable() : false);
     emit this->enableFrustumSelection(true);
@@ -312,7 +318,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     this->Internal->RenderView->setCursor(
       this->Internal->ZoomCursor);
     }
-  else if (selectionMode == POLYGON_POINTS)
+  else if (selectionMode == POLYGON_POINTS || selectionMode == POLYGON_CELLS)
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
       vtkPVRenderView::INTERACTION_MODE_POLYGON);
@@ -690,7 +696,10 @@ void pqRubberBandHelper::onPolygonSelection(vtkObject*, unsigned long,
     switch (this->Mode)
       {
       case POLYGON_POINTS:
-        this->Internal->RenderView->selectPolygonPoints( polygonPoints, ctrl);
+        this->Internal->RenderView->selectPolygonPoints(polygonPoints, ctrl);
+        break;
+      case POLYGON_CELLS:
+        this->Internal->RenderView->selectPolygonCells(polygonPoints, ctrl);
         break;
       }
     this->endSelection();

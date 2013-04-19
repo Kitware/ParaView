@@ -213,6 +213,10 @@ public:
   /// coordinates.
   void selectPolygonPoints(vtkIntArray* polygon, bool expand=false);
 
+  /// Creates a new surface cells selection given the polygon in display
+  /// coordinates.
+  void selectPolygonCells(vtkIntArray* polygon, bool expand=false);
+
 signals:
   // Triggered when interaction mode change underneath
   void updateInteractionMode(int mode);

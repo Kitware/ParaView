@@ -71,7 +71,8 @@ public:
     PICK,
     PICK_ON_CLICK,
     FAST_INTERSECT,
-    POLYGON_POINTS
+    POLYGON_POINTS,
+    POLYGON_CELLS
   };
   // PICK_ON_CLICK mode is same as pick, except that the helper does not change
   // the interactor or draw any rubber bands, now change the cursor. It just
@@ -128,6 +129,7 @@ signals:
   void enableZoom(bool enabled);
   void enablePick(bool enabled);
   void enablePolygonPointsSelection(bool enabled);
+  void enablePolygonCellsSelection(bool enabled);
 
   /// Fired with selection mode changes.
   /// \c selectionMode is enum Modes{...}.

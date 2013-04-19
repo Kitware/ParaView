@@ -126,6 +126,16 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     actionSelect_Block->setCheckable (true);
     actionSelect_Block->setShortcut(QString("b"));
 
+    QAction* actionSelectionPolygonPoints = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfacePoint24.png"), "Select Points With Polygon");
+    actionSelectionPolygonPoints->setObjectName("actionPolygonSelectionPoints");
+    actionSelectionPolygonPoints->setCheckable (true);
+
+    QAction* actionSelectionPolygonCells = frame->addTitleBarAction(
+      QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfaceCell24.png"), "Select Cells With Polygon");
+    actionSelectionPolygonCells->setObjectName("actionPolygonSelectionCells");
+    actionSelectionPolygonCells->setCheckable (true);
+
     QAction* actionSelectFrustumPoints = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqFrustumSelectionPoint24.png"),
       "Select Points Through (g)");
@@ -152,12 +162,6 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     actionSelectionMode->setCheckable (true);
     actionSelectionMode->setShortcut(QString("s"));
 
-    QAction* actionSelectionPolygonPoints = frame->addTitleBarAction(
-      QIcon(":/pqWidgets/Icons/pqPolygonSelectSurfacePoint24.png"), "Select Points With Polygon");
-    actionSelectionMode->setObjectName("actionPolygonSelectionPoints");
-    actionSelectionMode->setCheckable (true);
-    //actionSelectionMode->setShortcut(QString("p"));
-
     // Register all actions with the pqSelection3DHelper.
     selectionHelper->setActionSelectionMode(actionSelectionMode);
     selectionHelper->setActionSelectSurfacePoints(actionSelectSurfacePoints);
@@ -166,6 +170,7 @@ bool pqStandardViewFrameActionGroup::connect(pqViewFrame *frame, pqView *view)
     selectionHelper->setActionSelect_Block(actionSelect_Block);
     selectionHelper->setActionPickObject(actionPickObject);
     selectionHelper->setActionSelectPolygonPoints(actionSelectionPolygonPoints);
+    selectionHelper->setActionSelectPolygonCells(actionSelectionPolygonCells);
 
     QAction* cameraAction = frame->addTitleBarAction(
       QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), "Adjust Camera");

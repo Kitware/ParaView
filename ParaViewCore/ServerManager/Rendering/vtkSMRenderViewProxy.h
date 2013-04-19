@@ -61,6 +61,10 @@ public:
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
+  bool SelectPolygonCells(vtkIntArray* polygon,
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
+    bool multiple_selections=false);
 
   // Description:
   // Convenience method to pick a location. Internally uses SelectSurfaceCells

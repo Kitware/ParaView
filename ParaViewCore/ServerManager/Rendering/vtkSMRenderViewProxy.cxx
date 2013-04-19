@@ -1043,6 +1043,20 @@ bool vtkSMRenderViewProxy::SelectPolygonPoints(vtkIntArray* polygonPts,
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMRenderViewProxy::SelectPolygonCells(vtkIntArray* polygonPts,
+  vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources,
+  bool multiple_selections)
+{
+  if (!this->IsSelectionAvailable())
+    {
+    return false;
+    }
+  return this->SelectPolygonInternal(polygonPts, selectedRepresentations,
+    selectionSources, multiple_selections, "SelectPolygonCells");
+}
+
+//----------------------------------------------------------------------------
 bool vtkSMRenderViewProxy::SelectPolygonInternal(vtkIntArray* polygonPts,
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources,

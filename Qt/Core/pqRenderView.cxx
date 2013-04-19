@@ -848,6 +848,16 @@ void pqRenderView::selectPolygonPoints(vtkIntArray* polygon, bool expand)
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderView::selectPolygonCells(vtkIntArray* polygon, bool expand)
+{
+  QList<pqOutputPort*> output_ports;
+  this->selectPolygonInternal(polygon, output_ports, false, expand, false);
+  // Fire selection event to let the world know that this view selected
+  // something.
+  this->emitSelectionSignal(output_ports);
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
   QList<pqOutputPort*>& pqOutputPorts,  bool select_points,
   bool expand, bool select_blocks)
@@ -869,12 +879,12 @@ void pqRenderView::selectPolygonInternal(vtkIntArray* polygon,
     }
   else
     {
-    //if (!renderModuleP->SelectPolygonCellss(polygon,
-    //  selectedRepresentations, selectionSources,
-    //  this->UseMultipleRepresentationSelection))
-    //  {
-    //  return;
-    //  }
+    if (!renderModuleP->SelectPolygonCells(polygon,
+      selectedRepresentations, selectionSources,
+      this->UseMultipleRepresentationSelection))
+      {
+      return;
+      }
     }
 
   this->collectSelectionPorts(selectedRepresentations,
