@@ -271,7 +271,7 @@ vtkPVRenderView::vtkPVRenderView()
     this->PolygonStyle = vtkInteractorStyleDrawPolygon::New();
     vtkCommand* observer3 = vtkMakeMemberFunctionCommand(*this,
       &vtkPVRenderView::OnPolygonSelectionEvent);
-    this->PolygonStyle->AddObserver(vtkCommand::PolygonSelectionEvent,
+    this->PolygonStyle->AddObserver(vtkCommand::SelectionChangedEvent,
       observer3);
     observer3->Delete();
     }
@@ -538,7 +538,7 @@ void vtkPVRenderView::OnPolygonSelectionEvent()
       polygonPointsArray->SetTupleValue(j, pos);
       }
 
-    this->InvokeEvent(vtkCommand::PolygonSelectionEvent,
+    this->InvokeEvent(vtkCommand::SelectionChangedEvent,
       polygonPointsArray.GetPointer());
     }
 }

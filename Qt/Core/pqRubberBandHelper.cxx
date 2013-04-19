@@ -126,14 +126,14 @@ public:
   }
 
 
-  void AddPolygonObserver(vtkPVGenericRenderWindowInteractor* proxyToObserver)
+  void AddPolygonObserver(vtkSMRenderViewProxy* proxyToObserver)
   {
     this->RemoveObserver();
     this->ObservedProxy = proxyToObserver;
     if(this->ObservedProxy)
       {
       this->ObserverId = this->ObservedProxy->AddObserver(
-            vtkCommand::PolygonSelectionEvent,
+            vtkCommand::SelectionChangedEvent,
             this->Owner.data(),
             &pqRubberBandHelper::onPolygonSelection);
       }
@@ -316,7 +316,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     {
     vtkSMPropertyHelper(rmp, "InteractionMode").Set(
       vtkPVRenderView::INTERACTION_MODE_POLYGON);
-    this->Internal->AddPolygonObserver(rmp->GetInteractor());
+    this->Internal->AddPolygonObserver(rmp);
     rmp->UpdateVTKObjects();
     this->Internal->RenderView->setCursor(Qt::PointingHandCursor);
     }
