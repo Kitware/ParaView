@@ -1,3 +1,5 @@
+#ifndef NOSCALAPACK
+
 #include "nektar.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -1533,3 +1535,5 @@ void gather_vector(Bsystem *Bsys, double *v_global, double *work){
 #endif
 
 }
+
+#endif

@@ -22,21 +22,23 @@
 #include <stdio.h>
 
 using namespace polylib;
+//jai added
+using namespace nektarTri;
 
-/*
+/* 
 
 Function name: Element::gen_bndry
 
 Function Purpose:
 
 Argument 1: char bc
-Purpose:
+Purpose: 
 
 Argument 2: int fac
-Purpose:
+Purpose: 
 
 Argument 3: ...
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -59,7 +61,7 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
 
   if(fac == 0)
     qt = qa;
-  else
+  else 
     qt = qb;
 
   X.x = dvector(0,qt-1);
@@ -76,7 +78,7 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
   if(islower(bc)){
 
     if((bf = (strchr(va_arg(ap,char *),'='))) == (char *) NULL)
-      error_msg(gen_bndry: Illegal B.C. function definition);
+      error_msg(Tri::gen_bndry: Illegal B.C. function definition);
 
     while(isspace(*++bf));
 
@@ -85,20 +87,20 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
     vector_def("x y",bf);
     /* set top vertex */
     vector_set(1,&(vert[vnum(fac,1)].x),&(vert[vnum(fac,1)].y),
-         nbdry->bvert+1);
+	       nbdry->bvert+1);
     GetFaceCoord(fac,&X);
     vector_set(qt,X.x,X.y,f);
   }
   else{
     char buf[BUFSIZ];
-
+    
     bv = va_arg(ap,double);
 
     dfill(qt,bv,f,1);
     sprintf(buf,"%lf",bv);
     nbdry->bstring = strdup(buf);
   }
-
+  
   va_end(ap);
 
   nbdry->type = toupper(bc);
@@ -112,10 +114,10 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
 #ifdef COMPRESS
   nbdry->phys_val   = dvector(0,QGmax-1);
   nbdry->phys_val_g = dvector(0,QGmax-1);
-  switch(bc){
+  switch(bc){ 
   case 'V':
     dfill(qt, bv, f, 1);
-  case 'v':
+  case 'v': 
     Tri_Fill_Phys_Bound (nbdry,f);
     break;
   case 'W':
@@ -126,26 +128,26 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
     break;
   case 'F':
     dcopy(qt,&bv,0,f,1);
-  case 'f': case's':
+  case 'f': case's': 
     Tri_Fill_Phys_Bound (nbdry,f);
     break;
   }
 #endif
 
-  if(OpSplit&&(bc != 'X')){
+  if(OpSplit&&(bc != 'X')){ 
     nbdry->phys_val_g = dvector(0,QGmax-1);
     Tri_Fill_Phys_Bound (nbdry,f);
   }
-
+  
   switch(bc){
-  case 'v':
+  case 'v': 
     nbdry->bvert[0] = f[0];
     JtransEdge(nbdry,fac,0,f);
     break;
-  case 'V':
+  case 'V': 
     for(i = 0; i < Tri_DIM; ++i) nbdry->bvert[i] = bv;
     break;
-  case 'F': case 'R':
+  case 'F': case 'R': 
     dfill(qt,bv,f,1);
   case 'f': case 'r':
     Surface_geofac(nbdry);
@@ -156,9 +158,9 @@ Bndry *Tri::gen_bndry(char bc, int fac, ...){
   }
 
   free(X.x);  free(X.y); free(f);
-
+  
   return nbdry;
-}
+} 
 
 static void Quad_Fill_Phys_Bound (Bndry *Ubc, double *f);
 
@@ -171,10 +173,10 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
   Coord   X;
   va_list ap;
   int OpSplit = option("OpSplit");
-
+  
   if(fac == 0 || fac ==2)
     qt = qa;
-  else
+  else 
     qt = qb;
 
   X.x = dvector(0,qt-1);
@@ -189,9 +191,9 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
 
   va_start(ap, fac);
   if(islower(bc)){
-
+    
     if((bf = (strchr(va_arg(ap,char *),'='))) == (char *) NULL)
-      error_msg(gen_bndry: Illegal B.C. function definition);
+      error_msg(Quad::gen_bndry: Illegal B.C. function definition);
 
     while(isspace(*++bf));
 
@@ -200,7 +202,7 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
     vector_def("x y",bf);
     /* set top vertex */
     vector_set(1,&(vert[vnum(fac,1)].x),&(vert[vnum(fac,1)].y),
-         nbdry->bvert+1);
+	       nbdry->bvert+1);
     GetFaceCoord(fac,&X);
 
     vector_set(qt,X.x,X.y,f);
@@ -215,7 +217,7 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
     nbdry->bstring = strdup(buf);
   }
   va_end(ap);
-
+  
   nbdry->type = toupper(bc);
   nbdry->face = fac;
   nbdry->elmt = this;
@@ -223,10 +225,10 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
 #ifdef COMPRESS
   nbdry->phys_val   = dvector(0,QGmax-1);
   nbdry->phys_val_g = dvector(0,QGmax-1);
-  switch(bc){
+  switch(bc){    
   case 'V':
     dfill(qt, bv, f, 1);
-  case 'v':
+  case 'v': 
     Quad_Fill_Phys_Bound (nbdry,f);
     break;
   case 'W':
@@ -237,7 +239,7 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
     break;
   case 'F':
     dcopy(qt,&bv,0,f,1);
-  case 'f': case's':
+  case 'f': case's': 
     Quad_Fill_Phys_Bound (nbdry,f);
     break;
   }
@@ -247,18 +249,18 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
     nbdry->phys_val_g = dvector(0,QGmax-1);
     Quad_Fill_Phys_Bound (nbdry,f);
   }
-
+  
   switch(bc){
-  case 'v':
+  case 'v': 
     nbdry->bvert[0] = f[0];
     JtransEdge(nbdry,fac,0,f);
     break;
   case 'V':
     for(i = 0; i < 2; ++i) nbdry->bvert[i] = bv;
     break;
-  case 'F': case 'R':
+  case 'F': case 'R': 
     dfill(qt,bv,f,1);
-  case 'f': case 'r':
+  case 'f': case 'r': 
     Surface_geofac(nbdry);
     MakeFlux(nbdry,fac,f);
     break;
@@ -267,7 +269,7 @@ Bndry *Quad::gen_bndry(char bc, int fac, ...){
   }
 
   free(X.x);  free(X.y);  free(X.z); free(f);
-
+    
   return nbdry;
 }
 
@@ -288,10 +290,10 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
 
   if(fac == 0)
     qt = qa*qb;
-  else
+  else 
     if(fac == 1)
       qt = qa*qc;
-    else
+    else 
       qt = (qb+1)*qc;
 
   X.x = dvector(0,qt-1);
@@ -307,7 +309,7 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
   if(islower(bc)){
 
     if((bf = (strchr(va_arg(ap,char *),'='))) == (char *) NULL)
-      error_msg(gen_bndry: Illegal B.C. function definition);
+      error_msg(Tet::gen_bndry: Illegal B.C. function definition);
 
     while(isspace(*++bf));
 
@@ -316,7 +318,7 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
 
     /* set singular point */
     vector_set(1,&(vert[vnum(fac,2)].x),&(vert[vnum(fac,2)].y),
-         &(vert[vnum(fac,2)].z),nbdry->bvert+2);
+	       &(vert[vnum(fac,2)].z),nbdry->bvert+2);
 
     GetFaceCoord(fac,&X);
     vector_set(qt,X.x,X.y,X.z,f);
@@ -332,21 +334,21 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
   }
 
   va_end(ap);
-
+  
   nbdry->type = toupper(bc);
   nbdry->face = fac;
   nbdry->elmt = this;
-
+  
 #ifdef COMPRESS
   nbdry->phys_val   = dvector(0,qt-1);
   nbdry->phys_val_g = dvector(0,qt-1);
-  switch(bc){
-  case 'v':
+  switch(bc){    
+  case 'v': 
     Tet_Fill_Phys_Bound (nbdry,f);
     break;
   case 'W':
     break;
-  case 'f': case's':
+  case 'f': case's': 
     Tet_Fill_Phys_Bound (nbdry,f);
     break;
   }
@@ -356,9 +358,9 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
     nbdry->phys_val_g = dvector(0,qt-1);
     Tet_Fill_Phys_Bound (nbdry,f);
   }
-
+  
   switch(bc){
-  case 'v':
+  case 'v': 
     Tet::JtransFace(nbdry,f);
     break;
   case 'V':
@@ -377,7 +379,7 @@ Bndry *Tet::gen_bndry(char bc, int fac, ...){
 
   free(tmp); free(f);
   free(X.x);  free(X.y);  free(X.z);
-
+    
   return nbdry;
 }
 
@@ -426,15 +428,15 @@ Bndry *Pyr::gen_bndry(char bc, int fac, ...){
 
     for(i=0;i<Nfverts(fac);++i)
       vector_set(1,
-     &(vert[vnum(fac,i)].x),&(vert[vnum(fac,i)].y),
-     &(vert[vnum(fac,i)].z),nbdry->bvert+i);
-
+		 &(vert[vnum(fac,i)].x),&(vert[vnum(fac,i)].y),
+		 &(vert[vnum(fac,i)].z),nbdry->bvert+i);
+    
     GetFaceCoord(fac,&X);
     vector_set(qt,X.x,X.y,X.z,f);
   }
   else{
     char buf[BUFSIZ];
-
+    
     bv = va_arg(ap,double);
 
     sprintf(buf,"%lf",bv);
@@ -443,18 +445,18 @@ Bndry *Pyr::gen_bndry(char bc, int fac, ...){
   }
 
   va_end(ap);
-
+  
   nbdry->type = toupper(bc);
   nbdry->face = fac;
   nbdry->elmt = this;
-
+  
   if(OpSplit&&(bc != 'X')){ // don't use this when defining boundaries
     nbdry->phys_val_g = dvector(0,qt-1);
     fprintf(stderr,"Pyr_Fill_Phys_Bound needs definiing\n");
   }
 
   switch(bc){
-  case 'v':
+  case 'v':  
     InterpToFace1(fac,f,tmp);
     Pyr::JtransFace(nbdry,tmp);
     break;
@@ -473,7 +475,7 @@ Bndry *Pyr::gen_bndry(char bc, int fac, ...){
   }
 
  free(tmp); free(X.x); free(X.y); free(X.z); free(f);
-
+    
   return nbdry;
 }
 
@@ -505,7 +507,7 @@ Bndry *Prism::gen_bndry(char bc, int fac, ...){
   nbdry = (Bndry *)calloc(1,sizeof(Bndry));
   Je = (option("tvarying"))? iparam("INTYPE")+1:1;
   MemBndry(nbdry,fac,Je);
-
+ 
   va_start(ap, fac);
   if(islower(bc)){
 
@@ -515,20 +517,20 @@ Bndry *Prism::gen_bndry(char bc, int fac, ...){
     while(isspace(*++bf));
 
     nbdry->bstring = strdup(bf);
-
+    
     vector_def("x y z",bf);
 
     for(i=0;i<Nfverts(fac);++i)
       vector_set(1,
-     &(vert[vnum(fac,i)].x),&(vert[vnum(fac,i)].y),
-     &(vert[vnum(fac,i)].z),nbdry->bvert+i);
-
+		 &(vert[vnum(fac,i)].x),&(vert[vnum(fac,i)].y),
+		 &(vert[vnum(fac,i)].z),nbdry->bvert+i);
+    
     GetFaceCoord(fac,&X);
     vector_set(qt,X.x,X.y,X.z,f);
   }
   else{
     char buf[BUFSIZ];
-
+    
     bv = va_arg(ap,double);
 
     sprintf(buf,"%lf",bv);
@@ -537,7 +539,7 @@ Bndry *Prism::gen_bndry(char bc, int fac, ...){
   }
 
   va_end(ap);
-
+  
   nbdry->type = toupper(bc);
   nbdry->face = fac;
   nbdry->elmt = this;
@@ -545,25 +547,25 @@ Bndry *Prism::gen_bndry(char bc, int fac, ...){
 #ifdef COMPRESS
   nbdry->phys_val   = dvector(0,qt-1);
   nbdry->phys_val_g = dvector(0,qt-1);
-  switch(bc){
-  case 'v':
+  switch(bc){    
+  case 'v': 
     Prism_Fill_Phys_Bound (nbdry,f);
     break;
   case 'W':
     break;
-  case 'f': case's':
+  case 'f': case's': 
     Prism_Fill_Phys_Bound (nbdry,f);
     break;
   }
 #endif
-
+  
   if(OpSplit&&(bc != 'X')){ // don't use this when defining boundaries
     nbdry->phys_val_g = dvector(0,qt-1);
     Prism_Fill_Phys_Bound (nbdry,f);
   }
 
   switch(bc){
-  case 'v':
+  case 'v': 
     InterpToFace1(fac,f,tmp);
     Prism::JtransFace(nbdry,tmp);
     break;
@@ -582,7 +584,7 @@ Bndry *Prism::gen_bndry(char bc, int fac, ...){
   }
 
   free(tmp); free(X.x); free(X.y); free(X.z); free(f);
-
+    
   return nbdry;
 }
 
@@ -599,7 +601,7 @@ Bndry *Hex::gen_bndry(char bc, int fac, ...){
   int OpSplit = option("OpSplit");
 
   double *tmp = dvector(0, QGmax*QGmax-1);
-
+  
   qt = qa*qb;
 
   X.x = dvector(0,qt-1);
@@ -629,7 +631,7 @@ Bndry *Hex::gen_bndry(char bc, int fac, ...){
   }
   else{
     char buf[BUFSIZ];
-
+    
     bv = va_arg(ap,double);
 
     sprintf(buf,"%lf",bv);
@@ -638,18 +640,18 @@ Bndry *Hex::gen_bndry(char bc, int fac, ...){
   }
 
   va_end(ap);
-
+  
   nbdry->type = toupper(bc);
   nbdry->face = fac;
   nbdry->elmt = this;
-
+  
 #ifdef COMPRESS
   nbdry->phys_val   = dvector(0,QGmax*QGmax-1);
   nbdry->phys_val_g = dvector(0,QGmax*QGmax-1);
-  switch(bc){
+  switch(bc){    
   case 'V':
     dfill(qt, bv, f, 1);
-  case 'v':
+  case 'v': 
     Hex_Fill_Phys_Bound (nbdry,f);
     break;
   case 'W':
@@ -660,7 +662,7 @@ Bndry *Hex::gen_bndry(char bc, int fac, ...){
     break;
   case 'F':
     dcopy(qt,&bv,0,f,1);
-  case 'f': case's':
+  case 'f': case's': 
     Hex_Fill_Phys_Bound (nbdry,f);
     break;
   }
@@ -689,7 +691,7 @@ Bndry *Hex::gen_bndry(char bc, int fac, ...){
   default:
     break;
   }
-#endif
+#endif    
   // leak
   free(tmp); free(X.x); free(X.y); free(X.z); free(f);
   return nbdry;
@@ -707,16 +709,16 @@ static void Tri_Fill_Phys_Bound (Bndry *Ubc, double *f){
   int qedg = Ubc->elmt->edge[Ubc->face].qedg;
 
   switch (Ubc->face) {
-  case 0:
+  case 0: 
     qt=Ubc->elmt->qa;
-    getim(qt,qedg,&im,a2g);
+    getim(qt,qedg,&im,a2g); 
     break;
   case 1:  case 2:
     qt=Ubc->elmt->qb;
-    getim(qt,qedg,&im,b2g);
+    getim(qt,qedg,&im,b2g); 
     break;
   }
-
+  
   if(!option("OpSplit")){
     /* store quadrature points for viscous part */
     dcopy(qt,f,1,Ubc->phys_val,1);
@@ -750,7 +752,7 @@ static void Quad_Fill_Phys_Bound (Bndry *Ubc, double *f){
 
 
 
-
+ 
 static void Tet_Fill_Phys_Bound (Bndry *Ubc, double *f){
   int      q1,q2;
   double **ima, **imb;
@@ -758,7 +760,7 @@ static void Tet_Fill_Phys_Bound (Bndry *Ubc, double *f){
   int      qface = E->face[Ubc->face].qface;
 
   switch (Ubc->face) {
-  case 0:
+  case 0: 
     q1 = E->qa;
     q2 = E->qb;
     getim(q1,qface,&ima,a2g); //ok
@@ -781,7 +783,7 @@ static void Tet_Fill_Phys_Bound (Bndry *Ubc, double *f){
   /* store quadrature points for viscous part */
   if(!option("OpSplit"))
     dcopy(q1*q2,f,1,Ubc->phys_val,1);
-
+  
   /* store gaussian distribution for euler part */
   Interp2d(*ima,*imb,f,q1,q2, Ubc->phys_val_g,qface,qface);
 
@@ -796,13 +798,13 @@ static void Prism_Fill_Phys_Bound (Bndry *Ubc, double *f){
   int      qface = E->face[Ubc->face].qface;
 
   switch (Ubc->face) {
-  case 0:
+  case 0: 
     q1 = E->qa;
     q2 = E->qb;
     getim(q1,qface,&ima,a2g); //ok
     getim(q2,qface,&imb,a2g); //ok
     break;
-  case 1: case 3:
+  case 1: case 3: 
     q1 = E->qa;
     q2 = E->qc;
     getim(q1,qface,&ima,a2g); //ok
@@ -819,7 +821,7 @@ static void Prism_Fill_Phys_Bound (Bndry *Ubc, double *f){
   /* store quadrature points for viscous part */
   if(!option("OpSplit"))
     dcopy(q1*q2,f,1,Ubc->phys_val,1);
-
+  
   /* store gaussian distribution for euler part */
   Interp2d(*ima,*imb,f,q1,q2, Ubc->phys_val_g,qface,qface);
 
@@ -860,14 +862,14 @@ static void Hex_Fill_Phys_Bound (Bndry *Ubc, double *f){
     dcopy(qt,f,1,Ubc->phys_val,1);
 
   /* store gaussian distribution for euler part */
-  Interp2d(*ima,*imb,f,q1,q2,
-     Ubc->phys_val_g,E->face[Ubc->face].qface,E->face[Ubc->face].qface);
+  Interp2d(*ima,*imb,f,q1,q2, 
+	   Ubc->phys_val_g,E->face[Ubc->face].qface,E->face[Ubc->face].qface);
 
   return;
 }
 
 
-/*
+/* 
 
 Function name: Element::update_bndry
 
@@ -875,7 +877,7 @@ Function Purpose:
   Update the coefficients in the Bc storage.
 
 Argument 1: Bndry *Bc
-Purpose:
+Purpose: 
  Storage for boundary condition data.
 
 Function Notes:
@@ -889,9 +891,9 @@ void Tri::update_bndry(Bndry *Bc, int save){
 
   if(Bc->face == 0)
     qt = qa;
-  else
+  else 
     qt = qb;
-
+  
   X.x = dvector(0,qt-1);
   X.y = dvector(0,qt-1);
   f   = dvector(0,qt-1);
@@ -904,19 +906,19 @@ void Tri::update_bndry(Bndry *Bc, int save){
     for(i = Je; i > 0; --i){
       Bc->bvert[2*i  ] = Bc->bvert[2*(i-1)];
       Bc->bvert[2*i+1] = Bc->bvert[2*(i-1)+1];
-      dcopy(l,Bc->bedge[0]+(i-1)*l,1,Bc->bedge[0]+i*l,1);
+      dcopy(l,Bc->bedge[0]+(i-1)*l,1,Bc->bedge[0]+i*l,1);    
     }
-  }
+  }    
 
   vector_def("x y",Bc->bstring);
   /* set top vertex */
   vector_set(1,&(vert[vnum(Bc->face,1)].x),&(vert[vnum(Bc->face,1)].y),
-       Bc->bvert+1);
+	     Bc->bvert+1);
   GetFaceCoord(Bc->face,&X);
   vector_set(qt,X.x,X.y,f);
-
+ 
   switch(Bc->type){
-  case 'V': case 'M':
+  case 'V': case 'M': 
     Bc->bvert[0] = f[0];
     JtransEdge(Bc,Bc->face,0,f);
     break;
@@ -925,12 +927,12 @@ void Tri::update_bndry(Bndry *Bc, int save){
   case 'B':
     if(type == 'u')
       break;
-  case 'F': case 'R':
+  case 'F': case 'R': 
     MakeFlux(Bc,Bc->face,f);
     break;
-  }
+  }  
   free(X.x);  free(X.y);  free(f);
-
+    
   return;
 }
 
@@ -939,12 +941,12 @@ void Quad::update_bndry(Bndry *Bc,int save){
   int     qt;
   double  *f;
   Coord   X;
-
+  
   if(Bc->face == 0 || Bc->face ==2)
     qt = qa;
-  else
+  else 
     qt = qb;
-
+  
   X.x = dvector(0,qt-1);
   X.y = dvector(0,qt-1);
 
@@ -958,19 +960,19 @@ void Quad::update_bndry(Bndry *Bc,int save){
     for(i = Je; i > 0; --i){
       Bc->bvert[2*i  ] = Bc->bvert[2*(i-1)];
       Bc->bvert[2*i+1] = Bc->bvert[2*(i-1)+1];
-      dcopy(l,Bc->bedge[0]+(i-1)*l,1,Bc->bedge[0]+i*l,1);
+      dcopy(l,Bc->bedge[0]+(i-1)*l,1,Bc->bedge[0]+i*l,1);    
     }
-  }
+  }    
 
   vector_def("x y",Bc->bstring);
   /* set top vertex */
   vector_set(1,&(vert[vnum(Bc->face,1)].x),&(vert[vnum(Bc->face,1)].y),
-       Bc->bvert+1);
+	     Bc->bvert+1);
   GetFaceCoord(Bc->face,&X);
-  vector_set(qt,X.x,X.y,f);
-
+  vector_set(qt,X.x,X.y,f);  
+ 
   switch(Bc->type){
-  case 'V': case 'M':
+  case 'V': case 'M': 
     Bc->bvert[0] = f[0];
     JtransEdge(Bc,Bc->face,0,f);
     break;
@@ -979,13 +981,13 @@ void Quad::update_bndry(Bndry *Bc,int save){
   case 'B':
     if(Bc->elmt->type == 'u')
       break;
-  case 'F': case 'R':
+  case 'F': case 'R': 
     MakeFlux(Bc,Bc->face,f);
     break;
   }
 
   free(X.x);  free(X.y);  free(f);
-
+    
   return;
 }
 
@@ -997,10 +999,10 @@ void Tet::update_bndry(Bndry *Bc, int save){
 
   if(fac == 0)
     qt = qa*qb;
-  else
+  else 
     if(fac == 1)
       qt = qa*qc;
-    else
+    else 
       qt = (qb+1)*qc;
 
   X.x = dvector(0,qt-1);
@@ -1009,10 +1011,10 @@ void Tet::update_bndry(Bndry *Bc, int save){
   f   = dvector(0,qt-1);
 
   vector_def("x y z",Bc->bstring);
-
+  
   GetFaceCoord(Bc->face,&X);
   vector_set(qt,X.x,X.y,X.z,f);
-
+  
   if(save){
     static int Je = iparam("INTYPE");
     int i,j,nfv,l;
@@ -1021,27 +1023,27 @@ void Tet::update_bndry(Bndry *Bc, int save){
     nfv = E->Nfverts(Bc->face);
     for(j = Je; j > 0; --j){
       for(i = 0; i < nfv; ++i)
-  Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
+	Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
 
       for(i = 0; i < nfv; ++i){
-  l = E->edge[E->ednum(Bc->face,i)].l;
-  dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
+	l = E->edge[E->ednum(Bc->face,i)].l;
+	dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
       }
-
+      
       l  =  Bc->elmt->face[Bc->face].l;
       l = l*(l+1)/2;
       dcopy(l,Bc->bface[0]+(j-1)*l,1,Bc->bface[0]+j*l,1);
     }
-  }
+  }    
 
   /* set singular point */
   vector_set(1,&(vert[vnum(fac,2)].x),&(vert[vnum(fac,2)].y),
-         &(vert[vnum(fac,2)].z),Bc->bvert+2);
-
+	       &(vert[vnum(fac,2)].z),Bc->bvert+2);
+  
   Tet::JtransFace(Bc,f);
 
   free(f);  free(X.x);  free(X.y);  free(X.z);
-
+    
   return;
 }
 
@@ -1064,7 +1066,7 @@ void Pyr::update_bndry(Bndry *Bc,int save){
   X.y = dvector(0,qt-1);
   X.z = dvector(0,qt-1);
   f   = dvector(0,qt-1);
-
+  
   if(save){
     static int Je = iparam("INTYPE");
     int i,j,nfv,l;
@@ -1073,13 +1075,13 @@ void Pyr::update_bndry(Bndry *Bc,int save){
     nfv = E->Nfverts(Bc->face);
     for(j = Je; j > 0; --j){
       for(i = 0; i < nfv; ++i)
-  Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
+	Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
 
       for(i = 0; i < nfv; ++i){
-  l = E->edge[E->ednum(Bc->face,i)].l;
-  dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
+	l = E->edge[E->ednum(Bc->face,i)].l;
+	dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
       }
-
+      
       l  =  Bc->elmt->face[Bc->face].l;
 
     l  =  Bc->elmt->face[Bc->face].l;
@@ -1089,15 +1091,15 @@ void Pyr::update_bndry(Bndry *Bc,int save){
       l = l*l;
     dcopy(l,Bc->bface[0]+(j-1)*l,1,Bc->bface[0]+j*l,1);
     }
-  }
+  }    
 
   vector_def("x y z",Bc->bstring);
-
+  
   for(i=0;i<Nfverts(Bc->face);++i)
     vector_set(1,&(vert[vnum(Bc->face,i)].x),
-           &(vert[vnum(Bc->face,i)].y),
-           &(vert[vnum(Bc->face,i)].z),Bc->bvert+i);
-
+	         &(vert[vnum(Bc->face,i)].y),
+	         &(vert[vnum(Bc->face,i)].z),Bc->bvert+i);
+  
   GetFaceCoord(Bc->face,&X);
   vector_set(qt,X.x,X.y,X.z,f);
 
@@ -1106,7 +1108,7 @@ void Pyr::update_bndry(Bndry *Bc,int save){
   Pyr::JtransFace(Bc,tmp);
 
   free(tmp); free(X.x);free(X.y);free(X.z);free(f);
-
+   
   return;
 }
 
@@ -1139,13 +1141,13 @@ void Prism::update_bndry(Bndry *Bc, int save){
     nfv = E->Nfverts(Bc->face);
     for(j = Je; j > 0; --j){
       for(i = 0; i < nfv; ++i)
-  Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
+	Bc->bvert[j*nfv+i] = Bc->bvert[(j-1)*nfv+i];
 
       for(i = 0; i < nfv; ++i){
-  l = E->edge[E->ednum(Bc->face,i)].l;
-  dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
+	l = E->edge[E->ednum(Bc->face,i)].l;
+	dcopy(l,Bc->bedge[i]+(j-1)*l,1,Bc->bedge[i]+j*l,1);
       }
-
+      
       l  =  Bc->elmt->face[Bc->face].l;
 
     l  =  Bc->elmt->face[Bc->face].l;
@@ -1155,15 +1157,15 @@ void Prism::update_bndry(Bndry *Bc, int save){
       l = l*l;
     dcopy(l,Bc->bface[0]+(j-1)*l,1,Bc->bface[0]+j*l,1);
     }
-  }
+  }    
 
   vector_def("x y z",Bc->bstring);
-
+  
   for(i=0;i<Nfverts(Bc->face);++i)
     vector_set(1,&(vert[vnum(Bc->face,i)].x),
-         &(vert[vnum(Bc->face,i)].y),
-         &(vert[vnum(Bc->face,i)].z),Bc->bvert+i);
-
+	       &(vert[vnum(Bc->face,i)].y),
+	       &(vert[vnum(Bc->face,i)].z),Bc->bvert+i);
+  
   GetFaceCoord(Bc->face,&X);
   vector_set(qt,X.x,X.y,X.z,f);
 
@@ -1172,7 +1174,7 @@ void Prism::update_bndry(Bndry *Bc, int save){
   Prism::JtransFace(Bc,tmp);
 
   free(tmp); free(X.x);free(X.y);free(X.z); free(f);
-
+   
   return;
 }
 
@@ -1195,7 +1197,7 @@ void Hex::update_bndry(Bndry *Bc, int save){
   f   = dvector(0,qt-1);
 
   vector_def("x y z",Bc->bstring);
-
+  
   GetFaceCoord(Bc->face,&X);
   vector_set(qt,X.x,X.y,X.z,f);
 
@@ -1215,7 +1217,7 @@ void Hex::update_bndry(Bndry *Bc, int save){
     l = l*l;
 
     dcopy(l,Bc->bface[0],1,Bc->bface[0]+l,1);
-  }
+  }    
 
   Hex::JtransFace(Bc,f);
 
@@ -1226,17 +1228,17 @@ void Hex::update_bndry(Bndry *Bc, int save){
 
 void Element::update_bndry(Bndry *, int){ERR;}
 
-/*
+/* 
 
 Function name: Element::setbcs
 
 Function Purpose:
 
 Argument 1: Bndry *Ubc
-Purpose:
+Purpose: 
 
 Argument 2: double *bc
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -1244,17 +1246,17 @@ Function Notes:
 
 void Tri::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
-     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
+     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' || 
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o' && Ubc->type != 's')
       ? dparam("BNDTIMEFCE"): 1.0;
     int     fac = Ubc->face;
     for(int i = 0; i < 2; ++i){
       if(!vert[vnum(fac,i)].solve)
-  bc[vert[vnum(fac,i)].gid] = scal*Ubc->bvert[i];
+	bc[vert[vnum(fac,i)].gid] = scal*Ubc->bvert[i];
     }
-    if(edge[fac].l)
+    if(edge[fac].l) 
       dsmul(edge[fac].l,scal,Ubc->bedge[0],1,edge[fac].hj,1);
   }
 }
@@ -1266,15 +1268,15 @@ void Quad::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
      Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o' && Ubc->type != 's')
       ? dparam("BNDTIMEFCE"): 1.0;
     int     fac = Ubc->face;
     for(int i = 0; i < 2; ++i){
       if(!vert[vnum(fac,i)].solve)
-  bc[vert[vnum(fac,i)].gid] = scal*Ubc->bvert[i];
+	bc[vert[vnum(fac,i)].gid] = scal*Ubc->bvert[i];
     }
-    if(edge[fac].l)
+    if(edge[fac].l) 
       dsmul(edge[fac].l,scal,Ubc->bedge[0],1,edge[fac].hj,1);
   }
 }
@@ -1284,9 +1286,9 @@ void Quad::setbcs(Bndry *Ubc,double *bc){
 
 void Tet::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
-     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
+     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' || 
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o')? dparam("BNDTIMEFCE"): 1.0;
     int    fac  = Ubc->face, i,j;
     Vert *v;    Edge *e;    Face *f;
@@ -1295,7 +1297,7 @@ void Tet::setbcs(Bndry *Ubc,double *bc){
     for(i = 0; i < Nverts-1; ++i){
       v = vert + vnum(fac,i);
       if(!v->solve)
-  bc[v->gid] = scal*Ubc->bvert[i];
+	bc[v->gid] = scal*Ubc->bvert[i];
     }
 
     for(i = 0; i < Nfverts(fac); ++i){
@@ -1303,10 +1305,10 @@ void Tet::setbcs(Bndry *Ubc,double *bc){
       dcopy(e->l,Ubc->bedge[i],1,e->hj,1); /* need for single boundary */
       con = e->con;
       for(e = e->base;e;e = e->link)
-  if(e->l){
-    dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
-    if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1;
-  }
+	if(e->l){
+	  dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
+	  if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1;
+	}
     }
     f = face + fac;
     if(f->l) dsmul(f->l*(f->l+1)/2, scal, *Ubc->bface, 1, *f->hj ,1);
@@ -1318,9 +1320,9 @@ void Tet::setbcs(Bndry *Ubc,double *bc){
 
 void Pyr::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
-     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
+     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' || 
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o')? dparam("BNDTIMEFCE"): 1.0;
     int    fac  = Ubc->face, i,j;
     Vert *v;    Edge *e;    Face *f;
@@ -1329,7 +1331,7 @@ void Pyr::setbcs(Bndry *Ubc,double *bc){
     for(i = 0; i < Nfverts(fac); ++i){
       v = vert + vnum(fac,i);
       if(!v->solve)
-  bc[v->gid] = scal*Ubc->bvert[i];
+	bc[v->gid] = scal*Ubc->bvert[i];
     }
 
     for(i = 0; i < Nfverts(fac); ++i){
@@ -1337,17 +1339,17 @@ void Pyr::setbcs(Bndry *Ubc,double *bc){
       dcopy(e->l,Ubc->bedge[i],1,e->hj,1); /* need for single boundary */
       con = e->con;
       for(e = e->base;e;e = e->link)
-  if(e->l){
-    dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
-    if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
-  }
+	if(e->l){
+	  dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
+	  if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
+	}
     }
     f = face + fac;
     if(f->l)
       if(Nfverts(fac) == 4)
-  dsmul(f->l*f->l, scal, *Ubc->bface, 1, *f->hj ,1);
+	dsmul(f->l*f->l, scal, *Ubc->bface, 1, *f->hj ,1);
       else
-  dsmul(f->l*(f->l+1)/2, scal, *Ubc->bface, 1, *f->hj ,1);
+	dsmul(f->l*(f->l+1)/2, scal, *Ubc->bface, 1, *f->hj ,1);
   }
 }
 
@@ -1356,9 +1358,9 @@ void Pyr::setbcs(Bndry *Ubc,double *bc){
 
 void Prism::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
-     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
+     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' || 
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o')? dparam("BNDTIMEFCE"): 1.0;
     int    fac  = Ubc->face, i,j;
     Vert *v;    Edge *e;    Face *f;
@@ -1367,7 +1369,7 @@ void Prism::setbcs(Bndry *Ubc,double *bc){
     for(i = 0; i < Nfverts(fac); ++i){
       v = vert + vnum(fac,i);
       if(!v->solve)
-  bc[v->gid] = scal*Ubc->bvert[i];
+	bc[v->gid] = scal*Ubc->bvert[i];
     }
 
     for(i = 0; i < Nfverts(fac); ++i){
@@ -1375,17 +1377,17 @@ void Prism::setbcs(Bndry *Ubc,double *bc){
       dcopy(e->l,Ubc->bedge[i],1,e->hj,1); /* need for single boundary */
       con = e->con;
       for(e = e->base;e;e = e->link)
-  if(e->l){
-    dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
-    if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
-  }
+	if(e->l){
+	  dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
+	  if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
+	}
     }
     f = face + fac;
     if(f->l)
       if(Nfverts(fac) == 4)
-  dsmul(f->l*f->l, scal, *Ubc->bface, 1, *f->hj ,1);
+	dsmul(f->l*f->l, scal, *Ubc->bface, 1, *f->hj ,1);
       else
-  dsmul(f->l*(f->l+1)/2, scal, *Ubc->bface, 1, *f->hj ,1);
+	dsmul(f->l*(f->l+1)/2, scal, *Ubc->bface, 1, *f->hj ,1);
   }
 }
 
@@ -1394,9 +1396,9 @@ void Prism::setbcs(Bndry *Ubc,double *bc){
 
 void Hex::setbcs(Bndry *Ubc,double *bc){
   if(Ubc->type == 'W' || Ubc->type == 'V' || Ubc->type == 'M' ||
-     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' ||
+     Ubc->type == 'v' || Ubc->type == 'o' || Ubc->type == 'm' || 
      Ubc->type == 's' || (Ubc->type == 'B' && type == 'u')){
-
+    
     double scal = (Ubc->type != 'o')? dparam("BNDTIMEFCE"): 1.0;
     int    fac  = Ubc->face, i,j;
     Vert *v;    Edge *e;    Face *f;
@@ -1405,7 +1407,7 @@ void Hex::setbcs(Bndry *Ubc,double *bc){
     for(i = 0; i < Nfverts(fac); ++i){
       v = vert + vnum(fac,i);
       if(!v->solve)
-  bc[v->gid] = scal*Ubc->bvert[i];
+	bc[v->gid] = scal*Ubc->bvert[i];
     }
 
     for(i = 0; i < Nfverts(fac); ++i){
@@ -1413,10 +1415,10 @@ void Hex::setbcs(Bndry *Ubc,double *bc){
       dcopy(e->l,Ubc->bedge[i],1,e->hj,1); /* need for single boundary */
       con = e->con;
       for(e = e->base;e;e = e->link)
-  if(e->l){
-    dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
-    if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
-  }
+	if(e->l){
+	  dsmul(e->l,scal,Ubc->bedge[i],1,e->hj,1);
+	  if(e->con!=con) for(j=1;j<e->l;j+=2) e->hj[j] *= -1.0;
+	}
     }
     f = face + fac;
     if(f->l) dsmul(f->l*f->l, scal, *Ubc->bface, 1, *f->hj ,1);
@@ -1431,14 +1433,14 @@ void Element::setbcs(Bndry *,double *){ERR;}
 
 
 
-/*
+/* 
 
 Function name: Element::Add_flux_terms
 
 Function Purpose:
 
 Argument 1: Bndry *Ebc
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -1450,7 +1452,7 @@ void Tri::Add_flux_terms(Bndry *Ebc){
     int fac = Ebc->face;
     for(int i = 0; i < Tri_DIM; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     dvadd(edge[fac].l, Ebc->bedge[0], 1, edge[fac].hj, 1, edge[fac].hj, 1);
   }
 }
@@ -1464,7 +1466,7 @@ void Quad::Add_flux_terms(Bndry *Ebc){
     int fac = Ebc->face;
     for(int i = 0; i < Quad_DIM; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     dvadd(edge[fac].l, Ebc->bedge[0], 1, edge[fac].hj, 1, edge[fac].hj, 1);
   }
 }
@@ -1482,7 +1484,7 @@ void Tet::Add_flux_terms(Bndry *Ebc){
     int fac = Ebc->face;
     for(i = 0; i < Nfverts(fac) ; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     for(i = 0; i < Nfverts(fac); ++i){
       e   = edge+ednum(fac,i);
       dvadd(e->l, Ebc->bedge[i], 1, e->hj, 1, e->hj, 1);
@@ -1505,18 +1507,18 @@ void Pyr::Add_flux_terms(Bndry *Ebc){
 
     for(i = 0; i < nfv ; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     for(i = 0; i < nfv; ++i){
       e   = edge+ednum(fac,i);
       dvadd(e->l, Ebc->bedge[i], 1, e->hj, 1, e->hj, 1);
     }
-
+    
     f = face + fac;
     if(f->l)
       if(nfv == 3)
-  dvadd(f->l*(f->l+1)/2, *Ebc->bface, 1, *f->hj, 1, *f->hj, 1);
+	dvadd(f->l*(f->l+1)/2, *Ebc->bface, 1, *f->hj, 1, *f->hj, 1);
       else
-        dvadd(f->l*f->l,       *Ebc->bface, 1, *f->hj, 1, *f->hj, 1);
+      	dvadd(f->l*f->l,       *Ebc->bface, 1, *f->hj, 1, *f->hj, 1);
   }
 }
 
@@ -1527,18 +1529,18 @@ void Prism::Add_flux_terms(Bndry *Ebc){
   if(Ebc->type == 'F' || Ebc->type == 'R'){
     Edge *e;
     Face *f;
-
+    
     int fac = Ebc->face;
     int nfv = Nfverts(fac), i;
 
     for(i = 0; i < nfv ; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     for(i = 0; i < nfv; ++i){
       e   = edge+ednum(fac,i);
       dvadd(e->l, Ebc->bedge[i], 1, e->hj, 1, e->hj, 1);
     }
-
+    
     f = face + fac;
     i = (nfv == 3) ? f->l*(f->l+1)/2 : f->l*f->l;
     if(i)
@@ -1556,15 +1558,15 @@ void Hex::Add_flux_terms(Bndry *Ebc){
   if(Ebc->type == 'F' || Ebc->type == 'R'){
     int fac = Ebc->face;
     int nfv = Nfverts(fac), i;
-
+    
     for(i = 0; i < nfv ; ++i)
       vert[vnum(fac,i)].hj[0] += Ebc->bvert[i];
-
+    
     for(i = 0; i < nfv; ++i){
       e   = edge+ednum(fac,i);
       dvadd(e->l, Ebc->bedge[i], 1, e->hj, 1, e->hj, 1);
     }
-
+    
     f = face + fac;
     if(f->l)
       dvadd(f->l*f->l, *Ebc->bface, 1, *f->hj, 1, *f->hj, 1);
@@ -1579,20 +1581,20 @@ void Element::Add_flux_terms(Bndry *){ERR;}
 
 
 
-/*
+/* 
 
 Function name: Element::MakeFlux
 
 Function Purpose:
 
 Argument 1: Bndry *B
-Purpose:
+Purpose: 
 
 Argument 2: int iface
-Purpose:
+Purpose: 
 
 Argument 3: double *f
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -1610,27 +1612,27 @@ void Tri::MakeFlux(Bndry *B, int iface, double *f){
   tmp = dvector(0,qa-1);
   fi  = dvector(0,qa-1);
   getzw(qa,&wa,&wa,'a');
-
+  
   m   = Base->edge[0];
-
+  
   InterpToFace1(iface, f, fi);
-
+  
   if(curve)
     dvmul(qa,B->sjac.p,1,fi,1,fi,1);
   else
     dscal(qa,B->sjac.d,fi,1);
-
+  
   /* calculate inner product over surface */
   dvmul(qa,Base->vert[0].a,1,wa,1,tmp,1);
   B->bvert[0] = ddot(qa,tmp,1,fi,1);
   dvmul(qa,Base->vert[1].a,1,wa,1,tmp,1);
   B->bvert[1] = ddot(qa,tmp,1,fi,1);
-
+  
   for(i = 0; i < L; ++i){
     dvmul(qa,m[i].a,1,wa,1,tmp,1);
     B->bedge[0][i] = ddot(qa,tmp,1,fi,1);
   }
-
+  
   free(tmp);
   free(fi);
 }
@@ -1649,24 +1651,24 @@ void Quad::MakeFlux(Bndry *B, int iface, double *f){
   tmp = dvector(0,qa-1);
   fi  = dvector(0,qa-1);
   getzw(qa,&wa,&wa,'a');
-
+  
   m   = Base->edge[0];
-
+  
   InterpToFace1(iface, f, fi);
-
+  
   dvmul(qa,B->sjac.p,1,fi,1,fi,1);
-
+  
   /* calculate inner product over surface */
   dvmul(qa,Base->vert[0].a,1,wa,1,tmp,1);
   B->bvert[0] = ddot(qa,tmp,1,fi,1);
   dvmul(qa,Base->vert[1].a,1,wa,1,tmp,1);
   B->bvert[1] = ddot(qa,tmp,1,fi,1);
-
+  
   for(i = 0; i < L; ++i){
     dvmul(qa,m[i].a,1,wa,1,tmp,1);
     B->bedge[0][i] = ddot(qa,tmp,1,fi,1);
   }
-
+  
   free(tmp); free(fi);
 }
 
@@ -1702,7 +1704,7 @@ void Tet::MakeFlux(Bndry *B, int iface, double *f){
     dvmul(qb,wb,1,tmp1,1,tmp1,1);
     B->bvert[i] = ddot(qb,m->b,1,tmp1,1);
   }
-
+  
   /* Weak flux of edges */
   for(i = 0; i < Nfverts(fac); ++i){
     l = B->elmt->edge[ednum(fac,i)].l;
@@ -1714,21 +1716,21 @@ void Tet::MakeFlux(Bndry *B, int iface, double *f){
       B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
     }
   }
-
+    
   /* Weak flux of interior face modes */
-  l  = B->elmt->face[fac].l;
+  l  = B->elmt->face[fac].l;  
   s  = B->bface;
   m1 = Base->face[0];
   for(i = 0; i < l; ++i){
     dvmul(qa-2,wa+1,1,m1[i][0].a+1,1,tmp,1);
     for(j = 1; j < qb; ++j) tmp1[j-1] = ddot(qa-2,tmp,1,f+qa*j+1,1);
-
+    
     dvmul(qb-1,wb+1,1,tmp1,1,tmp1,1);
     for(j = 0; j < l-i; ++j)
       s[i][j] = ddot(qb-1,m1[i][j].b+1,1,tmp1,1);
   }
 
-  free(tmp1); free(tmp); // free(f);
+  free(tmp1); free(tmp); // free(f); 
 }
 
 
@@ -1748,83 +1750,83 @@ void Pyr::MakeFlux(Bndry *B, int iface, double *f){
   //   fi   = dvector(0,QGmax*QGmax-1);
 
   //  InterpToFace1(iface, f, fi);
-
+  
   if(Nfverts(fac) == 4){
     getzw(qa,&wa,&wa,'a');
     getzw(qb,&wb,&wb,'a');
-
+    
     dvmul(qa*qb,B->sjac.p,1,f,1,f,1);
 
     for(j = 0; j < qb; ++j) dvmul(qa, wa, 1, f+j*qa, 1, f+j*qa, 1);
     for(j = 0; j < qb; ++j) dscal(qa, wb[j], f+j*qa, 1);
-
+      
     /* Weak flux of vertices */
     for(i = 0; i < Nfverts(fac); ++i){
       m = Base->vert+i;
-
+      
       for(j = 0; j < qb; ++j) tmp1[j] = ddot(qa,m->a,1,f+qa*j,1);
       B->bvert[i] = ddot(qb,m->b,1,tmp1,1);
     }
-
+    
     /* Weak flux of edges */
     for(i = 0; i < Nfverts(fac); ++i){
       l = B->elmt->edge[ednum(fac,i)].l;
       m = Base->edge[i];
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+qa*k,1);
-  B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
+	for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+qa*k,1);
+	B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
       }
     }
-
+    
     /* Weak flux of interior face modes */
-    l  = B->elmt->face[fac].l;
+    l  = B->elmt->face[fac].l;  
     s  = B->bface;
     m1 = Base->face[0];
     for(i = 0; i < l; ++i)
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
-  s[i][j] = ddot(qb,m1[i][j].b,1,tmp1,1);
+	for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
+	s[i][j] = ddot(qb,m1[i][j].b,1,tmp1,1);
       }
   }
   else{
     getzw(qa,&wa,&wa,'a');
     getzw(qc,&wc,&wc,'c');
-
+    
     dvmul(qa*qc,B->sjac.p,1,f,1,f,1);
-
+    
     for(j = 0; j < qc; ++j) dvmul(qa, wa, 1, f+j*qa, 1, f+j*qa, 1);
     for(j = 0; j < qc; ++j) dscal(qa, wc[j], f+j*qa, 1);
-
+  
     /* Weak flux of vertices */
     for(i = 0; i < Nfverts(fac); ++i){
       m = Base->vert+vnum(fac,i);
-
+      
       for(j = 0; j < qc; ++j) tmp1[j] = ddot(qa,m->a,1,f+qa*j,1);
       B->bvert[i] = ddot(qc,m->c,1,tmp1,1);
     }
-
+    
     /* Weak flux of edges */
     for(i = 0; i < Nfverts(fac); ++i){
       l = B->elmt->edge[ednum(fac,i)].l;
       m = Base->edge[ednum(fac,i)];
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+k*qa,1);
-  B->bedge[i][j] = ddot(qc,m[j].c,1,tmp1,1);
+	for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+k*qa,1);
+	B->bedge[i][j] = ddot(qc,m[j].c,1,tmp1,1);
       }
     }
-
+    
     /* Weak flux of interior face modes */
-    l  = B->elmt->face[fac].l;
+    l  = B->elmt->face[fac].l;  
     s  = B->bface;
     m1 = Base->face[1];
     for(i = 0; i < l; ++i)
       for(j = 0; j < l-i; ++j){
-  for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
-  s[i][j] = ddot(qc,m1[i][j].c,1,tmp1,1);
+	for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
+	s[i][j] = ddot(qc,m1[i][j].c,1,tmp1,1);
       }
   }
-
-  free(tmp1); free(tmp); // free(fi);
+  
+  free(tmp1); free(tmp); // free(fi); 
 }
 
 
@@ -1850,33 +1852,33 @@ void Prism::MakeFlux(Bndry *B, int iface, double *f){
 
     for(j = 0; j < qb; ++j) dvmul(qa, wa, 1, f+j*qa, 1, f+j*qa, 1);
     for(j = 0; j < qb; ++j) dscal(qa, wb[j], f+j*qa, 1);
-
+      
     /* Weak flux of vertices */
     for(i = 0; i < Nfverts(fac); ++i){
       m = Base->vert+i;
-
+      
       for(j = 0; j < qb; ++j) tmp1[j] = ddot(qa,m->a,1,f+qa*j,1);
       B->bvert[i] = ddot(qb,m->b,1,tmp1,1);
     }
-
+    
     /* Weak flux of edges */
     for(i = 0; i < Nfverts(fac); ++i){
       l = B->elmt->edge[ednum(fac,i)].l;
       m = Base->edge[i];
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+qa*k,1);
-  B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
+	for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+qa*k,1);
+	B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
       }
     }
-
+    
     /* Weak flux of interior face modes */
-    l  = B->elmt->face[fac].l;
+    l  = B->elmt->face[fac].l;  
     s  = B->bface;
     m1 = Base->face[0];
     for(i = 0; i < l; ++i)
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
-  s[i][j] = ddot(qb,m1[i][j].b,1,tmp1,1);
+	for(k = 0; k < qb; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
+	s[i][j] = ddot(qb,m1[i][j].b,1,tmp1,1);
       }
   }
   else{
@@ -1884,10 +1886,10 @@ void Prism::MakeFlux(Bndry *B, int iface, double *f){
     getzw(qc,&wc,&wc,'b');
 
     dvmul(qa*qc,B->sjac.p,1,f,1,f,1);
-
+    
     for(j = 0; j < qc; ++j) dvmul(qa, wa, 1, f+j*qa, 1, f+j*qa, 1);
     for(j = 0; j < qc; ++j) dscal(qa, wc[j], f+j*qa, 1);
-
+  
     /* Weak flux of vertices */
     for(i = 0; i < nfv; ++i){
       m = Base->vert+vnum(fac,i);
@@ -1895,25 +1897,25 @@ void Prism::MakeFlux(Bndry *B, int iface, double *f){
       for(j = 0; j < qc; ++j) tmp1[j] = ddot(qa,m->a,1,f+qa*j,1);
       B->bvert[i] = ddot(qc,m->c,1,tmp1,1);
     }
-
+    
     /* Weak flux of edges */
     for(i = 0; i < nfv; ++i){
       l = B->elmt->edge[ednum(fac,i)].l;
       m = Base->edge[ednum(fac,i)];
       for(j = 0; j < l; ++j){
-  for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+k*qa,1);
-  B->bedge[i][j] = ddot(qc,m[j].c,1,tmp1,1);
+	for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m[j].a,1,f+k*qa,1);
+	B->bedge[i][j] = ddot(qc,m[j].c,1,tmp1,1);
       }
     }
-
+    
     /* Weak flux of interior face modes */
-    l  = B->elmt->face[fac].l;
+    l  = B->elmt->face[fac].l;  
     s  = B->bface;
     m1 = Base->face[1];
     for(i = 0; i < l; ++i)
       for(j = 0; j < l-i; ++j){
-  for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
-  s[i][j] = ddot(qc,m1[i][j].c,1,tmp1,1);
+	for(k = 0; k < qc; ++k) tmp1[k] = ddot(qa,m1[i][j].a,1,f+qa*k,1);
+	s[i][j] = ddot(qc,m1[i][j].c,1,tmp1,1);
       }
   }
 
@@ -1938,22 +1940,22 @@ void Hex::MakeFlux(Bndry *B, int iface, double *f){
 
   getzw(qa,&wa,&wa,'a');
   getzw(qb,&wb,&wb,'a');
-
+  
   //  InterpToFace1(iface, f, fi);
 
   dvmul(qa*qb,B->sjac.p,1,f,1,f,1);
 
   for(j = 0; j < qb; ++j) dvmul(qa, wa, 1, f+j*qa, 1, f+j*qa, 1);
   for(j = 0; j < qb; ++j) dscal(qa, wb[j], f+j*qa, 1);
-
+  
   /* Weak flux of vertices */
   for(i = 0; i < Nfverts(fac); ++i){
     m = Base->vert+i;
-
+    
     for(j = 0; j < qb; ++j) tmp1[j] = ddot(qa,m->a,1,f+qa*j,1);
     B->bvert[i] = ddot(qb,m->b,1,tmp1,1);
   }
-
+  
   /* Weak flux of edges */
   for(i = 0; i < Nfverts(fac); ++i){
     l = B->elmt->edge[ednum(fac,i)].l;
@@ -1963,9 +1965,9 @@ void Hex::MakeFlux(Bndry *B, int iface, double *f){
       B->bedge[i][j] = ddot(qb,m[j].b,1,tmp1,1);
     }
   }
-
+  
   /* Weak flux of interior face modes */
-  l  = B->elmt->face[fac].l;
+  l  = B->elmt->face[fac].l;  
   s  = B->bface;
   m1 = Base->face[0];
   for(i = 0; i < l; ++i)
@@ -1974,7 +1976,7 @@ void Hex::MakeFlux(Bndry *B, int iface, double *f){
       s[i][j] = ddot(qb,m1[i][j].b,1,tmp1,1);
     }
 
-  free(tmp1); free(tmp);  // free(fi);
+  free(tmp1); free(tmp);  // free(fi); 
 }
 
 
@@ -1984,20 +1986,20 @@ void Element::MakeFlux(Bndry *, int , double *){ERR;}
 
 
 
-/*
+/* 
 
 Function name: Element::Add_Surface_Contrib
 
 Function Purpose:
 
 Argument 1: Element *Ef
-Purpose:
+Purpose: 
 
 Argument 2: double *in
-Purpose:
+Purpose: 
 
 Argument 3: char dir
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -2013,7 +2015,7 @@ void Tri::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg){
 }
 
 void Tri::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
-            int invjac){
+			      int invjac){
   int      qedga,qedgb,i;
   Element *E = this;
   double   *za,*zb,*wa,*wb;
@@ -2022,14 +2024,14 @@ void Tri::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
   double *f  = Tri_wk.get();
   double *fi = f+QGmax;
 
-  getzw(qa,&za,&wa,'a');
+  getzw(qa,&za,&wa,'a'); 
   getzw(qb,&zb,&wb,'b');
 
   if((edg == 0)|| (edg == -1)){
     /* add surface contribition of edge 1 */
     qedga = edge[0].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 1 and multiply by edge Jacobian/face Jacobian */
     dvsub(qedga,Ef->edge[0].h,1,E->edge[0].h,1,f,1);
     dvmul(qedga,E->edge[0].jac,1,f,1,f,1);
@@ -2037,90 +2039,90 @@ void Tri::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->x[i];
+	f[i] *= E->edge[0].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->y[i];
-
+	f[i] *= E->edge[0].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     dscal(qa,1.0/wb[0],fi,1);
 
-    if(invjac == 0) // divide by area Jacobian
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
       else
-  dscal(qa,1/geom->jac.d,fi,1);
-
+	dscal(qa,1/geom->jac.d,fi,1);    
+      
     /* add to Ef physical mode storage */
     dvadd(qa,fi,1,in,1,in,1);
   }
-
+     
   if((edg == 1|| edg == -1)){
     /* add surface contribition of edge 2 */
     qedgb = E->edge[1].qedg;
     getim(qedgb,qb,&imb,g2b);
-
+    
     /* gather edge 2 and multiply by jacobian */
     dvsub(qedgb,Ef->edge[1].h,1,E->edge[1].h,1,f,1);
     dvmul(qedgb,E->edge[1].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->x[i];
+	f[i] *= E->edge[1].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->y[i];
-
+	f[i] *= E->edge[1].norm->y[i];
+    
     /* interpolate to guass-radau points */
     Interp(*imb,f,qedgb,fi,qb);
-
+  
     for(i = 0; i < qb; ++i)
       f[i] = fi[i]*two/(wa[qa-1]*(one-zb[i]));
-
-    if(invjac == 0) // divide by area Jacobian
+  
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,f,1,geom->jac.p+qa-1,qa,f,1);
+	dvdiv(qa,f,1,geom->jac.p+qa-1,qa,f,1);
       else
-  dscal(qb,1/geom->jac.d,f,1);
+	dscal(qb,1/geom->jac.d,f,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qb,f,1,in + qa-1,qa,in + qa-1,qa);
   }
-
-
+     
+    
   if((edg == 2|| edg == -1)){
     /* add surface contribition of edge 3 */
     qedgb = E->edge[2].qedg;
     getim(qedgb,qb,&imb,g2b);
-
+  
     /* gather edge 3 and multiply by jacobian */
     dvsub(qedgb,Ef->edge[2].h,1,E->edge[2].h,1,f,1);
     dvmul(qedgb,E->edge[2].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[2].norm->x[i];
+	f[i] *= E->edge[2].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[2].norm->y[i];
-
+	f[i] *= E->edge[2].norm->y[i];
+    
     /* interpolate to guass-radau points */
     Interp(*imb,f,qedgb,fi,qb);
 
 
     for(i = 0; i < qb; ++i)
       f[i] = fi[i]*two/(wa[0]*(one-zb[i]));
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,f,1,geom->jac.p,qa,f,1);
+	dvdiv(qa,f,1,geom->jac.p,qa,f,1);
       else
-  dscal(qb,1/geom->jac.d,f,1);
+	dscal(qb,1/geom->jac.d,f,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qb,f,1,in,qa,in,qa);
@@ -2130,9 +2132,9 @@ void Tri::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
 }
 
 
-/* Add surface value stored in edge[edg].h into vector in so that
-   on taking the inner product you calculate both the function and its
-   flux
+/* Add surface value stored in edge[edg].h into vector in so that 
+   on taking the inner product you calculate both the function and its 
+   flux 
 
    if edg = -1 then all edges are evaluated
 */
@@ -2150,105 +2152,105 @@ void Tri::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
   double *f  = Tri_wk.get();
   double *fi = f+QGmax;
 
-  getzw(qa,&za,&wa,'a');
+  getzw(qa,&za,&wa,'a'); 
   getzw(qb,&zb,&wb,'b');
 
   if((edg == 0)|| (edg == -1)){
     /* add surface contribition of edge 1 */
     qedga = edge[0].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 1 and ultiply by edge Jacobian/face Jacobian */
     dcopy(qedga,E->edge[0].h,1,f,1);
     dvmul(qedga,E->edge[0].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->x[i];
+	f[i] *= E->edge[0].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->y[i];
-
+	f[i] *= E->edge[0].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     dscal(qa,1.0/wb[0],fi,1);
 
-    if(invjac == 0) // divide by area Jacobian
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
       else
-  dscal(qa,1/geom->jac.d,fi,1);
+	dscal(qa,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qa,fi,1,in,1,in,1);
   }
-
+     
   if((edg == 1|| edg == -1)){
     /* add surface contribition of edge 2 */
     qedgb = E->edge[1].qedg;
     getim(qedgb,qb,&imb,g2b);
-
+    
     /* gather edge 2 and multiply by jacobian */
     dcopy(qedgb,E->edge[1].h,1,f,1);
     dvmul(qedgb,E->edge[1].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->x[i];
+	f[i] *= E->edge[1].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->y[i];
-
+	f[i] *= E->edge[1].norm->y[i];
+    
     /* interpolate to guass-radau points */
     Interp(*imb,f,qedgb,fi,qb);
-
+  
     for(i = 0; i < qb; ++i)
       f[i] = fi[i]*two/(wa[qa-1]*(one-zb[i]));
 
-    if(invjac == 0) // divide by area Jacobian
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,f,1,geom->jac.p+qa-1,qa,f,1);
+	dvdiv(qa,f,1,geom->jac.p+qa-1,qa,f,1);
       else
-  dscal(qb,1/geom->jac.d,f,1);
-
+	dscal(qb,1/geom->jac.d,f,1);    
+  
     /* add to Ef physical mode storage */
     dvadd(qb,f,1,in + qa-1,qa,in + qa-1,qa);
   }
-
-
+     
+    
   if((edg == 2|| edg == -1)){
     /* add surface contribition of edge 3 */
     qedgb = E->edge[2].qedg;
     getim(qedgb,qb,&imb,g2b);
-
+  
     /* gather edge 3 and multiply by jacobian */
     dcopy(qedgb,E->edge[2].h,1,f,1);
     dvmul(qedgb,E->edge[2].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[2].norm->x[i];
+	f[i] *= E->edge[2].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[2].norm->y[i];
-
+	f[i] *= E->edge[2].norm->y[i];
+    
     /* interpolate to guass-radau points */
     Interp(*imb,f,qedgb,fi,qb);
 
     for(i = 0; i < qb; ++i)
       f[i] = fi[i]*two/(wa[0]*(one-zb[i]));
 
-    if(invjac == 0) // divide by area Jacobian
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,f,1,geom->jac.p,qa,f,1);
+	dvdiv(qa,f,1,geom->jac.p,qa,f,1);
       else
-  dscal(qb,1/geom->jac.d,f,1);
-
+	dscal(qb,1/geom->jac.d,f,1);    
+    
     /* add to Ef physical mode storage */
     dvadd(qb,f,1,in,qa,in,qa);
   }
@@ -2257,7 +2259,7 @@ void Tri::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
 
 
 static double Quad_Penalty_Fac = 1.;
-
+  
 void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir){
   Add_Surface_Contrib(Ef,in,dir,-1,1);
 }
@@ -2266,48 +2268,48 @@ void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg){
   Add_Surface_Contrib(Ef,in,dir,-1,1);
 }
 
-void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
-             int invjac){
+void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg, 
+			       int invjac){
   int      qedga,qedgb,i;
   Element *E = this;
   double   *za,*zb,*wa,*wb;
   double   **ima, **imb;
-
+ 
   double *f  = Quad_wk;
   double *fi = Quad_wk+QGmax;
-
+  
   getzw(qa,&za,&wa,'a'); // ok
   getzw(qb,&zb,&wb,'a'); // ok
-
+    
   if((edg == 0|| edg == -1)){
     /* add surface contribition of edge 1 */
     qedga = E->edge[0].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 1 and multiply by jacobian */
     dvsub(qedga,Ef->edge[0].h,1,E->edge[0].h,1,f,1);
     dvmul(qedga,E->edge[0].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->x[i];
+	f[i] *= E->edge[0].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->y[i];
-
+	f[i] *= E->edge[0].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     //  dscal(qa,1.0/wb[0],fi,1);
     dscal(qa,Quad_Penalty_Fac/wb[0],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
+	dscal(qb,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qa,fi,1,in,1,in,1);
@@ -2317,34 +2319,34 @@ void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
     /* add surface contribition of edge 3 */
     qedga = E->edge[2].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 3 and multiply by jacobian */
     dvsub(qedga,Ef->edge[2].h,1,E->edge[2].h,1,f,1);
     dvmul(qedga,E->edge[2].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[2].norm->x[i];
+	f[i] *= E->edge[2].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
       f[i] *= E->edge[2].norm->y[i];
-
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     //  dscal(qa,1.0/wb[qb-1],fi,1);
     dscal(qa,Quad_Penalty_Fac/wb[qb-1],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p+qa*(qb-1),1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p+qa*(qb-1),1,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
+	dscal(qb,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
-    dvadd(qa,fi,1,in+qa*(qb-1),1,in+qa*(qb-1),1);
+    dvadd(qa,fi,1,in+qa*(qb-1),1,in+qa*(qb-1),1);    
   }
     // ---------------------------------------------
 
@@ -2352,32 +2354,32 @@ void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
     /* add surface contribition of edge 2 */
     qedgb = E->edge[1].qedg;
     getim(qedgb,qb,&imb,g2a);
-
+    
     /* gather edge 2 and multiply by jacobian */
     dvsub(qedgb,Ef->edge[1].h,1,E->edge[1].h,1,f,1);
     dvmul(qedgb,E->edge[1].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->x[i];
+	f[i] *= E->edge[1].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->y[i];
-
+	f[i] *= E->edge[1].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*imb,f,qedgb,fi,qb);
-
+    
     /* divide by wb[0] */
     //  dscal(qb,1.0/wa[qa-1],fi,1);
     dscal(qb,Quad_Penalty_Fac/wa[qa-1],fi,1);
 
-    if(invjac == 0) // divide by area Jacobian
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p+qa-1,qa,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p+qa-1,qa,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
-
+	dscal(qb,1/geom->jac.d,fi,1);    
+    
     /* add to Ef physical mode storage */
     dvadd(qb,fi,1,in+qa-1,qa,in+qa-1,qa);
   }
@@ -2386,36 +2388,36 @@ void Quad::Add_Surface_Contrib(Element *Ef, double *in, char dir, int edg,
     /* add surface contribition of edge 4 */
     qedgb = E->edge[3].qedg;
     getim(qedgb,qb,&imb,g2a);
-
+      
     /* gather edge 4 and multiply by jacobian */
     dvsub(qedgb,Ef->edge[3].h,1,E->edge[3].h,1,f,1);
     dvmul(qedgb,E ->edge[3].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[3].norm->x[i];
+	f[i] *= E->edge[3].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[3].norm->y[i];
-
+	f[i] *= E->edge[3].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*imb,f,qedgb,fi,qb);
-
+    
     /* divide by wb[0] */
     //  dscal(qb,1.0/wa[0],fi,1);
     dscal(qb,Quad_Penalty_Fac/wa[0],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+      
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,qa,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p,qa,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
-
+	dscal(qb,1/geom->jac.d,fi,1);    
+    
     /* add to Ef physical mode storage */
-    dvadd(qb,fi,1,in,qa,in,qa);
+    dvadd(qb,fi,1,in,qa,in,qa);    
   }
-
+    
   return;
 }
 
@@ -2428,42 +2430,42 @@ void Quad::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
   Element *E = this;
   double   *za,*zb,*wa,*wb;
   double   **ima, **imb;
-
+ 
   double *f  = Quad_wk;
   double *fi = Quad_wk+QGmax;
-
+  
   getzw(qa,&za,&wa,'a'); // ok
   getzw(qb,&zb,&wb,'a'); // ok
-
+    
   if((edg == 0|| edg == -1)){
     /* add surface contribition of edge 1 */
     qedga = E->edge[0].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 1 and multiply by jacobian */
     dcopy(qedga,E->edge[0].h,1,f,1);
     dvmul(qedga,E->edge[0].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->x[i];
+	f[i] *= E->edge[0].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[0].norm->y[i];
-
+	f[i] *= E->edge[0].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     //  dscal(qa,1.0/wb[0],fi,1);
     dscal(qa,Quad_Penalty_Fac/wb[0],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p,1,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
+	dscal(qb,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qa,fi,1,in,1,in,1);
@@ -2473,34 +2475,34 @@ void Quad::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
     /* add surface contribition of edge 3 */
     qedga = E->edge[2].qedg;
     getim(qedga,qa,&ima,g2a);
-
+    
     /* gather edge 3 and multiply by jacobian */
     dcopy(qedga,E->edge[2].h,1,f,1);
     dvmul(qedga,E->edge[2].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedga; ++i)
-  f[i] *= E->edge[2].norm->x[i];
+	f[i] *= E->edge[2].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedga; ++i)
       f[i] *= E->edge[2].norm->y[i];
-
+    
     /* interpolate to guass lobatto points */
     Interp(*ima,f,qedga,fi,qa);
-
+    
     /* divide by wb[0] */
     //  dscal(qa,1.0/wb[qb-1],fi,1);
     dscal(qa,Quad_Penalty_Fac/wb[qb-1],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p+qa*(qb-1),1,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p+qa*(qb-1),1,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
+	dscal(qb,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
-    dvadd(qa,fi,1,in+qa*(qb-1),1,in+qa*(qb-1),1);
+    dvadd(qa,fi,1,in+qa*(qb-1),1,in+qa*(qb-1),1);    
   }
     // ---------------------------------------------
 
@@ -2508,31 +2510,31 @@ void Quad::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
     /* add surface contribition of edge 2 */
     qedgb = E->edge[1].qedg;
     getim(qedgb,qb,&imb,g2a);
-
+    
     /* gather edge 2 and multiply by jacobian */
     dcopy(qedgb,E->edge[1].h,1,f,1);
     dvmul(qedgb,E->edge[1].jac,1,f,1,f,1);
-
+    
     /* multiply by appropriate component of normal */
     if(dir == 'x')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->x[i];
+	f[i] *= E->edge[1].norm->x[i];
     else if(dir == 'y')
       for(i =0; i < qedgb; ++i)
-  f[i] *= E->edge[1].norm->y[i];
-
+	f[i] *= E->edge[1].norm->y[i];
+    
     /* interpolate to guass lobatto points */
     Interp(*imb,f,qedgb,fi,qb);
-
+    
     /* divide by wa[qa-1] */
     //  dscal(qb,1.0/wa[qa-1],fi,1);
     dscal(qb,Quad_Penalty_Fac/wa[qa-1],fi,1);
-
-    if(invjac == 0) // divide by area Jacobian
+    
+    if(invjac == 0) // divide by area Jacobian 
       if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p+qa-1,qa,fi,1);
+	dvdiv(qa,fi,1,geom->jac.p+qa-1,qa,fi,1);
       else
-  dscal(qb,1/geom->jac.d,fi,1);
+	dscal(qb,1/geom->jac.d,fi,1);    
 
     /* add to Ef physical mode storage */
     dvadd(qb,fi,1,in+qa-1,qa,in+qa-1,qa);
@@ -2542,36 +2544,36 @@ void Quad::Add_Surface_Contrib(double *in, char dir, int edg, int invjac){
       /* add surface contribition of edge 4 */
       qedgb = E->edge[3].qedg;
       getim(qedgb,qb,&imb,g2a);
-
+      
       /* gather edge 4 and multiply by jacobian */
       dcopy(qedgb,E->edge[3].h,1,f,1);
       dvmul(qedgb,E->edge[3].jac,1,f,1,f,1);
-
+      
       /* multiply by appropriate component of normal */
       if(dir == 'x')
-  for(i =0; i < qedgb; ++i)
-    f[i] *= E->edge[3].norm->x[i];
+	for(i =0; i < qedgb; ++i)
+	  f[i] *= E->edge[3].norm->x[i];
       else if(dir == 'y')
-  for(i =0; i < qedgb; ++i)
-    f[i] *= E->edge[3].norm->y[i];
-
+	for(i =0; i < qedgb; ++i)
+	  f[i] *= E->edge[3].norm->y[i];
+    
       /* interpolate to guass lobatto points */
       Interp(*imb,f,qedgb,fi,qb);
-
+      
       /* divide by wb[0] */
       //  dscal(qb,1.0/wa[0],fi,1);
       dscal(qb,Quad_Penalty_Fac/wa[0],fi,1);
-
-      if(invjac == 0) // divide by area Jacobian
-  if(curvX)
-  dvdiv(qa,fi,1,geom->jac.p,qa,fi,1);
-  else
-    dscal(qb,1/geom->jac.d,fi,1);
-
+    
+      if(invjac == 0) // divide by area Jacobian 
+	if(curvX)
+	dvdiv(qa,fi,1,geom->jac.p,qa,fi,1);
+	else
+	  dscal(qb,1/geom->jac.d,fi,1);    
+      
       /* add to Ef physical mode storage */
-      dvadd(qb,fi,1,in,qa,in,qa);
+      dvadd(qb,fi,1,in,qa,in,qa);    
     }
-
+    
   return;
 }
 
@@ -2596,18 +2598,18 @@ void Tet::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   getzw(qa,&za,&wa,'a'); // ok
   getzw(qb,&zb,&wb,'b'); // ok
   getzw(qc,&zc,&wc,'c'); // ok
-
+    
   /* add surface contribition of face 1 */
   fq = face[0].qface;
   qftot = fq*fq;
 
   getim(fq,qa,&ima,g2a);
   getim(fq,qb,&imb,g2b);
-
+    
   /* gather face 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[0].h,1,E->face[0].h,1,f,1);
   dvmul(qftot,E->face[0].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2639,7 +2641,7 @@ void Tet::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[1].h,1,E->face[1].h,1,f,1);
   dvmul(qftot,E->face[1].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2675,7 +2677,7 @@ void Tet::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[2].h,1,E->face[2].h,1,f,1);
   dvmul(qftot,E->face[2].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2712,7 +2714,7 @@ void Tet::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[3].h,1,E->face[3].h,1,f,1);
   dvmul(qftot,E->face[3].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2728,12 +2730,12 @@ void Tet::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
-
-  // FIX THESE
+  
+  // FIX THESE  
   dscal(qb*qc,1.0/wa[0],fi,1);
 
   /* add to Ef physical mode storage */
-
+  
   for(i=0;i<qb;++i)
     dscal(qc, 2./(1.-zb[i]), fi+i, qb);
 
@@ -2783,18 +2785,18 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   getzw(qa,&za,&wa,'a'); // ok
   getzw(qb,&zb,&wb,'a'); // ok
   getzw(qc,&zc,&wc,'b'); // ok
-
+    
   /* add surface contribition of face 1 */
   fq = face[0].qface;
   qftot = fq*fq;
 
   getim(fq,qa,&ima,g2a);
   getim(fq,qb,&imb,g2a);
-
+    
   /* gather face 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[0].h,1,E->face[0].h,1,f,1);
   dvmul(qftot,E->face[0].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2810,7 +2812,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qb);
-
+  
   /* add to Ef physical mode storage */
   daxpy(qa*qb,1./wc[0],fi,1,out,1);
 
@@ -2826,7 +2828,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[1].h,1,E->face[1].h,1,f,1);
   dvmul(qftot,E->face[1].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2842,7 +2844,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qc);
-
+  
   /* divide by wb[0] */
   for(i=0;i<qc;++i)
     daxpy(qa,1.0/wb[0],fi+i*qa, 1,out +i*qa*qb,1);
@@ -2859,7 +2861,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[2].h,1,E->face[2].h,1,f,1);
   dvmul(qftot,E->face[2].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2875,7 +2877,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
-
+  
   /* add to Ef physical mode storage */
 
   for(i=0;i<qc;++i)
@@ -2893,7 +2895,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[3].h,1,E->face[3].h,1,f,1);
   dvmul(qftot,E->face[3].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2909,7 +2911,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qc);
-
+  
   /* add to Ef physical mode storage */
 
   for(i=0;i<qc;++i)
@@ -2927,7 +2929,7 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[4].h,1,E->face[4].h,1,f,1);
   dvmul(qftot,E->face[4].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -2943,9 +2945,9 @@ void Prism::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
-
+  
   /* add to Ef physical mode storage */
-
+  
   for(i=0;i<qc;++i)
     daxpy(qb,2./(wa[0]*(1.-zc[i])),fi+i*qb,1, out+i*qa*qb,qa);
 
@@ -2974,18 +2976,18 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   getzw(qa,&za,&wa,'a'); // ok
   getzw(qb,&zb,&wb,'a'); // ok
   getzw(qc,&zc,&wc,'a'); // ok
-
+    
   /* add surface contribition of face 1 */
   fq = face[0].qface;
   qftot = fq*fq;
 
   getim(fq,qa,&ima,g2a);
   getim(fq,qb,&imb,g2a);
-
+    
   /* gather face 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[0].h,1,E->face[0].h,1,f,1);
   dvmul(qftot,E->face[0].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3001,7 +3003,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qb);
-
+  
   /* add to Ef physical mode storage */
   daxpy(qa*qb,1./wc[0],fi,1,out,1);
 
@@ -3017,7 +3019,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[1].h,1,E->face[1].h,1,f,1);
   dvmul(qftot,E->face[1].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3033,7 +3035,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qc);
-
+  
   /* divide by wb[0] */
   for(i=0;i<qc;++i)
     daxpy(qa,1.0/wb[0],fi+i*qa, 1,out +i*qa*qb,1);
@@ -3049,7 +3051,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[2].h,1,E->face[2].h,1,f,1);
   dvmul(qftot,E->face[2].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3065,7 +3067,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
-
+  
   /* add to Ef physical mode storage */
 
   for(i=0;i<qc;++i)
@@ -3083,7 +3085,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[3].h,1,E->face[3].h,1,f,1);
   dvmul(qftot,E->face[3].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3099,9 +3101,9 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qc);
-
+  
   /* add to Ef physical mode storage */
-
+  
   for(i=0;i<qc;++i)
     daxpy(qa,1./wb[qb-1],fi+i*qa,1, out+qa*(qb-1)+i*qa*qb,1);
 
@@ -3117,7 +3119,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[4].h,1,E->face[4].h,1,f,1);
   dvmul(qftot,E->face[4].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3133,9 +3135,9 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
-
+  
   /* add to Ef physical mode storage */
-
+  
   for(i=0;i<qc;++i)
     daxpy(qb,1./wa[0],fi+i*qb,1, out+i*qa*qb,qa);
 
@@ -3151,7 +3153,7 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
   /* gather edge 1 and multiply by jacobian */
   dvsub(qftot,Ef->face[5].h,1,E->face[5].h,1,f,1);
   dvmul(qftot,E->face[5].jac,1,f,1,f,1);
-
+    
   /* multiply by appropriate component of normal */
   switch(dir){
   case 'x':
@@ -3167,9 +3169,9 @@ void Hex::Add_Surface_Contrib(Element *Ef, double *out, char dir){
 
   /* interpolate to guass lobatto points */
   Interp2d(*ima,*imb, f,fq,fq,fi,qa,qb);
-
+  
   /* Add to Ef physical mode storage */
-
+  
   daxpy(qa*qb,1./wc[qc-1],fi,1, out+qa*qb*(qc-1),1);
 
   return;
@@ -3181,19 +3183,19 @@ void Element::Add_Surface_Contrib( double *, char, int){ERR;}
 void Element::Add_Surface_Contrib( double *, char, int, int){ERR;}
 void Element::Add_Surface_Contrib(Element *, double *, char ){ERR;}
 
-/*
+/* 
 Function name: Element::fill_edges
 
 Function Purpose:
 
 Argument 1: double *ux
-Purpose:
+Purpose: 
 
 Argument 2: double *uy
-Purpose:
+Purpose: 
 
 Argument 3: double *
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -3370,11 +3372,11 @@ void Tet::fill_edges(double *ux, double *uy, double *uz){
       GetFace(ux,i,wka);
       InterpToGaussFace(i, wka, qface, qface, wkb);
       dvmul (qface*qface, f->n->x, 1, wkb, 1, f->h, 1);
-
+      
       GetFace(uy,i,wka);
       InterpToGaussFace(i, wka, qface, qface, wkb);
       dvvtvp(qface*qface, f->n->y, 1, wkb, 1, f->h, 1, f->h, 1);
-
+      
       GetFace(uz,i,wka);
       InterpToGaussFace(i, wka, qface, qface, wkb);
       dvvtvp(qface*qface, f->n->z, 1, wkb, 1, f->h, 1, f->h, 1);
@@ -3436,7 +3438,7 @@ void Prism::fill_edges(double *ux, double *uy, double *uz){
       GetFace(ux,i,wka);
       InterpToGaussFace(i, wka, qedg, qedg, wkb);
       dvmul (qedg*qedg, f->n->x, 1, wkb, 1, f->h, 1);
-
+      
       GetFace(uy,i,wka);
       InterpToGaussFace(i, wka, qedg, qedg, wkb);
       dvvtvp(qedg*qedg, f->n->y, 1, wkb, 1, f->h, 1, f->h, 1);
@@ -3459,7 +3461,7 @@ void Hex::fill_edges(double *ux, double *uy, double *uz){
 
   if(!uy){
     for(i=0;i<NHex_faces;++i){
-      getim(qa,face[i].qface,&ima,a2g);   // assume
+      getim(qa,face[i].qface,&ima,a2g);   // assume 
 
       GetFace(ux,i,Hex_wk);
       Interp2d(*ima,*ima,Hex_wk,qa,qb,face[i].h,face[i].qface,face[i].qface);
@@ -3479,7 +3481,7 @@ void Hex::fill_edges(double *ux, double *uy, double *uz){
       GetFace(ux,i,wka);
       InterpToGaussFace(i, wka, qedg, qedg, wkb);
       dvmul (qedg*qedg, f->n->x, 1, wkb, 1, f->h, 1);
-
+      
       GetFace(uy,i,wka);
       InterpToGaussFace(i, wka, qedg, qedg, wkb);
       dvvtvp(qedg*qedg, f->n->y, 1, wkb, 1, f->h, 1, f->h, 1);
@@ -3500,7 +3502,7 @@ void Element::fill_edges(double *, double *, double *){ERR;}
 
 
 
-/*
+/* 
 
 Function name: Element::Sign_Change
 
@@ -3521,7 +3523,7 @@ void Tri::Sign_Change(){
 
 void Quad::Sign_Change(){
   int i;
-
+  
   for(i = 0; i < Nedges; ++i)
     if(edge[i].con)
       dscal(edge[i].l/2, -1., edge[i].hj+1, 2);
@@ -3535,12 +3537,12 @@ void Tet::Sign_Change(){
   for(i = 0; i < Nedges; ++i)
     if(edge[i].con)
       dscal(edge[i].l/2, -1.0, edge[i].hj+1, 2);
-
+  
   for(i = 0; i < Nfaces; ++i)
     if(face[i].con)
       for(j = 1; j < (L=face[i].l); j = j + 2)
-  dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
-
+	dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
+  
 }
 
 
@@ -3559,27 +3561,27 @@ void Pyr::Sign_Change(){
     if(Nfverts(i) == 4)
       switch(face[i].con ){
       case 0:
-  break;
+	break; 
       case 1: case 5:
-  for(j = 0; j < (L=face[i].l); ++j)
-    dscal(L/2, -1., face[i].hj[j]+1, 2);
-  break;
+	for(j = 0; j < (L=face[i].l); ++j)
+	  dscal(L/2, -1., face[i].hj[j]+1, 2);
+	break;
       case 2: case 6:
-  for(j = 1; j < (L=face[i].l); j = j + 2)
-    dscal(L, -1., face[i].hj[j], 1);
-  break;
+	for(j = 1; j < (L=face[i].l); j = j + 2)
+	  dscal(L, -1., face[i].hj[j], 1);
+	break;
       case 3: case 7:
-  for(j = 0; j < (L=face[i].l); ++j)
-    dscal(L/2, -1., face[i].hj[j]+1, 2);
+	for(j = 0; j < (L=face[i].l); ++j)
+	  dscal(L/2, -1., face[i].hj[j]+1, 2);
 
-  for(j = 1; j < (L=face[i].l); j += 2)
-    dscal(L, -1., face[i].hj[j], 1);
-  break;
+	for(j = 1; j < (L=face[i].l); j += 2)
+	  dscal(L, -1., face[i].hj[j], 1);
+	break;
       }
     else
       if(face[i].con)
-  for(j = 1; j < (L=face[i].l); j = j + 2)
-    dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
+	for(j = 1; j < (L=face[i].l); j = j + 2)
+	  dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
   }
 }
 
@@ -3600,27 +3602,27 @@ void Prism::Sign_Change(){
     if(Nfverts(i) == 4)
       switch(face[i].con ){
       case 0:
-  break;
+	break;
       case 1: case 5:
-  for(j = 0; j < L; ++j)
-    dscal(L/2, -1., face[i].hj[j]+1, 2);
-  break;
+	for(j = 0; j < L; ++j)
+	  dscal(L/2, -1., face[i].hj[j]+1, 2);
+	break;
       case 2: case 6:
-  for(j = 1; j < L; j += 2)
-    dscal(L, -1., face[i].hj[j], 1);
-  break;
+	for(j = 1; j < L; j += 2)
+	  dscal(L, -1., face[i].hj[j], 1);
+	break;
       case 3: case 7:
-  for(j = 0; j < L; ++j)
-    dscal(L/2, -1., face[i].hj[j]+1, 2);
+	for(j = 0; j < L; ++j)
+	  dscal(L/2, -1., face[i].hj[j]+1, 2);
 
-  for(j = 1; j < L; j += 2)
-    dscal(L, -1., face[i].hj[j], 1);
-  break;
+	for(j = 1; j < L; j += 2)
+	  dscal(L, -1., face[i].hj[j], 1);
+	break;
       }
     else
       if(face[i].con)
-  for(j = 1; j < L; j += 2)
-    dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
+	for(j = 1; j < L; j += 2)
+	  dsmul(L-j, -1, face[i].hj[j], 1, face[i].hj[j], 1);
   }
 }
 
@@ -3640,18 +3642,18 @@ void Hex::Sign_Change(){
       break;
     case 1: case 5:
       for(j = 0; j < (L=face[i].l); ++j)
-  dscal(L/2, -1., face[i].hj[j]+1, 2);
+	dscal(L/2, -1., face[i].hj[j]+1, 2);
       break;
     case 2: case 6:
       for(j = 1; j < (L=face[i].l); j = j + 2)
-  dscal(L, -1., face[i].hj[j], 1);
+	dscal(L, -1., face[i].hj[j], 1);
       break;
     case 3: case 7:
       for(j = 0; j < (L=face[i].l); ++j)
-  dscal(L/2, -1., face[i].hj[j]+1, 2);
+	dscal(L/2, -1., face[i].hj[j]+1, 2);
 
       for(j=1;j<(L=face[i].l);++j)
-  dscal(L, -1., face[i].hj[j], 1);
+	dscal(L, -1., face[i].hj[j], 1);
       break;
     }
   }
@@ -3679,17 +3681,17 @@ static MMinfo   *Pyr_addmmat1d(int L,   Pyr *E);
 static MMinfo *Prism_addmmat1d(int L, Prism *E);
 static MMinfo   *Hex_addmmat1d(int L,   Hex *E);
 
-/*
+/* 
 
 Function name: Element::get_mmat1d
 
 Function Purpose:
 
 Argument 1: double **mat
-Purpose:
+Purpose: 
 
 Argument 2: int L
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -3703,13 +3705,13 @@ void Tri::get_mmat1d(double **mat, int L){
       *mat = Tri_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Tri_m1inf  = Tri_m1base;
   Tri_m1base = Tri_addmmat1d(L,this);
   Tri_m1base->next = Tri_m1inf;
-
+  
   *mat = Tri_m1base->mat;
 
   return;
@@ -3726,13 +3728,13 @@ void Quad::get_mmat1d(double **mat, int L){
       *mat = Quad_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Quad_m1inf  = Quad_m1base;
   Quad_m1base = Quad_addmmat1d(L,this);
   Quad_m1base->next = Quad_m1inf;
-
+  
   *mat = Quad_m1base->mat;
 
   return;
@@ -3749,13 +3751,13 @@ void Tet::get_mmat1d(double **mat, int L){
       *mat = Tet_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Tet_m1inf  = Tet_m1base;
   Tet_m1base = Tet_addmmat1d(L,this);
   Tet_m1base->next = Tet_m1inf;
-
+  
   *mat = Tet_m1base->mat;
 
   return;
@@ -3772,13 +3774,13 @@ void Pyr::get_mmat1d(double **mat, int L){
       *mat = Pyr_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Pyr_m1inf  = Pyr_m1base;
   Pyr_m1base = Pyr_addmmat1d(L,this);
   Pyr_m1base->next = Pyr_m1inf;
-
+  
   *mat = Pyr_m1base->mat;
 
   return;
@@ -3795,13 +3797,13 @@ void Prism::get_mmat1d(double **mat, int L){
       *mat = Prism_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Prism_m1inf  = Prism_m1base;
   Prism_m1base = Prism_addmmat1d(L,this);
   Prism_m1base->next = Prism_m1inf;
-
+  
   *mat = Prism_m1base->mat;
 
   return;
@@ -3818,13 +3820,13 @@ void Hex::get_mmat1d(double **mat, int L){
       *mat = Hex_m1inf->mat;
       return;
     }
-
+  
     /* else add new zeros and weights */
-
+  
   Hex_m1inf  = Hex_m1base;
   Hex_m1base = Hex_addmmat1d(L,this);
   Hex_m1base->next = Hex_m1inf;
-
+  
   *mat = Hex_m1base->mat;
 
   return;
@@ -3846,26 +3848,26 @@ static MMinfo *Tri_addmmat1d(int L, Tri *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
 
   /* If qa is less than L+3 release base definition and regenerate. */
   /* This usually won't be necessary but arises in Utilities.       */
   getzw(qa,&z,&w,'a');
   tmp =  dvector(0,qa-1);
-
+    
   if(L>3){ /* banded matrix */
     M->mat = dvector(0,L*3-1);
 
     for(i = 0; i < L-3; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < i + 3; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < i + 3; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     for(i = L-3; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < L; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < L; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpbtrf('L',L,2,M->mat,3,info);
   }
@@ -3875,17 +3877,17 @@ static MMinfo *Tri_addmmat1d(int L, Tri *E){
     for(i = 0, k=0; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
       for(j = i; j < L; ++j,++k)
-  M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+	M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpptrf('L',L,M->mat,info);
   }
   if(info) error_msg(Tri addmmat1d: info not zero);
-
+  
   if(trip){
     E->qa = trip;
     Tri_reset_basis();
   }
-
+  
   free(tmp);
   return M;
 }
@@ -3902,15 +3904,15 @@ static MMinfo *Quad_addmmat1d(int L, Quad *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
-
+  
   /* If qa is less than L+3 release base definition and regenerate. */
   /* This usually won't be necessary but arises in Utilities.       */
 #if 0
   if(qa < L+3){
     Quad_reset_basis();
-    trip = E->qa;
+    trip = E->qa; 
     E->qa = qa = L+3;
     b = E->getbasis();
   }
@@ -3920,39 +3922,39 @@ static MMinfo *Quad_addmmat1d(int L, Quad *E){
 
   if(L>3){ /* banded matrix */
     M->mat =  dvector(0,L*3-1);
-
+    
     for(i = 0; i < L-3; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < i + 3; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < i + 3; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     for(i = L-3; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < L; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < L; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpbtrf('L',L,2,M->mat,3,info);
   }
-  else
+  else 
     { /* symmetric */
-      // tcew
-
+      // tcew 
+      
       M->mat = dvector(0, L*(L+1)/2-1);
-
+    
       for(i = 0, k=0; i < L; ++i){
-  dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-  for(j = i; j < L; ++j,++k)
-    M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+	dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
+	for(j = i; j < L; ++j,++k)
+	  M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
       }
       dpptrf('L',L,M->mat,info);
     }
   if(info) error_msg(Quad addmmat1d: info not zero);
-
+  
   if(trip){
     E->qa = trip;
     Quad_reset_basis();
   }
-
+  
   free(tmp);
   return M;
 }
@@ -3968,7 +3970,7 @@ static MMinfo *Tet_addmmat1d(int L, Tet *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
 
   /* If qa is less than L+3 release base definition and regenerate. */
@@ -3976,26 +3978,26 @@ static MMinfo *Tet_addmmat1d(int L, Tet *E){
 #if 0
   if(qa < L+3){
     Tet_reset_basis();
-    trip = E->qa;
+    trip = E->qa; 
     E->qa = qa = L+3;
     b = E->getbasis();
   }
 #endif
   getzw(qa,&z,&w,'a');
   tmp =  dvector(0,qa-1);
-
+    
   if(L>3){ /* banded matrix */
     M->mat = dvector(0,L*3-1);
 
     for(i = 0; i < L-3; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < i + 3; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < i + 3; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     for(i = L-3; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < L; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < L; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpbtrf('L',L,2,M->mat,3,info);
   }
@@ -4005,7 +4007,7 @@ static MMinfo *Tet_addmmat1d(int L, Tet *E){
     for(i = 0, k=0; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
       for(j = i; j < L; ++j,++k)
-  M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+	M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpptrf('L',L,M->mat,info);
   }
@@ -4032,7 +4034,7 @@ static MMinfo *Pyr_addmmat1d(int L, Pyr *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
 
   /* If qa is less than L+3 release base definition and regenerate. */
@@ -4040,9 +4042,9 @@ static MMinfo *Pyr_addmmat1d(int L, Pyr *E){
 
   getzw(qa,&z,&w,'a');
   tmp =  dvector(0,qa-1);
-
+    
   M->mat = dvector(0,L*(L+1)/2-1);
-
+  
   for(i = 0, k=0; i < L; ++i){
     dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
     for(j = i; j < L; ++j,++k)
@@ -4051,7 +4053,7 @@ static MMinfo *Pyr_addmmat1d(int L, Pyr *E){
   dpptrf('L',L,M->mat,info);
 
   if(info) error_msg(addmmat1d: info not zero);
-
+  
   free(tmp);
   return M;
 }
@@ -4068,7 +4070,7 @@ static MMinfo *Prism_addmmat1d(int L, Prism *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
 
   /* If qa is less than L+3 release base definition and regenerate. */
@@ -4076,9 +4078,9 @@ static MMinfo *Prism_addmmat1d(int L, Prism *E){
 
   getzw(qa,&z,&w,'a');
   tmp =  dvector(0,qa-1);
-
+    
   M->mat = dvector(0,L*(L+1)/2-1);
-
+  
   for(i = 0, k=0; i < L; ++i){
     dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
     for(j = i; j < L; ++j,++k)
@@ -4087,7 +4089,7 @@ static MMinfo *Prism_addmmat1d(int L, Prism *E){
   dpptrf('L',L,M->mat,info);
 
   if(info) error_msg(addmmat1d: info not zero);
-
+  
   free(tmp);
   return M;
 }
@@ -4103,7 +4105,7 @@ static MMinfo *Hex_addmmat1d(int L, Hex *E){
   Basis   *b = E->getbasis();
 
   M->L = L;
-
+  
   if(!L) return M;
 
   /* If qa is less than L+3 release base definition and regenerate. */
@@ -4111,19 +4113,19 @@ static MMinfo *Hex_addmmat1d(int L, Hex *E){
 
   getzw(qa,&z,&w,'a');
   tmp =  dvector(0,qa-1);
-
+    
   if(L>3){ /* banded matrix */
     M->mat = dvector(0,L*3-1);
 
     for(i = 0; i < L-3; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < i + 3; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < i + 3; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     for(i = L-3; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
-      for(j = i; j < L; ++j)
-  M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+      for(j = i; j < L; ++j) 
+	M->mat[i*3+(j-i)] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpbtrf('L',L,2,M->mat,3,info);
   }
@@ -4133,30 +4135,30 @@ static MMinfo *Hex_addmmat1d(int L, Hex *E){
     for(i = 0, k=0; i < L; ++i){
       dvmul(qa-2,w+1,1,b->edge[0][i].a+1,1,tmp,1);
       for(j = i; j < L; ++j,++k)
-  M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
+	M->mat[k] = ddot(qa-2,tmp,1,b->edge[0][j].a+1,1);
     }
     dpptrf('L',L,M->mat,info);
   }
   if(info) error_msg(addmmat1d: info not zero);
-
-
+  
+  
   free(tmp);
-
+  
   return M;
 }
 
 
-/*
+/* 
 
 Function name: Element::set_solve
 
 Function Purpose:
 
 Argument 1: int fac
-Purpose:
+Purpose: 
 
 Argument 2: int mask
-Purpose:
+Purpose: 
 
 Function Notes:
 
@@ -4213,8 +4215,8 @@ void Hex::set_solve(int fac, int mask){
 void Element::set_solve(int , int ){ERR;}
 
 
-// needs to be process into Element_list structure
-/*
+// needs to be process into Element_list structure 
+/* 
    This function interploltes the value in in->[Bc->id].link at the
    quadrature points multiplied by beta and the subtracts this value
    from the current field U multiplied by alpha and put the value into
@@ -4230,16 +4232,16 @@ void Tri::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   double *f, *fi, *u, *uf,**im;
   double **ima, **imb;
   Edge   *e;
-
+  
   fi = Tri_wk.get();
-
+  
   /* set up boundary conditions  */
   e    = edge[Bface].link;
   qedg = e->qedg;
   f    = e->h;
   u    = this->h[0];
   uf   = out->h[0];
-
+  
   switch(Bface){
   case 0:
     getim (qedg,qa,&im,g2a);
@@ -4258,7 +4260,7 @@ void Tri::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
     Interp (*im,f,qedg,fi,qb);
     dscal  (qb,beta,fi,1);
     dsvtvm (qb,alpha,u,qa,fi,1,uf,qa);
-
+    
   }
 }
 
@@ -4267,16 +4269,16 @@ void Quad::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   double *f, *fi, *u, *uf,**im;
   double **ima, **imb;
   Edge   *e;
-
+  
   fi = Quad_wk;
-
+  
   /* set up boundary conditions  */
   e    = edge[Bface].link;
   qedg = e->qedg;
   f    = e->h;
   u    = this->h[0];
   uf   = out->h[0];
-
+  
   switch(Bface){
   case 0:
     getim (qedg,qa,&im,g2a);
@@ -4309,7 +4311,7 @@ void Tet::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   int     qedg,fq,qftot,i;
   double *f, *fi, *u, *uf,**im;
   double **ima, **imb;
-
+  
   fi = Tet_wk;
 
   /* set up boundary conditions  */
@@ -4318,7 +4320,7 @@ void Tet::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   f    = face[Bface].link->h;
   u    = this->h_3d[0][0];
   uf   = out->h_3d[0][0];
-
+  
   switch(Bface){
   case 0:
     getim   (fq,qa,&ima,g2a);
@@ -4341,7 +4343,7 @@ void Tet::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
     Interp2d(*ima,*imb, f,fq,fq,fi,qb,qc);
     dscal  (qb*qc,beta,fi,1);
     for(i=0;i<qc;++i)
-  dsvtvm (qb,alpha,u+i*qa*qb+qa-1,qa,fi+i*qb,1,uf+qa*qb+qa-1,qa);
+	dsvtvm (qb,alpha,u+i*qa*qb+qa-1,qa,fi+i*qb,1,uf+qa*qb+qa-1,qa);
     break;
   case 3:
     getim(fq,qb,&ima,g2b);
@@ -4363,7 +4365,7 @@ void Prism::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   int     qedg,fq,qftot,i;
   double  *f, *fi, *u, *uf,**im;
   double  **ima, **imb;
-
+  
   fi = Prism_wk;
 
   /* set up boundary conditions  */
@@ -4372,7 +4374,7 @@ void Prism::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   f    = face[Bface].link->h;
   u    = this->h_3d[0][0];
   uf   = out->h_3d[0][0];
-
+  
   switch(Bface){
   case 0:
     getim(fq,qa,&ima,g2a);
@@ -4404,7 +4406,7 @@ void Prism::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
     dscal  (qa*qc,beta,fi,1);
     for(i=0;i<qc;++i)
       dsvtvm (qa,alpha,u+qa*(qb-1)+i*qa*qb,1,fi+i*qa,1,
-        uf+qa*(qb-1)+i*qa*qb,1);
+	      uf+qa*(qb-1)+i*qa*qb,1);
     break;
   case 4:
     getim(fq,qb,&ima,g2a);
@@ -4420,7 +4422,7 @@ void Hex::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   int     qedg,fq,qftot,i;
   double *f, *fi, *u, *uf,**im;
   double **ima, **imb;
-
+  
   fi = Hex_wk;
 
   /* set up boundary conditions  */
@@ -4429,7 +4431,7 @@ void Hex::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
   f    = face[Bface].link->h;
   u    = this->h_3d[0][0];
   uf   = out->h_3d[0][0];
-
+  
   switch(Bface){
   case 0:
     getim(fq,qa,&ima,g2a);
@@ -4461,7 +4463,7 @@ void Hex::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
     dscal  (qa*qc,beta,fi,1);
     for(i=0;i<qc;++i)
       dsvtvm (qa,alpha,u+qa*(qb-1)+i*qa*qb,1,fi+i*qa,1,
-        uf+qa*(qb-1)+i*qa*qb,1);
+	      uf+qa*(qb-1)+i*qa*qb,1);
     break;
   case 4:
     getim(fq,qb,&ima,g2a);
@@ -4478,3 +4480,4 @@ void Hex::SubtractBC(double alpha, double  beta, int Bface,  Element *out){
     dsvtvm (qa*qb,alpha,u+i*qa*qb*(qc-1),1,fi,1,uf+i*qa*qb*(qc-1),1);
   }
 }
+

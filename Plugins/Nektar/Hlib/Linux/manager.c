@@ -147,7 +147,7 @@
 #include "zbesj.h"
 
 
-#define SIZE   256       /* Maximum number of function string characters */
+#define SIZE   512       /* Maximum number of function string characters */
 
 typedef double (*PFD)(); /* Pointer to a function returning double */
 
@@ -162,8 +162,25 @@ typedef struct Symbol {  /* Symbol table entry */
 	      } u;
       } Symbol;
 
-//extern double doUserdefA(double x, double y, double z);
 
+/*-----------------------------------------------------------------------*
+ *     Functions reqired to set womersley profile on multiple inlets     *
+ *-----------------------------------------------------------------------*/
+  extern double doWomprofA(double x,double y,double z); /* womersley profile */
+  extern double doWomprofB(double x,double y,double z); /* womersley profile */
+  extern double doWomprofC(double x,double y,double z); /* womersley profile */
+  extern double doWomprofD(double x,double y,double z); /* womersley profile */
+
+  extern double doUserdefAu(double x, double y, double z);
+  extern double doUserdefAv(double x, double y, double z);
+  extern double doUserdefAw(double x, double y, double z);
+  extern double doUserdefBu(double x, double y, double z);
+  extern double doUserdefBv(double x, double y, double z);
+#ifndef BUILD_EXE
+  extern double doUserdefBw(double x, double y, double z);
+  extern double doUserdefC(double x, double y, double z);
+  extern double doUserdefD(double x, double y, double z);
+#endif
 
 /* --------------------------------------------------------------------- *
  *                 Function declarations and prototypes                  *
@@ -195,8 +212,28 @@ static  double
   Womsin(double,double,double,double,double),
   Womcos(double,double,double,double,double);
 
-//static double 
-//   UserdefA(double,double,double);
+
+
+
+static
+double WomprofA(double,double,double),
+       WomprofB(double,double,double),
+       WomprofC(double,double,double),
+       WomprofD(double,double,double);
+
+static double 
+      UserdefAu(double,double,double),
+      UserdefAv(double,double,double),
+      UserdefAw(double,double,double),
+      UserdefBu(double,double,double),
+      UserdefBv(double,double,double),
+      UserdefBw(double,double,double),
+      UserdefC(double,double,double),
+      UserdefD(double,double,double);
+
+static double 
+      Wannier_stream(double, double, double),
+      Wannier_cross(double, double, double);
 
 
 extern void show_symbol (Symbol *s);         /* Print symbol's value     */
@@ -345,7 +382,20 @@ static struct {                /* Built-ins */
          "jacobi", 4,  Jacobi,
 	 "womsin", 5,  Womsin,     /* Womersley solution due to sin component of u_avg  */
 	 "womcos", 5,  Womcos,     /* Womersley solution due to cos component of u_avg  */
-   /*      "userdefA", 3, UserdefA, */
+         "womprofA", 3, WomprofA,    /* womersley profile  */
+         "womprofB", 3, WomprofB,    /* womersley profile  */
+         "womprofC", 3, WomprofC,    /* womersley profile  */
+         "womprofD", 3, WomprofD,    /* womersley profile  */
+         "userdefAu", 3, UserdefAu,
+         "userdefAv", 3, UserdefAv,
+         "userdefAw", 3, UserdefAw,
+         "userdefBu", 3, UserdefBu,
+         "userdefBv", 3, UserdefBv,
+         "userdefBw", 3, UserdefBw,
+         "userdefC", 3, UserdefC,
+         "userdefD", 3, UserdefD,
+         "wannierS", 3, Wannier_stream,
+         "wannierC", 3, Wannier_cross,
 	 0,       0
 };
 
@@ -383,13 +433,13 @@ extern int errno;
 #endif
 
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
-#line 275 "../src/manager.y"
+#line 324 "../src/manager.y"
 typedef union YYSTYPE {                /* stack type */
 	double  val;    /* actual value */
 	Symbol *sym;    /* symbol table pointer */
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
-#line 393 "y.tab.c"
+#line 442 "y.tab.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -401,7 +451,7 @@ typedef union YYSTYPE {                /* stack type */
 
 
 /* Line 219 of yacc.c.  */
-#line 405 "y.tab.c"
+#line 454 "y.tab.c"
 
 #if ! defined (YYSIZE_T) && defined (__SIZE_TYPE__)
 # define YYSIZE_T __SIZE_TYPE__
@@ -631,9 +681,9 @@ static const yysigned_char yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const unsigned short int yyrline[] =
 {
-       0,   288,   288,   289,   290,   291,   292,   294,   296,   297,
-     300,   301,   302,   303,   305,   307,   309,   311,   313,   314,
-     315,   316,   329,   330,   331
+       0,   337,   337,   338,   339,   340,   341,   343,   345,   346,
+     349,   350,   351,   352,   354,   356,   358,   360,   362,   363,
+     364,   365,   378,   379,   380
 };
 #endif
 
@@ -1463,84 +1513,84 @@ yyreduce:
   switch (yyn)
     {
         case 5:
-#line 291 "../src/manager.y"
+#line 340 "../src/manager.y"
     { stack_value = (yyvsp[-1].val); }
     break;
 
   case 6:
-#line 292 "../src/manager.y"
+#line 341 "../src/manager.y"
     { yyerrok; }
     break;
 
   case 7:
-#line 294 "../src/manager.y"
+#line 343 "../src/manager.y"
     { (yyval.val)=(yyvsp[-2].sym)->u.val=(yyvsp[0].val); (yyvsp[-2].sym)->type = VAR; }
     break;
 
   case 8:
-#line 296 "../src/manager.y"
+#line 345 "../src/manager.y"
     { (yyval.val) = (yyvsp[0].val); }
     break;
 
   case 9:
-#line 297 "../src/manager.y"
+#line 346 "../src/manager.y"
     { if ((yyvsp[0].sym)->type == UNDEF)
 		      execerrnr("undefined variable",(yyvsp[0].sym)->name);
 		    (yyval.val) = (yyvsp[0].sym)->u.val; }
     break;
 
   case 10:
-#line 300 "../src/manager.y"
+#line 349 "../src/manager.y"
     { (yyval.val) = (double) (yyvsp[0].sym)->u.num; }
     break;
 
   case 11:
-#line 301 "../src/manager.y"
+#line 350 "../src/manager.y"
     { (yyval.val) = (yyvsp[0].sym)->u.val; }
     break;
 
   case 13:
-#line 304 "../src/manager.y"
+#line 353 "../src/manager.y"
     { (yyval.val) = (*((yyvsp[-3].sym)->u.ptr))((yyvsp[-1].val)); }
     break;
 
   case 14:
-#line 306 "../src/manager.y"
+#line 355 "../src/manager.y"
     { (yyval.val) = (*((yyvsp[-5].sym)->u.ptr))((yyvsp[-3].val),(yyvsp[-1].val)); }
     break;
 
   case 15:
-#line 308 "../src/manager.y"
+#line 357 "../src/manager.y"
     { (yyval.val) = (*((yyvsp[-7].sym)->u.ptr))((yyvsp[-5].val),(yyvsp[-3].val),(yyvsp[-1].val)); }
     break;
 
   case 16:
-#line 310 "../src/manager.y"
+#line 359 "../src/manager.y"
     { (yyval.val) = (*((yyvsp[-9].sym)->u.ptr))((yyvsp[-7].val),(yyvsp[-5].val),(yyvsp[-3].val),(yyvsp[-1].val)); }
     break;
 
   case 17:
-#line 312 "../src/manager.y"
+#line 361 "../src/manager.y"
     { (yyval.val) = (*((yyvsp[-11].sym)->u.ptr))((yyvsp[-9].val),(yyvsp[-7].val),(yyvsp[-5].val),(yyvsp[-3].val),(yyvsp[-1].val)); }
     break;
 
   case 18:
-#line 313 "../src/manager.y"
+#line 362 "../src/manager.y"
     { (yyval.val) = (yyvsp[-2].val) + (yyvsp[0].val); }
     break;
 
   case 19:
-#line 314 "../src/manager.y"
+#line 363 "../src/manager.y"
     { (yyval.val) = (yyvsp[-2].val) - (yyvsp[0].val); }
     break;
 
   case 20:
-#line 315 "../src/manager.y"
+#line 364 "../src/manager.y"
     { (yyval.val) = (yyvsp[-2].val) * (yyvsp[0].val); }
     break;
 
   case 21:
-#line 316 "../src/manager.y"
+#line 365 "../src/manager.y"
     {
 	  if ((yyvsp[0].val) == 0.0){
 #if ZERONULLDIV
@@ -1557,17 +1607,17 @@ yyreduce:
     break;
 
   case 22:
-#line 329 "../src/manager.y"
+#line 378 "../src/manager.y"
     { (yyval.val) = Pow((yyvsp[-2].val),(yyvsp[0].val)); }
     break;
 
   case 23:
-#line 330 "../src/manager.y"
+#line 379 "../src/manager.y"
     { (yyval.val) = (yyvsp[-1].val); }
     break;
 
   case 24:
-#line 331 "../src/manager.y"
+#line 380 "../src/manager.y"
     { (yyval.val) = -(yyvsp[0].val); }
     break;
 
@@ -1576,7 +1626,7 @@ yyreduce:
     }
 
 /* Line 1126 of yacc.c.  */
-#line 1580 "y.tab.c"
+#line 1629 "y.tab.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;
@@ -1844,7 +1894,7 @@ yyreturn:
 }
 
 
-#line 333 "../src/manager.y"
+#line 382 "../src/manager.y"
 
 	/* end of grammer */
 
@@ -2613,11 +2663,89 @@ static double Single(double x, double y)
 }
 #endif
 
-/*
-static double UserdefA(double x, double y, double z){
-  return doUserdefA(x,y,z);
+/*-----------------------------------------------------*/
+/* Artery tree, velocity BC at inlets - womersley      */
+/*-----------------------------------------------------*/
+// here all functions return 0.0
+// these functions are not important for VIZ. purposes but only for computation
+// we keep them in order to be able to preocess the input *rea file
+
+
+
+static double WomprofA(double x, double y, double z)
+{
+    return 0;//doWomprofA(x,y,z);
 }
-*/
+static double WomprofB(double x, double y, double z)
+{
+    return 0;//doWomprofB(x,y,z);
+}
+
+static double WomprofC(double x, double y, double z)
+{
+    return 0;//doWomprofC(x,y,z);
+}
+
+static double WomprofD(double x, double y, double z)
+{
+    return 0;//doWomprofD(x,y,z);
+}
+
+static double UserdefAu(double x, double y, double z){
+    return 0;//doUserdefAu(x,y,z);
+}
+
+static double UserdefAv(double x, double y, double z){
+    return 0;//doUserdefAv(x,y,z);
+}
+
+static double UserdefAw(double x, double y, double z){
+    return 0;//doUserdefAw(x,y,z);
+}
+
+
+static double UserdefBu(double x, double y, double z){
+    return 0;//doUserdefBu(x,y,z);
+}
+
+static double UserdefBv(double x, double y, double z){
+    return 0;//doUserdefBv(x,y,z);
+}
+
+static double UserdefBw(double x, double y, double z){
+#ifdef BUILD_EXE
+  return 0;
+#else
+  return doUserdefBw(x,y,z);
+#endif
+}
+
+
+static double UserdefC(double x, double y, double z){
+#ifdef BUILD_EXE
+  return 0;
+#else
+  return doUserdefC(x,y,z);
+#endif
+}
+
+static double UserdefD(double x, double y, double z){
+#ifdef BUILD_EXE
+  return 0;
+#else
+  return doUserdefD(x,y,z);
+#endif
+}
+
+static double Wannier_stream(double x, double y, double z){
+    return 0;//doWannier_stream(x,y,z);
+}
+
+static double Wannier_cross(double x, double y, double z){
+    return 0;//doWannier_cross(x,y,z);
+}
+
+
   
 #undef M_PI
 

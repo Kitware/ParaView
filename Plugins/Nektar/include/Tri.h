@@ -1,6 +1,9 @@
 #ifndef TRI_H
 #define TRI_H
 
+namespace nektarTri
+{
+
 class Tri: public Element{
 private:
 public:
@@ -199,4 +202,5 @@ public:
   void       Coll_to_cart    (Coord A, Coord *csi);
 };
 
+} // end namespage nektarTri
 #endif

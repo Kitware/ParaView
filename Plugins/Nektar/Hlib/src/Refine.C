@@ -20,6 +20,9 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
 static void un_link(Element_List *U, int eid1, int id1);
 static void add_bc(Element_List *EL, Bndry **Ubc, int nfields,
        int bid, int eid, int face);

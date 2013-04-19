@@ -1,33 +1,33 @@
 ifeq ($(PARALLEL),1)
 override CPPFLAGS :=  -DPARALLEL -DMETIS  $(CPPFLAGS) $(MPIINC)
 override LIBS     := $(LIBS) -lgs -lmetis
-override ALL    := $(ALL)
+override ALL	  := $(ALL)
 
 
-ifeq ($(LTYPE),g)  # turn on debug flag
+ifeq ($(LTYPE),g)	# turn on debug flag 
 CPPFLAGS := -DDEBUG $(CPPFLAGS)
 CXXFLAGS := $(DEBUG) $(CCWOFF)
 CFLAGS := $(DEBUG) $(CWOFF)
 FFLAGS := $(FFLAGS) $(DEBUGF) $(FWOFF)
-LDFLAGS  := $(DEBUGLD)
-else      # Maximal optimization flags
+LDFLAGS	:= $(DEBUGLD)
+else			# Maximal optimization flags
 ifeq ($(LTYPE),mopt)
 CXXFLAGS := $(MOPTXX)
 CFLAGS := $(MOPT)
 FFLAGS := $(FFLAGS) $(MOPTF)
-LDFLAGS  := $(MOPTLD)
-else      # Regular optimization flags
+LDFLAGS	:= $(MOPTLD)
+else			# Regular optimization flags
 ifeq ($(LTYPE),opt)
 CXXFLAGS := $(OPTXX)
 CFLAGS := $(OPT)
 FFLAGS := $(FFLAGS) $(OPTF)
-LDFLAGS  := $(OPTLD)
+LDFLAGS	:= $(OPTLD)
 endif
 endif
 endif
 
 endif
-
+	
 override LIB    := $(LIB)$(LTYPE).a
 
 # ---------------------------------------------------------------- #
@@ -42,15 +42,15 @@ OBJS  = $(foreach routine, $(ALL), $(routine).o)
 # -----------------------------------------------------------
 
 $(LIB): $(LMOD)
-  ranlib $(LIB)
+	ranlib $(LIB)
 
 # ------------------------------------------------------------------
 #                 Special rules for certain files
 # ------------------------------------------------------------------
 
 .C.o:
-  $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
 .c.o:
-  $(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
 .F.o:
-  $(FC) $(FFLAGS)  -c $<
+	$(FC) $(FFLAGS)  -c $<

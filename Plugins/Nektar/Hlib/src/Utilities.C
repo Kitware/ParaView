@@ -788,6 +788,8 @@ int  Interp_symmpts(Element *E, int n, double *uj, double *ui, char storage){
   static Nek_Facet_Type  NekTypeStore;
   int qa,qb,qc;
   int ntot, qtot;
+  if (E==NULL)
+      fprintf(stdout, "Interp_symmpts: E==NULL!!!!!\n");
   int dim = E->dim();
   double *utmp;
 

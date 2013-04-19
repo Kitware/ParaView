@@ -23,7 +23,7 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "-fPIC -ffast-math -funroll-loops -fstrict-aliasing -w")
 endif()
 
-add_definitions(-DPARALLEL -DMETIS)
+add_definitions(-DPARALLEL -DMETIS -DCSGSLIB -DNDEBUG -DNOSCALAPACK)
 
 set(nektar_sources
   SRC_PV_NEK/nek2vel_PV_interface.C
@@ -39,8 +39,31 @@ set(nektar_sources
   SRC_PV_NEK/sgs.C
   )
 
-add_library(nektar STATIC ${nektar_sources})
+if(BUILD_TEST_EXE)
+  FIND_LIBRARY(SCALAPACK_LIBRARY REQUIRED NAMES scalapack scalapack-pvm scalapack-mpi scalapack-mpich scalapack-mpich2 scalapack-openmpi scalapack-lam
+    PATHS /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib)
 
+  # the BLACS library may be included in some newer builds of scalapack
+  FIND_LIBRARY(BLACS_LIBRARY REQUIRED NAMES blacs blacs-pvm blacs-mpi blacs-mpich blacs-mpich2 blacs-openmpi blacs-lam
+    PATHS /usr/lib64 /usr/lib /usr/local/lib64 /usr/local/lib)
+
+  # Report the found libraries, quit with fatal error if any required library has not been found.
+  INCLUDE(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(SCALAPACK DEFAULT_MSG SCALAPACK_LIBRARY BLACS_LIBRARY)
+endif()
+
+SET(SCALAPACK_LIBRARIES ${SCALAPACK_LIBRARY} ${BLACS_LIBRARY})
+
+add_library(nektar STATIC ${nektar_sources})
+target_link_libraries(nektar
+  nektarobj
+  hybrid
+  vec
+  metis
+  ${SCALAPACK_LIBRARIES}
+  ${LAPACK_lapack_LIBRARY}
+  ${BLAS_LIBRARIES}
+)
 #target_link_libraries(nektar
 #  ${MPI_LIBRARY}
 #  metis

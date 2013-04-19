@@ -8,7 +8,7 @@ FC      = $(COMPATH)/gfortran
 #FC  = $(COMPATH)/f77
 
 #MPILIB  = -L/usr/local/bin/
-MPI_DIR = /home/venkatv/software/mpich2_joe
+MPI_DIR = /soft/apps/mpich2-1.3.1-gnu/
 
 MPILIB  = -L$(MPI_DIR)/lib/
 MPIINC  = -I$(MPI_DIR)/include/

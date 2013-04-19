@@ -56,7 +56,7 @@
 #include "zbesj.h"
 
 
-#define SIZE   256       /* Maximum number of function string characters */
+#define SIZE   512       /* Maximum number of function string characters */
 
 typedef double (*PFD)(); /* Pointer to a function returning double */
 
@@ -71,7 +71,23 @@ typedef struct Symbol {  /* Symbol table entry */
 	      } u;
       } Symbol;
 
-//extern double doUserdefA(double x, double y, double z);
+
+/*-----------------------------------------------------------------------*
+ *     Functions reqired to set womersley profile on multiple inlets     *
+ *-----------------------------------------------------------------------*/
+  extern double doWomprofA(double x,double y,double z); /* womersley profile */
+  extern double doWomprofB(double x,double y,double z); /* womersley profile */
+  extern double doWomprofC(double x,double y,double z); /* womersley profile */
+  extern double doWomprofD(double x,double y,double z); /* womersley profile */
+
+  extern double doUserdefAu(double x, double y, double z);
+  extern double doUserdefAv(double x, double y, double z);
+  extern double doUserdefAw(double x, double y, double z);
+  extern double doUserdefBu(double x, double y, double z);
+  extern double doUserdefBv(double x, double y, double z);
+  extern double doUserdefBw(double x, double y, double z);
+  extern double doUserdefC(double x, double y, double z);
+  extern double doUserdefD(double x, double y, double z);
 
 
 /* --------------------------------------------------------------------- *
@@ -104,8 +120,28 @@ static  double
   Womsin(double,double,double,double,double),
   Womcos(double,double,double,double,double);
 
-//static double 
-//   UserdefA(double,double,double);
+
+
+
+static
+double WomprofA(double,double,double),
+       WomprofB(double,double,double),
+       WomprofC(double,double,double),
+       WomprofD(double,double,double);
+
+static double 
+      UserdefAu(double,double,double),
+      UserdefAv(double,double,double),
+      UserdefAw(double,double,double),
+      UserdefBu(double,double,double),
+      UserdefBv(double,double,double),
+      UserdefBw(double,double,double),
+      UserdefC(double,double,double),
+      UserdefD(double,double,double);
+
+static double 
+      Wannier_stream(double, double, double),
+      Wannier_cross(double, double, double);
 
 
 extern void show_symbol (Symbol *s);         /* Print symbol's value     */
@@ -254,7 +290,20 @@ static struct {                /* Built-ins */
          "jacobi", 4,  Jacobi,
 	 "womsin", 5,  Womsin,     /* Womersley solution due to sin component of u_avg  */
 	 "womcos", 5,  Womcos,     /* Womersley solution due to cos component of u_avg  */
-   /*      "userdefA", 3, UserdefA, */
+         "womprofA", 3, WomprofA,    /* womersley profile  */
+         "womprofB", 3, WomprofB,    /* womersley profile  */
+         "womprofC", 3, WomprofC,    /* womersley profile  */
+         "womprofD", 3, WomprofD,    /* womersley profile  */
+         "userdefAu", 3, UserdefAu,
+         "userdefAv", 3, UserdefAv,
+         "userdefAw", 3, UserdefAw,
+         "userdefBu", 3, UserdefBu,
+         "userdefBv", 3, UserdefBv,
+         "userdefBw", 3, UserdefBw,
+         "userdefC", 3, UserdefC,
+         "userdefD", 3, UserdefD,
+         "wannierS", 3, Wannier_stream,
+         "wannierC", 3, Wannier_cross,
 	 0,       0
 };
 
@@ -1098,11 +1147,77 @@ static double Single(double x, double y)
 }
 #endif
 
-/*
-static double UserdefA(double x, double y, double z){
-  return doUserdefA(x,y,z);
+/*-----------------------------------------------------*/
+/* Artery tree, velocity BC at inlets - womersley      */
+/*-----------------------------------------------------*/
+// here all functions return 0.0
+// these functions are not important for VIZ. purposes but only for computation
+// we keep them in order to be able to preocess the input *rea file
+
+
+
+static double WomprofA(double x, double y, double z)
+{
+    return 0;//doWomprofA(x,y,z);
 }
-*/
+static double WomprofB(double x, double y, double z)
+{
+    return 0;//doWomprofB(x,y,z);
+}
+
+static double WomprofC(double x, double y, double z)
+{
+    return 0;//doWomprofC(x,y,z);
+}
+
+static double WomprofD(double x, double y, double z)
+{
+    return 0;//doWomprofD(x,y,z);
+}
+
+static double UserdefAu(double x, double y, double z){
+    return 0;//doUserdefAu(x,y,z);
+}
+
+static double UserdefAv(double x, double y, double z){
+    return 0;//doUserdefAv(x,y,z);
+}
+
+static double UserdefAw(double x, double y, double z){
+    return 0;//doUserdefAw(x,y,z);
+}
+
+
+static double UserdefBu(double x, double y, double z){
+    return 0;//doUserdefBu(x,y,z);
+}
+
+static double UserdefBv(double x, double y, double z){
+    return 0;//doUserdefBv(x,y,z);
+}
+
+static double UserdefBw(double x, double y, double z){
+  return doUserdefBw(x,y,z);
+}
+
+
+static double UserdefC(double x, double y, double z){
+  return doUserdefC(x,y,z);
+}
+
+static double UserdefD(double x, double y, double z){
+  return doUserdefD(x,y,z);
+}
+
+static double Wannier_stream(double x, double y, double z){
+    return 0;//doWannier_stream(x,y,z);
+}
+
+static double Wannier_cross(double x, double y, double z){
+    return 0;//doWannier_cross(x,y,z);
+}
+
+
   
 #undef M_PI
 

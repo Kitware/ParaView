@@ -3,10 +3,10 @@
  *                                                                           *
  * $Source: /homedir/cvs/Nektar/Utilities/src/nek2tec.C,v $
  * $Revision: 1.2 $
- * $Date: 2006/01/16 15:49:01 $
- * $Author: ssherw $
+ * $Date: 2006/01/16 15:49:01 $ 
+ * $Author: ssherw $ 
  * $State: Exp $
- * $Updated by Leopold Grinberg 2010/01/16 $
+ * $Updated by Leopold Grinberg 2010/01/16 $ 
  *---------------------------------------------------------------------------*/
 #include <ctype.h>
 #include <math.h>
@@ -27,6 +27,8 @@ using std::string;
 using std::copy;
 using std::fill_n;
 
+// jai added
+using namespace nektarTri;
 
 
 #include <sys/stat.h>
@@ -36,6 +38,12 @@ using std::fill_n;
 /* function form comm_split.C*/
 MPI_Comm get_MPI_COMM();
 #endif
+
+// ** jai added
+  double timer_start;
+  double timer_stop;
+  double timer_diff;
+// **
 
 #ifdef WIN32
 #include <direct.h>
@@ -66,7 +74,7 @@ char *prog   = "nek2tec";
 char *usage  = "nek2tec:  [options]  -r file[.rea]  input[.fld]\n";
 char *author = "";
 char *rcsid  = "";
-char *help   =
+char *help   = 
   "-q      ... quadrature point spacing. Default is even spacing\n"
   "-R      ... range data information. must have mesh file specified\n"
   "-b      ... make body elements specified in mesh file\n"
@@ -83,7 +91,7 @@ char *help   =
 
 typedef struct body{
   int N;       /* number of faces    */
-  int *elmt;   /* element # of face  */
+  int *elmt;   /* element # of face  */ 
   int *faceid; /* face if in element */
 } Body;
 
@@ -97,8 +105,9 @@ typedef struct range{
 
 static Range *rnge;
 
+#ifndef BUILD_EXE
 int  setup (FileList *f, Element_List **U, int *nftot, int Nsnapshots);
-
+#endif
 void ReadCopyField (FileList *f, Element_List **U);
 void ReadAppendField (FileList *f, Element_List **U,  int start_fieled_index);
 static void Substruct_mean ( Element_List **U, int nfields, int Nsnapshot);
@@ -106,7 +115,7 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index);
 static void Calc_Write_WSS(Element_List **E, FileList f, Bndry *Ubc, int Snapshot_index);
 static void Get_Body(FILE *fp);
 static void dump_faces(FILE *out, Element_List **E, Coord X, int nel, int zone,
-           int nfields);
+		       int nfields);
 static void parse_util_args (int argc, char *argv[], FileList *f);
 static void WriteS(Element_List **E, FILE *out, int nfields,int Snapshot_index);
 static void WriteC(Element_List **E, FILE *out, int nfields);
@@ -150,7 +159,7 @@ do_main (int argc, char *argv[])
 
   FileList       f;
   Element_List **master;
-  Bndry         *Ubc;
+  Bndry         *Ubc; 
   char file_name[BUFSIZ];
   char file_name_in[BUFSIZ], file_name_out[BUFSIZ];
   int My_rank = 0;
@@ -191,10 +200,14 @@ do_main (int argc, char *argv[])
      fprintf(stderr,"Nsnapshots = %d ",Nsnapshots);
      write_pvd_file(Nsnapshots, Time_all_steps, fieldID, file_name_out);
   }
-
+ 
   master  = (Element_List **) malloc((2)*4*sizeof(Element_List *));
-  nfields = setup (&f, master, &nftot, 1);
 
+#ifdef BUILD_EXE
+  nfields = 0;
+#else
+  nfields = setup (&f, master, &nftot, 1);
+#endif
 
   /* read the first field */
   ReadCopyField(&f,master);
@@ -234,7 +247,7 @@ do_main (int argc, char *argv[])
 
 
  // exit_comm();
-
+  
   return 0;
 }
 
@@ -264,8 +277,8 @@ void OrthoJTransBwd(Element_List *EL, Element_List *ELf){
 
 void init_ortho_basis(void);
 
-static void Average_edges_div(Element_List *Us, Element_List *Uf,
-            char operation){
+static void Average_edges_div(Element_List *Us, Element_List *Uf, 
+			      char operation){
   register int i,j,k,n;
   int     qedg,nel = Us->nel;
   double  w1,w2;
@@ -274,26 +287,26 @@ static void Average_edges_div(Element_List *Us, Element_List *Uf,
   for(k = 0; k < nel; ++k)
     for(i = 0 ; i < Us->flist[k]->Nedges; ++i){
       if((e = Us->flist[k]->edge+i)->link){
-  qedg = e->qedg;
-  w1   = e->weight;
-  w2   = e->link->weight;
-  if(e->con == e->link->con)
-    for(j = 0; j < qedg; ++j)
-      Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->link->h[j]*w2;
-  else
-    for(j = 0; j < qedg; ++j)
-      Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->link->h[qedg-1-j]*w2;
+	qedg = e->qedg;
+	w1   = e->weight;
+	w2   = e->link->weight;
+	if(e->con == e->link->con)
+	  for(j = 0; j < qedg; ++j)
+	    Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->link->h[j]*w2;
+	else
+	  for(j = 0; j < qedg; ++j)
+	    Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->link->h[qedg-1-j]*w2;
       }
       else{
-  qedg = e->qedg;
-  w1   = e->weight;
-  w2   = e->base->weight;
-  if(e->con == e->base->con)
-    for(j = 0; j < qedg; ++j)
-      Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->base->h[j]*w2;
-  else
-    for(j = 0; j < qedg; ++j)
-      Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->base->h[qedg-1-j]*w2;
+	qedg = e->qedg;
+	w1   = e->weight;
+	w2   = e->base->weight;
+	if(e->con == e->base->con)
+	  for(j = 0; j < qedg; ++j)
+	    Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->base->h[j]*w2;
+	else
+	  for(j = 0; j < qedg; ++j)
+	    Uf->flist[k]->edge[i].h[j] =e->h[j]*w1 + e->base->h[qedg-1-j]*w2;
       }
     }
 }
@@ -304,7 +317,7 @@ int read_number_of_snapshots(FILE *pFile){
   char buf[BUFSIZ];
   char *p;
   int index_start, index_end;
-  int Nsnapshots = 0;
+  int Nsnapshots = 0;  
   rewind(pFile);
 
   /* read number of fields */
@@ -315,7 +328,7 @@ int read_number_of_snapshots(FILE *pFile){
          sscanf(buf,"%d %d",&index_start,&index_end);
          Nsnapshots = index_end-index_start+1;
          break;
-      }
+      }  
       if (strstr (p, "SELECTION")){
          fgets(buf,BUFSIZ,pFile);
          sscanf(buf,"%d",&Nsnapshots);
@@ -344,14 +357,14 @@ int read_number_of_snapshots(FILE *pFile, int *index_file){
          sscanf(buf,"%d %d",&index_start,&index_end);
          Nsnapshots = index_end-index_start+1;
          for (i = 0; i < Nsnapshots; ++i)
-           index_file[i] = index_start+i;
+           index_file[i] = index_start+i;   
          break;
       }
       if (strstr (p, "SELECTION")){
          fgets(buf,BUFSIZ,pFile);
          sscanf(buf,"%d",&Nsnapshots);
          for (i = 0; i < Nsnapshots; ++i){
-            fgets(buf,BUFSIZ,pFile);
+            fgets(buf,BUFSIZ,pFile); 
             sscanf(buf,"%d",index_file+i);
          }
          break;
@@ -410,23 +423,36 @@ void read_field_name_out(FILE *pFile, char *name){
 
 Gmap *gmap;
 
-int  setup (FileList *f, Element_List **U, int *nft, int Nsnapshots){
+int  setup (FileList *f, Element_List **U, int *nft, int Nsnapshots, bool mesh_only){
   int    i,shuff;
   int    nfields,nftot;
   Field  fld;
   extern Element_List *Mesh;
-
+  
   memset(&fld, '\0', sizeof (Field));
-  readHeader(f->in.fp,&fld,&shuff);
-  rewind(f->in.fp);
+
+  if(!mesh_only)
+  {
+      readHeader(f->in.fp,&fld,&shuff);
+      rewind(f->in.fp);
+  }
+  else
+  {
+      fld.lmax = 10;
+  }
 
   nfields = strlen(fld.type);
   nftot   = nfields*Nsnapshots;
 
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: setup(): mynode(%d): call ReadParams\n", mynode());
   ReadParams  (f->rea.fp);
 
-  //printf("setup: after ReadParams: MODES= %d, LQUAD= %d, MQUAD= %d, NQUAD= %d\n",
-//   iparam("MODES"), iparam("LQUAD"), iparam("MQUAD"), iparam("NQUAD"));
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: setup(): mynode(%d): ReadParams complete\n", mynode());
+
+  //printf("setup: after ReadParams: MODES= %d, LQUAD= %d, MQUAD= %d, NQUAD= %d\n", 
+//	 iparam("MODES"), iparam("LQUAD"), iparam("MQUAD"), iparam("NQUAD"));
 
 #if 0
   iparam_set("LQUAD",fld.lmax+1);
@@ -440,33 +466,75 @@ int  setup (FileList *f, Element_List **U, int *nft, int Nsnapshots){
   else if(option("Qpts")){
     iparam_set("LQUAD",fld.lmax+1);
     iparam_set("MQUAD",fld.lmax+1);
-  }
+  }    
   else{
     iparam_set("LQUAD",fld.lmax+1);
     iparam_set("MQUAD",fld.lmax+1);
-  }
+  }    
 #endif
 
   iparam_set("MODES",iparam("LQUAD")-1);
 
-//printf("setup: after adjusting: MODES= %d, LQUAD= %d, MQUAD= %d, NQUAD= %d\n",
-//   iparam("MODES"), iparam("LQUAD"), iparam("MQUAD"), iparam("NQUAD"));
+//printf("setup: after adjusting: MODES= %d, LQUAD= %d, MQUAD= %d, NQUAD= %d\n", 
+//	 iparam("MODES"), iparam("LQUAD"), iparam("MQUAD"), iparam("NQUAD"));
   /* Generate the list of elements */
-  Mesh = ReadMesh(f->rea.fp, strtok(f->rea.name,"."));
+  timer_start = MPI_Wtime();
+
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: setup(): mynode(%d): call ReadMesh\n", mynode());
+
+  Mesh = ReadMesh(f->rea.fp, strtok(f->rea.name,".")); 
+  timer_stop = MPI_Wtime();
+  timer_diff = timer_stop - timer_start;
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: setup() mynode(%d) ** Total Time for ReadMesh(): %f\n", mynode(), timer_diff);
+
+  timer_start = MPI_Wtime();
   //fprintf(stderr, "setup: after ReadMesh()\n");
   gmap = GlobalNumScheme(Mesh, (Bndry *)NULL);
+  timer_stop = MPI_Wtime();
+  timer_diff = timer_stop - timer_start;
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: mynode(%d) ** Time for GlobalNumScheme(before DO_PARALLEL): %f\n", mynode(), timer_diff);
+
   //fprintf(stderr, "setup: after GlobalNumScheme()\n");
-  U[0] = LocalMesh(Mesh,strtok(f->rea.name,"."));
+  timer_start = MPI_Wtime();
+  U[0] = LocalMesh(Mesh,strtok(f->rea.name,".")); 
+  timer_stop = MPI_Wtime();
+  timer_diff = timer_stop - timer_start;
+  //ROOTONLY
+  //    fprintf(stderr, "nek2vel_PV_interface.C: mynode(%d) ** Time for LocalMesh(): %f\n", mynode(), timer_diff);
+
   //fprintf(stderr, "setup: after LocalMesh()\n");
   DO_PARALLEL{ // recall global numbering to put partition vertices first
     free_gmap(gmap);
+
+    timer_start = MPI_Wtime();
     Reflect_Global_Velocity    (Mesh, (Bndry *)NULL, 0);
+    timer_stop = MPI_Wtime();
+    timer_diff = timer_stop - timer_start;
+    //ROOTONLY
+    //    fprintf(stderr, "nek2vel_PV_interface.C: mynode(%d) ** Time for Reflect_Global_Velocity(): %f\n", mynode(), timer_diff);
+
+    timer_start = MPI_Wtime();
     gmap  = GlobalNumScheme    (Mesh, (Bndry *)NULL);
+    timer_stop = MPI_Wtime();
+    timer_diff = timer_stop - timer_start;   
+    //ROOTONLY
+    //    fprintf(stderr, "nek2vel_PV_interface.C: mynode(%d) ** Time for  GlobalNumScheme(inside DO_PARALLEL): %f\n", mynode(), timer_diff);
+
+    timer_start = MPI_Wtime();
     Replace_Numbering          (U[0], Mesh);
+    timer_stop = MPI_Wtime();
+    timer_diff = timer_stop - timer_start;
+    //ROOTONLY
+    //    fprintf(stderr, "nek2vel_PV_interface.C: mynode(%d) ** Time for Replace_Numbering(): %f\n", mynode(), timer_diff);
+
   }
 
-  init_ortho_basis();
-
+  //  *** jai commented out, trying to get mesh only to work
+  //init_ortho_basis();
+ 
   if(f->mesh.name) Get_Body(f->mesh.fp);
 
   for(i = 1; i < nfields; ++i){
@@ -531,7 +599,7 @@ void ReadCopyField (FileList *f, Element_List **U){
 
   if(option("Surface_Fld")){
     Bndry   *Ubc, *B;
-    int     nbcs=0;
+    int     nbcs=0;    
     /* set up boundary structure */
     Ubc = ReadMeshBCs(f->rea.fp,U[0]);
     for (B=Ubc;B;B=B->next) nbcs++;
@@ -564,8 +632,8 @@ void read_time_all_steps ( int Nsnapshots, double *Time_all_steps, int *fieldID,
       p = fgets (buf, BUFSIZ, pFile);
 
     sscanf(buf,"%lf",Time_all_steps+i);
-    ROOTONLY
-      fprintf(stderr,"Time_all_steps[%d] = %f \n", fieldID[i],Time_all_steps[i]);
+    //ROOTONLY
+    //  fprintf(stderr,"Time_all_steps[%d] = %f \n", fieldID[i],Time_all_steps[i]);
     fclose(pFile);
   }
 }
@@ -580,14 +648,14 @@ static void Substruct_mean ( Element_List **U, int nfields, int Nsnapshot){
   for(k = 0; k < U[0]->nel; ++k){
     qt = U[0]->flist[k]->qtot;
     sum_val = new double[qt];
-
+    
     for (field = 0; field < nfields; ++field){
       /* compute the average */
       memset(sum_val,'\0',qt*sizeof(double));
-      for (i = 0; i < Nsnapshot; ++i)
+      for (i = 0; i < Nsnapshot; ++i) 
         dvadd(qt, **U[i*nfields+field]->flist[k]->h_3d, 1, sum_val, 1, sum_val, 1);
 
-      dscal(qt, 1.0/Nsnapshot, sum_val, 1);
+      dscal(qt, 1.0/Nsnapshot, sum_val, 1); 
 
      /* substruct the average */
       for (i = 0; i < Nsnapshot; ++i)
@@ -615,6 +683,8 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
   // jai : setting PROJECT to true, just for a test...
   //option_set("PROJECT", true);
 
+  //ROOTONLY
+  //    fprintf(stderr, "Calc_Vort(): rank %d: just set PROJECT to true\n", mynode());
   /*************** new variables ***********************/
   int INFO;
   double S11,S12,S13,S22,S23,S33,T12,T13,T23,p11,p12,p13,p22,p23,p33;
@@ -626,9 +696,9 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
 
 //LG: not sure if we need teh following two lines, it is transform from modal to physical space
 //and we might have done it already.... need to check
-
-  for(i=0;i<nfields;++i)
-    U[i+Snapshot_index]->Trans(U[i+Snapshot_index],J_to_Q);
+ 
+//  for(i=0;i<nfields;++i)
+//    U[i+Snapshot_index]->Trans(U[i+Snapshot_index],J_to_Q);
 
   if(U[0]->fhead->dim() == 3){
 
@@ -702,29 +772,44 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
     free_dmatrix(Z,0,0);
     free_dmatrix(d,0,0);
 
+    //ROOTONLY
+    //    fprintf(stderr, "in Calc_Vort(): rank: %d : about to check for option PROJECT\n",mynode() );
+
     if(option("PROJECT")){
+	//ROOTONLY
+	//    fprintf(stderr, "in Calc_Vort(): rank: %d : option PROJECT is set\n", mynode());
       Element_List *T  = U[0+Snapshot_index]->gen_aux_field('T');
+      //ROOTONLY
+      //    fprintf(stderr, "in Calc_Vort(): rank: %d : Element_List *T set\n", mynode());
       Element_List *Tf = T->gen_aux_field('T');
+      //ROOTONLY
+      //    fprintf(stderr, "in Calc_Vort(): rank: %d : Element_List *Tf set\n", mynode());
+
       Bsystem *Bsys;
       option_set("recursive",1);
 
       Bsys = gen_bsystem(T, gmap);
 
-      ROOTONLY
-        fprintf(stderr,"Projecting Vorticity -- Generating Matrix [");
+      //ROOTONLY
+      //    fprintf(stderr, "in Calc_Vort(): rank: %d : gen_bsystem() complete\n", mynode());
+
+      //ROOTONLY
+      //  fprintf(stderr,"Projecting Vorticity -- Generating Matrix [");
 
       Bsys->lambda = (Metric*) calloc(U[0+Snapshot_index]->nel, sizeof(Metric));
+      //ROOTONLY
+      //  fprintf(stderr," %d ", U[0+Snapshot_index]->nel);
       GenMat(T, NULL, Bsys, Bsys->lambda, Mass);
-      ROOTONLY fprintf(stderr," ]\n");
+      //ROOTONLY fprintf(stderr," ]\n");
 
 
       /********** PROJECTION  OF VORTICITY ON Co FIELD ******************/
-
+ 
       /* project Wx */
 
       dcopy(U[0+Snapshot_index]->htot, U[0+Snapshot_index]->base_h, 1, Tf->base_h, 1);
       Tf->Set_state('p');
-      ROOTONLY fprintf(stderr,"Projecting Wx\n");
+      //ROOTONLY fprintf(stderr,"Projecting Wx\n");
       solve(T, Tf, NULL, Bsys, Mass);
       T->Trans(U[0+Snapshot_index], J_to_Q);
       dcopy(T->hjtot, T->base_hj, 1, U[0+Snapshot_index]->base_hj, 1);
@@ -735,7 +820,7 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
 
       dcopy(U[1+Snapshot_index]->htot, U[1+Snapshot_index]->base_h, 1, Tf->base_h, 1);
       Tf->Set_state('p');
-      ROOTONLY fprintf(stderr,"Projecting Wy\n");
+      //ROOTONLY fprintf(stderr,"Projecting Wy\n");
       solve(T, Tf, NULL, Bsys, Mass);
       T->Trans(U[1+Snapshot_index], J_to_Q);
       dcopy(T->hjtot, T->base_hj, 1, U[1+Snapshot_index]->base_hj, 1);
@@ -746,7 +831,7 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
 
       dcopy(U[2+Snapshot_index]->htot, U[2+Snapshot_index]->base_h, 1, Tf->base_h, 1);
       Tf->Set_state('p');
-      ROOTONLY fprintf(stderr,"Projecting Wz\n");
+      //ROOTONLY fprintf(stderr,"Projecting Wz\n");
       solve(T, Tf, NULL, Bsys, Mass);
       T->Trans(U[2+Snapshot_index], J_to_Q);
       dcopy(T->hjtot, T->base_hj, 1, U[2+Snapshot_index]->base_hj, 1);
@@ -757,7 +842,7 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
 
       dcopy(U[3+Snapshot_index]->htot, U[3+Snapshot_index]->base_h, 1, Tf->base_h, 1);
       Tf->Set_state('p');
-      ROOTONLY fprintf(stderr,"Projecting Lambda\n");
+      //ROOTONLY fprintf(stderr,"Projecting Lambda\n");
       solve(T, Tf, NULL, Bsys, Mass);
       T->Trans(U[3+Snapshot_index], J_to_Q);
       dcopy(T->hjtot, T->base_hj, 1, U[3+Snapshot_index]->base_hj, 1);
@@ -832,11 +917,11 @@ void Calc_Vort (FileList *f, Element_List **U, int nfields, int Snapshot_index){
 
       Bsys = gen_bsystem(T, gmap);
 
-      ROOTONLY fprintf(stderr,"Projecting Vorticity -- Generating Matrix [");
+      //ROOTONLY fprintf(stderr,"Projecting Vorticity -- Generating Matrix [");
 
       Bsys->lambda = (Metric*) calloc(U[0]->nel, sizeof(Metric));
       GenMat(T, NULL, Bsys, Bsys->lambda, Mass);
-      ROOTONLY fprintf(stderr," ]\n");
+      //ROOTONLY fprintf(stderr," ]\n");
 
       dcopy(U[nfields]->htot, U[nfields]->base_h, 1, Tf->base_h, 1);
       Tf->Set_state('p');
@@ -1116,7 +1201,7 @@ void WriteVTK(Element_List **E, char *fname_vtk, int nfields, int Snapshot_index
         vert_ID_array[k] -= 1;
 
     free_dtarray(num,0,0,0);
-    }//end "if (FLAG_GEOM)"
+    }//end "if (FLAG_GEOM)"   
 
     free(X.x); free(X.y); free(X.z);
 
@@ -1148,11 +1233,11 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
   Coord    X;
   char     *outformat;
   Element  *F;
-
-  Snapshot_index *= nfields;
+  
+  Snapshot_index *= nfields;      
 
   interior = ivector(0,E[0+Snapshot_index]->nel-1);
-
+ 
 
   float *XYZUVWP,*XYZUVWP_all;
   //float *UVWP, *Pres;
@@ -1169,28 +1254,28 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
     X.x = dvector(0,QGmax*QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax*QGmax-1);
     X.z = dvector(0,QGmax*QGmax*QGmax-1);
-
+    
 
     // ROOTONLY{
       fprintf(out,"VARIABLES = x y z");
 
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
-
+	fprintf(out," %c", E[i]->fhead->type);
+      
       fputc('\n',out);
       //}
-
+   
     qa = E[0]->flist[0]->qa;
-
+ 
     int Nel = E[0+Snapshot_index]->nel;
 
     for(k = 0,n=i=0; k < Nel; ++k){
       F  = E[0+Snapshot_index]->flist[k];
       if(Check_range_sub_cyl(F)){
-  //if(Check_range(F)){
-  qa = F->qa;
-  i += qa*(qa+1)*(qa+2)/6;
-  n += (qa-1)*(qa-1)*(qa-1);
+	//if(Check_range(F)){
+	qa = F->qa;
+	i += qa*(qa+1)*(qa+2)/6;
+	n += (qa-1)*(qa-1)*(qa-1);
       }
     }
 
@@ -1198,8 +1283,8 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
     Nelements_total = n;
 
     XYZUVWP = new float[Nvert_total*(3+nfields)];
-
-
+   
+   
     switch(F->identify()){
     case Nek_Tet:
       fprintf(out,"ZONE  N=%d, E=%d, F=FEPOINT, ET=TETRAHEDRON\n",i,n);
@@ -1212,7 +1297,7 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 
 
     /* fill XYZ and UVWP arrays */
-
+    
     index = 0;
     for(k = 0; k < Nel; ++k){
       F  = E[0+Snapshot_index]->flist[k];
@@ -1227,9 +1312,9 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
           F = E[n+Snapshot_index]->flist[k];
           Interp_symmpts(F,F->qa,F->h_3d[0][0],F->h_3d[0][0],'p');
         }
-
+        
         for(i = 0; i < ntot; ++i){
-    XYZUVWP[index*(3+nfields)]   = X.x[i];
+	  XYZUVWP[index*(3+nfields)]   = X.x[i];
           XYZUVWP[index*(3+nfields)+1] = X.y[i];
           XYZUVWP[index*(3+nfields)+2] = X.z[i];
 
@@ -1263,7 +1348,7 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 #ifdef PARALLEL
     MPI_Allgather(&Nvert_total,1,MPI_INT,Nvert_per_core,1,MPI_INT,get_MPI_COMM());
 #else
-    Nvert_total = Nvert_per_core[0];
+    Nvert_total = Nvert_per_core[0]; 
 #endif
 
     Nvert_global = 0;
@@ -1273,19 +1358,19 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
       recvcnt[0] = Nvert_per_core[0]*(3+nfields);
       Nvert_global += Nvert_per_core[0];
       for (i = 1; i < Ncores; ++i){
-  displs[i] = displs[i-1]+recvcnt[i-1];
-  recvcnt[i] = Nvert_per_core[i]*(3+nfields);
+	displs[i] = displs[i-1]+recvcnt[i-1];
+	recvcnt[i] = Nvert_per_core[i]*(3+nfields);
         Nvert_global += Nvert_per_core[0];
       }
       XYZUVWP_all = new float[Nvert_global*(3+nfields)];
     }
 
 
-    /* gather data to VIZ_ROOT */
-#ifdef PARALLEL
-    MPI_Gatherv (XYZUVWP, Nvert_total*(3+nfields), MPI_FLOAT,
-     XYZUVWP_all, recvcnt, displs,
-     MPI_FLOAT, VIZ_ROOT, get_MPI_COMM() );
+    /* gather data to VIZ_ROOT */  
+#ifdef PARALLEL 
+    MPI_Gatherv (XYZUVWP, Nvert_total*(3+nfields), MPI_FLOAT, 
+		 XYZUVWP_all, recvcnt, displs,
+		 MPI_FLOAT, VIZ_ROOT, get_MPI_COMM() );
 #else
    memcpy(XYZUVWP_all,XYZUVWP,Nvert_total*(3+nfields)*sizeof(float));
 #endif
@@ -1297,7 +1382,7 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
         i = index*(3+nfields);
         fprintf(out,"%f %f %f", XYZUVWP_all[i],XYZUVWP_all[i+1],XYZUVWP_all[i+2]);
         for(n = 0; n < nfields;  ++n)
-    fprintf(out," %f", XYZUVWP_all[i+3+n]);
+	  fprintf(out," %f", XYZUVWP_all[i+3+n]);
         fputc('\n',out);
       }
       delete[] XYZUVWP_all;
@@ -1310,29 +1395,29 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
    for(k = 0; k < Nel; ++k){
       F  = E[0+Snapshot_index]->flist[k];
       if(Check_range_sub_cyl(F)){
-  //if(Check_range(F)){
-  qa = F->qa;
-  F->coord(&X);
-  ntot = Interp_symmpts(F,F->qa,X.x,X.x,'p');
-  ntot = Interp_symmpts(F,F->qa,X.y,X.y,'p');
-  ntot = Interp_symmpts(F,F->qa,X.z,X.z,'p');
-  for(n = 0; n < nfields; ++n){
-    F = E[n+Snapshot_index]->flist[k];
-    Interp_symmpts(F,F->qa,F->h_3d[0][0],F->h_3d[0][0],'p');
-  }
-  for(i = 0; i < ntot; ++i){
-    fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n+Snapshot_index]->flist[k]->h_3d[0][0][i]);
-    fputc('\n',out);
-  }
+	//if(Check_range(F)){
+	qa = F->qa;
+	F->coord(&X);
+	ntot = Interp_symmpts(F,F->qa,X.x,X.x,'p');
+	ntot = Interp_symmpts(F,F->qa,X.y,X.y,'p');
+	ntot = Interp_symmpts(F,F->qa,X.z,X.z,'p');
+	for(n = 0; n < nfields; ++n){
+	  F = E[n+Snapshot_index]->flist[k];
+	  Interp_symmpts(F,F->qa,F->h_3d[0][0],F->h_3d[0][0],'p');
+	}
+	for(i = 0; i < ntot; ++i){
+	  fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n+Snapshot_index]->flist[k]->h_3d[0][0][i]);
+	  fputc('\n',out);
+	}
       }
     }
 #endif
 
-
+    
     /* numbering array */
-
+  
     for(e = 0,n=0; e < Nel; ++e){
       F  = E[0]->flist[e];
       if(Check_range_sub_cyl(F)){
@@ -1368,31 +1453,31 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 
     for(cnt = 1, k = 0; k < qa; ++k)
       for(j = 0; j < qa-k; ++j)
-  for(i = 0; i < qa-k-j; ++i, ++cnt)
-    num[i][j][k] = cnt;
+	for(i = 0; i < qa-k-j; ++i, ++cnt)
+	  num[i][j][k] = cnt;
 
     //fprintf(stderr,"rank = %d: cnt*Nel = %d\n",mynode(),cnt*Nel);
     //gsync();
 
-    index = 0;
+    index = 0;  
     for(e = 0,n=0; e < Nel; ++e){
       F  = E[0]->flist[e];
       if(Check_range_sub_cyl(F)){
-  //if(Check_range(F)){
-  qa = F->qa;
-  /* dump connectivity */
-  switch(F->identify()){
-  case Nek_Tet:
-    for(k=0; k < qa-1; ++k)
-      for(j = 0; j < qa-1-k; ++j){
-        for(i = 0; i < qa-2-k-j; ++i){
+	//if(Check_range(F)){
+	qa = F->qa;
+	/* dump connectivity */
+	switch(F->identify()){
+	case Nek_Tet:
+	  for(k=0; k < qa-1; ++k)
+	    for(j = 0; j < qa-1-k; ++j){
+	      for(i = 0; i < qa-2-k-j; ++i){
 
                 vert_ID_array[index++] = n+(int) num[i][j][k];
                 vert_ID_array[index++] = n+(int) num[i+1][j][k];
                 vert_ID_array[index++] = n+(int) num[i][j+1][k];
                 vert_ID_array[index++] = n+(int) num[i][j][k+1];
 
-                vert_ID_array[index++] = n+(int) num[i+1][j][k];
+                vert_ID_array[index++] = n+(int) num[i+1][j][k];   
                 vert_ID_array[index++] = n+(int) num[i][j+1][k];
                 vert_ID_array[index++] = n+(int) num[i][j][k+1];
                 vert_ID_array[index++] = n+(int) num[i+1][j][k+1];
@@ -1406,8 +1491,8 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
                 vert_ID_array[index++] = n+(int) num[i][j+1][k];
                 vert_ID_array[index++] = n+(int) num[i+1][j][k];
                 vert_ID_array[index++] = n+(int) num[i+1][j][k+1];
-
-                vert_ID_array[index++] = n+(int) num[i+1][j+1][k];
+             
+                vert_ID_array[index++] = n+(int) num[i+1][j+1][k]; 
                 vert_ID_array[index++] = n+(int) num[i][j+1][k];
                 vert_ID_array[index++] = n+(int) num[i+1][j][k+1];
                 vert_ID_array[index++] = n+(int) num[i][j+1][k+1];
@@ -1419,47 +1504,47 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
                   vert_ID_array[index++] = n+(int) num[i+1][j+1][k];
                 }
 #if 0
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i][j][k],
-      n+(int) num[i+1][j][k],
-      n+(int) num[i][j+1][k], n+(int) num[i][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i][j][k+1], n+(int) num[i+1][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k+1],
-      n+(int) num[i][j][k+1],
-      n+(int) num[i][j+1][k+1], n+(int) num[i][j+1][k]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i+1][j][k], n+(int) num[i+1][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i+1][j][k+1], n+(int) num[i][j+1][k+1]);
-    if(i < qa-3-k-j)
-      fprintf(out,"%d %d %d %d\n", n+(int) num[i][j+1][k+1],
-        n+(int) num[i+1][j+1][k+1],
-        n+(int) num[i+1][j][k+1],
-        n+(int) num[i+1][j+1][k]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i][j][k],
+			n+(int) num[i+1][j][k],
+			n+(int) num[i][j+1][k], n+(int) num[i][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i][j][k+1], n+(int) num[i+1][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k+1],
+			n+(int) num[i][j][k+1],
+			n+(int) num[i][j+1][k+1], n+(int) num[i][j+1][k]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i+1][j][k], n+(int) num[i+1][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i+1][j][k+1], n+(int) num[i][j+1][k+1]);
+		if(i < qa-3-k-j)
+		  fprintf(out,"%d %d %d %d\n", n+(int) num[i][j+1][k+1],
+			  n+(int) num[i+1][j+1][k+1],
+			  n+(int) num[i+1][j][k+1], 
+			  n+(int) num[i+1][j+1][k]);
 #endif
-        }
+	      }
 
                 vert_ID_array[index++] = n+(int) num[qa-2-k-j][j][k];
                 vert_ID_array[index++] = n+(int) num[qa-1-k-j][j][k];
                 vert_ID_array[index++] = n+(int) num[qa-2-k-j][j+1][k];
                 vert_ID_array[index++] = n+(int) num[qa-2-k-j][j][k+1];
 #if 0
-        fprintf(out,"%d %d %d %d\n", n+(int) num[qa-2-k-j][j][k],
-                                  n+(int) num[qa-1-k-j][j][k],
-                               n+(int) num[qa-2-k-j][j+1][k],
-                               n+(int) num[qa-2-k-j][j][k+1]);
+	      fprintf(out,"%d %d %d %d\n", n+(int) num[qa-2-k-j][j][k],
+   		                           n+(int) num[qa-1-k-j][j][k],
+		                           n+(int) num[qa-2-k-j][j+1][k],
+		                           n+(int) num[qa-2-k-j][j][k+1]);
 #endif
-      }
-    n += qa*(qa+1)*(qa+2)/6;
-    break;
-  default:
-    fprintf(stderr,"WriteS is not set up for this element type \n");
-    exit(1);
-    break;
-  }
+	    }
+	  n += qa*(qa+1)*(qa+2)/6;
+	  break;
+	default:
+	  fprintf(stderr,"WriteS is not set up for this element type \n");
+	  exit(1);
+	  break;
+	}
       }
     }
 #ifdef PARALLEL
@@ -1478,15 +1563,15 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 
 #ifdef PARALLEL
     MPI_Allgather (&vert_ID_array_length,     1, MPI_INT,
-              vert_ID_array_len_per_core, 1, MPI_INT,
-      get_MPI_COMM());
+  	          vert_ID_array_len_per_core, 1, MPI_INT,
+		  get_MPI_COMM());
 #else
    vert_ID_array_len_per_core[0] = vert_ID_array_length;
 #endif
 
     if (MyRank == VIZ_ROOT){
       for (i = 0; i < Ncores; ++i)
-  vert_ID_array_length_all += vert_ID_array_len_per_core[i];
+	vert_ID_array_length_all += vert_ID_array_len_per_core[i];
 
       vert_ID_array_all = new int[vert_ID_array_length_all];
 
@@ -1494,8 +1579,8 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
       displs[0] = 0;
       recvcnt[0] = vert_ID_array_len_per_core[0];
       for (i = 1; i < Ncores; ++i){
-  displs[i] = displs[i-1]+recvcnt[i-1];
-  recvcnt[i] = vert_ID_array_len_per_core[i];
+	displs[i] = displs[i-1]+recvcnt[i-1];
+	recvcnt[i] = vert_ID_array_len_per_core[i];
       }
     }
 
@@ -1511,16 +1596,16 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 
 #ifdef PARALLEL
       MPI_Gatherv ( vert_ID_array, vert_ID_array_length, MPI_INT,
-        vert_ID_array_all, recvcnt, displs,
-        MPI_INT,
-        VIZ_ROOT, get_MPI_COMM() );
+		    vert_ID_array_all, recvcnt, displs,
+		    MPI_INT,
+		    VIZ_ROOT, get_MPI_COMM() );
 
 #else
      memcpy(vert_ID_array_all,vert_ID_array,vert_ID_array_length*sizeof(int));
-#endif
+#endif 
 
      //fprintf(stderr,"rank = %d:: vert_ID_array - updated \n");
-
+    
     delete[] vert_ID_array;
 
   }
@@ -1528,31 +1613,31 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
 
     ROOTONLY{
       fprintf(out,"VARIABLES = x y");
-
+      
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
+	fprintf(out," %c", E[i]->fhead->type);
       fputc('\n',out);
     }
 
-    /* set up global number scheme for this partition */
+    /* set up global number scheme for this partition */ 
     nelmts = 0;
     for(k = 0,n=0; k < E[0]->nel; ++k){
       F= E[0]->flist[k];
       qa = F->qa;
 
       if(F->identify() == Nek_Tri){
-  nelmts += (qa-1)*(qa-1);
-  n += qa*(qa+1)/2;
+	nelmts += (qa-1)*(qa-1);
+	n += qa*(qa+1)/2;
       }
       else{
-  nelmts += 2*(qa-1)*(qa-1);
-  n += qa*qa;
+	nelmts += 2*(qa-1)*(qa-1);
+	n += qa*qa;
       }
     }
 
     /* treat all elements as tri's for hybrid code in tecplot */
     fprintf(out,"ZONE, N=%d, E=%d, F=FEPOINT, ET=TRIANGLE\n",n, nelmts);
-
+    
     X.x = dvector(0,QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax-1);
 
@@ -1560,52 +1645,52 @@ static void WriteS(Element_List **E, FILE *out, int nfields, int Snapshot_index)
     for(k = 0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
-  F->coord(&X);
+	qa = F->qa;
+	F->coord(&X);
 
-  ntot = Interp_symmpts(F,qa,X.x,X.x,'p');
-  ntot = Interp_symmpts(F,qa,X.y,X.y,'p');
-  for(n = 0; n < nfields; ++n){
-    F = E[n]->flist[k];
-    Interp_symmpts(F,qa,F->h[0],F->h[0],'p');
-  }
+	ntot = Interp_symmpts(F,qa,X.x,X.x,'p');
+	ntot = Interp_symmpts(F,qa,X.y,X.y,'p');
+	for(n = 0; n < nfields; ++n){
+	  F = E[n]->flist[k];
+	  Interp_symmpts(F,qa,F->h[0],F->h[0],'p');
+	}
 
-  for(i = 0; i < ntot; ++i){
-    fprintf(out,"%lg %lg", X.x[i], X.y[i]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n]->flist[k]->h[0][i]);
-    fputc('\n',out);
-  }
+	for(i = 0; i < ntot; ++i){
+	  fprintf(out,"%lg %lg", X.x[i], X.y[i]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n]->flist[k]->h[0][i]);
+	  fputc('\n',out);
+	}
       }
     }
-
+	
     /* dump connectivity */
     for(k = 0,n=0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
-  if(F->identify() == Nek_Tri){
-    for(cnt = 0,j = 0; j < qa-1; ++j){
-      for(i = 0; i < qa-2-j; ++i){
-        fprintf(out,"%d %d %d\n",n+cnt+i+1,n+cnt+i+2,n+cnt+qa-j+i+1);
-        fprintf(out,"%d %d %d\n",n+cnt+qa-j+i+2,n+cnt+qa-j+i+1,n+cnt+i+2);
-      }
-      fprintf(out,"%d %d %d\n",n+cnt+qa-1-j,n+cnt+qa-j,
-        n+cnt+2*qa-2*j-1);
-      cnt += qa-j;
-    }
-    n += qa*(qa+1)/2;
-  }
-  else{
-    for(cnt = 0,j = 0; j < qa-1; ++j){
-      for(i = 0; i < qa-1; ++i){
-        fprintf(out,"%d %d %d\n",cnt+i+1,cnt+i+2,cnt+qa+i+1);
-        fprintf(out,"%d %d %d\n",cnt+qa+i+2,cnt+qa+i+1,cnt+i+2);
-      }
-      cnt += qa;
-    }
-    n += 2*(qa-1)*(qa-1);
-  }
+	qa = F->qa;
+	if(F->identify() == Nek_Tri){
+	  for(cnt = 0,j = 0; j < qa-1; ++j){
+	    for(i = 0; i < qa-2-j; ++i){
+	      fprintf(out,"%d %d %d\n",n+cnt+i+1,n+cnt+i+2,n+cnt+qa-j+i+1);
+	      fprintf(out,"%d %d %d\n",n+cnt+qa-j+i+2,n+cnt+qa-j+i+1,n+cnt+i+2);
+	    }
+	    fprintf(out,"%d %d %d\n",n+cnt+qa-1-j,n+cnt+qa-j,
+		    n+cnt+2*qa-2*j-1);
+	    cnt += qa-j;
+	  }
+	  n += qa*(qa+1)/2;
+	}
+	else{
+	  for(cnt = 0,j = 0; j < qa-1; ++j){
+	    for(i = 0; i < qa-1; ++i){
+	      fprintf(out,"%d %d %d\n",cnt+i+1,cnt+i+2,cnt+qa+i+1);
+	      fprintf(out,"%d %d %d\n",cnt+qa+i+2,cnt+qa+i+1,cnt+i+2);
+	    }
+	    cnt += qa;
+	  }
+	  n += 2*(qa-1)*(qa-1);
+	}
       }
     }
     free(X.x); free(X.y);
@@ -1621,10 +1706,10 @@ static void WriteC(Element_List **E, FILE *out, int nfields){
   Coord    X;
   char     *outformat;
   Element  *F;
-
-
+  
+     
   interior = ivector(0,E[0]->nel-1);
-
+  
   if(E[0]->fhead->dim() == 3){
     double ***num;
 
@@ -1634,21 +1719,21 @@ static void WriteC(Element_List **E, FILE *out, int nfields){
     X.x = dvector(0,QGmax*QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax*QGmax-1);
     X.z = dvector(0,QGmax*QGmax*QGmax-1);
-
+    
     ROOTONLY{
       fprintf(out,"VARIABLES = x y z");
 
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
+	fprintf(out," %c", E[i]->fhead->type);
       fputc('\n',out);
     }
-
+    
     for(k = 0,n=i=0; k < E[0]->nel; ++k){
       F  = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
-  i += qa*(qa+1)*(qa+2)/6;
-  n += (qa-1)*(qa-1)*(qa-1);
+	qa = F->qa;
+	i += qa*(qa+1)*(qa+2)/6;
+	n += (qa-1)*(qa-1)*(qa-1);
       }
     }
 
@@ -1666,76 +1751,76 @@ static void WriteC(Element_List **E, FILE *out, int nfields){
     for(k = 0; k < E[0]->nel; ++k){
       F  = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
-  F->coord(&X);
-  ntot = Interp_symmpts(F,F->qa,X.x,X.x,'m');
-  ntot = Interp_symmpts(F,F->qa,X.y,X.y,'m');
-  ntot = Interp_symmpts(F,F->qa,X.z,X.z,'m');
-  for(n = 0; n < nfields; ++n){
-    F = E[n]->flist[k];
-    Interp_symmpts(F,F->qa,F->h_3d[0][0],F->h_3d[0][0],'m');
-  }
-  for(i = 0; i < ntot; ++i){
-    fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n]->flist[k]->h_3d[0][0][i]);
-    fputc('\n',out);
-  }
+	qa = F->qa;
+	F->coord(&X);
+	ntot = Interp_symmpts(F,F->qa,X.x,X.x,'m');
+	ntot = Interp_symmpts(F,F->qa,X.y,X.y,'m');
+	ntot = Interp_symmpts(F,F->qa,X.z,X.z,'m');
+	for(n = 0; n < nfields; ++n){
+	  F = E[n]->flist[k];
+	  Interp_symmpts(F,F->qa,F->h_3d[0][0],F->h_3d[0][0],'m');
+	}
+	for(i = 0; i < ntot; ++i){
+	  fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n]->flist[k]->h_3d[0][0][i]);
+	  fputc('\n',out);
+	}
       }
     }
 
-
+    
     /* numbering array */
     num = dtarray(0,QGmax-1,0,QGmax-1,0,QGmax-1);
 
     for(cnt = 1, k = 0; k < qa; ++k)
       for(j = 0; j < qa-k; ++j)
-  for(i = 0; i < qa-k-j; ++i, ++cnt)
-    num[i][j][k] = cnt;
-
+	for(i = 0; i < qa-k-j; ++i, ++cnt)
+	  num[i][j][k] = cnt;
+    
     for(e = 0,n=0; e < E[0]->nel; ++e){
       F  = E[0]->flist[e];
       if(Check_range(F)){
-  qa = F->qa;
-  /* dump connectivity */
-  switch(F->identify()){
-  case Nek_Tet:
-    for(k=0; k < qa-1; ++k)
-      for(j = 0; j < qa-1-k; ++j){
-        for(i = 0; i < qa-2-k-j; ++i){
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i][j][k],
-      n+(int) num[i+1][j][k],
-      n+(int) num[i][j+1][k], n+(int) num[i][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i][j][k+1], n+(int) num[i+1][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k+1],
-      n+(int) num[i][j][k+1],
-      n+(int) num[i][j+1][k+1], n+(int) num[i][j+1][k]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i+1][j][k], n+(int) num[i+1][j][k+1]);
-    fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
-      n+(int) num[i][j+1][k],
-      n+(int) num[i+1][j][k+1], n+(int) num[i][j+1][k+1]);
-    if(i < qa-3-k-j)
-      fprintf(out,"%d %d %d %d\n", n+(int) num[i][j+1][k+1],
-        n+(int) num[i+1][j+1][k+1],
-        n+(int) num[i+1][j][k+1],
-        n+(int) num[i+1][j+1][k]);
-        }
-        fprintf(out,"%d %d %d %d\n", n+(int) num[qa-2-k-j][j][k],
-          n+(int) num[qa-1-k-j][j][k],
-          n+(int) num[qa-2-k-j][j+1][k],
-          n+(int) num[qa-2-k-j][j][k+1]);
-      }
-    n += qa*(qa+1)*(qa+2)/6;
-    break;
-  default:
-    fprintf(stderr,"WriteS is not set up for this element type \n");
-    exit(1);
-    break;
-  }
+	qa = F->qa;
+	/* dump connectivity */
+	switch(F->identify()){
+	case Nek_Tet:
+	  for(k=0; k < qa-1; ++k)
+	    for(j = 0; j < qa-1-k; ++j){
+	      for(i = 0; i < qa-2-k-j; ++i){
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i][j][k],
+			n+(int) num[i+1][j][k],
+			n+(int) num[i][j+1][k], n+(int) num[i][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i][j][k+1], n+(int) num[i+1][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j][k+1],
+			n+(int) num[i][j][k+1],
+			n+(int) num[i][j+1][k+1], n+(int) num[i][j+1][k]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i+1][j][k], n+(int) num[i+1][j][k+1]);
+		fprintf(out,"%d %d %d %d\n", n+(int) num[i+1][j+1][k],
+			n+(int) num[i][j+1][k],
+			n+(int) num[i+1][j][k+1], n+(int) num[i][j+1][k+1]);
+		if(i < qa-3-k-j)
+		  fprintf(out,"%d %d %d %d\n", n+(int) num[i][j+1][k+1],
+			  n+(int) num[i+1][j+1][k+1],
+			  n+(int) num[i+1][j][k+1], 
+			  n+(int) num[i+1][j+1][k]);
+	      }
+	      fprintf(out,"%d %d %d %d\n", n+(int) num[qa-2-k-j][j][k],
+		      n+(int) num[qa-1-k-j][j][k],
+		      n+(int) num[qa-2-k-j][j+1][k],
+		      n+(int) num[qa-2-k-j][j][k+1]);
+	    }
+	  n += qa*(qa+1)*(qa+2)/6;
+	  break;
+	default:
+	  fprintf(stderr,"WriteS is not set up for this element type \n");
+	  exit(1);
+	  break;
+	}
       }
     }
 
@@ -1745,72 +1830,72 @@ static void WriteC(Element_List **E, FILE *out, int nfields){
   else{
     ROOTONLY{
       fprintf(out,"VARIABLES = x y");
-
+      
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
-
+	fprintf(out," %c", E[i]->fhead->type);
+    
       fputc('\n',out);
     }
 
     nelmts = 0;
-    /* set up global number scheme for this partition */
+    /* set up global number scheme for this partition */ 
     for(k = 0,n=1; k < E[0]->nel; ++k){
       F= E[0]->flist[k];
       qa = F->qa;
       for(i = 0; i < F->Nverts; ++i)
-  if(F->vert[0].base){
-    if(F->vert[i].base == F->vert+i)
-      F->vert[i].gid = n++;
-  }
-  else
-    F->vert[i].gid = n++;
-
+	if(F->vert[0].base){
+	  if(F->vert[i].base == F->vert+i)
+	    F->vert[i].gid = n++;
+	}
+	else
+	  F->vert[i].gid = n++;
+      
       for(i = 0; i < F->Nedges; ++i)
-  if(F->edge[i].base){
-    if(F->edge[i].base == F->edge+i){
-      F->edge[i].gid = n;
-      n += qa-2;
-    }
+	if(F->edge[i].base){
+	  if(F->edge[i].base == F->edge+i){
+	    F->edge[i].gid = n;
+	    n += qa-2;
+	  }
 
-    if(F->edge[i].base->con){ /* make sure base con is 0 */
-      F->edge[i].base->con = 0;
-      F->edge[i].link->con = 1;
-    }
-  }
-  else{
-    F->edge[i].gid = n;
-    n+=qa-2;
-  }
-
+	  if(F->edge[i].base->con){ /* make sure base con is 0 */
+	    F->edge[i].base->con = 0;
+	    F->edge[i].link->con = 1;
+	  }
+	}
+	else{
+	  F->edge[i].gid = n;
+	  n+=qa-2;
+	}
+      
       interior[k] = n;
       if(F->identify() == Nek_Tri){
-  nelmts += (qa-1)*(qa-1);
-  n += (qa-3)*(qa-2)/2;
+	nelmts += (qa-1)*(qa-1);
+	n += (qa-3)*(qa-2)/2;
       }
       else{
-  nelmts += 2*(qa-1)*(qa-1);
-  n += (qa-2)*(qa-2);
+	nelmts += 2*(qa-1)*(qa-1);
+	n += (qa-2)*(qa-2);
       }
     }
-
+    
     /* look over and update link lists */
     for(k = 0; k < E[0]->nel; ++k){
       F= E[0]->flist[k];
       qa = F->qa;
       for(i = 0; i < F->Nverts; ++i)
-  if(F->vert[i].base)
-    if(F->vert[i].base != F->vert+i)
-      F->vert[i].gid = F->vert[i].base->gid;
-
+	if(F->vert[i].base)
+	  if(F->vert[i].base != F->vert+i)
+	    F->vert[i].gid = F->vert[i].base->gid;
+      
       for(i = 0; i < F->Nedges; ++i)
-  if(F->edge[i].base)
-    if(F->edge[i].base != F->edge+i)
-      F->edge[i].gid = F->edge[i].base->gid;
+	if(F->edge[i].base)
+	  if(F->edge[i].base != F->edge+i)
+	    F->edge[i].gid = F->edge[i].base->gid;
     }
-
+    
     /* treat all elements as tri's for hybrid code in tecplot */
     fprintf(out,"ZONE, N=%d, E=%d, F=FEPOINT, ET=TRIANGLE\n",n-1, nelmts);
-
+    
     X.x = dvector(0,QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax-1);
 
@@ -1818,108 +1903,108 @@ static void WriteC(Element_List **E, FILE *out, int nfields){
     for(k = 0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
-  F->coord(&X);
+	qa = F->qa;
+	F->coord(&X);
 
-  ntot = Interp_symmpts(F,qa,X.x,X.x,'m');
-  ntot = Interp_symmpts(F,qa,X.y,X.y,'m');
+	ntot = Interp_symmpts(F,qa,X.x,X.x,'m');
+	ntot = Interp_symmpts(F,qa,X.y,X.y,'m');
 
-  for(n = 0; n < nfields; ++n){
-    F = E[n]->flist[k];
-    Interp_symmpts(F,qa,F->h[0],F->h[0],'m');
-  }
+	for(n = 0; n < nfields; ++n){
+	  F = E[n]->flist[k];
+	  Interp_symmpts(F,qa,F->h[0],F->h[0],'m');
+	}
 
-  F = E[0]->flist[k];
-  cnt = 0;
-  for(i = 0; i < F->Nverts; ++i,++cnt)
-    if((!F->vert[i].base)||(F->vert[i].base == F->vert+i)){
-      fprintf(out,"%lg %lg", X.x[cnt], X.y[cnt]);
-      for(n = 0; n < nfields; ++n)
-        fprintf(out," %lg",E[n]->flist[k]->h[0][cnt]);
-      fputc('\n',out);
-    }
+	F = E[0]->flist[k];
+	cnt = 0;
+	for(i = 0; i < F->Nverts; ++i,++cnt)
+	  if((!F->vert[i].base)||(F->vert[i].base == F->vert+i)){
+	    fprintf(out,"%lg %lg", X.x[cnt], X.y[cnt]);
+	    for(n = 0; n < nfields; ++n)
+	      fprintf(out," %lg",E[n]->flist[k]->h[0][cnt]);
+	    fputc('\n',out);
+	  }
 
-  for(i = 0; i < F->Nedges; ++i,cnt += qa-2)
-    if((!F->edge[i].base)||(F->edge[i].base == F->edge+i))
-      for(j = 0; j < qa-2; ++j){
-        fprintf(out,"%lg %lg", X.x[cnt+j], X.y[cnt+j]);
-        for(n = 0; n < nfields; ++n)
-    fprintf(out," %lg",E[n]->flist[k]->h[0][cnt+j]);
-        fputc('\n',out);
+	for(i = 0; i < F->Nedges; ++i,cnt += qa-2)
+	  if((!F->edge[i].base)||(F->edge[i].base == F->edge+i))
+	    for(j = 0; j < qa-2; ++j){
+	      fprintf(out,"%lg %lg", X.x[cnt+j], X.y[cnt+j]);
+	      for(n = 0; n < nfields; ++n)
+		fprintf(out," %lg",E[n]->flist[k]->h[0][cnt+j]);
+	      fputc('\n',out);
+	    }
+	
+	for(j = cnt; j < ntot; ++j){
+	  fprintf(out,"%lg %lg", X.x[j], X.y[j]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n]->flist[k]->h[0][j]);
+	  fputc('\n',out);
+	}
       }
-
-  for(j = cnt; j < ntot; ++j){
-    fprintf(out,"%lg %lg", X.x[j], X.y[j]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n]->flist[k]->h[0][j]);
-    fputc('\n',out);
-  }
-      }
     }
-
-
+      
+    
     int **num = imatrix(0,QGmax-1,0,QGmax-1);
 
     /* dump connectivity */
     for(k = 0,n=0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  qa = F->qa;
+	qa = F->qa;
 
-  if(F->identify() == Nek_Tri){
-    /* set up numbering */
-    num[0][0]    = F->vert[0].gid;
-    num[0][qa-1] = F->vert[1].gid;
-    num[qa-1][0] = F->vert[2].gid;
+	if(F->identify() == Nek_Tri){
+	  /* set up numbering */
+	  num[0][0]    = F->vert[0].gid;
+	  num[0][qa-1] = F->vert[1].gid;
+	  num[qa-1][0] = F->vert[2].gid;
 
-    if(F->edge[0].con)
-      for(i = 0; i < qa-2; ++i)
-        num[0][i+1] = F->edge[0].gid+qa-3-i;
-    else
-      for(i = 0; i < qa-2; ++i)
-        num[0][i+1] = F->edge[0].gid+i;
+	  if(F->edge[0].con)
+	    for(i = 0; i < qa-2; ++i)
+	      num[0][i+1] = F->edge[0].gid+qa-3-i;
+	  else
+	    for(i = 0; i < qa-2; ++i)
+	      num[0][i+1] = F->edge[0].gid+i;
 
-    if(F->edge[1].con)
-      for(i = 0; i < qa-2; ++i)
-        num[i+1][qa-2-i] = F->edge[1].gid+qa-3-i;
-    else
-      for(i = 0; i < qa-2; ++i)
-        num[i+1][qa-2-i] = F->edge[1].gid+i;
+	  if(F->edge[1].con)
+	    for(i = 0; i < qa-2; ++i)
+	      num[i+1][qa-2-i] = F->edge[1].gid+qa-3-i;
+	  else
+	    for(i = 0; i < qa-2; ++i)
+	      num[i+1][qa-2-i] = F->edge[1].gid+i;
 
-    if(F->edge[2].con)
-      for(i = 0; i < qa-2; ++i)
-        num[i+1][0] = F->edge[2].gid+qa-3-i;
-    else
-      for(i = 0; i < qa-2; ++i)
-        num[i+1][0] = F->edge[2].gid+i;
+	  if(F->edge[2].con)
+	    for(i = 0; i < qa-2; ++i)
+	      num[i+1][0] = F->edge[2].gid+qa-3-i;
+	  else
+	    for(i = 0; i < qa-2; ++i)
+	      num[i+1][0] = F->edge[2].gid+i;
+	  
+	  for(cnt = 0,j = 0; j < qa-3; ++j)
+	    for(i = 0; i < qa-3-j; ++i,++cnt)
+	      num[j+1][i+1] = interior[k] + cnt;
+	  
+	  for(cnt = 0,j = 0; j < qa-1; ++j){
+	    for(i = 0; i < qa-2-j; ++i){
+	      fprintf(out,"%d %d %d\n",num[j][i],num[j][i+1],num[j+1][i]);
+	      fprintf(out,"%d %d %d\n",num[j+1][i+1],num[j+1][i],
+		      num[j][i+1]);
+	    }
+	    fprintf(out,"%d %d %d\n",num[j][qa-2-j],num[j][qa-1-j],
+		    num[j+1][qa-2-j]);
+	  }
 
-    for(cnt = 0,j = 0; j < qa-3; ++j)
-      for(i = 0; i < qa-3-j; ++i,++cnt)
-        num[j+1][i+1] = interior[k] + cnt;
-
-    for(cnt = 0,j = 0; j < qa-1; ++j){
-      for(i = 0; i < qa-2-j; ++i){
-        fprintf(out,"%d %d %d\n",num[j][i],num[j][i+1],num[j+1][i]);
-        fprintf(out,"%d %d %d\n",num[j+1][i+1],num[j+1][i],
-          num[j][i+1]);
-      }
-      fprintf(out,"%d %d %d\n",num[j][qa-2-j],num[j][qa-1-j],
-        num[j+1][qa-2-j]);
-    }
-
-  }
-  else{
-    fprintf(stderr,"Continuous output not set up for quads: WriteC\n");
-    exit(1);
-    for(cnt = 0,j = 0; j < qa-1; ++j){
-      for(i = 0; i < qa-1; ++i){
-        fprintf(out,"%d %d %d\n",cnt+i+1,cnt+i+2,cnt+qa+i+1);
-        fprintf(out,"%d %d %d\n",cnt+qa+i+2,cnt+qa+i+1,cnt+i+2);
-      }
-      cnt += qa;
-    }
-    n += 2*(qa-1)*(qa-1);
-  }
+	}
+	else{
+	  fprintf(stderr,"Continuous output not set up for quads: WriteC\n");
+	  exit(1);
+	  for(cnt = 0,j = 0; j < qa-1; ++j){
+	    for(i = 0; i < qa-1; ++i){
+	      fprintf(out,"%d %d %d\n",cnt+i+1,cnt+i+2,cnt+qa+i+1);
+	      fprintf(out,"%d %d %d\n",cnt+qa+i+2,cnt+qa+i+1,cnt+i+2);
+	    }
+	    cnt += qa;
+	  }
+	  n += 2*(qa-1)*(qa-1);
+	}
       }
 
     }
@@ -1937,58 +2022,58 @@ static void Write(Element_List **E, FILE *out, int nfields){
   Coord    X;
   char     *outformat;
   Element  *F;
-
+  
   if(!option("Qpts")){
     /* transform to equispaced */
     for(i=0;i<nfields;++i)
       OrthoInnerProduct(E[i],E[i]);
-    reset_bases();
+    reset_bases();  
     init_ortho_basis(); /* this is a lazy way of reseting ortho basis */
 
     for(j=2;j<QGmax+2;++j){
       getzw(j,&z,&w,'a');
       for(i = 0; i < j; ++i) z[i] = 2.0*i/(double)(j-1) -1.0;
-
+      
       getzw(j,&z,&w,'b');
       for(i = 0; i < j; ++i) z[i] = 2.0*i/(double)(j-1) -1.0;
     }
     if(dim == 3)
       for(j=2;j<QGmax+2;++j){
-  getzw(j,&z,&w,'c');
-  for(i = 0; i < j; ++i) z[i] = 2.0*i/(double)(j-1) -1.0;
+	getzw(j,&z,&w,'c');
+	for(i = 0; i < j; ++i) z[i] = 2.0*i/(double)(j-1) -1.0;
       }
 
     for(i=0;i<nfields;++i)
       OrthoJTransBwd(E[i],E[i]);
   }
-
+     
 
   if(E[0]->fhead->dim() == 3){
     X.x = dvector(0,QGmax*QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax*QGmax-1);
     X.z = dvector(0,QGmax*QGmax*QGmax-1);
-
+    
     ROOTONLY{
       fprintf(out,"VARIABLES = x y z");
 
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
+	fprintf(out," %c", E[i]->fhead->type);
 
       fputc('\n',out);
     }
-
+    
     for(k = 0,zone=0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  F->coord(&X);
-  fprintf(out,"ZONE T=\"Triangle %d\", I=%d, J=%d, K=%d, F=POINT\n",
-    ++zone,F->qa,F->qb,F->qc);
-  for(i = 0; i < F->qtot; ++i){
-    fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n]->flist[k]->h_3d[0][0][i]);
-    fputc('\n',out);
-  }
+	F->coord(&X);
+	fprintf(out,"ZONE T=\"Triangle %d\", I=%d, J=%d, K=%d, F=POINT\n",
+		++zone,F->qa,F->qb,F->qc);
+	for(i = 0; i < F->qtot; ++i){
+	  fprintf(out,"%lg %lg %lg", X.x[i], X.y[i], X.z[i]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n]->flist[k]->h_3d[0][0][i]);
+	  fputc('\n',out);
+	}
       }
     }
     if(bdy.N) dump_faces(out,E,X,k,zone,nfields);
@@ -1997,33 +2082,195 @@ static void Write(Element_List **E, FILE *out, int nfields){
   else{
     ROOTONLY{
       fprintf(out,"VARIABLES = x y");
-
+      
       for(i = 0; i < nfields; ++i)
-  fprintf(out," %c", E[i]->fhead->type);
-
+	fprintf(out," %c", E[i]->fhead->type);
+      
       fputc('\n',out);
     }
 
     X.x = dvector(0,QGmax*QGmax-1);
     X.y = dvector(0,QGmax*QGmax-1);
-
+    
     for(k = 0,zone=0; k < E[0]->nel; ++k){
       F = E[0]->flist[k];
       if(Check_range(F)){
-  F->coord(&X);
+	F->coord(&X);
 
-  fprintf(out,"ZONE T=\"Triangle %d\", I=%d, J=%d, F=POINT\n",
-    ++zone,F->qa,F->qb);
-  for(i = 0; i < F->qtot; ++i){
-    fprintf(out,"%lg %lg", X.x[i], X.y[i]);
-    for(n = 0; n < nfields; ++n)
-      fprintf(out," %lg",E[n]->flist[k]->h[0][i]);
-    fputc('\n',out);
-  }
+	fprintf(out,"ZONE T=\"Triangle %d\", I=%d, J=%d, F=POINT\n",
+		++zone,F->qa,F->qb);
+	for(i = 0; i < F->qtot; ++i){
+	  fprintf(out,"%lg %lg", X.x[i], X.y[i]);
+	  for(n = 0; n < nfields; ++n)
+	    fprintf(out," %lg",E[n]->flist[k]->h[0][i]);
+	  fputc('\n',out);
+	}
       }
     }
     free(X.x); free(X.y);
   }
+}
+
+int get_number_of_vertices_WSS(FileList *f, Element_List **E, Bndry *Ubc, int Snapshot_index){
+
+  Element  *F;
+  Bndry *B;
+  int counter = 0, qa, qb, nfs, eid;
+
+  for(B = Ubc;B; B = B->next){
+    if((B->type == 'W'))
+    {
+      eid = B->elmt->id;//element ID
+        F = E[Snapshot_index]->flist[eid];
+        nfs = F->Nfverts(B->face);
+        if(nfs == 3){
+          qa = F->qa;
+          qb = F->qc; /* fix for prisms */
+        }
+        else{
+          qa = F->qa;
+          qb = F->qb;
+        }
+	counter += (qa*qb);
+    }
+  }
+  return counter;
+}
+
+void Calc_WSS(FileList *f, Element_List **E, Bndry *Ubc, int Snapshot_index, double** wss_vals){
+
+    //fprintf(stderr, "Calc_WSS: ENTER\n");
+
+
+
+  int i,j,k,n;
+  int       qa,qb,qc,nfs,qt,eid,wss_offset = 0;
+  double    **Dm,**D,**s;
+  Coord     X;
+  Element  *F;
+//#if 0
+  double   kinvis = dparam("KINVIS");
+
+//#if 0
+//  Tri      T;
+//  fprintf(stderr, "Calc_WSS: called Tri T\n");
+
+  Bndry *B;
+
+  //fprintf(stderr, "Calc_WSS: QGmax: %d\n", QGmax);
+
+  qt = QGmax*QGmax;
+  //fprintf(stderr, "Calc_WSS: qt: %d\n", qt);
+  Dm = dmatrix(0,8,0,qt-1);
+  dzero(9*qt,Dm[0],1);
+
+//#if 0
+
+  s  = dmatrix(0,2,0,qt-1);
+  D  = dmatrix(0,2,0,qt*QGmax-1);
+  
+  double wk[QGmax*QGmax];
+  //double *wk = dvector(0, qt-1);
+
+  int jai_cnt=0;
+    /* calculate derivatives */
+  for(B = Ubc;B; B = B->next){
+      //fprintf(stderr, "Calc_WSS: B number: %d start\n", jai_cnt);
+    //if(0)
+    if((B->type == 'W'))
+    {
+      
+
+    }
+
+  }
+  for(B = Ubc;B; B = B->next){
+      //fprintf(stderr, "Calc_WSS: B number: %d start\n", jai_cnt);
+    //if(0)
+    if((B->type == 'W'))
+    {
+      
+      eid = B->elmt->id;//element ID
+
+      //fprintf(stderr, "     Calc_WSS: B number: %d B->type==W, eid=%d\n", jai_cnt, eid);
+      for(i = 0; i < 3; ++i){
+        F = E[i+Snapshot_index]->flist[eid];
+	nfs = F->Nfverts(B->face);
+        if(nfs == 3){
+          qa = F->qa;
+          qb = F->qc; /* fix for prisms */
+        }
+        else{
+          qa = F->qa;
+          qb = F->qb;
+        }
+      
+        F->Grad_d(D[0],D[1],D[2],'a');
+      
+        /* Extract faces and interp to face 1 */
+        for(j = 0; j < 3; ++j){
+          F->GetFace      (D[j],B->face,wk);
+          F->InterpToFace1(B->face,wk,Dm[i*3+j]);
+        }
+      }
+      
+      /* calculate shear stress */
+      if(F->curvX){
+	  //fprintf(stderr, "     Calc_WSS: B number: %d F->curvX\n", jai_cnt, eid);
+        for(i = 0; i < qa*qb; ++i){
+          s[0][i] = kinvis*(2.0*       Dm[0][i] *B->nx.p[i] +
+                           (Dm[1][i] + Dm[3][i])*B->ny.p[i] +
+                           (Dm[2][i] + Dm[6][i])*B->nz.p[i]);
+          s[1][i] = kinvis*(2.0*       Dm[4][i] *B->ny.p[i] +
+                           (Dm[1][i] + Dm[3][i])*B->nx.p[i] +
+                           (Dm[5][i] + Dm[7][i])*B->nz.p[i]);
+          s[2][i] = kinvis*(2.0*       Dm[8][i] *B->nz.p[i] +
+                           (Dm[2][i] + Dm[6][i])*B->nx.p[i] +
+                           (Dm[5][i] + Dm[7][i])*B->ny.p[i]);
+        }
+      }
+      else{
+	  //fprintf(stderr, "     Calc_WSS: B number: %d NOT F->curvX\n", jai_cnt, eid);
+        for(i = 0; i < qa*qb; ++i){
+          s[0][i] = kinvis*(2.0*Dm[0][i]        *B->nx.d +
+                           (Dm[1][i] + Dm[3][i])*B->ny.d +
+                           (Dm[2][i] + Dm[6][i])*B->nz.d);
+          s[1][i] = kinvis*(2.0*Dm[4][i]        *B->ny.d +
+                           (Dm[1][i] + Dm[3][i])*B->nx.d +
+                           (Dm[5][i] + Dm[7][i])*B->nz.d);
+          s[2][i] = kinvis*(2.0*Dm[8][i]        *B->nz.d +
+                           (Dm[2][i] + Dm[6][i])*B->nx.d +
+                           (Dm[5][i] + Dm[7][i])*B->ny.d);
+        }
+      }
+      
+      /* store WSS in h_3d */
+      //fprintf(stderr, "     Calc_WSS: B number: %d About to store WSS in h_3d\n", jai_cnt);
+      for(i = 0; i < 3; ++i){
+        F = E[i+Snapshot_index]->flist[eid];
+        memcpy(&wss_vals[i][wss_offset],s[i],qa*qb*sizeof(double));
+        //memcpy(F->h_3d[0][0],s[i],qt*sizeof(double));     
+      }
+      wss_offset += (qa*qb);
+      //fprintf(stderr, "     Calc_WSS: B number: %d Done storing WSS in h_3d\n", jai_cnt);
+    }//end of "if B->type..."
+    //fprintf(stderr, "Calc_WSS: B number: %d end\n", jai_cnt);
+    jai_cnt++;
+  }//end of  "for(B = Ubc;B; B = B->next)"
+  //fprintf(stderr, "Calc_WSS:  About to free_dmatrix()\n");
+  free_dmatrix(Dm,0,0); 
+  free_dmatrix(D,0,0);
+  free_dmatrix(s,0,0);
+
+//#endif
+
+//  free_dmatrix(Dm,0,0);
+  //fprintf(stderr, "Calc_WSS:  About to free(wk)\n");
+  //free(wk);
+
+
+
+//fprintf(stderr, "Calc_WSS: EXIT\n");
 }
 
 
@@ -2040,7 +2287,7 @@ static void Calc_Write_WSS(Element_List **E, FileList f, Bndry *Ubc, int Snapsho
   int symm = option("Equispaced");
   symm = 1;
 
-  double *xyz2vw = dvector(0,4);
+  double *xyz2vw = dvector(0,4); 
   double *vw = xyz2vw+3;
   int surf_marker;
 
@@ -2057,7 +2304,7 @@ static void Calc_Write_WSS(Element_List **E, FileList f, Bndry *Ubc, int Snapsho
     B->id = cnt++;
     if(B->type == 'W') B->elmt->Surface_geofac(B);
   }
-
+ 
   qt = QGmax*QGmax;
   Dm = dmatrix(0,8,0,cnt*qt-1);
   dzero(9*cnt*qt,Dm[0],1);
@@ -2305,7 +2552,7 @@ static void Calc_Write_WSS(Element_List **E, FileList f, Bndry *Ubc, int Snapsho
 
   free_dmatrix(Dm,0,0);  free_dmatrix(D,0,0);
   free(p);               free(wk);
-  free(xyz2vw);
+  free(xyz2vw); 
 }
 
 #if 0
@@ -2600,7 +2847,7 @@ static int Check_range_sub_cyl(Element *E){
   int i;
   double xo,yo,zo;
   xo=yo=zo=0;
-  /* compute center of the element */
+  /* compute center of the element */ 
   for(i = 0; i < E->Nverts; ++i){
       xo += E->vert[i].x;
       yo += E->vert[i].y;
@@ -2612,7 +2859,7 @@ static int Check_range_sub_cyl(Element *E){
   zo *= R;
 
   if (zo < 26.0)
-     return 0;
+     return 0; 
 
 
 #if 0
@@ -2645,13 +2892,13 @@ static int Check_range_sub_cyl(Element *E){
 
 
 /* sub ICA */
-//  if (zo > 100.0)
+//  if (zo > 100.0) 
 //    return 0;
 
 #endif
 
   double Ox = 8.7692;//11.62866;//    68.60218;
-  double Oy = -0.77;//4.784833; //57.52709;
+  double Oy = -0.77;//4.784833; //57.52709; 
   double Oz = 50.574;//86.13319; //83.89227;
   double v[3];
   double nx,ny,nz;
@@ -2659,7 +2906,7 @@ static int Check_range_sub_cyl(Element *E){
   if (zo >= 50.574 ){
     nx = 0.079090982706979;   //-0.04171497;
     ny = 0.16250236948079;//-0.17585484;
-    nz = 0.98353322077476;//-0.98353191;
+    nz = 0.98353322077476;//-0.98353191; 
     R = 2.3;
   }
   else{
@@ -2694,7 +2941,7 @@ static int Check_range(Element *E){
       if((E->vert[i].x < rnge->x[0])||(E->vert[i].x > rnge->x[1])) return 0;
       if((E->vert[i].y < rnge->y[0])||(E->vert[i].y > rnge->y[1])) return 0;
       if(DIM == 3)
-  if((E->vert[i].z < rnge->z[0])||(E->vert[i].z > rnge->z[1])) return 0;
+	if((E->vert[i].z < rnge->z[0])||(E->vert[i].z > rnge->z[1])) return 0;
     }
   }
   return 1;
@@ -2703,16 +2950,16 @@ static int Check_range(Element *E){
 static int Check_range(Element *E){
   if(rnge){
     register int i;
-
+    
     for(i = 0; i < E->Nverts; ++i){
       if(DIM == 3){
-  if((E->vert[i].x > rnge->x[0])&&(E->vert[i].x < rnge->x[1])
-     && (E->vert[i].y > rnge->y[0])&&(E->vert[i].y < rnge->y[1])
-     && (E->vert[i].z > rnge->z[0])&&(E->vert[i].z < rnge->z[1])) return 1;
+	if((E->vert[i].x > rnge->x[0])&&(E->vert[i].x < rnge->x[1]) 
+	   && (E->vert[i].y > rnge->y[0])&&(E->vert[i].y < rnge->y[1]) 
+	   && (E->vert[i].z > rnge->z[0])&&(E->vert[i].z < rnge->z[1])) return 1;
       }
       else
-  if((E->vert[i].x > rnge->x[0])&&(E->vert[i].x < rnge->x[1])
-     && (E->vert[i].y > rnge->y[0])&&(E->vert[i].y < rnge->y[1])) return 1;
+	if((E->vert[i].x > rnge->x[0])&&(E->vert[i].x < rnge->x[1]) 
+	   && (E->vert[i].y > rnge->y[0])&&(E->vert[i].y < rnge->y[1])) return 1;
     }
     return 0;
   }
@@ -2753,34 +3000,34 @@ static void parse_util_args (int argc, char *argv[], FileList *f)
     while (c = *++argv[0])                  /* more to parse... */
       switch (c) {
       case 'b':
-  option_set("Body",1);
-  break;
+	option_set("Body",1);
+	break;
       case 'c':
-  option_set("Continuous",1);
-  break;
-      case 'f':
-  option_set("FEstorage",1);
-  break;
+	option_set("Continuous",1);
+	break;
+      case 'f': 
+	option_set("FEstorage",1);
+	break;
       case 'R':
-  option_set("Range",1);
-  break;
+	option_set("Range",1);
+	break;
       case 'q':
-  option_set("Qpts",1);
-  break;
+	option_set("Qpts",1);
+	break;
       case 'd':
-  option_set("DUMPFILE",1);
+	option_set("DUMPFILE",1);
       case 'p':
-  option_set("PROJECT",1);
-  break;
+	option_set("PROJECT",1);
+	break;
       case 'i':
-  option_set("iterative",1);
-  break;
+	option_set("iterative",1);
+	break;
       default:
-  fprintf(stderr, "%s: unknown option -- %c\n", prog, c);
-  break;
+	fprintf(stderr, "%s: unknown option -- %c\n", prog, c);
+	break;
       }
   }
-
+  
   /* open input file */
 
   if ((*argv)[0] == '-') {
@@ -2790,9 +3037,9 @@ static void parse_util_args (int argc, char *argv[], FileList *f)
     if ((f->in.fp = fopen(fname, "r")) == (FILE*) NULL) {
       sprintf(fname, "%s.fld", *argv);
       if ((f->in.fp = fopen(fname, "r")) == (FILE*) NULL) {
-  fprintf(stderr, "%s: unable to open the input file -- %s or %s\n",
-    prog, *argv, fname);
-  exit(1);
+	fprintf(stderr, "%s: unable to open the input file -- %s or %s\n",
+		prog, *argv, fname);
+	exit(1);
       }
     }
     f->in.name = strdup(fname);
@@ -2800,8 +3047,8 @@ static void parse_util_args (int argc, char *argv[], FileList *f)
 
   if (option("verbose")) {
     fprintf (stderr, "%s: in = %s, rea = %s, out = %s\n", prog,
-       f->in.name   ? f->in.name   : "<stdin>",  f->rea.name,
-       f->out.name  ? f->out.name  : "<stdout>");
+	     f->in.name   ? f->in.name   : "<stdin>",  f->rea.name,
+	     f->out.name  ? f->out.name  : "<stdout>");
   }
 
   return;
@@ -2829,89 +3076,89 @@ static void Get_Body(FILE *fp){
 
   if(option("Body")){
     rewind(fp);/* search for body data  */
-    while(s && !strstr((s=fgets(buf,BUFSIZ,fp)),"Body"));
-
+    while(s && !strstr((s=fgets(buf,BUFSIZ,fp)),"Body"));   
+    
     if(s!=NULL){
-
+      
       fgets(buf,BUFSIZ,fp);
       sscanf(buf,"%d",&N);
-
+      
       bdy.N = N;
       bdy.elmt   = ivector(0,N-1);
       bdy.faceid = ivector(0,N-1);
-
+      
       for(i = 0; i < N; ++i){
-  fgets(buf,BUFSIZ,fp);
-  sscanf(buf,"%d%d",bdy.elmt+i,bdy.faceid+i);
-  --bdy.elmt[i];
-  --bdy.faceid[i];
+	fgets(buf,BUFSIZ,fp);
+	sscanf(buf,"%d%d",bdy.elmt+i,bdy.faceid+i);
+	--bdy.elmt[i];
+	--bdy.faceid[i];
       }
     }
   }
 }
 
-static void dump_faces(FILE *out, Element_List **U, Coord X, int nel,
-           int zone, int nfields){
+static void dump_faces(FILE *out, Element_List **U, Coord X, int nel, 
+		       int zone, int nfields){
   Element *F;
   int qa, qb, qc,fac, cnt;
   register int i,j,k,l,n;
-  double **tmp;
+  double **tmp; 
   int data_skip = 0;
   int size_skip = 0;
-
+  
   tmp  = dmatrix(0, nfields, 0, QGmax*QGmax*QGmax-1);
-
+  
   k = 0;
   for(l=0;l<bdy.N;++l){
     F = U[0]->flist[bdy.elmt[l]];
 
     fac = bdy.faceid[l];
-
+    
     if(F->identify() == Nek_Tet)
       switch(fac){
       case 0:
-  qa = F->qa;      qb = F->qb;
-  break;
+	qa = F->qa;      qb = F->qb;
+	break;
       case 1:
-  qa = F->qa;      qb = F->qc;
-  break;
+	qa = F->qa;      qb = F->qc;
+	break;
       case 2: case 3:
-  qa = F->qb;      qb = F->qc;
-  break;
+	qa = F->qb;      qb = F->qc;
+	break;
       }
     else if(F->identify() == Nek_Hex){
       switch(fac){
       case 0: case 5:
-  qa = F->qa;      qb = F->qb;
-  break;
+	qa = F->qa;      qb = F->qb;
+	break;
       case 1: case 3:
-  qa = F->qa;      qb = F->qc;
-  break;
+	qa = F->qa;      qb = F->qc;
+	break;
       case 2: case 4:
-  qa = F->qb;      qb = F->qc;
-  break;
+	qa = F->qb;      qb = F->qc;
+	break;
       }
     }
     else if(F->identify() == Nek_Prism){
       switch(fac){
-      case 0:
-  qa = F->qa;      qb = F->qb;
-  break;
+      case 0: 
+	qa = F->qa;      qb = F->qb;
+	break;
       case 1: case 3:
-  qa = F->qa;      qb = F->qc;
-  break;
+	qa = F->qa;      qb = F->qc;
+	break;
       case 2: case 4:
-  qa = F->qb;      qb = F->qc;
-  break;
+	qa = F->qb;      qb = F->qc;
+	break;
       }
     }
-
+      
     cnt = F->qa*F->qb;
-
+    
     F->GetFaceCoord(fac, &X);
-
+    
     fprintf(out,"ZONE T=\"ELEMENT %d\", I=%d, J=%d, K=%d, F=POINT\n",
-      ++zone,qa,qb,1);
+	    ++zone,qa,qb,1);
 
     for(n = 0; n < nfields; ++n)
       U[n]->flist[F->id]->GetFace(**U[n]->flist[F->id]->h_3d, fac, tmp[n]);
@@ -2919,11 +3166,11 @@ static void dump_faces(FILE *out, Element_List **U, Coord X, int nel,
     for(i = 0; i < cnt; ++i){
       fprintf(out,"%lg %lg %lg ",X.x[i], X.y[i], X.z[i]);
       for(n = 0; n < nfields; ++n)
-  fprintf(out,"%lg ",tmp[n][i]);
+	fprintf(out,"%lg ",tmp[n][i]);
       fputc('\n',out);
     }
     ++k;
-  }
+  } 
   free_dmatrix(tmp,0,0);
 }
 
@@ -2934,16 +3181,16 @@ void  set_elmt_edges(Element_List *EL){
   int     nel = EL->nel,edgtot;
   double  tot,*wa,*wb,*wk,w;
   Element *E;
-
+  
   wk = dvector(0,QGmax-1);
-
+  
 
   for(k = 0; k < nel; ++k)   /* set up number of quadrature points */
     for(i = 0,e=EL->flist[k]->edge; i < EL->flist[k]->Nedges; ++i)
-      e[i].qedg = EL->flist[e[i].eid]->lmax;
-
+      e[i].qedg = EL->flist[e[i].eid]->lmax; 
+  
   edgtot = 0;
-  for(k = 0; k < nel; ++k){
+  for(k = 0; k < nel; ++k){ 
     E = EL->flist[k];
     getzw(E->qa,&wa,&wa,'a'); // ok
 
@@ -2953,32 +3200,32 @@ void  set_elmt_edges(Element_List *EL){
       getzw(E->qb,&wb,&wb,'a'); // ok
 
     for(i = 0,e=E->edge; i < E->Nedges; ++i){
-
+      
       /* set up weights for based on edge area */
       if(E->curvX){
-  for(j = 0; j < E->qb; ++j)
-    wk[j] = ddot(E->qa,wa,1,E->geom->jac.p+j*E->qa,1);
-  e[i].weight = ddot(E->qb,wb,1,wk,1);
+	for(j = 0; j < E->qb; ++j)
+	  wk[j] = ddot(E->qa,wa,1,E->geom->jac.p+j*E->qa,1);
+	e[i].weight = ddot(E->qb,wb,1,wk,1);
       }
       else{
-  e[i].weight = E->geom->jac.d;
+	e[i].weight = E->geom->jac.d;
       }
 
       /* loop through and reset to minimum */
       if(e[i].base){
-  /* see if there is an adjacent edge */
-  if(e[i].link)
-    e[i].qedg = max(e[i].qedg,e[i].link->qedg);
-  else
-    e[i].qedg = max(e[i].qedg,e[i].base->qedg);
-  edgtot += e[i].qedg;
+	/* see if there is an adjacent edge */
+	if(e[i].link)
+	  e[i].qedg = max(e[i].qedg,e[i].link->qedg);
+	else
+	  e[i].qedg = max(e[i].qedg,e[i].base->qedg);
+	edgtot += e[i].qedg;
       }
       else{
-  e[i].link = (Edge *)calloc(1,sizeof(Edge));
-  //e[i].link[0] = e[i];
-  memcpy(e[i].link,e+i,sizeof(Edge));
-  e[i].link->base = e+i;
-  edgtot += 2*e[i].qedg;
+	e[i].link = (Edge *)calloc(1,sizeof(Edge));
+	//e[i].link[0] = e[i]; 
+	memcpy(e[i].link,e+i,sizeof(Edge));
+	e[i].link->base = e+i;
+	edgtot += 2*e[i].qedg;
       }
     }
   }
@@ -2993,8 +3240,8 @@ void  set_elmt_edges(Element_List *EL){
       e[i].h = EL->flist[0]->edge->h + c;
       c += e[i].qedg;
       if(!e[i].base){
-  e[i].link->h = EL->flist[0]->edge->h + c;
-  c += e[i].qedg;
+	e[i].link->h = EL->flist[0]->edge->h + c;
+	c += e[i].qedg;
       }
     }
   }
@@ -3005,17 +3252,17 @@ void  set_elmt_edges(Element_List *EL){
   for(E=EL->fhead;E;E = E->next){
     for(i = 0; i < E->Nedges; ++i)
       if(E->edge[i].base){
-  if(E->edge[i].link){
-    tot = E->edge[i].weight + E->edge[i].link->weight;
-
-    w = E->edge[i].weight/tot;
-    E->edge[i].weight =  E->edge[i].link->weight/tot;
-    E->edge[i].link->weight = w;
-  }
+	if(E->edge[i].link){
+	  tot = E->edge[i].weight + E->edge[i].link->weight;
+	  
+	  w = E->edge[i].weight/tot;
+	  E->edge[i].weight =  E->edge[i].link->weight/tot;
+	  E->edge[i].link->weight = w;
+	}
       }
       else{
-  E->edge[i].weight = 1;
-  E->edge[i].link->weight = 0;
+	E->edge[i].weight = 1;
+	E->edge[i].link->weight = 0;
       }
   }
   free(wk);
@@ -3058,7 +3305,7 @@ void compute_Corr_matrix(double **C, Element_List **E, int field_index, int nfie
       F = E[field_index_I]->flist[k];
 
 
-#if 1
+#if 1 
       /* if the element is inside the region of interest  process it */
 
       qa = Check_range_sub_cyl(F);
@@ -3067,13 +3314,13 @@ void compute_Corr_matrix(double **C, Element_List **E, int field_index, int nfie
       //  if((F->vert[i].x < rnge->x[0])||(F->vert[i].x > rnge->x[1])) return 0;
       //  if((F->vert[i].y < rnge->y[0])||(F->vert[i].y > rnge->y[1])) return 0;
       //  if(DIM == 3)
-      //   if( F->vert[i].z > 68.75){
+      //   if( F->vert[i].z > 68.75){ 
       //   if( (F->vert[i].z > 77.3) || (F->vert[i].z < 68.75) )  {
-      //      qa = 0;
+      //      qa = 0; 
       //      break;
       //   }
       //}
-      if (qa == 0) continue;
+      if (qa == 0) continue;     
 #endif
 
       field_index_I = time_index_I*4+field_index;
@@ -3099,19 +3346,19 @@ void compute_Corr_matrix(double **C, Element_List **E, int field_index, int nfie
         dvmul(qc,wc,1,tmp+i,qab,tmp+i,qab);
 
       if(F->curvX)
-  dvmul(qt, F->geom->jac.p, 1, tmp, 1, tmp, 1);
+	dvmul(qt, F->geom->jac.p, 1, tmp, 1, tmp, 1);
       else
-  dsmul(qt, F->geom->jac.d, tmp, 1, tmp, 1);
+	dsmul(qt, F->geom->jac.d, tmp, 1, tmp, 1);
 
       dvmul(qt, val, 1, tmp, 1, val, 1);
 
-      /* now loop over this element for different times
-   do dot product and add result into C */
+      /* now loop over this element for different times 
+	 do dot product and add result into C */
 
-
+            
       for (time_index_J = time_index_I; time_index_J < nfields; ++time_index_J){
-  field_index_J = time_index_J*4+field_index;
-  C[time_index_I][time_index_J] += ddot(qt,val,1,E[field_index_J]->flist[k]->h_3d[0][0],1);
+	field_index_J = time_index_J*4+field_index;
+	C[time_index_I][time_index_J] += ddot(qt,val,1,E[field_index_J]->flist[k]->h_3d[0][0],1);
       }
     }
   }
@@ -3186,14 +3433,14 @@ int compute_VA(double **V, Element_List **E, int field_index, int nfields){
   tmp = dvector(0,nfields-1);
 
   for(k = 0; k < E[0]->nel; ++k){
-
+  
     F = E[0]->flist[k];
     qt = F->qa*F->qb*F->qc;
 
     for (i = 0; i < qt; ++i){
       j = 0;
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I)
-        val[field_index_I] =  E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i];
+        val[field_index_I] =  E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i]; 
 
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I)
         tmp[field_index_I] = ddot(nfields,V[field_index_I],1,val,1);
@@ -3202,7 +3449,7 @@ int compute_VA(double **V, Element_List **E, int field_index, int nfields){
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I)
          E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i] = tmp[field_index_I];
 
-    }
+    } 
   }
 
   free(val);
@@ -3228,13 +3475,13 @@ int reconstruct_field(double **V, Element_List **E, int field_index, int nfields
   for (field_index_I = 0; field_index_I < j; ++field_index_I)
     memset(V[field_index_I],'\0',nfields*sizeof(double));
 
-  j = nfields-4;
+  j = nfields-4; 
   for (field_index_I = j; field_index_I < nfields; ++field_index_I)
     memset(V[field_index_I],'\0',nfields*sizeof(double));
 #endif
 
 
-#if 1
+#if 1 
   j = nfields - Nmodes;
   for (field_index_I = 0; field_index_I < j; ++field_index_I)
     memset(V[field_index_I],'\0',nfields*sizeof(double));
@@ -3255,25 +3502,25 @@ int reconstruct_field(double **V, Element_List **E, int field_index, int nfields
 
 
   for(k = 0; k < E[0]->nel; ++k){
-
+  
     F = E[0]->flist[k];
     qt = F->qa*F->qb*F->qc;
 
     for (i = 0; i < qt; ++i){
 
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I)
-        val[field_index_I] =  E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i];
+        val[field_index_I] =  E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i]; 
 
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I){
-  sum = 0;
-  for (j = 0; j < nfields; ++j)
-    sum += V[j][field_index_I]*val[j];
+	sum = 0;
+	for (j = 0; j < nfields; ++j)
+	  sum += V[j][field_index_I]*val[j];
 
-  tmp[field_index_I] = sum;
+	tmp[field_index_I] = sum;
       }
-
+	
       for (field_index_I = 0; field_index_I < nfields; ++field_index_I)
-          E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i] = tmp[field_index_I];
+          E[field_index_I*4+field_index]->flist[k]->h_3d[0][0][i] = tmp[field_index_I]; 
     }
   }
   free(val);
@@ -3284,18 +3531,18 @@ int reconstruct_field(double **V, Element_List **E, int field_index, int nfields
 
 
 /* write file in XML format. unstructured grid. Tetarahedral elements. binary output */
-int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, int Nelements,
+int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, int Nelements, 
                        int vert_ID_array_len, int Elemnt_type, char *file_name, int FLAG_DUMP_INDEX,
                        int FLAG_GEOM){
 
 
     int i,j,k,iel,Nvert_total,vert_ID_array_length, Nelements_total;
-
+    
 
     /*  gather data on ROOT, then write  */
-
+    
 #ifdef PARALLEL
-    int Ncores = numnodes();
+    int Ncores = numnodes();       
     int MyRank = mynode();
 #else
    int Ncores = 1;
@@ -3312,27 +3559,27 @@ int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, 
        pFile = fopen(fname,"w");
 
        for (i = 0; i < vert_ID_array_len; ++i)
-   fprintf(pFile," %d \n", vert_ID_array[i]);
+	 fprintf(pFile," %d \n", vert_ID_array[i]);
 
        fclose(pFile);
      }
 
 */
     Nverts_per_core            = new int[Ncores];
-    vert_ID_array_len_per_core = new int[Ncores];
-
-#ifdef PARALLEL
-    MPI_Allgather (&Nverts,         1, MPI_INT,
-       Nverts_per_core, 1, MPI_INT,
-       get_MPI_COMM());
+    vert_ID_array_len_per_core = new int[Ncores]; 
+ 
+#ifdef PARALLEL   
+    MPI_Allgather (&Nverts,         1, MPI_INT, 
+		   Nverts_per_core, 1, MPI_INT,
+		   get_MPI_COMM());
 
     MPI_Allgather (&vert_ID_array_len,         1, MPI_INT,
-       vert_ID_array_len_per_core, 1, MPI_INT,
-       get_MPI_COMM());
+		   vert_ID_array_len_per_core, 1, MPI_INT,
+		   get_MPI_COMM());
 
     MPI_Reduce(&Nelements, &Nelements_total,1,MPI_INT, MPI_SUM,
                VIZ_ROOT, get_MPI_COMM());
-
+    
     MPI_Reduce(&Nverts, &Nvert_total,1,MPI_INT, MPI_SUM,
                VIZ_ROOT, get_MPI_COMM());
 #else
@@ -3353,114 +3600,114 @@ int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, 
 
     if (FLAG_GEOM){
       if (MyRank == VIZ_ROOT){
-  XYZ_all = new float[Nvert_total*3];
-
+	XYZ_all = new float[Nvert_total*3];
+    
         /* compute displasments and recv countes */
         displs[0] = 0;
         recvcnt[0] = 3*Nverts_per_core[0];
         for (i = 1; i < Ncores; ++i){
-    displs[i] = displs[i-1]+recvcnt[i-1];
-    recvcnt[i] = 3*Nverts_per_core[i];
-  }
+	  displs[i] = displs[i-1]+recvcnt[i-1];
+	  recvcnt[i] = 3*Nverts_per_core[i];
+	}
       }
 
 #ifdef PARALLEL
-      MPI_Gatherv ( XYZ, 3*Nverts, MPI_FLOAT,
-        XYZ_all, recvcnt, displs,
-        MPI_FLOAT,
-        VIZ_ROOT, get_MPI_COMM() );
+      MPI_Gatherv ( XYZ, 3*Nverts, MPI_FLOAT, 
+		    XYZ_all, recvcnt, displs,
+		    MPI_FLOAT, 
+		    VIZ_ROOT, get_MPI_COMM() );
 #else
-   memcpy(XYZ_all,XYZ,3*Nverts*sizeof(float));
-#endif
+   memcpy(XYZ_all,XYZ,3*Nverts*sizeof(float)); 
+#endif   
 
 
         /* gather connectivity */
       if (MyRank == VIZ_ROOT){
 
-  vert_ID_array_length = vert_ID_array_len;
-  for (i = 1; i < Ncores; ++i)
-    vert_ID_array_length +=  vert_ID_array_len_per_core[i];
+	vert_ID_array_length = vert_ID_array_len;
+	for (i = 1; i < Ncores; ++i)
+	  vert_ID_array_length +=  vert_ID_array_len_per_core[i];
 
-  vert_ID_array_all = new int[vert_ID_array_length];
-
+	vert_ID_array_all = new int[vert_ID_array_length];
+    
         /* compute offsets and recv. countes */
         displs[0] = 0;
         recvcnt[0] = vert_ID_array_len_per_core[0];
         for (i = 1; i < Ncores; ++i){
-    displs[i] = displs[i-1]+recvcnt[i-1];
-    recvcnt[i] = vert_ID_array_len_per_core[i];
-  }
+	  displs[i] = displs[i-1]+recvcnt[i-1];
+	  recvcnt[i] = vert_ID_array_len_per_core[i];
+	}
       }
 
       /*      shift values of  the vert_IDs    */
       /*      compute offset */
       j = 0;
       for (i = 0; i < MyRank; ++i)
-  j += Nverts_per_core[i];
+	j += Nverts_per_core[i];
 
       /*      shift vert. IDs  */
       for (i = 0; i < vert_ID_array_len; ++i)
-  vert_ID_array[i] += j;
+	vert_ID_array[i] += j;
 
 #ifdef PARALLEL
       MPI_Gatherv ( vert_ID_array, vert_ID_array_len, MPI_INT,
-        vert_ID_array_all, recvcnt, displs,
-        MPI_INT,
-        VIZ_ROOT, get_MPI_COMM() );
+		    vert_ID_array_all, recvcnt, displs,
+		    MPI_INT,
+		    VIZ_ROOT, get_MPI_COMM() );
 #else
    memcpy(vert_ID_array_all,vert_ID_array,vert_ID_array_len*sizeof(int));
 #endif
 
-
+   
     }
 
-
+   
     if (MyRank == VIZ_ROOT){
       UVW_all  = new float[Nvert_total*3];
       /* compute displasments and recv countes */
       displs[0] = 0;
       recvcnt[0] = 3*Nverts_per_core[0];
       for (i = 1; i < Ncores; ++i){
-  displs[i] = displs[i-1]+recvcnt[i-1];
-  recvcnt[i] = 3*Nverts_per_core[i];
+	displs[i] = displs[i-1]+recvcnt[i-1];
+	recvcnt[i] = 3*Nverts_per_core[i];
       }
     }
     /* gather velocity vector */
 #ifdef PARALLEL
-    MPI_Gatherv ( UVWP, 3*Nverts, MPI_FLOAT,
-      UVW_all, recvcnt, displs,
-      MPI_FLOAT,
-      VIZ_ROOT, get_MPI_COMM() );
+    MPI_Gatherv ( UVWP, 3*Nverts, MPI_FLOAT, 
+		  UVW_all, recvcnt, displs,
+		  MPI_FLOAT, 
+		  VIZ_ROOT, get_MPI_COMM() );
 #else
    memcpy(UVW_all,UVWP,3*Nverts*sizeof(float));
 #endif
-
+ 
 
     if (MyRank == VIZ_ROOT){
       Pres_all = new float[Nvert_total];
       displs[0] = 0;
       recvcnt[0] = Nverts_per_core[0];
       for (i = 1; i < Ncores; ++i){
-  displs[i] = displs[i-1]+recvcnt[i-1];
-  recvcnt[i] = Nverts_per_core[i];
+	displs[i] = displs[i-1]+recvcnt[i-1];
+	recvcnt[i] = Nverts_per_core[i];
       }
     }
     /* gather pressure */
 #ifdef PARALLEL
-    MPI_Gatherv ( UVWP+3*Nverts, Nverts, MPI_FLOAT,
-      Pres_all, recvcnt, displs,
-      MPI_FLOAT,
-      VIZ_ROOT, get_MPI_COMM() );
+    MPI_Gatherv ( UVWP+3*Nverts, Nverts, MPI_FLOAT, 
+		  Pres_all, recvcnt, displs,
+		  MPI_FLOAT, 
+		  VIZ_ROOT, get_MPI_COMM() );
 #else
     memcpy(Pres_all,UVWP+3,Nverts*sizeof(float));
 #endif
-
+    
 
     delete[] displs;
     delete[] recvcnt;
     delete[] vert_ID_array_len_per_core;
     delete[] Nverts_per_core;
-
+   
     if (MyRank != VIZ_ROOT)
       return -1;
 
@@ -3494,12 +3741,12 @@ int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, 
        pFile = fopen("test_vert_array_ID_all.dat","w");
 
        for (i = 0; i < vert_ID_array_length; ++i)
-   fprintf(pFile," %d \n", vert_ID_array_all[i]);
+	 fprintf(pFile," %d \n", vert_ID_array_all[i]);
 
        fclose(pFile);
      }
 */
-
+     
 
      if (FLAG_GEOM){
        ostringstream xml_geom;
@@ -3565,7 +3812,7 @@ int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, 
 
        /* connectivity */
        k = 0;
-       for(iel = 0; iel < Nelements_total; iel++){
+       for(iel = 0; iel < Nelements_total; iel++){      
          for (i = 0; i < 4; i++){
            j = vert_ID_array_all[k];
            k++;
@@ -3598,7 +3845,7 @@ int write_vtk_file_XML(float *XYZ, float *UVWP, int *vert_ID_array, int Nverts, 
        ////////////////////////
 
        /* set name for *vtu file */
-
+     
        sprintf(vert_id_file_name,"%s_geom/%s_%d.vtu",file_name, file_name,mynode());
 
        vert_id_file = fopen(vert_id_file_name,"wb");
@@ -3720,9 +3967,9 @@ void write_pvd_file(int Ndumps, double *Time_all_steps, int *fieldID, char *file
 
   int i,timestep, Ncpu;//, VTKSTEPS = iparam("VTKSTEPS");
   double timevalue = 0;
-
-  int Ncores = 1;
-
+ 
+  int Ncores = 1;  
+ 
   FILE *pvd_file;
   char pvd_file_name[BUFSIZ];
 
@@ -3788,7 +4035,7 @@ void write_pvd_file(int Ndumps, double *Time_all_steps, int *fieldID, char *file
       ostringstream xml_temp;
 #if 1
       xml_temp    << string("    <DataSet timestep=\"")
-                  << timevalue    << string("\" part=\"")
+                  << timevalue    << string("\" part=\"") 
                   << Ncpu        << string("\" file=\"")
                   << file_name << string("_time")
                   << fieldID[timestep]    << string("/")
@@ -3847,3 +4094,10 @@ void write_pvd_file(int Ndumps, double *Time_all_steps, int *fieldID, char *file
   delete[] xml_core;
 
 }
+
+
+
+
+
+
+

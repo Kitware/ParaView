@@ -2,25 +2,31 @@
 
 #include "vtkUnstructuredGrid.h"
 
-class VTK_EXPORT nektarObject
+#define MAX_EXTRA_VARS 16
+
+class nektarObject 
 {
  public:
-//    static nektarObject *New();
-//    static nektarObject *Delete();
-
     vtkUnstructuredGrid* ugrid;
+    vtkUnstructuredGrid* wss_ugrid;
     bool pressure;
     bool velocity;
     bool vorticity;
     bool lambda_2;
+    bool wss;
+    bool extra_vars[MAX_EXTRA_VARS];
     int index;
     int resolution;
+    int wss_resolution;
+    bool use_projection;
     nektarObject *prev;
     nektarObject *next;
+    char * dataFilename;
 
     nektarObject *find_obj(int id);
+    void setDataFilename(char* filename);
     void reset();
-
+   
 // protected:
     nektarObject();
     ~nektarObject();
@@ -31,7 +37,6 @@ class VTK_EXPORT nektarObject
 class nektarList
 {
  public:
-//    static nektarList *New();
     nektarObject* head;
     nektarObject* tail;
     int max_count;

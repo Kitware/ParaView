@@ -20,6 +20,9 @@
 
 #include <stdio.h>
 
+// jai added
+using namespace nektarTri;
+
 #define RERR -100
 
 static int Tri_vnum  [][2] = {{0,1},{1,2},{0,2}};

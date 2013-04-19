@@ -20,7 +20,8 @@
 #include <stdio.h>
 
 using namespace polylib;
-
+// jai added
+using namespace nektarTri;
 
 #define TANTOL 1e-10
 /* new atan2 function to stop Nan on atan(0,0)*/
