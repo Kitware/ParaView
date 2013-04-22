@@ -14,6 +14,16 @@
     // Internal field used to store all connection objects
     var Connections = [], module = {}, console = GLOBAL.console;
 
+    function generateSecretKey() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 10; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
     /**
      * @class pv.ConnectionConfig
      * This class provides all the informations needed to connect to the session
@@ -99,6 +109,9 @@
      * message will be provided as argument.
      */
     function start(config, successFunction, errorFunction) {
+        if(!config.hasOwnProperty("secret")) {
+            config.secret = generateSecretKey();
+        }
         var okCallback = successFunction,
         koCallback = errorFunction,
         arg = {

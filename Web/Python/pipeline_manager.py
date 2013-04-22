@@ -13,6 +13,7 @@ from paraview import web, paraviewweb_wamp, paraviewweb_protocols
 
 # Setup global variables
 directoryToList = None
+secret = "paraviewweb-secret" # "Replaced by --authKey value"
 
 # Define ParaView Protocol
 class PipelineManager(paraviewweb_wamp.ServerProtocol):
@@ -27,6 +28,8 @@ class PipelineManager(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebPipelineManager())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(directoryToList))
 
+        self.updateSecret(secret)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="ParaView/Web Pipeline Manager web-application")
@@ -34,6 +37,8 @@ if __name__ == "__main__":
     parser.add_argument("--data-dir", default=os.getcwd(),
         help="path to data directory to list", dest="path")
     args = parser.parse_args()
+
+    secret = args.authKey
     directoryToList = args.path
 
     web.start_webserver(options=args, protocol=PipelineManager)

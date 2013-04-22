@@ -16,16 +16,4 @@
 ##
 ###############################################################################
 
-from _version import __version__
-version = __version__ # backward compat.
-
-import util
-import useragent
-import flashpolicy
-import httpstatus
-import utf8validator
-import xormasker
-import websocket
-import resource
-import prefixmap
-import wamp
+__version__ = "0.6.0"

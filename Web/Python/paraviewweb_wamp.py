@@ -3,29 +3,33 @@ WAMP related class for the purpose of ParaViewWeb.
 
 """
 
+import string
+import random
 import types
 import logging
-import time
+
 from threading import Timer
 
-from twisted.python import log
-from twisted.internet import reactor
+from twisted.python     import log
+from twisted.internet   import reactor
+
+from autobahn.resource  import WebSocketResource
 from autobahn.websocket import listenWS
-from autobahn.wamp import exportRpc, \
-                          WampServerProtocol
-from autobahn.resource import WebSocketResource
-from autobahn.wamp import WampServerFactory
+from autobahn.wamp      import exportRpc, WampServerProtocol, WampCraProtocol, \
+                               WampCraServerProtocol, WampServerFactory
 
 from paraview import simple
 from vtkParaViewWebCorePython import vtkPVWebApplication
 
+# =============================================================================
+salt = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 # =============================================================================
 #
 # Base class for ParaViewWeb WampServerProtocol
 #
 # =============================================================================
 
-class ServerProtocol(WampServerProtocol):
+class ServerProtocol(WampCraServerProtocol):
     """
     Defines the core server protocol for ParaView/Web. Adds support to
     marshall/unmarshall RPC callbacks that involve ServerManager proxies as
@@ -35,6 +39,9 @@ class ServerProtocol(WampServerProtocol):
     register any RPC callbacks that are required for basic web-applications with
     interactive visualizations. For that, use ParaViewServerProtocol.
     """
+
+    AUTHEXTRA = {'salt': salt, 'keylen': 32, 'iterations': 1000}
+    SECRETS   = {'paraviewweb': WampCraProtocol.deriveKey("paraviewweb-secret", AUTHEXTRA)}
 
     def __init__(self):
         self.Application = vtkPVWebApplication()
@@ -47,6 +54,27 @@ class ServerProtocol(WampServerProtocol):
         themselves.
         """
         pass
+
+    def getAuthPermissions(self, authKey, authExtra):
+        return {'permissions': 'all', 'authextra': self.AUTHEXTRA}
+
+    def updateSecret(self, newSecret):
+        print "Update secret to ", newSecret
+        self.SECRETS['paraviewweb'] = WampCraProtocol.deriveKey(newSecret, self.AUTHEXTRA)
+
+    def getAuthSecret(self, authKey):
+        ## return the auth secret for the given auth key or None when the auth key
+        ## does not exist
+        secret = self.SECRETS.get(authKey, None)
+        return secret
+
+    def onAuthenticated(self, authKey, perms):
+        ## register RPC endpoints
+        if authKey is not None:
+            self.registerForPubSub("http://paraview.org/event#", True)
+            self.registerForRpc(self, "http://paraview.org/pv#")
+            for protocol in self.ParaViewWebProtocols:
+                self.registerForRpc(protocol, "http://paraview.org/pv#")
 
     def registerParaViewWebProtocol(self, protocol):
         protocol.setApplication(self.Application)
@@ -125,7 +153,7 @@ class ServerProtocol(WampServerProtocol):
             self.factory.on_connect()
         except AttributeError:
             pass
-        return WampServerProtocol.onConnect(self, connection_request)
+        return WampCraServerProtocol.onConnect(self, connection_request)
 
     def connectionLost(self, reason):
         """
@@ -138,16 +166,7 @@ class ServerProtocol(WampServerProtocol):
             self.factory.connection_lost()
         except AttributeError:
             pass
-        WampServerProtocol.connectionLost(self, reason)
-
-    def onSessionOpen(self):
-        """
-        Callback fired when WAMP session was fully established.
-        """
-        self.registerForPubSub("http://paraview.org/event#", True)
-        self.registerForRpc(self, "http://paraview.org/pv#")
-        for protocol in self.ParaViewWebProtocols:
-            self.registerForRpc(protocol, "http://paraview.org/pv#")
+        WampCraServerProtocol.connectionLost(self, reason)
 
     @exportRpc("exit")
     def exit(self):

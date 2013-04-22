@@ -47,6 +47,8 @@ def add_arguments(parser):
         help="root for web-pages to serve (default: current-working-directory)")
     parser.add_argument("-j", "--js", default='',
         help="root for JavaScript to serve (default: none)")
+    parser.add_argument("-a", "--authKey", default='paraviewweb-secret',
+        help="Authentication key that should be used by the client to connect to the WebSocket.")
 
     return parser
 
