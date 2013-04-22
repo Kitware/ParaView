@@ -13,15 +13,19 @@ except ImportError:
 from autobahn.wamp import exportRpc
 
 # import paraview modules.
-from paraview import simple, web, servermanager
+from paraview import simple, web, paraviewweb_wamp, paraviewweb_protocols
 
 # find out the path of the file to load
 reader = None
 fileToLoad = None
 pathToList = "."
 fileList = {}
+view = None
 
 def listFiles(pathToList):
+    """
+    Custom server list file.
+    """
     nodeTree = {}
     rootNode = { "data": "/", "children": [] , "state" : "open"}
     nodeTree[pathToList] = rootNode
@@ -39,34 +43,31 @@ def listFiles(pathToList):
             parent['children'].append(child)
     return rootNode
 
-view = None
-def initializePipeline():
-    """
-    Called by the default server and serves as a demonstration purpose.
-    This should be overriden by application protocols to setup the
-    application specific pipeline
-    """
-    global view, reader
-    if fileToLoad:
-        reader = simple.OpenDataFile(fileToLoad)
-        simple.Show()
+class FileOpener(paraviewweb_wamp.ServerProtocol):
 
-        view = simple.Render()
-        view.ViewSize = [800,800]
-        # If this is running on a Mac DO NOT use Offscreen Rendering
-        #view.UseOffscreenRendering = 1
-        simple.ResetCamera()
-    else:
-        view = simple.GetRenderView()
-        simple.Render()
-        view.ViewSize = [800,800]
+    def initialize(self):
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebMouseHandler())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPort())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortImageDelivery())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
 
-    # setup animation scene
-    scene = simple.GetAnimationScene()
-    simple.GetTimeTrack()
-    scene.PlayMode = "Snap To TimeSteps"
+        # Create default pipeline"""
+        global view, reader, fileToLoad
+        if fileToLoad:
+            reader = simple.OpenDataFile(fileToLoad)
+            simple.Show()
 
-class FileOpener(web.ParaViewServerProtocol):
+            view = simple.Render()
+            view.ViewSize = [800,800]
+            # If this is running on a Mac DO NOT use Offscreen Rendering
+            #view.UseOffscreenRendering = 1
+            simple.ResetCamera()
+        else:
+            view = simple.GetRenderView()
+            simple.Render()
+            view.ViewSize = [800,800]
+        simple.SetActiveView(view)
 
     @exportRpc("openFile")
     def openFile(self, file):
@@ -96,25 +97,6 @@ class FileOpener(web.ParaViewServerProtocol):
     def listFiles(self):
         return fileList
 
-    @exportRpc("vcr")
-    def updateTime(self,action):
-        animationScene = simple.GetAnimationScene()
-        currentTime = view.ViewTime
-
-        if action == "next":
-            animationScene.GoToNext()
-            if currentTime == view.ViewTime:
-                animationScene.GoToFirst()
-        if action == "prev":
-            animationScene.GoToPrevious()
-            if currentTime == view.ViewTime:
-                animationScene.GoToLast()
-        if action == "first":
-            animationScene.GoToFirst()
-        if action == "last":
-            animationScene.GoToLast()
-
-        return view.ViewTime
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -129,5 +111,4 @@ if __name__ == "__main__":
     fileToLoad = args.data
     pathToList = args.path
     fileList = listFiles(pathToList)
-    initializePipeline()
     web.start_webserver(options=args, protocol=FileOpener)

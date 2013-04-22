@@ -18,10 +18,10 @@ except ImportError:
 from autobahn.wamp import exportRpc
 
 # import paraview modules.
-from paraview import simple, web, servermanager
+from paraview import simple, web, servermanager, paraviewweb_wamp, paraviewweb_protocols
 from paraview import vtk
 
-class DataProber(web.ParaViewServerProtocol):
+class DataProber(paraviewweb_wamp.ServerProtocol):
     """DataProber extends web.ParaViewServerProtocol to add API for loading
         datasets add probing them."""
 
@@ -30,6 +30,13 @@ class DataProber(web.ParaViewServerProtocol):
     Database = ""
     Widget = None
     View = None
+
+    def initialize(self):
+        global directoryToList
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebMouseHandler())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPort())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortImageDelivery())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
 
     @classmethod
     def setupApplication(cls):
