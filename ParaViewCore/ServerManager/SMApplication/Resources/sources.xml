@@ -1529,7 +1529,7 @@
         <Property name="ZFreq" />
       </PropertyGroup>
 
-      <PropertyGroup label="Amplitube">
+      <PropertyGroup label="Amplitude">
         <Property name="XMag" />
         <Property name="YMag" />
         <Property name="ZMag" />

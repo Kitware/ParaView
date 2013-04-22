@@ -1191,8 +1191,8 @@
                       panel_visibility="never" />
             <Property name="UserTransform"
                       panel_visibility="never" />
-		        <Property name="BlockVisibility"
-		                  panel_visibility="never" />
+            <Property name="BlockVisibility"
+                      panel_visibility="never" />
             <Property name="NonlinearSubdivisionLevel"
                       panel_visibility="advanced" />
           </PropertyGroup>
