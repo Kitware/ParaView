@@ -1403,6 +1403,8 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
 
   this->Internals->PropertyGroups.push_back(group);
   group->Delete();
+
+  return group;
 }
 
 //---------------------------------------------------------------------------
