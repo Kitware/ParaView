@@ -97,16 +97,16 @@ namespace
       this->Panel->setParent(NULL);
       }
 
-    void show(QWidget* parent)
+    void show(QWidget* parentWdg)
       {
-      Q_ASSERT(parent != NULL);
+      Q_ASSERT(parentWdg != NULL);
 
-      delete parent->layout();
-      QVBoxLayout* layout = new QVBoxLayout(parent);
+      delete parentWdg->layout();
+      QVBoxLayout* layout = new QVBoxLayout(parentWdg);
       layout->setMargin(0);
       layout->setSpacing(0);
       this->Panel->setObjectName("ProxyPanel");
-      this->Panel->setParent(parent);
+      this->Panel->setParent(parentWdg);
       layout->addWidget(this->Panel);
       this->Panel->show();
       }
@@ -391,12 +391,12 @@ void pqPropertiesPanel::setRepresentation(pqDataRepresentation* repr)
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertiesPanel::setView(pqView* view)
+void pqPropertiesPanel::setView(pqView* pqview)
 {
-  if (this->Internals->View != view)
+  if (this->Internals->View != pqview)
     {
-    this->Internals->View = view;
-    emit this->viewChanged(view);
+    this->Internals->View = pqview;
+    emit this->viewChanged(pqview);
     }
 }
 

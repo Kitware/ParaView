@@ -825,7 +825,7 @@ void pqProxyWidget::create3DWidgets()
 
 //-----------------------------------------------------------------------------
 pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
-  vtkSMProperty *property, vtkSMProxy *proxy, QWidget *parentObj)
+  vtkSMProperty *smproperty, vtkSMProxy *smproxy, QWidget *parentObj)
 {
   // check for custom widgets
   pqPropertyWidget *widget = NULL;
@@ -835,7 +835,7 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
     interfaceTracker->interfaces<pqPropertyWidgetInterface*>();
   foreach(pqPropertyWidgetInterface *interface, interfaces)
     {
-    widget = interface->createWidgetForProperty(proxy, property);
+    widget = interface->createWidgetForProperty(smproxy, smproperty);
     if (widget)
       {
       break;
@@ -845,19 +845,19 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
   if (widget != NULL)
     {
     }
-  else if (vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(property))
+  else if (vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(smproperty))
     {
-    widget = new pqDoubleVectorPropertyWidget(dvp, proxy, parentObj);
+    widget = new pqDoubleVectorPropertyWidget(dvp, smproxy, parentObj);
     }
-  else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property))
+  else if(vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(smproperty))
     {
-    widget = new pqIntVectorPropertyWidget(ivp, proxy, parentObj);
+    widget = new pqIntVectorPropertyWidget(ivp, smproxy, parentObj);
     }
-  else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(property))
+  else if(vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(smproperty))
     {
-    widget = new pqStringVectorPropertyWidget(svp, proxy, parentObj);
+    widget = new pqStringVectorPropertyWidget(svp, smproxy, parentObj);
     }
-  else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(property))
+  else if(vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(smproperty))
     {
     bool selection_input = (pp->GetHints() &&
       pp->GetHints()->FindNestedElementByName("SelectionInput"));
@@ -873,25 +873,26 @@ pqPropertyWidget* pqProxyWidget::createWidgetForProperty(
 
     if (selection_input || vtkSMProxyListDomain::SafeDownCast(domain))
       {
-      widget = new pqProxyPropertyWidget(pp, proxy, parentObj);
+      widget = new pqProxyPropertyWidget(pp, smproxy, parentObj);
       }
     }
-  else if (property && strcmp(property->GetClassName(), "vtkSMProperty") == 0)
+  else if (smproperty && strcmp(smproperty->GetClassName(), "vtkSMProperty") == 0)
     {
-    widget = new pqCommandPropertyWidget(property, proxy, parentObj);
+    widget = new pqCommandPropertyWidget(smproperty, smproxy, parentObj);
     }
 
   if (widget)
     {
-    widget->setProperty(property);
+    widget->setProperty(smproperty);
     }
 
   // Create decorators, if any.
-  QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(property->GetHints());
+  QMap<QString, vtkPVXMLElement*> decoratorTypes = getDecorators(smproperty->GetHints());
   foreach (const QString& type, decoratorTypes.keys())
     {
-    foreach(pqPropertyWidgetInterface *interface, interfaces)
+    for (int cc=0; cc < interfaces.size(); cc++)
       {
+      pqPropertyWidgetInterface* interface = interfaces[cc];
       if (interface->createWidgetDecorator(type, decoratorTypes[type], widget))
         {
         break;

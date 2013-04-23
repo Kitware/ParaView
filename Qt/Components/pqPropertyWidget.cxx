@@ -97,10 +97,10 @@ pqView* pqPropertyWidget::view() const
 }
 
 //-----------------------------------------------------------------------------
-void pqPropertyWidget::setView(pqView* view)
+void pqPropertyWidget::setView(pqView* pqview)
 {
-  this->View = view;
-  emit this->viewChanged(view);
+  this->View = pqview;
+  emit this->viewChanged(pqview);
 }
 
 //-----------------------------------------------------------------------------
