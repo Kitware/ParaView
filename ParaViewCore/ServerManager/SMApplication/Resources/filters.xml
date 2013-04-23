@@ -6701,6 +6701,22 @@ found and the point will be rejected.</Documentation>
         <Property name="Source" />
       </PropertyGroup>
 
+      <PropertyGroup label="Integration Parameters">
+        <Property name="IntegrationDirection" />
+        <Property name="IntegratorType" />
+        <Property name="IntegrationStepUnit" />
+        <Property name="InitialIntegrationStep" />
+        <Property name="MinimumIntegrationStep" />
+        <Property name="MaximumIntegrationStep" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Streamline Parameters" >
+        <Property name="MaximumNumberOfSteps" />
+        <Property name="MaximumPropagation" />
+        <Property name="TerminalSpeed" />
+        <Property name="MaximumError" />
+      </PropertyGroup>
+
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
