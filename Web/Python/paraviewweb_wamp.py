@@ -59,7 +59,6 @@ class ServerProtocol(WampCraServerProtocol):
         return {'permissions': 'all', 'authextra': self.AUTHEXTRA}
 
     def updateSecret(self, newSecret):
-        print "Update secret to ", newSecret
         self.SECRETS['paraviewweb'] = WampCraProtocol.deriveKey(newSecret, self.AUTHEXTRA)
 
     def getAuthSecret(self, authKey):

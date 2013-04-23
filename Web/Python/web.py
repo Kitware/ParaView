@@ -29,6 +29,14 @@ from vtkParaViewWebCorePython import vtkPVWebApplication,\
                                      vtkPVWebUtilities
 from webgl import WebGLResource
 
+# =============================================================================
+# Setup default arguments to be parsed
+#   -d, --debug
+#   -p, --port     8080
+#   -t, --timeout  300 (seconds)
+#   -c, --content  ''  (No content means WebSocket only)
+#   -a, --authKey  paraviewweb-secret
+# =============================================================================
 
 def add_arguments(parser):
     """
@@ -43,14 +51,16 @@ def add_arguments(parser):
         help="port number for the web-server to listen on (default: 8080)")
     parser.add_argument("-t", "--timeout", type=int, default=300,
         help="timeout for reaping process on idle in seconds (default: 300s)")
-    parser.add_argument("-c", "--content", default=os.getcwd(),
-        help="root for web-pages to serve (default: current-working-directory)")
-    parser.add_argument("-j", "--js", default='',
-        help="root for JavaScript to serve (default: none)")
+    parser.add_argument("-c", "--content", default='',
+        help="root for web-pages to serve (default: none)")
     parser.add_argument("-a", "--authKey", default='paraviewweb-secret',
-        help="Authentication key that should be used by the client to connect to the WebSocket.")
+        help="Authentication key for clients to connect to the WebSocket.")
 
     return parser
+
+# =============================================================================
+# Parse arguments and start webserver
+# =============================================================================
 
 def start(argv=None,
         protocol=paraviewweb_wamp.ServerProtocol,
@@ -72,6 +82,10 @@ def start(argv=None,
     args = parser.parse_args(argv)
     start_webserver(options=args, protocol=protocol)
 
+# =============================================================================
+# Start webserver
+# =============================================================================
+
 def start_webserver(options, protocol=paraviewweb_wamp.ServerProtocol, disableLogging=False):
     """
     Starts the web-server with the given protocol. Options must be an object
@@ -92,22 +106,26 @@ def start_webserver(options, protocol=paraviewweb_wamp.ServerProtocol, disableLo
     wampFactory = paraviewweb_wamp.ReapingWampServerFactory(
         "ws://localhost:%d" % options.port, options.debug, options.timeout)
     wampFactory.protocol = protocol
-    wsResource = WebSocketResource(wampFactory)
 
-    root = File(options.content)
-    root.putChild("ws", wsResource)
+    # Do we serve static content or just websocket ?
+    if len(options.content) == 0:
+        # Only WebSocket
+        listenWS(wampFactory)
+    else:
+        # Static HTTP + WebSocket
+        wsResource = WebSocketResource(wampFactory)
 
-    webgl = WebGLResource()
-    root.putChild("WebGL", webgl);
+        root = File(options.content)
+        root.putChild("ws", wsResource)
 
-    # To ease development
-    if len(options.js) > 0:
-        root.putChild("js", File(options.js))
+        webgl = WebGLResource()
+        root.putChild("WebGL", webgl);
 
-    site = Site(root)
+        site = Site(root)
 
-    reactor.listenTCP(options.port, site)
+        reactor.listenTCP(options.port, site)
 
+    # Start factory and reactor
     wampFactory.startFactory()
     reactor.run()
     wampFactory.stopFactory()

@@ -3,6 +3,13 @@
 import sys
 import os
 import os.path
+
+# import paraview modules.
+from paraview import simple, web, servermanager, paraviewweb_wamp, paraviewweb_protocols, vtk
+
+# import annotations
+from autobahn.wamp import exportRpc
+
 from twisted.python import log
 import logging
 
@@ -13,13 +20,9 @@ except ImportError:
     # the source for the same as _argparse and we use it instead.
     import _argparse as argparse
 
-
-# import annotations
-from autobahn.wamp import exportRpc
-
-# import paraview modules.
-from paraview import simple, web, servermanager, paraviewweb_wamp, paraviewweb_protocols
-from paraview import vtk
+# =============================================================================
+# Create custom Data Prober class to handle clients requests
+# =============================================================================
 
 class DataProber(paraviewweb_wamp.ServerProtocol):
     """DataProber extends web.ParaViewServerProtocol to add API for loading
@@ -30,6 +33,7 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
     Database = ""
     Widget = None
     View = None
+    authKey = "paraviewweb-secret"
 
     def initialize(self):
         global directoryToList
@@ -37,6 +41,9 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPort())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortImageDelivery())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
+
+        # Update authentication key to use
+        self.updateSecret(DataProber.authKey)
 
     @classmethod
     def setupApplication(cls):
@@ -255,15 +262,27 @@ class DataProber(paraviewweb_wamp.ServerProtocol):
             return True
         return False
 
+# =============================================================================
+# Main: Parse args and start server
+# =============================================================================
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="ParaView Web Data-Prober")
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="ParaView Web Data-Prober")
+
+    # Add default arguments
     web.add_arguments(parser)
-    parser.add_argument("--data-dir",
-        help="path to data directory", dest="path")
+
+    # Add local arguments
+    parser.add_argument("--data-dir", help="path to data directory", dest="path")
+
+    # Exctract arguments
     args = parser.parse_args()
 
+    # Configure our current application
     DataProber.DataPath = args.path
     DataProber.setupApplication()
+    DataProber.authKey = args.authKey
 
+    # Start server
     web.start_webserver(options=args, protocol=DataProber)

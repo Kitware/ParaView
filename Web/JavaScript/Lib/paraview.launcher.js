@@ -60,6 +60,35 @@
      *
      * OPTIONAL
      */
+    /**
+     * @member pv.ConnectionConfig
+     * @property {String} secret
+     * Password that should be used to protect remote session access.
+     *
+     * This property is used by the launcher to secure the process that it start
+     * but it is also used by the client to authenticate itself against
+     * the remote process.
+     *
+     * This can be provided by the client or by the server depending who
+     * generate it. In both case, the client will use it for its authentication.
+     * If missing, then the client will use the default secret key.
+     *
+     * OPTIONAL
+     */
+    /**
+     * @member pv.ConnectionConfig
+     * @property {Number} generate-secret
+     * Property used to specify where the generation of the secret key should be
+     * made.
+     * 0: We use the default secret key. (No dynamic one)
+     * 1: The JavaScript client generate the key and its the responsability of
+     *    the server to provide the generated key to the ParaViewWeb process.
+     * 2: The launcher process generate that key when it start the ParaViewWeb
+     *    process. That given secret key must be returned to the client within
+     *    the connection object.
+     *
+     * OPTIONAL
+     */
 
     //=========================================================================
 
@@ -109,8 +138,10 @@
      * message will be provided as argument.
      */
     function start(config, successFunction, errorFunction) {
-        if(!config.hasOwnProperty("secret")) {
+        if(!config.hasOwnProperty("secret") && config.hasOwnProperty("generate-secret") && config["generate-secret"] === 1) {
             config.secret = generateSecretKey();
+        } else if(!config.hasOwnProperty("secret") && (!config.hasOwnProperty("generate-secret") || config["generate-secret"] === 0)) {
+            config.secret = "paraviewweb-secret";
         }
         var okCallback = successFunction,
         koCallback = errorFunction,

@@ -1,6 +1,9 @@
 # import to process args
 import os
 
+# import paraview modules.
+from paraview import web, paraviewweb_wamp, paraviewweb_protocols
+
 try:
     import argparse
 except ImportError:
@@ -8,37 +11,48 @@ except ImportError:
     # the source for the same as _argparse and we use it instead.
     import _argparse as argparse
 
-# import paraview modules.
-from paraview import web, paraviewweb_wamp, paraviewweb_protocols
+# =============================================================================
+# Create custom Pipeline Manager class to handle clients requests
+# =============================================================================
 
-# Setup global variables
-directoryToList = None
-secret = "paraviewweb-secret" # "Replaced by --authKey value"
-
-# Define ParaView Protocol
 class PipelineManager(paraviewweb_wamp.ServerProtocol):
 
+    dataDir = None
+    authKey = "paraviewweb-secret"
+
     def initialize(self):
-        global directoryToList
+        # Bring used components
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebMouseHandler())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPort())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortImageDelivery())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
         self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebPipelineManager())
-        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(directoryToList))
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebFileManager(PipelineManager.dataDir))
 
-        self.updateSecret(secret)
+        # Update authentication key to use
+        self.updateSecret(PipelineManager.authKey)
+
+# =============================================================================
+# Main: Parse args and start server
+# =============================================================================
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="ParaView/Web Pipeline Manager web-application")
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="ParaView/Web Pipeline Manager web-application")
+
+    # Add default arguments
     web.add_arguments(parser)
-    parser.add_argument("--data-dir", default=os.getcwd(),
-        help="path to data directory to list", dest="path")
+
+    # Add local arguments
+    parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
+
+    # Exctract arguments
     args = parser.parse_args()
 
-    secret = args.authKey
-    directoryToList = args.path
+    # Configure our current application
+    PipelineManager.authKey = args.authKey
+    PipelineManager.dataDir = args.path
 
+    # Start server
     web.start_webserver(options=args, protocol=PipelineManager)
