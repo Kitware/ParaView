@@ -140,8 +140,6 @@
     function start(config, successFunction, errorFunction) {
         if(!config.hasOwnProperty("secret") && config.hasOwnProperty("generate-secret") && config["generate-secret"] === 1) {
             config.secret = generateSecretKey();
-        } else if(!config.hasOwnProperty("secret") && (!config.hasOwnProperty("generate-secret") || config["generate-secret"] === 0)) {
-            config.secret = "paraviewweb-secret";
         }
         var okCallback = successFunction,
         koCallback = errorFunction,
