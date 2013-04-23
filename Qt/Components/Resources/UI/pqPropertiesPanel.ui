@@ -127,8 +127,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>342</width>
-        <height>223</height>
+        <width>344</width>
+        <height>232</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,0,1">
@@ -137,12 +137,6 @@
        </property>
        <item>
         <widget class="pqExpanderButton" name="PropertiesButton">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
          <property name="text" stdset="0">
           <string>Properties</string>
          </property>
@@ -169,12 +163,6 @@
        </item>
        <item>
         <widget class="pqExpanderButton" name="DisplayButton">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
          <property name="text" stdset="0">
           <string>Display</string>
          </property>
