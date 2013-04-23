@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqRubberBandHelper;
 class pqView;
+class pqPipelineSource;
 class vtkPVGenericRenderWindowInteractor;
 
 /// pqCameraToolbar is the toolbar that has icons for resetting camera
@@ -67,12 +68,14 @@ private slots:
   void startZoomToBox();
   void endZoomToBox();
   void activeViewChanged(pqView*);
+  void activeSourceChanged(pqPipelineSource*);
 
 private:
   Q_DISABLE_COPY(pqCameraToolbar)
   void constructor();
 
   QAction* ZoomAction;
+  QAction* ZoomToDataAction;
   bool ZoomToBoxStarted;
   pqRubberBandHelper* SelectionHelper;
   vtkWeakPointer<vtkPVGenericRenderWindowInteractor> Interactor;
