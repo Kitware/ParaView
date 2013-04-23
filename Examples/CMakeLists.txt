@@ -39,7 +39,3 @@ elseif (PARAVIEW_BUILD_QT_GUI)
   # vtkIOVisItBridge is enabled.
   add_subdirectory(CustomApplications/ParticlesViewer)
 endif ()
-
-if (PARAVIEW_ENABLE_WEB)
-  add_subdirectory(Web)
-endif()
