@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntRangeWidget.h"
 #include "pqLineEdit.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
@@ -101,27 +102,58 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     }
   else if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
     {
-    QComboBox *comboBox = new QComboBox(this);
-    comboBox->setObjectName("ComboBox");
-
-    for(unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
+    if (vtkSMVectorProperty::SafeDownCast(smproperty)->GetRepeatCommand())
       {
-      comboBox->addItem(ed->GetEntryText(i));
+      // Some enumeration properties, we add
+      // ability to select mutliple elements. This is the case if the
+      // SM property has repeat command flag set.
+      pqTreeWidget *treeWidget = new pqTreeWidget(this);
+      treeWidget->setObjectName("TreeWidget");
+      treeWidget->setColumnCount(1);
+      treeWidget->setRootIsDecorated(false);
+
+      QTreeWidgetItem* header = new QTreeWidgetItem();
+      header->setData(0, Qt::DisplayRole, smproperty->GetXMLLabel());
+      treeWidget->setHeaderItem(header);
+
+      // helper makes it easier to select multiple entries.
+      pqTreeWidgetSelectionHelper* helper =
+        new pqTreeWidgetSelectionHelper(treeWidget);
+      helper->setObjectName("TreeWidgetSelectionHelper");
+
+      // adaptor makes it possible to link with the smproperty.
+      pqSignalAdaptorSelectionTreeWidget* adaptor =
+        new pqSignalAdaptorSelectionTreeWidget(treeWidget, smproperty);
+      adaptor->setObjectName("SelectionTreeWidgetAdaptor");
+      this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()),
+                            smproperty);
+      
+      layoutLocal->addWidget(treeWidget);
+      this->setChangeAvailableAsChangeFinished(true);
+      this->setShowLabel(false);
       }
+    else
+      {
+      QComboBox *comboBox = new QComboBox(this);
+      comboBox->setObjectName("ComboBox");
+      for(unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
+        {
+        comboBox->addItem(ed->GetEntryText(i));
+        }
+      pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+      this->addPropertyLink(adaptor,
+        "currentText",
+        SIGNAL(currentTextChanged(QString)),
+        smproperty);
+      this->setChangeAvailableAsChangeFinished(true);
+      layoutLocal->addWidget(comboBox);
 
-    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+      PV_DEBUG_PANELS()
+        << "QComboBox for an IntVectorProperty with a "
+        << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")"
+        << "(with non-repeatable command)";
 
-    this->addPropertyLink(adaptor,
-                          "currentText",
-                          SIGNAL(currentTextChanged(QString)),
-                          smproperty);
-    this->setChangeAvailableAsChangeFinished(true);
-
-
-    layoutLocal->addWidget(comboBox);
-
-    PV_DEBUG_PANELS() << "QComboBox for an IntVectorProperty with a "
-                  << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")";
+      }
     }
   else if(vtkSMCompositeTreeDomain::SafeDownCast(domain))
     {
