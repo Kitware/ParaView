@@ -61,6 +61,8 @@ pqPropertyWidget* @name@Implementation::createWidgetForProperty(
     return new @classname@(smproxy, smproperty);
     }
 #endif
+  Q_UNUSED(smproxy);
+  Q_UNUSED(smproperty);
   return NULL;
 }
 
@@ -77,6 +79,8 @@ pqPropertyWidget* @name@Implementation::createWidgetForPropertyGroup(
     return new @classname@(smproxy, smgroup);
     }
 #endif
+  Q_UNUSED(smproxy);
+  Q_UNUSED(smgroup);
   return NULL;
 }
 
@@ -91,5 +95,8 @@ pqPropertyWidgetDecorator* @name@Implementation::createWidgetDecorator(
     return new @classname@(config, widget);
     }
 #endif
+  Q_UNUSED(type);
+  Q_UNUSED(config);
+  Q_UNUSED(widget);
   return NULL;
 }
