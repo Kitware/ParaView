@@ -131,6 +131,11 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
       layoutLocal->addWidget(treeWidget);
       this->setChangeAvailableAsChangeFinished(true);
       this->setShowLabel(false);
+
+      PV_DEBUG_PANELS()
+        << "TreeWidget for an IntVectorProperty with a "
+        << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")"
+        << "(with repeatable command)";
       }
     else
       {
