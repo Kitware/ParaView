@@ -359,13 +359,17 @@ unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyProperty::GetProxy(unsigned int idx)
 {
-  return this->PPInternals->Proxies[idx].Value.GetPointer();
+  return idx <
+    static_cast<unsigned int>(this->PPInternals->Proxies.size())?
+    this->PPInternals->Proxies[idx].Value.GetPointer() : NULL;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyProperty::GetUncheckedProxy(unsigned int idx)
 {
-  return this->PPInternals->UncheckedProxies[idx];
+  return idx <
+    static_cast<unsigned int>(this->PPInternals->UncheckedProxies.size())?
+    this->PPInternals->UncheckedProxies[idx] : NULL;
 }
 
 

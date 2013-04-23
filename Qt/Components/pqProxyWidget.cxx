@@ -377,6 +377,11 @@ namespace
   // possible.
   pqDisplayPanel* CreateLegacyPanel(pqRepresentation* repr)
     {
+    if (repr == NULL)
+      {
+      return NULL;
+      }
+
     pqInterfaceTracker *interfaceTracker =
       pqApplicationCore::instance()->interfaceTracker();
     foreach (pqDisplayPanelInterface* iface,
@@ -401,6 +406,10 @@ namespace
   // possible.
   pqObjectPanel* CreateLegacyPanel(pqProxy* proxy)
     {
+    if (proxy == NULL)
+      {
+      return NULL;
+      }
     pqInterfaceTracker *interfaceTracker =
       pqApplicationCore::instance()->interfaceTracker();
     foreach (pqObjectPanelInterface* iface,
