@@ -5,20 +5,22 @@ import QtTestingImage
 
 object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object2 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
+object2 = 'pqClientMainWindow/propertiesDock/propertiesPanel/Accept'
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/SplitVertical'
 QtTesting.playCommand(object3, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object4 = 'pqClientMainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
+object4 = 'pqClientMainWindow/propertiesDock/propertiesPanel/scrollArea/qt_scrollarea_viewport/scrollAreaWidgetContents/PropertiesFrame/ProxyPanel/Center/LineEdit0'
 QtTesting.playCommand(object4, 'set_string', '1')
 QtTesting.playCommand(object2, 'activate', '')
 object5 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
 QtTesting.playCommand(object5, 'currentChanged', '/0/0|0')
 object6 = 'pqClientMainWindow/1QTabBar1'
-QtTesting.playCommand(object6, 'set_tab_with_text', 'Display')
-object7 = 'pqClientMainWindow/displayDock/displayWidgetFrame/displayScrollArea/qt_scrollarea_viewport/displayWidget/Form/ViewGroup/ViewData'
-QtTesting.playCommand(object7, 'set_boolean', 'true')
+
+object7 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser'
+QtTesting.playCommand(object7, 'mousePress', '1,1,0,10,12,/0:0/0:1')
+QtTesting.playCommand(object7, "mouseRelease", "1,0,0,10,12,/0:0/0:1")
+
 object8 = 'pqClientMainWindow/menubar'
 QtTesting.playCommand(object8, 'activate', 'menu_View')
 object8 = 'pqClientMainWindow/menubar/menu_View'

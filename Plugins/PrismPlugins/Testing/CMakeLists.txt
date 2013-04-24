@@ -14,6 +14,12 @@ SET (PrismView_BREAK TRUE)
 SET (PrismScaleView_BREAK TRUE)
 SET (PrismScaleView1_BREAK TRUE)
 
+set(PrismMultipleSurfaces_USE_OLD_PANELS TRUE)
+set(PrismSelection_USE_OLD_PANELS TRUE)
+set(PrismView_USE_OLD_PANELS TRUE)
+set(PrismScaleView_USE_OLD_PANELS TRUE)
+set(PrismScaleView1_USE_OLD_PANELS TRUE)
+
 IF (PARAVIEW_DATA_ROOT AND BUILD_SHARED_LIBS)
   add_client_tests("Prism"
     BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline

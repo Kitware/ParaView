@@ -101,12 +101,10 @@ IF (BUILD_TESTING)
   # in the coprocessing library but that may not be built so we
   # add it here as well. this test though is a subset of that test.
   IF ( BUILD_SHARED_LIBS )
-    set(CoProcessingGUI_USE_NEW_PANELS TRUE)
     add_client_tests("pv"
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI.xml )
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI PROPERTIES RUN_SERIAL ON)
   ELSE ( BUILD_SHARED_LIBS )
-    set(CoProcessingGUI-static_USE_NEW_PANELS TRUE)
     add_client_tests("pv"
       TEST_SCRIPTS ${CMAKE_CURRENT_SOURCE_DIR}/Testing/CoProcessingGUI-static.xml )
     SET_TESTS_PROPERTIES(pv.CoProcessingGUI-static PROPERTIES RUN_SERIAL ON)

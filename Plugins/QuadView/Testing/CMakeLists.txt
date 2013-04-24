@@ -16,19 +16,13 @@ set(MULTI_SLICE_STATIC_TESTS
 )
 
 set(QuadViewSliceMultiBlock_BREAK TRUE)
-set(QuadViewSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(QuadViewSliceWavelet_BREAK TRUE)
-set(QuadViewSliceWavelet_USE_NEW_PANELS TRUE)
 
 set(serverQuadViewSliceMultiBlock_BREAK TRUE)
-set(serverQuadViewSliceMultiBlock_USE_NEW_PANELS TRUE)
 set(serverQuadViewSliceWavelet_BREAK TRUE)
-set(serverQuadViewSliceWavelet_USE_NEW_PANELS TRUE)
 
 set(QuadViewSliceMultiBlock-static_BREAK TRUE)
-set(QuadViewSliceMultiBlock-static_USE_NEW_PANELS TRUE)
 set(QuadViewSliceWavelet-static_BREAK TRUE)
-set(QuadViewSliceWavelet-static_USE_NEW_PANELS TRUE)
 
 IF (PARAVIEW_DATA_ROOT AND PARAVIEW_BUILD_QT_GUI)
   IF (BUILD_SHARED_LIBS)
