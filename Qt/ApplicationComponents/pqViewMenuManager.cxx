@@ -56,6 +56,18 @@ pqViewMenuManager::pqViewMenuManager(QMainWindow* mainWindow, QMenu* menu)
   QObject::connect(menu, SIGNAL(aboutToShow()), this, SLOT(buildMenu()));
 }
 
+namespace
+{
+  bool toolbarLessThan(const QToolBar* tb1, const QToolBar* tb2)
+    {
+    return tb1->toggleViewAction()->text() < tb2->toggleViewAction()->text();
+    }
+
+  bool dockWidgetLessThan(const QDockWidget* tb1, const QDockWidget* tb2)
+    {
+    return tb1->toggleViewAction()->text() < tb2->toggleViewAction()->text();
+    }
+}
 //-----------------------------------------------------------------------------
 void pqViewMenuManager::buildMenu()
 {
@@ -69,17 +81,20 @@ void pqViewMenuManager::buildMenu()
   QMenu* toolbars = this->Menu->addMenu("Toolbars")
     << pqSetName("Toolbars");
   QList<QToolBar*> all_toolbars = this->Window->findChildren<QToolBar*>();
+  qSort(all_toolbars.begin(), all_toolbars.end(), toolbarLessThan);
+
   foreach (QToolBar* toolbar, all_toolbars)
     {
     toolbars->addAction(toolbar->toggleViewAction());
     }
-
   this->Menu->addSeparator();
-  foreach (QDockWidget* dock_widget, this->Window->findChildren<QDockWidget*>())
+
+  QList<QDockWidget*> all_docks = this->Window->findChildren<QDockWidget*>();
+  qSort(all_docks.begin(), all_docks.end(), dockWidgetLessThan);
+  foreach (QDockWidget* dock_widget, all_docks)
     {
     this->Menu->addAction(dock_widget->toggleViewAction());
     }
-
   this->Menu->addSeparator();
 
   pqTabbedMultiViewWidget* viewManager = qobject_cast<pqTabbedMultiViewWidget*>(
