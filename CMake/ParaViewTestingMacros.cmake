@@ -126,7 +126,7 @@ FUNCTION(add_multi_client_tests prefix)
       set (extra_args)
       set (use_old_panels)
       process_args(extra_args)
-      if (NOT DEFINED ${test_name}_USE_OLD_PANELS)
+      if (DEFINED ${test_name}_USE_OLD_PANELS)
         set (use_old_panels "--use-old-panels")
       endif ()
 
