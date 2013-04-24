@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPropertyWidgetDecorator::pqPropertyWidgetDecorator(
-  vtkPVXMLElement* xml,
+  vtkPVXMLElement* xmlConfig,
   pqPropertyWidget* parentObject)
   : Superclass(parentObject),
-  XML(xml)
+  XML(xmlConfig)
 {
   Q_ASSERT(parentObject != NULL);
   parentObject->addDecorator(this);
