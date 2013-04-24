@@ -31,14 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqStandardColorLinkAdaptor.h"
 
-// Server Manager Includes.
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkEventQtSlotConnect.h"
-
-// Qt Includes.
-#include "pqStandardColorButton.h"
 #include "pqApplicationCore.h"
-// ParaView Includes.
+#include "pqStandardColorButton.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSMGlobalPropertiesManager.h"
 
 //-----------------------------------------------------------------------------
 pqStandardColorLinkAdaptor::pqStandardColorLinkAdaptor(
@@ -54,7 +50,7 @@ pqStandardColorLinkAdaptor::pqStandardColorLinkAdaptor(
     this, SLOT(onStandardColorChanged(const QString&)));
   this->VTKConnect->Connect(
     pqApplicationCore::instance()->getGlobalPropertiesManager(),
-    vtkCommand::ModifiedEvent,
+    vtkSMGlobalPropertiesManager::GlobalPropertyLinkModified,
     this, SLOT(onGlobalPropertiesChanged()));
 
   this->onGlobalPropertiesChanged();

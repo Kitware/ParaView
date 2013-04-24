@@ -35,18 +35,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include "pqSignalAdaptors.h"
-#include "pqColorChooserButton.h"
+#include "pqStandardColorButton.h"
+#include "pqStandardColorLinkAdaptor.h"
+#include "vtkSMProxy.h"
 
 pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy,
-                                                           vtkSMProperty *proxyProperty,
+                                                           vtkSMProperty *smProperty,
                                                            QWidget *pWidget)
   : pqPropertyWidget(smProxy, pWidget)
 {
-  QVBoxLayout *l = new QVBoxLayout;
-  l->setSpacing(0);
-  l->setMargin(0);
+  PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
+                    << "the panel_widget=\"color_chooser\" attribute";
 
-  pqColorChooserButton *button = new pqColorChooserButton(this);
+  QVBoxLayout *vbox = new QVBoxLayout(this);
+  vbox->setSpacing(0);
+  vbox->setMargin(0);
+
+  pqStandardColorButton *button = new pqStandardColorButton(this);
+  button->setObjectName("ColorButton");
   pqSignalAdaptorColor *adaptor =
     new pqSignalAdaptorColor(button,
                              "chosenColor",
@@ -56,14 +62,15 @@ pqColorSelectorPropertyWidget::pqColorSelectorPropertyWidget(vtkSMProxy *smProxy
   this->addPropertyLink(adaptor,
                         "color",
                         SIGNAL(colorChanged(const QVariant&)),
-                        proxyProperty);
+                        smProperty);
+  if (strcmp(smProxy->GetPropertyName(smProperty), "EdgeColor") == 0)
+    {
+    // pqStandardColorLinkAdaptor makes it possible to set this color to one of
+    // the standard colors.
+    new pqStandardColorLinkAdaptor(button, smProxy, smProxy->GetPropertyName(smProperty));
+    }
 
-  l->addWidget(button);
-
-  this->setLayout(l);
-
-  PV_DEBUG_PANELS() << "pqColorSelectorPropertyWidget for a property with "
-                << "the panel_widget=\"color_chooser\" attribute";
+  vbox->addWidget(button);
 }
 
 pqColorSelectorPropertyWidget::~pqColorSelectorPropertyWidget()

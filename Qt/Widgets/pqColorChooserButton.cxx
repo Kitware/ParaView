@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QColorDialog>
 #include <QPainter>
+#include <QResizeEvent>
 
+//-----------------------------------------------------------------------------
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
   : QToolButton(p)
 {
@@ -44,11 +46,13 @@ pqColorChooserButton::pqColorChooserButton(QWidget* p)
   this->connect(this, SIGNAL(clicked()), SLOT(chooseColor()));
 }
 
+//-----------------------------------------------------------------------------
 QColor pqColorChooserButton::chosenColor() const
 {
   return this->Color;
 }
 
+//-----------------------------------------------------------------------------
 void pqColorChooserButton::setChosenColor(const QColor& color)
 {
   if(color.isValid())
@@ -56,17 +60,7 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
     if(color != this->Color)
       {
       this->Color = color;
-      int sz = qRound(this->height() * 0.5);
-      
-      QPixmap pix(sz, sz);
-      pix.fill(QColor(0,0,0,0));
-      QPainter painter(&pix);
-      painter.setRenderHint(QPainter::Antialiasing, true);
-      painter.setBrush(QBrush(color));
-      painter.drawEllipse(1,1,sz-2,sz-2);
-      painter.end();
-
-      this->setIcon(QIcon(pix));
+      this->setIcon(this->renderColorSwatch(color));
       
       emit this->beginUndo(this->UndoLabel);
       emit this->chosenColorChanged(this->Color);
@@ -76,9 +70,35 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
     }
 }
 
+//-----------------------------------------------------------------------------
+QIcon pqColorChooserButton::renderColorSwatch(const QColor& color)
+{
+  int radius = qRound(this->height() * 0.75);
+  if (radius <= 10)
+    {
+    radius = 10;
+    }
+
+  QPixmap pix(radius, radius);
+  pix.fill(QColor(0,0,0,0));
+
+  QPainter painter(&pix);
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setBrush(QBrush(color));
+  painter.drawEllipse(1, 1, radius-2, radius-2);
+  painter.end();
+
+  return QIcon(pix);
+}
+
+//-----------------------------------------------------------------------------
 void pqColorChooserButton::chooseColor()
 {
   this->setChosenColor(QColorDialog::getColor(this->Color, this));
 }
 
-
+//-----------------------------------------------------------------------------
+void pqColorChooserButton::resizeEvent(QResizeEvent *rEvent)
+{
+  this->setIcon(this->renderColorSwatch(this->Color));
+}
