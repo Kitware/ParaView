@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertiesPanel.h"
 #include "pqPropertyWidgetDecorator.h"
 #include "pqProxy.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
@@ -86,7 +87,9 @@ void pqPropertyWidget::onChangeFinished()
 {
   if (this->AutoUpdateVTKObjects)
     {
+    BEGIN_UNDO_SET("Property Changed");
     this->apply();
+    END_UNDO_SET();
     }
 }
 
