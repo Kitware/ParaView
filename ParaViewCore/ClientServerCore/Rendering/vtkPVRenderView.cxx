@@ -168,6 +168,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->InteractorStyle = 0;
   this->TwoDInteractorStyle = 0;
   this->ThreeDInteractorStyle = 0;
+  this->PolygonStyle = 0;
   this->RubberBandStyle = 0;
   this->RubberBandZoom = 0;
   this->CenterAxes = vtkPVCenterAxesActor::New();
