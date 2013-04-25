@@ -63,6 +63,17 @@ int vtkCPProcessor::AddPipeline(vtkCPPipeline* pipeline)
     vtkErrorMacro("Pipeline is NULL.");
     return 0;
     }
+  if(pipeline->IsA("vtkCPPythonScriptPipeline") == 1 &&
+     this->IsA("vtkCPPythonProcessor") == 0)
+    {
+    // If this isn't a vtkCPPythonProcessor we should assume that Python
+    // isn't initialized and we can't execute any vtkCPPythonScriptPipeline.
+    // We add in a warning because originally vtkCPProcessor would properly
+    // initialize Python and this new behavior isn't backwards compatible.
+    vtkErrorMacro("Must have a vtkCPPythonProcessor in order to use a " <<
+                  "vtkCPPythonScriptPipeline. This script will not be added");
+    return 0;
+    }
   this->Internal->Pipelines.push_back(pipeline);
   return 1;
 }
