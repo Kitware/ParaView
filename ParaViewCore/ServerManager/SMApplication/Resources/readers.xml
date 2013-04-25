@@ -2678,6 +2678,15 @@
         <Documentation>This property specifies the .q (solution) file name for
         the PLOT3D reader.</Documentation>
       </StringVectorProperty>
+      <StringVectorProperty animateable="0"
+                            command="SetFunctionFileName"
+                            name="FunctionFileName"
+                            number_of_elements="1"
+                            panel_visibility="default">
+        <FileListDomain name="files" />
+        <Documentation>This property specifies the .f (function) file name for
+        the PLOT3D reader.</Documentation>
+      </StringVectorProperty>
       <IntVectorProperty command="SetAutoDetectFormat"
                          default_values="1"
                          name="AutoDetectFormat"
@@ -7206,6 +7215,7 @@
                proxyname="P3DReaderCore"></Proxy>
         <ExposedProperties>
           <Property name="FileName" />
+	  <Property name="FunctionFileName"/>
 	  <Property name="AutoDetectFormat"/>
           <Property name="BinaryFile" />
           <Property name="MultiGrid" />
