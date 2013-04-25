@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 #include <QMenu>
 #include <QAction>
-#include <QPainter>
 #include <QIcon>
 #include <QActionGroup>
 #include <QColorDialog>
@@ -48,20 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqApplicationCore.h"
 #include "pqSetName.h"
-
-inline QIcon getIcon(double rgb[3], int icon_size)
-{
-  QColor color;
-  color.setRgbF(rgb[0], rgb[1], rgb[2]);
-  QPixmap pix(icon_size, icon_size);
-  pix.fill(QColor(0,0,0,0));
-  QPainter painter(&pix);
-  painter.setRenderHint(QPainter::Antialiasing, true);
-  painter.setBrush(QBrush(color));
-  painter.drawEllipse(1,1,icon_size-2,icon_size-2);
-  painter.end();
-  return QIcon(pix);
-}
 
 //-----------------------------------------------------------------------------
 pqStandardColorButton::pqStandardColorButton(QWidget* _parent) :
@@ -131,7 +116,6 @@ void pqStandardColorButton::updateMenu()
   QObject::connect(popupMenu, SIGNAL(triggered(QAction*)),
     this, SLOT(actionTriggered(QAction*)));
 
-  int icon_size = qRound(this->height() * 0.5);
   pqApplicationCore* core = pqApplicationCore::instance();
   vtkSMProxy* globalProps = core->getGlobalPropertiesManager();
   vtkSMPropertyIterator* iter = globalProps->NewPropertyIterator();
@@ -141,8 +125,11 @@ void pqStandardColorButton::updateMenu()
       iter->GetProperty());
     if (dvp && dvp->GetNumberOfElements() == 3)
       {
+      QColor qcolor;
+      qcolor.setRgbF(dvp->GetElement(0), dvp->GetElement(1), dvp->GetElement(2));
+
       QAction* action = popupMenu->addAction(
-        ::getIcon(dvp->GetElements(), icon_size), dvp->GetXMLLabel());
+        this->renderColorSwatch(qcolor), dvp->GetXMLLabel());
       action << pqSetName(iter->GetKey());
       action->setData(QVariant(iter->GetKey()));
       action->setCheckable(true);

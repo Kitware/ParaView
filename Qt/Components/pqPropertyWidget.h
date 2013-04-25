@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsModule.h"
 
-#include <string>
-
 #include <QPointer>
 #include <QWidget>
 
@@ -77,7 +75,7 @@ public:
 
   /// Description:
   /// This static utility method returns the XML name for an object as
-  /// a std::string. This allows for code to get the XML name of an object
+  /// a QString. This allows for code to get the XML name of an object
   /// without having to explicitly check for a possibly NULL char* pointer.
   ///
   /// This is templated so that it will work with a variety of objects such
@@ -85,11 +83,11 @@ public:
   /// that has a "char* GetXMLName()" method.
   ///
   /// For example, to get the XML name of a vtkSMIntRangeDomain:
-  /// std::string name = pqPropertyWidget::getXMLName(domain);
+  /// QString name = pqPropertyWidget::getXMLName(domain);
   template<class T>
-  static std::string getXMLName(T *object)
+  static QString getXMLName(T *object)
   {
-    return object->GetXMLName() ? object->GetXMLName() : std::string();
+    return QString(object->GetXMLName());
   }
 
   /// Provides access to the decorators for this widget.
