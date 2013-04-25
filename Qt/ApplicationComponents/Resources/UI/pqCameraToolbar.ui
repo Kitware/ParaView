@@ -182,6 +182,10 @@
    <property name="toolTip">
     <string>Zoom To Data</string>
    </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqZoomToData24.png</normaloff>:/pqWidgets/Icons/pqZoomToData24.png</iconset>
+   </property>
   </action>
   <addaction name="actionResetCamera"/>
   <addaction name="actionZoomToData"/>

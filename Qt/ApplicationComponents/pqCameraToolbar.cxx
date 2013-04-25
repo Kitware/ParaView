@@ -71,6 +71,9 @@ void pqCameraToolbar::constructor()
     this->SelectionHelper, SLOT(beginZoom()));
   QObject::connect(this->SelectionHelper, SIGNAL(startSelection()),
     this, SLOT(startZoomToBox()));
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(sourceChanged(pqPipelineSource*)),
+    this, SLOT(activeSourceChanged(pqPipelineSource*)));
 
   // When a selection is marked, we revert to interaction mode.
   QObject::connect(
@@ -86,6 +89,8 @@ void pqCameraToolbar::constructor()
     SIGNAL(selectionModeChanged(int)),
     this, SLOT(onSelectionModeChanged(int)));
   this->ZoomAction = ui.actionZoomToBox;
+  this->ZoomToDataAction = ui.actionZoomToData;
+  this->ZoomToDataAction->setEnabled(pqActiveObjects::instance().activeSource() != 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -125,4 +130,13 @@ void pqCameraToolbar::activeViewChanged(pqView* view)
         vtkSMRenderViewProxy::SafeDownCast(view->getViewProxy());
     this->Interactor = viewProxy ? viewProxy->GetInteractor() : NULL;
     }
+  else
+    {
+    this->ZoomToDataAction->setEnabled(false);
+    }
+}
+//-----------------------------------------------------------------------------
+void pqCameraToolbar::activeSourceChanged(pqPipelineSource *source)
+{
+  this->ZoomToDataAction->setEnabled(source != 0);
 }

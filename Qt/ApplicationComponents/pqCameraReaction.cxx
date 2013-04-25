@@ -51,6 +51,7 @@ pqCameraReaction::pqCameraReaction(QAction* parentObject,
 void pqCameraReaction::updateEnableState()
 {
   pqView* view = pqActiveObjects::instance().activeView();
+  pqPipelineSource* source = pqActiveObjects::instance().activeSource();
   pqRenderView* rview = qobject_cast<pqRenderView*>(view);
   if (view && this->ReactionMode == RESET_CAMERA)
     {
@@ -58,7 +59,14 @@ void pqCameraReaction::updateEnableState()
     }
   else if (rview)
     {
-    this->parentAction()->setEnabled(true);
+    if(this->ReactionMode == ZOOM_TO_DATA)
+      {
+      this->parentAction()->setEnabled(source != 0);
+      }
+    else
+      {
+      this->parentAction()->setEnabled(true);
+      }
     }
   else
     {
