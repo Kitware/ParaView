@@ -94,7 +94,8 @@ int vtkCPPVSMPipeline::CoProcess(
 
   // Create a vtkPVTrivialProducer and set its output
   // to be the input grid.
-  vtkSmartPointer<vtkSMSourceProxy> producer(
+  vtkSmartPointer<vtkSMSourceProxy> producer;
+  producer.TakeReference(
     vtkSMSourceProxy::SafeDownCast(
       sessionProxyManager->NewProxy("sources", "PVTrivialProducer")));
   producer->UpdateVTKObjects();
@@ -104,14 +105,16 @@ int vtkCPPVSMPipeline::CoProcess(
   realProducer->SetOutput(grid);
 
   // Create a slice filter and set the cut type to plane
-  vtkSmartPointer<vtkSMSourceProxy> slice(
+  vtkSmartPointer<vtkSMSourceProxy> slice;
+  slice.TakeReference(
     vtkSMSourceProxy::SafeDownCast(sessionProxyManager->NewProxy("filters", "Cut")));
   vtkSMInputProperty* sliceInputConnection =
     vtkSMInputProperty::SafeDownCast(slice->GetProperty("Input"));
 
   vtkSMProxyProperty* cutType =
     vtkSMProxyProperty::SafeDownCast(slice->GetProperty("CutFunction"));
-  vtkSmartPointer<vtkSMProxy> cutPlane(
+  vtkSmartPointer<vtkSMProxy> cutPlane;
+  cutPlane.TakeReference(
     sessionProxyManager->NewProxy("implicit_functions", "Plane"));
   cutPlane->UpdatePropertyInformation();
   cutPlane->UpdateVTKObjects();
@@ -130,7 +133,8 @@ int vtkCPPVSMPipeline::CoProcess(
 
   // Finally, create the parallel poly data writer, set the
   // filename and then update the pipeline.
-  vtkSmartPointer<vtkSMWriterProxy> writer(
+  vtkSmartPointer<vtkSMWriterProxy> writer;
+  writer.TakeReference(
     vtkSMWriterProxy::SafeDownCast(sessionProxyManager->NewProxy("writers", "XMLPPolyDataWriter")));
   vtkSMInputProperty* writerInputConnection =
     vtkSMInputProperty::SafeDownCast(writer->GetProperty("Input"));
