@@ -66,3 +66,7 @@ add_custom_target(vtkParaViewWebDocumentation ALL
 
 set_directory_properties(PROPERTIES
   ADDITIONAL_MAKE_CLEAN_FILES "${docs_binary_dir}")
+
+install(DIRECTORY "${docs_binary_dir}/"
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/
+  COMPONENT Runtime)
