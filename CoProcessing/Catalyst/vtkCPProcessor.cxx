@@ -19,6 +19,10 @@
 #include "vtkCPPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <list>
 
@@ -130,6 +134,20 @@ int vtkCPProcessor::Initialize()
   if (this->InitializationHelper == NULL)
     {
     this->InitializationHelper = this->NewInitializationHelper();
+
+    // turn on immediate mode rendering. this helps avoid memory
+    // fragmentation which can kill a run on memory constrained machines.
+    vtkSMProxyManager* proxyManager = vtkSMProxyManager::GetProxyManager();
+    vtkSMSessionProxyManager* sessionProxyManager =
+      proxyManager->GetActiveSessionProxyManager();
+    vtkSmartPointer<vtkSMProxy> globalMapperProperties;
+    globalMapperProperties.TakeReference(
+      sessionProxyManager->NewProxy("misc", "GlobalMapperProperties"));
+    vtkSMIntVectorProperty* immediateModeRendering =
+      vtkSMIntVectorProperty::SafeDownCast(
+        globalMapperProperties->GetProperty("GlobalImmediateModeRendering"));
+    immediateModeRendering->SetElements1(1);
+    globalMapperProperties->UpdateVTKObjects();
     }
   return 1;
 }
