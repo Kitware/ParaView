@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPropertiesPanel.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
@@ -61,7 +62,8 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor16.png");
 
   this->Layout  = new QHBoxLayout( this );
-  this->Layout->setMargin( 0 );
+  this->Layout->setMargin(0);
+  this->Layout->setSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
 
   this->Variables = new QComboBox( this );
   this->Variables->setMaxVisibleItems(60);

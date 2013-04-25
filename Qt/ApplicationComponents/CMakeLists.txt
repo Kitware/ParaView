@@ -59,6 +59,8 @@ set (Module_SRCS
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.cxx
   pqChartSelectionReaction.h
+  pqClipScalarsDecorator.cxx
+  pqClipScalarsDecorator.h
   pqCollaborationBehavior.cxx
   pqCollaborationBehavior.h
   pqColorSelectorPropertyWidget.cxx
@@ -77,6 +79,8 @@ set (Module_SRCS
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.cxx
   pqCreateCustomFilterReaction.h
+  pqCTHArraySelectionDecorator.cxx
+  pqCTHArraySelectionDecorator.h
   pqCubeAxesPropertyWidget.cxx
   pqCubeAxesPropertyWidget.h
   pqDataQueryReaction.cxx
@@ -91,6 +95,8 @@ set (Module_SRCS
   pqDeleteBehavior.h
   pqDeleteReaction.cxx
   pqDeleteReaction.h
+  pqDoubleRangeSliderPropertyWidget.cxx
+  pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.cxx
   pqEditCameraReaction.h
   pqEditColorMapReaction.cxx
@@ -101,8 +107,6 @@ set (Module_SRCS
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.cxx
   pqFixPathsInStateFilesBehavior.h
-  pqGenericSummaryDisplayPanel.cxx
-  pqGenericSummaryDisplayPanel.h
   pqHelpReaction.cxx
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.cxx
@@ -185,8 +189,6 @@ set (Module_SRCS
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.cxx
   pqStandardPropertyWidgetInterface.h
-  pqStandardSummaryPanelImplementation.cxx
-  pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.cxx
   pqStandardViewFrameActionGroup.h
   pqStatusBar.cxx
@@ -235,6 +237,7 @@ set (Module_MOC_HDRS
   pqCategoryToolbarsBehavior.h
   pqChangePipelineInputReaction.h
   pqChartSelectionReaction.h
+  pqClipScalarsDecorator.h
   pqCollaborationBehavior.h
   pqColorSelectorPropertyWidget.h
   pqColorEditorPropertyWidget.h
@@ -244,6 +247,7 @@ set (Module_MOC_HDRS
   pqCopyReaction.h
   pqCrashRecoveryBehavior.h
   pqCreateCustomFilterReaction.h
+  pqCTHArraySelectionDecorator.h
   pqCubeAxesPropertyWidget.h
   pqDataQueryReaction.h
   pqDataTimeStepBehavior.h
@@ -251,12 +255,12 @@ set (Module_MOC_HDRS
   pqDefaultViewBehavior.h
   pqDeleteBehavior.h
   pqDeleteReaction.h
+  pqDoubleRangeSliderPropertyWidget.h
   pqEditCameraReaction.h
   pqEditColorMapReaction.h
   pqExportReaction.h
   pqFiltersMenuReaction.h
   pqFixPathsInStateFilesBehavior.h
-  pqGenericSummaryDisplayPanel.h
   pqHelpReaction.h
   pqIgnoreSourceTimeReaction.h
   pqListPropertyWidget.h
@@ -297,7 +301,6 @@ set (Module_MOC_HDRS
   pqSourcesMenuReaction.h
   pqSpreadSheetVisibilityBehavior.h
   pqStandardPropertyWidgetInterface.h
-  pqStandardSummaryPanelImplementation.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
   pqTestingReaction.h
@@ -332,8 +335,10 @@ endif()
 set (Module_UI_FILES
   Resources/UI/pqAxesToolbar.ui
   Resources/UI/pqCameraToolbar.ui
+  Resources/UI/pqColorEditorPropertyWidget.ui
   Resources/UI/pqColorToolbar.ui
   Resources/UI/pqDefaultMainWindow.ui
+  Resources/UI/pqDoubleRangeSliderPropertyWidget.ui
   Resources/UI/pqEditMenuBuilder.ui
   Resources/UI/pqFileMenuBuilder.ui
   Resources/UI/pqMainControlsToolbar.ui

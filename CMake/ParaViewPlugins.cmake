@@ -193,6 +193,99 @@ MACRO(ADD_PYTHON_EXTENSION OUTSRCS NAME VERSION)
 
 ENDMACRO(ADD_PYTHON_EXTENSION)
 
+
+#------------------------------------------------------------------------------
+# Register a custom pqPropertyWidget class for a property.
+# pqPropertyWidget instances are used
+# to create widgets for properties in the Properties Panel.
+# Usage:
+#   add_paraview_property_widget(OUTIFACES OUTSRCS
+#     TYPE "<string identifier>"
+#     CLASS_NAME "<classname>")
+macro(add_paraview_property_widget outifaces outsrcs)
+  set (pwi_widget 1)
+  set (pwi_group 0)
+  set (pwi_decorator 0)
+  __add_paraview_property_widget(${outifaces} ${outsrcs} ${ARGN})
+endmacro()
+
+#------------------------------------------------------------------------------
+# Register a custom pqPropertyWidget class for a property group.
+# pqPropertyWidget instances are used to create widgets for properties in the
+# Properties Panel.
+# Usage:
+#   add_paraview_property_group_widget(OUTIFACES OUTSRCS
+#     TYPE "<string identifier>"
+#     CLASS_NAME "<classname>")
+macro(add_paraview_property_group_widget outifaces outsrcs)
+  set (pwi_widget 0)
+  set (pwi_group 1)
+  set (pwi_decorator 0)
+  __add_paraview_property_widget(${outifaces} ${outsrcs} ${ARGN})
+endmacro()
+
+#------------------------------------------------------------------------------
+# Register a custom pqPropertyWidgetDecorator. 
+# pqPropertyWidgetDecorator instances are used to add custom logic to
+# pqPropertyWidget.
+# Usage:
+#   add_paraview_property_widget_decorator(OUTIFACES OUTSRCS
+#     TYPE "<string identifier>"
+#     CLASS_NAME "<classname>")
+macro(add_paraview_property_widget_decorator outifaces outsrcs)
+  set (pwi_widget 0)
+  set (pwi_group 0)
+  set (pwi_decorator 1)
+  __add_paraview_property_widget(${outifaces} ${outsrcs} ${ARGN})
+endmacro()
+
+#------------------------------------------------------------------------------
+# Internal function used by add_paraview_property_widget,
+# add_paraview_property_group_widget and add_paraview_property_widget_decorator
+function(__add_paraview_property_widget outifaces outsrcs)
+  set (_type)
+  set (_classname)
+
+  set (_doing)
+  foreach (arg ${ARGN})
+    if (NOT _doing AND (arg MATCHES "^(TYPE|CLASS_NAME)$"))
+      set (_doing "${arg}")
+    elseif ("${_doing}" STREQUAL "TYPE")
+      set (_type "${arg}")
+      set (_doing)
+    elseif ("${_doing}" STREQUAL "CLASS_NAME")
+      set (_classname "${arg}")
+      set (_doing)
+    else()
+      message(AUTHOR_WARNING "Unknown argument [${arg}]")
+    endif()
+  endforeach()
+
+  if (_type AND _classname)
+    set (name ${_classname}PWI)
+    set (type ${_type})
+    set (classname ${_classname})
+    configure_file(${ParaView_CMAKE_DIR}/pqPropertyWidgetInterface.h.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h
+                   @ONLY)
+    configure_file(${ParaView_CMAKE_DIR}/pqPropertyWidgetInterface.cxx.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.cxx
+                   @ONLY)
+
+    set (_moc_srcs)
+    qt4_wrap_cpp(_moc_srcs ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h)
+
+    set (${outifaces} ${name} PARENT_SCOPE)
+    set (${outsrcs}
+         ${_moc_srcs}
+         ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.cxx
+         ${CMAKE_CURRENT_BINARY_DIR}/${name}Implementation.h
+         PARENT_SCOPE)
+  else()
+    message(AUTHOR_WARNING "Missing required arguments.")
+  endif()
+endfunction()
+
 # create implementation for a custom object panel interface
 # ADD_PARAVIEW_OBJECT_PANEL(
 #    OUTIFACES
@@ -268,27 +361,6 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL OUTIFACES OUTSRCS)
       ${DISPLAY_MOC_SRCS}
       )
 ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL)
-
-# create implementation for a custom summary panel interface
-MACRO(ADD_PARAVIEW_SUMMARY_DISPLAY_PANEL OUTIFACES OUTSRCS REPRESENTATIONS CLASS_NAME)
-  SET(PANEL_NAME ${CLASS_NAME})
-  SET(REPRESENTATIONS ${REPRESENTATIONS})
-  SET(${OUTIFACES} ${PANEL_NAME})
-
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqSummaryPanelImplementation.h.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h @ONLY)
-  CONFIGURE_FILE(${ParaView_CMAKE_DIR}/pqSummaryPanelImplementation.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx @ONLY)
-
-  SET(DISPLAY_MOC_SRCS)
-  QT4_WRAP_CPP(DISPLAY_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h)
-
-  SET(${OUTSRCS} 
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.cxx
-      ${CMAKE_CURRENT_BINARY_DIR}/${PANEL_NAME}Implementation.h
-      ${DISPLAY_MOC_SRCS}
-      )
-ENDMACRO(ADD_PARAVIEW_SUMMARY_DISPLAY_PANEL OUTIFACES OUTSRCS REPRESENTATIONS CLASS_NAME)
 
 # create implementation for a custom view 
 # Usage:

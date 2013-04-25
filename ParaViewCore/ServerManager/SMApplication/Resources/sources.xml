@@ -1521,8 +1521,23 @@
         the volume. The extent of the dataset in each dimension will be divided
         by this value. (See the Whole Extent property.)</Documentation>
       </IntVectorProperty>
+
+      <!-- Define property groups for better readability of panels -->
+      <PropertyGroup label="Frequency">
+        <Property name="XFreq" />
+        <Property name="YFreq" />
+        <Property name="ZFreq" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Amplitude">
+        <Property name="XMag" />
+        <Property name="YMag" />
+        <Property name="ZMag" />
+      </PropertyGroup>
+
       <!-- End Wavelet -->
     </SourceProxy>
+
     <!-- ==================================================================== -->
     <SourceProxy class="vtkConeSource"
                  name="Test3DWidget">

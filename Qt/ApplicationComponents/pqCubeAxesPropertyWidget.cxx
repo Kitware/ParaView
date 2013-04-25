@@ -33,30 +33,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCubeAxesPropertyWidget.h"
 
 #include <QCheckBox>
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QPushButton>
 
-#include "vtkSMProxy.h"
-
-#include "pqProxy.h"
 #include "pqCubeAxesEditorDialog.h"
+#include "pqPropertiesPanel.h"
+#include "pqProxy.h"
+#include "vtkSMProxy.h"
 
 pqCubeAxesPropertyWidget::pqCubeAxesPropertyWidget(vtkSMProxy *smProxy, QWidget
   *parentObject)
   : pqPropertyWidget(smProxy, parentObject)
 {
-  QHBoxLayout *layoutLocal = new QHBoxLayout;
-  layoutLocal->setMargin(0);
-  layoutLocal->setSpacing(4);
-  QCheckBox *checkBox = new QCheckBox("Visible");
+  QGridLayout *layoutLocal = new QGridLayout(this);
+  layoutLocal->setMargin(pqPropertiesPanel::suggestedMargin());
+  layoutLocal->setHorizontalSpacing(pqPropertiesPanel::suggestedHorizontalSpacing());
+  layoutLocal->setVerticalSpacing(pqPropertiesPanel::suggestedVerticalSpacing());
+
+  QCheckBox *checkBox = new QCheckBox("Show Axis");
   checkBox->setObjectName("VisibilityCheckBox");
   this->addPropertyLink(checkBox, "checked", SIGNAL(toggled(bool)), smProxy->GetProperty("CubeAxesVisibility"));
-  layoutLocal->addWidget(checkBox);
+  layoutLocal->addWidget(checkBox, 0, 0);
+
   QPushButton *button = new QPushButton("Edit");
   button->setObjectName("EditButton");
   connect(button, SIGNAL(clicked()), SLOT(showEditorDialog()));
-  layoutLocal->addWidget(button);
-  setLayout(layoutLocal);
+  layoutLocal->addWidget(button, 0, 1);
+
+  button->setEnabled(checkBox->isChecked());
+  QObject::connect(checkBox, SIGNAL(toggled(bool)),
+    button, SLOT(setEnabled(bool)));
 }
 
 void pqCubeAxesPropertyWidget::showEditorDialog()

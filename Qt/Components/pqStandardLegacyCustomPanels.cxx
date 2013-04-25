@@ -1,0 +1,107 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    $RCSfile$
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2.
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "pqStandardLegacyCustomPanels.h"
+
+#include "pqContourPanel.h"
+#include "pqGlyphPanel.h"
+#include "pqPassArraysPanel.h"
+#include "pqProxy.h"
+#include "pqYoungsMaterialInterfacePanel.h"
+#include "vtkSMProxy.h"
+
+#include <QDebug>
+#include <QWidget>
+
+//-----------------------------------------------------------------------------
+pqStandardLegacyCustomPanels::pqStandardLegacyCustomPanels(QObject* parentObject)
+  : Superclass(parentObject)
+{
+}
+
+//-----------------------------------------------------------------------------
+pqStandardLegacyCustomPanels::~pqStandardLegacyCustomPanels()
+{
+}
+
+//-----------------------------------------------------------------------------
+pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget* p)
+{
+  if(QString("filters") == proxy->getProxy()->GetXMLGroup())
+    {
+    if(QString("PassArrays") == proxy->getProxy()->GetXMLName())
+      {
+      return new pqPassArraysPanel(proxy, p);
+      }
+    if (QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
+      QString("Glyph") == proxy->getProxy()->GetXMLName())
+      {
+      return new pqGlyphPanel(proxy, p);
+      }
+    //      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
+    //        {
+    //        return new pqParticleTracerPanel(proxy, p);
+    //        }
+    if(QString("Contour") == proxy->getProxy()->GetXMLName() ||
+      QString("GenericContour") == proxy->getProxy()->GetXMLName())
+      {
+      return new pqContourPanel(proxy, p);
+      }
+    if (QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
+      {
+      return new pqYoungsMaterialInterfacePanel(proxy, p);
+      }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool pqStandardLegacyCustomPanels::canCreatePanel(pqProxy* proxy) const
+{
+  if(QString("filters") == proxy->getProxy()->GetXMLGroup())
+    {
+    if(
+      QString("ArbitrarySourceGlyph") == proxy->getProxy()->GetXMLName() ||
+      QString("Glyph") == proxy->getProxy()->GetXMLName() ||
+      //         QString("ExtractDataSets") == proxy->getProxy()->GetXMLName() ||
+      //         QString("ParticleTracer") == proxy->getProxy()->GetXMLName() ||
+      QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
+      QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName() ||
+      QString("Contour") == proxy->getProxy()->GetXMLName() ||
+      QString("GenericContour") == proxy->getProxy()->GetXMLName() ||
+      QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName() ||
+      QString("PassArrays") == proxy->getProxy()->GetXMLName() )
+      {
+      return true;
+      }
+    }
+  return false;
+}

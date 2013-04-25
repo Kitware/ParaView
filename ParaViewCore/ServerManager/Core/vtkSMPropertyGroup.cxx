@@ -43,6 +43,9 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
 vtkSMPropertyGroup::~vtkSMPropertyGroup()
 {
   this->SetXMLLabel(0);
+  this->SetName(0);
+  this->SetType(0);
+  this->SetPanelVisibility(0);
   delete this->Internals;
 }
 

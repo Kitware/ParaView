@@ -62,8 +62,8 @@ pqTransferFunctionEditorPropertyWidget::pqTransferFunctionEditorPropertyWidget(v
 
   this->setLayout(l);
 
-  this->setReason() << "pqTransferFunctionEditorPropertyWidget for a property with "
-                    << "the panel_widget=\"transfer_function_editor\" attribute";
+  PV_DEBUG_PANELS() << "pqTransferFunctionEditorPropertyWidget for a property with "
+                << "the panel_widget=\"transfer_function_editor\" attribute";
 }
 
 pqTransferFunctionEditorPropertyWidget::~pqTransferFunctionEditorPropertyWidget()

@@ -29,14 +29,18 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqPropertyWidget.h"
 
-#include "pqProxy.h"
 #include "pqPropertiesPanel.h"
+#include "pqPropertyWidgetDecorator.h"
+#include "pqProxy.h"
+#include "pqUndoStack.h"
+#include "pqView.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProperty.h"
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
   : QWidget(parentObject),
     Proxy(smProxy),
@@ -58,10 +62,18 @@ pqPropertyWidget::pqPropertyWidget(vtkSMProxy *smProxy, QWidget *parentObject)
     this, SLOT(onChangeFinished()));
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget::~pqPropertyWidget()
 {
+  foreach (pqPropertyWidgetDecorator* decorator, this->Decorators)
+    {
+    delete decorator;
+    }
+
+  this->Decorators.clear();
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::onChangeAvailable()
 {
   if (this->ChangeAvailableAsChangeFinished)
@@ -70,74 +82,81 @@ void pqPropertyWidget::onChangeAvailable()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::onChangeFinished()
 {
   if (this->AutoUpdateVTKObjects)
     {
+    BEGIN_UNDO_SET("Property Changed");
     this->apply();
+    END_UNDO_SET();
     }
 }
 
+//-----------------------------------------------------------------------------
 pqView* pqPropertyWidget::view() const
 {
-  pqPropertiesPanel *panel =
-    qobject_cast<pqPropertiesPanel *>(this->parentWidget());
-
-  return panel ? panel->view() : 0;
+  return this->View;
 }
 
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::setView(pqView* pqview)
+{
+  this->View = pqview;
+  emit this->viewChanged(pqview);
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProxy* pqPropertyWidget::proxy() const
 {
   return this->Proxy;
 }
 
-void pqPropertyWidget::setProperty(vtkSMProperty *p)
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::setProperty(vtkSMProperty *smproperty)
 {
-  this->Property = p;
+  this->Property = smproperty;
+  if (smproperty && smproperty->GetDocumentation())
+    {
+    QString doc = smproperty->GetDocumentation()->GetDescription();
+    doc = doc.trimmed();
+    doc = doc.replace(QRegExp("\\s+")," ");
+    this->setToolTip(
+      QString("<html><head/><body><p align=\"justify\">%1</p></body></html>").arg(doc));
+    }
 }
 
+//-----------------------------------------------------------------------------
 vtkSMProperty* pqPropertyWidget::property() const
 {
   return this->Property;
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::apply()
 {
   this->Links.accept();
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::reset()
 {
   this->Links.reset();
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::setShowLabel(bool isLabelVisible)
 {
   this->ShowLabel = isLabelVisible;
 }
 
+//-----------------------------------------------------------------------------
 bool pqPropertyWidget::showLabel() const
 {
   return this->ShowLabel;
 }
 
-void pqPropertyWidget::setReason(const QString &message)
-{
-  QByteArray ascii = message.toAscii();
-
-  this->Reason.str(ascii.constData());
-}
-
-std::stringstream& pqPropertyWidget::setReason()
-{
-  return this->Reason;
-}
-
-QString pqPropertyWidget::reason() const
-{
-  return QString::fromStdString(this->Reason.str());
-}
-
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::addPropertyLink(QObject *qobject,
                                        const char *qproperty,
                                        const char *qsignal,
@@ -152,20 +171,37 @@ void pqPropertyWidget::addPropertyLink(QObject *qobject,
                               smindex);
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::setAutoUpdateVTKObjects(bool autoUpdate)
 {
   this->AutoUpdateVTKObjects = autoUpdate;
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::setUseUncheckedProperties(bool useUnchecked)
 {
   this->Links.setUseUncheckedProperties(useUnchecked);
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyWidget::updateDependentDomains()
 {
   if(this->Property)
     {
     this->Property->UpdateDependentDomains();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyWidget::addDecorator(pqPropertyWidgetDecorator* decorator)
+{
+  if (!decorator || decorator->parent() != this)
+    {
+    qCritical("Either the decorator is NULL or has an invalid parent."
+      "Please check the code.");
+    }
+  else
+    {
+    this->Decorators.push_back(decorator);
     }
 }

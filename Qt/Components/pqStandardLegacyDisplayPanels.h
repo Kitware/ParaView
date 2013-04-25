@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGenericSummaryDisplayPanel.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,43 +28,34 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqStandardLegacyDisplayPanels_h
+#define __pqStandardLegacyDisplayPanels_h
 
-#ifndef _pqGenericSummaryDisplayPanel_h
-#define _pqGenericSummaryDisplayPanel_h
+#include <QObject>
+#include "pqComponentsModule.h"
+#include "pqDisplayPanelInterface.h"
 
-#include <QWidget>
-
-#include "pqPropertyLinks.h"
-#include "pqApplicationComponentsModule.h"
-
-class pqRepresentation;
-
-class PQAPPLICATIONCOMPONENTS_EXPORT pqGenericSummaryDisplayPanel : public QWidget
+/// pqStandardLegacyDisplayPanels is used by pqPropertiesPanel to create legacy
+/// custom panels for representations. In time, this class needs to disappear
+/// with all panels created using the newer panels API.
+class PQCOMPONENTS_EXPORT pqStandardLegacyDisplayPanels :
+  public QObject,
+  public pqDisplayPanelInterface
 {
   Q_OBJECT
-
+  typedef QObject Superclass;
 public:
-  enum DisplayAttributes
-    {
-    ColorBy,
-    LineWidth,
-    PointSize,
-    EdgeColor,
-    SliceDirection,
-    SliceNumber,
-    VolumeMapper
-    };
+  pqStandardLegacyDisplayPanels(QObject* parent=0);
+  virtual ~pqStandardLegacyDisplayPanels();
 
-  pqGenericSummaryDisplayPanel(pqRepresentation *representation,
-                               const QList<DisplayAttributes> &attributes,
-                               QWidget *parent = 0);
-  ~pqGenericSummaryDisplayPanel();
+  /// Returns true if this panel can be created for the given the proxy.
+  virtual bool canCreatePanel(pqRepresentation* proxy) const;
 
+  /// Creates a panel for the given proxy
+  virtual pqDisplayPanel* createPanel(pqRepresentation* proxy, QWidget* parent);
 private:
-  pqRepresentation *Representation;
-  pqPropertyLinks Links;
-  QList<DisplayAttributes> Attributes;
+  Q_DISABLE_COPY(pqStandardLegacyDisplayPanels)
 };
 
 #endif

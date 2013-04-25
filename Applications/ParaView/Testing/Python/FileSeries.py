@@ -10,7 +10,7 @@ QtTesting.playCommand(object2, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/FileSe
 object12 = 'pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex'
 QtTesting.playCommand(object12, 'set_int', '0')
 QtTesting.playCommand(object12, 'key', '16777220')
-object3 = 'pqClientMainWindow/objectInspectorDock/objectInspector/Accept'
+object3 = 'pqClientMainWindow/propertiesDock/propertiesPanel/Accept'
 QtTesting.playCommand(object3, 'activate', '')
 object4 = 'pqClientMainWindow/centralwidget/MultiViewWidget/CoreWidget/qt_tabwidget_stackedwidget/MultiViewWidget1/Frame.0/Viewport'
 QtTesting.playCommand(object4, 'mousePress', '(0.539658,0.641618,1,1,0)')

@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqProxyPropertiesPanel.h
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,44 +28,35 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqStandardLegacyCustomPanels_h
+#define __pqStandardLegacyCustomPanels_h
 
-#ifndef _pqProxyPropertiesPanel_h
-#define _pqProxyPropertiesPanel_h
+#include <QObject>
+#include "pqObjectPanelInterface.h"
 
 #include "pqComponentsModule.h"
 
-#include <QWidget>
-#include <QPointer>
-
-class QFormLayout;
-
-class pqProxy;
-class pqPropertiesPanelItem;
-
-class PQCOMPONENTS_EXPORT pqProxyPropertiesPanel : public QWidget
+/// pqStandardLegacyCustomPanels is used by pqPropertiesPanel to create legacy
+/// custom panels. In time, this class needs to disappear with all panels being
+/// created using the newer panels API.
+class PQCOMPONENTS_EXPORT pqStandardLegacyCustomPanels :
+  public QObject,
+  public pqObjectPanelInterface
 {
   Q_OBJECT
-  typedef QWidget Superclass;
+  typedef QObject Superclass;
 public:
-  pqProxyPropertiesPanel(pqProxy *proxy_, QWidget *parent_ = 0);
-  ~pqProxyPropertiesPanel();
+  pqStandardLegacyCustomPanels(QObject* parent=0);
+  virtual ~pqStandardLegacyCustomPanels();
 
-  void apply();
-  void reset();
+  /// create panel for proxy.
+  virtual pqObjectPanel* createPanel(pqProxy* proxy, QWidget* parent);
 
-  /// Overridden to hide/show 3D widgets (pq3DWidget subclasses) that may be
-  /// present in the panel.
-  virtual void setVisible(bool);
-
-  pqProxy* proxy() const;
-  void addPropertyWidgetItem(pqPropertiesPanelItem item);
-  QList<pqPropertiesPanelItem> propertyWidgetItems() const;
+  /// returns if a panel can be created.
+  virtual bool canCreatePanel(pqProxy* proxy) const;
 
 private:
-  QFormLayout *m_layout;
-  QPointer<pqProxy> m_proxy;
-  QList<pqPropertiesPanelItem> m_items;
+  Q_DISABLE_COPY(pqStandardLegacyCustomPanels)
 };
-
-#endif // _pqProxyPropertiesPanel_h
+#endif

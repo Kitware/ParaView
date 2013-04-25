@@ -32,35 +32,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStandardPropertyWidgetInterface.h"
 
-#include "pqApplicationCore.h"
 #include "pqArrayStatusPropertyWidget.h"
 #include "pqCalculatorWidget.h"
+#include "pqClipScalarsDecorator.h"
 #include "pqColorEditorPropertyWidget.h"
 #include "pqColorSelectorPropertyWidget.h"
 #include "pqCommandButtonPropertyWidget.h"
+#include "pqCTHArraySelectionDecorator.h"
 #include "pqCubeAxesPropertyWidget.h"
 #include "pqDisplayRepresentationWidget.h"
+#include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqListPropertyWidget.h"
-#include "pqPipelineRepresentation.h"
-#include "pqProxy.h"
-#include "pqServerManagerModel.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionEditorPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
 
 #include <QtDebug>
 
+//-----------------------------------------------------------------------------
 pqStandardPropertyWidgetInterface::pqStandardPropertyWidgetInterface(QObject *p)
   : QObject(p)
 {
 }
 
+//-----------------------------------------------------------------------------
 pqStandardPropertyWidgetInterface::~pqStandardPropertyWidgetInterface()
 {
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
                                                            vtkSMProperty *smProperty)
@@ -99,6 +100,10 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
       {
       return new pqListPropertyWidget(smProxy, smProperty);
       }
+    else if (name == "double_range")
+      {
+      return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
+      }
     else
       {
       qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
@@ -108,6 +113,7 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
                                                                 vtkSMPropertyGroup *group)
@@ -127,4 +133,20 @@ pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *prox
 
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqPropertyWidgetDecorator*
+pqStandardPropertyWidgetInterface::createWidgetDecorator(
+  const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
+{
+  if (type == "ClipScalarsDecorator")
+    {
+    return new pqClipScalarsDecorator(config, widget);
+    }
+  if (type == "CTHArraySelectionDecorator")
+    {
+    return new pqCTHArraySelectionDecorator(config, widget);
+    }
+  return NULL;
 }

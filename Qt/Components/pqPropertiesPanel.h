@@ -1,13 +1,13 @@
 /*=========================================================================
 
    Program: ParaView
-   Module: pqPropertiesPanel.h
+   Module:  pqPropertiesPanel.h
 
-   Copyright (c) 2005-2012 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -28,60 +28,34 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
-
-#ifndef _pqPropertiesPanel_h
-#define _pqPropertiesPanel_h
+========================================================================*/
+#ifndef __pqPropertiesPanel_h
+#define __pqPropertiesPanel_h
 
 #include "pqComponentsModule.h"
-
-#include "vtkNew.h"
-#include "vtkEventQtSlotConnect.h"
-
-#include <QMap>
 #include <QWidget>
-#include <QPointer>
-#include <QFormLayout>
-#include <QStackedLayout>
-#include <QShortcut>
 
-namespace Ui {
-  class pqPropertiesPanel;
-}
-
-class pqView;
-class pqProxy;
+class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
 class pqPropertyWidget;
-class pqRepresentation;
-class pqPropertiesPanelItem;
-class pqProxyPropertiesPanel;
-class vtkSMProxy;
+class pqView;
 class vtkSMProperty;
+class vtkSMProxy;
 
-/// \class pqPropertiesPanel
-/// \brief The pqPropertiesPanel class is used to display the properties of
-///        proxies and representations in an editable form.
+/// pqPropertiesPanel is the default panel used by paraview to edit source
+/// properties and display properties for pipeline objects. pqPropertiesPanel
+/// supports auto-generating widgets for properties of the proxy as well as a
+/// mechanism to provide custom widgets/panels for the proxy or its
+/// representations. pqPropertiesPanel uses pqProxyWidget to create and manage
+/// the widgets for the source and representation proxies.
 class PQCOMPONENTS_EXPORT pqPropertiesPanel : public QWidget
 {
   Q_OBJECT
-
+  typedef QWidget Superclass;
 public:
-  /// Creates a new properties panel widget with parent \p p.
-  pqPropertiesPanel(QWidget *p = 0);
-
-  /// Destroys the properties panel object.
+  pqPropertiesPanel(QWidget *parent = 0);
   virtual ~pqPropertiesPanel();
-
-  /// Returns the current render view.
-  pqView* view() const;
-
-  /// Creates and returns a new property widget for the \p property in
-  /// \p proxy with \p parent.
-  static pqPropertyWidget* createWidgetForProperty(vtkSMProperty *property,
-                                                   vtkSMProxy *proxy,
-                                                   QWidget *parent = 0);
 
   /// Enable/disable auto-apply.
   static void setAutoApply(bool enabled);
@@ -94,6 +68,15 @@ public:
 
   /// Returns the delay for the auto-apply (in msec).
   static int autoApplyDelay();
+
+  /// Returns the current view, if any.
+  pqView* view() const;
+
+  /// methods used to obtain the recommended spacing and margins to be used for
+  /// widgets.
+  static int suggestedMargin() { return 0; }
+  static int suggestedHorizontalSpacing() { return 4; }
+  static int suggestedVerticalSpacing() { return 4; }
 
 public slots:
   /// Apply the changes properties to the proxies.
@@ -120,87 +103,58 @@ public slots:
   /// properties panel.
   void showHelp();
 
-  /// Sets the current render view to \p view.
-  void setView(pqView *view);
-
-  /// Sets the current proxy to \p proxy.
-  void setProxy(pqProxy *proxy);
-
-  /// Sets the output port to \p port.
-  void setOutputPort(pqOutputPort *port);
-
-  /// Sets the representation to \p repr.
-  void setRepresentation(pqRepresentation *repr);
-
 signals:
-  // This signal is emitted after the user clicks the apply button.
+  /// This signal is emitted after the user clicks the apply button.
   void applied();
 
   /// This signal is emitted when the current view changes.
-  void viewChanged(pqView *view);
+  void viewChanged(pqView*);
 
-  /// These signals are emitted when the user clicks the help button.
-  void helpRequested(const QString &proxyType);
+  /// This signal is emitted when the user clicks the help button.
   void helpRequested(const QString &groupname, const QString &proxyType);
 
 private slots:
-  /// Removes the proxy.
-  void removeProxy(pqPipelineSource *proxy);
+  void setView(pqView*);
+  void setOutputPort(pqOutputPort*);
+  void setRepresentation(pqDataRepresentation*);
 
-  /// Sets the enabled state of the delete button.
-  void handleConnectionChanged(pqPipelineSource *in, pqPipelineSource *out);
+  /// slot gets called when a proxy is deleted.
+  void proxyDeleted(pqPipelineSource*);
 
-  /// Called when the search string changes.
-  void searchTextChanged(const QString &string);
+  /// Updates the entire panel (properties+display) using the current
+  /// port/representation.
+  void updatePanel();
 
-  /// Called when Esc key is pressed.
-  void clearSearchText();
+  /// Updates the display part of the panel alone, unlike updatePanel().
+  void updateDisplayPanel();
 
-  /// Called when the advanced button is toggled.
-  void advancedButtonToggled(bool state);
-
-  // Called when the representation type changes.
-  void representationPropertyChanged(vtkObject *object, unsigned long event, void *data);
-
-  /// Updates the state of the apply button.
-  void updateButtonState();
+  /// renders the view, if any.
+  void renderActiveView();
 
   /// Called when a property on the current proxy changes.
-  void proxyPropertyChanged(bool change_finished=true);
-  void proxyPropertyChangeAvailable()
-    { this->proxyPropertyChanged(false); }
+  void sourcePropertyChanged(bool change_finished=true);
+  void sourcePropertyChangeAvailable()
+    { this->sourcePropertyChanged(false); }
+
+  /// Updates the state of all the buttons, apply/reset/delete.
+  void updateButtonState();
+
+protected:
+  /// Update the panel to show the widgets for the given pair.
+  void updatePanel(pqOutputPort* port);
+  void updatePropertiesPanel(pqPipelineSource* source);
+  void updateDisplayPanel(pqDataRepresentation* repr);
 
 private:
-  /// Shows the source.
-  void show(pqPipelineSource *source);
-
-  /// Creates and returns a group of property widgets for \p proxy.
-  QList<pqPropertiesPanelItem> createWidgetsForProxy(pqProxy *proxy);
-
-  /// Returns \c true if \p item should be visible.
-  bool isPanelItemVisible(const pqPropertiesPanelItem &item, bool show_advanced) const;
-
-  /// Update information properties and domains.
-  void updateInformationAndDomains();
-
-  /// Method used to apply the change associated with the panel for a particular
-  /// proxy.
-  void applyProxyPanel(pqProxy*);
-
-private:
-  Ui::pqPropertiesPanel *Ui;
-  QShortcut *esc;
-  QPointer<pqView> View;
-  QPointer<pqProxy> Proxy;
-  QPointer<pqOutputPort> OutputPort;
-  QPointer<pqRepresentation> Representation;
-  vtkNew<vtkEventQtSlotConnect> RepresentationTypeSignal;
-  QList<pqPropertiesPanelItem> RepresentationPropertyItems;
-  QMap<pqProxy *, pqProxyPropertiesPanel *> ProxyPanels;
-  bool DebugWidgetCreation;
-  bool DebugApplyButtonState;
   static bool AutoApply;
   static int AutoApplyDelay;
+
+  class pqInternals;
+  friend class pqInternals;
+
+  pqInternals* Internals;
+
+  Q_DISABLE_COPY(pqPropertiesPanel)
 };
 
-#endif // _pqPropertiesPanel_h
+#endif

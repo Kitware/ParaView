@@ -29,24 +29,24 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqPropertyWidget_h
 #define _pqPropertyWidget_h
 
 #include "pqComponentsModule.h"
 
 #include <string>
-#include <sstream>
 
+#include <QPointer>
 #include <QWidget>
-#include <QTextStream>
 
 #include "pqPropertyLinks.h"
+#include "pqDebug.h"
 
+class pqPropertyWidgetDecorator;
 class pqView;
-class vtkSMProxy;
 class vtkSMDomain;
 class vtkSMProperty;
+class vtkSMProxy;
 
 /// pqPropertyWidget represents a widget created for each property of a proxy on
 /// the pqPropertiesPanel (for the proxy's properties or display properties).
@@ -61,8 +61,9 @@ public:
   virtual void apply();
   virtual void reset();
 
-  /// These methods are called when the pqProxyPropertiesPanel containing the
-  /// widget is activated/deactivated. Only widgets that have 3D widgets need to
+  /// These methods are called by pqPropertiesPanel when the panel for proxy
+  /// becomes active/deactive.
+  /// Only widgets that have 3D widgets need to
   /// override these methods to select/deselect the 3D widgets.
   /// Default implementation does nothing.
   virtual void select() {}
@@ -74,22 +75,28 @@ public:
 
   bool showLabel() const;
 
-  // Description:
-  // This static utility method returns the XML name for an object as
-  // a std::string. This allows for code to get the XML name of an object
-  // without having to explicitly check for a possibly NULL char* pointer.
-  //
-  // This is templated so that it will work with a variety of objects such
-  // as vtkSMProperty's and vtkSMDomain's. It can be called with anything
-  // that has a "char* GetXMLName()" method.
-  //
-  // For example, to get the XML name of a vtkSMIntRangeDomain:
-  // std::string name = pqPropertyWidget::getXMLName(domain);
+  /// Description:
+  /// This static utility method returns the XML name for an object as
+  /// a std::string. This allows for code to get the XML name of an object
+  /// without having to explicitly check for a possibly NULL char* pointer.
+  ///
+  /// This is templated so that it will work with a variety of objects such
+  /// as vtkSMProperty's and vtkSMDomain's. It can be called with anything
+  /// that has a "char* GetXMLName()" method.
+  ///
+  /// For example, to get the XML name of a vtkSMIntRangeDomain:
+  /// std::string name = pqPropertyWidget::getXMLName(domain);
   template<class T>
   static std::string getXMLName(T *object)
   {
     return object->GetXMLName() ? object->GetXMLName() : std::string();
   }
+
+  /// Provides access to the decorators for this widget.
+  const QList<pqPropertyWidgetDecorator*>& decorators() const
+    {
+    return this->Decorators;
+    }
 
 signals:
   /// This signal is emitted when the current view changes.
@@ -104,7 +111,10 @@ signals:
   void changeFinished();
 
 public slots:
-  void updateDependentDomains();
+  virtual void updateDependentDomains();
+
+  /// called to set the active view. This will fire the viewChanged() signal.
+  virtual void setView(pqView*);
 
 protected:
   void addPropertyLink(QObject *qobject,
@@ -113,10 +123,6 @@ protected:
                        vtkSMProperty *smproperty,
                        int smindex = -1);
   void setShowLabel(bool show);
-
-  void setReason(const QString &message);
-  std::stringstream& setReason();
-  QString reason() const;
 
   /// For most pqPropertyWidget subclasses a changeAvailable() signal,
   /// corresponds to a changeFinished() signal. Hence by default we connect the
@@ -137,7 +143,11 @@ private:
   void setUseUncheckedProperties(bool useUnchecked);
   void setProperty(vtkSMProperty *property);
 
+  void addDecorator(pqPropertyWidgetDecorator*);
+
   friend class pqPropertiesPanel;
+  friend class pqPropertyWidgetDecorator;
+  friend class pqProxyWidget;
 
 private slots:
   /// check if changeFinished() must be fired as well.
@@ -149,9 +159,11 @@ private slots:
 private:
   vtkSMProxy *Proxy;
   vtkSMProperty *Property;
+  QPointer<pqView> View;
+  QList<pqPropertyWidgetDecorator*> Decorators;
+
   pqPropertyLinks Links;
   bool ShowLabel;
-  std::stringstream Reason;
   bool ChangeAvailableAsChangeFinished;
   bool AutoUpdateVTKObjects;
 
@@ -160,5 +172,7 @@ private:
   void modified();
   void editingFinished();
 };
+
+#define PV_DEBUG_PANELS() pqDebug("PV_DEBUG_PANELS")
 
 #endif // _pqPropertyWidget_h

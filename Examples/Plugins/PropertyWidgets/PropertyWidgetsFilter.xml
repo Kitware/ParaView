@@ -1,0 +1,39 @@
+<ServerManagerConfiguration>
+  <!-- This is the server manager configuration XML. It defines the interface to
+       our new filter. As a rule of thumb, try to locate the configuration for
+       a filter already in ParaView
+       that matches your filter and then model your xml on it
+       Here, we just change the XML to create our custom widgets instead of
+       default ones.
+       -->
+  <ProxyGroup name="filters">
+   <SourceProxy name="MyPropertyWidgetsFilter" label="MyPropertyWidgets"
+                class="vtkShrinkFilter"
+                base_proxygroup="filters"
+                base_proxyname="ShrinkFilter">
+
+    <IntVectorProperty name="DemonstratePropertyWidget"
+                          number_of_elements="1"
+                          default_values="0"
+                          panel_widget="my_property_widget_type">
+      <Documentation>
+        This property's widget is a custom widget.
+      </Documentation>
+      <BooleanDomain name="bool"/>
+    </IntVectorProperty>
+
+    <DoubleVectorProperty name="DemonstratePropertyWidgetDecorator"
+                          number_of_elements="1"
+                          default_values="0">
+      <Documentation>
+        This property's widget is standard, but the decorator controls it's
+        logic. This property will be "available" only when
+        ShrinkFactor >= 0.1.
+      </Documentation>
+      <Hints>
+          <PropertyWidgetDecorator type="my_decorator" />
+      </Hints>
+    </DoubleVectorProperty>
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

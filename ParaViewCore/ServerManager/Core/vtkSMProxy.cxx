@@ -1352,6 +1352,62 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
 }
 
 //---------------------------------------------------------------------------
+vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
+{
+  vtkSMPropertyGroup *group = vtkSMPropertyGroup::New();
+
+  // FIXME: should we use group-name as the "key" for the property groups?
+  const char *groupName = groupElem->GetAttribute("name");
+  if(groupName)
+    {
+    group->SetName(groupName);
+    }
+
+  const char *groupLabel = groupElem->GetAttribute("label");
+  if(groupLabel)
+    {
+    group->SetXMLLabel(groupLabel);
+    }
+
+  const char *groupType = groupElem->GetAttribute("type");
+  if(groupType)
+    {
+    group->SetType(groupType);
+    }
+
+  const char *panelVisibility = groupElem->GetAttribute("panel_visibility");
+  if(panelVisibility)
+    {
+    group->SetPanelVisibility(panelVisibility);
+    }
+
+  for (unsigned int k = 0; k < groupElem->GetNumberOfNestedElements(); k++)
+    {
+    vtkPVXMLElement* elem = groupElem->GetNestedElement(k);
+
+    // if elem has "exposed_name", use that to locate the property, else use the
+    // "name".
+    const char* propname = elem->GetAttribute("exposed_name")?
+      elem->GetAttribute("exposed_name") : elem->GetAttribute("name");
+    vtkSMProperty* property = propname? this->GetProperty(propname) : NULL;
+    if (!property)
+      {
+      vtkWarningMacro("Failed to locate property '" <<
+        (propname? propname : "(none)") << "' for PropertyGroup. Skipping.");
+      }
+    else
+      {
+      group->AddProperty(property);
+      }
+    }
+
+  this->Internals->PropertyGroups.push_back(group);
+  group->Delete();
+
+  return group;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMProxy::ReadXMLAttributes( vtkSMSessionProxyManager* pm,
                                    vtkPVXMLElement* element)
 {
@@ -1504,6 +1560,11 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMSessionProxyManager* pm,
       std::string propName = propElement->GetAttribute("name");
       this->NewProperty(propName.c_str(), propElement);
       }
+    else if (strcmp(propElement->GetName(), "PropertyGroup") == 0)
+      {
+      // Create a property group.
+      this->NewPropertyGroup(propElement);
+      }
     }
   return 1;
 }
@@ -1610,45 +1671,15 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
         }
       else if(strcmp(propertyElement->GetName(), "PropertyGroup") == 0)
         {
-        vtkSMPropertyGroup *group = vtkSMPropertyGroup::New();
-
-        const char *groupName = propertyElement->GetAttribute("name");
-        if(groupName)
-          {
-          group->SetName(groupName);
-          }
-
-        const char *groupLabel = propertyElement->GetAttribute("label");
-        if(groupLabel)
-          {
-          group->SetXMLLabel(groupLabel);
-          }
-
-        const char *groupType = propertyElement->GetAttribute("type");
-        if(groupType)
-          {
-          group->SetType(groupType);
-          }
-
-        const char *panelVisibility = propertyElement->GetAttribute("panel_visibility");
-        if(panelVisibility)
-          {
-          group->SetPanelVisibility(panelVisibility);
-          }
-
+        // Process properties exposed under this element first.
         vtkPVXMLElement *groupElement = propertyElement;
-        for(unsigned int k = 0; k < groupElement->GetNumberOfNestedElements(); k++)
+        for (unsigned int k = 0; k < groupElement->GetNumberOfNestedElements(); k++)
           {
-          propertyElement = groupElement->GetNestedElement(k);
-
-          vtkSMProperty *property =
-            this->SetupExposedProperty(propertyElement, subproxy_name);
-
-          group->AddProperty(property);
+          this->SetupExposedProperty(groupElement->GetNestedElement(k), subproxy_name);
           }
-
-        this->Internals->PropertyGroups.push_back(group);
-        group->Delete();
+     
+        // Now create the group.
+        this->NewPropertyGroup(groupElement);
         }
       else
         {

@@ -1,55 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>pqPropertiesPanel</class>
- <widget class="QWidget" name="pqPropertiesPanel">
+ <class>propertiesPanel</class>
+ <widget class="QWidget" name="propertiesPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>368</width>
-    <height>594</height>
+    <width>366</width>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Properties Panel</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="spacing">
-    <number>4</number>
-   </property>
-   <property name="margin">
-    <number>4</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="ButtonLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
-      <widget class="QPushButton" name="ApplyButton">
+      <widget class="QPushButton" name="Accept">
        <property name="text">
         <string>&amp;Apply</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqUpdate16.png</normaloff>:/pqWidgets/Icons/pqUpdate16.png</iconset>
        </property>
        <property name="shortcut">
         <string>Alt+A</string>
        </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ResetButton">
+      <widget class="QPushButton" name="Reset">
        <property name="text">
         <string>&amp;Reset</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="DeleteButton">
-       <property name="text">
-        <string>&amp;Delete</string>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqCancel16.png</normaloff>:/pqWidgets/Icons/pqCancel16.png</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="HelpButton">
+      <widget class="QPushButton" name="Delete">
        <property name="text">
-        <string>?</string>
+        <string>&amp;Delete</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../Widgets/Resources/QtWidgets.qrc">
+         <normaloff>:/QtWidgets/Icons/pqDelete16.png</normaloff>:/QtWidgets/Icons/pqDelete16.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Help">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../pqComponents.qrc">
+         <normaloff>:/pqWidgets/Icons/pqHelp16.png</normaloff>:/pqWidgets/Icons/pqHelp16.png</iconset>
        </property>
        <property name="shortcut">
         <string>Ctrl+S</string>
@@ -60,6 +76,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="SearchBoxLayout">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
       <widget class="QLineEdit" name="SearchLineEdit">
        <property name="toolTip">
@@ -108,28 +127,16 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>360</width>
-        <height>38</height>
+        <width>344</width>
+        <height>232</height>
        </rect>
       </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="ScrollAreaLayout" stretch="0,0,0,0,1">
        <property name="margin">
         <number>0</number>
        </property>
        <item>
         <widget class="pqExpanderButton" name="PropertiesButton">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
          <property name="text" stdset="0">
           <string>Properties</string>
          </property>
@@ -152,33 +159,10 @@
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
-         <layout class="QFormLayout" name="PropertiesLayout">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
-          <property name="labelAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="horizontalSpacing">
-           <number>0</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>0</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-         </layout>
         </widget>
        </item>
        <item>
         <widget class="pqExpanderButton" name="DisplayButton">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
          <property name="text" stdset="0">
           <string>Display</string>
          </property>
@@ -201,24 +185,20 @@
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
          </property>
-         <layout class="QFormLayout" name="DisplayLayout">
-          <property name="fieldGrowthPolicy">
-           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-          </property>
-          <property name="labelAlignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-          </property>
-          <property name="horizontalSpacing">
-           <number>2</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>2</number>
-          </property>
-          <property name="margin">
-           <number>0</number>
-          </property>
-         </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>9</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -236,6 +216,7 @@
  </customwidgets>
  <resources>
   <include location="../pqComponents.qrc"/>
+  <include location="../../../Widgets/Resources/QtWidgets.qrc"/>
  </resources>
  <connections/>
 </ui>

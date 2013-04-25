@@ -94,9 +94,9 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       layoutLocal->addWidget(widget);
       this->setShowLabel(false);
 
-      this->setReason() << "pqScalarValueListPropertyWidget for a repeatable "
-                           "DoubleVectorProperty with a BoundsDomain ("  <<
-                           pqPropertyWidget::getXMLName(range) << ") ";
+      PV_DEBUG_PANELS() << "pqScalarValueListPropertyWidget for a repeatable "
+                    << "DoubleVectorProperty with a BoundsDomain ("
+                    << pqPropertyWidget::getXMLName(range) << ") ";
       }
     else if(dvp->GetNumberOfElements() == 1 &&
             range->GetMinimumExists(0) &&
@@ -115,10 +115,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
       layoutLocal->setSpacing(4);
       layoutLocal->addWidget(widget);
 
-      this->setReason() << "pqDoubleRangeWidget for an DoubleVectorProperty "
-                        << "with a single element and a "
-                        << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                        << "with a minimum and a maximum";
+      PV_DEBUG_PANELS() << "pqDoubleRangeWidget for an DoubleVectorProperty "
+                    << "with a single element and a "
+                    << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                    << "with a minimum and a maximum";
       }
     else
       {
@@ -138,7 +138,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setObjectName(QString("LineEdit%1").arg(i));
           lineEdit->setTextAndResetCursor(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i)).toString());
-          gridLayout->addWidget(lineEdit, 0, i);
+          gridLayout->addWidget(lineEdit, i, 0);
           this->addPropertyLink(lineEdit, "text2",
                                 SIGNAL(textChanged(const QString&)), dvp, i);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
@@ -149,7 +149,7 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
           lineEdit->setObjectName(QString("LineEdit%1").arg(i+3));
           lineEdit->setTextAndResetCursor(
             QVariant(vtkSMPropertyHelper(smProperty).GetAsDouble(i + 3)).toString());
-          gridLayout->addWidget(lineEdit, 1, i);
+          gridLayout->addWidget(lineEdit, i, 1);
           this->addPropertyLink(lineEdit, "text2",
                                 SIGNAL(textChanged(const QString&)), dvp, i + 3);
           this->connect(lineEdit, SIGNAL(textChangedAndEditingFinished()),
@@ -158,10 +158,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
 
         layoutLocal->addLayout(gridLayout);
 
-        this->setReason() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
-                          << "with an "
-                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and 6 elements";
+        PV_DEBUG_PANELS() << "3x2 grid of QLineEdit's for an DoubleVectorProperty "
+                      << "with an "
+                      << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                      << "and 6 elements";
         }
       else
         {
@@ -179,10 +179,10 @@ pqDoubleVectorPropertyWidget::pqDoubleVectorPropertyWidget(vtkSMProperty *smProp
                         this, SIGNAL(changeFinished()));
           }
 
-        this->setReason() << "List of QLineEdit's for an DoubleVectorProperty "
-                          << "with an "
-                          << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and more than one element";
+        PV_DEBUG_PANELS() << "List of QLineEdit's for an DoubleVectorProperty "
+                      << "with an "
+                      << "DoubleRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                      << "and more than one element";
         }
       }
     }

@@ -5223,17 +5223,21 @@
           <Property name="SideSetResultArrayInfo" />
           <Property name="SILUpdateStamp" />
           <Property name="TimeStepRangeInfo" />
-          <Property name="HasModeShapes" />
-          <Property name="ModeShape" />
-          <Property name="AnimateVibrations" />
-          <Property name="FilePrefix" panel_visibility="advanced" />
-          <Property name="FilePrefixInfo" />
-          <Property name="FilePattern" panel_visibility="advanced"/>
-          <Property name="FilePatternInfo" />
-          <Property name="FileRange" panel_visibility="advanced" />
-          <Property name="FileRangeInfo" />
-          <Property name="XMLFileName" panel_visibility="advanced"/>
-          <Property name="XMLFileNameInfo" />
+          <PropertyGroup label="Mode Shapes">
+            <Property name="HasModeShapes" panel_visibility="advanced" />
+            <Property name="ModeShape" panel_visibility="advanced" />
+            <Property name="AnimateVibrations" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="File Pattern">
+            <Property name="FilePrefix" panel_visibility="advanced" />
+            <Property name="FilePrefixInfo" />
+            <Property name="FilePattern" panel_visibility="advanced"/>
+            <Property name="FilePatternInfo" />
+            <Property name="FileRange" panel_visibility="advanced" />
+            <Property name="FileRangeInfo" />
+            <Property name="XMLFileName" panel_visibility="advanced"/>
+            <Property name="XMLFileNameInfo" />
+          </PropertyGroup>
           <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>
@@ -5361,17 +5365,21 @@
           <Property name="SideSetResultArrayInfo" />
           <Property name="SILUpdateStamp" />
           <Property name="TimeStepRangeInfo" />
-          <Property name="HasModeShapes" />
-          <Property name="ModeShape" />
-          <Property name="AnimateVibrations" />
-          <Property name="FilePrefix" panel_visibility="advanced"/>
-          <Property name="FilePrefixInfo" />
-          <Property name="FilePattern" panel_visibility="advanced"/>
-          <Property name="FilePatternInfo" />
-          <Property name="FileRange" panel_visibility="advanced"/>
-          <Property name="FileRangeInfo" />
-          <Property name="XMLFileName" panel_visibility="advanced"/>
-          <Property name="XMLFileNameInfo" />
+          <PropertyGroup label="Mode Shapes">
+            <Property name="HasModeShapes" panel_visibility="advanced" />
+            <Property name="ModeShape" panel_visibility="advanced" />
+            <Property name="AnimateVibrations" panel_visibility="advanced" />
+          </PropertyGroup>
+          <PropertyGroup label="File Pattern">
+            <Property name="FilePrefix" panel_visibility="advanced"/>
+            <Property name="FilePrefixInfo" />
+            <Property name="FilePattern" panel_visibility="advanced"/>
+            <Property name="FilePatternInfo" />
+            <Property name="FileRange" panel_visibility="advanced"/>
+            <Property name="FileRangeInfo" />
+            <Property name="XMLFileName" panel_visibility="advanced"/>
+            <Property name="XMLFileNameInfo" />
+          </PropertyGroup>
           <Property name="Refresh" />
         </ExposedProperties>
       </SubProxy>

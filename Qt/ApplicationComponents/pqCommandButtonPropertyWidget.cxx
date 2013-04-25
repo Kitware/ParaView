@@ -57,8 +57,8 @@ pqCommandButtonPropertyWidget::pqCommandButtonPropertyWidget(vtkSMProxy *smProxy
   this->setShowLabel(false);
   this->setLayout(l);
 
-  this->setReason() << "pqCommandButtonPropertyWidget for a property with "
-                    << "the panel_widget=\"command_button\" attribute";
+  PV_DEBUG_PANELS() << "pqCommandButtonPropertyWidget for a property with "
+                << "the panel_widget=\"command_button\" attribute";
 }
 
 pqCommandButtonPropertyWidget::~pqCommandButtonPropertyWidget()

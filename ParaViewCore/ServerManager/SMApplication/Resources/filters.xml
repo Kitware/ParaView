@@ -1720,6 +1720,10 @@ found and the point will be rejected.</Documentation>
             not set the default value for this property
             using the domain when the proxy is created -->
           <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddFloatVolumeArrayName" />
+            <Property name="AddUnsignedCharVolumeArrayName" />
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty clean_command="RemoveFloatVolumeArrayNames"
@@ -1743,6 +1747,10 @@ found and the point will be rejected.</Documentation>
             not set the default value for this property
             using the domain when the proxy is created -->
           <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddDoubleVolumeArrayName" />
+            <Property name="AddUnsignedCharVolumeArrayName" />
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty clean_command="RemoveUnsignedCharVolumeArrayNames"
@@ -1761,6 +1769,12 @@ found and the point will be rejected.</Documentation>
                       name="Input" />
           </RequiredProperties>
         </ArrayListDomain>
+        <Hints>
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddDoubleVolumeArrayName" />
+            <Property name="AddFloatVolumeArrayName" />
+          </PropertyWidgetDecorator>
+        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
                             default_values="0.1"
@@ -2351,6 +2365,10 @@ found and the point will be rejected.</Documentation>
            not set the default value for this property
            using the domain when the proxy is created -->
           <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddFloatVolumeArrayName" />
+            <Property name="AddUnsignedCharVolumeArrayName" />
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty clean_command="RemoveFloatVolumeArrayNames"
@@ -2374,6 +2392,10 @@ found and the point will be rejected.</Documentation>
            not set the default value for this property
            using the domain when the proxy is created -->
           <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddDoubleVolumeArrayName" />
+            <Property name="AddUnsignedCharVolumeArrayName" />
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <StringVectorProperty clean_command="RemoveUnsignedCharVolumeArrayNames"
@@ -2397,6 +2419,10 @@ found and the point will be rejected.</Documentation>
            not set the default value for this property
            using the domain when the proxy is created -->
           <NoDefault />
+          <PropertyWidgetDecorator type="CTHArraySelectionDecorator">
+            <Property name="AddDoubleVolumeArrayName" />
+            <Property name="AddFloatVolumeArrayName" />
+          </PropertyWidgetDecorator>
         </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetVolumeFractionSurfaceValue"
@@ -5281,6 +5307,9 @@ found and the point will be rejected.</Documentation>
         <Documentation>If clipping with scalars, this property specifies the
         name of the scalar array on which to perform the clip
         operation.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+        </Hints>
       </StringVectorProperty>
       <DoubleVectorProperty command="SetValue"
                             default_values="0.0"
@@ -5301,6 +5330,9 @@ found and the point will be rejected.</Documentation>
         property specifies an offset from the clip function to use in the
         clipping operation. Neither functionality is currently available in
         ParaView's user interface.</Documentation>
+        <Hints>
+          <PropertyWidgetDecorator type="ClipScalarsDecorator" />
+        </Hints>
       </DoubleVectorProperty>
       <IntVectorProperty command="SetInsideOut"
                          default_values="0"
@@ -5315,7 +5347,8 @@ found and the point will be rejected.</Documentation>
       <IntVectorProperty command="SetUseValueAsOffset"
                          default_values="0"
                          name="UseValueAsOffset"
-                         number_of_elements="1">
+                         number_of_elements="1"
+                         panel_visibility="never">
         <BooleanDomain name="bool" />
         <Documentation>If UseValueAsOffset is true, Value is used as an offset
         parameter to the implicit function. Otherwise, Value is used only when
@@ -5333,8 +5366,6 @@ found and the point will be rejected.</Documentation>
       </IntVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
-        <Property name="UseValueAsOffset"
-                  show="0" />
       </Hints>
       <!-- End Clip -->
     </SourceProxy>
@@ -5511,7 +5542,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0"
                             label="Threshold Range"
                             name="ThresholdBetween"
-                            number_of_elements="2">
+                            number_of_elements="2"
+                            panel_widget="double_range">
         <ArrayRangeDomain name="range">
           <RequiredProperties>
             <Property function="Input"
@@ -5606,7 +5638,8 @@ found and the point will be rejected.</Documentation>
                             default_values="0 0"
                             label="Threshold Range"
                             name="ThresholdBetween"
-                            number_of_elements="2">
+                            number_of_elements="2"
+                            panel_widget="double_range">
         <ArrayRangeDomain name="range">
           <RequiredProperties>
             <Property function="Input"
@@ -6663,6 +6696,26 @@ found and the point will be rejected.</Documentation>
         <Documentation>The value of this property determines how the seeds for
         the streamlines will be generated.</Documentation>
       </InputProperty>
+
+      <PropertyGroup label="Seeds">
+        <Property name="Source" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Integration Parameters">
+        <Property name="IntegrationDirection" />
+        <Property name="IntegratorType" />
+        <Property name="IntegrationStepUnit" />
+        <Property name="InitialIntegrationStep" />
+        <Property name="MinimumIntegrationStep" />
+        <Property name="MaximumIntegrationStep" />
+      </PropertyGroup>
+
+      <PropertyGroup label="Streamline Parameters" >
+        <Property name="MaximumNumberOfSteps" />
+        <Property name="MaximumPropagation" />
+        <Property name="TerminalSpeed" />
+        <Property name="MaximumError" />
+      </PropertyGroup>
 
       <Hints>
         <Visibility replace_input="2" />

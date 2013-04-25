@@ -51,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqQtMessageHandlerBehavior.h"
 #include "pqSpreadSheetVisibilityBehavior.h"
-#include "pqStandardSummaryPanelImplementation.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqVerifyRequiredPluginBehavior.h"
@@ -72,8 +71,6 @@ pqParaViewBehaviors::pqParaViewBehaviors(
 
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));
-
-  pgm->addInterface(new pqStandardSummaryPanelImplementation(pgm));
 
   pgm->addInterface(new pqStandardPropertyWidgetInterface(pgm));
 

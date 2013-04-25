@@ -60,9 +60,6 @@ public:
     return qobject_cast<QAction*>(this->parent());
     }
 
-signals:
-  void enableStateToggled(bool enabled);
-
 protected slots:
   /// Called when the action is triggered.
   virtual void onTriggered(){ }

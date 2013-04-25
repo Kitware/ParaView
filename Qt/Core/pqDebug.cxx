@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSummaryPanel.cxx
+   Module:    $RCSfile$
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -28,31 +28,31 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#include "pqDebug.h"
 
-#ifndef _pqSurfaceLICSummaryDisplayPanel_h
-#define _pqSurfaceLICSummaryDisplayPanel_h
+#include <QProcessEnvironment>
 
-#include <QWidget>
+//-----------------------------------------------------------------------------
+pqDebugType::pqDebugType(const QString& envVariable/*=QString()*/)
+{
+  // since call to systemEnvironment is expensive, we only do it once.
+  static QProcessEnvironment systemEnvironment =
+    QProcessEnvironment::systemEnvironment();
 
-#include "pqPropertyLinks.h"
-#include "pqRepresentation.h"
-
-namespace Ui {
-    class pqSurfaceLICSummaryDisplayPanel;
+  this->Enabled = envVariable.isEmpty()? true:
+    systemEnvironment.contains(envVariable);
 }
 
-class pqSurfaceLICSummaryDisplayPanel : public QWidget
+//-----------------------------------------------------------------------------
+pqDebugType::~pqDebugType()
 {
-    Q_OBJECT
+}
 
-public:
-    explicit pqSurfaceLICSummaryDisplayPanel(pqRepresentation *representation, QWidget *parent = 0);
-    ~pqSurfaceLICSummaryDisplayPanel();
-
-private:
-    Ui::pqSurfaceLICSummaryDisplayPanel *ui;
-    pqPropertyLinks Links;
-};
-
-#endif
+//-----------------------------------------------------------------------------
+QDebug pqDebug(const pqDebugType& type/*=pqDebugType()*/)
+{
+  static QString messageEater;
+  messageEater.clear();
+  return type? QDebug(QtDebugMsg) : QDebug(&messageEater);
+}

@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqIntRangeWidget.h"
 #include "pqLineEdit.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
@@ -97,31 +98,67 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
     this->setShowLabel(false);
 
-    this->setReason() << "QCheckBox for an IntVectorProperty with a BooleanDomain";
+    PV_DEBUG_PANELS() << "QCheckBox for an IntVectorProperty with a BooleanDomain";
     }
   else if(vtkSMEnumerationDomain *ed = vtkSMEnumerationDomain::SafeDownCast(domain))
     {
-    QComboBox *comboBox = new QComboBox(this);
-    comboBox->setObjectName("ComboBox");
-
-    for(unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
+    if (vtkSMVectorProperty::SafeDownCast(smproperty)->GetRepeatCommand())
       {
-      comboBox->addItem(ed->GetEntryText(i));
+      // Some enumeration properties, we add
+      // ability to select mutliple elements. This is the case if the
+      // SM property has repeat command flag set.
+      pqTreeWidget *treeWidget = new pqTreeWidget(this);
+      treeWidget->setObjectName("TreeWidget");
+      treeWidget->setColumnCount(1);
+      treeWidget->setRootIsDecorated(false);
+
+      QTreeWidgetItem* header = new QTreeWidgetItem();
+      header->setData(0, Qt::DisplayRole, smproperty->GetXMLLabel());
+      treeWidget->setHeaderItem(header);
+
+      // helper makes it easier to select multiple entries.
+      pqTreeWidgetSelectionHelper* helper =
+        new pqTreeWidgetSelectionHelper(treeWidget);
+      helper->setObjectName("TreeWidgetSelectionHelper");
+
+      // adaptor makes it possible to link with the smproperty.
+      pqSignalAdaptorSelectionTreeWidget* adaptor =
+        new pqSignalAdaptorSelectionTreeWidget(treeWidget, smproperty);
+      adaptor->setObjectName("SelectionTreeWidgetAdaptor");
+      this->addPropertyLink(adaptor, "values", SIGNAL(valuesChanged()),
+                            smproperty);
+      
+      layoutLocal->addWidget(treeWidget);
+      this->setChangeAvailableAsChangeFinished(true);
+      this->setShowLabel(false);
+
+      PV_DEBUG_PANELS()
+        << "TreeWidget for an IntVectorProperty with a "
+        << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")"
+        << "(with repeatable command)";
       }
+    else
+      {
+      QComboBox *comboBox = new QComboBox(this);
+      comboBox->setObjectName("ComboBox");
+      for(unsigned int i = 0; i < ed->GetNumberOfEntries(); i++)
+        {
+        comboBox->addItem(ed->GetEntryText(i));
+        }
+      pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+      this->addPropertyLink(adaptor,
+        "currentText",
+        SIGNAL(currentTextChanged(QString)),
+        smproperty);
+      this->setChangeAvailableAsChangeFinished(true);
+      layoutLocal->addWidget(comboBox);
 
-    pqSignalAdaptorComboBox *adaptor = new pqSignalAdaptorComboBox(comboBox);
+      PV_DEBUG_PANELS()
+        << "QComboBox for an IntVectorProperty with a "
+        << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")"
+        << "(with non-repeatable command)";
 
-    this->addPropertyLink(adaptor,
-                          "currentText",
-                          SIGNAL(currentTextChanged(QString)),
-                          smproperty);
-    this->setChangeAvailableAsChangeFinished(true);
-
-
-    layoutLocal->addWidget(comboBox);
-
-    this->setReason() << "QComboBox for an IntVectorProperty with a "
-                      << "EnumerationDomain (" << pqPropertyWidget::getXMLName(ed) << ")";
+      }
     }
   else if(vtkSMCompositeTreeDomain::SafeDownCast(domain))
     {
@@ -144,8 +181,8 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
     layoutLocal->addWidget(treeWidget);
     this->setShowLabel(false);
 
-    this->setReason() << "pqTreeWidget for an IntVectorPropertyWidget with a "
-                      << "CompositeTreeDomain";
+    PV_DEBUG_PANELS() << "pqTreeWidget for an IntVectorPropertyWidget with a "
+                  << "CompositeTreeDomain";
     }
   else if(vtkSMIntRangeDomain *range = vtkSMIntRangeDomain::SafeDownCast(domain))
     {
@@ -166,10 +203,10 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                     this, SIGNAL(changeFinished()));
       layoutLocal->addWidget(widget);
 
-      this->setReason() << "pqIntRangeWidget for an IntVectorProperty with a "
-                        << "single element and an "
-                        << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                        << "with a minimum and a maximum";
+      PV_DEBUG_PANELS() << "pqIntRangeWidget for an IntVectorProperty with a "
+                    << "single element and an "
+                    << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                    << "with a minimum and a maximum";
       }
     else
       {
@@ -204,10 +241,10 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
 
         layoutLocal->addLayout(gridLayout);
 
-        this->setReason() << "3x2 grid of QLineEdit's for an IntVectorProperty "
-                          << "with an "
-                          << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and 6 elements";
+        PV_DEBUG_PANELS() << "3x2 grid of QLineEdit's for an IntVectorProperty "
+                      << "with an "
+                      << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                      << "and 6 elements";
         }
       else
         {
@@ -224,10 +261,10 @@ pqIntVectorPropertyWidget::pqIntVectorPropertyWidget(vtkSMProperty *smproperty,
                         this, SIGNAL(changeFinished()));
           }
 
-        this->setReason() << "List of QLineEdit's for an IntVectorProperty "
-                          << "with an "
-                          << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
-                          << "and more than one element";
+        PV_DEBUG_PANELS() << "List of QLineEdit's for an IntVectorProperty "
+                      << "with an "
+                      << "IntRangeDomain (" << pqPropertyWidget::getXMLName(range) << ") "
+                      << "and more than one element";
         }
       }
     }

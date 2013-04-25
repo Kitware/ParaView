@@ -103,8 +103,6 @@ void pqScalarBarVisibilityReaction::updateEnableState()
   bool prev = parent_action->blockSignals(true);
   parent_action->setChecked(is_shown);
   parent_action->blockSignals(prev);
-
-  emit enableStateToggled(can_show_sb);
 }
 
 //-----------------------------------------------------------------------------
