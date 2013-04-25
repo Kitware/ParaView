@@ -29,7 +29,6 @@
 #
 #==========================================================================
 set (Module_SRCS
-  cp_helper_py.cxx
   CPythonAdaptorAPI.cxx
   vtkCPPythonAdaptorAPI.cxx
   vtkCPPythonHelper.cxx
@@ -40,18 +39,6 @@ set (Module_SRCS
 set_source_files_properties(
   vtkCPPythonAdaptorAPI
   ABSTRACT)
-
-# Embed helper Python script inside code base
-add_custom_command(
-    OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/cp_helper_py.cxx"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/cp_helper.py"
-            vtkEncodeString
-    COMMAND vtkEncodeString
-    ARGS "${CMAKE_CURRENT_BINARY_DIR}/cp_helper_py.cxx"
-         "${CMAKE_CURRENT_SOURCE_DIR}/cp_helper.py"
-         cp_helper_py)
-
-set_source_files_properties(cp_helper_py WRAP_EXCLUDE)
 
 configure_file(vtkCPPythonHelperConfig.h.in
                vtkCPPythonHelperConfig.h @ONLY)

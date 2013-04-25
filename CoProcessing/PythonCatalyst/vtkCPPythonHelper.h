@@ -40,10 +40,6 @@ public:
   /// Get the interpretor that has been setup.
   static vtkPVPythonInterpretor* GetPythonInterpretor();
 
-  /// Get access to helper script.
-  /// Developer Note: We may want to convert this into a regular Python module.
-  static const char* GetPythonHelperScript();
-
 protected:
   vtkCPPythonHelper();
   virtual ~vtkCPPythonHelper();

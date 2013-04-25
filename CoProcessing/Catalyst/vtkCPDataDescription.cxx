@@ -122,6 +122,25 @@ vtkCPInputDataDescription *vtkCPDataDescription::GetInputDescription(
 }
 
 //----------------------------------------------------------------------------
+const char* vtkCPDataDescription::GetInputDescriptionName(
+  unsigned int index)
+{
+  unsigned int cur_index=0;
+  vtkInternals::GridDescriptionMapType::iterator iter;
+  for (iter = this->Internals->GridDescriptionMap.begin();
+    iter != this->Internals->GridDescriptionMap.end(); ++iter, ++cur_index)
+    {
+    if (cur_index == index)
+      {
+      return iter->first.c_str();
+      }
+    }
+
+  return NULL;
+}
+
+
+//----------------------------------------------------------------------------
 vtkCPInputDataDescription* vtkCPDataDescription::GetInputDescriptionByName(
   const char* name)
 {

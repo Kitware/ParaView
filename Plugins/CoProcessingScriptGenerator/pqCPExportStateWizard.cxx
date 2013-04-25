@@ -52,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMViewProxy.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnsignedCharArray.h>
-#include <vtkCPPythonHelper.h>
 #include <vtksys/SystemTools.hxx>
 
 #include <QLabel>
@@ -66,7 +65,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDebug>
 
-extern const char* cp_export_py;
+static const char* cp_python_export_code =
+"from paraview import cpexport\n"
+"cpexport.DumpCoProcessingScript(export_rendering=%1,\n"
+"   simulation_input_map={%2},\n"
+"   screenshot_info={%3},\n"
+"   rescale_data_range=%4,\n"
+"   enable_live_viz=%5,\n"
+"   filename='%6')\n";
 
 // HACK.
 namespace
@@ -568,11 +574,13 @@ bool pqCPExportStateWizard::validateCurrentPage()
   QString live_visualization = (this->Internals->liveViz->isChecked() == true ?
                                 "True" : "False");
 
-  QString command =
-    QString(cp_export_py).arg(export_rendering).arg(sim_inputs_map).arg(rendering_info).arg(rescale_data_range).arg(filename).arg(live_visualization);
-
-  dialog->runString(vtkCPPythonHelper::GetPythonHelperScript());
+  QString command(cp_python_export_code);
+  command = command.arg(export_rendering)
+                   .arg(sim_inputs_map)
+                   .arg(rendering_info)
+                   .arg(rescale_data_range)
+                   .arg(live_visualization)
+                   .arg(filename);
   dialog->runString(command);
-
   return true;
 }

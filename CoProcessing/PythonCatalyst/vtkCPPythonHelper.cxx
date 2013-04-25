@@ -37,8 +37,6 @@ extern "C" {
   void vtkPVInitializePythonModules();
 }
 
-extern const char* cp_helper_py;
-
 //----------------------------------------------------------------------------
 // Needed when we don't use the vtkStandardNewMacro.
 vtkInstantiatorNewMacro(vtkCPPythonHelper);
@@ -66,11 +64,6 @@ vtkCPPythonHelper::~vtkCPPythonHelper()
     this->PythonInterpretor = 0;
     }
   vtkInitializationHelper::Finalize();
-}
-
-const char* vtkCPPythonHelper::GetPythonHelperScript()
-{
-  return cp_helper_py;
 }
 
 //----------------------------------------------------------------------------
@@ -142,8 +135,6 @@ vtkCPPythonHelper* vtkCPPythonHelper::New()
       << "import vtkPVCatalystPython\n";
     vtkCPPythonHelper::Instance->PythonInterpretor->RunSimpleString(
         loadPythonModules.str().c_str());
-    vtkCPPythonHelper::Instance->PythonInterpretor->RunSimpleString(
-      vtkCPPythonHelper::GetPythonHelperScript());
     vtkCPPythonHelper::Instance->PythonInterpretor->FlushMessages();
     delete []argv[0];
     }
