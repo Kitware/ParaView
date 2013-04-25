@@ -2,6 +2,12 @@
 import sys
 import os
 
+# import paraview modules.
+from paraview import simple, web, paraviewweb_wamp, paraviewweb_protocols
+
+# import annotations
+from autobahn.wamp import exportRpc
+
 try:
     import argparse
 except ImportError:
@@ -9,125 +15,110 @@ except ImportError:
     # the source for the same as _argparse and we use it instead.
     import _argparse as argparse
 
-# import annotations
-from autobahn.wamp import exportRpc
+# =============================================================================
+# Create custom File Opener class to handle clients requests
+# =============================================================================
 
-# import paraview modules.
-from paraview import simple, web, servermanager
+class FileOpener(paraviewweb_wamp.ServerProtocol):
 
-# find out the path of the file to load
-reader = None
-fileToLoad = None
-pathToList = "."
-fileList = {}
+    # Application configuration
+    reader     = None
+    fileToLoad = None
+    pathToList = "."
+    view       = None
+    authKey    = "paraviewweb-secret"
 
-def listFiles(pathToList):
-    nodeTree = {}
-    rootNode = { "data": "/", "children": [] , "state" : "open"}
-    nodeTree[pathToList] = rootNode
-    for path, directories, files in os.walk(pathToList):
-        parent = nodeTree[path]
-        for directory in directories:
-            child = {'data': directory , 'children': [], "state" : "open", 'metadata': {'path': 'dir'}}
-            nodeTree[path + '/' + directory] = child
-            parent['children'].append(child)
-            if directory == 'vtk':
-                child['state'] = 'closed'
-        for filename in files:
-            child = {'data': { 'title': filename, 'icon': '/'}, 'children': [], 'metadata': {'path': path + '/' + filename}}
-            nodeTree[path + '/' + filename] = child
-            parent['children'].append(child)
-    return rootNode
+    def initialize(self):
+        # Bring used components
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebMouseHandler())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPort())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortImageDelivery())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebViewPortGeometryDelivery())
+        self.registerParaViewWebProtocol(paraviewweb_protocols.ParaViewWebTimeHandler())
 
-view = None
-def initializePipeline():
-    """
-    Called by the default server and serves as a demonstration purpose.
-    This should be overriden by application protocols to setup the
-    application specific pipeline
-    """
-    global view, reader
-    if fileToLoad:
-        reader = simple.OpenDataFile(fileToLoad)
-        simple.Show()
+        # Update authentication key to use
+        self.updateSecret(FileOpener.authKey)
 
-        view = simple.Render()
-        view.ViewSize = [800,800]
-        # If this is running on a Mac DO NOT use Offscreen Rendering
-        #view.UseOffscreenRendering = 1
-        simple.ResetCamera()
-    else:
-        view = simple.GetRenderView()
-        simple.Render()
-        view.ViewSize = [800,800]
+        # Create default pipeline
+        if FileOpener.fileToLoad:
+            FileOpener.reader = simple.OpenDataFile(FileOpener.fileToLoad)
+            simple.Show()
 
-    # setup animation scene
-    scene = simple.GetAnimationScene()
-    simple.GetTimeTrack()
-    scene.PlayMode = "Snap To TimeSteps"
-
-class FileOpener(web.ParaViewServerProtocol):
+            FileOpener.view = simple.Render()
+            FileOpener.view.ViewSize = [800,800]
+            # If this is running on a Mac DO NOT use Offscreen Rendering
+            #view.UseOffscreenRendering = 1
+            simple.ResetCamera()
+        else:
+            FileOpener.view = simple.GetRenderView()
+            simple.Render()
+            FileOpener.view.ViewSize = [800,800]
+        simple.SetActiveView(FileOpener.view)
 
     @exportRpc("openFile")
     def openFile(self, file):
-        global reader
         id = ""
-        if reader:
+        if FileOpener.reader:
             try:
-                simple.Delete(reader)
+                simple.Delete(FileOpener.reader)
             except:
-                reader = None
+                FileOpener.reader = None
         try:
-            reader = simple.OpenDataFile(file)
+            FileOpener.reader = simple.OpenDataFile(file)
             simple.Show()
             simple.Render()
             simple.ResetCamera()
-            id = reader.GetGlobalIDAsString()
+            id = FileOpener.reader.GetGlobalIDAsString()
         except:
-            reader = None
+            FileOpener.reader = None
         return id
 
     @exportRpc("openFileFromPath")
     def openFileFromPath(self, file):
-        file = os.path.join(pathToList, file)
+        file = os.path.join(FileOpener.pathToList, file)
         return self.openFile(file)
 
     @exportRpc("listFiles")
     def listFiles(self):
-        return fileList
+        nodeTree = {}
+        rootNode = { "data": "/", "children": [] , "state" : "open"}
+        nodeTree[FileOpener.pathToList] = rootNode
+        for path, directories, files in os.walk(FileOpener.pathToList):
+            parent = nodeTree[path]
+            for directory in directories:
+                child = {'data': directory , 'children': [], "state" : "open", 'metadata': {'path': 'dir'}}
+                nodeTree[path + '/' + directory] = child
+                parent['children'].append(child)
+                if directory == 'vtk':
+                    child['state'] = 'closed'
+            for filename in files:
+                child = {'data': { 'title': filename, 'icon': '/'}, 'children': [], 'metadata': {'path': path + '/' + filename}}
+                nodeTree[path + '/' + filename] = child
+                parent['children'].append(child)
+        return rootNode
 
-    @exportRpc("vcr")
-    def updateTime(self,action):
-        animationScene = simple.GetAnimationScene()
-        currentTime = view.ViewTime
-
-        if action == "next":
-            animationScene.GoToNext()
-            if currentTime == view.ViewTime:
-                animationScene.GoToFirst()
-        if action == "prev":
-            animationScene.GoToPrevious()
-            if currentTime == view.ViewTime:
-                animationScene.GoToLast()
-        if action == "first":
-            animationScene.GoToFirst()
-        if action == "last":
-            animationScene.GoToLast()
-
-        return view.ViewTime
+# =============================================================================
+# Main: Parse args and start server
+# =============================================================================
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="ParaView/Web file loader web-application")
+    # Create argument parser
+    parser = argparse.ArgumentParser(description="ParaView/Web file loader web-application")
+
+    # Add default arguments
     web.add_arguments(parser)
-    parser.add_argument("--file-to-load", help="path to data file to load",
-        dest="data")
-    parser.add_argument("--data-dir", default=os.getcwd(),
-        help="path to data directory to list", dest="path")
+
+    # Add local arguments
+    parser.add_argument("--file-to-load", help="path to data file to load", dest="data")
+    parser.add_argument("--data-dir", default=os.getcwd(), help="path to data directory to list", dest="path")
+
+    # Exctract arguments
     args = parser.parse_args()
 
-    fileToLoad = args.data
-    pathToList = args.path
-    fileList = listFiles(pathToList)
-    initializePipeline()
+    # Configure our current application
+    FileOpener.fileToLoad = args.data
+    FileOpener.pathToList = args.path
+    FileOpener.authKey    = args.authKey
+
+    # Start server
     web.start_webserver(options=args, protocol=FileOpener)

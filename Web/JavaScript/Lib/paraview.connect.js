@@ -93,13 +93,33 @@
      */
     function connect(connection, readyCallback, closeCallback) {
         var wsuri = connection.sessionURL, onReady = readyCallback, onClose = closeCallback;
+
+        if(!connection.hasOwnProperty("secret")) {
+            connection.secret = "paraviewweb-secret"; // Default value
+        }
+
         GLOBAL.ab.connect(wsuri, function (session) {
-            session.prefix("pv", "http://paraview.org/pv#");
-            session.prefix("event", "http://paraview.org/event#");
-            connection.session = session;
-            connections[connection.sessionURL] = connection;
-            if (onReady) {
-                onReady(connection);
+            try {
+                session.authreq("paraviewweb").then(function (challenge) {
+                    // derive secret if salted WAMP-CRA
+                    var secret = GLOBAL.ab.deriveKey(connection.secret, JSON.parse(challenge).authextra);
+                    var signature = session.authsign(challenge, secret);
+
+                    session.auth(signature).then(function(){
+                        session.prefix("pv", "http://paraview.org/pv#");
+                        session.prefix("event", "http://paraview.org/event#");
+                        connection.session = session;
+                        connections[connection.sessionURL] = connection;
+                        if (onReady) {
+                            onReady(connection);
+                        }
+                    }).otherwise(function(error){
+                        alert("Authentication error");
+                        GLOBAL.close();
+                    });
+                });
+            } catch(e) {
+                console.log(e);
             }
         }, function (code, reason) {
             delete connections[connection.sessionURL];

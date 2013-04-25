@@ -46,9 +46,10 @@
 
             var serviceURL = location.protocol + "//" + location.hostname + ":" + location.port + "/paraview",
             config = {
-                sessionManagerURL: serviceURL,
-                name: "WebVisualizer",
-                application: "pipeline"
+                "sessionManagerURL": serviceURL,
+                "name": "WebVisualizer",
+                "application": "pipeline",
+                "generate-secret": 0 // 0: None / 1: JavaScript generation / 2: Server side generation
             },
             pv = { pipeline: null, sources: null, files: null},
             fetchDataQueueSize = 0;
