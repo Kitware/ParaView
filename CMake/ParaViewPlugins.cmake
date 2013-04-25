@@ -1056,8 +1056,9 @@ FUNCTION(ADD_PARAVIEW_PLUGIN NAME VERSION)
       ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h
     )
     IF (plugin_type_gui)
-      QT4_WRAP_CPP(tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
-      SET (plugin_sources ${plugin_sources} ${tmp})
+      set (__plugin_sources_tmp)
+      QT4_WRAP_CPP(__plugin_sources_tmp ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}_Plugin.h)
+      SET (plugin_sources ${plugin_sources} ${__plugin_sources_tmp})
     ENDIF (plugin_type_gui)
     
    if (MSVC)
