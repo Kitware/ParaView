@@ -352,9 +352,21 @@
             if(renderer.hasClass('active')){
                 render(true);
             }
-        }).bind('render', function(){
+        }).bind('render', function(e){
             if(renderer.hasClass('active')){
-                render(false);
+                var opts = e.options,
+                previousQuality = quality,
+                forceRender = false;
+
+                if(opts) {
+                    quality = opts.hasOwnProperty('quality') ? opts.quality : quality;
+                    forceRender = opts.hasOwnProperty('forceRender');
+                }
+
+                render(forceRender);
+
+                // Revert back to previous state
+                quality = previousQuality;
             }
         }).bind('mouse', function(evt){
             if(renderer.hasClass('active')){

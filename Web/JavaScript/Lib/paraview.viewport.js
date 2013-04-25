@@ -515,9 +515,9 @@
              * @member pv.Viewport
              * @param {Function} ondone Function to call after rendering is complete.
              */
-            render: function(onDone) {
+            render: function(onDone, args) {
                 onDoneQueue.push(onDone);
-                rendererContainer.trigger('render');
+                rendererContainer.trigger({type: 'render', options: args});
             },
 
             /**
