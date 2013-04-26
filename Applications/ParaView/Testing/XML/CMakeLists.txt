@@ -105,6 +105,8 @@ SET (TESTS_WITH_BASELINES
   ${CMAKE_CURRENT_SOURCE_DIR}/Plot3DReader.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PlotEdges2.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PolygonCellSelection.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/PolygonPointSelection.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/ProbePicking.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/PropertyConversion1.xml
@@ -215,10 +217,11 @@ set (GlobalProperties_USE_OLD_PANELS TRUE)
 
 #------------------------------------------------------------------------------
 
-
 # Selection is not available in CRS mode
 set(MultiSliceWavelet_DISABLE_CRS TRUE)
 set(MultiSliceMultiBlock_DISABLE_CRS TRUE)
+set(PolygonCellSelection_DISABLE_CRS TRUE)
+set(PolygonPointSelection_DISABLE_CRS TRUE)
 
 # These tests should not be run along with those using the new panels
 set(3DWidgetInCustomFilter_BREAK TRUE)
@@ -230,6 +233,8 @@ set(DataOutlines_BREAK TRUE)
 # changed events.
 set (AnimatePipelineTime_FORCE_SERIAL TRUE)
 set (ProbePicking_FORCE_SERIAL TRUE)
+set (PolygonCellSelection_FORCE_SERIAL TRUE)
+set (PolygonPointSelection_FORCE_SERIAL TRUE)
 
 # Set properties for CTH tests
 set(CTHAMRBaseline_BREAK TRUE)
@@ -287,6 +292,8 @@ set (ColorEditor4_BREAK TRUE)
 set (GridConnectivity_BREAK TRUE)
 set (H5PartReaderPlugin_BREAK TRUE)
 SET (PlotEdges2_BREAK TRUE)
+SET (PolygonCellSelection_BREAK TRUE)
+SET (PolygonPointSelection_BREAK TRUE)
 SET (PropertyConversion2_BREAK TRUE)
 SET (PropertyConversion3_BREAK TRUE)
 set (ReadXMLPolyDataFileSeries_BREAK TRUE)

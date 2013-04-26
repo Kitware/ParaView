@@ -70,7 +70,9 @@ public:
     ZOOM,
     PICK,
     PICK_ON_CLICK,
-    FAST_INTERSECT
+    FAST_INTERSECT,
+    POLYGON_POINTS,
+    POLYGON_CELLS
   };
   // PICK_ON_CLICK mode is same as pick, except that the helper does not change
   // the interactor or draw any rubber bands, now change the cursor. It just
@@ -126,6 +128,8 @@ signals:
   void enableBlockSelection(bool enabled);
   void enableZoom(bool enabled);
   void enablePick(bool enabled);
+  void enablePolygonPointsSelection(bool enabled);
+  void enablePolygonCellsSelection(bool enabled);
 
   /// Fired with selection mode changes.
   /// \c selectionMode is enum Modes{...}.
@@ -164,6 +168,9 @@ protected:
 
   // Called whenever a selection is made in the view.
   void onSelectionChanged(vtkObject*, unsigned long, void*);
+
+  // Called whenever a polygon is drawn in the view
+  void onPolygonSelection(vtkObject*, unsigned long, void*);
 
 private:
   class pqInternal;

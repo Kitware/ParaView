@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCell.h"
 #include "vtkCollection.h"
+#include "vtkIntArray.h"
 #include "vtkInteractorStyleRubberBandZoom.h"
 #include "vtkMath.h"
 #include "vtkMemberFunctionCommand.h"
@@ -121,6 +122,20 @@ public:
             vtkCommand::LeftButtonReleaseEvent,
             this->Owner.data(),
             &pqRubberBandHelper::onZoom);
+      }
+  }
+
+
+  void AddPolygonObserver(vtkSMRenderViewProxy* proxyToObserver)
+  {
+    this->RemoveObserver();
+    this->ObservedProxy = proxyToObserver;
+    if(this->ObservedProxy)
+      {
+      this->ObserverId = this->ObservedProxy->AddObserver(
+            vtkCommand::SelectionChangedEvent,
+            this->Owner.data(),
+            &pqRubberBandHelper::onPolygonSelection);
       }
   }
 
@@ -222,6 +237,8 @@ void pqRubberBandHelper::emitEnabledSignals()
     emit this->enableSurfacePointsSelection(false);
     emit this->enableFrustumSelection(false);
     emit this->enableFrustumPointSelection(false);
+    emit this->enablePolygonPointsSelection(false);
+    emit this->enablePolygonCellsSelection(false);
     return;
     }
 
@@ -233,6 +250,10 @@ void pqRubberBandHelper::emitEnabledSignals()
           NULL == proxy->IsSelectVisibleCellsAvailable() : false);
     emit this->enableSurfacePointsSelection(proxy ?
           NULL == proxy->IsSelectVisiblePointsAvailable() : false);
+    emit this->enablePolygonCellsSelection(proxy ?
+      NULL == proxy->IsSelectVisibleCellsAvailable() : false);
+    emit this->enablePolygonPointsSelection(proxy ?
+      NULL == proxy->IsSelectVisiblePointsAvailable() : false);
     emit this->enablePick(proxy ?
           proxy->IsSelectionAvailable() : false);
     emit this->enableFrustumSelection(true);
@@ -296,6 +317,14 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
     rmp->UpdateVTKObjects();
     this->Internal->RenderView->setCursor(
       this->Internal->ZoomCursor);
+    }
+  else if (selectionMode == POLYGON_POINTS || selectionMode == POLYGON_CELLS)
+    {
+    vtkSMPropertyHelper(rmp, "InteractionMode").Set(
+      vtkPVRenderView::INTERACTION_MODE_POLYGON);
+    this->Internal->AddPolygonObserver(rmp);
+    rmp->UpdateVTKObjects();
+    this->Internal->RenderView->setCursor(Qt::PointingHandCursor);
     }
   else if (selectionMode == PICK_ON_CLICK)
     {
@@ -452,6 +481,11 @@ void pqRubberBandHelper::onSelectionChanged(vtkObject*, unsigned long,
 
   case FRUSTUM_POINTS:
     this->Internal->RenderView->selectFrustumPoints(region);
+    break;
+
+  case POLYGON_POINTS:
+    // nothing to do.
+    this->setRubberBandOff();
     break;
 
   case BLOCKS:
@@ -636,7 +670,41 @@ void pqRubberBandHelper::onZoom(vtkObject*, unsigned long, void*)
 {
   pqTimer::singleShot(0, this, SLOT(delayedSelectionChanged()));
 }
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::onPolygonSelection(vtkObject*, unsigned long,
+ void* vpolygonpoints)
+{
+  if (!this->Internal->RenderView)
+    {
+    //qDebug("Selection is unavailable without visible data.");
+    return;
+    }
 
+  vtkSMRenderViewProxy* rmp =
+    this->Internal->RenderView->getRenderViewProxy();
+  if (!rmp)
+    {
+    qDebug("No render module proxy specified. Cannot switch to selection");
+    return;
+    }
+
+  vtkObject* pointArray = static_cast<vtkObject*>(vpolygonpoints);
+  if(vpolygonpoints && vtkIntArray::SafeDownCast(pointArray))
+    {
+    vtkIntArray* polygonPoints = vtkIntArray::SafeDownCast(pointArray);
+    bool ctrl = (rmp->GetInteractor()->GetControlKey() == 1);
+    switch (this->Mode)
+      {
+      case POLYGON_POINTS:
+        this->Internal->RenderView->selectPolygonPoints(polygonPoints, ctrl);
+        break;
+      case POLYGON_CELLS:
+        this->Internal->RenderView->selectPolygonCells(polygonPoints, ctrl);
+        break;
+      }
+    this->endSelection();
+    }
+}
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::onPickOnClick(vtkObject*, unsigned long, void*)
 {

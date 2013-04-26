@@ -41,6 +41,7 @@ pqSelection3DHelper::pqSelection3DHelper(QObject* _parent/*=null*/)
   this->ActionSelect_Frustum      = 0;
   this->ActionSelectSurfacePoints = 0;
   this->ActionSelectionMode       = 0;
+  this->ActionSelectPolygonPoints = 0;
 
   this->PickObject          = false;
   this->Select_Block        = false;
@@ -48,6 +49,8 @@ pqSelection3DHelper::pqSelection3DHelper(QObject* _parent/*=null*/)
   this->Select_Frustum      = false;
   this->SelectSurfacePoints = false;
   this->SelectionMode       = false;
+  this->SelectPolygonPoints = false;
+  this->SelectPolygonCells  = false;
 
   this->ModeGroup = new QActionGroup(this);
   QObject::connect(
@@ -144,6 +147,32 @@ void pqSelection3DHelper::togglePick()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqSelection3DHelper::togglePolygonPointsSelection()
+{
+  if(this->SelectPolygonPoints)
+    {
+    this->endSelection();
+    }
+  else
+    {
+    this->setRubberBandOn(POLYGON_POINTS);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelection3DHelper::togglePolygonCellsSelection()
+{
+  if(this->SelectPolygonCells)
+    {
+    this->endSelection();
+    }
+  else
+    {
+    this->setRubberBandOn(POLYGON_CELLS);
+    }
+}
+
 // ----------------------------------------------------------------------------
 void pqSelection3DHelper::setActionSelectionMode(QAction *action)
 {
@@ -230,6 +259,36 @@ void pqSelection3DHelper::setActionPickObject(QAction *action)
     SLOT(togglePick()));
 }
 
+// ----------------------------------------------------------------------------
+void pqSelection3DHelper::setActionSelectPolygonPoints(QAction *action)
+{
+  this->ActionSelectPolygonPoints = action;
+  this->ModeGroup->addAction(this->ActionSelectPolygonPoints);
+  QObject::connect(
+    this,
+    SIGNAL(enablePolygonPointsSelection(bool)),
+    this->ActionSelectPolygonPoints, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->ActionSelectPolygonPoints, SIGNAL(triggered()),
+    this,
+    SLOT(togglePolygonPointsSelection()));
+}
+
+// ----------------------------------------------------------------------------
+void pqSelection3DHelper::setActionSelectPolygonCells(QAction *action)
+{
+  this->ActionSelectPolygonCells = action;
+  this->ModeGroup->addAction(this->ActionSelectPolygonCells);
+  QObject::connect(
+    this,
+    SIGNAL(enablePolygonCellsSelection(bool)),
+    this->ActionSelectPolygonCells, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->ActionSelectPolygonCells, SIGNAL(triggered()),
+    this,
+    SLOT(togglePolygonCellsSelection()));
+}
+
 //-----------------------------------------------------------------------------
 void pqSelection3DHelper::onSelectionModeChanged(int mode)
 {
@@ -283,6 +342,22 @@ void pqSelection3DHelper::onSelectionModeChanged(int mode)
         }
       break;
 
+    case pqSelection3DHelper::POLYGON_CELLS:
+      if(this->ActionSelectPolygonCells)
+        {
+        this->ActionSelectPolygonCells->setChecked(true);
+        this->SelectPolygonCells = true;
+        }
+      break;
+
+    case pqSelection3DHelper::POLYGON_POINTS:
+      if(this->ActionSelectPolygonPoints)
+        {
+        this->ActionSelectPolygonPoints->setChecked(true);
+        this->SelectPolygonPoints = true;
+        }
+      break;
+
     case pqSelection3DHelper::INTERACT:
       this->endSelection();
       if(this->SelectionMode)
@@ -314,6 +389,16 @@ void pqSelection3DHelper::onSelectionModeChanged(int mode)
         {
         this->ActionPickObject->setChecked(false);
         this->PickObject = false;
+        }
+      if (this->SelectPolygonPoints)
+        {
+        this->ActionSelectPolygonPoints->setChecked(false);
+        this->SelectPolygonPoints = false;
+        }
+      if (this->SelectPolygonCells)
+        {
+        this->ActionSelectPolygonCells->setChecked(false);
+        this->SelectPolygonCells = false;
         }
       break;
 

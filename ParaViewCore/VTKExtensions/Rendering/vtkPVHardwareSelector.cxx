@@ -51,7 +51,7 @@ bool vtkPVHardwareSelector::PassRequired(int pass)
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVHardwareSelector::Select(int region[4])
+bool vtkPVHardwareSelector::PrepareSelect()
 {
   if (this->NeedToRenderForSelection())
     {
@@ -62,12 +62,32 @@ vtkSelection* vtkPVHardwareSelector::Select(int region[4])
     if (this->CaptureBuffers() == false)
       {
       this->CaptureTime.Modified();
-      return NULL;
+      return false;
       }
     this->CaptureTime.Modified();
     }
+  return true;
+}
 
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVHardwareSelector::Select(int region[4])
+{
+  if(!this->PrepareSelect())
+    {
+    return NULL;
+    }
   return this->GenerateSelection(region[0], region[1], region[2], region[3]);
+}
+
+//----------------------------------------------------------------------------
+vtkSelection* vtkPVHardwareSelector::PolygonSelect(
+  int* polygonPoints, vtkIdType count)
+{
+  if(!this->PrepareSelect())
+    {
+    return NULL;
+    }
+  return this->GeneratePolygonSelection(polygonPoints, count);
 }
 
 //----------------------------------------------------------------------------

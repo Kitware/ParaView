@@ -40,6 +40,11 @@ public:
   vtkSelection* Select(int region[4]);
 
   // Description:
+  // Same as Select() above, except this one use a polygon, instead
+  // of a rectangle region, and select elements inside the polygon
+  vtkSelection* PolygonSelect(int* polygonPoints, vtkIdType count);
+
+  // Description:
   // Returns true when the next call to Select() will result in renders to
   // capture the selection-buffers.
   virtual bool NeedToRenderForSelection();
@@ -56,7 +61,7 @@ protected:
   vtkPVHardwareSelector();
   ~vtkPVHardwareSelector();
 
-   // Description:
+  // Description:
   // Return a unique ID for the prop.
   virtual int GetPropID(int idx, vtkProp* prop);
 
@@ -66,6 +71,11 @@ protected:
   // can be smart about it by only requiring it for sessions with more than 1
   // data-server.
   virtual bool PassRequired(int pass);
+
+  // Description:
+  // Prepare for selection.
+  // Return false if CaptureBuffers() is false
+  bool PrepareSelect();
 
   vtkTimeStamp CaptureTime;
   int UniqueId;

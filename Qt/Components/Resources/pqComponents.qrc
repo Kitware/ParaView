@@ -132,6 +132,8 @@
         <file>Icons/PluginYellow.png</file>
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>
+        <file>Icons/pqPolygonSelectSurfaceCell24.png</file>
+        <file>Icons/pqPolygonSelectSurfacePoint24.png</file>
         <file>Icons/pqPrint22.png</file>
         <file>Icons/pqProbeLocation24.png</file>
         <file>Icons/pqProgrammableFilter24.png</file>

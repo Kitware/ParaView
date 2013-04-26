@@ -26,6 +26,7 @@
 
 class vtkCamera;
 class vtkCollection;
+class vtkIntArray;
 class vtkPVGenericRenderWindowInteractor;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -53,6 +54,14 @@ public:
     vtkCollection* selectionSources,
     bool multiple_selections=false);
   bool SelectFrustumPoints(int region[4],
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
+    bool multiple_selections=false);
+  bool SelectPolygonPoints(vtkIntArray* polygon,
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
+    bool multiple_selections=false);
+  bool SelectPolygonCells(vtkIntArray* polygon,
     vtkCollection* selectedRepresentations,
     vtkCollection* selectionSources,
     bool multiple_selections=false);
@@ -163,6 +172,11 @@ protected:
     vtkCollection* selectionSources,
     bool multiple_selections,
     int fieldAssociation);
+  bool SelectPolygonInternal(vtkIntArray* polygon,
+    vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources,
+    bool multiple_selections,
+    const char* method);
 
   virtual vtkTypeUInt32 PreRender(bool interactive);
   virtual void PostRender(bool interactive);
