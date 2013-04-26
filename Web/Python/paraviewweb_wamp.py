@@ -197,6 +197,11 @@ class ReapingWampServerFactory(WampServerFactory):
         self._timeout = timeout
         WampServerFactory.__init__(self, url, debugWamp)
 
+    def startFactory(self):
+        if not self._reaper:
+            self._reaper = reactor.callLater(self._timeout, lambda: reactor.stop())
+        WampServerFactory.startFactory(self)
+
     def on_connect(self):
         """
         Called when a new connection is made.
@@ -215,12 +220,12 @@ class ReapingWampServerFactory(WampServerFactory):
         """
         Called when a connection is lost.
         """
-        self._connection_count -= 1
+        if self._connection_count > 0:
+            self._connection_count -= 1
         log.msg("connection_lost: connection count = %s" % self._connection_count,
             logLevel=logging.DEBUG)
+
         if self._connection_count == 0 and not self._reaper:
             log.msg("Starting timer, process will terminate in: %ssec" % self._timeout,
                 logLevel=logging.DEBUG)
-            self._reaper = Timer(self._timeout, lambda: reactor.stop())
-            self._reaper.daemon=True
-            self._reaper.start()
+            self._reaper = reactor.callLater(self._timeout, lambda: reactor.stop())
