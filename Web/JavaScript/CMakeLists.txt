@@ -49,10 +49,10 @@ add_custom_target(vtkParaViewWebJavaScript ALL DEPENDS
   ${paraview_all_min_js}
   "${CMAKE_CURRENT_BINARY_DIR}/ext-js-copy-complete")
 
-install(DIRECTORY ${ext_binary_dir}
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/js
+install(DIRECTORY "${CMAKE_BINARY_DIR}/www/ext/js-core"
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/ext/
   COMPONENT Runtime)
 
-install(DIRECTORY ${lib_binary_dir}
-  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/
+install(DIRECTORY "${CMAKE_BINARY_DIR}/www/lib/js/"
+  DESTINATION ${VTK_INSTALL_LIBRARY_DIR}/www/lib/js
   COMPONENT Runtime)
