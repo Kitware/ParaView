@@ -81,7 +81,6 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 
     vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);
-    vtkCPCxxHelper::Instance->Options->SetProcessType(vtkProcessModule::PROCESS_BATCH);
 
     vtkInitializationHelper::Initialize(
         argc, argv, vtkProcessModule::PROCESS_BATCH,

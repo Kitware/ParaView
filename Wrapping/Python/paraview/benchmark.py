@@ -112,14 +112,11 @@ def maximize_logs () :
         return
 
     # Not used here...
-    default_buffer_length[str(0x01)] = 1000000
-    default_buffer_length[str(0x04)] = 1000000
-    default_buffer_length[str(0x10)] = 1000000
-
-    default_log_threshold[str(0x01)] = 0.0
-    default_log_threshold[str(0x04)] = 0.0
-    default_log_threshold[str(0x10)] = 0.0
-
+    ss = paraview.servermanager.vtkSMSession
+    for ptype in [ss.CLIENT_AND_SERVERS, ss.CLIENT, ss.SERVERS,
+                 ss.RENDER_SERVER, ss.DATA_SERVER]:
+      default_buffer_length[str(ptype)] = 1000000
+      default_log_threshold[str(ptype)] = 0.0
 
 def dump_logs( filename ) :
     """
@@ -157,50 +154,29 @@ def get_logs() :
 
     connectionId = paraview.servermanager.ActiveConnection.ID
     session = paraview.servermanager.ActiveConnection.Session
-    pmOptions = pm.GetOptions()
 
-    """
-    vtkPVOptions::ProcessTypeEnum
-    PARAVIEW = 0x2,
-    PVCLIENT = 0x4,
-    PVSERVER = 0x8,
-    PVRENDER_SERVER = 0x10,
-    PVDATA_SERVER = 0x20,
-    PVBATCH = 0x40,
-    """
-    if pmOptions.GetProcessType() == 0x40:
+    is_symmetric_mode = False
+    if pm.GetProcessTypeAsInt() == pm.PROCESS_BATCH:
         runmode = 'batch'
+        is_symmetric_mode = pm.GetSymmetricMPIMode()
     else:
         runmode = 'interactive'
 
-    """
-    vtkSMSession::RenderingMode
-    RENDERING_NOT_AVAILABLE = 0x00,
-    RENDERING_UNIFIED = 0x01,
-    RENDERING_SPLIT = 0x02
-    """
-    if session.GetRenderClientMode() == 0x01:
+    if session.GetRenderClientMode() == session.RENDERING_UNIFIED:
         servertype = 'unified'
     else:
         servertype = 'split'
 
-    """
-    vtkProcessModule::SERVER_FLAGS
-    DATA_SERVER = 0x01,
-    DATA_SERVER_ROOT = 0x02,
-    RENDER_SERVER = 0x04,
-    RENDER_SERVER_ROOT = 0x08,
-    SERVERS = DATA_SERVER | RENDER_SERVER,
-    CLIENT = 0x10,
-    CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
-    """
     if runmode == 'batch':
-        components = [0x04]
+        # collect information from all processes in one go.
+        components = [session.CLIENT_AND_SERVERS]
     else:
         if servertype == 'unified':
-            components = [0x10, 0x04]
+            # collect information separately for client and servers.
+            components = [session.CLIENT, session.SERVERS]
         else:
-            components = [0x10, 0x04, 0x01]
+            # collect information separately for all process types.
+            components = [session.CLIENT, session.RENDER_SERVER, session.DATA_SERVER]
 
     for component in components:
         timerInfo = paraview.servermanager.vtkPVTimerInformation()
@@ -214,6 +190,13 @@ def get_logs() :
             alog.servertype = servertype
             alog.component = component
             alog.rank = i
+
+            if is_symmetric_mode:
+                # in Symmetric mode, GatherInformation() only collects
+                # information from the current node. so the
+                # vtkPVTimerInformation will only have info for local process.
+                alog.rank = pm.GetPartitionId()
+
             for line in timerInfo.GetLog(i).split('\n'):
                 alog.lines.append(line)
             logs.append(alog)
@@ -622,5 +605,20 @@ def run(filename=None, nframes=60):
     for i in results:
         print >>f, '"%s", %g, %g' % (i[0], i[1][1], i[2][1])
 
+
+def test_module():
+    """Simply exercises a few components of the module."""
+    maximize_logs()
+
+    paraview.servermanager.SetProgressPrintingEnabled(0)
+    ss = Sphere(ThetaResolution=1000, PhiResolution=500)
+    rep = Show()
+    v = Render()
+
+    print_logs()
+
 if __name__ == "__main__":
-    run()
+    if "--test" in sys.argv:
+        test_module()
+    else:
+        run()

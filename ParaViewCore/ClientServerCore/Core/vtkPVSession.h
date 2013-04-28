@@ -54,6 +54,14 @@ public:
   virtual ServerFlags GetProcessRoles();
 
   // Description:
+  // Convenience method that returns true if the current session is serving the
+  // indicated role on this process.
+  bool HasProcessRole(vtkTypeUInt32 flag)
+    {
+    return ((flag & static_cast<vtkTypeUInt32>(this->GetProcessRoles())) == flag);
+    }
+
+  // Description:
   // Returns the controller used to communicate with the process. Value must be
   // DATA_SERVER_ROOT or RENDER_SERVER_ROOT or CLIENT.
   // Default implementation returns NULL.
