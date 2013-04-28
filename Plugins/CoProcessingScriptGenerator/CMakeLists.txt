@@ -79,8 +79,6 @@ ADD_PARAVIEW_PLUGIN(
     ${PARAVIEW_PLUGIN_SRCS2}
 )
 
-target_link_libraries(CoProcessingPlugin vtkPVPythonCatalyst)
-
 IF (BUILD_TESTING)
   include(ParaViewTestingMacros)
   # this test is redundant with the CoProcessingFullWorkflow test
