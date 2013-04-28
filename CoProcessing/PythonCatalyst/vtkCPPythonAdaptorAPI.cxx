@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkCPPythonAdaptorAPI.h"
 
-#include "vtkCPPythonProcessor.h"
+#include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
 
 //----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void vtkCPPythonAdaptorAPI::CoProcessorInitialize(const char* pythonFileName)
 {
   if (!Superclass::CoProcessor)
     {
-    Superclass::CoProcessor = vtkCPPythonProcessor::New();
+    Superclass::CoProcessor = vtkCPProcessor::New();
     Superclass::CoProcessor->Initialize();
     }
   // needed to initialize vtkCPDataDescription.

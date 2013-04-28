@@ -564,7 +564,7 @@ if (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_ENABLE_CATALYST)
     ${CMAKE_CURRENT_SOURCE_DIR}/CoProcessing/PythonCatalyst/)
 
   list(APPEND VTK_PYTHON_MODULES ${vtk-module})
-  set(vtkPVPythonCatalyst_HEADERS vtkCPPythonHelper vtkCPPythonScriptPipeline vtkCPPythonProcessor)
+  set(vtkPVPythonCatalyst_HEADERS vtkCPPythonScriptPipeline)
   vtk_add_python_wrapping(${vtk-module})
   if (BUILD_TESTING)
     set (_test_module_name "${vtk-module}-Test-Cxx")

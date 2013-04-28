@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkCPPythonHelperConfig.h
+  Module:    vtkCPPythonScriptPipelineConfig.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkCPPythonHelperConfig_h
-#define __vtkCPPythonHelperConfig_h
+#ifndef __vtkCPPythonScriptPipelineConfig_h
+#define __vtkCPPythonScriptPipelineConfig_h
 
 // These variables are used to locate the python module files since we cannot
 // reply on the executable path to locate python module files.

@@ -19,7 +19,7 @@
 #include "vtkCPInputDataDescription.h"
 #include "vtkCPLinearScalarFieldFunction.h"
 #include "vtkCPNodalFieldBuilder.h"
-#include "vtkCPPythonProcessor.h"
+#include "vtkCPProcessor.h"
 #include "vtkCPPythonScriptPipeline.h"
 #include "vtkCPUniformGridBuilder.h"
 #include "vtkDataObject.h"
@@ -34,7 +34,7 @@ vtkStandardNewMacro(vtkPVCustomTestDriver);
 //----------------------------------------------------------------------------
 vtkPVCustomTestDriver::vtkPVCustomTestDriver()
 {
-  this->Processor = vtkCPPythonProcessor::New();
+  this->Processor = vtkCPProcessor::New();
   this->Processor->Initialize();
 
   // Specify how the field varies over space and time.

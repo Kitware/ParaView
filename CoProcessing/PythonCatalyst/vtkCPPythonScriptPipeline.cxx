@@ -12,24 +12,38 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// vtkPython is at the very beginning since it defines stuff
+// that will get defined elsewhere if it's not already defined
+#include "vtkPython.h"
+
 #include "vtkCPPythonScriptPipeline.h"
 
 #include "vtkCPDataDescription.h"
-#include "vtkCPPythonHelper.h"
 #include "vtkDataObject.h"
+#include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPVPythonOptions.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
+#include "vtkSMProxyManager.h"
+
+// for PARAVIEW_INSTALL_DIR and PARAVIEW_BINARY_DIR variables
+#include "vtkCPPythonScriptPipelineConfig.h"
 
 #include <string>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-vtkStandardNewMacro(vtkCPPythonScriptPipeline);
+extern "C" {
+  void vtkPVInitializePythonModules();
+}
 
+// static member variable.
+vtkSmartPointer<vtkPVPythonInterpretor> vtkCPPythonScriptPipeline::PythonInterpretor;
+
+vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 //----------------------------------------------------------------------------
 vtkCPPythonScriptPipeline::vtkCPPythonScriptPipeline()
 {
@@ -51,6 +65,14 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     return 0;
     }
 
+  vtkPVPythonInterpretor* interp =
+    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  if (!interp)
+    {
+    vtkErrorMacro("Could not setup Python interpretor correctly.")
+    return 0;
+    }
+
   // for now do not check on filename extension:
   //vtksys::SystemTools::GetFilenameLastExtension(FileName) == ".py" == 0)
 
@@ -65,9 +87,8 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     << "sys.path.append('" << fileNamePath << "')\n"
     << "import " << fileNameName << "\n";
 
-  vtkCPPythonHelper::GetPythonInterpretor()->RunSimpleString(
-    loadPythonModules.str().c_str());
-  vtkCPPythonHelper::GetPythonInterpretor()->FlushMessages();
+  interp->RunSimpleString(loadPythonModules.str().c_str());
+  interp->FlushMessages();
   return 1;
 }
 
@@ -80,6 +101,14 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
     vtkWarningMacro("dataDescription is NULL.");
     return 0;
     }
+
+  vtkPVPythonInterpretor* interp =
+    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  if (!interp)
+    {
+    return 0;
+    }
+
   // check the script to see if it should be run...
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
@@ -88,8 +117,8 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
               << dataDescriptionString << "')\n"
               << this->PythonScriptName << ".RequestDataDescription(dataDescription)\n";
 
-  vtkCPPythonHelper::GetPythonInterpretor()->RunSimpleString(pythonInput.str().c_str());
-  vtkCPPythonHelper::GetPythonInterpretor()->FlushMessages();
+  interp->RunSimpleString(pythonInput.str().c_str());
+  interp->FlushMessages();
 
   return dataDescription->GetIfAnyGridNecessary()? 1: 0;
 }
@@ -103,6 +132,14 @@ int vtkCPPythonScriptPipeline::CoProcess(
     vtkWarningMacro("DataDescription is NULL.");
     return 0;
     }
+
+  vtkPVPythonInterpretor* interp =
+    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  if (!interp)
+    {
+    return 0;
+    }
+
   vtkStdString dataDescriptionString = this->GetPythonAddress(dataDescription);
 
   vtksys_ios::ostringstream pythonInput;
@@ -111,9 +148,8 @@ int vtkCPPythonScriptPipeline::CoProcess(
     << dataDescriptionString << "')\n"
     << this->PythonScriptName << ".DoCoProcessing(dataDescription)\n";
 
-  vtkCPPythonHelper::GetPythonInterpretor()->RunSimpleString(
-    pythonInput.str().c_str());
-  vtkCPPythonHelper::GetPythonInterpretor()->FlushMessages();
+  interp->RunSimpleString(pythonInput.str().c_str());
+  interp->FlushMessages();
 
   return 1;
 }
@@ -136,6 +172,61 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
 
   vtkStdString value = aplus;
   return value;
+}
+
+//----------------------------------------------------------------------------
+vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::GetPythonInterpretor()
+{
+  if (vtkCPPythonScriptPipeline::PythonInterpretor)
+    {
+    return vtkCPPythonScriptPipeline::PythonInterpretor;
+    }
+
+  // create and setup a new interpretor.
+  vtkNew<vtkPVPythonInterpretor> interp;
+
+  // register callback to initialize modules statically. The callback is
+  // empty when BUILD_SHARED_LIBS is ON.
+  vtkPVInitializePythonModules();
+
+  int argc = 1;
+  char* argv[1];;
+  std::string CWD = vtksys::SystemTools::GetCurrentWorkingDirectory();
+  argv[0] = new char[CWD.size()+1];
+#ifdef COPROCESSOR_WIN32_BUILD
+  strcpy_s(argv[0], strlen(CWD.c_str()), CWD.c_str());
+#else
+  strcpy(argv[0], CWD.c_str());
+#endif
+
+  interp->InitializeSubInterpretor(argc, argv);
+  interp->AddPythonPath(PARAVIEW_INSTALL_DIR "/lib");
+  interp->AddPythonPath(
+    PARAVIEW_INSTALL_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
+  interp->AddPythonPath(PARAVIEW_BINARY_DIR "/lib");
+  interp->AddPythonPath(
+    PARAVIEW_BINARY_DIR "/lib/paraview-" PARAVIEW_VERSION "/site-packages");
+
+  vtksys_ios::ostringstream loadPythonModules;
+  loadPythonModules
+    << "import sys\n"
+    << "import paraview\n"
+    << "f1 = paraview.print_error\n"
+    << "f2 = paraview.print_debug_info\n"
+    << "def print_dummy(text):\n"
+    << "  pass\n"
+    << "paraview.print_error = print_dummy\n"
+    << "paraview.print_debug_info = print_dummy\n"
+    << "from paraview.simple import *\n"
+    << "paraview.print_error = f1\n"
+    << "paraview.print_debug_info = f2\n"
+    << "import vtkPVCatalystPython\n";
+  interp->RunSimpleString(loadPythonModules.str().c_str());
+  interp->FlushMessages();
+  delete []argv[0];
+
+  vtkCPPythonScriptPipeline::PythonInterpretor = interp.GetPointer();
+  return interp.GetPointer();
 }
 
 //----------------------------------------------------------------------------

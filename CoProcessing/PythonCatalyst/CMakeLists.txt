@@ -31,8 +31,6 @@
 set (Module_SRCS
   CPythonAdaptorAPI.cxx
   vtkCPPythonAdaptorAPI.cxx
-  vtkCPPythonHelper.cxx
-  vtkCPPythonProcessor.cxx
   vtkCPPythonScriptPipeline.cxx
 )
 
@@ -40,8 +38,8 @@ set_source_files_properties(
   vtkCPPythonAdaptorAPI
   ABSTRACT)
 
-configure_file(vtkCPPythonHelperConfig.h.in
-               vtkCPPythonHelperConfig.h @ONLY)
+configure_file(vtkCPPythonScriptPipelineConfig.h.in
+               vtkCPPythonScriptPipelineConfig.h @ONLY)
 
 
 set (${vtk-module}_HDRS CPythonAdaptorAPI.h)
