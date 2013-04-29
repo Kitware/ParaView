@@ -132,7 +132,7 @@ void initPermTexture(GLuint *texID)
 {
   char *pixels;
   int i,j;
-  glActiveTexture(GL_TEXTURE1);
+  vtkgl::ActiveTexture(vtkgl::TEXTURE1);
 
   glGenTextures(1, texID); // Generate a unique texture ID
   glBindTexture(GL_TEXTURE_2D, *texID); // Bind the texture to texture unit 0
@@ -153,7 +153,7 @@ void initPermTexture(GLuint *texID)
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-  glActiveTexture(GL_TEXTURE0); // Switch active texture unit back to 0 again
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0); // Switch active texture unit back to 0 again
 }
 
 /*
@@ -164,7 +164,7 @@ void initPermTexture(GLuint *texID)
  */
 void initSimplexTexture(GLuint *texID)
 {
-  glActiveTexture(GL_TEXTURE2); // Activate a different texture unit (unit 1)
+  vtkgl::ActiveTexture(vtkgl::TEXTURE2); // Activate a different texture unit (unit 1)
 
   glGenTextures(1, texID); // Generate a unique texture ID
   glBindTexture(GL_TEXTURE_1D, *texID); // Bind the texture to texture unit 1
@@ -174,7 +174,7 @@ void initSimplexTexture(GLuint *texID)
   glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
   glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-  glActiveTexture(GL_TEXTURE0); // Switch active texture unit back to 0 again
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0); // Switch active texture unit back to 0 again
 }
 
 /*
@@ -186,7 +186,7 @@ void initGradTexture(GLuint *texID)
   char *pixels;
   int i,j;
 
-  glActiveTexture(GL_TEXTURE3); // Activate a different texture unit (unit 2)
+  vtkgl::ActiveTexture(vtkgl::TEXTURE3); // Activate a different texture unit (unit 2)
 
   glGenTextures(1, texID); // Generate a unique texture ID
   glBindTexture(GL_TEXTURE_2D, *texID); // Bind the texture to texture unit 2
@@ -207,7 +207,7 @@ void initGradTexture(GLuint *texID)
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-  glActiveTexture(GL_TEXTURE0); // Switch active texture unit back to 0 again
+  vtkgl::ActiveTexture(vtkgl::TEXTURE0); // Switch active texture unit back to 0 again
 }
 
 } // end anonymous namespace
