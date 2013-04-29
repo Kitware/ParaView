@@ -67,6 +67,7 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
                                                            vtkSMProperty *smProperty)
 {
   // handle properties that specify custom panel widgets
+  // *** NOTE: When adding new types, please update the header documentation ***
   const char *custom_widget = smProperty->GetPanelWidget();
   if(custom_widget)
     {
@@ -104,10 +105,11 @@ pqStandardPropertyWidgetInterface::createWidgetForProperty(vtkSMProxy *smProxy,
       {
       return new pqDoubleRangeSliderPropertyWidget(smProxy, smProperty);
       }
-    else
-      {
-      qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
-      }
+    // we should not report any errors/messages on failure.
+    //else
+    //  {
+    //  qDebug() << "Unknown \"panel_widget\" '" << name.c_str() << "' specified.";
+    //  }
     }
 
   return 0;
@@ -118,6 +120,7 @@ pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
                                                                 vtkSMPropertyGroup *group)
 {
+  // *** NOTE: When adding new types, please update the header documentation ***
   if(QString(group->GetPanelWidget()) == "ColorEditor")
     {
     return new pqColorEditorPropertyWidget(proxy);
@@ -139,6 +142,7 @@ pqPropertyWidgetDecorator*
 pqStandardPropertyWidgetInterface::createWidgetDecorator(
   const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget)
 {
+  // *** NOTE: When adding new types, please update the header documentation ***
   if (type == "ClipScalarsDecorator")
     {
     return new pqClipScalarsDecorator(config, widget);
