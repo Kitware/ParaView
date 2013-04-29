@@ -1106,7 +1106,7 @@
                proxyname="SurfaceRepresentation"></Proxy>
         <ExposedProperties>
           <PropertyGroup panel_visibility="default"
-                         type="ColorEditor"
+                         panel_widget="ColorEditor"
                          label="Coloring" >
             <Property name="Ambient" />
             <Property name="AmbientColor" />
@@ -1247,7 +1247,7 @@
         <ExposedProperties>
           <PropertyGroup label="Cube Axes"
                          panel_visibility="default"
-                         type="CubeAxes">
+                         panel_widget="CubeAxes">
             <Property exposed_name="CubeAxesColor"
                       name="Color" />
             <Property exposed_name="CubeAxesCornerOffset"
@@ -4284,7 +4284,7 @@
           <ExposedProperties>
             <PropertyGroup panel_visibility="default"
                            label="Color"
-                           type="ColorEditor">
+                           panel_widget="ColorEditor">
               <Property name="AllowSpecularHighlightingWithScalarColoring" />
               <Property name="Ambient" />
               <Property name="AmbientColor" />
@@ -4441,7 +4441,7 @@
       <ExposedProperties>
         <PropertyGroup label="Cube Axes"
                        panel_visibility="default"
-                       type="CubeAxes">
+                       panel_widget="CubeAxes">
           <Property exposed_name="CubeAxesColor"
                     name="Color" />
           <Property exposed_name="CubeAxesCornerOffset"

@@ -1369,10 +1369,20 @@ vtkSMPropertyGroup* vtkSMProxy::NewPropertyGroup(vtkPVXMLElement* groupElem)
     group->SetXMLLabel(groupLabel);
     }
 
+  // this is deprecated attribute that's replaced by "panel_widget". We still
+  // process it for backwards compatibility.
   const char *groupType = groupElem->GetAttribute("type");
   if(groupType)
     {
-    group->SetType(groupType);
+    vtkWarningMacro("Found deprecated attribute 'type' of PropertyGroup. "
+      "Please use 'panel_widget' instead.");
+    group->SetPanelWidget(groupType);
+    }
+
+  groupType = groupElem->GetAttribute("panel_widget");
+  if(groupType)
+    {
+    group->SetPanelWidget(groupType);
     }
 
   const char *panelVisibility = groupElem->GetAttribute("panel_visibility");

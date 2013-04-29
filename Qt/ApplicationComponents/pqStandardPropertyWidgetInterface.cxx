@@ -118,19 +118,18 @@ pqPropertyWidget*
 pqStandardPropertyWidgetInterface::createWidgetForPropertyGroup(vtkSMProxy *proxy,
                                                                 vtkSMPropertyGroup *group)
 {
-  if(QString(group->GetType()) == "ColorEditor")
+  if(QString(group->GetPanelWidget()) == "ColorEditor")
     {
     return new pqColorEditorPropertyWidget(proxy);
     }
-  else if(QString(group->GetType()) == "CubeAxes")
+  else if(QString(group->GetPanelWidget()) == "CubeAxes")
     {
     return new pqCubeAxesPropertyWidget(proxy);
     }
-  else if (QString(group->GetType()) == "ArrayStatus")
+  else if (QString(group->GetPanelWidget()) == "ArrayStatus")
     {
     return new pqArrayStatusPropertyWidget(proxy, group);
     }
-
 
   return 0;
 }

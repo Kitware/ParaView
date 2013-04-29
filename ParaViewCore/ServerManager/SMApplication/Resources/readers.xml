@@ -2962,7 +2962,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="PointArrayStatus" />
             <Property name="CellArrayStatus" />
           </PropertyGroup>
@@ -3319,7 +3319,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3378,7 +3378,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3436,7 +3436,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3494,7 +3494,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3552,7 +3552,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3612,7 +3612,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3673,7 +3673,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3735,7 +3735,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3796,7 +3796,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -3858,7 +3858,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
@@ -5168,7 +5168,7 @@
           <PropertyGroup label="Variables"
                          name="Variables"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="GenerateObjectIdCellArray" />
             <Property name="GenerateGlobalElementIdArray" />
             <Property name="ElementVariables" />
@@ -5191,7 +5191,7 @@
           <PropertyGroup label="Sets"
                          name="Sets"
                          panel_visibility="advanced"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="NodeSetArrayStatus" />
             <Property name="SideSetArrayStatus" />
             <Property name="FaceSetArrayStatus" />
@@ -5201,7 +5201,7 @@
           <PropertyGroup label="Maps"
                          name="Maps"
                          panel_visibility="advanced"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="NodeMapArrayStatus" />
             <Property name="EdgeMapArrayStatus" />
             <Property name="FaceMapArrayStatus" />
@@ -5310,7 +5310,7 @@
           <PropertyGroup label="Variables"
                          name="Variables"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="GenerateObjectIdCellArray" />
             <Property name="GenerateGlobalElementIdArray" />
             <Property name="ElementVariables" />
@@ -5333,7 +5333,7 @@
           <PropertyGroup label="Sets"
                          name="Sets"
                          panel_visibility="advanced"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="NodeSetArrayStatus" />
             <Property name="SideSetArrayStatus" />
             <Property name="FaceSetArrayStatus" />
@@ -5343,7 +5343,7 @@
           <PropertyGroup label="Maps"
                          name="Maps"
                          panel_visibility="advanced"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="NodeMapArrayStatus" />
             <Property name="EdgeMapArrayStatus" />
             <Property name="FaceMapArrayStatus" />
@@ -5447,7 +5447,7 @@
           <PropertyGroup label="Cell/Point Array Status"
                          name="CellPointArrayStatus"
                          panel_visibility="default"
-                         type="ArrayStatus">
+                         panel_widget="ArrayStatus">
             <Property name="CellArrayInfo" />
             <Property name="CellArrayStatus" />
             <Property name="PointArrayInfo" />
