@@ -1553,15 +1553,15 @@ void pqColorScaleEditor::addActiveValues()
         else
           {
           bool ok;
-          double x = comp.ToDouble(&ok);
+          double dval = comp.ToDouble(&ok);
           // String or vector values cannot be mapped to a double, so make them NaN
           if (!ok || uniq->GetNumberOfComponents() > 1)
             {
             // Retrieve the NaN color. Not all vtkScalarsToColors
             // subclasses have one, so we are stuck using GetColor.
-            x = vtkMath::Nan();
+            dval = vtkMath::Nan();
             }
-          tf->GetColor(x, color.GetData());
+          tf->GetColor(dval, color.GetData());
           }
         valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
         }
@@ -1598,8 +1598,8 @@ void pqColorScaleEditor::addAnnotationEntry()
       }
     else
       {
-      double x = vtkMath::Nan();
-      tf->GetColor(x, color.GetData());
+      double dval = vtkMath::Nan();
+      tf->GetColor(dval, color.GetData());
       }
     valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
     }
@@ -1662,15 +1662,15 @@ void pqColorScaleEditor::updateAnnotationColors()
       else
         {
         bool ok;
-        double x = valItem->data(PQ_ANN_VALUE_COL, Qt::DisplayRole).toDouble(&ok);
+        double dval = valItem->data(PQ_ANN_VALUE_COL, Qt::DisplayRole).toDouble(&ok);
         // String or vector values cannot be mapped to a double, so make them NaN
         if (!ok)
           {
           // Retrieve the NaN color. Not all vtkScalarsToColors
           // subclasses have one, so we are stuck using GetColor.
-          x = vtkMath::Nan();
+          dval = vtkMath::Nan();
           }
-        tf->GetColor(x, color.GetData());
+        tf->GetColor(dval, color.GetData());
         }
       valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
       }
@@ -2013,14 +2013,14 @@ void pqColorScaleEditor::loadAnnotations()
       else
         {
         bool ok;
-        double x = list[i].toDouble(&ok);
+        double dval = list[i].toDouble(&ok);
         if (!ok)
           {
           // Retrieve the NaN color. Not all vtkScalarsToColors
           // subclasses have one, so we are stuck using GetColor.
-          x = vtkMath::Nan();
+          dval = vtkMath::Nan();
           }
-        tf->GetColor(x, color.GetData());
+        tf->GetColor(dval, color.GetData());
         }
       valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
       }
