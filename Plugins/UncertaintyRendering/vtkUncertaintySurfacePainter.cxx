@@ -39,6 +39,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkScalarsToColors.h"
 #include "vtkScalarsToColorsPainter.h"
+#include "vtkOpenGLExtensionManager.h"
 
 // vertex and fragment shader source code for the uncertainty surface
 extern const char* vtkUncertaintySurfacePainter_fs;
@@ -311,6 +312,39 @@ void vtkUncertaintySurfacePainter::PrepareForRendering(vtkRenderer *renderer,
   if(this->LastRenderWindow && this->LastRenderWindow != renWin)
     {
     this->ReleaseGraphicsResources(this->LastRenderWindow);
+    }
+
+  if(!vtkgl::ActiveTexture)
+    {
+    // try to load the multitexture extensions
+    vtkOpenGLExtensionManager *extensions = vtkOpenGLExtensionManager::New();
+    extensions->SetRenderWindow(renWin);
+
+    if(!(extensions->LoadSupportedExtension("GL_ARB_multitexture") &&
+         extensions->LoadSupportedExtension("GL_VERSION_1_2")))
+      {
+      vtkWarningMacro(<< "GL_ARB_multitexture is not supported.");
+      this->RenderingPreparationSuccess = 0;
+      extensions->Delete();
+      return;
+      }
+
+    if(!vtkgl::ActiveTexture)
+      {
+      // try to load the function directly
+      vtkgl::ActiveTexture =
+        (vtkgl::PFNGLACTIVETEXTUREPROC) extensions->GetProcAddress("glActiveTextureARB");
+      }
+
+    if(!vtkgl::ActiveTexture)
+      {
+      vtkWarningMacro(<< "vtkgl::ActiveTexture() not found.");
+      this->RenderingPreparationSuccess = 0;
+      extensions->Delete();
+      return;
+      }
+
+    extensions->Delete();
     }
 
   // store current render window
