@@ -26,10 +26,10 @@ import paraview, re, new, sys, vtk
 import simple
 import servermanager
 
-from vtkPVClientServerCorePython import *
-from vtkPVServerImplementationPython import *
-from vtkPVServerManagerPython import *
-from vtkPVCommonPython import *
+from paraview.vtk import vtkPVClientServerCoreCore
+from paraview.vtk import vtkPVServerManagerCore
+from paraview.vtk import vtkPVServerImplementationCore
+from paraview.vtk import vtkCommonCore
 
 def processServerEvents():
   """Update the local state based on the notifications received from the server
@@ -37,5 +37,5 @@ def processServerEvents():
   if servermanager.ActiveConnection:
      session = servermanager.ActiveConnection.Session
      if session.IsMultiClients() and session.IsNotBusy():
-        while vtkProcessModule.GetProcessModule().GetNetworkAccessManager().ProcessEvents(100):
+        while vtkPVClientServerCoreCore.vtkProcessModule.GetProcessModule().GetNetworkAccessManager().ProcessEvents(100):
           pass
