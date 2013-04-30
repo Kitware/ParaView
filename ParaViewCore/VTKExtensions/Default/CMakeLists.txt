@@ -93,12 +93,14 @@ set(Module_SRCS
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
   vtkPVDReader.cxx
+  vtkPVDataSetAlgorithmSelectorFilter.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerReader2.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVExtractVOI.cxx
   vtkPVFrustumActor.cxx
   vtkPVGlyphFilter.cxx
+  vtkPVImageReader.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMetaClipDataSet.cxx
   vtkPVMetaSliceDataSet.cxx
@@ -107,7 +109,6 @@ set(Module_SRCS
   vtkPVSelectionSource.cxx
   vtkPVTextSource.cxx
   vtkPVTransform.cxx
-  vtkPVDataSetAlgorithmSelectorFilter.cxx
   vtkQuerySelectionSource.cxx
   vtkRectilinearGridConnectivity.cxx
   vtkScatterPlotMapper.cxx
