@@ -483,6 +483,7 @@ void vtkXMLPVDWriter::CreateWriters()
       w->SetBlockSize(this->GetBlockSize());
       w->SetDataMode(this->GetDataMode());
       w->SetEncodeAppendedData(this->GetEncodeAppendedData());
+      w->SetHeaderType(this->GetHeaderType());
       }
     
     // If this is a parallel writer, set the piece information.

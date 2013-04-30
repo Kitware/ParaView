@@ -22,6 +22,18 @@
         <Documentation>The input filter/source whose output dataset is to
         written to the files.</Documentation>
       </InputProperty>
+      <IntVectorProperty command="SetHeaderType"
+                         default_values="32"
+                         name="HeaderType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="UInt32" value="32" />
+          <Entry text="UInt64" value="64" />
+        </EnumerationDomain>
+        <Documentation>Set the binary data header word type.  The default is
+        UInt32. Set to UInt64 when storing arrays requiring 64-bit indexing.
+        </Documentation>
+      </IntVectorProperty>
       <IntVectorProperty command="SetDataMode"
                          default_values="2"
                          name="DataMode"
@@ -80,9 +92,12 @@
                proxygroup="internal_writers"
                proxyname="XMLDataSetWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <!-- End of XMLDataSetWriterBase -->
@@ -279,9 +294,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPPolyDataWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -318,9 +336,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPUnstructuredGridWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -357,9 +378,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPStructuredGridWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -396,9 +420,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPRectilinearGridWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -435,9 +462,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPImageDataWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -474,9 +504,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPMultiBlockDataWriterCore"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
@@ -515,9 +548,12 @@
                proxygroup="internal_writers"
                proxyname="XMLPUniformGridAMRWriter"></Proxy>
         <ExposedProperties>
-          <Property name="DataMode" />
-          <Property name="EncodeAppendedData" />
-          <Property name="CompressorType" />
+          <PropertyGroup label="XML Writer Parameters">
+            <Property name="DataMode" />
+            <Property name="HeaderType" />
+            <Property name="EncodeAppendedData" />
+            <Property name="CompressorType" />
+          </PropertyGroup>
         </ExposedProperties>
       </SubProxy>
       <Hints>
