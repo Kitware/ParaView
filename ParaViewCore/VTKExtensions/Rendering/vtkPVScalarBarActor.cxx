@@ -542,7 +542,7 @@ void vtkPVScalarBarActor::LayoutTicks()
   vtkNew<vtkTextRenderer> dummyRenderer;
   vtkNew<vtkTextProperty> dummyProp;
   dummyProp->ShallowCopy(this->LabelTextProperty);
-  int targetHeight, targetWidth;
+  int targetHeight;
   int bbox[4];
 
   // Initialize the height with the requested height from the font (which
@@ -575,7 +575,6 @@ void vtkPVScalarBarActor::LayoutTicks()
       {
       this->P->TickBox.Posn[0] += this->P->ScalarBarBox.Size[0];
       }
-    targetWidth = this->P->TickBox.Size[0] - this->LabelSpace - 2;
 
     int maxHeight = static_cast<int>(
       this->P->ScalarBarBox.Size[1] / this->NumberOfLabels);
@@ -586,8 +585,6 @@ void vtkPVScalarBarActor::LayoutTicks()
     this->P->TickBox.Size[0] =
       this->LabelSpace + 2 + targetHeight;
     this->P->TickBox.Size[1] = this->P->ScalarBarBox.Size[1];
-    targetWidth = static_cast<int>(
-      this->P->TickBox.Size[1] * 0.9 / this->NumberOfLabels);
     //targetHeight = std::min(targetHeight, this->P->TickBox.Size[0]);
     if (this->TextPosition == PrecedeScalarBar)
       { // Push scalar bar and NaN swatch up to make room for ticks.
