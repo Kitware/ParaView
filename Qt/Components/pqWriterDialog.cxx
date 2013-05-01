@@ -59,8 +59,11 @@ pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) : Superclass(p),
   this->Implementation->Proxy = proxy;
   this->Implementation->UI.setupUi(this);
   this->Implementation->ProxyWidget = new pqProxyWidget(proxy, this);
-  this->Implementation->UI.PropertiesFrame->setWidget(
-    this->Implementation->ProxyWidget);
+  QVBoxLayout* vbox = new QVBoxLayout(this->Implementation->UI.Container);
+  vbox->addWidget(this->Implementation->ProxyWidget);
+  vbox->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum,
+      QSizePolicy::Expanding));
+
   this->Implementation->HasConfigurableProperties =
     this->Implementation->ProxyWidget->filterWidgets(true);
 }
