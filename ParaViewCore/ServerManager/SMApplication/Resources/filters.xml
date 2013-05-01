@@ -5705,6 +5705,7 @@ found and the point will be rejected.</Documentation>
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
       </StringVectorProperty>
+
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Isosurfaces"
@@ -5726,6 +5727,7 @@ found and the point will be rejected.</Documentation>
         isosurfaces/isolines and also the number of such
         values.</Documentation>
       </DoubleVectorProperty>
+
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
                          default_values="1"
@@ -7966,6 +7968,7 @@ found and the point will be rejected.</Documentation>
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
       </StringVectorProperty>
+
       <DoubleVectorProperty animateable="1"
                             command="SetValue"
                             label="Isosurfaces"
@@ -7987,6 +7990,8 @@ found and the point will be rejected.</Documentation>
         isosurfaces/isolines and also the number of such
         values.</Documentation>
       </DoubleVectorProperty>
+
+
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
                          default_values="1"

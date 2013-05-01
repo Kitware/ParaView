@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 class QListWidgetItem;
+class vtkSMDoubleRangeDomain;
 class vtkSMDoubleVectorPropertyWidget;
 class pqScalarValueListPropertyWidgetPrivate;
 
@@ -55,6 +56,9 @@ public:
   void setScalars(const QVariantList &scalars);
   QVariantList scalars() const;
 
+  /// Sets range domain that will be used to initialize the scalar range.
+  void setRangeDomain(vtkSMDoubleRangeDomain* smRangeDomain);
+
 signals:
   void scalarsChanged();
 
@@ -65,6 +69,8 @@ private slots:
   void addRange();
   void deleteScalar();
   void deleteAllScalars();
+  void smRangeModified();
+  bool getRange(double& range_min, double& range_max);
 
 private:
   Q_DISABLE_COPY(pqScalarValueListPropertyWidget)
