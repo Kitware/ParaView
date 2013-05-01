@@ -41,7 +41,7 @@ extern "C" {
 }
 
 // static member variable.
-vtkSmartPointer<vtkPVPythonInterpretor> vtkCPPythonScriptPipeline::PythonInterpretor;
+vtkWeakPointer<vtkPVPythonInterpretor> vtkCPPythonScriptPipeline::GlobalPythonInterpretor;
 
 vtkStandardNewMacro(vtkCPPythonScriptPipeline);
 //----------------------------------------------------------------------------
@@ -54,6 +54,7 @@ vtkCPPythonScriptPipeline::vtkCPPythonScriptPipeline()
 vtkCPPythonScriptPipeline::~vtkCPPythonScriptPipeline()
 {
   this->SetPythonScriptName(0);
+  this->PythonInterpretor = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -65,8 +66,7 @@ int vtkCPPythonScriptPipeline::Initialize(const char* fileName)
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp =
-    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
   if (!interp)
     {
     vtkErrorMacro("Could not setup Python interpretor correctly.")
@@ -102,8 +102,7 @@ int vtkCPPythonScriptPipeline::RequestDataDescription(
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp =
-    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
   if (!interp)
     {
     return 0;
@@ -133,8 +132,7 @@ int vtkCPPythonScriptPipeline::CoProcess(
     return 0;
     }
 
-  vtkPVPythonInterpretor* interp =
-    vtkCPPythonScriptPipeline::GetPythonInterpretor();
+  vtkPVPythonInterpretor* interp = this->GetPythonInterpretor();
   if (!interp)
     {
     return 0;
@@ -177,9 +175,21 @@ vtkStdString vtkCPPythonScriptPipeline::GetPythonAddress(void* pointer)
 //----------------------------------------------------------------------------
 vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::GetPythonInterpretor()
 {
-  if (vtkCPPythonScriptPipeline::PythonInterpretor)
+  if (this->PythonInterpretor == NULL)
     {
-    return vtkCPPythonScriptPipeline::PythonInterpretor;
+    this->PythonInterpretor.TakeReference(
+      vtkCPPythonScriptPipeline::NewPythonInterpretor());
+    }
+  return this->PythonInterpretor;
+}
+
+//----------------------------------------------------------------------------
+vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::NewPythonInterpretor()
+{
+  if (vtkCPPythonScriptPipeline::GlobalPythonInterpretor)
+    {
+    vtkCPPythonScriptPipeline::GlobalPythonInterpretor->Register(NULL);
+    return vtkCPPythonScriptPipeline::GlobalPythonInterpretor;
     }
 
   // create and setup a new interpretor.
@@ -225,7 +235,8 @@ vtkPVPythonInterpretor* vtkCPPythonScriptPipeline::GetPythonInterpretor()
   interp->FlushMessages();
   delete []argv[0];
 
-  vtkCPPythonScriptPipeline::PythonInterpretor = interp.GetPointer();
+  vtkCPPythonScriptPipeline::GlobalPythonInterpretor = interp.GetPointer();
+  interp->Register(NULL);
   return interp.GetPointer();
 }
 

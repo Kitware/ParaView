@@ -19,6 +19,7 @@
 #include "vtkStdString.h"  // for the string
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
 #include "vtkSmartPointer.h" // for vtkSmartPointer.
+#include "vtkWeakPointer.h" // for vtkWeakPointer.
 
 class vtkCPDataDescription;
 class vtkPVPythonInterpretor;
@@ -63,7 +64,8 @@ protected:
   vtkGetStringMacro(PythonScriptName);
 
   /// Provides access to the Python interpretor.
-  static vtkPVPythonInterpretor* GetPythonInterpretor();
+  vtkPVPythonInterpretor* GetPythonInterpretor();
+  vtkSmartPointer<vtkPVPythonInterpretor> PythonInterpretor;
 
 private:
   vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&); // Not implemented
@@ -73,7 +75,8 @@ private:
   /// that is used as the namespace of the functions of the script.
   char* PythonScriptName;
   
-  static vtkSmartPointer<vtkPVPythonInterpretor> PythonInterpretor;
+  static vtkPVPythonInterpretor* NewPythonInterpretor();
+  static vtkWeakPointer<vtkPVPythonInterpretor> GlobalPythonInterpretor;
 };
 
 #endif
