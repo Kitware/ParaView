@@ -82,9 +82,13 @@ private:
   unsigned int orientation;
   double dataTypeSize;
   unsigned int Type;
-  int width;
-  int height;
-  int depth;
+  int voxelDimensions[3];
+  int diskDimensions[3];
+  int diskExtent[6];
+  double diskSpacing[3];
+  //int width;
+  //int height;
+  //int depth;
   int binaryOnDiskWidth;
   int binaryOnDiskHeight;
   int binaryOnDiskDepth;
