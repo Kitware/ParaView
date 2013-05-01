@@ -16,6 +16,7 @@
 
 #include "vtkAnnotationLink.h"
 #include "vtkAxis.h"
+#include "vtkChartWarning.h"
 #include "vtkChartLegend.h"
 #include "vtkChartParallelCoordinates.h"
 #include "vtkChartXY.h"
@@ -73,6 +74,7 @@ vtkPVXYChartView::vtkPVXYChartView()
   // Use the buffer id - performance issues are fixed.
   this->ContextView->GetScene()->SetUseBufferId(true);
   this->ContextView->GetScene()->SetScaleTiles(false);
+  this->LogScaleWarningLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +84,11 @@ vtkPVXYChartView::~vtkPVXYChartView()
     {
     this->Chart->Delete();
     this->Chart = NULL;
+    }
+  if (LogScaleWarningLabel)
+    {
+    this->LogScaleWarningLabel->Delete();
+    this->LogScaleWarningLabel = NULL;
     }
   this->PlotTime->Delete();
   this->PlotTime = NULL;
@@ -118,6 +125,11 @@ void vtkPVXYChartView::SetChartType(const char *type)
     this->Chart->Delete();
     this->Chart = NULL;
     }
+  if (LogScaleWarningLabel)
+    {
+    this->LogScaleWarningLabel->Delete();
+    this->LogScaleWarningLabel = NULL;
+    }
 
   // Construct the correct type of chart
   if (strcmp(type, "Line") == 0 || strcmp(type, "Bar") == 0)
@@ -148,6 +160,19 @@ void vtkPVXYChartView::SetChartType(const char *type)
       vtkNew<vtkAnnotationLink> annLink;
       this->Chart->SetAnnotationLink(annLink.GetPointer());
       }
+
+    // Set up a warning for when log-scaling is requested on negative values
+    this->LogScaleWarningLabel = vtkChartWarning::New();
+    this->LogScaleWarningLabel->SetLabel(
+      "WARNING!\n"
+      "One or more plot series crosses or contains\n"
+      "an axis origin. Use the View Options menu to\n"
+      "turn off log-scaling or remove the series from\n"
+      "the Line Series section of the Properties Tab."
+      );
+    this->LogScaleWarningLabel->SetVisible(1);
+    this->LogScaleWarningLabel->SetDimensions(150, 150, 150, 150);
+    this->Chart->AddItem(this->LogScaleWarningLabel);
     }
 }
 

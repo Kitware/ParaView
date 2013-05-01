@@ -12,10 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVXYChartView - view proxy for vtkQtBarChartView
+// .NAME vtkPVXYChartView - vtkPVView subclass for drawing charts
 // .SECTION Description
-// vtkPVXYChartView is a concrete subclass of vtkSMChartViewProxy that
-// creates a vtkQtBarChartView as the chart view.
+// vtkPVXYChartView is a concrete subclass of vtkPVContextView -- which
+// in turn inherits vtkPVView -- that creates a vtkChart to perform
+// rendering.
 
 #ifndef __vtkPVXYChartView_h
 #define __vtkPVXYChartView_h
@@ -25,8 +26,8 @@
 #include "vtkAxis.h" //for enums.
 
 class vtkChart;
-class vtkChartView;
 class vtkPVPlotTime;
+class vtkChartWarning;
 
 class VTKPVCLIENTSERVERCORERENDERING_EXPORT vtkPVXYChartView : public vtkPVContextView
 {
@@ -279,6 +280,7 @@ protected:
   // Pointer to the proxy's chart instance.
   vtkChart* Chart;
   vtkPVPlotTime* PlotTime;
+  vtkChartWarning* LogScaleWarningLabel;
 
   void SelectionChanged();
 
