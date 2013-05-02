@@ -180,7 +180,9 @@ class CoProcessor(object):
         grid = datadescription.GetInputDescriptionByName(inputname).GetGrid()
 
         producer = simple.PVTrivialProducer()
-        producer.GetClientSideObject().SetOutput(grid, datadescription.GetTime())
+        # we purposefully don't set the time for the PVTrivialProducer here.
+        # when we update the pipeline we will do it then.
+        producer.GetClientSideObject().SetOutput(grid)
 
         if grid.IsA("vtkImageData") == True or \
                 grid.IsA("vtkStructuredGrid") == True or \
