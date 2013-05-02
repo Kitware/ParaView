@@ -1,19 +1,9 @@
-#set (_dependencies)
-#if (PARAVIEW_USE_MPI)
-#  list(APPEND _dependencies
-#    vtkFiltersParallelImaging
-#    vtkFiltersParallelMPI
-##    vtkFiltersParallelTracers
-#    vtkIOMPIImage
-#    vtkIOParallelNetCDF
-#    vtkParallelMPI
-#    )
-#
-#  if (PARAVIEW_USE_ICE_T)
-#    list(APPEND _dependencies
-#      vtkicet)
-#  endif()
-#endif()
+set (_dependencies)
+if (PARAVIEW_USE_MPI)
+  list(APPEND _dependencies vtkIOMPIImage)
+elseif()
+  list(APPEND _dependencies vtkIOImage)
+endif()
 
 vtk_module(vtkPVVTKExtensionsDefault
   DEPENDS
