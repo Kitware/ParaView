@@ -51,12 +51,25 @@ public:
   /// Given a proxy and its property, create a widget for the same, of possible.
   /// For unsupported/unknown proxies/properties, implementations should simply
   /// return NULL without raising any errors (or messages).
+  /// Supported types are:
+  /// \li \c calculator : pqCalculatorWidget
+  /// \li \c color_selector : pqColorSelectorPropertyWidget
+  /// \li \c command_button : pqCommandButtonPropertyWidget
+  /// \li \c display_representation_selector : pqDisplayRepresentationPropertyWidget
+  /// \li \c double_range : pqDoubleRangeSliderPropertyWidget
+  /// \li \c list : pqListPropertyWidget
+  /// \li \c texture_selector : pqTextureSelectorPropertyWidget
+  /// \li \c transfer_function_editor : pqTransferFunctionEditorPropertyWidget
   virtual pqPropertyWidget* createWidgetForProperty(
     vtkSMProxy *proxy, vtkSMProperty *property);
 
   /// Given a proxy and its property group, create a widget for the same, of possible.
   /// For unsupported/unknown proxies/property-groups, implementations should simply
   /// return NULL without raising any errors (or messages).
+  /// Supported types are:
+  /// \li \c ArrayStatus : pqArrayStatusPropertyWidget
+  /// \li \c ColorEditor : pqColorEditorPropertyWidget
+  /// \li \c CubeAxes : pqCubeAxesPropertyWidget
   virtual pqPropertyWidget* createWidgetForPropertyGroup(
     vtkSMProxy *proxy, vtkSMPropertyGroup *group);
 
@@ -64,6 +77,9 @@ public:
   /// decorated, create the pqPropertyWidgetDecorator instance, if possible.
   /// For unsupported/unknown, implementations should simply return NULL without
   /// raising any errors (or messages).
+  /// Supported types are:
+  /// \li \c ClipScalarsDecorator : pqClipScalarsDecorator
+  /// \li \c CTHArraySelectionDecorator : pqCTHArraySelectionDecorator
   virtual pqPropertyWidgetDecorator* createWidgetDecorator(
     const QString& type, vtkPVXMLElement* config, pqPropertyWidget* widget);
 };

@@ -73,8 +73,8 @@ pqPropertyWidget* @name@Implementation::createWidgetForPropertyGroup(
 {
 #if @pwi_group@
   // handle properties that specify custom panel widgets
-  if (smgroup && smgroup->GetType() &&
-    strcmp(smgroup->GetType(), "@type@") == 0)
+  if (smgroup && smgroup->GetPanelWidget() &&
+    strcmp(smgroup->GetPanelWidget(), "@type@") == 0)
     {
     return new @classname@(smproxy, smgroup);
     }

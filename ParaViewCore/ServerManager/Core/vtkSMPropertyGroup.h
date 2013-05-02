@@ -46,12 +46,12 @@ public:
   vtkGetStringMacro(XMLLabel)
 
   // Description:
-  // Sets the type of the property group to \p type.
-  vtkSetStringMacro(Type)
+  // Sets the name of the panel widget to use for the property group.
+  vtkSetStringMacro(PanelWidget)
 
   // Description:
-  // Returns the type of the property group.
-  vtkGetStringMacro(Type)
+  // Gets the name of the panel widget to use for the property group.
+  vtkGetStringMacro(PanelWidget)
 
   // Description:
   // Sets the panel visibility for the property group.
@@ -89,7 +89,7 @@ private:
 
   char *Name;
   char *XMLLabel;
-  char *Type;
+  char *PanelWidget;
   char *PanelVisibility;
 
   vtkSMPropertyGroupInternals* const Internals;

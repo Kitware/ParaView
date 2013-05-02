@@ -32,7 +32,7 @@ vtkSMPropertyGroup::vtkSMPropertyGroup()
 {
   this->Name = 0;
   this->XMLLabel = 0;
-  this->Type = 0;
+  this->PanelWidget = 0;
   this->PanelVisibility = 0;
 
   // by default, properties are set to always shown
@@ -44,7 +44,7 @@ vtkSMPropertyGroup::~vtkSMPropertyGroup()
 {
   this->SetXMLLabel(0);
   this->SetName(0);
-  this->SetType(0);
+  this->SetPanelWidget(0);
   this->SetPanelVisibility(0);
   delete this->Internals;
 }

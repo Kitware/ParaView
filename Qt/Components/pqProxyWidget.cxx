@@ -692,7 +692,7 @@ void pqProxyWidget::createPropertyWidgets()
                       << propertyWidget->metaObject()->className();
 
         propertyWidget->setParent(this);
-        QString groupTypeName = group->GetType();
+        QString groupTypeName = group->GetPanelWidget();
         groupTypeName.replace(" ", "");
         propertyWidget->setObjectName(groupTypeName);
 
@@ -700,7 +700,7 @@ void pqProxyWidget::createPropertyWidgets()
         pqProxyWidgetItem* item = pqProxyWidgetItem::newGroupItem(
           propertyWidget, group->GetXMLLabel(), this);
         item->Advanced = QString(group->GetPanelVisibility()) == "advanced";
-        item->SearchTags << group->GetType()
+        item->SearchTags << group->GetPanelWidget()
                          << group->GetXMLLabel();
         // FIXME: Maybe SearchTags should have the labels for all the properties
         // in this group.
