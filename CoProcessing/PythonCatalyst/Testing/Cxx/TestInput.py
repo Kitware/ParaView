@@ -1,62 +1,67 @@
 
 try: paraview.simple
 except: from paraview.simple import *
+
+from paraview import coprocessing
 import sys
 
-# Make sure the helper methods are loaded
-try:
-  __cp_helper_script_loaded__
-except:
-  import vtkPVPythonCatalystPython
-  exec vtkPVPythonCatalystPython.vtkCPPythonHelper.GetPythonHelperScript()
+# ----------------------- CoProcessor definition -----------------------
+def CreateCoProcessor():
+  def _CreatePipeline(coprocessor, datadescription):
+    class Pipeline:
+      Wavelet1 = coprocessor.CreateProducer( datadescription, "input" )
+    return Pipeline()
 
+  class CoProcessor(coprocessing.CoProcessor):
+    def CreatePipeline(self, datadescription):
+      self.Pipeline = _CreatePipeline(self, datadescription)
+
+  coprocessor = CoProcessor()
+  freqs = {'input': [1]}
+  coprocessor.SetUpdateFrequencies(freqs)
+  return coprocessor
+
+#--------------------------------------------------------------
 # Global variables that will hold the pipeline for each timestep
-pipeline = None
+# Creating the CoProcessor object, doesn't actually create the ParaView pipeline.
+# It will be automatically setup when coprocessor.UpdateProducers() is called the
+# first time.
+coprocessor = CreateCoProcessor()
 
-# Live visualization inside ParaView
-live_visu_active = False
-pv_host = "localhost"
-pv_port = 22222
-
-write_frequencies    = {'input': [1]}
-simulation_input_map = {'Wavelet1': 'input'}
-
-# ----------------------- Pipeline definition -----------------------
-
-def CreatePipeline(datadescription):
-  class Pipeline:
-    global cp_views, cp_writers
-    Wavelet1 = CreateProducer( datadescription, "input" )
-
-  return Pipeline()
-
+#--------------------------------------------------------------
+# Enable Live-Visualizaton with ParaView
+coprocessor.EnableLiveVisualization(False)
 
 # ---------------------- Data Selection method ----------------------
 
 def RequestDataDescription(datadescription):
     "Callback to populate the request for current timestep"
+    global coprocessor
     if datadescription.GetForceOutput() == True:
+        # We are just going to request all fields and meshes from the simulation
+        # code/adaptor.
         for i in range(datadescription.GetNumberOfInputDescriptions()):
             datadescription.GetInputDescription(i).AllFieldsOn()
             datadescription.GetInputDescription(i).GenerateMeshOn()
         return
 
-    for input_name in simulation_input_map.values():
-       LoadRequestedData(datadescription, input_name)
+    # setup requests for all inputs based on the requirements of the
+    # pipeline.
+    coprocessor.LoadRequestedData(datadescription)
 
 # ------------------------ Processing method ------------------------
 
 def DoCoProcessing(datadescription):
     "Callback to do co-processing for current timestep"
-    global pipeline, cp_writers, cp_views
+    global coprocessor
     timestep = datadescription.GetTimeStep()
+    print "Timestep:", timestep, "Time:", datadescription.GetTime()
 
-    # Load the Pipeline if not created yet
-    if not pipeline:
-       pipeline = CreatePipeline(datadescription)
-    else:
-      # update to the new input and time
-      UpdateProducers(datadescription)
+    # Update the coprocessor by providing it the newly generated simulation data.
+    # If the pipeline hasn't been setup yet, this will setup the pipeline.
+    coprocessor.UpdateProducers(datadescription)
+
+    pipeline = coprocessor.Pipeline
 
     grid = servermanager.Fetch(pipeline.Wavelet1)
     array = grid.GetPointData().GetArray("RTData")

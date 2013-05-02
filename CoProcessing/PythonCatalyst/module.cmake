@@ -8,6 +8,4 @@ vtk_module(vtkPVPythonCatalyst
     vtkPVCatalystTestDriver
   TEST_LABELS
     PARAVIEW CATALYST
-  COMPILE_DEPENDS
-    vtkUtilitiesEncodeString
 )

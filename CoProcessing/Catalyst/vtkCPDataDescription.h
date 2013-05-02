@@ -75,6 +75,9 @@ public:
 
   /// Provides access to a grid description using the index.
   vtkCPInputDataDescription *GetInputDescription(unsigned int);
+ 
+  /// Provides the name for the input description at the given index.
+  const char* GetInputDescriptionName(unsigned int);
 
   /// Provides access to a grid description using the grid name.
   vtkCPInputDataDescription *GetInputDescriptionByName(const char*);

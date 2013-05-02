@@ -3,7 +3,7 @@
 #include "vtkStdString.h"
 
 #include "vtkCTHSource.h"
-#include "vtkCPPythonProcessor.h"
+#include "vtkCPProcessor.h"
 #include "vtkCPDataDescription.h"
 #include "vtkCPPythonScriptPipeline.h"
 
@@ -43,7 +43,7 @@ void pvspy_fil(char *filename, int len, char * /*runid*/, int * /*error*/)
   // signal (SIGSEGV, handler);
 
   // Build all the coprocessing classes
-  coProcessor = vtkCPPythonProcessor::New ();
+  coProcessor = vtkCPProcessor::New ();
   coProcessor->Initialize ();
 
   coProcessorData = vtkCPDataDescription::New ();

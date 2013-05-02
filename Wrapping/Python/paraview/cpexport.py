@@ -1,0 +1,120 @@
+r"""This module is used to export complete CoProcessing Python scripts that
+can be used in a vtkCPPythonScriptPipeline.
+
+This module uses paraview.cpstate Module to dump the ParaView session state as a
+an Python class description that can be then be used in the CoProcessor.
+
+The exported script can be used in a vtkCPPythonScriptPipeline instance for
+CoProcessing."""
+
+# -----------------------------------------------------------------------------
+# The __output_contents is the templet script that accept 3 arguments:
+#  1) The CoProcessor class definition
+#  2) The boolean to know if we want to enable live-visualization
+#  3) The boolean to know if we need to rescale the data range
+# -----------------------------------------------------------------------------
+__output_contents = """
+try: paraview.simple
+except: from paraview.simple import *
+
+from paraview import coprocessing
+
+
+#--------------------------------------------------------------
+# Code generated from cpstate.py to create the CoProcessor.
+
+%s
+#--------------------------------------------------------------
+# Global variables that will hold the pipeline for each timestep
+# Creating the CoProcessor object, doesn't actually create the ParaView pipeline.
+# It will be automatically setup when coprocessor.UpdateProducers() is called the
+# first time.
+coprocessor = CreateCoProcessor()
+
+#--------------------------------------------------------------
+# Enable Live-Visualizaton with ParaView
+coprocessor.EnableLiveVisualization(%s)
+
+
+# ---------------------- Data Selection method ----------------------
+
+def RequestDataDescription(datadescription):
+    "Callback to populate the request for current timestep"
+    global coprocessor
+    if datadescription.GetForceOutput() == True:
+        # We are just going to request all fields and meshes from the simulation
+        # code/adaptor.
+        for i in range(datadescription.GetNumberOfInputDescriptions()):
+            datadescription.GetInputDescription(i).AllFieldsOn()
+            datadescription.GetInputDescription(i).GenerateMeshOn()
+        return
+
+    # setup requests for all inputs based on the requirements of the
+    # pipeline.
+    coprocessor.LoadRequestedData(datadescription)
+
+# ------------------------ Processing method ------------------------
+
+def DoCoProcessing(datadescription):
+    "Callback to do co-processing for current timestep"
+    global coprocessor
+
+    # Update the coprocessor by providing it the newly generated simulation data.
+    # If the pipeline hasn't been setup yet, this will setup the pipeline.
+    coprocessor.UpdateProducers(datadescription)
+
+    # Write output data, if appropriate.
+    coprocessor.WriteData(datadescription);
+
+    # Write image capture (Last arg: rescale lookup table), if appropriate.
+    coprocessor.WriteImages(datadescription, rescale_lookuptable=%s)
+
+    # Live Visualization, if enabled.
+    coprocessor.DoLiveVisualization(datadescription, "localhost", 22222)
+"""
+
+from paraview import cpstate
+
+def DumpCoProcessingScript(export_rendering, simulation_input_map, screenshot_info,
+    rescale_data_range, enable_live_viz, filename=None):
+    """Returns a string with the generated CoProcessing script based on the
+        options specified.
+        
+        First three arguments are same as those expected by
+        cpstate.DumpPipeline() function.
+
+        rescale_data_range :- boolean set to true if the LUTs must be scaled on
+                              each timestep
+        enable_live_viz    :- boolean set to true if the generated script should
+                              handle live-visualization.
+        filename           :- if specified, the script is written to the file.
+    """
+    pipeline_script = cpstate.DumpPipeline(\
+        export_rendering, simulation_input_map, screenshot_info)
+    script = __output_contents % (pipeline_script, enable_live_viz, rescale_data_range)
+    if filename:
+        outFile = open(filename, "w")
+        outFile.write(script)
+        outFile.close()
+    return script
+
+def run(filename=None):
+    """Create a dummy pipeline and save the coprocessing state in the filename
+    specified, if any, else dumps it out on stdout."""
+    
+    from paraview import simple, servermanager
+    wavelet = simple.Wavelet(registrationName="Wavelet1")
+    contour = simple.Contour()
+    script = DumpCoProcessingScript(export_rendering=False,
+        simulation_input_map={"Wavelet1" : "input"},
+        screenshot_info={},
+        rescale_data_range=True,
+        enable_live_viz=True,
+        filename=filename)
+    if not filename:
+        print "# *** Generated Script Begin ***"
+        print script
+        print "# *** Generated Script End ***"
+
+if __name__ == "__main__":
+    run()

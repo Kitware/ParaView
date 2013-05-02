@@ -67,6 +67,8 @@ public:
     };
 
   static ProcessTypes GetProcessType();
+  static unsigned int GetProcessTypeAsInt()
+    { return static_cast<int>(vtkProcessModule::GetProcessType()); }
 
   // Description:
   // This method has been added to support migration from one type to another

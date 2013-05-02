@@ -18,17 +18,17 @@
 #include "vtkCPPipeline.h"
 #include "vtkStdString.h"  // for the string
 #include "vtkPVPythonCatalystModule.h" // For windows import/export of shared libraries
+#include "vtkSmartPointer.h" // for vtkSmartPointer.
+#include "vtkWeakPointer.h" // for vtkWeakPointer.
 
 class vtkCPDataDescription;
-class vtkCPPythonHelper;
+class vtkPVPythonInterpretor;
 
 /// @ingroup CoProcessing
 /// Class that creates a coprocessing pipeline starting from a coprocessing
 /// script.  This class only does operations with respect to the script
 /// and uses the name of the script as the module to hide its definitions
-/// from other python modules.  Python is primarily set up in 
-/// vtkCPPythonHelper where it loads servermanager, the coprocessing library
-/// and the trivial producer used to get the grid into the script.
+/// from other python modules.
 class VTKPVPYTHONCATALYST_EXPORT vtkCPPythonScriptPipeline : public vtkCPPipeline
 {
 public:
@@ -63,6 +63,10 @@ protected:
   vtkSetStringMacro(PythonScriptName);
   vtkGetStringMacro(PythonScriptName);
 
+  /// Provides access to the Python interpretor.
+  vtkPVPythonInterpretor* GetPythonInterpretor();
+  vtkSmartPointer<vtkPVPythonInterpretor> PythonInterpretor;
+
 private:
   vtkCPPythonScriptPipeline(const vtkCPPythonScriptPipeline&); // Not implemented
   void operator=(const vtkCPPythonScriptPipeline&); // Not implemented
@@ -70,8 +74,9 @@ private:
   /// The name of the python script (without the path or extension)
   /// that is used as the namespace of the functions of the script.
   char* PythonScriptName;
+  
+  static vtkPVPythonInterpretor* NewPythonInterpretor();
+  static vtkWeakPointer<vtkPVPythonInterpretor> GlobalPythonInterpretor;
 };
-
-
 
 #endif

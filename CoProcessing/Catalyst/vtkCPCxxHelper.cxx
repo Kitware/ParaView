@@ -19,13 +19,15 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVOptions.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMObject.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSession.h"
 
+#include <assert.h>
 #include <string>
-#include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 // Needed when we don't use the vtkStandardNewMacro.
@@ -79,11 +81,15 @@ vtkCPCxxHelper* vtkCPCxxHelper::New()
 
     vtkCPCxxHelper::Instance->Options = vtkPVOptions::New();
     vtkCPCxxHelper::Instance->Options->SetSymmetricMPIMode(1);
-    vtkCPCxxHelper::Instance->Options->SetProcessType(vtkProcessModule::PROCESS_BATCH);
 
     vtkInitializationHelper::Initialize(
         argc, argv, vtkProcessModule::PROCESS_BATCH,
         vtkCPCxxHelper::Instance->Options);
+
+    // Setup default session.
+    vtkIdType connectionId = vtkSMSession::ConnectToSelf();
+    assert(connectionId != 0);
+    (void)connectionId;
 
     delete []argv[0];
     delete []argv;
