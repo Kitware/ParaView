@@ -39,6 +39,7 @@ set (Module_SRCS
   vtkSICollaborationManager.cxx
   vtkSICompoundSourceProxy.cxx
   vtkSIDataArrayProperty.cxx
+  vtkSIDoubleMapProperty.cxx
   vtkSIDoubleVectorProperty.cxx
   vtkSIFileSeriesReaderProxy.cxx
   vtkSIIdTypeVectorProperty.cxx

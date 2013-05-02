@@ -107,6 +107,8 @@ def _wrap_property(proxy, smproperty):
         property = InputProperty(proxy, smproperty)
     elif smproperty.IsA("vtkSMProxyProperty"):
         property = ProxyProperty(proxy, smproperty)
+    elif smproperty.IsA("vtkSMDoubleMapProperty"):
+	property = DoubleMapProperty(proxy, smproperty)
     else:
         property = Property(proxy, smproperty)
     return property
@@ -705,6 +707,64 @@ class VectorProperty(Property):
     def Clear(self):
         "Removes all elements."
         self.SMProperty().SetNumberOfElements(0)
+        self._UpdateProperty()
+
+class DoubleMapProperty(Property):
+    """A DoubleMapProperty provides access to a map of double vector values."""
+
+    def __len__(self):
+        """Returns the number of elements."""
+        return self.SMProperty.GetNumberOfElements()
+
+    def __getitem__(self, key):
+        """Returns the values for key."""
+        return self.GetData()[key]
+
+    def __setitem__(self, key, values):
+        """Sets the values for key."""
+        for i, value in enumerate(values):
+            self.SMProperty.SetElementComponent(key, i, value)
+        self._UpdateProperty()
+
+    def __contains__(self, key):
+	"""Returns True if the property contains key."""
+        return key in self.keys()
+
+    def keys(self):
+	"""Returns the keys."""
+        return self.GetData().keys()
+
+    def GetData(self):
+	"""Returns all the elements as a dictionary"""
+
+	data = {}
+
+	iter = self.SMProperty.NewIterator()
+        while not iter.IsAtEnd():
+            values = []
+            for i in range(self.SMProperty.GetNumberOfComponents()):
+                values.append(iter.GetElementComponent(i))
+            data[iter.GetKey()] = values
+            iter.Next()
+        iter.UnRegister(None)
+
+	return data
+
+    def SetData(self, elements):
+        """Sets all the elements at once."""
+
+        # first clear existing data
+	self.Clear()
+
+        for key, values in elements.items():
+            for i, value in enumerate(values):
+                self.SMProperty.SetElementComponent(key, i, value)
+
+        self._UpdateProperty()
+
+    def Clear(self):
+        """Removes all elements."""
+        self.SMProperty.ClearElements()
         self._UpdateProperty()
 
 class ColorArrayProperty(VectorProperty):

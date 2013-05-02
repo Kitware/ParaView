@@ -18,6 +18,7 @@
 #include "pqActiveObjects.h"
 #include "pqOutputPort.h"
 #include "pqUndoStack.h"
+#include "pqDoubleRangeDialog.h"
 #include "vtkSMProxy.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -31,12 +32,18 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSessionProxyManager.h"
+#include "vtkSMDoubleMapProperty.h"
+#include "vtkSMDoubleMapPropertyIterator.h"
 
 #include <QMenu>
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QColorDialog>
+#include <QIcon>
+#include <QPixmap>
+#include <QPainter>
 
 pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   : QWidget(parent_)
@@ -47,8 +54,7 @@ pqMultiBlockInspectorPanel::pqMultiBlockInspectorPanel(QWidget *parent_)
   this->TreeWidget->header()->close();
 
   // create tree widget selection helper
-  pqTreeWidgetSelectionHelper *treeSelectionHelper =
-    new pqTreeWidgetSelectionHelper(this->TreeWidget);
+  new pqTreeWidgetSelectionHelper(this->TreeWidget);
 
   // disconnect from selection helper's context menu so that
   // we can use our own menu with multi-block support
@@ -141,16 +147,34 @@ void pqMultiBlockInspectorPanel::setRepresentation(pqRepresentation *representat
 
   if(this->Representation)
     {
-    vtkSMProxy *proxy = this->Representation->getProxy();
-    vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
+    // update properties
+    this->updateInformation();
 
-    if(property_)
+    // listen to property changes
+    vtkSMProxy *proxy = this->Representation->getProxy();
+    vtkSMProperty *visibilityProperty = proxy->GetProperty("BlockVisibility");
+    if(visibilityProperty)
       {
-      this->VisibilityPropertyListener->Connect(property_,
+      this->VisibilityPropertyListener->Connect(visibilityProperty,
                                                 vtkCommand::ModifiedEvent,
                                                 this,
-                                                SLOT(updateTreeWidgetBlockVisibilities()));
+                                                SLOT(updateBlockVisibilities()));
       }
+
+    vtkSMProperty *colorProperty = proxy->GetProperty("BlockColors");
+    if(colorProperty)
+      {
+      this->VisibilityPropertyListener->Connect(colorProperty,
+                                                vtkCommand::ModifiedEvent,
+                                                this,
+                                                SLOT(updateBlockColors()));
+      }
+    }
+  else
+    {
+    this->BlockVisibilites.clear();
+    this->BlockColors.clear();
+    this->TreeWidget->clear();
     }
 }
 
@@ -174,8 +198,11 @@ void pqMultiBlockInspectorPanel::buildTree(vtkPVCompositeDataInformation *info,
       }
 
     QTreeWidgetItem *item = new QTreeWidgetItem(parent_, QStringList() << text);
-    item->setData(0, Qt::UserRole, flatIndex++);
+    item->setData(0, Qt::UserRole, flatIndex);
     item->setData(0, Qt::CheckStateRole, Qt::Checked);
+    item->setData(0, Qt::DecorationRole, makeBlockIcon(flatIndex));
+
+    flatIndex++;
 
     if(childInfo)
       {
@@ -257,6 +284,62 @@ void pqMultiBlockInspectorPanel::clearBlockVisibility(unsigned int index)
   this->Representation->renderViewEventually();
 }
 
+void pqMultiBlockInspectorPanel::setBlockColor(unsigned int index, const QColor &color)
+{
+  this->BlockColors[index] = color;
+  this->updateBlockColors();
+  this->Representation->renderViewEventually();
+}
+
+void pqMultiBlockInspectorPanel::clearBlockColor(unsigned int index)
+{
+  this->BlockColors.remove(index);
+  this->updateBlockColors();
+  this->Representation->renderViewEventually();
+}
+
+void pqMultiBlockInspectorPanel::setBlockOpacity(unsigned int index, double opacity)
+{
+  this->BlockOpacities[index] = opacity;
+  this->updateBlockOpacities();
+  this->Representation->renderViewEventually();
+}
+
+void pqMultiBlockInspectorPanel::clearBlockOpacity(unsigned int index)
+{
+  this->BlockOpacities.remove(index);
+  this->updateBlockOpacities();
+  this->Representation->renderViewEventually();
+}
+
+void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(unsigned int index)
+{
+  QList<unsigned int> list;
+  list.append(index);
+  promptAndSetBlockOpacity(list);
+}
+
+void pqMultiBlockInspectorPanel::promptAndSetBlockOpacity(const QList<unsigned int> &indices)
+{
+  if(indices.isEmpty())
+    {
+    return;
+    }
+
+  double current_opacity = this->BlockOpacities.value(indices[0], 1.0);
+
+  pqDoubleRangeDialog dialog("Opacity:", 0.0, 1.0, this);
+  dialog.setValue(current_opacity);
+  bool ok = dialog.exec();
+  if(ok)
+    {
+    foreach(unsigned int index, indices)
+      {
+      this->setBlockOpacity(index, dialog.value());
+      }
+    }
+}
+
 void pqMultiBlockInspectorPanel::showOnlyBlock(unsigned int index)
 {
   this->BlockVisibilites.clear();
@@ -283,12 +366,75 @@ void pqMultiBlockInspectorPanel::updateBlockVisibilities()
 
   if(property_)
     {
-    BEGIN_UNDO_SET("Change Block Properties");
+    BEGIN_UNDO_SET("Change Block Visibilities");
     vtkSMIntVectorProperty *ivp =
       vtkSMIntVectorProperty::SafeDownCast(property_);
 
     ivp->SetNumberOfElements(static_cast<unsigned int>(vector.size()));
-    ivp->SetElements(&vector[0]);
+    if(!vector.empty())
+      {
+      ivp->SetElements(&vector[0]);
+      }
+
+    proxy->UpdateVTKObjects();
+    END_UNDO_SET();
+    }
+
+  this->updateTreeWidgetBlockVisibilities();
+}
+
+void pqMultiBlockInspectorPanel::updateBlockColors()
+{
+  // update vtk property
+  vtkSMProxy *proxy = this->Representation->getProxy();
+  vtkSMProperty *property_ = proxy->GetProperty("BlockColor");
+
+  if(property_)
+    {
+    BEGIN_UNDO_SET("Change Block Colors");
+    vtkSMDoubleMapProperty *dmp =
+      vtkSMDoubleMapProperty::SafeDownCast(property_);
+
+    dmp->ClearElements();
+
+    QMap<unsigned int, QColor>::const_iterator iter;
+    for(iter = this->BlockColors.begin();
+        iter != this->BlockColors.end();
+        iter++)
+      {
+      QColor qcolor = iter.value();
+      double color[] = { qcolor.redF(), qcolor.greenF(), qcolor.blueF() };
+      dmp->SetElements(iter.key(), color);
+      }
+
+    proxy->UpdateVTKObjects();
+    END_UNDO_SET();
+    }
+
+  this->updateTreeWidgetBlockVisibilities();
+}
+
+void pqMultiBlockInspectorPanel::updateBlockOpacities()
+{
+  // update vtk property
+  vtkSMProxy *proxy = this->Representation->getProxy();
+  vtkSMProperty *property_ = proxy->GetProperty("BlockOpacity");
+
+  if(property_)
+    {
+    BEGIN_UNDO_SET("Change Block Opacities");
+    vtkSMDoubleMapProperty *dmp =
+      vtkSMDoubleMapProperty::SafeDownCast(property_);
+
+    dmp->ClearElements();
+
+    QMap<unsigned int, double>::const_iterator iter;
+    for(iter = this->BlockOpacities.begin();
+        iter != this->BlockOpacities.end();
+        iter++)
+      {
+      dmp->SetElement(iter.key(), iter.value());
+      }
 
     proxy->UpdateVTKObjects();
     END_UNDO_SET();
@@ -306,8 +452,8 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
 
   // update BlockVisibility map from vtk property
   vtkSMProxy *proxy = this->Representation->getProxy();
-  vtkSMProperty *property_ = proxy->GetProperty("BlockVisibility");
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property_);
+  vtkSMProperty *blockVisibilityProperty = proxy->GetProperty("BlockVisibility");
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(blockVisibilityProperty);
   this->BlockVisibilites.clear();
 
   if(ivp)
@@ -316,6 +462,40 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
       {
       this->BlockVisibilites[ivp->GetElement(i)] = ivp->GetElement(i+1);
       }
+    }
+
+  // update BlockColor map from vtk property
+  vtkSMProperty *blockColorProperty = proxy->GetProperty("BlockColor");
+  vtkSMDoubleMapProperty *dmp = vtkSMDoubleMapProperty::SafeDownCast(blockColorProperty);
+  this->BlockColors.clear();
+
+  if(dmp)
+    {
+    vtkSMDoubleMapPropertyIterator *iter = dmp->NewIterator();
+    for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      QColor color;
+      color.setRedF(iter->GetElementComponent(0));
+      color.setGreenF(iter->GetElementComponent(1));
+      color.setBlueF(iter->GetElementComponent(2));
+      this->BlockColors[iter->GetKey()] = color;
+      }
+    iter->Delete();
+    }
+
+  // update BlockOpacity map from vtk property
+  vtkSMProperty *blockOpacityProperty = proxy->GetProperty("BlockOpacity");
+  dmp = vtkSMDoubleMapProperty::SafeDownCast(blockOpacityProperty);
+  this->BlockOpacities.clear();
+
+  if(dmp)
+    {
+    vtkSMDoubleMapPropertyIterator *iter = dmp->NewIterator();
+    for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      this->BlockOpacities[iter->GetKey()] = iter->GetElementComponent(0);
+      }
+    iter->Delete();
     }
 
   // update ui
@@ -342,6 +522,7 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities()
     rootItem->setData(0,
                       Qt::CheckStateRole,
                       root_visibility ? Qt::Checked : Qt::Unchecked);
+    rootItem->setData(0, Qt::DecorationRole, makeBlockIcon(0));
 
     // recurse down the tree updating child visibilities
     this->updateTreeWidgetBlockVisibilities(compositeInfo,
@@ -368,6 +549,7 @@ void pqMultiBlockInspectorPanel::updateTreeWidgetBlockVisibilities(
       }
 
     item->setData(0, Qt::CheckStateRole, visibility ? Qt::Checked : Qt::Unchecked);
+    item->setData(0, Qt::DecorationRole, makeBlockIcon(flatIndex));
 
     vtkPVDataInformation *childInfo = info->GetDataInformation(i);
     if(childInfo)
@@ -435,8 +617,15 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoi
       }
     showAction = menu.addAction(label);
     }
-
   QAction *unsetVisibilityAction = menu.addAction("Unset Visibility");
+  menu.addSeparator();
+  QAction *setColorAction = menu.addAction("Set Color...");
+  QAction *unsetColorAction = menu.addAction("Unset Color");
+  menu.addSeparator();
+  QAction *setOpacityAction = menu.addAction("Set Opacity...");
+  QAction *unsetOpacityAction = menu.addAction("Unset Opacity");
+
+  // show menu
   QAction *action = menu.exec(QCursor::pos());
 
   if(!action)
@@ -483,6 +672,48 @@ void pqMultiBlockInspectorPanel::treeWidgetCustomContextMenuRequested(const QPoi
       this->clearBlockVisibility(flat_index);
       item->setData(
         0, Qt::CheckStateRole, item->parent()->data(0, Qt::CheckStateRole));
+      }
+    }
+  else if(action == setColorAction)
+    {
+    QColor color = QColorDialog::getColor(Qt::gray, this);
+    if(color.isValid())
+      {
+      foreach(QTreeWidgetItem *item, items)
+        {
+        unsigned int flat_index =
+          item->data(0, Qt::UserRole).value<unsigned int>();
+        this->setBlockColor(flat_index, color);
+        }
+      }
+    }
+  else if(action == unsetColorAction)
+    {
+    foreach(QTreeWidgetItem *item, items)
+      {
+      unsigned int flat_index =
+        item->data(0, Qt::UserRole).value<unsigned int>();
+      this->clearBlockColor(flat_index);
+      }
+    }
+  else if(action == setOpacityAction)
+    {
+    QList<unsigned int> indices;
+    foreach(QTreeWidgetItem *item, items)
+      {
+      indices.append(item->data(0, Qt::UserRole).value<unsigned int>());
+      }
+
+    this->promptAndSetBlockOpacity(indices);
+    }
+  else if(action == unsetOpacityAction)
+    {
+    foreach(QTreeWidgetItem *item, items)
+      {
+      unsigned int flat_index =
+        item->data(0, Qt::UserRole).value<unsigned int>();
+
+      this->clearBlockOpacity(flat_index);
       }
     }
 }
@@ -615,4 +846,51 @@ QString pqMultiBlockInspectorPanel::lookupBlockName(unsigned int flatIndex) cons
     }
 
   return QString();
+}
+
+QIcon pqMultiBlockInspectorPanel::makeBlockIcon(unsigned int flatIndex) const
+{
+
+  QPixmap pixmap(32, 16);
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+
+  // draw color circle
+  if(this->BlockColors.contains(flatIndex))
+    {
+    QColor color = this->BlockColors[flatIndex];
+    painter.setPen(Qt::black);
+    painter.setBrush(color);
+    painter.drawEllipse(0, 0, 14, 14);
+    }
+  else
+    {
+    static QIcon inheritedColorIcon(
+      ":/pqWidgets/Icons/pqBlockInheritColor16.png"
+    );
+
+    painter.drawPixmap(0, 0, inheritedColorIcon.pixmap(16, 16));
+    }
+
+  // draw opacity circle
+  if(this->BlockOpacities.contains(flatIndex))
+    {
+    double opacity = this->BlockOpacities[flatIndex];
+    int angle = 5760 * opacity;
+    painter.setBrush(Qt::lightGray);
+    painter.drawPie(16, 0, 14, 14, 0, angle);
+    painter.setBrush(Qt::transparent);
+    painter.drawEllipse(16, 0, 14, 14);
+    }
+  else
+    {
+    static QIcon inheritedOpacityIcon(
+      ":/pqWidgets/Icons/pqBlockInheritOpacity16.png"
+    );
+
+    painter.drawPixmap(16, 0, inheritedOpacityIcon.pixmap(16, 16));
+    }
+
+  painter.end();
+  return QIcon(pixmap);
 }

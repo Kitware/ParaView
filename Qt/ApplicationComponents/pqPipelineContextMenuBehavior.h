@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QPoint> // needed for QPoint.
 #include <QPointer>
+#include <QVector> // needed for QVector.
+#include "vtkType.h"
 #include "pqApplicationComponentsModule.h"
 
 class pqDataRepresentation;
@@ -78,6 +80,22 @@ protected slots:
   /// emits the signal will contain the block index in its data()
   void unsetBlockVisibility();
 
+  /// called to set the color for the block. the action which emits the
+  /// signal will contain the block index in its data()
+  void setBlockColor();
+
+  /// called to unset the color for the block. the action which emits the
+  /// signal will contain the block index in its data()
+  void unsetBlockColor();
+
+  /// called to set the opacity for the block. the action which emits the
+  /// signal will contain the block index in its data()
+  void setBlockOpacity();
+
+  /// called to unset the opacity for the block. the action which emits the
+  /// signal will contain the block index in its data()
+  void unsetBlockOpacity();
+
   /// called to change the representation type.
   void reprTypeChanged(QAction* action);
 
@@ -106,6 +124,7 @@ protected:
   QMenu* Menu;
   QPoint Position;
   QPointer<pqDataRepresentation> PickedRepresentation;
+  QVector<vtkIdType> PickedBlocks;
 private:
   Q_DISABLE_COPY(pqPipelineContextMenuBehavior)
 

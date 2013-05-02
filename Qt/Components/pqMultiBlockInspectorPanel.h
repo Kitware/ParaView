@@ -50,6 +50,12 @@ public slots:
   void updateInformation();
   void setBlockVisibility(unsigned int index, bool visible);
   void clearBlockVisibility(unsigned int index);
+  void setBlockColor(unsigned int index, const QColor &color);
+  void clearBlockColor(unsigned int index);
+  void setBlockOpacity(unsigned int index, double opacity);
+  void clearBlockOpacity(unsigned int index);
+  void promptAndSetBlockOpacity(unsigned int index);
+  void promptAndSetBlockOpacity(const QList<unsigned int> &indices);
   void showOnlyBlock(unsigned int index);
 
 private slots:
@@ -63,21 +69,26 @@ private slots:
     bool visibility);
   void currentSelectionChanged(pqOutputPort *port);
   void currentTreeItemSelectionChanged();
+  void updateBlockVisibilities();
+  void updateBlockColors();
+  void updateBlockOpacities();
 
 private:
   Q_DISABLE_COPY(pqMultiBlockInspectorPanel)
 
-  void updateBlockVisibilities();
   void buildTree(vtkPVCompositeDataInformation *iter,
                  QTreeWidgetItem *parent,
                  unsigned int &flatIndex);
   void unsetChildVisibilities(QTreeWidgetItem *parent);
+  QIcon makeBlockIcon(unsigned int flatIndex) const;
 
 private:
   QTreeWidget *TreeWidget;
   QPointer<pqOutputPort> OutputPort;
   QPointer<pqRepresentation> Representation;
   QMap<unsigned int, bool> BlockVisibilites;
+  QMap<unsigned int, QColor> BlockColors;
+  QMap<unsigned int, double> BlockOpacities;
   vtkEventQtSlotConnect *VisibilityPropertyListener;
 };
 

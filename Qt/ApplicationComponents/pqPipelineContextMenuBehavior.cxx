@@ -42,9 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "pqSelectionManager.h"
+#include "pqPVApplicationCore.h"
 #include "vtkSMProxy.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVCompositeDataInformation.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMSourceProxy.h"
 
 #include <QWidget>
 #include <QAction>
@@ -52,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include <QRegExp>
 #include <QApplication>
+#include <QColorDialog>
 
 namespace
 {
@@ -73,7 +78,23 @@ namespace
       }
     return false;
     }
-};
+
+  pqMultiBlockInspectorPanel* getMultiBlockInspectorPanel()
+  {
+    // get multi-block inspector panel
+    pqMultiBlockInspectorPanel *panel = 0;
+    foreach(QWidget *widget, qApp->topLevelWidgets())
+      {
+      panel = widget->findChild<pqMultiBlockInspectorPanel *>();
+
+      if(panel)
+        {
+        break;
+        }
+      }
+    return panel;
+  }
+}
 
 //-----------------------------------------------------------------------------
 pqPipelineContextMenuBehavior::pqPipelineContextMenuBehavior(QObject* parentObject)
@@ -152,6 +173,35 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
   pqRenderView* view = qobject_cast<pqRenderView*>(
     pqActiveObjects::instance().activeView());  
 
+  // get currently selected block ids
+  this->PickedBlocks.clear();
+
+  pqSelectionManager *selectionManager =
+    pqPVApplicationCore::instance()->selectionManager();
+  if(selectionManager)
+    {
+    pqOutputPort *port = selectionManager->getSelectedPort();
+    if(port)
+      {
+      vtkSMSourceProxy *activeSelection = port->getSelectionInput();
+      if(activeSelection &&
+         strcmp(activeSelection->GetXMLName(), "BlockSelectionSource") == 0)
+        {
+        vtkSMPropertyHelper blocksProp(activeSelection, "Blocks");
+        this->PickedBlocks.resize(blocksProp.GetNumberOfElements());
+        blocksProp.Get(&this->PickedBlocks[0], blocksProp.GetNumberOfElements());
+        }
+      }
+    }
+
+  if(!this->PickedBlocks.contains(blockIndex))
+    {
+    // the block that was clicked on is not one of the currently selected
+    // block so actions should only affect that block
+    this->PickedBlocks.clear();
+    this->PickedBlocks.append(blockIndex);
+    }
+
   if (repr)
     {
     this->Menu->clear();
@@ -161,24 +211,47 @@ void pqPipelineContextMenuBehavior::buildMenu(pqDataRepresentation* repr,
     if(compositeInfo && compositeInfo->GetDataIsComposite())
       {
       QString blockName = this->lookupBlockName(blockIndex);
+      this->Menu->addAction(QString("Block '%1'").arg(blockName));
+      this->Menu->addSeparator();
 
       QAction *hideBlockAction =
-        this->Menu->addAction(QString("Hide Block '%1'").arg(blockName));
-      hideBlockAction->setData(blockIndex);
+        this->Menu->addAction(QString("Hide Block"));
       this->connect(hideBlockAction, SIGNAL(triggered()),
                     this, SLOT(hideBlock()));
 
       QAction *showOnlyBlockAction =
-        this->Menu->addAction(QString("Show Only Block '%1'").arg(blockName));
-      showOnlyBlockAction->setData(blockIndex);
+        this->Menu->addAction(QString("Show Only Block"));
       this->connect(showOnlyBlockAction, SIGNAL(triggered()),
                     this, SLOT(showOnlyBlock()));
 
       QAction *unsetVisibilityAction =
         this->Menu->addAction("Unset Block Visibility");
-      unsetVisibilityAction->setData(blockIndex);
       this->connect(unsetVisibilityAction, SIGNAL(triggered()),
                     this, SLOT(unsetBlockVisibility()));
+
+      this->Menu->addSeparator();
+
+      QAction *setBlockColorAction =
+        this->Menu->addAction("Set Block Color");
+      this->connect(setBlockColorAction, SIGNAL(triggered()),
+                    this, SLOT(setBlockColor()));
+
+      QAction *unsetBlockColorAction =
+        this->Menu->addAction("Unset Block Color");
+      this->connect(unsetBlockColorAction, SIGNAL(triggered()),
+                    this, SLOT(unsetBlockColor()));
+
+      this->Menu->addSeparator();
+
+      QAction *setBlockOpacityAction =
+        this->Menu->addAction("Set Block Opacity");
+      this->connect(setBlockOpacityAction, SIGNAL(triggered()),
+                    this, SLOT(setBlockOpacity()));
+
+      QAction *unsetBlockOpacityAction =
+        this->Menu->addAction("Unset Block Opacity");
+      this->connect(unsetBlockOpacityAction, SIGNAL(triggered()),
+                    this, SLOT(unsetBlockOpacity()));
 
       this->Menu->addSeparator();
       }
@@ -368,23 +441,13 @@ void pqPipelineContextMenuBehavior::hideBlock()
     return;
     }
 
-  unsigned int blockIndex = action->data().value<unsigned int>();
-
-  // get multi-block inspector panel
-  pqMultiBlockInspectorPanel *panel = 0;
-  foreach(QWidget *widget, qApp->topLevelWidgets())
-    {
-    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
-
-    if(panel)
-      {
-      break;
-      }
-    }
-
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    panel->setBlockVisibility(blockIndex, false);
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->setBlockVisibility(blockIndex, false);
+      }
     }
 }
 
@@ -397,23 +460,10 @@ void pqPipelineContextMenuBehavior::showOnlyBlock()
     return;
     }
 
-  unsigned int blockIndex = action->data().value<unsigned int>();
-
-  // get multi-block inspector panel
-  pqMultiBlockInspectorPanel *panel = 0;
-  foreach(QWidget *widget, qApp->topLevelWidgets())
-    {
-    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
-
-    if(panel)
-      {
-      break;
-      }
-    }
-
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    panel->showOnlyBlock(blockIndex);
+    panel->showOnlyBlock(this->PickedBlocks.front());
     }
 }
 
@@ -426,41 +476,98 @@ void pqPipelineContextMenuBehavior::unsetBlockVisibility()
     return;
     }
 
-  unsigned int blockIndex = action->data().value<unsigned int>();
-
-  // get multi-block inspector panel
-  pqMultiBlockInspectorPanel *panel = 0;
-  foreach(QWidget *widget, qApp->topLevelWidgets())
-    {
-    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
-
-    if(panel)
-      {
-      break;
-      }
-    }
-
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
-    panel->clearBlockVisibility(blockIndex);
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->clearBlockVisibility(blockIndex);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::setBlockColor()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
+  if(panel)
+    {
+    QColor color = QColorDialog::getColor(Qt::gray);
+
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->setBlockColor(blockIndex, color);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::unsetBlockColor()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
+  if(panel)
+    {
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->clearBlockColor(blockIndex);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::setBlockOpacity()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
+  if(panel)
+    {
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->promptAndSetBlockOpacity(blockIndex);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineContextMenuBehavior::unsetBlockOpacity()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+  if(!action)
+    {
+    return;
+    }
+
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
+  if(panel)
+    {
+    foreach(vtkIdType blockIndex, this->PickedBlocks)
+      {
+      panel->clearBlockOpacity(blockIndex);
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
 QString pqPipelineContextMenuBehavior::lookupBlockName(unsigned int flatIndex) const
 {
-  // get multi-block inspector panel
-  pqMultiBlockInspectorPanel *panel = 0;
-  foreach(QWidget *widget, qApp->topLevelWidgets())
-    {
-    panel = widget->findChild<pqMultiBlockInspectorPanel *>();
-
-    if(panel)
-      {
-      break;
-      }
-    }
-
+  pqMultiBlockInspectorPanel *panel = getMultiBlockInspectorPanel();
   if(panel)
     {
     return panel->lookupBlockName(flatIndex);

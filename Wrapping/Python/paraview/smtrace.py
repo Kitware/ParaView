@@ -304,6 +304,11 @@ def vector_smproperty_tostring(proxyInfo, propInfo):
   pythonProp = servermanager._wrap_property(proxy, prop)
   return str(pythonProp)
 
+def map_smproperty_tostring(proxyInfo, propInfo):
+  proxy = proxyInfo.Proxy
+  prop = propInfo.Prop
+  pythonProp = servermanager._wrap_property(proxy, prop)
+  return str(pythonProp)
 
 def get_property_value_from_list_domain(proxyInfo, propInfo):
   """Given a proxy and one of its proxyproperties (or inputproperty),
@@ -404,6 +409,8 @@ def trace_property_modified(info, prop):
   propValue = None
   if (prop.IsA("vtkSMVectorProperty")):
     propValue = vector_smproperty_tostring(info, propInfo)
+  elif (prop.IsA("vtkSMMapProperty")):
+    propValue = map_smproperty_tostring(info, propInfo)
   elif (prop.IsA("vtkSMInputProperty")):
     propValue = input_smproperty_tostring(info, propInfo)
   elif (prop.IsA("vtkSMProxyProperty")):
