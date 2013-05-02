@@ -83,7 +83,10 @@ void pqCategoryToolbarsBehavior::updateToolbars()
     QToolBar* toolbar = this->MainWindow->findChild<QToolBar*>(category);
     if (!toolbar)
       {
-      this->MainWindow->addToolBarBreak();
+      if ( category == "Common" )
+        {
+        this->MainWindow->addToolBarBreak();
+        }
       toolbar = new QToolBar(this->MainWindow);
       toolbar->setObjectName(category);
       toolbar->setOrientation(Qt::Horizontal);
