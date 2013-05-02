@@ -5711,6 +5711,9 @@ found and the point will be rejected.</Documentation>
                          name="ComputeNormals"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="NonPolyDataInputDecorator" />
+        </Hints>
         <Documentation>If this property is set to 1, a scalar array containing
         a normal value at each point in the isosurface or isoline will be
         created by the contour filter; otherwise an array of normals will not
@@ -5726,6 +5729,9 @@ found and the point will be rejected.</Documentation>
                          name="ComputeGradients"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="StructuredInputDecorator" />
+        </Hints>
         <Documentation>If this property is set to 1, a scalar array containing
         a gradient value at each point in the isosurface or isoline will be
         created by this filter; otherwise an array of gradients will not be
@@ -7980,6 +7986,9 @@ found and the point will be rejected.</Documentation>
                          name="ComputeNormals"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="NonPolyDataInputDecorator" />
+        </Hints>
         <Documentation>Select whether to compute normals.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"
@@ -7988,6 +7997,9 @@ found and the point will be rejected.</Documentation>
                          name="ComputeGradients"
                          number_of_elements="1">
         <BooleanDomain name="bool" />
+        <Hints>
+          <PropertyWidgetDecorator type="StructuredInputDecorator" />
+        </Hints>
         <Documentation>Select whether to compute gradients.</Documentation>
       </IntVectorProperty>
       <IntVectorProperty animateable="0"

@@ -69,11 +69,23 @@ public:
     return true;
     }
 
+  /// Override this method to override the enable state of the widget in the
+  /// panel. This is called after the generic tests for advanced and text
+  /// filtering are passed. Since there can be multiple decorators, the first
+  /// decorator that returns 'false' wins. Default implementation returns true.
+  /// Thus subclasses typically override this method only to force the widget
+  /// disabled given the current state.
+  virtual bool enableWidget() const
+    {
+    return true;
+    }
+
 signals:
   /// This signal is fired whenever the decorator has determined that the panel
   /// *may* need a refresh since the state of the system has changed which would
-  /// deem changes in the widget visibility.
+  /// deem changes in the widget visibility or enable state.
   void visibilityChanged();
+  void enableStateChanged();
 
 protected:
   vtkPVXMLElement* xml() const;

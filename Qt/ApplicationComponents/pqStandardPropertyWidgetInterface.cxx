@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayRepresentationWidget.h"
 #include "pqDoubleRangeSliderPropertyWidget.h"
 #include "pqListPropertyWidget.h"
+#include "pqNonPolyDataInputDecorator.h"
+#include "pqStructuredInputDecorator.h"
 #include "pqTextureSelectorPropertyWidget.h"
 #include "pqTransferFunctionEditorPropertyWidget.h"
 #include "vtkSMPropertyGroup.h"
@@ -150,6 +152,14 @@ pqStandardPropertyWidgetInterface::createWidgetDecorator(
   if (type == "CTHArraySelectionDecorator")
     {
     return new pqCTHArraySelectionDecorator(config, widget);
+    }
+  if (type == "StructuredInputDecorator")
+    {
+    return new pqStructuredInputDecorator(config, widget);
+    }
+  if (type == "NonPolyDataInputDecorator")
+    {
+    return new pqNonPolyDataInputDecorator(config, widget);
     }
   return NULL;
 }
