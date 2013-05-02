@@ -71,8 +71,6 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
 {
   this->setShowLabel(false);
 
-  pqCollapsedGroup *groupBox = new pqCollapsedGroup(this);
-  groupBox->setTitle(smProperty->GetXMLLabel());
   QVBoxLayout *groupBoxLayout = new QVBoxLayout;
   QHBoxLayout *groupListLayout = new QHBoxLayout;
   d->ListWidget = new QListWidget;
@@ -81,7 +79,7 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
                 this, SLOT(itemChanged(QListWidgetItem*)));
   groupListLayout->addWidget(d->ListWidget);
 
-  d->ScalarRange = new QLabel("Scalar Range: 0.0 - 1.0", groupBox);
+  d->ScalarRange = new QLabel("Scalar Range: 0.0 - 1.0", this);
   groupBoxLayout->addWidget(d->ScalarRange);
   d->ScalarRange->setVisible(false);
 
@@ -102,12 +100,9 @@ pqScalarValueListPropertyWidget::pqScalarValueListPropertyWidget(vtkSMProperty *
   buttonBox->addWidget(scientificModeCheckBox);
   groupListLayout->addLayout(buttonBox);
   groupBoxLayout->addLayout(groupListLayout);
-  groupBox->setLayout(groupBoxLayout);
 
   // create top-level layout for the group box
-  QVBoxLayout *internalLayout = new QVBoxLayout;
-  internalLayout->addWidget(groupBox);
-  this->setLayout(internalLayout);
+  this->setLayout(groupBoxLayout);
 
   this->setScalars(pqSMAdaptor::getMultipleElementProperty(smProperty, pqSMAdaptor::UNCHECKED));
 }

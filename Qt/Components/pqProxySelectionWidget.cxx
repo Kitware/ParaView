@@ -244,12 +244,7 @@ void pqProxySelectionWidget::initialize3DWidget()
     if(!this->Internal->Widget)
       {
       pqProxyPanel* sub_panel = new pqProxyPanel(smProxy, this);
-      pqCollapsedGroup* group = new pqCollapsedGroup(sub_panel);
       QGridLayout* gl = new QGridLayout(sub_panel);
-      gl->setMargin(0);
-      gl->addWidget(group);
-      gl = new QGridLayout(group);
-      group->setTitle(smProxy->GetXMLLabel());
       gl->setMargin(2);
       pqNamedWidgets::createWidgets(gl, smProxy);
       if (gl->rowCount() <= 2)
@@ -259,7 +254,7 @@ void pqProxySelectionWidget::initialize3DWidget()
         }
       else
         {
-        pqNamedWidgets::link(group, smProxy, sub_panel->propertyManager());
+        pqNamedWidgets::link(sub_panel, smProxy, sub_panel->propertyManager());
         QGridLayout* l = qobject_cast<QGridLayout*>(this->layout());
         this->Internal->Widget = sub_panel;
         l->addWidget(this->Internal->Widget, 1, 0, 1, 2);

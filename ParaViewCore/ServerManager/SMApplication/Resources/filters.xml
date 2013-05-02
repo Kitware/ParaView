@@ -5705,29 +5705,6 @@ found and the point will be rejected.</Documentation>
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
       </StringVectorProperty>
-
-      <DoubleVectorProperty animateable="1"
-                            command="SetValue"
-                            label="Isosurfaces"
-                            name="ContourValues"
-                            number_of_elements="0"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            set_number_command="SetNumberOfContours"
-                            use_index="1">
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>This property specifies the values at which to compute
-        isosurfaces/isolines and also the number of such
-        values.</Documentation>
-      </DoubleVectorProperty>
-
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
                          default_values="1"
@@ -5780,6 +5757,27 @@ found and the point will be rejected.</Documentation>
         Warning: Many filters do not properly handle non-trianglular polygons.
         </Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Isosurfaces"
+                            name="ContourValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>This property specifies the values at which to compute
+        isosurfaces/isolines and also the number of such
+        values.</Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="2" />
       </Hints>
@@ -5802,6 +5800,14 @@ found and the point will be rejected.</Documentation>
         merging duplicate / coincident points.</Documentation>
       </ProxyProperty>
       <!-- incremental point locator end -->
+
+      <PropertyGroup label="Isosurfaces">
+        <Property name="ContourValues" />
+      </PropertyGroup>
+      <PropertyGroup label="Point Locator">
+        <Property name="Locator" />
+      </PropertyGroup>
+
       <!-- End Contour -->
     </SourceProxy>
     <!-- ==================================================================== -->
@@ -7968,30 +7974,6 @@ found and the point will be rejected.</Documentation>
         from which the contour filter will compute isolines and/or
         isosurfaces.</Documentation>
       </StringVectorProperty>
-
-      <DoubleVectorProperty animateable="1"
-                            command="SetValue"
-                            label="Isosurfaces"
-                            name="ContourValues"
-                            number_of_elements="0"
-                            number_of_elements_per_command="1"
-                            repeat_command="1"
-                            set_number_command="SetNumberOfContours"
-                            use_index="1">
-        <ArrayRangeDomain name="scalar_range">
-          <RequiredProperties>
-            <Property function="Input"
-                      name="Input" />
-            <Property function="ArraySelection"
-                      name="SelectInputScalars" />
-          </RequiredProperties>
-        </ArrayRangeDomain>
-        <Documentation>This property specifies the values at which to compute
-        isosurfaces/isolines and also the number of such
-        values.</Documentation>
-      </DoubleVectorProperty>
-
-
       <IntVectorProperty animateable="0"
                          command="SetComputeNormals"
                          default_values="1"
@@ -8016,6 +7998,27 @@ found and the point will be rejected.</Documentation>
         <BooleanDomain name="bool" />
         <Documentation>Select whether to compute scalars.</Documentation>
       </IntVectorProperty>
+      <DoubleVectorProperty animateable="1"
+                            command="SetValue"
+                            label="Isosurfaces"
+                            name="ContourValues"
+                            number_of_elements="0"
+                            number_of_elements_per_command="1"
+                            repeat_command="1"
+                            set_number_command="SetNumberOfContours"
+                            use_index="1">
+        <ArrayRangeDomain name="scalar_range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>This property specifies the values at which to compute
+        isosurfaces/isolines and also the number of such
+        values.</Documentation>
+      </DoubleVectorProperty>
       <Hints>
         <Visibility replace_input="0" />
       </Hints>
@@ -8038,6 +8041,14 @@ found and the point will be rejected.</Documentation>
         merging duplicate / coincident points.</Documentation>
       </ProxyProperty>
       <!-- incremental point locator end -->
+
+      <PropertyGroup label="Isosurfaces">
+        <Property name="ContourValues" />
+      </PropertyGroup>
+      <PropertyGroup label="Point Locator">
+        <Property name="Locator" />
+      </PropertyGroup>
+
       <!-- End GenericContour -->
     </SourceProxy>
     <!-- ==================================================================== -->

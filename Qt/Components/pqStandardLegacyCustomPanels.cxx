@@ -66,15 +66,6 @@ pqObjectPanel* pqStandardLegacyCustomPanels::createPanel(pqProxy* proxy, QWidget
       {
       return new pqGlyphPanel(proxy, p);
       }
-    //      if(QString("ParticleTracer") == proxy->getProxy()->GetXMLName())
-    //        {
-    //        return new pqParticleTracerPanel(proxy, p);
-    //        }
-    //if(QString("Contour") == proxy->getProxy()->GetXMLName() ||
-    //  QString("GenericContour") == proxy->getProxy()->GetXMLName())
-    //  {
-    //  return new pqContourPanel(proxy, p);
-    //  }
     if (QString("YoungsMaterialInterface") == proxy->getProxy()->GetXMLName())
       {
       return new pqYoungsMaterialInterfacePanel(proxy, p);
