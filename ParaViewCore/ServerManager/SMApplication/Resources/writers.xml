@@ -987,6 +987,14 @@
         animation scene at all. In other words, this is the playback frame rate
         and not the animation generation frame rate.</Documentation>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty command="SetPlaybackTimeWindow"
+                            default_values="-1 1"
+                            name="PlaybackTimeWindow"
+                            number_of_elements="2">
+        <Documentation>Time range to write</Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty command="SetCompression"
                          default_values="1"
                          name="Compression"

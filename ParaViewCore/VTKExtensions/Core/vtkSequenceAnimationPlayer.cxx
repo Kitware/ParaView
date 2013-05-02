@@ -31,7 +31,7 @@ vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer()
 
 //----------------------------------------------------------------------------
 void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
-                                           double currenttime)
+                                           double* playbackWindow)
 {
   // the frame index is inited to 0 ONLY when an animation is not resumed from
   // an intermediate frame
@@ -43,12 +43,18 @@ void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
   // currenttime, which might be the 'scene time' (usually unequal to
   // starttime) upon the previous pause / stop operation (if any), is used to
   // determine the actual frame index from which to resume the animation
-  if (currenttime > starttime)
+  if (playbackWindow[0] > starttime)
     {
     // let's resume from the frame NEXT to the one on which the animation WAS
     // paused / stopped
-    this->FrameNo = static_cast<int>( (currenttime - this->StartTime) * 
+    this->FrameNo = static_cast<int>( (playbackWindow[0] - this->StartTime) *
                                       (this->NumberOfFrames - 1) / 
+                                      (this->EndTime - this->StartTime) + 0.5
+                                    ) + 1;
+
+    // Let's compute the upper bounds in Frame unit
+    this->MaxFrameWindow = static_cast<int>( (playbackWindow[1] - this->StartTime) *
+                                      (this->NumberOfFrames - 1) /
                                       (this->EndTime - this->StartTime) + 0.5
                                     ) + 1;
     }
@@ -58,7 +64,7 @@ void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
 double vtkSequenceAnimationPlayer::GetNextTime(double vtkNotUsed(curtime))
 { 
   this->FrameNo++;
-  if (this->StartTime == this->EndTime && this->FrameNo >= this->NumberOfFrames)
+  if (this->StartTime >= this->EndTime && this->FrameNo >= this->MaxFrameWindow)
     {
     return VTK_DOUBLE_MAX;
     }

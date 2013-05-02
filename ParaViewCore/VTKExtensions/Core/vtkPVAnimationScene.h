@@ -70,6 +70,18 @@ public:
   // AnimationCueTickEvent handlers.
   vtkGetMacro(SceneTime, double);
 
+  // Description:
+  // Get/Set the Playback Window for this cue.
+  // The Playback Window is use to mask out time that belong to a given cue
+  // but that we don't want to play back.
+  // This is particulary useful when we want to export a subset of an animation
+  // without recomputing any start and end value relative to the cue and the
+  // number of frame associated to it.
+  // This is used by the Animation Player to only play a subset of the cue.
+  // To disable it just make the lower bound bigger than the upper one.
+  vtkSetVector2Macro(PlaybackTimeWindow, double);
+  vtkGetVector2Macro(PlaybackTimeWindow, double);
+
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
@@ -89,6 +101,7 @@ protected:
 
   bool InTick;
   double SceneTime;
+  double PlaybackTimeWindow[2];
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.
   void operator=(const vtkPVAnimationScene&); // Not implemented.

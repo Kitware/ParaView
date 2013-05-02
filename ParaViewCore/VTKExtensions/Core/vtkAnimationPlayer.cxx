@@ -69,8 +69,15 @@ void vtkAnimationPlayer::Play()
 
   double starttime = this->AnimationScene->GetStartTime();
   double endtime = this->AnimationScene->GetEndTime();
+  double playbackWindow[2];
+  this->AnimationScene->GetPlaybackTimeWindow(playbackWindow);
+  if(playbackWindow[0] > playbackWindow[1])
+    {
+    playbackWindow[0] = starttime;
+    playbackWindow[1] = endtime;
+    }
 
-  this->CurrentTime = this->AnimationScene->GetSceneTime();
+  this->CurrentTime = playbackWindow[0];
   this->CurrentTime = (this->CurrentTime < starttime || 
     this->CurrentTime >= endtime)? starttime : this->CurrentTime;
  
@@ -79,13 +86,13 @@ void vtkAnimationPlayer::Play()
 
   do 
     {
-    this->StartLoop(starttime, endtime, this->CurrentTime);
+    this->StartLoop(starttime, endtime, playbackWindow);
     this->AnimationScene->Initialize();
     double deltatime = 0.0;
-    while (!this->StopPlay && this->CurrentTime <= endtime)
+    while (!this->StopPlay && this->CurrentTime <= playbackWindow[1])
       {
       this->AnimationScene->Tick(this->CurrentTime, deltatime, this->CurrentTime);
-      double progress = (this->CurrentTime-starttime)/(endtime-starttime);
+      double progress = (this->CurrentTime-playbackWindow[0])/(playbackWindow[1]-playbackWindow[0]);
       this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
 
       double nexttime = this->GetNextTime(this->CurrentTime);

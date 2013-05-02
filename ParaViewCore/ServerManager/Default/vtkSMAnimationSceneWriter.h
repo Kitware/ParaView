@@ -52,6 +52,13 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
+  // Description:
+  // Get/Set time window that we want to write
+  // If PlaybackTimeWindow[0] > PlaybackTimeWindow[1] that mean that we
+  // want to export the full time range available.
+  vtkSetVector2Macro(PlaybackTimeWindow, double);
+  vtkGetVector2Macro(PlaybackTimeWindow, double);
+
 protected:
   vtkSMAnimationSceneWriter();
   ~vtkSMAnimationSceneWriter();
@@ -81,6 +88,7 @@ protected:
   bool Saving;
   bool SaveFailed;
   char* FileName;
+  double PlaybackTimeWindow[2];
 private:
   vtkSMAnimationSceneWriter(const vtkSMAnimationSceneWriter&); // Not implemented.
   void operator=(const vtkSMAnimationSceneWriter&); // Not implemented.

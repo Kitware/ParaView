@@ -36,10 +36,11 @@ vtkRealtimeAnimationPlayer::~vtkRealtimeAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkRealtimeAnimationPlayer::StartLoop(double start, double end, double curtime)
+void vtkRealtimeAnimationPlayer::StartLoop(double start, double end, double* playbackWindow)
 {
   this->StartTime = start;
   this->Factor = (end - start)/this->Duration;
+  double curtime = playbackWindow[0];
   
   // set a time shift to resume an interrupted animation (fix to bug #0008280)
   if ( start < curtime && curtime < end )
@@ -52,7 +53,7 @@ void vtkRealtimeAnimationPlayer::StartLoop(double start, double end, double curt
     }
   
   // obtain the end time to be used in GetNextTime(...)
-  this->EndTime = end;
+  this->EndTime = playbackWindow[1];
   
   this->Timer->StartTimer();
 }
