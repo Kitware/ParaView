@@ -2,7 +2,8 @@ r"""simple is a module for using paraview server manager in Python. It
 provides a simple convenience layer to functionality provided by the
 C++ classes wrapped to Python as well as the servermanager module.
 
-A simple example:
+A simple example::
+
   from paraview.simple import *
 
   # Create a new sphere proxy on the active connection and register it
@@ -11,12 +12,13 @@ A simple example:
 
   # Apply a shrink filter
   shrink = Shrink(sphere)
-  
+
   # Turn the visiblity of the shrink object on.
   Show(shrink)
-  
+
   # Render the scene
   Render()
+
 """
 #==============================================================================
 #
@@ -64,7 +66,8 @@ def Disconnect(ns=None, force=True):
           gc.collect()
 
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
-    """Creates a connection to a server. Example usage:
+    """Creates a connection to a server. Example usage::
+
     > Connect("amber") # Connect to a single server at default port
     > Connect("amber", 12345) # Connect to a single server at port 12345
     > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
@@ -301,8 +304,9 @@ def _DisableFirstRenderCameraReset():
 def SetProperties(proxy=None, **params):
     """Sets one or more properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
-    pairs to this function to set property values. For example:
-     SetProperties(Center=[1, 2, 3], Radius=3.5)
+    pairs to this function to set property values. For example::
+
+        SetProperties(Center=[1, 2, 3], Radius=3.5)
     """
     if not proxy:
         proxy = active_objects.source
@@ -314,14 +318,17 @@ def SetProperties(proxy=None, **params):
 def GetProperty(*arguments, **keywords):
     """Get one property of the given pipeline object. If keywords are used,
        you can set the proxy and the name of the property that you want to get
-       like in the following example :
+       like in the following example::
+
             GetProperty({proxy=sphere, name="Radius"})
+
        If it's arguments that are used, then you have two case:
          - if only one argument is used that argument will be
            the property name.
          - if two arguments are used then the first one will be
            the proxy and the second one the property name.
-       Several example are given below:
+       Several example are given below::
+
            GetProperty({name="Radius"})
            GetProperty({proxy=sphereProxy, name="Radius"})
            GetProperty( sphereProxy, "Radius" )
@@ -348,8 +355,9 @@ def GetProperty(*arguments, **keywords):
 def SetDisplayProperties(proxy=None, view=None, **params):
     """Sets one or more display properties of the given pipeline object. If an argument
     is not provided, the active source is used. Pass a list of property_name=value
-    pairs to this function to set property values. For example:
-     SetProperties(Color=[1, 0, 0], LineWidth=2)
+    pairs to this function to set property values. For example::
+
+        SetProperties(Color=[1, 0, 0], LineWidth=2)
     """
     rep = GetDisplayProperties(proxy, view)
     SetProperties(rep, **params)
@@ -357,8 +365,9 @@ def SetDisplayProperties(proxy=None, view=None, **params):
 def SetViewProperties(view=None, **params):
     """Sets one or more properties of the given view. If an argument
     is not provided, the active view is used. Pass a list of property_name=value
-    pairs to this function to set property values. For example:
-     SetProperties(Background=[1, 0, 0], UseImmediateMode=0)
+    pairs to this function to set property values. For example::
+
+        SetProperties(Background=[1, 0, 0], UseImmediateMode=0)
     """
     if not view:
         view = active_objects.view
@@ -505,12 +514,12 @@ def CreateScalarBar(**params):
     be added to a render view by appending it to the view's representations
     The widget must have a valid lookup table before it is added to a view.
     It is possible to pass the lookup table (and other properties) as arguments
-    to this method:
-    
-    lt = MakeBlueToRedLt(3.5, 7.5)
-    bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
-    GetRenderView().Representations.append(bar)
-    
+    to this method::
+
+        lt = MakeBlueToRedLt(3.5, 7.5)
+        bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
+        GetRenderView().Representations.append(bar)
+
     By default the returned widget is selectable and resizable.
     """
     sb = servermanager.rendering.ScalarBarWidgetRepresentation()
@@ -572,8 +581,10 @@ def RemoveCameraLink(linkName):
 def WriteImage(filename, view=None, **params):
     """Saves the given view (or the active one if none is given) as an
     image. Optionally, you can specify the writer and the magnification
-    using the Writer and Magnification named arguments. For example:
-     WriteImage("foo.mypng", aview, Writer=vtkPNGWriter, Magnification=2)
+    using the Writer and Magnification named arguments. For example::
+
+        WriteImage("foo.mypng", aview, Writer=vtkPNGWriter, Magnification=2)
+
     If no writer is provided, the type is determined from the file extension.
     Currently supported extensions are png, bmp, ppm, tif, tiff, jpg and jpeg.
     The writer is a VTK class that is capable of writing images.
@@ -701,6 +712,10 @@ def _func_name_valid(name):
     return valid
 
 def _add_functions(g):
+    import os
+    if os.environ.has_key("PARAVIEW_DOCUMENTATION_SKIP_ADD_FUNCTIONS"):
+        return
+
     activeModule = servermanager.ActiveConnection.Modules
     for m in [activeModule.filters, activeModule.sources,
               activeModule.writers, activeModule.animation]:
@@ -727,19 +742,23 @@ def _remove_functions(g):
                 #print "remove %s function" % key
 
 def GetActiveView():
-    "Returns the active view."
+    """.. _GetActiveView:
+        Returns the active view."""
     return active_objects.view
     
 def SetActiveView(view):
-    "Sets the active view."
+    """.. _SetActiveView:
+        Sets the active view."""
     active_objects.view = view
     
 def GetActiveSource():
-    "Returns the active source."
+    """.. _GetActiveSource:
+        Returns the active source."""
     return active_objects.source
     
 def SetActiveSource(source):
-    "Sets the active source."
+    """.. _SetActiveSource:
+        Sets the active source."""
     active_objects.source = source
     
 def GetActiveCamera():
@@ -766,17 +785,18 @@ def WriteAnimation(filename, **params):
     """Writes the current animation as a file. Optionally one can specify
     arguments that qualify the saved animation files as keyword arguments.
     Accepted options are as follows:
-    * Magnification (integer) : set the maginification factor for the saved
+
+    * **Magnification** *(integer)* : set the maginification factor for the saved
       animation.
-    * Quality (0 [worst] or 1 or 2 [best]) : set the quality of the generated
+    * **Quality** *(0 [worst] or 1 or 2 [best])* : set the quality of the generated
       movie (if applicable).
-    * Subsampling (integer) : setting whether the movie encoder should use
+    * **Subsampling** *(integer)* : setting whether the movie encoder should use
       subsampling of the chrome planes or not, if applicable. Since the human
       eye is more sensitive to brightness than color variations, subsampling
       can be useful to reduce the bitrate. Default value is 0.
-    * BackgroundColor (3-tuple of doubles) : set the RGB background color to
+    * **BackgroundColor** *(3-tuple of doubles)* : set the RGB background color to
       use to fill empty spaces in the image.
-    * FrameRate (double): set the frame rate (if applicable)."""
+    * **FrameRate** *(double)*: set the frame rate (if applicable)."""
     scene = GetAnimationScene()
     # ensures that the TimeKeeper track is created.
     GetTimeTrack()
@@ -816,19 +836,20 @@ def _GetRepresentationAnimationHelper(sourceproxy):
 def GetAnimationTrack(propertyname_or_property, index=None, proxy=None):
     """Returns an animation cue for the property. If one doesn't exist then a
     new one will be created.
-    Typical usage:
-        track = GetAnimationTrack("Center", 0, sphere) or
-        track = GetAnimationTrack(sphere.GetProperty("Radius")) or
+    Typical usage::
 
-        # this returns the track to animate visibility of the active source in
-        # all views.
-        track = GetAnimationTrack("Visibility")
+      track = GetAnimationTrack("Center", 0, sphere) or
+      track = GetAnimationTrack(sphere.GetProperty("Radius")) or
 
-     For animating properties on implicit planes etc., use the following
-     signatures:
-        track = GetAnimationTrack(slice.SliceType.GetProperty("Origin"), 0) or
-        track = GetAnimationTrack("Origin", 0, slice.SliceType)
+      # this returns the track to animate visibility of the active source in
+      # all views.
+      track = GetAnimationTrack("Visibility")
 
+    For animating properties on implicit planes etc., use the following
+    signatures::
+
+      track = GetAnimationTrack(slice.SliceType.GetProperty("Origin"), 0) or
+      track = GetAnimationTrack("Origin", 0, slice.SliceType)
     """
     if not proxy:
         proxy = GetActiveSource()
@@ -923,10 +944,12 @@ def LoadPlugin(filename, remote=True, ns=None):
     if any. The remote argument (default to True) is to specify whether 
     the plugin will be loaded on client (remote=False) or on server (remote=True).
     If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as an argument:
-    LoadPlugin("myplugin", False, globals()), to load on client;
-    LoadPlugin("myplugin", True, globals()), to load on server; 
-    LoadPlugin("myplugin", ns=globals()), to load on server.
+    make sure to pass globals() as an argument::
+
+        LoadPlugin("myplugin", False, globals()) # to load on client
+        LoadPlugin("myplugin", True, globals())  # to load on server
+        LoadPlugin("myplugin", ns=globals())     # to load on server
+
     Otherwise, the new functions will not appear in the global namespace."""
     
     if not ns:
@@ -1002,8 +1025,9 @@ def ClearSelection(proxy=None):
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
     objects are shared between Python and the user interface. This class
-    is for internal use. Use the Set/Get methods for setting and getting
-    active objects."""
+    is for internal use. Use the :ref:`SetActiveSource`,
+    :ref:`GetActiveSource`, :ref:`SetActiveView`, and :ref:`GetActiveView`
+    methods for setting and getting active objects."""
     def __get_selection_model(self, name, session=None):
         "Internal method."
         if session and session != servermanager.ActiveConnection.Session:
