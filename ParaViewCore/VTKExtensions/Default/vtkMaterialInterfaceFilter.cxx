@@ -203,7 +203,27 @@ vtkCxxSetObjectMacro(vtkMaterialInterfaceFilter,ClipFunction,vtkImplicitFunction
 //
 
 //============================================================================
+namespace {
+vtkUniformGrid* GetReferenceGrid(vtkNonOverlappingAMR *amrds)
+{
+  unsigned int numLevels = amrds->GetNumberOfLevels();
+  for(unsigned int l=0; l < numLevels; ++l )
+    {
+    unsigned int numDatasets = amrds->GetNumberOfDataSets( l );
+    for( unsigned int dataIdx=0; dataIdx < numDatasets; ++dataIdx )
+      {
+      vtkUniformGrid *refGrid = amrds->GetDataSet( l, dataIdx );
+      if( refGrid != NULL )
+        {
+        return( refGrid );
+        }
+      } // END for all datasets
+    } // END for all number of levels
 
+  // This process has no grids
+  return NULL;
+}
+};
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
 // from different processes.
@@ -3543,20 +3563,42 @@ int vtkMaterialInterfaceFilter::RequestData(
     this->NMassWtdAvgs
       = this->MaterialId<nMassArrays ? nMassWtdAvgs : 0;
     // arrays to copy to the output are affected as well
-    vector<int> MergedMarkers;
+
+    // We used to compute the Union of the data array that were needed but now
+    // we simply pass all possible array so the user can use other one to color by
     this->IntegratedArrayNames.clear();
-    this->NToIntegrate
-      = MergeEnabledArrayNames(this->VolumeWtdAvgArraySelection,
-                               this->IntegratedArrayNames);
-    if (this->MaterialId<nMassArrays)
-      {
-      this->NToIntegrate
-        += MergeEnabledArrayNames(this->MassWtdAvgArraySelection,
-                                  this->IntegratedArrayNames);
-      }
+    this->NToIntegrate = 0;
 
     if ( hbdsInput!=0 )
       {
+      // Extract all compatible cell data so they could be used by the user
+      // to color by. Previously only the array that were used for computation
+      // was kept
+      vtkUniformGrid* ds = GetReferenceGrid(hbdsInput);
+      if(ds)
+        {
+        this->NToIntegrate = ds->GetCellData()->GetNumberOfArrays();
+        int substract = 0;
+        for(int i=0; i < this->NToIntegrate; ++i)
+          {
+          switch(ds->GetCellData()->GetArray(i)->GetDataType())
+            {
+          case VTK_FLOAT:
+          case VTK_DOUBLE:
+          case VTK_UNSIGNED_INT:
+          case VTK_INT:{
+            const char* arrayName = ds->GetCellData()->GetArrayName(i);
+            this->IntegratedArrayNames.push_back(arrayName);
+            }
+            break;
+          default:
+            ++substract;
+            break;
+            }
+          }
+        this->NToIntegrate -= substract;
+        }
+
       // build arrays for results of attribute calculations
       this->PrepareForPass(hbdsInput,
                            this->VolumeWtdAvgArrayNames,
