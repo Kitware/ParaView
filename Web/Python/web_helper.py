@@ -135,7 +135,7 @@ class LookupTableManager:
                 name = array.Name
                 nbComp = array.GetNumberOfComponents()
                 dataRange = [0.0, 1.0]
-                if nbComp == 3:
+                if nbComp != 1:
                     dataRange = array.GetRange(-1)
                 else:
                     dataRange = array.GetRange(0)
