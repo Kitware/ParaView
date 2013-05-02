@@ -392,6 +392,10 @@
           <Property name="LabelFormat" />
           <Property name="NumberOfLabels" />
           <Property name="AspectRatio" />
+          <Property name="DrawAnnotations" />
+          <Property name="DrawNanAnnotation" />
+          <Property name="NanAnnotation" />
+          <Property name="TextPosition" />
           <!-- properties for Label -->
           <Property name="LabelColor" />
           <Property name="LabelOpacity" />

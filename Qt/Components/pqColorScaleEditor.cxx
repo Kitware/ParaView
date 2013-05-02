@@ -62,12 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkAbstractArray.h"
 #include "vtkAxis.h"
 #include "vtkChartXY.h"
+#include "vtkColor.h"
 #include "vtkColorTransferControlPointsItem.h"
 #include "vtkCompositeControlPointsItem.h"
 #include "vtkPiecewiseControlPointsItem.h"
 #include "vtkTransferFunctionViewer.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkMath.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVProminentValuesInformation.h"
@@ -1499,13 +1501,14 @@ void pqColorScaleEditor::addActiveValues()
     QTreeWidgetItem* valItem;
     //QTreeWidgetItem* txtItem;
     std::ostringstream sval;
+    vtkVariant comp;
     for ( int c = 0; c < nc; ++ c )
       {
       if ( c )
         {
         sval << numsep;
         }
-      vtkVariant comp = uniq->GetVariantValue( i * nc + c );
+      comp = uniq->GetVariantValue( i * nc + c );
       if ( comp.IsDouble() )
         {
         sval.precision(17);
@@ -1537,9 +1540,30 @@ void pqColorScaleEditor::addActiveValues()
       vtkColorTransferFunction* tf = this->currentColorFunction();
       if ( tf && tf->GetSize() )
         {
-        double nodeValue[6];
-        tf->GetNodeValue(nr % tf->GetSize(), nodeValue);
-        valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+        vtkColor3d color;
+        if (tf->GetIndexedLookup())
+          {
+          double nodeValue[6];
+          tf->GetNodeValue(nr % tf->GetSize(), nodeValue);
+          for (int j = 0; j < 3; ++j)
+            {
+            color[j] = nodeValue[j+1];
+            }
+          }
+        else
+          {
+          bool ok;
+          double dval = comp.ToDouble(&ok);
+          // String or vector values cannot be mapped to a double, so make them NaN
+          if (!ok || uniq->GetNumberOfComponents() > 1)
+            {
+            // Retrieve the NaN color. Not all vtkScalarsToColors
+            // subclasses have one, so we are stuck using GetColor.
+            dval = vtkMath::Nan();
+            }
+          tf->GetColor(dval, color.GetData());
+          }
+        valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
         }
       valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( sval.str().c_str() ) );
       valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( sval.str().c_str() ) );
@@ -1562,9 +1586,22 @@ void pqColorScaleEditor::addAnnotationEntry()
   vtkColorTransferFunction* tf = this->currentColorFunction();
   if ( tf && tf->GetSize() )
     {
-    double nodeValue[6];
-    tf->GetNodeValue(nxtRow % tf->GetSize(), nodeValue);
-    valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+    vtkColor3d color;
+    if (tf->GetIndexedLookup())
+      {
+      double nodeValue[6];
+      tf->GetNodeValue(nxtRow % tf->GetSize(), nodeValue);
+      for (int j = 0; j < 3; ++j)
+        {
+        color[j] = nodeValue[j+1];
+        }
+      }
+    else
+      {
+      double dval = vtkMath::Nan();
+      tf->GetColor(dval, color.GetData());
+      }
+    valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
     }
   valItem->setData( PQ_ANN_VALUE_COL, Qt::DisplayRole, QString( "" ) );
   valItem->setData( PQ_ANN_ENTRY_COL, Qt::DisplayRole, QString( "Note" ) );
@@ -1578,6 +1615,7 @@ void pqColorScaleEditor::annotationsChanged()
 {
   // Reset annotations on local and proxy color transfer functions.
   this->pushAnnotations();
+  this->updateAnnotationColors();
 }
 
 void pqColorScaleEditor::resetAnnotationSort()
@@ -1611,11 +1649,30 @@ void pqColorScaleEditor::updateAnnotationColors()
     {
     if ( nc )
       {
-      double nodeValue[6];
-      //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
-      tf->GetNodeValue( i % nc, nodeValue );
-      valItem->setData( PQ_ANN_VALUE_COL, Qt::DecorationRole,
-        QColor::fromRgbF( nodeValue[1], nodeValue[2], nodeValue[3] ) );
+      vtkColor3d color;
+      if (tf->GetIndexedLookup())
+        {
+        double nodeValue[6];
+        tf->GetNodeValue(i % nc, nodeValue);
+        for (int j = 0; j < 3; ++j)
+          {
+          color[j] = nodeValue[j+1];
+          }
+        }
+      else
+        {
+        bool ok;
+        double dval = valItem->data(PQ_ANN_VALUE_COL, Qt::DisplayRole).toDouble(&ok);
+        // String or vector values cannot be mapped to a double, so make them NaN
+        if (!ok)
+          {
+          // Retrieve the NaN color. Not all vtkScalarsToColors
+          // subclasses have one, so we are stuck using GetColor.
+          dval = vtkMath::Nan();
+          }
+        tf->GetColor(dval, color.GetData());
+        }
+      valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
       }
     else
       {
@@ -1631,8 +1688,7 @@ void pqColorScaleEditor::updateAnnotationColors()
 void pqColorScaleEditor::annotationSelectionChanged()
 {
   QTreeWidget* atab = this->Form->AnnotationTree;
-  vtkColorTransferFunction* tf = this->currentColorFunction();
-  if (!tf || !atab)
+  if (!atab)
     {
     return;
     }
@@ -1642,45 +1698,20 @@ void pqColorScaleEditor::annotationSelectionChanged()
     return;
     }
   QTreeWidgetItem* selectedItem = seln[0];
-  int nc = tf->GetSize();
-  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
-  QTreeWidgetItem* valItem;
-  // Find top-most item in list
-  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
-    {
-    last = valItem;
-    }
-  valItem = last;
-  // Traverse list from top down searching for our item and counting colors along the way.
-  for (int i = 0; valItem; ++i)
-    {
-    if ( valItem == selectedItem )
-      {
-      if ( nc )
-        {
-        double nodeValue[6];
-        //tf->GetNodeValue( (total - i - 1) % nc, nodeValue );
-        tf->GetNodeValue( i % nc, nodeValue );
-        QColor newColor;
-        newColor.setRgbF(nodeValue[1], nodeValue[2], nodeValue[3]);
-        this->Form->AnnotationSwatch->blockSignals(true);
-        this->Form->AnnotationSwatch->setChosenColor(newColor);
-        this->Form->AnnotationSwatch->blockSignals(false);
-        }
-      else
-        {
-        this->Form->AnnotationSwatch->blockSignals(true);
-        this->Form->AnnotationSwatch->setChosenColor(this->Form->NanColor->chosenColor());
-        this->Form->AnnotationSwatch->blockSignals(false);
-        }
-      return;
-      }
-    valItem = this->Form->AnnotationTree->itemBelow(valItem);
-    }
+  QColor newColor = qVariantValue<QColor>(selectedItem->data(PQ_ANN_VALUE_COL, Qt::DecorationRole));
+  this->Form->AnnotationSwatch->blockSignals(true);
+  this->Form->AnnotationSwatch->setChosenColor(newColor);
+  this->Form->AnnotationSwatch->blockSignals(false);
 }
 
 /**\brief When the annotation swatch color is changed by the user, update the appropriate color transfer control point.
  *
+ * In interval/ratio mode, a new control point is added if one did not already exist
+ * at the annotated value. If the annotated value cannot be converted to a double or
+ * is NaN, then no action is taken. The control point's color is then modified.
+ *
+ * In categorical mode, the behavior is more complex in order to provide a way to change the number
+ * of colors in the palette.
  * When the currently selected annotation index is larger than the number of control points in the color transfer
  * function, we add to the list of control points.
  * The addition goes as follows: if there are originally N control points and M>N annotations, with annotation P's color
@@ -1703,67 +1734,95 @@ void pqColorScaleEditor::editAnnotationColor(const QColor& newColor)
   this->Form->AnnotationSwatch->blockSignals(true);
   QTreeWidgetItem* selectedItem = seln[seln.size() - 1];
   int nc = tf->GetSize();
-  QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
-  QTreeWidgetItem* valItem;
-  // Find top-most item in list
-  while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
+  if (tf->GetIndexedLookup())
     {
-    last = valItem;
-    }
-  valItem = last;
-  // Traverse list from top down searching for our item and counting colors along the way.
-  for (int i = 0; valItem; ++i)
-    {
-    if ( valItem == selectedItem )
+    QTreeWidgetItem* last = this->Form->AnnotationTree->topLevelItem(0);
+    QTreeWidgetItem* valItem;
+    // Find top-most item in list
+    while (last && (valItem = this->Form->AnnotationTree->itemAbove(last)))
       {
-      if ( nc )
-        { // At least one transfer function control point.
-        double nodeValue[6];
-        if ( i >= nc )
-          { // Need to add control points.
-          double xRange[2];
-          tf->GetRange(xRange);
-          // Keep adding control points past point i until we reach a multiple of nc.
-          int nc_mod = (((i + 1) / nc) + ((i + 1) % nc ? 1 : 0)) * nc;
-          for (int j = nc; j < nc_mod; ++j)
-            {
-            tf->GetNodeValue(j % nc, nodeValue);
-            tf->AddRGBPoint(xRange[1] + j + 1, nodeValue[1], nodeValue[2], nodeValue[3], nodeValue[4], nodeValue[5]);
+      last = valItem;
+      }
+    valItem = last;
+    // Traverse list from top down searching for our item and counting colors along the way.
+    for (int i = 0; valItem; ++i)
+      {
+      if ( valItem == selectedItem )
+        {
+        if ( nc )
+          { // At least one transfer function control point.
+          double nodeValue[6];
+          if ( i >= nc )
+            { // Need to add control points.
+            double xRange[2];
+            tf->GetRange(xRange);
+            // Keep adding control points past point i until we reach a multiple of nc.
+            int nc_mod = (((i + 1) / nc) + ((i + 1) % nc ? 1 : 0)) * nc;
+            for (int j = nc; j < nc_mod; ++j)
+              {
+              tf->GetNodeValue(j % nc, nodeValue);
+              tf->AddRGBPoint(xRange[1] + j + 1, nodeValue[1], nodeValue[2], nodeValue[3], nodeValue[4], nodeValue[5]);
+              }
+            // Now overwrite the i-th entry with the new color
+            tf->GetNodeValue(i, nodeValue);
+            nodeValue[1] = newColor.redF();
+            nodeValue[2] = newColor.greenF();
+            nodeValue[3] = newColor.blueF();
+            tf->SetNodeValue(i, nodeValue);
             }
-          // Now overwrite the i-th entry with the new color
-          tf->GetNodeValue(i, nodeValue);
-          nodeValue[1] = newColor.redF();
-          nodeValue[2] = newColor.greenF();
-          nodeValue[3] = newColor.blueF();
-          tf->SetNodeValue(i, nodeValue);
+          else
+            { // No need to add control points.
+            tf->GetNodeValue( i % nc, nodeValue );
+            nodeValue[1] = newColor.redF();
+            nodeValue[2] = newColor.greenF();
+            nodeValue[3] = newColor.blueF();
+            tf->SetNodeValue( i, nodeValue );
+            }
           }
         else
-          { // No need to add control points.
-          tf->GetNodeValue( i % nc, nodeValue );
-          nodeValue[1] = newColor.redF();
-          nodeValue[2] = newColor.greenF();
-          nodeValue[3] = newColor.blueF();
-          tf->SetNodeValue( i, nodeValue );
-          }
-        }
-      else
-        {
-        // No transfer function control points.
-        // Insert NanColor entries up to our selection and then add the new color as the last entry.
-        QColor nan(this->Form->NanColor->chosenColor());
-        for (int j = 0; j < i - 1; ++j)
           {
-          tf->AddRGBPoint(j / (i - 1.), nan.redF(), nan.greenF(), nan.blueF());
+          // No transfer function control points.
+          // Insert NanColor entries up to our selection and then add the new color as the last entry.
+          QColor nan(this->Form->NanColor->chosenColor());
+          for (int j = 0; j < i - 1; ++j)
+            {
+            tf->AddRGBPoint(j / (i - 1.), nan.redF(), nan.greenF(), nan.blueF());
+            }
+          tf->AddRGBPoint(1., newColor.redF(), newColor.greenF(), newColor.blueF());
           }
-        tf->AddRGBPoint(1., newColor.redF(), newColor.greenF(), newColor.blueF());
+        this->pushColors();
+        this->updateAnnotationColors();
+        break;
         }
-      this->pushColors();
-      this->updateAnnotationColors();
-      break;
+      valItem = this->Form->AnnotationTree->itemBelow(valItem);
       }
-    valItem = this->Form->AnnotationTree->itemBelow(valItem);
+    this->Form->AnnotationSwatch->blockSignals(false);
     }
-  this->Form->AnnotationSwatch->blockSignals(false);
+  else
+    {
+    double xRange[2];
+    tf->GetRange(xRange);
+    double nodeValue[6];
+    double xSel = selectedItem->data( PQ_ANN_VALUE_COL, Qt::DisplayRole ).toDouble();
+    for (int i = 0; i < nc; ++i)
+      {
+      tf->GetNodeValue(i, nodeValue);
+      if (nodeValue[0] == xSel)
+        {
+        nodeValue[1] = newColor.redF();
+        nodeValue[2] = newColor.greenF();
+        nodeValue[3] = newColor.blueF();
+        tf->SetNodeValue(i, nodeValue);
+        this->pushColors();
+        this->updateAnnotationColors();
+        return;
+        }
+      }
+    // We made it here by not finding a matching control point. Add one:
+    tf->AddRGBPoint(xSel, newColor.redF(), newColor.greenF(), newColor.blueF());
+    this->pushColors();
+    this->updateAnnotationColors();
+    }
 }
 
 void pqColorScaleEditor::checkForLegend()
@@ -1941,9 +2000,29 @@ void pqColorScaleEditor::loadAnnotations()
     vtkColorTransferFunction* tf = this->currentColorFunction();
     if ( tf && tf->GetSize() )
       {
-      double nodeValue[6];
-      tf->GetNodeValue((i / 2) % tf->GetSize(), nodeValue);
-      valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(nodeValue[1], nodeValue[2], nodeValue[3]));
+      vtkColor3d color;
+      if (tf->GetIndexedLookup())
+        {
+        double nodeValue[6];
+        tf->GetNodeValue((i / 2) % tf->GetSize(), nodeValue);
+        for (int j = 0; j < 3; ++j)
+          {
+          color[j] = nodeValue[j+1];
+          }
+        }
+      else
+        {
+        bool ok;
+        double dval = list[i].toDouble(&ok);
+        if (!ok)
+          {
+          // Retrieve the NaN color. Not all vtkScalarsToColors
+          // subclasses have one, so we are stuck using GetColor.
+          dval = vtkMath::Nan();
+          }
+        tf->GetColor(dval, color.GetData());
+        }
+      valItem->setData(PQ_ANN_VALUE_COL, Qt::DecorationRole, QColor::fromRgbF(color[0], color[1], color[2]));
       }
     }
   this->Form->InSetAnnotation = false;
@@ -2362,6 +2441,18 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
     this->Form->Links.addPropertyLink(this->Form->AspectRatio,
                                       "value", SIGNAL(valueChanged(double)),
                                       proxy, proxy->GetProperty("AspectRatio"));
+    this->Form->Links.addPropertyLink(this->Form->DrawAnnotations,
+        "checked", SIGNAL(toggled(bool)),
+        proxy, proxy->GetProperty("DrawAnnotations"));
+    this->Form->Links.addPropertyLink(this->Form->DrawNanAnnotation,
+        "checked", SIGNAL(toggled(bool)),
+        proxy, proxy->GetProperty("DrawNanAnnotation"));
+    this->Form->Links.addPropertyLink(this->Form->NanAnnotation,
+        "text", SIGNAL(textChanged(const QString&)),
+        proxy, proxy->GetProperty("NanAnnotation"));
+    this->Form->Links.addPropertyLink(this->Form->TextPosition,
+        "checked", SIGNAL(toggled(bool)),
+        proxy, proxy->GetProperty("TextPosition"));
 
     // this manages the linking between the global properties and the color
     // properties.
