@@ -333,20 +333,20 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
 
   this->SetNumberOfScalarComponents(numComponents);
 
-  width  = m_NiftiImage->dim[1];
-  height = m_NiftiImage->dim[2];
-  depth  = m_NiftiImage->dim[3];
+  this->diskDimensions[0] = m_NiftiImage->dim[1];
+  this->diskDimensions[1] = m_NiftiImage->dim[2];
+  this->diskDimensions[2] = m_NiftiImage->dim[3];
 
-  this->DataExtent[0] = 0;
-  this->DataExtent[1] = m_NiftiImage->dim[1] - 1;
-  this->DataExtent[2] = 0;
-  this->DataExtent[3] = m_NiftiImage->dim[2] - 1;
-  this->DataExtent[4] = 0;
-  this->DataExtent[5] = m_NiftiImage->dim[3] - 1;
+  this->diskExtent[0] = 0;
+  this->diskExtent[1] = m_NiftiImage->dim[1] - 1;
+  this->diskExtent[2] = 0;
+  this->diskExtent[3] = m_NiftiImage->dim[2] - 1;
+  this->diskExtent[4] = 0;
+  this->diskExtent[5] = m_NiftiImage->dim[3] - 1;
 
-  this->DataSpacing[0] = m_NiftiImage->pixdim[1];
-  this->DataSpacing[1] = m_NiftiImage->pixdim[2];
-  this->DataSpacing[2] = m_NiftiImage->pixdim[3];
+  this->diskSpacing[0] = m_NiftiImage->pixdim[1];
+  this->diskSpacing[1] = m_NiftiImage->pixdim[2];
+  this->diskSpacing[2] = m_NiftiImage->pixdim[3];
 
   //this->DataOrigin[0] = -128.5;
   //this->DataOrigin[1] = -127.5;
@@ -371,6 +371,70 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     } else {
     this->SetDataByteOrderToLittleEndian();
     }
+
+
+  int InPlaceFilteredAxes[3];
+
+  InPlaceFilteredAxes[0]=0;
+  InPlaceFilteredAxes[1]=1;
+  InPlaceFilteredAxes[2]=2;
+
+  switch(orientation){
+    case 0: {
+    }
+    break;
+    case 1: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      }
+    break;
+    case 2: {
+      InPlaceFilteredAxes[0]=2;
+      InPlaceFilteredAxes[1]=0;
+      InPlaceFilteredAxes[2]=1;
+    }
+    break;
+    case 3: {
+    }
+    break;
+    case 4: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+    }
+    break;
+    case 5: {
+      InPlaceFilteredAxes[0]=2;
+      InPlaceFilteredAxes[1]=0;
+      InPlaceFilteredAxes[2]=1;
+    }
+    break;
+    case 6: {
+    }
+    break;
+    case 255: {
+    }
+    break;
+    default: {
+    }
+    break;
+    }
+
+  this->voxelDimensions[0] = this->diskDimensions[InPlaceFilteredAxes[0]];
+  this->voxelDimensions[1] = this->diskDimensions[InPlaceFilteredAxes[1]];
+  this->voxelDimensions[2] = this->diskDimensions[InPlaceFilteredAxes[2]];
+
+  this->DataExtent[0] = this->diskExtent[(InPlaceFilteredAxes[0]*2)];
+  this->DataExtent[1] = this->diskExtent[(InPlaceFilteredAxes[0]*2) + 1];
+  this->DataExtent[2] = this->diskExtent[(InPlaceFilteredAxes[1]*2)];
+  this->DataExtent[3] = this->diskExtent[(InPlaceFilteredAxes[1]*2) + 1];
+  this->DataExtent[4] = this->diskExtent[(InPlaceFilteredAxes[2]*2)];
+  this->DataExtent[5] = this->diskExtent[(InPlaceFilteredAxes[2]*2) + 1];
+
+  this->DataSpacing[0] = this->diskSpacing[InPlaceFilteredAxes[0]];
+  this->DataSpacing[1] = this->diskSpacing[InPlaceFilteredAxes[1]];
+  this->DataSpacing[2] = this->diskSpacing[InPlaceFilteredAxes[2]];
 
   this->vtkImageReader::ExecuteInformation();
 
@@ -447,10 +511,6 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
   unsigned char shiftedBit;
   int bitCount;
   //int binaryOnDiskWidth = width;
-  //int binaryOnDiskHeight = height;
-  //int binaryOnDiskDepth = depth;
-
-  
   double tempSize = binaryOnDiskWidth * binaryOnDiskHeight;
   double onDiskDoubleSliceSizeInBytes = tempSize * dataTypeSize;
   int onDiskIntSliceSizeInBytes = (int) onDiskDoubleSliceSizeInBytes;
@@ -461,9 +521,9 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
   //int scalarSizeInBits = (int) (dataTypeSize * 8);
 
   int inDim[3];
-  inDim[0] = width;
-  inDim[1] = height;
-  inDim[2] = depth;
+  inDim[0] = this->voxelDimensions[0];
+  inDim[1] = this->voxelDimensions[1];
+  inDim[2] = this->voxelDimensions[2];
 
   double rowDoubleMemorySizeInBytes = inDim[0] * dataTypeSize;
   int rowIntMemorySizeInBytes = (int) rowDoubleMemorySizeInBytes;
@@ -652,7 +712,11 @@ void vtkAnalyzeReader::vtkAnalyzeReaderUpdateVTKBit(vtkImageData * vtkNotUsed(da
 
     unsignedOutP[count] = newByte;
     }
-
+  if(p!=NULL){
+    delete [] p;
+    p = NULL;
+    unsignedP = NULL;
+  }
 }
 
 
@@ -766,18 +830,33 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   }
     break;
   case 1: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
   }
     break;
   case 2: {
+      InPlaceFilteredAxes[0]=2;
+      InPlaceFilteredAxes[1]=0;
+      InPlaceFilteredAxes[2]=1;
   }
     break;
   case 3: {
+      flipAxis[1] = 1;
   }
     break;
   case 4: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
   }
     break;
   case 5: {
+      InPlaceFilteredAxes[0]=2;
+      InPlaceFilteredAxes[1]=0;
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
   }
     break;
   case 6: {
@@ -796,9 +875,9 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     }
 
   for (count=0;count<3;count++){
-    inDim[count] = (this->DataExtent[(count*2)+1] - this->DataExtent[count*2]) + 1;
-    inExtent[count*2] = this->DataExtent[count*2];
-    inExtent[(count*2)+1] = this->DataExtent[(count*2)+1];
+    inDim[count] = (this->diskExtent[(count*2)+1] - this->diskExtent[count*2]) + 1;
+    inExtent[count*2] = this->diskExtent[count*2];
+    inExtent[(count*2)+1] = this->diskExtent[(count*2)+1];
     }
 
   inStride[0] =                       scalarSize;
@@ -832,6 +911,10 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
     if (tempSizeInt!=tempSizeDouble){
       tempSizeInt++;
       }
+  if(tempUnsignedCharData!=NULL){
+    delete [] tempUnsignedCharData;
+    tempUnsignedCharData = NULL;
+  }
     tempUnsignedCharData = new unsigned char[tempSizeInt];
     }
 
@@ -867,15 +950,14 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
   for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
     for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
       for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
+        inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
+        //inOffset = (inIndex[2] * inStride[2]) + (inIndex[1] * inStride[1]) + (inIndex[0] * inStride[0]);
         if(tempScalarTypeValue!=1){
-          inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
           for (idSize = 0; idSize < scalarSize ; idSize++){
             charInOffset = inOffset + idSize;
             tempUnsignedCharData[count++] = outUnsignedCharPtr[charInOffset];
             }
           } else {
-          inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
-
           inOffsetByte = inOffset / 8;
           inOffsetBit = inOffset % 8;
 
@@ -1073,8 +1155,10 @@ Note: Index0 is fastest-varying (innermost-nested) index, Index2 the outermost.
         }
       }
     }
-  delete tempUnsignedCharData;
+  if(tempUnsignedCharData!=NULL){
+  delete [] tempUnsignedCharData;
   tempUnsignedCharData = NULL;
+  }
 
   vtkFieldData *fa = data->GetFieldData();
 

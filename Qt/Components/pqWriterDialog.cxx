@@ -29,112 +29,67 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqWriterDialog.h"
+#include "ui_pqWriterDialog.h"
 
 // Qt includes
 #include <QGridLayout>
-#include <QApplication>
-#include <QStyle>
-#include <QStyleOption>
-#include "ui_pqWriterDialog.h"
+#include <QPointer>
 
 // ParaView Server Manager includes
-#include <vtkSMProxy.h>
-
-#include "pqPropertyManager.h"
-#include "pqNamedWidgets.h"
+#include "pqProxyWidget.h"
+#include "vtkSMProxy.h"
+#include "vtkWeakPointer.h"
 
 class pqWriterDialog::pqImplementation
 {
 public:
-  pqImplementation()
-  {
-  }
-  ~pqImplementation()
-  {
-    delete this->PropertyManager;
-  }
-  
-  vtkSMProxy *Proxy;
+  vtkWeakPointer<vtkSMProxy> Proxy;
   Ui::pqWriterDialog UI;
-  pqPropertyManager* PropertyManager;
+  QPointer<pqProxyWidget> ProxyWidget;
+  bool HasConfigurableProperties;
 
+  pqImplementation() : HasConfigurableProperties(false) {}
 };
 
 //-----------------------------------------------------------------------------
-pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) :
-   QDialog(p), 
+pqWriterDialog::pqWriterDialog(vtkSMProxy *proxy, QWidget *p) : Superclass(p), 
   Implementation(new pqImplementation())
 {
-  this->Implementation->UI.setupUi(this);
-
-  this->Implementation->PropertyManager = new pqPropertyManager(this);
-
-  QGridLayout *propertyFrameLayout = new QGridLayout(this->Implementation->UI.PropertyFrame);
   this->Implementation->Proxy = proxy;
+  this->Implementation->UI.setupUi(this);
+  this->Implementation->ProxyWidget = new pqProxyWidget(proxy, this);
+  QVBoxLayout* vbox = new QVBoxLayout(this->Implementation->UI.Container);
+  vbox->addWidget(this->Implementation->ProxyWidget);
+  vbox->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum,
+      QSizePolicy::Expanding));
 
-  // Create the widgets inside "propertyFrameLayout"
-  pqNamedWidgets::createWidgets(propertyFrameLayout,this->Implementation->Proxy);
-  pqNamedWidgets::link(this->Implementation->UI.PropertyFrame, 
-                       this->Implementation->Proxy, 
-                       this->Implementation->PropertyManager);
+  this->Implementation->HasConfigurableProperties =
+    this->Implementation->ProxyWidget->filterWidgets(true);
 }
 
 //-----------------------------------------------------------------------------
 pqWriterDialog::~pqWriterDialog()
 {
-  pqNamedWidgets::unlink(this->Implementation->UI.PropertyFrame, 
-                         this->Implementation->Proxy, 
-                         this->Implementation->PropertyManager);
-
   delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
 bool pqWriterDialog::hasConfigurableProperties()
 {
-  // If there are no configurable properties then the frame's only child  
-  //  should be the QGridLayout object.
-
-  return (this->Implementation->UI.PropertyFrame->children().count()>1) ? true : false;
+  return this->Implementation->HasConfigurableProperties;
 }
 
 //-----------------------------------------------------------------------------
 void pqWriterDialog::accept()
 {
-  this->Implementation->PropertyManager->accept();
-
+  this->Implementation->ProxyWidget->apply();
   this->done(QDialog::Accepted);
 }
 
 //-----------------------------------------------------------------------------
 void pqWriterDialog::reject()
 {
-  this->Implementation->PropertyManager->reject();
-
-  pqNamedWidgets::unlink(this->Implementation->UI.PropertyFrame, 
-                         this->Implementation->Proxy, 
-                         this->Implementation->PropertyManager);
-
+  this->Implementation->ProxyWidget->reset();
   this->done(QDialog::Rejected);
 }
-
-//-----------------------------------------------------------------------------
-QSize pqWriterDialog::sizeHint() const
-{
-  // return a size hint that would reasonably fit several properties
-  ensurePolished();
-  QFontMetrics fm(font());
-  int h = 20 * (qMax(fm.lineSpacing(), 14));
-  int w = fm.width('x') * 25;
-  QStyleOptionFrame opt;
-  opt.rect = rect();
-  opt.palette = palette();
-  opt.state = QStyle::State_None;
-  return (style()->sizeFromContents(
-              QStyle::CT_LineEdit, &opt, QSize(w, h).
-              expandedTo(QApplication::globalStrut()), this));
-}
-
-

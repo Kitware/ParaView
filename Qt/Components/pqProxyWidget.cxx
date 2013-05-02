@@ -139,6 +139,26 @@ namespace
     return decoratorTypes;
     }
 
+  void DetermineLegacyHiddenProperties(QSet<QString> &properties, vtkSMProxy* proxy)
+    {
+    vtkPVXMLElement* hints = proxy->GetHints();
+    if (!hints)
+      {
+      return;
+      }
+
+    for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child->GetName() && strcmp(child->GetName(), "Property") == 0 &&
+          child->GetAttribute("name") &&
+          strcmp(child->GetAttributeOrEmpty("show"), "0") == 0)
+        {
+        properties.insert(child->GetAttribute("name"));
+        }
+      }
+    }
+
   // class corresponding to a single widget for a property/properties.
   class pqProxyWidgetItem : public QObject
     {
@@ -691,6 +711,13 @@ void pqProxyWidget::createPropertyWidgets()
       }
     }
 
+  // Handle legacy-hidden properties: previously, developers hid properties from
+  // panels by adding XML in the hints section. We need to ensure that that
+  // works too. So, we'll scan the hints and create a list of properties to
+  // hide.
+  QSet<QString> legacyHiddenProperties;
+  DetermineLegacyHiddenProperties(legacyHiddenProperties, smproxy);
+
   // iterate over each property, and create corresponding widgets
   vtkNew<vtkSMOrderedPropertyIterator> propertyIter;
   propertyIter->SetProxy(smproxy);
@@ -702,7 +729,7 @@ void pqProxyWidget::createPropertyWidgets()
       {
       // skip information only properties
       PV_DEBUG_PANELS()
-        << "Property:" << smproxy->GetPropertyName(smProperty)
+        << "Property:" << propertyIter->GetKey()
         << " (" << smProperty->GetXMLLabel() << ")"
         << " gets skipped because it is an information only property";
       PV_DEBUG_PANELS() << ""; // this adds a newline.
@@ -713,7 +740,7 @@ void pqProxyWidget::createPropertyWidgets()
       {
       // skip internal properties
       PV_DEBUG_PANELS()
-        << "Property:" << smproxy->GetPropertyName(smProperty)
+        << "Property:" << propertyIter->GetKey()
         << " (" << smProperty->GetXMLLabel() << ")"
         << " gets skipped because it is an internal property";
       PV_DEBUG_PANELS() << ""; // this adds a newline.
@@ -724,10 +751,20 @@ void pqProxyWidget::createPropertyWidgets()
       {
       // skip properties marked as never show
       PV_DEBUG_PANELS()
-        << "Property:" << smproxy->GetPropertyName(smProperty)
+        << "Property:" << propertyIter->GetKey()
         << "(" << smProperty->GetXMLLabel() << ")"
         << " gets skipped because it has panel_visibility of \"never\"";
       PV_DEBUG_PANELS() << ""; // this adds a newline.
+      continue;
+      }
+
+    if (legacyHiddenProperties.contains(propertyIter->GetKey()))
+      {
+      // skipping properties marked with "show=0" in the hints section.
+      PV_DEBUG_PANELS()
+        << "Property:" << propertyIter->GetKey()
+        << "(" << smProperty->GetXMLLabel() << ")"
+        << " gets skipped because is has show='0' specified in the Hints.";
       continue;
       }
 
@@ -766,7 +803,7 @@ void pqProxyWidget::createPropertyWidgets()
       {
       PV_DEBUG_PANELS()
         << "Property:"
-        << smproxy->GetPropertyName(smProperty)
+        << propertyIter->GetKey()
         << "(" << smProperty->GetXMLLabel() << ")"
         << " gets skipped as we could not determine the widget type to create.";
       continue;

@@ -48,10 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \class pqWriterDialog
 /// \brief
 ///   The pqWriterDialog class is used to display the properties
-///   of a writer proxy in an editable form.
+///   of a writer proxy in an editable form. pqWriterDialog uses pqProxyWidget
+///   to create the panel for the writer proxy, if needed.
 class PQCOMPONENTS_EXPORT pqWriterDialog : public QDialog
 {
   Q_OBJECT
+  typedef QDialog Superclass;
 public:
   pqWriterDialog(vtkSMProxy *proxy, QWidget *parent=0);
   virtual ~pqWriterDialog();
@@ -60,9 +62,6 @@ public:
   /// This could be zero once the properties in the hints are hidden.
   bool hasConfigurableProperties();
 
-  /// hint for sizing this widget
-  virtual QSize sizeHint() const;
-  
 private:
   /// The ok button was pressed.
   /// Accept the changes made to the properties

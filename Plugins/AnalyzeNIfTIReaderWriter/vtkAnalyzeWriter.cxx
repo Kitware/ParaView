@@ -253,6 +253,17 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
   nifti_1_header tempNiftiHeader;
   unsigned char * headerUnsignedCharArrayPtr = (unsigned char *) &tempNiftiHeader;
   int count;
+  int flipAxis[3];
+  int InPlaceFilteredAxes[3];
+  this->orientation = 0;
+
+  flipAxis[0] = 0;
+  flipAxis[1] = 0;
+  flipAxis[2] = 0;
+
+  InPlaceFilteredAxes[0]=0;
+  InPlaceFilteredAxes[1]=1;
+  InPlaceFilteredAxes[2]=2;
 
   //this->headerUnsignedCharArrayPtr = new unsigned char[this->headerSize];
 
@@ -263,6 +274,64 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
       headerUnsignedCharArrayPtr[count] = headerUnsignedCharArray->GetValue(count);
       }
     m_NiftiImage = vtknifti1_io::nifti_convert_nhdr2nim(tempNiftiHeader, HeaderFileName.c_str());
+    this->orientation = m_NiftiImage->analyze75_orient;
+
+      if (this->orientation>0){
+
+       switch(this->orientation){
+    case 0: {
+    }
+    break;
+    case 1: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      }
+    break;
+    case 2: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
+    }
+    break;
+    case 3: {
+      flipAxis[1] = 1;
+    }
+    break;
+    case 4: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+    }
+    break;
+    case 5: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+    }
+    break;
+    case 6: {
+    }
+    break;
+    case 255: {
+    }
+    break;
+    default: {
+    }
+    break;
+       }
+    }
+
+    savedFlipAxis[0] = flipAxis[0];
+    savedFlipAxis[1] = flipAxis[1];
+    savedFlipAxis[2] = flipAxis[2];
+
+    savedInPlaceFilteredAxes[0] = InPlaceFilteredAxes[0];
+    savedInPlaceFilteredAxes[1] = InPlaceFilteredAxes[1];
+    savedInPlaceFilteredAxes[2] = InPlaceFilteredAxes[2];
+
     } else if(foundNiftiHeader){
     for(count=0;count<headerSize;count++){
       headerUnsignedCharArrayPtr[count] = headerUnsignedCharArray->GetValue(count);
@@ -271,6 +340,7 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
     int qform_code = m_NiftiImage->qform_code;
     int sform_code = m_NiftiImage->sform_code;
+    this->orientation = m_NiftiImage->analyze75_orient;
 
     int row,col;
     double **q;
@@ -290,17 +360,6 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
         q[row][col] = m_NiftiImage->qto_xyz.m[row][col];
         }
       }
-
-    int flipAxis[3];
-    int InPlaceFilteredAxes[3];
-
-    flipAxis[0] = 0;
-    flipAxis[1] = 0;
-    flipAxis[2] = 0;
-
-    InPlaceFilteredAxes[0]=0;
-    InPlaceFilteredAxes[1]=1;
-    InPlaceFilteredAxes[2]=2;
 
     if(sform_code>0){
       if(s[0][0]>=1.0){
@@ -430,6 +489,52 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
         InPlaceFilteredAxes[2]=2;
         flipAxis[2] = 1;
         }
+      } else if (this->orientation>0){
+
+       switch(this->orientation){
+    case 0: {
+    }
+    break;
+    case 1: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      }
+    break;
+    case 2: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
+    }
+    break;
+    case 3: {
+      flipAxis[1] = 1;
+    }
+    break;
+    case 4: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      flipAxis[2] = 1;
+    }
+    break;
+    case 5: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
+      flipAxis[2] = 1;
+    }
+    break;
+    case 6: {
+    }
+    break;
+    case 255: {
+    }
+    break;
+    default: {
+    }
+    break;
+       }
       }
 
 
@@ -482,10 +587,38 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
 
   m_NiftiImage->qfac = 1.0 ;
 
+  int inExt[6];
+  int outExt[6];
+  double inSpacing[3];
+  double outSpacing[3];
+
+  inExt[0] = wholeExtent[0];
+  inExt[1] = wholeExtent[1];
+  inExt[2] = wholeExtent[2];
+  inExt[3] = wholeExtent[3];
+  inExt[4] = wholeExtent[4];
+  inExt[5] = wholeExtent[5];
+
+  inSpacing[0] = spacing[0];
+  inSpacing[1] = spacing[1];
+  inSpacing[2] = spacing[2];
+
+
+  outExt[0] = inExt[(InPlaceFilteredAxes[0]*2)];
+  outExt[1] = inExt[(InPlaceFilteredAxes[0]*2) + 1];
+  outExt[2] = inExt[(InPlaceFilteredAxes[1]*2)];
+  outExt[3] = inExt[(InPlaceFilteredAxes[1]*2) + 1];
+  outExt[4] = inExt[(InPlaceFilteredAxes[2]*2)];
+  outExt[5] = inExt[(InPlaceFilteredAxes[2]*2) + 1];
+
+  outSpacing[0] = inSpacing[InPlaceFilteredAxes[0]];
+  outSpacing[1] = inSpacing[InPlaceFilteredAxes[0]];
+  outSpacing[2] = inSpacing[InPlaceFilteredAxes[0]];
+
   m_NiftiImage->ndim = 4;
-  m_NiftiImage->dim[1] = wholeExtent[1] + 1;
-  m_NiftiImage->dim[2] = wholeExtent[3] + 1;
-  m_NiftiImage->dim[3] = wholeExtent[5] + 1;
+  m_NiftiImage->dim[1] = outExt[1] + 1;
+  m_NiftiImage->dim[2] = outExt[3] + 1;
+  m_NiftiImage->dim[3] = outExt[5] + 1;
   m_NiftiImage->dim[4] = 1;
   m_NiftiImage->dim[5] = 0;
   m_NiftiImage->dim[6] = 0;
@@ -499,9 +632,9 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
   m_NiftiImage->nw =  m_NiftiImage->dim[7];
 
   nhdr.pixdim[0] = 0.0 ;
-  m_NiftiImage->pixdim[1] = spacing[0];
-  m_NiftiImage->pixdim[2] = spacing[1];
-  m_NiftiImage->pixdim[3] = spacing[2];
+  m_NiftiImage->pixdim[1] = outSpacing[0];
+  m_NiftiImage->pixdim[2] = outSpacing[1];
+  m_NiftiImage->pixdim[3] = outSpacing[2];
   m_NiftiImage->pixdim[4] = 0;
   m_NiftiImage->pixdim[5] = 0;
   m_NiftiImage->pixdim[6] = 0;
@@ -632,7 +765,7 @@ void vtkAnalyzeWriter::WriteFileHeader(ofstream * vtkNotUsed(file),
   nhdr.extents = 16384;
   unsigned char * niftiHeaderPtr = (unsigned char *) &nhdr;
   niftiHeaderPtr[orientPosition] = headerUnsignedCharArray->GetValue(orientPosition);
-  orientation = niftiHeaderPtr[orientPosition];
+  this->orientation = niftiHeaderPtr[orientPosition];
   // write the header and extensions
 
   ss = vtkznzlib::znzwrite(&nhdr , 1 , sizeof(nhdr) , fp); // write header
@@ -713,6 +846,12 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   InPlaceFilteredAxes[1]=1;
   InPlaceFilteredAxes[2]=2;
 
+  int postFlipAxis[3];
+
+  postFlipAxis[0] = 0;
+  postFlipAxis[1] = 0;
+  postFlipAxis[2] = 0;
+
   //now flip if historic incorrect behavior is desired
   if(fixFlipError==false){
     flipAxis[0] = 1;
@@ -728,18 +867,33 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
   }
     break;
   case 1: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
   }
     break;
   case 2: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
   }
     break;
   case 3: {
+      postFlipAxis[1] = 1;
   }
     break;
   case 4: {
+      InPlaceFilteredAxes[0]=0;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=1;
+      postFlipAxis[1] = 1;
   }
     break;
   case 5: {
+      InPlaceFilteredAxes[0]=1;
+      InPlaceFilteredAxes[1]=2;
+      InPlaceFilteredAxes[2]=0;
+      postFlipAxis[1] = 1;
   }
     break;
   case 6: {
@@ -799,6 +953,10 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     if (tempSizeInt!=tempSizeDouble){
       tempSizeInt++;
       }
+  if(tempUnsignedCharData!=NULL){
+    delete [] tempUnsignedCharData;
+    tempUnsignedCharData = NULL;
+  }
     tempUnsignedCharData = new unsigned char[tempSizeInt];
     }
   
@@ -923,9 +1081,6 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
 
   // then permute
 
-  delete tempUnsignedCharData;
-  tempUnsignedCharData = NULL;
-
   double tempSize = outDim[0] * outDim[1];
   double tempSliceSize = tempSize * dataTypeSize;
   int tempSliceSizeInt = (int) tempSliceSize;
@@ -934,12 +1089,54 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     }
   int onDiskImageSizeInBytes = tempSliceSizeInt * outDim[2];
 
+  if(tempUnsignedCharData!=NULL){
+  delete [] tempUnsignedCharData;
+  tempUnsignedCharData = NULL;
+  }
   tempUnsignedCharData = new unsigned char[onDiskImageSizeInBytes];
 
   if (imageDataType!=VTK_BIT){
-    for (count = 0 ; count < onDiskImageSizeInBytes ; count++){
-      tempUnsignedCharData[count] = tempOutUnsignedCharData[count];
+  //too easy
+    //for (count = 0 ; count < onDiskImageSizeInBytes ; count++){
+    //  tempUnsignedCharData[count] = tempOutUnsignedCharData[count];
+    //}
+
+  // Loop through input voxels
+  count = 0;
+  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
+    for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
+      for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
+        inOffset = (inIndex[2] * outStride[2]) + (inIndex[1] * outStride[1]) + (inIndex[0] * outStride[0]);
+        //inOffset = (inIndex[2] * inStride[2]) + (inIndex[1] * inStride[1]) + (inIndex[0] * inStride[0]);
+          for (idSize = 0; idSize < scalarSize ; idSize++){
+            charInOffset = inOffset + idSize;
+            tempUnsignedCharData[count++] = tempOutUnsignedCharData[charInOffset];
       }
+      }
+    }
+  }
+
+    //for (count = 0 ; count < onDiskImageSizeInBytes ; count++){
+      //tempOutUnsignedCharData[count] = tempUnsignedCharData[count];
+    //}
+
+    // Loop through output voxels
+  count = 0;
+  for (idZ = 0 ; idZ < outDim[2] ; idZ++){
+    outSliceOffset = idZ * outSliceSize;
+    for (idY = 0; idY < outDim[1]; idY++){
+      outRowOffset = idY * outRowSize;
+      for (idX = 0; idX < outDim[0]  ; idX++){
+          outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
+          //outOffset = (idZ * outDim[0] * outDim[1]) + (idY * outDim[0]) + (idX * scalarSize);
+          for (idSize = 0; idSize < scalarSize ; idSize++){
+            charOutOffset = outOffset + idSize;
+            tempOutUnsignedCharData[charOutOffset] = tempUnsignedCharData[count++];
+          }
+      }
+    }
+  }
+
     } else {
     // Loop through input voxels
     int totalBitCount = 0;
@@ -978,11 +1175,86 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
         }
       }
     (void) outTotalBitNumber;
-    }
-  char * outP = (char *) (tempUnsignedCharData);
 
-  delete tempOutUnsignedCharData;
-  tempOutUnsignedCharData = NULL;
+  //now loop through the output
+    for (count = 0 ; count < onDiskImageSizeInBytes ; count++){
+      tempOutUnsignedCharData[count] = tempUnsignedCharData[count];
+    }
+
+  }
+
+  //post flip
+
+ // Loop through input voxels
+  count = 0;
+  for ( inIndex[2] = 0 ; inIndex[2] < outDim[2] ; inIndex[2]++){
+    if(postFlipAxis[2]==1){
+      flipIndex[2] = ((outDim[2] -1) - inIndex[2]);
+      } else {
+      flipIndex[2] = inIndex[2];
+      }
+    for ( inIndex[1] = 0; inIndex[1] < outDim[1] ; inIndex[1]++){
+      if(postFlipAxis[1]==1){
+        flipIndex[1] = ((outDim[1] -1) - inIndex[1]);
+        } else {
+        flipIndex[1] = inIndex[1];
+        }
+      for (inIndex[0] = 0; inIndex[0] < outDim[0] ; inIndex[0]++){
+        if(postFlipAxis[0]==1){
+          flipIndex[0] = ((outDim[0] -1) - inIndex[0]);
+          } else {
+          flipIndex[0] = inIndex[0];
+          }
+        if(imageDataType!=1){
+          inOffset = (flipIndex[2] * outSliceSize) + (flipIndex[1] * outRowSize) + (flipIndex[0] * scalarSize);
+          for (idSize = 0; idSize < scalarSize ; idSize++){
+            charInOffset = inOffset + idSize;
+            tempUnsignedCharData[count++] = tempOutUnsignedCharData[charInOffset];
+            }
+          } else {
+          inOffset = (flipIndex[2] * outDim[0]*outDim[1]) + (flipIndex[1] *  outDim[0]) + flipIndex[0];
+
+          inOffsetByte = inOffset / 8;
+          inOffsetBit = inOffset % 8;
+
+          inByteValue = tempOutUnsignedCharData[inOffsetByte];
+          inBitValue = (inByteValue >> (inOffsetBit)) & 0x01;
+
+          outBitCount = count % 8;
+          outByteCount = count / 8;
+          shiftedBitValue = inBitValue << (outBitCount);
+          tempUnsignedCharData[outByteCount] += shiftedBitValue;
+          count++;
+          }
+        }
+      }
+    }
+
+  // Loop through output voxels
+  if(imageDataType!=1){
+    count = 0;
+    for (idZ = 0 ; idZ < outDim[2] ; idZ++){
+      outSliceOffset = idZ * outSliceSize;
+      for (idY = 0; idY < outDim[1]; idY++){
+        outRowOffset = idY * outRowSize;
+        for (idX = 0; idX < outDim[0]  ; idX++){
+          outOffset = outSliceOffset + outRowOffset + (idX * scalarSize);
+          for (idSize = 0; idSize < scalarSize ; idSize++){
+            charOutOffset = outOffset + idSize;
+            tempOutUnsignedCharData[charOutOffset] = tempUnsignedCharData[count++];
+            }
+          }
+        }
+      }
+    } else if(imageDataType==1){
+    for (count = 0; count < tempSizeInt ; count++){
+      //outUnsignedCharPtr[count] = zeroValue;
+      tempOutUnsignedCharData[count] = tempUnsignedCharData[count];
+      }
+    }
+
+
+  char * outP = (char *) (tempOutUnsignedCharData);
 
   write_data = 1;
   leave_open = 0;
@@ -1005,8 +1277,14 @@ void vtkAnalyzeWriter::WriteFile(ofstream * vtkNotUsed(file), vtkImageData *data
     }
   if( ! leave_open ) vtkznzlib::znzclose(fp);
 
-  delete tempUnsignedCharData;
+  if(tempUnsignedCharData!=NULL){
+  delete [] tempUnsignedCharData;
   tempUnsignedCharData = NULL;
+  }
+  if(tempOutUnsignedCharData!=NULL){
+  delete [] tempOutUnsignedCharData;
+  tempOutUnsignedCharData = NULL;
+  }
   outP = NULL;
 
 }

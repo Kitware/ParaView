@@ -69,6 +69,11 @@
         executed once for each timestep available from the
         reader.</Documentation>
       </IntVectorProperty>
+
+      <PropertyGroup label="File Series">
+        <Property name="WriteAllTimeSteps" />
+      </PropertyGroup>
+
       <!-- End of FileSeriesWriter -->
     </Proxy>
     <!-- ================================================================= -->
@@ -94,6 +99,11 @@
         <SourceProxy class="vtkCompleteArrays"
                      name="CompleteArrays"></SourceProxy>
       </SubProxy>
+
+      <PropertyGroup label="File Series">
+        <Property name="WriteAllTimeSteps" />
+      </PropertyGroup>
+
       <!-- End of ParallelFileSeriesWriter -->
     </Proxy>
     <!-- ================================================================= -->
@@ -141,6 +151,18 @@
         </EnumerationDomain>
         <Documentation>The mode uses for writing the file's data i.e. ascii,
         binary, appended binary.</Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty command="SetHeaderType"
+                         default_values="32"
+                         name="HeaderType"
+                         number_of_elements="1">
+        <EnumerationDomain name="enum">
+          <Entry text="UInt32" value="32" />
+          <Entry text="UInt64" value="64" />
+        </EnumerationDomain>
+        <Documentation>Set the binary data header word type.  The default is
+        UInt32. Set to UInt64 when storing arrays requiring 64-bit indexing.
+        </Documentation>
       </IntVectorProperty>
       <IntVectorProperty command="SetEncodeAppendedData"
                          default_values="0"
