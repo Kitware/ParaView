@@ -30,7 +30,7 @@ public:
   static vtkUncertaintySurfacePainter* New();
   vtkTypeMacro(vtkUncertaintySurfacePainter, vtkPainter)
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Release any graphics resources that are being consumed by this mapper.
   void ReleaseGraphicsResources(vtkWindow *window);
@@ -108,6 +108,9 @@ private:
   int RenderingPreparationSuccess;
   float UncertaintyScaleFactor;
   float ScalarValueRange;
+  GLuint PermTextureId;
+  GLuint SimplexTextureId;
+  GLuint GradTextureId;
 };
 
 #endif // __vtkUncertaintySurfacePainter_h
