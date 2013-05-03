@@ -332,7 +332,7 @@ class ParaViewWebPipelineManager(ParaViewWebProtocol):
                     if array.Name == name:
                         nbComp = array.GetNumberOfComponents()
             elif type == 'CELL_DATA':
-                data = proxy.GetPointDataInformation()
+                data = proxy.GetCellDataInformation()
                 for i in range(data.GetNumberOfArrays()):
                     array = data.GetArray(i)
                     if array.Name == name:
